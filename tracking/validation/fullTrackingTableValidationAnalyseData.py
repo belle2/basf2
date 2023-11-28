@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,7 +20,7 @@ import basf2
 from ROOT import TFile, TNamed
 import os
 
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+VALIDATION_OUTPUT_FILE = "fullTrackingValidationTable.root"
 
 try:
     import uproot  # noqa

@@ -12,11 +12,6 @@ namespace Belle2 {
   namespace Variable {
 
     /**
-     * return cnn_pid_ecl_pion of CNNPIDECLPion
-     */
-    double CNNPIDECLPion(const Particle* part);
-
-    /**
      * return cnn_pid_ecl_muon of CNNPIDECLMuon
      */
     double CNNPIDECLMuon(const Particle* part);

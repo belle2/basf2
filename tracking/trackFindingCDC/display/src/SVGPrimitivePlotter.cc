@@ -79,7 +79,7 @@ void SVGPrimitivePlotter::drawArrow(float startX,
     {"x2", std::to_string(endX)},
     {"y1", std::to_string(startY)},
     {"y2", std::to_string(endY)},
-    {"marker-end" , "url(#endArrow)"}
+    {"marker-end", "url(#endArrow)"}
   };
 
   writeStandAloneTag(m_svgContentStream, "line", geometryAttributeMap, attributeMap);

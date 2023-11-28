@@ -25,10 +25,10 @@ namespace Belle2 {
     typedef unsigned char index_t;
 
     /// Upper limits of the sectors in normalized U coordinates.
-    std::map<double , index_t> m_normalizedUsup;
+    std::map<double, index_t> m_normalizedUsup;
 
     /// Upper limits of the sectors in normalized V coordinates.
-    std::map<double , index_t> m_normalizedVsup;
+    std::map<double, index_t> m_normalizedVsup;
 
     /// The 2D array of the full sec ID is stored in this member.
     /// It is indexed by discretized normalized U V pairs

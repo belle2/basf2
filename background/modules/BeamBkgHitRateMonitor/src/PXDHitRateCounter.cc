@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <background/modules/BeamBkgHitRateMonitor/PXDHitRateCounter.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>

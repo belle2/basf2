@@ -17,8 +17,6 @@
 #include <Math/SpecFuncMathCore.h>
 #include <Math/DistFunc.h>
 
-using namespace std;
-
 namespace Belle2::InvariantMassMuMuCalib {
 
   void InvariantMassMuMuIntegrator::init(double Mean,
@@ -259,7 +257,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     double s0 = integrate([&](double t) {
       return eval(t);
-    }   , 0, m_eps);
+    }, 0, m_eps);
 
 
     double tMin = m_slope * m_tauL;
@@ -279,7 +277,7 @@ namespace Belle2::InvariantMassMuMuCalib {
         return eval(t) / est;
 
 
-      }   , r1, r2);
+      }, r1, r2);
 
       s *= exp((m_m0 - m_x) / m_tauL) * pow(m_tauL, -m_slope + 1) * ROOT::Math::tgamma(1 - m_slope);
 
@@ -297,12 +295,12 @@ namespace Belle2::InvariantMassMuMuCalib {
 
       double s01 = integrate([&](double t) {
         return eval(t);
-      }     , 0, m_m0 - m_x);
+      }, 0, m_m0 - m_x);
 
 
       double s02 = integrate([&](double t) {
         return eval(t);
-      }     , m_m0 - m_x, m_eps);
+      }, m_m0 - m_x, m_eps);
 
 
       double r1 = ROOT::Math::inc_gamma_c(1 - m_slope,   a   / m_tauL);
@@ -315,7 +313,7 @@ namespace Belle2::InvariantMassMuMuCalib {
         return eval(t) / est;
 
 
-      }   , r1, r2);
+      }, r1, r2);
 
       s *= exp((m_m0 - m_x) / m_tauL) * pow(m_tauL, -m_slope + 1) * ROOT::Math::tgamma(1 - m_slope);
 
@@ -345,7 +343,7 @@ namespace Belle2::InvariantMassMuMuCalib {
           return eval(t) / est;
 
 
-        }   , r1, r2);
+        }, r1, r2);
 
         s1 *= exp((m_m0 - m_x) / m_tauL) * pow(m_tauL, -m_slope + 1) * ROOT::Math::tgamma(1 - m_slope);
 
@@ -365,7 +363,7 @@ namespace Belle2::InvariantMassMuMuCalib {
           double t = pow(r * (1 - m_slope), 1. / (1 - m_slope));
           double est = pow(t, -m_slope);
           return eval(t) / est;
-        }   , r1, r2);
+        }, r1, r2);
       }
 
       return (s0 + s1  + s2);
@@ -391,7 +389,7 @@ namespace Belle2::InvariantMassMuMuCalib {
           return eval(t) / est;
 
 
-        }   , r1, r2);
+        }, r1, r2);
 
         s1 *= exp((m_m0 - m_x) / m_tauL) * pow(m_tauL, -m_slope + 1) * ROOT::Math::tgamma(1 - m_slope);
 
@@ -409,7 +407,7 @@ namespace Belle2::InvariantMassMuMuCalib {
           double t = pow(r * (1 - m_slope), 1. / (1 - m_slope));
           double est = pow(t, -m_slope);
           return eval(t) / est;
-        }   , r1, r2);
+        }, r1, r2);
 
       }
 
@@ -425,7 +423,7 @@ namespace Belle2::InvariantMassMuMuCalib {
           double t = log(r / m_tauR) * m_tauR;
           double est = exp(t / m_tauR);
           return eval(t) / est;
-        }   , r1, r2);
+        }, r1, r2);
 
       }
 

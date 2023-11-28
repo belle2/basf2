@@ -11,20 +11,21 @@
 
 # ---------------------------------------------------------------------------------------
 # Unpack raw data to TOPDigits
-# Usage: basf2 unpackToTOPDigits.py -i <input_file.sroot> -o <output_file.root>
+# Usage: basf2 unpackToTOPDigits.py -i <input_file.root> -o <output_file.root>
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
 
-# Define a global tag (note: the one given bellow will become out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+# Define a global tag
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
-# roinput = register_module('RootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
@@ -40,10 +41,9 @@ main.add_module(converter)
 
 # output
 output = b2.register_module('RootOutput')
-output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPInterimFEInfos',
-                             'TOPRawDigitsToTOPInterimFEInfos',
-                             # 'TOPRawWaveforms', 'TOPRawWaveformsToTOPInterimFEInfos',
-                             # 'TOPRawDigitsToTOPRawWaveforms',
+output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPProductionEventDebugs',
+                             'TOPProductionHitDebugs', 'TOPRawDigitsToTOPProductionHitDebugs',
+                             # 'TOPRawWaveforms', 'TOPRawDigitsToTOPRawWaveforms',
                              ])
 main.add_module(output)
 

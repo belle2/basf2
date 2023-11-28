@@ -60,12 +60,12 @@ param_pGun = {
 pGun.param(param_pGun)
 main.add_module(pGun)
 
-# bg = None
 if 'BELLE2_BACKGROUND_DIR' in os.environ:
     bg = glob.glob(os.environ['BELLE2_BACKGROUND_DIR'] + '/*.root')
+    b2.B2INFO('Using background samples from ' +
+              os.environ['BELLE2_BACKGROUND_DIR'])
 else:
-    print('Warning: variable BELLE2_BACKGROUND_DIR is not set')
-b2.B2INFO('Using background samples from ' + os.environ['BELLE2_BACKGROUND_DIR'])
+    b2.B2FATAL('Environment variable BELLE2_BACKGROUND_DIR is not set.')
 
 add_simulation(main, bkgfiles=bg)
 add_reconstruction(main)
@@ -76,5 +76,6 @@ ecldataanalysis.param('rootFileName', '../ECLMuonOutput.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
+main.add_module('Progress')
 b2.process(main)
 # print(statistics)

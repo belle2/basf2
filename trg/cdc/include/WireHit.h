@@ -48,10 +48,10 @@ namespace Belle2 {
     static void removeAll(void);
 
     /// new operator.
-    static void* operator new(size_t);
+    static void* operator new (size_t);
 
     /// delete operator.
-    static void operator delete(void*);
+    static void operator delete (void*);
 
   public:// Selectors
 

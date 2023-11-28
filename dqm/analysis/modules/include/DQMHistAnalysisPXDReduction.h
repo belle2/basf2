@@ -12,24 +12,16 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
+#include <dqm/core/DQMHistAnalysis.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
-
-#include <TH2F.h>
-#include <TCanvas.h>
 #include <TLine.h>
 
-#include <vector>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Reduction */
 
-  class DQMHistAnalysisPXDReductionModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDReductionModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -69,8 +61,18 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
+    //! low warn limit for alarm
+    double m_lowarnlimit{NAN};
+    //! low error limit for alarm
+    double m_loerrorlimit{NAN};
+    //! high warn limit for alarm
+    double m_hiwarnlimit{NAN};
+    //! high error limit for alarm
+    double m_hierrorlimit{NAN};
+    /** Update entry intervall */
+    int m_minEntries = 1000;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -85,14 +87,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! EPICS PVs
-    std::vector <chid>  mychid;
-#endif
   };
 } // end namespace Belle2
 

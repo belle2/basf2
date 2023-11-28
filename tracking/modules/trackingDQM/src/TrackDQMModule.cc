@@ -14,7 +14,6 @@
 
 using namespace Belle2;
 using namespace Belle2::HistogramFactory;
-using namespace std;
 using boost::format;
 
 //-----------------------------------------------------------------
@@ -85,7 +84,7 @@ void TrackDQMModule::defineHisto()
   originalDirectory->cd();
 
   for (auto change : m_histogramParameterChanges)
-    ProcessHistogramParameterChange(get<0>(change), get<1>(change), get<2>(change));
+    ProcessHistogramParameterChange(std::get<0>(change), std::get<1>(change), std::get<2>(change));
 }
 
 void TrackDQMModule::event()

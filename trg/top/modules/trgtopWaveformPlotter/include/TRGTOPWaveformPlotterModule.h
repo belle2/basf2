@@ -76,9 +76,9 @@ namespace Belle2 {
   private:
 
     //! TDirectory
-    TDirectory* oldROOTDir = nullptr;
+    // TDirectory* oldROOTDir = nullptr;
     //! TDirectory
-    TDirectory* myROOTDir = nullptr;
+    // TDirectory* myROOTDir = nullptr;
 
     /** pointer to ROOT file with TTree for efficiecy studies */
     //    TFile* m_file;

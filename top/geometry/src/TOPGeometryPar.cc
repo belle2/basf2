@@ -131,7 +131,7 @@ namespace Belle2 {
     void TOPGeometryPar::finalizeInitialization()
     {
       // set B field flag
-      m_BfieldOn = (BFieldManager::getField(0, 0, 0).Mag() / Unit::T) > 0.1;
+      m_BfieldOn = (BFieldManager::getField(0, 0, 0).R() / Unit::T) > 0.1;
 
       // add call backs for PMT data
       m_pmtInstalled.addCallback(this, &TOPGeometryPar::clearCache);

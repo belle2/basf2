@@ -42,10 +42,6 @@
 // ifstream constructor.
 #include <fstream>
 
-const char* record_strings[] = { "Event", "Begin_run", "Pause", "Resume", "End_run" };
-
-using namespace std;
-
 namespace Belle2 {
 
 
@@ -65,10 +61,10 @@ namespace Belle2 {
     setDescription("Module for the ARICH Beamtest data analysis. It creates track form the MWPC hits and reads the HAPD hits");
 
     //Parameter definition
-    addParam("outputFileName", m_outFile, "Output Root Filename", string("output.root"));
-    vector<string> defaultList;
+    addParam("outputFileName", m_outFile, "Output Root Filename", std::string("output.root"));
+    std::vector<std::string> defaultList;
     addParam("runList", m_runList, "Data Filenames.", defaultList);
-    vector<int> defaultMask;
+    std::vector<int> defaultMask;
     addParam("mwpcTrackMask", m_MwpcTrackMask, "Create track from MWPC layers", defaultMask);
     m_fp = NULL;
     addParam("beamMomentum", m_beamMomentum, "Momentum of the beam [GeV]", 0.0);
@@ -137,7 +133,7 @@ namespace Belle2 {
      for (int i=0;i<6;i++){
       for (int k=0;k<144;k++){
         TVector3 r = _arichgp->getChannelCenterGlob(i + 1, k);
-        dout  << r.x() << " " << r.y() << endl;
+        dout  << r.X() << " " << r.Y() << endl;
       }
      }
      dout.close();
@@ -290,7 +286,7 @@ namespace Belle2 {
               double globalTime = 0;
 
               double rposx = 0, rposy = 0;
-              pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
+              std::pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
               int channel = eposhapd.second;
 
               if ((channel < 108 && channel > 71) || channel < 36) channel = 108 - (int(channel / 6) * 2 + 1) * 6 +
@@ -302,8 +298,8 @@ namespace Belle2 {
               arichDigits.appendNew(module + 1, channel, globalTime);
 
               TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
-              pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
-              m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.x(), rechit.y(), module, channelID, rposx, rposy);
+              std::pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
+              m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.X(), rechit.Y(), module, channelID, rposx, rposy);
             }
           }
         }
@@ -372,20 +368,20 @@ namespace Belle2 {
     dir = dir.Unit();
 
 // end replace by fitter
-    if (dir.z() != 0) {
+    if (dir.Z() != 0) {
       for (int i = 0; i < 4; i++) {
         ARICHTracking* w = &m_mwpc[i];
-        double l = (w->reco[2] - r.z()) / dir.z() ;
+        double l = (w->reco[2] - r.Z()) / dir.Z() ;
         TVector3 rext = r + dir * l;
-        if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.y());
-        if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.x());
+        if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.Y());
+        if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.X());
 
         TAxis* axis =  mwpc_residualsz[i][1]->GetYaxis();
         for (int k = 0; k < axis->GetNbins(); k++) {
-          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.z()) / dir.z();
+          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.Z()) / dir.Z();
           TVector3 rextt = r + dir * ll;
-          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.y(), axis->GetBinCenter(k + 1));
-          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.x(), axis->GetBinCenter(k + 1));
+          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.Y(), axis->GetBinCenter(k + 1));
+          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.X(), axis->GetBinCenter(k + 1));
 
         }
       }
@@ -435,11 +431,11 @@ namespace Belle2 {
         //
         // end track rotation
         //----------------------------------------
-        r[1]  = -r.y();
-        dir[1] = -dir.y();
-        B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<
-                rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<
-                dir.z());
+        r[1]  = -r.Y();
+        dir[1] = -dir.Y();
+        B2DEBUG(50, "-----------> " <<  rc.X() <<  " " << rc.Y() << " " <<   rc.Z() << "::::" << rrel.X() <<  " " << rrel.Y() << " " <<
+                rrel.Z()  << " ----> R " <<   r.X() <<  " " << r.Y() << " " <<   r.Z() << " ----> S " <<   dir.X() <<  " " << dir.Y() << " " <<
+                dir.Z());
 
         // Add new ARIHCAeroHit to datastore
         arichAeroHits.appendNew(particleId, r, dir);
@@ -567,7 +563,7 @@ namespace Belle2 {
   void arichBtestModule::terminate()
   {
     int j = 1;
-    BOOST_FOREACH(const string & fname, m_runList) {
+    BOOST_FOREACH(const std::string & fname, m_runList) {
       B2INFO(m_eveList[j] << " events processed from file " << fname);
       j++;
     }

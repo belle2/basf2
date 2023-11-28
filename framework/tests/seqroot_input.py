@@ -11,7 +11,6 @@
 # Test SeqRootInputModule. Input data is the same as used by chain_input.py
 # (both files)
 
-import os
 import basf2
 from ROOT import Belle2
 import gzip
@@ -92,9 +91,10 @@ with clean_working_directory():
     # and one where the record size is extremely large
     open("10-max.sroot", "wb").write(struct.pack("@i", 0x7fffffff))
 
+    # FIXME: this does not work on GitLab runner.
     # and one without permission
-    open("11-no-permission.sroot", "wb").write(content)
-    os.chmod("11-no-permission.sroot", 0)
+    # open("11-no-permission.sroot", "wb").write(content)
+    # os.chmod("11-no-permission.sroot", 0)
 
     files = sorted(glob.glob("*.sroot") + glob.glob("*.sroot.gz")) + \
         ["nosuchfile.sroot", "/nosuchdir/file.sroot"]

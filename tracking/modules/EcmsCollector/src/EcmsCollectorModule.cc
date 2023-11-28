@@ -15,7 +15,6 @@
 
 
 using namespace Belle2;
-using std::vector;
 
 
 
@@ -48,15 +47,15 @@ void EcmsCollectorModule::prepare()
   tree->Branch<int>("run", &m_run);
   tree->Branch<double>("time", &m_time);
 
-  tree->Branch<vector<double>>("pBcms", &m_pBcms);
-  tree->Branch<vector<double>>("mB", &m_mB);
+  tree->Branch<std::vector<double>>("pBcms", &m_pBcms);
+  tree->Branch<std::vector<double>>("mB", &m_mB);
 
-  tree->Branch<vector<int>>("pdg", &m_pdg);
-  tree->Branch<vector<int>>("mode", &m_mode);
-  tree->Branch<vector<double>>("Kpid", &m_Kpid);
-  tree->Branch<vector<double>>("R2", &m_R2);
-  tree->Branch<vector<double>>("mD", &m_mD);
-  tree->Branch<vector<double>>("dmDstar", &m_dmDstar);
+  tree->Branch<std::vector<int>>("pdg", &m_pdg);
+  tree->Branch<std::vector<int>>("mode", &m_mode);
+  tree->Branch<std::vector<double>>("Kpid", &m_Kpid);
+  tree->Branch<std::vector<double>>("R2", &m_R2);
+  tree->Branch<std::vector<double>>("mD", &m_mD);
+  tree->Branch<std::vector<double>>("dmDstar", &m_dmDstar);
 
 
   // We register the objects so that our framework knows about them.
@@ -94,7 +93,7 @@ void EcmsCollectorModule::collect()
 
 
   //put all the B candidates into the vector
-  vector<const Particle*> Bparts;
+  std::vector<const Particle*> Bparts;
 
   if (B0.isValid()) {
     for (unsigned i = 0; i < B0->getListSize(); ++i)
@@ -143,14 +142,17 @@ void EcmsCollectorModule::collect()
     } else {
       B2INFO("No D meson found");
     }
-    m_mD[i] = D->getMass();
-    const Particle* Kaon =  D->getDaughter(0);
+    if (D != nullptr) {
+      m_mD[i] = D->getMass();
+      const Particle* Kaon =  D->getDaughter(0);
 
-
-
-    m_Kpid[i] = -99;
-    if (Kaon && Kaon->getPIDLikelihood()) {
-      m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
+      m_Kpid[i] = -99;
+      if (Kaon && Kaon->getPIDLikelihood()) {
+        m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
+      }
+    } else {
+      m_mD[i] = -99;
+      m_Kpid[i] = -99;
     }
   }
 

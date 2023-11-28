@@ -9,8 +9,8 @@
 ECL_PHYSICS = [
     "filter Elab gt 0.3 plus 3 others with Elab gt 0.18 plus no clust with Ecms gt 2.0",
     "filter Elab gt 0.5 plus 2 others with Elab gt 0.18 plus no clust with Ecms gt 2.0",
-    "filter ge1 Estargt2 GeV neutral clst 2232 or 130145 not gg2clst ee2clst ee1leg eeBrem",
-    "filter ge1 Estargt2 GeV neutral clst 32130 not gg2clst ee1leg1clst ee1leg1trk eeBrem"
+    "filter ge1 Estargt2 GeV neutral clst 2232 or 130145 not gg2clst ee2clst ee1leg eeBremB",
+    "filter ge1 Estargt2 GeV neutral clst 32130 not gg2clst ee1leg1clst ee1leg1trk eeBremB"
 ]
 
 # ECL Potentially Prescaled channels
@@ -31,10 +31,10 @@ ECL_PRESCALED = [
 
 # CDC Physics channels
 CDC_PHYSICS = [
-    "filter ge3 loose tracks inc 1 tight not ee2leg",
-    "filter 2 loose tracks inc 1 tight q==0 pstarmaxlt0.8 GeVc not eexx",
-    "filter 2 loose tracks 0.8ltpstarmaxlt4.5 GeVc not ee2leg ee1leg1trk eexx",
-    "filter 2 loose tracks pstarmaxgt4.5 GeVc not ee2leg ee1leg1trk ee1leg1e eeBrem muonPairV"
+    "filter ge3 looseB tracks inc 1 tightB not ee2leg",
+    "filter 2 looseB tracks inc 1 tightB q==0 pstarmaxlt0.8 GeVc not eexx",
+    "filter 2 looseB tracks 0.8ltpstarmaxlt4.5 GeVc not ee2leg ee1leg1trk eexx",
+    "filter 2 looseB tracks pstarmaxgt4.5 GeVc not ee2leg ee1leg1trk ee1leg1e eeBremB muonPairVB"
 ]
 
 # CDC Potentially Prescaled channels
@@ -51,9 +51,10 @@ PHYSICS = [
     "filter 1 photon Estargt1 GeV clust in 32130 and no other clust Estargt0.3 GeV",
     "filter 1 photon Estargt0.5 GeV clust in 4498 and no other clust Estargt0.3 GeV",
     "filter ggBarrelLoose",
-    "filter singleTagLowMass",
-    "filter singleTagHighMass",
-    "filter b2b phi photons"
+    "filter singleTagLowMassB",
+    "filter singleTagHighMassB",
+    "filter b2b phi photons",
+    "filter displaced vertex"
 ]
 
 # QED channels
@@ -70,12 +71,13 @@ QED = [
     "filter selectee",
     "filter selee1leg1clst",
     "filter selee1leg1trk",
-    "filter eexxSelect",
-    "filter radiative Bhabha",
+    "filter eexxSelectB",
+    "filter eexxHighP",
+    "filter radiative BhabhaB",
     "filter selectmumu",
     "filter single muon",
     "filter cosmic",
-    "filter rad Bhabha 1trk",
+    "filter rad Bhabha 1trkB",
     "filter Bhabha one cluster"
 ]
 
@@ -99,8 +101,25 @@ VETOES = [
     "filter ee1leg1trk",
     "filter ee2clst",
     "filter ee2leg",
-    "filter eeBrem",
+    "filter eeBremB",
     "filter eexx",
+    "filter muonPairVB"
+]
+
+# Obsolete channels
+OBSOLETE = [
+    "filter ge1 Estargt2 GeV neutral clst 2232 or 130145 not gg2clst ee2clst ee1leg eeBrem",
+    "filter ge1 Estargt2 GeV neutral clst 32130 not gg2clst ee1leg1clst ee1leg1trk eeBrem",
+    "filter ge3 loose tracks inc 1 tight not ee2leg",
+    "filter 2 loose tracks inc 1 tight q==0 pstarmaxlt0.8 GeVc not eexx",
+    "filter 2 loose tracks 0.8ltpstarmaxlt4.5 GeVc not ee2leg ee1leg1trk eexx",
+    "filter 2 loose tracks pstarmaxgt4.5 GeVc not ee2leg ee1leg1trk ee1leg1e eeBrem muonPairV",
+    "filter singleTagLowMass",
+    "filter singleTagHighMass",
+    "filter eexxSelect",
+    "filter radiative Bhabha",
+    "filter rad Bhabha 1trk",
+    "filter eeBrem",
     "filter muonPairV"
 ]
 

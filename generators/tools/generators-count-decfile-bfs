@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+##############################################################################
+# Script to count how often an initial particle decays directly into another in the dec file.
+# The dec file lines are written to an output file and the sum of the BFs is given.
+# Dec file changes between different releases (set-up before) can be tracked..
+# Initial state particles are passed using -is option. Currently 4 allowed.
+# Default is [B+, B- ,B0, anti-B0]. Same possible for D, tau, pi, K, etc.
+# Final state particles passed using -fs option. Also 4 allowed.
+# Default is [e+, e-, mu+, mu-]. Can also look at KL, Ks, K+, K-, etc.
+# The names of the particles have to agree with the exact spelling used in the dec file.
+#############################################################################
+
+import basf2
+import argparse
+
+
+def arg_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('-i', '--input',
+                        default=basf2.find_file('decfiles/dec/DECAY_BELLE2.DEC'),
+                        help='input file path',
+                        metavar='FILE')
+    parser.add_argument('-o', '--output',
+                        default='BF.out',
+                        help='output file path',
+                        metavar='FILE')
+    parser.add_argument('-fs', '--finalstate',
+                        nargs='*',
+                        default=['e+', 'e-', 'mu+', 'mu-'],
+                        help='final state particles',
+                        metavar='LIST')
+    parser.add_argument('-is', '--initialstate',
+                        nargs='*',
+                        default=['B+', 'B-', 'B0', 'anti-B0'],
+                        help='initial state particles',
+                        metavar='LIST')
+    return parser
+
+
+if __name__ == '__main__':
+
+    args = arg_parser().parse_args()
+    filepath = args.input
+    outpath = args.output
+    istate = args.initialstate
+    fstate = args.finalstate
+
+    B1decs = {istate[0]: [], istate[1]: [], istate[2]: [], istate[3]: []}
+    B2decs = {istate[0]: [], istate[1]: [], istate[2]: [], istate[3]: []}
+    Bdecs = {istate[0]: [], istate[1]: [], istate[2]: [], istate[3]: []}
+
+    B1BF = {istate[i]: 0 for i in range(len(istate))}
+    B2BF = B1BF
+    BtotBF = B1BF
+    togglesave = ''
+
+    with open(filepath) as f:
+        line = f.readline()
+        while line:
+            for i in range(len(istate)):
+                if f"Decay {istate[i]}" in line and line[0] != '#':
+                    togglesave = istate[i]
+                    break
+
+            if "Enddecay" in line:
+                togglesave = ''
+
+            if togglesave:
+                if(line[0] != '#' and (f' {fstate[0]} ' in line or f' {fstate[1]} ' in line
+                                       or f' {fstate[2]} ' in line or f' {fstate[3]} ' in line)
+                   and line[0:5] != 'Decay' and line != '\n'):
+                    Bdecs[togglesave].append(line)
+                if(line[0] != '#' and (f' {fstate[0]} ' in line or f' {fstate[1]} ' in line)
+                   and line[0:5] != 'Decay' and line != '\n'):
+                    B1decs[togglesave].append(line)
+                if(line[0] != '#' and (f' {fstate[2]} ' in line or f' {fstate[3]} ' in line)
+                   and line[0:5] != 'Decay' and line != '\n'):
+                    B2decs[togglesave].append(line)
+            line = f.readline()
+
+    print()
+    basf2.B2INFO("Number of decays for: ")
+    for i in range(len(istate)):
+        basf2.B2INFO(f'{istate[i]} {len(Bdecs[istate[i]])}')
+    print()
+
+    for keys, vals in Bdecs.items():
+        for string in vals:
+            BtotBF[keys] += float(string.split()[0])
+    for keys, vals in B1decs.items():
+        for string in vals:
+            B1BF[keys] += float(string.split()[0])
+    for keys, vals in B2decs.items():
+        for string in vals:
+            B2BF[keys] += float(string.split()[0])
+
+    basf2.B2INFO(f"The BFs for {fstate[0]} and {fstate[1]} are:")
+    basf2.B2INFO({k: round(v, 9) for k, v in B1BF.items()})
+    basf2.B2INFO(f"The BFs for {fstate[2]} and {fstate[3]} are:")
+    basf2.B2INFO({k: round(v, 9) for k, v in B2BF.items()})
+    basf2.B2INFO("The total BFs are:")
+    basf2.B2INFO({k: round(v, 9) for k, v in BtotBF.items()})
+
+    with open(filepath) as f:
+        with open(outpath, "w+") as outf:
+            for keys, vals in B1decs.items():
+                outf.write(str(keys)+'\n')
+                for val in vals:
+                    outf.write(str(val))
+            for keys, vals in B2decs.items():
+                outf.write(str(keys)+'\n')
+                for val in vals:
+                    outf.write(str(val))
+        print()
+        basf2.B2INFO('Successfully written decays to '+outpath)
+        outf.close()

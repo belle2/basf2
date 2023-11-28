@@ -139,8 +139,8 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);
         } else {
-          TVector2 v1(x1_d, y1_d);
-          TVector2 v2(x2_d, y2_d);
+          ROOT::Math::XYVector v1(x1_d, y1_d);
+          ROOT::Math::XYVector v2(x2_d, y2_d);
           houghCand.push_back(CDCTriggerHoughCand(idx_list, make_pair(v1, v2),
                                                   nSL, houghCand.size()));
           if (m_storePlane > 0) {
@@ -221,7 +221,7 @@ CDCTrigger2DFinderModule::connectedRegions()
     int xmax = 0;
     int ymin = m_nCellsR;
     int ymax = 0;
-    vector<TVector2> cellIds = {};
+    vector<ROOT::Math::XYVector> cellIds = {};
     for (unsigned ir2 = 0; ir2 < regions[ir].size(); ++ir2) {
       coord2dPair hc = regions[ir][ir2].getCoord();
       B2DEBUG(100, "  " << regions[ir][ir2].getID()
@@ -246,7 +246,7 @@ CDCTrigger2DFinderModule::connectedRegions()
       xmax = max(xmax, ix);
       ymin = min(ymin, iy);
       ymax = max(ymax, iy);
-      cellIds.push_back(TVector2(ix, iy));
+      cellIds.push_back(ROOT::Math::XYVector(ix, iy));
     }
     x *= 0.5 / n;
     if (x > M_PI)
@@ -516,7 +516,7 @@ CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
       // form cluster
       vector<unsigned> pattern(rX * rY, 0);
       pattern[0] = plane2[ix][iy];
-      vector<TVector2> cellIds = {TVector2(2 * ix, 2 * iy)};
+      vector<ROOT::Math::XYVector> cellIds = {ROOT::Math::XYVector(2 * ix, 2 * iy)};
       for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
         for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
           if (iy + iy2 >= nY) continue;
@@ -535,7 +535,7 @@ CDCTrigger2DFinderModule::patternClustering(const cdcMap& inputMap)
                connectedDiag(plane2[ileft][iy + iy2 - 1], plane2[iright][iy + iy2]))) {
             pattern[ip] = plane2[iright][iy + iy2];
             B2DEBUG(100, "connect cell " << iright << " " << iy + iy2);
-            cellIds.push_back(TVector2(2 * (ix + ix2), 2 * (iy + iy2)));
+            cellIds.push_back(ROOT::Math::XYVector(2 * (ix + ix2), 2 * (iy + iy2)));
           }
         }
       }

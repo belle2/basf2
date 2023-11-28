@@ -18,7 +18,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/utility/ReferenceFrame.h>
 
@@ -66,6 +66,26 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     {
+      Particle pH({0.290582573157898, 0, 6.99796952744559,  7.004},  11);
+      Particle pL({0.166035330010433, 0, -3.99855423973071, 4.002}, -11);
+
+      Particle p({0, 0.999999869440028, 0, 1.0}, -11);
+      const double eps = 1e-15;
+      UseReferenceFrame<CMSFrame> dummy;
+
+      EXPECT_NEAR(0.0, particlePx(&pH), eps);
+      EXPECT_NEAR(0.0, particlePy(&pH), eps);
+      EXPECT_NEAR(0.0, particlePx(&pL), eps);
+      EXPECT_NEAR(0.0, particlePy(&pL), eps);
+      EXPECT_FLOAT_EQ(5.289778893721573, particlePz(&pH));
+      EXPECT_FLOAT_EQ(-5.289778893721573, particlePz(&pL));
+      EXPECT_FLOAT_EQ(10.579557836806245064 / 2, particleE(&pH));
+      EXPECT_FLOAT_EQ(10.579557836806245064 / 2, particleE(&pL));
+
+      EXPECT_FLOAT_EQ(0.999999869440028, particlePy(&p));
+    }
+
+    {
       Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
 
       TMatrixFSym error(7);
@@ -97,14 +117,14 @@ namespace {
 
       {
         UseReferenceFrame<CMSFrame> dummy;
-        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
-        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.68174648, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80918372, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.5489524, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80521482, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -184,14 +204,14 @@ namespace {
 
       {
         UseReferenceFrame<CMSRotationFrame> dummy(XYZVector(1, 0, 0), XYZVector(0, 1, 0), XYZVector(0, 0, 1));
-        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
-        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.68174648, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80918372, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.5489524, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80521482, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -279,11 +299,11 @@ namespace {
 
     {
       UseReferenceFrame<CMSFrame> dummy;
-      EXPECT_FLOAT_EQ(1.0382183, particleDX(&p));
+      EXPECT_FLOAT_EQ(1.026177, particleDX(&p));
       EXPECT_FLOAT_EQ(2.0, particleDY(&p));
-      EXPECT_FLOAT_EQ(2.2510159, particleDZ(&p));
-      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0382183 * 1.0382183), particleDRho(&p));
-      EXPECT_FLOAT_EQ(3.185117, particleDistance(&p));
+      EXPECT_FLOAT_EQ(2.2568872, particleDZ(&p));
+      EXPECT_FLOAT_EQ(hypot(2.0, 1.026177), particleDRho(&p));
+      EXPECT_FLOAT_EQ(3.1853695, particleDistance(&p));
       EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
     }
 
@@ -307,7 +327,7 @@ namespace {
     {
       Particle p2({ 0.0 , 1.0, 0.0, 1.0 }, 11);
       p2.setPValue(0.5);
-      p2.setVertex(B2Vector3D(1.0, 0.0, 2.0));
+      p2.setVertex(XYZVector(1.0, 0.0, 2.0));
 
       UseReferenceFrame<RestFrame> dummy(&p2);
       EXPECT_FLOAT_EQ(0.0, particleDX(&p));
@@ -344,11 +364,11 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
 
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
 
@@ -370,7 +390,7 @@ namespace {
     EXPECT_FALSE(std::get<bool>(vIsFromV0->function(part)));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
-    EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
+    EXPECT_FLOAT_EQ(position.Rho(), trackD0(part));
     EXPECT_FLOAT_EQ(3, trackNCDCHits(part));
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
@@ -383,8 +403,8 @@ namespace {
     secondTrack.setTrackFitResultIndex(Const::electron, 1);
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
     myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
-    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
-    const PxPyPzEVector v0Momentum(2 * momentum.x(), 2 * momentum.y(), 2 * momentum.z(), (momentum * 2).Mag());
+    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1]), 0.0, 0.0, 0.0));
+    const PxPyPzEVector v0Momentum(2 * momentum.X(), 2 * momentum.Y(), 2 * momentum.Z(), (momentum * 2).R());
     auto v0particle = myParticles.appendNew(v0Momentum, 22,
                                             Particle::c_Unflavored, Particle::c_V0, 0);
     v0particle->appendDaughter(0, false);
@@ -465,7 +485,7 @@ namespace {
       // create a reco track (one has to also mock up a track fit result)
       TMatrixDSym cov(6);
       trackfits.appendNew(
-        B2Vector3D(), B2Vector3D(), cov, -1, Const::electron, 0.5, 1.5,
+        ROOT::Math::XYZVector(), ROOT::Math::XYZVector(), cov, -1, Const::electron, 0.5, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* electron_tr = tracks.appendNew(Track());
       electron_tr->setTrackFitResultIndex(Const::electron, 0);
@@ -473,7 +493,7 @@ namespace {
 
       TMatrixDSym cov1(6);
       trackfits.appendNew(
-        B2Vector3D(), B2Vector3D(), cov1, -1, Const::pion, 0.51, 1.5,
+        ROOT::Math::XYZVector(), ROOT::Math::XYZVector(), cov1, -1, Const::pion, 0.51, 1.5,
         static_cast<unsigned long long int>(0x300000000000000), 16777215, 0);
       auto* pion_tr = tracks.appendNew(Track());
       pion_tr->setTrackFitResultIndex(Const::pion, 0);
@@ -917,15 +937,15 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.68176979);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)),  0.68174650327489894064);
 
     var = Manager::Instance().getVariable("useCMSFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80920333);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80918372124478121776);
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.185117);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.1853695);
   }
 
   TEST_F(MetaVariableTest, useTagSideRecoilRestFrame)
@@ -1270,13 +1290,13 @@ namespace {
     Particle p({ 0.1, -0.4, 0.8, 2.0 }, 11);
     Particle p2({ 0.1, -0.4, 0.8, 4.0 }, 11);
 
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.1, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.1, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.15, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.15, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.4, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.4, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
-    track_fit_results.appendNew(B2Vector3D(0.1, 0.1, 0.1), B2Vector3D(0.6, 0.0, 0.0),
+    track_fit_results.appendNew(ROOT::Math::XYZVector(0.1, 0.1, 0.1), ROOT::Math::XYZVector(0.6, 0.0, 0.0),
                                 TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0, 0);
 
     tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
@@ -1869,7 +1889,7 @@ namespace {
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5033823);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5004894);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -1996,7 +2016,7 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(par)), 2.8638029);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(par)), 2.8613892);
     EXPECT_FLOAT_EQ(std::get<double>(varCMS->function(par)), M_PI);
   }
 
@@ -2628,7 +2648,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(closest->function(electron)), 0.68014491);
 
       const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(angleToClosestInList(testGammaList))");
-      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.67899209);
+      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.67901474);
     }
 
     {
@@ -2665,7 +2685,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 2.2869499);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(angleToMostB2BInList(testGammaList))");
-      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.8312073);
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.8312778);
     }
 
     {
@@ -2682,7 +2702,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 1.7);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, E))");
-      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 1.584888); // the energy gets smeared because of boost
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 1.5848758); // the energy gets smeared because of boost
 
       const auto* mostB2BCMSLabE = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, useLabFrame(E)))");
       EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMSLabE->function(electron)), 1.7); // aaand should be back to the lab frame value
@@ -4201,10 +4221,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4264,8 +4284,7 @@ namespace {
     // Likelihoods for all detectors but SVD
     auto* lAllNoSVD = likelihood.appendNew();
 
-    for (unsigned int iDet(0); iDet < Const::PIDDetectors::c_size; iDet++) {
-      const auto det =  Const::PIDDetectors::c_set[iDet];
+    for (const auto& det : Const::PIDDetectorSet::set()) {
       for (const auto& hypo : Const::chargedStableSet) {
         if (det != Const::SVD) {
           lAllNoSVD->setLogLikelihood(det, hypo, lAll->getLogL(hypo, det));
@@ -4453,10 +4472,10 @@ namespace {
     // Generate a random put orthogonal pair of vectors in the r-phi plane
     ROOT::Math::Cartesian2D d(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
     ROOT::Math::Cartesian2D pt(generator.Uniform(-1, 1), generator.Uniform(-1, 1));
-    d.SetXY(d.X(), -(d.X()*pt.x()) / pt.y());
+    d.SetXY(d.X(), -(d.X()*pt.X()) / pt.Y());
     // Add a random z component
-    B2Vector3D position(d.X(), d.Y(), generator.Uniform(-1, 1));
-    B2Vector3D momentum(pt.x(), pt.y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector position(d.X(), d.Y(), generator.Uniform(-1, 1));
+    ROOT::Math::XYZVector momentum(pt.X(), pt.Y(), generator.Uniform(-1, 1));
 
     auto CDCValue = static_cast<unsigned long long int>(0x300000000000000);
     tfrs.appendNew(position, momentum, cov6, charge, Const::electron, pValue, bField, CDCValue, 16777215, 0);
@@ -4842,7 +4861,7 @@ namespace {
       MCParticle mcKs;
       mcKs.setPDG(Const::Kshort.getPDGCode());
       mcKs.setDecayVertex(4.0, 5.0, 0.0);
-      mcKs.setProductionVertex(B2Vector3D(1.0, 2.0, 3.0));
+      mcKs.setProductionVertex(1.0, 2.0, 3.0);
       mcKs.setMassFromPDG();
       mcKs.setMomentum(1.164, 1.55200, 0);
       mcKs.setStatus(MCParticle::c_PrimaryParticle);

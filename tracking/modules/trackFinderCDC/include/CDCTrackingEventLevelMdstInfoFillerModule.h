@@ -53,7 +53,7 @@ namespace Belle2 {
     public:
       /// Constructor setting up the default store array names
       CDCTrackingEventLevelMdstInfoFillerModule()
-        : FindletModule<CDCTrackingEventLevelMdstInfoFillerFindlet>( {"CDCWireHitVector", "CDCSegment2DVector"})
+        : FindletModule<CDCTrackingEventLevelMdstInfoFillerFindlet>({"CDCWireHitVector", "CDCSegment2DVector"})
       {
       }
     };

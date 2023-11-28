@@ -38,6 +38,9 @@
 !daq/**/doc/**
 !daq/slc/extra/javalib/**
 
+# the online book contains an image
+!online_book/**
+
 
 # External resources #
 # ################## #

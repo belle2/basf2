@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,7 +16,8 @@ skip_test_if_light()  # light builds don't contain simulation, reconstruction et
 
 from basf2 import set_random_seed, set_log_level, LogLevel, create_path, Module, find_file, process, statistics, conditions
 from simulation import add_simulation
-from reconstruction import add_reconstruction, add_mdst_output
+from reconstruction import add_reconstruction
+from mdst import add_mdst_output
 from ROOT import Belle2
 from modularAnalysis import reconstructDecay, rankByHighest, buildRestOfEvent, buildContinuumSuppression, matchMCTruth, \
     variablesToNtuple, getAnalysisGlobaltag
@@ -119,7 +119,7 @@ TagV('B0:jpsiks', 'breco', path=main)
 fs_vars = ['kaonID', 'muonID', 'dr', 'dz', 'pValue', 'isSignal', 'mcErrors', 'genMotherID']
 b_vars = ['nTracks', 'Mbc', 'deltaE', 'p', 'E', 'useCMSFrame(p)', 'useCMSFrame(E)',
           'isSignal', 'mcErrors', 'nROE_KLMClusters', 'qrOutput(FBDT)', 'TagVLBoost', 'TagVz', 'TagVzErr', 'mcDeltaT'] + \
-    ['daughter(0,daughter(0,%s))' % var for var in fs_vars]
+    [f'daughter(0,daughter(0,{var}))' for var in fs_vars]
 
 # save variables to ntuple
 variablesToNtuple('B0:jpsiks', variables=b_vars, filename='ntuple.root', treename='B0tree', path=main)

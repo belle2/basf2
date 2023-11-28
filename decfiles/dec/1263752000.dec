@@ -1,0 +1,100 @@
+# EventType: 1263752000
+# Descriptor: [B- -> [D**0 -> [D+ -> K pi pi] pi(pi0)] l nu]cc
+# NickName: Bu_Dstst0lnu_K2pi
+# Documentation: B-->D**0 l nu, D**0(D*+)->D+ pi(pi0), D+->K pi pi, bkg mode for inclusive tagging R(D(*))
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Boyang Zhang
+# Email: zhangboy@hawaii.edu 
+# Cuts: None
+# Date: 20220721
+
+
+yesPhotos
+
+Alias D_10sig D_10
+Alias anti-D_10sig anti-D_10
+ChargeConj D_10sig anti-D_10sig
+
+Alias D_0*0sig D_0*0
+Alias anti-D_0*0sig anti-D_0*0
+ChargeConj D_0*0sig anti-D_0*0sig
+
+Alias D'_10sig D'_10
+Alias anti-D'_10sig anti-D'_10
+ChargeConj D'_10sig anti-D'_10sig
+
+Alias D_2*0sig D_2*0
+Alias anti-D_2*0sig anti-D_2*0
+ChargeConj D_2*0sig anti-D_2*0sig
+
+
+# One B decays to signal mode, while the other to generic decay modes
+Decay Upsilon(4S)
+0.5000        B+sig     B-                                   VSS;
+0.5000        B+        B-sig                                VSS;
+Enddecay
+
+Decay B-sig
+0.007570000   D_10sig   e-   anti-nu_e                       LLSW 0.71 -1.6 -0.5 2.9;
+0.003890000   D_0*0sig  e-   anti-nu_e                       LLSW 0.68 -0.2 0.3;;
+0.004310000   D'_10sig  e-   anti-nu_e                       LLSW 0.68 -0.2 0.3;;
+0.003730000   D_2*0sig  e-   anti-nu_e                       LLSW 0.71 -1.6 -0.5 2.9;
+
+0.001000000   D*+sig  pi-  e-  anti-nu_e                      GOITY_ROBERTS;
+0.001000000   D+sig  pi-  e-  anti-nu_e                       GOITY_ROBERTS;
+
+0.000150000   D+sig  pi-  pi0  e-  anti-nu_e                  PHSP;
+0.000750000   D*+sig  pi-  pi0  e-  anti-nu_e                 PHSP;
+
+
+0.007570000   D_10sig   mu-  anti-nu_mu                      LLSW 0.71 -1.6 -0.5 2.9;
+0.003890000   D_0*0sig  mu-  anti-nu_mu                      LLSW 0.68 -0.2 0.3;
+0.004310000   D'_10sig  mu-  anti-nu_mu                      LLSW 0.68 -0.2 0.3;
+0.003730000   D_2*0sig  mu-  anti-nu_mu                      LLSW 0.71 -1.6 -0.5 2.9;sig
+
+0.001000000   D*+sig  pi-  mu-  anti-nu_mu                    GOITY_ROBERTS;
+0.001000000   D+sig  pi-  mu-  anti-nu_mu                     GOITY_ROBERTS;
+
+0.000150000   D+sig  pi-  pi0  mu-  anti-nu_mu                PHSP;
+0.000750000   D*+sig  pi-  pi0  mu-  anti-nu_mu               PHSP;
+
+Enddecay
+CDecay B+sig
+
+
+Decay D_10sig
+0.3994         D*+sig   pi-                                 VVS_PWAVE  0.0 0.0 0.0 0.0 1.0 0.0;
+0.1145         D+sig    pi-   pi0                           PHSP;
+Enddecay
+CDecay anti-D_10sig
+
+Decay D_0*0sig
+1.0            D+sig    pi-                                 PHSP;
+Enddecay
+CDecay anti-D_0*0sig
+
+Decay D'_10sig
+1.0            D*+sig   pi-                                 VVS_PWAVE  1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+CDecay anti-D'_10sig
+
+Decay D_2*0sig
+0.2669         D*+sig   pi-                                 TVS_PWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+0.3998         D+sig    pi-                                 TSS;
+Enddecay
+CDecay anti-D_2*0sig
+
+Decay D*+sig
+0.307000000    D+sig  pi0                                   VSS;
+0.016000000    D+sig  gamma                                 VSP_PWAVE;
+Enddecay
+CDecay D*-sig
+
+Decay D+sig
+1.0            K-   pi+   pi+                               D_DALITZ;
+Enddecay
+CDecay D-sig
+
+
+End

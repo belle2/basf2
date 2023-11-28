@@ -168,6 +168,12 @@ namespace Belle2 {
        */
       const Prism& getPrism() const {return m_prism;}
 
+      /**
+       * Sets the mirror center-of-curvature
+       * @param xc center of curvature in x
+       * @param yc center of curvature in y
+       */
+      void setMirrorCenter(double xc, double yc);
 
     protected:
 

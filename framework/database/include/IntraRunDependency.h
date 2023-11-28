@@ -54,6 +54,14 @@ namespace Belle2 {
      */
     bool isOwner() const {return m_objects.IsOwner();}
 
+    /**
+     * Get a vector with the intra-run boundaries.
+     * In case of no intra-run dependence, the vector is empty.
+     * In general for n payloads there are n-1 boundaries.
+     * The method must be implemented by the derived classes.
+     */
+    virtual const std::vector<unsigned int>& getBoundaries() const = 0;
+
   protected:
     TObjArray m_objects;   /**< Array of intra-run dependent objects **/
 

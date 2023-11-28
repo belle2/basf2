@@ -1,0 +1,22 @@
+# EventType: 1120910103
+# Descriptor: [B0 -> KS0 tau+ e-]cc
+# NickName: Bd_Kstau+e-
+# Documentation: LFV b->sll' process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Soumen Halder
+# Email: soumen.halder@tifr.res.in
+# Cuts: None
+# Date: 20230131
+# Comments: 
+
+Decay Upsilon(4S)
+1.0     B0sig anti-B0sig B0 anti-B0           	VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0 K_S0   tau+  e-  PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+End

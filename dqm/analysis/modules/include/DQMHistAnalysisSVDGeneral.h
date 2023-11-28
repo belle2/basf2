@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
 #include <TFile.h>
@@ -24,7 +24,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDGeneralModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDGeneralModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -37,47 +37,48 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisSVDGeneralModule();
+    ~DQMHistAnalysisSVDGeneralModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 
     // parameters
     bool m_printCanvas; /**< if true print the pdf of the canvases */
-    float m_occError; /**<error level of the occupancy */
-    float m_occWarning; /**< warning level of the occupancy */
-    float m_occEmpty; /**<empty level of the occupancy */
+    bool m_3Samples; /**< if true enable 3 samples histograms analysis */
+    double m_occError; /**<error level of the occupancy */
+    double m_occWarning; /**< warning level of the occupancy */
+    double m_occEmpty; /**<empty level of the occupancy */
 
-    float m_onlineOccError; /**<error level of the onlineOccupancy */
-    float m_onlineOccWarning; /**< warning level of the onlineOccupancy */
-    float m_onlineOccEmpty; /**<empty level of the occupancy */
+    double m_onlineOccError; /**<error level of the onlineOccupancy */
+    double m_onlineOccWarning; /**< warning level of the onlineOccupancy */
+    double m_onlineOccEmpty; /**<empty level of the occupancy */
 
-    int m_statThreshold; /**< minimal number of events to compare histograms */
-    float m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
+    double m_statThreshold; /**< minimal number of events to compare histograms */
+    double m_timeThreshold; /**< difference between mean of cluster time for present and reference run */
     float m_refMeanP; /**< mean of the signal time peak from Physics reference run */
     float m_refMeanC; /**< mean of the signal time peak from Cosmic reference run */
 
@@ -91,17 +92,34 @@ namespace Belle2 {
 
     TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
     TH2F* m_hOccupancyU = nullptr; /**< occupancy U histo */
+    TH2F* m_hOccupancyU3Samples = nullptr; /**< occupancy U histo  for 3 samples*/
+    TH2F* m_hOccupancyUGroupId0 = nullptr; /**< occupancy U histo  for cluster time group Id = 0*/
     TCanvas* m_cOccupancyU = nullptr; /**< occupancy U histo canvas */
+    TCanvas* m_cOccupancyU3Samples = nullptr; /**< occupancy U histo canvas for 3 sampes */
+    TCanvas* m_cOccupancyUGroupId0 = nullptr; /**< occupancy U histo canvas  for cluster time group Id = 0*/
+
     TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
+    TH2F* m_hOccupancyV3Samples = nullptr; /**< occupancy V histo  for 3 samples*/
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
+    TH2F* m_hOccupancyVGroupId0 = nullptr; /**< occupancy V histo  for cluster time group Id = 0*/
+
+    TCanvas* m_cOccupancyV3Samples = nullptr; /**< occupancy V histo canvas  for 3 samples*/
+    TCanvas* m_cOccupancyVGroupId0 = nullptr; /**< occupancy V histo canvas  for cluster time group Id = 0*/
+
+    /** additional plots flag*/
+    bool m_additionalPlots = false;
 
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 
     TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
+    TH2F* m_hOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
+    TCanvas* m_cOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo canvas for 3 samples*/
     TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
+    TH2F* m_hOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
+    TCanvas* m_cOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
 
     const int nSensors = 172; /**< total number of sensors */
     TH1F m_hStripOccupancyU[172]; /**< u-side strip chart occupancy histos*/
@@ -111,6 +129,9 @@ namespace Belle2 {
 
     TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
+
+    TH1F m_hClusterOnTrackTimeL456V3Samples; /**< time for clusters on Track for L456V histo for 3 samples*/
+    TCanvas* m_cClusterOnTrackTimeL456V3Samples = nullptr; /**< time for clusters on Track for L456V canvas for 3 sampples */
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
 
@@ -129,11 +150,22 @@ namespace Belle2 {
     Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed before throwing ERROR*/
     Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
+    Int_t m_occU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
+    Int_t m_occV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
+
+    Int_t m_occUGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
+    Int_t m_occVGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
+
     Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
     Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
 
+    Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
+    Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
+
     TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
     TString runtype = nullptr; /**< string with runtype: physics or cosmic */
+
+    std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

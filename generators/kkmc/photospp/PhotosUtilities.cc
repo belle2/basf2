@@ -81,9 +81,9 @@ namespace Photospp {
 
       if (j == 0) { // initialization
         j = 1;
-        fill_val(0 ,  8, SPIN, 0.5);
-        fill_val(8 ,  9, SPIN, 1.0);
-        fill_val(9 , 10, SPIN, 0.0);
+        fill_val(0,  8, SPIN, 0.5);
+        fill_val(8,  9, SPIN, 1.0);
+        fill_val(9, 10, SPIN, 0.0);
         fill_val(10, 18, SPIN, 0.5);
         fill_val(18, 20, SPIN, 0.0);
         fill_val(20, 24, SPIN, 1.0);
@@ -130,23 +130,23 @@ namespace Photospp {
 
       if (j == 0) { // initialization
         j = 1;
-        fill_val(0 ,  1, CHARGE, 0.0);
-        fill_val(1 ,  2, CHARGE, -0.3333333333);
-        fill_val(2 ,  3, CHARGE, 0.6666666667);
-        fill_val(3 ,  4, CHARGE, -0.3333333333);
-        fill_val(4 ,  5, CHARGE, 0.6666666667);
-        fill_val(5 ,  6, CHARGE, -0.3333333333);
-        fill_val(6 ,  7, CHARGE, 0.6666666667);
-        fill_val(7 ,  8, CHARGE, -0.3333333333);
-        fill_val(8 ,  9, CHARGE, 0.6666666667);
-        fill_val(9 , 11, CHARGE, 0.0);
-        fill_val(11 , 12, CHARGE, -1.0);
-        fill_val(12 , 13, CHARGE, 0.0);
-        fill_val(13 , 14, CHARGE, -1.0);
+        fill_val(0,  1, CHARGE, 0.0);
+        fill_val(1,  2, CHARGE, -0.3333333333);
+        fill_val(2,  3, CHARGE, 0.6666666667);
+        fill_val(3,  4, CHARGE, -0.3333333333);
+        fill_val(4,  5, CHARGE, 0.6666666667);
+        fill_val(5,  6, CHARGE, -0.3333333333);
+        fill_val(6,  7, CHARGE, 0.6666666667);
+        fill_val(7,  8, CHARGE, -0.3333333333);
+        fill_val(8,  9, CHARGE, 0.6666666667);
+        fill_val(9, 11, CHARGE, 0.0);
+        fill_val(11, 12, CHARGE, -1.0);
+        fill_val(12, 13, CHARGE, 0.0);
+        fill_val(13, 14, CHARGE, -1.0);
         fill_val(14, 15, CHARGE, 0.0);
-        fill_val(15 , 16, CHARGE, -1.0);
+        fill_val(15, 16, CHARGE, -1.0);
         fill_val(16, 17, CHARGE, 0.0);
-        fill_val(17 , 18, CHARGE, -1.0);
+        fill_val(17, 18, CHARGE, -1.0);
         fill_val(18, 24, CHARGE, 0.0);
         fill_val(24, 25, CHARGE, 1.0);
         fill_val(25, 37, CHARGE, 0.0);

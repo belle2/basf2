@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,10 +22,11 @@ import tempfile
 import collections
 
 
-class State(object):
+class State:
     """
     XGBoost state
     """
+
     def __init__(self, num_round=0, parameters=None):
         """ Constructor of the state object """
         #: Parameters passed to xgboost model
@@ -43,10 +43,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     param = {'bst:max_depth': 2, 'bst:eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
     nTrees = 100
-    if 'nTrees' in parameters:
-        nTrees = parameters['nTrees']
-        del parameters['nTrees']
     if isinstance(parameters, collections.Mapping):
+        if 'nTrees' in parameters:
+            nTrees = parameters.pop('nTrees')
         param.update(parameters)
     return State(nTrees, param)
 
@@ -81,7 +80,7 @@ def apply(state, X):
     return np.require(result, dtype=np.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Initialize lists which will store the received data
     """
@@ -94,7 +93,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Stores received training data.
     XGBoost is usually not able to perform a partial fit.

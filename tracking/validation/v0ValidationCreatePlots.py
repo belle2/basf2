@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,6 +12,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>V0ValidationHarvested.root</input>
+  <output>V0Validation.root</output>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>
 """
@@ -209,11 +209,16 @@ class V0ValidationPlots:
         """
         output_root_file = ROOT.TFile.Open(self.output_file, "RECREATE")
 
-        V0ValidationPlots.efficiency_plot(self.hist_r_found, self.hist_r, 'Efficiency vs R', 'r', 'cm',
-                                          description='Reconstruction Efficiency vs. r (perpendicular)',
-                                          check='',
-                                          contact='software-tracking@belle2.org',
-                                          meta_options='shifter').Write()
+        V0ValidationPlots.efficiency_plot(
+            self.hist_r_found,
+            self.hist_r,
+            'Efficiency vs R',
+            'r',
+            'cm',
+            description='Reconstruction Efficiency vs. r (perpendicular)',
+            check='Check that efficiencies are close to the reference. Report significant deviations.',
+            contact='software-tracking@belle2.org',
+            meta_options='shifter').Write()
 
         V0ValidationPlots.efficiency_plot(self.hist_theta_found, self.hist_theta, 'Efficiency vs Theta', 'Theta', 'deg',
                                           description='Reconstruction Efficiency vs. theta',

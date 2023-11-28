@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/RestOfEventPrinter/RestOfEventPrinterModule.h>
 
 // framework - DataStore
@@ -62,7 +62,7 @@ void RestOfEventPrinterModule::event()
 
   if (roe.isValid()) {
 
-    const Particle* part = roe->getRelated<Particle>();
+    const Particle* part = roe->getRelatedFrom<Particle>();
     const MCParticle* mcpart = part->getRelated<MCParticle>();
 
     int relatedPDG = part->getPDGCode();

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/SpecificKinematicVariables.h>
 
 // include VariableManager
@@ -46,7 +46,7 @@ namespace Belle2 {
       unsigned n = particle->getNDaughters();
 
       if (n < 1)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       for (unsigned i = 0; i < n; i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
@@ -75,7 +75,7 @@ namespace Belle2 {
       unsigned n = particle->getNDaughters();
 
       if (n < 1)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       for (unsigned i = 0; i < n; i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
@@ -141,7 +141,7 @@ namespace Belle2 {
         //Construct the B0 p 3-vector with the current phi by summing the 3 components.
 
         XYZVector B0_p3_Dframe(B0_px_Dframe + B0_py_Dframe + B0_pz_Dframe);
-        PxPyPzEVector B0_p4_Dframe(B0_p3_Dframe.x(), B0_p3_Dframe.y(), B0_p3_Dframe.z(), E_B);
+        PxPyPzEVector B0_p4_Dframe(B0_p3_Dframe.X(), B0_p3_Dframe.Y(), B0_p3_Dframe.Z(), E_B);
 
         //This is the polar angle of B0.
 
@@ -186,20 +186,21 @@ namespace Belle2 {
     REGISTER_VARIABLE("recQ2BhSimple", REC_q2BhSimple,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1 ... H_n \\ell \\nu_\\ell`.\n"
-                      "The B meson momentum in CMS is assumed to be 0.", ":math:`[\\text{GeV}/\\text{c}]^2`");
+                      "The B meson momentum in CMS is assumed to be 0.\n\n", ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("recQ2Bh", REC_q2Bh,
                       "Returns the momentum transfer squared, :math:`q^2`, calculated in CMS as :math:`q^2 = (p_B - p_h)^2`, \n"
                       "where p_h is the CMS momentum of all hadrons in the decay :math:`B \\to H_1\\dots H_n \\ell \\nu_\\ell`.\n"
                       "This calculation uses a weighted average of the B meson around the reco B cone. \n"
                       "Based on diamond frame calculation of :math:`q^2` following the idea presented in https://www.osti.gov/biblio/1442697 \n"
-                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.",
+                      "It will switch to use of :b2:var:`recQ2BhSimple` if absolute of :b2:var:`cosThetaBetweenParticleAndNominalB`  > 1.\n\n",
                       ":math:`[\\text{GeV}/\\text{c}]^2`");
 
-    REGISTER_VARIABLE("recMissM2", REC_MissM2,
-                      "Returns the invariant mass squared of the missing momentum calculated assumings the"
-                      "reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\\nu = p_B - p_\\mathrm{had} - p_\\mathrm{lep}`",
-                      ":math:`[\\text{GeV}/\\text{c}^2]^2`");
+    REGISTER_VARIABLE("recMissM2", REC_MissM2, R"DOC(
+                      Returns the invariant mass squared of the missing momentum calculated assumings the
+                      reco B is at rest and calculating the neutrino (missing) momentum from :math:`p_\nu = p_B - p_{\rm had} - p_{\rm lep}`
+
+                      )DOC", ":math:`[\\text{GeV}/\\text{c}^2]^2`");
 
 
 

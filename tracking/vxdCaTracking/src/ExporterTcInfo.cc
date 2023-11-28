@@ -8,6 +8,4 @@
 
 #include "tracking/vxdCaTracking/ExporterTcInfo.h"
 
-
-using namespace std;
 using namespace Belle2;

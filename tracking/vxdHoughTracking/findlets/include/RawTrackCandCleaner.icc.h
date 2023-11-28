@@ -6,14 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <tracking/vxdHoughTracking/findlets/RawTrackCandCleaner.dcl.h>
-#include <tracking/vxdHoughTracking/utilities/VXDHoughTrackingHelpers.h>
+#include <tracking/vxdHoughTracking/utilities/SVDHoughTrackingHelpers.h>
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/core/ModuleParamList.templateDetails.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/vxdHoughTracking/entities/VXDHoughState.h>
 #include <tracking/vxdHoughTracking/filters/relations/LayerRelationFilter.icc.h>
-#include <tracking/vxdHoughTracking/findlets/VXDHoughTrackingTreeSearcher.icc.h>
+#include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.icc.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -40,8 +40,8 @@ namespace Belle2::vxdHoughTracking {
     m_treeSearcher.exposeParameters(moduleParamList, prefix);
     m_resultRefiner.exposeParameters(moduleParamList, prefix);
 
-    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_param_maxRelations,
-                                  "Maximum number of relations allowed for entering tree search.", m_param_maxRelations);
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "maxRelations"), m_maxRelations,
+                                  "Maximum number of relations allowed for entering tree search.", m_maxRelations);
   }
 
   template<class AHit>
@@ -67,7 +67,7 @@ namespace Belle2::vxdHoughTracking {
 
       m_relationCreator.apply(rawTrackCand, m_relations);
 
-      if (m_relations.size() > m_param_maxRelations) {
+      if (m_relations.size() > m_maxRelations) {
         m_relations.clear();
         continue;
       }

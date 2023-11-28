@@ -38,6 +38,6 @@ namespace Belle2 {
     hitXPDerivate(const PXDTrueHit& hit, const MCParticle& particle, const VXD::SensorInfoBase& sensor);
 
     //! needed by root
-    ClassDef(hitXPDerivate, 1);
+    ClassDef(hitXPDerivate, 2);
   };
 } /** end namespace Belle2 */

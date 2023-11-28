@@ -7,13 +7,10 @@
  **************************************************************************/
 #include <tracking/modules/mcMatcher/MCV0MatcherModule.h>
 
-#include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/V0.h>
 
 using namespace Belle2;
 
@@ -45,18 +42,10 @@ MCV0MatcherModule::~MCV0MatcherModule()
 
 void MCV0MatcherModule::initialize()
 {
-  StoreArray<Track> tracks(m_TrackColName);
-  tracks.isRequired();
+  m_V0s.isRequired(m_V0ColName);
+  m_MCParticles.isRequired(m_MCParticleColName);
 
-  StoreArray<TrackFitResult> trackFitResults(m_TFRColName);
-  trackFitResults.isRequired();
-
-  StoreArray<V0> v0s(m_V0ColName);
-  v0s.isRequired();
-
-  StoreArray<MCParticle> mcParticles(m_MCParticleColName);
-  mcParticles.isRequired();
-  v0s.registerRelationTo(mcParticles);
+  m_V0s.registerRelationTo(m_MCParticles);
   B2WARNING("This module is supposed to be used only for the debugging\n \
             of the V0Finder module, not as MC matching during analysis.");
 }
@@ -68,10 +57,9 @@ void MCV0MatcherModule::beginRun()
 
 void MCV0MatcherModule::event()
 {
-  StoreArray<V0> v0s(m_V0ColName);
-  B2DEBUG(20, (v0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
+  B2DEBUG(20, (m_V0s.getEntries() != 0 ? "V0s has entries." : " No V0s."));
 
-  for (const auto& v0 : v0s) {
+  for (const auto& v0 : m_V0s) {
     // Try to match the tracks of each V0 with the MC V0.
     const Const::ParticleType v0hypothesis = v0.getV0Hypothesis();
     const std::pair<Track*, Track*> trackPtrs = v0.getTracks();

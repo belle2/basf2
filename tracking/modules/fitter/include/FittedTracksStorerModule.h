@@ -8,6 +8,9 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
 
 #include <optional>
 #include <string>
@@ -34,6 +37,11 @@ namespace Belle2 {
     std::string m_param_outputRecoTracksStoreArrayName = "RecoTracks";
     /// Minimal weight for copying the hits.
     std::optional<double> m_param_minimalWeight = std::nullopt;
+
+    StoreArray<RecoTrack>   m_inputRecoTracks;    /**< Input RecoTracks StoreArray */
+    StoreArray<RecoTrack>   m_outputRecoTracks;   /**< Output RecoTracks StoreArray */
+    StoreArray<MCParticle>  m_MCParticles;        /**< MCParticles StoreArray */
+    StoreArray<Track>       m_Tracks;             /**< Tracks StoreArray */
   };
 }
 

@@ -52,8 +52,9 @@ namespace Belle2 {
   public:
     /** Constructor */
     VXDPolyConePar(const std::string& name = "", const std::string& material = "", double minPhi = 0, double maxPhi = 0,
-                   bool doCutOut = false, double cutOutWidth = 0, double cutOutHeight = 0, double cutOutDepth = 0):
-      m_name(name), m_material(material), m_minPhi(minPhi), m_maxPhi(maxPhi), m_doCutOut(doCutOut), m_cutOutWidth(cutOutWidth),
+                   bool doCutOut = false, double cutOutWidth1 = 0, double cutOutWidth2 = 0, double cutOutHeight = 0, double cutOutDepth = 0):
+      m_name(name), m_material(material), m_minPhi(minPhi), m_maxPhi(maxPhi), m_doCutOut(doCutOut), m_cutOutWidth1(cutOutWidth1),
+      m_cutOutWidth2(cutOutWidth2),
       m_cutOutHeight(cutOutHeight), m_cutOutDepth(cutOutDepth)
     {}
 
@@ -68,7 +69,11 @@ namespace Belle2 {
     //! Get doCutOut flag
     bool getDoCutOut(void) const { return m_doCutOut; }
     //! Get CutOut Width in mm
-    double getCutOutWidth(void) const { return m_cutOutWidth; }
+    //double getCutOutWidth(void) const { return m_cutOutWidth; }
+    //! Get CutOut Width1 in mm
+    double getCutOutWidth1(void) const { return m_cutOutWidth1; }
+    //! Get CutOut Width2 in mm
+    double getCutOutWidth2(void) const { return m_cutOutWidth2; }
     //! Get CutOut Height in mm
     double getCutOutHeight(void) const { return m_cutOutHeight; }
     //! Get CutOut Depth in mm
@@ -90,7 +95,11 @@ namespace Belle2 {
     //! doCutOut flag
     bool m_doCutOut;
     //! CutOut Width in mm
-    double m_cutOutWidth;
+    //double m_cutOutWidth;
+    //! CutOut Width1 in mm
+    double m_cutOutWidth1;
+    //! CutOut Width2 in mm
+    double m_cutOutWidth2;
     //! CutOut Height in mm
     double m_cutOutHeight;
     //! CutOut Depth in mm
@@ -98,7 +107,7 @@ namespace Belle2 {
     //! Planes
     std::vector<VXDPolyConePlanePar> m_planes;
 
-    ClassDef(VXDPolyConePar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(VXDPolyConePar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 

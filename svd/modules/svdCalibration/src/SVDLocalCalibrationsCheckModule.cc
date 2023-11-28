@@ -585,6 +585,8 @@ void SVDLocalCalibrationsCheckModule::printPage(VxdID theVxdID, TList* listUBAD,
     leftLine = -m_cutPedestal_out;
     rightLine = m_cutPedestal_out;
     topLine = 25;
+  } else {
+    B2FATAL("The printPage function is not implemented for" << LogVar("variable", variable));
   }
   refU->GetYaxis()->SetRangeUser(minY, maxY);
   refV->GetYaxis()->SetRangeUser(minY, maxY);
@@ -727,7 +729,7 @@ int SVDLocalCalibrationsCheckModule::hasAnyProblem(TH1F* h, float cutAve, float 
 {
 
   float average = h->GetMean();
-  if (abs(average) > cutAve)
+  if (std::fabs(average) > cutAve)
     return 1;
 
   TAxis* xaxis = h->GetXaxis();

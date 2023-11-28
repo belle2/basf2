@@ -37,8 +37,8 @@ namespace Belle2 {
   unsigned* TRGCDCLink::_nHitsSL = 0;
   vector<TCLink*> TRGCDCLink::_all;
 
-  TRGCDCLink::TRGCDCLink(TCTrack* t,
-                         const Belle2::TCCHit* h,
+  TRGCDCLink::TRGCDCLink(TRGCDCTrack* t,
+                         const TRGCDCCellHit* h,
                          const HepGeom::Point3D<double>& p)
     : _track(t),
       _hit(h),
@@ -339,7 +339,6 @@ namespace Belle2 {
           }
         }
       }
-      // cppcheck-suppress knownConditionTrueFalse
       if (MCCOverFlow)
         cout << "(counter overflow)";
       cout << endl;
@@ -850,7 +849,7 @@ namespace Belle2 {
   }
 
   void*
-  TRGCDCLink::operator new(size_t size)
+  TRGCDCLink::operator new (size_t size)
   {
     void* p = malloc(size);
     _all.push_back(static_cast<TRGCDCLink*>(p));
@@ -863,7 +862,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCLink::operator delete(void* t)
+  TRGCDCLink::operator delete (void* t)
   {
     for (vector<TRGCDCLink*>::iterator it = _all.begin();
          it != _all.end();

@@ -127,12 +127,12 @@ int SocketIO::get_pxd(int sock, char* data, int len)
 {
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  int* pxdheader = (int*) data;
-  int* pxdheadertable = (int*) &data[headerlen];
+  int* pxdheader = (int*) data;            // TODO should it be unsigned int?
+  int* pxdheadertable = (int*) &data[headerlen];  // TODO should it be unsigned int?
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(sock, data, headerlen);
   if (br <= 0) return br;
-  if (pxdheader[0] != htonl(0xCAFEBABE)) {
+  if (static_cast<uint>(pxdheader[0]) != htonl(0xCAFEBABE)) {
     printf("pxdheader wrong : Magic %X , Frames %X \n", pxdheader[0], ntohl(pxdheader[1]));
     exit(0);
   }
@@ -155,7 +155,6 @@ int SocketIO::get_pxd(int sock, char* data, int len)
     exit(0);
   }
   int bcount = read_data(sock, data + headerlen + tablelen, datalen);
-  if (br <= 0) return br;
   return (headerlen + tablelen + bcount);
 }
 

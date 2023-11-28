@@ -13,12 +13,12 @@
 
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdMu
+from stdCharged import stdMu
 from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
 
-__liaison__ = "Sen Jia <jiasen@buaa.edu.cn>"
+__liaison__ = "Sen Jia <jiasen@seu.edu.cn>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -42,13 +42,12 @@ class BottomoniumEtabExclusive(BaseSkim):
     __category__ = "physics, quarkonium"
 
     def load_standard_lists(self, path):
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         # create and fill hard photon
         ma.fillParticleList(decayString="pi+:BottomoniumEtab_eventshape", cut="pt > 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:BottomoniumEtab_eventshape", cut="E > 0.1", path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(decayString="gamma:BottomoniumEtab_eventshape", cut="E > 0.1", path=path)
 
         ma.buildEventShape(inputListNames=["pi+:BottomoniumEtab_eventshape", "gamma:BottomoniumEtab_eventshape"],
                            allMoments=False,
@@ -102,7 +101,7 @@ class BottomoniumUpsilon(BaseSkim):
     __category__ = "physics, quarkonium"
 
     def load_standard_lists(self, path):
-        stdPhotons("loose", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
         Ycuts = ""
@@ -119,8 +118,7 @@ class BottomoniumUpsilon(BaseSkim):
 
         # require foxWolframR2 < 0.995
         ma.fillParticleList(decayString="pi+:BottomoniumUpsilon_eventshape", cut="pt > 0.1", path=path)
-        ma.fillParticleList(decayString="gamma:BottomoniumUpsilon_eventshape", cut="E > 0.1", path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(decayString="gamma:BottomoniumUpsilon_eventshape", cut="E > 0.1", path=path)
 
         ma.buildEventShape(inputListNames=["pi+:BottomoniumUpsilon_eventshape", "gamma:BottomoniumUpsilon_eventshape"],
                            allMoments=False,
@@ -175,11 +173,13 @@ class CharmoniumPsi(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
-        stdE('loosepid', path=path)
         stdMu('loosepid', path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
+
+        # Electron list. Exclude TOP
+        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1', path=path)
 
         # Mass cuts.
         jpsi_mass_cut = '2.85 < M < 3.3'
@@ -191,15 +191,15 @@ class CharmoniumPsi(BaseSkim):
         # The recommeneded list for further reconstruction is J/psi:eebrems.
         # The estimated ratio of efficiencies in B decays in release 5.1.5 is
         # 1.00 (J/psi:eebrems) : 0.95 (J/psi:eebrems2) : 0.82 (J/psi:ee).
-        ma.correctBremsBelle('e+:brems', 'e+:loosepid', 'gamma:all',
+        ma.correctBremsBelle('e+:brems', 'e+:loosepid_noTOP', 'gamma:all',
                              angleThreshold=0.05,
                              path=path)
-        ma.correctBrems('e+:brems2', 'e+:loosepid', 'gamma:all', path=path)
+        ma.correctBrems('e+:brems2', 'e+:loosepid_noTOP', 'gamma:all', path=path)
 
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay('J/psi:ee -> e+:loosepid e-:loosepid',
+        ma.reconstructDecay('J/psi:ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
                             jpsi_mass_cut, path=path)
-        ma.reconstructDecay('psi(2S):ee -> e+:loosepid e-:loosepid',
+        ma.reconstructDecay('psi(2S):ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
                             psi2s_mass_cut, path=path)
 
         ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
@@ -230,7 +230,7 @@ class CharmoniumPsi(BaseSkim):
 
         # [Y(3S) -> pi+pi- [Y(1S,2S) -> mu+mu-]] decay
         ma.reconstructDecay('J/psi:mumu_test -> mu+:loosepid mu-:loosepid', '', path=path)
-        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid e-:loosepid', '', path=path)
+        ma.reconstructDecay('J/psi:ee_test -> e+:loosepid_noTOP e-:loosepid_noTOP', '', path=path)
         ma.copyList('J/psi:ll', 'J/psi:mumu_test', path=path)
         ma.copyList('J/psi:ll', 'J/psi:ee_test', path=path)
 

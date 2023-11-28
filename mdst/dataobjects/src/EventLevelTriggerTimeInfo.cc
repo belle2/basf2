@@ -42,10 +42,11 @@ int EventLevelTriggerTimeInfo::getTimeSinceInjectedBunch() const
   } else {
     B2ERROR("Payload 'TTDOffsets' not found. To get the (uncorrected) information from TTD, use 'getTimeSinceLastInjection() or 'getTimeSinceLastInjectionInMicroSeconds()'.");
   }
-  return m_timeSinceLastInjection + delay;
+  // a negative number means the "just" injected bunch has not yet passed the detector
+  return m_timeSinceLastInjection - delay;
 }
 
-// get time since the previous trigger in microseconds
+// get time since injected bunch passed the detector in microseconds
 double EventLevelTriggerTimeInfo::getTimeSinceInjectedBunchInMicroSeconds() const
 {
   // use the 'HardwareClockSettings' to get the frequency the clock

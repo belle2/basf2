@@ -85,7 +85,7 @@ CalibrationAlgorithm::EResult PXDClusterPositionCalibrationAlgorithm::calibrate(
         createShapeClassifier(treename, &localShapeClassifier, &localShapeIndexer);
 
         bufferkey_t key = std::make_tuple(clusterKind, uBin, vBin);
-        localCalibrationMap[key] = buffervalue_t(localShapeIndexer ,  localShapeClassifier);
+        localCalibrationMap[key] = buffervalue_t(localShapeIndexer,  localShapeClassifier);
       }
     }
   }

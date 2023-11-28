@@ -1,0 +1,55 @@
+# EventType: 1216052013
+# Descriptor:  Y(4S) -> B-B+
+#                       B- -> D*0 a_1-
+#                             D*0 -> D0 pi0
+#                                    D0 -> K- pi+
+#                             a_1- -> K- K*0
+#                                     K*0 -> K+ pi-
+#                       B+ -> anything
+# NickName: Bu_Dst0a1-D0pi0_K-Kst0_K-pi+_K+pi-
+# PhysicsWG: B2Hadronic
+# Reponsible: Valerio Bertacchi
+# Email:bertacchi@cppm.in2p3.fr
+# Cuts: None
+# Date: 2022-07-27
+
+# Aliases
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+Alias a_1-sig a_1-
+Alias a_1+sig a_1+
+ChargeConj anti-K*0sig K*0sig
+ChargeConj a_1+sig a_1-sig
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+Decay B-sig
+1.0 D*0sig  a_1-sig SVV_HELAMP 0.200 0.0 0.866 0.0 0.458 0.0; #from http://babar-hn.slac.stanford.edu:5090/HyperNews/get/event_gen/168.html,
+Enddecay
+
+Decay D*0sig
+1.0 D0sig  pi0 VSS;
+Enddecay
+
+Decay a_1-sig
+1.0 K*0sig K- VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+
+Decay D0sig
+1.0 K-   pi+ PHSP;
+Enddecay
+
+Decay K*0sig
+1.0   K+  pi-  VSS;
+Enddecay
+
+CDecay B+sig
+CDecay anti-D*0sig
+CDecay anti-D0sig
+CDecay anti-K*0sig
+CDecay a_1+sig
+
+End

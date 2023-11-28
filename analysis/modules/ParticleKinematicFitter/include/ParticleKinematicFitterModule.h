@@ -25,7 +25,7 @@
 #include <analysis/OrcaKinFit/ParticleFitObject.h>
 
 // analysis dataobjects
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/ParticleList.h>
 
 // framework datastore

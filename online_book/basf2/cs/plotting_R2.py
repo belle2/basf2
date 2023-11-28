@@ -2,9 +2,10 @@
 # %matplotlib inline
 
 import matplotlib.pyplot as plt
-from root_pandas import read_root
+import uproot
 
-df = read_root("ContinuumSuppression.root")
+var_list = ['isContinuumEvent', 'R2']
+df = uproot.open("ContinuumSuppression_applied.root:tree").arrays(var_list, library='pd')
 
 fig, ax = plt.subplots()
 

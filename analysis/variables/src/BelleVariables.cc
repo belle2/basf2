@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/BelleVariables.h>
 
 // include VariableManager
@@ -159,7 +159,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackFirstX();
     }
@@ -169,7 +169,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackFirstY();
     }
@@ -179,7 +179,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackFirstZ();
     }
@@ -189,7 +189,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackLastX();
     }
@@ -199,7 +199,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackLastY();
     }
@@ -209,7 +209,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTrackLastZ();
     }
@@ -230,7 +230,7 @@ namespace Belle2 {
       double massErrSquared = jacobian * (covarianceMatrix * jacobian);
 
       if (massErrSquared < 0.0)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
 
       double invMass = particleInvariantMassFromDaughters(particle);
       double nomMass = particle->getPDGMass();
@@ -243,7 +243,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTof();
     }
@@ -253,7 +253,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTofQuality();
     }
@@ -263,7 +263,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getTofSigma();
     }
@@ -273,7 +273,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getPathLength();
     }
@@ -283,7 +283,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getdEdx();
     }
@@ -293,7 +293,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getdEdxQuality();
     }
@@ -303,7 +303,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getACCPe();
     }
@@ -313,7 +313,7 @@ namespace Belle2 {
       auto belleTrkExtra = getBelleTrkExtraInfoFromParticle(particle);
       if (!belleTrkExtra) {
         B2WARNING("Cannot find BelleTrkExtra, did you forget to enable BelleTrkExtra during the conversion?");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return belleTrkExtra->getACCQuality();
     }
@@ -335,10 +335,10 @@ flight distance in the transverse plane.
 [Legacy] Returns 2.0, 1.0, 0.0 as an indication of goodness of :math:`\Lambda^0` candidates, 
 based on:
 
-    * The distance of the two daughter tracks at their interception at z axis,
-    * the minimum distance of the daughter tracks and the IP in xy plane,
-    * the difference of the azimuthal angle of the vertex vector and the momentum vector,
-    * and the flight distance of the Lambda0 candidates in xy plane.
+* The distance of the two daughter tracks at their interception at z axis,
+* the minimum distance of the daughter tracks and the IP in xy plane,
+* the difference of the azimuthal angle of the vertex vector and the momentum vector,
+* and the flight distance of the Lambda0 candidates in xy plane.
 
 It reproduces the ``goodLambda()`` function in Belle.
 
@@ -371,26 +371,32 @@ energy selection for Belle data and MC.
 
     REGISTER_VARIABLE("BelleFirstCDCHitX", BelleFirstCDCHitX, R"DOC(
 [Legacy] Returns x component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
+
 )DOC","cm");
 
     REGISTER_VARIABLE("BelleFirstCDCHitY", BelleFirstCDCHitY, R"DOC(
 [Legacy] Returns y component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
+
 )DOC","cm");
 
     REGISTER_VARIABLE("BelleFirstCDCHitZ", BelleFirstCDCHitZ, R"DOC(
 [Legacy] Returns z component of starting point of the track near the 1st SVD or CDC hit for SVD1 data (exp. 7 - 27) or the 1st CDC hit for SVD2 data (from exp. 31). (Belle only, originally stored in mdst_trk_fit.)
+
 )DOC","cm");
 
     REGISTER_VARIABLE("BelleLastCDCHitX", BelleLastCDCHitX, R"DOC(
 [Legacy] Returns x component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+
 )DOC","cm");
 
     REGISTER_VARIABLE("BelleLastCDCHitY", BelleLastCDCHitY, R"DOC(
 [Legacy] Returns y component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+
 )DOC","cm");
 
     REGISTER_VARIABLE("BelleLastCDCHitZ", BelleLastCDCHitZ, R"DOC(
 [Legacy] Returns z component of end point of the track near the last CDC hit. (Belle only, originally stored in mdst_trk_fit.)
+
 )DOC","cm");
 
     REGISTER_VARIABLE("BellePi0SigM", BellePi0InvariantMassSignificance, R"DOC(
@@ -405,6 +411,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 
     REGISTER_VARIABLE("BelleTof", BelleTof, R"DOC(
 [Legacy] Returns the time of flight of a track. (Belle only).
+
 )DOC", "ns");
 
     REGISTER_VARIABLE("BelleTofQuality", BelleTofQuality, R"DOC(
@@ -413,14 +420,17 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 
     REGISTER_VARIABLE("BelleTofSigma", BelleTofSigma, R"DOC(
 [Legacy] Returns the expected resolution on the time of flight of a track. (Belle only).
+
 )DOC", "ns");
 
     REGISTER_VARIABLE("BellePathLength", BellePathLength, R"DOC(
 [Legacy] Returns the track path length. This is defined from the closest point to the z-axis up to TOF counter. (Belle only).
+
 )DOC", "cm");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(
 [Legacy] Returns the dE/dx measured in the CDC. (Belle only).
+
 )DOC", "keV/cm");
 
     REGISTER_VARIABLE("BelledEdxQuality", BelledEdxQuality, R"DOC(

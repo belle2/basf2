@@ -9,12 +9,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <array>
 
-#include <framework/geometry/B2Vector3.h> // gradually moving to B2Vector3 instead of TVector3
+#include <framework/geometry/B2Vector3.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -143,6 +144,12 @@ namespace Belle2 {
 
     /** set the origin to a specific point. Needed for determining the direction of flight of the particle for a given hit */
     std::vector<double> m_PARAMsetOrigin;
+
+    StoreArray<SpacePointTrackCand> m_spacePointTCs;  /**< SpacePointTrackCand StoreArray */
+    StoreArray<SpacePointTrackCand> m_curlingFirstOuts;  /**< Curling SpacePointTrackCand StoreArray */
+    StoreArray<SpacePointTrackCand> m_curlingAllIns;  /**< Curling SpacePointTrackCand StoreArray */
+    StoreArray<SpacePointTrackCand> m_curlingRestOuts;  /**< Curling SpacePointTrackCand StoreArray */
+    StoreArray<SpacePointTrackCand> m_curlingCompletes;  /**< Curling SpacePointTrackCand StoreArray */
 
     int m_PARAMnTrackStubs; /**< maximum number of TrackCand Stubs to be stored for a curling TrackCand */
 

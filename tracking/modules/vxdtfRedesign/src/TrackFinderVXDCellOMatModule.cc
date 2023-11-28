@@ -14,7 +14,6 @@
 #include <tracking/trackFindingVXD/segmentNetwork/NodeNetworkHelperFunctions.h>
 
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(TrackFinderVXDCellOMat);
@@ -32,17 +31,17 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
   addParam("NetworkName",
            m_PARAMNetworkName,
            "name for StoreObjPtr< DirectedNodeNetwork> which contains the networks needed.",
-           string(""));
+           std::string(""));
 
   addParam("SpacePointTrackCandArrayName",
            m_PARAMSpacePointTrackCandArrayName,
            "name for StoreArray< SpacePointTrackCand> to be filled.",
-           string(""));
+           std::string(""));
 
   addParam("EventLevelTrackingInfoName",
            m_PARAMEventLevelTrackingInfoName,
            "Name of the EventLevelTrackingInfo that should be used (different one for ROI-finding).",
-           string("EventLevelTrackingInfo"));
+           std::string("EventLevelTrackingInfo"));
 
   addParam("printNetworks",
            m_PARAMprintNetworks,

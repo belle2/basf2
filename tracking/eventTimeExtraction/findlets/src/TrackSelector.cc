@@ -28,7 +28,7 @@ void TrackSelector::apply(std::vector<RecoTrack*>& tracks)
 {
   const auto trackHasEnoughPtAndHits = [this](RecoTrack * rt) {
     return (rt->getNumberOfCDCHits() < m_param_minNumberCDCHits) or
-           (rt->getMomentumSeed().Mag() < m_param_minimumTrackPt);
+           (rt->getMomentumSeed().Rho() < m_param_minimumTrackPt);
   };
   TrackFindingCDC::erase_remove_if(tracks, trackHasEnoughPtAndHits);
 
@@ -44,5 +44,5 @@ void TrackSelector::apply(std::vector<RecoTrack*>& tracks)
   // limit to the maximum number of tracks
   tracks.resize(maximalNumberOfElements);
 
-  B2DEBUG(50, "Limited number of selected tracks: " << tracks.size());
+  B2DEBUG(25, "Limited number of selected tracks: " << tracks.size());
 }

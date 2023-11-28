@@ -25,7 +25,7 @@ int vhdlVersion0(ofstream&);
 int ucfVersion0(ofstream&);
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
 
   cout << NAME << " ... " << VERSION << endl;

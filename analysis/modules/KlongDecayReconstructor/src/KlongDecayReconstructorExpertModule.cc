@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/KlongDecayReconstructor/KlongDecayReconstructorExpertModule.h>
 
 // framework aux
@@ -19,6 +19,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <Math/Vector4D.h>
+#include <TMath.h>
 
 #include <memory>
 
@@ -85,24 +86,27 @@ void KlongDecayReconstructorExpertModule::initialize()
   std::string kListName;
   newDecayString = m_listName + " -> ";
 
-  bool k_check = false;
-
   // Daughters
+  bool k_check = false;
   int nProducts = m_decaydescriptor.getNDaughters();
   for (int i = 0; i < nProducts; ++i) {
     const DecayDescriptorParticle* daughter = m_decaydescriptor.getDaughter(i)->getMother();
-    if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
-      StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
-      newDecayString = newDecayString + daughter->getFullName() + " ";
-    } else {
+    if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+      if (k_check)
+        B2FATAL("More than one K_L is detected! This module accepts only one K_L in the final state.");
+
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName() + m_recoList);
       kListName = daughter->getFullName() + m_recoList;
       k_check = true;
+    } else {
+      StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+      newDecayString = newDecayString + daughter->getFullName() + " ";
     }
   }
 
   if (!k_check)
     B2FATAL("This module is meant to reconstruct decays with a K_L0 in the final state. There is no K_L0 in this decay!");
+
   newDecayString = newDecayString + kListName;
 
   m_generator = std::make_unique<ParticleGenerator>(newDecayString, m_cutParameter);

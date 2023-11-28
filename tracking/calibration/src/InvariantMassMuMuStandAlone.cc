@@ -17,7 +17,6 @@
 
 #include <TROOT.h>
 #include <TTree.h>
-#include <TVector3.h>
 #include <TGraph.h>
 #include <TRandom3.h>
 #include <TH1D.h>
@@ -54,8 +53,6 @@
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
 
-using namespace std;
-
 
 namespace Belle2::InvariantMassMuMuCalib {
 
@@ -63,10 +60,10 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
   /// read events from TTree to std::vector
-  vector<Event> getEvents(TTree* tr, bool is4S)
+  std::vector<Event> getEvents(TTree* tr, bool is4S)
   {
 
-    vector<Event> events;
+    std::vector<Event> events;
     events.reserve(tr->GetEntries());
 
     Event evt;
@@ -75,8 +72,8 @@ namespace Belle2::InvariantMassMuMuCalib {
     tr->SetBranchAddress("exp", &evt.exp);
     tr->SetBranchAddress("event", &evt.evtNo);
 
-    TVector3* p0 = nullptr;
-    TVector3* p1 = nullptr;
+    B2Vector3D* p0 = nullptr;
+    B2Vector3D* p1 = nullptr;
 
     tr->SetBranchAddress("mu0_p", &p0);
     tr->SetBranchAddress("mu1_p", &p1);
@@ -115,20 +112,20 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
   // Numerical integration using Gauss-Konrod algorithm
-  double integrate(function<double(double)> f, double a, double b)
+  double integrate(std::function<double(double)> f, double a, double b)
   {
-    static const vector<double> nodes = {
+    static const std::vector<double> nodes = {
       -0.991455371120813,
-      -0.949107912342759,
-      -0.864864423359769,
-      -0.741531185599394,
-      -0.586087235467691,
-      -0.405845151377397,
-      -0.207784955007898,
-      0.000000000000000
-    };
+        -0.949107912342759,
+        -0.864864423359769,
+        -0.741531185599394,
+        -0.586087235467691,
+        -0.405845151377397,
+        -0.207784955007898,
+        0.000000000000000
+      };
 
-    static const vector<double> wgts = {
+    static const std::vector<double> wgts = {
       0.022935322010529,
       0.063092092629979,
       0.104790010322250,
@@ -473,10 +470,10 @@ namespace Belle2::InvariantMassMuMuCalib {
 
   /** read the mass from events and filter on mu PID and invariant mass range, i.e. a < mass < b
     a and b are in MeV */
-  vector<double> readEvents(const vector<Event>& evts, double pidCut, double a, double b)
+  std::vector<double> readEvents(const std::vector<Event>& evts, double pidCut, double a, double b)
   {
 
-    vector<double> vMass;
+    std::vector<double> vMass;
     for (const auto& ev : evts) {
 
       //Keep only muons
@@ -619,7 +616,7 @@ namespace Belle2::InvariantMassMuMuCalib {
     grLine->SetLineColor(kRed);
     grLine->Draw("same");
 
-    filesystem::create_directories("plotsMuMu");
+    std::filesystem::create_directories("plotsMuMu");
 
     can->SaveAs(Form("plotsMuMu/mumu_%d.pdf", time));
 
@@ -639,7 +636,7 @@ namespace Belle2::InvariantMassMuMuCalib {
   }
 
 /// plots the result of the fit to the Mmumu, i.e. data and the fitted curve
-  static void plotMuMuFit(const vector<double>& data, const Pars& pars, Eigen::MatrixXd mat, double mMin, double mMax, int time)
+  static void plotMuMuFit(const std::vector<double>& data, const Pars& pars, Eigen::MatrixXd mat, double mMin, double mMax, int time)
   {
     const int nBins = 100;
 
@@ -708,15 +705,15 @@ namespace Belle2::InvariantMassMuMuCalib {
 
   /** run the collision invariant mass calibration,
       it returns (eCMS, eCMSstatUnc, 0) */
-  pair<Pars, MatrixXd> getInvMassPars(const vector<Event>& evts, Pars pars, double mMin, double mMax, int bootStrap = 0)
+  std::pair<Pars, MatrixXd> getInvMassPars(const std::vector<Event>& evts, Pars pars, double mMin, double mMax, int bootStrap = 0)
   {
     bool is4S = evts[0].is4S;
 
-    vector<double> dataNow = readEvents(evts, 0.9/*PIDcut*/, mMin, mMax);
+    std::vector<double> dataNow = readEvents(evts, 0.9/*PIDcut*/, mMin, mMax);
 
 
     // do bootStrap
-    vector<double> data;
+    std::vector<double> data;
     TRandom3* rand = nullptr;
     if (bootStrap) rand = new TRandom3(bootStrap);
     for (auto d : dataNow) {
@@ -734,27 +731,27 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
     Pars pars0_4S = {
-      {"C" , 15        },
-      {"bDelta" , 1.60307        },
-      {"bMean" , 0        },
-      {"frac" , 0.998051        },
-      {"m0" , 10570.2        },
-      {"mean" , 4.13917        },
-      {"sigma" , 37.0859        },
-      {"slope" , 0.876812        },
-      {"tau" , 99.4225}
+      {"C", 15        },
+      {"bDelta", 1.60307        },
+      {"bMean", 0        },
+      {"frac", 0.998051        },
+      {"m0", 10570.2        },
+      {"mean", 4.13917        },
+      {"sigma", 37.0859        },
+      {"slope", 0.876812        },
+      {"tau", 99.4225}
     };
 
     Pars pars0_Off = {
-      {"C" , 15        },
-      {"bDelta" , 2.11        },
-      {"bMean" , 0        },
-      {"frac" , 0.9854        },
-      {"m0" , mMax - 230     },
-      {"mean" , 4.13917        },
-      {"sigma" , 36.4         },
-      {"slope" , 0.892           },
-      {"tau" , 64.9}
+      {"C", 15        },
+      {"bDelta", 2.11        },
+      {"bMean", 0        },
+      {"frac", 0.9854        },
+      {"m0", mMax - 230     },
+      {"mean", 4.13917        },
+      {"sigma", 36.4         },
+      {"slope", 0.892           },
+      {"tau", 64.9}
     };
 
     if (pars.empty()) {
@@ -764,16 +761,16 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
     Limits limits = {
-      {"mean",   make_pair(0, 0)},
-      {"sigma",  make_pair(10, 120)},
-      {"bMean",  make_pair(0, 0)},
-      {"bDelta", make_pair(0.01, 10.)},
-      {"tau",    make_pair(20, 250)},
-      {"frac",   make_pair(0.00, 1.0)},
+      {"mean",   std::make_pair(0, 0)},
+      {"sigma",  std::make_pair(10, 120)},
+      {"bMean",  std::make_pair(0, 0)},
+      {"bDelta", std::make_pair(0.01, 10.)},
+      {"tau",    std::make_pair(20, 250)},
+      {"frac",   std::make_pair(0.00, 1.0)},
 
-      {"m0",    make_pair(10450, 10950)},
-      {"slope", make_pair(0.3, 0.999)},
-      {"C",     make_pair(0, 0)}
+      {"m0",    std::make_pair(10450, 10950)},
+      {"slope", std::make_pair(0.3, 0.999)},
+      {"C",     std::make_pair(0, 0)}
     };
 
 
@@ -785,19 +782,19 @@ namespace Belle2::InvariantMassMuMuCalib {
 
 
   // Returns tuple with the invariant mass parameters (cmsEnergy in GeV)
-  tuple<vector<VectorXd>, vector<MatrixXd>, MatrixXd>  runMuMuInvariantMassAnalysis(vector<Event> evts,
-      const vector<double>& splitPoints)
+  std::tuple<std::vector<VectorXd>, std::vector<MatrixXd>, MatrixXd>  runMuMuInvariantMassAnalysis(std::vector<Event> evts,
+      const std::vector<double>& splitPoints)
   {
     int n = splitPoints.size() + 1;
 
-    vector<VectorXd>     invMassVec(n);
-    vector<MatrixXd>  invMassVecUnc(n);
+    std::vector<VectorXd>     invMassVec(n);
+    std::vector<MatrixXd>  invMassVecUnc(n);
     MatrixXd          invMassVecSpred;
 
-    std::ofstream mumuTextOut("mumuEcalib.txt", ios::app);
+    std::ofstream mumuTextOut("mumuEcalib.txt", std::ios::app);
     static int iPrint = 0;
     if (iPrint == 0)
-      mumuTextOut << "n   id    t1   t2    exp1   run1     exp2  run2    Ecms   EcmsUnc   state" << endl;
+      mumuTextOut << "n   id    t1   t2    exp1   run1     exp2  run2    Ecms   EcmsUnc   state" << std::endl;
     ++iPrint;
 
     for (int iDiv = 0; iDiv < n; ++iDiv) {
@@ -807,7 +804,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       invMassVecUnc[iDiv].resize(1, 1); //1x1 matrix covariance mat of the center
       invMassVecSpred.resize(1, 1);  //1x1 matrix for spread of the 1D Gauss
 
-      vector<Event> evtsNow;
+      std::vector<Event> evtsNow;
       for (auto ev :  evts) {
         double tMin = (iDiv != 0)   ? splitPoints[iDiv - 1] : -1e40;
         double tMax = (iDiv != n - 1) ? splitPoints[iDiv]   :  1e40;
@@ -823,7 +820,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
       // in case of offResonance runs adjust limits from median
       if (!evtsNow[0].is4S) {
-        vector<double> dataNow;
+        std::vector<double> dataNow;
         for (const auto& ev : evtsNow)
           dataNow.push_back(ev.m);
         double mMedian = 1e3 * Belle2::BoostVectorCalib::median(dataNow.data(), dataNow.size());
@@ -839,7 +836,7 @@ namespace Belle2::InvariantMassMuMuCalib {
       const int nRep = 25;
 
 
-      vector<double> vals, errs;
+      std::vector<double> vals, errs;
       for (int rep = 0; rep < 200; ++rep) {
         double errEst = 50. / sqrt(evtsNow.size());
 
@@ -905,10 +902,10 @@ namespace Belle2::InvariantMassMuMuCalib {
         sum2 += pow(v - meanMass, 2);
       double errBootStrap = vals.size() > 1 ? sqrt(sum2 / (vals.size() - 1)) : 0;
 
-      mumuTextOut << n << " " << iDiv << " " << setprecision(14) << evtsNow.front().t << " " << evtsNow.back().t << " " <<
+      mumuTextOut << n << " " << iDiv << " " << std::setprecision(14) << evtsNow.front().t << " " << evtsNow.back().t << " " <<
                   evtsNow.front().exp << " " << evtsNow.front().run << " " << evtsNow.back().exp << " " << evtsNow.back().run  <<   "  " << meanMass
                   <<
-                  "   " << meanMassUnc << " " << errBootStrap <<   endl;
+                  "   " << meanMassUnc << " " << errBootStrap <<   std::endl;
 
       // Convert to GeV
       invMassVec[iDiv](0) = meanMass / 1e3;
@@ -918,7 +915,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     mumuTextOut.close();
 
-    return make_tuple(invMassVec, invMassVecUnc, invMassVecSpred);
+    return std::make_tuple(invMassVec, invMassVecUnc, invMassVecSpred);
   }
 
 }

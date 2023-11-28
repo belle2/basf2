@@ -30,6 +30,7 @@
 #include <simulation/monopoles/G4MonopolePhysics.h>
 #include <simulation/longlivedneutral/G4LongLivedNeutralPhysics.h>
 
+#include <G4FieldManager.hh>
 #include <G4TransportationManager.hh>
 #include <G4Transportation.hh>
 #include <G4PhysListFactory.hh>
@@ -51,6 +52,7 @@
 #include <G4HelixExplicitEuler.hh>
 #include <G4HelixSimpleRunge.hh>
 #include <G4CachedMagneticField.hh>
+#include <G4ChordFinder.hh>
 
 using namespace std;
 using namespace Belle2;
@@ -96,7 +98,7 @@ FullSimModule::FullSimModule() : Module(), m_useNativeGeant4(true)
            "[cm] Apply continuous energy loss to primary particle which has no longer enough energy to produce secondaries which travel at least the specified productionCut distance.",
            0.07);
   addParam("PXDProductionCut", m_pxdProductionCut, "[cm] Secondary production threshold in PXD envelope.", 0.0);
-  addParam("SVDProductionCut", m_svdProductionCut, "[cm] Secondary production threshold in SVD envelope.", 0.0005);
+  addParam("SVDProductionCut", m_svdProductionCut, "[cm] Secondary production threshold in SVD envelope.", 0.0);
   addParam("CDCProductionCut", m_cdcProductionCut, "[cm] Secondary production threshold in CDC envelope.", 0.0);
   addParam("ARICHTOPProductionCut", m_arichtopProductionCut, "[cm] Secondary production threshold in ARICH and TOP envelopes.", 0.02);
   addParam("ECLProductionCut", m_eclProductionCut, "[cm] Secondary production threshold in ECL envelope.", 0.0);
@@ -198,7 +200,7 @@ void FullSimModule::initialize()
 
   if (m_physicsList == "Belle2") {
     // Use Belle2PhysicsList
-    Belle2PhysicsList* physicsList = new Belle2PhysicsList(m_physicsList);
+    Belle2PhysicsList* physicsList = new Belle2PhysicsList(m_physicsList, m_hadronProcessVerbosity);
     physicsList->SetVerbosity(m_runEventVerbosity);
     physicsList->UseStandardEMPhysics(m_standardEM);
     physicsList->UseOpticalPhysics(m_optics);
@@ -246,16 +248,16 @@ void FullSimModule::initialize()
       }
     }
 
-    // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
-    // all the energy (as is done in G4ErrorPhysicsList)
-    G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
-    myParticleIterator->reset();
-    while ((*myParticleIterator)()) {
-      G4ParticleDefinition* particle = myParticleIterator->value();
-      if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
-        physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
-      }
-    }
+    // // LEP: For geant4e-specific particles, set a big step so that AlongStep computes
+    // // all the energy (as is done in G4ErrorPhysicsList)
+    // G4ParticleTable::G4PTblDicIterator* myParticleIterator = G4ParticleTable::GetParticleTable()->GetIterator();
+    // myParticleIterator->reset();
+    // while ((*myParticleIterator)()) {
+    //   G4ParticleDefinition* particle = myParticleIterator->value();
+    //   if (particle->GetParticleName().compare(0, 4, "g4e_") == 0) {
+    //     physicsList->SetParticleCuts(1.0E+9 * CLHEP::cm, particle);
+    //   }
+    // }
     runManager.SetUserInitialization(physicsList);
   }
 

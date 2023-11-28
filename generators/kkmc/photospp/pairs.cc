@@ -133,22 +133,22 @@ namespace Photospp {
     // ---------------------------------------------------------------------
     if (KEY == 1) {
       bostd3(PRM, PNEUTR, PNEUTR);
-      bostd3(PRM, PNU , PNU);
-      bostd3(PRM, PAA , PAA);
-      bostd3(PRM, PE , PE);
-      bostd3(PRM, PP , PP);
+      bostd3(PRM, PNU, PNU);
+      bostd3(PRM, PAA, PAA);
+      bostd3(PRM, PE, PE);
+      bostd3(PRM, PP, PP);
     } else if (KEY == 2) {
       rotod2(PRM, PNEUTR, PNEUTR);
-      rotod2(PRM, PNU , PNU);
-      rotod2(PRM, PAA , PAA);
-      rotod2(PRM, PE  , PE);
-      rotod2(PRM, PP  , PP);
+      rotod2(PRM, PNU, PNU);
+      rotod2(PRM, PAA, PAA);
+      rotod2(PRM, PE, PE);
+      rotod2(PRM, PP, PP);
     } else if (KEY == 3) {
       rotod3(PRM, PNEUTR, PNEUTR);
-      rotod3(PRM, PNU , PNU);
-      rotod3(PRM, PAA , PAA);
-      rotod3(PRM, PE  , PE);
-      rotod3(PRM, PP  , PP);
+      rotod3(PRM, PNU, PNU);
+      rotod3(PRM, PAA, PAA);
+      rotod3(PRM, PE, PE);
+      rotod3(PRM, PP, PP);
     } else {
       printf(" STOP IN LOTRA. WRONG KEYTRA");
       exit(-1);
@@ -473,7 +473,7 @@ namespace Photospp {
 
     //*2*PI*4*PI  /2/PI/4/PI;      // other angles normalization of transformation to random numbers.
 
-    double XPMAX = (AMTO * AMTO + XMP * XMP - (AMCH + AMNE) * (AMCH + AMNE)) / 2.0 / AMTO;
+    //double XPMAX = (AMTO * AMTO + XMP * XMP - (AMCH + AMNE) * (AMCH + AMNE)) / 2.0 / AMTO;
 
     double YOT3 = F * G * H; // jacobians for phase space variables
     double YOT2 =      // lambda factors:
@@ -545,9 +545,9 @@ namespace Photospp {
     PARNEU = GNEU - sqrt(GNEU * GNEU - 1.0);
 
     // 2) REDUCTIEV BOOSTS
-    bostd3(PARNEU, VEC , VEC);
+    bostd3(PARNEU, VEC, VEC);
     bostd3(PARNEU, PNEUTR, PNEUTR);
-    bostd3(PARCH, PAA , PAA);
+    bostd3(PARCH, PAA, PAA);
     spaj(2, PNEUTR, PAA, PP, PE);
 
     // TIME FOR THE PHOTON that is electron pair
@@ -650,8 +650,8 @@ namespace Photospp {
     double ppq2 = PNEUTR[3] * PE[3] - PNEUTR[2] * PE[2] - PNEUTR[1] * PE[1] - PNEUTR[0] * PE[0];
 
     double ppp = PNEUTR[3] * PAA[3] - PNEUTR[2] * PAA[2] - PNEUTR[1] * PAA[1] - PNEUTR[0] * PAA[0];
-    double mneutr2 = PNEUTR[3] * PNEUTR[3] - PNEUTR[2] * PNEUTR[2] - PNEUTR[1] * PNEUTR[1] - PNEUTR[0] * PNEUTR[0];
-    double maa2 = PAA[3] * PAA[3] - PAA[2] * PAA[2] - PAA[1] * PAA[1] - PAA[0] * PAA[0];
+    //double mneutr2 = PNEUTR[3] * PNEUTR[3] - PNEUTR[2] * PNEUTR[2] - PNEUTR[1] * PNEUTR[1] - PNEUTR[0] * PNEUTR[0];
+    //double maa2 = PAA[3] * PAA[3] - PAA[2] * PAA[2] - PAA[1] * PAA[1] - PAA[0] * PAA[0];
 
     double YOT1 = 1. / 2. / XMP / XMP / XMP / XMP *
                   (4 * (pq1 / pq - ppq1 / ppq) * (pq2 / pq - ppq2 / ppq)
@@ -714,9 +714,9 @@ namespace Photospp {
       XMP = sqrt(fabs(XMP));
 
 
-      double YOT1p = 1. / 2. / XMP / XMP / XMP / XMP *
-                     (4 * (pq1 / pq - ppq1 / ppq) * (pq2 / pq - ppq2 / ppq)
-                      - XMP * XMP * (AMCH2 / pq / pq + AMNE2 / ppq / ppq - ppp / pq / ppq - ppp / pq / ppq));
+      //      double YOT1p = 1. / 2. / XMP / XMP / XMP / XMP *
+      //               (4 * (pq1 / pq - ppq1 / ppq) * (pq2 / pq - ppq2 / ppq)
+      //                - XMP * XMP * (AMCH2 / pq / pq + AMNE2 / ppq / ppq - ppp / pq / ppq - ppp / pq / ppq));
       //   *(1-XP/XPMAX+0.5*(XP/XPMAX)*(XP/XPMAX));  // A-P kernel divide by (1-XP/XPMAX)?
       double wtint = 0.; // not yet installed
       wtint = 1; //(YOT1+YOT1p+wtint)/(YOT1+YOT1p);

@@ -10,7 +10,6 @@
 ##########################################################################
 
 import basf2 as b2
-import sys
 
 
 def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, applyMasking=False):
@@ -46,6 +45,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
 
     if(isROIsimulation):
         clusterizerName = '__ROISVDClusterizer'
+        timeGroupComposerName = '__ROISVDTimeGrouping'
         recocreatorName = '__ROISVDRecoDigitCreator'
         dataFormatName = '__ROISVDDataFormat'
         # recoDigitsName = '__ROIsvdRecoDigits'
@@ -54,6 +54,7 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         missingAPVsClusterCreatorName = '__ROISVDMissingAPVsClusterCreator'
     else:
         clusterizerName = 'SVDClusterizer'
+        timeGroupComposerName = 'SVDTimeGrouping'
         recocreatorName = 'SVDRecoDigitCreator'
         dataFormatName = 'SVDDataFormat'
         # recoDigitsName = ""
@@ -99,6 +100,12 @@ def add_svd_reconstruction(path, isROIsimulation=False, createRecoDigits=False, 
         svdTrackingEventLevelMdstInfoFiller.param('EventLevelTrackingInfoName', nameEventTrackingInfo)
         svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clustersName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
+
+    if timeGroupComposerName not in [e.name() for e in path.modules()]:
+        svdTimeGrouping = b2.register_module('SVDTimeGrouping')
+        svdTimeGrouping.set_name(timeGroupComposerName)
+        svdTimeGrouping.param('SVDClusters', clustersName)
+        path.add_module(svdTimeGrouping)
 
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
@@ -164,6 +171,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     if(isROIsimulation):
         fitterName = '__ROISVDCoGTimeEstimator'
         clusterizerName = '__ROISVDSimpleClusterizer'
+        timeGroupComposerName = '__ROISVDTimeGrouping'
         dataFormatName = '__ROISVDDataFormat'
         clusterName = '__ROIsvdClusters'
         recoDigitsName = '__ROIsvdRecoDigits'
@@ -172,6 +180,7 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
     else:
         fitterName = 'SVDCoGTimeEstimator'
         clusterizerName = 'SVDSimpleClusterizer'
+        timeGroupComposerName = 'SVDTimeGrouping'
         dataFormatName = 'SVDDataFormat'
         clusterName = ""
         recoDigitsName = ""
@@ -223,6 +232,12 @@ def add_rel5_svd_reconstruction(path, isROIsimulation=False, applyMasking=False)
         svdTrackingEventLevelMdstInfoFiller.param('svdClustersName', clusterName)
         path.add_module(svdTrackingEventLevelMdstInfoFiller)
 
+    if timeGroupComposerName not in [e.name() for e in path.modules()]:
+        svdTimeGrouping = b2.register_module('SVDTimeGrouping')
+        svdTimeGrouping.set_name(timeGroupComposerName)
+        svdTimeGrouping.param('SVDClusters', clusterName)
+        path.add_module(svdTimeGrouping)
+
     # Add SVDSpacePointCreator
     add_svd_SPcreation(path, isROIsimulation)
 
@@ -249,9 +264,9 @@ def add_svd_simulation(path, useConfigFromDB=False, daqMode=2, relativeShift=9):
 
     if not useConfigFromDB:
         if daqMode != 2 and daqMode != 1 and daqMode != 3:
-            print("OOPS the acquisition mode that you want to simulate is not available.")
-            print("Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample). Exiting now.")
-            sys.exit()
+            message = 'OOPS the acquisition mode that you want to simulate is not available.\n' \
+                      'Please choose among daqMode = 2 (6-sample) and daqMode = 1 (3-sample).'
+            b2.B2FATAL(message)
 
         # TODO add check of relative shift value
         svdevtinfoset.param("daqMode", daqMode)
@@ -285,8 +300,7 @@ def add_svd_unpacker_simulate3sampleDAQ(path, latencyShift=-1, relativeShift=-1)
     """
 
     if relativeShift != -1 and latencyShift != -1:
-        print("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
-        sys.exit(1)
+        b2.B2FATAL("OOPS please choose only one between relativeShift and latencyShift. Exiting now.")
 
     unpacker = b2.register_module('SVDUnpacker')
     unpacker.param("SVDEventInfo", "SVDEventInfoOriginal")

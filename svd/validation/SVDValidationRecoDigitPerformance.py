@@ -45,8 +45,8 @@ pu.plotter(
     expr='recodigit_time - truehit_time',
     cut='',
     descr='Definition: (reconstructed time of the RecoDigit) - (time of the Truehit);\
-    for all RecoDigit related to one TrueHit.',
-    check='Distribution between -40 and 20 ns.',
+    for all RecoDigit related to at least one TrueHit.',
+    check='Distribution should be centered around 0, with an RMS between 7 and 10 ns.',
     isShifter=True)
 
 pu.plotter(
@@ -55,12 +55,12 @@ pu.plotter(
     nbins=50,
     xmin=0,
     xmax=120000,
-    x_label='Strip charge (# of electrons)',
+    x_label='Strip charge (e-)',
     y_label='counts',
     granules=pu.gD,
     tree=treeRD,
     expr='recodigit_charge',
     cut='',
-    descr='Strip charge for all RecoDigits related to one TrueHit.',
-    check='Distribution peak around 15-30 ke.',
+    descr='Strip charge for all RecoDigits related to at least one TrueHit.',
+    check='',
     isShifter=False)

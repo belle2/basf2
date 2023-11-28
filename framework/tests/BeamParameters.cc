@@ -72,7 +72,7 @@ namespace {
     std::vector<double> cov;
     TMatrixDSym matrix(3);
     beamparams.setHER(0, 0, 0, cov);
-    beamparams.setVertex(TVector3(0, 0, 0), cov);
+    beamparams.setVertex(ROOT::Math::XYZVector(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
   }
@@ -90,7 +90,7 @@ namespace {
       vertex(1, 1) = i;
       vertex(2, 2) = i;
       beamparams.setHER(0, 0, 0, cov);
-      beamparams.setVertex(TVector3(0, 0, 0), cov);
+      beamparams.setVertex(ROOT::Math::XYZVector(0, 0, 0), cov);
       EXPECT_EQ(beam, beamparams.getCovHER());
       EXPECT_EQ(vertex, beamparams.getCovVertex());
     }
@@ -107,7 +107,7 @@ namespace {
     matrix(1, 1) = 2;
     matrix(2, 2) = 3;
     beamparams.setHER(0, 0, 0, cov);
-    beamparams.setVertex(TVector3(0, 0, 0), cov);
+    beamparams.setVertex(ROOT::Math::XYZVector(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
   }
@@ -125,7 +125,7 @@ namespace {
     matrix(1, 2) = matrix(2, 1) = 5;
     matrix(2, 2) = 6;
     beamparams.setHER(0, 0, 0, cov);
-    beamparams.setVertex(TVector3(0, 0, 0), cov);
+    beamparams.setVertex(ROOT::Math::XYZVector(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
   }
@@ -143,7 +143,7 @@ namespace {
     matrix(1, 2) = matrix(2, 1) = 6;
     matrix(2, 2) = 9;
     beamparams.setHER(0, 0, 0, cov);
-    beamparams.setVertex(TVector3(0, 0, 0), cov);
+    beamparams.setVertex(ROOT::Math::XYZVector(0, 0, 0), cov);
     EXPECT_EQ(matrix, beamparams.getCovHER());
     EXPECT_EQ(matrix, beamparams.getCovVertex());
   }

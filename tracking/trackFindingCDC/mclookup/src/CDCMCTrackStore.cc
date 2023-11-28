@@ -33,7 +33,7 @@ const CDCMCTrackStore& CDCMCTrackStore::getInstance()
 void CDCMCTrackStore::clear()
 {
 
-  B2DEBUG(200, "In CDCMCTrackStore::clear()");
+  B2DEBUG(29, "In CDCMCTrackStore::clear()");
 
   m_ptrMCMap = nullptr;
 
@@ -52,7 +52,7 @@ void CDCMCTrackStore::clear()
 void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrSimHitLookUp)
 {
 
-  B2DEBUG(200, "In CDCMCTrackStore::fill()");
+  B2DEBUG(29, "In CDCMCTrackStore::fill()");
   clear();
 
   m_ptrMCMap = ptrMCMap;
@@ -73,13 +73,13 @@ void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrS
   // Assigne the reverse mapping from CDCHits to the number of already traversed superlayers
   fillNLoopsAndNPassedSuperLayers();
 
-  B2DEBUG(100, "m_mcTracksByMCParticleIdx.size(): " << m_mcTracksByMCParticleIdx.size());
-  B2DEBUG(100, "m_mcSegmentsByMCParticleIdx.size(): " << m_mcSegmentsByMCParticleIdx.size());
+  B2DEBUG(28, "m_mcTracksByMCParticleIdx.size(): " << m_mcTracksByMCParticleIdx.size());
+  B2DEBUG(28, "m_mcSegmentsByMCParticleIdx.size(): " << m_mcSegmentsByMCParticleIdx.size());
 
-  B2DEBUG(100, "m_inTrackIds.size(): " << m_inTrackIds.size());
-  B2DEBUG(100, "m_inTrackSegmentIds.size() " << m_inTrackSegmentIds.size());
-  B2DEBUG(100, "m_nPassedSuperLayers.size(): " << m_nPassedSuperLayers.size());
-  B2DEBUG(100, "m_nLoops.size(): " << m_nLoops.size());
+  B2DEBUG(28, "m_inTrackIds.size(): " << m_inTrackIds.size());
+  B2DEBUG(28, "m_inTrackSegmentIds.size() " << m_inTrackSegmentIds.size());
+  B2DEBUG(28, "m_nPassedSuperLayers.size(): " << m_nPassedSuperLayers.size());
+  B2DEBUG(28, "m_nLoops.size(): " << m_nLoops.size());
 
 }
 

@@ -164,9 +164,8 @@ void PXDMappingLookup::map_rc_to_uv_IB_OF(unsigned int& v_cellID, unsigned int& 
 
   DCD_channel = (u_cellID << 2) + (v_cellID & 0x3) + 256 * dhp_id;
   Drain = LUT_IB_OF[DCD_channel];
-  u_cellID = 250 - 1 - (Drain >> 2);
-  if (Drain >> 2 <= -1) u_cellID = 255;  // workaround for alway false condition
-//  if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!! fix LUT above!
+  if (Drain >> 2 >= 250) u_cellID = 255;
+  else u_cellID = 250 - 1 - (Drain >> 2);
 //   row = (v_cellID / 4) * 4  + Drain % 4;
   row = (v_cellID & ~0x3)  + ((~Drain) & 0x3); // ~ bei drain
   row = row % 768;

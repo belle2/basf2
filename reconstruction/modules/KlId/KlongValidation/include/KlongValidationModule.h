@@ -108,8 +108,6 @@ namespace Belle2 {
     TH1F* m_time{nullptr};
     /**  track separation distance plot   */
     TH1F* m_trackSep{nullptr};
-    /**  energy plot   */
-    TH1F* m_energy{nullptr};
     /**  layer count plot   */
     TH1F* m_nLayer{nullptr};
     /**  innermostlayer  */

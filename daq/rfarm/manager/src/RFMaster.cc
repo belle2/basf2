@@ -70,7 +70,7 @@ void RFMaster::Hook_Message_Handlers()
 
 // NSM callback functions for message
 
-void RFMaster::Log_Handler(NSMmsg* msg, NSMcontext* ctx)
+void RFMaster::Log_Handler(NSMmsg* /*msg*/, NSMcontext* /*ctx*/)
 {
   //  printf ( "RFMaster : [INFO] received\n" );
   //  b2nsm_ok ( msg, "INFO!!", NULL );
@@ -82,7 +82,7 @@ void RFMaster::Log_Handler(NSMmsg* msg, NSMcontext* ctx)
 
 int RFMaster::Configure(NSMmsg*, NSMcontext*)
 {
-  int* pars;
+  int* pars = nullptr;
 
   // 0. Configure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");
@@ -147,7 +147,7 @@ int RFMaster::Configure(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* msgc)
+int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* /*msgc*/)
 {
   int pars[10];
   pars[0] = msgm->pars[0];
@@ -221,7 +221,7 @@ int RFMaster::UnConfigure(NSMmsg* msgm, NSMcontext* msgc)
 
 }
 
-int RFMaster::Start(NSMmsg* msgm, NSMcontext* msgc)
+int RFMaster::Start(NSMmsg* msgm, NSMcontext* /*msgc*/)
 {
   int pars[10];
   pars[0] = msgm->pars[0];
@@ -308,7 +308,7 @@ int RFMaster::Stop(NSMmsg* msg, NSMcontext*)
 
 int RFMaster::Restart(NSMmsg*, NSMcontext*)
 {
-  int* pars;
+  int* pars = nullptr;
 
   // 0. Configure DqmServer
   char* dqmserver = m_conf->getconf("dqmserver", "nodename");

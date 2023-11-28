@@ -451,6 +451,11 @@ class Plotuple:
             self._height = 525
         canvas = ROOT.TCanvas("", "", self._width, self._height)
 
+        # Create a ROOT Legend
+        legend = ROOT.TLegend(0.01, 0.01, 0.53, 0.06)
+        legend.SetNColumns(3)
+        legend.SetTextSize(0.02)
+
         # Allow possibility to turn off the stats box
         if self._mop.has_option("nostats"):
             ROOT.gStyle.SetOptStat("")
@@ -514,6 +519,7 @@ class Plotuple:
                 self._draw_ref(pad)
 
         items_to_plot_count = len(self._elements)
+
         # Now draw the normal plots
         for plot in reversed(self._elements):
 
@@ -545,6 +551,8 @@ class Plotuple:
                     drawn = True
                 else:
                     options_str = "SAME"
+
+                legend.AddEntry(plot.object, plot.revision)
 
                 self._draw_root_object(self.type, plot.object, options_str)
 
@@ -593,6 +601,12 @@ class Plotuple:
             self._set_background(canvas)
 
         canvas.GetFrame().SetFillColor(ROOT.kWhite)
+
+        # Add reference legend entry last for neatness
+        if self._reference is not None:
+            legend.AddEntry(self._reference.object, 'reference')
+
+        legend.Draw()
 
         # Save the plot as PNG and PDF
         canvas.Print(os.path.join(self._plot_folder, self.get_png_filename()))

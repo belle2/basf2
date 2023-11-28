@@ -14,6 +14,8 @@
 
 namespace Belle2 {
 
+  class RandomEngine;
+
   namespace Simulation {
 
     /**
@@ -79,6 +81,9 @@ namespace Belle2 {
 
       /** Vector of pointers to G4AssemblyVolumes */
       std::vector<G4AssemblyVolume*> m_AssemblyVolumes;
+
+      /** Pointer to RandomEngine to avoid memory leak by creating it in the constructor and deleting it in the destructor. */
+      RandomEngine* m_randomEngine;
 
       /** Destroyer class to delete the instance of the RunManager class when the program terminates. */
       class SingletonDestroyer {

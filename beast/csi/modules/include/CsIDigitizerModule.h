@@ -6,14 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef CSIDIGITIZERMODULE_H
-#define CSIDIGITIZERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <beast/csi/dataobjects/CsiDigiHit.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
-#include <beast/csi/dataobjects/CsiHit.h>
 
 #include <vector>
 
@@ -106,7 +104,7 @@ namespace Belle2 {
 
       /** Calculates the time response of a first order system (such as crystal, PMT, etc)
        *
-       * @param _gain: Overall gain applied to the ouput
+       * @param _gain: Overall gain applied to the output
        * @param _u: The input to the system
        * @param _y0: Initial value of the output
        * @param _dt: Integration step (in ns)
@@ -117,15 +115,6 @@ namespace Belle2 {
        */
       Signal firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay);
 
-
-      /** Method to use when crystal has two light components
-       * @param _tRatio: For crystal with two light components: ratio fast light / slow light
-       * @param _tFast: For crystal with two light components: fast time constant
-       */
-      //      Signal firstOrderResponse(double _gain, Signal _u, double _y0, double _dt, double _tSlow, double _delay, double _tRatio, double _tFast);
-
-
-
       /** Realizes the charge integration of the input signal
        *
        * @param _u: The input signal in Volts
@@ -135,7 +124,7 @@ namespace Belle2 {
        * @param t: A pointer to the value holding the trigger time
        * @param _Waveform: A pointer to the vector holding all waveform data points
        * @param _DPPCIBits: A pointer to the vector holding the bits of the DPP-CI status. Order [MSB-LSB] is [stop,holdoff,gate,trigger]
-       * @param _Treshold: Treshold above which generate a trigger (in LSB)
+       * @param _Treshold: Threshold above which generate a trigger (in LSB)
        * @param _TriggerHoldoff: Width of signal integration (in ns)
        * @param _GateWidth: Width of signal integration (in ns)
        * @param _GateOffset: Width of signal integration (in ns)
@@ -219,7 +208,6 @@ namespace Belle2 {
       const double m_tTransitPMT = 48; /**< 48Mean transit time of the PMT signal (in ns) */
       const double m_Zl = 50;    /**< Line impedance of the analog chain (to get voltage from anode current) */
 
-      StoreArray<CsiHit>     m_aHit; /**<  Time-accumulated hits... deprecated      */
       StoreArray<CsiSimHit>  m_aSimHit; /**< Each simulated particle in the crystal */
       StoreArray<CsiDigiHit> m_aDigiHit; /**< Output: a digitized hit */
 
@@ -242,5 +230,3 @@ namespace Belle2 {
 
   }
 }
-
-#endif /* CSIDIGITIZERMODULE_H */

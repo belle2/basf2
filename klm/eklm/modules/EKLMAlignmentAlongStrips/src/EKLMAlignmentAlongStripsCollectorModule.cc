@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/eklm/modules/EKLMAlignmentAlongStrips/EKLMAlignmentAlongStripsCollectorModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <tracking/dataobjects/ExtHit.h>
 
@@ -59,7 +59,7 @@ void EKLMAlignmentAlongStripsCollectorModule::collect()
   int i, j, n, n2, vol;
   double l;
   const HepGeom::Transform3D* tr;
-  TVector3 hitPosition;
+  ROOT::Math::XYZVector hitPosition;
   HepGeom::Point3D<double> hitGlobal, hitLocal;
   std::multimap<int, ExtHit*> mapExtHit;
   std::multimap<int, ExtHit*>::iterator it, it2, itLower, itUpper;

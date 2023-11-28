@@ -73,8 +73,8 @@ TrgEclFAMFit::setup(int eventId)
   // prepare coefficient for fitting
   //
 
-  _DataBase -> getCoeffSigPDF(CoeffSigPDF0 ,  CoeffSigPDF1);
-  _DataBase -> getCoeffNoise(0,  CoeffNoise31 , CoeffNoise32, CoeffNoise33);
+  _DataBase -> getCoeffSigPDF(CoeffSigPDF0,  CoeffSigPDF1);
+  _DataBase -> getCoeffNoise(0,  CoeffNoise31, CoeffNoise32, CoeffNoise33);
 
   EventId = eventId;
   //
@@ -102,7 +102,6 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   int pedFlag = 0;
   double CoeffAAA = 0;
   double CoeffBBB = 0;
-  double CoeffPPP = 0;
   int dTBin = 0;
   int ShiftdTBin = 0;
   int Nsmalldt = 10;
@@ -111,15 +110,9 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   //  double EThreshold = _Threshold; //[MeV]
   int FitSleepCounter   = 100; // counter to suspend fit
   int FitSleepThreshold = 2;   // # of clk to suspend fit
-  /* cppcheck-suppress variableScope */
-  double FitE;
-  /* cppcheck-suppress variableScope */
-  double FitT;
 
   for (int iTCIdm = 0; iTCIdm < 576; iTCIdm++) {
 
-    FitE = 0;
-    FitT = 0;
     for (int iShift = 20; iShift < (NSampling - 12); iShift++) { // In order to avoid BKG shaping effect, iShift start from 20.
 
       FitSleepCounter++;
@@ -129,6 +122,7 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
         TCFitSample[iFitSample] = digiEnergy[iTCIdm][iReplace] * 1000.0;
         if (0) {
           if (pedFlag == 1 && iFitSample < 4) {
+            // cppcheck-suppress uninitdata
             TCFitSample[iFitSample] = preped[iFitSample];
             pedFlag = 0;
           }
@@ -144,32 +138,30 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
 
       CoeffAAA = 0;
       CoeffBBB = 0;
-      CoeffPPP = 0;
       for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
         CoeffAAA += CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
         CoeffBBB += CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
-        CoeffPPP += CoeffNoise33[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
       }
       double deltaT = CoeffBBB / CoeffAAA; // deltaT [us]
 
       ShiftdTBin = int(deltaT / IntervaldT + dTBin);
 
-      FitE = CoeffAAA;
+      double fitE = CoeffAAA;
 
       //-------
       // Require "expected time" is around middle of table = Nsmalldt.
       //-------
       double condition_t = -(deltaT + dTBin * IntervaldT - fam_sampling_interval * 0.001);
 
-      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && FitE > Threshold[iTCIdm]) {
-        FitT = condition_t + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
+      if (fabs(condition_t) < 0.8 * (fam_sampling_interval * 0.001) && fitE > Threshold[iTCIdm]) {
+        double fitT = condition_t + (SmallOffset + iShift + nbin_pedestal - 5) * (fam_sampling_interval * 0.001);
 
 
         pedFlag = 1;
         double rand_sampling_correction = digiTiming[iTCIdm][iShift] + (nbin_pedestal - iShift + 32) * fam_sampling_interval;
 
-        TCFitEnergy[iTCIdm].push_back(FitE / 1000.0); // [GeV/c2]
-        TCFitTiming[iTCIdm].push_back(FitT * 1000 - 4000 + (_DataBase->GetTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
+        TCFitEnergy[iTCIdm].push_back(fitE / 1000.0); // [GeV/c2]
+        TCFitTiming[iTCIdm].push_back(fitT * 1000 - 4000 + (_DataBase->GetTCFLatency(iTCIdm + 1)) + rand_sampling_correction);
         FitSleepCounter = 0;
         ShiftdTBin = 0;
 
@@ -430,25 +422,24 @@ TrgEclFAMFit::save(int m_nEvent)
   //---------------
   // Root Output
   //---------------
-  int m_hitNum = 0;
+  int hitNum = 0;
 
   for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
     const int hitsize = TCFitEnergy[iTCIdm].size();
     for (int iHit = 0; iHit < hitsize; iHit++) {
       StoreArray<TRGECLHit> TrgEclHitArray;
       TrgEclHitArray.appendNew();
-      m_hitNum = TrgEclHitArray.getEntries() - 1;
-      TrgEclHitArray[m_hitNum]->setEventId(m_nEvent);
-      TrgEclHitArray[m_hitNum]->setTCId(iTCIdm + 1);
-      TrgEclHitArray[m_hitNum]->setEnergyDep(TCFitEnergy[iTCIdm][iHit]);
-      TrgEclHitArray[m_hitNum]->setTimeAve(TCFitTiming[iTCIdm][iHit]);
+      hitNum = TrgEclHitArray.getEntries() - 1;
+      TrgEclHitArray[hitNum]->setEventId(m_nEvent);
+      TrgEclHitArray[hitNum]->setTCId(iTCIdm + 1);
+      TrgEclHitArray[hitNum]->setEnergyDep(TCFitEnergy[iTCIdm][iHit]);
+      TrgEclHitArray[hitNum]->setTimeAve(TCFitTiming[iTCIdm][iHit]);
       if (_BeamBkgTag == 1) {
-        TrgEclHitArray[m_hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
+        TrgEclHitArray[hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
       }
     }
   }
 
-  m_hitNum = 0;
   if (_AnaTag == 1) {
     for (int iTCIdm = 0; iTCIdm < 576;  iTCIdm++) {
       if (TCFitEnergy[iTCIdm].size() != TCRawEnergy[iTCIdm].size()) {continue;}
@@ -456,22 +447,22 @@ TrgEclFAMFit::save(int m_nEvent)
       for (int iHit = 0; iHit < hitsize; iHit++) {
         StoreArray<TRGECLFAMAna> TrgEclAnaArray;
         TrgEclAnaArray.appendNew();
-        m_hitNum = TrgEclAnaArray.getEntries() - 1;
-        TrgEclAnaArray[m_hitNum]->setEventId(m_nEvent);
-        TrgEclAnaArray[m_hitNum]->setTCId(iTCIdm + 1);
-        TrgEclAnaArray[m_hitNum]->setPhiId(_TCMap->getTCPhiIdFromTCId(iTCIdm + 1));
-        TrgEclAnaArray[m_hitNum]->setThetaId(_TCMap->getTCThetaIdFromTCId(iTCIdm + 1));
-        TrgEclAnaArray[m_hitNum]->setRawEnergy(TCRawEnergy[iTCIdm][iHit]);
-        TrgEclAnaArray[m_hitNum]->setRawTiming(TCRawTiming[iTCIdm][iHit]);
+        hitNum = TrgEclAnaArray.getEntries() - 1;
+        TrgEclAnaArray[hitNum]->setEventId(m_nEvent);
+        TrgEclAnaArray[hitNum]->setTCId(iTCIdm + 1);
+        TrgEclAnaArray[hitNum]->setPhiId(_TCMap->getTCPhiIdFromTCId(iTCIdm + 1));
+        TrgEclAnaArray[hitNum]->setThetaId(_TCMap->getTCThetaIdFromTCId(iTCIdm + 1));
+        TrgEclAnaArray[hitNum]->setRawEnergy(TCRawEnergy[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setRawTiming(TCRawTiming[iTCIdm][iHit]);
 
-        //        TrgEclAnaArray[m_hitNum]->setFitEnergy(TCFitEnergy[iTCIdm][iHit]);
+        //        TrgEclAnaArray[hitNum]->setFitEnergy(TCFitEnergy[iTCIdm][iHit]);
         int p_ene2adc = 525;
         int ene_i0 = (int)(TCFitEnergy[iTCIdm][iHit] * 100000.0 / p_ene2adc);
         double ene_d = (double) ene_i0 * p_ene2adc /  100000;
-        TrgEclAnaArray[m_hitNum]->setFitEnergy(ene_d);
+        TrgEclAnaArray[hitNum]->setFitEnergy(ene_d);
 
-        TrgEclAnaArray[m_hitNum]->setFitTiming(TCFitTiming[iTCIdm][iHit]);
-        TrgEclAnaArray[m_hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setFitTiming(TCFitTiming[iTCIdm][iHit]);
+        TrgEclAnaArray[hitNum]->setBeamBkgTag(BeamBkgTag[iTCIdm][iHit]);
       }
     }
   }

@@ -26,7 +26,7 @@ using namespace Belle2;
 #define VERSION       "version 0.00"
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
 
   cout << NAME << " ... " << VERSION << endl;
@@ -49,7 +49,6 @@ main(int argc, char* argv[])
   }
 
   char b[800];
-  unsigned line = 0;
   while (! infile.eof()) {
     infile.getline(b, 800);
     string l(b);
@@ -93,8 +92,6 @@ main(int argc, char* argv[])
         cout << endl;
       }
     }
-
-    ++line;
   }
 
   //...Termination...

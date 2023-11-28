@@ -51,10 +51,10 @@ namespace Belle2 {
     static void removeAll(void);
 
     /// new operator.
-    static void* operator new(size_t);
+    static void* operator new (size_t);
 
     /// delete operator.
-    static void operator delete(void*);
+    static void operator delete (void*);
 
   public:// Selectors
 
@@ -98,7 +98,7 @@ namespace Belle2 {
     double distance(void) const;
 
     /// returns neighbor TRGCDCLink.
-    TRGCDCLink* neighbor(unsigned int) const;
+    TRGCDCLink* neighbor(unsigned n) const;
 
     /// returns a pointer to a TRGCDCLink.
     TRGCDCLink* link(void) const;
@@ -138,7 +138,7 @@ namespace Belle2 {
     const HepGeom::Point3D<double>& position(const HepGeom::Point3D<double>&);
 
     /// sets neighbor TRGCDCLink.
-    void neighbor(unsigned int, TRGCDCLink*);
+    void neighbor(unsigned n, TRGCDCLink* neighbor);
 
     /// sets a pointer to a TRGCDCLink.
     TRGCDCLink* link(TRGCDCLink*);

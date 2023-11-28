@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DeSerializerFILE)
+REG_MODULE(DeSerializerFILE);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -92,7 +92,7 @@ void DeSerializerFILEModule::initialize()
 }
 
 
-int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, int* data_type)
+int* DeSerializerFILEModule::readOneDataBlock(int* /*delete_flag*/, int* /*size_word*/, int* /*data_type*/)
 {
 #ifdef USE_PCIE40
   char err_buf[500];
@@ -294,7 +294,7 @@ void DeSerializerFILEModule::event()
                                    m_dummy_evenum - 2, &temp_cur_copper_ctr,
                                    m_prev_exprunsubrun_no, &m_exprunsubrun_no);
 
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           print_err.PrintError(m_shmflag, &g_status, err_str);
           exit(1);
         }
@@ -315,7 +315,7 @@ void DeSerializerFILEModule::event()
     int block_num = 0;
 
     unsigned int eve_num;
-    int subsysid = 0;
+    //int subsysid = 0;
 
     if (temp_rawdblk.CheckFTSWID(block_num)) {
       RawFTSW temp_raw_ftsw;
@@ -325,7 +325,7 @@ void DeSerializerFILEModule::event()
       RawCOPPER temp_raw_copper;
       temp_raw_copper.SetBuffer(temp_buf, size_word, 0, num_nodes, num_events);
       eve_num = temp_raw_copper.GetEveNo(block_num);
-      subsysid = temp_raw_copper.GetNodeID(block_num);
+      //subsysid = temp_raw_copper.GetNodeID(block_num);
     }
 
     if (eve_num != prev_eve_num && first_flag != 0) {
@@ -384,7 +384,7 @@ void DeSerializerFILEModule::event()
   }
 
   if (n_basf2evt % 100 == 0) {
-    printf("[DEBUG] Processing Evt # %d...\n", prev_eve_num);
+    printf("[DEBUG] Processing Evt # %u...\n", prev_eve_num);
   }
 
   n_basf2evt++;

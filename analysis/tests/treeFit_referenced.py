@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,13 +23,9 @@ class TestTreeFits(unittest.TestCase):
 
         testFile = tempfile.NamedTemporaryFile()
 
-        # we want to use the latest grated globaltag, not the old one from the
-        # file
-        basf2.conditions.disable_globaltag_replay()
-
         main = basf2.create_path()
 
-        inputfile = b2test_utils.require_file('analysis/tests/100_noBKG_B0ToPiPiPi0.root', py_case=self)
+        inputfile = b2test_utils.require_file('analysis/B0ToPiPiPi0.root', 'validation', py_case=self)
         ma.inputMdst(inputfile, path=main)
 
         ma.fillParticleList('pi+:a', 'pionID > 0.5', path=main)
@@ -77,13 +72,14 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 2107, "Background rejection too small.")
+        self.assertTrue(falsePositives < 8299, "Background rejection too small.")
 
-        self.assertTrue(truePositives > 32, "Signal rejection too high")
+        self.assertTrue(truePositives > 212, "Signal rejection too high")
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 
         print("Test passed, cleaning up.")
 
 
 if __name__ == '__main__':
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        unittest.main()

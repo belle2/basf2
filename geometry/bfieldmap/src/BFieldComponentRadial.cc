@@ -78,9 +78,9 @@ namespace Belle2 {
   }
 }
 
-B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
+ROOT::Math::XYZVector BFieldComponentRadial::calculate(const ROOT::Math::XYZVector& point) const
 {
-  B2Vector3D B;
+  ROOT::Math::XYZVector B;
   // If both 'Radial' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
   // If no 'Beamline' component is defined in xml file, the following function will never be called.

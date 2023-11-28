@@ -48,11 +48,13 @@ namespace Belle2 {
 
     /** The delay between the time of the injection pre-kick signal and
      *  the time the noisy bunch passes by the detector for HER.
+     *  The delay is a positive number!
      *  Time in clock ticks (127MHz=RF/4) */
     int m_injectionDelayHER;
 
     /** The delay between the time of the injection pre-kick signal and
      *  the time the noisy bunch passes by the detector for LER.
+     *  The delay is a positive number!
      *  Time in clock ticks (127MHz=RF/4) */
     int m_injectionDelayLER;
 

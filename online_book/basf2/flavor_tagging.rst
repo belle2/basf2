@@ -12,15 +12,15 @@ Flavor tagging
 
     **Prerequisites**:
 
-        * The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
+    * How can I distinguish between a :math:`B_\text{tag}^0` and a :math:`\bar B_\text{tag}^0`
 
     **Objectives**:
 
-        * Perform flavor tagging
+    * Perform flavor tagging
 
 How can we distinguish between a :math:`B^0` and a :math:`\bar B^0`? This is not
 as simple as the case where we have a :math:`B^+` vs a :math:`B^-` and can just
@@ -57,6 +57,7 @@ that is, consult this page again: :ref:`conditionsdb_overview`).
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S10
         :end-at: E10
+        :language: python        
 
 Good! Now we have the weights and we have already created the ROE, so we can
 start right away!
@@ -75,12 +76,14 @@ start right away!
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S23
         :end-at: E23
+        :language: python        
 
     and call the function:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S20
         :end-at: E20
+        :language: python        
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -95,6 +98,7 @@ start right away!
     .. literalinclude:: steering_files/049_flavor_tagging.py
         :start-at: S43
         :end-at: E43
+        :language: python        
 
 .. admonition:: Exercise
     :class: stacked exercise
@@ -107,7 +111,7 @@ start right away!
     This is the full steering file at this point:
 
     .. literalinclude:: steering_files/049_flavor_tagging.py
-        :linenos:
+        :language: python        
 
 Good!
 Now let's talk about the output of the flavor tagger. This is the value
@@ -156,7 +160,7 @@ it to ``FBDT_qrCombined``!
     :class: solution toggle
 
     .. literalinclude:: flavor_tagging/plot_flavor_tags.py
-        :linenos:
+        :language: python        
 
     .. _flavor_plots:
     .. figure:: flavor_tagging/flavor_tags.svg
@@ -179,6 +183,6 @@ it to ``FBDT_qrCombined``!
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Kilian Lieret
+Kilian Lieret

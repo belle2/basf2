@@ -1,6 +1,6 @@
 ### How to update GenFit in basf2
 
-To update the GenFit version in basf2, we follow the procedure described in https://agira.desy.de/browse/BII-11:
+To update the GenFit version in basf2, we follow the procedure described in https://gitlab.desy.de/belle2/software/basf2/-/issues/12:
 
 * `git remote add genfit2-on-github "https://github.com/GenFit/GenFit"`
 * `git fetch genfit2-on-github`
@@ -15,4 +15,4 @@ or, even better:
 
 * `genfit2-update`
 
-Then, open a pull request and merge it after the review.
+Then, open a merge request and merge it after the review.

@@ -4,17 +4,17 @@ Rest Of Event
 =============
 
 Heavy quarks, like :math:`b` and :math:`c` quarks, are produced in pairs in electron-positron collisions
-and, typically, they form two heavy hadrons as an intermediate-state particles. 
-To study these kinds of events we have to reconstruct at least one hadron decay and 
-look for another hadron in the rest of the event. Such use case is one of the possible 
+and, typically, they form two heavy hadrons as an intermediate-state particles.
+To study these kinds of events we have to reconstruct at least one hadron decay and
+look for another hadron in the rest of the event. Such use case is one of the possible
 application of the Rest Of Event (ROE) modules in the basf2 analysis framework.
 
 .. tip:: For an introductory hands-on lesson, take a look at :numref:`onlinebook_roe`.
 
 Overview
 --------
-The Rest Of Event is built around a reconstructed target particle and it is 
-a collection of all other particles in the event. 
+The Rest Of Event is built around a reconstructed target particle and it is
+a collection of all other particles in the event.
 The ROE can be used in multiple cases. For example, two of the most common ones
 are in **tagged** and **untagged** analyses of :math:`Y(4S)` decays:
 
@@ -51,8 +51,8 @@ Now, it is possible to calculate simple ROE-based variables using target particl
 like the ROE momentum :b2:var:`roeP`, the ROE mass :b2:var:`roeM` or others. The full list of the ROE variables can be found
 by using command ``b2help-variables`` under the **Rest of Event** section.
 
-.. warning:: 
-  Names or behavior of the ROE variables may vary from release to release. 
+.. warning::
+  Names or behavior of the ROE variables may vary from release to release.
   Please recheck list of variables ``b2help-variables`` when switching between the releases.
 
 After reconstructing the ROE, one can use ROE-dependent modules, like :doc:`FlavorTagger`, `ContinuumSuppression`, :doc:`FullEventInterpretation` and other algorithms.
@@ -81,9 +81,9 @@ Also, the neutral particles, photons and :math:`K_L^0`'s will be supplied to the
 Charged PID priors
 ------------------
 
-User can provide prior expectations for the most probable mass hypothesis mentioned above. This is useful to suppress harmful mis-IDs, like charged pion 
-being reconstructed as a muon because of similarity of their PID likelihoods. 
-The priors are provided in the form of a list containing 6 float numbers, which correspond to 
+User can provide prior expectations for the most probable mass hypothesis mentioned above. This is useful to suppress harmful mis-IDs, like charged pion
+being reconstructed as a muon because of similarity of their PID likelihoods.
+The priors are provided in the form of a list containing 6 float numbers, which correspond to
 :math:`[ e^\mp, \mu^\mp, \pi^\mp K^\pm, p^\pm, d^\pm]`.
 
 Here is an example of the prior usage:
@@ -93,10 +93,10 @@ Here is an example of the prior usage:
   import modularAnalysis as ma
   # Suppose we have a signal B meson stored in a particle list 'B0:rec'
   # Build the ROE object:
-  ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True, 
+  ma.buildRestOfEvent('B0:rec', fillWithMostLikely=True,
         chargedPIDPriors=[0.0, 0.0, 1.0, 1.0, 0.0, 0.0], path = main_path)
 
-In this example, only kaons and pions will enter ROE. The same functionality is enabled for Event Shape and the Event Kinematics algorithms. 
+In this example, only kaons and pions will enter ROE. The same functionality is enabled for Event Shape and the Event Kinematics algorithms.
 
 .. note::
   An additional study is needed to fully understand the prior behavior.
@@ -121,14 +121,14 @@ Nevertheless, there is an option to add particle lists manually:
   # Build the ROE object:
   ma.buildRestOfEvent('B0:rec',['K+:good', 'p+:good','e+:good','mu+:good'], path = main_path)
 
-Particles from these lists will be added to the ROE first, and then the ROE object will be completed 
-by adding the default particle types, pions, photons and :math:`K_L^0`'s. 
+Particles from these lists will be added to the ROE first, and then the ROE object will be completed
+by adding the default particle types, pions, photons and :math:`K_L^0`'s.
 Therefore, it is not necessary to provide here a pion particle list with any PID cuts.
 The order of provided particle lists matters, so preferably, the particle lists which contain rare particles should enter the ROE first.
 
-Changing charged particle hypothesis is important, as the charged particles have different mass, and it will 
+Changing charged particle hypothesis is important, as the charged particles have different mass, and it will
 affect the computation of the ROE mass or energy.
-Also, this method allows to study the ROE particle composition by using :b2:var:`nROE_Charged` metavariable, 
+Also, this method allows to study the ROE particle composition by using :b2:var:`nROE_Charged` metavariable,
 as well as :b2:var:`nROE_Photons` and :b2:var:`nROE_NeutralHadrons` metavariables, see output of ``b2help-variables`` command.
 
 
@@ -155,9 +155,9 @@ In basf2 this is realized by ``path.for_each`` functionality:
 
 In this example we create another path ``roe_path``, which is used to loop over the created ROE objects.
 By calling ``modularAnalysis`` methods with ``path = roe_path`` we create basf2 modules, which will be executed for each ROE candidate.
-Here we fill ``gamma:roe`` particle list with ROE photons by using 
-a cut ``isInRestOfEvent == 1``. One can proceed to fill other types ROE particles, 
-like pions, kaons etc, in the same way. 
+Here we fill ``gamma:roe`` particle list with ROE photons by using
+a cut ``isInRestOfEvent == 1``. One can proceed to fill other types ROE particles,
+like pions, kaons etc, in the same way.
 It is possible to execute other modules in the ROE loop, like :func:`modularAnalysis.reconstructDecay` for example,
 however, it is **important** to use a proper ROE path when calling any basf2 functionality in the ROE loop.
 One can also move information calculated in the ROE to the signal side.
@@ -173,11 +173,11 @@ extended to any particle on the signal side, for example:
 
 .. code-block:: python
 
-  roe_path.add_module('SignalSideVariablesToDaughterExtraInfo', 
+  roe_path.add_module('SignalSideVariablesToDaughterExtraInfo',
         particleListName='D0:all', variablesToExtraInfo={'x' : 'VtxX'})
 
-If your script creates ROE objects from multiple signal side particle lists, 
-one can use `SignalSideParticleFilter` module in the ROE loop to iterate only 
+If your script creates ROE objects from multiple signal side particle lists,
+one can use `SignalSideParticleFilter` module in the ROE loop to iterate only
 over ROE objects related to a certain particle list:
 
 .. code-block:: python
@@ -201,15 +201,15 @@ over ROE objects related to a certain particle list:
 
 
 .. note::
-  Usage of the `SignalSideParticleFilter` module in the ROE loop is mandatory if one 
+  Usage of the `SignalSideParticleFilter` module in the ROE loop is mandatory if one
   uses several different ROEs with different ROE masks, which will help to avoid missing mask errors.
 
 ROE masks
 ---------
 
-The ROE object contains **every** particle in the event, which has not been associated to the target particle candidate. 
+The ROE object contains **every** particle in the event, which has not been associated to the target particle candidate.
 Therefore, a clean up procedure is **necessary** to filter out beam-induced energy depositions from the ROE.
-In basf2 framework it is done using a concept of ROE mask. The ROE mask is a simple container of particles, 
+In basf2 framework it is done using a concept of ROE mask. The ROE mask is a simple container of particles,
 which have passed a selection criteria:
 
 .. code-block:: python
@@ -230,13 +230,13 @@ The mask tuples should contain a mask name and cuts for charged particles, for p
 In the example above a cut is not set, therefore, all hadrons will pass the mask.
 
 .. warning::
-  Mask name ``all`` is reserved for no ROE mask case, users cannot create a ROE mask wth this name. 
+  Mask name ``all`` is reserved for no ROE mask case, users cannot create a ROE mask wth this name.
   The mask name ``all`` can be provided to the ROE metavariables and ROE-dependent modules
-  right after creation of the ROE to use all particles in the ROE with no selection cuts, although it is not advised. 
+  right after creation of the ROE to use all particles in the ROE with no selection cuts, although it is not advised.
   Moreover, mask names can only contain alphanumeric or underscore characters.
 
-Most of ROE variables accept mask name as an argument, which allows user to compare 
-variable distributions from different ROE masks. 
+Most of ROE variables accept mask name as an argument, which allows user to compare
+variable distributions from different ROE masks.
 For example, the :b2:var:`roeE` variable will be computed using only ROE particles from a corresponding mask.
 
 .. note::
@@ -244,8 +244,8 @@ For example, the :b2:var:`roeE` variable will be computed using only ROE particl
   particles.
 
 After appending masks to ROE, one can perform different manipulations with masked particles.
-The methods :func:`modularAnalysis.keepInROEMasks` and :func:`modularAnalysis.discardFromROEMasks` 
-allow to keep or discard particles from an ROE mask if they are present in an input particle list. 
+The methods :func:`modularAnalysis.keepInROEMasks` and :func:`modularAnalysis.discardFromROEMasks`
+allow to keep or discard particles from an ROE mask if they are present in an input particle list.
 Also, one can replace masked particles by their parent :math:`V_0` objects, by using :func:`modularAnalysis.optimizeROEWithV0`.
 These methods should be executed inside the ROE loop:
 
@@ -324,13 +324,13 @@ particles from host ROE object:
   # Execute loop for each host ROE:
   main_path.for_each('RestOfEvent', 'RestOfEvents', path = roe_path)
 
-In this piece of code, we first reconstruct a host ROE object with a mask *cleanMask*, we create ``roe_path`` path for it, 
+In this piece of code, we first reconstruct a host ROE object with a mask *cleanMask*, we create ``roe_path`` path for it,
 and we reconstruct a :math:`\pi_0` object inside the host ROE, similarly to the previous code snippets.
 Then we create a nested ROE using :func:`modularAnalysis.buildNestedRestOfEvent`, which
 is going to be reconstructed using particles from *cleanMask* of the host ROE.
-This is needed to clean up the nested ROE from the beam-background energy depositions. 
+This is needed to clean up the nested ROE from the beam-background energy depositions.
 Then we create ``nestedroe_path`` path for the nested ROE modules and finally we reconstruct a :math:`K_S^0` inside the nested ROE.
-One can execute all possible ROE-related methods using nested ROE objects or loops. 
+One can execute all possible ROE-related methods using nested ROE objects or loops.
 
 
 Load ROE as a particle
@@ -352,11 +352,14 @@ It is possible to load ROE as a particle, which can be manipulated as any other 
   # append masks to existing ROE object
   ma.appendROEMasks('B0:rec', [cleanMask], path = main_path)
   # Load ROE as a particle and use a mask 'cleanMask':
-  ma.fillParticleListFromROE('B0:tagFromROE', '', maskName='cleanMask', 
+  ma.fillParticleListFromROE('B0:tagFromROE', '', maskName='cleanMask',
     sourceParticleListName='B0:rec', path=main_path)
   
   # A shorter option:
   # ma.fillParticleListFromROE('B0:tagFromROE -> B0:rec', '', 'cleanMask', path=main_path)
+
+  ma.reconstructDecay('Upsilon(4S):rec -> B0:rec B0:tagFromROE', 'hasCorrectROECombination==1', path=main_path)
+  # 'hasCorrectROECombination' returns 1 if the combination of candidates of B0:rec and B0:tagFromROE is correct
 
 The resulting particle list can be combined with other particles, like
 ``Upsilon(4S) -> B0:tagFromROE B0:rec`` in this example.
@@ -370,7 +373,7 @@ event:
 
 .. code-block:: python
   
-  ma.fillParticleListFromROE('nu:missing', '', maskName='cleanMask', 
+  ma.fillParticleListFromROE('nu:missing', '', maskName='cleanMask',
     sourceParticleListName='B0:rec', useMissing = True, path=main_path)
 
 These reconstructed neutrino particles have no daughters, and they can be
@@ -380,7 +383,7 @@ useful in combination with the visible signal side, for example in semileptonic
 .. hint::
   It is recommended to try to use ROE variables first, unless it is *absolutely* necessary to reconstruct ROE as a particle in your analysis.
   The decay vertex of the resulting particles can be fitted by `kFit`.
-  Also MC truth-matching works, but after removing all neutral hadrons matched to tracks. 
+  Also MC truth-matching works, but after removing all neutral hadrons matched to tracks.
   More improvements will come soon.
 
 
@@ -391,11 +394,11 @@ It is possible to create ROE using MCParticles:
 
 .. code-block:: python
 
-  ma.fillParticleListFromMC("B0:gen", signal_selection, 
+  ma.fillParticleListFromMC("B0:gen", signal_selection,
         addDaughters=True, skipNonPrimaryDaughters=True, path=main_path)
   ma.buildRestOfEventFromMC("B0:gen",path=main_path)
 
-It is important to add primary daughters to the signal side particle and not to forget to provide a selection cut. 
+It is important to add primary daughters to the signal side particle and not to forget to provide a selection cut.
 
 .. note::
   ROE masks and many of the ROE variables are working only with reconstructed particles.
@@ -406,7 +409,7 @@ MVA based cleaning
 
 One can then apply and kind of additional info to the
 particles in these particle lists, even training from MVA's, which was the
-original initiative for this procedure. 
+original initiative for this procedure.
 Here the provided cut strings are applied to the particles in particle lists and then you specify if you want to
 keep or discard the objects used by the particles.
 
@@ -431,12 +434,12 @@ keep or discard the objects used by the particles.
   fillParticleList('gamma:roe', 'isInRestOfEvent == 1', path=roe_main)
   fillParticleList('pi+:roe', 'isInRestOfEvent == 1', path=roe_main)
    
-  # let's assume that training INFO is available for tracks and clusters, 
+  # let's assume that training INFO is available for tracks and clusters,
   # apply training (should be switched to new MVA in near future)
-  applyTMVAMethod('gamma:roe', prefix=pathToClusterTraining, 
+  applyTMVAMethod('gamma:roe', prefix=pathToClusterTraining,
                   method="FastBDT", expertOutputName='SignalProbability',
                   workingDirectory=tmvaWorkDir, path=roe_main)
-  applyTMVAMethod('pi+:roe', prefix=pathToTrackTraining, 
+  applyTMVAMethod('pi+:roe', prefix=pathToTrackTraining,
                   method="FastBDT", expertOutputName='SignalProbability',
                   workingDirectory=tmvaWorkDir, path=roe_main)
    

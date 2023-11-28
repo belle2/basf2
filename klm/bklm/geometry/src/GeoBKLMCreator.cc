@@ -10,11 +10,12 @@
 #include <klm/bklm/geometry/GeoBKLMCreator.h>
 
 /* KLM headers. */
-#include <klm/bklm/simulation/SensitiveDetector.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dbobjects/bklm/BKLMGeometryPar.h>
+#include <klm/simulation/SensitiveDetector.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <geometry/Materials.h>
 
 /* Geant 4 headers. */
@@ -30,7 +31,6 @@
 #include <G4UnionSolid.hh>
 #include <G4VisAttributes.hh>
 
-using namespace std;
 using namespace Belle2::bklm;
 using namespace Belle2::geometry;
 
@@ -40,7 +40,7 @@ using namespace Belle2::geometry;
 
 GeoBKLMCreator::GeoBKLMCreator()
 {
-  m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new SensitiveDetector(G4String("BKLM")));
+  m_Sensitive = dynamic_cast<G4VSensitiveDetector*>(new KLM::SensitiveDetector(G4String("BKLM"), KLMElementNumbers::c_BKLM));
   m_GeoPar = nullptr;
   m_SectorDphi = 0.0;
   m_SectorDz = 0.0;

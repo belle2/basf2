@@ -126,7 +126,7 @@ void SegmentFitter::apply(std::vector<CDCSegment2D>& outputSegments)
         Vector2D recoPos2D = rlWireHit.reconstruct2D(trajectory2D);
         recoHit2D.setRecoPos2D(recoPos2D);
       }
-      if (nRLChanges > 0) B2DEBUG(100, "RL changes " << nRLChanges);
+      if (nRLChanges > 0) B2DEBUG(25, "RL changes " << nRLChanges);
     }
   }
 }

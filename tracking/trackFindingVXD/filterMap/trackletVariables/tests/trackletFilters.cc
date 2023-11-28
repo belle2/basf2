@@ -98,13 +98,13 @@ namespace VXDTFtrackletFilterTest {
   TEST_F(TrackletFilterTest, SelectionVariableName)
   {
     auto ziggZaggXYChecker = ZiggZaggXY<SpacePoint, SpacePointTrackCand>();
-    EXPECT_EQ("ZiggZaggXY" , ziggZaggXYChecker.name());
+    EXPECT_EQ("ZiggZaggXY", ziggZaggXYChecker.name());
 
     auto ziggZaggXYWithSigmaChecker = ZiggZaggXYWithSigma<SpacePoint, SpacePointTrackCand>();
-    EXPECT_EQ("ZiggZaggXYWithSigma" , ziggZaggXYWithSigmaChecker.name());
+    EXPECT_EQ("ZiggZaggXYWithSigma", ziggZaggXYWithSigmaChecker.name());
 
     auto ziggZaggRZChecker = ZiggZaggRZ<SpacePoint, SpacePointTrackCand>();
-    EXPECT_EQ("ZiggZaggRZ" , ziggZaggRZChecker.name());
+    EXPECT_EQ("ZiggZaggRZ", ziggZaggRZChecker.name());
   }
 
 

@@ -12,7 +12,7 @@
 #                                                                        #
 # Stuck? Ask for help at questions.belle2.org                            #
 #                                                                        #
-# This tutorial demonstrates how to weight tracks using                  #
+# This tutorial demonstrates how to append the weights to tracks using   #
 # LooKUpTable from the database                                          #
 #                                                                        #
 ##########################################################################

@@ -54,6 +54,7 @@ int TrgEclBeamBKG::GetBeamBkg(std::vector<std::vector<double>> ThetaRingSum)
       if (phiid >= 16 && phiid <= 25) {
         Quadrant[0][2] = 1;
       }
+      // cppcheck-suppress knownConditionTrueFalse
       if ((phiid >= 24 && phiid <= 32) || phiid == 1) {
         Quadrant[0][3] = 1;
       }
@@ -72,6 +73,7 @@ int TrgEclBeamBKG::GetBeamBkg(std::vector<std::vector<double>> ThetaRingSum)
       if (phiid >= 18 && phiid <= 28) {
         Quadrant[1][2] = 1;
       }
+      // cppcheck-suppress knownConditionTrueFalse
       if ((phiid >= 27 && phiid <= 36) || phiid == 1) {
         Quadrant[1][3] = 1;
       }

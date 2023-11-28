@@ -5,6 +5,7 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
 from enum import Enum
 
 
@@ -66,8 +67,7 @@ PROCESSED_OBJECTS = ['Tracks', 'TrackFitResults',
                      'SVDClusters', 'PXDClusters',
                      'CDCHits', 'TOPDigits',
                      'ARICHHits', 'ECLClusters',
-                     'BKLMHit1ds', 'BKLMHit2ds',
-                     'EKLMHit2ds', 'SoftwareTriggerResult']
+                     'KLMHit2ds', 'SoftwareTriggerResult']
 
 #: List of DataStore names that are present when data enters the HLT.
 HLT_INPUT_OBJECTS = RAWDATA_OBJECTS + ["EventMetaData", "RawFTSWs"]

@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
   unsigned int port;
   std::string shmName;
   unsigned int shmID;
-  bool raw;
+  bool raw = false;
   std::string sourceHost;
 
   po::options_description desc("b2hlt_socket2rb PORT RING-BUFFER-NAME SHM-NAME SHM-ID");
@@ -116,7 +116,7 @@ int main(int argc, char* argv[])
       // However we have to make sure to pad the buffer correctly, as sizeInWords could be a larger buffer
       unsigned int sizeRoundedUp = sizeInWords * sizeof(int);
       auto charBuffer = reinterpret_cast<char*>(buffer);
-      for (int pos = size; pos < sizeRoundedUp; pos++) {
+      for (unsigned int pos = size; pos < sizeRoundedUp; ++pos) {
         charBuffer[pos] = 0;
       }
       size = sizeInWords;

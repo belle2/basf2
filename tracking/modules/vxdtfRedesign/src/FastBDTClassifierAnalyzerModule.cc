@@ -45,16 +45,16 @@ void FastBDTClassifierAnalyzerModule::initialize()
     B2ERROR("Could not open file: " << m_PARAMtestSampleFileName << ".");
   }
 
-  B2DEBUG(1, "Reading Classifier from file: " << m_PARAMfbdtFileName << ".");
+  B2DEBUG(20, "Reading Classifier from file: " << m_PARAMfbdtFileName << ".");
   m_classifier.readFromStream(fbdt);
   fbdt.close();
-  B2DEBUG(1, "Done");
+  B2DEBUG(20, "Done");
 
-  B2DEBUG(1, "Reading training samples from file: " << m_PARAMtrainSampleFileName << ".");
+  B2DEBUG(20, "Reading training samples from file: " << m_PARAMtrainSampleFileName << ".");
   readSamplesFromStream(train, m_trainSample);
   train.close();
 
-  B2DEBUG(1, "Reading training samples from file: " << m_PARAMtestSampleFileName << ".");
+  B2DEBUG(20, "Reading training samples from file: " << m_PARAMtestSampleFileName << ".");
   readSamplesFromStream(test, m_testSample);
   test.close();
 }
@@ -62,14 +62,14 @@ void FastBDTClassifierAnalyzerModule::initialize()
 void FastBDTClassifierAnalyzerModule::terminate()
 {
   std::ofstream ofs("analyze_trout.dat");
-  B2DEBUG(10, "Processing the training sample");
+  B2DEBUG(21, "Processing the training sample");
   for (const auto& event : m_trainSample) {
     m_trainOutput.insert(std::make_pair(event.signal, m_classifier.analyze(event.hits)));
     ofs << event.signal << " " << m_classifier.analyze(event.hits) << std::endl;
   }
   ofs.close();
 
-  B2DEBUG(10, "Processing the test sample");
+  B2DEBUG(21, "Processing the test sample");
   for (const auto& event : m_testSample) {
     m_testOutput.insert(std::make_pair(event.signal, m_classifier.analyze(event.hits)));
   }

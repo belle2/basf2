@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,7 +18,7 @@
 """
 <header>
     <output>muon-KLMValidation.root</output>
-    <contact>martina.laurenza@roma3.infn.it</contact>
+    <contact>Laura.Salutari@uniroma3.it</contact>
     <description>Create events with 1 muon track for BKLM and EKLM validation.</description>
 </header>
 """
@@ -64,5 +63,6 @@ main_path.add_module('RootOutput',
                      outputFileName=output_filename,
                      branchNames=['MCParticles', 'KLMMuidLikelihoods', 'KLMDigits', 'KLMHit2ds', 'EventT0'])
 
+main_path.add_module('Progress')
 basf2.process(main_path)
 print(basf2.statistics)

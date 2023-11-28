@@ -39,7 +39,7 @@ using namespace Belle2_TRGCDC;
 #define CONFIG          "TRGCDCWireConfig_0_20101110_0836.dat"
 
 int
-main(int , char**)
+main(int, char**)
 {
 
   cout << PROGRAM_NAME << " ... " << PROGRAM_VERSION << endl;

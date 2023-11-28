@@ -357,7 +357,7 @@ namespace Belle2 {
 
   void
   TRGCDCDisplayDrawingAreaRphi::drawCircle(const TCCircle& t,
-                                           int ,
+                                           int,
                                            Gdk::Color& c,
                                            Gdk::LineStyle)
   {

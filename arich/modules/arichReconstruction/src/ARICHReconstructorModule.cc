@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-// Own include
+// Own header.
 
 #include <arich/modules/arichReconstruction/ARICHReconstructorModule.h>
 #include <time.h>
@@ -31,7 +31,6 @@
 // ROOT
 #include <TVector3.h>
 
-using namespace std;
 using namespace boost;
 
 namespace Belle2 {
@@ -80,38 +79,34 @@ namespace Belle2 {
     m_ana->setTrackAngleResolution(m_trackAngleResolution);
     m_ana->useMirrorAlignment(m_alignMirrors);
 
-    StoreArray<ARICHHit> arichHits;
-    arichHits.isRequired();
+    // Input: ARICHDigits
+    m_ARICHHits.isRequired();
 
-    StoreArray<Track> tracks;
-    StoreArray<ExtHit> extHits;
-    StoreArray<ARICHAeroHit> aeroHits;
-    tracks.isOptional();
-    extHits.isOptional();
-    aeroHits.isOptional();
+    m_Tracks.isOptional();
+    m_ExtHits.isOptional();
+    m_aeroHits.isOptional();
 
-    if (!aeroHits.isOptional()) {
-      tracks.isRequired();
-      extHits.isRequired();
+    if (!m_aeroHits.isOptional()) {
+      m_Tracks.isRequired();
+      m_ExtHits.isRequired();
     }
 
-    StoreArray<MCParticle> mcParticles;
-    mcParticles.isOptional();
+    StoreArray<MCParticle> MCParticles;
+    MCParticles.isOptional();
 
-    StoreArray<ARICHLikelihood> likelihoods;
-    likelihoods.registerInDataStore();
+    // Output - log likelihoods
+    m_ARICHLikelihoods.registerInDataStore();
 
-    StoreArray<ARICHTrack> arichTracks;
-    arichTracks.registerInDataStore();
+    m_ARICHTracks.registerInDataStore();
 
-    if (m_inputTrackType) arichTracks.registerRelationTo(likelihoods);
+    if (m_inputTrackType) m_ARICHTracks.registerRelationTo(m_ARICHLikelihoods);
     else {
-      arichTracks.registerRelationTo(extHits);
-      tracks.registerRelationTo(likelihoods);
+      m_ARICHTracks.registerRelationTo(m_ExtHits);
+      m_Tracks.registerRelationTo(m_ARICHLikelihoods);
     }
-    //arichTracks.registerInDataStore(DataStore::c_DontWriteOut);
-    //arichTracks.registerRelationTo(likelihoods, DataStore::c_Event, DataStore::c_DontWriteOut);
-    arichTracks.registerRelationTo(aeroHits);
+    //m_ARICHTracks.registerInDataStore(DataStore::c_DontWriteOut);
+    //m_ARICHTracks.registerRelationTo(m_ARICHLikelihoods, DataStore::c_Event, DataStore::c_DontWriteOut);
+    m_ARICHTracks.registerRelationTo(m_aeroHits);
     printModuleParams();
   }
 
@@ -122,40 +117,26 @@ namespace Belle2 {
 
   void ARICHReconstructorModule::event()
   {
-
-    // Output - log likelihoods
-    StoreArray<ARICHLikelihood> arichLikelihoods;
-
-    // input AeroHits
-    StoreArray<ARICHTrack> arichTracks;
-
-    // Input: ARICHDigits
-    StoreArray<ARICHHit> arichHits;
-
     // using track information form tracking system (mdst Track)
     if (m_inputTrackType == 0) {
-
-      StoreArray<Track> Tracks;
 
       Const::EDetector myDetID = Const::EDetector::ARICH; // arich
       Const::ChargedStable hypothesis = Const::pion;
       int pdgCode = abs(hypothesis.getPDGCode());
 
-      for (int itrk = 0; itrk < Tracks.getEntries(); ++itrk) {
-
-        const Track* track = Tracks[itrk];
-        const TrackFitResult* fitResult = track->getTrackFitResultWithClosestMass(hypothesis);
+      for (const Track& track : m_Tracks) {
+        const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(hypothesis);
         if (!fitResult) {
           B2ERROR("No TrackFitResult for " << hypothesis.getPDGCode());
           continue;
         }
 
-        const MCParticle* particle = track->getRelated<MCParticle>();
+        const MCParticle* mcParticle = track.getRelated<MCParticle>();
 
         ARICHAeroHit* aeroHit = NULL;
-        if (particle) aeroHit = particle->getRelated<ARICHAeroHit>();
+        if (mcParticle) aeroHit = mcParticle->getRelated<ARICHAeroHit>();
 
-        RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
+        RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(&track);
         ARICHTrack* arichTrack = NULL;
 
         //const ExtHit* arich1stHit = NULL;
@@ -164,11 +145,11 @@ namespace Belle2 {
 
         for (unsigned i = 0; i < extHits.size(); i++) {
           const ExtHit* extHit = extHits[i];
-          if (abs(extHit->getPdgCode()) != pdgCode) continue;
-          if (extHit->getDetectorID() != myDetID) continue;
-          if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-          if (extHit->getMomentum().Z() < 0.0) continue; // track passes in backward
-          if (extHit->getCopyID() == 12345) { continue;}
+          if (abs(extHit->getPdgCode()) != pdgCode or
+              extHit->getDetectorID() != myDetID or
+              extHit->getStatus() != EXT_EXIT or // particles registered at the EXIT of the Al plate
+              extHit->getMomentum().Z() < 0.0 or // track passes in backward
+              extHit->getCopyID() == 12345) { continue;}
           if (extHit->getCopyID() == 6789) {  arich2ndHit = extHit; continue;}
           arichWinHit = extHit;
         }
@@ -178,7 +159,7 @@ namespace Belle2 {
           if (!aeroHit) aeroHit = arich2ndHit->getRelated<ARICHAeroHit>();
 
           // make new ARICHTrack
-          arichTrack = arichTracks.appendNew(arich2ndHit);
+          arichTrack = m_ARICHTracks.appendNew(arich2ndHit);
           if (arichWinHit) arichTrack->setHapdWindowHit(arichWinHit);
         }
 
@@ -187,11 +168,11 @@ namespace Belle2 {
         // transform track parameters to ARICH local frame
         m_ana->transformTrackToLocal(*arichTrack, m_align);
         // make new ARICHLikelihood
-        ARICHLikelihood* like = arichLikelihoods.appendNew();
+        ARICHLikelihood* like = m_ARICHLikelihoods.appendNew();
         // calculate and set likelihood values
-        m_ana->likelihood2(*arichTrack, arichHits, *like);
+        m_ana->likelihood2(*arichTrack, m_ARICHHits, *like);
         // make relations
-        track->addRelationTo(like);
+        track.addRelationTo(like);
         arichTrack->addRelationTo(arich2ndHit);
         if (aeroHit) arichTrack->addRelationTo(aeroHit);
 
@@ -202,37 +183,25 @@ namespace Belle2 {
     // using track information form MC (stored in ARICHAeroHit)
     else {
 
-      StoreArray<ARICHAeroHit> aeroHits;
-      int nTracks = aeroHits.getEntries();
-
       // Loop over all ARICHAeroHits
-      for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
-        ARICHAeroHit* aeroHit = aeroHits[iTrack];
+      for (const ARICHAeroHit& aeroHit : m_aeroHits) {
 
         // make new ARICHTrack
-        ARICHTrack* arichTrack = arichTracks.appendNew(aeroHit);
+        ARICHTrack* arichTrack = m_ARICHTracks.appendNew(&aeroHit);
         // smearing of track parameters (to mimic tracking system resolutions)
         m_ana->smearTrack(*arichTrack);
         // transform track parameters to ARICH local frame
         m_ana->transformTrackToLocal(*arichTrack, m_align);
         // make associated ARICHLikelihood
-        ARICHLikelihood* like = arichLikelihoods.appendNew();
+        ARICHLikelihood* like = m_ARICHLikelihoods.appendNew();
         // calculate and set likelihood values
-        m_ana->likelihood2(*arichTrack, arichHits, *like);
+        m_ana->likelihood2(*arichTrack, m_ARICHHits, *like);
         // make relation
         arichTrack->addRelationTo(like);
-        arichTrack->addRelationTo(aeroHit);
+        arichTrack->addRelationTo(&aeroHit);
       } // for iTrack
 
     }
-  }
-
-  void ARICHReconstructorModule::endRun()
-  {
-  }
-
-  void ARICHReconstructorModule::terminate()
-  {
   }
 
   void ARICHReconstructorModule::printModuleParams()

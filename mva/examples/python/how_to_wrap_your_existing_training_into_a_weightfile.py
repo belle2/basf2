@@ -26,12 +26,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return None
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """ Must be implemented otherwise custom framework will raise an error """
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """ Must be implemented otherwise custom framework will raise an error """
     return True
 
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     but you can overwrite all of them.
     """
     import ROOT  # noqa
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -132,7 +132,10 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, python_options)
 
     # Apply the training as usual
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+    testing_data = basf2_mva.vector(test_file)
+
     method = basf2_mva_util.Method(general_options.m_identifier)
-    p, t = method.apply_expert(basf2_mva.vector("test.root"), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     print("Custom Method", auc)

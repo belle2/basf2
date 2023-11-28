@@ -9,6 +9,8 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <tracking/dataobjects/ROIpayload.h>
 #include <string>
 #include <stdio.h>
 
@@ -45,6 +47,8 @@ namespace Belle2 {
      * Termination action.
      */
     void terminate() override;
+
+    StoreObjPtr<ROIpayload> m_ROIPayloads; /**< ROIpayload StoreArray */
 
     std::string m_outfileName; /**< produced file name*/
     std::string m_ROIpayloadName; /**< ROI payload name*/

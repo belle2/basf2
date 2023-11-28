@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -52,9 +51,9 @@ ma.inputMdst(environmentType='default',
 # my_path.add_module(arichRecon)
 # ===========================
 
-# creates "pi+:all" ParticleList (and c.c.)
+# creates "pi+:loose" ParticleList (and c.c.)
 # includes all tracks with thetaInCDCAcceptance and nCDCHits>20
-ma.fillParticleList('pi+:all', 'thetaInCDCAcceptance and nCDCHits>20', True, path=my_path)
+ma.fillParticleList('pi+:loose', 'thetaInCDCAcceptance and nCDCHits>20', True, path=my_path)
 
 
 # define aliases for daughter particles
@@ -68,13 +67,13 @@ variables.addAlias('pi1_p', 'daughter(1, p)')
 # reconstruct ks -> pi+ pi- decay
 # keep only candidates with 0.45 < M(pi+pi-) < 0.55 GeV and with
 # at least one "forward" track with cosTheta>0.82 and p>0.5 GeV
-ma.reconstructDecay(decayString='K_S0 -> pi+:all pi-:all',
+ma.reconstructDecay(decayString='K_S0 -> pi+:loose pi-:loose',
                     cut='0.45 < M < 0.55 and [[pi0_cosTheta > 0.82 and pi0_p > 0.5] or [pi1_cosTheta > 0.82 and pi1_p>0.5]]',
                     path=my_path)
 
 # do vertex fit
 # only keeps candidates with conf_level>0.001
-vx.KFit(list_name='K_S0',
+vx.kFit(list_name='K_S0',
         conf_level=0.001,
         path=my_path)
 

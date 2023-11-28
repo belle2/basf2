@@ -63,11 +63,11 @@ namespace Belle2 {
         if (recoTrack.getArrayIndex() == thisRecoTrack.getArrayIndex())
           continue;
 
-        float mom_diff_mag = fabs(recoTrack.getMomentumSeed().Mag() - thisRecoTrack.getMomentumSeed().Mag());
+        float mom_diff_mag = fabs(recoTrack.getMomentumSeed().R() - thisRecoTrack.getMomentumSeed().R());
         if (mom_diff_mag < min_mom_diff_mag) {
           min_mom_diff_mag = mom_diff_mag;
         }
-        float mom_diff_Pt = fabs(recoTrack.getMomentumSeed().Pt() - thisRecoTrack.getMomentumSeed().Pt());
+        float mom_diff_Pt = fabs(recoTrack.getMomentumSeed().Rho() - thisRecoTrack.getMomentumSeed().Rho());
         if (mom_diff_Pt < min_mom_diff_Pt) {
           min_mom_diff_Pt = mom_diff_Pt;
         }

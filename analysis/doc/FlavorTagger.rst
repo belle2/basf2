@@ -14,8 +14,8 @@ with a charged :math:`B` meson pair.
 
 .. seealso:: For a more detailed introduction, take a look at
 
-  * `First flavor tagging calibration using 2019 Belle II data (2008.02707) <https://arxiv.org/abs/2008.02707>`_
-  * `BELLE2-NOTE-PH-2020-013 <https://docs.belle2.org/record/1905>`_
+  * The paper: `B-flavor tagging at Belle II <https://link.springer.com/article/10.1140/epjc/s10052-022-10180-9>`_
+  * The note on calibration using 62.8/fb data collected in 2019 and 2020: `BELLE2-NOTE-PH-2021-001 <https://docs.belle2.org/record/2686>`_
 
 Flavor Tagging Principle
 ------------------------
@@ -113,7 +113,7 @@ fitted with a specific mass hypothesis. The mass hypothesis of each
 ParticleList corresponds to the searched flavor signature, e.g. "K+:KaonROE" is
 created for the categories using the information of kaons. Several flavor
 tagging input variables are calculated for each track. In these calculations
-the ECL and KLM Clusters are implicitly involved. The variables are taked as
+the ECL and KLM Clusters are implicitly involved. The variables are taken as
 inputs for a category specific multivariate method.
 
 For each category, an EventLevel multivariate method is assigned which is
@@ -158,7 +158,7 @@ Using the FlavorTagger
 
 Adding the FlavorTagger to your analysis is very simple: an example can be found in this tutorial:
 
-analysis/examples/tutorials/B2A801-FlavorTagger.py
+:code:`analysis/examples/tutorials/B2A801-FlavorTagger.py`
 
 At the beginning of your steering file you have to import:
 
@@ -228,7 +228,7 @@ The variable has several output values. The meaning  are the following:
   * *-2 (+2)* At least one MC particle that is related to a ROE track is found to be a descendant of MC :math:`B^0_{\rm sig}`:
     *-2 (+2)* means MC :math:`B^0_{\rm sig}` is a :math:`B^0 (\overline{B}^0)`.
 
-  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendent of MC :math:`B^0_{\rm sig}`:
+  * *-1 (+1)* Everything is correctly matched. All MC particles related to ROE tracks are not descendant of MC :math:`B^0_{\rm sig}`:
     *-1 (+1)* means that the MC neutral :math:`B` on the tag side is a :math:`B^0 (\overline{B}^0)`.
 
   * *0* Wrongly matched :math:`B^0_{\rm sig}`, or correctly matched but no neutral :math:`B` found on the tag side.
@@ -245,12 +245,12 @@ The variable has several output values. The meaning  are the following:
     is under or overestimating the dilution.
 
 The flavor tagger also saves the variable ``mcFlavorOfOtherB`` which returns the flavor of the
-accompaning tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched
+accompanying tag-side :math:`B` meson (positive or negative) if the given particle is a correctly MC-matched
 :math:`B` (it returns 0 else). In other words, this variable checks the generated flavor
 of the other MC :math:`\Upsilon(4{\rm S})` daughter without considering the ROE particles.
 
 The additional information about individual categories are saved using the aliases
-``qpCategory<Name>``, where ``<name>`` is the cathegory.
+``qpCategory<Name>``, where ``<name>`` is the category.
 These are 13 values which correspond to the 13 inputs which are given to the
 combiners. They are actually not ``qr`` but ``qp`` where ``p`` is the output of the
 category level mva (FBDT) for the track with the highest target probability.
@@ -302,10 +302,10 @@ An example tutorial for normal use can be found under:
   analysis/examples/tutorials/B2A801-FlavorTagger.py
 
 Find the latest tutorial given at the `2nd OPEN Belle II physics week <https://indico.belle2.org/event/493/contributions/4538>`_
-at `DESY stash <https://stash.desy.de/users/abudinen/repos/handsonexercises>`_.
+at `GitLab <https://gitlab.desy.de/belle2/software/training/handsonexercises>`_.
 
-Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse/B2T_Advanced_3_FlavorTagger.ipynb>`_
-(Jupyter notebook) under the latest `b2-starter-kit <https://stash.desy.de/projects/B2T/repos/b2-starterkit/browse>`_ tutorials.
+Try the advanced tutorial `B2T_Advanced_3_FlavorTagger.ipynb <https://gitlab.desy.de/belle2/software/training/b2-starterkit/-/blob/main/B2T_Advanced_3_FlavorTagger.ipynb>`_
+(Jupyter notebook) under the latest `b2-starter-kit <https://gitlab.desy.de/belle2/software/training/b2-starterkit>`_ tutorials.
 
 As further examples you can have a look on the scripts used to generate the weight files at kekcc once a release is tagged.
 You find them under:
@@ -329,7 +329,7 @@ The convention is BGx0 for no machine background and BGx1 for MC with machine ba
   flavorTaggerVertexingValidation.py
 
 
-If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://stash.desy.de/projects/B2A/repos/flavortaggingvalidation>`_ repository.
+If you are interested in the validation of the flavor tagger, have a look at the `flavortaggingvalidation <https://gitlab.desy.de/belle2/data-production/validation/flavortaggingvalidation>`_ repository.
 
 
 Functions

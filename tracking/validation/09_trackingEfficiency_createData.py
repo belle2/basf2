@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -40,4 +39,8 @@ path = b2.create_path()
 run_simulation(path, pt_value)
 run_reconstruction(path, output_filename)
 
+path.add_module('Progress')
+
 b2.process(path)
+
+print(b2.statistics)

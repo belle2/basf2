@@ -9,6 +9,7 @@
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 import bisect
 from datetime import datetime
+import tempfile
 import numpy as np
 import matplotlib.pyplot as plt
 import basf2
@@ -95,7 +96,7 @@ class QuadTreePlotter(basf2.Module):
         """
         Save the plot to a svg and show it (maybe a png would be better?)
         """
-        fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
+        fileName = tempfile.gettempdir() + "/" + datetime.now().isoformat() + '.svg'
         plt.savefig(fileName)
         self.file_names.append(fileName)
 
@@ -568,6 +569,6 @@ class QueueStereoQuadTreePlotter(StereoQuadTreePlotter):
         from datetime import datetime
         from matplotlib import pyplot as plt
 
-        fileName = "/tmp/" + datetime.now().isoformat() + '.svg'
+        fileName = tempfile.gettempdir() + "/" + datetime.now().isoformat() + '.svg'
         plt.savefig(fileName)
         self.file_list.append(fileName)

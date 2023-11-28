@@ -15,6 +15,6 @@ using namespace TrackFindingCDC;
 REG_MODULE(TFCDC_SegmentTrackCombiner);
 
 TFCDC_SegmentTrackCombinerModule::TFCDC_SegmentTrackCombinerModule()
-  : Super( {"CDCSegment2DVector", "CDCTrackVector"})
+  : Super({"CDCSegment2DVector", "CDCTrackVector"})
 {
 }

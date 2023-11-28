@@ -74,11 +74,9 @@ u4svars = vc.inv_mass + vc.kinematics + vc.mc_truth +\
     vu.create_aliases_for_selected(muvars, 'Upsilon(4S) -> eta [Upsilon -> ^mu+ ^mu-]') + \
     vu.create_aliases_for_selected(gvars, 'Upsilon(4S) -> [eta -> ^gamma ^gamma] Upsilon')
 
-u4svars_4c = u4svars + vu.create_aliases(['OrcaKinFitProb',
-                                          'OrcaKinFitChi2',
-                                          'OrcaKinFitErrorCode'], 'extraInfo({variable})', "")
+u4svars_4c = u4svars + ['OrcaKinFitProb', 'OrcaKinFitChi2', 'OrcaKinFitErrorCode']
 
-u4svars_def = u4svars + vu.create_aliases(['chiProb'], 'extraInfo({variable})', "")
+u4svars_def = u4svars + ['chiProb']
 
 
 # Saving variables to ntuple

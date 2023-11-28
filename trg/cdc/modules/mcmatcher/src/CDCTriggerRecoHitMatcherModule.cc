@@ -40,7 +40,7 @@ using namespace std;
 
 //this line registers the module with the framework and actually makes it available
 //in steering files or the the module list (basf2 -m).
-REG_MODULE(CDCTriggerRecoHitMatcher)
+REG_MODULE(CDCTriggerRecoHitMatcher);
 
 CDCTriggerRecoHitMatcherModule::CDCTriggerRecoHitMatcherModule() : Module()
 {

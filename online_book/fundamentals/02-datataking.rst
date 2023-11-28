@@ -10,12 +10,12 @@ Data Taking
 
     **Prerequisites**:
 
-        * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
+    * :ref:`Fundamentals Introduction <onlinebook_fundamentals_introduction>`
 
     **Objectives**:
 
-        * Understand the different detector systems in Belle II.
-        * Definition of triggers and their effects.
+    * Understand the different detector systems in Belle II.
+    * Definiton of triggers and their effects.
 
 One of the most important steps is of course to record the data we want to
 analyse. In this chapter we will go through the important concepts of the Belle
@@ -44,7 +44,7 @@ of the physics program.
 .. admonition:: Question
     :class: exercise stacked
 
-    At LHC, every bunch collision generates dozens of individual particle
+    At the LHC, every bunch collision generates dozens of individual particle
     interactions that overlay each other in the detectors (pile-up),
     considerably complicating the data analysis.
     This doesn't seem to be a problem at SuperKEKB and Belle II. Why?
@@ -60,7 +60,7 @@ of the physics program.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^{35}\, \textrm
+    The goal instantaneous luminosity of SuperKEKB is :math:`6\times 10^{35}\, \textrm
     {cm}^{-2} \textrm{s}^{-1}`. It takes a beam particle bunch roughly 10 μs to complete
     a full revolution around the accelerator ring. Up to 2376 bunches will circulate
     in each ring.
@@ -68,13 +68,13 @@ of the physics program.
 .. admonition:: Solution
     :class: toggle solution
 
-    At a final design luminosity of :math:`8\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
+    At a final design luminosity of :math:`6\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
     {-1}` at 2376 bunches per ring, each taking about 10 μs to complete a revolution, the
-    delivered luminosity per bunch crossing is about :math:`8\times 10^{35}\, \textrm
-    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 3.4\times10^{-6}\,
+    delivered luminosity per bunch crossing is about :math:`6\times 10^{35}\, \textrm
+    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 2.6\times10^{-6}\,
     (\textrm{nb})^{-1}`, so even the most likely Bhabha process at :math:`125\,
     \textrm{nb}` only happens about once every
-    :math:`(3.4\times 10^{-6}\cdot 125)^{-1} \approx 2400` bunch crossings.
+    :math:`(2.6\times 10^{-6}\cdot 125)^{-1} \approx 3100` bunch crossings.
 
 .. figure:: belle2.png
     :align: center
@@ -310,7 +310,7 @@ ARICH
     and the fraction of particles actually hitting the backwards direction of
     the detector is low.
 
-    With higher boost we would not need a backawards detector at all. And if we
+    With higher boost we would not need a backwards detector at all. And if we
     could go even higher with the boost we might not even need a barrel region.
 
     So now if you look at the LHCb detector you might understand why its only a
@@ -344,7 +344,7 @@ ECL
     :width: 900px
     :alt: Picture of ECL electronics
 
-    Small part of the ECL electronics in the endcap. oards do the mapping from
+    Small part of the ECL electronics in the endcap. Boards do the mapping from
     the preamps (which you can’t see) to the cables that go to the ShaperDSPs.
     You can also see the cooling lines under the boards.
 
@@ -559,10 +559,10 @@ intended functionality is of highest importance for the success of the experimen
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author(s) of this lesson
+.. rubric:: Author(s) of this lesson
 
-    Umberto Tamponi,
-    Martin Ritter,
-    Oskar Hartbrich,
-    Michael Eliachevitch,
-    Sam Cunliffe
+Umberto Tamponi,
+Martin Ritter,
+Oskar Hartbrich,
+Michael Eliachevitch,
+Sam Cunliffe

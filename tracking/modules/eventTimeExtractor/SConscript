@@ -1,4 +1,9 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'tracking_eventTimeExtraction', 'cdc_dataobjects', 'svd_dataobjects', 'tracking_dataobjects', 'tracking_trackFindingCDC']
+env['LIBS'] = ['framework', 
+  'tracking_eventTimeExtraction', 
+  'cdc_dataobjects', 
+  'tracking_dataobjects', 
+  'tracking_trackFindingCDC']
+
 Return('env')

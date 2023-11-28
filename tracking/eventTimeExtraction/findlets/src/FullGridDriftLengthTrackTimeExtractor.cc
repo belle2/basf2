@@ -57,7 +57,7 @@ void FullGridDriftLengthTrackTimeExtractor::apply(std::vector<RecoTrack*>& recoT
   m_wasSuccessful = m_finalExtractor.wasSuccessful();
 
   if (not wasSuccessful()) {
-    B2DEBUG(50, "Resetting the event t0 as the final extraction was not successful.");
+    B2DEBUG(25, "Resetting the event t0 as the final extraction was not successful.");
     resetEventT0();
   }
 }

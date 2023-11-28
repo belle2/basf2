@@ -25,7 +25,6 @@
 #include <display/ObjectInfo.h>
 
 #include <vxd/geometry/GeoCache.h>
-#include <klm/dataobjects/bklm/BKLMSimHitPosition.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
@@ -49,7 +48,9 @@
 #include <framework/dataobjects/DisplayData.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/ColorPalette.h>
+#include <framework/geometry/VectorUtil.h>
 
+#include <Math/VectorUtil.h>
 #include <TEveArrow.h>
 #include <TEveBox.h>
 #include <TEveCalo.h>
@@ -207,8 +208,8 @@ void EVEVisualization::addTrackCandidate(const std::string& collectionName,
 
 
   //track seeds
-  TVector3 track_pos = recoTrack.getPositionSeed();
-  TVector3 track_mom = recoTrack.getMomentumSeed();
+  const B2Vector3D& track_pos = recoTrack.getPositionSeed();
+  const B2Vector3D& track_mom = recoTrack.getMomentumSeed();
 
   TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
   lines->SetMainColor(c_recoTrackColor);
@@ -267,7 +268,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
   // Create a track as a polyline through reconstructed points
   // FIXME this is snatched from PrimitivePlotter, need to add extrapolation out of CDC
   TEveLine* track = new TEveLine(); // We are going to just add points with SetNextPoint
-  std::vector<TVector3> posPoints; // But first we'll have to sort them as in RecoHits axial and stereo come in blocks
+  std::vector<ROOT::Math::XYZVector> posPoints; // But first we'll have to sort them as in RecoHits axial and stereo come in blocks
   track->SetName(label); //popup label set at end of function
   track->SetLineColor(c_recoTrackColor);
   track->SetLineWidth(3);
@@ -279,6 +280,7 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
     if (!recoHit->useInFit())
       continue;
 
+    // Need TVector3 here for genfit interface below
     TVector3 pos;
     TVector3 mom;
     TMatrixDSym cov;
@@ -297,11 +299,11 @@ void EVEVisualization::addTrackCandidateImproved(const std::string& collectionNa
       continue;
     }
 
-    posPoints.push_back(TVector3(pos.X(), pos.Y(), pos.Z()));
+    posPoints.push_back(ROOT::Math::XYZVector(pos.X(), pos.Y(), pos.Z()));
   }
 
   sort(posPoints.begin(), posPoints.end(),
-  [](const TVector3 & a, const TVector3 & b) -> bool {
+  [](const ROOT::Math::XYZVector & a, const ROOT::Math::XYZVector & b) -> bool {
     return a.X() * a.X() + a.Y() * a.Y() > b.X() * b.X() + b.Y() * b.Y();
   });
   for (auto vec : posPoints) {
@@ -339,10 +341,10 @@ void EVEVisualization::addCDCTriggerTrack(const std::string& collectionName,
 {
   const TString label = ObjectInfo::getIdentifier(&trgTrack);
 
-  TVector3 track_pos = TVector3(0, 0, trgTrack.getZ0());
-  TVector3 track_mom = (trgTrack.getChargeSign() == 0) ?
-                       trgTrack.getDirection() * 1000 :
-                       trgTrack.getMomentum(1.5);
+  B2Vector3D track_pos = B2Vector3D(0, 0, trgTrack.getZ0());
+  B2Vector3D track_mom = (trgTrack.getChargeSign() == 0) ?
+                         trgTrack.getDirection() * 1000 :
+                         trgTrack.getMomentum(1.5);
 
   TEveRecTrack rectrack;
   rectrack.fP.Set(track_mom);
@@ -406,14 +408,14 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
 
   TEveRecTrackD recTrack;
-  const TVector3& poca = fitResult->getPosition();
+  const B2Vector3D& poca = fitResult->getPosition();
   recTrack.fV.Set(poca);
 
-  const TVector3& poca_momentum = fitResult->getMomentum();
+  const B2Vector3D& poca_momentum = fitResult->getMomentum();
   if (std::isfinite(poca_momentum.Mag()))
     recTrack.fP.Set(poca_momentum);
   else //use 1TeV momentum for tracks without curvature
-    recTrack.fP.Set(fitResult->getHelix().getDirection() * 1000);
+    recTrack.fP.Set(B2Vector3D(fitResult->getHelix().getDirection() * 1000));
 
   recTrack.fSign = fitResult->getChargeSign();
   TEveTrack* eveTrack = new TEveTrack(&recTrack, m_gftrackpropagator);
@@ -502,7 +504,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
         continue;
       }
 
-      TVector3 track_pos = representation->getPos(*fittedState);
+      ROOT::Math::XYZVector track_pos = ROOT::Math::XYZVector(representation->getPos(*fittedState));
 
       // draw track if corresponding option is set ------------------------------------------
       if (prevFittedState != NULL) {
@@ -578,9 +580,9 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
         // finished getting the hit infos -----------------------------------------------------
 
         // sort hit infos into variables ------------------------------------------------------
-        TVector3 o = fittedState->getPlane()->getO();
-        TVector3 u = fittedState->getPlane()->getU();
-        TVector3 v = fittedState->getPlane()->getV();
+        ROOT::Math::XYZVector o = ROOT::Math::XYZVector(fittedState->getPlane()->getO());
+        ROOT::Math::XYZVector u = ROOT::Math::XYZVector(fittedState->getPlane()->getU());
+        ROOT::Math::XYZVector v = ROOT::Math::XYZVector(fittedState->getPlane()->getV());
 
         bool planar_hit = false;
         bool planar_pixel_hit = false;
@@ -609,7 +611,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                    || dynamic_cast<const genfit::WireMeasurementNew*>(m)) {
           wire_hit = true;
           hit_u = fabs(hit_coords(0));
-          hit_v = v * (track_pos - o); // move the covariance tube so that the track goes through it
+          hit_v = v.Dot(track_pos - o); // move the covariance tube so that the track goes through it
           if (dynamic_cast<const genfit::WirePointMeasurement*>(m) != NULL) {
             wirepoint_hit = true;
             hit_v = hit_coords(1);
@@ -623,8 +625,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
         // draw planes if corresponding option is set -----------------------------------------
         if (drawPlanes || (drawDetectors && planar_hit)) {
-          TVector3 move(0, 0, 0);
-          if (wire_hit) move = v * (v * (track_pos - o)); // move the plane along the wire until the track goes through it
+          ROOT::Math::XYZVector move(0, 0, 0);
+          if (wire_hit) move = v * (v.Dot(track_pos - o)); // move the plane along the wire until the track goes through it
           TEveBox* box = boxCreator(o + move, u, v, plane_size, plane_size, 0.01);
           if (drawDetectors && planar_hit) {
             box->SetMainColor(kCyan);
@@ -644,14 +646,14 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             det_shape->SetShape(new TGeoTube(std::max(0., (double)(hit_u - 0.0105 / 2.)), hit_u + 0.0105 / 2., plane_size));
             fixGeoShapeRefCount(det_shape);
 
-            TVector3 norm = u.Cross(v);
+            ROOT::Math::XYZVector norm = u.Cross(v);
             TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
                                  (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
                                  (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi()); // move the tube to the right place and rotate it correctly
-            TVector3 move = v * (v * (track_pos - o)); // move the tube along the wire until the track goes through it
-            TGeoCombiTrans det_trans(o(0) + move.X(),
-                                     o(1) + move.Y(),
-                                     o(2) + move.Z(),
+            ROOT::Math::XYZVector move = v * (v.Dot(track_pos - o)); // move the tube along the wire until the track goes through it
+            TGeoCombiTrans det_trans(o.X() + move.X(),
+                                     o.Y() + move.Y(),
+                                     o.Z() + move.Z(),
                                      &det_rot);
             det_shape->SetTransMatrix(det_trans);
             det_shape->SetMainColor(kCyan);
@@ -679,7 +681,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
               const VXD::SensorInfoBase& sensor = geo.get(recoHit->getSensorID());
               double du, dv;
-              TVector3 a = o; //defines position of sensor plane
+              ROOT::Math::XYZVector a = o; //defines position of sensor plane
               double hit_res_u = hit_cov(0, 0);
               if (recoHit->isU()) {
                 du = std::sqrt(hit_res_u);
@@ -710,17 +712,17 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
               // calculate the semiaxis of the error ellipse ----------------------------
               cov_shape->SetShape(new TGeoEltu(pseudo_res_0, pseudo_res_1, 0.0105));
               fixGeoShapeRefCount(cov_shape);
-              TVector3 pix_pos = o + hit_u * u + hit_v * v;
-              TVector3 u_semiaxis = (pix_pos + eVec(0, 0) * u + eVec(1, 0) * v) - pix_pos;
-              TVector3 v_semiaxis = (pix_pos + eVec(0, 1) * u + eVec(1, 1) * v) - pix_pos;
-              TVector3 norm = u.Cross(v);
+              ROOT::Math::XYZVector pix_pos = o + hit_u * u + hit_v * v;
+              ROOT::Math::XYZVector u_semiaxis = (pix_pos + eVec(0, 0) * u + eVec(1, 0) * v) - pix_pos;
+              ROOT::Math::XYZVector v_semiaxis = (pix_pos + eVec(0, 1) * u + eVec(1, 1) * v) - pix_pos;
+              ROOT::Math::XYZVector norm = u.Cross(v);
               // finished calculating ---------------------------------------------------
 
               // rotate and translate everything correctly ------------------------------
               TGeoRotation det_rot("det_rot", (u_semiaxis.Theta() * 180) / TMath::Pi(), (u_semiaxis.Phi() * 180) / TMath::Pi(),
                                    (v_semiaxis.Theta() * 180) / TMath::Pi(), (v_semiaxis.Phi() * 180) / TMath::Pi(),
                                    (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi());
-              TGeoCombiTrans det_trans(pix_pos(0), pix_pos(1), pix_pos(2), &det_rot);
+              TGeoCombiTrans det_trans(pix_pos.X(), pix_pos.Y(), pix_pos.Z(), &det_rot);
               cov_shape->SetTransMatrix(det_trans);
               // finished rotating and translating --------------------------------------
 
@@ -741,10 +743,9 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             fixGeoShapeRefCount(cov_shape);
             const TVectorD& ev = eigen_values.GetEigenValues();
             const TMatrixD& eVec = eigen_values.GetEigenVectors();
-            TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
-            TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
-            TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
-            TVector3 norm = u.Cross(v);
+            ROOT::Math::XYZVector eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+            ROOT::Math::XYZVector eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+            ROOT::Math::XYZVector eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
             // got everything we need -----------------------------------------------------
 
 
@@ -759,7 +760,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             // finished scaling -----------------------------------------------------------
 
             // rotate and translate -------------------------------------------------------
-            TGeoGenTrans det_trans(o(0), o(1), o(2),
+            TGeoGenTrans det_trans(o.X(), o.Y(), o.Z(),
                                    //std::sqrt(pseudo_res_0/pseudo_res_1/pseudo_res_2), std::sqrt(pseudo_res_1/pseudo_res_0/pseudo_res_2), std::sqrt(pseudo_res_2/pseudo_res_0/pseudo_res_1), // this workaround is necessary due to the "normalization" performed in  TGeoGenTrans::SetScale
                                    //1/(pseudo_res_0),1/(pseudo_res_1),1/(pseudo_res_2),
                                    pseudo_res_0, pseudo_res_1, pseudo_res_2,
@@ -783,15 +784,15 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
             cov_shape->SetShape(new TGeoTube(std::max(0., (double)(hit_u - pseudo_res_0)), hit_u + pseudo_res_0, pseudo_res_1));
             fixGeoShapeRefCount(cov_shape);
-            TVector3 norm = u.Cross(v);
+            ROOT::Math::XYZVector norm = u.Cross(v);
 
             // rotate and translate -------------------------------------------------------
             TGeoRotation det_rot("det_rot", (u.Theta() * 180) / TMath::Pi(), (u.Phi() * 180) / TMath::Pi(),
                                  (norm.Theta() * 180) / TMath::Pi(), (norm.Phi() * 180) / TMath::Pi(),
                                  (v.Theta() * 180) / TMath::Pi(), (v.Phi() * 180) / TMath::Pi());
-            TGeoCombiTrans det_trans(o(0) + hit_v * v.X(),
-                                     o(1) + hit_v * v.Y(),
-                                     o(2) + hit_v * v.Z(),
+            TGeoCombiTrans det_trans(o.X() + hit_v * v.X(),
+                                     o.Y() + hit_v * v.Y(),
+                                     o.Z() + hit_v * v.Z(),
                                      &det_rot);
             cov_shape->SetTransMatrix(det_trans);
             // finished rotating and translating ------------------------------------------
@@ -838,7 +839,8 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   addObject(belle2Track, eveTrack);
 }
 
-TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth)
+TEveBox* EVEVisualization::boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud,
+                                      float vd, float depth)
 {
   //force minimum width of polygon to deal with Eve limits
   float min = 0.04;
@@ -852,7 +854,7 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
   TEveBox* box = new TEveBox;
   box->SetPickable(true);
 
-  TVector3 norm = u.Cross(v);
+  ROOT::Math::XYZVector norm = u.Cross(v);
   u *= (0.5 * ud);
   v *= (0.5 * vd);
   norm *= (0.5 * depth);
@@ -865,9 +867,12 @@ TEveBox* EVEVisualization::boxCreator(const TVector3& o, TVector3 u, TVector3 v,
     int signV = (k & 4) ? -1 : 1;
     int signN = (k & 2) ? -1 : 1;
     float vertex[3];
-    for (int i = 0; i < 3; ++i) {
-      vertex[i] = o(i) + signU * u(i) + signV * v(i) + signN * norm(i);
-    }
+    // for (int i = 0; i < 3; ++i) {
+    //   vertex[i] = o(i) + signU * u(i) + signV * v(i) + signN * norm(i);
+    // }
+    vertex[0] = o.X() + signU * u.X() + signV * v.X() + signN * norm.X();
+    vertex[1] = o.Y() + signU * u.Y() + signV * v.Y() + signN * norm.Y();
+    vertex[2] = o.Z() + signU * u.Z() + signV * v.Z() + signN * norm.Z();
     box->SetVertex(k, vertex);
   }
 
@@ -880,6 +885,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 {
   using namespace genfit;
 
+  // Need TVector3 for genfit interface
   TVector3 pos, dir, oldPos, oldDir;
   rep->getPosDir(*state, pos, dir);
   rep->getPosDir(*prevState, oldPos, oldDir);
@@ -893,8 +899,8 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
   TEvePathMark mark(
     markType,
-    TEveVector(pos(0), pos(1), pos(2)),
-    TEveVector(dir(0), dir(1), dir(2))
+    TEveVector(pos.X(), pos.Y(), pos.Z()),
+    TEveVector(dir.X(), dir.Y(), dir.Z())
   );
   eveTrack->AddPathMark(mark);
 
@@ -909,7 +915,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
     if (measuredState != NULL) {
 
       // step for evaluate at a distance from the original plane
-      TVector3 eval;
+      ROOT::Math::XYZVector eval;
       if (markerPos == 0)
         eval = 0.2 * distA * oldDir;
       else
@@ -918,6 +924,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
       // get cov at first plane
       TMatrixDSym cov;
+      // Need TVector3 for genfit interface
       TVector3 position, direction;
       rep->getPosMomCov(*measuredState, position, direction, cov);
 
@@ -925,7 +932,7 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
       TMatrixDSymEigen eigen_values(cov.GetSub(0, 2, 0, 2));
       const TVectorD& ev = eigen_values.GetEigenValues();
       const TMatrixD& eVec = eigen_values.GetEigenVectors();
-      TVector3 eVec1, eVec2;
+      ROOT::Math::XYZVector eVec1, eVec2;
       // limit
       static const double maxErr = 1000.;
       double ev0 = std::min(ev(0), maxErr);
@@ -950,27 +957,27 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
         eVec2 *= sqrt(ev1);
       }
 
-      if (eVec1.Cross(eVec2)*eval < 0)
+      if (eVec1.Cross(eVec2).Dot(eval) < 0)
         eVec2 *= -1;
       //assert(eVec1.Cross(eVec2)*eval > 0);
 
-      TVector3 oldEVec1(eVec1);
+      ROOT::Math::XYZVector oldEVec1(eVec1);
 
       const int nEdges = 24;
-      std::vector<TVector3> vertices;
+      std::vector<ROOT::Math::XYZVector> vertices;
 
-      vertices.push_back(position);
+      vertices.push_back(ROOT::Math::XYZVector(position));
 
       // vertices at plane
       for (int i = 0; i < nEdges; ++i) {
         const double angle = 2 * TMath::Pi() / nEdges * i;
-        vertices.push_back(position + cos(angle)*eVec1 + sin(angle)*eVec2);
+        vertices.push_back(ROOT::Math::XYZVector(position) + cos(angle)*eVec1 + sin(angle)*eVec2);
       }
 
 
 
       SharedPlanePtr newPlane(new DetPlane(*(measuredState->getPlane())));
-      newPlane->setO(position + eval);
+      newPlane->setO(position + XYZToTVector(eval));
 
       MeasuredStateOnPlane stateCopy(*measuredState);
       try {
@@ -1011,25 +1018,25 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
         } eVec2 *= sqrt(ev1);
       }
 
-      if (eVec1.Cross(eVec2)*eval < 0)
+      if (eVec1.Cross(eVec2).Dot(eval) < 0)
         eVec2 *= -1;
       //assert(eVec1.Cross(eVec2)*eval > 0);
 
-      if (oldEVec1 * eVec1 < 0) {
+      if (oldEVec1.Dot(eVec1) < 0) {
         eVec1 *= -1;
         eVec2 *= -1;
       }
 
       // vertices at 2nd plane
-      double angle0 = eVec1.Angle(oldEVec1);
-      if (eVec1 * (eval.Cross(oldEVec1)) < 0)
+      double angle0 = ROOT::Math::VectorUtil::Angle(eVec1, oldEVec1);
+      if (eVec1.Dot(eval.Cross(oldEVec1)) < 0)
         angle0 *= -1;
       for (int i = 0; i < nEdges; ++i) {
         const double angle = 2 * TMath::Pi() / nEdges * i - angle0;
-        vertices.push_back(position + cos(angle)*eVec1 + sin(angle)*eVec2);
+        vertices.push_back(ROOT::Math::XYZVector(position) + cos(angle)*eVec1 + sin(angle)*eVec2);
       }
 
-      vertices.push_back(position);
+      vertices.push_back(ROOT::Math::XYZVector(position));
 
 
       TEveTriangleSet* error_shape = new TEveTriangleSet(vertices.size(), nEdges * 2);
@@ -1058,38 +1065,31 @@ void EVEVisualization::makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane
 
 void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particle)
 {
-  addSimHit(hit->getPosWire(), particle);
+  addSimHit(ROOT::Math::XYZVector(hit->getPosWire()), particle);
 }
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const TVector3& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const TVector3& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
-void EVEVisualization::addSimHit(const BKLMSimHit* hit, const MCParticle* particle)
+void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
 {
-  TVector3 global_pos;
-  BKLMSimHitPosition* p = hit->getRelatedFrom<BKLMSimHitPosition>();
-  if (p) global_pos = p->getPosition();
+  const ROOT::Math::XYZVector& global_pos = hit->getPosition();
   addSimHit(global_pos, particle);
 }
-void EVEVisualization::addSimHit(const EKLMSimHit* hit, const MCParticle* particle)
-{
-  const TVector3& global_pos = hit->getPosition();
-  addSimHit(global_pos, particle);
-}
-void EVEVisualization::addSimHit(const TVector3& v, const MCParticle* particle)
+void EVEVisualization::addSimHit(const ROOT::Math::XYZVector& v, const MCParticle* particle)
 {
   MCTrack* track = addMCParticle(particle);
   if (!track)
     return; //hide hits from this particle
-  track->simhits->SetNextPoint(v.x(), v.y(), v.z());
+  track->simhits->SetNextPoint(v.X(), v.Y(), v.Z());
 }
 
 EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* particle)
@@ -1116,17 +1116,17 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
   }
 
   if (!m_mcparticleTracks[particle].track) {
-    const TVector3& p = particle->getMomentum();
-    const B2Vector3D& vertex = particle->getProductionVertex();
+    const ROOT::Math::XYZVector& p = particle->getMomentum();
+    const ROOT::Math::XYZVector& vertex = particle->getProductionVertex();
     const int pdg = particle->getPDG();
     TParticle tparticle(pdg, particle->getStatus(),
                         (particle->getMother() ? particle->getMother()->getIndex() : 0), 0, particle->getFirstDaughter(), particle->getLastDaughter(),
-                        p.x(), p.y(), p.z(), particle->getEnergy(),
-                        vertex.x(), vertex.y(), vertex.z(), particle->getProductionTime());
+                        p.X(), p.Y(), p.Z(), particle->getEnergy(),
+                        vertex.X(), vertex.Y(), vertex.Z(), particle->getProductionTime());
     TEveMCTrack mctrack;
     mctrack = tparticle;
     mctrack.fTDecay = particle->getDecayTime();
-    mctrack.fVDecay.Set(particle->getDecayVertex());
+    mctrack.fVDecay.Set(B2Vector3D(particle->getDecayVertex()));
     mctrack.fDecayed = !boost::math::isinf(mctrack.fTDecay);
     mctrack.fIndex = particle->getIndex();
     m_mcparticleTracks[particle].track = new TEveTrack(&mctrack, m_trackpropagator);
@@ -1169,7 +1169,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
 
         TEvePathMarkD refMark(TEvePathMarkD::kDaughter);
         refMark.fV.Set(B2Vector3D(daughter->getProductionVertex()));
-        refMark.fP.Set(daughter->getMomentum());
+        refMark.fP.Set(B2Vector3D(daughter->getMomentum()));
         refMark.fTime = daughter->getProductionTime();
         m_mcparticleTracks[particle].track->AddPathMark(refMark);
       }
@@ -1179,7 +1179,7 @@ EVEVisualization::MCTrack* EVEVisualization::addMCParticle(const MCParticle* par
       if ((TMath::Nint(particle->getCharge()) == 0 or !particle->hasStatus(MCParticle::c_StoppedInDetector))
           and mctrack.fDecayed) {
         TEvePathMarkD decayMark(TEvePathMarkD::kDecay);
-        decayMark.fV.Set(particle->getDecayVertex());
+        decayMark.fV.Set(B2Vector3D(particle->getDecayVertex()));
         m_mcparticleTracks[particle].track->AddPathMark(decayMark);
       }
     }
@@ -1343,12 +1343,12 @@ void EVEVisualization::clearEvent()
 
 void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 {
-  TVector3 v = vertex->getPos();
+  ROOT::Math::XYZVector v = ROOT::Math::XYZVector(vertex->getPos());
   TEvePointSet* vertexPoint = new TEvePointSet(ObjectInfo::getInfo(vertex));
   //sadly, setting a title for a TEveGeoShape doesn't result in a popup...
   vertexPoint->SetTitle(ObjectInfo::getTitle(vertex));
   vertexPoint->SetMainColor(c_recoHitColor);
-  vertexPoint->SetNextPoint(v.x(), v.y(), v.z());
+  vertexPoint->SetNextPoint(v.X(), v.Y(), v.Z());
 
   TMatrixDSymEigen eigen_values(vertex->getCov());
   TEveGeoShape* det_shape = new TEveGeoShape(ObjectInfo::getInfo(vertex) + " Error");
@@ -1356,11 +1356,11 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
   fixGeoShapeRefCount(det_shape);
   const TVectorD& ev = eigen_values.GetEigenValues(); //Assigns the eigenvalues into the "ev" matrix.
   const TMatrixD& eVec = eigen_values.GetEigenVectors();  //Assigns the eigenvalues into the "eVec" matrix.
-  TVector3 eVec1(eVec(0, 0), eVec(1, 0), eVec(2,
-                                              0));   //Define the 3 eigenvectors of the covariance matrix as objects of the TVector3 class using constructor.
-  TVector3 eVec2(eVec(0, 1), eVec(1, 1), eVec(2,
-                                              1));   //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
-  TVector3 eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
+  //Define the 3 eigenvectors of the covariance matrix as objects of the ROOT::Math::XYZVector class using constructor.
+  ROOT::Math::XYZVector eVec1(eVec(0, 0), eVec(1, 0), eVec(2, 0));
+  //eVec(i,j) uses the method/overloaded operator ( . ) of the TMatrixT class to return the matrix entry.
+  ROOT::Math::XYZVector eVec2(eVec(0, 1), eVec(1, 1), eVec(2, 1));
+  ROOT::Math::XYZVector eVec3(eVec(0, 2), eVec(1, 2), eVec(2, 2));
   // got everything we need -----------------------------------------------------   //Eigenvalues(semi axis) of the covariance matrix accquired!
 
 
@@ -1379,8 +1379,8 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 
 
   // rotate and translate -------------------------------------------------------
-  TGeoGenTrans det_trans(v(0), v(1), v(2), pseudo_res_0, pseudo_res_1, pseudo_res_2,
-                         &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.x(), operator () overloaded.
+  TGeoGenTrans det_trans(v.X(), v.Y(), v.Z(), pseudo_res_0, pseudo_res_1, pseudo_res_2,
+                         &det_rot); //Puts the ellipsoid at the position of the vertex, v(0)=v.X(), operator () overloaded.
   det_shape->SetTransMatrix(det_trans);
   // finished rotating and translating ------------------------------------------
 
@@ -1414,10 +1414,10 @@ void EVEVisualization::addECLCluster(const ECLCluster* cluster)
     }
 
     //convert theta +- dTheta into eta +- dEta
-    TVector3 thetaLow;
-    thetaLow.SetPtThetaPhi(1.0, cluster->getTheta() - dTheta, phi);
-    TVector3 thetaHigh;
-    thetaHigh.SetPtThetaPhi(1.0, cluster->getTheta() + dTheta, phi);
+    ROOT::Math::XYZVector thetaLow;
+    VectorUtil::setPtThetaPhi(thetaLow, 1.0, cluster->getTheta() - dTheta, phi);
+    ROOT::Math::XYZVector thetaHigh;
+    VectorUtil::setPtThetaPhi(thetaHigh, 1.0, cluster->getTheta() + dTheta, phi);
     float etaLow = thetaLow.Eta();
     float etaHigh = thetaHigh.Eta();
     if (etaLow > etaHigh) {
@@ -1435,41 +1435,43 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
   const double layerThicknessCm = 3.16; //TDR, Fig 10.2
   const double layerDistanceCm = 9.1 - layerThicknessCm;
 
-  TVector3 startPos = cluster->getClusterPosition(); //position of first RPC plane
-  TVector3 dir; //direction of cluster stack, Mag() == distance between planes
-  TVector3 a, b; //defines RPC plane
+  // Pposition of first RPC plane.
+  ROOT::Math::XYZVector position = cluster->getClusterPosition();
+  ROOT::Math::XYZVector startPos(position.X(), position.Y(), position.Z());
+  ROOT::Math::XYZVector dir; //direction of cluster stack, Mag() == distance between planes
+  ROOT::Math::XYZVector a, b; //defines RPC plane
   bool isBarrel = (startPos.Z() > -175.0 and startPos.Z() < 270.0);
   if (isBarrel) {
     //barrel
-    b = TVector3(0, 0, 1);
+    b = ROOT::Math::XYZVector(0, 0, 1);
     a = startPos.Cross(b).Unit();
     double c = M_PI / 4.0;
     double offset = c / 2.0 + M_PI;
-    a.SetPhi(int((a.Phi() + offset) / (c))*c - M_PI);
-    TVector3 perp = b.Cross(a);
+    VectorUtil::setPhi(a, int((a.Phi() + offset) / (c))*c - M_PI);
+    ROOT::Math::XYZVector perp = b.Cross(a);
 
     const double barrelRadiusCm = 204.0;
-    startPos.SetMag(barrelRadiusCm / perp.Dot(startPos.Unit()));
+    VectorUtil::setMag(startPos, barrelRadiusCm / perp.Dot(startPos.Unit()));
 
     dir = startPos.Unit();
-    dir.SetMag((layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
+    VectorUtil::setMag(dir, (layerDistanceCm + layerThicknessCm) / perp.Dot(dir));
   } else {
     //endcap
-    b = TVector3(startPos.x(), startPos.y(), 0).Unit();
+    b = ROOT::Math::XYZVector(startPos.X(), startPos.Y(), 0).Unit();
     a = startPos.Cross(b).Unit();
     double endcapStartZ = 284;
-    if (startPos.z() < 0)
+    if (startPos.Z() < 0)
       endcapStartZ = -189.5;
 
-    double scaleFac = endcapStartZ / startPos.z();
-    startPos.SetMag(startPos.Mag() * scaleFac);
+    double scaleFac = endcapStartZ / startPos.Z();
+    VectorUtil::setMag(startPos, startPos.R() * scaleFac);
 
     dir = startPos.Unit();
-    dir.SetMag((layerDistanceCm + layerThicknessCm) / fabs(dir.z()));
+    VectorUtil::setMag(dir, (layerDistanceCm + layerThicknessCm) / fabs(dir.Z()));
   }
 
   for (int i = 0; i < cluster->getLayers(); i++) {
-    TVector3 layerPos = startPos;
+    ROOT::Math::XYZVector layerPos = startPos;
     layerPos += (cluster->getInnermostLayer() + i) * dir;
     auto* layer = boxCreator(layerPos, a, b, 20.0, 20.0, layerThicknessCm / 2);
     layer->SetMainColor(c_klmClusterColor);
@@ -1484,7 +1486,6 @@ void EVEVisualization::addKLMCluster(const KLMCluster* cluster)
 
 void EVEVisualization::addBKLMHit2d(const KLMHit2d* bklm2dhit)
 {
-  //TVector3 globalPosition=  bklm2dhit->getGlobalPosition();
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
   const bklm::Module* module = m_GeoPar->findModule(bklm2dhit->getSection(), bklm2dhit->getSector(), bklm2dhit->getLayer());
 
@@ -1510,9 +1511,9 @@ void EVEVisualization::addBKLMHit2d(const KLMHit2d* bklm2dhit)
   CLHEP::Hep3Vector globalU = module->localToGlobal(localU);
   CLHEP::Hep3Vector globalV = module->localToGlobal(localV);
 
-  TVector3 o(global[0], global[1], global[2]);
-  TVector3 u(globalU[0], globalU[1], globalU[2]);
-  TVector3 v(globalV[0], globalV[1], globalV[2]);
+  ROOT::Math::XYZVector o(global[0], global[1], global[2]);
+  ROOT::Math::XYZVector u(globalU[0], globalU[1], globalU[2]);
+  ROOT::Math::XYZVector v(globalV[0], globalV[1], globalV[2]);
 
   //Lest's just assign the depth is 1.0 cm (thickness of a layer), better to update
   TEveBox* bklmbox = boxCreator(o, u - o, v - o, du, dv, 1.0);
@@ -1529,9 +1530,10 @@ void EVEVisualization::addEKLMHit2d(const KLMHit2d* eklm2dhit)
 {
   const double du = 2.0;
   const double dv = 2.0;
-  TVector3 o = eklm2dhit->getPosition();
-  TVector3 u(1.0, 0.0, 0.0);
-  TVector3 v(0.0, 1.0, 0.0);
+  ROOT::Math::XYZVector hitPosition = eklm2dhit->getPosition();
+  ROOT::Math::XYZVector o(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
+  ROOT::Math::XYZVector u(1.0, 0.0, 0.0);
+  ROOT::Math::XYZVector v(0.0, 1.0, 0.0);
   TEveBox* eklmbox = boxCreator(o, u, v, du, dv, 4.0);
   eklmbox->SetMainColor(kGreen);
   eklmbox->SetName("EKLMHit2d");
@@ -1552,15 +1554,15 @@ void EVEVisualization::addROI(const ROIid* roi)
   double maxV = aSensorInfo.getVCellPosition(roi->getMaxVid());
 
 
-  TVector3 localA(minU, minV, 0);
-  TVector3 localB(minU, maxV, 0);
-  TVector3 localC(maxU, minV, 0);
+  ROOT::Math::XYZVector localA(minU, minV, 0);
+  ROOT::Math::XYZVector localB(minU, maxV, 0);
+  ROOT::Math::XYZVector localC(maxU, minV, 0);
 
-  TVector3 globalA = aSensorInfo.pointToGlobal(localA);
-  TVector3 globalB = aSensorInfo.pointToGlobal(localB);
-  TVector3 globalC = aSensorInfo.pointToGlobal(localC);
+  ROOT::Math::XYZVector globalA = aSensorInfo.pointToGlobal(localA);
+  ROOT::Math::XYZVector globalB = aSensorInfo.pointToGlobal(localB);
+  ROOT::Math::XYZVector globalC = aSensorInfo.pointToGlobal(localC);
 
-  TEveBox* ROIbox = boxCreator((globalB + globalC) * 0.5 , globalB - globalA, globalC - globalA, 1, 1, 0.01);
+  TEveBox* ROIbox = boxCreator(globalB + globalC * 0.5, globalB - globalA, globalC - globalA, 1, 1, 0.01);
 
   ROIbox->SetName(ObjectInfo::getIdentifier(roi));
   ROIbox->SetMainColor(kSpring - 9);
@@ -1575,28 +1577,28 @@ void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* li
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
   const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
 
-  TVector3 a, b;
+  ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
     const float u = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
-    b = sensor.pointToGlobal(TVector3(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getBackwardWidth() / sensor.getWidth(0) * u, -0.5 * sensor.getLength(), 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(sensor.getForwardWidth() / sensor.getWidth(0) * u, +0.5 * sensor.getLength(), 0.0));
   } else {
     const float v = hit->getPosition();
-    a = sensor.pointToGlobal(TVector3(-0.5 * sensor.getWidth(v), v, 0.0));
-    b = sensor.pointToGlobal(TVector3(+0.5 * sensor.getWidth(v), v, 0.0));
+    a = sensor.pointToGlobal(ROOT::Math::XYZVector(-0.5 * sensor.getWidth(v), v, 0.0));
+    b = sensor.pointToGlobal(ROOT::Math::XYZVector(+0.5 * sensor.getWidth(v), v, 0.0));
   }
 
-  lines->AddLine(a.x(), a.y(), a.z(), b.x(), b.y(), b.z());
+  lines->AddLine(a.X(), a.Y(), a.Z(), b.X(), b.Y(), b.Z());
   m_shownRecohits.insert(hit);
 }
 
 void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-  const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
-  const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+  const ROOT::Math::XYZVector& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+  const ROOT::Math::XYZVector& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
 
-  lines->AddLine(wire_pos_f.x(), wire_pos_f.y(), wire_pos_f.z(), wire_pos_b.x(), wire_pos_b.y(), wire_pos_b.z());
+  lines->AddLine(wire_pos_f.X(), wire_pos_f.Y(), wire_pos_f.Z(), wire_pos_b.X(), wire_pos_b.Y(), wire_pos_b.Z());
   m_shownRecohits.insert(hit);
 
 }
@@ -1604,8 +1606,8 @@ void EVEVisualization::addRecoHit(const CDCHit* hit, TEveStraightLineSet* lines)
 void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-  const TVector3& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
-  const TVector3& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
+  const B2Vector3D& wire_pos_f = cdcgeo.wireForwardPosition(WireID(hit->getID()));
+  const B2Vector3D& wire_pos_b = cdcgeo.wireBackwardPosition(WireID(hit->getID()));
   static CDC::RealisticTDCCountTranslator tdcTranslator;
   TEveGeoShape* cov_shape = new TEveGeoShape("cov_shape");
   //TODO: leftrightflag not set! (same for other parameters, unsure which ones should be set)
@@ -1615,12 +1617,12 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
   const double lengthOfWireSection = 3.0;
 
   //z in wire direction, x,y orthogonal
-  const TVector3 zaxis = wire_pos_b - wire_pos_f;
-  const TVector3 xaxis = zaxis.Orthogonal();
-  const TVector3 yaxis = xaxis.Cross(zaxis);
+  const B2Vector3D zaxis = wire_pos_b - wire_pos_f;
+  const B2Vector3D xaxis = zaxis.Orthogonal();
+  const B2Vector3D yaxis = xaxis.Cross(zaxis);
 
   // move to z=0
-  const TVector3 midPoint = wire_pos_f - zaxis * (wire_pos_f.z() / zaxis.z());
+  const B2Vector3D midPoint = wire_pos_f - zaxis * (wire_pos_f.Z() / zaxis.Z());
 
   cov_shape->SetShape(new TGeoTube(std::max(0., (double)(driftLength - driftLengthRes)), driftLength + driftLengthRes,
                                    lengthOfWireSection));
@@ -1632,7 +1634,7 @@ void EVEVisualization::addCDCHit(const CDCHit* hit, bool showTriggerHits)
                        zaxis.Theta() * 180 / TMath::Pi(), zaxis.Phi() * 180 / TMath::Pi()
                       );
 
-  TGeoCombiTrans det_trans(midPoint(0), midPoint(1), midPoint(2), &det_rot);
+  TGeoCombiTrans det_trans(midPoint.X(), midPoint.Y(), midPoint.Z(), &det_rot);
   cov_shape->SetTransMatrix(det_trans);
 
   // get relation to trigger track segments
@@ -1719,7 +1721,7 @@ void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName
   // draw all cells in segment
   for (unsigned il = 0; il < layershift.size(); ++il) {
     for (unsigned ic = 0; ic < cellshift[il].size(); ++ic) {
-      TVector3 corners[2][2];
+      ROOT::Math::XYZVector corners[2][2];
       for (unsigned ir = 0; ir < 2; ++ir) {
         double r = cdcgeo.fieldWireR(iL + layershift[il] - ir);
         double fz = cdcgeo.fieldWireFZ(iL + layershift[il] - ir);
@@ -1728,21 +1730,21 @@ void EVEVisualization::addCDCTriggerSegmentHit(const std::string& collectionName
           double phib = (iCenter + cellshift[il][ic] + iphi - 0.5) * 2 * M_PI / nWires;
           double phif = phib + cdcgeo.nShifts(iL + layershift[il]) * M_PI / nWires;
 
-          TVector3 pos_f = TVector3(cos(phif) * r, sin(phif) * r, fz);
-          TVector3 pos_b = TVector3(cos(phib) * r, sin(phib) * r, bz);
-          TVector3 zaxis = pos_b - pos_f;
-          corners[ir][iphi] = pos_f - zaxis * (pos_f.z() / zaxis.z());
+          ROOT::Math::XYZVector pos_f = ROOT::Math::XYZVector(cos(phif) * r, sin(phif) * r, fz);
+          ROOT::Math::XYZVector pos_b = ROOT::Math::XYZVector(cos(phib) * r, sin(phib) * r, bz);
+          ROOT::Math::XYZVector zaxis = pos_b - pos_f;
+          corners[ir][iphi] = pos_f - zaxis * (pos_f.Z() / zaxis.Z());
         }
       }
 
-      shape->AddLine(corners[0][0].x(), corners[0][0].y(), 0,
-                     corners[0][1].x(), corners[0][1].y(), 0);
-      shape->AddLine(corners[0][1].x(), corners[0][1].y(), 0,
-                     corners[1][1].x(), corners[1][1].y(), 0);
-      shape->AddLine(corners[1][1].x(), corners[1][1].y(), 0,
-                     corners[1][0].x(), corners[1][0].y(), 0);
-      shape->AddLine(corners[1][0].x(), corners[1][0].y(), 0,
-                     corners[0][0].x(), corners[0][0].y(), 0);
+      shape->AddLine(corners[0][0].X(), corners[0][0].Y(), 0,
+                     corners[0][1].X(), corners[0][1].Y(), 0);
+      shape->AddLine(corners[0][1].X(), corners[0][1].Y(), 0,
+                     corners[1][1].X(), corners[1][1].Y(), 0);
+      shape->AddLine(corners[1][1].X(), corners[1][1].Y(), 0,
+                     corners[1][0].X(), corners[1][0].Y(), 0);
+      shape->AddLine(corners[1][0].X(), corners[1][0].Y(), 0,
+                     corners[0][0].X(), corners[0][0].Y(), 0);
     }
   }
 
@@ -1767,13 +1769,15 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   int hitModule = hit->getModule();
   float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
 
-  TVector3 centerPos3D =  hit->getPosition();
+  B2Vector3D centerPos3D =  hit->getPosition();
 
-  TVector3 channelX(1, 0, 0);    channelX.RotateZ(fi);
-  TVector3 channelY(0, 1, 0);    channelY.RotateZ(fi);
+  B2Vector3D channelX(1, 0, 0);    channelX.RotateZ(fi);
+  B2Vector3D channelY(0, 1, 0);    channelY.RotateZ(fi);
 
-  auto* arichbox = boxCreator(centerPos3D, arichGeo->getMasterVolume().momentumToGlobal(channelX),
-                              arichGeo->getMasterVolume().momentumToGlobal(channelY), 0.49, 0.49, 0.05);
+  auto* arichbox = boxCreator(centerPos3D,
+                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelX)),
+                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelY)),
+                              0.49, 0.49, 0.05);
   arichbox->SetMainColor(kOrange + 10);
   arichbox->SetName((std::to_string(hitModule)).c_str());
 
@@ -1783,7 +1787,7 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
 
 void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
 {
-  /** TOP module ID -> #digits */
+  /* TOP module ID -> #digits */
   std::map<int, int> m_topSummary;
   for (const TOPDigit& hit : digits) {
     int mod = hit.getModuleID();
@@ -1800,16 +1804,16 @@ void EVEVisualization::addTOPDigits(const StoreArray<TOPDigit>& digits)
     double r_center = topmod.getRadius();
     double z = topmod.getZc();
 
-    TVector3 centerPos3D;
-    centerPos3D.SetMagThetaPhi(r_center, M_PI / 2, phi);
+    ROOT::Math::XYZVector centerPos3D;
+    VectorUtil::setMagThetaPhi(centerPos3D, r_center, M_PI / 2, phi);
     centerPos3D.SetZ(z);
 
-    TVector3 channelX(1, 0, 0);    channelX.RotateZ(phi);
-    TVector3 channelY(0, 1, 0);    channelY.RotateZ(phi);
+    B2Vector3D channelX(1, 0, 0);     channelX.RotateZ(phi);
+    B2Vector3D channelY(0, 1, 0);     channelY.RotateZ(phi);
 
     //bar is a bit thicker so we can mouse over without getting the geometry
     auto* moduleBox = boxCreator(centerPos3D, channelX, channelY,
-                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth() , topmod.getBarLength());
+                                 3.0 * topmod.getBarThickness(), topmod.getBarWidth(), topmod.getBarLength());
     moduleBox->SetMainColor(kAzure + 10);
     double weight = double(modCountPair.second) / maxcount;
     moduleBox->SetMainTransparency(90 - weight * 50);
@@ -1833,8 +1837,8 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     text->SetName(labelPair.first.c_str());
     text->SetTitle(labelPair.first.c_str());
     text->SetMainColor(kGray + 1);
-    const TVector3& p = labelPair.second;
-    text->PtrMainTrans()->SetPos(p.x(), p.y(), p.z());
+    const ROOT::Math::XYZVector& p = labelPair.second;
+    text->PtrMainTrans()->SetPos(p.X(), p.Y(), p.Z());
     addToGroup("DisplayData", text);
   }
 
@@ -1843,17 +1847,17 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     points->SetTitle(pointPair.first.c_str());
     points->SetMarkerStyle(7);
     points->SetMainColor(kGreen);
-    for (const TVector3& p : pointPair.second) {
-      points->SetNextPoint(p.x(), p.y(), p.z());
+    for (const auto& p : pointPair.second) {
+      points->SetNextPoint(p.X(), p.Y(), p.Z());
     }
     addToGroup("DisplayData", points);
   }
 
   int randomColor = 2; //primary colours, changing rapidly with index
   for (const auto& arrow : displayData.m_arrows) {
-    const TVector3 pos = arrow.start;
-    const TVector3 dir = arrow.end - pos;
-    TEveArrow* eveArrow = new TEveArrow(dir.x(), dir.y(), dir.z(), pos.x(), pos.y(), pos.z());
+    const ROOT::Math::XYZVector pos = arrow.start;
+    const ROOT::Math::XYZVector dir = arrow.end - pos;
+    TEveArrow* eveArrow = new TEveArrow(dir.X(), dir.Y(), dir.Z(), pos.X(), pos.Y(), pos.Z());
     eveArrow->SetName(arrow.name.c_str());
     eveArrow->SetTitle(arrow.name.c_str());
     int arrowColor = arrow.color;
@@ -1866,9 +1870,24 @@ void EVEVisualization::showUserData(const DisplayData& displayData)
     //add label
     TEveText* text = new TEveText(arrow.name.c_str());
     text->SetMainColor(arrowColor);
-    //in middle of arrow, with some slight offset
-    const TVector3& labelPos = pos + 0.5 * dir + 0.1 * dir.Orthogonal();
-    text->PtrMainTrans()->SetPos(labelPos.x(), labelPos.y(), labelPos.z());
+    //place label in middle of arrow, with some slight offset
+    // orthogonal direction is arbitrary, set smallest component zero
+    ROOT::Math::XYZVector orthogonalDir;
+    if (std::abs(dir.X()) < std::abs(dir.Y())) {
+      if (std::abs(dir.X()) < std::abs(dir.Z())) {
+        orthogonalDir.SetCoordinates(0, dir.Z(), -dir.Y());
+      } else {
+        orthogonalDir.SetCoordinates(dir.Y(), -dir.X(), 0);
+      }
+    } else {
+      if (std::abs(dir.Y()) < std::abs(dir.Z())) {
+        orthogonalDir.SetCoordinates(-dir.Z(), 0, dir.X());
+      } else {
+        orthogonalDir.SetCoordinates(dir.Y(), -dir.X(), 0);
+      }
+    }
+    const ROOT::Math::XYZVector& labelPos = pos + 0.5 * dir + 0.1 * orthogonalDir;
+    text->PtrMainTrans()->SetPos(labelPos.X(), labelPos.Y(), labelPos.Z());
     eveArrow->AddElement(text);
     addToGroup("DisplayData", eveArrow);
   }

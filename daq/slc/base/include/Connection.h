@@ -32,6 +32,11 @@ namespace Belle2 {
   public:
     bool operator==(const Connection& st) const;
     bool operator!=(const Connection& st) const;
+
+    /**
+     * Operator =.
+     */
+    const Connection& operator=(const Connection& connection);
     const Connection& operator=(const std::string& msg);
     const Connection& operator=(const char* msg);
     const Connection& operator=(int i);

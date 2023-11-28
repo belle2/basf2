@@ -11,9 +11,7 @@
 #include <sstream>
 #include <fstream>
 #include <string>
-
-//Boost
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 // ECL
 #include <ecl/dbobjects/ECLDigitEnergyConstants.h>
@@ -86,6 +84,9 @@ void ECLDatabaseImporter::importDigitEnergyCalibration()
 
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
 
+  if (!amplitude) B2FATAL("None of the input files contains the histogram called 'amplitude'!");
+  if (!energy) B2FATAL("None of the input files contains the histogram called 'energy'!");
+
   // loop over the histogram to fill the TClonesArray
   int cell = 0;
   for (int bin = 1; bin <= amplitude->GetNbinsX(); ++bin) {
@@ -126,6 +127,8 @@ void ECLDatabaseImporter::importDigitTimeCalibration()
   }
 
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
+
+  if (!offset) B2FATAL("None of the input files contains the histogram called 'constantB'!");
 
   // loop over the histogram to fill the TClonesArray
   int cell = 0;
@@ -354,7 +357,7 @@ void ECLDatabaseImporter::importShowerEnergyCorrectionTemporary()
     B2FATAL("Sorry, you must only import one file at a time for now!");
 
   //Expect a root file
-  boost::filesystem::path path(m_inputFileNames[0]);
+  std::filesystem::path path(m_inputFileNames[0]);
   if (path.extension() != ".root")
     B2FATAL("Expecting a .root file. Aborting");
 
@@ -432,7 +435,7 @@ void ECLDatabaseImporter::importTrackClusterMatchingThresholds()
     B2FATAL("Sorry, you must only import one file at a time for now!");
 
   //Expect a txt file
-  boost::filesystem::path path(m_inputFileNames[0]);
+  std::filesystem::path path(m_inputFileNames[0]);
   if (path.extension() != ".txt")
     B2FATAL("Expecting a .txt file. Aborting");
 

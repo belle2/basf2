@@ -11,11 +11,11 @@
 using namespace std;
 using namespace Belle2;
 
-B2Vector3D BFieldComponentConstant::calculate(const B2Vector3D& point) const
+ROOT::Math::XYZVector BFieldComponentConstant::calculate(const ROOT::Math::XYZVector& point) const
 {
-  if ((maxRadius4BField > 0.0 && maxRadius4BField < point.Perp()) ||
-      (point.z() < minZ4BField  || point.z() > maxZ4BField)) return B2Vector3D(0, 0, 0);
-  return B2Vector3D(m_magneticField);
+  if ((maxRadius4BField > 0.0 && maxRadius4BField < point.Rho()) ||
+      (point.Z() < minZ4BField  || point.Z() > maxZ4BField)) return ROOT::Math::XYZVector(0, 0, 0);
+  return ROOT::Math::XYZVector(m_magneticField[0], m_magneticField[1], m_magneticField[2]);
 }
 
 

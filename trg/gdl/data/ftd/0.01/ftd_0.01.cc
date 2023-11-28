@@ -5,8 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 namespace Belle2 {
-  void ftd_0_01(bool* b, bool* i)
+  void ftd_0_01(bool* b, const bool* i)
   {
     b[0] = (i[1] && i[3] && i[13] && !i[62]) || (i[1] && i[4] && i[13] && !i[62]) || (i[1] && i[5] && i[13] && !i[62]) || (i[2] && i[3]
            && i[13] && !i[62]) || (i[2] && i[4] && i[13] && !i[62]) || (i[2] && i[5] && i[13] && !i[62]);

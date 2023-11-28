@@ -98,6 +98,12 @@ namespace Belle2 {
     /** Return overriden input file names, or empty vector if none were set */
     const std::vector<std::string>& getInputFilesOverride() const { return m_inputFilesOverride; }
 
+    /** Override secondary input file names for modules */
+    void setSecondaryInputFilesOverride(const std::vector<std::string>& names) { m_secondaryInputFilesOverride = names; }
+
+    /** Return overriden secondary input file names, or empty vector if none were set */
+    const std::vector<std::string>& getSecondaryInputFilesOverride() const { return m_secondaryInputFilesOverride; }
+
     /** Override output file name for modules */
     void setOutputFileOverride(const std::string& name) { m_outputFileOverride = name; }
 
@@ -310,6 +316,52 @@ namespace Belle2 {
       m_zmqFailOnFailedWorkers = zmqFailOnFailedWorkers;
     }
 
+    // DAQ environment
+    /// obtain current environment (DAQ or not)
+    bool getZMQDAQEnvironment() const
+    {
+      return m_zmqDAQEnvironment;
+    }
+
+    /// Set DAQ environment
+    void setZMQDAQEnvironment(bool zmqDAQ)
+    {
+      m_zmqDAQEnvironment = zmqDAQ;
+    }
+
+    /// get the exp number for DAQ first event
+    int getZMQDAQFirstEventExp() const
+    {
+      return m_zmqDAQFirstEventExp;
+    }
+
+    /// set the exp number for DAQ first event
+    void setZMQDAQFirstEventExp(int exp)
+    {
+      m_zmqDAQFirstEventExp = exp;
+    }
+
+    /// get run number for DAQ first event
+    int getZMQDAQFirstEventRun() const
+    {
+      return m_zmqDAQFirstEventRun;
+    }
+
+    /// set run number for DAQ first event
+    void setZMQDAQFirstEventRun(int run)
+    {
+      m_zmqDAQFirstEventRun = run;
+    }
+
+    /// checks the exp/run is DAQ first event
+    bool isZMQDAQFirstEvent(int exp, int run)
+    {
+      if (exp == m_zmqDAQFirstEventExp && run == m_zmqDAQFirstEventRun)
+        return true;
+      else
+        return false;
+    }
+
   private:
 
     std::string m_externalsPath;  /**< The path in which the externals are located. */
@@ -317,6 +369,7 @@ namespace Belle2 {
     std::string m_steering;       /**< The content of the steering file. */
     unsigned int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::vector<std::string> m_inputFilesOverride; /**< Override input file names for input modules */
+    std::vector<std::string> m_secondaryInputFilesOverride; /**< Override secondary input file names for input modules */
     std::vector<std::string>
     m_entrySequencesOverride; /**< A number sequence (e.g. 23:42,101) defining the entries which are processed for each input file in m_inputFilesOverride.*/
     std::string m_outputFileOverride; /**< Override name of output file for output module */
@@ -339,13 +392,17 @@ namespace Belle2 {
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */
     std::string m_zmqSocketAddress = ""; /**< Socket address to use in ZMQ. If not set, uses a random IPC connection. */
-    unsigned int m_zmqMaximalWaitingTime = 100 * 1000; /**< Maximal waiting time of any ZMQ module for any communication in ms */
-    unsigned int m_zmqEventBufferSize = 2; /**< Number of events to keep in flight for every worker */
+    unsigned int m_zmqMaximalWaitingTime = (3600 * 24) *
+                                           1000; /**< Maximal waiting time of any ZMQ module for any communication in ms */
+    unsigned int m_zmqEventBufferSize = 1; /**< Number of events to keep in flight for every worker */
     unsigned int m_zmqWorkerTimeout =
       0; /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
     bool m_zmqUseEventBackup = false; /**< If a worker dies, store its events in a backup. */
     bool m_zmqRestartFailedWorkers = false; /**< If a worker dies, restart it. */
     bool m_zmqFailOnFailedWorkers = true; /**< If a worker dies, fail also. Will not be used if restartFailedWorkers is true. */
+    bool m_zmqDAQEnvironment = false;   /**< True in DAQ environment */
+    int m_zmqDAQFirstEventExp = 42; /**< Exp no. for the special first event */
+    int m_zmqDAQFirstEventRun = 8; /**< Exp no. for the special first event */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

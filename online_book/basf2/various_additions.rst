@@ -12,22 +12,22 @@ Various additions
 
     **Prerequisites**:
 
-        * :ref:`onlinebook_first_steering_file`
+    * :ref:`onlinebook_first_steering_file`
 
     **Questions**:
 
-        * What is Bremsstrahlung radiation? Why do we care about it?
-        * How do we look for Bremsstrahlung photons?
-        * Why do we need to perform a best candidate selection?
-        * How can I correct for Bremsstrahlung?
-        * How can I perform a best candidate selection (BCS)?
+    * What is Bremsstrahlung radiation? Why do we care about it?
+    * How do we look for Bremsstrahlung photons?
+    * Why do we need to perform a best candidate selection?
+    * How can I correct for Bremsstrahlung?
+    * How can I perform a best candidate selection (BCS)?
 
     **Objectives**:
 
-        * Use the different Bremsstrahlung recovery strategies to correct the
-          momentum of the electrons in the
-          :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
-        * Perform a Best Candidate Selection
+    * Use the different Bremsstrahlung recovery strategies to correct the
+      momentum of the electrons in the
+      :math:`B^0 \to K_S^0 J/\psi\left(\to e^+ e^-\right)` decay
+    * Perform a Best Candidate Selection
 
 What is Bremsstrahlung radiation?
 ---------------------------------
@@ -156,9 +156,9 @@ with the `passesCut` function.
 
    Create a particle list, called ``gamma:brems``, with photons following the next cuts:
 
-         1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
-         2. If they are in the barrel region, their energy should be larger than 50 MeV
-         3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
+   1. If the photons are in the forward endcap of the ECL, their energy should be at least 75 MeV
+   2. If they are in the barrel region, their energy should be larger than 50 MeV
+   3. Finally, if they are in the backward endcap, their energy should be larger than 100 MeV
 
    To do this, you need the `clusterReg` and `clusterE` variable.
    To keep everything neat and
@@ -187,6 +187,7 @@ with the `passesCut` function.
    .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S10
            :end-at: E10
+           :language: python        
 
 .. admonition:: Solution
    :class: toggle solution
@@ -194,6 +195,7 @@ with the `passesCut` function.
         .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S20
            :end-at: E20
+           :language: python        
 
 Next, we perform the actual recovery, using the `correctBrems` function in the
 Modular Analysis package.
@@ -220,6 +222,7 @@ one Bremsstrahlung photon was added to this particle.
         .. literalinclude:: steering_files/039_various_additions.py
            :start-at: S30
            :end-at: E30
+           :language: python        
 
 .. admonition:: Question
    :class: exercise stacked
@@ -272,6 +275,7 @@ marker to the decay string:
 .. literalinclude:: steering_files/039_various_additions.py
    :start-at: S40
    :end-at: E40
+   :language: python        
 
 Finally, let's add the invariant mass of the :math:`J/\psi` meson without any
 Bremsstrahlung recovery applied. Then, after running your steering file, compare
@@ -309,6 +313,7 @@ Bremsstrahlung recovery?
     .. literalinclude:: steering_files/039_various_additions.py
       :start-at: S50
       :end-at: E50
+      :language: python        
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -321,7 +326,7 @@ Bremsstrahlung recovery?
     Your steering file should look like this:
 
     .. literalinclude:: steering_files/035_various_additions.py
-        :linenos:
+        :language: python        
 
 .. admonition:: Exercise
     :class: exercise stacked
@@ -333,7 +338,7 @@ Bremsstrahlung recovery?
    :class: toggle solution
 
     .. literalinclude:: roe/invariant_mass_plot.py
-      :linenos:
+      :language: python        
 
     The results should look similar to :numref:`jpsi_brems_validation_plot` (this was obtained with a
     different steering file, so do not mind if your plot is not exactly the same).
@@ -425,6 +430,7 @@ random seed.
     .. literalinclude:: steering_files/039_various_additions.py
        :start-at: S60
        :end-at: E60
+       :language: python        
 
 .. warning::
 
@@ -443,7 +449,7 @@ random seed.
      :class: solution toggle
 
      .. literalinclude:: steering_files/039_various_additions.py
-       :linenos:
+       :language: python        
 
 .. admonition:: Extra exercises
    :class: exercise
@@ -480,7 +486,7 @@ random seed.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-     Alejandro Mora,
-     Kilian Lieret
+Alejandro Mora,
+Kilian Lieret

@@ -9,7 +9,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/vxdHoughTracking/findlets/RelationCreator.h>
-#include <tracking/vxdHoughTracking/findlets/VXDHoughTrackingTreeSearcher.dcl.h>
+#include <tracking/vxdHoughTracking/findlets/SVDHoughTrackingTreeSearcher.dcl.h>
 #include <tracking/vxdHoughTracking/findlets/TrackCandidateResultRefiner.h>
 #include <tracking/vxdHoughTracking/filters/relations/ChooseableRelationFilter.h>
 #include <tracking/vxdHoughTracking/filters/pathFilters/ChooseablePathFilter.h>
@@ -55,7 +55,7 @@ namespace Belle2 {
       RelationCreator<AHit, ChooseableRelationFilter> m_relationCreator;
 
       /// perform a tree search using a cellular automaton for all the hits and relations of each raw track candidate
-      VXDHoughTrackingTreeSearcher<AHit, ChooseablePathFilter, Result> m_treeSearcher;
+      SVDHoughTrackingTreeSearcher<AHit, ChooseablePathFilter, Result> m_treeSearcher;
 
       /// sort and refine the results for each raw track cand, performing a fit and a basic overlap check
       TrackCandidateResultRefiner m_resultRefiner;
@@ -73,7 +73,7 @@ namespace Belle2 {
       std::vector<SpacePointTrackCand> m_filteredResults;
 
       /// maximum number of relations that can be created per track candidate
-      uint m_param_maxRelations = 2000;
+      uint m_maxRelations = 100;
     };
 
   }

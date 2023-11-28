@@ -13,6 +13,9 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
+/* ROOT headers. */
+#include <Math/VectorUtil.h>
+
 /* C++ headers. */
 #include <algorithm>
 
@@ -65,7 +68,7 @@ void KLMClustersReconstructorModule::beginRun()
 
 static bool compareDistance(const KLMHit2d* hit1, const KLMHit2d* hit2)
 {
-  return hit1->getPosition().Mag() < hit2->getPosition().Mag();
+  return hit1->getPosition().R() < hit2->getPosition().R();
 }
 
 void KLMClustersReconstructorModule::event()
@@ -80,7 +83,6 @@ void KLMClustersReconstructorModule::event()
   std::vector<KLMHit2d*> klmHit2ds, klmClusterHits;
   std::vector<KLMHit2d*>::iterator it, it0, it2;
   KLMCluster* klmCluster;
-  TVector3 hitPos;
   layerHitsBKLM = new int[nLayersBKLM];
   layerHitsEKLM = new int[nLayersEKLM];
   /* Fill vector of 2d hits. */
@@ -103,7 +105,8 @@ void KLMClustersReconstructorModule::event()
       switch (m_ClusterMode) {
         case c_AnyHit:
           while (it2 != klmClusterHits.end()) {
-            if ((*it)->getPosition().Angle((*it2)->getPosition()) <
+            if (ROOT::Math::VectorUtil::Angle(
+                  (*it)->getPosition(), (*it2)->getPosition()) <
                 m_ClusteringAngle) {
               klmClusterHits.push_back(*it);
               it = klmHit2ds.erase(it);
@@ -113,7 +116,8 @@ void KLMClustersReconstructorModule::event()
           }
           break;
         case c_FirstHit:
-          if ((*it)->getPosition().Angle((*it2)->getPosition()) <
+          if (ROOT::Math::VectorUtil::Angle(
+                (*it)->getPosition(), (*it2)->getPosition()) <
               m_ClusteringAngle) {
             klmClusterHits.push_back(*it);
             it = klmHit2ds.erase(it);
@@ -124,9 +128,7 @@ void KLMClustersReconstructorModule::event()
       ++it;
 clusterFound:;
     }
-    hitPos.SetX(0);
-    hitPos.SetY(0);
-    hitPos.SetZ(0);
+    ROOT::Math::XYZVector clusterPosition{0, 0, 0};
     for (i = 0; i < nLayersBKLM; i++)
       layerHitsBKLM[i] = 0;
     for (i = 0; i < nLayersEKLM; i++)
@@ -138,7 +140,7 @@ clusterFound:;
       if (((*it)->getSubdetector() == (*it0)->getSubdetector() &&
            (*it)->getLayer() == (*it0)->getLayer()) ||
           m_PositionMode == c_FullAverage) {
-        hitPos = hitPos + (*it)->getPosition();
+        clusterPosition = clusterPosition + (*it)->getPosition();
         nHits++;
       }
       if (minTime < 0 || (*it)->getTime() < minTime)
@@ -148,7 +150,7 @@ clusterFound:;
       else
         layerHitsEKLM[(*it)->getLayer() - 1]++;
     }
-    hitPos = hitPos * (1.0 / nHits);
+    clusterPosition = clusterPosition * (1.0 / nHits);
     /* Find innermost layer. */
     nLayers = 0;
     innermostLayer = -1;
@@ -175,14 +177,14 @@ clusterFound:;
     p = klmClusterHits.size() * 0.215;
     /* FIXME: Reimplement time calculation after completion of time calibration.
     } else {
-      v = hitPos.Mag() / minTime / Const::speedOfLight;
+      v = clusterPosition.R() / minTime / Const::speedOfLight;
       if (v < 0.999999)
         p = mass * v / sqrt(1.0 - v * v);
       else
         p = 0;
     }*/
     klmCluster = m_KLMClusters.appendNew(
-                   hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
+                   clusterPosition.X(), clusterPosition.Y(), clusterPosition.Z(), minTime, nLayers,
                    innermostLayer, p);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it)
       klmCluster->addRelationTo(*it);

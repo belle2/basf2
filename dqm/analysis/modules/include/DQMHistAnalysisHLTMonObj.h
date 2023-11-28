@@ -9,14 +9,14 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 namespace Belle2 {
 
   /**
    * Creates monitoring object for HLT
    */
-  class DQMHistAnalysisHLTMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisHLTMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -28,32 +28,23 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisHLTMonObjModule();
+    ~DQMHistAnalysisHLTMonObjModule();
 
     /**
      * Initialize the Module.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
-    /**
-     * Begin run function
-     */
-    virtual void beginRun() override;
-
-    /**
-     * Event processor.
-     */
-    virtual void event() override;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   protected:
 
@@ -61,6 +52,7 @@ namespace Belle2 {
     TCanvas* m_c_skim = nullptr; /**<Canvas with histograms related to HLT skims*/
     TCanvas* m_c_hardware = nullptr; /**<Canvas with histograms related to HLT hardware*/
     TCanvas* m_c_l1 = nullptr; /**<Canvas with histograms related to L1*/
+    TCanvas* m_c_ana_eff_shifter = nullptr; /**<Canvas with histogram related to ana_eff_shifter*/
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 

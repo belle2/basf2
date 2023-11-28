@@ -1,0 +1,19 @@
+#Descriptor: automade [B0 -> Xs gamma]cc
+#NickName: Bd_Xsgamma #model parameters are based on the latest global fit (SIMBA fit).
+#Documentation: Rare b->s gamma process, fully inclusive decays (non-resonant)
+#Cuts: None
+#Date: 20230316
+#
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+1.0  Xsd gamma PHOTOS BTOXSGAMMA 2 1 5.27885 4.624 4.8 -0.359 0.9 0.084 100 80 ; #[para. from PRL 127, 102001 (2021) after scheme conversion]
+Enddecay
+CDecay anti-B0sig
+
+#
+End

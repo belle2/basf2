@@ -43,9 +43,9 @@ def add_generator_preselection(
         Adds generator preselection.
         Should be added to the path after the generator.add_abc_generator but before simulation.add_simulation modules
         It uses all particles from the event generator (i.e. primary, non-virtual, non-initial particles).
-        It checks if the required conditions are fullfilled.
+        It checks if the required conditions are fulfilled.
         If not, the events are given to the emptypath.
-        The main usecase is a reduction of simulation time.
+        The main use case is a reduction of simulation time.
         Note that you have to multiply the generated cross section by the retention fraction of the preselection.
 
         Parameters:
@@ -102,6 +102,11 @@ def add_aafh_generator(
         finalstate (str): either "e+e-e+e-", "e+e-mu+mu-", "e+e-tau+tau-", "mu+mu-mu+mu-" or "mu+mu-tau+tau-"
         preselection (bool): if True, select events with at least one medium pt particle in the CDC acceptance
         enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
+        minmass (float): minimum invariant mass
+        subweights (list(float)): list of four or eight values (first four are interpreted as WAP, rest as WBP)
+                                  which specify the relative weights for each of the four sub generators
+        maxsubweight (float): maximum expected subgenerator weight for rejection scheme
+        maxfinalweight (float): maximum expected final weight for rejection scheme
     """
 
     if finalstate == 'e+e-e+e-':
@@ -268,10 +273,13 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): Either "charged" for B+/B- or "mixed" for B0/anti-B0
+        finalstate (str): Either "charged" for generation of generic B+/B-, "mixed" for generic B0/anti-B0, or "signal" for
+                          generation of user-defined signal mode
+        signaldecfile (str): path to decfile which defines the signal decay to be generated
+                             (only needed if ``finalstate`` set to "signal")
         coherentMixing: Either True or False. Switches on or off the coherent decay of the B0-B0bar pair.
-                        It should always be True,  unless you are generating Y(5,6S) -> BBar. In the latter case,
-                        setting it False solves the interla limiation of Evtgen that allows to make a
+                        It should always be True, unless you are generating Y(5,6S) -> BBar. In the latter case,
+                        setting it False solves the internal limitation of Evtgen that allows to make a
                         coherent decay only starting from the Y(4S).
         parentParticle (str): initial state (used only if it is not Upsilon(4S).
     """
@@ -428,6 +436,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
         `add_continuum_generator()` to add continuum generation without preselection
 
     Parameters:
+        path (basf2.Path): path to which the generator should be added
         finalstate (str): uubar, ddbar, ssbar, ccbar
         particles (list): A list of particle names or pdg codes. An event is
            only accepted if at lease one of those particles appears in the event.
@@ -565,7 +574,8 @@ def add_phokhara_generator(path, finalstate=''):
 
 def add_phokhara_evtgen_combination(
         path, final_state_particles, user_decay_file,
-        beam_energy_spread=True):
+        beam_energy_spread=True, isr_events=False, min_inv_mass_vpho=0.0,
+        max_inv_mass_vpho=0.0):
     """
     Add combination of PHOKHARA and EvtGen to the path. Phokhara is
     acting as ISR generator by generating e+ e- -> mu+ mu-, the muon pair is
@@ -581,6 +591,17 @@ def add_phokhara_evtgen_combination(
             it does not depend on subsequent J/psi or eta_c decays.
         user_decay_file (str): Name of EvtGen user decay file. The initial
             particle must be the virtual photon (vpho).
+        beam_energy_spread (bool): Whether beam-energy spread should be
+            simulated
+        isr_events (bool): If true, then PHOKHARA is used with ph0 (LO in
+            basf2) = 0, i.e. generation of processes with one photon.
+        min_inv_mass_hadrons(float): Minimum invariant mass of the virtual
+            photon. This parameter is used only if isr_events is true,
+            otherwise the minimum mass is computed from the masses of
+            the final-state particles.
+        max_inv_mass_hadrons(float): Maximum invariant mass of the virtual
+            photon. This parameter is used only if isr_events is true,
+            otherwise the maximum mass is not restricted.
     """
 
     import pdg
@@ -605,7 +626,10 @@ def add_phokhara_evtgen_combination(
     phokhara.param('nMaxTrials', 25000)
 
     # Use NNLO.
-    phokhara.param('LO', 1)
+    if isr_events:
+        phokhara.param('LO', 0)
+    else:
+        phokhara.param('LO', 1)
     phokhara.param('NLO', 1)
 
     # Use ISR only.
@@ -627,17 +651,25 @@ def add_phokhara_evtgen_combination(
     # Minimal invariant mass of the muons and tagged photon combination.
     phokhara.param('MinInvMassHadronsGamma', 0.)
 
-    # Minimal squared invariant mass of muons (final state).
-    # Force application of this cut.
-    mass = 0
-    for particle in final_state_particles:
-        p = pdg.get(particle)
-        mass = mass + p.Mass()
-    phokhara.param('MinInvMassHadrons', mass * mass)
-    phokhara.param('ForceMinInvMassHadronsCut', True)
-
-    # Maximal squared invariant mass of muons (final state) (st to lagre
-    phokhara.param('MaxInvMassHadrons', 200.0)
+    if isr_events:
+        # Minimum squared invariant mass of muons (final state).
+        phokhara.param('MinInvMassHadrons',
+                       min_inv_mass_vpho * min_inv_mass_vpho)
+        # Maximum squared invariant mass of muons (final state).
+        phokhara.param('MaxInvMassHadrons',
+                       max_inv_mass_vpho * max_inv_mass_vpho)
+    else:
+        # Minimum squared invariant mass of muons (final state).
+        # Force application of this cut.
+        mass = 0
+        for particle in final_state_particles:
+            p = pdg.get(particle)
+            mass = mass + p.Mass()
+        phokhara.param('MinInvMassHadrons', mass * mass)
+        phokhara.param('ForceMinInvMassHadronsCut', True)
+        # Maximum squared invariant mass of muons (final state).
+        # It is set to a large value, resulting in unrestricted mass.
+        phokhara.param('MaxInvMassHadrons', 200.0)
 
     # Minimal photon energy.
     phokhara.param('MinEnergyGamma', 0.01)

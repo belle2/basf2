@@ -12,17 +12,17 @@ Vertex fitting
 
     **Prerequisites**:
 
-        * The previous lesson
+    * The previous lesson
 
     **Questions**:
 
-        * What is a vertex fit?
-        * When do I want to perform a vertex fit?
-        * How should I choose my fit and constraints?
+    * What is a vertex fit?
+    * When do I want to perform a vertex fit?
+    * How should I choose my fit and constraints?
 
     **Objectives**:
 
-        * Perform vertex fit of a decay
+    * Perform vertex fit of a decay
 
 Introduction
 ------------
@@ -227,7 +227,7 @@ results.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/059_vertex_fitting.py
-         :linenos:
+         :language: python        
 
 You can now plot some relevant vertex variables. In general, the choice would
 depend on what you need for your analysis. A few examples would include:
@@ -268,7 +268,7 @@ As an exercise we will focus on the first two.
     :class: toggle solution
 
     .. literalinclude:: vertex/vertex_plots.py
-        :linenos:
+        :language: python        
 
 .. _vertex_plots:
 .. figure:: vertex/jpsi_dz.svg
@@ -305,6 +305,6 @@ As an exercise we will focus on the first two.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Francesco Tenchini
+Francesco Tenchini

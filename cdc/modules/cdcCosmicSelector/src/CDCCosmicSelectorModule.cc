@@ -92,7 +92,7 @@ void CDCCosmicSelectorModule::event()
     //    B2INFO("No .of prim. charged MC particles= " << nPrimChgds);
     if (nPrimChgds > 1) continue;
 
-    const B2Vector3D vertex = m_P->getProductionVertex();
+    const ROOT::Math::XYZVector vertex = m_P->getProductionVertex();
     const double vX0 = vertex.X();
     const double vY0 = vertex.Y();
     const double cosphi =  cos(m_phiOfCounter * M_PI / 180.);
@@ -105,7 +105,7 @@ void CDCCosmicSelectorModule::event()
     //    std::cout <<" "<< std::endl;
     //    std::cout <<"vr,vx,vy,yz= "<< sqrt(vX*vX + vY*vY) <<" "<<vX <<" "<< vY <<" "<< vZ << std::endl;
 
-    const TVector3 momentum = m_P->getMomentum();
+    const ROOT::Math::XYZVector momentum = m_P->getMomentum();
     //(px,py) is momentum in frame rotated in phi wrt lab. frame
     const double pX0 = momentum.X();
     const double pY0 = momentum.Y();

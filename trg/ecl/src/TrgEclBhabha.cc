@@ -115,6 +115,12 @@ TrgEclBhabha::TrgEclBhabha():
   m_taub2b2CLEEndcapCut = 3.0;
   m_taub2b2CLECut = 1.62;
 
+  //Taub2b3 by S.Ito
+  m_taub2b3EtotCut = 7.0;
+  m_taub2b3CLEb2bCut  = 0.14;
+  m_taub2b3CLELowCut  = 0.12;
+  m_taub2b3CLEHighCut = 4.5;
+
 }
 //
 //
@@ -343,9 +349,9 @@ bool TrgEclBhabha::GetBhabha01()
     int maxTCId    = aTRGECLCluster->getMaxTCId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
+    ROOT::Math::XYZVector clusterposition(aTRGECLCluster->getPositionX(),
+                                          aTRGECLCluster->getPositionY(),
+                                          aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     ClusterPosition.push_back(clusterposition);
@@ -439,9 +445,9 @@ bool TrgEclBhabha::GetBhabha02()
     int maxTCId    = aTRGECLCluster->getMaxTCId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
+    ROOT::Math::XYZVector clusterposition(aTRGECLCluster->getPositionX(),
+                                          aTRGECLCluster->getPositionY(),
+                                          aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     ClusterPosition.push_back(clusterposition);
@@ -537,9 +543,9 @@ bool TrgEclBhabha::Getmumu()
     int maxTCId    = aTRGECLCluster->getMaxTCId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
+    ROOT::Math::XYZVector clusterposition(aTRGECLCluster->getPositionX(),
+                                          aTRGECLCluster->getPositionY(),
+                                          aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     ClusterPosition.push_back(clusterposition);
@@ -742,6 +748,101 @@ bool TrgEclBhabha::GetTaub2b2(double E_total1to17)
 
   return taub2b2Flag;
 }
+
+
+//========================================================
+// taub2b3 added by S.Ito
+//========================================================
+bool TrgEclBhabha::GetTaub2b3(double E_total1to17)
+{
+  //
+  // Read Cluster Table
+  //
+  MaxTCId.clear();
+  MaxTCThetaId.clear();
+  ClusterEnergy.clear();
+  ClusterTiming.clear();
+  ClusterPosition.clear();
+
+  int taub2b3EtotFlag = 0;
+  int taub2b3AngleCLEThetaIdFlag = 0;
+  int taub2b3CLELowCutFlag  = 1;
+  int taub2b3CLEHighCutFlag = 1;
+
+  // Total Energy Etot < 7 GeV in lab
+  if (E_total1to17 < m_taub2b3EtotCut) {
+    taub2b3EtotFlag = 1;
+  }
+
+  // cluster array loop
+  StoreArray<TRGECLCluster> trgeclClusterArray;
+  for (int ii = 0; ii < trgeclClusterArray.getEntries(); ii++) {
+    TRGECLCluster* aTRGECLCluster = trgeclClusterArray[ii];
+    int maxTCId           = aTRGECLCluster->getMaxTCId();
+    double clusterenergy  = aTRGECLCluster->getEnergyDep();
+    ClusterEnergy.push_back(clusterenergy);
+    MaxTCId.push_back(maxTCId);
+    MaxTCThetaId.push_back(aTRGECLCluster->getMaxThetaId());
+
+    // All clusters in the event shoule be E > 0.12 GeV in lab.
+    if (clusterenergy <= m_taub2b3CLELowCut) {
+      taub2b3CLELowCutFlag = 0;
+    }
+    // The number of clusters with E > 4.5 GeV in lab should be 0.
+    if (clusterenergy > m_taub2b3CLEHighCut) {
+      taub2b3CLEHighCutFlag = 0;
+    }
+  }
+
+  // total number of cluster
+  const int ncluster = ClusterEnergy.size();
+
+  // 2 cluster combination
+  for (int icluster = 0; icluster < ncluster ; icluster++) {
+    for (int jcluster = icluster + 1; jcluster < ncluster; jcluster ++) {
+      if (icluster == jcluster) {continue;}
+      int energy1 = 0;
+      int energy2 = 0;
+      int dphi = 0;
+      int thetaSum = 0;
+      get2CLETP(MaxTCId[icluster],
+                MaxTCId[jcluster],
+                energy1,
+                energy2,
+                dphi,
+                thetaSum);
+
+      // delta phi and theta sum selection in cms
+      if (dphi     > m_taub2b3AngleCut[0] &&
+          dphi     < m_taub2b3AngleCut[1] &&
+          thetaSum > m_taub2b3AngleCut[2] &&
+          thetaSum < m_taub2b3AngleCut[3]) {
+        // Cluster ThetaID selection
+        if (MaxTCThetaId[icluster] >=  2 &&
+            MaxTCThetaId[icluster] <= 16 &&
+            MaxTCThetaId[jcluster] >=  2 &&
+            MaxTCThetaId[jcluster] <= 16) {
+          // Cluster energy selection in lab
+          if (ClusterEnergy[icluster] > m_taub2b3CLEb2bCut ||
+              ClusterEnergy[jcluster] > m_taub2b3CLEb2bCut) {
+            taub2b3AngleCLEThetaIdFlag++;
+          }
+        }
+      }
+    }
+  }
+  // all selections
+  bool taub2b3Flag = false;
+  if (taub2b3EtotFlag            > 0 &&
+      taub2b3AngleCLEThetaIdFlag > 0 &&
+      taub2b3CLELowCutFlag       > 0 &&
+      taub2b3CLEHighCutFlag      > 0) {
+    taub2b3Flag = true;
+  }
+
+  return taub2b3Flag;
+}
+
 //========================================================
 // additional Bhabha veto
 //========================================================

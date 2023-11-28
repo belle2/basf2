@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cdc/dataobjects/CDCGeometryTranslatorBase.h>
+#include <cdc/translators/CDCGeometryTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
 namespace Belle2 {
@@ -23,27 +23,27 @@ namespace Belle2 {
       ~IdealCDCGeometryTranslator() {}
 
       /** As this is for the ideal geometry, I take simply the one used in the simulation. */
-      const TVector3 getWireForwardPosition(const WireID& wireID,
-                                            float) override
+      const ROOT::Math::XYZVector getWireForwardPosition(const WireID& wireID,
+                                                         float) override
       {
         return CDCGeometryPar::Instance().wireForwardPosition(wireID);
       }
 
       /** The following (dummy) is needed to make this class compilable */
-      const TVector3 getWireForwardPosition(const WireID& wireID) override
+      const ROOT::Math::XYZVector getWireForwardPosition(const WireID& wireID) override
       {
         return CDCGeometryPar::Instance().wireForwardPosition(wireID);
       }
 
       /** As this is for the ideal geometry, I take simply the one used in the simulation. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID,
-                                             float) override
+      const ROOT::Math::XYZVector getWireBackwardPosition(const WireID& wireID,
+                                                          float) override
       {
         return CDCGeometryPar::Instance().wireBackwardPosition(wireID);
       }
 
       /** The following (dummy) is needed to make this class compilable */
-      const TVector3 getWireBackwardPosition(const WireID& wireID) override
+      const ROOT::Math::XYZVector getWireBackwardPosition(const WireID& wireID) override
       {
         return CDCGeometryPar::Instance().wireBackwardPosition(wireID);
       }

@@ -54,7 +54,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     Returns just the state object
     """
@@ -64,7 +64,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Do the fit
     """
@@ -81,8 +81,8 @@ def partial_fit(state, X, S, y, w, epoch):
             """
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
-            print('\nTesting loss: {}, acc: {}'.format(loss, acc))
-            print('Training loss: {}, acc: {}'.format(loss2, acc2))
+            print(f'\nTesting loss: {loss}, acc: {acc}')
+            print(f'Training loss: {loss2}, acc: {acc2}')
 
     state.model.fit(X, y, batch_size=100, epochs=100, validation_data=(state.Xtest, state.ytest),
                     callbacks=[TestCallback(), EarlyStopping(monitor='val_loss')])
@@ -92,7 +92,7 @@ def partial_fit(state, X, S, y, w, epoch):
 if __name__ == "__main__":
     import os
     import pandas
-    from root_pandas import to_root
+    import uproot
     import tempfile
     import json
 
@@ -157,7 +157,8 @@ if __name__ == "__main__":
             dic.update({'isSignal': target})
 
             df = pandas.DataFrame(dic)
-            to_root(df, os.path.join(path, filename), key='variables')
+            with uproot.recreate(os.path.join(path, filename)) as outfile:
+                outfile['variables'] = df
 
         # ##########################Do Training#################################
         # Do a comparison of different Nets for this task.

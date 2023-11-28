@@ -49,6 +49,7 @@ add_reconstruction(main)
 # but interesting for validation purposes
 add_svd_create_recodigits(main)
 
+main.add_module('Progress')
 # memory profile
 main.add_module("Profile")
 

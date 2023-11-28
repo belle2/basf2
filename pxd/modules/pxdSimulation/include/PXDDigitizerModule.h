@@ -99,7 +99,7 @@ namespace Belle2 {
        * @param position start position of the charge
        * @param electrons number of electrons to drift
        */
-      void driftCharge(const TVector3& position, double electrons);
+      void driftCharge(const ROOT::Math::XYZVector& position, double electrons);
       /** Add pure noise digits to the Sensors */
       void addNoiseDigits();
       /** Calculate the noise contribution to one pixel with given charge.
@@ -195,7 +195,7 @@ namespace Belle2 {
       /** Pointer to the SensorInfo of the current sensor */
       const SensorInfo*  m_currentSensorInfo;
       /** Current magnetic field */
-      TVector3 m_currentBField;
+      ROOT::Math::XYZVector m_currentBField;
 
       /** Number of readout gates (or total number of Switcher channels) */
       int m_nGates;

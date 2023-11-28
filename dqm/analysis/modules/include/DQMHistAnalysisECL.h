@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //ROOT
 #include <TCanvas.h>
@@ -25,7 +25,7 @@ namespace Belle2 {
    * This module is for analysis of ECL DQM histograms.
    */
 
-  class DQMHistAnalysisECLModule : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
+  class DQMHistAnalysisECLModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
   public:
 
@@ -33,18 +33,18 @@ namespace Belle2 {
     DQMHistAnalysisECLModule();
 
     /** Destructor. */
-    virtual ~DQMHistAnalysisECLModule();
+    ~DQMHistAnalysisECLModule();
 
     /** Initialize the module. */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Call when a run begins. */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Event processor. */
-    virtual void event() override;
+    void event() override final;
     /** Call when a run ends. */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Terminate. */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 
@@ -56,9 +56,16 @@ namespace Belle2 {
     double m_CrateTimeOffsetsMax;
     /** Maximum of fails for logic test. */
     int m_LogicTestMax;
+    /** Prefix to use for PVs registered by this module */
+    std::string m_pvPrefix;
 
     /** Vector for crates IDs w/ low statistics. */
     std::vector<short> m_low{};
+
+    /** Values of crate time offsets */
+    double m_crate_time_offsets[52] = {};
+    /** Minimum fraction of saved waveforms for each waveform type */
+    std::map<std::string, double> m_wf_fraction;
 
     /** TLine to show lower boundary for 'trigtag2_trigid' histogram. */
     TLine* m_lower_boundary_trigtag2 = nullptr;
@@ -107,6 +114,8 @@ namespace Belle2 {
 
     /**Vector of TCanvases for waveforms .*/
     std::vector<TCanvas*> c_wf_analysis{};
+
+    MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
 
     /** Normalize histograms. */
     void normalize(TCanvas*, const std::string&, const Double_t&);

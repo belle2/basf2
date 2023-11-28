@@ -6,25 +6,32 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/modules/eclBhabhaTCollector/ECLBhabhaTCollectorModule.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/gearbox/Const.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/HitPatternCDC.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <analysis/utility/PCmsLabTransform.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
+/* Basf2 headers. */
+#include <analysis/ClusterUtility/ClusterUtils.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/gearbox/Const.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/HitPatternCDC.h>
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+
+/* ROOT headers. */
+#include <TFile.h>
 #include <TH2F.h>
 #include <TTree.h>
-#include <TFile.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -57,7 +64,7 @@ ECLBhabhaTCollectorModule::ECLBhabhaTCollectorModule() : CalibrationCollectorMod
   addParam("minCrystal", m_minCrystal,
            "First CellId to handle.", 1);
   addParam("maxCrystal", m_maxCrystal,
-           "Last CellId to handle.", 8736);
+           "Last CellId to handle.", ECLElementNumbers::c_NCrystals);
 
   addParam("saveTree", m_saveTree,
            "If true, TTree 'tree' with more detailed event info is saved in "
@@ -226,7 +233,7 @@ void ECLBhabhaTCollectorModule::prepare()
 
   auto TimevsCrysPrevCrateCalibPrevCrystCalib = new TH2F("TimevsCrysPrevCrateCalibPrevCrystCalib",
                                                          "Time t psi - ts - tcrate (previous calibs) vs crystal cell ID;crystal cell ID;Time t_psi with previous calib (ns)",
-                                                         8736, 1, 8736 + 1, nbins, min_t, max_t);
+                                                         ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibPrevCrystCalib", TimevsCrysPrevCrateCalibPrevCrystCalib);
 
   auto TimevsCratePrevCrateCalibPrevCrystCalib = new TH2F("TimevsCratePrevCrateCalibPrevCrystCalib",
@@ -235,7 +242,8 @@ void ECLBhabhaTCollectorModule::prepare()
   registerObject<TH2F>("TimevsCratePrevCrateCalibPrevCrystCalib", TimevsCratePrevCrateCalibPrevCrystCalib);
 
   auto TimevsCrysNoCalibrations = new TH2F("TimevsCrysNoCalibrations",
-                                           "Time tpsi vs crystal cell ID;crystal cell ID;Time t_psi (ns)", 8736, 1, 8736 + 1, nbins, min_t, max_t);
+                                           "Time tpsi vs crystal cell ID;crystal cell ID;Time t_psi (ns)", ECLElementNumbers::c_NCrystals, 1,
+                                           ECLElementNumbers::c_NCrystals + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysNoCalibrations", TimevsCrysNoCalibrations);
 
   auto TimevsCrateNoCalibrations = new TH2F("TimevsCrateNoCalibrations",
@@ -244,7 +252,7 @@ void ECLBhabhaTCollectorModule::prepare()
 
   auto TimevsCrysPrevCrateCalibNoCrystCalib = new TH2F("TimevsCrysPrevCrateCalibNoCrystCalib",
                                                        "Time tpsi - tcrate (previous calib) vs crystal cell ID;crystal cell ID;Time t_psi including previous crate calib (ns)",
-                                                       8736, 1, 8736 + 1, nbins, min_t, max_t);
+                                                       ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, nbins, min_t, max_t);
   registerObject<TH2F>("TimevsCrysPrevCrateCalibNoCrystCalib", TimevsCrysPrevCrateCalibNoCrystCalib);
 
   auto TimevsCrateNoCrateCalibPrevCrystCalib = new TH2F("TimevsCrateNoCrateCalibPrevCrystCalib",
@@ -253,16 +261,20 @@ void ECLBhabhaTCollectorModule::prepare()
   registerObject<TH2F>("TimevsCrateNoCrateCalibPrevCrystCalib", TimevsCrateNoCrateCalibPrevCrystCalib);
 
 
-  auto TsDatabase = new TH1F("TsDatabase", ";cell id;Ts from database", 8736, 1, 8736 + 1);
+  auto TsDatabase = new TH1F("TsDatabase", ";cell id;Ts from database", ECLElementNumbers::c_NCrystals, 1,
+                             ECLElementNumbers::c_NCrystals + 1);
   registerObject<TH1F>("TsDatabase", TsDatabase);
 
-  auto TsDatabaseUnc = new TH1F("TsDatabaseUnc", ";cell id;Ts uncertainty from database", 8736, 1, 8736 + 1);
+  auto TsDatabaseUnc = new TH1F("TsDatabaseUnc", ";cell id;Ts uncertainty from database", ECLElementNumbers::c_NCrystals, 1,
+                                ECLElementNumbers::c_NCrystals + 1);
   registerObject<TH1F>("TsDatabaseUnc", TsDatabaseUnc);
 
-  auto TcrateDatabase = new TH1F("TcrateDatabase", ";cell id;Tcrate from database", 8736, 1, 8736 + 1);
+  auto TcrateDatabase = new TH1F("TcrateDatabase", ";cell id;Tcrate from database", ECLElementNumbers::c_NCrystals, 1,
+                                 ECLElementNumbers::c_NCrystals + 1);
   registerObject<TH1F>("TcrateDatabase", TcrateDatabase);
 
-  auto TcrateUncDatabase = new TH1F("TcrateUncDatabase", ";cell id;Tcrate uncertainty from database", 8736, 1, 8736 + 1);
+  auto TcrateUncDatabase = new TH1F("TcrateUncDatabase", ";cell id;Tcrate uncertainty from database", ECLElementNumbers::c_NCrystals,
+                                    1, ECLElementNumbers::c_NCrystals + 1);
   registerObject<TH1F>("TcrateUncDatabase", TcrateUncDatabase);
 
 
@@ -286,7 +298,8 @@ void ECLBhabhaTCollectorModule::prepare()
                                             ";Maximum energy crystal energy / (sum) cluster energy;Number", 22, 0, 1.1);
   registerObject<TH1F>("maxEcrsytalEnergyFraction", maxEcrsytalEnergyFraction);
 
-  auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal", 8736, 1, 8736 + 1);
+  auto refCrysIDzeroingCrate = new TH1F("refCrysIDzeroingCrate", ";cell id;Boolean - is reference crystal",
+                                        ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   registerObject<TH1F>("refCrysIDzeroingCrate", refCrysIDzeroingCrate);
 
   auto CDCEventT0Correction = new TH1F("CDCEventT0Correction", ";;CDC event t0 offset correction  [ns]", 1, 1, 2);
@@ -430,7 +443,7 @@ void ECLBhabhaTCollectorModule::collect()
   vector<float> Crate_time_ns(52, 0.0); /**< vector derived from DB object */
 
   // Make a crate time offset vector with an entry per crate (instead of per crystal) and convert from ADC counts to ns.
-  for (int crysID = 1; crysID <= 8736; crysID++) {
+  for (int crysID = 1; crysID <= ECLElementNumbers::c_NCrystals; crysID++) {
     int crateID_temp = m_crystalMapper->getCrateID(crysID);
     Crate_time_ns[crateID_temp - 1] = m_CrateTime[crysID] * TICKS_TO_NS;
   }
@@ -448,7 +461,7 @@ void ECLBhabhaTCollectorModule::collect()
 
 
   /** Record the input database constants */
-  for (int crysID = 1; crysID <= 8736; crysID++) {
+  for (int crysID = 1; crysID <= ECLElementNumbers::c_NCrystals; crysID++) {
     getObjectPtr<TH1F>("TsDatabase")->SetBinContent(crysID + 0.001, m_PreviousCrystalTime[crysID - 1]);
     getObjectPtr<TH1F>("TsDatabaseUnc")->SetBinContent(crysID + 0.001, m_PreviousCrystalTimeUnc[crysID - 1]);
     getObjectPtr<TH1F>("TcrateDatabase")->SetBinContent(crysID + 0.001, m_CrateTime[crysID - 1]);
@@ -459,7 +472,7 @@ void ECLBhabhaTCollectorModule::collect()
            << LogVar("IoV", m_PreviousCrystalTimeDB.getIoV())
            << LogVar("Checksum", m_PreviousCrystalTimeDB.getChecksum()));
     B2INFO("First event so print out previous ts values");
-    for (int crysID = 1; crysID <= 8736; crysID++) {
+    for (int crysID = 1; crysID <= ECLElementNumbers::c_NCrystals; crysID++) {
       B2INFO("cid = " << crysID << ", Ts previous = " << m_PreviousCrystalTime[crysID - 1]);
     }
     m_storeCalib = false;
@@ -565,9 +578,9 @@ void ECLBhabhaTCollectorModule::collect()
      Taken from Chris's ec/modules/eclGammaGammaECollector   */
 
   // Resize vectors
-  m_EperCrys.resize(8736);
-  m_eclCalDigitID.resize(8736);
-  m_eclDigitID.resize(8736);
+  m_EperCrys.resize(ECLElementNumbers::c_NCrystals);
+  m_eclCalDigitID.resize(ECLElementNumbers::c_NCrystals);
+  m_eclDigitID.resize(ECLElementNumbers::c_NCrystals);
 
 
   int idx = 0;
@@ -616,7 +629,7 @@ void ECLBhabhaTCollectorModule::collect()
     double z0 = tempTrackFit->getZ0();
     double d0 = tempTrackFit->getD0();
     int nCDChits = tempTrackFit->getHitPatternCDC().getNHits();
-    double p = tempTrackFit->getMomentum().Mag();
+    double p = tempTrackFit->getMomentum().R();
 
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
     //== Save debug TTree with detailed information if necessary.

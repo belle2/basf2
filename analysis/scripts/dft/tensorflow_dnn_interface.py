@@ -198,7 +198,7 @@ def load(obj):
     return state
 
 
-def begin_fit(state, Xtest, Stest, ytest, wtest):
+def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     """
     use test sets for monitoring
     """
@@ -212,7 +212,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     returns fractions of training and testing dataset, also uses weights
     :param X: unprocessed training dataset
@@ -220,8 +220,8 @@ def partial_fit(state, X, S, y, w, epoch):
     :return: bool, True == continue, False == stop iterations
     """
 
-    # the epochs are handled internally by the Trainer. This is all done within 1 external epoch.
-    if epoch > 0:
+    # the epochs and batches are handled internally by the Trainer. This is all done within 1 external epoch and 1 external batch.
+    if epoch > 0 or batch > 0:
         raise RuntimeError
 
     # preprocessing

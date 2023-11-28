@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -27,14 +25,20 @@ settings = CalibrationSettings(
         "bhabha_all_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["bhabha_all_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
         "gamma_gamma_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["gamma_gamma_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]],
         "mumu_tight_or_highm_calib": [
             INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
+            INPUT_DATA_FILTERS["Beam Energy"]["4S"],
+            INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={"ee5x5_min_entries": 100})
@@ -56,7 +60,6 @@ def touch_CRFinder(path, new_seed):
         else:
             crfinder = basf2.register_module('ECLCRFinder')
             crfinder.param('energyCut0', new_seed)
-            crfinder.param('energyCutBkgd0', new_seed)
             basf2.print_params(crfinder)
             new_path.add_module(crfinder)
             found = True

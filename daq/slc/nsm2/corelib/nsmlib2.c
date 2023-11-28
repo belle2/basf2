@@ -133,7 +133,7 @@ typedef struct NSMrecvqueue_struct {
 /* checkpoint of signal handler to be studied with gdb
    0: never called, -1: done, 1..1000 user checkpoint, 1001.. corelib/b2lib
  */
-#define DBS(nsmc,val) nsmlib_checkpoints[nsmlib_currecursive] = (val)
+#define DBS(val) nsmlib_checkpoints[nsmlib_currecursive] = (val)
 
 /* -- extern functions -- */
 /* implemented in nsmhash.c */
@@ -211,7 +211,7 @@ time1ms()
   return (uint64)tv.tv_sec * 1000 + tv.tv_usec / 1000; /* in 1msec unit */
 }
 /* -- htonll --------------------------------------------------------- */
-static uint64
+uint64
 htonll(uint64 h)
 {
   static int n42 = 0;
@@ -338,9 +338,9 @@ nsmlib_logging(FILE *logfp)
    for user function, between 1 and 999 (outside range becomes 1000)
 \* ------------------------------------------------------------------- */
 void
-nsmlib_checkpoint(NSMcontext *nsm, int val)
+nsmlib_checkpoint(NSMcontext * /*nsm*/, int val)
 {
-  DBS(nsm, val);
+  DBS(val);
 }
 /* -- nsmlib_strerror ------------------------------------------------ */
 const char *
@@ -657,7 +657,7 @@ nsmlib_checkif(NSMcontext *nsmc, SOCKAD_IN *sap)
   since nsm-1931 second argument is unused.
  */
 int
-nsmlib_initnet(NSMcontext *nsmc, const char *unused, int port)
+nsmlib_initnet(NSMcontext *nsmc, const char * /*unused*/, int /*port*/)
 {
   struct hostent *hp;
   NSMcontext *nsmcp;
@@ -867,7 +867,7 @@ nsmlib_selectc(int usesig, unsigned int msec)
     ASSERT("nsmlib_selectc should not reach here - no fd");
     return 0;
   }
-  if (usesig > 0 && msec > 0 && ret <= 0) {
+  if (usesig > 0 && msec > 0) {
     LOG("nsmlib_selectc should not reach here - ret=%d msec=%d usesig=%d",
         ret, msec, nsmc->usesig);
   }
@@ -1031,7 +1031,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   NSMrequest *reqp = nsmc->req;
   NSMrequest *reqlast = reqp + nsmc->nreq;
 
-  DBS(nsmc,1002);
+  DBS(1002);
   
   /* search request */
   msg.req = ntohs(hp->req);
@@ -1060,7 +1060,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   }
   DBG("nsmlib_call req=%s", reqp->name);
 
-  DBS(nsmc,1003);
+  DBS(1003);
   
   /* fill other msg entries */
   msg.req  = ntohs(hp->req);
@@ -1074,7 +1074,7 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   }
   msg.datap = msg.len ? recvbuf + msg.npar*sizeof(int32_t) : 0;
 
-  DBS(nsmc,1004);
+  DBS(1004);
   
   switch (reqp->functype) {
   case NSMLIB_FNSYS:
@@ -1084,22 +1084,23 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
       }
       nsmc->reqwait = 0;
       DBG("pipewrite pars0=%d", msg.pars[0]);
-      DBS(nsmc,1006);
+      DBS(1006);
       nsmlib_pipewrite(nsmc, msg.pars[0]);
-      DBS(nsmc,1008);
+      DBS(1008);
       break;
     }
     /* no break */
+    __attribute__((__fallthrough__));
 
   case NSMLIB_FNSTD:
-    DBS(nsmc,1010);
+    DBS(1010);
     if (! nsmc->hook) {
       DBG("nsmlib_call calling callback without hook");
-      DBS(nsmc,1012);
+      DBS(1012);
       reqp->callback(&msg, nsmc);
     } else if (! nsmc->hook(&msg, nsmc)) {
       DBG("nsmlib_call calling callback");
-      DBS(nsmc,1014);
+      DBS(1014);
       reqp->callback(&msg, nsmc);
     } else {
       DBG("nsmlib_call hook error");
@@ -1109,12 +1110,12 @@ nsmlib_call(NSMcontext *nsmc, NSMtcphead *hp)
   default:
     DBG("nsmlib_call functype=%d", reqp->functype);
   }
-  DBS(nsmc,1016);
+  DBS(1016);
 }
 /* -- nsmlib_handler ------------------------------------------------- */
 static void
 #ifdef SIGRTMIN
-nsmlib_handler(int sig, siginfo_t * info, void *ignored)
+nsmlib_handler(int sig, siginfo_t * /*info*/, void * /*ignored*/)
 #else
 nsmlib_handler(int sig)
 #endif
@@ -1146,13 +1147,13 @@ nsmlib_handler(int sig)
       nsmlib_lastskipped = *(NSMtcphead *)buf;
     } else {
       nsmlib_currecursive++;
-      DBS(nsmc,1001);
+      DBS(1001);
       sigemptyset(&mask);
       sigaddset(&mask, sig);
       sigprocmask(SIG_UNBLOCK, &mask, 0);
       nsmlib_call(nsmc, (NSMtcphead *)buf);
       /*sigprocmask(SIG_BLOCK, &mask, 0);*/
-      DBS(nsmc,-1);
+      DBS(-1);
       nsmlib_currecursive--;
     }
   };
@@ -1176,6 +1177,8 @@ int
 nsmlib_callbackid(NSMcontext *nsmc, int req, const char *name,
 		  NSMcallback_t callback, NSMfunctype functype)
 {
+  if (! nsmc)                         return NSMENOINIT;
+
   NSMrequest *reqp = nsmc->req;
   NSMrequest *reqlast = reqp + nsmc->nreq;
   NSMrequest *reqfound = 0;
@@ -1183,7 +1186,7 @@ nsmlib_callbackid(NSMcontext *nsmc, int req, const char *name,
   int sigfound = 0;
   
   /* basic checks */
-  if (! nsmc || ! nsmc->memp)         return NSMENOINIT;
+  if (nsmc->memp)                     return NSMENOINIT;
   if (nsmc->nodeid == NSMSYS_MAX_NOD) return NSMEPERM; /* anonymous */
 
   /* search for existing and free-space */
@@ -1255,7 +1258,7 @@ nsmlib_usesig(NSMcontext *nsmc, int usesig)
 }
 /* -- nsmlib_delclient ----------------------------------------------- */
 void
-nsmlib_delclient(NSMmsg * msg, NSMcontext * nsmc)
+nsmlib_delclient(NSMmsg * /*msg*/, NSMcontext * /*nsmc*/)
 {
   LOG("killed by nsmd2");
   exit(1);
@@ -1341,7 +1344,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   int err = 0;
   int i;
 
-  DBS(nsmc,1100);
+  DBS(1100);
   
   if (! nsmc)                         return NSMENOINIT;
   if (nsmc->sock < 0)                 return NSMENOINIT;
@@ -1350,7 +1353,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   if (msgp->len == 0 && msgp->datap != 0)   return NSMEINVDATA;
   if (msgp->len == 0 && msgp->datap != 0)   return NSMEINVDATA;
   
-  DBS(nsmc,1102);
+  DBS(1102);
   
   DBG("nsmlib_send nodeid=%d, req=%04x", msgp->node, msgp->req);
   
@@ -1373,7 +1376,7 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
   }
   writep = buf;
 
-  DBS(nsmc,1104);
+  DBS(1104);
   DBG("writep = %x", writep);
 
   while (writelen > 0) {
@@ -1412,11 +1415,11 @@ nsmlib_send(NSMcontext *nsmc, NSMmsg *msgp)
     writelen -= ret;
     writep   += ret;
   }
-  DBS(nsmc,1106);
+  DBS(1106);
   return 0;
   
  nsmlib_send_error:
-  DBS(nsmc,1199);
+  DBS(1199);
   shutdown(nsmc->sock, SHUT_RDWR);
   close(nsmc->sock);
   nsmc->sock = -1;
@@ -1500,7 +1503,7 @@ nsmlib_initcli(NSMcontext *nsmc, const char *nodename)
 /* -- nsmlib_sendreqid ----------------------------------------------- */
 int
 nsmlib_sendreqid(NSMcontext *nsmc,
-		 const char *node, uint16_t req, uint npar, int *pars,
+		 const char *node, uint16_t req, uint npar, const int *pars,
 		 int len, const char *datap)
 {
   NSMmsg msg;
@@ -1617,7 +1620,6 @@ nsmlib_readmem(NSMcontext *nsmc, void *buf,
     return nsmc->errc = NSMEPARSE;
   }
   nsmlib_parsefree(parsep);
-  parsep = 0;
   
   if (revision == -1) {
     revision = newrevision;
@@ -1786,7 +1788,7 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
 {
   NSMmsg msg;
   NSMsys *sysp;
-  size_t ppos;
+  //size_t ppos;
   int nnext;
   int n = 0; /* to check inf-loop */
   int ret;
@@ -1799,7 +1801,7 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
     return nsmc->errc = NSMENOINIT;
   }
   
-  ppos = MEMPOS(nsmc->memp, ptr);
+  int ppos = MEMPOS(nsmc->memp, ptr);
   if (psiz < 0 || ppos < 0 || ppos >= NSM2_MEMSIZ || ppos+psiz > NSM2_MEMSIZ) {
     DBG("flushmem(invptr): psiz=%d ppos=%d", (int)psiz, (int)ppos);
     return nsmc->errc = NSMEINVPTR;
@@ -1809,8 +1811,8 @@ nsmlib_flushmem(NSMcontext *nsmc, const void *ptr, int psiz)
   nnext = (int16_t)ntohs(sysp->nod[nsmc->nodeid].noddat);
   while (nnext >= 0 && nnext < NSMSYS_MAX_DAT) {
     NSMdat *datp = sysp->dat + nnext;
-    size_t dpos = (int32_t)ntohl(datp->dtpos);
-    size_t dsiz = (int16_t)ntohs(datp->dtsiz);
+    int dpos = ntohl(datp->dtpos);
+    int dsiz = ntohs(datp->dtsiz);
     DBG("flushmem: ppos=%d dpos=%d ppos+psiz=%d dpos+dsiz=%d",
         (int)ppos, (int)dpos, (int)(ppos+psiz), (int)(dpos+dsiz));
     if (ppos == dpos && psiz == 0) psiz = dsiz;
@@ -1850,6 +1852,8 @@ void *
 nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
 		int revision, float cycle)
 {
+  if (! nsmc) { nsmlib_errc = NSMENOINIT; return 0; }
+
   NSMmsg msg;
   int ret;
   char fmtstr[256];
@@ -1861,7 +1865,6 @@ nsmlib_allocmem(NSMcontext *nsmc, const char *datname, const char *fmtname,
   DBG("allocmem 1");
   
   if (! fmtname) fmtname = datname;
-  if (! nsmc) { nsmlib_errc = NSMENOINIT; return 0; }
   if (! datname) { nsmc->errc = NSMEINVPAR; return 0; }
   if (revision <= 0) { nsmc->errc = NSMEINVPAR; return 0; }
   if (strlen(datname) > NSMSYS_DNAM_SIZ) { nsmc->errc = NSMEINVPAR; return 0; }
@@ -1937,7 +1940,6 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
   nsmlib_errc = ret;
   nsmlib_port = port;
   nsmlib_free(nsmc);
-  nsmc = 0;
   sleep(1); /* one second penalty */
   return 0; // TODO is the return value OK?
 }
@@ -1950,7 +1952,7 @@ nsmlib_shutdown(NSMcontext *nsmc, int ret, int port)
 /*                                                                        */
 /* ---------------------------------------------------------------------- */
 NSMcontext *
-nsmlib_init(const char *nodename, const char * unused, int port, int shmkey)
+nsmlib_init(const char *nodename, const char * /*unused*/, int port, int shmkey)
 {
   NSMcontext *nsmc;
   int ret = 0;

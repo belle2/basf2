@@ -102,7 +102,7 @@ namespace Belle2 {
       jointBestPaths.reserve(std::accumulate(m_bestPaths.begin(), m_bestPaths.end(), 0,
       [](int a, auto b) { return a + b.size(); }));
 
-      for (auto && set : m_bestPaths) {
+      for (auto&& set : m_bestPaths) {
         jointBestPaths.insert(jointBestPaths.end(), set.begin(), set.end());
       }
 

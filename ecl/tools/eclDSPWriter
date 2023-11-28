@@ -32,15 +32,12 @@
 
 import sys, os
 import ROOT
-
-ROOT.gSystem.Load('libframework')
-ROOT.gInterpreter.Declare('#include <framework/database/Configuration.h>')
+from basf2 import conditions
 
 from ROOT import Belle2, TClonesArray
-from ROOT.Belle2 import ECL, ECLDspData, Conditions, EventMetaData
-from ROOT.Belle2.Conditions import Configuration
-from ROOT.Belle2.ECL import ECLDspUtilities
-from ROOT.Belle2.ECL.ECLDspUtilities import readEclDsp, writeEclDsp
+from ROOT.Belle2 import ECL, ECLDspData, EventMetaData
+ECLDspUtilities = ROOT.Belle2.ECL.ECLDspUtilities
+readEclDsp, writeEclDsp = ECLDspUtilities.readEclDsp, ECLDspUtilities.writeEclDsp
 
 ################################################
 # SET PARAMETERS
@@ -151,9 +148,8 @@ def ecldspFromRoot(localdb_path, exp, run):
     @param run          Run number
     """
     db  = Belle2.Database.Instance()
-    cfg = Configuration.getInstance()
-    db.reset()
-    cfg.prependTestingPayloadLocation(localdb_path)
+    conditions.reset()
+    conditions.prepend_testing_payloads(localdb_path)
 
     dsp_list = []
 
@@ -185,9 +181,8 @@ def ecldspToRoot(localdb_path, dsp_list, exp, run, expEnd = -1, runEnd = -1):
     @param runEnd       Last run number in IntervalOfValidity
     """
     db = Belle2.Database.Instance()
-    cfg = Configuration.getInstance()
-    db.reset()
-    cfg.setNewPayloadLocation(localdb_path)
+    conditions.reset()
+    conditions.expert_settings(save_payloads=localdb_path)
 
     dsp_pars = []
     dsp_id = 0
@@ -213,9 +208,8 @@ def ecldspFromDB(db_tag, exp, run):
     @param run          Run number
     """
     db = Belle2.Database.Instance()
-    cfg = Configuration.getInstance()
-    db.reset()
-    cfg.appendGlobalTag(db_tag)
+    conditions.reset()
+    conditions.append_globaltag(db_tag)
 
     dsp_list = []
 

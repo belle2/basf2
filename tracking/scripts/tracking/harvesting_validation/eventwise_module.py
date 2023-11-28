@@ -90,41 +90,73 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
         # Aggregate information about Monte Carlo tracks
         all_mc_tracks_det_hit_ids = set()
         n_matched_mc_reco_tracks = 0
+        n_matched_correct_charge_mc_reco_tracks = 0
+        n_matched_wrong_charge_mc_reco_tracks = 0
         n_merged_mc_reco_tracks = 0
+        n_merged_correct_charge_mc_reco_tracks = 0
+        n_merged_wrong_charge_mc_reco_tracks = 0
         n_missing_mc_reco_tracks = 0
         for mc_reco_track in mc_reco_tracks:
             mc_reco_track_det_hit_ids = utilities.get_det_hit_ids(mc_reco_track)
             all_mc_tracks_det_hit_ids.update(mc_reco_track_det_hit_ids)
 
-            is_matched = track_match_look_up.isMatchedMCRecoTrack(mc_reco_track)
-            is_merged = track_match_look_up.isMergedMCRecoTrack(mc_reco_track)
+            is_matched = track_match_look_up.isAnyChargeMatchedMCRecoTrack(mc_reco_track)
+            is_matched_correct_charge = track_match_look_up.isCorrectChargeMatchedMCRecoTrack(mc_reco_track)
+            is_matched_wrong_charge = track_match_look_up.isWrongChargeMatchedMCRecoTrack(mc_reco_track)
+            is_merged = track_match_look_up.isAnyChargeMergedMCRecoTrack(mc_reco_track)
+            is_merged_correct_charge = track_match_look_up.isCorrectChargeMergedMCRecoTrack(mc_reco_track)
+            is_merged_wrong_charge = track_match_look_up.isWrongChargeMergedMCRecoTrack(mc_reco_track)
             is_missing = track_match_look_up.isMissingMCRecoTrack(mc_reco_track)
 
             if is_matched:
                 n_matched_mc_reco_tracks += 1
+                if is_matched_correct_charge:
+                    n_matched_correct_charge_mc_reco_tracks += 1
+                elif is_matched_wrong_charge:
+                    n_matched_wrong_charge_mc_reco_tracks += 1
             elif is_merged:
                 n_merged_mc_reco_tracks += 1
+                if is_merged_correct_charge:
+                    n_merged_correct_charge_mc_reco_tracks += 1
+                elif is_merged_wrong_charge:
+                    n_merged_wrong_charge_mc_reco_tracks += 1
             elif is_missing:
                 n_missing_mc_reco_tracks += 1
 
         # Aggregate information about pattern recognition tracks
         n_matched_reco_tracks = 0
+        n_matched_correct_charge_reco_tracks = 0
+        n_matched_wrong_charge_reco_tracks = 0
         n_clone_reco_tracks = 0
+        n_clone_correct_charge_reco_tracks = 0
+        n_clone_wrong_charge_reco_tracks = 0
         n_background_reco_tracks = 0
         n_ghost_reco_tracks = 0
 
         all_tracks_det_hit_ids = set()
         n_matched_hits = 0
         for reco_track in reco_tracks:
-            is_matched = track_match_look_up.isMatchedPRRecoTrack(reco_track)
-            is_clone = track_match_look_up.isClonePRRecoTrack(reco_track)
+            is_matched = track_match_look_up.isAnyChargeMatchedPRRecoTrack(reco_track)
+            is_matched_correct_charge = track_match_look_up.isCorrectChargeMatchedPRRecoTrack(reco_track)
+            is_matched_wrong_charge = track_match_look_up.isWrongChargeMatchedPRRecoTrack(reco_track)
+            is_clone = track_match_look_up.isAnyChargeClonePRRecoTrack(reco_track)
+            is_clone_correct_charge = track_match_look_up.isCorrectChargeClonePRRecoTrack(reco_track)
+            is_clone_wrong_charge = track_match_look_up.isWrongChargeClonePRRecoTrack(reco_track)
             is_background = track_match_look_up.isBackgroundPRRecoTrack(reco_track)
             is_ghost = track_match_look_up.isGhostPRRecoTrack(reco_track)
 
             if is_matched:
                 n_matched_reco_tracks += 1
+                if is_matched_correct_charge:
+                    n_matched_correct_charge_reco_tracks += 1
+                elif is_matched_wrong_charge:
+                    n_matched_wrong_charge_reco_tracks += 1
             elif is_clone:
                 n_clone_reco_tracks += 1
+                if is_clone_correct_charge:
+                    n_clone_correct_charge_reco_tracks += 1
+                elif is_clone_wrong_charge:
+                    n_clone_wrong_charge_reco_tracks += 1
             elif is_background:
                 n_background_reco_tracks += 1
             elif is_ghost:
@@ -145,11 +177,23 @@ class EventwiseTrackingValidationModule(harvesting.HarvestingModule):
             n_reco_tracks=n_reco_tracks,
 
             n_matched_mc_reco_tracks=n_matched_mc_reco_tracks,
+            n_matched_correct_charge_mc_reco_tracks=n_matched_correct_charge_mc_reco_tracks,
+            n_matched_wrong_charge_mc_reco_tracks=n_matched_wrong_charge_mc_reco_tracks,
+
             n_merged_mc_reco_tracks=n_merged_mc_reco_tracks,
+            n_merged_correct_charge_mc_reco_tracks=n_merged_correct_charge_mc_reco_tracks,
+            n_merged_wrong_charge_mc_reco_tracks=n_merged_wrong_charge_mc_reco_tracks,
+
             n_missing_mc_reco_tracks=n_missing_mc_reco_tracks,
 
+
             n_matched_reco_tracks=n_matched_reco_tracks,
+            n_matched_correct_charge_reco_tracks=n_matched_correct_charge_reco_tracks,
+            n_matched_wrong_charge_reco_tracks=n_matched_wrong_charge_reco_tracks,
             n_clone_reco_tracks=n_clone_reco_tracks,
+            n_clone_correct_charge_reco_tracks=n_clone_correct_charge_reco_tracks,
+            n_clone_wrong_charge_reco_tracks=n_clone_wrong_charge_reco_tracks,
+
             n_background_reco_tracks=n_background_reco_tracks,
             n_ghost_reco_tracks=n_ghost_reco_tracks,
 

@@ -23,7 +23,7 @@ Running this fit updates the :b2:var:`chiProb` of the mother particle.
    :members:
    :undoc-members:
 
-.. seealso:: 
+.. seealso::
 
    The :b2:mod:`ParticleKinematicFitter` documentation if you prefer to
    directly configure the module yourself.

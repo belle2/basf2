@@ -64,7 +64,7 @@ double radtodeg;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TRGGRLProjects)
+REG_MODULE(TRGGRLProjects);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -147,11 +147,11 @@ void TRGGRLProjectsModule::initialize()
   for (int tc = 1; tc <= 576; tc++) {
 
     //..Four vector of a 1 GeV lab photon at this TC
-    TVector3 CellPosition = eclMapping->getTCPosition(tc);
+    ROOT::Math::XYZVector CellPosition = eclMapping->getTCPosition(tc);
     ROOT::Math::PxPyPzEVector CellLab;
-    CellLab.SetPx(CellPosition.Px() / CellPosition.Mag());
-    CellLab.SetPy(CellPosition.Py() / CellPosition.Mag());
-    CellLab.SetPz(CellPosition.Pz() / CellPosition.Mag());
+    CellLab.SetPx(CellPosition.X() / CellPosition.R());
+    CellLab.SetPy(CellPosition.Y() / CellPosition.R());
+    CellLab.SetPz(CellPosition.Z() / CellPosition.R());
     CellLab.SetE(1.);
 
     //..cotan Theta and phi in lab
@@ -646,6 +646,7 @@ void TRGGRLProjectsModule::event()
   //ecltaub2b
   bool ecltaub2b = (ECLtoGDL[2] & (1 << (89 - 32 * 2))) != 0;
   bool ecltaub2b2 = (ECLtoGDL[2] & (1 << (93 - 32 * 2))) != 0;
+  bool ecltaub2b3 = (ECLtoGDL[2] & (1 << (94 - 32 * 2))) != 0;
   // ehigh1-3
   bool ehigh1 = (ECLtoGDL[2] & (1 << (90 - 32 * 2))) != 0;
   bool ehigh2 = (ECLtoGDL[2] & (1 << (91 - 32 * 2))) != 0;
@@ -741,6 +742,8 @@ void TRGGRLProjectsModule::event()
   int i2io   = trgInfo->geti2io();
   int n_secl = trgInfo->getNsecl();
   int n_iecl = trgInfo->getNiecl();
+
+  bool ecltaunn = trgInfo->getTauNN();
 
   //std::cout << "klm    " << klm_hit << " " << klm_0 << " " << klm_1 << " " << klm_2 << " " << klmb2b << std::endl;
   //std::cout << "eklm   " << eklm_hit << " " << eklm_0 << " " << eklm_1 << " " << eklm_2 << " " << eklmb2b << std::endl;
@@ -869,6 +872,7 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "ecl_bst") {bit = ecl_bst;}
     else if (bitname == "ecl_taub2b") {bit = ecltaub2b;}
     else if (bitname == "ecl_taub2b2") {bit = ecltaub2b2;}
+    else if (bitname == "ecl_taub2b3") {bit = ecltaub2b3;}
     else if (bitname == "ehigh1") {bit = ehigh1;}
     else if (bitname == "ehigh2") {bit = ehigh2;}
     else if (bitname == "ehigh3") {bit = ehigh3;}
@@ -967,6 +971,9 @@ void TRGGRLProjectsModule::event()
     else if (bitname == "inp157") {bit = false;}
     else if (bitname == "inp158") {bit = false;}
     else if (bitname == "inp159") {bit = false;}
+
+    //new tau bit
+    else if (bitname == "ecl_taunn") {bit = ecltaunn;}
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.

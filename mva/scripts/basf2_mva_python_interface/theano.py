@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@ except ImportError:
 import numpy
 
 
-class State(object):
+class State:
     """
     State class for proper handling of parameters and data during function calls. This is a very brief theano example.
     """
@@ -118,13 +117,13 @@ def apply(state, X):
     return numpy.require(result, dtype=numpy.float32, requirements=['A', 'W', 'C', 'O'])
 
 
-def begin_fit(state, Xvalid, Svalid, yvalid, wvalid):
+def begin_fit(state, Xvalid, Svalid, yvalid, wvalid, nBatches):
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     avg_cost = state.train_function(X, y) / len(y)
-    print("Epoch:", '%04d' % (epoch), "cost=", "{:.9f}".format(avg_cost))
+    print("Epoch:", f'{int(epoch):04}', "Batch:", f'{int(batch):04}', "cost=", f"{avg_cost:.9f}")
     return True
 
 

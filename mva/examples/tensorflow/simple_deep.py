@@ -70,10 +70,13 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
             return cross_entropy + l2_loss
 
     state = State(model=my_model())
+    state.epoch = 0
+    state.avg_costs = []  # keeps track of the avg costs per batch over an epoch
+
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass batches of received data to tensorflow
     """
@@ -85,9 +88,15 @@ def partial_fit(state, X, S, y, w, epoch):
 
     state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
 
-    # epoch = i_epoch * nBatches + iBatch
-    if epoch % 1000 == 0:
-        print(f"Epoch: {epoch:04d} cost= {avg_cost:.9f}")
+    if batch == 0 and epoch == 0:
+        state.avg_costs = [avg_cost]
+    elif batch != state.nBatches-1:
+        state.avg_costs.append(avg_cost)
+    else:
+        # end of the epoch, print summary results, reset the avg_costs and update the counter
+        print(f"Epoch: {epoch:04d} cost= {np.mean(state.avg_costs):.9f}")
+        state.avg_costs = [avg_cost]
+
     if epoch == 100000:
         return False
     return True
@@ -103,14 +112,19 @@ def apply(state, X):
 
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
 
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_identifier = "Tensorflow"
     general_options.m_treename = "tree"
     variables = ['M', 'p', 'pt', 'pz',
@@ -139,8 +153,7 @@ if __name__ == "__main__":
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)
     inference_start = time.time()
-    test_data = ["test.root"] * 10
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)

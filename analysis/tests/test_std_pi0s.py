@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -42,7 +41,7 @@ class TestStdPi0s(unittest.TestCase):
 
         # we have the particle lists we expect
         for a, b in zip(built_lists, expected_lists):
-            self.assertEqual(a, b, "Loaded list \'%s\' instead of \'%s\' with function %s" % (a, b, std_function.__name__))
+            self.assertEqual(a, b, f"Loaded list \'{a}\' instead of \'{b}\' with function {std_function.__name__}")
 
         print(list(built_lists))
         result = map(lambda w1, w2: w1 == w2, built_lists, expected_lists)

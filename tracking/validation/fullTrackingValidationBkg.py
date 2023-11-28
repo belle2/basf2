@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -52,6 +51,8 @@ class FullBkg(TrackingValidationRun):
     fit_tracks = False
     #: But we need to tell the validation module to use the fit information
     use_fit_information = True
+    #: do not create expert-level output histograms in dedicated folder but in the main folder
+    use_expert_folder = False
     #: Include pulls in the validation output
     pulls = True
     #: Include resolution information in the validation output

@@ -84,16 +84,16 @@ void BFieldComponentKlm1::initialize()
 }
 
 
-B2Vector3D BFieldComponentKlm1::calculate(const B2Vector3D& point) const
+ROOT::Math::XYZVector BFieldComponentKlm1::calculate(const ROOT::Math::XYZVector& point) const
 {
   //Get the r and z Component
-  double r = point.Perp();
+  double r = point.Rho();
   double x = point.X();
   double y = point.Y();
   double z = point.Z() - m_mapOffset;
   double absZ =  std::abs(z);
 
-  B2Vector3D bField(0., 0., 0.);
+  ROOT::Math::XYZVector bField(0., 0., 0.);
 
   // Barrel
   if (absZ < m_barrelZMax) {

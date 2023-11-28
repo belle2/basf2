@@ -58,6 +58,14 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p.comesFrom(*q);
     }
 
+    // if positron goes to positive z-direction, we have to rotate along y-axis by 180deg
+    if (m_wrongSignPz) {
+      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
+      p4.SetPz(-1.0 * p4.Pz());
+      p4.SetPx(-1.0 * p4.Px());
+      p.set4Vector(p4);
+    }
+
     //move vertex position of selected particle and its daughters
     if (m_meanDecayLength > 0) {
       if (p.getPDG() == m_pdgDisplaced) {
@@ -69,7 +77,7 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
         x = r * p4.Px() / p4.P();
         y = r * p4.Py() / p4.P();
         z = r * p4.Pz() / p4.P();
-        p.setDecayVertex(TVector3(x, y, z));
+        p.setDecayVertex(x, y, z);
         t = (r / Const::speedOfLight) * (p4.E() / p4.P());
         p.setDecayTime(t);
         p.setValidVertex(true);
@@ -77,18 +85,13 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
 
       if (mother > 0) {
         if (graph[mother - 1].getPDG() == m_pdgDisplaced) {
-          p.setProductionVertex(TVector3(x, y, z));
+          p.setProductionVertex(x, y, z);
           p.setProductionTime(t);
           p.setValidVertex(true);
         }
       }
     }
 
-    if (m_wrongSignPz) { // this means we have to mirror Pz
-      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
-      p4.SetPz(-1.0 * p4.Pz());
-      p.set4Vector(p4);
-    }
 
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)
     // check if particle should be made virtual according to steering options:
@@ -215,7 +218,7 @@ int LHEReader::readParticle(MCParticleGraph::GraphParticle& particle)
       particle.addStatus(MCParticle::c_PrimaryParticle);
       particle.setPDG(static_cast<int>(fields[0]));
       mother = static_cast<int>(fields[2]);
-      particle.setMomentum(TVector3(&fields[6]));
+      particle.setMomentum(ROOT::Math::XYZVector(fields[6], fields[7], fields[8]));
       particle.setEnergy(fields[9]);
       particle.setMass(fields[10]);
       break;

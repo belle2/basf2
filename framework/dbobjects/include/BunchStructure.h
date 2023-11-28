@@ -52,7 +52,7 @@ namespace Belle2 {
      * @param i bucket number (modulo c_RFBuckets applied internally)
      * @return true if bucket is filled
      */
-    bool getBucket(unsigned i) const;
+    bool getBucket(int i) const;
 
     /**
      * Checks if the fill pattern is really set

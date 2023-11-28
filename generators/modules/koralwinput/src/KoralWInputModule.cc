@@ -9,10 +9,12 @@
 /* Own header. */
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+
+#include <Math/Vector3D.h>
 
 using namespace std;
 using namespace Belle2;
@@ -66,7 +68,7 @@ void KoralWInputModule::event()
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
   m_mcGraph.clear();
   m_generator.generateEvent(m_mcGraph, vertex, boost);
   m_mcGraph.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);

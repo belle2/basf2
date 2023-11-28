@@ -9,7 +9,7 @@
 
 
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
-
+#include <framework/gearbox/Const.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,7 +46,8 @@ MakeMotherKFit::addTrack(const KFitTrack& p) {
 
 
 enum KFitError::ECode
-MakeMotherKFit::addTrack(const HepLorentzVector& p, const HepPoint3D& x, const HepSymMatrix& e, const double q, const int flag) {
+MakeMotherKFit::addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double q,
+                         const int flag) {
   if (e.num_row() != (int)KFitConst::kNumber7)
   {
     m_ErrorCode = KFitError::kBadMatrixSize;
@@ -224,8 +225,7 @@ MakeMotherKFit::doMake() {
   {
     double a = 0, dx = 0, dy = 0;
     if (m_FlagAtDecayPoint) {
-      const double c = KFitConst::kLightSpeed; // C++ bug?
-      // a = -KFitConst::kLightSpeed * m_MagneticField * m_Tracks[i].getCharge();
+      const double c = Belle2::Const::speedOfLight * 1e-4;
       a = -c * m_MagneticField * m_Tracks[i].getCharge();
       dx = m_Vertex.x() - m_Tracks[i].getPosition(m_FlagBeforeAfter).x();
       dy = m_Vertex.y() - m_Tracks[i].getPosition(m_FlagBeforeAfter).y();
@@ -309,8 +309,7 @@ MakeMotherKFit::calculateDELMDELC(HepMatrix* dMdC) const
   double sum_a = 0;
 
   for (int i = 0; i < m_TrackCount; i++) {
-    const double c = KFitConst::kLightSpeed; // C++ bug?
-    // double a = -KFitConst::kLightSpeed * m_MagneticField * m_Tracks[i].getCharge();
+    const double c = Belle2::Const::speedOfLight * 1e-4;
     double a = -c * m_MagneticField * m_Tracks[i].getCharge();
     sum_a += a;
 

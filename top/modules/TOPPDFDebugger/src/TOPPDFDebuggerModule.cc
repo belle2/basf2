@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPPDFDebugger/TOPPDFDebuggerModule.h>
+
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
@@ -25,6 +27,7 @@
 #include <algorithm>
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   using namespace TOP;
@@ -125,7 +128,7 @@ namespace Belle2 {
       // add this vector of vector of triplets to the TOPPDFCollection
       TOPPDFCollection* topPDFColl = m_pdfCollection.appendNew();
       const auto& module = geo->getModule(trk.getModuleID());
-      topPDFColl->setLocalPositionMomentum(module.pointToLocal(trk.getExtHit()->getPosition()),
+      topPDFColl->setLocalPositionMomentum(module.pointToLocal(static_cast<XYZPoint>(trk.getExtHit()->getPosition())),
                                            module.momentumToLocal(trk.getExtHit()->getMomentum()),
                                            trk.getModuleID());
 

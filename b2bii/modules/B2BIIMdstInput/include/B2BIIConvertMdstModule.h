@@ -30,7 +30,7 @@
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <b2bii/dataobjects/BelleTrkExtra.h>
 
 // Replace BeamParameters
@@ -151,6 +151,7 @@ namespace Belle2 {
 
     bool m_convertTrkExtra; /**< Flag to switch on conversion of first(last)_{x,y,z} of mdst_trk_fit */
 
+    bool m_convertNbar; /**< Flag to create anti-n0:mdst list from gamma:mdst */
     /**
      * E9/E25 threshold value
      * clusters with a value above this threshold are classified as neutral
@@ -201,6 +202,11 @@ namespace Belle2 {
     void convertMdstGammaTable();
 
     /**
+     * Copies Particles in 'gamma:mdst' with energy > 0.5 GeV to be anti-n0:mdst
+     */
+    void copyNbarFromGamma();
+
+    /**
      * Reads all entries of Mdst_Klong Panther table, creates a particle list 'K_L0:mdst' and adds them to StoreArray<Particles>.
      */
     void convertMdstKLongTable();
@@ -236,6 +242,11 @@ namespace Belle2 {
      * If running on MC, the ECLCluster -> MCParticle relation is set as well.
      */
     void convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster);
+
+    /**
+     * calculate the minimal distance between a cluster and a set of tracks on the ECL surface.
+     */
+    double computeTrkMinDistanceBelle(ECLCluster* eclCluster);
 
     /**
     * Converts Mdst_klm_cluster record to KLMCluster object.

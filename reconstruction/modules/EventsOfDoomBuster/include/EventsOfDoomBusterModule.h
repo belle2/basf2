@@ -10,7 +10,7 @@
 /* Reconstruction headers. */
 #include <reconstruction/dbobjects/EventsOfDoomParameters.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>

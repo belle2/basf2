@@ -69,6 +69,15 @@ namespace Belle2 {
     void printEDepToADC();
 
     /**
+     * Import corrtothreshold to the data base.
+     */
+    void importCorrToThreshold(std::string fileName);
+    /**
+     * Get corrtothreshold from the database and print.
+     */
+    void printCorrToThreshold();
+
+    /**
      * Import t0 table to the data base.
      */
     void importTimeZero(std::string fileName);
@@ -207,6 +216,12 @@ namespace Belle2 {
 
     /// Do some basic testing of the CDCCrossTalkLibrary
     void testCDCCrossTalkLibrary(bool spotChecks = false) const;
+
+    /// import CDClayerTimeCut
+    void importCDClayerTimeCut(const std::string& jsonFileName) const;
+
+    /// Print content of CDClayerTimeCut
+    void printCDClayerTimeCut() const;
 
   private:
 

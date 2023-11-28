@@ -9,6 +9,10 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {
 
@@ -39,6 +43,8 @@ namespace Belle2 {
      */
     void event() override final;
 
+    StoreObjPtr<EventMetaData> m_eventMetaData;   /**< EventMetaData DataStore pointer */
+    StoreArray<ROIid> m_ROIs;   /**< ROIs StoreArray */
 
     std::string m_ROIListName; /**< ROi list name*/
     int m_divider; /**< generate one ROI every m_divider event*/

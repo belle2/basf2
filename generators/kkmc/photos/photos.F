@@ -3472,6 +3472,11 @@ C--   For 'stable particle' calculate vector momentum sum
       SUMVEC(5)=SQRT(SUMVEC(4)**2-SUMVEC(1)**2-SUMVEC(2)**2-
      &SUMVEC(3)**2)
       WRITE(PHLUN,9070) (SUMVEC(J),J=1,5)
+      WRITE(PHLUN,9090)
+      WRITE(PHLUN,9091)
+      DO 40 I=1,NHEP
+        WRITE(PHLUN,9092) I,VHEP(1,I),VHEP(2,I),VHEP(3,I),VHEP(4,I)
+   40 CONTINUE
       RETURN
  9000 FORMAT(1H0,80('='))
  9010 FORMAT(1H ,29X,'Event No.:',I10)
@@ -3483,4 +3488,7 @@ C--   For 'stable particle' calculate vector momentum sum
  9060 FORMAT(1H ,I4,I7,I4,' - ',I4,2X,I4,' - ',I4,5F9.2)
  9070 FORMAT(1H0,23X,'Vector Sum: ', 5F9.2)
  9080 FORMAT(1H0,6X,'Particle Parameters')
+ 9090 FORMAT(1H0,6X,'Vertices:')
+ 9091 FORMAT(1H0,1X,'Nr',8X,'Vx',7X,'Vy',7X,'Vz',7X,'T')
+ 9092 FORMAT(1H ,1X,I2,3X, 5F9.2,5F9.2,5F9.2,5F9.2)
       END

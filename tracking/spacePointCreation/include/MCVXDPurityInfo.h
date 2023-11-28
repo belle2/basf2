@@ -59,7 +59,7 @@ namespace Belle2 {
                     unsigned int nSVDUClusters,
                     unsigned int nSVDVClusters) :
       m_iD(iD),
-      m_nTotalClusters( { {nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal} }),
+      m_nTotalClusters({ {nPXDClustersTotal, nSVDUClustersTotal, nSVDVClustersTotal} }),
     m_nFoundClusters({ {nPXDClusters, nSVDUClusters, nSVDVClusters} }) {}
 
     /**

@@ -12,8 +12,6 @@
 #include <TMatrixDSym.h>
 
 
-class TVector3;
-
 namespace Belle2 {
 
   /** This class represents an ideal helix in perigee parameterization including the covariance matrix of the 5 perigee parameters.
@@ -48,8 +46,8 @@ namespace Belle2 {
      *  @param pValue                 p-value of the fit.
      *                                It is assumed, that the B-field is parallel to the z-Axis.
      */
-    UncertainHelix(const TVector3& position,
-                   const TVector3& momentum,
+    UncertainHelix(const ROOT::Math::XYZVector& position,
+                   const ROOT::Math::XYZVector& momentum,
                    const short int charge,
                    const double bZ,
                    const TMatrixDSym& cartesianCovariance,
@@ -112,7 +110,7 @@ namespace Belle2 {
      *  @param by            Vector by which the origin of the coordinate system should be moved.
      *  @return              The double value is the two dimensional arc length, which has the be traversed from the old perigee to the new.
      */
-    double passiveMoveBy(const TVector3& by)
+    double passiveMoveBy(const ROOT::Math::XYZVector& by)
     { return passiveMoveBy(by.X(), by.Y(), by.Z()); }
 
     /** Moves origin of the coordinate system (passive transformation) by the given vector. Updates the helix inplace.

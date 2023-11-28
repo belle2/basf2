@@ -5,8 +5,11 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* ECL headers. */
 #include <ecl/dataobjects/ECLShower.h>
 
+/* Gtest headers. */
 #include <gtest/gtest.h>
 
 using namespace std;
@@ -42,8 +45,8 @@ namespace Belle2 {
     EXPECT_EQ(myECLShower.getTrkDepth(), 0);
     EXPECT_EQ(myECLShower.getShowerDepth(), 0);
     EXPECT_EQ(myECLShower.getNumberOfCrystals(), 0);
-    EXPECT_EQ(myECLShower.getAbsZernike40(), 0);
-    EXPECT_EQ(myECLShower.getAbsZernike51(), 0);
+    EXPECT_EQ(myECLShower.getAbsZernikeMoment(4, 0), 0);
+    EXPECT_EQ(myECLShower.getAbsZernikeMoment(5, 1), 0);
     EXPECT_EQ(myECLShower.getZernikeMVA(), 0);
     EXPECT_EQ(myECLShower.getSecondMoment(), 0);
     EXPECT_EQ(myECLShower.getE1oE9(), 0);
@@ -58,7 +61,7 @@ namespace Belle2 {
     EXPECT_EQ(errorArray[4], 0);
     EXPECT_EQ(errorArray[5], 0);
 
-    TVector3 momentum(myECLShower.getMomentum());
+    ROOT::Math::XYZVector momentum(myECLShower.getMomentum());
     EXPECT_EQ(momentum.X(), 0);
     EXPECT_EQ(momentum.Y(), 0);
     EXPECT_EQ(momentum.Z(), 0);
@@ -113,8 +116,8 @@ namespace Belle2 {
     myECLShower.setTrkDepth(trkDepth);
     myECLShower.setShowerDepth(showerDepth);
     myECLShower.setNumberOfCrystals(NofCrystals);
-    myECLShower.setAbsZernike40(absZernike40);
-    myECLShower.setAbsZernike51(absZernike51);
+    myECLShower.setAbsZernikeMoment(4, 0, absZernike40);
+    myECLShower.setAbsZernikeMoment(5, 1, absZernike51);
     myECLShower.setZernikeMVA(zernikeMVA);
     myECLShower.setSecondMoment(secondMoment);
     myECLShower.setE1oE9(E1oE9);
@@ -141,8 +144,8 @@ namespace Belle2 {
     EXPECT_EQ(myECLShower.getMinTrkDistance(), minTrkDistance);
     EXPECT_EQ(myECLShower.getTrkDepth(), trkDepth);
     EXPECT_EQ(myECLShower.getNumberOfCrystals(), NofCrystals);
-    EXPECT_EQ(myECLShower.getAbsZernike40(), absZernike40);
-    EXPECT_EQ(myECLShower.getAbsZernike51(), absZernike51);
+    EXPECT_EQ(myECLShower.getAbsZernikeMoment(4, 0), absZernike40);
+    EXPECT_EQ(myECLShower.getAbsZernikeMoment(5, 1), absZernike51);
     EXPECT_EQ(myECLShower.getZernikeMVA(), zernikeMVA);
     EXPECT_EQ(myECLShower.getSecondMoment(), secondMoment);
     EXPECT_EQ(myECLShower.getE1oE9(), E1oE9);
@@ -158,7 +161,7 @@ namespace Belle2 {
     EXPECT_EQ(errorArray[4], error[4]);
     EXPECT_EQ(errorArray[5], error[5]);
 
-    TVector3 momentum(myECLShower.getMomentum());
+    ROOT::Math::XYZVector momentum(myECLShower.getMomentum());
     EXPECT_FLOAT_EQ(momentum.X(), energy * sin(theta) * cos(phi));
     EXPECT_FLOAT_EQ(momentum.Y(), energy * sin(theta) * sin(phi));
     EXPECT_FLOAT_EQ(momentum.Z(), energy * cos(theta));

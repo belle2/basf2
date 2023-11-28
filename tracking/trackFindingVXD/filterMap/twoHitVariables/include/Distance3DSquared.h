@@ -30,9 +30,9 @@ namespace Belle2 {
     {
 
       return
-        std::pow(outerHit.X() - innerHit.X() , 2) +
-        std::pow(outerHit.Y() - innerHit.Y() , 2) +
-        std::pow(outerHit.Z() - innerHit.Z() , 2) ;
+        std::pow(outerHit.X() - innerHit.X(), 2) +
+        std::pow(outerHit.Y() - innerHit.Y(), 2) +
+        std::pow(outerHit.Z() - innerHit.Z(), 2) ;
     }
   };
 

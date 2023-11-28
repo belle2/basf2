@@ -11,6 +11,7 @@
 #include <tracking/eventTimeExtraction/findlets/IterativeEventTimeExtractor.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -55,7 +56,7 @@ void FullGridChi2TrackTimeExtractor::apply(std::vector<RecoTrack*>& recoTracks)
   m_wasSuccessful = m_finalExtractor.wasSuccessful();
 
   if (not wasSuccessful()) {
-    B2DEBUG(50, "Resetting the event t0 as the final extraction was not successful.");
+    B2DEBUG(25, "Resetting the event t0 as the final extraction was not successful.");
     resetEventT0();
   }
 }

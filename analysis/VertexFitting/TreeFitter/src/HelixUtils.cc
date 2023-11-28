@@ -14,12 +14,16 @@
 
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 
+#include <algorithm>
+#include <initializer_list>
+#include <vector>
+
 namespace TreeFitter {
 
   void HelixUtils::vertexFromHelix(const Belle2::Helix& helix,
                                    double L, double Bz,
-                                   Belle2::B2Vector3D& position,
-                                   Belle2::B2Vector3D& momentum, int& charge)
+                                   ROOT::Math::XYZVector& position,
+                                   ROOT::Math::XYZVector& momentum, int& charge)
   {
     position = helix.getPositionAtArcLength2D(L);
     momentum = helix.getMomentumAtArcLength2D(L, Bz);
@@ -33,15 +37,10 @@ namespace TreeFitter {
                                    Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
+    helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMomentum(0), positionAndMomentum(1), positionAndMomentum(2)),
+                          ROOT::Math::XYZVector(positionAndMomentum(3), positionAndMomentum(4), positionAndMomentum(5)),
+                          charge, Bz);
 
-    Belle2::B2Vector3D position(positionAndMomentum(0),
-                                positionAndMomentum(1),
-                                positionAndMomentum(2));
-    Belle2::B2Vector3D momentum(positionAndMomentum(3),
-                                positionAndMomentum(4),
-                                positionAndMomentum(5));
-
-    helix = Belle2::Helix(position, momentum, charge, Bz);
     L = helix.getArcLength2DAtXY(positionAndMomentum(0),
                                  positionAndMomentum(1));
 
@@ -134,34 +133,27 @@ namespace TreeFitter {
                                                           Eigen::Matrix<double, 5, 6>& jacobian)
   {
 
-    Belle2::B2Vector3D position(positionAndMom(0),
-                                positionAndMom(1),
-                                positionAndMom(2));
-
-    Belle2::B2Vector3D momentum(positionAndMom(3),
-                                positionAndMom(4),
-                                positionAndMom(5));
-
-    helix = Belle2::Helix(position, momentum, charge, Bz);
+    helix = Belle2::Helix(ROOT::Math::XYZVector(positionAndMom(0), positionAndMom(1), positionAndMom(2)),
+                          ROOT::Math::XYZVector(positionAndMom(3), positionAndMom(4), positionAndMom(5)),
+                          charge, Bz);
 
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
 
     double delta = 1e-5;// this is arbitrary, only needs to be small
 
-    Belle2::B2Vector3D postmp;
-    Belle2::B2Vector3D momtmp;
+    ROOT::Math::XYZVector postmp;
+    ROOT::Math::XYZVector momtmp;
 
     for (int jin = 0; jin < 6; ++jin) {
-      for (int i = 0; i < 3; ++i) {
-        postmp[i] = positionAndMom(i);
-        momtmp[i] = positionAndMom(i + 3);
-      }
-      if (jin < 3) {
-        postmp[jin] += delta;
-      } else {
-        momtmp[jin - 3] += delta;
-      }
+      postmp.SetCoordinates(positionAndMom(0), positionAndMom(1), positionAndMom(2));
+      momtmp.SetCoordinates(positionAndMom(3), positionAndMom(4), positionAndMom(5));
+      if (jin == 0) postmp.SetX(postmp.X() + delta);
+      if (jin == 1) postmp.SetY(postmp.Y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.Z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.X() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.Y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.Z() + delta);
 
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
@@ -185,20 +177,18 @@ namespace TreeFitter {
     // numeric calculation of the jacobian
     Belle2::Helix helixPlusDelta;
 
-    Belle2::B2Vector3D postmp;
-    Belle2::B2Vector3D momtmp;
+    ROOT::Math::XYZVector postmp;
+    ROOT::Math::XYZVector momtmp;
 
     for (int jin = 0; jin < 6; ++jin) {
-      for (int i = 0; i < 3; ++i) {
-        postmp[i] = positionAndMom(i);
-        momtmp[i] = positionAndMom(i + 3);
-      }
-
-      if (jin < 3) {
-        postmp[jin] += delta;
-      } else {
-        momtmp[jin - 3] += delta;
-      }
+      postmp.SetCoordinates(positionAndMom(0), positionAndMom(1), positionAndMom(2));
+      momtmp.SetCoordinates(positionAndMom(3), positionAndMom(4), positionAndMom(5));
+      if (jin == 0) postmp.SetX(postmp.X() + delta);
+      if (jin == 1) postmp.SetY(postmp.Y() + delta);
+      if (jin == 2) postmp.SetZ(postmp.Z() + delta);
+      if (jin == 3) momtmp.SetX(momtmp.X() + delta);
+      if (jin == 4) momtmp.SetY(momtmp.Y() + delta);
+      if (jin == 5) momtmp.SetZ(momtmp.Z() + delta);
 
       helixPlusDelta = Belle2::Helix(postmp, momtmp, charge, Bz);
       jacobian(iD0, jin)        = (helixPlusDelta.getD0()        - helix.getD0())        / delta ;
@@ -227,106 +217,148 @@ namespace TreeFitter {
                                Belle2::B2Vector3D& vertex, bool parallel)
   {
 
-    double d0_1     = helix1.getD0();
-    double phi0_1   = helix1.getPhi0();
-    double omega_1  = helix1.getOmega();
-    double z0_1     = helix1.getZ0();
-    double tandip_1 = helix1.getTanLambda();
-    double cosdip_1 = cos(atan(tandip_1))  ; // can do that faster
+    const double d0_1     = helix1.getD0();
+    const double phi0_1   = helix1.getPhi0();
+    const double omega_1  = helix1.getOmega();
 
-    double d0_2     = helix2.getD0();
-    double phi0_2   = helix2.getPhi0();
-    double omega_2  = helix2.getOmega();
-    double z0_2     = helix2.getZ0();
-    double tandip_2 = helix2.getTanLambda();
-    double cosdip_2 = cos(atan(tandip_2))  ; // can do that faster
+    const double d0_2     = helix2.getD0();
+    const double phi0_2   = helix2.getPhi0();
+    const double omega_2  = helix2.getOmega();
 
-    double r_1 = 1 / omega_1 ;
-    double r_2 = 1 / omega_2 ;
+    // These radii have a sign, like omega (negative for negative charge)
+    const double r_1 = 1 / omega_1 ;
+    const double r_2 = 1 / omega_2 ;
 
-    double x0_1 = - (r_1 + d0_1) * sin(phi0_1) ;
-    double y0_1 = (r_1 + d0_1) * cos(phi0_1) ;
+    // 1) First look at the transverse plane, where the helix projection is a circle
+    // Coordinates of the centers of the circles
+    const double x0_1 = (r_1 + d0_1) * sin(phi0_1) ;
+    const double y0_1 = -(r_1 + d0_1) * cos(phi0_1) ;
 
-    double x0_2 = - (r_2 + d0_2) * sin(phi0_2) ;
-    double y0_2 = (r_2 + d0_2) * cos(phi0_2) ;
+    const double x0_2 = (r_2 + d0_2) * sin(phi0_2) ;
+    const double y0_2 = -(r_2 + d0_2) * cos(phi0_2) ;
 
-    double deltax = x0_2 - x0_1 ;
-    double deltay = y0_2 - y0_1 ;
+    // Vector that goes from center1 to center2
+    const double deltax = x0_2 - x0_1 ;
+    const double deltay = y0_2 - y0_1 ;
 
+    // Intersections of the circles, can be at most two
     double phi1[2] ;
     double phi2[2] ;
     int nsolutions = 1;
 
-    // the phi of the 'intersection'.
-    const double pi = TMath::Pi();
-    double phi    = - atan2(deltax, deltay) ;
-    double phinot = phi > 0 ?  phi - pi : phi + pi ;
+    // The phi of the delta vector.
+    const double phi    = - atan2(deltax, deltay) ;
+    const double phinot = phi > 0 ?  phi - TMath::Pi() : phi + TMath::Pi() ;
     phi1[0] = r_1 < 0 ? phi : phinot ;
     phi2[0] = r_2 > 0 ? phi : phinot ;
 
-    double R1 = fabs(r_1) ;
-    double R2 = fabs(r_2) ;
-    double Rmin = R1 < R2 ? R1 : R2 ;
-    double Rmax = R1 > R2 ? R1 : R2 ;
-    double dX = sqrt(deltax * deltax + deltay * deltay) ;
+    // These radii do NOT have a sign instead
+    const double R1 = fabs(r_1) ;
+    const double R2 = fabs(r_2) ;
+    const double Rmin = R1 < R2 ? R1 : R2 ;
+    const double Rmax = R1 > R2 ? R1 : R2 ;
+    const double dX = hypot(deltax, deltay) ;
 
     if (!parallel && dX + Rmin > Rmax && dX < R1 + R2) {
-      // there are two solutions
+      // Circles intersect in two points
       nsolutions = 2 ;
-      double ddphi1 = acos((dX * dX - R2 * R2 + R1 * R1) / (2.*dX * R1)) ;
+
+      // This is just the law of cosines
+      const double ddphi1 = acos((dX * dX - R2 * R2 + R1 * R1) / (2.*dX * R1)) ;
       phi1[1] = phidomain(phi1[0] + ddphi1) ;
       phi1[0] = phidomain(phi1[0] - ddphi1)  ;
 
-      double ddphi2 = acos((dX * dX - R1 * R1 + R2 * R2) / (2.*dX * R2)) ;
+      const double ddphi2 = acos((dX * dX - R1 * R1 + R2 * R2) / (2.*dX * R2)) ;
       phi2[1] = phidomain(phi2[0] - ddphi2) ;
       phi2[0] = phidomain(phi2[0] + ddphi2) ;
 
     } else if (dX < Rmax) {
+      // Tangent or non-intersecting circles, one inside the other (only one POCA)
       if (R1 > R2) phi2[0] = r_2 < 0 ? phi : phinot ;
-      else          phi1[0] = r_1 < 0 ? phi : phinot ;
+      else         phi1[0] = r_1 < 0 ? phi : phinot ;
+    }
+    // else: tangent or non-intersecting circles, outside of each other (only one POCA)
+    // what we saved in phi1 and phi2 gives already the correct solution
+
+    // Intersections of the circles (cartesian)
+    double x1[2], y1[2], x2[2], y2[2];
+    for (int i = 0; i < nsolutions; i++) {
+      x1[i] =  r_1 * sin(phi1[i]) + x0_1 ;
+      y1[i] = -r_1 * cos(phi1[i]) + y0_1 ;
+      x2[i] =  r_2 * sin(phi2[i]) + x0_2 ;
+      y2[i] = -r_2 * cos(phi2[i]) + y0_2 ;
     }
 
-    // find the best solution for z by running multiples of 2_pi
-    double z1(0), z2(0) ;
-    bool first(true) ;
+    // 2) Find the best solution for z by running multiples of 2pi from the xy intersection(s)
+    double z1(0), z2(0);
+    bool first = true;
     int ibest = 0;
-    const int ncirc(2) ;
+    const int nturnsmax = 10; // Max number of turns we try backwards and forwards
+
+    // Loop on all xy-plane solutions
     for (int i = 0; i < nsolutions; ++i) {
-      double dphi1 = phidomain(phi1[i] - phi0_1) ;
-      double dphi2 = phidomain(phi2[i] - phi0_2) ;
-      for (int n1 = 1 - ncirc; n1 <= 1 + ncirc ; ++n1) {
-        double l1 = (dphi1 + n1 * TMath::TwoPi()) / omega_1 ;
-        double tmpz1 = (z0_1 + l1 * tandip_1) ;
-        if (n1 == 0 || fabs(tmpz1) < 100) {
-          for (int n2 = 1 - ncirc ; n2 <= 1 + ncirc; ++n2) {
-            double l2 = (dphi2 + n2 * TMath::TwoPi()) / omega_2 ;
-            double tmpz2 = (z0_2 + l2 * tandip_2) ;
-            if (n2 == 0 || fabs(tmpz2) < 100) {
-              if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
-                ibest = i ;
-                first = false ;
-                z1 = tmpz1 ;
-                z2 = tmpz2 ;
-                flt1 = l1 / cosdip_1 ;
-                flt2 = l2 / cosdip_2 ;
-              }
+      const double l1 = helix1.getArcLength2DAtXY(x1[i], y1[i]);
+      const double l2 = helix2.getArcLength2DAtXY(x2[i], y2[i]);
+
+      // Loop on helix1 turns, save corresponding z positions
+      std::vector<double> z1s;
+      for (int n1 = 0; n1 <= nturnsmax; ++n1) {
+        bool added = false;
+        // Try forwards and backwards
+        for (int sn1 : {n1, -n1}) {
+          const double tmpz1 = helix1.getPositionAtArcLength2D(l1 + sn1 * TMath::TwoPi() / omega_1).Z();
+          if (sn1 == 0 || (-82 <= tmpz1 && tmpz1 <= 158)) {
+            // Only keep the 0th turn and those inside CDC volume
+            z1s.push_back(tmpz1);
+            added = true;
+          }
+          if (sn1 == 0)
+            break; // Do not store 0th turn twice
+        }
+        // If we did not add any point we are already outside CDC volume both backwards and forwards
+        if (!added)
+          break;
+      }
+
+      // Loop on helix2 turns, find closest approach to one of helix1 points
+      for (int n2 = 0; n2 <= nturnsmax; ++n2) {
+        bool tried = false;
+        // Try forwards and backwards
+        for (int sn2 : {n2, -n2}) {
+          const double tmpz2 = helix2.getPositionAtArcLength2D(l2 + sn2 * TMath::TwoPi() / omega_2).Z();
+          if (sn2 == 0 || (-82 <= tmpz2 && tmpz2 <= 158)) {
+            // Only keep the 0th turn and those inside CDC volume
+            tried = true;
+            // Find the tmpz1 closest to tmpz2
+            const auto i1best = std::min_element(
+            z1s.cbegin(), z1s.cend(), [&tmpz2](const double & z1a, const double & z1b) {
+              return fabs(z1a - tmpz2) < fabs(z1b - tmpz2);
+            });
+            const double tmpz1 = *i1best;
+            // Keep the solution where the z distance of closest approach is minimum
+            if (first || fabs(tmpz1 - tmpz2) < fabs(z1 - z2)) {
+              ibest = i;
+              first = false;
+              z1 = tmpz1;
+              z2 = tmpz2;
+              flt1 = l1;
+              flt2 = l2;
             }
           }
+          if (n2 == 0)
+            break; // Do not try 0th turn twice
         }
+        // If we did not try any point we are already outside CDC volume both backwards and forwards
+        if (!tried)
+          break;
       }
     }
 
-    double x1 =  r_1 * sin(phi1[ibest]) + x0_1 ;
-    double y1 = -r_1 * cos(phi1[ibest]) + y0_1 ;
-
-    double x2 =  r_2 * sin(phi2[ibest]) + x0_2 ;
-    double y2 = -r_2 * cos(phi2[ibest]) + y0_2 ;
-
-    vertex.SetX(0.5 * (x1 + x2));
-    vertex.SetY(0.5 * (y1 + y2));
+    vertex.SetX(0.5 * (x1[ibest] + x2[ibest]));
+    vertex.SetY(0.5 * (y1[ibest] + y2[ibest]));
     vertex.SetZ(0.5 * (z1 + z2));
 
-    return sqrt(sqr(x2 - x1) + sqr(y2 - y1) + sqr(z2 - z1)) ;
+    return hypot(x2[ibest] - x1[ibest], y2[ibest] - y1[ibest], z2 - z1);
   }
 
   //POCA between a track and a point
@@ -334,42 +366,42 @@ namespace TreeFitter {
                                const Belle2::B2Vector3D& point,
                                double& flt)
   {
-    double d0     = helix.getD0();
-    double phi0   = helix.getPhi0();
-    double omega  = helix.getOmega();
-    double z0     = helix.getZ0();
-    double tandip = helix.getTanLambda();
-    double cosdip = cos(atan(tandip))  ; // can do that faster
+    const double d0     = helix.getD0();
+    const double phi0   = helix.getPhi0();
+    const double omega  = helix.getOmega();
+    const double z0     = helix.getZ0();
+    const double tandip = helix.getTanLambda();
+    const double cosdip = cos(atan(tandip))  ; // can do that faster
 
-    double r = 1 / omega ;
+    const double r = 1 / omega ;
 
-    double x0 = - (r + d0) * sin(phi0) ;
-    double y0 = (r + d0) * cos(phi0) ;
+    const double x0 = - (r + d0) * sin(phi0) ;
+    const double y0 = (r + d0) * cos(phi0) ;
 
-    double deltax = x0 - point.X() ;
-    double deltay = y0 - point.Y() ;
+    const double deltax = x0 - point.X() ;
+    const double deltay = y0 - point.Y() ;
 
     const double pi = TMath::Pi();
-    double phi    = - atan2(deltax, deltay) ;
+    double phi = - atan2(deltax, deltay) ;
     if (r < 0) phi = phi > 0 ?  phi - pi : phi + pi ;
 
     // find the best solution for z by running multiples of 2_pi
-    double x =  r * sin(phi) + x0 ;
-    double y = -r * cos(phi) + y0 ;
+    const double x =  r * sin(phi) + x0 ;
+    const double y = -r * cos(phi) + y0 ;
     double z(0) ;
     bool first(true) ;
     const int ncirc(2) ;
-    double dphi = phidomain(phi - phi0) ;
+    const double dphi = phidomain(phi - phi0) ;
     for (int n = 1 - ncirc; n <= 1 + ncirc ; ++n) {
-      double l = (dphi + n * TMath::TwoPi()) / omega ;
-      double tmpz = (z0 + l * tandip) ;
-      if (first || fabs(tmpz - point.z()) < fabs(z - point.z())) {
+      const double l = (dphi + n * TMath::TwoPi()) / omega ;
+      const double tmpz = (z0 + l * tandip) ;
+      if (first || fabs(tmpz - point.Z()) < fabs(z - point.Z())) {
         first = false ;
         z = tmpz ;
         flt = l / cosdip ;
       }
     }
-    return sqrt(sqr(x - point.x()) + sqr(y - point.y()) + sqr(z - point.z())) ;
+    return sqrt(sqr(x - point.X()) + sqr(y - point.Y()) + sqr(z - point.Z())) ;
   }
 
   void HelixUtils::getJacobianToCartesianFrameworkHelix(Eigen::Matrix<double, 5, 6>& jacobian,

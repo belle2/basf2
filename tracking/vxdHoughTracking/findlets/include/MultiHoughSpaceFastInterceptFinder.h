@@ -22,8 +22,8 @@ namespace Belle2 {
     class VXDHoughState;
 
     /**
-    * Findlet for finding intersections of sinosoidal curves in the 2D Hough space by iteratively calling
-    * fastInterceptFinder2d. This is done 80 times for a subset of SVD sensors, one subset for each layer 6 sensor
+    * Findlet for finding intersections of sinusoidal curves in the 2D Hough space by iteratively calling
+    * FastInterceptFinder2d. This is done 80 times for a subset of SVD sensors, one subset for each layer 6 sensor
     * to reduce combinatorics in the Hough Space and to improve the purity of the found track candidates.
     * The found track candidates are then clustered via a recursive search. Afterwards track candidates are formed
     * and stored in the output vector.
@@ -87,30 +87,30 @@ namespace Belle2 {
 
       // Parameters
       /// maximum number of recursive calls of fastInterceptFinder2d
-      uint m_param_maxRecursionLevel = 7;
+      uint m_maxRecursionLevel = 7;
 
       /// number of sectors of the Hough Space on the horizontal axis
-      uint m_param_nAngleSectors = 256;
+      uint m_nAngleSectors = 256;
 
       /// number of sectors of the Hough Space on the vertical axis
-      uint m_param_nVerticalSectors = 256;
+      uint m_nVerticalSectors = 256;
 
       /// vertical size of the Hough Space, defaults to the value for u-side
-      double m_param_verticalHoughSpaceSize = 0.25;
+      double m_verticalHoughSpaceSize = 0.25;
 
       /// minimum x value of the Hough Space, defaults to the value for u-side
-      double m_param_minimumX = -3.168;
+      double m_minimumX = -3.168;
       /// maximum x value of the Hough Space, defaults to the value for u-side
-      double m_param_maximumX = 3.168;
+      double m_maximumX = 3.168;
 
       /// minimum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_param_MinimumHSClusterSize = 6;
+      uint m_MinimumHSClusterSize = 6;
       /// maximum cluster size of sectors belonging to intercepts in the Hough Space
-      uint m_param_MaximumHSClusterSize = 100;
+      uint m_MaximumHSClusterSize = 100;
       /// maximum cluster size in x of sectors belonging to intercepts in the Hough Space
-      uint m_param_MaximumHSClusterSizeX = 100;
+      uint m_MaximumHSClusterSizeX = 100;
       /// maximum cluster size in y of sectors belonging to intercepts in the Hough Space
-      uint m_param_MaximumHSClusterSizeY = 100;
+      uint m_MaximumHSClusterSizeY = 100;
 
       // class variables
       /// HS unit size in x

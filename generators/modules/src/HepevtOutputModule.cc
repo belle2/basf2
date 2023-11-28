@@ -68,7 +68,7 @@ void HepevtOutputModule::event()
     MCParticle& mcPart = *mcPartCollection[iPart];
     if (!m_storeVirtualParticles && mcPart.isVirtual()) continue;
 
-    TVector3 mom = mcPart.getMomentum();
+    ROOT::Math::XYZVector mom = mcPart.getMomentum();
     if (m_mirrorPz) mom.SetZ(-1.0 * mom.Z());
 
     if (m_fullFormat) {

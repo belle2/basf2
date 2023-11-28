@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/OrcaKinFitVariables.h>
 
 // include VariableManager
@@ -27,7 +27,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitChi2")) return part->getExtraInfo("OrcaKinFitChi2");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitChi2' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -36,7 +36,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitProb")) return part->getExtraInfo("OrcaKinFitProb");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitProb' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -45,7 +45,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitErrorCode")) return part->getExtraInfo("OrcaKinFitErrorCode");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitErrorCode' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -56,7 +56,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredTheta");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredTheta' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -65,7 +65,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredPhi")) return part->getExtraInfo("OrcaKinFitUnmeasuredPhi");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredPhi' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -74,7 +74,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredE")) return part->getExtraInfo("OrcaKinFitUnmeasuredE");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredE' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -83,7 +83,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorTheta")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorTheta");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredErrorTheta' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -92,7 +92,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorPhi")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorPhi");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredErrorPhi' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -101,7 +101,7 @@ namespace Belle2 {
       if (part->hasExtraInfo("OrcaKinFitUnmeasuredErrorE")) return part->getExtraInfo("OrcaKinFitUnmeasuredErrorE");
       else {
         B2WARNING("The ExtraInfo 'OrcaKinFitUnmeasuredErrorE' not found!");
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -121,7 +121,7 @@ Returns NaN if Orca was not run.
         
 .. seealso:: :ref:`kinfit`
         )DOC");
-    // TODO: explan the actual error codes
+    // TODO: explain the actual error codes
     REGISTER_VARIABLE("OrcaKinFitErrorCode", ErrorCode, R"DOC(
 The error code returned by the Orca kinematic fitter.
 Returns NaN if Orca was not run.
@@ -134,25 +134,28 @@ I.e. for fits with sufficient constraints remaining to constrain a missing 3-vec
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC", "rad");
+
+)DOC", "rad");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredPhi", UnmeasuredPhi, R"DOC(
 The azimuthal angle of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
 I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC", "rad");
+
+)DOC", "rad");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredE", UnmeasuredE, R"DOC(
 The energy of the "unmeasured photon" returned by Orca kinematic fitter for specific 1C fits with the ``addUnmeasuredPhoton`` parameter set.
 I.e. for fits with sufficient constraints remaining to constrain a missing 3-vector.
 Returns NaN if Orca was not run or if the ``addUnmeasuredPhoton`` parameter was not set.
         
 .. seealso:: :ref:`kinfit`
-        )DOC", "GeV");
+
+)DOC", "GeV");
     REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorTheta", UnmeasuredErrorTheta,
-                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.", "rad");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.",
+                      "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredTheta`.\n\n", "rad");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorPhi", UnmeasuredErrorPhi, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredPhi`.\n\n",
                       "rad");
-    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.", "GeV");
+    REGISTER_VARIABLE("OrcaKinFitUnmeasuredErrorE", UnmeasuredErrorE, "The uncertainty on :b2:var:`OrcaKinFitUnmeasuredE`.\n\n", "GeV");
   }
 }

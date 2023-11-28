@@ -233,6 +233,9 @@ void SVDUnpackerModule::event()
         short strip, sample[6];
         vector<uint32_t> crc16vec;
 
+        //reset value for headers and trailers check
+        seenHeadersAndTrailers = 0;
+
         for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
           m_data32 = *data32_it; //put current 32-bit frame to union
 
@@ -240,7 +243,7 @@ void SVDUnpackerModule::event()
             crc16vec.clear(); // clear the input container for crc16 calculation
             crc16vec.push_back(m_data32);
 
-            seenHeadersAndTrailers++; // we found FTB header
+            seenHeadersAndTrailers |= 0x1; // we found FTB header
 
             data32_it++; // go to 2nd part of FTB header
             crc16vec.push_back(*data32_it);
@@ -290,7 +293,7 @@ void SVDUnpackerModule::event()
 
           if (m_MainHeader.check == 6) { // FADC header
 
-            seenHeadersAndTrailers += 2; //we found FADC Header
+            seenHeadersAndTrailers |= 0x2; //we found FADC Header
 
             fadc = m_MainHeader.FADCnum;
             trgType = m_MainHeader.trgType;
@@ -336,6 +339,7 @@ void SVDUnpackerModule::event()
               m_svdEventInfoPtr.create();
               m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
               m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
+              m_svdEventInfoPtr->setAPVClock(m_hwClock);
 
               //set relative time shift
               m_svdEventInfoPtr->setRelativeShift(m_relativeTimeShift);
@@ -437,7 +441,7 @@ void SVDUnpackerModule::event()
 
           if (m_FADCTrailer.check == 14)  { // FADC trailer
 
-            seenHeadersAndTrailers += 4; // we found FAD trailer
+            seenHeadersAndTrailers |= 0x4; // we found FADC trailer
 
             //additional check if we have a faulty/fake FADC that is not in the map
             if (APVmap->find(fadc) == APVmap->end()) badMapping = true;
@@ -503,7 +507,7 @@ void SVDUnpackerModule::event()
 
           if (m_FTBTrailer.controlWord == 0xff55)  {// FTB trailer
 
-            seenHeadersAndTrailers += 8; // we found FTB trailer
+            seenHeadersAndTrailers |= 0x8; // we found FTB trailer
 
             //check CRC16
             crc16vec.pop_back();
@@ -527,32 +531,28 @@ void SVDUnpackerModule::event()
 
         } // end loop over 32-bit frames in each buffer
 
+        //Let's check if all the headers and trailers were in place in the last frame
+        if (seenHeadersAndTrailers != 0xf) {
+          if (!(seenHeadersAndTrailers & 1)) {B2ERROR("Missing FTB Header is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedHeader = true;}
+          if (!(seenHeadersAndTrailers & 2)) {B2ERROR("Missing FADC Header is detected -> related FADC number couldn't be retreived. SVD data might be corrupted! " << LogVar("Event number", eventNo) << LogVar("previous FADC", fadc)); missedHeader = true;}
+          if (!(seenHeadersAndTrailers & 4)) {B2ERROR("Missing FADC Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
+          if (!(seenHeadersAndTrailers & 8)) {B2ERROR("Missing FTB Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
+        }
+
+        for (auto p : vDiagnostic_ptr) {
+          // adding remaining info to Diagnostic object
+          p->setFTBFlags(ftbFlags);
+          p->setApvErrorOR(apvErrorsOR);
+          p->setAPVMatch(nAPVmatch);
+          p->setBadMapping(badMapping);
+          p->setBadTrailer(badTrailer);
+          p->setMissedHeader(missedHeader);
+          p->setMissedTrailer(missedTrailer);
+        }
+
+        vDiagnostic_ptr.clear();
+
       } // end iteration on 4(COPPER)/48(PCIe40) data buffers
-
-      //Let's check if all the headers and trailers were in place in the last frame
-      if (seenHeadersAndTrailers != 0xf) {
-        if (!(seenHeadersAndTrailers & 1)) {B2ERROR("Missing FTB Header is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedHeader = true;}
-        if (!(seenHeadersAndTrailers & 2)) {B2ERROR("Missing FADC Header is detected -> related FADC number couldn't be retreived. SVD data might be corrupted! " << LogVar("Event number", eventNo) << LogVar("previous FADC", fadc)); missedHeader = true;}
-        if (!(seenHeadersAndTrailers & 4)) {B2ERROR("Missing FADC Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
-        if (!(seenHeadersAndTrailers & 8)) {B2ERROR("Missing FTB Trailer is detected. SVD data might be corrupted!" << LogVar("Event number", eventNo) << LogVar("FADC", fadc)); missedTrailer = true;}
-      }
-
-      //reset value for headers and trailers check
-      seenHeadersAndTrailers = 0;
-
-      for (auto p : vDiagnostic_ptr) {
-        // adding remaining info to Diagnostic object
-        p->setFTBFlags(ftbFlags);
-        p->setApvErrorOR(apvErrorsOR);
-        p->setAPVMatch(nAPVmatch);
-        p->setBadMapping(badMapping);
-        p->setBadTrailer(badTrailer);
-        p->setMissedHeader(missedHeader);
-        p->setMissedTrailer(missedTrailer);
-
-      }
-
-      vDiagnostic_ptr.clear();
 
     } // end event loop
 

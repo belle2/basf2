@@ -105,7 +105,7 @@ void SignalSideParticleListCreatorModule::event()
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
   if (roe.isValid()) {
-    const Particle* particle = roe->getRelated<Particle>();
+    const Particle* particle = roe->getRelatedFrom<Particle>();
     if (particle) {
       std::vector<const Particle*> selparticles = m_pDDescriptor.getSelectionParticles(particle);
 

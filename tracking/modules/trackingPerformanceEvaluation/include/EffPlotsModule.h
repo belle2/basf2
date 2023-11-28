@@ -9,6 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <tracking/modules/trackingPerformanceEvaluation/PerformanceEvaluationBaseClass.h>
 
 #include <TList.h>
@@ -85,11 +86,13 @@ namespace Belle2 {
     std::string m_TrackColName; /**< name of the Tracks dataobjects collection */
     std::string m_V0sType; /**< type (as a string) of the selected V0 */
 
+    StoreArray<MCParticle> m_MCParticles;   /**< MCParticle StoreArray */
+
     bool m_allHistograms; /**< true to create all histograms */
     bool m_geometricalAccettance; /**< true to create output for the geometrical acceptance */
 
-    MCParticle* mc_dau0 = nullptr; /**< daughter 0 of a decayed MCParticle */
-    MCParticle* mc_dau1 = nullptr; /**< daughter 1 of a decayed MCParticle */
+    MCParticle* m_MCDaughter0 = nullptr; /**< daughter 0 of a decayed MCParticle */
+    MCParticle* m_MCDaughter1 = nullptr; /**< daughter 1 of a decayed MCParticle */
 
     TList* m_histoList_MCParticles = nullptr; /**< list of histograms for MCParticles */
     TList* m_histoList_RecoTracks = nullptr; /**< list of histograms for RecoTracks */

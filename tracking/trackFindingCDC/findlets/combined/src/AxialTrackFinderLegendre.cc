@@ -42,7 +42,7 @@ void AxialTrackFinderLegendre::exposeParameters(ModuleParamList* moduleParamList
 void AxialTrackFinderLegendre::apply(const std::vector<CDCWireHit>& wireHits,
                                      std::vector<CDCTrack>& tracks)
 {
-  B2DEBUG(100, "**********   CDCTrackingModule  ************");
+  B2DEBUG(25, "**********   CDCTrackingModule  ************");
 
   // Acquire the axial hits
   std::vector<const CDCWireHit*> axialWireHits;

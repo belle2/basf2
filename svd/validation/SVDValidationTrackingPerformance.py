@@ -41,14 +41,14 @@ pu.plotter(
     nbins=200,
     xmin=-100,
     xmax=100,
-    x_label='SP time (ns)',
+    x_label='SP-u time (ns)',
     y_label='counts',
     granules=pu.gD2,
     tree=treeSP,
     expr='time_u',
     cut='',
-    descr='Time of the U cluster which belong to Space Point. Distribution for all clusters: signal + background.',
-    check='Distribution peak around 0.',
+    descr='Time of the U cluster in the Space Point. Distribution for all clusters: signal + background.',
+    check='Signal peaks around 0.',
     isShifter=True)
 
 
@@ -58,14 +58,14 @@ pu.plotter(
     nbins=200,
     xmin=-100,
     xmax=100,
-    x_label='SP time (ns)',
+    x_label='SP-v time (ns)',
     y_label='counts',
     granules=pu.gD2,
     tree=treeSP,
     expr='time_v',
     cut='',
     descr='Time of the V cluster which belong to SP. Distribution for all clusters: signal + background.',
-    check='Distribution peak around 0 for signal.',
+    check='Signal peaks around 0.',
     isShifter=True)
 
 
@@ -80,10 +80,10 @@ pu.plotter(
     granules=pu.gD2,
     tree=treeRT,
     expr='cluster_UVTimeDiff',
-    cut=pu.cut_oneTH,
+    cut="",
     descr='Time difference between opposite sides of clusters belonging to the same layer.\
     Distribution for signal clusters.',
-    check='Distribution peak around 0 for signal.',
+    check='Signal peaks around 0.',
     isShifter=True)
 
 
@@ -98,10 +98,10 @@ pu.plotter(
     granules=pu.granulesTD,
     tree=treeRT,
     expr='cluster_UUTimeDiff',
-    cut=pu.cut_U+pu.cut_oneTH,
+    cut=pu.cut_U,
     descr='Time difference between clusters belonging to the neighbour layers.\
     Distribution for signal clusters.',
-    check='Distributions peak around 0.',
+    check='Signal peaks around 0.',
     isShifter=True)
 
 
@@ -116,10 +116,10 @@ pu.plotter(
     granules=pu.granulesTD,
     tree=treeRT,
     expr='cluster_VVTimeDiff',
-    cut=pu.cut_V+pu.cut_oneTH,
+    cut=pu.cut_V,
     descr='Time difference between clusters belonging to the neighbour layers.\
     Distribution for signal clusters.',
-    check='Distributions peak around 0.',
+    check='Signal peaks around 0.',
     isShifter=True)
 
 
@@ -131,9 +131,9 @@ pu.plotRegions(
     granules=pu.granulesLayersTypes,
     tree=treeRT,
     expr='strip_dir',
-    cutALL=pu.cut_noV,
-    cut=pu.cut_oneTH,
-    descr='Definition: (number of clusters related to one TrueHit) / (number of clusters).\
+    cutALL=pu.cut_U,
+    cut=pu.cut_U + pu.cut_matched,
+    descr='Definition: (number of clusters related to at least one TrueHit) / (number of clusters).\
     Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Should be close to 1 in all bins',
     isShifter=True)
@@ -147,9 +147,9 @@ pu.plotRegions(
     granules=pu.granulesLayersTypes,
     tree=treeRT,
     expr='strip_dir',
-    cutALL=pu.cut_noU,
-    cut=pu.cut_oneTH,
-    descr='Definition: (number of clusters related to one TrueHit) / (number of clusters).\
+    cutALL=pu.cut_V,
+    cut=pu.cut_V + pu.cut_matched,
+    descr='Definition: (number of clusters related to at least one TrueHit) / (number of clusters).\
     Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Should be close to 1 in all bins.',
     isShifter=True)
@@ -168,6 +168,5 @@ pu.plotter(
     expr='clusters_number',
     cut=pu.cut_U,
     descr='Number of all clusters (signal + background) in one track.',
-    check='Maximum is expected for 8, i.e. each cluster for one of 4 layers,\
-    separately for U and V side.',
+    check='An average of 8 is expected (one cluster on each side of each layer).',
     isShifter=True)

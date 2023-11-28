@@ -8,12 +8,15 @@
 
 #pragma once
 
-//STL
-#include <string>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+/* C++ headers. */
+#include <string>
 
 class TFile;
 class TTree;
@@ -59,29 +62,29 @@ namespace Belle2 {
     TTree* m_tree{nullptr};  /**< Root tree for saving the output */
     TFile* m_rootFile{nullptr};  /**< Root file for saving the output */
 
-    int m_nhits = 8736; /**< Maximum number of hits */
+    int m_nhits = ECLElementNumbers::c_NCrystals; /**< Maximum number of hits */
     int m_neclhits{ -1}; /**< Actual number of hits */
-    int m_cellId[8736] = {}; /**< Array of cellIDs */
-    double m_energy[8736] = {}; /**< Array of deposited MC energy */
-    double m_allenergy[8736] = {}; /**< Array of deposited energy */
-    double m_time[8736] = {}; /**< Array of digit time */
-    int m_theta[8736] = {}; /**< Array oh ThetaID */
-    int m_phi[8736] = {}; /**< Array of PhiID */
+    int m_cellId[ECLElementNumbers::c_NCrystals] = {}; /**< Array of cellIDs */
+    double m_energy[ECLElementNumbers::c_NCrystals] = {}; /**< Array of deposited MC energy */
+    double m_allenergy[ECLElementNumbers::c_NCrystals] = {}; /**< Array of deposited energy */
+    double m_time[ECLElementNumbers::c_NCrystals] = {}; /**< Array of digit time */
+    int m_theta[ECLElementNumbers::c_NCrystals] = {}; /**< Array oh ThetaID */
+    int m_phi[ECLElementNumbers::c_NCrystals] = {}; /**< Array of PhiID */
 
-    int m_DspHit1[8736][31] = {}; /**< WF sampling points for first digit array */
-    int m_DspHit2[8736][31] = {};  /**< WF sampling points for second digit array */
-    int m_baseline1[8736][16] = {};  /**< Baseline sampling points for first digit array */
-    int m_baseline2[8736][16] = {};  /**< Baseline sampling points for second digit array */
-    double m_baselineAvg1[8736] = {}; /**< Baseline energy for first digit array */
-    double m_baselineAvg2[8736] = {}; /**< Baseline energy for second digit array */
-    int m_maxVal1[8736] = {}; /**< WF maximum for first digit array */
-    int m_maxVal2[8736] = {}; /**< WF maximum for second digit array */
-    int m_digiQual1[8736] = {}; /**< Digit quality for first digit array */
-    int m_digiQual2[8736] = {}; /**< Digit quality for second digit array */
-    double m_digiTime1[8736] = {}; /**< Digit time for first digit array */
-    double m_digiTime2[8736] = {}; /**< Digit time for second digit array */;
-    double m_digiE1[8736] = {}; /**< Deposited energy for first digit array */
-    double m_digiE2[8736] = {}; /**< Deposited energy for second digit array */
+    int m_DspHit1[ECLElementNumbers::c_NCrystals][31] = {}; /**< WF sampling points for first digit array */
+    int m_DspHit2[ECLElementNumbers::c_NCrystals][31] = {};  /**< WF sampling points for second digit array */
+    int m_baseline1[ECLElementNumbers::c_NCrystals][16] = {};  /**< Baseline sampling points for first digit array */
+    int m_baseline2[ECLElementNumbers::c_NCrystals][16] = {};  /**< Baseline sampling points for second digit array */
+    double m_baselineAvg1[ECLElementNumbers::c_NCrystals] = {}; /**< Baseline energy for first digit array */
+    double m_baselineAvg2[ECLElementNumbers::c_NCrystals] = {}; /**< Baseline energy for second digit array */
+    int m_maxVal1[ECLElementNumbers::c_NCrystals] = {}; /**< WF maximum for first digit array */
+    int m_maxVal2[ECLElementNumbers::c_NCrystals] = {}; /**< WF maximum for second digit array */
+    int m_digiQual1[ECLElementNumbers::c_NCrystals] = {}; /**< Digit quality for first digit array */
+    int m_digiQual2[ECLElementNumbers::c_NCrystals] = {}; /**< Digit quality for second digit array */
+    double m_digiTime1[ECLElementNumbers::c_NCrystals] = {}; /**< Digit time for first digit array */
+    double m_digiTime2[ECLElementNumbers::c_NCrystals] = {}; /**< Digit time for second digit array */;
+    double m_digiE1[ECLElementNumbers::c_NCrystals] = {}; /**< Deposited energy for first digit array */
+    double m_digiE2[ECLElementNumbers::c_NCrystals] = {}; /**< Deposited energy for second digit array */
     double m_trig1{ -1}; /**< Trigger time for array 1 */
     double m_trig2{ -1}; /**< Trigger time for array 2 */
   private:

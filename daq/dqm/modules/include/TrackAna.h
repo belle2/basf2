@@ -42,7 +42,6 @@ namespace Belle2 {
   private:
     TH1F* h_multi;
     TH1F* h_p[4];
-    TH1F* h_e;
 
   };
 

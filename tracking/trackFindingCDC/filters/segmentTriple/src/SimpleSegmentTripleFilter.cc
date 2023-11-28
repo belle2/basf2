@@ -74,7 +74,7 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   for (const CDCRecoHit2D& recoHit2D : middleSegment) {
     reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D));
     if (not reconstructedMiddle.back().isInCellZBounds(toleranceFraction)) {
-      B2DEBUG(100, "  RecoHit out of CDC");
+      B2DEBUG(25, "  RecoHit out of CDC");
       return NAN;
     }
   }

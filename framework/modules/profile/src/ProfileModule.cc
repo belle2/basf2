@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/modules/profile/ProfileModule.h>
+#include <framework/core/MetadataService.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Utils.h>
@@ -114,6 +115,7 @@ void ProfileModule::storeMemoryGraph(const std::string& name, const std::string&
   if (!imgOutput.empty()) {
     TDirectory* saveDir = gDirectory;
     gROOT->cd();
+    gROOT->SetBatch(true);
     auto* can = new TCanvas();
     auto* graph = new TGraph(nPoints);
     for (int i = 0; i < nPoints; i++) {
@@ -169,4 +171,9 @@ void ProfileModule::terminate()
                    m_outputFileName, m_extractVirtualMem);
   storeMemoryGraph("RssMemoryProfile", "Rss Memory usage", "Rss Memory Usage [MB]",
                    m_rssOutputFileName, m_extractRssMem);
+
+  // add them to the metadata service
+  MetadataService::Instance().addRootNtupleFile(m_outputFileName);
+  MetadataService::Instance().addRootNtupleFile(m_rssOutputFileName);
+
 }

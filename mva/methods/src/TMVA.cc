@@ -14,7 +14,7 @@
 #include <TPluginManager.h>
 
 #include <boost/algorithm/string.hpp>
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 #include <memory>
 
 namespace Belle2 {
@@ -209,7 +209,7 @@ namespace Belle2 {
 
       std::string directory = specific_options.m_workingDirectory;
       if (specific_options.m_workingDirectory.empty()) {
-        char* directory_template = strdup("/tmp/Basf2TMVA.XXXXXX");
+        char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2TMVA.XXXXXX").c_str());
         directory = mkdtemp(directory_template);
         free(directory_template);
       }
@@ -280,7 +280,7 @@ namespace Belle2 {
       delete background_tree;
 
       if (specific_options.m_workingDirectory.empty()) {
-        boost::filesystem::remove_all(directory);
+        std::filesystem::remove_all(directory);
       }
 
       return weightfile;
@@ -294,6 +294,7 @@ namespace Belle2 {
     // Implement me!
     Weightfile TMVATeacherMulticlass::train(Dataset& training_data) const
     {
+      B2ERROR("Training TMVAMulticlass classifiers within the MVA package has not been implemented yet.");
       (void) training_data;
       return Weightfile();
     }
@@ -311,7 +312,7 @@ namespace Belle2 {
 
       std::string directory = specific_options.m_workingDirectory;
       if (specific_options.m_workingDirectory.empty()) {
-        char* directory_template = strdup("/tmp/Basf2TMVA.XXXXXX");
+        char* directory_template = strdup((std::filesystem::temp_directory_path() / "Basf2TMVA.XXXXXX").c_str());
         directory = mkdtemp(directory_template);
         free(directory_template);
       }
@@ -370,7 +371,7 @@ namespace Belle2 {
       delete regression_tree;
 
       if (specific_options.m_workingDirectory.empty()) {
-        boost::filesystem::remove_all(directory);
+        std::filesystem::remove_all(directory);
       }
 
       return weightfile;
@@ -383,7 +384,7 @@ namespace Belle2 {
       // Initialize TMVA and ROOT stuff
       TMVA::Tools::Instance();
 
-      m_expert = std::make_unique<TMVA::Reader>("!Color:!Silent");
+      m_expert = std::make_unique<TMVA::Reader>("!Color:Silent");
 
       GeneralOptions general_options;
       weightfile.getOptions(general_options);

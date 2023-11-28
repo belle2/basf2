@@ -13,7 +13,6 @@
 
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <dqm/analysis/modules/DQMHistSnapshots.h>
-#include <daq/slc/base/StringUtil.h>
 #include <TROOT.h>
 #include <TClass.h>
 #include <TH1F.h>
@@ -74,26 +73,24 @@ void DQMHistSnapshotsModule::event()
     m_last_check = cur_time;
   }
 
-  const HistList& hlist = getHistList();
+  for (auto it : getHistList()) {
+    auto name = it.first;
 
-  for (HistList::const_iterator it = hlist.begin(); it != hlist.end(); ++it) {
-    TString a = it->first;
-
-    SSNODE* n = find_snapshot(a);
+    SSNODE* n = find_snapshot(name);
     if (n == NULL) { // no existing snapshot, create new one
       n = new SSNODE;
-      n->histo = (TH1*) it->second->Clone();
+      n->histo = (TH1*) it.second.getHist()->Clone();
 
-      StringList s = StringUtil::split(a.Data(), '/');
-      std::string dirname = s[0];
-      std::string hname = s[1];
+      auto s = StringSplit(name, '/');
+      auto dirname = s.at(0);
+      auto hname = s.at(1);
       std::string canvas_name = dirname + "/c_" + hname;
       n->canvas = findCanvas(canvas_name);
       n->stale = 0;
 
       m_ssnode.push_back(n);
     } else {
-      TH1* h = it->second;
+      auto h = it.second.getHist();
       if (check == 1) {
         if (h->GetEntries() > n->histo->GetEntries()) { // histogram has been updated
           delete n->histo;

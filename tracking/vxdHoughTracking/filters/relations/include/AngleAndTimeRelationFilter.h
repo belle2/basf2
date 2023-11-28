@@ -23,15 +23,17 @@ namespace Belle2 {
 
     private:
       /// Cut on relations in theta for overlay region on same layer but different ladder
-      double m_param_ThetaCutDeltaL0 = 0.03;
+      double m_ThetaCutDeltaL0 = 0.02;
       /// Filter relations in theta between hit states where the layer difference is +-1
-      double m_param_ThetaCutDeltaL1 = 0.1;
+      double m_ThetaCutDeltaL1 = 0.1;
       /// Filter relations in theta between hit states where the layer difference is +-2
-      double m_param_ThetaCutDeltaL2 = 0.2;
+      double m_ThetaCutDeltaL2 = 0.15;
       /// Cut on difference in u-side cluster time of the two hits
-      double m_param_DeltaTU = 15; // ns
+      double m_DeltaTU = 17.5; // ns
       /// Cut on difference in v-side cluster time of the two hits
-      double m_param_DeltaTV = 15; // ns
+      double m_DeltaTV = 17.5; // ns
+      /// Use the delta t cuts between hits?
+      bool m_useDeltaTCuts = false;
     };
 
   }

@@ -12,14 +12,14 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <string>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisOutputFileModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisOutputFileModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -32,32 +32,32 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisOutputFileModule();
+    ~DQMHistAnalysisOutputFileModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
     // Data members
   private:

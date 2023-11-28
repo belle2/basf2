@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -121,6 +121,15 @@ void KLMElementNumbers::channelNumberToElementNumbers(
     m_eklmElementNumbers->stripNumberToElementNumbers(
       localChannel, section, layer, sector, plane, strip);
   }
+}
+
+KLMPlaneNumber KLMElementNumbers::planeNumber(
+  int subdetector, int section, int sector, int layer, int plane) const
+{
+  if (subdetector == c_BKLM)
+    return planeNumberBKLM(section, sector, layer, plane);
+  else
+    return planeNumberEKLM(section, sector, layer, plane);
 }
 
 KLMPlaneNumber KLMElementNumbers::planeNumberBKLM(

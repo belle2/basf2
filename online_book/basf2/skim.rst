@@ -12,24 +12,24 @@ Skimming
 
     **Prerequisites**:
 
-        * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
+    * :ref:`gbasf2 lesson <onlinebook_gbasf2>`
 
     **Questions**:
 
-        * What are skims, and why should analysts use skims?
+    * What are skims, and why should analysts use skims?
 
-        * How can I find information about what skims are available?
+    * How can I find information about what skims are available?
 
     **Objectives**:
 
-        * Find documentation about available skims.
+    * Find documentation about available skims.
 
-        * Run a skim on a file using the command-line tool :ref:`b2skim-run
-          <b2skim-run>`.
+    * Run a skim on a file using the command-line tool :ref:`b2skim-run
+      <b2skim-run>`.
 
-        * Add an existing skim to a steering file.
+    * Add an existing skim to a steering file.
 
-        * Find information about skims available on the grid.
+    * Find information about skims available on the grid.
 
 
 What is skimming?
@@ -62,15 +62,15 @@ Skims are intended into reduce the overall CPU requirements of the
 collaboration, and to make your life easier. Skims can make your life easier in
 the following ways:
 
-    * Skimmed files are generally less than 10% the size of the original
-      (unskimmed) files, so your steering file will not need to process as many
-      events, and your jobs will finish quicker.
+* Skimmed files are generally less than 10% the size of the original
+  (unskimmed) files, so your steering file will not need to process as many
+  events, and your jobs will finish quicker.
 
-    * The particles reconstructed during a skim are available when you load in
-      the skimmed uDST, so you can use these in further reconstruction. For
-      example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
-      this computationally expensive reconstruction is performed during the
-      skimming step and does not need to be repeated in later reconstruction.
+* The particles reconstructed during a skim are available when you load in
+  the skimmed uDST, so you can use these in further reconstruction. For
+  example, there are skims which use the :ref:`FEI <onlinebook_fei>`, so
+  this computationally expensive reconstruction is performed during the
+  skimming step and does not need to be repeated in later reconstruction.
 
 
 Mechanics of a skim
@@ -192,7 +192,7 @@ or by using the ``-h`` flag.
      :class: exercise stacked
 
      Use ``b2skim-run`` to apply the skim ``XToD0_D0ToHpJm`` to the file
-     ``$BELLE2_VALIDATION_DATA_DIR/mdst13.root``.
+     ``$BELLE2_VALIDATION_DATA_DIR/mdst14.root``.
 
 .. admonition:: Solution
      :class: toggle solution
@@ -201,7 +201,7 @@ or by using the ``-h`` flag.
 
      .. code-block:: bash
 
-         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst13.root
+         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst14.root
 
      By default, this will output a uDST file in the current directory titled
      ``17230100.udst.root``.
@@ -223,11 +223,11 @@ or by using the ``-h`` flag.
 
      .. code-block:: bash
 
-         b2file-metadata-show $BELLE2_VALIDATION_DATA_DIR/mdst13.root
+         b2file-metadata-show $BELLE2_VALIDATION_DATA_DIR/mdst14.root
          b2file-metadata-show 17230100.udst.root
 
-     We find the unskimmed file has 10124 events, and the skimmed file has 228
-     events, so the retention rate on this sample is 2.2%.
+     We find the unskimmed file has 90000 events, and the skimmed file has 8347
+     events, so the retention rate on this sample is 9.3%.
 
 
 Accessing skims on the grid
@@ -236,12 +236,12 @@ Accessing skims on the grid
 Analysts do not have to run the skims themselves on data or generic MC.
 Each new MC campaign or data collection, a list of skims is requested by the
 analysts in the Belle II physics working groups. This is done via the skim
-liaison or via JIRA tickets. Once requested, the skim is run on the large MC
+liaison or via GitLab issues. Once requested, the skim is run on the large MC
 and/or data samples by the skim production managers. These skims are then
 announced when ready and made available to the analyst.
 
 
-Each skim campaign on data or MC samples  has a given name. For example, skims of MC13a
+Each skim campaign on data or MC samples has a given name. For example, skims of MC13a
 run-independent MC are listed under the campaign name ``SkimM13ax1``. Skims of data are usually
 made available for official processing, like ``Proc11``, or for individual buckets like ``bucket9``,
 ``bucket10``, etc..The corresponding skim campaign names are ``SkimP11x1`` and ``SkimB9x1-SkimB13x1``.
@@ -253,7 +253,7 @@ For example, you can browse `here <https://confluence.desy.de/pages/viewpage.act
 for the latest updates on 2020a,b data skims.
 
 To find the list of skim campaign campaigns available on the, simply browse through the app,
-select Data type: MC or Data and look in the drop-down menu under Campaigns.  All skim campaigns
+select Data type: MC or Data and look in the drop-down menu under Campaigns. All skim campaigns
 start with the not so mysterious name "Skim".
 
 
@@ -307,7 +307,7 @@ in the documentation of `skim.registry.SkimRegistryClass`.
      :class: exercise
 
      Run the analysis script in `B2A303-MultipleDecays-Reconstruction.py
-     <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
+     <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
      on one of the LPNs for the mixed samples of the ``B0toDpi_Kspi``
      skim from the MC skim campaign ``SkimM13ax1`` on the grid.
 
@@ -367,7 +367,7 @@ documentation helpful.
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-     Phil Grace, Racha Cheaib
+Phil Grace, Racha Cheaib
 

@@ -25,9 +25,9 @@ namespace Belle2 {
   namespace vxdHoughTracking {
 
     /// Store RecoTracks into StoreArray
-    class RecoTrackStorer : public TrackFindingCDC::Findlet<const SpacePointTrackCand, const SpacePoint* const> {
+    class RecoTrackStorer : public TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const> {
       /// Parent class
-      using Super = TrackFindingCDC::Findlet<const SpacePointTrackCand, const SpacePoint* const>;
+      using Super = TrackFindingCDC::Findlet<SpacePointTrackCand, const SpacePoint* const>;
 
     public:
       /// Constructor
@@ -49,17 +49,22 @@ namespace Belle2 {
       void beginEvent() override;
 
       /// Store the finishey SpacePointTrackCands into RecoTracks and tag the SpacePoints
-      void apply(const std::vector<SpacePointTrackCand>& finishedResults,
+      void apply(std::vector<SpacePointTrackCand>& finishedResults,
                  const std::vector<const SpacePoint*>& spacePoints) override;
 
     private:
       /// StoreArray name of the output Track StoreArray
-      std::string m_param_RecoTracksStoreArrayName = "VXDHoughTrackingRecoTracks";
+      std::string m_RecoTracksStoreArrayName = "SVDHoughRecoTracks";
       /// StoreArray name of the SVDCluster StoreArray
-      std::string m_param_SVDClustersStoreArrayName = "SVDClusters";
+      std::string m_SVDClustersStoreArrayName = "SVDClusters";
+      /// StoreArray name of the SpacePointTrackCandidate StoreArray
+      std::string m_SVDSpacePointTrackCandsStoreArrayName = "SVDHoughSpacePointTrackCands";
 
       /// Output RecoTracks Store Array
       StoreArray<RecoTrack> m_storeRecoTracks;
+
+      /// Output SpacePointTrackCand Store Array
+      StoreArray<SpacePointTrackCand> m_storeSpacePointTrackCands;
 
       /// Store the used clusters in the results
       std::set<const SVDCluster*> m_usedClusters;
@@ -69,12 +74,12 @@ namespace Belle2 {
       /// pointer to the selected QualityEstimator
       std::unique_ptr<QualityEstimatorBase> m_estimator;
       /// sets the name of the expected StoreArray containing MCRecoTracks. Only required for MCInfo method
-      std::string m_param_MCRecoTracksStoreArrayName = "MCRecoTracks";
+      std::string m_MCRecoTracksStoreArrayName = "MCRecoTracks";
       /// Only required for MCInfo method
-      bool m_param_MCStrictQualityEstimator = true;
+      bool m_MCStrictQualityEstimator = true;
       /// Identifier which estimation method to use. Valid identifiers are:
       /// mcInfo, circleFit, tripletFit, helixFit
-      std::string m_param_EstimationMethod = "helixFit";
+      std::string m_EstimationMethod = "helixFit";
     };
 
   }

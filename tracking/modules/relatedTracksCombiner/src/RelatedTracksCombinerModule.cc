@@ -21,9 +21,9 @@ RelatedTracksCombinerModule::RelatedTracksCombinerModule() :
                  "if the hits go before (-1) or after (+1) the CDC track.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName , "Name of the input CDC StoreArray.",
+  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName, "Name of the input CDC StoreArray.",
            m_cdcRecoTracksStoreArrayName);
-  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName , "Name of the input VXD StoreArray.",
+  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName, "Name of the input VXD StoreArray.",
            m_vxdRecoTracksStoreArrayName);
   addParam("recoTracksStoreArrayName", m_recoTracksStoreArrayName, "Name of the output StoreArray.", m_recoTracksStoreArrayName);
 }

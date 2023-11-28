@@ -41,6 +41,27 @@ mypath.add_module('VariablesToNtuple',
                   variables=['nTracks', 'isMC', 'year'],
                   fileName='EventVariables.root')
 
+# One can also call the VariablesToNtuple module in the roe_path to store the ROE particles' variables.
+# Build ROE and append a mask for cleanup
+ma.buildRestOfEvent('D0', path=mypath)
+cleanMask = ('cleanMask',  # mask name
+             'nCDCHits > 0 and useCMSFrame(p)<=3.2',  # criteria on tracks
+             'p >= 0.05 and useCMSFrame(p)<=3.2'  # criteria on ECL-clusters
+             )
+ma.appendROEMasks('D0', mask_tuples=[cleanMask], path=mypath)
+
+# Make another path that is called in for_each loop over ROE objects
+roe_path = basf2.Path()
+ma.fillParticleList('pi+:inRoe', 'isInRestOfEvent > 0 and passesROEMask(cleanMask)', path=roe_path)
+ma.variablesToNtuple(decayString='pi+:inRoe',
+                     variables=['p', 'E'],
+                     filename='CandidateVariables.root',
+                     treename='roe',
+                     signalSideParticleList='D0',  # index of D0 is stored in the branch '__signalSideCandidate__'
+                     path=roe_path)
+mypath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+
 # you might also like to uncomment the following, and read the help for the
 # convenient wrapper function:
 # print(help(ma.variablesToNtuple))

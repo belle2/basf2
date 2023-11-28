@@ -147,6 +147,11 @@ namespace Belle2 {
      */
     bool operator<(const KLMElectronicsChannel& channel) const;
 
+    /**
+     * Get ASIC.
+     */
+    KLMElectronicsChannel getAsic() const;
+
   private:
 
     /** Copper. */

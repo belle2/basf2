@@ -43,6 +43,11 @@ namespace Belle2 {
     State nextState() const;
 
   public:
+
+    /**
+     * Operator =.
+     */
+    const RFCommand& operator=(const RFCommand& command);
     const RFCommand& operator=(const std::string& label);
     const RFCommand& operator=(const char* label);
 

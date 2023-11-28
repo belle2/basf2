@@ -146,6 +146,14 @@ namespace Belle2 {
        */
       static void setChannelEffi();
 
+      /**
+       * Sets the mirror center-of-curvature
+       * @param moduleID slot ID (1-based)
+       * @param xc center of curvature in x
+       * @param yc center of curvature in y
+       */
+      static void setMirrorCenter(int moduleID, double xc, double yc);
+
     private:
 
       /** Singleton: private constructor */

@@ -28,8 +28,8 @@ namespace Belle2 {
     {
       m_filter.exposeParameters(moduleParamList, prefix);
 
-      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useNBestHits"), m_param_useNHits, "Only use the best N hits",
-                                    m_param_useNHits);
+      moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "useNBestHits"), m_useNHits, "Only use the best N hits",
+                                    m_useNHits);
     };
 
     template <class AHit, class AFilter>
@@ -38,9 +38,9 @@ namespace Belle2 {
     {
       Super::apply(currentPath, childHits);
 
-      if (m_param_useNHits > 0 and childHits.size() > static_cast<unsigned int>(m_param_useNHits)) {
+      if (m_useNHits > 0 and childHits.size() > static_cast<unsigned int>(m_useNHits)) {
         std::sort(childHits.begin(), childHits.end(), TrackFindingCDC::GreaterOf<TrackFindingCDC::GetWeight>());
-        childHits.erase(childHits.begin() + m_param_useNHits, childHits.end());
+        childHits.erase(childHits.begin() + m_useNHits, childHits.end());
       }
     };
 

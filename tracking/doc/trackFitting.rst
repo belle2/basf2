@@ -1,4 +1,4 @@
-.. _tracking_trackFitting: 
+.. _tracking_trackFitting:
 
 Track Fitting
 ^^^^^^^^^^^^^

@@ -7,8 +7,8 @@
  **************************************************************************/
 /*
   <header>
-  <input>EvtGenSimRec_dedx.root</input>
-  <contact>jkumar@andrew.cmu.edu</contact>
+  <input>ParticleGunSimRec_dedx.root</input>
+  <contact>renu2@andrew.cmu.edu</contact>
   <description>check log-likelihood difference pi vs. K</description>
   </header>
 */
@@ -68,7 +68,7 @@ TH1D *GetLLDiffPlot(TFile *file, TTree *tree, TString det="temp", Int_t ipart=0)
   } else {
     hist->GetListOfFunctions()->Add(new TNamed("Check", "Should be as low as possible (esp. for low momenta), with almost no entries > 0 "));
   }
-  hist->GetListOfFunctions()->Add(new TNamed("Contact","Jitendra Kumar: jkumar@andrew.cmu.edu"));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact","Renu Garg: renu2@andrew.cmu.edu"));
   hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter,nostats"));
   return hist;
 }
@@ -133,5 +133,5 @@ void dedx3_lldiff_pi_K()
 {
   gROOT->SetStyle("Plain");
   
-  plot("../EvtGenSimRec_dedx.root");
+  plot("../ParticleGunSimRec_dedx.root");
 }

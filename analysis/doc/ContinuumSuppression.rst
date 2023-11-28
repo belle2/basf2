@@ -4,7 +4,7 @@ Continuum suppression
 =====================
 
 This page contains instructions on how to use the continuum suppression
-framework, with a focus on recent modifications. 
+framework, with a focus on recent modifications.
 
 .. seealso::
 
@@ -91,10 +91,10 @@ The Continuum Suppression variables are defined as following:
 
 Thrust and thrust axis
   For a set of :math:`N` particles with momenta :math:`p_i` the thrust axis :math:`\vec{T}` is defined as the unit vector along which their total projection is maximal.
-  The thrust scalar is 
+  The thrust scalar is
   :math:`T=\frac{\sum^N_{i=1} |\vec{T}\cdot \vec{p}_i|}{\sum^N_{i=1} |\vec{p}_i|}`,
 
-CLEO Cones 
+CLEO Cones
   The CLEO collaboration introduced variables based on the sum of the
   absolute values of the momenta of all particles within angular sectors around the thrust
   axis in intervals of 10 degrees, resulting in 9 concentric cones.
@@ -112,15 +112,15 @@ The Deep Continuum Suppression (DCS) employs additional detector-level
 variables describing nearly every track (cluster) in the event to increase the
 classification performance.
 
-It is described in detail in this `MsC thesis <http://ekp-invenio.physik.uni-karlsruhe.de/record/48934>`_.
+It is described in detail in this `MSc thesis <https://publish.etp.kit.edu/record/21416>`_.
 Tutorial files are available in
 ``basf2`` in ``analysis/examples/tutorials/``.
 
 There are two big differences when using the DCS instead of the Continuum Suppression:
 
-  1 Writing out of new variables, which describe single tracks and clusters instead of the whole shape of the event.
+  1. Writing out of new variables, which describe single tracks and clusters instead of the whole shape of the event.
 
-  2 Using Deep Neural Networks as MVA methods to increase performance and to deal with the large number of new variables.
+  2. Using Deep Neural Networks as MVA methods to increase performance and to deal with the large number of new variables.
 
 This following section provides additional information about the DCS, which supplements the information in the tutorials.
 
@@ -128,7 +128,7 @@ Adversarial Networks
 """"""""""""""""""""
 
 Due to the new variables in the DCS, correlations between the classifier output
-and quantities like ``Mbc`` and :math:`\Delta{Z}` are much more likely to occur.
+and quantities like `Mbc` and :math:`\Delta{Z}` are much more likely to occur.
 
 Using Adversarial Networks during training can reduce such correlations to a
 minimum. This is achieved by using additional networks for signal and
@@ -142,7 +142,7 @@ This parameter is highly dependent on the given problem and can vary in orders o
 
 Please note that in most cases either the signal or continuum distribution of a quantity is correlated.
 
-While in the DCS tutorial there is an Adverserial Network for every signal and
+While in the DCS tutorial there is an Adversarial Network for every signal and
 background distribution for every quantity (which is put in as a spectator),
 one should limit the number of Adversarial Networks to only those distributions
 which are correlated.

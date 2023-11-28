@@ -468,8 +468,8 @@ namespace Belle2 {
   }
 
   // Return name of offset.
-  // cppcheck-suppress constParameter
-  string TRGCDCJLUT::operate(std::string out, std::string in, std::map<std::string, std::map<std::string, double>* >& m_intStorage)
+  string TRGCDCJLUT::operate(const std::string out, const std::string in,
+                             std::map<std::string, std::map<std::string, double>* >& m_intStorage)
   {
     double floatInput = (*m_intStorage["int"])[in] + m_inputOffset;
     floatInput *= m_inputToReal;

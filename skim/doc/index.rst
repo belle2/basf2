@@ -28,27 +28,8 @@ These files actually contain more information but fewer events.
             from skimExpertFunctions import BaseSkim, CombinedSkim
             from skim.ewp import BtoXll
 
-Systematics skims
------------------
-
-.. toctree:: 01-systematics
-
-
-Physics skims
--------------
-
-.. toctree:: 02-physics
-    
-
-Standard skim lists
--------------------
-
-.. toctree:: 03-lists
-    
-
-Information for skim experts
-----------------------------
-
-.. toctree:: 04-experts
-    
-
+.. toctree::
+    01-systematics
+    02-physics
+    03-lists
+    04-experts

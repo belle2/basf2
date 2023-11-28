@@ -9,6 +9,7 @@
 ##########################################################################
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
+from ROOT.Belle2 import Const
 from ROOT.Math import XYZVector
 from basf2 import Module, B2FATAL
 
@@ -182,7 +183,7 @@ class DataStorePrinter:
                 if isinstance(all_args, list):
                     all_args = (all_args,)
             else:
-                # if arguments is not callable we asume it's one set of
+                # if arguments is not callable we assume it's one set of
                 # arguments
                 all_args = (arguments,)
 
@@ -254,7 +255,9 @@ class DataStorePrinter:
             self._printResult(result.first, depth + 1)
             self._printResult(result.second, depth + 1)
         # or, could it be a std::vector like container? But ROOT might wrap a std::string so if it has npos assume it's a string
-        elif (hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end")) and not hasattr(result, "npos"):
+        elif (hasattr(result, "size") and hasattr(result, "begin")
+              and hasattr(result, "end")) and not hasattr(result, "npos") \
+                and not isinstance(result, Const.DetectorSet):
             print("size(%d)%s" % (result.size(), weight))
             # if it is a RelationVector we also want to print the weights. So
             # check whether we have weights and pass them to the _printResult

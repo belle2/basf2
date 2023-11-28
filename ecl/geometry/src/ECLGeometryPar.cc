@@ -6,15 +6,24 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/geometry/ECLGeometryPar.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-#include <G4VTouchable.hh>
-#include <G4PhysicalVolumeStore.hh>
+/* Geant4 headers. */
 #include <G4NavigationHistory.hh>
-#include <G4Transform3D.hh>
+#include <G4PhysicalVolumeStore.hh>
 #include <G4Point3D.hh>
+#include <G4Transform3D.hh>
 #include <G4Vector3D.hh>
+#include <G4VTouchable.hh>
+
+/* C++ headers. */
 #include <iomanip>
 
 using namespace std;
@@ -364,9 +373,9 @@ void ECLGeometryPar::InitCrystal(int cid)
     sincos<16>(ss16, nreplica, s, c);
 
   G4Transform3D* T;
-  if (cid < 1152) {
+  if (ECLElementNumbers::isForward(cid + 1)) {
     T = m_ECLForwardGlobalT;
-  } else if (cid < 7776) {
+  } else if (ECLElementNumbers::isBarrel(cid + 1)) {
     T = m_ECLBarrelGlobalT;
   } else {
     T = m_ECLBackwardGlobalT;
@@ -658,8 +667,8 @@ EclNbr::getNbr(const Identifier aCellId)
   int tp1 = thetaId + 1;
   int tp2 = thetaId + 2;
 
-  if (aCellId > 1151 && aCellId < 7776) {
-    // barrel
+  if (ECLElementNumbers::isBarrel(aCellId + 1)) {
+    // Barrel.
     //
     //   12 13 14 15 16      ^ theta
     //   11  2  3  4 17      |
@@ -699,15 +708,16 @@ EclNbr::getNbr(const Identifier aCellId)
     vNbr.push_back(GetCellID(tm2, f00));
     vNbr.push_back(GetCellID(tm2, fm1));
     vNbr.push_back(GetCellID(tm2, fm2));
-  }//if( aCellId > 1152 && aCellId < 7777 )
-  else {
+  } else {
+    // Forward or backward.
     // endcap -- not always 24!
     int n00 = 1000;
     int np1 = 1000;
     int np2 = 1000;
     int nm1 = 1000;
     int nm2 = 1000;
-    if (aCellId < 1153) { // forward
+    if (ECLElementNumbers::isForward(aCellId + 1)) {
+      // Forward.
       const EclIdentifier mPerRingForward[]
         = { 48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
       if (thetaId > 1) nm2 = mPerRingForward[ thetaId - 2 ];
@@ -715,7 +725,8 @@ EclNbr::getNbr(const Identifier aCellId)
       n00 = mPerRingForward[ thetaId     ];
       np1 = mPerRingForward[ thetaId + 1 ];
       np2 = mPerRingForward[ thetaId + 2 ];
-    } else { // backward
+    } else {
+      // Backward.
       const EclIdentifier mPerRingBackward[]
         = { 64, 64, 64, 96, 96, 96, 96, 96, 144, 144, 144, 144 };
       if (thetaId < 67) np2 = mPerRingBackward[ 66 - thetaId ];
@@ -919,7 +930,6 @@ EclNbr::getNbr(const Identifier aCellId)
       if (fp2p2 < 999)
         vNbr.push_back(GetCellID(tp2, fp2p2));
     }
-  }//else( aCellId > 1152 && aCellId < 7777 )
-  return
-    EclNbr(vNbr, nearSize);
+  }
+  return EclNbr(vNbr, nearSize);
 }

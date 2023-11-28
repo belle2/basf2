@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -41,5 +40,9 @@ output.param('branchNames', ['ExtHits', 'KLMHit2ds',
                              'MCParticles', 'Tracks', 'TrackFitResults'])
 main.add_module(output)
 
+main.add_module('Progress')
+
 # Process the path.
 basf2.process(main, max_event=1000)
+
+print(basf2.statistics)

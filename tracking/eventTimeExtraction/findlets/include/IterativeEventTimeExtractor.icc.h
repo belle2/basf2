@@ -46,7 +46,7 @@ namespace Belle2 {
         }
         TimeExtractionUtils::addEventT0WithQuality(recoTracks, m_eventT0, m_eventT0WithQuality);
       } else if (m_param_abortOnUnsuccessfulStep) {
-        B2DEBUG(50, "Aborting because time extraction was not successful.");
+        B2DEBUG(25, "Aborting because time extraction was not successful.");
         breakLoop = true;
       }
 

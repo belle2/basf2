@@ -6,23 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <beast/csi/geometry/CsiGeometryPar.h>
+// Own header
 #include <beast/csi/modules/CsIDigitizerModule.h>
-#include <beast/csi/dataobjects/CsiDigiHit.h>
-#include <beast/csi/dataobjects/CsiSimHit.h>
-#include <beast/csi/dataobjects/CsiHit.h>
+
+// Beast headers
+#include <beast/csi/geometry/CsiGeometryPar.h>
+
+// Basf2 headers
+#include <framework/core/RandomNumbers.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <vector>
+// ROOT headers
 #include <TGraph.h>
 #include <TH1F.h>
 #include <TH1I.h>
-#include <framework/core/RandomNumbers.h>
-#include <TVector3.h>
-#include <math.h>
+#include <TMath.h>
+#include <Math/Vector3D.h>
 
-#define PI 3.14159265358979323846
+// C++ headers
+#include <math.h>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -69,11 +73,10 @@ void CsIDigitizerModule::initialize()
 
   B2DEBUG(100, "Initializing ");
 
-  //m_aHit.isRequired();
   m_aSimHit.isRequired();
   m_aDigiHit.registerInDataStore();
 
-  //Calculation of the derived paramaters
+  //Calculation of the derived parameters
   m_dt = 1e9 / m_SampleRate;
   setnSamples(8192);
 
@@ -130,12 +133,12 @@ void CsIDigitizerModule::event()
       //      double hitTimeRMS = sqrt( aCsISimHit->getTimeVar()/aCsISimHit->getEnergyDep());    /**< Time rms of the hit*/
       CsiGeometryPar* csip = CsiGeometryPar::Instance();
 
-      TVector3 hitPos    = aCsISimHit->getPosition();
-      TVector3 cellPos   = csip->GetPositionTV3(m_cellID);
-      TVector3 cellAngle = csip->GetOrientationTV3(m_cellID);
+      ROOT::Math::XYZVector hitPos    = aCsISimHit->getPosition();
+      ROOT::Math::XYZVector cellPos   = csip->GetPosition(m_cellID);
+      ROOT::Math::XYZVector cellAngle = csip->GetOrientation(m_cellID);
 
-      double localPos = (15. - (hitPos  - cellPos) *
-                         cellAngle);  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
+      double localPos = (15. - (hitPos  - cellPos).Dot(
+                           cellAngle));  /**< Distance between the hit and the PIN-diode end of the crystal (cm).*/
 
       // 0.06 is the speed of light in CsI(Tl)
       double  propagTime = m_SampleRate *
@@ -227,7 +230,7 @@ uint16_t  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16
   TH1I h_holdoff("h_holdoff", "Holdoff", nSam, 0, nSam - 1);
   TH1I h_baseline("h_baseline", "Baseline", nSam, 0, nSam - 1);
   TH1I h_charge("h_charge", "Charge", nSam, 0, nSam - 1);
-  TH1F h_signal("h_signal", "Continous signal", nSam, 0, nSam - 1);
+  TH1F h_signal("h_signal", "Continuous signal", nSam, 0, nSam - 1);
   TH1I h_digsig("h_digsig", "Digital signal", nSam, 0, nSam - 1);
 
 
@@ -336,29 +339,6 @@ uint16_t  CsIDigitizerModule::doChargeIntegration(Signal _u, int _NsamBL, uint16
   if (not(_recordTraces)) {
     _Waveform->clear();
     _DPPCIBits->clear();
-  } else {
-    //Below is obsolete: recording now done in the study module
-    /*
-      char rootfilename[100];
-      sprintf(rootfilename, "output/BEAST/plots/dpp-ci_WF%i.root", m_nWFcounter);
-
-      B2INFO("Writing to " << rootfilename);
-      TFile fs(rootfilename, "recreate");
-
-      h_trigger.Write();
-      h_gate.Write();
-      h_holdoff.Write();
-      h_baseline.Write();
-      h_charge.Write();
-      h_signal.Write();
-      h_digsig.Write();
-
-      TVectorD Edep(1);
-      Edep[0] = m_TrueEdep;
-      Edep.Write("Edep");
-
-      fs.Close();
-    */
   }
 
   return maxval;

@@ -17,10 +17,15 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/database/DBObjPtr.h>
-#include <calibration/CalibrationAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
+
+/* Basf2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -66,7 +71,7 @@ namespace Belle2 {
       DBObjPtr<ECLCrystalCalib> m_ECLCrateTimeOffset;
 
       /** Number of Crystals expected */
-      static constexpr int m_numCrystals = 8736;
+      static constexpr int m_numCrystals = ECLElementNumbers::c_NCrystals;
 
       /** Number of Crates expected */
       static constexpr int m_numCrates = 52;

@@ -6,11 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisTRGGDL.h>
-
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TH1F.h>
 #include <TH2F.h>
@@ -43,13 +40,12 @@ DQMHistAnalysisTRGGDLModule::DQMHistAnalysisTRGGDLModule()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debug", m_debug, "debug mode", false);
   addParam("alert", m_enableAlert, "Enable color alert", true);
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
 }
 
 DQMHistAnalysisTRGGDLModule::~DQMHistAnalysisTRGGDLModule()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (ca_current_context()) ca_context_destroy();
   }
 #endif
@@ -100,7 +96,7 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   m_runtype = m_rtype ? m_rtype->GetTitle() : "";
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
     for (int i = 0; i < n_eff_shifter; i++) {
       std::string aa = "TRGAna:eff_shift_" + std::to_string(i);
@@ -119,9 +115,6 @@ void DQMHistAnalysisTRGGDLModule::initialize()
   B2DEBUG(20, "DQMHistAnalysisTRGGDL: initialized.");
 }
 
-void DQMHistAnalysisTRGGDLModule::beginRun()
-{
-}
 
 void DQMHistAnalysisTRGGDLModule::event()
 {
@@ -744,7 +737,7 @@ void DQMHistAnalysisTRGGDLModule::event()
 
 
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto i = 0; i < n_eff_shifter; i++) {
       double data;
       //data = m_h_eff_shifter->GetBinContent(i + 1);
@@ -781,7 +774,7 @@ void DQMHistAnalysisTRGGDLModule::endRun()
 void DQMHistAnalysisTRGGDLModule::terminate()
 {
 #ifdef _BELLE2_EPICS
-  if (m_useEpics) {
+  if (getUseEpics()) {
     for (auto i = 0; i < n_eff_shifter; i++) {
       if (mychid[i]) SEVCHK(ca_clear_channel(mychid[i]), "ca_clear_channel failure");
     }

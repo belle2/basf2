@@ -15,15 +15,14 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/FileMetaData.h>
 
-#include <boost/filesystem.hpp>
 #include <memory>
-
 #include <iostream>
 #include <cstdlib>
+#include <filesystem>
 
 using namespace Belle2;
 using namespace std;
-namespace fs = boost::filesystem;
+namespace fs = std::filesystem;
 
 
 Environment& Environment::Instance()
@@ -43,7 +42,7 @@ unsigned int Environment::getNumberOfEvents() const
   if (m_mcEvents != 0)
     return m_mcEvents;
 
-  unsigned int numEventsFromInput = InputController::numEntries();
+  unsigned int numEventsFromInput = InputController::getNumEntriesToProcess();
   unsigned int numEventsFromArgument = getNumberEventsOverride();
   if (numEventsFromArgument != 0
       && (numEventsFromInput == 0 || numEventsFromArgument < numEventsFromInput))
@@ -88,6 +87,7 @@ Environment::Environment() :
   m_steering(""),
   m_numberEventsOverride(0),
   m_inputFilesOverride(),
+  m_secondaryInputFilesOverride(),
   m_entrySequencesOverride(),
   m_outputFileOverride(""),
   m_numberProcessesOverride(-1),
@@ -120,7 +120,7 @@ Environment::Environment() :
   }
 
   // add module directories for current build options, starting with the working directory on program startup
-  std::string added_dirs = fs::initial_path().string();
+  std::string added_dirs = fs::current_path().string();
   ModuleManager::Instance().addModuleSearchPath(added_dirs);
 
   if (envarAnalysisDir) {
@@ -154,12 +154,7 @@ Environment::~Environment() = default;
 
 // we know getFileNames is deprecated but we need it as long as --dry-run is available
 // so let's remove the warning for now ...
-#ifdef __INTEL_COMPILER
-#pragma warning (disable:1478) //[[deprecated]]
-#pragma warning (disable:1786) //[[deprecated("message")]]
-#else
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-#endif
 
 void Environment::setJobInformation(const std::shared_ptr<Path>& path)
 {

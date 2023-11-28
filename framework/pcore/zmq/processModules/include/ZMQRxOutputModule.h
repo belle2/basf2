@@ -58,5 +58,10 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData;
     /// The random generator in the data store
     StoreObjPtr<RandomGenerator> m_randomgenerator;
+
+    /// Begin Run counter
+    int m_beginRun;
+    /// End Run counter
+    int m_endRun;
   };
 }

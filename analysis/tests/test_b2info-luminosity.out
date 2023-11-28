@@ -1,0 +1,206 @@
+[INFO] Steering file: test_b2info-luminosity.py
+[INFO] Need to get some runs from RunDB for exp [18]
+[INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
+[INFO] Read 302 runs from exp 18
+[INFO] No Selection on good runs (use --good)
+[INFO] No Selection on beam-energy (use --beam-energy XX)
+[INFO] Selecting online lumi: uncertainty is not available
+[INFO] Num runs: 95
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED online 4S        : L =    2.779 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
+[INFO] RECORDED online 4S_offres : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED online   18 4S        : L =    2.779 +/- 0.000 /fb =   0.0028 +/- 0.000 /ab
+[INFO] RECORDED online   18 4S_offres : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [18]
+[INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
+[INFO] Read 302 runs from exp 18
+[INFO] No Selection on good runs (use --good)
+[INFO] No Selection on beam-energy (use --beam-energy XX)
+[INFO] Selecting online lumi: uncertainty is not available
+----------------------------------------------------------------------------------------------------
+---------------------------------------- online Luminosity -----------------------------------------
+----------------------------------------------------------------------------------------------------
+Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Delivered [/fb]  Good Beam Energy
+ 18   100      0.373 NaN 2021/04/09 07:41  00:00          0.000 NaN                    1.754  True    4S      
+ 18   200     39.725 NaN 2021/04/13 22:37  00:41          4.759 NaN                    7.303  True    4S      
+ 18   201    103.456 NaN 2021/04/13 23:22  01:37          4.863 NaN                    7.421  True    4S      
+ 18   202     60.917 NaN 2021/04/14 01:18  01:03          4.923 NaN                    7.488  True    4S      
+ 18   203    120.226 NaN 2021/04/14 02:23  01:37          5.044 NaN                    7.624  True    4S      
+ 18   204      0.000 NaN 2021/04/14 04:03  00:00          5.044 NaN                    7.628 False    4S      
+ 18   205     77.421 NaN 2021/04/14 04:06  01:02          5.121 NaN                    7.719  True    4S      
+ 18   206    130.226 NaN 2021/04/14 05:13  01:59          5.251 NaN                    7.868  True    4S      
+ 18   207    142.621 NaN 2021/04/14 07:15  02:04          5.394 NaN                    8.032  True    4S      
+ 18   208     33.810 NaN 2021/04/14 09:23  00:30          5.428 NaN                    8.073  True    4S      
+ 18   221    106.430 NaN 2021/04/14 21:53  01:31          5.534 NaN                    8.193  True    4S      
+ 18   222     20.318 NaN 2021/04/14 23:31  00:14          5.555 NaN                    8.226  True    4S      
+ 18   223    106.108 NaN 2021/04/14 23:48  01:16          5.661 NaN                    8.347  True    4S      
+ 18   224     67.106 NaN 2021/04/15 01:37  00:56          5.728 NaN                    8.421  True    4S      
+ 18   225      0.000 NaN 2021/04/15 02:35  00:00          5.728 NaN                    8.426 False    4S      
+ 18   227     10.059 NaN 2021/04/15 02:43  00:08          5.738 NaN                    8.450  True    4S      
+ 18   228     31.531 NaN 2021/04/15 02:57  00:23          5.769 NaN                    8.493  True    4S      
+ 18   229     15.451 NaN 2021/04/15 03:45  00:14          5.785 NaN                    8.513  True    4S      
+ 18   230      2.002 NaN 2021/04/15 04:01  00:01          5.787 NaN                    8.517  True    4S      
+ 18   231    115.133 NaN 2021/04/15 04:04  01:24          5.902 NaN                    8.646  True    4S      
+ 18   232      0.000 NaN 2021/04/15 05:30  00:01          5.902 NaN                    8.652 False    4S      
+ 18   234    267.258 NaN 2021/04/15 05:49  03:24          6.169 NaN                    8.970  True    4S      
+ 18   236      0.000 NaN 2021/04/15 09:34  00:00          6.169 NaN                    8.971 False    4S      
+ 18   239     15.109 NaN 2021/04/15 09:55  00:11          6.184 NaN                    9.016 False    4S      
+ 18   240      0.359 NaN 2021/04/15 10:26  00:00          6.185 NaN                    9.018  True    4S      
+ 18   241     23.446 NaN 2021/04/15 10:47  00:17          6.208 NaN                    9.071  True    4S      
+ 18   242      4.813 NaN 2021/04/15 11:15  00:04          6.213 NaN                    9.092  True    4S      
+ 18   243     11.505 NaN 2021/04/15 11:22  00:08          6.224 NaN                    9.110  True    4S      
+ 18   244     50.816 NaN 2021/04/15 11:32  00:37          6.275 NaN                    9.168  True    4S      
+ 18   245      6.797 NaN 2021/04/15 12:14  00:05          6.282 NaN                    9.182  True    4S      
+ 18   246     20.516 NaN 2021/04/15 12:23  00:14          6.303 NaN                    9.211  True    4S      
+ 18   247     20.822 NaN 2021/04/15 12:46  00:14          6.323 NaN                    9.249  True    4S      
+ 18   248    115.124 NaN 2021/04/15 13:22  01:23          6.438 NaN                    9.407  True    4S      
+ 18   249      6.350 NaN 2021/04/15 14:51  00:04          6.445 NaN                    9.423  True    4S      
+ 18   250     12.777 NaN 2021/04/15 14:57  00:09          6.458 NaN                    9.440  True    4S      
+ 18   251     24.693 NaN 2021/04/15 15:19  00:18          6.482 NaN                    9.480  True    4S      
+ 18   252     20.024 NaN 2021/04/15 15:41  00:14          6.502 NaN                    9.507  True    4S      
+ 18   253     62.622 NaN 2021/04/15 16:11  00:48          6.565 NaN                    9.598  True    4S      
+ 18   254    102.930 NaN 2021/04/15 17:13  01:15          6.668 NaN                    9.725  True    4S      
+ 18   255     47.333 NaN 2021/04/15 18:30  00:34          6.715 NaN                    9.781  True    4S      
+ 18   256     25.550 NaN 2021/04/15 19:12  00:18          6.741 NaN                    9.821  True    4S      
+ 18   257      0.000 NaN 2021/04/15 20:13  00:00          6.741 NaN                    9.847 False    4S      
+ 18   258      8.548 NaN 2021/04/15 20:15  00:13          6.749 NaN                    9.856  True    4S      
+ 18   259     20.739 NaN 2021/04/15 20:31  00:15          6.770 NaN                    9.882  True    4S      
+ 18   264      0.125 NaN 2021/04/15 21:53  00:00          6.770 NaN                    9.894 False    4S      
+ 18   265      0.017 NaN 2021/04/15 21:58  00:00          6.770 NaN                    9.896 False    4S      
+ 18   266      0.003 NaN 2021/04/15 22:03  00:00          6.770 NaN                    9.901 False    4S      
+ 18   267    165.717 NaN 2021/04/15 22:09  02:23          6.936 NaN                   10.085  True    4S      
+ 18   268      0.000 NaN 2021/04/16 00:36  00:00          6.936 NaN                   10.090 False    4S      
+ 18   269    144.750 NaN 2021/04/16 00:40  01:52          7.081 NaN                   10.252  True    4S      
+ 18   270     26.522 NaN 2021/04/16 02:36  00:22          7.107 NaN                   10.286  True    4S      
+ 18   271     12.724 NaN 2021/04/16 03:13  00:12          7.120 NaN                   10.302  True    4S      
+ 18   272      0.001 NaN 2021/04/16 03:28  00:00          7.120 NaN                   10.306 False    4S      
+ 18   273     44.561 NaN 2021/04/16 03:31  00:38          7.164 NaN                   10.356  True    4S      
+ 18   274      9.148 NaN 2021/04/16 04:11  00:07          7.174 NaN                   10.369  True    4S      
+ 18   275     55.495 NaN 2021/04/16 04:39  00:50          7.229 NaN                   10.430  True    4S      
+ 18   276     33.579 NaN 2021/04/16 05:48  00:34          7.263 NaN                   10.466  True    4S      
+ 18   277     24.206 NaN 2021/04/16 06:28  00:23          7.287 NaN                   10.501  True    4S      
+ 18   278     61.756 NaN 2021/04/16 06:53  00:49          7.349 NaN                   10.570  True    4S      
+ 18   279     80.084 NaN 2021/04/16 07:48  01:19          7.429 NaN                   10.663  True    4S      
+ 18   281     69.029 NaN 2021/04/16 09:33  01:02          7.498 NaN                   10.737  True    4S      
+ 18   600      0.000 NaN 2021/04/23 16:29  00:00         13.397 NaN                   17.688 False   4S_offres
+ 18   601    112.869 NaN 2021/04/23 16:33  02:45         13.510 NaN                   17.814  True   4S_offres
+ 18   602     12.213 NaN 2021/04/23 19:53  00:20         13.522 NaN                   17.830  True   4S_offres
+ 18   603     23.423 NaN 2021/04/23 21:04  00:28         13.546 NaN                   17.858  True   4S_offres
+ 18   604     34.387 NaN 2021/04/23 21:35  00:42         13.580 NaN                   17.896  True   4S_offres
+ 18   605     71.229 NaN 2021/04/23 22:19  01:29         13.651 NaN                   17.975  True   4S_offres
+ 18   606      7.519 NaN 2021/04/24 00:06  00:14         13.659 NaN                   17.984  True   4S_offres
+ 18   607      4.976 NaN 2021/04/24 00:22  00:07         13.664 NaN                   17.991  True   4S_offres
+ 18   608      3.203 NaN 2021/04/24 00:47  00:07         13.667 NaN                   17.995  True   4S_offres
+ 18   609    114.012 NaN 2021/04/24 01:26  04:42         13.781 NaN                   18.114  True   4S_offres
+ 18   610      0.001 NaN 2021/04/24 07:26  00:00         13.781 NaN                   18.115  True   4S_offres
+ 18   611     23.637 NaN 2021/04/24 08:02  00:58         13.805 NaN                   18.140  True   4S_offres
+ 18   612      1.713 NaN 2021/04/24 09:03  00:20         13.806 NaN                   18.143  True   4S_offres
+ 18   614      3.805 NaN 2021/04/24 10:05  00:11         13.810 NaN                   18.147  True   4S_offres
+ 18   625     11.535 NaN 2021/04/24 12:09  00:34         13.822 NaN                   18.160  True   4S_offres
+ 18   626      2.140 NaN 2021/04/24 13:03  00:06         13.824 NaN                   18.162  True   4S_offres
+ 18   627     31.212 NaN 2021/04/24 13:32  01:18         13.855 NaN                   18.195  True   4S_offres
+ 18   628      3.217 NaN 2021/04/24 15:12  00:16         13.858 NaN                   18.199  True   4S_offres
+ 18   629     30.938 NaN 2021/04/24 15:31  01:04         13.889 NaN                   18.232  True   4S_offres
+ 18   631      0.237 NaN 2021/04/24 16:47  00:00         13.890 NaN                   18.240 False   4S_offres
+ 18   632     51.092 NaN 2021/04/24 16:50  01:09         13.941 NaN                   18.296  True   4S_offres
+ 18   633    181.691 NaN 2021/04/24 18:17  03:48         14.122 NaN                   18.489  True   4S_offres
+ 18   634      0.085 NaN 2021/04/24 22:56  00:00         14.122 NaN                   18.489 False   4S_offres
+ 18   635      0.172 NaN 2021/04/24 22:58  00:00         14.123 NaN                   18.490 False   4S_offres
+ 18   636      0.270 NaN 2021/04/24 23:00  00:00         14.123 NaN                   18.492 False   4S_offres
+ 18   637     75.377 NaN 2021/04/24 23:02  01:27         14.198 NaN                   18.573  True   4S_offres
+ 18   638     66.956 NaN 2021/04/25 01:01  01:25         14.265 NaN                   18.644  True   4S_offres
+ 18   639      0.000 NaN 2021/04/25 02:28  00:00         14.265 NaN                   18.646 False   4S_offres
+ 18   640     82.824 NaN 2021/04/25 02:30  01:36         14.348 NaN                   18.736  True   4S_offres
+ 18   641     79.383 NaN 2021/04/25 04:28  01:45         14.427 NaN                   18.820  True   4S_offres
+ 18   642      0.001 NaN 2021/04/25 06:15  00:03         14.427 NaN                   18.825 False   4S_offres
+ 18   643     21.811 NaN 2021/04/25 06:27  00:26         14.449 NaN                   18.856  True   4S_offres
+ 18   644    119.845 NaN 2021/04/25 06:55  02:15         14.569 NaN                   18.985  True   4S_offres
+ 18   646      0.000 NaN 2021/04/25 09:23  00:00         14.569 NaN                   18.986 False   4S_offres
+----------------------------------------------------------------------------------------------------
+[INFO] Num runs: 95
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED online 4S        : L =    2.779 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
+[INFO] RECORDED online 4S_offres : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED online   18 4S        : L =    2.779 +/- 0.000 /fb =   0.0028 +/- 0.000 /ab
+[INFO] RECORDED online   18 4S_offres : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [18]
+[INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
+[INFO] Read 60 runs from exp 18
+[INFO] Selecting good runs: Good/Total: 49/60
+[INFO] Selecting beam-energy 4S/Total= 49/60
+[INFO] Selecting online lumi: uncertainty is not available
+[INFO] Num runs: 49
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED online 4S        : L =    2.763 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED online   18 4S        : L =    2.763 +/- 0.000 /fb =   0.0028 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED online RunDB     : L =    2.763 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED online RunDB     : L =    2.763 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [18]
+[INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
+[INFO] Read 302 runs from exp 18
+[INFO] No Selection on good runs (use --good)
+[INFO] Selecting beam-energy 4S_offres/Total= 65/302
+[INFO] Selecting online lumi: uncertainty is not available
+[INFO] Num runs: 34
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED online 4S_offres : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED online   18 4S_offres : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED online RunDB     : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED online RunDB     : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [12, 14]
+[INFO] Read 2607 runs for experiment 12-14
+[INFO] Using processing proc13 (and prompt) for luminosity information
+[INFO] No Selection on good runs (use --good)
+[INFO] No Selection on beam-energy (use --beam-energy XX)
+[INFO] Num runs: 615
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED offline 4S        : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000  /ab
+[INFO] RECORDED offline 4S_offres : L =    8.685 +/- 0.002 /fb =   0.0087 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED offline   12 4S_offres : L =    8.685 +/- 0.002 /fb =   0.0087 +/- 0.000 /ab
+[INFO] RECORDED offline   14 4S        : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED offline proc13    : L =   25.088 +/- 0.006 /fb =   0.0251 +/- 0.000  /ab
+[INFO] RECORDED offline prompt    : L =    0.015 +/- 0.000 /fb =   0.0000 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED offline prompt    : L =   25.102 +/- 0.006 /fb =   0.0251 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Need to get some runs from RunDB for exp [12, 14]
+[INFO] Read 2607 runs for experiment 12-14
+[INFO] Using processing proc12 (and prompt) for luminosity information
+[INFO] No Selection on good runs (use --good)
+[INFO] No Selection on beam-energy (use --beam-energy XX)
+[INFO] Num runs: 2015
+[INFO] -------------------- Luminosity by Beam Eenrgy --------------------
+[INFO] RECORDED offline 4S        : L =   71.061 +/- 0.007 /fb =   0.0711 +/- 0.000  /ab
+[INFO] RECORDED offline 4S_offres : L =    8.716 +/- 0.002 /fb =   0.0087 +/- 0.000  /ab
+[INFO] -------------------- Luminosity by Exp and Beam Eenrgy --------------------
+[INFO] RECORDED offline   12 4S        : L =   54.642 +/- 0.004 /fb =   0.0546 +/- 0.000 /ab
+[INFO] RECORDED offline   12 4S_offres : L =    8.716 +/- 0.002 /fb =   0.0087 +/- 0.000 /ab
+[INFO] RECORDED offline   14 4S        : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000 /ab
+[INFO] -------------------- Luminosity by processing --------------------
+[INFO] RECORDED offline proc12    : L =   63.358 +/- 0.005 /fb =   0.0634 +/- 0.000  /ab
+[INFO] RECORDED offline prompt    : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000  /ab
+[INFO] -------------------- Total Luminosity --------------------
+[INFO] RECORDED offline prompt    : L =   79.776 +/- 0.007 /fb =   0.0798 +/- 0.000  /ab
+[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv

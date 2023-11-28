@@ -7,12 +7,8 @@
  **************************************************************************/
 
 #include <tracking/modules/pxdDataReduction/ROIGeneratorModule.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
-#include <tracking/dataobjects/ROIid.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -51,26 +47,18 @@ ROIGeneratorModule::ROIGeneratorModule() : Module()
 
 void ROIGeneratorModule::initialize()
 {
-  StoreObjPtr<EventMetaData> eventMetaData;
-  eventMetaData.isRequired();
+  m_eventMetaData.isRequired();
 
-  StoreArray<ROIid> roiIDs;
-  roiIDs.registerInDataStore(m_ROIListName); // does not report error if ROIid exists
+  m_ROIs.registerInDataStore(m_ROIListName); // does not report error if ROIid exists
 }
 
 void ROIGeneratorModule::event()
 {
-
-  StoreArray<ROIid> ROIList(m_ROIListName);
-
-  StoreObjPtr<EventMetaData> eventMetaDataPtr;
-  int tNr = eventMetaDataPtr->getEvent(); // trigger number
+  int tNr = m_eventMetaData->getEvent(); // trigger number
 
   // Only if divider tells us to...
   if (m_divider != 0 && (tNr % m_divider) != 0)
     return ;
-
-  //  ROIList.create(true);
 
   ROIid tmp_ROIid;
 
@@ -137,7 +125,7 @@ void ROIGeneratorModule::event()
   tmp_ROIid.setMaxVid(maxV);
   tmp_ROIid.setSensorID(sensorID);
 
-  ROIList.appendNew(tmp_ROIid);
+  m_ROIs.appendNew(tmp_ROIid);
 
   if (m_nROIs > 1) {
     // ... plus additional ones for debugging.
@@ -157,7 +145,7 @@ void ROIGeneratorModule::event()
       tmp_ROIid.setMaxVid(maxV);
       tmp_ROIid.setSensorID(sensorID);
 
-      ROIList.appendNew(tmp_ROIid);
+      m_ROIs.appendNew(tmp_ROIid);
     }
   }
 }

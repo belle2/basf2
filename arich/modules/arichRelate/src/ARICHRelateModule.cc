@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichRelate/ARICHRelateModule.h>
 
 // framework - DataStore
@@ -16,7 +16,10 @@
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
-using namespace std;
+#include <mdst/dataobjects/Track.h>
+#include <tracking/dataobjects/ExtHit.h>
+#include <mdst/dataobjects/MCParticle.h>
+#include <arich/dataobjects/ARICHAeroHit.h>
 
 namespace Belle2 {
 
@@ -39,10 +42,6 @@ namespace Belle2 {
 
   }
 
-  ARICHRelateModule::~ARICHRelateModule()
-  {
-  }
-
   void ARICHRelateModule::initialize()
 
   {
@@ -54,18 +53,13 @@ namespace Belle2 {
     m_extHits.registerRelationTo(m_aeroHits);
   }
 
-  void ARICHRelateModule::beginRun()
-  {
-  }
-
   void ARICHRelateModule::event()
   {
     int nHits = m_aeroHits.getEntries();
     B2DEBUG(50, "No. of hits " << nHits);
 
-    for (int iHit = 0; iHit < nHits; ++iHit) {
-      const ARICHAeroHit* aeroHit = m_aeroHits[iHit];
-      const MCParticle* particle = DataStore::getRelated<MCParticle>(aeroHit);
+    for (const ARICHAeroHit& aeroHit : m_aeroHits) {
+      const MCParticle* particle = DataStore::getRelated<MCParticle>(&aeroHit);
       if (!particle) {
         B2DEBUG(50, "No MCParticle for AeroHit!");
         continue;
@@ -79,32 +73,17 @@ namespace Belle2 {
       if (!fitResult) continue;
 
       RelationVector<ExtHit> extHits = DataStore::getRelationsWithObj<ExtHit>(track);
-      Const::EDetector myDetID = Const::EDetector::ARICH;
-      for (unsigned i = 0; i < extHits.size(); i++) {
-        const ExtHit* extHit = extHits[i];
-        if (abs(extHit->getPdgCode()) != Const::pion.getPDGCode()) continue;
-        if (extHit->getDetectorID() != myDetID) continue;
-        if (extHit->getCopyID() != 6789) continue; // aerogel Al support plate
-        if (extHit->getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
-        extHit->addRelationTo(aeroHit);
+      const Const::EDetector arich = Const::EDetector::ARICH;
+      for (const ExtHit& extHit : extHits) {
+        if (abs(extHit.getPdgCode()) != Const::pion.getPDGCode() or
+            extHit.getDetectorID() != arich or
+            extHit.getCopyID() != 6789 or // aerogel Al support plate
+            extHit.getStatus() != EXT_EXIT) continue; // particles registered at the EXIT of the Al plate
+        extHit.addRelationTo(&aeroHit);
         break;
       }
     }
   }
-
-
-  void ARICHRelateModule::endRun()
-  {
-  }
-
-  void ARICHRelateModule::terminate()
-  {
-  }
-
-  void ARICHRelateModule::printModuleParams() const
-  {
-  }
-
 
 } // end Belle2 namespace
 

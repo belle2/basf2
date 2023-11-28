@@ -92,9 +92,9 @@ class CheckCalibDB(b2.Module):
 
 # Database
 if '.txt' in tag:
-    b2.use_local_database(tag)
+    b2.conditions.append_testing_payloads(tag)
 else:
-    b2.use_central_database(tag)
+    b2.conditions.append_globaltag(tag)
 
 # Create path
 main = b2.create_path()

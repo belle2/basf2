@@ -43,15 +43,15 @@ void CDCSimHitLookUp::clear()
 
 void CDCSimHitLookUp::fill(const CDCMCMap* ptrMCMap)
 {
-  B2DEBUG(100, "In CDCSimHitLookUp::fill()");
+  B2DEBUG(25, "In CDCSimHitLookUp::fill()");
   clear();
   m_ptrMCMap = ptrMCMap;
 
   fillPrimarySimHits();
   fillRLInfo();
 
-  B2DEBUG(100, "m_primarySimHits.size(): " << m_primarySimHits.size());
-  B2DEBUG(100, "m_rightLeftInfos.size(): " << m_rightLeftInfos.size());
+  B2DEBUG(25, "m_primarySimHits.size(): " << m_primarySimHits.size());
+  B2DEBUG(25, "m_rightLeftInfos.size(): " << m_rightLeftInfos.size());
 }
 
 void CDCSimHitLookUp::fillPrimarySimHits()

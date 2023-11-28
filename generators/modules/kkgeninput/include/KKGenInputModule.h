@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef KKGENINPUTMODULE_H
-#define KKGENINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -71,5 +70,3 @@ namespace Belle2 {
   };
 
 } // end namespace Belle2
-
-#endif // KKGENINPUTMODULE_H

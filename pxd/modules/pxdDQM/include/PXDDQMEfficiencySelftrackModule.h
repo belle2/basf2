@@ -22,7 +22,6 @@
 
 #include "TH1F.h"
 #include "TH2F.h"
-#include "TVector3.h"
 
 
 namespace Belle2 {
@@ -77,9 +76,10 @@ namespace Belle2 {
       isgood: flag which is false if some error occured (do not use the point if false)
       du and dv are the uncertainties in u and v on the sensor plane of the fit (local coordinates)
      */
-    TVector3 getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du, double& dv);
+    ROOT::Math::XYZVector getTrackInterSec(const VXD::SensorInfoBase& pxdSensorInfo, const RecoTrack& aTrack, bool& isgood, double& du,
+                                           double& dv);
     /** find the closest cluster*/
-    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(const VxdID& vxdid, ROOT::Math::XYZVector intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/

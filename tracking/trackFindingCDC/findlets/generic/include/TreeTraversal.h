@@ -58,7 +58,8 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the subfindlet
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final
+      {
         m_stateRejecter.exposeParameters(moduleParamList, prefix);
       }
 
@@ -94,11 +95,11 @@ namespace Belle2 {
 
       std::vector<const AState*> path;
       for (const AState* state : seededStates) {
-        B2DEBUG(50, "Starting with new seed...");
+        B2DEBUG(25, "Starting with new seed...");
         path.push_back(state);
         traverseTree(path, stateRelations, results);
         path.pop_back();
-        B2DEBUG(50, "... finished with seed");
+        B2DEBUG(25, "... finished with seed");
       }
       assert(path.empty());
     }
@@ -127,13 +128,13 @@ namespace Belle2 {
       m_stateRejecter.apply(constPath, childStates);
 
       if (childStates.empty()) {
-        B2DEBUG(50, "Terminating this route, as there are no possible child states.");
+        B2DEBUG(25, "Terminating this route, as there are no possible child states.");
         results.emplace_back(path);
         return;
       }
 
       // Traverse the tree from each new state on
-      B2DEBUG(50, "Having found " << childStates.size() << " child states.");
+      B2DEBUG(25, "Having found " << childStates.size() << " child states.");
       for (const AState* childState : childStates) {
         if (std::count(path.begin(), path.end(), childState)) {
           // Cycle detected -- is this the best handling?

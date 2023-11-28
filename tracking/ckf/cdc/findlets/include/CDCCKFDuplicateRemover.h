@@ -10,14 +10,15 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/ckf/cdc/entities/CDCCKFResult.h>
 
-#include <ecl/dataobjects/ECLShower.h>
-
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 #include <tracking/ckf/cdc/filters/paths/CDCPathFilterFactory.h>
 
 #include <tracking/ckf/cdc/filters/pathPairs/CDCPathPairFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.icc.h>
 
+#include <ecl/dataobjects/ECLShower.h>
+
+#include <Math/VectorUtil.h>
 
 namespace Belle2 {
   /// Remove duplicate paths created from ECLShowers
@@ -76,7 +77,7 @@ namespace Belle2 {
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
-                  << "r/z = " << result.front().getSeed()->getPositionSeed().Perp() << "; " << result.front().getSeed()->getPositionSeed().Z());
+                  << "r/z = " << result.front().getSeed()->getPositionSeed().Rho() << "; " << result.front().getSeed()->getPositionSeed().Z());
         }
       }
 
@@ -114,7 +115,7 @@ namespace Belle2 {
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
-                  << "r/z = " << result.front().getSeed()->getPositionSeed().Perp() << "; " << result.front().getSeed()->getPositionSeed().Z());
+                  << "r/z = " << result.front().getSeed()->getPositionSeed().Rho() << "; " << result.front().getSeed()->getPositionSeed().Z());
         }
       }
 
@@ -130,7 +131,7 @@ namespace Belle2 {
         while (iter2 < goodResults.end()) {
           // find tracks from close-by seeds (use small strip in phi direction as expected from Bremsstrahlung)
           // to disregard this filter set duplicateSeed_maxPhi and duplicateSeed_maxTheta to negative values
-          if (std::abs(TVector2::Phi_mpi_pi(iter2->front().getSeed()->getPositionSeed().Phi() - phiClus)) < duplicateSeed_maxPhi
+          if (std::abs(ROOT::Math::VectorUtil::Phi_mpi_pi(iter2->front().getSeed()->getPositionSeed().Phi() - phiClus)) < duplicateSeed_maxPhi
               && std::abs(iter2->front().getSeed()->getPositionSeed().Theta() - thetaClus) < duplicateSeed_maxTheta) {
             // let filter decide which one to keep
             bool isDuplicate = m_filter_duplicateSeed({&*iter, &*iter2}) > 0;
@@ -167,7 +168,7 @@ namespace Belle2 {
                   << "theta = " << result.front().getSeed()->getPositionSeed().Theta() * 180. / M_PI << "; "
                   << (result.size() - 1) << " hits (" << result.at(1).getWireHit()->getWire().getICLayer() << "->" <<
                   result.back().getWireHit()->getWire().getICLayer() << "); "
-                  << "r/z = " << result.front().getSeed()->getPositionSeed().Perp() << "; " << result.front().getSeed()->getPositionSeed().Z());
+                  << "r/z = " << result.front().getSeed()->getPositionSeed().Rho() << "; " << result.front().getSeed()->getPositionSeed().Z());
         }
       }
     }

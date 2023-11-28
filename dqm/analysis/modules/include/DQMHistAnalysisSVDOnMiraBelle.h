@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 #include <vector>
 
@@ -20,24 +20,24 @@
 namespace Belle2 {
 
   /** Class derived from HistoModule, for SVD monitoring variables at MiraBelle */
-  class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDOnMiraBelleModule final : public DQMHistAnalysisModule {
 
   public:
 
     /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
     /** Destructor */
-    virtual ~DQMHistAnalysisSVDOnMiraBelleModule();
+    ~DQMHistAnalysisSVDOnMiraBelleModule();
     /** Module function initialize */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Module function beginRun */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Module function event */
-    virtual void event() override;
+    void event() override final;
     /** Module function endRun */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Module function terminate */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 
@@ -49,6 +49,7 @@ namespace Belle2 {
     TCanvas* m_c_MPVTimeClusterOnTrack = nullptr; /**< time for clusters on track */
     TCanvas* m_c_avgMaxBinClusterOnTrack =
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
+    TCanvas* m_c_MeanSVDEventT0 = nullptr; /**< Mean Event T0 from SVD */
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;

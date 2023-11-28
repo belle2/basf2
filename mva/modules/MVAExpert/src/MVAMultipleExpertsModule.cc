@@ -12,12 +12,11 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <mva/interface/Interface.h>
 
 #include <boost/algorithm/string/predicate.hpp>
-#include <memory>
 
 #include <framework/logging/Logger.h>
 
@@ -40,10 +39,10 @@ MVAMultipleExpertsModule::MVAMultipleExpertsModule() : Module()
   addParam("identifiers", m_identifiers, "The database identifiers which is used to load the weights during the training.");
   addParam("signalFraction", m_signal_fraction_override,
            "signalFraction to calculate probability (if -1 the signalFraction of the training data is used)", -1.0);
-  std::vector<bool> empty_bool;
+  std::vector<int> empty_vec;
   addParam("overwriteExistingExtraInfo", m_overwriteExistingExtraInfo,
            "If true, when the given extraInfo has already defined, the old extraInfo value is overwritten. If false, the original value is kept.",
-           empty_bool);
+           empty_vec);
 }
 
 void MVAMultipleExpertsModule::initialize()
@@ -70,8 +69,9 @@ void MVAMultipleExpertsModule::initialize()
   m_experts.resize(m_identifiers.size());
   m_individual_feature_variables.resize(m_identifiers.size());
   m_datasets.resize(m_identifiers.size());
-  // if the size of m_overwriteExistingExtraInfo is smaller than that of m_identifiers, true will be filled.
-  m_overwriteExistingExtraInfo.resize(m_identifiers.size(), true);
+  m_nClasses.resize(m_identifiers.size());
+  // if the size of m_overwriteExistingExtraInfo is smaller than that of m_identifiers, 2 will be filled.
+  m_overwriteExistingExtraInfo.resize(m_identifiers.size(), 2);
   m_existGivenExtraInfo.resize(m_identifiers.size(), false);
 
   for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
@@ -137,13 +137,12 @@ void MVAMultipleExpertsModule::init_mva(MVA::Weightfile& weightfile, unsigned in
   dummy.resize(m_individual_feature_variables[i].size(), 0);
   m_datasets[i] = std::make_unique<MVA::SingleDataset>(general_options, dummy, 0);
 
+  m_nClasses[i] = general_options.m_nClasses;
+
 }
 
-std::vector<float> MVAMultipleExpertsModule::analyse(Particle* particle)
+void MVAMultipleExpertsModule::fillDatasets(Particle* particle)
 {
-
-  std::vector<float> targetValues;
-  targetValues.resize(m_identifiers.size());
   for (auto const& iVariable : m_feature_variables) {
     if (iVariable.first->variabletype == Variable::Manager::VariableDataType::c_double) {
       m_feature_variables[iVariable.first] = std::get<double>(iVariable.first->function(particle));
@@ -158,12 +157,71 @@ std::vector<float> MVAMultipleExpertsModule::analyse(Particle* particle)
     for (unsigned int j = 0; j < m_individual_feature_variables[i].size(); ++j) {
       m_datasets[i]->m_input[j] = m_feature_variables[m_individual_feature_variables[i][j]];
     }
-    targetValues[i] = m_experts[i]->apply(*m_datasets[i])[0];
   }
-
-  return targetValues;
 }
 
+std::vector<std::vector<float>> MVAMultipleExpertsModule::analyse(Particle* particle)
+{
+  std::vector<std::vector<float>> responseValues;
+  fillDatasets(particle);
+
+  for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
+    if (m_nClasses[i] == 2) {
+      responseValues.push_back({m_experts[i]->apply(*m_datasets[i])[0],});
+    } else if (m_nClasses[i] > 2) {
+      responseValues.push_back(m_experts[i]->applyMulticlass(*m_datasets[i])[0]);
+    } else {
+      B2ERROR("Received a value of " << m_nClasses[i] <<
+              " for the number of classes considered by the MVA Expert. This value should be >=2.");
+    }
+  }
+  return responseValues;
+}
+
+void MVAMultipleExpertsModule::setExtraInfoField(Particle* particle, std::string extraInfoName, float responseValue, unsigned int i)
+{
+  if (particle->hasExtraInfo(extraInfoName)) {
+    if (particle->getExtraInfo(extraInfoName) != responseValue) {
+      m_existGivenExtraInfo[i] = true;
+      double current = particle->getExtraInfo(extraInfoName);
+      if (m_overwriteExistingExtraInfo[i] == -1) {
+        if (responseValue < current) particle->setExtraInfo(extraInfoName, responseValue);
+      } else if (m_overwriteExistingExtraInfo[i] == 0) {
+        // don't overwrite!
+      } else if (m_overwriteExistingExtraInfo[i] == 1) {
+        if (responseValue > current) particle->setExtraInfo(extraInfoName, responseValue);
+      } else if (m_overwriteExistingExtraInfo[i] == 2) {
+        particle->setExtraInfo(extraInfoName, responseValue);
+      } else {
+        B2FATAL("m_overwriteExistingExtraInfo must be one of {-1,0,1,2}. Received '" << m_overwriteExistingExtraInfo[i] << "'.");
+      }
+    }
+  } else {
+    particle->addExtraInfo(extraInfoName, responseValue);
+  }
+}
+
+void MVAMultipleExpertsModule::setEventExtraInfoField(StoreObjPtr<EventExtraInfo> eventExtraInfo, std::string extraInfoName,
+                                                      float responseValue, unsigned int i)
+{
+  if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
+    m_existGivenExtraInfo[i] = true;
+    double current = eventExtraInfo->getExtraInfo(extraInfoName);
+    if (m_overwriteExistingExtraInfo[i] == -1) {
+      if (responseValue < current) eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else if (m_overwriteExistingExtraInfo[i] == 0) {
+      // don't overwrite!
+    } else if (m_overwriteExistingExtraInfo[i] == 1) {
+      if (responseValue > current) eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else if (m_overwriteExistingExtraInfo[i] == 2) {
+      eventExtraInfo->setExtraInfo(extraInfoName, responseValue);
+    } else {
+      B2FATAL("m_overwriteExistingExtraInfo must be one of {-1,0,1,2}. Received '" << m_overwriteExistingExtraInfo[i] << "'.");
+    }
+  } else {
+    eventExtraInfo->addExtraInfo(extraInfoName, responseValue);
+  }
+}
 
 void MVAMultipleExpertsModule::event()
 {
@@ -172,35 +230,46 @@ void MVAMultipleExpertsModule::event()
     // Calculate target Value for Particles
     for (unsigned i = 0; i < list->getListSize(); ++i) {
       Particle* particle = list->getParticle(i);
-      std::vector<float> targetValues = analyse(particle);
-
+      std::vector<std::vector<float>> responseValues = analyse(particle);
       for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
-        if (particle->hasExtraInfo(m_extraInfoNames[j])) {
-          if (particle->getExtraInfo(m_extraInfoNames[j]) != targetValues[j]) {
-            m_existGivenExtraInfo[j] = true;
-            if (m_overwriteExistingExtraInfo[j])
-              particle->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+        if (m_nClasses[j] == 2) {
+          setExtraInfoField(particle, m_extraInfoNames[j], responseValues[j][0], j);
+        } else if (m_nClasses[j] > 2) {
+          if (responseValues[j].size() != m_nClasses[j]) {
+            B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << responseValues[j].size() <<
+                    ") does not match the declared number of classes (" << m_nClasses[j] << ").");
+          }
+          for (unsigned int iClass = 0; iClass < m_nClasses[j]; iClass++) {
+            setExtraInfoField(particle, m_extraInfoNames[j] + "_" + std::to_string(iClass), responseValues[j][iClass], j);
           }
         } else {
-          particle->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
+          B2ERROR("Received a value of " << m_nClasses[j] <<
+                  " for the number of classes considered by the MVA Expert. This value should be >=2.");
         }
-      }
+      } //identifiers
     }
-  }
+  } // listnames
   if (m_listNames.empty()) {
     StoreObjPtr<EventExtraInfo> eventExtraInfo;
     if (not eventExtraInfo.isValid())
       eventExtraInfo.create();
-    std::vector<float> targetValues = analyse(nullptr);
+    std::vector<std::vector<float>> responseValues = analyse(nullptr);
     for (unsigned int j = 0; j < m_identifiers.size(); ++j) {
-      if (eventExtraInfo->hasExtraInfo(m_extraInfoNames[j])) {
-        m_existGivenExtraInfo[j] = true;
-        if (m_overwriteExistingExtraInfo[j])
-          eventExtraInfo->setExtraInfo(m_extraInfoNames[j], targetValues[j]);
+      if (m_nClasses[j] == 2) {
+        setEventExtraInfoField(eventExtraInfo, m_extraInfoNames[j], responseValues[j][0], j);
+      } else if (m_nClasses[j] > 2) {
+        if (responseValues[j].size() != m_nClasses[j]) {
+          B2ERROR("Size of results returned by MVA Expert applyMulticlass (" << responseValues[j].size() <<
+                  ") does not match the declared number of classes (" << m_nClasses[j] << ").");
+        }
+        for (unsigned int iClass = 0; iClass < m_nClasses[j]; iClass++) {
+          setEventExtraInfoField(eventExtraInfo, m_extraInfoNames[j] + "_" + std::to_string(iClass), responseValues[j][iClass], j);
+        }
       } else {
-        eventExtraInfo->addExtraInfo(m_extraInfoNames[j], targetValues[j]);
+        B2ERROR("Received a value of " << m_nClasses[j] <<
+                " for the number of classes considered by the MVA Expert. This value should be >=2.");
       }
-    }
+    } //identifiers
   }
 }
 
@@ -211,12 +280,18 @@ void MVAMultipleExpertsModule::terminate()
     m_datasets[i].reset();
 
     if (m_existGivenExtraInfo[i]) {
-      if (m_overwriteExistingExtraInfo[i])
+      if (m_overwriteExistingExtraInfo[i] == -1) {
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] <<
+                  " has already been set! It was overwritten by this module if the new value was lower than the previous!");
+      } else if (m_overwriteExistingExtraInfo[i] == 0) {
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] <<
+                  " has already been set! The original value was kept and this module did not overwrite it!");
+      } else if (m_overwriteExistingExtraInfo[i] == 1) {
+        B2WARNING("The extraInfo " << m_extraInfoNames[i] <<
+                  " has already been set! It was overwritten by this module if the new value was higher than the previous!");
+      } else if (m_overwriteExistingExtraInfo[i] == 2) {
         B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! It was overwritten by this module!");
-      else
-        B2WARNING("The extraInfo " << m_extraInfoNames[i] << " has already been set! "
-                  << "The original value was kept and this module did not overwrite it!");
+      }
     }
   }
-
 }

@@ -219,7 +219,6 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
   } else { //  A field exerts force
     G4double       momentumMagnitude = pParticle->GetTotalMomentum() ;
     G4ThreeVector  EndUnitMomentum ;
-    G4double       lengthAlongCurve ;
     G4double       restMass = fParticleDef->GetPDGMass() ;
 
     G4ChargeState chargeState(particleElectricCharge,  // The charge can change (dynamic)
@@ -251,10 +250,11 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
     if (currentMinimumStep > 0) {
       // Do the Transport in the field (non recti-linear)
       //
-      lengthAlongCurve = fFieldPropagator->ComputeStep(aFieldTrack,
-                                                       currentMinimumStep,
-                                                       currentSafety,
-                                                       track.GetVolume()) ;
+      G4double lengthAlongCurve = fFieldPropagator->ComputeStep(
+                                    aFieldTrack,
+                                    currentMinimumStep,
+                                    currentSafety,
+                                    track.GetVolume()) ;
       fGeometryLimitedStep = lengthAlongCurve < currentMinimumStep;
       if (fGeometryLimitedStep) {
         geometryStepLength   = lengthAlongCurve ;
@@ -262,7 +262,7 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
         geometryStepLength   = currentMinimumStep ;
       }
     } else {
-      geometryStepLength   = lengthAlongCurve = 0.0 ;
+      geometryStepLength   = 0.0 ;
       fGeometryLimitedStep = false ;
     }
 
@@ -345,11 +345,13 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
                                                            const G4Step&  stepData)
 {
+#ifdef G4VERBOSE
   static G4int noCalls = 0;
+  noCalls++;
+#endif
+
   static const G4ParticleDefinition* fOpticalPhoton =
     G4ParticleTable::GetParticleTable()->FindParticle("opticalphoton");
-
-  noCalls++;
 
   fParticleChange.Initialize(track) ;
 

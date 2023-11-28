@@ -23,6 +23,74 @@ __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
+def tauskim_particle_selection(label, path):
+    # Track
+    trackCuts = "-3.0 < dz < 3.0 and dr < 1.0"
+    ma.cutAndCopyList(f"pi+:{label}", "pi+:all", trackCuts, path=path)
+
+    # pi0
+
+    gammaDetectorLocation = {
+        "FWD": "clusterReg == 1",
+        "BRL": "clusterReg == 2",
+        "BWD": "clusterReg == 3"
+    }
+
+    gammaForPi0lists = []
+    for g in gammaDetectorLocation.keys():
+        gammaForPi0Cuts = gammaDetectorLocation[g]
+        gammaForPi0Cuts += ' and abs(clusterTiming) < 200'
+        gammaForPi0Cuts += ' and thetaInCDCAcceptance'
+        gammaForPi0Cuts += ' and clusterNHits > 1.5'
+        gammaForPi0Cuts += ' and [[minC2TDist > 40] or [E > 0.4]]'  # new
+        gammaForPi0 = f'gamma:looseForPi0{label}{g}'
+        gammaForPi0lists.append(gammaForPi0)
+        ma.cutAndCopyLists(gammaForPi0, 'gamma:all', gammaForPi0Cuts, path=path)
+
+    # -# -- -- cos of opening angle between the photons
+    vm.addAlias(
+        'cosAngle2Photons',
+        'formula((daughter(0, px) * daughter(1, px) + '
+        'daughter(0, py) * daughter(1, py) + '
+        'daughter(0, pz) * daughter(1, pz) ) / daughter(0, p) / daughter(1, p) )')
+
+    vm.addAlias('leadingclusterE', 'formula(max(daughter(0, clusterE),daughter(1, clusterE)))')
+    vm.addAlias('subleadingclusterE', 'formula(min(daughter(0, clusterE),daughter(1, clusterE)))')
+
+    # Determine pi0 reco for individual Detector Parts
+    Pi0CutLabel = ["leadingclusterE", "subleadingclusterE", "cosAngle2Photons", "p"]
+    Pi0CutValue = {
+        "FWD,FWD": [0.5625,        0.1625,        0.9458,        0.9444],
+        "BRL,BRL": [0.4125,        0.0625,        0.8875,        0.6333],
+        "BWD,BWD": [0.4125,        0.1125,        0.8708,        0.6111],
+        "BRL,FWD": [0.3625,        0.0875,        0.8875,        0.5889],
+        "BRL,BWD": [0.3625,        0.0875,        0.8875,        0.5889]
+    }
+
+    Pi0lists = []
+    for cut in Pi0CutValue.keys():
+        gammalists = cut.split(",")
+        CurrentPi0List = f'pi0:fromLooseGammas{label}{gammalists[0]}{gammalists[1]}'
+        Pi0lists.append(CurrentPi0List)
+        Pi0Cut = '0.115 < M < 0.152'
+        for i, c in enumerate(Pi0CutLabel):
+            Pi0Cut += f' and {c} > {Pi0CutValue[cut][i]}'
+
+        ma.reconstructDecay(f'{CurrentPi0List} -> gamma:looseForPi0{label}{gammalists[0]} gamma:looseForPi0{label}{gammalists[1]}',
+                            Pi0Cut, path=path)
+
+    ma.copyLists(f'pi0:{label}', Pi0lists, path=path)
+
+    # gamma
+    gammaCuts = 'E > 0.2'
+    gammaCuts += ' and [[minC2TDist > 40] or [E > 0.4]]'
+    gammaCuts += ' and abs(clusterTiming) < 200'
+    gammaCuts += ' and thetaInCDCAcceptance'
+    gammaCuts += ' and clusterNHits > 1.5'
+    gammaCuts += f' and isDescendantOfList(pi0:{label}) == 0'
+    ma.cutAndCopyList(f'gamma:{label}', 'gamma:all', gammaCuts, path=path)
+
+
 @fancy_skim_header
 class TauLFV(BaseSkim):
     """
@@ -50,7 +118,7 @@ class TauLFV(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdPr("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
         loadStdAllRho0(path=path)
         loadStdAllKstar0(path=path)
         loadStdAllPhi(path=path)
@@ -67,10 +135,10 @@ class TauLFV(BaseSkim):
 
         ma.reconstructDecay("K_S0:taulfv -> pi+:all pi-:all", "0.3 < M < 0.7", path=path)
 
-        gammaCuts = "E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563"
+        gammaCuts = "E > 0.20 and clusterNHits > 1.5 and thetaInCDCAcceptance"
         ma.cutAndCopyList("gamma:taulfv", "gamma:all", gammaCuts, path=path)
 
-        gammaLooseCuts = "E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5"
+        gammaLooseCuts = "E > 0.1 and thetaInCDCAcceptance and clusterNHits > 1.5"
         ma.cutAndCopyLists("gamma:taulfvloose", "gamma:all", gammaLooseCuts, path=path)
         # pi0
         ma.reconstructDecay("pi0:taulfv -> gamma:taulfvloose gamma:taulfvloose", "0.115 < M < 0.152", path=path)
@@ -255,13 +323,13 @@ class TauGeneric(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
         Set particle lists and variables for TauGeneric skim.
 
-        **Output particle lists**: ``pi+:tauskim, gamma:tauskim, pi+:S1/S2, gamma:S1/S2``
+        **Output particle lists**: ``pi+:tauskim, pi0:tauskim, gamma:tauskim, pi+:S1/S2, pi0:S1/S2, gamma:S1/S2``
 
         **Variables**:
 
@@ -273,23 +341,19 @@ class TauGeneric(BaseSkim):
         * ``E_ECLtrk``: total ECL energy of good tracks
         """
 
-        # Track and gamma cuts
-        trackCuts = "-3.0 < dz < 3.0 and dr < 1.0"
-        # trackCuts += " and -0.8660 < cosTheta < 0.9563"
-        gammaCuts = "E > 0.15"
-        gammaCuts += " and -0.8660 < cosTheta < 0.9563"
-        ma.cutAndCopyList("pi+:tauskim", "pi+:all", trackCuts, path=path)
-        ma.cutAndCopyList("gamma:tauskim", "gamma:all", gammaCuts, path=path)
+        tauskim_particle_selection("tauskim", path)
 
         # Get EventShape variables
-        ma.buildEventShape(["pi+:tauskim", "gamma:tauskim"],
+        ma.buildEventShape(["pi+:tauskim", "pi0:tauskim", "gamma:tauskim"],
                            allMoments=False, foxWolfram=False, cleoCones=False,
                            sphericity=False, jets=False, path=path)
-        ma.buildEventKinematics(["pi+:tauskim", "gamma:tauskim"], path=path)
+        ma.buildEventKinematics(["pi+:tauskim", "pi0:tauskim", "gamma:tauskim"], path=path)
 
         # Split in signal and tag
         ma.cutAndCopyList("pi+:S1", "pi+:tauskim", "cosToThrustOfEvent > 0", path=path)
         ma.cutAndCopyList("pi+:S2", "pi+:tauskim", "cosToThrustOfEvent < 0", path=path)
+        ma.cutAndCopyList("pi0:S1", "pi0:tauskim", "cosToThrustOfEvent > 0", path=path)
+        ma.cutAndCopyList("pi0:S2", "pi0:tauskim", "cosToThrustOfEvent < 0", path=path)
         ma.cutAndCopyList("gamma:S1", "gamma:tauskim", "cosToThrustOfEvent > 0", path=path)
         ma.cutAndCopyList("gamma:S2", "gamma:tauskim", "cosToThrustOfEvent < 0", path=path)
 
@@ -297,8 +361,8 @@ class TauGeneric(BaseSkim):
         vm.addAlias("netCharge", "formula(countInList(pi+:tauskim, charge == 1) - countInList(pi+:tauskim, charge == -1))")
         vm.addAlias("nTracksS1", "nParticlesInList(pi+:S1)")
         vm.addAlias("nTracksS2", "nParticlesInList(pi+:S2)")
-        vm.addAlias("invMS1", "invMassInLists(pi+:S1, gamma:S1)")
-        vm.addAlias("invMS2", "invMassInLists(pi+:S2, gamma:S2)")
+        vm.addAlias("invMS1", "invMassInLists(pi+:S1, pi0:S1, gamma:S1)")
+        vm.addAlias("invMS2", "invMassInLists(pi+:S2, pi0:S2, gamma:S2)")
         # vm.addAlias("Evis", "visibleEnergyOfEventCMS")
         vm.addAlias("maxPt", "maxPtInList(pi+:tauskim)")
         vm.addAlias("E_ECLtrk", "formula(totalECLEnergyOfParticlesInList(pi+:tauskim))")
@@ -343,9 +407,15 @@ class TauGeneric(BaseSkim):
         # add contact information to histogram
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
+        ma.copyLists('tau+:generic', self.SkimLists, path=path)
+        ma.rankByHighest(particleList='tau+:generic',
+                         variable='p',
+                         numBest=1,
+                         path=path)
+
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='',
+            particlelist='tau+:generic',
             variables_1d=[
                 ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
                 ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
@@ -371,6 +441,7 @@ class TauThrust(BaseSkim):
     * ``0.8 < thrust``
     * ``visibleEnergyOfEventCMS < 10.4 GeV``
     * For 1x1 topology, ``thrust < 0.99``
+    * For 1x1 topology, ``1.5 < visibleEnergyOfEventCMS``
     """
     __authors__ = ["Ami Rostomyan", "Kenji Inami"]
     __description__ = "Skim for Tau decays using thrust."
@@ -382,7 +453,7 @@ class TauThrust(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def additional_setup(self, path):
         """
@@ -396,15 +467,8 @@ class TauThrust(BaseSkim):
         * ``netChargeThrust``: total net charge of good tracks
         * ``nTracksS1Thrust/nTracksS2Thrust``: number of good tracks in each hemisphere S1/S2 divided by thrust axis
         """
-        # Track and gamma cuts
-        trackCuts = '-3.0 < dz < 3.0 and dr < 1.0'
-        ma.cutAndCopyList('pi+:thrust', 'pi+:all', trackCuts, path=path)
-        gammaForPi0Cuts = 'E > 0.1 and -0.8660 < cosTheta < 0.9563 and clusterNHits > 1.5'
-        ma.cutAndCopyLists('gamma:thrustForPi0', 'gamma:all', gammaForPi0Cuts, path=path)
-        ma.reconstructDecay('pi0:thrust -> gamma:thrustForPi0 gamma:thrustForPi0', '0.115 < M < 0.152', path=path)
-        gammaCuts = 'E > 0.20 and clusterNHits > 1.5 and -0.8660 < cosTheta < 0.9563'
-        gammaCuts += ' and isDescendantOfList(pi0:thrust,1) == 0'
-        ma.cutAndCopyList('gamma:thrust', 'gamma:all', gammaCuts, path=path)
+
+        tauskim_particle_selection("thrust", path)
 
         # Get EventShape variables
         ma.buildEventShape(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'],
@@ -439,8 +503,9 @@ class TauThrust(BaseSkim):
         ma.applyCuts("tau+:thrust", topologyCuts, path=path)  # cut3
         ma.applyCuts("tau+:thrust", "0.8 < thrust", path=path)  # cut4
         ma.applyCuts("tau+:thrust", "visibleEnergyOfEventCMS < 10.4", path=path)  # cut5
-        # cut6 thrust upper cut for 1x1 topology
+        # cut for 1x1 topology
         ma.applyCuts("tau+:thrust", "thrust < 0.99 or nGoodTracksThrust!=2", path=path)
+        ma.applyCuts("tau+:thrust", "1.5 < visibleEnergyOfEventCMS or nGoodTracksThrust!=2", path=path)
 
         return eventParticle
 
@@ -451,9 +516,14 @@ class TauThrust(BaseSkim):
 
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
+        ma.rankByHighest(particleList='tau+:thrust',
+                         variable='p',
+                         numBest=1,
+                         path=path)
+
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='',
+            particlelist='tau+:thrust',
             variables_1d=[
                 ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
                 ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),

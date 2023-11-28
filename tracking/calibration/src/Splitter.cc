@@ -27,16 +27,14 @@
 #endif
 
 
-using namespace std;
-
 namespace Belle2 {
 
 
   //return filtered runs intervals (remove very short runs)
-  map<ExpRun, pair<double, double>> filter(const map<ExpRun, pair<double, double>>& runs, double cut,
-                                           map<ExpRun, pair<double, double>>& runsRemoved)
+  std::map<ExpRun, std::pair<double, double>> filter(const std::map<ExpRun, std::pair<double, double>>& runs, double cut,
+                                                     std::map<ExpRun, std::pair<double, double>>& runsRemoved)
   {
-    map<ExpRun, pair<double, double>> runsCopy;
+    std::map<ExpRun, std::pair<double, double>> runsCopy;
 
     for (auto r : runs) {
       auto& I = r.second;
@@ -52,7 +50,7 @@ namespace Belle2 {
 
 
   /// plot runs on time axis
-  void plotRuns(vector<pair<double, double>>  runs)
+  void plotRuns(std::vector<std::pair<double, double>>  runs)
   {
     TGraphErrors* gr = new TGraphErrors();
 
@@ -78,7 +76,7 @@ namespace Belle2 {
   }
 
   /// get the range of interval with nIntervals and breaks stored in a vector
-  pair<int, int> getStartEndIndexes(int nIntervals,  vector<int> breaks, int indx)
+  std::pair<int, int> getStartEndIndexes(int nIntervals,  std::vector<int> breaks, int indx)
   {
     B2ASSERT("There must be at least one interval", nIntervals >= 1);
     B2ASSERT("Interval index must be positive", indx >= 0);
@@ -89,13 +87,13 @@ namespace Belle2 {
   }
 
   /// plot clusters or runs on time axis
-  void plotSRuns(vector<pair<double, double>>  runs, vector<int> breaks, int offset = 2)
+  void plotSRuns(std::vector<std::pair<double, double>>  runs, std::vector<int> breaks, int offset = 2)
   {
     TGraphErrors* gr = new TGraphErrors();
 
     for (int i = 0; i < int(breaks.size()) + 1; ++i) {
       int s, e;
-      tie(s, e) = getStartEndIndexes(runs.size(), breaks, i);
+      std::tie(s, e) = getStartEndIndexes(runs.size(), breaks, i);
       double a = runs[s].first;
       double b = runs[e].second;
 
@@ -114,9 +112,9 @@ namespace Belle2 {
 
 
   /// print sorted lenghts of the runs
-  void printBySize(vector<pair<double, double>>  runs)
+  void printBySize(std::vector<std::pair<double, double>>  runs)
   {
-    vector<double> dist;
+    std::vector<double> dist;
     for (auto r : runs) {
       double d = r.second - r.first;
       dist.push_back(d);
@@ -130,7 +128,7 @@ namespace Belle2 {
   }
 
   /// the lossFunction formula (it can be modified according to the user's taste)
-  double Splitter::lossFunction(const vector<Atom>&  vec, int s, int e) const
+  double Splitter::lossFunction(const std::vector<Atom>&  vec, int s, int e) const
   {
 
     //raw time
@@ -140,7 +138,7 @@ namespace Belle2 {
     double maxGap = 0;
     for (int i = s; i <= e - 1; ++i) {
       double d = vec[i + 1].t1 - vec[i].t2;
-      maxGap = max(maxGap, d);
+      maxGap = std::max(maxGap, d);
     }
 
     //net time
@@ -168,10 +166,10 @@ namespace Belle2 {
 
 
   // split to many small intervals (atoms)
-  vector<pair<double, double>> Splitter::splitToSmall(map<ExpRun, pair<double, double>> runs, double intSize)
+  std::vector<std::pair<double, double>> Splitter::splitToSmall(std::map<ExpRun, std::pair<double, double>> runs, double intSize)
   {
     // split into small intervals
-    vector<pair<double, double>> smallRuns;
+    std::vector<std::pair<double, double>> smallRuns;
 
     for (auto r : runs) {
       auto& I = r.second;
@@ -182,7 +180,7 @@ namespace Belle2 {
 
       double runTime = I.second - I.first;
       int nSplits = runTime / intSize; //1-m intervals
-      nSplits = max(1, nSplits); //at least 1 interval
+      nSplits = std::max(1, nSplits); //at least 1 interval
 
       for (int i = 0; i < nSplits; ++i) {
         double L = I.first + i * (runTime / nSplits);
@@ -199,7 +197,7 @@ namespace Belle2 {
 
 
   // Get the optimal clustering of the atoms with indeces 0 .. e (recursive function with cache)
-  double Splitter::getMinLoss(const vector<Atom>&  vec, int e, vector<int>& breaks)
+  double Splitter::getMinLoss(const std::vector<Atom>&  vec, int e, std::vector<int>& breaks)
   {
     // If entry in cache (speed up)
     if (cache[e].first >= 0) {
@@ -208,7 +206,7 @@ namespace Belle2 {
     }
 
 
-    vector<int> breaksOpt;
+    std::vector<int> breaksOpt;
     double minVal = 1e30;
     int iMin = -10;
     for (int i = -1; i <= e - 1; ++i) {
@@ -231,20 +229,20 @@ namespace Belle2 {
 
 
     breaks = breaksOpt;
-    cache[e] = make_pair(minVal, breaks); //store solution to cache
+    cache[e] = std::make_pair(minVal, breaks); //store solution to cache
     return minVal;
   }
 
   //Get the indexes of the break-points
-  vector<int> Splitter::dynamicBreaks(const vector<Atom>& runs)
+  std::vector<int> Splitter::dynamicBreaks(const std::vector<Atom>& runs)
   {
     //reset cache
     cache.resize(runs.size());
     for (auto& c : cache)
-      c = make_pair(-1.0, vector<int>({}));
+      c = std::make_pair(-1.0, std::vector<int>({}));
 
 
-    vector<int> breaks;
+    std::vector<int> breaks;
     getMinLoss(runs, runs.size() - 1, breaks); //the minLoss (output) currently not used, only breaks
 
     return breaks;
@@ -257,7 +255,7 @@ namespace Belle2 {
    * @param t: time of interest [hours]
    * @return:  the exp-run number at the input time t
    **/
-  static ExpRun getRun(map<ExpRun, pair<double, double>> runs, double t)
+  static ExpRun getRun(std::map<ExpRun, std::pair<double, double>> runs, double t)
   {
     ExpRun rFound(-1, -1);
     int nFound = 0;
@@ -275,20 +273,21 @@ namespace Belle2 {
 
 
 
-  vector<map<ExpRun, pair<double, double>>> breaks2intervalsSep(const map<ExpRun, pair<double, double>>& runsMap,
-      const vector<Atom>& currVec, const vector<int>& breaks)
+  std::vector<std::map<ExpRun, std::pair<double, double>>> breaks2intervalsSep(const std::map<ExpRun, std::pair<double, double>>&
+      runsMap,
+      const std::vector<Atom>& currVec, const std::vector<int>& breaks)
   {
-    vector<map<ExpRun, pair<double, double>>> splitsNow(breaks.size() + 1);
+    std::vector<std::map<ExpRun, std::pair<double, double>>> splitsNow(breaks.size() + 1);
     for (int i = 0; i < int(breaks.size()) + 1; ++i) {
       int s, e;
-      tie(s, e) = getStartEndIndexes(currVec.size(), breaks, i);
+      std::tie(s, e) = getStartEndIndexes(currVec.size(), breaks, i);
 
       // loop over atoms in single calib interval
       for (int k = s; k <= e; ++k) {
         ExpRun r = getRun(runsMap, (currVec[k].t1 + currVec[k].t2) / 2.); //runexp of the atom
         if (splitsNow[i].count(r)) { //if already there
-          splitsNow[i].at(r).first  = min(splitsNow[i].at(r).first, currVec[k].t1);
-          splitsNow[i].at(r).second = max(splitsNow[i].at(r).second, currVec[k].t2);
+          splitsNow[i].at(r).first  = std::min(splitsNow[i].at(r).first, currVec[k].t1);
+          splitsNow[i].at(r).second = std::max(splitsNow[i].at(r).second, currVec[k].t2);
         } else { //if new
           splitsNow[i][r].first  = currVec[k].t1;
           splitsNow[i][r].second = currVec[k].t2;
@@ -300,16 +299,16 @@ namespace Belle2 {
   }
 
   //Merge two intervals together
-  map<ExpRun, pair<double, double>> Splitter::mergeIntervals(map<ExpRun, pair<double, double>> I1,
-                                                             map<ExpRun, pair<double, double>> I2)
+  std::map<ExpRun, std::pair<double, double>> Splitter::mergeIntervals(std::map<ExpRun, std::pair<double, double>> I1,
+                                           std::map<ExpRun, std::pair<double, double>> I2)
   {
-    map<ExpRun, pair<double, double>>  I = I1;
+    std::map<ExpRun, std::pair<double, double>>  I = I1;
     for (auto r : I2) {
       ExpRun run = r.first;
       if (I.count(run) == 0)
         I[run] = r.second;
       else {
-        I.at(run) = make_pair(min(I1.at(run).first, I2.at(run).first),   max(I1.at(run).second, I2.at(run).second));
+        I.at(run) = std::make_pair(std::min(I1.at(run).first, I2.at(run).first),   std::max(I1.at(run).second, I2.at(run).second));
       }
     }
     return I;

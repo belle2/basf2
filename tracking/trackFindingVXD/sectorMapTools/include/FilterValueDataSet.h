@@ -150,9 +150,9 @@ namespace Belle2 {
     {
       for (auto name : filterNames) {
         m_values.insert({name, std::numeric_limits<double>::max()});
-        B2DEBUG(60, "FilterValueDataSet::constructor: filterName " << name << " has been added.");
+        B2DEBUG(26, "FilterValueDataSet::constructor: filterName " << name << " has been added.");
       }
-      B2DEBUG(50, "FilterValueDataSet::constructor: " << m_values.size() << " filters have been added.");
+      B2DEBUG(25, "FilterValueDataSet::constructor: " << m_values.size() << " filters have been added.");
     }
 
     /** for given filterName a value is set. if filterName does not exist, an error is produced and nothing gets stored. */

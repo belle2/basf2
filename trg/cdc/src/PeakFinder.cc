@@ -65,8 +65,7 @@ namespace Belle2 {
           if (n < threshold) continue;
           candidates[nActive] = hp.serialId(i, j);
           ++nActive;
-        }
-      else
+        } else
         for (unsigned z = hp.nX(); z > 0 ; --z) {
           //...Threshold check...
           unsigned i = 0;

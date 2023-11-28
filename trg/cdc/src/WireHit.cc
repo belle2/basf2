@@ -78,7 +78,7 @@ namespace Belle2 {
   }
 
   void*
-  TRGCDCWireHit::operator new(size_t size)
+  TRGCDCWireHit::operator new (size_t size)
   {
     void* p = malloc(size);
     _all.push_back(static_cast<TRGCDCWireHit*>(p));
@@ -91,7 +91,7 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCWireHit::operator delete(void* t)
+  TRGCDCWireHit::operator delete (void* t)
   {
     for (vector<TRGCDCWireHit*>::iterator it = _all.begin();
          it != _all.end();

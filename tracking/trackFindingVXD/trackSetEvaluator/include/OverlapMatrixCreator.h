@@ -35,7 +35,7 @@ namespace Belle2 {
     {
       //Loop over all the hits and make corresponding connections for the tracks
       //This yields unordered indices of tracks, one for each shared hit.
-      for (auto && tracks : m_hitRelatedTracks) {
+      for (auto&& tracks : m_hitRelatedTracks) {
         for (unsigned short ii = 0; ii < tracks.size(); ii++) {
           for (unsigned short jj = ii + 1; jj < tracks.size(); jj++) {
             m_overlapMatrix[tracks[ii]].push_back(tracks[jj]);
@@ -51,7 +51,7 @@ namespace Belle2 {
       if (allowedOverlaps) {
         std::vector <unsigned short> overlapChache;
 
-        for (auto && overlapTracks : m_overlapMatrix) {
+        for (auto&& overlapTracks : m_overlapMatrix) {
           std::sort(overlapTracks.begin(), overlapTracks.end());
 
           auto endIter    = overlapTracks.end();
@@ -72,7 +72,7 @@ namespace Belle2 {
       //sort and erase duplicate overlaps
       //TODO: Check in realistic situation alternative approach:
       //see http://stackoverflow.com/questions/1041620/whats-the-most-efficient-way-to-erase-duplicates-and-sort-a-vector
-      for (auto && overlapTracks : m_overlapMatrix) {
+      for (auto&& overlapTracks : m_overlapMatrix) {
         std::sort(overlapTracks.begin(), overlapTracks.end());
         overlapTracks.erase(std::unique(overlapTracks.begin(), overlapTracks.end()), overlapTracks.end());
       }

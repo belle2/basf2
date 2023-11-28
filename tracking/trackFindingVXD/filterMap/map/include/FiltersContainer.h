@@ -80,7 +80,7 @@ namespace Belle2 {
 
 
     /** assigns filters. The ownership of filters is taken by FiltersContainer! */
-    void assignFilters(const std::string& setupName ,
+    void assignFilters(const std::string& setupName,
                        VXDTFFilters<point_t>* filters)
     {
       // case there is already a filter with this name in the container, we delete that filter!

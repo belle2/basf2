@@ -1,0 +1,42 @@
+# EventType: 1211552100
+# Descriptor: [B+ -> J/psi [-> e+ e-] pi+ pi0 [-> gamma gamma] K_S0 [-> pi+ pi-]]
+# NickName: Bu_JpsipiKS_ee
+# Documentation: B -> charmonium decays.
+# Tested: Yes
+# PhysicsWG: Charmonium
+# Responsible: Kirill Chilikin
+# Email: chilikin@lebedev.ru
+# Cuts: None
+# Date: 20220601
+#
+# This decay model is intended for phase-space-dependent efficiency
+# determination. All exclusive decays have the PHSP distributuion.
+# Do not use it for one-dimensional analyses without proper reweighting.
+
+Alias pi0sig pi0
+Alias K_S0sig K_S0
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.0 J/psisig pi+ pi0sig K_S0sig PHOTOS PHSP;
+Enddecay
+
+CDecay B-sig
+
+Decay J/psisig
+1.0 e+ e- PHOTOS PHSP;
+Enddecay
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+
+Decay K_S0sig
+1.0 pi+ pi- PHOTOS PHSP;
+Enddecay
+
+End

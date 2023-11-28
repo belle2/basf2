@@ -8,7 +8,6 @@
 
 #include <framework/database/DBStoreEntry.h>
 #include <framework/database/DBAccessorBase.h>
-#include <framework/database/IntraRunDependency.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
 #include <iomanip>
@@ -33,6 +32,7 @@ namespace {
 namespace Belle2 {
   DBStoreEntry DBStoreEntry::fromObject(const std::string& name, const TObject* obj, bool isRequired)
   {
+    assert(obj);
     bool isArray = dynamic_cast<const TClonesArray*>(obj) != nullptr;
     TClass* objClass = isArray ? (dynamic_cast<const TClonesArray*>(obj)->GetClass()) : (obj->IsA());
     return DBStoreEntry(c_Object, name, objClass, isArray, isRequired);

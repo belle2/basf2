@@ -27,7 +27,7 @@ A helix is described by 5 parameters, computed at the point of closest approach 
 .. [#] the charge of the particle is determined by the track fit.
 
 The momentum :math:`\vec{p}_{\rm POCA}` and position :math:`\vec{x}_{\rm POCA}` of the track are univocally determined by the 5 track parameters.
-When tracks are used in analysis, *e.g.* when you look for primary and secondary vertices, they are represented by the perfect helix at the POCA. 
+When tracks are used in analysis, *e.g.* when you look for primary and secondary vertices, they are represented by the perfect helix at the POCA.
 
 Additional Details
 ^^^^^^^^^^^^^^^^^^
@@ -46,8 +46,8 @@ Since most of the tracks (with the exception of the daughters of long-lived part
 The POCA is therefore the most convenient point to compute the 5 helix parameters for the physics analysis.
 
 3) Tracks that are created outside the beam pipe need a different treatment as the extrapolated helix to the POCA is not a good representation
-of their trajectory. For this reason we have the :ref:`V0 Finder<tracking_v0Finding>`, a dedicated module that 
-looks for vertices outside the beam pipe, and stores the track parameters at the point of closest approach to the vertex. 
+of their trajectory. For this reason we have the :ref:`V0 Finder<tracking_v0Finding>`, a dedicated module that
+looks for vertices outside the beam pipe, and stores the track parameters at the point of closest approach to the vertex.
 This module improves the reconstruction of the so-called long-lived particles: :math:`K_S`, :math:`\Lambda` and photon conversions.
 
 .. note::

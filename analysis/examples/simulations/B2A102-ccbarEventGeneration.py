@@ -28,9 +28,9 @@
 ##########################################################################
 
 import basf2 as b2
-import modularAnalysis as ma
-import reconstruction as re
-import generators as ge
+from modularAnalysis import setupEventInfo
+from mdst import add_mdst_output
+from generators import add_inclusive_continuum_generator
 
 # Defining one path
 my_path = b2.create_path()
@@ -39,13 +39,13 @@ my_path = b2.create_path()
 # e+e- -> ccbar -> D*+ anything
 # D*+ -> D0 pi+; D0 -> K- pi+
 #
-ma.setupEventInfo(100, path=my_path)
-ge.add_inclusive_continuum_generator(finalstate="ccbar",
-                                     particles=["D*+"],
-                                     userdecfile=b2.find_file('analysis/examples/simulations/B2A102-ccbarEventGeneration.dec'),
-                                     path=my_path)
+setupEventInfo(100, path=my_path)
+add_inclusive_continuum_generator(finalstate="ccbar",
+                                  particles=["D*+"],
+                                  userdecfile=b2.find_file('analysis/examples/simulations/B2A102-ccbarEventGeneration.dec'),
+                                  path=my_path)
 
-re.add_mdst_output(mc=True, filename='B2A102-ccbarEventGeneration-kkmc.root', path=my_path)
+add_mdst_output(mc=True, filename='B2A102-ccbarEventGeneration-kkmc.root', path=my_path)
 
 # Process the events
 b2.process(my_path)

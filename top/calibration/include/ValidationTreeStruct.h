@@ -30,6 +30,12 @@ namespace Belle2 {
       int numActiveCalibrated[c_numModules] = {0}; /**< number of active calibrated channels, index = slot - 1 */
       float thrEffi[c_numModules] = {0}; /**< threshold efficiency: average over active calibrated channels, index = slot - 1 */
       float asicShifts[4] = {0}; /**< carrier shifts of BS13d, index = carrier number */
+      float svdOffset = 0; /**< SVD event T0 offset */
+      float svdSigma = 0; /**< SVD event T0 resolution */
+      float cdcOffset = 0; /**< CDC event T0 offset */
+      float cdcSigma = 0; /**< CDC event T0 resolution */
+      float fillPatternOffset = 0; /**< fill pattern offset */
+      float fillPatternFraction = 0; /**< fraction of reconstructed buckets matched with filled ones */
       int numMerged = 0; /**< number of merged entries */
 
       /**

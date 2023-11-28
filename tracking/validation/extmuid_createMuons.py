@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +19,7 @@
 """
 <header>
     <output>muon-ExtMuidValidation.root</output>
-    <contact>depietro@infn.it</contact>
+    <contact>piilonen@vt.edu</contact>
     <description>Create events with 1 muon track for ext/muid validation.</description>
 </header>
 """
@@ -42,9 +41,6 @@ path = b2.create_path()
 eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 path.add_module(eventinfosetter)
-
-progress = b2.register_module('Progress')
-path.add_module(progress)
 
 pgun = b2.register_module('ParticleGun')
 param_pgun = {
@@ -78,6 +74,7 @@ output = b2.register_module('RootOutput')
 output.param('outputFileName', output_filename)
 output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'KLMHit2ds'])
 path.add_module(output)
+path.add_module('Progress')
 
 b2.process(path)
 print(b2.statistics)

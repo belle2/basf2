@@ -6,14 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* Basf2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/LogSystem.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* C++ headers. */
 #include <iostream>
 
 using namespace Belle2;
@@ -60,7 +66,7 @@ int main()
   /*
    float calib = 0.;
    float calibUnc = 0.;
-   for (int cellID = 1; cellID <= 8736; cellID++) {
+   for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
    tempCalib.push_back(calib);
    tempCalibUnc.push_back(calibUnc);
    } */
@@ -68,7 +74,7 @@ int main()
   /** Sample code to read text file of values */
   /* std::ifstream calibFile("refref1.txt");
    float cellIDf, amplitude, toff;
-   for(int cellID=1; cellID<=8736; cellID++) {
+   for(int cellID=1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
    calibFile >> cellIDf >> amplitude >> toff;
    if(cellID<=1152) {
    calib = 1.;
@@ -84,7 +90,7 @@ int main()
   /** Sample code to read in a histogram */
   /* TFile f("eclCosmicEAlgorithm.root");
    TH1F *CalibvsCrys = (TH1F*)f.Get("CalibvsCrys");
-   for(int cellID=1; cellID<=8736; cellID++) {
+   for(int cellID=1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
    if(cellID<1153) {
    calib = 4.06902e-05;
    calibUnc = 0.;

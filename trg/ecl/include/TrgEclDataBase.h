@@ -42,7 +42,7 @@ namespace Belle2 {
     //! Make Fitter Coefficients from Signal PDF and Noise covariance metrix
     void MakeFitterCoefficient(const std::vector<int>&, std::vector<int>);
     //! Util to interpalate Signal Shape
-    double interFADC(double , std::vector<int>);
+    double interFADC(double, std::vector<int>);
 
   private:
     /** Amplitude Coefficient */

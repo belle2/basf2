@@ -14,10 +14,9 @@
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/rawdata/RawData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace Belle2::KLM;
 
@@ -31,7 +30,7 @@ KLMUnpackerModule::KLMUnpackerModule() : Module(),
   setDescription("KLM unpacker (creates KLMDigits from RawKLM).");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("outputKLMDigitsName", m_outputKLMDigitsName,
-           "Name of KLMDigit store array.", string(""));
+           "Name of KLMDigit store array.", std::string(""));
   addParam("WriteDigitRaws", m_WriteDigitRaws,
            "Record raw data in dataobject format (e.g. for debugging).", false);
   addParam("WriteWrongHits", m_WriteWrongHits,
@@ -115,8 +114,14 @@ void KLMUnpackerModule::createDigit(
      * trigger ctime.
      */
     klmDigitEventInfo->increaseSciHits();
-    double time = m_Time->getScintillatorTime(
-                    raw->getCTime(), klmDigitEventInfo->getTriggerCTime());
+    double time;
+    if (raw->getType() == 0x4) { // old firmware has ~8ns time resolution
+      time = m_Time->getScintillatorTime(raw->getCTime(), 0,
+                                         klmDigitEventInfo->getTriggerCTime());
+    } else { // new firmware has ~1ns time resolution
+      time = m_Time->getScintillatorTime(raw->getCTime(), raw->getTDC(),
+                                         klmDigitEventInfo->getTriggerCTime());
+    }
     klmDigit->setTime(time);
     KLMChannelNumber channelNumber = m_ElementNumbers->channelNumber(subdetector, section, sector, layer, plane, strip);
     const KLMScintillatorFEEData* FEEData =
@@ -197,7 +202,7 @@ void KLMUnpackerModule::unpackKLMDigit(
       /*
        * Multiple-strip hit. It is necessary to find matching detector channels
        * for all DAQ channels, because all channels in the group may not
-       * be necessary connected to strips in case of BKLM.
+       * be necessarily connected to strips in BKLM.
        */
       bool firstMatchedChannel = true;
       for (int channel = channelGroup.firstChannel;
@@ -238,7 +243,7 @@ void KLMUnpackerModule::unpackKLMDigit(
     if (!(m_WriteWrongHits || m_DebugElectronicsMap))
       return;
     /*
-     * Try to find channel from the same plane.
+     * Try to find channel from the same scintillator plane.
      * BKLM phi-plane channels may start from 3 or 5.
      */
     electronicsChannel.setChannel(5);

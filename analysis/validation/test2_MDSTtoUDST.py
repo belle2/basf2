@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -32,6 +31,7 @@ input.param('inputFileName', '../DSTtoMDST.mdst.root')
 main.add_module(input)
 outputUdst('../MDSTtoUDST.udst.root', path=main)
 
+main.add_module('Progress')
 basf2.process(main)
 
 # Print call statistics

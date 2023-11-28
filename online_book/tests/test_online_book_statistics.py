@@ -29,7 +29,9 @@ statistics_script = this_dir.parent / "online_book_statistics.py"
 
 
 class Test(unittest.TestCase):
+    """Test case for online book statistics"""
     def test(self):
+        """Check that statistics creation works"""
         subprocess.call(["python3", str(statistics_script.resolve())])
 
 

@@ -27,7 +27,8 @@ main.add_module(
   'DQMHistAnalysisInputRootFile', SelectHistograms=['SVDDose*'],
   FileList=args.files, RunList=[args.run] * len(args.files),
   EventsList=[args.nevt] * len(args.files), Experiment=args.exp,
-  EventInterval=1, NullHistogramMode=False, AutoCanvas=False)
+  EventInterval=1, NullHistogramMode=False)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 # Analysis module
 main.add_module(
   'DQMHistAnalysisSVDDose', logLevel=b2.LogLevel.DEBUG, debugLevel=19,

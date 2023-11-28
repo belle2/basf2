@@ -1,0 +1,28 @@
+# EventType: 1250310001   
+# Descriptor: [B+ -> rho0 tau nu ]cc
+# NickName: Bu_rho0taunu
+# Documentation: with generic tau decays
+# Tested: YES
+# PhysicsWG: SL
+# Responsible: Karol Adamczyk, Anja Novosel
+# Email: karol.adamczyk@ijs.si, anja.novosel@ijs.si
+# Cuts: None
+# Date: 20220627
+
+# Turn on PHOTOS for all decays
+yesPhotos
+
+Decay Upsilon(4S)
+0.5 B+sig  B-                          VSS;
+0.5 B-sig B+                          VSS;
+Enddecay
+
+
+Decay B+sig
+0.000084530   rho0   tau+    nu_tau      BCL -0.86 1.43 0.26 0.38 0.16 0.29 0.72 0.37 0.33 -0.87 1.88; # fit results for BCL expansion coefficients from (2104.05739)
+Enddecay
+CDecay B-sig
+
+#
+End
+

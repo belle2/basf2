@@ -77,12 +77,12 @@ CalibrationAlgorithm::EResult PXDAnalyticGainCalibrationAlgorithm::calibrate()
   if (cluster_counter->GetEntries() < int(safetyFactor * minClusters * nSensors * nBinsU * nBinsV)) {
     if (not forceContinue) {
       B2WARNING("Not enough Data: Only " <<  cluster_counter->GetEntries() << " hits were collected but " << int(
-                  safetyFactor * minClusters *
+                  safetyFactor * minClusters*
                   nSensors * nBinsU * nBinsV) << " needed!");
       return c_NotEnoughData;
     } else {
       B2WARNING("Continue despite low statistics: Only " <<  cluster_counter->GetEntries() << " hits were collected but" << int(
-                  safetyFactor * minClusters *
+                  safetyFactor * minClusters*
                   nSensors * nBinsU * nBinsV) << " would be desirable!");
     }
   }

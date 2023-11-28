@@ -26,7 +26,7 @@ using namespace Belle2::CDC;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(CDCTrigger2DFinder)
+REG_MODULE(CDCTrigger2DFinder);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -110,7 +110,7 @@ CDCTrigger2DFinderModule::CDCTrigger2DFinderModule() : Module()
 
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
-           "subsequent clones." , false);
+           "subsequent clones.", false);
 }
 
 void
@@ -184,7 +184,7 @@ CDCTrigger2DFinderModule::event()
     phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
     double r = radius[iSL][int(m_usePriority &&
                                m_segmentHits[iHit]->getPriorityPosition() < 3)];
-    TVector2 pos(cos(phi) / r, sin(phi) / r);
+    ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
     hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
   }
 

@@ -71,7 +71,7 @@ void ROIpayload::setTriggerNumber(unsigned long int triggerNumber)
   m_data32[OFFSET_TRIGNR] = htonl(triggerNumber);
 };
 
-void ROIpayload::setRunSubrunExpNumber(int run , int subrun , int exp)
+void ROIpayload::setRunSubrunExpNumber(int run, int subrun, int exp)
 {
   int rseNumber;
   rseNumber = (exp & 0x3FF) << 22 | (run & 0x3FFF) << 8 | (subrun & 0xFF) ;

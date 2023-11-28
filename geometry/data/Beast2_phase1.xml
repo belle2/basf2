@@ -20,8 +20,8 @@
   <xi:include href="../top/TOP-Materials.xml"/>
   <xi:include href="../arich/ARICH-Materials.xml"/>
   <xi:include href="../ecl/ECL-Materials.xml"/>
-  <xi:include href="../klm/bklm/BKLM-Materials.xml"/>
-  <xi:include href="../klm/eklm/EKLMMaterials.xml"/>
+  <xi:include href="../klm/BKLMMaterials.xml"/>
+  <xi:include href="../klm/EKLMMaterials.xml"/>
 
   <xi:include href="../beast/bgo/BGO-Materials.xml"/>
   <xi:include href="../beast/microtpc/MICROTPC-Materials.xml"/>

@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <string>
 
 #ifdef _BELLE2_EPICS
@@ -25,7 +25,7 @@
 namespace Belle2 {
   /*! Write DQM Histogram Content to EPICS Arrays */
 
-  class DQMHistOutputToEPICSModule : public DQMHistAnalysisModule {
+  class DQMHistOutputToEPICSModule final : public DQMHistAnalysisModule {
 
 #ifdef _BELLE2_EPICS
     typedef struct {
@@ -85,7 +85,7 @@ namespace Belle2 {
     /** Parameter list for histograms */
     std::vector< std::vector<std::string>> m_histlist;
 
-    /** Flag to mark that a new runs as started anddata not copied to last PV */
+    /** Flag to mark that a new runs as started and data not copied to last PV */
     bool m_dirty = false;
 
 #ifdef _BELLE2_EPICS

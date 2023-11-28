@@ -26,6 +26,7 @@ Wrappers have one of the following granularity:
 #. strip granularity: one value/payload per strip
 #. sensor-side granularity: one value/payload per sensor side
 #. detector granularity: one value/payload for all sensors
+#. sensor-on-ladder granularity: one value/payload per sensor side integrated over all ladders
 
 
 .. warning:
@@ -46,6 +47,27 @@ In simulation, sensors are grouped by type (L3, origami, backward, forward) and 
 	       #. coupling constants: describe the charge sharing among implants up to readout-to-next-to-next-to-floating
 
 Check `ChargeSimulation@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDChargeSimulationCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **4** is used for experiment 0 and 1003.
+
+
+.. _svdfudgeposition:
+
+.. cpp:class:: SVDMCClusterPositionFudgeFactor
+
+	       Parameter to fudge position reconstruction in simulation, to match resolution measured in data, with sensor-side granularity_:
+
+	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster position, depends on the track incident angle
+
+Check `MCPositionFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterPositionFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **5** is used for experiment 0 and 1003.
+
+.. _svdfudgetime:
+
+.. cpp:class:: SVDMCClusterTimeFudgeFactor
+
+	       Parameter to fudge time reconstruction in simulation, to match resolution measured in data, with sensor-side granularity_:
+
+	       #. fudge factor: width of the gaussian from which we draw a random number to be added to the reconstructed cluster time
+
+Check `MCTimeFudge@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDMCClusterTimeFudgeFactor&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003, and run-dependent MC.
 
 The local calibrations wrappers  :ref:`SVDNoiseCalibrations<svdnoisecal>`, :ref:`SVDPulseShapeCalibrations<svdpulsecal>` and :ref:`SVDFADCMaskedStrips<svdmaskedcal>` are also used in the digitizer.
 
@@ -97,13 +119,22 @@ Check `LocalConfig@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDLocalConfig
 Reconstruction Calibrations
 ---------------------------
 
+
+.. _svdrecoconfiguration:
+
+.. cpp:class:: SVDRecoConfiguration
+
+	       Stores SVDRecoConfiguration (time, position, charge, etc), with detector granularity_
+
+   Check `SVDRecoConfiguration@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDRecoConfiguration&perpage=25&>`_ all revisions available in the Conditions Database. Revision **10** is used for experiment 0 (with grouping module turned ON), revision **11** is used for experiment 1002/3/4.
+
 .. _svdcogonlyerr:
 
 .. cpp:class:: SVDCoGOnlyPositionError
 
 	       Stores the position error formulas for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
-Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **2** is used for exp 0, 1003 and data reconstruction.
+Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPositionError&perpage=25&>`_ all revisions available in the Conditions Database.  Revision **5** is used for exp 0, 1003 and data reconstruction.
 
 .. _svdcogonlycal:
 
@@ -112,6 +143,7 @@ Check `CoGOnlyErr@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyPosit
 	       Stores the position error scaling factors for the ``CoGOnly`` algorithm, with the same granularity_ as simulation objects
 
 Check `CoGOnlySF@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDCoGOnlyErrorScaleFactors&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** (scale factors = 1) is used for exp 0, 1003 and data reconstruction.
+While revision **6** (scale factors != 1) is used for data.
 
 .. _svdolddefaultcal:
 
@@ -147,6 +179,14 @@ Check `HitTimeSelection@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDHitTim
 
 	       wrapper with the hot strips as determined by ``SVDHotStripFinder``, strip granularity_
 
+.. _svdtimegroupingconfiguration:
+
+.. cpp:class:: SVDTimeGroupingConfiguration
+
+	       Stores parameters used in SVDTimeGrouping module, with detector granularity_
+
+   Check `SVDTimeGroupingConfiguration@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDTimeGroupingConfiguration&perpage=25&>`_ all revisions available in the Conditions Database. Revision **3** is used for experiment 0 and 1003/4, revision **4** is calculated from *Exp24-Run1726* and should be used for data.
+
 
 Time Calibrations
 -----------------
@@ -175,3 +215,11 @@ Check `CoG3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleCoGTime
 	       ELS3 Time calibration wrapper, with sensor-side granularity_
 
 Check `ELS3Time@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVD3SampleELSTimeCalibrations&perpage=25&>`_ all revisions available in the Conditions Database. Revision **2** is used for experiment 0 and 1003, revision **1** correspond to no calibration.
+
+.. _svdclustertimeshifter:
+
+.. cpp:class:: SVDClusterTimeShifter
+
+	       Time shift adjustment depending on cluster-size, with sensor-on-ladder granularity_
+
+   Check `SVDClusterTimeShifter@CDB <https://cdbweb.sdcc.bnl.gov/Payload?basf2=SVDClusterTimeShifter&perpage=25&>`_ all revisions available in the Conditions Database. Revision **1** is used for experiment 0 and 1002/3/4 which corresponds to no shift, revision **3** is calculated from *Exp24,Run1726* and should only be used for data.

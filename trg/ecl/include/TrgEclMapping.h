@@ -10,7 +10,7 @@
 #define TRGECLTCMAPPING_FLAG_
 
 #include <vector>
-#include "TVector3.h"
+#include <Math/Vector3D.h>
 //
 //
 //
@@ -42,9 +42,9 @@ namespace Belle2 {
     /** get [TC Phi ID] from [TC ID] */
     int getTCPhiIdFromTCId(int);
     /**TC position (cm)*/
-    TVector3 getTCPosition(int);
+    ROOT::Math::XYZVector getTCPosition(int);
     /** Get TC from FAM # and Channel #*/
-    int getTCIdFromFAMChannel(int , int);
+    int getTCIdFromFAMChannel(int, int);
     /** Get FAM # and Channel # from TC Id*/
     std::vector<int> getFAMChannelFromTCId(int);
     //! get TCId from phi and theta position(LSB = 1.4)

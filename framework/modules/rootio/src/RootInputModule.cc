@@ -89,6 +89,11 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "Bitmask of error flags to silently discard without raising a WARNING. Should be a combination of the ErrorFlags defined "
            "in the EventMetaData. No Warning will be issued when discarding an event if the error flag consists exclusively of flags "
            "present in this mask", m_discardErrorMask);
+
+  addParam("isSecondaryInput", m_isSecondaryInput,
+           "When using a second RootInputModule in an independent path [usually if you are using add_independent_merge_path(...)] "
+           "this has to be set to true",
+           false);
 }
 
 RootInputModule::~RootInputModule() = default;
@@ -285,7 +290,7 @@ void RootInputModule::initialize()
     m_tree = nullptr; //don't try to read from there
   } else {
     InputController::setCanControlInput(true);
-    InputController::setChain(m_tree);
+    InputController::setChain(m_tree, m_isSecondaryInput);
   }
 
   if (m_parentLevel > 0) {
@@ -301,7 +306,7 @@ void RootInputModule::initialize()
   //   * no -n or process(path, N) with N <= the number of entries in our files
   unsigned int maxEvent = Environment::Instance().getNumberEventsOverride();
   m_processingAllEvents &= m_skipNEvents == 0 && m_entrySequences.size() == 0;
-  m_processingAllEvents &= (maxEvent == 0 || maxEvent >= InputController::numEntries());
+  m_processingAllEvents &= (maxEvent == 0 || maxEvent >= InputController::numEntries(m_isSecondaryInput));
 
   if (!m_skipToEvent.empty()) {
     // Skipping to some specific event is also not processing all events ...
@@ -322,6 +327,12 @@ void RootInputModule::initialize()
     }
   }
 
+  // Tell the InputController which event will be processed first
+  // (important if we want to do event mixing and skip some events in the input)
+  if (m_nextEntry > 0) {
+    InputController::setSkippedEntries(m_nextEntry, m_isSecondaryInput);
+  }
+
   // Processing everything so forward number of MC events
   if (m_processingAllEvents) {
     Environment::Instance().setNumberOfMCEvents(sumInputMCEvents);
@@ -337,9 +348,12 @@ void RootInputModule::event()
     return;
 
   while (true) {
-    const long nextEntry = InputController::getNextEntry();
-    if (nextEntry >= 0 && nextEntry < InputController::numEntries()) {
-      B2INFO("RootInput: will read entry " << nextEntry << " next.");
+    const long nextEntry = InputController::getNextEntry(m_isSecondaryInput);
+    if (nextEntry >= 0 && nextEntry < InputController::numEntries(m_isSecondaryInput)) {
+      // don't show this message if we are doing event merging, as it will pop up twice for every event
+      if (!InputController::getEventMerging()) {
+        B2INFO("RootInput: will read entry " << nextEntry << " next.");
+      }
       m_nextEntry = nextEntry;
     } else if (InputController::getNextExperiment() >= 0 && InputController::getNextRun() >= 0
                && InputController::getNextEvent() >= 0) {
@@ -354,7 +368,7 @@ void RootInputModule::event()
                 InputController::getNextExperiment() << ") in file! Loading entry " << m_nextEntry << " instead.");
       }
     }
-    InputController::eventLoaded(m_nextEntry);
+    InputController::eventLoaded(m_nextEntry, m_isSecondaryInput);
 
     readTree();
     m_nextEntry++;
@@ -569,6 +583,7 @@ bool RootInputModule::connectBranches(TTree* tree, DataStore::EDurability durabi
 bool RootInputModule::createParentStoreEntries()
 {
   // get the experiment/run/event number and parentLfn of the first entry
+  assert(m_tree);
   TBranch* branch = m_tree->GetBranch("EventMetaData");
   char* address = branch->GetAddress();
   EventMetaData* eventMetaData = nullptr;

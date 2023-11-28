@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,10 +12,8 @@ import basf2
 import basf2_mva
 import unittest
 import unittest.mock
+import b2test_utils
 import os
-import tempfile
-import atexit
-import shutil
 import ROOT
 
 import b2bii
@@ -240,7 +237,7 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleLoader', decayStrings=['Lambda0:V0 -> p+ pi-'], writeOut=True)
         path.add_module('ParticleLoader', decayStrings=['gamma:V0 -> e+ e-'], addDaughters=True, writeOut=True)
         hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
-                          for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
+                          for pdgcode in {11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111}]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
                         fileName='Monitor_FSPLoader.root')
@@ -300,7 +297,7 @@ class TestFSPLoader(unittest.TestCase):
         path.add_module('ParticleListManipulator', outputListName='gamma:V0', inputListNames=['gamma:v0mdst'], writeOut=True)
         path.add_module('ParticleCopier', inputListNames=['gamma:V0'])
         hist_variables = [(f'NumberOfMCParticlesInEvent({pdgcode})', 100, -0.5, 99.5)
-                          for pdgcode in set([11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111])]
+                          for pdgcode in {11, 321, 211, 13, 22, 310, 2212, 130, 3122, 111}]
         path.add_module('VariablesToHistogram', particleList='',
                         variables=hist_variables,
                         fileName='Monitor_FSPLoader.root')
@@ -1020,7 +1017,7 @@ class TestGetPath(unittest.TestCase):
         f = ROOT.TFile('mcParticlesCount.root', 'RECREATE')
         f.cd()
 
-        for pdgnumber in set([abs(pdg.from_name(particle.name)) for particle in particles]):
+        for pdgnumber in {abs(pdg.from_name(particle.name)) for particle in particles}:
             hist = ROOT.TH1F(f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc",
                              f"NumberOfMCParticlesInEvent__bo{pdgnumber}__bc", 11, -0.5, 10.5)
             for i in range(10):
@@ -1216,12 +1213,8 @@ class TestGetPath(unittest.TestCase):
 
 
 if __name__ == '__main__':
-
-    tempdir = tempfile.mkdtemp()
-    os.chdir(tempdir)
-    basf2.conditions.testing_payloads = ['localdb/database.txt']
-    # main() never returns, so install exit handler to do our cleanup
-    atexit.register(shutil.rmtree, tempdir)
-    unittest.main()
+    with b2test_utils.clean_working_directory():
+        basf2.conditions.testing_payloads = ['localdb/database.txt']
+        unittest.main()
 
 # @endcond

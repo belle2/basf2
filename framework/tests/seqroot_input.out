@@ -2141,11 +2141,6 @@ Trying 10-max.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
 [ERROR] SeqFile::read() buffer too small, need at least 2147483647 bytes
 [FATAL] SeqRootInput : Error in reading first event
-Trying 11-no-permission.sroot ...
-[INFO] Starting event processing, random seed is set to 'something important'
-[WARNING] SeqFile: error opening '11-no-permission.sroot': Permission denied, trying again with '.gz'
-[ERROR] SeqFile: error opening '11-no-permission.sroot': No such file or directory
-[FATAL] SeqRootInput : Error in opening input file : 11-no-permission.sroot
 Trying nosuchfile.sroot ...
 [INFO] Starting event processing, random seed is set to 'something important'
 [WARNING] SeqFile: error opening 'nosuchfile.sroot': No such file or directory, trying again with '.gz'

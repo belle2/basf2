@@ -40,7 +40,6 @@ namespace Belle2 {
      * Constructor to access an object in the DBStore which is not a ROOT Object.
      * @param type       should be one of c_RootFile or c_RawFile.
      * @param name       Name under which the object is stored in the database (and DBStore).
-     * @param isArray    Flag that indicates whether this is a single object or a TClonesArray.
      * @param isRequired If true emit errors if the object cannot be found in the Database
      */
     DBAccessorBase(DBStoreEntry::EPayloadType type, const std::string& name, bool isRequired):
@@ -143,6 +142,15 @@ namespace Belle2 {
 
     /** Get the filename this object is loaded from */
     const std::string& getFilename() const { ensureAttached(); return m_entry->getFilename(); }
+
+    /** Check wether this conditions object has some intra-run dependencies. */
+    bool isIntraRunDependent() const { ensureAttached(); return m_entry->isIntraRunDependent(); }
+
+    /**
+     * Get the intra-run boundaries, if any.
+     * If the intra-run dependency is by event number, the event numbers used as boundaries are returned.
+     */
+    const std::vector<unsigned int> getIntraRunBoundaries() const { ensureAttached(); return m_entry->getIntraRunBoundaries(); }
 
     /** Check whether this conditions object is required (at least one user declared it as required) */
     bool isRequired() const { ensureAttached(); return m_entry->isRequired(); }

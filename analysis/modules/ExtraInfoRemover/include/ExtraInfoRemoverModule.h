@@ -10,7 +10,7 @@
 #include <framework/core/Module.h>
 #include <string>
 
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {

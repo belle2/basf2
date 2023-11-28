@@ -9,6 +9,13 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <pxd/dataobjects/PXDCluster.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <tracking/dataobjects/MCParticleInfo.h>
+#include <vxd/dataobjects/VXDTrueHit.h>
+#include <genfit/TrackCand.h>
+
 #include <string>
 #include <TFile.h>
 #include <TList.h>
@@ -16,8 +23,6 @@
 #include <TH3F.h>
 #include <time.h>
 
-#include <tracking/dataobjects/MCParticleInfo.h>
-#include <vxd/dataobjects/VXDTrueHit.h>
 
 namespace Belle2 {
 
@@ -116,13 +121,21 @@ namespace Belle2 {
 
   private:
 
+    StoreArray<PXDCluster> m_PXDClusters; /**< PXDClusters StoreArray */
+    StoreArray<SVDCluster> m_SVDClusters; /**< SVDClusters StoreArray */
+    StoreArray<MCParticle> m_MCParticles; /**< MCParticles StoreArray */
+    StoreArray<genfit::TrackCand> m_GenfitMCTrackCands; /**< MC Genfit TrackCands StoreArray */
+    StoreArray<genfit::TrackCand> m_GenfitIdealMCTrackCands; /**< Ideal Genfit TrackCands StoreArray */
+
+    ROOT::Math::XYZVector m_magField; /**< magnetic field needed set particle info */
+
     /** Function to get semiplane.
      * @param vertex: Vertex position
      * @param center: center positon
      * @param hit: hit position
      * @return difference in y-slope between hit and semiplane
      */
-    double semiPlane(TVector3 vertex, TVector3 center, TVector3 hit);
+    double semiPlane(ROOT::Math::XYZVector vertex, ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
 
     /** Function to check if a omega value is in a given semiPlane.
      * @param semiPlane: slope of semiplane
@@ -136,7 +149,7 @@ namespace Belle2 {
      * @param hit: hit position
      * @return Distance between the two hits
      */
-    double theDistance(TVector3 center, TVector3 hit);
+    double theDistance(ROOT::Math::XYZVector center, ROOT::Math::XYZVector hit);
 
     /** Function to check if hitDistance is within a given annulus.
      * @param hitDistance: distance between two hits

@@ -56,6 +56,7 @@ add_simulation(main)
 main.add_module(register_module("Profile"))
 main.add_module("RootOutput", outputFileName="../KShortGenSimNoBkg.root")
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics

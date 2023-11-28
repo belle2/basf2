@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHHITMAPMAKER_H
-#define ARICHHITMAPMAKER_H
+#pragma once
 
 #include <TCanvas.h>
 #include <TH1F.h>
@@ -59,4 +57,3 @@ namespace Belle2 {
 
 } // Belle2 namespace
 
-#endif

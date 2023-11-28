@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichFillHits/ARICHFillHitsModule.h>
 
 // framework - DataStore
@@ -21,8 +21,6 @@
 #include <arich/dataobjects/ARICHHit.h>
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -62,10 +60,6 @@ namespace Belle2 {
     arichHits.registerInDataStore();
 
     arichHits.registerRelationTo(digits);
-  }
-
-  void ARICHFillHitsModule::beginRun()
-  {
   }
 
   void ARICHFillHitsModule::event()
@@ -154,20 +148,11 @@ namespace Belle2 {
 
   void ARICHFillHitsModule::magFieldCorrection(TVector3& hitpos)
   {
-    TVector3 Bfield = BFieldManager::getField(hitpos);
-    TVector3 shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(ROOT::Math::XYZVector(hitpos));
+    ROOT::Math::XYZVector shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());
   }
-
-  void ARICHFillHitsModule::endRun()
-  {
-  }
-
-  void ARICHFillHitsModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

@@ -7,6 +7,7 @@
  **************************************************************************/
 #pragma once
 #include <framework/geometry/BFieldManager.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/gearbox/Unit.h>
 #include <genfit/AbsBField.h>
 
@@ -30,7 +31,7 @@ public:
   TVector3 get(const TVector3& position) const override
   {
     static double conversion{1. / Belle2::Unit::kGauss};
-    return Belle2::BFieldManager::getField(position) * conversion;
+    return Belle2::B2Vector3D(Belle2::BFieldManager::getField(ROOT::Math::XYZVector(position)) * conversion);
   }
 };
 

@@ -11,6 +11,8 @@
 
 #include <gtest/gtest.h>
 
+#include <Math/Vector3D.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -260,9 +262,9 @@ namespace Belle2 {
       return fabs(expected - actual) < tolerance;
     }
 
-    /** Predicate checking that all three components of TVector3 are close by a maximal error of tolerance. */
+    /** Predicate checking that all three components of XYZVector are close by a maximal error of tolerance. */
     template<>
-    bool allNear<TVector3>(const TVector3& expected, const TVector3& actual, double tolerance);
+    bool allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected, const ROOT::Math::XYZVector& actual, double tolerance);
 
     /** Print function for the google test framework to print a TVector3 to an output stream */
     void PrintTo(const TVector3& tVector3, ::std::ostream& output);

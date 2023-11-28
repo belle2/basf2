@@ -13,7 +13,7 @@
 #include <vector>
 #include <utility>
 #include <math.h>
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 
 namespace Belle2 {
 
@@ -53,7 +53,8 @@ namespace Belle2 {
        * @param norm window surface normal (pointing out of prism)
        * @param slanted slanted surface normal
        */
-      UnfoldedWindow(const TVector2& orig, const TVector2& dir, const TVector2& norm, const TVector2& slanted);
+      UnfoldedWindow(const ROOT::Math::XYVector& orig, const ROOT::Math::XYVector& dir,
+                     const ROOT::Math::XYVector& norm, const ROOT::Math::XYVector& slanted);
     };
 
 
@@ -264,8 +265,9 @@ namespace Belle2 {
      * @param k index of the surface to start unfolding (0 or 1)
      * @param result the result of unfolding
      */
-    void reflect(const TVector2* points, const TVector2* normals,
-                 const TVector2& orig, const TVector2& surf, const TVector2& norm, const TVector2& slanted, int k,
+    void reflect(const ROOT::Math::XYVector* points, const ROOT::Math::XYVector* normals,
+                 const ROOT::Math::XYVector& orig, const ROOT::Math::XYVector& surf,
+                 const ROOT::Math::XYVector& norm, const ROOT::Math::XYVector& slanted, int k,
                  std::vector<UnfoldedWindow>& result) const;
 
     float m_exitThickness = 0; /**< thickness at PMT side */

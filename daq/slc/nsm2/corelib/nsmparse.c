@@ -66,11 +66,12 @@ static int nsmparse_alloccnt2 = 0;
 static void
 nsmparse_free(void *ptr)
 {
-  int32_t siz = *(int32_t *)((char *)ptr - 4);
   if (! ptr) {
     printf("nsmparse_free: freeing null pointer\n");
     exit(1);
   }
+
+  int32_t siz = *(int32_t *)((char *)ptr - 4);
   if (siz == 0) {
     printf("nsmparse_free: possible double free attempt\n");
     exit(1);
@@ -306,7 +307,7 @@ nsmparse_revision(const char *file, char *filebuf, const char *datname)
   char *p = filebuf;
   int num;
 
-  while (p = strstr(p, datname)) {
+  while ( (p = strstr(p, datname)) ) {
     if ((p == filebuf || ! isa_num(*(p-1))) &&
 	strncmp(p+len, "_revision", 9) == 0) {
       p += len + 9;
@@ -337,12 +338,10 @@ nsmparse_struct(char *filebuf, const char *datname)
 {
   int datlen = strlen(datname);
   char *p = filebuf;
-  char *structp = 0;
-  char *definep = 0;
 
   while (p) {
-    structp = strstr(p, "struct");
-    definep = strstr(p, "\n#define");
+    char *structp = strstr(p, "struct");
+    char *definep = strstr(p, "\n#define");
     
     if (definep && definep < structp) {
       int val;
@@ -453,7 +452,6 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 	      char *fmtout, int *fmtsiz)
 {
   char *ptr = start;
-  char *q = 0; /* temporary pointer */
   struct types_t { char *name; int siz; char sym; char type; };
   struct types_t *typep;
   static struct types_t types[] = {
@@ -476,11 +474,11 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
     { "uint8_t",  1, 'a', 'C' },
     { "double", 8, 'd', 'd' },
     { "float",  4, 'i', 'f' },
-    { 0, 0, 0 }};
+    { 0, 0, 0, 0 }};
   char sym_prev = 0;
   int n_same = 0;
-  char fmtstr[256];
-  int fmtlen = 63;
+  char fmtstr[512];
+  const unsigned int fmtlen = 63;
   int offset = 0;
   NSMparse *parsetop = 0;
   NSMparse *parsep = 0;
@@ -519,7 +517,6 @@ nsmparse_scan(const char *file, char *filebuf, char *start, char **endp,
 
       if (*ptr == '{') {
 	static char fmtout2[256];
-	NSMparse *parse2 = 0;
 	char *nestp = 0;
 	int num = -1;
 	int siz2 = 0;
@@ -831,7 +828,7 @@ main(int argc, char **argv)
   char fmtstr[256];
   int revision;
   int newrevision = -1;
-  NSMparse *parsep;
+  NSMparse *parsep = nullptr;
   char indent[256];
 
   memset(fmtstr, 0, sizeof(fmtstr));

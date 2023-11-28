@@ -1,0 +1,20 @@
+[INFO] Steering file: best_candidate_selection_reserved.py
+[INFO] The random number seed is set to "1337"
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e+:all (e-:all)
+[INFO]    -> MDST source: Tracks
+[FATAL] You are trying to apply a best-candidate-selection on the list e+:all but the label 'all' is protected for lists of final-state particles. It could introduce *very* dangerous bugs.
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: e-:MC (e+:MC)
+[INFO]    -> MDST source: MCParticles
+[FATAL] You are trying to apply a best-candidate-selection on the list e+:MC but the label MC is protected and can not be reduced.
+[INFO] Starting event processing, random seed is set to '1337'
+[INFO] Added file ${BELLE2_SOFTWARE_DIR}/analysis/tests/mdst.root
+[INFO] ParticleLoader's Summary of Actions:
+[INFO]  o) creating (anti-)ParticleList with name: K_S0:V0 (K_S0:V0)
+[INFO]    -> MDST source: V0
+[FATAL] You are trying to apply a best-candidate-selection on the list K_S0:V0 but the label V0 is protected and can not be reduced.

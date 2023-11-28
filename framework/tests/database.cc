@@ -25,7 +25,7 @@
 
 #include <gtest/gtest.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 #include <list>
 #include <cstdio>
 
@@ -115,7 +115,7 @@ namespace {
     /** clear datastore */
     void TearDown() override
     {
-      if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
+      if (m_dbType != c_central) std::filesystem::remove_all("testPayloads");
       Database::reset();
       DataStore::Instance().reset();
     }
@@ -428,11 +428,6 @@ namespace {
     EXPECT_FALSE(payload);
   }
 
-  //disable (wrong) warnings about unused functions
-#if defined(__INTEL_COMPILER)
-#pragma warning disable 177
-#endif
-
   /** Test callbacks */
   int callbackCounter = 0;
 
@@ -553,7 +548,7 @@ namespace {
 
     DBObjPtr<TNamed> named;
     EXPECT_TRUE(named.isValid());
-    double Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    double Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     EXPECT_EQ(Bz, 1.5);
     DBStore::Instance().reset();
     //Ok, on next access the DBObjPtr should try to reconnect
@@ -566,7 +561,7 @@ namespace {
     field->addComponent(new Belle2::MagneticFieldComponentConstant({0, 0, 1.5 * Belle2::Unit::T}));
     Belle2::DBStore::Instance().addConstantOverride("MagneticField", field, false);
     //So now it should work again
-    Bz = BFieldManager::getFieldInTesla({0, 0, 0}).Z();
+    Bz = BFieldManager::getField(0, 0, 0).Z() / Unit::T;
     EXPECT_EQ(Bz, 1.5);
   }
 
@@ -650,7 +645,7 @@ namespace {
     /** Just reset the Database, hopefully no DataStore needs resetting */
     void TearDown() override
     {
-      if (m_dbType != c_central) boost::filesystem::remove_all("testPayloads");
+      if (m_dbType != c_central) std::filesystem::remove_all("testPayloads");
       Database::reset();
     }
 

@@ -67,5 +67,6 @@ main.add_module("ProgressBar")
 
 basf2.print_path(main)
 
+main.add_module('Progress')
 basf2.process(main)
 print(basf2.statistics)

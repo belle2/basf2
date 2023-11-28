@@ -33,7 +33,7 @@
  and at which step you have to resume the training.
 
  After the training the weight files will be stored in the localdb in the collection directory
- You have to upload these local database to the Belle 2 Condition Database if you want to use the FEI everywhere.
+ You have to upload these local database to the Belle II Condition Database if you want to use the FEI everywhere.
  Alternatively you can just copy the localdb to somewhere and use it directly.
 
  Example:
@@ -67,6 +67,7 @@ def getCommandLineOptions():
     """ Parses the command line options of the fei and returns the corresponding arguments. """
     # FEI defines own command line options, therefore we disable
     # the ROOT command line options, which otherwise interfere sometimes.
+    # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
     ROOT.PyConfig.IgnoreCommandLineOptions = True
     parser = argparse.ArgumentParser()

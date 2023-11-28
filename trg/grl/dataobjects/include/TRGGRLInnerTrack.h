@@ -19,7 +19,7 @@ namespace Belle2 {
   public:
 
     /// Constructor
-    TRGGRLInnerTrack(): m_TS_ID( {0}) {}
+    TRGGRLInnerTrack(): m_TS_ID({0}) {}
     /// Destructor
     ~TRGGRLInnerTrack() {}
 

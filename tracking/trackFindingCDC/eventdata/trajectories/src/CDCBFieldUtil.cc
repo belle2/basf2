@@ -24,8 +24,7 @@ using namespace TrackFindingCDC;
 
 bool CDCBFieldUtil::isOff()
 {
-  B2Vector3D origin(0, 0, 0);
-  double b = BFieldManager::getField(origin).Mag();
+  double b = BFieldManager::getField(0, 0, 0).R();
   double c_EarthMagneticField = 3.2e-5 * Unit::T;
   return not(b > 5 * c_EarthMagneticField);
 }

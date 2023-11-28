@@ -250,6 +250,9 @@ namespace Belle2 {
     /** check that neutrals were seen in ECL, and charged were seen in SVD */
     double isReconstructible(const Particle*);
 
+    /** the charged stable particle from MCparticle is reconstructed */
+    double isTrackFound(const Particle*);
+
     /** the particle was seen in the PXD */
     double seenInPXD(const Particle*);
 

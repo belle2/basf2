@@ -79,7 +79,7 @@ namespace Belle2 {
        * import mappings to database
        * @param iov     Interval of validity.
        */
-      void import(const IntervalOfValidity& iov) const;
+      void importPayload(const IntervalOfValidity& iov) const;
 
       /**
        * Return electornic type (see enum)

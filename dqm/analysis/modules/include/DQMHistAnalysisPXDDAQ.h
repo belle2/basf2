@@ -12,21 +12,14 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
+#include <dqm/core/DQMHistAnalysis.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-
-#include <TH1F.h>
 #include <TH2F.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD DAQ */
 
-  class DQMHistAnalysisPXDDAQModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDDAQModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -56,18 +49,11 @@ namespace Belle2 {
      */
     void event(void) override final;
 
-    /**
-     * This method is called at the end of the event processing.
-     */
-    void terminate(void) override final;
-
   private:
 
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     /** Update entry intervall */
     int m_minEntries = 10000;
 
@@ -81,8 +67,6 @@ namespace Belle2 {
     TH1F* m_hMissingDHP = nullptr;
     //! Histogram covering stat
     TH1D* m_hStatistic = nullptr;
-    //! Histogram preserving last stat upd
-    TH1* m_hDaqStatOld = nullptr;
     //! Final Canvas
     TCanvas* m_cDAQError = nullptr;
     //! Final Canvas
@@ -99,14 +83,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! one EPICS PV
-    std::vector <chid> mychid;
-#endif
   };
 } // end namespace Belle2
 

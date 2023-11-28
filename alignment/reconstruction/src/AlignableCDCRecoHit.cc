@@ -30,8 +30,8 @@ std::pair<std::vector<int>, TMatrixD> AlignableCDCRecoHit::globalDerivatives(con
   GlobalDerivatives globals;
   unsigned short LR = (int(m_leftRight) > 0.) ? 1 : 0;
 
-  const TVector3& mom = sop->getMom();
-  const TVector3& wirePositon = sop->getPlane()->getO();
+  const B2Vector3D& mom = sop->getMom();
+  const B2Vector3D& wirePositon = sop->getPlane()->getO();
   const unsigned short layer = getWireID().getICLayer();
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -252,8 +252,8 @@ TMatrixD AlignableCDCRecoHit::localDerivatives(const genfit::StateOnPlane* sop)
 
   unsigned short LR = (int(m_leftRight) > 0.) ? 1 : 0;
 
-  const TVector3& mom = sop->getMom();
-  const TVector3& wirePositon = sop->getPlane()->getO();
+  const B2Vector3D& mom = sop->getMom();
+  const B2Vector3D& wirePositon = sop->getPlane()->getO();
   const unsigned short layer = getWireID().getICLayer();
 
   CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();

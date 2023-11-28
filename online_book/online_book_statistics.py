@@ -8,7 +8,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""This script calculates some numbers about the online book, e.g. number of
+"""
+This script calculates some numbers about the online book, e.g. number of
 exercises etc.
 """
 
@@ -19,22 +20,30 @@ import re
 
 
 class Statistics:
+    """
+    Statistics base class
+    """
     def __init__(self):
+        """Initialize members"""
         self.code_inclusions: int = 0
         self.hints: int = 0
         self.solutions: int = 0
         self.exercises: int = 0
-        self.overview_boxes = 0
-        self.key_points = 0
-        self.figures = 0
-        self.characters = 0
+        self.overview_boxes: int = 0
+        self.key_points: int = 0
+        self.figures: int = 0
+        self.characters: int = 0
 
     def print_summary(self):
+        """Print the summary"""
         pprint.pprint(self.__dict__)
 
 
 class StatisticsVisitor:
-    # Dictionary keys must match attributes of Statistics class
+    """
+    Statistics visitor class
+    """
+    #: Dictionary keys must match attributes of Statistics class
     regexes = dict(
         code_inclusions=re.compile("(code-block\\s*::)|(literalinclude\\s*::)"),
         hints=re.compile(":class:.*hint"),
@@ -46,9 +55,12 @@ class StatisticsVisitor:
     )
 
     def __init__(self):
+        """Initialize class"""
+        #: statistics object
         self.statistics = Statistics()
 
     def read_rst_file(self, path: Path):
+        """Read rst file"""
         text = path.read_text()
         self.statistics.characters += len(text)
         for line in text.split("\n"):
@@ -59,6 +71,7 @@ class StatisticsVisitor:
                     )
 
     def walk_directory(self, path: Path):
+        """Loop over all directories in the path"""
         print(f"Walking {path}")
         for root, _, files in os.walk(path):
             for file in files:

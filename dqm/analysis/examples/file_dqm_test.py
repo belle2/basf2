@@ -31,6 +31,7 @@ input.param('Experiment', 12)
 input.param('EventInterval', 10)
 input.param('NullHistogramMode', False)  # Set to True to use the null histogram test mode, in which no histogram will be loaded
 main.add_module(input)
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 top = b2.register_module('DQMHistAnalysisTOP')
 main.add_module(top)

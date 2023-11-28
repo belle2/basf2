@@ -44,7 +44,7 @@ int b2nsm_sendany(const char* node, const char* req, int npar, int32_t* pars,
                   int len, const char* datp, const char* caller);
 int b2nsm_sendreq(const char* node, const char* req, int npar, int32_t* pars);
 
-int b2nsm_ok(NSMmsg* msg, const char* newstate, const char* fmt, ...);
+int b2nsm_ok(const NSMmsg* msg, const char* newstate, const char* fmt, ...);
 int b2nsm_error(NSMmsg* msg, const char* fmt, ...);
 int b2nsm_readmem(void* buf, const char* dat, const char* fmt, int rev);
 int b2nsm_statmem(const char* dat, char* fmtbuf, int buflen);

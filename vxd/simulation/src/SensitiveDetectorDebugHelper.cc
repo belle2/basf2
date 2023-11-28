@@ -82,15 +82,15 @@ namespace Belle2 {
       m_info.trueInfo[6] = truehit->getExitU();
       m_info.trueInfo[7] = truehit->getExitV();
       m_info.trueInfo[8] = truehit->getExitW();
-      m_info.trueInfo[9] = truehit->getEntryMomentum()[0];
-      m_info.trueInfo[10] = truehit->getEntryMomentum()[1];
-      m_info.trueInfo[11] = truehit->getEntryMomentum()[2];
-      m_info.trueInfo[12] = truehit->getMomentum()[0];
-      m_info.trueInfo[13] = truehit->getMomentum()[1];
-      m_info.trueInfo[14] = truehit->getMomentum()[2];
-      m_info.trueInfo[15] = truehit->getExitMomentum()[0];
-      m_info.trueInfo[16] = truehit->getExitMomentum()[1];
-      m_info.trueInfo[17] = truehit->getExitMomentum()[2];
+      m_info.trueInfo[9] = truehit->getEntryMomentum().X();
+      m_info.trueInfo[10] = truehit->getEntryMomentum().Y();
+      m_info.trueInfo[11] = truehit->getEntryMomentum().Z();
+      m_info.trueInfo[12] = truehit->getMomentum().X();
+      m_info.trueInfo[13] = truehit->getMomentum().Y();
+      m_info.trueInfo[14] = truehit->getMomentum().Z();
+      m_info.trueInfo[15] = truehit->getExitMomentum().X();
+      m_info.trueInfo[16] = truehit->getExitMomentum().Y();
+      m_info.trueInfo[17] = truehit->getExitMomentum().Z();
       m_info.trueInfo[18] = truehit->getEnergyDep();
       m_info.trueInfo[19] = truehit->getGlobalTime();
       m_info.trueN = SIZE_TRUE;
@@ -99,12 +99,12 @@ namespace Belle2 {
     void SensitiveDetectorDebugHelper::addSimHit(const VXDSimHit* simhit, int startPoint, int endPoint)
     {
       assert(m_info.simhitN + SIZE_HITS < MAX_HITS * SIZE_HITS);
-      m_info.simhitInfo[m_info.simhitN + 0] = simhit->getPosIn()[0];
-      m_info.simhitInfo[m_info.simhitN + 1] = simhit->getPosIn()[1];
-      m_info.simhitInfo[m_info.simhitN + 2] = simhit->getPosIn()[2];
-      m_info.simhitInfo[m_info.simhitN + 3] = simhit->getPosOut()[0];
-      m_info.simhitInfo[m_info.simhitN + 4] = simhit->getPosOut()[1];
-      m_info.simhitInfo[m_info.simhitN + 5] = simhit->getPosOut()[2];
+      m_info.simhitInfo[m_info.simhitN + 0] = simhit->getPosIn().X();
+      m_info.simhitInfo[m_info.simhitN + 1] = simhit->getPosIn().Y();
+      m_info.simhitInfo[m_info.simhitN + 2] = simhit->getPosIn().Z();
+      m_info.simhitInfo[m_info.simhitN + 3] = simhit->getPosOut().X();
+      m_info.simhitInfo[m_info.simhitN + 4] = simhit->getPosOut().Y();
+      m_info.simhitInfo[m_info.simhitN + 5] = simhit->getPosOut().Z();
       m_info.simhitInfo[m_info.simhitN + 6] = simhit->getGlobalTime();
       m_info.simhitInfo[m_info.simhitN + 7] = startPoint;
       m_info.simhitInfo[m_info.simhitN + 8] = endPoint;

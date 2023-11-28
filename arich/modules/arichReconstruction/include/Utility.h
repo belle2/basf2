@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHUTILITY_H
-#define ARICHUTILITY_H
+#pragma once
 
 #include <TVector3.h>
 #include <TRotation.h>
@@ -90,5 +88,3 @@ namespace Belle2 {
 
   } // namespace arich
 } // namespace Belle2
-
-#endif

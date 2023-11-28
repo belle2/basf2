@@ -9,7 +9,6 @@
 /* Own header. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-using namespace std;
 using namespace Belle2;
 
 KLMMuidLikelihood::KLMMuidLikelihood() :

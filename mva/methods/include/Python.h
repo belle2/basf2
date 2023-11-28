@@ -38,6 +38,7 @@
 #pragma GCC diagnostic pop
 #endif
 
+
 namespace Belle2 {
   namespace MVA {
 
@@ -124,6 +125,12 @@ namespace Belle2 {
        * @param test_data dataset
        */
       virtual std::vector<float> apply(Dataset& test_data) const override;
+
+      /**
+       * Apply this expert onto a dataset for multiclass problem
+       * @param test_data dataset
+       */
+      virtual std::vector<std::vector<float>> applyMulticlass(Dataset& test_data) const override;
 
     protected:
       PythonOptions m_specific_options; /**< Method specific options */

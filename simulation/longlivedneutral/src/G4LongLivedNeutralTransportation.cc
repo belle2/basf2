@@ -259,8 +259,8 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 G4VParticleChange* G4LongLivedNeutralTransportation::AlongStepDoIt(const G4Track& track,
     const G4Step&  stepData)
 {
-  static G4ThreadLocal G4long noCallsASDI = 0;
-  noCallsASDI++;
+  // static G4ThreadLocal G4long noCallsASDI = 0;
+  // noCallsASDI++;
 
   fParticleChange.Initialize(track) ;
 
@@ -381,7 +381,7 @@ G4VParticleChange* G4LongLivedNeutralTransportation::PostStepDoIt(const G4Track&
     // Update the Step flag which identifies the Last Step in a volume
     if (!fFieldExertedForce)
       isLastStep =  fLinearNavigator->ExitedMotherVolume()
-                    | fLinearNavigator->EnteredDaughterVolume() ;
+                    or fLinearNavigator->EnteredDaughterVolume() ;
     else
       isLastStep = fFieldPropagator->IsLastStepInVolume();
   } else {             // fGeometryLimitedStep  is false
@@ -493,7 +493,7 @@ G4LongLivedNeutralTransportation::StartTracking(G4Track* aTrack)
 
   // Inform field propagator of new track
   //
-  fFieldPropagator->PrepareNewTrack();
+  if (fFieldPropagator) fFieldPropagator->PrepareNewTrack();
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -555,19 +555,19 @@ void G4LongLivedNeutralTransportation::SetLowLooperThresholds() // Values for lo
 
 /////////////////////////////////////////////////////////////////////////////
 //
-void G4LongLivedNeutralTransportation::ProcessDescription(std::ostream& outStr) const
+void G4LongLivedNeutralTransportation::ProcessDescription(std::ostream& outStream) const
 
 // StreamInfo(std::ostream& out, const G4ParticleDefinition& part, G4bool rst) const
 
 {
   G4String indent = "  "; //  : "");
-  G4int oldPrec = outStr.precision(6);
-  // outStr << std::setprecision(6);
-  outStr << G4endl << indent << GetProcessName() << ": ";
+  G4int oldPrec = outStream.precision(6);
+  // outStream << std::setprecision(6);
+  outStream << G4endl << indent << GetProcessName() << ": ";
 
-  outStr << "   Parameters for looping particles: " << G4endl
-         << "     warning-E = " << fThreshold_Warning_Energy / CLHEP::MeV  << " MeV "  << G4endl
-         << "     important E = " << fThreshold_Important_Energy / CLHEP::MeV << " MeV " << G4endl
-         << "     thresholdTrials " << fThresholdTrials << G4endl;
-  outStr.precision(oldPrec);
+  outStream << "   Parameters for looping particles: " << G4endl
+            << "     warning-E = " << fThreshold_Warning_Energy / CLHEP::MeV  << " MeV "  << G4endl
+            << "     important E = " << fThreshold_Important_Energy / CLHEP::MeV << " MeV " << G4endl
+            << "     thresholdTrials " << fThresholdTrials << G4endl;
+  outStream.precision(oldPrec);
 }

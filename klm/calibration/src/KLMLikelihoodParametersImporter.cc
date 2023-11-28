@@ -13,7 +13,7 @@
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>
@@ -25,7 +25,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 
 void KLMLikelihoodParametersImporter::writeLikelihoodParameters()
@@ -35,7 +34,7 @@ void KLMLikelihoodParametersImporter::writeLikelihoodParameters()
   /** cppcheck-suppress unreachableCode */
   DBImportObjPtr<KLMLikelihoodParameters> likelihoodParameters;
   likelihoodParameters.construct();
-  vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
+  std::vector<std::string> const hypotheses = {"Positron", "Electron", "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
   for (unsigned int hypothesis = 0; hypothesis < hypotheses.size(); hypothesis++) {
     GearDir content("/Detector/Muid/MuidParameters//Experiment[@exp=\"0\"]/");
     content.append(hypotheses[hypothesis]);
@@ -80,7 +79,7 @@ void KLMLikelihoodParametersImporter::writeLikelihoodParameters()
 void KLMLikelihoodParametersImporter::readLikelihoodParameters()
 {
   DBObjPtr<KLMLikelihoodParameters> likelihoodParameters;
-  vector<string> const hypotheses = {"Positron", "Electron" , "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
+  std::vector<std::string> const hypotheses = {"Positron", "Electron", "Deuteron", "Antideuteron", "Proton", "Antiproton", "PionPlus", "PionMinus", "KaonPlus", "KaonMinus", "MuonPlus", "MuonMinus" };
   for (unsigned int hypothesis = 0; hypothesis < hypotheses.size(); hypothesis++) {
     B2INFO(" hypothesisName  " << hypotheses[hypothesis]);
     for (int outcome = 1; outcome <= MuidElementNumbers::getMaximalOutcome(); ++outcome) {

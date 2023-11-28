@@ -16,7 +16,6 @@ from argparse import ArgumentParser
 import basf2 as b2
 import os
 import uproot
-import root_pandas
 import pandas as pd
 import numpy as np
 
@@ -66,7 +65,7 @@ if __name__ == "__main__":
     for fi in args.input:
 
         # might have swtr files with no events selected: skip these
-        swtr = uproot.open(fi)["software_trigger_results"].pandas.df()
+        swtr = uproot.open(fi)["software_trigger_results"].arrays(library='pd')
         if not swtr['total_events'][0].any():
             continue
 
@@ -103,8 +102,7 @@ if __name__ == "__main__":
                 sum_out.at[PRESCALE_ROW, col] = np.nan
             i += 1
 
-    root_pandas.to_root(sum_out, key='software_trigger_results', path=args.output)
-    # TODO: uproot.newtree works with the current externals version so this can be root free
-    # BUT, unfortunately we are not sure how to write the pandas data frame to a root tree
+    with uproot.recreate(args.output) as outfile:
+        outfile['software_trigger_results'] = sum_out
 
     print("Created file %s" % args.output)

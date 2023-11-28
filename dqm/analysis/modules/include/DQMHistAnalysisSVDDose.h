@@ -12,7 +12,7 @@
 #include "cadef.h"
 #endif
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TCanvas.h>
 #include <TString.h>
 #include <TPaveText.h>
@@ -37,12 +37,12 @@ namespace Belle2 {
    * Sends the occupancies averaged over the run to MiraBelle (via the
    * `svd` MonitoringObject).
    *
-   * @sa https://agira.desy.de/browse/BII-7853
+   * @sa [BII-7853]: https://gitlab.desy.de/belle2/software/basf2/-/issues/7721
    */
-  class DQMHistAnalysisSVDDoseModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDDoseModule final : public DQMHistAnalysisModule {
   public:
     DQMHistAnalysisSVDDoseModule();
-    virtual ~DQMHistAnalysisSVDDoseModule();
+    ~DQMHistAnalysisSVDDoseModule();
 
   private:
     /** A struct to define the sensors group we average over.
@@ -118,7 +118,6 @@ namespace Belle2 {
 
     // Steerable data members (parameters)
     std::string m_pvPrefix; /**< Prefix for EPICS PVs */
-    bool m_useEpics; /**< Whether to update EPICS PVs */
     double m_epicsUpdateSeconds; /**< Minimum interval between successive PV updates */
     std::string m_pvSuffix; /**< Suffix for EPICS PVs */
     std::string m_deltaTPVSuffix; /**< Suffix of the update-time monitoring PV */

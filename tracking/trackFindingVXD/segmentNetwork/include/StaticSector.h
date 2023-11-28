@@ -86,19 +86,19 @@ namespace Belle2 {
 
     /** Get constant access to the whole set of 2 Space Point filters.
      */
-    const std::unordered_map<CompactSecIDs::sectorID_t    , Filter2sp >&
+    const std::unordered_map<CompactSecIDs::sectorID_t, Filter2sp >&
     getAllFilters2sp() const
     {return m_2spFilters;}
 
     /** Get constant access to the whole set of 3 Space Point filters.
      */
-    const std::unordered_map<CompactSecIDs::secPairID_t   , Filter3sp >&
+    const std::unordered_map<CompactSecIDs::secPairID_t, Filter3sp >&
     getAllFilters3sp() const
     {return m_3spFilters;}
 
     /** Get constant access to the whole set of 4 Space Point filters.
      */
-    const std::unordered_map<CompactSecIDs::secTripletID_t   , Filter4sp >&
+    const std::unordered_map<CompactSecIDs::secTripletID_t, Filter4sp >&
     getAllFilters4sp() const
     {return m_4spFilters;}
 
@@ -112,7 +112,7 @@ namespace Belle2 {
 
     /** Assign the 2 space point
     @param inner FullSecID of the inner SpacePoint
-    @param filter to this static sector which is friend of the sector whose FullSecID is @param inner.
+    @param filter to this static sector which is friend of the sector whose FullSecID is the parameter inner.
     */
     void assign2spFilter(FullSecID inner, const Filter2sp  filter)
     {
@@ -227,10 +227,10 @@ namespace Belle2 {
       filter.getNameAndReference(&accessor);
 
       // this will produce lots of output
-      B2DEBUG(1, std::endl << "BEFORE: " << filter.getNameAndReference() << std::endl);
+      B2DEBUG(20, std::endl << "BEFORE: " << filter.getNameAndReference() << std::endl);
 
       // loop over all adjustfunctions
-      for (const std::tuple<int , std::string >& entry : adjustFunctions) {
+      for (const std::tuple<int, std::string >& entry : adjustFunctions) {
         // first is the index
         int index = std::get<0>(entry);
 
@@ -273,7 +273,7 @@ namespace Belle2 {
 
       }// end loop over the functions
 
-      B2DEBUG(1, "AFTER: " << filter.getNameAndReference() << std::endl);
+      B2DEBUG(20, "AFTER: " << filter.getNameAndReference() << std::endl);
     }
 
     /** stores its own secID */
@@ -290,9 +290,9 @@ namespace Belle2 {
     std::vector< std::tuple< FullSecID, FullSecID, FullSecID > > m_inner4spSecIDs;
 
     /// stores the attached 2-hit filters
-    std::unordered_map<CompactSecIDs::sectorID_t    , Filter2sp > m_2spFilters;
+    std::unordered_map<CompactSecIDs::sectorID_t, Filter2sp > m_2spFilters;
     /// stores the attached 3-hit filters
-    std::unordered_map<CompactSecIDs::secPairID_t   , Filter3sp > m_3spFilters;
+    std::unordered_map<CompactSecIDs::secPairID_t, Filter3sp > m_3spFilters;
     /// stores the attached 4-hit filters
     std::unordered_map<CompactSecIDs::secTripletID_t, Filter4sp > m_4spFilters;
 

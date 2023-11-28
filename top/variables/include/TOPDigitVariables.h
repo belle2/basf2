@@ -10,8 +10,9 @@
 
 #include <analysis/VariableManager/Manager.h>
 #include <vector>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
-class TVector3;
 namespace Belle2 {
   class Particle;
   class TOPLikelihood;
@@ -92,7 +93,7 @@ namespace Belle2 {
        * @param result local position if the return value is true
        * @return true on success
        */
-      bool getLocalPosition(const Particle* particle, TVector3& result);
+      bool getLocalPosition(const Particle* particle, ROOT::Math::XYZPoint& result);
 
       /**
        * Returns the X coordinate of the particle entry point to the TOP in the local frame
@@ -128,7 +129,7 @@ namespace Belle2 {
        * @param result local position if the return value is true
        * @return true on success
        */
-      bool getLocalPositionMCMatch(const Particle* particle, TVector3& result);
+      bool getLocalPositionMCMatch(const Particle* particle, ROOT::Math::XYZPoint& result);
 
       /**
        * Returns the X coordinate of the matched MC particle entry point to the TOP in the local frame.
@@ -164,7 +165,7 @@ namespace Belle2 {
        * @param result local position if the return value is true
        * @return true on success
        */
-      bool getLocalMomentum(const Particle* particle, TVector3& result);
+      bool getLocalMomentum(const Particle* particle, ROOT::Math::XYZVector& result);
 
       /**
        * Returns the momentum azimuthal angle in the local frame of the particle at entry point to the TOP.
@@ -191,7 +192,7 @@ namespace Belle2 {
        * @param result local momentum vector if the return value is true
        * @return true on success
        */
-      bool getLocalMomentumMCMatch(const Particle* particle, TVector3& result);
+      bool getLocalMomentumMCMatch(const Particle* particle, ROOT::Math::XYZVector& result);
 
       /**
        * Returns the momentum azimuthal angle in the local frame of the matched MC particle at entry point to the TOP.
@@ -540,6 +541,15 @@ namespace Belle2 {
       double isTOPRecBunchReconstructed([[maybe_unused]] const Particle* particle);
 
       /**
+       * Returns whether the rec bunch is filled.
+       * Requires TOPRecBunch.
+       * Variable name: topBunchIsFilled
+       * @param particle unused
+       * @return 1 if filled, 0 if empty, -1 if unknown
+       */
+      double isTOPRecBunchFilled([[maybe_unused]] const Particle* particle);
+
+      /**
        * Returns the reconstructed bunch number relative to L1 trigger.
        * Requires TOPRecBunch.
        * Variable name: topBunchNumber
@@ -547,6 +557,15 @@ namespace Belle2 {
        * @return relative bunch number (NaN if N/A)
        */
       double TOPRecBunchNumber([[maybe_unused]] const Particle* particle);
+
+      /**
+       * Returns the reconstructed bucket number within the ring
+       * Requires TOPRecBunch.
+       * Variable name: topBucketNumber
+       * @param particle unused
+       * @return buncket number (NaN if N/A)
+       */
+      double TOPRecBucketNumber([[maybe_unused]] const Particle* particle);
 
       /**
        * Is the reconstructed bunch number equal to the simulated one?

@@ -7,7 +7,6 @@
  **************************************************************************/
 #include <tracking/trackFindingVXD/analyzingTools/RootParameterTracker.h>
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -25,14 +24,14 @@ void RootParameterTracker::collectData4DoubleAlgorithms(std::string tcTypeName, 
     auto* anAlgorithm = entry.second.first;
     auto* dataVector = entry.second.second;
     // sanity check: key has to be compatible with stored algorithm:
-    string algoName = anAlgorithm->getIDName();
+    std::string algoName = anAlgorithm->getIDName();
     if (entry.first != algoName) {
       B2ERROR("RootParameterTracker::collectData4DoubleAlgorithms() key (" << entry.first <<
               ") of container does not match to its content (" << algoName <<
               ") - skipping entry! ");
       continue;
     }
-    B2DEBUG(50, "RootParameterTracker::collectData4DoubleAlgorithms(), executing algorithm of type: " << algoName <<
+    B2DEBUG(21, "RootParameterTracker::collectData4DoubleAlgorithms(), executing algorithm of type: " << algoName <<
             " with collected data-entries of " << dataVector->size());
 
     try {
@@ -68,7 +67,7 @@ void RootParameterTracker::collectData4IntAlgorithms(std::string tcTypeName, con
     auto* anAlgorithm = entry.second.first;
     auto* dataVector = entry.second.second;
     // sanity check: key has to be compatible with stored algorithm:
-    string algoName = anAlgorithm->getIDName();
+    std::string algoName = anAlgorithm->getIDName();
     if (entry.first != algoName) {
       B2ERROR("RootParameterTracker::collectData4DoubleAlgorithms() key (" << entry.first <<
               ") of container does not match to its content (" << algoName <<
@@ -110,9 +109,9 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
   for (auto& entry : *foundTCTypeData) {
     // increase readability:
     auto* anAlgorithm = entry.second.first;
-    auto* dataVector = entry.second.second; // vector< vector < double>>
+    auto* dataVector = entry.second.second; // std::vector< vector < double>>
     // sanity check: key has to be compatible with stored algorithm:
-    string algoName = anAlgorithm->getIDName();
+    std::string algoName = anAlgorithm->getIDName();
     if (entry.first != algoName) {
       B2ERROR("RootParameterTracker::collectData4VecDoubleAlgorithms() key (" << entry.first <<
               ") of container does not match to its content (" << algoName <<
@@ -123,13 +122,13 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
             " with collected data-entries of " << dataVector->size());
 
     try {
-      vector<double> calcVal = anAlgorithm->calcData(aTC);
+      std::vector<double> calcVal = anAlgorithm->calcData(aTC);
       dataVector->push_back(calcVal);
-      auto printVec = [&]() -> string {
-        string out;
+      auto printVec = [&]() -> std::string {
+        std::string out;
         for (double val : calcVal)
         {
-          out += (" " + to_string(val));
+          out += (" " + std::to_string(val));
         }
         return (out += "\n");
       };
@@ -137,7 +136,7 @@ void RootParameterTracker::collectData4VecDoubleAlgorithms(std::string tcTypeNam
               " and applied algorithm " << algoName <<
               " and got: " << printVec() <<
               " as a result!");
-    }  catch (AnalyzingAlgorithm<vector<double>>::No_refTC_Attached& anException) {
+    }  catch (AnalyzingAlgorithm<std::vector<double>>::No_refTC_Attached& anException) {
       B2WARNING("RootParameterTracker::collectData4VecDoubleAlgorithms(), Exception caught for tc with type " << tcTypeName <<
                 " and applied algorithm " << algoName <<
                 ". Failed with exception: " << anException.what() <<
@@ -189,7 +188,7 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
             " not yet added to m_algoDataDouble, doing it now...");
     m_algoDataDouble.push_back({
       tcTypeName,
-      StringKeyBox<pair<AnalyzingAlgorithm<double>*, vector<double>*> >()
+      StringKeyBox<std::pair<AnalyzingAlgorithm<double>*, std::vector<double>*> >()
     });
     algorithms4tcType = m_algoDataDouble.find(tcTypeName);
   }
@@ -201,13 +200,13 @@ void RootParameterTracker::addParameters4DoubleAlgorithms(std::string tcTypeName
   if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4DoubleAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataDouble[tcType], doing it now...");
-    AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactoryDouble<double, AnalizerTCInfo, TVector3>
+    AnalyzingAlgorithm<double>* newAlgorithm = AnalyzingAlgorithmFactoryDouble<double, AnalizerTCInfo, ROOT::Math::XYZVector>
                                                (AlgoritmType::getTypeEnum(algorithmName));
     algorithms4tcType->push_back({
       algorithmName,
       {
         newAlgorithm,
-        new vector<double>()
+        new std::vector<double>()
       }
     });
     data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
@@ -247,7 +246,7 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
             " not yet added to m_algoDataInt, doing it now...");
     m_algoDataInt.push_back({
       tcTypeName,
-      StringKeyBox<pair<AnalyzingAlgorithm<int>*, vector<int>*> >()
+      StringKeyBox<std::pair<AnalyzingAlgorithm<int>*, std::vector<int>*> >()
     });
     algorithms4tcType = m_algoDataInt.find(tcTypeName);
   }
@@ -258,13 +257,14 @@ void RootParameterTracker::addParameters4IntAlgorithms(std::string tcTypeName, s
   if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4IntAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataInt[tcType], doing it now...");
-    AnalyzingAlgorithm<int>* newAlgorithm = AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, TVector3>(AlgoritmType::getTypeEnum(
-                                              algorithmName));
+    AnalyzingAlgorithm<int>* newAlgorithm =
+      AnalyzingAlgorithmFactoryInt<int, AnalizerTCInfo, ROOT::Math::XYZVector>(AlgoritmType::getTypeEnum(algorithmName));
+
     algorithms4tcType->push_back({
       algorithmName,
       {
         newAlgorithm,
-        new vector<int>()
+        new std::vector<int>()
       }
     });
     data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);
@@ -304,7 +304,7 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
             " not yet added to m_algoDataVecDouble, doing it now...");
     m_algoDataVecDouble.push_back({
       tcTypeName,
-      StringKeyBox<pair<AnalyzingAlgorithm<vector<double>>*, vector<vector<double>>*> >()
+      StringKeyBox<std::pair<AnalyzingAlgorithm<std::vector<double>>*, std::vector<std::vector<double>>*> >()
     });
     algorithms4tcType = m_algoDataVecDouble.find(tcTypeName);
   }
@@ -316,13 +316,14 @@ void RootParameterTracker::addParameters4VecDoubleAlgorithms(std::string tcTypeN
   if (data4AlgorithmOftcType == nullptr) {
     B2DEBUG(5, "RootParameterTracker::addParameters4VecDoubleAlgorithms(), algorithm " << algorithmName <<
             " not yet added to m_algoDataVecDouble[tcType], doing it now...");
-    AnalyzingAlgorithm<vector<double>>* newAlgorithm = AnalyzingAlgorithmFactoryVecDouble<vector<double>, AnalizerTCInfo, TVector3>
-                                                       (AlgoritmType::getTypeEnum(algorithmName));
+    AnalyzingAlgorithm<std::vector<double>>* newAlgorithm =
+                                           AnalyzingAlgorithmFactoryVecDouble<std::vector<double>, AnalizerTCInfo, ROOT::Math::XYZVector>
+                                           (AlgoritmType::getTypeEnum(algorithmName));
     algorithms4tcType->push_back({
       algorithmName,
       {
         newAlgorithm,
-        new vector<vector<double>>()
+        new std::vector<std::vector<double>>()
       }
     });
     data4AlgorithmOftcType = algorithms4tcType->find(algorithmName);

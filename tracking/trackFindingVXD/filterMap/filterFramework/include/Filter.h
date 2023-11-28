@@ -917,8 +917,8 @@ namespace Belle2 {
     typename ... types1,
     typename ... types2
     >
-  Filter<Belle2::OperatorOr, Belle2::Filter<types1...>, Belle2::Filter<types2...> , Belle2::VoidObserver>
-  operator ||(const Filter<types1...>& filter1 , const Filter<types2...>& filter2)
+  Filter<Belle2::OperatorOr, Belle2::Filter<types1...>, Belle2::Filter<types2...>, Belle2::VoidObserver>
+  operator ||(const Filter<types1...>& filter1, const Filter<types2...>& filter2)
   {
     return Filter<OperatorOr, Filter<types1...>, Filter<types2...>, VoidObserver> (filter1, filter2);
   }
@@ -941,7 +941,7 @@ namespace Belle2 {
            class observer,
            typename ... argsTypes>
   bool initializeObservers(const Filter<booleanBinaryOperator, Belle2::Filter<types1...>,
-                           Belle2::Filter<types2...> , observer>&,
+                           Belle2::Filter<types2...>, observer>&,
                            argsTypes ... args)
   {
     return observer::initialize(args ...)

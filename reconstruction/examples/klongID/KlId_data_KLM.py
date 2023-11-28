@@ -13,10 +13,8 @@ import basf2 as b2
 import modularAnalysis as ma
 
 from simulation import add_simulation
-# from reconstruction import add_mdst_output
 from reconstruction import add_reconstruction
 from generators import add_evtgen_generator
-# import pandas as pd
 import sys
 import glob
 
@@ -49,14 +47,13 @@ except BaseException:
     KLMexpertPath = False
 
 
-if '.root' not in outPath:
+if outPath[-5:] != '.root':
     outPath = outPath + str(noEvents) + '.root'
 
 # dec_path_string = base_path + '/dec_files/generic_Btag.dec'
 mypath = b2.Path()
 
-# '/ghi/fs01/belle2/bdata/MC/release-03-01-00/DB00000547/MC12b/prod00007427/s00/e1003/4S/r00000/mixed/mdst/sub00/mdst_000*.root'
-# my_path.add_module('RootInput', inputFileNames=inputFilename)
+# my_path.add_module('RootInput', inputFileNames=b2.find_file('mdst14.root', 'validation'))
 
 dec_file = None
 final_state = 'mixed'
@@ -74,10 +71,10 @@ add_reconstruction(mypath)
 #    #m.logging.debug_level = 200
 #    if KLMexpertPath:
 #      m.logging.info("Setting KLMclassifier to {}".format(KLMexpertPath))
-#      m.param("classifierPath",KLMexpertPath)
+#      m.param("classifierPath", KLMexpertPath)
 
 if((not useKLM) and (not useECL)):
-    sys.exit("nether KLM nor ECL data will be written. Aborting...")
+    sys.exit("neither KLM nor ECL data will be written. Aborting...")
 
 data_writer = b2.register_module('DataWriter')
 data_writer.param("outPath", outPath)

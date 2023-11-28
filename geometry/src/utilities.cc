@@ -25,14 +25,17 @@
 
 namespace Belle2 {
   namespace geometry {
-    /** Parse a color string of the form #rgb, #rrggbb, #rgba, #rrggbbaa or
-     * rgb(r, g, b) and return a corresponding G4Colour.
+
+    /**
+     * Parse a color string of the form "#rgb", "#rrggbb", "#rgba", "#rrggbbaa"
+     * or "rgb(r, g, b)" and return a corresponding G4Colour.
      *
-     * For #rgb and #rgba the color for red, green, blue (and optionally alpha)
-     * is each represented by one hexadecimal digit, #rrggbb and #rrggbbaa is
-     * the same with two digits per colour.
+     * For "#rgb" and "#rgba" the color for red, green, blue (and optionally
+     * alpha) is each represented by one hexadecimal digit, "#rrggbb" and
+     * "#rrggbbaa" is the same with two digits per colour.
      *
-     * rgb(r, g, b) expects the fraction of red, green and blue as float between 0 and 1.
+     * "rgb(r, g, b)" expects the fraction of red, green and blue as
+     * float between 0 and 1.
      */
     G4Colour parseColor(std::string colorString)
     {
@@ -253,16 +256,6 @@ namespace Belle2 {
       return new G4Polycone(name, minPhi, dPhi, nPlanes, &z.front(), &rMin.front(), &rMax.front());
     }
 
-    /**
-     * Create rotation solid.
-     * @param name         Name of the volume.
-     * @param innerPoints  Inner points of the volume.
-     * @param outerPointes Outer points of the volume.
-     * @param minPhi       Minimum phi angle.
-     * @param maxPhi       Maximum phi angle.
-     * @param minZ         Minimum z coordinate.
-     * @param maxZ         Maximum z coordinate.
-     */
     G4Polycone* createRotationSolid(const std::string& name,
                                     std::list< std::pair<double, double> > innerPoints,
                                     std::list< std::pair<double, double> > outerPoints,

@@ -10,8 +10,11 @@
 
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
+#include <genfit/TrackCand.h>
 
 #include <tracking/spacePointCreation/SpacePoint.h>
+#include <tracking/spacePointCreation/SpacePointTrackCand.h>
 
 namespace Belle2 {
   /**
@@ -48,6 +51,9 @@ namespace Belle2 {
     unsigned int m_skippedSPsCtr; /**< Counter for SpacePoints that were not converted */
 
     void initializeCounters(); /**< reset counters to 0 to avoid indeterministic behaviour */
+
+    StoreArray<genfit::TrackCand> m_GenfitTrackCands; /**< genfit::TrackCands StoreArray */
+    StoreArray<SpacePointTrackCand> m_SpacePointTrackCands; /**< SpacePointTrackCands StoreArray */
 
     /** get all related Clusters to a SpacePoint
      * @param spacePoint pointer to the SpacePoint of interest

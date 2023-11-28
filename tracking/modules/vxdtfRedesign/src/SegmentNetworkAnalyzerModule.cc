@@ -14,7 +14,6 @@
 
 
 using namespace Belle2;
-using namespace std;
 
 REG_MODULE(SegmentNetworkAnalyzer);
 
@@ -119,7 +118,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   combinationSPs.push_back(outer.getInnerHit()->m_spacePoint);
   combinationSPs.push_back(inner.getInnerHit()->m_spacePoint);
 
-  const vector<MCVXDPurityInfo> purityInfo = createPurityInfosVec(combinationSPs);
+  const std::vector<MCVXDPurityInfo> purityInfo = createPurityInfosVec(combinationSPs);
   auto mcId = purityInfo[0].getPurity();
   bool signal = mcId.first >= 0 && mcId.second == 1;
   m_rootVariables.signal.push_back((int) signal);
@@ -131,7 +130,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   if (signal) {
     const MCParticle* part = m_mcParticles[mcId.first];
     pdg = part->getPDG();
-    pT = part->getMomentum().Pt();
+    pT = part->getMomentum().Rho();
   }
 
   m_rootVariables.pdg.push_back(pdg);
@@ -149,7 +148,7 @@ void SegmentNetworkAnalyzerModule::analyzeCombination(const Belle2::Segment<Bell
   m_rootVariables.phi.push_back(position.Phi());
   m_rootVariables.theta.push_back(position.Theta());
 
-  B2DEBUG(100, "Collected combination with: phi " << position.Phi() << ", theta " << position.Theta() <<
+  B2DEBUG(22, "Collected combination with: phi " << position.Phi() << ", theta " << position.Theta() <<
           ", pdg " << pdg << ", pT " << pT << ", signal " << signal << ", passed " << passed << ", mcId " << mcId.first);
 }
 

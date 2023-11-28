@@ -63,7 +63,7 @@ void ECLFinalizerModule::initialize()
   m_eclShowers.isRequired(eclShowerArrayName());
   m_eclClusters.registerInDataStore(eclClusterArrayName());
   m_eclCalDigits.isRequired(eclCalDigitArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore();
+  m_eventLevelClusteringInfo.isRequired();
   m_eventT0.isRequired();
 
   // Register relations.
@@ -241,8 +241,8 @@ int ECLFinalizerModule::makeCluster(int index, double evtt0)
   };
   eclCluster->setCovarianceMatrix(covmat);
 
-  eclCluster->setAbsZernike40(eclShower->getAbsZernike40());
-  eclCluster->setAbsZernike51(eclShower->getAbsZernike51());
+  eclCluster->setAbsZernike40(eclShower->getAbsZernikeMoment(4, 0));
+  eclCluster->setAbsZernike51(eclShower->getAbsZernikeMoment(5, 1));
   eclCluster->setZernikeMVA(eclShower->getZernikeMVA());
   eclCluster->setE1oE9(eclShower->getE1oE9());
   eclCluster->setE9oE21(eclShower->getE9oE21());

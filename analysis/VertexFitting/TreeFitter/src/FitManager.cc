@@ -31,7 +31,6 @@ namespace TreeFitter {
     m_decaychain(nullptr),
     m_status(VertexStatus::UnFitted),
     m_chiSquare(-1),
-    m_niter(-1),
     m_prec(prec),
     m_updateDaugthers(updateDaughters),
     m_ndf(0),
@@ -39,10 +38,7 @@ namespace TreeFitter {
     m_useReferencing(useReferencing),
     m_config(config)
   {
-    m_decaychain =  new DecayChain(particle,
-                                   config,
-                                   false
-                                  );
+    m_decaychain = new DecayChain(particle, config, false);
     m_fitparams  = new FitParams(m_decaychain->dim());
   }
 
@@ -52,22 +48,11 @@ namespace TreeFitter {
     delete m_fitparams;
   }
 
-  void FitManager::setExtraInfo(Belle2::Particle* part, const std::string& name, const double value) const
-  {
-    if (part) {
-      if (part->hasExtraInfo(name)) {
-        part->setExtraInfo(name, value);
-      } else {
-        part->addExtraInfo(name, value);
-      }
-    }
-  }
-
   bool FitManager::fit()
   {
     const int nitermax = 100;
     const int maxndiverging = 3;
-    double dChisqConv = m_prec;
+    const double dChisqConv = m_prec;
     m_chiSquare = -1;
     m_errCode.reset();
 
@@ -81,34 +66,34 @@ namespace TreeFitter {
       m_status = VertexStatus::UnFitted;
       int ndiverging = 0;
       bool finished = false;
-      for (m_niter = 0; m_niter < nitermax && !finished; ++m_niter) {
-        if (0 == m_niter) {
+      int niter = 0;
+      for (niter = 0; niter < nitermax && !finished; ++niter) {
+        if (niter == 0) {
           m_errCode = m_decaychain->filter(*m_fitparams);
         } else if (m_useReferencing) {
           auto* tempState = new FitParams(*m_fitparams);
           m_errCode = m_decaychain->filterWithReference(*m_fitparams, *tempState);
           delete tempState;
         }
-        m_ndf = nDof();
+        m_ndf = m_fitparams->nDof();
         double chisq = m_fitparams->chiSquare();
         double deltachisq = chisq - m_chiSquare;
         if (m_errCode.failure()) {
           finished = true ;
           m_status = VertexStatus::Failed;
-          setExtraInfo(m_particle, "failed", 1);
+          m_particle->writeExtraInfo("failed", 1);
         } else {
-          if (m_niter > 0) {
+          if (niter > 0) {
             if ((std::abs(deltachisq) / m_chiSquare < dChisqConv)) {
               m_chiSquare = chisq;
               m_status = VertexStatus::Success;
               finished = true ;
-              setExtraInfo(m_particle, "failed", 0);
+              m_particle->writeExtraInfo("failed", 0);
             } else if (deltachisq > 0 && ++ndiverging >= maxndiverging) {
-              setExtraInfo(m_particle, "failed", 2);
+              m_particle->writeExtraInfo("failed", 2);
               m_status = VertexStatus::NonConverged;
               m_errCode = ErrCode(ErrCode::Status::slowdivergingfit);
               finished = true ;
-            } else if (deltachisq > 0) {
             }
           }
           if (deltachisq < 0) {
@@ -117,12 +102,12 @@ namespace TreeFitter {
           m_chiSquare = chisq;
         }
       }
-      if (m_niter == nitermax && m_status != VertexStatus::Success) {
-        setExtraInfo(m_particle, "failed", 3);
+      if (niter == nitermax && m_status != VertexStatus::Success) {
+        m_particle->writeExtraInfo("failed", 3);
         m_status = VertexStatus::NonConverged;
       }
       if (!(m_fitparams->testCovariance())) {
-        setExtraInfo(m_particle, "failed", 4);
+        m_particle->writeExtraInfo("failed", 4);
         m_status = VertexStatus::Failed;
       }
     }
@@ -137,26 +122,6 @@ namespace TreeFitter {
     }
 
     return (m_status == VertexStatus::Success);
-  }
-
-  int FitManager::nDof() const
-  {
-    return m_fitparams->nDof();
-  }
-
-  int FitManager::posIndex(Belle2::Particle* particle) const
-  {
-    return m_decaychain->posIndex(particle);
-  }
-
-  int FitManager::momIndex(Belle2::Particle* particle) const
-  {
-    return m_decaychain->momIndex(particle);
-  }
-
-  int FitManager::tauIndex(Belle2::Particle* particle) const
-  {
-    return m_decaychain->tauIndex(particle);
   }
 
   void FitManager::getCovFromPB(const ParticleBase* pb, TMatrixFSym& returncov) const
@@ -195,7 +160,7 @@ namespace TreeFitter {
         }
       }
 
-      double mass = pb->pdgMass();
+      double mass = pb->particle()->getPDGMass();
       Eigen::Matrix<double, 3, 1> momVec =
         m_fitparams->getStateVector().segment(momindex, 3);
 
@@ -251,17 +216,17 @@ namespace TreeFitter {
         if (&pb == m_decaychain->cand()) { // if head
           const double fitparchi2 = m_fitparams->chiSquare();
           cand.setPValue(TMath::Prob(fitparchi2, m_ndf));//if m_ndf<1, this is 0.
-          setExtraInfo(&cand, "chiSquared", fitparchi2);
-          setExtraInfo(&cand, "modifiedPValue", TMath::Prob(fitparchi2, 3));
-          setExtraInfo(&cand, "ndf", m_ndf);
+          cand.writeExtraInfo("chiSquared", fitparchi2);
+          cand.writeExtraInfo("modifiedPValue", TMath::Prob(fitparchi2, 3));
+          cand.writeExtraInfo("ndf", m_ndf);
         }
         if (pb.mother()) {
           int motherPosIndex = pb.mother()->posIndex();
           if (motherPosIndex >= 0) {
-            setExtraInfo(&cand, "prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
-            setExtraInfo(&cand, "prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
+            cand.writeExtraInfo("prodVertexX", m_fitparams->getStateVector()(motherPosIndex));
+            cand.writeExtraInfo("prodVertexY", m_fitparams->getStateVector()(motherPosIndex + 1));
             if (pb.mother()->dim() > 2)
-              setExtraInfo(&cand, "prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
+              cand.writeExtraInfo("prodVertexZ", m_fitparams->getStateVector()(motherPosIndex + 2));
           }
         }
       }
@@ -273,11 +238,11 @@ namespace TreeFitter {
       p.SetPz(m_fitparams->getStateVector()(momindex + 2));
       if (pb.hasEnergy()) {
         p.SetE(m_fitparams->getStateVector()(momindex + 3));
-        cand.set4Vector(p);
+        cand.set4VectorDividingByMomentumScaling(p);
       } else {
         const double mass = cand.getPDGMass();
         p.SetE(std::sqrt(p.P2() + mass * mass));
-        cand.set4Vector(p);
+        cand.set4VectorDividingByMomentumScaling(p);
       }
       TMatrixFSym cov7b2(7);
       getCovFromPB(&pb, cov7b2);
@@ -285,12 +250,12 @@ namespace TreeFitter {
     }
 
     if (pb.tauIndex() > 0) {
-      std::tuple<double, double>tau  = getDecayLength(cand);
-      std::tuple<double, double>life = getLifeTime(cand);
-      setExtraInfo(&cand, std::string("decayLength"), std::get<0>(tau));
-      setExtraInfo(&cand, std::string("decayLengthErr"), std::get<1>(tau));
-      setExtraInfo(&cand, std::string("lifeTime"), std::get<0>(life));
-      setExtraInfo(&cand, std::string("lifeTimeErr"), std::get<1>(life));
+      const std::tuple<double, double>tau  = getDecayLength(cand);
+      const std::tuple<double, double>life = getLifeTime(cand);
+      cand.writeExtraInfo("decayLength", std::get<0>(tau));
+      cand.writeExtraInfo("decayLengthErr", std::get<1>(tau));
+      cand.writeExtraInfo("lifeTime", std::get<0>(life));
+      cand.writeExtraInfo("lifeTimeErr", std::get<1>(life));
     }
   }
 
@@ -298,7 +263,8 @@ namespace TreeFitter {
   {
     const bool updateableMother = updateCand(cand, isTreeHead);
 
-    if (updateableMother and not cand.hasExtraInfo("bremsCorrected")) {
+    if (updateableMother and not cand.hasExtraInfo("bremsCorrected") and
+        not(cand.hasExtraInfo("treeFitterTreatMeAsInvisible") and cand.getExtraInfo("treeFitterTreatMeAsInvisible") == 1)) {
       const int ndaughters = cand.getNDaughters();
       for (int i = 0; i < ndaughters; i++) {
         auto* daughter = const_cast<Belle2::Particle*>(cand.getDaughter(i));
@@ -319,7 +285,7 @@ namespace TreeFitter {
       const Eigen::Matrix<double, 3, 3> mom_cov = m_fitparams->getCovariance().block<3, 3>(momindex, momindex);
       Eigen::Matrix<double, 4, 4> comb_cov =  Eigen::Matrix<double, 4, 4>::Zero(4, 4);
 
-      std::tuple<double, double> lenTuple  = getDecayLength(cand);
+      const std::tuple<double, double> lenTuple  = getDecayLength(cand);
 
       const double lenErr = std::get<1>(lenTuple);
       comb_cov(0, 0) = lenErr * lenErr;
@@ -329,7 +295,7 @@ namespace TreeFitter {
 
       comb_cov.block<3, 3>(1, 1) = mom_cov;
 
-      const double mass = pb->pdgMass();
+      const double mass = pb->particle()->getPDGMass();
       const double mBYc = mass / Belle2::Const::speedOfLight;
       const double mom = mom_vec.norm();
       const double mom3 = mom * mom * mom;

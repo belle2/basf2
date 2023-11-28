@@ -10,10 +10,12 @@
 
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
+#include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
 
 #include <Math/Boost.h>
+#include <Math/AxisAngle.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector4D.h>
 
@@ -48,7 +50,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns LAB four-momentum of e+e-
+     * Returns LAB four-momentum of e+e-, i.e. pHER + pLER
      */
     ROOT::Math::PxPyPzEVector getBeamFourMomentum() const
     {
@@ -58,11 +60,30 @@ namespace Belle2 {
     /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
+     * Similar transformation done in MCInitialParticles::calculateBoost()
      */
     const ROOT::Math::LorentzRotation rotateLabToCms() const
     {
-      ROOT::Math::LorentzRotation rotation(ROOT::Math::Boost(-1.*getBoostVector()));
-      return rotation;
+      //boost to CM frame
+      ROOT::Math::LorentzRotation boost(ROOT::Math::Boost(-1.*getBoostVector()));
+
+
+      //rotation such that the collision axis is aligned with z-axis
+      ROOT::Math::XYZVector zaxis(0., 0., 1.); //target collision axis
+
+      double tanAngleXZ = tan(m_axisCmsDB->getAngleXZ());
+      double tanAngleYZ = tan(m_axisCmsDB->getAngleYZ());
+      double Norm   = 1 / sqrt(1 + pow(tanAngleXZ, 2) + pow(tanAngleYZ, 2));
+      ROOT::Math::XYZVector electronCMS(Norm * tanAngleXZ, Norm * tanAngleYZ, Norm); //current collision axis
+
+      ROOT::Math::XYZVector rotAxis = zaxis.Cross(electronCMS);
+      double rotangle = asin(rotAxis.R());
+
+      ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotAxis, -rotangle));
+
+
+      ROOT::Math::LorentzRotation trans = rotation * boost;
+      return trans;
     }
 
     /**
@@ -105,6 +126,7 @@ namespace Belle2 {
   private:
     const DBObjPtr<CollisionInvariantMass> m_invariantMassDB; /**< db object for invariant mass. */
     const DBObjPtr<CollisionBoostVector> m_boostVectorDB; /**< db object for boost vector. */
+    const DBObjPtr<CollisionAxisCMS> m_axisCmsDB; /**< db object for collision axis in CM system from boost. */
   };
 
 } // Belle2 namespace

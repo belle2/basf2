@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +14,12 @@ Test backwards compatibility for an mdst file produced with release-02-01-00.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-02-01-00:
+
+- EventLevelClusteringInfo
+  + nKLMDigitsMultiStrip
+  + nECLShowers
+  + nECLLocalMaximums
+  + nECLTriggerCells
 - EventMetaData:
   + isEndOfRun
 - EventLevelTrackingInfo:
@@ -37,11 +42,22 @@ CHANGES since release-02-01-00:
 - TrackFitResult:
   + ndf
   + chi2
+  + remove the const classifier of TrackFitResults and add a function to update the contents
+  + updateTrackFitResult
+  + mask
 - Particle masses:
   * The particle masses have been updated to PDG 2020. As a result, the
     energies corresponding to the measured momenta became slightly different.
 - EventLevelTriggerTimeInfo
   *  added new storage element for information from the Trigger Timing Distribution (TTD)
+- Track:
+  + statusBitmap and getStatusBit
+  + getTrackTime added
+  + wasRefined
+  + isFlippedAndRefitted
+  + getTrackFitResultByName
+  + getTrackFitResultsByName
+  + getTrackFitResultWithClosestMassByName
 """
 
 from basf2 import create_path, process, set_random_seed, find_file

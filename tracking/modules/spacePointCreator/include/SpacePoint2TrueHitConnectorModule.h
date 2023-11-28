@@ -389,7 +389,7 @@ namespace Belle2 {
 
     /** get the local (.first) and global (.second) position of a TrueHit (passed by index) */
     template<typename TrueHitType>
-    std::pair<TVector3, TVector3> getTrueHitPositions(TrueHitType* trueHit);
+    std::pair<ROOT::Math::XYZVector, ROOT::Math::XYZVector> getTrueHitPositions(TrueHitType* trueHit);
 
     /** initialize the root file that is used for output */
     void initializeRootFile();
@@ -404,7 +404,7 @@ namespace Belle2 {
     std::pair<unsigned short int, unsigned short int> getClusterSizes(Belle2::SpacePoint* spacePoint, e_detTypes detType);
 
     /** get the position error of SpacePoints in local coordinates
-     * @retuns .first is U position error, .second is V position error
+     * @returns A pair of doubles. .first is U position error, .second is V position error
      */
     std::pair<double, double> getLocalError(Belle2::SpacePoint* spacePoint);
 

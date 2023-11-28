@@ -36,13 +36,15 @@
 #include <cdc/dbobjects/CDCADCDeltaPedestals.h>
 #include <cdc/dbobjects/CDCFEElectronics.h>
 #include <cdc/dbobjects/CDCEDepToADCConversions.h>
+#include <cdc/dbobjects/CDCCorrToThresholds.h>
 #include <cdc/dbobjects/CDCWireHitRequirements.h>
 #include <cdc/dbobjects/CDCCrossTalkLibrary.h>
-
+#include <cdc/dbobjects/CDClayerTimeCut.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <TFile.h>
 #include <TTreeReader.h>
 #include <TH1F.h>
+#include <Math/Vector3D.h>
 #include <iostream>
 #include <fstream>
 
@@ -56,7 +58,7 @@
 using namespace std;
 using namespace Belle2;
 
-CDCDatabaseImporter::CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun):
+Belle2::CDCDatabaseImporter::CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun):
   m_firstExperiment(fexp), m_firstRun(frun), m_lastExperiment(lexp), m_lastRun(lrun)
 {
   const CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
@@ -65,7 +67,7 @@ CDCDatabaseImporter::CDCDatabaseImporter(int fexp, int frun, int lexp, int lrun)
   m_nSenseWires       = cdcgp.getNumberOfSenseWires();
 }
 
-void CDCDatabaseImporter::importTimeZero(std::string fileName)
+void Belle2::CDCDatabaseImporter::importTimeZero(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -107,12 +109,12 @@ void CDCDatabaseImporter::importTimeZero(std::string fileName)
                          m_lastExperiment, m_lastRun);
   tz.import(iov);
 
-  B2RESULT("Time zero table imported to database.");
+  B2INFO("Time zero table imported to database.");
 
 }
 
 
-void CDCDatabaseImporter::importChannelMap(std::string fileName)
+void Belle2::CDCDatabaseImporter::importChannelMap(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -146,12 +148,12 @@ void CDCDatabaseImporter::importChannelMap(std::string fileName)
 
   cm.import(iov);
 
-  B2RESULT("Channel map imported to database.");
+  B2INFO("Channel map imported to database.");
 
 }
 
 
-void CDCDatabaseImporter::importFEElectronics(std::string fileName)
+void Belle2::CDCDatabaseImporter::importFEElectronics(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -182,11 +184,11 @@ void CDCDatabaseImporter::importFEElectronics(std::string fileName)
 
   cf.import(iov);
 
-  B2RESULT("FEEElectronics imported to database.");
+  B2INFO("FEEElectronics imported to database.");
 }
 
 
-void CDCDatabaseImporter::importEDepToADC(std::string fileName)
+void Belle2::CDCDatabaseImporter::importEDepToADC(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -240,11 +242,11 @@ void CDCDatabaseImporter::importEDepToADC(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   etoa.import(iov);
-  B2RESULT("EDep-toADC table imported to database.");
+  B2INFO("EDep-toADC table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importBadWire(std::string fileName)
+void Belle2::CDCDatabaseImporter::importBadWire(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -282,11 +284,11 @@ void CDCDatabaseImporter::importBadWire(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   bw.import(iov);
-  B2RESULT("BadWire table imported to database.");
+  B2INFO("BadWire table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importPropSpeed(std::string fileName)
+void Belle2::CDCDatabaseImporter::importPropSpeed(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -326,11 +328,50 @@ void CDCDatabaseImporter::importPropSpeed(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   ps.import(iov);
-  B2RESULT("PropSpeed table imported to database.");
+  B2INFO("PropSpeed table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importTimeWalk(std::string fileName)
+void Belle2::CDCDatabaseImporter::importCorrToThreshold(std::string fileName)
+{
+  std::ifstream stream;
+  stream.open(fileName.c_str());
+  if (!stream) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportObjPtr<CDCCorrToThresholds> cr;
+  cr.construct();
+
+  uint iCL(0), nRead(0);
+  double param(1.);
+
+  while (true) {
+    stream >> iCL >> param;
+    if (stream.eof()) break;
+
+    if (iCL < m_firstLayerOffset) {
+      continue;
+    }
+
+    ++nRead;
+    cr->setParam(iCL, param);
+  }
+  stream.close();
+
+  if (nRead != c_maxNSenseLayers) B2FATAL("#lines read-in (=" << nRead << ") is not equal to #sense layers (=" << c_maxNSenseLayers <<
+                                            ") !");
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  cr.import(iov);
+  B2INFO("CorrToThreshold table imported to database.");
+}
+
+
+void Belle2::CDCDatabaseImporter::importTimeWalk(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -368,11 +409,11 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   tw.import(iov);
-  B2RESULT("Time-walk coeff. table imported to database.");
+  B2INFO("Time-walk coeff. table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importXT(std::string fileName)
+void Belle2::CDCDatabaseImporter::importXT(std::string fileName)
 {
   DBImportObjPtr<CDCXtRelations> xt;
   xt.construct();
@@ -440,7 +481,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
-  unsigned nRead = 0;
+  // unsigned nRead = 0;
 
   ifs >> xtParamMode >> np;
   if (xtParamMode < 0 || xtParamMode > 1) B2FATAL("Invalid xt param mode read !");
@@ -462,7 +503,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
       continue;
     }
 
-    ++nRead;
+    // ++nRead;
 
     int ialpha = -99;
     for (unsigned short i = 0; i < nAlphaBins; ++i) {
@@ -497,10 +538,10 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   xt.import(iov);
-  B2RESULT("XT table imported to database.");
+  B2INFO("XT table imported to database.");
 }
 
-void CDCDatabaseImporter::importSigma(std::string fileName)
+void Belle2::CDCDatabaseImporter::importSigma(std::string fileName)
 {
   DBImportObjPtr<CDCSpaceResols> sg;
   sg.construct();
@@ -555,7 +596,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   const unsigned short npx = c_nSigmaParams;
   double sgm[npx];
   double theta, alpha;
-  unsigned nRead = 0;
+  // unsigned nRead = 0;
 
   ifs >> sgParamMode >> np;
   if (sgParamMode < 0 || sgParamMode > 1) B2FATAL("Invalid sigma param mode read !");
@@ -581,7 +622,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
       continue;
     }
 
-    ++nRead;
+    // ++nRead;
 
     int ialpha = -99;
     for (unsigned short i = 0; i < nAlphaBins; ++i) {
@@ -615,11 +656,11 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   sg.import(iov);
-  B2RESULT("Sigma table imported to database.");
+  B2INFO("Sigma table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importFFactor(std::string fileName)
+void Belle2::CDCDatabaseImporter::importFFactor(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -657,11 +698,11 @@ void CDCDatabaseImporter::importFFactor(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   etoa.import(iov);
-  B2RESULT("Fudge factor table imported to database.");
+  B2INFO("Fudge factor table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importDisplacement(std::string fileName)
+void Belle2::CDCDatabaseImporter::importDisplacement(std::string fileName)
 {
   //read alpha bins
   //  std::ifstream ifs;
@@ -703,8 +744,8 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
 
     ++nRead;
     WireID wire(iL, iC);
-    TVector3 fwd(fwrd[0], fwrd[1], fwrd[2]);
-    TVector3 bwd(back[0], back[1], back[2]);
+    ROOT::Math::XYZVector fwd(fwrd[0], fwrd[1], fwrd[2]);
+    ROOT::Math::XYZVector bwd(back[0], back[1], back[2]);
     disp.appendNew(wire, fwd, bwd, tension);
   }
 
@@ -717,11 +758,11 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   disp.import(iov);
-  B2RESULT("Wire displasement table imported to database.");
+  B2INFO("Wire displasement table imported to database.");
 }
 
 
-void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
+void Belle2::CDCDatabaseImporter::importWirPosAlign(std::string fileName)
 {
   //  std::ifstream ifs;
   //  ifs.open(fileName.c_str());
@@ -782,11 +823,11 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   al.import(iov);
-  B2RESULT("Wire alignment table imported to database.");
+  B2INFO("Wire alignment table imported to database.");
 }
 
 
-void CDCDatabaseImporter::printChannelMap()
+void Belle2::CDCDatabaseImporter::printChannelMap()
 {
 
   DBArray<CDCChannelMap> channelMaps;
@@ -799,7 +840,7 @@ void CDCDatabaseImporter::printChannelMap()
 
 }
 
-void CDCDatabaseImporter::printFEElectronics()
+void Belle2::CDCDatabaseImporter::printFEElectronics()
 {
   DBArray<CDCFEElectronics> fEElectronics;
   for (const auto& cf : fEElectronics) {
@@ -811,13 +852,13 @@ void CDCDatabaseImporter::printFEElectronics()
   //              << cf.getL1TrgLatency() << std::endl;
 }
 
-void CDCDatabaseImporter::printEDepToADC()
+void Belle2::CDCDatabaseImporter::printEDepToADC()
 {
   DBObjPtr<CDCEDepToADCConversions> etoa;
   etoa->dump();
 }
 
-void CDCDatabaseImporter::printTimeZero()
+void Belle2::CDCDatabaseImporter::printTimeZero()
 {
 
   DBObjPtr<CDCTimeZeros> timeZeros;
@@ -831,43 +872,43 @@ void CDCDatabaseImporter::printTimeZero()
 
 }
 
-void CDCDatabaseImporter::printBadWire()
+void Belle2::CDCDatabaseImporter::printBadWire()
 {
   DBObjPtr<CDCBadWires> bw;
   bw->dump();
 }
 
-void CDCDatabaseImporter::printPropSpeed()
+void Belle2::CDCDatabaseImporter::printPropSpeed()
 {
   DBObjPtr<CDCPropSpeeds> ps;
   ps->dump();
 }
 
-void CDCDatabaseImporter::printTimeWalk()
+void Belle2::CDCDatabaseImporter::printTimeWalk()
 {
   DBObjPtr<CDCTimeWalks> tw;
   tw->dump();
 }
 
-void CDCDatabaseImporter::printXT()
+void Belle2::CDCDatabaseImporter::printXT()
 {
   DBObjPtr<CDCXtRelations> xt;
   xt->dump();
 }
 
-void CDCDatabaseImporter::printSigma()
+void Belle2::CDCDatabaseImporter::printSigma()
 {
   DBObjPtr<CDCSpaceResols> sgm;
   sgm->dump();
 }
 
-void CDCDatabaseImporter::printFFactor()
+void Belle2::CDCDatabaseImporter::printFFactor()
 {
   DBObjPtr<CDCFudgeFactorsForSigma> ff;
   ff->dump();
 }
 
-void CDCDatabaseImporter::printDisplacement()
+void Belle2::CDCDatabaseImporter::printDisplacement()
 {
   DBArray<CDCDisplacement> displacements;
   for (const auto& disp : displacements) {
@@ -877,20 +918,20 @@ void CDCDatabaseImporter::printDisplacement()
   }
 }
 
-void CDCDatabaseImporter::printWirPosAlign()
+void Belle2::CDCDatabaseImporter::printWirPosAlign()
 {
   DBObjPtr<CDCAlignment> al;
   al->dump();
 }
 
-void CDCDatabaseImporter::printWirPosMisalign()
+void Belle2::CDCDatabaseImporter::printWirPosMisalign()
 {
   DBObjPtr<CDCMisalignment> mal;
   mal->dump();
 }
 
 
-void CDCDatabaseImporter::importADCDeltaPedestal(std::string fileName)
+void Belle2::CDCDatabaseImporter::importADCDeltaPedestal(std::string fileName)
 {
   std::ifstream stream;
   stream.open(fileName.c_str());
@@ -933,10 +974,10 @@ void CDCDatabaseImporter::importADCDeltaPedestal(std::string fileName)
                          m_lastExperiment, m_lastRun);
   dbPed.import(iov);
 
-  B2RESULT("ADC delta pedestal table imported to database.");
+  B2INFO("ADC delta pedestal table imported to database.");
 }
 
-void CDCDatabaseImporter::importADCDeltaPedestal()
+void Belle2::CDCDatabaseImporter::importADCDeltaPedestal()
 {
 
   DBImportObjPtr<CDCADCDeltaPedestals> dbPed;
@@ -946,17 +987,17 @@ void CDCDatabaseImporter::importADCDeltaPedestal()
                          m_lastExperiment, m_lastRun);
   dbPed.import(iov);
 
-  B2RESULT("ADC delta pedestal w/ zero  imported to database.");
+  B2INFO("ADC delta pedestal w/ zero  imported to database.");
 }
 
-void CDCDatabaseImporter::printADCDeltaPedestal()
+void Belle2::CDCDatabaseImporter::printADCDeltaPedestal()
 {
 
   DBObjPtr<CDCADCDeltaPedestals> dbPed;
   dbPed->dump();
 }
 
-void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFileName) const
+void Belle2::CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFileName) const
 {
 
   // Create a property tree
@@ -979,10 +1020,10 @@ void CDCDatabaseImporter::importCDCWireHitRequirements(const std::string& jsonFi
                          m_lastExperiment, m_lastRun);
   dbWireHitReq.import(iov);
 
-  B2RESULT("CDCWireHit requirements imported to database.");
+  B2INFO("CDCWireHit requirements imported to database.");
 }
 
-void CDCDatabaseImporter::printCDCWireHitRequirements() const
+void Belle2::CDCDatabaseImporter::printCDCWireHitRequirements() const
 {
 
   DBObjPtr<CDCWireHitRequirements> dbWireHitReq;
@@ -993,7 +1034,7 @@ void CDCDatabaseImporter::printCDCWireHitRequirements() const
   }
 }
 
-void CDCDatabaseImporter::importCDCCrossTalkLibrary(const std::string& rootFileName) const
+void Belle2::CDCDatabaseImporter::importCDCCrossTalkLibrary(const std::string& rootFileName) const
 {
   DBImportObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLibrary;
   dbCDCCrossTalkLibrary.construct();
@@ -1058,10 +1099,10 @@ void CDCDatabaseImporter::importCDCCrossTalkLibrary(const std::string& rootFileN
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   dbCDCCrossTalkLibrary.import(iov);
-  B2RESULT("CDCCrossTalkLibrary requirements imported to database.");
+  B2INFO("CDCCrossTalkLibrary requirements imported to database.");
 }
 
-void CDCDatabaseImporter::printCDCCrossTalkLibrary() const
+void Belle2::CDCDatabaseImporter::printCDCCrossTalkLibrary() const
 {
   DBObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLib;
   if (dbCDCCrossTalkLib.isValid()) {
@@ -1071,7 +1112,7 @@ void CDCDatabaseImporter::printCDCCrossTalkLibrary() const
   }
 }
 
-void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
+void Belle2::CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
 {
   DBObjPtr<CDCCrossTalkLibrary> dbCDCCrossTalkLib;
 
@@ -1116,9 +1157,42 @@ void CDCDatabaseImporter::testCDCCrossTalkLibrary(bool spotChecks) const
 }
 
 
+void Belle2::CDCDatabaseImporter::importCDClayerTimeCut(const std::string& jsonFileName) const
+{
+  // Create a property tree
+  boost::property_tree::ptree tree;
+  try {
+    // Load the json file in this property tree.
+    B2INFO("Loading json file: " << jsonFileName);
+    boost::property_tree::read_json(jsonFileName, tree);
+  } catch (boost::property_tree::ptree_error& e) {
+    B2FATAL("Error when loading json file: " << e.what());
+  }
+
+  DBImportObjPtr<CDClayerTimeCut> dbCDClayerTimeCut;
+  dbCDClayerTimeCut.construct(tree);
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  dbCDClayerTimeCut.import(iov);
+  B2INFO("dbCDClayerTimeCut imported to database.");
+}
+
+void Belle2::CDCDatabaseImporter::printCDClayerTimeCut() const
+{
+  DBObjPtr<CDClayerTimeCut> dbCDClayerTimeCut;
+  if (dbCDClayerTimeCut.isValid()) {
+    dbCDClayerTimeCut->dump();
+  } else {
+    B2WARNING("DBObjPtr<CDClayerTimeCut> not valid for the current run.");
+  }
+
+}
+
+
 //Note; the following function is no longer needed
 #if 0
-void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
+void Belle2::CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
 {
   std::ifstream ifs;
   ifs.open(fileName.c_str());
@@ -1169,7 +1243,7 @@ void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   mal.import(iov);
-  B2RESULT("Wire misalignment table imported to database.");
+  B2INFO("Wire misalignment table imported to database.");
 }
 #endif
 

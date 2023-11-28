@@ -12,18 +12,18 @@ Batch submission
 
     **Prerequisites**:
 
-        * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
+    * A `KEKCC account <https://belle.kek.jp/secured2/secretary/registration/comp_system.html>`_
 
     **Questions**:
 
-        * How to check batch queues for Belle II workgroup?
-        * How to submit a job to a specific queue?
-        * How to check the status of running jobs?
-        * How to cancel a batch job?
+    * How to check batch queues for Belle II workgroup?
+    * How to submit a job to a specific queue?
+    * How to check the status of running jobs?
+    * How to cancel a batch job?
 
     **Objectives**:
 
-        * Submit computation intensive scripts to worker servers
+    * Submit computation intensive scripts to worker servers
 
 When a batch job is submitted from a work server at KEKCC, the job is scheduled by
 `LSF <https://www.ibm.com/support/knowledgecenter/en/SSWRJV_10.1.0/lsf_welcome/lsf_kc_using.html>`_
@@ -240,6 +240,6 @@ To resumes suspended jobs
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Author of this lesson
+.. rubric:: Author of this lesson
 
-   Chia-Ling Hsu
+Chia-Ling Hsu

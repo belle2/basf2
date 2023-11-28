@@ -15,8 +15,6 @@
 //---------------------------------------------------------------
 // Description : TRG GDL Unpacker Module
 //---------------------------------------------------------------
-// 1.00 : 2017/07/26 : First version
-//---------------------------------------------------------------
 
 #include <trg/gdl/modules/trggdlUnpacker/trggdlUnpackerModule.h>
 
@@ -100,8 +98,8 @@ void TRGGDLUnpackerModule::initialize()
 
     if (m_print_dbmap) {
 
-      int aBitMap[320][2] = {0};
-      int aBitMap_extra[100][3] = { -1};
+      int aBitMap[320][2] = {{0}};
+      int aBitMap_extra[100][3] = {{ -1}};
       for (int i = 0; i < n_leafsExtra; i++) {
         aBitMap_extra[i][0] = m_dbunpacker->getBitMap_extra(i, 0);
         aBitMap_extra[i][1] = m_dbunpacker->getBitMap_extra(i, 1);
@@ -201,7 +199,7 @@ void TRGGDLUnpackerModule::event()
             }
           }
 
-        } else if (m_pciedata) {
+        } else {
 
           unsigned pcie40id = raw_trgarray[i]->GetNodeID(j);
           if (pcie40id == 0x10000001) {

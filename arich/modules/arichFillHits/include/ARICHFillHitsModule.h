@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHFILLHITSMODULE_H
-#define ARICHFILLHITSMODULE_H
+#pragma once
 
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
@@ -45,12 +43,6 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
@@ -59,18 +51,6 @@ namespace Belle2 {
      * Corrects hit position for distorsion due to non-perpendicular magnetic field component
      */
     void magFieldCorrection(TVector3& hitpos);
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
 
   private:
 
@@ -85,5 +65,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

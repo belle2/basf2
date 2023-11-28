@@ -10,7 +10,6 @@
 #include <sys/stat.h>
 #include <chrono>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -81,11 +80,11 @@ ROISenderModule::event()
     }
   } else {
     B2FATAL(std::string(__FILE__) << ":" << __LINE__  <<
-            "ROI payload too long." << endl <<
-            "Payload length     = " << length << endl <<
-            "Message max length = " << m_messageQueueMsgSize << endl <<
+            "ROI payload too long." << std::endl <<
+            "Payload length     = " << length << std::endl <<
+            "Message max length = " << m_messageQueueMsgSize << std::endl <<
             "We stop here, as this will result in event mismatch on EB! Please increase mqueue message length on HLT and/or check size limit in ROIPayload Assembler"
-            << endl);
+            << std::endl);
   }
 
   // Calculate the time difference between now and the trigger time
@@ -118,8 +117,8 @@ ROISenderModule::terminate()
 {
   closeMessageQueue("on terminate");
   //  unlinkMessageQueue("on terminate");
-  string str = "HLT Delay time distribution: ( ";
-  for (auto& a : m_histo) str += to_string(a) + ";";
+  std::string str = "HLT Delay time distribution: ( ";
+  for (auto& a : m_histo) str += std::to_string(a) + ";";
   str += " )";
   B2RESULT(str);
 }

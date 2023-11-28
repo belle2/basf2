@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+from basf2 import find_file
 import numpy as np
 import tensorflow as tf
 import basf2_mva
@@ -15,7 +16,7 @@ import basf2_mva
 from basf2_mva_python_interface.tensorflow import State
 
 
-class Prior(object):
+class Prior:
     """
     Calculates prior from signal and background pdfs of the fit variable
     """
@@ -163,13 +164,19 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     return state
 
 
-def partial_fit(state, X, S, y, w, epoch):
+def partial_fit(state, X, S, y, w, epoch, batch):
     """
     Pass received data to tensorflow session
     """
     prior = Prior(S[:, 0], y[:, 0])
     N = 100
     batch_size = 100
+
+    # make sure we have the epochs and batches set correctly.
+    assert epoch < 2, "There should only be two iterations, one for the boost training,"\
+        " one for the dplot training. Check the value of m_nIterations."
+    assert batch == 0, "All data should be passed to partial_fit on each call."\
+        " The mini batches are handled internally. Check that m_mini_batch_size=0."
 
     indices = np.arange(len(X))
     for i in range(N):
@@ -209,13 +216,17 @@ def partial_fit(state, X, S, y, w, epoch):
 
             optimizer.apply_gradients(zip(grads, trainable_variables))
 
-        print("Epoch:", '%04d' % (i), "cost=", "{:.9f}".format(avg_cost))
+        print("Internal Epoch:", f'{int(i):04}', "cost=", f"{avg_cost:.9f}")
     return True
 
 
 if __name__ == "__main__":
+
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    training_data = basf2_mva.vector(train_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_identifier = "TensorflowDPlot"
     general_options.m_treename = "tree"
     variables = ['p', 'pt', 'pz',

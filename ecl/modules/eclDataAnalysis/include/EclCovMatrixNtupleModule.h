@@ -8,12 +8,15 @@
 
 #pragma once
 
-//STL
-#include <string>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+/* C++ headers. */
+#include <string>
 
 class TTree;
 class TFile;
@@ -70,21 +73,21 @@ namespace Belle2 {
     int m_nhits{ -1};
 
     /** Crystal ID */
-    int m_cellID[8736] = {};
+    int m_cellID[ECLElementNumbers::c_NCrystals] = {};
     /** Crystal Theta ID */
-    int m_theta[8736] = {};
+    int m_theta[ECLElementNumbers::c_NCrystals] = {};
     /** Crystal Phi ID */
-    int m_phi[8736] = {};
+    int m_phi[ECLElementNumbers::c_NCrystals] = {};
     /** eclDsp sample Array */
-    int m_DspHit[8736][31] = {};
+    int m_DspHit[ECLElementNumbers::c_NCrystals][31] = {};
     /** eclHit Energy */
-    double m_hitE[8736] = {};
+    double m_hitE[ECLElementNumbers::c_NCrystals] = {};
     /** eclHit Time */
-    double m_hitTime[8736] = {};
+    double m_hitTime[ECLElementNumbers::c_NCrystals] = {};
     /** eclDigit Time */
-    int m_DigiTime[8736] = {};
+    int m_DigiTime[ECLElementNumbers::c_NCrystals] = {};
     /** eclTrig Time */
-    double m_DeltaT[8736] = {};
+    double m_DeltaT[ECLElementNumbers::c_NCrystals] = {};
 
   private:
     /** Store array: ECLDsp. */

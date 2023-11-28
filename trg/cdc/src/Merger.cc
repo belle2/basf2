@@ -156,12 +156,12 @@ namespace Belle2 {
     //...Clear input signal bundle...
     if (_misb) {
       for (unsigned i = 0; i < _misb->size(); i++)
-        delete(* _misb)[i];
+        delete (* _misb)[i];
       delete _misb;
     }
     if (_mosb) {
       for (unsigned i = 0; i < _mosb->size(); i++)
-        delete(* _mosb)[i];
+        delete (* _mosb)[i];
       delete _mosb;
     }
 
@@ -250,7 +250,7 @@ namespace Belle2 {
 
 
   TRGState
-  TCMerger::packerInner(const TRGState& input)
+  TRGCDCMerger::packerInner(const TRGState& input)
   {
 
     //...inputInsdie should be 32 hit pattern and 2x16x5 timing, total 192 bits...
@@ -453,7 +453,7 @@ namespace Belle2 {
 
 
   TRGState
-  TCMerger::packerOuter(const TRGState& input)
+  TRGCDCMerger::packerOuter(const TRGState& input)
   {
 
     // packerOuter: for SuperLayer 1 - 8
@@ -712,8 +712,8 @@ namespace Belle2 {
 
 
   void
-  TCMerger:: unpackerInner(const TRGState& input,
-                           const TRGState& output)
+  TRGCDCMerger:: unpackerInner(const TRGState& input,
+                               const TRGState& output)
   {
 
     TRGState inputInside = input.subset(0, 256);
@@ -898,8 +898,8 @@ namespace Belle2 {
 
 
   void
-  TCMerger:: unpackerOuter(const TRGState& input,
-                           const TRGState& output)
+  TRGCDCMerger:: unpackerOuter(const TRGState& input,
+                               const TRGState& output)
   {
 
     TRGState inputInside = input.subset(0, 256);

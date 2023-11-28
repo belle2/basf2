@@ -78,9 +78,9 @@ namespace Belle2 {
         return {};
       }
 
-      const TVector3& momentum = recoTrack.getMomentumSeed();
+      const ROOT::Math::XYZVector& momentum = recoTrack.getMomentumSeed();
 
-      if (momentum.Mag() > m_minimumMomentum) {
+      if (momentum.R() > m_minimumMomentum) {
         return {};
       }
 

@@ -47,8 +47,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_clsTime',
-    cut=pu.cut_oneTH,
-    descr='Reconstructed time of the cluster for all clusters related to one TrueHit.\
+    cut=pu.cut_matched,
+    descr='Reconstructed time of the cluster for all clusters related to at least one TrueHit.\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=True)
@@ -65,8 +65,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=pu.cut_oneTH,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    cut=pu.cut_matched,
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -83,8 +83,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=pu.cut_oneTH+pu.cut_size1,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    cut=pu.cut_size1 + pu.cut_matched,
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -101,8 +101,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=pu.cut_oneTH+pu.cut_size2,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    cut=pu.cut_size2 + pu.cut_matched,
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -119,8 +119,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_position - truehit_position',
-    cut=pu.cut_oneTH+pu.cut_size3plus,
-    descr='Definition: (reconstructed position of the cluster) - (position of the TrueHit).\
+    cut=pu.cut_size3plus + pu.cut_matched,
+    descr='Definition: (reconstructed position of the cluster) - (position of the best TrueHit).\
     Distribution for signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -137,7 +137,7 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=pu.cut_oneTH,
+    cut=pu.cut_matched,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -155,7 +155,7 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=pu.cut_oneTH+pu.cut_size1,
+    cut=pu.cut_size1 + pu.cut_matched,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -173,7 +173,7 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=pu.cut_oneTH+pu.cut_size2,
+    cut=pu.cut_size2 + pu.cut_matched,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -191,7 +191,7 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='(cluster_position - truehit_position)/cluster_positionSigma',
-    cut=pu.cut_oneTH+pu.cut_size3plus,
+    cut=pu.cut_size3plus + pu.cut_matched,
     descr='Definition: (cluster_position - truehit_position)/cluster_positionSigma.\
     Distribution for signal clusters.',
     check='Distribution peaks around 0 with RMS less than 2.0.',
@@ -209,8 +209,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_clsTime - truehit_time',
-    cut=pu.cut_oneTH,
-    descr='Definition: (reconstructed time of the cluster) - (time of the TrueHit)\
+    cut=pu.cut_matched,
+    descr='Definition: (reconstructed time of the cluster) - (time of the best TrueHit)\
     for all signal clusters.',
     check='Distribution peak around 0.',
     isShifter=False)
@@ -227,8 +227,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_charge',
-    cut=pu.cut_oneTH,
-    descr='Reconstructed charge of the cluster related to one TrueHit.\
+    cut=pu.cut_matched,
+    descr='Reconstructed charge of the cluster related to at least one TrueHit.\
     Distribution for signal clusters.',
     check='Distribution peaks around 20-40 ke.',
     isShifter=True)
@@ -244,8 +244,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_snr',
-    cut=pu.cut_oneTH,
-    descr='Signal/Noise ratio of the cluster related to one TrueHit. Distribution for signal clusters.',
+    cut=pu.cut_matched,
+    descr='Signal/Noise ratio of the clusters related to at least one TrueHit.',
     check='Distribution peaks around 20.',
     isShifter=True)
 
@@ -260,7 +260,7 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_interstripPosition',
-    cut=pu.cut_oneTH,
+    cut=pu.cut_matched,
     descr='Definition: (cluster_position % strip_pitch / strip_pitch).\
     Distribution for signal clusters.',
     check='',
@@ -277,8 +277,8 @@ pu.plotter(
     granules=pu.gD,
     tree=treeC,
     expr='cluster_size',
-    cut=pu.cut_oneTH,
-    descr='Number of strips in the Cluster related to one TrueHit. Distribution for signal clusters.',
+    cut=pu.cut_matched,
+    descr='Number of strips in the Cluster related to at least one TrueHit.',
     check='Distribution peaks in range 2-3.',
     isShifter=False)
 
@@ -290,10 +290,12 @@ pu.plotRegions(
     granules=pu.granulesLayersTypes,
     tree=treeTH,
     expr='strip_dir',
-    cutALL=pu.cut_noV,
-    cut=pu.cut_U,
-    descr='Definition: (number of clusters related to TrueHit) / (number of Truehits)',
-    check='Efficiency should be close to 1 in all bins.',
+    cutALL=pu.cut_notV,
+    cut=pu.cut_notV + pu.cut_reco,
+    descr='Definition: (number of clusters related to at least one TrueHit) / (number of best TrueHits)',
+    check='Efficiency should be close to 1 in all bins. Note that only one TrueHit (the best one, \
+        i.e. the one with the largest energy deposit) is counted\
+        in case one cluster is related to more than one TrueHit (e.g. in case of delta rays).',
     isShifter=True)
 
 
@@ -305,24 +307,26 @@ pu.plotRegions(
     granules=pu.granulesLayersTypes,
     tree=treeTH,
     expr='strip_dir',
-    cutALL=pu.cut_noU,
-    cut=pu.cut_V,
-    descr='Definition: (number of clusters related to TrueHit) / (number of Truehits).',
-    check='Efficiency should be close to 1 in all bins.',
+    cutALL=pu.cut_notU,
+    cut=pu.cut_notU + pu.cut_reco,
+    descr='Definition: (number of clusters related to at least one TrueHit) / (number of best TrueHits)',
+    check='Efficiency should be close to 1 in all bins. Note that only one TrueHit (the best one, \
+        i.e. the one with the largest energy deposit) is counted\
+        in case one cluster is related to more than one TrueHit (e.g. in case of delta rays).',
     isShifter=True)
 
 
 pu.plotRegions(
     name='ClusterizationPurity_U',
-    title='Purity of clusterization for U side',
+    title='Fraction of U-side signal clusters (purity)',
     x_label='SVD regions',
     y_label='Purity',
     granules=pu.granulesLayersTypes,
     tree=treeC,
     expr='strip_dir',
-    cutALL=pu.cut_noV,
-    cut=pu.cut_oneTH,
-    descr='(number of clusters related to one TrueHit) / (number of clusters).\
+    cutALL=pu.cut_U,
+    cut=pu.cut_U + pu.cut_matched,
+    descr='(number of clusters related to at least one TrueHit) / (number of clusters).\
     Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Purity should be above 0 in all bins.',
     isShifter=True)
@@ -330,15 +334,15 @@ pu.plotRegions(
 
 pu.plotRegions(
     name='ClusterizationPurity_V',
-    title='Purity of clusterization for V side',
+    title='Fraction of V-side signal clusters (purity)',
     x_label='SVD regions',
     y_label='Purity',
     granules=pu.granulesLayersTypes,
     tree=treeC,
     expr='strip_dir',
-    cutALL=pu.cut_noU,
-    cut=pu.cut_oneTH,
-    descr='(number of clusters related to one TrueHit) / (number of clusters).\
+    cutALL=pu.cut_V,
+    cut=pu.cut_V + pu.cut_matched,
+    descr='(number of clusters related to at least one TrueHit) / (number of clusters).\
     Evaluates the fraction of signal cluster over the total number of signal and background clusters.',
     check='Purity should be above 0 in all bins.',
     isShifter=True)

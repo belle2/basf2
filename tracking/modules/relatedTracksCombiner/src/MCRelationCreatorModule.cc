@@ -18,9 +18,9 @@ MCRelationCreatorModule::MCRelationCreatorModule() :
   setDescription("Create relations between MC-matched RecoTracks in CDC and SVD.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName , "Name of the input CDC StoreArray.",
+  addParam("CDCRecoTracksStoreArrayName", m_cdcRecoTracksStoreArrayName, "Name of the input CDC StoreArray.",
            m_cdcRecoTracksStoreArrayName);
-  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName , "Name of the input VXD StoreArray.",
+  addParam("VXDRecoTracksStoreArrayName", m_vxdRecoTracksStoreArrayName, "Name of the input VXD StoreArray.",
            m_vxdRecoTracksStoreArrayName);
 }
 
@@ -38,12 +38,12 @@ void MCRelationCreatorModule::initialize()
 void MCRelationCreatorModule::event()
 {
   for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
-    const RecoTrack* matchedMCRecoTrack = m_cdcTrackMatchLookUp->getMatchedMCRecoTrack(cdcRecoTrack);
+    const RecoTrack* matchedMCRecoTrack = m_cdcTrackMatchLookUp->getAnyChargeMatchedMCRecoTrack(cdcRecoTrack);
     if (not matchedMCRecoTrack) {
       continue;
     }
 
-    const RecoTrack* matchedVXDRecoTrack = m_vxdTrackMatchLookUp->getMatchedPRRecoTrack(*matchedMCRecoTrack);
+    const RecoTrack* matchedVXDRecoTrack = m_vxdTrackMatchLookUp->getAnyChargeMatchedPRRecoTrack(*matchedMCRecoTrack);
     if (not matchedVXDRecoTrack) {
       continue;
     }

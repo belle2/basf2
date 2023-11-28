@@ -390,6 +390,18 @@ vector<string> DecayDescriptor::getSelectionNames()
   return strNames;
 }
 
+vector<int> DecayDescriptor::getSelectionPDGCodes()
+{
+  vector<int> listPDG;
+  if (m_mother.isSelected()) listPDG.push_back(m_mother.getPDGCode());
+  for (auto& daughter : m_daughters) {
+    vector<int> listPDGDaughters = daughter.getSelectionPDGCodes();
+    listPDG.insert(listPDG.end(), listPDGDaughters.begin(), listPDGDaughters.end());
+  }
+  return listPDG;
+}
+
+
 std::vector<std::vector<std::pair<int, std::string>>>  DecayDescriptor::getHierarchyOfSelected()
 {
   if (not m_hierarchy.empty()) {

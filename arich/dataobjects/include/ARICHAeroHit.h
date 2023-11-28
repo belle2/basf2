@@ -49,12 +49,12 @@ namespace Belle2 {
                  TVector3 momentum)
     {
       m_particleID = particleId;
-      m_x = (float) position.x();
-      m_y = (float) position.y();
-      m_z = (float) position.z();
-      m_px = (float) momentum.x();
-      m_py = (float) momentum.y();
-      m_pz = (float) momentum.z();
+      m_x = (float) position.X();
+      m_y = (float) position.Y();
+      m_z = (float) position.Z();
+      m_px = (float) momentum.X();
+      m_py = (float) momentum.Y();
+      m_pz = (float) momentum.Z();
     }
 
     //! Get particle PDG identity number

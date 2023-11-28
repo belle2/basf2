@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -29,8 +28,7 @@ b2.set_log_level(b2.LogLevel.INFO)
 
 home = os.environ['BELLE2_LOCAL_DIR']
 # cosmic test local DB folder
-b2.use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
-                      home + "/arich/database/cosmicTest_payloads")
+b2.conditions.append_testing_payloads(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt")
 
 # Create path
 main = b2.create_path()
@@ -45,8 +43,7 @@ main.add_module(histo)
 
 
 # Load parameters
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+main.add_module('Gearbox')
 
 # Create geometry
 geometry = b2.register_module('Geometry')
@@ -101,12 +98,10 @@ arichDIGI.param('BackgroundHits', 0)
 main.add_module(arichDIGI)
 
 # fill ARICHHits from ARICHDigits
-arichHits = b2.register_module('ARICHFillHits')
-main.add_module(arichHits)
+main.add_module('ARICHFillHits')
 
 # add ARICH DQM module
-arichDQM = b2.register_module('ARICHDQM')
-main.add_module(arichDQM)
+main.add_module('ARICHDQM')
 
 # add display module
 # display = register_module('Display')
@@ -123,8 +118,7 @@ main.add_module(arichDQM)
 # main.add_module(output)
 
 # Show progress of processing
-progress = b2.register_module('Progress')
-main.add_module(progress)
+main.add_module('Progress')
 
 # Process events
 b2.process(main)

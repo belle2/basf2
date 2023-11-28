@@ -11,7 +11,6 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
-using namespace std;
 using namespace Belle2;
 
 ROIStripTranslator::ROIStripTranslator(double user_sigmaSystU, double user_sigmaSystV, double user_numSigmaTotU,
@@ -48,7 +47,7 @@ ROIStripTranslator::fillRoiIDList(StoreArray<SVDIntercept>* listOfIntercepts,
 
   for (int i = 0; i < listOfIntercepts->getEntries(); i++) {
 
-    B2DEBUG(10, "  --->> a NEW INTERCEPT!");
+    B2DEBUG(20, "  --->> a NEW INTERCEPT!");
 
 
     const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo((*listOfIntercepts)[i]->getSensorID());
@@ -73,26 +72,26 @@ ROIStripTranslator::fillRoiIDList(StoreArray<SVDIntercept>* listOfIntercepts,
     double max_uID = aSensorInfo.getUCellID(maxU, maxV, false);
     double max_vID = aSensorInfo.getVCellID(maxV, false);
 
-    B2DEBUG(10, "  LAYER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLayerNumber()
+    B2DEBUG(20, "  LAYER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLayerNumber()
             << " LADDER = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getLadderNumber()
             << " SENSOR = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getSensorNumber()
            );
 
-    B2DEBUG(10, "  nStrips (U,V) = (" << nStripsU << "," << nStripsV << ")");
+    B2DEBUG(20, "  nStrips (U,V) = (" << nStripsU << "," << nStripsV << ")");
 
-    B2DEBUG(10, "  widthU = " << maxU - minU
+    B2DEBUG(20, "  widthU = " << maxU - minU
             << "  minU = "  << minU
             << "  maxU = "  << maxU
             << "  lengthU = " << aSensorInfo.getUSize((*listOfIntercepts)[i]->getCoorV())
            );
 
-    B2DEBUG(10, "  widthV = " << maxV - minV
+    B2DEBUG(20, "  widthV = " << maxV - minV
             << "  minV = " << minV
             << "  maxV = " << maxV
             << "  lengthV = " << aSensorInfo.getVSize());
 
-    B2DEBUG(10, " U strips in (" << min_uID << "," << max_uID << ")");
-    B2DEBUG(10, " V strips in (" << min_vID << "," << max_vID << ")");
+    B2DEBUG(20, " U strips in (" << min_uID << "," << max_uID << ")");
+    B2DEBUG(20, " V strips in (" << min_vID << "," << max_vID << ")");
 
 
     //check that the pixel belong to the sensor

@@ -12,23 +12,15 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
+#include <dqm/core/DQMHistAnalysis.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
 
-#include <vector>
-#include <array>
-#include <TF1.h>
-#include "TF1Convolution.h"
-#include <TCanvas.h>
-#include <TLine.h>
-#include <TGraphErrors.h>
 #include <TFile.h>
 #include <TH2.h>
+#include <TF1.h>
+#include <TLine.h>
+#include <TGraphErrors.h>
 
 #include <RooRealVar.h>
 #include <RooWorkspace.h>
@@ -36,7 +28,7 @@
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Cluster Charge */
 
-  class DQMHistAnalysisPXDTrackChargeModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDTrackChargeModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -77,24 +69,16 @@ namespace Belle2 {
     void terminate(void) override final;
 
   private:
-
-    /**
-     * Get histogram by its name.
-     * @param histoname The name of the histogram.
-     * @return The pointer to the histogram, or nullptr if not found.
-     */
-    TH1* GetHisto(TString histoname);
-
     // Data members
 
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     //! fit range lo edge for landau
     double m_rangeLow;
     //! fit range hi edge for landau
     double m_rangeHigh;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -140,13 +124,6 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! Place for EPICS PVs, Mean and maximum deviation
-    std::vector <chid> mychid;
-#endif
   };
 } // end namespace Belle2
 

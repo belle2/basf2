@@ -34,7 +34,7 @@ public:
   /// Geometry variables. [rr0, rr1, rr2, rr3, anglest0, anglest1, anglest2, anglest3, ztostraw0, ztostraw1, ztostraw2, ztostraw3]
   /// Init variables. [cotStart, cotEnd, z0Start, z0End, nCotSteps, nZ0Steps]
   /// Initializes the 3D finder.
-  void initialize(const TVectorD& geometryVariables , std::vector<float >& initVariables);
+  void initialize(const TVectorD& geometryVariables, std::vector<float >& initVariables);
   /// Destructs the 3D finder.
   void destruct(void);
   /// Track variables. [charge, rho, phi0]
@@ -82,8 +82,6 @@ public:
   double m_ztostraw[4];
   /// Holds the tan theta of streo super layer in radian.
   double m_anglest[4];
-  /// Hold the PI value.
-  double m_Trg_PI;
   /// Hough finder variables.
   /// Hough mesh cot start range.
   double m_cotStart;

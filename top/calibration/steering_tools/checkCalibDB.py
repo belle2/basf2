@@ -42,13 +42,13 @@ class CheckCalibDB(b2.Module):
             b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
-        all = 0
+        all_entries = 0
         for moduleID in range(1, 17):
             for channel in range(512):
-                all += 1
+                all_entries += 1
                 if db.isCalibrated(moduleID, channel):
                     calibrated += 1
-        print(payload + ': ' + str(calibrated) + '/' + str(all) + ' calibrated')
+        print(payload + ': ' + str(calibrated) + '/' + str(all_entries) + ' calibrated')
 
     def printChannelMask(self):
         ''' print status of channel masks '''
@@ -59,8 +59,8 @@ class CheckCalibDB(b2.Module):
             b2.B2ERROR(payload + ' not found')
             return
         active = db.getNumOfActiveChannels()
-        all = db.getNumOfChannels()
-        print(payload + ': ' + str(active) + '/' + str(all) + ' active')
+        all_entries = db.getNumOfChannels()
+        print(payload + ': ' + str(active) + '/' + str(all_entries) + ' active')
 
     def printModule(self, payload):
         ''' print status of a payload given by the argument '''
@@ -70,12 +70,12 @@ class CheckCalibDB(b2.Module):
             b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
-        all = 0
+        all_entries = 0
         for moduleID in range(1, 17):
-            all += 1
+            all_entries += 1
             if db.isCalibrated(moduleID):
                 calibrated += 1
-        print(payload + ': ' + str(calibrated) + '/' + str(all) + ' calibrated')
+        print(payload + ': ' + str(calibrated) + '/' + str(all_entries) + ' calibrated')
 
     def printCommon(self, payload):
         ''' print status of a payload given by the argument '''
@@ -85,10 +85,10 @@ class CheckCalibDB(b2.Module):
             b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
-        all = 1
+        all_entries = 1
         if db.isCalibrated():
             calibrated += 1
-        print(payload + ': ' + str(calibrated) + '/' + str(all) + ' calibrated')
+        print(payload + ': ' + str(calibrated) + '/' + str(all_entries) + ' calibrated')
 
     def printTimeBase(self):
         ''' print status of time base calibration '''
@@ -99,11 +99,11 @@ class CheckCalibDB(b2.Module):
             b2.B2ERROR(payload + ' not found')
             return
         calibrated = 0
-        all = 8192
+        all_entries = 8192
         for sampleTimes in db.getSampleTimes():
             if sampleTimes.isCalibrated():
                 calibrated += 1
-        print(payload + ': ' + str(calibrated) + '/' + str(all) + ' calibrated')
+        print(payload + ': ' + str(calibrated) + '/' + str(all_entries) + ' calibrated')
 
     def event(self):
         ''' event processing '''
@@ -129,7 +129,7 @@ class CheckCalibDB(b2.Module):
 
 # Central database
 if len(argvs) == 4:
-    b2.use_central_database(tag)
+    b2.conditions.append_globaltag(tag)
 
 # Create path
 main = b2.create_path()

@@ -17,7 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <analysis/VertexFitting/RaveInterface/RaveVertexFitter.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <vector>
 
 
@@ -51,7 +51,7 @@ namespace Belle2 {
      * @param track_p The track with positive charge
      * @param track_m The track with negative charge
      */
-    PXD2TrackBase(const TVector3& vertex, const T& track_p, const T& track_m):
+    PXD2TrackBase(const ROOT::Math::XYZVector& vertex, const T& track_p, const T& track_m):
       m_vx(vertex.X()), m_vy(vertex.Y()), m_vz(vertex.Z()),
       m_track_p(track_p), m_track_m(track_m)
     {
@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Get the vertex.
      * @return Vertex of the 2 tracks.
      */
-    TVector3 getVertex() const { return TVector3(m_vx, m_vy, m_vz); }
+    ROOT::Math::XYZVector getVertex() const { return ROOT::Math::XYZVector(m_vx, m_vy, m_vz); }
 
     /** Get the track with positive charge.
      * @return track struct with positive charge.
@@ -124,7 +124,7 @@ namespace Belle2 {
     if (tfr1Ptr->getChargeSign() * tfr2Ptr->getChargeSign() >= 0) return false;
 
     // Setup Rave vertex fitter
-    auto bField = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
+    auto bField = BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
     B2DEBUG(20, "B Field = " << bField << " T");
     analysis::RaveSetup::initialize(1, bField);
     analysis::RaveVertexFitter rvf;
@@ -152,7 +152,7 @@ namespace Belle2 {
 
     // Set track containers
     DBObjPtr<BeamSpot> beamSpotDB; // beam spot is required to correct d0/z0
-    auto ip = beamSpotDB->getIPPosition();
+    auto ip = ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
     if (tfr1Ptr->getChargeSign() > 0) {
       m_track_p.setValues(*recoTracks[0], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);
       m_track_m.setValues(*recoTracks[1], ip, recoTracksName, pxdInterceptsName, pxdTrackClustersName);

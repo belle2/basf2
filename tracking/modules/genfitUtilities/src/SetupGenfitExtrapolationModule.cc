@@ -107,7 +107,7 @@ void SetupGenfitExtrapolationModule::initialize()
 {
   if (genfit::FieldManager::getInstance()->isInitialized() or genfit::MaterialEffects::getInstance()->isInitialized()) {
     if (m_ignoreIfPresent) {
-      B2DEBUG(50, "Magnetic field or material handling already initialized.  Not touching settings.");
+      B2DEBUG(29, "Magnetic field or material handling already initialized.  Not touching settings.");
       return;
     } else {
       B2FATAL("Magnetic field or material handling already initialized.  Not touching settings.");

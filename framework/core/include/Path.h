@@ -113,6 +113,11 @@ namespace Belle2 {
     /** See 'pydoc3 basf2.Path' */
     void addIndependentPath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back);
 
+    /** See 'pydoc3 basf2.Path' */
+    void addIndependentMergePath(const PathPtr& independent_path, std::string ds_ID, const boost::python::list& merge_back,
+                                 std::string consistency_check, bool event_mixing, bool mergeSameFile);
+
+
     /** return a string of the form [module a -> module b -> [another path]]
      *
      *  can be used to 'print' a path in a steering file.

@@ -125,29 +125,29 @@ namespace VXDTFthreeHitFilterTest {
   TEST_F(ThreeHitFilterTest, SelectionVariableName)
   {
     auto angle3DS = Angle3DSimple<SpacePoint>();
-    EXPECT_EQ("Angle3DSimple" , angle3DS.name());
+    EXPECT_EQ("Angle3DSimple", angle3DS.name());
     auto angle3DF = Angle3DFull<SpacePoint>();
-    EXPECT_EQ("Angle3DFull" , angle3DF.name());
+    EXPECT_EQ("Angle3DFull", angle3DF.name());
     auto angleXYF = AngleXYFull<SpacePoint>();
-    EXPECT_EQ("AngleXYFull" , angleXYF.name());
+    EXPECT_EQ("AngleXYFull", angleXYF.name());
     auto angleXYS = CosAngleXY<SpacePoint>();
-    EXPECT_EQ("CosAngleXY" , angleXYS.name());
+    EXPECT_EQ("CosAngleXY", angleXYS.name());
     auto angleRZF = AngleRZFull<SpacePoint>();
-    EXPECT_EQ("AngleRZFull" , angleRZF.name());
+    EXPECT_EQ("AngleRZFull", angleRZF.name());
     auto angleRZS = AngleRZSimple<SpacePoint>();
-    EXPECT_EQ("AngleRZSimple" , angleRZS.name());
+    EXPECT_EQ("AngleRZSimple", angleRZS.name());
     auto dSlopeRZ = DeltaSlopeRZ<SpacePoint>();
-    EXPECT_EQ("DeltaSlopeRZ" , dSlopeRZ.name());
+    EXPECT_EQ("DeltaSlopeRZ", dSlopeRZ.name());
     auto helixFit = HelixParameterFit<SpacePoint>();
-    EXPECT_EQ("HelixParameterFit" , helixFit.name());
+    EXPECT_EQ("HelixParameterFit", helixFit.name());
     auto dSlopeZS = DeltaSlopeZoverS<SpacePoint>();
-    EXPECT_EQ("DeltaSlopeZoverS" , dSlopeZS.name());
+    EXPECT_EQ("DeltaSlopeZoverS", dSlopeZS.name());
     auto dSZ = DeltaSoverZ<SpacePoint>();
-    EXPECT_EQ("DeltaSoverZ" , dSZ.name());
+    EXPECT_EQ("DeltaSoverZ", dSZ.name());
     auto pT = Pt<SpacePoint>();
-    EXPECT_EQ("Pt" , pT.name());
+    EXPECT_EQ("Pt", pT.name());
     auto cDist2IP = CircleDist2IP<SpacePoint>();
-    EXPECT_EQ("CircleDist2IP" , cDist2IP.name());
+    EXPECT_EQ("CircleDist2IP", cDist2IP.name());
   }
 
 
@@ -157,9 +157,9 @@ namespace VXDTFthreeHitFilterTest {
     // Very verbose declaration, see below for convenient shortcuts
     Filter< Angle3DSimple<SpacePoint>, Range<double, double>, VoidObserver > filter(Range<double, double>(0., 1.));
 
-    SpacePoint x1 = provideSpacePointDummy(0. , 0., 0.);
-    SpacePoint x2 = provideSpacePointDummy(.5 , 0., 0.);
-    SpacePoint x3 = provideSpacePointDummy(2. , 0., 0.);
+    SpacePoint x1 = provideSpacePointDummy(0., 0., 0.);
+    SpacePoint x2 = provideSpacePointDummy(.5, 0., 0.);
+    SpacePoint x3 = provideSpacePointDummy(2., 0., 0.);
 
     EXPECT_FALSE(filter.accept(x1, x2, x3));
 

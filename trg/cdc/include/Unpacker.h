@@ -269,10 +269,13 @@ namespace Belle2 {
       unsigned sector;
       /// input ID list of a NN track
       std::array<float, 9> inputID;
+      std::array<int, 9> rawinputID;
       /// input T list of a NN track
       std::array<float, 9> inputT;
+      std::array<int, 9> rawinputT;
       /// input Alpha list of a NN track
       std::array<float, 9> inputAlpha;
+      std::array<int, 9> rawinputAlpha;
       /// input TS list of a NN track
       std::array<tsOut, 9> ts;
       /// raw output values of hw network
@@ -656,6 +659,12 @@ namespace Belle2 {
                                                          p_mlpin_drifttime.size() / 9)) * scale_drifttime;
         foundTrack.inputID[iSL] =
           mlp_bin_to_signed_int(p_mlpin_id.substr((8 - iSL) * p_mlpin_drifttime.size() / 9, p_mlpin_drifttime.size() / 9)) * scale_id;
+        foundTrack.rawinputAlpha[iSL] = mlp_bin_to_signed_int(p_mlpin_alpha.substr((8 - iSL) * p_mlpin_alpha.size() / 9,
+                                                              p_mlpin_alpha.size() / 9));
+        foundTrack.rawinputT[iSL] = mlp_bin_to_signed_int(p_mlpin_drifttime.substr((8 - iSL) * p_mlpin_drifttime.size() / 9,
+                                                          p_mlpin_drifttime.size() / 9));
+        foundTrack.rawinputID[iSL] = mlp_bin_to_signed_int(p_mlpin_id.substr((8 - iSL) * p_mlpin_drifttime.size() / 9,
+                                                           p_mlpin_drifttime.size() / 9));
         if (sim13dt) {
           foundTrack.ts[iSL] = decodeTSHit_sim(p_tsfsel.substr((8 - iSL) * lenTS, lenTS), p_2dcc);
         } else {
@@ -1054,7 +1063,7 @@ namespace Belle2 {
 
       for (unsigned iSL = 0; iSL < 9; ++iSL) {
         if (trkNN.ts[iSL][3] > 0) {
-          CDCTriggerSegmentHit* hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, foundTime);
+          CDCTriggerSegmentHit* hit = addTSHit(trkNN.ts[iSL], iSL, iTracker, tsHits, foundTime);
           trackNN->addRelationTo(hit);
         }
       }
@@ -1443,11 +1452,17 @@ namespace Belle2 {
                 trackNN->setQualityVector(1);
               }
               std::vector<float> inputVector(27, 0.);
+              std::vector<int> rawinputVector(27, 0.);
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
                 inputVector[3 * iSL] = trkNN.inputID[iSL];
                 inputVector[3 * iSL + 1] = trkNN.inputT[iSL];
                 inputVector[3 * iSL + 2] = trkNN.inputAlpha[iSL];
+                rawinputVector[3 * iSL] = trkNN.rawinputID[iSL];
+                rawinputVector[3 * iSL + 1] = trkNN.rawinputT[iSL];
+                rawinputVector[3 * iSL + 2] = trkNN.rawinputAlpha[iSL];
               }
+              trackNN->setRawInput(rawinputVector);
+
               CDCTriggerMLPInput* storeInput =
                 storeNNInputs->appendNew(inputVector, trkNN.sector);
               trackNN->addRelationTo(storeInput);
@@ -1485,7 +1500,7 @@ namespace Belle2 {
 
                   // cppcheck-suppress knownConditionTrueFalse
                   if (!hit) {
-                    hit = addTSHit(trkNN.ts[iSL] , iSL, iTracker, tsHits, iclock);
+                    hit = addTSHit(trkNN.ts[iSL], iSL, iTracker, tsHits, iclock);
                     //   B2DEBUG(1, "Hit with short drift time added, should not happen!");
                     // }
                   }

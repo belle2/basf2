@@ -70,7 +70,7 @@ namespace Belle2 {
 
     /** returns the momentum in pT */
     DataType calcData(const TCInfoType& aTC) override
-    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Perp(); }
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Rho(); }
   };
 
 
@@ -84,7 +84,7 @@ namespace Belle2 {
 
     /** returns the momentum in |p| */
     DataType calcData(const TCInfoType& aTC) override
-    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.Mag(); }
+    { return AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).momSeed.R(); }
   };
 
 
@@ -130,7 +130,7 @@ namespace Belle2 {
 
     /** returns the the seed position in 3D */
     DataType calcData(const TCInfoType& aTC) override
-    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin).Mag(); }
+    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin).R(); }
   };
 
 
@@ -145,7 +145,7 @@ namespace Belle2 {
 
     /** returns the seed position in XY (=r) */
     DataType calcData(const TCInfoType& aTC) override
-    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin).Perp(); }
+    { return (AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::chooseCorrectTC(aTC).posSeed - AnalyzingAlgorithmBase<DataType, TCInfoType, VectorType>::s_origin).Rho(); }
   };
 
 

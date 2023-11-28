@@ -10,7 +10,7 @@ import argparse
 import basf2.utils as b2utils
 
 
-class PythonVariableManager(object):
+class PythonVariableManager:
     '''
     Wrapper around the variable manager class.
     This is necessary for avoiding to import ROOT globally when 'variables' is imported.
@@ -21,7 +21,8 @@ class PythonVariableManager(object):
         '''
         Return an instance to the variable manager.
         '''
-        import ROOT
+        # Always avoid the top-level 'import ROOT'.
+        import ROOT  # noqa
         instance = ROOT.Belle2.Variable.Manager.Instance()
         return instance
 
@@ -54,6 +55,20 @@ class PythonVariableManager(object):
         '''
         instance = PythonVariableManager._instance()
         instance.printAliases()
+
+    def clearAliases(self):
+        '''
+        Wrapper around Manager::clearAliases().
+        '''
+        instance = PythonVariableManager._instance()
+        instance.clearAliases()
+
+    def resolveAlias(self, alias):
+        '''
+        Wrapper around Manager::resolveAlias(const std::string& alias).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.resolveAlias(alias)
 
     def addCollection(self, *args):
         '''
@@ -120,7 +135,8 @@ def std_vector(*args):
     """
     Creates an std::vector which can be passed to pyROOT
     """
-    import ROOT
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
     v = ROOT.std.vector(type(args[0]))()
     for x in args:
         v.push_back(x)
@@ -136,7 +152,7 @@ def getCommandLineOptions():
     return args
 
 
-def printVars(changedVariableNames=None):
+def printVars(changedVariableNames=None, listVars=None):
     """
     Print list of all available variables.
     """
@@ -144,26 +160,47 @@ def printVars(changedVariableNames=None):
     if changedVariableNames:
         print(changedVariableNames)
     print('Available variables in Variable::Manager:')
-    allVars = variables.getVariables()
+
+    if listVars is None:
+        listVars = variables.getVariables()
+    else:
+        listVars = [variables.getVariable(name) for name in listVars]
+
+    dict_VariableDataType = {0: 'double', 1: 'int', 2: 'bool'}
+
     vars = []
-    for v in allVars:
-        vars.append((v.group, v.name, v.description))
+    for v in listVars:
+        vars.append((v.group, v.name, v.description,
+                     dict_VariableDataType[v.variabletype]))
 
     rows = []
     current_group = ''
-    for (group, name, description) in sorted(vars):
+    for (group, name, description, vartype) in sorted(vars):
         if current_group != group:
             current_group = group
             rows.append([group])
-        rows.append([name, description])
+        rows.append([name, description, vartype])
     b2utils.pretty_print_description_list(rows)
+
+
+def printVariableType(listVars=None):
+
+    if isinstance(listVars, str):
+        listVars = [listVars]
+
+    dict_VariableDataType = {0: 'double', 1: 'int', 2: 'bool'}
+
+    for var_name in listVars:
+        var = variables.getVariable(var_name)
+        print(f"{var_name}: {dict_VariableDataType[var.variabletype]}")
 
 
 def getAllTrgNames():
     """
     Return all PSNM trigger bit names
     """
-    import ROOT
+    # Always avoid the top-level 'import ROOT'.
+    import ROOT  # noqa
     bits = ROOT.Belle2.PyDBObj('TRGGDLDBFTDLBits')
     evt = ROOT.Belle2.EventMetaData()
     ROOT.Belle2.DBStore.Instance().update(evt)

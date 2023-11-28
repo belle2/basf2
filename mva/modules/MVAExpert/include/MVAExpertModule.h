@@ -14,13 +14,15 @@
 #include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
 
+#include <framework/datastore/StoreArray.h>
 #include <framework/database/DBObjPtr.h>
 
+#include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/VariableManager/Manager.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 
 #include <vector>
 #include <string>
-#include <memory>
 
 namespace Belle2 {
 
@@ -62,7 +64,12 @@ namespace Belle2 {
     /**
      * Calculates expert output for given Particle pointer
      */
-    float analyse(Particle*);
+    float analyse(const Particle*);
+
+    /**
+     * Calculates expert output for given Particle pointer
+     */
+    std::vector<float> analyseMulticlass(const Particle*);
 
     /**
      * Initialize mva expert, dataset and features
@@ -70,10 +77,33 @@ namespace Belle2 {
      */
     void init_mva(MVA::Weightfile& weightfile);
 
+    /**
+     * Evaluate the variables and fill the Dataset to be used by the expert.
+     */
+    void fillDataset(const Particle*);
+
+    /**
+     * Set the extra info field.
+     */
+    void setExtraInfoField(Particle*, std::string, float);
+
+    /**
+     * Set the event extra info field.
+     */
+    void setEventExtraInfoField(StoreObjPtr<EventExtraInfo>, std::string, float);
+
 
   private:
-
+    /**
+     * StoreArray of Particles
+     */
+    StoreArray<Particle> m_particles;
+    /**
+     * Decay descriptor of decays to look for.
+     */
+    std::unordered_map<std::string, DecayDescriptor>  m_decaydescriptors;
     std::vector<std::string> m_listNames; /**< input particle list names */
+    std::vector<std::string> m_targetListNames; /**< input particle list names after decay descriptor*/
     std::string m_identifier; /**< weight-file */
     std::string m_extraInfoName; /**< Name under which the SignalProbability is stored in the extraInfo of the Particle object. */
     double m_signal_fraction_override; /**< Signal Fraction which should be used. < 0 means use signal fraction of training sample */
@@ -85,8 +115,11 @@ namespace Belle2 {
     std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert */
     std::unique_ptr<MVA::SingleDataset> m_dataset; /**< Pointer to the current dataset */
 
-    bool m_overwriteExistingExtraInfo; /**< if true, when the given extraInfo is already defined, the old extraInfo value is overwritten */
+    int m_overwriteExistingExtraInfo; /**< -1/0/1/2: overwrite if lower/ don't overwrite / overwrite if higher/ always overwrite, in case the given extraInfo is already defined. */
     bool m_existGivenExtraInfo; /**< check if the given extraInfo is already defined. */
+
+    unsigned int
+    m_nClasses; /**< number of classes (~outputs) of the current MVA Expert. If m_nClasses==2 then only 1 output is expected. */
   };
 
 } // Belle2 namespace

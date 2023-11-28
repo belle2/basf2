@@ -31,7 +31,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit::globalDerivatives(con
 
   if (s_enableLorentzGlobalDerivatives) {
     auto lorentz = GlobalCalibrationManager::getInstance().getLorentzShiftHierarchy().getGlobalDerivatives<VXDAlignment>(getPlaneId(),
-                   sop, BFieldManager::getInstance().getField(sop->getPos()));
+                   sop, BFieldManager::getInstance().getField(ROOT::Math::XYZVector(sop->getPos())));
     globals.add(lorentz);
   }
 

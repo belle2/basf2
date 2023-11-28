@@ -25,7 +25,7 @@ import sys
 argvs = sys.argv
 if len(argvs) != 5:
     print('usage: basf2', argvs[0],
-          '-i <file_sroot> (pocket|local) <slot> <channel> <output_dir>')
+          '-i <file_root> (pocket|local) <slot> <channel> <output_dir>')
     sys.exit()
 
 datatype = argvs[1]      # data type (pocket, local)
@@ -36,8 +36,10 @@ outdir = argvs[4]        # output directory path
 print('data type:', datatype, ' slot:', slot, ' calibration channel:', channel,
       ' output to:', outdir)
 
-# Define a global tag (note: the one given bellow can be out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+# Database
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
+# b2.conditions.append_testing_payloads('localDB-FEMaps/localDB.txt')  # SCROD mapping from local database
 
 # Suppress messages and warnings during processing
 b2.set_log_level(b2.LogLevel.ERROR)
@@ -46,7 +48,8 @@ b2.set_log_level(b2.LogLevel.ERROR)
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects

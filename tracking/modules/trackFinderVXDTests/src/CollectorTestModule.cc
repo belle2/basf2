@@ -9,7 +9,6 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace Belle2;
 
 
@@ -32,6 +31,6 @@ void CollectorTestModule::event()
 
 void CollectorTestModule::terminate()
 {
-  cerr << "\n";
+  std::cerr << "\n";
 }
 

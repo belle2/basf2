@@ -11,6 +11,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
+#include <TMath.h>
 
 #include <cmath>
 #include <numeric>

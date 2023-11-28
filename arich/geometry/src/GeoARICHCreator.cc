@@ -307,8 +307,10 @@ namespace Belle2 {
       const std::vector<double> wedge2 = supportPar.getWedge(2);
       G4Material* wedge1Material = Materials::get(supportPar.getWedgeMaterial(1));
       G4Material* wedge2Material = Materials::get(supportPar.getWedgeMaterial(2));
-      G4AssemblyVolume* assemblyWedge1 = makeJoint(wedge1Material, wedge1);
-      G4AssemblyVolume* assemblyWedge2 = makeJoint(wedge2Material, wedge2);
+      G4AssemblyVolume* assemblyWedge1 = new G4AssemblyVolume();
+      G4AssemblyVolume* assemblyWedge2 = new G4AssemblyVolume();
+      makeJoint(wedge1Material, wedge1, assemblyWedge1);
+      makeJoint(wedge2Material, wedge2, assemblyWedge2);
 
       G4Transform3D Tr;
       int nWedge = supportPar.getNWedges();
@@ -425,6 +427,9 @@ namespace Belle2 {
       }
 
       m_config.useBasf2Units();
+
+      delete assemblyWedge1;
+      delete assemblyWedge2;
 
       return;
 
@@ -1057,6 +1062,7 @@ namespace Belle2 {
         //
         G4TriangularFacet* facet = new G4TriangularFacet(point_1, point_2, point_3, ABSOLUTE);
         volume_solid->AddFacet((G4VFacet*) facet);
+        delete facet;
       }
 
       volume_solid->SetSolidClosed(true);
@@ -1637,7 +1643,7 @@ namespace Belle2 {
       return mVector->GetValue(2 * Unit::eV / Unit::MeV, b);
     }
 
-    G4AssemblyVolume* GeoARICHCreator::makeJoint(G4Material* supportMaterial, const std::vector<double>& par)
+    void GeoARICHCreator::makeJoint(G4Material* supportMaterial, const std::vector<double>& par, G4AssemblyVolume* assemblyWedge)
     {
 
       int size = par.size();
@@ -1653,8 +1659,6 @@ namespace Belle2 {
       G4LogicalVolume* wedgeBox1LV = new G4LogicalVolume(wedgeBox1, supportMaterial, "ARICH.supportWedge");
       G4LogicalVolume* wedgeBox2LV = new G4LogicalVolume(wedgeBox2, supportMaterial, "ARICH.supportWedge");
 
-      G4AssemblyVolume* assemblyWedge = new G4AssemblyVolume();
-
       G4RotationMatrix Rm;
       G4ThreeVector Ta(0, 0, 0);
       G4Transform3D Tr;
@@ -1667,7 +1671,7 @@ namespace Belle2 {
       Tr = G4Transform3D(Rm, Ta);
       assemblyWedge->AddPlacedVolume(wedgeBox2LV, Tr);
 
-      if (size == 4) return assemblyWedge;
+      if (size == 4) return;
       double edge = par.at(4);
 
       G4Box* wedgeBox3 = new G4Box("wedgeBox3", lenz / 2., edge / 2., thick / 2.);
@@ -1692,8 +1696,6 @@ namespace Belle2 {
       Ta.setZ(-thick / 2. - edge / 2.);
       Tr = G4Transform3D(Rm, Ta);
       assemblyWedge->AddPlacedVolume(wedgeBox4LV, Tr);
-
-      return assemblyWedge;
 
     }
 

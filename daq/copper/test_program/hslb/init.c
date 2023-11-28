@@ -15,19 +15,30 @@
 #include <time.h>
 #include "cprfin_fngeneric.h"
 #include "para.h"
+#include <vector>
 static int FirmwareVersion = 0x000a;
 static int HardwareVersion = 0x000a;
 char *ARGV0  = 0;
 char *DEVICE = 0;
 unsigned int adr;
-static struct  { char *name; int adrs; } regs[]= {
-    { "trigger",   CONTROL},
-    { "trghold",      CONTROL   },
-    { "checkerr",    CONTROL },
-    { "checkfee",    CONTROL   },
-    { "link",  CONTROL  },
-    { "linkrst",  CONTROL  },
-     };//regs[] = {
+
+
+static const vector<string> regs = { "trigger",
+                                     "trghold",
+                                     "checkerr",
+                                     "checkfee",
+                                     "link",
+                                     "linkrst"};
+
+
+//static struct  { char *name; int adrs; } regs[]= {
+//    { "trigger",   CONTROL},
+//    { "trghold",      CONTROL   },
+//    { "checkerr",    CONTROL },
+//    { "checkfee",    CONTROL   },
+//    { "link",  CONTROL  },
+//    { "linkrst",  CONTROL  },
+//     };
 //    { "window",   WINDOW},
 //    { "csr",      CSR   },
 //    { "delay",    DELAY },
@@ -43,8 +54,8 @@ usage()
   int m;
   printf("usage: %s -(a,b,c,d)  <parameter(char)>\n",ARGV0);
   printf("valid parameter options : ");
-  for(m = 0 ; m < sizeof(regs)/sizeof(regs[0]);m++)
-     printf("  %s  ",regs[m].name);
+  for(m = 0 ; m < regs.size(); m++)
+     printf("  %s  ", regs[m].c_str()); // regs[m].name);
   printf("\n");
 }
 

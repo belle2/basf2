@@ -16,21 +16,21 @@ REG_MODULE(TFCDC_HitReclaimer);
 REG_MODULE(TFCDC_WireHitBackgroundDetector);
 
 TFCDC_WireHitPreparerModule::TFCDC_WireHitPreparerModule()
-  : Super( {"CDCWireHitVector"})
+  : Super({"CDCWireHitVector"})
 {
 }
 
 TFCDC_WireHitCreatorModule::TFCDC_WireHitCreatorModule()
-  : Super( {"CDCWireHitVector"})
+  : Super({"CDCWireHitVector"})
 {
 }
 
 TFCDC_HitReclaimerModule::TFCDC_HitReclaimerModule()
-  : Super( {"CDCWireHitVector"})
+  : Super({"CDCWireHitVector"})
 {
 }
 
 TFCDC_WireHitBackgroundDetectorModule::TFCDC_WireHitBackgroundDetectorModule()
-  : Super( {"CDCWireHitVector"})
+  : Super({"CDCWireHitVector"})
 {
 }

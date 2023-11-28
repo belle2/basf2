@@ -530,7 +530,6 @@ void SpaceResolutionCalibration::readSigmaFromText()
   unsigned short np = 0;
   unsigned short iCL, iLR;
   double theta, alpha;
-  unsigned nRead = 0;
 
   ifs >> m_sigmaParamMode_old >> np;
   double sigma[8]; // cppcheck-suppress constVariable
@@ -543,7 +542,6 @@ void SpaceResolutionCalibration::readSigmaFromText()
     for (int i = 0; i < np; ++i) {
       ifs >> sigma[i];
     }
-    ++nRead;
 
     int ith = -99;
     for (unsigned short i = 0; i < ntheta_old; ++i) {

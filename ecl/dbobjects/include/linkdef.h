@@ -20,6 +20,10 @@
 #pragma link C++ class Belle2::ECLReferenceCrystalPerCrateCalib+; // checksum=0x5c126a47, version=3
 #pragma link C++ enum Belle2::ECLChargedPidPDFs::InputVar+; //implicit
 #pragma link C++ class Belle2::ECLChargedPidPDFs::VarTransfoSettings+; // checksum=0x1a8bc0c9, implicit, version=-1
+#pragma link C++ class Belle2::ECLChargedPIDPhasespaceBinning+; // checksum=0x65ede86a, implicit, version=1
+#pragma link C++ class Belle2::ECLChargedPIDPhasespaceCategory+; // checksum=0xc3de5acc, implicit, version=1
+#pragma link C++ class Belle2::ECLChargedPIDMVAWeights+; // , checksum=0xcb04e543, version=1
+#pragma link C++ enum Belle2::ECLChargedPIDPhasespaceCategory::MVAResponseTransformMode+; //implicit
 #pragma link C++ class Belle2::PackedAutoCovariance; // checksum=0xb1a29561, implicit, version=1
 #pragma link C++ class Belle2::ECLAutoCovariance; // checksum=0x1f75052d, version=1
 #pragma link C++ class Belle2::ECLTrackClusterMatchingThresholds; // checksum=0xdc6f9453, version=1
@@ -34,6 +38,7 @@
 #pragma link C++ class Belle2::ECLNoiseData+; // checksum=0xf538d169, implicit, version=1
 #pragma link C++ class Belle2::ECLLookupTable+; // checksum=0xe3749e00, implicit, version=1
 #pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x262d45e4, version=2
+#pragma link C++ class Belle2::ECLnOptimal+; // checksum=0xe49fab6f, version=1
 
 // workaround for https://github.com/root-project/root/issues/7960
 #pragma link C++ class std::pair<int,std::unordered_map<int,vector<Belle2::ECLChargedPidPDFs::InputVar>>>+; // checksum=0xacd09862, version=-1

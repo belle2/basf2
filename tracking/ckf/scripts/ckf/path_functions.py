@@ -452,16 +452,25 @@ def add_vtx_ckf(path, cdc_reco_tracks, cdc_vtx_reco_tracks, use_mc_truth=False,
         )
     else:
         module_parameters = dict(
-            firstHighFilterParameters={"identifier": "ckf_ToVTXStateFilter_1", "cut": first_filter_cut, "direction": direction},
+            firstHighFilterParameters={
+              'DBPayloadName': 'ckf_ToVTXStateFilter_1_r1_Parameters',
+              "direction": direction
+            },
             firstHighUseNStates=use_best_seeds,
 
-            secondHighFilterParameters={"identifier": "ckf_ToVTXStateFilter_2", "cut": second_filter_cut},
+            secondHighFilterParameters={
+              'DBPayloadName': 'ckf_ToVTXStateFilter_2_r1_Parameters',
+            },
             secondHighUseNStates=use_best_seeds,
 
-            thirdHighFilterParameters={"identifier": "ckf_ToVTXStateFilter_3", "cut": third_filter_cut},
+            thirdHighFilterParameters={
+              'DBPayloadName': 'ckf_ToVTXStateFilter_3_r1_Parameters',
+            },
             thirdHighUseNStates=use_best_seeds,
 
-            filterParameters={"identifier": "ckf_ToVTXResultFilter", "cut": result_filter_cut},
+            filterParameters={
+              'DBPayloadName': 'ckf_ToVTXResultFilter_r1_Parameters',
+            },
             useBestNInSeed=use_best_results,
         )
 

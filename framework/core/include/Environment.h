@@ -194,6 +194,10 @@ namespace Belle2 {
     /** Get the basf2 execution realm. */
     LogConfig::ELogRealm getRealm() const { return m_realm; }
 
+    void setVirtualReality(const bool virtualReality) { m_virtualReality = virtualReality; }
+
+    bool getVirtualReality() const { return m_virtualReality; }
+
     /** Print information on input/output files in current steering file, used by --dry-run.
      *
      *  Function only relies on information available during module construction,
@@ -388,6 +392,7 @@ namespace Belle2 {
     int m_experiment; /**< override experiment for EventInfoSetter. */
     unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
     LogConfig::ELogRealm m_realm = LogConfig::c_None; /**< The realm in which basf2 is executed. */
+    bool m_virtualReality; /**< bool for keeping track if we run the job for producing events for the virtual reality */
 
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */

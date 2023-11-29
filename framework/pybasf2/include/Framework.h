@@ -127,6 +127,7 @@ namespace Belle2 {
     */
     static void setRealm(const std::string& realm);
 
+    static void setVirtualRealityMode();
 
     /** Find a file. This is a wrapper around FileSystem::findFile() to be able
      * to call it nicely from python and create a `FileNotFoundError` if the

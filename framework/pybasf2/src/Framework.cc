@@ -213,6 +213,10 @@ void Framework::setRealm(const std::string& realm)
   }
 }
 
+void Framework::setVirtualRealityMode()
+{
+  Environment::Instance().setVirtualReality(true);
+}
 
 std::string Framework::findFile(const std::string& filename, const std::string& type, bool ignore_errors)
 {
@@ -402,6 +406,9 @@ The severity of log messages sometimes depends on where basf2 runs. This is cont
 
 Usually the realm does not have to be set explicitly. On the HLT or express reco it should be set to 'online' and for official productions to 'production'.
 )DOCSTRING", args("realm"));
+  def("set_virtual_reality_mode", &Framework::setVirtualRealityMode, R"DOCSTRING(
+Set virtual reality mode.
+)DOCSTRING");
   def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
 Processes up to max_events events by starting with the first module in the specified path.
 

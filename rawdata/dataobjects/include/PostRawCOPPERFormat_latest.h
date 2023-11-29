@@ -162,7 +162,7 @@ namespace Belle2 {
     //! check if this channel's data has been removed on a readout PC for CDC online "masking"
     //! True : data contents was removed on a readout PC
     /* cppcheck-suppress missingOverride */
-    bool CheckOnlineRemovedDataBit(int n, int finesse_num);
+    bool CheckOnlineRemovedDataBit(int n, int finesse_num) OVERRIDE_CPP17;
 
     // Data Format : "B2Link PCIe40 ch Header"
     enum {

@@ -225,13 +225,6 @@ graFEI_vars = [
     "graFEI_validTree",
     "graFEI_goodEvent",
     "graFEI_goodTopology",
-    # "graFEI_6inLCAS",
-    # "graFEI_5inLCAS",
-    # "graFEI_4inLCAS",
-    # "graFEI_3inLCAS",
-    # "graFEI_2inLCAS",
-    # "graFEI_1inLCAS",
-    # "graFEI_nIntermediates",
     "graFEI_nFSP",
     "graFEI_nCharged_preFit",
     "graFEI_nElectrons_preFit",
@@ -253,10 +246,6 @@ graFEI_vars = [
     "graFEI_nOthers_postFit",
     "graFEI_nPredictedUnmatched",
     "graFEI_nPredictedUnmatched_noPhotons",
-    # "graFEI_depthLCA",
-    # "graFEI_nBtagDaughters",
-    # "graFEI_nBsigDaughters",
-    # "graFEI_nNotBParticles",
 ]
 if mc:
     graFEI_vars.extend(
@@ -266,7 +255,6 @@ if mc:
             "graFEI_truth_perfectEvent",
             "graFEI_truth_isSemileptonic",
             "graFEI_truth_nFSP",
-            # "graFEI_truth_depthLCA",
             "graFEI_truth_nPhotons",
             "graFEI_truth_nElectrons",
             "graFEI_truth_nMuons",

@@ -260,12 +260,15 @@ SocketRecv::~SocketRecv()
 
 int SocketRecv::reconnect(int ntry)
 {
+  // TODO  tis code does not make sense at all, as it is listening/receiving socket
+  // TODO it looks like it was copied from SocketSend w/o
   // Close existing socket once.
   shutdown(m_sock, 2);
   ::close(m_sock);
 
   // Setup socket parameters again;
   bzero(&m_sa, sizeof(m_sa));
+  // TODO BUG m_hp is not initialized! This must crash
   bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
   m_sa.sin_family = m_hp->h_addrtype;
   m_sa.sin_port = htons((u_short)m_port);

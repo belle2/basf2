@@ -347,7 +347,7 @@ def update_linked_issues(
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
-    # get list of available revision lables
+    # get list of available revision labels
     rev_list = get_json_object_list(
             validationpath.get_results_folder(cwd_folder),
             validationpath.file_name_results_json,
@@ -390,7 +390,7 @@ def upload_file_gitlab(
 def get_librarians(package: str) -> List[str]:
     """
     Function to get package librarian(s)' GitLab usernames. Temp solution
-    until the .librarians file directly provdies Gitlab usernames.
+    until the .librarians file directly provides Gitlab usernames.
 
     Return:
         list of librarians' Gitlab usernames
@@ -522,7 +522,7 @@ def create_gitlab_issue(
     using Gitlab API.
 
     Returns:
-        created isssue id
+        created issue id
     """
 
     issue = project.issues.create({"title": title,
@@ -1297,7 +1297,7 @@ def run_server(
                 update_linked_issues(gitlab_object, cwd_folder)
                 gitlab_map = usermap_file
                 logging.info(
-                    f"{gitlab_map} will be used to assign isues."
+                    f"{gitlab_map} will be used to assign issues."
                 )
 
         cherrypy.quickstart(

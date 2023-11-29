@@ -525,62 +525,62 @@ class PerfectEvent(Metric, object):
         return self._per_corrects / self._num_examples
 
 
-class IsTrueB(Metric, object):
-    """
-    Computes the percentage of correctly identified B's
-    - `update` must receive output of the form `(u_pred, u_y, batch, num_graph)` or `{'u_pred': u_pred, 'u_y': u_y , ...}`.
-    - `u_pred` must contain logits and has shape (num_graph, 1)
-    - `u` contains ground-truth class indices and has same shape as u_pred
-    - num graph is the number of graph, it could be computed here using batch
-    """
+# class IsTrueB(Metric, object):
+#     """
+#     Computes the percentage of correctly identified B's
+#     - `update` must receive output of the form `(u_pred, u_y, batch, num_graph)` or `{'u_pred': u_pred, 'u_y': u_y , ...}`.
+#     - `u_pred` must contain logits and has shape (num_graph, 1)
+#     - `u` contains ground-truth class indices and has same shape as u_pred
+#     - num graph is the number of graph, it could be computed here using batch
+#     """
 
-    def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu'):
+#     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu'):
 
-        self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
-        self.device = device
-        self._per_corrects = None
-        self._num_examples = None
+#         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
+#         self.device = device
+#         self._per_corrects = None
+#         self._num_examples = None
 
-        super(IsTrueB, self).__init__(output_transform=output_transform, device=device)
+#         super(IsTrueB, self).__init__(output_transform=output_transform, device=device)
 
-    @reinit__is_reduced
-    def reset(self):
+#     @reinit__is_reduced
+#     def reset(self):
 
-        self._per_corrects = 0
-        self._num_examples = 0
+#         self._per_corrects = 0
+#         self._num_examples = 0
 
-        super(IsTrueB, self).reset()
+#         super(IsTrueB, self).reset()
 
-    @reinit__is_reduced
-    def update(self, output):
-        u_pred, u_y, num_graphs = output
+#     @reinit__is_reduced
+#     def update(self, output):
+#         u_pred, u_y, num_graphs = output
 
-        num_graphs = num_graphs.item()
+#         num_graphs = num_graphs.item()
 
-        u_pred = (torch.sigmoid(u_pred) > 0.5).double()  # If element has probability > 0.5 it's signal, else background
+#         u_pred = (torch.sigmoid(u_pred) > 0.5).double()  # If element has probability > 0.5 it's signal, else background
 
-        assert u_y.shape == u_pred.shape, 'Predictions shape does not match target shape'
+#         assert u_y.shape == u_pred.shape, 'Predictions shape does not match target shape'
 
-        # Create a mask for the padded entries
-        mask = torch.ones(u_y.size(), dtype=torch.long, device=self.device)
-        for ig_class in self.ignore_index:
-            mask &= (u_y != ig_class)
+#         # Create a mask for the padded entries
+#         mask = torch.ones(u_y.size(), dtype=torch.long, device=self.device)
+#         for ig_class in self.ignore_index:
+#             mask &= (u_y != ig_class)
 
-        # Zero the respective entries in the predictions
-        u_pred_mask = u_pred * mask
-        u_mask = u_y * mask
+#         # Zero the respective entries in the predictions
+#         u_pred_mask = u_pred * mask
+#         u_mask = u_y * mask
 
-        # Count the number of zero wrong predictions across the batch
-        good_predictions = (u_pred_mask == u_mask).sum().item()
+#         # Count the number of zero wrong predictions across the batch
+#         good_predictions = (u_pred_mask == u_mask).sum().item()
 
-        self._per_corrects += good_predictions
-        self._num_examples += num_graphs
+#         self._per_corrects += good_predictions
+#         self._num_examples += num_graphs
 
-    @sync_all_reduce("_isTrueB")
-    def compute(self):
+#     @sync_all_reduce("_isTrueB")
+#     def compute(self):
 
-        if self._num_examples == 0:
-            raise NotComputableError(
-                "CustomAccuracy must have at least one example before it can be computed."
-            )
-        return self._per_corrects / self._num_examples
+#         if self._num_examples == 0:
+#             raise NotComputableError(
+#                 "CustomAccuracy must have at least one example before it can be computed."
+#             )
+#         return self._per_corrects / self._num_examples

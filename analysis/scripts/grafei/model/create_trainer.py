@@ -7,7 +7,7 @@ import collections.abc
 from datetime import datetime
 from pathlib import Path
 import yaml
-from .metrics import PerfectLCAGeometric, PerfectEvent, PerfectMasses, IsTrueB
+from .metrics import PerfectLCAGeometric, PerfectEvent, PerfectMasses  # , IsTrueB
 
 
 class GraFEIIgniteTrainer:
@@ -148,19 +148,7 @@ class GraFEIIgniteTrainer:
                 #     output_transform=lambda x: [x[1], x[4]],
                 #     device=device,
                 # ),
-                # "perfectLCA": grafei.metrics.PerfectLCAGeometric(
-                #     ignore_index=ignore_index,
-                #     device=device,
-                #     output_transform=lambda x: [
-                #         x[1],
-                #         x[4],
-                #         x[6],
-                #         x[5][:, 1],
-                #         x[7],
-                #         x[8],
-                #     ],
-                # ),
-                "perfectLCA_noBkg": PerfectLCAGeometric(
+                "perfectLCA": PerfectLCAGeometric(
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [
@@ -173,13 +161,13 @@ class GraFEIIgniteTrainer:
                     ],
                     ignore_background=True,
                 ),
-                "perfectMasses_noBkg": PerfectMasses(
+                "perfectMasses": PerfectMasses(
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [x[0], x[3], x[5], x[7], x[8]],
                     ignore_background=True,
                 ),
-                "perfectEvent_noBkg": PerfectEvent(
+                "perfectEvent": PerfectEvent(
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [
@@ -195,24 +183,24 @@ class GraFEIIgniteTrainer:
                     ignore_background=True,
                 ),
             }
-            if self.configs["geometric_model"]["global_layer"]:
-                metrics.update(
-                    {
-                        "correct_class": IsTrueB(
-                            ignore_index=ignore_index,
-                            output_transform=lambda x: [x[2], x[5], x[8]],
-                            device=device,
-                        ),
-                        # "momentum_loss": ignite.metrics.Loss(
-                        #     grafei.losses.B_MomentumLoss(reduction="mean"),
-                        #     output_transform=lambda x: [
-                        #         x[2][:, :3],
-                        #         x[5][:, :3],
-                        #     ],
-                        #     device=device,
-                        # ),
-                    }
-                )
+            # if self.configs["geometric_model"]["global_layer"]:
+            #     metrics.update(
+            #         {
+            #             "correct_class": IsTrueB(
+            #                 ignore_index=ignore_index,
+            #                 output_transform=lambda x: [x[2], x[5], x[8]],
+            #                 device=device,
+            #             ),
+            #             # "momentum_loss": ignite.metrics.Loss(
+            #             #     B_MomentumLoss(reduction="mean"),
+            #             #     output_transform=lambda x: [
+            #             #         x[2][:, :3],
+            #             #         x[5][:, :3],
+            #             #     ],
+            #             #     device=device,
+            #             # ),
+            #         }
+            #     )
 
             def _predict_on_batch(engine, batch):
                 model.eval()  # It just enables evaluation mode
@@ -273,11 +261,11 @@ class GraFEIIgniteTrainer:
 
     # def lca_score_fn(self, engine):
     #     """Metric to use for checkpoints"""
-    #     return engine.state.metrics["perfectLCA_noBkg"]
+    #     return engine.state.metrics["perfectLCA"]
 
     def perfect_score_fn(self, engine):
         """Metric to use for checkpoints"""
-        return engine.state.metrics["perfectEvent_noBkg"]
+        return engine.state.metrics["perfectEvent"]
 
     def _clean_config_dict(self, configs):
         """

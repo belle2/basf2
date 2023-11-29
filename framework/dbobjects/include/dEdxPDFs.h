@@ -34,15 +34,21 @@ namespace Belle2 {
     dEdxPDFs() = default;
 
     /**
-     * Returns the dE/dx PDF for the given particle hypothesis.
+     * Return the dE/dx PDF for the given particle hypothesis.
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
-     * @param truncated If true, returns the truncated dE/dx PDF
+     * @param truncated If true, return the truncated dE/dx PDF
      */
     const TH2F* getPDF(const int hypothesis, const bool truncated) const
     {
       return truncated ? &m_dEdxPDFsTruncated.at(hypothesis) : &m_dEdxPDFs.at(hypothesis);
     }
 
+    /**
+     * Set the dE/dx PDF for the given particle hypothesis.
+     * @param pdf dE/dx PDF as a pointer to the 2D histogram (`TH2F*`)
+     * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
+     * @param truncated If true, set the truncated dE/dx PDF
+     */
     void setPDF(const TH2F* pdf, const int hypothesis, const bool truncated)
     {
       TH2F temp{};
@@ -53,6 +59,12 @@ namespace Belle2 {
         m_dEdxPDFs.at(hypothesis) = temp;
     }
 
+    /**
+     * Set the dE/dx PDF for the given particle hypothesis.
+     * @param pdf dE/dx PDF as a 2D histogram (`TH2F`)
+     * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
+     * @param truncated If true, set the truncated dE/dx PDF
+     */
     void setPDF(const TH2F pdf, const int hypothesis, const bool truncated)
     {
       if (truncated)
@@ -61,6 +73,11 @@ namespace Belle2 {
         m_dEdxPDFs.at(hypothesis) = pdf;
     }
 
+    /**
+     * Set the dE/dx PDF for all the particle hypothesis.
+     * @param pdfs Array of dE/dx PDF as a 2D histogram (`TH2F`) for all the particle hypotheses
+     * @param truncated If true, set the truncated dE/dx PDFs
+     */
     void setPDFs(const std::array<TH2F, Const::ChargedStable::c_SetSize>& pdfs, const bool truncated)
     {
       if (truncated)

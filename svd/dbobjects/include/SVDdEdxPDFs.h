@@ -29,9 +29,9 @@ namespace Belle2 {
     SVDdEdxPDFs() = default;
 
     /**
-     * Returns the SVD dE/dx PDF for the given particle hypothesis.
+     * Return the SVD dE/dx PDF for the given particle hypothesis.
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
-     * @param truncated If true, returns the truncated dE/dx PDF
+     * @param truncated If true, return the truncated dE/dx PDF
      */
     const TH2F* getSVDPDF(const int hypothesis, const bool truncated) const
     {

@@ -60,14 +60,17 @@ namespace Belle2 {
 
     protected:
 
-      /** Method to write (almost) each G4Step to the VR event file. */
-      void writeVREventStep(const G4Step*, const G4Track*);
-
       int m_maxNumberSteps; /**< The maximum number of steps before the track transportation is stopped and the track is killed. */
       /** if true, check if the track has attached trajectory info and append step information if necessary */
       bool m_storeTrajectories = false;
       std::vector<float> m_absorbers; /**< The absorbers defined at given radii where tracks across them will be destroyed. */
 
+    private:
+
+      /** Method to write (almost) each G4Step to the VR event file. */
+      void writeVREventStep(const G4Step*, const G4Track*);
+
+      bool m_isForVirtualReality{false};
 
     };
 

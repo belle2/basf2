@@ -10,6 +10,7 @@
 #include <simulation/kernel/EventAction.h>
 #include <simulation/kernel/RunManager.h>
 #include <simulation/kernel/UserInfo.h>
+#include <framework/core/Environment.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
 
@@ -31,6 +32,7 @@ SteppingAction::SteppingAction()
     G4Step* aStep;
     UserSteppingAction(aStep);
   }
+  m_isForVirtualReality = Environment::Instance().getVirtualReality();
 }
 
 
@@ -70,7 +72,10 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
     }
   }
 
-  writeVREventStep(step, track);
+  // If we are running this job for producing virtual reality events, let's run the relevant method
+  if (m_isForVirtualReality) {
+    writeVREventStep(step, track);
+  }
 
   //---------------------------------------
   // Check for very high number of steps.

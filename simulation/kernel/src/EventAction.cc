@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <simulation/kernel/EventAction.h>
+#include <framework/core/Environment.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
@@ -27,27 +28,36 @@ EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& m
     BeginOfEventAction(event);
     EndOfEventAction(event);
   }
-  m_VREventStream = new std::ofstream();
+  m_isForVirtualReality = Environment::Instance().getVirtualReality();
+  if (m_isForVirtualReality)
+    m_VREventStream = new std::ofstream;
 }
 
 EventAction::~EventAction()
 {
-  delete m_VREventStream;
+  if (m_isForVirtualReality) {
+    // Just in case the file is still opened...
+    if (m_VREventStream->is_open())
+      m_VREventStream->close();
+    delete m_VREventStream;
+  }
 }
 
 void EventAction::BeginOfEventAction(const G4Event*)
 {
   //Enable recording of Hits
   SensitiveDetectorBase::setActive(true);
-  // Open a new output file for the VR event-history steps
-  if (m_VREventStream->is_open())
-    m_VREventStream->close();
-  if (not m_evtMetaData.isValid())
-    B2FATAL("EventMetaData is not valid.");
-  int eventNumber = m_evtMetaData->getEvent();
-  std::string filename = boost::str(boost::format("event%1%.csv") % eventNumber);
-  m_VREventStream->open(filename);
-  B2INFO("Opened VR event-history file " << filename);
+  if (m_isForVirtualReality) {
+    // Open a new output file for the VR event-history steps
+    if (m_VREventStream->is_open())
+      m_VREventStream->close();
+    if (not m_evtMetaData.isValid())
+      B2FATAL("EventMetaData is not valid.");
+    int eventNumber = m_evtMetaData->getEvent();
+    std::string filename = boost::str(boost::format("event%1%.csv") % eventNumber);
+    m_VREventStream->open(filename);
+    B2INFO("Opened VR event-history file " << filename);
+  }
 }
 
 
@@ -77,7 +87,9 @@ void EventAction::EndOfEventAction(const G4Event*)
     if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity(), it->second);
   }
 
-  // Close the VR event-history file
-  if (m_VREventStream->is_open())
-    m_VREventStream->close();
+  if (m_isForVirtualReality) {
+    // Close the VR event-history file
+    if (m_VREventStream->is_open())
+      m_VREventStream->close();
+  }
 }

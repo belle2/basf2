@@ -438,8 +438,7 @@ SocketSend::SocketSend(const char* node, u_short port)
 {
   m_errno = 0;
   m_sock = -1;
-  struct hostent* hp;
-  if ((hp = gethostbyname(node)) == NULL) {
+  if ((m_hp = gethostbyname(node)) == NULL) {
     m_errno = errno;
     fprintf(stderr,
             "SocketSend::gethostbyname(%s): not found\n", node);
@@ -448,13 +447,13 @@ SocketSend::SocketSend(const char* node, u_short port)
 
   struct sockaddr_in sa;
   bzero(&sa, sizeof(sa));
-  bcopy(hp->h_addr, (char*)&sa.sin_addr, hp->h_length);
-  sa.sin_family = hp->h_addrtype;
+  bcopy(m_hp->h_addr, (char*)&sa.sin_addr, m_hp->h_length);
+  sa.sin_family = m_hp->h_addrtype;
   sa.sin_port = htons((u_short)port);
 
   int s;
   m_sock = -1;
-  if ((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
+  if ((s = socket(m_hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
     m_errno = errno;
     perror("SocketSend:socket");
     return;

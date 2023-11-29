@@ -125,7 +125,7 @@ namespace Belle2 {
     boost::iostreams::filtering_ostream outStream;
     outStream.push(boost::iostreams::gzip_compressor());
     outStream.push(gzipfile4);
-    int inlen = m_neuroParameters.AdditionWireMode ? 27 : 9 * (3 + m_neuroParameters.AdditionInputPerSL);
+    int inlen = m_neuroParameters.AdditionWireMode ? 9 * (3 + m_neuroParameters.AdditionInputPerSL) : 27 ;
     CDCTriggerMLPData::NeuroSet sample(inlen);
     outStream << sample.headline << std::endl;
   }
@@ -133,6 +133,7 @@ namespace Belle2 {
   CDCTriggerNeuroDataModule::event()
   {
     StoreObjPtr<EventMetaData> evtmetadata;
+    B2DEBUG(150, Form("Number of Track : %d", m_tracks.getEntries()));
     for (int itrack = 0; itrack < m_tracks.getEntries(); ++itrack) {
       // get related MCParticle/RecoTrack for target
       // and retrieve track parameters

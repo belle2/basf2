@@ -117,7 +117,7 @@ namespace Belle2 {
             headline += "SL" + std::to_string(i) + "-extra_input" + std::to_string(j) + "\t";
           }
         }
-        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\n";
+        headline += "RecoZ\tRecoTheta\tScaleZ\tRawZ\tScaleTheta\tRawTheta\t2DPhi\t3DTheta\t2DinvPt\t2DPt\n";
       }
 
       NeuroSet(std::vector<float> xin, std::vector<float> xout,  int xexp, int xrun, int xsubrun, int xevt, int xtrack, unsigned xexpert,

@@ -291,6 +291,7 @@ def search_project_issues(
         search=search_term,
         state='opened',
         lazy=True,
+        scope='all',
     )
 
     return issues

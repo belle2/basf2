@@ -79,6 +79,8 @@ if __name__ == "__main__":
     svdpdfs = Belle2.SVDdEdxPDFs()
 
     for i in range(6):  # shortcut for looping over the 6 hypotheses
+        # Here getCDCPDF returns a TH2F*,
+        # so we set the pdf using the signature setPDF(const TH2F*, const unsigned int, const bool)
         cdcpdf = oldpdfs.getCDCPDF(i, False)
         cdcpdfs.setPDF(cdcpdf, i, False)
         cdcpdf_truncated = oldpdfs.getCDCPDF(i, True)

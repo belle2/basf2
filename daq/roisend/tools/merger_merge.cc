@@ -930,13 +930,13 @@ main(int argc, char* argv[])
       event_count++;
       if (event_count % 10000 == 0) {
         int hltcount = hltused.size();
-        int mod = *triggers.begin() % hltcount; // TODO what happens if triggers is empty?
         if (triggers.empty()) {
           // workaround for empty vector, but keep same structure for monitor parsing (kibana)
           ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
                       event_number_max, event_number_max, missing_walk_index, triggers.size(),
-                      0, event_number_max, mod, hlts[mod]);
+                      0, event_number_max, -1, -1);
         } else {
+          int mod = *triggers.begin() % hltcount;
           ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
                       *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
                       *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);

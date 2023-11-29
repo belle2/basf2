@@ -7,7 +7,7 @@ import collections.abc
 from datetime import datetime
 from pathlib import Path
 import yaml
-from .metrics import PerfectLCAGeometric, PerfectEvent, PerfectMasses  # , IsTrueB
+from .metrics import PerfectLCA, PerfectEvent, PerfectMasses  # , IsTrueB
 
 
 class GraFEIIgniteTrainer:
@@ -143,12 +143,7 @@ class GraFEIIgniteTrainer:
                     ],
                     device=device,
                 ),
-                # "pad_accuracy": grafei.metrics.Pad_Accuracy(
-                #     ignore_index=ignore_index,
-                #     output_transform=lambda x: [x[1], x[4]],
-                #     device=device,
-                # ),
-                "perfectLCA": PerfectLCAGeometric(
+                "perfectLCA": PerfectLCA(
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [

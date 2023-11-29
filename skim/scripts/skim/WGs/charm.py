@@ -479,11 +479,24 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         * :math:`D^{0}\\to K^+ K^- \\pi^0` (and CC)
 
     **Selection Criteria**:
-        * Tracks: dr < 1 cm, abs(dz) < 3 cm, :math:`\\theta` in CDC acceptance
+        * Tracks: ``charmSkim`` lists from `charm_skim_std_charged`
+
+          * Pions: ``pionIDNN > 0.1``
+          * Kaons: ``kaonIDNN > 0.1``
+
         * :math:`\\pi^{0}`: from `stdPi0s.loadStdSkimPi0`
         * ``1.70 < M(D0) < 2.10``
         * ``M(D*)-M(D0) < 0.16``
         * ``pCM(D*) > 2.0``
+
+    .. Note::
+        The neural-network based PID variables ``pionIDNN`` and ``kaonIDNN``
+        require the analysis globaltag to be set (e.g. via
+        ``b2skim-run --analysis-globaltag ANALYSIS_GT_NAME ...``). In case
+        calibrated weights are not ready for the skimming campaign, this skim
+        must be modified to use :b2:var:`binaryPID_noSVD` or
+        :b2:var:`binaryPID` instead (this will have some impact on skim
+        performance, although small, and needs to be tested).
     """
 
     __authors__ = ["Ludovico Massaccesi", "Emma Oxford"]

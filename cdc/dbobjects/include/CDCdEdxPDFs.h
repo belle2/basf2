@@ -33,7 +33,7 @@ namespace Belle2 {
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
      * @param truncated If true, return the truncated dE/dx PDF
      */
-    const TH2F* getCDCPDF(const int hypothesis, const bool truncated) const
+    const TH2F* getCDCPDF(const unsigned int hypothesis, const bool truncated) const
     {
       return getPDF(hypothesis, truncated);
     }

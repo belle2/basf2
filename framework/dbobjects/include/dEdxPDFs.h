@@ -38,7 +38,7 @@ namespace Belle2 {
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
      * @param truncated If true, return the truncated dE/dx PDF
      */
-    const TH2F* getPDF(const int hypothesis, const bool truncated) const
+    const TH2F* getPDF(const unsigned int hypothesis, const bool truncated) const
     {
       return truncated ? &m_dEdxPDFsTruncated.at(hypothesis) : &m_dEdxPDFs.at(hypothesis);
     }
@@ -49,7 +49,7 @@ namespace Belle2 {
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
      * @param truncated If true, set the truncated dE/dx PDF
      */
-    void setPDF(const TH2F pdf, const int hypothesis, const bool truncated)
+    void setPDF(const TH2F pdf, const unsigned int hypothesis, const bool truncated)
     {
       if (truncated)
         m_dEdxPDFsTruncated.at(hypothesis) = pdf;
@@ -63,7 +63,7 @@ namespace Belle2 {
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
      * @param truncated If true, set the truncated dE/dx PDF
      */
-    void setPDF(const TH2F* pdf, const int hypothesis, const bool truncated)
+    void setPDF(const TH2F* pdf, const unsigned int hypothesis, const bool truncated)
     {
       TH2F temp{};
       pdf->Copy(temp);

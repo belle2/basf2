@@ -14,9 +14,8 @@ from grafei.modules.FlagBDecayModule import getObjectList
 from grafei.model.geometric_network import GeometricNetwork
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
-from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, select_good_decay  # , n_intermediate_particles
+from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, select_good_decay
 from grafei.model.tree_utils import masses_to_classes
-# from grafei.model.tree_utils import node_masses
 from grafei.modules.RootSaverModule import write_hist
 
 warnings.filterwarnings(
@@ -188,13 +187,7 @@ class graFEISaverModule(b2.Module):
                 candidate.addExtraInfo("graFEI_probEdgeGeom", np.nan)
                 candidate.addExtraInfo("graFEI_validTree", np.nan)
                 candidate.addExtraInfo("graFEI_goodEvent", np.nan)
-                # candidate.addExtraInfo("graFEI_6inLCAS", np.nan)
-                # candidate.addExtraInfo("graFEI_5inLCAS", np.nan)
-                # candidate.addExtraInfo("graFEI_4inLCAS", np.nan)
-                # candidate.addExtraInfo("graFEI_3inLCAS", np.nan)
-                # candidate.addExtraInfo("graFEI_2inLCAS", np.nan)
-                # candidate.addExtraInfo("graFEI_1inLCAS", np.nan)
-                # candidate.addExtraInfo("graFEI_nIntermediates", np.nan)
+                candidate.addExtraInfo("graFEI_goodTopology", np.nan)
                 candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
                 candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)
                 candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
@@ -216,10 +209,6 @@ class graFEISaverModule(b2.Module):
                 candidate.addExtraInfo("graFEI_nOthers_postFit", np.nan)
                 candidate.addExtraInfo("graFEI_nPredictedUnmatched", np.nan)
                 candidate.addExtraInfo("graFEI_nPredictedUnmatched_noPhotons", np.nan)
-                # candidate.addExtraInfo("graFEI_depthLCA", np.nan)
-                # candidate.addExtraInfo("graFEI_nBtag_daughters", np.nan)
-                # candidate.addExtraInfo("graFEI_nBsig_daughters", np.nan)
-                # candidate.addExtraInfo("graFEI_notB_daughters", np.nan)
 
                 # if self.storeTrueInfo and Belle2.Environment.Instance().isMC():
                 if self.storeTrueInfo:
@@ -228,7 +217,6 @@ class graFEISaverModule(b2.Module):
                     candidate.addExtraInfo("graFEI_truth_perfectEvent", np.nan)
                     candidate.addExtraInfo("graFEI_truth_isSemileptonic", np.nan)
                     candidate.addExtraInfo("graFEI_truth_nFSP", np.nan)
-                    # candidate.addExtraInfo("graFEI_truth_depthLCA", np.nan)
                     candidate.addExtraInfo("graFEI_truth_nPhotons", np.nan)
                     candidate.addExtraInfo("graFEI_truth_nElectrons", np.nan)
                     candidate.addExtraInfo("graFEI_truth_nMuons", np.nan)
@@ -360,9 +348,6 @@ class graFEISaverModule(b2.Module):
                 else 0
             )
 
-            # Particle list for matched
-            # matched_list = [j for i, j in enumerate(p_list) if predicted_matched[i]]
-
             # Get LCA of predicted matched only
             predicted_LCA_square_matched = predicted_LCA_square[predicted_matched]
             predicted_LCA_square_matched = predicted_LCA_square_matched[:, predicted_matched]
@@ -379,27 +364,25 @@ class graFEISaverModule(b2.Module):
                 except InvalidLCAMatrix:
                     pass
 
-            # Check if each stage is present in the LCAS
-            # graFEI_6inLCAS = 0
-            # graFEI_5inLCAS = 0
-            # graFEI_4inLCAS = 0
-            # graFEI_3inLCAS = 0
-            # graFEI_2inLCAS = 0
-            # graFEI_1inLCAS = 0
-            # graFEI_nIntermediates = 0
-            # graFEI_depthLCA = -1
-            # graFEI_nB1_daughters = 0
-            # graFEI_nB2_daughters = 0
-            # graFEI_notB_daughters = 0
+            # Check if event is good, depending on the chosen decay string
             graFEI_goodEvent = 0
-            # masses_ordered = dict((i, []) for i in range(1, 7))
+            graFEI_goodTopology = 0
             if graFEI_validTree:
+                # Check if the topology is correct
                 good_decay, root_level, sig_side_fsps = select_good_decay(predicted_LCA_square_matched, self.decay_string)
-                good_topology = int((self.max_level == root_level) and good_decay)
+                graFEI_goodTopology = int((self.max_level == root_level) and good_decay)
 
-                if good_topology:
+                if graFEI_goodTopology:
+                    # Find sig- and tag-side FSPs (1 = sig-side, 0 = tag-side)
+                    p_list_matched = list(np.array(p_list)[predicted_matched])
+                    for i, particle in enumerate(p_list_matched):
+                        if i in sig_side_fsps:
+                            particle.addExtraInfo("graFEI_sigSide", 1)
+                        else:
+                            particle.addExtraInfo("graFEI_sigSide", 0)
+
                     # Check if mass hypotheses are correct
-                    sig_side_predicted_masses = predicted_masses_matched[sig_side_fsps]
+                    sig_side_predicted_masses = predicted_masses_matched[sig_side_fsps].tolist()
                     chosen_predicted_masses = "".join(
                         list(filter(lambda x: x in ["i", "k", "p", "e", "m", "g", "o"],
                                     self.decay_string[self.decay_string.find("->") + 2:])))
@@ -411,19 +394,6 @@ class graFEISaverModule(b2.Module):
 
                     graFEI_goodEvent = int(Counter(sig_side_predicted_masses) == Counter(chosen_predicted_masses))
 
-                # level_intermediates, lca_idx_of_daughters, graFEI_depthLCA = n_intermediate_particles(
-                #     predicted_LCA_square_matched
-                # )
-
-                # graFEI_6inLCAS = level_intermediates[6]
-                # graFEI_5inLCAS = level_intermediates[5]
-                # graFEI_4inLCAS = level_intermediates[4]
-                # graFEI_3inLCAS = level_intermediates[3]
-                # graFEI_2inLCAS = level_intermediates[2]
-                # graFEI_1inLCAS = level_intermediates[1]
-                # graFEI_nIntermediates = (
-                #     graFEI_1inLCAS + graFEI_2inLCAS + graFEI_3inLCAS + graFEI_4inLCAS + graFEI_5inLCAS
-                # )
                 b2.B2DEBUG(11, "This LCA describes a valid tree")
                 b2.B2DEBUG(
                     11,
@@ -431,60 +401,11 @@ class graFEISaverModule(b2.Module):
                     predicted_LCA_square_matched,
                 )
                 b2.B2DEBUG(11, "Adjacency matrix:\n", adjacency)
-                # b2.B2DEBUG(
-                #     11, "Number of intermediate particles:\n", level_intermediates
-                # )
-                # b2.B2DEBUG(
-                #     11,
-                #     "Indices of FSPs coming from each ancestor:\n",
-                #     lca_idx_of_daughters,
-                # )
-
-                # # Compute invariant mass of nodes in LCA
-                # nodes_masses = [
-                #     round(i, 4) for i in node_masses(matched_list, lca_idx_of_daughters)
-                # ]
-
-                # Group the invariant masses
-                # it = iter(nodes_masses)
-                # masses_ordered = [
-                #     list(itertools.islice(it, 0, i))
-                #     for i in level_intermediates.values()
-                # ]
-                # masses_ordered = dict(
-                #     (i, j) for i, j in zip(level_intermediates.keys(), masses_ordered)
-                # )
-
-                # Assign FSPs to B mesons with extraInfo
-                # Only do that if we have exactly 1 Upsilon(4S) reconstructed
-                # if graFEI_6inLCAS == 1:
-                #     # Case with only one B
-                #     if graFEI_5inLCAS == 1:
-                #         graFEI_nB1_daughters = len(lca_idx_of_daughters[1])
-                #         for i, particle in enumerate(matched_list):
-                #             particle.addExtraInfo("graFEI_fromWhichB", 1 if i in lca_idx_of_daughters[1] else -1)
-                #     # Case with 2 Bs
-                #     elif graFEI_5inLCAS == 2:
-                #         # B1 has always >= particles than B2
-                #         whichB = 1 if len(lca_idx_of_daughters[1]) >= len(lca_idx_of_daughters[2]) else 2
-                #         graFEI_nB1_daughters = len(lca_idx_of_daughters[whichB])
-                #         graFEI_nB2_daughters = len(lca_idx_of_daughters[3 - whichB])
-                #         for i, particle in enumerate(matched_list):
-                #             if i in lca_idx_of_daughters[1]:
-                #                 particle.addExtraInfo("graFEI_fromWhichB", whichB)
-                #             elif i in lca_idx_of_daughters[2]:
-                #                 particle.addExtraInfo("graFEI_fromWhichB", 3 - whichB)
 
             # Particles not assigned to B decays get -1
-            # for particle in p_list:
-            #     if not particle.hasExtraInfo("graFEI_fromWhichB"):
-            #         particle.addExtraInfo("graFEI_fromWhichB", -1)
-            #         graFEI_notB_daughters += 1
-
-            # b2.B2DEBUG(11, "Invariant masses of intermediates:\n", masses_ordered)
-            # b2.B2DEBUG(11, "B1 number of daughters:", graFEI_nB1_daughters)
-            # b2.B2DEBUG(11, "B2 number of daughters:", graFEI_nB2_daughters)
-            # b2.B2DEBUG(11, "Not B number of daughters:", graFEI_notB_daughters)
+            for particle in p_list:
+                if not particle.hasExtraInfo("graFEI_sigSide"):
+                    particle.addExtraInfo("graFEI_sigSide", -1)
 
             # Define B probabilities
             graFEI_probEdgeProd = edge_probability_unique.prod().item()
@@ -492,19 +413,13 @@ class graFEISaverModule(b2.Module):
             graFEI_probEdgeGeom = torch.pow(edge_probability_unique.prod(), 1/n_nodes).item()
             # graFEI_B_probGlobal = torch.sigmoid(u_pred[0][0]).item()
 
-            # Add extra info for each B candidate (one for each event)
+            # Add extra info for each B candidate
             candidate.addExtraInfo("graFEI_probEdgeProd", graFEI_probEdgeProd)
             candidate.addExtraInfo("graFEI_probEdgeMean", graFEI_probEdgeMean)
             candidate.addExtraInfo("graFEI_probEdgeGeom", graFEI_probEdgeGeom)
             candidate.addExtraInfo("graFEI_validTree", graFEI_validTree)
             candidate.addExtraInfo("graFEI_goodEvent", graFEI_goodEvent)
-            # candidate.addExtraInfo("graFEI_6inLCAS", graFEI_6inLCAS)
-            # candidate.addExtraInfo("graFEI_5inLCAS", graFEI_5inLCAS)
-            # candidate.addExtraInfo("graFEI_4inLCAS", graFEI_4inLCAS)
-            # candidate.addExtraInfo("graFEI_3inLCAS", graFEI_3inLCAS)
-            # candidate.addExtraInfo("graFEI_2inLCAS", graFEI_2inLCAS)
-            # candidate.addExtraInfo("graFEI_1inLCAS", graFEI_1inLCAS)
-            # candidate.addExtraInfo("graFEI_nIntermediates", graFEI_nIntermediates)
+            candidate.addExtraInfo("graFEI_goodTopology", graFEI_goodTopology)
             candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
             candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
             candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)
@@ -526,18 +441,8 @@ class graFEISaverModule(b2.Module):
             candidate.addExtraInfo("graFEI_nOthers_postFit", graFEI_nOthers_postFit)
             candidate.addExtraInfo("graFEI_nPredictedUnmatched", graFEI_nPredictedUnmatched)
             candidate.addExtraInfo("graFEI_nPredictedUnmatched_noPhotons", graFEI_nPredictedUnmatched_noPhotons)
-            # candidate.addExtraInfo("graFEI_depthLCA", graFEI_depthLCA)
-            # candidate.addExtraInfo("graFEI_nBtagDaughters", graFEI_nB1_daughters)
-            # candidate.addExtraInfo("graFEI_nBsigDaughters", graFEI_nB2_daughters)
-            # candidate.addExtraInfo("graFEI_nNotBParticles", graFEI_notB_daughters)
-
-            # # Invariant masses of intermediates are stored in dedicated extraInfo, one for each intermediate
-            # for lcas_level in range(1, 7):
-            #     for i, mass in enumerate(masses_ordered[lcas_level], 1):
-            #         candidate.addExtraInfo(f"graFEI_{lcas_level}Mass_{i}", mass)
 
             # Add MC truth information
-            # if self.storeTrueInfo and Belle2.Environment.Instance().isMC():
             if self.storeTrueInfo:
                 # Get the true IDs of the ancestors (if it's a B)
                 parentID = np.array([p.getExtraInfo("BParentGenID") for p in p_list], dtype=int)
@@ -584,7 +489,6 @@ class graFEISaverModule(b2.Module):
                 graFEI_truth_perfectLCA = 0  # 1 if LCA perfectly reconstructed
                 graFEI_truth_isSemileptonic = -1  # 0 if hadronic, 1 is semileptonic, -1 if not matched
                 graFEI_truth_nFSP = -1  # Number of true FSPs
-                # graFEI_truth_depthLCA = -1  # Number of different classes in the LCA
                 graFEI_truth_perfectMasses = int(
                     (predicted_masses.numpy() == p_masses).all()
                 )  # Check if all the masses are predicted correctly
@@ -657,13 +561,6 @@ class graFEISaverModule(b2.Module):
                             true_LCA_square[x[0], y[0]] = levels[intersection[-1]]
                             true_LCA_square[y[0], x[0]] = levels[intersection[-1]]
 
-                        # try:
-                        #     _, _, graFEI_truth_depthLCA = n_intermediate_particles(
-                        #         torch.tensor(true_LCA_square, dtype=int)
-                        #     )
-                        # except InvalidLCAMatrix:
-                        #     pass
-
                         x_leaves = p_indices
                         y_leaves = list(leaf_hist.keys())
 
@@ -721,7 +618,6 @@ class graFEISaverModule(b2.Module):
                 candidate.addExtraInfo("graFEI_truth_perfectEvent", graFEI_truth_perfectEvent)
                 candidate.addExtraInfo("graFEI_truth_isSemileptonic", graFEI_truth_isSemileptonic)
                 candidate.addExtraInfo("graFEI_truth_nFSP", graFEI_truth_nFSP)
-                # candidate.addExtraInfo("graFEI_truth_depthLCA", graFEI_truth_depthLCA)
                 candidate.addExtraInfo("graFEI_truth_nPhotons", graFEI_truth_nPhotons)
                 candidate.addExtraInfo("graFEI_truth_nElectrons", graFEI_truth_nElectrons)
                 candidate.addExtraInfo("graFEI_truth_nMuons", graFEI_truth_nMuons)

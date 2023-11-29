@@ -376,50 +376,6 @@ def lca2adjacency(lca_matrix, format="bfs"):
     return adjacency_matrix
 
 
-# def n_intermediate_particles(lca_matrix):
-#     """
-#     Counts how many intermediate particles of each generation are in the tree.
-
-#     Args:
-#         lca (np.ndarray): LCA matrix.
-#     Returns:
-#         defaultdict(<class 'int'>): number of particles for each generation in a dictionary.
-#     """
-
-#     level_count = defaultdict(int)
-#     n_particles = defaultdict(int)
-#     nodes_to_fsps = []
-#     nodes_to_level = []
-
-#     # Get unique elements of LCA without 0's
-#     elements = lca_matrix.unique().sort(descending=True).values
-#     elements = elements[elements > 0].tolist()
-
-#     # Reconstruct the tree structure
-#     root, _ = _reconstruct(lca_matrix)
-#     queue = _breadth_first_enumeration(root, {}, None)
-
-#     # Count how many particles there are at a given level
-#     for i in range(root.level, 0, -1):
-#         for node in queue[i]:
-#             if node.actual_level > 1:
-#                 level_count[node.actual_level - 1] += 1
-#                 nodes_to_fsps.append(_get_fsps_of_node(node))
-#                 nodes_to_level.append(node.actual_level - 1)
-
-#     # Order masses
-#     nodes_to_level = np.array(nodes_to_level)
-#     nodes_to_level = nodes_to_level.max() - nodes_to_level
-
-#     nodes_to_fsps = [x for _, x in sorted(zip(nodes_to_level, nodes_to_fsps))]
-
-#     # Transform levels to actual generation/stages
-#     for i, j in zip(elements, level_count):
-#         n_particles[i] = level_count[j]
-
-#     return n_particles, nodes_to_fsps, root.level
-
-
 def _is_good_decay_string(decay_string):
     """
     Check if decay string has the good syntax.
@@ -546,7 +502,7 @@ def select_good_decay(lcas_matrix, decay_string):
         fsps_counter = Counter(FSPs)
         B1_counter = Counter([gchild.lcas_level for gchild in root.children[0].children])
         B2_counter = Counter([gchild.lcas_level for gchild in root.children[1].children])
-        if B1_counter != fsps_counter and B2_counter != fsps_counter:
+        if (B1_counter != fsps_counter) and (B2_counter != fsps_counter):
             return (False, root.lcas_level, [-1])
 
         # # Find all decays of root children

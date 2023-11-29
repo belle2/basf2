@@ -131,40 +131,31 @@ graFEI = graFEISaverModule(
     "Upsilon(4S):graFEI",
     cfg_path=cfg_file,
     param_file=weight_file,
+    decay_string="5->ik",
 )
 path.add_module(graFEI)
 
 for part in part_types:
     ma.cutAndCopyList(
-        f"{part}:B_1",
+        f"{part}:Bsig",
         f"{part}:graFEI",
-        cut="extraInfo(graFEI_fromWhichB) == 1",
+        cut="extraInfo(graFEI_sigSide) == 1",
         writeOut=True,
         path=path,
     )
     ma.cutAndCopyList(
-        f"{part}:B_2",
+        f"{part}:Btag",
         f"{part}:graFEI",
-        cut="extraInfo(graFEI_fromWhichB) == 2",
-        writeOut=True,
-        path=path,
-    )
-    ma.cutAndCopyList(
-        f"{part}:notB",
-        f"{part}:graFEI",
-        cut="extraInfo(graFEI_fromWhichB) == -1",
+        cut="extraInfo(graFEI_sigSide) == 0",
         writeOut=True,
         path=path,
     )
 
 ma.combineAllParticles(
-    [f"{part}:B_1" for part in part_types], "B0:B_1_graFEI", path=path
+    [f"{part}:Bsig" for part in part_types], "B0:Bsig_graFEI", path=path
 )
 ma.combineAllParticles(
-    [f"{part}:B_2" for part in part_types], "B0:B_2_graFEI", path=path
-)
-ma.combineAllParticles(
-    [f"{part}:notB" for part in part_types], "B0:notB_graFEI", path=path
+    [f"{part}:Btag" for part in part_types], "B0:Btag_graFEI", path=path
 )
 
 # # Continuum suppression
@@ -181,8 +172,8 @@ ma.combineAllParticles(
 # ma.buildContinuumSuppression(list_name="B0:B_2_graFEI", roe_mask="csMask", path=path)
 
 if mc:
-    ma.matchMCTruth("B0:B_1_graFEI", path=path)
-    ma.matchMCTruth("B0:B_2_graFEI", path=path)
+    ma.matchMCTruth("B0:Bsig_graFEI", path=path)
+    ma.matchMCTruth("B0:Btag_graFEI", path=path)
     ma.matchMCTruth("Upsilon(4S):graFEI", path=path)
 
 # ---------------- Write information to file ---------------------------
@@ -216,13 +207,13 @@ if mc:
     )
 
 ma.variablesToEventExtraInfo(
-    "B0:B_1_graFEI",
-    dict((var, f"Btag_{var}") for var in default_vars),
+    "B0:Bsig_graFEI",
+    dict((var, f"Bsig_{var}") for var in default_vars),
     path=path,
 )
 ma.variablesToEventExtraInfo(
-    "B0:B_2_graFEI",
-    dict((var, f"Bsig_{var}") for var in default_vars),
+    "B0:Btag_graFEI",
+    dict((var, f"Btag_{var}") for var in default_vars),
     path=path,
 )
 
@@ -232,13 +223,15 @@ graFEI_vars = [
     "graFEI_probEdgeMean",
     "graFEI_probEdgeGeom",
     "graFEI_validTree",
-    "graFEI_6inLCAS",
-    "graFEI_5inLCAS",
-    "graFEI_4inLCAS",
-    "graFEI_3inLCAS",
-    "graFEI_2inLCAS",
-    "graFEI_1inLCAS",
-    "graFEI_nIntermediates",
+    "graFEI_goodEvent",
+    "graFEI_goodTopology",
+    # "graFEI_6inLCAS",
+    # "graFEI_5inLCAS",
+    # "graFEI_4inLCAS",
+    # "graFEI_3inLCAS",
+    # "graFEI_2inLCAS",
+    # "graFEI_1inLCAS",
+    # "graFEI_nIntermediates",
     "graFEI_nFSP",
     "graFEI_nCharged_preFit",
     "graFEI_nElectrons_preFit",
@@ -260,10 +253,10 @@ graFEI_vars = [
     "graFEI_nOthers_postFit",
     "graFEI_nPredictedUnmatched",
     "graFEI_nPredictedUnmatched_noPhotons",
-    "graFEI_depthLCA",
-    "graFEI_nBtagDaughters",
-    "graFEI_nBsigDaughters",
-    "graFEI_nNotBParticles",
+    # "graFEI_depthLCA",
+    # "graFEI_nBtagDaughters",
+    # "graFEI_nBsigDaughters",
+    # "graFEI_nNotBParticles",
 ]
 if mc:
     graFEI_vars.extend(
@@ -273,7 +266,7 @@ if mc:
             "graFEI_truth_perfectEvent",
             "graFEI_truth_isSemileptonic",
             "graFEI_truth_nFSP",
-            "graFEI_truth_depthLCA",
+            # "graFEI_truth_depthLCA",
             "graFEI_truth_nPhotons",
             "graFEI_truth_nElectrons",
             "graFEI_truth_nMuons",

@@ -414,6 +414,7 @@ class MakePlots(basf2.Module):
             bine0 = (teff.GetEfficiencyErrorUp(ibin) + teff.GetEfficiencyErrorLow(ibin)) / 2.0
             heff.SetBinContent(ibin, binc0)
             heff.SetBinError(ibin, bine0)
+        heff.GetYaxis().SetRangeUser(0.0, 1.2)
         return heff
 
     def initialize(self):

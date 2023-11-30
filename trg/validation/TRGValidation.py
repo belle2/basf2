@@ -23,6 +23,16 @@ import ROOT
 from ROOT import Belle2, TH1F, TFile, TNamed, TEfficiency
 from math import pi as PI
 
+"""
+<header>
+  <input>TRGValidationGen.root</input>
+  <output>TRGValidation.root</output>
+  <contact>yinjh2012@korea.ac.kr</contact>
+  <description>makes validation plots for TRG</description>
+</header>
+
+"""
+
 
 Fac = 180.0 / PI
 inputBits = ["t3_0", "ty_0", "t2_0", "ts_0", "ta_0", "typ", "ehigh", "elow", "elum", "ecl_3dbha", "cdc_open90",

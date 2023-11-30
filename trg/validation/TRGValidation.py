@@ -14,15 +14,6 @@
 # For full documentation please refer to https://software.belle2.org
 # Anything unclear? Ask questions at https://questions.belle2.org
 
-import basf2
-import modularAnalysis as ma  # a shorthand for the analysis tools namespace
-import stdCharged as stdc
-import variables.utils as vu
-
-import ROOT
-from ROOT import Belle2, TH1F, TFile, TNamed, TEfficiency
-from math import pi as PI
-
 """
 <header>
   <input>TRGValidationGen.root</input>
@@ -33,6 +24,14 @@ from math import pi as PI
 
 """
 
+import basf2
+import modularAnalysis as ma  # a shorthand for the analysis tools namespace
+import stdCharged as stdc
+import variables.utils as vu
+
+import ROOT
+from ROOT import Belle2, TH1F, TFile, TNamed, TEfficiency
+from math import pi as PI
 
 Fac = 180.0 / PI
 inputBits = ["t3_0", "ty_0", "t2_0", "ts_0", "ta_0", "typ", "ehigh", "elow", "elum", "ecl_3dbha", "cdc_open90",

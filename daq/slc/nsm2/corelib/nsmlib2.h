@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /* ---------------------------------------------------------------------- *\
    nsmlib2.h
 
@@ -18,7 +19,7 @@
 #include <stdio.h>       /* for FILE * */
 #include <netinet/in.h>  /* for struct sockaddr_in */
 
-#include "nsm2.h"
+#include "nsm2/nsm2.h"
 
 #if defined(__cplusplus)
 extern "C" {

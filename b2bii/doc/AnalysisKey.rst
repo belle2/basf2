@@ -186,6 +186,39 @@ FlavorTagger will call the corresponding payloads in the module.
    ft.flavorTagger(
        particleLists=['B+:sig'],
        weightFiles=weightfiles,
+       prefix='',
        path=my_path)
 
+
+
+-------------------------------------
+BeamBackground MVA and FakePhoton MVA
+-------------------------------------
+
+The weight files for the b2bii case are stored in the ``analysis_b2bii`` global tag.
+To apply beam background MVA and fake photon MVA in a b2bii analysis, the correct
+suffix, ``Belle``, should be used for the weight file, and apply them over the
+premade ``gamma:mdst`` list:
+
+
+.. code-block:: python3
+
+   basf2.conditions.append_globaltag(ma.getAnalysisGlobaltagB2BII())
+   # Apply fake photon MVA
+   ma.getFakePhotonProbability(
+       particleList=['gamma:mdst'],
+       weight="Belle",
+       path=mypath)
+   # Apply beamBackground MVA
+   ma.getBeamBackgroundProbability(
+       particleList=['gamma:mdst'],
+       weight="Belle",
+       path=mypath)
+
+
+.. note::
+   Details for the training done in Belle MC can be found in the appendix in 
+   `BELLE2-NOTE-PH-2023-036`_.
+
+.. _BELLE2-NOTE-PH-2023-036: https://docs.belle2.org/record/3754/
 

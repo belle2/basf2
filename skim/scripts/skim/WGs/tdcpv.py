@@ -13,8 +13,8 @@ import modularAnalysis as ma
 from skim.standardlists.dileptons import (loadStdJpsiToee_noTOP, loadStdJpsiTomumu,
                                           loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
-                                            loadStdSkimHighEffPhi, loadStdAllEtaPrime,
-                                            loadStdAllEta, loadStdSkimHighEffKstar0,
+                                            loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
+                                            loadStdSkimHighEffEta, loadStdSkimHighEffKstar0,
                                             loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
                                             loadStdSkimHighEffF_0, loadStdAllRho0)
 
@@ -107,6 +107,7 @@ class TDCPV_qqs(BaseSkim):
         stdK("all", path=path)
         stdPi("all", path=path)
         stdPhotons("all", path=path)
+        stdPhotons("tight", path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
@@ -116,8 +117,8 @@ class TDCPV_qqs(BaseSkim):
         loadStdAllRho0(path=path)
 
         loadStdSkimHighEffPhi(path=path)
-        loadStdAllEta(path=path)
-        loadStdAllEtaPrime(path=path)
+        loadStdSkimHighEffEta(path=path)
+        loadStdSkimHighEffEtaPrime(path=path)
         loadStdSkimHighEffKstar0(path=path)
         loadStdSkimHighEffRho0(path=path)
         loadStdSkimHighEffOmega(path=path)
@@ -136,10 +137,10 @@ class TDCPV_qqs(BaseSkim):
 
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',
-            'eta\':all K_S0:merged',
-            'eta:all K_S0:merged',
-            'eta\':all K*0:SkimHighEff',
-            'eta:all K*0:SkimHighEff',
+            'eta\':SkimHighEff K_S0:merged',
+            'eta:SkimHighEff K_S0:merged',
+            'eta\':SkimHighEff K*0:SkimHighEff',
+            'eta:SkimHighEff K*0:SkimHighEff',
             'K_S0:merged K_S0:merged K_S0:merged',
             'pi0:skim K_S0:merged',
             'rho0:SkimHighEff K_S0:merged',
@@ -154,7 +155,7 @@ class TDCPV_qqs(BaseSkim):
         ]
 
         bu_qqs_Channels = [
-            'eta\':all K+:SkimHighEff',
+            'eta\':SkimHighEff K+:SkimHighEff',
             'phi:SkimHighEff K+:SkimHighEff',
         ]
 
@@ -196,7 +197,7 @@ class TDCPV_qqs(BaseSkim):
         return bd_qqs_List + bu_qqs_List
 
     def validation_histograms(self, path):
-        ma.reconstructDecay("B0:etap -> eta':all K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
+        ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
         Kres = 'K_10'
         ma.applyCuts('gamma:E15', '1.4 < E < 4', path=path)

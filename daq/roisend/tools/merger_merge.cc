@@ -155,7 +155,7 @@ void check_event_nr(unsigned int event_number)
   } else if (missing_walk_index > 0 && event_number_max - *std::next(triggers.begin(), missing_walk_index) < 100000) {
     missing_walk_index--;
   }
-  if (triggers.size() > 50_000) {
+  if (triggers.size() > 50000) {
     // diable to avoid slow-down by too many in-flight triggers
     enable_check = false;
     ERR_FPRINTF(stderr, "[ERROR] Too many in-flight triggers -> disable checking until next run\n");

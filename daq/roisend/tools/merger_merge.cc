@@ -45,6 +45,7 @@ std::vector<int> hlts; // initialized on run START
 std::set<int> triggers;
 unsigned int event_number_max = 0;
 unsigned int missing_walk_index = 0;
+bool enable_check = true;
 
 bool got_sigusr1 = false;
 bool got_sigusr2 = false;
@@ -152,6 +153,11 @@ void check_event_nr(unsigned int event_number)
     missing_walk_index++;
   } else if (missing_walk_index > 0 && event_number_max - *std::next(triggers.begin(), missing_walk_index) < 100000) {
     missing_walk_index--;
+  }
+  if (triggers.size() > 50_000) {
+    // diable to avoid slow-down by too many in-flight triggers
+    enable_check = false;
+    ERR_FPRINTF(stderr, "[ERROR] Too many in-flight triggers -> disable checking until next run\n");
   }
 }
 
@@ -737,6 +743,8 @@ main(int argc, char* argv[])
   int minfd = sd_acc;
   fd_set rset;//, wset;
 
+  // enable the checking of missing triggers
+  enable_check = true;
   // Handle Obtain ROI and send it to ONSEN
   while (!stop_running) {
     memcpy(&rset, &allset, sizeof(rset));
@@ -878,6 +886,7 @@ main(int argc, char* argv[])
             print_stat();
             clear_triggers();
             current_runnr = runnr;
+            enable_check = true;
           } else if (runnr < current_runnr) {
             // got some event from old run
             ERR_FPRINTF(stderr, "[WARNING] merger_merge: got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
@@ -886,7 +895,7 @@ main(int argc, char* argv[])
 
           if (runnr == current_runnr) {
             // seperate if, as we might set it in the if above
-            check_event_nr(eventnr);
+            if (enable_check) check_event_nr(eventnr);
           } // if we end the if here, we will send out old events to ONSEN!
 
           n_bytes_to_onsen = n_bytes_from_hltout;

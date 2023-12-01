@@ -1,22 +1,13 @@
 import torch as t
-# import numpy as np
-# import re
-# from collections import defaultdict, Counter
+import numpy as np
 from collections import Counter
+from itertools import permutations
 from .tree_utils import is_valid_tree
 
 
 class InvalidLCAMatrix(Exception):
     """
     Specialized Exception sub-class raised for malformed LCA-gram-matrices or LCA-gram-matrices that do not encode trees.
-    """
-
-    pass
-
-
-class BadDecayString(Exception):
-    """
-    Specialized Exception sub-class raised for invalid decay strings.
     """
 
     pass
@@ -376,54 +367,6 @@ def lca2adjacency(lca_matrix, format="bfs"):
     return adjacency_matrix
 
 
-def _is_good_decay_string(decay_string):
-    """
-    Check if decay string has the good syntax.
-
-    Args:
-        decay_string (str): decay string to check
-
-    Returns:
-        decay_string (str): decay string with some formatting
-    """
-
-    # Empty decay string is allowed
-    if decay_string == "":
-        return decay_string
-
-    # Remove whitespaces from decay string
-    decay_string = "".join(decay_string.split())
-
-    # Decay string should start with 5
-    try:
-        int(decay_string[0])
-    except ValueError:
-        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m'")
-    if int(decay_string[0]) != 5:
-        raise BadDecayString("Decay string should start with 5. Example of decay string:'5 -> 1 p m'")
-
-    # ... and continue with '->'
-    if not decay_string[1:3] == "->":
-        raise BadDecayString("Decay string should contain '->' just after the root node. Example of decay string:'5 -> 1 p m'")
-
-    FSPs = decay_string[3:]
-
-    # Select only allowed characters
-    for e in set(FSPs):
-        if e not in ['1', '2', '3', '4', 'i', 'o', 'g', 'k', 'm', 'e', 'p']:
-            raise BadDecayString(
-                "Allowed characters are 1-4 and 'i', 'o', 'g', 'k', 'm', 'e', 'p'. Example of decay string:'5 -> 1 p m'")
-
-    for p in ['i', 'o', 'g', 'k', 'm', 'e', 'p']:
-        decay_string = decay_string.replace(p, "0")
-
-    # If only one FSP, then must be a 0
-    if len(FSPs) == 1 and FSPs[0] not in ['i', 'o', 'g', 'k', 'm', 'e', 'p']:
-        raise BadDecayString("If the signal side is composed of only one particle, it should be a FSP. Example:'5->p'")
-
-    return decay_string
-
-
 def _get_fsps_of_node(node):
     """
     Given a node, find all the final state particles connected to it and get their indices in the LCA.
@@ -445,69 +388,113 @@ def _get_fsps_of_node(node):
     return list(set(indices))
 
 
-def select_good_decay(lcas_matrix, decay_string):
+def select_good_decay(predicted_lcas, predicted_masses, sig_side_lcas=None, sig_side_masses=None):
     """
-    Cheks if given decay string is found in LCAS matrix.
-    WARNING: you have to make sure to call this function only for valid tree structures,
-             because it doesn't throw an exception in that case
+    Checks if given LCAS matrix is found in reconstructed LCAS matrix and mass hypotheses are correct.
+    WARNING: you have to make sure to call this function only for valid tree structures encoded in predicted_lcas,
+             otherwise it will throw an exception
 
     Args:
-        lcas_matrix (torch.Tensor): LCAS matrix
-        decay_string (str): decay string
+        predicted_lcas (torch.Tensor): LCAS matrix
+        predicted_masses (list): list of predicted mass classes
+        sig_side_lcas (torch.Tensor): LCAS matrix of your signal-side (you have to choose one)
+        sig_side_masses (list): List of mass hypotheses for your FSPs
 
     Returns:
-        bool: True if LCAS matches decay string, False otherwise
+        bool: True if LCAS and masses matche, False otherwise
         int: LCAS level of root node
         list: LCA indices of FSPs belonging to the signal side ([-1] if LCAS does not match decay string)
     """
 
-    # Check if decay string has good syntax
-    decay_string = _is_good_decay_string(decay_string)
-
     # Reconstruct decay chain
-    root, _ = _reconstruct(lcas_matrix)
+    root, _ = _reconstruct(predicted_lcas)
 
-    # If decay string is empty then False
-    if decay_string == "":
-        return (False, root.lcas_level, [-1])
-
-    # If root is not Ups nor B then False
+    # If root is not Ups nor B then decay is not good
     if root.lcas_level not in [5, 6]:
         return (False, root.lcas_level, [-1])
 
     # If root is B don't go any further (function is supposed to check wheter signal-side on Ups decay is good)
     if root.lcas_level == 5:
-        return (True, 5, [i for i in range(lcas_matrix.shape[0])])
+        return (True, 5, [i for i in range(predicted_lcas.shape[0])])
 
-    # Remove root and first arrow
-    decay_string = decay_string[3:]
-    # Get final state particles
-    FSPs = [int(fsp) for fsp in decay_string]
+    # If chosen LCAS or masses are None then decay is not good
+    if sig_side_lcas is None or sig_side_masses is None:
+        return (False, root.lcas_level, [-1])
 
+    # Check if the LCA matrix/masses you chose are valid
+    try:
+        if sig_side_lcas.item() == 0:
+            more_fsps = False
+        else:
+            raise InvalidLCAMatrix("If you have only one sig-side FSP, the LCA matrix should be [[0]]")
+    except ValueError:
+        try:
+            lca2adjacency(sig_side_lcas)
+            more_fsps = True
+        except InvalidLCAMatrix:
+            raise InvalidLCAMatrix("You chose an invalid LCA matrix")
+
+    # Check if the number of FSPs in the LCA is the same as the number of mass hypotheses
+    if sig_side_lcas.shape[0] != len(sig_side_masses):
+        raise InvalidLCAMatrix("The dimension of the LCA matrix you chose does not match with the number of mass hypotheses")
+
+    # Check if mass hypotheses are allowed
+    for e in set(sig_side_masses):
+        if e not in ['i', 'o', 'g', 'k', 'm', 'e', 'p']:
+            # Ok this is not properly an InvalidLCAMatrix case but I'm too lazy to define dedicated exception
+            raise InvalidLCAMatrix("Allowed mass hypotheses are 'i', 'o', 'g', 'k', 'm', 'e', 'p'")
+
+    # Convert mass hypotheses to classes and then to integers
+    for s, n in zip(["i", "k", "p", "e", "m", "g", "o"], ["3", "4", "5", "1", "2", "6", "0"]):
+        sig_side_masses = list(map(lambda x: x.replace(s, n), sig_side_masses))
+    sig_side_masses = t.from_numpy(np.array(sig_side_masses, dtype=int))
+
+    # Let's start the proper decay check
     # Case 1: only one FSP in the signal-side
-    # There should be two nodes: one '5' and one '0'
-    if len(FSPs) == 1:
+    if not more_fsps:
+        # There should be two nodes: one '5' and one '0'
         if Counter([child.lcas_level for child in root.children]) != Counter({5: 1, 0: 1}):
             return (False, root.lcas_level, [-1])
-        # I think the exceptions are over, LCAS is good
-        lca_idx = root.children[0].lca_index if root.children[0].lcas_level == 0 else root.children[1].lca_index
-        return (True, root.lcas_level, [lca_idx])
 
-    # Case 2: more FSP in the signal-side
+        # Get FSP index in LCA
+        fsp_idx = root.children[0].lca_index if root.children[0].lcas_level == 0 else root.children[1].lca_index
+
+        # Check mass hypothesis
+        if predicted_masses[fsp_idx] != sig_side_masses[0]:
+            return (False, root.lcas_level, [-1])
+
+        # I think the exceptions are over, decay is good
+        return (True, root.lcas_level, [fsp_idx])
+
+    # Case 2: more FSPs in the signal-side
     else:
         # There should be two nodes labelled as '5'
         if Counter([child.lcas_level for child in root.children]) != Counter({5: 2}):
             return (False, root.lcas_level, [-1])
-        # If there are two '5', at least one of them should decay into the nodes given by the decay string
-        fsps_counter = Counter(FSPs)
-        B1_counter = Counter([gchild.lcas_level for gchild in root.children[0].children])
-        B2_counter = Counter([gchild.lcas_level for gchild in root.children[1].children])
-        if (B1_counter != fsps_counter) and (B2_counter != fsps_counter):
-            return (False, root.lcas_level, [-1])
 
-        # # Find all decays of root children
-        # decays = re.findall(r"\(.*?\)", decay_string)
+        # If there are two '5', at least one of them should decay into the nodes given by the chosen LCAS/masses
+        # Step 1: get LCA indices of both Bs
+        B1_indices = _get_fsps_of_node(root.children[0])
+        B2_indices = _get_fsps_of_node(root.children[1])
 
-        # I think the exceptions are over, LCAS is good
-        sig_B = root.children[0] if B1_counter == fsps_counter else root.children[1]
-        return (True, root.lcas_level, _get_fsps_of_node(sig_B))
+        # Step 2: Loop over the two Bs and select LCA sub-matrix and sub-masses
+        for indices in [B1_indices, B2_indices]:
+            # Step 3: check whether number of FSPs in the chosen sig-side corresponds to that of one of the B's
+            if sig_side_lcas.shape[0] != len(indices):
+                continue
+
+            sub_lca = predicted_lcas[indices][:, indices]
+            sub_masses = predicted_masses[indices]
+
+            # Step 4: your chosen sig-side LCAS/masses could have different ordering,
+            # we have to check all possible permutations
+            for permutation in permutations(list(range(len(sub_lca)))):
+                permutation = list(permutation)
+                permuted_sig_side_lca = sig_side_lcas[permutation][:, permutation]
+                permuted_sig_side_masses = sig_side_masses[permutation]
+                # Step 5: if one of the permutations works decay is good
+                if (permuted_sig_side_lca == sub_lca).all() and (permuted_sig_side_masses == sub_masses).all():
+                    return (True, root.lcas_level, indices)
+
+        # If we get here decay is not good
+        return (False, root.lcas_level, [-1])

@@ -3,13 +3,13 @@
 
 import itertools
 import numpy as np
-from collections import Counter
 import yaml
 import warnings
 import basf2 as b2
 from ROOT import Belle2
 from variables import variables as vm
 import torch
+from torch_geometric.data import Batch
 from grafei.modules.FlagBDecayModule import getObjectList
 from grafei.model.geometric_network import GeometricNetwork
 from grafei.model.normalize_features import normalize_features
@@ -23,24 +23,14 @@ warnings.filterwarnings(
 )
 
 
-class Batch:
-    """Helper to pass argument to geometric model"""
-
-    def __init__(self, x=None, edge_attr=None, edge_index=None, u=None, batch=None):
-        self.x = x
-        self.edge_attr = edge_attr
-        self.edge_index = edge_index
-        self.u = u
-        self.batch = batch
-
-
 class graFEISaverModule(b2.Module):
     def __init__(
         self,
         particle_list: str,
         cfg_path=None,
         param_file=None,
-        decay_string="",
+        sig_side_lcas=None,
+        sig_side_masses=None,
         gpu=False,
     ):
         """
@@ -57,7 +47,8 @@ class graFEISaverModule(b2.Module):
         self.particle_list = particle_list
         self.cfg_path = cfg_path
         self.param_file = param_file
-        self.decay_string = "".join(decay_string.split())  # Remove whitespaces
+        self.sig_side_lcas = torch.tensor(sig_side_lcas) if sig_side_lcas else None
+        self.sig_side_masses = sig_side_masses
         self.gpu = gpu
 
     def initialize(self):
@@ -187,7 +178,6 @@ class graFEISaverModule(b2.Module):
                 candidate.addExtraInfo("graFEI_probEdgeGeom", np.nan)
                 candidate.addExtraInfo("graFEI_validTree", np.nan)
                 candidate.addExtraInfo("graFEI_goodEvent", np.nan)
-                candidate.addExtraInfo("graFEI_goodTopology", np.nan)
                 candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
                 candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)
                 candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
@@ -282,7 +272,7 @@ class graFEISaverModule(b2.Module):
             u = torch.tensor(x_global, dtype=torch.float).to(self.device)
             torch_batch = torch_batch.to(self.device)
 
-            # Create object to be passed to model
+            # Create Batch object to be passed to model
             batch = Batch(
                 x=x, edge_index=edge_index, edge_attr=edge_attr, u=u, batch=torch_batch
             )
@@ -364,15 +354,18 @@ class graFEISaverModule(b2.Module):
                 except InvalidLCAMatrix:
                     pass
 
-            # Check if event is good, depending on the chosen decay string
+            # Check if event is good, depending on the chosen sig-side LCA matrix/masses
             graFEI_goodEvent = 0
-            graFEI_goodTopology = 0
+            # graFEI_goodTopology = 0
             if graFEI_validTree:
-                # Check if the topology is correct
-                good_decay, root_level, sig_side_fsps = select_good_decay(predicted_LCA_square_matched, self.decay_string)
-                graFEI_goodTopology = int((self.max_level == root_level) and good_decay)
+                # Check if the event is good
+                good_decay, root_level, sig_side_fsps = select_good_decay(predicted_LCA_square_matched,
+                                                                          predicted_masses_matched,
+                                                                          self.sig_side_lcas,
+                                                                          self.sig_side_masses)
+                graFEI_goodEvent = int((self.max_level == root_level) and good_decay)
 
-                if graFEI_goodTopology:
+                if graFEI_goodEvent:
                     # Find sig- and tag-side FSPs (1 = sig-side, 0 = tag-side)
                     p_list_matched = list(np.array(p_list)[predicted_matched])
                     for i, particle in enumerate(p_list_matched):
@@ -380,19 +373,6 @@ class graFEISaverModule(b2.Module):
                             particle.addExtraInfo("graFEI_sigSide", 1)
                         else:
                             particle.addExtraInfo("graFEI_sigSide", 0)
-
-                    # Check if mass hypotheses are correct
-                    sig_side_predicted_masses = predicted_masses_matched[sig_side_fsps].tolist()
-                    chosen_predicted_masses = "".join(
-                        list(filter(lambda x: x in ["i", "k", "p", "e", "m", "g", "o"],
-                                    self.decay_string[self.decay_string.find("->") + 2:])))
-
-                    for s, n in zip(["i", "k", "p", "e", "m", "g", "o"], ["3", "4", "5", "1", "2", "6", "0"]):
-                        chosen_predicted_masses = chosen_predicted_masses.replace(s, n)
-
-                    chosen_predicted_masses = [int(i) for i in chosen_predicted_masses]
-
-                    graFEI_goodEvent = int(Counter(sig_side_predicted_masses) == Counter(chosen_predicted_masses))
 
                 b2.B2DEBUG(11, "This LCA describes a valid tree")
                 b2.B2DEBUG(
@@ -419,7 +399,6 @@ class graFEISaverModule(b2.Module):
             candidate.addExtraInfo("graFEI_probEdgeGeom", graFEI_probEdgeGeom)
             candidate.addExtraInfo("graFEI_validTree", graFEI_validTree)
             candidate.addExtraInfo("graFEI_goodEvent", graFEI_goodEvent)
-            candidate.addExtraInfo("graFEI_goodTopology", graFEI_goodTopology)
             candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
             candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
             candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)

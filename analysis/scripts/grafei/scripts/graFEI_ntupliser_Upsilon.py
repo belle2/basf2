@@ -16,6 +16,10 @@ b2.set_random_seed("Pino")
 random.seed(10)
 
 # ------------------------SETTINGS--------------------------------------------------------------------------
+# Sig-side LCAS and mass hypotheses
+sig_side_lcas = [[0, 5], [5, 0]]
+sig_side_masses = ["k", "i"]
+
 # graFEI cuts
 priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
 # f"pidIsMostLikely({','.join(str(p) for p in priors)})" #"pidIsMostLikely()"
@@ -131,7 +135,8 @@ graFEI = graFEISaverModule(
     "Upsilon(4S):graFEI",
     cfg_path=cfg_file,
     param_file=weight_file,
-    decay_string="5->ik",
+    sig_side_lcas=sig_side_lcas,
+    sig_side_masses=sig_side_masses,
 )
 path.add_module(graFEI)
 
@@ -224,7 +229,6 @@ graFEI_vars = [
     "graFEI_probEdgeGeom",
     "graFEI_validTree",
     "graFEI_goodEvent",
-    "graFEI_goodTopology",
     "graFEI_nFSP",
     "graFEI_nCharged_preFit",
     "graFEI_nElectrons_preFit",

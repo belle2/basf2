@@ -74,7 +74,7 @@ B2INFO('Some other message')
 
 # show number of log_messages per level
 for (level, num) in logging.log_stats.items():
-    print(f'Messages for level {level.name:8}: {int(num):2}')
+    print(f'Messages for level {level.name:8}: {num:2}')
 
 main = Path()
 eventinfosetter = main.add_module('EventInfoSetter')

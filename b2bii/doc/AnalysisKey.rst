@@ -203,6 +203,7 @@ premade ``gamma:mdst`` list:
 
 .. code-block:: python
 
+   import modularAnalysis as ma
    basf2.conditions.append_globaltag(ma.getAnalysisGlobaltagB2BII())
    # Apply fake photon MVA
    ma.getFakePhotonProbability(

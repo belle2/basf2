@@ -22,6 +22,7 @@
 import basf2
 import ROOT
 from modularAnalysis import cutAndCopyList, inputMdst
+from stdPi0s import stdPi0s
 from validation_tools.metadata import create_validation_histograms
 from validation_tools.metadata import validation_metadata_update
 from variables import variables as vm
@@ -32,6 +33,7 @@ OUTPUT_FILENAME = "Pi0_Validation.root"
 main = basf2.Path()
 inputMdst(INPUT_FILENAME, path=main)
 
+stdPi0s('all', path=main)
 cutAndCopyList('pi0:rec', 'pi0:all', 'daughter(0, E)>0.05 and daughter(1, E)>0.05', path=main)
 cutAndCopyList('pi0:mc', 'pi0:all', 'mcErrors<1', path=main)
 

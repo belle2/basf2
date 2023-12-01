@@ -8,7 +8,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from stdPi0s import stdPi0s
 import modularAnalysis as ma
 
 
@@ -24,15 +23,12 @@ def bToCharmHLTSkim(path):
     # Light mesons
     ma.fillParticleList("pi+:GoodTrackForHLT", "abs(d0) < 2 and abs(z0) < 5", path=path)
     ma.fillParticleList("K+:GoodTrackForHLT", "abs(d0) < 2 and abs(z0) < 5", path=path)
-    stdPi0s('all', path)
-    ma.cutAndCopyList(outputListName='pi0:GoodPi0ForHLT', inputListName='pi0:all',
-                      cut='[[daughter(0, clusterReg) == 1 and daughter(0, E) > 0.02250] or ' +
-                      '[daughter(0, clusterReg) == 2 and daughter(0, E) > 0.020] or ' +
-                      '[daughter(0, clusterReg) == 3 and daughter(0, E) > 0.020]] and ' +
-                      '[[daughter(1, clusterReg) == 1 and daughter(1, E) > 0.02250] or ' +
-                      '[daughter(1, clusterReg) == 2 and daughter(1, E) > 0.020] or ' +
-                      '[daughter(1, clusterReg) == 3 and daughter(1, E) > 0.020]] and ' +
-                      'M > 0.105 and M < 0.150', path=path)
+    ma.fillParticleList('gamma:GoodPi0ForHLT', '[clusterReg == 1 and E > 0.02250] or \
+                                                [clusterReg == 2 and E > 0.020] or \
+                                                [clusterReg == 3 and E > 0.020]',
+                        writeOut=True, path=path)
+    ma.reconstructDecay('pi0:GoodPi0ForHLT -> gamma:GoodPi0ForHLT gamma:GoodPi0ForHLT', '0.105 < M < 0.150', 1, True, path)
+    ma.matchMCTruth('pi0:GoodPi0ForHLT', path)
 
     # D0 lists
     ma.reconstructDecay(decayString='D0:KpiForHLT -> K-:GoodTrackForHLT pi+:GoodTrackForHLT', cut='1.7 < M < 2.0', path=path)

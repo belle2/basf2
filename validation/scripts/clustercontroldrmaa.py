@@ -48,7 +48,7 @@ class Cluster(ClusterBase):
     @staticmethod
     def name():
         """
-        Returns name of this job contol
+        Returns name of this job control
         """
         return "cluster-drmaa"
 
@@ -197,12 +197,12 @@ class Cluster(ClusterBase):
                 (donefile_exists, donefile_returncode) = self.checkDoneFile(job)
 
                 # always return the job es complete even if there is no done
-                #  file at this ponint tho job is also not longer
+                #  file at this point tho job is also not longer
                 # running/queued on the cluster
                 return [True, donefile_returncode]
 
             # Return that the job is finished + the return code for it
-            # depending when we look for the job this migh never be used,
+            # depending when we look for the job this might never be used,
             # because the jobs disappear from qstat before we can query them
             #  ..
             if status == drmaa.JobState.DONE:

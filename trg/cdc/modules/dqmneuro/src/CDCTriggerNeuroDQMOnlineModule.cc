@@ -85,22 +85,22 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   // histograms with recotracks (and hwsimtracks):
 
   m_neuroHWOutdzall = new TH1F("NeuroHWOutZ-RecoZ",
-                               "z Resolution of unpacked and valid neuro tracks; z [cm]",
+                               "z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                                200, -100, 100);
   m_neuroHWOutdz0 = new TH1F("Q0NeuroHWOutZ-RecoZ",
-                             "Quadrant0 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant0 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWOutdz1 = new TH1F("Q1NeuroHWOutZ-RecoZ",
-                             "Quadrant1 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant1 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWOutdz2 = new TH1F("Q2NeuroHWOutZ-RecoZ",
-                             "Quadrant2 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant2 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWOutdz3 = new TH1F("Q3NeuroHWOutZ-RecoZ",
-                             "Quadrant3 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant3 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWSimRecodZ = new TH1F("NeuroHWSimZ-RecoZ",
-                                "z Resolution of Simulated HW Tracks; z [cm]",
+                                "z Resolution of Simulated HW Tracks; delta z [cm]",
                                 200, -100, 100);
 
   // histograms wih just hwneuro and hw2dtracks:

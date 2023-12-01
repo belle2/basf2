@@ -1883,11 +1883,12 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
   }
   /* Create other volumes. */
   /* Set up region for production cuts. */
-  G4Region* aRegion = new G4Region("EKLMEnvelope");
+  G4Region* aRegion = 0;
   for (m_CurVol.section = 1; m_CurVol.section <= m_GeoDat->getNSections();
        m_CurVol.section++) {
     section = createSection(&topVolume);
     /* Assign same region to each section. */
+    if (not aRegion) aRegion = new G4Region("EKLMEnvelope");
     section->SetRegion(aRegion);
     aRegion->AddRootLogicalVolume(section);
     for (m_CurVol.layer = 1; m_CurVol.layer <= m_GeoDat->getNLayers();

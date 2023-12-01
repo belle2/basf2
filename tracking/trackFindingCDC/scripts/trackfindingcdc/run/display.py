@@ -10,13 +10,14 @@
 
 from tracking.run.tracked_event_generation import ReadOrGenerateTrackedEventsRun
 import trackfindingcdc.cdcdisplay as cdcdisplay
+import tempfile
 
 
 class CDCDisplayRun(ReadOrGenerateTrackedEventsRun):
     """Prepare and execute a basf2 job to read generated events or generate new events then display the CDC tracks"""
 
     #: Destination folder for displays
-    output_folder = '/tmp'
+    output_folder = tempfile.gettempdir()
 
     #: Switch to show the event display after each event. Run in batch mode for false
     iteractive = True

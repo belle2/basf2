@@ -278,7 +278,7 @@ class ComparisonBase(ABC):
 
     def _has_compatible_bins(self) -> bool:
         """
-        Check if both ROOT obeject have the same amount of bins
+        Check if both ROOT objects have the same amount of bins
         @return: True if the bins are equal, otherwise False
         """
         if (
@@ -296,7 +296,7 @@ class ComparisonBase(ABC):
 
     def _raise_has_compatible_bins(self) -> None:
         """
-        Raise Exception if not both ROOT obeject have the same amount of bins
+        Raise Exception if not both ROOT objects have the same amount of bins
         @return: None
         """
         if not self._has_compatible_bins():
@@ -642,7 +642,7 @@ class KolmogorovTest(PvalueTest):
             )
 
         return (
-            r"Performed Komlogorov test between {{revision1}} "
+            r"Performed Kolmogorov test between {{revision1}} "
             r"and {{revision2}} "
             r" <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, "
             r"p-value error: {pvalue_error})".format(
@@ -878,8 +878,8 @@ def debug_cli():
             f"in file '{args.rootfile_b}'."
         )
 
-    # 3. Performe testing with debug option
-    # =====================================
+    # 3. Perform testing with debug option
+    # ====================================
 
     test = Chi2Test(obj_a, obj_b, debug=True)
     test.ensure_compute()

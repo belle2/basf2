@@ -33,7 +33,7 @@ naming schemes of each PID payloads are slightly different.
 Naming scheme for LID is ``BelleLID<e|mu>_<LID cut>``.
 Using ``eIDBelle>0.9`` as an example:
 
-.. code-block:: python3
+.. code-block:: python
 
    import variables as va
    import basf2 as b2
@@ -76,7 +76,7 @@ Here,
 To append PID correction information for pion efficiency selected as kaons with
 ``atcPIDBelle(3, 2)>0.6`` cut:
 
-.. code-block:: python3
+.. code-block:: python
 
    kid_table = "BelleKIDPiFakePlus_6"
 
@@ -128,7 +128,7 @@ Here,
 If you'd like to add the information for proton efficiency selected
 with ``atcPIDBelle(4, 2)>0.6`` and ``atcPIDBelle(4, 3)>0.6``.
 
-.. code-block:: python3
+.. code-block:: python
 
    pid_table = "BellePIDPlus_0.6"
 
@@ -154,7 +154,7 @@ Full Event Interpretation
 
 To utilize FEI, the correct prefix of FEI payloads needs to be set:
 
-.. code-block:: python3
+.. code-block:: python
 
    import fei
    basf2.conditions.append_globaltag("analysis_tools_light-2012-minos")
@@ -176,7 +176,7 @@ To apply flavour tagger in a b2bii analysis, one will need to append the
 correct global tag.
 FlavorTagger will call the corresponding payloads in the module.
 
-.. code-block:: python3
+.. code-block:: python
 
    import flavorTagger as ft
 
@@ -201,7 +201,7 @@ suffix, ``Belle``, should be used for the weight file, and apply them over the
 premade ``gamma:mdst`` list:
 
 
-.. code-block:: python3
+.. code-block:: python
 
    basf2.conditions.append_globaltag(ma.getAnalysisGlobaltagB2BII())
    # Apply fake photon MVA

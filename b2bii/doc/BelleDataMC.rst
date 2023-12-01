@@ -5,13 +5,13 @@ one, specifying the input Belle MDST sample to be converted and analysed. You ca
 either specify the location of the input Belle MDST file (e.g. when running over
 your privately produced signal MC):
 
-.. code-block:: python3
+.. code-block:: python
 
    convertBelleMdstToBelleIIMdst('/location_to_my_mdst_files/myMDSTFile.mdst', path=mypath)
 
 or specify the url of real data or generic MC samples. For example:
 
-.. code-block:: python3
+.. code-block:: python
 
    convertBelleMdstToBelleIIMdst('http://bweb3/montecarlo.php?ex=37&rs=100&re=200&ty=evtgen-mixed&dt=on_resonance&bl=caseB&st=0', path=mypath)
 
@@ -171,7 +171,7 @@ more information regarding the list of runs for your analysis.
 
 Then modify the following line in your generation script:
 
-.. code-block:: python3
+.. code-block:: python
 
    # Generate for experiment 55, run 402 (run-dependent MC).
    main.add_module('EventInfoSetter', expList=55, runList=402, evtNumList=100)
@@ -210,7 +210,7 @@ one need to modify ``.dat`` file to set up the correct ``RunNo`` as:
 
 To generate user-defined decay files (aka signal decay files), use the following line in the script:
 
-.. code-block:: python3
+.. code-block:: python
 
    from generators import add_evtgen_generator
    add_evtgen_generator(path=mypath,

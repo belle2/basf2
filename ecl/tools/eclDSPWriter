@@ -125,10 +125,10 @@ def ecldspToDat(path, dsp_list):
        @param dsp_list  List of ECLDspData objects
     """
     for crate in range(1, 52 + 1):
-        folder = path + f'/crate{int(crate):02}/'
+        folder = path + f'/crate{crate:02}/'
         ensureDir(folder)
         for board in range(1, 12 + 1):
-            file_path = folder + f'/dsp{int(board):02}.dat'
+            file_path = folder + f'/dsp{board:02}.dat'
             board_number = (crate - 1) * 12 + board
             dsp_data = dsp_list[board_number - 1]
             # Open+close the file to make sure at least empty file exists

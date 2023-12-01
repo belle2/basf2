@@ -55,9 +55,9 @@ statistic_counters = [
 for stats in statistics.modules:
     print(f'Module {stats.name}:')
     for stat_counter, stat_name in statistic_counters:
-        print(f' -> {stat_name:12}: {stats.time_sum(stat_counter) / 1000000.0:10.3f} ms, {int(stats.calls(stat_counter)):4} ' +
-              f'calls, {stats.time_mean(stat_counter) / 1000000.0:10.3f} ' +
-              f'+-{stats.time_stddev(stat_counter) / 1000000.0:10.3f} ms/call')
+        print(f' -> {stat_name:12}: {stats.time_sum(stat_counter) / 1e6:10.3f} ms, {int(stats.calls(stat_counter)):4} ' +
+              f'calls, {stats.time_mean(stat_counter) / 1e6:10.3f} ' +
+              f'+-{stats.time_stddev(stat_counter) / 1e6:10.3f} ms/call')
         # Time is in the default time unit which happens to be ns
     print()
 
@@ -71,16 +71,16 @@ for stats in statistics.modules:
 # Get Statistics for single module
 stats = statistics.get(eventinfosetter)
 eventinfo_total = stats.time_sum(statistics.TOTAL)
-print(f'EventInfoSetter needed {eventinfo_total / 1000000.0:.3f} ms in total')
+print(f'EventInfoSetter needed {eventinfo_total / 1e6:.3f} ms in total')
 
 # Print total processing time
 framework_total = statistics.get_global().time_sum(statistics.TOTAL)
-print(f'Total processing time: {framework_total / 1000000.0:.3f} ms')
+print(f'Total processing time: {framework_total / 1e6:.3f} ms')
 
 # Calculate estimate for framework overhead
 modules_total = sum(e.time_sum(statistics.TOTAL) for e in statistics.modules)
 overhead = framework_total - modules_total
-print(f'Framework overhead: {overhead / 1000000.0:.3f} ms ({100 * overhead / framework_total:.2f} %)')
+print(f'Framework overhead: {overhead / 1e6:.3f} ms ({100 * overhead / framework_total:.2f} %)')
 print()
 
 # Clear statistics

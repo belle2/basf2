@@ -90,7 +90,7 @@ class ShapeFitterModule(b2.Module):
                 print(f'RealData: {cid:4} {amp:6} {time:6} {qual:6}')
                 print(f'Emulator: {cid:4} {amp2:6} {time2:6} {qual2:6}')
                 if verbose:
-                    print(f'Event : {self.evtn} Trigger time: {trigger_time}')
+                    print(f'Event : {self.eventNumber} Trigger time: {trigger_time}')
                     print(f'CellID: {cid} AmpData: {amp} TimeData: {time} QualityData: {qual}')
                     print(' '.join([str(x) for x in adc]), end='')
                     print(' ')

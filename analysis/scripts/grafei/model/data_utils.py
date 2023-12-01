@@ -23,7 +23,6 @@ def calculate_class_weights(dataloader, num_classes, edges, num_batches=100):
         index, count = torch.unique(
             batch.edge_y if edges else batch.x_y, sorted=True, return_counts=True
         )
-        # TODO: add padding value as input to specifically ignore
         if -1 in index:
             # This line here assumes that the lowest class found is -1 (padding) which should be ignored
             weights[index[1:]] += count[1:]

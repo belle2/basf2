@@ -275,7 +275,6 @@ class GraFEIIgniteTrainer:
         Returns:
             dict: Cleaned config dict
         """
-        # TODO: Add torch conversions as well
         for k, v in configs.items():
             if isinstance(v, collections.abc.Mapping):
                 configs[k] = self._clean_config_dict(configs[k])

@@ -398,7 +398,7 @@ def iovToString(iov):
     exp_max = iov.getExperimentHigh()
     run_min = iov.getRunLow()
     run_max = iov.getRunHigh()
-    return f'({int(exp_min)}, {int(run_min)}, {int(exp_max)}, {int(run_max)})'
+    return f'({exp_min}, {run_min}, {exp_max}, {run_max})'
 
 ################################################
 # ECL NOISE DATA

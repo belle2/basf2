@@ -44,7 +44,7 @@ logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE |
 # show default loginfo for all levels
 for (name, value) in LogLevel.names.items():
     if name != 'default':
-        print(f'LogInfo for level {name:8}: {int(logging.get_info(value)):3}')
+        print(f'LogInfo for level {name:8}: {logging.get_info(value):3}')
 
 # reset logging connections (default log connection to the console is deleted)
 logging.reset()

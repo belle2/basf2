@@ -46,8 +46,6 @@ namespace Belle2 {
     SocketRecv(u_short port);
     ~SocketRecv();
 
-    int reconnect(int ntry);
-
     int examine();
     int accept();
     int close();

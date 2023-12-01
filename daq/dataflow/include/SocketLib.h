@@ -65,9 +65,6 @@ namespace Belle2 {
 
   private:
     SocketIO m_io;
-    struct hostent* m_hp;
-    struct sockaddr_in m_sa;
-    int m_port;
     int m_sock;
     int m_sender;
     int m_errno;

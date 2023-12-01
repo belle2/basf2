@@ -119,15 +119,15 @@ def duration(seconds):
     seconds = int(seconds % 60)
     string = ''
     if hours != 0:
-        string += f"{int(hours)}h"
+        string += f"{hours}h"
     if minutes != 0:
-        string += f"{int(minutes)}m"
+        string += f"{minutes}m"
     if seconds != 0 and hours == 0:
-        string += f"{int(seconds)}s"
+        string += f"{seconds}s"
     if ms != 0 and hours == 0 and minutes == 0 and seconds == 0:
-        string += f"{int(ms)}ms"
+        string += f"{ms}ms"
     if us != 0 and hours == 0 and minutes == 0 and seconds == 0 and ms == 0:
-        string += r"%d$\mu$s" % (us)
+        string += f"{us}$\\mu$s"
 
     if hours == 0 and minutes == 0 and seconds == 0 and ms == 0 and us == 0:
         string += r'$<1\mu$s'

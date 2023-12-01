@@ -1,4 +1,5 @@
 import torch as t
+import numpy as np
 
 
 def masses_to_classes(array):
@@ -10,7 +11,7 @@ def masses_to_classes(array):
     Returns:
         array (numpy array): array containing mass hypothese converted to classes
     """
-    array[array > 0] *= -1  # All elements become negative
+    array = -1 * np.abs(array)  # All elements become negative
     array[array == -11] = 1  # Electrons are class 1
     array[array == -13] = 2  # Muons are class 2
     array[array == -211] = 3  # Pions are class 3

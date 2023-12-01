@@ -178,7 +178,7 @@ Then modify the following line in your generation script:
 
 This will generate signal MC using the beam energy from run 402 in experiment 55.
 
-.. rubric:: Simuation with run-dependent MC
+.. rubric:: Simulation with run-dependent MC
 
 If one wants to generate run-dependent MC samples, ``gsim/gsim/gsim.*.dat`` have
 to be modified with corresponding ``RunNo`` accordingly.
@@ -202,7 +202,7 @@ one need to modify ``.dat`` file to set up the correct ``RunNo`` as:
    RUNG 402 1
 
 .. warning::
-   If ``RunNo`` is not currectly set in ``gsim.*.dat``, it will be overwritten by gsim.
+   If ``RunNo`` is not correctly set in ``gsim.*.dat``, it will be overwritten by gsim.
    As a result, incorrect beam energies will be used for your MC files.
 
 

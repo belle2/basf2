@@ -53,6 +53,7 @@ bool got_sigint = false;
 bool got_sigpipe = false;
 bool got_sigterm = false;
 
+
 void
 dump_binary(FILE* fp, const void* ptr, const size_t size)
 {
@@ -166,7 +167,6 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
 {
   int ret;
 
-
   if (timeout > 0) {
     struct timeval tv;
 
@@ -205,7 +205,6 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
     }
   }
 
-
   return 0;
 }
 
@@ -227,7 +226,6 @@ b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct soc
   }
   in->sin_port = htons(port);
 
-
   return 0;
 }
 
@@ -236,7 +234,6 @@ static int
 b2_create_tcp_socket(void)
 {
   int sd, ret, one = 1;
-
 
   sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (sd == -1) {
@@ -258,7 +255,6 @@ b2_create_tcp_socket(void)
     return -1;
   }
 
-
   return sd;
 }
 
@@ -268,7 +264,6 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
 {
   int sd, ret;
   struct sockaddr_in in;
-
 
   sd = b2_create_tcp_socket();
   if (sd < 0) {
@@ -294,7 +289,6 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
     return -1;
   }
 
-
   return sd;
 }
 
@@ -304,7 +298,6 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
 {
   int sd, ret;
   struct sockaddr_in in;
-
 
   sd = b2_create_tcp_socket();
   if (sd < 0) {
@@ -324,7 +317,6 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
     return -1;
   }
 
-
   return sd;
 }
 
@@ -334,7 +326,6 @@ b2_send(const int sd, const void* buf, const size_t size)
 {
   unsigned char* ptr = (unsigned char*)buf;
   size_t n_bytes_remained = size;
-
 
   for (;;) {
     int ret, n_bytes_send;
@@ -371,7 +362,6 @@ b2_send(const int sd, const void* buf, const size_t size)
     }
   }
 
-
   return size;
 }
 
@@ -381,7 +371,6 @@ b2_recv(const int sd,       void* buf, const size_t size)
 {
   unsigned char* ptr = (unsigned char*)buf;
   size_t n_bytes_remained = size;
-
 
   for (;;) {
     int ret, n_bytes_recv;
@@ -417,7 +406,6 @@ b2_recv(const int sd,       void* buf, const size_t size)
     }
   }
 
-
   return size;
 }
 
@@ -428,7 +416,6 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
 {
   int sd, ret;
   struct pollfd fds;
-
 
   sd = b2_create_connect_socket(host, port);
   if (sd == -1) {
@@ -478,7 +465,6 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
     return -1;
   }
 
-
   return sd;
 }
 
@@ -489,7 +475,6 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
   int sd;
   int one = 1, ret;
   // struct pollfd fds;
-
 
   LOG_FPRINTF(stderr, "[INFO] merger_merge: Waiting for connection from hltout2merger on port %d\n", port);
 
@@ -565,7 +550,6 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
     return -1;
   }
   */
-
 
   return sd;
   //  return nd;

@@ -741,13 +741,42 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     if b2bii.isB2BII():
         B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('scale', scale)
-    trackingmomentum.param('payloadName', payloadName)
-    trackingmomentum.param('scalingFactorName', scalingFactorName)
+    TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
+    TrackingMomentumScaleFactors.param('particleLists', inputListNames)
+    TrackingMomentumScaleFactors.param('scale', scale)
+    TrackingMomentumScaleFactors.param('payloadName', payloadName)
+    TrackingMomentumScaleFactors.param('scalingFactorName', scalingFactorName)
 
-    path.add_module(trackingmomentum)
+    path.add_module(TrackingMomentumScaleFactors)
+
+
+def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", correctionName="SF", path=None):
+    """
+    Correct the energy loss of tracks according to a 'correction' value.
+    This correction can either be given as constant number or as the name of the payload which contains
+    the variable corrections.
+    If the particle list contains composite particles, the momenta of the track-based daughters are corrected.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        correction (float): correction value to be substracted to the particle energy (0.0 -- no correction)
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        correctionName (str): name of correction variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The tracking energy correction can only be run over Belle II data.")
+
+    TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')
+    TrackingEnergyLossCorrection.param('particleLists', inputListNames)
+    TrackingEnergyLossCorrection.param('correction', correction)
+    TrackingEnergyLossCorrection.param('payloadName', payloadName)
+    TrackingEnergyLossCorrection.param('correctionName', correctionName)
+
+    path.add_module(TrackingEnergyLossCorrection)
 
 
 def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
@@ -763,12 +792,12 @@ def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear"
         path (basf2.Path): module is added to this path
     """
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('payloadName', payloadName)
-    trackingmomentum.param('smearingFactorName',  smearingFactorName)
+    TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
+    TrackingMomentumScaleFactors.param('particleLists', inputListNames)
+    TrackingMomentumScaleFactors.param('payloadName', payloadName)
+    TrackingMomentumScaleFactors.param('smearingFactorName',  smearingFactorName)
 
-    path.add_module(trackingmomentum)
+    path.add_module(TrackingMomentumScaleFactors)
 
 
 def mergeListsWithBestDuplicate(outputListName,
@@ -1996,7 +2025,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix=""):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2012,6 +2041,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+        useFloat (bool): Use single precision (float) instead of double precision (double)
+                         for floating-point numbers.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2025,6 +2056,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
+    output.param('useFloat', useFloat)
     path.add_module(output)
 
 
@@ -4166,6 +4198,41 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
+def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticle, path=None):
+    """
+    Sets photon kinematics to corrected values in two body decays with an ISR photon
+    and a massive particle. The original photon kinematics are kept in the input
+    particleList and can be accessed using the originalParticle() metavariable on the
+    new list.
+
+    @param ouputListName    new ParticleList filled with copied Particles
+    @param inputListName    input ParticleList with original Particles
+    @param massiveParticle  name or PDG code of massive particle participating in the two
+                            body decay with the ISR photon
+    @param path             modules are added to this path
+    """
+
+    # set the corrected energy of the photon in a new list
+    photon_energy_correction = register_module('TwoBodyISRPhotonCorrector')
+    photon_energy_correction.set_name('TwoBodyISRPhotonCorrector_' + outputListName)
+    photon_energy_correction.param('outputGammaList', outputListName)
+    photon_energy_correction.param('inputGammaList', inputListName)
+
+    # prepare PDG code of massive particle
+    if isinstance(massiveParticle, int):
+        photon_energy_correction.param('massiveParticlePDGCode', massiveParticle)
+    else:
+        from ROOT import Belle2
+        decayDescriptor = Belle2.DecayDescriptor()
+        if not decayDescriptor.init(massiveParticle):
+            raise ValueError("TwoBodyISRPhotonCorrector: value of massiveParticle must be" +
+                             " an int or valid decay string.")
+        pdgCode = decayDescriptor.getMother().getPDGCode()
+        photon_energy_correction.param('massiveParticlePDGCode', pdgCode)
+
+    path.add_module(photon_energy_correction)
+
+
 def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     """
     Add photon Data/MC detection efficiency ratio weights to the specified particle list
@@ -4352,7 +4419,7 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
 
 
 func_requiring_analysisGT = [
-    scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
+    correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
     addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
 for _ in func_requiring_analysisGT:

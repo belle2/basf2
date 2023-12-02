@@ -336,6 +336,13 @@ namespace Belle2 {
     void setEpicsPV(std::string keyname, int value);
 
     /**
+     * Write string to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value string to write
+     */
+    void setEpicsStringPV(std::string keyname, std::string value);
+
+    /**
      * Write value to a EPICS PV
      * @param index index of PV
      * @param value value to write
@@ -350,6 +357,13 @@ namespace Belle2 {
     void setEpicsPV(int index, int value);
 
     /**
+     * Write string to a EPICS PV
+     * @param index index of PV
+     * @param value string to write
+     */
+    void setEpicsStringPV(int index, std::string value);
+
+    /**
      * Read value from a EPICS PV
      * @param keyname key name (or full PV name) of PV
      * @return value or NAN if not existing
@@ -362,6 +376,22 @@ namespace Belle2 {
      * @return value or NAN if not existing
      */
     double getEpicsPV(int index);
+
+    /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param status return status (true on success)
+     * @return string value (empty string if non existing)
+     */
+    std::string getEpicsStringPV(std::string keyname, bool& status);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @param status return status (true on success)
+     * @return string value (empty string if non existing)
+     */
+    std::string getEpicsStringPV(int index, bool& status);
 
     /**
      * Update all EPICS PV (flush to network)
@@ -455,7 +485,35 @@ namespace Belle2 {
      * set global Prefix for EPICS PVs
      * @param prefix Prefix to set
      */
+
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+
+    /**
+     * Status flag of histogram
+    */
+    enum EStatus {
+      c_TooFew = 0, /**< Not enough entries/event to judge */
+      c_Default = 1, /**< default for non-coloring */
+      c_Good = 2, /**< Analysis result: Good */
+      c_Warning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_Error = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Helper function to judge the status for coloring and EPICS
+     * @param enough enough events for judging
+     * @param warn_flag outside of expected range
+     * @param error_flag outside of warning range
+     * @return the status
+     */
+    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+
+    /**
+     * Helper function for Canvas colorization
+     * @param canvas Canvas to change
+     * @param status status to color
+     */
+    void colorizeCanvas(TCanvas* canvas, EStatus status);
 
     // Public functions
   public:

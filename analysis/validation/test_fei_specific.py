@@ -10,7 +10,7 @@
 
 """
 <header>
-  <contact>wsut@uni-bonn.de</contact>
+  <contact>vidya.sagar.vobbilisetti@belle2.org</contact>
 </header>
 """
 

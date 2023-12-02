@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -538,9 +537,9 @@ class MakePlots(basf2.Module):
         #: validation histogram
         self.d_w = TH1F("d_w", "#Deltaw of CDC 2D finder, w = 0.00449/p_{t}", 50, -0.02, 0.02)
         self.d_w_2 = TH1F("d_w_2", "d_w_2", 50, -0.02, 0.02)
-        tree.Draw("({0} - 0.00449)/sqrt({1}*{1} + {2}*{2})>> d_w".format(trk2d_omega, mc_px, mc_py),
+        tree.Draw(f"({trk2d_omega} - 0.00449)/sqrt({mc_px}*{mc_px} + {mc_py}*{mc_py})>> d_w",
                   "MCParticles.m_pdg<0&&" + mc)
-        tree.Draw("({0} + 0.00449)/sqrt({1}*{1} + {2}*{2}) >> d_w_2".format(trk2d_omega, mc_px, mc_py),
+        tree.Draw(f"({trk2d_omega} + 0.00449)/sqrt({mc_px}*{mc_px} + {mc_py}*{mc_py}) >> d_w_2",
                   "MCParticles.m_pdg>0 && " + mc)
         self.d_w.Add(self.d_w_2)
         self.set_descr(self.d_w, "Comparison on w (=0.00449/pt) of a track between CDC 2D finder output and MC.",
@@ -549,19 +548,19 @@ class MakePlots(basf2.Module):
 
         #: validation histogram
         self.d_phi = TH1F("d_phi", "#Delta#phi of CDC 2D finder", 50, -0.5, 0.5)
-        tree.Draw("{0}-atan({1}/{2})>>d_phi".format(trk2d_phi, mc_py, mc_px),
+        tree.Draw(f"{trk2d_phi}-atan({mc_py}/{mc_px})>>d_phi",
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
-                  "fabs({0}-atan({1}/{2}))<{3}&&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
+                  f"fabs({trk2d_phi}-atan({mc_py}/{mc_px}))<{PI}&&" + mc)
 
         self.d_phi_2 = TH1F("d_phi_2", "d_phi_2", 50, -0.5, 0.5)
-        tree.Draw("{0}-atan({1}/{2})-{3}>>d_phi_2".format(trk2d_phi, mc_py, mc_px, PI),
+        tree.Draw(f"{trk2d_phi}-atan({mc_py}/{mc_px})-{PI}>>d_phi_2",
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
-                  "{0}-atan({1}/{2})>={3} &&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
+                  f"{trk2d_phi}-atan({mc_py}/{mc_px})>={PI} &&" + mc)
 
         self.d_phi_3 = TH1F("d_phi_3", "d_phi_3", 50, -0.5, 0.5)
-        tree.Draw("{0}-atan({1}/{2})+{3}>>d_phi_2".format(trk2d_phi, mc_py, mc_px, PI),
+        tree.Draw(f"{trk2d_phi}-atan({mc_py}/{mc_px})+{PI}>>d_phi_2",
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
-                  "{0}-atan({1}/{2})<=-{3}&&".format(trk2d_phi, mc_py, mc_px, PI) + mc)
+                  f"{trk2d_phi}-atan({mc_py}/{mc_px})<=-{PI}&&" + mc)
 
         self.d_phi.Add(self.d_phi_2)
         self.d_phi.Add(self.d_phi_3)
@@ -711,6 +710,7 @@ class MakePlots(basf2.Module):
         self.d_z0_nn.Write()
         self.d_E_ECL.Write()
         self.tfile.Close()
+#: \endcond
 
 #####################################################
 

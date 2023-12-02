@@ -291,6 +291,7 @@ def search_project_issues(
         search=search_term,
         state='opened',
         lazy=True,
+        scope='all',
     )
 
     return issues
@@ -346,7 +347,7 @@ def update_linked_issues(
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
-    # get list of available revision lables
+    # get list of available revision labels
     rev_list = get_json_object_list(
             validationpath.get_results_folder(cwd_folder),
             validationpath.file_name_results_json,
@@ -386,10 +387,133 @@ def upload_file_gitlab(
     return uploaded_file
 
 
+def get_librarians(package: str) -> List[str]:
+    """
+    Function to get package librarian(s)' GitLab usernames. Temp solution
+    until the .librarians file directly provides Gitlab usernames.
+
+    Return:
+        list of librarians' Gitlab usernames
+    """
+
+    usernames = []
+    librarian_file = os.path.join(
+        validationpath.get_basepath()['local'],
+        package,
+        '.librarians'
+    )
+    try:
+        with open(librarian_file, 'r') as f:
+            librarians = f.readlines()
+    except FileNotFoundError:
+        logging.exception(
+            f"{librarian_file} couldn't be found. Corrupted package/librarian file?"
+        )
+        return usernames
+    # Temp workaround to fetch DESY -> Gitlab map
+    import importlib
+    desy_map_path = os.path.join(
+        "/home/b2soft/gitlab",
+        "account_map.py"
+    )
+    spec = importlib.util.spec_from_file_location('account_map', desy_map_path)
+    desy_map = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(desy_map)
+    except FileNotFoundError:
+        logging.exception(
+            f"{desy_map_path} couldn't be found. Have you setup Gitlab Webhook?"
+        )
+        return usernames
+
+    for librarian in librarians:
+        usernames.append(desy_map.get_gitlab_account(librarian.rstrip()))
+
+    return usernames
+
+
+def parse_contact(
+        contact: str,
+        map_file: str,
+        package: str,
+        gitlab_object: gitlab.Gitlab
+) -> List[str]:
+    """
+    Parse string to find email id(s) and then match them with their Gitlab ids
+    using the userid map.
+
+    Returns :
+        Dictionary with list of Gitlab IDs and corresponding list of
+        Gitlab usernames.
+    """
+
+    email_regex = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*"
+                             r"|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9="
+                             r"?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]"
+                             r"*])"
+                             )
+    email_ids = re.finditer(email_regex, contact)
+    assignees = {
+        'gitlab_ids': [],
+        'usernames': [],
+    }
+
+    try:
+        with open(map_file, 'r') as f:
+            id_map = f.readlines()
+    except FileNotFoundError:
+        logging.exception(
+            f"{map_file} couldn't be found. Did you get the location right?"
+        )
+        email_ids = []
+
+    for email in email_ids:
+        try:
+            match = next(
+                (line for line in id_map if email.group() in line), None
+            )
+            username = match.split(' ')[1].rstrip()
+            assignees['usernames'].append(username)
+        except IndexError:
+            logging.error(
+                f"Map info {match} does not match the required format for map "
+                "'email gitlab_username'."
+            )
+            continue
+
+    # Assign to librarian(s) if no contact found
+    if not assignees['usernames']:
+        assignees['usernames'] = get_librarians(package)
+        logging.info(
+            "Couldn't find contact/id so assigning issue to the"
+            " package librarians."
+        )
+
+    for user in assignees['usernames']:
+        try:
+            assignees['gitlab_ids'].append(
+                gitlab_object.users.list(username=user)[0].id
+                )
+        except IndexError:
+            logging.error(
+                f"Could not find {user} in Gitlab."
+            )
+            continue
+    logging.info(
+        "Issue will be assigned to "
+        f"{[gitlab_object.users.get(id) for id in assignees['gitlab_ids']]}."
+    )
+
+    # to-do: add comment/note if no ids matched
+
+    return assignees
+
+
 def create_gitlab_issue(
     title: str,
     description: str,
     uploaded_file: Dict[str, str],
+    assignees: Dict[str, List],
     package: str,
     project: 'gitlab.project'
 ) -> str:
@@ -398,17 +522,24 @@ def create_gitlab_issue(
     using Gitlab API.
 
     Returns:
-        created isssue id
+        created issue id
     """
 
     issue = project.issues.create({"title": title,
                                    "description": description,
                                    "labels": [package, 'validation_issue']})
 
-    issue.notes.create(
-        {"body": "View the [error plot/log file]({}).".format(
-            uploaded_file["url"])}
+    issue_note = issue.notes.create(
+        {"body": f'View the [error plot/log file]({uploaded_file["url"]}).'}
     )
+
+    issue.assignee_ids = assignees['gitlab_ids']
+
+    # Workaround for Gitlab not allowing multiple assignees
+    if len(assignees['gitlab_ids']) > 1:
+        related_users = [f'@{user} ' for user in assignees['usernames'][1:]]
+        issue_note.body += f"\n\nPinging {' '.join(related_users)}"
+        issue_note.save()
 
     issue.save()
 
@@ -440,10 +571,8 @@ def update_gitlab_issue(
         issue_type = 'script'
     issue.notes.create(
         {
-            "body": "Related observation in validation of `{0}` package, `{1}`\
-             {4} in `{2}` build. View the [error plot/log file]({3}).".format(
-                package, name, rev_label, uploaded_file["url"], issue_type
-            )
+            "body": f'Related observation in validation of `{package}` package, `{name}`' +
+            f'{issue_type} in `{rev_label}` build. View the [error plot/log file]({uploaded_file["url"]}).'
         }
     )
 
@@ -515,7 +644,7 @@ class ValidationRoot:
 
     """
 
-    def __init__(self, working_folder, gitlab_object, gitlab_config):
+    def __init__(self, working_folder, gitlab_object, gitlab_config, gitlab_map):
         """
         class initializer, which takes the path to the folders containing the
         validation run results and plots (aka comparison), gitlab object and
@@ -539,10 +668,15 @@ class ValidationRoot:
         #: Gitlab config
         self.gitlab_config = gitlab_config
 
+        #: Gitlab usermap
+        self.gitlab_map = gitlab_map
+
         #: placeholder variable for path
         self.file_path = None
         #: placeholder variable for revision label
         self.revision_label = None
+        #: placeholder variable for contact
+        self.contact = None
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -784,17 +918,21 @@ class ValidationRoot:
         # Create issue in the Gitlab project and save it
         project = get_project_object(self.gitlab_object, project_id)
         uploaded_file = upload_file_gitlab(self.file_path, project)
+        assignees = {
+            'gitlab_ids': [],
+            'usernames': [],
+        }
         file_name = self.file_path.split("/")[-1].split(".log")[0]
         file_package = self.file_path.split("/")[-2]
-        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant {2}: {0}\n\n\
-            Revision label: {1}\n\n---".format(
-            file_name,
-            self.revision_label,
-            issue_type
-        )
+        if self.gitlab_map:
+            assignees = parse_contact(
+                self.contact, self.gitlab_map, file_package, self.gitlab_object
+            )
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n" + \
+            f"Relevant {issue_type}: {file_name}\n\n" + \
+            f"Revision label: {self.revision_label}\n\n---"
         issue_id = create_gitlab_issue(
-            title, description, uploaded_file, file_package, project
+            title, description, uploaded_file, assignees, file_package, project
         )
         project.save()
 
@@ -826,7 +964,7 @@ class ValidationRoot:
         )
 
     @cherrypy.expose
-    def issue(self, file_path, rev_label):
+    def issue(self, file_path, rev_label, contact):
         """
         Return a template issue creation interface
         for the user to add title and description.
@@ -836,6 +974,7 @@ class ValidationRoot:
         )
 
         self.revision_label = rev_label
+        self.contact = contact
 
         if not self.gitlab_object:
             return "ERROR: Gitlab integration not set up, verify config file."
@@ -947,6 +1086,13 @@ def get_argument_parser():
         "no log/error output via website and no auto-reload",
         action="store_true",
     )
+    parser.add_argument(
+        "-u",
+        "--usermap",
+        help="Path of file containing <email gitlab_username> map.",
+        type=str,
+        default=None,
+    )
 
     return parser
 
@@ -1031,8 +1177,8 @@ def run_server(
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
         sys.exit(
-            "Result folder {} does not exist, run validate_basf2 first "
-            "to create validation output".format(results_folder)
+            f"Result folder {results_folder} does not exist, run validate_basf2 first " +
+            "to create validation output"
         )
 
     results_count = sum(
@@ -1108,6 +1254,7 @@ def run_server(
         port = int(cmd_arguments.port)
         open_site = cmd_arguments.view
         production_env = cmd_arguments.production
+        usermap_file = cmd_arguments.usermap
 
     cherrypy.config.update(
         {
@@ -1129,6 +1276,7 @@ def run_server(
         # gitlab toggle
         gitlab_object = None
         gitlab_config = None
+        gitlab_map = None
         if not os.path.exists(config_path):
             logging.warning(
                 "ERROR: Expected to find config folder with Gitlab config,"
@@ -1140,12 +1288,17 @@ def run_server(
             gitlab_object = create_gitlab_object(config_path)
             if gitlab_object:
                 update_linked_issues(gitlab_object, cwd_folder)
+                gitlab_map = usermap_file
+                logging.info(
+                    f"{gitlab_map} will be used to assign issues."
+                )
 
         cherrypy.quickstart(
             ValidationRoot(
                 working_folder=cwd_folder,
                 gitlab_object=gitlab_object,
                 gitlab_config=gitlab_config,
+                gitlab_map=gitlab_map,
             ),
             "/",
             cherry_config,

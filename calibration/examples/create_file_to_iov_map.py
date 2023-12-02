@@ -116,7 +116,7 @@ def main():
     filename = "file_iov_map.pkl"
     with open(filename, 'bw') as iov_map_file:
         pickle.dump(file_to_iov, iov_map_file)
-        print("Saved dictionary to the file '{}' for later use.".format(filename))
+        print(f"Saved dictionary to the file '{filename}' for later use.")
 
     # To read it in, usually in a separate process/steering file
     # fils_to_iov = pickle.load(open("file_iov_map.pkl", 'rb'))

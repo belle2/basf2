@@ -78,6 +78,8 @@ namespace Belle2 {
     bool m_perModuleAlarm;
     /** generate alarm from adhoc values */
     bool m_alarmAdhoc;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

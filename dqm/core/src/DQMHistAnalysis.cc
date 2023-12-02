@@ -344,6 +344,24 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
 #endif
 }
 
+void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string value)
+{
+  if (!m_useEpics || m_epicsReadOnly) return;
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return;
+  }
+  if (value.length() > 40) {
+    B2ERROR("Epics string PV " << keyname << " too long (>40 characters)!");
+    return;
+  }
+  char text[40];
+  strcpy(text, value.c_str());
+  SEVCHK(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure");
+#endif
+}
+
 void DQMHistAnalysisModule::setEpicsPV(int index, double value)
 {
   if (!m_useEpics || m_epicsReadOnly) return;
@@ -365,6 +383,20 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
     return;
   }
   SEVCHK(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure");
+#endif
+}
+
+void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
+{
+  if (!m_useEpics || m_epicsReadOnly) return;
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return;
+  }
+  char text[40];
+  strcpy(text, value.c_str());
+  SEVCHK(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure");
 #endif
 }
 
@@ -414,6 +446,55 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   return NAN;
 }
 
+std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& status)
+{
+  status = false;
+  char value[40] = "";
+  if (!m_useEpics) return std::string(value);
+#ifdef _BELLE2_EPICS
+  if (m_epicsNameToChID[keyname] == nullptr) {
+    B2ERROR("Epics PV " << keyname << " not registered!");
+    return std::string(value);
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_STRING, m_epicsNameToChID[keyname], value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    status = true;
+    return std::string(value);
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return std::string(value);
+}
+
+std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
+{
+  status = false;
+  char value[40] = "";
+  if (!m_useEpics) return std::string(value);
+#ifdef _BELLE2_EPICS
+  if (index < 0 || index >= (int)m_epicsChID.size()) {
+    B2ERROR("Epics PV with " << index << " not registered!");
+    return std::string(value);
+  }
+  // From EPICS doc. When ca_get or ca_array_get are invoked the returned channel value cant be assumed to be stable
+  // in the application supplied buffer until after ECA_NORMAL is returned from ca_pend_io. If a connection is lost
+  // outstanding get requests are not automatically reissued following reconnect.
+  auto r = ca_get(DBR_DOUBLE, m_epicsChID[index], value);
+  if (r == ECA_NORMAL) r = ca_pend_io(5.0); // this is needed!
+  if (r == ECA_NORMAL) {
+    status = true;
+    return std::string(value);
+  } else {
+    SEVCHK(r, "ca_get or ca_pend_io failure");
+  }
+#endif
+  return std::string(value);
+}
 
 chid DQMHistAnalysisModule::getEpicsPVChID(std::string keyname)
 {
@@ -510,4 +591,56 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
     }
   }
   return false;
+}
+
+DQMHistAnalysisModule::EStatus DQMHistAnalysisModule::makeStatus(bool enough, bool warn_flag, bool error_flag)
+{
+  // white color is the default, if no colorize
+  if (!enough) {
+    return (c_TooFew);
+  } else {
+    if (error_flag) {
+      return (c_Error);
+    } else if (warn_flag) {
+      return (c_Warning);
+    } else {
+      return (c_Good);
+    }
+  }
+
+  return (c_Default); // default, but should not be reached
+}
+
+void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
+{
+  if (!canvas) return;
+  // white color is the default, if no colorize
+  int color;
+  switch (stat) {
+    case c_TooFew:
+      color = kGray; // Magenta or Gray
+      break;
+    case c_Default:
+      color = kWhite; // default no colors
+      break;
+    case c_Good:
+      color = kGreen; // Good
+      break;
+    case c_Warning:
+      color = kYellow; // Warning
+      break;
+    case c_Error:
+      color = kRed; // Severe
+      break;
+    default:
+      color = kWhite; // default no colors
+      break;
+  }
+
+  canvas->Pad()->SetFillColor(color);
+
+  canvas->Pad()->SetFrameFillColor(kWhite - 1); // White
+  canvas->Pad()->SetFrameFillStyle(1001);// White
+  canvas->Pad()->Modified();
+  canvas->Pad()->Update();
 }

@@ -9,6 +9,7 @@
 #include <analysis/modules/HelixErrorScaler/HelixErrorScalerModule.h>
 
 #include <analysis/DecayDescriptor/ParticleListName.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <framework/datastore/RelationArray.h>
@@ -124,19 +125,20 @@ void HelixErrorScalerModule::event()
       if (particle->getNDaughters() != 2)
         B2ERROR("V0 particle should have exactly two daughters");
 
-      const Particle* dauP = particle->getDaughter(0);
-      const Particle* dauM = particle->getDaughter(1);
+      Particle* newV0 = ParticleCopy::copyParticle(particle);
+
+      const Particle* dauP = newV0->getDaughter(0);
+      const Particle* dauM = newV0->getDaughter(1);
 
       Particle* newDauP = getChargedWithScaledError(dauP);
       Particle* newDauM = getChargedWithScaledError(dauM);
 
       ROOT::Math::PxPyPzEVector v0Momentum = newDauP->get4Vector() + newDauM->get4Vector();
-      Particle new_v0(v0Momentum, m_pdgCode, particle->getFlavorType(),
-                      Particle::EParticleSourceObject::c_V0, particle->getMdstArrayIndex());
-      new_v0.appendDaughter(newDauP, false);
-      new_v0.appendDaughter(newDauM, false);
+      newV0->set4VectorDividingByMomentumScaling(v0Momentum);
 
-      Particle* newV0 = m_particles.appendNew(new_v0);
+      newV0->replaceDaughter(dauP, newDauP);
+      newV0->replaceDaughter(dauM, newDauM);
+
       m_outputparticleList->addParticle(newV0);
 
     } // loop over Kshort

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -56,7 +55,7 @@ def timeOfFlightToColor(timeOfFlight):
 
     (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+    color = f'rgb({red:.2%}, {green:.2%}, {blue:.2%})'
     return color
 
 
@@ -71,7 +70,7 @@ def inTrackIdToColor(inTrackId):
 
     (red, green, blue) = colorsys.hls_to_rgb(hue, lightness, saturation)
 
-    color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+    color = f'rgb({red:.2%}, {green:.2%}, {blue:.2%})'
     return color
 
 
@@ -327,8 +326,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
         color = self.color_by_bkgtag.get(backgroundTag, None)
 
         if color is None:
-            print('Background tag %s not associated with a color.'
-                  % backgroundTag)
+            print(f'Background tag {backgroundTag} not associated with a color.')
             return 'orange'
         else:
             return color
@@ -347,7 +345,7 @@ class BackgroundTagColorMap(CDCHitColorMap):
 
         bkgname_and_color = sorted(color_by_bkgname.items())
 
-        message = 'Background tag color coding is \n%s' % '\n'.join(name + ' -> ' + color for (name, color) in bkgname_and_color)
+        message = f'Background tag color coding is \n{chr(10).join(name + " -> " + color for (name, color) in bkgname_and_color):s}'
         return message
 
 
@@ -376,7 +374,7 @@ class MCSegmentIdColorMap(CDCHitColorMap):
             (red, green, blue) = colorsys.hls_to_rgb(hue, lightness,
                                                      saturation)
 
-            color = 'rgb({0:.2%}, {1:.2%}, {2:.2%})'.format(red, green, blue)
+            color = f'rgb({red:.2%}, {green:.2%}, {blue:.2%})'
             return color
 
 

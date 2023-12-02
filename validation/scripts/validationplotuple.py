@@ -39,7 +39,7 @@ class Plotuple:
     @var root_objects: A list of Root-objects which belong
         together (i.e. should be drawn into one histogram or one table)
     @var revisions: The list of revisions
-    @var warnings: A list of warnings that occured while creating the
+    @var warnings: A list of warnings that occurred while creating the
         plots/tables for this Plotuple object
     @var reference: The reference RootObject for this Plotuple
     @var elements: The elements (RootObject of different revisions) for this
@@ -82,7 +82,7 @@ class Plotuple:
         # The list of revisions
         self._revisions = revisions
 
-        # A list of all problems that occured with this Plotuple,
+        # A list of all problems that occurred with this Plotuple,
         # e.g. missing reference object, missing meta-information...
         self.warnings: List[str] = []
 
@@ -407,20 +407,20 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}",
         )
 
     def get_png_filename(self):
-        return "{}_{}.png".format(strip_ext(self.rootfile), self.key)
+        return f"{strip_ext(self.rootfile)}_{self.key}.png"
 
     def get_pdf_filename(self):
-        return "{}_{}.pdf".format(strip_ext(self.rootfile), self.key)
+        return f"{strip_ext(self.rootfile)}_{self.key}.pdf"
 
     @staticmethod
     def _draw_root_object(typ, obj, options):
         """
         Special handling of the ROOT Draw calls, as some
-        ROOT objects have a slightly differen flavour.
+        ROOT objects have a slightly different flavour.
         """
 
         if typ == "TEfficiency" or typ == "TGraph":
@@ -556,7 +556,7 @@ class Plotuple:
 
                 self._draw_root_object(self.type, plot.object, options_str)
 
-                # redraw grid ontop of histogram, if selected
+                # redraw grid on top of histogram, if selected
                 if not self._mop.has_option("nogrid"):
                     canvas.RedrawAxis("g")
 
@@ -614,7 +614,7 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}",
         )
 
     def create_graph_plot(self):
@@ -695,7 +695,7 @@ class Plotuple:
             else:
                 self._draw_root_object(self.type, plot.object, "SAME")
 
-            # redraw grid ontop of histogram, if selected
+            # redraw grid on top of histogram, if selected
             if not self._mop.has_option("nogrid"):
                 canvas.RedrawAxis("g")
 
@@ -712,7 +712,7 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}",
         )
 
     def create_html_content(self):
@@ -794,7 +794,7 @@ class Plotuple:
 
         json_ntuple_file = os.path.join(
             self._plot_folder,
-            "{}_{}.json".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}.json",
         )
 
         with open(json_ntuple_file, "w+") as json_file:

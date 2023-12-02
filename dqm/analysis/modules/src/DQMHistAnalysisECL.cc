@@ -9,12 +9,16 @@
 //THIS MODULE
 #include <dqm/analysis/modules/DQMHistAnalysisECL.h>
 
-#include <boost/format.hpp>
-#include <cmath>
+//ROOT
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TColor.h>
+
+//std
 #include <sstream>
+
+//boost
+#include "boost/format.hpp"
 
 using namespace Belle2;
 
@@ -36,6 +40,8 @@ DQMHistAnalysisECLModule::DQMHistAnalysisECLModule()
            m_WaveformOption);
   addParam("CrateTimeOffsetsMax", m_CrateTimeOffsetsMax, "Maximum boundary for crate time offsets", 20.);
   addParam("LogicTestMax", m_LogicTestMax, " Maximum of fails for logic test", 50);
+  addParam("pvPrefix", m_pvPrefix, "Prefix to use for PVs registered by this module",
+           std::string("ECL:"));
 }
 
 
@@ -106,6 +112,19 @@ void DQMHistAnalysisECLModule::initialize()
   for (unsigned short i = 0; i < 12; i++) h_logic_summary->GetYaxis()->SetBinLabel(i + 1, std::to_string(i + 1).c_str());
   h_logic_summary->LabelsOption("v");
   h_logic_summary->SetTickLength(0, "xy");
+
+
+  //EPICS PVs for 'crate_time_offset' plot
+  for (unsigned short i = 0; i < 52; i++) {
+    auto pv_name = (boost::format("time_offset:crate%02d") % (i + 1)).str();
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+  }
+  for (auto wf_option : m_WaveformOption) {
+    auto pv_name = (boost::format("wf_frac:%s:min") % wf_option).str();
+    registerEpicsPV(m_pvPrefix + pv_name, pv_name);
+  }
+
+  m_monObj = getMonitoringObject("ecl");
 }
 
 void DQMHistAnalysisECLModule::beginRun()
@@ -326,18 +345,26 @@ void DQMHistAnalysisECLModule::event()
   h_crate_time_offsets->Set(0);
 
   for (unsigned short i = 0; i < 52; i++) {
+    m_crate_time_offsets[i] = std::numeric_limits<double>::quiet_NaN();
+
     std::string h_title = "ECL/time_crate_" + std::to_string(i + 1) + "_Thr1GeV";
     h_time_crate_Thr1GeV = findHist(h_title);
     if (h_time_crate_Thr1GeV != NULL) {
+      m_crate_time_offsets[i] = h_time_crate_Thr1GeV->GetMean();
       h_crate_time_offsets->SetPoint(i, i + 0.5, h_time_crate_Thr1GeV->GetMean());
       h_crate_time_offsets->SetPointError(i, 0.1, h_time_crate_Thr1GeV->GetMeanError());
+
       if (h_time_crate_Thr1GeV->Integral() > 100) {
         double yval = (h_time_crate_Thr1GeV->GetMean() > 0) ?
                       h_time_crate_Thr1GeV->GetMean() - 2 * h_time_crate_Thr1GeV->GetMeanError() :
                       h_time_crate_Thr1GeV->GetMean() + 2 * h_time_crate_Thr1GeV->GetMeanError();
         if (fabs(yval) > m_CrateTimeOffsetsMax) colRed = true;
-      } else m_low.push_back(i + 1);
+      } else {
+        m_low.push_back(i + 1);
+      }
     }
+    auto pv_name = (boost::format("time_offset:crate%02d") % (i + 1)).str();
+    setEpicsPV(pv_name, m_crate_time_offsets[i]);
   }
 
   c_crate_time_offsets->Clear();
@@ -418,11 +445,34 @@ void DQMHistAnalysisECLModule::event()
     c_logic_summary->Modified();
     c_logic_summary->Update();
   }
+
+  //Set EPICS PVs
+  if (h_evtot == NULL) return;
+
+  Double_t events = h_evtot->GetBinContent(1);
+  for (auto wf_option : m_WaveformOption) {
+    m_wf_fraction[wf_option] = std::numeric_limits<double>::quiet_NaN();
+    // Get minimal value for each type of saved waveforms
+    if (events > 100000) {
+      TH1* hist = findHist(str(boost::format("ECL/wf_cid_%1%") % wf_option));
+      m_wf_fraction[wf_option] = hist->GetMinimum();
+    }
+    auto pv_name = (boost::format("wf_frac:%s:min") % wf_option).str();
+    setEpicsPV(pv_name, m_wf_fraction[wf_option]);
+  }
 }
 
 void DQMHistAnalysisECLModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisECL: endRun called");
+  for (unsigned short i = 0; i < 52; i++) {
+    auto var_name = (boost::format("time_offset_crate%02d") % (i + 1)).str();
+    m_monObj->setVariable(var_name, m_crate_time_offsets[i]);
+  }
+  for (auto wf_option : m_WaveformOption) {
+    auto var_name = (boost::format("wf_frac_%s_min") % wf_option).str();
+    m_monObj->setVariable(var_name, m_wf_fraction[wf_option]);
+  }
 }
 
 

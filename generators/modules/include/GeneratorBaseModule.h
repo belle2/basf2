@@ -41,6 +41,8 @@ namespace Belle2 {
       if (std::isnan(m_eventType))
         B2FATAL("EventType is not set!");
 
+      m_eventExtraInfo.registerInDataStore();
+
       generatorInitialize();
     };
 

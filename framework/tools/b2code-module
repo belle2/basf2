@@ -184,13 +184,14 @@ if __name__ == "__main__":
     # get module methods
     methods_header = ''
     methods_src = ''
+    method_desc = ''
     print('Please select the required module methods:', flush=True)
     for method in ['initialize', 'beginRun', 'event', 'endRun', 'terminate', 'destructor']:
         if method == 'initialize' and init_src != '':
             selected = True
             method_desc = 'Register input and output data'
         else:
-            selected = input('  %-10s (y/n) [n]: ' % method) == 'y'
+            selected = input(f'  {method:<10} (y/n) [n]: ') == 'y'
             if selected:
                 method_desc = input('    description       : ')
         if selected:
@@ -212,19 +213,17 @@ if __name__ == "__main__":
 
     '''
                 if method == 'initialize':
-                    methods_src = methods_src + '''void %sModule::%s()
-    {
-    %s}
+                    methods_src = methods_src + f'''void {module}Module::{method}()
+    {{
+    {init_src}}}
 
-    ''' \
-                        % (module, method, init_src)
+    '''
                 else:
-                    methods_src = methods_src + '''void %sModule::%s()
-    {
-    }
+                    methods_src = methods_src + f'''void {module}Module::{method}()
+    {{
+    }}
 
-    ''' \
-                        % (module, method)
+    '''
 
     # determine include statements
     header_includes = [f + '.h' for f in list(set(header_includes))]
@@ -250,10 +249,10 @@ if __name__ == "__main__":
                     src_includes.remove(name)
 
     if len(header_includes + src_includes) > 0:
-        sys.stderr.write('''
+        sys.stderr.write(f'''
     WARNING: The header files for the following classes were not found:
-    %s
-    '''   % ', '.join(header_includes + src_includes))
+    {', '.join(header_includes + src_includes)}
+    ''')
 
     # write the header file
     f = open(header, 'w')
@@ -302,7 +301,7 @@ if __name__ == "__main__":
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-    #include <{os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir)}>
+    #include <{os.path.relpath(os.path.join(os.getcwd(), f'{module}Module.h'), local_dir)}>
 
     /* --------------- WARNING ---------------------------------------------- *
     If you have more complex parameter types in your class then simple int,

@@ -25,7 +25,7 @@ def loadStdVeryLooseTracks(particletype, path):
     """
 
     # basic quality cut strings
-    trackQuality = 'thetaInCDCAcceptance and nCDCHits>20 '
+    trackQuality = 'thetaInCDCAcceptance'
     ipCut = 'abs(dr) < 0.5 and abs(dz) < 2'
     goodTrack = trackQuality + ' and ' + ipCut
 

@@ -40,7 +40,7 @@ floating_expressions = {
 
 for width in integral_types:
     # check signed types, we want min, max -1, 0 and 1
-    dtype = np.dtype(f"int{int(width)}")
+    dtype = np.dtype(f"int{width}")
     for i, value in enumerate([-2**(width - 1), -1, 0, 1, 2**(width - 1) - 1]):
         # create a unique member name
         func_name = f"int{width}test{i}"
@@ -54,7 +54,7 @@ for width in integral_types:
         results.append(['ref_' + func_name, value, dtype])
 
     # check unsigned types, just 0, 1, and max
-    dtype = np.dtype(f"uint{int(width)}")
+    dtype = np.dtype(f"uint{width}")
     for i, value in enumerate([0, 1, 2**(width) - 1]):
         # create a unique member name
         func_name = f"uint{width}test{i}"

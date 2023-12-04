@@ -188,7 +188,7 @@ def find_children(rootpid):
         try:
             # since we read the stat files of all processes very often we
             # optimize this using native os.open instead of file objects
-            fd = os.open(f"/proc/{int(pid)}/stat", os.O_RDONLY)
+            fd = os.open(f"/proc/{pid}/stat", os.O_RDONLY)
             stat = os.read(fd, 1024)
             os.close(fd)
             # stat has ppid in the fourth field but the process name (second

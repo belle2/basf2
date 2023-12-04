@@ -96,9 +96,9 @@ def run_test(init_signal, event_signal, abort, test_in_process):
         if not status_ok:
             print(killsig, retcode)
             if killsig:
-                raise RuntimeError(f"Killed with wrong signal {int(killsig)}?")
+                raise RuntimeError(f"Killed with wrong signal {killsig}?")
             else:
-                raise RuntimeError(f"Wrong exit code {int(retcode)}")
+                raise RuntimeError(f"Wrong exit code {retcode}")
 
         fileExists = os.path.isfile(testFile.name)
         if fileExists and (not abort or event_signal == signal.SIGINT):
@@ -145,7 +145,7 @@ for nproc in [0, 3]:
     for in_proc in [0, 1, 2]:
         if nproc == 0 and in_proc != 0:
             break  # running more tests in single process mode doesn't make sense
-        basf2.B2WARNING(f"== starting tests with nproc={int(nproc)}, test_in_process={int(in_proc)}")
+        basf2.B2WARNING(f"== starting tests with nproc={nproc}, test_in_process={in_proc}")
 
         try:
             run_test(None, None, abort=False, test_in_process=in_proc)
@@ -164,7 +164,7 @@ for nproc in [0, 3]:
             # SIGPIPE would be nice, too. just stops immediately now
         except Exception as e:
             # Note: Without specifying exception type, we might get those from forked processes, too
-            basf2.B2WARNING(f"Exception occured for nproc={int(nproc)}, test_in_process={int(in_proc)}")
+            basf2.B2WARNING(f"Exception occured for nproc={nproc}, test_in_process={in_proc}")
             raise e
 
 print("\n")

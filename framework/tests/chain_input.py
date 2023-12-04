@@ -43,7 +43,7 @@ class TestModule(basf2.Module):
         for hit in simhits:
             relations = hit.getRelationsFrom("PXDTrueHits")
             for truehit in relations:
-                print(f'truehit {int(truehit.getArrayIndex())} => hit {int(hit.getArrayIndex())}')
+                print(f'truehit {truehit.getArrayIndex()} => hit {hit.getArrayIndex()}')
 
         self.iEvent += 1
 

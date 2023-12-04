@@ -65,7 +65,7 @@ with clean_working_directory():
     configure_logging_for_tests()
     for i, entry in enumerate(entries.splitlines(True)):
         print("testing", repr(entry))
-        filename = f"database-{int(i):02}.txt"
+        filename = f"database-{i:02}.txt"
         with open(filename, "w") as f:
             f.write(entry)
 

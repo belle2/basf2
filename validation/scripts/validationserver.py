@@ -292,6 +292,7 @@ def search_project_issues(
         state='opened',
         lazy=True,
         scope='all',
+        get_all=True,
     )
 
     return issues
@@ -472,6 +473,12 @@ def parse_contact(
             match = next(
                 (line for line in id_map if email.group() in line), None
             )
+            if not match:
+                logging.error(
+                    f"No userid found for {email} in the map, could it be that "
+                    "they are (sadly) no longer in the collaboration?"
+                )
+                continue
             username = match.split(' ')[1].rstrip()
             assignees['usernames'].append(username)
         except IndexError:

@@ -40,7 +40,8 @@ class graFEISaverModule(b2.Module):
             particle_list (list): Name of particle list to run graFEI on
             cfg_path (str): path to config file
             param_file (str): path to file containing weight files for the model
-            store_true_info (bool): whether to save truth-matching information
+            sig_side_lcas (list): list containing LCAS matrix of signal-side
+            sig_side_masses (list): list containing mass hypotheses of signal-side
             gpu (bool): whether running on a GPU
         """
         super().__init__()

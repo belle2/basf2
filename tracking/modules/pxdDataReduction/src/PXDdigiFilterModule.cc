@@ -65,8 +65,8 @@ void PXDdigiFilterModule::beginRun()
 {
   // reset variables used to enable/disable ROI-filtering
   m_skipEveryNth = -1;
-  if (m_roiParameters) {
-    m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+  if (m_ROISimulationParameters) {
+    m_skipEveryNth = m_ROISimulationParameters->getDisableROIforEveryNth();
   } else {
     B2ERROR("No configuration for the current run found");
   }
@@ -76,9 +76,9 @@ void PXDdigiFilterModule::beginRun()
 void PXDdigiFilterModule::event()
 {
   // parameters might also change on a per-event basis
-  if (m_roiParameters.hasChanged()) {
-    if (m_roiParameters) {
-      m_skipEveryNth = m_roiParameters->getDisableROIforEveryNth();
+  if (m_ROISimulationParameters.hasChanged()) {
+    if (m_ROISimulationParameters) {
+      m_skipEveryNth = m_ROISimulationParameters->getDisableROIforEveryNth();
     } else {
       B2ERROR("No configuration for the current run found");
     }

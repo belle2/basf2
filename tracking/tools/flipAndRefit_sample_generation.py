@@ -13,6 +13,7 @@ from basf2 import process, set_random_seed, create_path, statistics, print_path,
 from basf2 import conditions as b2c
 from simulation import add_simulation
 from tracking import add_prefilter_tracking_reconstruction
+from tracking.path_utils import add_mc_matcher
 from tracking.FlippingMVA.savingFlippingVariables import Saving1stMVAData
 from tracking.FlippingMVA.savingFlippingVariablesFor2ndMVA import Saving2ndMVAData
 from background import get_background_files
@@ -46,9 +47,13 @@ def arg_parser():
                         help='Global Tags to be prepended',
                         metavar='GTs')
     parser.add_argument('--output_file_mva',
-                        default='',
+                        default='BBbar_mva1.root',
                         type=str,
                         help='Output file name. Default is \'\'.')
+    parser.add_argument('--output_file_mva2',
+                        default='BBbar_mva2.root',
+                        type=str,
+                        help='Output file2 name. Default is \'\'.')
     parser.add_argument('--num',
                         default=1,
                         type=int,
@@ -81,10 +86,6 @@ if __name__ == "__main__":
     if args.output_file_mva == '':
         B2FATAL("Empty output file name. Terminating here.")
 
-    outputfile = args.output_file_mva
-    if not outputfile.endswith(".root"):
-        outputfile + ".root"
-
     # Setting the random seed for particle generation
     set_random_seed(args.randseed)
 
@@ -112,21 +113,14 @@ if __name__ == "__main__":
     add_prefilter_tracking_reconstruction(main)
 
     main.add_module('TrackTimeEstimator')
+    add_mc_matcher(main, reco_tracks="RecoTracks")
 
-    # Save data to train the first MVA. After that, we're done
-    if (training_mva_number == 1):
-        saveFirstMVAData = Saving1stMVAData(
-            name="saving1stMVA_BBbar",
-            output_file_name=outputfile)
-        main.add_module(saveFirstMVAData)
-
-    # Now that the first MVA is trained, use the weight file to decide in the FlipQuality module which RecoTracks to flip and refit.
-    # Afterwards, revert the RecoTracks marked as such by the first MVA, fit them, calculate the IPTrackTime
-    # (is this really necessary?!?!?), create Track objects, and fill the information into the training sample for the second MVA
-    elif (training_mva_number == 2):
+    # here we save two samples for MVA1 and MVA2
+    if (training_mva_number):
         main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
                         identifier='TRKTrackFlipAndRefit_MVA1_weightfile',
                         indexOfFlippingMVA=1).set_name("FlipQuality_1stMVA")
+
         reco_tracks_flipped = "RecoTracks_flipped"
         main.add_module("RecoTracksReverter", inputStoreArrayName="RecoTracks",
                         outputStoreArrayName=reco_tracks_flipped)
@@ -137,10 +131,19 @@ if __name__ == "__main__":
                         trackFitResultColName="TrackFitResults_flipped",
                         recoTrackColName=reco_tracks_flipped,
                         pdgCodes=[211, 321, 2212]).set_name("TrackCreator_flipped")
-        saveSecondMVAData = Saving2ndMVAData(
-            name="saving2ndMVA_BBbar",
-            output_file_name=outputfile)
-        main.add_module(saveSecondMVAData)
+        main.add_module("FlipQuality", recoTracksStoreArrayName="RecoTracks",
+                        identifier='TRKTrackFlipAndRefit_MVA2_weightfile',
+                        indexOfFlippingMVA=2).set_name("FlipQuality_2ndMVA")
+        if (training_mva_number == 1):
+            saveFirstMVAData = Saving1stMVAData(
+                name="saving1stMVA_BBbar",
+                output_file_name=args.output_file_mva)
+            main.add_module(saveFirstMVAData)
+        else:
+            saveSecondMVAData = Saving2ndMVAData(
+                name="saving2ndMVA_BBbar",
+                output_file_name=args.output_file_mva2)
+            main.add_module(saveSecondMVAData)
 
     # Process events
     print_path(main)

@@ -12,7 +12,7 @@
 #include <framework/datastore/SelectSubset.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <framework/database/DBObjPtr.h>
-#include <simulation/dbobjects/ROIParameters.h>
+#include <simulation/dbobjects/ROISimulationParameters.h>
 #include <tracking/dataobjects/ROIid.h>
 
 namespace Belle2 {
@@ -65,7 +65,7 @@ namespace Belle2 {
     std::string m_PXDDigitsInsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_PXDDigitsOutsideROIName;  /**< The name of the StoreArray of Filtered PXDDigits */
     std::string m_ROIidsName;  /**< The name of the StoreArray of ROIs */
-    DBObjPtr<ROIParameters> m_roiParameters;  /**< Configuration parameters for ROIs */
+    DBObjPtr<ROISimulationParameters> m_ROISimulationParameters;  /**< Configuration parameters for ROIs */
 
     bool m_CreateOutside = false; /**< if set, create list of outside pixels, too */
     bool m_overrideDB = false; /**< if set, overwrites ROI-finding settings in DB */

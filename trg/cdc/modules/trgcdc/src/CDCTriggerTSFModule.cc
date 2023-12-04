@@ -17,6 +17,7 @@
 #include <trg/cdc/Wire.h>
 #include <trg/cdc/WireHit.h>
 #include <trg/cdc/Segment.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <fstream>
 
@@ -61,6 +62,11 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            "Switch to create a table of hit pattern <-> "
            "number of true left / true right, which is needed to create the LUT",
            false);
+  addParam("makeRecoLRTable",
+           m_makeRecoLRTable,
+           "Switch to create a table of hit pattern <-> "
+           "number of reconstructed left / true right, which is needed to create the LUT",
+           false);
   addParam("innerTrueLRTableFilename",
            m_innerTrueLRTableFilename,
            "Filename for the true left/right table for the innermost super layer.",
@@ -77,6 +83,18 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_crosstalk_tdcfilter,
            "TDC based crosstalk filtering logic on CDCFE. True:enable False:disable",
            false);
+  addParam("innerRecoLRTableFilename",
+           m_innerRecoLRTableFilename,
+           "Filename for the reconnstructed left/right table for the innermost super layer.",
+           string("innerRecoLRTable.dat"));
+  addParam("outerRecoLRTableFilename",
+           m_outerRecoLRTableFilename,
+           "Filename for the reconstructed left/right table for the outer super layers.",
+           string("outerRecoLRTable.dat"));
+  addParam("relateAllHits",
+           m_relateAllHits,
+           "Flag to relate all cdchits to the TrackSegment, not just the priority hits.",
+           true);
   addParam("ADC_cut_enable",
            m_adcflag,
            "remove hits with lower ADC than cut threshold. True:enable False:disable",
@@ -96,14 +114,21 @@ CDCTriggerTSFModule::initialize()
   if (m_makeTrueLRTable) {
     StoreArray<CDCSimHit> simhits;
     simhits.isRequired();
-    innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(3, 0));
-    outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(3, 0));
+    innerTrueLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
+    outerTrueLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
+  }
+  if (m_makeRecoLRTable) {
+    m_recoTracks.isRequired("RecoTracks");
+    innerRecoLRTable.assign(pow(2, 16), vector<unsigned>(5, 0));
+    outerRecoLRTable.assign(pow(2, 12), vector<unsigned>(5, 0));
   }
   // register relations
   StoreArray<MCParticle> mcparticles;
   m_segmentHits.registerRelationTo(m_cdcHits);
   mcparticles.registerRelationTo(m_segmentHits);
-
+  m_recoTracks.registerRelationTo(m_segmentHits);
+  m_recoTracks.registerRelationTo(m_cdcHits);
+  m_segmentHits.registerRelationTo(m_recoTracks);
   // Prepare track segment shapes.
   // First a structure of wires is created for all layers and super layers.
   // Each track segment consists of pointers to wires in this structure.
@@ -462,13 +487,17 @@ CDCTriggerTSFModule::event()
                                   s.priorityTime(),
                                   s.fastestTime(),
                                   s.foundTime());
+        unsigned short adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];
           if (wire->signal().active()) {
             // priority wire has relation weight 2
-            double weight = (wire == &(s.priority())) ? 2. : 1.;
-            tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);
+            double weight = (wire == &(s.priority())) ? 2. : 1.; // not sure if this is needed..
+            if (weight == 2. || m_relateAllHits) {
+              tsHit->addRelationTo(m_cdcHits[wire->hit()->iCDCHit()], weight);
+              adcSum += m_cdcHits[wire->hit()->iCDCHit()]->getADCCount();
+            }
           }
         }
         // relation to MCParticles (same as priority hit)
@@ -480,16 +509,101 @@ CDCTriggerTSFModule::event()
         if (m_makeTrueLRTable) {
           const CDCSimHit* simHit = priorityHit->getRelatedFrom<CDCSimHit>();
           if (simHit && !simHit->getBackgroundTag()) {
-            if (isl == 0)
+            if (isl == 0) {
+              B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
               innerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
-            else
+              innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              innerTrueLRTable[s.lutPattern()][4] += adcSum;
+            } else {
               outerTrueLRTable[s.lutPattern()][simHit->getLeftRightPassage()] += 1;
+              outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              outerTrueLRTable[s.lutPattern()][4] += adcSum;
+              B2DEBUG(100, its << " creating entry in TrueLUT for pattern: " << s.lutPattern() << " :  " << simHit->getLeftRightPassage());
+            }
           } else {
-            if (isl == 0)
+            if (isl == 0) {
+              B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
               innerTrueLRTable[s.lutPattern()][2] += 1;
-            else
+              innerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              innerTrueLRTable[s.lutPattern()][4] += adcSum;
+            }  else {
+              B2DEBUG(100, its  << " creating bghit in TrueLUT for pattern: " << s.lutPattern());
               outerTrueLRTable[s.lutPattern()][2] += 1;
+              outerTrueLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              outerTrueLRTable[s.lutPattern()][4] += adcSum;
+            }
           }
+        }
+
+        if (m_makeRecoLRTable) {
+          // for the recotable, we have no simhits and w can have more than one recotrack per event
+          // so wee need to loop over them:
+          unsigned lrflag = 2; // see explanation below
+          for (int ireco = 0; ireco < m_recoTracks.getEntries(); ++ireco) {
+            //        std::cout << "recotrack " << ireco << " of " << m_recoTracks.getEntries());
+            RecoTrack* recoTrack = m_recoTracks[ireco];
+            // since there is no relation between recotracks and the tshits yet, we need to create them first.
+            // within the recotrack class, there is a function which returns the hitids of the cdchits used
+            // in the recotrack. now we can loop over them and compare them with the id from the priorityhit:
+            // /
+            // Before looping over the recotracks, we set the rl information to 'bkg hit'. Then, we loop over all
+            // recotracks and determine if there is a relation and wether it passed left or right. If this is set for
+            // one recotrack, we set the rl information to the corresponding value. if it is set for another recotrack,
+            // we will also use this information for the recolrtable and set the corresponding value again.
+            // Just in the case, where after the loop over all recotracks it wasn't related to any of them, we will set
+            // the background flag in the recolrtable.
+            vector<CDCHit*> cdcHits = recoTrack->getCDCHitList();
+            bool related = false;
+            for (unsigned iHit = 0; iHit < cdcHits.size(); ++iHit) {
+//std::cout << "now looping over cdchits... " << iHit << "/" << cdcHits.size() << std::endl;
+              if (tsHit->getID() == cdcHits[iHit]->getID()) {
+                // check, wether recotrack is already related to ts, skip in this case.
+                // this is necessary because sometimes two wires are related to the same ts // dont get it, should be uneccessary
+                if (related == false) related = true;
+                else continue;
+//              std::cout << "ts " << tsHit->getID() << " :  creating relation to recotrack " << ireco;
+                //              std::cout << tsHit->getID() << " " << cdcHits[iHit]->getID() << " " << iHit << " matching id of priohit and current cdchit, creating relation... " << std::endl;
+                recoTrack->addRelationTo(tsHit);
+                tsHit->addRelationTo(recoTrack);
+                if (isl == 0) {
+                  // this getrightleftinformation function returns 2 for a right pass, and 3 for a left pass
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
+                  innerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+                  innerRecoLRTable[s.lutPattern()][4] += adcSum;
+                  B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
+                          "), hit: " << iHit);
+                } else {
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  3) lrflag = 0;
+                  if (recoTrack->getRightLeftInformation(cdcHits[iHit]) ==  2) lrflag = 1;
+                  outerRecoLRTable[s.lutPattern()][lrflag] += 1;
+                  outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+                  outerRecoLRTable[s.lutPattern()][4] += adcSum;
+                  B2DEBUG(100, its << " creating entry in recoLUT for pattern: " << s.lutPattern() << " :  " << lrflag << " (recotrack " << ireco <<
+                          "), hit: " << iHit);
+                }
+//std::cout << " , lrflag: " << lrflag << ", 0=left, 1=right";
+                //break;
+              }
+            }
+          }
+          if (lrflag == 2) {
+            if (isl == 0) {
+              B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern());
+              innerRecoLRTable[s.lutPattern()][2] += 1;
+              innerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              innerRecoLRTable[s.lutPattern()][4] += adcSum;
+            } else {
+              B2DEBUG(100, its << " creating bghit in recoLUT for pattern: " << s.lutPattern());
+              outerRecoLRTable[s.lutPattern()][2] += 1;
+              outerRecoLRTable[s.lutPattern()][3] += tsHit->priorityTime();
+              outerRecoLRTable[s.lutPattern()][4] += adcSum;
+
+            }
+            //std::cout << " , lrflag: " << lrflag << ", 0=left, 1=right, 2=bg";
+          }
+          //std::cout << std::endl;
         }
       }
     }
@@ -547,6 +661,23 @@ CDCTriggerTSFModule::terminate()
     }
   }
 
+  // save reco left/right table
+  if (m_makeRecoLRTable) {
+    ofstream innerFile(m_innerRecoLRTableFilename);
+    ostream_iterator<unsigned> innerIterator(innerFile, " ");
+    for (unsigned pattern = 0; pattern < innerRecoLRTable.size(); ++pattern) {
+      copy(innerRecoLRTable[pattern].begin(), innerRecoLRTable[pattern].end(),
+           innerIterator);
+      innerFile << "\n";
+    }
+    ofstream outerFile(m_outerRecoLRTableFilename);
+    ostream_iterator<unsigned> outerIterator(outerFile, " ");
+    for (unsigned pattern = 0; pattern < outerRecoLRTable.size(); ++pattern) {
+      copy(outerRecoLRTable[pattern].begin(), outerRecoLRTable[pattern].end(),
+           outerIterator);
+      outerFile << "\n";
+    }
+  }
 }
 
 void

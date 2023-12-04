@@ -111,6 +111,12 @@ namespace Belle2::Conditions {
     }
   }
 
+  void MetadataProvider::printInfoMessage(const std::string& provider = "")
+  {
+    B2INFO("Conditions Database: found working metadata provider"
+           << LogVar("provider", provider));
+  }
+
   std::string NullMetadataProvider::getGlobaltagStatus([[maybe_unused]] const std::string& name)
   {
     if (!m_errorShown) B2ERROR("No Metadata provider configured, globaltags cannot be used");

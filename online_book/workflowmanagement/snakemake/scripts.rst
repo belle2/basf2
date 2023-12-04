@@ -7,22 +7,18 @@ For completeness, we here provide the separate analysis scripts called by the sn
 
 .. literalinclude:: offlineanalysis.py
    :language: python
-   :linenos:
    :caption:
    
 .. literalinclude:: reconstruction.py
    :language: python
-   :linenos:
    :caption:
 
 .. literalinclude:: batchToTxt.py
    :language: python
-   :linenos:
    :caption:
    
 When using our provided :code:`wrapper:` for submitting gbasf2 jobs to the grid, the steering file does not need any specific adaptations.
 
 .. literalinclude:: skim.py
    :language: python
-   :linenos:
    :caption:

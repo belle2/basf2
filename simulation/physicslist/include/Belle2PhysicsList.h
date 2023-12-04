@@ -24,7 +24,7 @@ namespace Belle2 {
 
     public:
       /** Constructor */
-      explicit Belle2PhysicsList(const G4String& physicsListName);
+      explicit Belle2PhysicsList(const G4String& physicsListName, const G4int hadronicVerbosityLevel = 0);
       /** destructor */
       ~Belle2PhysicsList();
 

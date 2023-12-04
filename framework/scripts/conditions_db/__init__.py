@@ -16,9 +16,9 @@ Python interface to the ConditionsDB
 """
 
 import os
-from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING
+import stat
+from basf2 import B2FATAL, B2ERROR, B2INFO, B2WARNING, conditions
 import requests
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.packages.urllib3.fields import RequestField
 from requests.packages.urllib3.filepost import encode_multipart_formdata
 import json
@@ -29,6 +29,7 @@ from concurrent.futures import ThreadPoolExecutor, wait as futures_wait
 import hashlib
 import itertools
 from typing import Union  # noqa
+import getpass
 
 
 def encode_name(name):
@@ -52,6 +53,81 @@ def chunks(container, chunk_size):
         if not chunk:
             return
         yield chunk
+
+
+def get_cdb_authentication_token(path=None):
+    """
+    Helper function for correctly retrieving the CDB authentication token (either via file or via issuing server).
+
+    :param path: Path to a file containing a CDB authentication token; if None, the function will use
+           a default path (``${HOME}/b2cdb_${BELLE2_USER}.token`` or ``/tmp/b2cdb_${BELLE2_USER}.token``) to look for a token.
+    """
+    # if we pass a path, let's use it for getting the token, otherwise use the default one
+    if path:
+        path_to_token = path
+    else:
+        path_to_token = os.path.join(os.getenv('HOME', '/tmp'), f'b2cdb_{os.getenv("BELLE2_USER", None)}.token')
+
+    # check validity of existing token
+    if os.path.isfile(path_to_token):
+        with open(path_to_token) as token_file:
+            response = requests.get('https://token.belle2.org/check', verify=False, params={'token': token_file.read().strip()})
+            if response.status_code == 400:
+                B2INFO(f'The file {path_to_token} contains an invalid token, getting a new token...')
+                os.unlink(path_to_token)
+            elif response.status_code > 400:
+                B2WARNING("The validity of the existing token could not be checked. Trying to connect to CDB anyway.")
+
+    # request a token if there is none
+    if not os.path.isfile(path_to_token):
+        username = os.environ['BELLE2_USER']
+        othername = input(f'\nConfirm your DESY user name by pressing enter or type the correct one [{username}]: ')
+        if othername != '':
+            username = othername
+        password = getpass.getpass("Please type your DESY password to request a CDB token: ")
+        response = requests.get('https://token.belle2.org', verify=False, auth=(username, password))
+        print(response.content)
+        if response.status_code == requests.codes.ok:
+            with open(path_to_token, 'wb') as token_file:
+                os.chmod(path_to_token, stat.S_IRUSR | stat.S_IWUSR)
+                token_file.write(response.content)
+        else:
+            B2ERROR('Failed to get token')
+            return None
+
+    # read and return token
+    with open(path_to_token) as token_file:
+        return token_file.read().strip()
+
+
+def set_cdb_authentication_token(cdb_instance, auth_token=None):
+    """
+    Helper function for setting the CDB authentication token.
+
+    :param cdb_instance: An instance of the ``ConditionsDB`` class.
+    :param auth_token: A CDB authentication token: if ``None``, it is automatically retrieved from the issuing server
+           and then set
+    """
+    if auth_token is not None:
+        cdb_instance.set_authentication_token(auth_token)
+    else:
+        # If something goes wrong with the auth. token, the function returns None and the authentication will fail
+        token = get_cdb_authentication_token(os.getenv('BELLE2_CDB_AUTH_TOKEN', default=None))
+        cdb_instance.set_authentication_token(token)
+
+
+class BearerAuth(requests.auth.AuthBase):
+    """Simple class to present bearer token instead of username/password"""
+
+    def __init__(self, token):
+        """Construct from a token"""
+        #: Authorization header to send with each request
+        self._authtoken = f"Bearer {token}"
+
+    def __call__(self, r):
+        """Update headers to include token"""
+        r.headers["X-Authorization"] = self._authtoken
+        return r
 
 
 class PayloadInformation:
@@ -153,7 +229,7 @@ class ConditionsDB:
     """Class to interface conditions db REST interface"""
 
     #: base url to the conditions db to be used if no custom url is given
-    BASE_URLS = ["http://belle2db.sdcc.bnl.gov/b2s/rest/"]
+    BASE_URLS = [conditions.default_metadata_provider_url]
 
     class RequestError(RuntimeError):
         """Class to be thrown by request() if there is any error"""
@@ -238,17 +314,15 @@ class ConditionsDB:
         # results.
         self._session.headers.update({"Accept": "application/json", "Cache-Control": "no-cache"})
 
-    def set_authentication(self, user, password, basic=True):
+    def set_authentication_token(self, token):
         """
-        Set authentication credentials when talking to the database
+        Set authentication token when talking to the database
 
         Args:
-            user (str): username
-            password (str): password
-            basic (bool): if True us HTTP Basic authentication, otherwise HTTP Digest
+            token (str): JWT to hand to the database. Will not be checked
+                for validity here.
         """
-        authtype = HTTPBasicAuth if basic else HTTPDigestAuth
-        self._session.auth = authtype(user, password)
+        self._session.auth = BearerAuth(token)
 
     def request(self, method, url, message=None, *args, **argk):
         """

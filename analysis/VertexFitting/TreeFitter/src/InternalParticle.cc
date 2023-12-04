@@ -14,6 +14,7 @@
 #include <analysis/VertexFitting/TreeFitter/HelixUtils.h>
 #include <framework/logging/Logger.h>
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/V0.h>
 
 using std::vector;
 
@@ -113,26 +114,59 @@ namespace TreeFitter {
         }
       }
 
-      Belle2::B2Vector3D v;
-
       if (trkdaughters.size() >= 2) {
-        std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
 
-        RecoTrack* dau1 = trkdaughters[0];
-        RecoTrack* dau2 = trkdaughters[1];
+        auto v0 = particle()->getV0();
+        auto dummy_vertex = ROOT::Math::XYZVector(0, 0, 0);
 
-        Belle2::Helix helix1 = dau1->particle()->getTrackFitResult()->getHelix();
-        Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
+        bool initWithV0 = false;
+        if (v0 && v0->getFittedVertexPosition() != dummy_vertex) {
+          auto part_dau1 = particle()->getDaughter(0);
+          auto part_dau2 = particle()->getDaughter(1);
 
-        double flt1(0), flt2(0);
-        HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
+          auto recotrack_dau1 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
+          [&part_dau1](RecoTrack * rt) { return rt->particle()->getMdstArrayIndex() == part_dau1->getMdstArrayIndex(); });
+          auto recotrack_dau2 = std::find_if(trkdaughters.begin(), trkdaughters.end(),
+          [&part_dau2](RecoTrack * rt) { return rt->particle()->getMdstArrayIndex() == part_dau2->getMdstArrayIndex(); });
 
-        fitparams.getStateVector()(posindex)     = v.X();
-        fitparams.getStateVector()(posindex + 1) = v.Y();
-        fitparams.getStateVector()(posindex + 2) = v.Z();
+          if (recotrack_dau1 == trkdaughters.end() || recotrack_dau2 == trkdaughters.end()) {
+            B2WARNING("V0 daughter particles do not match with RecoTracks.");
+          } else {
+            double X_V0(v0->getFittedVertexX()), Y_V0(v0->getFittedVertexY()), Z_V0(v0->getFittedVertexZ());
+            fitparams.getStateVector()(posindex)     = X_V0;
+            fitparams.getStateVector()(posindex + 1) = Y_V0;
+            fitparams.getStateVector()(posindex + 2) = Z_V0;
 
-        dau1->setFlightLength(flt1);
-        dau2->setFlightLength(flt2);
+            Belle2::Helix helix1 = v0->getTrackFitResults().first->getHelix();
+            Belle2::Helix helix2 = v0->getTrackFitResults().second->getHelix();
+
+            (*recotrack_dau1)->setFlightLength(helix1.getArcLength2DAtXY(X_V0, Y_V0));
+            (*recotrack_dau2)->setFlightLength(helix2.getArcLength2DAtXY(X_V0, Y_V0));
+
+            initWithV0 = true;
+          }
+        }
+
+        if (!initWithV0) {
+          std::sort(trkdaughters.begin(), trkdaughters.end(), compTrkTransverseMomentum);
+
+          RecoTrack* dau1 = trkdaughters[0];
+          RecoTrack* dau2 = trkdaughters[1];
+
+          Belle2::Helix helix1 = dau1->particle()->getTrackFitResult()->getHelix();
+          Belle2::Helix helix2 = dau2->particle()->getTrackFitResult()->getHelix();
+
+          double flt1(0), flt2(0);
+          Belle2::B2Vector3D v;
+          HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion);
+
+          fitparams.getStateVector()(posindex)     = v.X();
+          fitparams.getStateVector()(posindex + 1) = v.Y();
+          fitparams.getStateVector()(posindex + 2) = v.Z();
+
+          dau1->setFlightLength(flt1);
+          dau2->setFlightLength(flt2);
+        }
 
       } else if (false && trkdaughters.size() + vtxdaughters.size() >= 2)  {
         // TODO switched off waiting for refactoring of init1 and init2 functions (does not affect performance)

@@ -350,7 +350,6 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
             mc_figures_of_merit['mc_multiplicities'] = self.mc_multiplicities
             mc_figures_of_merit['mc_phis'] = self.mc_phi
             mc_figures_of_merit['mc_tan_lambdas'] = self.mc_tan_lambdas
-            mc_figures_of_merit['mc_thetas'] = self.mc_theta
             mc_figures_of_merit['mc_missing'] = self.mc_missing
             mc_figures_of_merit['mc_is_primary'] = self.mc_is_primary
             mc_figures_of_merit['mc_number_of_hits'] = self.mc_number_of_hits

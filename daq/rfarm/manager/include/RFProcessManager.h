@@ -38,7 +38,6 @@ namespace Belle2 {
 
   private:
     int m_iopipe[2];
-    int m_fdout;
     std::vector<pid_t> m_pidlist;
 
   };

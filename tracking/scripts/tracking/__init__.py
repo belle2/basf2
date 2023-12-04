@@ -616,8 +616,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
 
     if is_pxd_used(components) and not useVTX:
         add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                 output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                 filter_cut=0.01)
+                                 output_reco_tracks=full_reco_tracks, add_both_directions=True)
 
     if is_vtx_used(components) and useVTX:
         add_vtx_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
@@ -698,14 +697,6 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
         'recoTrackListName': reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': roiName,
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)

@@ -351,20 +351,10 @@ class ConditionsDB:
                 response = req.json()
                 message = response.get("message", "")
                 colon = ": " if message.strip() else ""
-                error = "Request {method} {url} returned {code} {reason}{colon}{message}".format(
-                    method=method, url=url,
-                    code=response["code"],
-                    reason=response["reason"],
-                    message=message,
-                    colon=colon,
-                )
+                error = f"Request {method} {url} returned {response['code']} {response['reason']}{colon}{message}"
             except json.JSONDecodeError:
                 # seems the reply was not even json
-                error = "Request {method} {url} returned non JSON response {code}: {content}".format(
-                    method=method, url=url,
-                    code=req.status_code,
-                    content=req.content
-                )
+                error = f"Request {method} {url} returned non JSON response {req.status_code}: {req.content}"
 
             if message is not None:
                 raise ConditionsDB.RequestError(f"{message} failed: {error}")
@@ -376,8 +366,7 @@ class ConditionsDB:
                 req.json()
             except json.JSONDecodeError as e:
                 B2INFO(f"Invalid response: {req.content}")
-                raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
-                                                .format(e, method=method, url=url))
+                raise ConditionsDB.RequestError(f"{method} {url} returned invalid JSON response {e}")
         return req
 
     def get_globalTags(self):
@@ -400,7 +389,7 @@ class ConditionsDB:
         """Check whether the globaltag with the given name exists."""
 
         try:
-            self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
+            self.request("GET", f"/globalTag/{encode_name(name)}")
         except ConditionsDB.RequestError:
             return False
 
@@ -411,7 +400,7 @@ class ConditionsDB:
         id or None if the tag was not found"""
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
+            req = self.request("GET", f"/globalTag/{encode_name(name)}")
         except ConditionsDB.RequestError as e:
             B2ERROR(f"Cannot find globaltag '{name}': {e}")
             return None
@@ -434,7 +423,7 @@ class ConditionsDB:
         if name in types:
             return types[name]
 
-        B2ERROR("Unknown globaltag type: '{}', please use one of {}".format(name, ", ".join(types)))
+        B2ERROR(f"Unknown globaltag type: '{name}', please use one of {', '.join(types)}")
         return None
 
     def create_globalTag(self, name, description, user):
@@ -500,8 +489,7 @@ class ConditionsDB:
 
         try:
             if global_tag:
-                req = self.request("GET", "/globalTag/{global_tag}/payloads"
-                                   .format(global_tag=encode_name(global_tag)))
+                req = self.request("GET", f"/globalTag/{encode_name(global_tag)}/payloads")
             else:
                 req = self.request("GET", "/payloads")
         except ConditionsDB.RequestError as e:
@@ -603,9 +591,7 @@ class ConditionsDB:
         # now make the request. Note to self: if multipart/form-data would be
         # accepted this would be so much nicer here. but it works.
         try:
-            req = self.request("POST", "/package/dbstore/module/{moduleName}/payload"
-                               .format(moduleName=encode_name(module)),
-                               data=post_body, headers=headers)
+            req = self.request("POST", f"/package/dbstore/module/{encode_name(module)}/payload", data=post_body, headers=headers)
         except ConditionsDB.RequestError as e:
             B2ERROR(f"Could not create Payload: {e}")
             return None
@@ -658,8 +644,7 @@ class ConditionsDB:
         """
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
-                               .format(globalTagName=encode_name(globalTagName)))
+            req = self.request("GET", f"/globalTag/{encode_name(globalTagName)}/globalTagPayloads")
         except ConditionsDB.RequestError:
             # there could be just no iovs so no error
             return {}
@@ -959,7 +944,7 @@ class ConditionsDB:
 
             B2INFO(f"Commenting on jira issue {issue} for {data['task']} globaltag request")
             if isinstance(password, str):
-                response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
+                response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/comment',
                                          auth=(data['user'], password), json={'body': description})
             else:
                 fields = {'id': issue, 'user': user, 'comment': description}

@@ -47,7 +47,7 @@ def skip_test(reason, py_case=None):
     if py_case:
         py_case.skipTest(reason)
     else:
-        print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
+        print(f"TEST SKIPPED: {reason}", file=sys.stderr, flush=True)
     sys.exit(1)
 
 
@@ -69,7 +69,7 @@ def require_file(filename, data_type="", py_case=None):
     try:
         fullpath = basf2.find_file(filename, data_type, silent=False)
     except FileNotFoundError as fnf:
-        skip_test('Cannot find: %s' % fnf.filename, py_case)
+        skip_test(f'Cannot find: {fnf.filename}', py_case)
     return fullpath
 
 

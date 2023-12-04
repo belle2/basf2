@@ -65,7 +65,7 @@ mydict = {
     'MGPARAMETER_gDM': mg_parameter_gDM,
     'MGPARAMETER_kappa': mg_parameter_kappa,
 }
-with open(mg_steeringtemplate, 'r') as template:
+with open(mg_steeringtemplate) as template:
     data = template.read()
     for (key, value) in mydict.items():
         data = data.replace(key, value)

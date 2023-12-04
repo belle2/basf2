@@ -22,8 +22,6 @@ has to implement the actual functionality, usually inside the event() method.
 import sys
 import os
 import subprocess
-import datetime
-from getpass import getuser
 import argparse
 
 

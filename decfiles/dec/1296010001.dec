@@ -25,6 +25,6 @@ Decay Lambda_c+sig
 1.0 Lambda0 pi+ 	     PHSP;
 Enddecay
 
-CDecay Lambda_c-sig
+CDecay anti-Lambda_c-sig
 
 End

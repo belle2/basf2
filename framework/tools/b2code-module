@@ -257,7 +257,7 @@ if __name__ == "__main__":
 
     # write the header file
     f = open(header, 'w')
-    f.write("""/**************************************************************************
+    f.write(f"""/**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
  *                                                                        *
@@ -268,11 +268,11 @@ if __name__ == "__main__":
     #pragma once
 
     #include <framework/core/Module.h>
-    {includes}
+    {includes_header}
 
     namespace Belle2 {{
     /**
-     * {module_description}
+     * {module_desc}
      */
     class {module}Module : public Module {{
 
@@ -283,24 +283,18 @@ if __name__ == "__main__":
          */
         {module}Module();
 
-    {methods}
+    {methods_header}
     private:
 
-    {members}  }};
+    {params_header + init_header}  }};
     }}
-    """.format(
-        includes=includes_header,
-        module_description=module_desc,
-        module=module,
-        methods=methods_header,
-        members=params_header + init_header,
-    ))
+    """)
     f.close()
 
     # write the source file
     path = ''
     f = open(src, 'w')
-    f.write("""/**************************************************************************
+    f.write(f"""/**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
  *                                                                        *
@@ -308,7 +302,7 @@ if __name__ == "__main__":
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-    #include <{module_header}>
+    #include <{os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir)}>
 
     /* --------------- WARNING ---------------------------------------------- *
     If you have more complex parameter types in your class then simple int,
@@ -317,31 +311,23 @@ if __name__ == "__main__":
     * ---------------------------------------------------------------------- */
     // #include <framework/core/ModuleParam.templateDetails.h>
 
-    {includes}
+    {includes_src}
 
     using namespace Belle2;
 
     REG_MODULE({module});
 
-    {module}Module::{module}Module() : Module(){constructor}
+    {module}Module::{module}Module() : Module(){ctor_src}
     {{
     // Set module properties
-    setDescription(R"DOC({module_description})DOC");
+    setDescription(R"DOC({module_desc})DOC");
 
     // Parameter definitions
-    {params}
+    {params_src}
     }}
 
-    {methods}
-    """.format(
-        module_header=os.path.relpath(os.path.join(os.getcwd(), '%sModule.h' % module), local_dir),
-        includes=includes_src,
-        module_description=module_desc,
-        module=module,
-        constructor=ctor_src,
-        methods=methods_src,
-        params=params_src,
-    ))
+    {methods_src}
+    """)
     f.close()
 
     # fix the style of the new files and add them to git

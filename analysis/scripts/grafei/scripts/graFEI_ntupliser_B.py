@@ -199,7 +199,6 @@ if mc:
     flag_decay_module = FlagBDecayModule(
         "B0:tag",
         b_parent_var="BParentGenID",
-        get_daughters=True,
     )
     path.add_module(flag_decay_module)
 

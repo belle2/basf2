@@ -19,34 +19,31 @@ def getObjectList(pointerVec):
 
 class FlagBDecayModule(b2.Module):
     """
-    Save variables indicating the decay mode the particles originated from.
-
+    Saves variables indicating the decay mode the particles originated from.
     Flags indicated which B meson was the parent and whether the decay was semileptonic
     or hadronic.
     Assumes MC matching has already been run on the list.
+
+    Args:
+        particle_list (str): name of Belle II particle list (can be FSP or composite)
+        b_parent_var (str): name of the extraInfo to save
     """
 
     def __init__(
         self,
         particle_list,
         b_parent_var='BParentGenID',
-        get_daughters=False,
-        # decay_type_var='SLDecay',
     ):
         super().__init__()
         self.particle_list = particle_list
         self.b_parent_var = b_parent_var
-        self.get_daughters = get_daughters
-        # self.decay_type_var = decay_type_var
 
     def event(self):
-        p_list = Belle2.PyStoreObj(self.particle_list)
+        p_list = getObjectList(Belle2.PyStoreObj(self.particle_list).obj())
 
-        if self.get_daughters:  # Take the daughters of the particle if the mother is provided to the algorithm
-            p_list = getObjectList(p_list.obj())[0].getFinalStateDaughters()
-            particles = getObjectList(p_list)
-        else:
-            particles = getObjectList(p_list.obj())
+        particles = []
+        for p in p_list:
+            particles.extend(getObjectList(p.getFinalStateDaughters()))
 
         for particle in particles:
             # First get related MC particle

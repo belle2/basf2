@@ -13,6 +13,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <pxd/geometry/SensorInfo.h>
 #include <pxd/reconstruction/PXDGainCalibrator.h>
+#include <pxd/utilities/PXDUtilities.h>
 
 #include <TTree.h>
 #include <TH1I.h>
@@ -234,7 +235,7 @@ void PXDPerformanceCollectorModule::collect() // Do your event() stuff here
 
   // Beam spot
   DBObjPtr<BeamSpot> beamSpotDB;
-  auto ip = beamSpotDB->getIPPosition();
+  auto ip = ROOT::Math::XYZVector(beamSpotDB->getIPPosition());
 
   // Actually only one event holder / event
   for (auto& pxd2TrackEvent : m_pxd2TrackEvents) {
@@ -326,7 +327,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       m_signal = cluster.charge;
       m_estimated = intersection.chargeMPV;
 
-      VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
+      VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
       auto uID = Info.getUCellID(cluster.posU);
       auto vID = Info.getVCellID(cluster.posV);
@@ -366,7 +367,7 @@ void PXDPerformanceCollectorModule::collectFromTrack(const PXD2TrackEvent::baseT
       auto z = intersection.z;
 
       // Get uBin and vBin from a global point.
-      VxdID sensorID = getVxdIDFromPXDModuleID(cluster.pxdID);
+      VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
       const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
       auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(x, y, z));
       auto uID = Info.getUCellID(localPoint.X());

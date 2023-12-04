@@ -1371,14 +1371,18 @@ bool TrackExtrapolateG4e::createMuidHit(ExtState& extState, G4ErrorFreeTrajState
   // Create a new MuidHit and RelationEntry between it and the track.
   // Adjust geant4e's position, momentum and covariance based on matching hit and tell caller to update the geant4e state.
   if (intersection.chi2 >= 0.0) {
-    TVector3 tpos(intersection.position.x(), intersection.position.y(), intersection.position.z());
-    TVector3 tposAtHitPlane(intersection.positionAtHitPlane.x(),
-                            intersection.positionAtHitPlane.y(),
-                            intersection.positionAtHitPlane.z());
-    KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode, intersection.inBarrel, intersection.isForward,
-                                                     intersection.sector,
-                                                     intersection.layer, tpos,
-                                                     tposAtHitPlane, extState.tof, intersection.time, intersection.chi2);
+    ROOT::Math::XYZVector tpos(intersection.position.x(),
+                               intersection.position.y(),
+                               intersection.position.z());
+    ROOT::Math::XYZVector tposAtHitPlane(intersection.positionAtHitPlane.x(),
+                                         intersection.positionAtHitPlane.y(),
+                                         intersection.positionAtHitPlane.z());
+    KLMMuidHit* klmMuidHit = m_klmMuidHits.appendNew(extState.pdgCode,
+                                                     intersection.inBarrel, intersection.isForward,
+                                                     intersection.sector, intersection.layer,
+                                                     tpos, tposAtHitPlane,
+                                                     extState.tof, intersection.time,
+                                                     intersection.chi2);
     if (extState.track != nullptr) { extState.track->addRelationTo(klmMuidHit); }
     G4Point3D newPos(intersection.position.x() * CLHEP::cm,
                      intersection.position.y() * CLHEP::cm,
@@ -1544,6 +1548,11 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       dn = nStrips - 1.5;
       factor = std::pow((0.9 + 0.4 * dn * dn), 1.5) * 0.55; // measured-in-Belle resolution
       localVariance[1] = m_BarrelZStripVariance[intersection.layer] * factor;
+    } else {
+      int nStrips = hit->getPhiStripMax() - hit->getPhiStripMin() + 1;
+      localVariance[0] *= (nStrips * nStrips); // variance inflated for multi-strip hit
+      nStrips = hit->getZStripMax() - hit->getZStripMin() + 1;
+      localVariance[1] *= (nStrips * nStrips); // variance inflated for multi-strip hit
     }
     G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(),
                          hit->getPositionZ());
@@ -1603,6 +1612,10 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
     intersection.sector = hit->getSector() - 1;
     intersection.time = hit->getTime();
     double localVariance[2] = {m_EndcapScintVariance, m_EndcapScintVariance};
+    int nStrips = hit->getXStripMax() - hit->getXStripMin() + 1;
+    localVariance[0] *= (nStrips * nStrips); // variance inflated for multi-strip hit
+    nStrips = hit->getYStripMax() - hit->getYStripMin() + 1;
+    localVariance[1] *= (nStrips * nStrips); // variance inflated for multi-strip hit
     G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(), hit->getPositionZ());
     adjustIntersection(intersection, localVariance, hitPos, intersection.position);
     if (intersection.chi2 >= 0.0) {

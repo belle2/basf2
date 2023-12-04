@@ -348,41 +348,46 @@ bool BKLMTrackingModule::findClosestRecoTrack(BKLMTrack* bklmTrk, RecoTrack*& cl
     B2INFO("BKLMTrackingModule::there is no recoTrack");
     return false;
   }
-  double oldDistance = INFINITY;
+  double oldDistanceSq = INFINITY;
   double oldAngle = INFINITY;
   closestTrack = nullptr;
-  //TVector3 poca = TVector3(0, 0, 0);
   //bklmHits are already sorted by layer
   //possible two hits in one layer?
-  ROOT::Math::XYZVector hitPosition = bklmHits[0]->getPosition();
-  TVector3 firstBKLMHitPosition(hitPosition.X(), hitPosition.Y(), hitPosition.Z());
+  //genfit requires TVector3 rather than XYZVector
+  TVector3 firstBKLMHitPosition(bklmHits[0]->getPosition().X(),
+                                bklmHits[0]->getPosition().Y(),
+                                bklmHits[0]->getPosition().Z());
+
+  // To get direction (angle) below, we have two points on the bklmTrk:
+  //     (x1, TrackParam[0]+TrackParam[1]*x1, TrackParam[2]+TrackParam[3]*x1)
+  //     (x2, TrackParam[0]+TrackParam[1]*x2, TrackParam[2]+TrackParam[3]*x2)
+  // the difference vector is
+  //     (x2-x1, TrackParam[1]*(x2-x1), TrackParam[3]*(x2-x1))
+  // which is proportional to
+  //     (1, TrackParam[1], TrackParam[3]).
+  TVector3 bklmTrkVec(1.0,  bklmTrk->getTrackParam()[1], bklmTrk->getTrackParam()[3]);
 
   TMatrixDSym cov(6);
-  TVector3 pos(0, 0, 0);
-  TVector3 mom(0, 0, 0);
+  TVector3 pos; // initializes to (0,0,0)
+  TVector3 mom; // initializes to (0,0,0)
 
   for (RecoTrack& track : recoTracks) {
     try {
       genfit::MeasuredStateOnPlane state = track.getMeasuredStateOnPlaneFromLastHit();
       //! Translates MeasuredStateOnPlane into 3D position, momentum and 6x6 covariance.
       state.getPosMomCov(pos, mom, cov);
-      if (mom.Y() * pos.Y() < 0)
-      { state = track.getMeasuredStateOnPlaneFromFirstHit(); }
-      //pos.Print(); mom.Print();
+      if (mom.Y() * pos.Y() < 0) {
+        state = track.getMeasuredStateOnPlaneFromFirstHit();
+      }
       const TVector3& distanceVec = firstBKLMHitPosition - pos;
       state.extrapolateToPoint(firstBKLMHitPosition);
-      double newDistance = distanceVec.Mag2();
-      // two points on the track, (x1,TrkParam[0]+TrkParam[1]*x1, TrkParam[2]+TrkParam[3]*x1),
-      // and (x2,TrkParam[0]+TrkParam[1]*x2, TrkParam[2]+TrkParam[3]*x2),
-      // then we got the vector (x2-x1,....), that is same with (1,TrkParam[1], TrkParam[3]).
-      TVector3 trkVec(1, bklmTrk->getTrackParam()[1], bklmTrk->getTrackParam()[3]);
-      double angle = trkVec.Angle(mom);
+      double newDistanceSq = distanceVec.Mag2();
+      double angle = bklmTrkVec.Angle(mom);
       // choose closest distance or minimum open angle ?
       // overwrite old distance
-      if (newDistance < oldDistance) {
-        oldDistance = newDistance;
+      if (newDistanceSq < oldDistanceSq) {
+        oldDistanceSq = newDistanceSq;
         closestTrack = &track;
-        //poca = pos;
         oldAngle = angle;
       }
 

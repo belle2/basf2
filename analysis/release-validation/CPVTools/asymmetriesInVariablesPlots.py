@@ -298,7 +298,7 @@ for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
         if category == "Lambda" and inputVariable == 'distance':
             variablesPlotParamsDict[inputVariable][5] = r"{\rm cm}\, "
 
-        binWidth = '{:8.2f}'.format(binWidth)
+        binWidth = f'{binWidth:8.2f}'
 
         legendLocation = 1
         ax1.set_ylabel(r'${\rm Fraction\hspace{0.25em} of\hspace{0.25em} Events}\, /\, (\, ' + binWidth + r'\, ' +

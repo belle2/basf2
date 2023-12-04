@@ -364,10 +364,10 @@ def draw_progress_bar(delete_lines: int, scripts: List[Script], barlength=50):
 
     @param delete_lines: The amount of lines which need to be deleted before
         we can redraw the progress bar
-    @param scripts: List of all Script obejcts
-    @param barlength: The length of the progess bar (in characters)
+    @param scripts: List of all Script objects
+    @param barlength: The length of the progress bar (in characters)
     @return: The number of lines that were printed by this function call.
-        Usefule if this function is called repeatedly.
+        Useful if this function is called repeatedly.
     """
 
     # Get statistics: Number of finished scripts + number of scripts in total
@@ -560,7 +560,7 @@ class Validation:
     @staticmethod
     def get_available_job_control():
         """
-        insert the possible backend controls, they will be checed via their
+        insert the possible backend controls, they will be checked via their
         is_supported method if they actually can be executed in the current
         environment
         """
@@ -737,7 +737,7 @@ class Validation:
                 ):
                     self.scripts.append(script)
 
-        # Thats it, now there is a complete list of all steering files on
+        # That's it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.scripts
 
     def get_log_folder(self):
@@ -1049,7 +1049,7 @@ class Validation:
 
     def add_script(self, script: Script):
         """!
-        Explictly add a script object. In normal operation, scripts are
+        Explicitly add a script object. In normal operation, scripts are
         auto-discovered but this method is useful for testing
         """
 
@@ -1378,6 +1378,40 @@ class Validation:
 
         validationplots.create_plots(force=True, work_folder=self.work_folder)
 
+    def save_metadata(self):
+        """!
+        This method fetches the metadata of all the data files produced
+        during the validation run and saves them in individual text files of the
+        same name (with .txt appended at the end) inside the results folder.
+        @return: None
+        """
+
+        result_folder = self.get_log_folder()
+
+        if not os.path.exists(result_folder):
+            self.log.error(
+                f"Folder {result_folder} not found in "
+                f"the work directory {self.work_folder}, please run "
+                f"b2validation first"
+            )
+
+        # Loop through all the *.root files in the current result
+        for file in os.listdir(result_folder):
+            if file.endswith(".root"):
+                metadata = validationfunctions.get_file_metadata(
+                    os.path.join(result_folder, file))
+                if metadata:
+                    metadata_file = os.path.join(result_folder, f'{file}.txt')
+                    # Remove old metadata file if it exists
+                    try:
+                        os.remove(metadata_file)
+                    except FileNotFoundError:
+                        pass
+                    with open(metadata_file, 'a') as out:
+                        out.write(f'{metadata}\n')
+                else:
+                    self.log.debug(f"b2file-metadata-show failed for {file}.")
+
 
 def execute(tag=None, is_test=None):
     """!
@@ -1403,8 +1437,8 @@ def execute(tag=None, is_test=None):
     ):
         sys.exit("Error: No basf2 release set up!")
 
-    # Otherwise we can start the execution. The mainpart is wrapped in a
-    # try/except-contruct to fetch keyboard interrupts
+    # Otherwise we can start the execution. The main part is wrapped in a
+    # try/except-construct to fetch keyboard interrupts
     # fixme: except instructions make only sense after Validation obj is
     #   initialized ==> Pull everything until there out of try statement
     try:
@@ -1466,7 +1500,7 @@ def execute(tag=None, is_test=None):
             )
             validation.dry = True
 
-        # If running in test mode, only execute scripts in validation packgase
+        # If running in test mode, only execute scripts in validation package
         if cmd_arguments.test:
             validation.log.note("Running in test mode")
             validation.ignored_packages = []
@@ -1565,7 +1599,7 @@ def execute(tag=None, is_test=None):
                     incremental = None
                 mails.send_all_mails(incremental=incremental)
                 validation.log.note(
-                    "Save mail data to {}".format(validation.get_log_folder())
+                    f"Save mail data to {validation.get_log_folder()}"
                 )
                 # save json with data about outgoing mails
                 mails.write_log()
@@ -1575,6 +1609,8 @@ def execute(tag=None, is_test=None):
             )
 
         validation.report_on_scripts()
+
+        validation.save_metadata()
 
         # Log that everything is finished
         validation.log.note(

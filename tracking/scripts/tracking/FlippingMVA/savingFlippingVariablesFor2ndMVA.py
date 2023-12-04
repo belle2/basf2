@@ -97,6 +97,13 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
         quality_2ndflip_indicator = nan
         isPrimary_misID = False
         ismatched = False
+        ismatched_CC = False
+        ismatched_WC = False
+        isclone_CC = False
+        isclone_WC = False
+        isclone = False
+        isbackground = False
+        isghost = False
         isprimary = False
         charge_truth = nan
         track_charge = nan
@@ -118,12 +125,25 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
             InOutArmTimeDifference = recoTrack.getInOutArmTimeDifference()
             InOutArmTimeDifferenceError = recoTrack.getInOutArmTimeDifferenceError()
 
-            ismatched = track_match_look_up.isMatchedPRRecoTrack(recoTrack)
+            quality_flip_indicator = recoTrack.getFlipQualityIndicator()
+            quality_2ndflip_indicator = recoTrack.get2ndFlipQualityIndicator()
+
+            ismatched = track_match_look_up.isAnyChargeMatchedPRRecoTrack(recoTrack)
+            ismatched_CC = track_match_look_up.isCorrectChargeMatchedPRRecoTrack(recoTrack)
+            ismatched_WC = track_match_look_up.isWrongChargeMatchedPRRecoTrack(recoTrack)
+
+            isclone = track_match_look_up.isAnyChargeClonePRRecoTrack(recoTrack)
+            isclone_CC = track_match_look_up.isCorrectChargeClonePRRecoTrack(recoTrack)
+            isclone_WC = track_match_look_up.isWrongChargeClonePRRecoTrack(recoTrack)
+
+            isbackground = track_match_look_up.isBackgroundPRRecoTrack(recoTrack)
+            isghost = track_match_look_up.isGhostPRRecoTrack(recoTrack)
+
             if mc_particle and fit_result:
                 isprimary = bool(mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle))
                 charge_truth = mc_particle.getCharge()
+                track_charge = fit_result.getChargeSign()
                 if isprimary:
-                    track_charge = fit_result.getChargeSign()
                     if charge_truth != track_charge:
                         isPrimary_misID = True
 
@@ -187,9 +207,6 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
                         flipped_py_variance = cov6_flipped(4, 4)
                         flipped_p_value = fit_result_flipped.getPValue()
 
-                        quality_flip_indicator = recoTrack.getFlipQualityIndicator()
-                        quality_2ndflip_indicator = recoTrack.get2ndFlipQualityIndicator()
-
         crops = dict(
             flipped_pz_estimate=flipped_pz_estimate,
             y_variance=y_variance,
@@ -230,6 +247,13 @@ class Saving2ndMVAData(harvesting.HarvestingModule):
             quality_2ndflip_indicator=quality_2ndflip_indicator,
             isPrimary_misID=isPrimary_misID,
             ismatched=ismatched,
+            ismatched_CC=ismatched_CC,
+            ismatched_WC=ismatched_WC,
+            isclone_CC=isclone_CC,
+            isclone_WC=isclone_WC,
+            isclone=isclone,
+            isbackground=isbackground,
+            isghost=isghost,
             isprimary=isprimary,
             charge_truth=charge_truth,
             track_charge=track_charge,

@@ -21,8 +21,7 @@
 
 #include <TFile.h>
 
-#include <boost/filesystem.hpp>
-
+#include <filesystem>
 #include <iostream>
 #include <string>
 
@@ -201,7 +200,7 @@ namespace {
       GlobalLabel::clearTimeDependentParamaters();
       GlobalLabel::setCurrentTimeInterval(0);
 
-      boost::filesystem::remove_all("testPayloads");
+      std::filesystem::remove_all("testPayloads");
       Database::reset();
       DataStore::Instance().reset();
     }

@@ -2,8 +2,8 @@
 [INFO] The random number seed is set to "\m/"
 [INFO] Starting event processing, random seed is set to '\m/'
 [INFO] Added file ${BELLE2_SOFTWARE_DIR}/mdst/tests/mdst-v05-00-00.root
-[INFO] Conditions Database: found working server
-	url = http://belle2db.sdcc.bnl.gov/b2s/rest/
+[INFO] Conditions Database: found working metadata provider
+	provider = ${BELLE2_CONDB_METADATA}
 [INFO] Conditions data: configured globaltags (highest priority first) are release-05-00-00, Legacy_CollisionAxisCMS
 [WARNING] The requested output trigger name does not exist
 	name = INVALID_INPUT

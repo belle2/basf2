@@ -23,6 +23,9 @@
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
 #include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
+#include <reconstruction/utility/CDCDedxMeanPred.h>
+#include <reconstruction/utility/CDCDedxSigmaPred.h>
+#include <framework/gearbox/Const.h>
 
 // namespace constants
 namespace numdedx {
@@ -81,6 +84,16 @@ namespace Belle2 {
     }
 
     /**
+    * function to set chi hist parameters
+    */
+    void setChiPars(int value, double min, double max)
+    {
+      m_chiBins = value;
+      m_chiMin = min;
+      m_chiMax = max;
+    }
+
+    /**
     * function to perform gaus fit for input histogram
     */
     void fitGaussianWRange(TH1D*& temphist, fstatus& status);
@@ -119,7 +132,14 @@ namespace Belle2 {
     /**
     * function to store payloads after full calibration
     */
-    void createPayload(std::array<double, numdedx::nrings>& scale);
+    void createPayload(std::array<double, numdedx::nrings>& scale, std::map<int, std::vector<double>>& vmeans,
+                       std::map<int, std::vector<double>>& varscal, std::string svar);
+
+    /**
+    * function to get mean and reso of histogram
+    */
+    void getMeanReso(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar,
+                     std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos);
 
     /**
     * function to draw event/track statistics plots
@@ -127,22 +147,26 @@ namespace Belle2 {
     void plotEventStats();
 
     /**
-    * function to draw dedx and time dist.
+    * function to draw dedx, chi and time dist.
     */
     void plotBinLevelDist(std::array<std::vector<TH1D*>, numdedx::nrings>& hvar, std::string var);
 
     /**
-    * function to relative constant from dedx fit mean/reso
+    * function to relative constant from dedx fit mean and chi fit reso
     */
-    void plotRelConstants(std::map<int, std::vector<double>>& meancorr, std::map<int, std::vector<double>>& resocorr,
-                          std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos,
-                          std::array<std::vector<TH1D*>, numdedx::nrings>& htime);
+    void plotRelConstants(std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos,
+                          std::map<int, std::vector<double>>& corr, std::string svar);
+
+    /**
+    * function to draw time stats
+    */
+    void plotTimeStat(std::array<std::vector<TH1D*>, numdedx::nrings>& htime);
 
     /**
     * function to final constant from merging or abs fits
     */
     void plotFinalConstants(std::map<int, std::vector<double>>& vmeans, std::map<int, std::vector<double>>& vresos,
-                            std::array<double, numdedx::nrings>& scale);
+                            std::array<double, numdedx::nrings>& scale,  std::array<double, numdedx::nrings>& scale_reso);
 
     /**
     * function to injection time distributions (HER/LER in three bins)
@@ -201,6 +225,12 @@ namespace Belle2 {
       }
     }
 
+    /**
+    * function to get the correction factor of mean
+    */
+    double getCorrection(unsigned int ring, unsigned int time, std::map<int, std::vector<double>>&  vmeans);
+
+
   protected:
 
     /**
@@ -223,6 +253,10 @@ namespace Belle2 {
     int m_dedxBins; /**< bins for dedx histogram */
     double m_dedxMin; /**< min range of dedx */
     double m_dedxMax; /**< max range of dedx */
+
+    int m_chiBins; /**< bins for chi histogram */
+    double m_chiMin; /**< min range of chi */
+    double m_chiMax; /**< max range of chi */
 
     int m_countR; /**< a hack for running functions once */
     int m_thersE; /**< min tracks to start calibration */

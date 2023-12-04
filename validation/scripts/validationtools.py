@@ -21,7 +21,7 @@ def update_env():
     """Update the environment with b2setup
 
     This is very annoying as there is no way for sub processes to modify the
-    parent environment. And also b2setup ist not inherited by sub shells. So we
+    parent environment. And also b2setup is not inherited by sub shells. So we
     have to run bash, source the tools, run b2setup and get all the environment
     variables from the output.
     """

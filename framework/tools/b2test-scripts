@@ -176,15 +176,15 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = "A CellExecutionError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A CellExecutionError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
         extra = str(ce)
     except TimeoutError as te:
         result = False
-        message = "A TimeoutError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A TimeoutError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
         extra = str(te)
     except RuntimeError as re:
         result = False
-        message = "A RuntimeError happened. Please re-run the build if this failure happened on bamboo."
+        message = "A RuntimeError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
         extra = str(re)
 
     time = timeit.default_timer() - time_start
@@ -370,10 +370,13 @@ def executor(options, prepare_step):
     # let's collect all tests
     all_tests = []
     processed_dirs = []
+    release_dir = ''
     if "BELLE2_LOCAL_DIR" in os.environ:
         all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs, prepare_step)
+        release_dir = os.environ['BELLE2_LOCAL_DIR']
     if "BELLE2_RELEASE_DIR" in os.environ:
         all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs, prepare_step)
+        release_dir = os.environ['BELLE2_RELEASE_DIR']
 
     for name, invert in [("filter", False), ("exclude", True)]:
         arg = getattr(options, name)
@@ -386,6 +389,19 @@ def executor(options, prepare_step):
             all_tests = [e for e in all_tests if (re_filter.search(e[0]) is not None) != invert]
 
     all_tests.sort()
+
+    # Small hack for scheduling the slowest tests first
+    # to be removed/improved via getting the list as input
+    slowest_tests = [
+        (os.path.join('tracking', 'tests', 'tracking_doxygen_check.py'), release_dir),
+        (os.path.join('framework', 'tests', 'sphinx.py'), release_dir),
+        (os.path.join('mva', 'tests', 'all_classifiers.py'), release_dir),
+        (os.path.join('online_book', 'tests', 'steering_files.py'), release_dir),
+        (os.path.join('framework', 'tests', 'signals.py'), release_dir),
+    ]
+    for t in reversed(slowest_tests):
+        if t in all_tests:
+            all_tests.insert(0, all_tests.pop(all_tests.index(t)))
     print(f"Collected {len(all_tests)} tests...", flush=True)
 
     # now let's run them, either in multiprocessing or in a single process

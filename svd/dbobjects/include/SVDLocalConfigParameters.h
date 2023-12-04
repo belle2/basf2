@@ -31,7 +31,6 @@ namespace Belle2 {
     {};
     /**
      * Returns the injected charge during the calibration run
-     * @param none
      * @return float corresponding to injected charge
      */
     float getInjectedCharge(void) const { return m_injectedCharge; };
@@ -39,7 +38,6 @@ namespace Belle2 {
     /**
      * Returns the time units in which the peak time of the pulse
      * shape is provided.
-     * @param none
      * @return float corresponding to calibration time units [Accelerator RFC converted in ns]
      */
     float getCalibrationTimeInRFCUnits(void) const
@@ -53,7 +51,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns the time stamp date_hour (yyyymmdd_hhmm) of the current calibration     * @param none
+     * Returns the time stamp date_hour (yyyymmdd_hhmm) of the current calibration
      * @return string corresponding to the time stamp of the current calibration in the format yyyymmdd_hhmm.
      */
     std::string getCalibDate(void) const { return m_calibDate; };

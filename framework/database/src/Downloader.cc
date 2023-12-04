@@ -201,6 +201,7 @@ namespace Belle2::Conditions {
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYPEER, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYHOST, 0L);
     curl_easy_setopt(m_session->curl, CURLOPT_SSL_VERIFYSTATUS, 0L);
+    curl_easy_setopt(m_session->curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_WHATEVER);
     // Don't cache DNS entries, ask the system every time we need to connect ...
     curl_easy_setopt(m_session->curl, CURLOPT_DNS_CACHE_TIMEOUT, 0L);
     // and shuffle the addresses so we try a different node, otherwise we might

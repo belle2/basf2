@@ -14,11 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <vxd/dataobjects/VxdID.h>
 
 #include <TH2F.h>
@@ -67,8 +62,6 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     //! u binning for 2d plots
     int m_u_bins;
     //! v binning for 2d plots
@@ -85,6 +78,8 @@ namespace Belle2 {
     bool m_perModuleAlarm;
     /** generate alarm from adhoc values */
     bool m_alarmAdhoc;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -127,13 +122,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-#ifdef _BELLE2_EPICS
-    //! EPICS PVs for Status
-    std::vector <chid>  mychid_status;
-    //! EPICS PVs for Efficiency
-    std::map <VxdID, chid> mychid_eff;
-#endif
   };
 } // end namespace Belle2
 

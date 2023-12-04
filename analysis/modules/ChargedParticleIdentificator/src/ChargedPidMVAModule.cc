@@ -158,9 +158,7 @@ void ChargedPidMVAModule::event()
         // LEGACY TRAININGS: always require a track-cluster match.
         const ECLCluster* eclCluster = particle->getECLCluster();
         if (!eclCluster) {
-          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
-          }
+          B2DEBUG(11, "\nParticle [" << ipart << "] has invalid Track-ECLCluster relation, skip MVA application...");
           continue;
         }
       }
@@ -172,6 +170,12 @@ void ChargedPidMVAModule::event()
       auto p = particle->getP();
       // Set a dummy charge of zero to pick charge-independent payloads, if requested.
       auto charge = (!m_charge_independent) ? particle->getCharge() : 0.0;
+      if (std::isnan(theta) or std::isnan(p) or std::isnan(charge)) {
+        B2DEBUG(11, "\nParticle [" << ipart << "] has invalid input variable, skip MVA application..." <<
+                " polar angle: " << theta << ", p: " << p << ", charge: " << charge);
+        continue;
+      }
+
       int idx_theta, idx_p, idx_charge;
       auto index = (*m_weightfiles_representation.get())->getMVAWeightIdx(theta, p, charge, idx_theta, idx_p, idx_charge);
 
@@ -199,14 +203,10 @@ void ChargedPidMVAModule::event()
 
       // Don't even bother if particle does not fulfil the category selection.
       if (m_cuts.at(index)) {
-
         if (!m_cuts.at(index)->check(particle)) {
-          if (LogSystem::Instance().isLevelEnabled(LogConfig::c_Debug, 11)) {
-            B2WARNING("\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
-          }
+          B2DEBUG(11, "\nParticle [" << ipart << "] didn't pass MVA category cut, skip MVA application...");
           continue;
         }
-
       }
 
       // Fill the MVA::SingleDataset w/ variables and spectators.

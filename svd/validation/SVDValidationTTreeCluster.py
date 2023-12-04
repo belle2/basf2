@@ -27,7 +27,7 @@ import basf2 as b2
 import ROOT
 from ROOT import Belle2
 from ROOT import gROOT, addressof
-from ROOT import TVector3
+from ROOT import Math
 
 # Define a ROOT struct to hold output data in the TTree
 gROOT.ProcessLine('struct EventDataCluster {\
@@ -199,7 +199,7 @@ class SVDValidationTTreeCluster(b2.Module):
             else:
                 uPos = 0
                 vPos = cluster_position
-            localPosition = TVector3(uPos, vPos, 0)  # sensor center at (0, 0, 0)
+            localPosition = Math.XYZVector(uPos, vPos, 0)  # sensor center at (0, 0, 0)
             globalPosition = sensorInfo.pointToGlobal(localPosition, True)
             x = globalPosition.X()
             y = globalPosition.Y()

@@ -17,7 +17,7 @@ Enddecay
 
 Decay B0sig
 0.5  rho+ pi-          PHOTOS SVS;
-0.5  rho- pi+	       PHOTOS SVS;
+0.5  rho- pi+	         PHOTOS SVS;
 Enddecay
 CDecay anti-B0sig
 

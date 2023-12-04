@@ -565,7 +565,7 @@ particles themselves need to be written in the decay string.
     electron-positron combinations, and then combining them with a :math:`K_S^0` to
     form :math:`B^0` candidates.
 
-    Include a ``dM < 0.11`` cut for the :math:`J/\Psi`.
+    Include a ``abs(dM) < 0.11`` cut for the :math:`J/\Psi`.
 
 .. admonition:: Hint
     :class: toggle xhint stacked
@@ -994,7 +994,7 @@ or `matchedMC`.
 .. seealso::
 
     Some more example steering files that center around the `VariableManager`
-    can be found `on stash <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager>`_.
+    can be found `on GitLab <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager>`_.
 
 .. admonition:: Exercise
     :class: exercise

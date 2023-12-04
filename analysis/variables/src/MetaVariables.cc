@@ -2048,6 +2048,7 @@ namespace Belle2 {
           }
 
           MCParticle* mcUpsilon4S = mcParticles[0];
+          if (mcUpsilon4S->isInitial()) mcUpsilon4S = mcParticles[2];
           if (mcUpsilon4S->getPDG() != 300553)
           {
             return Const::doubleNaN;
@@ -3149,6 +3150,47 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() != 1) {
+        B2FATAL("Number of arguments for nTrackFitResults must be 1, particleType or PDGcode");
+      }
+
+      std::string arg = arguments[0];
+      TParticlePDG* part = TDatabasePDG::Instance()->GetParticle(arg.c_str());
+      int absPdg;
+      if (part != nullptr) {
+        absPdg = std::abs(part->PdgCode());
+      } else {
+        try {
+          absPdg = Belle2::convertString<int>(arg);
+        } catch (std::exception& e) {}
+      }
+
+      auto func = [absPdg](const Particle*) -> int {
+
+        Const::ChargedStable type(absPdg);
+        StoreArray<Track> tracks;
+
+        int nTrackFitResults = 0;
+
+        for (int i = 0; i < tracks.getEntries(); i++)
+        {
+          const Track* track = tracks[i];
+          const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
+
+          if (!trackFit) continue;
+          if (trackFit->getChargeSign() == 0) continue;
+
+          nTrackFitResults++;
+        }
+
+        return nTrackFitResults;
+
+      };
+      return func;
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_METAVARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                           "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -3325,18 +3367,16 @@ The arguments of the function must be the ``index`` of the particle in the MCPar
 and ``variable``, the name of the function or variable for that generator particle.
 If ``index`` goes beyond the length of the MCParticles array, NaN will be returned.
 
-E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which is
-the Upsilon(4S) in a generic decay.
-``genParticle(0, mcDaughter(1, p)`` returns the total momentum of the second daughter of
-the first MC Particle, which is the momentum of the second B meson in a generic decay.
+E.g. ``genParticle(0, p)`` returns the total momentum of the first MCParticle, which in a generic decay up to MC15 is
+the Upsilon(4S) and for MC16 and beyond the initial electron.
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("genUpsilon4S(variable)", genUpsilon4S, R"DOC(
 [Eventbased] Returns the ``variable`` evaluated for the generator-level :math:`\Upsilon(4S)`.
 If no generator level :math:`\Upsilon(4S)` exists for the event, NaN will be returned.
 
 E.g. ``genUpsilon4S(p)`` returns the total momentum of the :math:`\Upsilon(4S)` in a generic decay.
-``genUpsilon4S(mcDaughter(1, p)`` returns the total momentum of the second daughter of the
-generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in a generic decay.
+``genUpsilon4S(mcDaughter(1, p))`` returns the total momentum of the second daughter of the
+generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in a generic decay).
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterProductOf(variable)", daughterProductOf,
                       "Returns product of a variable over all daughters.\n"
@@ -3623,7 +3663,11 @@ Returns a ``variable`` calculated using new mass hypotheses for (some of) the pa
 
 )DOC", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("varForFirstMCAncestorOfType(type, variable)",varForFirstMCAncestorOfType,R"DOC(Returns requested variable of the first ancestor of the given type.
-Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double)
+Ancestor type can be set up by PDG code or by particle name (check evt.pdl for valid particle names))DOC", Manager::VariableDataType::c_double);
+
+    REGISTER_METAVARIABLE("nTrackFitResults(particleType)", nTrackFitResults,
+			  "[Eventbased] Returns the total number of TrackFitResults for a given particleType. The argument can be the name of particle (e.g. pi+) or PDG code (e.g. 211).",
+			  Manager::VariableDataType::c_int);
 
   }
 }

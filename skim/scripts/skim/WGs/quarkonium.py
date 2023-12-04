@@ -289,3 +289,72 @@ class InclusiveLambda(BaseSkim):
 
         # Return the lists.
         return ["Lambda0:merged"]
+
+
+@fancy_skim_header
+class InclusiveUpsilon(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * Upsilon(1S,2S,3S) -> l^+ l^- (l = e or mu)
+
+    Selection criteria:
+
+    * 2 tracks with electronID_noTOP > 0.1 or muonID > 0.1 and 9 < M < 10.6.
+      Track-quality requirements are not applied.
+      foxWolframR2 < 0.995
+    """
+    __authors__ = ["Sen Jia"]
+    __description__ = "Inclusive Upsilon(1S,2S,3S) skim"
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    def load_standard_lists(self, path):
+        stdMu('loosepid', path=path)
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+
+        # Electron list. Exclude TOP
+        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1', path=path)
+
+        # Mass cuts.
+        Upsilon_mass_cut = '9 < M < 10.6'
+
+        # Electrons with bremsstrahlung correction.
+        ma.correctBremsBelle('e+:brems', 'e+:loosepid_noTOP', 'gamma:all',
+                             angleThreshold=0.05,
+                             path=path)
+        ma.correctBrems('e+:brems2', 'e+:loosepid_noTOP', 'gamma:all', path=path)
+
+        # Reconstruct Upsilon(1S,2S,3S).
+        ma.reconstructDecay('Upsilon:ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
+                            Upsilon_mass_cut, path=path)
+        ma.reconstructDecay('Upsilon:eebrems -> e+:brems e-:brems',
+                            Upsilon_mass_cut, path=path)
+        ma.reconstructDecay('Upsilon:eebrems2 -> e+:brems2 e-:brems2',
+                            Upsilon_mass_cut, path=path)
+        ma.reconstructDecay('Upsilon:mumu -> mu+:loosepid mu-:loosepid',
+                            Upsilon_mass_cut, path=path)
+        ma.copyLists("Upsilon:all", ["Upsilon:ee", "Upsilon:eebrems", "Upsilon:eebrems2", "Upsilon:mumu"], path=path)
+
+        # require foxWolframR2 < 0.995
+        ma.fillParticleList(decayString="pi+:BottomoniumUpsilon_eventshape", cut="pt > 0.1", path=path)
+        ma.fillParticleList(decayString="gamma:BottomoniumUpsilon_eventshape", cut="E > 0.1", path=path)
+
+        ma.buildEventShape(inputListNames=["pi+:BottomoniumUpsilon_eventshape", "gamma:BottomoniumUpsilon_eventshape"],
+                           allMoments=False,
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=False,
+                           path=path)
+
+        ma.applyCuts("Upsilon:all", "foxWolframR2 < 0.995", path=path)
+
+        # Return the lists.
+        return ['Upsilon:all']

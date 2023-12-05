@@ -724,9 +724,9 @@ Decay B+Rare
 0.000010700   f'_0  K+                                     PHSP; #UL
 0.000004400   f_0(1500)  K+                                PHSP; #UL
 0.000003000   f'_0  pi+                                    PHSP; #UL
-0.000003400   f'_2  K+                                     STS;     #UL
-0.000012000   K''*0  pi+                                   SVS;     #UL
-0.000000590   K*0  K+                                      SVS;     #[BF update - PG 09/2020]
+0.000003400   f'_2  K+                                     STS;  #UL
+0.000012000   K''*0  pi+                                   SVS;  #UL
+0.000000590   K*0  K+                                      SVS;  #[BF update - PG 09/2020]
 0.000005000   rho(3S)0  K+                                 SVS;
 0.000005000   rho(2S)+  K0                                 SVS;
 0.000002500   rho(3S)+  K0                                 SVS;
@@ -736,7 +736,7 @@ Decay B+Rare
 
 # TP
 #
-0.000001100   a_20  K+                                     STS;     #UL
+0.000001100   a_20  K+                                     STS;  #UL
 
 # KKK
 #
@@ -1870,9 +1870,9 @@ Decay B-Rare
 0.000010700   f'_0  K-                                     PHSP; #UL
 0.000004400   f_0(1500)  K-                                PHSP; #UL
 0.000003000   f'_0  pi-                                    PHSP; #UL
-0.000003400   f'_2  K-                                     STS;     #UL
-0.000012000   anti-K''*0  pi-                              SVS;     #UL
-0.000000590   anti-K*0  K-                                 SVS;     #[BF update - PG 09/2020]
+0.000003400   f'_2  K-                                     STS;  #UL
+0.000012000   anti-K''*0  pi-                              SVS;  #UL
+0.000000590   anti-K*0  K-                                 SVS;  #[BF update - PG 09/2020]
 0.000005000   rho(3S)0  K-                                 SVS;
 0.000005000   rho(2S)-  anti-K0                            SVS;
 0.000002500   rho(3S)-  anti-K0                            SVS;

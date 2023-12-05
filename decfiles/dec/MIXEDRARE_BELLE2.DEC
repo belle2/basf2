@@ -859,17 +859,17 @@ Decay B0Rare
 
 # VP
 #
-0.000003650   K_2*+  pi-                                   STS;     #[BF update - PG 09/2020]
+0.000003650   K_2*+  pi-                                   STS;  #[BF update - PG 09/2020]
 0.000003150   K_2*0  pi0                                   STS;
 0.000086000   K'*+  pi-                                    PHSP; #UL
 0.000019300   K'*0  pi0                                    PHSP; #[K0 pi0]/[K0 pi+]*[K'*0 pi+]
 0.000008200   f'_0  K0                                     PHSP; #[K0 pi0]/[K+ pi0]*[f'_0 K+]
 0.000003400   f_0(1500)  K0                                PHSP; #[K0 pi0]/[K+ pi0]*[f_0(1500) K+]
 0.000009000   rho(3S)0  K0                                 SVS;
-0.000002400   rho(2S)-  K+                                 SVS;     #[BF update - PG 09/2020]
-0.000000600   rho(3S)-  K+                                 SVS;     #[BF update - PG 09/2020]
-0.000025200   K_1+  pi-                                    SVS;     #UL
-0.000021800   K'_1+  pi-                                   SVS;     #UL
+0.000002400   rho(2S)-  K+                                 SVS;  #[BF update - PG 09/2020]
+0.000000600   rho(3S)-  K+                                 SVS;  #[BF update - PG 09/2020]
+0.000025200   K_1+  pi-                                    SVS;  #UL
+0.000021800   K'_1+  pi-                                   SVS;  #UL
 
 # PPP
 #
@@ -2170,17 +2170,17 @@ Decay anti-B0Rare
 
 # VP
 #
-0.000003650   K_2*-  pi+                                   STS;     #[BF update - PG 09/2020]
+0.000003650   K_2*-  pi+                                   STS;  #[BF update - PG 09/2020]
 0.000003150   anti-K_2*0  pi0                              STS;
 0.000086000   K'*-  pi+                                    PHSP; #UL
 0.000019300   anti-K'*0  pi0                               PHSP; #[K0 pi0]/[K0 pi+]*[K'*0 pi+]
 0.000008200   f'_0  anti-K0                                PHSP; #[K0 pi0]/[K+ pi0]*[f'_0 K+]
 0.000003400   f_0(1500)  anti-K0                           PHSP; #[K0 pi0]/[K+ pi0]*[f_0(1500) K+]
 0.000009000   rho(3S)0  anti-K0                            SVS;
-0.000002400   rho(2S)+  K-                                 SVS;     #[BF update - PG 09/2020]
-0.000000600   rho(3S)+  K-                                 SVS;     #[BF update - PG 09/2020]
-0.000025200   K_1-  pi+                                    SVS;     #UL
-0.000021800   K'_1-  pi+                                   SVS;     #UL
+0.000002400   rho(2S)+  K-                                 SVS;  #[BF update - PG 09/2020]
+0.000000600   rho(3S)+  K-                                 SVS;  #[BF update - PG 09/2020]
+0.000025200   K_1-  pi+                                    SVS;  #UL
+0.000021800   K'_1-  pi+                                   SVS;  #UL
 
 # PPP
 #

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -200,7 +199,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         totalHitListPRFake = set(totalHitListPRFake)
 
         # # All CDC Hits
-        totalHitList = set([cdcHit.getArrayIndex() for cdcHit in cdcHits])
+        totalHitList = {cdcHit.getArrayIndex() for cdcHit in cdcHits}
 
         number_of_mc_hits = len(totalHitListMC)
         number_of_pr_hits = len(totalHitListPR)
@@ -341,7 +340,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
         if self.write_tables:
             # MC Figures of merit
             mc_figures_of_merit = \
-                ValidationManyFiguresOfMerit('%s_mc_figures_of_merit' % self.validation_name)
+                ValidationManyFiguresOfMerit(f'{self.validation_name}_mc_figures_of_merit')
 
             mc_figures_of_merit['mc_pts'] = self.mc_pts
             mc_figures_of_merit['mc_d0s'] = self.mc_d0s
@@ -364,7 +363,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             # PR Figures of merit
             pr_figures_of_merit = \
-                ValidationManyFiguresOfMerit('%s_pr_figures_of_merit' % self.validation_name)
+                ValidationManyFiguresOfMerit(f'{self.validation_name}_pr_figures_of_merit')
 
             pr_figures_of_merit['pr_clones_and_matches'] = \
                 self.pr_clones_and_matches
@@ -384,7 +383,7 @@ class ExpertTrackingValidationModule(TrackingValidationModule):
 
             # Hit Figures of merit
             hit_figures_of_merit = \
-                ValidationFiguresOfMerit('%s_hit_figures_of_merit' % self.validation_name)
+                ValidationFiguresOfMerit(f'{self.validation_name}_hit_figures_of_merit')
 
             hit_figures_of_merit['number_of_total_hits'] = \
                 np.sum(self.number_of_total_hits)

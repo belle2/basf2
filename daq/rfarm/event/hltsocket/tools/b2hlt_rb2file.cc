@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
   std::string ringBufferName;
   std::string shmName;
   unsigned int shmID;
-  bool raw;
+  bool raw = false;
   std::string file_name;
 
   po::options_description desc("b2hlt_rb2socket RING-BUFFER-NAME FILE-NAME SHM-NAME SHM-ID");

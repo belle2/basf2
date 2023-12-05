@@ -155,7 +155,6 @@ int SocketIO::get_pxd(int sock, char* data, int len)
     exit(0);
   }
   int bcount = read_data(sock, data + headerlen + tablelen, datalen);
-  if (br <= 0) return br;
   return (headerlen + tablelen + bcount);
 }
 
@@ -261,12 +260,15 @@ SocketRecv::~SocketRecv()
 
 int SocketRecv::reconnect(int ntry)
 {
+  // TODO  tis code does not make sense at all, as it is listening/receiving socket
+  // TODO it looks like it was copied from SocketSend w/o
   // Close existing socket once.
   shutdown(m_sock, 2);
   ::close(m_sock);
 
   // Setup socket parameters again;
   bzero(&m_sa, sizeof(m_sa));
+  // TODO BUG m_hp is not initialized! This must crash
   bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
   m_sa.sin_family = m_hp->h_addrtype;
   m_sa.sin_port = htons((u_short)m_port);
@@ -438,8 +440,7 @@ SocketSend::SocketSend(const char* node, u_short port)
 {
   m_errno = 0;
   m_sock = -1;
-  struct hostent* hp;
-  if ((hp = gethostbyname(node)) == NULL) {
+  if ((m_hp = gethostbyname(node)) == NULL) {
     m_errno = errno;
     fprintf(stderr,
             "SocketSend::gethostbyname(%s): not found\n", node);
@@ -448,13 +449,13 @@ SocketSend::SocketSend(const char* node, u_short port)
 
   struct sockaddr_in sa;
   bzero(&sa, sizeof(sa));
-  bcopy(hp->h_addr, (char*)&sa.sin_addr, hp->h_length);
-  sa.sin_family = hp->h_addrtype;
+  bcopy(m_hp->h_addr, (char*)&sa.sin_addr, m_hp->h_length);
+  sa.sin_family = m_hp->h_addrtype;
   sa.sin_port = htons((u_short)port);
 
   int s;
   m_sock = -1;
-  if ((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
+  if ((s = socket(m_hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
     m_errno = errno;
     perror("SocketSend:socket");
     return;

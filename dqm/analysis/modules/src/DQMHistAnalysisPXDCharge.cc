@@ -38,6 +38,7 @@ DQMHistAnalysisPXDChargeModule::DQMHistAnalysisPXDChargeModule()
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDER"));
   addParam("RangeLow", m_rangeLow, "Lower boarder for fit", 30.);
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 85.);
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(99, "DQMHistAnalysisPXDCharge: Constructor done.");
 }
 
@@ -208,14 +209,17 @@ void DQMHistAnalysisPXDChargeModule::event()
 
   setEpicsPV("Status", status);
 
-  // keep this commented code as we may have excluded modules in phase4
-//   auto tt = new TLatex(5.5, 0, "1.3.2 Module is excluded, please ignore");
-//   tt->SetTextAngle(90);// Rotated
-//   tt->SetTextAlign(12);// Centered
-//   tt->Draw();
+  for (auto& it : m_excluded) {
+    auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+    tt->SetTextSize(0.035);
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+  }
 
   m_cCharge->Modified();
   m_cCharge->Update();
+  UpdateCanvas(m_cCharge);
 }
 
 void DQMHistAnalysisPXDChargeModule::endRun()

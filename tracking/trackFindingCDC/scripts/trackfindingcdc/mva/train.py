@@ -28,7 +28,7 @@ def get_truth_name(variable_names):
     try:
         truth_name = min(truth_names, key=len)
     except ValueError:
-        raise ValueError("variable_names='%s' does not contain a truth variable" % variable_names)
+        raise ValueError(f"variable_names='{variable_names}' does not contain a truth variable")
     else:
         return truth_name
 
@@ -98,8 +98,7 @@ class ClassificationOverview:
             truth_name = get_truth_name(column_names)
 
         if truth_name not in column_names:
-            raise KeyError("Truth column {truth} not in tree {tree}".format(truth=truth_name,
-                                                                            tree=tree_name))
+            raise KeyError(f"Truth column {truth_name} not in tree {tree_name}")
         variable_names = [name for name in column_names if name != truth_name]
 
         exclude = self.exclude
@@ -160,7 +159,7 @@ class ClassificationOverview:
                 if groupby is None:
                     groupby_folder_name = '.'
                 else:
-                    groupby_folder_name = "groupby_{name}_{value}".format(name=groupby, value=groupby_value)
+                    groupby_folder_name = f"groupby_{groupby}_{groupby_value}"
 
                 with root_cd(groupby_folder_name) as tdirectory:
                     for variable_name in variable_names:

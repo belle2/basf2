@@ -71,7 +71,7 @@ class SegmentQuadTreeRun(StandardEventGenerationRun):
 
     def create_path(self):
         """ Make SegmentFinding and QuadTreeFinding and plotting/display/validation"""
-        main_path = super(SegmentQuadTreeRun, self).create_path()
+        main_path = super().create_path()
 
         add_mc_track_finder(main_path)
         main_path.add_module("TFCDC_WireHitPreparer")

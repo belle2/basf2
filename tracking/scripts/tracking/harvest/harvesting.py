@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -80,7 +78,7 @@ def harvest(foreach="", pick=None, name=None, output_file_name=None, show_result
 
     def harvest_decorator(peel_func):
         name_or_default = name or peel_func.__name__
-        output_file_name_or_default = output_file_name or "{}.root".format(name_or_default)
+        output_file_name_or_default = output_file_name or f"{name_or_default}.root"
         harvesting_module = HarvestingModule(foreach=foreach,
                                              output_file_name=output_file_name_or_default,
                                              name=name_or_default,
@@ -320,10 +318,7 @@ class HarvestingModule(basf2.Module):
                     crops[part_name] = np.array(parts)
 
         else:
-            msg = "Unrecognised crop {} of type {}".format(
-                crop,
-                type(crop)
-            )
+            msg = f"Unrecognised crop {crop} of type {type(crop)}"
             raise ValueError(msg)
 
         #: the dictionaries from peel as a numpy.array of doubles
@@ -350,22 +345,18 @@ class HarvestingModule(basf2.Module):
         if foreach is not None:
             if foreach_is_store_array:
                 store_array = Belle2.PyStoreArray(self.foreach)
-                for crop in store_array:
-                    yield crop
+                yield from store_array
 
             elif foreach_is_store_obj:
                 store_obj = Belle2.PyStoreObj(self.foreach)
                 try:
-                    for crop in self.iter_store_obj(store_obj):
-                        yield crop
+                    yield from self.iter_store_obj(store_obj)
                 except TypeError:
                     # Cannot iter the store object. Yield it instead.
                     yield store_obj.obj()
 
             else:
-                msg = "Name {} does not refer to a valid object on the data store".format(
-                    self.foreach
-                )
+                msg = f"Name {self.foreach} does not refer to a valid object on the data store"
                 raise KeyError(msg)
         else:
             yield None

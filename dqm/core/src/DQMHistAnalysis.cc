@@ -592,3 +592,55 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
   }
   return false;
 }
+
+DQMHistAnalysisModule::EStatus DQMHistAnalysisModule::makeStatus(bool enough, bool warn_flag, bool error_flag)
+{
+  // white color is the default, if no colorize
+  if (!enough) {
+    return (c_TooFew);
+  } else {
+    if (error_flag) {
+      return (c_Error);
+    } else if (warn_flag) {
+      return (c_Warning);
+    } else {
+      return (c_Good);
+    }
+  }
+
+  return (c_Default); // default, but should not be reached
+}
+
+void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
+{
+  if (!canvas) return;
+  // white color is the default, if no colorize
+  int color;
+  switch (stat) {
+    case c_TooFew:
+      color = kGray; // Magenta or Gray
+      break;
+    case c_Default:
+      color = kWhite; // default no colors
+      break;
+    case c_Good:
+      color = kGreen; // Good
+      break;
+    case c_Warning:
+      color = kYellow; // Warning
+      break;
+    case c_Error:
+      color = kRed; // Severe
+      break;
+    default:
+      color = kWhite; // default no colors
+      break;
+  }
+
+  canvas->Pad()->SetFillColor(color);
+
+  canvas->Pad()->SetFrameFillColor(kWhite - 1); // White
+  canvas->Pad()->SetFrameFillStyle(1001);// White
+  canvas->Pad()->Modified();
+  canvas->Pad()->Update();
+}

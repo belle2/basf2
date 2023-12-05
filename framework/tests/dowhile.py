@@ -26,7 +26,7 @@ class TestDoWhile(Module):
         """Print the current iteration for this event as well as the first five random numbers"""
         weight = self.eventInfo.getGeneratedWeight()
         B2INFO(f"Current Iteration: {weight}")
-        rndm = ["%.4f" % gRandom.Rndm() for i in range(5)]
+        rndm = [f"{gRandom.Rndm():.4f}" for i in range(5)]
         B2INFO(f"First 5 random numbers: {rndm}")
         weight += 1
         self.eventInfo.setGeneratedWeight(weight)

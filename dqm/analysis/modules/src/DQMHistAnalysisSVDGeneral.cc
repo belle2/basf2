@@ -369,16 +369,15 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cUnpacker->SetFillColor(kRed);
       m_cUnpacker->SetFrameFillColor(10);
     }
+    setEpicsPV("UnpackError", h->GetEntries() / nEvents);
+
+    m_cUnpacker->cd();
+    h->Draw("colztext");
+    h->SetStats(0);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->SetFillColor(kRed);
   }
-
-  setEpicsPV("UnpackError", h->GetEntries() / nEvents);
-
-  m_cUnpacker->cd();
-  h->Draw("colztext");
-  h->SetStats(0);
 
   m_cUnpacker->Modified();
   m_cUnpacker->Update();

@@ -1230,6 +1230,9 @@ std::string Particle::getInfoHTML() const
   stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
   stream << "<br>";
 
+  stream << " <b>Energy loss correction</b>=" << m_energyLossCorrection;
+  stream << "<br>";
+
   stream << " <b>position</b>=" << HTML::getString(ROOT::Math::XYZVector(m_x, m_y, m_z));
   stream << "<br>";
 

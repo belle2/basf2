@@ -15,45 +15,16 @@
 #include <analysis/dataobjects/Particle.h>
 
 namespace Belle2 {
+
   /**
-  *This set of module is designed for tracking systematics studies
-  *
+  * Tracking momentum systematics module: allows for the application of a corrective momentum scale factor which is read from a ParticleWeightingLookUpTable payload
   */
-
-
-  /**
-   * Tracking efficiency systematics
-   */
-  class TrackingEfficiencyModule : public Module {
-  public:
-
-    /**
-    * Constructor: Sets the description, the properties and the parameters of the module.
-    */
-    TrackingEfficiencyModule();
-
-    /**
-    * Function to be executed at each event
-    */
-    virtual void event() override;
-
-  private:
-    /** input particle lists */
-    std::vector<std::string> m_ParticleLists;
-    /** fraction of particles to be removed from the particlelist */
-    double m_frac;
-  }; //TrackingEfficiencyModule
-
-
-  /**
-  * Tracking momentum systematics
-  */
-  class TrackingMomentumModule : public Module {
+  class TrackingMomentumScaleFactorsModule : public Module {
   public:
     /**
     * Constructor: Sets the description, the properties and the parameters of the module.
     */
-    TrackingMomentumModule();
+    TrackingMomentumScaleFactorsModule();
 
     /**
     * Initializes the modules and checks the validity of the input parameters
@@ -104,7 +75,7 @@ namespace Belle2 {
      */
     void setMomentumSmearingFactor(Particle* particle);
 
-  }; // TrackingMomentumModule
+  }; // TrackingMomentumScaleFactorsModule
 
 }; //namespace
 

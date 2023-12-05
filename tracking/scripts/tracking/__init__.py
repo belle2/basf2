@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -54,9 +53,13 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
 
-    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
+    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD SpacePoint CKF<tracking_cdc2svd_ckf>`
 
     #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
+
+    #. CDC standalone tracks which don't have SVD hits attached to them from the \
+    :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>` are combined with SVD standalone tracks found in the previous step using the \
+    :ref:`CDC to SVD Seed CKF<tracking_svdcdc_merger_ckf>`
 
     #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
 

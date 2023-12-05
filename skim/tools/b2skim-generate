@@ -186,7 +186,7 @@ def main():
         mdstOutput=args.skimmed_mdst_output,
         backward_compatibility=(not args.no_backward_compatibility),
         analysis_globaltag=args.analysis_globaltag,
-        pid_globaltag=args.pid_globaltag
+        pid_globaltag=args.pid_globaltag,
         udst_output_name = args.udst_output_name
     )
 

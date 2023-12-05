@@ -71,6 +71,8 @@ namespace Belle2 {
     double m_hierrorlimit{NAN};
     /** Update entry intervall */
     int m_minEntries = 1000;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

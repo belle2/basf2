@@ -293,9 +293,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     hist_hadronb2_over_bhabha_all->Draw();
     hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
                                  hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
-                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2"));
-    cout << "hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin(accept_hadronb2))" <<
-         hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2"));
+                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
 
     B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
     setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);

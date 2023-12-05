@@ -71,7 +71,7 @@ void ParticleWeightingModule::initialize()
   m_ParticleWeightingLookUpTable = std::make_unique<OptionalDBObjPtr<ParticleWeightingLookUpTable>>(m_tableName);
 
   if (!(*m_ParticleWeightingLookUpTable)) {
-    if (allowToSkip)
+    if (m_allowToSkip)
       B2INFO("The payload for the " << m_tableName << " is not available! This module will do nothing.");
     else
       B2ERROR("The payload for the " << m_tableName << " is not available! The basf2 process will not start.");

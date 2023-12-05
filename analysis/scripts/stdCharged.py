@@ -417,11 +417,13 @@ def stdLep(pdgId,
                     tableName=payload_eff).set_name(f"ParticleWeighting_eff_{outputListName}")
     path.add_module("ParticleWeighting",
                     particleList=outputListName,
-                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
+                    tableName=payload_misid_pi,
+                    allowToSkip=True).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
     if classification == "global":
         path.add_module("ParticleWeighting",
                         particleList=outputListName,
-                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{outputListName}")
+                        tableName=payload_misid_K,
+                        allowToSkip=True).set_name(f"ParticleWeighting_misid_K_{outputListName}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.

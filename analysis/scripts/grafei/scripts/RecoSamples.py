@@ -23,7 +23,7 @@ def get_args():
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Reconstruct most likely particles and save their features + B meson LCA matrices'
     )
-    parser.add_argument('-t', '--type', choices=['B0', 'B+', 'Upsilon(4S)'], required=True,
+    parser.add_argument('-t', '--type', choices=['B0', 'B+', 'Ups'], required=True,
                         help='Training target', metavar='type',
                         dest='type')
     # parser.add_argument('-b', '--bkg_prob', required=False, default=0., type=float,
@@ -44,8 +44,14 @@ if __name__ == '__main__':
     path = b2.create_path()
     ma.inputMdst(str(input_file), path=path)
 
+    mc_particle_name = {
+        "B0": "B0:MC",
+        "B+": "B+:MC",
+        "Ups": "Upsilon(4S)"
+    }
+
     # ###### BUILD MC B/Ups FOR LCA/TAGGING ######
-    ma.fillParticleListFromMC(args.type + ":MC", '', path=path)
+    ma.fillParticleListFromMC(mc_particle_name[args.type], '', path=path)
 
     # Fill particle list with optimized cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
@@ -135,14 +141,7 @@ if __name__ == '__main__':
     ]
 
     # Set up particle lists we'll work with
-    p_lists = [
-        'pi+:final',
-        'K+:final',
-        'p+:final',
-        'e+:final',
-        'mu+:final',
-        'gamma:final',
-    ]
+    p_lists = charged_lists + ['gamma:final']
     p_names = [x.split(':')[0] for x in p_lists]
 
     # ##### TAG AND SAVE #######
@@ -165,7 +164,7 @@ if __name__ == '__main__':
         particle_lists=p_lists,
         features=save_vars,
         b_parent_var=b_parent_var,
-        mcparticle_list=args.type + ":MC",
+        mcparticle_list=mc_particle_name[args.type],
         output_file=f'output_{input_file.stem}.root',
         # bkg_prob=args.bkg_prob,
     )

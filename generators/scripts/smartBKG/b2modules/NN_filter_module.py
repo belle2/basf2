@@ -15,18 +15,7 @@ from ROOT import Belle2
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 
 from smartBKG import TOKENIZE_DICT, PREPROC_CONFIG, MODEL_CONFIG
-
-
-def check_status_bit(status_bit):
-    """
-    Returns True if conditions are satisfied (not an unusable particle)
-    """
-    return (
-        (status_bit & 1 << 4 == 0) &  # IsVirtual
-        (status_bit & 1 << 5 == 0) &  # Initial
-        (status_bit & 1 << 6 == 0) &  # ISRPhoton
-        (status_bit & 1 << 7 == 0)  # FSRPhoton
-    )
+from smartBKG.utils.preprocess import check_status_bit
 
 
 class NNFilterModule(b2.Module):
@@ -37,9 +26,9 @@ class NNFilterModule(b2.Module):
        3. Execute reweighting or sampling process to get a weight
 
     Arguments:
-       model_file(str): Path to saved model
+       model_file(str): Path to the saved model
        model_config(dict): Parameters to build the model
-       preproc_config(dict): Parameters to provide information for preprocessing
+       preproc_config(dict): Parameters for preprocessing
        threshold(float): Threshold for event selection using reweighting method, value *None* indicating sampling mehtod
        extra_info_var(str): Name of eventExtraInfo to save model prediction to
        global_tag(str): Tag in ConditionDB where the well trained model was stored
@@ -68,26 +57,26 @@ class NNFilterModule(b2.Module):
     ):
         """
         Initialise the class.
-        :param model_file:  TODO
-        :param model_config:  TODO
-        :param preproc_config:  TODO
-        :param threshold:  TODO
-        :param extra_info_var:  TODO
-        :param global_tag:  TODO
-        :param payload:  TODO
+        :param model_file: Path to the saved model file.
+        :param model_config: Parameters for building the model.
+        :param preproc_config: Parameters for preprocessing.
+        :param threshold: Threshold for event selection using reweighting method, value *None* indicating sampling mehtod.
+        :param extra_info_var: Name of eventExtraInfo to save model prediction to.
+        :param global_tag: Tag in ConditionDB where the well-trained model was stored.
+        :param payload: Payload for the well-trained model in global tag.
         """
         super().__init__()
-        #: TODO
+        #: Path to the saved model file
         self.model_file = model_file
-        #: TODO
+        #: Parameters for building the model
         self.model_config = model_config
-        #: TODO
+        #: Parameters for preprocessing
         self.preproc_config = preproc_config
-        #: TODO
+        #: Threshold for event selection using reweighting method, value *None*  indicating sampling method
         self.threshold = threshold
-        #: TODO
+        #: Name of eventExtraInfo to save model prediction to
         self.extra_info_var = extra_info_var
-        #: TODO
+        #: Payload for the well-trained model in global tag
         self.payload = payload
 
         # set additional database conditions for trained neural network
@@ -102,7 +91,7 @@ class NNFilterModule(b2.Module):
 
         DEVICE = torch.device("cpu")
 
-        # read trained model parameters from
+        # read trained model parameters from database
         if not self.model_file:
             accessor = DBAccessorBase(DBStoreEntry.c_RawFile, self.payload, True)
             self.model_file = accessor.getFilename()

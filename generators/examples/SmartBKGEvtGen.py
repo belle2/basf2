@@ -13,7 +13,7 @@ from skim.WGs.fei import feiHadronicB0
 import modularAnalysis as ma
 import mdst
 
-from smartBKG.NN_filter_module import NNFilterModule
+from smartBKG.b2modules.NN_filter_module import NNFilterModule
 
 num_events = 1000
 out_dir = "./"

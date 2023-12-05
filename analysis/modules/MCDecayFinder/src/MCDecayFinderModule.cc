@@ -390,9 +390,8 @@ Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, 
 
 void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
 {
-  for (unsigned int ipart = 0; ipart < m_outputList->getListSize(); ipart++) {
-    auto existingParticle = m_outputList->getParticle(ipart);
-    if (existingParticle->isCopyOf(newParticle))
+  for (auto& existingParticle : *m_outputList) {
+    if (existingParticle.isCopyOf(newParticle))
       return;
   }
 

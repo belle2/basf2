@@ -53,7 +53,7 @@ class Basf2Object(ObjectDescription):
                 if not arg:
                     continue
                 paramlist += addnodes.desc_parameter(arg, arg)
-                signode += paramlist
+            signode += paramlist
 
         # return the object name for referencing
         return name

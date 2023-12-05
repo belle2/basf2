@@ -415,27 +415,13 @@ def stdLep(pdgId,
     path.add_module("ParticleWeighting",
                     particleList=outputListName,
                     tableName=payload_eff).set_name(f"ParticleWeighting_eff_{outputListName}")
-
-    # Check if payloads of hadron fake rate are provided
-    import conditions_db
-    cdb = conditions_db.ConditionsDB()
-    payload_dict = cdb.get_payloads(lid_weights_gt)
-    payload_names = [entry[0] for entry in payload_dict.keys()]
-
-    if payload_misid_pi in payload_names:
+    path.add_module("ParticleWeighting",
+                    particleList=outputListName,
+                    tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
+    if classification == "global":
         path.add_module("ParticleWeighting",
                         particleList=outputListName,
-                        tableName=payload_misid_pi).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
-    else:
-        b2.B2INFO(f"Payload of the pion fake rate correction is not available in the global tag {lid_weights_gt}")
-
-    if classification == "global":
-        if payload_misid_K in payload_names:
-            path.add_module("ParticleWeighting",
-                            particleList=outputListName,
-                            tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{outputListName}")
-        else:
-            b2.B2INFO(f"Payload of the kion fake rate correction is not available in the global tag {lid_weights_gt}")
+                        tableName=payload_misid_K).set_name(f"ParticleWeighting_misid_K_{outputListName}")
 
     # Apply the PID selection cut, which is read from the efficiency payload.
     # The '>=' handles extreme cases in which the variable and the threshold value are at a boundary of the PID variable range.

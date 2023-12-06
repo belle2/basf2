@@ -27,6 +27,8 @@
 #include <sstream>
 #include <filesystem>
 
+namespace fs = std::filesystem;
+
 namespace Belle2 {
   namespace MVA {
 
@@ -46,9 +48,9 @@ namespace Belle2 {
     Weightfile::~Weightfile()
     {
       for (auto& filename : m_filenames) {
-        if (std::filesystem::exists(filename)) {
+        if (fs::exists(filename)) {
           if (m_remove_temporary_directories)
-            std::filesystem::remove_all(filename);
+            fs::remove_all(filename);
         }
       }
     }
@@ -98,7 +100,7 @@ namespace Belle2 {
 
     std::string Weightfile::generateFileName(const std::string& suffix)
     {
-      char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXX").c_str());
+      char* directory_template = strdup((fs::temp_directory_path() / "Basf2MVA.XXXXXX").c_str());
       auto directory = mkdtemp(directory_template);
       std::string tmpfile = std::string(directory) + std::string("/weightfile") + suffix;
       m_filenames.emplace_back(directory);
@@ -211,7 +213,7 @@ namespace Belle2 {
     Weightfile Weightfile::loadFromROOTFile(const std::string& filename)
     {
 
-      if (not std::filesystem::exists(filename)) {
+      if (not fs::exists(filename)) {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 
@@ -233,7 +235,7 @@ namespace Belle2 {
 
     Weightfile Weightfile::loadFromXMLFile(const std::string& filename)
     {
-      if (not std::filesystem::exists(filename)) {
+      if (not fs::exists(filename)) {
         throw std::runtime_error("Given filename does not exist: " + filename);
       }
 

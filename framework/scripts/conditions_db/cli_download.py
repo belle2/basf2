@@ -62,10 +62,10 @@ def download_file(db, local_file, remote_file, checksum, iovlist=None):
             # done, nothing else to do
             return iovlist
         else:
-            B2WARNING("Checksum mismatch for %s, downloading again" % local_file)
+            B2WARNING(f"Checksum mismatch for {local_file}, downloading again")
 
     # download the file
-    B2INFO("download %s" % local_file)
+    B2INFO(f"download {local_file}")
     with open(local_file, "wb") as out:
         file_req = db._session.get(remote_file, stream=True)
         if file_req.status_code != requests.codes.ok:
@@ -75,7 +75,7 @@ def download_file(db, local_file, remote_file, checksum, iovlist=None):
 
     # and check it
     if file_checksum(local_file) != checksum:
-        B2ERROR("Checksum mismatch after download: %s" % local_file)
+        B2ERROR(f"Checksum mismatch after download: {local_file}")
         return None
 
     return iovlist
@@ -189,7 +189,7 @@ def command_legacydownload(args, db=None):
     failed = 0
     for tagname in sorted(tagnames):
         try:
-            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tagname)),
+            req = db.request("GET", f"/globalTag/{encode_name(tagname)}/globalTagPayloads",
                              f"Downloading list of payloads for {tagname} tag{payloadfilter}")
         except ConditionsDB.RequestError as e:
             B2ERROR(str(e))
@@ -224,7 +224,7 @@ def command_legacydownload(args, db=None):
                 txtfile.writelines(dbfile)
 
     if failed > 0:
-        B2ERROR("{} out of {} payloads could not be downloaded".format(failed, len(download_list)))
+        B2ERROR(f"{failed} out of {len(download_list)} payloads could not be downloaded")
         return 1
 
 

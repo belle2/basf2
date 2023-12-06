@@ -342,7 +342,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
             'RootInput',
             branchNames=HLT_INPUT_OBJECTS,
             entrySequences=[
-                '0:{}'.format(max_events)])
+                f'0:{max_events}'])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')

@@ -24,7 +24,7 @@ import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'CDCCombinedTrackingValidation.root'
 N_EVENTS = 1000
-ACTIVE = True
+ACTIVE = False
 
 basf2.set_random_seed(1337)
 

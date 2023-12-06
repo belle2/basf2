@@ -562,10 +562,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
             vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
             vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
-            vm.addAlias('keepMe', 'passesCut(e_ROE_pCM < 3.0 or mu_ROE_pCM < 3.0 or gamma_ROE_ECM > 0 or nROE_Ch < 2.5' +
-                        ' or E_extra_ROE < 1.6)')
-#            vm.addAlias('keepMe','passesCut(e_ROE_pCM < 3.0 or mu_ROE_pCM < 3.0 or nROE_Ch < 2.5 or E_extra_ROE < 2.0)')
-#            ma.variableToSignalSideExtraInfo(Btype, {'keepMe': 'keepMe'}, path=roe_path)
 
             path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
 

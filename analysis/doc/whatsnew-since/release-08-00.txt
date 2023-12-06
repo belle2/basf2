@@ -34,6 +34,13 @@ Photon Energy Resolution
   ``ClusterUtils`` triggers the replacement if a globaltag with a valid ``ECLPhotonEnergyResolution`` payload is present and
   without further user input.
 
+Particle weights
+++++++++++++++++
+* Added a new utility class ``PostProcessingParticleWeighting`` for
+  post-processing particle weighting. This class reads the weights from the
+  database for the specified experiment and run numbers and the weight-table
+  variables.
+
 Variables
 +++++++++
 * Added the variables `PxHER`, `PyHER`, `PzHER` and  `PxLER`, `PyLER`, `PzLER`  which are the nominal beam momenta

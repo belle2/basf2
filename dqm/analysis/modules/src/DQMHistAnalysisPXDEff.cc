@@ -233,17 +233,16 @@ void DQMHistAnalysisPXDEffModule::event()
     auto buff = (std::string)aPXDModule;
     replace(buff.begin(), buff.end(), '.', '_');
 
-    TH1* Hits, *Matches;
     std::string locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits);
+    auto Hits = (TH1*)findHist(locationHits);
     std::string locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH1*)findHist(locationMatches);
+    auto Matches = (TH1*)findHist(locationMatches);
 
     // Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {
@@ -299,7 +298,7 @@ void DQMHistAnalysisPXDEffModule::event()
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  TH1* Combined = (TH1*)findHist(locationHits);
+  auto Combined = (TH1*)findHist(locationHits);
 
   double stat_data = 0;
   bool error_flag = false;

@@ -309,6 +309,9 @@ void DQMHistAnalysisPXDEffModule::event()
 
   std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    // workaround for excluded module
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+    // excluded modules are not counted at all!
     int j = i + 1;
 
     if (Combined == nullptr) {
@@ -323,8 +326,6 @@ void DQMHistAnalysisPXDEffModule::event()
         ihit +=  nhit;
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        // workaround for excluded module
-        if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);

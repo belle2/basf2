@@ -38,7 +38,7 @@ ParticleWeightingModule::ParticleWeightingModule() : Module()
   addParam("particleList", m_inputListName, "Name of the ParticleList to reduce to the best candidates");
   addParam("selectedDaughters", m_selectedDaughters, "Daughters for which one wants to append weights", std::string(""));
   addParam("allowToSkip", m_allowToSkip,
-           "If False (default), the basf2 process stops when the payload is not available. It True, this module is skipped.",
+           "If False (default), the basf2 process stops when the payload is not available. If True, this module is skipped.",
            false);
 }
 

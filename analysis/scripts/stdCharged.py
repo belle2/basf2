@@ -409,7 +409,6 @@ def stdLep(pdgId,
     # The names of the payloads w/ efficiency and mis-id corrections.
     payload_eff = f"ParticleReweighting:{pid_alias}_eff_{channel_eff}_{working_point}"
     payload_misid_pi = f"ParticleReweighting:{pid_alias}_misid_pi_{channel_misid_pi}_{working_point}"
-    payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_{channel_misid_K}_{working_point}"
 
     # Configure weighting module(s).
     path.add_module("ParticleWeighting",
@@ -419,7 +418,9 @@ def stdLep(pdgId,
                     particleList=outputListName,
                     tableName=payload_misid_pi,
                     allowToSkip=True).set_name(f"ParticleWeighting_misid_pi_{outputListName}")
+
     if classification == "global":
+        payload_misid_K = f"ParticleReweighting:{pid_alias}_misid_K_{channel_misid_K}_{working_point}"
         path.add_module("ParticleWeighting",
                         particleList=outputListName,
                         tableName=payload_misid_K,

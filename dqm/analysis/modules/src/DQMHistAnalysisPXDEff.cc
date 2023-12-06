@@ -173,6 +173,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   registerEpicsPV("PXD:Eff:Status", "Status");
   registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:L1", "L1");
+  registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -305,7 +307,9 @@ void DQMHistAnalysisPXDEffModule::event()
   double all = 0.0;
 
   double imatch = 0.0, ihit = 0.0;
-  int ieff = 0;
+  double imatchL1 = 0.0, ihitL1 = 0.0;
+  double imatchL2 = 0.0, ihitL2 = 0.0;
+  int ieff = 0; // count number of modules with useful stytistics
 
   std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
@@ -324,6 +328,15 @@ void DQMHistAnalysisPXDEffModule::event()
       if (nmatch > 10 && nhit > 10) { // could be zero, too
         imatch += nmatch;
         ihit +=  nhit;
+        // check layer
+        if (i > 16) {
+          imatchL2 += nmatch;
+          ihitL2 +=  nhit;
+        } else {
+          imatchL1 += nmatch;
+          ihitL1 +=  nhit;
+        }
+
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
 
@@ -550,12 +563,21 @@ void DQMHistAnalysisPXDEffModule::event()
 
 
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
+  double var_efficiencyL1 = ihitL1 > 0 ? imatchL1 / ihitL1 : 0.0;
+  double var_efficiencyL2 = ihitL2 > 0 ? imatchL2 / ihitL2 : 0.0;
+
   m_monObj->setVariable("efficiency", var_efficiency);
+  m_monObj->setVariable("efficiencyL1", var_efficiencyL1);
+  m_monObj->setVariable("efficiencyL2", var_efficiencyL2);
   m_monObj->setVariable("nmodules", ieff);
 
   setEpicsPV("Status", stat_data);
   // only update if statistics is reasonable, we dont want "0" drops between runs!
-  if (stat_data != 0) setEpicsPV("Overall", var_efficiency);
+  if (stat_data != 0) {
+    setEpicsPV("Overall", var_efficiency);
+    setEpicsPV("L1", var_efficiencyL1);
+    setEpicsPV("L2", var_efficiencyL2);
+  }
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()

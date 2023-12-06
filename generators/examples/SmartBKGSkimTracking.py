@@ -21,7 +21,6 @@ file_id = int((job_id - 1)/73+1)
 num_events = 2500
 out_dir = "./"
 f_input = f"./mdst{file_id}.root"
-f_input = f"/project/agkuhr/users/boyang/data/MC15/mdst{file_id}.root"
 
 main = b2.create_path()
 

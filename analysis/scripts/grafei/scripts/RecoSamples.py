@@ -21,7 +21,7 @@ from grafei.modules.RootSaverModule import RootSaverModule
 def get_args():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
-        description='Reconstruct most likely particles and save their features + B meson LCA matrices'
+        description='Reconstruct most likely particles and save their features and LCA matrix'
     )
     parser.add_argument('-t', '--type', choices=['B0', 'B+', 'Ups'], required=True,
                         help='Training target', metavar='type',

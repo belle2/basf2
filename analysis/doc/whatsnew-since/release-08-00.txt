@@ -19,6 +19,8 @@ Modules
   This module modifies the track energy of each particle inside a particle list according to the given correction value
   or by a phase-space dependent correction value extracted from a ParticleWeightingLookUpTable payload.
   This module is intended to be used alongside the momentum scale factors implemented in the module `TrackingMomentumScaleFactors`.
+* Fixed a bug in the `MCDecayFinder` and `modularAnalysis.findMCDecay` that causes a segmentation fault when multiple candidates are
+  found.
 
 Variables
 +++++++++

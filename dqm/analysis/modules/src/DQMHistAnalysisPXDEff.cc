@@ -48,7 +48,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -300,7 +300,7 @@ void DQMHistAnalysisPXDEffModule::event()
   }
   auto Combined = (TH1*)findHist(locationHits);
 
-  double stat_data = 0;
+  EStatus stat_data = c_TooFew;
   bool error_flag = false;
   bool warn_flag = false;
   double all = 0.0;
@@ -437,23 +437,10 @@ void DQMHistAnalysisPXDEffModule::event()
         tt->Draw();
       }
 
-      if (all < 100.) {
-        m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
-      } else {
-        if (error_flag) {
-          m_cEffAll->Pad()->SetFillColor(kRed);// Red
-        } else if (warn_flag) {
-          m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
-        } else {
-          m_cEffAll->Pad()->SetFillColor(kGreen);// Green
-          //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
-        }
-      }
 
-      m_cEffAll->Pad()->SetFrameFillColor(kWhite - 1); // White
-      m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
-      m_cEffAll->Pad()->Modified();
-      m_cEffAll->Pad()->Update();
+      EStatus all_stat = makeStatus(all < 100., warn_flag, error_flag);
+      colorizeCanvas(m_cEffAll, all_stat);
+
       m_hWarnLine->Draw("same,hist");
       m_hErrorLine->Draw("same,hist");
     }
@@ -532,27 +519,10 @@ void DQMHistAnalysisPXDEffModule::event()
       tt->Draw();
     }
 
-    if (all < 100.) {
-      m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
-      stat_data = 0.;
-    } else {
-      if (error_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
-        stat_data = 4.;
-      } else if (warn_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
-        stat_data = 3.;
-      } else {
-        m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
-        stat_data = 2.;
-        /// we wont use "white" =1 in this module
-        //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
-      }
-    }
-    m_cEffAllUpdate->Pad()->SetFrameFillColor(kWhite - 1); // White
-    m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
-    m_cEffAllUpdate->Pad()->Modified();
-    m_cEffAllUpdate->Pad()->Update();
+
+    stat_data = makeStatus(all < 100., warn_flag, error_flag);
+    colorizeCanvas(m_cEffAllUpdate, stat_data);
+
     m_hWarnLine->Draw("same,hist");
     m_hErrorLine->Draw("same,hist");
   }

@@ -822,6 +822,32 @@ namespace Belle2 {
       return weightsum;
     }
 
+    double particleClusterTotalMCMatchWeightForKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      double totalWeight = 0;
+      for (unsigned int i = 0; i < mcps.size(); ++i) {
+        double weight = mcps.weight(i);
+        const MCParticle* mcp = mcps[i];
+
+        while (mcp) {
+          if (mcp->getPDG() == 130) {
+            totalWeight += weight;
+            break;
+          } else {
+            mcp = mcp->getMother();
+          }
+        }
+      }
+
+      return totalWeight;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
@@ -1110,6 +1136,10 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
+
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
+
 
   }
 }

@@ -216,20 +216,14 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (single_cmap.second) single_cmap.second->Clear();
   }
 
+  m_hInnerMap->Reset();
+  m_hOuterMap->Reset();
 }
 
 
 void DQMHistAnalysisPXDEffModule::event()
 {
-  //Count how many of each type of histogram there are for the averaging
-  //std::map<std::string, int> typeCounter;
-
-  m_hInnerMap->Reset();
-  m_hOuterMap->Reset();
-
-  for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
-    VxdID& aPXDModule = m_PXDModules[i - 1];
-
+  for (auto aPXDModule : m_PXDModules) {
     auto buff = (std::string)aPXDModule;
     replace(buff.begin(), buff.end(), '.', '_');
 
@@ -237,17 +231,21 @@ void DQMHistAnalysisPXDEffModule::event()
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    auto Hits = (TH1*)findHist(locationHits);
     std::string locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    auto Matches = (TH1*)findHist(locationMatches);
 
-    // Finding only one of them should only happen in very strange situations...
-    if (Hits == nullptr || Matches == nullptr) {
-      B2ERROR("Missing histogram for sensor " << aPXDModule);
-    } else {
+    auto Hits = (TH1*)findHist(locationHits, true);// check if updated
+    auto Matches = (TH1*)findHist(locationMatches, true);// check if updated
+
+    if (Hits == nullptr && Matches == nullptr) continue; // none updated
+
+    if (Hits == nullptr) Hits = (TH1*)findHist(locationHits); // actually, this should not happen ...
+    if (Matches == nullptr) Matches = (TH1*)findHist(locationMatches); // ... as updates should coincide
+
+    // Finding only one of them should only happen in very strange situations... still better check
+    if (Hits && Matches) {
       if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
         m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
         m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
@@ -278,8 +276,8 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
     }
-  }// Single-Module histos + 2d overview finished
-
+  }
+  // Single-Module histos + 2d overview finished. now draw overviews
   m_cInnerMap->cd();
   if (m_hInnerMap) m_hInnerMap->Draw("colz");
   m_cInnerMap->Modified();
@@ -290,15 +288,19 @@ void DQMHistAnalysisPXDEffModule::event()
   m_cOuterMap->Update();
   UpdateCanvas(m_cInnerMap->GetName());
   UpdateCanvas(m_cOuterMap->GetName());
+  // overview done
+
 
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
   // guaranteed by DQM framework
-  std::string locationHits = "PXD_Eff_combined";
+  std::string combinedHistname = "PXD_Eff_combined";
   if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
+    combinedHistname = m_histogramDirectoryName + "/" + combinedHistname;
   }
-  auto Combined = (TH1*)findHist(locationHits);
+  auto Combined = (TH1*)findHist(combinedHistname, true);// only if updated
+
+  if (Combined == nullptr) return; // histogram was not changed, thus no update
 
   EStatus stat_data = c_TooFew;
   bool error_flag = false;
@@ -529,7 +531,6 @@ void DQMHistAnalysisPXDEffModule::event()
   UpdateCanvas(m_cEffAllUpdate->GetName());
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();
-
 
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
   double var_efficiencyL1 = ihitL1 > 0 ? imatchL1 / ihitL1 : 0.0;

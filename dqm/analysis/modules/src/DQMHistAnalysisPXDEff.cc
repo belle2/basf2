@@ -228,20 +228,20 @@ void DQMHistAnalysisPXDEffModule::event()
   for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
     VxdID& aPXDModule = m_PXDModules[i - 1];
 
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
 
     TH1* Hits, *Matches;
-    TString locationHits = "track_hits_" + buff;
+    std::string locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits.Data());
-    TString locationMatches = "matched_cluster_" + buff;
+    Hits = (TH1*)findHist(locationHits);
+    std::string locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH1*)findHist(locationMatches.Data());
+    Matches = (TH1*)findHist(locationMatches);
 
     // Finding only one of them should only happen in very strange situations...
     if (Hits == nullptr || Matches == nullptr) {
@@ -293,11 +293,11 @@ void DQMHistAnalysisPXDEffModule::event()
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
   // guaranteed by DQM framework
-  TString locationHits = "PXD_Eff_combined";
+  std::string locationHits = "PXD_Eff_combined";
   if (m_histogramDirectoryName != "") {
     locationHits = m_histogramDirectoryName + "/" + locationHits;
   }
-  TH1* Combined = (TH1*)findHist(locationHits.Data());
+  TH1* Combined = (TH1*)findHist(locationHits);
 
   double stat_data = 0;
   bool error_flag = false;

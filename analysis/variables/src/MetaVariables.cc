@@ -2361,6 +2361,84 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr clusterBestMatchedMCKlong(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+
+        auto func = [var](const Particle * particle) -> double {
+
+          const ECLCluster* cluster = particle->getECLCluster();
+          if (!cluster) return Const::doubleNaN;
+
+          auto mcps = cluster->getRelationsTo<MCParticle>();
+          if (mcps.size() == 0) return Const::doubleNaN;
+
+
+          std::map<int, double> mapMCParticleIndxAndWeight;
+
+          for (unsigned int i = 0; i < mcps.size(); ++i)
+          {
+            double weight = mcps.weight(i);
+            const MCParticle* mcp = mcps[i];
+
+            while (mcp) {
+              if (mcp->getPDG() == 130) {
+                int index = mcp->getArrayIndex();
+                if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
+                  mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
+                } else {
+                  mapMCParticleIndxAndWeight.insert({index, weight});
+                }
+                break;
+              } else {
+                mcp = mcp->getMother();
+              }
+            }
+          }
+
+          // Klong is not found
+          if (mapMCParticleIndxAndWeight.size() == 0)
+            return Const::doubleNaN;
+
+
+          // find max totalWeight
+          double maxWeight = -1;
+          double indexAtMaxWeight = -1;
+          for (auto [index, weight] : mapMCParticleIndxAndWeight)
+          {
+            if (weight > maxWeight) {
+              maxWeight = weight;
+              indexAtMaxWeight = index;
+            }
+          }
+
+          StoreArray<MCParticle> mcparticles;
+          const MCParticle* mcKlong = mcparticles[indexAtMaxWeight];
+
+          Particle tmpPart(mcKlong);
+          auto var_result = var->function(&tmpPart);
+          if (std::holds_alternative<double>(var_result))
+          {
+            return std::get<double>(var_result);
+          } else if (std::holds_alternative<int>(var_result))
+          {
+            return std::get<int>(var_result);
+          } else if (std::holds_alternative<bool>(var_result))
+          {
+            return std::get<bool>(var_result);
+          } else
+          {
+            return Const::doubleNaN;
+          }
+        };
+
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function clusterBestMatchedMCKlong");
+      }
+    }
+
     double matchedMCHasPDG(const Particle* particle, const std::vector<double>& pdgCode)
     {
       if (pdgCode.size() != 1) {
@@ -3573,6 +3651,10 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "When the variable is called for ``gamma`` and if the ``gamma`` is matched with MCParticle, it works same as `matchedMC`.\n"
                       "If the variable is called for ``gamma`` that fails to match with an MCParticle, it provides the mdst-level MCMatching information abouth the ECLCluster.\n"
                       "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching MCParticles", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("clusterBestMatchedMCKlong(variable)", clusterBestMatchedMCKlong,
+                      "Returns variable output for the best-matched Klong of MCParticle with the ECLCluster of the given Particle.\n"
+                      "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching Klong MCParticle", Manager::VariableDataType::c_double);
+
     REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "
                       "Returns number of particle which pass given in cut in the specified particle list.\n"
                       "Useful for creating statistics about the number of particles in a list.\n"

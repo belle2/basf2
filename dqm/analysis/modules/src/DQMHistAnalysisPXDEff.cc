@@ -330,7 +330,7 @@ void DQMHistAnalysisPXDEffModule::event()
         imatch += nmatch;
         ihit +=  nhit;
         // check layer
-        if (i > 16) {
+        if (i >= 16) {
           imatchL2 += nmatch;
           ihitL2 +=  nhit;
         } else {

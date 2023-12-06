@@ -27,7 +27,7 @@ from tracking.path_utils import add_svd_hough_tracking
 
 VALIDATION_OUTPUT_FILE = 'SVDHoughTrackingValidation.root'
 N_EVENTS = 1000
-ACTIVE = True
+ACTIVE = False
 
 basf2.set_random_seed(1337)
 

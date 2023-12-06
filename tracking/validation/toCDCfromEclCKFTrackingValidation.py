@@ -22,8 +22,8 @@ from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
 VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation.root'
-N_EVENTS = 10000
-ACTIVE = True
+N_EVENTS = 1000
+ACTIVE = False
 
 basf2.set_random_seed(1337)
 

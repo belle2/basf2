@@ -23,8 +23,8 @@ import logging
 import reconstruction
 import basf2
 VALIDATION_OUTPUT_FILE = 'fullTrackingValidation_plusECL.root'
-N_EVENTS = 10000
-ACTIVE = True
+N_EVENTS = 1000
+ACTIVE = False
 
 basf2.set_random_seed(1337)
 

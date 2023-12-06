@@ -165,7 +165,7 @@ class data_production():
         out_dir (str): Output directory.
         job_id (int): Job ID for batch processing.
         save_vars (dict): Variables to save for different event levels.
-        By default having `Y4S` and `B` keys for the corresponding particle list.
+            By default having Y4S and B keys for the corresponding particle list.
         dataName (str): Data file name prefix.
         flagName (str): Flag file name prefix.
 
@@ -181,7 +181,7 @@ class data_production():
         :param out_dir: Output directory.
         :param job_id: Job ID for batch processing.
         :param save_vars: Variables to save for different event levels.
-        By default having `Y4S` and `B` keys for the corresponding particle list.
+            By default having Y4S and B keys for the corresponding particle list.
         :param dataName: Data file name prefix.
         :param flagName: Flag file name prefix.
         """

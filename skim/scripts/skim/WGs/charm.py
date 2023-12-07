@@ -33,7 +33,7 @@ from functools import lru_cache
 import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdK, stdMu, stdPi, stdPr, stdCharged
+from stdCharged import stdK, stdPi, stdPr, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
@@ -209,7 +209,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
     """
 
-    __authors__ = ["Doris Yangsoo Kim", "Jaeyeon Kim"]
+    __authors__ = ["Jaeyoung Kim", "Doris Yangsoo Kim", "Jaeyeon Kim"]
     __description__ = "Skim list for D*+ to pi+ D0, D0 to rare decay."
     __contact__ = __liaison__
     __category__ = "physics, charm"
@@ -217,9 +217,9 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
-        stdE("loose", path=path)
-        stdMu("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('e', path=path)
+        charm_skim_std_charged('mu', path=path)
+        charm_skim_std_charged('pi', path=path)
         loadStdSkimPhoton(path=path)
         loadStdSkimPi0(path=path)
 
@@ -228,11 +228,11 @@ class DstToD0Pi_D0ToRare(BaseSkim):
         Dstcuts = "0 < Q < 0.02 and 2.0 < useCMSFrame(p)"
 
         D0_Channels = ["gamma:skim gamma:skim",
-                       "e+:loose e-:loose",
-                       "e+:loose mu-:loose",
-                       "e-:loose mu+:loose",
-                       "mu+:loose mu-:loose",
-                       "pi+:loose pi-:loose"]
+                       "e+:charmSkim e-:charmSkim",
+                       "e+:charmSkim mu-:charmSkim",
+                       "e-:charmSkim mu+:charmSkim",
+                       "mu+:charmSkim mu-:charmSkim",
+                       "pi+:charmSkim pi-:charmSkim"]
         DstList = []
 
         for chID, channel in enumerate(D0_Channels):

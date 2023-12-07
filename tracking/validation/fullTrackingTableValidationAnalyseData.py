@@ -152,6 +152,6 @@ if __name__ == '__main__':
         html_content.Write()
         tfile.Close()
     else:
-        print("This validation deactivated and thus basf2 is not executed. \n\
-               If you want to run this validation, please set the 'ACTIVE' flag above to 'True'. \n\
-               Exiting.")
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

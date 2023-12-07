@@ -40,6 +40,8 @@ from optparse import OptionParser
 CONTACT_PERSON = {'Name': 'Giacomo De Pietro',
                   'Email': 'giacomo.pietro@kit.edu'}
 
+ACTIVE = True
+
 
 def main():
     """Create validation plots for Ext and Muid"""
@@ -530,4 +532,9 @@ def draw_likelihoods(file_chain):
 # Entry point of this script: call the main() function             #
 ####################################################################
 if __name__ == '__main__':
-    main()
+    if ACTIVE:
+        main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed. \n\
+               If you want to run this validation, please set the 'ACTIVE' flag above to 'True'. \n\
+               Exiting.")

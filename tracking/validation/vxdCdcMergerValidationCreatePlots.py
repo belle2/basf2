@@ -19,6 +19,8 @@
 
 import ROOT
 
+ACTIVE = True
+
 
 class VxdCdcMergerValidationPlots:
     """Create efficiency plots for the V0 validation"""
@@ -93,4 +95,9 @@ class VxdCdcMergerValidationPlots:
 
 
 if __name__ == '__main__':
-    VxdCdcMergerValidationPlots().collect_histograms().plot()
+    if ACTIVE:
+        VxdCdcMergerValidationPlots().collect_histograms().plot()
+    else:
+        print("This validation deactivated and thus basf2 is not executed. \n\
+               If you want to run this validation, please set the 'ACTIVE' flag above to 'True'. \n\
+               Exiting.")

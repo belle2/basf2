@@ -22,6 +22,8 @@ import basf2
 import ROOT
 from ROOT import Belle2, TNamed
 
+ACTIVE = True
+
 contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
 
 bklm_numbers = Belle2.BKLMElementNumbers()
@@ -353,4 +355,9 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed. \n\
+               If you want to run this validation, please set the 'ACTIVE' flag above to 'True'. \n\
+               Exiting.")

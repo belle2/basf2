@@ -47,7 +47,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
-           "Minimal number for delta histogram updates", 500000.);
+           "Minimal number for delta histogram updates", 50000.);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
@@ -418,13 +418,14 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
   }
 
   else {
+    canvas->Clear();
+    canvas->cd();
+    histogram->Draw();
     /* calling on delta histogram*/
     TH1* delta = getDelta(m_histogramDirectoryName, histName);
-    UpdateCanvas(canvas->GetName(), delta != nullptr);
+    UpdateCanvas(canvas->GetName(), delta != nullptr); //keeping this for testing purposes
     if (delta != nullptr) {
-      canvas->Clear();
-      canvas->cd();
-      delta->Draw("hist");
+      deltaDrawer(delta, histogram, canvas);
     }
   }
 }

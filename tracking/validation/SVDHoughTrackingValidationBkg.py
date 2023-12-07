@@ -29,8 +29,6 @@ VALIDATION_OUTPUT_FILE = 'SVDHoughTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class SVDHoughTrackingValidationBkg(TrackingValidationRun):
     """
@@ -75,6 +73,7 @@ def main():
     """
     create SVD validation class and execute
     """
+    basf2.set_random_seed(1337)
     validation_run = SVDHoughTrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 

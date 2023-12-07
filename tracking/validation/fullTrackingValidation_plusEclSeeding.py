@@ -26,8 +26,6 @@ VALIDATION_OUTPUT_FILE = 'fullTrackingValidation_plusECL.root'
 N_EVENTS = 1000
 ACTIVE = False
 
-basf2.set_random_seed(1337)
-
 
 class fullTrackingValidation_plusECL(TrackingValidationRun):
     """Validate the full track-finding chain includung the ecl seeded ckf"""
@@ -76,6 +74,7 @@ class fullTrackingValidation_plusECL(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = fullTrackingValidation_plusECL()
     validation_run.configure_and_execute_from_commandline()
 

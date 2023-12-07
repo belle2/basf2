@@ -37,9 +37,6 @@ N_EVENTS = 1000
 ACTIVE = True
 
 
-basf2.set_random_seed(1509)
-
-
 def run():
     """
     Create EvtGen input sample and run a simple ROI validation.
@@ -218,6 +215,8 @@ def run():
             output_tfile.Close()
 
     """ Steering """
+
+    basf2.set_random_seed(1509)
 
     path = basf2.create_path()
 

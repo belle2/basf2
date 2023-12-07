@@ -25,8 +25,6 @@ VALIDATION_OUTPUT_FILE = 'CosmicsAxialHoughTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = False
 
-basf2.set_random_seed(1337)
-
 
 class CosmicsAxialHough(TrackingValidationRun):
     """Validate the CDC axial Hough track finder with cosmic rays"""
@@ -72,6 +70,7 @@ class CosmicsAxialHough(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = CosmicsAxialHough()
     validation_run.configure_and_execute_from_commandline()
 

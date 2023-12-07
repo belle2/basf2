@@ -25,8 +25,6 @@ VALIDATION_OUTPUT_FILE = 'FullTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class Full(TrackingValidationRun):
     """Validate the full track-finding chain"""
@@ -64,6 +62,7 @@ class Full(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = Full()
     validation_run.configure_and_execute_from_commandline()
 

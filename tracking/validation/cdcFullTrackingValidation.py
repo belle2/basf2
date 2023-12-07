@@ -26,8 +26,6 @@ VALIDATION_OUTPUT_FILE = 'CDCFullTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = False
 
-basf2.set_random_seed(1337)
-
 
 class CDCFull(TrackingValidationRun):
     """Validate the full CDC track-finding chain"""
@@ -66,6 +64,7 @@ class CDCFull(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = CDCFull()
     validation_run.configure_and_execute_from_commandline()
 

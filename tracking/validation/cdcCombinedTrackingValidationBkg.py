@@ -26,8 +26,6 @@ VALIDATION_OUTPUT_FILE = 'CDCCombinedTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class CDCCombined(TrackingValidationRun):
     """Validate the combined CDC track-finding chain include Legendre step"""
@@ -69,6 +67,7 @@ class CDCCombined(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = CDCCombined()
     validation_run.configure_and_execute_from_commandline()
 

@@ -27,8 +27,6 @@ VALIDATION_OUTPUT_FILE = 'toCDCCKFTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class toCDCCKFValidationBkg(TrackingValidationRun):
     """Validate the ToCDCCKF Kalman finder/filter algorithm with Y(4S) events"""
@@ -96,6 +94,7 @@ class toCDCCKFValidationBkg(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = toCDCCKFValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 

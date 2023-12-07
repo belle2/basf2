@@ -26,8 +26,6 @@ CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 10000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class Cosmics(TrackingValidationRun):
     """
@@ -62,6 +60,7 @@ class Cosmics(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = Cosmics()
     validation_run.configure_and_execute_from_commandline()
 

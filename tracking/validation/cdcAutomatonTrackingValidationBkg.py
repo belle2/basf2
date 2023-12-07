@@ -28,8 +28,6 @@ CONTACT = 'software-tracking@belle2.org'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class CDCAutomaton(TrackingValidationRun):
     """Validate the CDC TrackFinderAutomaton"""
@@ -70,6 +68,7 @@ class CDCAutomaton(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = CDCAutomaton()
     validation_run.configure_and_execute_from_commandline()
 

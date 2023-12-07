@@ -29,8 +29,6 @@ VALIDATION_OUTPUT_FILE = 'CombinedSVDTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = False
 
-basf2.set_random_seed(1337)
-
 
 class CombinedSVDTrackingValidation(TrackingValidationRun):
     """
@@ -79,6 +77,7 @@ def main():
     """
     create SVD validation class and execute
     """
+    basf2.set_random_seed(1337)
     validation_run = CombinedSVDTrackingValidation()
     validation_run.configure_and_execute_from_commandline()
 

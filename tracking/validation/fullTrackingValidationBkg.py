@@ -25,8 +25,6 @@ VALIDATION_OUTPUT_FILE = 'FullTrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class FullBkg(TrackingValidationRun):
     """Validate the full track-finding chain, including background overlay"""
@@ -62,6 +60,7 @@ class FullBkg(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = FullBkg()
     validation_run.configure_and_execute_from_commandline()
 

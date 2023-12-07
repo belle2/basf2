@@ -25,8 +25,6 @@ VALIDATION_OUTPUT_FILE = 'toCDCfromEclCKFTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = False
 
-basf2.set_random_seed(1337)
-
 
 class toCDCfromEclCKF(TrackingValidationRun):
     """Validate the ecl seeded ckf"""
@@ -122,6 +120,7 @@ class toCDCfromEclCKF(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = toCDCfromEclCKF()
     validation_run.configure_and_execute_from_commandline()
 

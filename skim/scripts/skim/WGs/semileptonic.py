@@ -630,11 +630,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
                 ('mu_ROE_pCM', 100, 0, 5.0, 'ROE mu momentum in CMS', __liaison__, '', ''),
                 ('gamma_ROE_ECM', 100, 0, 5.0, 'ROE gamma energy in CMS', __liaison__, '', ''),
                 ('nROE_Ch', 20, 0, 20.0, 'N(trk) in ROE', __liaison__, '', ''),
-                ('E_extra_ROE', 100, 0, 2.5, 'E_ECL (CMS) in ROE', __liaison__, '', ''),
+                ('E_extra_ROE', 100, 0, 2.5, 'E_ECL (CMS) in ROE', __liaison__, '', '')
             ],
-            variables_2d=[
-                #                ("deltaE", 100, -5, 5, "Mbc", 100, 4.0, 5.3, "Mbc vs deltaE", contact,
-                #                 "", "")
-            ],
-            path=path,
-        )
+            path=path)

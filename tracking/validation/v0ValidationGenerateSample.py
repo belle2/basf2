@@ -23,6 +23,8 @@ from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest.refiners import SaveTreeRefiner
 import numpy
 
+ACTIVE = True
+
 
 def run():
     """
@@ -139,4 +141,9 @@ def run():
 
 
 if __name__ == '__main__':
-    run()
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed. \n\
+               If you want to run this validation, please set the 'ACTIVE' flag above to 'True'. \n\
+               Exiting.")

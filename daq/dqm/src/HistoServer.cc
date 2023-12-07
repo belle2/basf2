@@ -107,7 +107,13 @@ int HistoServer::server()
               updated = false;
               continue;
             }
-            auto lpos = objname.find("SUBDIR:");
+            auto lpos = objname.find("DQMRC:SAVE:");
+            if (lpos != string::npos) {
+              auto filename = objname.substr(11);
+              m_hman->filedump(filename);
+              continue;
+            }
+            lpos = objname.find("SUBDIR:");
             if (lpos != string::npos) {
               subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";

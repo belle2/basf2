@@ -312,7 +312,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
 
     """
 
-    __authors__ = ["Aman Sangal"]
+    __authors__ = ["Jaeyoung Kim", "Aman Sangal"]
     __description__ = "Skim list for D_(s)+ to h+ h- j+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
@@ -321,16 +321,16 @@ class XToDp_DpToHpHmJp(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('K', path=path)
+        charm_skim_std_charged('pi', path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
 
-        Dp_Channels = ["pi+:loose pi-:loose pi+:loose",
-                       "pi+:loose pi-:loose K+:loose",
-                       "pi+:loose K-:loose K+:loose",
-                       "K+:loose K-:loose pi+:loose",
+        Dp_Channels = ["pi+:charmSkim pi-:charmSkim pi+:charmSkim",
+                       "pi+:charmSkim pi-:charmSkim K+:charmSkim",
+                       "pi+:charmSkim K-:charmSkim K+:charmSkim",
+                       "K+:charmSkim K-:charmSkim pi+:charmSkim",
                        ]
 
         DpList = []

@@ -432,6 +432,44 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
 
 
 @fancy_skim_header
+class DpToHpPi0(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ \\pi^0`
+
+    **Selection Criteria**:
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * ``1.67 < M(D+) < 2.07, pcms(D+) > 2.0``
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Yifan Jin"]
+    __description__ = "Skim list for D+ to h+ pi0 without D* tag."
+    __contact__ = ["Jaeyoung Kim"]
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        loadStdSkimPi0(listtype='eff50_May2020_nomcmatch', path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList('pi+:hppi0', 'pi+:charmSkim', 'pt > 0.1 and pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('pi0:hppi0', 'pi0:skim', 'pt > 0.1', path=path)
+
+        Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
+
+        DList = []
+        ma.reconstructDecay("D+:HpPi0 -> pi+:hppi0 pi0:hppi0", Dpcuts, path=path)
+        DList.append("D+:HpPi0")
+
+        return DList
+
+
+@fancy_skim_header
 class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:

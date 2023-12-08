@@ -326,8 +326,10 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
 
     // both histograms should have the same update condition but checking both should be okay?
     // if this condition is not satisfied, does it cause the above to not ever update?
-    //UpdateCanvas(canvas->GetName(), (deltaNumer != nullptr && deltaDenom != nullptr));
+    // after test campaign, switch condition back to (deltaNumer != nullptr && deltaDenom != nullptr)
+    UpdateCanvas(canvas->GetName(), (effHist != nullptr));
     if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
+      B2INFO("DQMHistAnalysisKLM2: Eff Delta Num/Denom Entries is " << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
       effClone->Draw("SAME");
       canvas->Modified();

@@ -425,6 +425,7 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
     TH1* delta = getDelta(m_histogramDirectoryName, histName);
     UpdateCanvas(canvas->GetName(), delta != nullptr); //keeping this for testing purposes
     if (delta != nullptr) {
+      B2INFO("DQMHistAnalysisKLM: Time Delta Entries is " << delta->GetEntries());
       deltaDrawer(delta, histogram, canvas);
     }
   }
@@ -622,7 +623,8 @@ void DQMHistAnalysisKLMModule::event()
       }
       // Add this canvas that it is time to update
       // not sure if this is interfering with the generation of some features
-      //UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
+      // after testing, switch condition back to delta != nullptr || histogram != nullptr
+      UpdateCanvas(canvas->GetName(), true);
       analyseChannelHitHistogram(
         klmSector.getSubdetector(), klmSector.getSection(),
         klmSector.getSector(), j, histogram, delta, canvas, latex);

@@ -39,8 +39,8 @@ class CheckPayloadNames(b2.Module):
     def event(self):
         '''Event.'''
         payload_names = sorted(B2.Database.Instance().getAllDataNames())
-        print('Payloads set:', self.payload_names)
-        print('Payloads get:', payload_names)
+        print('Set payloads:', self.payload_names)
+        print('Got payloads:', payload_names)
         assert(self.payload_names == payload_names)
 
 

@@ -319,71 +319,66 @@ void DQMHistAnalysisPXDEffModule::event()
     // excluded modules are not counted at all!
     int j = i + 1;
 
-    if (Combined == nullptr) {
-      m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, 0);
-    } else {
-      VxdID& aModule = m_PXDModules[i];
-      double nmatch = Combined->GetBinContent(i * 2 + 2);
-      double nhit = Combined->GetBinContent(i * 2 + 1);
-      if (nmatch > 10 && nhit > 10) { // could be zero, too
-        imatch += nmatch;
-        ihit +=  nhit;
-        // check layer
-        if (i >= 16) {
-          imatchL2 += nmatch;
-          ihitL2 +=  nhit;
-        } else {
-          imatchL1 += nmatch;
-          ihitL1 +=  nhit;
-        }
-
-        ieff++; // only count in modules working
-        double var_e = nmatch / nhit; // can never be zero
-
-        m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
-                              var_e);
+    VxdID& aModule = m_PXDModules[i];
+    double nmatch = Combined->GetBinContent(i * 2 + 2);
+    double nhit = Combined->GetBinContent(i * 2 + 1);
+    if (nmatch > 10 && nhit > 10) { // could be zero, too
+      imatch += nmatch;
+      ihit +=  nhit;
+      // check layer
+      if (i >= 16) {
+        imatchL2 += nmatch;
+        ihitL2 +=  nhit;
+      } else {
+        imatchL1 += nmatch;
+        ihitL1 +=  nhit;
       }
 
-      /// TODO: one value per module, and please change to the "delta" instead of integral
-      all += nhit;
-      m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, nhit);
-      m_hEffAll->SetPassedEvents(j, nmatch);
+      ieff++; // only count in modules working
+      double var_e = nmatch / nhit; // can never be zero
 
-      if (nhit < m_minEntries) {
-        // update the first entries directly (short runs)
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit);
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch);
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
-        updated[aModule] = true;
-      } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
-        updated[aModule] = true;
-      }
+      m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
+                            var_e);
+    }
 
-      // workaround for excluded module
-      if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+    /// TODO: one value per module, and please change to the "delta" instead of integral
+    all += nhit;
+    m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAll->SetTotalEvents(j, nhit);
+    m_hEffAll->SetPassedEvents(j, nmatch);
 
-      // get the errors and check for limits for each bin seperately ...
+    if (nhit < m_minEntries) {
+      // update the first entries directly (short runs)
+      m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+      m_hEffAllUpdate->SetTotalEvents(j, nhit);
+      m_hEffAllUpdate->SetPassedEvents(j, nmatch);
+      m_hEffAllLastTotal->SetBinContent(j, nhit);
+      m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      updated[aModule] = true;
+    } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
+      m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+      m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
+      m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
+      m_hEffAllLastTotal->SetBinContent(j, nhit);
+      m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      updated[aModule] = true;
+    }
 
-      if (nhit > 50) {
-        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+    // workaround for excluded module
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+
+    // get the errors and check for limits for each bin seperately ...
+
+    if (nhit > 50) {
+      error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                     m_errorlevelmod[aModule]); // error if upper error value is below limit
+      warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                    m_warnlevelmod[aModule]); // (and not only the actual eff value)
+      if (m_alarmAdhoc) {
+        error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
                        m_errorlevelmod[aModule]); // error if upper error value is below limit
-        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+        warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
                       m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        if (m_alarmAdhoc) {
-          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                         m_errorlevelmod[aModule]); // error if upper error value is below limit
-          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        }
       }
     }
   }

@@ -455,7 +455,7 @@ void DQMHistAnalysisECLModule::event()
     // Get minimal value for each type of saved waveforms
     if (events > 100000) {
       TH1* hist = findHist(str(boost::format("ECL/wf_cid_%1%") % wf_option));
-      m_wf_fraction[wf_option] = hist->GetMinimum();
+      m_wf_fraction[wf_option] = hist->GetBinContent(hist->GetMinimumBin());
     }
     auto pv_name = (boost::format("wf_frac:%s:min") % wf_option).str();
     setEpicsPV(pv_name, m_wf_fraction[wf_option]);

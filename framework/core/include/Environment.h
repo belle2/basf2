@@ -397,8 +397,8 @@ namespace Belle2 {
     unsigned int m_zmqEventBufferSize = 1; /**< Number of events to keep in flight for every worker */
     unsigned int m_zmqWorkerTimeout =
       0; /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
-    bool m_zmqUseEventBackup = false; /**< If a worker dies, store its events in a backup. */
-    bool m_zmqRestartFailedWorkers = false; /**< If a worker dies, restart it. */
+    bool m_zmqUseEventBackup = true; /**< If a worker dies, store its events in a backup. */
+    bool m_zmqRestartFailedWorkers = true; /**< If a worker dies, restart it. */
     bool m_zmqFailOnFailedWorkers = true; /**< If a worker dies, fail also. Will not be used if restartFailedWorkers is true. */
     bool m_zmqDAQEnvironment = false;   /**< True in DAQ environment */
     int m_zmqDAQFirstEventExp = 42; /**< Exp no. for the special first event */

@@ -12,8 +12,7 @@
 """(Semi-)Leptonic Working Group Skim list building functions for semi-leptonic analyses.
 """
 
-from basf2 import create_path
-from basf2 import conditions
+import basf2 as b2
 import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0, loadStdDplus, loadStdDstar0,
@@ -429,7 +428,9 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     def build_lists(self, path):
 
-        conditions.prepend_globaltag("analysis_tools_light-2305-korat")
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
         eIDCut = "pidChargedBDTScore(11,all) > 0.9"
         muIDCut = "muonID_noSVD > 0.9"
@@ -535,8 +536,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
         for Btype in ['B-:SL', 'anti-B0:SL']:
 
-            roe_path = create_path()
-            deadEndPath = create_path()
+            roe_path = b2.create_path()
+            deadEndPath = b2.create_path()
 # Execute the filter module:
             ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
             ma.appendROEMasks(Btype, [cleanMask], path=path)
@@ -578,7 +579,9 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        conditions.prepend_globaltag("analysis_tools_light-2305-korat")
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
         eIDCut = "pidChargedBDTScore(11,all) > 0.9"
         muIDCut = "muonID_noSVD > 0.9"
@@ -587,8 +590,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         gammaSignalECut = "1.4"
         cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
                      f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
-        roe_path = create_path()
-        deadEndPath = create_path()
+        roe_path = b2.create_path()
+        deadEndPath = b2.create_path()
         for Btype in ['B-:SL', 'anti-B0:SL']:
             ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
             ma.appendROEMasks(Btype, [cleanMask], path=path)

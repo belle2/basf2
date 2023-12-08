@@ -31,10 +31,8 @@ class CheckPayloadNames(b2.Module):
             'HardwareClockSettings',
             'MagneticField']
         self.payload_names.sort()
-        #: Payloads required by this module
-        self.payloads = []
         for payload_name in self.payload_names:
-            self.payloads.append(B2.PyDBObj(payload_name))
+            B2.PyDBObj(payload_name)
 
     def event(self):
         '''Event.'''

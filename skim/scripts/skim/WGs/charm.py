@@ -447,14 +447,14 @@ class DpToHpPi0(BaseSkim):
 
     __authors__ = ["Yifan Jin"]
     __description__ = "Skim list for D+ to h+ pi0 without D* tag."
-    __contact__ = ["Jaeyoung Kim"]
+    __contact__ = __liaison__
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
-        loadStdSkimPi0(listtype='eff50_May2020_nomcmatch', path=path)
+        loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList('pi+:hppi0', 'pi+:charmSkim', 'pt > 0.1 and pionIDNN > 0.1', path=path)

@@ -396,8 +396,9 @@ namespace Belle2 {
     /**
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
+     * @return status of ca_pend_io
      * */
-    void updateEpicsPVs(float timeout);
+    int updateEpicsPVs(float timeout);
 
     /**
      * Get EPICS PV Channel Id
@@ -514,6 +515,17 @@ namespace Belle2 {
      * @param status status to color
      */
     void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Check the status of all PVs and report if disconnected or not found
+     */
+    void checkPVStatus(void);
+
+    /**
+     * check the status of a PVs and report if disconnected or not found
+     * @param onlyError print only if in error condition (default)
+     */
+    void printPVStatus(chid it, bool onlyError = true);
 
     // Public functions
   public:

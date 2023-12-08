@@ -669,22 +669,25 @@ void DQMHistAnalysisModule::checkPVStatus(void)
   }
   B2INFO("Check PVs done");
 }
-void DQMHistAnalysisModule::printPVStatus(chid it, bool onlyError)
+void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
 
 {
-  auto state = ca_state(it);
+  auto state = ca_state(pv);
   switch (state) {
     case cs_never_conn: /* valid chid, server not found or unavailable */
-      B2WARNING("Channel never connected " << ca_name(it));
+      B2WARNING("Channel never connected " << ca_name(pv));
       break;
     case cs_prev_conn:  /* valid chid, previously connected to server */
-      B2WARNING("Channel was connected, but now is not " << ca_name(it));
+      B2WARNING("Channel was connected, but now is not " << ca_name(pv));
       break;
     case cs_closed:   /* channel deleted by user */
-      B2WARNING("Channel deleted already " << ca_name(it));
+      B2WARNING("Channel deleted already " << ca_name(pv));
       break;
     case cs_conn:       /* valid chid, connected to server */
-      if (!onlyError) B2INFO("Channel connected and OK " << ca_name(it));
+      if (!onlyError) B2INFO("Channel connected and OK " << ca_name(pv));
+      break;
+    default:
+      B2WARNING("Undefined status for channel " << ca_name(pv));
       break;
   }
 }

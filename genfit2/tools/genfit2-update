@@ -8,6 +8,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+set -e
+
 # check if we are in a local repository
 if [ -z ${BELLE2_LOCAL_DIR} ]; then
   echo "You can update GenFit only if you setup a local basf2 repository" 

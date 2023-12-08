@@ -621,9 +621,10 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     // This indicates that DQMHistAnalysisECL module is not included in the path
     bool not_normalized = (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr);
     if (total_events >= dead_alarm.required_statistics) {
-      // Number of hits with E > threshold should be higher than 0.01%
+      // For null runs, it should be higher than 0.0001%
+      // For cosmic runs, number of hits with E > threshold should be higher than 0.01%
       // (for physics runs, as opposed to cosmics, this can actually be set to higher value)
-      double min_occupancy = 0.0001;
+      double min_occupancy = 1e-6;
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count
         min_occupancy *= total_events;

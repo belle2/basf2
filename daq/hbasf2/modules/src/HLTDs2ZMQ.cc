@@ -37,8 +37,8 @@ HLTDs2ZMQModule::HLTDs2ZMQModule() : Module()
   addParam("raw", m_param_raw, "Send out raw data with send header and trailer around the evtmessage instead of just the evtmessage. "
            "The former is the typical use case when talking with e.g. storage, "
            "the latter can be used for local tests or when sending full events e.g. to the event display.");
-  addParam("outputConfirmation", m_param_outputConfirmation, "Waiting output confirmation message or not. "
-           "ExpressReco ouptut is event displays and usually don't need the confirmation message.", m_param_outputConfirmation);
+  addParam("outputConfirmation", m_param_outputConfirmation, "Waiting for output confirmation message or not. "
+           "ExpressReco output is event displays and usually don't need the confirmation message.", m_param_outputConfirmation);
 }
 
 void HLTDs2ZMQModule::event()

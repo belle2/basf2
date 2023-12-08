@@ -523,9 +523,10 @@ namespace Belle2 {
 
     /**
      * check the status of a PVs and report if disconnected or not found
+     * @param pv the chid of the PV to check
      * @param onlyError print only if in error condition (default)
      */
-    void printPVStatus(chid it, bool onlyError = true);
+    void printPVStatus(chid pv, bool onlyError = true);
 
     // Public functions
   public:

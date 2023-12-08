@@ -367,54 +367,46 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^- \\to D^0 e^-`
-    * :math:`B^- \\to D^0 \\mu^-`
-    * :math:`anti-B^0 \\to D^+ e^-`
-    * :math:`anti-B^0 \\to D^+ \\mu^-`
-    * :math:`anti-B^0 \\to D^{*+}(D^0 \\pi^+) e^-`
-    * :math:`anti-B^0 \\to D^{*+}(D^0 \\pi^+) \\mu^-`
+    * :math:`B^- \\to D^0 e^-`,  :math:`B^- \\to D^0 \\mu^-`
+    * anti-:math:`B^0 \\to D^+ e^-`,  anti-:math:`B^0 \\to D^+ \\mu^-`
+    * anti-:math:`B^0 \\to D^{*+}(D^0 \\pi^+) e^-`,  anti-:math:`B^0 \\to D^{*+}(D^0 \\pi^+) \\mu^-`
 
     Additional ROE cuts:
 
     * The logical OR of the following:
-    * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
-    * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
-    * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
-    * Two or fewer charged tracks
-    * :math:`E_{ECL} < 2.0` GeV
+
+        * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
+        * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
+        * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
+        * Two or fewer charged tracks
+        * :math:`E_{ECL} < 2.0` GeV
 
     Cuts on electrons:
 
     * :math:`\\text{pidChargedBDTScore(11,all)} > 0.9`
-    * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame
-    * :math:`p > 0.5\\,\\text{GeV}` in lab frame
-    * :math:`dr < 0.5`
-    * :math:`abs(dz) < 2`
+    * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame,  :math:`p > 0.5\\,\\text{GeV}` in lab frame
+    * :math:`dr < 0.5`,  :math:`|dz| < 2`
     * :math:`\\text{thetaInCDCAcceptance}`
 
     Cuts on muons:
 
     * :math:`\\text{muonID_noSVD} > 0.9`
-    * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame
-    * :math:`p > 0.7\\,\\text{GeV}` in lab frame
-    * :math:`dr < 0.5`
-    * :math:`abs(dz) < 2`
+    * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame,  :math:`p > 0.7\\,\\text{GeV}` in lab frame
+    * :math:`dr < 0.5`,  :math:`|dz| < 2`
 
     Charged mask for ROE:
 
     * :math:`p_t>0.05\\,\\text{GeV}`
-    * :math:`dr < 5\\,\\test{cm}`
-    * :math:`dz < 10\\,\\test{cm}`
+    * :math:`dr < 5\\,\\text{cm}`,  :math:`|dz| < 10\\,\\text{cm}`
 
     ECL cluster mask for ROE:
 
-    * :math:`\\text{clusterNHits}>1.5`
-    * :math:`0.2967<\\theta<2.6180`
-    * :math:`E>0.080,\\test{GeV}`
+    * :math:`\\text{clusterNHits}>1.5`,  :math:`0.2967<\\theta<2.6180`
+    * :math:`E>0.080,\\text{GeV}`
     """
 
     __authors__ = ["Bob Kowalewski"]
-    __description__ = "Skim for semileptonic tags with an electron or a muon or a photon or a low-multiplicity signal decay"
+    __description__ = "Skim for semileptonic tags with an ROE electron, muon, photon or a low-multiplicity signal decay"
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 

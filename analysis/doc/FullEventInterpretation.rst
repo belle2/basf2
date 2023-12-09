@@ -126,7 +126,7 @@ the tool `b2conditionsdb-recommend` or the function `modularAnalysis.getAnalysis
 You will need to prepend this tag to your global tags list.
 This is done inside the FEI steering script.
 
-.. code-block:: python3
+.. code-block:: python
 
         import basf2
         import fei
@@ -187,7 +187,7 @@ Another interesting configuration is given by ``get_fr_channels``, which will re
 
 In the training and application steering file you probably will use:
 
-.. code-block:: python3
+.. code-block:: python
 
    import fei
    particles = fei.get_default_channels(hadronic=True, semileptonic=True, chargedB=True, neutralB=True)
@@ -683,7 +683,7 @@ all other tasks will be constructed from the requirements, down to the ``FEIAnal
 
 To run the full workflow, the wrapper contains the following piece of code:
 
-.. code-block:: python3
+.. code-block:: python
 
         yield FEITrainingTask(
             mode="Training",
@@ -779,7 +779,7 @@ To access the old Belle database anyway you have to forward to server to you loc
 Depending on how you use b2bii, the BELLE_POSTGRES_SERVER will be overridden by b2bii. Hence you have to enforce that localhost is used anyway.
 You can ensure this by adding:
 
-.. code-block:: python3
+.. code-block:: python
 
     import os
 

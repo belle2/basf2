@@ -396,8 +396,9 @@ namespace Belle2 {
     /**
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
+     * @return status of ca_pend_io
      * */
-    void updateEpicsPVs(float timeout);
+    int updateEpicsPVs(float timeout);
 
     /**
      * Get EPICS PV Channel Id
@@ -485,7 +486,47 @@ namespace Belle2 {
      * set global Prefix for EPICS PVs
      * @param prefix Prefix to set
      */
+
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+
+    /**
+     * Status flag of histogram
+    */
+    enum EStatus {
+      c_TooFew = 0, /**< Not enough entries/event to judge */
+      c_Default = 1, /**< default for non-coloring */
+      c_Good = 2, /**< Analysis result: Good */
+      c_Warning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_Error = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Helper function to judge the status for coloring and EPICS
+     * @param enough enough events for judging
+     * @param warn_flag outside of expected range
+     * @param error_flag outside of warning range
+     * @return the status
+     */
+    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+
+    /**
+     * Helper function for Canvas colorization
+     * @param canvas Canvas to change
+     * @param status status to color
+     */
+    void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Check the status of all PVs and report if disconnected or not found
+     */
+    void checkPVStatus(void);
+
+    /**
+     * check the status of a PVs and report if disconnected or not found
+     * @param pv the chid of the PV to check
+     * @param onlyError print only if in error condition (default)
+     */
+    void printPVStatus(chid pv, bool onlyError = true);
 
     // Public functions
   public:

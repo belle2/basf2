@@ -305,8 +305,8 @@ class Mails:
 
         if incremental:
             body = (
-                "You are receiving this email, because additional"
-                " validation plots/scripts (that include you as contact "
+                "You are receiving this email, because additional "
+                "validation plots/scripts (that include you as contact "
                 "person) produced warnings/errors or "
                 "because their warning/error status "
                 "changed. \n"
@@ -314,8 +314,8 @@ class Mails:
             )
         else:
             body = (
-                "This is a full list of validation plots/scripts that"
-                " produced warnings/errors and include you as contact"
+                "This is a full list of validation plots/scripts that "
+                "produced warnings/errors and include you as contact "
                 "person (sent out once a week).\n\n"
             )
 

@@ -15,6 +15,12 @@ Modules
   inaccurate energy measurement. The energy is corrected kinematically based on the beam energy, the photon's direction, and the mass of the
   other particle in the two-body decay. The corrected kinematics are stored in copied particles in a new ParticleList. The original 
   kinematics of the ISR photon can be accessed using the metavariable `originalParticle`.
+* Added a new module `TrackingEnergyLossCorrection` alongside its helper function `modularAnalysis.correctTrackEnergy`.
+  This module modifies the track energy of each particle inside a particle list according to the given correction value
+  or by a phase-space dependent correction value extracted from a ParticleWeightingLookUpTable payload.
+  This module is intended to be used alongside the momentum scale factors implemented in the module `TrackingMomentumScaleFactors`.
+* Fixed a bug in the `MCDecayFinder` and `modularAnalysis.findMCDecay` that causes a segmentation fault when multiple candidates are
+  found.
 
 Variables
 +++++++++
@@ -53,6 +59,13 @@ Photon Energy Resolution
   calculated values if the cluster properties (:math:`E`, :math:`\phi`, :math:`\theta`) are within valid binning and leaves them unchanged otherwise.
   ``ClusterUtils`` triggers the replacement if a globaltag with a valid ``ECLPhotonEnergyResolution`` payload is present and
   without further user input.
+
+Particle weights
+++++++++++++++++
+* Added a new utility class ``PostProcessingParticleWeighting`` for
+  post-processing particle weighting. This class reads the weights from the
+  database for the specified experiment and run numbers and the weight-table
+  variables.
 
 Variables
 +++++++++

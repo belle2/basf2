@@ -417,6 +417,8 @@ double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
   if (r == ECA_NORMAL) {
     return value;
   } else {
+    B2WARNING("Read PV failed for " << keyname);
+    printPVStatus(m_epicsNameToChID[keyname], false);
     SEVCHK(r, "ca_get or ca_pend_io failure");
   }
 #endif
@@ -440,6 +442,8 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   if (r == ECA_NORMAL) {
     return value;
   } else {
+    B2WARNING("Read PV failed for " << ca_name(m_epicsChID[index]));
+    printPVStatus(m_epicsChID[index], false);
     SEVCHK(r, "ca_get or ca_pend_io failure");
   }
 #endif
@@ -465,6 +469,8 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& s
     status = true;
     return std::string(value);
   } else {
+    B2WARNING("Read PV failed for " << keyname);
+    printPVStatus(m_epicsNameToChID[keyname], false);
     SEVCHK(r, "ca_get or ca_pend_io failure");
   }
 #endif
@@ -490,6 +496,8 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
     status = true;
     return std::string(value);
   } else {
+    B2WARNING("Read PV failed for " << ca_name(m_epicsChID[index]));
+    printPVStatus(m_epicsChID[index], false);
     SEVCHK(r, "ca_get or ca_pend_io failure");
   }
 #endif
@@ -524,12 +532,17 @@ chid DQMHistAnalysisModule::getEpicsPVChID(int index)
   return nullptr;
 }
 
-void DQMHistAnalysisModule::updateEpicsPVs(float wait)
+int DQMHistAnalysisModule::updateEpicsPVs(float wait)
 {
-  if (!m_useEpics) return;
+  int state = ECA_NORMAL;
+  if (!m_useEpics) return state;
 #ifdef _BELLE2_EPICS
-  if (wait > 0.) SEVCHK(ca_pend_io(wait), "ca_pend_io failure");
+  if (wait > 0.) {
+    state = ca_pend_io(wait);
+    SEVCHK(state, "ca_pend_io failure");
+  }
 #endif
+  return state;
 }
 
 void DQMHistAnalysisModule::cleanupEpicsPVs(void)
@@ -587,8 +600,95 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
       }
       return true;
     } else {
+      B2WARNING("Reading PV Limits failed for " << ca_name(pv));
+      printPVStatus(pv, false);
       SEVCHK(r, "ca_get or ca_pend_io failure");
     }
   }
   return false;
 }
+
+DQMHistAnalysisModule::EStatus DQMHistAnalysisModule::makeStatus(bool enough, bool warn_flag, bool error_flag)
+{
+  // white color is the default, if no colorize
+  if (!enough) {
+    return (c_TooFew);
+  } else {
+    if (error_flag) {
+      return (c_Error);
+    } else if (warn_flag) {
+      return (c_Warning);
+    } else {
+      return (c_Good);
+    }
+  }
+
+  return (c_Default); // default, but should not be reached
+}
+
+void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
+{
+  if (!canvas) return;
+  // white color is the default, if no colorize
+  int color;
+  switch (stat) {
+    case c_TooFew:
+      color = kGray; // Magenta or Gray
+      break;
+    case c_Default:
+      color = kWhite; // default no colors
+      break;
+    case c_Good:
+      color = kGreen; // Good
+      break;
+    case c_Warning:
+      color = kYellow; // Warning
+      break;
+    case c_Error:
+      color = kRed; // Severe
+      break;
+    default:
+      color = kWhite; // default no colors
+      break;
+  }
+
+  canvas->Pad()->SetFillColor(color);
+
+  canvas->Pad()->SetFrameFillColor(kWhite - 1); // White
+  canvas->Pad()->SetFrameFillStyle(1001);// White
+  canvas->Pad()->Modified();
+  canvas->Pad()->Update();
+}
+
+void DQMHistAnalysisModule::checkPVStatus(void)
+{
+  B2INFO("Check PV Connections");
+
+  for (auto& it : m_epicsChID) {
+    printPVStatus(it);
+  }
+  B2INFO("Check PVs done");
+}
+void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
+
+{
+  auto state = ca_state(pv);
+  switch (state) {
+    case cs_never_conn: /* valid chid, server not found or unavailable */
+      B2WARNING("Channel never connected " << ca_name(pv));
+      break;
+    case cs_prev_conn:  /* valid chid, previously connected to server */
+      B2WARNING("Channel was connected, but now is not " << ca_name(pv));
+      break;
+    case cs_closed:   /* channel deleted by user */
+      B2WARNING("Channel deleted already " << ca_name(pv));
+      break;
+    case cs_conn:       /* valid chid, connected to server */
+      if (!onlyError) B2INFO("Channel connected and OK " << ca_name(pv));
+      break;
+    default:
+      B2WARNING("Undefined status for channel " << ca_name(pv));
+      break;
+  }
+}
+

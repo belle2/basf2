@@ -28,7 +28,9 @@ namespace Belle2 {
      */
     class GammaLeptoNuclearPhysics: public G4VPhysicsConstructor {
     public:
-      GammaLeptoNuclearPhysics();
+      /** Constructor **/
+      GammaLeptoNuclearPhysics(const G4int verbosityLevel = 0);
+      /** Destructor **/
       ~GammaLeptoNuclearPhysics();
 
       /** Build processes, models, cross sections used in physics list */
@@ -52,6 +54,9 @@ namespace Belle2 {
 
       /** Precompound model to deexcite post-collision nucleus */
       G4GeneratorPrecompoundInterface* m_preCompoundModel;
+
+      /** Switch between GammaNuclearXS and PhotoNuclearXS */
+      G4bool m_useGammaNuclearXS;
 
     };
 

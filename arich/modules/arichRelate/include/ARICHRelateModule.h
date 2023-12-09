@@ -5,23 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHRELATEMODULE_H
-#define ARICHRELATEMODULE_H
-
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <arich/dataobjects/ARICHAeroHit.h>
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 
 #include <framework/core/Module.h>
 
 namespace Belle2 {
+  class Track;
+  class ExtHit;
+  class MCParticle;
+  class ARICHAeroHit;
 
   /**
-   *
+   * Creates relations between ARICHAeroHits and ExtHits. Allows to store simulation output without MCParticles
    */
   class ARICHRelateModule : public Module {
 
@@ -35,7 +32,7 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~ARICHRelateModule();
+    virtual ~ARICHRelateModule() {};
 
     /**
      * Initialize the Module.
@@ -44,32 +41,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
 
   private:
 
@@ -82,5 +56,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

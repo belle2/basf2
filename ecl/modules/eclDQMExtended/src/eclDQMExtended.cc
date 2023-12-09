@@ -6,33 +6,33 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclDQMExtended/eclDQMExtended.h>
 
-//FRAMEWORK
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/utility/ECLDspEmulator.h>
+#include <ecl/utility/ECLDspUtilities.h>
+
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
-//ECL
-#include <ecl/utility/ECLDspUtilities.h>
-#include <ecl/utility/ECLDspEmulator.h>
-
-//STL
-#include <regex>
-#include <map>
-#include <vector>
-#include <string>
-#include <iostream>
-
-//ROOT
+/* ROOT headers. */
+#include <TDirectory.h>
 #include <TH1F.h>
 #include <TH2F.h>
-#include <TDirectory.h>
 
-//BOOST
-#include <boost/filesystem.hpp>
+/* Boost headers. */
 #include <boost/format.hpp>
+
+/* C++ headers. */
+#include <filesystem>
+#include <iostream>
+#include <map>
+#include <regex>
+#include <string>
+#include <vector>
 
 
 //NAMESPACE(S)
@@ -150,13 +150,16 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_timefail_quality->SetFillColor(kPink - 4);
   h_timefail_quality->GetXaxis()->SetTitle("FPGA fit qual. -1-all evts,0-good,1-int overflow,2-low amp,3-bad chi2");
 
-  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies", 8736, 1, 8737);
+  h_ampfail_cellid = new TH1F("ampfail_cellid", "Cell IDs w/ amp inconsistencies",
+                              ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_ampfail_cellid->GetXaxis()->SetTitle("Cell ID");
 
-  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies", 8736, 1, 8737);
+  h_timefail_cellid = new TH1F("timefail_cellid", "Cell IDs w/ time inconsistencies",
+                               ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_timefail_cellid->GetXaxis()->SetTitle("Cell ID");
 
-  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies", 8736, 1, 8737);
+  h_amptimefail_cellid = new TH1F("amptimefail_cellid", "Cell IDs w/ time and amp inconsistencies",
+                                  ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_amptimefail_cellid->GetXaxis()->SetTitle("Cell ID");
 
   h_ampfail_shaperid = new TH1F("ampfail_shaperid", "Shaper IDs w/ amp inconsistencies", 624, 1, 625);
@@ -177,7 +180,8 @@ void ECLDQMEXTENDEDModule::defineHisto()
   h_amptimefail_crateid = new TH1F("amptimefail_crateid", "Crate IDs w/ time and amp inconsistencies", 52, 1, 53);
   h_amptimefail_crateid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
 
-  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies", 8736, 1, 8737);
+  h_qualityfail_cellid = new TH1F("qualityfail_cellid", "Cell IDs w/ fit qual inconsistencies",
+                                  ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1);
   h_qualityfail_cellid->GetXaxis()->SetTitle("Cell ID");
 
   h_qualityfail_shaperid = new TH1F("qualityfail_shaperid", "Shaper IDs w/ fit qual inconsistencies", 624, 1, 625);
@@ -197,12 +201,12 @@ void ECLDQMEXTENDEDModule::defineHisto()
 
   if (m_SaveDetailedFitData) {
     h_ampdiff_cellid = new TH2F("ampdiff_cellid", "Amp. diff. (Emulator-Data) for amp inconsistencies",
-                                8736, 1, 8737, 239, -262143, 262143);
+                                ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, 239, -262143, 262143);
     h_ampdiff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_ampdiff_cellid->GetYaxis()->SetTitle("Amplitude difference");
 
     h_timediff_cellid = new TH2F("timediff_cellid", "Time diff. (Emulator-Data) for time inconsistencies",
-                                 8736, 1, 8737, 239, -4095, 4095);
+                                 ECLElementNumbers::c_NCrystals, 1, ECLElementNumbers::c_NCrystals + 1, 239, -4095, 4095);
     h_timediff_cellid->GetXaxis()->SetTitle("Cell ID");
     h_timediff_cellid->GetYaxis()->SetTitle("Time difference");
 
@@ -242,6 +246,10 @@ void ECLDQMEXTENDEDModule::defineHisto()
                                     -1, 3);
   h_timeflag_qualityfail->GetXaxis()->SetTitle("FPGA fit quality. 0-good,1-int overflow,2-low amp,3-bad chi2");
   h_timeflag_qualityfail->GetYaxis()->SetTitle("Time flag (0-time consistent)");
+
+  h_missing_ecldigits = new TH1F("missing_ecldigits", "", 4, 0, 4);
+  h_missing_ecldigits->SetTitle("Fit quality flag for missing ECLDigits (missing fit results)");
+  h_missing_ecldigits->GetXaxis()->SetTitle("C++ fit quality. 0-good,1-int overflow,2-low amplitude,3-bad chi2");
 
   oldDir->cd();
 }
@@ -342,13 +350,13 @@ void ECLDQMEXTENDEDModule::initDspfromDB()
 
 void ECLDQMEXTENDEDModule::initDspfromFile()
 {
-  const boost::filesystem::path MainDir(m_DSPDirectoryName);
-  const boost::filesystem::path RunSubDir(m_RunName);
+  const std::filesystem::path MainDir(m_DSPDirectoryName);
+  const std::filesystem::path RunSubDir(m_RunName);
   const std::regex Filter(".*(crate)([0-9]{2})/.*(dsp)([0-9]{2})(.dat)");
   if (!exists(MainDir / RunSubDir)) B2FATAL("ECL DQM logic test FATAL: Directory w/ DSP files don't exist" << LogVar("Directory",
                                               MainDir / RunSubDir));
-  for (boost::filesystem::directory_entry& x : boost::filesystem::recursive_directory_iterator(MainDir / RunSubDir)) {
-    if (!std::regex_match(x.path().string(), Filter) || !boost::filesystem::is_regular_file(x.path())) continue;
+  for (const std::filesystem::directory_entry& x : std::filesystem::recursive_directory_iterator(MainDir / RunSubDir)) {
+    if (!std::regex_match(x.path().string(), Filter) || !std::filesystem::is_regular_file(x.path())) continue;
     int iCrate = atoi(std::regex_replace(x.path().string(), Filter, "$2").c_str());
     int iShaperPosition = atoi(std::regex_replace(x.path().string(), Filter, "$4").c_str());
     int iShaper = (iCrate - 1) * 12 + iShaperPosition;
@@ -389,7 +397,7 @@ void ECLDQMEXTENDEDModule::emulator(int cellID, int trigger_time, std::vector<in
   int k_16 = map_coef.at("k_16");
   int chi_thres = map_coef.at("chi_thres");
 
-  int A0 = (int)v_totalthrA0[cellID - 1];
+  int A0    = (int)v_totalthrA0[cellID - 1];
   int Ahard = (int)v_totalthrAhard[cellID - 1];
   int Askip = (int)v_totalthrAskip[cellID - 1];
 
@@ -443,6 +451,7 @@ void ECLDQMEXTENDEDModule::beginRun()
   h_quality_fit_data->Reset();
   h_ampflag_qualityfail->Reset();
   h_timeflag_qualityfail->Reset();
+  h_missing_ecldigits->Reset();
 }
 
 void ECLDQMEXTENDEDModule::event()
@@ -469,11 +478,15 @@ void ECLDQMEXTENDEDModule::event()
     emulator(m_CellId, m_TrigTime, DspArray);
     ECLDigit* aECLDigit = ECLDigit::getByCellID(m_CellId);
 
-    if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit)
-      B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"
-              << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
-              << LogVar("A_emulator", m_AmpFit)
-              << LogVar("Quality_emulator", m_QualityFit));
+    if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && m_QualityFit < 4 && !aECLDigit) {
+      if (h_missing_ecldigits->GetEntries() == 0) {
+        B2ERROR("ECL DQM logic test error: ECL Digit does not exist for A_emulator > Thr_skip"
+                << LogVar("Thr_skip", (int)v_totalthrAskip[m_CellId - 1])
+                << LogVar("A_emulator", m_AmpFit)
+                << LogVar("Quality_emulator", m_QualityFit));
+      }
+      h_missing_ecldigits->Fill(m_QualityFit);
+    }
 
     if ((m_AmpFit >= (int)v_totalthrAskip[m_CellId - 1]) && aECLDigit) {
 

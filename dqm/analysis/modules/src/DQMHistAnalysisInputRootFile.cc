@@ -46,7 +46,6 @@ DQMHistAnalysisInputRootFileModule::DQMHistAnalysisInputRootFileModule()
   addParam("EventFilled", m_fillEvent, "Event override", 0);
   addParam("EventInterval", m_interval, "Time between events (seconds)", 20u);
   addParam("NullHistogramMode", m_nullHistoMode, "Test mode for null histograms", false);
-  addParam("AutoCanvas", m_autocanvas, "Automatic creation of canvas", true);
   B2DEBUG(1, "DQMHistAnalysisInputRootFile: Constructor done.");
 }
 
@@ -178,33 +177,12 @@ void DQMHistAnalysisInputRootFileModule::event()
 
       if (hname.find("/") == std::string::npos) h->SetName((dirname + "/" + hname).c_str());
       hs.push_back(h);
-
-      if (m_autocanvas) {
-        std::string name = dirname + "_" + hname;
-        if (m_cs.find(name) == m_cs.end()) {
-          TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
-          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-        }
-
-        TCanvas* c = m_cs[name]; // access already created canvas
-        B2DEBUG(1, "DQMHistAnalysisInputRoot: new canvas " << c->GetName());
-        c->cd();
-        if (h->GetDimension() == 1) {
-          // assume users are expecting non-0-suppressed axis
-          if (h->GetMinimum() > 0) h->SetMinimum(0);
-          h->Draw("hist");
-        } else if (h->GetDimension() == 2) {
-          // ... but not in 2d
-          h->Draw("colz");
-        }
-        c->Update();
-      }
     }
     m_file->cd();
   }
 
   // if no histograms are found in the sub-directories
-  // searc the top folder
+  // search the top folder
   if (hs.size() == 0) {
     TIter nexth(m_file->GetListOfKeys());
     TKey* keyh = NULL;
@@ -230,22 +208,6 @@ void DQMHistAnalysisInputRootFileModule::event()
       hs.push_back(h);
       Double_t scale = 1.0 * m_count / m_eventsList[m_run_idx];
       h->Scale(scale);
-      if (m_autocanvas) {
-        std::string name = h->GetName();
-        name.replace(name.find("/"), 1, "/c_");
-        if (m_cs.find(name) == m_cs.end()) {
-          TCanvas* c = new TCanvas(name.c_str(), name.c_str());
-          m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
-        }
-        TCanvas* c = m_cs[name];
-        c->cd();
-        if (h->GetDimension() == 1) {
-          h->Draw("hist");
-        } else if (h->GetDimension() == 2) {
-          h->Draw("colz");
-        }
-        c->Update();
-      }
     }
   }
 
@@ -270,15 +232,3 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   B2INFO("DQMHistAnalysisInputRootFile: event finished. count: " << m_count);
 }
-
-void DQMHistAnalysisInputRootFileModule::endRun()
-{
-  B2INFO("DQMHistAnalysisInputRootFile : endRun called");
-}
-
-
-void DQMHistAnalysisInputRootFileModule::terminate()
-{
-  B2INFO("terminate called");
-}
-

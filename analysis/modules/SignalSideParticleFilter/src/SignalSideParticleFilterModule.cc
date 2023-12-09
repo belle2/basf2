@@ -56,34 +56,36 @@ void SignalSideParticleFilterModule::initialize()
 void SignalSideParticleFilterModule::event()
 {
   setReturnValue(false);
-  bool inTheLists = false;
 
   StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-  if (roe.isValid()) {
-    const Particle* particle = roe->getRelatedFrom<Particle>();
-    if (particle) {
+  if (!roe.isValid())
+    return;
+
+  const Particle* particle = roe->getRelatedFrom<Particle>();
+  if (!particle)
+    return;
+
+  for (auto& iParticleListName : m_particleLists) {
+    StoreObjPtr<ParticleList> iParticlelist(iParticleListName);
+
+    if (!iParticlelist) {
+      B2WARNING("Input list " << iParticlelist.getName() << " was not created?");
+      continue;
+    }
+
+    const unsigned int numParticles = iParticlelist->getListSize();
+    if (numParticles == 0)
+      continue;
+
+    if (iParticlelist->contains(particle)) {
+      // cut should be called only if the particle is in the ParticleList
       if (m_cut->check(particle)) {
-        for (auto& iParticleListName : m_particleLists) {
-
-          StoreObjPtr<ParticleList> iParticlelist(iParticleListName);
-
-          if (!iParticlelist) {
-            B2WARNING("Input list " << iParticlelist.getName() << " was not created?");
-            continue;
-          }
-
-          const unsigned int numParticles = iParticlelist->getListSize();
-          if (numParticles == 0)
-            continue;
-
-          if (iParticlelist->contains(particle)) {
-            inTheLists = true; break;
-          }
-        }
+        setReturnValue(true);
+        return;
       }
     }
   }
-  setReturnValue(inTheLists);
+
 }
 
 

@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/bklm/modules/bklmSimHistogrammer/BKLMSimHistogrammerModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

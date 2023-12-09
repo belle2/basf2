@@ -135,7 +135,7 @@ class ROIFindingTrackingValidationPlots(basf2.Module):
         """Receive signal at the end of event processing"""
 
         contact = self.contact
-        basf2.B2RESULT("total nROIs = {}".format(self.nROIs))
+        basf2.B2RESULT(f"total nROIs = {self.nROIs}")
 
         ''' Saving'''
 
@@ -240,14 +240,6 @@ param_pxdDataRed = {
     'recoTrackListName': svd_reco_tracks,
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
-    'tolerancePhi': 0.15,
-    'toleranceZ': 0.5,
-    'sigmaSystU': 0.02,
-    'sigmaSystV': 0.02,
-    'numSigmaTotU': 10,
-    'numSigmaTotV': 10,
-    'maxWidthU': 0.5,
-    'maxWidthV': 0.5,
 }
 pxdDataRed.param(param_pxdDataRed)
 path.add_module(pxdDataRed)
@@ -269,3 +261,5 @@ if ACTIVE:
     basf2.process(path)
 
     print(path)
+
+    print(basf2.statistics)

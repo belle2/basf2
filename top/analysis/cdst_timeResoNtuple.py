@@ -16,22 +16,26 @@
 # The following draw command must show a peak that represents an overall time resolution:
 #    tree->Draw("time-t0>>h(100,-1,2)", "t0<10")
 #
-# Usage: basf2 cdst_timeResoNtuple.py -i <cdst_file-dimuon_skim.root> [mc]
+# Usage: basf2 cdst_timeResoNtuple.py -i <cdst_file-dimuon_skim.root>
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
 from ROOT import Belle2
 from ROOT import TH1F, TH2F
-from ROOT import AddressOf, gROOT
-from ROOT.Math import PxPyPzEVector
+from ROOT import addressof, gROOT
 import math
 import ROOT
-import sys
 
-MC = False
-if len(sys.argv) > 1:
-    MC = True
-    file_num = sys.argv[1]
+# global tags
+# ******************************************************************************************************************
+# note: The patching global tags and their order are bucket number and basf2 version dependent.
+#       Given below is what is needed for cdst files of bucket 16 calibration and January-2023 development version.
+# ******************************************************************************************************************
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('patch_main_release-07_noTOP')
+b2.conditions.append_globaltag('data_reprocessing_proc13')  # experiments 7 - 18
+# b2.conditions.append_globaltag('data_reprocessing_prompt')  # experiments 20 - 26
+b2.conditions.append_globaltag('online')
 
 
 gROOT.ProcessLine('struct TreeStruct {\
@@ -51,7 +55,7 @@ gROOT.ProcessLine('struct TreeStruct {\
    float poca_y;  /* POCA y */ \
    float poca_z;  /* POCA z */ \
    int hitsCDC;   /* number of CDC hits */ \
-   float dEcms;   /* delta Ecms for muon */ \
+   float Ecms;    /* CMS energy of muon */ \
    float rec_t0;   /* t0 of this track determined with bunch finder */ \
    int valid_t0;   /* reconstruction status of t0 */ \
    int nfot;      /* number of photons */ \
@@ -67,6 +71,7 @@ gROOT.ProcessLine('struct TreeStruct {\
    float wid0[1000];    /* leading PDF peak: width w/o TTS */ \
    float t1[1000];      /* next to leading PDF peak: position */ \
    float t_pdf[1000];   /* associated pdf peak time */ \
+   float wid[1000];     /* associated pdf peak width */ \
    int type[1000];      /* 0 bkg, 1 direct, 2 reflected */ \
    int nx[1000];    /* total number of reflections in x */ \
    int ny[1000];    /* total number of reflections in y */ \
@@ -75,6 +80,7 @@ gROOT.ProcessLine('struct TreeStruct {\
    int nxe[1000];    /* number of reflections in x in prism */ \
    int nye[1000];    /* number of reflections in y in prism */ \
    int nys[1000];    /* number of reflections on slanted surface of prism */ \
+   float fic[1000];  /* Cherenkov azimuthal angle in degrees */ \
    float xd[1000];  /* unfolded x coordinate of a pixel */ \
    float yd[1000];  /* unfolded y coordinate of a pixel */ \
    float xm[1000];  /* unfolded x coordinate of a reconstructed point on mirror */ \
@@ -85,7 +91,7 @@ gROOT.ProcessLine('struct TreeStruct {\
 
 int_arrays = ['channel', 'pixel', 'pulseHeight', 'sample', 'status', 'type', 'nx', 'ny',
               'nxm', 'nym', 'nxe', 'nye', 'nys']
-float_arrays = ['time', 'timeErr', 'pulseWidth', 't0', 'wid0', 't1', 't_pdf', 'alpha',
+float_arrays = ['time', 'timeErr', 'pulseWidth', 't0', 'wid0', 't1', 't_pdf', 'wid', 'alpha', 'fic',
                 'xd', 'yd', 'xm', 'kx', 'ky']
 
 from ROOT import TreeStruct  # noqa
@@ -104,10 +110,13 @@ class Ntuple(b2.Module):
         expNo = evtMetaData.obj().getExperiment()
         runNo = evtMetaData.obj().getRun()
         exp_run = '-e' + '{:0=4d}'.format(expNo) + '-r' + '{:0=5d}'.format(runNo)
-        if not MC:
-            outName = 'out_data/timeResoNtuple' + exp_run + '.root'
-        else:
-            outName = 'out_mc/timeResoNtuple' + exp_run + '-' + file_num + '.root'
+        outName = 'timeResoNtuple' + exp_run + '.root'
+
+        #: track selector - selection of muons from ee->mumu events
+        self.trk_selector = Belle2.TOP.TrackSelector("dimuon")
+        self.trk_selector.setDeltaEcms(0.1)
+        self.trk_selector.setCutOnPOCA(2.0, 4.0)
+        self.trk_selector.setCutOnLocalZ(-130.0, 130.0)
 
         #: file object
         self.file = ROOT.TFile(outName, 'recreate')
@@ -168,7 +177,7 @@ class Ntuple(b2.Module):
                     formstring = '[nfot]/I'
                 elif key in float_arrays:
                     formstring = '[nfot]/F'
-                self.tree.Branch(key, AddressOf(self.data, key), key + formstring)
+                self.tree.Branch(key, addressof(self.data, key), key + formstring)
 
     def sortPeaks(self, unsortedPeaks):
         ''' sort PDF peaks according to their positions '''
@@ -192,49 +201,6 @@ class Ntuple(b2.Module):
                 h.Fill(x, peak.mean)
         h.Write()
 
-    def getEcms(self, tfit, chargedStable):
-        ''' returns c.m.s. energy of a particle '''
-        mom = tfit.getMomentum()
-        mass = chargedStable.getMass()
-        lorentzLab = PxPyPzMVector(mom.X(), mom.Y(), mom.Z(), mass)
-        T = Belle2.PCmsLabTransform()
-        lorentzCms = T.labToCms(lorentzLab)
-        return [lorentzCms.energy(), T.getCMSEnergy() / 2]
-
-    def trackSelected(self):
-        ''' returns true if track fulfills selection criteria  '''
-
-        if abs(self.data.dEcms) > 0.1:
-            return False
-        if abs(self.data.poca_x) > 0.2:
-            return False
-        if abs(self.data.poca_y) > 0.2:
-            return False
-        if abs(self.data.poca_z) > 0.5:
-            return False
-        return True
-
-    def getTOF(self, track, pdg, slot):
-        ''' returns timo-of-flight of extrapolated track '''
-
-        extHits = track.getRelationsWith('ExtHits')
-        extEnter = None
-        extExit = None
-        for extHit in extHits:
-            if abs(extHit.getPdgCode()) != pdg:
-                continue
-            if extHit.getDetectorID() != Belle2.Const.TOP:
-                continue
-            if extHit.getCopyID() != slot:
-                continue
-            if extHit.getStatus() == Belle2.EXT_ENTER:
-                extEnter = extHit
-            elif extHit.getStatus() == Belle2.EXT_EXIT:
-                extExit = extHit
-                if extEnter:
-                    return (extEnter.getTOF() + extExit.getTOF()) / 2
-        return 0
-
     def event(self):
         ''' event processing '''
 
@@ -252,18 +218,23 @@ class Ntuple(b2.Module):
         self.data.usedTrk = recBunch.getUsedTracks()
 
         for track in Belle2.PyStoreArray('Tracks'):
+            trk = Belle2.TOP.TOPTrack(track)
+            if not trk.isValid():
+                continue
+            if not self.trk_selector.isSelected(trk):
+                continue
             pdfs = track.getRelated('TOPPDFCollections')
             if not pdfs:
                 continue
             self.data.slot = pdfs.getModuleID()
             momentum = pdfs.getAssociatedLocalMomentum()
             position = pdfs.getAssociatedLocalHit()
-            self.data.p = momentum.Mag()
-            self.data.cth = momentum.CosTheta()
+            self.data.p = momentum.R()
+            self.data.cth = math.cos(momentum.Theta())
             self.data.phi = momentum.Phi()
             self.data.z = position.Z()
             self.data.x = position.X()
-            self.data.tof = self.getTOF(track, 13, self.data.slot)
+            self.data.tof = trk.getTOF(Belle2.Const.muon)
             try:
                 tfit = track.getTrackFitResultWithClosestMass(Belle2.Const.muon)
             except BaseException:
@@ -275,13 +246,9 @@ class Ntuple(b2.Module):
             self.data.poca_y = pocaPosition.Y()
             self.data.poca_z = pocaPosition.Z()
             self.data.hitsCDC = tfit.getHitPatternCDC().getNHits()
-            Ecms = self.getEcms(tfit, Belle2.Const.muon)
-            self.data.dEcms = Ecms[0] - Ecms[1]
-            if not self.trackSelected():
-                continue
+            self.data.Ecms = self.trk_selector.getCMSEnergy()
             try:
-                topll = track.getRelated('TOPLikelihoods')
-                extHit = topll.getRelated('ExtHits')
+                extHit = trk.getExtHit()
                 timeZero = extHit.getRelated('TOPTimeZeros')
                 self.data.rec_t0 = timeZero.getTime()
                 self.data.valid_t0 = timeZero.isValid()
@@ -299,7 +266,7 @@ class Ntuple(b2.Module):
             self.h_poca_xy.Fill(self.data.poca_x, self.data.poca_y)
             self.h_poca_z.Fill(self.data.poca_z)
             self.h_hitsCDC.Fill(self.data.hitsCDC)
-            self.h_Ecms.Fill(Ecms[0])
+            self.h_Ecms.Fill(self.data.Ecms)
             try:
                 pdf = pdfs.getHypothesisPDF(13)
             except BaseException:
@@ -307,8 +274,9 @@ class Ntuple(b2.Module):
                 continue
             self.data.itrk += 1
             self.pdfHistogram(pdf)
-            x0 = position.X() - momentum.X() / momentum.Y() * position.Y()  # emission
-            z0 = position.Z() - momentum.Z() / momentum.Y() * position.Y()  # emission
+            emi = trk.getEmissionPoint()
+            x0 = emi.position.X()
+            z0 = emi.position.Y()
             self.data.nfot = 0
             for digit in Belle2.PyStoreArray('TOPDigits'):
                 if digit.getModuleID() == self.data.slot and digit.getHitQuality() == 1:
@@ -337,6 +305,8 @@ class Ntuple(b2.Module):
                         if peaks.size() > 1:
                             self.data.t1[k] = sorted_peaks[1].mean
                     self.data.t_pdf[k] = 0
+                    self.data.wid[k] = 0
+                    self.data.fic[k] = 0
                     self.data.type[k] = 0
                     self.data.nx[k] = 0
                     self.data.ny[k] = 0
@@ -356,6 +326,8 @@ class Ntuple(b2.Module):
                         pik = assocPDF.getSinglePeak()
                         if pik:
                             self.data.t_pdf[k] = pik.position
+                            self.data.wid[k] = pik.width
+                            self.data.fic[k] = math.degrees(pik.fic)
                             self.data.type[k] = pik.type
                             self.data.nx[k] = pik.nx
                             self.data.ny[k] = pik.ny
@@ -391,11 +363,14 @@ main = b2.create_path()
 # Input: cdst file(s), use -i option
 main.add_module('RootInput')
 
-# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
-main.add_module('TOPGeometryParInitializer')
-
-# Channel masking
+# Reconstruction: TOP only
+main.add_module('Gearbox')
+main.add_module('Geometry')
+main.add_module('Ext')
+main.add_module('TOPUnpacker')
+main.add_module('TOPRawDigitConverter')
 main.add_module('TOPChannelMasker')
+main.add_module('TOPBunchFinder')
 
 # Make a muon PDF available at datastore
 main.add_module('TOPPDFDebugger', pdgCodes=[13])  # default

@@ -102,7 +102,7 @@ def get_det_hit_ids(reco_track, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Bel
 
         # Working around a bug in ROOT where you should not access empty std::vectors
         if len(hits) != 0:
-            det_hit_ids |= set((det_id, hit.getArrayIndex()) for hit in hits)
+            det_hit_ids |= {(det_id, hit.getArrayIndex()) for hit in hits}
 
     return det_hit_ids
 

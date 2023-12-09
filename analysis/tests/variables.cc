@@ -66,6 +66,26 @@ namespace {
     gearbox.open("geometry/Belle2.xml", false);
 
     {
+      Particle pH({0.290582573157898, 0, 6.99796952744559,  7.004},  11);
+      Particle pL({0.166035330010433, 0, -3.99855423973071, 4.002}, -11);
+
+      Particle p({0, 0.999999869440028, 0, 1.0}, -11);
+      const double eps = 1e-15;
+      UseReferenceFrame<CMSFrame> dummy;
+
+      EXPECT_NEAR(0.0, particlePx(&pH), eps);
+      EXPECT_NEAR(0.0, particlePy(&pH), eps);
+      EXPECT_NEAR(0.0, particlePx(&pL), eps);
+      EXPECT_NEAR(0.0, particlePy(&pL), eps);
+      EXPECT_FLOAT_EQ(5.289778893721573, particlePz(&pH));
+      EXPECT_FLOAT_EQ(-5.289778893721573, particlePz(&pL));
+      EXPECT_FLOAT_EQ(10.579557836806245064 / 2, particleE(&pH));
+      EXPECT_FLOAT_EQ(10.579557836806245064 / 2, particleE(&pL));
+
+      EXPECT_FLOAT_EQ(0.999999869440028, particlePy(&p));
+    }
+
+    {
       Particle p({ 0.1, -0.4, 0.8, 1.0 }, 411);
 
       TMatrixFSym error(7);
@@ -97,14 +117,14 @@ namespace {
 
       {
         UseReferenceFrame<CMSFrame> dummy;
-        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
-        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.68174648, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80918372, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.5489524, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80521482, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -184,14 +204,14 @@ namespace {
 
       {
         UseReferenceFrame<CMSRotationFrame> dummy(XYZVector(1, 0, 0), XYZVector(0, 1, 0), XYZVector(0, 0, 1));
-        EXPECT_FLOAT_EQ(0.68176979, particleP(&p));
-        EXPECT_FLOAT_EQ(0.80920333, particleE(&p));
-        EXPECT_FLOAT_EQ(0.061728548, particlePx(&p));
+        EXPECT_FLOAT_EQ(0.68174648, particleP(&p));
+        EXPECT_FLOAT_EQ(0.80918372, particleE(&p));
+        EXPECT_FLOAT_EQ(0.058562335, particlePx(&p));
         EXPECT_FLOAT_EQ(-0.40000001, particlePy(&p));
-        EXPECT_FLOAT_EQ(0.54863429, particlePz(&p));
-        EXPECT_FLOAT_EQ(0.404735, particlePt(&p));
-        EXPECT_FLOAT_EQ(0.80472076, particleCosTheta(&p));
-        EXPECT_FLOAT_EQ(-1.4176828, particlePhi(&p));
+        EXPECT_FLOAT_EQ(0.5489524, particlePz(&p));
+        EXPECT_FLOAT_EQ(0.40426421, particlePt(&p));
+        EXPECT_FLOAT_EQ(0.80521482, particleCosTheta(&p));
+        EXPECT_FLOAT_EQ(-1.4254233, particlePhi(&p));
 
         EXPECT_FLOAT_EQ(sqrt(0.2), particlePyErr(&p));
       }
@@ -279,11 +299,11 @@ namespace {
 
     {
       UseReferenceFrame<CMSFrame> dummy;
-      EXPECT_FLOAT_EQ(1.0382183, particleDX(&p));
+      EXPECT_FLOAT_EQ(1.026177, particleDX(&p));
       EXPECT_FLOAT_EQ(2.0, particleDY(&p));
-      EXPECT_FLOAT_EQ(2.2510159, particleDZ(&p));
-      EXPECT_FLOAT_EQ(std::sqrt(2.0 * 2.0 + 1.0382183 * 1.0382183), particleDRho(&p));
-      EXPECT_FLOAT_EQ(3.185117, particleDistance(&p));
+      EXPECT_FLOAT_EQ(2.2568872, particleDZ(&p));
+      EXPECT_FLOAT_EQ(hypot(2.0, 1.026177), particleDRho(&p));
+      EXPECT_FLOAT_EQ(3.1853695, particleDistance(&p));
       EXPECT_FLOAT_EQ(0.5, particlePvalue(&p));
     }
 
@@ -370,7 +390,7 @@ namespace {
     EXPECT_FALSE(std::get<bool>(vIsFromV0->function(part)));
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
-    EXPECT_FLOAT_EQ(sqrt(pow(position.X(), 2) + pow(position.Y(), 2)), trackD0(part));
+    EXPECT_FLOAT_EQ(position.Rho(), trackD0(part));
     EXPECT_FLOAT_EQ(3, trackNCDCHits(part));
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
@@ -383,7 +403,7 @@ namespace {
     secondTrack.setTrackFitResultIndex(Const::electron, 1);
     Track* savedTrack2 = myTracks.appendNew(secondTrack);
     myParticles.appendNew(savedTrack2, Const::ChargedStable(11));
-    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1])));
+    myV0s.appendNew(V0(std::pair(savedTrack, myResults[0]), std::pair(savedTrack2, myResults[1]), 0.0, 0.0, 0.0));
     const PxPyPzEVector v0Momentum(2 * momentum.X(), 2 * momentum.Y(), 2 * momentum.Z(), (momentum * 2).R());
     auto v0particle = myParticles.appendNew(v0Momentum, 22,
                                             Particle::c_Unflavored, Particle::c_V0, 0);
@@ -917,15 +937,15 @@ namespace {
 
     var = Manager::Instance().getVariable("useCMSFrame(p)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.68176979);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)),  0.68174650327489894064);
 
     var = Manager::Instance().getVariable("useCMSFrame(E)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80920333);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 0.80918372124478121776);
 
     var = Manager::Instance().getVariable("useCMSFrame(distance)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.185117);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(&p)), 3.1853695);
   }
 
   TEST_F(MetaVariableTest, useTagSideRecoilRestFrame)
@@ -1869,7 +1889,7 @@ namespace {
 
     var = Manager::Instance().getVariable("daughterDiffOf(1, 0, useCMSFrame(phi))");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5033823);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5004894);
 
     EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
   }
@@ -1996,7 +2016,7 @@ namespace {
     const Particle* par = particles.appendNew(momentum, 111, Particle::c_Unflavored, daughterIndices);
 
     //now we expect non-nan results
-    EXPECT_FLOAT_EQ(std::get<double>(var->function(par)), 2.8638029);
+    EXPECT_FLOAT_EQ(std::get<double>(var->function(par)), 2.8613892);
     EXPECT_FLOAT_EQ(std::get<double>(varCMS->function(par)), M_PI);
   }
 
@@ -2628,7 +2648,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(closest->function(electron)), 0.68014491);
 
       const auto* closestCMS = Manager::Instance().getVariable("useCMSFrame(angleToClosestInList(testGammaList))");
-      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.67899209);
+      EXPECT_FLOAT_EQ(std::get<double>(closestCMS->function(electron)), 0.67901474);
     }
 
     {
@@ -2665,7 +2685,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 2.2869499);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(angleToMostB2BInList(testGammaList))");
-      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.8312073);
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 2.8312778);
     }
 
     {
@@ -2682,7 +2702,7 @@ namespace {
       EXPECT_FLOAT_EQ(std::get<double>(mostB2B->function(electron)), 1.7);
 
       const auto* mostB2BCMS = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, E))");
-      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 1.584888); // the energy gets smeared because of boost
+      EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMS->function(electron)), 1.5848758); // the energy gets smeared because of boost
 
       const auto* mostB2BCMSLabE = Manager::Instance().getVariable("useCMSFrame(mostB2BInList(testGammaList, useLabFrame(E)))");
       EXPECT_FLOAT_EQ(std::get<double>(mostB2BCMSLabE->function(electron)), 1.7); // aaand should be back to the lab frame value

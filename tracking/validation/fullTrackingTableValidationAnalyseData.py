@@ -20,7 +20,7 @@ import basf2
 from ROOT import TFile, TNamed
 import os
 
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+VALIDATION_OUTPUT_FILE = "fullTrackingValidationTable.root"
 
 try:
     import uproot  # noqa
@@ -91,10 +91,10 @@ def write_value_cell(key, value):
     else:
         color = "white"
 
-    return """
+    return f"""
         <td style="border: 1px solid black" colspan={colspan}
         align="center" valign=middle bgcolor="{color}">{value}</td>
-    """.format(colspan=colspan, color=color, value=value)
+    """
 
 
 def make_html_row(x):

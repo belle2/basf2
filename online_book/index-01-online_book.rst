@@ -15,7 +15,7 @@ the software by following through a series of hands-on lessons.
 
 .. tip::
 
-   Just as there are many versions of the Belle 2 software, there are many
+   Just as there are many versions of the Belle II software, there are many
    versions of this documentation to match it. After all, if a new feature is
    added in our software, we also want to have the documentation for it.
 

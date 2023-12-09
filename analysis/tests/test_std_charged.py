@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -46,7 +45,7 @@ class TestStdCharged(unittest.TestCase):
             f(listtype, path=testpath)
             self.assertEqual(
                 len(testpath.modules()), 1 if listtype == 'all' else 3,
-                "List %s doesn't work with function %s" % (listtype, f.__name__))
+                f"List {listtype} doesn't work with function {f.__name__}")
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
 
             # now we're certain that the loader is the only module on the path,
@@ -61,7 +60,7 @@ class TestStdCharged(unittest.TestCase):
             f(path=testpath)
             self.assertEqual(
                 len(testpath.modules()), 3,
-                "Function %s doesn't work" % f.__name__)
+                f"Function {f.__name__} doesn't work")
             self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
             loader = testpath.modules()[0]
             self._check_list_name(expectedlist, f.__name__, loader)
@@ -73,7 +72,7 @@ class TestStdCharged(unittest.TestCase):
             f(listtype, path=testpath)
             self.assertEqual(
                 len(testpath.modules()), 0,
-                "List %s works with function %s" % (listtype, f.__name__))
+                f"List {listtype} works with function {f.__name__}")
             self.assertFalse(any(module.type() == "ParticleLoader" for module in testpath.modules()))
 
     def test_nonesense_list(self):
@@ -122,7 +121,7 @@ class TestStdCharged(unittest.TestCase):
         stdCharged.stdMostLikely(path=testpath)
         self.assertEqual(
             len(testpath.modules()), 3 * nLists,
-            "There should be %i fillParticleList calls" % nLists)
+            f"There should be {int(nLists)} fillParticleList calls")
         self.assertTrue(any(module.type() == "ParticleLoader" for module in testpath.modules()))
         for module in testpath.modules():
             self._check_list_name('mostlikely', 'stdMostLikely', module)

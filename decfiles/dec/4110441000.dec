@@ -9,16 +9,15 @@
 # Email: y_li21@m.fudan.edu.cn 
 # Date: 20230102
 
-
 Decay vpho
-1.0   Upsilon(2S)sig gamma  VECTORISR 1.0 1.0;
+1.0   Upsilon(2S) gamma  VECTORISR 1.0 1.0;
 Enddecay
 
-Decay Upsilon(2S)sig
-1.0   Upsilonsig  pi+ pi-  YMSTOYNSPIPICLEOBOOST -0.753 0.000;
+Decay Upsilon(2S)
+1.0   Upsilon  pi+ pi-  YMSTOYNSPIPICLEOBOOST -0.753 0.000;
 Enddecay
 
-Decay Upsilonsig
+Decay Upsilon
 1.0   mu+ mu-  PHSP;
 Enddecay
 End

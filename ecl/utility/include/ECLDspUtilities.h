@@ -59,7 +59,7 @@ namespace Belle2 {
        *        See ecl/examples/eclShapeFitter.py for usage example.
        *
        * @param[in] cid      CellID, 1..8736
-       * @param[in] adc[31]  Waveform data from ECLDsp dataobject
+       * @param[in] adc  Waveform data from ECLDsp dataobject of length 31
        * @param[in] ttrig    Trigger time from ECLTrig dataobject
        * @param[in] adjusted_timing Optional.
        *              Use adjusted formula to determine fit time.

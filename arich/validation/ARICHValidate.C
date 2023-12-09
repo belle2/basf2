@@ -9,9 +9,12 @@
  * ROOT macro for ARICH validation plots
  * Author: Luka Santelj
  * 11.3.2014
+*/
 
+/*
 <header>
-<noexecute>Used as library.</noexecute>
+  <input>../ARICHEvents.root</input>
+  <output>ARICHValidate.root</output>
 </header>
 */
 
@@ -23,6 +26,7 @@ void ARICHValidate(){
 
   // output file
   TFile* output = TFile::Open("ARICHValidate.root", "recreate");
+  gROOT->SetBatch(true);
 
   // define histograms for likelihood distributions
   TH1F* hpi = new TH1F("hpi","#pi;L_{#pi}-L_{K}",500000,-200,200);
@@ -39,7 +43,7 @@ void ARICHValidate(){
   hall->GetListOfFunctions()->Add(new TNamed("Description", "Difference of ARICHLikelihood value for K and #pi hypothesis, for K and #pi tracks with 3.0 - 3.5 GeV (particle gun from the IP). TrackFinderMCTruth is used for track matching."));
   hall->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@ijs.si"));
   hall->GetListOfFunctions()->Add(new TNamed("Check", "Well separated K and #pi peaks."));
-
+  hall->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
   hall->Write();
 
   TH1F* heff = new TH1F("heff","K id. efficiency vs. #pi missid. probability;fake;efficiency",100,0.005,0.05);
@@ -73,11 +77,12 @@ void ARICHValidate(){
 
   TH1F* hnphot = new TH1F("hnphot","Number of detected photons;# of photons;Entries", 35,-0.5,34.5);
 
-  ch->Draw("detPhot.pi>>hnphot","abs(PDG)==211 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
+  ch->Draw("detPhot>>hnphot","abs(PDG)==211 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
 
   hnphot->GetListOfFunctions()->Add(new TNamed("Description", "Number of detected photons in a 3#sigma band around the expected Cherenkov angle, for #pi with momenta 3.0-3.5 GeV."));
   hnphot->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@ijs.si"));
-  hnphot->GetListOfFunctions()->Add(new TNamed("Check", "Poissonian peak with average at ~11.5."));
+  hnphot->GetListOfFunctions()->Add(new TNamed("Check", "Poissonian peak with average at ~14.5."));
+  hnphot->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
   hnphot->Write();
 

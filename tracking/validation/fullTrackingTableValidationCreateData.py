@@ -136,7 +136,7 @@ def run():
     # Gather the results into ROOT files
     path.add_module(VxdCdcPartFinderHarvester("../matching_validation.root"))
 
-    path.add_module("ProgressBar")
+    path.add_module("Progress")
     basf2.process(path)
     print(basf2.statistics)
 

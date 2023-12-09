@@ -42,12 +42,18 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
+    'sphinx_codeautolink',
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
     'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
+
+# Codeautolink warnings for compilation. Turned off due to conflicts with line
+# numbering.
+codeautolink_warn_on_missing_inventory = False
+codeautolink_warn_on_failed_resolve = False
 
 nbsphinx_allow_errors = True
 # Anything that ends with .jupy.py will be understood as a jupyter
@@ -63,7 +69,7 @@ nbsphinx_custom_formats = {
 # prefix each section with the name of the document it is in followed by a
 # colon
 autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = ['autosectionlabel.*', 'codeautolink.*']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']
@@ -91,9 +97,9 @@ author = 'Belle II Software Group'
 # The short X.Y version.
 version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 # Used for links to the repository
-basf2_repository = "https://stash.desy.de/projects/B2/repos/basf2"
+basf2_repository = "https://gitlab.desy.de/belle2/software/basf2/"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
-basf2_jira = "https://agira.desy.de"
+basf2_issues = "https://gitlab.desy.de/belle2/software/basf2/-/issues/"
 
 # The full version, including alpha/beta/rc tags.
 release = os.environ.get('BELLE2_RELEASE', 'development')
@@ -296,7 +302,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'Belle 2 Software Documentation',
+    (master_doc, 'basf2.tex', 'Belle II Software Documentation',
      author, 'manual'),
 ]
 
@@ -364,7 +370,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
-                       'matplotlib': ('https://matplotlib.org/stable/', None)}
+                       'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):

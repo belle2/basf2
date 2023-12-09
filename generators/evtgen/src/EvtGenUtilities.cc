@@ -9,7 +9,7 @@
 /* Own header. */
 #include <generators/evtgen/EvtGenUtilities.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 

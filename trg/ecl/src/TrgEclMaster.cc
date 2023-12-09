@@ -355,9 +355,6 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
       int maxTCId    = aTRGECLCluster->getMaxTCId();
       double clusterenergy  = aTRGECLCluster->getEnergyDep();
       double clustertiming  =  aTRGECLCluster->getTimeAve();
-      TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                               aTRGECLCluster->getPositionY(),
-                               aTRGECLCluster->getPositionZ());
       ClusterTiming.push_back(clustertiming);
       ClusterEnergy.push_back(clusterenergy);
       MaxTCId.push_back(maxTCId);
@@ -740,9 +737,6 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
     int maxThetaId = aTRGECLCluster->getMaxThetaId();
     double clusterenergy  = aTRGECLCluster->getEnergyDep();
     double clustertiming  =  aTRGECLCluster->getTimeAve();
-    TVector3 clusterposition(aTRGECLCluster->getPositionX(),
-                             aTRGECLCluster->getPositionY(),
-                             aTRGECLCluster->getPositionZ());
     ClusterTiming.push_back(clustertiming);
     ClusterEnergy.push_back(clusterenergy);
     MaxTCId.push_back(maxTCId);
@@ -1299,7 +1293,6 @@ TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId,
   int _n2GeV117 = 0;
   int _n1GeV415 = 0;
   int _n1GeV2316 = 0;
-  int _n1GeV117 = 0;
   int _nClust216 = 0;
   int _n500MeV216 = 0;
   int _n500MeV611 = 0;
@@ -1325,7 +1318,6 @@ TrgEclMaster::makeLowMultiTriggerBit(std::vector<int> CenterTCId,
     if (clusterenergy[ic] * 100 > thresh * m_LowMultiThreshold[0]) { // 100 MeV
       if (thetaid >= 4 && thetaid <= 15) {_n1GeV415++;}
       if (thetaid == 2 || thetaid == 3 || thetaid == 16) {_n1GeV2316++;}
-      if (thetaid == 1 || thetaid == 17) {_n1GeV117++;}
     }
   }
   //---------------------------------------------------------------------

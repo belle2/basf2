@@ -12,6 +12,7 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
+#include <framework/utilities/RootFileCreationManager.h>
 
 #include <string>
 #include <vector>
@@ -41,8 +42,6 @@ ParticleMCDecayStringModule::ParticleMCDecayStringModule() : Module(), m_tree(""
   addParam("conciseString", m_useConciseString, "If set to true, the code will use a more concise format for the string.", false);
   addParam("identifiers", m_identifiers, "Identifiers used to identify particles in the concise format.",
            std::string("abcdefghijklmnopqrstuvwxyz"));
-
-  m_file = nullptr;
 }
 
 void ParticleMCDecayStringModule::initialize()
@@ -58,8 +57,8 @@ void ParticleMCDecayStringModule::initialize()
 
   // Initializing the output root file
   if (m_fileName != "") {
-    m_file = new TFile(m_fileName.c_str(), "RECREATE");
-    if (!m_file->IsOpen()) {
+    m_file = RootFileCreationManager::getInstance().getFile(m_fileName);
+    if (!m_file) {
       B2WARNING("Could not create file " << m_fileName);
       return;
     }
@@ -146,17 +145,14 @@ void ParticleMCDecayStringModule::terminate()
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
     if (m_tree.isValid()) {
       B2INFO("Writing NTuple " << m_treeName);
-      m_tree->write(m_file);
+      TDirectory::TContext directoryGuard(m_file.get());
+      m_tree->write(m_file.get());
 
       const bool writeError = m_file->TestBit(TFile::kWriteError);
+      m_file.reset();
       if (writeError) {
-        //m_file deleted first so we have a chance of closing it (though that will probably fail)
-        delete m_file;
         B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
       }
-
-      B2INFO("Closing file " << m_fileName);
-      delete m_file;
     }
   }
 }

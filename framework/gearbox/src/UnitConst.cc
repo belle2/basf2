@@ -387,6 +387,7 @@ const Const::Cluster Const::clusterjunk = Const::clusterSet.find(9900001);
 const Const::ParticleType Const::photon = Const::ParticleType(22);
 const Const::ParticleType Const::pi0 = Const::ParticleType(111);
 const Const::ParticleType Const::neutron = Const::ParticleType(2112);
+const Const::ParticleType Const::antiNeutron = Const::ParticleType(-2112);
 const Const::ParticleType Const::Kshort = Const::ParticleType(310);
 const Const::ParticleType Const::Klong = Const::ParticleType(130);
 const Const::ParticleType Const::Lambda = Const::ParticleType(3122);
@@ -437,3 +438,5 @@ const double Const::fineStrConst   = 1.0 / 137.036;
 const double Const::permSi         = 11.9 * 8.8542 * 1e-18 * Unit::C / Unit::V / Unit::um;
 const double Const::uTherm         = 0.026 * Unit::V;
 const double Const::eMobilitySi    = 1415 * Unit::cm2 / Unit::V / Unit::s;
+
+const double Const::doubleNaN = std::numeric_limits<double>::quiet_NaN();

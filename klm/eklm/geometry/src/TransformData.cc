@@ -15,7 +15,7 @@
 #include <klm/eklm/geometry/AlignmentChecker.h>
 #include <klm/eklm/geometry/GeometryData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>

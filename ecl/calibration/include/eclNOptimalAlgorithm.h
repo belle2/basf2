@@ -7,7 +7,8 @@
  **************************************************************************/
 
 #pragma once
-#include <ecl/calibration/eclNOptimalAlgorithm.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {

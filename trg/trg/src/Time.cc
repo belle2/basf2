@@ -105,7 +105,7 @@ namespace Belle2 {
     if (a.time() < b.time()) {
       return true;
     } else if (a.time() == b.time()) {
-      if (a.edge() & (! b.edge()))
+      if (a.edge() and (! b.edge()))
         return true;
       else if (a.edge() == b.edge())
         return true;

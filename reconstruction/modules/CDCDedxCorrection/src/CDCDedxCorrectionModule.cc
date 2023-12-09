@@ -7,14 +7,9 @@
  **************************************************************************/
 
 #include <reconstruction/modules/CDCDedxCorrection/CDCDedxCorrectionModule.h>
-#include <reconstruction/dataobjects/CDCDedxTrack.h>
-#include <reconstruction/dataobjects/DedxConstants.h>
-
-#include <cmath>
-#include <algorithm>
-#include "TMath.h"
 
 using namespace Belle2;
+using namespace CDC;
 using namespace Dedx;
 
 REG_MODULE(CDCDedxCorrection);
@@ -23,19 +18,20 @@ CDCDedxCorrectionModule::CDCDedxCorrectionModule() : Module()
 {
 
   setDescription("Apply hit level corrections to the dE/dx measurements.");
-  addParam("relativeCorrections", m_relative, "If true, apply corrections relative to those used in production", true);
+  addParam("relativeCorrections", m_relative, "If true, apply corrections relative", true);
   addParam("momentumCor", m_momCor, "Boolean to apply momentum correction", false);
   addParam("momentumCorFromDB", m_useDBMomCor, "Boolean to apply momentum correction from DB", false);
   addParam("scaleCor", m_scaleCor, "Boolean to apply scale correction", false);
   addParam("cosineCor", m_cosineCor, "Boolean to apply cosine correction", false);
   addParam("wireGain", m_wireGain, "Boolean to apply wire gains", false);
   addParam("runGain", m_runGain, "Boolean to apply run gain", false);
+  addParam("timeGain", m_timeGain, "Boolean to apply time gain", false);
   addParam("twoDCell", m_twoDCell, "Boolean to apply 2D correction", false);
   addParam("oneDCell", m_oneDCell, "Boolean to apply 1D correction", false);
   addParam("cosineEdge", m_cosineEdge, "Boolean to apply cosine edge correction", true);
   addParam("nonlADC", m_nonlADC, "Boolean to apply non-linear adc correction", true);
-  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx that should be discarded", double(0.05));
-  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx that should be discarded", double(0.25));
+  addParam("removeLowest", m_removeLowest, "portion of events with low dE/dx", double(0.05));
+  addParam("removeHighest", m_removeHighest, "portion of events with high dE/dx", double(0.25));
 }
 
 CDCDedxCorrectionModule::~CDCDedxCorrectionModule() { }
@@ -52,7 +48,7 @@ void CDCDedxCorrectionModule::initialize()
   }
 
   // wire gains
-  for (unsigned int i = 0; i < 14336; ++i) {
+  for (unsigned int i = 0; i < c_nSenseWires; ++i) {
     if (m_DBWireGains->getWireGain(i) == 0)
       B2WARNING("Wire gain is zero for this wire: " << i);
   }
@@ -72,7 +68,28 @@ void CDCDedxCorrectionModule::initialize()
       m_hadronpars.push_back(0.0);
     m_hadronpars.push_back(1.0);
   } else m_hadronpars = m_DBHadronCor->getHadronPars();
+
+  int jwire = -1;
+  B2INFO("Creating CDCGeometryPar object");
+  CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+
+  for (unsigned int il = 0; il < c_maxNSenseLayers; il++) {
+    int activewires = 0;
+    m_lgainavg[il] = 0.0;
+
+    for (unsigned int iw = 0; iw < cdcgeo.nWiresInLayer(il); ++iw) {
+      jwire++;
+      if (m_DBWireGains->getWireGain(jwire) > 0.) {
+        //active wire only
+        m_lgainavg[il] += m_DBWireGains->getWireGain(jwire);
+        activewires++;
+      }
+    }
+    if (activewires > 0) m_lgainavg[il] /= activewires;
+    else m_lgainavg[il] = 1.0;
+  }
 }
+
 
 void CDCDedxCorrectionModule::event()
 {
@@ -98,6 +115,22 @@ void CDCDedxCorrectionModule::event()
     if (costh < TMath::Cos(150.0 * TMath::DegToRad()))continue; //-0.866
     if (costh > TMath::Cos(17.0 * TMath::DegToRad())) continue; //0.95
 
+
+    double injtime = dedxTrack.getInjectionTime();
+    double injring = dedxTrack.getInjectionRing();
+
+    //--------REMOVEBAL--------
+    //when CDST are reproduced with injection time
+    if (injtime == -1 || injring == -1) {
+      if (m_TTDInfo.isValid() && m_TTDInfo->hasInjection()) {
+        injring = m_TTDInfo->isHER();
+        injtime =  m_TTDInfo->getTimeSinceLastInjectionInMicroSeconds();
+      }
+    }
+    dedxTrack.m_injring = injring;
+    dedxTrack.m_injtime = injtime;
+    //--------REMOVEBAL--------
+
     for (int i = 0; i < nhits; ++i) {
 
       //pay attention to deadwire or gain uses
@@ -110,13 +143,13 @@ void CDCDedxCorrectionModule::event()
       double jEntaRS = dedxTrack.getEntaRS(i);
       double jPath = dedxTrack.getPath(i);
 
-      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_cosCor * dedxTrack.m_cosEdgeCor *
+      double correction = dedxTrack.m_scale * dedxTrack.m_runGain * dedxTrack.m_timeGain * dedxTrack.m_cosCor * dedxTrack.m_cosEdgeCor *
                           dedxTrack.getTwoDCorrection(i) * dedxTrack.getOneDCorrection(i) * dedxTrack.getNonLADCCorrection(i);
       if (dedxTrack.getWireGain(i) > 0)correction *= dedxTrack.getWireGain(i); //also keep dead wire
 
       //Modify hit level dedx
       double newhitdedx = (m_relative) ? 1 / correction : 1.0;
-      StandardCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, jPath, costh, newhitdedx);
+      StandardCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, jPath, costh, injring, injtime, newhitdedx);
       dedxTrack.setDedx(i, newhitdedx);
 
       // do track level dedx and modifiy after loop over hits
@@ -125,11 +158,11 @@ void CDCDedxCorrectionModule::event()
       if (m_relative) {
         //prewire gains need old tracks (old bad wire) and post need track new wg (new dead wire)
         //get same base adc + rel correction factor
-        correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
+        correction *= GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh, injring, injtime);
         if (!m_DBWireGains && dedxTrack.getWireGain(i) == 0)correction = 0;
       } else {
         //get modifed adc + abs correction factor
-        correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh);
+        correction = GetCorrection(jadcbase, jLayer, jWire, jNDocaRS, jEntaRS, costh, injring, injtime);
       }
 
       // combine hits accross layers
@@ -166,14 +199,21 @@ void CDCDedxCorrectionModule::terminate()
 
 void CDCDedxCorrectionModule::RunGainCorrection(double& dedx) const
 {
-
   double gain = m_DBRunGain->getRunGain();
   if (gain != 0) {
     dedx = dedx / gain;
   } else dedx = 0;
 }
 
-void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
+void CDCDedxCorrectionModule::TimeGainCorrection(double& dedx, double ring, double time) const
+{
+  double gain = m_DBInjectTime->getCorrection("mean", ring, time);
+  if (gain != 0) {
+    dedx = dedx / gain;
+  } else dedx = 0;
+}
+
+void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx, int layer) const
 {
   double gain = m_DBWireGains->getWireGain(wireID);
   if (gain != 0) dedx = dedx / gain;
@@ -181,6 +221,9 @@ void CDCDedxCorrectionModule::WireGainCorrection(int wireID, double& dedx) const
     //rel-abs method needs all wire for cal but w/ this method post calis (e.g.final RG)
     //will also see all hitdedx but that is not an issue for track level calibration
     if (m_relative)dedx = 0;
+    else {
+      if (m_lgainavg.at(layer) > 0)dedx = dedx / m_lgainavg.at(layer);
+    }
   }
 }
 
@@ -222,7 +265,7 @@ void CDCDedxCorrectionModule::HadronCorrection(double costheta, double& dedx) co
 }
 
 void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID, double doca, double enta, double length,
-                                                 double costheta, double& dedx) const
+                                                 double costheta, double ring, double time, double& dedx) const
 {
 
   if (!m_relative && m_nonlADC)
@@ -239,8 +282,11 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
   if (m_runGain)
     RunGainCorrection(dedx);
 
+  if (m_timeGain)
+    TimeGainCorrection(dedx, ring, time);
+
   if (m_wireGain)
-    WireGainCorrection(wireID, dedx);
+    WireGainCorrection(wireID, dedx, layer);
 
   if (m_cosineCor)
     CosineCorrection(costheta, dedx);
@@ -254,15 +300,16 @@ void CDCDedxCorrectionModule::StandardCorrection(int adc, int layer, int wireID,
 
   if (m_oneDCell)
     OneDCorrection(layer, enta, dedx);
-
 }
 
 
-double CDCDedxCorrectionModule::GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta) const
+double CDCDedxCorrectionModule::GetCorrection(int& adc, int layer, int wireID, double doca, double enta, double costheta,
+                                              double ring, double time) const
 {
   double correction = 1.0;
   if (m_scaleCor) correction *= m_DBScaleFactor->getScaleFactor();
   if (m_runGain) correction *= m_DBRunGain->getRunGain();
+  if (m_timeGain) correction *= m_DBInjectTime->getCorrection("mean", ring, time);
   if (m_wireGain) correction *= m_DBWireGains->getWireGain(wireID);
   if (m_twoDCell) correction *= m_DB2DCell->getMean(layer, doca, enta);
   if (m_oneDCell) correction *= m_DB1DCell->getMean(layer, enta);

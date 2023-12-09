@@ -32,34 +32,28 @@ REG_MODULE(DQMHistAnalysisPXDEff);
 DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for PXD Efficiency");
 
-  //Parameter definition
+  // Parameter definition
 
-  //Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
-  //Or get one and clone it
+  // Would be much more elegant to get bin numbers from the saved histograms, but would need to retrieve at least one of them before the initialize function for this
+  // Or get one and clone it
   addParam("binsU", m_u_bins, "histogram bins in u direction, needs to be the same as in PXDDQMEfficiency", int(16));
   addParam("binsV", m_v_bins, "histogram bins in v direction, needs to be the same as in PXDDQMEfficiency", int(48));
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDEFF"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Eff:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
-  addParam("useEpicsRO", m_useEpicsRO, "useEpics ReadOnly", false);
   addParam("ConfidenceLevel", m_confidence, "Confidence Level for error bars and alarms", 0.9544);
   addParam("WarnLevel", m_warnlevel, "Efficiency Warn Level for alarms", 0.92);
   addParam("ErrorLevel", m_errorlevel, "Efficiency  Level for alarms", 0.90);
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
 DQMHistAnalysisPXDEffModule::~DQMHistAnalysisPXDEffModule()
 {
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDEffModule::initialize()
@@ -82,41 +76,33 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   int nu = 1;//If this does not get overwritten, the histograms will anyway never contain anything useful
   int nv = 1;
-  //Have been promised that all modules have the same number of pixels, so just take from the first one
   if (m_PXDModules.size() == 0) {
-    //This could as well be a B2FATAL, the module won't do anything useful if this happens
+    // This could as well be a B2FATAL, the module won't do anything useful if this happens
     B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
     std::vector <string> mod = {
       "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
       "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
-      "2.4.1", "2.4.2", "2.5.1", "2.5.2"
+      "2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.3.1", "2.3.2", "2.4.1", "2.4.2",
+      "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
+      "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
     };
     for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
     // set some default size to nu, nv?
   } else {
+    // Have been promised that all modules have the same number of pixels, so just take from the first one
     VXD::SensorInfoBase cellGetInfo = geo.getSensorInfo(m_PXDModules[0]);
     nu = cellGetInfo.getUCells();
     nv = cellGetInfo.getVCells();
   }
 
-#ifdef _BELLE2_EPICS
-  m_useEpics |= m_useEpicsRO; // implicit
-  if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-  }
-#endif
-
   for (VxdID& aPXDModule : m_PXDModules) {
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
-#ifdef _BELLE2_EPICS
-    if (m_useEpics) {
-      SEVCHK(ca_create_channel((m_pvPrefix + buff).Data(), NULL, NULL, 10, &mychid_eff[aPXDModule]), "ca_create_channel failure");
-    }
-#endif
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
+    registerEpicsPV("PXD:Eff:" + buff, (std::string)aPXDModule);
+
     TString histTitle = "PXD Hit Efficiency on Module " + (std::string)aPXDModule + ";Pixel in U;Pixel in V";
-    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_").data() + buff);
-    m_hEffModules[aPXDModule] = new TEfficiency("ePXDHitEff_" + buff, histTitle,
+    m_cEffModules[aPXDModule] = new TCanvas((m_histogramDirectoryName + "/c_Eff_" + buff).c_str());
+    m_hEffModules[aPXDModule] = new TEfficiency(("ePXDHitEff_" + buff).c_str(), histTitle,
                                                 m_u_bins, -0.5, nu - 0.5, m_v_bins, -0.5, nv - 0.5);
   }
 
@@ -185,16 +171,10 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    // values per module, see above
-    mychid_status.resize(2);
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid_status[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Overall").data(), NULL, NULL, 10, &mychid_status[1]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:Eff:Status", "Status");
+  registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:L1", "L1");
+  registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -217,29 +197,15 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
     m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
 
-#ifdef _BELLE2_EPICS
-    if (m_useEpics) {
-      // get warn and error limit
-      // as the same array as above, we assume chid exists
-      struct dbr_ctrl_double tPvData;
-      auto r = ca_get(DBR_CTRL_DOUBLE, mychid_eff[m_PXDModules[i]], &tPvData);
-      if (r == ECA_NORMAL) r = ca_pend_io(5.0);
-      if (r == ECA_NORMAL) {
-        if (!std::isnan(tPvData.lower_alarm_limit)
-            && tPvData.lower_alarm_limit > 0.0) {
-          m_hErrorLine->SetBinContent(i + 1, tPvData.lower_alarm_limit);
-          if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = tPvData.lower_alarm_limit;
-        }
-        if (!std::isnan(tPvData.lower_warning_limit)
-            && tPvData.lower_warning_limit > 0.0) {
-          m_hWarnLine->SetBinContent(i + 1, tPvData.lower_warning_limit);
-          if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = tPvData.lower_warning_limit;
-        }
-      } else {
-        SEVCHK(r, "ca_get or ca_pend_io failure");
-      }
+    // get warn and error limit
+    // as the same array as above, we assume chid exists
+    double dummy, loerr = 0, lowarn = 0;
+    if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
+      m_hErrorLine->SetBinContent(i + 1, loerr);
+      if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
+      m_hWarnLine->SetBinContent(i + 1, lowarn);
+      if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
     }
-#endif
 
   }
   // Thus histo will contain old content until first update
@@ -250,39 +216,36 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (single_cmap.second) single_cmap.second->Clear();
   }
 
+  m_hInnerMap->Reset();
+  m_hOuterMap->Reset();
 }
 
 
 void DQMHistAnalysisPXDEffModule::event()
 {
-  //Count how many of each type of histogram there are for the averaging
-  //std::map<std::string, int> typeCounter;
+  for (auto aPXDModule : m_PXDModules) {
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
 
-  m_hInnerMap->Reset();
-  m_hOuterMap->Reset();
-
-  for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
-    VxdID& aPXDModule = m_PXDModules[i - 1];
-
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
-
-    TH1* Hits, *Matches;
-    TString locationHits = "track_hits_" + buff;
+    std::string locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits.Data());
-    TString locationMatches = "matched_cluster_" + buff;
+    std::string locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH1*)findHist(locationMatches.Data());
 
-    // Finding only one of them should only happen in very strange situations...
-    if (Hits == nullptr || Matches == nullptr) {
-      B2ERROR("Missing histogram for sensor " << aPXDModule);
-    } else {
+    auto Hits = (TH1*)findHist(locationHits, true);// check if updated
+    auto Matches = (TH1*)findHist(locationMatches, true);// check if updated
+
+    if (Hits == nullptr && Matches == nullptr) continue; // none updated
+
+    if (Hits == nullptr) Hits = (TH1*)findHist(locationHits); // actually, this should not happen ...
+    if (Matches == nullptr) Matches = (TH1*)findHist(locationMatches); // ... as updates should coincide
+
+    // Finding only one of them should only happen in very strange situations... still better check
+    if (Hits && Matches) {
       if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
         m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
         m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
@@ -313,93 +276,109 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
     }
-  }// Single-Module histos + 2d overview finished
-
+  }
+  // Single-Module histos + 2d overview finished. now draw overviews
   m_cInnerMap->cd();
-  m_hInnerMap->Draw("colz");
+  if (m_hInnerMap) m_hInnerMap->Draw("colz");
   m_cInnerMap->Modified();
   m_cInnerMap->Update();
   m_cOuterMap->cd();
-  m_hOuterMap->Draw("colz");
+  if (m_hOuterMap) m_hOuterMap->Draw("colz");
   m_cOuterMap->Modified();
   m_cOuterMap->Update();
+  UpdateCanvas(m_cInnerMap->GetName());
+  UpdateCanvas(m_cOuterMap->GetName());
+  // overview done
+
 
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
   // guaranteed by DQM framework
-  TString locationHits = "PXD_Eff_combined";
+  std::string combinedHistname = "PXD_Eff_combined";
   if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
+    combinedHistname = m_histogramDirectoryName + "/" + combinedHistname;
   }
-  TH1* Combined = (TH1*)findHist(locationHits.Data());
+  auto Combined = (TH1*)findHist(combinedHistname, true);// only if updated
 
-  double stat_data = 0;
+  if (Combined == nullptr) return; // histogram was not changed, thus no update
+
+  EStatus stat_data = c_TooFew;
   bool error_flag = false;
   bool warn_flag = false;
   double all = 0.0;
 
   double imatch = 0.0, ihit = 0.0;
-  int ieff = 0;
+  double imatchL1 = 0.0, ihitL1 = 0.0;
+  double imatchL2 = 0.0, ihitL2 = 0.0;
+  int ieff = 0; // count number of modules with useful stytistics
 
   std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    // workaround for excluded module
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+    // excluded modules are not counted at all!
     int j = i + 1;
 
-    if (Combined == nullptr) {
-      m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, 0);
-    } else {
-      VxdID& aModule = m_PXDModules[i];
-      double nmatch = Combined->GetBinContent(i * 2 + 2);
-      double nhit = Combined->GetBinContent(i * 2 + 1);
-      if (nmatch > 10 && nhit > 10) { // could be zero, too
-        imatch += nmatch;
-        ihit +=  nhit;
-        ieff++; // only count in modules working
-        double var_e = nmatch / nhit; // can never be zero
-        if (j == 6) continue; // workaround for 1.3.2 module
-        m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
-                              var_e);
+    VxdID& aModule = m_PXDModules[i];
+    double nmatch = Combined->GetBinContent(i * 2 + 2);
+    double nhit = Combined->GetBinContent(i * 2 + 1);
+    if (nmatch > 10 && nhit > 10) { // could be zero, too
+      imatch += nmatch;
+      ihit +=  nhit;
+      // check layer
+      if (i >= 16) {
+        imatchL2 += nmatch;
+        ihitL2 +=  nhit;
+      } else {
+        imatchL1 += nmatch;
+        ihitL1 +=  nhit;
       }
 
-      /// TODO: one value per module, and please change to the "delta" instead of integral
-      all += nhit;
-      m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, nhit);
-      m_hEffAll->SetPassedEvents(j, nmatch);
+      ieff++; // only count in modules working
+      double var_e = nmatch / nhit; // can never be zero
 
-      if (nhit < m_minEntries) {
-        // update the first entries directly (short runs)
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit);
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch);
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
-        updated[aModule] = true;
-      } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
-        updated[aModule] = true;
-      }
+      m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
+                            var_e);
+    }
 
-      if (j == 6) continue; // workaround for 1.3.2 module
+    /// TODO: one value per module, and please change to the "delta" instead of integral
+    all += nhit;
+    m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAll->SetTotalEvents(j, nhit);
+    m_hEffAll->SetPassedEvents(j, nmatch);
 
-      // get the errors and check for limits for each bin seperately ...
+    if (nhit < m_minEntries) {
+      // update the first entries directly (short runs)
+      m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+      m_hEffAllUpdate->SetTotalEvents(j, nhit);
+      m_hEffAllUpdate->SetPassedEvents(j, nmatch);
+      m_hEffAllLastTotal->SetBinContent(j, nhit);
+      m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      updated[aModule] = true;
+    } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
+      m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+      m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
+      m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
+      m_hEffAllLastTotal->SetBinContent(j, nhit);
+      m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      updated[aModule] = true;
+    }
 
-      if (nhit > 50) {
-        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+    // workaround for excluded module
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+
+    // get the errors and check for limits for each bin seperately ...
+
+    if (nhit > 50) {
+      error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                     m_errorlevelmod[aModule]); // error if upper error value is below limit
+      warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                    m_warnlevelmod[aModule]); // (and not only the actual eff value)
+      if (m_alarmAdhoc) {
+        error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
                        m_errorlevelmod[aModule]); // error if upper error value is below limit
-        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+        warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
                       m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        if (m_alarmAdhoc) {
-          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                         m_errorlevelmod[aModule]); // error if upper error value is below limit
-          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        }
       }
     }
   }
@@ -422,8 +401,8 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (i != 5) { // exclude 1.3.2
-          /// check for val > 0.0) { would exclude all zero efficient modules!!!
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+          // scale update only for included module
           if (scale_min > val) scale_min = val;
         }
       }
@@ -448,32 +427,22 @@ void DQMHistAnalysisPXDEffModule::event()
 
       gr->Draw("AP");
 
-      auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
-      tt->Draw();
-
-      if (all < 100.) {
-        m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
-      } else {
-        if (error_flag) {
-          m_cEffAll->Pad()->SetFillColor(kRed);// Red
-        } else if (warn_flag) {
-          m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
-        } else {
-          m_cEffAll->Pad()->SetFillColor(kGreen);// Green
-          //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
-        }
+      for (auto& it : m_excluded) {
+        auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextAngle(90);// Rotated
+        tt->SetTextAlign(12);// Centered
+        tt->Draw();
       }
 
-      m_cEffAll->Pad()->SetFrameFillColor(kWhite - 1); // White
-      m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
-      m_cEffAll->Pad()->Modified();
-      m_cEffAll->Pad()->Update();
+
+      EStatus all_stat = makeStatus(all >= 100., warn_flag, error_flag);
+      colorizeCanvas(m_cEffAll, all_stat);
+
       m_hWarnLine->Draw("same,hist");
       m_hErrorLine->Draw("same,hist");
     }
 
+    UpdateCanvas(m_cEffAll->GetName());
     m_cEffAll->Modified();
     m_cEffAll->Update();
   }
@@ -504,8 +473,8 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->GetPoint(i, x, y);
         gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
         auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (i != 5) { // exclude 1.3.2
-          /// check for val > 0.0) { would exclude all zero efficient modules!!!
+        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+          // skip scale update only for included modules
           if (scale_min > val) scale_min = val;
         }
       }
@@ -523,82 +492,61 @@ void DQMHistAnalysisPXDEffModule::event()
           ax->SetBinLabel(i + 1, ModuleName);
         }
       }
-#ifdef _BELLE2_EPICS
-      if (m_useEpics && !m_useEpicsRO) {
-        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          if (updated[m_PXDModules[i]]) {
-            Double_t x, y;// we assume that double and Double_t are same!
-            gr->GetPoint(i, x, y);
-            auto& my = mychid_eff[m_PXDModules[i]];// as the same array as above, we assume it exists
-            // we should only write if it was updated!
-            SEVCHK(ca_put(DBR_DOUBLE, my, (void*)&y), "ca_set failure");
-          }
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        if (updated[m_PXDModules[i]]) {
+          // we should only write if it was updated!
+          Double_t x, y;// we assume that double and Double_t are same!
+          gr->GetPoint(i, x, y);
+          setEpicsPV((std::string)m_PXDModules[i], y);
         }
       }
-#endif
+
       gr->SetLineColor(kBlack);
       gr->SetLineWidth(3);
       gr->SetMarkerStyle(33);
+      gr->Draw("AP");
     } else scale_min = 0.0;
-    if (gr) gr->Draw("AP");
-    if (gr3) gr3->Draw("P");
-    auto tt = new TLatex(5.5, scale_min, " 1.3.2 Module is excluded, please ignore");
-    tt->SetTextSize(0.035);
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
+    if (gr3) gr3->Draw("P"); // both in one plot
 
-    if (all < 100.) {
-      m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
-      stat_data = 0.;
-    } else {
-      if (error_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
-        stat_data = 4.;
-      } else if (warn_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
-        stat_data = 3.;
-      } else {
-        m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
-        stat_data = 2.;
-        /// we wont use "white" =1 in this module
-        //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
-      }
+    for (auto& it : m_excluded) {
+      auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
     }
-    m_cEffAllUpdate->Pad()->SetFrameFillColor(kWhite - 1); // White
-    m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
-    m_cEffAllUpdate->Pad()->Modified();
-    m_cEffAllUpdate->Pad()->Update();
+
+
+    stat_data = makeStatus(all >= 100., warn_flag, error_flag);
+    colorizeCanvas(m_cEffAllUpdate, stat_data);
+
     m_hWarnLine->Draw("same,hist");
     m_hErrorLine->Draw("same,hist");
   }
+  UpdateCanvas(m_cEffAllUpdate->GetName());
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();
 
-
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
+  double var_efficiencyL1 = ihitL1 > 0 ? imatchL1 / ihitL1 : 0.0;
+  double var_efficiencyL2 = ihitL2 > 0 ? imatchL2 / ihitL2 : 0.0;
+
   m_monObj->setVariable("efficiency", var_efficiency);
+  m_monObj->setVariable("efficiencyL1", var_efficiencyL1);
+  m_monObj->setVariable("efficiencyL2", var_efficiencyL2);
   m_monObj->setVariable("nmodules", ieff);
 
-#ifdef _BELLE2_EPICS
-  if (m_useEpics && !m_useEpicsRO) {
-    SEVCHK(ca_put(DBR_DOUBLE, mychid_status[0], (void*)&stat_data), "ca_set failure");
-    // only update if statistics is reasonable, we dont want "0" drops between runs!
-    if (stat_data != 0) SEVCHK(ca_put(DBR_DOUBLE, mychid_status[1], (void*)&var_efficiency), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  setEpicsPV("Status", stat_data);
+  // only update if statistics is reasonable, we dont want "0" drops between runs!
+  if (stat_data != 0) {
+    setEpicsPV("Overall", var_efficiency);
+    setEpicsPV("L1", var_efficiencyL1);
+    setEpicsPV("L2", var_efficiencyL2);
   }
-#endif
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDEff: terminate called");
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    for (auto& m : mychid_status) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    for (auto& m : mychid_eff) SEVCHK(ca_clear_channel(m.second), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

@@ -157,7 +157,7 @@ def create_daughter_aliases(
 
     """
 
-    if not isinstance(indices, collections.Iterable):
+    if not isinstance(indices, collections.abc.Iterable):
         indices = [indices]
 
     if include_indices:
@@ -248,7 +248,7 @@ class DecayParticleNode:
             prefix = current_prefix + c.name
             # is this particle name ambiguous or are all indices requested? add index
             if always_include_indices or names[c.name] > 1:
-                prefix += "_{}".format(relative_indices[c.name] if use_relative_indices else index)
+                prefix += f"_{relative_indices[c.name] if use_relative_indices else index}"
                 # always increase the relative indices
                 relative_indices[c.name] += 1
 
@@ -555,8 +555,9 @@ def create_isSignal_alias(aliasName, flags):
     unmasking (setting bits to zero)
     the ``c_MissGamma`` bit (16 or 0b00010000) and ``c_MissNeutrino`` bit (8 or 0b00001000) in mcErrors.
 
-    For more information, please check this `example script <https://stash.desy.de/projects/B2/repos/basf2/
-    browse/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
+    For more information, please check this
+    `example script
+    <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/VariableManager/isSignalAcceptFlags.py>`_.
 
     Parameters:
         aliasName (str): the name of the alias to be set
@@ -572,4 +573,4 @@ def create_isSignal_alias(aliasName, flags):
             informationString += "Now one of the input flags is " + str(int) + " ."
             raise ValueError(informationString)
 
-    variables.variables.addAlias(aliasName, "passesCut(unmask(mcErrors, %d) == %d)" % (mask, 0))
+    variables.variables.addAlias(aliasName, f"passesCut(unmask(mcErrors, {int(mask)}) == {int(0)})")

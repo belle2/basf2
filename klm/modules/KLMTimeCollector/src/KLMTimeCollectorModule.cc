@@ -15,7 +15,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/dataobjects/EventT0.h>

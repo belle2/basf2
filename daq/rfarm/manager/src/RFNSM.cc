@@ -236,7 +236,7 @@ void RFNSM::m_Restart(NSMmsg* msg, NSMcontext* ctx)
   }
 }
 
-void RFNSM::m_Status(NSMmsg* msg, NSMcontext* ctx)
+void RFNSM::m_Status(NSMmsg* msg, NSMcontext* /*ctx*/)
 {
   /* Old imp
   int stat = g_nsmserver->Status(msg, ctx);
@@ -251,7 +251,7 @@ void RFNSM::m_Status(NSMmsg* msg, NSMcontext* ctx)
 }
 
 // Function to handle execution status
-void RFNSM::m_OK(NSMmsg* msg, NSMcontext* ctx)
+void RFNSM::m_OK(NSMmsg* /*msg*/, NSMcontext* /*ctx*/)
 {
   RFNSM_Status& rfs = RFNSM_Status::Instance();
   int flag = rfs.get_flag();
@@ -260,7 +260,7 @@ void RFNSM::m_OK(NSMmsg* msg, NSMcontext* ctx)
   //  printf ( "OK received. flag set to %d\n", flag );
 }
 
-void RFNSM::m_ERROR(NSMmsg* msg, NSMcontext* ctx)
+void RFNSM::m_ERROR(NSMmsg* /*msg*/, NSMcontext* /*ctx*/)
 {
   RFNSM_Status::Instance().set_flag(-1);
   //  printf ( "ERROR received. m_flag set to -1\n" );

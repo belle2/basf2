@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/modules/KLMClusterAna/KLMClusterAnaModule.h>
 
-/* Other Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -17,7 +17,6 @@
 #include <TMatrixT.h>
 #include <TMatrixDSymEigen.h>
 #include <TVectorT.h>
-#include <TVector3.h>
 
 /* C++ headers. */
 #include <algorithm>

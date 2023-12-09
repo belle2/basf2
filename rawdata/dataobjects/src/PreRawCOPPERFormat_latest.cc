@@ -76,7 +76,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
     vector<vector<unsigned int>> summary_table;
     CompareHeaderValue(n, eve, summary_table);
 
-    char err_buf[2500];
+    char err_buf[3000];
     char err_buf_temp[2500];
     char hostname[128];
     GetNodeName(n, hostname, sizeof(hostname));
@@ -127,7 +127,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
                                           unsigned int prev_exprunsubrun_no, unsigned int* cur_exprunsubrun_no)
 {
 
-  char err_buf[2500];
+  char err_buf[3000];
   int err_flag = 0;
 
   //
@@ -300,7 +300,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[MAX_PCIE40_CH], ctime_trgtype[MAX_PCIE40_CH], eve[MAX_PCIE40_CH], exprun[MAX_PCIE40_CH];
-  char err_buf[2500];
+  char err_buf[4000];
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -343,7 +343,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
             }
           }
 
-          char err_buf_1[2500], err_buf_2[2500], err_buf_3[2500];
+          char err_buf_1[2500], err_buf_2[3000], err_buf_3[3500];
           sprintf(err_buf_1,
                   "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting...",
                   hostname, -1);

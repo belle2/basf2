@@ -15,7 +15,7 @@
 #include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 #include <klm/simulation/SensitiveDetector.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <geometry/Materials.h>
 
 /* Geant 4 headers. */

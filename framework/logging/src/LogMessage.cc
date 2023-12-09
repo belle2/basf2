@@ -50,7 +50,7 @@ LogMessage::LogMessage(LogConfig::ELogLevel logLevel, LogVariableStream&& messag
   m_logInfo(0),
   m_count(0)
 {
-  messageStream.adjustLogLevel(m_logLevel);
+  m_message.adjustLogLevel(m_logLevel);
 }
 
 

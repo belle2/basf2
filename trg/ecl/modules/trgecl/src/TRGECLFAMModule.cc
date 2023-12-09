@@ -105,6 +105,8 @@ namespace Belle2 {
     m_TRGECLWaveform.registerInDataStore();
     m_TRGECLHit.registerInDataStore();
     m_TRGECLFAMAna.registerInDataStore();
+    m_eventLevelClusteringInfo.registerInDataStore();
+
     //    m_FAMPara = new DBObjPtr<TRGECLFAMPara>;
   }
 //
@@ -166,6 +168,32 @@ namespace Belle2 {
     else if (_famMethod == 2) {obj_trgeclfit->  FAMFit02(TCDigiE, TCDigiT); } // no-fit method = backup method 1
     else if (_famMethod == 3) { obj_trgeclfit-> FAMFit03(TCDigiE, TCDigiT); } // orignal method = backup method 2
     obj_trgeclfit-> save(m_nEvent);
+
+
+    // Count number of trigger cells in each ECL region for EventLevelClusteringInfo
+    uint16_t nTCsPerRegion[3] = {};
+    const double absTimeRequirement = 9999.; // Selection on time to reproduce data
+    const int firstBarrelId = 81; // First TCId in the barrel
+    const int lastBarrelId = 512; // Last TCId in the barrel
+    for (auto& trgeclhit : m_TRGECLHit) {
+      const int tcId = trgeclhit.getTCId();
+      const double tcTime = trgeclhit.getTimeAve();
+      if (std::abs(tcTime) < absTimeRequirement) {
+        if (tcId < firstBarrelId) {
+          nTCsPerRegion[0]++;
+        } else if (tcId > lastBarrelId) {
+          nTCsPerRegion[2]++;
+        } else {
+          nTCsPerRegion[1]++;
+        }
+      }
+    }
+
+    // Store
+    if (!m_eventLevelClusteringInfo) { m_eventLevelClusteringInfo.create();}
+    m_eventLevelClusteringInfo->setNECLTriggerCellsFWD(nTCsPerRegion[0]);
+    m_eventLevelClusteringInfo->setNECLTriggerCellsBarrel(nTCsPerRegion[1]);
+    m_eventLevelClusteringInfo->setNECLTriggerCellsBWD(nTCsPerRegion[2]);
 
 
     //

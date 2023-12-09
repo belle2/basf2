@@ -84,7 +84,7 @@ DBObject DBObjectLoader::load(ConfigFile& config)
 
 DBObject DBObjectLoader::load(DBInterface& db,
                               const std::string& tablename,
-                              const std::string& config_in, bool isfull)
+                              const std::string& config_in, bool /*isfull*/)
 {
   std::string configname = config_in;
   if (!db.isConnected()) {
@@ -133,16 +133,17 @@ DBObject DBObjectLoader::load(DBInterface& db,
 bool DBObjectLoader::add(DBObject& obj, StringList& str,
                          const std::string& name_in, const DBObject& cobj)
 {
-  std::string name = str[0];
+  std::string name;
   int index = 0;
   StringList sstr = StringUtil::split(str[0], '[');
   if (sstr.size() > 1) {
     index = atoi(sstr[1].c_str());
     name = sstr[0];
   } else {
-    name = str[0];
     index = 0;
+    name = str[0];
   }
+
   if (str.size() > 1) {
     str.erase(str.begin());
     if (obj.hasObject(name)) {

@@ -102,7 +102,7 @@ class AverageQE(b2.Module):
 # Central database
 argvs = sys.argv
 if len(argvs) == 2:
-    b2.use_central_database(argvs[1])
+    b2.conditions.append_globaltag(argvs[1])
 
 # Create path
 main = b2.create_path()

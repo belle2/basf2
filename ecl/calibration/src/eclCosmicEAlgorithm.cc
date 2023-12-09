@@ -5,14 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/calibration/eclCosmicEAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
-#include "TH2F.h"
-#include "TFile.h"
-#include "TMath.h"
-#include "TF1.h"
-#include "TROOT.h"
+/* ROOT headers. */
+#include <TF1.h>
+#include <TFile.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -46,7 +52,8 @@ double eclCosmicNovoConst(double* x, double* par)
   return par[0] * exp(-qc) + par[4];
 }
 
-eclCosmicEAlgorithm::eclCosmicEAlgorithm(): CalibrationAlgorithm("eclCosmicECollector"), cellIDLo(1), cellIDHi(8736),
+eclCosmicEAlgorithm::eclCosmicEAlgorithm(): CalibrationAlgorithm("eclCosmicECollector"), cellIDLo(1),
+  cellIDHi(ECLElementNumbers::c_NCrystals),
   minEntries(150), maxIterations(10), tRatioMin(0.2), tRatioMax(0.25), performFits(true), findExpValues(false), storeConst(0)
 {
   setDescription(
@@ -127,30 +134,37 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   /**..Record the number of entries per crystal in each of the two normalized energy  histograms
    and average the constants obtained from DB  */
   TH1F* IntegralVsCrys[2];
-  IntegralVsCrys[0] = new TH1F("IntegralVsCrysSame", "Integral of EnVsCrys for each crystal, same theta ring;Crystal ID", 8736, 0,
-                               8736);
+  IntegralVsCrys[0] = new TH1F("IntegralVsCrysSame", "Integral of EnVsCrys for each crystal, same theta ring;Crystal ID",
+                               ECLElementNumbers::c_NCrystals, 0,
+                               ECLElementNumbers::c_NCrystals);
   IntegralVsCrys[1] = new TH1F("IntegralVsCrysDifferent", "Integral of EnVsCrys for each crystal, different theta rings;Crystal ID",
-                               8736, 0, 8736);
+                               ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   TH1F* AverageExpECrys[2];
   AverageExpECrys[0] = new TH1F("AverageExpECrysSame",
-                                "Average expected E per crys from collector, same theta ring;Crystal ID;Energy (GeV)", 8736, 0, 8736);
+                                "Average expected E per crys from collector, same theta ring;Crystal ID;Energy (GeV)", ECLElementNumbers::c_NCrystals, 0,
+                                ECLElementNumbers::c_NCrystals);
   AverageExpECrys[1] = new TH1F("AverageExpECrysDifferent",
-                                "Average expected E per crys from collector, different theta ring;Crystal ID;Energy (GeV)", 8736, 0, 8736);
+                                "Average expected E per crys from collector, different theta ring;Crystal ID;Energy (GeV)", ECLElementNumbers::c_NCrystals, 0,
+                                ECLElementNumbers::c_NCrystals);
 
   TH1F* AverageElecCalib[2];
   AverageElecCalib[0] = new TH1F("AverageElecCalibSame",
-                                 "Average electronics calib const vs crys, same theta ring;Crystal ID;Calibration constant", 8736, 0, 8736);
+                                 "Average electronics calib const vs crys, same theta ring;Crystal ID;Calibration constant", ECLElementNumbers::c_NCrystals, 0,
+                                 ECLElementNumbers::c_NCrystals);
   AverageElecCalib[1] = new TH1F("AverageElecCalibDifferent",
-                                 "Average electronics calib const vs crys, different theta rings;Crystal ID;Calibration constant", 8736, 0, 8736);
+                                 "Average electronics calib const vs crys, different theta rings;Crystal ID;Calibration constant", ECLElementNumbers::c_NCrystals, 0,
+                                 ECLElementNumbers::c_NCrystals);
 
   TH1F* AverageInitialCalib[2];
   AverageInitialCalib[0] = new TH1F("AverageInitialCalibSame",
-                                    "Average initial cosmic calib const vs crys, same theta ring;Crystal ID;Calibration constant", 8736, 0, 8736);
+                                    "Average initial cosmic calib const vs crys, same theta ring;Crystal ID;Calibration constant", ECLElementNumbers::c_NCrystals, 0,
+                                    ECLElementNumbers::c_NCrystals);
   AverageInitialCalib[1] = new TH1F("AverageInitialCalibDifferent",
-                                    "Average initial cosmic calib const vs crys, different theta rings;Crystal ID;Calibration constant", 8736, 0, 8736);
+                                    "Average initial cosmic calib const vs crys, different theta rings;Crystal ID;Calibration constant", ECLElementNumbers::c_NCrystals,
+                                    0, ECLElementNumbers::c_NCrystals);
 
-  for (int crysID = 0; crysID < 8736; crysID++) {
+  for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
     int histbin = crysID + 1;
     for (int idir = 0; idir < 2; idir++) {
       TH1D* hEnergy = EnvsCrys[idir]->ProjectionY("hEnergy", histbin, histbin);
@@ -224,28 +238,37 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   const TString preName[2] = {"SameRing", "DifferentRing"};
 
   TH1F* PeakperCrys[2];
-  PeakperCrys[0] = new TH1F("PeakperCrysSame", "Fit peak per crystal, same theta ring;Crystal ID;Peak normalized energy", 8736, 0,
-                            8736);
+  PeakperCrys[0] = new TH1F("PeakperCrysSame", "Fit peak per crystal, same theta ring;Crystal ID;Peak normalized energy",
+                            ECLElementNumbers::c_NCrystals, 0,
+                            ECLElementNumbers::c_NCrystals);
   PeakperCrys[1] = new TH1F("PeakperCrysDifferent", "Fit peak per crystal, different theta ring;Crystal ID;Peak normalized energy",
-                            8736, 0, 8736);
+                            ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   TH1F* SigmaperCrys[2];
-  SigmaperCrys[0] = new TH1F("SigmaperCrysSame", "Fit sigma per crysal, same theta ring;Crystal ID;Sigma (ADC)", 8736, 0, 8736);
-  SigmaperCrys[1] = new TH1F("SigmaperCrysDifferent", "Fit sigma per crysal, different theta ring;Crystal ID;Sigma (ADC)", 8736, 0,
-                             8736);
+  SigmaperCrys[0] = new TH1F("SigmaperCrysSame", "Fit sigma per crysal, same theta ring;Crystal ID;Sigma (ADC)",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  SigmaperCrys[1] = new TH1F("SigmaperCrysDifferent", "Fit sigma per crysal, different theta ring;Crystal ID;Sigma (ADC)",
+                             ECLElementNumbers::c_NCrystals, 0,
+                             ECLElementNumbers::c_NCrystals);
 
   TH1F* EtaperCrys[2];
-  EtaperCrys[0] = new TH1F("EtaperCrysSame", "Fit eta per crysal, same theta ring;Crystal ID;Eta", 8736, 0, 8736);
-  EtaperCrys[1] = new TH1F("EtaperCrysDifferent", "Fit eta per crysal, different theta ring;Crystal ID;Eta", 8736, 0, 8736);
+  EtaperCrys[0] = new TH1F("EtaperCrysSame", "Fit eta per crysal, same theta ring;Crystal ID;Eta", ECLElementNumbers::c_NCrystals, 0,
+                           ECLElementNumbers::c_NCrystals);
+  EtaperCrys[1] = new TH1F("EtaperCrysDifferent", "Fit eta per crysal, different theta ring;Crystal ID;Eta",
+                           ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   TH1F* ConstperCrys[2];
-  ConstperCrys[0] = new TH1F("ConstperCrysSame", "Fit constant per crystal, same theta ring;Crystal ID;Constant", 8736, 0, 8736);
-  ConstperCrys[1] = new TH1F("ConstperCrysDifferent", "Fit constant per crystal, different theta ring;Crystal ID;Constant", 8736, 0,
-                             8736);
+  ConstperCrys[0] = new TH1F("ConstperCrysSame", "Fit constant per crystal, same theta ring;Crystal ID;Constant",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  ConstperCrys[1] = new TH1F("ConstperCrysDifferent", "Fit constant per crystal, different theta ring;Crystal ID;Constant",
+                             ECLElementNumbers::c_NCrystals, 0,
+                             ECLElementNumbers::c_NCrystals);
 
   TH1F* StatusperCrys[2];
-  StatusperCrys[0] = new TH1F("StatusperCrysSame", "Fit status, same theta ring;Crystal ID;Status", 8736, 0, 8736);
-  StatusperCrys[1] = new TH1F("StatusperCrysDifferent", "Fit status, different theta ring;Crystal ID;Status", 8736, 0, 8736);
+  StatusperCrys[0] = new TH1F("StatusperCrysSame", "Fit status, same theta ring;Crystal ID;Status", ECLElementNumbers::c_NCrystals, 0,
+                              ECLElementNumbers::c_NCrystals);
+  StatusperCrys[1] = new TH1F("StatusperCrysDifferent", "Fit status, different theta ring;Crystal ID;Status",
+                              ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   /**..1D summary histograms */
   TH1F* hStatus[2];
@@ -263,12 +286,14 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   /**..Histograms to store results for DB */
   TH1F* ExpEnergyperCrys[2];
   ExpEnergyperCrys[0] = new TH1F("ExpEnergyperCrysSame", "Expected energy per crystal, same theta ring;Crystal ID;Peak energy (GeV)",
-                                 8736, 0, 8736);
+                                 ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   ExpEnergyperCrys[1] = new TH1F("ExpEnergyperCrysDifferent",
-                                 "Expected energy per crystal, different theta ring;Crystal ID;Peak energy (GeV)", 8736, 0, 8736);
+                                 "Expected energy per crystal, different theta ring;Crystal ID;Peak energy (GeV)", ECLElementNumbers::c_NCrystals, 0,
+                                 ECLElementNumbers::c_NCrystals);
 
-  TH1F* CalibvsCrys = new TH1F("CalibvsCrys", "Energy calibration constant from cosmics;Crystal ID;Calibration constant", 8736, 0,
-                               8736);
+  TH1F* CalibvsCrys = new TH1F("CalibvsCrys", "Energy calibration constant from cosmics;Crystal ID;Calibration constant",
+                               ECLElementNumbers::c_NCrystals, 0,
+                               ECLElementNumbers::c_NCrystals);
 
   /**-----------------------------------------------------------------------------------------------*/
   /**..Loop over specified crystals and performs fits to the two normalized energy distributions */
@@ -444,7 +469,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   if (findExpValues) {
 
     /**..Write out expected energies if status is adequate. Check that every crystal has at least one good fit */
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       int histbin = crysID + 1;
       bool atLeastOneOK = false;
       for (int idir = 0; idir < 2; idir++) {
@@ -474,7 +499,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
   } else {
 
     /**..Find calibration constant separately for the two normalized energy distributions for each crystal */
-    for (int crysID = 0; crysID < 8736; crysID++) {
+    for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
       int histbin = crysID + 1;
       double calibConst[2] = {};
       double calibConstUnc[2] = {999999., 999999.};
@@ -535,7 +560,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
       for (int idir = 0; idir < 2; idir++) {
         std::vector<float> tempE;
         std::vector<float> tempUnc;
-        for (int crysID = 0; crysID < 8736; crysID++) {
+        for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
           int histbin = crysID + 1;
           tempE.push_back(ExpEnergyperCrys[idir]->GetBinContent(histbin));
           tempUnc.push_back(ExpEnergyperCrys[idir]->GetBinError(histbin));
@@ -550,7 +575,7 @@ CalibrationAlgorithm::EResult eclCosmicEAlgorithm::calibrate()
     } else {
       std::vector<float> tempCalib;
       std::vector<float> tempCalibUnc;
-      for (int crysID = 0; crysID < 8736; crysID++) {
+      for (int crysID = 0; crysID < ECLElementNumbers::c_NCrystals; crysID++) {
         int histbin = crysID + 1;
         tempCalib.push_back(CalibvsCrys->GetBinContent(histbin));
         tempCalibUnc.push_back(CalibvsCrys->GetBinError(histbin));

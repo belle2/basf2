@@ -7,8 +7,15 @@
  **************************************************************************/
 
 #pragma once
-#include <TObject.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -29,7 +36,12 @@ namespace Belle2 {
     /** Set vector of constants with uncertainties. One entry per crystal */
     void setCalibVector(const std::vector<float>& CalibConst, const std::vector<float>& CalibConstUnc)
     {
-      if (CalibConst.size() != 8736 || CalibConstUnc.size() != 8736) {B2FATAL("ECLCrystalCalib: wrong size vector uploaded, " << CalibConst.size() << " " << CalibConstUnc.size() << " instead of 8736");}
+      if ((CalibConst.size() != ECLElementNumbers::c_NCrystals) ||
+          (CalibConstUnc.size() != ECLElementNumbers::c_NCrystals)) {
+        B2FATAL("ECLCrystalCalib: wrong size vector uploaded, " <<
+                CalibConst.size() << " " << CalibConstUnc.size() <<
+                " instead of " << ECLElementNumbers::c_NCrystals);
+      }
       m_CalibConst = CalibConst;
       m_CalibConstUnc = CalibConstUnc;
     };

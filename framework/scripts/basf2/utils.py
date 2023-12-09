@@ -225,7 +225,7 @@ def pretty_print_description_list(rows):
             subheading = row[0]
             print('')
             print(bold(subheading).center(term_width))
-        else:
+        elif len(row) == 2:
             name, description = row
             for i, line in enumerate(description.splitlines()):
                 if i == 0:
@@ -237,6 +237,15 @@ def pretty_print_description_list(rows):
                 else:
                     # not first line anymore, no module name in front so initial
                     # indent is equal to subsequent indent
+                    wrapper.initial_indent = wrapper.subsequent_indent
+                    print(wrapper.fill(line))
+        else:
+            name, description, vartype = row
+            for i, line in enumerate(description.splitlines()):
+                if i == 0:
+                    wrapper.initial_indent = max(module_width, len(name + vartype) + 4) * " "
+                    print(bold((name+' ['+vartype+']').ljust(module_width - 1)), wrapper.fill(line).lstrip())
+                else:
                     wrapper.initial_indent = wrapper.subsequent_indent
                     print(wrapper.fill(line))
 
@@ -300,12 +309,12 @@ def print_params(module, print_values=True, shared_lib_path=None):
 
     print('')
     print('=' * (len(module.name()) + 4))
-    print('  %s' % module.name())
+    print(f'  {module.name()}')
     print('=' * (len(module.name()) + 4))
-    print('Description: %s' % module.description())
+    print(f'Description: {module.description()}')
     if shared_lib_path is not None:
-        print('Found in:    %s' % shared_lib_path)
-    print('Package:     %s' % module.package())
+        print(f'Found in:    {shared_lib_path}')
+    print(f'Package:     {module.package()}')
 
     # gather output data in table
     output = []
@@ -376,7 +385,7 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
     for module in path.modules():
         out = indentation_string + ' % 2d. % s' % (index, module.name())
         if description:
-            out += '  #%s' % module.description()
+            out += f'  #{module.description()}'
         print(out)
         index += 1
         for param in module.available_params():
@@ -384,7 +393,7 @@ def print_path(path, defaults=False, description=False, indentation=0, title=Tru
                 continue
             out = indentation_string + f'      {param.name}={param.values}'
             if description:
-                out += '  #%s' % param.description
+                out += f'  #{param.description}'
             print(out)
 
         for condition in module.get_all_conditions():

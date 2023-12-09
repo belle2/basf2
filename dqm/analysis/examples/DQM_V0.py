@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,10 +29,9 @@ main.add_module(inroot)
 
 # input = register_module('DQMHistAnalysisInput')
 # input.param('HistMemoryPath', argv[1])
-# input.param('AutoCanvas', False)
-# input.param('AutoCanvasFolders', [])
 # main.add_module(input)
 
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 # v0a = register_module('DQMHistAnalysisV0')
 # v0a.param('OverlayPath', Belle2.FileSystem.findFile('/dqm/analysis/CAD'))

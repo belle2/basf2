@@ -22,12 +22,13 @@
 #include <klm/eklm/geometry/GeometryData.h>
 #include <klm/eklm/geometry/TransformData.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 namespace Belle2 {
 
@@ -172,6 +173,9 @@ namespace Belle2 {
 
     /** EventT0. */
     StoreObjPtr<EventT0> m_EventT0;
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_EventLevelClusteringInfo;
 
     /* BKLM member variables. */
 

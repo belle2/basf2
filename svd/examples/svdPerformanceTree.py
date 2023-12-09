@@ -17,10 +17,11 @@
 ###################################################################################
 
 import basf2 as b2
-from basf2 import conditions as b2conditions
+# from basf2 import conditions as b2conditions
 import rawdata as raw
 import tracking as trk
 import simulation as sim
+import svd as svd
 import glob
 
 useSimulation = True
@@ -56,16 +57,18 @@ if useSimulation:
         usePXDDataReduction=ROIfinding,
         simulateT0jitter=simulateJitter)
 else:
-    # setup database
-    b2conditions.reset()
-    b2conditions.override_globaltags()
-    b2conditions.globaltags = ["online"]
+    MCTracking = False
+
+    # setup database - if needed
+    # b2conditions.reset()
+    # b2conditions.override_globaltags()
+    # b2conditions.globaltags = ["online"]
 
     # input root files
     main.add_module('RootInput', branchNames=['RawPXDs', 'RawSVDs', 'RawCDCs'])
     raw.add_unpackers(main, components=['PXD', 'SVD', 'CDC'])
 
-    # change ZS to 5
+    # change ZS to 5 - if needed
     # for moda in main.modules():
     #    if moda.name() == 'SVDUnpacker':
     #        moda.param("svdShaperDigitListName", "SVDShaperDigitsZS3")
@@ -75,32 +78,19 @@ else:
 trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
-    trackFitHypotheses=[211])  # ,
-#    skipHitPreparerAdding=True)
+    trackFitHypotheses=[211],
+    append_full_grid_cdc_eventt0=True)
 
-'''
-# skim mu+mu- events:
-ma.applyEventCuts("nTracks ==2", path=main)
+# reconstruct strips
+svd.add_svd_create_recodigits(main)
 
-mySelection = 'pt>1.0 and abs(dz)<0.5 and dr<0.4'
-ma.fillParticleList('mu+:DQM', mySelection, path=main)
-ma.reconstructDecay('Upsilon(4S):IPDQM -> mu+:DQM mu-:DQM', '10<M<11', path=main)
-
-skimfilter = b2.register_module('SkimFilter')
-skimfilter.set_name('SkimFilter_MUMU')
-skimfilter.param('particleLists', ['Upsilon(4S):IPDQM'])
-main.add_module(skimfilter)
-filter_path = b2.create_path()
-skimfilter.if_value('=1', filter_path, b2.AfterConditionPath.CONTINUE)
-'''
+# look at raw time - uncomment if needed
+b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
 
 # fill TTrees
 main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")
-
-# write everything
 main.add_module('OverlapResiduals', ExpertLevel=True)
 
-# main.add_module('RootOutput')
 main.add_module('Progress')
 
 b2.print_path(main)

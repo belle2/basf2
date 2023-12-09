@@ -9,10 +9,13 @@
 ##########################################################################
 
 from basf2 import set_random_seed, create_path, register_module, process, find_file
-from b2test_utils import clean_working_directory, require_file, configure_logging_for_tests
+from b2test_utils import clean_working_directory, require_file, configure_logging_for_tests, is_ci, skip_test
 import modularAnalysis as ma
 import subprocess
 
+
+if is_ci():
+    skip_test("The test is too slow for running on our pipeline")
 
 configure_logging_for_tests()
 set_random_seed('pid_priors')

@@ -31,4 +31,3 @@ ax.hist(
 ax.set_xlabel("FBDT_qrCombined")
 ax.legend()
 fig.savefig("flavor_tags.svg")
-

@@ -20,7 +20,7 @@ basf2_dir = os.environ.get('BELLE2_LOCAL_DIR', os.environ.get('BELLE2_RELEASE_DI
 # Generation parameters
 mg_steeringtemplate = f'{basf2_dir}/generators/madgraph/examples/run_darkphoton_isr.steeringtemplate'
 mg_nevents = '1000'
-mg_beamenergy = '10.58/2.'
+mg_beamenergy = '10.579558/2.'
 b2_seed = b2.get_random_seed().encode('utf-8')
 mg_seed = f'{int(hashlib.sha256(b2_seed).hexdigest(), 16) % 10**8}'
 
@@ -65,7 +65,7 @@ mydict = {
     'MGPARAMETER_gDM': mg_parameter_gDM,
     'MGPARAMETER_kappa': mg_parameter_kappa,
 }
-with open(mg_steeringtemplate, 'r') as template:
+with open(mg_steeringtemplate) as template:
     data = template.read()
     for (key, value) in mydict.items():
         data = data.replace(key, value)

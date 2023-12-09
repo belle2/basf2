@@ -9,10 +9,14 @@
 /* Own header. */
 #include <analysis/modules/LowEnergyPi0IdentificationExpert/LowEnergyPi0IdentificationExpertModule.h>
 
-/* Belle 2 headers. */
+/* Analysis headers. */
 #include <analysis/variables/ECLVariables.h>
 #include <analysis/variables/HelicityVariables.h>
+
+/* Basf2 headers. */
 #include <mva/interface/Interface.h>
+
+/* Boost headers. */
 #include <boost/algorithm/string/predicate.hpp>
 
 using namespace Belle2;

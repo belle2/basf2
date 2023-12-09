@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -170,8 +169,8 @@ class SeqAlgorithmsRunner(AlgorithmsRunner):
                             final_loop = True
                             continue
                         else:
-                            raise RunnerError((f"Strategy for {strategy.algorithm.name} "
-                                               "exited subprocess but without a final state!"))
+                            raise RunnerError(f"Strategy for {strategy.algorithm.name} "
+                                              "exited subprocess but without a final state!")
 
             # Exit early and don't continue strategies as this one failed
             if final_state == AlgorithmStrategy.FAILED:
@@ -197,3 +196,5 @@ class RunnerError(Exception):
     """
     Base exception class for Runners
     """
+
+# @endcond

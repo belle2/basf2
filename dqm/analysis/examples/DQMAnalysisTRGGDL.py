@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,6 +20,7 @@ main = b2.create_path()
 inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', '/group/belle2/phase3/dqm/dqmsrv1/e0017/dqmhisto/hltdqm_e0017r000060.root')
 main.add_module(inroot)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 trggdl_analysis = b2.register_module('DQMHistAnalysisTRGGDL')
 main.add_module(trggdl_analysis)

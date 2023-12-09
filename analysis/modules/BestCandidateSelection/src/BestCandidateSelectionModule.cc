@@ -70,6 +70,7 @@ output list. If ``allowMultiRank=True`` that means that there can be more than
   addParam("cut", m_cutParameter, "Only candidates passing the cut will be ranked. The others will have rank -1.", std::string(""));
   addParam("outputVariable", m_outputVariableName,
            "Name for created variable, which contains the rank for the particle. If not provided, the standard name ``${variable}_rank`` is used.");
+  addParam("overwriteRank", m_overwriteRank, "If true, the extraInfo of rank is overwritten when the particle has already the extraInfo.", false);
 
 }
 
@@ -178,6 +179,9 @@ void BestCandidateSelectionModule::event()
 
     if (!p->hasExtraInfo(m_outputVariableName))
       p->addExtraInfo(m_outputVariableName, rank);
+    else if (m_overwriteRank)
+      p->setExtraInfo(m_outputVariableName, rank);
+
     m_inputList->addParticle(p);
     previous_val = candidate.first;
 

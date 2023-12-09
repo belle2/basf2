@@ -18,7 +18,7 @@
   - It can be used for hadronic and semileptonic tagging.
   - The algorithm has to be trained on MC, and can afterwards be applied on data.
   - The training requires O(100) million MC events
-  - The weight files are stored in the Belle 2 Condition database
+  - The weight files are stored in the Belle II Condition database
 
  Read this file if you want to understand the technical details of the FEI.
 
@@ -148,7 +148,7 @@ class FSPLoader:
     Steers the loading of FSP particles.
     This does NOT include RootInput, Geometry or anything required before loading FSPs,
     the user has to add this himself (because it depends on the MC campaign and if you want
-    to use Belle 1 or Belle 2).
+    to use Belle or Belle II).
     """
 
     def __init__(self, particles: typing.Sequence[config.Particle], config: config.FeiConfiguration):
@@ -372,7 +372,10 @@ class PreReconstruction:
                     pvfit.param('listName', channel.name)
                     pvfit.param('confidenceLevel', channel.preCutConfig.vertexCut)
                     pvfit.param('vertexFitter', 'KFit')
-                    pvfit.param('fitType', 'vertex')
+                    if particle.name in ['pi0']:
+                        pvfit.param('fitType', 'mass')
+                    else:
+                        pvfit.param('fitType', 'vertex')
                     pvfit.set_log_level(basf2.logging.log_level.ERROR)  # let's not produce gigabytes of uninteresting warnings
                     path.add_module(pvfit)
 

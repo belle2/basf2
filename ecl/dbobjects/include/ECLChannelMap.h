@@ -7,8 +7,15 @@
  **************************************************************************/
 
 #pragma once
-#include <TObject.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
+
+/* ROT headers. */
+#include <TObject.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -26,10 +33,10 @@ namespace Belle2 {
       ECL_COPPERS            = 26,
       ECL_BARREL_COPPERS     = 18,
       ECL_ENDCAP_COPPERS     = 8,
-      ECL_TOTAL_CHANNELS     = 8736,
-      ECL_BARREL_CHANNELS    = 6624,
-      ECL_FWD_CHANNELS       = 1152,
-      ECL_BKW_CHANNELS       = 960
+      ECL_TOTAL_CHANNELS     = ECLElementNumbers::c_NCrystals,
+      ECL_BARREL_CHANNELS    = ECLElementNumbers::c_NCrystalsBarrel,
+      ECL_FWD_CHANNELS       = ECLElementNumbers::c_NCrystalsForward,
+      ECL_BKW_CHANNELS       = ECLElementNumbers::c_NCrystalsBackward
     };
   }
 

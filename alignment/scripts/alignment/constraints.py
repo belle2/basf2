@@ -146,7 +146,7 @@ class VXDHierarchyConstraints(Constraints):
         """
 
         #  TODO: cannot currently change the filename in collector, so fixed here
-        super(VXDHierarchyConstraints, self).__init__("constraints.txt")
+        super().__init__("constraints.txt")
         #: Constraint type
         self.type = type
         #: Flag for PXD
@@ -207,7 +207,7 @@ class CDCLayerConstraints(Constraints):
         z_scale : bool
           Constraint for Z-scale
         """
-        super(CDCLayerConstraints, self).__init__(filename)
+        super().__init__(filename)
         #: 6D CDC constraints
         self.rigid = rigid
         #: CDC twist constraint
@@ -360,7 +360,7 @@ class CDCTimeZerosConstraint(Constraints):
         filename : str
           Can use different filename
         """
-        super(CDCTimeZerosConstraint, self).__init__(filename)
+        super().__init__(filename)
         pass
 
     def generate(self):
@@ -426,7 +426,7 @@ class CDCWireConstraints(Constraints):
 
         """
 
-        super(CDCWireConstraints, self).__init__(filename)
+        super().__init__(filename)
         #: List of layers for whose wires to generate the constraints. None = all layers
         if layers is None:
             layers = list(range(0, 56))

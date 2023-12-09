@@ -30,9 +30,9 @@ ma.inputMdst(filename=b2.find_file('B02D0pi0_D02pi0pi0.root', 'examples', False)
              path=path)
 
 # ID of weight table
-weight_table_id = "PhotonEfficiencyDataMCRatio_June2021"
+weight_table_id = "PhotonEfficiencyDataMCRatio_proc13MC15_November2022"
 
-b2.conditions.prepend_globaltag("test_photoneff_tag_v1")
+b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
 # We know what weight info will be added,
 # so we add aliases and add it to the tools

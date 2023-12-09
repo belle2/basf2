@@ -13,7 +13,7 @@
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/gearbox/GearDir.h>

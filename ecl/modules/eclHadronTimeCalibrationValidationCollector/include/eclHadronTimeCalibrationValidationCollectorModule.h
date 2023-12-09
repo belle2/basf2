@@ -14,13 +14,16 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/utility/ECLChannelMapper.h>
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
+#include <framework/datastore/StoreArray.h>
 
 class TTree ;
 
@@ -71,7 +74,8 @@ namespace Belle2 {
     //StoreArray<ECLDigit> m_eclDigitArray; /**< Required input array of ECLDigits */
     StoreArray<ECLCalDigit> m_eclCalDigitArray; /**< Required input array of ECLCalDigits */
 
-
+    /** Event metadata. */
+    StoreObjPtr<EventMetaData> m_EventMetaData;
 
     /**
      * StoreObjPtr for T0. The event t0 class has an overall event t0 so use that as presumably some code has been run to determine what the best t0 is to use.
@@ -88,7 +92,7 @@ namespace Belle2 {
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evt_num = -1;    /**< Event number for debug TTree output*/
     int m_tree_run = -1;     /**< Run number for debug TTree output */
-    int m_tree_cid = -1;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_cid = -1;     /**< ECL Cell ID (1..ECLElementNumbers::c_NCrystals) for debug TTree output */
     double m_tree_dt99 = -1;  /**< dt99 for cluster */
     double m_tree_time = -1; /**< Calibrated time */
 

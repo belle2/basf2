@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Spline.h>
 

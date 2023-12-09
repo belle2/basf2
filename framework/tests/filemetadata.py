@@ -31,6 +31,7 @@ metadata = Belle2.PyStoreObj('FileMetaData', 1)
 
 # print (metadata.getLfn()) #?
 assert 10 == metadata.getNEvents()
+assert 10 == metadata.getNFullEvents()
 
 assert 7 == metadata.getExperimentLow()
 assert 1 == metadata.getRunLow()
@@ -77,6 +78,8 @@ assert 1 == m['eventHigh']
 assert 'something important' == m['randomSeed']
 assert 10 == m['nEvents']
 assert isinstance(m['nEvents'], int)
+assert 10 == m['nFullEvents']
+assert isinstance(m['nFullEvents'], int)
 assert '/logical/file/name' == m['LFN']
 
 # steering file is in metadata, so we check for existence of this string:

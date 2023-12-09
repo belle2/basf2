@@ -100,14 +100,14 @@ namespace Belle2 {
     /**
      * Generate random module displacements and check if they are correct
      * (no overlaps).
-     * @oaram[in] f Output file.
+     * @param[in] f Output file.
      */
     void studyModuleAlignmentLimits(TFile* f);
 
     /**
      * Generate random segment displacements and check if they are correct
      * (no overlaps).
-     * @oaram[in] f Output file.
+     * @param[in] f Output file.
      */
     void studySegmentAlignmentLimits(TFile* f);
 

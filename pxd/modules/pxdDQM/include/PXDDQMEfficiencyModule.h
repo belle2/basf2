@@ -24,7 +24,7 @@
 #include "TH1F.h"
 #include "TH1D.h"
 #include "TH2F.h"
-#include "TVector3.h"
+#include <Math/Vector3D.h>
 
 
 namespace Belle2 {
@@ -71,7 +71,7 @@ namespace Belle2 {
   private:
     /* helper functions to do some of the calculations*/
     /** find the closest cluster*/
-    int findClosestCluster(const VxdID& vxdid, TVector3 intersection);
+    int findClosestCluster(const VxdID& vxdid, ROOT::Math::XYZVector intersection);
     /** is it close to the border*/
     bool isCloseToBorder(int u, int v, int checkDistance);
     /** is a dead pixel close*/

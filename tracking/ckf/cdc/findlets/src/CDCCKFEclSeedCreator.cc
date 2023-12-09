@@ -15,7 +15,7 @@
 #include <framework/core/ModuleParamList.h>
 
 #include <framework/gearbox/Const.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 

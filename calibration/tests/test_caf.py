@@ -65,5 +65,5 @@ with b2test_utils.clean_working_directory():
             with open(err_name) as err_file:
                 basf2.B2ERROR('Calibration failed, here is the stderr of the first collector job.')
                 print(err_file.read())
-        basf2.B2FATAL(
-            f'The test failed because an exception was raised ({e}). Please re-run the build if this failure happened on bamboo.')
+        basf2.B2FATAL(f'The test failed because an exception was raised ({e}). '
+                      'Please re-run the run-tests stage if this failure happened in the GitLab pipeline.')

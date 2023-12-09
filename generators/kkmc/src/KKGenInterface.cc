@@ -9,7 +9,7 @@
 /* Own header. */
 #include <generators/kkmc/KKGenInterface.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>

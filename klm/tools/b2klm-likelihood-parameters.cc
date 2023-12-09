@@ -10,7 +10,7 @@
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/variables/AcceptanceVariables.h>
 #include <mdst/dataobjects/MCParticle.h>

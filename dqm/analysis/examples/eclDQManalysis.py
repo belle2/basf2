@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -46,6 +45,7 @@ inroot = b2.register_module('DQMHistAnalysisInputRootFile')
 inroot.param('FileList', input_filename)
 inroot.param('SelectHistograms', "ECL/*")
 main.add_module(inroot)
+# main.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 
 ecl = b2.register_module('DQMHistAnalysisECL')
 main.add_module(ecl)

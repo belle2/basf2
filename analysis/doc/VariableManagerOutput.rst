@@ -1,9 +1,9 @@
 .. _variablemanageroutput:
 
-Variable Manager Output 
+Variable Manager Output
 =======================
 
-A common task is to write out information to a `ROOT`_ file to analyse it outside of the ``basf2`` framework (e.g. to perform a fit, and extract a physical observable). 
+A common task is to write out information to a `ROOT`_ file to analyse it outside of the ``basf2`` framework (e.g. to perform a fit, and extract a physical observable).
 
 .. _ROOT: https://root.cern.ch
 
@@ -17,14 +17,14 @@ VariablesToNtuple
 
 Writes out Variables to a flat `ROOT`_ TTree (it is also possible to write out several trees to one file).
 
-.. note:: 
-        New since release-03: event, run, and experiment numbers are now automatically included. 
+.. note::
+        New since release-03: event, run, and experiment numbers are now automatically included.
         If you have are writing candidates, you will also see a candidate counter and the number of candidates (ncandidates).
 
 
 Candidate-wise
 ~~~~~~~~~~~~~~
-For each candidate in the given `ParticleList`_, there will be one entry in the TTree containing the desired Variables. 
+For each candidate in the given `ParticleList`_, there will be one entry in the TTree containing the desired Variables.
 In other words, this produces a candidate-based ROOT file.
 Here is an example of use:
 
@@ -62,13 +62,13 @@ You can write several trees to the same file by calling the module several times
 .. code-block:: python
 
         from modularAnalysis import variablesToNtuple
-        variablesToNtuple('', list_of_interesting_event_variables, 
-                          treename="event", filename="myoutput.root", 
+        variablesToNtuple('', list_of_interesting_event_variables,
+                          treename="event", filename="myoutput.root",
                           path=mypath)
-        variablesToNtuple('pi+:all', list_of_interesting_variables, 
+        variablesToNtuple('pi+:all', list_of_interesting_variables,
                           treename='pions', filename='myoutput.root', # <-- same file
                           path=mypath)
-        variablesToNtuple('K+:all', list_of_interesting_variables, 
+        variablesToNtuple('K+:all', list_of_interesting_variables,
                           treename='kaons', filename='anotheroutput.root', # <-- different file
                           path=mypath)
 
@@ -80,7 +80,7 @@ As with many modules, there is a `modularAnalysis` convenience function:
 
 .. _v2ebt:
 
-VariablesToEventBasedTree 
+VariablesToEventBasedTree
 -------------------------
 
 Writes out Variables to a structured `ROOT`_ TTree.
@@ -119,8 +119,8 @@ Analogous to `VariablesToNtuple <v2nt>`.
 
 .. _pandas.DataFrame: https://pandas.pydata.org
 
-.. note:: 
-        There is currently no `modularAnalysis` convenience function. 
+.. note::
+        There is currently no `modularAnalysis` convenience function.
         Instead you can add the module to your path explicitly (it only takes two lines).
 
 .. code-block:: python

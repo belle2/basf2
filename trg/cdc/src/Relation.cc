@@ -24,7 +24,7 @@ namespace Belle2 {
                                  const std::map<unsigned, unsigned>& relation)
     : _track(track),
       _relations(relation),
-      _pairs(0)
+      _pairs(nullptr)
   {
   }
 
@@ -46,14 +46,12 @@ namespace Belle2 {
     }
 
     //...Preparation...
-    if (_pairs == 0) {
-      _pairs = (const pair<unsigned, unsigned>**)
-               malloc(sizeof(pair<unsigned, unsigned>) * n);
+    if (_pairs == nullptr) {
+      _pairs = new const pair<unsigned, unsigned>* [n];
       map<unsigned, unsigned>::const_iterator it = _relations.begin();
       unsigned i = 0;
       while (it != _relations.end()) {
-        _pairs[i] =
-          new const pair<unsigned, unsigned>(it->first, it->second);
+        _pairs[i] = new const pair<unsigned, unsigned>(it->first, it->second);
         ++it;
         ++i;
       }

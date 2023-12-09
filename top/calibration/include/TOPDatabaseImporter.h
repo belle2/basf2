@@ -144,7 +144,7 @@ namespace Belle2 {
     /**
      * Prints sample time calibration info about constants stored in database
      */
-    void getSampleTimeCalibrationInfo();
+    void printSampleTimeCalibrationInfo();
 
     /**
      * Print sample time calibration constants stored in database

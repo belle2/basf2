@@ -27,7 +27,7 @@ void* RunRbufReader(void*)
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(FastRbuf2Ds)
+REG_MODULE(FastRbuf2Ds);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -123,12 +123,12 @@ void FastRbuf2DsModule::initialize()
 void FastRbuf2DsModule::ReadRbufInThread()
 {
   printf("ReadFileInThread started!!\n");
-  int rf_nevt = 0;
+  int rf_nevt [[maybe_unused]] = 0;
   for (;;) {
     char* evtbuf = new char[EvtMessage::c_MaxEventSize];
     int size;
     while ((size = m_rbuf->remq((int*)evtbuf)) == 0) usleep(20);
-    if (size == 0) {
+    if (size == 0) { // TODO this condition is always false
       printf("ReadRbufInThread : ERROR! record with size=0 detected!!!!!\n");
       m_streamer->queueEvtMessage(NULL);
       delete[] evtbuf;

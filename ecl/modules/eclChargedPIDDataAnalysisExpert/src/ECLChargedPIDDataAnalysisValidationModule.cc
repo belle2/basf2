@@ -8,7 +8,6 @@
 #include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisValidationModule.h>
 
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
@@ -195,6 +194,11 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       if (itrack_max < 0) continue; // Go to next particle if no track found.
 
       const auto track = particle.getRelationsFrom<Track>()[itrack_max];
+      // Very unlikely, but random failures due to missing ECLPidLikelihood have been observed
+      // Let's continue if this is a nullptr
+      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
+      if (not eclLikelihood)
+        continue;
       const auto fitRes = track->getTrackFitResultWithClosestMass(Const::pion);
 
       m_p[chargedIdx] = p_max;
@@ -225,8 +229,6 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       m_clusterReg[chargedIdx] = eclCluster->getDetectorRegion();
 
       m_trackClusterMatch[chargedIdx] = 1;
-
-      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
 
       // The "signal" likelihood corresponds to the current chargedPdgId.
       const auto chargedStableSig = Const::chargedStableSet.find(std::abs(chargedPdgId));

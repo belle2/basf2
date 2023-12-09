@@ -11,7 +11,7 @@
 /* KLM headers. */
 #include <klm/dbobjects/KLMTimeConversion.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 
@@ -54,9 +54,10 @@ namespace Belle2 {
     /**
      * Get time for scintillator.
      * @param[in] ctime        CTIME.
+     * @param[in] tdc          TDC.
      * @param[in] triggerCTime Trigger CTIME.
      */
-    double getScintillatorTime(int ctime, int triggerCTime) const;
+    double getScintillatorTime(int ctime, int tdc, int triggerCTime) const;
 
     /**
      * Get coarse and fine times for RPC.

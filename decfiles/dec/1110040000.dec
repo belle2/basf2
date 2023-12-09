@@ -1,15 +1,15 @@
-#EventType:1110040000
-#Descriptor:[B0 -> phi [-> K+ K-] K*0 [-> K+ pi-]]
-#NickName:Bd_phiKstar_K+K-K+pi-
-#Documentation:Rare B decay process
-#Tested:Yes
-#PhysicsWG:TDCPV
-#Responsible:Sayaka Imai
-#Email:was_imai@cc.nara-wu.ac.jp
-#Cuts:None
-#Date:20221201
-#
-#
+# EventType: 1110040000
+# Descriptor: [B0 -> phi [-> K+ K-] K*0 [-> K+ pi-]]
+# NickName: Bd_phiKstar_K+K-K+pi-
+# Documentation: Rare B decay process
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Sayaka Imai
+# Email: was_imai@cc.nara-wu.ac.jp
+# Cuts: None
+# Date: 20221201
+
+
 Alias   phisig  phi
 Alias   K*0sig    K*0
 Alias   anti-K*0sig anti-K*0

@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dbobjects/bklm/BKLMAlignment.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>
@@ -606,6 +606,9 @@ double GeometryPar::getModuleMiddleRadius(int layer) const
 
 double GeometryPar::getActiveMiddleRadius(int section, int sector, int layer) const
 {
+#ifdef __clang_analyzer__
+  m_NSector = 8;
+#endif
   // place the active radius midway between the two readout planes
   // (same as positioning in GeoBKLMCreator.cc)
   double dx = getModuleMiddleRadius(layer) - getGapMiddleRadius(layer);

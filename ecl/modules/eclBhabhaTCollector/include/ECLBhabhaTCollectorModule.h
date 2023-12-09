@@ -8,16 +8,17 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/utility/ECLChannelMapper.h>
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/utility/ECLTimingUtilities.h>
 
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
+#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>
-
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 
@@ -133,7 +134,7 @@ namespace Belle2 {
     /*** tree branches ***/
     /*** See inDefineHisto method for branches description ***/
     int m_tree_evtNum = intNaN;    /**< Event number for debug TTree output*/
-    int m_tree_cid = intNaN;     /**< ECL Cell ID (1..8736) for debug TTree output */
+    int m_tree_cid = intNaN;     /**< ECL Cell ID (1..ECLElementNumbers::c_NCrystals) for debug TTree output */
     int m_tree_amp = intNaN;     /**< Fitting amplitude from ECL for debug TTree output */
     double m_tree_en = realNaN;     /**< Energy of crystal with maximum energy within ECL cluster, GeV for debug TTree output */
     double m_tree_E1Etot = realNaN;     /**< Energy of crystal with maximum energy within

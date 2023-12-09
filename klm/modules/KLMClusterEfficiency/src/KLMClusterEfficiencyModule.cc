@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMHit2d.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 
 /* ROOT headers. */
@@ -102,7 +102,7 @@ void KLMClusterEfficiencyModule::event()
   char str[128];
   int i1, i2, i3, n1, n2, n3;
   int bs1, bs2, es1, es2;
-  TVector3 clusterPosition;
+  ROOT::Math::XYZVector clusterPosition;
   ROOT::Math::XYZVector decayVertex, hitPosition;
   float angle;
   /* cppcheck-suppress variableScope */

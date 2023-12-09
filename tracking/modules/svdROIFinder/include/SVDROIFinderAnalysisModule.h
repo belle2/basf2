@@ -180,8 +180,8 @@ namespace Belle2 {
     TH2F* m_h2ROIvMinMax; /**< min VS max of the V coordinate */
     TH1F* m_h1totROIs; /**< distribution of number of all ROIs*/
     TH1F* m_h1okROIs; /**< distribution of number of ROIs containin a SVDShaperDigit*/
-    TH1F* m_h1totUstrips; /**< distribution of #u strips of all ROIs*/
-    TH1F* m_h1totVstrips; /**< distribution of #u strips of all ROIs*/
+    TH1F* m_h1totUstrips; /**< distribution of number of u strips of all ROIs*/
+    TH1F* m_h1totVstrips; /**< distribution of number of v strips of all ROIs*/
 
     TH1F* m_h1effPerTrack; /**< efficiency per track */
 

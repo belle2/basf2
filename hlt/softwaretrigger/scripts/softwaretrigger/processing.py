@@ -8,6 +8,7 @@
 import os
 import argparse
 import multiprocessing
+import tempfile
 
 import basf2
 
@@ -57,6 +58,10 @@ def setup_basf2_and_db(zmq=False):
                         default=constants.DEFAULT_DB_FILE_LOCATION)
     parser.add_argument('--central-db-tag', type=str, nargs="*",
                         help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
+    parser.add_argument('--udp-hostname', type=str,
+                        help="set hostname for UDP logging connection", default=None)
+    parser.add_argument('--udp-port', type=int,
+                        help="set port number for UDP logging connection", default=None)
 
     args = parser.parse_args()
 
@@ -73,11 +78,15 @@ def setup_basf2_and_db(zmq=False):
     # Number of processes
     basf2.set_nprocesses(args.number_processes)
 
-    # Logging
+    # basf2 logging setup
     basf2.set_log_level(basf2.LogLevel.ERROR)
     # And because reasons we want every log message to be only one line,
     # otherwise the LogFilter in daq_slc throws away the other lines
     basf2.logging.enable_escape_newlines = True
+
+    # UDP logging
+    if (args.udp_hostname is not None) and (args.udp_port is not None):
+        basf2.logging.add_udp(args.udp_hostname, args.udp_port)
 
     # Online realm
     basf2.set_realm("online")
@@ -110,7 +119,7 @@ def start_path(args, location):
 
     # Histogram Handling
     if not args.histo_output_file:
-        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
+        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName=tempfile.gettempdir()+"/")
     else:
         workdir = os.path.dirname(args.histo_output_file)
         filename = os.path.basename(args.histo_output_file)

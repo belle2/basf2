@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     printf("createrb : rbufname \n");
     exit(-1);
   }
-  RFSharedMem* shm = new RFSharedMem(argv[1]);
+  new RFSharedMem(argv[1]); // returns shm
 }
 
 

@@ -978,27 +978,9 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 
 class DstToD0Pi_D0ToGeneric(BaseSkim):
     """
-    **Decay Modes**:
-    * :math: tag side charm particles (D*0/D0/D*+/D+/D_s*+/D_s+/Lambda_c+)
-    *   => many decay channels
-    * :math: fragmentation systems for each tag side particles
-    *   => many channels conserving strangness, baryon quantum number and charge to allow generic decay of signal side D0
-
-    **Selection Criteria**:
-    * Use charged tracks from PID > 0.1 & |dr| < 2.0 & |dz| < 3.0
-    * Use :math:`\\gamma` with E > 0.05
-    * Use :math:`\\pi^{0}` from '\\gamma \\gamma' combination with 0.115 < M < 0.160
-    * Use :math:'\\Lambda^{0}' from stdV0s.stdLambdas
-    * Use :math: K_S0 from stdV0s.stdKshorts
-    * Cut on :math: tag side charm partcles:
-      `` Mass Cut with 0.1 GeV ~ 0.2 GeV width & '\\p^{*}' > 2.0 GeV ''
-    * Cut on :math: signal side recoil 'D^{*}'
-    * '' 1.75 < mRecoil < 2.27 & \\p^{*} > 2.0 ''
-    * Cut on :math: signal side recoil 'D^{0}'
-    * '' 0.115 GeV < Recoil Mass - nominal Mass (defined as DelM) < 0.230 GeV
-    * For more details, please check the source code of this skim.
+    Cut criteria are not finally decided, and could be changed. Please check the
+    code in the master branch to get up-to-date information.
     """
-
     vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
     vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')
     vm.addAlias('reco_pz', 'formula(daughter(0,pzRecoil)-daughter(1,pz))')

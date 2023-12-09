@@ -35,7 +35,8 @@ from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
-from stdV0s import stdKshorts
+from stdV0s import stdKshorts, stdLambdas
+from variables import variables as vm
 
 
 __liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
@@ -994,3 +995,254 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         DstList.append("D*+:all")
 
         return DstList
+
+
+class DstToD0Pi_D0ToGeneric(BaseSkim):
+    """
+    **Decay Modes**:
+    * :math: tag side charm particles (D*0/D0/D*+/D+/D_s*+/D_s+/Lambda_c+)
+    *   => many decay channels
+    * :math: fragmentation systems for each tag side particles
+    *   => many channels conserving strangness, baryon quantum number and charge to allow generic decay of signal side D0
+
+    **Selection Criteria**:
+    * Use charged tracks from PID > 0.1 & |dr| < 2.0 & |dz| < 3.0
+    * Use :math:`\\gamma` with E > 0.05
+    * Use :math:`\\pi^{0}` from '\\gamma \\gamma' combination with 0.115 < M < 0.160
+    * Use :math:'\\Lambda^{0}' from stdV0s.stdLambdas
+    * Use :math: K_S0 from stdV0s.stdKshorts
+    * Cut on :math: tag side charm partcles:
+      `` Mass Cut with 0.1 GeV ~ 0.2 GeV width & '\\p^{*}' > 2.0 GeV ''
+    * Cut on :math: signal side recoil 'D^{*}'
+    * '' 1.75 < mRecoil < 2.27 & \\p^{*} > 2.0 ''
+    * Cut on :math: signal side recoil 'D^{0}'
+    * '' 0.115 GeV < Recoil Mass - nominal Mass (defined as DelM) < 0.230 GeV
+    * For more details, please check the source code of this skim.
+    """
+
+    vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
+    vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')
+    vm.addAlias('reco_pz', 'formula(daughter(0,pzRecoil)-daughter(1,pz))')
+    vm.addAlias('reco_E', 'formula(daughter(0,eRecoil)-daughter(1,E))')
+    vm.addAlias('reco_p', 'formula((reco_px^2 + reco_py^2 + reco_pz^2)^0.5)')
+    vm.addAlias('reco_M', 'formula((reco_E^2-reco_p^2)^0.5)')
+    vm.addAlias('DelM', 'formula(daughter(0,mRecoil)-reco_M)')
+    vm.addAlias('cms_p', 'useCMSFrame(reco_p)')
+
+    __authors__ = ["Chanho Kim"]
+    __description__ = "Skim list for Inclusive D0 from charm tagger"
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        stdLambdas(path=path)
+
+    def build_lists(self, path):
+        ma.fillParticleList("pi+:hadtag", "pionID > 0.1 and abs(dr) < 2.0 and abs(dz) < 3.0", path=path)
+        ma.fillParticleList("K+:hadtag", "kaonID > 0.1 and abs(dr) < 2.0 and abs(dz) < 3.0", path=path)
+        ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 2.0 and abs(dz) < 3.0", path=path)
+        ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
+        ma.reconstructDecay("pi0:mypion -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
+        d0cuts = "1.65 < M < 2.05 and useCMSFrame(p) > 2.0"
+
+        D0_channels = [
+            "K-:hadtag pi+:hadtag",
+            "K-:hadtag pi+:hadtag pi0:mypion",
+            "K-:hadtag pi+:hadtag pi0:mypion pi0:mypion",
+            "K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
+            "K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag pi0:mypion",
+            "pi-:hadtag pi+:hadtag",
+            "pi-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
+            "pi-:hadtag pi+:hadtag pi0:mypion",
+            "pi-:hadtag pi+:hadtag pi0:mypion pi0:mypion",
+            "K_S0:merged pi+:hadtag pi-:hadtag",
+            "K_S0:merged pi+:hadtag pi-:hadtag pi0:mypion",
+            "K_S0:merged pi0:mypion",
+            "K-:hadtag K+:hadtag",
+            "K-:hadtag K+:hadtag pi0:mypion",
+            "K-:hadtag K+:hadtag K_S0:merged"]
+        # tag D0 decay channels for reconstruction
+
+        D0List = []
+        for chID, channel in enumerate(D0_channels):
+            ma.reconstructDecay("D0:skimDm" + str(chID) + " -> " + channel, d0cuts, chID, path=path)
+            D0List.append("D0:skimDm" + str(chID))
+
+        Dp_channels = [
+            "K-:hadtag pi+:hadtag pi+:hadtag",
+            "K-:hadtag pi+:hadtag pi+:hadtag pi0:mypion",
+            "K-:hadtag K+:hadtag pi+:hadtag",
+            "K-:hadtag K+:hadtag pi+:hadtag pi0:mypion",
+            "pi+:hadtag pi0:mypion",
+            "pi+:hadtag pi+:hadtag pi-:hadtag",
+            "pi+:hadtag pi+:hadtag pi-:hadtag pi0:mypion",
+            "K_S0:merged pi+:hadtag",
+            "K_S0:merged pi+:hadtag pi0:mypion",
+            "K_S0:merged pi+:hadtag pi+:hadtag pi-:hadtag",
+            "K+:hadtag K_S0:merged K_S0:merged"]
+        # tag D+ decay channels for reconstruction
+
+        dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
+        DpList = []
+        for chID, channel in enumerate(Dp_channels):
+            ma.reconstructDecay("D+:skimDm" + str(chID) + " -> " + channel, dpcuts, chID, path=path)
+            DpList.append("D+:skimDm" + str(chID))
+
+        ma.reconstructDecay("Sigma+:hadtag -> p+:hadtag pi0:mypion", "1.08 < M < 1.3", path=path)
+
+        LC_channels = [
+                "p+:hadtag K-:hadtag pi+:hadtag",
+                "p+:hadtag pi-:hadtag pi+:hadtag",
+                "p+:hadtag K-:hadtag K+:hadtag",
+                "p+:hadtag K-:hadtag pi+:hadtag pi0:mypion",
+                "p+:hadtag K-:hadtag pi+:hadtag pi0:mypion pi0:mypion",
+                "p+:hadtag pi+:hadtag pi+:hadtag pi-:hadtag pi-:hadtag",
+                "p+:hadtag K_S0:merged",
+                "p+:hadtag K_S0:merged pi0:mypion",
+                "p+:hadtag K_S0:merged pi+:hadtag pi-:hadtag",
+                "Lambda0:merged pi+:hadtag",
+                "Lambda0:merged pi+:hadtag pi0:mypion",
+                "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag",
+                "Lambda0:merged pi+:hadtag gamma:tag",
+                "Lambda0:merged pi+:hadtag pi0:mypion gamma:tag",
+                "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag gamma:tag",
+                "Sigma+:hadtag pi+:hadtag pi-:hadtag",
+                "Sigma+:hadtag pi+:hadtag pi-:hadtag pi0:mypion",
+                "Sigma+:hadtag pi0:mypion"]
+        # tag Lambda_c+ decay channels for reconstruction
+
+        LCcuts = "2.18 < M < 2.38 and useCMSFrame(p) > 2.0"
+
+        LambdacList = []
+        for chID, channel in enumerate(LC_channels):
+            ma.reconstructDecay("Lambda_c+:skimDm" + str(chID) + " -> " + channel, LCcuts, chID, path=path)
+            LambdacList.append("Lambda_c+:skimDm" + str(chID))
+
+        Ds_channels = [
+                "K+:hadtag K-:hadtag pi+:hadtag",
+                "K+:hadtag K_S0:merged",
+                "K_S0:merged K_S0:merged pi+:hadtag",
+                "K+:hadtag K-:hadtag pi+:hadtag pi0:mypion",
+                "K_S0:merged K-:hadtag pi+:hadtag pi+:hadtag",
+                "K_S0:merged K+:hadtag pi+:hadtag pi-:hadtag",
+                "pi+:hadtag pi+:hadtag pi-:hadtag",
+                "K_S0:merged pi+:hadtag",
+                "K_S0:merged pi+:hadtag pi0:mypion",
+                "K+:hadtag K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag"]
+        # tag D_s+ decay channels for reconstruction
+
+        DScuts = "1.77 < M < 2.17 and useCMSFrame(p) > 2.0"
+
+        DsList = []
+        for chID, channel in enumerate(Ds_channels):
+            ma.reconstructDecay("D_s+:skimDm" + str(chID) + " -> " + channel, DScuts, chID, path=path)
+            DsList.append("D_s+:skimDm" + str(chID))
+
+        ma.copyLists("D0:skim", D0List, path=path)
+        ma.copyLists("D+:skim", DpList, path=path)
+        ma.copyLists("Lambda_c+:skim", LambdacList, path=path)
+        ma.copyLists("D_s+:skim", DsList, path=path)
+
+        ma.reconstructDecay("D*+:skim1 -> D0:skim pi+:hadtag", "0.135 < massDifference(0) < 0.155", 1, path=path)
+        ma.reconstructDecay("D*+:skim2 -> D+:skim pi0:mypion", "0.130 < massDifference(0) < 0.160", 2, path=path)
+        ma.copyLists("D*+:skim", ["D*+:skim1", "D*+:skim2"], path=path)
+
+        ma.reconstructDecay("D*0:skim1 -> D0:skim pi0:mypion", "0.130 < massDifference(0) < 0.160", 1, path=path)
+        ma.reconstructDecay("D*0:skim2 -> D0:skim gamma:tag", "0.120 < massDifference(0) < 0.165", 2, path=path)
+        ma.copyLists("D*0:skim", ["D*0:skim1", "D*0:skim2"], path=path)
+
+        ma.reconstructDecay("D_s*+:skim -> D_s+:skim gamma:tag", "0.120 < massDifference(0) < 0.165", path=path)
+
+        # ==============================================================================================
+        # ============================ fragmentation part ==============================================
+        # ==============================================================================================
+        DstP_Xfrag = [
+            "", "pi0:mypion", "pi+:hadtag pi-:hadtag", "pi+:hadtag pi-:hadtag pi0:mypion"]
+
+        sigCuts = "1.75 < mRecoil < 2.27"
+
+        sigDst_fromDstP = []
+        for chID, channel in enumerate(DstP_Xfrag):
+            n = len(DstP_Xfrag)
+            ma.reconstructDecay("D*+:dsp_" + str(chID) + " -> D*+:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dsp_" + str(chID + n) + " -> D*+:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDstP.append("D*+:dsp_" + str(chID))
+            sigDst_fromDstP.append("D*+:dsp_" + str(chID + n))
+        ma.copyLists("D*+:fromDstP", sigDst_fromDstP, path=path)
+
+        sigDst_fromDp = []
+        for chID, channel in enumerate(DstP_Xfrag):
+            n = len(DstP_Xfrag)
+            ma.reconstructDecay("D*+:dp_" + str(chID) + " -> D*+:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dp_" + str(chID + n) + " -> D*+:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDp.append("D*+:dp_" + str(chID))
+            sigDst_fromDp.append("D*+:dp_" + str(chID + n))
+        ma.copyLists("D*+:fromDp", sigDst_fromDp, path=path)
+
+        Dst0_Xfrag = [
+            "pi+:hadtag", "pi+:hadtag pi0:mypion", "pi+:hadtag pi-:hadtag pi+:hadtag"]
+
+        sigDst_fromDst0 = []
+        for chID, channel in enumerate(Dst0_Xfrag):
+            n = len(Dst0_Xfrag)
+            ma.reconstructDecay("D*+:dsz_" + str(chID) + " -> D*0:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dsz_" + str(chID + n) + " -> D*0:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDst0.append("D*+:dsz_" + str(chID))
+            sigDst_fromDst0.append("D*+:dsz_" + str(chID + n))
+        ma.copyLists("D*+:fromDstz", sigDst_fromDst0, path=path)
+
+        sigDst_fromD0 = []
+        for chID, channel in enumerate(Dst0_Xfrag):
+            n = len(Dst0_Xfrag)
+            ma.reconstructDecay("D*+:dz_" + str(chID) + " -> D0:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dz_" + str(chID + n) + " -> D0:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID, path=path)
+            sigDst_fromD0.append("D*+:dz_" + str(chID))
+            sigDst_fromD0.append("D*+:dz_" + str(chID))
+        ma.copyLists("D*+:fromDz", sigDst_fromD0, path=path)
+
+        LC_Xfrag = [
+            "pi+:hadtag anti-p-:hadtag",
+            "pi+:hadtag pi0:mypion anti-p-:hadtag",
+            "pi+:hadtag pi-:hadtag pi+:hadtag anti-p-:hadtag"]
+
+        sigDst_fromLC = []
+        for chID, channel in enumerate(LC_Xfrag):
+            ma.reconstructDecay("D*+:LC" + str(chID) + " -> Lambda_c+:skim " + channel, sigCuts, chID, path=path)
+            sigDst_fromLC.append("D*+:LC" + str(chID))
+
+        ma.copyLists("D*+:fromLC", sigDst_fromLC, path=path)
+
+        DstS_Xfrag = [
+            "K_S0:merged", "pi0:mypion K_S0:merged",
+            "pi+:hadtag K-:hadtag", "pi+:hadtag pi0:mypion K-:hadtag",
+            "pi+:hadtag pi-:hadtag K_S0:merged", "pi+:hadtag pi-:hadtag pi0:mypion K_S0:merged",
+            "pi+:hadtag pi-:hadtag pi+:hadtag K-:hadtag"]
+
+        sigDst_fromDstS = []
+        for chID, channel in enumerate(DstS_Xfrag):
+            ma.reconstructDecay("D*+:Dsts" + str(chID) + " -> D_s*+:skim " + channel, sigCuts, chID, path=path)
+            sigDst_fromDstS.append("D*+:Dsts" + str(chID))
+        ma.copyLists("D*+:fromDstS", sigDst_fromDstS, path=path)
+
+        sigDst_fromcDS = []
+        for chID, channel in enumerate(DstS_Xfrag):
+            ma.reconstructDecay("D*+:Ds" + str(chID) + " -> D_s+:skim " + channel, sigCuts, chID, path=path)
+            sigDst_fromcDS.append("D*+:Ds" + str(chID))
+        ma.copyLists("D*+:fromDs", sigDst_fromcDS, path=path)
+
+        sigDstList = ["D*+:fromDstP", "D*+:fromDstz", "D*+:fromLC", "D*+:fromDstS", "D*+:fromDp", "D*+:fromDz", "D*+:fromDs"]
+
+        ma.copyLists("D*+:skimSig", sigDstList, path=path)
+
+        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.110 < DelM < 0.220", path=path)
+
+        sigDzList = ["D0:skimSig"]
+        return sigDzList

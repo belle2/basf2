@@ -48,7 +48,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -173,6 +173,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   registerEpicsPV("PXD:Eff:Status", "Status");
   registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:L1", "L1");
+  registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -214,39 +216,36 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (single_cmap.second) single_cmap.second->Clear();
   }
 
+  m_hInnerMap->Reset();
+  m_hOuterMap->Reset();
 }
 
 
 void DQMHistAnalysisPXDEffModule::event()
 {
-  //Count how many of each type of histogram there are for the averaging
-  //std::map<std::string, int> typeCounter;
+  for (auto aPXDModule : m_PXDModules) {
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
 
-  m_hInnerMap->Reset();
-  m_hOuterMap->Reset();
-
-  for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
-    VxdID& aPXDModule = m_PXDModules[i - 1];
-
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
-
-    TH1* Hits, *Matches;
-    TString locationHits = "track_hits_" + buff;
+    std::string locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits.Data());
-    TString locationMatches = "matched_cluster_" + buff;
+    std::string locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH1*)findHist(locationMatches.Data());
 
-    // Finding only one of them should only happen in very strange situations...
-    if (Hits == nullptr || Matches == nullptr) {
-      B2ERROR("Missing histogram for sensor " << aPXDModule);
-    } else {
+    auto Hits = (TH1*)findHist(locationHits, true);// check if updated
+    auto Matches = (TH1*)findHist(locationMatches, true);// check if updated
+
+    if (Hits == nullptr && Matches == nullptr) continue; // none updated
+
+    if (Hits == nullptr) Hits = (TH1*)findHist(locationHits); // actually, this should not happen ...
+    if (Matches == nullptr) Matches = (TH1*)findHist(locationMatches); // ... as updates should coincide
+
+    // Finding only one of them should only happen in very strange situations... still better check
+    if (Hits && Matches) {
       if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
         m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
         m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
@@ -277,8 +276,8 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
     }
-  }// Single-Module histos + 2d overview finished
-
+  }
+  // Single-Module histos + 2d overview finished. now draw overviews
   m_cInnerMap->cd();
   if (m_hInnerMap) m_hInnerMap->Draw("colz");
   m_cInnerMap->Modified();
@@ -289,86 +288,97 @@ void DQMHistAnalysisPXDEffModule::event()
   m_cOuterMap->Update();
   UpdateCanvas(m_cInnerMap->GetName());
   UpdateCanvas(m_cOuterMap->GetName());
+  // overview done
+
 
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
   // guaranteed by DQM framework
-  TString locationHits = "PXD_Eff_combined";
+  std::string combinedHistname = "PXD_Eff_combined";
   if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
+    combinedHistname = m_histogramDirectoryName + "/" + combinedHistname;
   }
-  TH1* Combined = (TH1*)findHist(locationHits.Data());
+  auto Combined = (TH1*)findHist(combinedHistname, true);// only if updated
 
-  double stat_data = 0;
+  if (Combined == nullptr) return; // histogram was not changed, thus no update
+
+  EStatus stat_data = c_TooFew;
   bool error_flag = false;
   bool warn_flag = false;
   double all = 0.0;
 
   double imatch = 0.0, ihit = 0.0;
-  int ieff = 0;
+  double imatchL1 = 0.0, ihitL1 = 0.0;
+  double imatchL2 = 0.0, ihitL2 = 0.0;
+  int ieff = 0; // count number of modules with useful stytistics
 
   std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    // workaround for excluded module
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+    // excluded modules are not counted at all!
     int j = i + 1;
 
-    if (Combined == nullptr) {
-      m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, 0);
-    } else {
-      VxdID& aModule = m_PXDModules[i];
-      double nmatch = Combined->GetBinContent(i * 2 + 2);
-      double nhit = Combined->GetBinContent(i * 2 + 1);
-      if (nmatch > 10 && nhit > 10) { // could be zero, too
-        imatch += nmatch;
-        ihit +=  nhit;
-        ieff++; // only count in modules working
-        double var_e = nmatch / nhit; // can never be zero
-        // workaround for excluded module
-        if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
-
-        m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
-                              var_e);
+    VxdID& aModule = m_PXDModules[i];
+    double nmatch = Combined->GetBinContent(i * 2 + 2);
+    double nhit = Combined->GetBinContent(i * 2 + 1);
+    if (nmatch > 10 && nhit > 10) { // could be zero, too
+      imatch += nmatch;
+      ihit +=  nhit;
+      // check layer
+      if (i >= 16) {
+        imatchL2 += nmatch;
+        ihitL2 +=  nhit;
+      } else {
+        imatchL1 += nmatch;
+        ihitL1 +=  nhit;
       }
 
-      /// TODO: one value per module, and please change to the "delta" instead of integral
-      all += nhit;
-      m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, nhit);
-      m_hEffAll->SetPassedEvents(j, nmatch);
+      ieff++; // only count in modules working
+      double var_e = nmatch / nhit; // can never be zero
 
-      if (nhit < m_minEntries) {
-        // update the first entries directly (short runs)
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit);
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch);
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
-        updated[aModule] = true;
-      } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
-        updated[aModule] = true;
-      }
+      m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
+                            var_e);
+    }
 
-      // workaround for excluded module
-      if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+    /// TODO: one value per module, and please change to the "delta" instead of integral
+    all += nhit;
+    m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAll->SetTotalEvents(j, nhit);
+    m_hEffAll->SetPassedEvents(j, nmatch);
 
-      // get the errors and check for limits for each bin seperately ...
+    if (nhit < m_minEntries) {
+      // update the first entries directly (short runs)
+      m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+      m_hEffAllUpdate->SetTotalEvents(j, nhit);
+      m_hEffAllUpdate->SetPassedEvents(j, nmatch);
+      m_hEffAllLastTotal->SetBinContent(j, nhit);
+      m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      updated[aModule] = true;
+    } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
+      m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+      m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
+      m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
+      m_hEffAllLastTotal->SetBinContent(j, nhit);
+      m_hEffAllLastPassed->SetBinContent(j, nmatch);
+      updated[aModule] = true;
+    }
 
-      if (nhit > 50) {
-        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+    // workaround for excluded module
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+
+    // get the errors and check for limits for each bin seperately ...
+
+    if (nhit > 50) {
+      error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                     m_errorlevelmod[aModule]); // error if upper error value is below limit
+      warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+                    m_warnlevelmod[aModule]); // (and not only the actual eff value)
+      if (m_alarmAdhoc) {
+        error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
                        m_errorlevelmod[aModule]); // error if upper error value is below limit
-        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
+        warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
                       m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        if (m_alarmAdhoc) {
-          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                         m_errorlevelmod[aModule]); // error if upper error value is below limit
-          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        }
       }
     }
   }
@@ -424,23 +434,10 @@ void DQMHistAnalysisPXDEffModule::event()
         tt->Draw();
       }
 
-      if (all < 100.) {
-        m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
-      } else {
-        if (error_flag) {
-          m_cEffAll->Pad()->SetFillColor(kRed);// Red
-        } else if (warn_flag) {
-          m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
-        } else {
-          m_cEffAll->Pad()->SetFillColor(kGreen);// Green
-          //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
-        }
-      }
 
-      m_cEffAll->Pad()->SetFrameFillColor(kWhite - 1); // White
-      m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
-      m_cEffAll->Pad()->Modified();
-      m_cEffAll->Pad()->Update();
+      EStatus all_stat = makeStatus(all >= 100., warn_flag, error_flag);
+      colorizeCanvas(m_cEffAll, all_stat);
+
       m_hWarnLine->Draw("same,hist");
       m_hErrorLine->Draw("same,hist");
     }
@@ -519,27 +516,10 @@ void DQMHistAnalysisPXDEffModule::event()
       tt->Draw();
     }
 
-    if (all < 100.) {
-      m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
-      stat_data = 0.;
-    } else {
-      if (error_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
-        stat_data = 4.;
-      } else if (warn_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
-        stat_data = 3.;
-      } else {
-        m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
-        stat_data = 2.;
-        /// we wont use "white" =1 in this module
-        //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
-      }
-    }
-    m_cEffAllUpdate->Pad()->SetFrameFillColor(kWhite - 1); // White
-    m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
-    m_cEffAllUpdate->Pad()->Modified();
-    m_cEffAllUpdate->Pad()->Update();
+
+    stat_data = makeStatus(all >= 100., warn_flag, error_flag);
+    colorizeCanvas(m_cEffAllUpdate, stat_data);
+
     m_hWarnLine->Draw("same,hist");
     m_hErrorLine->Draw("same,hist");
   }
@@ -547,14 +527,22 @@ void DQMHistAnalysisPXDEffModule::event()
   m_cEffAllUpdate->Modified();
   m_cEffAllUpdate->Update();
 
-
   double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
+  double var_efficiencyL1 = ihitL1 > 0 ? imatchL1 / ihitL1 : 0.0;
+  double var_efficiencyL2 = ihitL2 > 0 ? imatchL2 / ihitL2 : 0.0;
+
   m_monObj->setVariable("efficiency", var_efficiency);
+  m_monObj->setVariable("efficiencyL1", var_efficiencyL1);
+  m_monObj->setVariable("efficiencyL2", var_efficiencyL2);
   m_monObj->setVariable("nmodules", ieff);
 
   setEpicsPV("Status", stat_data);
   // only update if statistics is reasonable, we dont want "0" drops between runs!
-  if (stat_data != 0) setEpicsPV("Overall", var_efficiency);
+  if (stat_data != 0) {
+    setEpicsPV("Overall", var_efficiency);
+    setEpicsPV("L1", var_efficiencyL1);
+    setEpicsPV("L2", var_efficiencyL2);
+  }
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()

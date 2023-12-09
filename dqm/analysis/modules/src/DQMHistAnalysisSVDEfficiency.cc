@@ -137,16 +137,24 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: beginRun called.");
-  m_cEfficiencyU->Clear();
-  m_cEfficiencyV->Clear();
-  m_cEfficiencyErrU->Clear();
-  m_cEfficiencyErrV->Clear();
+  if (m_cEfficiencyU)
+    m_cEfficiencyU->Clear();
+  if (m_cEfficiencyV)
+    m_cEfficiencyV->Clear();
+  if (m_cEfficiencyErrU)
+    m_cEfficiencyErrU->Clear();
+  if (m_cEfficiencyErrV)
+    m_cEfficiencyErrV->Clear();
 
   if (m_3Samples) {
-    m_cEfficiencyU3Samples->Clear();
-    m_cEfficiencyV3Samples->Clear();
-    m_cEfficiencyErrU3Samples->Clear();
-    m_cEfficiencyErrV3Samples->Clear();
+    if (m_cEfficiencyU3Samples)
+      m_cEfficiencyU3Samples->Clear();
+    if (m_cEfficiencyV3Samples)
+      m_cEfficiencyV3Samples->Clear();
+    if (m_cEfficiencyErrU3Samples)
+      m_cEfficiencyErrU3Samples->Clear();
+    if (m_cEfficiencyErrV3Samples)
+      m_cEfficiencyErrV3Samples->Clear();
   }
 
   //Retrieve limits from EPICS

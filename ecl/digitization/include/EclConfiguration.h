@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLCONFIGURATION_H_
-#define ECLCONFIGURATION_H_
+#pragma once
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -25,7 +27,8 @@ namespace Belle2 {
       /** set the background flag */
       void setBackground(bool val) { m_background = val; }
 
-      static constexpr int        m_nch = 8736;  /**< total number of electronic channels (crystals) in calorimeter */
+      static constexpr int        m_nch =
+        ECLElementNumbers::c_NCrystals;  /**< total number of electronic channels (crystals) in calorimeter */
       static constexpr double    m_step = 0.5; /**< time between points in internal units t_{asrto}*m_rf/2./24./12. */
       static constexpr double    s_clock = 24.*12.; /**< digitization clock in RF units */
       static constexpr int       m_ntrg = 144; /**< number of trigger counts per ADC clock tick */
@@ -113,4 +116,3 @@ namespace Belle2 {
     };
   }
 }
-#endif

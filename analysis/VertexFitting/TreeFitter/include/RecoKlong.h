@@ -38,13 +38,13 @@ namespace TreeFitter {
     ErrCode projectRecoConstraint(const FitParams& fitparams, Projection& p) const override;
 
     /** sets the size of the corresponding residual projection */
-    virtual int dimM() const override { return 3; }
+    virtual int dimM() const override { return m_dim; }
 
     /** how should the energy be calculated ? from momentum or from E ?  */
-    virtual bool hasEnergy() const override { return true; }
+    virtual bool hasEnergy() const override { return false; }
 
     /**set the size of the particle in the statevector */
-    virtual int dim() const override { return 4; }
+    virtual int dim() const override { return m_dim; }
 
     /** type */
     virtual int type()     const override { return kRecoKlong ; }
@@ -84,3 +84,4 @@ namespace TreeFitter {
   };
 
 }
+

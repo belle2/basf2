@@ -6,16 +6,21 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/calibration/eclee5x5Algorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 
-#include "TH2F.h"
-#include "TFile.h"
-#include "TF1.h"
-#include "TROOT.h"
-#include "TMatrixD.h"
-#include "TMatrixDSym.h"
-#include "TDecompLU.h"
+/* ROOT headers. */
+#include <TDecompLU.h>
+#include <TH2F.h>
+#include <TF1.h>
+#include <TFile.h>
+#include <TMatrixD.h>
+#include <TMatrixDSym.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -78,15 +83,17 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Calculate the average expected energy per crystal and calibration constants from Collector,
    and mean normalized energy */
-  TH1F* AverageExpECrys = new TH1F("AverageExpECrys", "Average expected E per crys from collector;Crystal ID;Energy (GeV)", 8736, 0,
-                                   8736);
+  TH1F* AverageExpECrys = new TH1F("AverageExpECrys", "Average expected E per crys from collector;Crystal ID;Energy (GeV)",
+                                   ECLElementNumbers::c_NCrystals, 0,
+                                   ECLElementNumbers::c_NCrystals);
   TH1F* AverageElecCalib = new TH1F("AverageElecCalib", "Average electronics calib const vs crystal;Crystal ID;Calibration constant",
-                                    8736, 0, 8736);
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
   TH1F* AverageInitCalib = new TH1F("AverageInitCalib", "Average initial calib const vs crystal;Crystal ID;Calibration constant",
-                                    8736, 0, 8736);
-  TH1F* meanEnvsCrysID = new TH1F("meanEnvsCrysID", "Mean normalized energy vs crystal;CrystalID;E/Eexp", 8736, 0, 8736);
+                                    ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* meanEnvsCrysID = new TH1F("meanEnvsCrysID", "Mean normalized energy vs crystal;CrystalID;E/Eexp",
+                                  ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     double TotEntries = CalibEntriesvsCrys->GetBinContent(cellID);
     if (TotEntries > 0.) {
       AverageElecCalib->SetBinContent(cellID, ElecCalibvsCrys->GetBinContent(cellID) / TotEntries);
@@ -124,7 +131,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Check that all crystals to be calibrated have enough statistics */
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
 
     /** Only crystals with initial calib>0 are going to be calibrated */
     if (AverageInitCalib->GetBinContent(cellID) > 0.) {
@@ -145,17 +152,20 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Ready to find new calibration constants */
   bool foundConst = false;
-  TH1F* gVsCrysID = new TH1F("gVsCrysID", "Ratio of new to old calibration vs crystal ID;crystal ID;vector g", 8736, 0, 8736);
-  TH1F* CalibVsCrysID = new TH1F("CalibVsCrysID", "Calibration constant vs crystal ID;crystal ID;counts per GeV", 8736, 0, 8736);
-  TH1F* ExpEnergyperCrys = new TH1F("ExpEnergyperCrys", "Expected energy per crystal;Crystal ID;Energy in 25 crystal sum (GeV)", 8736,
-                                    0, 8736);
+  TH1F* gVsCrysID = new TH1F("gVsCrysID", "Ratio of new to old calibration vs crystal ID;crystal ID;vector g",
+                             ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* CalibVsCrysID = new TH1F("CalibVsCrysID", "Calibration constant vs crystal ID;crystal ID;counts per GeV",
+                                 ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
+  TH1F* ExpEnergyperCrys = new TH1F("ExpEnergyperCrys", "Expected energy per crystal;Crystal ID;Energy in 25 crystal sum (GeV)",
+                                    ECLElementNumbers::c_NCrystals,
+                                    0, ECLElementNumbers::c_NCrystals);
   TString title = "dPhi cut per crystal " + m_payloadName + ";Crystal ID;dPhi requirement (deg)";
-  TH1F* dPhiperCrys = new TH1F("dPhiperCrys", title, 8736, 0, 8736);
+  TH1F* dPhiperCrys = new TH1F("dPhiperCrys", title, ECLElementNumbers::c_NCrystals, 0, ECLElementNumbers::c_NCrystals);
 
   /**-----------------------------------------------------------------------------------------------*/
   /** Expected energy payload */
   if (m_payloadName == "ECLExpee5x5E") {
-    for (int cellID = 1; cellID <= 8736; cellID++) {
+    for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
       float mean = meanEnvsCrysID->GetBinContent(cellID);
       float stdDev = meanEnvsCrysID->GetBinError(cellID);
       float inputE = AverageExpECrys->GetBinContent(cellID);
@@ -174,7 +184,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       std::vector<float> tempCalib;
       std::vector<float> tempCalibStdDev;
 
-      for (int cellID = 1; cellID <= 8736; cellID++) {
+      for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
         tempCalib.push_back(ExpEnergyperCrys->GetBinContent(cellID));
         tempCalibStdDev.push_back(ExpEnergyperCrys->GetBinError(cellID));
       }
@@ -189,20 +199,20 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
   } else if (m_payloadName == "ECLCrystalEnergy5x5") {
 
     //..Create the Q matrix and the R vector
-    TMatrixDSym matrixQ(8736);
-    TVectorD vectorR(8736);
-    for (int ix = 1; ix <= 8736; ix++) {
+    TMatrixDSym matrixQ(ECLElementNumbers::c_NCrystals);
+    TVectorD vectorR(ECLElementNumbers::c_NCrystals);
+    for (int ix = 1; ix <= ECLElementNumbers::c_NCrystals; ix++) {
       vectorR[ix - 1] = RvsCrysID->GetBinContent(ix);
-      for (int iy = 1; iy <= 8736; iy++) {
+      for (int iy = 1; iy <= ECLElementNumbers::c_NCrystals; iy++) {
         matrixQ[ix - 1][iy - 1] = Qmatrix->GetBinContent(ix, iy);
       }
     }
 
     //..Crystals that are not being calibrated have no entries in NR. Adjust R and Q to get g=-1
     int nNotCalibrated = 0;
-    for (int cellID = 1; cellID <= 8736; cellID++) {
+    for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
       if (NRvsCrysID->GetBinContent(cellID) < 0.5) {
-        for (int othercell = 1; othercell <= 8736; othercell++) {
+        for (int othercell = 1; othercell <= ECLElementNumbers::c_NCrystals; othercell++) {
           matrixQ[cellID - 1][othercell - 1] = 0.;
           matrixQ[othercell - 1][cellID - 1] = 0.;
         }
@@ -221,7 +231,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
     //..Fill histograms and check that there are no unexpected negative output values
     if (solved) {
       foundConst = true;
-      for (int cellID = 1; cellID <= 8736; cellID++) {
+      for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
         gVsCrysID->SetBinContent(cellID, vectorg[cellID - 1]);
         gVsCrysID->SetBinError(cellID, 0.);
         float newCalib = vectorg[cellID - 1] * abs(AverageInitCalib->GetBinContent(cellID));
@@ -237,7 +247,7 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
       std::vector<float> tempCalib;
       std::vector<float> tempCalibStdDev;
 
-      for (int cellID = 1; cellID <= 8736; cellID++) {
+      for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
         tempCalib.push_back(CalibVsCrysID->GetBinContent(cellID));
         tempCalibStdDev.push_back(CalibVsCrysID->GetBinError(cellID));
       }
@@ -326,8 +336,8 @@ CalibrationAlgorithm::EResult eclee5x5Algorithm::calibrate()
     m_eclNeighbours5x5 = new ECL::ECLNeighbours("N", 2);
     std::vector<float> tempCalib;
     std::vector<float> tempCalibWidth;
-    tempCalib.resize(8736);
-    tempCalibWidth.resize(8736);
+    tempCalib.resize(ECLElementNumbers::c_NCrystals);
+    tempCalibWidth.resize(ECLElementNumbers::c_NCrystals);
     int crysID = 0;
     for (int thetaID = 0; thetaID < 69; thetaID++) {
       for (int ic = 0; ic < m_eclNeighbours5x5->getCrystalsPerRing(thetaID); ic++) {

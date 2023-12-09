@@ -7,7 +7,12 @@
  **************************************************************************/
 
 #pragma once
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/calibration/eclGammaGammaEAlgorithm.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {
@@ -112,7 +117,7 @@ namespace Belle2 {
       /**..Parameters to control Novosibirsk fit to energy deposited in each crystal by mu+mu- events */
       std::string m_outputName = "eclGammaGammaEAlgorithm.root"; /**< file name for histogram output */
       int m_cellIDLo = 1;  /**<  First cellID to be fit */
-      int m_cellIDHi = 8736;  /**<  Last cellID to be fit */
+      int m_cellIDHi = ECLElementNumbers::c_NCrystals;  /**<  Last cellID to be fit */
       int m_minEntries = 150;  /**<  Minimum entries to fit a crystal */
       int m_highStatEntries = 25000; /**< Adjust fit range above this many entries */
       int m_maxIterations = 10; /**< no more than maxIteration iterations */

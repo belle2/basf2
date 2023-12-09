@@ -339,6 +339,7 @@ void SVDUnpackerModule::event()
               m_svdEventInfoPtr.create();
               m_svdEventInfoPtr->setModeByte(m_SVDModeByte);
               m_svdEventInfoPtr->setTriggerType(m_SVDTriggerType);
+              m_svdEventInfoPtr->setAPVClock(m_hwClock);
 
               //set relative time shift
               m_svdEventInfoPtr->setRelativeShift(m_relativeTimeShift);

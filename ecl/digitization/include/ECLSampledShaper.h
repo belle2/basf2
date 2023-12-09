@@ -6,9 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ECLSampleShaper
-#define ECLSampleShaper
+#pragma once
 
+/* ROOT headers. */
 #include <TH1.h>
 
 namespace Belle2 {
@@ -43,4 +43,3 @@ namespace Belle2 {
 
   }
 }
-#endif

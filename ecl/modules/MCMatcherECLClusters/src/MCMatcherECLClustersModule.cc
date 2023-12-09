@@ -5,19 +5,21 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own headers. */
 #include <ecl/modules/MCMatcherECLClusters/MCMatcherECLClustersModule.h>
 
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-//ECL
-#include <ecl/dataobjects/ECLHit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLHit.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLSimHit.h>
+
+/* Basf2 headers. */
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 using namespace Belle2;
 
@@ -31,10 +33,10 @@ REG_MODULE(MCMatcherECLClustersPureCsI);
 //-----------------------------------------------------------------
 
 MCMatcherECLClustersModule::MCMatcherECLClustersModule() : Module(),
-  m_eclCalDigits(eclCalDigitArrayName()),
-  m_eclDigits(eclDigitArrayName()),
-  m_eclClusters(eclClusterArrayName()),
-  m_eclShowers(eclShowerArrayName()),
+  m_eclDigitArrayName(getECLDigitArrayName()),
+  m_eclCalDigitArrayName(getECLCalDigitArrayName()),
+  m_eclClusterArrayName(getECLClusterArrayName()),
+  m_eclShowerArrayName(getECLShowerArrayName()),
   m_mcParticleToECLHitRelationArray(m_mcParticles, m_eclHits),
   m_mcParticleToECLSimHitRelationArray(m_mcParticles, m_eclSimHits)
 {
@@ -49,31 +51,33 @@ MCMatcherECLClustersModule::~MCMatcherECLClustersModule()
 
 void MCMatcherECLClustersModule::initialize()
 {
-  m_mcParticles.registerInDataStore();
+  m_mcParticles.isOptional();
 
-  m_eclHits.registerInDataStore();
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclDigits.registerInDataStore(eclDigitArrayName());
-  m_eclClusters.registerInDataStore(eclClusterArrayName());
-  m_eclShowers.registerInDataStore(eclShowerArrayName());
+  m_eclHits.isRequired();
+  m_eclCalDigits.isRequired(m_eclCalDigitArrayName);
+  m_eclDigits.isRequired(m_eclDigitArrayName);
+  m_eclClusters.isRequired(m_eclClusterArrayName);
+  m_eclShowers.isRequired(m_eclShowerArrayName);
 
-  m_mcParticles.registerRelationTo(m_eclHits);
-  m_eclCalDigits.registerRelationTo(m_mcParticles);
-  m_eclDigits.registerRelationTo(m_mcParticles);
-  m_eclShowers.registerRelationTo(m_mcParticles);
-  m_eclClusters.registerRelationTo(m_mcParticles);
-}
-
-void MCMatcherECLClustersModule::beginRun()
-{
+  if (m_mcParticles.isValid()) {
+    m_mcParticles.registerRelationTo(m_eclHits);
+    m_eclCalDigits.registerRelationTo(m_mcParticles);
+    m_eclDigits.registerRelationTo(m_mcParticles);
+    m_eclShowers.registerRelationTo(m_mcParticles);
+    m_eclClusters.registerRelationTo(m_mcParticles);
+  }
 }
 
 void MCMatcherECLClustersModule::event()
 {
+  // Don't do anything if MCParticles aren't present
+  if (not m_mcParticles.isValid()) {
+    return;
+  }
 
   //CalDigits
-  short int Index[8736];
-  std::fill_n(Index, 8736, -1);
+  short int Index[ECLElementNumbers::c_NCrystals];
+  std::fill_n(Index, ECLElementNumbers::c_NCrystals, -1);
   const TClonesArray* cd = m_eclCalDigits.getPtr();
   TObject** ocd = cd->GetObjectRef();
   for (int i = 0, imax = cd->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
@@ -117,7 +121,7 @@ void MCMatcherECLClustersModule::event()
       double shower_mcParWeight = 0; //Weight between shower and MCParticle
 
       //Loop on ECLCalDigits related to this MCParticle
-      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>(eclCalDigitArrayName());
+      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>(m_eclCalDigitArrayName);
       for (unsigned int iRelation = 0; iRelation < shower_CalDigitRelations.size(); ++iRelation) {
 
         //Retrieve calDigit
@@ -140,7 +144,7 @@ void MCMatcherECLClustersModule::event()
   }
 
   // reuse Index
-  std::fill_n(Index, 8736, -1);
+  std::fill_n(Index, ECLElementNumbers::c_NCrystals, -1);
   const TClonesArray* ed = m_eclDigits.getPtr();
   TObject** oed = ed->GetObjectRef();
   for (int i = 0, imax = ed->GetEntries(); i < imax; i++) { // avoiding call of StoreArray::getArrayIndex() member function
@@ -170,7 +174,7 @@ void MCMatcherECLClustersModule::event()
   // to create the relation between ECLCluster->MCParticle with the same weight as
   // the relation between ECLShower->MCParticle.  StoreArray<ECLCluster> eclClusters;
   for (const auto& eclShower : m_eclShowers) {
-    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(eclClusterArrayName());
+    const ECLCluster* eclCluster = eclShower.getRelatedFrom<ECLCluster>(m_eclClusterArrayName);
     if (!eclCluster) continue;
 
     const RelationVector<MCParticle> mcParticles = eclShower.getRelationsTo<MCParticle>();
@@ -180,12 +184,4 @@ void MCMatcherECLClustersModule::event()
       eclCluster->addRelationTo(mcParticle, weight);
     }
   }
-}
-
-void MCMatcherECLClustersModule::endRun()
-{
-}
-
-void MCMatcherECLClustersModule::terminate()
-{
 }

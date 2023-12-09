@@ -9,10 +9,13 @@
 /* Own header. */
 #include <mdst/dataobjects/KLMCluster.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
+
+/* ROOT headers. */
+#include <TMatrixD.h>
 
 using namespace Belle2;
 

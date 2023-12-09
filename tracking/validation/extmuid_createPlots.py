@@ -19,7 +19,7 @@
 <header>
     <input>muon-ExtMuidValidation.root,
            pion-ExtMuidValidation.root</input>
-    <contact>giacomo.pietro@kit.edu</contact>
+    <contact>piilonen@vt.edu</contact>
     <description>Create validation plots for Ext and Muid</description>
 </header>
 """
@@ -37,8 +37,8 @@ from optparse import OptionParser
 
 # contact person information
 # is added to the plot descriptions
-CONTACT_PERSON = {'Name': 'Giacomo De Pietro',
-                  'Email': 'giacomo.pietro@kit.edu'}
+CONTACT_PERSON = {'Name': 'Leo Piilonen',
+                  'Email': 'piilonen@vt.edu'}
 
 
 def main():
@@ -65,10 +65,10 @@ def main():
     try:
         number_entries = file_chain.GetEntries()
     except AttributeError:
-        print('Could not load input file(s) %s.' % options.input_file)
+        print(f'Could not load input file(s) {options.input_file}.')
 
     if number_entries == 0:
-        print('Data tree is empty or does not exist in file(s) %s. Exit.' % options.input_file)
+        print(f'Data tree is empty or does not exist in file(s) {options.input_file}. Exit.')
         sys.exit(0)
 
     # open the output root file
@@ -89,7 +89,7 @@ def draw_exthits(file_chain):
     Draw the ExtHit-related distributions.
     """
 
-    contact_mail = "giacomo.pietro@kit.edu"
+    contact_mail = CONTACT_PERSON["Email"]
 
     # NOTE: *.Draw() must precede *.GetListOfFunctions().Add() or the latter will be discarded!
     detectorID = TH1F('DetectorID', 'Detector ID for ExtHits', 8, -0.5, 7.5)
@@ -120,7 +120,7 @@ def draw_exthits(file_chain):
     tofKLM.Write()
 
     r = TH1F('r', 'r for non-KLM ExtHits', 40, 0.0, 200.0)
-    file_chain.Draw('ExtHits.getPosition().Perp()>>r', '(ExtHits.m_DetectorID&0x0F)!=7')
+    file_chain.Draw('ExtHits.getPosition().Rho()>>r', '(ExtHits.m_DetectorID&0x0F)!=7')
     r.GetXaxis().SetTitle('r (cm)')
     r.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     r.GetListOfFunctions().Add(TNamed('Check', "Sharp peak at 120 cm; broad peak at 140 cm"))
@@ -138,7 +138,7 @@ def draw_exthits(file_chain):
     z.Write()
 
     rKLM = TH1F('rKLM', 'r for KLM ExtHits', 50, 100.0, 350.0)
-    file_chain.Draw('ExtHits.getPosition().Perp()>>rKLM', '(ExtHits.m_DetectorID&0x0F)==7')
+    file_chain.Draw('ExtHits.getPosition().Rho()>>rKLM', '(ExtHits.m_DetectorID&0x0F)==7')
     rKLM.GetXaxis().SetTitle('r (cm)')
     rKLM.GetListOfFunctions().Add(TNamed('Description', "Radial position in transverse plane of each ExtHit"))
     rKLM.GetListOfFunctions().Add(TNamed('Check', "Low shoulder below 200 cm (EKLM); comb-like pattern above 200 cm (BKLM)"))
@@ -221,7 +221,7 @@ def draw_likelihoods(file_chain):
     Draw the Muid likelihood-based distributions.
     """
 
-    contact_mail = "giacomo.pietro@kit.edu"
+    contact_mail = CONTACT_PERSON["Email"]
 
     outcome = TH1F('Outcome', 'Outcome', 5, -0.5, 4.5)
 

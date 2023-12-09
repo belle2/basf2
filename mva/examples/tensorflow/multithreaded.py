@@ -35,7 +35,7 @@ def execute_train_op(state):
             state.model.optimizer.apply_gradients(zip(grads, state.model.trainable_variables))
 
             if (epoch % 100 == 0):
-                print('Step %d: Train cost = %.4f' % (epoch, avg_cost))
+                print(f'Step {epoch:d}: Train cost = {avg_cost:.4f}')
             epoch += 1
 
     except tf.errors.OutOfRangeError:
@@ -128,7 +128,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     Put data in the queue.
     """
     state.queue.enqueue_many([X, w, y])
-    print("Queue Epoch: %d, Queue Batch: %d, Queue Size: %d" % (epoch, batch, state.queue.size()))
+    print(f"Queue Epoch: {epoch:d}, Queue Batch: {batch:d}, Queue Size: {state.queue.size():d}")
     return True
 
 
@@ -171,7 +171,7 @@ def end_fit(state):
 
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -180,8 +180,14 @@ if __name__ == "__main__":
     import basf2_mva
     import json
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     variables = ['p', 'pt', 'pz',
                  'daughter(0, p)', 'daughter(0, pz)', 'daughter(0, pt)',
@@ -215,8 +221,7 @@ if __name__ == "__main__":
     training_time = training_stop - training_start
     method = basf2_mva_util.Method(general_options.m_identifier)
     inference_start = time.time()
-    test_data = ["test.root"] * 10
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
     auc = basf2_mva_util.calculate_roc_auc(p, t)

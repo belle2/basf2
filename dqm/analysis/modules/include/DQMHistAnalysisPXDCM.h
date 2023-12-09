@@ -14,11 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 #include <vxd/dataobjects/VxdID.h>
 
 #include <TH2.h>
@@ -67,8 +62,6 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
     /** Update entry intervall */
     int m_minEntries = 10000;
 
@@ -82,6 +75,8 @@ namespace Belle2 {
     double m_errorOutsideAdhoc{};
     /** threshold level/line for outside fraction */
     int m_upperLineAdhoc{};
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! Module list for masking
     std::vector <std::string> m_parModuleList;
@@ -105,16 +100,6 @@ namespace Belle2 {
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! epics PVs
-    std::vector <chid> mychid;
-    //! epics PVs
-    std::map <VxdID, chid> mychid_mean;
-#endif
   };
 } // end namespace Belle2
 

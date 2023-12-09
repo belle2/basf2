@@ -14,8 +14,6 @@
 #include <mva/interface/Teacher.h>
 #include <mva/interface/Expert.h>
 
-#include <TRandom.h>
-
 /**
  * Python headers include some weird stuff which
  * we don't want to be seen by CLING, otherwise there are
@@ -103,22 +101,6 @@ namespace Belle2 {
 
     private:
       PythonOptions m_specific_options; /**< Method specific options */
-
-      //--- Structs to help simplify the process ------------------------------------------------------------------------
-      /** Wrap TRandom to be useable as a uniform random number generator with std algorithms like std::shuffle. */
-      struct TRandomWrapper {
-        /** Define the result type to be a normal unsigned int. */
-        typedef unsigned int result_type;
-
-        /** Minimum value returned by the random number generator. */
-        static constexpr result_type min() { return 0; }
-
-        /** Maximum value returned by the random number generator. */
-        static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-
-        /** Return a random value in the range [min(), max()]. */
-        result_type operator()() { return gRandom->Integer(max()); }
-      };
     };
 
     /**

@@ -15,7 +15,7 @@
 #include <klm/dataobjects/KLMSimHit.h>
 #include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/database/DBObjPtr.h>

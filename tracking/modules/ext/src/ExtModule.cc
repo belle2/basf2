@@ -12,7 +12,7 @@
 /* Tracking headers. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 #include <simulation/kernel/ExtManager.h>
 

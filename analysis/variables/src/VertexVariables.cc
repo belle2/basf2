@@ -28,34 +28,33 @@ namespace Belle2 {
 
   namespace Variable {
 
-    static const double realNaN = std::numeric_limits<double>::quiet_NaN();
+    // Generate Vertex information
 
-    // Generated vertex information
     double mcDecayVertexX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getDecayVertex().X();
     }
 
     double mcDecayVertexY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getDecayVertex().Y();
     }
 
     double mcDecayVertexZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getDecayVertex().Z();
     }
 
     double mcDecayVertexRho(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getDecayVertex().Rho();
     }
 
@@ -69,56 +68,56 @@ namespace Belle2 {
     double mcDecayVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).X();
     }
 
     double mcDecayVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Y();
     }
 
     double mcDecayVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Z();
     }
 
     double mcDecayVertexFromIPRho(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Perp();
     }
 
     double mcDecayVertexFromIPDistance(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcDecayVertexFromIP(mcparticle).Mag();
     }
 
     double mcProductionVertexX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getProductionVertex().X();
     }
 
     double mcProductionVertexY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getProductionVertex().Y();
     }
 
     double mcProductionVertexZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return mcparticle->getProductionVertex().Z();
     }
 
@@ -132,21 +131,21 @@ namespace Belle2 {
     double mcProductionVertexFromIPX(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcProductionVertexFromIP(mcparticle).X();
     }
 
     double mcProductionVertexFromIPY(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcProductionVertexFromIP(mcparticle).Y();
     }
 
     double mcProductionVertexFromIPZ(const Particle* part)
     {
       auto* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
       return getMcProductionVertexFromIP(mcparticle).Z();
     }
 
@@ -263,7 +262,7 @@ namespace Belle2 {
       const TMatrixFSym& vertexErr = frame.getVertexErrorMatrix(static_cast<TMatrixDSym>(part->getVertexErrorMatrix()) +
                                                                 beamSpotDB->getCovVertex());
       const double denominator = vertex * B2Vector3D(vertexErr * vertex);
-      if (denominator <= 0) return realNaN;
+      if (denominator <= 0) return Const::doubleNaN;
 
       return vertex.Mag2() / std::sqrt(denominator);
     }
@@ -272,19 +271,19 @@ namespace Belle2 {
 
     double particleProductionX(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertX")) return realNaN;
+      if (!part->hasExtraInfo("prodVertX")) return Const::doubleNaN;
       return part->getExtraInfo("prodVertX");
     }
 
     double particleProductionY(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertY")) return realNaN;
+      if (!part->hasExtraInfo("prodVertY")) return Const::doubleNaN;
       return part->getExtraInfo("prodVertY");
     }
 
     double particleProductionZ(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertZ")) return realNaN;
+      if (!part->hasExtraInfo("prodVertZ")) return Const::doubleNaN;
       return part->getExtraInfo("prodVertZ");
     }
 
@@ -305,25 +304,25 @@ namespace Belle2 {
       const std::vector<char> names = {'x', 'y', 'z'};
       const std::string prodVertS = Form("prodVertS%c%c", names[ielement], names[jelement]);
 
-      if (!part->hasExtraInfo(prodVertS)) return realNaN;
+      if (!part->hasExtraInfo(prodVertS)) return Const::doubleNaN;
       return part->getExtraInfo(prodVertS);
     }
 
     double particleProductionXErr(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertSxx")) return realNaN;
+      if (!part->hasExtraInfo("prodVertSxx")) return Const::doubleNaN;
       return std::sqrt(part->getExtraInfo("prodVertSxx"));
     }
 
     double particleProductionYErr(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertSyy")) return realNaN;
+      if (!part->hasExtraInfo("prodVertSyy")) return Const::doubleNaN;
       return std::sqrt(part->getExtraInfo("prodVertSyy"));
     }
 
     double particleProductionZErr(const Particle* part)
     {
-      if (!part->hasExtraInfo("prodVertSzz")) return realNaN;
+      if (!part->hasExtraInfo("prodVertSzz")) return Const::doubleNaN;
       return std::sqrt(part->getExtraInfo("prodVertSzz"));
     }
 

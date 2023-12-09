@@ -13,7 +13,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -182,7 +182,7 @@ namespace Belle2 {
     /** Initialize for track extrapolation by the MUID module.
      @param meanDt Mean value of the in-time window (ns).
      @param maxDt Half-width of the in-time window (ns).
-     @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (#sigmas).
+     @param maxSeparation Maximum separation between track crossing and matching hit in detector plane (number of sigmas).
      @param maxKLMTrackClusterDistance Maximum distance between associated track and KLMCluster (cm), criterion for matching relation Track->KLMCluster on MDST.
      @param maxECLTrackClusterDistance Maximum distance between associated track and ECLCluster (cm).
      @param minPt Minimum transverse momentum to begin extrapolation (GeV/c).
@@ -221,20 +221,6 @@ namespace Belle2 {
                      const G4ThreeVector& position,
                      const G4ThreeVector& momentum,
                      const G4ErrorSymMatrix& covariance);
-
-    //! Performs muon identification for a single track (specified in genfit2 units).
-    //! @param pdgCode Signed PDG identifier of the particle hypothesis to be used for the extrapolation.
-    //! @param tof Starting time, i.e., time of flight from the IP, at the starting point (ns).
-    //! @param isCosmic True to back-extrapolate a cosmic ray
-    //! @param position Starting point of the extrapolation (cm).
-    //! @param momentum Momentum of the track at the starting point (GeV/c).
-    //! @param covariance Phase-space covariance matrix (6x6) at the starting point (cm, GeV/c).
-    void identifyMuon(int pdgCode,
-                      double tof,
-                      bool isCosmic,
-                      const G4ThreeVector& position,
-                      const G4ThreeVector& momentum,
-                      const G4ErrorSymMatrix& covariance);
 
   private:
 
@@ -318,7 +304,7 @@ namespace Belle2 {
     //! Magnetic field z component (gauss) at origin
     double m_MagneticField;
 
-    //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
+    //! user-defined maximum squared-distance (in number of variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
     //! user-defined maximum distance (mm) between KLMCluster and associated track (for KLID)

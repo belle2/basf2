@@ -87,7 +87,7 @@
   <DetectorComponent name="PINDIODE-phase2" isDefault="false">
     <xi:include href="../beast/pindiode/PINDIODE-phase2.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
-  <DetectorComponent name="BEAMABORT" isDefault="false">
+  <DetectorComponent name="BEAMABORT" isDefault="true">
     <xi:include href="../beast/beamabort/BEAMABORT.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
   <DetectorComponent name="HE3TUBE" isDefault="false">

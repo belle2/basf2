@@ -8,30 +8,26 @@
 
 #pragma once
 
-// Module manager
+/* ECL headers. */
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLDspData.h>
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
-
-//STL
-#include <map>
-#include <vector>
-#include <string>
-
-//FRAMEWORK
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dbobjects/ECLDspData.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/utility/ECLChannelMapper.h>
-
-//TRG
 #include <mdst/dataobjects/TRGSummary.h>
+
+/* C++ headers. */
+#include <map>
+#include <string>
+#include <vector>
 
 class TH1F;
 class TH2F;
@@ -204,9 +200,10 @@ namespace Belle2 {
     TH2F* h_quality_fit_data{nullptr};
     /** Histogram: Amp flag (0/1) w/ failed qualities in bins of QualityData. */
     TH2F* h_ampflag_qualityfail{nullptr};
-    /**Histogram: Time flag (0/1) w/ failed qualities in bins of Quality Data. */
+    /** Histogram: Time flag (0/1) w/ failed qualities in bins of Quality Data. */
     TH2F* h_timeflag_qualityfail{nullptr};
-
+    /** Histogram: Quality flag (from emulator) for the waveforms where fit result (ECLDigit) should have been saved but for some reason was not saved by ShaperDSP module*/
+    TH1F* h_missing_ecldigits{nullptr};
 
     /** Convert a CellID number to the global Shaper number. */
     int conversion(int);

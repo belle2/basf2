@@ -300,13 +300,13 @@ class Mails:
         """
 
         # link to validation page
-        url = "https://b2-master.belle2.org/validation/static/validation.html"
+        url = "https://validation.belle2.org/static/validation.html"
         # url = "http://localhost:8000/static/validation.html"
 
         if incremental:
             body = (
-                "You are receiving this email, because additional"
-                " validation plots/scripts (that include you as contact "
+                "You are receiving this email, because additional "
+                "validation plots/scripts (that include you as contact "
                 "person) produced warnings/errors or "
                 "because their warning/error status "
                 "changed. \n"
@@ -314,8 +314,8 @@ class Mails:
             )
         else:
             body = (
-                "This is a full list of validation plots/scripts that"
-                " produced warnings/errors and include you as contact"
+                "This is a full list of validation plots/scripts that "
+                "produced warnings/errors and include you as contact "
                 "person (sent out once a week).\n\n"
             )
 

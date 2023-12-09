@@ -704,7 +704,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
         const auto chSum = par1->getCharge() + par2->getCharge();
         const ROOT::Math::PxPyPzEVector V4p1 = par1->get4Vector();
         const ROOT::Math::PxPyPzEVector V4p2 = par2->get4Vector();
-        const double opAng = V4p1.Theta() - V4p2.Theta();
+        const double opAng = V4p1.Theta() + V4p2.Theta();
         const ROOT::Math::PxPyPzEVector V4pSum = V4p1 + V4p2;
         const ROOT::Math::PxPyPzEVector V4pSumCMS = PCmsLabTransform::labToCms(V4pSum);
         const double ptCMS = V4pSumCMS.Pt();

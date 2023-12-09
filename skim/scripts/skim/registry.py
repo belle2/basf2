@@ -54,7 +54,7 @@ _RegisteredSkims = [
     ("12160100", "ewp", "BtoXgamma"),
     ("12160200", "ewp", "BtoXll"),
     ("12160300", "ewp", "BtoXll_LFV"),
-    ("12160400", "ewp", "inclusiveBplusToKplusNuNu"),
+    # ("12160400", "ewp", "inclusiveBplusToKplusNuNu"), # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
@@ -105,9 +105,8 @@ _RegisteredSkims = [
     ("17230500", "charm", "XToDp_DpToHpHmJp"),  # D+ -> h+ h- j+
     ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h- j+
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
-    # D* -> D0 -> K- pi+ pi0 (""+WS)
-    ("17240200", "charm", "DstToD0Pi_D0ToHpJmPi0"),
-    ("17240300", "charm", "DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
+    # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)
+    ("17240200", "charm", "DstToD0Pi_D0ToHpJmPi0"),  # D* -> D0 -> h h pi0
     # D* -> D0 -> Ks omega / Ks eta -> Ks pi+ pi- pi0
     ("17240400", "charm", "DstToD0Pi_D0ToKsOmega"),
     # D* -> D0 -> K- pi+ eta (""+WS)
@@ -140,6 +139,8 @@ _RegisteredSkims = [
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
+    ("18020500", "dark", "InelasticDarkMatterWithDarkHiggs"),
+    ("18370100", "dark", "AA2uuuu"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

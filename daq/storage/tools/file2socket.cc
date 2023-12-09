@@ -40,7 +40,7 @@ int main(int argc, char** argv)
   TCPServerSocket server_socket;
   const std::string host = argv[2];
   server_socket.open(host, atoi(argv[3]));
-  const int ninterval = atoi(argv[4]);
+  // const int ninterval = atoi(argv[4]);
   printf("file2socket::accepting\n");
   TCPSocket socket = server_socket.accept();
   printf("file2socket::accepted\n");
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     if (sstat + rstat != evtbuf[0]) continue;
     unsigned int nbyte_hton = htonl(nbyte);
     //socket.write(data.getBuffer()+1, nbyte + sizeof(int));
-    printf("nbyte = %d\n", nbyte);
+    printf("nbyte = %u\n", nbyte);
     socket.write(&nbyte_hton, sizeof(int));
     socket.write(evtbuf, nbyte);
     nrec++;

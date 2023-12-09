@@ -6,6 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#pragma once
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* ROOT headers. */
 #include <TObject.h>
 
 /** Database storage for ECL autocovariance or noise spectral characteristics */
@@ -38,14 +44,14 @@ namespace Belle2 {
     /** Get packed autocovariance */
     const PackedAutoCovariance& getPacked(const int cellID) const
     {
-      if (cellID < 1 || cellID > 8736) return m_acov[0];
+      if (cellID < 1 || cellID > ECLElementNumbers::c_NCrystals) return m_acov[0];
       return m_acov[cellID - 1];
     }
 
     /** Get auto covariance for a channel */
     void getAutoCovariance(const int cellID, double acov[31]) const
     {
-      if (cellID < 1 || cellID > 8736) return;
+      if (cellID < 1 || cellID > ECLElementNumbers::c_NCrystals) return;
       const PackedAutoCovariance& tempPacked = m_acov[cellID - 1];
       acov[0] = static_cast<double>(tempPacked.sigmaNoiseSq);
       const double norm = acov[0] * (1.0 / 32767);
@@ -55,7 +61,7 @@ namespace Belle2 {
     /** Set auto covariance for a channel */
     void setAutoCovariance(const int cellID, const double acov[31])
     {
-      if (cellID < 1 || cellID > 8736) return;
+      if (cellID < 1 || cellID > ECLElementNumbers::c_NCrystals) return;
       const double norm = 32767 / acov[0];
       PackedAutoCovariance& tempPacked = m_acov[cellID - 1];
       tempPacked.sigmaNoiseSq = static_cast<float>(acov[0]);
@@ -64,7 +70,7 @@ namespace Belle2 {
     }
 
   private:
-    PackedAutoCovariance m_acov[8736] = {}; /**< Packed autocovariance matrix for each crystal */
+    PackedAutoCovariance m_acov[ECLElementNumbers::c_NCrystals] = {}; /**< Packed autocovariance matrix for each crystal */
 
     //Initial Version
     ClassDef(ECLAutoCovariance, 1); /**< ClassDef */

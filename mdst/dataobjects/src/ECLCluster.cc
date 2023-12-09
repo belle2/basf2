@@ -6,13 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* External headers. */
-#include <TMatrixD.h>
-#include <bitset>
-
-/* Belle2 headers. */
+/* Own header. */
 #include <mdst/dataobjects/ECLCluster.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TMatrixD.h>
+
+/* C++ headers. */
+#include <bitset>
 
 using namespace Belle2;
 
@@ -37,12 +41,12 @@ double ECLCluster::getEnergy(ECLCluster::EHypothesisBit hypothesis) const
   };
 }
 
-TVector3 ECLCluster::getClusterPosition() const
+ROOT::Math::XYZVector ECLCluster::getClusterPosition() const
 {
   const double cluster_x =  getR() * sin(getTheta()) * cos(getPhi());
   const double cluster_y =  getR() * sin(getTheta()) * sin(getPhi());
   const double cluster_z =  getR() * cos(getTheta());
-  return TVector3(cluster_x, cluster_y, cluster_z);
+  return ROOT::Math::XYZVector(cluster_x, cluster_y, cluster_z);
 }
 
 TMatrixDSym ECLCluster::getCovarianceMatrix3x3() const

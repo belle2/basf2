@@ -19,7 +19,7 @@
 """
 <header>
     <output>pion-ExtMuidValidation.root</output>
-    <contact>giacomo.pietro@kit.edu</contact>
+    <contact>piilonen@vt.edu</contact>
     <description>Create events with 1 pion track for ext/muid validation.</description>
 </header>
 """
@@ -42,8 +42,6 @@ eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param('evtNumList', [1000])
 path.add_module(eventinfosetter)
 
-progress = b2.register_module('Progress')
-path.add_module(progress)
 
 pgun = b2.register_module('ParticleGun')
 param_pgun = {
@@ -77,6 +75,7 @@ output = b2.register_module('RootOutput')
 output.param('outputFileName', output_filename)
 output.param('branchNames', ['MCParticles', 'ExtHits', 'KLMMuidLikelihoods', 'KLMHit2ds'])
 path.add_module(output)
+path.add_module('Progress')
 
 b2.process(path)
 print(b2.statistics)

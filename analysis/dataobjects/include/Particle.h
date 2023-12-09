@@ -14,6 +14,7 @@
 
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
+#include <TMatrixFfwd.h>
 #include <TMatrixFSymfwd.h>
 
 #include <vector>
@@ -211,22 +212,6 @@ namespace Belle2 {
 
     /**
      * Constructor from a reconstructed Track given as TrackFitResult.
-     * To be used to create Particle objects from V0 daughters.
-     * @param trackArrayIndex track StoreArray index
-     * @param trackFit pointer to TrackFitResult object
-     * @param chargedStable Type of charged particle
-     * @param chargedStableUsedForFit Type of particle which has been used in the track fit.
-     *        This can be different as chargedStable as we don't fit all tracks with
-     *        all hypothesis.
-     */
-    [[deprecated("Please use the constructor without the chargedStableUsedForFit")]]
-    Particle(const int trackArrayIndex,
-             const TrackFitResult* trackFit,
-             const Const::ChargedStable& chargedStable,
-             const Const::ChargedStable& chargedStableUsedForFit);
-
-    /**
-     * Constructor from a reconstructed Track given as TrackFitResult.
      * To be used to create Particle objects from tracks with full control over
      * the hypothesis (e.g. V0 daughters).
      * @param trackArrayIndex track StoreArray index
@@ -309,6 +294,34 @@ namespace Belle2 {
       m_y = vertex.Y();
       m_z = vertex.Z();
     };
+
+    /**
+     * Sets Energy loss correction
+     * @param energyLossCorrection Correction factor
+     */
+    void setEnergyLossCorrection(double energyLossCorrection)
+    {
+      m_energyLossCorrection = energyLossCorrection;
+    }
+
+    /**
+      * Returns effect of energy correction on the particle momentum
+      * @return momentum change
+      */
+    double getMomentumLossCorrectionFactor() const
+    {
+      if (m_energyLossCorrection == 0.0) {
+        return 1.0;
+      }
+      double origP = m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      if (origP == 0.0) {
+        return 1.0;
+      }
+      double origE = sqrt(origP * origP + m_mass * m_mass);
+
+      double newP = sqrt((origE - m_energyLossCorrection) * (origE - m_energyLossCorrection) - m_mass * m_mass);
+      return newP / origP;
+    }
 
     /**
      * Sets momentum scaling
@@ -418,7 +431,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    bool replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughter(const Particle* oldDaughter, Particle* newDaughter);
 
     /**
      * Apply replaceDaughter to all Particles in the decay tree by looping recursively through
@@ -426,7 +439,7 @@ namespace Belle2 {
      * @param oldDaughter pointer to the daughter that will be removed
      * @param newDaughter pointer to the particle that will be added as a daughter
      */
-    bool replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter);
+    bool replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter);
 
     // getters
 
@@ -517,8 +530,10 @@ namespace Belle2 {
      */
     double getEnergy() const
     {
-      return sqrt(m_momentumScale * m_momentumScale * m_px * m_px + m_momentumScale * m_momentumScale * m_py * m_py + m_momentumScale *
-                  m_momentumScale * m_pz * m_pz + m_mass * m_mass);
+      return sqrt(m_momentumScale * m_momentumScale * m_px * m_px +
+                  m_momentumScale * m_momentumScale * m_py * m_py +
+                  m_momentumScale * m_momentumScale * m_pz * m_pz +
+                  m_mass * m_mass) - m_energyLossCorrection;
     }
 
     /**
@@ -527,7 +542,11 @@ namespace Belle2 {
      */
     ROOT::Math::PxPyPzEVector get4Vector() const
     {
-      return ROOT::Math::PxPyPzEVector(m_momentumScale * m_px, m_momentumScale * m_py, m_momentumScale * m_pz, getEnergy());
+      double correction = getMomentumLossCorrectionFactor();
+      return ROOT::Math::PxPyPzEVector(m_momentumScale * correction * m_px,
+                                       m_momentumScale * correction * m_py,
+                                       m_momentumScale * correction * m_pz,
+                                       getEnergy());
     }
 
     /**
@@ -536,7 +555,7 @@ namespace Belle2 {
      */
     ROOT::Math::XYZVector getMomentum() const
     {
-      return m_momentumScale * ROOT::Math::XYZVector(m_px, m_py, m_pz);
+      return m_momentumScale * getMomentumLossCorrectionFactor() * ROOT::Math::XYZVector(m_px, m_py, m_pz);
     };
 
     /**
@@ -545,7 +564,7 @@ namespace Belle2 {
      */
     double getMomentumMagnitude() const
     {
-      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return getP();
     };
 
     /**
@@ -554,7 +573,7 @@ namespace Belle2 {
      */
     double getP() const
     {
-      return m_momentumScale * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
+      return m_momentumScale * getMomentumLossCorrectionFactor() * sqrt(m_px * m_px + m_py * m_py + m_pz * m_pz);
     };
 
     /**
@@ -563,7 +582,7 @@ namespace Belle2 {
      */
     double getPx() const
     {
-      return m_momentumScale * m_px;
+      return m_momentumScale * getMomentumLossCorrectionFactor() * m_px;
     }
 
     /**
@@ -572,7 +591,7 @@ namespace Belle2 {
      */
     double getPy() const
     {
-      return m_momentumScale * m_py;
+      return m_momentumScale * getMomentumLossCorrectionFactor() * m_py;
     }
 
     /**
@@ -581,7 +600,7 @@ namespace Belle2 {
      */
     double getPz() const
     {
-      return m_momentumScale * m_pz;
+      return m_momentumScale * getMomentumLossCorrectionFactor() * m_pz;
     }
 
     /**
@@ -593,6 +612,14 @@ namespace Belle2 {
       return m_momentumScale;
     }
 
+    /**
+     * Returns Energy Loss Correction
+     * @return Energy Loss Correction
+     */
+    double getEnergyLossCorrection() const
+    {
+      return m_energyLossCorrection;
+    }
     /**
      * Returns vertex position (POCA for charged, IP for neutral FS particles)
      * @return vertex position
@@ -1029,6 +1056,7 @@ namespace Belle2 {
     double m_momentumScale = 1.0; /**< effective momentum scale factor */
     double m_momentumScalingFactor = 1.0; /**< momentum scaling factor */
     double m_momentumSmearingFactor = 1.0; /**< momentum smearing factor */
+    double m_energyLossCorrection = 0.0; /**< energy loss correction. defined as 'm_energyLossCorrection = E_measured - E_true'*/
     double m_x;      /**< position component x */
     double m_y;      /**< position component y */
     double m_z;      /**< position component z */
@@ -1124,7 +1152,7 @@ namespace Belle2 {
      */
     int generatePDGCodeFromCharge(const int chargedSign, const Const::ChargedStable& chargedStable);
 
-    ClassDefOverride(Particle, 16); /**< Class to store reconstructed particles. */
+    ClassDefOverride(Particle, 17); /**< Class to store reconstructed particles. */
     // v8: added identifier, changed getMdstSource
     // v9: added m_pdgCodeUsedForFit
     // v10: added m_properties
@@ -1134,7 +1162,7 @@ namespace Belle2 {
     // v14: added m_jacobiMatrix
     // v15: added m_momentumScalingFactor and m_momentumSmearingFactor
     // v16: use double precision for private members
-
+    // v17: added m_energyLossCorrection
     friend class ParticleSubset;
   };
 

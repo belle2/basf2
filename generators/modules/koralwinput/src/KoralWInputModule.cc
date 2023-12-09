@@ -9,7 +9,7 @@
 /* Own header. */
 #include <generators/modules/koralwinput/KoralWInputModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>

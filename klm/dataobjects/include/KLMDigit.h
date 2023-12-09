@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMScintillatorFirmwareFitResult.h>
 #include <klm/dataobjects/KLMSimHit.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/DigitBase.h>
 
 namespace Belle2 {

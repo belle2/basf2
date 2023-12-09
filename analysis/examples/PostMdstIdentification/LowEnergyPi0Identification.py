@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -52,8 +51,15 @@ ma.reconstructDecay('pi0:gamma -> gamma:pi0 gamma:pi0', mass_cut,
                     path=analysis_path)
 if arguments.belle1:
     payload_name_suffix = 'Belle1'
+    tag = ma.getAnalysisGlobaltagB2BII()
 else:
     payload_name_suffix = 'Belle2Release5'
+    tag = ma.getAnalysisGlobaltag()
+
+# lowEnergyPi0Identification requires a payload stored in the analysis global tag
+# It must be appended (or prepended) manually
+basf2.conditions.append_globaltag(tag)
+
 ma.lowEnergyPi0Identification(pi0_list, 'gamma:pi0', payload_name_suffix,
                               path=analysis_path)
 

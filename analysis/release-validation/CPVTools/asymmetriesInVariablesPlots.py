@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -183,7 +182,7 @@ for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
             if inputVariable == 'chiProb':
                 nBins = 25
 
-        additionalCond = str()
+        additionalCond = ''
 
         if category == "FastHadron":
             particleList = 'h+:inRoe'
@@ -200,7 +199,7 @@ for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
                                       limXmin,
                                       limXmax)
 
-        factorMultiplication = str()
+        factorMultiplication = ''
 
         if belleOrBelle2 == "Belle2" and ((category != "Lambda" and inputVariable == 'distance') or inputVariable ==
                                           'z0' or inputVariable == 'ImpactXY' or inputVariable == 'y' or inputVariable == 'OBoost'):
@@ -299,7 +298,7 @@ for (particleList, category, _) in ft.getEventLevelParticleLists(categories):
         if category == "Lambda" and inputVariable == 'distance':
             variablesPlotParamsDict[inputVariable][5] = r"{\rm cm}\, "
 
-        binWidth = '{:8.2f}'.format(binWidth)
+        binWidth = f'{binWidth:8.2f}'
 
         legendLocation = 1
         ax1.set_ylabel(r'${\rm Fraction\hspace{0.25em} of\hspace{0.25em} Events}\, /\, (\, ' + binWidth + r'\, ' +

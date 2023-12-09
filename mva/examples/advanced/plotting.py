@@ -10,7 +10,7 @@
 
 # You can use the basf2_mva_evaluation.py tool as well
 
-from basf2_mva_util import tree2dict, calculate_auc_efficiency_vs_background_retention
+from basf2_mva_util import chain2dict, calculate_auc_efficiency_vs_background_retention
 from basf2_mva_evaluation import plotting
 import ROOT
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     variables = ['extraInfo__boFull__bc', 'extraInfo__boOrdinary__bc', 'extraInfo__boPdf__bc', 'extraInfo__boSPlot__bc',
                  'extraInfo__boSPlotCombined__bc', 'extraInfo__boSPlotBoosted__bc', 'extraInfo__boSPlotCombinedBoosted__bc',
                  'isSignal']
-    data = tree2dict(rootchain, variables, variables)
+    data = chain2dict(rootchain, variables, variables)
 
     p = plotting.RejectionOverEfficiency()
     p.set_plot_options(dict(linestyle='-', lw=6))

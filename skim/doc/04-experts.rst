@@ -1,7 +1,7 @@
 Information for skim experts
 ----------------------------
 
-.. tip:: 
+.. tip::
     The functions and tools documented here are intended for skim liaisons and developers. If you are only interested in the selection criteria, then this section is probably not relevant for you.
 
 .. _writing-skims:
@@ -299,7 +299,7 @@ This will read the output files of the test jobs, and produce tables of statisti
 
 * By default, a subset of the statistics are printed to the screen.
 
-* If the ``-M`` flag is provided, a Markdown table will be written to ``SkimStats.md``. This table is in a format that can be copied into the comment fields of pull requests (where BitBucket will format the table nicely for you). Use this flag when asked to produce a table of stats in a pull request.
+* If the ``-M`` flag is provided, a Markdown table will be written to ``SkimStats.md``. This table is in a format that can be copied into the comment fields of merge requests (where GitLab will format the table nicely for you). Use this flag when asked to produce a table of stats in a merge request.
 
 * If the ``-C`` flag is provided, a text file ``SkimStats.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
 

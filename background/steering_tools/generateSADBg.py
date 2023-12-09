@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,13 +17,13 @@
 # usage:
 #    basf2 generateSADBg.py bgType accRing equivTime_us num [sampleType phase outdir]
 # arguments:
-#    bgType         Coulomb, Touschek or Brems
+#    bgType         Coulomb, Coulomb_base, Coulomb_dynamic, Touschek, Brems, Brems_base, Brems_dynamic
 #    accRing        LER or HER
 #    equivTime_us   equivalent SuperKEKB running time in micro-seconds
 #    num            output file number
-#    sampleType     one of: study, usual, PXD, ECL
-#    phase          2, 31 (= early phase 3) or 3
-#    outdir         output directory path
+#    sampleType     one of: study, usual, PXD, ECL (D = usual)
+#    phase          2, 31 (= early phase 3, ie Run 1), 32 (= Run 2) or 3 (D = 3)
+#    outdir         output directory path (D = output)
 # -------------------------------------------------------------------------------------
 
 import basf2 as b2
@@ -38,7 +37,7 @@ argvs = sys.argv
 argc = len(argvs)
 
 if argc == 5:
-    bgType = argvs[1]     # Coulomb, Touschek or Brems
+    bgType = argvs[1]     # Coulomb, Coulomb_base, Coulomb_dynamic, Touschek, Brems, Brems_base, Brems_dynamic
     accRing = argvs[2]    # LER or HER
     equivTime = argvs[3]  # equivalent SuperKEKB running time in micro-seconds
     num = argvs[4]        # output file number
@@ -70,22 +69,33 @@ elif argc == 8:
     phase = int(argvs[6])
     outdir = argvs[7]
 else:
-    print('usage:')
-    print('basf2', argvs[0],
-          '(Touschek,Coulomb,Brems) (HER,LER) equivTime_us num [(study,usual,ECL,PXD) phase outdir]')
+    print('Usage:')
+    print('  basf2', argvs[0], 'bgType accRing equivTime_us num [sampleType phase outdir]')
+    print('Arguments:')
+    print('  bgType         Coulomb, Coulomb_base, Coulomb_dynamic, Touschek, Brems, Brems_base, Brems_dynamic')
+    print('  accRing        LER or HER')
+    print('  equivTime_us   equivalent SuperKEKB running time in micro-seconds')
+    print('  num            output file number')
+    print('  sampleType     one of: study, usual, PXD, ECL (D = usual)')
+    print('  phase          2, 31 (= early phase 3, ie Run 1), 32 (= Run 2) or 3 (D = 3)')
+    print('  outdir         output directory path (D = output)')
     sys.exit()
 
-# set parameters
+# set sub-directories of SAD files
 
 if phase == 3:
-    subdir = 'phase3-15th/'
+    subdir = 'phase3/'
 elif phase == 31:
     subdir = 'phase3-early/'
+elif phase == 32:
+    subdir = 'phase3-Run2/'
 elif phase == 2:
     subdir = 'phase2/'
 else:
     print('phase ', phase, 'not supported')
     sys.exit()
+
+# set parameters
 
 bgType = bgType + '_' + accRing
 sadFile = 'input/' + subdir + bgType + '.root'
@@ -93,7 +103,7 @@ realTime = float(equivTime) * 1000
 fname = bgType + '_' + sampleType + '-phase' + str(phase) + '-' + num
 outputFile = outdir + '/' + fname + '.root'
 
-# check for the existance of a SAD file
+# check for the existence of a SAD file
 
 if not os.path.exists(sadFile):
     b2.B2ERROR('SAD file ' + sadFile + ' not found')
@@ -105,6 +115,7 @@ if not os.path.exists(outdir):
     os.makedirs(outdir)
 
 # log message
+b2.B2RESULT('SAD file (input): ' + sadFile)
 b2.B2RESULT('Output file: ' + outputFile)
 b2.B2RESULT('Corresponds to ' + equivTime + ' us of running phase ' + str(phase))
 
@@ -126,6 +137,8 @@ if phase == 2:
     gearbox.param('fileName', 'geometry/Beast2_phase2.xml')
 elif phase == 31:
     gearbox.param('fileName', 'geometry/Belle2_earlyPhase3.xml')
+elif phase == 32:
+    gearbox.param('fileName', 'geometry/Belle2_Run2.xml')
 if sampleType == 'study':
     gearbox.param('override', [
         ("/DetectorComponent[@name='PXD']//ActiveChips", 'true', ''),
@@ -135,7 +148,8 @@ if sampleType == 'study':
         ("/DetectorComponent[@name='TOP']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ARICH']//BeamBackgroundStudy", '1', ''),
         ("/DetectorComponent[@name='ECL']//BeamBackgroundStudy", '1', ''),
-        ("/DetectorComponent[@name='KLM']//BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//BKLM/BeamBackgroundStudy", '1', ''),
+        ("/DetectorComponent[@name='KLM']//EKLM/BeamBackgroundStudy", '1', ''),
     ])
 main.add_module(gearbox)
 
@@ -149,8 +163,8 @@ main.add_module(generator)
 # Geant geometry
 geometry = b2.register_module('Geometry')
 geometry.param('useDB', False)
-# add beast detectors for early phase3
-if phase == 31 and sampleType == 'study':
+# add beast detectors
+if sampleType == 'study' and (phase == 31 or phase == 32):
     geometry.param('additionalComponents', ["BEAMABORT", "MICROTPC", "CLAWS", "HE3TUBE"])
 main.add_module(geometry)
 
@@ -168,7 +182,7 @@ progress = b2.register_module('Progress')
 main.add_module(progress)
 
 # Output
-if phase == 31:
+if phase == 31 or phase == 32:
     phase = 3
 add_output(main, bgType, realTime, sampleType, phase, fileName=outputFile)
 

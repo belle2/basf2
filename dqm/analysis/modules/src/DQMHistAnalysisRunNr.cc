@@ -31,22 +31,17 @@ DQMHistAnalysisRunNrModule::DQMHistAnalysisRunNrModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("DQM Analysis for RunNr/Mixing Check");
 
   //Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("DAQ"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:DAQ:RunNr:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
+  addParam("Prefix", m_prefix, "Prefix HLT or ERECO");
 
   B2DEBUG(99, "DQMHistAnalysisRunNr: Constructor done.");
 }
 
 DQMHistAnalysisRunNrModule::~DQMHistAnalysisRunNrModule()
 {
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisRunNrModule::initialize()
@@ -59,16 +54,9 @@ void DQMHistAnalysisRunNrModule::initialize()
 
   // m_monObj->addCanvas(m_cRunNr);// useful?
 
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    mychid.resize(2);
-    SEVCHK(ca_create_channel((m_pvPrefix + "Alarm").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "RunNr").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
+  registerEpicsPV("DAQ:" + m_prefix + ":RunNr:RunNr", "RunNr");
+  registerEpicsPV("DAQ:" + m_prefix + ":RunNr:Alarm", "Alarm");
 
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
   B2DEBUG(99, "DQMHistAnalysisRunNr: initialized.");
 }
 
@@ -79,16 +67,11 @@ void DQMHistAnalysisRunNrModule::beginRun()
   m_cRunNr->Clear();
 
   // make sure we reset at run start to retrigger the alarm
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    double mean = 0.0; // must be double, mean of histogram -> runnr
-    int status = 0; // must be int, epics alarm status 0 = no data, 2 = o.k., 4 = not o.k.
-    // if status & runnr valid
-    SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&mean), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  double mean = 0.0; // must be double, mean of histogram -> runnr
+  int status = 0; // must be int, epics alarm status 0 = no data, 2 = o.k., 4 = not o.k.
+  // if status & runnr valid
+  setEpicsPV("Alarm", status);
+  setEpicsPV("RunNr", mean);
 }
 
 void DQMHistAnalysisRunNrModule::event()
@@ -125,11 +108,14 @@ void DQMHistAnalysisRunNrModule::event()
           leg->AddText(tmp);
         }
       }
+      // Check number of bins filled
       if (nfilled > 1) {
+        // problem
         status = 4;
       } else if (nfilled == 1) {
+        // ok
         status = 2;
-      }// else nfilled=0, status stays 0
+      }// else nfilled=0, status stays 0 (no data)
     }
   }
 
@@ -150,26 +136,12 @@ void DQMHistAnalysisRunNrModule::event()
   m_cRunNr->Modified();
   m_cRunNr->Update();
 
-
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    // if status & runnr valid
-    SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&mean), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  setEpicsPV("Alarm", status);
+  setEpicsPV("RunNr", mean);
 }
 
 void DQMHistAnalysisRunNrModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisRunNr: terminate called");
-  // should delete canvas here, maybe hist, too? Who owns it?
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

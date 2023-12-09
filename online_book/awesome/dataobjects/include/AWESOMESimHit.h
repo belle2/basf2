@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 #include <framework/geometry/B2Vector3.h>
 

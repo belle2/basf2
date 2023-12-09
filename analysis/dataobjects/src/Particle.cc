@@ -51,7 +51,7 @@ Particle::Particle() :
 }
 
 
-Particle::Particle(const PxPyPzEVector& momentum, const int pdgCode) :
+Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum, const int pdgCode) :
   m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
 {
@@ -65,7 +65,7 @@ Particle::Particle(const PxPyPzEVector& momentum, const int pdgCode) :
 }
 
 
-Particle::Particle(const PxPyPzEVector& momentum,
+Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const EParticleSourceObject source,
@@ -86,7 +86,7 @@ Particle::Particle(const PxPyPzEVector& momentum,
 }
 
 
-Particle::Particle(const PxPyPzEVector& momentum,
+Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
@@ -119,7 +119,7 @@ Particle::Particle(const PxPyPzEVector& momentum,
   }
 }
 
-Particle::Particle(const PxPyPzEVector& momentum,
+Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
@@ -155,7 +155,7 @@ Particle::Particle(const PxPyPzEVector& momentum,
 }
 
 
-Particle::Particle(const PxPyPzEVector& momentum,
+Particle::Particle(const ROOT::Math::PxPyPzEVector& momentum,
                    const int pdgCode,
                    EFlavorType flavorType,
                    const std::vector<int>& daughterIndices,
@@ -221,34 +221,6 @@ Particle::Particle(const int trackArrayIndex,
   // set momentum, position and error matrix
   setMomentumPositionErrorMatrix(trackFit);
 }
-
-//FIXME: Deprecated, to be removed after release-05
-Particle::Particle(const int trackArrayIndex,
-                   const TrackFitResult* trackFit,
-                   const Const::ChargedStable& chargedStable,
-                   const Const::ChargedStable& chargedStableUsedForFit) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleSource(c_Undefined), m_mdstIndex(0), m_properties(0), m_arrayPointer(nullptr)
-{
-  if (!trackFit) return;
-
-  m_flavorType = c_Flavored; //tracks are charged
-  m_particleSource = c_Track;
-
-  setMdstArrayIndex(trackArrayIndex);
-
-  m_pdgCodeUsedForFit = chargedStableUsedForFit.getPDGCode();
-  m_pdgCode           = generatePDGCodeFromCharge(trackFit->getChargeSign(), chargedStable);
-
-  // set mass
-  if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == nullptr)
-    B2FATAL("PDG=" << m_pdgCode << " ***code unknown to TDatabasePDG");
-  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
-
-  // set momentum, position and error matrix
-  setMomentumPositionErrorMatrix(trackFit);
-}
-
 
 Particle::Particle(const ECLCluster* eclCluster, const Const::ParticleType& type) :
   m_pdgCode(type.getPDGCode()), m_mass(type.getMass()), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
@@ -383,9 +355,7 @@ void Particle::setMdstArrayIndex(const int arrayIndex)
   if (m_particleSource == c_ECLCluster) {
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
-      const int crid     = cluster->getConnectedRegionId();
-      const int clusterid = cluster->getClusterId();
-      m_identifier = 1000 * crid + clusterid;
+      m_identifier = cluster->getUniqueClusterId();
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -407,9 +377,7 @@ int Particle::getMdstSource() const
   if (m_particleSource == c_ECLCluster) {
     const ECLCluster* cluster = this->getECLCluster();
     if (cluster) {
-      const int crid     = cluster->getConnectedRegionId();
-      const int clusterid = cluster->getClusterId();
-      identifier = 1000 * crid + clusterid;
+      identifier = cluster->getUniqueClusterId();
     } else {
       B2ERROR("Particle is of type = ECLCluster has identifier not set and no relation to ECLCluster.\n"
               "This has happen because old microDST is analysed with newer version of software.");
@@ -734,7 +702,7 @@ void Particle::removeDaughter(const Particle* daughter, const bool updateType)
     m_particleSource = c_Undefined;
 }
 
-bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newDaughter)
+bool Particle::replaceDaughter(const Particle* oldDaughter, Particle* newDaughter)
 {
   int index = oldDaughter->getArrayIndex();
 
@@ -744,13 +712,15 @@ bool Particle::replaceDaughter(const Particle* oldDaughter, const Particle* newD
       m_daughterIndices.insert(ite_index, newDaughter->getArrayIndex());
       auto ite_property =  m_daughterProperties.erase(m_daughterProperties.begin() + i);
       m_daughterProperties.insert(ite_property, Particle::PropertyFlags::c_Ordinary);
+
+      newDaughter->writeExtraInfo("original_index", index);
       return true;
     }
   }
   return false;
 }
 
-bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, const Particle* newDaughter)
+bool Particle::replaceDaughterRecursively(const Particle* oldDaughter, Particle* newDaughter)
 {
   bool isReplaced = this->replaceDaughter(oldDaughter, newDaughter);
   if (isReplaced)
@@ -1258,6 +1228,9 @@ std::string Particle::getInfoHTML() const
   stream << "<br>";
 
   stream << " <b>momentum scaling factor</b>=" << m_momentumScale;
+  stream << "<br>";
+
+  stream << " <b>Energy loss correction</b>=" << m_energyLossCorrection;
   stream << "<br>";
 
   stream << " <b>position</b>=" << HTML::getString(ROOT::Math::XYZVector(m_x, m_y, m_z));

@@ -42,10 +42,6 @@
 // ifstream constructor.
 #include <fstream>
 
-const char* record_strings[] = { "Event", "Begin_run", "Pause", "Resume", "End_run" };
-
-using namespace std;
-
 namespace Belle2 {
 
 
@@ -65,10 +61,10 @@ namespace Belle2 {
     setDescription("Module for the ARICH Beamtest data analysis. It creates track form the MWPC hits and reads the HAPD hits");
 
     //Parameter definition
-    addParam("outputFileName", m_outFile, "Output Root Filename", string("output.root"));
-    vector<string> defaultList;
+    addParam("outputFileName", m_outFile, "Output Root Filename", std::string("output.root"));
+    std::vector<std::string> defaultList;
     addParam("runList", m_runList, "Data Filenames.", defaultList);
-    vector<int> defaultMask;
+    std::vector<int> defaultMask;
     addParam("mwpcTrackMask", m_MwpcTrackMask, "Create track from MWPC layers", defaultMask);
     m_fp = NULL;
     addParam("beamMomentum", m_beamMomentum, "Momentum of the beam [GeV]", 0.0);
@@ -290,7 +286,7 @@ namespace Belle2 {
               double globalTime = 0;
 
               double rposx = 0, rposy = 0;
-              pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
+              std::pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
               int channel = eposhapd.second;
 
               if ((channel < 108 && channel > 71) || channel < 36) channel = 108 - (int(channel / 6) * 2 + 1) * 6 +
@@ -302,7 +298,7 @@ namespace Belle2 {
               arichDigits.appendNew(module + 1, channel, globalTime);
 
               TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
-              pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
+              std::pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
               m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.X(), rechit.Y(), module, channelID, rposx, rposy);
             }
           }
@@ -567,7 +563,7 @@ namespace Belle2 {
   void arichBtestModule::terminate()
   {
     int j = 1;
-    BOOST_FOREACH(const string & fname, m_runList) {
+    BOOST_FOREACH(const std::string & fname, m_runList) {
       B2INFO(m_eveList[j] << " events processed from file " << fname);
       j++;
     }

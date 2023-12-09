@@ -8,16 +8,14 @@
 
 #pragma once
 
-//Calibration
-#include <calibration/CalibrationCollectorModule.h>
+/* ECL headers. */
+#include <ecl/geometry/ECLNeighbours.h>
 
-//Framework
+/* Basf2 headers. */
+#include <analysis/utility/PCmsLabTransform.h>
+#include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <analysis/utility/PCmsLabTransform.h>
-
-//ECL
-#include <ecl/geometry/ECLNeighbours.h>
 
 namespace Belle2 {
   class ECLCrystalCalib;

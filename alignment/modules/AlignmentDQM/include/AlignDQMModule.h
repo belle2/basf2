@@ -10,6 +10,8 @@
 
 #include <tracking/dqmUtils/DQMHistoModuleBase.h>
 
+#include <Math/Vector3D.h>
+
 namespace Belle2 {
   /** DQM of Alignment for off line
     * residuals per sensor, layer,
@@ -50,9 +52,9 @@ namespace Belle2 {
     /** Fill histograms with helix parameters and their correlations. */
     virtual void FillHelixParametersAndCorrelations(const TrackFitResult* tfr) override;
     /** Fill histograms which depend on position for individual sensors. */
-    virtual void FillPositionSensors(TVector3 residual_um, TVector3 position, int sensorIndex);
+    virtual void FillPositionSensors(ROOT::Math::XYZVector residual_um, ROOT::Math::XYZVector position, int sensorIndex);
     /** Fill histograms which depend on layerIndex */
-    virtual void FillLayers(TVector3 residual_um, float phi_deg, float theta_deg, int layerIndex);
+    virtual void FillLayers(ROOT::Math::XYZVector residual_um, float phi_deg, float theta_deg, int layerIndex);
     /** @} */
 
   protected:

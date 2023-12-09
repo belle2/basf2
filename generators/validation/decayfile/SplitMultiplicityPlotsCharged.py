@@ -18,6 +18,25 @@
 """
 
 import ROOT
+import argparse
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        # epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        # usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('--input', type=str, default='MCvalidationCharged.root', help='The name of the input root file')
+    parser.add_argument('--output', type=str, default='SplitMultiplicityPlotsCharged.root', help='The name of the output root file')
+
+    return parser
 
 
 def PlottingHistos(particle, pos, neg):
@@ -39,8 +58,11 @@ def PlottingHistos(particle, pos, neg):
 
 if __name__ == '__main__':
 
+    parser = get_argument_parser()
+    args = parser.parse_args()
+
     # load in the root files
-    rdf = ROOT.RDataFrame("Split", "MCvalidationCharged.root")
+    rdf = ROOT.RDataFrame("Split", args.input)
     rdf_fix = rdf.Define("gen_Kn", "-gen_Km").Define("gen_K0bar", "-gen_antiK0")
 
     axis_dic = {'Kpm': 'K^{+} / K^{#minus} from both B',
@@ -55,10 +77,8 @@ if __name__ == '__main__':
                  'K0_diff': 3.5
                  }
 
-    outputFile = ROOT.TFile("SplitMultiplicityPlotsCharged.root", "RECREATE")
+    outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
-    ROOT.gROOT.SetStyle("BELLE2")
-    ROOT.gROOT.ForceStyle()
 
     PlottingHistos("Kpm", "gen_Kp", "gen_Kn")
     PlottingHistos("K0", "gen_K0", "gen_K0bar")

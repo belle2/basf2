@@ -49,7 +49,6 @@ main(int argc, const char* argv[])
   }
 
   char b[800];
-  unsigned line = 0;
   while (! infile.eof()) {
     infile.getline(b, 800);
     string l(b);
@@ -93,8 +92,6 @@ main(int argc, const char* argv[])
         cout << endl;
       }
     }
-
-    ++line;
   }
 
   //...Termination...

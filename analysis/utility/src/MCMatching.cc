@@ -187,7 +187,7 @@ namespace {
         continue;
       }
 
-      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
+      if (mcParticle and daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
         if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
           //now daug does not have any daughters.
           //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,

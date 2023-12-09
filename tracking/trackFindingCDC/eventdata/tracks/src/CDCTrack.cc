@@ -156,7 +156,7 @@ CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   // TODO: Maybe enhance the estimation of the z coordinate with the superlayer slopes.
 }
 
-CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
+CDCTrack CDCTrack::condense(const Path<const CDCTrack>& trackPath)
 {
   if (trackPath.empty()) {
     return CDCTrack();

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichRawUnpacker/ARICHRawUnpackerModule.h>
 #include <arich/dataobjects/ARICHRawDigit.h>
 
@@ -17,8 +17,6 @@
 #include <rawdata/dataobjects/RawARICH.h>
 
 #include <sstream>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -58,10 +56,6 @@ namespace Belle2 {
     rawdigit.registerInDataStore();
   }
 
-  void ARICHRawUnpackerModule::beginRun()
-  {
-  }
-
   void ARICHRawUnpackerModule::event()
   {
     StoreArray<RawARICH> rawdata;
@@ -82,7 +76,6 @@ namespace Belle2 {
         ARICHRawDigit* rawdigit = rawdigits.appendNew(type, ver, boardid, febno, length_all, mrg_evtno);
         rawdigit->setCopperId(raw.GetNodeID(0));
         rawdigit->setHslbId(finesse);
-        int nfebs = 0;
         while (m_ibyte < length_all) {
           int type_feb = calbyte(buf);
           ver = calbyte(buf);
@@ -105,7 +98,6 @@ namespace Belle2 {
             }
           }
           ARICHRawDigit::FEBDigit feb;
-          nfebs++;
           if (type_feb == 0x02) {//Raw mode
             int ch = 143;
             //B2INFO("raw mode");
@@ -116,7 +108,7 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad:" << LogVar("FEB", to_string(febno) + " hslb-" + to_string(finesse))
+                  B2ERROR("FEB is bad:" << LogVar("FEB", std::to_string(febno) + " hslb-" + std::to_string(finesse))
                           << LogVar("type", type_feb) << LogVar("ver", ver)
                           << LogVar("boardid", boardid) << LogVar("febno", febno)
                           << LogVar("length", length) << LogVar("evtno", evtno));
@@ -138,7 +130,7 @@ namespace Belle2 {
                 ss << "ch# " << ch << "(" << val << ") ";
                 hasHit = true;
                 if (febno < 0 || febno > 6) {
-                  B2ERROR("FEB is bad:" << LogVar("FEB", to_string(febno) + " hslb-" + to_string(finesse))
+                  B2ERROR("FEB is bad:" << LogVar("FEB", std::to_string(febno) + " hslb-" + std::to_string(finesse))
                           << LogVar("type", type_feb) << LogVar("ver", ver)
                           << LogVar("boardid", boardid) << LogVar("febno", febno)
                           << LogVar("length", length) << LogVar("evtno", evtno));
@@ -155,15 +147,6 @@ namespace Belle2 {
         }
       }
     }
-  }
-
-
-  void ARICHRawUnpackerModule::endRun()
-  {
-  }
-
-  void ARICHRawUnpackerModule::terminate()
-  {
   }
 
 } // end Belle2 namespace

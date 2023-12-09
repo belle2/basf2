@@ -17,6 +17,7 @@ import subprocess
 
 import b2test_utils as b2tu
 
+lumiDB_path = b2tu.require_file('luminosity/', 'validation')
 
 if __name__ == '__main__':
 
@@ -47,4 +48,14 @@ if __name__ == '__main__':
         subprocess.check_call(
             ['b2info-luminosity', '--exp', '18', '--runs', '100,600-650', '--what', 'online',
              '--beam-energy', '4S_offres', '--token', os.environ['BELLE2_RUNDB_TOKEN']]
+        )
+
+        subprocess.check_call(
+            ['b2info-luminosity', '--exp', '12,14', '--what', 'offline',
+             '--dboffline', f'{lumiDB_path}/test_OffLineLuminosityProc.db', '--token', os.environ['BELLE2_RUNDB_TOKEN']]
+        )
+
+        subprocess.check_call(
+            ['b2info-luminosity', '--exp', '12,14', '--what', 'offline', '--proc', 'proc12',
+             '--dboffline', f'{lumiDB_path}/test_OffLineLuminosityProc.db', '--token', os.environ['BELLE2_RUNDB_TOKEN']]
         )

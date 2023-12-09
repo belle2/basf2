@@ -35,7 +35,7 @@ namespace Belle2 {
 
     void MisalignmentCache::readMisalignmentsFromXml(const string& filename)
     {
-      const double mradToDeg = 0.18 / 3.1415926;
+      const double mradToDeg = 0.18 / M_PI;
       ptree propertyTree;
 
       // Identify the location of the xml file.

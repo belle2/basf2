@@ -5,24 +5,36 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <ecl/geometry/GeoECLCreator.h>
-#include "ecl/geometry/BelleLathe.h"
-#include "ecl/geometry/BelleCrystal.h"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
-#include <G4VisAttributes.hh>
-#include <G4Box.hh>
-#include <G4AssemblyVolume.hh>
-#include <G4Region.hh>
-#include <G4TwoVector.hh>
-#include <G4PVReplica.hh>
-#include "G4UserLimits.hh"
-#include <G4Trap.hh>
 
-#include <iostream>
-#include "CLHEP/Matrix/Vector.h"
-#include "ecl/geometry/shapes.h"
+/* Own header. */
+#include <ecl/geometry/GeoECLCreator.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/geometry/BelleLathe.h>
+#include <ecl/geometry/BelleCrystal.h>
+#include <ecl/geometry/shapes.h>
+
+/* Basf2 headers. */
 #include <geometry/Materials.h>
+
+/* Geant4 headers. */
+#include <G4AssemblyVolume.hh>
+#include <G4Box.hh>
+#include <G4LogicalVolume.hh>
+#include <G4PVPlacement.hh>
+#include <G4PVReplica.hh>
+#include <G4Region.hh>
+#include <G4Trap.hh>
+#include <G4TwoVector.hh>
+#include <G4UserLimits.hh>
+#include <G4VisAttributes.hh>
+
+/* CLHEP headers. */
+#include <CLHEP/Matrix/Vector.h>
+
+/* C++ headers. */
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -268,7 +280,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBackwardWrappedCrystal_Physical", indx),
                                   crystalvolume_logical,
-                                  false, (1152 + 6624) / 16 + indx, 0);
+                                  false, (ECLElementNumbers::c_NCrystalsForwardBarrel) / 16 + indx, 0);
       if (overlap)pv->CheckOverlaps(npoints);
     }
 
@@ -282,7 +294,8 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + get_pa_box_height() / 2)*G4RotateZ3D(-M_PI / 2), get_preamp(),
-                                  suf("phys_backward_preamplifier", indx), crystalvolume_logical, false, (1152 + 6624) / 16 + indx, 0);
+                                  suf("phys_backward_preamplifier", indx), crystalvolume_logical, false, (ECLElementNumbers::c_NCrystalsForwardBarrel) / 16 + indx,
+                                  0);
       if (overlap)pv->CheckOverlaps(npoints);
     }
   }

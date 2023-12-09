@@ -33,7 +33,7 @@ if __name__ == "__main__":
     choices = ["list", "categorized"]
     try:
         from tabulate import tabulate
-        choices += ['jira', 'grid', 'stash']
+        choices += ['github', 'gitlab', 'grid']
     except ImportError:
         pass
 
@@ -146,9 +146,7 @@ if __name__ == "__main__":
 
         print(df_sorted)
 
-    elif args.format == "jira":
-        print(tabulate(df_print, tablefmt="jira", showindex=True, headers="keys"))
-    elif args.format == "stash":
-        print(tabulate(df_print, tablefmt="pipe", showindex=True, headers="keys"))
     elif args.format == "grid":
         print(tabulate(df_print, tablefmt="grid", showindex=True, headers="keys"))
+    elif args.format in ["github", "gitlab"]:
+        print(tabulate(df_print, tablefmt="github", showindex=True, headers="keys"))

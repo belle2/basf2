@@ -12,7 +12,7 @@
 # ---------------------------------------------------------------------------------------
 # Unpack raw data to TOPDigits using time base calibration
 #
-# Usage: basf2 unpackToTOPDigitsWithTBC.py -i <input_file.sroot> -o <output_file.root>
+# Usage: basf2 unpackToTOPDigitsWithTBC.py -i <input_file.root> -o <output_file.root>
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
@@ -27,8 +27,8 @@ b2.conditions.append_globaltag('online')
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
-# roinput = b2.register_module('RootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects (uncomment for pocketDAQ)

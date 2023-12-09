@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ logging.basicConfig(level=logging.DEBUG,
                     )
 
 
-class ProTool(object):
+class ProTool:
 
     """
     All pro tools inherit form this class.

@@ -27,8 +27,8 @@ main.add_module('TOPGeometryParInitializer')
 # process single event
 b2.process(main)
 
-# define a local database (will be created automatically, if doesn't exist)
-b2.use_local_database('localDB/localDB.txt', readonly=False)
+# define local database with write access
+b2.conditions.expert_settings(save_payloads="localDB/localDB.txt")
 
 # and then run the importer
 dbImporter = TOPDatabaseImporter()

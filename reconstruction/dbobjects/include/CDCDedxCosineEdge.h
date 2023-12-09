@@ -80,12 +80,14 @@ namespace Belle2 {
     };
 
     /** return calibration constant for cosine value
-      * @param costh is a signed cosine theta value so by definitioi it recog it's side
+      * @param costh is a signed cosine theta value so by definition it recog it's side
       */
     double getMean(double costh)const
     {
+
       double coslow = 0.0, coshigh = 0.0;
       std::vector<double> temp;
+
       if (costh < 0) {
         temp = m_largeCos[0];
         coslow = -0.870; coshigh = -0.850; //this is hardcoded and fixed
@@ -103,18 +105,33 @@ namespace Belle2 {
         return 1.0;
       }
 
-      double bw = abs(coshigh - coslow) / temp.size();
-      unsigned int ibin = int((costh - coslow) / bw);
+      if (costh <= -0.866 || costh >= 0.9575) return 1.0;
 
-      if (ibin >= temp.size()) {
-        B2WARNING("CDCDedxCosineEdge:no constants for bin #: " << ibin << " as it is not in range");
+      // gains are stored at the center of the bins
+      // find the bin center immediately preceding this value of costh
+      double binsize = (coshigh - coslow) / temp.size();
+      int bin = std::floor((costh - 0.5 * binsize - coslow) / binsize);
+
+      // extrapolate backward for lowest half-bin and center positive half-bin
+      // extrapolate forward for highest half-bin and center negative half-bin
+      int thisbin = bin, nextbin = bin + 1;
+      int nbin = int(temp.size());
+      if (bin < 0 || (temp[nextbin] - temp[thisbin] < -0.6 && bin < nbin - 1)) {
+        thisbin = bin + 1; nextbin = bin + 2;
+      } else {
+        if (bin >= nbin - 1 || (temp[nextbin] - temp[thisbin] > 0.6 && bin < nbin - 1)) {
+          thisbin = bin - 1; nextbin = bin;
+        }
+      }
+
+      double frac = ((costh - 0.5 * binsize - coslow) / binsize) - thisbin;
+
+      if (thisbin < 0 || (unsigned)nextbin >= temp.size()) {
+        B2WARNING("CDCDedxCosineEdge:no constants for costh: " << costh << " as it is not in range");
         return 1.0;
       }
 
-      //nothing but a protection only
-      if (temp[ibin] <= 0.0)return 1.0;
-
-      return temp[ibin];
+      return ((temp[nextbin] - temp[thisbin]) * frac + temp[thisbin]);
     }
 
     /** return specific large cosine constants on give side

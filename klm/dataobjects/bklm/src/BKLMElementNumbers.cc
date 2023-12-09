@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <rawdata/dataobjects/RawCOPPERFormat.h>
 
 using namespace Belle2;

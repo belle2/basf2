@@ -6,19 +6,26 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <ecl/calibration/eclNOptimalAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/calibration/tools.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLnOptimal.h>
+
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/database/DBStore.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
 
-
-#include "TH2F.h"
-#include "TROOT.h"
-#include "TMath.h"
-#include "TF1.h"
+/* ROOT headers. */
+#include <TF1.h>
+#include <TH2F.h>
+#include <TMath.h>
+#include <TROOT.h>
 
 using namespace std;
 using namespace Belle2;
@@ -233,23 +240,29 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
   //..Also read in and normalize group number for each cellID
   auto groupNumberOfEachCellID = getObjectPtr<TH1F>("groupNumberOfEachCellID");
-  for (int ic = 1; ic <= 8736; ic++) {
+  for (int ic = 1; ic <= ECLElementNumbers::c_NCrystals; ic++) {
     const double groupNum = groupNumberOfEachCellID->GetBinContent(ic);
     groupNumberOfEachCellID->SetBinContent(ic, groupNum / scale);
     groupNumberOfEachCellID->SetBinError(ic, 0.);
   }
 
+  //..Couple of diagnostic histograms
+  auto entriesPerThetaIdEnergy = getObjectPtr<TH2F>("entriesPerThetaIdEnergy");
+  auto mcEnergyDiff = getObjectPtr<TH2F>("mcEnergyDiff");
+
   //..Write these to disk.
   TFile* histFile = new TFile("eclNOptimalAlgorithm.root", "recreate");
   inputParameters->Write();
   groupNumberOfEachCellID->Write();
+  entriesPerThetaIdEnergy->Write();
+  mcEnergyDiff->Write();
 
   //-----------------------------------------------------------------------------------
   //..Parameters from the inputParameters histogram
   const int nCrystalGroups = (int)(inputParameters->GetBinContent(1) + 0.5);
   const int nEnergies = (int)(inputParameters->GetBinContent(2) + 0.5);
   const int nLeakReg = 3; // 3 regions forward barrel backward
-  float generatedE[nLeakReg][nEnergies];
+  auto generatedE = create2Dvector<float>(nLeakReg, nEnergies);
   int bin = 2; // bin 1 = nCrystalGroups, bin 2 = nEnergies, bin 3 = first energy
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -315,9 +328,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   std::vector<int> crystalsPerGroup;
   crystalsPerGroup.resize(nCrystalGroups, 0);
 
-  const int iFirstBarrel = 1153; // first barrel cellID
-  const int iLastBarrel = 7776; // last barrel cellID
-  const int nCrystalsTotal = 8736;
+  const int nCrystalsTotal = ECLElementNumbers::c_NCrystals;
   for (int cellID = 1; cellID <= nCrystalsTotal; cellID++) {
 
     //..Group number of this cellID
@@ -326,10 +337,10 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
     //..Energy boundaries of previous payload, which depend on the ECL region
     std::vector<float> eUpperBoundariesPrev = eUpperBoundariesBrlPrev;
     int iRegion = 1; // barrel
-    if (cellID < iFirstBarrel) {
+    if (ECLElementNumbers::isForward(cellID)) {
       eUpperBoundariesPrev = eUpperBoundariesFwdPrev;
       iRegion = 0;
-    } else if (cellID > iLastBarrel) {
+    } else if (ECLElementNumbers::isBackward(cellID)) {
       eUpperBoundariesPrev = eUpperBoundariesBwdPrev;
       iRegion = 2;
     }
@@ -574,6 +585,9 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
         //------------------------------------------------------------------------------
         //..Logic to decide what to do next
+
+        //..keep checking different N until resolution is this much worse than best value
+        const double resTolerance = 1.05;
         if (nCrysSumToFit == initialnCrysSumToFit) {
 
           //..After testing the previous nOptimal, try one fewer if possible
@@ -586,7 +600,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
           //..Trying fewer crystals. If this is the best so far, try one
           //  fewer, if possible. Otherwise, try more crystals.
-          if (nCrysSumToFit == nOpt and nCrysSumToFit > 1) {
+          if (fractionalResolution < resTolerance* bestFractionalResolution and nCrysSumToFit > 1) {
             nCrysSumToFit--;
           } else if (initialnCrysSumToFit != nCrysMax) {
             nCrysSumToFit = initialnCrysSumToFit + 1;
@@ -597,7 +611,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
           //..Trying more crystals. If this is the best, try one more, if
           //  possible. Otherwise, do the current reconstruction case (nCrysSumToFit = nCrysBins)
-          if (nCrysSumToFit == nOpt and nCrysSumToFit < nCrysMax) {
+          if (fractionalResolution < resTolerance * bestFractionalResolution and nCrysSumToFit < nCrysMax) {
             nCrysSumToFit++;
           } else {
             nCrysSumToFit = nCrysBins;
@@ -826,7 +840,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Prepare the payload contents
   //..Upper energy boundaries are the mid-point of the log energies
-  float boundaryE[nLeakReg][nEnergies];
+  auto  boundaryE = create2Dvector<float>(nLeakReg, nEnergies);
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
     B2INFO("Generated energies and boundaries for region = " << ireg);
     for (int ie = 0; ie < nEnergies - 1; ie++) {
@@ -844,7 +858,7 @@ CalibrationAlgorithm::EResult eclNOptimalAlgorithm::calibrate()
 
   //..Group number of each cellID
   std::vector<int> groupNumber;
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     const int iGroup = (int)(0.5 + groupNumberOfEachCellID->GetBinContent(cellID));
     groupNumber.push_back(iGroup);
   }

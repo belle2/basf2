@@ -8,9 +8,10 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
   class ECLCellIdMapping;
@@ -61,16 +62,16 @@ namespace Belle2 {
     /** Store object pointer: ECLCellIdToECLCalDigitMapping. */
     StoreObjPtr<ECLCellIdMapping> m_eclCellIdMapping;
 
-    /** vector (8736+1 entries) with cell id to phi values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to phi values  */
     std::vector<double> m_CellIdToPhi;
 
-    /** vector (8736+1 entries) with cell id to theta values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to theta values  */
     std::vector<double> m_CellIdToTheta;
 
-    /** vector (8736+1 entries) with cell id to phi id values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to phi id values  */
     std::vector<int> m_CellIdToPhiId;
 
-    /** vector (8736+1 entries) with cell id to theta id values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to theta id values  */
     std::vector<int> m_CellIdToThetaId;
 
 

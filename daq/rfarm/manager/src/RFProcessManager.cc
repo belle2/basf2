@@ -31,7 +31,7 @@ using namespace Belle2;
 //RFProcessManager::RFProcessManager( string& nodename, string& conffile, string& infofile ) :
 //  RFSharedMem (nodename.c_str()), RFNSM (nodename.c_str(), infofile.c_str() ), RFConf ( conffile.c_str() )
 
-RFProcessManager::RFProcessManager(char* nodename)
+RFProcessManager::RFProcessManager(char* /*nodename*/)
 {
   // Create IO pipe for output logging
   if (pipe2(m_iopipe, O_NONBLOCK) < 0) {
@@ -47,7 +47,7 @@ RFProcessManager::~RFProcessManager()
 {
 }
 
-void RFProcessManager::signal_handler(int num)
+void RFProcessManager::signal_handler(int /*num*/)
 {
 }
 
@@ -89,7 +89,7 @@ int RFProcessManager::Execute(char* scr, int nargs, char** args)
     }
     fflush(stdout);
     fflush(stderr);
-    int stexe = execvp(scr, argval);
+    execvp(scr, argval); // returns int stexe
     perror("execvp!!");
     fprintf(stderr, "missing file : %s\n", scr);
     fflush(stderr);

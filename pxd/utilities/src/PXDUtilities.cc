@@ -8,7 +8,7 @@
 
 #include <pxd/utilities/PXDUtilities.h>
 #include <framework/logging/Logger.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 #include <pxd/reconstruction/PXDPixelMasker.h>
 
 namespace Belle2 {
@@ -68,5 +68,6 @@ namespace Belle2 {
       }
       return false;
     }
+
   } // end namespace PXD
 } // end namespace Belle2

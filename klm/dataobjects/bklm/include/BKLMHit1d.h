@@ -13,7 +13,7 @@
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 #include <klm/dataobjects/KLMDigit.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 /* C++ headers. */
@@ -125,7 +125,7 @@ namespace Belle2 {
     }
 
     //! Set reconstructed hit time.
-    //! @parameter time Reconstructed hit time (ns).
+    //! @param[in] time Reconstructed hit time (ns).
     void setTime(double time)
     {
       m_Time = time;

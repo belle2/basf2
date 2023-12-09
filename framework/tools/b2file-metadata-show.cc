@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Belle 2 headers
+// Basf2 headers
 #include <framework/core/FileCatalog.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/io/RootFileInfo.h>

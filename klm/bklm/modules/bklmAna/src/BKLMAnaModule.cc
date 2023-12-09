@@ -9,12 +9,15 @@
 /* Own header. */
 #include <klm/bklm/modules/bklmAna/BKLMAnaModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
+
+/* ROOT headers. */
+#include <TMath.h>
 
 /* CLHEP headers. */
 #include <CLHEP/Units/SystemOfUnits.h>

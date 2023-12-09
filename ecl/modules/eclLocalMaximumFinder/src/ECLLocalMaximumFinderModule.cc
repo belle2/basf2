@@ -6,29 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclLocalMaximumFinder/ECLLocalMaximumFinderModule.h>
 
-// ROOT
-#include "TFile.h"
-#include "TTree.h"
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/geometry/ECLNeighbours.h>
 
-// FRAMEWORK
-#include <framework/datastore/StoreArray.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
+
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// MDST
 #include <mdst/dataobjects/MCParticle.h>
-
-// ECL
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
 // NAMESPACE(S)
 using namespace Belle2;
@@ -84,6 +82,7 @@ void ECLLocalMaximumFinderModule::initialize()
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclConnectedRegions.registerRelationTo(m_eclLocalMaximums);
   m_eclCalDigits.registerRelationTo(m_eclLocalMaximums);
+  m_eventLevelClusteringInfo.registerInDataStore();
 
   // Check user input.
   if (m_energyCut < c_minEnergyCut) {
@@ -155,7 +154,7 @@ void ECLLocalMaximumFinderModule::initialize()
   }
 
   // initialize the vector that gives the relation between cellid and store array position
-  m_StoreArrPosition.resize(8736 + 1);
+  m_StoreArrPosition.resize(ECLElementNumbers::c_NCrystals + 1);
 
 }
 
@@ -337,6 +336,21 @@ void ECLLocalMaximumFinderModule::event()
     }
 
   } // end CR loop
+
+  // Find the number of local maximums in each ECL region in mdst
+  uint16_t nLMPerRegion[3] = {};
+  for (const ECLLocalMaximum& aLM : m_eclLocalMaximums) {
+    const int iCellId = aLM.getCellId();
+    if (ECLElementNumbers::isForward(iCellId)) {nLMPerRegion[0]++;}
+    if (ECLElementNumbers::isBarrel(iCellId)) {nLMPerRegion[1]++;}
+    if (ECLElementNumbers::isBackward(iCellId)) {nLMPerRegion[2]++;}
+  }
+
+  // Store numbers in EventLevelClusteringInfo mdst object
+  if (!m_eventLevelClusteringInfo) { m_eventLevelClusteringInfo.create();}
+  m_eventLevelClusteringInfo->setNECLLocalMaximumsFWD(nLMPerRegion[0]);
+  m_eventLevelClusteringInfo->setNECLLocalMaximumsBarrel(nLMPerRegion[1]);
+  m_eventLevelClusteringInfo->setNECLLocalMaximumsBWD(nLMPerRegion[2]);
 
 }
 

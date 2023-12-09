@@ -95,7 +95,7 @@ namespace Belle2 {
      * but does not limit the step
      */
     G4double PostStepGetPhysicalInteractionLength(
-      const G4Track&,
+      const G4Track& track,
       G4double   previousStepSize,
       G4ForceCondition* pForceCond
     );
@@ -179,9 +179,9 @@ namespace Belle2 {
     /**
      * G4LongLivedNeutralTransportation::ProcessDescription()
      *
-     * @outfile Description of process
+     * @param outStream Output file with a description of process
      */
-    virtual void ProcessDescription(std::ostream& outFile) const;
+    virtual void ProcessDescription(std::ostream& outStream) const;
 
     void PrintStatistics(std::ostream& outStr) const;
     /**< returns current logging info of the algorithm */

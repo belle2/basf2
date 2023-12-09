@@ -6,24 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclSplitterN2/ECLSplitterN2Module.h>
 
-// FRAMEWORK
-#include <framework/datastore/RelationArray.h>
-#include <framework/logging/Logger.h>
-
-// ECL
+/* ECL headers. */
 #include <ecl/utility/Position.h>
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 
-// MDST
+/* Basf2 headers. */
+#include <framework/datastore/RelationArray.h>
+#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/ECLCluster.h>
 
-// OTHER
+/* C++ headers. */
 #include <string>
 
 // NAMESPACES
@@ -143,10 +141,10 @@ void ECLSplitterN2Module::event()
 
     }
 
-    const TVector3& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
+    const ROOT::Math::XYZVector& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
     aECLShower->setTheta(showerposition.Theta());
     aECLShower->setPhi(showerposition.Phi());
-    aECLShower->setR(showerposition.Mag());
+    aECLShower->setR(showerposition.R());
 
     aECLShower->setEnergy(energySum);
     aECLShower->setEnergyRaw(energySum);

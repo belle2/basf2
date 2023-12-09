@@ -23,7 +23,7 @@ Vertex Fitting
   The IP tube is defined by a neutral track pointing towards the boost direction starting from the smeared IP profile.
   Setting ``smearing=0`` gives the original ``iptube`` option, which is an elongated ellipsoid in boost direction.
 
-* Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`BII-6336`).
+* Fixed TreeFitter bias on V0s by propagating the correct TrackFitResult from V0 daughters (see :issue:`6220`).
 
 * Added ``FeedthroughParticle`` and ``InternalTrack`` to `vertex.treeFit`.
   This now provides compatibility of TreeFitter with the bremsstrahlung recovery modules.
@@ -54,7 +54,7 @@ Standard Particle Lists
 
 * The default vertex fitter for the V0 lists `stdKshorts` and `stdLambdas` has been changed from ``Rave`` to ``TreeFit``.
   However, a new option called ``fitter`` has been added that allows to change the vertex fitter back to `raveFit` or to `kFit`.
-  This change is motivated by a much faster execution time (see :issue:`BII-5699`) and a compatible performance as summarized
+  This change is motivated by a much faster execution time (see :issue:`5606`) and a compatible performance as summarized
   `here <https://indico.belle2.org/event/1684/contributions/9245/attachments/4576/7096/V0VertexFitting_workshopSummary.pdf>`_.
 * Added a new standard list `stdCharged.stdMostLikely` which creates 5 mutually-exclusive lists of track-based particles under
   their most likely hypothesis.
@@ -98,7 +98,7 @@ Variables
 * Fixed :b2:var:`clusterEoP` for particles with Bremsstrahlung correction by adding the energy of the added photon(s)
 * Added :b2:var:`isSignalAcceptBremsPhotons` to ignore any reconstructed brems photons.
 
- .. note:: This is not the generator-level match (see :issue:`BII-5741`) but simply ignores photons added by the :b2:mod:`BremsFinder`.
+ .. note:: This is not the generator-level match but simply ignores photons added by the :b2:mod:`BremsFinder`.
 
 * Added :b2:var:`useTagSideRecoilRestFrame`, which allows variables to be calculated in the rest frame
   recoiling against the tag side B meson. This variable is intended to be used on Upsilon(4S) particle lists
@@ -124,7 +124,7 @@ Variables
   approximation, i.e. based on ``mcDeltaL`` variable
 * Added :b2:var:`pidChargedBDTScore` and :b2:var:`pidPairChargedBDTScore` for global and binary BDT-based charged particle
   identification, respectively. Require booking the `ChargedPidMVAMulticlass` (`ChargedPidMVA`) module in the path.
-* Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`BII-5973`)
+* Bug fix for the `isCloneTrack` variable. Antiparticles have been falsely classified which is now fixed (see :issue:`5863`)
 * Added :b2:var:`isChargedBEvent` and :b2:var:`isUnmixedBEvent` variables
 * The variables `daughterAngle` and ``daughterAngleInBetween`` have been merged using the name of the former but the extended
   functionality of the latter.

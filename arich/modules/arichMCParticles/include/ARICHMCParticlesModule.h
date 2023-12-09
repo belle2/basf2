@@ -5,21 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHMCPARTICLESMODULE_H
-#define ARICHMCPARTICLESMODULE_H
-
-#include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/ExtHit.h>
-#include <mdst/dataobjects/MCParticle.h>
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
+  class Track;
+  class ExtHit;
+  class MCParticle;
 
   /**
-   *
+   * Module to match ARICH hits to MCParticles
    */
   class ARICHMCParticlesModule : public Module {
 
@@ -42,32 +39,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-    /**
-     * Prints module parameters.
-     */
-    void printModuleParams() const;
 
   private:
 
@@ -79,5 +53,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

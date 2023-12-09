@@ -41,7 +41,6 @@ namespace Belle2 {
     enum {
       SENDTRL_NWORDS = 2
     };
-  private:
 
     enum {
       POS_CHKSUM = 0,
@@ -51,6 +50,8 @@ namespace Belle2 {
     enum {
       MAGIC_WORD_SEND_TRAILER = 0x7fff0007
     };
+
+  private:
 
     int m_buffer[ SENDTRL_NWORDS ];
     //    ClassDef(SendTrailer, 1);

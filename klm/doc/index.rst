@@ -16,7 +16,7 @@ This is a list of the ``klm`` modules. Some modules (in the ``klm/bklm`` and ``k
    :io-plots:
 
 .. b2-modules::
-   :modules: MCMatcherKLMClusters 
+   :modules: MCMatcherKLMClusters
    :io-plots:
 
 

@@ -9,7 +9,7 @@
 #include <framework/utilities/ScopeGuard.h>
 #include <framework/utilities/Utils.h>
 #include <gtest/gtest.h>
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace {
   /** Simple functor to set and get the values of an integer */
@@ -150,20 +150,21 @@ namespace {
   /** Test guarding the current working directory */
   TEST(ScopeGuards, WorkingDirectory)
   {
-    std::string start{boost::filesystem::current_path().c_str()};
-    std::string tmpdir("/tmp");
+    std::string start{std::filesystem::current_path().c_str()};
+    std::string tmpdir(std::filesystem::temp_directory_path().c_str());
     std::string root("/");
     {
-      auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory("/tmp"); // cppcheck-suppress unreadVariable
-      ASSERT_EQ(tmpdir, boost::filesystem::current_path().c_str());
+      auto guard1 = Belle2::ScopeGuard::guardWorkingDirectory( // cppcheck-suppress unreadVariable
+                      std::filesystem::temp_directory_path().c_str());
+      ASSERT_EQ(tmpdir, std::filesystem::current_path().c_str());
       {
         auto guard2 = Belle2::ScopeGuard::guardWorkingDirectory("/");
-        ASSERT_EQ(root, boost::filesystem::current_path().c_str());
+        ASSERT_EQ(root, std::filesystem::current_path().c_str());
         guard2.release();
       }
-      ASSERT_EQ(root, boost::filesystem::current_path().c_str());
+      ASSERT_EQ(root, std::filesystem::current_path().c_str());
     }
-    ASSERT_EQ(start, boost::filesystem::current_path().c_str());
+    ASSERT_EQ(start, std::filesystem::current_path().c_str());
   }
 
 

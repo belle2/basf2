@@ -71,8 +71,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            INFINITY);
   addParam("UseOnlyBeforeTOP",
            m_useOnlyBeforeTOP,
-           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector "
-           "(only implemented for CDCHits).",
+           "Mark hits as auxiliary after the track left the CDC and touched the TOP detector.",
            false);
   addParam("UseReassignedHits",
            m_useReassignedHits,
@@ -121,6 +120,14 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "\"is:X\" where X is a PDG code: particle must have this code. "
            "\"from:X\" any of the particles's ancestors must have this (X) code",
            std::vector<std::string>(1, "primary"));
+  addParam("onlyCheckDirectParentPdgCode",
+           m_onlyCheckDirectParentPdgCode,
+           "To be used together with WhichParticles to select the ancestor and daughters. "
+           "If true, only check the direct parent to be contained in the list of possible ancestors. "
+           "If false, check all ancestors in in the list of possible ancestors. "
+           "This could be used to e.g. only create MCRecoTracks for slow pions from D* decays instead of creating an MCRecoTrack "
+           "for every pion as long as the D* is one of its ancestors.",
+           m_onlyCheckDirectParentPdgCode);
 
   addParam("EnergyCut",
            m_energyCut,
@@ -134,7 +141,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 
   addParam("MergeDecayInFlight",
            m_mergeDecayInFlight,
-           "Merge decay in flights that produce a single charged particle to the mother particle",
+           "Merge decay in flights that produce a single charged particle to the parent particle",
            bool(false));
 
   addParam("SetTimeSeed",
@@ -456,21 +463,31 @@ void TrackFinderMCTruthRecoTracksModule::event()
     //check if particle has an ancestor selected by the user. If user did not set any pdg code every code is fine for track candidate creation
     const int nFromPdgCodes = m_fromPdgCodes.size();
     if (nFromPdgCodes not_eq 0) {
-      MCParticle* currentMother = aMcParticlePtr->getMother();
+      MCParticle* currentParent = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
-      while (currentMother not_eq nullptr) {
-        int currentMotherPdgCode = currentMother->getPDG();
+      bool foundParent = false;
+      while (currentParent not_eq nullptr) {
+        int currentParentPdgCode = currentParent->getPDG();
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
-          if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
+          if (m_fromPdgCodes[i] not_eq currentParentPdgCode) {
             ++nFalsePdgCodes;
+          } else {
+            foundParent = true;
+            // if (m_onlyCheckDirectParentPdgCode) {
+            //   break;
+            // }
           }
         }
 
-        currentMother = currentMother->getMother();
-        ++nAncestor;
+        if (m_onlyCheckDirectParentPdgCode) {
+          currentParent = nullptr;
+        } else {
+          currentParent = currentParent->getMother();
+          ++nAncestor;
+        }
       }
-      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes)) {
+      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes) or not(m_onlyCheckDirectParentPdgCode and foundParent)) {
         B2DEBUG(20, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
         continue; //goto next mcParticle, do not make track candidate
       }
@@ -544,6 +561,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<PXDCluster, PXDTrueHit>(relatedClusters.object(i))) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
@@ -609,6 +631,11 @@ void TrackFinderMCTruthRecoTracksModule::event()
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
+          // check if the particle left hits in TOP and add mark hits after that as auxiliary.
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<SVDCluster, SVDTrueHit>(relatedClusters.object(i))) {
+            mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
+          }
+
           // if flag is set discard all auxiliary hits:
           if (m_discardAuxiliaryHits and mcFinder == RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit) continue;
 
@@ -652,27 +679,6 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     } // end if m_useSVDHits
 
-
-    auto didParticleExitCDC = [](const CDCHit * hit) {
-      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
-      if (not simHit) return false;
-
-      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
-      if (not mcParticle) return false;
-      if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
-
-      RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
-      if (topHits.size() == 0) return false;
-
-      // Get hit with the smallest time.
-      auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
-        return lhs.getTime() < rhs.getTime();
-      };
-      auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
-
-      return simHit->getGlobalTime() > itFirstTopHit->getTime();
-    };
-
     if (m_useCDCHits) {
       // create a list containing the indices to the CDCHits that belong to one track
       int nAxialHits = 0;
@@ -711,7 +717,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
           }
 
           // check if the particle left hits in TOP and add mark hits after that as auxiliary.
-          if (m_useOnlyBeforeTOP and didParticleExitCDC(cdcHit)) {
+          if (m_useOnlyBeforeTOP and didParticleExitCDC<CDCHit, CDCSimHit>(cdcHit)) {
             mcFinder = RecoHitInformation::OriginTrackFinder::c_MCTrackFinderAuxiliaryHit;
           }
 
@@ -971,6 +977,28 @@ bool TrackFinderMCTruthRecoTracksModule::isWithinNLoops(double Bz, const THit* a
     return true;
   }
 }
+
+template< class THit, class TSimHit>
+bool TrackFinderMCTruthRecoTracksModule::didParticleExitCDC(const THit* ahit)
+{
+  const TSimHit* simHit = ahit->template getRelated<TSimHit>();
+  if (not simHit) return false;
+
+  const MCParticle* mcParticle = simHit->template getRelated<MCParticle>();
+  if (not mcParticle) return false;
+  if (not mcParticle->hasSeenInDetector(Const::TOP)) return false;
+
+  RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
+  if (topHits.size() == 0) return false;
+
+  // Get hit with the smallest time.
+  auto lessTime = [](const TOPBarHit & lhs, const TOPBarHit & rhs) {
+    return lhs.getTime() < rhs.getTime();
+  };
+  auto itFirstTopHit = std::min_element(topHits.begin(), topHits.end(), lessTime);
+
+  return simHit->getGlobalTime() > itFirstTopHit->getTime();
+};
 
 
 

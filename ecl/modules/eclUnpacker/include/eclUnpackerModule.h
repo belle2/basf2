@@ -5,19 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #pragma once
 
-// Framework
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLTrig.h>
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/RelationArray.h>
-
-// ECL
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/dataobjects/ECLTrig.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
 

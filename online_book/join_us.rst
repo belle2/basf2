@@ -37,7 +37,7 @@ If you're interested in getting to know us better,
 * join our `chat.belle2 channel <https://chat.belle2.org/channel/training-documentation>`_
 * `subscribe to our mailing list <https://lists.belle2.org/sympa/info/software-doc>`_ ``software-doc@belle2.org``
 * visit our `confluence page <https://confluence.desy.de/x/IzpnAw>`_ which also
-  shows our next meetings and has a display of open issues on JIRA
+  shows our next meetings and has a display of open issues on GitLab
 
 Some possible ideas for contributions:
 

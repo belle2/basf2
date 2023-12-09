@@ -142,7 +142,7 @@ TH1*  PerformanceEvaluationBaseClass::duplicateHistogram(const char* newname, co
   TH2F* h2 =  dynamic_cast<TH2F*>(h);
   TH3F* h3 =  dynamic_cast<TH3F*>(h);
 
-  TH1* newh = 0;
+  TH1* newh = nullptr;
 
   if (h1)
     newh = new TH1F(*h1);
@@ -150,6 +150,12 @@ TH1*  PerformanceEvaluationBaseClass::duplicateHistogram(const char* newname, co
     newh = new TH2F(*h2);
   if (h3)
     newh = new TH3F(*h3);
+
+  if (newh == nullptr) {
+    B2ERROR("In function duplicateHistogram: newh is a nullptr. This shouldn't happen."\
+            "Don't continue creation of duplicate histogram in this case and return nullptr.");
+    return nullptr;
+  }
 
   newh->SetName(newname);
   newh->SetTitle(newtitle);
@@ -326,6 +332,11 @@ void  PerformanceEvaluationBaseClass::addPurityPlots(TList* histoList, TH3F* h3_
 TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, const char* name, const char* title,
                                                 bool geo_accettance, TList* histoList)
 {
+  if (h1_den == nullptr or h1_num == nullptr) {
+    B2ERROR("One of the input histograms for function effPlot1D is a nullptr, "\
+            "can't create new histograms from this. Returning a nullptr.");
+    return nullptr;
+  }
 
   std::string total;
   std::string trueTitle;
@@ -367,7 +378,11 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_den, TH1F* h1_num, cons
 TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack, TH1F* h1_Track, const char* name,
                                                 const char* title, TList* histoList)
 {
-  if (h1_Track == nullptr) B2INFO("h_Track missing");
+  if (h1_MC == nullptr or h1_RecoTrack == nullptr or h1_Track == nullptr) {
+    B2ERROR("One of the input histograms for function effPlot1D is a nullptr, "\
+            "can't create new histograms from this. Returning a nullptr.");
+    return nullptr;
+  }
 
   std::string name1 = "_noGeoAcc";
   std::string name2 = "_withGeoAcc";
@@ -425,6 +440,12 @@ TH1F* PerformanceEvaluationBaseClass::effPlot1D(TH1F* h1_MC, TH1F* h1_RecoTrack,
 TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
                                                 const char* name, const char* title, bool geo_accettance, TList* histoList)
 {
+  if (h2_den == nullptr or h2_num == nullptr) {
+    B2ERROR("One of the input histograms for function effPlot1D is a nullptr, "\
+            "can't create new histograms from this. Returning a nullptr.");
+    return nullptr;
+  }
+
   std::string err_char = "_error_";
   std::string addTitle = "Errors, ";
 
@@ -481,7 +502,11 @@ TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_den, TH2F* h2_num,
 TH2F* PerformanceEvaluationBaseClass::effPlot2D(TH2F* h2_MC, TH2F* h2_RecoTrack, TH2F* h2_Track, const char* name,
                                                 const char* title, TList* histoList)
 {
-  if (h2_Track == nullptr) B2INFO("h_Track missing");
+  if (h2_MC == nullptr or h2_RecoTrack == nullptr or h2_Track == nullptr) {
+    B2ERROR("One of the input histograms for function effPlot1D is a nullptr, "\
+            "can't create new histograms from this. Returning a nullptr.");
+    return nullptr;
+  }
 
   std::string name1 = "_noGeoAcc";
   std::string name2 = "_withGeoAcc";

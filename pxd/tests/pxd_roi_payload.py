@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -73,7 +72,7 @@ class PxdROIPayloadTestModule(b2.Module):
         # if not len(orgrois) == len(unpackedrois):
         #     B2FATAL("Org. ROIs and Unpacked ROIs count not equal after packing and unpacking")
 
-        print("Comparing %i ROIs " % len(orgrois))
+        print(f"Comparing {len(orgrois)} ROIs ")
 
         def f(x):
             return (
@@ -101,12 +100,8 @@ class PxdROIPayloadTestModule(b2.Module):
             if i != 0 and f(org) == f(orgrois[i - 1]):
                 b2.B2WARNING("Found the same ROI a second time (Double ROI)!")
                 b2.B2WARNING(
-                    "Check $%X %3d %3d %3d %3d" %
-                    (org.getSensorID().getID(),
-                     org.getMinUid(),
-                        org.getMaxUid(),
-                        org.getMinVid(),
-                        org.getMaxVid()))
+                    f"Check ${org.getSensorID().getID():X} {int(org.getMinUid()):3d} {int(org.getMaxUid()):3d} " +
+                    f"{int(org.getMinVid()):3d} {int(org.getMaxVid()):3d}")
             if i == 0 or f(org) != f(orgrois[i - 1]):
                 if j == len(unpackedrois):
                     b2.B2FATAL("Unpacked ROIs comparison exceeds array limit!")
@@ -115,17 +110,9 @@ class PxdROIPayloadTestModule(b2.Module):
                 unp = unpackedrois[j]
 
                 b2.B2INFO(
-                    "Check Org $%X %3d %3d %3d %3d Unp $%X %3d %3d %3d %3d" %
-                    (org.getSensorID().getID(),
-                     org.getMinUid(),
-                        org.getMaxUid(),
-                        org.getMinVid(),
-                        org.getMaxVid(),
-                        unp.getSensorID().getID(),
-                        unp.getMinUid(),
-                        unp.getMaxUid(),
-                        unp.getMinVid(),
-                        unp.getMaxVid()))
+                    f"Check Org ${org.getSensorID().getID():X} {org.getMinUid():3d} {org.getMaxUid():3d} " +
+                    f"{org.getMinVid():3d} {org.getMaxVid():3d} Unp ${unp.getSensorID().getID():X} {unp.getMinUid():3d} " +
+                    f"{unp.getMaxUid():3d} {unp.getMinVid():3d} {unp.getMaxVid():3d}")
                 # compare all available quantities
                 if unp.getMinUid() == 0 and unp.getMinVid() == 0 and unp.getMaxUid() == 250 - 1 and unp.getMaxVid() == 768 - 1:
                     b2.B2INFO("Full size ROI")

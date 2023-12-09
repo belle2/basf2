@@ -218,8 +218,8 @@ void TRGRAWDATAModule::initialize()
     const int n_leafsExtra = m_unpacker->getnLeafsExtra();
     //const int conf         = m_unpacker->getconf(); //not used for now
 
-    int aBitMap[320][2] = {0};
-    int aBitMap_extra[100][3] = { -1};
+    int aBitMap[320][2] = {{0}};
+    int aBitMap_extra[100][3] = {{ -1}};
     for (int i = 0; i < n_leafsExtra; i++) {
       aBitMap_extra[i][0] = m_unpacker->getBitMap_extra(i, 0);
       aBitMap_extra[i][1] = m_unpacker->getBitMap_extra(i, 1);

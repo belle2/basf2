@@ -82,7 +82,6 @@ svddedx_params = {  # 'pdfFile': 'YourPDFFile.root',
     'usePXD': use_pxd,
     'useSVD': True,
     'trackDistanceThreshold': 4.0,
-    'enableDebugOutput': True,
     'ignoreMissingParticles': False,
 }
 svddedx.param(svddedx_params)

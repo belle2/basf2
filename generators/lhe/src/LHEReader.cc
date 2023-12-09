@@ -58,6 +58,14 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       p.comesFrom(*q);
     }
 
+    // if positron goes to positive z-direction, we have to rotate along y-axis by 180deg
+    if (m_wrongSignPz) {
+      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
+      p4.SetPz(-1.0 * p4.Pz());
+      p4.SetPx(-1.0 * p4.Px());
+      p.set4Vector(p4);
+    }
+
     //move vertex position of selected particle and its daughters
     if (m_meanDecayLength > 0) {
       if (p.getPDG() == m_pdgDisplaced) {
@@ -84,11 +92,6 @@ int LHEReader::getEvent(MCParticleGraph& graph, double& eventWeight)
       }
     }
 
-    if (m_wrongSignPz) { // this means we have to mirror Pz
-      ROOT::Math::PxPyPzEVector p4 = p.get4Vector();
-      p4.SetPz(-1.0 * p4.Pz());
-      p.set4Vector(p4);
-    }
 
     // initial 2 (e+/e-), virtual 3 (Z/gamma*)
     // check if particle should be made virtual according to steering options:

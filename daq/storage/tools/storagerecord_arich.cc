@@ -34,8 +34,6 @@
 
 using namespace Belle2;
 
-const unsigned long long GB = 1000 * 1024 * 1024;
-const unsigned long long MAX_FILE_SIZE = 2 * GB;
 const char* g_table = "datafiles";
 unsigned int g_streamersize = 0;
 char* g_streamerinfo = new char[1000000];
@@ -54,6 +52,11 @@ public:
     m_filesize = 0;
     m_fileid = 0;
     m_diskid = 1;
+    m_id    = -1;
+    m_expno = -1;
+    m_runno = -1;
+    m_nevents = 0;
+    m_chksum  = 0;
   }
   ~FileHandler() throw()
   {
@@ -221,7 +224,7 @@ int main(int argc, char** argv)
   const char* path = argv[5];
   const int ndisks = atoi(argv[6]);
   const char* file_dbtmp = argv[7];
-  const char* obufname = (argc > 7) ? argv[8] : "";
+  const char* obufname = argv[8];
   const int obufsize = (argc > 8) ? atoi(argv[9]) : -1;
   const char* nodename = (argc > 9) ? argv[10] : "";
   const int nodeid = (argc > 10) ? atoi(argv[11]) : -1;
@@ -248,7 +251,7 @@ int main(int argc, char** argv)
   if (obufsize > 0) obuf.open(obufname, obufsize * 1000000);//, true);
   if (use_info) info.reportReady();
   B2DEBUG(1, "started recording.");
-  unsigned long long nbyte_out = 0;
+  unsigned long long nbyte_out [[maybe_unused]] = 0;
   unsigned int count_out = 0;
   unsigned int expno = 0;
   unsigned int runno = 0;
@@ -260,7 +263,7 @@ int main(int argc, char** argv)
   bool newrun = false;
   unsigned int fileid = 0;
   struct dataheader {
-    int nword;
+    // int nword; // unused
     int type;
     unsigned int expno;
     unsigned int runno;
@@ -331,14 +334,6 @@ int main(int argc, char** argv)
         continue;
       }
       if (file) {
-        /*
-              if (nbyte_out > MAX_FILE_SIZE) {
-                file.close();
-                nbyte_out = 0;
-                file.open(path, ndisks, expno, runno, fileid);
-                fileid++;
-              }
-        */
         file.write((char*)evtbuf, nbyte);
         nbyte_out += nbyte;
         if (!isnew && obufsize > 0 && count_out % interval == 0 && obuf.isWritable(nword)) {

@@ -10,12 +10,13 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/datcon/utilities/DATCONHelpers.h>
 
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <fstream>
+#include <iostream>
 #include <string>
 #include <vector>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-#include <cmath>
 
 namespace Belle2 {
   class ModuleParamList;

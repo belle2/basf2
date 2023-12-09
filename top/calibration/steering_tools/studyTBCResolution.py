@@ -13,7 +13,7 @@
 # Module to study the features of the double pulse used for the TOP calibration.
 # To be used to determine the TBC quality and precision
 #
-# usage: basf2 studyTBCResolution.py dbaddress (path|none) type (local|pocket) output_name.root path_to_sroot run1 run2 ... runN
+# usage: basf2 studyTBCResolution.py dbaddress (path|none) type (local|pocket) output_name.root path_to_files run1 run2 ... runN
 #        The run number accepts wildcards
 # ------------------------------------------------------------------------
 
@@ -316,20 +316,24 @@ print('usage: basf2', argvs[0], 'runNumber outfileName')
 dbaddress = argvs[1]        # path to the calibration DB  (absolute path  or 'none')
 datatype = argvs[2]         # data type  ('pocket' or 'local')
 outfile = argvs[3]          # output name
-folder = argvs[4]           # folder containing the sroot files
+folder = argvs[4]           # folder containing input files
 runnumbers = sys.argv[5:]   # run numbers
 
 files = []
 for runnumber in runnumbers:
     files += [f for f in glob.glob(str(folder) + '/*' + str(runnumber) + '*.sroot')]
+sroot = True
+if len(files) == 0:
+    sroot = False
+    for runnumber in runnumbers:
+        files += [f for f in glob.glob(str(folder) + '/*' + str(runnumber) + '*.root')]
 
 for fname in files:
     print("file: " + fname)
 
 if dbaddress != 'none':
     print("using local DB " + dbaddress)
-    b2.reset_database()
-    b2.use_local_database(dbaddress + "/localDB.txt", dbaddress)
+    b2.conditions.append_testing_payloads(dbaddress + "/localDB.txt")
 else:
     print("database not set. Continuing without calibrations")
 
@@ -337,13 +341,17 @@ else:
 b2.set_log_level(b2.LogLevel.ERROR)
 
 # Define a global tag (note: the one given bellow can be out-dated!)
-b2.use_central_database('data_reprocessing_proc8')
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
+if sroot:
+    roinput = b2.register_module('SeqRootInput')  # sroot files
+else:
+    roinput = b2.register_module('RootInput')  # root files
 roinput.param('inputFileNames', files)
 main.add_module(roinput)
 

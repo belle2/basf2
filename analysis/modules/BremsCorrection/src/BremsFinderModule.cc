@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/BremsCorrection/BremsFinderModule.h>
 
 // framework aux
@@ -89,8 +89,8 @@ BremsFinderModule::BremsFinderModule() :
   See also:
     `eclTrackBremFinder module`_
                  
-  .. _eclTrackBremFinder module: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder
-  .. _here: https://stash.desy.de/projects/B2/repos/basf2/browse/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
+  .. _eclTrackBremFinder module: https://gitlab.desy.de/belle2/software/basf2/-/tree/main/ecl/modules/eclTrackBremFinder
+  .. _here: https://gitlab.desy.de/belle2/software/basf2/-/tree/main/ecl/modules/eclTrackBremFinder/src/BremFindingMatchCompute.cc)DOC");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
@@ -237,7 +237,7 @@ void BremsFinderModule::event()
         Particle* gamma = m_gammaList->getParticle(k);
         auto cluster = gamma->getECLCluster();
 
-        if (bremCluster->getClusterId() == cluster->getClusterId()) {
+        if (bremCluster->getUniqueClusterId() == cluster->getUniqueClusterId()) {
           if (m_usePhotonOnlyOnce) { //If only one track per photon should be used...
             if (track->getArrayIndex() == static_cast<int>
                 (gamma->getExtraInfo("bestMatchIndex")))      //... check if this track is the best match ...

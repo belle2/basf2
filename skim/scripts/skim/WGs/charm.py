@@ -1028,7 +1028,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         ma.reconstructDecay("pi0:mypion -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
         d0cuts = "1.65 < M < 2.05 and useCMSFrame(p) > 2.0"
 
-        # D0 Hadronic Decay channels for tag reconstruction
+        # tag charm hadrons reconstruction (D0/D+/Lambda_c+/D_s+/D*0/D*+/D_s*+)
 
         D0_channels = [
             "K-:hadtag pi+:hadtag",
@@ -1052,8 +1052,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
             ma.reconstructDecay("D0:skimDm" + str(chID) + " -> " + channel, d0cuts, chID, path=path)
             D0List.append("D0:skimDm" + str(chID))
 
-        # D+ Hadronic Decay channels for tag reconstruction
-
         Dp_channels = [
             "K-:hadtag pi+:hadtag pi+:hadtag",
             "K-:hadtag pi+:hadtag pi+:hadtag pi0:mypion",
@@ -1074,8 +1072,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
             DpList.append("D+:skimDm" + str(chID))
 
         ma.reconstructDecay("Sigma+:hadtag -> p+:hadtag pi0:mypion", "1.08 < M < 1.3", path=path)
-
-        # Lambda_c+ Hadronic Decay channels for tag reconstruction
 
         LC_channels = [
                 "p+:hadtag K-:hadtag pi+:hadtag",
@@ -1103,8 +1099,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         for chID, channel in enumerate(LC_channels):
             ma.reconstructDecay("Lambda_c+:skimDm" + str(chID) + " -> " + channel, LCcuts, chID, path=path)
             LambdacList.append("Lambda_c+:skimDm" + str(chID))
-
-        # D_s+ Hadronic Decay channels for tag reconstruction
 
         Ds_channels = [
                 "K+:hadtag K-:hadtag pi+:hadtag",

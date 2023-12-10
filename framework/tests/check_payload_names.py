@@ -20,8 +20,8 @@ class CheckPayloadNames(b2.Module):
     '''
 
     def __init__(self):
-        '''Consructor.'''
-        super(CheckPayloadNames, self).__init__()
+        '''Constructor.'''
+        super().__init__()
         #: Payload names to be required
         self.payload_names = [
             'BeamParameters',

@@ -998,17 +998,24 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
+    def additional_setup(self, path):
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
+
     def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
         stdKshorts(path=path)
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        ma.fillParticleList("pi+:hadtag", "pionID > 0.1 and abs(dr) < 2.0 and abs(dz) < 3.0", path=path)
-        ma.fillParticleList("K+:hadtag", "kaonID > 0.1 and abs(dr) < 2.0 and abs(dz) < 3.0", path=path)
-        ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 2.0 and abs(dz) < 3.0", path=path)
+        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
+        ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
         ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
         ma.reconstructDecay("pi0:mypion -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
-        d0cuts = "1.65 < M < 2.05 and useCMSFrame(p) > 2.0"
+        d0cuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
 
         # tag charm hadrons reconstruction (D0/D+/Lambda_c+/D_s+/D*0/D*+/D_s*+)
 
@@ -1047,7 +1054,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
             "K_S0:merged pi+:hadtag pi+:hadtag pi-:hadtag",
             "K+:hadtag K_S0:merged K_S0:merged"]
 
-        dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
+        dpcuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
         DpList = []
         for chID, channel in enumerate(Dp_channels):
             ma.reconstructDecay("D+:skimDm" + str(chID) + " -> " + channel, dpcuts, chID, path=path)
@@ -1094,7 +1101,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
                 "K_S0:merged pi+:hadtag pi0:mypion",
                 "K+:hadtag K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag"]
 
-        DScuts = "1.77 < M < 2.17 and useCMSFrame(p) > 2.0"
+        DScuts = "1.82 < M < 2.12 and useCMSFrame(p) > 2.0"
 
         DsList = []
         for chID, channel in enumerate(Ds_channels):
@@ -1122,7 +1129,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         DstP_Xfrag = [
             "", "pi0:mypion", "pi+:hadtag pi-:hadtag", "pi+:hadtag pi-:hadtag pi0:mypion"]
 
-        sigCuts = "1.75 < mRecoil < 2.27"
+        sigCuts = "1.81 < mRecoil < 2.21"
 
         sigDst_fromDstP = []
         for chID, channel in enumerate(DstP_Xfrag):
@@ -1211,7 +1218,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
         ma.copyLists("D*+:skimSig", sigDstList, path=path)
 
-        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.110 < DelM < 0.220", path=path)
+        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.115 < DelM < 0.220", path=path)
 
         sigDzList = ["D0:skimSig"]
         return sigDzList

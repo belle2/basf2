@@ -771,3 +771,64 @@ class AA2uuuu(BaseSkim):
         ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
 
         return ["Upsilon(4S):rec"]
+
+
+@fancy_skim_header
+class DimuonPlusVisibleDarkHiggs(BaseSkim):
+    """
+    **Physics channel**: e+e- -> A'h', A'-> mu+mu-, hp -> tr+tr-
+
+    Skim list contains candidates for the visible dark Higgs produced in association with a a prompt muon-pair.
+    """
+    __authors__ = ["Luigi Corona"]
+    __contact__ = __liaison__
+    __description__ = "Skim for the visible dark higgs analysis"
+    __category__ = "physics, dark sector"
+
+    ApplyHLTHadronCut = False
+
+    def addParticlesToPDG(self):
+        """Adds the particle codes to the basf2 pdg instance """
+        pdg.add_particle('Ap', 53, 999., 999., 0, 2)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdMu("all", path=path)
+
+    def additional_setup(self, path):
+        self.addParticlesToPDG()
+
+    def build_lists(self, path):
+        skim_str = 'skimDimuonPlusVisibleDarkHiggs'
+        darkPhoton_str = 'darkPhoton'
+
+        track_selection = '[abs(dr) < 0.5] and [abs(dz) < 2]'
+        muon_pid_selection = '[muonID > 0.2]'
+
+        ma.cutAndCopyList(
+            f"mu+:{darkPhoton_str}",
+            "mu+:all",
+            f"[{track_selection} and {muon_pid_selection}]",
+            path=path)
+
+        ma.reconstructDecay(
+             decayString=f'Ap:{skim_str} -> mu+:{darkPhoton_str} mu-:{darkPhoton_str}',
+             cut='',
+             path=path)
+
+        ma.reconstructRecoil(f'Ap:recoil -> Ap:{skim_str}',
+                             cut='',
+                             path=path)
+
+        ma.reconstructDecay(
+             decayString=f'A0:{skim_str} -> pi+:all pi-:all',
+             cut='',
+             path=path)
+
+        mrecoil_cut = "[daughter(0, mRecoil) < 8.5]"
+        ma.reconstructDecay(
+             decayString=f'vpho:{skim_str} -> Ap:{skim_str} A0:{skim_str}',
+             cut=f'{mrecoil_cut}',
+             path=path)
+
+        return [f'vpho:{skim_str}']

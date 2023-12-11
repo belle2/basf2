@@ -789,7 +789,7 @@ class DimuonPlusVisibleDarkHiggs(BaseSkim):
 
     def addParticlesToPDG(self):
         """Adds the particle codes to the basf2 pdg instance """
-        pdg.add_particle('Ap', 53, 999., 999., 0, 2)
+        pdg.add_particle('Ap', 1802060053, 999., 999., 0, 2)
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -850,7 +850,7 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
 
     def addParticlesToPDG(self):
         """Adds the particle codes to the basf2 pdg instance """
-        pdg.add_particle('Ap', 53, 999., 999., 0, 2)
+        pdg.add_particle('ap', 1802070053, 999., 999., 0, 2)
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -873,11 +873,11 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
             path=path)
 
         ma.reconstructDecay(
-             decayString=f'Ap:{skim_str} -> e+:{darkPhoton_str} e-:{darkPhoton_str}',
+             decayString=f'ap:{skim_str} -> e+:{darkPhoton_str} e-:{darkPhoton_str}',
              cut='',
              path=path)
 
-        ma.reconstructRecoil(f'Ap:recoil -> Ap:{skim_str}',
+        ma.reconstructRecoil(f'ap:recoil -> ap:{skim_str}',
                              cut='',
                              path=path)
 
@@ -888,7 +888,7 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
 
         mrecoil_cut = "[daughter(0, mRecoil) < 8.5]"
         ma.reconstructDecay(
-             decayString=f'vpho:{skim_str} -> Ap:{skim_str} A0:{skim_str}',
+             decayString=f'vpho:{skim_str} -> ap:{skim_str} A0:{skim_str}',
              cut=f'{mrecoil_cut}',
              path=path)
 

@@ -461,11 +461,11 @@ class DpToHpPi0(BaseSkim):
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         # loadStdSkimPi0(path=path)
-        stdPi0s(listtype='eff40_May2020Fit', path=path)
+        stdPi0s(listtype='eff50_May2020Fit', path=path)
 
     def build_lists(self, path):
-        ma.cutAndCopyList('pi+:hppi0', 'pi+:charmSkim', 'pt > 0.1 and pionIDNN > 0.2 and useCMSFrame(p) > 0.5', path=path)
-        ma.cutAndCopyList('pi0:hppi0', 'pi0:eff40_May2020Fit', 'useCMSFrame(p) > 0.5', path=path)
+        ma.cutAndCopyList('pi+:hppi0', 'pi+:charmSkim', 'pt > 0.1 and pionIDNN > 0.1 and useCMSFrame(p) > 0.5', path=path)
+        ma.cutAndCopyList('pi0:hppi0', 'pi0:eff50_May2020Fit', 'useCMSFrame(p) > 0.5', path=path)
 
         Dpcuts = "1.57 < M < 2.17 and useCMSFrame(p) > 2.0"
 

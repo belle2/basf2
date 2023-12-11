@@ -19,7 +19,7 @@ from stdCharged import stdE, stdMu, stdPi, stdK
 from stdPhotons import stdPhotons
 import vertex as vertex
 
-__liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
+__liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

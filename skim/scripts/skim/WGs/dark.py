@@ -832,3 +832,64 @@ class DimuonPlusVisibleDarkHiggs(BaseSkim):
              path=path)
 
         return [f'vpho:{skim_str}']
+
+
+@fancy_skim_header
+class DielectronPlusVisibleDarkHiggs(BaseSkim):
+    """
+    **Physics channel**: e+e- -> A'h', A'-> e+e-, hp -> tr+tr-
+
+    Skim list contains candidates for the visible dark Higgs produced in association with a prompt electron-pair.
+    """
+    __authors__ = ["Luigi Corona"]
+    __contact__ = __liaison__
+    __description__ = "Skim for the visible dark higgs analysis"
+    __category__ = "physics, dark sector"
+
+    ApplyHLTHadronCut = False
+
+    def addParticlesToPDG(self):
+        """Adds the particle codes to the basf2 pdg instance """
+        pdg.add_particle('Ap', 53, 999., 999., 0, 2)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdE("all", path=path)
+
+    def additional_setup(self, path):
+        self.addParticlesToPDG()
+
+    def build_lists(self, path):
+        skim_str = 'skimDielectronPlusVisibleDarkHiggs'
+        darkPhoton_str = 'darkPhoton'
+
+        track_selection = '[abs(dr) < 0.5] and [abs(dz) < 2]'
+        electron_pid_selection = '[electronID > 0.2]'
+
+        ma.cutAndCopyList(
+            f"e+:{darkPhoton_str}",
+            "e+:all",
+            f"[{track_selection} and {electron_pid_selection}]",
+            path=path)
+
+        ma.reconstructDecay(
+             decayString=f'Ap:{skim_str} -> e+:{darkPhoton_str} e-:{darkPhoton_str}',
+             cut='',
+             path=path)
+
+        ma.reconstructRecoil(f'Ap:recoil -> Ap:{skim_str}',
+                             cut='',
+                             path=path)
+
+        ma.reconstructDecay(
+             decayString=f'A0:{skim_str} -> pi+:all pi-:all',
+             cut='',
+             path=path)
+
+        mrecoil_cut = "[daughter(0, mRecoil) < 8.5]"
+        ma.reconstructDecay(
+             decayString=f'vpho:{skim_str} -> Ap:{skim_str} A0:{skim_str}',
+             cut=f'{mrecoil_cut}',
+             path=path)
+
+        return [f'vpho:{skim_str}']

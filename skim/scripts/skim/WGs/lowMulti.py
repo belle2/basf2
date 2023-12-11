@@ -279,3 +279,111 @@ class SingleTagPseudoScalar(BaseSkim):
         path = self.skim_event_cuts(EventCuts, path=path)
 
         return [f"e+:{label}"]
+
+
+@fancy_skim_header
+class LowMassOneOrTwoTrack(BaseSkim):
+    """
+    **Physics channel**: `e^{+}e^{-} to \\gamma \\pi^{+}\\pi^{-} and, `e^{+}e^{-} to \\gamma \\mu^{+}\\mu^{-} and,`
+
+    """
+    __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
+    __description__ = "Skim list for low mass events with one or two tracks and one hard photon in final state."
+    __contact__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
+    __category__ = "physics, low multiplicity"
+
+    TestSampleProcess = "mumu"
+    ApplyHLTHadronCut = False
+    validation_sample = _VALIDATION_SAMPLE
+
+    def build_lists(self, path):
+        # label = "LowMassOneOrTwoTrack"
+
+        # Momenta of tracks greater than 0.3 GeV in the Lab frame
+        track_cut = "p > 0.3"
+        # Energy of hard ISR gamma greater than 2 GeV in the CMS frame
+        isr_cut = "useCMSFrame(E) > 2"
+        # Invariant mass of two tracks system less than 4.0 GeV
+        M_2tracks_limit = 4.0
+
+        # Event based cut
+        # Number of tracks passing the selection criteria, should be less than or equal to 2
+
+        nTracksCut = f"nCleanedTracks({track_cut}) == 2"
+
+        singleTrack_cut = f"nCleanedTracks({track_cut}) == 1"
+
+        # Require at least one hard photon
+        nHardISRPhotonCut = f"nCleanedECLClusters({isr_cut}) > 0"
+
+        # Apply event based cuts
+        path = self.skim_event_cuts(f"[{nTracksCut} or {singleTrack_cut}] and {nHardISRPhotonCut}", path=path)
+
+        two_track_cut = f"{track_cut} and {nTracksCut}"
+        positive_one_track_cut = f"{track_cut} and {singleTrack_cut} and [charge > 0]"
+        negative_one_track_cut = f"{track_cut} and {singleTrack_cut} and [charge < 0]"
+
+        case = "_LowMassTwoTrack"
+
+        track_list = ['pi', 'mu']
+        suffixes = ["_2CHER", "_1Cp", "_1Cm"]
+        ParticleLists = []
+        for suffix in suffixes:
+            if suffix == "_2CHER":
+                ma.fillParticleList(f"gamma:isr_{case}{suffix}", isr_cut, path=path)
+                ma.rankByHighest(f"gamma:isr_{case}{suffix}",
+                                 "useCMSFrame(E)",
+                                 outputVariable="highestE_rank",
+                                 numBest=1,
+                                 path=path
+                                 )
+                for tracks in track_list:
+                    ma.fillParticleList(f"{tracks}+:{case}{suffix}", two_track_cut, path=path)
+
+                    ma.reconstructDecay(f"Z0:{tracks}{case}{suffix} -> {tracks}+:{case}{suffix} {tracks}-:{case}{suffix}",
+                                        cut=f"daughterInvM(0,1) < {M_2tracks_limit}", path=path)
+
+                    ma.reconstructDecay(
+                        f"vpho:g_{tracks}{case}{suffix} -> gamma:isr_{case}{suffix} Z0:{tracks}{case}{suffix}",
+                        cut="",
+                        path=path)
+
+                    ParticleLists.append(f"vpho:g_{tracks}{case}{suffix}")
+
+            elif suffix == "1Cp":
+                case = "_LowMassOneTrack"
+                ma.fillParticleList(f"gamma:isr_{case}{suffix}", isr_cut, path=path)
+                ma.rankByHighest(f"gamma:isr_{case}{suffix}",
+                                 "useCMSFrame(E)",
+                                 outputVariable="highestE_rank",
+                                 numBest=1,
+                                 path=path
+                                 )
+                for tracks in track_list:
+                    ma.fillParticleList(f"{tracks}+:{case}{suffix}", positive_one_track_cut, path=path)
+                    ma.reconstructDecay(f"vpho:g_{tracks}{case}{suffix} -> gamma:isr_{case}{suffix} {tracks}+:{case}{suffix}",
+                                        cut="",
+                                        allowChargeViolation=True,
+                                        path=path,
+                                        )
+                    ParticleLists.append(f"vpho:g_{tracks}{case}{suffix}")
+
+            elif suffix == "1Cm":
+                case = "_LowMassOneTrack"
+                ma.fillParticleList(f"gamma:isr_{case}{suffix}", isr_cut, path=path)
+                ma.rankByHighest(f"gamma:isr_{case}{suffix}",
+                                 "useCMSFrame(E)",
+                                 outputVariable="highestE_rank",
+                                 numBest=1,
+                                 path=path
+                                 )
+                for tracks in track_list:
+                    ma.fillParticleList(f"{tracks}-:{case}{suffix}", negative_one_track_cut, path=path)
+                    ma.reconstructDecay(f"vpho:g_{tracks}{case}{suffix} -> gamma:isr_{case}{suffix} {tracks}-:{case}{suffix}",
+                                        cut="",
+                                        allowChargeViolation=True,
+                                        path=path,
+                                        )
+                    ParticleLists.append(f"vpho:g_{tracks}{case}{suffix}")
+
+        return ParticleLists

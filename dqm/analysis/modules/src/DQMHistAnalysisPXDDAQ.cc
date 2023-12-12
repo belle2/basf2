@@ -114,7 +114,7 @@ void DQMHistAnalysisPXDDAQModule::event()
   {
     std::string name = "PXDDAQError";
 
-    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
+//    if (m_hDAQError) { delete m_hDAQError; m_hDAQError = nullptr;}
 
     TH1* hh1 = findHist(name);
     if (hh1 == NULL) {
@@ -181,7 +181,7 @@ void DQMHistAnalysisPXDDAQModule::event()
 
   {
     // DHP histogram
-    if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
+    //if (m_hMissingDHP) { delete m_hMissingDHP; m_hMissingDHP = nullptr;}
 
     std::string name = "PXDDAQDHPDataMissing";
 
@@ -210,7 +210,7 @@ void DQMHistAnalysisPXDDAQModule::event()
   auto* statsum = findHist(m_histogramDirectoryName, name, true);
   if (statsum) {
     // Stat histogram
-    if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
+    //if (m_hStatistic) { delete m_hStatistic; m_hStatistic = nullptr;}
     m_cStatistic->cd();
     m_hStatistic = (TH1D*)statsum->DrawClone("text");
     if (m_hStatistic->GetBinContent(0)) {

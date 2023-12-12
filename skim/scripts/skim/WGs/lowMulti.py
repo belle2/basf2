@@ -284,8 +284,7 @@ class SingleTagPseudoScalar(BaseSkim):
 @fancy_skim_header
 class LowMassOneTrack(BaseSkim):
     """
-    **Physics channel**: `e^{+}e^{-} to \\gamma \\pi^{+}\\pi^{-} and, `e^{+}e^{-} to \\gamma \\mu^{+}\\mu^{-} and,`
-
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma \\pi^{+}\\pi^{-}` and :math:`e^{+}e^{-} \\to \\gamma \\mu^{+}\\mu^{-}`
     """
     __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
     __description__ = "Skim list for low mass events with one track and one hard photon in final state."

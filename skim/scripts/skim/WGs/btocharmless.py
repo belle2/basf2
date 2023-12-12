@@ -24,7 +24,12 @@ from skim.standardlists.charmless import (
     loadStdVeryLooseKstarPlus,
     loadStdVeryLooseKstarPlusPi0,
     loadStdVeryLooseRhoPlus)
-
+from skim.standardlists.lightmesons import (
+    loadStdSkimHighEffTracks,
+    loadStdSkimHighEffEtaPrime,
+    loadStdSkimHighEffEta)
+from stdPi0s import stdPi0s
+from stdPhotons import stdPhotons
 
 __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -299,4 +304,43 @@ class BtoRhopRhom(BaseSkim):
         ma.reconstructDecay('B0:Charmless_b2rr -> rho+:veryLoose rho-:veryLoose', Bcuts, path=path)
         BsigList.append('B0:Charmless_b2rr')
         path = self.skim_event_cuts("nTracks >= 2", path=path)
+        return BsigList
+
+
+class BtoEtapKstp(BaseSkim):
+    """
+    Reconstructed decay mode:
+
+    * :math:`B^{+}\\to \\eta^{'} K^{*+}`
+
+    Cuts applied:
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+
+    """
+
+    __authors__ = ["Chia-Ling Hsu"]
+    __description__ = "Skim list for B+ to eta' K*+."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        stdPhotons('all', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdVeryLooseTracks('pi', path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdSkimHighEffTracks('pi', path=path)
+        loadStdSkimHighEffEta(path=path)
+        loadStdSkimHighEffEtaPrime(path=path)
+        loadStdVeryLooseKstarPlus(path=path)
+
+    def build_lists(self, path):
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay("B+:Charmless_b2etapkst -> eta':SkimHighEff K*+:veryLoose", Bcuts, path=path)
+        BsigList.append('B+:Charmless_b2etapkst')
         return BsigList

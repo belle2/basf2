@@ -118,7 +118,7 @@ def available_revisions(work_folder: str) -> List[str]:
 def get_latest_nightly(work_folder: str) -> str:
     """
     Loops over the results folder and looks for nightly builds. It then returns
-    a list, with the most recent nightly sorted by date in the name. If no
+    the most recent nightly tag sorted by date in the name. If no
     nightly results are available then it returns the default 'current' tag.
     :return: the most recent nightly build or current
     """

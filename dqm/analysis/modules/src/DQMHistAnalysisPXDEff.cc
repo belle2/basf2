@@ -408,8 +408,6 @@ void DQMHistAnalysisPXDEffModule::event()
       }
       if (scale_min == 1.0) scale_min = 0.0;
       if (scale_min > 0.9) scale_min = 0.9;
-      gr->SetMinimum(0);
-      gr->SetMaximum(m_PXDModules.size());
       auto ay = gr->GetYaxis();
       if (ay) ay->SetRangeUser(scale_min, 1.0);
       auto ax = gr->GetXaxis();

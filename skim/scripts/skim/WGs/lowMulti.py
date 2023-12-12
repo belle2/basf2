@@ -288,7 +288,7 @@ class LowMassOneTrack(BaseSkim):
 
     """
     __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
-    __description__ = "Skim list for low mass events with one or two tracks and one hard photon in final state."
+    __description__ = "Skim list for low mass events with one track and one hard photon in final state."
     __contact__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
     __category__ = "physics, low multiplicity"
 
@@ -299,7 +299,7 @@ class LowMassOneTrack(BaseSkim):
         label = "LowMassOneTrack"
 
         # Momenta of tracks greater than 0.3 GeV in the Lab frame
-        track_cut = "[p > 1] and [abs(dz) < 5.0] and [abs(dr) < 2.0] and inCDCAcceptance"
+        track_cut = "[p > 0.5] and [abs(dz) < 5.0] and [abs(dr) < 2.0] and inCDCAcceptance"
         # Energy of hard ISR gamma greater than 2 GeV in the CMS frame
         isr_cut = "useCMSFrame(E) > 2"
 

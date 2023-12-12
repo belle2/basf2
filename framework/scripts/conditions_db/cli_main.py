@@ -56,7 +56,7 @@ manually obtained via https://token.belle2.org/extended and stored into
 # Creation of command line parser is done semi-automatically: it looks for
 # functions which are called command_* and will take the * as sub command name
 # and the docstring as documentation: the first line as brief explanation and
-# the remainder as dull documentation. command_foo_bar will create subcommand
+# the remainder as full documentation. command_foo_bar will create subcommand
 # bar inside command foo. The function will be called first with an instance of
 # argument parser where the command line options required for that command
 # should be added. If the command is run it will be called with the parsed
@@ -82,6 +82,7 @@ from dateutil.parser import parse as parse_date
 from getpass import getuser
 from conditions_db import ConditionsDB, enable_debugging, encode_name, PayloadInformation, set_cdb_authentication_token
 from conditions_db.cli_utils import ItemFilter
+from conditions_db.iov import IntervalOfValidity
 # the command_* functions are imported but not used so disable warning about
 # this if pylama/pylint is used to check
 from conditions_db.cli_upload import command_upload  # noqa
@@ -639,6 +640,8 @@ def command_iov(args, db):
        modified output structure and added ``--human-readable``
     .. versionchanged:: after release-04-00-00
        added parameter ``--checksums`` and ``--show-ids``
+    .. versionchanged:: after release-08-00-04
+       added parameter ``--run-range``
     """
 
     iovfilter = ItemFilter(args)
@@ -657,6 +660,10 @@ def command_iov(args, db):
                           help="If given don't show the revision number but the md5 checksum")
         args.add_argument("--show-ids", default=False, action="store_true",
                           help="If given also show the payload and iov ids for each iov")
+        args.add_argument("--run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be shown"
+                          "Only iovs overlapping, even partially, with this range will be shown.")
         iovfilter.add_arguments("payloads")
         return
 
@@ -664,16 +671,21 @@ def command_iov(args, db):
     if not iovfilter.check_arguments():
         return 1
 
+    run_range_str = ""
+    if args.run_range is not None:
+        run_range_str = f" [valid in {tuple(args.run_range)}]"
+        args.run_range = IntervalOfValidity(args.run_range)
+
     if args.run is not None:
         msg = "Obtaining list of iovs for globaltag {tag}, exp={exp}, run={run}{filter}".format(
             tag=args.tag, exp=args.run[0], run=args.run[1], filter=iovfilter)
         req = db.request("GET", "/iovPayloads", msg, params={'gtName': args.tag, 'expNumber': args.run[0],
                                                              'runNumber': args.run[1]})
     else:
-        msg = f"Obtaining list of iovs for globaltag {args.tag}{iovfilter}"
-        req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(args.tag)), msg)
+        msg = f"Obtaining list of iovs for globaltag {args.tag}{iovfilter}{run_range_str}"
+        req = db.request("GET", f"/globalTag/{encode_name(args.tag)}/globalTagPayloads", msg)
 
-    with Pager("List of IoVs{}{}".format(iovfilter, " (detailed)" if args.detail else ""), True):
+    with Pager(f"List of IoVs{iovfilter}{run_range_str}{' (detailed)' if args.detail else ''}", True):
         payloads = []
         for item in req.json():
             payload = item["payload" if 'payload' in item else "payloadId"]
@@ -686,6 +698,12 @@ def command_iov(args, db):
                 continue
 
             for iov in iovs:
+                if args.run_range is not None:
+                    if IntervalOfValidity(
+                            iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd']
+                    ).intersect(args.run_range) is None:
+                        continue
+
                 if args.detail:
                     # detailed mode, show a table with all information for each
                     # iov

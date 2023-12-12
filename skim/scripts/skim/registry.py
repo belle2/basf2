@@ -103,7 +103,6 @@ _RegisteredSkims = [
     ("17230300", "charm", "DstToD0Pi_D0ToRare"),  # D0 -> g g/e e/mu mu
     ("17230400", "charm", "XToDp_DpToKsHp"),  # D+ -> Ks h+
     ("17230500", "charm", "XToDp_DpToHpHmJp"),  # D+ -> h+ h- j+
-    ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h- j+
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)
     ("17240200", "charm", "DstToD0Pi_D0ToHpJmPi0"),  # D* -> D0 -> h h pi0
@@ -120,6 +119,13 @@ _RegisteredSkims = [
     ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
+    # Charmed baryons
+    ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h+ j-
+    ("17230700", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
+    ("17230800", "charm", "LambdacToSKs"),  # Lambda_c+ -> Sigma+ K_S0
+    ("17230900", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
+    ("17231000", "charm", "XictoXimpippim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
+    ("17231100", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),

@@ -369,15 +369,16 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cUnpacker->SetFillColor(kRed);
       m_cUnpacker->SetFrameFillColor(10);
     }
-    setEpicsPV("UnpackError", h->GetEntries() / nEvents);
-
-    m_cUnpacker->cd();
-    h->Draw("colztext");
-    h->SetStats(0);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->SetFillColor(kRed);
   }
+
+  setEpicsPV("UnpackError", h->GetEntries() / nEvents);
+
+  m_cUnpacker->cd();
+  h->Draw("colztext");
+  h->SetStats(0);
 
   m_cUnpacker->Modified();
   m_cUnpacker->Update();
@@ -551,6 +552,12 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOnlineOccupancyV->SetTitle("Average ONLINE Sensor Occupancy (%), V side " + runID);
   m_hOnlineOccupancyV->SetStats(0);
 
+  m_hOccupancyUGroupId0->SetTitle("Average OFFLINE Sensor Occupancy (%), U side for cluster time group Id = 0" + runID);
+  m_hOccupancyUGroupId0->SetStats(0);
+
+  m_hOccupancyVGroupId0->SetTitle("Average OFFLINE Sensor Occupancy (%), V side for cluster time group Id = 0" + runID);
+  m_hOccupancyVGroupId0->SetStats(0);
+
   if (m_3Samples) {
     //update titles with exp and run number for 3 samples
     m_hOccupancyU3Samples->SetTitle("Average OFFLINE Sensor Occupancy (%), U side for 3 samples" + runID);
@@ -646,7 +653,6 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
     // groupId0 side U
     TString tmpnameGrpId0 = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0U", tmp_layer, tmp_ladder, tmp_sensor);
-
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy U histogram for group Id0 not found");

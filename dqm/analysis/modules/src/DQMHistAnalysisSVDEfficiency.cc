@@ -103,8 +103,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     B2INFO("no events, nothing to do here");
     return;
   }
-  TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
-  B2INFO("runID = " << runID);
+
 
   gROOT->cd();
   m_cEfficiencyU = new TCanvas("SVDAnalysis/c_SVDEfficiencyU");
@@ -112,10 +111,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_cEfficiencyErrU = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrU");
   m_cEfficiencyErrV = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV");
 
-  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", Form("Summary of SVD efficiencies (%%), @view/@side Side %s",
-                                      runID.Data()));
-  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", Form("Summary of SVD efficiencies errors (%%), @view/@side Side %s",
-                                         runID.Data()));
+  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%%), @view/@side Side");
+  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%%), @view/@side Side");
 
 
   if (m_3Samples) {
@@ -125,9 +122,9 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_cEfficiencyErrV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV3Samples");
 
     m_hEfficiency3Samples = new SVDSummaryPlots("SVD3Efficiency@view",
-                                                Form("Summary of SVD efficiencies (%%), @view/@side Side for 3 samples %s", runID.Data()));
+                                                "Summary of SVD efficiencies (%%), @view/@side Side for 3 samples");
     m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
-                                                   Form("Summary of SVD efficiencies errors (%%), @view/@side Side for 3 samples %s", runID.Data()));
+                                                   "Summary of SVD efficiencies errors (%%), @view/@side Side for 3 samples");
   }
 
   //register limits for EPICS
@@ -137,6 +134,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: beginRun called.");
+
   if (m_cEfficiencyU)
     m_cEfficiencyU->Clear();
   if (m_cEfficiencyV)
@@ -179,18 +177,53 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
+  TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
+  B2INFO("DQMHistAnalysisSVDEfficiencyModule::runID = " << runID);
+
+
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
 
-  m_hEfficiency->getHistogram(0)->Reset();
-  m_hEfficiency->getHistogram(1)->Reset();
-  m_hEfficiency->getHistogram(0)->SetStats(0);
-  m_hEfficiency->getHistogram(1)->SetStats(0);
-  m_hEfficiencyErr->getHistogram(0)->Reset();
-  m_hEfficiencyErr->getHistogram(1)->Reset();
-  m_hEfficiencyErr->getHistogram(0)->SetStats(0);
-  m_hEfficiencyErr->getHistogram(1)->SetStats(0);
+  // do it by nhand, the interface of the SVDSummaryPlots does not allow to change the title after cstr
+  if (m_hEfficiency) {
+    m_hEfficiency->getHistogram(0)->Reset();
+    m_hEfficiency->getHistogram(1)->Reset();
+    m_hEfficiency->getHistogram(0)->SetStats(0);
+    m_hEfficiency->getHistogram(1)->SetStats(0);
+    m_hEfficiency->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies (%%), V/N Side for 3 samples %s", runID.Data()));
+    m_hEfficiency->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies (%%), U/P Side for 3 samples %s", runID.Data()));
+  }
 
+  if (m_hEfficiencyErr) {
+    m_hEfficiencyErr->getHistogram(0)->Reset();
+    m_hEfficiencyErr->getHistogram(1)->Reset();
+    m_hEfficiencyErr->getHistogram(0)->SetStats(0);
+    m_hEfficiencyErr->getHistogram(1)->SetStats(0);
+    m_hEfficiencyErr->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies errors (%%), V/N Side %s", runID.Data()));
+    m_hEfficiencyErr->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies errors (%%), U/P Side %s", runID.Data()));
+  }
+
+  if (m_3Samples) {
+    if (m_hEfficiency3Samples) {
+      m_hEfficiency3Samples->getHistogram(0)->Reset();
+      m_hEfficiency3Samples->getHistogram(1)->Reset();
+      m_hEfficiency3Samples->getHistogram(0)->SetStats(0);
+      m_hEfficiency3Samples->getHistogram(1)->SetStats(0);
+      m_hEfficiency3Samples->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies (%%), V/N Side for 3 samples %s", runID.Data()));
+      m_hEfficiency3Samples->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies (%%), U/P Side for 3 samples %s", runID.Data()));
+    }
+
+    if (m_hEfficiencyErr3Samples) {
+      m_hEfficiencyErr3Samples->getHistogram(0)->Reset();
+      m_hEfficiencyErr3Samples->getHistogram(1)->Reset();
+      m_hEfficiencyErr3Samples->getHistogram(0)->SetStats(0);
+      m_hEfficiencyErr3Samples->getHistogram(1)->SetStats(0);
+      m_hEfficiencyErr3Samples->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies errors (%%), V/N Side for 3 samples %s",
+                                                               runID.Data()));
+      m_hEfficiencyErr3Samples->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies errors (%%), U/P Side for 3 samples %s",
+                                                               runID.Data()));
+    }
+  }
 
   Float_t effU = -1;
   Float_t effV = -1;

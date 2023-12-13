@@ -3286,7 +3286,7 @@
          <sec name="trdY0" unit="mm">442</sec>
          <sec name="trdZ0" unit="mm">-3400</sec>
 
-         <N desc="Number of cuts">6</N>
+         <N desc="Number of cuts">8</N>
 
          <!--cut 0 box-->
          <sec name="cutType0" unit="mm">0</sec>
@@ -3329,8 +3329,8 @@
 
          <sec name="cutW4" unit="mm">280.0</sec>
          <sec name="cutH4" unit="mm">280.0</sec>
-         <sec name="cutL4" unit="mm">280.0</sec>
-         <sec name="cutDX4" unit="mm">720.0</sec>
+         <sec name="cutL4" unit="mm">180.0</sec>
+         <sec name="cutDX4" unit="mm">770.0</sec>
          <sec name="cutDY4" unit="mm">-452.5</sec>
          <sec name="cutDZ4" unit="mm">1905.0</sec>
          <sec name="cutTH4" unit="rad">0.7854</sec>
@@ -3340,11 +3340,33 @@
 
          <sec name="cutW5" unit="mm">280.0</sec>
          <sec name="cutH5" unit="mm">280.0</sec>
-         <sec name="cutL5" unit="mm">280.0</sec>
-         <sec name="cutDX5" unit="mm">-720.0</sec>
+         <sec name="cutL5" unit="mm">180.0</sec>
+         <sec name="cutDX5" unit="mm">-770.0</sec>
          <sec name="cutDY5" unit="mm">-452.5</sec>
          <sec name="cutDZ5" unit="mm">1905.0</sec>
          <sec name="cutTH5" unit="rad">0.7854</sec>
+
+         <!--cut 6 box-->
+         <sec name="cutType6" unit="mm">0</sec>
+
+         <sec name="cutW6" unit="mm">140.0</sec>
+         <sec name="cutH6" unit="mm">140.0</sec>
+         <sec name="cutL6" unit="mm">360.0</sec>
+         <sec name="cutDX6" unit="mm">770.0</sec>
+         <sec name="cutDY6" unit="mm">-452.5</sec>
+         <sec name="cutDZ6" unit="mm">1905.0</sec>
+         <sec name="cutTH6" unit="rad">0.7854</sec>
+
+         <!--cut 7 box-->
+         <sec name="cutType7" unit="mm">0</sec>
+
+         <sec name="cutW7" unit="mm">140.0</sec>
+         <sec name="cutH7" unit="mm">140.0</sec>
+         <sec name="cutL7" unit="mm">360.0</sec>
+         <sec name="cutDX7" unit="mm">-770.0</sec>
+         <sec name="cutDY7" unit="mm">-452.5</sec>
+         <sec name="cutDZ7" unit="mm">1905.0</sec>
+         <sec name="cutTH7" unit="rad">0.7854</sec>
 
          <Material>SUS316L</Material>
          <Desc>Left cryostat support</Desc>
@@ -3411,9 +3433,9 @@
          <!--cut 4 box-->
          <sec name="cutType4" unit="mm">0</sec>
 
-         <sec name="cutW4" unit="mm">480.0</sec>
-         <sec name="cutH4" unit="mm">480.0</sec>
-         <sec name="cutL4" unit="mm">480.0</sec>
+         <sec name="cutW4" unit="mm">540.0</sec>
+         <sec name="cutH4" unit="mm">540.0</sec>
+         <sec name="cutL4" unit="mm">1080.0</sec>
          <sec name="cutDX4" unit="mm">770.0</sec>
          <sec name="cutDY4" unit="mm">-472.5</sec>
          <sec name="cutDZ4" unit="mm">-1905.0</sec>
@@ -3422,9 +3444,9 @@
          <!--cut 5 box-->
          <sec name="cutType5" unit="mm">0</sec>
 
-         <sec name="cutW5" unit="mm">480.0</sec>
-         <sec name="cutH5" unit="mm">480.0</sec>
-         <sec name="cutL5" unit="mm">480.0</sec>
+         <sec name="cutW5" unit="mm">540.0</sec>
+         <sec name="cutH5" unit="mm">540.0</sec>
+         <sec name="cutL5" unit="mm">1080.0</sec>
          <sec name="cutDX5" unit="mm">-770.0</sec>
          <sec name="cutDY5" unit="mm">-472.5</sec>
          <sec name="cutDZ5" unit="mm">-1905.0</sec>

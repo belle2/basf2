@@ -438,9 +438,9 @@ class DpToHpPi0(BaseSkim):
         * :math:`D^+ \\to \\pi^+ \\pi^0`
 
     **Selection Criteria**:
-        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799, \\piIDNN > 0.1, pcms > 0.5``
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799, pcms > 0.5``
         * Use :math:`\\pi^{0}` from `stdPi0s(eff40_May2020Fit)` + `pcms > 0.5`
-        * ``1.67 (1.57) < M(D+) < 2.07 (2.17), pcms(D+) > 2.0``
+        * ``1.57 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 
     """
@@ -453,24 +453,19 @@ class DpToHpPi0(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = False
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         # loadStdSkimPi0(path=path)
         stdPi0s(listtype='eff50_May2020Fit', path=path)
 
     def build_lists(self, path):
-        ma.cutAndCopyList('pi+:hppi0', 'pi+:charmSkim', 'pt > 0.1 and pionIDNN > 0.1 and useCMSFrame(p) > 0.5', path=path)
-        ma.cutAndCopyList('pi0:hppi0', 'pi0:eff50_May2020Fit', 'useCMSFrame(p) > 0.5', path=path)
+        ma.cutAndCopyList('pi+:HpPi0', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
+        ma.cutAndCopyList('pi0:HpPi0', 'pi0:eff50_May2020Fit', 'useCMSFrame(p) > 0.5', path=path)
 
         Dpcuts = "1.57 < M < 2.17 and useCMSFrame(p) > 2.0"
 
         DList = []
-        ma.reconstructDecay("D+:HpPi0 -> pi+:hppi0 pi0:hppi0", Dpcuts, path=path)
+        ma.reconstructDecay("D+:HpPi0 -> pi+:HpPi0 pi0:HpPi0", Dpcuts, path=path)
         DList.append("D+:HpPi0")
 
         return DList
@@ -483,9 +478,9 @@ class DpToKsHp(BaseSkim):
         * :math:`D^+ \\to \\Ks \\pi^+`
 
     **Selection Criteria**:
-        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799, \\piIDNN > 0.1``
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
         * Use Ks from `stdKshorts`
-        * ``1.67 (1.57) < M(D+) < 2.07 (2.17), pcms(D+) > 2.0``
+        * ``1.77 < M(D+) < 1.97, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 
     """
@@ -498,17 +493,12 @@ class DpToKsHp(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = False
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        ma.cutAndCopyList('pi+:KsPi+', 'pi+:charmSkim', 'pt > 0.1 and pionIDNN > 0.1 and useCMSFrame(p) > 0.5', path=path)
+        ma.cutAndCopyList('pi+:KsPi+', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
 
         Dpcuts = "1.77 < M < 1.97 and useCMSFrame(p) > 2.0"
 

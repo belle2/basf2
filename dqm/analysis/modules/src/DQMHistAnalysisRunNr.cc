@@ -132,7 +132,7 @@ void DQMHistAnalysisRunNrModule::event()
 
   m_cRunNr->Modified();
   m_cRunNr->Update();
-  UpdateHistogram(m_cRunNr);
+  UpdateCanvas(m_cRunNr);
 
   setEpicsPV("Alarm", status);
   setEpicsPV("RunNr", mean);

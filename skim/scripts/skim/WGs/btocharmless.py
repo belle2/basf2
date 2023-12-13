@@ -332,7 +332,6 @@ class BtoEtapKstp(BaseSkim):
         stdPhotons('all', path=path)
         stdPi0s("eff40_May2020", path=path)
         loadStdVeryLooseTracks('pi', path=path)
-        loadStdVeryLooseTracks('K', path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffEta(path=path)
         loadStdSkimHighEffEtaPrime(path=path)

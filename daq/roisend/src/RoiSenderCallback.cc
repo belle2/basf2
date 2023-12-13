@@ -118,8 +118,8 @@ void RoiSenderCallback::abort(void)
   // wait until
   for (int i = 0; m_pid_merger; i++) {
     sleep(1);
+    int pid = m_pid_merger;
     if (i == 5 && m_pid_merger > 0) {
-      int pid = m_pid_merger;
       kill(pid, SIGKILL); // force!
       LogFile::warning("kill merger (pid=%d) with SIGKILL", pid);
     }

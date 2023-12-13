@@ -122,6 +122,7 @@ class LowMassTwoTrack(BaseSkim):
         4. :math:`e^{+}e^{-} \\to \\gamma p \\overline{p} X`,
         5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
         6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
+        7. :math:`e^{+}e^{-} \\to \\gamma \\mu^{+} \\mu^{-} X`,
     """
     __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
@@ -157,6 +158,7 @@ class LowMassTwoTrack(BaseSkim):
         ma.fillParticleList(f"K+:{label}", pCut, path=path)
         ma.fillParticleList(f"p+:{label}", pCut, path=path)
         ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path)
+        ma.fillParticleList(f"mu+:{label}", pCut, path=path)
 
         # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
         ModesAndCuts = [
@@ -171,6 +173,7 @@ class LowMassTwoTrack(BaseSkim):
             (f"vpho:{label}_ppi", f" -> gamma:{label}_ISR p+:{label} pi-:{label}", hhMassWindow),
             # Might be useful when one wants to reconstruct ISR p K and missing other final state particles
             (f"vpho:{label}_pK", f" -> gamma:{label}_ISR p+:{label} K-:{label}", hhMassWindow),
+            (f"vpho:{label}_mumu", f" -> gamma:{label}_ISR mu+:{label} mu-:{label}", hhMassWindow),
         ]
 
         ParticleLists = []

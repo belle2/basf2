@@ -171,8 +171,7 @@ namespace Belle2 {
     Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
     Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
 
-    TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
-    TString runtype = nullptr; /**< string with runtype: physics or cosmic */
+    TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 

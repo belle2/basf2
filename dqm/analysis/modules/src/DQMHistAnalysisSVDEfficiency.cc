@@ -190,8 +190,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_hEfficiency->getHistogram(1)->Reset();
     m_hEfficiency->getHistogram(0)->SetStats(0);
     m_hEfficiency->getHistogram(1)->SetStats(0);
-    m_hEfficiency->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies (%%), V/N Side for 3 samples %s", runID.Data()));
-    m_hEfficiency->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies (%%), U/P Side for 3 samples %s", runID.Data()));
+    m_hEfficiency->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies (%%), V/N Side %s", runID.Data()));
+    m_hEfficiency->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies (%%), U/P Side %s", runID.Data()));
   }
 
   if (m_hEfficiencyErr) {

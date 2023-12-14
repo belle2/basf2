@@ -222,6 +222,7 @@ class TDCPV_ccs(BaseSkim):
     * ``B0 -> J/psi (ee/mm) K*``
     * ``B+ -> J/psi (ee/mm) K+``
     * ``B0 -> J/psi (ee/mm) KL``
+    * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``
 
     **Particle lists used**:
 
@@ -235,6 +236,7 @@ class TDCPV_ccs(BaseSkim):
     * ``K+:SkimHighEff``
     * ``K_L0:allklm``
     * ``K_L0:allecl``
+    * ``eta:SkimHighEff``
 
     **Cuts used**:
 
@@ -270,6 +272,7 @@ class TDCPV_ccs(BaseSkim):
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
         loadStdSkimHighEffKstar0(path=path)
+        loadStdSkimHighEffEta(path=path)
 
         loadStdJpsiToee_noTOP(path=path)
         loadStdJpsiTomumu(path=path)
@@ -293,7 +296,9 @@ class TDCPV_ccs(BaseSkim):
                            'J/psi:mumu K_S0:merged',
                            'psi(2S):ll K_S0:merged',
                            'J/psi:ee K*0:SkimHighEff',
-                           'J/psi:mumu K*0:SkimHighEff']
+                           'J/psi:mumu K*0:SkimHighEff',
+                           'J/psi:ee eta:SkimHighEff',
+                           'J/psi:mumu eta:SkimHighEff']
 
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:SkimHighEff',
                                 'J/psi:ee K+:SkimHighEff']

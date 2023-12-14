@@ -1,6 +1,14 @@
-#
-# Example / Test for BCL
-#
+# EventType: 1250112000
+# Descriptor: Example / Test for BCL
+# NickName: B2pi0munu
+# Cuts: None
+# PhysicsWG: SL
+# Tested: Yes
+# Responsible:
+# Email:
+# Date:
+
+
 Alias myB+ B+
 Alias myB- B-
 ChargeConj myB+ myB-

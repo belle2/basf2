@@ -1,3 +1,9 @@
+# EventType: 2613032000
+# Descriptor: [ccbar Dstarp2DpPi0 Dp2KmPipPip]
+# NickName: DstpToD0Pi_D0ToKPiPi0
+# PhysicsWG: Charm
+
+
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 #
 # June 2021 Automated: Converted PYTHIA ids

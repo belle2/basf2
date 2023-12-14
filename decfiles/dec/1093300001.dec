@@ -1,5 +1,10 @@
-# example decay file of BSTD_2HDMTYPE2 model based on M. Tanaka and R. Watanabe PRD87,034028(2013)
+# EventType: 1093300001
+# Descriptor: example decay file of BSTD_2HDMTYPE2 model based on M. Tanaka and R. Watanabe PRD87,034028(2013)
+# NickName: BSemiTauonic_BSTD_2HDMTYPE2
+# Cuts: None
+# PhysicsWG: SL
 # author: Koji Hara (koji.hara@kek.jp)
+
 
 # (GeV/c^2)^-1
 Define tanBeta/m_H+	0.5

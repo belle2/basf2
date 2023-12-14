@@ -1,4 +1,8 @@
-# example decay file of BSTD model, based on M. Tanaka and R. Watanabe PRD87,034028(2013)
+# EventType: 1093300000
+# Descriptor: example decay file of BSTD model, based on M. Tanaka and R. Watanabe PRD87,034028(2013)
+# NickName: BSemiTauonic_BSTD
+# Cuts: None
+# PhysicsWG: SL
 # author: Koji Hara (koji.hara@kek.jp)
 
 # Wilson coefficients for New Physics contributions

@@ -120,6 +120,10 @@ _RegisteredSkims = [
     ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
+    # D*+ -> D+ pi0 / D+ -> K/pi+ omega / omega -> pi+ pi- pi0
+    ("17241300", "charm", "DstToDpPi0_DpToHpOmega"),
+    # D*+ -> D_s+ pi0 / D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
+    ("17241400", "charm", "DstToDspPi0_DspToHpOmega"),
 
     # --- WG8: Dark matter searches and tau physics ---
     ("18020100", "dark", "SinglePhotonDark"),

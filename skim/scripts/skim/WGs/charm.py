@@ -973,3 +973,109 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         DstList.append("D*+:all")
 
         return DstList
+
+
+@fancy_skim_header
+class DstToDpPi0_DpToHpOmega(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{*+}\\to \\D^{+} \\pi^0` (and CC)
+        * :math:`D^{+}\\to \\K^+ \\omega` (and CC)
+        * :math:`D^{+}\\to \\pi^+ \\omega` (and CC)
+        * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
+
+    **Selection Criteria**:
+        * Tracks :math: loose `\\pi^{+} and K^{+}` selection from `stdPi' and 'stdK'
+        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and p(pi^{0})>0.25
+        * ``0.71 < M(omega) < 0.85``
+        * ``1.67 < M(D+) < 2.07``
+        * ``2.0 < p*(D+) `
+        * ``0.0 < Q(D*+) < 0.018 ``
+    """
+
+    __authors__ = ["Yongheon Ahn"]
+    __description__ = "Skim list for D*+ to D+ pi0, D+ to h+ omega, omega to pi+ pi- pi0."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi("loose", path=path)
+        stdK("loose", path=path)
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+
+        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
+        ma.reconstructDecay("omega:3pi -> pi+:loose pi-:loose pi0:my", "[0.71 < M < 0.85 ]", path=path)
+
+        Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
+
+        ma.reconstructDecay("D+:Kpomega -> K+:loose omega:3pi", Dpcuts, path=path)
+        ma.reconstructDecay("D+:pipomega -> pi+:loose omega:3pi", Dpcuts, path=path)
+
+        ma.reconstructDecay("D*+:K -> D+:Kpomega", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:pi -> D+:pipomega", "0 < Q < 0.018", path=path)
+
+        DstList = []
+        DstList.append("D*+:K")
+        DstList.append("D*+:pi")
+
+        return DstList
+
+
+@fancy_skim_header
+class DstToDspPi0_DspToHpOmega(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{*+}\\to \\D^{+} \\pi^0` (and CC)
+        * :math:`D_{s}^{+}\\to \\K^+ \\omega` (and CC)
+        * :math:`D_{s}^{+}\\to \\pi^+ \\omega` (and CC)
+        * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
+
+    **Selection Criteria**:
+        * Tracks :math: loose `\\pi^{+} and K^{+}` selection from `stdPi' and 'stdK'
+        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and p(pi^{0})>0.25
+        * ``0.71 < M(omega) < 0.85``
+        * ``1.77 < M(D_s+) < 2.17``
+        * ``2.0 < p*(D_s+) `
+        * ``0.0 < Q(D*+) < 0.018 ``
+    """
+
+    __authors__ = ["Yongheon Ahn"]
+    __description__ = "Skim list for D*+ to D_s+ pi0, D_s+ to h+ omega, omega to pi+ pi- pi0."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi("loose", path=path)
+        stdK("loose", path=path)
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+        mySel = "abs(d0) < 0.5 and abs(z0) < 2"
+        mySel += " and 0.296706 < theta < 2.61799"
+        ma.fillParticleList("pi+:my", mySel, path=path)
+        ma.fillParticleList("K+:my", mySel, path=path)
+
+        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
+
+        ma.reconstructDecay("omega:3pi -> pi+:loose pi-:loose pi0:my", "[0.71 < M < 0.85 ]", path=path)
+
+        Dspcuts = "1.77 < M < 2.17 and useCMSFrame(p) > 2.0"
+        ma.reconstructDecay("D_s+:Kpomega -> K+:loose omega:3pi", Dspcuts, path=path)
+        ma.reconstructDecay("D_s+:pipomega -> pi+:loose omega:3pi", Dspcuts, path=path)
+
+        ma.reconstructDecay("D*+:K -> D_s+:Kpomega", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:pi -> D_s+:pipomega", "0 < Q < 0.018", path=path)
+
+        DstList = []
+        DstList.append("D*+:K")
+        DstList.append("D*+:pi")
+
+        return DstList

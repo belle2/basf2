@@ -101,7 +101,7 @@ class TauLFV(BaseSkim):
 
     **Output particle lists**: ``e+:taulfv, mu+:taulfv, pi+:taulfv, K+:taulfv, p+:taulfv``,
     ``gamma:taulfv, pi0:taulfv, K_S0:taulfv, eta:taulfv, eta':taulfv``,
-    ``omega:taulfv, Lambda0:taulfv1, Lambda0:taulfv2``
+    ``omega:taulfv, Lambda0:taulfv_p, Lambda0:taulfv_antip``
 
     **Criteria for 1 prong final states**: Number of good tracks < 5, :math:`1.0 < M < 2.0` GeV, :math:`-1.5 < \\Delta E < 0.5` GeV
 
@@ -157,8 +157,8 @@ class TauLFV(BaseSkim):
         ma.reconstructDecay("omega:taulfv -> pi0:taulfv pi-:all pi+:all", "0.73 < M < 0.83", path=path)
 
         # Lambda0
-        ma.reconstructDecay("Lambda0:taulfv1 -> p+:all pi-:all", "0.9 < M < 1.3", path=path)
-        ma.reconstructDecay("Lambda0:taulfv2 -> anti-p-:all pi+:all", "0.9 < M < 1.3", path=path)
+        ma.reconstructDecay("Lambda0:taulfv_p -> p+:all pi-:all", "0.9 < M < 1.3", path=path)
+        ma.reconstructDecay("Lambda0:taulfv_antip -> anti-p-:all pi+:all", "0.9 < M < 1.3", path=path)
 
         # event selection
 #        vm.addAlias("netChargeLFV", "formula(countInList(pi+:taulfv, charge == 1) - countInList(pi+:taulfv, charge == -1))")
@@ -228,8 +228,8 @@ class TauLFV(BaseSkim):
                             "p+:taulfv pi-:taulfv pi+:taulfv",
                             "anti-p-:taulfv pi+:taulfv K+:taulfv",
                             "p+:taulfv pi-:taulfv K+:taulfv",
-                            "Lambda0:taulfv1 pi+:taulfv",
-                            "Lambda0:taulfv2 pi+:taulfv"
+                            "Lambda0:taulfv_p pi+:taulfv",
+                            "Lambda0:taulfv_antip pi+:taulfv"
                             ]
 
         tau_lgamma_list = []

@@ -1036,7 +1036,6 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Tracks
         * :math:`\\pi^{+}` and :math:`\\K^{+}` selection from ``stdPi`` and ``stdK``
         * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``

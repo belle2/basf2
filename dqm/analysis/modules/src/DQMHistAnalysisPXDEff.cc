@@ -111,9 +111,10 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_hInnerMap = new TH2F("hEffInnerMap", "hEffInnerMap", m_u_bins * 8, 0, m_u_bins * 8,  m_v_bins * 2, 0, m_v_bins * 2);
   m_hOuterMap = new TH2F("hEffOuterMap", "hEffOuterMap", m_u_bins * 12, 0, m_u_bins * 12,  m_v_bins * 2, 0, m_v_bins * 2);
 
-  m_hErrorLine = new TH1F("hPXDErrorlimit", "Error Limit", m_PXDModules.size(), 0, m_PXDModules.size());
-  m_hWarnLine = new TH1F("hPXDWarnlimit", "Warn Limit", m_PXDModules.size(), 0, m_PXDModules.size());
-  for (int i = 0; i < (int)m_PXDModules.size(); i++) {
+  m_nrxbins = m_PXDModules.size() + 3; // Modules + L1 + L2 + All
+  m_hErrorLine = new TH1F("hPXDErrorlimit", "Error Limit", m_nrxbins, 0, m_nrxbins);
+  m_hWarnLine = new TH1F("hPXDWarnlimit", "Warn Limit", m_nrxbins, 0, m_nrxbins);
+  for (int i = 0; i < (int)m_nrxbins; i++) {
     m_hErrorLine->SetBinContent(i + 1, m_errorlevel);
     m_hWarnLine->SetBinContent(i + 1, m_warnlevel);
   }
@@ -144,13 +145,16 @@ void DQMHistAnalysisPXDEffModule::initialize()
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);
         }
+        ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
+        ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
+        ax->SetBinLabel(m_PXDModules.size() + 3, "All");
       }
     }
   }
 
   m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
   m_hEffAllUpdate = new TEfficiency("ePXDHitEffAllUpdate", "PXD Integral and last-updated Efficiency per module;PXD Module;",
-                                    m_PXDModules.size(), 0, m_PXDModules.size());
+                                    m_nrxbins, 0, m_nrxbins);
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
 
   {
@@ -164,6 +168,9 @@ void DQMHistAnalysisPXDEffModule::initialize()
           TString ModuleName = (std::string)m_PXDModules[i];
           ax->SetBinLabel(i + 1, ModuleName);
         }
+        ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
+        ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
+        ax->SetBinLabel(m_PXDModules.size() + 3, "All");
       }
     }
   }
@@ -208,6 +215,27 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     }
 
   }
+  {
+    double dummy, loerr = 0, lowarn = 0;
+    if (requestLimitsFromEpicsPVs("L1", loerr, lowarn, dummy, dummy)) {
+      m_hErrorLine->SetBinContent(m_nrxbins + 1, loerr);
+      if (m_perModuleAlarm) m_errorlevelmod["L1"] = loerr;
+      m_hWarnLine->SetBinContent(m_nrxbins + 1, lowarn);
+      if (m_perModuleAlarm) m_warnlevelmod["L1"] = lowarn;
+    }
+    if (requestLimitsFromEpicsPVs("L2", loerr, lowarn, dummy, dummy)) {
+      m_hErrorLine->SetBinContent(m_nrxbins + 2, loerr);
+      if (m_perModuleAlarm) m_errorlevelmod["L2"] = loerr;
+      m_hWarnLine->SetBinContent(m_nrxbins + 2, lowarn);
+      if (m_perModuleAlarm) m_warnlevelmod["L2"] = lowarn;
+    }
+    if (requestLimitsFromEpicsPVs("All", loerr, lowarn, dummy, dummy)) {
+      m_hErrorLine->SetBinContent(m_nrxbins + 3, loerr);
+      if (m_perModuleAlarm) m_errorlevelmod["All"] = loerr;
+      m_hWarnLine->SetBinContent(m_nrxbins + 3, lowarn);
+      if (m_perModuleAlarm) m_warnlevelmod["All"] = lowarn;
+    }
+  }
   // Thus histo will contain old content until first update
   m_hEffAllLastTotal->Reset();
   m_hEffAllLastPassed->Reset();
@@ -220,6 +248,49 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   m_hOuterMap->Reset();
 }
 
+void DQMHistAnalysisPXDEffModule::updateEffBins(int bin, int nhit, int nmatch, int minentries)
+{
+  m_hEffAll->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+  m_hEffAll->SetTotalEvents(bin, nhit);
+  m_hEffAll->SetPassedEvents(bin, nmatch);
+
+  if (nhit < minentries) {
+    // update the first entries directly (short runs)
+    m_hEffAllUpdate->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAllUpdate->SetTotalEvents(bin, nhit);
+    m_hEffAllUpdate->SetPassedEvents(bin, nmatch);
+    m_hEffAllLastTotal->SetBinContent(bin, nhit);
+    m_hEffAllLastPassed->SetBinContent(bin, nmatch);
+  } else if (nhit - m_hEffAllLastTotal->GetBinContent(bin) > minentries) {
+    m_hEffAllUpdate->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_hEffAllUpdate->SetTotalEvents(bin, nhit - m_hEffAllLastTotal->GetBinContent(bin));
+    m_hEffAllUpdate->SetPassedEvents(bin, nmatch - m_hEffAllLastPassed->GetBinContent(bin));
+    m_hEffAllLastTotal->SetBinContent(bin, nhit);
+    m_hEffAllLastPassed->SetBinContent(bin, nmatch);
+  }
+}
+
+bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, std::string name)
+{
+  bool warn_flag = (m_hEffAll->GetEfficiency(bin) + m_hEffAll->GetEfficiencyErrorUp(bin) <
+                    m_warnlevelmod[name]); // (and not only the actual eff value)
+  if (m_alarmAdhoc) {
+    warn_flag |= (m_hEffAllUpdate->GetEfficiency(bin) + m_hEffAllUpdate->GetEfficiencyErrorUp(bin) <
+                  m_warnlevelmod[name]); // (and not only the actual eff value)
+  }
+  return warn_flag;
+}
+
+bool DQMHistAnalysisPXDEffModule::check_error_level(int bin, std::string name)
+{
+  bool error_flag = (m_hEffAll->GetEfficiency(bin) + m_hEffAll->GetEfficiencyErrorUp(bin) <
+                     m_errorlevelmod[name]); // error if upper error value is below limit
+  if (m_alarmAdhoc) {
+    error_flag |= (m_hEffAllUpdate->GetEfficiency(bin) + m_hEffAllUpdate->GetEfficiencyErrorUp(bin) <
+                   m_errorlevelmod[name]); // error if upper error value is below limit
+  }
+  return error_flag;
+}
 
 void DQMHistAnalysisPXDEffModule::event()
 {
@@ -352,24 +423,11 @@ void DQMHistAnalysisPXDEffModule::event()
 
       /// TODO: one value per module, and please change to the "delta" instead of integral
       all += nhit;
-      m_hEffAll->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, nhit);
-      m_hEffAll->SetPassedEvents(j, nmatch);
 
+      updateEffBins(j, nhit, nmatch, m_minEntries);
       if (nhit < m_minEntries) {
-        // update the first entries directly (short runs)
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit);
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch);
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
         updated[aModule] = true;
       } else if (nhit - m_hEffAllLastTotal->GetBinContent(j) > m_minEntries) {
-        m_hEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-        m_hEffAllUpdate->SetTotalEvents(j, nhit - m_hEffAllLastTotal->GetBinContent(j));
-        m_hEffAllUpdate->SetPassedEvents(j, nmatch - m_hEffAllLastPassed->GetBinContent(j));
-        m_hEffAllLastTotal->SetBinContent(j, nhit);
-        m_hEffAllLastPassed->SetBinContent(j, nmatch);
         updated[aModule] = true;
       }
 
@@ -379,17 +437,25 @@ void DQMHistAnalysisPXDEffModule::event()
       // get the errors and check for limits for each bin seperately ...
 
       if (nhit > 50) {
-        error_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
-                       m_errorlevelmod[aModule]); // error if upper error value is below limit
-        warn_flag |= (m_hEffAll->GetEfficiency(j) + m_hEffAll->GetEfficiencyErrorUp(j) <
-                      m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        if (m_alarmAdhoc) {
-          error_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                         m_errorlevelmod[aModule]); // error if upper error value is below limit
-          warn_flag |= (m_hEffAllUpdate->GetEfficiency(j) + m_hEffAllUpdate->GetEfficiencyErrorUp(j) <
-                        m_warnlevelmod[aModule]); // (and not only the actual eff value)
-        }
+        error_flag |= check_error_level(j, aModule);
+        warn_flag |= check_warn_level(j, aModule);
       }
+    }
+
+    updateEffBins(m_nrxbins + 0, ihitL1, imatchL1, m_minEntries * 8);
+    if (ihitL1 >= 400) {
+      error_flag |= check_error_level(m_nrxbins + 0, "L1");
+      warn_flag |= check_warn_level(m_nrxbins + 0, "L1");
+    }
+    updateEffBins(m_nrxbins + 1, ihitL2, imatchL2, m_minEntries * 12);
+    if (ihitL2 >= 600) {
+      error_flag |= check_error_level(m_nrxbins + 1, "L2");
+      warn_flag |= check_warn_level(m_nrxbins + 1, "L2");
+    }
+    updateEffBins(m_nrxbins + 2, ihit, imatch, m_minEntries * 20);
+    if (ihit >= 1000) {
+      error_flag |= check_error_level(m_nrxbins + 2, "All");
+      warn_flag |= check_warn_level(m_nrxbins + 2, "All");
     }
 
     {
@@ -545,7 +611,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
     setEpicsPV("Status", stat_data);
     // only update if statistics is reasonable, we dont want "0" drops between runs!
-    if (stat_data != 0) {
+    if (stat_data != c_TooFew) {
       setEpicsPV("Overall", var_efficiency);
       setEpicsPV("L1", var_efficiencyL1);
       setEpicsPV("L2", var_efficiencyL2);

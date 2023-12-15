@@ -551,6 +551,10 @@ def command_diff(args, db):
 
         args.add_argument("tagA", metavar="TAGNAME1", help="base for comparison")
         args.add_argument("tagB", metavar="TAGNAME2", help="tagname to compare")
+        args.add_argument("--run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be compared"
+                          "Only iovs overlapping, even partially, with this range will be considered.")
         iovfilter.add_arguments("payloads")
         return
 
@@ -564,8 +568,8 @@ def command_diff(args, db):
         if ntags != 2:
             return 1
         print()
-        listA = [e for e in db.get_all_iovs(args.tagA, message=str(iovfilter)) if iovfilter.check(e.name)]
-        listB = [e for e in db.get_all_iovs(args.tagB, message=str(iovfilter)) if iovfilter.check(e.name)]
+        listA = [e for e in db.get_all_iovs(args.tagA, message=str(iovfilter), run_range=args.run_range) if iovfilter.check(e.name)]
+        listB = [e for e in db.get_all_iovs(args.tagB, message=str(iovfilter), run_range=args.run_range) if iovfilter.check(e.name)]
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)

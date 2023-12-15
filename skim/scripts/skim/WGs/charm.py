@@ -903,7 +903,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
     **Selection Criteria**:
         * Use charged tracks from the loose lists in `stdCharged` to reconstruct :math:`D^{0}`
         * Use :math:`\\gamma` from `stdPhotons.loadStdSkimPhoton`
-        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * use :math:`\\pi^{0}` from `stdpi0s.loadstdskimpi0`
         * Cut on :math:`\\phi`:
           ``abs(dM) < 0.03``
         * Cut on :math:`\\rho^{0}`:
@@ -979,18 +979,18 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 class DstToDpPi0_DpToHpOmega(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D^{*+}\\to \\D^{+} \\pi^0` (and CC)
-        * :math:`D^{+}\\to \\K^+ \\omega` (and CC)
+        * :math:`D^{*+}\\to D^{+} \\pi^0` (and CC)
+        * :math:`D^{+}\\to K^+ \\omega` (and CC)
         * :math:`D^{+}\\to \\pi^+ \\omega` (and CC)
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * :math:`\\pi^{+}` and :math:`\\K^{+}` selection from ``stdPi`` and ``stdK``
-        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
+        * Use charged tracks from loose list in `stdCharged`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
-        * ``2.0 < p*(D+) ``
-        * ``0.0 < Q(D*+) < 0.018 ``
+        * ``2.0 < p*(D+)``
+        * ``0.0 < Q(D*+) < 0.018``
     """
 
     __authors__ = ["Yongheon Ahn"]
@@ -1036,12 +1036,12 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * :math:`\\pi^{+}` and :math:`\\K^{+}` selection from ``stdPi`` and ``stdK``
-        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
+        * Use charged tracks from loose list in `stdCharged`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
-        * ``2.0 < p*(D_s+) ``
-        * ``0.0 < Q(D*+) < 0.018 ``
+        * ``2.0 < p*(D_s+)``
+        * ``0.0 < Q(D*+) < 0.018``
     """
 
     __authors__ = ["Yongheon Ahn"]

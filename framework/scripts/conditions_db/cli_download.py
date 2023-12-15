@@ -223,10 +223,11 @@ def command_legacydownload(args, db=None):
             name = payload["payloadId"]["basf2Module"]["name"]
             if payloadfilter.check(name):
                 local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload, args.run_range)
-                if local_file in download_list:
-                    download_list[local_file][-1] += iovlist
-                else:
-                    download_list[local_file] = [local_file, remote_file, checksum, iovlist]
+                if iovlist:
+                    if local_file in download_list:
+                        download_list[local_file][-1] += iovlist
+                    else:
+                        download_list[local_file] = [local_file, remote_file, checksum, iovlist]
 
         # do the downloading
         full_iovlist = []

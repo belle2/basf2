@@ -1,4 +1,4 @@
-[INFO] Steering file: test_b2conditionsdb_iov_diff.py
+[INFO] Steering file: test_b2conditionsdb_commands.py
 [INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
 --------------------------------------------------------------------------------
 Name                                            Rev  First  First  Final  Final
@@ -81,3 +81,4 @@ modified by depietro                           depietro
 - KLMStripEfficiency                            2670 5      299    5      299
 - KLMStripEfficiency                            3001 5      300    5      399
 + KLMStripEfficiency                            3001 5      0      5      999
+Downloaded 2 payloads

@@ -976,10 +976,9 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 
 
 @fancy_skim_header
-class DstToDpPi0_DpToHpOmega(BaseSkim):
+class DpToHpOmega(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D^{*+}\\to D^{+} \\pi^0` (and CC)
         * :math:`D^{+}\\to K^+ \\omega` (and CC)
         * :math:`D^{+}\\to \\pi^+ \\omega` (and CC)
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
@@ -990,11 +989,10 @@ class DstToDpPi0_DpToHpOmega(BaseSkim):
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
         * ``2.0 < p*(D+)``
-        * ``0.0 < Q(D*+) < 0.018``
     """
 
     __authors__ = ["Yongheon Ahn"]
-    __description__ = "Skim list for D*+ to D+ pi0, D+ to h+ omega, omega to pi+ pi- pi0."
+    __description__ = "Skim list for D+ to h+ omega, omega to pi+ pi- pi0."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
@@ -1019,21 +1017,17 @@ class DstToDpPi0_DpToHpOmega(BaseSkim):
         ma.reconstructDecay("D+:Kpomega -> K+:my omega:3pi", Dpcuts, path=path)
         ma.reconstructDecay("D+:pipomega -> pi+:my omega:3pi", Dpcuts, path=path)
 
-        ma.reconstructDecay("D*+:DpK -> D+:Kpomega pi0:my", "0 < Q < 0.018", path=path)
-        ma.reconstructDecay("D*+:Dppi -> D+:pipomega pi0:my", "0 < Q < 0.018", path=path)
+        DList = []
+        DList.append("D+:Kpomega")
+        DList.append("D+:pipomega")
 
-        DstList = []
-        DstList.append("D*+:DpK")
-        DstList.append("D*+:Dppi")
-
-        return DstList
+        return DList
 
 
 @fancy_skim_header
-class DstToDspPi0_DspToHpOmega(BaseSkim):
+class DspToHpOmega(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D^{*+}\\to \\D^{+} \\pi^0` (and CC)
         * :math:`D_{s}^{+}\\to \\K^+ \\omega` (and CC)
         * :math:`D_{s}^{+}\\to \\pi^+ \\omega` (and CC)
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
@@ -1044,11 +1038,10 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
         * ``2.0 < p*(D_s+)``
-        * ``0.0 < Q(D*+) < 0.018``
     """
 
     __authors__ = ["Yongheon Ahn"]
-    __description__ = "Skim list for D*+ to D_s+ pi0, D_s+ to h+ omega, omega to pi+ pi- pi0."
+    __description__ = "Skim list for D_s+ to h+ omega, omega to pi+ pi- pi0."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
@@ -1062,8 +1055,8 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
 
     def build_lists(self, path):
         trackcuts = "dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20"
-        ma.cutAndCopyList("pi+:my", "pi+:all", "pionID>0.1 and" + trackcuts, path=path)
-        ma.cutAndCopyList("K+:my", "K+:all", "kaonID>0.1 and" + trackcuts, path=path)
+        ma.cutAndCopyList("pi+:my", "pi+:all", "pionID>0.1 and " + trackcuts, path=path)
+        ma.cutAndCopyList("K+:my", "K+:all", "kaonID>0.1 and " + trackcuts, path=path)
         ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
 
         ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
@@ -1072,11 +1065,8 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         ma.reconstructDecay("D_s+:Kpomega -> K+:my omega:3pi", Dspcuts, path=path)
         ma.reconstructDecay("D_s+:pipomega -> pi+:my omega:3pi", Dspcuts, path=path)
 
-        ma.reconstructDecay("D*+:DspK -> D_s+:Kpomega pi0:my", "0 < Q < 0.018", path=path)
-        ma.reconstructDecay("D*+:Dsppi -> D_s+:pipomega pi0:my", "0 < Q < 0.018", path=path)
+        DsList = []
+        DsList.append("D_s+:Kpomega")
+        DsList.append("D_s+:pipomega")
 
-        DstList = []
-        DstList.append("D*+:DspK")
-        DstList.append("D*+:Dsppi")
-
-        return DstList
+        return DsList

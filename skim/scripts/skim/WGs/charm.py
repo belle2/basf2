@@ -337,8 +337,8 @@ class DpToPipHpHm(BaseSkim):
 
         DpList = []
         for chID, channel in enumerate(Dp_Channels):
-            ma.reconstructDecay("D+:HpHmJp" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
-            DpList.append("D+:HpHmJp" + str(chID))
+            ma.reconstructDecay("D+:PipHpHm" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
+            DpList.append("D+:PipHpHm" + str(chID))
 
         return DpList
 

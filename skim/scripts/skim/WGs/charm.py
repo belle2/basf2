@@ -989,7 +989,7 @@ class DstToDpPi0_DpToHpOmega(BaseSkim):
         * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and p(pi^{0})>0.25
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
-        * ``2.0 < p*(D+) `
+        * ``2.0 < p*(D+) ``
         * ``0.0 < Q(D*+) < 0.018 ``
     """
 
@@ -1040,7 +1040,7 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and p(pi^{0})>0.25
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
-        * ``2.0 < p*(D_s+) `
+        * ``2.0 < p*(D_s+) ``
         * ``0.0 < Q(D*+) < 0.018 ``
     """
 

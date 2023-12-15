@@ -590,7 +590,7 @@ void DQMHistAnalysisPXDEffModule::event()
       }
 
 
-      stat_data = makeStatus(all >= 100., warn_flag, error_flag);
+      stat_data = makeStatus(all >= 1000., warn_flag, error_flag);
       colorizeCanvas(m_cEffAllUpdate, stat_data);
 
       m_hWarnLine->Draw("same,hist");

@@ -492,6 +492,9 @@ void DQMHistAnalysisPXDEffModule::event()
             TString ModuleName = (std::string)m_PXDModules[i];
             ax->SetBinLabel(i + 1, ModuleName);
           }
+          ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
+          ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
+          ax->SetBinLabel(m_PXDModules.size() + 3, "All");
         }
 
         gr->SetLineColor(4);
@@ -553,8 +556,6 @@ void DQMHistAnalysisPXDEffModule::event()
         }
         if (scale_min == 1.0) scale_min = 0.0;
         if (scale_min > 0.9) scale_min = 0.9;
-        gr->SetMinimum(0);
-        gr->SetMaximum(m_PXDModules.size());
         auto ay = gr->GetYaxis();
         if (ay) ay->SetRangeUser(scale_min, 1.0);
         auto ax = gr->GetXaxis();
@@ -564,6 +565,9 @@ void DQMHistAnalysisPXDEffModule::event()
             TString ModuleName = (std::string)m_PXDModules[i];
             ax->SetBinLabel(i + 1, ModuleName);
           }
+          ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
+          ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
+          ax->SetBinLabel(m_PXDModules.size() + 3, "All");
         }
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           if (updated[m_PXDModules[i]]) {

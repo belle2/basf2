@@ -58,6 +58,18 @@ namespace Belle2 {
     void terminate(void) override final;
 
   private:
+    /**
+     * Update bin in efficiency plots with condition on nhits
+     */
+    void updateEffBins(int bin, int nhit, int nmatch, int minentries);
+
+    /**
+     * Update bin in efficiency plots with condition on nhits
+     */
+    bool check_error_level(int bin, std::string name);
+    bool check_warn_level(int bin, std::string name);
+
+  private:
 
     // Data members
     //! name of histogram directory
@@ -116,9 +128,11 @@ namespace Belle2 {
     /** TLine object for error error */
     TH1F* m_hErrorLine{};
     //! warn level for alarm per module
-    std::map<VxdID, double> m_warnlevelmod;
+    std::map<std::string, double> m_warnlevelmod;
     //! error level for alarm per module
-    std::map<VxdID, double> m_errorlevelmod;
+    std::map<std::string, double> m_errorlevelmod;
+
+    int m_nrxbins;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

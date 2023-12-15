@@ -903,7 +903,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
     **Selection Criteria**:
         * Use charged tracks from the loose lists in `stdCharged` to reconstruct :math:`D^{0}`
         * Use :math:`\\gamma` from `stdPhotons.loadStdSkimPhoton`
-        * use :math:`\\pi^{0}` from `stdpi0s.loadstdskimpi0`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * Cut on :math:`\\phi`:
           ``abs(dM) < 0.03``
         * Cut on :math:`\\rho^{0}`:
@@ -1002,19 +1002,22 @@ class DstToDpPi0_DpToHpOmega(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdPi("loose", path=path)
-        stdK("loose", path=path)
+        stdPi("all", path=path)
+        stdK("all", path=path)
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-
+        trackcuts = "dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20"
+        ma.cutAndCopyList("pi+:my", "pi+:all", "pionID>0.1 and " + trackcuts, path=path)
+        ma.cutAndCopyList("K+:my", "K+:all", "kaonID>0.1 and " + trackcuts, path=path)
         ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
-        ma.reconstructDecay("omega:3pi -> pi+:loose pi-:loose pi0:my", "[0.71 < M < 0.85 ]", path=path)
+
+        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
 
         Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
 
-        ma.reconstructDecay("D+:Kpomega -> K+:loose omega:3pi", Dpcuts, path=path)
-        ma.reconstructDecay("D+:pipomega -> pi+:loose omega:3pi", Dpcuts, path=path)
+        ma.reconstructDecay("D+:Kpomega -> K+:my omega:3pi", Dpcuts, path=path)
+        ma.reconstructDecay("D+:pipomega -> pi+:my omega:3pi", Dpcuts, path=path)
 
         ma.reconstructDecay("D*+:K -> D+:Kpomega", "0 < Q < 0.018", path=path)
         ma.reconstructDecay("D*+:pi -> D+:pipomega", "0 < Q < 0.018", path=path)
@@ -1053,23 +1056,21 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdPi("loose", path=path)
-        stdK("loose", path=path)
+        stdPi("all", path=path)
+        stdK("all", path=path)
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        mySel = "abs(d0) < 0.5 and abs(z0) < 2"
-        mySel += " and 0.296706 < theta < 2.61799"
-        ma.fillParticleList("pi+:my", mySel, path=path)
-        ma.fillParticleList("K+:my", mySel, path=path)
-
+        trackcuts = "dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20"
+        ma.cutAndCopyList("pi+:my", "pi+:all", "pionID>0.1 and" + trackcuts, path=path)
+        ma.cutAndCopyList("K+:my", "K+:all", "kaonID>0.1 and" + trackcuts, path=path)
         ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
 
-        ma.reconstructDecay("omega:3pi -> pi+:loose pi-:loose pi0:my", "[0.71 < M < 0.85 ]", path=path)
+        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
 
         Dspcuts = "1.77 < M < 2.17 and useCMSFrame(p) > 2.0"
-        ma.reconstructDecay("D_s+:Kpomega -> K+:loose omega:3pi", Dspcuts, path=path)
-        ma.reconstructDecay("D_s+:pipomega -> pi+:loose omega:3pi", Dspcuts, path=path)
+        ma.reconstructDecay("D_s+:Kpomega -> K+:my omega:3pi", Dspcuts, path=path)
+        ma.reconstructDecay("D_s+:pipomega -> pi+:my omega:3pi", Dspcuts, path=path)
 
         ma.reconstructDecay("D*+:K -> D_s+:Kpomega", "0 < Q < 0.018", path=path)
         ma.reconstructDecay("D*+:pi -> D_s+:pipomega", "0 < Q < 0.018", path=path)

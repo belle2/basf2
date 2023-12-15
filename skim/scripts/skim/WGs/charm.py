@@ -1019,12 +1019,12 @@ class DstToDpPi0_DpToHpOmega(BaseSkim):
         ma.reconstructDecay("D+:Kpomega -> K+:my omega:3pi", Dpcuts, path=path)
         ma.reconstructDecay("D+:pipomega -> pi+:my omega:3pi", Dpcuts, path=path)
 
-        ma.reconstructDecay("D*+:K -> D+:Kpomega", "0 < Q < 0.018", path=path)
-        ma.reconstructDecay("D*+:pi -> D+:pipomega", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:DpK -> D+:Kpomega pi0:my", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:Dppi -> D+:pipomega pi0:my", "0 < Q < 0.018", path=path)
 
         DstList = []
-        DstList.append("D*+:K")
-        DstList.append("D*+:pi")
+        DstList.append("D*+:DpK")
+        DstList.append("D*+:Dppi")
 
         return DstList
 
@@ -1072,11 +1072,11 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         ma.reconstructDecay("D_s+:Kpomega -> K+:my omega:3pi", Dspcuts, path=path)
         ma.reconstructDecay("D_s+:pipomega -> pi+:my omega:3pi", Dspcuts, path=path)
 
-        ma.reconstructDecay("D*+:K -> D_s+:Kpomega", "0 < Q < 0.018", path=path)
-        ma.reconstructDecay("D*+:pi -> D_s+:pipomega", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:DspK -> D_s+:Kpomega pi0:my", "0 < Q < 0.018", path=path)
+        ma.reconstructDecay("D*+:Dsppi -> D_s+:pipomega pi0:my", "0 < Q < 0.018", path=path)
 
         DstList = []
-        DstList.append("D*+:K")
-        DstList.append("D*+:pi")
+        DstList.append("D*+:DspK")
+        DstList.append("D*+:Dsppi")
 
         return DstList

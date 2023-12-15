@@ -26,17 +26,25 @@ import textwrap
 from urllib.parse import urljoin
 from . import ConditionsDB, encode_name, file_checksum
 from .cli_utils import ItemFilter
+from .iov import IntervalOfValidity
 from .local_metadata import LocalMetadataProvider
 from basf2 import B2ERROR, B2WARNING, B2INFO, LogLevel, LogInfo, logging
 from basf2.utils import get_terminal_width
 from concurrent.futures import ThreadPoolExecutor
 
 
-def check_payload(destination, payloadinfo):
+def check_payload(destination, payloadinfo, run_range=None):
+    """Return a list of all iovs for a given payload together with the file checksum and filenames.
+
+    Args:
+        destination (str): local folder where to download the payload
+        payloadinfo (dict): pyalod informations as returned by the REST API
+        run_range (b2conditions_db.iov.IntervalOfValidity, optional): Interval of validity . Defaults to None.
+
+    Returns:
+        tuple: local file name, remote file name, checksum, list of iovs
     """
-    Download a single payload and return a list of all iovs. If the functions
-    returns None there was an error downloading.
-    """
+
     payload = payloadinfo["payloadId"]
     module = payload["basf2Module"]["name"]
     revision = int(payload["revision"])
@@ -49,6 +57,15 @@ def check_payload(destination, payloadinfo):
 
     iovlist = []
     for iov in payloadinfo["payloadIovs"]:
+        if run_range is not None:
+            if run_range is not None:
+                if (
+                    IntervalOfValidity(
+                        iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
+                    ).intersect(run_range)
+                    is None
+                ):
+                    continue
         iovlist.append([module, revision, iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]])
 
     return (local_file, remote_file, checksum, iovlist)
@@ -155,6 +172,10 @@ def command_legacydownload(args, db=None):
         args.add_argument("--retries", type=int, default=3,
                           help="Number of retries on connection problems (default: "
                           "%(default)s)")
+        args.add_argument("--run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be downloaded"
+                          "Only iovs overlapping, even partially, with this range will be downloaded.")
         group = args.add_mutually_exclusive_group()
         group.add_argument("--tag-pattern", default=False, action="store_true",
                            help="if given, all globaltags which match the shell-style "
@@ -177,6 +198,10 @@ def command_legacydownload(args, db=None):
     if not payloadfilter.check_arguments():
         return 1
 
+    if args.run_range is not None:
+        run_range_str = f" [valid in {tuple(args.run_range)}]"
+        args.run_range = IntervalOfValidity(args.run_range)
+
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():
         logging.set_info(level, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.TIMESTAMP)
@@ -189,8 +214,8 @@ def command_legacydownload(args, db=None):
     failed = 0
     for tagname in sorted(tagnames):
         try:
-            req = db.request("GET", "/globalTag/{}/globalTagPayloads".format(encode_name(tagname)),
-                             f"Downloading list of payloads for {tagname} tag{payloadfilter}")
+            req = db.request("GET", f"/globalTag/{encode_name(tagname)}/globalTagPayloads",
+                             f"Downloading list of payloads for {tagname} tag{payloadfilter}{run_range_str}")
         except ConditionsDB.RequestError as e:
             B2ERROR(str(e))
             continue
@@ -199,7 +224,7 @@ def command_legacydownload(args, db=None):
         for payload in req.json():
             name = payload["payloadId"]["basf2Module"]["name"]
             if payloadfilter.check(name):
-                local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload)
+                local_file, remote_file, checksum, iovlist = check_payload(args.destination, payload, args.run_range)
                 if local_file in download_list:
                     download_list[local_file][-1] += iovlist
                 else:

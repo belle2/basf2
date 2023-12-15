@@ -44,8 +44,8 @@ MonitorDataModule::~MonitorDataModule()
 void MonitorDataModule::defineHisto()
 {
   h_ncpr = new TH1F("NumCOPPER", "Number of COPPERs", 10, 0.0, 10.0);
-  h_nevt = new TH1F("Nevent", "Number of Events", 10, 0.0, 10.0);
-  h_size = new TH1F("Data Size", "Data Size", 100, 0.0, 2000.0);
+  h_nevt = new TH1F("Nevent COPPER", "Number of Events", 10, 0.0, 10.0);
+  h_size = new TH1F("Data Size COPPER", "Data Size", 100, 0.0, 2000.0);
   h_size2d = new TH2F("Data Size vs. Cpr", "Data Size vs. Copper", 100, 0.0, 2000.0, 5, 0.0, 5.0);
 }
 

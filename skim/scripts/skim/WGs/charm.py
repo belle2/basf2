@@ -985,8 +985,8 @@ class DstToDpPi0_DpToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Tracks :math: loose `\\pi^{+} and K^{+}` selection from `stdPi' and 'stdK'
-        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and p(pi^{0})>0.25
+        * Tracks :math: loose `\\pi^{+} and K^{+}` selection from `stdPi` and `stdK`
+        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and `p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
         * ``2.0 < p*(D+) ``
@@ -1036,8 +1036,8 @@ class DstToDspPi0_DspToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Tracks :math: loose `\\pi^{+} and K^{+}` selection from `stdPi' and 'stdK'
-        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and p(pi^{0})>0.25
+        * Tracks :math: loose `\\pi^{+} and K^{+}` selection from `stdPi` and `stdK`
+        * :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and `p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
         * ``2.0 < p*(D_s+) ``

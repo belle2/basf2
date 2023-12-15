@@ -7,7 +7,12 @@
 ##########################################################################
 
 '''
-Test for checking b2conditionsdb iov and b2conditionsdb diff commands and option --run-range:
+Test for checking:
+    - b2conditionsdb iov
+    - b2conditionsdb iov --run-range
+    - b2conditionsdb diff
+    - b2conditionsdb diff --run-range
+    - b2conditionsdb legacydownload --run-range
 '''
 
 

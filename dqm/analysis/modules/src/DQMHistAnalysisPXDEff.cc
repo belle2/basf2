@@ -127,8 +127,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   //One bin for each module in the geometry, one histogram for each layer
   m_cEffAll = new TCanvas((m_histogramDirectoryName + "/c_EffAll").data());
-  m_hEffAll = new TEfficiency("ePXDHitEffAll", "PXD Integrated Efficiency of each module;PXD Module;",
-                              m_PXDModules.size(), 0, m_PXDModules.size());
+  m_hEffAll = new TEfficiency("ePXDHitEffAll", "PXD Integrated Efficiency of each module;PXD Module;", m_nrxbins, 0, m_nrxbins);
   m_hEffAll->SetConfidenceLevel(m_confidence);
   m_hEffAll->Paint("AP");
   m_hEffAllLastTotal = m_hEffAll->GetCopyTotalHisto();

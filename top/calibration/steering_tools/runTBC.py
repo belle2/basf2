@@ -14,8 +14,6 @@
 # Called by the wrapper scripts runTBCpocket.sh and runTBClocal.sh, which
 # sets the proper directories for the output.
 #
-# Note: check the global tag!
-#
 
 import basf2 as b2
 import sys
@@ -61,13 +59,9 @@ if datatype == 'pocket':
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
 main.add_module('TOPGeometryParInitializer')
 
-# Unpacking (format auto detection works now)
+# Unpacking
 unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
-
-# Add multiple hits by running feature extraction offline
-featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
-main.add_module(featureExtractor)
 
 # Convert to TOPDigits
 converter = b2.register_module('TOPRawDigitConverter')
@@ -76,11 +70,12 @@ converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('calibrationChannel', channel)  # if set, cal pulses will be flagged
-converter.param('calpulseHeightMin', 450)  # in [ADC counts]
+converter.param('calpulseHeightMin', 200)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
-converter.param('calpulseWidthMin', 2.0)  # in [ns]
-converter.param('calpulseWidthMax', 8.0)  # in [ns]
-converter.param('lookBackWindows', 29)  # in number of windows
+converter.param('calpulseWidthMin', 0.5)  # in [ns]
+converter.param('calpulseWidthMax', 4.0)  # in [ns]
+converter.param('minPulseWidth', 0.5)  # in [ns]
+converter.param('lookBackWindows', 28)  # in number of windows
 main.add_module(converter)
 
 # TB calibrator

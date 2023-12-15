@@ -10,7 +10,7 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------------
-# CAF calibration script: channel T0 with laser (including pre-calibration of BS13d)
+# CAF calibration script: channel T0 with laser
 # data type: local runs with laser
 #
 # usage: basf2 run_channelT0_laser_calibration.py expNo run_1 run_2 ... run_n
@@ -25,7 +25,6 @@ from caf.framework import Calibration, CAF
 from caf.strategies import SingleIOV
 from ROOT.Belle2 import TOP
 from basf2 import B2ERROR
-from top_calibration import BS13d_calibration_local
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
@@ -37,7 +36,7 @@ look_back = 28  # look-back window setting (set to 0 if look-back setting availa
 tts_file = '/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root'
 laser_mc_fit = '/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root'
 fit_mode = 'calibration'  # can be either monitoring, MC or calibration
-sroot_format = True  # on True data in sroot format, on False data in root format
+sroot_format = False  # on True data in sroot format, on False data in root format
 #
 # ---------------------------------------------------------------------------------------
 
@@ -104,10 +103,12 @@ def channelT0_calibration(sroot=False):
                     useChannelT0Calibration=False,
                     useModuleT0Calibration=False,
                     useCommonT0Calibration=False,
-                    calpulseHeightMin=320,
+                    calpulseHeightMin=200,
                     calpulseHeightMax=680,
                     calpulseWidthMin=1.5,
                     calpulseWidthMax=2.2,
+                    calpulseTimeMin=0.0,
+                    calpulseTimeMax=70.0,
                     calibrationChannel=0,
                     lookBackWindows=look_back)
 
@@ -139,16 +140,12 @@ def channelT0_calibration(sroot=False):
 
 
 # Define calibrations
-cal1 = BS13d_calibration_local(inputFiles, look_back, globalTags, localDBs, sroot_format)
-cal2 = channelT0_calibration(sroot_format)
-cal1.backend_args = {"queue": "l"}
-cal2.backend_args = {"queue": "l"}
-cal2.depends_on(cal1)
+cal = channelT0_calibration(sroot_format)
+cal.backend_args = {"queue": "l"}
 
 # Add calibrations to CAF
 cal_fw = CAF()
-cal_fw.add_calibration(cal1)
-cal_fw.add_calibration(cal2)
+cal_fw.add_calibration(cal)
 cal_fw.output_dir = output_dir
 cal_fw.backend = backends.LSF()
 

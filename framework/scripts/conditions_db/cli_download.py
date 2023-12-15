@@ -58,14 +58,13 @@ def check_payload(destination, payloadinfo, run_range=None):
     iovlist = []
     for iov in payloadinfo["payloadIovs"]:
         if run_range is not None:
-            if run_range is not None:
-                if (
-                    IntervalOfValidity(
-                        iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
-                    ).intersect(run_range)
+            if (
+               IntervalOfValidity(
+                    iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]
+               ).intersect(run_range)
                     is None
-                ):
-                    continue
+               ):
+                continue
         iovlist.append([module, revision, iov["expStart"], iov["runStart"], iov["expEnd"], iov["runEnd"]])
 
     return (local_file, remote_file, checksum, iovlist)
@@ -198,9 +197,8 @@ def command_legacydownload(args, db=None):
     if not payloadfilter.check_arguments():
         return 1
 
-    if args.run_range is not None:
-        run_range_str = f" [valid in {tuple(args.run_range)}]"
-        args.run_range = IntervalOfValidity(args.run_range)
+    run_range_str = f' valid in {tuple(args.run_range)}' if args.run_range else ''
+    args.run_range = IntervalOfValidity(args.run_range) if args.run_range else None
 
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():

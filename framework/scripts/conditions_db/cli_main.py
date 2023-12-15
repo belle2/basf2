@@ -675,10 +675,8 @@ def command_iov(args, db):
     if not iovfilter.check_arguments():
         return 1
 
-    run_range_str = ""
-    if args.run_range is not None:
-        run_range_str = f" [valid in {tuple(args.run_range)}]"
-        args.run_range = IntervalOfValidity(args.run_range)
+    run_range_str = f' valid in {tuple(args.run_range)}' if args.run_range else ''
+    args.run_range = IntervalOfValidity(args.run_range) if args.run_range else None
 
     if args.run is not None:
         msg = f"Obtaining list of iovs for globaltag {args.tag}, exp={args.run[0]}, run={args.run[1]}{iovfilter}"

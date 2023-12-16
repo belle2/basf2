@@ -10,8 +10,6 @@ import random
 import string
 import awkward as ak
 import numpy as np
-from numba import njit
-from numba.typed import typeddict
 
 from smartBKG import PREPROC_CONFIG, TOKENIZE_DICT, LIST_FIELDS
 
@@ -140,15 +138,18 @@ def remove_masks(array):
     return out
 
 
-@njit(boundscheck=True)
-def mapped_mother_index_flat(array_indices_ak, mother_indices_ak, total, dict_size):
+def mapped_mother_index_flat(array_indices_flat, mother_indices_flat, total, sizes, dict_size):
     """
     Map mother indices for particle arrays to handle removed mothers.
     """
     out = np.empty(total, dtype=np.int32)
     i = 0
     idx_dict = np.empty(dict_size, dtype=np.int32)
-    for array_indices, mother_indices in zip(array_indices_ak, mother_indices_ak):
+    start = 0
+    for size in sizes:
+        stop = start + size
+        array_indices = array_indices_flat[start:stop]
+        mother_indices = mother_indices_flat[start:stop]
         # fill idx_dict
         for original_index in mother_indices:
             # default -1 (will represent mothers that have been removed)
@@ -160,7 +161,7 @@ def mapped_mother_index_flat(array_indices_ak, mother_indices_ak, total, dict_si
         for mother_index in mother_indices:
             out[i] = idx_dict[mother_index]
             i += 1
-
+        start = stop
     return out
 
 
@@ -171,34 +172,30 @@ def mapped_mother_index(array_indices, mother_indices):
     max_dict_index = max(ak.max(array_indices), ak.max(mother_indices))
     dict_size = max_dict_index + 1
     flat = mapped_mother_index_flat(
-        ak.fill_none(array_indices, -1),
-        ak.fill_none(mother_indices, -1),
+        ak.to_numpy(ak.flatten(ak.fill_none(array_indices, -1))),
+        ak.to_numpy(ak.flatten(ak.fill_none(mother_indices, -1))),
+        sizes=ak.num(array_indices),
         total=ak.sum(ak.num(array_indices)),
         dict_size=dict_size,
     )
     return ak.unflatten(flat, ak.num(array_indices))
 
 
-@njit
-def mapped_pdg_id_flat(pdg, tokens):
+def map_np(array, mapping):
     """
     Map PDG IDs to tokens.
     """
-    out = np.empty(len(pdg), dtype=np.int16)
-    for i, x in enumerate(pdg):
-        out[i] = tokens[x]
-    return out
+    unique, inv = np.unique(array, return_inverse=True)
+    np_mapping = np.array([mapping[x] for x in unique])
+    return np_mapping[inv]
 
 
 def mapped_pdg_id(pdg):
     """
     Map PDG IDs to tokens for awkward arrays.
     """
-    tokens = typeddict.Dict()
-    for k, v in TOKENIZE_DICT.items():
-        tokens[k] = v
     return ak.unflatten(
-        mapped_pdg_id_flat(ak.to_numpy(ak.flatten(pdg)), tokens), ak.num(pdg)
+        map_np(ak.to_numpy(ak.flatten(pdg)), TOKENIZE_DICT), ak.num(pdg)
     )
 
 

@@ -9,6 +9,7 @@
 # Cuts: None
 # Date: 20231201
 
+Alias      K_S0sig  K_S0
 # Upsilon(4S) decay
 Decay Upsilon(4S)
 0.5 B+sig B-   VSS;
@@ -22,9 +23,13 @@ Enddecay
 CDecay B-sig
 
 Decay Lambda_c+sig
-1.0 p+ K_S0 		     PHSP;
+1.0 p+ K_S0sig 		     PHSP;
 Enddecay
 
 CDecay anti-Lambda_c-sig
+
+Decay K_S0sig
+1.0 pi+ pi- PHSP;
+Enddecay
 
 End

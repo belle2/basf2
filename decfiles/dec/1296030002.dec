@@ -9,6 +9,7 @@
 # Cuts: None
 # Date: 20231201
 
+Alias      Lambda0sig  Lambda0
 # Upsilon(4S) decay
 Decay Upsilon(4S)
 0.5 B+sig B-   VSS;
@@ -22,9 +23,13 @@ Enddecay
 CDecay B-sig
 
 Decay Lambda_c+sig
-1.0 Lambda0 pi+ pi+ pi-      PHSP;
+1.0 Lambda0sig pi+ pi+ pi-      PHSP;
 Enddecay
 
 CDecay anti-Lambda_c-sig
+
+Decay Lambda0sig
+1.0   p+  pi-                                      HypNonLepton 0.748 -6.5; #[PDG2023]
+Enddecay
 
 End

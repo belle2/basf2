@@ -48,7 +48,9 @@ class SaveFlag(b2.Module):
         """
         Initialize the data store and the list to save event numbers before processing events.
         """
+        #: Initialise event metadata from data store
         self.eventInfo = Belle2.PyStoreObj('EventMetaData')
+        #: List to save event numbers of pass events
         self.pass_list = []
 
     def event(self):
@@ -101,8 +103,11 @@ class TrainDataSaver(b2.Module):
         """
         Initialize the data store and the dictionary to save particle features before processing events.
         """
+        #: Initialise event metadata from data store
         self.eventinfo = Belle2.PyStoreObj('EventMetaData')
+        #: Initialise event extra info from data store
         self.eventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
+        #: Dictionary to save particle features
         self.df_dict = defaultdict(list)
 
     def event(self):
@@ -151,8 +156,8 @@ class TrainDataSaver(b2.Module):
         """
         Append events to the DataFrame on disk and free memory.
         """
-        self.event_df = pd.DataFrame(self.df_dict)
-        self.event_df.to_hdf(self.output_file, key='mc_information', mode='a', format='table', append=True)
+        event_df = pd.DataFrame(self.df_dict)
+        event_df.to_hdf(self.output_file, key='mc_information', mode='a', format='table', append=True)
         self.df_dict = defaultdict(list)
 
 

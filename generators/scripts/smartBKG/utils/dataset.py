@@ -112,7 +112,7 @@ class ArrayDataset(torch.utils.data.IterableDataset):
         self.batch_size = batch_size
         #: Whether to shuffle the data
         self.shuffle = shuffle
-        # Random seed for shuffling, consistent seed for all workers
+        #: Random seed for shuffling, consistent seed for all workers
         self.seed = seed if seed is not None else np.random.SeedSequence().entropy
         #: Whether the dataset includes weights
         self.weighted = weighted

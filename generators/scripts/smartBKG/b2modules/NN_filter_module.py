@@ -108,6 +108,10 @@ class NNFilterModule(b2.Module):
 
         #: generated variables
         self.gen_vars = defaultdict(list)
+
+        #: record the production time of root particle for the correction of jitter
+        self.root_prodTime = defaultdict(list)
+
         #: node features
         self.out_features = self.preproc_config['features']
         if 'PDG' in self.preproc_config['features']:
@@ -125,21 +129,28 @@ class NNFilterModule(b2.Module):
         self.EventExtraInfo.create()
 
         mcplist = Belle2.PyStoreArray("MCParticles")
-
-        array_indices = []
-        mother_indices = []
+        root_index = 0
 
         for i, mcp in enumerate(mcplist):
-            if mcp.isPrimaryParticle():
-                # Check mc particle is useable
-                if not check_status_bit(mcp.getStatus()):
-                    continue
-
+            if mcp.isPrimaryParticle() and check_status_bit(mcp.getStatus()):
                 prodTime = mcp.getProductionTime()
-                # record the production time of root particle for the correction of jitter
-                if i == 0:
-                    root_prodTime = prodTime
-                prodTime -= root_prodTime
+
+                # Collect indices for graph
+                array_index = mcp.getArrayIndex()
+                mother = mcp.getMother()
+                if mother:
+                    mother_index = mother.getArrayIndex()
+                    self.gen_vars['mother_indices'].append(mother_index - root_index)
+                    # pass the production time of root particle for the correction of jitter
+                    self.root_prodTime[array_index] = self.root_prodTime[mother_index]
+                else:
+                    root_index = array_index
+                    self.gen_vars['mother_indices'].append(0)
+                    # record the production time of root particle for the correction of jitter
+                    self.root_prodTime[array_index] = prodTime
+                self.gen_vars['array_indices'].append(array_index - root_index)
+
+                prodTime -= self.root_prodTime[array_index]
 
                 four_vec = mcp.get4Vector()
                 prod_vec = mcp.getProductionVertex()
@@ -165,16 +176,8 @@ class NNFilterModule(b2.Module):
                         values.pop()
                     continue
 
-                # Collect indices for graph
-                array_indices.append(mcp.getArrayIndex())
-                mother = mcp.getMother()
-                if mother:
-                    mother_indices.append(mother.getArrayIndex())
-                else:
-                    mother_indices.append(0)
-
         graph = self.build_graph(
-            array_indices=array_indices, mother_indices=mother_indices,
+            array_indices=self.gen_vars['array_indices'], mother_indices=self.gen_vars['mother_indices'],
             PDGs=self.gen_vars['PDG'], Features=[self.gen_vars[key] for key in self.out_features],
             symmetrize=True, add_self_loops=True
         )

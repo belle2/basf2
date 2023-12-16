@@ -984,7 +984,7 @@ class DpToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Use charged tracks from loose list in `stdCharged`
+        * ``track cuts: dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
@@ -1033,7 +1033,7 @@ class DspToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Use charged tracks from loose list in `stdCharged`
+        * ``track cuts: dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``

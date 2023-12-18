@@ -67,9 +67,79 @@ namespace Belle2 {
 
       k0 = prism.getK0();
       unfoldedWindows = prism.getUnfoldedWindows();
-      for (auto& w : unfoldedWindows) w.z0 += zR;
+      for (auto& w : unfoldedWindows) {
+        w.z0 += zR;
+      }
+      int n = unfoldedWindows.size();
+      projectedY = new double[n];
+      projectedZ = new double[n];
+      double dz = std::abs(zD - zFlat);
+      for (int i = 0; i < n; ++i) {
+        const TOPGeoPrism::UnfoldedWindow& win = unfoldedWindows[i];
+        projectedY[i] = win.y0 + win.ny * dz;
+        projectedZ[i] = win.z0 + win.nz * dz;
+      }
     }
 
+    RaytracerBase::Prism::~Prism()
+    {
+      if (projectedY != nullptr)
+        delete[] projectedY;
+      if (projectedZ != nullptr)
+        delete[] projectedZ;
+    }
+
+    RaytracerBase::Prism::Prism(const Prism& prism) :
+      A(prism.A), B(prism.B), yUp(prism.yUp), yDown(prism.yDown),
+      zL(prism.zL), zR(prism.zR), zFlat(prism.zFlat), zD(prism.zD),
+      slope(prism.slope), k0(prism.k0), unfoldedWindows(prism.unfoldedWindows)
+    {
+      if (prism.projectedY != nullptr) {
+        int n = unfoldedWindows.size();
+        projectedY = new double[n];
+        std::memcpy(projectedY, prism.projectedY, n * sizeof(double));
+      } else {
+        projectedY = nullptr;
+      }
+      if (prism.projectedZ != nullptr) {
+        int n = unfoldedWindows.size();
+        projectedZ = new double[n];
+        std::memcpy(projectedZ, prism.projectedZ, n * sizeof(double));
+      } else {
+        projectedZ = nullptr;
+      }
+    }
+
+    RaytracerBase::Prism& RaytracerBase::Prism::operator=(
+      const RaytracerBase::Prism& prism)
+    {
+      A = prism.A;
+      B = prism.B;
+      yUp = prism.yUp;
+      yDown = prism.yDown;
+      zL = prism.zL;
+      zR = prism.zR;
+      zFlat = prism.zFlat;
+      zD = prism.zD;
+      slope = prism.slope;
+      k0 = prism.k0;
+      unfoldedWindows = prism.unfoldedWindows;
+      if (prism.projectedY != nullptr) {
+        int n = unfoldedWindows.size();
+        projectedY = new double[n];
+        std::memcpy(projectedY, prism.projectedY, n * sizeof(double));
+      } else {
+        projectedY = nullptr;
+      }
+      if (prism.projectedZ != nullptr) {
+        int n = unfoldedWindows.size();
+        projectedZ = new double[n];
+        std::memcpy(projectedZ, prism.projectedZ, n * sizeof(double));
+      } else {
+        projectedZ = nullptr;
+      }
+      return *this;
+    }
 
     RaytracerBase::RaytracerBase(int moduleID, EGeometry geometry, EOptics optics):
       m_moduleID(moduleID), m_geometry(geometry), m_optics(optics)

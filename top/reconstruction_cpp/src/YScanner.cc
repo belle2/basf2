@@ -400,28 +400,44 @@ namespace Belle2 {
     }
 
 
-    double YScanner::prismEntranceY(double y, int k, double dydz) const
+    void YScanner::prismEntranceY(double prismEntrance[2], double y[2], int k,
+                                  double dydz) const
     {
-      const auto& win = m_prism.unfoldedWindows[k];
-      double dz = std::abs(m_prism.zD - m_prism.zFlat);
-      double z1 = y * win.sz + win.z0 + win.nz * dz;
-      double y1 = y * win.sy + win.y0 + win.ny * dz;
-      return y1 + dydz * (m_prism.zR - z1);
+      const TOPGeoPrism::UnfoldedWindow& win = m_prism.unfoldedWindows[k];
+      #pragma omp simd
+      for (int i = 0; i < 2; ++i) {
+        double z1 = y[i] * win.sz + m_prism.projectedZ[k];
+        double y1 = y[i] * win.sy + m_prism.projectedY[k];
+        prismEntrance[i] = y1 + dydz * (m_prism.zR - z1);
+      }
     }
 
 
     void YScanner::projectPixel(double yc, double size, int k, double dydz, PixelProjection& proj) const
     {
-      double halfSize = (k - m_prism.k0) % 2 == 0 ? size / 2 : -size / 2;
-      double y1 = prismEntranceY(yc - halfSize, k, dydz);
-      double y2 = prismEntranceY(yc + halfSize, k, dydz);
+      double halfSize = 0.5 * size;
+      double y[2], y2[2];
+      y2[0] = yc - halfSize;
+      y2[1] = yc + halfSize;
+      if ((k - m_prism.k0) % 2 == 0) {
+        y2[0] = -halfSize;
+        y2[1] = halfSize;
+      } else {
+        y2[0] = -halfSize;
+        y2[1] = halfSize;
+      }
+      #pragma omp simd
+      for (int i = 0; i < 2; ++i) {
+        y2[i] = y2[i] + yc;
+      }
+      prismEntranceY(y, y2, k, dydz);
 
       double Bh = m_bars.front().B / 2;
-      y1 = std::max(y1, -Bh);
-      y2 = std::min(y2, Bh);
+      y[0] = std::max(y[0], -Bh);
+      y[1] = std::min(y[1], Bh);
 
-      proj.yc = (y1 + y2) / 2;
-      proj.Dy = y2 - y1;
+      proj.yc = (y[0] + y[1]) / 2;
+      proj.Dy = y[1] - y[0];
     }
 
   } //TOP

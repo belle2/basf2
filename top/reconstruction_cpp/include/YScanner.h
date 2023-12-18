@@ -404,13 +404,25 @@ namespace Belle2 {
       void integrate(const EnergyMask* energyMask, double Ecp, Result& result) const;
 
       /**
-       * Calculates y at prism entrance from detection position, reflection number and photon slope
-       * @param y detection position in y
-       * @param k valid index of vector of unfolded prism exit windows
-       * @param dydz photon slope at prism entrance
-       * @return y position at prism entrance
+       * Calculates y at prism entrance from detection position,
+       * reflection number and photon slope.
+       *
+       * @param[out] prismEntance
+       * Y at prsim entrance.
+       *
+       * @param[in] y
+       * Detection position in y.
+       *
+       * @param[in] k
+       * Valid index of vector of unfolded prism exit windows.
+       *
+       * @param[in] dydz
+       * Photon slope at prism entrance.
+       *
+       * @return Y position at prism entrance.
        */
-      double prismEntranceY(double y, int k, double dydz) const;
+      void prismEntranceY(double prismEntrance[2], double y[2], int k,
+                          double dydz) const;
 
       /**
        * Calculates a projection of a pixel to prism entrance window (going down-stream the photon).

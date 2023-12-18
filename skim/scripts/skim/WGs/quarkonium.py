@@ -258,12 +258,12 @@ class InclusiveLambda(BaseSkim):
     * :math:`\\Lambda \\to p \\pi^-` (and charge conjugate)
 
     Selection criteria:
-    * proton
-    ``protonID > 0.1``
+    * proton:
+    ``protonID_proton > 0.1``
     * Lambda:
-    ``cosAngleBetweenMomentumAndVertexVector > 0.99``
-    ``flightDistance/flightDistanceErr > 3.``
-    * ``0.6 < p,proton/p,Lambda < 1.0 GeV/c``
+    ``cosAngleBetweenMomentumAndVertexVector > 0.75``
+    ``flightDistance/flightDistanceErr > 0.``
+    * ``0.5 < p,proton/p,Lambda < 1.25 GeV/c``
 
     """
     __authors__ = ["Bianca Scavino"]
@@ -282,9 +282,9 @@ class InclusiveLambda(BaseSkim):
         v.addAlias('flightSignificance', 'formula(flightDistance/flightDistanceErr)')
 
         # Apply selection to Lambdas
-        ma.applyCuts("Lambda0:merged", "cosAngleBetweenMomentumAndVertexVector > 0.99", path=path)
-        ma.applyCuts("Lambda0:merged", "0.6 < momRatio_protonLambda < 1.", path=path)
-        ma.applyCuts("Lambda0:merged", "flightSignificance > 3.", path=path)
+        ma.applyCuts("Lambda0:merged", "cosAngleBetweenMomentumAndVertexVector > 0.75", path=path)
+        ma.applyCuts("Lambda0:merged", "0.5 < momRatio_protonLambda < 1.25", path=path)
+        ma.applyCuts("Lambda0:merged", "flightSignificance > 0.", path=path)
         ma.applyCuts("Lambda0:merged", "protonID_proton > 0.1", path=path)
 
         # Return the lists.

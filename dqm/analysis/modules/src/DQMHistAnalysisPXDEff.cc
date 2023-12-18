@@ -386,21 +386,21 @@ void DQMHistAnalysisPXDEffModule::event()
       VxdID& aModule = m_PXDModules[i];
       double nmatch = Combined->GetBinContent(i * 2 + 2);
       double nhit = Combined->GetBinContent(i * 2 + 1);
-      if (nmatch > 10 && nhit > 10) { // could be zero, too
-        imatch += nmatch;
-        ihit +=  nhit;
-        // check layer
-        if (i >= 16) {
-          imatchL2 += nmatch;
-          ihitL2 +=  nhit;
-        } else {
-          imatchL1 += nmatch;
-          ihitL1 +=  nhit;
-        }
 
-        ieff++; // only count in modules working
+      imatch += nmatch;
+      ihit +=  nhit;
+      // check layer
+      if (i >= 16) {
+        imatchL2 += nmatch;
+        ihitL2 +=  nhit;
+      } else {
+        imatchL1 += nmatch;
+        ihitL1 +=  nhit;
+      }
+
+      if (nhit > 50) { // dont update if there is nothing to calculate
+        ieff++; // only count in modules with significant stat
         double var_e = nmatch / nhit; // can never be zero
-
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
       }
@@ -426,17 +426,17 @@ void DQMHistAnalysisPXDEffModule::event()
       }
     }
 
-    updateEffBins(m_nrxbins + 0, ihitL1, imatchL1, m_minEntries * 8);
+    updateEffBins(m_nrxbins + 1, ihitL1, imatchL1, m_minEntries * 8);
     if (ihitL1 >= 400) {
       error_flag |= check_error_level(m_nrxbins + 0, "L1");
       warn_flag |= check_warn_level(m_nrxbins + 0, "L1");
     }
-    updateEffBins(m_nrxbins + 1, ihitL2, imatchL2, m_minEntries * 12);
+    updateEffBins(m_nrxbins + 2, ihitL2, imatchL2, m_minEntries * 12);
     if (ihitL2 >= 600) {
       error_flag |= check_error_level(m_nrxbins + 1, "L2");
       warn_flag |= check_warn_level(m_nrxbins + 1, "L2");
     }
-    updateEffBins(m_nrxbins + 2, ihit, imatch, m_minEntries * 20);
+    updateEffBins(m_nrxbins + 3, ihit, imatch, m_minEntries * 20);
     if (ihit >= 1000) {
       error_flag |= check_error_level(m_nrxbins + 2, "All");
       warn_flag |= check_warn_level(m_nrxbins + 2, "All");

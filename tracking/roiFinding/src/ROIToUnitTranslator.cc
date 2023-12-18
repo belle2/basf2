@@ -60,11 +60,11 @@ ROIToUnitTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
 
     double minU = (*listOfIntercepts)[i]->getCoorU() - widthTotU / 2 ;
     double maxU = (*listOfIntercepts)[i]->getCoorU() + widthTotU / 2 ;
-    const int nPixelsU = aSensorInfo.getUCells() - 1;
+    const int nUnitsU = aSensorInfo.getUCells() - 1;
 
     double minV = (*listOfIntercepts)[i]->getCoorV() - widthTotV / 2;
     double maxV = (*listOfIntercepts)[i]->getCoorV() + widthTotV / 2;
-    const int nPixelsV = aSensorInfo.getVCells() - 1;
+    const int nUnitsV = aSensorInfo.getVCells() - 1;
 
     const int firstPixelID = 0;
 
@@ -78,7 +78,7 @@ ROIToUnitTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
             << " SENSOR = " << VxdID((*listOfIntercepts)[i]->getSensorID()).getSensorNumber()
            );
 
-    B2DEBUG(21, "  nPixels (U,V) = (" << nPixelsU << "," << nPixelsV << ")");
+    B2DEBUG(21, "  number of units (pixel or strip) (U,V) = (" << nUnitsU << "," << nUnitsV << ")");
 
     B2DEBUG(21, "  widthU = " << maxU - minU
             << "  minU = "  << minU
@@ -91,14 +91,14 @@ ROIToUnitTranslator::fillRoiIDList(StoreArray<PXDIntercept>* listOfIntercepts,
             << "  maxV = " << maxV
             << "  lengthV = " << aSensorInfo.getVSize());
 
-    B2DEBUG(21, "  bottom left pixel (U,V) = (" << bottomLeft_uID << "," << bottomLeft_vID << ")");
-    B2DEBUG(21, "  top right pixel (U,V) = (" << topRight_uID << "," << topRight_vID << ")");
+    B2DEBUG(21, "  bottom left unit (pixel or strip) (U,V) = (" << bottomLeft_uID << "," << bottomLeft_vID << ")");
+    B2DEBUG(21, "  top right unit (pixel or strip) (U,V) = (" << topRight_uID << "," << topRight_vID << ")");
 
 
     //check that the pixel belong to the sensor
     bool inside = true;
-    if (bottomLeft_uID > nPixelsU || topRight_uID < firstPixelID || bottomLeft_vID > nPixelsV || topRight_vID < firstPixelID) {
-      B2DEBUG(21, "  OOOPS: this pixel does NOT belong to the sensor");
+    if (bottomLeft_uID > nUnitsU || topRight_uID < firstPixelID || bottomLeft_vID > nUnitsV || topRight_vID < firstPixelID) {
+      B2DEBUG(21, "  OOOPS: this unit (pixel or strip) does NOT belong to the sensor");
       inside = false;
     }
 

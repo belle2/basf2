@@ -15,7 +15,7 @@
 namespace Belle2 {
   class ROIid;
 
-  /** Translator for ROI-geometry-information into a list of pixels.
+  /** Translator for ROI-geometry-information into a list of pixels or strips.
    */
   class ROIToUnitTranslator {
 

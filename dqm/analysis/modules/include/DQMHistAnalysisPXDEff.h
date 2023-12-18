@@ -60,14 +60,33 @@ namespace Belle2 {
   private:
     /**
      * Update bin in efficiency plots with condition on nhits
+     * @param bin Bin number
+     * @param nhit Number of hits
+     * @param nmatch Number of matched hits
+     * @param minentries Number of minimal entries required ofr update
      */
     void updateEffBins(int bin, int nhit, int nmatch, int minentries);
 
     /**
-     * Update bin in efficiency plots with condition on nhits
+     * Check bin/name for error condition
+     * @param bin Bin number
+     * @param name Name of bin (Module, layer, ..)
+     * @return If error condition was met
      */
     bool check_error_level(int bin, std::string name);
+
+    /**
+     * Check bin/name for warn condition
+     * @param bin Bin number
+     * @param name Name of bin (Module, layer, ..)
+     * @return If warn condition was met
+     */
     bool check_warn_level(int bin, std::string name);
+
+    /**
+     * Set module labels for TGraphAsymmErrors
+     * @param gr the TGraphAsymmErrors to update
+     */
     void setLabels(TGraphAsymmErrors* gr);
 
   private:
@@ -132,7 +151,7 @@ namespace Belle2 {
     std::map<std::string, double> m_warnlevelmod;
     //! error level for alarm per module
     std::map<std::string, double> m_errorlevelmod;
-
+    //! Number of bins in efficiency plot, all modules plus layer and summary
     int m_nrxbins;
 
     /** Monitoring Object */

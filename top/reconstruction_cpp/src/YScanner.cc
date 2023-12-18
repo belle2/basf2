@@ -417,8 +417,6 @@ namespace Belle2 {
     {
       double halfSize = 0.5 * size;
       double y[2], y2[2];
-      y2[0] = yc - halfSize;
-      y2[1] = yc + halfSize;
       if ((k - m_prism.k0) % 2 == 0) {
         y2[0] = -halfSize;
         y2[1] = halfSize;

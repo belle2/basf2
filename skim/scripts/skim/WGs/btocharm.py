@@ -1054,7 +1054,7 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
     * ``abs(deltaE) < 0.32``
     * ``1.7 < M_D < 2.0``
     * ``(M_D* - M_D0) < 0.16``
-    * ``0.38 < M_eta < 0.67``
+    * ``0.35 < M_eta < 0.7``
     * ``E_photons > 0.05``
 
     Note:
@@ -1078,7 +1078,7 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.38 < daughter(1,M) < 0.67"
-        etacuts = "0.38 < M < 0.67 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
+        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
         ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B0:B0toDstaretapi_D0pi_Kpi -> D*-:D0_Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)

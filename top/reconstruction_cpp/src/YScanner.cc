@@ -423,8 +423,8 @@ namespace Belle2 {
         y2[0] = -halfSize;
         y2[1] = halfSize;
       } else {
-        y2[0] = -halfSize;
-        y2[1] = halfSize;
+        y2[0] = halfSize;
+        y2[1] = -halfSize;
       }
       #pragma omp simd
       for (int i = 0; i < 2; ++i) {

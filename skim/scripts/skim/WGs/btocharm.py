@@ -1053,7 +1053,7 @@ class BptoD0etapi_Kpi(BaseSkim):
     * ``Mbc > 5.25``
     * ``abs(deltaE) < 0.32``
     * ``1.7 < M_D < 2.0``
-    * ``0.38 < M_eta < 0.67``
+    * ``0.35 < M_eta < 0.7``
     * ``E_photons > 0.05``
 
     Note:
@@ -1074,8 +1074,8 @@ class BptoD0etapi_Kpi(BaseSkim):
         loadStdD0_Kpi(path=path)
 
     def build_lists(self, path):
-        Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.38 < daughter(1,M) < 0.67"
-        etacuts = "0.38 < M < 0.67 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
+        Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
+        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
         ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B+:BptoD0etapi_Kpi -> anti-D0:Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)

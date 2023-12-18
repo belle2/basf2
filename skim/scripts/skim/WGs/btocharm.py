@@ -1077,7 +1077,7 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
         loadStdDstarPlus_D0pi_Kpi(path=path)
 
     def build_lists(self, path):
-        Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.38 < daughter(1,M) < 0.67"
+        Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
         etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
         ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)

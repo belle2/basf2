@@ -48,7 +48,7 @@ DQMHistAnalysisPXDEffModule::DQMHistAnalysisPXDEffModule() : DQMHistAnalysisModu
   addParam("perModuleAlarm", m_perModuleAlarm, "Alarm level per module", true);
   addParam("alarmAdhoc", m_alarmAdhoc, "Generate Alarm from adhoc values", true);
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
-  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
+  addParam("excluded", m_excluded, "the list of excluded modules, indices from 0 to 39");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: Constructor done.");
 }
 
@@ -173,6 +173,8 @@ void DQMHistAnalysisPXDEffModule::initialize()
 
   registerEpicsPV("PXD:Eff:Status", "Status");
   registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:L1", "L1");
+  registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
 }
 
@@ -214,52 +216,53 @@ void DQMHistAnalysisPXDEffModule::beginRun()
     if (single_cmap.second) single_cmap.second->Clear();
   }
 
+  m_hInnerMap->Reset();
+  m_hOuterMap->Reset();
 }
 
 
 void DQMHistAnalysisPXDEffModule::event()
 {
-  //Count how many of each type of histogram there are for the averaging
-  //std::map<std::string, int> typeCounter;
+  bool updateinner = false, updateouter = false;
+  for (auto aPXDModule : m_PXDModules) {
+    auto buff = (std::string)aPXDModule;
+    replace(buff.begin(), buff.end(), '.', '_');
 
-  m_hInnerMap->Reset();
-  m_hOuterMap->Reset();
-
-  for (unsigned int i = 1; i <= m_PXDModules.size(); i++) {
-    VxdID& aPXDModule = m_PXDModules[i - 1];
-
-    TString buff = (std::string)aPXDModule;
-    buff.ReplaceAll(".", "_");
-
-    TH1* Hits, *Matches;
-    TString locationHits = "track_hits_" + buff;
+    std::string locationHits = "track_hits_" + buff;
     if (m_histogramDirectoryName != "") {
       locationHits = m_histogramDirectoryName + "/" + locationHits;
     }
-    Hits = (TH1*)findHist(locationHits.Data());
-    TString locationMatches = "matched_cluster_" + buff;
+    std::string locationMatches = "matched_cluster_" + buff;
     if (m_histogramDirectoryName != "") {
       locationMatches = m_histogramDirectoryName + "/" + locationMatches;
     }
-    Matches = (TH1*)findHist(locationMatches.Data());
 
-    // Finding only one of them should only happen in very strange situations...
-    if (Hits == nullptr || Matches == nullptr) {
-      B2ERROR("Missing histogram for sensor " << aPXDModule);
-    } else {
+    auto Hits = (TH1*)findHist(locationHits, true);// check if updated
+    auto Matches = (TH1*)findHist(locationMatches, true);// check if updated
+
+    if (Hits == nullptr && Matches == nullptr) continue; // none updated
+
+    if (Hits == nullptr) Hits = (TH1*)findHist(locationHits); // actually, this should not happen ...
+    if (Matches == nullptr) Matches = (TH1*)findHist(locationMatches); // ... as updates should coincide
+
+    // Finding only one of them should only happen in very strange situations... still better check
+    if (Hits && Matches) {
       if (m_cEffModules[aPXDModule] && m_hEffModules[aPXDModule]) {// this check creates them with a nullptr ..bad
         m_hEffModules[aPXDModule]->SetTotalHistogram(*Hits, "f");
         m_hEffModules[aPXDModule]->SetPassedHistogram(*Matches, "f");
 
         m_cEffModules[aPXDModule]->cd();
         m_hEffModules[aPXDModule]->Paint("colz"); // not Draw, enforce to create GetPaintedHistogram?
+        m_hEffModules[aPXDModule]->Draw("colz"); // but Draw needed to export Canvas!
         m_cEffModules[aPXDModule]->Modified();
         m_cEffModules[aPXDModule]->Update();
+        UpdateCanvas(m_cEffModules[aPXDModule]);
 
         auto h = m_hEffModules[aPXDModule]->GetPaintedHistogram();
         int s = (2 - aPXDModule.getSensorNumber()) * m_v_bins;
         int l = (aPXDModule.getLadderNumber() - 1) * m_u_bins;
         if (m_hInnerMap && aPXDModule.getLayerNumber() == 1) {
+          updateinner = true;
           for (int u = 0; u < m_u_bins; u++) {
             for (int v = 0; v < m_v_bins; v++) {
               auto b = h->GetBin(u + 1, v + 1);
@@ -268,6 +271,7 @@ void DQMHistAnalysisPXDEffModule::event()
           }
         }
         if (m_hOuterMap && aPXDModule.getLayerNumber() == 2) {
+          updateouter = true;
           for (int u = 0; u < m_u_bins; u++) {
             for (int v = 0; v < m_v_bins; v++) {
               auto b = h->GetBin(u + 1, v + 1);
@@ -276,55 +280,71 @@ void DQMHistAnalysisPXDEffModule::event()
           }
         }
       }
+    } else {
+      B2WARNING("only one plot upd " << aPXDModule);
     }
-  }// Single-Module histos + 2d overview finished
+  }
+  // Single-Module histos + 2d overview finished. now draw overviews
+  if (updateinner) {
+    m_cInnerMap->cd();
+    if (m_hInnerMap) m_hInnerMap->Draw("colz");
+    m_cInnerMap->Modified();
+    m_cInnerMap->Update();
+    UpdateCanvas(m_cInnerMap);
+  }
+  if (updateouter) {
+    m_cOuterMap->cd();
+    if (m_hOuterMap) m_hOuterMap->Draw("colz");
+    m_cOuterMap->Modified();
+    m_cOuterMap->Update();
+    UpdateCanvas(m_cOuterMap);
+  }
+  // overview done
 
-  m_cInnerMap->cd();
-  if (m_hInnerMap) m_hInnerMap->Draw("colz");
-  m_cInnerMap->Modified();
-  m_cInnerMap->Update();
-  m_cOuterMap->cd();
-  if (m_hOuterMap) m_hOuterMap->Draw("colz");
-  m_cOuterMap->Modified();
-  m_cOuterMap->Update();
-  UpdateCanvas(m_cInnerMap->GetName());
-  UpdateCanvas(m_cOuterMap->GetName());
 
   // Change: We now use one histogram for hits and matches to make
   // sure that we have an atomic update which is otherwise not
   // guaranteed by DQM framework
-  TString locationHits = "PXD_Eff_combined";
-  if (m_histogramDirectoryName != "") {
-    locationHits = m_histogramDirectoryName + "/" + locationHits;
-  }
-  TH1* Combined = (TH1*)findHist(locationHits.Data());
+  std::string combinedHistname = "PXD_Eff_combined";
+  auto Combined = (TH1*)findHist(m_histogramDirectoryName, combinedHistname, true);// only if updated
 
-  double stat_data = 0;
-  bool error_flag = false;
-  bool warn_flag = false;
-  double all = 0.0;
+  if (Combined) {
+    // only if histogram was changed
 
-  double imatch = 0.0, ihit = 0.0;
-  int ieff = 0;
+    EStatus stat_data = c_TooFew;
+    bool error_flag = false;
+    bool warn_flag = false;
+    double all = 0.0;
 
-  std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
-  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    int j = i + 1;
+    double imatch = 0.0, ihit = 0.0;
+    double imatchL1 = 0.0, ihitL1 = 0.0;
+    double imatchL2 = 0.0, ihitL2 = 0.0;
+    int ieff = 0; // count number of modules with useful stytistics
 
-    if (Combined == nullptr) {
-      m_hEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
-      m_hEffAll->SetTotalEvents(j, 0);
-    } else {
+    std::map <VxdID, bool> updated{}; // init to false, keep track of updated histograms
+    for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+      // workaround for excluded module
+      if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+      // excluded modules are not counted at all!
+      int j = i + 1;
+
       VxdID& aModule = m_PXDModules[i];
       double nmatch = Combined->GetBinContent(i * 2 + 2);
       double nhit = Combined->GetBinContent(i * 2 + 1);
       if (nmatch > 10 && nhit > 10) { // could be zero, too
         imatch += nmatch;
         ihit +=  nhit;
+        // check layer
+        if (i >= 16) {
+          imatchL2 += nmatch;
+          ihitL2 +=  nhit;
+        } else {
+          imatchL1 += nmatch;
+          ihitL1 +=  nhit;
+        }
+
         ieff++; // only count in modules working
         double var_e = nmatch / nhit; // can never be zero
-        // workaround for excluded module
-        if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
 
         m_monObj->setVariable(Form("efficiency_%d_%d_%d", aModule.getLayerNumber(), aModule.getLadderNumber(), aModule.getSensorNumber()),
                               var_e);
@@ -371,190 +391,166 @@ void DQMHistAnalysisPXDEffModule::event()
         }
       }
     }
-  }
 
-  {
-    m_cEffAll->cd();
-    m_cEffAll->cd(0);
-    m_hEffAll->Paint("AP");
-    m_cEffAll->Clear();
-    m_cEffAll->cd(0);
+    {
+      m_cEffAll->cd();
+      m_cEffAll->cd(0);
+      m_hEffAll->Paint("AP");
+      m_cEffAll->Clear();
+      m_cEffAll->cd(0);
 
-    auto gr = m_hEffAll->GetPaintedGraph();
-    if (gr) {
+      auto gr = m_hEffAll->GetPaintedGraph();
+      if (gr) {
+        double scale_min = 1.0;
+        for (int i = 0; i < gr->GetN(); i++) {
+          gr->SetPointEXhigh(i, 0.);
+          gr->SetPointEXlow(i, 0.);
+          // this has to be done first, as it will recalc Min/Max and destroy axis
+          Double_t x, y;
+          gr->GetPoint(i, x, y);
+          gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
+          auto val = y - gr->GetErrorYlow(i); // Error is relative to value
+          if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+            // scale update only for included module
+            if (scale_min > val) scale_min = val;
+          }
+        }
+        if (scale_min == 1.0) scale_min = 0.0;
+        if (scale_min > 0.9) scale_min = 0.9;
+        auto ay = gr->GetYaxis();
+        if (ay) ay->SetRangeUser(scale_min, 1.0);
+        auto ax = gr->GetXaxis();
+        if (ax) {
+          ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+          for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+            TString ModuleName = (std::string)m_PXDModules[i];
+            ax->SetBinLabel(i + 1, ModuleName);
+          }
+        }
+
+        gr->SetLineColor(4);
+        gr->SetLineWidth(2);
+        gr->SetMarkerStyle(8);
+
+        gr->Draw("AP");
+
+        for (auto& it : m_excluded) {
+          auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+          tt->SetTextAngle(90);// Rotated
+          tt->SetTextAlign(12);// Centered
+          tt->Draw();
+        }
+
+
+        EStatus all_stat = makeStatus(all >= 100., warn_flag, error_flag);
+        colorizeCanvas(m_cEffAll, all_stat);
+
+        m_hWarnLine->Draw("same,hist");
+        m_hErrorLine->Draw("same,hist");
+      }
+
+      UpdateCanvas(m_cEffAll->GetName());
+      m_cEffAll->Modified();
+      m_cEffAll->Update();
+    }
+
+    {
+      m_cEffAllUpdate->cd();
+      m_hEffAllUpdate->Paint("AP");
+      m_cEffAllUpdate->Clear();
+      m_cEffAllUpdate->cd(0);
+
+      auto gr = m_hEffAllUpdate->GetPaintedGraph();
+      auto gr3 = (TGraphAsymmErrors*) m_hEffAll->GetPaintedGraph()->Clone();
+      if (gr3) {
+        for (int i = 0; i < gr3->GetN(); i++) {
+          Double_t x, y;
+          gr3->GetPoint(i, x, y);
+          gr3->SetPoint(i, x + 0.2, y);
+        }
+      }
+
       double scale_min = 1.0;
-      for (int i = 0; i < gr->GetN(); i++) {
-        gr->SetPointEXhigh(i, 0.);
-        gr->SetPointEXlow(i, 0.);
-        // this has to be done first, as it will recalc Min/Max and destroy axis
-        Double_t x, y;
-        gr->GetPoint(i, x, y);
-        gr->SetPoint(i, x - 0.01, y); // workaround for jsroot bug (fixed upstream)
-        auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
-          // scale update only for included module
-          if (scale_min > val) scale_min = val;
+      if (gr) {
+        for (int i = 0; i < gr->GetN(); i++) {
+          gr->SetPointEXhigh(i, 0.);
+          gr->SetPointEXlow(i, 0.);
+          // this has to be done first, as it will recalc Min/Max and destroy axis
+          Double_t x, y;
+          gr->GetPoint(i, x, y);
+          gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
+          auto val = y - gr->GetErrorYlow(i); // Error is relative to value
+          if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
+            // skip scale update only for included modules
+            if (scale_min > val) scale_min = val;
+          }
         }
-      }
-      if (scale_min == 1.0) scale_min = 0.0;
-      if (scale_min > 0.9) scale_min = 0.9;
-      gr->SetMinimum(0);
-      gr->SetMaximum(m_PXDModules.size());
-      auto ay = gr->GetYaxis();
-      if (ay) ay->SetRangeUser(scale_min, 1.0);
-      auto ax = gr->GetXaxis();
-      if (ax) {
-        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+        if (scale_min == 1.0) scale_min = 0.0;
+        if (scale_min > 0.9) scale_min = 0.9;
+        gr->SetMinimum(0);
+        gr->SetMaximum(m_PXDModules.size());
+        auto ay = gr->GetYaxis();
+        if (ay) ay->SetRangeUser(scale_min, 1.0);
+        auto ax = gr->GetXaxis();
+        if (ax) {
+          ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
+          for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+            TString ModuleName = (std::string)m_PXDModules[i];
+            ax->SetBinLabel(i + 1, ModuleName);
+          }
+        }
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          TString ModuleName = (std::string)m_PXDModules[i];
-          ax->SetBinLabel(i + 1, ModuleName);
+          if (updated[m_PXDModules[i]]) {
+            // we should only write if it was updated!
+            Double_t x, y;// we assume that double and Double_t are same!
+            gr->GetPoint(i, x, y);
+            setEpicsPV((std::string)m_PXDModules[i], y);
+          }
         }
-      }
 
-      gr->SetLineColor(4);
-      gr->SetLineWidth(2);
-      gr->SetMarkerStyle(8);
-
-      gr->Draw("AP");
+        gr->SetLineColor(kBlack);
+        gr->SetLineWidth(3);
+        gr->SetMarkerStyle(33);
+        gr->Draw("AP");
+      } else scale_min = 0.0;
+      if (gr3) gr3->Draw("P"); // both in one plot
 
       for (auto& it : m_excluded) {
         auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextSize(0.035);
         tt->SetTextAngle(90);// Rotated
         tt->SetTextAlign(12);// Centered
         tt->Draw();
       }
 
-      if (all < 100.) {
-        m_cEffAll->Pad()->SetFillColor(kGray);// Magenta or Gray
-      } else {
-        if (error_flag) {
-          m_cEffAll->Pad()->SetFillColor(kRed);// Red
-        } else if (warn_flag) {
-          m_cEffAll->Pad()->SetFillColor(kYellow);// Yellow
-        } else {
-          m_cEffAll->Pad()->SetFillColor(kGreen);// Green
-          //       m_cEffAll->Pad()->SetFillColor(kWhite);// White
-        }
-      }
 
-      m_cEffAll->Pad()->SetFrameFillColor(kWhite - 1); // White
-      m_cEffAll->Pad()->SetFrameFillStyle(1001);// White
-      m_cEffAll->Pad()->Modified();
-      m_cEffAll->Pad()->Update();
+      stat_data = makeStatus(all >= 100., warn_flag, error_flag);
+      colorizeCanvas(m_cEffAllUpdate, stat_data);
+
       m_hWarnLine->Draw("same,hist");
       m_hErrorLine->Draw("same,hist");
     }
+    UpdateCanvas(m_cEffAllUpdate->GetName());
+    m_cEffAllUpdate->Modified();
+    m_cEffAllUpdate->Update();
 
-    UpdateCanvas(m_cEffAll->GetName());
-    m_cEffAll->Modified();
-    m_cEffAll->Update();
+    double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
+    double var_efficiencyL1 = ihitL1 > 0 ? imatchL1 / ihitL1 : 0.0;
+    double var_efficiencyL2 = ihitL2 > 0 ? imatchL2 / ihitL2 : 0.0;
+
+    m_monObj->setVariable("efficiency", var_efficiency);
+    m_monObj->setVariable("efficiencyL1", var_efficiencyL1);
+    m_monObj->setVariable("efficiencyL2", var_efficiencyL2);
+    m_monObj->setVariable("nmodules", ieff);
+
+    setEpicsPV("Status", stat_data);
+    // only update if statistics is reasonable, we dont want "0" drops between runs!
+    if (stat_data != 0) {
+      setEpicsPV("Overall", var_efficiency);
+      setEpicsPV("L1", var_efficiencyL1);
+      setEpicsPV("L2", var_efficiencyL2);
+    }
   }
-
-  {
-    m_cEffAllUpdate->cd();
-    m_hEffAllUpdate->Paint("AP");
-    m_cEffAllUpdate->Clear();
-    m_cEffAllUpdate->cd(0);
-
-    auto gr = m_hEffAllUpdate->GetPaintedGraph();
-    auto gr3 = (TGraphAsymmErrors*) m_hEffAll->GetPaintedGraph()->Clone();
-    if (gr3) {
-      for (int i = 0; i < gr3->GetN(); i++) {
-        Double_t x, y;
-        gr3->GetPoint(i, x, y);
-        gr3->SetPoint(i, x + 0.2, y);
-      }
-    }
-
-    double scale_min = 1.0;
-    if (gr) {
-      for (int i = 0; i < gr->GetN(); i++) {
-        gr->SetPointEXhigh(i, 0.);
-        gr->SetPointEXlow(i, 0.);
-        // this has to be done first, as it will recalc Min/Max and destroy axis
-        Double_t x, y;
-        gr->GetPoint(i, x, y);
-        gr->SetPoint(i, x - 0.2, y); // shift a bit if in same plot
-        auto val = y - gr->GetErrorYlow(i); // Error is relative to value
-        if (std::find(m_excluded.begin(), m_excluded.end(), i) == m_excluded.end()) {
-          // skip scale update only for included modules
-          if (scale_min > val) scale_min = val;
-        }
-      }
-      if (scale_min == 1.0) scale_min = 0.0;
-      if (scale_min > 0.9) scale_min = 0.9;
-      gr->SetMinimum(0);
-      gr->SetMaximum(m_PXDModules.size());
-      auto ay = gr->GetYaxis();
-      if (ay) ay->SetRangeUser(scale_min, 1.0);
-      auto ax = gr->GetXaxis();
-      if (ax) {
-        ax->Set(m_PXDModules.size(), 0, m_PXDModules.size());
-        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          TString ModuleName = (std::string)m_PXDModules[i];
-          ax->SetBinLabel(i + 1, ModuleName);
-        }
-      }
-      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-        if (updated[m_PXDModules[i]]) {
-          // we should only write if it was updated!
-          Double_t x, y;// we assume that double and Double_t are same!
-          gr->GetPoint(i, x, y);
-          setEpicsPV((std::string)m_PXDModules[i], y);
-        }
-      }
-
-      gr->SetLineColor(kBlack);
-      gr->SetLineWidth(3);
-      gr->SetMarkerStyle(33);
-      gr->Draw("AP");
-    } else scale_min = 0.0;
-    if (gr3) gr3->Draw("P"); // both in one plot
-
-    for (auto& it : m_excluded) {
-      auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-      tt->SetTextSize(0.035);
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
-      tt->Draw();
-    }
-
-    if (all < 100.) {
-      m_cEffAllUpdate->Pad()->SetFillColor(kGray);// Magenta or Gray
-      stat_data = 0.;
-    } else {
-      if (error_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kRed);// Red
-        stat_data = 4.;
-      } else if (warn_flag) {
-        m_cEffAllUpdate->Pad()->SetFillColor(kYellow);// Yellow
-        stat_data = 3.;
-      } else {
-        m_cEffAllUpdate->Pad()->SetFillColor(kGreen);// Green
-        stat_data = 2.;
-        /// we wont use "white" =1 in this module
-        //       m_cEffAllUpdate->Pad()->SetFillColor(kWhite);// White
-      }
-    }
-    m_cEffAllUpdate->Pad()->SetFrameFillColor(kWhite - 1); // White
-    m_cEffAllUpdate->Pad()->SetFrameFillStyle(1001);// White
-    m_cEffAllUpdate->Pad()->Modified();
-    m_cEffAllUpdate->Pad()->Update();
-    m_hWarnLine->Draw("same,hist");
-    m_hErrorLine->Draw("same,hist");
-  }
-  UpdateCanvas(m_cEffAllUpdate->GetName());
-  m_cEffAllUpdate->Modified();
-  m_cEffAllUpdate->Update();
-
-
-  double var_efficiency = ihit > 0 ? imatch / ihit : 0.0;
-  m_monObj->setVariable("efficiency", var_efficiency);
-  m_monObj->setVariable("nmodules", ieff);
-
-  setEpicsPV("Status", stat_data);
-  // only update if statistics is reasonable, we dont want "0" drops between runs!
-  if (stat_data != 0) setEpicsPV("Overall", var_efficiency);
 }
 
 void DQMHistAnalysisPXDEffModule::terminate()

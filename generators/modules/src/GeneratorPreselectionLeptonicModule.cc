@@ -52,6 +52,9 @@ void GeneratorPreselectionLeptonicModule::initialize()
 
 void GeneratorPreselectionLeptonicModule::event()
 {
+
+  m_tauLeptonPVecs.clear();
+  m_tauLeptonZs.clear();
   m_nSignalLepton = 0;
   m_nTauLepton = 0;
   m_missingPx = 0.0;
@@ -113,7 +116,7 @@ void GeneratorPreselectionLeptonicModule::checkParticle(const MCParticle& mc)
     m_signalLeptonZ = mc.getVertex().Z();
   }
 
-  if (abs(pdg) == 12 || abs(pdg) == 14) {
+  if (abs(pdg) == 12 || abs(pdg) == 14 || abs(pdg) == 16) {
     m_missingPx += vec.Px();
     m_missingPy += vec.Py();
     m_missingPz += vec.Pz();

@@ -31,9 +31,6 @@ description Globaltag used during the          Globaltag used during the
 type        DEV                                DEV
 status      VALIDATED                          VALIDATED
 # payloads  5                                  3
-created     2022-05-23 12:26:16 local time     2022-05-23 12:26:38 local time
-modified    2022-05-23 12:35:27 local time     2022-05-23 12:35:53 local time
-modified by depietro                           depietro
 
 [INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
 [INFO] Obtaining list of iovs for globaltag main_tag_merge_test_3
@@ -64,9 +61,6 @@ description Globaltag used during the          Globaltag used during the
 type        DEV                                DEV
 status      VALIDATED                          VALIDATED
 # payloads  5                                  3
-created     2022-05-23 12:26:16 local time     2022-05-23 12:26:38 local time
-modified    2022-05-23 12:35:27 local time     2022-05-23 12:35:53 local time
-modified by depietro                           depietro
 
 [INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 [valid in (5, 200, 5, 300)]
 [INFO] Obtaining list of iovs for globaltag main_tag_merge_test_3 [valid in (5, 200, 5, 300)]

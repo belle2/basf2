@@ -194,9 +194,13 @@ namespace Belle2 {
     /** Get the basf2 execution realm. */
     LogConfig::ELogRealm getRealm() const { return m_realm; }
 
-    void setVirtualReality(const bool virtualReality) { m_virtualReality = virtualReality; }
-
-    bool getVirtualReality() const { return m_virtualReality; }
+    /**
+     * Set the flag for writing the simulation steps into an output csv file.
+     * This is useful for simulating events for the Belle II Virtual Reality application.
+     */
+    void setWriteSimSteps(const bool writeSimSteps) { m_writeSimSteps = writeSimSteps; }
+    /** Get the flag for writing the simulation steps into an output csv file. */
+    bool getWriteSimSteps() const { return m_writeSimSteps; }
 
     /** Print information on input/output files in current steering file, used by --dry-run.
      *
@@ -392,7 +396,7 @@ namespace Belle2 {
     int m_experiment; /**< override experiment for EventInfoSetter. */
     unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
     LogConfig::ELogRealm m_realm = LogConfig::c_None; /**< The realm in which basf2 is executed. */
-    bool m_virtualReality; /**< bool for keeping track if we run the job for producing events for the virtual reality */
+    bool m_writeSimSteps; /**< bool for writing out the simulation steps into a csv file. */
 
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */

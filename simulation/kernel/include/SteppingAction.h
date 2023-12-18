@@ -70,7 +70,8 @@ namespace Belle2 {
       /** Method to write (almost) each G4Step to the VR event file. */
       void writeVREventStep(const G4Step*, const G4Track*);
 
-      bool m_isForVirtualReality{false};
+      /** Flag for writing out the simulation steps. */
+      bool m_writeSimSteps{false};
 
     };
 

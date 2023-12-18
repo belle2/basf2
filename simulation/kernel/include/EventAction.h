@@ -70,7 +70,7 @@ namespace Belle2 {
 
     private:
 
-      bool m_isForVirtualReality{false};
+      bool m_writeSimSteps{false}; /**< Flag for writing out the simulation steps. */
       std::ofstream* m_VREventStream{nullptr};  /**< Output stream for writing each step of event's history for the Virtual Reality. */
       StoreObjPtr<EventMetaData> m_evtMetaData; /**< Event metadata. */
 

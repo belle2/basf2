@@ -32,7 +32,7 @@ SteppingAction::SteppingAction()
     G4Step* aStep;
     UserSteppingAction(aStep);
   }
-  m_isForVirtualReality = Environment::Instance().getVirtualReality();
+  m_writeSimSteps = Environment::Instance().getWriteSimSteps();
 }
 
 
@@ -73,7 +73,7 @@ void SteppingAction::UserSteppingAction(const G4Step* step)
   }
 
   // If we are running this job for producing virtual reality events, let's run the relevant method
-  if (m_isForVirtualReality) {
+  if (m_writeSimSteps) {
     writeVREventStep(step, track);
   }
 

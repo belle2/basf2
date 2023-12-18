@@ -28,14 +28,14 @@ EventAction::EventAction(const std::string& mcCollectionName, MCParticleGraph& m
     BeginOfEventAction(event);
     EndOfEventAction(event);
   }
-  m_isForVirtualReality = Environment::Instance().getVirtualReality();
-  if (m_isForVirtualReality)
+  m_writeSimSteps = Environment::Instance().getWriteSimSteps();
+  if (m_writeSimSteps)
     m_VREventStream = new std::ofstream;
 }
 
 EventAction::~EventAction()
 {
-  if (m_isForVirtualReality) {
+  if (m_writeSimSteps) {
     // Just in case the file is still opened...
     if (m_VREventStream->is_open())
       m_VREventStream->close();
@@ -47,7 +47,7 @@ void EventAction::BeginOfEventAction(const G4Event*)
 {
   //Enable recording of Hits
   SensitiveDetectorBase::setActive(true);
-  if (m_isForVirtualReality) {
+  if (m_writeSimSteps) {
     // Open a new output file for the VR event-history steps
     if (m_VREventStream->is_open())
       m_VREventStream->close();
@@ -87,7 +87,7 @@ void EventAction::EndOfEventAction(const G4Event*)
     if (mcPartRelation) mcPartRelation.consolidate(indexReplacement, RelationArray::Identity(), it->second);
   }
 
-  if (m_isForVirtualReality) {
+  if (m_writeSimSteps) {
     // Close the VR event-history file
     if (m_VREventStream->is_open())
       m_VREventStream->close();

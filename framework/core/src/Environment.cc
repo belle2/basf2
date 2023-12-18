@@ -99,7 +99,7 @@ Environment::Environment() :
   m_run(-1),
   m_experiment(-1),
   m_skipNEvents(0),
-  m_virtualReality(false)
+  m_writeSimSteps(false)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");

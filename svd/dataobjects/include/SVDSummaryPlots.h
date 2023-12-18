@@ -150,7 +150,6 @@ namespace Belle2 {
     TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
     TH2F* m_defaultHistogram; /**< default histograms*/
 
-  private:
 
     /** find the Y bin given the layer and sensor number */
     Int_t findBinY(Int_t layer, Int_t sensor)

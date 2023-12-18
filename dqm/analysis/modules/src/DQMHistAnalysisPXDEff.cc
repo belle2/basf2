@@ -133,46 +133,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_hEffAllLastTotal = m_hEffAll->GetCopyTotalHisto();
   m_hEffAllLastPassed = m_hEffAll->GetCopyPassedHisto();
 
-  {
-    auto gr = m_hEffAll->GetPaintedGraph();
-
-    if (gr) {
-      auto ax = gr->GetXaxis();
-      if (ax) {
-        ax->Set(m_nrxbins, 0, m_nrxbins);
-        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          TString ModuleName = (std::string)m_PXDModules[i];
-          ax->SetBinLabel(i + 1, ModuleName);
-        }
-        ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
-        ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
-        ax->SetBinLabel(m_PXDModules.size() + 3, "All");
-      }
-    }
-  }
+  setLabels(m_hEffAll->GetPaintedGraph());
 
   m_cEffAllUpdate = new TCanvas((m_histogramDirectoryName + "/c_EffAllUp").data());
   m_hEffAllUpdate = new TEfficiency("ePXDHitEffAllUpdate", "PXD Integral and last-updated Efficiency per module;PXD Module;",
                                     m_nrxbins, 0, m_nrxbins);
   m_hEffAllUpdate->SetConfidenceLevel(m_confidence);
 
-  {
-    auto gr = m_hEffAllUpdate->GetPaintedGraph();
-
-    if (gr) {
-      auto ax = gr->GetXaxis();
-      if (ax) {
-        ax->Set(m_nrxbins, 0, m_nrxbins);
-        for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-          TString ModuleName = (std::string)m_PXDModules[i];
-          ax->SetBinLabel(i + 1, ModuleName);
-        }
-        ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
-        ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
-        ax->SetBinLabel(m_PXDModules.size() + 3, "All");
-      }
-    }
-  }
+  setLabels(m_hEffAllUpdate->GetPaintedGraph());
 
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
@@ -289,6 +257,23 @@ bool DQMHistAnalysisPXDEffModule::check_error_level(int bin, std::string name)
                    m_errorlevelmod[name]); // error if upper error value is below limit
   }
   return error_flag;
+}
+
+void DQMHistAnalysisPXDEffModule::setLabels(TGraphAsymmErrors* gr)
+{
+  if (gr) {
+    auto ax = gr->GetXaxis();
+    if (ax) {
+      ax->Set(m_nrxbins, 0, m_nrxbins);
+      for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+        TString ModuleName = (std::string)m_PXDModules[i];
+        ax->SetBinLabel(i + 1, ModuleName);
+      }
+      ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
+      ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
+      ax->SetBinLabel(m_PXDModules.size() + 3, "All");
+    }
+  }
 }
 
 void DQMHistAnalysisPXDEffModule::event()
@@ -484,17 +469,7 @@ void DQMHistAnalysisPXDEffModule::event()
         if (scale_min > 0.9) scale_min = 0.9;
         auto ay = gr->GetYaxis();
         if (ay) ay->SetRangeUser(scale_min, 1.0);
-        auto ax = gr->GetXaxis();
-        if (ax) {
-          ax->Set(m_nrxbins, 0, m_nrxbins);
-          for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-            TString ModuleName = (std::string)m_PXDModules[i];
-            ax->SetBinLabel(i + 1, ModuleName);
-          }
-          ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
-          ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
-          ax->SetBinLabel(m_PXDModules.size() + 3, "All");
-        }
+        setLabels(gr);
 
         gr->SetLineColor(4);
         gr->SetLineWidth(2);
@@ -504,6 +479,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
         for (auto& it : m_excluded) {
           auto tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+          tt->SetTextSize(0.035);
           tt->SetTextAngle(90);// Rotated
           tt->SetTextAlign(12);// Centered
           tt->Draw();
@@ -557,17 +533,8 @@ void DQMHistAnalysisPXDEffModule::event()
         if (scale_min > 0.9) scale_min = 0.9;
         auto ay = gr->GetYaxis();
         if (ay) ay->SetRangeUser(scale_min, 1.0);
-        auto ax = gr->GetXaxis();
-        if (ax) {
-          ax->Set(m_nrxbins, 0, m_nrxbins);
-          for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-            TString ModuleName = (std::string)m_PXDModules[i];
-            ax->SetBinLabel(i + 1, ModuleName);
-          }
-          ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
-          ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
-          ax->SetBinLabel(m_PXDModules.size() + 3, "All");
-        }
+        setLabels(gr);
+
         for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
           if (updated[m_PXDModules[i]]) {
             // we should only write if it was updated!
@@ -591,7 +558,6 @@ void DQMHistAnalysisPXDEffModule::event()
         tt->SetTextAlign(12);// Centered
         tt->Draw();
       }
-
 
       stat_data = makeStatus(all >= 1000., warn_flag, error_flag);
       colorizeCanvas(m_cEffAllUpdate, stat_data);

@@ -68,6 +68,7 @@ namespace Belle2 {
      */
     bool check_error_level(int bin, std::string name);
     bool check_warn_level(int bin, std::string name);
+    void setLabels(TGraphAsymmErrors* gr);
 
   private:
 

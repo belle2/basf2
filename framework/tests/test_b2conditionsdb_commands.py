@@ -21,14 +21,26 @@ import shlex
 import tempfile
 
 
+def call_command(command):
+    """Call command print output after having removed some lines from output
+
+    Args:
+        command (string): command to be called
+    """
+    output = subprocess.check_output(shlex.split(command), encoding='utf-8').strip().split('\n')
+    for line in output:
+        if "created" not in line and "modified" not in line:
+            print(line)
+
+
 if __name__ == '__main__':
 
     tags = ['main_tag_merge_test_1', 'main_tag_merge_test_2', 'main_tag_merge_test_3']
 
-    subprocess.check_call(shlex.split('b2conditionsdb iov main_tag_merge_test_2'))
-    subprocess.check_call(shlex.split('b2conditionsdb iov main_tag_merge_test_2 --run-range 5 200 5 300'))
-    subprocess.check_call(shlex.split('b2conditionsdb diff main_tag_merge_test_2 main_tag_merge_test_3'))
-    subprocess.check_call(shlex.split('b2conditionsdb diff main_tag_merge_test_2 main_tag_merge_test_3 --run-range 5 200 5 300'))
+    call_command('b2conditionsdb iov main_tag_merge_test_2')
+    call_command('b2conditionsdb iov main_tag_merge_test_2 --run-range 5 200 5 300')
+    call_command('b2conditionsdb diff main_tag_merge_test_2 main_tag_merge_test_3')
+    call_command('b2conditionsdb diff main_tag_merge_test_2 main_tag_merge_test_3 --run-range 5 200 5 300')
 
     # As the output of b2conditionsdb legacydownload contains some
     # irreproducible elements (times, tempfolder location) I check only the

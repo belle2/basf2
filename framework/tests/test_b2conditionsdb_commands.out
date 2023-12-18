@@ -81,4 +81,6 @@ modified by depietro                           depietro
 - KLMStripEfficiency                            2670 5      299    5      299
 - KLMStripEfficiency                            3001 5      300    5      399
 + KLMStripEfficiency                            3001 5      0      5      999
-Downloaded 2 payloads
+[INFO] Downloading list of payloads for main_tag_merge_test_3 tag valid in (5, 0, 5, 1000)
+[INFO] download centraldb/dbstore_KLMStripEfficiency_rev_3001.root
+[INFO] download centraldb/dbstore_KLMStripEfficiency_rev_3205.root

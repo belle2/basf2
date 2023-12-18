@@ -38,7 +38,7 @@ def check_payload(destination, payloadinfo, run_range=None):
 
     Args:
         destination (str): local folder where to download the payload
-        payloadinfo (dict): pyalod informations as returned by the REST API
+        payloadinfo (dict): pyload informations as returned by the REST API
         run_range (b2conditions_db.iov.IntervalOfValidity, optional): Interval of validity . Defaults to None.
 
     Returns:

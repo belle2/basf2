@@ -38,4 +38,5 @@ if __name__ == '__main__':
         output = subprocess.check_output(
             shlex.split(f'b2conditionsdb legacydownload -c main_tag_merge_test_3 {tmpdirname} --run-range 5 0 5 1000'),
             encoding='utf-8').strip().split('\n')
-        print(f"Downloaded {len(output)-1} payloads")
+        for line in output:
+            print(line.replace(tmpdirname, "centraldb")[7:])

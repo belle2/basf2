@@ -294,7 +294,7 @@ class RootSaverModule(b2.Module):
         # ### Create the LCA
         # IMPORTANT: The ArrayIndex is 0-based.
         # mcplist contains the root particles we are to create LCAs from
-        # Reset the LCA list so if only one B is there it does now carry an older version over
+        # Reset the LCA list so if only one B is there it does not carry an older version over
         self.reset_LCA()
 
         if p_list.getListSize() > 0:
@@ -302,9 +302,9 @@ class RootSaverModule(b2.Module):
                 # Get the corresponding MCParticle
                 mcp = part.getMCParticle()
                 # In this way the LCA variables in the ntuples will be labelled _1 and _2
-                # If we train on B decays these will correspond to the two Bs
+                # If we train on B decays these will correspond to the two B's
                 # while if we train on the Upsilon, _1 will correspond to it and _2 will remain empty
-                # becaus getArrayIndex() gives 0 for the Upsilon and 1, 2 for the Bs
+                # becaus getArrayIndex() gives 0 for the Upsilon and 1, 2 for the B's
                 array_index = 1 if self.isB[0] == 0 else mcp.getArrayIndex()
 
                 # Get the B flag

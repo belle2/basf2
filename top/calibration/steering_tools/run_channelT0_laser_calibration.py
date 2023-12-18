@@ -32,7 +32,9 @@ globalTags = ['data_reprocessing_proc11']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
-look_back = 28  # look-back window setting (set to 0 if look-back setting available in DB)
+look_back = 30  # look-back window setting (set to 0 if look-back setting available in DB)
+calpulse_min_time = 50.0  # calibration pulse selection in time: minimal time [ns]
+calpulse_max_time = 120.0  # calibration pulse selection in time: maximal time [ns]
 tts_file = '/group/belle2/group/detector/TOP/calibration/MCreferences/TTSParametrizations.root'
 laser_mc_fit = '/group/belle2/group/detector/TOP/calibration/MCreferences/laserMCFit.root'
 fit_mode = 'calibration'  # can be either monitoring, MC or calibration
@@ -98,8 +100,8 @@ def channelT0_calibration():
                     calpulseHeightMax=680,
                     calpulseWidthMin=1.5,
                     calpulseWidthMax=2.2,
-                    calpulseTimeMin=0.0,
-                    calpulseTimeMax=70.0,
+                    calpulseTimeMin=calpulse_min_time,
+                    calpulseTimeMax=calpulse_max_time,
                     calibrationChannel=0,
                     lookBackWindows=look_back)
 

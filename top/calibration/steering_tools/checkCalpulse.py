@@ -25,7 +25,7 @@ from ROOT import Belle2
 from ROOT import TFile, TH1F, TH2F
 import sys
 
-look_back_windows = 28  # make sure this is the correct setting for your local run!
+look_back_windows = 30  # make sure this is the correct setting for your local run!
 
 cal_channel = None
 if len(sys.argv) > 1:
@@ -67,7 +67,7 @@ class Histogrammer(b2.Module):
         self.width_vs_sample = TH2F("width_vs_sample", "Pulse width vs. sample; sample number; pulse width [ns]",
                                     256, 0, 256, 100, 0, 10)
         #: histogram of time distribution
-        self.time = TH1F('time', 'Time distibution; time [ns]', 300, -100, 200)
+        self.time = TH1F('time', 'Time distibution; time [ns]', 400, -100, 300)
         #: histogram of asic channel occupancy
         self.asic_channels = TH1F('asic_channels', 'ASIC channel occupancy; ASIC channel number', 8, 0, 8)
 

@@ -407,7 +407,7 @@ namespace Belle2 {
        * Calculates y at prism entrance from detection position,
        * reflection number and photon slope.
        *
-       * @param[out] prismEntance
+       * @param[out] prismEntrance
        * Y at prsim entrance.
        *
        * @param[in] y

@@ -366,7 +366,7 @@ void DQMHistAnalysisPXDEffModule::event()
   if (Combined) {
     // only if histogram was changed
 
-    EStatus stat_data = c_TooFew;
+    EStatus stat_data = c_StatusTooFew;
     bool error_flag = false;
     bool warn_flag = false;
     double all = 0.0;

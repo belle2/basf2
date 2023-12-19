@@ -259,7 +259,7 @@ class InclusiveLambda(BaseSkim):
 
     Selection criteria:
     * proton:
-    ``protonID_proton > 0.1``
+    ``protonID > 0.1``
     * Lambda:
     ``cosAngleBetweenMomentumAndVertexVector > 0.75``
     ``flightDistance/flightDistanceErr > 0.``

@@ -141,9 +141,9 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
   const int nY = 19;
   TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
-                         "", "L4.x.1", "L4.x.2", "L4.x.3",
-                         "", "L5.x.1", "L5.x.2", "L5.x.3", "L5.x.4",
-                         "", "L6.x.1", "L6.x.2", "L6.x.3", "L6.x.4", "L6.x.5", ""
+                         " ", "L4.x.1", "L4.x.2", "L4.x.3",
+                         "  ", "L5.x.1", "L5.x.2", "L5.x.3", "L5.x.4",
+                         "   ", "L6.x.1", "L6.x.2", "L6.x.3", "L6.x.4", "L6.x.5", "    "
                         };
 
 

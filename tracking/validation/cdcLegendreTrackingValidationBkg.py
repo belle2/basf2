@@ -11,8 +11,8 @@
 """
 <header>
   <contact>software-tracking@belle2.org</contact>
-  <input>EvtGenSimNoBkg.root</input>
-  <output>CDCLegendreTrackingValidation.root</output>
+  <input>EvtGenSim.root</input>
+  <output>CDCLegendreTrackingValidationBkg.root</output>
   <description>This module validates that legendre track finding is capable of reconstructing tracks in Y(4S) runs.</description>
 </header>
 """
@@ -20,9 +20,9 @@
 from tracking.validation.run import TrackingValidationRun
 import logging
 import basf2
-VALIDATION_OUTPUT_FILE = 'CDCLegendreTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'CDCLegendreTrackingValidationBkg.root'
 N_EVENTS = 1000
-ACTIVE = False
+ACTIVE = True
 
 
 class CDCLegendre(TrackingValidationRun):
@@ -32,7 +32,7 @@ class CDCLegendre(TrackingValidationRun):
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     #: no background overlay
-    root_input_file = '../EvtGenSimNoBkg.root'
+    root_input_file = '../EvtGenSim.root'
 
     @staticmethod
     def finder_module(path):

@@ -11,41 +11,36 @@
 """
 <header>
   <contact>software-tracking@belle2.org</contact>
-  <input>EvtGenSimNoBkg.root</input>
-  <output>CDCLegendreTrackingValidation.root</output>
-  <description>This module validates that legendre track finding is capable of reconstructing tracks in Y(4S) runs.</description>
+  <input>EvtGenSim.root</input>
+  <output>CDCFullTrackingValidationBkg.root</output>
+  <description>This script validates the full CDC tracking chain with a legendre step first
+  and a cellular automaton step second in Y(4S) runs.</description>
 </header>
 """
 
 from tracking.validation.run import TrackingValidationRun
+import tracking
 import logging
 import basf2
-VALIDATION_OUTPUT_FILE = 'CDCLegendreTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'CDCFullTrackingValidationBkg.root'
 N_EVENTS = 1000
-ACTIVE = False
+ACTIVE = True
 
 
-class CDCLegendre(TrackingValidationRun):
-    """Validate the combined CDC Legendre track-finding algorithm"""
+class CDCFull(TrackingValidationRun):
+    """Validate the full CDC track-finding chain"""
     #: number of events to generate
     n_events = N_EVENTS
     #: Generator to be used in the simulation (-so)
     generator_module = 'generic'
     #: no background overlay
-    root_input_file = '../EvtGenSimNoBkg.root'
+    root_input_file = '../EvtGenSim.root'
 
-    @staticmethod
-    def finder_module(path):
-        """Add the CDC Legendre track-finding module and related modules to the basf2 path"""
-        path.add_module('TFCDC_WireHitPreparer')
-
-        use_legendre_finder = True
-        if use_legendre_finder:
-            path.add_module('TFCDC_AxialTrackFinderLegendre')
-        else:
-            path.add_module('TFCDC_AxialTrackFinderHough')
-
-        path.add_module('TFCDC_TrackExporter')
+    def finder_module(self, path):
+        """Add the CDC track-finding module to the basf2 path"""
+        tracking.add_cdc_track_finding(path)
+        # adjust_module(path, "TFCDC_WireHitPreparer",
+        #               UseNLoops=1)
 
     #: Define the user parameters for the track-finding module
     tracking_coverage = {
@@ -53,27 +48,24 @@ class CDCLegendre(TrackingValidationRun):
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': True,
+        'UseOnlyAxialCDCHits': False,
         "UseReassignedHits": True,
-        'UseOnlyBeforeTOP': True,
-        'UseNLoops': 1,
+        "UseNLoops": 1,
+        "UseOnlyBeforeTOP": True,
         'MinCDCAxialHits': 8,
+        'MinCDCStereoHits': 6,
+        "AllowFirstCDCSuperLayerOnly": True,
         'EnergyCut': 0,
     }
-
     #: Include pulls in the validation output
     pulls = True
     #: name of the output ROOT file
     output_file_name = VALIDATION_OUTPUT_FILE
 
-    #: disabled plotting of tan lambda and theta for this validation because
-    #: the seed's theta is 90* for all and therefore this profile plot is useless
-    exclude_profile_pr_parameter = ["Seed tan #lambda", "Seed #theta"]
-
 
 def main():
     basf2.set_random_seed(1337)
-    validation_run = CDCLegendre()
+    validation_run = CDCFull()
     validation_run.configure_and_execute_from_commandline()
 
 

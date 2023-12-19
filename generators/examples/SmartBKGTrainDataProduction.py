@@ -11,6 +11,13 @@ import os
 from smartBKG import DECORR_LIST
 from smartBKG.b2modules.NN_trainer_module import data_production
 
+
+def none_or_str(value):
+    if value == 'None':
+        return None
+    return value
+
+
 parser = argparse.ArgumentParser(
     description='''Generator variables saver.''',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -24,7 +31,7 @@ parser.add_argument('-f', type=str, required=False, default='./',
 parser.add_argument('-o', type=str, required=False, default='./',
                     help="Out dir", metavar="OUT_DIR",
                     dest='out_dir')
-parser.add_argument('-d', type=list, required=False, default=DECORR_LIST,
+parser.add_argument('-d', type=none_or_str, required=False, default=DECORR_LIST,
                     help="Event level variables to save", metavar="SAVE_VARS",
                     dest='save_vars')
 parser.add_argument("--workers", type=int, default=False,
@@ -33,8 +40,6 @@ args = parser.parse_args()
 
 os.makedirs(args.out_dir, exist_ok=True)
 
-if not args.save_vars:
-    args.save_vars = None
 data_prod = data_production(
     in_dir=args.in_dir, out_dir=args.out_dir,
     job_id=args.job_id, save_vars=args.save_vars

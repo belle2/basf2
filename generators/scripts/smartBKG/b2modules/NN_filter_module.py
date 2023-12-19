@@ -109,7 +109,7 @@ class NNFilterModule(b2.Module):
         #: generated variables
         self.gen_vars = defaultdict(list)
 
-        #: record the production time of root particle for the correction of jitter
+        #: record the production time(s) of root particle(s) for the correction of jitter
         self.root_prodTime = defaultdict(list)
 
         #: node features
@@ -129,34 +129,39 @@ class NNFilterModule(b2.Module):
         self.EventExtraInfo.create()
 
         mcplist = Belle2.PyStoreArray("MCParticles")
-        root_index = 0
+        nVirtualRoot = 0
 
-        for i, mcp in enumerate(mcplist):
+        for mcp in mcplist:
+            prodTime = mcp.getProductionTime()
+
+            # Collect indices for graph
+            array_index = mcp.getArrayIndex()
+            mother = mcp.getMother()
+            if mother:
+                root = False
+                mother_index = mother.getArrayIndex()
+                # pass the production time of root particle for the correction of jitter
+                self.root_prodTime[array_index] = self.root_prodTime[mother_index]
+                if mother.isVirtual():
+                    mother_index = array_index
+            else:
+                root = True
+                nVirtualRoot += 1
+                mother_index = array_index
+                # record the production time of root particle for the correction of jitter
+                self.root_prodTime[array_index] = prodTime
+
             if mcp.isPrimaryParticle() and check_status_bit(mcp.getStatus()):
-                prodTime = mcp.getProductionTime()
-
-                # Collect indices for graph
-                array_index = mcp.getArrayIndex()
-                mother = mcp.getMother()
-                if mother:
-                    mother_index = mother.getArrayIndex()
-                    self.gen_vars['mother_indices'].append(mother_index - root_index)
-                    # pass the production time of root particle for the correction of jitter
-                    self.root_prodTime[array_index] = self.root_prodTime[mother_index]
-                else:
-                    root_index = array_index
-                    self.gen_vars['mother_indices'].append(0)
-                    # record the production time of root particle for the correction of jitter
-                    self.root_prodTime[array_index] = prodTime
-                self.gen_vars['array_indices'].append(array_index - root_index)
-
-                prodTime -= self.root_prodTime[array_index]
+                if root:
+                    nVirtualRoot -= 1
+                self.gen_vars['array_indices'].append(array_index-nVirtualRoot)
+                self.gen_vars['mother_indices'].append(mother_index-nVirtualRoot)
 
                 four_vec = mcp.get4Vector()
                 prod_vec = mcp.getProductionVertex()
 
                 # build generated variables as node features
-                self.gen_vars['prodTime'].append(prodTime)
+                self.gen_vars['prodTime'].append(prodTime-self.root_prodTime[array_index])
                 self.gen_vars['energy'].append(mcp.getEnergy())
                 self.gen_vars['x'].append(prod_vec.x())
                 self.gen_vars['y'].append(prod_vec.y())

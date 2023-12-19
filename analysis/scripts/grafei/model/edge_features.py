@@ -117,12 +117,7 @@ def compute_edge_features(
     features = [f.replace("feat_", "") for f in features]
 
     # Associate node feature names with values
-    name_values = {}
-    for name, values in zip(
-        features,
-        x.T[:, ],
-    ):
-        name_values.update({name: values})
+    name_values = dict(zip(features, x.T))
 
     # Compute edge features
     for feat in edge_feature_names:

@@ -97,13 +97,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   }
   std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
 
-  //find nEvents testing if histograms are present
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
-  if (hnEvnts == NULL) {
-    B2INFO("no events, nothing to do here");
-    return;
-  }
-
 
   gROOT->cd();
   m_cEfficiencyU = new TCanvas("SVDAnalysis/c_SVDEfficiencyU");
@@ -129,6 +122,14 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "efficiencyLimits", "effLimits");
+
+  //find nEvents testing if histograms are present
+  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
+  if (hnEvnts == NULL) {
+    B2INFO("no events, nothing to do here");
+    return;
+  }
+
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()

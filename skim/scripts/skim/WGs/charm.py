@@ -997,12 +997,14 @@ class LambdacToSHpJm(BaseSkim):
         * :math:`\\Lambda_c^+ \\to \\Sigma^+ \\pi^+ K^-`
         * :math:`\\Lambda_c^+ \\to \\Sigma^+ K^+ \\pi^-`
         * :math:`\\Lambda_c^+ \\to \\Sigma^+ K^+ K^-`
+        * :math:`\\Lambda_c^+ \\to \\Sigma^+ K_S0`
 
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
         * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
         * loose mass window for :math:'\\pi^0\\' and skim selections from stdPi0s
+        * ``0.44 < M(K_s) < 0.55, significanceOfDistance > 2.0``
         * :math:`\\pm 3\\sigma` mass windows for :math:'\\Sigma^+\\'
         * lower bound on significance of distance for :math:'\\Sigma^+\\' > 2
         * For more details, please check the source code of this skim.
@@ -1026,6 +1028,7 @@ class LambdacToSHpJm(BaseSkim):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
+        stdKshorts(path=path)
 
     def build_lists(self, path):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
@@ -1035,6 +1038,12 @@ class LambdacToSHpJm(BaseSkim):
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
         ma.fillParticleList('p+:loose', 'trinaryID > 0.2', path=path)
+
+        ma.cutAndCopyList(
+            'K_S0:charmSkim',
+            'K_S0:merged',
+            'significanceOfDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
+            path=path)
 
         ma.cutAndCopyList('pi0:charmSkim', 'pi0:skim', '0.120<InvM<0.145', True, path=path)
 
@@ -1046,75 +1055,13 @@ class LambdacToSHpJm(BaseSkim):
                            "Sigma+:charmSkim pi+:charmSkim_pid K-:charmSkim_pid",
                            "Sigma+:charmSkim K+:charmSkim_pid pi-:charmSkim_pid",
                            "Sigma+:charmSkim K+:charmSkim_pid K-:charmSkim_pid",
+                           "Sigma+:charmSkim K_S0:charmSkim",
                            ]
 
         LambdacList = []
         for chID, channel in enumerate(LambdacChannels):
             ma.reconstructDecay("Lambda_c+:SHpJm" + str(chID) + " -> " + channel, LambdacCuts, chID, path=path)
             LambdacList.append("Lambda_c+:SHpJm" + str(chID))
-
-        return LambdacList
-
-
-@fancy_skim_header
-class LambdacToSKs(BaseSkim):
-    """
-    **Decay Modes**:
-        * :math:`\\Lambda_c^+ \\to \\Sigma K_s`
-
-    **Selection Criteria**:
-        * Use tracks from the charm_skim_std_charged
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
-        * p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
-        * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
-        * ``0.44 < M(K_s) < 0.55, significanceOfDistance > 2.0``
-        * :math:`\\pm 3\\sigma` mass windows for :math:'\\Sigma^+\\'
-        * lower bound on significance of distance for :math:'\\Sigma^+\\' > 2
-        * For more details, please check the source code of this skim.
-
-    """
-
-    __authors__ = ["Quinn Campagna"]
-    __description__ = "Skim list for Lambda_c+ -> Sigma K_s."
-    __contact__ = __liaison__
-    __category__ = "physics, charm"
-
-    NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = True
-
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Lambdac+ -> Sigma+ K_S0 skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
-    def load_standard_lists(self, path):
-        stdKshorts(path=path)
-        loadStdSkimPi0(path=path)
-
-    def build_lists(self, path):
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
-
-        ma.fillParticleList('p+:loose', 'trinaryID > 0.2', path=path)
-
-        ma.cutAndCopyList(
-            'K_S0:charmSkim',
-            'K_S0:merged',
-            '0.44 < M < 0.55 and significanceOfDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
-            path=path)
-
-        ma.cutAndCopyList('pi0:charmSkim', 'pi0:skim', '0.120 < InvM < 0.145', path=path)
-
-        ma.reconstructDecay('Sigma+:charmSkim -> p+:loose pi0:charmSkim',
-                            cut='1.1166 < M < 1.211 and significanceOfDistance > 2', path=path)
-
-        LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["Sigma+:charmSkim K_S0:charmSkim",
-                           ]
-
-        LambdacList = []
-        for chID, channel in enumerate(LambdacChannels):
-            ma.reconstructDecay("Lambda_c+:SigKs" + str(chID) + " -> " + channel, LambdacCuts, chID, path=path)
-            LambdacList.append("Lambda_c+:SigKs" + str(chID))
 
         return LambdacList
 

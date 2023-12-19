@@ -41,10 +41,6 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias MyD0 D0
-Alias MyAntiD0 anti-D0
-ChargeConj MyD0 MyAntiD0
-
 Decay vpho
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
@@ -52,16 +48,16 @@ Decay vpho
 Enddecay
 
 Decay D*+
-1.0 MyD0  pi+ PHOTOS VSS;
+1.0 D0sig  pi+ PHOTOS VSS;
 Enddecay
 
 Decay D*-
-1.0 MyAntiD0 pi- PHOTOS VSS;
+1.0 anti-D0sig pi- PHOTOS VSS;
 Enddecay
 
-Decay MyD0
+Decay D0sig
 1.0 K- pi+ pi0	PHOTOS PHSP;
 Enddecay
-CDecay MyAntiD0
+CDecay anti-D0sig
 
 End

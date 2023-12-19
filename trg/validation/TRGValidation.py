@@ -72,7 +72,7 @@ inputBits_expert = [
     'cdc_b2b7',
     'cdc_b2b9',
     'itsfb2b',
-    'ti\t 0',
+    'ti',
     'i2io',
     'i2fo',
     'f2f30',
@@ -380,7 +380,7 @@ class MakePlots(basf2.Module):
         histogram.GetListOfFunctions().Add(Check)
         contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
         histogram.GetListOfFunctions().Add(contact)
-        Meta = TNamed("MetaOptions", "shifter")
+        Meta = TNamed("MetaOptions", "shifter,pvalue-warn=0.1,pvalue-error=0.01")
         histogram.GetListOfFunctions().Add(Meta)
 
     def set_style(self, histogram, xtitle, ytitle):
@@ -654,39 +654,66 @@ class MakePlots(basf2.Module):
 
     def terminate(self):
 
-        bits = ['ty_0', 'ehigh', 'clst_0', 'klm_0']
-        for part in ["e", "mu"]:
-            h_gen_p = self.tfile.Get(f"{part}_all/p")
-            h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
-            h_gen_theta = self.tfile.Get(f"{part}_all/theta")
-            h_gen_phi = self.tfile.Get(f"{part}_all/phi")
+        bits = ['ty_0', 'ehigh', 'clst_0']
+        part = 'e'
+        h_gen_p = self.tfile.Get(f"{part}_all/p")
+        h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
+        h_gen_theta = self.tfile.Get(f"{part}_all/theta")
+        h_gen_phi = self.tfile.Get(f"{part}_all/phi")
 
-            for bit in bits:
-                h_p = self.tfile.Get(f"{part}_{bit}/p")
-                h_E = self.tfile.Get(f"{part}_{bit}/clusterE")
-                h_theta = self.tfile.Get(f"{part}_{bit}/theta")
-                h_phi = self.tfile.Get(f"{part}_{bit}/phi")
+        for bit in bits:
+            h_p = self.tfile.Get(f"{part}_{bit}/p")
+            h_E = self.tfile.Get(f"{part}_{bit}/clusterE")
+            h_theta = self.tfile.Get(f"{part}_{bit}/theta")
+            h_phi = self.tfile.Get(f"{part}_{bit}/phi")
 
-                h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
-                self.set_style(h_eff_p, "Momentum", "Efficiency")
-                if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
-                    self.set_descr(h_eff_p, "Momentum dependent efficiency for shifters", "")
+            h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
+            self.set_style(h_eff_p, "Momentum", "Efficiency")
+            if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
+                self.set_descr(h_eff_p, "Momentum dependent efficiency for shifters", "")
 
-                h_eff_E = self.get_relative(h_E, h_gen_E, 'E', part, bit)
-                self.set_style(h_eff_E, "Energy", "Efficiency")
-                if (bit == 'ehigh' or bit == 'clst_0') and part == 'e':
-                    self.set_descr(h_eff_E, "Energy dependent efficiency for shifters", "")
+            h_eff_E = self.get_relative(h_E, h_gen_E, 'E', part, bit)
+            self.set_style(h_eff_E, "Energy", "Efficiency")
+            if (bit == 'ehigh' or bit == 'clst_0') and part == 'e':
+                self.set_descr(h_eff_E, "Energy dependent efficiency for shifters", "")
 
-                h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
-                self.set_style(h_eff_theta, "Polar angle", "Efficiency")
+            h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
+            self.set_style(h_eff_theta, "Polar angle", "Efficiency")
 
-                h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
-                self.set_style(h_eff_phi, "phi angle", "Efficiency")
+            h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
+            self.set_style(h_eff_phi, "phi angle", "Efficiency")
 
-                h_eff_p.Write()
-                h_eff_E.Write()
-                h_eff_theta.Write()
-                h_eff_phi.Write()
+            h_eff_p.Write()
+            h_eff_E.Write()
+            h_eff_theta.Write()
+            h_eff_phi.Write()
+
+        bits = ['ty_0', 'klm_0']
+        part = "mu"
+        h_gen_p = self.tfile.Get(f"{part}_all/p")
+        h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
+        h_gen_theta = self.tfile.Get(f"{part}_all/theta")
+        h_gen_phi = self.tfile.Get(f"{part}_all/phi")
+
+        for bit in bits:
+            h_p = self.tfile.Get(f"{part}_{bit}/p")
+            h_theta = self.tfile.Get(f"{part}_{bit}/theta")
+            h_phi = self.tfile.Get(f"{part}_{bit}/phi")
+
+            h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
+            self.set_style(h_eff_p, "Momentum", "Efficiency")
+            if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
+                self.set_descr(h_eff_p, "Momentum dependent efficiency for shifters", "")
+
+            h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
+            self.set_style(h_eff_theta, "Polar angle", "Efficiency")
+
+            h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
+            self.set_style(h_eff_phi, "phi angle", "Efficiency")
+
+            h_eff_p.Write()
+            h_eff_theta.Write()
+            h_eff_phi.Write()
 
         self.hist_inbit.Scale(1./self.Nevent)
         self.hist_outbit.Scale(1.0/self.Nevent)
@@ -742,8 +769,8 @@ for bit in bits:
     ma.cutAndCopyList(f'e+:{bit}', 'e+:true', cut=inb_cut, path=mypath)
 
     ma.variablesToHistogram(decayString=f'mu+:{bit}',
-                            variables=[('p', 40, 1.0, 3.0),
-                                       ('clusterE', 40, 1.0, 3.0),
+                            variables=[('p', 50, 0.5, 3.0),
+                                       ('clusterE', 50, 0.5, 3.0),
                                        ('theta', 40, 0.5, 2.5),
                                        ('phi', 40, -3.141593, 3.141593)],
                             filename='TRGValidation.root',
@@ -752,8 +779,8 @@ for bit in bits:
                             )
 
     ma.variablesToHistogram(decayString=f'e+:{bit}',
-                            variables=[('p', 40, 1.0, 3.0),
-                                       ('clusterE', 40, 1.0, 3.0),
+                            variables=[('p', 50, 0.5, 3.0),
+                                       ('clusterE', 50, 0.5, 3.0),
                                        ('theta', 40, 0.5, 2.5),
                                        ('phi', 40, -3.141593, 3.141593)],
                             filename='TRGValidation.root',
@@ -763,8 +790,8 @@ for bit in bits:
 
 
 ma.variablesToHistogram(decayString='mu+:true',
-                        variables=[('p', 40, 1.0, 3.0),
-                                   ('clusterE', 40, 1.0, 3.0),
+                        variables=[('p', 50, 0.5, 3.0),
+                                   ('clusterE', 50, 0.5, 3.0),
                                    ('theta', 40, 0.5, 2.5),
                                    ('phi', 40, -3.141593, 3.141593)],
                         filename='TRGValidation.root',
@@ -773,8 +800,8 @@ ma.variablesToHistogram(decayString='mu+:true',
                         )
 
 ma.variablesToHistogram(decayString='e+:true',
-                        variables=[('p', 40, 1.0, 3.0),
-                                   ('clusterE', 40, 1.0, 3.0),
+                        variables=[('p', 50, 0.5, 3.0),
+                                   ('clusterE', 50, 0.5, 3.0),
                                    ('theta', 40, 0.5, 2.5),
                                    ('phi', 40, -3.141593, 3.141593)],
                         filename='TRGValidation.root',

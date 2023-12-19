@@ -24,9 +24,11 @@ main = b2.create_path()
 # default to early phase 3 (exp=1003), run 0
 main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=num_events)
 
-# generate BBbar events
+# generate BBbar (or Continuum) events
 ge.add_evtgen_generator(path=main, finalstate='mixed')
+# ge.add_continuum_generator(path=main, finalstate='ccbar')
 
+# main.add_module('PrintMCParticles',showStatus=True, onlyPrimaries=False,maxLevel=3)
 # # GAT prediction
 NNFilterModule_m = NNFilterModule(
         extra_info_var='GAT_AfterGen'
@@ -56,7 +58,7 @@ fei_skim(path=main)
 mdst.add_mdst_output(
     path=main,
     filename=f'{out_dir}AfterFEI.root',
-    # additionalBranches=["EventExtraInfo"]
+    additionalBranches=["EventExtraInfo"]
 )
 
 b2.process(path=main)

@@ -109,6 +109,8 @@ class TrainDataSaver(b2.Module):
         self.eventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
         #: Dictionary to save particle features
         self.df_dict = defaultdict(list)
+        #: record the production time(s) of root particle(s) for the correction of jitter
+        self.root_prodTime = defaultdict(list)
 
     def event(self):
         """
@@ -118,29 +120,48 @@ class TrainDataSaver(b2.Module):
 
         evtNum = self.eventinfo.getEvent()
         skim = evtNum in self.flag_list
+        nVirtualRoot = 0
 
         # Create particle features
         for mcp in mcplist:
+            prodTime = mcp.getProductionTime()
+
+            # Collect indices for graph
+            arrayIndex = mcp.getArrayIndex()
+            mother = mcp.getMother()
+
+            if mother:
+                root = False
+                motherPDG = mother.getPDG()
+                motherArrayIndex = mother.getArrayIndex()
+                # pass the production time of root particle for the correction of jitter
+                self.root_prodTime[arrayIndex] = self.root_prodTime[motherArrayIndex]
+                if mother.isVirtual():
+                    motherArrayIndex = arrayIndex
+            else:
+                root = True
+                nVirtualRoot += 1
+                motherPDG = 0
+                motherArrayIndex = arrayIndex
+                # record the production time of root particle for the correction of jitter
+                self.root_prodTime[arrayIndex] = prodTime
+
             if mcp.isPrimaryParticle() and check_status_bit(mcp.getStatus()):
-                arrayIndex = mcp.getArrayIndex()
+                if root:
+                    nVirtualRoot -= 1
                 four_vec = mcp.get4Vector()
                 prod_vec = mcp.getProductionVertex()
-                mother = mcp.getMother()
-                motherPDG = 0
-                motherArrayIndex = 0
-                if mother:
-                    motherPDG = mother.getPDG()
-                    motherArrayIndex = mother.getArrayIndex()
+
                 # indices
                 self.df_dict['label'].append(skim)
                 self.df_dict['evtNum'].append(evtNum)
-                self.df_dict['arrayIndex'].append(arrayIndex)
+                self.df_dict['arrayIndex'].append(arrayIndex-nVirtualRoot)
                 # features
                 self.df_dict['PDG'].append(mcp.getPDG())
                 self.df_dict['mass'].append(mcp.getMass())
                 self.df_dict['charge'].append(mcp.getCharge())
                 self.df_dict['energy'].append(mcp.getEnergy())
-                self.df_dict['prodTime'].append(mcp.getProductionTime())
+                self.df_dict['prodTime'].append(prodTime-self.root_prodTime[arrayIndex])
                 self.df_dict['x'].append(prod_vec.x())
                 self.df_dict['y'].append(prod_vec.y())
                 self.df_dict['z'].append(prod_vec.z())
@@ -150,7 +171,7 @@ class TrainDataSaver(b2.Module):
                 self.df_dict['nDaughters'].append(mcp.getNDaughters())
                 self.df_dict['status'].append(mcp.getStatus())
                 self.df_dict['motherPDG'].append(motherPDG)
-                self.df_dict['motherIndex'].append(motherArrayIndex)
+                self.df_dict['motherIndex'].append(motherArrayIndex-nVirtualRoot)
 
     def terminate(self):
         """

@@ -438,8 +438,8 @@ class DpToHpPi0(BaseSkim):
         * :math:`D^+ \\to \\pi^+ \\pi^0`
 
     **Selection Criteria**:
-        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799, pcms > 0.5``
-        * Use :math:`\\pi^{0}` from `stdPi0s(eff40_May2020Fit)` + `pcms > 0.5`
+        * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799, pcms(\\pi^{+}) > 0.5``
+        * Use :math:`\\pi^{0}` from `stdPi0s(eff50_May2020Fit)` + `pcms(\\pi^{0}) > 0.5`
         * ``1.57 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 

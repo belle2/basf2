@@ -720,7 +720,7 @@ class BtoD0h_Kshh(BaseSkim):
 
     * ``1.5 < M_D0 < 2.2``
     * ``5.2 < Mbc``
-    * ``abs(deltaE) < 0.3``
+    * ``deltaE < 0.3 and deltaE > -0.45``
 
     Note:
         This skim uses `skim.standardlists.charm.loadD0_Kshh_loose`, where :math:`D^0`
@@ -742,7 +742,7 @@ class BtoD0h_Kshh(BaseSkim):
         loadD0_Kshh_loose(path=path)
 
     def build_lists(self, path):
-        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+        Bcuts = "Mbc > 5.2 and deltaE < 0.3 and deltaE > -0.45"
 
         BsigChannels = ["anti-D0:Kshh pi+:GoodTrack",
                         "anti-D0:Kshh K+:GoodTrack"

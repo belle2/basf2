@@ -138,7 +138,7 @@ class ANSIColors(enum.Enum):
             codes.append(7)
         if not codes:
             return ""
-        return '\x1b[{}m'.format(";".join(map(str, codes)))
+        return f"\x1b[{';'.join(map(str, codes))}m"
 
     @classmethod
     def fg(cls, color):

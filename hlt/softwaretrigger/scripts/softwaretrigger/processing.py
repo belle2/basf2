@@ -8,6 +8,7 @@
 import os
 import argparse
 import multiprocessing
+import tempfile
 
 import basf2
 
@@ -118,7 +119,7 @@ def start_path(args, location):
 
     # Histogram Handling
     if not args.histo_output_file:
-        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName="/tmp/")
+        path.add_module('DqmHistoManager', Port=args.histo_port, DumpInterval=1000, workDirName=tempfile.gettempdir()+"/")
     else:
         workdir = os.path.dirname(args.histo_output_file)
         filename = os.path.basename(args.histo_output_file)
@@ -351,8 +352,8 @@ def finalize_zmq_path(path, args, location):
     basf2.set_streamobjs(save_objects)
 
     if location == constants.Location.expressreco:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=False)
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=False, outputConfirmation=False)
     elif location == constants.Location.hlt:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=True, outputConfirmation=True)
     else:
         basf2.B2FATAL(f"Does not know location {location}")

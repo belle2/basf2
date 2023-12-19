@@ -39,7 +39,7 @@ namespace Belle2 {
 
   private:
 
-    const float m_svdLayerRadius[4] = {3.8, 8.0, 11.5, 14.0}; /**< mean SVD layer radius for both layers */
+    const float m_svdLayerRadius[4] = {3.9, 8.0, 10.4, 13.5}; /**< mean SVD layer radius for both layers */
 
     SVDROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
 

@@ -134,6 +134,8 @@ def add_simulation(
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
     """
 
+    path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
+
     # Check compoments.
     check_components(components)
 

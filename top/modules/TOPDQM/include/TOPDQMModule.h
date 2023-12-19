@@ -92,6 +92,7 @@ namespace Belle2 {
     TH1F* m_eventT0 = 0; /**< reconstructed event T0 */
     TH1F* m_bunchOffset = 0; /**< reconstructed bunch: current offset */
     TH1F* m_time = 0; /**< time distribution of good hits */
+    TH1F* m_timeBG = 0; /**< time distribution of good hits (background) */
     TProfile* m_signalHits = 0; /**< number of hits in the signal time window vs. slot number */
     TProfile* m_backgroundHits = 0; /**< number of hits in the background time window vs. slot number */
 
@@ -113,8 +114,10 @@ namespace Belle2 {
     std::vector<TH1F*> m_goodTDC; /**< Histograms for TDC distribution of good hits */
     std::vector<TH1F*> m_badTDC; /**< Histograms for TDC distribution of bad hits */
     std::vector<TH1F*> m_goodTiming; /**< Histograms for timing distribution of good hits */
+    std::vector<TH1F*> m_goodTimingBG; /**< Histograms for timing distribution of good hits (background) */
     std::vector<TH1F*> m_goodChannelHits; /**< Histograms for good channel hits */
     std::vector<TH1F*> m_badChannelHits; /**< Histograms for bad channel hits */
+    std::vector<TProfile*> m_pulseHeights; /**< Pulse heights of good hits */
 
     // other
     int m_numModules = 0; /**< number of TOP modules */

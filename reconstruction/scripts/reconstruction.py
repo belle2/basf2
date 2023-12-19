@@ -9,6 +9,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+# Limit the number of threads spawned by external libraries (e.g. XGBoost)
+import os
+os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
+
 import basf2
 
 from geometry import check_components
@@ -232,7 +236,6 @@ def add_prefilter_reconstruction(path,
     if reconstruct_cdst:
         add_special_vxd_modules(path, components=components)
     if reconstruct_cdst == 'rawFormat' and not add_modules_for_trigger_calculation:
-        add_dedx_modules(path, components=components)
         return
 
     # Add prefilter posttracking modules
@@ -270,8 +273,9 @@ def add_postfilter_reconstruction(path,
 
     path.add_module('StatisticsSummary').set_name('Sum_Postfilter_Tracking')
 
-    # Skip postfilter posttracking modules for raw format cdst reconstruction
+    # Skip postfilter posttracking modules except dedx for raw format cdst reconstruction
     if reconstruct_cdst == 'rawFormat':
+        add_dedx_modules(path, components=components)
         if pruneTracks:
             add_prune_tracks(path, components)
         return
@@ -442,10 +446,6 @@ def add_prefilter_posttracking_reconstruction(path,
     :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
-    # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
-    if not for_cdst_analysis:
-        add_dedx_modules(path, components)
-
     add_ext_module(path, components)
 
     # Add EventT0Combiner, if this function is not called from prepare_cdst_analysis() or if requested also there.
@@ -479,6 +479,10 @@ def add_postfilter_posttracking_reconstruction(path,
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
+
+    # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        add_dedx_modules(path, components)
 
     add_top_modules(path, components, cosmics=cosmics)
     add_arich_modules(path, components)

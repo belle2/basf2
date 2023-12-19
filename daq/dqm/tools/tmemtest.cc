@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "daq/rfarm/manager/SharedMem.h"
+#include "daq/dqm/DqmSharedMem.h"
 
 #include "TH1F.h"
 #include "TMemFile.h"
@@ -17,10 +17,10 @@ using namespace std;
 
 int main(int /*argc*/, char** /*argv*/)
 {
-  SharedMem* shm = new SharedMem("testhisto", 2000000);
+  DqmSharedMem* shm = new DqmSharedMem("testhisto", 2000000);
   //  TMemFile* file = new TMemFile ( "TestHisto", (char*)shm->ptr(), 2000000, "RECREATE", "", 0 );
   TMemFile* file = new TMemFile("TestHisto", "RECREATE");
-  int cpysize = file->CopyTo(shm->ptr(), 500000);
+  file->CopyTo(shm->ptr(), 500000);
 
   //  TMapFile* file = TMapFile::Create("TestHisto", "RECREATE", 2000000);
   //  TFile* file = new TFile ( "testhist.root", "RECREATE" );
@@ -38,13 +38,13 @@ int main(int /*argc*/, char** /*argv*/)
     //      cpysize = file->CopyTo( shm.ptr(), 2000000 );
     file->Write(0, TObject::kOverwrite);
     shm->lock();
-    cpysize = file->CopyTo(shm->ptr(), 500000);
+    int cpysize = file->CopyTo(shm->ptr(), 500000);
     shm->unlock();
     printf("Objects copied : cpysize = %d\n", cpysize);
   }
   //    h1->Reset();
   //  }
-  cpysize = file->CopyTo(shm->ptr(), 500000);
+  file->CopyTo(shm->ptr(), 500000);
   file->ls();
   file->Print();
   file->Write();

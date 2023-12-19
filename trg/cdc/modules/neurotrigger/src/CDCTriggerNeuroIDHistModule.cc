@@ -74,7 +74,9 @@ namespace Belle2 {
       m_neuroParameters.loadconfigtxt(m_configFileName);
       m_NeuroTrigger.initialize(m_neuroParameters);
     } else {
-      B2ERROR("Configuration file is missing! Make sure to give the configuration file as a parameter.");
+      m_neuroParameters.saveconfigtxt("neuroconfig_example.conf");
+      B2ERROR("Configuration file is missing! Make sure to give the configuration file as a parameter. \
+              An example file neuroconfig_example.conf has been saved.");
     }
     m_trainSets_prepare.clear();
     CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
@@ -161,7 +163,6 @@ namespace Belle2 {
           }
         }
         if (!m_neuroParameters.rescaleTarget && outOfRange) continue;
-        //
         if (m_nPrepare == 0 || m_trainSets_prepare[isector].getTrackCounter() < m_nPrepare) {
           // get relative ids for all hits related to the MCParticle / RecoTrack
           // and count them to find relevant id range
@@ -230,14 +231,13 @@ namespace Belle2 {
       std::vector<NNTParam<float>> expertline;
       expertline.push_back(float(isector));
       expertline.back().lock();
-      for (auto x : m_NeuroTrigger[isector].getRelID()) {
+      for (auto x : hset.relID) {
         expertline.push_back(x);
         expertline.back().lock();
       }
       m_neuroParameters.IDRanges.push_back(expertline);
       B2DEBUG(15, hset);
     }
-    m_configFileName = "IDTable_" + m_configFileName;
     // lock the variables used in this module, that are not supposed be changed
     // further down the training chain because of the danger of implications or
     // wrong assumptions.

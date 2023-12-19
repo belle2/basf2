@@ -111,9 +111,9 @@ namespace Belle2 {
   }
 
   TRGState
-  TCTracker2D::packer(const TRGState& input,
-                      TRGState& registers,
-                      bool& logicStillActive)
+  TRGCDCTracker2D::packer(const TRGState& input,
+                          TRGState& registers,
+                          bool& logicStillActive)
   {
 
     //...Registers...
@@ -150,8 +150,8 @@ namespace Belle2 {
   }
 
   void
-  TCTracker2D:: unpacker(const TRGState& input,
-                         TRGState& output)
+  TRGCDCTracker2D:: unpacker(const TRGState& input,
+                             TRGState& output)
   {
 
     const string sn = "TRGCDC 2D unpacker";
@@ -197,7 +197,7 @@ namespace Belle2 {
   }
 
   void
-  TCTracker2D::hitInformation(const TRGState& registers)
+  TRGCDCTracker2D::hitInformation(const TRGState& registers)
   {
 
     //...Clear info...
@@ -212,7 +212,7 @@ namespace Belle2 {
   }
 
   void
-  TCTracker2D::setConstants(void)
+  TRGCDCTracker2D::setConstants(void)
   {
 
     //...# of TSFs...

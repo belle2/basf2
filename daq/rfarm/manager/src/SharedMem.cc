@@ -24,24 +24,31 @@ using namespace std;
 
 SharedMem::SharedMem(const char* name, int size)
 {
+  bool hasFile = false;
   std::string tmpPathName;
   // 0. Determine shared memory type
   if (strcmp(name, "private") != 0) {      // Global
+    int tmpFilefd = -1;
+    hasFile = true;
     tmpPathName = getTmpFileName(getenv("USER"), name);
-    m_pathfd = open(tmpPathName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
-    if (m_pathfd > 0) {   // a new shared memory file created
-      printf("SharedMem: Creating a shared memory with key %s\n", name);
+    tmpFilefd = open(tmpPathName.c_str(), O_CREAT | O_EXCL | O_RDWR, 0644);
+    // existance of file does not really imply shared mem is existing.
+    // -> better we do not rely and update the content anyway!
+    if (tmpFilefd > 0) {   // a new shared memory file created
+      printf("SharedMem: Creating a new tmp file %s\n", name);
       m_new = true;
-    } else if (m_pathfd == -1 && errno == EEXIST) { // shm already there
-      printf("SharedMem: Attaching the ring buffer with key %s\n", name);
+      close(tmpFilefd); // will open again later
+    } else if (tmpFilefd == -1 && errno == EEXIST) { // shm already there
+      printf("SharedMem: Found existing tmp file %s\n", name);
       m_new = false;
     } else {
-      printf("SharedMem: error to open shm file\n");
+      printf("SharedMem: error to open tmp file %s\n", tmpPathName.c_str());
       return;
     }
     m_shmkey = ftok(tmpPathName.c_str(), 1);
     m_semkey = ftok(tmpPathName.c_str(), 2);
   } else { // Private
+    hasFile = false;
     m_new = true;
     m_shmkey = IPC_PRIVATE;
     m_semkey = IPC_PRIVATE;
@@ -72,39 +79,52 @@ SharedMem::SharedMem(const char* name, int size)
   // - IPC_CREATE will open existing or create new one
   // - IPC_CREATE|IPC_EXCL will create new one and fail is existing
   // - 0 will open existing one and fails if not existing
-  m_semid = semget(m_semkey, 1, IPC_CREAT | 0644);
+  m_semid = semget(m_semkey, 1, IPC_CREAT | IPC_EXCL | 0666);
   if (m_semid >= 0) {
     // POSIX doesn't guarantee any particular state of our fresh semaphore
     int semval = 1; //unlocked state
+    printf("Semaphore ID %d created for key $%X\n", m_semid, m_semkey);
     if (semctl(m_semid, 0, SETVAL, semval) == -1) { //set 0th semaphore to semval
-      printf("Initializing semaphore with semctl() failed.\n");
+      perror("Initializing semaphore with semctl() failed.");
+      return;
     }
   } else if (errno == EEXIST) {
-    m_semid = semget(m_semkey, 1, 0600);
+    m_semid = semget(m_semkey, 1, 0); // obtain existing one
+    printf("Found existing Semaphore ID %d for key $%X\n", m_semid, m_semkey);
   }
   if (m_semid < 0) {
     perror("SharedMem::shmget");
     return;
   }
 
-  // 3. Leave id of shm and semaphore in file name
-  if (m_new) {
-    /*
-    m_strbuf = new char[1024];
-    sprintf(m_strbuf, "/tmp/SHM%d-SEM%d-SHM_%s", m_shmid, m_semid, name);
-    int fd = open(m_strbuf, O_CREAT | O_TRUNC | O_RDWR, 0644);
-    if (fd < 0) {
-      printf("SharedMem ID file could not be created.\n");
-    } else {
-      close(fd);
+  // 3. Put id of shm and semaphore in tmp file
+  if (hasFile) {
+    // private shm dont have a file, thus need to skip
+    bool updateneeded = m_new;
+    // 3.1 check if id of shm and semaphore in tmp file need update
+    if (!m_new) {
+      int shmid = 0, semid = 0;
+      if (getIdFromTmpFileName(tmpPathName.c_str(), shmid, semid)) {
+        updateneeded = (shmid != m_shmid || semid != m_semid);
+        printf("tmp file %s content still uptodate\n", tmpPathName.c_str());
+      } else {
+        updateneeded = true; // could not open file or empty
+      }
     }
-    */
-    //    printf("SharedMem: leaving shmid and semid in the path file %d %d fd=%d\n", m_shmid, m_semid, m_pathfd);
-    char shminfo[256];
-    sprintf(shminfo, "%d %d\n", m_shmid, m_semid);
-    int is = write(m_pathfd, shminfo, strlen(shminfo));
-    if (is < 0) perror("write");
-    close(m_pathfd);
+    // 3.2 put id of shm and semaphore in tmp file
+    if (updateneeded) {
+      char shminfo[256];
+      int tmpFilefd = open(tmpPathName.c_str(), O_RDWR, 0644);
+      if (tmpFilefd < 0) {
+        printf("SharedMem: error to reopen tmp file %s\n", tmpPathName.c_str());
+        return;
+      }
+      snprintf(shminfo, sizeof(shminfo), "%d %d\n", m_shmid, m_semid);
+      int is = write(tmpFilefd, shminfo, strlen(shminfo));
+      if (is < 0) perror("write");
+      close(tmpFilefd);
+      printf("tmp file %s has been updated with shminfo \"%s\"\n", tmpPathName.c_str(), shminfo);
+    }
   }
   printf("SharedMem: created. shmid = %d, semid = %d\n", m_shmid, m_semid);
 

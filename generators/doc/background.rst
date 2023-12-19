@@ -45,7 +45,8 @@ Alternatively, you can update the globaltag
 (refer to :numref:`framework/doc/development/tuppr:Updating the main globaltag`).
 
 If you wish to apply the project to particle lists other than Y(4S) and B, manual specification is required 
-in the script ``generators/script/smartBKG/b2modules/NN_trainer_module/data_production.py``. 
+in the script ``generators/script/smartBKG/b2modules/NN_trainer_module/data_production.py`` and 
+``generators/script/smartBKG/__init__.py``
 The modules are designed to handle continuum datasets as well.
 
 

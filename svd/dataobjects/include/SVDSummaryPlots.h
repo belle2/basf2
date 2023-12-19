@@ -146,10 +146,10 @@ namespace Belle2 {
       delete m_defaultHistogram;
     }
 
-  private:
-    TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
-    TH2F* m_defaultHistogram; /**< default histograms*/
 
+
+
+  private:
 
     /** find the Y bin given the layer and sensor number */
     Int_t findBinY(Int_t layer, Int_t sensor)
@@ -166,6 +166,10 @@ namespace Belle2 {
       else
         return -1;
     }
+
+    TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
+
+    TH2F* m_defaultHistogram; /**< default histograms*/
 
     /** customize the histogram with the sensor, view*/
     void customize(TH2F& histogram, int view)

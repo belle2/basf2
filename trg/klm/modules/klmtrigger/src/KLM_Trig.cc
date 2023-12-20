@@ -139,7 +139,7 @@ Belle2::group_helper::KLM_trg_summery Belle2::make_trg(const std::vector<Belle2:
   [](letref e1)  {
     let  bit_mask     = to_bit_mask(project(e1,  [](letref t) { return (layer(t) + 1) * 2 + plane(t); }));
     let  layer_count_ = countBits(bit_mask);
-    return std::tuple(layer_mask(layer_count_), layer_count(bit_mask));
+    return std::tuple(layer_count(layer_count_), layer_mask(bit_mask));
   }
                                                                        );
 

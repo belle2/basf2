@@ -122,7 +122,7 @@ namespace Belle2 {
     std::vector<TOPSampleTimes> m_sampleTimes; /**< calibration constants */
 
     /** cache for a map */
-    mutable std::map<unsigned, const TOPSampleTimes*> m_map; //!
+    mutable std::map<unsigned, size_t> m_map; //!
 
     /** cache for default (equidistant) sample times */
     mutable TOPSampleTimes* m_sampleTime = 0; //!

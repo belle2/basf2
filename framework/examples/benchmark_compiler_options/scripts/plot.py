@@ -89,13 +89,13 @@ def read(optlevel, b, name):
             + "&"
             + str(n[i])
             + "&"
-            + str("%.3f" % value[i])
+            + str(f"{value[i]:.3f}")
             + " & "
-            + str("%.3f" % sigma[i])
+            + str(f"{sigma[i]:.3f}")
             + "&"
-            + str("%.4f" % valuenormed[i])
+            + str(f"{valuenormed[i]:.4f}")
             + "&"
-            + str("%.4f" % sigmanormed[i])
+            + str(f"{sigmanormed[i]:.4f}")
             + "\\\\\n"
         )
         fobj.write(r"\hline\n")

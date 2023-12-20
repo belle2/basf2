@@ -984,7 +984,7 @@ class DpToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * ``track cuts: dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20``
+        * ``track cuts: charm_skim_std_charged pion and Kaon with PID>0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
@@ -1000,14 +1000,13 @@ class DpToHpOmega(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdPi("all", path=path)
-        stdK("all", path=path)
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        trackcuts = "dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20"
-        ma.cutAndCopyList("pi+:my", "pi+:all", "pionID>0.1 and " + trackcuts, path=path)
-        ma.cutAndCopyList("K+:my", "K+:all", "kaonID>0.1 and " + trackcuts, path=path)
+        ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
+        ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
         ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
 
         ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
@@ -1033,7 +1032,7 @@ class DspToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * ``track cuts: dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20``
+        * ``track cuts: charm_skim_std_charged pion and Kaon with PID>0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
@@ -1049,14 +1048,13 @@ class DspToHpOmega(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdPi("all", path=path)
-        stdK("all", path=path)
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        trackcuts = "dr<0.5 and abs(dz)<2 and thetaInCDCAcceptance and nCDCHits>20"
-        ma.cutAndCopyList("pi+:my", "pi+:all", "pionID>0.1 and " + trackcuts, path=path)
-        ma.cutAndCopyList("K+:my", "K+:all", "kaonID>0.1 and " + trackcuts, path=path)
+        ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
+        ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
         ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
 
         ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)

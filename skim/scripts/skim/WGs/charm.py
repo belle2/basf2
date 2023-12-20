@@ -985,7 +985,8 @@ class DpToHpOmega(BaseSkim):
 
     **Selection Criteria**:
         * ``track cuts: charm_skim_std_charged pion and Kaon with PID>0.1``
-        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * :math:`p(\\pi^{0})>0.25` and :math:`0.11<InvM(\\pi^{0})<0.15`
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
         * ``2.0 < p*(D+)``
@@ -1007,7 +1008,7 @@ class DpToHpOmega(BaseSkim):
     def build_lists(self, path):
         ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
         ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
-        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
+        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and [0.11 < InvM < 0.15]", path=path)
 
         ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
 
@@ -1033,7 +1034,8 @@ class DspToHpOmega(BaseSkim):
 
     **Selection Criteria**:
         * ``track cuts: charm_skim_std_charged pion and Kaon with PID>0.1``
-        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0` and :math:`p(\\pi^{0})>0.25`
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * :math:`p(\\pi^{0})>0.25` and :math:`0.11<InvM(\\pi^{0})<0.15`
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
         * ``2.0 < p*(D_s+)``
@@ -1055,7 +1057,7 @@ class DspToHpOmega(BaseSkim):
     def build_lists(self, path):
         ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
         ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
-        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25", path=path)
+        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and [0.11 < InvM < 0.15]", path=path)
 
         ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
 

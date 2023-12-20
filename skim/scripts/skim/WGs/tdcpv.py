@@ -280,6 +280,8 @@ class TDCPV_ccs(BaseSkim):
         stdKlongs(listtype='allklm', path=path)
         stdKlongs(listtype='allecl', path=path)
 
+        ma.reconstructDecay('K*0:neutral -> K_S0:merged pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
+
     def additional_setup(self, path):
         ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
         ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
@@ -297,6 +299,8 @@ class TDCPV_ccs(BaseSkim):
                            'psi(2S):ll K_S0:merged',
                            'J/psi:ee K*0:SkimHighEff',
                            'J/psi:mumu K*0:SkimHighEff',
+                           'J/psi:ee K*0:neutral',
+                           'J/psi:mumu K*0:neutral',
                            'J/psi:ee eta:SkimHighEff',
                            'J/psi:mumu eta:SkimHighEff']
 

@@ -295,22 +295,20 @@ class XToDp_DpToKsHp(BaseSkim):
 
 
 @fancy_skim_header
-class DpToPipHpHm(BaseSkim):
+class DpToPipepem(BaseSkim):
     """
     **Decay Modes**:
         * :math:`D^+ \\to \\pi^+ e^- e^+`,
-        * :math:`D^+ \\to \\pi^+ \\mu^- \\mu^+`,
-        * :math:`D^+ \\to \\pi^+ K^- K^+`
 
     **Selection Criteria**:
         * Use tracks from the charm lists in `charm_skim_std_charged`
-        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for ee, mumu, KK
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for ee
         * For more details, please check the source code of this skim.
 
     """
 
     __authors__ = ["Andrej Lozar"]
-    __description__ = "Skim list for D+ to pi+ h+ h-."
+    __description__ = "Skim list for D+ to pi+ e+ e-."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
@@ -320,25 +318,89 @@ class DpToPipHpHm(BaseSkim):
     def load_standard_lists(self, path):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("e", path=path)
-        charm_skim_std_charged("K", path=path)
-        charm_skim_std_charged("mu", path=path)
 
         ma.cutAndCopyList("e+:mySel", "e+:charmSkim", "electronID_noSVD_noTOP > 0.01", path=path)
-        ma.cutAndCopyList("K+:mySel", "K+:charmSkim", "kaonID > 0.1", path=path)
-        ma.cutAndCopyList("mu+:mySel", "mu+:charmSkim", "muonID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
 
-        Dp_Channels = ["pi+:charmSkim e+:mySel e-:mySel",
-                       "pi+:charmSkim K+:mySel K-:mySel",
-                       "pi+:charmSkim mu+:mySel mu-:mySel"
-                       ]
+        DpList = []
+        ma.reconstructDecay("D+:Pipepem -> pi+:charmSkim e+:mySel e-:mySel", Dpcuts, 1, path=path)
+        DpList.append("D+:Pipepem")
+
+        return DpList
+
+
+@fancy_skim_header
+class DpToPipmupmum(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ \\mu^- \\mu^+`
+
+    **Selection Criteria**:
+        * Use tracks from the charm lists in `charm_skim_std_charged`
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for mumu
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Andrej Lozar"]
+    __description__ = "Skim list for D+ to pi+ mu+ mu-."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged("pi", path=path)
+        charm_skim_std_charged("mu", path=path)
+
+        ma.cutAndCopyList("mu+:mySel", "mu+:charmSkim", "muonID_noSVD > 0.01", path=path)
+
+    def build_lists(self, path):
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
 
         DpList = []
-        for chID, channel in enumerate(Dp_Channels):
-            ma.reconstructDecay("D+:PipHpHm" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
-            DpList.append("D+:PipHpHm" + str(chID))
+        ma.reconstructDecay("D+:Pipmupmum -> pi+:charmSkim mu+:mySel mu-:mySel", Dpcuts, 1, path=path)
+        DpList.append("D+:Pipmupmum")
+
+        return DpList
+
+
+@fancy_skim_header
+class DpToPipKpKm(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ K^- K^+`
+
+    **Selection Criteria**:
+        * Use tracks from the charm lists in `charm_skim_std_charged`
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for KK
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Andrej Lozar"]
+    __description__ = "Skim list for D+ to pi+ K+ K-."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged("pi", path=path)
+        charm_skim_std_charged("K", path=path)
+
+        ma.cutAndCopyList("K+:mySel", "K+:charmSkim", "kaonID > 0.1", path=path)
+
+    def build_lists(self, path):
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
+
+        DpList = []
+        ma.reconstructDecay("D+:PipKpKm -> pi+:charmSkim K+:mySel K-:mySel", Dpcuts, 1, path=path)
+        DpList.append("D+:PipKpKm")
 
         return DpList
 

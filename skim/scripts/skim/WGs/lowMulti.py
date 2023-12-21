@@ -301,7 +301,7 @@ class LowMassOneTrack(BaseSkim):
         label = "LowMassOneTrack"
 
         # Momenta of tracks greater than 0.3 GeV in the Lab frame
-        track_cut = "[p > 0.5] and [abs(dz) < 5.0] and [abs(dr) < 2.0] and inCDCAcceptance"
+        track_cut = "[p > 0.5] and [clusterEoP < 0.9] and [abs(dz) < 5.0] and [abs(dr) < 2.0] and inCDCAcceptance"
         # Energy of hard ISR gamma greater than 2 GeV in the CMS frame
         isr_cut = "useCMSFrame(E) > 2"
 

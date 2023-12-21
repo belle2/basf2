@@ -2867,16 +2867,22 @@ void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, u
       weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] + M_PI - m_alphaPoints[points[0]]);
     }
   } else {
-    for (unsigned short i = 0; i <= m_nAlphaPoints - 2; ++i) {
-      if (m_alphaPoints[i] <= alphao && alphao < m_alphaPoints[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
-        break;
+    int i1 = 0;
+    int i2 = m_nAlphaPoints - 1;
+    while (true) {
+      int next = (i1 + i2) / 2;
+      if (alphao < m_alphaPoints[next]) {
+        i2 = next;
+      } else {
+        i1 = next;
       }
+      if (i1 == i2 - 1)
+        break;
     }
+    points[0] = i1;
+    points[1] = i2;
+    weight = (alphao - m_alphaPoints[i1]) / (m_alphaPoints[i2] - m_alphaPoints[i1]);
   }
-  //  weight = (alphao - m_alphaPoints[points[0]]) / (m_alphaPoints[points[1]] - m_alphaPoints[points[0]]);
 }
 
 
@@ -2901,14 +2907,21 @@ void CDCGeometryPar::getClosestAlphaPoints4Sgm(const double alpha, double& weigh
       weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] + M_PI - m_alphaPoints4Sgm[points[0]]);
     }
   } else {
-    for (unsigned short i = 0; i <= m_nAlphaPoints4Sgm - 2; ++i) {
-      if (m_alphaPoints4Sgm[i] <= alphao && alphao < m_alphaPoints4Sgm[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] - m_alphaPoints4Sgm[points[0]]);
-        break;
+    int i1 = 0;
+    int i2 = m_nAlphaPoints4Sgm - 1;
+    while (true) {
+      int next = (i1 + i2) / 2;
+      if (alphao < m_alphaPoints[next]) {
+        i2 = next;
+      } else {
+        i1 = next;
       }
+      if (i1 == i2 - 1)
+        break;
     }
+    points[0] = i1;
+    points[1] = i2;
+    weight = (alphao - m_alphaPoints4Sgm[i1]) / (m_alphaPoints4Sgm[i2] - m_alphaPoints4Sgm[i1]);
   }
 }
 
@@ -2930,14 +2943,21 @@ void CDCGeometryPar::getClosestThetaPoints(const double alpha, const double thet
     points[1] = m_nThetaPoints - 1;
     weight = 1.;
   } else {
-    for (unsigned short i = 0; i <= m_nThetaPoints - 2; ++i) {
-      if (m_thetaPoints[i] <= thetao && thetao < m_thetaPoints[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
-        break;
+    int i1 = 0;
+    int i2 = m_nThetaPoints - 1;
+    while (true) {
+      int next = (i1 + i2) / 2;
+      if (thetao < m_thetaPoints[next]) {
+        i2 = next;
+      } else {
+        i1 = next;
       }
+      if (i1 == i2 - 1)
+        break;
     }
+    points[0] = i1;
+    points[1] = i2;
+    weight = (thetao - m_thetaPoints[i1]) / (m_thetaPoints[i2] - m_thetaPoints[i1]);
   }
   //  weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
 }
@@ -2957,14 +2977,21 @@ void CDCGeometryPar::getClosestThetaPoints4Sgm(const double alpha, const double 
     points[1] = m_nThetaPoints4Sgm - 1;
     weight = 1.;
   } else {
-    for (unsigned short i = 0; i <= m_nThetaPoints4Sgm - 2; ++i) {
-      if (m_thetaPoints4Sgm[i] <= thetao && thetao < m_thetaPoints4Sgm[i + 1]) {
-        points[0] = i;
-        points[1] = i + 1;
-        weight = (thetao - m_thetaPoints4Sgm[points[0]]) / (m_thetaPoints4Sgm[points[1]] - m_thetaPoints4Sgm[points[0]]);
-        break;
+    int i1 = 0;
+    int i2 = m_nThetaPoints4Sgm - 1;
+    while (true) {
+      int next = (i1 + i2) / 2;
+      if (thetao < m_thetaPoints[next]) {
+        i2 = next;
+      } else {
+        i1 = next;
       }
+      if (i1 == i2 - 1)
+        break;
     }
+    points[0] = i1;
+    points[1] = i2;
+    weight = (thetao - m_thetaPoints4Sgm[i1]) / (m_thetaPoints4Sgm[i2] - m_thetaPoints4Sgm[i1]);
   }
 }
 

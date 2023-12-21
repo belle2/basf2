@@ -152,9 +152,10 @@ class XToD0_D0ToNeutrals(BaseSkim):
             * List of D0 particle list names.
 
         """
-        charmcuts = "1.62 < M < 2.1 and useCMSFrame(p)>2.0"
-        D0_Channels = ["pi0:skim pi0:skim",
-                       "K_S0:merged pi0:skim",
+        charmcuts = "1.6 < M < 2.1 and useCMSFrame(p)>2.0"
+        ma.cutAndCopyList('pi0:D0', 'pi0:skim', 'p>0.4', path=path)
+        D0_Channels = ["pi0:D0 pi0:D0",
+                       "K_S0:merged pi0:D0",
                        "K_S0:merged K_S0:merged",
                        ]
 

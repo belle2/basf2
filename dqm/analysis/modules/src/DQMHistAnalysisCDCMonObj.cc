@@ -302,7 +302,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
   TH1F* hHitRatePerWire = new TH1F("hHitRatePerWire", "hit rate (kHz)/Wire;layer", 56, 0, 56);
   int nHits = 0;
-  int tdcwindow = 0;
+  int tdcwindow;
   for (int i = 0; i < 56; ++i) {
     if (i < 8) tdcwindow = 416;
     else tdcwindow = 768;

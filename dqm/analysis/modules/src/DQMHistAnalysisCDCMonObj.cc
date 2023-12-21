@@ -302,8 +302,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
   TH1F* hHitRatePerWire = new TH1F("hHitRatePerWire", "hit rate (kHz)/Wire;layer", 56, 0, 56);
   int nHits = 0;
-  int tdcwindow;
   for (int i = 0; i < 56; ++i) {
+    int tdcwindow;
+    double tdcclock = 0.98255764; //unit: ns
     if (i < 8) tdcwindow = 416;
     else tdcwindow = 768;
     m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
@@ -316,10 +317,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       }
       if (neve > 0) {
         hHitPerLayer->SetBinContent(i + 1, static_cast<float>(1.0 * nhitSumL / neve));
-        hHitRatePerWire->SetBinContent(i + 1, static_cast<float>((1.0 * nhitSumL / neve) / (1.0 * nBins * tdcwindow * 0.98255764 * 1e-6)));
+        hHitRatePerWire->SetBinContent(i + 1, static_cast<float>((1.0 * nhitSumL / neve) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6)));
       } else {
         hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
-        hHitRatePerWire->SetBinContent(i + 1, static_cast<float>((1.0 * nhitSumL) / (1.0 * nBins * tdcwindow * 0.98255764 * 1e-6)));
+        hHitRatePerWire->SetBinContent(i + 1, static_cast<float>((1.0 * nhitSumL) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6)));
       }
       hHitPerLayer->SetBinError(i + 1, 0);
       hHitRatePerWire->SetBinError(i + 1, 0);

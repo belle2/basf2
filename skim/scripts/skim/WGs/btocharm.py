@@ -1038,3 +1038,71 @@ class B0toD0Kpipi0_pi0(BaseSkim):
         ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0_loose pi0:charmlessFit", Bcuts, path=path)
 
         return ["B0:D0Kpipi0_pi0"]
+
+
+@fancy_skim_header
+class B0toDDs0star(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\phi(\\to K^+ K^-) \\pi+ \\pi0) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
+    * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\overline{K}^{*0}(\\to K^- \\pi^+ ) K^+) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
+    * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\phi(\\to K^+ K^-) \\pi+) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
+
+    Cuts applied:
+
+    * ``5.2 < Mbc < 5.3``
+    * ``abs(deltaE) < 0.2``
+    * ``0.31 < D_s0ST_massDifference_0 < 0.347``
+
+    """
+
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+
+    __authors__ = ["Kuanying Wu"]
+    __description__ = "skim list for B0 to D_{s0}^{*+} D-"
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+
+    def build_lists(self, path):
+
+        BsigList_1 = []
+        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",  cut="1.01 < M < 1.03", path=path)
+        ma.reconstructDecay("D_s+ -> phi pi+:GoodTrack pi0:bth_skim", cut="1.942 < M < 1.978", path=path)
+        ma.reconstructDecay("D_s0*+ -> D_s+ pi0:bth_skim", cut="2.249 < M < 2.298 and 0.31 < massDifference(0) < 0.347 and \
+                            1.017 < p < 2.552 and 2.267 < daughterInvM(0, 1) < 2.311", path=path)
+        ma.reconstructDecay("B0:B0toDDs0star_Dsp_phipipi0 -> D_s0*+ D-:Kpipi", cut="5.2 < Mbc < 5.3 and \
+                            0.2 < deltaE < 0.2", path=path)
+        ma.matchMCTruth("B0:B0toDDs0star_Dsp_phipipi0", path=path)
+        BsigList_1.append("B0:B0toDDs0star_Dsp_phipipi0")
+
+        BsigList_2 = []
+        ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",  cut="0.793 < M < 1.015", path=path)
+        ma.reconstructDecay("D_s+ -> anti-K*0 K+:GoodTrack", cut="1.944 < InvM < 1.992", path=path)
+        ma.reconstructDecay("D_s0*+ -> D_s+ pi0:bth_skim", cut="2.252 < M < 2.330 and \
+                            0.25 < massDifference(0) < 0.36 and 1.017 < p < 2.552", path=path)
+        ma.reconstructDecay("B0:B0toDDs0star_Dsp_antiKstarK -> D_s0*+ D-:Kpipi", cut="5.2 < Mbc < 5.3 and \
+                            -0.2 < deltaE < 0.2", path=path)
+        ma.matchMCTruth("B0:B0toDDs0star_Dsp_antiKstarK", path=path)
+        BsigList_2.append("B0:B0toDDs0star_Dsp_antiKstarK")
+
+        BsigList_3 = []
+        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack", cut=" 1.001 < InvM < 1.043 ", path=path)
+        ma.reconstructDecay("D_s+ -> phi pi+:GoodTrack", cut=" 1.935 < InvM < 1.999 ", path=path)
+        ma.reconstructDecay("D_s0*+ -> D_s+ pi0:bth_skim", cut=" 2.265 < InvM < 2.355 and \
+                            0.286 < massDifference(0) < 0.361 ", path=path)
+        ma.reconstructDecay("B0:B0toDDs0star_Dsp_phipi -> D_s0*+ D-:Kpipi", cut=" 5.2 < Mbc < 5.3 and \
+                            -0.2 < deltaE < 0.2 ", path=path)
+        ma.matchMCTruth("B0:B0toDDs0star_Dsp_phipi", path=path)
+        BsigList_3.append("B0:B0toDDs0star_Dsp_phipi")
+        BsigList = BsigList_1 + BsigList_2 + BsigList_3
+        return BsigList

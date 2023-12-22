@@ -1062,6 +1062,8 @@ class B0toDs1D(BaseSkim):
     Cuts applied:
     * ``5.2 < Mbc < 5.3``
     * ``-0.5 < deltaE < 0.5``
+    * ``0.247 < M(D_s1+) - M(D_s*+) < 0.378``
+    * ``0.072 < M(D_s*+) - M(D_s+) < 0.179``
 
     Note:
     """

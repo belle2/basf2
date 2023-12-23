@@ -1050,13 +1050,13 @@ class B0toDs1D(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\phi (\\to K^+ K^-)\\pi^+) \\gamma) \\pi^0)
+    * .. math::`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\phi (\\to K^+ K^-)\\pi^+) \\gamma) \\pi^0)
        D^- (\\to K^+ \\pi^-\\pi^-)`,
-    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\phi (\\to K^+ K^-) \\pi^+ \\pi^0) \\gamma) \\pi^0)
+    * .. math::`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\phi (\\to K^+ K^-) \\pi^+ \\pi^0) \\gamma) \\pi^0)
        D^- (\\to K^+ \\pi^-\\pi^-)`,
-    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\overline{K}^{*0} (\\to K^- \\pi^+)K^+) \\gamma) \\pi^0)
+    * .. math::`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\overline{K}^{*0} (\\to K^- \\pi^+)K^+) \\gamma) \\pi^0)
        D^- (\\to K^+ \\pi^-\\pi^-)`,
-    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to K_S^0 (\\to \\pi^- \\pi^+)K^+) \\gamma) \\pi^0)
+    * .. math::`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to K_S^0 (\\to \\pi^- \\pi^+)K^+) \\gamma) \\pi^0)
        D^- (\\to K^+ \\pi^-\\pi^-)`,
 
     Cuts applied:

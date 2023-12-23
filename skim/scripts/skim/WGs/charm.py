@@ -37,6 +37,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi, stdPr, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
+import variables as va
 
 
 __liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
@@ -61,67 +62,56 @@ def charm_skim_std_charged(particle_type, path):
 @fancy_skim_header
 class XToD0_D0ToHpJm(BaseSkim):
     """
-    Skims :math:`D^0`'s reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`.
+    **Decay Modes**:
+        * :math:`\\D^{0} \\to \\pi^+ \\pi^-`
+        * :math:`\\D^{0} \\to \\pi^+ K^-`
+        * :math:`\\D^{0} \\to K^+ \\pi^-`
+        * :math:`\\D^{0} \\to K^+ K^-`
+
+    **Selection Criteria**:
+        * Use tracks from the charm_skim_std_charged
+        * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
+        * K/pi binary ID > 0.2, pi_pionIDNN > 0.1
+        * For more details, please check the source code of this skim.
+
     """
 
-    __authors__ = ["Giulia Casarosa"]
-    __description__ = "Skim list for D0 to two charged FSPs."
+    __authors__ = ["Dinura Hettiarachchi"]
+    __description__ = "Skim list for inclusive D0 two body decays."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    # Cached static method, so that its contents are only executed once for a single path.
-    # Factored out into a separate function here, so it is available to other skims.
+    def additional_setup(self, path):
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL("The analysis globaltag is not set in the charm D0 -> HpJm skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
-    @staticmethod
-    @lru_cache()
-    def D0ToHpJm(path):
-        """
-        **Decay Modes**:
-            * :math:`D^{0}\\to \\pi^+ \\pi^-`,
-            * :math:`D^{0}\\to K^+ \\pi^-`,
-            * :math:`D^{0}\\to K^- \\pi^+`,
-            * :math:`D^{0}\\to K^+ K^-`,
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
 
-        **Selection Criteria**:
-            * Tracks: ``abs(d0) < 1, abs(z0) < 3, 0.296706 < theta < 2.61799``
-            * ``1.66 < M(D0) < 2.06``
-            * ``pcms(D0) > 2.0``
-            * For more details, please check the source code of this skim.
+    def build_lists(self, path):
+        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
 
-        **Parameters**:
-            * path (basf2.Path): Skim path to be processed.
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
-        **Returns**:
-            * List of D0 particle list names.
-
-        """
-        mySel = "abs(d0) < 1 and abs(z0) < 3"
-        mySel += " and 0.296706 < theta < 2.61799"
-        ma.fillParticleList("pi+:mygood", mySel, path=path)
-        ma.fillParticleList("K+:mygood", mySel, path=path)
-
-        charmcuts = "1.66 < M < 2.06 and useCMSFrame(p)>2.0"
-        D0_Channels = [
-            "pi+:mygood pi-:mygood",
-            "K+:mygood pi-:mygood",
-            "K-:mygood pi+:mygood",
-            "K+:mygood K-:mygood",
-        ]
+        D0Cuts = "1.66 < M < 2.06 and useCMSFrame(p) > 2.0"
+        D0Channels = ["pi+:charmSkim_pid pi-:charmSkim_pid",
+                      "pi+:charmSkim_pid K-:charmSkim_pid",
+                      "K+:charmSkim_pid pi-:charmSkim_pid",
+                      "K+:charmSkim_pid K-:charmSkim_pid",
+                      ]
 
         D0List = []
-
-        for chID, channel in enumerate(D0_Channels):
-            ma.reconstructDecay("D0:HpJm" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
+        for chID, channel in enumerate(D0Channels):
+            ma.reconstructDecay("D0:HpJm" + str(chID) + " -> " + channel, D0Cuts, chID, path=path)
             D0List.append("D0:HpJm" + str(chID))
 
         return D0List
-
-    def build_lists(self, path):
-        """Builds :math:`D^0` skim lists defined in `XToD0_D0ToHpJm.D0ToHpJm`."""
-        return self.D0ToHpJm(path)
 
 
 @fancy_skim_header

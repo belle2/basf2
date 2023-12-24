@@ -219,7 +219,7 @@ class TDCPV_ccs(BaseSkim):
 
     * ``B0 -> J/psi (ee/mm) K_S0``
     * ``B0 -> psi(2s) (ee/mm) K_S0``
-    * ``B0 -> J/psi (ee/mm) K*``
+    * ``B0 -> J/psi (ee/mm) K* (K+ pi- / K_S0 pi0)``
     * ``B+ -> J/psi (ee/mm) K+``
     * ``B0 -> J/psi (ee/mm) KL``
     * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``

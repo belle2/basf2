@@ -1,5 +1,10 @@
-# example decay file of BSTD_2HDMTYPE2 model based on M. Tanaka and R. Watanabe PRD87,034028(2013)
+# EventType: 1093300001
+# Descriptor: example decay file of BSTD_2HDMTYPE2 model based on M. Tanaka and R. Watanabe PRD87,034028(2013)
+# NickName: BSemiTauonic_BSTD_2HDMTYPE2
+# Cuts: None
+# PhysicsWG: SL
 # author: Koji Hara (koji.hara@kek.jp)
+
 
 # (GeV/c^2)^-1
 Define tanBeta/m_H+	0.5
@@ -30,20 +35,13 @@ Define R21	0.854
 Define aS1 	1.0
 Define aR3	1.0
 
-Alias MyB0 B0
-Alias MyB0B anti-B0
-ChargeConj MyB0 MyB0B
-
-Alias MyB+ B+
-Alias MyB- B-
-
 Decay Upsilon(4S)
-0.2575613225 MyB+      B-                                      VSS;
-0.2575613225 MyB-      B+                                      VSS;
-0.483122645 MyB0      MyB0B B0 anti-B0	             	VSS_BMIX dm;
+0.2575613225 B+sig      B-                                      VSS;
+0.2575613225 B-sig      B+                                      VSS;
+0.483122645 B0sig anti-B0sig B0 anti-B0	             	VSS_BMIX dm;
 Enddecay
 
-Decay MyB0
+Decay B0sig
 0.5 D*- tau+ nu_tau		BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+;
 0.5 D-  tau+ nu_tau		BSTD_2HDMTYPE2   rho12 aS1 m_b m_c tanBeta/m_H+;
 
@@ -51,17 +49,9 @@ Decay MyB0
 #0.5 D*- tau+ nu_tau		BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+ m_H+;
 #0.5 D-  tau+ nu_tau		BSTD_2HDMTYPE2   rho12 aS1 m_b m_c tanBeta/m_H+ m_H+;
 Enddecay
+CDecay anti-B0sig
 
-Decay MyB0B
-0.5 D*+ tau- anti-nu_tau	BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+;
-0.5 D+  tau- anti-nu_tau	BSTD_2HDMTYPE2   rho12  aS1 m_b m_c tanBeta/m_H+;
-
-# if m_H+ is added to the parameter, S2 term with CS2 = -m_tau*m_c/m_H+/m_H+ is added. (default is CS2=0).
-#0.5 D*+ tau- anti-nu_tau	BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+ m_H+;
-#0.5 D+  tau- anti-nu_tau	BSTD_2HDMTYPE2   rho12  aS1 m_b m_c tanBeta/m_H+ m_H+;
-Enddecay
-
-Decay MyB+
+Decay B+sig
 0.5 anti-D*0 tau+ nu_tau	BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+;
 0.5 anti-D0  tau+ nu_tau	BSTD_2HDMTYPE2   rho12 aS1 m_b m_c tanBeta/m_H+;
 
@@ -69,14 +59,6 @@ Decay MyB+
 #0.5 anti-D*0 tau+ nu_tau	BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+ m_H+;
 #0.5 anti-D0  tau+ nu_tau	BSTD_2HDMTYPE2   rho12 aS1 m_b m_c tanBeta/m_H+ m_H+;
 Enddecay
-
-Decay MyB-
-0.5 D*0 tau- anti-nu_tau	BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+;
-0.5 D0  tau- anti-nu_tau	BSTD_2HDMTYPE2   rho12  aS1 m_b m_c tanBeta/m_H+;
-
-# if m_H+ is added to the parameter, S2 term with CS2 = -m_tau*m_c/m_H+/m_H+ is added. (default is CS2=0).
-#0.5 D*0 tau- anti-nu_tau	BSTD_2HDMTYPE2   rhoA12 R11 R21 aR3 m_b m_c tanBeta/m_H+ m_H+;
-#0.5 D0  tau- anti-nu_tau	BSTD_2HDMTYPE2   rho12  aS1 m_b m_c tanBeta/m_H+ m_H+;
-Enddecay
+CDecay B-sig
 
 End

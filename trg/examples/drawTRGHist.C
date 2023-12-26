@@ -21,7 +21,9 @@ void drawTRGHist(){
 	file1 = new TFile("TRGValidation.root","read");
 	file2 = new TFile("newTRGValidation.root","read");
 	h1 = (TH1F*)file1->Get("hin_expert");
-	h2 = (TH1F*)file1->Get("hin_expert");
+	h2 = (TH1F*)file2->Get("hin_expert");
+	h1->SetLineColor(2);
+	h2->SetLineColor(4);
 
 	c1=new TCanvas("c1_hin","",1600,600);
 	h1->Draw("HIST");

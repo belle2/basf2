@@ -279,7 +279,7 @@ class EventType:
              KeywordDictionary dictionary of keywords
              remove            "remove file" flag - force removing the option file and create a new one
              OptionFile        flag for existence of option file
-             technology        specify the langauge of the script
+             technology        specify the language of the script
         """
 
         #: name of decay file
@@ -290,12 +290,12 @@ class EventType:
         self.remove = remove
         #: flag for existence of option file
         self.OptionFile = None
-        #: specify the langauge of the script
+        #: specify the language of the script
         self.technology = technology
 
     def DecodeDecayFile(self):
         """
-        Operates deconding of decay file.
+        Operates decoding of decay file.
         """
         fullstring = ''
         with open(self.DecayFileName, 'rb') as f:
@@ -888,7 +888,7 @@ def CheckFile(option, opt_str, value, parser):
 # The background is set with 40 plus the number of the color, and the
 # foreground with 30
 
-# These are the sequences need to get colored ouput
+# These are the sequences needed to get colored output
 RESET_SEQ = "\033[0m"
 COLOR_SEQ = "\033[1;%d;40m"
 BOLD_SEQ = "\033[1m"

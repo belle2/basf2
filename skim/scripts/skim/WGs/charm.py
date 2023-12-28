@@ -998,7 +998,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         * Cut on photon:
           ``E > 0.05``
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma`:
-          ``0.115 < M(pi0) < 0.160''
+          ``0.115 < M(pi0) < 0.160``
         * Cut on tag side charm particles(D0/D+/D_s+/Lambda_c+):
           ``1.72 < M(D0) < 2.02 and p*(D0) > 2.0``
           ``1.72 < M(D+) < 2.02 and p*(D+) > 2.0``

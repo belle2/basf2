@@ -1010,7 +1010,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
           ``0.120 < massDifference(0) < 0.165`` on decay with gamma
         * Cut on signal side :math:`D^{*+}, D^{0}`
           ``1.81 < M(D*+) < 2.21`` on :math:`D^{*+}`
-          ``0.110 < (M(D*+)-M(D0)) < 0.220 and p*(D0) > 2.0`` on :math:`D^{0}`
+          ``0.115 < (M(D*+)-M(D0)) < 0.220 and p*(D0) > 2.0`` on :math:`D^{0}`
     """
     vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
     vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')

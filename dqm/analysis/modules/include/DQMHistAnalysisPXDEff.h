@@ -117,12 +117,12 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! Individual efficiency for each module, 2d histogram
-    std::map<VxdID, TEfficiency*> m_hEffModules;
+    std::map<VxdID, TEfficiency*> m_eEffModules;
     //! Individual efficiency for each module, canvas
     std::map<VxdID, TCanvas*> m_cEffModules;
 
     //! One bin for each module in the geometry
-    TEfficiency* m_hEffAll = nullptr;
+    TEfficiency* m_eEffAll = nullptr;
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
     //! TH1, last state, total
@@ -130,7 +130,7 @@ namespace Belle2 {
     //! TH1, last state, passed
     TH1* m_hEffAllLastPassed = nullptr;
     //! Efficiency, last state, updated
-    TEfficiency* m_hEffAllUpdate = nullptr;
+    TEfficiency* m_eEffAllUpdate = nullptr;
     //! Final Canvas for Update
     TCanvas* m_cEffAllUpdate = nullptr;
 

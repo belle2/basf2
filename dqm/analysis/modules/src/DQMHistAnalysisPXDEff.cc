@@ -593,7 +593,7 @@ void DQMHistAnalysisPXDEffModule::event()
 
     setEpicsPV("Status", stat_data);
     // only update if statistics is reasonable, we dont want "0" drops between runs!
-    if (stat_data != c_TooFew) {
+    if (stat_data != c_StatusTooFew) {
       setEpicsPV("Overall", var_efficiency);
       setEpicsPV("L1", var_efficiencyL1);
       setEpicsPV("L2", var_efficiencyL2);

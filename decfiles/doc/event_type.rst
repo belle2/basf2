@@ -472,7 +472,7 @@ The particle names to be used in nicknames (the second form is the short one):
   (:math:`D^{*+}`), ``Dst0`` (:math:`D^{*0}`), ``Dsst+`` (:math:`D_s^{*+}`), ``Jpsi`` (:math:`J/\psi`)
   and ``etac`` (:math:`\eta_c`).
 - **Strange hadrons:** ``K`` (:math:`K^+`), ``KS`` (:math:`K^0_S`), ``KL`` (:math:`K^0_S`) and
-``Lambda`` (:math:`\Lambda^0`).
+  ``Lambda`` (:math:`\Lambda^0`).
 - **Unflavoured hadrons:** ``pi`` (:math:`\pi^+` / :math:`\pi^0`), ``rho``
   (:math:`\rho^+` / :math:`\rho^0`), ``eta`` (:math:`\eta`), ``etap`` (:math:`\eta^{\prime}`),
   ``a1`` (:math:`a1`), ``phi`` (:math:`\phi`), ``p`` (:math:`p`), ``n`` (:math:`n`).
@@ -481,8 +481,8 @@ The particle names to be used in nicknames (the second form is the short one):
 
 For other event types, the rules are:
 
-- **Particle gun production:** The short name is of the form gun, followed by the particle name and
+- **Particle gun production:** The short name is of the form ``gun``, followed by the particle name and
   the particle gun conditions, separated by the equality sign. The particle gun conditions are used to
   describe the momentum or momentum range and the polar angle range.
-- **Machine background generation:** The short name is of the form bkg, followed by the type of
+- **Machine background generation:** The short name is of the form ``bkg``, followed by the type of
   background. Then the conditions are indicated after the equality sign.

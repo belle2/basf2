@@ -58,8 +58,8 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(RecoTrack& recoTrack)
     {
-      auto cdcHitList = recoTrack.getSortedCDCHitList();
-      RecoTrack* svdcdcRecoTrack =  recoTrack.getRelated<RecoTrack>("svdcdcRecoTracks");
+      const auto& cdcHitList = recoTrack.getSortedCDCHitList();
+      const RecoTrack* svdcdcRecoTrack =  recoTrack.getRelated<RecoTrack>("svdcdcRecoTracks");
       // In case the CDC hit list is empty, or there is no svdcdcRecoTrack, set arbitrary default value and return
       if (cdcHitList.size() == 0 or not svdcdcRecoTrack) {
         const float errorvalue = -99999.9;
@@ -103,15 +103,15 @@ namespace Belle2 {
       m_variables.at(m_prefix + "n_svd_hits") = recoTrack.getNumberOfSVDHits();
       m_variables.at(m_prefix + "n_cdc_hits") = recoTrack.getNumberOfCDCHits();
 
-      auto svdcdcRecoTrackCovariance = svdcdcRecoTrack->getSeedCovariance();
-      auto svdcdcRecoTrackMomentum = svdcdcRecoTrack->getMomentumSeed();
-      auto svdcdcRecoTrackPosition = svdcdcRecoTrack->getPositionSeed();
-      auto svdcdcRecoTrackChargeSign = svdcdcRecoTrack->getChargeSeed() > 0 ? 1 : -1;
-      auto bFieldValue = BFieldManager::getFieldInTesla(svdcdcRecoTrackPosition).Z();
+      const auto& svdcdcRecoTrackCovariance = svdcdcRecoTrack->getSeedCovariance();
+      const auto& svdcdcRecoTrackMomentum = svdcdcRecoTrack->getMomentumSeed();
+      const auto& svdcdcRecoTrackPosition = svdcdcRecoTrack->getPositionSeed();
+      const auto& svdcdcRecoTrackChargeSign = svdcdcRecoTrack->getChargeSeed() > 0 ? 1 : -1;
+      const auto& bFieldValue = BFieldManager::getFieldInTesla(svdcdcRecoTrackPosition).Z();
       const uint16_t svdcdcNDF = 0xffff;
-      auto svdcdcFitResult = TrackFitResult(svdcdcRecoTrackPosition, svdcdcRecoTrackMomentum, svdcdcRecoTrackCovariance,
-                                            svdcdcRecoTrackChargeSign, Const::pion, 0, bFieldValue, 0, 0,
-                                            svdcdcNDF);
+      const auto& svdcdcFitResult = TrackFitResult(svdcdcRecoTrackPosition, svdcdcRecoTrackMomentum, svdcdcRecoTrackCovariance,
+                                                   svdcdcRecoTrackChargeSign, Const::pion, 0, bFieldValue, 0, 0,
+                                                   svdcdcNDF);
 
       m_variables.at(m_prefix + "seed_pz_variance") = svdcdcRecoTrackCovariance(5, 5);
       m_variables.at(m_prefix + "seed_pz_estimate") = svdcdcRecoTrackMomentum.Z();
@@ -129,7 +129,7 @@ namespace Belle2 {
 
       m_variables.at(m_prefix + "svd_layer3_positionSigma") = -99999.9;
       m_variables.at(m_prefix + "svd_layer6_clsTime") = -99999.9;
-      for (auto* svdHit : recoTrack.getSVDHitList()) {
+      for (const auto* svdHit : recoTrack.getSVDHitList()) {
         if (svdHit->getSensorID().getLayerNumber() == 3) {
           m_variables.at(m_prefix + "svd_layer3_positionSigma") = svdHit->getPositionSigma();
         }

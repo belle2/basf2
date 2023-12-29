@@ -48,33 +48,34 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(RecoTrack& recoTrack)
     {
-      auto genfitTrack = recoTrack.getRelated<Track>("Tracks");
-      RecoTrack* flippedRecoTrack = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
-      if (not genfitTrack or not flippedRecoTrack) {
-        // Don't have genfitTrack or flippedRecoTrack -> set default values and return
+      const Track* track = recoTrack.getRelated<Track>("Tracks");
+      const RecoTrack* flippedRecoTrack = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
+      if (not track or not flippedRecoTrack) {
+        // Don't have track or flippedRecoTrack -> set default values and return
         setDefaultValues();
         return;
       }
-      Track* flippedTrack = flippedRecoTrack->getRelatedFrom<Track>("Tracks_flipped");
+      const Track* flippedTrack = flippedRecoTrack->getRelatedFrom<Track>("Tracks_flipped");
       if (not flippedTrack) {
         // Don't have flippedTrack -> set default values and return
         setDefaultValues();
         return;
       }
-      auto trackFitResult = genfitTrack->getTrackFitResultWithClosestMass(Const::pion);
-      auto flippedTrackFitResult = flippedTrack->getTrackFitResultWithClosestMassByName(Const::pion, "TrackFitResults_flipped");
+      const TrackFitResult* trackFitResult = track->getTrackFitResultWithClosestMass(Const::pion);
+      const TrackFitResult* flippedTrackFitResult =
+        flippedTrack->getTrackFitResultWithClosestMassByName(Const::pion, "TrackFitResults_flipped");
       if (not trackFitResult or not flippedTrackFitResult) {
         // Don't have trackFitResult or flippedTrackFitResult -> set default values and return
         setDefaultValues();
         return;
       }
 
-      auto unflippedCovariance = trackFitResult->getCovariance6();
-      auto unflippedMomentum = trackFitResult->getMomentum();
-      auto unflippedPosition = trackFitResult->getPosition();
+      const auto& unflippedCovariance = trackFitResult->getCovariance6();
+      const auto& unflippedMomentum = trackFitResult->getMomentum();
+      const auto& unflippedPosition = trackFitResult->getPosition();
 
-      auto flippedMomentum = flippedTrackFitResult->getMomentum();
-      auto flippedPosition = flippedTrackFitResult->getPosition();
+      const auto& flippedMomentum = flippedTrackFitResult->getMomentum();
+      const auto& flippedPosition = flippedTrackFitResult->getPosition();
 
       m_variables.at(m_prefix + "flipped_pz_estimate") = flippedMomentum.Z();
       m_variables.at(m_prefix + "tan_lambda_estimate") = trackFitResult->getCotTheta();

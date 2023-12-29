@@ -90,51 +90,51 @@ namespace Belle2 {
         return;
       }
 
-      m_variables.at(m_prefix + "InOutArmTimeDifference") = recoTrack.getInOutArmTimeDifference();
-      m_variables.at(m_prefix + "InOutArmTimeDifferenceError") = recoTrack.getInOutArmTimeDifferenceError();
-      m_variables.at(m_prefix + "inGoingArmTime") = recoTrack.getIngoingArmTime();
-      m_variables.at(m_prefix + "inGoingArmTimeError") = recoTrack.getIngoingArmTimeError();
-      m_variables.at(m_prefix + "outGoingArmTime") = recoTrack.getOutgoingArmTime();
-      m_variables.at(m_prefix + "outGoingArmTimeError") = recoTrack.getOutgoingArmTimeError();
+      m_variables.at(m_prefix + "InOutArmTimeDifference") = static_cast<float>(recoTrack.getInOutArmTimeDifference());
+      m_variables.at(m_prefix + "InOutArmTimeDifferenceError") = static_cast<float>(recoTrack.getInOutArmTimeDifferenceError());
+      m_variables.at(m_prefix + "inGoingArmTime") = static_cast<float>(recoTrack.getIngoingArmTime());
+      m_variables.at(m_prefix + "inGoingArmTimeError") = static_cast<float>(recoTrack.getIngoingArmTimeError());
+      m_variables.at(m_prefix + "outGoingArmTime") = static_cast<float>(recoTrack.getOutgoingArmTime());
+      m_variables.at(m_prefix + "outGoingArmTimeError") = static_cast<float>(recoTrack.getOutgoingArmTimeError());
 
-      m_variables.at(m_prefix + "first_cdc_layer") =  cdcHitList.front()->getICLayer();
-      m_variables.at(m_prefix + "last_cdc_layer") =  cdcHitList.back()->getICLayer();
+      m_variables.at(m_prefix + "first_cdc_layer") =  static_cast<float>(cdcHitList.front()->getICLayer());
+      m_variables.at(m_prefix + "last_cdc_layer") =  static_cast<float>(cdcHitList.back()->getICLayer());
 
-      m_variables.at(m_prefix + "n_svd_hits") = recoTrack.getNumberOfSVDHits();
-      m_variables.at(m_prefix + "n_cdc_hits") = recoTrack.getNumberOfCDCHits();
+      m_variables.at(m_prefix + "n_svd_hits") = static_cast<float>(recoTrack.getNumberOfSVDHits());
+      m_variables.at(m_prefix + "n_cdc_hits") = static_cast<float>(recoTrack.getNumberOfCDCHits());
 
       const auto& svdcdcRecoTrackCovariance = svdcdcRecoTrack->getSeedCovariance();
       const auto& svdcdcRecoTrackMomentum = svdcdcRecoTrack->getMomentumSeed();
       const auto& svdcdcRecoTrackPosition = svdcdcRecoTrack->getPositionSeed();
-      const auto& svdcdcRecoTrackChargeSign = svdcdcRecoTrack->getChargeSeed() > 0 ? 1 : -1;
-      const auto& bFieldValue = BFieldManager::getFieldInTesla(svdcdcRecoTrackPosition).Z();
+      const float svdcdcRecoTrackChargeSign = svdcdcRecoTrack->getChargeSeed() > 0 ? 1.0f : -1.0f;
+      const float bFieldValue = static_cast<float>(BFieldManager::getFieldInTesla(svdcdcRecoTrackPosition).Z());
       const uint16_t svdcdcNDF = 0xffff;
       const auto& svdcdcFitResult = TrackFitResult(svdcdcRecoTrackPosition, svdcdcRecoTrackMomentum, svdcdcRecoTrackCovariance,
                                                    svdcdcRecoTrackChargeSign, Const::pion, 0, bFieldValue, 0, 0,
                                                    svdcdcNDF);
 
-      m_variables.at(m_prefix + "seed_pz_variance") = svdcdcRecoTrackCovariance(5, 5);
-      m_variables.at(m_prefix + "seed_pz_estimate") = svdcdcRecoTrackMomentum.Z();
-      m_variables.at(m_prefix + "seed_z_estimate") = svdcdcRecoTrackPosition.Z() ;
-      m_variables.at(m_prefix + "seed_tan_lambda_estimate") = svdcdcFitResult.getCotTheta();
+      m_variables.at(m_prefix + "seed_pz_variance") = static_cast<float>(svdcdcRecoTrackCovariance(5, 5));
+      m_variables.at(m_prefix + "seed_pz_estimate") = static_cast<float>(svdcdcRecoTrackMomentum.Z());
+      m_variables.at(m_prefix + "seed_z_estimate") = static_cast<float>(svdcdcRecoTrackPosition.Z());
+      m_variables.at(m_prefix + "seed_tan_lambda_estimate") = static_cast<float>(svdcdcFitResult.getCotTheta());
 
-      m_variables.at(m_prefix + "seed_pt_estimate") = svdcdcRecoTrackMomentum.Rho();
-      m_variables.at(m_prefix + "seed_x_estimate") = svdcdcRecoTrackPosition.X();
-      m_variables.at(m_prefix + "seed_y_estimate") = svdcdcRecoTrackPosition.Y();
-      m_variables.at(m_prefix + "seed_py_variance") = svdcdcRecoTrackCovariance(4, 4);
-      m_variables.at(m_prefix + "seed_d0_estimate") = svdcdcFitResult.getD0();
-      m_variables.at(m_prefix + "seed_omega_variance") = svdcdcFitResult.getCov()[9];
-      m_variables.at(m_prefix + "seed_tan_lambda_variance") = svdcdcFitResult.getCov()[14];
-      m_variables.at(m_prefix + "seed_z_variance") = svdcdcRecoTrackCovariance(2, 2);
+      m_variables.at(m_prefix + "seed_pt_estimate") = static_cast<float>(svdcdcRecoTrackMomentum.Rho());
+      m_variables.at(m_prefix + "seed_x_estimate") = static_cast<float>(svdcdcRecoTrackPosition.X());
+      m_variables.at(m_prefix + "seed_y_estimate") = static_cast<float>(svdcdcRecoTrackPosition.Y());
+      m_variables.at(m_prefix + "seed_py_variance") = static_cast<float>(svdcdcRecoTrackCovariance(4, 4));
+      m_variables.at(m_prefix + "seed_d0_estimate") = static_cast<float>(svdcdcFitResult.getD0());
+      m_variables.at(m_prefix + "seed_omega_variance") = static_cast<float>(svdcdcFitResult.getCov()[9]);
+      m_variables.at(m_prefix + "seed_tan_lambda_variance") = static_cast<float>(svdcdcFitResult.getCov()[14]);
+      m_variables.at(m_prefix + "seed_z_variance") = static_cast<float>(svdcdcRecoTrackCovariance(2, 2));
 
       m_variables.at(m_prefix + "svd_layer3_positionSigma") = -99999.9;
       m_variables.at(m_prefix + "svd_layer6_clsTime") = -99999.9;
       for (const auto* svdHit : recoTrack.getSVDHitList()) {
         if (svdHit->getSensorID().getLayerNumber() == 3) {
-          m_variables.at(m_prefix + "svd_layer3_positionSigma") = svdHit->getPositionSigma();
+          m_variables.at(m_prefix + "svd_layer3_positionSigma") = static_cast<float>(svdHit->getPositionSigma());
         }
         if (svdHit->getSensorID().getLayerNumber() == 6) {
-          m_variables.at(m_prefix + "svd_layer6_clsTime") = svdHit->getClsTime();
+          m_variables.at(m_prefix + "svd_layer6_clsTime") = static_cast<float>(svdHit->getClsTime());
         }
       }
     }

@@ -77,24 +77,24 @@ namespace Belle2 {
       const auto& flippedMomentum = flippedTrackFitResult->getMomentum();
       const auto& flippedPosition = flippedTrackFitResult->getPosition();
 
-      m_variables.at(m_prefix + "flipped_pz_estimate") = flippedMomentum.Z();
-      m_variables.at(m_prefix + "tan_lambda_estimate") = trackFitResult->getCotTheta();
-      m_variables.at(m_prefix + "d0_variance") = trackFitResult->getCov()[0];
-      m_variables.at(m_prefix + "z_estimate") = unflippedPosition.Z();
-      m_variables.at(m_prefix + "px_variance") = unflippedCovariance(3, 3);
-      m_variables.at(m_prefix + "p_value") = trackFitResult->getPValue();
-      m_variables.at(m_prefix + "pt_estimate") = unflippedMomentum.Rho();
-      m_variables.at(m_prefix + "y_estimate") = unflippedPosition.Y();
-      m_variables.at(m_prefix + "d0_estimate") = trackFitResult->getD0();
-      m_variables.at(m_prefix + "x_estimate") = unflippedPosition.X();
-      m_variables.at(m_prefix + "pz_variance") = unflippedCovariance(5, 5);
-      m_variables.at(m_prefix + "omega_estimate") = trackFitResult->getOmega();
-      m_variables.at(m_prefix + "quality_flip_indicator") = recoTrack.getFlipQualityIndicator();
-      m_variables.at(m_prefix + "px_estimate") = unflippedMomentum.X();
-      m_variables.at(m_prefix + "flipped_z_estimate") = flippedPosition.Z();
-      m_variables.at(m_prefix + "py_estimate") = unflippedMomentum.Y();
-      m_variables.at(m_prefix + "inGoingArmTime") = recoTrack.getIngoingArmTime();
-      m_variables.at(m_prefix + "outGoingArmTime") = recoTrack.getOutgoingArmTime();
+      m_variables.at(m_prefix + "flipped_pz_estimate") = static_cast<float>(flippedMomentum.Z());
+      m_variables.at(m_prefix + "tan_lambda_estimate") = static_cast<float>(trackFitResult->getCotTheta());
+      m_variables.at(m_prefix + "d0_variance") = static_cast<float>(trackFitResult->getCov()[0]);
+      m_variables.at(m_prefix + "z_estimate") = static_cast<float>(unflippedPosition.Z());
+      m_variables.at(m_prefix + "px_variance") = static_cast<float>(unflippedCovariance(3, 3));
+      m_variables.at(m_prefix + "p_value") = static_cast<float>(trackFitResult->getPValue());
+      m_variables.at(m_prefix + "pt_estimate") = static_cast<float>(unflippedMomentum.Rho());
+      m_variables.at(m_prefix + "y_estimate") = static_cast<float>(unflippedPosition.Y());
+      m_variables.at(m_prefix + "d0_estimate") = static_cast<float>(trackFitResult->getD0());
+      m_variables.at(m_prefix + "x_estimate") = static_cast<float>(unflippedPosition.X());
+      m_variables.at(m_prefix + "pz_variance") = static_cast<float>(unflippedCovariance(5, 5));
+      m_variables.at(m_prefix + "omega_estimate") = static_cast<float>(trackFitResult->getOmega());
+      m_variables.at(m_prefix + "quality_flip_indicator") = static_cast<float>(recoTrack.getFlipQualityIndicator());
+      m_variables.at(m_prefix + "px_estimate") = static_cast<float>(unflippedMomentum.X());
+      m_variables.at(m_prefix + "flipped_z_estimate") = static_cast<float>(flippedPosition.Z());
+      m_variables.at(m_prefix + "py_estimate") = static_cast<float>(unflippedMomentum.Y());
+      m_variables.at(m_prefix + "inGoingArmTime") = static_cast<float>(recoTrack.getIngoingArmTime());
+      m_variables.at(m_prefix + "outGoingArmTime") = static_cast<float>(recoTrack.getOutgoingArmTime());
     }
 
   protected:

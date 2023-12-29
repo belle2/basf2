@@ -104,25 +104,24 @@ namespace Belle2 {
     /// Set all variables to default error value
     void setDefaultValues()
     {
-      const float errorvalue = -99999.9;
-      m_variables.at(m_prefix + "flipped_pz_estimate") = errorvalue;
-      m_variables.at(m_prefix + "tan_lambda_estimate") = errorvalue;
-      m_variables.at(m_prefix + "d0_variance") = errorvalue;
-      m_variables.at(m_prefix + "z_estimate") = errorvalue;
-      m_variables.at(m_prefix + "px_variance") = errorvalue;
-      m_variables.at(m_prefix + "p_value") = errorvalue;
-      m_variables.at(m_prefix + "pt_estimate") = errorvalue;
-      m_variables.at(m_prefix + "y_estimate") = errorvalue;
-      m_variables.at(m_prefix + "d0_estimate") = errorvalue;
-      m_variables.at(m_prefix + "x_estimate") = errorvalue;
-      m_variables.at(m_prefix + "pz_variance") = errorvalue;
-      m_variables.at(m_prefix + "omega_estimate") = errorvalue;
-      m_variables.at(m_prefix + "px_estimate") = errorvalue;
-      m_variables.at(m_prefix + "flipped_z_estimate") = errorvalue;
-      m_variables.at(m_prefix + "py_estimate") = errorvalue;
-      m_variables.at(m_prefix + "outGoingArmTime") = errorvalue;
-      m_variables.at(m_prefix + "quality_flip_indicator") = errorvalue;
-      m_variables.at(m_prefix + "inGoingArmTime") = errorvalue;
+      m_variables.at(m_prefix + "flipped_pz_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "tan_lambda_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "d0_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "z_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "px_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "p_value") = Const::floatNaN;
+      m_variables.at(m_prefix + "pt_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "y_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "d0_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "x_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "pz_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "omega_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "px_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "flipped_z_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "py_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "outGoingArmTime") = Const::floatNaN;
+      m_variables.at(m_prefix + "quality_flip_indicator") = Const::floatNaN;
+      m_variables.at(m_prefix + "inGoingArmTime") = Const::floatNaN;
     }
   };
 }

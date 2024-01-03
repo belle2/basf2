@@ -58,34 +58,13 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(RecoTrack& recoTrack)
     {
+      // Set all values to NaN to make sure that no values from previous recoTrack are used accidentally
+      setDefaultValues();
+
       const auto& cdcHitList = recoTrack.getSortedCDCHitList();
       const RecoTrack* svdcdcRecoTrack =  recoTrack.getRelated<RecoTrack>("SVDCDCRecoTracks");
       // In case the CDC hit list is empty, or there is no svdcdcRecoTrack, set arbitrary default value and return
       if (cdcHitList.size() == 0 or not svdcdcRecoTrack) {
-        m_variables.at(m_prefix + "InOutArmTimeDifference") = Const::floatNaN;
-        m_variables.at(m_prefix + "InOutArmTimeDifferenceError") = Const::floatNaN;
-        m_variables.at(m_prefix + "inGoingArmTime") = Const::floatNaN;
-        m_variables.at(m_prefix + "inGoingArmTimeError") = Const::floatNaN;
-        m_variables.at(m_prefix + "outGoingArmTime") = Const::floatNaN;
-        m_variables.at(m_prefix + "outGoingArmTimeError") = Const::floatNaN;
-        m_variables.at(m_prefix + "first_cdc_layer") =  Const::floatNaN;
-        m_variables.at(m_prefix + "last_cdc_layer") =  Const::floatNaN;
-        m_variables.at(m_prefix + "n_svd_hits") = Const::floatNaN;
-        m_variables.at(m_prefix + "n_cdc_hits") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_pz_variance") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_pz_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_z_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_tan_lambda_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_pt_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_x_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_y_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_py_variance") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_d0_estimate") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_omega_variance") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_tan_lambda_variance") = Const::floatNaN;
-        m_variables.at(m_prefix + "seed_z_variance") = Const::floatNaN;
-        m_variables.at(m_prefix + "svd_layer3_positionSigma") = Const::floatNaN;
-        m_variables.at(m_prefix + "svd_layer6_clsTime") = Const::floatNaN;
         return;
       }
 
@@ -126,8 +105,6 @@ namespace Belle2 {
       m_variables.at(m_prefix + "seed_tan_lambda_variance") = static_cast<float>(svdcdcFitResult.getCov()[14]);
       m_variables.at(m_prefix + "seed_z_variance") = static_cast<float>(svdcdcRecoTrackCovariance(2, 2));
 
-      m_variables.at(m_prefix + "svd_layer3_positionSigma") = Const::floatNaN;
-      m_variables.at(m_prefix + "svd_layer6_clsTime") = Const::floatNaN;
       for (const auto* svdHit : recoTrack.getSVDHitList()) {
         if (svdHit->getSensorID().getLayerNumber() == 3) {
           m_variables.at(m_prefix + "svd_layer3_positionSigma") = static_cast<float>(svdHit->getPositionSigma());
@@ -142,6 +119,35 @@ namespace Belle2 {
   protected:
     /// prefix for RecoTrack extracted variables
     std::string m_prefix;
+  private:
+    /// Set all variables to default error value
+    void setDefaultValues()
+    {
+      m_variables.at(m_prefix + "InOutArmTimeDifference") = Const::floatNaN;
+      m_variables.at(m_prefix + "InOutArmTimeDifferenceError") = Const::floatNaN;
+      m_variables.at(m_prefix + "inGoingArmTime") = Const::floatNaN;
+      m_variables.at(m_prefix + "inGoingArmTimeError") = Const::floatNaN;
+      m_variables.at(m_prefix + "outGoingArmTime") = Const::floatNaN;
+      m_variables.at(m_prefix + "outGoingArmTimeError") = Const::floatNaN;
+      m_variables.at(m_prefix + "first_cdc_layer") =  Const::floatNaN;
+      m_variables.at(m_prefix + "last_cdc_layer") =  Const::floatNaN;
+      m_variables.at(m_prefix + "n_svd_hits") = Const::floatNaN;
+      m_variables.at(m_prefix + "n_cdc_hits") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_pz_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_pz_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_z_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_tan_lambda_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_pt_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_x_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_y_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_py_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_d0_estimate") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_omega_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_tan_lambda_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "seed_z_variance") = Const::floatNaN;
+      m_variables.at(m_prefix + "svd_layer3_positionSigma") = Const::floatNaN;
+      m_variables.at(m_prefix + "svd_layer6_clsTime") = Const::floatNaN;
+    }
   };
 
 }

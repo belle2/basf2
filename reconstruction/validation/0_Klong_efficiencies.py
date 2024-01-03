@@ -14,7 +14,7 @@
   <output>K_long_full_validation_sample.root</output>
   <description>Generates particle gun Klong Events for Kl efficiency validation.\t
    Output is not very meaningful but sufficient to check for regression.</description>
-  <contact>fnc@lnf.infn.it</contact>
+  <contact>cristina.martellini@roma3.infn.it</contact>
   <interval>nightly</interval>
 </header>
 """

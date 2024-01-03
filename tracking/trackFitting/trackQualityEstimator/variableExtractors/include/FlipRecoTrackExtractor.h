@@ -64,7 +64,7 @@ namespace Belle2 {
       const auto& cdcHitList = recoTrack.getSortedCDCHitList();
       const RecoTrack* svdcdcRecoTrack =  recoTrack.getRelated<RecoTrack>("SVDCDCRecoTracks");
       // In case the CDC hit list is empty, or there is no svdcdcRecoTrack, set arbitrary default value and return
-      if (cdcHitList.size() == 0 or not svdcdcRecoTrack) {
+      if (not svdcdcRecoTrack) {
         return;
       }
 
@@ -75,8 +75,10 @@ namespace Belle2 {
       m_variables.at(m_prefix + "outGoingArmTime") = static_cast<float>(recoTrack.getOutgoingArmTime());
       m_variables.at(m_prefix + "outGoingArmTimeError") = static_cast<float>(recoTrack.getOutgoingArmTimeError());
 
-      m_variables.at(m_prefix + "first_cdc_layer") =  static_cast<float>(cdcHitList.front()->getICLayer());
-      m_variables.at(m_prefix + "last_cdc_layer") =  static_cast<float>(cdcHitList.back()->getICLayer());
+      if (cdcHitList.size() > 0) {
+        m_variables.at(m_prefix + "first_cdc_layer") =  static_cast<float>(cdcHitList.front()->getICLayer());
+        m_variables.at(m_prefix + "last_cdc_layer") =  static_cast<float>(cdcHitList.back()->getICLayer());
+      }
 
       m_variables.at(m_prefix + "n_svd_hits") = static_cast<float>(recoTrack.getNumberOfSVDHits());
       m_variables.at(m_prefix + "n_cdc_hits") = static_cast<float>(recoTrack.getNumberOfCDCHits());

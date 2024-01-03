@@ -59,7 +59,7 @@ namespace Belle2 {
     void extractVariables(RecoTrack& recoTrack)
     {
       const auto& cdcHitList = recoTrack.getSortedCDCHitList();
-      const RecoTrack* svdcdcRecoTrack =  recoTrack.getRelated<RecoTrack>("svdcdcRecoTracks");
+      const RecoTrack* svdcdcRecoTrack =  recoTrack.getRelated<RecoTrack>("SVDCDCRecoTracks");
       // In case the CDC hit list is empty, or there is no svdcdcRecoTrack, set arbitrary default value and return
       if (cdcHitList.size() == 0 or not svdcdcRecoTrack) {
         m_variables.at(m_prefix + "InOutArmTimeDifference") = Const::floatNaN;

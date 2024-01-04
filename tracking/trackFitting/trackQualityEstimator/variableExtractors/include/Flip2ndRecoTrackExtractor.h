@@ -48,25 +48,25 @@ namespace Belle2 {
     /// extract the actual variables and write into a variable set
     void extractVariables(RecoTrack& recoTrack)
     {
+      // Set all values to NaN to make sure that no values from previous recoTrack are used accidentally
+      setDefaultValues();
+
       const Track* track = recoTrack.getRelated<Track>("Tracks");
       const RecoTrack* flippedRecoTrack = recoTrack.getRelatedFrom<RecoTrack>("RecoTracks_flipped");
       if (not track or not flippedRecoTrack) {
-        // Don't have track or flippedRecoTrack -> set default values and return
-        setDefaultValues();
+        // Don't have track or flippedRecoTrack -> return
         return;
       }
       const Track* flippedTrack = flippedRecoTrack->getRelatedFrom<Track>("Tracks_flipped");
       if (not flippedTrack) {
-        // Don't have flippedTrack -> set default values and return
-        setDefaultValues();
+        // Don't have flippedTrack -> return
         return;
       }
       const TrackFitResult* trackFitResult = track->getTrackFitResultWithClosestMass(Const::pion);
       const TrackFitResult* flippedTrackFitResult =
         flippedTrack->getTrackFitResultWithClosestMassByName(Const::pion, "TrackFitResults_flipped");
       if (not trackFitResult or not flippedTrackFitResult) {
-        // Don't have trackFitResult or flippedTrackFitResult -> set default values and return
-        setDefaultValues();
+        // Don't have trackFitResult or flippedTrackFitResult -> return
         return;
       }
 

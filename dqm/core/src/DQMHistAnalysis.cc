@@ -612,45 +612,51 @@ DQMHistAnalysisModule::EStatus DQMHistAnalysisModule::makeStatus(bool enough, bo
 {
   // white color is the default, if no colorize
   if (!enough) {
-    return (c_TooFew);
+    return (c_StatusTooFew);
   } else {
     if (error_flag) {
-      return (c_Error);
+      return (c_StatusError);
     } else if (warn_flag) {
-      return (c_Warning);
+      return (c_StatusWarning);
     } else {
-      return (c_Good);
+      return (c_StatusGood);
     }
   }
 
-  return (c_Default); // default, but should not be reached
+  return (c_StatusDefault); // default, but should not be reached
+}
+
+DQMHistAnalysisModule::EStatusColor DQMHistAnalysisModule::getStatusColor(EStatus stat)
+{
+  // white color is the default, if no colorize
+  EStatusColor color = c_ColorDefault;
+  switch (stat) {
+    case c_StatusTooFew:
+      color = c_ColorTooFew; // Magenta or Gray
+      break;
+    case c_StatusDefault:
+      color = c_ColorDefault; // default no colors
+      break;
+    case c_StatusGood:
+      color = c_ColorGood; // Good
+      break;
+    case c_StatusWarning:
+      color = c_ColorWarning; // Warning
+      break;
+    case c_StatusError:
+      color = c_ColorError; // Severe
+      break;
+    default:
+      color = c_ColorDefault; // default no colors
+      break;
+  }
+  return color;
 }
 
 void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 {
   if (!canvas) return;
-  // white color is the default, if no colorize
-  int color;
-  switch (stat) {
-    case c_TooFew:
-      color = kGray; // Magenta or Gray
-      break;
-    case c_Default:
-      color = kWhite; // default no colors
-      break;
-    case c_Good:
-      color = kGreen; // Good
-      break;
-    case c_Warning:
-      color = kYellow; // Warning
-      break;
-    case c_Error:
-      color = kRed; // Severe
-      break;
-    default:
-      color = kWhite; // default no colors
-      break;
-  }
+  auto color = getStatusColor(stat);
 
   canvas->Pad()->SetFillColor(color);
 

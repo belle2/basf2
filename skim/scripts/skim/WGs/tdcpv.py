@@ -219,9 +219,12 @@ class TDCPV_ccs(BaseSkim):
 
     * ``B0 -> J/psi (ee/mm) K_S0``
     * ``B0 -> psi(2s) (ee/mm) K_S0``
-    * ``B0 -> J/psi (ee/mm) K*``
+    * ``B0 -> J/psi (ee/mm) K* (K+ pi- / K_S0 pi0)``
     * ``B+ -> J/psi (ee/mm) K+``
     * ``B0 -> J/psi (ee/mm) KL``
+    * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``
+    * ``B0 -> J/psi (ee/mm) pi0``
+
 
     **Particle lists used**:
 
@@ -235,6 +238,9 @@ class TDCPV_ccs(BaseSkim):
     * ``K+:SkimHighEff``
     * ``K_L0:allklm``
     * ``K_L0:allecl``
+    * ``eta:SkimHighEff``
+    * ``pi0:eff40_May2020``
+    * ``pi0:eff60_May2020``
 
     **Cuts used**:
 
@@ -269,13 +275,18 @@ class TDCPV_ccs(BaseSkim):
         loadStdSkimPi0(path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        stdPi0s("eff60_May2020", path=path)
         loadStdSkimHighEffKstar0(path=path)
+        loadStdSkimHighEffEta(path=path)
 
         loadStdJpsiToee_noTOP(path=path)
         loadStdJpsiTomumu(path=path)
         loadStdPsi2s2lepton(path=path)
         stdKlongs(listtype='allklm', path=path)
         stdKlongs(listtype='allecl', path=path)
+
+        ma.reconstructDecay('K*0:neutral -> K_S0:merged pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
+        ma.applyCuts('pi0:eff60_May2020', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
         ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
@@ -293,7 +304,13 @@ class TDCPV_ccs(BaseSkim):
                            'J/psi:mumu K_S0:merged',
                            'psi(2S):ll K_S0:merged',
                            'J/psi:ee K*0:SkimHighEff',
-                           'J/psi:mumu K*0:SkimHighEff']
+                           'J/psi:mumu K*0:SkimHighEff',
+                           'J/psi:ee K*0:neutral',
+                           'J/psi:mumu K*0:neutral',
+                           'J/psi:ee eta:SkimHighEff',
+                           'J/psi:mumu eta:SkimHighEff',
+                           'J/psi:ee pi0:eff60_May2020',
+                           'J/psi:mumu pi0:eff60_May2020']
 
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:SkimHighEff',
                                 'J/psi:ee K+:SkimHighEff']

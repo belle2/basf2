@@ -639,7 +639,7 @@ def channel_mask_calibration(inputFiles, globalTags=None, localDBs=None, unpack=
 def offset_calibration(inputFiles, globalTags=None, localDBs=None,
                        new_cdst_format=True):
     '''
-    Returns calibration object for common T0 calibration with method BF
+    Returns calibration object for the calibration of offsets
     :param inputFiles: A list of input files in cdst data format
     :param globalTags: a list of global tags, highest priority first
     :param localDBs: a list of local databases, highest priority first
@@ -689,7 +689,7 @@ def offset_calibration(inputFiles, globalTags=None, localDBs=None,
 
 def photonYields_calibration(inputFiles, sample='dimuon', globalTags=None, localDBs=None):
     '''
-    Returns calibration object for rough module T0 calibration with method DeltaT
+    Returns calibration object for photon pixel yields aimed for PMT ageing studies and for finding optically decoupled PMT's
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
     :param globalTags: a list of global tags, highest priority first
@@ -738,7 +738,7 @@ def photonYields_calibration(inputFiles, sample='dimuon', globalTags=None, local
 
 def calibration_validation(inputFiles, sample='dimuon', globalTags=None, localDBs=None, new_cdst_format=True):
     '''
-    Returns calibration object for final module T0 calibration with method LL
+    Returns calibration object for calibration validation
     :param inputFiles: A list of input files in cdst data format
     :param sample: data sample ('dimuon' or 'bhabha')
     :param globalTags: a list of global tags, highest priority first

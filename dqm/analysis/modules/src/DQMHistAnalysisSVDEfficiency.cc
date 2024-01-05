@@ -222,7 +222,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyU->Draw();
     m_cEfficiencyU->cd();
     m_hEfficiency->getHistogram(1)->Draw("text");
-    colorizeCanvas(m_cEfficiencyU, c_Default);
+    colorizeCanvas(m_cEfficiencyU, c_StatusDefault);
   } else {
     B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effUstatus = good;
@@ -266,7 +266,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyV->cd();
     m_cEfficiencyV->Draw();
     m_hEfficiency->getHistogram(0)->Draw("text");
-    colorizeCanvas(m_cEfficiencyV, c_Default);
+    colorizeCanvas(m_cEfficiencyV, c_StatusDefault);
   } else {
     B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effVstatus = good;
@@ -310,22 +310,22 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   switch (m_effUstatus) {
     case good: {
-      colorizeCanvas(m_cEfficiencyU, c_Good);
+      colorizeCanvas(m_cEfficiencyU, c_StatusGood);
       m_legNormal->Draw("same");
       break;
     }
     case error: {
-      colorizeCanvas(m_cEfficiencyU, c_Error);
+      colorizeCanvas(m_cEfficiencyU, c_StatusError);
       m_legProblem->Draw("same");
       break;
     }
     case warning: {
-      colorizeCanvas(m_cEfficiencyU, c_Warning);
+      colorizeCanvas(m_cEfficiencyU, c_StatusWarning);
       m_legWarning->Draw("same");
       break;
     }
     case lowStat: {
-      colorizeCanvas(m_cEfficiencyU, c_TooFew);
+      colorizeCanvas(m_cEfficiencyU, c_StatusTooFew);
       m_legEmpty->Draw("same");
       break;
     }
@@ -347,22 +347,22 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   switch (m_effVstatus) {
     case good: {
-      colorizeCanvas(m_cEfficiencyV, c_Good);
+      colorizeCanvas(m_cEfficiencyV, c_StatusGood);
       m_legNormal->Draw("same");
       break;
     }
     case error: {
-      colorizeCanvas(m_cEfficiencyV, c_Error);
+      colorizeCanvas(m_cEfficiencyV, c_StatusError);
       m_legProblem->Draw("same");
       break;
     }
     case warning: {
-      colorizeCanvas(m_cEfficiencyV, c_Warning);
+      colorizeCanvas(m_cEfficiencyV, c_StatusWarning);
       m_legWarning->Draw("same");
       break;
     }
     case lowStat: {
-      colorizeCanvas(m_cEfficiencyV, c_TooFew);
+      colorizeCanvas(m_cEfficiencyV, c_StatusTooFew);
       m_legEmpty->Draw("same");
       break;
     }
@@ -406,7 +406,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_cEfficiencyU3Samples->Draw();
       m_cEfficiencyU3Samples->cd();
       m_hEfficiency3Samples->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cEfficiencyU3Samples, c_Default);
+      colorizeCanvas(m_cEfficiencyU3Samples, c_StatusDefault);
     } else {
       B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
       m_effUstatus = good;
@@ -451,7 +451,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_cEfficiencyV3Samples->Draw();
       m_cEfficiencyV3Samples->cd();
       m_hEfficiency3Samples->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cEfficiencyV3Samples, c_Default);
+      colorizeCanvas(m_cEfficiencyV3Samples, c_StatusDefault);
     } else {
       B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());
       m_effVstatus = good;
@@ -495,22 +495,22 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
     switch (m_effUstatus) {
       case good: {
-        colorizeCanvas(m_cEfficiencyU3Samples, c_Good);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusGood);
         m_legNormal->Draw("same");
         break;
       }
       case error: {
-        colorizeCanvas(m_cEfficiencyU3Samples, c_Error);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusError);
         m_legProblem->Draw("same");
         break;
       }
       case warning: {
-        colorizeCanvas(m_cEfficiencyU3Samples, c_Warning);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusWarning);
         m_legWarning->Draw("same");
         break;
       }
       case lowStat: {
-        colorizeCanvas(m_cEfficiencyU3Samples, c_TooFew);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusTooFew);
         m_legEmpty->Draw("same");
         break;
       }
@@ -531,22 +531,22 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
     switch (m_effVstatus) {
       case good: {
-        colorizeCanvas(m_cEfficiencyV3Samples, c_Good);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusGood);
         m_legNormal->Draw("same");
         break;
       }
       case error: {
-        colorizeCanvas(m_cEfficiencyV3Samples, c_Error);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusError);
         m_legProblem->Draw("same");
         break;
       }
       case warning: {
-        colorizeCanvas(m_cEfficiencyV3Samples, c_Warning);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusWarning);
         m_legWarning->Draw("same");
         break;
       }
       case lowStat: {
-        colorizeCanvas(m_cEfficiencyV3Samples, c_TooFew);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusTooFew);
         m_legEmpty->Draw("same");
         break;
       }

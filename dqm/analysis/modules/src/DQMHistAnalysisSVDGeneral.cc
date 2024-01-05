@@ -342,13 +342,13 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cUnpacker->cd();
       h->Draw("colztext");
       h->SetStats(0);
-      colorizeCanvas(m_cUnpacker, c_Good);
+      colorizeCanvas(m_cUnpacker, c_StatusGood);
     } else {
       m_cUnpacker->cd();
       h->Draw("colztext");
       h->SetStats(0);
       m_legError->Draw("same");
-      colorizeCanvas(m_cUnpacker, c_Error);
+      colorizeCanvas(m_cUnpacker, c_StatusError);
     }
     if (nEvents > 0)
       setEpicsPV("UnpackError", h->GetEntries() / nEvents);
@@ -357,7 +357,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_cUnpacker->cd();
     h->Draw("colztext");
     h->SetStats(0);
-    colorizeCanvas(m_cUnpacker, c_Default);
+    colorizeCanvas(m_cUnpacker, c_StatusDefault);
   }
 
   m_cUnpacker->Modified();
@@ -423,24 +423,24 @@ void DQMHistAnalysisSVDGeneralModule::event()
     if (! hasError) {
       m_cClusterOnTrackTime_L456V->cd();
       m_hClusterOnTrackTime_L456V.Draw();
-      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_Good);
+      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusGood);
     } else {
       m_cClusterOnTrackTime_L456V->cd();
       m_hClusterOnTrackTime_L456V.Draw();
-      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_Error);
+      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusError);
     }
 
     if (lowStat) {
       m_cClusterOnTrackTime_L456V->cd();
       m_hClusterOnTrackTime_L456V.Draw();
-      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_TooFew);
+      colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusTooFew);
     }
 
   } else {
     B2INFO("Histogram SVDClsTrk/c_SVDTRK_ClusterTimeV456 from SVDDQMClustersOnTrack module not found!");
     m_cClusterOnTrackTime_L456V->cd();
     m_hClusterOnTrackTime_L456V.Draw();
-    colorizeCanvas(m_cClusterOnTrackTime_L456V, c_Default);
+    colorizeCanvas(m_cClusterOnTrackTime_L456V, c_StatusDefault);
   }
 
   if (hasError)
@@ -492,24 +492,24 @@ void DQMHistAnalysisSVDGeneralModule::event()
       if (! hasError3) {
         m_cClusterOnTrackTimeL456V3Samples->cd();
         m_hClusterOnTrackTimeL456V3Samples.Draw();
-        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_Good);
+        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusGood);
       } else {
         m_cClusterOnTrackTimeL456V3Samples->cd();
         m_hClusterOnTrackTimeL456V3Samples.Draw();
-        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_Error);
+        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusError);
       }
 
       if (lowStat3) {
         m_cClusterOnTrackTimeL456V3Samples->cd();
         m_hClusterOnTrackTimeL456V3Samples.Draw();
-        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_TooFew);
+        colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusTooFew);
       }
 
     } else {
       B2INFO("Histogram SVDClsTrk/c_SVDTRK_Cluster3TimeV456 from SVDDQMClustersOnTrack module not found!");
       m_cClusterOnTrackTimeL456V3Samples->cd();
       m_hClusterOnTrackTimeL456V3Samples.Draw();
-      colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_Default);
+      colorizeCanvas(m_cClusterOnTrackTimeL456V3Samples, c_StatusDefault);
     }
 
     if (hasError3)
@@ -590,7 +590,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyU->Draw();
       m_cOccupancyU->cd();
       m_hOccupancy->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cOccupancyU, c_Default);
+      colorizeCanvas(m_cOccupancyU, c_StatusDefault);
     } else {
 
       Int_t nStrips = 768;
@@ -638,7 +638,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         m_cOccupancyU3Samples->Draw();
         m_cOccupancyU3Samples->cd();
         m_hOccupancy3Samples->getHistogram(1)->Draw("text");
-        colorizeCanvas(m_cOccupancyU3Samples, c_Default);
+        colorizeCanvas(m_cOccupancyU3Samples, c_StatusDefault);
       } else {
 
         Int_t nStrips = 768;
@@ -667,7 +667,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyUGroupId0->Draw();
       m_cOccupancyUGroupId0->cd();
       m_hOccupancyGroupId0->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cOccupancyUGroupId0, c_Default);
+      colorizeCanvas(m_cOccupancyUGroupId0, c_StatusDefault);
     } else {
 
       Int_t nStrips = 768;
@@ -695,7 +695,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyV->Draw();
       m_cOccupancyV->cd();
       m_hOccupancy->getHistogram(0)->Draw("text");
-      colorizeCanvas(m_cOccupancyV, c_Default);
+      colorizeCanvas(m_cOccupancyV, c_StatusDefault);
     } else {
 
       Int_t nStrips = 768;
@@ -744,7 +744,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         m_cOccupancyV3Samples->Draw();
         m_cOccupancyV3Samples->cd();
         m_hOccupancy3Samples->getHistogram(0)->Draw("text");
-        colorizeCanvas(m_cOccupancyV3Samples, c_Default);
+        colorizeCanvas(m_cOccupancyV3Samples, c_StatusDefault);
       } else {
 
         Int_t nStrips = 768;
@@ -775,7 +775,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOccupancyVGroupId0->Draw();
       m_cOccupancyVGroupId0->cd();
       m_hOccupancyGroupId0->getHistogram(0)->Draw("text");
-      colorizeCanvas(m_cOccupancyVGroupId0, c_Default);
+      colorizeCanvas(m_cOccupancyVGroupId0, c_StatusDefault);
     } else {
 
       Int_t nStrips = 768;
@@ -805,7 +805,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOnlineOccupancyV->Draw();
       m_cOnlineOccupancyV->cd();
       m_hOnlineOccupancy->getHistogram(0)->Draw("text");
-      colorizeCanvas(m_cOnlineOccupancyV, c_Default);
+      colorizeCanvas(m_cOnlineOccupancyV, c_StatusDefault);
     } else {
 
       Int_t nStrips = 768;
@@ -842,7 +842,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         m_cOnlineOccupancyV3Samples->Draw();
         m_cOnlineOccupancyV3Samples->cd();
         m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text");
-        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_Default);
+        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusDefault);
       } else {
 
         Int_t nStrips = 768;
@@ -879,7 +879,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cOnlineOccupancyU->Draw();
       m_cOnlineOccupancyU->cd();
       m_hOnlineOccupancy->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cOnlineOccupancyU, c_Default);
+      colorizeCanvas(m_cOnlineOccupancyU, c_StatusDefault);
     } else {
 
       Int_t nStrips = 768;
@@ -913,7 +913,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
         m_cOnlineOccupancyU3Samples->Draw();
         m_cOnlineOccupancyU3Samples->cd();
         m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text");
-        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_Default);
+        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusDefault);
       } else {
 
         Int_t nStrips = 768;
@@ -960,19 +960,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOccupancy->getHistogram(1)->Draw("text");
 
   if (m_occUstatus == 0) {
-    colorizeCanvas(m_cOccupancyU, c_Good);
+    colorizeCanvas(m_cOccupancyU, c_StatusGood);
     m_legNormal->Draw("same");
   } else {
     if (m_occUstatus == 3) {
-      colorizeCanvas(m_cOccupancyU, c_Error);
+      colorizeCanvas(m_cOccupancyU, c_StatusError);
       m_legProblem->Draw("same");
     }
     if (m_occUstatus == 2) {
-      colorizeCanvas(m_cOccupancyU, c_Warning);
+      colorizeCanvas(m_cOccupancyU, c_StatusWarning);
       m_legWarning->Draw("same");
     }
     if (m_occUstatus == 1) {
-      colorizeCanvas(m_cOccupancyU, c_TooFew);
+      colorizeCanvas(m_cOccupancyU, c_StatusTooFew);
       m_legEmpty->Draw("same");
     }
   }
@@ -987,19 +987,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hOccupancy3Samples->getHistogram(1)->Draw("text");
 
     if (m_occU3Samples == 0) {
-      colorizeCanvas(m_cOccupancyU3Samples, c_Good);
+      colorizeCanvas(m_cOccupancyU3Samples, c_StatusGood);
       m_legNormal->Draw("same");
     } else {
       if (m_occU3Samples == 3) {
-        colorizeCanvas(m_cOccupancyU3Samples, c_Error);
+        colorizeCanvas(m_cOccupancyU3Samples, c_StatusError);
         m_legProblem->Draw("same");
       }
       if (m_occU3Samples == 2) {
-        colorizeCanvas(m_cOccupancyU3Samples, c_Warning);
+        colorizeCanvas(m_cOccupancyU3Samples, c_StatusWarning);
         m_legWarning->Draw("same");
       }
       if (m_occU3Samples == 1) {
-        colorizeCanvas(m_cOccupancyU3Samples, c_TooFew);
+        colorizeCanvas(m_cOccupancyU3Samples, c_StatusTooFew);
         m_legEmpty->Draw("same");
       }
     }
@@ -1014,19 +1014,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOccupancyGroupId0->getHistogram(1)->Draw("text");
 
   if (m_occUGroupId0 == 0) {
-    colorizeCanvas(m_cOccupancyUGroupId0, c_Good);
+    colorizeCanvas(m_cOccupancyUGroupId0, c_StatusGood);
     m_legNormal->Draw("same");
   } else {
     if (m_occUGroupId0 == 3) {
-      colorizeCanvas(m_cOccupancyUGroupId0, c_Error);
+      colorizeCanvas(m_cOccupancyUGroupId0, c_StatusError);
       m_legProblem->Draw("same");
     }
     if (m_occUGroupId0 == 2) {
-      colorizeCanvas(m_cOccupancyUGroupId0, c_Warning);
+      colorizeCanvas(m_cOccupancyUGroupId0, c_StatusWarning);
       m_legWarning->Draw("same");
     }
     if (m_occUGroupId0 == 1) {
-      colorizeCanvas(m_cOccupancyUGroupId0, c_TooFew);
+      colorizeCanvas(m_cOccupancyUGroupId0, c_StatusTooFew);
       m_legEmpty->Draw("same");
     }
   }
@@ -1040,19 +1040,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOccupancy->getHistogram(0)->Draw("text");
 
   if (m_occVstatus == 0) {
-    colorizeCanvas(m_cOccupancyV, c_Good);
+    colorizeCanvas(m_cOccupancyV, c_StatusGood);
     m_legNormal->Draw("same");
   } else {
     if (m_occVstatus == 3) {
-      colorizeCanvas(m_cOccupancyV, c_Error);
+      colorizeCanvas(m_cOccupancyV, c_StatusError);
       m_legProblem->Draw("same");
     }
     if (m_occVstatus == 2) {
-      colorizeCanvas(m_cOccupancyV, c_Warning);
+      colorizeCanvas(m_cOccupancyV, c_StatusWarning);
       m_legWarning->Draw("same");
     }
     if (m_occVstatus == 1) {
-      colorizeCanvas(m_cOccupancyV, c_TooFew);
+      colorizeCanvas(m_cOccupancyV, c_StatusTooFew);
       m_legEmpty->Draw("same");
     }
   }
@@ -1068,19 +1068,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hOccupancy3Samples->getHistogram(0)->Draw("text");
 
     if (m_occV3Samples == 0) {
-      colorizeCanvas(m_cOccupancyV3Samples, c_Good);
+      colorizeCanvas(m_cOccupancyV3Samples, c_StatusGood);
       m_legNormal->Draw("same");
     } else {
       if (m_occV3Samples == 3) {
-        colorizeCanvas(m_cOccupancyV3Samples, c_Error);
+        colorizeCanvas(m_cOccupancyV3Samples, c_StatusError);
         m_legProblem->Draw("same");
       }
       if (m_occV3Samples == 2) {
-        colorizeCanvas(m_cOccupancyV3Samples, c_Warning);
+        colorizeCanvas(m_cOccupancyV3Samples, c_StatusWarning);
         m_legWarning->Draw("same");
       }
       if (m_occV3Samples == 1) {
-        colorizeCanvas(m_cOccupancyV3Samples, c_TooFew);
+        colorizeCanvas(m_cOccupancyV3Samples, c_StatusTooFew);
         m_legEmpty->Draw("same");
       }
     }
@@ -1096,19 +1096,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOccupancyGroupId0->getHistogram(0)->Draw("text");
 
   if (m_occVGroupId0 == 0) {
-    colorizeCanvas(m_cOccupancyVGroupId0, c_Good);
+    colorizeCanvas(m_cOccupancyVGroupId0, c_StatusGood);
     m_legNormal->Draw("same");
   } else {
     if (m_occVGroupId0 == 3) {
-      colorizeCanvas(m_cOccupancyVGroupId0, c_Error);
+      colorizeCanvas(m_cOccupancyVGroupId0, c_StatusError);
       m_legProblem->Draw("same");
     }
     if (m_occVGroupId0 == 2) {
-      colorizeCanvas(m_cOccupancyVGroupId0, c_Warning);
+      colorizeCanvas(m_cOccupancyVGroupId0, c_StatusWarning);
       m_legWarning->Draw("same");
     }
     if (m_occVGroupId0 == 1) {
-      colorizeCanvas(m_cOccupancyVGroupId0, c_TooFew);
+      colorizeCanvas(m_cOccupancyVGroupId0, c_StatusTooFew);
       m_legEmpty->Draw("same");
     }
   }
@@ -1122,19 +1122,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOnlineOccupancy->getHistogram(1)->Draw("text");
 
   if (m_onlineOccUstatus == 0) {
-    colorizeCanvas(m_cOnlineOccupancyU, c_Good);
+    colorizeCanvas(m_cOnlineOccupancyU, c_StatusGood);
     m_legOnNormal->Draw("same");
   } else {
     if (m_onlineOccUstatus == 3) {
-      colorizeCanvas(m_cOnlineOccupancyU, c_Error);
+      colorizeCanvas(m_cOnlineOccupancyU, c_StatusError);
       m_legOnProblem->Draw("same");
     }
     if (m_onlineOccUstatus == 2) {
-      colorizeCanvas(m_cOnlineOccupancyU, c_Warning);
+      colorizeCanvas(m_cOnlineOccupancyU, c_StatusWarning);
       m_legOnWarning->Draw("same");
     }
     if (m_onlineOccUstatus == 1) {
-      colorizeCanvas(m_cOnlineOccupancyU, c_TooFew);
+      colorizeCanvas(m_cOnlineOccupancyU, c_StatusTooFew);
       m_legOnEmpty->Draw("same");
     }
   }
@@ -1149,19 +1149,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_hOnlineOccupancy->getHistogram(0)->Draw("text");
 
   if (m_onlineOccVstatus == 0) {
-    colorizeCanvas(m_cOnlineOccupancyV, c_Good);
+    colorizeCanvas(m_cOnlineOccupancyV, c_StatusGood);
     m_legOnNormal->Draw("same");
   } else {
     if (m_onlineOccVstatus == 3) {
-      colorizeCanvas(m_cOnlineOccupancyV, c_Error);
+      colorizeCanvas(m_cOnlineOccupancyV, c_StatusError);
       m_legOnProblem->Draw("same");
     }
     if (m_onlineOccVstatus == 2) {
-      colorizeCanvas(m_cOnlineOccupancyV, c_Warning);
+      colorizeCanvas(m_cOnlineOccupancyV, c_StatusWarning);
       m_legOnWarning->Draw("same");
     }
     if (m_onlineOccVstatus == 1) {
-      colorizeCanvas(m_cOnlineOccupancyV, c_TooFew);
+      colorizeCanvas(m_cOnlineOccupancyV, c_StatusTooFew);
       m_legOnEmpty->Draw("same");
     }
   }
@@ -1184,19 +1184,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text");
 
     if (m_onlineOccU3Samples == 0) {
-      colorizeCanvas(m_cOnlineOccupancyU3Samples, c_Good);
+      colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusGood);
       m_legOnNormal->Draw("same");
     } else {
       if (m_onlineOccU3Samples == 3) {
-        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_Error);
+        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusError);
         m_legOnProblem->Draw("same");
       }
       if (m_onlineOccU3Samples == 2) {
-        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_Warning);
+        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusWarning);
         m_legOnWarning->Draw("same");
       }
       if (m_onlineOccU3Samples == 1) {
-        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_TooFew);
+        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusTooFew);
         m_legOnEmpty->Draw("same");
       }
     }
@@ -1211,19 +1211,19 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text");
 
     if (m_onlineOccV3Samples == 0) {
-      colorizeCanvas(m_cOnlineOccupancyV3Samples, c_Good);
+      colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusGood);
       m_legOnNormal->Draw("same");
     } else {
       if (m_onlineOccV3Samples == 3) {
-        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_Error);
+        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusError);
         m_legOnProblem->Draw("same");
       }
       if (m_onlineOccV3Samples == 2) {
-        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_Warning);
+        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusWarning);
         m_legOnWarning->Draw("same");
       }
       if (m_onlineOccV3Samples == 1) {
-        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_TooFew);
+        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusTooFew);
         m_legOnEmpty->Draw("same");
       }
     }

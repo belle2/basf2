@@ -658,7 +658,6 @@ class Job:
             # b2code-option has to be executed only after the source of the tools.
             self.setup_cmds.append("b2code-option $BACKEND_BELLE2_OPTION")
             self.setup_cmds.append("popd > /dev/null")
-        print(self.setup_cmds)
 
 
 class SubJob(Job):

@@ -659,7 +659,7 @@ namespace Belle2 {
 
           double cut_type = m_config.getParameter(prep + "cutType" + oss_block_num.str());
           string geo_supx_name;
-          if (i == sup_cut_N) {
+          if (i == sup_cut_N - 1) {
             geo_supx_name = "geo_" + name + "_name";
           } else {
             geo_sup_name = "geo_" + name + "_x" + oss_block_num.str() + "_name";
@@ -675,13 +675,14 @@ namespace Belle2 {
 
             geo_cut = new G4Box(geo_cut_name, cut_W / 2.0, cut_H / 2.0, cut_L / 2.0);
             // else if(cut_type == "Tubs")
-          } else if (cut_type != 0.0) {
+          } else { // if (cut_type != 0.0) {
             double cut_L = m_config.getParameter(prep + "cutL" + oss_block_num.str()) * unitFactor;
             double cut_R = m_config.getParameter(prep + "cutR" + oss_block_num.str()) * unitFactor;
 
             geo_cut = new G4Tubs(geo_cut_name, 0.0, cut_R, cut_L / 2.0, 0.0, 2.0 * M_PI);
-          } else
-            continue;
+          }
+          //} else
+          //  continue;
 
           double cut_X0 = m_config.getParameter(prep + "cutDX" + oss_block_num.str()) * unitFactor;
           double cut_Y0 = m_config.getParameter(prep + "cutDY" + oss_block_num.str()) * unitFactor;

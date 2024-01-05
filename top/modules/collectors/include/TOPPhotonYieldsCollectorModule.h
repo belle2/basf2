@@ -55,11 +55,13 @@ namespace Belle2 {
     double m_deltaEcms; /**< c.m.s energy window */
     double m_dr; /**< cut on POCA in r */
     double m_dz; /**< cut on POCA in z */
-    double m_minZ; /**< minimal local z of extrapolated track */
-    double m_maxZ; /**< maximal local z of extrapolated track */
-    double m_excludedZ; /**< excluded central region of extrapolated track for photon impact angle counting */
-    double m_timeWindow; /**< time window for counting photon hits (half size) */
     double m_minThresholdEffi; /**< minimal threshold efficiency */
+
+    // cuts (do not change the values)
+    const double m_minZ = -130.0; /**< minimal local z of extrapolated track */
+    const double m_maxZ = 130.0; /**< maximal local z of extrapolated track */
+    const double m_excludedZ = 50.0; /**< excluded central region of extrapolated track for photon impact angle counting */
+    const double m_timeWindow = 50.0; /**< time window for counting photon hits (half size) */
 
     // procedure
     TOP::TrackSelector m_selector; /**< track selection utility */
@@ -68,6 +70,7 @@ namespace Belle2 {
     std::vector<std::string> m_activeNames; /**< histogram names for active pixels count */
     std::vector<std::string> m_alphaLowNames; /**< histogram names for counting hits w/ low impact angle on photo cathode */
     std::vector<std::string> m_alphaHighNames; /**< histogram names for counting hits w/ high impact angle on photo cathode */
+    std::vector<std::string> m_pulseHeightNames; /**< histogram names for pulse heights */
     std::vector<std::string> m_muonZNames; /**< histogram names for track z-distribution */
 
     // collections

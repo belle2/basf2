@@ -114,6 +114,15 @@ namespace Belle2 {
         alphaHigh->Sumw2();
         alphaHigh->Write();
 
+        auto pulseHeights = getObjectPtr<TH2F>("pulseHeights" + slotName);
+        if (not pulseHeights) {
+          B2ERROR("TOPPhotonYieldsAlgorithm: histogram 'pulseHeights' for slot " << slot << " not found");
+          file->Close();
+          delete dbobject;
+          return c_Failure;
+        }
+        pulseHeights->Write();
+
         auto muonZ = getObjectPtr<TH1F>("muonZ" + slotName);
         if (not muonZ) {
           B2ERROR("TOPPhotonYieldsAlgorithm: histogram 'muonZ' for slot " << slot << " not found");
@@ -132,7 +141,7 @@ namespace Belle2 {
         alphaRatio->Divide(alphaHigh.get(), alphaLow.get());
         equalize(alphaRatio);
 
-        dbobject->set(slot, photonYields, alphaRatio, activePixels.get(), muonZ.get());
+        dbobject->set(slot, photonYields, alphaRatio, activePixels.get(), pulseHeights.get(), muonZ.get());
 
         delete photonYields;
         delete alphaRatio;

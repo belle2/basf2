@@ -16,6 +16,7 @@
 
 // root
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TProfile.h>
 
 using namespace std;
@@ -45,11 +46,7 @@ namespace Belle2 {
     addParam("deltaEcms", m_deltaEcms, "c.m.s energy window (half size) if sample is dimuon or bhabha", 0.1);
     addParam("dr", m_dr, "cut on POCA in r", 2.0);
     addParam("dz", m_dz, "cut on POCA in abs(z)", 4.0);
-    addParam("minZ", m_minZ, "minimal local z of extrapolated hit", -130.0);
-    addParam("maxZ", m_maxZ, "maximal local z of extrapolated hit", 130.0);
-    addParam("excludedZ", m_excludedZ, "excluded central region of extrapolated hit for photon impact angle counting", 50.0);
     addParam("minThresholdEffi", m_minThresholdEffi, "threshold efficiency cut to suppress unreliable calibrations", 0.7);
-    addParam("timeWindow", m_timeWindow, "time window for counting photon hits (half size)", 50.0);
 
   }
 
@@ -76,8 +73,8 @@ namespace Belle2 {
 
     // create and register histograms
 
-    int numModules = 16;
-    int numPixels = 512;
+    const int numModules = 16;
+    const int numPixels = 512;
 
     // time stamp (average unix time and its standard deviation)
     auto* timeStamp = new TProfile("timeStamp", "Time stamp; ; unix time", 1, 0, 1, 0, 1.0e10, "S");
@@ -142,6 +139,17 @@ namespace Belle2 {
       m_alphaHighNames.push_back(name);
     }
 
+    // pixel pulse-height distributions
+    for (int slot = 1; slot <= numModules; slot++) {
+      string name = (slot < 10) ? "pulseHeights_0" + to_string(slot) : "pulseHeights_" + to_string(slot);
+      string title = "Pulse height distributions for slot " + to_string(slot);
+      auto h = new TH2F(name.c_str(), title.c_str(), numPixels, 0.5, numPixels + 0.5, 200, 0, 2000);
+      h->SetXTitle("pixel number");
+      h->SetYTitle("pulse height");
+      registerObject<TH2F>(name, h);
+      m_pulseHeightNames.push_back(name);
+    }
+
     // local z-distribution of tracks
     for (int slot = 1; slot <= numModules; slot++) {
       string name = (slot < 10) ? "muonZ_0" + to_string(slot) : "muonZ_" + to_string(slot);
@@ -183,6 +191,7 @@ namespace Belle2 {
 
       auto signalHits = getObjectPtr<TH1F>(m_signalNames[slot - 1]);
       auto bkgHits = getObjectPtr<TH1F>(m_bkgNames[slot - 1]);
+      auto pulseHeight = getObjectPtr<TH2F>(m_pulseHeightNames[slot - 1]);
       for (const auto& digit : m_digits) {
         if (digit.getModuleID() != slot) continue;
         if (digit.getHitQuality() != TOPDigit::c_Good) continue;  // junk hit or pixel masked-out
@@ -190,9 +199,13 @@ namespace Belle2 {
         double effi = m_thresholdEff->getThrEff(slot, digit.getChannel());
         if (effi < m_minThresholdEffi) continue; // to suppress possibly unreliable calibration
         if (std::abs(digit.getTime()) > m_timeWindow) continue;
-        // fill with weight=1/effi to correct for threshold efficiency
-        if (digit.getTime() > 0) signalHits->Fill(digit.getPixelID(), 1 / effi);
-        else bkgHits->Fill(digit.getPixelID(), 1 / effi);
+        // fill signal and background hits with weight=1/effi to correct for threshold efficiency
+        if (digit.getTime() > 0) {
+          signalHits->Fill(digit.getPixelID(), 1 / effi);
+          pulseHeight->Fill(digit.getPixelID(), digit.getPulseHeight());
+        } else {
+          bkgHits->Fill(digit.getPixelID(), 1 / effi);
+        }
       }
 
       auto activePixels = getObjectPtr<TH1F>(m_activeNames[slot - 1]);

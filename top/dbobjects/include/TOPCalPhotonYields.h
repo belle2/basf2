@@ -46,9 +46,11 @@ namespace Belle2 {
      * @param photonYields pixel photon yields
      * @param alphaRatio equalized alpha ratio
      * @param activePixels active pixels
+     * @param pulseHeights pixel pulse-heights
      * @param muonZ z-distribution of tracks
      */
-    void set(int slot, const TH1F* photonYields, const TH1F* alphaRatio, const TH1F* activePixels, const TH1F* muonZ);
+    void set(int slot, const TH1F* photonYields, const TH1F* alphaRatio, const TH1F* activePixels,
+             const TH2F* pulseHeights, const TH1F* muonZ);
 
     /**
      * Returns average unix time stamp of events used to make histograms stored in this class.
@@ -86,6 +88,13 @@ namespace Belle2 {
     const TH2F* getActivePixels(int slot) const;
 
     /**
+     * Returns a 2D histogram of pixel pulse-heights.
+     * @param slot slot ID
+     * @return pixel pulse-heights (nullptr if N/A)
+     */
+    const TH2F* getPulseHeights(int slot) const;
+
+    /**
      * Returns z distribution of tracks used to determine pixel yields.
      * @param slot slot ID
      * @return z distribution in local frame (nullptr if N/A)
@@ -114,6 +123,7 @@ namespace Belle2 {
     std::vector<TH2F> m_photonYields;  /**< photon yields per pixel (index = slot - 1) */
     std::vector<TH2F> m_alphaRatio;    /**< equalized alpha ratio per pixel (index = slot - 1) */
     std::vector<TH2F> m_activePixels;  /**< active pixels (index = slot - 1) */
+    std::vector<TH2F> m_pulseHeights;  /**< pixel pulse-heights (index = slot - 1) */
     std::vector<TH1F> m_muonZ;         /**< local z distribution of tracks (index = slot - 1) */
 
     ClassDef(TOPCalPhotonYields, 1); /**< ClassDef */

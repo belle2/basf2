@@ -14,7 +14,7 @@ using namespace std;
 namespace Belle2 {
 
   void TOPCalPhotonYields::set(int slot, const TH1F* photonYields, const TH1F* alphaRatio, const TH1F* activePixels,
-                               const TH1F* muonZ)
+                               const TH2F* pulseHeights, const TH1F* muonZ)
   {
     string slotName = (slot < 10) ? "_0" + to_string(slot) : "_" + to_string(slot);
 
@@ -34,6 +34,7 @@ namespace Belle2 {
     copyContent(activePixels, m_activePixels.back());
     m_activePixels.back().Scale(1 / muonZ->GetEntries());
 
+    m_pulseHeights.push_back(*pulseHeights);
     m_muonZ.push_back(*muonZ);
   }
 
@@ -69,6 +70,14 @@ namespace Belle2 {
   {
     unsigned index = slot - 1;
     if (index < m_activePixels.size()) return &m_activePixels[index];
+    return 0;
+  }
+
+
+  const TH2F* TOPCalPhotonYields::getPulseHeights(int slot) const
+  {
+    unsigned index = slot - 1;
+    if (index < m_pulseHeights.size()) return &m_pulseHeights[index];
     return 0;
   }
 

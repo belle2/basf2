@@ -354,9 +354,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
       setEpicsPV("UnpackError", h->GetEntries() / nEvents);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
-    m_cUnpacker->cd();
-    h->Draw("colztext");
-    h->SetStats(0);
+    m_cUnpacker->cd(1);
     colorizeCanvas(m_cUnpacker, c_StatusDefault);
   }
 

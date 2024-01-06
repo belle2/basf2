@@ -179,7 +179,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
-  TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
+  TString tmp = hnEvnts->GetTitle();
+  Int_t pos = tmp.Last('~');
+  if (pos == -1) pos = 0;
+
+  TString runID = tmp(pos, tmp.Length() - pos);
   B2INFO("DQMHistAnalysisSVDEfficiencyModule::runID = " << runID);
 
   gStyle->SetOptStat(0);

@@ -320,8 +320,11 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   m_runtype = rtype ? rtype->GetTitle() : "physics"; // per default
 
+  TString tmp = hnEvnts->GetTitle();
+  Int_t pos = tmp.Last('~');
+  if (pos == -1) pos = 0;
 
-  TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
+  TString runID = tmp(pos, tmp.Length() - pos);
   B2INFO("DQMHistAnalysisSVDGeneralModule::runID = " << runID);
   Float_t nEvents = hnEvnts->GetEntries();
 

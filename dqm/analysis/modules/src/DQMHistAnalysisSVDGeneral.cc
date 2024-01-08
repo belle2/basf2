@@ -70,8 +70,8 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
 
   m_legError = new TPaveText(-1, 54, 3, 57.5);
   m_legError->AddText("ERROR!!");
-  m_legError->SetFillColor(kRed);
-  m_legError->SetTextColor(kWhite);
+  m_legError->SetFillColor(c_ColorError);
+  m_legError->SetTextColor(c_ColorDefault);
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -220,23 +220,26 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   m_legProblem->AddText("ERROR!");
   m_legProblem->AddText("at least one sensor with:");
   m_legProblem->AddText(Form("occupancy > %1.1f%%", m_occError));
-  m_legProblem->SetFillColor(kRed);
+  m_legProblem->SetFillColor(c_ColorError);
+
   m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
   m_legWarning->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occWarning, m_occError));
-  m_legWarning->SetFillColor(kYellow);
+  m_legWarning->SetFillColor(c_ColorWarning);
+
   m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legNormal->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occEmpty, m_occWarning));
-  m_legNormal->SetFillColor(kGreen);
+  m_legNormal->SetFillColor(c_ColorGood);
   m_legNormal->SetBorderSize(0.);
   m_legNormal->SetLineColor(kBlack);
+
   m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
   m_legEmpty->AddText("NO DATA RECEIVED");
   m_legEmpty->AddText("from at least one sensor");
   m_legEmpty->SetFillColor(kBlack);
-  m_legEmpty->SetTextColor(kWhite);
+  m_legEmpty->SetTextColor(c_ColorTooFew);
   m_legEmpty->SetBorderSize(0.);
   m_legEmpty->SetLineColor(kBlack);
 
@@ -245,23 +248,26 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   m_legOnProblem->AddText("ERROR!");
   m_legOnProblem->AddText("at least one sensor with:");
   m_legOnProblem->AddText(Form("online occupancy > %1.1f%%", m_onlineOccError));
-  m_legOnProblem->SetFillColor(kRed);
+  m_legOnProblem->SetFillColor(c_ColorError);
+
   m_legOnWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legOnWarning->AddText("WARNING!");
   m_legOnWarning->AddText("at least one sensor with:");
   m_legOnWarning->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccWarning, m_onlineOccError));
-  m_legOnWarning->SetFillColor(kYellow);
+  m_legOnWarning->SetFillColor(c_ColorWarning);
+
   m_legOnNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legOnNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legOnNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
-  m_legOnNormal->SetFillColor(kGreen);
+  m_legOnNormal->SetFillColor(c_ColorGood);
   m_legOnNormal->SetBorderSize(0.);
   m_legOnNormal->SetLineColor(kBlack);
+
   m_legOnEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
   m_legOnEmpty->AddText("NO DATA RECEIVED");
   m_legOnEmpty->AddText("from at least one sensor");
   m_legOnEmpty->SetFillColor(kBlack);
-  m_legOnEmpty->SetTextColor(kWhite);
+  m_legOnEmpty->SetTextColor(c_ColorTooFew);
 
 
   // cluster time on tracks legend
@@ -273,32 +279,31 @@ void DQMHistAnalysisSVDGeneralModule::beginRun()
   m_legTiNormal = new TPaveText(0.15, 0.65, 0.35, 0.80, "NDC");
   m_legTiNormal->AddText("TIME SHIFT UNDER LIMIT");
   m_legTiNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legTiNormal->SetFillColor(kGreen);
+  m_legTiNormal->SetFillColor(c_ColorGood);
   m_legTiNormal->SetBorderSize(0.);
   m_legTiNormal->SetLineColor(kBlack);
 
   m_legTiEmpty = new TPaveText(0.15, 0.65, 0.35, 0.80, "NDC");
   m_legTiEmpty->AddText("NO DATA RECEIVED");
   m_legTiEmpty->SetFillColor(kBlack);
-  m_legTiEmpty->SetTextColor(kWhite);
-
+  m_legTiEmpty->SetTextColor(c_ColorTooFew);
 
   m_legTi3Problem = new TPaveText(0.15, 0.65, 0.35, 0.80, "NDC");
   m_legTi3Problem->AddText("ERROR!");
   m_legTi3Problem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
-  m_legTi3Problem->SetFillColor(kRed);
+  m_legTi3Problem->SetFillColor(c_ColorError);
 
   m_legTi3Normal = new TPaveText(0.15, 0.65, 0.35, 0.80, "NDC");
   m_legTi3Normal->AddText("TIME SHIFT UNDER LIMIT");
   m_legTi3Normal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legTi3Normal->SetFillColor(kGreen);
+  m_legTi3Normal->SetFillColor(c_ColorGood);
   m_legTi3Normal->SetBorderSize(0.);
   m_legTi3Normal->SetLineColor(kBlack);
 
   m_legTi3Empty = new TPaveText(0.15, 0.65, 0.35, 0.80, "NDC");
   m_legTi3Empty->AddText("NO DATA RECEIVED");
   m_legTi3Empty->SetFillColor(kBlack);
-  m_legTi3Empty->SetTextColor(kWhite);
+  m_legTi3Empty->SetTextColor(c_ColorTooFew);
 }
 
 void DQMHistAnalysisSVDGeneralModule::event()
@@ -570,7 +575,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
 
   //set dedicate gStyle
   const Int_t colNum = 4;
-  Int_t palette[colNum] {kBlack,  kGreen, kYellow, kRed};
+  Int_t palette[colNum] {kBlack,  c_ColorGood, c_ColorWarning, c_ColorError};
   gStyle->SetPalette(colNum, palette);
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.3f");

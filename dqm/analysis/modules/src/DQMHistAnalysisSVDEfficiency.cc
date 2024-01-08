@@ -59,22 +59,25 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legProblem->AddText("ERROR!");
   m_legProblem->AddText("at least one sensor with:");
   m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
-  m_legProblem->SetFillColor(kRed);
+  m_legProblem->SetFillColor(c_ColorError);
+
   m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
   m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
-  m_legWarning->SetFillColor(kYellow);
+  m_legWarning->SetFillColor(c_ColorWarning);
+
   m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
   m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
-  m_legNormal->SetFillColor(kGreen);
+  m_legNormal->SetFillColor(c_ColorGood);
   m_legNormal->SetBorderSize(0.);
   m_legNormal->SetLineColor(kBlack);
+
   m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
   m_legEmpty->AddText("Not enough statistics,");
   m_legEmpty->AddText("check again in a few minutes");
-  m_legEmpty->SetFillColor(kBlack);
+  m_legEmpty->SetFillColor(c_ColorTooFew);
   m_legEmpty->SetTextColor(kWhite);
   m_legEmpty->SetBorderSize(0.);
   m_legEmpty->SetLineColor(kBlack);

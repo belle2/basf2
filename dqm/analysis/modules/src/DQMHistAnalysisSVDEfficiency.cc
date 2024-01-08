@@ -348,7 +348,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   // update summary for V side
   m_cEfficiencyV->cd();
   m_cEfficiencyV->Draw();
-  m_hEfficiency->getHistogram(0)->Draw("text");
+  if (m_hEfficiency)
+    m_hEfficiency->getHistogram(0)->Draw("text");
 
   switch (m_effVstatus) {
     case good: {
@@ -498,7 +499,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     // update summary for U side
     m_cEfficiencyU3Samples->Draw();
     m_cEfficiencyU3Samples->cd();
-    m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+    if (m_hEfficiency3Samples)
+      m_hEfficiency3Samples->getHistogram(1)->Draw("text");
 
     switch (m_effUstatus) {
       case good: {

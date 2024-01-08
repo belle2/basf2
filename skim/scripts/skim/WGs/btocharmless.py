@@ -316,6 +316,15 @@ class BtoEtapKstp(BaseSkim):
     Cuts applied:
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
+    * ``0.4 < M_{eta} < 0.6``
+    * ``0.8 < M_{eta'} < 1.1``
+    * ``0.7 < M_{K*} < 1.6``
+
+    Note:
+        This skim uses `skim.standardlists.lightmesons.loadStdSkimHighEffEtaPrime`
+        and `skim.standardlists.charmless.loadStdVeryLooseKstarPlus` where
+        :math:`\\eta^{'}` and :math:`K^{*+}` are defined, respectively.
+        :math:`\\eta` channel is defined in `skim.standardlists.lightmesons.loadStdSkimHighEffEta`.
 
     """
 

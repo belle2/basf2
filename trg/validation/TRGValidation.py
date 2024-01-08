@@ -380,7 +380,7 @@ class MakePlots(basf2.Module):
         histogram.GetListOfFunctions().Add(Check)
         contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
         histogram.GetListOfFunctions().Add(contact)
-        Meta = TNamed("MetaOptions", "shifter,pvalue-warn=0.1,pvalue-error=0.01")
+        Meta = TNamed("MetaOptions", "shifter,pvalue-warn=0.02,pvalue-error=0.01")
         histogram.GetListOfFunctions().Add(Meta)
 
     def set_descr_expert(self, histogram, description, check):
@@ -396,7 +396,7 @@ class MakePlots(basf2.Module):
         histogram.GetListOfFunctions().Add(Check)
         contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
         histogram.GetListOfFunctions().Add(contact)
-        Meta = TNamed("MetaOptions", "expert,pvalue-warn=0.1,pvalue-error=0.01")
+        Meta = TNamed("MetaOptions", "expert,pvalue-warn=0.02,pvalue-error=0.01")
         histogram.GetListOfFunctions().Add(Meta)
 
     def set_style(self, histogram, xtitle, ytitle):

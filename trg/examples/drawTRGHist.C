@@ -1,3 +1,18 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+// this is an example for comparing the trigger bits efficiencies from two different release simulations
+// Before running this script, you must run the scripts under trg/validation
+// Step 0. set the old environment
+// Step 1. run trg/validation/TRGValidationGen.py or any other MC production script
+// Step 2. run trg/validation/TRGValidation.py or change the input file to your own => (file1)
+// Step 3. change to the new environment and do Step 1 and 2 again => (file2)
+// Step 4. rename file1 and file2 and run this script
+
 void drawTRGHist(){
 
         gROOT->SetStyle("Plain");

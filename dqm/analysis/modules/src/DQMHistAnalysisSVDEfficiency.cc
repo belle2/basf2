@@ -310,7 +310,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   // update summary for U side
   m_cEfficiencyU->Draw();
   m_cEfficiencyU->cd();
-  m_hEfficiency->getHistogram(1)->Draw("text");
+  if (m_hEfficiency)
+    m_hEfficiency->getHistogram(1)->Draw("text");
 
   switch (m_effUstatus) {
     case good: {
@@ -381,14 +382,16 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyV->Update();
 
   m_cEfficiencyErrU->cd();
-  m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
+  if (m_hEfficiencyErr)
+    m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
   m_cEfficiencyErrU->Draw();
   m_cEfficiencyErrU->Update();
   m_cEfficiencyErrU->Modified();
   m_cEfficiencyErrU->Update();
 
   m_cEfficiencyErrV->cd();
-  m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
+  if (m_hEfficiencyErr)
+    m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
   m_cEfficiencyErrV->Draw();
   m_cEfficiencyErrV->Update();
   m_cEfficiencyErrV->Modified();
@@ -531,7 +534,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     // update summary for V side
     m_cEfficiencyV3Samples->Draw();
     m_cEfficiencyV3Samples->cd();
-    m_hEfficiency3Samples->getHistogram(0)->Draw("text");
+    if (m_hEfficiency3Samples)
+      m_hEfficiency3Samples->getHistogram(0)->Draw("text");
 
     switch (m_effVstatus) {
       case good: {
@@ -565,14 +569,16 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyV3Samples->Update();
 
     m_cEfficiencyErrU3Samples->cd();
-    m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
+    if (m_hEfficiencyErr3Samples)
+      m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
     m_cEfficiencyErrU3Samples->Draw();
     m_cEfficiencyErrU3Samples->Update();
     m_cEfficiencyErrU3Samples->Modified();
     m_cEfficiencyErrU3Samples->Update();
 
     m_cEfficiencyErrV3Samples->cd();
-    m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
+    if (m_hEfficiencyErr3Samples)
+      m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
     m_cEfficiencyErrV3Samples->Draw();
     m_cEfficiencyErrV3Samples->Update();
     m_cEfficiencyErrV3Samples->Modified();

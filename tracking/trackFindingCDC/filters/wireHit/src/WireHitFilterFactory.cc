@@ -59,6 +59,7 @@ WireHitFilterFactory::create(const std::string& filterName) const
     // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "cuts_from_DB") {
     return std::make_unique<CutsFromDBWireHitFilter>();
+    // cppcheck-suppress knownConditionTrueFalse
   } else if (filterName == "mva") {
     return std::make_unique<MVACDCWireHitFilter>();
   } else {

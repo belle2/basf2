@@ -78,7 +78,7 @@ def _make_tobject_const(obj):
         non_const = [m.GetName() for m in obj.Class().GetListOfMethods() if (m.Property() & _ROOT_kIsPublic)
                      and not (m.Property() & (_ROOT_kIsConstMethod | _ROOT_kIsStatic))]
     except AttributeError:
-        raise ValueError("Object does not have a valid dictionary: %r" % obj)
+        raise ValueError(f"Object does not have a valid dictionary: {obj!r}")
 
     # Override all setters to just raise an exception
     for name in non_const:

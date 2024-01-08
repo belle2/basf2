@@ -26,21 +26,34 @@
 import basf2 as b2
 from tracking.validation.tracking_efficiency_helpers import run_simulation, run_reconstruction, get_generated_pt_value
 
-b2.set_random_seed(123460)
+ACTIVE = True
 
-pt_value = get_generated_pt_value(8)
 
-output_filename = '../trackingEfficiency_pt_%.2fGeV.root' % pt_value
+def run():
+    b2.set_random_seed(123460)
 
-print(output_filename)
+    pt_value = get_generated_pt_value(8)
 
-path = b2.create_path()
+    output_filename = f'../trackingEfficiency_pt_{pt_value:.2f}GeV.root'
 
-run_simulation(path, pt_value)
-run_reconstruction(path, output_filename)
+    print(output_filename)
 
-path.add_module('Progress')
+    path = b2.create_path()
 
-b2.process(path)
+    run_simulation(path, pt_value)
+    run_reconstruction(path, output_filename)
 
-print(b2.statistics)
+    path.add_module('Progress')
+
+    b2.process(path)
+
+    print(b2.statistics)
+
+
+if __name__ == '__main__':
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

@@ -122,6 +122,13 @@ namespace Belle2 {
     void reset(bool keepEntries = false);
 
     /**
+     * Return the names of all the payloads stored in the database at the time
+     * of this function is called. This is equivalent to getting all the payloads'
+     * names used by the current basf2 process.
+     */
+    std::set<std::string> getAllEntryNames();
+
+    /**
      * Add constant override payload.
      * This payload will be valid for all possible iov and will be used instead of values from the database.
      *

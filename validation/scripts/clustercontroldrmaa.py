@@ -191,8 +191,7 @@ class Cluster(ClusterBase):
                 status = session.jobStatus(job.job_id)
             except drmaa.errors.InvalidJobException:
                 print(
-                    "Job info for jobid {} cannot be retrieved, assuming "
-                    "job has terminated".format(job.job_id)
+                    f"Job info for jobid {job.job_id} cannot be retrieved, assuming job has terminated"
                 )
 
                 (donefile_exists, donefile_returncode) = self.checkDoneFile(job)

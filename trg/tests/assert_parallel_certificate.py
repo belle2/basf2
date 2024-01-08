@@ -21,4 +21,4 @@ add_trigger_simulation(path)
 modules = path.modules()
 for m in modules:
     assert m.has_properties(
-        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)
+        b2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), f'{m} is missing c_ParallelProcessingCertified flag!'

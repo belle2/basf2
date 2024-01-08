@@ -145,6 +145,15 @@ namespace Belle2 {
     TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */
     TPaveText* m_legOnEmpty = nullptr; /**< onlineOccupancy plot legend, empty */
     TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
+
+    TPaveText* m_legTiProblem = nullptr; /**< cluster time on tracks plot legend, problem */
+    TPaveText* m_legTiNormal = nullptr; /**< cluster time on tracks plot legend, normal */
+    TPaveText* m_legTiEmpty = nullptr; /**< cluster time on tracks plot legend, empty */
+
+    TPaveText* m_legTi3Problem = nullptr; /**< cluster time on tracks  for 3 samples plot legend, problem */
+    TPaveText* m_legTi3Normal = nullptr; /**< cluster time on tracks for 3 samples  plot legend, normal */
+    TPaveText* m_legTi3Empty = nullptr; /**< cluster time on tracks  for 3 samples plot legend, empty */
+
     TText* m_yTitle = nullptr; /**< y axis title text*/
 
     Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed before throwing ERROR*/
@@ -162,8 +171,7 @@ namespace Belle2 {
     Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
     Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
 
-    TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
-    TString runtype = nullptr; /**< string with runtype: physics or cosmic */
+    TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -46,8 +45,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 svd_standalone_mode="VXDTF2",
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                                v0_finding=True, flip_recoTrack=True):
+                                pxd_filtering_offline=False,
+                                append_full_grid_cdc_eventt0=True,
+                                v0_finding=True, flip_recoTrack=True,
+                                skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
@@ -120,6 +121,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                       and provides the CDC temporary EventT0.
     :param v0_finding: if false, the V0Finder module is not executed
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
     add_prefilter_tracking_reconstruction(
@@ -140,7 +145,8 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI,
         pxd_filtering_offline=pxd_filtering_offline,
-        append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
+        append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
@@ -160,7 +166,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                          pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False):
+                                          pxd_filtering_offline=False,
+                                          append_full_grid_cdc_eventt0=True,
+                                          skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -198,6 +206,10 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -242,7 +254,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, append_full_grid_cdc_eventt0, components=components)
+    add_time_extraction(path, append_full_grid_cdc_eventt0, components=components,
+                        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     if fit_tracks:
         add_prefilter_track_fit_and_track_creator(path,
@@ -296,7 +309,8 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module("PruneRecoHits")
 
 
-def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None):
+def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None,
+                        skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     Add time extraction components via tracking
 
@@ -304,12 +318,19 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param components: the list of geometry components in use or None for all components.
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
+
+    # Always run SVD EventT0 estimation first so that the CDC based medhod can check whether an SVD based EventT0 exists
     if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")
 
     if is_cdc_used(components) and append_full_grid_cdc_eventt0:
-        path.add_module("FullGridChi2TrackTimeExtractor")
+        path.add_module("FullGridChi2TrackTimeExtractor",
+                        skipIfSVDEventT0Present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,

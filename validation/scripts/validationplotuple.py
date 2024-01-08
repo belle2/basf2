@@ -407,14 +407,14 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}",
         )
 
     def get_png_filename(self):
-        return "{}_{}.png".format(strip_ext(self.rootfile), self.key)
+        return f"{strip_ext(self.rootfile)}_{self.key}.png"
 
     def get_pdf_filename(self):
-        return "{}_{}.pdf".format(strip_ext(self.rootfile), self.key)
+        return f"{strip_ext(self.rootfile)}_{self.key}.pdf"
 
     @staticmethod
     def _draw_root_object(typ, obj, options):
@@ -614,7 +614,7 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}",
         )
 
     def create_graph_plot(self):
@@ -712,7 +712,7 @@ class Plotuple:
 
         self._file = os.path.join(
             self._plot_folder,
-            "{}_{}".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}",
         )
 
     def create_html_content(self):
@@ -794,7 +794,7 @@ class Plotuple:
 
         json_ntuple_file = os.path.join(
             self._plot_folder,
-            "{}_{}.json".format(strip_ext(self.rootfile), self.key),
+            f"{strip_ext(self.rootfile)}_{self.key}.json",
         )
 
         with open(json_ntuple_file, "w+") as json_file:

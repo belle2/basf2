@@ -23,7 +23,7 @@ class CheckPayloadMetadata(b2.Module):
 
     def __init__(self, use_testing_payloads, md5_revision):
         '''Consructor.'''
-        super(CheckPayloadMetadata, self).__init__()
+        super().__init__()
         #: BeamParameters database object.
         self.beam_parameters = B2.PyDBObj('BeamParameters')
         #: Flag to mark if testing payloads are used or not.

@@ -28,12 +28,8 @@ def update_env():
     # the no_tools_check variable speeds up the process as it does not check
     # git to see if the tools are up to date.
     cmd = (
-        "BELLE2_NO_TOOLS_CHECK=1 source {}/b2setup > /dev/null && "
-        '{} -c "import sys,os,pickle; '
-        'sys.stdout.buffer.write(pickle.dumps(dict(os.environ)))"'.format(
-            os.environ["BELLE2_TOOLS"], sys.executable
-        )
-    )
+        f"BELLE2_NO_TOOLS_CHECK=1 source {os.environ['BELLE2_TOOLS']}/b2setup > /dev/null && {sys.executable} -c " +
+        '\"import sys,os,pickle; sys.stdout.buffer.write(pickle.dumps(dict(os.environ)))\"')
     output = subprocess.check_output(["bash", "-c", cmd])
     newenv = pickle.loads(output)
     os.environ.update(newenv)

@@ -55,6 +55,8 @@ namespace Belle2 {
     std::string m_param_output;
     /// Module paremeter: send out raw data with send header and trailer around the evtmessage instead of just the evtmessage.
     bool m_param_raw;
+    /// Module parameter: waiting for output confirmation message or not
+    bool m_param_outputConfirmation = true;
 
     /// ZMQ Parent needed for the connections
     std::shared_ptr<ZMQParent> m_parent;

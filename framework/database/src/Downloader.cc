@@ -288,11 +288,12 @@ namespace Belle2::Conditions {
         const std::string error = len ? m_session->errbuf : curl_easy_strerror(res);
         if (m_maxRetries > 0 && res == CURLE_HTTP_RETURNED_ERROR) {
           if (retry <= m_maxRetries) {
-            // we treat everything below 500 as permanent error with the request,
-            // only retry on 500.
+            // we treat everything below 300 as permanent error with the request,
+            // while if 300 or above we retry
             long responseCode{0};
             curl_easy_getinfo(m_session->curl, CURLINFO_RESPONSE_CODE, &responseCode);
-            if (responseCode >= 500) {
+            if (responseCode == 404 and silentOnMissing) return false;
+            if (responseCode >= 300) {
               // use exponential backoff but don't restrict to exact slots like
               // Ethernet, just use a random wait time between 1s and maxDelay =
               // 2^(retry)-1 * backoffFactor
@@ -304,7 +305,7 @@ namespace Belle2::Conditions {
               std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
               continue;
             }
-            if (responseCode == 404 and silentOnMissing) return false;
+
           }
         }
         throw std::runtime_error(error);

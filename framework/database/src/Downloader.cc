@@ -14,12 +14,10 @@
 
 #include <curl/curl.h>
 #include <TMD5.h>
-#include <TRandom.h>
 
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
-#include <memory>
 #include <thread>
 
 namespace Belle2::Conditions {
@@ -135,6 +133,8 @@ namespace Belle2::Conditions {
     static Downloader instance;
     return instance;
   }
+
+  Downloader::Downloader() { m_rnd->seed(gRandom->Integer(std::numeric_limits<unsigned int>::max())); }
 
   Downloader::~Downloader() { finishSession(); }
 
@@ -298,7 +298,16 @@ namespace Belle2::Conditions {
               // Ethernet, just use a random wait time between 1s and maxDelay =
               // 2^(retry)-1 * backoffFactor
               double maxDelay = (std::pow(2, retry) - 1) * m_backoffFactor;
-              double seconds = gRandom->Uniform(1., maxDelay);
+              // This is an exception in the whole basf2: instead of relying on gRandom for getting a random number,
+              // we rely on a different random number generator, and the reason is:
+              // since the request may fail because of several reasons independent from basf2 (bad connection,
+              // faulty squid cache, etc.), we might retry a new request altering the internal state of the gRandom
+              // instance, spoiling our capability to fully reproduce our results.
+              // In this way, relying on a different generator, we are safe.
+              // Note that gRandom is still used for getting the seed for m_rnd: this is done in the initializer of
+              // the class, which is safe for reproducing the results.
+              m_rndDistribution->param(std::uniform_real_distribution<double>::param_type(1.0, maxDelay));
+              double seconds = (*m_rndDistribution)(*m_rnd);
               B2WARNING("Could not download url, retrying ..."
                         << LogVar("url", url) << LogVar("error", error)
                         << LogVar("try", retry) << LogVar("waiting time", seconds));

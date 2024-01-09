@@ -10,8 +10,12 @@
 
 #include <framework/utilities/ScopeGuard.h>
 
+#include <TRandom.h>
+
 #include <iosfwd>
+#include <limits>
 #include <memory>
+#include <random>
 
 namespace Belle2::Conditions {
   /** Forward declare internal curl session pointer to limit exposure to curl headers */
@@ -20,9 +24,8 @@ namespace Belle2::Conditions {
   /** Simple class to encapsulate libcurl as used by the ConditionsDatabase */
   class Downloader final {
   public:
-    /** Create a new payload downloader
-     */
-    Downloader() = default;
+    /** Create a new payload downloader */
+    Downloader();
     /** Destructor */
     ~Downloader();
 
@@ -104,5 +107,15 @@ namespace Belle2::Conditions {
     unsigned int m_maxRetries{5};
     /** Backoff factor for retries in seconds */
     unsigned int m_backoffFactor{5};
+
+    /**
+     * A Mersenne Twister pseudo-random generator of 32-bit numbers with a state size of 19937 bits.
+     * This is a special exception in basf2 where an instance of gRandom is NOT used:
+     * since this class interacts with the Conditions Database, it might alter the state of the random
+     * number generator in case of connection troubles, loosing our capability to fully reproduce the results.
+     */
+    std::unique_ptr<std::mt19937> m_rnd{std::make_unique<std::mt19937>()};
+    /** A uniform real distribution for extracting random numbers. */
+    std::unique_ptr<std::uniform_real_distribution<double>> m_rndDistribution{std::make_unique<std::uniform_real_distribution<double>>()};
   };
 } // namespace Belle2::Conditions

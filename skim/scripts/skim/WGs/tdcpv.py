@@ -16,7 +16,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
                                             loadStdSkimHighEffEta, loadStdSkimHighEffKstar0,
                                             loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
-                                            loadStdSkimHighEffF_0)
+                                            loadStdSkimHighEffF_0, loadStdAllRho0)
 
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
@@ -107,12 +107,14 @@ class TDCPV_qqs(BaseSkim):
         stdK("all", path=path)
         stdPi("all", path=path)
         stdPhotons("all", path=path)
+        stdPhotons("tight", path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
         loadStdSkimHighEffPi0(path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        loadStdAllRho0(path=path)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)

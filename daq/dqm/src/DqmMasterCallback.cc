@@ -51,6 +51,14 @@ void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runty
 {
   m_runtype = runtype;
   LogFile::info("LOAD: runtype %s", m_runtype.c_str());
+  {
+    // workaround until we have a better solution
+    auto fh = fopen("/tmp/runtype", "wt+");
+    if (fh) {
+      fputs(fh, runtyp.c_str());
+      fclose(fh);
+    }
+  }
 }
 
 void DqmMasterCallback::start(int expno, int runno)
@@ -58,86 +66,103 @@ void DqmMasterCallback::start(int expno, int runno)
   m_expno = expno;
   m_runno = runno;
 
-  MsgHandler hdl(0);
-  int numobjs = 0;
-
-  TText rc_clear(0, 0, "DQMRC:CLEAR");
-  hdl.add(&rc_clear, "DQMRC:CLEAR");
-  numobjs++;
-  TText subdir(0, 0, "DQMInfo");
-  hdl.add(&subdir, "SUBDIR:DQMInfo") ;
-  numobjs++;
-  TH1F h_expno("expno", to_string(m_expno).c_str(), 1, 0, 1);
-  hdl.add(&h_expno, "expno");
-  numobjs++;
-  TH1F h_runno("runno", to_string(m_runno).c_str(), 1, 0, 1);
-  hdl.add(&h_runno, "runno");
-  numobjs++;
-  TH1F h_rtype("rtype", m_runtype.c_str(), 1, 0, 1);
-  hdl.add(&h_rtype, "rtype");
-  numobjs++;
-  TText command(0, 0, "COMMAND:EXIT");
-  hdl.add(&command, "SUBDIR:EXIT");
-  numobjs++;
-  TText rc_merge(0, 0, "DQMRC:MERGE");
-  hdl.add(&rc_merge, "DQMRC:MERGE");
-  numobjs++;
-
-  EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
-  (msg->header())->reserved[0] = 0;
-  (msg->header())->reserved[1] = numobjs;
-
-  while (m_sock->send(msg) < 0) {
-    LogFile::error("Connection to histogramm server is missing in START: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
-                   m_runtype.c_str());
-    m_sock->sock()->reconnect(10); // each one waits 5s
+  // currently, we do not (yet) use exp and run nr, just add it in case it may be needed later
+  {
+    // workaround until we have a better solution
+    auto fh = fopen("/tmp/expnr", "wt+");
+    if (fh) {
+      fputs(fh, "%d", expnr);
+      fclose(fh);
+    }
   }
-  delete (msg);
+  {
+    {
+      // workaround until we have a better solution
+      auto fh = fopen("/tmp/runnr", "wt+");
+      if (fh) {
+        fputs(fh, "%d", runnr);
+        fclose(fh);
+      }
+    }
 
-  LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
-  m_running = 1;
-}
+    MsgHandler hdl(0);
+    int numobjs = 0;
 
-void DqmMasterCallback::stop(void)
-{
-  LogFile::info("STOP: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
+    TText rc_clear(0, 0, "DQMRC:CLEAR");
+    hdl.add(&rc_clear, "DQMRC:CLEAR");
+    numobjs++;
+    TText subdir(0, 0, "DQMInfo");
+    hdl.add(&subdir, "SUBDIR:DQMInfo") ;
+    numobjs++;
+    TH1F h_expno("expno", to_string(m_expno).c_str(), 1, 0, 1);
+    hdl.add(&h_expno, "expno");
+    numobjs++;
+    TH1F h_runno("runno", to_string(m_runno).c_str(), 1, 0, 1);
+    hdl.add(&h_runno, "runno");
+    numobjs++;
+    TH1F h_rtype("rtype", m_runtype.c_str(), 1, 0, 1);
+    hdl.add(&h_rtype, "rtype");
+    numobjs++;
+    TText command(0, 0, "COMMAND:EXIT");
+    hdl.add(&command, "SUBDIR:EXIT");
+    numobjs++;
+    TText rc_merge(0, 0, "DQMRC:MERGE");
+    hdl.add(&rc_merge, "DQMRC:MERGE");
+    numobjs++;
 
-  if (m_running == 0) return;
+    EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
+    (msg->header())->reserved[0] = 0;
+    (msg->header())->reserved[1] = numobjs;
 
-  m_running = 0;
+    while (m_sock->send(msg) < 0) {
+      LogFile::error("Connection to histogramm server is missing in START: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                     m_runtype.c_str());
+      m_sock->sock()->reconnect(10); // each one waits 5s
+    }
+    delete (msg);
 
-  char outfile[1024];
-
-  MsgHandler hdl(0);
-  int numobjs = 0;
-
-  snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%sdqm_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
-           m_runno);
-
-  TText rc_save(0, 0, outfile);
-  hdl.add(&rc_save, outfile);
-  numobjs++;
-
-  EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
-  (msg->header())->reserved[0] = 0;
-  (msg->header())->reserved[1] = numobjs;
-
-  while (m_sock->send(msg) < 0) {
-    LogFile::error("Connection closed during STOP, file not saved: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
-                   m_runtype.c_str());
-    m_sock->sock()->reconnect(10); // each one waits 5s
-    // we assume that the connection was terminated by a restart of the server
-    // depending on when this happened, we may have new histograms to dump
-    // EVEN if the DQM analysis could not handle it (because after restart there is no
-    // run information.
+    LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
+    m_running = 1;
   }
-  delete (msg);
-}
 
-void DqmMasterCallback::abort(void)
-{
-  stop();
-}
+  void DqmMasterCallback::stop(void) {
+    LogFile::info("STOP: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
+
+    if (m_running == 0) return;
+
+    m_running = 0;
+
+    char outfile[1024];
+
+    MsgHandler hdl(0);
+    int numobjs = 0;
+
+    snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%sdqm_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
+             m_runno);
+
+    TText rc_save(0, 0, outfile);
+    hdl.add(&rc_save, outfile);
+    numobjs++;
+
+    EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
+    (msg->header())->reserved[0] = 0;
+    (msg->header())->reserved[1] = numobjs;
+
+    while (m_sock->send(msg) < 0) {
+      LogFile::error("Connection closed during STOP, file not saved: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                     m_runtype.c_str());
+      m_sock->sock()->reconnect(10); // each one waits 5s
+      // we assume that the connection was terminated by a restart of the server
+      // depending on when this happened, we may have new histograms to dump
+      // EVEN if the DQM analysis could not handle it (because after restart there is no
+      // run information.
+    }
+    delete (msg);
+  }
+
+  void DqmMasterCallback::abort(void) {
+    stop();
+  }
 
 
 

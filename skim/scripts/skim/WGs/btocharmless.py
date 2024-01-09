@@ -314,6 +314,7 @@ class BtoEtapKstp(BaseSkim):
     * :math:`B^{+}\\to \\eta^{'} K^{*+}`
 
     Cuts applied:
+
     * ``5.20 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
     * ``0.4 < M_{eta} < 0.6``

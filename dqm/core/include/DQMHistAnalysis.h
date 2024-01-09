@@ -36,6 +36,28 @@ namespace Belle2 {
 
   public:
     /**
+     * Status flag of histogram/canvas
+    */
+    enum EStatus {
+      c_StatusTooFew = 0, /**< Not enough entries/event to judge */
+      c_StatusDefault = 1, /**< default for non-coloring */
+      c_StatusGood = 2, /**< Analysis result: Good */
+      c_StatusWarning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_StatusError = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Status colors of histogram/canvas (corresponding to status)
+    */
+    enum EStatusColor {
+      c_ColorTooFew = kGray, /**< Not enough entries/event to judge */
+      c_ColorDefault = kWhite, /**< default for non-coloring */
+      c_ColorGood = kGreen, /**< Analysis result: Good */
+      c_ColorWarning = kYellow, /**< Analysis result: Warning, there may be minor issues */
+      c_ColorError = kRed /**< Analysis result: Severe issue found */
+    };
+
+    /**
      * The type of list of histograms.
      */
     typedef std::map<std::string, HistObject> HistList;
@@ -396,8 +418,9 @@ namespace Belle2 {
     /**
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
+     * @return status of ca_pend_io
      * */
-    void updateEpicsPVs(float timeout);
+    int updateEpicsPVs(float timeout);
 
     /**
      * Get EPICS PV Channel Id
@@ -486,6 +509,41 @@ namespace Belle2 {
      * @param prefix Prefix to set
      */
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+
+    /**
+     * Helper function to judge the status for coloring and EPICS
+     * @param enough enough events for judging
+     * @param warn_flag outside of expected range
+     * @param error_flag outside of warning range
+     * @return the status
+     */
+    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+
+    /**
+     * Helper function for Canvas colorization
+     * @param canvas Canvas to change
+     * @param status status to color
+     */
+    void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Return color for canvas state
+     * @param status canvas status
+     * @return alarm color
+     */
+    EStatusColor getStatusColor(EStatus status);
+
+    /**
+     * Check the status of all PVs and report if disconnected or not found
+     */
+    void checkPVStatus(void);
+
+    /**
+     * check the status of a PVs and report if disconnected or not found
+     * @param pv the chid of the PV to check
+     * @param onlyError print only if in error condition (default)
+     */
+    void printPVStatus(chid pv, bool onlyError = true);
 
     // Public functions
   public:

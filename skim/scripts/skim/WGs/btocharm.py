@@ -11,8 +11,8 @@
 
 """
 List of functions to skim events containing :math:`B\\to X_c + h` decays,
-where :math:`X_c` stays for :math:`D^0`, :math:`D^{\\pm}`, :math:`D^{*0}` and :math:`D^{*\\pm}`,
-and :math:`h` stays for :math:`\\pi^{\\pm}`, :math:`K^{\\pm}`, :math:`\\rho^{\\pm}` and :math:`a_1^{\\pm}`.
+where :math:`X_c` stands for :math:`D^0`, :math:`D^{\\pm}`, :math:`D^{*0}` and :math:`D^{*\\pm}`,
+and :math:`h` stands for :math:`\\pi^{\\pm}`, :math:`K^{\\pm}`, :math:`\\rho^{\\pm}` and :math:`a_1^{\\pm}`.
 """
 
 import modularAnalysis as ma
@@ -29,15 +29,20 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadStdDstarPlus_D0pi_Kpipi0,
                                       loadStdDstarPlus_D0pi_Kpipipi,
                                       loadStdDstarPlus_Dpi0_Kpipi,
-                                      loadCharmlessD0_Kpipi0)
+                                      loadCharmlessD0_Kpipi0,
+                                      loadPiSkimHighEff,
+                                      loadKSkimHighEff)
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
-                                            loadStdPi0ForBToHadrons)
+                                            loadStdPi0ForBToHadrons,
+                                            loadStdSkimHighEffPhi,
+                                            loadStdSkimHighEffKstar0,)
 from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
 from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdK, stdPi
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
+from stdPhotons import stdPhotons
 
 __liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -48,8 +53,8 @@ class BtoD0h_Kspi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^0) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 \\pi^0) K^+`,
 
     Cuts applied:
 
@@ -111,8 +116,8 @@ class BtoD0h_Kspipipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^- \\pi^0) K^+`,
 
     Cuts applied:
 
@@ -290,7 +295,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
+    * :math:`B^{0}\\to \\overline{D}{}^{*-} (\\to \\overline{D}{}^{0}
       (\\to K^+ \\pi^- \\pi^- \\pi^+, K^+\\pi^-\\pi^0) \\pi^-) \\pi^+`
 
     Cuts applied:
@@ -421,7 +426,7 @@ class B0toDstarRho_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\rho^+`,
+    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) \\pi^-) \\rho^+`,
 
     Cuts applied:
 
@@ -466,7 +471,7 @@ class B0toDstarRho_D0pi_Kpipipi_Kpipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}^{0}
+    * :math:`B^{0}\\to D^{*-} (\\to \\overline{D}{}^{0}
       (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)\\pi^-) \\rho^+`,
 
     Cuts applied:
@@ -526,14 +531,14 @@ class BtoD0h_hh(BaseSkim):
 
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^- \\pi^+) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to \\pi^+ \\pi^-) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ K^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^- \\pi^+) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to \\pi^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ K^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^- \\pi^+) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to \\pi^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ K^-) K^+`,
 
     Cuts applied:
 
@@ -596,8 +601,8 @@ class BtoD0h_Kpi(BaseSkim):
 
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) K^+`,
 
     Cuts applied:
 
@@ -641,12 +646,12 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ pi^- pi^- pi^+, \\to K^+ pi^- pi^0) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^- \\pi^- \\pi^+, \\to K^+ \\pi^- \\pi^0) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^- \\pi^- \\pi^+, \\to K^+ \\pi^- \\pi^0) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{*0} (\\to \\overline{D}{}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
       \\pi^0) \\pi^+`
-    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
-      \\pi^0) \\K^+`
+    * :math:`B^{+}\\to \\overline{D}{}^{*0} (\\to \\overline{D}{}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0)
+      \\pi^0) K^+`
 
     Cuts applied:
 
@@ -707,20 +712,20 @@ class BtoD0h_Kshh(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) \\pi^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) K^+`,
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K_{\\rm S}^0 K^+ K^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 K^+ K^-) \\pi^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 K^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 K^- \\pi^+) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 \\pi^+ \\pi^-) K^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K_{\\rm S}^0 K^+ K^-) K^+`,
 
     Cuts applied:
 
     * ``1.5 < M_D0 < 2.2``
     * ``5.2 < Mbc``
-    * ``abs(deltaE) < 0.3``
+    * ``deltaE < 0.3 and deltaE > -0.45``
 
     Note:
         This skim uses `skim.standardlists.charm.loadD0_Kshh_loose`, where :math:`D^0`
@@ -742,7 +747,7 @@ class BtoD0h_Kshh(BaseSkim):
         loadD0_Kshh_loose(path=path)
 
     def build_lists(self, path):
-        Bcuts = "Mbc > 5.2 and abs(deltaE) < 0.3"
+        Bcuts = "Mbc > 5.2 and deltaE < 0.3 and deltaE > -0.45"
 
         BsigChannels = ["anti-D0:Kshh pi+:GoodTrack",
                         "anti-D0:Kshh K+:GoodTrack"
@@ -776,8 +781,8 @@ class BtoD0rho_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\rho^+`,
-    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+ \\pi^-) \\pi^0) \\rho^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) \\rho^+`,
+    * :math:`B^{+}\\to \\overline{D}{}^{*0} (\\to \\overline{D}{}^{0} (\\to K^+ \\pi^-) \\pi^0) \\rho^+`,
 
     Cuts applied:
 
@@ -827,8 +832,8 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+}\\to \\overline{D}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`
-    * :math:`B^{+}\\to \\overline{D}^{*0} (\\to \\overline{D}^{0} (\\to K^+2 \\pi^-
+    * :math:`B^{+}\\to \\overline{D}{}^{0} (\\to K^+2\\pi^-\\pi^+, K^+\\pi^-\\pi^0) \\rho^+`
+    * :math:`B^{+}\\to \\overline{D}{}^{*0} (\\to \\overline{D}{}^{0} (\\to K^+2 \\pi^-
       \\pi^+, K^+\\pi^-\\pi^0) \\pi^0) \\rho^+`
 
     Cuts applied:
@@ -951,9 +956,9 @@ class B0toDstarD(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
-      (\\to K^+ \\pi^-, \\to K^+ \\pi^- \\pi^- \\pi^+, K^+ \\pi^- \\pi^0) \\pi^-) \\D^+(\\to K^- \\pi^+ \\pi^+)`
-    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to D^{-} \\pi^0) \\D^+(\\to K^- \\pi^+ \\pi^+)`
+    * :math:`B^{0}\\to \\overline{D}{}^{*-} (\\to \\overline{D}{}^{0}
+      (\\to K^+ \\pi^-, \\to K^+ \\pi^- \\pi^- \\pi^+, K^+ \\pi^- \\pi^0) \\pi^-) D^+ (\\to K^- \\pi^+ \\pi^+)`
+    * :math:`B^{0}\\to \\overline{D}{}^{*-} (\\to D^{-} \\pi^0) D^+ (\\to K^- \\pi^+ \\pi^+)`
 
     Cuts applied:
 
@@ -1006,7 +1011,7 @@ class B0toD0Kpipi0_pi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to \\bar{D}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^0`
+    * :math:`B^{0}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^0`
 
     Cuts applied:
 
@@ -1015,7 +1020,7 @@ class B0toD0Kpipi0_pi0(BaseSkim):
 
     Note:
         This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`, where the
-        :math:`\\bar{D}^{0}` channel is defined.
+        :math:`\\overline{D}{}^{0}` channel is defined.
     """
 
     __authors__ = ["Francis Pham"]
@@ -1038,3 +1043,68 @@ class B0toD0Kpipi0_pi0(BaseSkim):
         ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0_loose pi0:charmlessFit", Bcuts, path=path)
 
         return ["B0:D0Kpipi0_pi0"]
+
+
+@fancy_skim_header
+class B0toDs1D(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\phi (\\to K^+ K^-)\\pi^+) \\gamma) \\pi^0)
+      D^- (\\to K^+ \\pi^-\\pi^-)`,
+    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\phi (\\to K^+ K^-) \\pi^+ \\pi^0) \\gamma) \\pi^0)
+      D^- (\\to K^+ \\pi^-\\pi^-)`,
+    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to \\overline{K}{}^{*0} (\\to K^- \\pi^+)K^+) \\gamma) \\pi^0)
+      D^- (\\to K^+ \\pi^-\\pi^-)`,
+    * :math:`B^{0}\\to D_{s1}^{+} (\\to D_s^{*+}(\\to D_s^+(\\to K_S^0 (\\to \\pi^- \\pi^+)K^+) \\gamma) \\pi^0)
+      D^- (\\to K^+ \\pi^-\\pi^-)`,
+
+    Cuts applied:
+
+    * ``5.2 < Mbc < 5.3``
+    * ``-0.5 < deltaE < 0.5``
+    * ``0.247 < M(D_s1+) - M(D_s*+) < 0.378``
+    * ``0.072 < M(D_s*+) - M(D_s+) < 0.179``
+    * ``2.288 < M(D_s1+) < 2.507``
+    """
+
+    __authors__ = ["Tsai Hua Lee, Chih Han Tseng"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadPiSkimHighEff(path=path)
+        loadKSkimHighEff(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+        stdPhotons('loose', path=path)
+        stdKshorts(path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path)
+        loadStdDplus_Kpipi(path=path)
+        loadStdSkimHighEffPhi(path=path)
+        loadStdSkimHighEffKstar0(path=path)
+
+    def build_lists(self, path):
+        ma.reconstructDecay(decayString="D_s+:phipi -> phi:SkimHighEff pi+:SkimHighEff", cut="[1.942 < M < 1.993]", path=path)
+        ma.reconstructDecay(decayString="D_s+:phipipi0 -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
+                            cut="[1.874 < M < 1.997]", path=path)
+        ma.reconstructDecay(decayString="D_s+:Ksk -> K_S0:merged K+:SkimHighEff",
+                            cut="[1.914 < M < 2.015]", path=path)
+        ma.reconstructDecay(decayString="D_s+:anti-Kstar0K -> anti-K*0:SkimHighEff K+:SkimHighEff",
+                            cut="[1.934 < M < 2.002]", path=path)
+        DsList = ['D_s+:phipi', 'D_s+:phipipi0', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
+        ma.copyLists(outputListName="D_s+:all", inputListNames=DsList, path=path)
+
+        ma.reconstructDecay(decayString="D_s*+ -> D_s+:all gamma:loose",
+                            cut="[2.062 < M < 2.131] and [0.072 < massDifference(0) < 0.179]", path=path)
+        ma.reconstructDecay(decayString="D_s1+ -> D_s*+ pi0:bth_skim",
+                            cut="[2.288 < M < 2.507] and [0.247 < massDifference(0) < 0.378]", path=path)
+        ma.reconstructDecay(decayString="B0:merged -> D_s1+ D-:Kpipi",
+                            cut="[5.2 < Mbc < 5.3] and [-0.5 < deltaE < 0.5]", path=path)
+
+        return ["B0:merged"]

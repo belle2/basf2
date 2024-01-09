@@ -256,7 +256,7 @@ def create_pre_collector_path(
 
     if not isMC:
         # run tracking reconstruction
-        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True)
+        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True, skip_full_grid_cdc_eventt0_if_svd_time_present=False)
         path = remove_module(path, "V0Finder")
         if not is_validation:
             # if we would like using the grouping (True by default), we should use the calibrated cluster time

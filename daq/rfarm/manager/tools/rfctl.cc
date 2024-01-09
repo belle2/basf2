@@ -182,7 +182,7 @@ msg_handler(NSMmsg* /*msg*/, NSMcontext*)
 //    main does everything except callback functions
 // ----------------------------------------------------------------------
 int
-main(int argc, char** argv)
+main(int argc, const char** argv)
 {
   const char* program  = argv[0];
   const char* nodename = argv[1]; // need to check before using

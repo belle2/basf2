@@ -20,6 +20,8 @@
 
 import ROOT
 
+ACTIVE = True
+
 
 class VxdCdcMergerValidationPlots:
     """Create efficiency plots for the V0 validation"""
@@ -54,12 +56,11 @@ class VxdCdcMergerValidationPlots:
     def histogram_plot(hist, title, x_variable, x_unit=None, description='', check='', contact='', meta_options=''):
         """Label and annotate the histograms"""
         hist.SetName("".join(title.split()))
-        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
-        ylabel = 'Entries / ({} {})'.format((hist.GetXaxis().GetXmax() -
-                                             hist.GetXaxis().GetXmin()) /
-                                            hist.GetNbinsX(), x_unit) if x_unit is not None \
-            else 'Entries / ({})'.format((hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX())
-        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        xlabel = f'{x_variable} / ({x_unit})' if x_unit is not None else f'{x_variable}'
+        ylabel = f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()} {x_unit})' \
+            if x_unit is not None \
+            else f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()})'
+        hist.SetTitle(f"{title};{xlabel};{ylabel}")
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -94,4 +95,9 @@ class VxdCdcMergerValidationPlots:
 
 
 if __name__ == '__main__':
-    VxdCdcMergerValidationPlots().collect_histograms().plot()
+    if ACTIVE:
+        VxdCdcMergerValidationPlots().collect_histograms().plot()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

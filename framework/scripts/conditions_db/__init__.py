@@ -30,6 +30,8 @@ import hashlib
 import itertools
 from typing import Union  # noqa
 import getpass
+import tempfile
+from conditions_db.iov import IntervalOfValidity
 
 
 def encode_name(name):
@@ -66,7 +68,7 @@ def get_cdb_authentication_token(path=None):
     if path:
         path_to_token = path
     else:
-        path_to_token = os.path.join(os.getenv('HOME', '/tmp'), f'b2cdb_{os.getenv("BELLE2_USER", None)}.token')
+        path_to_token = os.path.join(os.getenv('HOME', tempfile.gettempdir()), f'b2cdb_{os.getenv("BELLE2_USER", None)}.token')
 
     # check validity of existing token
     if os.path.isfile(path_to_token):
@@ -350,20 +352,10 @@ class ConditionsDB:
                 response = req.json()
                 message = response.get("message", "")
                 colon = ": " if message.strip() else ""
-                error = "Request {method} {url} returned {code} {reason}{colon}{message}".format(
-                    method=method, url=url,
-                    code=response["code"],
-                    reason=response["reason"],
-                    message=message,
-                    colon=colon,
-                )
+                error = f"Request {method} {url} returned {response['code']} {response['reason']}{colon}{message}"
             except json.JSONDecodeError:
                 # seems the reply was not even json
-                error = "Request {method} {url} returned non JSON response {code}: {content}".format(
-                    method=method, url=url,
-                    code=req.status_code,
-                    content=req.content
-                )
+                error = f"Request {method} {url} returned non JSON response {req.status_code}: {req.content}"
 
             if message is not None:
                 raise ConditionsDB.RequestError(f"{message} failed: {error}")
@@ -375,8 +367,7 @@ class ConditionsDB:
                 req.json()
             except json.JSONDecodeError as e:
                 B2INFO(f"Invalid response: {req.content}")
-                raise ConditionsDB.RequestError("{method} {url} returned invalid JSON response {}"
-                                                .format(e, method=method, url=url))
+                raise ConditionsDB.RequestError(f"{method} {url} returned invalid JSON response {e}")
         return req
 
     def get_globalTags(self):
@@ -399,7 +390,7 @@ class ConditionsDB:
         """Check whether the globaltag with the given name exists."""
 
         try:
-            self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
+            self.request("GET", f"/globalTag/{encode_name(name)}")
         except ConditionsDB.RequestError:
             return False
 
@@ -410,7 +401,7 @@ class ConditionsDB:
         id or None if the tag was not found"""
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}".format(globalTagName=encode_name(name)))
+            req = self.request("GET", f"/globalTag/{encode_name(name)}")
         except ConditionsDB.RequestError as e:
             B2ERROR(f"Cannot find globaltag '{name}': {e}")
             return None
@@ -433,7 +424,7 @@ class ConditionsDB:
         if name in types:
             return types[name]
 
-        B2ERROR("Unknown globaltag type: '{}', please use one of {}".format(name, ", ".join(types)))
+        B2ERROR(f"Unknown globaltag type: '{name}', please use one of {', '.join(types)}")
         return None
 
     def create_globalTag(self, name, description, user):
@@ -449,7 +440,7 @@ class ConditionsDB:
 
         return req.json()
 
-    def get_all_iovs(self, globalTag, exp=None, run=None, message=None):
+    def get_all_iovs(self, globalTag, exp=None, run=None, message=None, run_range=None):
         """
         Return list of all payloads in the given globaltag where each element is
         a `PayloadInformation` instance
@@ -463,6 +454,8 @@ class ConditionsDB:
             message (str): additional message to show when downloading the
                 payload information. Will be directly appended to
                 "Obtaining lists of iovs for globaltag {globalTag}"
+            run_range (tuple): if given limit the list of payloads to the ones
+                overlapping with the given run range
 
         Warning:
             Both, exp and run, need to be given at the same time. Just supplying
@@ -471,6 +464,9 @@ class ConditionsDB:
         globalTag = encode_name(globalTag)
         if message is None:
             message = ""
+        if run_range is not None:
+            message += f" [valid in {tuple(run_range)}]"
+            run_range = IntervalOfValidity(run_range)
         if exp is not None:
             msg = f"Obtaining list of iovs for globaltag {globalTag}, exp={exp}, run={run}{message}"
             req = self.request("GET", "/iovPayloads", msg, params={'gtName': globalTag, 'expNumber': exp, 'runNumber': run})
@@ -486,6 +482,11 @@ class ConditionsDB:
                 iovs = item['payloadIovs']
 
             for iov in iovs:
+                if run_range is not None:
+                    if IntervalOfValidity(
+                            iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd']
+                    ).intersect(run_range) is None:
+                        continue
                 all_iovs.append(PayloadInformation.from_json(payload, iov))
 
         all_iovs.sort()
@@ -499,8 +500,7 @@ class ConditionsDB:
 
         try:
             if global_tag:
-                req = self.request("GET", "/globalTag/{global_tag}/payloads"
-                                   .format(global_tag=encode_name(global_tag)))
+                req = self.request("GET", f"/globalTag/{encode_name(global_tag)}/payloads")
             else:
                 req = self.request("GET", "/payloads")
         except ConditionsDB.RequestError as e:
@@ -602,9 +602,7 @@ class ConditionsDB:
         # now make the request. Note to self: if multipart/form-data would be
         # accepted this would be so much nicer here. but it works.
         try:
-            req = self.request("POST", "/package/dbstore/module/{moduleName}/payload"
-                               .format(moduleName=encode_name(module)),
-                               data=post_body, headers=headers)
+            req = self.request("POST", f"/package/dbstore/module/{encode_name(module)}/payload", data=post_body, headers=headers)
         except ConditionsDB.RequestError as e:
             B2ERROR(f"Could not create Payload: {e}")
             return None
@@ -657,8 +655,7 @@ class ConditionsDB:
         """
 
         try:
-            req = self.request("GET", "/globalTag/{globalTagName}/globalTagPayloads"
-                               .format(globalTagName=encode_name(globalTagName)))
+            req = self.request("GET", f"/globalTag/{encode_name(globalTagName)}/globalTagPayloads")
         except ConditionsDB.RequestError:
             # there could be just no iovs so no error
             return {}
@@ -958,7 +955,7 @@ class ConditionsDB:
 
             B2INFO(f"Commenting on jira issue {issue} for {data['task']} globaltag request")
             if isinstance(password, str):
-                response = requests.post('https://agira.desy.de/rest/api/latest/issue/%s/comment' % issue,
+                response = requests.post(f'https://agira.desy.de/rest/api/latest/issue/{issue}/comment',
                                          auth=(data['user'], password), json={'body': description})
             else:
                 fields = {'id': issue, 'user': user, 'comment': description}

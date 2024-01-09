@@ -9,6 +9,7 @@
 #include <framework/pcore/RingBuffer.h>
 #include <framework/logging/Logger.h>
 
+#include <filesystem>
 #include <iostream>
 #include <iomanip>
 
@@ -48,7 +49,7 @@ std::vector<int> findRingBuffers()
 {
   std::vector<int> buffer_SHMs;
   DIR* dir;
-  if ((dir = opendir("/tmp")) != nullptr) {
+  if ((dir = opendir(std::filesystem::temp_directory_path().c_str())) != nullptr) {
     struct dirent* ent;
     while ((ent = readdir(dir)) != nullptr) {
       if (strncmp(ent->d_name, "SHM", 3) == 0) {

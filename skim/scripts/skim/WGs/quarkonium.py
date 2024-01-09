@@ -254,16 +254,21 @@ class CharmoniumPsi(BaseSkim):
 @fancy_skim_header
 class InclusiveLambda(BaseSkim):
     """
-    Reconstructed decay
+    **Reconstructed decay:**
+
     * :math:`\\Lambda \\to p \\pi^-` (and charge conjugate)
 
-    Selection criteria:
-    * proton:
-    ``protonID > 0.1``
-    * Lambda:
-    ``cosAngleBetweenMomentumAndVertexVector > 0.75``
-    ``flightDistance/flightDistanceErr > 0.``
-    * ``0.5 < p,proton/p,Lambda < 1.25 GeV/c``
+    **Selection criteria:**
+
+    Cuts on proton:
+
+    * ``protonID > 0.1``
+
+    Cuts on Lambda:
+
+    * ``cosAngleBetweenMomentumAndVertexVector > 0.75``
+    * ``flightDistance/flightDistanceErr > 0.``
+    * ``0.5 < p_proton/p_Lambda < 1.25 GeV/c``
 
     """
     __authors__ = ["Bianca Scavino"]

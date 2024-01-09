@@ -270,6 +270,7 @@ class TDCPV_ccs(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdPhotons("all", path=path)
+        stdPhotons("tight", path=path)
 
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)

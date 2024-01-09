@@ -106,7 +106,7 @@ namespace Belle2::Conditions {
     /** Number of retries to perform when downloading fails with HTTP response code >=300 */
     unsigned int m_maxRetries{5};
     /** Backoff factor for retries in seconds */
-    unsigned int m_backoffFactor{5};
+    unsigned int m_backoffFactor{3};
 
     /**
      * A Mersenne Twister pseudo-random generator of 32-bit numbers with a state size of 19937 bits.

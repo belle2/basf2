@@ -34,10 +34,13 @@ namespace Belle2 {
                                     19, 0, 19);
 
       for (int view = VIndex ; view < UIndex + 1; view++) {
-        TH2F h(*m_defaultHistogram);
-
-        customize(h, view);
-        m_histos[view] = new TH2F(h);
+        std::string hname = name.Data();
+        bool isU = (view == UIndex);
+        customizeString(hname, isU);
+        m_histos[view] = new TH2F(hname.c_str(), title.Data(),
+                                  16, 0.5, 16.5,
+                                  19, 0, 19);
+        customize(*m_histos[view], view);
       }
     }
 
@@ -140,6 +143,7 @@ namespace Belle2 {
     {
       delete m_histos[0];
       delete m_histos[1];
+      delete m_defaultHistogram;
     }
 
 
@@ -173,9 +177,9 @@ namespace Belle2 {
 
       const int nY = 19;
       TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
-                             "", "L4.x.1", "L4.x.2", "L4.x.3",
-                             "", "L5.x.1", "L5.x.2", "L5.x.3", "L5.x.4",
-                             "", "L6.x.1", "L6.x.2", "L6.x.3", "L6.x.4", "L6.x.5", ""
+                             " ", "L4.x.1", "L4.x.2", "L4.x.3",
+                             "  ", "L5.x.1", "L5.x.2", "L5.x.3", "L5.x.4",
+                             "   ", "L6.x.1", "L6.x.2", "L6.x.3", "L6.x.4", "L6.x.5", "    "
                             };
 
       histogram.SetMarkerSize(1.1);
@@ -185,10 +189,6 @@ namespace Belle2 {
         histogram.GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
       bool isU = view == UIndex;
-      std::string name = histogram.GetName();
-      customizeString(name, isU);
-      histogram.SetName(name.c_str());
-
       std::string title = histogram.GetTitle();
       customizeString(title, isU);
       histogram.SetTitle(title.c_str());

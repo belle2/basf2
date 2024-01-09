@@ -43,7 +43,7 @@ class BtoXgamma(BaseSkim):
     Cuts on photons:
 
     * :math:`\\text{clusterE9E21}>0.9`
-    * :math:`1.4\\,\\text{GeV}<\\E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
+    * :math:`1.4\\,\\text{GeV}< E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
     """
 
     __authors__ = ["Trevor Shillington"]
@@ -119,37 +119,37 @@ class BtoXgamma(BaseSkim):
 @fancy_skim_header
 class BtoXll(BaseSkim):
     """
-        Reconstructed decay modes:
+    Reconstructed decay modes:
 
-      * :math:`B^+ \\to X e^+ e^-`
-      * :math:`B^+ \\to X e^+ e^+`
-      * :math:`B^+ \\to X \\mu^+ \\mu^-`
-      * :math:`B^+ \\to X \\mu^+ \\mu^+`
-
-
-      Event-level cuts:
-
-      * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
-        :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-      * :math:`n_{\\text{tracks}} \\geq 3`
-
-      Cuts on electrons:
-
-      * :math:`\\text{electronID} > 0.1`
-      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:`dr<0.5 and abs(dz)<2`
-
-      Cuts on muons:
-
-      * :math:`\\text{muonID} > 0.5`
-      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`B^+ \\to X e^+ e^-`
+    * :math:`B^+ \\to X e^+ e^+`
+    * :math:`B^+ \\to X \\mu^+ \\mu^-`
+    * :math:`B^+ \\to X \\mu^+ \\mu^+`
 
 
-      Cut on dilepton energy:
+    Event-level cuts:
 
-      * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
-      """
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} \\geq 3`
+
+    Cuts on electrons:
+
+    * :math:`\\text{electronID} > 0.1`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
+
+
+    Cut on dilepton energy:
+
+    * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+    """
 
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
@@ -237,7 +237,7 @@ class BtoXll(BaseSkim):
 @fancy_skim_header
 class BtoXll_LFV(BaseSkim):
     """
-      Reconstructed decay modes:
+    Reconstructed decay modes:
 
     * :math:`B^+ \\to X e^+ \\mu^-`
     * :math:`B^+ \\to X \\mu^+ e^-`
@@ -254,13 +254,13 @@ class BtoXll_LFV(BaseSkim):
 
     * :math:`\\text{electronID} > 0.1`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
 
     Cuts on muons:
 
     * :math:`\\text{muonID} > 0.5`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
 
 
     Cut on dilepton energy:

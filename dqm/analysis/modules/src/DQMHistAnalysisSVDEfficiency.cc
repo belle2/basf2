@@ -54,32 +54,30 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialize");
 
-  B2DEBUG(10, " black = " << kBlack);
-  B2DEBUG(10, " green = " << kGreen);
-  B2DEBUG(10, " yellow = " << kYellow);
-  B2DEBUG(10, " Red = " << kRed);
-
   //build the legend
   m_legProblem = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legProblem->AddText("ERROR!");
   m_legProblem->AddText("at least one sensor with:");
   m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
-  m_legProblem->SetFillColor(kRed);
+  m_legProblem->SetFillColor(c_ColorError);
+
   m_legWarning = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
   m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
-  m_legWarning->SetFillColor(kYellow);
+  m_legWarning->SetFillColor(c_ColorWarning);
+
   m_legNormal = new TPaveText(11, findBinY(4, 3) - 3, 16, findBinY(4, 3));
   m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
   m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
-  m_legNormal->SetFillColor(kGreen);
+  m_legNormal->SetFillColor(c_ColorGood);
   m_legNormal->SetBorderSize(0.);
   m_legNormal->SetLineColor(kBlack);
+
   m_legEmpty = new TPaveText(11, findBinY(4, 3) - 2, 16, findBinY(4, 3));
   m_legEmpty->AddText("Not enough statistics,");
   m_legEmpty->AddText("check again in a few minutes");
-  m_legEmpty->SetFillColor(kBlack);
+  m_legEmpty->SetFillColor(c_ColorTooFew);
   m_legEmpty->SetTextColor(kWhite);
   m_legEmpty->SetBorderSize(0.);
   m_legEmpty->SetLineColor(kBlack);
@@ -97,13 +95,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   }
   std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
 
-  //find nEvents testing if histograms are present
-  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
-  if (hnEvnts == NULL) {
-    B2INFO("no events, nothing to do here");
-    return;
-  }
-
 
   gROOT->cd();
   m_cEfficiencyU = new TCanvas("SVDAnalysis/c_SVDEfficiencyU");
@@ -111,8 +102,10 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_cEfficiencyErrU = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrU");
   m_cEfficiencyErrV = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV");
 
-  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%%), @view/@side Side");
-  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%%), @view/@side Side");
+  m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
+  m_hEfficiency->setStats(0);
+  m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
+  m_hEfficiencyErr->setStats(0);
 
 
   if (m_3Samples) {
@@ -122,13 +115,25 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_cEfficiencyErrV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyErrV3Samples");
 
     m_hEfficiency3Samples = new SVDSummaryPlots("SVD3Efficiency@view",
-                                                "Summary of SVD efficiencies (%%), @view/@side Side for 3 samples");
+                                                "Summary of SVD efficiencies (%), @view/@side Side for 3 samples");
+    m_hEfficiency3Samples->setStats(0);
+
     m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
-                                                   "Summary of SVD efficiencies errors (%%), @view/@side Side for 3 samples");
+                                                   "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");
+    m_hEfficiencyErr3Samples->setStats(0);
+
   }
 
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "efficiencyLimits", "effLimits");
+
+  //find nEvents testing if histograms are present
+  TH1* hnEvnts = findHist("SVDExpReco/SVDDQM_nEvents");
+  if (hnEvnts == NULL) {
+    B2INFO("no events, nothing to do here");
+    return;
+  }
+
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -177,51 +182,36 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
-  TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
-  B2INFO("DQMHistAnalysisSVDEfficiencyModule::runID = " << runID);
+  TString tmp = hnEvnts->GetTitle();
+  Int_t pos = tmp.Last('~');
+  if (pos == -1) pos = 0;
 
+  TString runID = tmp(pos, tmp.Length() - pos);
+  B2INFO("DQMHistAnalysisSVDEfficiencyModule::runID = " << runID);
 
   gStyle->SetOptStat(0);
   gStyle->SetPaintTextFormat("2.1f");
 
   // do it by nhand, the interface of the SVDSummaryPlots does not allow to change the title after cstr
   if (m_hEfficiency) {
-    m_hEfficiency->getHistogram(0)->Reset();
-    m_hEfficiency->getHistogram(1)->Reset();
-    m_hEfficiency->getHistogram(0)->SetStats(0);
-    m_hEfficiency->getHistogram(1)->SetStats(0);
-    m_hEfficiency->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies (%%), V/N Side %s", runID.Data()));
-    m_hEfficiency->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies (%%), U/P Side %s", runID.Data()));
+    m_hEfficiency->reset();
+    m_hEfficiency->setRunID(runID);
   }
 
   if (m_hEfficiencyErr) {
-    m_hEfficiencyErr->getHistogram(0)->Reset();
-    m_hEfficiencyErr->getHistogram(1)->Reset();
-    m_hEfficiencyErr->getHistogram(0)->SetStats(0);
-    m_hEfficiencyErr->getHistogram(1)->SetStats(0);
-    m_hEfficiencyErr->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies errors (%%), V/N Side %s", runID.Data()));
-    m_hEfficiencyErr->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies errors (%%), U/P Side %s", runID.Data()));
+    m_hEfficiencyErr->reset();
+    m_hEfficiencyErr->setRunID(runID);
   }
 
   if (m_3Samples) {
     if (m_hEfficiency3Samples) {
-      m_hEfficiency3Samples->getHistogram(0)->Reset();
-      m_hEfficiency3Samples->getHistogram(1)->Reset();
-      m_hEfficiency3Samples->getHistogram(0)->SetStats(0);
-      m_hEfficiency3Samples->getHistogram(1)->SetStats(0);
-      m_hEfficiency3Samples->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies (%%), V/N Side for 3 samples %s", runID.Data()));
-      m_hEfficiency3Samples->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies (%%), U/P Side for 3 samples %s", runID.Data()));
+      m_hEfficiency3Samples->reset();
+      m_hEfficiency3Samples->setRunID(runID);
     }
 
     if (m_hEfficiencyErr3Samples) {
-      m_hEfficiencyErr3Samples->getHistogram(0)->Reset();
-      m_hEfficiencyErr3Samples->getHistogram(1)->Reset();
-      m_hEfficiencyErr3Samples->getHistogram(0)->SetStats(0);
-      m_hEfficiencyErr3Samples->getHistogram(1)->SetStats(0);
-      m_hEfficiencyErr3Samples->getHistogram(0)->SetTitle(Form("Summary of SVD efficiencies errors (%%), V/N Side for 3 samples %s",
-                                                               runID.Data()));
-      m_hEfficiencyErr3Samples->getHistogram(1)->SetTitle(Form("Summary of SVD efficiencies errors (%%), U/P Side for 3 samples %s",
-                                                               runID.Data()));
+      m_hEfficiencyErr3Samples->reset();
+      m_hEfficiencyErr3Samples->setRunID(runID);
     }
   }
 
@@ -236,7 +226,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   if (matched_clusU == NULL || found_tracksU == NULL) {
     B2INFO("Histograms needed for Efficiency computation are not found");
-    m_cEfficiencyU->SetFillColor(kRed);
+    m_cEfficiencyU->Draw();
+    m_cEfficiencyU->cd();
+    m_hEfficiency->getHistogram(1)->Draw("text");
+    colorizeCanvas(m_cEfficiencyU, c_StatusDefault);
   } else {
     B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effUstatus = good;
@@ -277,7 +270,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   if (matched_clusV == NULL || found_tracksV == NULL) {
     B2INFO("Histograms needed for Efficiency computation are not found");
-    m_cEfficiencyV->SetFillColor(kRed);
+    m_cEfficiencyV->cd();
+    m_cEfficiencyV->Draw();
+    m_hEfficiency->getHistogram(0)->Draw("text");
+    colorizeCanvas(m_cEfficiencyV, c_StatusDefault);
   } else {
     B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());
     m_effVstatus = good;
@@ -315,31 +311,29 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
 
   // update summary for U side
+  m_cEfficiencyU->Draw();
   m_cEfficiencyU->cd();
-  m_hEfficiency->getHistogram(1)->Draw("text");
+  if (m_hEfficiency)
+    m_hEfficiency->getHistogram(1)->Draw("text");
 
   switch (m_effUstatus) {
     case good: {
-      m_cEfficiencyU->SetFillColor(kGreen);
-      m_cEfficiencyU->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyU, c_StatusGood);
       m_legNormal->Draw("same");
       break;
     }
     case error: {
-      m_cEfficiencyU->SetFillColor(kRed);
-      m_cEfficiencyU->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyU, c_StatusError);
       m_legProblem->Draw("same");
       break;
     }
     case warning: {
-      m_cEfficiencyU->SetFillColor(kYellow);
-      m_cEfficiencyU->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyU, c_StatusWarning);
       m_legWarning->Draw("same");
       break;
     }
     case lowStat: {
-      m_cEfficiencyU->SetFillColor(kGray);
-      m_cEfficiencyU->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyU, c_StatusTooFew);
       m_legEmpty->Draw("same");
       break;
     }
@@ -350,37 +344,34 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
 //   setEpicsPV("EfficiencyUAlarm", alarm);
 
-  m_cEfficiencyU->Draw("text");
   m_cEfficiencyU->Update();
   m_cEfficiencyU->Modified();
   m_cEfficiencyU->Update();
 
   // update summary for V side
   m_cEfficiencyV->cd();
-  m_hEfficiency->getHistogram(0)->Draw("text");
+  m_cEfficiencyV->Draw();
+  if (m_hEfficiency)
+    m_hEfficiency->getHistogram(0)->Draw("text");
 
   switch (m_effVstatus) {
     case good: {
-      m_cEfficiencyV->SetFillColor(kGreen);
-      m_cEfficiencyV->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyV, c_StatusGood);
       m_legNormal->Draw("same");
       break;
     }
     case error: {
-      m_cEfficiencyV->SetFillColor(kRed);
-      m_cEfficiencyV->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyV, c_StatusError);
       m_legProblem->Draw("same");
       break;
     }
     case warning: {
-      m_cEfficiencyV->SetFillColor(kYellow);
-      m_cEfficiencyV->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyV, c_StatusWarning);
       m_legWarning->Draw("same");
       break;
     }
     case lowStat: {
-      m_cEfficiencyV->SetFillColor(kGray);
-      m_cEfficiencyV->SetFrameFillColor(10);
+      colorizeCanvas(m_cEfficiencyV, c_StatusTooFew);
       m_legEmpty->Draw("same");
       break;
     }
@@ -390,20 +381,21 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
   }
 
-  m_cEfficiencyV->Draw();
   m_cEfficiencyV->Update();
   m_cEfficiencyV->Modified();
   m_cEfficiencyV->Update();
 
   m_cEfficiencyErrU->cd();
-  m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
+  if (m_hEfficiencyErr)
+    m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
   m_cEfficiencyErrU->Draw();
   m_cEfficiencyErrU->Update();
   m_cEfficiencyErrU->Modified();
   m_cEfficiencyErrU->Update();
 
   m_cEfficiencyErrV->cd();
-  m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
+  if (m_hEfficiencyErr)
+    m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
   m_cEfficiencyErrV->Draw();
   m_cEfficiencyErrV->Update();
   m_cEfficiencyErrV->Modified();
@@ -422,7 +414,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
     if (matched3_clusU == NULL || found3_tracksU == NULL) {
       B2INFO("Histograms needed for Efficiency computation are not found");
-      m_cEfficiencyU3Samples->SetFillColor(kRed);
+      m_cEfficiencyU3Samples->Draw();
+      m_cEfficiencyU3Samples->cd();
+      m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+      colorizeCanvas(m_cEfficiencyU3Samples, c_StatusDefault);
     } else {
       B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
       m_effUstatus = good;
@@ -464,7 +459,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
     if (matched3_clusV == NULL || found3_tracksV == NULL) {
       B2INFO("Histograms needed for Efficiency computation are not found");
-      m_cEfficiencyV3Samples->SetFillColor(kRed);
+      m_cEfficiencyV3Samples->Draw();
+      m_cEfficiencyV3Samples->cd();
+      m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+      colorizeCanvas(m_cEfficiencyV3Samples, c_StatusDefault);
     } else {
       B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());
       m_effVstatus = good;
@@ -502,31 +500,29 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
 
     // update summary for U side
+    m_cEfficiencyU3Samples->Draw();
     m_cEfficiencyU3Samples->cd();
-    m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+    if (m_hEfficiency3Samples)
+      m_hEfficiency3Samples->getHistogram(1)->Draw("text");
 
     switch (m_effUstatus) {
       case good: {
-        m_cEfficiencyU3Samples->SetFillColor(kGreen);
-        m_cEfficiencyU3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusGood);
         m_legNormal->Draw("same");
         break;
       }
       case error: {
-        m_cEfficiencyU3Samples->SetFillColor(kRed);
-        m_cEfficiencyU3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusError);
         m_legProblem->Draw("same");
         break;
       }
       case warning: {
-        m_cEfficiencyU3Samples->SetFillColor(kYellow);
-        m_cEfficiencyU3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusWarning);
         m_legWarning->Draw("same");
         break;
       }
       case lowStat: {
-        m_cEfficiencyU3Samples->SetFillColor(kGray);
-        m_cEfficiencyU3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusTooFew);
         m_legEmpty->Draw("same");
         break;
       }
@@ -536,37 +532,34 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       }
     }
 
-    m_cEfficiencyU3Samples->Draw("text");
     m_cEfficiencyU3Samples->Update();
     m_cEfficiencyU3Samples->Modified();
     m_cEfficiencyU3Samples->Update();
 
     // update summary for V side
+    m_cEfficiencyV3Samples->Draw();
     m_cEfficiencyV3Samples->cd();
-    m_hEfficiency3Samples->getHistogram(0)->Draw("text");
+    if (m_hEfficiency3Samples)
+      m_hEfficiency3Samples->getHistogram(0)->Draw("text");
 
     switch (m_effVstatus) {
       case good: {
-        m_cEfficiencyV3Samples->SetFillColor(kGreen);
-        m_cEfficiencyV3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusGood);
         m_legNormal->Draw("same");
         break;
       }
       case error: {
-        m_cEfficiencyV3Samples->SetFillColor(kRed);
-        m_cEfficiencyV3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusError);
         m_legProblem->Draw("same");
         break;
       }
       case warning: {
-        m_cEfficiencyV3Samples->SetFillColor(kYellow);
-        m_cEfficiencyV3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusWarning);
         m_legWarning->Draw("same");
         break;
       }
       case lowStat: {
-        m_cEfficiencyV3Samples->SetFillColor(kGray);
-        m_cEfficiencyV3Samples->SetFrameFillColor(10);
+        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusTooFew);
         m_legEmpty->Draw("same");
         break;
       }
@@ -576,20 +569,21 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       }
     }
 
-    m_cEfficiencyV3Samples->Draw();
     m_cEfficiencyV3Samples->Update();
     m_cEfficiencyV3Samples->Modified();
     m_cEfficiencyV3Samples->Update();
 
     m_cEfficiencyErrU3Samples->cd();
-    m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
+    if (m_hEfficiencyErr3Samples)
+      m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
     m_cEfficiencyErrU3Samples->Draw();
     m_cEfficiencyErrU3Samples->Update();
     m_cEfficiencyErrU3Samples->Modified();
     m_cEfficiencyErrU3Samples->Update();
 
     m_cEfficiencyErrV3Samples->cd();
-    m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
+    if (m_hEfficiencyErr3Samples)
+      m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
     m_cEfficiencyErrV3Samples->Draw();
     m_cEfficiencyErrV3Samples->Update();
     m_cEfficiencyErrV3Samples->Modified();

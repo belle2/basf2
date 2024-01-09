@@ -72,7 +72,7 @@ inputBits_expert = [
     'cdc_b2b7',
     'cdc_b2b9',
     'itsfb2b',
-    'ti\t 0',
+    'ti',
     'i2io',
     'i2fo',
     'f2f30',
@@ -367,7 +367,7 @@ class MakePlots(basf2.Module):
     Make validation histograms for trg ecl/cdc/klm
     '''
 
-    def set_descr(self, histogram, description, check):
+    def set_descr_shifter(self, histogram, description, check):
         '''
         Sets description, check and contact to validation histogram.
         :param h validation histogram
@@ -380,7 +380,23 @@ class MakePlots(basf2.Module):
         histogram.GetListOfFunctions().Add(Check)
         contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
         histogram.GetListOfFunctions().Add(contact)
-        Meta = TNamed("MetaOptions", "shifter")
+        Meta = TNamed("MetaOptions", "shifter,pvalue-warn=0.02,pvalue-error=0.01")
+        histogram.GetListOfFunctions().Add(Meta)
+
+    def set_descr_expert(self, histogram, description, check):
+        '''
+        Sets description, check and contact to validation histogram.
+        :param h validation histogram
+        :param Descr description text
+        '''
+
+        descr = TNamed("Description", description)
+        histogram.GetListOfFunctions().Add(descr)
+        Check = TNamed("Check", check)
+        histogram.GetListOfFunctions().Add(Check)
+        contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
+        histogram.GetListOfFunctions().Add(contact)
+        Meta = TNamed("MetaOptions", "expert,pvalue-warn=0.02,pvalue-error=0.01")
         histogram.GetListOfFunctions().Add(Meta)
 
     def set_style(self, histogram, xtitle, ytitle):
@@ -458,7 +474,7 @@ class MakePlots(basf2.Module):
         self.hist_inbit = TH1F("hin", "trigger input bits", n_inbit_test, 0, n_inbit_test)
         self.hist_inbit.GetXaxis().SetRangeUser(0, n_inbit_test)
         self.hist_inbit.GetXaxis().SetLabelSize(0.04)
-        self.set_descr(self.hist_inbit, "trigger input bits for shifters", "")
+        self.set_descr_shifter(self.hist_inbit, "trigger input bits for shifters", "")
         self.set_style(self.hist_inbit, "", "Efficiency")
 
         #: validation histogram
@@ -466,7 +482,7 @@ class MakePlots(basf2.Module):
         self.hist_outbit = TH1F("hout", "trigger output bits", n_oubit_test, 0, n_oubit_test)
         self.hist_outbit.GetXaxis().SetRangeUser(0, n_oubit_test)
         self.hist_outbit.GetXaxis().SetLabelSize(0.04)
-        self.set_descr(self.hist_outbit, "trigger ftdl bits for shifters", "")
+        self.set_descr_shifter(self.hist_outbit, "trigger ftdl bits for shifters", "")
         self.set_style(self.hist_outbit, "", "Efficiency")
 
         for i in range(n_inbit_test):
@@ -478,49 +494,51 @@ class MakePlots(basf2.Module):
 
         #: validation histogram
         self.h_E_ECL = TH1F("h_E_ECL", "ECL cluster energy [50 MeV]", 200, 0, 10)
-        self.set_descr(self.h_E_ECL, "TRG ECL cluster energy", "")
+        self.set_descr_shifter(self.h_E_ECL, "TRG ECL cluster energy", "")
         self.set_style(self.h_E_ECL, "ECL cluster energy (GeV)", "Events/(50 MeV)")
 
         #: validation histogram
         self.h_Esum_ECL = TH1F("h_Esum_ECL", "sum of ECL cluster energy [50 MeV]", 200, 0, 10)
-        self.set_descr(self.h_Esum_ECL, "sum of TRG ECL cluster energy", "")
+        self.set_descr_shifter(self.h_Esum_ECL, "sum of TRG ECL cluster energy", "")
         self.set_style(self.h_Esum_ECL, "sum of ECL cluster energy (GeV)", "Events/(50 MeV)")
 
         #: validation histogram
         self.h_theta_ECL = TH1F("h_theta_ECL", "TRG ECL cluster #theta [1.4 degrees]", 128, 0, 180)
-        self.set_descr(self.h_theta_ECL, "TRG ECL cluster polar angle", "unform in barrel")
+        self.set_descr_shifter(self.h_theta_ECL, "TRG ECL cluster polar angle", "unform in barrel")
         self.set_style(self.h_theta_ECL, "TRG ECL cluster polar angle (degree)", "Events/(1.4 degree)")
 
         #: validation histogram
         self.h_thetaID_ECL = TH1F("h_thetaID_ECL", "ECL cluster TC ID", 610, 0, 610)
-        self.set_descr(self.h_thetaID_ECL, "TRG ECL cluster theta ID", "unform in barrel")
+        self.set_descr_shifter(self.h_thetaID_ECL, "TRG ECL cluster theta ID", "unform in barrel")
         self.set_style(self.h_thetaID_ECL, "ECL cluster TC ID", "Events/(1)")
 
         #: validation histogram
         self.h_phi_ECL = TH1F("h_phi_ECL", "TRG ECL cluster phi [2.0 degrees]", 180, -180, 180)
-        self.set_descr(self.h_phi_ECL, "TRG ECL cluster phi distribution", "distribute unformly")
+        self.set_descr_shifter(self.h_phi_ECL, "TRG ECL cluster phi distribution", "distribute unformly")
         self.set_style(self.h_phi_ECL, "ECL cluster #phi (degree) ", "Events/(2.0 degrees)")
 
         #: validation histogram
         self.h_sector_BKLM = TH1F("h_sector_BKLM", "BKLM TRG hit sector", 10, 0, 10)
-        self.set_descr(self.h_sector_BKLM, "# of BKLM TRG sector", "peak at 0")
+        self.set_descr_shifter(self.h_sector_BKLM, "# of BKLM TRG sector", "peak at 0")
         self.set_style(self.h_sector_BKLM, "# of BKLM TRG sector", "Events/(1)")
 
         #: validation histogram
         self.h_sector_EKLM = TH1F("h_sector_EKLM", "EKLM TRG hit sector", 10, 0, 10)
-        self.set_descr(self.h_sector_EKLM, "# of EKLM TRG sector", "peak at 0")
+        self.set_descr_shifter(self.h_sector_EKLM, "# of EKLM TRG sector", "peak at 0")
         self.set_style(self.h_sector_EKLM, "# of EKLM TRG sector", "Events/(1)")
 
         #: validation histogram for experts
         n_inbit_expert = len(inputBits_expert)
         self.hist_inbit_expert = TH1F("hin_expert", "trigger input bits", n_inbit_expert, 0, n_inbit_expert)
         self.hist_inbit_expert.GetXaxis().SetRangeUser(0, n_inbit_expert)
+        self.set_descr_expert(self.hist_inbit_expert, "# of EKLM TRG sector", "peak at 0")
         self.set_style(self.hist_inbit_expert, "", "Efficiency")
 
         #: validation histogram for experts
         n_oubit_expert = len(outputBits_expert)
         self.hist_outbit_expert = TH1F("hout_expert", "trigger output bits", n_oubit_expert, 0, n_oubit_expert)
         self.hist_outbit_expert.GetXaxis().SetRangeUser(0, n_oubit_expert)
+        self.set_descr_expert(self.hist_outbit_expert, "# of EKLM TRG sector", "peak at 0")
         self.set_style(self.hist_outbit_expert, "", "Efficiency")
 
         for i in range(n_inbit_expert):
@@ -542,8 +560,8 @@ class MakePlots(basf2.Module):
         tree.Draw(f"({trk2d_omega} + 0.00449)/sqrt({mc_px}*{mc_px} + {mc_py}*{mc_py}) >> d_w_2",
                   "MCParticles.m_pdg>0 && " + mc)
         self.d_w.Add(self.d_w_2)
-        self.set_descr(self.d_w, "Comparison on w (=0.00449/pt) of a track between CDC 2D finder output and MC.",
-                                 "A clear peak at 0 with tail.")
+        self.set_descr_shifter(self.d_w, "Comparison on w (=0.00449/pt) of a track between CDC 2D finder output and MC.",
+                               "A clear peak at 0 with tail.")
         self.set_style(self.d_w, "#Deltaw", "Events/(0.08)")
 
         #: validation histogram
@@ -564,29 +582,29 @@ class MakePlots(basf2.Module):
 
         self.d_phi.Add(self.d_phi_2)
         self.d_phi.Add(self.d_phi_3)
-        self.set_descr(self.d_phi, "Comparison on phi_i of a track between CDC 2D finder output and MC.",
-                                   "A Gaussian peak at 0.")
+        self.set_descr_shifter(self.d_phi, "Comparison on phi_i of a track between CDC 2D finder output and MC.",
+                               "A Gaussian peak at 0.")
         self.set_style(self.d_phi, "#Delta#phi [rad]", "Events/(0.02 rad)")
 
         #: validation histogram
         self.d_z0_3d = TH1F("d_z0_3d", "#Deltaz0 of CDC 3D fitter", 60, -30, 30)
         tree.Draw("TRGCDC3DFitterTracks.m_z0-MCParticles.m_productionVertex_z>>d_z0_3d", mc)
-        self.set_descr(self.d_z0_3d, "Comparison on z0 of a track between CDC 2D fitter output and MC.",
-                                     "A Gaussian peak at 0 with small tail.")
+        self.set_descr_shifter(self.d_z0_3d, "Comparison on z0 of a track between CDC 2D fitter output and MC.",
+                               "A Gaussian peak at 0 with small tail.")
         self.set_style(self.d_z0_3d, "#Deltaz0 [cm]", "Events/(1 cm)")
 
         #: validation histogram
         self.d_z0_nn = TH1F("d_z0_nn", "#Deltaz0 of CDC Neuro", 60, -30, 30)
         tree.Draw("TRGCDCNeuroTracks.m_z0-MCParticles.m_productionVertex_z>>d_z0_nn", mc)
-        self.set_descr(self.d_z0_nn, "Comparison on z0 of a track between CDC Neuro output and MC.",
-                                     "A Gaussian peak at 0 with small tail.")
+        self.set_descr_shifter(self.d_z0_nn, "Comparison on z0 of a track between CDC Neuro output and MC.",
+                               "A Gaussian peak at 0 with small tail.")
         self.set_style(self.d_z0_nn, "#Deltaz0 [cm]", "Events/(1 cm)")
 
         #: validation histogram
         self.d_E_ECL = TH1F("d_E_ECL", "#DeltaE of ECL clustering", 100, -6, 6)
         tree.Draw("TRGECLClusters.m_edep-MCParticles.m_energy>>d_E_ECL", mc)
-        self.set_descr(self.d_E_ECL, "Comparison on deposit energy between ECL cluster output and MC.",
-                                     "A peak around -0.5 ~ 0 with a tail toward -6.")
+        self.set_descr_shifter(self.d_E_ECL, "Comparison on deposit energy between ECL cluster output and MC.",
+                               "A peak around -0.5 ~ 0 with a tail toward -6.")
         self.set_style(self.d_E_ECL, "#DeltaE [GeV]", "Events/(0.12 GeV)")
 
     def beginRun(self):
@@ -654,39 +672,76 @@ class MakePlots(basf2.Module):
 
     def terminate(self):
 
-        bits = ['ty_0', 'ehigh', 'clst_0', 'klm_0']
-        for part in ["e", "mu"]:
-            h_gen_p = self.tfile.Get(f"{part}_all/p")
-            h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
-            h_gen_theta = self.tfile.Get(f"{part}_all/theta")
-            h_gen_phi = self.tfile.Get(f"{part}_all/phi")
+        bits = ['ty_0', 'ehigh', 'clst_0']
+        part = 'e'
+        h_gen_p = self.tfile.Get(f"{part}_all/p")
+        h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
+        h_gen_theta = self.tfile.Get(f"{part}_all/theta")
+        h_gen_phi = self.tfile.Get(f"{part}_all/phi")
 
-            for bit in bits:
-                h_p = self.tfile.Get(f"{part}_{bit}/p")
-                h_E = self.tfile.Get(f"{part}_{bit}/clusterE")
-                h_theta = self.tfile.Get(f"{part}_{bit}/theta")
-                h_phi = self.tfile.Get(f"{part}_{bit}/phi")
+        for bit in bits:
+            h_p = self.tfile.Get(f"{part}_{bit}/p")
+            h_E = self.tfile.Get(f"{part}_{bit}/clusterE")
+            h_theta = self.tfile.Get(f"{part}_{bit}/theta")
+            h_phi = self.tfile.Get(f"{part}_{bit}/phi")
 
-                h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
-                self.set_style(h_eff_p, "Momentum", "Efficiency")
-                if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
-                    self.set_descr(h_eff_p, "Momentum dependent efficiency for shifters", "")
+            h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
+            self.set_style(h_eff_p, "Momentum", "Efficiency")
+            if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
+                self.set_descr_shifter(h_eff_p, "Momentum dependent efficiency for shifters", "")
+            else:
+                self.set_descr_expert(h_eff_p, "Momentum dependent efficiency for shifters", "")
 
-                h_eff_E = self.get_relative(h_E, h_gen_E, 'E', part, bit)
-                self.set_style(h_eff_E, "Energy", "Efficiency")
-                if (bit == 'ehigh' or bit == 'clst_0') and part == 'e':
-                    self.set_descr(h_eff_E, "Energy dependent efficiency for shifters", "")
+            h_eff_E = self.get_relative(h_E, h_gen_E, 'E', part, bit)
+            self.set_style(h_eff_E, "Energy", "Efficiency")
+            if (bit == 'ehigh' or bit == 'clst_0') and part == 'e':
+                self.set_descr_shifter(h_eff_E, "Energy dependent efficiency for shifters", "")
+            else:
+                self.set_descr_expert(h_eff_E, "Energy dependent efficiency for shifters", "")
 
-                h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
-                self.set_style(h_eff_theta, "Polar angle", "Efficiency")
+            h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
+            self.set_style(h_eff_theta, "Polar angle", "Efficiency")
+            self.set_descr_expert(h_eff_theta, "polar angle dependent efficiency for shifters", "")
 
-                h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
-                self.set_style(h_eff_phi, "phi angle", "Efficiency")
+            h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
+            self.set_style(h_eff_phi, "phi angle", "Efficiency")
+            self.set_descr_expert(h_eff_phi, "azimuth angle dependent efficiency for shifters", "")
 
-                h_eff_p.Write()
-                h_eff_E.Write()
-                h_eff_theta.Write()
-                h_eff_phi.Write()
+            h_eff_p.Write()
+            h_eff_E.Write()
+            h_eff_theta.Write()
+            h_eff_phi.Write()
+
+        bits = ['ty_0', 'klm_0']
+        part = "mu"
+        h_gen_p = self.tfile.Get(f"{part}_all/p")
+        h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
+        h_gen_theta = self.tfile.Get(f"{part}_all/theta")
+        h_gen_phi = self.tfile.Get(f"{part}_all/phi")
+
+        for bit in bits:
+            h_p = self.tfile.Get(f"{part}_{bit}/p")
+            h_theta = self.tfile.Get(f"{part}_{bit}/theta")
+            h_phi = self.tfile.Get(f"{part}_{bit}/phi")
+
+            h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
+            self.set_style(h_eff_p, "Momentum", "Efficiency")
+            if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
+                self.set_descr_shifter(h_eff_p, "Momentum dependent efficiency for shifters", "")
+            else:
+                self.set_descr_expert(h_eff_p, "Momentum dependent efficiency for experts", "")
+
+            h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
+            self.set_style(h_eff_theta, "Polar angle", "Efficiency")
+            self.set_descr_expert(h_eff_theta, "polar angle dependent efficiency for experts", "")
+
+            h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
+            self.set_style(h_eff_phi, "phi angle", "Efficiency")
+            self.set_descr_expert(h_eff_phi, "azimuth angle dependent efficiency for experts", "")
+
+            h_eff_p.Write()
+            h_eff_theta.Write()
+            h_eff_phi.Write()
 
         self.hist_inbit.Scale(1./self.Nevent)
         self.hist_outbit.Scale(1.0/self.Nevent)
@@ -742,8 +797,8 @@ for bit in bits:
     ma.cutAndCopyList(f'e+:{bit}', 'e+:true', cut=inb_cut, path=mypath)
 
     ma.variablesToHistogram(decayString=f'mu+:{bit}',
-                            variables=[('p', 40, 1.0, 3.0),
-                                       ('clusterE', 40, 1.0, 3.0),
+                            variables=[('p', 50, 0.5, 3.0),
+                                       ('clusterE', 50, 0.5, 3.0),
                                        ('theta', 40, 0.5, 2.5),
                                        ('phi', 40, -3.141593, 3.141593)],
                             filename='TRGValidation.root',
@@ -752,8 +807,8 @@ for bit in bits:
                             )
 
     ma.variablesToHistogram(decayString=f'e+:{bit}',
-                            variables=[('p', 40, 1.0, 3.0),
-                                       ('clusterE', 40, 1.0, 3.0),
+                            variables=[('p', 50, 0.5, 3.0),
+                                       ('clusterE', 50, 0.5, 3.0),
                                        ('theta', 40, 0.5, 2.5),
                                        ('phi', 40, -3.141593, 3.141593)],
                             filename='TRGValidation.root',
@@ -763,8 +818,8 @@ for bit in bits:
 
 
 ma.variablesToHistogram(decayString='mu+:true',
-                        variables=[('p', 40, 1.0, 3.0),
-                                   ('clusterE', 40, 1.0, 3.0),
+                        variables=[('p', 50, 0.5, 3.0),
+                                   ('clusterE', 50, 0.5, 3.0),
                                    ('theta', 40, 0.5, 2.5),
                                    ('phi', 40, -3.141593, 3.141593)],
                         filename='TRGValidation.root',
@@ -773,8 +828,8 @@ ma.variablesToHistogram(decayString='mu+:true',
                         )
 
 ma.variablesToHistogram(decayString='e+:true',
-                        variables=[('p', 40, 1.0, 3.0),
-                                   ('clusterE', 40, 1.0, 3.0),
+                        variables=[('p', 50, 0.5, 3.0),
+                                   ('clusterE', 50, 0.5, 3.0),
                                    ('theta', 40, 0.5, 2.5),
                                    ('phi', 40, -3.141593, 3.141593)],
                         filename='TRGValidation.root',

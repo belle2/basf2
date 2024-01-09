@@ -979,38 +979,32 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 class DstToD0Pi_D0ToGeneric(BaseSkim):
     """
     **Decay Modes**:
-        * on signal side
-          :math:`D^{*+}\\to \\pi^+ D^{0}`
-        * on tag side
-          :math:`D^{*+}\\to D^0 \\pi^+, D^+ \\pi^0`
-          :math:`D^{*0}\\to D^0 \\pi^0, D^0 \\gamma`
+        * on signal side::math:`D^{*+}\\to \\pi^+ D^{0}`
+        * the :math:`D_{tag}^{*}` decay channels:
+          :math:`D^{*+}\\to D^0 \\pi^+, D^+ \\pi^0`,
+          :math:`D^{*0}\\to D^0 \\pi^0, D^0 \\gamma`,
           :math:`D_s^{*+}\\to D_s^{+} \\gamma`
-          ``15 hadronic channels including charged pions, kaons, pi0, Kshort for D0 reconstruction``
-          ``11 hadronic channels including charged pions, kaons, pi0, Kshort for D+ reconstruction``
-          ``10 hadronic channels including charged pions, kaons, pi0, Kshort for D_s+ reconstruction``
-          ``19 hadronic channels including charged pions, kaons, pi0, Kshort for Lambda_c+ reconstruction``
+        * the :math`D_{tag}` decay channels:
+          15 hadronic channels including :math:`\\pi^{+}, K^{+}, \\pi^{0}, K_{S}^{0}` for :math:`D^{0}` reconstruction,
+          11 hadronic channels for :math:`D^{+}` reconstruction,
+          10 hadronic channels for :math:`D_{s}^{+}` reconstruction and
+          19 hadronic channels for :math:`\\Lambda_{c}^{+}` reconstruction
 
     **Selection Criteria**:
-        * Cut on charged pions and kaons:
-          ``track cuts: charm_skim_std_charged pion and kaon with PIDNN > 0.1``
-        * Cut on proton:
-          ``abs(dr) < 1.0 and abs(dz) < 3.0 and protonID > 0.1``
-        * Cut on photon:
-          ``E > 0.05``
-        * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma`:
-          ``0.115 < M(pi0) < 0.160``
-        * Cut on tag side charm particles(D0/D+/D_s+/Lambda_c+):
-          ``1.72 < M(D0) < 2.02 and p*(D0) > 2.0``
-          ``1.72 < M(D+) < 2.02 and p*(D+) > 2.0``
-          ``1.82 < M(D_s+) < 2.12 and p*(D_s+) > 2.0``
-          ``2.18 < M(Lambda_c+) < 2.38 and p*(Lambda_c+) > 2.0``
-        * Cut on tag side :math:`D^{*0}, D^{*+}, D_{s}^{*+}`
-          ``0.135 < massDifference(0) < 0.155`` on decay with slow pion
-          ``0.130 < massDifference(0) < 0.160`` on decay with pi0
-          ``0.120 < massDifference(0) < 0.165`` on decay with gamma
-        * Cut on signal side :math:`D^{*+}, D^{0}`
-          ``1.81 < M(D*+) < 2.21`` on :math:`D^{*+}`
-          ``0.115 < (M(D*+)-M(D0)) < 0.220 and p*(D0) > 2.0`` on :math:`D^{0}`
+        * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with PIDNN > 0.1
+        * Cut on :math:`p^{+}` : abs(dr) < 1.0 and abs(dz) < 3.0 and protonID > 0.1
+        * Cut on :math:`\\gamma` : E > 0.05
+        * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma` : 0.115 < M < 0.160
+        * Cut on tag side :math:`D^{0}` : 1.72 < M < 2.02 and p* > 2.0
+        * Cut on tag side :math:`D^{+}` : 1.72 < M < 2.02 and p* > 2.0
+        * Cut on tag side :math:`D_{s}^{+}` :  1.82 < M < 2.12 and p* > 2.0
+        * Cut on tag side :math:`\\Lambda_{c}^{+}` : 2.18 < M < 2.38 and p* > 2.0
+        * Cut on tag side :math:`D^{*0}, D^{*+}, D_{s}^{*+}` :
+          0.135 < massDifference(0) < 0.155 on decay with :math:`\\pi_{s}^{+}`,
+          0.130 < massDifference(0) < 0.160 on decay with :math:`\\pi^{0}` and
+          0.120 < massDifference(0) < 0.165 on decay with :math:`\\gamma`
+        * Cut on signal side :math:`D^{*+}, D^{0}` :
+          1.81 < M < 2.21 on :math:`D^{*+}` and 0.115 < :math:`M_{D^{*}}` - :math:`M_{D}` < 0.220 and p* > 2.0 on :math:`D^{0}`
     """
     vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
     vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')

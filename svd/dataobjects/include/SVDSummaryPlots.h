@@ -197,7 +197,7 @@ namespace Belle2 {
 
     TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
 
-    TH2F* m_defaultHistogram; /**< default histograms*/
+    TH2F* m_defaultHistogram = nullptr; /**< default histograms*/
 
     TString m_Title[2];    /**< Base title */
 

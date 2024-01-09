@@ -16,7 +16,7 @@ from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
                                             loadStdSkimHighEffEta, loadStdSkimHighEffKstar0,
                                             loadStdSkimHighEffRho0, loadStdSkimHighEffOmega,
-                                            loadStdSkimHighEffF_0)
+                                            loadStdSkimHighEffF_0, loadStdAllRho0)
 
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
@@ -107,12 +107,14 @@ class TDCPV_qqs(BaseSkim):
         stdK("all", path=path)
         stdPi("all", path=path)
         stdPhotons("all", path=path)
+        stdPhotons("tight", path=path)
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
         loadStdSkimPi0(path=path)
         loadStdSkimHighEffPi0(path=path)
         stdKshorts(path=path)
         stdPi0s("eff40_May2020", path=path)
+        loadStdAllRho0(path=path)
 
         loadStdSkimHighEffPhi(path=path)
         loadStdSkimHighEffEta(path=path)
@@ -268,6 +270,7 @@ class TDCPV_ccs(BaseSkim):
         stdMu("all", path=path)
         stdPi("all", path=path)
         stdPhotons("all", path=path)
+        stdPhotons("tight", path=path)
 
         loadStdSkimHighEffTracks('pi', path=path)
         loadStdSkimHighEffTracks('K', path=path)
@@ -332,7 +335,8 @@ class TDCPV_ccs(BaseSkim):
 
         b0toJPsiKL_List = []
         for chID, channel in enumerate(bd_ccs_KL_Channels):
-            ma.reconstructMissingKlongDecayExpert('B0:TDCPV_JPsiKL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
+            ma.reconstructMissingKlongDecayExpert('B0:TDCPV_JPsiKL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path,
+                                                  recoList=f'_reco{chID}')
             b0toJPsiKL_List.append('B0:TDCPV_JPsiKL' + str(chID))
 
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
@@ -373,8 +377,6 @@ class TDCPV_ccs(BaseSkim):
         ma.variablesToHistogram('B0:jpsiee', variableshisto, filename=filename, path=path, directory="jpsiee")
         ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
 
-        ma.reconstructMissingKlongDecayExpert('B0:KL_jpsimumu -> J/psi:mumu K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
-        ma.reconstructMissingKlongDecayExpert('B0:KL_jpsiee -> J/psi:ee   K_L0:all_klmecl', 'abs(deltaE) < 0.3', path=path)
         variableshisto = [('deltaE', 100, -0.020, 0.180)]
-        ma.variablesToHistogram('B0:KL_jpsimumu', variableshisto, filename=filename, path=path, directory="KLjpsimumu")
-        ma.variablesToHistogram('B0:KL_jpsiee',   variableshisto, filename=filename, path=path, directory="KLjpsiee")
+        ma.variablesToHistogram('B0:TDCPV_JPsiKL0', variableshisto, filename=filename, path=path, directory="KLjpsimumu")
+        ma.variablesToHistogram('B0:TDCPV_JPsiKL1', variableshisto, filename=filename, path=path, directory="KLjpsiee")

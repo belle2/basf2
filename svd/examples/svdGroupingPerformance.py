@@ -694,7 +694,8 @@ else:
 trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
-    append_full_grid_cdc_eventt0=True)
+    append_full_grid_cdc_eventt0=True,
+    skip_full_grid_cdc_eventt0_if_svd_time_present=False)
 
 main.add_module(SVDGroupingPerformance())
 

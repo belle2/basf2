@@ -451,7 +451,7 @@ class ConditionsDB:
 
         return req.json()
 
-    def get_all_iovs(self, globalTag, exp=None, run=None, message=None, run_range=None):
+    def get_all_iovs(self, globalTag, exp=None, run=None, message=None, overlap_run_range=None, in_run_range=None):
         """
         Return list of all payloads in the given globaltag where each element is
         a `PayloadInformation` instance
@@ -465,8 +465,10 @@ class ConditionsDB:
             message (str): additional message to show when downloading the
                 payload information. Will be directly appended to
                 "Obtaining lists of iovs for globaltag {globalTag}"
-            run_range (tuple): if given limit the list of payloads to the ones
+            overlap_run_range (tuple): if given limit the list of payloads to the ones
                 overlapping with the given run range
+            in_run_range (tuple): if given limit the list of payloads to the ones
+                fully contained in the given run range
 
         Warning:
             Both, exp and run, need to be given at the same time. Just supplying
@@ -475,9 +477,12 @@ class ConditionsDB:
         globalTag = encode_name(globalTag)
         if message is None:
             message = ""
-        if run_range is not None:
-            message += f" [valid in {tuple(run_range)}]"
-            run_range = IntervalOfValidity(run_range)
+        if overlap_run_range is not None:
+            message += f" [valid in {tuple(overlap_run_range)}]"
+            overlap_run_range = IntervalOfValidity(overlap_run_range)
+        if in_run_range is not None:
+            message += f" [fully contained in {tuple(in_run_range)}]"
+            in_run_range = IntervalOfValidity(in_run_range)
         if exp is not None:
             msg = f"Obtaining list of iovs for globaltag {globalTag}, exp={exp}, run={run}{message}"
             req = self.request("GET", "/iovPayloads", msg, params={'gtName': globalTag, 'expNumber': exp, 'runNumber': run})
@@ -493,10 +498,14 @@ class ConditionsDB:
                 iovs = item['payloadIovs']
 
             for iov in iovs:
-                if run_range is not None:
+                if overlap_run_range is not None:
                     if IntervalOfValidity(
                             iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd']
-                    ).intersect(run_range) is None:
+                    ).intersect(overlap_run_range) is None:
+                        continue
+                if in_run_range is not None:
+                    iov_ = IntervalOfValidity(iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd'])
+                    if not iov_.intersect(in_run_range) == iov_:
                         continue
                 all_iovs.append(PayloadInformation.from_json(payload, iov))
 
@@ -657,6 +666,33 @@ class ConditionsDB:
             return None
 
         return req.json()["payloadIovId"]
+
+    def delete_iov(self, iovId):
+        """Delete an iov
+
+        Args:
+            iovId (int): id of the iov to be deleted
+        """
+        try:
+            self.request("DELETE", f"/payloadIov/{iovId}")
+        except ConditionsDB.RequestError as e:
+            B2ERROR(f"Could not delete IOV: {e}")
+
+    def modify_iov(self, iovId, firstExp, firstRun, finalExp, finalRun):
+        """Modify the validity range of a given iov
+
+        Args:
+            iovId (int): id of the iov to be modified
+            firstExp (int): first experiment for which this iov is valid
+            firstRun (int): first run for which this iov is valid
+            finalExp (int): final experiment for which this iov is valid
+            finalRun (int): final run for which this iov is valid
+        """
+        try:
+            querystring = {"expStart": str(firstExp), "runStart": str(firstRun), "expEnd": str(finalExp), "runEnd": str(finalRun)}
+            self.request("PUT", f"/payloadIov/{iovId}", params=querystring)
+        except ConditionsDB.RequestError as e:
+            B2ERROR(f"Could not modify IOV: {e}")
 
     def get_iovs(self, globalTagName, payloadName=None):
         """Return existing iovs for a given tag name. It returns a dictionary

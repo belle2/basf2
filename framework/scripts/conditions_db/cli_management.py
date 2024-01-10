@@ -7,6 +7,7 @@
 ##########################################################################
 import functools
 import time
+from fnmatch import fnmatch
 from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 from basf2 import B2INFO, B2ERROR, B2WARNING, LogPythonInterface  # noqa
@@ -15,6 +16,7 @@ from terminal_utils import Pager
 from conditions_db import set_cdb_authentication_token
 from conditions_db.iov import IoVSet, IntervalOfValidity
 from conditions_db.runningupdate import RunningTagUpdater, RunningTagUpdaterError, RunningTagUpdateMode
+from conditions_db.cli_utils import ItemFilter
 
 
 def get_all_iovsets(existing_payloads, run_range=None):
@@ -462,3 +464,278 @@ def command_tag_runningupdate(args, db=None):
     except RunningTagUpdaterError as e:
         B2ERROR(e, **e.extra_vars)
         return 1
+
+
+def command_iovs(args, db=None):
+    """
+    Modify, delete or copy iovs from a globaltags.
+
+    This command allows to modify, delete or copy iovs of a globaltag. If no other command is given do nothing.
+    """
+
+    # no arguments to define, just a group command
+    pass
+
+
+def command_iovs_delete(args, db=None):
+    """
+    Delete iovs from a globaltag
+
+    This command allows to delete the iovs from a globaltags, optionally limiting the iovs to be deleted to those
+    of a specific payload, revision, IoVid or run range.
+    """
+    iovfilter = ItemFilter(args)
+    if db is None:
+        args.add_argument("tag", metavar="TAGNAME", help="globaltag for which the the IoVs should be deleted")
+        args.add_argument("--iov-id", default=None, type=int,
+                          help="IoVid of the iov to be considered")
+        args.add_argument(
+            "--iov-pattern",
+            default=None,
+            help="whitespace-separated string with pattern of the iov to be replaced. "
+            " Use * to mark the fields that shold be ignored. Valid patterns are '0 0 -1 -1'"
+            " (a very specific IoV),  '0 * -1 -1' (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
+            ", '* * 3 45' (any Iov ending in exp 3, run 45, regardless from where it starts).")
+        args.add_argument("--overlap-run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be considered"
+                          " Only iovs overlapping, even partially, with this range will be considered.")
+        args.add_argument("--in-run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be considered"
+                          " Only iovs fully contained in this range will be considered.")
+        args.add_argument("--revision", metavar='revision', type=int, help="Specify the revision of the payload to be removed")
+        args.add_argument("--dry-run", help="Don't do anything, just print what would be done",
+                          action="store_true", default=False)
+        args.add_argument("-j", type=int, default=10, dest="nprocess",
+                          help="Number of concurrent threads to use.")
+        iovfilter.add_arguments("payloads")
+        return
+
+    # check arguments
+    if not iovfilter.check_arguments():
+        return 1
+
+    all_iovs = db.get_all_iovs(
+        args.tag,
+        overlap_run_range=args.overlap_run_range,
+        in_run_range=args.in_run_range,
+        message=str(iovfilter))
+    iovs_to_delete = []
+    for iov in all_iovs:
+        if args.iov_id and iov.iov_id != args.iov_id:
+            continue
+        if not iovfilter.check(iov.name):
+            continue
+        if args.iov_pattern and not fnmatch("{} {} {} {}".format(*iov.iov), "{} {} {} {}".format(*args.iov_pattern.split())):
+            continue
+        if args.revision and iov.revision != args.revision:
+            continue
+        iovs_to_delete.append(iov)
+
+    table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_delete]
+    table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+    columns = [9, -40, 6, 6, 6, 6, 6]
+
+    if len(all_iovs) == len(iovs_to_delete) and args.overlap_run_range is None and args.in_run_range is None:
+        B2WARNING(f"All the iovs in the globaltag {args.tag} will be deleted!")
+        gt_check = input('Please enter the global tag name again to confirm this action: ')
+        if gt_check != args.tag:
+            B2ERROR('global tag names do not match.')
+            return 1
+
+    B2INFO("Deleting the following iovs")
+    pretty_print_table(table, columns)
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+        try:
+            with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+                start = time.monotonic()
+                for iov_num, _ in enumerate(pool.map(db.delete_iov, [i.iov_id for i in iovs_to_delete]), 1):
+                    eta = (time.monotonic() - start) / iov_num * (len(iovs_to_delete) - iov_num)
+                    B2INFO(f"{iov_num}/{len(iovs_to_delete)} iovs deleted, ETA: {eta:.1f} seconds")
+        except RuntimeError:
+            B2ERROR("Not all iovs could be deleted. This could be a server/network problem "
+                    "or the destination globaltag was not writeable.")
+            return 1
+
+    return 0
+
+
+def command_iovs_copy(args, db=None):
+    """
+    Delete iovs from a globaltag
+
+    This command allows to delete the iovs from a globaltags, optionally limiting the iovs to be deleted to those
+    of a specific payload, revision, IoV id or run range.
+    """
+    iovfilter = ItemFilter(args)
+    if db is None:
+        args.add_argument("tag", metavar="INPUT_TAGNAME", help="globaltag for which the the IoVs should be copied")
+        args.add_argument("output", metavar="OUTPUT_TAGNAME", help="globaltag to which the the IoVs should be copied")
+        args.add_argument("--iov-id", default=None, type=int,
+                          help="IoVid of the iov to be considered")
+        args.add_argument(
+            "--iov-pattern",
+            default=None,
+            help="whitespace-separated string with pattern of the iov to be replaced. Use * to mark the fields that shold be"
+            " ignored. Valid patterns are '0 0 -1 -1' (a very specific IoV),  '0 * -1 -1' "
+            "(any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1),"
+            " '* * 3 45' (any Iov ending in exp 3, run 45, regardless from where it starts).")
+        args.add_argument("--overlap-run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be considered"
+                          " Only iovs overlapping, even partially, with this range will be considered.")
+        args.add_argument("--in-run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be considered"
+                          " Only iovs fully contained in this range will be considered.")
+        args.add_argument("--revision", metavar='revision', type=int, help="Specify the revision of the payload to be removed")
+        args.add_argument("--dry-run", help="Don't do anything, just print what would be done",
+                          action="store_true", default=False)
+        args.add_argument("-j", type=int, default=10, dest="nprocess",
+                          help="Number of concurrent threads to use.")
+        iovfilter.add_arguments("payloads")
+        return
+
+    # check arguments
+    if not iovfilter.check_arguments():
+        return 1
+
+    all_iovs = db.get_all_iovs(
+        args.tag,
+        overlap_run_range=args.overlap_run_range,
+        in_run_range=args.in_run_range,
+        message=str(iovfilter))
+    iovs_to_copy = []
+    for iov in all_iovs:
+        if args.iov_id and iov.iov_id != args.iov_id:
+            continue
+        if not iovfilter.check(iov.name):
+            continue
+        if args.iov_pattern and not fnmatch("{} {} {} {}".format(*iov.iov), "{} {} {} {}".format(*args.iov_pattern.split())):
+            continue
+        if args.revision and iov.revision != args.revision:
+            continue
+        iovs_to_copy.append(iov)
+
+    table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_copy]
+    table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+    columns = [9, -40, 6, 6, 6, 6, 6]
+
+    # make sure output tag exists
+    output_id = db.get_globalTagInfo(args.output)
+    if output_id is None:
+        B2ERROR("Output globaltag doesn't exist. Please create it first with a proper description")
+        return False
+
+    B2INFO(f"Copying the following iovs to {args.output}")
+    pretty_print_table(table, columns)
+
+    output_id = output_id["globalTagId"]
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+
+        try:
+            with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+                start = time.monotonic()
+                for iov_num, _ in enumerate(pool.map(lambda args: db.create_iov(output_id, *args),
+                                            [(i.payload_id, *i.iov) for i in iovs_to_copy]), 1):
+                    eta = (time.monotonic() - start) / iov_num * (len(iovs_to_copy) - iov_num)
+                    B2INFO(f"{iov_num}/{len(iovs_to_copy)} iovs copied, ETA: {eta:.1f} seconds")
+        except RuntimeError:
+            B2ERROR("Not all iovs could be copied. This could be a server/network problem "
+                    "or the destination globaltag was not writeable.")
+            return 1
+
+    return 0
+
+
+def command_iovs_modify(args, db=None):
+    """
+    Delete iovs from a globaltag
+
+    This command allows to delete the iovs from a globaltags, optionally limiting the iovs to be deleted to those
+    of a specific payload, revision, IoV id or run range.
+    """
+    iovfilter = ItemFilter(args)
+    if db is None:
+        args.add_argument("tag", metavar="INPUT_TAGNAME", help="globaltag for which the the IoVs should be modified")
+        args.add_argument("first_exp", metavar="FIRST_EXP", type=int,
+                          help="First experiment that will be set to all considered iovs.")
+        args.add_argument("first_run", metavar="FIRST_RUN", type=int, help="First run that will be set to all considered iovs.")
+        args.add_argument("last_exp", metavar="LAST_EXP", type=int, help="Last experiment that will be set to all considered iovs.")
+        args.add_argument("last_run", metavar="LAST_RUN", type=int, help="Last run that will be set to all considered iovs.")
+        args.add_argument("--iov-id", default=None, type=int,
+                          help="IoVid of the iov to be considered")
+        args.add_argument(
+            "--iov-pattern",
+            default=None,
+            help="whitespace-separated string with pattern of the iov to be replaced. Use * to mark the fields that "
+            "shold be ignored. Valid patterns are '0 0 -1 -1' (a very specific IoV),  '0 * -1 -1' "
+            "(any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1), '* * 3 45' "
+            "(any Iov ending in exp 3, run 45, regardless from where it starts).")
+        args.add_argument("--overlap-run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be considered"
+                          " Only iovs overlapping, even partially, with this range will be considered.")
+        args.add_argument("--in-run-range", nargs=4, default=None, type=int,
+                          metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
+                          help="Can be four numbers to limit the run range to be considered"
+                          " Only iovs fully contained in this range will be considered.")
+        args.add_argument("--revision", metavar='revision', type=int, help="Specify the revision of the payload to be removed")
+        args.add_argument("--dry-run", help="Don't do anything, just print what would be done",
+                          action="store_true", default=False)
+        args.add_argument("-j", type=int, default=10, dest="nprocess",
+                          help="Number of concurrent threads to use.")
+        iovfilter.add_arguments("payloads")
+        return
+
+    # check arguments
+    if not iovfilter.check_arguments():
+        return 1
+
+    all_iovs = db.get_all_iovs(
+        args.tag,
+        overlap_run_range=args.overlap_run_range,
+        in_run_range=args.in_run_range,
+        message=str(iovfilter))
+    iovs_to_modify = []
+    for iov in all_iovs:
+        if args.iov_id and iov.iov_id != args.iov_id:
+            continue
+        if not iovfilter.check(iov.name):
+            continue
+        if args.iov_pattern and not fnmatch("{} {} {} {}".format(*iov.iov), "{} {} {} {}".format(*args.iov_pattern.split())):
+            continue
+        if args.revision and iov.revision != args.revision:
+            continue
+        iovs_to_modify.append(iov)
+
+    table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_modify]
+    table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
+    columns = [9, -40, 6, 6, 6, 6, 6]
+
+    B2INFO(f"Setting to  the following iovs to {args.first_exp} {args.first_run} {args.last_exp} {args.last_run}")
+    pretty_print_table(table, columns)
+
+    if not args.dry_run:
+        set_cdb_authentication_token(db, args.auth_token)
+
+        try:
+            with ThreadPoolExecutor(max_workers=args.nprocess) as pool:
+                start = time.monotonic()
+                for iov_num, _ in enumerate(pool.map(
+                            lambda args: db.modify_iov(*args),
+                            [(i.iov_id, args.first_exp, args.first_run, args.last_exp, args.last_run) for i in iovs_to_modify]
+                        ), 1):
+                    eta = (time.monotonic() - start) / iov_num * (len(iovs_to_modify) - iov_num)
+                    B2INFO(f"{iov_num}/{len(iovs_to_modify)} iovs modified, ETA: {eta:.1f} seconds")
+        except RuntimeError:
+            B2ERROR("Not all iovs could be modified. This could be a server/network problem "
+                    "or the destination globaltag was not writeable.")
+            return 1
+
+    return 0

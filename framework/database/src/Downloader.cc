@@ -261,7 +261,7 @@ namespace Belle2::Conditions {
     //make sure we have an active curl session ...
     auto session = ensureSession();
     B2DEBUG(37, "Download started ..." << LogVar("url", url));
-    // we might need to try a few times in case of HTTP>=500
+    // we might need to try a few times in case of HTTP error >= 300
     for (unsigned int retry{1};; ++retry) {
       //rewind the stream to the beginning
       buffer.clear();
@@ -292,8 +292,7 @@ namespace Belle2::Conditions {
             // while if 300 or above we retry
             long responseCode{0};
             curl_easy_getinfo(m_session->curl, CURLINFO_RESPONSE_CODE, &responseCode);
-            if (responseCode == 404 and silentOnMissing) return false;
-            if (responseCode >= 300) {
+            if (responseCode >= 300 and responseCode != 404) {
               // use exponential backoff but don't restrict to exact slots like
               // Ethernet, just use a random wait time between 1s and maxDelay =
               // 2^(retry)-1 * backoffFactor
@@ -314,7 +313,7 @@ namespace Belle2::Conditions {
               std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
               continue;
             }
-
+            if (responseCode == 404 and silentOnMissing) return false;
           }
         }
         throw std::runtime_error(error);

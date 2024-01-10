@@ -10,8 +10,6 @@
 
 #include <framework/utilities/ScopeGuard.h>
 
-#include <TRandom.h>
-
 #include <iosfwd>
 #include <memory>
 #include <random>

@@ -21,6 +21,8 @@
 #include <limits>
 #include <thread>
 
+#include <TRandom.h>
+
 namespace Belle2::Conditions {
   /** struct encapsulating all the state information needed by curl */
   struct CurlSession {

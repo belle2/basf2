@@ -13,6 +13,7 @@ from .svgdrawing import attributemaps
 from . import svgdrawing
 from datetime import datetime
 import subprocess
+import tempfile
 import os.path
 import os
 from ROOT import Belle2  # make Belle2 namespace available
@@ -30,7 +31,7 @@ class CDCSVGDisplayModule(basf2.Module):
     Personal two dimensional event display based on scalable vector graphics
     """
 
-    def __init__(self, output_folder="/tmp", interactive=True):
+    def __init__(self, output_folder=tempfile.gettempdir(), interactive=True):
         """
         Constructor method
 

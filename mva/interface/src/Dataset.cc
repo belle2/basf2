@@ -14,7 +14,7 @@
 
 #include <TLeaf.h>
 
-#include <boost/filesystem/operations.hpp>
+#include <filesystem>
 
 namespace Belle2 {
   namespace MVA {
@@ -325,7 +325,7 @@ namespace Belle2 {
 
       std::vector<std::string> filenames;
       for (const auto& filename : m_general_options.m_datafiles) {
-        if (boost::filesystem::exists(filename)) {
+        if (std::filesystem::exists(filename)) {
           filenames.push_back(filename);
         } else {
           auto temp = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
@@ -340,7 +340,7 @@ namespace Belle2 {
       //Open TFile
       TDirectory* dir = gDirectory;
       for (const auto& filename : filenames) {
-        if (not boost::filesystem::exists(filename)) {
+        if (not std::filesystem::exists(filename)) {
           B2ERROR("Error given ROOT file does not exist " << filename);
           throw std::runtime_error("Error during open of ROOT file named " + filename);
         }

@@ -979,10 +979,10 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 class DstToD0Pi_D0ToGeneric(BaseSkim):
     """
     **Decay Modes**:
-        * On signal side: :math:`D^{*+}\\to D^{0} \\pi^{+}`
-        * :math:`D^{*+}\\to D^0 \\pi^{+}` and :math:`D^{*+}\\to D^{+} \\pi^{0}` on tag side
-        * :math:`D^{*0}\\to D^0 \\pi^{0}` and :math:`D^{*0}\\to D^{0} \\gamma` on tag side
-        * :math:`D_s^{*+}\\to D_s^{+} \\gamma` on tag side
+        * :math:`D^{*+}\\to D^{0} \\pi^{+}` (signal side)
+        * :math:`D^{*+}\\to D^0 \\pi^{+}` and :math:`D^{*+}\\to D^{+} \\pi^{0}` (tag side)
+        * :math:`D^{*0}\\to D^0 \\pi^{0}` and :math:`D^{*0}\\to D^{0} \\gamma` (tag side)
+        * :math:`D_s^{*+}\\to D_s^{+} \\gamma` (tag side)
         * 15 hadronic channels for tag :math:`D^{0}` reconstruction
         * 11 hadronic channels for tag :math:`D^{+}` reconstruction
         * 10 hadronic channels for tag :math:`D_{s}^{+}` reconstruction

@@ -1,4 +1,3 @@
-from __future__ import division  # int divided by int = float, just to be sure
 import torch
 import torch.nn as nn
 import torch.nn.functional as F

@@ -53,6 +53,7 @@ void DQMHistAnalysisTrackingHLTModule::beginRun()
   double buffMinEvents(NAN);
   double dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, dummy_upperAlarm;
 
+  // read thresholds from EPICS
   requestLimitsFromEpicsPVs("failureRateThreshold", dummy_lowerAlarm, dummy_lowerWarn, buffThreshold, dummy_upperAlarm);
   requestLimitsFromEpicsPVs("minNoEvents",          dummy_lowerAlarm, buffMinEvents, dummy_upperWarn, dummy_upperAlarm);
 
@@ -64,6 +65,7 @@ void DQMHistAnalysisTrackingHLTModule::beginRun()
     B2INFO(getName() << ": Setting min number of events threshold from EPICS. New minNoEvents " << buffMinEvents);
     m_statThreshold = buffMinEvents;
   }
+
 }
 
 
@@ -79,8 +81,18 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   m_monObj = getMonitoringObject("trackingHLT");
 
   // register the PVs for setting thresholds
-  registerEpicsPV("TRACKING:failureRateThreshold", "failureRateThreshold");
-  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents");
+  registerEpicsPV("TRACKING:failureRateThreshold", "failureRateThreshold", false);
+  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents", false);
+
+  // variables to be monitored via EPICS
+  registerEpicsPV("trackingHLT:nTracksPerEvent", "nTracksPerEvent", false);
+  registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent", false);
+  registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent", false);
+  registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent", false);
+  registerEpicsPV("trackingHLT:abortRate", "abortRate", false);
+
+  updateEpicsPVs(5.0);
+
 }
 
 void DQMHistAnalysisTrackingHLTModule::event()
@@ -96,6 +108,8 @@ void DQMHistAnalysisTrackingHLTModule::event()
     hAbort->SetTitle(Form("Fraction of Events in which Tracking aborts = %.4f %%", abortRate * 100));
 
     m_monObj->setVariable("abortRate", abortRate);
+    setEpicsPV("abortRate", abortRate);
+
     //check if number of errors is above the allowed limit
     if (abortRate > m_failureRateThreshold)
       hasError = true;
@@ -180,25 +194,32 @@ void DQMHistAnalysisTrackingHLTModule::event()
   if (hnTracks != nullptr) {
     double averageNTracks = hnTracks->GetMean();
     m_monObj->setVariable("nTracksPerEvent", averageNTracks);
+    setEpicsPV("nTracksPerEvent", averageNTracks);
   }
 
   TH1* hnVXDTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDOnly");
   if (hnVXDTracks != nullptr) {
     double averageNVXDTracks = hnVXDTracks->GetMean();
     m_monObj->setVariable("nVXDTracksPerEvent", averageNVXDTracks);
+    setEpicsPV("nVXDTracksPerEvent", averageNVXDTracks);
   }
 
   TH1* hnCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInCDCOnly");
   if (hnCDCTracks != nullptr) {
     double averageNCDCTracks = hnCDCTracks->GetMean();
     m_monObj->setVariable("nCDCTracksPerEvent", averageNCDCTracks);
+    setEpicsPV("nCDCTracksPerEvent", averageNCDCTracks);
   }
 
   TH1* hnVXDCDCTracks = findHist("TrackingHLTDQM/NoOfTracksInVXDCDC");
   if (hnVXDCDCTracks != nullptr) {
     double averageNVXDCDCTracks = hnVXDCDCTracks->GetMean();
     m_monObj->setVariable("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
+    setEpicsPV("nVXDCDCTracksPerEvent", averageNVXDCDCTracks);
   }
+
+  // update all PVs
+  updateEpicsPVs(5.0);
 
 }
 

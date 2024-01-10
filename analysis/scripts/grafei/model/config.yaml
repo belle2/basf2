@@ -57,18 +57,6 @@ train:
   include_efficiency: False
   compile_model: False
   seed: 42 #seed
-  optuna:
-    explore:
-      # Optuna hyperparameters to vary
-      # NOTE: first is type (categorical, int, float, discrete_uniform, loguniform, uniform), then the needed arguments.
-      #       See https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#
-      learning_rate: [loguniform, 1.e-5, 1]
-      batch_size: [categorical, [32, 64, 128, 256, 512, 1024]]
-      l2_loss: [loguniform, 1.e-7, 0.1]
-    ntrials: 1000
-    timeout: 604800 # in seconds
-    # One study for many trials
-    study_path: ./results/optuna/
 val:
   num_workers: 0
 geometric_model:
@@ -84,12 +72,3 @@ geometric_model:
   dropout: 0.3
   symmetrize: True
   normalize: batchnorm #batchnorm layernorm null
-  # Optuna hyperparameters to vary
-  # NOTE: first is type (categorical, int, float, discrete_uniform, loguniform, uniform), then the needed arguments.
-  #       See https://optuna.readthedocs.io/en/stable/reference/generated/optuna.trial.Trial.html#
-  optuna:
-    hidden_layer_dim: [categorical, [64, 128, 256, 512, 1024]]
-    num_hid_layers: [int, 1, 3]
-    num_ML: [int, 1, 3]
-    dropout: [uniform, 0, 1]
-    # normalize: [categorical, [batchnorm, layernorm]] # categorical parameters need a list as input

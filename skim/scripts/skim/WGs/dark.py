@@ -658,7 +658,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 
     def build_lists(self, path):
         skim_str = "InelasticDarkMatterWithDarkHiggs"
-        n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
+        n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
 
         track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 20]"
 
@@ -722,7 +722,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             list_name=f"beam:{skim_str}",
             mask_tuples=[
                 ("std_roe",
-                 "thetaInCDCAcceptance and nCDCHits>20 and dr < 0.5 and abs(dz) < 2",
+                 "thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2",
                  "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and [[clusterReg==1 and E>0.08]" +
                  "or [clusterReg==2 and E>0.07] or [clusterReg==3 and E>0.1]] and [abs(clusterTiming) < 200]")],
             path=path,

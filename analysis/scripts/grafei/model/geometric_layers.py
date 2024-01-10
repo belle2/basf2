@@ -36,7 +36,7 @@ class EdgeLayer(nn.Module):
     ):
         """
         Module to update edges in MetaLayer.
-           e_ij' = f(e_ij, v_i, v_j)
+           e_ij' = f(e_ij, v_i, v_j, u)
 
         Args:
             nfeat_in_dim (int): node features input dimension (number of node features in input)
@@ -125,7 +125,7 @@ class NodeLayer(nn.Module):
     ):
         """
         Module to update nodes in MetaLayer.
-           v_i' = f(v_i, Avg(e_i1, ..., e_ik, e_1i, ..., e_ki))
+           v_i' = f(v_i, Avg(e_i1, ..., e_ik, e_1i, ..., e_ki), u)
 
         Args:
             nfeat_in_dim (int): node features input dimension (number of node features in input)
@@ -219,7 +219,7 @@ class GlobalLayer(nn.Module):
     ):
         """
         Module to update global attribute in MetaLayer.
-           u_i' = f(Avg(v_11, ..., v_jk), Avg(e_11, ..., e_jk))
+           u_i' = f(Avg(v_11, ..., v_jk), Avg(e_11, ..., e_jk), u)
 
         Args:
             nfeat_in_dim (int): node features input dimension (number of node features in input)

@@ -18,6 +18,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
+#include <limits>
 #include <thread>
 
 namespace Belle2::Conditions {
@@ -133,8 +134,6 @@ namespace Belle2::Conditions {
     static Downloader instance;
     return instance;
   }
-
-  Downloader::Downloader() { m_rnd->seed(gRandom->Integer(std::numeric_limits<unsigned int>::max())); }
 
   Downloader::~Downloader() { finishSession(); }
 
@@ -258,8 +257,10 @@ namespace Belle2::Conditions {
 
   bool Downloader::download(const std::string& url, std::ostream& buffer, bool silentOnMissing)
   {
-    //make sure we have an active curl session ...
+    // make sure we have an active curl session ...
     auto session = ensureSession();
+    // and initialize the internal random number generator
+    initializeRandomGeneratorSeed();
     B2DEBUG(37, "Download started ..." << LogVar("url", url));
     // we might need to try a few times in case of HTTP error >= 300
     for (unsigned int retry{1};; ++retry) {
@@ -303,8 +304,8 @@ namespace Belle2::Conditions {
               // faulty squid cache, etc.), we might retry a new request altering the internal state of the gRandom
               // instance, spoiling our capability to fully reproduce our results.
               // In this way, relying on a different generator, we are safe.
-              // Note that gRandom is still used for getting the seed for m_rnd: this is done in the initializer of
-              // the class, which is safe for reproducing the results.
+              // Note that gRandom is still used for getting the seed for m_rnd: this is done in the constructor of
+              // the class (it's a singleton -> it's constructed once), which is safe for reproducing the results.
               m_rndDistribution->param(std::uniform_real_distribution<double>::param_type(1.0, maxDelay));
               double seconds = (*m_rndDistribution)(*m_rnd);
               B2WARNING("Could not download url, retrying ..."
@@ -323,5 +324,13 @@ namespace Belle2::Conditions {
     // all fine
     B2DEBUG(37, "Download finished successfully." << LogVar("url", url));
     return true;
+  }
+
+  void Downloader::initializeRandomGeneratorSeed()
+  {
+    if (not m_rndIsInitialized) {
+      m_rnd->seed(gRandom->Integer(std::numeric_limits<unsigned int>::max()));
+      m_rndIsInitialized = true;
+    }
   }
 } // namespace Belle2::Conditions

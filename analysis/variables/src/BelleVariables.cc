@@ -288,9 +288,8 @@ namespace Belle2 {
       double time = belleTrkExtra->getTof();
       double length = belleTrkExtra->getPathLength();
       double p = particle->getP(); //3-momentum
-      double conversion = 10000000. / 299792458.; //from cm/ns to natural units (GeV)
-      double tofbeta = conversion * length / time;
-      double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.);
+      double tofbeta = length / time / Belle2::Const::speedOfLight;
+      double tofmass = p * sqrt(1. / (tofbeta * tofbeta) - 1.); //(GeV)
 
       return tofmass;
     }

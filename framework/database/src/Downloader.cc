@@ -7,8 +7,9 @@
  **************************************************************************/
 
 #include <framework/database/Downloader.h>
-#include <framework/logging/Logger.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/EnvironmentVariables.h>
 
@@ -18,10 +19,9 @@
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
+#include <functional>
 #include <limits>
 #include <thread>
-
-#include <TRandom.h>
 
 namespace Belle2::Conditions {
   /** struct encapsulating all the state information needed by curl */
@@ -293,6 +293,7 @@ namespace Belle2::Conditions {
           if (retry <= m_maxRetries) {
             // we treat everything below 300 as permanent error with the request,
             // while if 300 or above we retry
+            // 404 corresponds to Not Found and we want to treat it differently
             long responseCode{0};
             curl_easy_getinfo(m_session->curl, CURLINFO_RESPONSE_CODE, &responseCode);
             if (responseCode >= 300 and responseCode != 404) {
@@ -306,8 +307,6 @@ namespace Belle2::Conditions {
               // faulty squid cache, etc.), we might retry a new request altering the internal state of the gRandom
               // instance, spoiling our capability to fully reproduce our results.
               // In this way, relying on a different generator, we are safe.
-              // Note that gRandom is still used for getting the seed for m_rnd: this is done in the constructor of
-              // the class (it's a singleton -> it's constructed once), which is safe for reproducing the results.
               m_rndDistribution->param(std::uniform_real_distribution<double>::param_type(1.0, maxDelay));
               double seconds = (*m_rndDistribution)(*m_rnd);
               B2WARNING("Could not download url, retrying ..."
@@ -316,6 +315,8 @@ namespace Belle2::Conditions {
               std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
               continue;
             }
+            // special treatment for 404: if silentOnMissing is true we just return false silently
+            // this is useful when checking if a file exists on the server
             if (responseCode == 404 and silentOnMissing) return false;
           }
         }
@@ -331,7 +332,9 @@ namespace Belle2::Conditions {
   void Downloader::initializeRandomGeneratorSeed()
   {
     if (not m_rndIsInitialized) {
-      m_rnd->seed(gRandom->Integer(std::numeric_limits<unsigned int>::max()));
+      // We need to provide a seed for m_rnd: let's take the basf2Seed and hash it
+      auto downloaderSeed = std::hash<std::string> {}(RandomNumbers::getSeed());
+      m_rnd->seed(downloaderSeed);
       m_rndIsInitialized = true;
     }
   }

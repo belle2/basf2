@@ -7,10 +7,10 @@ def getDoca(name_values):
     Computes DOCA between two tracks.
 
     Args:
-        name_values (dict): dict of numpy arrays containing px, py, pz, x, y, z
+        name_values (dict): Dictionary of numpy arrays containing px, py, pz, x, y, z.
 
     Returns:
-        doca (numpy array): array containing doca values
+        doca (numpy.ndarray): Array containing doca values.
     """
     eps = 1e-7
 
@@ -50,13 +50,13 @@ def getDoca(name_values):
 
 def getCostheta(name_values):
     """
-    Computes cos of angle between two tracks.
+    Computes cosinus of angle between two tracks.
 
     Args:
-        name_values (dict): dict of numpy arrays containing p, px, py, pz
+        name_values (dict): Dictionary of numpy arrays containing p, px, py, pz.
 
     Returns:
-        costheta (numpy array): array containing cos theta values
+        costheta (numpy.ndarray): Array containing cosinus of theta values.
     """
     ux = name_values["px"] / name_values["p"]
     uy = name_values["py"] / name_values["p"]
@@ -79,13 +79,14 @@ available_features = {  # put here available features with respective functions 
 
 def available_edge_features(feat, name_values):
     """
-    Returns value of edge feature if contained in dictionary defined below
+    Returns value of edge feature if contained in dictionary available_features.
 
     Args:
-        feat (string): edge feature name
-        name_values (dict): dict of numpy array containing node features
+        feat (str): Edge feature name.
+        name_values (dict): Dictionary of numpy arrays containing node features.
+
     Returns:
-        (Numpy array): edge feature `feat` computed given certain node features `name_values`
+        (numpy.ndarray): Edge feature `feat` computed given certain node features in `name_values`.
     """
     if feat not in available_features:
         sys.exit(
@@ -95,18 +96,17 @@ def available_edge_features(feat, name_values):
     return available_features[feat](name_values)
 
 
-def compute_edge_features(
-    edge_feature_names: list, features: list, x: np.ndarray
-) -> np.ndarray:
+def compute_edge_features(edge_feature_names, features, x):
     """
-    Computes a series of edge features strarting from node features
+    Computes a series of edge features starting from node features.
 
     Args:
-        edge_feature_names (list): list of edge features names
-        features (list): list of node feature names
-        x (numpy array): array of node features
+        edge_feature_names (list): List of edge features names.
+        features (list): List of node feature names.
+        x (numpy.ndarray): Array of node features.
+
     Returns:
-        edge_features (numpy array): array of edge features
+        edge_features (numpy.ndarray): Array of edge features.
     """
 
     # Will be filled and converted to np.ndarray of shape [E, F_e] with

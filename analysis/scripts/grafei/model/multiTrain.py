@@ -42,7 +42,7 @@ class MultiTrainLoss(nn.Module):
     Args:
         alpha_mass (float): weight of masses term in the loss
         ignore_index (int): index to ignore while padding
-        reduction (string): type of reduction to be applied on the batch
+        reduction (str): type of reduction to be applied on the batch
         edge_weights (array): weights applied to edge classes
         node_weights (array): weights applied to node classes
     Returns:

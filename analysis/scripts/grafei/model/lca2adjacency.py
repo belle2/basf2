@@ -7,7 +7,7 @@ from .tree_utils import is_valid_tree
 
 class InvalidLCAMatrix(Exception):
     """
-    Specialized Exception sub-class raised for malformed LCA-gram-matrices or LCA-gram-matrices that do not encode trees.
+    Specialized Exception sub-class raised for malformed LCA matrices or LCA matrices not encoding trees.
     """
 
     pass
@@ -16,6 +16,12 @@ class InvalidLCAMatrix(Exception):
 class Node:
     """
     Class to hold levels of nodes in the tree.
+
+    Args:
+        level (int): Level in the tree.
+        children (Node): Children of the nodes.
+        lca_index (int): Index in the LCAS matrix.
+        lcas_level (int): Level in the LCAS matrix.
     """
 
     def __init__(self, level, children, lca_index=None, lcas_level=0):
@@ -50,7 +56,7 @@ def _get_ancestor(node):
         node (Node): A node instance for which to determine the ancestor.
 
     Returns:
-        ancestor (Node): the node's ancestor, returns self if a disconnected leaf node.
+        ancestor (Node): The node's ancestor, returns self if a disconnected leaf node.
     """
     ancestor = node
 
@@ -62,7 +68,7 @@ def _get_ancestor(node):
 
 def _nodes_in_ancestors_children(parent, node1, node2):
     """
-    Check if any node in parent's line of descent is also an ancestor of both node1 and node2.
+    Checks if any node in parent's line of descent is also an ancestor of both node1 and node2.
 
     Args:
         parent (Node): A node instance used to check its line of descent.
@@ -83,7 +89,7 @@ def _nodes_in_ancestors_children(parent, node1, node2):
 
 def _pull_down(node):
     """
-    Work up the node's history, pulling down a level any nodes
+    Works up the node's history, pulling down a level any nodes
     whose children are all more than one level below.
 
     Performs the operation in place.
@@ -105,11 +111,11 @@ def _pull_down(node):
 
 def _breadth_first_enumeration(root, queue, adjacency_matrix):
     """
-    Enumerates the tree breadth-first into a queue
+    Enumerates the tree breadth-first into a queue.
 
     Args:
-        root (Node): the root of the tree to get the enumeration of.
-        queue (dict): level-indexed dictionary
+        root (Node): The root of the tree to get the enumeration of.
+        queue (dict): Level-indexed dictionary.
         adjacency_matrix (iterable): 2-dimensional LCA-gram-matrix (M, M).
     """
     # insert current root node into the queue
@@ -125,11 +131,11 @@ def _breadth_first_enumeration(root, queue, adjacency_matrix):
 
 def _breadth_first_adjacency(root, adjacency_matrix):
     """
-    Enumerates the tree breadth-first into a queue
+    Enumerates the tree breadth-first into a queue.
 
     Args:
-        root (Node): the root of the tree to get the enumeration of.
-        queue (dict): level-indexed dictionary
+        root (Node): Root of the tree to get the enumeration of.
+        queue (dict): Level-indexed dictionary.
         adjacency_matrix (iterable): 2-dimensional LCA-gram-matrix (M, M).
     """
     queue = _breadth_first_enumeration(root, {}, adjacency_matrix)
@@ -151,10 +157,10 @@ def _breadth_first_adjacency(root, adjacency_matrix):
 
 def _depth_first_enumeration(root, index):
     """
-    Fills the passed adjacency matrix based on the tree spanned by `root`.
+    Fills the passed adjacency matrix based on the tree spanned by ``root``.
 
     Args:
-        root (Node): the root of the tree to enumerate the indices of.
+        root (Node): Root of the tree to enumerate the indices of.
         index (int): 2-dimensional adjacency matrix to be filled (N, N).
     """
     root.dfs_index = index
@@ -171,7 +177,7 @@ def _depth_first_labeling(root, adjacency_matrix):
     Sets the adjacencies for the a node and its children depth-first.
 
     Args:
-        root (Node): the root of the tree to get the adjacency matrix of.
+        root (Node): Root of the tree to get the adjacency matrix of.
         lca_matrix (iterable): 2-dimensional adjacency matrix to be filled (N, N).
     """
     for child in root.children:
@@ -183,10 +189,10 @@ def _depth_first_labeling(root, adjacency_matrix):
 
 def _depth_first_adjacency(root, adjacency_matrix):
     """
-    Fills the passed adjacency matrix based on the tree spanned by `root`.
+    Fills the passed adjacency matrix based on the tree spanned by ``root``.
 
     Args:
-        root (Node): the root of the tree to get the adjacency matrix of.
+        root (Node): Root of the tree to get the adjacency matrix of.
         lca_matrix (iterable): 2-dimensional adjacency matrix to be filled (N, N).
     """
     _depth_first_enumeration(root, index=0)
@@ -204,11 +210,10 @@ def _reconstruct(lca_matrix):
         lca_matrix (iterable): 2-dimensional LCA-gram-matrix (M, M).
 
     Returns:
-        Node: the root node of the reconstructed tree.
-        int: the total number of nodes in the tree
+        root (Node), total_nodes (int): Root node of the reconstructed tree and Total number of nodes in the tree.
 
     Raises:
-        InvalidLCAMatrix: If passed LCA-gram-matrix is not a tree.
+        InvalidLCAMatrix: If passed LCA matrix is not a tree.
     """
     n = lca_matrix.shape[0]
     total_nodes = n
@@ -303,22 +308,22 @@ def _reconstruct(lca_matrix):
 
 def lca2adjacency(lca_matrix, format="bfs"):
     """
-    Converts a tree's LCA-gram matrix representation, i.e. a square matrix (M, M), where each row/column corresponds to
+    Converts a tree's LCA matrix representation, i.e. a square matrix (M, M) where each row/column corresponds to
     a leaf of the tree and each matrix entry is the level of the lowest-common-ancestor (LCA) of the two leaves, into
     the corresponding two-dimension adjacency matrix (N,N), with M < N. The levels are enumerated top-down from the
     root.
 
     Args:
-        lca_matrix (iterable): 2-dimensional LCA-gram-matrix (M, M).
-        format (string): output format of the generated adjacency matrix. Can be either on of the two 'bfs' or 'dfs' for
-            bread-first or depth-first.
+        lca_matrix (iterable): 2-dimensional LCA matrix (M, M).
+        format (str): Output format of the generated adjacency matrix.
+            Can be either one of the two 'bfs' or 'dfs' for bread-first or depth-first.
 
     Returns:
-        iterable: 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked nodes have values unequal to
-            zero.
+        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+        Linked nodes have values unequal to zero.
 
     Raises:
-        InvalidLCAMatrix: If passed LCA-gram-matrix is malformed (e.g. not 2d or not square) or does not encode a tree.
+        InvalidLCAMatrix: If passed LCA matrix is malformed (e.g. not 2d or not square) or does not encode a tree.
     """
     # sanitize the output format
     if format not in {"bfs", "dfs"}:
@@ -369,13 +374,13 @@ def lca2adjacency(lca_matrix, format="bfs"):
 
 def _get_fsps_of_node(node):
     """
-    Given a node, find all the final state particles connected to it and get their indices in the LCA.
+    Given a node, finds all the final state particles connected to it and get their indices in the LCA.
 
     Args:
-        node (Node): node to be inspected.
+        node (Node): Node to be inspected.
 
     Returns:
-        indices (list): list of final state particles' indices in the LCA matrix connected to node.
+        indices (list): List of final state particles' indices in the LCA matrix connected to node.
     """
     indices = []
 
@@ -391,19 +396,32 @@ def _get_fsps_of_node(node):
 def select_good_decay(predicted_lcas, predicted_masses, sig_side_lcas=None, sig_side_masses=None):
     """
     Checks if given LCAS matrix is found in reconstructed LCAS matrix and mass hypotheses are correct.
-    WARNING: you have to make sure to call this function only for valid tree structures encoded in predicted_lcas,
-             otherwise it will throw an exception
+
+    .. warning:: You have to make sure to call this function only for valid tree structures encoded in `predicted_lcas`,
+        otherwise it will throw an exception.
+
+    Mass hypotheses are indicated by letters. The following convention is used:
+
+    .. math::
+        e \\to e \\\\
+        i \\to \\pi \\\\
+        k \\to K \\\\
+        p \\to p \\\\
+        m \\to \\mu \\\\
+        g \\to \\gamma \\\\
+        o \\to \\text{others}
+
+    .. warning:: The order of mass hypotheses should match that of the final state particles in the LCAS.
 
     Args:
-        predicted_lcas (torch.Tensor): LCAS matrix
-        predicted_masses (list): list of predicted mass classes
-        sig_side_lcas (torch.Tensor): LCAS matrix of your signal-side (you have to choose one)
-        sig_side_masses (list): List of mass hypotheses for your FSPs
+        predicted_lcas (torch.tensor): LCAS matrix.
+        predicted_masses (list): List of predicted mass classes.
+        sig_side_lcas (torch.tensor): LCAS matrix of your signal-side.
+        sig_side_masses (list): List of mass hypotheses for your FSPs.
 
     Returns:
-        bool: True if LCAS and masses matche, False otherwise
-        int: LCAS level of root node
-        list: LCA indices of FSPs belonging to the signal side ([-1] if LCAS does not match decay string)
+        bool, int, list: True if LCAS and masses match, LCAS level of root node,
+        LCA indices of FSPs belonging to the signal side ([-1] if LCAS does not match decay string).
     """
 
     # Reconstruct decay chain

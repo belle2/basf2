@@ -2,19 +2,22 @@ import numpy as np
 import uproot
 
 
-def populate_avail_samples(
-    X,
-    Y,
-    B_reco=0,
-    # allow_background=False,
-):
+def populate_avail_samples(X, Y, B_reco=0,
+                           # allow_background=False,
+                           ):
     """
-    Shift through the file metadata to populate a list of available dataset samples
+    Shifts through the file metadata to populate a list of available dataset samples.
 
     Args:
-        X (list): List of ROOT lazyarray dicts for X (input) data
-        Y (list): List of ROOT lazyarray dicts for Y (ground truth) data
-        B_reco (int): flag for Upsilon/B0/B+ reconstruction (set automatically). Ups = 0, B0 = 1, B+ = 2
+        X (list): List of ROOT lazyarray dicts for X (input) data.
+        Y (list): List of ROOT lazyarray dicts for Y (ground truth) data.
+        B_reco (int): Reconstruction mode flag (set automatically):
+
+            .. math::
+               \\text{Upsilon} (4S) = 0,\\ B^0 = 1,\\ B^+ = 2.
+
+    Returns:
+        avail_samples (list): List of available samples for training.
     """
     # Must iterate over Y because X contains a b_index of -1 for unmatched particles
     avail_samples = []
@@ -61,19 +64,18 @@ def populate_avail_samples(
     return avail_samples
 
 
-def preload_root_data(
-    root_files, features, discarded,
-):
+def preload_root_data(root_files, features, discarded):
     """
-    Load all data from root files as lazyarrays (not actually read from disk until accessed)
+    Load all data from root files as lazyarrays (not actually read from disk until accessed).
 
     Args:
-        root_files (string): path to ROOT files
-        features (list): list of feature names
-        discarded (list): list of features present in the ROOT files and not used as input,
-                          but used to calculate other quantities (e.g. edge features)
+        root_files (str): Path to ROOT files.
+        features (list): List of feature names.
+        discarded (list): List of features present in the ROOT files and not used as input,
+            but used to calculate other quantities (e.g. edge features).
+
     Returns:
-        x, y (list): list of dictionaries containing training information
+        x (list), y (list): Lists of dictionaries containing training information for input and ground-truth.
     """
     x = []
     y = []

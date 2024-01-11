@@ -106,7 +106,7 @@ def main(
     )
     print(f"Using LCAS format, max depth of {5 if B_reco else 6} corresponding to {'B' if B_reco else 'Upsilon(4S)'}\n")
 
-    # Compile the model (requires Pytorch >= 2.0.0)
+    # Compile the model (requires PyTorch >= 2.0.0)
     if float(torch.__version__[0]) >= 2 and configs["train"]["compile_model"]:
         print("Compiling the model!")
         model = torch.compile(base_model)
@@ -173,7 +173,6 @@ def main(
         tags=list(mode_tags.keys()),
         scheduler=scheduler,
         ignore_index=-1,
-        include_efficiency=configs["train"]["include_efficiency"],
     )
 
     # Set up the actual checkpoints and save the configs if requested

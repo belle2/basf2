@@ -3,16 +3,24 @@ from pathlib import Path
 import collections.abc
 
 
-def update_config_dict(d, u):
+def _update_config_dict(d, u):
     """
-    Function to update the config dictionary.
+    Updates the config dictionary.
 
-    Need a recursive solution because it's a nested dict of varying depth.
-    This is pulled from https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth
+    .. seealso:: Need a
+    `recursive solution <https://stackoverflow.com/questions/3232943/update-value-of-a-nested-dictionary-of-varying-depth>`_
+    because it's a nested dict of varying depth.
+
+    Args:
+        d (dict): Dictionary to update.
+        u (dict): Dictionary of configs.
+
+    Returns:
+        d (dict): Updated dictionary of configs.
     """
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
-            d[k] = update_config_dict(d.get(k, {}), v)
+            d[k] = _update_config_dict(d.get(k, {}), v)
         else:
             d[k] = v
     return d
@@ -23,15 +31,15 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
     Load default configs followed by user configs and populate dataset tags.
 
     Args:
-        cfg_path(str or Path): Path to user config yaml
-        model(str, optional): Name of model to use (overwrites loaded config)
-        dataset(int, optional): Individual dataset to load (overwrites loaded config)
-        run_name(str, optional): Name of training run (overwrites loaded config)
-        samples(int, optional): Number of samples to train on (overwrites loaded config)
+        cfg_path(str or Path): Path to user config yaml.
+        model(str): Name of model to use (overwrites loaded config).
+        dataset(int): Individual dataset to load (overwrites loaded config).
+        run_name(str): Name of training run (overwrites loaded config).
+        samples(int): Number of samples to train on (overwrites loaded config).
 
     Returns:
-        dict: The loaded training configuration dictionary
-        list: A list of tuples containing (tag name, dataset path, tag key)
+        configs (dict), tags (list): Loaded training configuration dictionary
+        and list of tuples containing (tag name, dataset path, tag key).
     """
 
     # Need to get this file's working directory to import config from
@@ -47,7 +55,7 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
             # Approach if configs was not a nested dict
             # configs.update(yaml.safe_load(file))
             # Use custom update function for nested dict
-            configs = update_config_dict(configs, yaml.safe_load(file))
+            configs = _update_config_dict(configs, yaml.safe_load(file))
 
     # Overwrite model architecture if specified in command line
     if model is not None:
@@ -60,23 +68,22 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
         configs['output']['run_name'] = run_name
 
     # Finally, generate the dataset tags
-    tags = generate_dataset_tags(configs, samples)
+    tags = _generate_dataset_tags(configs, samples)
 
     return configs, tags
 
 
-def generate_dataset_tags(configs, samples=None):
+def _generate_dataset_tags(configs, samples=None):
     """
     Generate the different dataset tags and assign their file paths.
-
-    This helps us keep track of the train/val/test datasets throughout training and evaluation
+    This helps us keep track of the train/val datasets throughout training and evaluation.
 
     Args:
-        config(dict): Training configuration dictionary
-        samples(dict): Training configuration dictionary
+        config (dict): Training configuration dictionary.
+        samples (dict): Number of training samples.
 
     Returns:
-        list: A list of tuples containing (tag name, dataset path, tag key)
+        tags (list): A list of tuples containing (tag name, dataset path, tag key).
     """
     # Fetch whichever data source we're loading
     source_confs = configs['dataset']

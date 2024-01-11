@@ -24,26 +24,28 @@ warnings.filterwarnings(
 
 
 class graFEISaverModule(b2.Module):
+    """
+        Applies graFEI model to a particle list in basf2.
+        GraFEI information is stored as extraInfos.
+
+        Args:
+            particle_list (str): Name of particle list.
+            cfg_path (str): Path to config file. If `None` the config file in the global tag is used.
+            param_file (str): Path to parameter file containing the model. If `None` the parameter file in the global tag is used.
+            sig_side_lcas (list): List containing LCAS matrix of signal-side.
+            sig_side_masses (list): List containing mass hypotheses of signal-side.
+            gpu (bool): Whether to run on a GPU.
+    """
+
     def __init__(
         self,
-        particle_list: str,
+        particle_list,
         cfg_path=None,
         param_file=None,
         sig_side_lcas=None,
         sig_side_masses=None,
         gpu=False,
     ):
-        """
-        Apply graFEI model to some given particle lists in basf2
-
-        Args:
-            particle_list (list): Name of particle list to run graFEI on
-            cfg_path (str): path to config file
-            param_file (str): path to file containing weight files for the model
-            sig_side_lcas (list): list containing LCAS matrix of signal-side
-            sig_side_masses (list): list containing mass hypotheses of signal-side
-            gpu (bool): whether running on a GPU
-        """
         super().__init__()
         self.particle_list = particle_list
         self.cfg_path = cfg_path
@@ -53,6 +55,7 @@ class graFEISaverModule(b2.Module):
         self.gpu = gpu
 
     def initialize(self):
+        """"""
         # Get weights and configs from the DB if they are not provided from the user
         if not self.cfg_path:
             config = Belle2.DBAccessorBase(
@@ -134,11 +137,8 @@ class graFEISaverModule(b2.Module):
 
         b2.B2DEBUG(10, "Model structure:\n", {self.model})
 
-    def terminate(self):
-        """Called once after all the processing is complete"""
-        pass
-
     def event(self):
+        """"""
         b2.B2DEBUG(10, "---- Processing new event ----")
 
         # Get the B candidate list

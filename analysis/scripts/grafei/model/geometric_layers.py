@@ -4,13 +4,13 @@ import torch.nn.functional as F
 from torch_scatter import scatter
 
 
-def init_weights(layer, normalize):
+def _init_weights(layer, normalize):
     """
-    Initialize the weights and biases.
+    Initializes the weights and biases.
 
     Args:
-        layer (torch.nn.Module): pytorch module
-        normalize (string): whether to fill biases or not
+        layer (torch.nn.Module): PyTorch module.
+        normalize (str): If `None` then fill biases.
     """
     for m in layer.modules():
         if isinstance(m, nn.Linear):
@@ -23,6 +23,26 @@ def init_weights(layer, normalize):
 
 
 class EdgeLayer(nn.Module):
+    """
+        Updates edge features in MetaLayer:
+
+        .. math::
+            e_{ij}^{'} = f(e_{ij}, v_{i}, v_{j}, u)
+
+        Args:
+            nfeat_in_dim (int): Node features input dimension (number of node features in input).
+            efeat_in_dim (int): Edge features input dimension (number of edge features in input).
+            gfeat_in_dim (int): Gloabl features input dimension (number of global features in input).
+            efeat_hid_dim (int): Edge features dimension in hidden layers.
+            efeat_out_dim (int): Edge features output dimension.
+            num_hid_layers (int): Number of hidden layers.
+            dropout (float): Dropout rate :math:`r \\in [0,1]`.
+            normalize (str): Type of normalization (batch/layer).
+
+        Returns:
+            out (torch.tensor): Updated edge features tensor.
+    """
+
     def __init__(
         self,
         nfeat_in_dim,
@@ -34,22 +54,6 @@ class EdgeLayer(nn.Module):
         dropout,
         normalize,
     ):
-        """
-        Module to update edges in MetaLayer.
-           e_ij' = f(e_ij, v_i, v_j, u)
-
-        Args:
-            nfeat_in_dim (int): node features input dimension (number of node features in input)
-            ... (same for edge and global features)
-            efeat_hid_dim (int): edge features dimension in hidden layers
-            efeat_out_dim (int): edge features output dimension
-            num_hid_layers (int) number of hidden layers
-            dropout (float): dropout rate
-            normalize (string): type of normalization (batch/layer)
-
-        Returns:
-            out (torch.tensor): updated edge features tensor
-        """
         super(EdgeLayer, self).__init__()
 
         self.nonlin_function = F.elu
@@ -77,14 +81,15 @@ class EdgeLayer(nn.Module):
         elif self.normalize == "layernorm":
             self.norm = nn.LayerNorm(efeat_out_dim)
 
-        init_weights(self, self.normalize)
+        _init_weights(self, self.normalize)
 
     def forward(self, src, dest, edge_attr, u, batch):
+        """"""
+
         # src, dest: [E, F_x], where E is the number of edges.
         # edge_attr: [E, F_e]
         # u: [B, F_u], where B is the number of graphs.
         # batch: [E] with max entry B - 1.
-
         out = (
             torch.cat([edge_attr, src, dest, u[batch]], dim=1)
             if u.shape != torch.Size([0])
@@ -112,6 +117,26 @@ class EdgeLayer(nn.Module):
 
 
 class NodeLayer(nn.Module):
+    """
+        Updates node features in MetaLayer:
+
+        .. math::
+            v_{i}^{'} = f(v_{i}, \\text{Avg}(e_{i1}, ..., e_{ik}, e_{1i}, ..., e_{ki}), u)
+
+        Args:
+            nfeat_in_dim (int): Node features input dimension (number of node features in input).
+            efeat_in_dim (int): Edge features input dimension (number of edge features in input).
+            gfeat_in_dim (int): Gloabl features input dimension (number of global features in input).
+            nfeat_hid_dim (int): Node features dimension in hidden layers.
+            nfeat_out_dim (int): Node features output dimension.
+            num_hid_layers (int): Number of hidden layers.
+            dropout (float): Dropout rate :math:`r \\in [0,1]`.
+            normalize (str): Type of normalization (batch/layer).
+
+        Returns:
+            out (torch.tensor): Updated node features tensor.
+    """
+
     def __init__(
         self,
         nfeat_in_dim,
@@ -123,22 +148,6 @@ class NodeLayer(nn.Module):
         dropout,
         normalize,
     ):
-        """
-        Module to update nodes in MetaLayer.
-           v_i' = f(v_i, Avg(e_i1, ..., e_ik, e_1i, ..., e_ki), u)
-
-        Args:
-            nfeat_in_dim (int): node features input dimension (number of node features in input)
-            ... (same for edge and global features)
-            nfeat_hid_dim (int): node features dimension in hidden layers
-            nfeat_out_dim (int): node features output dimension
-            num_hid_layers (int) number of hidden layers
-            dropout (float): dropout rate
-            normalize (string): type of normalization (batch/layer)
-
-        Returns:
-            out (torch.tensor): updated node features tensor
-        """
         super(NodeLayer, self).__init__()
 
         self.nonlin_function = F.elu
@@ -166,9 +175,11 @@ class NodeLayer(nn.Module):
         elif self.normalize == "layernorm":
             self.norm = nn.LayerNorm(nfeat_out_dim)
 
-        init_weights(self, self.normalize)
+        _init_weights(self, self.normalize)
 
     def forward(self, x, edge_index, edge_attr, u, batch):
+        """"""
+
         # x: [N, F_x], where N is the number of nodes.
         # edge_index: [2, E] with max entry N - 1.
         # edge_attr: [E, F_e]
@@ -206,6 +217,26 @@ class NodeLayer(nn.Module):
 
 
 class GlobalLayer(nn.Module):
+    """
+        Updates node features in MetaLayer:
+
+        .. math::
+            u_{i}^{'} = f(\\text{Avg}(v_{11}, ..., v_{jk}), \\text{Avg}(e_{11}, ..., e_{jk}), u)
+
+        Args:
+            nfeat_in_dim (int): Node features input dimension (number of node features in input).
+            efeat_in_dim (int): Edge features input dimension (number of edge features in input).
+            gfeat_in_dim (int): Gloabl features input dimension (number of global features in input).
+            nfeat_hid_dim (int): Global features dimension in hidden layers.
+            nfeat_out_dim (int): Global features output dimension.
+            num_hid_layers (int): Number of hidden layers.
+            dropout (float): Dropout rate :math:`r \\in [0,1]`.
+            normalize (str): Type of normalization (batch/layer).
+
+        Returns:
+            out (torch.tensor): Updated node features tensor.
+    """
+
     def __init__(
         self,
         nfeat_in_dim,
@@ -217,22 +248,6 @@ class GlobalLayer(nn.Module):
         dropout,
         normalize,
     ):
-        """
-        Module to update global attribute in MetaLayer.
-           u_i' = f(Avg(v_11, ..., v_jk), Avg(e_11, ..., e_jk), u)
-
-        Args:
-            nfeat_in_dim (int): node features input dimension (number of node features in input)
-            ... (same for edge and global features)
-            gfeat_hid_dim (int): global features dimension in hidden layers
-            gfeat_out_dim (int): global features output dimension
-            num_hid_layers (int) number of hidden layers
-            dropout (float): dropout rate
-            normalize (string): type of normalization (batch/layer)
-
-        Returns:
-            out (torch.tensor): updated global features tensor
-        """
         super(GlobalLayer, self).__init__()
 
         self.nonlin_function = F.elu
@@ -261,9 +276,11 @@ class GlobalLayer(nn.Module):
         elif self.normalize == "layernorm":
             self.norm = nn.LayerNorm(gfeat_out_dim)
 
-        init_weights(self, self.normalize)
+        _init_weights(self, self.normalize)
 
     def forward(self, x, edge_index, edge_attr, u, batch):
+        """"""
+
         # x: [N, F_x], where N is the number of nodes.
         # edge_index: [2, E] with max entry N - 1.
         # edge_attr: [E, F_e]

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 # @cond internal
-# only public interfaces, to make package doc nicer. Also the only things imported by 'from grafei import *'
+# The only things imported by 'from grafei import *'
 __all__ = ["graFEISaverModule", "FlagBDecayModule"]
 # @endcond
 

@@ -1,7 +1,7 @@
 import torch
 import torch_geometric
 from pathlib import Path
-from .geometric_datasets import BelleRecoSetGeometricInMemory, BelleRecoSetGeometric
+from .geometric_datasets import BelleRecoSetGeometricInMemory
 
 
 def create_dataloader_mode_tags(configs, tags):
@@ -9,23 +9,17 @@ def create_dataloader_mode_tags(configs, tags):
     Convenience function to create the dataset/dataloader for each mode tag (train/val) and return them.
 
     Args:
-        configs (dict): Training configuration
-        tags (list): Train/val mode tags containing dataset paths
+        configs (dict): Training configuration.
+        tags (list): Mode tags train/val containing dataset paths.
 
     Returns:
-        dict: Mode tag dictionary containing tuples of (mode, dataset, dataloader)
+        mode_tags (dict): Mode tag dictionary containing tuples of (mode, dataset, dataloader).
     """
 
     mode_tags = {}
 
     for tag, path, mode in tags:
-        dataset_type = (
-            BelleRecoSetGeometricInMemory
-            if configs["dataset"]["inMemory"]
-            else BelleRecoSetGeometric
-        )
-
-        dataset = dataset_type(
+        dataset = BelleRecoSetGeometricInMemory(
             root=Path(path, mode),
             run_name=configs["output"]["run_name"],
             overwrite=configs["geometric_model"]["overwrite"],

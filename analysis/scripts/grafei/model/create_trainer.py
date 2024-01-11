@@ -12,7 +12,17 @@ from .metrics import PerfectLCA, PerfectEvent, PerfectMasses  # , IsTrueB
 
 class GraFEIIgniteTrainer:
     """
-    A class to setup the ignite trainer and hold all the things associated
+    Class to setup the ignite trainer and hold all the things associated.
+
+    Args:
+        model (torch model): The actual PyTorch model.
+        optimizer (torch optimizer): Optimizer used in training.
+        loss_fn (torch loss): Loss function.
+        device (torch device): Device to use.
+        configs (dict): Dictionary of run configs from loaded YAML config file.
+        tags (list): Various tags to sort train and validation evaluators by, e.g. "Training", "Validation".
+        scheduler (torch scheduler); Learning rate scheduler.
+        ignore_index (int): Label index to ignore when calculating metrics, e.g. padding.
     """
 
     def __init__(
@@ -25,28 +35,12 @@ class GraFEIIgniteTrainer:
         tags,
         scheduler=None,
         ignore_index=-1.0,
-        include_efficiency=False,
     ):
-        """
-        These are all the inputs to ignite's create_supervised_trainer plus the yaml configs
-
-        Args:
-            model(Torch Model): The actual PyTorch model
-            optimizer(Torch Optimizer): Optimizer used in training
-            loss_fn(Torch Loss): Loss function
-            device(Torch Device): Device to use
-            configs(dict): Dictionary of run configs from loaded YAML config file
-            tags(list): Various tags to sort train and validation evaluators by, e.g. "Training", "Validation"
-            ignore_index(int): Label index to ignore when calculating metrics, e.g. padding
-            include_efficiency(bool): Whether to include efficiency and purity metrics. Slows down computation significantly
-        """
-
         self.model = model
         self.optimizer = optimizer
         self.configs = configs
         self.tags = tags
         self.ignore_index = ignore_index
-        self.include_efficiency = include_efficiency
         self.device = device
 
         # Run timestamp to distinguish trainings
@@ -132,8 +126,7 @@ class GraFEIIgniteTrainer:
                 "loss": ignite.metrics.Loss(
                     loss_fn,
                     output_transform=lambda x: [
-                        x[0],
-                        x[3],
+                        x[0], x[3],
                         {
                             "edge_input": x[1],
                             "edge_target": x[4],
@@ -147,12 +140,7 @@ class GraFEIIgniteTrainer:
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [
-                        x[1],
-                        x[4],
-                        x[6],
-                        x[5],
-                        x[7],
-                        x[8],
+                        x[1], x[4], x[6], x[5], x[7], x[8],
                     ],
                     ignore_background=True,
                 ),
@@ -166,14 +154,7 @@ class GraFEIIgniteTrainer:
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [
-                        x[0],
-                        x[3],
-                        x[1],
-                        x[4],
-                        x[6],
-                        x[5],
-                        x[7],
-                        x[8],
+                        x[0], x[3], x[1], x[4], x[6], x[5], x[7], x[8],
                     ],
                     ignore_background=True,
                 ),
@@ -250,30 +231,27 @@ class GraFEIIgniteTrainer:
                     self.evaluators[tag], name="gpu"
                 )  # metric names are 'gpu:X mem(%)', 'gpu:X util(%)'
 
-    def score_fn(self, engine):
+    def _score_fn(self, engine):
         """Metric to use for early stoppging"""
         return engine.state.metrics["loss"]
 
-    # def lca_score_fn(self, engine):
+    # def _lca_score_fn(self, engine):
     #     """Metric to use for checkpoints"""
     #     return engine.state.metrics["perfectLCA"]
 
-    def perfect_score_fn(self, engine):
+    def _perfect_score_fn(self, engine):
         """Metric to use for checkpoints"""
         return engine.state.metrics["perfectEvent"]
 
     def _clean_config_dict(self, configs):
         """
-        Clean configs to prepare them for writing to file
-
-        This will convert any non-native types to Python natives.
-        Currently just converts numpy arrays to lists.
+        Clean configs to prepare them for writing to file.
 
         Args:
-            configs (dict): Config dictionary
+            configs (dict): Config dictionary.
 
         Returns:
-            dict: Cleaned config dict
+            configs (dict): Cleaned config dict.
         """
         for k, v in configs.items():
             if isinstance(v, collections.abc.Mapping):
@@ -286,10 +264,10 @@ class GraFEIIgniteTrainer:
 
     def setup_handlers(self, cfg_filename="config.yaml"):
         """
-        Create the various ignite handlers (callbacks)
+        Creates the various ignite handlers (callbacks).
 
         Args:
-            cfg_filename(str, optional): Name of config yaml file to use when saving configs
+            cfg_filename (str): Name of config yaml file to use when saving configs.
         """
         # Create the output directory
         if self.run_dir is not None:
@@ -323,7 +301,7 @@ class GraFEIIgniteTrainer:
         # Setup early stopping
         early_handler = ignite.handlers.EarlyStopping(
             patience=self.configs["train"]["early_stop_patience"],
-            score_function=self.score_fn,
+            score_function=self._score_fn,
             trainer=self.trainer,
             min_delta=1e-3,
         )
@@ -347,7 +325,7 @@ class GraFEIIgniteTrainer:
                     self.run_dir, create_dir=True, require_empty=False
                 ),
                 filename_prefix=self.timestamp,
-                score_function=self.perfect_score_fn,
+                score_function=self._perfect_score_fn,
                 score_name="validation_perfectEvent",
                 n_saved=1,
                 global_step_transform=ignite.handlers.global_step_from_engine(
@@ -396,16 +374,9 @@ class GraFEIIgniteTrainer:
         """
         Callback to run evaluation and report the results.
 
-        We place this here since it needs access to the evaluator engines in order to run.
-
-        Call this function via the add_event_handler() ignite function to tell it when to fire, e.g.:
-            `GraFEIIgniteTrainer.trainer.add_event_handler(ignite.engine.Events.EPOCH_COMPLETED,
-                                                           GraFEIIgniteTrainer.log_results,
-                                                           mode_tags)`
-
         Args:
-            trainer (ignite.Engine): trainer that gets passed by ignite to this method.
-            mode_tags (dict): Dictionary of mode tags containing (mode, dataset, dataloader) tuples
+            trainer (ignite.Engine): Trainer passed by ignite to this method.
+            mode_tags (dict): Dictionary of mode tags containing (mode, dataset, dataloader) tuples.
         """
 
         for tag, values in mode_tags.items():

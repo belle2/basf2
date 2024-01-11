@@ -1,6 +1,4 @@
 dataset:
-  # Select the data type, this decides which Dataset class to use
-  inMemory: True
   path:  # Should contain train/val subdirectories
   config:
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
@@ -54,7 +52,6 @@ train:
   class_weights: False
   progress_bar: False
   record_gpu_usage: False
-  include_efficiency: False
   compile_model: False
   seed: 42 #seed
 val:

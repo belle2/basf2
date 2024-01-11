@@ -7,13 +7,13 @@ from .tree_utils import masses_to_classes
 from .dataset_utils import populate_avail_samples, preload_root_data
 from .edge_features import compute_edge_features
 from .normalize_features import normalize_features
-from torch_geometric.data import Data, InMemoryDataset, Dataset
+from torch_geometric.data import Data, InMemoryDataset
 import uproot
 
 
 def _preload(self):
     """
-    Creates graph object and stores them into a python list.
+    Creates graph objects and stores them into a python list.
     """
 
     # Going to use x_files as an array that always exists
@@ -100,6 +100,12 @@ def _preload(self):
 def _process_graph(self, idx):
     """
     Actually builds the graph object.
+
+    Args:
+        idx (int): Index of training example to be processed.
+
+    Returns:
+        g (torch_geometric.data.Data): Graph object to be used in training.
     """
 
     file_id, evt, p_index = self.avail_samples[idx]
@@ -254,6 +260,29 @@ def _process_graph(self, idx):
 
 
 class BelleRecoSetGeometricInMemory(InMemoryDataset):
+    """
+        Dataset handler for converting Belle II data to PyTorch geometric InMemoryDataset.
+
+        The ROOT format expects the tree in every file to be named ``Tree``,
+        and all node features to have the format ``feat_FEATNAME``.
+
+        .. note:: This expects the files under root to have the structure ``root/**/<file_name>.root``
+            where the root path is different for train and val.
+            The ``**/`` is to handle subdirectories, e.g. ``sub00``.
+
+        Args:
+            root (str): Path to ROOT files.
+            n_files (int): Load only `n_files` files.
+            samples (int): Load only `samples` events.
+            subset_unmatched (bool): Assign a random subset of unmatched particles to each B.
+            features (list): List of node features names.
+            ignore (list): List of discarded node features names.
+            edge_features (list): List of edge features names.
+            global_features (list): List of global features names.
+            normalize (bool): Whether to normalize input features.
+            overwrite (bool): Overwrite graph files if already present.
+    """
+
     def __init__(
         self,
         root,
@@ -265,31 +294,9 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         edge_features=[],
         global_features=[],
         normalize=None,
-        overwrite=False,
+        overwrite=True,
         **kwargs,
     ):
-        """
-        Dataset handler thingy for reconstructed Belle II MC to pytorch geometric InMemoryDataset
-
-        This expects the files under root to have the structure:
-            `root/**/<file_id>.py`
-        where the root path is different for train, and val.
-        The `**/` is to handle subdirectories, e.g. `sub00`
-
-        The ROOT format expects the tree in every file to be named `Tree`, and all features to have the format `feat_<name>`.
-
-        Args:
-            root (string): path to ROOT files
-            n_files (int): load only `n_files` files
-            samples (int): load only `samples` events
-            subset_unmatched (bool): assign a random subset of unmatched particles to each B
-            features (list): list of node features names
-            ignore (list): list of discarded node features names
-            edge_features (list): list of edge features names
-            global_features (list): list of global features names
-            normalize (bool): whether to normalize input features
-            overwrite (bool): overwrite graph files if already present
-        """
         assert isinstance(
             ignore, list
         ), f'Argument "ignore" must be a list and not {type(ignore)}'
@@ -324,107 +331,19 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
 
     @property
     def processed_file_names(self):
+        """"""
         return ["processed_data.pt"]
 
     def process(self):
+        """
+        Processes the data to create graph objects and stores them in ``root/processed/processed_data.pt``
+        where the root path is different for train and val.
+
+        Called internally by PyTorch.
+        """
         num_samples = _preload(self)
         data_list = [_process_graph(self, i) for i in range(num_samples)]
         data, slices = self.collate(data_list)
         torch.save((data, slices), self.processed_paths[0])
 
         del self.x, self.y, self.avail_samples, data_list, data, slices
-
-
-class BelleRecoSetGeometric(Dataset):
-    def __init__(
-        self,
-        root,
-        n_files=None,
-        samples=None,
-        subset_unmatched=True,
-        features=[],
-        ignore=[],
-        edge_features=[],
-        global_features=[],
-        normalize=None,
-        overwrite=False,
-        **kwargs,
-    ):
-        """
-        Dataset handler thingy for reconstructed Belle II MC to pytorch geometric Dataset
-
-        This expects the files under root to have the structure:
-            `root/**/<file_id>.py`
-        where the root path is different for train, and val.
-        The `**/` is to handle subdirectories, e.g. `sub00`
-
-        The ROOT format expects the tree in every file to be named `Tree`, and all features to have the format `feat_<name>`.
-
-        Args:
-            root (string): path to ROOT files
-            n_files (int): load only `n_files` files
-            samples (int): load only `samples` events
-            subset_unmatched (bool): assign a random subset of unmatched particles to each B
-            features (list): list of node features names
-            ignore (list): list of discarded node features names
-            edge_features (list): list of edge features names
-            global_features (list): list of global features names
-            normalize (bool): whether to normalize input features
-            overwrite (bool): overwrite graph files if already present
-        """
-
-        assert isinstance(
-            ignore, list
-        ), f'Argument "ignore" must be a list and not {type(ignore)}'
-        assert isinstance(
-            features, list
-        ), f'Argument "features" must be a list and not {type(features)}'
-
-        self.root = Path(root)
-
-        self.normalize = normalize
-
-        self.subset_unmatched = subset_unmatched
-
-        self.overwrite = overwrite
-
-        self.n_files = n_files
-        self.node_features = features
-        self.edge_features = edge_features
-        self.global_features = global_features
-        self.ignore = ignore
-        self.samples = samples
-
-        # Delete processed files, in case
-        self.file_path = Path(self.root, "processed")
-        files = list(self.file_path.glob("*.pt"))
-        if self.overwrite:
-            for f in files:
-                f.unlink(missing_ok=True)
-            self.num_samples = None
-
-        # Needs to be called after having assigned all attributes
-        super().__init__(root, None, None, None)
-
-    @property
-    def processed_file_names(self):
-        if self.overwrite:
-            self.num_samples = _preload(self) if not self.num_samples else self.num_samples
-            return [self.file_path / f'processed_data_{i}.pt' for i in range(self.num_samples)]
-        else:
-            return list(self.file_path.glob('processed_data_*.pt'))
-
-    def process(self):
-        for idx in range(self.num_samples):
-            g = _process_graph(self, idx)
-            torch.save(g, self.file_path / f"processed_data_{idx}.pt")
-            del g
-
-        del self.x, self.y, self.avail_samples
-
-    def len(self):
-        return len(self.processed_file_names)
-
-    def get(self, idx):
-        data = torch.load(self.file_path / f"processed_data_{idx}.pt")
-        return data

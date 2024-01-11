@@ -4,7 +4,13 @@ from ROOT import Belle2
 
 def getObjectList(pointerVec):
     """
-    Workaround function to avoid memory problems in basf2.
+    Workaround to avoid memory problems in basf2.
+
+    Args:
+        pointerVec (list or Belle2.ParticleList): Input particle list.
+
+    Returns:
+        objList (list): Output python list.
     """
     objList = []
     size = (
@@ -19,14 +25,13 @@ def getObjectList(pointerVec):
 
 class FlagBDecayModule(b2.Module):
     """
-    Saves variables indicating the decay mode the particles originated from.
-    Flags indicated which B meson was the parent and whether the decay was semileptonic
-    or hadronic.
-    Assumes MC matching has already been run on the list.
+    Adds to particles in a given particle list the array index of the generated B meson ancestor, if a MC matching is found.
+    If the particle list contains non-FSPs, the FSPs are considered.
+    Assumes MC matching has been run on the particle list.
 
     Args:
-        particle_list (str): name of Belle II particle list (can be FSP or composite)
-        b_parent_var (str): name of the extraInfo to save
+        particle_list (str): Name of source particle list.
+        b_parent_var (str): Name of the extraInfo to save.
     """
 
     def __init__(
@@ -39,6 +44,7 @@ class FlagBDecayModule(b2.Module):
         self.b_parent_var = b_parent_var
 
     def event(self):
+        """"""
         p_list = getObjectList(Belle2.PyStoreObj(self.particle_list).obj())
 
         particles = []
@@ -71,19 +77,3 @@ class FlagBDecayModule(b2.Module):
                     12,
                     f'MC particle (pdg code = {b_ancestor.getPDG()}) has no mother!')
                 particle.addExtraInfo(self.b_parent_var, -1)
-
-    def _is_semileptonic(self, mcp):
-        """
-        Recursive function to check if MCParticle is neutrino.
-
-        If not then this calls itself on the daughters.
-        Exits on first neutrino found.
-        """
-        for daughter in mcp.getDaughters():
-            if self._is_semileptonic(daughter):
-                return True
-
-        if abs(mcp.getPDG()) in [12, 14, 16, 18]:
-            return True
-
-        return False

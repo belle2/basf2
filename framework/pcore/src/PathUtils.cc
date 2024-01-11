@@ -98,6 +98,12 @@ std::tuple<PathPtr, PathPtr, PathPtr> PathUtils::splitPath(const PathPtr& path)
 ModulePtr PathUtils::getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath)
 {
   ModulePtr histoManagerModule;
+
+  // parameters cast to void to suppress cpp warnings
+  // remove the following 2 lines when using mainPath and outputPath parameters
+  (void)mainPath;
+  (void)outputPath;
+
   for (const ModulePtr& module : inputPath->getModules()) {
     if (module->hasProperties(Module::c_HistogramManager)) {
       // Initialize histogram manager if found in the path

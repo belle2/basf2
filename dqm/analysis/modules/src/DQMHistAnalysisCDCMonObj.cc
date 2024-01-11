@@ -276,16 +276,16 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
       fitFunc[i]->SetParameter(6, 0.02);
       fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
-      int xxx = -1;
+      int TDCfitstatus = -1;
       if (i < 28) {
-        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
+        TDCfitstatus = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
       } else {
-        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
+        TDCfitstatus = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
       }
       float p4 = fitFunc[i]->GetParameter(4);
       float p5 = fitFunc[i]->GetParameter(5);
 
-      if (xxx != -1 && 4850 < p4 && p4 < 5000) {
+      if (TDCfitstatus != -1 && 4850 < p4 && p4 < 5000) {
         hTDCEdge->SetBinContent(i + 1, p4);
         hTDCEdge->SetBinError(i + 1, 0);
         hTDCSlope->SetBinContent(i + 1, p5);

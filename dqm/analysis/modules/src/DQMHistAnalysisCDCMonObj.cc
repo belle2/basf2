@@ -316,11 +316,11 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }
       if (neve > 0) {
-        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(1.0 * nhitSumL / neve));
-        hHitRatePerWire->SetBinContent(i + 1, static_cast<float>((1.0 * nhitSumL / neve) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6)));
+        hHitPerLayer->SetBinContent(i + 1, 1.0 * nhitSumL / neve);
+        hHitRatePerWire->SetBinContent(i + 1, (1.0 * nhitSumL / neve) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6));
       } else {
-        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
-        hHitRatePerWire->SetBinContent(i + 1, static_cast<float>((1.0 * nhitSumL) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6)));
+        hHitPerLayer->SetBinContent(i + 1, nhitSumL);
+        hHitRatePerWire->SetBinContent(i + 1, (1.0 * nhitSumL) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6));
       }
       hHitPerLayer->SetBinError(i + 1, 0);
       hHitRatePerWire->SetBinError(i + 1, 0);

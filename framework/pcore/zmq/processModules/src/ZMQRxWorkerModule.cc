@@ -18,6 +18,9 @@ using namespace Belle2;
 REG_MODULE(ZMQRxWorker);
 
 static int s_event_number = 0;
+// cast to void to suppress cpp warning
+// remove the following line when using the s_event_number variable
+(void)s_event_number;
 
 ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
 {

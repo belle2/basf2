@@ -535,7 +535,7 @@ def command_iovs_delete(args, db=None):
 
     table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_delete]
     table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
-    columns = [9, -40, 6, 6, 6, 6, 6]
+    columns = [9, "+", 6, 6, 6, 6, 6]
 
     if len(all_iovs) == len(iovs_to_delete) and args.overlap_run_range is None and args.in_run_range is None:
         B2WARNING(f"All the iovs in the globaltag {args.tag} will be deleted!")
@@ -622,7 +622,7 @@ def command_iovs_copy(args, db=None):
 
     table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_copy]
     table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
-    columns = [9, -40, 6, 6, 6, 6, 6]
+    columns = [9, "+", 6, 6, 6, 6, 6]
 
     # make sure output tag exists
     output_id = db.get_globalTagInfo(args.output)
@@ -716,7 +716,7 @@ def command_iovs_modify(args, db=None):
 
     table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_modify]
     table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
-    columns = [9, -40, 6, 6, 6, 6, 6]
+    columns = [9, "+", 6, 6, 6, 6, 6]
 
     B2INFO(f"Setting to  the following iovs to {args.first_exp} {args.first_run} {args.last_exp} {args.last_run}")
     pretty_print_table(table, columns)

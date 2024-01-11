@@ -488,13 +488,12 @@ class ConditionsDB:
 
             for iov in iovs:
                 if overlap_run_range is not None:
-                    if IntervalOfValidity(
-                            iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd']
-                    ).intersect(overlap_run_range) is None:
+                    iov_ = IntervalOfValidity(iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd'])
+                    if iov_ & overlap_run_range is None:
                         continue
                 if in_run_range is not None:
                     iov_ = IntervalOfValidity(iov['expStart'], iov['runStart'], iov['expEnd'], iov['runEnd'])
-                    if not iov_.intersect(in_run_range) == iov_:
+                    if not iov_ & in_run_range == iov_:
                         continue
                 all_iovs.append(PayloadInformation.from_json(payload, iov))
 

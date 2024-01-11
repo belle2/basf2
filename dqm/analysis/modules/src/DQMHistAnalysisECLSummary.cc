@@ -15,7 +15,6 @@
 //ROOT
 #include <TStyle.h>
 #include <TLine.h>
-#include <TText.h>
 
 //boost
 #include "boost/format.hpp"
@@ -40,7 +39,7 @@ DQMHistAnalysisECLSummaryModule::DQMHistAnalysisECLSummaryModule()
   addParam("maxDeviationForChi2", m_maxDeviationForChi2,
            "The higher this parameter, the larger differences in the number of hits with bad chi2 are allowed for adjacent channels",
            2.5);
-  addParam("onlyIfUpdated", m_onlyIfUpdated, "If true (default), update EPICS PVs only if there histograms were updated.",
+  addParam("onlyIfUpdated", m_onlyIfUpdated, "If true (default), update EPICS PVs only if histograms were updated.",
            true);
 }
 
@@ -86,7 +85,7 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   //=== Set up the histogram to indicate alarm status
 
   TString title = "#splitline{ECL errors monitoring}";
-  title += "{E - Error, W - Warning, L - Low statistics}";
+  title += "{#color[2]{E - Error}, #color[93]{W - Warning}, #color[13]{L - Low statistics}}";
   title += ";ECLCollector ID (same as Crate ID)";
   h_channels_summary = new TH2F("channels_summary", title,
                                 ECL::ECL_CRATES, 1, ECL::ECL_CRATES + 1,
@@ -117,6 +116,7 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   c_channels_summary->SetLeftMargin(0.20);
   c_channels_summary->SetRightMargin(0.005);
   c_channels_summary->SetBottomMargin(0.10);
+  c_channels_summary->SetFrameFillColor(DQMHistAnalysisModule::c_ColorTooFew);
 
   //=== Additional canvases/histograms to display which channels have problems
   c_occupancy = new TCanvas("ECL/c_cid_Thr5MeV_overlaid_analysis");
@@ -173,11 +173,12 @@ void DQMHistAnalysisECLSummaryModule::beginRun()
 
 void DQMHistAnalysisECLSummaryModule::event()
 {
-  h_channels_summary->Reset();
-
   TH1* h_total_events = findHist("ECL/event", m_onlyIfUpdated);
   if (!h_total_events) return;
   m_total_events = h_total_events->GetEntries();
+
+  c_channels_summary->Clear();
+  h_channels_summary->Reset();
 
   // [alarm_type][crate_id - 1] -> number of problematic channels in that crate
   std::vector< std::vector<int> > alarm_counts = updateAlarmCounts();
@@ -187,9 +188,18 @@ void DQMHistAnalysisECLSummaryModule::event()
   const double HISTCOLOR_RED    = 0.9;
   const double HISTCOLOR_GREEN  = 0.45;
   const double HISTCOLOR_ORANGE = 0.65;
-  const double HISTCOLOR_BLUE   = 0.01;
+  const double HISTCOLOR_GRAY   = 0.00;
 
-  std::vector<TText*> labels;
+  // TODO: Currently, I am explicitly removing
+  // TText labels from the histogram. However,
+  // normally I would assume that canvas->Clear()
+  // should have already removed them. So
+  // it might indicate a memory leak or some
+  // problem with ROOT->JSON->ROOT conversion
+  for (auto& text : m_labels) {
+    delete text;
+  }
+  m_labels.clear();
 
   for (size_t alarm_idx = 0; alarm_idx < alarm_counts.size(); alarm_idx++) {
     for (size_t crate = 0; crate < alarm_counts[alarm_idx].size(); crate++) {
@@ -197,13 +207,19 @@ void DQMHistAnalysisECLSummaryModule::event()
       char label_text[2] = {0};
       int alarm_limit   = m_ecl_alarms[alarm_idx].alarm_limit;
       int warning_limit = m_ecl_alarms[alarm_idx].warning_limit;
-      if (m_total_events < m_ecl_alarms[alarm_idx].required_statistics) {
-        color = HISTCOLOR_BLUE;
+
+      int alarms = alarm_counts[alarm_idx][crate];
+
+      if (m_total_events < m_ecl_alarms[alarm_idx].required_statistics || alarms < 0) {
+        // `alarms < 0` means that we could not get the relevant histogram.
+        // We assume that the histogram is not yet available due to low
+        // statistics but this is not a guarantee.
+        color = HISTCOLOR_GRAY;
         label_text[0] = 'L';
-      } else if (alarm_counts[alarm_idx][crate] >= alarm_limit) {
+      } else if (alarms >= alarm_limit) {
         color = HISTCOLOR_RED;
         label_text[0] = 'E';
-      } else if (alarm_counts[alarm_idx][crate] >= warning_limit) {
+      } else if (alarms >= warning_limit) {
         color = HISTCOLOR_ORANGE;
         label_text[0] = 'W';
       } else {
@@ -216,10 +232,10 @@ void DQMHistAnalysisECLSummaryModule::event()
       h_channels_summary->SetBinContent(crate + 1, alarm_idx + 1, color);
       if (label_text[0] != 0) {
         auto text = new TText((crate + 1.5), (alarm_idx + 0.5), label_text);
-        text->SetTextColor(kWhite);
+        if (label_text[0] != 'L') text->SetTextColor(kWhite);
         text->SetTextSize(0.03);
         text->SetTextAlign(22); // centered
-        labels.push_back(text);
+        m_labels.push_back(text);
       }
     }
   }
@@ -234,7 +250,6 @@ void DQMHistAnalysisECLSummaryModule::event()
   gStyle->SetTitleX(0.60);
   gStyle->SetTitleY(1.00);
 
-  c_channels_summary->Clear();
   c_channels_summary->cd();
 
   //=== Prepare special style objects to use correct color palette
@@ -247,7 +262,7 @@ void DQMHistAnalysisECLSummaryModule::event()
 
   m_ecl_style     = new TExec("ecl_style",
                               "gStyle->SetPalette(kRainBow);"
-                              "channels_summary->SetDrawOption(\"col\");");
+                              "if (channels_summary) channels_summary->SetDrawOption(\"col\");");
   h_channels_summary->GetListOfFunctions()->Add(m_ecl_style);
   m_default_style = new TExec("default_style",
                               "gStyle->SetPalette(kBird);");
@@ -256,7 +271,7 @@ void DQMHistAnalysisECLSummaryModule::event()
   //    https://root.cern.ch/js/latest/examples.htm#th2_colpal77
   h_channels_summary->Draw("");
   h_channels_summary->Draw("colpal55;same");
-  for (auto& text : labels) {
+  for (auto& text : m_labels) {
     text->Draw();
   }
   drawGrid(h_channels_summary);
@@ -383,10 +398,10 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
     if (h_fail_crateid) {
       errors_count = h_fail_crateid->GetBinContent(crate_id);
     } else {
-      errors_count = 9999;
+      errors_count = -1;
     }
 
-    alarm_counts[fit_alarm_index][crate_id - 1] += errors_count;
+    alarm_counts[fit_alarm_index][crate_id - 1] = errors_count;
   }
 
   // [Cell ID] -> error_bitmask
@@ -416,15 +431,22 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
   for (auto& index_name : indices) {
     int alarm_index = getAlarmByName(index_name).first;
     int alarm_bit   = 1 << alarm_index;
+
     for (auto& [cid, error_bitmask] : error_bitmasks) {
-      int crate_id = m_mapper.getCrateID(cid);
       if ((error_bitmask & alarm_bit) == 0) continue;
 
       bool masked = (m_mask[index_name].find(cid) != m_mask[index_name].end());
 
-      if (!masked) alarm_counts[alarm_index][crate_id - 1] += 1;
+      if (!masked) {
+        int crate_id = m_mapper.getCrateID(cid);
+        // If channel is not masked, increase the alarm counter.
+        alarm_counts[alarm_index][crate_id - 1] += 1;
+      }
 
       if (update_mirabelle) continue;
+
+      // Unless it is the end of run, add problematic channels
+      // to the detailed 1D histogram.
 
       if (index_name == "bad_chi2") {
         if (!masked) h_bad_chi2_overlay->SetBinContent(cid, 1);
@@ -455,7 +477,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
         current_canvas     = c_bad_chi2;
       }
 
-      if (main_hist) {
+      if (main_hist && main_hist->GetEntries() > 0) {
         for (auto& overlay : {overlay_hist, overlay_hist_green}) {
           for (int bin_id = 1; bin_id <= ECL::ECL_TOTAL_CHANNELS; bin_id++) {
             if (overlay->GetBinContent(bin_id) == 0) continue;
@@ -621,10 +643,15 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
     // This indicates that DQMHistAnalysisECL module is not included in the path
     bool not_normalized = (findCanvas("ECL/c_cid_Thr5MeV_analysis") == nullptr);
     if (total_events >= dead_alarm.required_statistics) {
-      // For null runs, it should be higher than 0.0001%
-      // For cosmic runs, number of hits with E > threshold should be higher than 0.01%
-      // (for physics runs, as opposed to cosmics, this can actually be set to higher value)
-      double min_occupancy = 1e-6;
+      double min_occupancy;
+      if (getRunType() == "null") {
+        // For null runs, occupancy should be higher than 0.0001%
+        min_occupancy = 1e-6;
+      } else {
+        // For cosmic runs, occupancy should be higher than 0.01%
+        min_occupancy = 1e-4;
+        // (for physics runs, as opposed to cosmics, this can actually be set to higher value)
+      }
       if (not_normalized) {
         // The histogram is not normalized, multiply the threshold by evt count
         min_occupancy *= total_events;

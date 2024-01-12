@@ -588,7 +588,7 @@ void DQMHistAnalysisKLMModule::event()
   m_ProcessedEvents = getProcessedEvents();
   std::string str, histogramName, canvasName;
   TLatex latex;
-  latex.SetTextColor(kBlack);
+  latex.SetTextColor(kRed);
   latex.SetTextAlign(11);
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
   for (KLMChannelIndex& klmSector : klmIndex) {

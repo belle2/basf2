@@ -183,6 +183,7 @@ void KLMDQM2Module::event()
 {
   if (triggerFlag() || m_SoftwareTriggerName == "") {
     unsigned int nMuons = m_MuonList->getListSize();
+    B2INFO("KLMDQM2: Number of Muons used = " << nMuons); //remove after LS1 debugging...
     for (unsigned int i = 0; i < nMuons; ++i) {
       const Particle* muon = m_MuonList->getParticle(i);
       collectDataTrack(muon, m_MatchedHitsBKLM,

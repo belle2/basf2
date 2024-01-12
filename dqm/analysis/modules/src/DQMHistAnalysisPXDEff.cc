@@ -221,7 +221,7 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   m_hOuterMap->Reset();
 }
 
-void DQMHistAnalysisPXDEffModule::updateEffBins(int bin, int nhit, int nmatch, int minentries)
+bool DQMHistAnalysisPXDEffModule::updateEffBins(int bin, int nhit, int nmatch, int minentries)
 {
   m_eEffAll->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
   m_eEffAll->SetTotalEvents(bin, nhit);
@@ -234,13 +234,16 @@ void DQMHistAnalysisPXDEffModule::updateEffBins(int bin, int nhit, int nmatch, i
     m_eEffAllUpdate->SetPassedEvents(bin, nmatch);
     m_hEffAllLastTotal->SetBinContent(bin, nhit);
     m_hEffAllLastPassed->SetBinContent(bin, nmatch);
+    return true;
   } else if (nhit - m_hEffAllLastTotal->GetBinContent(bin) > minentries) {
     m_eEffAllUpdate->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
     m_eEffAllUpdate->SetTotalEvents(bin, nhit - m_hEffAllLastTotal->GetBinContent(bin));
     m_eEffAllUpdate->SetPassedEvents(bin, nmatch - m_hEffAllLastPassed->GetBinContent(bin));
     m_hEffAllLastTotal->SetBinContent(bin, nhit);
     m_hEffAllLastPassed->SetBinContent(bin, nmatch);
-  }
+    return true;
+  }// else
+  return false;
 }
 
 bool DQMHistAnalysisPXDEffModule::check_warn_level(int bin, std::string name)
@@ -421,12 +424,7 @@ void DQMHistAnalysisPXDEffModule::event()
       /// TODO: one value per module, and please change to the "delta" instead of integral
       all += nhit;
 
-      updateEffBins(bin, nhit, nmatch, m_minEntries);
-      if (nhit < m_minEntries) {
-        updated[aModule] = true;
-      } else if (nhit - m_hEffAllLastTotal->GetBinContent(bin) >= m_minEntries) {
-        updated[aModule] = true;
-      }
+      updated[aModule] = updateEffBins(bin, nhit, nmatch, m_minEntries);
 
       // workaround for excluded module
       if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;

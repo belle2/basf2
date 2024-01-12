@@ -20,7 +20,7 @@ class GeometricNetwork(torch.nn.Module):
         3. A last MetaLayer to decrease the number of node and edge features to the desired output dimension.
 
         .. figure:: figs/graFEI.png
-          :width: 40em
+          :width: 42em
           :align: center
 
         Args:

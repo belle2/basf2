@@ -27,7 +27,13 @@ class EdgeLayer(nn.Module):
         Updates edge features in MetaLayer:
 
         .. math::
-            e_{ij}^{'} = f(e_{ij}, v_{i}, v_{j}, u)
+            e_{ij}^{'} = \\phi^{e}(e_{ij}, v_{i}, v_{j}, u),
+
+        where :math:`\\phi^{e}` is a neural network of the form
+
+        .. figure:: figs/MLP_structure.png
+          :width: 42em
+          :align: center
 
         Args:
             nfeat_in_dim (int): Node features input dimension (number of node features in input).
@@ -121,7 +127,18 @@ class NodeLayer(nn.Module):
         Updates node features in MetaLayer:
 
         .. math::
-            v_{i}^{'} = f(v_{i}, \\text{Avg}(e_{i1}, ..., e_{ik}, e_{1i}, ..., e_{ki}), u)
+            v_{i}^{'} = \\phi^{v}(v_{i}, \\rho^{e \\to v}(v_{i}), u)
+
+        with
+
+        .. math::
+            \\rho^{e \\to v}(v_{i}) = \\frac{\\sum_{j=1,\\ j \\neq i}^{N} (e_{ji} + e _{ij})}{2 \\cdot (N-1)},
+
+        where :math:`\\phi^{v}` is a neural network of the form
+
+        .. figure:: figs/MLP_structure.png
+          :width: 42em
+          :align: center
 
         Args:
             nfeat_in_dim (int): Node features input dimension (number of node features in input).
@@ -221,7 +238,19 @@ class GlobalLayer(nn.Module):
         Updates node features in MetaLayer:
 
         .. math::
-            u_{i}^{'} = f(\\text{Avg}(v_{11}, ..., v_{jk}), \\text{Avg}(e_{11}, ..., e_{jk}), u)
+            u_{i}^{'} = \\phi^{u}(\\rho^{e \\to u}(e), \\rho^{v \\to u}(v), u)
+
+        with
+
+        .. math::
+            \\rho^{e \\to u}(e) = \\frac{\\sum_{i,j=1,\\ i \\neq j}^{N} e_{ij}}{N \\cdot (N-1)},\\\\
+            \\rho^{v \\to u}(e) = \\frac{\\sum_{i=1}^{N} v_{i}}{N},
+
+        where :math:`\\phi^{u}` is a neural network of the form
+
+        .. figure:: figs/MLP_structure.png
+          :width: 42em
+          :align: center
 
         Args:
             nfeat_in_dim (int): Node features input dimension (number of node features in input).

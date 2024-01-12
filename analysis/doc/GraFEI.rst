@@ -26,7 +26,8 @@ You can import these modules in a steering file with ``from grafei import MODULE
 Other modules and functions
 ***************************
 
-Here the core code of the graFEI is described.
+Here the core code of the graFEI is described. This section is intended for developers, 
+users usually do not need to understand the details of the code.
 
 .. autofunction:: grafei.modules.FlagBDecayModule.getObjectList
 

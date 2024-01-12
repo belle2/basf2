@@ -290,7 +290,7 @@ class B0toDstarPi_D0pi_Kpipipi_Kpipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\overline{D}^{0}
+    * :math:`B^{0}\\to \\overline{D}{}^{*-} (\\to \\overline{D}{}^{0}
       (\\to K^+ \\pi^- \\pi^- \\pi^+, K^+\\pi^-\\pi^0) \\pi^-) \\pi^+`
 
     Cuts applied:
@@ -1046,7 +1046,7 @@ class B0toDDs0star(BaseSkim):
     Reconstructed decay modes:
 
     * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\phi(\\to K^+ K^-) \\pi+ \\pi0) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
-    * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\overline{K}^{*0}(\\to K^- \\pi^+ ) K^+) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
+    * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\overline{K}{}^{*0}(\\to K^- \\pi^+ ) K^+) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
     * :math:`B^{0}\\to D_{s0}^{*+}(\\to D_s^+(\\to \\phi(\\to K^+ K^-) \\pi+) \\pi0) D^{-}(\\to K^+ \\pi^- \\pi^-)`
 
     Cuts applied:
@@ -1089,6 +1089,5 @@ class B0toDDs0star(BaseSkim):
 
         ma.reconstructDecay("B0:B0toDDs0star_Dsp_phipi -> D_s0*+ D-:Kpipi", cut=" 5.2 < Mbc < 5.3 and \
                             -0.2 < deltaE < 0.2 ", path=path)
-        ma.matchMCTruth("B0:B0toDDs0star_Dsp_phipi", path=path)
 
         return ["B0:B0toDDs0star_Dsp_phipi"]

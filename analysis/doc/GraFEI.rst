@@ -6,12 +6,12 @@ Graph-based Full Event Interpretation
 
 **Author: J. Cerasoli**
 
-The Graph-based Full Event Interpretation is a machine learning tool based on deep grah neural networks to inclusively reconstruct events in Belle II.
+The Graph-based Full Event Interpretation (graFEI) is a machine learning tool based on deep grah neural networks to inclusively reconstruct events in Belle II.
 
 Code documentation
 ##################
 
-This section describes the code used to train the graFEI and apply it to Belle II data and simulation.
+This section describes the grafei code, contained in ``analysis/scripts/grafei``.
 
 Basf2 modules
 *************
@@ -27,7 +27,7 @@ Other modules and functions
 ***************************
 
 Here the core code of the graFEI is described. This section is intended for developers, 
-users usually do not need to understand the details of the code.
+users usually do not need to manipulate these classes and functions.
 
 .. autofunction:: grafei.modules.FlagBDecayModule.getObjectList
 

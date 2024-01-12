@@ -82,7 +82,7 @@ def write_hist(
 
     Args:
         particle (basf2.MCParticle): The current particle being inspected.
-        Other arguments are automatically set.
+            Other arguments are automatically set.
     """
 
     neutrino_pdgs = [12, 14, 16, 18]

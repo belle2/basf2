@@ -64,8 +64,9 @@ namespace Belle2 {
      * @param nhit Number of hits
      * @param nmatch Number of matched hits
      * @param minentries Number of minimal entries required ofr update
+     * @return if (delta) plot was updated
      */
-    void updateEffBins(int bin, int nhit, int nmatch, int minentries);
+    bool updateEffBins(int bin, int nhit, int nmatch, int minentries);
 
     /**
      * Check bin/name for error condition

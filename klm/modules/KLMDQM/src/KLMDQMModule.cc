@@ -89,11 +89,11 @@ void KLMDQMModule::defineHisto()
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorBKLM =
     new TH1F("time_scintillator_bklm", "Scintillator hit time (BKLM)",
-             100, -5000, -4000);
+             100, -5300, -4300);
   m_TimeScintillatorBKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
-             100, -5100, -4100);
+             100, -5300, -4300);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",

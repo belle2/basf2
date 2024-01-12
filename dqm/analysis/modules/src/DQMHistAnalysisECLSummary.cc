@@ -85,7 +85,7 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   //=== Set up the histogram to indicate alarm status
 
   TString title = "#splitline{ECL errors monitoring}";
-  title += "{#color[2]{E - Error}, #color[93]{W - Warning}, #color[13]{L - Low statistics}}";
+  title += "{E - Error, W - Warning, L - Low statistics}";
   title += ";ECLCollector ID (same as Crate ID)";
   h_channels_summary = new TH2F("channels_summary", title,
                                 ECL::ECL_CRATES, 1, ECL::ECL_CRATES + 1,
@@ -201,6 +201,12 @@ void DQMHistAnalysisECLSummaryModule::event()
   }
   m_labels.clear();
 
+  //== Set correct warning/error colors based on alarm thresholds
+
+  bool enough     = true;
+  bool warn_flag  = false;
+  bool error_flag = false;
+
   for (size_t alarm_idx = 0; alarm_idx < alarm_counts.size(); alarm_idx++) {
     for (size_t crate = 0; crate < alarm_counts[alarm_idx].size(); crate++) {
       double color;
@@ -216,12 +222,15 @@ void DQMHistAnalysisECLSummaryModule::event()
         // statistics but this is not a guarantee.
         color = HISTCOLOR_GRAY;
         label_text[0] = 'L';
+        enough = false;
       } else if (alarms >= alarm_limit) {
         color = HISTCOLOR_RED;
         label_text[0] = 'E';
+        error_flag = true;
       } else if (alarms >= warning_limit) {
         color = HISTCOLOR_ORANGE;
         label_text[0] = 'W';
+        warn_flag = true;
       } else {
         color = HISTCOLOR_GREEN;
       }
@@ -240,6 +249,10 @@ void DQMHistAnalysisECLSummaryModule::event()
     }
   }
 
+  //=== Set background color based on combined status.
+
+  if (warn_flag || error_flag) enough = true;
+
   //=== Draw histogram, labels and grid
 
   // Customize title
@@ -251,6 +264,7 @@ void DQMHistAnalysisECLSummaryModule::event()
   gStyle->SetTitleY(1.00);
 
   c_channels_summary->cd();
+  colorizeCanvas(c_channels_summary, makeStatus(enough, warn_flag, error_flag));
 
   //=== Prepare special style objects to use correct color palette
   //    and use it only for this histogram

@@ -141,7 +141,7 @@ void CDCUnpackerModule::event()
 
       for (int k = 0; k < MaxNumOfCh; ++k) {
         nWords[k] = m_rawCDCs[i]->GetDetectorNwords(j, k);
-        if (m_rawCDCs[i]->CheckOnlineRemovedDataBit(j, k) == true) { //for error flag in ff55 trailer
+        if (MaxNumOfCh == 48 && m_rawCDCs[i]->CheckOnlineRemovedDataBit(j, k) == true) { //for error flag in ff55 trailer
           if (nWords[k] != 0)
             B2FATAL("The data is not removed for the bad channel (" << j << "," << k << ") with error flag in ff55 trailer! ");
         }

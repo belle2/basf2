@@ -1074,35 +1074,21 @@ class B0toDDs0star(BaseSkim):
         loadStdPi0ForBToHadrons(path=path)
 
     def build_lists(self, path):
-
-        BsigList_1 = []
         ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",  cut="1.01 < M < 1.03", path=path)
-        ma.reconstructDecay("D_s+ -> phi pi+:GoodTrack pi0:bth_skim", cut="1.942 < M < 1.978", path=path)
-        ma.reconstructDecay("D_s0*+ -> D_s+ pi0:bth_skim", cut="2.249 < M < 2.298 and 0.31 < massDifference(0) < 0.347 and \
-                            1.017 < p < 2.552 and 2.267 < daughterInvM(0, 1) < 2.311", path=path)
-        ma.reconstructDecay("B0:B0toDDs0star_Dsp_phipipi0 -> D_s0*+ D-:Kpipi", cut="5.2 < Mbc < 5.3 and \
-                            0.2 < deltaE < 0.2", path=path)
-        ma.matchMCTruth("B0:B0toDDs0star_Dsp_phipipi0", path=path)
-        BsigList_1.append("B0:B0toDDs0star_Dsp_phipipi0")
-
-        BsigList_2 = []
         ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",  cut="0.793 < M < 1.015", path=path)
-        ma.reconstructDecay("D_s+ -> anti-K*0 K+:GoodTrack", cut="1.944 < InvM < 1.992", path=path)
-        ma.reconstructDecay("D_s0*+ -> D_s+ pi0:bth_skim", cut="2.252 < M < 2.330 and \
-                            0.25 < massDifference(0) < 0.36 and 1.017 < p < 2.552", path=path)
-        ma.reconstructDecay("B0:B0toDDs0star_Dsp_antiKstarK -> D_s0*+ D-:Kpipi", cut="5.2 < Mbc < 5.3 and \
-                            -0.2 < deltaE < 0.2", path=path)
-        ma.matchMCTruth("B0:B0toDDs0star_Dsp_antiKstarK", path=path)
-        BsigList_2.append("B0:B0toDDs0star_Dsp_antiKstarK")
 
-        BsigList_3 = []
-        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack", cut=" 1.001 < InvM < 1.043 ", path=path)
-        ma.reconstructDecay("D_s+ -> phi pi+:GoodTrack", cut=" 1.935 < InvM < 1.999 ", path=path)
-        ma.reconstructDecay("D_s0*+ -> D_s+ pi0:bth_skim", cut=" 2.265 < InvM < 2.355 and \
-                            0.286 < massDifference(0) < 0.361 ", path=path)
+        ma.reconstructDecay("D_s+:ch1 -> phi pi+:GoodTrack pi0:bth_skim", cut="1.942 < M < 1.978", dmID=1, path=path)
+        ma.reconstructDecay("D_s+:ch2 -> anti-K*0 K+:GoodTrack", cut="1.944 < InvM < 1.992", dmID=2, path=path)
+        ma.reconstructDecay("D_s+:ch3 -> phi pi+:GoodTrack", cut=" 1.935 < InvM < 1.999 ", dmID=3, path=path)
+        ma.copyLists(outputListName='D_s+:all',
+                     inputListNames=['D_s+:ch1', 'D_s+:ch2', 'D_s+:ch3'],
+                     path=path)
+
+        ma.reconstructDecay("D_s0*+ -> D_s+:all pi0:bth_skim", cut="2.249 < M < 2.298 and 0.31 < massDifference(0) < 0.347 and \
+                            1.017 < p < 2.552 and 2.267 < daughterInvM(0, 1) < 2.311", dmID=1, path=path)
+
         ma.reconstructDecay("B0:B0toDDs0star_Dsp_phipi -> D_s0*+ D-:Kpipi", cut=" 5.2 < Mbc < 5.3 and \
                             -0.2 < deltaE < 0.2 ", path=path)
         ma.matchMCTruth("B0:B0toDDs0star_Dsp_phipi", path=path)
-        BsigList_3.append("B0:B0toDDs0star_Dsp_phipi")
-        BsigList = BsigList_1 + BsigList_2 + BsigList_3
-        return BsigList
+
+        return ["B0:B0toDDs0star_Dsp_phipi"]

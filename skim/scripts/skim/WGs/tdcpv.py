@@ -58,13 +58,9 @@ class TDCPV_qqs(BaseSkim):
     * ``B0 -> pi+ pi- K_S0``
     * ``B0 -> pi+ pi- K_S0 gamma``
     * ``B0 -> pi0  K_S0 gamma``
-    * ``B0 -> pi0 pi0 K_S0``
-    * ``B0 -> phi K_S0 pi0``
-    * ``B0 -> pi+ pi- K_S0``
-    * ``B0 -> pi+ pi- K_S0 gamma``
-    * ``B0 -> pi0  K_S0 gamma``
     * ``B+ -> eta' K+``
     * ``B+ -> phi K+``
+    * ``B+ -> pi+ pi- K+ gamma``
 
     **Particle lists used**:
 
@@ -157,6 +153,7 @@ class TDCPV_qqs(BaseSkim):
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
             'phi:SkimHighEff K+:SkimHighEff',
+            'pi+:SkimHighEff pi-:SkimHighEff K+:SkimHighEff gamma:E15',
         ]
 
         bd_qqs_List = []
@@ -226,7 +223,7 @@ class TDCPV_ccs(BaseSkim):
     * ``B0 -> J/psi (ee/mm) KL``
     * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``
     * ``B0 -> J/psi (ee/mm) pi0``
-
+    * ``B0 -> J/psi (ee/mm) K+ pi-``
 
     **Particle lists used**:
 
@@ -313,7 +310,9 @@ class TDCPV_ccs(BaseSkim):
                            'J/psi:ee eta:SkimHighEff',
                            'J/psi:mumu eta:SkimHighEff',
                            'J/psi:ee pi0:eff60_May2020',
-                           'J/psi:mumu pi0:eff60_May2020']
+                           'J/psi:mumu pi0:eff60_May2020',
+                           'J/psi:ee K+:SkimHighEff pi-:SkimHighEff',
+                           'J/psi:mumu K+:SkimHighEff pi-:SkimHighEff']
 
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:SkimHighEff',
                                 'J/psi:ee K+:SkimHighEff']

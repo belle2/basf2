@@ -38,7 +38,7 @@ class GeometricNetwork(torch.nn.Module):
             global_layer (bool): Whether to use global layer.
 
         Returns:
-            x (torch.tensor), edge_attr (torch.tensor), u (torch.tensor): Node, edge and global features after model evaluation.
+            torch.tensor, torch.tensor, torch.tensor: Node, edge and global features after model evaluation.
     """
 
     def __init__(
@@ -230,7 +230,7 @@ class GeometricNetwork(torch.nn.Module):
     def getNXClasses(self):
         """
         Returns:
-            x_classes (int): Number of node classes in the model.
+            int: Number of node classes in the model.
         """
         # TODO: Check if can be removed.
         return self.x_classes
@@ -238,7 +238,7 @@ class GeometricNetwork(torch.nn.Module):
     def getNEClasses(self):
         """
         Returns:
-            edge_classes (int): Number of edge classes in the model.
+            int: Number of edge classes in the model.
         """
         # TODO: Check if can be removed.
         return self.edge_classes

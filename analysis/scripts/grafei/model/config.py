@@ -16,7 +16,7 @@ def _update_config_dict(d, u):
         u (dict): Dictionary of configs.
 
     Returns:
-        d (dict): Updated dictionary of configs.
+        dict: Updated dictionary of configs.
     """
     for k, v in u.items():
         if isinstance(v, collections.abc.Mapping):
@@ -38,7 +38,7 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
         samples(int): Number of samples to train on (overwrites loaded config).
 
     Returns:
-        configs (dict), tags (list): Loaded training configuration dictionary
+        dict, list: Loaded training configuration dictionary
         and list of tuples containing (tag name, dataset path, tag key).
     """
 
@@ -83,7 +83,7 @@ def _generate_dataset_tags(configs, samples=None):
         samples (dict): Number of training samples.
 
     Returns:
-        tags (list): A list of tuples containing (tag name, dataset path, tag key).
+        list: List of tuples containing (tag name, dataset path, tag key).
     """
     # Fetch whichever data source we're loading
     source_confs = configs['dataset']

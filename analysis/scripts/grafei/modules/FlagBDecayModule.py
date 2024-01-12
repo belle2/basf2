@@ -10,7 +10,7 @@ def getObjectList(pointerVec):
         pointerVec (list or Belle2.ParticleList): Input particle list.
 
     Returns:
-        objList (list): Output python list.
+        list: Output python list.
     """
     objList = []
     size = (

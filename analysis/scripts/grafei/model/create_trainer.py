@@ -251,7 +251,7 @@ class GraFEIIgniteTrainer:
             configs (dict): Config dictionary.
 
         Returns:
-            configs (dict): Cleaned config dict.
+            dict: Cleaned config dict.
         """
         for k, v in configs.items():
             if isinstance(v, collections.abc.Mapping):

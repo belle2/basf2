@@ -17,7 +17,7 @@ def populate_avail_samples(X, Y, B_reco=0,
                \\text{Upsilon} (4S) = 0,\\ B^0 = 1,\\ B^+ = 2.
 
     Returns:
-        avail_samples (list): List of available samples for training.
+        list: List of available samples for training.
     """
     # Must iterate over Y because X contains a b_index of -1 for unmatched particles
     avail_samples = []
@@ -75,7 +75,7 @@ def preload_root_data(root_files, features, discarded):
             but used to calculate other quantities (e.g. edge features).
 
     Returns:
-        x (list), y (list): Lists of dictionaries containing training information for input and ground-truth.
+        list, list: Lists of dictionaries containing training information for input and ground-truth.
     """
     x = []
     y = []

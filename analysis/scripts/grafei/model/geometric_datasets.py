@@ -105,7 +105,7 @@ def _process_graph(self, idx):
         idx (int): Index of training example to be processed.
 
     Returns:
-        g (torch_geometric.data.Data): Graph object to be used in training.
+        torch_geometric.data.Data: Graph object to be used in training.
     """
 
     file_id, evt, p_index = self.avail_samples[idx]

@@ -10,7 +10,7 @@ def getDoca(name_values):
         name_values (dict): Dictionary of numpy arrays containing px, py, pz, x, y, z.
 
     Returns:
-        doca (numpy.ndarray): Array containing doca values.
+        numpy.ndarray: Array containing doca values.
     """
     eps = 1e-7
 
@@ -56,7 +56,7 @@ def getCostheta(name_values):
         name_values (dict): Dictionary of numpy arrays containing p, px, py, pz.
 
     Returns:
-        costheta (numpy.ndarray): Array containing cosinus of theta values.
+        numpy.ndarray: Array containing cosinus of theta values.
     """
     ux = name_values["px"] / name_values["p"]
     uy = name_values["py"] / name_values["p"]
@@ -86,7 +86,7 @@ def available_edge_features(feat, name_values):
         name_values (dict): Dictionary of numpy arrays containing node features.
 
     Returns:
-        (numpy.ndarray): Edge feature `feat` computed given certain node features in `name_values`.
+        numpy.ndarray: Edge feature `feat` computed given certain node features in `name_values`.
     """
     if feat not in available_features:
         sys.exit(
@@ -106,7 +106,7 @@ def compute_edge_features(edge_feature_names, features, x):
         x (numpy.ndarray): Array of node features.
 
     Returns:
-        edge_features (numpy.ndarray): Array of edge features.
+        numpy.ndarray: Array of edge features.
     """
 
     # Will be filled and converted to np.ndarray of shape [E, F_e] with

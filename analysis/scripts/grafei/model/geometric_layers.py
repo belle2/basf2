@@ -40,7 +40,7 @@ class EdgeLayer(nn.Module):
             normalize (str): Type of normalization (batch/layer).
 
         Returns:
-            out (torch.tensor): Updated edge features tensor.
+            torch.tensor: Updated edge features tensor.
     """
 
     def __init__(
@@ -134,7 +134,7 @@ class NodeLayer(nn.Module):
             normalize (str): Type of normalization (batch/layer).
 
         Returns:
-            out (torch.tensor): Updated node features tensor.
+            torch.tensor: Updated node features tensor.
     """
 
     def __init__(
@@ -234,7 +234,7 @@ class GlobalLayer(nn.Module):
             normalize (str): Type of normalization (batch/layer).
 
         Returns:
-            out (torch.tensor): Updated node features tensor.
+            torch.tensor: Updated node features tensor.
     """
 
     def __init__(

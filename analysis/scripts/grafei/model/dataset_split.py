@@ -13,7 +13,7 @@ def create_dataloader_mode_tags(configs, tags):
         tags (list): Mode tags train/val containing dataset paths.
 
     Returns:
-        mode_tags (dict): Mode tag dictionary containing tuples of (mode, dataset, dataloader).
+        dict: Mode tag dictionary containing tuples of (mode, dataset, dataloader).
     """
 
     mode_tags = {}

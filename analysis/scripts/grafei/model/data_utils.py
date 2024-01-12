@@ -14,7 +14,7 @@ def calculate_class_weights(dataloader, num_classes, edges, num_batches=100):
         num_batches (int): Number of batches from dataloader to use to approximate class weights.
 
     Returns:
-        weights (torch.tensor): Tensor of class weights, normalised to 1.
+        torch.tensor: Tensor of class weights, normalised to 1.
 
     .. note:: Class weights do not improve the performances, left for experimenting.
     """

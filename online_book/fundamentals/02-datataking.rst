@@ -585,14 +585,13 @@ data to be used for conference results. Both prompt and reprocessed datasets can
 by specifying the campaign e.g. bucket17 campaign for prompt data, and proc13 campaign for reprocessed data. 
 
 .. _fig:data_overview:
-.. figure:: data_overview.jpg
+.. figure:: data_overview.png
     :align: center
     :width: 900px
     :alt: Diagram of relationship between prompt and reprocessed data
 
     A diagram showing the relationship between data collected at run time, prompt datasets (e.g. buckets) 
-    and reprocessed data (e.g. procXX). This is taken from the software and data production workshop slides 
-    `here <https://indico.belle2.org/event/9402/sessions/3440/attachments/25112/37142/DP_physweek_Octo2023.pdf>`_ 
+    and reprocessed data (e.g. procXX).  
 
 .. include:: ../lesson_footer.rstinclude
 

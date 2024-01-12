@@ -1,4 +1,4 @@
-# EventType: 1121820001
+# EventType: 1121842100
 # Descriptor: [B0 -> J/psi(l+l-) K*0(KS0pi0)] cc
 # NickName: Bd_JpsiK*S
 # Test : Yes
@@ -6,7 +6,7 @@
 # Responsible: Sagar Hazra
 # Email: shazra@mpp.mpg.de
 # Date: 2023/01/10
-# Comments: Modified 1121820001 decfile for K*0->KS0pi0 
+# Comments: Modified from 1121820000 decfile with the change K*0->KS0pi0 
 # Decay table to generate
 # Upsilon(4S) -> B0 anti-B0 -> Generic
 #             |

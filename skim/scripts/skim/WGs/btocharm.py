@@ -1045,7 +1045,7 @@ class B0toDstarpipi0_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to \\D^{*-} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\pi^+ \\pi^0`
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\pi^+ \\pi^0`
 
     Cuts applied:
 

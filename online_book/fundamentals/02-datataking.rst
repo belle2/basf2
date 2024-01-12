@@ -322,7 +322,7 @@ ARICH
     some analysis.
 
 ECL
-    The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the
+    The Electromagnetic Calorimeter (ECL) is chiefly tasked with measuring the
     electromagnetic energy of photons and electrons produced in the collision.
     In combination with tracking information, the calorimeter can distinguish, for
     example, electrons from muons.

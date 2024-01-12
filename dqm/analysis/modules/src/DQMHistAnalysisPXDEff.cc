@@ -195,21 +195,21 @@ void DQMHistAnalysisPXDEffModule::beginRun()
   {
     double dummy, loerr = 0, lowarn = 0;
     if (requestLimitsFromEpicsPVs("L1", loerr, lowarn, dummy, dummy)) {
-      m_hErrorLine->SetBinContent(m_nrxbins + 1, loerr);
+      m_hErrorLine->SetBinContent(m_PXDModules.size() + 1, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["L1"] = loerr;
-      m_hWarnLine->SetBinContent(m_nrxbins + 1, lowarn);
+      m_hWarnLine->SetBinContent(m_PXDModules.size() + 1, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["L1"] = lowarn;
     }
     if (requestLimitsFromEpicsPVs("L2", loerr, lowarn, dummy, dummy)) {
-      m_hErrorLine->SetBinContent(m_nrxbins + 2, loerr);
+      m_hErrorLine->SetBinContent(m_PXDModules.size() + 2, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["L2"] = loerr;
-      m_hWarnLine->SetBinContent(m_nrxbins + 2, lowarn);
+      m_hWarnLine->SetBinContent(m_PXDModules.size() + 2, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["L2"] = lowarn;
     }
     if (requestLimitsFromEpicsPVs("All", loerr, lowarn, dummy, dummy)) {
-      m_hErrorLine->SetBinContent(m_nrxbins + 3, loerr);
+      m_hErrorLine->SetBinContent(m_PXDModules.size() + 3, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["All"] = loerr;
-      m_hWarnLine->SetBinContent(m_nrxbins + 3, lowarn);
+      m_hWarnLine->SetBinContent(m_PXDModules.size() + 3, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["All"] = lowarn;
     }
   }
@@ -439,20 +439,20 @@ void DQMHistAnalysisPXDEffModule::event()
       }
     }
 
-    updateEffBins(m_nrxbins + 1, ihitL1, imatchL1, m_minEntries * 8);
+    updateEffBins(m_PXDModules.size() + 1, ihitL1, imatchL1, m_minEntries * 8);
     if (ihitL1 >= m_minEntries) {
-      error_flag |= check_error_level(m_nrxbins + 0, "L1");
-      warn_flag |= check_warn_level(m_nrxbins + 0, "L1");
+      error_flag |= check_error_level(m_PXDModules.size() + 0, "L1");
+      warn_flag |= check_warn_level(m_PXDModules.size() + 0, "L1");
     }
-    updateEffBins(m_nrxbins + 2, ihitL2, imatchL2, m_minEntries * 12);
+    updateEffBins(m_PXDModules.size() + 2, ihitL2, imatchL2, m_minEntries * 12);
     if (ihitL2 >= m_minEntries) {
-      error_flag |= check_error_level(m_nrxbins + 1, "L2");
-      warn_flag |= check_warn_level(m_nrxbins + 1, "L2");
+      error_flag |= check_error_level(m_PXDModules.size() + 1, "L2");
+      warn_flag |= check_warn_level(m_PXDModules.size() + 1, "L2");
     }
-    updateEffBins(m_nrxbins + 3, ihit, imatch, m_minEntries * 20);
+    updateEffBins(m_PXDModules.size() + 3, ihit, imatch, m_minEntries * 20);
     if (ihit >= m_minEntries) {
-      error_flag |= check_error_level(m_nrxbins + 2, "All");
-      warn_flag |= check_warn_level(m_nrxbins + 2, "All");
+      error_flag |= check_error_level(m_PXDModules.size() + 2, "All");
+      warn_flag |= check_warn_level(m_PXDModules.size() + 2, "All");
     }
 
     {

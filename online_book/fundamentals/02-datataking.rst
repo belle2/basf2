@@ -15,7 +15,8 @@ Data Taking
     **Objectives**:
 
     * Understand the different detector systems in Belle II.
-    * Definiton of triggers and their effects.
+    * Learn the definiton of triggers and their effects.
+    * Know the difference between proc and prompt data processing 
 
 One of the most important steps is of course to record the data we want to
 analyse. In this chapter we will go through the important concepts of the Belle
@@ -557,6 +558,42 @@ intended functionality is of highest importance for the success of the experimen
     * Prescaling might be used to only record every n-th event (on average) that
       satisfies given trigger conditions.
 
+Processing Data Samples
+------------------------
+
+Data from physics runs undergo two main stages of processing: prompt processing and reprocessing. 
+The difference between them relates to the level of calibrations that are applied during the 
+processing. The relationship between each stage of processing 
+(described below) is represented schematically in :numref:`fig:data_overview`.  
+
+Prompt processing occurs when each new bucket of data is collected. A bucket typically comprises of 
+the data collected from physics runs between subsequent maintenance days of operation, and therefore 
+often spans a period of 2 weeks of runs. Effectively, this means the data is processed in "real time" 
+hence why it is referred to as prompt processing. Prompt data is always obtained using the latest major 
+software release, and utilises the best initial guess for calibrations based on the information of 
+buckets and reprocessing campaigns. Each data bucket is available for use by analysts following prompt 
+processing, with a higher bucket number indicating newer data. It should also be noted that no full 
+offline luminosity estimation can be derived from prompt data.    
+
+Conversely, reprocessed data, labelled with the prefix "proc" (e.g. proc13), contains a combination of buckets 
+that have been processed again using the most refined knowledge of the required calibrations based on 
+dedicated performance studies and information from previous prompt data campaigns. Furthermore, all fixes 
+for bugs that were identified during the prompt processing are also included. 
+
+As a result, full publications must only use reprocessed data, while in principle it is fine for the prompt 
+data to be used for conference results. Both prompt and reprocessed datasets can be located on the grid 
+by specifying the campaign e.g. bucket17 campaign for prompt data, and proc13 campaign for reprocessed data. 
+
+.. _fig:data_overview:
+.. figure:: data_overview.jpg
+    :align: center
+    :width: 900px
+    :alt: Diagram of relationship between prompt and reprocessed data
+
+    A diagram showing the relationship between data collected at run time, prompt datasets (e.g. buckets) 
+    and reprocessed data (e.g. procXX). This is taken from the software and data production workshop slides 
+    `here <https://indico.belle2.org/event/9402/sessions/3440/attachments/25112/37142/DP_physweek_Octo2023.pdf>`_ 
+
 .. include:: ../lesson_footer.rstinclude
 
 .. rubric:: Author(s) of this lesson
@@ -566,3 +603,4 @@ Martin Ritter,
 Oskar Hartbrich,
 Michael Eliachevitch,
 Sam Cunliffe
+Priyanka Cheema

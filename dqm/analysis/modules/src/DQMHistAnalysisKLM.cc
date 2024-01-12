@@ -47,7 +47,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MinProcessedEventsForMessages", m_MinProcessedEventsForMessagesInput,
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
-           "Minimal number for delta histogram updates", 500000.);
+           "Minimal number for delta histogram updates", 50000.);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
@@ -332,6 +332,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
   }
 
+  // for hot/masked channels, log scale plots (reference and main)
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
     histogram->SetMinimum(1);
     canvas->SetLogy();
@@ -352,6 +353,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   int divisions;
   int bin = 1;
   double xLine;
+  // drawing lines for BKLM sectors
   if (subdetector == 1) {
     int shift;
     if (index == 0) {
@@ -367,7 +369,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       bin += BKLMElementNumbers::getNStrips(section, sector, k + shift, 0)
              + BKLMElementNumbers::getNStrips(section, sector, k + shift, 1);
     }
-  } else {
+  } else { // drawing lines for EKLM sectors
     if ((section == 2) && (index == 0 || index == 1))
       divisions = 5;
     else
@@ -416,13 +418,15 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
   }
 
   else {
+    canvas->Clear();
+    canvas->cd();
+    histogram->Draw();
     /* calling on delta histogram*/
     TH1* delta = getDelta(m_histogramDirectoryName, histName);
-    UpdateCanvas(canvas->GetName(), delta != nullptr);
+    UpdateCanvas(canvas->GetName(), delta != nullptr); //keeping this for testing purposes
     if (delta != nullptr) {
-      canvas->Clear();
-      canvas->cd();
-      delta->Draw("hist");
+      B2INFO("DQMHistAnalysisKLM: Time Delta Entries is " << delta->GetEntries());
+      deltaDrawer(delta, histogram, canvas);
     }
   }
 }
@@ -589,6 +593,7 @@ void DQMHistAnalysisKLMModule::event()
   latex.SetTextColor(kRed);
   latex.SetTextAlign(11);
   KLMChannelIndex klmIndex(KLMChannelIndex::c_IndexLevelSector);
+  // gathering relevant info for analyseChannelHitHistogram
   for (KLMChannelIndex& klmSector : klmIndex) {
     int nHistograms;
     if (klmSector.getSubdetector() == KLMElementNumbers::c_BKLM)
@@ -616,7 +621,10 @@ void DQMHistAnalysisKLMModule::event()
         B2WARNING("KLM DQM histogram canvas " << canvasName << " is not found.");
         continue;
       }
-      UpdateCanvas(canvas->GetName(), delta != nullptr || histogram != nullptr);
+      // Add this canvas that it is time to update
+      // not sure if this is interfering with the generation of some features
+      // after testing, switch condition back to delta != nullptr || histogram != nullptr
+      UpdateCanvas(canvas->GetName(), true);
       analyseChannelHitHistogram(
         klmSector.getSubdetector(), klmSector.getSection(),
         klmSector.getSector(), j, histogram, delta, canvas, latex);

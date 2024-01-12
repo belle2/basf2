@@ -16,6 +16,7 @@
 #include <TLine.h>
 
 namespace Belle2 {
+  /*! DQM Histogram Analysis for simple peaking distributions */
 
   class DQMHistAnalysisPeakModule final : public DQMHistAnalysisModule {
 

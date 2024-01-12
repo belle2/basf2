@@ -276,7 +276,7 @@ void DQMHistAnalysisPXDEffModule::setLabels(TGraphAsymmErrors* gr)
         ax->SetBinLabel(i + 1, ModuleName);
       }
       ax->SetBinLabel(m_PXDModules.size() + 1, "L1");
-      ax->SetBinLabel(m_PXDModules.size() + 2, "L1");
+      ax->SetBinLabel(m_PXDModules.size() + 2, "L2");
       ax->SetBinLabel(m_PXDModules.size() + 3, "All");
     }
   }

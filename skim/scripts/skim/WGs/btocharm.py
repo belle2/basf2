@@ -1046,16 +1046,16 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to \\D^{*-} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\eta (\\to \\gamma \\gamma) \\pi^+`
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\eta (\\to \\gamma \\gamma) \\pi^+`
 
     Cuts applied:
 
     * ``Mbc > 5.25``
     * ``abs(deltaE) < 0.32``
-    * ``1.7 < M_D < 2.0``
+    * ``1.7 < M_D0 < 2.0``
     * ``(M_D* - M_D0) < 0.16``
     * ``0.35 < M_eta < 0.7``
-    * ``E_photons > 0.05``
+    * ``Energy_photons > 0.05``
 
     Note:
         This skim uses `skim.standardlists.charm.loadStdD0_Kpi` and `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpi`, where the

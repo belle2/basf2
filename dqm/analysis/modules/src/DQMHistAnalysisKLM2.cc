@@ -30,7 +30,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms (depends on tracking variables).");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
-  addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 5000000.);
+  addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 50000.);
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
@@ -486,10 +486,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   eff2dHist->Draw("COLZ");
   errHist->Draw("TEXT SAME");
   if (setAlarm) {
-    eff2dCanv->Pad()->SetFillColor(kRed);
+    colorizeCanvas(eff2dCanv, c_StatusError);
   } else if (setWarn) {
-    eff2dCanv->Pad()->SetFillColor(kYellow);
-  }
+    colorizeCanvas(eff2dCanv, c_StatusWarning);
+  } else
+    colorizeCanvas(eff2dCanv, c_StatusGood);
   eff2dCanv->Modified();
   eff2dCanv->Update();
 }
@@ -556,7 +557,9 @@ void DQMHistAnalysisKLM2Module::event()
                         m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "Updating EPICS PVs in DQMHistAnalysisKLM2");
-  setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
-  setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
-  updateEpicsPVs(5.0);
+  double procesedEvents = DQMHistAnalysisModule::getEventProcessed();
+  if (procesedEvents > m_minEvents) {
+    setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
+    setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+  }
 }

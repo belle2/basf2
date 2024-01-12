@@ -7,11 +7,16 @@ import basf2 as b2
 
 
 class saveModelToPayload(b2.Module):
+    """
+    Module to save model weight and yaml files to payload.
+    """
 
     def initialize(self):
+        """"""
         b2.B2INFO('Creating local database...')
 
     def beginRun(self):
+        """"""
         iov = Belle2.IntervalOfValidity.always()
 
         db = Belle2.Database.Instance()
@@ -19,6 +24,7 @@ class saveModelToPayload(b2.Module):
         db.addPayload('graFEIConfigFile', config_file, iov)
 
     def terminate(self):
+        """"""
         b2.B2INFO('Done!')
 
 

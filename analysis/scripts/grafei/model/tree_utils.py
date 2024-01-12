@@ -4,12 +4,24 @@ import numpy as np
 
 def masses_to_classes(array):
     """
-    Convert the mass hypotheses to classes.
+    Converts mass hypotheses to classes used in cross-entropy computation.
+
+    Classes are:
+
+    .. math::
+        e \\to 1\\\\
+        \\mu \\to 2\\\\
+        \\pi \\to 3\\\\
+        K \\to 4\\\\
+        p \\to 5\\\\
+        \\gamma \\to 6\\\\
+        \\text{others} \\to 0
 
     Args:
-        array (numpy array): array containing PDG mass codes
+        array (numpy.ndarray): Array containing PDG mass codes.
+
     Returns:
-        array (numpy array): array containing mass hypothese converted to classes
+        numpy.ndarray: Array containing mass hypothese converted to classes.
     """
     array = -1 * np.abs(array)  # All elements become negative
     array[array == -11] = 1  # Electrons are class 1
@@ -23,13 +35,13 @@ def masses_to_classes(array):
     return array
 
 
-def check_undirected(adjacency_matrix):
+def _check_undirected(adjacency_matrix):
     """
     Checks whether an adjacency matrix-encoded graph is undirected, i.e. symmetric.
 
     Args:
-        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked nodes
-            should have value unequal to zero.
+        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+            Linked nodes should have value unequal to zero.
 
     Returns:
         bool: True if the graph encoded by adjacency matrix is undirected, False otherwise.
@@ -45,14 +57,14 @@ def _connectedness_dfs(adjacency_matrix, index, reached):
     """
     Actual depth-first search of graph connectedness. Starting from the node marked by index a recursive search is
     performed. Visited nodes are marked as reachable during recursion. If the graph is not connected, the reachability
-    'reached' mask will contain zero elements.
+    `reached` mask will contain zero elements.
 
     Args:
-        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked nodes
-            should have value unequal to zero.
+        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+            Linked nodes should have value unequal to zero.
         index (int): Row index into adjacency matrix for which to perform the DFS search.
-        reached (iterable): 1-dimensional bit-array (N) encoding the already visited and hence connected elements. This
-            variable is modified in-place.
+        reached (iterable): 1-dimensional bit-array (N) encoding the already visited and hence connected elements.
+            This variable is modified in-place.
     """
     n = adjacency_matrix.shape[0]
     reached[index] = 1
@@ -64,14 +76,14 @@ def _connectedness_dfs(adjacency_matrix, index, reached):
             _connectedness_dfs(adjacency_matrix, column, reached)
 
 
-def check_connectedness(adjacency_matrix, allow_disconnected_leaves=False):
+def _check_connectedness(adjacency_matrix, allow_disconnected_leaves=False):
     """
-    Checks whether all sub-graphs of an adjacency matrix-encoded graph are connected, i.e. have at least one edge
-    linking them.
+    Checks whether all sub-graphs of an adjacency matrix-encoded graph are connected,
+    i.e. have at least one edge linking them.
 
     Args:
-        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked
-            nodes should have value unequal to zero.
+        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+            Linked nodes should have value unequal to zero.
         allow_disconnected_leaves (bool): Allows singular nodes to be disconnected from the entire graph.
 
     Returns:
@@ -97,12 +109,15 @@ def _acyclic_dfs(adjacency_matrix, index, parent, reached):
     marked as already reached this indicates a cycle.
 
     Args:
-        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked nodes
-            should have value unequal to zero.
+        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+            Linked nodes should have value unequal to zero.
         index (int): Row index into adjacency matrix for which to perform the DFS search.
         parent (int): Row index into adjacency matrix for the immediate parent.
-        reached (iterable): 1-dimensional bit-array (N) encoding the already visited and hence connected elements. This
-            variable is modified in-place.
+        reached (iterable): 1-dimensional bit-array (N) encoding the already visited and hence connected elements.
+            This variable is modified in-place.
+
+    Returns:
+        bool: True if the graph is acyclic, False otherwise.
     """
     n = adjacency_matrix.shape[0]
     reached[index] = 1
@@ -124,14 +139,14 @@ def _acyclic_dfs(adjacency_matrix, index, parent, reached):
     return True
 
 
-def check_acyclic(adjacency_matrix):
+def _check_acyclic(adjacency_matrix):
     """
     Checks whether the graph encoded by the passed adjacency matrix is acyclic, i.e. all non-empty trails in the graph
     do not contain repetitions. Node self-references are legal and simply ignored.
 
     Args:
-        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked
-            nodes should have value unequal to zero.
+        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+            Linked nodes should have value unequal to zero.
 
     Returns:
         bool: True if the graph is acyclic, False otherwise.
@@ -147,18 +162,18 @@ def check_acyclic(adjacency_matrix):
 
 def is_valid_tree(adjacency_matrix):
     """
-    Checks whether the graph encoded by the passed adjacency matrix encodes a valid tree, i.e. an undirected, acyclic
-    and connected graph.
+    Checks whether the graph encoded by the passed adjacency matrix encodes a valid tree,
+    i.e. an undirected, acyclic and connected graph.
 
     Args:
-        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked
-            nodes should have value unequal to zero.
+        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
+            Linked nodes should have value unequal to zero.
 
     Returns:
         bool: True if the encoded graph is a tree, False otherwise.
     """
-    undirected = check_undirected(adjacency_matrix)
-    connected = check_connectedness(adjacency_matrix)
-    acyclic = check_acyclic(adjacency_matrix)
+    undirected = _check_undirected(adjacency_matrix)
+    connected = _check_connectedness(adjacency_matrix)
+    acyclic = _check_acyclic(adjacency_matrix)
 
     return undirected and connected and acyclic

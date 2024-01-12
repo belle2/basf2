@@ -7,15 +7,25 @@ from ignite.metrics.metric import sync_all_reduce, reinit__is_reduced
 
 class PerfectLCA(Metric, object):
     """
-    Computes the percentage of the Perfectly predicted LCAs
-    - `update` must receive output of the form `(y_pred, y, edge_index, u_y, batch, num_graph)` or `{'y_pred': y_pred, ...}`.
-    - `edge_pred` must contain logits and has the following shape (num_edges_in_batch, classes)
-    - `edge_y` should have the following shape (num_edges_in_batch, 1) and contains ground-truth class indices
-       with or without the background class. During the computation, argmax of `y_pred` is taken to determine predicted classes.
-    - edge index is the array that maps edges to its nodes
-    - 'u_y' is the signal/background class
-    - batch is a vector that comes with a batch of graph and maps nodes to their graph
-    - num graph is the number of graph, it could be computed here using batch
+    Computes the rate of perfectly predicted LCAS matrices over a batch.
+
+    `output_transform` should return the following items: ``(edge_pred, edge_y, edge_index, u_y, batch, num_graphs)``.
+
+    * ``edge_pred`` must contain edge prediction logits and have shape (num_edges_in_batch, edge_classes);
+    * ``edge_y`` must contain edge ground-truth class indices and have shape (num_edges_in_batch, 1);
+    * ``edge index`` maps edges to its nodes;
+    * ``u_y`` is the signal/background class (always 1 in the current setting);
+    * ``batch`` maps nodes to their graph;
+    * ``num_graphs`` is the number of graph in a batch (could be derived from ``batch`` also).
+
+    .. seealso::
+        `Ignite metrics <https://pytorch.org/ignite/metrics.html>`_
+
+    Args:
+        ignore_index (int or list): Class or list of classes to ignore during the computation (e.g. padding).
+        output_transform (function): Function to transform engine's output to desired output.
+        device (str): ``cpu`` or ``gpu``.
+        ignore_background (bool): Flag to ignore background events in computation (not used).
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
@@ -30,7 +40,7 @@ class PerfectLCA(Metric, object):
 
     @reinit__is_reduced
     def reset(self):
-
+        """"""
         self._per_corrects = 0
         self._num_examples = 0
 
@@ -38,6 +48,7 @@ class PerfectLCA(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
+        """"""
         edge_pred, edge_y, edge_index, u_y, batch, num_graphs = output
 
         num_graphs = num_graphs.item()
@@ -65,7 +76,7 @@ class PerfectLCA(Metric, object):
         # Count the number of zero wrong predictions across the batch
         batch_perfect = truth.sum().item()
 
-        # Ignore background events
+        # Ignore background events (does nothing in the current setting)
         ignored_num = torch.logical_and((u_y == 0), (truth == 1)).sum().item() if self.ignore_background else 0
         ignored_den = (u_y == 0).sum().item() if self.ignore_background else 0
 
@@ -74,7 +85,7 @@ class PerfectLCA(Metric, object):
 
     @sync_all_reduce("_perfectLCA")
     def compute(self):
-
+        """"""
         if self._num_examples == 0:
             raise NotComputableError(
                 "CustomAccuracy must have at least one example before it can be computed."
@@ -84,14 +95,24 @@ class PerfectLCA(Metric, object):
 
 class PerfectMasses(Metric, object):
     """
-    Computes the rate of events with perfectly predicted masses of FSP
-    - 'update' must receive output of the form `(x_pred, x, u_y, batch, num_graph)` or `{'x_pred': x_pred, 'x': x, ...}`.
-    - 'x_pred' must contain logits and has the following shape (num_nodes_in_batch, classes)
-    - 'x_y' should have the following shape (num_nodes_in_batch, 1) and contains ground-truth class indices
-       with or without the background class. During the computation, argmax of `x_pred` is taken to determine predicted classes.
-    - 'u_y' is the signal/background class
-    - batch is a vector that comes with a batch of graph and maps nodes to their graph
-    - num graph is the number of graph, it could be computed here using batch
+    Computes the rate of events with perfectly predicted mass hypotheses over a batch.
+
+    `output_transform` should return the following items: ``(x_pred, x_y, u_y, batch, num_graphs)``.
+
+    * ``x_pred`` must contain node prediction logits and have shape (num_nodes_in_batch, node_classes);
+    * ``x_y`` must contain node ground-truth class indices and have shape (num_nodes_in_batch, 1);
+    * ``u_y`` is the signal/background class (always 1 in the current setting);
+    * ``batch`` maps nodes to their graph;
+    * ``num_graphs`` is the number of graph in a batch (could be derived from ``batch`` also).
+
+    .. seealso::
+        `Ignite metrics <https://pytorch.org/ignite/metrics.html>`_
+
+    Args:
+        ignore_index (int or list): Class or list of classes to ignore during the computation (e.g. padding).
+        output_transform (function): Function to transform engine's output to desired output.
+        device (str): ``cpu`` or ``gpu``.
+        ignore_background (bool): Flag to ignore background events in computation (not used).
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
@@ -106,7 +127,7 @@ class PerfectMasses(Metric, object):
 
     @reinit__is_reduced
     def reset(self):
-
+        """"""
         self._per_corrects = 0
         self._num_examples = 0
 
@@ -114,6 +135,7 @@ class PerfectMasses(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
+        """"""
         x_pred, x_y, u_y, batch, num_graphs = output
 
         num_graphs = num_graphs.item()
@@ -148,7 +170,7 @@ class PerfectMasses(Metric, object):
 
     @sync_all_reduce("_perfectMasses")
     def compute(self):
-
+        """"""
         if self._num_examples == 0:
             raise NotComputableError(
                 "CustomAccuracy must have at least one example before it can be computed."
@@ -158,18 +180,27 @@ class PerfectMasses(Metric, object):
 
 class PerfectEvent(Metric, object):
     """
-    Computes the rate of events with masses and LCA correctly predicted
-    - 'update' must receive output of the form `(x_pred, x_y, y_pred, y, edge_index, u_y, batch, num_graph)`
-      or `{'x_pred': x_pred, ...}`
-    - 'x_pred' must contain logits and has the following shape (num_nodes_in_batch, classes)
-    - 'x_y' should have the following shape (num_nodes_in_batch, 1) and contains ground-truth class indices
-    - 'edge_pred' must contain logits and has the following shape (num_edges_in_batch, classes)
-    - 'edge_y' should have the following shape (num_edges_in_batch, 1) and contains ground-truth class indices
-       with or without the background class. During the computation, argmax of `y_pred` is taken to determine predicted classes.
-    - edge index is the array that maps edges to its nodes
-    - 'u_y' is the signal/background class
-    - batch is a vector that comes with a batch of graph and maps nodes to their graph
-    - num graph is the number of graph, it could be computed here using batch
+    Computes the rate of events with perfectly predicted mass hypotheses and LCAS matrices over a batch.
+
+    `output_transform` should return the following items: ``(x_pred, x_y, edge_pred, edge_y, edge_index, u_y, batch, num_graphs)``.
+
+    * ``x_pred`` must contain node prediction logits and have shape (num_nodes_in_batch, node_classes);
+    * ``x_y`` must contain node ground-truth class indices and have shape (num_nodes_in_batch, 1);
+    * ``edge_pred`` must contain edge prediction logits and have shape (num_edges_in_batch, edge_classes);
+    * ``edge_y`` must contain edge ground-truth class indices and have shape (num_edges_in_batch, 1);
+    * ``edge index`` maps edges to its nodes;
+    * ``u_y`` is the signal/background class (always 1 in the current setting);
+    * ``batch`` maps nodes to their graph;
+    * ``num_graphs`` is the number of graph in a batch (could be derived from ``batch`` also).
+
+    .. seealso::
+        `Ignite metrics <https://pytorch.org/ignite/metrics.html>`_
+
+    Args:
+        ignore_index (int or list): Class or list of classes to ignore during the computation (e.g. padding).
+        output_transform (function): Function to transform engine's output to desired output.
+        device (str): ``cpu`` or ``gpu``.
+        ignore_background (bool): Flag to ignore background events in computation (not used).
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
@@ -184,7 +215,7 @@ class PerfectEvent(Metric, object):
 
     @reinit__is_reduced
     def reset(self):
-
+        """"""
         self._per_corrects = 0
         self._num_examples = 0
 
@@ -192,6 +223,7 @@ class PerfectEvent(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
+        """"""
         x_pred, x_y, edge_pred, edge_y, edge_index, u_y, batch, num_graphs = output
 
         num_graphs = num_graphs.item()
@@ -239,7 +271,7 @@ class PerfectEvent(Metric, object):
 
     @sync_all_reduce("_perfectEvent")
     def compute(self):
-
+        """"""
         if self._num_examples == 0:
             raise NotComputableError(
                 "CustomAccuracy must have at least one example before it can be computed."

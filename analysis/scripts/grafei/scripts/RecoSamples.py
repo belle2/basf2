@@ -18,7 +18,7 @@ from grafei.modules.isMostLikelyTempVarsModule import isMostLikelyTempVars
 from grafei.modules.RootSaverModule import RootSaverModule
 
 
-def get_args():
+def _get_args():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
         description='Reconstruct most likely particles and save their features and LCA matrix'
@@ -35,7 +35,7 @@ def get_args():
 if __name__ == '__main__':
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-    args = get_args()
+    args = _get_args()
 
     # assert args.bkg_prob >= 0 and args.bkg_prob <= 1, "Background probability should be in [0, 1]"
 

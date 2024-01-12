@@ -2,17 +2,17 @@ import numpy as np
 from typing import Union
 
 
-def power(array: np.ndarray, power: Union[int, float]) -> np.ndarray:
-    """Preprocessing function to take power of given feature"""
+def _power(array: np.ndarray, power: Union[int, float]):
+    """Preprocessing function to take power of given feature."""
     return np.sign(array) * np.power(np.abs(array), power)
 
 
-def linear(array: np.ndarray, mu=0.0, sigma=1.0) -> np.ndarray:
-    """Preprocessing function to linear scale given feature"""
+def _linear(array: np.ndarray, mu=0.0, sigma=1.0):
+    """Preprocessing function to linear scale given feature."""
     return (array - mu) / sigma
 
 
-methods = {"power": power, "linear": linear}
+methods = {"power": _power, "linear": _linear}
 
 
 def normalize_features(
@@ -25,16 +25,19 @@ def normalize_features(
     x_global=[],
 ):
     """
-    Function to normalize input features
+    Function to normalize input features.
+
+    `normalize` should be a dictionary of the form ``{'power', [0.5], 'linear', [-0.5, 4.1]}``.
+    ``power`` and ``linear`` are the only processes supported.
 
     Args:
-        normalize (dict): what kind of normalization and parameters to apply
-        features (list): list of node feature names
-        x (array): array of node features
-        edge_features (list): list of edge feature names
-        x_edges (array): array of edge features
-        global_features (list): list of global feature names
-        x_global (array): array of global features
+        normalize (dict): Normalization processes and parameters.
+        features (list): List of node feature names.
+        x (numpy.ndarray): Array of node features.
+        edge_features (list): List of edge feature names.
+        x_edges (numpy.ndarray): Array of edge features.
+        global_features (list): List of global feature names.
+        x_global (numpy.ndarray): Array of global features.
     """
     for feat, processes in normalize.items():
         # Start with node features

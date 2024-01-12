@@ -43,6 +43,7 @@ def main(
     n_samples: int,
     log_level: int,
 ):
+    """"""
     logging.basicConfig(
         stream=sys.stdout,
         level=log_level,

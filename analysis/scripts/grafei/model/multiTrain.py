@@ -37,16 +37,14 @@ from torch import nn
 
 class MultiTrainLoss(nn.Module):
     """
-    Loss function to train the model against a variety of targets: LCA, B momentum, B probability and masses of FSP.
+    Sum of cross-entropies for training against LCAS and mass hypotheses.
 
     Args:
-        alpha_mass (float): weight of masses term in the loss
-        ignore_index (int): index to ignore while padding
-        reduction (str): type of reduction to be applied on the batch
-        edge_weights (array): weights applied to edge classes
-        node_weights (array): weights applied to node classes
-    Returns:
-        Total loss
+        alpha_mass (float): Weight of mass cross-entropy term in the loss.
+        ignore_index (int): Index to ignore in the computation (e.g. padding).
+        reduction (str): Type of reduction to be applied on the batch (``sum`` or ``mean``).
+        edge_weights (numpy.ndarray): Weights applied to edge classes.
+        node_weights (numpy.ndarray): Weights applied to node classes.
     """
 
     def __init__(
@@ -82,6 +80,7 @@ class MultiTrainLoss(nn.Module):
         ), "Alpha should be positive"
 
     def forward(self, x_input, x_target, edge_input, edge_target, u_input, u_target):
+        """"""
         # prob_input = u_input if self.global_layer else None
         # prob_target = u_target
         # p_input = u_input[:, :3] if self.global_layer else None

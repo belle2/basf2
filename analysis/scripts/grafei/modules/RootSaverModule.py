@@ -8,12 +8,21 @@ from variables import variables as vm
 from grafei.modules.FlagBDecayModule import getObjectList
 
 
-def update_levels(levels, hist, pdg):
+def pdg_to_lca_converter(pdg):
     """
-    Assigns LCAS level to each particle in the decay tree.
+    Converts PDG code to LCAS classes.
+
+    .. note:: If you want to modify the LCAS classes, it's here.
+        Don't forget to update the number of edge classes accordingly in the yaml file.
+
+    Args:
+        pdg (int): PDG code to convert.
+
+    Returns:
+        int or None: Corresponding LCAS class, or None if PDG not present in ``pdg_lca_match``.
     """
     # MC PDG code
-    FEI_pdg_converter = {
+    pdg_lca_match = {
         443: 1,  # J/psi
         111: 1,  # pi^0
         310: 2,  # K_S^0
@@ -29,18 +38,31 @@ def update_levels(levels, hist, pdg):
         300553: 6,  # Upsilon(4S)
     }
 
+    pdg = abs(pdg)
+    if pdg in pdg_lca_match:
+        return pdg_lca_match[pdg]
+    else:
+        return None
+
+
+def _update_levels(levels, hist, pdg):
+    """
+    Assigns LCAS level to each particle in the decay tree.
+
+    Arguments are automatically set.
+    """
     for i, n in enumerate(hist):
         if n in levels.keys():
             continue
 
-        temp_pdg = abs(pdg[n])  # Take the absolute value of the pdg for the converter
-        if temp_pdg in FEI_pdg_converter:
-            levels[n] = FEI_pdg_converter[temp_pdg]
+        lca = pdg_to_lca_converter(pdg[n])
+        if lca:
+            levels[n] = lca
         else:
             for j in range(i + 1):
-                temp_pdg = abs(pdg[hist[i - j]])
-                if temp_pdg in FEI_pdg_converter:
-                    levels[n] = FEI_pdg_converter[temp_pdg]
+                lca = pdg_to_lca_converter(pdg[hist[i - j]])
+                if lca:
+                    levels[n] = lca
                     break
 
     return levels
@@ -56,10 +78,10 @@ def write_hist(
     semilep_flag=False,
 ):
     """
-    Recursive function to traverse down to the leaves saving the history
+    Recursive function to traverse down to the leaves saving the history.
 
     Args:
-        particle (MCParticle): The current particle being inspected
+        particle (basf2.MCParticle): The current particle being inspected.
         Other arguments are automatically set.
     """
 
@@ -110,7 +132,7 @@ def write_hist(
 
             # And now that we have a full history down to the leaf
             # we can update the levels
-            levels = update_levels(levels, hist, pdg)
+            levels = _update_levels(levels, hist, pdg)
 
     # Here is deciding whether to continue traversing down the decay tree
     # Don't want to do this if all daughters are secondaries since we're not saving them
@@ -152,6 +174,17 @@ def write_hist(
 
 
 class RootSaverModule(b2.Module):
+    """
+        Save Lowest Common Ancestor matrix of each MC Particle in the given list.
+
+        Args:
+            particle_lists (list): Name of particle lists to save features of.
+            features (list): List of features to save for each particle.
+            b_parent_var (str): Name of variable used to flag ancestor B meson and split particles.
+            mcparticle_list (str): Name of particle list to build LCAs from (will use as root).
+            output_file (str): Path to output file to save.
+    """
+
     def __init__(
         self,
         particle_lists,
@@ -161,16 +194,6 @@ class RootSaverModule(b2.Module):
         output_file,
         # bkg_prob=0.0,
     ):
-        """
-        Save Lowest Common Ancestor matrix of each MC Particle in the given list
-
-        Args:
-            particle_lists (list): Name of particle lists to save features of
-            features (list): List of features to save for each particle
-            b_parent_var (str): Name of variable used to flag ancestor B meson and split particles
-            mcparticle_list (str): Name of particle list to build LCAs from (will use as root)
-            output_file (str): Path to output file to save
-        """
         super().__init__()
         self.particle_lists = particle_lists
         self.features = features
@@ -185,7 +208,7 @@ class RootSaverModule(b2.Module):
         self.max_particles = 500
 
     def initialize(self):
-        """Create a member to access event info StoreArray"""
+        """"""
         self.eventinfo = Belle2.PyStoreObj("EventMetaData")
 
         # Create the output file, fails if exists
@@ -265,7 +288,8 @@ class RootSaverModule(b2.Module):
         self.mc_pdg = np.zeros(self.max_particles, np.float32)
         self.tree.Branch("mcPDG", self.mc_pdg, "mcPDG[n_particles]/F")
 
-    def reset_LCA(self):
+    def _reset_LCA(self):
+        """"""
         for p_index in [1, 2]:
             self.truth_dict[f"LCAS_{p_index}"][: self.max_particles**2] *= 0
             self.truth_dict[f"n_LCA_leaves_{p_index}"][0] *= 0
@@ -273,8 +297,7 @@ class RootSaverModule(b2.Module):
             self.truth_dict[f"n_LCA_{p_index}"][0] *= 0
 
     def event(self):
-        """Run every event"""
-
+        """"""
         # Get the particle list (note this is a regular Particle list, not MCParticle)
         p_list = Belle2.PyStoreObj(self.mcparticle_list)
 
@@ -295,7 +318,7 @@ class RootSaverModule(b2.Module):
         # IMPORTANT: The ArrayIndex is 0-based.
         # mcplist contains the root particles we are to create LCAs from
         # Reset the LCA list so if only one B is there it does not carry an older version over
-        self.reset_LCA()
+        self._reset_LCA()
 
         if p_list.getListSize() > 0:
             for part in p_list.obj():
@@ -409,7 +432,7 @@ class RootSaverModule(b2.Module):
             self.tree.Fill()
 
     def terminate(self):
-        """Called once after all the processing is complete"""
+        """"""
         # self.h5_outfile.close()
         self.root_outfile.Write()
         self.root_outfile.Close()

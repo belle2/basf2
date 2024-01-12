@@ -7,7 +7,14 @@ from grafei.modules.FlagBDecayModule import getObjectList
 
 class isMostLikelyTempVars(b2.Module):
     """
-    Module to compute isMostLikely with temporary _noSVD and _noTOP likelihoods (will be removed when using new MC)
+    Module to compute isMostLikely with temporary _noSVD and _noTOP likelihoods.
+
+    .. note::
+        This module is temporary, and will be removed when MC16 is available.
+
+    Args:
+        particle_lists (list): List of particle list names.
+        priors (list): List of float priors.
     """
 
     def __init__(self, particle_lists, priors):
@@ -16,6 +23,7 @@ class isMostLikelyTempVars(b2.Module):
         self.priors = priors
 
     def event(self):
+        """"""
         # Loop over the particle lists
         for particle_list in self.particle_lists:
             p_name = particle_list.split(":")[0][:-1]

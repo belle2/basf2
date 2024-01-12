@@ -19,7 +19,7 @@ class GraFEIIgniteTrainer:
         optimizer (torch optimizer): Optimizer used in training.
         loss_fn (torch loss): Loss function.
         device (torch device): Device to use.
-        configs (dict): Dictionary of run configs from loaded YAML config file.
+        configs (dict): Dictionary of run configs from loaded yaml config file.
         tags (list): Various tags to sort train and validation evaluators by, e.g. "Training", "Validation".
         scheduler (torch scheduler); Learning rate scheduler.
         ignore_index (int): Label index to ignore when calculating metrics, e.g. padding.

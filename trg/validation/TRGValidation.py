@@ -17,7 +17,7 @@
 <header>
   <input>TRGValidationGen.root</input>
   <output>TRGValidation.root</output>
-  <contact>yinjh2012@korea.ac.kr</contact>
+  <contact>yinjh@nankai.edu.cn</contact>
   <description>makes validation plots for TRG</description>
 </header>
 
@@ -378,7 +378,7 @@ class MakePlots(basf2.Module):
         histogram.GetListOfFunctions().Add(descr)
         Check = TNamed("Check", check)
         histogram.GetListOfFunctions().Add(Check)
-        contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
+        contact = TNamed("Contact", "yinjh@nankai.edu.cn")
         histogram.GetListOfFunctions().Add(contact)
         Meta = TNamed("MetaOptions", "shifter,pvalue-warn=0.02,pvalue-error=0.01")
         histogram.GetListOfFunctions().Add(Meta)
@@ -394,7 +394,7 @@ class MakePlots(basf2.Module):
         histogram.GetListOfFunctions().Add(descr)
         Check = TNamed("Check", check)
         histogram.GetListOfFunctions().Add(Check)
-        contact = TNamed("Contact", "yinjh2012@korea.ac.kr")
+        contact = TNamed("Contact", "yinjh@nankai.edu.cn")
         histogram.GetListOfFunctions().Add(contact)
         Meta = TNamed("MetaOptions", "expert,pvalue-warn=0.02,pvalue-error=0.01")
         histogram.GetListOfFunctions().Add(Meta)

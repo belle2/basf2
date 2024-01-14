@@ -404,7 +404,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpPIDVars(TTree* sampleTree, c
                                                            pdgIdDesc.c_str()).Data()));
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Check",
                                                        "The more peaked at 1, the better. Non-zero population in the bins w/ flag != 0|1 indicates failure of MC matching for reco tracks. In such cases, flag=nan."));
-  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+  h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("Contact", "Priyanka Cheema. pche3675@uni.sydney.edu.au"));
   h_trkclusmatch->GetListOfFunctions()->Add(new TNamed("MetaOptions", metaopts.c_str()));
 
   h_pid->Write();
@@ -700,7 +700,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
                                                              pdgIdDesc.c_str()).Data()));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
-    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+    t_match_eff_th->GetListOfFunctions()->Add(new TNamed("Contact", "Priyanka Cheema. pche3675@uni.sydney.edu.au"));
     t_match_eff_th->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_match_eff_th->Write();
@@ -723,7 +723,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
                                                               pdgIdDesc.c_str()).Data()));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Check",
                                                           "Shape should be consistent. Obviously, check for decreasing efficiency."));
-    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+    t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("Contact", "Priyanka Cheema. pche3675@uni.sydney.edu.au"));
     t_match_eff_phi->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_match_eff_phi->Write();

@@ -13,6 +13,8 @@ Test for checking:
     - b2conditionsdb diff
     - b2conditionsdb diff --run-range
     - b2conditionsdb legacydownload --run-range
+    - b2conditionsdb iovs delete --run-range
+    - b2conditionsdb iovs delete --run-range --fully-contained
 '''
 
 
@@ -43,12 +45,13 @@ if __name__ == '__main__':
     call_command('b2conditionsdb diff main_tag_merge_test_2 main_tag_merge_test_3 --run-range 5 200 5 300')
 
     # As the output of b2conditionsdb legacydownload contains some
-    # irreproducible elements (times, tempfolder location) I check only the
-    # number of lines of its output that should be = number of downloaded
-    # payloads + 1
+    # irreproducible elements (times, tempfolder location) I remove those
     with tempfile.TemporaryDirectory() as tmpdirname:
         output = subprocess.check_output(
             shlex.split(f'b2conditionsdb legacydownload -c main_tag_merge_test_3 {tmpdirname} --run-range 5 0 5 1000'),
             encoding='utf-8').strip().split('\n')
         for line in output:
             print(line.replace(tmpdirname, "centraldb")[7:])
+
+    call_command('b2conditionsdb iovs delete --dry-run main_tag_merge_test_2 --run-range 5 200 5 300')
+    call_command('b2conditionsdb iovs delete --dry-run main_tag_merge_test_2 --run-range 5 200 5 300 --fully-contained')

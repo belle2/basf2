@@ -572,13 +572,13 @@ def command_diff(args, db):
             e for e in db.get_all_iovs(
                 args.tagA,
                 message=str(iovfilter),
-                overlap_run_range=args.run_range) if iovfilter.check(
+                run_range=args.run_range) if iovfilter.check(
                 e.name)]
         listB = [
             e for e in db.get_all_iovs(
                 args.tagB,
                 message=str(iovfilter),
-                overlap_run_range=args.run_range) if iovfilter.check(
+                run_range=args.run_range) if iovfilter.check(
                 e.name)]
 
         B2INFO("Comparing contents ...")

@@ -54,7 +54,7 @@ void DQMHistAnalysisTrackingHLTModule::beginRun()
   double dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, dummy_upperAlarm;
 
   // read thresholds from EPICS
-  requestLimitsFromEpicsPVs("abortRate", dummy_lowerAlarm, dummy_lowerWarn, buffThreshold, dummy_upperAlarm);
+  requestLimitsFromEpicsPVs("abortRate", dummy_lowerAlarm, dummy_lowerWarn, dummy_upperWarn, buffThreshold);
   requestLimitsFromEpicsPVs("minNoEvents",          dummy_lowerAlarm, buffMinEvents, dummy_upperWarn, dummy_upperAlarm);
 
   if (!std::isnan(buffThreshold)) {

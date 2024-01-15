@@ -78,3 +78,21 @@ status      VALIDATED                          VALIDATED
 [INFO] Downloading list of payloads for main_tag_merge_test_3 tag valid in (5, 0, 5, 1000)
 [INFO] download centraldb/dbstore_KLMStripEfficiency_rev_3001.root
 [INFO] download centraldb/dbstore_KLMStripEfficiency_rev_3205.root
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 [valid in (5, 200, 5, 300)]
+[INFO] Deleting the following iovs
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+                                                     Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294536   KLMStripEfficiency                  2914   5      199    5      250
+9294537   KLMStripEfficiency                  2999   5      251    5      298
+9294538   KLMStripEfficiency                  2670   5      299    5      299
+9294539   KLMStripEfficiency                  3001   5      300    5      399
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 [fully contained in (5, 200, 5, 300)]
+[INFO] Deleting the following iovs
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+                                                     Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294537   KLMStripEfficiency                  2999   5      251    5      298
+9294538   KLMStripEfficiency                  2670   5      299    5      299

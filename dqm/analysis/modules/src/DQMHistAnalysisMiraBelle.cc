@@ -43,6 +43,9 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   //mon_mumu = new Belle2::MonitoringObject("mumu");
   mon_mumu = getMonitoringObject("mumu");
   mon_dst = getMonitoringObject("dst");
+  //bhabha,hadrons
+  mon_bhabha = getMonitoringObject("bhabha");
+  mon_hadron = getMonitoringObject("hadronb2");
 
   // make cavases to be added to MonitoringObject
   mumu_main = new TCanvas("mumu_main", "mumu_main", 0, 0, 800, 600);
@@ -51,6 +54,10 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   dst_mass = new TCanvas("dst_mass", "dst_mass", 0, 0, 1200, 400);
   dst_pi_val = new TCanvas("dst_pi_val", "dst_pi_val", 0, 0, 800, 400);
   dst_k_val = new TCanvas("dst_k_val", "dst_k_val", 0, 0, 800, 400);
+  //bhabha,hadrons
+  bhabha_main = new TCanvas("bhabha_main", "bhabha_main", 0, 0, 800, 600);
+  bhabha_resolution = new TCanvas("bhabha_resolution", "bhabha_resolution", 0, 0, 800, 600);
+  hadron_main = new TCanvas("hadron_main", "hadron_main", 0, 0, 800, 600);
 
   // add canvases to MonitoringObject
   mon_mumu->addCanvas(mumu_main);
@@ -59,8 +66,13 @@ void DQMHistAnalysisMiraBelleModule::initialize()
   mon_dst->addCanvas(dst_mass);
   mon_dst->addCanvas(dst_pi_val);
   mon_dst->addCanvas(dst_k_val);
+  //bhabha,hadrons
+  mon_bhabha->addCanvas(bhabha_main);
+  mon_bhabha->addCanvas(bhabha_resolution);
+  mon_hadron->addCanvas(hadron_main);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle: initialized.");
+
 }
 
 void DQMHistAnalysisMiraBelleModule::beginRun()
@@ -482,6 +494,148 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_dst->setVariable("mean_D0_K_PID_ECL_kaon", mean_D0_K_PID_ECL_kaon);
   mon_dst->setVariable("mean_D0_K_PID_KLM_kaon", mean_D0_K_PID_KLM_kaon);
 
+  //bhabha,hadrons
+  // ========== bhabha_all
+  // get existing histograms produced by DQM modules
+  TH1* histbh_npxd = findHist("PhysicsObjectsMiraBelleBhabha/hist_npxd");
+  TH1* histbh_nsvd = findHist("PhysicsObjectsMiraBelleBhabha/hist_nsvd");
+  TH1* histbh_ncdc = findHist("PhysicsObjectsMiraBelleBhabha/hist_ncdc");
+  TH1* histbh_topdig = findHist("PhysicsObjectsMiraBelleBhabha/hist_topdig");
+  TH1* histbh_DetPhotonARICH = findHist("PhysicsObjectsMiraBelleBhabha/hist_DetPhotonARICH");
+  TH1* histbh_dD0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_dD0");
+  TH1* histbh_dZ0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_dZ0");
+  TH1* histbh_dPtcms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPtcms");
+  TH1* histbh_Pval = findHist("PhysicsObjectsMiraBelleBhabha/hist_Pval");
+  TH1* histbh_nExtraCDCHits = findHist("PhysicsObjectsMiraBelleBhabha/hist_nExtraCDCHits");
+  TH1* histbh_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
+  TH1* histbh_electronid = findHist("PhysicsObjectsMiraBelleBhabha/hist_electronid");
+  TH1* histbh_inv_p = findHist("PhysicsObjectsMiraBelleBhabha/hist_inv_p");
+  TH1* histbh_ndf = findHist("PhysicsObjectsMiraBelleBhabha/hist_ndf");
+  TH1* histbh_D0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_D0");
+  TH1* histbh_Z0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_Z0");
+  TH1* histbh_theta = findHist("PhysicsObjectsMiraBelleBhabha/hist_theta");
+  TH1* histbh_Phi0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_Phi0");
+  TH1* histbh_Pt = findHist("PhysicsObjectsMiraBelleBhabha/hist_Pt");
+  TH1* histbh_Mom = findHist("PhysicsObjectsMiraBelleBhabha/hist_Mom");
+  TH1* histbh_dPhicms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPhicms");
+
+  // Make TCanvases
+  // --- bhabha_Main
+  bhabha_main->Divide(4, 3);
+  bhabha_main->cd(1);  histbh_theta->Draw();
+  bhabha_main->cd(2);  histbh_Phi0->Draw();
+  bhabha_main->cd(3);  histbh_Mom->Draw();
+  bhabha_main->cd(4);  histbh_Pt->Draw();
+  bhabha_main->cd(5);  histbh_npxd->Draw();
+  bhabha_main->cd(6);  histbh_nsvd->Draw();
+  bhabha_main->cd(7);  histbh_ncdc->Draw();
+  bhabha_main->cd(8);  histbh_topdig->Draw();
+  bhabha_main->cd(9);  histbh_DetPhotonARICH->Draw();
+  bhabha_main->cd(10);  histbh_nExtraCDCHits->Draw();
+  bhabha_main->cd(11);  histbh_nECLClusters->Draw();
+  // --- bhabha_Resolution
+  bhabha_resolution->Divide(3, 3);
+  bhabha_resolution->cd(1);  histbh_inv_p->Draw();
+  bhabha_resolution->cd(2);  histbh_dD0->Draw();
+  bhabha_resolution->cd(3);  histbh_dZ0->Draw();
+  bhabha_resolution->cd(4);  histbh_dPtcms->Draw();
+  bhabha_resolution->cd(5);  histbh_dPhicms->Draw();
+  bhabha_resolution->cd(6);  histbh_nECLClusters->Draw();
+  bhabha_resolution->cd(7);  histbh_nExtraCDCHits->Draw();
+  bhabha_resolution->cd(8);  histbh_ndf->Draw();
+
+  // calculate the values of monitoring variables
+  float bh_mean_npxd = histbh_npxd->GetMean();
+  float bh_mean_nsvd = histbh_nsvd->GetMean();
+  float bh_mean_ncdc = histbh_ncdc->GetMean();
+  float bh_mean_topdig = histbh_topdig->GetMean();
+  float bh_mean_parich = histbh_DetPhotonARICH->GetMean();
+  float bh_mean_ncdc_ex = histbh_nExtraCDCHits->GetMean();
+  float bh_mean_necl = histbh_nECLClusters->GetMean();
+  float bh_mean_electronid = histbh_electronid->GetMean();
+  float bh_mean_d0 = histbh_D0->GetMean();
+  float bh_mean_z0 = histbh_Z0->GetMean();
+  float bh_mean_pval = histbh_Pval->GetMean();
+  float bh_mean_ndf = histbh_ndf->GetMean();
+  float bh_dif_ndf_ncdc = mean_ndf - mean_ncdc;
+  float bh_mean_dd0 = histbh_dD0->GetMean();
+  float bh_mean_dz0 = histbh_dZ0->GetMean();
+  float bh_mean_dpt = histbh_dPtcms->GetMean();
+  float bh_rms_dd0 = histbh_dD0->GetRMS();
+  float bh_rms_dz0 = histbh_dZ0->GetRMS();
+  float bh_rms_dpt = histbh_dPtcms->GetRMS();
+  float bh_sigma68_dd0 = getSigma68(histbh_dD0);
+  float bh_sigma68_dz0 = getSigma68(histbh_dZ0);
+  float bh_sigma68_dpt = getSigma68(histbh_dPtcms);
+  int bh_ntot = histbh_nsvd->GetEntries();
+  float bh_neve_bhabha = bh_ntot;
+  float bh_goode_frac = histbh_electronid->GetBinContent(20) / (float)bh_ntot;
+  float bh_goode_o_bade = histbh_electronid->GetBinContent(20) / (float)histbh_electronid->GetBinContent(1);
+  float bh_pval_more95 = 0;
+  float bh_pval_less05 = 0;
+  for (int i = 95; i < 100; i++) bh_pval_more95 += histbh_Pval->GetBinContent(i + 1);
+  for (int i = 0; i < 5; i++) bh_pval_less05 += histbh_Pval->GetBinContent(i + 1);
+  float bh_pval_frac_0 = bh_pval_less05 / (float)bh_ntot;
+  float bh_pval_frac_1 = bh_pval_more95 / (float)bh_ntot;
+  float bh_nocdc_frac = histbh_ncdc->GetBinContent(1) / (float)bh_ntot;
+  float bh_notop_frac = histbh_topdig->GetBinContent(1) / (float)bh_ntot;
+  float bh_noarich_frac = histbh_DetPhotonARICH->GetBinContent(1) / (float)bh_ntot;
+  // set values
+  mon_bhabha->setVariable("bh_mean_npxd", bh_mean_npxd);
+  mon_bhabha->setVariable("bh_mean_nsvd", bh_mean_nsvd);
+  mon_bhabha->setVariable("bh_mean_ncdc", bh_mean_ncdc);
+  mon_bhabha->setVariable("bh_mean_topdig", bh_mean_topdig);
+  mon_bhabha->setVariable("bh_mean_parich", bh_mean_parich);
+  mon_bhabha->setVariable("bh_mean_ncdc_ex", bh_mean_ncdc_ex);
+  mon_bhabha->setVariable("bh_mean_necl", bh_mean_necl);
+  mon_bhabha->setVariable("bh_mean_electronid", bh_mean_electronid);
+  mon_bhabha->setVariable("bh_mean_d0", bh_mean_d0);
+  mon_bhabha->setVariable("bh_mean_z0", bh_mean_z0);
+  mon_bhabha->setVariable("bh_mean_pval", bh_mean_pval);
+  mon_bhabha->setVariable("bh_mean_ndf", bh_mean_ndf);
+  mon_bhabha->setVariable("bh_dif_ndf_ncdc", bh_dif_ndf_ncdc);
+  mon_bhabha->setVariable("bh_mean_dd0", bh_mean_dd0);
+  mon_bhabha->setVariable("bh_mean_dz0", bh_mean_dz0);
+  mon_bhabha->setVariable("bh_mean_dpt", bh_mean_dpt);
+  mon_bhabha->setVariable("bh_rms_dd0", bh_rms_dd0);
+  mon_bhabha->setVariable("bh_rms_dz0", bh_rms_dz0);
+  mon_bhabha->setVariable("bh_rms_dpt", bh_rms_dpt);
+  mon_bhabha->setVariable("bh_sigma68_dd0", bh_sigma68_dd0);
+  mon_bhabha->setVariable("bh_sigma68_dz0", bh_sigma68_dz0);
+  mon_bhabha->setVariable("bh_sigma68_dpt", bh_sigma68_dpt);
+  mon_bhabha->setVariable("bh_neve_bhabha", bh_neve_bhabha);
+  mon_bhabha->setVariable("bh_goodmu_frac", bh_goode_frac);
+  mon_bhabha->setVariable("bh_goodmu_o_badmu", bh_goode_o_bade);
+  mon_bhabha->setVariable("bh_pval_frac_0", bh_pval_frac_0);
+  mon_bhabha->setVariable("bh_pval_frac_1", bh_pval_frac_1);
+  mon_bhabha->setVariable("bh_nocdc_frac", bh_nocdc_frac);
+  mon_bhabha->setVariable("bh_notop_frac", bh_notop_frac);
+  mon_bhabha->setVariable("bh_noarich_frac", bh_noarich_frac);
+  // ========== hadronb2 + tight
+  // get existing histograms produced by DQM modules
+  TH1* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
+  TH1* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleBhabha/hist_visibleEnergyCMSnorm");
+  TH1* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleBhabha/hist_EsumCMSnorm");
+  TH1* histhad_R2 = findHist("PhysicsObjectsMiraBelleBhabha/hist_R2");
+  // Make TCanvases
+  // --- hadron_Main
+  hadron_main->Divide(2, 2);
+  hadron_main->cd(1);  histhad_nECLClusters->Draw();
+  hadron_main->cd(2);  histhad_visibleEnergyCMSnorm->Draw();
+  hadron_main->cd(3);  histhad_EsumCMSnorm->Draw();
+  hadron_main->cd(4);  histhad_R2->Draw();
+  // calculate the values of monitoring variables
+  float had_ntot = histhad_R2->GetEntries();
+
+  float ratio_hadron_bhabha = -1.;
+  if (bh_ntot != 0) {
+    ratio_hadron_bhabha = bh_pval_less05 / (float)bh_ntot;
+  } else {
+    ratio_hadron_bhabha = 0;
+  }
+  // set values
+  mon_bhabha->setVariable("had_ntot", had_ntot);
+  mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle : endRun called");
 }

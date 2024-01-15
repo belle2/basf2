@@ -272,8 +272,8 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
 
         Args:
             root (str): Path to ROOT files.
-            n_files (int): Load only `n_files` files.
-            samples (int): Load only `samples` events.
+            n_files (int): Load only ``n_files`` files.
+            samples (int): Load only ``samples`` events.
             subset_unmatched (bool): Assign a random subset of unmatched particles to each B.
             features (list): List of node features names.
             ignore (list): List of discarded node features names.

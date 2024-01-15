@@ -8,13 +8,18 @@ def calculate_class_weights(dataloader, num_classes, edges, num_batches=100):
     This assumes there exists a -1 padding value that is not part of the class weights.
     Any classes not found will have a weight of one.
 
-    Args:
-        dataloader (torch.Dataloader): Dataloader to iterate through when collecting batches.
-        edges (bool): True for edges, False for nodes.
-        num_batches (int): Number of batches from dataloader to use to approximate class weights.
+    :param dataloader: PyTorch Geometric Dataloader.
+    :type dataloader: `DataLoader
+        <https://pytorch-geometric.readthedocs.io/en/latest/modules/loader.html#torch_geometric.loader.DataLoader>`_
+    :param num_classes: Number of classes.
+    :type num_classes: int
+    :param edges: True for edges False for nodes.
+    :type edges: bool
+    :param num_batches: Number of batches from dataloader to use to approximate class weights.
+    :type num_batches: int
 
-    Returns:
-        torch.tensor: Tensor of class weights, normalised to 1.
+    :return: Tensor of class weights, normalised to 1.
+    :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
 
     .. note:: Class weights do not improve the performances, left for experimenting.
     """

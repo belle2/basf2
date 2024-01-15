@@ -27,7 +27,7 @@ def normalize_features(
     """
     Function to normalize input features.
 
-    `normalize` should be a dictionary of the form ``{'power', [0.5], 'linear', [-0.5, 4.1]}``.
+    ``normalize`` should be a dictionary of the form ``{'power', [0.5], 'linear', [-0.5, 4.1]}``.
     ``power`` and ``linear`` are the only processes supported.
 
     Args:

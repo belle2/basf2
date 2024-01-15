@@ -45,8 +45,9 @@ class EdgeLayer(nn.Module):
             dropout (float): Dropout rate :math:`r \\in [0,1]`.
             normalize (str): Type of normalization (batch/layer).
 
-        Returns:
-            torch.tensor: Updated edge features tensor.
+
+        :return: Updated edge features tensor.
+        :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
     """
 
     def __init__(
@@ -150,8 +151,8 @@ class NodeLayer(nn.Module):
             dropout (float): Dropout rate :math:`r \\in [0,1]`.
             normalize (str): Type of normalization (batch/layer).
 
-        Returns:
-            torch.tensor: Updated node features tensor.
+        :return: Updated node features tensor.
+        :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
     """
 
     def __init__(
@@ -262,8 +263,8 @@ class GlobalLayer(nn.Module):
             dropout (float): Dropout rate :math:`r \\in [0,1]`.
             normalize (str): Type of normalization (batch/layer).
 
-        Returns:
-            torch.tensor: Updated node features tensor.
+        :return: Updated global features tensor.
+        :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
     """
 
     def __init__(

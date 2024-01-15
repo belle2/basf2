@@ -14,15 +14,22 @@ class GraFEIIgniteTrainer:
     """
     Class to setup the ignite trainer and hold all the things associated.
 
-    Args:
-        model (torch model): The actual PyTorch model.
-        optimizer (torch optimizer): Optimizer used in training.
-        loss_fn (torch loss): Loss function.
-        device (torch device): Device to use.
-        configs (dict): Dictionary of run configs from loaded yaml config file.
-        tags (list): Various tags to sort train and validation evaluators by, e.g. "Training", "Validation".
-        scheduler (torch scheduler): Learning rate scheduler.
-        ignore_index (int): Label index to ignore when calculating metrics, e.g. padding.
+    :param model: The actual PyTorch model.
+    :type model: `Model <https://pytorch.org/tutorials/beginner/introyt/modelsyt_tutorial.html>`_
+    :param optimizer: Optimizer used in training.
+    :type optimizer: `Optimizer <https://pytorch.org/docs/stable/optim.html#torch.optim.Optimizer>`_
+    :param loss_fn: Loss function.
+    :type loss_fn: `Loss <https://pytorch.org/docs/stable/nn.html#loss-functions>`_
+    :param device: Device to use.
+    :type device: `Device <https://pytorch.org/docs/stable/tensor_attributes.html#torch.device>`_
+    :param configs: Dictionary of run configs from loaded yaml config file.
+    :type configs: dict
+    :param tags: Various tags to sort train and validation evaluators by, e.g. "Training", "Validation".
+    :type tags: list
+    :param scheduler: Learning rate scheduler.
+    :type scheduler: `Scheduler <https://pytorch.org/docs/stable/optim.html#how-to-adjust-learning-rate>`_
+    :param ignore_index: Label index to ignore when calculating metrics, e.g. padding.
+    :type ignore_index: int
     """
 
     def __init__(
@@ -246,12 +253,6 @@ class GraFEIIgniteTrainer:
     def _clean_config_dict(self, configs):
         """
         Clean configs to prepare them for writing to file.
-
-        Args:
-            configs (dict): Config dictionary.
-
-        Returns:
-            dict: Cleaned config dict.
         """
         for k, v in configs.items():
             if isinstance(v, collections.abc.Mapping):
@@ -374,9 +375,10 @@ class GraFEIIgniteTrainer:
         """
         Callback to run evaluation and report the results.
 
-        Args:
-            trainer (ignite.Engine): Trainer passed by ignite to this method.
-            mode_tags (dict): Dictionary of mode tags containing (mode, dataset, dataloader) tuples.
+        :param trainer: Trainer passed by ignite to this method.
+        :type trainer: `Engine <https://pytorch.org/ignite/generated/ignite.engine.engine.Engine.html#ignite.engine.engine.Engine>`_
+        :param mode_tags: Dictionary of mode tags containing (mode, dataset, dataloader) tuples.
+        :type mode_tags: dict
         """
 
         for tag, values in mode_tags.items():

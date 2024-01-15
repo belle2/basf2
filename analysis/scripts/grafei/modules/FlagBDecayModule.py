@@ -7,7 +7,7 @@ def getObjectList(pointerVec):
     Workaround to avoid memory problems in basf2.
 
     Args:
-        pointerVec (list or Belle2.ParticleList): Input particle list.
+        pointerVec (list or ROOT.Belle2.ParticleList): Input particle list.
 
     Returns:
         list: Output python list.
@@ -26,8 +26,11 @@ def getObjectList(pointerVec):
 class FlagBDecayModule(b2.Module):
     """
     Adds to particles in a given particle list the array index of the generated B meson ancestor, if a MC matching is found.
-    If the particle list contains non-FSPs, the FSPs are considered.
-    Assumes MC matching has been run on the particle list.
+    If the particle list contains non-FSPs, the FSPs are retrieved.
+
+    .. note::
+        Assumes MC matching has been run on the particle list.
+        When processing MC, this module must be put necessarily before `graFEISaverModule` in order to save MC-truth information.
 
     Args:
         particle_list (str): Name of source particle list.

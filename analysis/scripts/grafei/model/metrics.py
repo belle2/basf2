@@ -9,7 +9,7 @@ class PerfectLCA(Metric, object):
     """
     Computes the rate of perfectly predicted LCAS matrices over a batch.
 
-    `output_transform` should return the following items: ``(edge_pred, edge_y, edge_index, u_y, batch, num_graphs)``.
+    ``output_transform`` should return the following items: ``(edge_pred, edge_y, edge_index, u_y, batch, num_graphs)``.
 
     * ``edge_pred`` must contain edge prediction logits and have shape (num_edges_in_batch, edge_classes);
     * ``edge_y`` must contain edge ground-truth class indices and have shape (num_edges_in_batch, 1);
@@ -21,11 +21,14 @@ class PerfectLCA(Metric, object):
     .. seealso::
         `Ignite metrics <https://pytorch.org/ignite/metrics.html>`_
 
-    Args:
-        ignore_index (int or list): Class or list of classes to ignore during the computation (e.g. padding).
-        output_transform (function): Function to transform engine's output to desired output.
-        device (str): ``cpu`` or ``gpu``.
-        ignore_background (bool): Flag to ignore background events in computation (not used).
+    :param ignore_index: Class or list of classes to ignore during the computation (e.g. padding).
+    :type ignore_index: list[int]
+    :param output_transform: Function to transform engine's output to desired output.
+    :type output_transform: `function <https://docs.python.org/3/glossary.html#term-function>`_
+    :param device: ``cpu`` or ``gpu``.
+    :type device: str
+    :param ignore_background: Flag to ignore background events in computation (not used).
+    :type ignore_background: bool
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
@@ -97,7 +100,7 @@ class PerfectMasses(Metric, object):
     """
     Computes the rate of events with perfectly predicted mass hypotheses over a batch.
 
-    `output_transform` should return the following items: ``(x_pred, x_y, u_y, batch, num_graphs)``.
+    ``output_transform`` should return the following items: ``(x_pred, x_y, u_y, batch, num_graphs)``.
 
     * ``x_pred`` must contain node prediction logits and have shape (num_nodes_in_batch, node_classes);
     * ``x_y`` must contain node ground-truth class indices and have shape (num_nodes_in_batch, 1);
@@ -108,11 +111,14 @@ class PerfectMasses(Metric, object):
     .. seealso::
         `Ignite metrics <https://pytorch.org/ignite/metrics.html>`_
 
-    Args:
-        ignore_index (int or list): Class or list of classes to ignore during the computation (e.g. padding).
-        output_transform (function): Function to transform engine's output to desired output.
-        device (str): ``cpu`` or ``gpu``.
-        ignore_background (bool): Flag to ignore background events in computation (not used).
+    :param ignore_index: Class or list of classes to ignore during the computation (e.g. padding).
+    :type ignore_index: list[int]
+    :param output_transform: Function to transform engine's output to desired output.
+    :type output_transform: `function <https://docs.python.org/3/glossary.html#term-function>`_
+    :param device: ``cpu`` or ``gpu``.
+    :type device: str
+    :param ignore_background: Flag to ignore background events in computation (not used).
+    :type ignore_background: bool
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
@@ -182,7 +188,8 @@ class PerfectEvent(Metric, object):
     """
     Computes the rate of events with perfectly predicted mass hypotheses and LCAS matrices over a batch.
 
-    `output_transform` should return the following items: ``(x_pred, x_y, edge_pred, edge_y, edge_index, u_y, batch, num_graphs)``.
+    ``output_transform`` should return the following items:
+    ``(x_pred, x_y, edge_pred, edge_y, edge_index, u_y, batch, num_graphs)``.
 
     * ``x_pred`` must contain node prediction logits and have shape (num_nodes_in_batch, node_classes);
     * ``x_y`` must contain node ground-truth class indices and have shape (num_nodes_in_batch, 1);
@@ -196,11 +203,14 @@ class PerfectEvent(Metric, object):
     .. seealso::
         `Ignite metrics <https://pytorch.org/ignite/metrics.html>`_
 
-    Args:
-        ignore_index (int or list): Class or list of classes to ignore during the computation (e.g. padding).
-        output_transform (function): Function to transform engine's output to desired output.
-        device (str): ``cpu`` or ``gpu``.
-        ignore_background (bool): Flag to ignore background events in computation (not used).
+    :param ignore_index: Class or list of classes to ignore during the computation (e.g. padding).
+    :type ignore_index: list[int]
+    :param output_transform: Function to transform engine's output to desired output.
+    :type output_transform: `function <https://docs.python.org/3/glossary.html#term-function>`_
+    :param device: ``cpu`` or ``gpu``.
+    :type device: str
+    :param ignore_background: Flag to ignore background events in computation (not used).
+    :type ignore_background: bool
     """
 
     def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):

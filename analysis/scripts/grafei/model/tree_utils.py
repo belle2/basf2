@@ -38,13 +38,6 @@ def masses_to_classes(array):
 def _check_undirected(adjacency_matrix):
     """
     Checks whether an adjacency matrix-encoded graph is undirected, i.e. symmetric.
-
-    Args:
-        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
-            Linked nodes should have value unequal to zero.
-
-    Returns:
-        bool: True if the graph encoded by adjacency matrix is undirected, False otherwise.
     """
     n, m = adjacency_matrix.shape
     if n != m:
@@ -58,13 +51,6 @@ def _connectedness_dfs(adjacency_matrix, index, reached):
     Actual depth-first search of graph connectedness. Starting from the node marked by index a recursive search is
     performed. Visited nodes are marked as reachable during recursion. If the graph is not connected, the reachability
     `reached` mask will contain zero elements.
-
-    Args:
-        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
-            Linked nodes should have value unequal to zero.
-        index (int): Row index into adjacency matrix for which to perform the DFS search.
-        reached (iterable): 1-dimensional bit-array (N) encoding the already visited and hence connected elements.
-            This variable is modified in-place.
     """
     n = adjacency_matrix.shape[0]
     reached[index] = 1
@@ -80,14 +66,6 @@ def _check_connectedness(adjacency_matrix, allow_disconnected_leaves=False):
     """
     Checks whether all sub-graphs of an adjacency matrix-encoded graph are connected,
     i.e. have at least one edge linking them.
-
-    Args:
-        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
-            Linked nodes should have value unequal to zero.
-        allow_disconnected_leaves (bool): Allows singular nodes to be disconnected from the entire graph.
-
-    Returns:
-        bool: True if all sub-graphs encoded by the adjacency matrix are connected, False otherwise.
     """
     n, m = adjacency_matrix.shape
     if n != m:
@@ -107,17 +85,6 @@ def _acyclic_dfs(adjacency_matrix, index, parent, reached):
     Actual depth-first search of graph cycles. Starting from the node marked by index a recursive search is performed.
     Visited nodes are marked as reachable during recursion. If a node is found in a trail that has been previously
     marked as already reached this indicates a cycle.
-
-    Args:
-        adjacency_matrix (iterable): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
-            Linked nodes should have value unequal to zero.
-        index (int): Row index into adjacency matrix for which to perform the DFS search.
-        parent (int): Row index into adjacency matrix for the immediate parent.
-        reached (iterable): 1-dimensional bit-array (N) encoding the already visited and hence connected elements.
-            This variable is modified in-place.
-
-    Returns:
-        bool: True if the graph is acyclic, False otherwise.
     """
     n = adjacency_matrix.shape[0]
     reached[index] = 1
@@ -143,13 +110,6 @@ def _check_acyclic(adjacency_matrix):
     """
     Checks whether the graph encoded by the passed adjacency matrix is acyclic, i.e. all non-empty trails in the graph
     do not contain repetitions. Node self-references are legal and simply ignored.
-
-    Args:
-        adjacency_matrix (numpy.ndarray): 2-dimensional matrix (N, N) encoding the graph's node adjacencies.
-            Linked nodes should have value unequal to zero.
-
-    Returns:
-        bool: True if the graph is acyclic, False otherwise.
     """
     n, m = adjacency_matrix.shape
     if n != m:

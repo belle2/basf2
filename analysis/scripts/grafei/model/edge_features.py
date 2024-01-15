@@ -86,7 +86,7 @@ def available_edge_features(feat, name_values):
         name_values (dict): Dictionary of numpy arrays containing node features.
 
     Returns:
-        numpy.ndarray: Edge feature `feat` computed given certain node features in `name_values`.
+        numpy.ndarray: Edge feature ``feat`` computed given certain node features in ``name_values``.
     """
     if feat not in available_features:
         sys.exit(

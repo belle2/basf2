@@ -37,8 +37,8 @@ class GeometricNetwork(torch.nn.Module):
             symmetrize (bool): Whether to symmetrize LCAS matrix at the end.
             global_layer (bool): Whether to use global layer.
 
-        Returns:
-            torch.tensor, torch.tensor, torch.tensor: Node, edge and global features after model evaluation.
+        :return: Node, edge and global features after model evaluation.
+        :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
     """
 
     def __init__(

@@ -116,7 +116,6 @@ void DQMHistAnalysisECLSummaryModule::initialize()
   c_channels_summary->SetLeftMargin(0.20);
   c_channels_summary->SetRightMargin(0.005);
   c_channels_summary->SetBottomMargin(0.10);
-  c_channels_summary->SetFrameFillColor(DQMHistAnalysisModule::c_ColorTooFew);
 
   //=== Additional canvases/histograms to display which channels have problems
   c_occupancy = new TCanvas("ECL/c_cid_Thr5MeV_overlaid_analysis");
@@ -265,6 +264,7 @@ void DQMHistAnalysisECLSummaryModule::event()
 
   c_channels_summary->cd();
   colorizeCanvas(c_channels_summary, makeStatus(enough, warn_flag, error_flag));
+  c_channels_summary->SetFrameFillColor(DQMHistAnalysisModule::c_ColorTooFew);
 
   //=== Prepare special style objects to use correct color palette
   //    and use it only for this histogram

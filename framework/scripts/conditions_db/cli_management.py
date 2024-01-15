@@ -663,11 +663,10 @@ def command_iovs_modify(args, db=None):
     iovfilter = ItemFilter(args)
     if db is None:
         args.add_argument("tag", metavar="INPUT_TAGNAME", help="globaltag for which the the IoVs should be modified")
-        args.add_argument("first_exp", metavar="FIRST_EXP", type=int,
-                          help="First experiment that will be set to all considered iovs.")
-        args.add_argument("first_run", metavar="FIRST_RUN", type=int, help="First run that will be set to all considered iovs.")
-        args.add_argument("last_exp", metavar="LAST_EXP", type=int, help="Last experiment that will be set to all considered iovs.")
-        args.add_argument("last_run", metavar="LAST_RUN", type=int, help="Last run that will be set to all considered iovs.")
+        args.add_argument("new_iov", metavar="NEW_IOV", help="New iov to be set to all considered iovs."
+                          " It should be a string with 4 numbers separated by spaces."
+                          " Use * to mark the fields that should not be modified. For example"
+                          " if '7 0 * *' is given the iov '7 1 9 42' will become '7 0 9 42'.")
         args.add_argument("--iov-id", default=None, type=int,
                           help="IoVid of the iov to be considered")
         args.add_argument(
@@ -697,6 +696,15 @@ def command_iovs_modify(args, db=None):
     if not iovfilter.check_arguments():
         return 1
 
+    new_iov = args.new_iov.split()
+    # Transform integer values of iov in int and keep '*' as strings. Raise error if something different is given.
+    for i in range(len(new_iov)):
+        try:
+            new_iov[i] = int(new_iov[i])
+        except ValueError:
+            if new_iov[i] != '*':
+                raise ValueError(f"Invalid IOV value: {new_iov[i]} should be an integer or '*'")
+
     all_iovs = db.get_all_iovs(
         args.tag,
         overlap_run_range=args.overlap_run_range,
@@ -712,13 +720,19 @@ def command_iovs_modify(args, db=None):
             continue
         if args.revision and iov.revision != args.revision:
             continue
-        iovs_to_modify.append(iov)
 
-    table = [[i.iov_id, i.name, i.revision] + list(i.iov) for i in iovs_to_modify]
-    table.insert(0, ["IovId", "Name", "Rev", "First Exp", "First Run", "Final Exp", "Final Run"])
-    columns = [9, "+", 6, 6, 6, 6, 6]
+        new_iow_ = new_iov.copy()
+        for i in range(len(new_iow_)):
+            if new_iow_[i] == '*':
+                new_iow_[i] = iov.iov[i]
+        iovs_to_modify.append((iov, new_iow_))
 
-    B2INFO(f"Setting to  the following iovs to {args.first_exp} {args.first_run} {args.last_exp} {args.last_run}")
+    table = [[i[0].iov_id, i[0].name, i[0].revision] + list(i[0].iov) + list(i[1]) for i in iovs_to_modify]
+    table.insert(0, ["IovId", "Name", "Rev", "Old First Exp", "Old First Run", "Old Final Exp", "Old Final Run",
+                     "New First Exp", "New First Run", "New Final Exp", "New Final Run"])
+    columns = [9, "+", 6, 6, 6, 6, 6, 6, 6, 6, 6]
+
+    B2INFO("Changing the following iovs")
     pretty_print_table(table, columns)
 
     if not args.dry_run:
@@ -729,7 +743,7 @@ def command_iovs_modify(args, db=None):
                 start = time.monotonic()
                 for iov_num, _ in enumerate(pool.map(
                             lambda args: db.modify_iov(*args),
-                            [(i.iov_id, args.first_exp, args.first_run, args.last_exp, args.last_run) for i in iovs_to_modify]
+                            [(i[0].iov_id, *i[1]) for i in iovs_to_modify]
                         ), 1):
                     eta = (time.monotonic() - start) / iov_num * (len(iovs_to_modify) - iov_num)
                     B2INFO(f"{iov_num}/{len(iovs_to_modify)} iovs modified, ETA: {eta:.1f} seconds")

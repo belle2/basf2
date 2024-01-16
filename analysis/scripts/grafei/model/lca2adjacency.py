@@ -19,7 +19,7 @@ class Node:
 
     Args:
         level (int): Level in the tree.
-        children (Node): Children of the nodes.
+        children (list[Node]): Children of the nodes.
         lca_index (int): Index in the LCAS matrix.
         lcas_level (int): Level in the LCAS matrix.
     """
@@ -39,9 +39,6 @@ class Node:
 # def _print_history(node):
 #     """
 #     Debug function to print history of node.
-
-#     Args:
-#         node (Node): root node to inspect.
 #     """
 
 #     print([child.lcas_level for child in node.children])
@@ -264,6 +261,10 @@ def lca2adjacency(lca_matrix, format="bfs"):
     a leaf of the tree and each matrix entry is the level of the lowest-common-ancestor (LCA) of the two leaves, into
     the corresponding two-dimension adjacency matrix (N,N), with M < N. The levels are enumerated top-down from the
     root.
+
+    .. seealso::
+        The pseudocode for LCA to tree conversion is described in
+        `Kahn et al <https://iopscience.iop.org/article/10.1088/2632-2153/ac8de0>`_.
 
     :param lca_matrix: 2-dimensional LCA matrix (M, M).
     :type lca_matrix: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_

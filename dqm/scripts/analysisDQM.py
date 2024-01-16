@@ -35,10 +35,6 @@ def add_analysis_dqm(path):
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
     ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
     ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
-    # bhabha,hadrons
-    ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
-    ma.reconstructDecay('UpsilonE:physDQM -> e-:physDQM e+:physDQM', '9 < M < 12', 1, True, path)
-    ma.fillParticleList('pi+:hadbphysDQM', 'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
     # to avoid loading the photons' beamBackgroundMVA variable on the DQM
@@ -60,10 +56,6 @@ def add_analysis_dqm(path):
     dqm.param('PI0PListName', 'pi0:physDQM')
     dqm.param('KS0PListName', 'K_S0:physDQM')
     dqm.param('UpsPListName', 'Upsilon:physDQM')
-    # bhabha,hadrons
-    dqm.param('ePListName', 'e+:physDQM')
-    dqm.param('UpsEPListName', 'UpsilonE:physDQM')
-    dqm.param('HadbPListName', 'pi+:hadbphysDQM')
 
     path.add_module(dqm)
 

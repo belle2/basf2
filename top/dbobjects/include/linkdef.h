@@ -57,6 +57,6 @@
 #pragma link C++ class Belle2::TOPCalTimeWalk+; // checksum=0x5f64cf54, version=1
 #pragma link C++ class Belle2::TOPCalEventT0Offset+; // checksum=0x115ee83c, version=1
 #pragma link C++ class Belle2::TOPCalFillPatternOffset+; // checksum=0x2130d86c, version=2
-#pragma link C++ class Belle2::TOPCalPhotonYields+; // checksum=0x8f0960a2, version=1
+#pragma link C++ class Belle2::TOPCalPhotonYields+; // checksum=0x684d61bb, version=2
 
 #endif

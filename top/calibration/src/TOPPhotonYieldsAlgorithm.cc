@@ -137,13 +137,17 @@ namespace Belle2 {
         for (int bin = 1; bin <= activePixels->GetNbinsX(); bin++) activePixels->SetBinError(bin, 0);
         photonYields->Divide(activePixels.get()); // normalize
 
+        auto* bkgYields = (TH1F*) bkgHits->Clone("tmp2");
+        bkgYields->Divide(activePixels.get()); // normalize
+
         auto* alphaRatio = (TH1F*) alphaHigh->Clone("tmp2");
         alphaRatio->Divide(alphaHigh.get(), alphaLow.get());
         equalize(alphaRatio);
 
-        dbobject->set(slot, photonYields, alphaRatio, activePixels.get(), pulseHeights.get(), muonZ.get());
+        dbobject->set(slot, photonYields, bkgYields, alphaRatio, activePixels.get(), pulseHeights.get(), muonZ.get());
 
         delete photonYields;
+        delete bkgYields;
         delete alphaRatio;
       }
 

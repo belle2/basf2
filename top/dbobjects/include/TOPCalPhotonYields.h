@@ -44,13 +44,14 @@ namespace Belle2 {
      * Note: the setter must be called in the ascending order of slot ID's, e.g slot = 1, 2, ... , 16
      * @param slot slot ID
      * @param photonYields pixel photon yields
+     * @param backgroundYields pixel background yields
      * @param alphaRatio equalized alpha ratio
      * @param activePixels active pixels
      * @param pulseHeights pixel pulse-heights
      * @param muonZ z-distribution of tracks
      */
-    void set(int slot, const TH1F* photonYields, const TH1F* alphaRatio, const TH1F* activePixels,
-             const TH2F* pulseHeights, const TH1F* muonZ);
+    void set(int slot, const TH1F* photonYields, const TH1F* backgroundYields, const TH1F* alphaRatio,
+             const TH1F* activePixels, const TH2F* pulseHeights, const TH1F* muonZ);
 
     /**
      * Returns average unix time stamp of events used to make histograms stored in this class.
@@ -71,6 +72,14 @@ namespace Belle2 {
      * @return pixel image of photon yields (nullptr if N/A)
      */
     const TH2F* getPhotonYields(int slot) const;
+
+    /**
+     * Returns a 2D histogram of background pixel yields.
+     * These are inefficiency corrected number of background hits per track in a pixel.
+     * @param slot slot ID
+     * @return pixel image of photon yields (nullptr if N/A)
+     */
+    const TH2F* getBackgroundYields(int slot) const;
 
     /**
      * Returns a 2D histogram of equalized pixel alpha ratio.
@@ -121,12 +130,13 @@ namespace Belle2 {
     unsigned m_utime = 0; /**< average unix time in seconds */
     unsigned m_utimeStd = 0; /**< standard deviation of unix time in seconds */
     std::vector<TH2F> m_photonYields;  /**< photon yields per pixel (index = slot - 1) */
+    std::vector<TH2F> m_backgroundYields;     /**< background yields per pixel (index = slot - 1) */
     std::vector<TH2F> m_alphaRatio;    /**< equalized alpha ratio per pixel (index = slot - 1) */
     std::vector<TH2F> m_activePixels;  /**< active pixels (index = slot - 1) */
     std::vector<TH2F> m_pulseHeights;  /**< pixel pulse-heights (index = slot - 1) */
     std::vector<TH1F> m_muonZ;         /**< local z distribution of tracks (index = slot - 1) */
 
-    ClassDef(TOPCalPhotonYields, 1); /**< ClassDef */
+    ClassDef(TOPCalPhotonYields, 2); /**< ClassDef */
 
   };
 

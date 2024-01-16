@@ -52,6 +52,9 @@ class SaveHisto(b2.Module):
             h = db.getPhotonYields(slot)
             if h:
                 h.Write()
+            h = db.getBackgroundYields(slot)
+            if h:
+                h.Write()
             h = db.getAlphaRatio(slot)
             if h:
                 h.Write()

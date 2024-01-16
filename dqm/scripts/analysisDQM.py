@@ -155,7 +155,7 @@ def add_mirabelle_dqm(path):
         'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance',
         path=MiraBelleBhabha_path)
     ma.reconstructDecay('UpsilonE:physMiraBelle -> e+:physMiraBelle e-:physMiraBelle', '9 < M < 12', path=MiraBelleBhabha_path)
-    MiraBelleBhabha = b2.register_module('PhysicsObjectsBhabhaMiraBelle')
+    MiraBelleBhabha = b2.register_module('PhysicsObjectsMiraBelleBhabha')
     MiraBelleBhabha.param('ePListName', 'e+:physMiraBelle')
     MiraBelleBhabha.param('bhabhaPListName', 'UpsilonE:physMiraBelle')
     MiraBelleBhabha_path.add_module(MiraBelleBhabha)
@@ -163,6 +163,6 @@ def add_mirabelle_dqm(path):
         'pi+:hadb2physMiraBelle',
         'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance',
         path=MiraBellehadronb2_path)
-    MiraBellehadronb = b2.register_module('PhysicsObjectsHadronMiraBelle')
+    MiraBellehadronb = b2.register_module('PhysicsObjectsMiraBelleHadron')
     MiraBellehadronb.param('hadronb2piPListName', 'pi+:hadb2physMiraBelle')
     MiraBellehadronb2_path.add_module(MiraBellehadronb)

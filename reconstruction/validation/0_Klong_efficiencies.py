@@ -55,7 +55,8 @@ rec.add_reconstruction(path=main)
 # Run a module to generate histograms for PID performances
 main.add_module('KlongValidation',
                 outputName='K_long_full_validation_sample.root',
-                KlIdCut=0.1)
+                KlIdCut=0.1,
+                contact='cristina.martellini@roma3.infn.it')
 
 # add_mdst_output(main, True, 'Klong_validation_check.root')
 

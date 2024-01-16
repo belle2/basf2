@@ -104,13 +104,13 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   std::vector<ROOT::Math::XYZVector> m_pionHadv3;
 
   double EsumPiHad = 0.;
-  double PzPiHad = 0.;
+
   for (unsigned int i = 0; i < hadpiParticles->getListSize(); i++) {
     const Particle* parPiHad = hadpiParticles->getParticle(i);
     ROOT::Math::PxPyPzEVector V4PiHad = PCmsLabTransform::labToCms(parPiHad->get4Vector());
     m_pionHadv3.push_back(parPiHad->getMomentum());
     EsumPiHad += V4PiHad.E();
-    PzPiHad += V4PiHad.Pz();
+
   }
   //nECLClustersLE
   double neclClusters = -1.;
@@ -118,7 +118,7 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   StoreArray<ECLCluster> eclClusters;
   ClusterUtils Cl;
   double EsumGamma = 0.;
-  double PzGamma = 0.;
+
   if (eclClusters.isValid()) {
     const unsigned int numberOfECLClusters = std::count_if(eclClusters.begin(), eclClusters.end(),
     [](const ECLCluster & eclcluster) {
@@ -134,7 +134,6 @@ void PhysicsObjectsMiraBelleHadronModule::event()
           ROOT::Math::PxPyPzEVector V4Gamma_CMS = PCmsLabTransform::labToCms(Cl.Get4MomentumFromCluster(eclClusters[ncl],
                                                   ECLCluster::EHypothesisBit::c_nPhotons));
           EsumGamma += V4Gamma_CMS.E();
-          PzGamma += V4Gamma_CMS.Pz();
         }
       }
     }

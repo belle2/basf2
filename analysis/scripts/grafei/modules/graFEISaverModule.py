@@ -11,7 +11,7 @@ from variables import variables as vm
 import torch
 from torch_geometric.data import Batch
 from grafei.modules.FlagBDecayModule import getObjectList
-from grafei.model.geometric_network import GeometricNetwork
+from grafei.model.geometric_network import GraFEIModel
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
 from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, select_good_decay
@@ -118,7 +118,7 @@ class graFEISaverModule(b2.Module):
         g_infeatures = len(self.glob_features)
 
         # Build the model (the correct edge_classes is taken from the config file)
-        self.model = GeometricNetwork(
+        self.model = GraFEIModel(
             nfeat_in_dim=n_infeatures,
             efeat_in_dim=e_infeatures,
             gfeat_in_dim=g_infeatures,

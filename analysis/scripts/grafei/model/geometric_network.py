@@ -3,7 +3,7 @@ from torch_geometric.nn import MetaLayer
 from .geometric_layers import NodeLayer, EdgeLayer, GlobalLayer
 
 
-class GeometricNetwork(torch.nn.Module):
+class GraFEIModel(torch.nn.Module):
     """
         Actual implementation of the model,
         based on the
@@ -57,7 +57,7 @@ class GeometricNetwork(torch.nn.Module):
         global_layer=True,
         **kwargs
     ):
-        super(GeometricNetwork, self).__init__()
+        super(GraFEIModel, self).__init__()
 
         self.symmetrize = symmetrize
         self.x_classes = x_classes

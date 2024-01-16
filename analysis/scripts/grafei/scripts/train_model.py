@@ -11,7 +11,7 @@ import numpy as np
 import random
 from grafei.model.config import load_config
 from grafei.model.dataset_split import create_dataloader_mode_tags
-from grafei.model.geometric_network import GeometricNetwork
+from grafei.model.geometric_network import GraFEIModel
 from grafei.model.data_utils import calculate_class_weights
 from grafei.model.multiTrain import MultiTrainLoss
 from grafei.model.create_trainer import GraFEIIgniteTrainer
@@ -89,7 +89,7 @@ def main(
     e_infeatures = mode_tags["Training"][1][0].edge_attr.shape[-1]
     g_infeatures = mode_tags["Training"][1][0].u.shape[-1]
 
-    base_model = GeometricNetwork(
+    base_model = GraFEIModel(
         nfeat_in_dim=n_infeatures,
         efeat_in_dim=e_infeatures,
         gfeat_in_dim=g_infeatures,

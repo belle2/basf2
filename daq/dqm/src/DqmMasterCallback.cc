@@ -32,11 +32,13 @@ void* RunDqmMasterLogger(void*)
 DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
 {
   m_histodir = config.get("dqmmaster.histodir");
+  m_tmpdir = config.get("dqmmaster.tmpdir");
   m_instance = config.get("dqmmaster.instance");
   auto host = config.get("dqmmaster.host");
   auto port = config.getInt("dqmmaster.port");
   m_running = 0;
-  LogFile::info("DqmMasterCallback : instance = %s, histodir = %s", m_instance.c_str(), m_histodir.c_str());
+  LogFile::info("DqmMasterCallback : instance = %s, histodir = %s, tmpdir = %s", m_instance.c_str(), m_histodir.c_str(),
+                m_tmpdir.c_str());
 
   // Open sockets to hserver
   m_sock = new EvtSocketSend(host.c_str(), port);
@@ -53,7 +55,7 @@ void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runty
   LogFile::info("LOAD: runtype %s", m_runtype.c_str());
 
   {
-    std::string filename = "/tmp/dqm_" + m_instance + "_runtype";
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_runtype";
     // workaround until we have a better solution
     auto fh = fopen(filename.c_str(), "wt+");
     if (fh) {
@@ -70,7 +72,7 @@ void DqmMasterCallback::start(int expno, int runno)
 
   // currently, we do not (yet) use exp and run nr, just add it in case it may be needed later
   {
-    std::string filename = "/tmp/dqm_" + m_instance + "_expnr";
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_expnr";
     // workaround until we have a better solution
     auto fh = fopen(filename.c_str(), "wt+");
     if (fh) {
@@ -79,7 +81,7 @@ void DqmMasterCallback::start(int expno, int runno)
     }
   }
   {
-    std::string filename = "/tmp/dqm_" + m_instance + "_runnr";
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_runnr";
     // workaround until we have a better solution
     auto fh = fopen(filename.c_str(), "wt+");
     if (fh) {

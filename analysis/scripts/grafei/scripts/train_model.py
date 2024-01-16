@@ -61,10 +61,10 @@ def main(
         samples=n_samples,
     )
 
-    # assert configs["geometric_model"]["global_layer"] or (
-    #     not configs["geometric_model"]["global_layer"]
-    #     and configs["geometric_model"]["alpha_momentum"] == 0
-    #     and configs["geometric_model"]["alpha_prob"] == 0
+    # assert configs["model"]["global_layer"] or (
+    #     not configs["model"]["global_layer"]
+    #     and configs["model"]["alpha_momentum"] == 0
+    #     and configs["model"]["alpha_prob"] == 0
     # ), "You can not learn B probability and/or B momentum without global layer"
 
     # Random seed
@@ -81,7 +81,7 @@ def main(
     # Find out if we are reconstructing B or Ups
     B_reco = mode_tags["Training"][1].B_reco
 
-    configs["geometric_model"].update({"edge_classes": 6 if B_reco else 7, "B_reco": B_reco})
+    configs["model"].update({"edge_classes": 6 if B_reco else 7, "B_reco": B_reco})
 
     # Now build the model
     # Extract the number of features, assuming last dim is features
@@ -93,7 +93,7 @@ def main(
         nfeat_in_dim=n_infeatures,
         efeat_in_dim=e_infeatures,
         gfeat_in_dim=g_infeatures,
-        **configs["geometric_model"],
+        **configs["model"],
     )
 
     # Parallelize on multiple GPUs
@@ -137,11 +137,11 @@ def main(
     # Set the loss
     loss_fn = MultiTrainLoss(
         ignore_index=-1,
-        reduction=configs["geometric_model"]["loss_reduction"],
-        # alpha_momentum=configs["geometric_model"]["alpha_momentum"],
-        alpha_mass=configs["geometric_model"]["alpha_mass"],
-        # alpha_prob=configs["geometric_model"]["alpha_prob"],
-        # global_layer=configs["geometric_model"]["global_layer"],
+        reduction=configs["model"]["loss_reduction"],
+        # alpha_momentum=configs["model"]["alpha_momentum"],
+        alpha_mass=configs["model"]["alpha_mass"],
+        # alpha_prob=configs["model"]["alpha_prob"],
+        # global_layer=configs["model"]["global_layer"],
         edge_weights=edge_weights,
         node_weights=node_weights,
     )
@@ -150,7 +150,7 @@ def main(
     optimizer = torch.optim.Adam(
         model.parameters(),
         configs["train"]["learning_rate"],
-        weight_decay=configs["train"]["l2_loss"],
+        weight_decay=0,
         amsgrad=False,
         eps=0.001,
     )

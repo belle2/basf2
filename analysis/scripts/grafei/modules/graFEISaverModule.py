@@ -81,13 +81,13 @@ class graFEISaverModule(b2.Module):
         self.configs = yaml.safe_load(cfg_file)
 
         # B or Ups reco? 0 = Ups, 1 = B0, 2 = B+
-        if self.configs["geometric_model"]["B_reco"] == 0:
+        if self.configs["model"]["B_reco"] == 0:
             self.mc_particle = "Upsilon(4S):MC"
             self.max_level = 6
-        elif self.configs["geometric_model"]["B_reco"] == 1:
+        elif self.configs["model"]["B_reco"] == 1:
             self.mc_particle = "B0:MC"
             self.max_level = 5
-        elif self.configs["geometric_model"]["B_reco"] == 2:
+        elif self.configs["model"]["B_reco"] == 2:
             self.mc_particle = "B+:MC"
             self.max_level = 5
         else:
@@ -122,7 +122,7 @@ class graFEISaverModule(b2.Module):
             nfeat_in_dim=n_infeatures,
             efeat_in_dim=e_infeatures,
             gfeat_in_dim=g_infeatures,
-            **self.configs["geometric_model"],
+            **self.configs["model"],
         )
 
         # Load paramaters' values

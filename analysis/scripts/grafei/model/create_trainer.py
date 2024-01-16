@@ -52,8 +52,6 @@ class GraFEIIgniteTrainer:
 
         # Run timestamp to distinguish trainings
         self.timestamp = datetime.now().strftime("%Y.%m.%d_%H.%M")
-        # And record monitor tag to know which data to watch
-        self.monitor_tag = self.configs["dataset"]["config"]["monitor_tag"]
 
         # Output directory for checkpoints
         self.run_dir = None
@@ -166,7 +164,7 @@ class GraFEIIgniteTrainer:
                     ignore_background=True,
                 ),
             }
-            # if self.configs["geometric_model"]["global_layer"]:
+            # if self.configs["model"]["global_layer"]:
             #     metrics.update(
             #         {
             #             "correct_class": IsTrueB(
@@ -306,7 +304,7 @@ class GraFEIIgniteTrainer:
             trainer=self.trainer,
             min_delta=1e-3,
         )
-        self.evaluators[self.monitor_tag].add_event_handler(
+        self.evaluators["Evaluation"].add_event_handler(
             ignite.engine.Events.EPOCH_COMPLETED, early_handler
         )
 
@@ -330,10 +328,10 @@ class GraFEIIgniteTrainer:
                 score_name="validation_perfectEvent",
                 n_saved=1,
                 global_step_transform=ignite.handlers.global_step_from_engine(
-                    self.evaluators[self.monitor_tag]
+                    self.evaluators["Evaluation"]
                 ),
             )
-            self.evaluators[self.monitor_tag].add_event_handler(
+            self.evaluators["Evaluation"].add_event_handler(
                 ignite.engine.Events.EPOCH_COMPLETED, best_model_handler
             )
 

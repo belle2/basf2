@@ -1,13 +1,16 @@
 dataset:
-  path:  # Should contain train/val subdirectories
+  # path to the root folder containing train/val subdirectories for training
+  path:  # /home/my_user_name/some_folder/maybe_another_one/root
   config:
+    # Node input features of the model
     features: ['electronID_noSVD_noTOP', 'protonID_noSVD', 'muonID_noSVD', 'kaonID_noSVD', 'pionID_noSVD', 'pt', 'pz', 'dr', 'dz', 'clusterNHits', 'clusterTiming', 'clusterE9E25', 'charge'] #'PDG', 'clusterReg']  # Input features to use (overrides "ignore" param)
+    # Edge input features
     edge_features: [costheta, doca]
-    global_features: null #[nParticles]
-    #ignore: ['isSignal']  # Input features to ignore
+    # Global input features (null to not use global features)
+    global_features: null
+    # True to assign random subset of unmatched particle to each B, False to assign all unmatched particles to each B
     subset_unmatched: True
-    # allow_background: False
-    monitor_tag: 'Validation'  # Which dataset tag to monitor for e.g. checkpointing
+    # allow_background: False (not used)
     # You can configure simple normalization of features
     # They will be executed in the order given
     # Supported processes:
@@ -24,48 +27,63 @@ dataset:
       dr: [[power, 0.25], [linear, 0.16, 0.19]]
       dz: [[power, 0.25], [linear, 0.41, 0.15]]
       doca: [[linear, 0.02, 0.04]]
-      # nParticles: [[linear, 11.4, 3.6]]
       #electronID : [[linear, 0.1, 0.25]]
       #kaonID : [[linear, 0.14, 0.33]]
       #muonID : [[linear, 0.19, 0.3]]
       #protonID : [[linear, 0.03, 0.14]]
       #pionID : [[linear, 0.53, 0.41]]
 output:
-  # Top directory to save model, run_name as subdir and timestamp suffix
-  # will be added automatically
-  path: null 
-  tensorboard: null
-  # Give a name to this config file's series of training
-  # Tensorboard logs will be saved in a subdir with that name to help 
-  # organise them
+  # Top directory to save model (null to not save it, e.g. for testing). run_name as subdir and timestamp suffix will be added automatically
+  path: null # /home/my_name/some_output_folder 
+  #tensorboard: null
+  # Name of the training
   run_name: test
 train:
+  # Number of training epochs
   epochs: 3
+  # Number of training samples in each batch
   batch_size: 128
-  num_workers: 0
-  # Whether to calculate class weights from dataset
+  # Number of epochs before training is pruned if no improvement is found 
   early_stop_patience: 100
+  # Learning rate of the model
   learning_rate: 0.001
+  # Whether to use a learning rate scheduler
   lr_scheduler: False
-  l2_loss: 0 # L2 regularization term
+  # Whether to use mixed precision for faster training
   mixed_precision: True
+  # Whether to calculate class weights from dataset
   class_weights: False
+  # Show progress bar during training (slows down the process)
   progress_bar: False
+  # Show GPU usage during training (slows down the process)
   record_gpu_usage: False
+  # Compile the model to have a speed-up (requires PyTorch >= 2.0)
   compile_model: False
-  seed: 42 #seed
-val:
-  num_workers: 0
-geometric_model:
-  overwrite: True # Process the graphs from scratch
-  global_layer: False
-  loss_reduction: mean #mean #sum
-  # alpha_prob: 0 # 0.1 # Parameter to tune the learning of B probability
-  # alpha_momentum: 0 # 0.1 # Parameter to tune the learning of B momentum
-  alpha_mass: 1 # 0.1 # Parameter to tune the learning of masses of FSP
+  # Random seed
+  seed: 42
+model:
+  # Any previous .pt PyTorch file containing processed data is overwritten (recommended unless you want to use the same data with e.g. different hyperparameters)
+  # Those files are stored in root/train(val)/processed
+  overwrite: True
+  # Whether to enable global layer in the model
+  global_layer: True
+  # compute 'mean' or 'sum' of losses across the batch. 'sum' is unstable and leads to errors during training
+  loss_reduction: mean
+  # Parameter to tune the learning of B probability (not used)
+  # alpha_prob: 0 
+  # Parameter to tune the learning of B momentum (not used)
+  # alpha_momentum: 0 
+  # Parameter to tune the learning of masses of FSP
+  alpha_mass: 1 
+  # Dimension of hidden layers
   hidden_layer_dim: 512
+  # Number of hidden layers
   num_hid_layers: 1
+  # Number of intermediate MetaLayers
   num_ML: 1
+  # Dropout rate
   dropout: 0.3
+  # Whether to symmetrize output LCAS matrices
   symmetrize: True
-  normalize: batchnorm #batchnorm layernorm null
+  # 'batchnorm' for batch normalization, 'layernorm' for layer normalization
+  normalize: batchnorm

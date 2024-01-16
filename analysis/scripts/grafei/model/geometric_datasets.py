@@ -40,22 +40,14 @@ def _preload(self):
         self.B_reco = int(stats.mode(t["isB"].array(library="np"), keepdims=False).mode)
         assert self.B_reco in [0, 1, 2], "B_reco should be 0, 1 or 2, something went wrong"
 
-    if self.node_features:
-        # Keep only requested features
-        self.discarded = [
-            f for f in self.features if not f[f.find("_") + 1:] in self.node_features
-        ]
-        self.features = [
-            f"feat_{f}" for f in self.node_features if f"feat_{f}" in self.features
-        ]
-    else:
-        # Remove ignored features
-        self.discarded = [
-            f for f in self.features if f[f.find("_") + 1:] in self.ignore
-        ]
-        self.features = [
-            f for f in self.features if f[f.find("_") + 1:] not in self.ignore
-        ]
+    # Keep only requested features
+    self.discarded = [
+        f for f in self.features if not f[f.find("_") + 1:] in self.node_features
+    ]
+    self.features = [
+        f"feat_{f}" for f in self.node_features if f"feat_{f}" in self.features
+    ]
+
     print(f"Input node features: {self.features}")
     print(f"Discarded node features: {self.discarded}")
 
@@ -276,7 +268,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
             samples (int): Load only ``samples`` events.
             subset_unmatched (bool): Assign a random subset of unmatched particles to each B.
             features (list): List of node features names.
-            ignore (list): List of discarded node features names.
             edge_features (list): List of edge features names.
             global_features (list): List of global features names.
             normalize (bool): Whether to normalize input features.
@@ -290,19 +281,17 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         samples=None,
         subset_unmatched=True,
         features=[],
-        ignore=[],
         edge_features=[],
         global_features=[],
         normalize=None,
         overwrite=True,
         **kwargs,
     ):
-        assert isinstance(
-            ignore, list
-        ), f'Argument "ignore" must be a list and not {type(ignore)}'
+
         assert isinstance(
             features, list
         ), f'Argument "features" must be a list and not {type(features)}'
+        assert len(features) > 0, "You need to use at least one node feature"
 
         self.root = Path(root)
 
@@ -314,7 +303,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         self.node_features = features
         self.edge_features = edge_features
         self.global_features = global_features
-        self.ignore = ignore
         self.samples = samples
 
         # Delete processed files, in case

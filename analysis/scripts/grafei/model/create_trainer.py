@@ -304,7 +304,7 @@ class GraFEIIgniteTrainer:
             trainer=self.trainer,
             min_delta=1e-3,
         )
-        self.evaluators["Evaluation"].add_event_handler(
+        self.evaluators["Validation"].add_event_handler(
             ignite.engine.Events.EPOCH_COMPLETED, early_handler
         )
 
@@ -328,10 +328,10 @@ class GraFEIIgniteTrainer:
                 score_name="validation_perfectEvent",
                 n_saved=1,
                 global_step_transform=ignite.handlers.global_step_from_engine(
-                    self.evaluators["Evaluation"]
+                    self.evaluators["Validation"]
                 ),
             )
-            self.evaluators["Evaluation"].add_event_handler(
+            self.evaluators["Validation"].add_event_handler(
                 ignite.engine.Events.EPOCH_COMPLETED, best_model_handler
             )
 
@@ -382,18 +382,15 @@ class GraFEIIgniteTrainer:
         for tag, values in mode_tags.items():
             evaluator = self.evaluators[tag]
 
-            eval_steps = (
-                self.configs["val"]["steps"] if "steps" in self.configs["val"] else None
-            )
             # Need to wrap this in autocast since it caculates metrics (i.e. loss) without autocast switched on
             # This is mostly fine except it fails to correctly cast the class weights tensor passed to the loss
             if self.configs["train"]["mixed_precision"] and self.device == torch.device(
                 "cuda"
             ):
                 with torch.cuda.amp.autocast():
-                    evaluator.run(values[2], epoch_length=eval_steps)
+                    evaluator.run(values[2], epoch_length=None)
             else:
-                evaluator.run(values[2], epoch_length=eval_steps)
+                evaluator.run(values[2], epoch_length=None)
 
             metrics = evaluator.state.metrics
             message = [f"{tag} Results - Epoch: {trainer.state.epoch}"]

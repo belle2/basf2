@@ -407,7 +407,7 @@ class RootSaverModule(b2.Module):
                         p_index = -1
                         p_primary = False
                         mc_pdg = 0
-                        # Count the unmatched particle to both side (TODO: reasonable?)
+                        # Count the unmatched particle to both side
 
                     evt_leaf_dict["primary"].append(p_primary)
                     evt_leaf_dict["leaves"].append(p_index)

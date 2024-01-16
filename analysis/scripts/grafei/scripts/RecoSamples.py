@@ -165,7 +165,7 @@ if __name__ == '__main__':
         features=save_vars,
         b_parent_var=b_parent_var,
         mcparticle_list=mc_particle_name[args.type],
-        output_file=f'output_{input_file.stem}.root',
+        output_file=f'graFEI_train_{input_file.stem}.root',
         # bkg_prob=args.bkg_prob,
     )
     path.add_module(root_saver_module)

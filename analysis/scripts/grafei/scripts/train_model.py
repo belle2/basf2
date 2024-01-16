@@ -103,7 +103,7 @@ def main(
 
     print(f"Model: {base_model}\n")
     print(
-        f"Number of parameters: {sum(p.numel() for p in base_model.parameters() if p.requires_grad)}\n"
+        f"Number of model parameters: {sum(p.numel() for p in base_model.parameters() if p.requires_grad)}\n"
     )
     print(f"Using LCAS format, max depth of {5 if B_reco else 6} corresponding to {'B' if B_reco else 'Upsilon(4S)'}\n")
 
@@ -123,12 +123,12 @@ def main(
     if configs["train"]["class_weights"]:
         edge_weights = calculate_class_weights(
             dataloader=mode_tags["Training"][2],
-            num_classes=model.getNEClasses(),
+            num_classes=model.x_classes,
             edges=True,
         )
         node_weights = calculate_class_weights(
             dataloader=mode_tags["Training"][2],
-            num_classes=model.getNXClasses(),
+            num_classes=model.edge_classes,
             edges=False,
         )
         edge_weights = edge_weights.to(device)

@@ -226,19 +226,3 @@ class GeometricNetwork(torch.nn.Module):
                 ).values()  # Symmetrization happens here
 
         return x, edge_attr, u
-
-    def getNXClasses(self):
-        """
-        Returns:
-            int: Number of node classes in the model.
-        """
-        # TODO: Check if can be removed.
-        return self.x_classes
-
-    def getNEClasses(self):
-        """
-        Returns:
-            int: Number of edge classes in the model.
-        """
-        # TODO: Check if can be removed.
-        return self.edge_classes

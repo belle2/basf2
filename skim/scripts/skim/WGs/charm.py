@@ -979,7 +979,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
 class DpToHpOmega(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D^{+}\\to K^+ \\omega` (and CC)
+        * :math:`D^{+}\\to K^{+} \\omega` (and CC)
         * :math:`D^{+}\\to \\pi^+ \\omega` (and CC)
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
@@ -1028,7 +1028,7 @@ class DpToHpOmega(BaseSkim):
 class DspToHpOmega(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D_{s}^{+}\\to K^+ \\omega` (and CC)
+        * :math:`D_{s}^{+}\\to K^{+} \\omega` (and CC)
         * :math:`D_{s}^{+}\\to \\pi^+ \\omega` (and CC)
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 

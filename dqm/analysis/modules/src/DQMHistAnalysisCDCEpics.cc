@@ -39,10 +39,10 @@ DQMHistAnalysisCDCEpicsModule::~DQMHistAnalysisCDCEpicsModule()
 void DQMHistAnalysisCDCEpicsModule::initialize()
 {
   gROOT->cd();
-  m_hist_adc = new TH1F("hist_adc", "m_hist_adc", 300, 0, 300);
+  m_hist_adc = new TH1F("CDC/hist_adc", "m_hist_adc", 300, 0, 300);
   m_hist_adc->SetTitle("ADC Medians of CDC boards; CDC board index; ADC medians");
 
-  m_hist_tdc = new TH1F("hist_tdc", "m_hist_tdc", 300, 0, 300);
+  m_hist_tdc = new TH1F("CDC/hist_tdc", "m_hist_tdc", 300, 0, 300);
   m_hist_tdc->SetTitle("TDC Medians of CDC boards; CDC board index; TDC medians");
 
   m_cBoards = new TCanvas("cdc_boardstatus", "cdc_boardstatus", 1000, 400);

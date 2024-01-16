@@ -200,9 +200,9 @@ void DQMHistAnalysisECLSummaryModule::event()
   }
   m_labels.clear();
 
-  //== Set correct warning/error colors based on alarm thresholds
+  //== Set correct warning/error colors for each bin based on alarm thresholds
 
-  bool enough     = true;
+  bool enough     = false;
   bool warn_flag  = false;
   bool error_flag = false;
 
@@ -221,17 +221,19 @@ void DQMHistAnalysisECLSummaryModule::event()
         // statistics but this is not a guarantee.
         color = HISTCOLOR_GRAY;
         label_text[0] = 'L';
-        enough = false;
       } else if (alarms >= alarm_limit) {
         color = HISTCOLOR_RED;
         label_text[0] = 'E';
         error_flag = true;
+        enough = true;
       } else if (alarms >= warning_limit) {
         color = HISTCOLOR_ORANGE;
         label_text[0] = 'W';
         warn_flag = true;
+        enough = true;
       } else {
         color = HISTCOLOR_GREEN;
+        enough = true;
       }
       if (label_text[0] == 'E' || label_text[0] == 'W') {
         B2DEBUG(100, "Non-zero (" << alarm_counts[alarm_idx][crate]
@@ -248,10 +250,6 @@ void DQMHistAnalysisECLSummaryModule::event()
     }
   }
 
-  //=== Set background color based on combined status.
-
-  if (warn_flag || error_flag) enough = true;
-
   //=== Draw histogram, labels and grid
 
   // Customize title
@@ -262,6 +260,7 @@ void DQMHistAnalysisECLSummaryModule::event()
   gStyle->SetTitleX(0.60);
   gStyle->SetTitleY(1.00);
 
+  //=== Set background color based on combined status.
   c_channels_summary->cd();
   colorizeCanvas(c_channels_summary, makeStatus(enough, warn_flag, error_flag));
   c_channels_summary->SetFrameFillColor(DQMHistAnalysisModule::c_ColorTooFew);

@@ -8106,7 +8106,7 @@ CDecay tau+
 ##########                                                              ##########
 ##################################################################################
 #
-#   Updated PDG 2011
+#   Updated PDG 2023
 #
 
 # D*+
@@ -8128,8 +8128,9 @@ CDecay anti-D*0
 
 # D_s*+
 Decay D_s*+
-0.942000000   D_s+  gamma                                  VSP_PWAVE;
-0.058000000   D_s+  pi0                                    VSS;
+0.935000000   D_s+  gamma                                  VSP_PWAVE; #[PDG2023]
+0.058000000   D_s+  pi0                                    VSS;  #[PDG2023]
+0.007000000   D_s+  e+ e-                                  PHSP;  #[PDG2023] 
 Enddecay
 
 CDecay D_s*-

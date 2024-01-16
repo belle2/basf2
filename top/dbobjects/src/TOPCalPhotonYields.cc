@@ -13,8 +13,8 @@ using namespace std;
 
 namespace Belle2 {
 
-  void TOPCalPhotonYields::set(int slot, const TH1F* photonYields, const TH1F* alphaRatio, const TH1F* activePixels,
-                               const TH2F* pulseHeights, const TH1F* muonZ)
+  void TOPCalPhotonYields::set(int slot, const TH1F* photonYields, const TH1F* backgroundYields, const TH1F* alphaRatio,
+                               const TH1F* activePixels, const TH2F* pulseHeights, const TH1F* muonZ)
   {
     string slotName = (slot < 10) ? "_0" + to_string(slot) : "_" + to_string(slot);
 
@@ -22,6 +22,11 @@ namespace Belle2 {
                                   ("Photon yields for slot " + to_string(slot) + "; pixel column; pixel row").c_str(),
                                   c_numCols, 0.5, c_numCols + 0.5, c_numRows, 0.5, c_numRows + 0.5));
     copyContent(photonYields, m_photonYields.back());
+
+    m_backgroundYields.push_back(TH2F(("backgroundYields" + slotName).c_str(),
+                                      ("Background yields for slot " + to_string(slot) + "; pixel column; pixel row").c_str(),
+                                      c_numCols, 0.5, c_numCols + 0.5, c_numRows, 0.5, c_numRows + 0.5));
+    copyContent(backgroundYields, m_backgroundYields.back());
 
     m_alphaRatio.push_back(TH2F(("alphaRatio" + slotName).c_str(),
                                 ("Equalized alpha ratio for slot " + to_string(slot) + "; pixel column; pixel row").c_str(),
@@ -54,6 +59,14 @@ namespace Belle2 {
   {
     unsigned index = slot - 1;
     if (index < m_photonYields.size()) return &m_photonYields[index];
+    return 0;
+  }
+
+
+  const TH2F* TOPCalPhotonYields::getBackgroundYields(int slot) const
+  {
+    unsigned index = slot - 1;
+    if (index < m_backgroundYields.size()) return &m_backgroundYields[index];
     return 0;
   }
 

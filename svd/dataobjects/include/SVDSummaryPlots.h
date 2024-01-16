@@ -41,6 +41,7 @@ namespace Belle2 {
                                   16, 0.5, 16.5,
                                   19, 0, 19);
         customize(*m_histos[view], view);
+        m_Title[view] = m_histos[view]->GetTitle();
       }
     }
 
@@ -114,7 +115,37 @@ namespace Belle2 {
       int sensor = vxdID.getSensorNumber();
 
       getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
+    }
 
+    /** set run ids in title
+     * @param runID
+    */
+    void setRunID(const TString& runID)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++) {
+        // add blank if needed before adding runID
+        if (!m_Title[view].EndsWith(" "))
+          m_Title[view].Append(" ");
+
+        getHistogram(view)->SetTitle(m_Title[view] + runID);
+      }
+    }
+
+    /** Reset histograms
+     */
+    void reset()
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->Reset();
+    }
+
+    /** set histograms stat
+     * @param stats
+     */
+    void setStats(bool stats = true)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->SetStats(stats);
     }
 
     /** fill the histogram for @param vxdID side @param isU with @param value*/
@@ -146,9 +177,6 @@ namespace Belle2 {
       delete m_defaultHistogram;
     }
 
-
-
-
   private:
 
     /** find the Y bin given the layer and sensor number */
@@ -169,7 +197,9 @@ namespace Belle2 {
 
     TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
 
-    TH2F* m_defaultHistogram; /**< default histograms*/
+    TH2F* m_defaultHistogram = nullptr; /**< default histograms*/
+
+    TString m_Title[2];    /**< Base title */
 
     /** customize the histogram with the sensor, view*/
     void customize(TH2F& histogram, int view)
@@ -208,7 +238,7 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDSummaryPlots, 1);  /**< needed by root */
+    ClassDef(SVDSummaryPlots, 2);  /**< needed by root */
   };
 
 

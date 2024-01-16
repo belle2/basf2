@@ -443,9 +443,14 @@ class MakePlots(basf2.Module):
         return heff
 
     def initialize(self):
+        '''
+        initialize class members
+        '''
 
         print('start read')
+        #: output file
         self.tfile = TFile("./TRGValidation.root", "update")
+        #: number of events
         self.Nevent = 0
 
         m_dbinput = Belle2.PyDBObj("TRGGDLDBInputBits")
@@ -554,9 +559,10 @@ class MakePlots(basf2.Module):
 
         #: validation histogram
         self.d_w = TH1F("d_w", "#Deltaw of CDC 2D finder, w = 0.00449/p_{t}", 50, -0.02, 0.02)
-        self.d_w_2 = TH1F("d_w_2", "d_w_2", 50, -0.02, 0.02)
         tree.Draw(f"({trk2d_omega} - 0.00449)/sqrt({mc_px}*{mc_px} + {mc_py}*{mc_py})>> d_w",
                   "MCParticles.m_pdg<0&&" + mc)
+        #: validation histogram
+        self.d_w_2 = TH1F("d_w_2", "d_w_2", 50, -0.02, 0.02)
         tree.Draw(f"({trk2d_omega} + 0.00449)/sqrt({mc_px}*{mc_px} + {mc_py}*{mc_py}) >> d_w_2",
                   "MCParticles.m_pdg>0 && " + mc)
         self.d_w.Add(self.d_w_2)
@@ -570,11 +576,13 @@ class MakePlots(basf2.Module):
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
                   f"fabs({trk2d_phi}-atan({mc_py}/{mc_px}))<{PI}&&" + mc)
 
+        #: validation histogram
         self.d_phi_2 = TH1F("d_phi_2", "d_phi_2", 50, -0.5, 0.5)
         tree.Draw(f"{trk2d_phi}-atan({mc_py}/{mc_px})-{PI}>>d_phi_2",
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
                   f"{trk2d_phi}-atan({mc_py}/{mc_px})>={PI} &&" + mc)
 
+        #: validation histogram
         self.d_phi_3 = TH1F("d_phi_3", "d_phi_3", 50, -0.5, 0.5)
         tree.Draw(f"{trk2d_phi}-atan({mc_py}/{mc_px})+{PI}>>d_phi_2",
                   "MCParticles.m_status==11&&abs(MCParticles.m_pdg)==11",
@@ -608,6 +616,10 @@ class MakePlots(basf2.Module):
         self.set_style(self.d_E_ECL, "#DeltaE [GeV]", "Events/(0.12 GeV)")
 
     def beginRun(self):
+        '''
+        reset all histograms at the begin of a new run
+        '''
+
         self.hist_inbit.Reset()
         self.hist_outbit.Reset()
         self.hist_inbit_expert.Reset()
@@ -619,6 +631,9 @@ class MakePlots(basf2.Module):
         self.h_phi_ECL.Reset()
 
     def event(self):
+        '''
+        event loop
+        '''
 
         trg_summary = Belle2.PyStoreObj("TRGSummary")
         clusters = Belle2.PyStoreArray("TRGECLClusters")
@@ -668,9 +683,16 @@ class MakePlots(basf2.Module):
         self.Nevent = self.Nevent + 1
 
     def endRun(self):
+        '''
+        end of run
+        '''
+
         print("end")
 
     def terminate(self):
+        '''
+        write histograms
+        '''
 
         bits = ['ty_0', 'ehigh', 'clst_0']
         part = 'e'
@@ -765,7 +787,6 @@ class MakePlots(basf2.Module):
         self.d_z0_nn.Write()
         self.d_E_ECL.Write()
         self.tfile.Close()
-#: \endcond
 
 #####################################################
 

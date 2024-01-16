@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisIP.cc
-// Description : Mean for IP position with delta histogramming
+// File : DQMHistAnalysisPeak.cc
+// Description : Simple Peak Analysis (Mean/Media/Width) for simple peaked distributions with delta histogramming
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisIP.h>
+#include <dqm/analysis/modules/DQMHistAnalysisPeak.h>
 
 using namespace std;
 using namespace Belle2;
@@ -19,38 +19,41 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisIP);
+REG_MODULE(DQMHistAnalysisPeak);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisIPModule::DQMHistAnalysisIPModule()
+DQMHistAnalysisPeakModule::DQMHistAnalysisPeakModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
-  setDescription("Modify and analyze the data quality histograms of IP Monitoring");
+  setDescription("Modify and analyze the peaking distributions in data quality histograms");
 
   //Parameter definition
   addParam("HistoName", m_histoName, "Name of Histogram (excl dir)", std::string(""));
   addParam("HistoDirectory", m_histoDirectory, "Name of Histogram dir", std::string(""));
-  addParam("PVName", m_pvPrefix, "PV Prefix and Name", std::string("DQM:TEST:hist:"));
-  addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix");// force to be set!
+  addParam("PVName", m_pvPrefix, "PV Prefix and Name", std::string(""));
+  addParam("MonitorPrefix", m_monPrefix, "Monitor Prefix", std::string(""));
+  addParam("MonitorObjectName", m_monObjectName, "Monitor Object Name", std::string(""));
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", 1000);
-  B2DEBUG(20, "DQMHistAnalysisIP: Constructor done.");
+  B2DEBUG(20, "DQMHistAnalysisPeak: Constructor done.");
 }
 
-void DQMHistAnalysisIPModule::initialize()
+void DQMHistAnalysisPeakModule::initialize()
 {
-  B2DEBUG(20, "DQMHistAnalysisIP: initialized.");
+  B2DEBUG(20, "DQMHistAnalysisPeak: initialized.");
 
-  m_monObj = getMonitoringObject("ip");
+  if (m_monObjectName != "") {
+    m_monObj = getMonitoringObject(m_monObjectName);
+  }
 
   // register delta
   if (!hasDeltaPar(m_histoDirectory, m_histoName)) addDeltaPar(m_histoDirectory, m_histoName, HistDelta::c_Entries, m_minEntries, 1);
 
   // prefer to change canvas name to monitorPrefix, but then changes on the web gui are needed :-(
-  m_c1 = new TCanvas((m_histoDirectory + "/" + m_histoName +  "_fit").data());
+  m_c1 = new TCanvas((m_histoDirectory + "/c_" + m_histoName +  "_fit").data());
 
   m_line = new TLine(0, 10, 0, 0);
   m_line->SetVertical(true);
@@ -61,22 +64,23 @@ void DQMHistAnalysisIPModule::initialize()
   m_line2->SetLineColor(9);
   m_line2->SetLineWidth(3);
 
-  m_monObj->addCanvas(m_c1);
+  if (m_monObj) m_monObj->addCanvas(m_c1);
 
-  registerEpicsPV(m_pvPrefix + "Mean", "Mean");
-  registerEpicsPV(m_pvPrefix + "RMS", "RMS");
-  registerEpicsPV(m_pvPrefix + "Median", "Median");
-  updateEpicsPVs(5.0);
+  if (m_pvPrefix != "") {
+    registerEpicsPV(m_pvPrefix + "Mean", "Mean");
+    registerEpicsPV(m_pvPrefix + "RMS", "RMS");
+    registerEpicsPV(m_pvPrefix + "Median", "Median");
+  }
 }
 
 
-void DQMHistAnalysisIPModule::beginRun()
+void DQMHistAnalysisPeakModule::beginRun()
 {
-  B2DEBUG(20, "DQMHistAnalysisIP: beginRun called.");
+  B2DEBUG(20, "DQMHistAnalysisPeak: beginRun called.");
   m_c1->Clear();
 }
 
-void DQMHistAnalysisIPModule::event()
+void DQMHistAnalysisPeakModule::event()
 {
   auto delta = getDelta(m_histoDirectory, m_histoName);
   // do not care about initial filling handling. we wont show or update unless we reach the min req entries
@@ -110,14 +114,17 @@ void DQMHistAnalysisIPModule::event()
     m_c1->Modified();
     m_c1->Update();
 
-    m_monObj->setVariable(m_monPrefix + "_median", m);
-    m_monObj->setVariable(m_monPrefix + "_mean", x);
-    m_monObj->setVariable(m_monPrefix + "_width", w);
+    if (m_monObj and m_monPrefix != "") {
+      m_monObj->setVariable(m_monPrefix + "_median", m);
+      m_monObj->setVariable(m_monPrefix + "_mean", x);
+      m_monObj->setVariable(m_monPrefix + "_width", w);
+    }
 
     B2DEBUG(20, "Now update Epics PVs");
-    setEpicsPV("Mean", x);
-    setEpicsPV("RMS", w);
-    setEpicsPV("Median", m);
-    updateEpicsPVs(5.0);
+    if (m_pvPrefix != "") {
+      setEpicsPV("Mean", x);
+      setEpicsPV("RMS", w);
+      setEpicsPV("Median", m);
+    }
   }
 }

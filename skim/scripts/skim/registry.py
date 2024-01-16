@@ -40,7 +40,6 @@ _RegisteredSkims = [
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
-    ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
     ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11180100", "fei", "feiHadronicB0"),
@@ -59,6 +58,8 @@ _RegisteredSkims = [
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
+    ("13130300", "tdcpv", "dilepton"),
+
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),
@@ -140,6 +141,7 @@ _RegisteredSkims = [
     ("18130100", "dark", "BtoKplusLLP"),
     ("18570600", "taupair", "TauGeneric"),
     ("18570700", "taupair", "TauThrust"),
+    ("18570800", "taupair", "TauKshort"),
     ("18530100", "lowMulti", "TwoTrackLeptonsForLuminosity"),
     ("18520500", "lowMulti", "LowMassTwoTrack"),
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
@@ -152,6 +154,7 @@ _RegisteredSkims = [
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
     ("19120400", "btocharmless", "BtoRhopRhom"),
+    ("19140500", "btocharmless", "BtoEtapKstp"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

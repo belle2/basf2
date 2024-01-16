@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisIP.h
-// Description : Median for IP position with delta histogramming
+// File : DQMHistAnalysisPeak.h
+// Description : Simple Peak Analysis (Mean/Media/Width) for simple peaked distributions with delta histogramming
 //-
 
 #pragma once
@@ -16,9 +16,9 @@
 #include <TLine.h>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /*! DQM Histogram Analysis for simple peaking distributions */
 
-  class DQMHistAnalysisIPModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPeakModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -26,7 +26,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    DQMHistAnalysisIPModule();
+    DQMHistAnalysisPeakModule();
 
   private:
 
@@ -55,6 +55,8 @@ namespace Belle2 {
     std::string  m_pvPrefix;
     /** The prefix for MonitoringObj. */
     std::string  m_monPrefix;
+    /** The Name for MonitoringObj. */
+    std::string  m_monObjectName;
     /** Update entry interval */
     int m_minEntries = 1000;
 

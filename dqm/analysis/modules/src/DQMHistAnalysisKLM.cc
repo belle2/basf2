@@ -512,7 +512,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       /* Then, color the canvas with red if there is a dead module
       * and write an error message. */
       if (m_DeadBarrelModules.size() == 0) {
-        canvas->Pad()->SetFillColor(kWhite);
+        colorizeCanvas(canvas, c_StatusGood);
       } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
         for (KLMModuleNumber module : m_DeadBarrelModules) {
           m_ElementNumbers->moduleNumberToElementNumbers(
@@ -523,10 +523,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
           yAlarm -= 0.05;
         }
         if (m_IsNullRun == false) {
-          alarm = "Call the KLM experts immediately!";
-          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-          canvas->Pad()->SetFillColor(kRed);
+          colorizeCanvas(canvas, c_StatusError);
         }
+      } //end of enough statistics condition
+      else {
+        colorizeCanvas(canvas, c_StatusTooFew);
       }
     } else {
       /* First draw the vertical lines and the sector names. */
@@ -552,7 +553,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       /* Then, color the canvas with red if there is a dead module
       * and write an error message. */
       if (m_DeadEndcapModules.size() == 0) {
-        canvas->Pad()->SetFillColor(kWhite);
+        colorizeCanvas(canvas, c_StatusGood);
       } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
         for (KLMModuleNumber module : m_DeadEndcapModules) {
           m_ElementNumbers->moduleNumberToElementNumbers(
@@ -563,10 +564,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
           yAlarm -= 0.05;
         }
         if (m_IsNullRun == false) {
-          alarm = "Call the KLM experts immediately!";
-          latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-          canvas->Pad()->SetFillColor(kRed);
+          colorizeCanvas(canvas, c_StatusError);
         }
+      } //end of high statistics condition
+      else {
+        colorizeCanvas(canvas, c_StatusTooFew);
       }
     }
     canvas->Modified();
@@ -672,11 +674,13 @@ void DQMHistAnalysisKLMModule::event()
   processTimeHistogram("time_scintillator_eklm");
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
-  setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
-  setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
-  setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
-  B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
-  B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
-  B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
-  updateEpicsPVs(5.0);
+  // only update PVs if there's enough statistics
+  if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+    setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
+    setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
+    setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
+    B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
+    B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
+    B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
+  }
 }

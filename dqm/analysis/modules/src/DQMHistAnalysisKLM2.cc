@@ -487,10 +487,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   eff2dHist->Draw("COLZ");
   errHist->Draw("TEXT SAME");
   if (setAlarm) {
-    eff2dCanv->Pad()->SetFillColor(kRed);
+    colorizeCanvas(eff2dCanv, c_StatusError);
   } else if (setWarn) {
-    eff2dCanv->Pad()->SetFillColor(kYellow);
-  }
+    colorizeCanvas(eff2dCanv, c_StatusWarning);
+  } else
+    colorizeCanvas(eff2dCanv, c_StatusGood);
   eff2dCanv->Modified();
   eff2dCanv->Update();
 }
@@ -557,7 +558,9 @@ void DQMHistAnalysisKLM2Module::event()
                         m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "Updating EPICS PVs in DQMHistAnalysisKLM2");
-  setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
-  setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
-  updateEpicsPVs(5.0);
+  double procesedEvents = DQMHistAnalysisModule::getEventProcessed();
+  if (procesedEvents > m_minEvents) {
+    setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
+    setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+  }
 }

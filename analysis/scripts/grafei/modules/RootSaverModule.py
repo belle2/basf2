@@ -81,7 +81,7 @@ def write_hist(
     Recursive function to traverse down to the leaves saving the history.
 
     Args:
-        particle (ROOT.Belle2.MCParticle): The current particle being inspected.
+        particle (Belle2.MCParticle): The current particle being inspected.
             Other arguments are automatically set.
     """
 

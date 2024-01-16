@@ -38,7 +38,7 @@ class GeometricNetwork(torch.nn.Module):
             global_layer (bool): Whether to use global layer.
 
         :return: Node, edge and global features after model evaluation.
-        :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
+        :rtype: tuple(`Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_)
     """
 
     def __init__(

@@ -1,4 +1,4 @@
-# EventType: 1210031001
+# EventType: 1220031000
 # Descriptor: [B+ -> [K_1+ -> K+ pi+ pi-] gamma] cc
 # NickName: B+_K+pipigamma_via_K1
 # Documentation: Rare b->s gamma process
@@ -14,9 +14,9 @@ Alias K1+sig K_1+
 Alias K1-sig K_1-
 ChargeConj K1+sig K1-sig
 
-Decay Upsilon(4S)sig
-1.00    B+sig B-  VSS;
-1.00    B+ B-sig  VSS;
+Decay Upsilon(4S)
+0.50    B+sig B-  VSS;
+0.50    B-sig B+  VSS;
 Enddecay
 
 Decay B+sig

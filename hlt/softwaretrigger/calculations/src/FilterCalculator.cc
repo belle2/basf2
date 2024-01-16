@@ -315,9 +315,9 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
       if (std::abs(z0) < 1.) {calculationResult["nTrkTightB"] += 1;}
       if (std::abs(z0) < 5.) {
         calculationResult["nTrkLooseB"] += 1;
+        calculationResult["netChargeLooseB"] += charge;
         if (std::isnan(calculationResult["maximumPCMSB"]) or pCMS > calculationResult["maximumPCMSB"]) {
           calculationResult["maximumPCMSB"] = pCMS;
-          calculationResult["netChargeLooseB"] += charge;
 
         }
       }

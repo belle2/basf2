@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -32,7 +31,7 @@ particlegun = b2.register_module('ParticleGun')
 particlegun.param('pdgCodes', [11, -11, 13, -13])
 particlegun.param('nTracks', 1)
 particlegun.param('momentumGeneration', 'uniformPt')
-particlegun.param('momentumParams', [1.0, 3.0])
+particlegun.param('momentumParams', [0.5, 3.0])
 particlegun.param('thetaParams', [35, 127])
 particlegun.param('phiGeneration', 'uniform')
 particlegun.param('phiParams', [0, 360])

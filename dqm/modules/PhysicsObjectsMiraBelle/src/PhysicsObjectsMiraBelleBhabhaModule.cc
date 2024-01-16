@@ -40,7 +40,7 @@ PhysicsObjectsMiraBelleBhabhaModule::PhysicsObjectsMiraBelleBhabhaModule() : His
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_bhabha_all"));
   addParam("ePListName", m_ePListName, "Name of the electron particle list", std::string("e+:physMiraBelle"));
-  addParam("bhabhaPListName", m_bhabhaPListName, "Name of the bhabha events particle list", std::string("UpsilonE:physMiraBelle"));
+  addParam("bhabhaPListName", m_bhabhaPListName, "Name of the bhabha events particle list", std::string("Upsilon:ephysMiraBelle"));
 
 }
 

@@ -21,6 +21,9 @@
 
 #include <klm/muidgnn/MuidBuilder_fixed.h>
 
+#include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/Track.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -45,13 +48,29 @@ namespace Belle2 {
     /** n */
     void getStripPosition();
 
+    /** n */
+    int GetMatchedHits(KLMHit2d& klmhit, int hit_inBKLM, const MCParticle* mcpart);
+
+    /** n */
+    void CheckMCParticle(RelationVector<KLMDigit>& digitrelations, const MCParticle* mcpart, int& matchedHits);
+
+    /** n */
+    void CheckMCParticle(KLMDigit* digit, const MCParticle* mcpart, int& matchedHits);
+
+    /** n */
+    int IterateMCMother(MCParticle* mcpart1, const MCParticle* mcpart);
+
+    /** n */
+    int HitOnTrack(KLMHit2d* klmhit, const Track* track);
+
+
   private:
 
     std::string  m_inputListName;
 
     DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
-    StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
+    //StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
 
     StoreArray<KLMHit2d> m_klmHit2ds;
 

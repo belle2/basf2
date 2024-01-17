@@ -215,7 +215,7 @@ void KLMMuIDGetterModule::event()
       unsigned long int hit_layer = klmhit->getLayer();
       unsigned long int hit_sector = klmhit->getSector();
       unsigned long int hit_section = klmhit->getSection();
-      int ontrack = HitOnTrack(klmhit, track);
+      int ontrack = HitOnTrack(klmhit, track); 
       nklmallontrackhits += ontrack;
 
       unsigned long int channelID = (hit_Zstripmin << 0) + (hit_Phistripmin << 6) + (hit_Zstripmax << 12) + (hit_Phistripmax << 18) +
@@ -234,7 +234,7 @@ void KLMMuIDGetterModule::event()
     int nklmontrackhits = 0;
     int nklmontrackhitistrue = 0;
     int nklmclusters = 0;
-    int hitTruthlist[3] = {0};
+    int hitTruthlist[3] = {0}; 
     for (KLMCluster& klmcluster : track->getRelationsTo<KLMCluster>()) {
 
       // releation weight?
@@ -262,24 +262,24 @@ void KLMMuIDGetterModule::event()
         double  hit_MinStripYposition = klmhit.getPositionYOfMinStrip();
         double  hit_MinStripZposition = klmhit.getPositionZOfMinStrip();
         double  hit_time = klmhit.getTime();
-        unsigned long int hit_Phistripmin;
-        unsigned long int hit_Phistripmax;
-        unsigned long int hit_Zstripmin  ;
-        unsigned long int hit_Zstripmax  ;
-        int ontrack = HitOnTrack(&klmhit, track);
-        nklmontrackhits += ontrack;
+        unsigned long int hit_Phistripmin; 
+        unsigned long int hit_Phistripmax; 
+        unsigned long int hit_Zstripmin  ; 
+        unsigned long int hit_Zstripmax  ; 
+        int ontrack = HitOnTrack(&klmhit, track); 
+        nklmontrackhits += ontrack;   
 
         unsigned long int hit_inBKLM = (klmhit.getSubdetector() == KLMElementNumbers::c_BKLM);
-        if (hit_inBKLM) {
-          hit_Phistripmin = klmhit.getPhiStripMin();
-          hit_Phistripmax = klmhit.getPhiStripMax();
-          hit_Zstripmin   = klmhit.getZStripMin();
-          hit_Zstripmax   = klmhit.getZStripMax();
+        if (hit_inBKLM){
+        hit_Phistripmin = klmhit.getPhiStripMin();
+        hit_Phistripmax = klmhit.getPhiStripMax();
+        hit_Zstripmin   = klmhit.getZStripMin();
+        hit_Zstripmax   = klmhit.getZStripMax();
         } else {
-          hit_Phistripmin = klmhit.getXStripMin();
-          hit_Phistripmax = klmhit.getXStripMax();
-          hit_Zstripmin = klmhit.getYStripMin();
-          hit_Zstripmax = klmhit.getYStripMax();
+        hit_Phistripmin = klmhit.getXStripMin();
+        hit_Phistripmax = klmhit.getXStripMax();
+        hit_Zstripmin = klmhit.getYStripMin();
+        hit_Zstripmax = klmhit.getYStripMax();
         }
         unsigned long int hit_layer = klmhit.getLayer();
         unsigned long int hit_sector = klmhit.getSector();
@@ -289,7 +289,7 @@ void KLMMuIDGetterModule::event()
          * bit 1...6 for min Z strip, bit 7...12 for min phi strip, bit 13...18 for max Z strip, bit 19...24 for max phi strip
          * bit 1...5 for layer, bit 6...8 for sector, bit 9...10 for section, bit 11 for subdetector
          */
-        unsigned long int channelID = (hit_Zstripmin << 0) + (hit_Phistripmin << 6) + (hit_Zstripmax << 12) + (hit_Phistripmax << 18);
+        unsigned long int channelID = (hit_Zstripmin << 0) + (hit_Phistripmin << 6) + (hit_Zstripmax << 12) + (hit_Phistripmax << 18); 
         unsigned long int sensorID = (hit_layer << 0) + (hit_sector << 5) + (hit_section << 8) + (hit_inBKLM << 10);
         part->writeExtraInfo("HitchannelID_" + std::to_string(nklmhits - 1), channelID);
         part->writeExtraInfo("HitsensorID_" + std::to_string(nklmhits - 1), sensorID);
@@ -307,7 +307,7 @@ void KLMMuIDGetterModule::event()
         part->writeExtraInfo("HitTruth_" + std::to_string(nklmhits - 1), matchedHits);
         part->writeExtraInfo("HitonTrack_" + std::to_string(nklmhits - 1), ontrack);
 
-        if (matchedHits > -0.5 && matchedHits < 2.5) hitTruthlist[matchedHits]++;
+        if (matchedHits > -0.5 && matchedHits < 2.5) hitTruthlist[matchedHits]++; 
         if (matchedHits == 2) nklmontrackhitistrue += ontrack;
 
       }
@@ -346,12 +346,12 @@ void KLMMuIDGetterModule::event()
       int inBKLM = (exthit.getDetectorID() == Const::EDetector::BKLM);
       int copyid = exthit.getCopyID();
       int layer;
-      if (inBKLM) {
+      if (inBKLM){
         int section, sector, plane, strip;
         BKLMElementNumbers::moduleNumberToElementNumbers(copyid, &section, &sector, &layer);
       } else {
         int section, sector, plane, strip;
-        EKLMElementNumbers::Instance().stripNumberToElementNumbers(copyid, &section, &layer, &sector, &plane, &strip);
+        EKLMElementNumbers::Instance().stripNumberToElementNumbers(copyid, &section, &layer, &sector, &plane, &strip); 
       }
 
 
@@ -448,12 +448,12 @@ void KLMMuIDGetterModule::getStripPosition()
 int KLMMuIDGetterModule::GetMatchedHits(KLMHit2d& klmhit, int hit_inBKLM, const MCParticle* mcpart)
 {
   int matchedHits = 0;
-  if (mcpart) {
-    //std::cout << "mcpart = " << mcpart << std::endl;
-    //std::cout << "new hit in layer " << klmhit.getLayer() << ", inbklm = " << hit_inBKLM << std::endl;
-    if (hit_inBKLM) {
+  if (mcpart){
+      //std::cout << "mcpart = " << mcpart << std::endl;
+      //std::cout << "new hit in layer " << klmhit.getLayer() << ", inbklm = " << hit_inBKLM << std::endl;
+    if (hit_inBKLM){
       RelationVector<BKLMHit1d> hit1drelations = klmhit.getRelationsTo<BKLMHit1d>();
-      BKLMHit1d* hit1d1, *hit1d2;
+      BKLMHit1d *hit1d1, *hit1d2;
       hit1d1 = hit1drelations[0];
       hit1d2 = hit1drelations[1];
       RelationVector<KLMDigit> digitrelations1 = hit1d1->getRelationsTo<KLMDigit>();
@@ -462,7 +462,7 @@ int KLMMuIDGetterModule::GetMatchedHits(KLMHit2d& klmhit, int hit_inBKLM, const 
       CheckMCParticle(digitrelations2, mcpart, matchedHits);
     } else {
       RelationVector<KLMDigit> digitrelations = klmhit.getRelationsTo<KLMDigit>();
-      KLMDigit* digit1, *digit2;
+      KLMDigit *digit1, *digit2;
       digit1 = digitrelations[0];
       digit2 = digitrelations[1];
       CheckMCParticle(digit1, mcpart, matchedHits);
@@ -478,10 +478,10 @@ int KLMMuIDGetterModule::GetMatchedHits(KLMHit2d& klmhit, int hit_inBKLM, const 
 void KLMMuIDGetterModule::CheckMCParticle(RelationVector<KLMDigit>& digitrelations, const MCParticle* mcpart, int& matchedHits)
 {
   // for BKLM
-  for (KLMDigit& digit : digitrelations) {
+  for (KLMDigit& digit : digitrelations){
     RelationVector<KLMSimHit> simhitrelations = digit.getRelationsTo<KLMSimHit>();
-    for (KLMSimHit& simhit : simhitrelations) {
-      MCParticle* mcpart1 = simhit.getRelatedFrom<MCParticle>();
+    for (KLMSimHit& simhit :simhitrelations){
+      MCParticle *mcpart1 = simhit.getRelatedFrom<MCParticle>();
       if (IterateMCMother(mcpart1, mcpart)) {
         matchedHits++;
         return;
@@ -494,8 +494,8 @@ void KLMMuIDGetterModule::CheckMCParticle(KLMDigit* digit, const MCParticle* mcp
 {
   // for EKLM
   RelationVector<KLMSimHit> simhitrelations = digit->getRelationsTo<KLMSimHit>();
-  for (KLMSimHit& simhit : simhitrelations) {
-    MCParticle* mcpart1 = simhit.getRelatedFrom<MCParticle>();
+  for (KLMSimHit& simhit :simhitrelations){
+    MCParticle *mcpart1 = simhit.getRelatedFrom<MCParticle>();
     if (IterateMCMother(mcpart1, mcpart)) {
       matchedHits++;
       return;
@@ -503,7 +503,7 @@ void KLMMuIDGetterModule::CheckMCParticle(KLMDigit* digit, const MCParticle* mcp
   }
 }
 
-int KLMMuIDGetterModule::IterateMCMother(MCParticle* mcpart1, const MCParticle* mcpart)
+int KLMMuIDGetterModule::IterateMCMother(MCParticle * mcpart1, const MCParticle * mcpart)
 {
   if (!mcpart1) return 0;
   if (mcpart1 == mcpart) {
@@ -514,10 +514,12 @@ int KLMMuIDGetterModule::IterateMCMother(MCParticle* mcpart1, const MCParticle* 
 }
 
 
-int KLMMuIDGetterModule::HitOnTrack(KLMHit2d* klmhit, const Track* track)
+int KLMMuIDGetterModule::HitOnTrack(KLMHit2d * klmhit, const Track * track)
 {
-  for (KLMHit2d& klmhit2d : track->getRelationsTo<KLMHit2d>()) {
-    if (&klmhit2d == klmhit) {
+  for (KLMHit2d& klmhit2d : track->getRelationsTo<KLMHit2d>())
+  {
+    if (&klmhit2d == klmhit)
+    {
       return 1;
     }
   }

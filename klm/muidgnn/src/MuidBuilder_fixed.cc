@@ -289,17 +289,20 @@ double MuidBuilder_fixed::getUnhitLayerEfficiency(const KLMMuidLikelihood* muid,
 double MuidBuilder_fixed::getLayerPDF(const KLMMuidLikelihood* muid, int layer) const
 {
   unsigned int outcome = muid->getOutcome();
-  int barrelExtLayer = muid->getBarrelExtLayer();
   if ((outcome <= MuidElementNumbers::c_NotReached) || (outcome > MuidElementNumbers::getMaximalOutcome()))
     return 0.0;
+  int barrelExtLayer = muid->getBarrelExtLayer();
   if (barrelExtLayer > MuidElementNumbers::getMaximalBarrelLayer())
     return 0.0;
   int endcapExtLayer = muid->getEndcapExtLayer();
   if (endcapExtLayer > MuidElementNumbers::getMaximalEndcapForwardLayer())
     return 0.0;
   int lastLayer = (endcapExtLayer < 0) ? barrelExtLayer : endcapExtLayer;
-  if (layer > lastLayer)
-    return -1;
-  return m_LayerPDF[outcome][lastLayer][layer];
+  if (layer <= barrelExtLayer) {
+    return m_LayerPDF[outcome][lastLayer][layer];
+  } else {
+    layer = layer - barrelExtLayer - 1;
+    return m_LayerPDF[outcome][lastLayer][layer + MuidElementNumbers::getMaximalBarrelLayer() + 1];
+  }
   //return 1;
 }

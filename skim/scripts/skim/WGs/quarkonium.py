@@ -300,43 +300,51 @@ class InclusiveUpsilon(BaseSkim):
 
     Selection criteria:
 
-    * 2 tracks with electronID_noTOP > 0.1 or muonID > 0.1.
+    * 3 charged tracks or 2 charged tracks + 1 std photon
       8.5 < M < 10.6 for e+e- mode and M > 8.5 for mu+mu- mode
-      Track-quality requirements are not applied.
     """
+
     __authors__ = ["Sen Jia"]
     __description__ = "Inclusive Upsilon(1S,2S,3S) skim"
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
     def load_standard_lists(self, path):
-        stdMu('loosepid', path=path)
-        stdPhotons("all", path=path)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
 
-        # Electron list. Exclude TOP
-        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1', path=path)
+        # create and fill e/mu/pi/photon ParticleLists
+        ma.fillParticleList('e+:all', "", path=path)
+        ma.fillParticleList("mu+:all", "", path=path)
+        ma.fillParticleList("pi+:all", "", path=path)
+        ma.cutAndCopyList("gamma:soft", "gamma:loose", "E>0.15", path=path)
 
-        # Mass cuts.
-        Upsilon_ee_mass_cut = '8.5 < M < 10.6'
-        Upsilon_mumu_mass_cut = '8.5 < M'
+        # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
+        ma.reconstructDecay("Upsilon:ee -> e+:all e-:all", "M > 8 and M < 10.6", path=path)
+        ma.reconstructDecay("Upsilon:mumu -> mu+:all mu-:all", "M > 8", path=path)
+        ma.copyLists("Upsilon:all", ["Upsilon:ee", "Upsilon:mumu"], path=path)
 
-        # Electrons with bremsstrahlung correction.
-        ma.correctBremsBelle('e+:brems', 'e+:loosepid_noTOP', 'gamma:all',
-                             angleThreshold=0.05,
-                             path=path)
-        ma.correctBrems('e+:brems2', 'e+:loosepid_noTOP', 'gamma:all', path=path)
+        # Y(1S,2S) with pi+ or photon are reconstructed
+        InclusiveUpsilon_Channels = ["Upsilon:all pi+:all",
+                                     "Upsilon:all gamma:soft"]
 
-        # Reconstruct Upsilon(1S,2S,3S).
-        ma.reconstructDecay('Upsilon:ee -> e+:loosepid_noTOP e-:loosepid_noTOP',
-                            Upsilon_ee_mass_cut, path=path)
-        ma.reconstructDecay('Upsilon:eebrems -> e+:brems e-:brems',
-                            Upsilon_ee_mass_cut, path=path)
-        ma.reconstructDecay('Upsilon:eebrems2 -> e+:brems2 e-:brems2',
-                            Upsilon_ee_mass_cut, path=path)
-        ma.reconstructDecay('Upsilon:mumu -> mu+:loosepid mu-:loosepid',
-                            Upsilon_mumu_mass_cut, path=path)
+        # define the Y(1S,2S) decay channel list
+        InclusiveUpsilon = []
+        InclusiveUpsilon_cuts = ""
 
-        # Return the lists.
-        return ['Upsilon:ee', 'Upsilon:eebrems', 'Upsilon:eebrems2', 'Upsilon:mumu']
+        # reconstruct the decay channel
+        for chID, channel in enumerate(InclusiveUpsilon_Channels):
+            ma.reconstructDecay(
+                "junction:all" +
+                str(chID) +
+                " -> " +
+                channel,
+                InclusiveUpsilon_cuts,
+                chID,
+                path=path,
+                allowChargeViolation=True)
+            InclusiveUpsilon.append("junction:all" + str(chID))
+
+        # reture the list
+        return InclusiveUpsilon

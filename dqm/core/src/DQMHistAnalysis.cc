@@ -238,6 +238,18 @@ std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& 
   return out;
 }
 
+void DQMHistAnalysisModule::clearCanvases(void)
+{
+  TIter nextckey(gROOT->GetListOfCanvases());
+  TObject* cobj = nullptr;
+
+  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
+    if (cobj->IsA()->InheritsFrom("TCanvas")) {
+      (dynamic_cast<TCanvas*>(cobj))->Clear();
+    }
+  }
+}
+
 void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 {
   for (auto& h : s_histList) {

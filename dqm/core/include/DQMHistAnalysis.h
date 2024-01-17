@@ -258,6 +258,11 @@ namespace Belle2 {
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
     /**
+     * Clear content of all Canvases
+     */
+    void clearCanvases(void);
+
+    /**
      * Reset the list of histograms.
      */
     static void initHistListBeforeEvent(void);

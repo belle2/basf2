@@ -568,20 +568,17 @@ processing. The relationship between each stage of processing
 
 Prompt processing occurs when each new bucket of data is collected. A bucket typically comprises of 
 the data collected from physics runs between subsequent maintenance days of operation, and therefore 
-often spans a period of 2 weeks of runs. Effectively, this means the data is processed in "real time" 
-hence why it is referred to as prompt processing. Prompt data is always obtained using the latest major 
+often spans a period of 2 weeks of runs. Prompt data is always obtained using the latest major 
 software release, and utilises the best initial guess for calibrations based on the information of 
 buckets and reprocessing campaigns. Each data bucket is available for use by analysts following prompt 
-processing, with a higher bucket number indicating newer data. It should also be noted that no full 
-offline luminosity estimation can be derived from prompt data.    
+processing, with a higher bucket number indicating newer data. 
 
 Conversely, reprocessed data, labelled with the prefix "proc" (e.g. proc13), contains a combination of buckets 
 that have been processed again using the most refined knowledge of the required calibrations based on 
 dedicated performance studies and information from previous prompt data campaigns. Furthermore, all fixes 
 for bugs that were identified during the prompt processing are also included. 
 
-As a result, full publications must only use reprocessed data, while in principle it is fine for the prompt 
-data to be used for conference results. Both prompt and reprocessed datasets can be located on the grid 
+Both prompt and reprocessed datasets can be located on the grid 
 by specifying the campaign e.g. bucket17 campaign for prompt data, and proc13 campaign for reprocessed data. 
 
 .. _fig:data_overview:

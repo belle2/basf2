@@ -52,11 +52,11 @@ void PhysicsObjectsMiraBelleHadronModule::defineHisto()
   // Mass distributions
   m_h_nECLClusters = new TH1F("hist_nECLClusters", "hist_nECLClusters", 100, 0, 60);
   m_h_nECLClusters->SetXTitle("hist_nECLClusters");
-  m_h_visibleEnergyCMSnorm = new TH1F("hist_visibleEnergyCMSnorm", "hist_visibleEnergyCMSnorm", 100, 0, 60);
+  m_h_visibleEnergyCMSnorm = new TH1F("hist_visibleEnergyCMSnorm", "hist_visibleEnergyCMSnorm", 100, 0, 2);
   m_h_visibleEnergyCMSnorm->SetXTitle("hist_visibleEnergyCMSnorm");
-  m_h_EsumCMSnorm = new TH1F("hist_EsumCMSnorm", "hist_EsumCMSnorm", 100, 0, 60);
+  m_h_EsumCMSnorm = new TH1F("hist_EsumCMSnorm", "hist_EsumCMSnorm", 100, 0, 2);
   m_h_EsumCMSnorm->SetXTitle("hist_EsumCMSnorm");
-  m_h_R2 = new TH1F("hist_R2", "hist_R2", 100, 0, 60);
+  m_h_R2 = new TH1F("hist_R2", "hist_R2", 100, 0, 1);
   m_h_R2->SetXTitle("hist_R2");
 
   oldDir->cd();

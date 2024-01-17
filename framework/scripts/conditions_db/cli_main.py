@@ -685,6 +685,11 @@ def command_iov(args, db):
     if not iovfilter.check_arguments():
         return 1
 
+    # Check if the globaltag exists otherwise I get the same result for an emply global tag or for a non-existing one
+    if db.get_globalTagInfo(args.tag) is None:
+        B2ERROR(f"Globaltag '{args.tag}' doesn't exist.")
+        return False
+
     run_range_str = f' valid in {tuple(args.run_range)}' if args.run_range else ''
     args.run_range = IntervalOfValidity(args.run_range) if args.run_range else None
 

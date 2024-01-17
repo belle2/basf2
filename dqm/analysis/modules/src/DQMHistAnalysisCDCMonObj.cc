@@ -70,7 +70,7 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   gStyle->SetPadBottomMargin(0.1);
   gStyle->SetPadLeftMargin(0.15);
 
-  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1000);
+  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1200);
   m_monObj->addCanvas(m_cMain);
 
   m_cADC = new TCanvas("cdc_adc", "cdc_adc", 2000, 10000);
@@ -366,7 +366,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   B2DEBUG(20, "writing");
-  m_cMain->Divide(3, 3);
+  m_cMain->Divide(4, 3);
 
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
@@ -382,17 +382,24 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hTDCSlope->SetMinimum(0);
   hTDCSlope->SetMaximum(50);
   hTDCSlope->DrawCopy();
+
   m_cMain->cd(4);
   hBadChannel->DrawCopy("col");
 
   m_cMain->cd(5);
   hBadChannelBC->DrawCopy("col");
-  m_cMain->cd(9);
-  hHitPerLayer->DrawCopy();
+
   m_cMain->cd(7);
   hADC1000->DrawCopy();
+
   m_cMain->cd(8);
   hADC0->DrawCopy();
+
+  m_cMain->cd(9);
+  hHitPerLayer->DrawCopy();
+
+  m_cMain->cd(10);
+  hHitRatePerWire->DrawCopy();
 
   m_cHit->Divide(4, 14);
   for (int i = 0; i < 56; i++) {

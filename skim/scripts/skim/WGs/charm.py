@@ -981,12 +981,12 @@ class DpToHpOmega(BaseSkim):
     **Decay Modes**:
         * :math:`D^{+}\\to K^{+} \\omega` (and CC)
         * :math:`D^{+}\\to \\pi^+ \\omega` (and CC)
-        * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
+        * :math:`\\omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID>0.1``
+        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID > 0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * ``p(pi0)>0.25 and 0.11<InvM(pi0)<0.15``
+        * ``p(pi0) > 0.25 and 0.11 < InvM(pi0) < 0.15``
         * ``0.71 < M(omega) < 0.85``
         * ``1.67 < M(D+) < 2.07``
         * ``p*(D+) > 2.0``
@@ -1030,12 +1030,12 @@ class DspToHpOmega(BaseSkim):
     **Decay Modes**:
         * :math:`D_{s}^{+}\\to K^{+} \\omega` (and CC)
         * :math:`D_{s}^{+}\\to \\pi^+ \\omega` (and CC)
-        * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
+        * :math:`\\omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID>0.1``
+        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID > 0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * ``p(pi0)>0.25 and 0.11<InvM(pi0)<0.15``
+        * ``p(pi0) > 0.25 and 0.11 < InvM(pi0) < 0.15``
         * ``0.71 < M(omega) < 0.85``
         * ``1.77 < M(D_s+) < 2.17``
         * ``p*(D_s+) > 2.0``

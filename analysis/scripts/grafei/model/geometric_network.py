@@ -23,6 +23,8 @@ class GraFEIModel(torch.nn.Module):
           :width: 42em
           :align: center
 
+        Each MetaLayer is in turn composed of a `EdgeLayer`, `NodeLayer` and `GlobalLayer` sub-blocks.
+
         Args:
             nfeat_in_dim (int): Node features dimension (number of input node features).
             efeat_in_dim (int): Edge features dimension (number of input edge features).

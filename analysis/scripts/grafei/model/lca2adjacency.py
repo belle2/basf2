@@ -355,13 +355,13 @@ def select_good_decay(predicted_lcas, predicted_masses, sig_side_lcas=None, sig_
     Mass hypotheses are indicated by letters. The following convention is used:
 
     .. math::
-        e \\to e \\\\
-        i \\to \\pi \\\\
-        k \\to K \\\\
-        p \\to p \\\\
-        m \\to \\mu \\\\
-        g \\to \\gamma \\\\
-        o \\to \\text{others}
+        'e' \\to e \\\\
+        'i' \\to \\pi \\\\
+        'k' \\to K \\\\
+        'p' \\to p \\\\
+        'm' \\to \\mu \\\\
+        'g' \\to \\gamma \\\\
+        'o' \\to \\text{others}
 
     .. warning:: The order of mass hypotheses should match that of the final state particles in the LCAS.
 

@@ -1002,45 +1002,6 @@ class B0toDstarD(BaseSkim):
 
 
 @fancy_skim_header
-class B0toD0Kpipi0_pi0(BaseSkim):
-    """
-    Reconstructed decay modes:
-
-    * :math:`B^{0}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^0`
-
-    Cuts applied:
-
-    * ``Mbc > 5.2``
-    * ``abs(deltaE) < 0.5``
-
-    Note:
-        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`, where the
-        :math:`\\overline{D}{}^{0}` channel is defined.
-    """
-
-    __authors__ = ["Francis Pham"]
-    __description__ = ""
-    __contact__ = __liaison__
-    __category__ = "physics, hadronic B to charm"
-
-    ApplyHLTHadronCut = True
-    produce_on_tau_samples = False  # retention is very close to zero on taupair
-
-    def load_standard_lists(self, path):
-        loadStdPi0ForBToCharmless(path=path)
-        loadStdVeryLooseTracks('K', path=path)
-        loadStdVeryLooseTracks('pi', path=path)
-        loadCharmlessD0_Kpipi0(path=path)
-
-    def build_lists(self, path):
-        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.5"
-
-        ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0_loose pi0:charmlessFit", Bcuts, path=path)
-
-        return ["B0:D0Kpipi0_pi0"]
-
-
-@fancy_skim_header
 class B0toDDs0star(BaseSkim):
     """
     Reconstructed decay modes:
@@ -1091,3 +1052,42 @@ class B0toDDs0star(BaseSkim):
                             -0.2 < deltaE < 0.2 ", path=path)
 
         return ["B0:B0toDDs0star_Dsp_phipi"]
+
+
+@fancy_skim_header
+class B0toD0Kpipi0_pi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\overline{D}{}^{0} (\\to K^+ \\pi^- \\pi^0) \\pi^0`
+
+    Cuts applied:
+
+    * ``Mbc > 5.2``
+    * ``abs(deltaE) < 0.5``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpipi0`, where the
+        :math:`\\overline{D}{}^{0}` channel is defined.
+    """
+
+    __authors__ = ["Francis Pham"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToCharmless(path=path)
+        loadStdVeryLooseTracks('K', path=path)
+        loadStdVeryLooseTracks('pi', path=path)
+        loadCharmlessD0_Kpipi0(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.2 < Mbc and abs(deltaE) < 0.5"
+
+        ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0_loose pi0:charmlessFit", Bcuts, path=path)
+
+        return ["B0:D0Kpipi0_pi0"]

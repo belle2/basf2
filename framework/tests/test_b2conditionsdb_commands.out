@@ -96,3 +96,32 @@ IovId     Name                                Rev    First  First  Final  Final
 --------------------------------------------------------------------------------
 9294537   KLMStripEfficiency                  2999   5      251    5      298
 9294538   KLMStripEfficiency                  2670   5      299    5      299
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_1
+[INFO] Copying the following iovs to main_tag_merge_test_1
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+                                                     Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294536   KLMStripEfficiency                  2914   5      199    5      250
+9294537   KLMStripEfficiency                  2999   5      251    5      298
+9294538   KLMStripEfficiency                  2670   5      299    5      299
+9294539   KLMStripEfficiency                  3001   5      300    5      399
+9294540   KLMStripEfficiency                  3112   5      400    5      499
+[WARNING] iovs to be deleted
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+                                                     Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294527   KLMStripEfficiency                  2587   5      0      5      9
+9294529   KLMStripEfficiency                  2615   5      10     5      35
+9294531   KLMStripEfficiency                  2704   5      87     5      90
+9294532   KLMStripEfficiency                  2810   5      91     5      100
+-------------------------------------------------------------------------------------------
+IovId     Name               Rev    Old    Old    Old    Old    New    New    New    New
+                                    First  First  Final  Final  First  First  Final  Final
+                                    Exp    Run    Exp    Run    Exp    Run    Exp    Run
+-------------------------------------------------------------------------------------------
+9294528   KLMStripEfficiency 2553   5      0      5      200    5      101    5      198
+9294530   KLMStripEfficiency 2670   5      36     5      87     5      0      5      100
+9294533   KLMStripEfficiency 2553   5      300    5      999    5      500    5      999

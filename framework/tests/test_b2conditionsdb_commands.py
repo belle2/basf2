@@ -15,6 +15,7 @@ Test for checking:
     - b2conditionsdb legacydownload --run-range
     - b2conditionsdb iovs delete --run-range
     - b2conditionsdb iovs delete --run-range --fully-contained
+    - b2conditionsdb iovs copy --replace
 '''
 
 
@@ -55,3 +56,4 @@ if __name__ == '__main__':
 
     call_command('b2conditionsdb iovs delete --dry-run main_tag_merge_test_2 --run-range 5 200 5 300')
     call_command('b2conditionsdb iovs delete --dry-run main_tag_merge_test_2 --run-range 5 200 5 300 --fully-contained')
+    call_command('b2conditionsdb iovs copy --replace --dry-run main_tag_merge_test_2 main_tag_merge_test_1')

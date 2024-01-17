@@ -157,7 +157,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
         **Selection Criteria**:
             * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
             * Use :math:`K_{S}` from `stdV0s.stdKshorts`
-            * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
+            * ``1.62 < M(D0) < 2.1, pcms(D0) > 2.0``
             * For more details, please check the source code of this skim.
             * (Maybe in the future, we can add a loose ECL cluster timing cut
               to :math:`\\pi^{0}` in this skim.)
@@ -169,9 +169,10 @@ class XToD0_D0ToNeutrals(BaseSkim):
             * List of D0 particle list names.
 
         """
-        charmcuts = "1.66 < M < 2.06 and useCMSFrame(p)>2.0"
-        D0_Channels = ["pi0:skim pi0:skim",
-                       "K_S0:merged pi0:skim",
+        charmcuts = "1.6 < M < 2.1 and useCMSFrame(p)>2.0"
+        ma.cutAndCopyList('pi0:D0', 'pi0:skim', 'p>0.4', path=path)
+        D0_Channels = ["pi0:D0 pi0:D0",
+                       "K_S0:merged pi0:D0",
                        "K_S0:merged K_S0:merged",
                        ]
 
@@ -825,7 +826,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     **Selection Criteria**:
         * Apply the cuts in `XToD0_D0ToNeutrals`
         * No cut on the slow pion
-        * ``Q < 0.02``
+        * ``deltaM<0.2``
         * For more details, please check the source code of this skim.
 
     """
@@ -846,7 +847,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
         D0List = self.D0ToNeutrals(path)
 
-        Dstcuts = "0 < Q < 0.02"
+        Dstcuts = "daughterMotherDiffOf(1,M)<0.2"
 
         DstList = []
         for chID, channel in enumerate(D0List):

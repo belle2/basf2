@@ -255,7 +255,7 @@ def _reconstruct(lca_matrix):
     return root, total_nodes
 
 
-def lca2adjacency(lca_matrix, format="bfs"):
+def lca_to_adjacency(lca_matrix, format="bfs"):
     """
     Converts a tree's LCA matrix representation, i.e. a square matrix (M, M) where each row/column corresponds to
     a leaf of the tree and each matrix entry is the level of the lowest-common-ancestor (LCA) of the two leaves, into
@@ -402,7 +402,7 @@ def select_good_decay(predicted_lcas, predicted_masses, sig_side_lcas=None, sig_
             raise InvalidLCAMatrix("If you have only one sig-side FSP, the LCA matrix should be [[0]]")
     except ValueError:
         try:
-            lca2adjacency(sig_side_lcas)
+            lca_to_adjacency(sig_side_lcas)
             more_fsps = True
         except InvalidLCAMatrix:
             raise InvalidLCAMatrix("You chose an invalid LCA matrix")

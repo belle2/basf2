@@ -5,7 +5,7 @@ import numpy as np
 import copy
 from itertools import combinations
 from variables import variables as vm
-from grafei.modules.FlagBDecayModule import getObjectList
+from grafei.modules.FlagBDecayModule import get_object_list
 
 
 def pdg_to_lca_converter(pdg):
@@ -110,7 +110,7 @@ def write_hist(
     # Check if we're a primary particle with no primary daughters
     prim_no_prim_daughters = (
         len(
-            [d for d in getObjectList(particle.getDaughters()) if d.isPrimaryParticle()]
+            [d for d in get_object_list(particle.getDaughters()) if d.isPrimaryParticle()]
         )
         == 0
     )
@@ -146,7 +146,7 @@ def write_hist(
             pdg[particle.getArrayIndex()] = particle.getPDG()
 
         # Now iterate over daughters passing history down
-        daughters = getObjectList(particle.getDaughters())
+        daughters = get_object_list(particle.getDaughters())
         for daughter in daughters:
             (
                 leaf_hist,

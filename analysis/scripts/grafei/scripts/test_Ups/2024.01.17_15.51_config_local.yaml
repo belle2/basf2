@@ -1,0 +1,95 @@
+dataset:
+  config:
+    edge_features:
+    - costheta
+    - doca
+    features:
+    - electronID_noSVD_noTOP
+    - protonID_noSVD
+    - muonID_noSVD
+    - kaonID_noSVD
+    - pionID_noSVD
+    - pt
+    - pz
+    - dr
+    - dz
+    - clusterNHits
+    - clusterTiming
+    - clusterE9E25
+    - charge
+    global_features: null
+    normalize:
+      clusterE9E25:
+      - - linear
+        - 0.96
+        - 0.06
+      clusterNHits:
+      - - linear
+        - 6.9
+        - 3.2
+      clusterTiming:
+      - - power
+        - 0.5
+      - - linear
+        - -0.5
+        - 4.1
+      doca:
+      - - linear
+        - 0.02
+        - 0.04
+      dr:
+      - - power
+        - 0.25
+      - - linear
+        - 0.16
+        - 0.19
+      dz:
+      - - power
+        - 0.25
+      - - linear
+        - 0.41
+        - 0.15
+      pt:
+      - - power
+        - 0.5
+      - - linear
+        - 0.5
+        - 0.2
+      pz:
+      - - power
+        - 0.5
+      - - linear
+        - 0.42
+        - 0.23
+    samples: null
+    subset_unmatched: true
+  datasets: null
+  path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts/ntuples_test_Ups
+model:
+  B_reco: 0
+  alpha_mass: 1
+  dropout: 0.3
+  edge_classes: 7
+  global_layer: true
+  hidden_layer_dim: 512
+  loss_reduction: mean
+  normalize: batchnorm
+  num_ML: 1
+  num_hid_layers: 1
+  overwrite: true
+  symmetrize: true
+output:
+  path: /home/jcerasol/Code/local_basf2/graFEI_development/analysis/scripts/grafei/scripts
+  run_name: test_Ups
+train:
+  batch_size: 128
+  class_weights: false
+  compile_model: false
+  early_stop_patience: 100
+  epochs: 3
+  learning_rate: 0.001
+  lr_scheduler: false
+  mixed_precision: true
+  progress_bar: false
+  record_gpu_usage: false
+  seed: 42

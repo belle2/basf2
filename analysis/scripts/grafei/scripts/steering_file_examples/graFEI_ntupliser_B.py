@@ -9,7 +9,7 @@ from variables import variables as vm
 from stdCharged import stdK, stdPi
 import random
 import argparse
-from grafei import graFEISaverModule
+from grafei import GraFEISaverModule
 from grafei import FlagBDecayModule
 
 # Random seeds
@@ -203,7 +203,7 @@ if mc:
     path.add_module(flag_decay_module)
 
 # Run graFEI
-graFEI = graFEISaverModule(
+graFEI = GraFEISaverModule(
     "B0:tag",
     cfg_path=cfg_file,
     param_file=weight_file,

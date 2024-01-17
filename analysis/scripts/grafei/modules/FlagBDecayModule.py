@@ -2,7 +2,7 @@ import basf2 as b2
 from ROOT import Belle2
 
 
-def getObjectList(pointerVec):
+def get_object_list(pointerVec):
     """
     Workaround to avoid memory problems in basf2.
 
@@ -30,7 +30,7 @@ class FlagBDecayModule(b2.Module):
 
     .. note::
         Assumes MC matching has been run on the particle list.
-        When processing MC, this module must be put necessarily before `graFEISaverModule` in order to save MC-truth information.
+        When processing MC, this module must be put necessarily before `GraFEISaverModule` in order to save MC-truth information.
 
     Args:
         particle_list (str): Name of source particle list.
@@ -48,11 +48,11 @@ class FlagBDecayModule(b2.Module):
 
     def event(self):
         """"""
-        p_list = getObjectList(Belle2.PyStoreObj(self.particle_list).obj())
+        p_list = get_object_list(Belle2.PyStoreObj(self.particle_list).obj())
 
         particles = []
         for p in p_list:
-            particles.extend(getObjectList(p.getFinalStateDaughters()))
+            particles.extend(get_object_list(p.getFinalStateDaughters()))
 
         for particle in particles:
             # First get related MC particle

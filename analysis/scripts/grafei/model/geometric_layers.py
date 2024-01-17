@@ -7,10 +7,6 @@ from torch_scatter import scatter
 def _init_weights(layer, normalize):
     """
     Initializes the weights and biases.
-
-    Args:
-        layer (torch.nn.Module): PyTorch module.
-        normalize (str): If `None` then fill biases.
     """
     for m in layer.modules():
         if isinstance(m, nn.Linear):

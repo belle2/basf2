@@ -14,7 +14,7 @@ import stdPhotons
 from variables import variables as vm
 
 from grafei.modules.FlagBDecayModule import FlagBDecayModule
-from grafei.modules.isMostLikelyTempVarsModule import isMostLikelyTempVars
+from grafei.modules.IsMostLikelyTempVarsModule import IsMostLikelyTempVars
 from grafei.modules.RootSaverModule import RootSaverModule
 
 
@@ -72,11 +72,11 @@ if __name__ == '__main__':
         path=path,
     )
 
-    most_likely_module = isMostLikelyTempVars(charged_lists, priors)
+    most_likely_module = IsMostLikelyTempVars(charged_lists, priors)
     path.add_module(most_likely_module)
 
     for list in charged_lists:
-        ma.applyCuts(list, 'extraInfo(isMostLikelyTempVars)==1', path=path)
+        ma.applyCuts(list, 'extraInfo(IsMostLikelyTempVars)==1', path=path)
 
     stdPhotons.stdPhotons(
         listtype='tight',

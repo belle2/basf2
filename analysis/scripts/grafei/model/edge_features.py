@@ -2,7 +2,7 @@ import sys
 import numpy as np
 
 
-def getDoca(name_values):
+def compute_doca(name_values):
     """
     Computes DOCA between two tracks.
 
@@ -48,7 +48,7 @@ def getDoca(name_values):
     ]  # Remove diagonal elements and flatten
 
 
-def getCostheta(name_values):
+def compute_cosTheta(name_values):
     """
     Computes cosinus of angle between two tracks.
 
@@ -72,21 +72,14 @@ def getCostheta(name_values):
 
 
 available_features = {  # put here available features with respective functions (prepend edge_ to the name)
-    "edge_costheta": getCostheta,
-    "edge_doca": getDoca,
+    "edge_costheta": compute_cosTheta,
+    "edge_doca": compute_doca,
 }
 
 
-def available_edge_features(feat, name_values):
+def _available_edge_features(feat, name_values):
     """
     Returns value of edge feature if contained in dictionary available_features.
-
-    Args:
-        feat (str): Edge feature name.
-        name_values (dict): Dictionary of numpy arrays containing node features.
-
-    Returns:
-        numpy.ndarray: Edge feature ``feat`` computed given certain node features in ``name_values``.
     """
     if feat not in available_features:
         sys.exit(
@@ -121,7 +114,7 @@ def compute_edge_features(edge_feature_names, features, x):
 
     # Compute edge features
     for feat in edge_feature_names:
-        feature_values = available_edge_features(feat, name_values)
+        feature_values = _available_edge_features(feat, name_values)
         edge_features.append(feature_values)
 
     return np.array(edge_features).T

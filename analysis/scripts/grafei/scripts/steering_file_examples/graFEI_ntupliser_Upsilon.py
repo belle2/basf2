@@ -8,7 +8,7 @@ from ROOT import Belle2
 from variables import variables as vm
 import random
 import argparse
-from grafei import graFEISaverModule
+from grafei import GraFEISaverModule
 from grafei import FlagBDecayModule
 
 # Random seeds
@@ -117,7 +117,7 @@ for part in part_types:
         )
         path.add_module(flag_decay_module)
 
-# most_likely_module = isMostLikelyTempVars([f"{part}:graFEI" for part in charged_types], priors)
+# most_likely_module = IsMostLikelyTempVars([f"{part}:graFEI" for part in charged_types], priors)
 # path.add_module(most_likely_module)
 
 for c in charged_types:
@@ -131,7 +131,7 @@ if mc:
     ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
     # ma.matchMCTruth("Upsilon(4S):graFEI", path=path)
 
-graFEI = graFEISaverModule(
+graFEI = GraFEISaverModule(
     "Upsilon(4S):graFEI",
     cfg_path=cfg_file,
     param_file=weight_file,

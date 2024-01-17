@@ -6,7 +6,7 @@ import sys
 import basf2 as b2
 
 
-class saveModelToPayload(b2.Module):
+class SaveModelToPayload(b2.Module):
     """
     Module to save model weight and yaml files to payload.
     """
@@ -38,7 +38,7 @@ if __name__ == "__main__":
     eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
     main.add_module(eventinfosetter)
 
-    modelSaver = b2.register_module(saveModelToPayload())
+    modelSaver = b2.register_module(SaveModelToPayload())
     main.add_module(modelSaver)
 
     b2.process(main)

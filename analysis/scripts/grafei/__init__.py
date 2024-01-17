@@ -2,10 +2,10 @@
 
 # @cond internal
 # The only things imported by 'from grafei import *'
-__all__ = ["graFEISaverModule", "FlagBDecayModule"]
+__all__ = ["GraFEISaverModule", "FlagBDecayModule"]
 # @endcond
 
-from grafei.modules.graFEISaverModule import graFEISaverModule
+from grafei.modules.GraFEISaverModule import GraFEISaverModule
 from grafei.modules.FlagBDecayModule import FlagBDecayModule
 
 print(r"""

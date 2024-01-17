@@ -2,10 +2,10 @@ import basf2 as b2
 from variables import variables as vm
 from ROOT import Belle2
 import numpy as np
-from grafei.modules.FlagBDecayModule import getObjectList
+from grafei.modules.FlagBDecayModule import get_object_list
 
 
-class isMostLikelyTempVars(b2.Module):
+class IsMostLikelyTempVars(b2.Module):
     """
     Module to compute isMostLikely with temporary _noSVD and _noTOP likelihoods.
 
@@ -27,7 +27,7 @@ class isMostLikelyTempVars(b2.Module):
         # Loop over the particle lists
         for particle_list in self.particle_lists:
             p_name = particle_list.split(":")[0][:-1]
-            particles = getObjectList(Belle2.PyStoreObj(particle_list).obj())
+            particles = get_object_list(Belle2.PyStoreObj(particle_list).obj())
 
             # Loop over all the particles in the list
             for particle in particles:
@@ -94,7 +94,7 @@ class isMostLikelyTempVars(b2.Module):
                     "deuteron",
                 ]
                 particle.addExtraInfo(
-                    "isMostLikelyTempVars",
+                    "IsMostLikelyTempVars",
                     1 if ordered_names[np.argmax(probs)] == p_name else 0,
                 )
 

@@ -10,11 +10,11 @@ from ROOT import Belle2
 from variables import variables as vm
 import torch
 from torch_geometric.data import Batch
-from grafei.modules.FlagBDecayModule import getObjectList
+from grafei.modules.FlagBDecayModule import get_object_list
 from grafei.model.geometric_network import GraFEIModel
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
-from grafei.model.lca2adjacency import lca2adjacency, InvalidLCAMatrix, select_good_decay
+from grafei.model.lca_to_adjacency import lca_to_adjacency, InvalidLCAMatrix, select_good_decay
 from grafei.model.tree_utils import masses_to_classes
 from grafei.modules.RootSaverModule import write_hist
 
@@ -23,7 +23,7 @@ warnings.filterwarnings(
 )
 
 
-class graFEISaverModule(b2.Module):
+class GraFEISaverModule(b2.Module):
     """
         Applies graFEI model to a particle list in basf2.
         GraFEI information is stored as extraInfos.
@@ -142,12 +142,12 @@ class graFEISaverModule(b2.Module):
         b2.B2DEBUG(10, "---- Processing new event ----")
 
         # Get the B candidate list
-        candidate_list = getObjectList(Belle2.PyStoreObj(self.particle_list).obj())
+        candidate_list = get_object_list(Belle2.PyStoreObj(self.particle_list).obj())
 
         # Get the particle candidate(s)
         for candidate in candidate_list:
             # Get FSPs
-            p_list = getObjectList(candidate.getFinalStateDaughters())
+            p_list = get_object_list(candidate.getFinalStateDaughters())
 
             # Number of FSPs
             n_nodes = len(p_list)
@@ -350,7 +350,7 @@ class graFEISaverModule(b2.Module):
             graFEI_validTree = 0
             if not torch.all(predicted_LCA_square == 0):
                 try:
-                    adjacency = lca2adjacency(predicted_LCA_square_matched)
+                    adjacency = lca_to_adjacency(predicted_LCA_square_matched)
                     graFEI_validTree = 1
                 except InvalidLCAMatrix:
                     pass

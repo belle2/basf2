@@ -57,7 +57,7 @@ DQMHistAnalysisSVDGeneralModule::DQMHistAnalysisSVDGeneralModule()
            double(6)); // 6 ns
   addParam("refMCTP", m_refMeanP, "Mean of the signal time peak from Physics reference run", float(0.0)); // Approximate, from exp 20
   addParam("refMCTC", m_refMeanC, "Mean of the signal time peak from Cosmic reference run", float(0.0));  //
-  addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
+  addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(true));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
@@ -210,13 +210,6 @@ void DQMHistAnalysisSVDGeneralModule::initialize()
   m_hOccupancyUGroupId0->GetXaxis()->SetTitle("ladder number");
   m_hOccupancyUGroupId0->GetXaxis()->SetLabelSize(0.04);
   for (unsigned short i = 0; i < nY; i++) m_hOccupancyUGroupId0->GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
-
-  rtype = findHist("DQMInfo/rtype");
-  if (rtype)
-    B2DEBUG(10, "DQMInfo/rtype found");
-
-  runtype = rtype ? rtype->GetTitle() : "physics"; // per default
-  // runtype = "physics";
 
   //register limits for EPICS
   registerEpicsPV(m_pvPrefix + "ratio3_6", "ratio3_6");
@@ -383,6 +376,13 @@ void DQMHistAnalysisSVDGeneralModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
+  TH1* rtype = findHist("DQMInfo/rtype");
+  if (rtype)
+    B2DEBUG(10, "DQMInfo/rtype found");
+
+  m_runtype = rtype ? rtype->GetTitle() : "physics"; // per default
+
+
   TString runID = TString((hnEvnts->GetTitle())).Remove(0, 21);
   B2INFO("runID = " << runID);
   Float_t nEvents = hnEvnts->GetEntries();
@@ -394,7 +394,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
   //  h->SetBinContent(100,0.01);
 
   if (h != NULL) {
-    h->SetTitle("SVD Data Format Monitor " + runID);
+    h->SetTitle(Form("SVD Data Format Monitor %s", runID.Data()));
     //check if number of errors is above the allowed limit
     bool hasError = false;
     for (int un = 0; un < h->GetNcells(); un++)
@@ -408,12 +408,13 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_cUnpacker->SetFillColor(kRed);
       m_cUnpacker->SetFrameFillColor(10);
     }
+    if (nEvents > 0)
+      setEpicsPV("UnpackError", h->GetEntries() / nEvents);
   } else {
     B2INFO("Histogram SVDUnpacker/DQMUnpackerHisto from SVDUnpackerDQM not found!");
     m_cUnpacker->SetFillColor(kRed);
   }
 
-  setEpicsPV("UnpackError", h->GetEntries() / nEvents);
 
   m_cUnpacker->cd();
   h->Draw("colztext");
@@ -432,7 +433,7 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hOccupancyChartChip.Clear();
     hChart->Copy(m_hOccupancyChartChip);
     m_hOccupancyChartChip.SetName("SVDOccupancyChart");
-    m_hOccupancyChartChip.SetTitle("SVD OFFLINE Occupancy per chip " + runID);
+    m_hOccupancyChartChip.SetTitle(Form("SVD OFFLINE Occupancy per chip %s", runID.Data()));
     m_hOccupancyChartChip.Scale(1 / nEvents / 128);
     m_cOccupancyChartChip->cd();
     //    m_hOccupancyChartChip->SetStats(0);
@@ -456,21 +457,21 @@ void DQMHistAnalysisSVDGeneralModule::event()
     m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
     Float_t mean_PeakInCenter = m_hClusterOnTrackTime_L456V.GetMean(); //
     m_hClusterOnTrackTime_L456V.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
-    m_hClusterOnTrackTime_L456V.SetTitle("ClusterOnTrack Time L456V " + runID);
+    m_hClusterOnTrackTime_L456V.SetTitle(Form("ClusterOnTrack Time L456V %s", runID.Data()));
 
     if (nEvents > m_statThreshold) {
-      if (runtype == "physics") {
+      if (m_runtype == "physics") {
         Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
         if (difference_physics > m_timeThreshold) {
           hasError = true;
         }
-      } else if (runtype == "cosmic") {
+      } else if (m_runtype == "cosmic") {
         Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
         if (difference_cosmic > m_timeThreshold) {
           hasError = true;
         }
       } else {
-        B2WARNING("Run type:" << runtype);
+        B2WARNING("Run type:" << m_runtype);
       }
     } else {
       lowStat = true;
@@ -524,21 +525,21 @@ void DQMHistAnalysisSVDGeneralModule::event()
       m_hClusterOnTrackTimeL456V3Samples.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]
       Float_t mean_PeakInCenter = m_hClusterOnTrackTimeL456V3Samples.GetMean(); //
       m_hClusterOnTrackTimeL456V3Samples.GetXaxis()->SetRange(); // back to [-150 ns,150 ns]
-      m_hClusterOnTrackTimeL456V3Samples.SetTitle("ClusterOnTrack Time L456V 3 samples " + runID);
+      m_hClusterOnTrackTimeL456V3Samples.SetTitle(Form("ClusterOnTrack Time L456V 3 samples %s", runID.Data()));
 
       if (nEvents > m_statThreshold) {
-        if (runtype == "physics") {
+        if (m_runtype == "physics") {
           Float_t difference_physics = fabs(mean_PeakInCenter - m_refMeanP);
           if (difference_physics > m_timeThreshold) {
             hasError3 = true;
           }
-        } else if (runtype == "cosmic") {
+        } else if (m_runtype == "cosmic") {
           Float_t difference_cosmic = fabs(mean_PeakInCenter - m_refMeanC);
           if (difference_cosmic > m_timeThreshold) {
             hasError3 = true;
           }
         } else {
-          B2WARNING("Run type:" << runtype);
+          B2WARNING("Run type:" << m_runtype);
         }
       } else {
         lowStat3 = true;
@@ -597,32 +598,34 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_occV3Samples = 0;
 
   //update titles with exp and run number
-  m_hOccupancyU->SetTitle("Average OFFLINE Sensor Occupancy (%), U side " + runID);
+  m_hOccupancyU->SetTitle(Form("Average OFFLINE Sensor Occupancy (%%), U side %s", runID.Data()));
   m_hOccupancyU->SetStats(0);
-  m_hOccupancyV->SetTitle("Average OFFLINE Sensor Occupancy (%), V side " + runID);
+  m_hOccupancyV->SetTitle(Form("Average OFFLINE Sensor Occupancy (%%), V side %s", runID.Data()));
   m_hOccupancyV->SetStats(0);
 
-  m_hOnlineOccupancyU->SetTitle("Average ONLINE Sensor Occupancy (%), U side " + runID);
+  m_hOnlineOccupancyU->SetTitle(Form("Average ONLINE Sensor Occupancy (%%), U side %s", runID.Data()));
   m_hOnlineOccupancyU->SetStats(0);
-  m_hOnlineOccupancyV->SetTitle("Average ONLINE Sensor Occupancy (%), V side " + runID);
+  m_hOnlineOccupancyV->SetTitle(Form("Average ONLINE Sensor Occupancy (%%), V side %s", runID.Data()));
   m_hOnlineOccupancyV->SetStats(0);
 
-  m_hOccupancyUGroupId0->SetTitle("Average OFFLINE Sensor Occupancy (%), U side for cluster time group Id = 0" + runID);
+  m_hOccupancyUGroupId0->SetTitle(Form("Average OFFLINE Sensor Occupancy (%%), U side for cluster time group Id = 0 %s",
+                                       runID.Data()));
   m_hOccupancyUGroupId0->SetStats(0);
 
-  m_hOccupancyVGroupId0->SetTitle("Average OFFLINE Sensor Occupancy (%), V side for cluster time group Id = 0" + runID);
+  m_hOccupancyVGroupId0->SetTitle(Form("Average OFFLINE Sensor Occupancy (%%), V side for cluster time group Id = 0 %s",
+                                       runID.Data()));
   m_hOccupancyVGroupId0->SetStats(0);
 
   if (m_3Samples) {
     //update titles with exp and run number for 3 samples
-    m_hOccupancyU3Samples->SetTitle("Average OFFLINE Sensor Occupancy (%), U side for 3 samples" + runID);
+    m_hOccupancyU3Samples->SetTitle(Form("Average OFFLINE Sensor Occupancy (%%), U side for 3 samples %s", runID.Data()));
     m_hOccupancyU3Samples->SetStats(0);
-    m_hOccupancyV3Samples->SetTitle("Average OFFLINE Sensor Occupancy (%), V side for 3 samples" + runID);
+    m_hOccupancyV3Samples->SetTitle(Form("Average OFFLINE Sensor Occupancy (%%), V side for 3 samples %s", runID.Data()));
     m_hOccupancyV3Samples->SetStats(0);
 
-    m_hOnlineOccupancyU3Samples->SetTitle("Average ONLINE Sensor Occupancy (%), U side for 3 samples" + runID);
+    m_hOnlineOccupancyU3Samples->SetTitle(Form("Average ONLINE Sensor Occupancy (%%), U side for 3 samples %s", runID.Data()));
     m_hOnlineOccupancyU3Samples->SetStats(0);
-    m_hOnlineOccupancyV3Samples->SetTitle("Average ONLINE Sensor Occupancy (%), V side for 3 samples" + runID);
+    m_hOnlineOccupancyV3Samples->SetTitle(Form("Average ONLINE Sensor Occupancy (%%), V side for 3 samples %s", runID.Data()));
     m_hOnlineOccupancyV3Samples->SetStats(0);
   }
 
@@ -673,8 +676,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
         htmp->Copy(m_hStripOccupancyU[i]);
         m_hStripOccupancyU[i].Scale(1 / nEvents);
         m_hStripOccupancyU[i].SetName(Form("%d_%d_%d_OccupancyU", tmp_layer, tmp_ladder, tmp_sensor));
-        m_hStripOccupancyU[i].SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
-                                            tmp_sensor));
+        m_hStripOccupancyU[i].SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number %s", tmp_layer, tmp_ladder,
+                                            tmp_sensor, runID.Data()));
       }
     }
 
@@ -761,8 +764,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
         htmp->Copy(m_hStripOccupancyV[i]);
         m_hStripOccupancyV[i].Scale(1 / nEvents);
         m_hStripOccupancyV[i].SetName(Form("%d_%d_%d_OccupancyV", tmp_layer, tmp_ladder, tmp_sensor));
-        m_hStripOccupancyV[i].SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number", tmp_layer, tmp_ladder,
-                                            tmp_sensor));
+        m_hStripOccupancyV[i].SetTitle(Form("SVD Sensor %d_%d_%d V-Strip OFFLINE Occupancy vs Strip Number %s", tmp_layer, tmp_ladder,
+                                            tmp_sensor, runID.Data()));
       }
 
     }

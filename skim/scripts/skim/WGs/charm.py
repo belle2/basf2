@@ -997,16 +997,16 @@ class LambdacToSHpJm(BaseSkim):
         * :math:`\\Lambda_c^+ \\to \\Sigma^+ \\pi^+ K^-`
         * :math:`\\Lambda_c^+ \\to \\Sigma^+ K^+ \\pi^-`
         * :math:`\\Lambda_c^+ \\to \\Sigma^+ K^+ K^-`
-        * :math:`\\Lambda_c^+ \\to \\Sigma^+ K_S0`
+        * :math:`\\Lambda_c^+ \\to \\Sigma^+ K_S`
 
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
         * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
-        * loose mass window for :math:'\\pi^0\\' and skim selections from stdPi0s
+        * loose mass window for :math:`\\pi^0\\` and skim selections from stdPi0s
         * ``0.44 < M(K_s) < 0.55, significanceOfDistance > 2.0``
-        * :math:`\\pm 3\\sigma` mass windows for :math:'\\Sigma^+\\'
-        * lower bound on significance of distance for :math:'\\Sigma^+\\' > 2
+        * :math:`\\pm 3\\sigma` mass windows for :math:`\\Sigma^+\\`
+        * lower bound on significance of distance for :math:`\\Sigma^+\\` > 2
         * For more details, please check the source code of this skim.
 
     """

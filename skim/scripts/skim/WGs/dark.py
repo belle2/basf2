@@ -661,7 +661,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 
     def build_lists(self, path):
         skim_str = "InelasticDarkMatterWithDarkHiggs"
-        n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
+        n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
 
         track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 20]"
 
@@ -678,7 +678,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 
         ma.reconstructDecay(
             decayString=f"A0:{skim_str} -> mu+:{skim_str} mu-:{skim_str}",
-            cut="pt > 0.1",
+            cut="",
             path=path
         )
         vertex.treeFit(
@@ -689,13 +689,13 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         )
         ma.applyCuts(
             list_name=f"A0:{skim_str}",
-            cut="chiProb > 0",
+            cut="chiProb > 0.001",
             path=path,
         )
 
         ma.reconstructDecay(
             decayString=f"chi2:{skim_str} -> e+:{skim_str} e-:{skim_str}",
-            cut="pt > 0.1",
+            cut="",
             path=path
         )
         vertex.treeFit(
@@ -706,15 +706,14 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         )
         ma.applyCuts(
             list_name=f"chi2:{skim_str}",
-            cut="chiProb > 0",
+            cut="chiProb > 0.001",
             path=path,
         )
 
-        dr_cut = "[daughter(0, dr) > 0.05] or [daughter(1, dr) > 0.05]"
-        vertex_fit_cut = "[daughter(0, chiProb) > 0.1] or [daughter(1, chiProb) > 0.1]"
+        dr_cut = "[daughter(0, distance) > 0.05] or [daughter(1, distance) > 0.05]"
         ma.reconstructDecay(
             decayString=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
-            cut=f"[{dr_cut} and {vertex_fit_cut}]",
+            cut=f"[{dr_cut}]",
             path=path,
         )
         ma.buildRestOfEvent(
@@ -726,8 +725,9 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             list_name=f"beam:{skim_str}",
             mask_tuples=[
                 ("std_roe",
-                 "thetaInCDCAcceptance and nCDCHits>20 and dr < 0.5 and abs(dz) < 2",
-                 "thetaInCDCAcceptance and E > 0.05")],
+                 "thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2",
+                 "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and [[clusterReg==1 and E>0.08]" +
+                 "or [clusterReg==2 and E>0.07] or [clusterReg==3 and E>0.1]] and [abs(clusterTiming) < 200]")],
             path=path,
          )
 

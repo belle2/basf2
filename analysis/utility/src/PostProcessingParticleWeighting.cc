@@ -47,9 +47,9 @@ PyObject* PostProcessingParticleWeighting::getInfoPython(
 {
   WeightInfo weightInfo = getInfo(experiment, run);
   PyObject* dictionary = PyDict_New();
-  for (const std::pair<std::string, double>& x : weightInfo) {
-    PyObject* key = PyUnicode_FromString(x.first.c_str());
-    PyObject* value = PyFloat_FromDouble(x.second);
+  for (const auto& [name, val] : weightInfo) {
+    PyObject* key = PyUnicode_FromString(name.c_str());
+    PyObject* value = PyFloat_FromDouble(val);
     PyDict_SetItem(dictionary, key, value);
   }
   return dictionary;

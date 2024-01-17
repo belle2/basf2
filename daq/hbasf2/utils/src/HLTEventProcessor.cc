@@ -54,14 +54,14 @@ namespace {
   }
 }
 
-void HLTEventProcessor::sendTerminatedMessage(unsigned int pid, bool waitForConformation)
+void HLTEventProcessor::sendTerminatedMessage(unsigned int pid, bool waitForConfirmation)
 {
   for (auto& socket : m_sockets) {
     auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_deleteWorkerMessage,
                                                     ZMQParent::createIdentity(pid));
     ZMQParent::send(socket, std::move(message));
 
-    if (not waitForConformation) {
+    if (not waitForConfirmation) {
       continue;
     }
     if (ZMQParent::poll({socket.get()}, 10 * 1000)) {
@@ -168,13 +168,14 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
     for (const int& pid : m_processList) {
       int count = 0;
       while (true) {
-        if (kill(pid, 0) == 0) {
+        if (kill(pid, 0) != 0) {
           break;
         }
         B2DEBUG(10, g_processNumber << ": Checking process termination, count = " << count);
         std::this_thread::sleep_for(1000ms);
         // Force to leave the loop after 20min
         // Before this, slow control app will send SIGKILL in normal case
+        if (count % 5 == 1) kill(pid, SIGINT);
         if (count == 1200) break;
         ++count;
       }

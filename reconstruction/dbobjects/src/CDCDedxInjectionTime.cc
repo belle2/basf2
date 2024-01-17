@@ -86,7 +86,7 @@ double CDCDedxInjectionTime::getCorrection(std::string svar, unsigned int ring, 
 
   if (std::isnan(ring) || std::isnan(time))return 1.0;
 
-  if (ring > 2) {
+  if (ring > 1) {
     B2ERROR("wrong ring input, choose 0 or 1");
     return 1.0;
   }

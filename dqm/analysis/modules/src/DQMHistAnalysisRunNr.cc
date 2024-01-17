@@ -87,10 +87,7 @@ void DQMHistAnalysisRunNrModule::event()
   leg->SetFillColor(kWhite);
 
   auto name = "hRunnr";
-  TH1* hh1 = findHist(name);
-  if (hh1 == NULL) {
-    hh1 = findHist(m_histogramDirectoryName, name);
-  }
+  auto hh1 = findHist(m_histogramDirectoryName, name);
   if (hh1) {
     hh1->SetStats(kFALSE); // get rid of annoying box, we have our own
     hh1->Draw("hist");
@@ -135,6 +132,7 @@ void DQMHistAnalysisRunNrModule::event()
 
   m_cRunNr->Modified();
   m_cRunNr->Update();
+  UpdateCanvas(m_cRunNr);
 
   setEpicsPV("Alarm", status);
   setEpicsPV("RunNr", mean);

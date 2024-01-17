@@ -984,7 +984,7 @@ class DpToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Track cuts: `charm_skim_std_charged` pion and Kaon with ``PID>0.1``
+        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID>0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``p(pi0)>0.25 and 0.11<InvM(pi0)<0.15``
         * ``0.71 < M(omega) < 0.85``
@@ -1033,7 +1033,7 @@ class DspToHpOmega(BaseSkim):
         * :math:`omega\\to \\pi^+ \\pi^- \\pi^0`
 
     **Selection Criteria**:
-        * Track cuts: `charm_skim_std_charged` pion and Kaon with ``PID>0.1``
+        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID>0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``p(pi0)>0.25 and 0.11<InvM(pi0)<0.15``
         * ``0.71 < M(omega) < 0.85``

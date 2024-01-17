@@ -1055,7 +1055,6 @@ class B0toDDs0star(BaseSkim):
     * ``5.2 < Mbc < 5.3``
     * ``abs(deltaE) < 0.2``
     * ``0.31 < D_s0ST_massDifference_0 < 0.347``
-
     """
 
     produce_on_tau_samples = False  # retention is very close to zero on taupair

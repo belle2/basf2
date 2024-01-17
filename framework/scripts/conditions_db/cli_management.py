@@ -616,7 +616,7 @@ def command_iovs_delete(args, db=None):
 
 def command_iovs_copy(args, db=None):
     """
-    Delete iovs from a globaltag
+    Copy iovs from a globaltag to another one
 
     This command allows to copy the iovs from a globaltags to another one, optionally limiting
     the iovs to be copied to those of a specific payload, revision, IoV id or run range.
@@ -769,7 +769,7 @@ def command_iovs_copy(args, db=None):
 
 def command_iovs_modify(args, db=None):
     """
-    Delete iovs from a globaltag
+    Modify iovs from a globaltag
 
     This command allows to modify the iovs from a globaltags, optionally limiting the iovs to be modified to those
     of a specific payload, revision, IoV id or run range.

@@ -928,50 +928,48 @@ namespace Belle2 {
     Manager::FunctionPtr mcDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        int iDaughterNumber = 0;
-        int jDaughterNumber = 0;
-        try {
-          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First two arguments of mcDaughterDiffOf meta function must be integers!");
-        }
-        auto variablename = arguments[2];
-        auto func = [variablename, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+        auto func = [arguments](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return Const::doubleNaN;
-          if (particle->getDaughter(jDaughterNumber)->getMCParticle() == nullptr || particle->getDaughter(iDaughterNumber)->getMCParticle() == nullptr)
-            return Const::doubleNaN;
-          else
+          const Particle* dau_i = particle->getParticleFromGeneralizedIndexString(arguments[0]);
+          const Particle* dau_j = particle->getParticleFromGeneralizedIndexString(arguments[1]);
+          auto variablename = arguments[2];
+          if (dau_i == nullptr || dau_j == nullptr)
           {
-            const MCParticle* iMcDaughter = particle->getDaughter(iDaughterNumber)->getMCParticle();
-            const MCParticle* jMcDaughter = particle->getDaughter(jDaughterNumber)->getMCParticle();
-            Particle iTmpPart(iMcDaughter);
-            Particle jTmpPart(jMcDaughter);
-            const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            auto result_j = var->function(&jTmpPart);
-            auto result_i = var->function(&iTmpPart);
-            double diff = Const::doubleNaN;
-            if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i)) {
-              diff = std::get<double>(result_j) - std::get<double>(result_i);
-            } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i)) {
-              diff = std::get<int>(result_j) - std::get<int>(result_i);
-            } else {
-              throw std::runtime_error("Bad variant access");
-            }
-            if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))) {
-              if (fabs(diff) > M_PI) {
-                if (diff > M_PI) {
-                  diff = diff - 2 * M_PI;
-                } else {
-                  diff = 2 * M_PI + diff;
-                }
+            B2ERROR("One of the first two arguments doesn't specify a valid (grand-)daughter!");
+            return Const::doubleNaN;
+          }
+          const MCParticle* iMcDaughter = dau_i->getMCParticle();
+          const MCParticle* jMcDaughter = dau_j->getMCParticle();
+          if (iMcDaughter == nullptr || jMcDaughter == nullptr)
+            return Const::doubleNaN;
+          Particle iTmpPart(iMcDaughter);
+          Particle jTmpPart(jMcDaughter);
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
+          auto result_j = var->function(&jTmpPart);
+          auto result_i = var->function(&iTmpPart);
+          double diff = Const::doubleNaN;
+          if (std::holds_alternative<double>(result_j) && std::holds_alternative<double>(result_i))
+          {
+            diff = std::get<double>(result_j) - std::get<double>(result_i);
+          } else if (std::holds_alternative<int>(result_j) && std::holds_alternative<int>(result_i))
+          {
+            diff = std::get<int>(result_j) - std::get<int>(result_i);
+          } else
+          {
+            throw std::runtime_error("Bad variant access");
+          }
+          if (variablename == "phi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)")))
+          {
+            if (fabs(diff) > M_PI) {
+              if (diff > M_PI) {
+                diff = diff - 2 * M_PI;
+              } else {
+                diff = 2 * M_PI + diff;
               }
             }
-            return diff;
           }
+          return diff;
         };
         return func;
       } else {

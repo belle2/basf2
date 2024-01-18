@@ -53,8 +53,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
                                    "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
-                                   "max_events_per_run":  60000,
-                                   "max_events_per_file": 30000,
+                                   "max_events_per_run":  10000,
+                                   "max_events_per_file": 5000,
                                    "isMC": False,
                                    "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],

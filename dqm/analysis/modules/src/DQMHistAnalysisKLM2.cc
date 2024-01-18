@@ -430,13 +430,13 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         refErr = 0.;
       }
 
-      if ((mainEff == 0) and (refEff == 0)) {
+      if ((mainEff == 0.) and (refEff == 0.)) {
         // empty histograms, draw blank bin
         eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
-      } else if (refEff == 0) {
+      } else if ((refEff == 0.) and (ratioPlot)) {
         // no reference, set maximum value
         eff2dHist->SetBinContent(binx + 1, biny + 1, maxVal);
-      } else if (mainEff == 0) {
+      } else if (mainEff == 0.) {
         // no data, set zero
         eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
         errHist->SetBinContent(binx + 1, biny + 1, 0);
@@ -557,7 +557,7 @@ void DQMHistAnalysisKLM2Module::event()
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
                         m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
-  B2DEBUG(20, "Updating EPICS PVs in DQMHistAnalysisKLM2");
+  B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs in DQMHistAnalysisKLM2");
   double procesedEvents = DQMHistAnalysisModule::getEventProcessed();
   if (procesedEvents > m_minEvents) {
     setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);

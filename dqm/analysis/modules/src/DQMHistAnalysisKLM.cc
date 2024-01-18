@@ -48,6 +48,8 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
            "Minimal number of processed events required to print error messages", 10000.);
   addParam("MinEntries", m_minEntries,
            "Minimal number for delta histogram updates", 50000.);
+  addParam("MessageThreshold", m_MessageThreshold,
+           "Max number of messages to show up in channel occupancy plots", 15);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
@@ -183,6 +185,7 @@ void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* 
     else scale = 1.0;
 
     // delta != nullptr should take care of whether update condition is met.
+    delta->SetLineColor(kCopper); //random choice of not green or blue
     delta->DrawNormalized("SAME", scale);
     canvas->Modified();
     canvas->Update();
@@ -251,6 +254,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     }
   }
   unsigned int activeModuleChannels = 0;
+  unsigned int message_counter = 0;
   for (it = moduleHitMap.begin(); it != moduleHitMap.end(); ++it) {
     KLMModuleNumber moduleNumber = it->first;
     if (it->second != 0) {
@@ -267,6 +271,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       m_ElectronicsMap->getElectronicsChannel(channel);
     if (electronicsChannel == nullptr)
       B2FATAL("Incomplete KLM electronics map.");
+    message_counter++;
     str = "No data from lane " + std::to_string(electronicsChannel->getLane());
     latex.DrawLatexNDC(x, y, str.c_str());
     y -= 0.05;
@@ -291,6 +296,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     return;
   average /= activeModuleChannels;
   ref_average /= activeModuleChannels;
+
   for (i = 1; i <= n; ++i) {
     KLMChannelNumber channelIndex = std::round(histogram->GetBinCenter(i));
     KLMChannelNumber channelNumber =
@@ -302,6 +308,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     std::string channelStatus = "Normal";
     if ((nHits > average * m_ThresholdForMasked) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Masked";
+      message_counter++;
       std::vector<KLMModuleNumber>::iterator ite =
         std::find(m_MaskedChannels.begin(),
                   m_MaskedChannels.end(),
@@ -311,6 +318,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       B2DEBUG(20, "KLM@MaskMe " << channelNumber);
     } else if ((nHits > average * m_ThresholdForHot) && (nHits > m_MinHitsForFlagging)) {
       channelStatus = "Hot";
+      message_counter++;
     }
     if (channelStatus != "Normal") {
       const KLMElectronicsChannel* electronicsChannel =
@@ -327,10 +335,19 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       str += ("L" + std::to_string(electronicsChannel->getLane()) +
               " A" + std::to_string(electronicsChannel->getAxis()) +
               " Ch" + std::to_string(electronicsChannel->getChannel()));
+      if message_counter <= m_MessageThreshold {
       latex.DrawLatexNDC(x, y, str.c_str());
-      y -= 0.05;
+        y -= 0.05;
+      }
     }
   }
+  if message_counter > m_MessageThreshold {
+  std::string verbose_message = " more messages";
+  verbose_message = std::str(message_counter - m_MessageThreshold) + verbose_message
+    latex.DrawLatexNDC(x, y, verbose_message.c_str());
+    y -= 0.05;
+  }
+
 
   // for hot/masked channels, log scale plots (reference and main)
   if (histogram->GetMaximum()*n > histogram->Integral()*m_ThresholdForLog && average * activeModuleChannels > m_MinHitsForFlagging) {
@@ -400,6 +417,7 @@ void DQMHistAnalysisKLMModule::processSpatial2DHitEndcapHistogram(
     m_2DHitsLine.DrawLine(-110, 80, 110, 80);
   }
   canvas->Modified();
+  canvas->Update();
 }
 
 void DQMHistAnalysisKLMModule::processTimeHistogram(
@@ -467,6 +485,7 @@ void DQMHistAnalysisKLMModule::fillMaskedChannelsHistogram(
   histogram->SetStats(false);
   histogram->Draw();
   canvas->Modified();
+  canvas->Update();
 }
 
 void DQMHistAnalysisKLMModule::processPlaneHistogram(
@@ -491,6 +510,8 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     canvas->cd();
     histogram->SetStats(false);
     histogram->Draw();
+
+    unsigned int message_counter = 0;
     if (histName.find("bklm") != std::string::npos) {
       /* First draw the vertical lines and the sector names. */
       const int maximalLayer = BKLMElementNumbers::getMaximalLayerNumber();
@@ -517,10 +538,13 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         for (KLMModuleNumber module : m_DeadBarrelModules) {
           m_ElementNumbers->moduleNumberToElementNumbers(
             module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
+          message_counter++;
           alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
           alarm += ", layer " + std::to_string(moduleLayer);
+          if message_counter <= m_MessageThreshold{
           latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-          yAlarm -= 0.05;
+            yAlarm -= 0.05;
+          }
         }
         if (m_IsNullRun == false) {
           colorizeCanvas(canvas, c_StatusError);
@@ -560,8 +584,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
             module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
           alarm = "No data from " + m_ElementNumbers->getSectorDAQName(moduleSubdetector, moduleSection, moduleSector);
           alarm += ", layer " + std::to_string(moduleLayer);
+          message_counter++;
+          if message_counter <= m_MessageThreshold{
           latex.DrawLatexNDC(xAlarm, yAlarm, alarm.c_str());
-          yAlarm -= 0.05;
+            yAlarm -= 0.05;
+          }
         }
         if (m_IsNullRun == false) {
           colorizeCanvas(canvas, c_StatusError);
@@ -570,6 +597,12 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       else {
         colorizeCanvas(canvas, c_StatusTooFew);
       }
+    }
+    if message_counter > m_MessageThreshold{
+    std::string verbose_string = " more messages";
+    verbose_string = std::str(message_counter - m_MessageThreshold) + verbose_string;
+      latex.DrawLatexNDC(xAlarm, yAlarm, verbose_string.c_str());
+      yAlarm -= 0.05;
     }
     canvas->Modified();
     canvas->Update();

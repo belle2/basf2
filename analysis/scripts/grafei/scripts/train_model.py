@@ -12,7 +12,6 @@ import random
 from grafei.model.config import load_config
 from grafei.model.dataset_split import create_dataloader_mode_tags
 from grafei.model.geometric_network import GraFEIModel
-from grafei.model.data_utils import calculate_class_weights
 from grafei.model.multiTrain import MultiTrainLoss
 from grafei.model.create_trainer import GraFEIIgniteTrainer
 
@@ -117,23 +116,6 @@ def main(
     # Send the model to specific device
     model.to(device)
 
-    # Compute class weights
-    edge_weights = None
-    node_weights = None
-    if configs["train"]["class_weights"]:
-        edge_weights = calculate_class_weights(
-            dataloader=mode_tags["Training"][2],
-            num_classes=model.x_classes,
-            edges=True,
-        )
-        node_weights = calculate_class_weights(
-            dataloader=mode_tags["Training"][2],
-            num_classes=model.edge_classes,
-            edges=False,
-        )
-        edge_weights = edge_weights.to(device)
-        node_weights = node_weights.to(device)
-
     # Set the loss
     loss_fn = MultiTrainLoss(
         ignore_index=-1,
@@ -142,8 +124,6 @@ def main(
         alpha_mass=configs["model"]["alpha_mass"],
         # alpha_prob=configs["model"]["alpha_prob"],
         # global_layer=configs["model"]["global_layer"],
-        edge_weights=edge_weights,
-        node_weights=node_weights,
     )
 
     # Set the optimiser

@@ -43,8 +43,6 @@ class MultiTrainLoss(nn.Module):
         alpha_mass (float): Weight of mass cross-entropy term in the loss.
         ignore_index (int): Index to ignore in the computation (e.g. padding).
         reduction (str): Type of reduction to be applied on the batch (``sum`` or ``mean``).
-        edge_weights (numpy.ndarray): Weights applied to edge classes.
-        node_weights (numpy.ndarray): Weights applied to node classes.
     """
 
     def __init__(
@@ -55,8 +53,6 @@ class MultiTrainLoss(nn.Module):
         ignore_index=-1,
         reduction="mean",
         # global_layer=False,
-        edge_weights=None,
-        node_weights=None,
     ):
         super().__init__()
         self.alpha_mass = alpha_mass
@@ -65,15 +61,13 @@ class MultiTrainLoss(nn.Module):
         # self.global_layer = global_layer
 
         self.LCA_CE = nn.CrossEntropyLoss(
-            weight=edge_weights, ignore_index=ignore_index, reduction=reduction
+            ignore_index=ignore_index, reduction=reduction
         )
         self.mass_CE = nn.CrossEntropyLoss(
-            weight=node_weights, ignore_index=ignore_index, reduction=reduction
+            ignore_index=ignore_index, reduction=reduction
         )
         # self.prob_CE = nn.BCEWithLogitsLoss(reduction=reduction)
         # self.momentum_L1 = B_MomentumLoss(reduction=reduction)
-
-        self.scaling = 1 if reduction == "mean" else 100
 
         assert (
             alpha_mass >= 0  # and alpha_momentum >= 0 and alpha_prob >= 0
@@ -123,4 +117,4 @@ class MultiTrainLoss(nn.Module):
             + self.alpha_mass * mass_loss
             # + self.alpha_prob * prob_loss
             # + self.alpha_momentum * momentum_loss
-        ) / self.scaling
+        )

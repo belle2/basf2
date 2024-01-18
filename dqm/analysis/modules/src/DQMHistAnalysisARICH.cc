@@ -208,22 +208,31 @@ void DQMHistAnalysisARICHModule::event()
 
   TH1F* chDigit = (TH1F*)findHist("ARICH/chDigit");
   int nhot = 0;
+  double avgOcc = 0;
   if (chDigit != NULL && nEvents != 0) {
-    for (int i = 0; i < chDigit->GetNbinsX(); i++) {
-      int nhit = chDigit->GetBinContent(i + 1);
-      if ((nhit - 3. * sqrt(nhit)) / float(nEvents) > m_hotLimit) nhot++;
+    avgOcc = chDigit->GetEntries() / 60480.;
+    if (avgOcc > 100.) {
+      for (int i = 0; i < chDigit->GetNbinsX(); i++) {
+        int nhit = chDigit->GetBinContent(i + 1);
+        if ((nhit - 3. * sqrt(nhit)) / float(nEvents) > m_hotLimit) nhot++;
+      }
     }
   }
   setEpicsPV("hotChannels", nhot);
 
   int ndeadHapd = 0;
   TH1F* hapdDigit = (TH1F*)findHist("ARICH/hapdDigit");
-  if (hapdDigit != NULL) {
+  if (hapdDigit != NULL && avgOcc * 144. > 100.) {
     for (int i = 0; i < hapdDigit->GetNbinsX(); i++) {
       if (hapdDigit->GetBinContent(i + 1) == 0) ndeadHapd++;
     }
   }
   setEpicsPV("deadHAPDs", ndeadHapd);
+
+  if (avgOcc * 36. < 100.) {
+    setEpicsPV("badAPDs", 0);
+    return;
+  }
 
   auto h_bitsPerChannel =  getDelta("ARICH", "bitsPerChannel", 0, true);
   if (h_bitsPerChannel == NULL) return;
@@ -252,7 +261,6 @@ void DQMHistAnalysisARICHModule::event()
   for (int i = 0; i < 7; i++) {
     ringApdAvg[i] /= float(4.*hapdInRing[i]);
   }
-
   int nbadApd = 0;
   for (int i = 0; i < 1680; i++) {
     int ring = getRing(i / 4 + 1);

@@ -1008,15 +1008,6 @@ class B0toDstarD(BaseSkim):
 
 @fancy_skim_header
 class B0toDDs0star(BaseSkim):
-    """
-    Reconstructed decay modes:
-
-    Cuts applied:
-
-    * ``5.2 < Mbc < 5.3``
-    * ``abs(deltaE) < 0.2``
-    * ``0.31 < D_s0ST_massDifference_0 < 0.347``
-    """
 
     produce_on_tau_samples = False  # retention is very close to zero on taupair
 

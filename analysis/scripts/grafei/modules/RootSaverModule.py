@@ -12,7 +12,7 @@ def pdg_to_lca_converter(pdg):
     """
     Converts PDG code to LCAS classes.
 
-    .. note:: If you want to modify the LCAS classes, it's here.
+    .. tip:: If you want to modify the LCAS classes, it's here.
         Don't forget to update the number of edge classes accordingly in the yaml file.
 
     Args:

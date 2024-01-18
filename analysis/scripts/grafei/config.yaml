@@ -51,8 +51,6 @@ train:
   lr_scheduler: False
   # Whether to use mixed precision for faster training
   mixed_precision: True
-  # Whether to calculate class weights from dataset
-  class_weights: False
   # Show progress bar during training (slows down the process)
   progress_bar: False
   # Show GPU usage during training (slows down the process)

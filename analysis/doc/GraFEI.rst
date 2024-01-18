@@ -85,7 +85,9 @@ Moreover, you can construct signal- and tag-side candidates with the following l
 
 .. code:: python
 
-   for part in ["e+", "mu+", "pi+", "K+", "p+", "gamma"]:
+   part_types = ["e+", "mu+", "pi+", "K+", "p+", "gamma"]
+
+   for part in part_types:
       ma.cutAndCopyList(
          f"{part}:Bsig",
          f"{part}:graFEI",
@@ -104,6 +106,7 @@ Moreover, you can construct signal- and tag-side candidates with the following l
    ma.combineAllParticles([f"{part}:Bsig" for part in part_types], "B0:Bsig_graFEI", path=path)
    ma.combineAllParticles([f"{part}:Btag" for part in part_types], "B0:Btag_graFEI", path=path)
 
+The ``PART:graFEI`` particle lists in the example are those used as input for the model.
 The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong to the signal-side, 0 for particles predicted to belong to the tag-side
 and -1 for particles in events with ``graFEI_goodEvent = 0``. Therefore, if you want meaningful distributions you should cut on events with ``graFEI_goodEvent = 1``.
 
@@ -179,9 +182,6 @@ users usually do not need to manipulate these components.
    :members:
 
 .. automodule:: grafei.model.create_trainer
-   :members:
-
-.. automodule:: grafei.model.data_utils
    :members:
 
 .. automodule:: grafei.model.dataset_split

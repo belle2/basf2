@@ -980,44 +980,19 @@ namespace Belle2 {
     Manager::FunctionPtr grandDaughterDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 5) {
-        int iDaughterNumber = 0, jDaughterNumber = 0, agrandDaughterNumber = 0, bgrandDaughterNumber = 0;
         try {
-          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-          agrandDaughterNumber = Belle2::convertString<int>(arguments[2]);
-          bgrandDaughterNumber = Belle2::convertString<int>(arguments[3]);
+          Belle2::convertString<int>(arguments[0]);
+          Belle2::convertString<int>(arguments[1]);
+          Belle2::convertString<int>(arguments[2]);
+          Belle2::convertString<int>(arguments[3]);
         } catch (std::invalid_argument&) {
           B2FATAL("First four arguments of grandDaughterDiffOf meta function must be integers!");
         }
-        auto variablename = arguments[4];
-        auto func = [variablename, iDaughterNumber, jDaughterNumber, agrandDaughterNumber,
-                      bgrandDaughterNumber](const Particle * particle) -> double {
-          if (particle == nullptr)
-            return Const::doubleNaN;
-          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return Const::doubleNaN;
-          if (agrandDaughterNumber >= int((particle->getDaughter(iDaughterNumber))->getNDaughters()) || bgrandDaughterNumber >= int((particle->getDaughter(jDaughterNumber))->getNDaughters()))
-            return Const::doubleNaN;
-          else
-          {
-            const Variable::Manager::Var* var = Manager::Instance().getVariable(variablename);
-            double diff = std::get<double>(var->function((particle->getDaughter(jDaughterNumber))->getDaughter(
-                                                           bgrandDaughterNumber))) - std::get<double>(var->function((particle->getDaughter(iDaughterNumber))->getDaughter(
-                                                                 agrandDaughterNumber)));
-            if (variablename == "phi" or variablename == "clusterPhi" or std::regex_match(variablename, std::regex("use.*Frame\\(phi\\)"))
-                or std::regex_match(variablename, std::regex("use.*Frame\\(clusterPhi\\)"))) {
-              if (fabs(diff) > M_PI) {
-                if (diff > M_PI) {
-                  diff = diff - 2 * M_PI;
-                } else {
-                  diff = 2 * M_PI + diff;
-                }
-              }
-            }
-            return diff;
-          }
-        };
-        return func;
+        std::vector<std::string> new_arguments;
+        new_arguments.push_back(std::string(arguments[0] + ":" + arguments[2]));
+        new_arguments.push_back(std::string(arguments[1] + ":" + arguments[3]));
+        new_arguments.push_back(arguments[4]);
+        return daughterDiffOf(new_arguments);
       } else {
         B2FATAL("Wrong number of arguments for meta function grandDaughterDiffOf");
       }
@@ -3398,6 +3373,9 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
                       "(That means that it returns :math:`p_j - p_i`)\n"
                       "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
+    MAKE_DEPRECATED("grandDaughterDiffOf", false, "light-2402-m", R"DOC(
+                     The difference between any combination of (grand-)daughters can be calculated with the more general variable :b2:var:`daughterDiffOf`
+                     by using generalized daughter indexes.)DOC");
     REGISTER_METAVARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"

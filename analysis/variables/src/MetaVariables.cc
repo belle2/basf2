@@ -1057,32 +1057,28 @@ namespace Belle2 {
     Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 3) {
-        int iDaughterNumber = 0;
-        int jDaughterNumber = 0;
-        try {
-          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
-        } catch (std::invalid_argument&) {
-          B2FATAL("First two arguments of daughterDiffOf meta function must be integers!");
-        }
-        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
-        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+        auto func = [arguments](const Particle * particle) -> double {
           if (particle == nullptr)
             return Const::doubleNaN;
-          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return Const::doubleNaN;
-          else
+          const Particle* dau_i = particle->getParticleFromGeneralizedIndexString(arguments[0]);
+          const Particle* dau_j = particle->getParticleFromGeneralizedIndexString(arguments[1]);
+          if (!(dau_i && dau_j))
           {
-            double iValue, jValue;
-            if (std::holds_alternative<double>(var->function(particle->getDaughter(jDaughterNumber)))) {
-              iValue = std::get<double>(var->function(particle->getDaughter(iDaughterNumber)));
-              jValue = std::get<double>(var->function(particle->getDaughter(jDaughterNumber)));
-            } else if (std::holds_alternative<int>(var->function(particle->getDaughter(jDaughterNumber)))) {
-              iValue = std::get<int>(var->function(particle->getDaughter(iDaughterNumber)));
-              jValue = std::get<int>(var->function(particle->getDaughter(jDaughterNumber)));
-            } else return Const::doubleNaN;
-            return (jValue - iValue) / (jValue + iValue);
+            B2ERROR("One of the first two arguments doesn't specify a valid (grand-)daughter!");
+            return Const::doubleNaN;
           }
+          const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+          double iValue, jValue;
+          if (std::holds_alternative<double>(var->function(dau_j)))
+          {
+            iValue = std::get<double>(var->function(dau_i));
+            jValue = std::get<double>(var->function(dau_j));
+          } else if (std::holds_alternative<int>(var->function(dau_j)))
+          {
+            iValue = std::get<int>(var->function(dau_i));
+            jValue = std::get<int>(var->function(dau_j));
+          } else return Const::doubleNaN;
+          return (jValue - iValue) / (jValue + iValue);
         };
         return func;
       } else {

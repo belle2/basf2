@@ -3393,15 +3393,13 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
                       "Returns the difference of a variable between the two given daughters.\n"
                       "E.g. ``useRestFrame(daughterDiffOf(0, 1, p))`` returns the momentum difference between first and second daughter in the rest frame of the given particle.\n"
-                      "(That means that it returns :math:`p_j - p_i`)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`daughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
+                      "(That means that it returns :math:`p_j - p_i`)", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("mcDaughterDiffOf(i, j, variable)", mcDaughterDiffOf,
                       "MC matched version of the `daughterDiffOf` function.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("grandDaughterDiffOf(i, j, variable)", grandDaughterDiffOf,
                       "Returns the difference of a variable between the first daughters of the two given daughters.\n"
                       "E.g. ``useRestFrame(grandDaughterDiffOf(0, 1, p))`` returns the momentum difference between the first daughters of the first and second daughter in the rest frame of the given particle.\n"
-                      "(That means that it returns :math:`p_j - p_i`)\n"
-                      "Nota Bene: for the particular case 'variable=phi' you should use the :b2:var:`grandDaughterDiffOfPhi` function.", Manager::VariableDataType::c_double);
+                      "(That means that it returns :math:`p_j - p_i`)", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("daughterDiffOfPhi(i, j)", daughterDiffOfPhi,
                       "Returns the difference in :math:`\\phi` between the two given daughters. The unit of the angle is ``rad``.\n"
                       "The difference is signed and takes account of the ordering of the given daughters.\n"

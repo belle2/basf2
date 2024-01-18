@@ -1012,7 +1012,7 @@ class B0toDDs0star(BaseSkim):
     produce_on_tau_samples = False  # retention is very close to zero on taupair
 
     __authors__ = ["Kuanying Wu"]
-    __description__ = "skim list for B0 to D_{s0}^{*+} D-"
+    __description__ = ""
     __contact__ = __liaison__
     __category__ = "physics, hadronic B to charm"
 

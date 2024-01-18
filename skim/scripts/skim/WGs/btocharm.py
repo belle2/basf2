@@ -1011,11 +1011,6 @@ class B0toDDs0star(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0}\\to D_{s0}^{*+} (\\to D_{s}^{+} (\\to \\phi (\\to K^+ K^-) \\pi^+ \\pi^0) \\pi^0) D^{-} (\\to K^+ \\pi^- \\pi^-)`
-    * :math:`B^{0}\\to D_{s0}^{*+} (\\to D_{s}^{+} (\\to \\overline{K}{}^{*0} (\\to K^- \\pi^+ ) K^+) \\pi^0) D^{-}
-      (\\to K^+ \\pi^- \\pi^-)`
-    * :math:`B^{0}\\to D_{s0}^{*+} (\\to D_{s}^{+} (\\to \\phi (\\to K^+ K^-) \\pi^+) \\pi^0) D^{-} (\\to K^+ \\pi^- \\pi^-)`
-
     Cuts applied:
 
     * ``5.2 < Mbc < 5.3``

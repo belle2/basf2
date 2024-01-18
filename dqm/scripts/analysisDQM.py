@@ -36,7 +36,7 @@ def add_analysis_dqm(path):
     ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
     # bhabha,hadrons
     ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
-    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '9 < M < 12', 1, True, path)
+    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, True, path)
     ma.fillParticleList('pi+:hadbphysDQM', 'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
@@ -160,10 +160,10 @@ def add_mirabelle_dqm(path):
         'e+:physMiraBelle',
         'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance',
         path=MiraBelleBhabha_path)
-    ma.reconstructDecay('Upsilon:ephysMiraBelle -> e+:physMiraBelle e-:physMiraBelle', '9 < M < 12', path=MiraBelleBhabha_path)
+    ma.reconstructDecay('Upsilon:ephysMiraBelle -> e+:physMiraBelle e-:physMiraBelle', '4 < M < 12', path=MiraBelleBhabha_path)
     MiraBelleBhabha = b2.register_module('PhysicsObjectsMiraBelleBhabha')
     MiraBelleBhabha.param('ePListName', 'e+:physMiraBelle')
-    MiraBelleBhabha.param('bhabhaPListName', 'UpsilonE:ephysMiraBelle')
+    MiraBelleBhabha.param('bhabhaPListName', 'Upsilon:ephysMiraBelle')
     MiraBelleBhabha_path.add_module(MiraBelleBhabha)
     ma.fillParticleList(
         'pi+:hadb2physMiraBelle',

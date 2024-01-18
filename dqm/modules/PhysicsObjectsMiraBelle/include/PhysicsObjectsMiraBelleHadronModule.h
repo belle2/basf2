@@ -62,7 +62,8 @@ namespace Belle2 {
     TH1F* m_h_nECLClusters = nullptr;/**< histogram for number of ecl clusters */
     TH1F* m_h_visibleEnergyCMSnorm = nullptr;/**< histogram for visible energy of tracks and gammas */
     TH1F* m_h_EsumCMSnorm = nullptr; /**< histogram for sum of energy of clusters with E > 0.1*/
-    TH1F* m_h_R2 = nullptr; /**< histogram for R2 of hadron events after the hadronb2 tight selection*/
+    TH1F* m_h_R2 = nullptr; /**< histogram for R2 of hadron events after the hadronb2 selection*/
+    TH1F* m_h_physicsresultsH = nullptr; /**< histogram for event results for hadronb2 and hadronb2 tight*/
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";

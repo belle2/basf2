@@ -36,6 +36,7 @@ KlongValidationModule::KlongValidationModule(): Module()
   addParam("KlIdCut", m_KlIdCut,
            "If cut < 0, then only the neutral KLMClusters will be used. Otherwise, only the KLMClusters that satisfies the selection will be used.",
            m_KlIdCut);
+  addParam("contact", m_contact, "Email address of contact for validation plots.", m_contact);
 }
 
 KlongValidationModule::~KlongValidationModule()
@@ -284,8 +285,8 @@ void KlongValidationModule::terminate()
                                                  "Purity vs Efficiency each point represents a cut on the klong ID."));
   m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
   m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Check", "Should be as high as possible"));
-  m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
-  m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
+  m_ROC   -> GetListOfFunctions() -> Add(new TNamed("Contact", m_contact));
+  m_backRej   -> GetListOfFunctions() -> Add(new TNamed("Contact", m_contact));
 
   // tuple: pointer to the plot, name of the plot, true for shifter plots
   std::vector<std::tuple<TH1F*, std::string, std::string, bool>> histograms;
@@ -315,7 +316,7 @@ void KlongValidationModule::terminate()
     std::get<0>(hist) -> SetTitle(std::get<1>(hist).c_str());
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Description", std::get<1>(hist)));
     std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Check", std::get<2>(hist).c_str()));
-    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", "fnc@lnf.infn.it"));
+    std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("Contact", m_contact));
     if (std::get<3>(hist))
       std::get<0>(hist) -> GetListOfFunctions() -> Add(new TNamed("MetaOptions", "shifter,pvalue-warn=0.99,pvalue-error=0.02"));
     else

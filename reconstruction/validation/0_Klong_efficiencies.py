@@ -14,7 +14,7 @@
   <output>K_long_full_validation_sample.root</output>
   <description>Generates particle gun Klong Events for Kl efficiency validation.\t
    Output is not very meaningful but sufficient to check for regression.</description>
-  <contact>fnc@lnf.infn.it</contact>
+  <contact>cristina.martellini@roma3.infn.it</contact>
   <interval>nightly</interval>
 </header>
 """
@@ -55,7 +55,8 @@ rec.add_reconstruction(path=main)
 # Run a module to generate histograms for PID performances
 main.add_module('KlongValidation',
                 outputName='K_long_full_validation_sample.root',
-                KlIdCut=0.1)
+                KlIdCut=0.1,
+                contact='cristina.martellini@roma3.infn.it')
 
 # add_mdst_output(main, True, 'Klong_validation_check.root')
 

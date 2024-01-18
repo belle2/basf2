@@ -48,7 +48,9 @@ PhysicsObjectsMiraBelleHadronModule::PhysicsObjectsMiraBelleHadronModule() : His
 void PhysicsObjectsMiraBelleHadronModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PhysicsObjectsMiraBelleHadron")->cd();
+  TDirectory* physicshadronDir = oldDir->mkdir("PhysicsObjectsMiraBelleHadron");
+  physicshadronDir->cd();
+
   // Mass distributions
   m_h_nECLClusters = new TH1F("hist_nECLClusters", "hist_nECLClusters", 100, 0, 60);
   m_h_nECLClusters->SetXTitle("hist_nECLClusters");
@@ -58,6 +60,10 @@ void PhysicsObjectsMiraBelleHadronModule::defineHisto()
   m_h_EsumCMSnorm->SetXTitle("hist_EsumCMSnorm");
   m_h_R2 = new TH1F("hist_R2", "hist_R2", 100, 0, 1);
   m_h_R2->SetXTitle("hist_R2");
+  m_h_physicsresultsH = new TH1F("hist_physicsresultsH", "hist_physicsresultsH", 10, 0, 10);
+  m_h_physicsresultsH->SetXTitle("hist_physicsresultsH");
+  m_h_physicsresultsH->GetXaxis()->SetBinLabel(2, "Hadronb2");
+  m_h_physicsresultsH->GetXaxis()->SetBinLabel(3, "Hadronb2_tight");
 
   oldDir->cd();
 }
@@ -78,6 +84,7 @@ void PhysicsObjectsMiraBelleHadronModule::beginRun()
   m_h_visibleEnergyCMSnorm->Reset();
   m_h_EsumCMSnorm->Reset();
   m_h_R2->Reset();
+  m_h_physicsresultsH->Reset();
 }
 
 void PhysicsObjectsMiraBelleHadronModule::event()
@@ -98,7 +105,7 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   // apply software trigger
   const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
   if (accepted == false) return;
-
+  m_h_physicsresultsH->Fill(1);
   // get pi list
   StoreObjPtr<ParticleList> hadpiParticles(m_hadpiPListName);
   std::vector<ROOT::Math::XYZVector> m_pionHadv3;
@@ -145,12 +152,13 @@ void PhysicsObjectsMiraBelleHadronModule::event()
   fw.calculateBasicMoments();
   double R2 = fw.getR(2);
 
+  m_h_nECLClusters->Fill(neclClusters);
+  m_h_visibleEnergyCMSnorm->Fill(visibleEnergyCMSnorm);
+  m_h_EsumCMSnorm->Fill(EsumCMSnorm);
+  m_h_R2->Fill(R2);
   bool hadronb_tag = visibleEnergyCMSnorm > 0.4 && EsumCMSnorm > 0.2 && R2 < 0.2;
   if (hadronb_tag) {
-    m_h_nECLClusters->Fill(neclClusters);
-    m_h_visibleEnergyCMSnorm->Fill(visibleEnergyCMSnorm);
-    m_h_EsumCMSnorm->Fill(EsumCMSnorm);
-    m_h_R2->Fill(R2);
+    m_h_physicsresultsH->Fill(2);
   }
 
 }

@@ -47,7 +47,8 @@ PhysicsObjectsMiraBelleBhabhaModule::PhysicsObjectsMiraBelleBhabhaModule() : His
 void PhysicsObjectsMiraBelleBhabhaModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PhysicsObjectsMiraBelleBhabha")->cd();
+  TDirectory* physicsBhabhaDir = oldDir->mkdir("PhysicsObjectsMiraBelleBhabha");
+  physicsBhabhaDir->cd();
 
   m_h_npxd = new TH1F("hist_npxd", "hist_npxd", 100, 0, 5);
   m_h_npxd->SetXTitle("hist_npxd");
@@ -73,7 +74,7 @@ void PhysicsObjectsMiraBelleBhabhaModule::defineHisto()
   m_h_nECLClusters->SetXTitle("hist_nECLClusters");
   m_h_electronid = new TH1F("hist_electronid", "hist_electronid", 20, 0, 1);
   m_h_electronid->SetXTitle("hist_electronid");
-  m_h_inv_p = new TH1F("hist_inv_p", "hist_inv_p", 400, 8, 12);
+  m_h_inv_p = new TH1F("hist_inv_p", "hist_inv_p", 400, 0, 12);
   m_h_inv_p->SetXTitle("hist_inv_p");
   m_h_ndf = new TH1F("hist_ndf", "hist_ndf", 100, 0, 80);
   m_h_ndf->SetXTitle("hist_ndf");

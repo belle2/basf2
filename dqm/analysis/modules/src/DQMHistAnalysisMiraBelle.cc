@@ -115,6 +115,107 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   TH1* hist_klmTotalEndcapHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalEndcapHits");
   TH1* hist_dPhicms = findHist("PhysicsObjectsMiraBelle/hist_dPhicms");
 
+  if (hist_npxd == nullptr) {
+    B2ERROR("Can not find the hist_npxd histogram!");
+    return;
+  }
+  if (hist_nsvd == nullptr) {
+    B2ERROR("Can not find the hist_nsvd histogram!");
+    return;
+  }
+  if (hist_ncdc == nullptr) {
+    B2ERROR("Can not find the hist_ncdc histogram!");
+    return;
+  }
+  if (hist_topdig == nullptr) {
+    B2ERROR("Can not find the hist_topdig histogram!");
+    return;
+  }
+  if (hist_DetPhotonARICH == nullptr) {
+    B2ERROR("Can not find the hist_DetPhotonARICH histogram!");
+    return;
+  }
+  if (hist_klmTotalHits == nullptr) {
+    B2ERROR("Can not find the hist_klmTotalHits histogram!");
+    return;
+  }
+  if (hist_klmClusterLayers == nullptr) {
+    B2ERROR("Can not find the hist_klmClusterLayers histogram!");
+    return;
+  }
+  if (hist_dD0 == nullptr) {
+    B2ERROR("Can not find the hist_dD0 histogram!");
+    return;
+  }
+  if (hist_dZ0 == nullptr) {
+    B2ERROR("Can not find the hist_dZ0 histogram!");
+    return;
+  }
+  if (hist_dPtcms == nullptr) {
+    B2ERROR("Can not find the hist_dPtcms histogram!");
+    return;
+  }
+  if (hist_Pval == nullptr) {
+    B2ERROR("Can not find the hist_Pval histogram!");
+    return;
+  }
+  if (hist_nExtraCDCHits == nullptr) {
+    B2ERROR("Can not find the hist_nExtraCDCHits histogram!");
+    return;
+  }
+  if (hist_nECLClusters == nullptr) {
+    B2ERROR("Can not find the hist_nECLClusters histogram!");
+    return;
+  }
+  if (hist_muid == nullptr) {
+    B2ERROR("Can not find the hist_muid histogram!");
+    return;
+  }
+  if (hist_inv_p == nullptr) {
+    B2ERROR("Can not find the hist_inv_p histogram!");
+    return;
+  }
+  if (hist_ndf == nullptr) {
+    B2ERROR("Can not find the hist_ndf histogram!");
+    return;
+  }
+  if (hist_D0 == nullptr) {
+    B2ERROR("Can not find the hist_D0 histogram!");
+    return;
+  }
+  if (hist_Z0 == nullptr) {
+    B2ERROR("Can not find the hist_Z0 histogram!");
+    return;
+  }
+  if (hist_theta == nullptr) {
+    B2ERROR("Can not find the hist_theta histogram!");
+    return;
+  }
+  if (hist_Phi0 == nullptr) {
+    B2ERROR("Can not find the hist_Phi0 histogram!");
+    return;
+  }
+  if (hist_Pt == nullptr) {
+    B2ERROR("Can not find the hist_Pt histogram!");
+    return;
+  }
+  if (hist_Mom == nullptr) {
+    B2ERROR("Can not find the hist_Mom histogram!");
+    return;
+  }
+  if (hist_klmTotalBarrelHits == nullptr) {
+    B2ERROR("Can not find the hist_klmTotalBarrelHits histogram!");
+    return;
+  }
+  if (hist_klmTotalEndcapHits == nullptr) {
+    B2ERROR("Can not find the hist_klmTotalEndcapHits histogram!");
+    return;
+  }
+  if (hist_dPhicms == nullptr) {
+    B2ERROR("Can not find the hist_dPhicms histogram!");
+    return;
+  }
+
   // Make TCanvases
   // --- Mumu_Main
   mumu_main->Divide(4, 3);
@@ -175,18 +276,39 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float sigma68_dz0 = getSigma68(hist_dZ0);
   float sigma68_dpt = getSigma68(hist_dPtcms);
   int ntot = hist_nsvd->GetEntries();
-  float neve_mumu = ntot;
-  float goodmu_frac = hist_muid->GetBinContent(20) / (float)ntot;
-  float goodmu_o_badmu = hist_muid->GetBinContent(20) / (float)hist_muid->GetBinContent(1);
+  double neve_mumu = ntot;
+  double goodmu_frac;
+  double pval_frac_0;
+  double pval_frac_1;
+  double nocdc_frac;
+  double notop_frac;
+  double noarich_frac;
+  double muidcontent = hist_muid->GetBinContent(1);
+  double goodmu_o_badmu;
+  if (muidcontent != 0) {
+    goodmu_o_badmu = hist_muid->GetBinContent(20) / muidcontent;
+  } else {
+    goodmu_o_badmu = 0.0;
+  }
   float pval_more95 = 0;
   float pval_less05 = 0;
   for (int i = 95; i < 100; i++) pval_more95 += hist_Pval->GetBinContent(i + 1);
   for (int i = 0; i < 5; i++) pval_less05 += hist_Pval->GetBinContent(i + 1);
-  float pval_frac_0 = pval_less05 / (float)ntot;
-  float pval_frac_1 = pval_more95 / (float)ntot;
-  float nocdc_frac = hist_ncdc->GetBinContent(1) / (float)ntot;
-  float notop_frac = hist_topdig->GetBinContent(1) / (float)ntot;
-  float noarich_frac = hist_DetPhotonARICH->GetBinContent(1) / (float)ntot;
+  if (ntot != 0) {
+    goodmu_frac = hist_muid->GetBinContent(20) / neve_mumu;
+    pval_frac_0 = pval_less05 / neve_mumu;
+    pval_frac_1 = pval_more95 / neve_mumu;
+    nocdc_frac = hist_ncdc->GetBinContent(1) / neve_mumu;
+    notop_frac = hist_topdig->GetBinContent(1) / neve_mumu;
+    noarich_frac = hist_DetPhotonARICH->GetBinContent(1) / neve_mumu;
+  } else {
+    goodmu_frac = 0.0;
+    pval_frac_0 = 0.0;
+    pval_frac_1 = 0.0;
+    nocdc_frac = 0.0;
+    notop_frac = 0.0;
+    noarich_frac = 0.0;
+  }
   //Calculate M(mumu)
   float peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
   TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
@@ -282,7 +404,186 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   TH1* hist_sideband_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ECL_kaon");
   TH1* hist_sideband_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_KLM_kaon");
   TH1* hist_D0_pi0_InvM = findHist("PhysicsObjectsMiraBelleDst2/hist_D0_pi0_InvM");
-
+  if (hist_D0_InvM == nullptr) {
+    B2ERROR("Can not find the hist_D0_InvM histogram!");
+    return;
+  }
+  if (hist_delta_m == nullptr) {
+    B2ERROR("Can not find the hist_delta_m histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_ALL_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_ALL_pion histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_SVD_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_SVD_pion histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_CDC_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_CDC_pion histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_TOP_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_TOP_pion histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_ARICH_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_ARICH_pion histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_ECL_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_ECL_pion histogram!");
+    return;
+  }
+  if (hist_D0_softpi_PID_KLM_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_softpi_PID_KLM_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_ALL_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_ALL_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_SVD_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_SVD_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_CDC_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_CDC_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_TOP_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_TOP_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_ARICH_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_ARICH_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_ECL_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_ECL_pion histogram!");
+    return;
+  }
+  if (hist_D0_pi_PID_KLM_pion == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi_PID_KLM_pion histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_ALL_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_ALL_kaon histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_SVD_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_SVD_kaon histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_CDC_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_CDC_kaon histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_TOP_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_TOP_kaon histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_ARICH_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_ARICH_kaon histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_ECL_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_ECL_kaon histogram!");
+    return;
+  }
+  if (hist_D0_K_PID_KLM_kaon == nullptr) {
+    B2ERROR("Can not find the hist_D0_K_PID_KLM_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_ALL_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_ALL_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_SVD_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_SVD_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_CDC_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_CDC_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_TOP_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_TOP_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_ARICH_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_ARICH_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_ECL_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_ECL_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_softpi_PID_KLM_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_softpi_PID_KLM_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_ALL_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_ALL_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_SVD_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_SVD_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_CDC_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_CDC_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_TOP_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_TOP_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_ARICH_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_ARICH_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_ECL_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_ECL_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_pi_PID_KLM_pion == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_pi_PID_KLM_pion histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_ALL_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_ALL_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_SVD_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_SVD_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_CDC_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_CDC_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_TOP_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_TOP_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_ARICH_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_ARICH_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_ECL_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_ECL_kaon histogram!");
+    return;
+  }
+  if (hist_sideband_D0_K_PID_KLM_kaon == nullptr) {
+    B2ERROR("Can not find the hist_sideband_D0_K_PID_KLM_kaon histogram!");
+    return;
+  }
+  if (hist_D0_pi0_InvM == nullptr) {
+    B2ERROR("Can not find the hist_D0_pi0_InvM histogram!");
+    return;
+  }
   // Fit mass distributions for scale factor
   TF1* f_InvM = new TF1("f_InvM", "[0]*TMath::Gaus(x,[1],[2])+[3]*pow(x-[4],2)+[5]", 1.81, 1.95);
   f_InvM->SetParNames("Height", "#mu", "#sigma", "a", "b", "c");
@@ -519,6 +820,91 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   TH1* histbh_Mom = findHist("PhysicsObjectsMiraBelleBhabha/hist_Mom");
   TH1* histbh_dPhicms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPhicms");
 
+  if (histbh_npxd == nullptr) {
+    B2ERROR("Can not find the histbh_npxd histogram!");
+    return;
+  }
+  if (histbh_nsvd == nullptr) {
+    B2ERROR("Can not find the histbh_nsvd histogram!");
+    return;
+  }
+  if (histbh_ncdc == nullptr) {
+    B2ERROR("Can not find the histbh_ncdc histogram!");
+    return;
+  }
+  if (histbh_topdig == nullptr) {
+    B2ERROR("Can not find the histbh_topdig histogram!");
+    return;
+  }
+  if (histbh_DetPhotonARICH == nullptr) {
+    B2ERROR("Can not find the histbh_DetPhotonARICH histogram!");
+    return;
+  }
+  if (histbh_dD0 == nullptr) {
+    B2ERROR("Can not find the histbh_dD0 histogram!");
+    return;
+  }
+  if (histbh_dZ0 == nullptr) {
+    B2ERROR("Can not find the histbh_dZ0 histogram!");
+    return;
+  }
+  if (histbh_dPtcms == nullptr) {
+    B2ERROR("Can not find the histbh_dPtcms histogram!");
+    return;
+  }
+  if (histbh_Pval == nullptr) {
+    B2ERROR("Can not find the histbh_Pval histogram!");
+    return;
+  }
+  if (histbh_nExtraCDCHits == nullptr) {
+    B2ERROR("Can not find the histbh_nExtraCDCHits histogram!");
+    return;
+  }
+  if (histbh_nECLClusters == nullptr) {
+    B2ERROR("Can not find the histbh_nECLClusters histogram!");
+    return;
+  }
+  if (histbh_electronid == nullptr) {
+    B2ERROR("Can not find the histbh_electronid histogram!");
+    return;
+  }
+  if (histbh_inv_p == nullptr) {
+    B2ERROR("Can not find the histbh_inv_p histogram!");
+    return;
+  }
+  if (histbh_ndf == nullptr) {
+    B2ERROR("Can not find the histbh_ndf histogram!");
+    return;
+  }
+  if (histbh_D0 == nullptr) {
+    B2ERROR("Can not find the histbh_D0 histogram!");
+    return;
+  }
+  if (histbh_Z0 == nullptr) {
+    B2ERROR("Can not find the histbh_Z0 histogram!");
+    return;
+  }
+  if (histbh_theta == nullptr) {
+    B2ERROR("Can not find the histbh_theta histogram!");
+    return;
+  }
+  if (histbh_Phi0 == nullptr) {
+    B2ERROR("Can not find the histbh_Phi0 histogram!");
+    return;
+  }
+  if (histbh_Pt == nullptr) {
+    B2ERROR("Can not find the histbh_Pt histogram!");
+    return;
+  }
+  if (histbh_Mom == nullptr) {
+    B2ERROR("Can not find the histbh_Mom histogram!");
+    return;
+  }
+  if (histbh_dPhicms == nullptr) {
+    B2ERROR("Can not find the histbh_dPhicms histogram!");
+    return;
+  }
+
   // Make TCanvases
   // --- bhabha_Main
   bhabha_main->Divide(4, 3);
@@ -568,18 +954,39 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   float bh_sigma68_dz0 = getSigma68(histbh_dZ0);
   float bh_sigma68_dpt = getSigma68(histbh_dPtcms);
   int bh_ntot = histbh_nsvd->GetEntries();
-  float bh_neve_bhabha = bh_ntot;
-  float bh_goode_frac = histbh_electronid->GetBinContent(20) / (float)bh_ntot;
-  float bh_goode_o_bade = histbh_electronid->GetBinContent(20) / (float)histbh_electronid->GetBinContent(1);
-  float bh_pval_more95 = 0;
-  float bh_pval_less05 = 0;
+  double bh_neve_bhabha = bh_ntot;
+  double bh_goode_frac;
+  double bh_pval_frac_0;
+  double bh_pval_frac_1;
+  double bh_nocdc_frac;
+  double bh_notop_frac;
+  double bh_noarich_frac;
+  double eidcontent = histbh_electronid->GetBinContent(1);
+  double bh_goode_o_bade;
+  if (eidcontent != 0) {
+    bh_goode_o_bade = histbh_electronid->GetBinContent(20) / eidcontent;
+  } else {
+    bh_goode_o_bade = 0.0;
+  }
+  double bh_pval_more95 = 0;
+  double bh_pval_less05 = 0;
   for (int i = 95; i < 100; i++) bh_pval_more95 += histbh_Pval->GetBinContent(i + 1);
   for (int i = 0; i < 5; i++) bh_pval_less05 += histbh_Pval->GetBinContent(i + 1);
-  float bh_pval_frac_0 = bh_pval_less05 / (float)bh_ntot;
-  float bh_pval_frac_1 = bh_pval_more95 / (float)bh_ntot;
-  float bh_nocdc_frac = histbh_ncdc->GetBinContent(1) / (float)bh_ntot;
-  float bh_notop_frac = histbh_topdig->GetBinContent(1) / (float)bh_ntot;
-  float bh_noarich_frac = histbh_DetPhotonARICH->GetBinContent(1) / (float)bh_ntot;
+  if (bh_neve_bhabha != 0) {
+    bh_goode_frac = histbh_electronid->GetBinContent(20) / bh_neve_bhabha;
+    bh_pval_frac_0 = bh_pval_less05 / bh_neve_bhabha;
+    bh_pval_frac_1 = bh_pval_more95 / bh_neve_bhabha;
+    bh_nocdc_frac = histbh_ncdc->GetBinContent(1) / bh_neve_bhabha;
+    bh_notop_frac = histbh_topdig->GetBinContent(1) / bh_neve_bhabha;
+    bh_noarich_frac = histbh_DetPhotonARICH->GetBinContent(1) / bh_neve_bhabha;
+  } else {
+    bh_goode_frac = 0.0;
+    bh_pval_frac_0 = 0.0;
+    bh_pval_frac_1 = 0.0;
+    bh_nocdc_frac = 0.0;
+    bh_notop_frac = 0.0;
+    bh_noarich_frac = 0.0;
+  }
   // set values
   mon_bhabha->setVariable("bh_mean_npxd", bh_mean_npxd);
   mon_bhabha->setVariable("bh_mean_nsvd", bh_mean_nsvd);
@@ -613,10 +1020,33 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_bhabha->setVariable("bh_noarich_frac", bh_noarich_frac);
   // ========== hadronb2 + tight
   // get existing histograms produced by DQM modules
-  TH1* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
-  TH1* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleBhabha/hist_visibleEnergyCMSnorm");
-  TH1* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleBhabha/hist_EsumCMSnorm");
-  TH1* histhad_R2 = findHist("PhysicsObjectsMiraBelleBhabha/hist_R2");
+  TH1* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleHadron/hist_nECLClusters");
+  TH1* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_visibleEnergyCMSnorm");
+  TH1* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_EsumCMSnorm");
+  TH1* histhad_R2 = findHist("PhysicsObjectsMiraBelleHadron/hist_R2");
+  TH1* histhad_physicsresultsH = findHist("PhysicsObjectsMiraBelleHadron/hist_physicsresultsH");
+
+  if (histhad_nECLClusters == nullptr) {
+    B2ERROR("Can not find the histhad_nECLClusters histogram!");
+    return;
+  }
+  if (histhad_visibleEnergyCMSnorm == nullptr) {
+    B2ERROR("Can not find the histhad_visibleEnergyCMSnorm histogram!");
+    return;
+  }
+  if (histhad_EsumCMSnorm == nullptr) {
+    B2ERROR("Can not find the histhad_EsumCMSnorm histogram!");
+    return;
+  }
+  if (histhad_R2 == nullptr) {
+    B2ERROR("Can not find the histhad_R2 histogram!");
+    return;
+  }
+  if (histhad_physicsresultsH == nullptr) {
+    B2ERROR("Can not find the histhad_physicsresultsH histogram!");
+    return;
+  }
+
   // Make TCanvases
   // --- hadron_Main
   hadron_main->Divide(2, 2);
@@ -625,11 +1055,11 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   hadron_main->cd(3);  histhad_EsumCMSnorm->Draw();
   hadron_main->cd(4);  histhad_R2->Draw();
   // calculate the values of monitoring variables
-  float had_ntot = histhad_R2->GetEntries();
+  double had_ntot = histhad_physicsresultsH->GetBinContent(3);
 
-  float ratio_hadron_bhabha = -1.;
+  double ratio_hadron_bhabha = -1.;
   if (bh_ntot != 0) {
-    ratio_hadron_bhabha = bh_pval_less05 / (float)bh_ntot;
+    ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
   } else {
     ratio_hadron_bhabha = 0;
   }

@@ -110,6 +110,10 @@ namespace Belle2 {
     m_backgroundHits->SetMinimum(0);
     m_backgroundHits->GetXaxis()->SetNdivisions(16);
 
+    m_trackHits = new TH2F("trackHits", "Number of events w/ and w/o track in the slot", 16, 0.5, 16.5, 2, 0, 2);
+    m_trackHits->SetXTitle("slot number");
+    m_trackHits->SetYTitle("numTracks > 0");
+
     int nbinsHits = 1000;
     double xmaxHits = 10000;
     m_goodHitsPerEventAll = new TH1F("goodHitsPerEventAll", "Number of good hits per event", nbinsHits, 0, xmaxHits);
@@ -272,6 +276,7 @@ namespace Belle2 {
     m_timeBG->Reset();
     m_signalHits->Reset();
     m_backgroundHits->Reset();
+    m_trackHits->Reset();
     m_goodTDCAll->Reset();
     m_badTDCAll->Reset();
     m_goodHitsPerEventAll->Reset();
@@ -339,6 +344,15 @@ namespace Belle2 {
       if (slot == 0) continue;
       numTracks[slot - 1]++;
       trackMomenta[slot - 1] = std::max(trackMomenta[slot - 1], fitResult->getMomentum().R());
+    }
+
+    // count events w/ and w/o track in the slot
+
+    if (recBunchValid or cosmics) {
+      for (size_t i = 0; i < numTracks.size(); i++) {
+        bool hit = numTracks[i] > 0;
+        m_trackHits->Fill(i + 1, hit);
+      }
     }
 
     // select modules for counting hits in signal and background time windows

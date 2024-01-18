@@ -84,11 +84,11 @@ _RegisteredSkims = [
     ("14140200", "btocharm", "BtoD0h_Kshh"),
     ("14141000", "btocharm", "BtoD0rho_Kpi"),
     ("14141001", "btocharm", "BtoD0rho_Kpipipi_Kpipi0"),
-    ("14160200", "btocharm", "B0toDDs0star"),
     ("14141002", "btocharm", "B0toDD_Kpipi_Kspi"),
     ("14141003", "btocharm", "B0toDstarD"),
     ("14121300", "btocharm", "B0toD0Kpipi0_pi0"),
     ("14160200", "btocharm", "B0toDs1D"),
+    ("14160201", "btocharm", "B0toDDs0star"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),

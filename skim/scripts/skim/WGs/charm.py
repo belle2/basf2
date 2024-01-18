@@ -63,15 +63,15 @@ def charm_skim_std_charged(particle_type, path):
 class XToD0_D0ToHpJm(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`\\D^{0} \\to \\pi^+ \\pi^-`
-        * :math:`\\D^{0} \\to \\pi^+ K^-`
-        * :math:`\\D^{0} \\to K^+ \\pi^-`
-        * :math:`\\D^{0} \\to K^+ K^-`
+        * :math:`D^{0}\\to \\pi^+ \\pi^-`,
+        * :math:`D^{0}\\to K^+ \\pi^-`,
+        * :math:`D^{0}\\to K^- \\pi^+`,
+        * :math:`D^{0}\\to K^+ K^-`,
 
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
-        * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
-        * K/pi binary ID > 0.2, pi_pionIDNN > 0.1
+        * ``1.70 < M(D0) < 2.00, pcms(D0) > 2.0``
+        * `` K/pi binary ID > 0.2, pi_pionIDNN > 0.1``
         * For more details, please check the source code of this skim.
 
     """
@@ -99,7 +99,7 @@ class XToD0_D0ToHpJm(BaseSkim):
         ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
-        D0Cuts = "1.66 < M < 2.06 and useCMSFrame(p) > 2.0"
+        D0Cuts = "1.70 < M < 2.00 and useCMSFrame(p) > 2.0"
         D0Channels = ["pi+:charmSkim_pid pi-:charmSkim_pid",
                       "pi+:charmSkim_pid K-:charmSkim_pid",
                       "K+:charmSkim_pid pi-:charmSkim_pid",

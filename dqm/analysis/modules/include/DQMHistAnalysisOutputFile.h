@@ -74,7 +74,7 @@ namespace Belle2 {
     bool m_savePerEvent;/**< Whether save to file per event */
     bool m_savePerRun;/**< Whether save to file per run */
 
-    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr;/**< event metadata object*/
 
   };
 } // end namespace Belle2

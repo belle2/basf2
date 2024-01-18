@@ -488,12 +488,25 @@ class CommandIoVsHelper:
     """
 
     def __init__(self, whichcommand, args, db):
-        """initialization, just remember the arguments or parser and the database instance"""
+        """initialization, just remember the arguments or parser and the database instance
+
+        Args:
+            whichcommand (str): from whichcommand it is called (copy, delete or modify)
+            args (argparse.ArgumentParser): where to append new arguments
+            db (conditions_db.ConditionsDB): database instance to be used
+        """
+
+        # from whichcommand it is called (copy, delete or modify)
         self.whichcommand = whichcommand
+        # argparse.ArgumentParser instance
         self._args = args
+        # conditions_db.ConditionsDB instance
         self.db = db
+        # ItemFilter
         self.iovfilter = ItemFilter(args)
+        # number of iovs before payload and revision selection
         self.num_all_iovs = None
+        # Dictionary with past participles
         self.past_dict = {"delete": "deleted", "modify": "modified", "copy": "copied", "create": "created"}
 
     def add_arguments(self):
@@ -524,6 +537,10 @@ class CommandIoVsHelper:
         self._args.add_argument("--fully-contained", action="store_true",
                                 help="If given together with --run_range limit the list of payloads "
                                 "to the ones fully contained in the given run range")
+        if self.whichcommand == "copy":
+            self._args.add_argument("--set-run-range", action="store_true",
+                                    help="If given together with --run_range modify the interval of validity"
+                                    " of partially overlapping iovs to be fully contained in the given run range")
         self.iovfilter.add_arguments("payloads")
         self._args.add_argument("--revision", metavar='revision', type=int,
                                 help="Specify the revision of the payload to be removed")
@@ -628,9 +645,11 @@ def command_iovs_copy(args, db=None):
 
     iovs_to_copy = command_iovs_helper.get_iovs()
 
-    # make sure that there are no overlaps in the iovs to copy
+    # make sure that there are no overlaps in the iovs to copy and set run range if needed
     by_name = defaultdict(lambda: IoVSet(allow_overlaps=False))
     for iov in iovs_to_copy:
+        if args.run_range and args.set_run_range:
+            iov.iov = (IntervalOfValidity(*iov.iov) & IntervalOfValidity(*args.run_range)).tuple
         try:
             by_name[iov.name].add(iov.iov)
         except ValueError as e:

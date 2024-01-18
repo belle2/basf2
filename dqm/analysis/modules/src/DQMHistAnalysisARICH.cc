@@ -251,7 +251,9 @@ void DQMHistAnalysisARICHModule::event()
 
   // for convenience I make this independent of the DB payloads... (it will never change)
   double ringApdAvg[7] = {0.};
-  int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
+
+  const int hapdInRing[7] = {42, 48, 54, 60, 66, 72, 78};
+
   // average in hapd ring
   for (int i = 1; i < 1681; i++) {
     int hapd = (i - 1) / 4 + 1;

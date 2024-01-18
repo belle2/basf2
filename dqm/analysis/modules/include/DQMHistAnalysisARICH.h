@@ -68,6 +68,10 @@ namespace Belle2 {
      */
     void terminate() override final;
 
+    /**
+     * Returns ring number of HAPD with given moduleID
+     * @param modID HAPD module ID
+     */
     int getRing(int modID);
 
 

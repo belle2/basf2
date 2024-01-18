@@ -507,16 +507,16 @@ class CommandIoVsHelper:
             self._args.add_argument("new_iov", metavar="NEW_IOV", help="New iov to be set to all considered iovs."
                                     " It should be a string with 4 numbers separated by spaces."
                                     " Use * to mark the fields that should not be modified. For example"
-                                    " if '7 0 * *' is given the iov '7 1 9 42' will become '7 0 9 42'.")
+                                    " if 7 0 * * is given the iov (7, 1, 9, 42) will become (7 0 9 42).")
         self._args.add_argument("--iov-id", default=None, type=int,
                                 help="IoVid of the iov to be considered")
         self._args.add_argument(
             "--iov-pattern",
             default=None,
             help="whitespace-separated string with pattern of the iov to be replaced. "
-            " Use * to mark the fields that shold be ignored. Valid patterns are '0 0 -1 -1'"
-            " (a very specific IoV),  '0 * -1 -1' (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
-            ", '* * 3 45' (any Iov ending in exp 3, run 45, regardless from where it starts).")
+            " Use * to mark the fields that shold be ignored. Valid patterns are 0 0 -1 -1"
+            " (a very specific IoV),  0 * -1 -1 (any iov that starts in any run of exp 0 and ends exactly in exp -1, run -1)"
+            ", * * 3 45 (any Iov ending in exp 3, run 45, regardless from where it starts).")
         self._args.add_argument("--run-range", nargs=4, default=None, type=int,
                                 metavar=("FIRST_EXP", "FIRST_RUN", "FINAL_EXP", "FINAL_RUN"),
                                 help="Can be four numbers to limit the run range to be considered"

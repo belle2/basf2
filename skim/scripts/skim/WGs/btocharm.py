@@ -1060,6 +1060,63 @@ class B0toDstarD(BaseSkim):
 
 
 @fancy_skim_header
+class B0toDDs0star(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to D_{s0}^{*+} (\\to D_{s}^{+} (\\to \\phi (\\to K^+ K^-) \\pi^+ \\pi^0) \\pi^0) D^{-} (\\to K^+ \\pi^- \\pi^-)`
+    * :math:`B^{0}\\to D_{s0}^{*+} (\\to D_{s}^{+} (\\to \\overline{K}{}^{*0} (\\to K^- \\pi^+ ) K^+) \\pi^0) D^{-}
+      (\\to K^+ \\pi^- \\pi^-)`
+    * :math:`B^{0}\\to D_{s0}^{*+} (\\to D_{s}^{+} (\\to \\phi (\\to K^+ K^-) \\pi^+) \\pi^0) D^{-} (\\to K^+ \\pi^- \\pi^-)`
+
+    Cuts applied:
+
+    * ``5.2 < Mbc < 5.3``
+    * ``abs(deltaE) < 0.2``
+    * ``0.31 < D_s0ST_massDifference_0 < 0.347``
+    """
+
+    __authors__ = ["Kuanying Wu"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    produce_on_tau_samples = False  # retention is very close to zero on taupair
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+        loadStdPi0ForBToHadrons(path=path)
+
+    def build_lists(self, path):
+        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",
+                            cut="[1.01 < M < 1.03]", path=path)
+        ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",
+                            cut="[0.793 < M < 1.015]", path=path)
+        ma.reconstructDecay("D_s+:phipipi0 -> phi pi+:GoodTrack pi0:bth_skim",
+                            cut="[1.942 < M < 1.978]", path=path)
+        ma.reconstructDecay("D_s+:antiKK -> anti-K*0 K+:GoodTrack",
+                            cut="[1.944 < M < 1.992]", path=path)
+        ma.reconstructDecay("D_s+:phipi -> phi pi+:GoodTrack",
+                            cut="[1.935 < M < 1.999]", path=path)
+        Dslist = ['D_s+:phipipi0', 'D_s+:antiKK', 'D_s+:phipi']
+        ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)
+
+        ma.reconstructDecay("D_s0*+ -> D_s+:all pi0:bth_skim",
+                            cut="[2.249 < M < 2.298] and [0.31 < massDifference(0) < 0.347] and \
+                            [1.017 < p < 2.552]", path=path)
+
+        ma.reconstructDecay("B0:B0toDDs0star -> D_s0*+ D-:Kpipi",
+                            cut="[5.2 < Mbc < 5.3] and \
+                            [-0.2 < deltaE < 0.2]", path=path)
+
+        return ["B0:B0toDDs0star"]
+
+
+@fancy_skim_header
 class B0toD0Kpipi0_pi0(BaseSkim):
     """
     Reconstructed decay modes:

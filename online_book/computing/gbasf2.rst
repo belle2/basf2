@@ -73,6 +73,21 @@ and verify that you have the prerequisites. You need:
 Setting up gbasf2 via cvmfs
 ---------------------------
 
+Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
+gbasf2 can function. At this moment, only SL6 and CentOS 7 are supported.
+
+Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
+a fresh ssh session (without sourcing ``b2setup``).
+
+.. note::
+
+    Be sure that the userkey.pem has the ``rw`` permissions only for the owner and no permission to the others.
+    You should see ``-rw-------`` with ``ls -l ~/.globus/userkey.pem``. Otherwise, use
+
+    .. code-block:: bash
+
+        chmod 600 ~/.globus/userkey.pem
+
 If your computing system has access to cvmfs (e.g. at KEKCC), the simplest way to use gbasf2 is via a central installation. The following command sets all the necessary environment variables and initializes a grid proxy for you (you will be asked to enter your credentials for this).
 
 .. code-block:: bash
@@ -99,6 +114,8 @@ It will request your certificate passphrase. If the command finishes without err
     Succeed with return value:
     0
 
+If you are not asked for your passphrase, you may need to initialize a proxy yourself using ``gb2_prxy_init -g belle``.
+
 That's it! You are ready to run grid jobs!
 
 A proxy is a short-term credential that verifies your identity, allowing you to perform operations on the grid. By default your proxy is valid for 24h. If it expires, you need to execute ``gb2_proxy_init -g belle`` again if you have already setup gbasf2 in the same shell (terminal).
@@ -112,65 +129,9 @@ A proxy is a short-term credential that verifies your identity, allowing you to 
 Installing gbasf2
 -----------------
 
-Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
-gbasf2 can function. At this moment, only SL6 and CentOS 7 are supported.
+The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the `gbasf2 documentation <https://gbasf2.belle2.org/gbasf2install.html>`_.
 
-Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
-a fresh ssh session (without sourcing ``b2setup``).
-
-.. note::
-
-    Be sure that the userkey.pem has the ``rw`` permissions only for the owner and no permission to the others.
-    You should see ``-rw-------`` with ``ls -l ~/.globus/userkey.pem``. Otherwise, use
-
-    .. code-block:: bash
-
-        chmod 600 ~/.globus/userkey.pem
-
-
-Open a terminal and create a directory to store your gbasf2 installation. Inside, let's download the
-installation script:
-
-.. code-block:: bash
-
-        mkdir gbasf2 && cd gbasf2
-        wget -N http://dirac.cc.kek.jp/dirac/dirac-install.py
-        python dirac-install.py -V Belle-KEK
-
-Execute the installation script specifying the installation type with ``-V Belle-KEK``:
-
-.. code-block:: bash
-
-        python dirac-install.py -V Belle-KEK
-
-Check that the execution finished without errors.
-
-.. tip::
-
-    If you see error messages,
-    a `gbasf2 troubleshooting <https://confluence.desy.de/display/BI/GBasf2+Troubleshooting>`_ is available.
-
-Proceed to the post-installation configuration:
-
-.. code-block:: bash
-
-        source bashrc && dirac-proxy-init -x
-        dirac-configure --cfg defaults-Belle-KEK.cfg
-
-Setting your gbasf2 environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-Once the above installation is done, you only need to execute two commands every time that you open a new terminal:
-
-.. code-block:: bash
-
-        source ~/gbasf2/BelleDIRAC/gbasf2/tools/setup
-        gb2_proxy_init -g belle
-
-It will ask for your certificate password before generating your credentials. Once created, your proxy will be valid
-for 24 hours. You just need to execute ``gb2_proxy_init -g belle`` again if your credentials expire.
-
-.. seealso:: https://confluence.desy.de/display/BI/Computing+GBasf2
+.. seealso:: https://gbasf2.belle2.org/
 
 
 Locating datasets on the grid
@@ -185,7 +146,7 @@ The most common task as user of the grid is the submission of jobs with input fi
 Files are stored around the world in the different storage elements.
 Fortunately, as users, you don't have to worry about the physical location.
 A file catalog keeps the record of where the files are located, and you just need to provide a logical identifier
-of the interesting samples for your analysis.
+of the samples of interest for your analysis.
 
 Datasets and Datablocks
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -263,7 +224,7 @@ The Dataset Searcher
 
 The Dataset Searcher is a web application to find datasets on the grid.
 Go to the `DIRAC webportal <https://dirac.cc.kek.jp:8443/DIRAC/>`_ and then open
-Menu (the icon at the left-bottom) -> BelleDIRACApps -> Dataset Searcher.
+Menu (the icon at the left-bottom) -> BelleDIRAC Apps -> Dataset Searcher.
 
 You have the option of searching between data or MC, samples
 with beam background (BGx1) or without (BGx0), and several other fields to refine your search. Play with all the

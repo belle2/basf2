@@ -496,17 +496,17 @@ class CommandIoVsHelper:
             db (conditions_db.ConditionsDB): database instance to be used
         """
 
-        # from whichcommand it is called (copy, delete or modify)
+        #: from whichcommand it is called (copy, delete or modify)
         self.whichcommand = whichcommand
-        # argparse.ArgumentParser instance
+        #: argparse.ArgumentParser instance
         self._args = args
-        # conditions_db.ConditionsDB instance
+        #: conditions_db.ConditionsDB instance
         self.db = db
-        # ItemFilter
+        #: ItemFilter
         self.iovfilter = ItemFilter(args)
-        # number of iovs before payload and revision selection
+        #: number of iovs before payload and revision selection
         self.num_all_iovs = None
-        # Dictionary with past participles
+        #: Dictionary with past participles
         self.past_dict = {"delete": "deleted", "modify": "modified", "copy": "copied", "create": "created"}
 
     def add_arguments(self):

@@ -95,6 +95,7 @@ namespace Belle2 {
     TH1F* m_timeBG = 0; /**< time distribution of good hits (background) */
     TProfile* m_signalHits = 0; /**< number of hits in the signal time window vs. slot number */
     TProfile* m_backgroundHits = 0; /**< number of hits in the background time window vs. slot number */
+    TH2F* m_trackHits = 0; /**< counting events w/ and w/o track in the slot vs. slot number */
 
     TH1F* m_goodHitsPerEventAll = 0; /**< Number of good hits per event (all slots) */
     TH1F* m_badHitsPerEventAll = 0;  /**< Number of bad hits per event (all slots) */

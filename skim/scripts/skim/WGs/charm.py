@@ -368,7 +368,7 @@ class LambdacTopHpJm(BaseSkim):
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
-        stdPr("all", path=path)
+        stdPr("loose", path=path)
 
     def build_lists(self, path):
 

@@ -48,8 +48,8 @@ PhysicsObjectsMiraBelleHadronModule::PhysicsObjectsMiraBelleHadronModule() : His
 void PhysicsObjectsMiraBelleHadronModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  TDirectory* physicshadronDir = oldDir->mkdir("PhysicsObjectsMiraBelleHadron");
-  physicshadronDir->cd();
+  oldDir->mkdir("PhysicsObjectsMiraBelleHadron");
+  oldDir->cd("PhysicsObjectsMiraBelleHadron");
 
   // Mass distributions
   m_h_nECLClusters = new TH1F("hist_nECLClusters", "hist_nECLClusters", 100, 0, 60);

@@ -47,8 +47,8 @@ PhysicsObjectsMiraBelleModule::PhysicsObjectsMiraBelleModule() : HistoModule()
 void PhysicsObjectsMiraBelleModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  TDirectory* physicsObjDir = oldDir->mkdir("PhysicsObjectsMiraBelle");
-  physicsObjDir->cd();
+  oldDir->mkdir("PhysicsObjectsMiraBelle");
+  oldDir->cd("PhysicsObjectsMiraBelle");
 
   m_h_npxd = new TH1F("hist_npxd", "hist_npxd", 100, 0, 5);
   m_h_npxd->SetXTitle("hist_npxd");

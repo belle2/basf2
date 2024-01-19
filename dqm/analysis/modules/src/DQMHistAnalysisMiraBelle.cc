@@ -249,49 +249,49 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mumu_muon_val->cd(4);  hist_Phi0->Draw();
 
   // calculate the values of monitoring variables
-  float mean_npxd = hist_npxd->GetMean();
-  float mean_nsvd = hist_nsvd->GetMean();
-  float mean_ncdc = hist_ncdc->GetMean();
-  float mean_nklmlayer = hist_klmClusterLayers->GetMean();
-  float mean_nklm = hist_klmTotalHits->GetMean();
-  float mean_nbklm = hist_klmTotalBarrelHits->GetMean();
-  float mean_neklm = hist_klmTotalEndcapHits->GetMean();
-  float mean_topdig = hist_topdig->GetMean();
-  float mean_parich = hist_DetPhotonARICH->GetMean();
-  float mean_ncdc_ex = hist_nExtraCDCHits->GetMean();
-  float mean_necl = hist_nECLClusters->GetMean();
-  float mean_muid = hist_muid->GetMean();
-  float mean_d0 = hist_D0->GetMean();
-  float mean_z0 = hist_Z0->GetMean();
-  float mean_pval = hist_Pval->GetMean();
-  float mean_ndf = hist_ndf->GetMean();
-  float dif_ndf_ncdc = mean_ndf - mean_ncdc;
-  float mean_dd0 = hist_dD0->GetMean();
-  float mean_dz0 = hist_dZ0->GetMean();
-  float mean_dpt = hist_dPtcms->GetMean();
-  float rms_dd0 = hist_dD0->GetRMS();
-  float rms_dz0 = hist_dZ0->GetRMS();
-  float rms_dpt = hist_dPtcms->GetRMS();
-  float sigma68_dd0 = getSigma68(hist_dD0);
-  float sigma68_dz0 = getSigma68(hist_dZ0);
-  float sigma68_dpt = getSigma68(hist_dPtcms);
+  double mean_npxd = hist_npxd->GetMean();
+  double mean_nsvd = hist_nsvd->GetMean();
+  double mean_ncdc = hist_ncdc->GetMean();
+  double mean_nklmlayer = hist_klmClusterLayers->GetMean();
+  double mean_nklm = hist_klmTotalHits->GetMean();
+  double mean_nbklm = hist_klmTotalBarrelHits->GetMean();
+  double mean_neklm = hist_klmTotalEndcapHits->GetMean();
+  double mean_topdig = hist_topdig->GetMean();
+  double mean_parich = hist_DetPhotonARICH->GetMean();
+  double mean_ncdc_ex = hist_nExtraCDCHits->GetMean();
+  double mean_necl = hist_nECLClusters->GetMean();
+  double mean_muid = hist_muid->GetMean();
+  double mean_d0 = hist_D0->GetMean();
+  double mean_z0 = hist_Z0->GetMean();
+  double mean_pval = hist_Pval->GetMean();
+  double mean_ndf = hist_ndf->GetMean();
+  double dif_ndf_ncdc = mean_ndf - mean_ncdc;
+  double mean_dd0 = hist_dD0->GetMean();
+  double mean_dz0 = hist_dZ0->GetMean();
+  double mean_dpt = hist_dPtcms->GetMean();
+  double rms_dd0 = hist_dD0->GetRMS();
+  double rms_dz0 = hist_dZ0->GetRMS();
+  double rms_dpt = hist_dPtcms->GetRMS();
+  double sigma68_dd0 = getSigma68(hist_dD0);
+  double sigma68_dz0 = getSigma68(hist_dZ0);
+  double sigma68_dpt = getSigma68(hist_dPtcms);
   int ntot = hist_nsvd->GetEntries();
   double neve_mumu = ntot;
-  double goodmu_frac;
-  double pval_frac_0;
-  double pval_frac_1;
-  double nocdc_frac;
-  double notop_frac;
-  double noarich_frac;
+  double goodmu_frac = -1.;
+  double pval_frac_0 = -1.;
+  double pval_frac_1 = -1.;
+  double nocdc_frac = -1.;
+  double notop_frac = -1.;
+  double noarich_frac = -1.;
   double muidcontent = hist_muid->GetBinContent(1);
-  double goodmu_o_badmu;
+  double goodmu_o_badmu = -1.;
   if (muidcontent != 0) {
     goodmu_o_badmu = hist_muid->GetBinContent(20) / muidcontent;
   } else {
     goodmu_o_badmu = 0.0;
   }
-  float pval_more95 = 0;
-  float pval_less05 = 0;
+  double pval_more95 = 0.0;
+  double pval_less05 = 0.0;
   for (int i = 95; i < 100; i++) pval_more95 += hist_Pval->GetBinContent(i + 1);
   for (int i = 0; i < 5; i++) pval_less05 += hist_Pval->GetBinContent(i + 1);
   if (ntot != 0) {
@@ -310,15 +310,15 @@ void DQMHistAnalysisMiraBelleModule::endRun()
     noarich_frac = 0.0;
   }
   //Calculate M(mumu)
-  float peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
+  double peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
   TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
   f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.045);
   f_mumuInvM->SetParLimits(1, peak_mumu - 0.04, peak_mumu + 0.04);
   f_mumuInvM->SetParLimits(2, 0.01, 0.06);
   hist_inv_p->Fit(f_mumuInvM, "R");
-  float fit_mumumass = f_mumuInvM->GetParameter(1);
-  if (fit_mumumass < 9) fit_mumumass = 9;
-  if (fit_mumumass > 12) fit_mumumass = 12;
+  double fit_mumumass = f_mumuInvM->GetParameter(1);
+  if (fit_mumumass < 9.) fit_mumumass = 9.;
+  if (fit_mumumass > 12.) fit_mumumass = 12.;
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
@@ -606,13 +606,13 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   // D->KPi and D->KPiPi0 yields
   TF1* f_gaus_InvM = new TF1("f_gaus_InvM", "gaus", 1.81, 1.95);
   f_gaus_InvM->SetParameters(f_InvM->GetParameter(0), f_InvM->GetParameter(1), f_InvM->GetParameter(2));
-  float InvM_bin_width = hist_D0_InvM->GetXaxis()->GetBinWidth(1);
-  float neve_dst = f_gaus_InvM->Integral(1.81, 1.95) / InvM_bin_width;
+  double InvM_bin_width = hist_D0_InvM->GetXaxis()->GetBinWidth(1);
+  double neve_dst = f_gaus_InvM->Integral(1.81, 1.95) / InvM_bin_width;
 
   TF1* f_gaus_pi0_InvM = new TF1("f_gaus_pi0_InvM", "gaus", 0.09, 0.17);
   f_gaus_pi0_InvM->SetParameters(f_pi0_InvM->GetParameter(0), f_pi0_InvM->GetParameter(1), f_pi0_InvM->GetParameter(2));
-  float pi0_InvM_bin_width = hist_D0_pi0_InvM->GetXaxis()->GetBinWidth(1);
-  float neve_pi0 = f_gaus_pi0_InvM->Integral(0.09, 0.17) / pi0_InvM_bin_width;
+  double pi0_InvM_bin_width = hist_D0_pi0_InvM->GetXaxis()->GetBinWidth(1);
+  double neve_pi0 = f_gaus_pi0_InvM->Integral(0.09, 0.17) / pi0_InvM_bin_width;
 
   // Sumw2
   hist_D0_softpi_PID_ALL_pion->Sumw2();
@@ -736,33 +736,33 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   dst_k_val->cd(7);  hist_D0_K_PID_KLM_kaon->Draw();
 
   // calculate the values of monitoring variables
-  float mean_D0_InvM = f_InvM->GetParameter(1);
-  float width_D0_InvM = f_InvM->GetParameter(2);
-  float mean_delta_m = f_delta_m->GetParameter(1);
-  float width_delta_m = f_delta_m->GetParameter(2);
-  float mean_pi0_InvM = f_pi0_InvM->GetParameter(1);
-  float width_pi0_InvM = f_pi0_InvM->GetParameter(2);
-  float mean_D0_softpi_PID_ALL_pion = hist_D0_softpi_PID_ALL_pion->GetMean();
-  float mean_D0_softpi_PID_SVD_pion = hist_D0_softpi_PID_SVD_pion->GetMean();
-  float mean_D0_softpi_PID_CDC_pion = hist_D0_softpi_PID_CDC_pion->GetMean();
-  float mean_D0_softpi_PID_TOP_pion = hist_D0_softpi_PID_TOP_pion->GetMean();
-  float mean_D0_softpi_PID_ARICH_pion = hist_D0_softpi_PID_ARICH_pion->GetMean();
-  float mean_D0_softpi_PID_ECL_pion = hist_D0_softpi_PID_ECL_pion->GetMean();
-  float mean_D0_softpi_PID_KLM_pion = hist_D0_softpi_PID_KLM_pion->GetMean();
-  float mean_D0_pi_PID_ALL_pion = hist_D0_pi_PID_ALL_pion->GetMean();
-  float mean_D0_pi_PID_SVD_pion = hist_D0_pi_PID_SVD_pion->GetMean();
-  float mean_D0_pi_PID_CDC_pion = hist_D0_pi_PID_CDC_pion->GetMean();
-  float mean_D0_pi_PID_TOP_pion = hist_D0_pi_PID_TOP_pion->GetMean();
-  float mean_D0_pi_PID_ARICH_pion = hist_D0_pi_PID_ARICH_pion->GetMean();
-  float mean_D0_pi_PID_ECL_pion = hist_D0_pi_PID_ECL_pion->GetMean();
-  float mean_D0_pi_PID_KLM_pion = hist_D0_pi_PID_KLM_pion->GetMean();
-  float mean_D0_K_PID_ALL_kaon = hist_D0_K_PID_ALL_kaon->GetMean();
-  float mean_D0_K_PID_SVD_kaon = hist_D0_K_PID_SVD_kaon->GetMean();
-  float mean_D0_K_PID_CDC_kaon = hist_D0_K_PID_CDC_kaon->GetMean();
-  float mean_D0_K_PID_TOP_kaon = hist_D0_K_PID_TOP_kaon->GetMean();
-  float mean_D0_K_PID_ARICH_kaon = hist_D0_K_PID_ARICH_kaon->GetMean();
-  float mean_D0_K_PID_ECL_kaon = hist_D0_K_PID_ECL_kaon->GetMean();
-  float mean_D0_K_PID_KLM_kaon = hist_D0_K_PID_KLM_kaon->GetMean();
+  double mean_D0_InvM = f_InvM->GetParameter(1);
+  double width_D0_InvM = f_InvM->GetParameter(2);
+  double mean_delta_m = f_delta_m->GetParameter(1);
+  double width_delta_m = f_delta_m->GetParameter(2);
+  double mean_pi0_InvM = f_pi0_InvM->GetParameter(1);
+  double width_pi0_InvM = f_pi0_InvM->GetParameter(2);
+  double mean_D0_softpi_PID_ALL_pion = hist_D0_softpi_PID_ALL_pion->GetMean();
+  double mean_D0_softpi_PID_SVD_pion = hist_D0_softpi_PID_SVD_pion->GetMean();
+  double mean_D0_softpi_PID_CDC_pion = hist_D0_softpi_PID_CDC_pion->GetMean();
+  double mean_D0_softpi_PID_TOP_pion = hist_D0_softpi_PID_TOP_pion->GetMean();
+  double mean_D0_softpi_PID_ARICH_pion = hist_D0_softpi_PID_ARICH_pion->GetMean();
+  double mean_D0_softpi_PID_ECL_pion = hist_D0_softpi_PID_ECL_pion->GetMean();
+  double mean_D0_softpi_PID_KLM_pion = hist_D0_softpi_PID_KLM_pion->GetMean();
+  double mean_D0_pi_PID_ALL_pion = hist_D0_pi_PID_ALL_pion->GetMean();
+  double mean_D0_pi_PID_SVD_pion = hist_D0_pi_PID_SVD_pion->GetMean();
+  double mean_D0_pi_PID_CDC_pion = hist_D0_pi_PID_CDC_pion->GetMean();
+  double mean_D0_pi_PID_TOP_pion = hist_D0_pi_PID_TOP_pion->GetMean();
+  double mean_D0_pi_PID_ARICH_pion = hist_D0_pi_PID_ARICH_pion->GetMean();
+  double mean_D0_pi_PID_ECL_pion = hist_D0_pi_PID_ECL_pion->GetMean();
+  double mean_D0_pi_PID_KLM_pion = hist_D0_pi_PID_KLM_pion->GetMean();
+  double mean_D0_K_PID_ALL_kaon = hist_D0_K_PID_ALL_kaon->GetMean();
+  double mean_D0_K_PID_SVD_kaon = hist_D0_K_PID_SVD_kaon->GetMean();
+  double mean_D0_K_PID_CDC_kaon = hist_D0_K_PID_CDC_kaon->GetMean();
+  double mean_D0_K_PID_TOP_kaon = hist_D0_K_PID_TOP_kaon->GetMean();
+  double mean_D0_K_PID_ARICH_kaon = hist_D0_K_PID_ARICH_kaon->GetMean();
+  double mean_D0_K_PID_ECL_kaon = hist_D0_K_PID_ECL_kaon->GetMean();
+  double mean_D0_K_PID_KLM_kaon = hist_D0_K_PID_KLM_kaon->GetMean();
 
   // set values
   mon_dst->setVariable("neve_dst", neve_dst);
@@ -931,36 +931,36 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   bhabha_resolution->cd(8);  histbh_ndf->Draw();
 
   // calculate the values of monitoring variables
-  float bh_mean_npxd = histbh_npxd->GetMean();
-  float bh_mean_nsvd = histbh_nsvd->GetMean();
-  float bh_mean_ncdc = histbh_ncdc->GetMean();
-  float bh_mean_topdig = histbh_topdig->GetMean();
-  float bh_mean_parich = histbh_DetPhotonARICH->GetMean();
-  float bh_mean_ncdc_ex = histbh_nExtraCDCHits->GetMean();
-  float bh_mean_necl = histbh_nECLClusters->GetMean();
-  float bh_mean_electronid = histbh_electronid->GetMean();
-  float bh_mean_d0 = histbh_D0->GetMean();
-  float bh_mean_z0 = histbh_Z0->GetMean();
-  float bh_mean_pval = histbh_Pval->GetMean();
-  float bh_mean_ndf = histbh_ndf->GetMean();
-  float bh_dif_ndf_ncdc = mean_ndf - mean_ncdc;
-  float bh_mean_dd0 = histbh_dD0->GetMean();
-  float bh_mean_dz0 = histbh_dZ0->GetMean();
-  float bh_mean_dpt = histbh_dPtcms->GetMean();
-  float bh_rms_dd0 = histbh_dD0->GetRMS();
-  float bh_rms_dz0 = histbh_dZ0->GetRMS();
-  float bh_rms_dpt = histbh_dPtcms->GetRMS();
-  float bh_sigma68_dd0 = getSigma68(histbh_dD0);
-  float bh_sigma68_dz0 = getSigma68(histbh_dZ0);
-  float bh_sigma68_dpt = getSigma68(histbh_dPtcms);
+  double bh_mean_npxd = histbh_npxd->GetMean();
+  double bh_mean_nsvd = histbh_nsvd->GetMean();
+  double bh_mean_ncdc = histbh_ncdc->GetMean();
+  double bh_mean_topdig = histbh_topdig->GetMean();
+  double bh_mean_parich = histbh_DetPhotonARICH->GetMean();
+  double bh_mean_ncdc_ex = histbh_nExtraCDCHits->GetMean();
+  double bh_mean_necl = histbh_nECLClusters->GetMean();
+  double bh_mean_electronid = histbh_electronid->GetMean();
+  double bh_mean_d0 = histbh_D0->GetMean();
+  double bh_mean_z0 = histbh_Z0->GetMean();
+  double bh_mean_pval = histbh_Pval->GetMean();
+  double bh_mean_ndf = histbh_ndf->GetMean();
+  double bh_dif_ndf_ncdc = mean_ndf - mean_ncdc;
+  double bh_mean_dd0 = histbh_dD0->GetMean();
+  double bh_mean_dz0 = histbh_dZ0->GetMean();
+  double bh_mean_dpt = histbh_dPtcms->GetMean();
+  double bh_rms_dd0 = histbh_dD0->GetRMS();
+  double bh_rms_dz0 = histbh_dZ0->GetRMS();
+  double bh_rms_dpt = histbh_dPtcms->GetRMS();
+  double bh_sigma68_dd0 = getSigma68(histbh_dD0);
+  double bh_sigma68_dz0 = getSigma68(histbh_dZ0);
+  double bh_sigma68_dpt = getSigma68(histbh_dPtcms);
   int bh_ntot = histbh_nsvd->GetEntries();
   double bh_neve_bhabha = bh_ntot;
-  double bh_goode_frac;
-  double bh_pval_frac_0;
-  double bh_pval_frac_1;
-  double bh_nocdc_frac;
-  double bh_notop_frac;
-  double bh_noarich_frac;
+  double bh_goode_frac = -1.;
+  double bh_pval_frac_0 = -1.;
+  double bh_pval_frac_1 = -1.;
+  double bh_nocdc_frac = -1.;
+  double bh_notop_frac = -1.;
+  double bh_noarich_frac = -1.;
   double eidcontent = histbh_electronid->GetBinContent(1);
   double bh_goode_o_bade;
   if (eidcontent != 0) {
@@ -968,8 +968,8 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   } else {
     bh_goode_o_bade = 0.0;
   }
-  double bh_pval_more95 = 0;
-  double bh_pval_less05 = 0;
+  double bh_pval_more95 = 0.0;
+  double bh_pval_less05 = 0.0;
   for (int i = 95; i < 100; i++) bh_pval_more95 += histbh_Pval->GetBinContent(i + 1);
   for (int i = 0; i < 5; i++) bh_pval_less05 += histbh_Pval->GetBinContent(i + 1);
   if (bh_neve_bhabha != 0) {
@@ -1061,7 +1061,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   if (bh_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
   } else {
-    ratio_hadron_bhabha = 0;
+    ratio_hadron_bhabha = 0.0;
   }
   // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);

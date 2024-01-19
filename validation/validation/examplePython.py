@@ -10,7 +10,7 @@
 
 """
 <header>
-<contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
+<contact>arul.prakash@physik.uni-muenchen.de</contact>
 <description>
 This file contains example for generating validation plots using python
 </description>

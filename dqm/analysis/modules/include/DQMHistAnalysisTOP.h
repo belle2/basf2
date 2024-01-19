@@ -148,6 +148,17 @@ namespace Belle2 {
     }
 
     /**
+     * Converts alarm state to official status (see EStatus of the base class)
+     * @param alarmState alarm state
+     * @return alarm status
+     */
+    int getOffcialAlarmStatus(unsigned alarmState) const
+    {
+      if (alarmState < m_officialStates.size()) return m_officialStates[alarmState];
+      return c_StatusDefault;
+    }
+
+    /**
      * Sets alarm lines.
      * @param alarmLevels alarm levels
      * @param xmin minimal x
@@ -202,6 +213,7 @@ namespace Belle2 {
     // other
 
     std::vector<int> m_alarmColors = {c_ColorTooFew, c_ColorGood, c_ColorWarning, c_ColorError}; /**< alarm colors (see base class) */
+    std::vector<int> m_officialStates = {c_StatusTooFew, c_StatusGood, c_StatusWarning, c_StatusError}; /**< official alarm states */
     std::vector<bool> m_includedBoardstacks; /**< boardstacks included in alarming */
     std::map<std::string, int> m_bsmap;  /**< a map of boardstack names to ID's */
     int m_alarmStateOverall = 0; /**< overall alarm state of histograms to be sent by EpicsPV */

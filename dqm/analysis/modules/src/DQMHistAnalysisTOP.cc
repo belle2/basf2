@@ -729,7 +729,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   int numBS = 0;
   for (auto included : m_includedBoardstacks) if (not included) numBS++;
   setEpicsPV("numExcludedBS", numBS);
-  setEpicsPV("histoAlarmState", m_alarmStateOverall);
+  setEpicsPV("histoAlarmState", getOffcialAlarmStatus(m_alarmStateOverall));
   updateEpicsPVs(5.0);
 
   B2DEBUG(20, "badBoardstacks: " << badBoardstacks);
@@ -737,7 +737,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   B2DEBUG(20, "badAsics: " << badAsics);
   B2DEBUG(20, "badPMTs: " << badPMTs);
   B2DEBUG(20, "excludedBS: " << numBS);
-  B2DEBUG(20, "histoAlarmState: " << m_alarmStateOverall);
+  B2DEBUG(20, "histoAlarmState: " << getOffcialAlarmStatus(m_alarmStateOverall));
 }
 
 void DQMHistAnalysisTOPModule::updateLimits()

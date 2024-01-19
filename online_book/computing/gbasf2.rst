@@ -77,9 +77,31 @@ If your computing system has access to cvmfs (e.g. at KEKCC), the simplest way t
 
 .. code-block:: bash
 
-    source /cvmfs/belle.kek.jp/grid/gbasf2/pro/setup.sh
+    source /cvmfs/belle.kek.jp/grid/gbasf2/pro/bashrc
+
+It will request your certificate passphrase. If the command finishes without errors and you see information related to your certificate, similar to that below, your proxy has been successfully set:
+
+.. code-block:: bash
+
+    Proxy generated:
+    subject      : /C=JP/O=KEK/OU=CRC/CN=USERNAME
+    issuer       : /C=JP/O=KEK/OU=CRC/CN=USERNAME
+    identity     : /C=JP/O=KEK/OU=CRC/CN=USERNAME
+    timeleft     : 23:53:58
+    DIRAC group  : belle
+    rfc          : True
+    path         : /tmp/x100up_u0001
+    username     : youruser
+    properties   : NormalUser
+    VOMS         : True
+    VOMS fqan    : ['/belle']
+
+    Succeed with return value:
+    0
 
 That's it! You are ready to run grid jobs!
+
+A proxy is a short-term credential that verifies your identity, allowing you to perform operations on the grid. By default your proxy is valid for 24h. If it expires, you need to execute ``gb2_proxy_init -g belle`` again if you have already setup gbasf2 in the same shell (terminal).
 
 .. note::
 

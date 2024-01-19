@@ -19,6 +19,7 @@ from top_calibration import BS13d_calibration_cdst
 from top_calibration import moduleT0_calibration_DeltaT, moduleT0_calibration_LL
 from top_calibration import commonT0_calibration_BF
 from top_calibration import offset_calibration
+from top_calibration import photonYields_calibration
 from top_calibration import calibration_validation
 from prompt.calibrations.caf_top_pre import settings as top_pretracking
 from prompt.utils import filter_by_max_files_per_run
@@ -53,7 +54,6 @@ def get_calibrations(input_data, **kwargs):
 
     file_to_iov = input_data["mumu_tight_or_highm_calib"]
     sample = 'dimuon'
-    requested_iov = kwargs.get("requested_iov", None)
     expert_config = kwargs.get("expert_config")
     max_files_per_run = expert_config["max_files_per_run"]
     min_events_per_file = 1
@@ -64,12 +64,27 @@ def get_calibrations(input_data, **kwargs):
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
 
-    cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
-           moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
-           moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
-           commonT0_calibration_BF(inputFiles),  # this is run-dep
-           offset_calibration(inputFiles),  # this is run-dep
-           calibration_validation(inputFiles, sample)]  # this is run-dep
+    # Run 2 calibration chain differs a bit from that of Run 1 (take Run 2 chain if requested_iov is not given)
+    if requested_iov.exp_low > 26 or requested_iov.exp_low <= 0:
+        basf2.B2INFO("Running Run 2 calibration chain for TOP")
+        cal = [moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
+               moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
+               commonT0_calibration_BF(inputFiles),  # this is run-dep
+               offset_calibration(inputFiles),  # this is run-dep
+               photonYields_calibration(inputFiles, sample),  # this cal cannot span across experiments
+               calibration_validation(inputFiles, sample)]  # this is run-dep
+        cal[0].save_payloads = False  # don't save the rough moduleT0 result
+        cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
+    else:
+        basf2.B2INFO("Running Run 1 calibration chain for TOP")
+        cal = [BS13d_calibration_cdst(inputFiles),  # this is run-dep
+               moduleT0_calibration_DeltaT(inputFiles),  # this cal cannot span across experiments
+               moduleT0_calibration_LL(inputFiles, sample),  # this cal cannot span across experiments
+               commonT0_calibration_BF(inputFiles),  # this is run-dep
+               offset_calibration(inputFiles),  # this is run-dep
+               calibration_validation(inputFiles, sample)]  # this is run-dep
+        cal[1].save_payloads = False  # don't save the rough moduleT0 result
+        cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
 
     for c in cal:
         # If it's a SequentialBoundary calibration, check if there is any boundary in the config file
@@ -91,15 +106,7 @@ def get_calibrations(input_data, **kwargs):
             for alg in c.algorithms:
                 alg.params = {"iov_coverage": output_iov}
 
-    # Don't save the rough moduleT0 result
-    cal[1].save_payloads = False
-    # Just to make it sure ...
-    cal[5].save_payloads = False  # in fact it does not make any payloads, but produces histograms for validation
-
-    cal[1].depends_on(cal[0])
-    cal[2].depends_on(cal[1])
-    cal[3].depends_on(cal[2])
-    cal[4].depends_on(cal[3])
-    cal[5].depends_on(cal[4])
+    for i in range(1, len(cal)):
+        cal[i].depends_on(cal[i - 1])
 
     return cal

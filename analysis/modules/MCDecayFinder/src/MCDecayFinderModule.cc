@@ -201,6 +201,7 @@ DecayTree<MCParticle>* MCDecayFinderModule::match(const MCParticle* mcp, const D
       DecayTree<MCParticle>* daughter = match(daugP, d->getDaughter(iDD), isCC, tmp);
       if (!daughter->getObj()) {
         ++itDP;
+        delete daughter;
         continue;
       }
       // Matching daughter found, remove it from list of unmatched particle daughters
@@ -389,8 +390,7 @@ Particle* MCDecayFinderModule::createParticleRecursively(const MCParticle* mcp, 
 
 void MCDecayFinderModule::addUniqueParticleToList(Particle* newParticle)
 {
-
-  for (auto existingParticle : *m_outputList) {
+  for (auto& existingParticle : *m_outputList) {
     if (existingParticle.isCopyOf(newParticle))
       return;
   }

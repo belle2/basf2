@@ -559,8 +559,6 @@ class SystematicsPhiGamma(BaseSkim):
         return ["gamma:PhiSystematics"]
 
     def validation_histograms(self, path):
-        stdKshorts(path=path)
-        ma.fillParticleList('K+:all', "", writeOut=True, path=path)
         ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
         ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
 

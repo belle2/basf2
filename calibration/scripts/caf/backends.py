@@ -41,6 +41,15 @@ _input_data_file_path = Path("__BACKEND_INPUT_FILES__.json")
 _STDOUT_FILE = "stdout"
 #: stderr file name
 _STDERR_FILE = "stderr"
+#: Environment variables to export in each Backend job
+_backend_job_envvars = (
+    "TMPDIR",
+    "BELLE2_CONFIG_DIR",
+    "VO_BELLE2_SW_DIR",
+    "BELLE2_EXTERNALS_TOPDIR",
+    "BELLE2_CONDB_METADATA",
+    "BELLE2_CONDB_PROXY",
+)
 
 
 def get_input_data():
@@ -623,20 +632,20 @@ class Job:
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.
         """
+        def append_environment_variable(cmds, envvar):
+            """
+            Append a command for setting an environment variable.
+            """
+            if envvar in os.environ:
+                cmds.append(f"""if [ -z "${{{envvar}}}" ]; then""")
+                cmds.append(f"  export {envvar}={os.environ[envvar]}")
+                cmds.append("fi")
+
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
-        if "BELLE2_CONFIG_DIR" in os.environ:
-            self.setup_cmds.append(f"""if [ -z "${{BELLE2_CONFIG_DIR}}" ]; then
-              export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}
-            fi""")
-        if "VO_BELLE2_SW_DIR" in os.environ:
-            self.setup_cmds.append(f"""if [ -z "${{VO_BELLE2_SW_DIR}}" ]; then
-              export VO_BELLE2_SW_DIR={os.environ['VO_BELLE2_SW_DIR']}
-            fi""")
-        if "BELLE2_EXTERNALS_TOPDIR" in os.environ:
-            self.setup_cmds.append(f"""if [ -z "${{BELLE2_EXTERNALS_TOPDIR}}" ]; then
-              export BELLE2_EXTERNALS_TOPDIR={os.environ['BELLE2_EXTERNALS_TOPDIR']}
-            fi""")
+        # Export all the environment variables defined via _backend_job_envvars
+        for envvar in _backend_job_envvars:
+            append_environment_variable(self.setup_cmds, envvar)
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")
         elif 'BELLE2_LOCAL_DIR' in os.environ:

@@ -30,8 +30,8 @@ void StreamHistogramsInDir(TDirectory* curdir, MsgHandler* hdl, int& numobjs)
 
   TIter nextkey(keylist);
   TKey* key = 0;
-  int nkeys = 0;
-  int nobjs = 0;
+  int nkeys [[maybe_unused]] = 0;
+  int nobjs [[maybe_unused]] = 0;
   while ((key = (TKey*)nextkey())) {
     nkeys++;
     TObject* obj = key->ReadObj();
@@ -82,8 +82,8 @@ int main(int argc, char** argv)
   (msg->header())->reserved[1] = numobjs;
 
   sock->send(msg);
-  delete(msg);
-  delete(sock);
+  delete (msg);
+  delete (sock);
 
   f->Close();
   delete f;

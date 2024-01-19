@@ -36,6 +36,28 @@ namespace Belle2 {
 
   public:
     /**
+     * Status flag of histogram/canvas
+    */
+    enum EStatus {
+      c_StatusTooFew = 0, /**< Not enough entries/event to judge */
+      c_StatusDefault = 1, /**< default for non-coloring */
+      c_StatusGood = 2, /**< Analysis result: Good */
+      c_StatusWarning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_StatusError = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Status colors of histogram/canvas (corresponding to status)
+    */
+    enum EStatusColor {
+      c_ColorTooFew = kGray, /**< Not enough entries/event to judge */
+      c_ColorDefault = kWhite, /**< default for non-coloring */
+      c_ColorGood = kGreen, /**< Analysis result: Good */
+      c_ColorWarning = kYellow, /**< Analysis result: Warning, there may be minor issues */
+      c_ColorError = kRed /**< Analysis result: Severe issue found */
+    };
+
+    /**
      * The type of list of histograms.
      */
     typedef std::map<std::string, HistObject> HistList;
@@ -99,6 +121,12 @@ namespace Belle2 {
      * do not set by yourself, use EpicsEnable module to set.
      */
     static bool m_epicsReadOnly;
+
+    /**
+     * The Prefix for EPICS PVs
+     */
+    static std::string m_PVPrefix;
+
 
 #ifdef _BELLE2_EPICS
     //! Vector of EPICS PVs
@@ -230,6 +258,11 @@ namespace Belle2 {
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
     /**
+     * Clear content of all Canvases
+     */
+    void clearCanvases(void);
+
+    /**
      * Reset the list of histograms.
      */
     static void initHistListBeforeEvent(void);
@@ -284,6 +317,13 @@ namespace Belle2 {
     void UpdateCanvas(std::string name, bool updated = true);
 
     /**
+     * Mark canvas as updated (or not)
+     * @param canvas Canvas from which to take the name for update
+     * @param updated was updated
+     */
+    void UpdateCanvas(TCanvas* canvas, bool updated = true);
+
+    /**
      * Extract Run Type from histogram title, called from input module
      */
     void ExtractRunType(std::vector <TH1*>& hs);
@@ -323,6 +363,13 @@ namespace Belle2 {
     void setEpicsPV(std::string keyname, int value);
 
     /**
+     * Write string to a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param value string to write
+     */
+    void setEpicsStringPV(std::string keyname, std::string value);
+
+    /**
      * Write value to a EPICS PV
      * @param index index of PV
      * @param value value to write
@@ -337,10 +384,48 @@ namespace Belle2 {
     void setEpicsPV(int index, int value);
 
     /**
+     * Write string to a EPICS PV
+     * @param index index of PV
+     * @param value string to write
+     */
+    void setEpicsStringPV(int index, std::string value);
+
+    /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(std::string keyname);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @return value or NAN if not existing
+     */
+    double getEpicsPV(int index);
+
+    /**
+     * Read value from a EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param status return status (true on success)
+     * @return string value (empty string if non existing)
+     */
+    std::string getEpicsStringPV(std::string keyname, bool& status);
+
+    /**
+     * Read value from a EPICS PV
+     * @param index index of PV
+     * @param status return status (true on success)
+     * @return string value (empty string if non existing)
+     */
+    std::string getEpicsStringPV(int index, bool& status);
+
+    /**
      * Update all EPICS PV (flush to network)
      * @param timeout maximum time until timeout in s
+     * @return status of ca_pend_io
      * */
-    void updateEpicsPVs(float timeout);
+    int updateEpicsPVs(float timeout);
 
     /**
      * Get EPICS PV Channel Id
@@ -355,6 +440,39 @@ namespace Belle2 {
      * @return Channel ID is written on success, otherwise nullptr
      */
     chid getEpicsPVChID(int index);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param id Channel ID
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(chid id, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param keyname key name (or full PV name) of PV
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(std::string keyname, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
+
+    /**
+     * Get Alarm Limits from EPICS PV
+     * @param index index of PV
+     * @param &lowerAlarm return low Alarm limit (lolo) if set, not changed otherwise
+     * @param &lowerWarn return low Warning limit (low) if set, not changed otherwise
+     * @param &upperWarn return upper Warning limit (high) if set, not changed otherwise
+     * @param &upperAlarm return upper Alarm limit (hihi) if set, not changed otherwise
+     * @return true if limits could be read (even if there are none set)
+     */
+    bool requestLimitsFromEpicsPVs(int index, double& lowerAlarm, double& lowerWarn, double& upperWarn, double& upperAlarm);
 
     /**
      * Setter for EPICS usage
@@ -381,9 +499,56 @@ namespace Belle2 {
     bool getUseEpicsReadOnly(void) {return m_epicsReadOnly;};
 
     /**
-     * Unsubsribe from EPICS PVs on terminate
+     * Unsubscribe from EPICS PVs on terminate
      */
     void cleanupEpicsPVs(void);
+
+    /**
+     * get global Prefix for EPICS PVs
+     * @return prefix in use
+     */
+    std::string& getPVPrefix(void) {return m_PVPrefix;};
+
+    /**
+     * set global Prefix for EPICS PVs
+     * @param prefix Prefix to set
+     */
+    void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
+
+    /**
+     * Helper function to judge the status for coloring and EPICS
+     * @param enough enough events for judging
+     * @param warn_flag outside of expected range
+     * @param error_flag outside of warning range
+     * @return the status
+     */
+    EStatus makeStatus(bool enough, bool warn_flag, bool error_flag);
+
+    /**
+     * Helper function for Canvas colorization
+     * @param canvas Canvas to change
+     * @param status status to color
+     */
+    void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Return color for canvas state
+     * @param status canvas status
+     * @return alarm color
+     */
+    EStatusColor getStatusColor(EStatus status);
+
+    /**
+     * Check the status of all PVs and report if disconnected or not found
+     */
+    void checkPVStatus(void);
+
+    /**
+     * check the status of a PVs and report if disconnected or not found
+     * @param pv the chid of the PV to check
+     * @param onlyError print only if in error condition (default)
+     */
+    void printPVStatus(chid pv, bool onlyError = true);
 
     // Public functions
   public:

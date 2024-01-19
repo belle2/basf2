@@ -101,14 +101,14 @@ namespace Belle2 {
   }
 
   void
-  TRGCDCTrackBase::append(TCLink* a)
+  TRGCDCTrackBase::append(TRGCDCLink* a)
   {
     _ts[a->cell()->superLayerId()].push_back(a);
     _tsAll.push_back(a);
   }
 
   void
-  TRGCDCTrackBase::append(const vector<TCLink*>& links)
+  TRGCDCTrackBase::append(const vector<TRGCDCLink*>& links)
   {
     for (unsigned i = 0; i < links.size(); i++) {
       append(links[i]);

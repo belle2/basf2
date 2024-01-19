@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -64,7 +63,7 @@ The values are lists of directory paths and the corresponding (Experiment, Run).
     input_data_path = Path(args.input_data)
     if not input_data_path.is_file():
         raise FileNotFoundError(f"The file {input_data_path.as_posix()} does not exist")
-    with open(input_data_path, 'r') as input_data_file:
+    with open(input_data_path) as input_data_file:
         input_data = json.load(input_data_file)
 
     # Currently not all backend subparsers include this option
@@ -148,7 +147,7 @@ Generally it is best not to set anything in the prompt script itself. Just use t
     caf_config_path = Path(args.caf_config)
     if not caf_config_path.is_file():
         raise FileNotFoundError(f"The file {caf_config_path.as_posix()} does not exist")
-    with open(caf_config_path, 'r') as caf_config_file:
+    with open(caf_config_path) as caf_config_file:
         caf_config = json.load(caf_config_file)
 
     # if for caf_script is given an full path import it from there, otherwise import it

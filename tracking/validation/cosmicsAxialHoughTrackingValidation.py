@@ -12,6 +12,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>CosmicsSimNoBkg.root</input>
+  <output>CosmicsAxialHoughTrackingValidation.root</output>
   <description>Validates the axial hough finder working on segments in cosmics events.</description>
 </header>
 """
@@ -24,8 +25,6 @@ import basf2
 VALIDATION_OUTPUT_FILE = 'CosmicsAxialHoughTrackingValidation.root'
 N_EVENTS = 1000
 ACTIVE = False
-
-basf2.set_random_seed(1337)
 
 
 class CosmicsAxialHough(TrackingValidationRun):
@@ -72,6 +71,7 @@ class CosmicsAxialHough(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = CosmicsAxialHough()
     validation_run.configure_and_execute_from_commandline()
 
@@ -80,3 +80,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

@@ -32,12 +32,12 @@ def check_file(input_file_name, trigger_variables):
 
 def swtr(name):
     """Make the string form variable name"""
-    return "SoftwareTriggerResult(%s)" % name
+    return f"SoftwareTriggerResult({name})"
 
 
 def swtp(name):
     """Make the string form prescale variable name"""
-    return "SoftwareTriggerPrescaling(%s)" % name
+    return f"SoftwareTriggerPrescaling({name})"
 
 
 if __name__ == "__main__":
@@ -49,5 +49,5 @@ if __name__ == "__main__":
     # test on some files
     b2.set_random_seed(r"\m/")
     b2tu.configure_logging_for_tests()
-    check_file("mdst13.root", trigger_variables)
+    check_file("mdst14.root", trigger_variables)
     # TODO: update this to check a data event when a suitable file is added

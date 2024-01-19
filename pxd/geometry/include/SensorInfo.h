@@ -137,13 +137,11 @@ namespace Belle2 {
       double getElectronMobility(double E) const;
       /** Model of the E field inside the sensor.
        * @param point Desired position in local coordinates.
-       * @param info The SensorInfo for the current sensor.
        * @return The E field vector in local coordinates.
        */
       const ROOT::Math::XYZVector getEField(const ROOT::Math::XYZVector& point) const;
       /** Get B field value from the field map.
        * @param point Desired position in local coordinates.
-       * @param info the SensorInfo for the current sensor.
        * @return The B field vector in local coordinates.
        */
       const ROOT::Math::XYZVector getBField(const ROOT::Math::XYZVector& point) const;

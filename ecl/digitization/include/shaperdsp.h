@@ -53,8 +53,8 @@ namespace Belle2 {
 
       /** struct for a shift of the shaper dsp */
       struct shaperdspshift_t: public sv123shift_t {
-        double et0; /**< . */
-        double et1; /**< . */
+        double et0; /**< shift parameter 0 */
+        double et1; /**< shift parameter 1 */
 
         shaperdspshift_t() {} /**< default constructor */
         shaperdspshift_t(double _t, const ShaperDSP_t& _p) { init(_t, _p);} /**< constructor from a ShaperDSP class */

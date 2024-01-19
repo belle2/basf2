@@ -179,8 +179,8 @@ namespace Belle2 {
      *  reserve that much of clocks in the Bitstream(s)
      *
      *  @param subDetectorId   COPPER id of the current data
-     *
      *  @param nWords          Number of words of each FINESSE in the COPPER
+     *  @param pciedata        Switch between PCIe 40 and COPPER
      */
     void reserve(int subDetectorId, std::array<int, nFinesse> nWords, bool pciedata) override
     {
@@ -220,10 +220,9 @@ namespace Belle2 {
      *  Unpack the Belle2Link data and fill the Bitstream
      *
      *  @param subDetectorId   COPPER id of the current data
-     *
      *  @param data32tab       list of pointers to the Belle2Link data buffers
-     *
      *  @param nWords          Number of words of each FINESSE in the COPPER
+     *  @param pciedata        Switch between PCIe 40 and COPPER
      */
     void unpack(int subDetectorId,
                 std::array<int*, 48> data32tab,

@@ -16,7 +16,7 @@ Skim list building functions for charm analyses.
     The Hp, Hm and Jm in the function name represent arbitrary charged particles with
     positive or negative charge. The Hp and Jm in `XToD0_D0ToHpJm`, mean a positive particle
     and a negative particle that could be either conjugate or non-conjugate. The Hp and Hm
-    in `DstToD0Pi_D0ToHpHmPi0`, mean a positive particle and a negative particle that
+    in `EarlyData_DstToD0Pi_D0ToHpHmPi0`, mean a positive particle and a negative particle that
     must be conjugate.
 
 .. Note::
@@ -30,16 +30,33 @@ Skim list building functions for charm analyses.
 
 from functools import lru_cache
 
+import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdK, stdMu, stdPi, stdPr
+from stdCharged import stdE, stdK, stdMu, stdPi, stdPr, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
-from stdV0s import stdKshorts
+from stdV0s import stdKshorts, stdLambdas
+from variables import variables as vm
 
 
 __liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
 _VALIDATION_SAMPLE = "mdst14.root"
+
+
+@lru_cache  # Avoid loading the list multiple time on the same path
+def charm_skim_std_charged(particle_type, path):
+    """
+    Provides a list of charged particles to be used by charm skims named
+    ``<particle_type>+:charmSkim``, with basic cuts applied:
+    ``dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance``.
+    """
+    if particle_type not in ['pi', 'K', 'p', 'e', 'mu']:
+        raise ValueError(f"Unknown particle type {particle_type!r}")
+    stdCharged(particle_type, 'all', path=path)
+    ma.cutAndCopyList(
+        f"{particle_type}+:charmSkim", f"{particle_type}+:all",
+        "dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance", path=path)
 
 
 @fancy_skim_header
@@ -140,7 +157,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
         **Selection Criteria**:
             * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
             * Use :math:`K_{S}` from `stdV0s.stdKshorts`
-            * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
+            * ``1.62 < M(D0) < 2.1, pcms(D0) > 2.0``
             * For more details, please check the source code of this skim.
             * (Maybe in the future, we can add a loose ECL cluster timing cut
               to :math:`\\pi^{0}` in this skim.)
@@ -152,9 +169,10 @@ class XToD0_D0ToNeutrals(BaseSkim):
             * List of D0 particle list names.
 
         """
-        charmcuts = "1.66 < M < 2.06 and useCMSFrame(p)>2.0"
-        D0_Channels = ["pi0:skim pi0:skim",
-                       "K_S0:merged pi0:skim",
+        charmcuts = "1.6 < M < 2.1 and useCMSFrame(p)>2.0"
+        ma.cutAndCopyList('pi0:D0', 'pi0:skim', 'p>0.4', path=path)
+        D0_Channels = ["pi0:D0 pi0:D0",
+                       "K_S0:merged pi0:D0",
                        "K_S0:merged K_S0:merged",
                        ]
 
@@ -274,6 +292,117 @@ class XToDp_DpToKsHp(BaseSkim):
         for chID, channel in enumerate(Dp_Channels):
             ma.reconstructDecay("D+:KsHp" + str(chID) + " -> " + channel, Dpcuts, chID, path=path)
             DpList.append("D+:KsHp" + str(chID))
+
+        return DpList
+
+
+@fancy_skim_header
+class DpToPipepem(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ e^- e^+`,
+
+    **Selection Criteria**:
+        * Use tracks from the charm lists in `charm_skim_std_charged`
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for ee
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Andrej Lozar"]
+    __description__ = "Skim list for D+ to pi+ e+ e-."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged("pi", path=path)
+        charm_skim_std_charged("e", path=path)
+
+        ma.cutAndCopyList("e+:mySel", "e+:charmSkim", "electronID_noSVD_noTOP > 0.01", path=path)
+
+    def build_lists(self, path):
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
+
+        DpList = []
+        ma.reconstructDecay("D+:Pipepem -> pi+:charmSkim e+:mySel e-:mySel", Dpcuts, 1, path=path)
+        DpList.append("D+:Pipepem")
+
+        return DpList
+
+
+@fancy_skim_header
+class DpToPipmupmum(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ \\mu^- \\mu^+`
+
+    **Selection Criteria**:
+        * Use tracks from the charm lists in `charm_skim_std_charged`
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for mumu
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Andrej Lozar"]
+    __description__ = "Skim list for D+ to pi+ mu+ mu-."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged("pi", path=path)
+        charm_skim_std_charged("mu", path=path)
+
+        ma.cutAndCopyList("mu+:mySel", "mu+:charmSkim", "muonID_noSVD > 0.01", path=path)
+
+    def build_lists(self, path):
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
+
+        DpList = []
+        ma.reconstructDecay("D+:Pipmupmum -> pi+:charmSkim mu+:mySel mu-:mySel", Dpcuts, 1, path=path)
+        DpList.append("D+:Pipmupmum")
+
+        return DpList
+
+
+@fancy_skim_header
+class DpToPipKpKm(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ K^- K^+`
+
+    **Selection Criteria**:
+        * Use tracks from the charm lists in `charm_skim_std_charged`
+        * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0`` and loose cuts for KK
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Andrej Lozar"]
+    __description__ = "Skim list for D+ to pi+ K+ K-."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged("pi", path=path)
+        charm_skim_std_charged("K", path=path)
+
+        ma.cutAndCopyList("K+:mySel", "K+:charmSkim", "kaonID > 0.1", path=path)
+
+    def build_lists(self, path):
+        Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
+
+        DpList = []
+        ma.reconstructDecay("D+:PipKpKm -> pi+:charmSkim K+:mySel K-:mySel", Dpcuts, 1, path=path)
+        DpList.append("D+:PipKpKm")
 
         return DpList
 
@@ -457,26 +586,36 @@ class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
 @fancy_skim_header
 class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     """
-    **Decay Modes**:
-        * :math:`RS: D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^- \\pi^+ \\pi^{0}`
-        * :math:`WS: D^{*-}\\to \\pi^- \\overline{D}^{0}, \\overline{D}^{0}\\to K^- \\pi^+ \\pi^{0}`
+    **Decay Modes**: :math:`D^{*\\pm}\\to D^{0} \\pi^\\pm` with
+        * :math:`D^{0}\\to K^\\mp \\pi^\\pm \\pi^0` (and CC)
+        * :math:`D^{0}\\to \\pi^+ \\pi^- \\pi^0` (and CC)
+        * :math:`D^{0}\\to K^+ K^- \\pi^0` (and CC)
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged` to reconstruct :math:`D^{0}`
-        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * ``1.70 < M(D0) < 2.10``
-        * No cut on the slow pion
-        * ``M(D*)-M(D0) < 0.16``
-        * ``pcms(D*) > 2.0``
-        * For more details, please check the source code of this skim.
+        * Tracks: ``charmSkim`` lists from `charm_skim_std_charged`
 
+          * Pions: ``pionIDNN > 0.1``
+          * Kaons: ``kaonIDNN > 0.1``
+
+        * :math:`\\pi^{0}`: from `stdPi0s.loadStdSkimPi0`
+        * ``1.70 < M(D0) < 2.10``
+        * ``M(D*)-M(D0) < 0.16``
+        * ``pCM(D*) > 2.0``
+
+    .. Note::
+        The neural-network based PID variables ``pionIDNN`` and ``kaonIDNN``
+        require the analysis globaltag to be set (e.g. via
+        ``b2skim-run --analysis-globaltag ANALYSIS_GT_NAME ...``). In case
+        calibrated weights are not ready for the skimming campaign, this skim
+        must be modified to use :b2:var:`binaryPID_noSVD` or
+        :b2:var:`binaryPID` instead (this will have some impact on skim
+        performance, although small, and needs to be tested).
     """
 
-    __authors__ = ["Emma Oxford"]
+    __authors__ = ["Ludovico Massaccesi", "Emma Oxford"]
     __description__ = (
-        "Skim list for D*+ to pi+ D0, D0 to pi0 and two charged FSPs, where the kinds "
-        "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is "
-        "also included."
+        "Skim list for D*-tagged D0 to pi0 and two charged hadrons"
+        " (any combination of kaons and pions)."
     )
     __contact__ = __liaison__
     __category__ = "physics, charm"
@@ -484,79 +623,32 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
+    def additional_setup(self, path):
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
+
     def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
-        charmcuts = "1.70 < M < 2.10"
-        ma.cutAndCopyList("pi0:myskim", "pi0:skim", "", path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
+        D0_cuts = "1.70 < M < 2.10"
+        Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
 
-        DstList = []
-        # NOTE: renamed to avoid particle list name clashes
-        ma.reconstructDecay("D0:HpJmPi0_withPID -> K-:loose pi+:loose pi0:myskim", charmcuts, path=path)
-        ma.reconstructDecay("D*+:HpJmPi0RS_withPID -> D0:HpJmPi0_withPID pi+:all", Dstcuts, path=path)
-        ma.reconstructDecay("D*-:HpJmPi0WS_withPID -> D0:HpJmPi0_withPID pi-:all", Dstcuts, path=path)
-        ma.copyLists("D*+:HpJmPi0_withPID", ["D*+:HpJmPi0RS_withPID", "D*+:HpJmPi0WS_withPID"], path=path)
-        DstList.append("D*+:HpJmPi0_withPID")
+        Dst_lists = []
+        for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:
+            lst = f"{h1}{h2}Pi0"
+            ma.reconstructDecay(f"D0:{lst} -> {h1}+:charmSkim_pid {h2}-:charmSkim_pid pi0:skim", D0_cuts, path=path)
+            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:charmSkim_pid", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:charmSkim_pid", Dst_cuts, path=path)
+            ma.copyLists(f"D*+:{lst}", [f"D*+:{lst}_RS", f"D*+:{lst}_WS"], path=path)
+            Dst_lists.append(f"D*+:{lst}")
 
-        return DstList
-
-
-@fancy_skim_header
-class DstToD0Pi_D0ToHpHmPi0(BaseSkim):
-    """
-    **Decay Modes**:
-        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\pi^+ \\pi^- \\pi^{0}`
-        * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to K^+ K^- \\pi^{0}`
-
-    **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged` to reconstruct D^{0}
-        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
-        * ``1.70 < M(D0) < 2.10``
-        * No cut on the slow pion
-        * ``M(D*)-M(D0) < 0.16``
-        * ``pcms(D*) > 2.0``
-        * For more details, please check the source code of this skim.
-
-    """
-
-    __authors__ = ["Emma Oxford"]
-    __description__ = "Skim list for D*+ to pi+ D0, D0 to pi0 and two conjugate charged FSPs."
-    __contact__ = __liaison__
-    __category__ = "physics, charm"
-
-    NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = True
-
-    def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
-        loadStdSkimPhoton(path=path)
-        loadStdSkimPi0(path=path)
-
-    def build_lists(self, path):
-        Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
-        charmcuts = "1.70 < M < 2.10"
-        ma.cutAndCopyList("pi0:myskim", "pi0:skim", "", path=path)  # additional cuts removed 27 Jun 2019 by Emma Oxford
-        D0_Channels = [
-            "pi+:loose pi-:loose pi0:myskim",
-            "K+:loose K-:loose pi0:myskim",
-        ]
-
-        DstList = []
-
-        for chID, channel in enumerate(D0_Channels):
-            # NOTE: renamed to avoid particle list name clashes
-            ma.reconstructDecay("D0:HpHmPi0" + str(chID) + "_withPID" + " -> " + channel, charmcuts, chID, path=path)
-            ma.reconstructDecay(
-                "D*+:HpHmPi0" + str(chID) + "_withPID" + " -> D0:HpHmPi0" + str(chID) + "_withPID" + " pi+:all",
-                Dstcuts, chID, path=path)
-            DstList.append("D*+:HpHmPi0" + str(chID) + "_withPID")
-
-        return DstList
+        return Dst_lists
 
 
 @fancy_skim_header
@@ -734,7 +826,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     **Selection Criteria**:
         * Apply the cuts in `XToD0_D0ToNeutrals`
         * No cut on the slow pion
-        * ``Q < 0.02``
+        * ``deltaM<0.2``
         * For more details, please check the source code of this skim.
 
     """
@@ -755,7 +847,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
 
         D0List = self.D0ToNeutrals(path)
 
-        Dstcuts = "0 < Q < 0.02"
+        Dstcuts = "daughterMotherDiffOf(1,M)<0.2"
 
         DstList = []
         for chID, channel in enumerate(D0List):
@@ -873,7 +965,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
     """
 
     __authors__ = []
-    __description__ = "A special version of `DstToD0Pi_D0ToHpHmPi0` to deal with Early Data."
+    __description__ = "A special version of ``DstToD0Pi_D0ToHpHmPi0`` to deal with Early Data."
     __contact__ = __liaison__
     __category__ = "physics, charm"
 
@@ -994,3 +1086,273 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         DstList.append("D*+:all")
 
         return DstList
+
+
+class DstToD0Pi_D0ToGeneric(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{*+}\\to D^{0} \\pi^{+}` (signal side)
+        * :math:`D^{*+}\\to D^0 \\pi^{+}` and :math:`D^{*+}\\to D^{+} \\pi^{0}` (tag side)
+        * :math:`D^{*0}\\to D^0 \\pi^{0}` and :math:`D^{*0}\\to D^{0} \\gamma` (tag side)
+        * :math:`D_s^{*+}\\to D_s^{+} \\gamma` (tag side)
+        * 15 hadronic channels for tag :math:`D^{0}` reconstruction
+        * 11 hadronic channels for tag :math:`D^{+}` reconstruction
+        * 10 hadronic channels for tag :math:`D_{s}^{+}` reconstruction
+        * 19 hadronic channels for tag :math:`\\Lambda_{c}^{+}` reconstruction
+
+    **Selection Criteria**:
+        * Cut on :math:`\\pi^{+}, K^{+}` : charm_skim_std_charged pion and kaon with PIDNN > 0.1
+        * Cut on :math:`p^{+}` : abs(dr) < 1.0 and abs(dz) < 3.0 and protonID > 0.1
+        * Cut on :math:`\\gamma` : E > 0.05
+        * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma` : 0.115 < M < 0.160
+        * Cut on tag side :math:`D^{0}` : 1.72 < M < 2.02 and p* > 2.0
+        * Cut on tag side :math:`D^{+}` : 1.72 < M < 2.02 and p* > 2.0
+        * Cut on tag side :math:`D_{s}^{+}` :  1.82 < M < 2.12 and p* > 2.0
+        * Cut on tag side :math:`\\Lambda_{c}^{+}` : 2.18 < M < 2.38 and p* > 2.0
+        * 0.135 < massDifference(0) < 0.155 on decay with :math:`\\pi_{s}^{+}` on :math:`D_{tag}^{*}`
+        * 0.130 < massDifference(0) < 0.160 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
+        * 0.120 < massDifference(0) < 0.165 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
+        * 1.81 < M < 2.21 on signal side :math:`D^{*+}`
+        * 0.115 < :math:`M_{D^{*}}` - :math:`M_{D}` < 0.220 and p* > 2.0 on signal side :math:`D^{0}`
+    """
+    vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
+    vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')
+    vm.addAlias('reco_pz', 'formula(daughter(0,pzRecoil)-daughter(1,pz))')
+    vm.addAlias('reco_E', 'formula(daughter(0,eRecoil)-daughter(1,E))')
+    vm.addAlias('reco_p', 'formula((reco_px^2 + reco_py^2 + reco_pz^2)^0.5)')
+    vm.addAlias('reco_M', 'formula((reco_E^2-reco_p^2)^0.5)')
+    vm.addAlias('DelM', 'formula(daughter(0,mRecoil)-reco_M)')
+    vm.addAlias('cms_p', 'useCMSFrame(reco_p)')
+
+    __authors__ = ["Chanho Kim"]
+    __description__ = "Skim list for Inclusive D0 from charm tagger"
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def additional_setup(self, path):
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
+        stdKshorts(path=path)
+        stdLambdas(path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
+        ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
+        ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
+        ma.reconstructDecay("pi0:mypion -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
+        d0cuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
+
+        # tag charm hadrons reconstruction (D0/D+/Lambda_c+/D_s+/D*0/D*+/D_s*+)
+
+        D0_channels = [
+            "K-:hadtag pi+:hadtag",
+            "K-:hadtag pi+:hadtag pi0:mypion",
+            "K-:hadtag pi+:hadtag pi0:mypion pi0:mypion",
+            "K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
+            "K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag pi0:mypion",
+            "pi-:hadtag pi+:hadtag",
+            "pi-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag",
+            "pi-:hadtag pi+:hadtag pi0:mypion",
+            "pi-:hadtag pi+:hadtag pi0:mypion pi0:mypion",
+            "K_S0:merged pi+:hadtag pi-:hadtag",
+            "K_S0:merged pi+:hadtag pi-:hadtag pi0:mypion",
+            "K_S0:merged pi0:mypion",
+            "K-:hadtag K+:hadtag",
+            "K-:hadtag K+:hadtag pi0:mypion",
+            "K-:hadtag K+:hadtag K_S0:merged"]
+
+        D0List = []
+        for chID, channel in enumerate(D0_channels):
+            ma.reconstructDecay("D0:skimDm" + str(chID) + " -> " + channel, d0cuts, chID, path=path)
+            D0List.append("D0:skimDm" + str(chID))
+
+        Dp_channels = [
+            "K-:hadtag pi+:hadtag pi+:hadtag",
+            "K-:hadtag pi+:hadtag pi+:hadtag pi0:mypion",
+            "K-:hadtag K+:hadtag pi+:hadtag",
+            "K-:hadtag K+:hadtag pi+:hadtag pi0:mypion",
+            "pi+:hadtag pi0:mypion",
+            "pi+:hadtag pi+:hadtag pi-:hadtag",
+            "pi+:hadtag pi+:hadtag pi-:hadtag pi0:mypion",
+            "K_S0:merged pi+:hadtag",
+            "K_S0:merged pi+:hadtag pi0:mypion",
+            "K_S0:merged pi+:hadtag pi+:hadtag pi-:hadtag",
+            "K+:hadtag K_S0:merged K_S0:merged"]
+
+        dpcuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
+        DpList = []
+        for chID, channel in enumerate(Dp_channels):
+            ma.reconstructDecay("D+:skimDm" + str(chID) + " -> " + channel, dpcuts, chID, path=path)
+            DpList.append("D+:skimDm" + str(chID))
+
+        ma.reconstructDecay("Sigma+:hadtag -> p+:hadtag pi0:mypion", "1.08 < M < 1.3", path=path)
+
+        LC_channels = [
+                "p+:hadtag K-:hadtag pi+:hadtag",
+                "p+:hadtag pi-:hadtag pi+:hadtag",
+                "p+:hadtag K-:hadtag K+:hadtag",
+                "p+:hadtag K-:hadtag pi+:hadtag pi0:mypion",
+                "p+:hadtag K-:hadtag pi+:hadtag pi0:mypion pi0:mypion",
+                "p+:hadtag pi+:hadtag pi+:hadtag pi-:hadtag pi-:hadtag",
+                "p+:hadtag K_S0:merged",
+                "p+:hadtag K_S0:merged pi0:mypion",
+                "p+:hadtag K_S0:merged pi+:hadtag pi-:hadtag",
+                "Lambda0:merged pi+:hadtag",
+                "Lambda0:merged pi+:hadtag pi0:mypion",
+                "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag",
+                "Lambda0:merged pi+:hadtag gamma:tag",
+                "Lambda0:merged pi+:hadtag pi0:mypion gamma:tag",
+                "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag gamma:tag",
+                "Sigma+:hadtag pi+:hadtag pi-:hadtag",
+                "Sigma+:hadtag pi+:hadtag pi-:hadtag pi0:mypion",
+                "Sigma+:hadtag pi0:mypion"]
+
+        LCcuts = "2.18 < M < 2.38 and useCMSFrame(p) > 2.0"
+
+        LambdacList = []
+        for chID, channel in enumerate(LC_channels):
+            ma.reconstructDecay("Lambda_c+:skimDm" + str(chID) + " -> " + channel, LCcuts, chID, path=path)
+            LambdacList.append("Lambda_c+:skimDm" + str(chID))
+
+        Ds_channels = [
+                "K+:hadtag K-:hadtag pi+:hadtag",
+                "K+:hadtag K_S0:merged",
+                "K_S0:merged K_S0:merged pi+:hadtag",
+                "K+:hadtag K-:hadtag pi+:hadtag pi0:mypion",
+                "K_S0:merged K-:hadtag pi+:hadtag pi+:hadtag",
+                "K_S0:merged K+:hadtag pi+:hadtag pi-:hadtag",
+                "pi+:hadtag pi+:hadtag pi-:hadtag",
+                "K_S0:merged pi+:hadtag",
+                "K_S0:merged pi+:hadtag pi0:mypion",
+                "K+:hadtag K-:hadtag pi+:hadtag pi+:hadtag pi-:hadtag"]
+
+        DScuts = "1.82 < M < 2.12 and useCMSFrame(p) > 2.0"
+
+        DsList = []
+        for chID, channel in enumerate(Ds_channels):
+            ma.reconstructDecay("D_s+:skimDm" + str(chID) + " -> " + channel, DScuts, chID, path=path)
+            DsList.append("D_s+:skimDm" + str(chID))
+
+        ma.copyLists("D0:skim", D0List, path=path)
+        ma.copyLists("D+:skim", DpList, path=path)
+        ma.copyLists("Lambda_c+:skim", LambdacList, path=path)
+        ma.copyLists("D_s+:skim", DsList, path=path)
+
+        ma.reconstructDecay("D*+:skim1 -> D0:skim pi+:hadtag", "0.135 < massDifference(0) < 0.155", 1, path=path)
+        ma.reconstructDecay("D*+:skim2 -> D+:skim pi0:mypion", "0.130 < massDifference(0) < 0.160", 2, path=path)
+        ma.copyLists("D*+:skim", ["D*+:skim1", "D*+:skim2"], path=path)
+
+        ma.reconstructDecay("D*0:skim1 -> D0:skim pi0:mypion", "0.130 < massDifference(0) < 0.160", 1, path=path)
+        ma.reconstructDecay("D*0:skim2 -> D0:skim gamma:tag", "0.120 < massDifference(0) < 0.165", 2, path=path)
+        ma.copyLists("D*0:skim", ["D*0:skim1", "D*0:skim2"], path=path)
+
+        ma.reconstructDecay("D_s*+:skim -> D_s+:skim gamma:tag", "0.120 < massDifference(0) < 0.165", path=path)
+
+        # ==============================================================================================
+        # ============================ fragmentation part ==============================================
+        # ==============================================================================================
+        DstP_Xfrag = [
+            "", "pi0:mypion", "pi+:hadtag pi-:hadtag", "pi+:hadtag pi-:hadtag pi0:mypion"]
+
+        sigCuts = "1.81 < mRecoil < 2.21"
+
+        sigDst_fromDstP = []
+        for chID, channel in enumerate(DstP_Xfrag):
+            n = len(DstP_Xfrag)
+            ma.reconstructDecay("D*+:dsp_" + str(chID) + " -> D*+:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dsp_" + str(chID + n) + " -> D*+:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDstP.append("D*+:dsp_" + str(chID))
+            sigDst_fromDstP.append("D*+:dsp_" + str(chID + n))
+        ma.copyLists("D*+:fromDstP", sigDst_fromDstP, path=path)
+
+        sigDst_fromDp = []
+        for chID, channel in enumerate(DstP_Xfrag):
+            n = len(DstP_Xfrag)
+            ma.reconstructDecay("D*+:dp_" + str(chID) + " -> D*+:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dp_" + str(chID + n) + " -> D*+:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDp.append("D*+:dp_" + str(chID))
+            sigDst_fromDp.append("D*+:dp_" + str(chID + n))
+        ma.copyLists("D*+:fromDp", sigDst_fromDp, path=path)
+
+        Dst0_Xfrag = [
+            "pi+:hadtag", "pi+:hadtag pi0:mypion", "pi+:hadtag pi-:hadtag pi+:hadtag"]
+
+        sigDst_fromDst0 = []
+        for chID, channel in enumerate(Dst0_Xfrag):
+            n = len(Dst0_Xfrag)
+            ma.reconstructDecay("D*+:dsz_" + str(chID) + " -> D*0:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dsz_" + str(chID + n) + " -> D*0:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDst0.append("D*+:dsz_" + str(chID))
+            sigDst_fromDst0.append("D*+:dsz_" + str(chID + n))
+        ma.copyLists("D*+:fromDstz", sigDst_fromDst0, path=path)
+
+        sigDst_fromD0 = []
+        for chID, channel in enumerate(Dst0_Xfrag):
+            n = len(Dst0_Xfrag)
+            ma.reconstructDecay("D*+:dsz_" + str(chID) + " -> D*0:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dsz_" + str(chID + n) + " -> D*0:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
+            sigDst_fromDst0.append("D*+:dsz_" + str(chID))
+            sigDst_fromDst0.append("D*+:dsz_" + str(chID + n))
+        ma.copyLists("D*+:fromDstz", sigDst_fromDst0, path=path)
+
+        sigDst_fromD0 = []
+        for chID, channel in enumerate(Dst0_Xfrag):
+            n = len(Dst0_Xfrag)
+            ma.reconstructDecay("D*+:dz_" + str(chID) + " -> D0:skim " + channel, sigCuts, chID, path=path)
+            ma.reconstructDecay("D*+:dz_" + str(chID + n) + " -> D0:skim " + channel +
+                                " K+:hadtag K-:hadtag", sigCuts, chID, path=path)
+            sigDst_fromD0.append("D*+:dz_" + str(chID))
+            sigDst_fromD0.append("D*+:dz_" + str(chID))
+        ma.copyLists("D*+:fromDz", sigDst_fromD0, path=path)
+
+        LC_Xfrag = [
+            "pi+:hadtag anti-p-:hadtag",
+            "pi+:hadtag pi0:mypion anti-p-:hadtag",
+            "pi+:hadtag pi-:hadtag pi+:hadtag anti-p-:hadtag"]
+
+        sigDst_fromLC = []
+        for chID, channel in enumerate(LC_Xfrag):
+            ma.reconstructDecay("D*+:LC" + str(chID) + " -> Lambda_c+:skim " + channel, sigCuts, chID, path=path)
+            sigDst_fromLC.append("D*+:LC" + str(chID))
+
+        ma.copyLists("D*+:fromLC", sigDst_fromLC, path=path)
+
+        DstS_Xfrag = [
+            "K_S0:merged", "pi0:mypion K_S0:merged",
+            "pi+:hadtag K-:hadtag", "pi+:hadtag pi0:mypion K-:hadtag",
+            "pi+:hadtag pi-:hadtag K_S0:merged", "pi+:hadtag pi-:hadtag pi0:mypion K_S0:merged",
+            "pi+:hadtag pi-:hadtag pi+:hadtag K-:hadtag"]
+
+        sigDst_fromDstS = []
+        for chID, channel in enumerate(DstS_Xfrag):
+            ma.reconstructDecay("D*+:Dsts" + str(chID) + " -> D_s*+:skim " + channel, sigCuts, chID, path=path)
+            sigDst_fromDstS.append("D*+:Dsts" + str(chID))
+        ma.copyLists("D*+:fromDstS", sigDst_fromDstS, path=path)
+
+        sigDst_fromcDS = []
+        for chID, channel in enumerate(DstS_Xfrag):
+            ma.reconstructDecay("D*+:Ds" + str(chID) + " -> D_s+:skim " + channel, sigCuts, chID, path=path)
+            sigDst_fromcDS.append("D*+:Ds" + str(chID))
+        ma.copyLists("D*+:fromDs", sigDst_fromcDS, path=path)
+
+        sigDstList = ["D*+:fromDstP", "D*+:fromDstz", "D*+:fromLC", "D*+:fromDstS", "D*+:fromDp", "D*+:fromDz", "D*+:fromDs"]
+
+        ma.copyLists("D*+:skimSig", sigDstList, path=path)
+
+        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.115 < DelM < 0.220", path=path)
+
+        sigDzList = ["D0:skimSig"]
+        return sigDzList

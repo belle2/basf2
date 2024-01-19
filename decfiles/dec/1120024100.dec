@@ -18,8 +18,7 @@ Enddecay
 ### 
 ### 
 Decay B0sig
-0.5  rho-  K_0*+        PHOTOS SVS;
-0.5  rho+  K_0*-        PHOTOS SVS;
+1.0  rho-  K_0*+        PHOTOS SVS;
 Enddecay
 CDecay anti-B0sig
 ###

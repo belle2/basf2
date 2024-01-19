@@ -12,11 +12,11 @@
 #include <framework/gearbox/Gearbox.h>
 
 #include <TVector3.h>
-#include <cmath>
 #include <filesystem>
 
 #include <boost/math/special_functions/sign.hpp>
 
+#include <cmath>
 #include <vector>
 
 using namespace Belle2::TestHelpers;
@@ -45,10 +45,17 @@ void TestWithGearbox::TearDownTestCase()
 TempDirCreator::TempDirCreator():
   m_oldpwd(current_path().string())
 {
-  path tmpdir = std::tmpnam(nullptr);
-  create_directories(tmpdir);
+  char* temporaryDirName = strdup((temp_directory_path() / "basf2_XXXXXX").c_str());
+  auto directory = mkdtemp(temporaryDirName);
+  if (!directory) {
+    B2ERROR("Cannot create temporary directory: " << strerror(errno));
+    free(temporaryDirName);
+    return;
+  }
+  path tmpdir = directory;
   current_path(tmpdir);
   m_tmpdir = tmpdir.string();
+  free(temporaryDirName);
 }
 
 TempDirCreator::~TempDirCreator()

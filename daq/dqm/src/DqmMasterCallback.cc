@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <daq/dqm/DqmMasterCallback.h>
+#include <daq/slc/system/LogFile.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
@@ -15,12 +16,10 @@
 
 #include <unistd.h>
 
-#include <sys/wait.h>
-
 using namespace Belle2;
 using namespace std;
 
-static int m_running = 0;
+int DqmMasterCallback::m_running = 0; // TODO
 
 //-----------------------------------------------------------------
 // Rbuf-Read Thread Interface
@@ -32,18 +31,17 @@ void* RunDqmMasterLogger(void*)
 
 DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
 {
-  m_hltdir = config.get("dqmmaster.hltdir");
-  m_erecodir = config.get("dqmmaster.erecodir");
+  m_histodir = config.get("dqmmaster.histodir");
+  m_tmpdir = config.get("dqmmaster.tmpdir");
+  m_instance = config.get("dqmmaster.instance");
+  auto host = config.get("dqmmaster.host");
+  auto port = config.getInt("dqmmaster.port");
   m_running = 0;
-  printf("DqmMasterCallback : hltdir = %s, erecodir = %s\n", m_hltdir.c_str(), m_erecodir.c_str());
+  LogFile::info("DqmMasterCallback : instance = %s, histodir = %s, tmpdir = %s", m_instance.c_str(), m_histodir.c_str(),
+                m_tmpdir.c_str());
 
-  // Open MemFile
-  m_hltdqm = new DqmMemFile("dqmhisto_hlt");
-  m_erecodqm = new DqmMemFile("dqmhisto_reco1");
-
-  // Open sockets to hservers
-  m_sock_hlt = new EvtSocketSend("localhost", 9991);
-  m_sock_reco = new EvtSocketSend("localhost", 9992);
+  // Open sockets to hserver
+  m_sock = new EvtSocketSend(host.c_str(), port);
 }
 
 DqmMasterCallback::~DqmMasterCallback()
@@ -54,12 +52,43 @@ DqmMasterCallback::~DqmMasterCallback()
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
+  LogFile::info("LOAD: runtype %s", m_runtype.c_str());
+
+  {
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_runtype";
+    // workaround until we have a better solution
+    auto fh = fopen(filename.c_str(), "wt+");
+    if (fh) {
+      fprintf(fh, "%s", m_runtype.c_str());
+      fclose(fh);
+    }
+  }
 }
 
 void DqmMasterCallback::start(int expno, int runno)
 {
   m_expno = expno;
   m_runno = runno;
+
+  // currently, we do not (yet) use exp and run nr, just add it in case it may be needed later
+  {
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_expnr";
+    // workaround until we have a better solution
+    auto fh = fopen(filename.c_str(), "wt+");
+    if (fh) {
+      fprintf(fh, "%d", m_expno);
+      fclose(fh);
+    }
+  }
+  {
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_runnr";
+    // workaround until we have a better solution
+    auto fh = fopen(filename.c_str(), "wt+");
+    if (fh) {
+      fprintf(fh, "%d", m_runno);
+      fclose(fh);
+    }
+  }
 
   MsgHandler hdl(0);
   int numobjs = 0;
@@ -90,92 +119,54 @@ void DqmMasterCallback::start(int expno, int runno)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock_hlt->send(msg);
-  m_sock_reco->send(msg);
-  delete(msg);
+  while (m_sock->send(msg) < 0) {
+    LogFile::error("Connection to histogramm server is missing in START: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                   m_runtype.c_str());
+    m_sock->sock()->reconnect(10); // each one waits 5s
+  }
+  delete (msg);
 
-  printf("expno = %d, runno = %d\n", m_expno, m_runno);
+  LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
   m_running = 1;
 }
 
-void DqmMasterCallback::stop()
+void DqmMasterCallback::stop(void)
 {
+  LogFile::info("STOP: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
 
   if (m_running == 0) return;
 
   m_running = 0;
 
   char outfile[1024];
-  //  m_expno = getExpNumber();
-  //  m_runno = getRunNumber();
 
-  // Connect TMemFile
-  TMemFile* hlttmem = m_hltdqm->LoadMemFile();
-  TMemFile* erecotmem = m_erecodqm->LoadMemFile();
+  MsgHandler hdl(0);
+  int numobjs = 0;
 
-  // Dump HLT DQM
-  int proc1 = fork();
-  if (proc1 == 0) {
-    //  TMemFile* tmem = m_hltdqm->LoadMemFile();
-    sprintf(outfile, "%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
-    TFile* dqmtfile = new TFile(outfile, "RECREATE");
-    printf("HLT dqm file = %s\n", outfile);
+  snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%sdqm_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
+           m_runno);
 
-    // Copy all histograms in TFile
-    TIter next(hlttmem->GetListOfKeys());
-    TKey* key = NULL;
-    while ((key = (TKey*)next())) {
-      TH1* hist = (TH1*)key->ReadObj();
-      printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-    }
+  TText rc_save(0, 0, outfile);
+  hdl.add(&rc_save, outfile);
+  numobjs++;
 
-    // Close TFile
-    dqmtfile->Write();
-    dqmtfile->Close();
-    delete dqmtfile;
-    //    delete hlttmem;
-    exit(0);
-  } else if (proc1 < 0) {
-    perror("DQMMASTER : fork HLTDQM writing");
+  EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
+  (msg->header())->reserved[0] = 0;
+  (msg->header())->reserved[1] = numobjs;
+
+  while (m_sock->send(msg) < 0) {
+    LogFile::error("Connection closed during STOP, file not saved: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                   m_runtype.c_str());
+    m_sock->sock()->reconnect(10); // each one waits 5s
+    // we assume that the connection was terminated by a restart of the server
+    // depending on when this happened, we may have new histograms to dump
+    // EVEN if the DQM analysis could not handle it (because after restart there is no
+    // run information.
   }
-
-  // Dump ERECO DQM
-  int proc2 = fork();
-  if (proc2 == 0) {
-    //    TMemFile* tmem = m_erecodqm->LoadMemFile();
-    sprintf(outfile, "%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-    //  sprintf(outfile, "hltdqm_e%4.4dr%6.6d.root", m_expno, m_runno);
-    TFile* erdqmtfile = new TFile(outfile, "RECREATE");
-    printf("ERECO dqm file = %s\n", outfile);
-
-    // Copy all histograms in TFile
-    TIter ernext(erecotmem->GetListOfKeys());
-    TKey* erkey = NULL;
-    while ((erkey = (TKey*)ernext())) {
-      TH1* hist = (TH1*)erkey->ReadObj();
-      printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
-    }
-
-    // Close TFile
-    erdqmtfile->Write();
-    erdqmtfile->Close();
-    delete erdqmtfile;
-    //    delete erecotmem;
-    exit(0);
-  } else if (proc2 < 0) {
-    perror("DQMMASTER : fork ERECODQM writing");
-  }
-
-  // Wait completion
-  int status1, status2;
-  waitpid(proc1, &status1, 0);
-  waitpid(proc2, &status2, 0);
-
-  //  delete hlttmem;
-  //  delete erecotmem;
+  delete (msg);
 }
 
-void DqmMasterCallback::abort()
+void DqmMasterCallback::abort(void)
 {
   stop();
 }

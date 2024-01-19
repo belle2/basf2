@@ -48,7 +48,7 @@ vm.addAlias("isBremsCorrected", "extraInfo(bremsCorrected)")  # [E30]
 # combine final state particles to form composite particles [S40]
 ma.reconstructDecay(
     "J/psi:ee -> e+:corrected e-:corrected ?addbrems",
-    cut="dM < 0.11",
+    cut="abs(dM) < 0.11",
     path=main,
 )  # [E40]
 

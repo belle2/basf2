@@ -1,0 +1,32 @@
+# EventType: 1210011100
+# Descriptor: [B+ -> [K_2*+ -> K_S0 pi+] gamma] cc
+# NickName: Bd_K2*gamma_Kshort
+# Documentation: Rare b->s gamma process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Sayan Mitra
+# Email: sayan97@iastate.edu
+# Cuts: None
+# Date: 20230817
+#
+#
+Alias      K_2*+sig          K_2*+
+Alias      K_2*-sig          K_2*-
+ChargeConj K_2*+sig          K_2*-sig
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+1.0  K_2*+sig  gamma HELAMP 1.0 0.0 1.0 0.;
+Enddecay
+CDecay B-sig
+#
+Decay K_2*+sig
+1.0   K_S0  pi+   TSS;
+Enddecay
+CDecay K_2*-sig
+
+End

@@ -381,7 +381,11 @@ void SVDDQMClustersOnTrackModule::event()
   m_expNumber = evtMetaData->getExperiment();
   m_runNumber = evtMetaData->getRun();
 
-  int nSamples = m_svdEventInfo->getNSamples();
+  int nSamples = 0;
+  if (m_svdEventInfo.isValid())
+    nSamples = m_svdEventInfo->getNSamples();
+  else
+    return;
 
   // get EventT0 if present and valid
   double eventT0 = -1000;
@@ -410,9 +414,13 @@ void SVDDQMClustersOnTrackModule::event()
   TIter nextH(m_histoList);
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
-      if (((TString)obj->GetTitle()).Contains(runID) == false) {
-        ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      }
+
+      TString tmp = (TString)obj->GetTitle();
+      Int_t pos = tmp.Last('~');
+      if (pos == -1) pos = tmp.Length() + 2;
+
+      TString title = tmp(0, pos - 2);
+      ((TH1F*)obj)->SetTitle(title + runID);
     }
 
   for (const Track& track : m_tracks) {

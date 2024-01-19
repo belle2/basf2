@@ -462,7 +462,7 @@ in the very same way that we previously did a cut on R2 in previous exercise.
 .. admonition:: Hint
     :class: toggle xhint stacked
 
-    In case you've forgotten, the files ``uubar_sample.root`` and ``B02ks0pi0_sample.root``
+    In case you've forgotten, the files ``B02ks0pi0_sample.root`` and ``uubar_sample.root``
     consist of 2000 and 30000 events respectively. You can choose half for each
     by using the ``entrySequences`` option in the ``inputMdstList`` function.
     See the documentation at :ref:`mawrappers`.

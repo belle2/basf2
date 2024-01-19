@@ -86,7 +86,7 @@ namespace Belle2 {
         return particle->getExtraInfo("beamBackgroundSuppression");
       } else {
         B2WARNING("The extraInfo beamBackgroundSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getBeamBackgroundProbability or turn the argument loadPhotonBeamBackgroundMVA to True when using fillParticleList.");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getBeamBackgroundProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -97,7 +97,7 @@ namespace Belle2 {
         return particle->getExtraInfo("fakePhotonSuppression");
       } else {
         B2WARNING("The extraInfo fakePhotonSuppression is not registered! \n"
-                  "This variable is only available for photons, and you either have to run the function getFakePhotonProbability or turn the argument loadFakePhotonMVA to True when using fillParticleList.");
+                  "This variable is only available for photons, and you either have to use the standard particle lists (stdPhotons or stdPi0s) or run getFakePhotonProbability on a photon list.");
         return Const::doubleNaN;
       }
     }
@@ -241,7 +241,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyEnergy();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[0][0]));
       }
       return Const::doubleNaN;
     }
@@ -385,7 +387,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster  = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyTheta();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[2][2]));
       }
       return Const::doubleNaN;
     }
@@ -395,7 +399,9 @@ namespace Belle2 {
 
       const ECLCluster* cluster = particle->getECLCluster();
       if (cluster) {
-        return cluster->getUncertaintyPhi();
+        ClusterUtils clutls;
+        const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+        return sqrt(fabs(EPhiThetaCov[1][1]));
       }
       return Const::doubleNaN;
     }
@@ -1410,11 +1416,11 @@ More details about Zernike polynomials can be found in `Wikipedia <https://en.wi
 Returns second moment :math:`S`. It is defined as:
 
 .. math::
-    S = \frac{\sum_{i=0}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=0}^{n} w_{i} E_{i}}
+    S = \frac{1}{S_{0}(\theta)}\frac{\sum_{i=0}^{n} w_{i} E_{i} r^2_{i}}{\sum_{i=0}^{n} w_{i} E_{i}}
 
 where :math:`E_{i} = (E_0, E_1, ...)` are the single crystal energies sorted by energy, :math:`w_{i}` is
 the crystal weight, and :math:`r_{i}` is the distance of the :math:`i`-th digit to the shower center projected
-to a plane perpendicular to the shower axis.
+to a plane perpendicular to the shower axis. :math:`S_{0}(\theta)` normalizes :math:`S` to 1 for isolated photons.
 
 .. note::
     | Please read `this <importantNoteECL>` first.
@@ -1423,7 +1429,7 @@ to a plane perpendicular to the shower axis.
     | Precision: :math:`10` bit
 ..
 
-)DOC",":math:`\\text{cm}^2`");
+)DOC","dimensionless");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT, R"DOC(
 Returns lateral energy distribution (shower variable). It is defined as following:
 

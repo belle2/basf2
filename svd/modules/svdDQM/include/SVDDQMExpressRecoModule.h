@@ -176,6 +176,12 @@ namespace Belle2 {
     /** v strip count (online Zero Suppression */
     TH1F** m_onlineZSstripCountV = nullptr;
 
+    /** U strip count for cluster time group Id = 0 */
+    TH1F** m_stripCountGroupId0U = nullptr;
+
+    /** V strip count for cluster time group Id = 0 */
+    TH1F** m_stripCountGroupId0V = nullptr;
+
     /** u strip count for 3 samples */
     TH1F** m_strip3CountU = nullptr;
     /** v strip count  for 3 samples*/

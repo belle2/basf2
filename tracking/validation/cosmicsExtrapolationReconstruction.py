@@ -20,25 +20,45 @@
 import basf2
 from reconstruction import add_cosmics_reconstruction
 
-basf2.set_random_seed(12345)
+ACTIVE = True
 
-main = basf2.create_path()
 
-# Input.
-main.add_module('RootInput', inputFileName='../CosmicsSimNoBkg.root')
+def run():
+    """
+    Run the cosmics reconstruction and extrapolation.
+    """
+    basf2.set_random_seed(12345)
 
-# Extrapolation. Tracks are not merged (otherwise, many backward-extrapolated
-# tracks are removed).
-main.add_module('Gearbox')
-main.add_module('Geometry')
-add_cosmics_reconstruction(main, merge_tracks=False)
+    main = basf2.create_path()
 
-# Output.
-output = basf2.register_module('RootOutput')
-output.param('outputFileName', '../CosmicsExtrapolation.root')
-output.param('branchNames', ['ExtHits', 'KLMHit2ds',
-                             'MCParticles', 'Tracks', 'TrackFitResults'])
-main.add_module(output)
+    # Input.
+    main.add_module('RootInput', inputFileName='../CosmicsSimNoBkg.root')
 
-# Process the path.
-basf2.process(main, max_event=1000)
+    # Extrapolation. Tracks are not merged (otherwise, many backward-extrapolated
+    # tracks are removed).
+    main.add_module('Gearbox')
+    main.add_module('Geometry')
+    add_cosmics_reconstruction(main, merge_tracks=False)
+
+    # Output.
+    output = basf2.register_module('RootOutput')
+    output.param('outputFileName', '../CosmicsExtrapolation.root')
+    output.param('branchNames', ['ExtHits', 'KLMHit2ds',
+                                 'MCParticles', 'Tracks', 'TrackFitResults'])
+    main.add_module(output)
+
+    main.add_module('Progress')
+
+    # Process the path.
+    basf2.process(main, max_event=1000)
+
+    print(basf2.statistics)
+
+
+if __name__ == '__main__':
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

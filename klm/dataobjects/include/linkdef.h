@@ -33,6 +33,7 @@
 #pragma read \
   sourceClass="Belle2::KLMMuidHit" source="TVector3 m_ExtPosition" version="[-1]"\
   targetClass="Belle2::KLMMuidHit" target="m_ExtPosition" \
+  include="TVector3.h" \
   code = "{ \
             m_ExtPosition[0] = onfile.m_ExtPosition.X(); \
             m_ExtPosition[1] = onfile.m_ExtPosition.Y(); \
@@ -41,6 +42,7 @@
 #pragma read \
   sourceClass="Belle2::KLMMuidHit" source="TVector3 m_HitPosition" version="[-1]"\
   targetClass="Belle2::KLMMuidHit" target="m_HitPosition" \
+  include="TVector3.h" \
   code = "{ \
             m_HitPosition[0] = onfile.m_HitPosition.X(); \
             m_HitPosition[1] = onfile.m_HitPosition.Y(); \

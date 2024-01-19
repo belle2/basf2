@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,6 +12,7 @@ from .svgdrawing import attributemaps
 from . import svgdrawing
 from datetime import datetime
 import subprocess
+import tempfile
 import os.path
 import os
 from ROOT import Belle2  # make Belle2 namespace available
@@ -30,7 +30,7 @@ class CDCSVGDisplayModule(basf2.Module):
     Personal two dimensional event display based on scalable vector graphics
     """
 
-    def __init__(self, output_folder="/tmp", interactive=True):
+    def __init__(self, output_folder=tempfile.gettempdir(), interactive=True):
         """
         Constructor method
 
@@ -43,7 +43,7 @@ class CDCSVGDisplayModule(basf2.Module):
             Defaults to True
         """
 
-        super(CDCSVGDisplayModule, self).__init__()
+        super().__init__()
         # call constructor of base class, required!
 
         #: Switch if the module shall show the event to the user and wait to continue or just generate the images

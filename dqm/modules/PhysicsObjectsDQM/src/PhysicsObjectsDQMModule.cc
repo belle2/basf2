@@ -65,8 +65,8 @@ PhysicsObjectsDQMModule::PhysicsObjectsDQMModule() : HistoModule()
 void PhysicsObjectsDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  TDirectory* physicsobjDir = oldDir->mkdir("PhysicsObjects");
-  physicsobjDir->cd();
+  oldDir->mkdir("PhysicsObjects");
+  oldDir->cd("PhysicsObjects");
 
   m_h_mKS0 = new TH1F("mKS0", "KS0 Invariant Mass", 20, 0.48, 0.52);
   m_h_mKS0->SetXTitle("M(K_{S}^{0}) [GeV]");

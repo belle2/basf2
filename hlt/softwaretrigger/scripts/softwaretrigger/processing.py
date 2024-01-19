@@ -297,6 +297,9 @@ def add_expressreco_processing(path,
         else:
             basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
+        basf2.set_module_parameters(path, "SVDTimeGrouping", forceGroupingFromDB=False,
+                                    isEnabledIn6Samples=True, isEnabledIn3Samples=True)
+
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
 
     if prune_output:

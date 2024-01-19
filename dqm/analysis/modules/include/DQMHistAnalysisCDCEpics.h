@@ -86,7 +86,9 @@ namespace Belle2 {
   protected:
 
     //Canvas for DQM analysis IR plots
-    TCanvas* m_cBoards = nullptr; /**< main panel */
+    TCanvas* c_hist_adc = nullptr; /**< canvas for adc board median */
+    TCanvas* c_hist_tdc = nullptr; /**< canvas for tdc board median */
+
     TBox* m_boxadc  = nullptr; /**< box for normal ADC window */
     TBox* m_boxtdc  = nullptr; /**< box for normal ADC window */
 

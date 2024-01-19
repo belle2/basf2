@@ -14,6 +14,7 @@
 //ROOT
 #include <TCanvas.h>
 #include <TH2F.h>
+#include <TText.h>
 #include <TExec.h>
 
 //std
@@ -147,6 +148,8 @@ namespace Belle2 {
     TH2F* h_channels_summary = nullptr;
     /** TCanvas for ECL alarms regarding suspicious channels */
     TCanvas* c_channels_summary = nullptr;
+    /** Labels on the ECL alarms histogram */
+    std::vector<TText*> m_labels;
     /** Special object to specify style parameters */
     TExec* m_ecl_style = nullptr;
     /** Special object to revert changes done by ecl_style */

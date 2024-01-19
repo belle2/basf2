@@ -49,7 +49,7 @@ def loadStdSkimHighEffTracks(particletype, path):
     @param path         modules are added to this path
     """
 
-    pidnames = {'pi': 'pionID', 'K': 'kaonID', 'p': 'protonID', 'e': 'electronID', 'mu': 'muonID'}
+    pidnames = {'pi': 'binaryPID(211,321)', 'K': 'binaryPID(321,211)', 'p': 'protonID', 'e': 'electronID', 'mu': 'muonID'}
 
     # basic quality cut strings
     trackQuality = 'thetaInCDCAcceptance and chiProb > 0 '
@@ -359,14 +359,14 @@ def loadStdAllEta(persistent=True, path=None):
 
 def loadStdSkimHighEffEta(persistent=True, path=None):
     """
-    Create a list of 'eta:SkimHighEff' list from 'gamma:all gamma:all' (dmID=1) and
+    Create a list of 'eta:SkimHighEff' list from 'gamma:tight gamma:tight' (dmID=1) and
     'pi0:eff40_May2020 pi-:SkimHighEff pi+:SkimHighEff'
     (dmID=2), with :math:`0.4< M < 0.6~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('eta:SkimHighEff1 -> gamma:all gamma:all', '0.4 < M < 0.6', 1, persistent, path)
+    ma.reconstructDecay('eta:SkimHighEff1 -> gamma:tight gamma:tight', '0.4 < M < 0.6', 1, persistent, path)
     ma.reconstructDecay(
         'eta:SkimHighEff2 -> pi0:eff40_May2020 pi-:SkimHighEff pi+:SkimHighEff',
         '0.4 < M < 0.6',
@@ -408,14 +408,14 @@ def loadStdAllEtaPrime(persistent=True, path=None):
 
 def loadStdSkimHighEffEtaPrime(persistent=True, path=None):
     """
-    Create a list of 'eta\':SkimHighEff' list from 'pi+:SkimHighEff pi-:SkimHighEff gamma:all' (dmID=1)
+    Create a list of 'eta\':SkimHighEff' list from 'pi+:SkimHighEff pi-:SkimHighEff gamma:tight' (dmID=1)
     and 'pi+:SkimHighEff pi-:SkimHighEff eta:SkimHighEff'
     (dmID=2), with :math:`0.8< M < 1.1~GeV`
 
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('eta\':SkimHighEff1 -> pi+:SkimHighEff pi-:SkimHighEff gamma:all', '0.8 < M < 1.1', 1, persistent, path)
+    ma.reconstructDecay('eta\':SkimHighEff1 -> pi+:SkimHighEff pi-:SkimHighEff gamma:tight', '0.8 < M < 1.1', 1, persistent, path)
     ma.reconstructDecay(
         'eta\':SkimHighEff2 -> pi+:SkimHighEff pi-:SkimHighEff eta:SkimHighEff',
         '0.8 < M < 1.1',
@@ -434,7 +434,8 @@ def loadStdLooseEtaPrime(persistent=True, path=None):
     @param persistent   whether RootOutput module should save the created ParticleLists (default True)
     @param path         modules are added to this path
     """
-    ma.reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:loose', '0.8 < M < 1.1', 1, persistent, path)
+    ma.cutAndCopyList('gamma:etaprg', 'gamma:loose', 'E>0.1')
+    ma.reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:etaprg', '0.8 < M < 1.1 and ', 1, persistent, path)
     ma.reconstructDecay('eta\':loose2 -> pi+:loose pi-:loose eta:loose', '0.8 < M < 1.1', 2, persistent, path)
     ma.copyLists('eta\':loose', ['eta\':loose1', 'eta\':loose2'], persistent, path)
     return 'eta\':loose'

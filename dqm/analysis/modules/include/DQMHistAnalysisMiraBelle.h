@@ -63,10 +63,7 @@ namespace Belle2 {
     void terminate() override final;
 
   protected:
-    bool m_debug;/**<debug*/
-    bool m_enableAlert;/**<Enable alert by base color of canvases*/
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */
-    Belle2::DQMFileMetaData* dqm_data = nullptr; /**< DQM file meta data */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
     Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
     Belle2::MonitoringObject* mon_bhabha = nullptr; /**< MonitoringObject for bhabha events */

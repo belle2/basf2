@@ -27,8 +27,6 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   // set module description (e.g. insert text)
   setDescription("Modify and analyze the data quality histograms of MiraBelle");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("debug", m_debug, "debug mode", false);
-  addParam("alert", m_enableAlert, "Enable color alert", true);
   addParam("scale_dst", m_scale_dst, "Scale factor signal/sideband", 0.09375);
 }
 
@@ -89,31 +87,31 @@ void DQMHistAnalysisMiraBelleModule::endRun()
 {
   // ========== mumutight
   // get existing histograms produced by DQM modules
-  TH1* hist_npxd = findHist("PhysicsObjectsMiraBelle/hist_npxd");
-  TH1* hist_nsvd = findHist("PhysicsObjectsMiraBelle/hist_nsvd");
-  TH1* hist_ncdc = findHist("PhysicsObjectsMiraBelle/hist_ncdc");
-  TH1* hist_topdig = findHist("PhysicsObjectsMiraBelle/hist_topdig");
-  TH1* hist_DetPhotonARICH = findHist("PhysicsObjectsMiraBelle/hist_DetPhotonARICH");
-  TH1* hist_klmTotalHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalHits");
-  TH1* hist_klmClusterLayers = findHist("PhysicsObjectsMiraBelle/hist_klmClusterLayers");
-  TH1* hist_dD0 = findHist("PhysicsObjectsMiraBelle/hist_dD0");
-  TH1* hist_dZ0 = findHist("PhysicsObjectsMiraBelle/hist_dZ0");
-  TH1* hist_dPtcms = findHist("PhysicsObjectsMiraBelle/hist_dPtcms");
-  TH1* hist_Pval = findHist("PhysicsObjectsMiraBelle/hist_Pval");
-  TH1* hist_nExtraCDCHits = findHist("PhysicsObjectsMiraBelle/hist_nExtraCDCHits");
-  TH1* hist_nECLClusters = findHist("PhysicsObjectsMiraBelle/hist_nECLClusters");
-  TH1* hist_muid = findHist("PhysicsObjectsMiraBelle/hist_muid");
-  TH1* hist_inv_p = findHist("PhysicsObjectsMiraBelle/hist_inv_p");
-  TH1* hist_ndf = findHist("PhysicsObjectsMiraBelle/hist_ndf");
-  TH1* hist_D0 = findHist("PhysicsObjectsMiraBelle/hist_D0");
-  TH1* hist_Z0 = findHist("PhysicsObjectsMiraBelle/hist_Z0");
-  TH1* hist_theta = findHist("PhysicsObjectsMiraBelle/hist_theta");
-  TH1* hist_Phi0 = findHist("PhysicsObjectsMiraBelle/hist_Phi0");
-  TH1* hist_Pt = findHist("PhysicsObjectsMiraBelle/hist_Pt");
-  TH1* hist_Mom = findHist("PhysicsObjectsMiraBelle/hist_Mom");
-  TH1* hist_klmTotalBarrelHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalBarrelHits");
-  TH1* hist_klmTotalEndcapHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalEndcapHits");
-  TH1* hist_dPhicms = findHist("PhysicsObjectsMiraBelle/hist_dPhicms");
+  auto* hist_npxd = findHist("PhysicsObjectsMiraBelle/hist_npxd");
+  auto* hist_nsvd = findHist("PhysicsObjectsMiraBelle/hist_nsvd");
+  auto* hist_ncdc = findHist("PhysicsObjectsMiraBelle/hist_ncdc");
+  auto* hist_topdig = findHist("PhysicsObjectsMiraBelle/hist_topdig");
+  auto* hist_DetPhotonARICH = findHist("PhysicsObjectsMiraBelle/hist_DetPhotonARICH");
+  auto* hist_klmTotalHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalHits");
+  auto* hist_klmClusterLayers = findHist("PhysicsObjectsMiraBelle/hist_klmClusterLayers");
+  auto* hist_dD0 = findHist("PhysicsObjectsMiraBelle/hist_dD0");
+  auto* hist_dZ0 = findHist("PhysicsObjectsMiraBelle/hist_dZ0");
+  auto* hist_dPtcms = findHist("PhysicsObjectsMiraBelle/hist_dPtcms");
+  auto* hist_Pval = findHist("PhysicsObjectsMiraBelle/hist_Pval");
+  auto* hist_nExtraCDCHits = findHist("PhysicsObjectsMiraBelle/hist_nExtraCDCHits");
+  auto* hist_nECLClusters = findHist("PhysicsObjectsMiraBelle/hist_nECLClusters");
+  auto* hist_muid = findHist("PhysicsObjectsMiraBelle/hist_muid");
+  auto* hist_inv_p = findHist("PhysicsObjectsMiraBelle/hist_inv_p");
+  auto* hist_ndf = findHist("PhysicsObjectsMiraBelle/hist_ndf");
+  auto* hist_D0 = findHist("PhysicsObjectsMiraBelle/hist_D0");
+  auto* hist_Z0 = findHist("PhysicsObjectsMiraBelle/hist_Z0");
+  auto* hist_theta = findHist("PhysicsObjectsMiraBelle/hist_theta");
+  auto* hist_Phi0 = findHist("PhysicsObjectsMiraBelle/hist_Phi0");
+  auto* hist_Pt = findHist("PhysicsObjectsMiraBelle/hist_Pt");
+  auto* hist_Mom = findHist("PhysicsObjectsMiraBelle/hist_Mom");
+  auto* hist_klmTotalBarrelHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalBarrelHits");
+  auto* hist_klmTotalEndcapHits = findHist("PhysicsObjectsMiraBelle/hist_klmTotalEndcapHits");
+  auto* hist_dPhicms = findHist("PhysicsObjectsMiraBelle/hist_dPhicms");
 
   if (hist_npxd == nullptr) {
     B2ERROR("Can not find the hist_npxd histogram!");
@@ -359,51 +357,51 @@ void DQMHistAnalysisMiraBelleModule::endRun()
 
   // ========== D*
   // get existing histograms produced by DQM modules
-  TH1* hist_D0_InvM = findHist("PhysicsObjectsMiraBelleDst/hist_D0_InvM");
-  TH1* hist_delta_m = findHist("PhysicsObjectsMiraBelleDst/hist_delta_m");
-  TH1* hist_D0_softpi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_ALL_pion");
-  TH1* hist_D0_softpi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_SVD_pion");
-  TH1* hist_D0_softpi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_CDC_pion");
-  TH1* hist_D0_softpi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_TOP_pion");
-  TH1* hist_D0_softpi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_ARICH_pion");
-  TH1* hist_D0_softpi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_ECL_pion");
-  TH1* hist_D0_softpi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_KLM_pion");
-  TH1* hist_D0_pi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_ALL_pion");
-  TH1* hist_D0_pi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_SVD_pion");
-  TH1* hist_D0_pi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_CDC_pion");
-  TH1* hist_D0_pi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_TOP_pion");
-  TH1* hist_D0_pi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_ARICH_pion");
-  TH1* hist_D0_pi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_ECL_pion");
-  TH1* hist_D0_pi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_KLM_pion");
-  TH1* hist_D0_K_PID_ALL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_ALL_kaon");
-  TH1* hist_D0_K_PID_SVD_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_SVD_kaon");
-  TH1* hist_D0_K_PID_CDC_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_CDC_kaon");
-  TH1* hist_D0_K_PID_TOP_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_TOP_kaon");
-  TH1* hist_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_ARICH_kaon");
-  TH1* hist_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_ECL_kaon");
-  TH1* hist_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_KLM_kaon");
-  TH1* hist_sideband_D0_softpi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_ALL_pion");
-  TH1* hist_sideband_D0_softpi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_SVD_pion");
-  TH1* hist_sideband_D0_softpi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_CDC_pion");
-  TH1* hist_sideband_D0_softpi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_TOP_pion");
-  TH1* hist_sideband_D0_softpi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_ARICH_pion");
-  TH1* hist_sideband_D0_softpi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_ECL_pion");
-  TH1* hist_sideband_D0_softpi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_KLM_pion");
-  TH1* hist_sideband_D0_pi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_ALL_pion");
-  TH1* hist_sideband_D0_pi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_SVD_pion");
-  TH1* hist_sideband_D0_pi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_CDC_pion");
-  TH1* hist_sideband_D0_pi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_TOP_pion");
-  TH1* hist_sideband_D0_pi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_ARICH_pion");
-  TH1* hist_sideband_D0_pi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_ECL_pion");
-  TH1* hist_sideband_D0_pi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_KLM_pion");
-  TH1* hist_sideband_D0_K_PID_ALL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ALL_kaon");
-  TH1* hist_sideband_D0_K_PID_SVD_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_SVD_kaon");
-  TH1* hist_sideband_D0_K_PID_CDC_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_CDC_kaon");
-  TH1* hist_sideband_D0_K_PID_TOP_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_TOP_kaon");
-  TH1* hist_sideband_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ARICH_kaon");
-  TH1* hist_sideband_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ECL_kaon");
-  TH1* hist_sideband_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_KLM_kaon");
-  TH1* hist_D0_pi0_InvM = findHist("PhysicsObjectsMiraBelleDst2/hist_D0_pi0_InvM");
+  auto* hist_D0_InvM = findHist("PhysicsObjectsMiraBelleDst/hist_D0_InvM");
+  auto* hist_delta_m = findHist("PhysicsObjectsMiraBelleDst/hist_delta_m");
+  auto* hist_D0_softpi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_ALL_pion");
+  auto* hist_D0_softpi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_SVD_pion");
+  auto* hist_D0_softpi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_CDC_pion");
+  auto* hist_D0_softpi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_TOP_pion");
+  auto* hist_D0_softpi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_ARICH_pion");
+  auto* hist_D0_softpi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_ECL_pion");
+  auto* hist_D0_softpi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_softpi_PID_KLM_pion");
+  auto* hist_D0_pi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_ALL_pion");
+  auto* hist_D0_pi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_SVD_pion");
+  auto* hist_D0_pi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_CDC_pion");
+  auto* hist_D0_pi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_TOP_pion");
+  auto* hist_D0_pi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_ARICH_pion");
+  auto* hist_D0_pi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_ECL_pion");
+  auto* hist_D0_pi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_D0_pi_PID_KLM_pion");
+  auto* hist_D0_K_PID_ALL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_ALL_kaon");
+  auto* hist_D0_K_PID_SVD_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_SVD_kaon");
+  auto* hist_D0_K_PID_CDC_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_CDC_kaon");
+  auto* hist_D0_K_PID_TOP_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_TOP_kaon");
+  auto* hist_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_ARICH_kaon");
+  auto* hist_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_ECL_kaon");
+  auto* hist_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_D0_K_PID_KLM_kaon");
+  auto* hist_sideband_D0_softpi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_ALL_pion");
+  auto* hist_sideband_D0_softpi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_SVD_pion");
+  auto* hist_sideband_D0_softpi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_CDC_pion");
+  auto* hist_sideband_D0_softpi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_TOP_pion");
+  auto* hist_sideband_D0_softpi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_ARICH_pion");
+  auto* hist_sideband_D0_softpi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_ECL_pion");
+  auto* hist_sideband_D0_softpi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_softpi_PID_KLM_pion");
+  auto* hist_sideband_D0_pi_PID_ALL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_ALL_pion");
+  auto* hist_sideband_D0_pi_PID_SVD_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_SVD_pion");
+  auto* hist_sideband_D0_pi_PID_CDC_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_CDC_pion");
+  auto* hist_sideband_D0_pi_PID_TOP_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_TOP_pion");
+  auto* hist_sideband_D0_pi_PID_ARICH_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_ARICH_pion");
+  auto* hist_sideband_D0_pi_PID_ECL_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_ECL_pion");
+  auto* hist_sideband_D0_pi_PID_KLM_pion = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_pi_PID_KLM_pion");
+  auto* hist_sideband_D0_K_PID_ALL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ALL_kaon");
+  auto* hist_sideband_D0_K_PID_SVD_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_SVD_kaon");
+  auto* hist_sideband_D0_K_PID_CDC_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_CDC_kaon");
+  auto* hist_sideband_D0_K_PID_TOP_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_TOP_kaon");
+  auto* hist_sideband_D0_K_PID_ARICH_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ARICH_kaon");
+  auto* hist_sideband_D0_K_PID_ECL_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_ECL_kaon");
+  auto* hist_sideband_D0_K_PID_KLM_kaon = findHist("PhysicsObjectsMiraBelleDst/hist_sideband_D0_K_PID_KLM_kaon");
+  auto* hist_D0_pi0_InvM = findHist("PhysicsObjectsMiraBelleDst2/hist_D0_pi0_InvM");
   if (hist_D0_InvM == nullptr) {
     B2ERROR("Can not find the hist_D0_InvM histogram!");
     return;
@@ -798,27 +796,27 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   //bhabha,hadrons
   // ========== bhabha_all
   // get existing histograms produced by DQM modules
-  TH1* histbh_npxd = findHist("PhysicsObjectsMiraBelleBhabha/hist_npxd");
-  TH1* histbh_nsvd = findHist("PhysicsObjectsMiraBelleBhabha/hist_nsvd");
-  TH1* histbh_ncdc = findHist("PhysicsObjectsMiraBelleBhabha/hist_ncdc");
-  TH1* histbh_topdig = findHist("PhysicsObjectsMiraBelleBhabha/hist_topdig");
-  TH1* histbh_DetPhotonARICH = findHist("PhysicsObjectsMiraBelleBhabha/hist_DetPhotonARICH");
-  TH1* histbh_dD0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_dD0");
-  TH1* histbh_dZ0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_dZ0");
-  TH1* histbh_dPtcms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPtcms");
-  TH1* histbh_Pval = findHist("PhysicsObjectsMiraBelleBhabha/hist_Pval");
-  TH1* histbh_nExtraCDCHits = findHist("PhysicsObjectsMiraBelleBhabha/hist_nExtraCDCHits");
-  TH1* histbh_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
-  TH1* histbh_electronid = findHist("PhysicsObjectsMiraBelleBhabha/hist_electronid");
-  TH1* histbh_inv_p = findHist("PhysicsObjectsMiraBelleBhabha/hist_inv_p");
-  TH1* histbh_ndf = findHist("PhysicsObjectsMiraBelleBhabha/hist_ndf");
-  TH1* histbh_D0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_D0");
-  TH1* histbh_Z0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_Z0");
-  TH1* histbh_theta = findHist("PhysicsObjectsMiraBelleBhabha/hist_theta");
-  TH1* histbh_Phi0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_Phi0");
-  TH1* histbh_Pt = findHist("PhysicsObjectsMiraBelleBhabha/hist_Pt");
-  TH1* histbh_Mom = findHist("PhysicsObjectsMiraBelleBhabha/hist_Mom");
-  TH1* histbh_dPhicms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPhicms");
+  auto* histbh_npxd = findHist("PhysicsObjectsMiraBelleBhabha/hist_npxd");
+  auto* histbh_nsvd = findHist("PhysicsObjectsMiraBelleBhabha/hist_nsvd");
+  auto* histbh_ncdc = findHist("PhysicsObjectsMiraBelleBhabha/hist_ncdc");
+  auto* histbh_topdig = findHist("PhysicsObjectsMiraBelleBhabha/hist_topdig");
+  auto* histbh_DetPhotonARICH = findHist("PhysicsObjectsMiraBelleBhabha/hist_DetPhotonARICH");
+  auto* histbh_dD0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_dD0");
+  auto* histbh_dZ0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_dZ0");
+  auto* histbh_dPtcms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPtcms");
+  auto* histbh_Pval = findHist("PhysicsObjectsMiraBelleBhabha/hist_Pval");
+  auto* histbh_nExtraCDCHits = findHist("PhysicsObjectsMiraBelleBhabha/hist_nExtraCDCHits");
+  auto* histbh_nECLClusters = findHist("PhysicsObjectsMiraBelleBhabha/hist_nECLClusters");
+  auto* histbh_electronid = findHist("PhysicsObjectsMiraBelleBhabha/hist_electronid");
+  auto* histbh_inv_p = findHist("PhysicsObjectsMiraBelleBhabha/hist_inv_p");
+  auto* histbh_ndf = findHist("PhysicsObjectsMiraBelleBhabha/hist_ndf");
+  auto* histbh_D0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_D0");
+  auto* histbh_Z0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_Z0");
+  auto* histbh_theta = findHist("PhysicsObjectsMiraBelleBhabha/hist_theta");
+  auto* histbh_Phi0 = findHist("PhysicsObjectsMiraBelleBhabha/hist_Phi0");
+  auto* histbh_Pt = findHist("PhysicsObjectsMiraBelleBhabha/hist_Pt");
+  auto* histbh_Mom = findHist("PhysicsObjectsMiraBelleBhabha/hist_Mom");
+  auto* histbh_dPhicms = findHist("PhysicsObjectsMiraBelleBhabha/hist_dPhicms");
 
   if (histbh_npxd == nullptr) {
     B2ERROR("Can not find the histbh_npxd histogram!");
@@ -1011,8 +1009,8 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_bhabha->setVariable("bh_sigma68_dz0", bh_sigma68_dz0);
   mon_bhabha->setVariable("bh_sigma68_dpt", bh_sigma68_dpt);
   mon_bhabha->setVariable("bh_neve_bhabha", bh_neve_bhabha);
-  mon_bhabha->setVariable("bh_goodmu_frac", bh_goode_frac);
-  mon_bhabha->setVariable("bh_goodmu_o_badmu", bh_goode_o_bade);
+  mon_bhabha->setVariable("bh_goode_frac", bh_goode_frac);
+  mon_bhabha->setVariable("bh_goode_o_bade", bh_goode_o_bade);
   mon_bhabha->setVariable("bh_pval_frac_0", bh_pval_frac_0);
   mon_bhabha->setVariable("bh_pval_frac_1", bh_pval_frac_1);
   mon_bhabha->setVariable("bh_nocdc_frac", bh_nocdc_frac);
@@ -1020,11 +1018,11 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_bhabha->setVariable("bh_noarich_frac", bh_noarich_frac);
   // ========== hadronb2 + tight
   // get existing histograms produced by DQM modules
-  TH1* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleHadron/hist_nECLClusters");
-  TH1* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_visibleEnergyCMSnorm");
-  TH1* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_EsumCMSnorm");
-  TH1* histhad_R2 = findHist("PhysicsObjectsMiraBelleHadron/hist_R2");
-  TH1* histhad_physicsresultsH = findHist("PhysicsObjectsMiraBelleHadron/hist_physicsresultsH");
+  auto* histhad_nECLClusters = findHist("PhysicsObjectsMiraBelleHadron/hist_nECLClusters");
+  auto* histhad_visibleEnergyCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_visibleEnergyCMSnorm");
+  auto* histhad_EsumCMSnorm = findHist("PhysicsObjectsMiraBelleHadron/hist_EsumCMSnorm");
+  auto* histhad_R2 = findHist("PhysicsObjectsMiraBelleHadron/hist_R2");
+  auto* histhad_physicsresultsH = findHist("PhysicsObjectsMiraBelleHadron/hist_physicsresultsH");
 
   if (histhad_nECLClusters == nullptr) {
     B2ERROR("Can not find the histhad_nECLClusters histogram!");

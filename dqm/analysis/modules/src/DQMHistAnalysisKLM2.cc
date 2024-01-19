@@ -54,9 +54,9 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_monObj = getMonitoringObject("klm");
 
   //register EPICS PVs
-  registerEpicsPV("KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
-  registerEpicsPV("KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
-  registerEpicsPV("KLMEff:2DEffSettings", "2DEffSettings");
+  registerEpicsPV("KLM:Eff:nEffBKLMLayers", "nEffBKLMLayers");
+  registerEpicsPV("KLM:Eff:nEffEKLMLayers", "nEffEKLMLayers");
+  registerEpicsPV("KLM:Eff:2DEffSettings", "2DEffSettings");
   updateEpicsPVs(5.0);
 
   if (m_refFileName != "") {

@@ -33,7 +33,7 @@ from functools import lru_cache
 import basf2 as b2
 import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdK, stdPi, stdCharged
+from stdCharged import stdK, stdPi, stdPr, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
@@ -357,7 +357,7 @@ class LambdacTopHpJm(BaseSkim):
 
     """
 
-    __authors__ = ["Jaeyoung Kim", "Justin Guilliams"]
+    __authors__ = ["Justin Guilliams"]
     __description__ = "Skim list for Lambda_c+ -> p K- pi+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
@@ -368,15 +368,15 @@ class LambdacTopHpJm(BaseSkim):
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
-        charm_skim_std_charged('p', path=path)
+        stdPr("all", path=path)
 
     def build_lists(self, path):
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["p+:charmSkim pi-:all pi+:all",
-                           "p+:charmSkim K-:all pi+:all",
-                           "p+:charmSkim pi-:all K+:all",
-                           "p+:charmSkim K-:all K+:all",
+        LambdacChannels = ["p+:loose pi-:all pi+:all",
+                           "p+:loose K-:all pi+:all",
+                           "p+:loose pi-:all K+:all",
+                           "p+:loose K-:all K+:all",
                            ]
 
         LambdacList = []

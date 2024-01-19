@@ -984,7 +984,7 @@ class DpToHpOmega(BaseSkim):
         * :math:`\\omega\\to \\pi^{+} \\pi^{-} \\pi^{0}`
 
     **Selection Criteria**:
-        * Track cuts are `charm_skim_std_charged` pion and Kaon with PID > 0.1
+        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID > 0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``p(pi0) > 0.25 and 0.11 < InvM(pi0) < 0.15``
         * ``0.71 < M(omega) < 0.85``
@@ -1008,9 +1008,9 @@ class DpToHpOmega(BaseSkim):
     def build_lists(self, path):
         ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
         ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
-        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and [0.11 < InvM < 0.15]", path=path)
+        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and 0.11 < InvM < 0.15", path=path)
 
-        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
+        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "0.71 < M < 0.85", path=path)
 
         Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
 
@@ -1033,7 +1033,7 @@ class DspToHpOmega(BaseSkim):
         * :math:`\\omega\\to \\pi^{+} \\pi^{-} \\pi^{0}`
 
     **Selection Criteria**:
-        * Track cuts are `charm_skim_std_charged` pion and Kaon with PID > 0.1
+        * Track cuts are `charm_skim_std_charged` pion and Kaon with ``PID > 0.1``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``p(pi0) > 0.25 and 0.11 < InvM(pi0) < 0.15``
         * ``0.71 < M(omega) < 0.85``
@@ -1057,9 +1057,9 @@ class DspToHpOmega(BaseSkim):
     def build_lists(self, path):
         ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
         ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
-        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and [0.11 < InvM < 0.15]", path=path)
+        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and 0.11 < InvM < 0.15", path=path)
 
-        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
+        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "0.71 < M < 0.85 ", path=path)
 
         Dspcuts = "1.77 < M < 2.17 and useCMSFrame(p) > 2.0"
         ma.reconstructDecay("D_s+:Kpomega -> K+:my omega:3pi", Dspcuts, path=path)

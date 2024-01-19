@@ -253,9 +253,9 @@ void DQMHistAnalysisECLSummaryModule::event()
   //=== Draw histogram, labels and grid
 
   // Customize title
-  int gstyle_title_h = gStyle->GetTitleH();
-  int gstyle_title_x = gStyle->GetTitleX();
-  int gstyle_title_y = gStyle->GetTitleY();
+  float gstyle_title_h = gStyle->GetTitleH();
+  float gstyle_title_x = gStyle->GetTitleX();
+  float gstyle_title_y = gStyle->GetTitleY();
   gStyle->SetTitleH(0.04);
   gStyle->SetTitleX(0.60);
   gStyle->SetTitleY(1.00);

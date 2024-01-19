@@ -300,6 +300,51 @@ class B0toDpi_Kspi(BaseSkim):
 
 
 @fancy_skim_header
+class B0toDstaretapi_D0pi_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\overline{D}^{*-} (\\to \\bar{D}^{0} (\\to K^+ \\pi^-) \\pi^-) \\eta (\\to \\gamma \\gamma) \\pi^+`
+
+    Cuts applied:
+
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.32``
+    * ``1.7 < M_D0 < 2.0``
+    * ``(M_D* - M_D0) < 0.16``
+    * ``0.35 < M_eta < 0.7``
+    * ``Energy_photons > 0.05``
+
+    Note:
+        This skim uses `skim.standardlists.charm.loadStdD0_Kpi` and `skim.standardlists.charm.loadStdDstarPlus_D0pi_Kpi`, where the
+        :math:`\\bar{D}^{0}` channel is defined.
+    """
+
+    __authors__ = ["Vismaya V S"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPhotons("all", path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdD0_Kpi(path=path)
+        loadStdDstarPlus_D0pi_Kpi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
+        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
+
+        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
+        ma.reconstructDecay("B0:B0toDstaretapi_D0pi_Kpi -> D*-:D0_Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
+
+        return ["B0:B0toDstaretapi_D0pi_Kpi"]
+
+
+@fancy_skim_header
 class B0toDstarPi_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:

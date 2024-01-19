@@ -93,6 +93,7 @@ _RegisteredSkims = [
     ("14141003", "btocharm", "B0toDstarD"),
     ("14121300", "btocharm", "B0toD0Kpipi0_pi0"),
     ("14160200", "btocharm", "B0toDs1D"),
+    ("14160201", "btocharm", "B0toDDs0star"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -153,6 +154,7 @@ _RegisteredSkims = [
     ("18530200", "lowMulti", "SingleTagPseudoScalar"),
     ("18020500", "dark", "InelasticDarkMatterWithDarkHiggs"),
     ("18370100", "dark", "AA2uuuu"),
+    ("18530600", "lowMulti", "LowMassOneTrack"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

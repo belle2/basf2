@@ -39,7 +39,7 @@ from stdPi0s import loadStdSkimPi0
 from stdV0s import stdKshorts
 
 
-__liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
+__liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

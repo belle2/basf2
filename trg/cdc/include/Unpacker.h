@@ -290,7 +290,7 @@ namespace Belle2 {
         const CDCTriggerNeuroConfig::B2FormatLine& b2line)
       {
         if (int(b2line.offset + foundtime) >= 0 &&
-            int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
+            int(b2line.offset + foundtime) < bitsNN->getEntries()) {
 
           NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
 

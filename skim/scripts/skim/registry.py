@@ -156,6 +156,7 @@ _RegisteredSkims = [
     ("18370100", "dark", "AA2uuuu"),
     ("18020600", "dark", "DimuonPlusVisibleDarkHiggs"),
     ("18020700", "dark", "DielectronPlusVisibleDarkHiggs"),
+    ("18530600", "lowMulti", "LowMassOneTrack"),
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),

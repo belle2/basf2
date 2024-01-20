@@ -326,11 +326,13 @@ class XToDp_DpToHpHmJp(BaseSkim):
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionID > 0.1', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'kaonID > 0.1', path=path)
 
-        Dp_Channels = ["pi+:charmSkim pi-:charmSkim pi+:charmSkim",
-                       "pi+:charmSkim pi-:charmSkim K+:charmSkim",
-                       "pi+:charmSkim K-:charmSkim K+:charmSkim",
-                       "K+:charmSkim K-:charmSkim pi+:charmSkim",
+        Dp_Channels = ["pi+:charmSkim_pid pi-:charmSkim_pid pi+:charmSkim_pid",
+                       "pi+:charmSkim_pid pi-:charmSkim_pid K+:charmSkim_pid",
+                       "pi+:charmSkim_pid K-:charmSkim_pid K+:charmSkim_pid",
+                       "K+:charmSkim_pid K-:charmSkim_pid pi+:charmSkim_pid",
                        ]
 
         DpList = []

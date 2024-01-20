@@ -318,16 +318,16 @@ class InclusiveUpsilon(BaseSkim):
         ma.fillParticleList('e+:all', "", path=path)
         ma.fillParticleList("mu+:all", "", path=path)
         ma.fillParticleList("pi+:all", "", path=path)
-        ma.cutAndCopyList("gamma:soft", "gamma:loose", "E>0.15", path=path)
+        ma.cutAndCopyList("gamma:skimsoft", "gamma:loose", "E>0.15", path=path)
 
         # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
-        ma.reconstructDecay("Upsilon:ee -> e+:all e-:all", "M > 8 and M < 10.6", path=path)
-        ma.reconstructDecay("Upsilon:mumu -> mu+:all mu-:all", "M > 8", path=path)
-        ma.copyLists("Upsilon:all", ["Upsilon:ee", "Upsilon:mumu"], path=path)
+        ma.reconstructDecay("Upsilon:llee -> e+:all e-:all", "M > 8 and M < 10.6", path=path)
+        ma.reconstructDecay("Upsilon:llmumu -> mu+:all mu-:all", "M > 8", path=path)
+        ma.copyLists("Upsilon:ll", ["Upsilon:llee", "Upsilon:llmumu"], path=path)
 
         # Y(1S,2S) with pi+ or photon are reconstructed
-        InclusiveUpsilon_Channels = ["Upsilon:all pi+:all",
-                                     "Upsilon:all gamma:soft"]
+        InclusiveUpsilon_Channels = ["Upsilon:ll pi+:all",
+                                     "Upsilon:ll gamma:skimsoft"]
 
         # define the Y(1S,2S) decay channel list
         InclusiveUpsilon = []

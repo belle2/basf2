@@ -68,7 +68,7 @@ and verify that you have the prerequisites. You need:
 
     It is required that you join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
     where you can ask for help and receive announcements on releases and system issues. You can also find more
-    details on the official ``gbasf2 documentation page <https://gbasf2.belle2.org/>``_
+    details on the official `gbasf2 documentation page <https://gbasf2.belle2.org/>`_
 
 
 Setting up gbasf2 via cvmfs
@@ -341,8 +341,8 @@ the data production team prepares ``collections`` of LFNs. This provides a commo
 which can help to avoid errors related to missing or using incorrect samples for an analysis. You can discover 
 collections in the same way as for LFNs.
 
-To discover the collection you need, you should first check ``Data main page <https://confluence.desy.de/display/BI/Data+main+page>``_ 
-and ``MC main page <https://confluence.desy.de/display/BI/MC+main+page>``_, which provide details for the official collections.
+To discover the collection you need, you should first check `Data main page <https://confluence.desy.de/display/BI/Data+main+page>`_ 
+and `MC main page <https://confluence.desy.de/display/BI/MC+main+page>`_, which provide details for the official collections.
 
 If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
 used the ``gb2_ds_search`` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
@@ -412,8 +412,6 @@ with the flag ``-i``.
     by the Dataset Searcher, but datablocks are now automatically appended to the dataset LPN when jobs are submitted.
     You can, if you wish to use only one datablock, append to the end of the dataset LPN the datablock of your
     choosing, but this is no longer strictly required.
-
-.. note::
 
 Everything clear? Ok, let's submit your first jobs.
 
@@ -613,7 +611,7 @@ You should see something like this:
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-      Do you see failed jobs? Go to the last section "Dealing with issues".
+     Do you see failed jobs? Go to the last section "Dealing with issues".
 
 .. admonition:: Solution
      :class: toggle solution

@@ -336,7 +336,7 @@ class InclusiveUpsilon(BaseSkim):
         # reconstruct the decay channel
         for chID, channel in enumerate(InclusiveUpsilon_Channels):
             ma.reconstructDecay(
-                "junction:all" +
+                "junction:InclusiveUpsilon" +
                 str(chID) +
                 " -> " +
                 channel,
@@ -344,7 +344,7 @@ class InclusiveUpsilon(BaseSkim):
                 chID,
                 path=path,
                 allowChargeViolation=True)
-            InclusiveUpsilon.append("junction:all" + str(chID))
+            InclusiveUpsilon.append("junction:InclusiveUpsilon" + str(chID))
 
         # reture the list
         return InclusiveUpsilon

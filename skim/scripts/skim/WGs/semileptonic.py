@@ -12,6 +12,7 @@
 """(Semi-)Leptonic Working Group Skim list building functions for semi-leptonic analyses.
 """
 
+import basf2 as b2
 import modularAnalysis as ma
 from skim.standardlists.charm import (loadKForBtoHadrons, loadPiForBtoHadrons,
                                       loadStdD0, loadStdDplus, loadStdDstar0,
@@ -27,6 +28,7 @@ from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from variables import variables as vm
+from ROOT import Belle2
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -274,8 +276,8 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     """
     Cuts applied:
 
-    * ``SkimHighEff tracks thetaInCDCAcceptance AND abs(dr) < 2 AND abs(dz) < 5 AND PID>=0.01``
-    * ``slowPi tracks thetaInCDCAcceptance AND abs(dr) < 2 AND abs(dz) < 5 AND useCMSFrame(p) < 0.4``
+    * ``SkimHighEff tracks thetaInCDCAcceptance AND dr < 2 AND abs(dz) < 5 AND PID>=0.01``
+    * ``slowPi tracks thetaInCDCAcceptance AND dr < 2 AND abs(dz) < 5 AND useCMSFrame(p) < 0.4``
     * :math:`2.5 > p_{\\ell} > 1.1\\,\\text{GeV}`
     * ``lepton with abs(d0) < 0.5 AND abs(z0) < 2 AND thetaInCDCAcceptance AND ID >= 0.95 AND 1.1 < useCMSFrame(p) < 2.5``
     * ``1.8 < M_D0 < 2.0``
@@ -356,3 +358,273 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
             B0_list.append("B0:Dstl_kpi_kpipi0_kpipipi" + str(chID))
 
         return B0_list
+
+# new SLskim
+
+
+@fancy_skim_header
+class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^- \\to D^0 e^-`,  :math:`B^- \\to D^0 \\mu^-`
+    * anti-:math:`B^0 \\to D^+ e^-`,  anti-:math:`B^0 \\to D^+ \\mu^-`
+    * anti-:math:`B^0 \\to D^{*+}(D^0 \\pi^+) e^-`,  anti-:math:`B^0 \\to D^{*+}(D^0 \\pi^+) \\mu^-`
+
+    Additional ROE cuts:
+
+    * The logical OR of the following:
+
+        * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
+        * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
+        * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
+        * Two or fewer charged tracks
+        * :math:`E_{ECL} < 2.0` GeV
+
+    Cuts on electrons:
+
+    * :math:`\\text{pidChargedBDTScore(11,all)} > 0.9`
+    * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame,  :math:`p > 0.5\\,\\text{GeV}` in lab frame
+    * :math:`dr < 0.5`,  :math:`|dz| < 2`
+    * :math:`\\text{thetaInCDCAcceptance}`
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID_noSVD} > 0.9`
+    * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame,  :math:`p > 0.7\\,\\text{GeV}` in lab frame
+    * :math:`dr < 0.5`,  :math:`|dz| < 2`
+
+    Charged mask for ROE:
+
+    * :math:`p_t>0.05\\,\\text{GeV}`
+    * :math:`dr < 5\\,\\text{cm}`,  :math:`|dz| < 10\\,\\text{cm}`
+
+    ECL cluster mask for ROE:
+
+    * :math:`\\text{clusterNHits}>1.5`,  :math:`0.2967<\\theta<2.6180`
+    * :math:`E>0.080,\\text{GeV}`
+    """
+
+    __authors__ = ["Bob Kowalewski"]
+    __description__ = "Skim for semileptonic tags with an ROE electron, muon, photon or a low-multiplicity signal decay"
+    __contact__ = __liaison__
+    __category__ = "physics, semileptonic"
+
+    TestSampleProcess = "charged"
+
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_particle_lists(self, path):
+
+        return
+
+    def build_lists(self, path):
+
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
+
+        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
+        muIDCut = "muonID_noSVD > 0.9"
+        ePCut = "p > 0.5"
+        ePtCut = "pt > 0.3"
+        muPCut = "p > 0.7"
+        muPtCut = "pt > 0.4"
+        lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
+        hadTrkCuts = "dr < 2.0 and abs(dz) < 4"
+        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
+        gammaECuts = "[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]"
+        cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
+                     f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
+        gammaSignalECut = "1.4"
+        BSLRecoCut = "InvM > 2.5 and cosBY > -3.0 and cosBY < 1.5"
+        BSLSkimCut = f"e_ROE_pCM < 3.0 or mu_ROE_pCM < 3.0 or gamma_ROE_ECM > {gammaSignalECut}" +\
+                     " or nROE_Ch < 2.5 or E_extra_ROE < 1.6"
+
+        vm.addAlias('pCM', 'useCMSFrame(p)')
+        vm.addAlias('ECM', 'useCMSFrame(E)')
+        vm.addAlias('cosBY', 'cosThetaBetweenParticleAndNominalB')
+        # electrons and muons
+        ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and pt>0.3 and p>0.5", path=path)
+        ma.applyChargedPidMVA(
+            particleLists=['e-:sig'],
+            path=path,
+            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
+        ma.applyCuts('e-:sig', eIDCut, path=path)
+
+        ma.fillParticleList("mu-:sig", f"{muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}", path=path)
+        total_leptons = "formula( nParticlesInList(e-:sig) + nParticlesInList(mu-:sig) )"
+        # don't waste time if there are no leptons
+        if (f"{total_leptons}" == "0"):
+            return []
+
+        # charged K and pi candidates
+        ma.fillParticleList("K-:loose", f"binaryPID(321,211) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1", path=path)
+        ma.fillParticleList(
+            "pi+:loose",
+            f"binaryPID(211,321) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1",
+            path=path)
+        ma.fillParticleList("pi+:slow", f"{hadTrkCuts} and thetaInCDCAcceptance and p>0.05", path=path)
+        # gamma and pi0 candidates
+        ma.fillParticleList("gamma:eff50", f'{gammaCuts} and {gammaECuts}', path=path)
+        ma.reconstructDecay("pi0:eff50 -> gamma:eff50 gamma:eff50", '0.114<InvM<0.150', path=path)
+        ma.cutAndCopyList("gamma:e90", "gamma:eff50", "E>0.090", path=path)
+        ma.reconstructDecay("pi0:e90 -> gamma:e90 gamma:e90", '0.118<InvM<0.148', path=path)
+        # K0s -> pi+pi- candidates
+        stdKshorts(path=path)
+        ma.cutAndCopyList('K_S0:good', 'K_S0:merged', cut='significanceOfDistance>2.5', path=path)
+
+        # D reconstruction - only clean modes
+        ma.reconstructDecay("D0:Kpi       -> K-:loose pi+:loose", cut="abs(dM) < 0.025", dmID=1, path=path)
+        ma.rankByLowest("D0:Kpi", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:KK        -> K-:loose K+:loose", cut="abs(dM) < 0.020", dmID=2, path=path)
+        ma.rankByLowest("D0:KK", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:K3pi      -> K-:loose pi+:loose pi-:loose pi+:loose", cut="abs(dM) < 0.020", dmID=3, path=path)
+        ma.rankByLowest("D0:K3pi", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:Kpi0pi    -> K-:loose pi0:e90 pi+:loose", cut="abs(dM)-0.005 < 0.050", dmID=4, path=path)
+        ma.rankByLowest("D0:Kpi0pi", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:piKspi      -> pi+:loose K_S0:good pi-:loose", cut="abs(dM) < 0.020", dmID=5, path=path)
+        ma.rankByLowest("D0:piKspi", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:Kspi0       -> K_S0:good pi0:e90", cut="abs(dM)-0.005 < 0.050", dmID=6, path=path)
+        ma.rankByLowest("D0:Kspi0", variable="abs(dM)", numBest=15, path=path)
+        ma.copyLists("D0:sig", ['D0:Kpi', 'D0:KK', 'D0:K3pi', 'D0:Kpi0pi', 'D0:piKspi', 'D0:Kspi0'], path=path)
+
+        ma.reconstructDecay("D+:Kpipi     -> K-:loose pi+:loose pi+:loose", cut="abs(dM) < 0.020", dmID=1, path=path)
+        ma.rankByLowest("D+:Kpipi", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D+:Kspi     -> K_S0:good pi+:loose", cut="abs(dM) < 0.020", dmID=2, path=path)
+        ma.rankByLowest("D+:Kspi", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D+:KKpi     -> K-:loose K+:loose pi+:loose", cut="abs(dM) < 0.015", dmID=3, path=path)
+        ma.rankByLowest("D+:KKpi", variable="abs(dM)", numBest=15, path=path)
+        ma.copyLists("D+:sig", ['D+:Kpipi', 'D+:Kspi', 'D+:KKpi'], path=path)
+
+# No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
+
+        ma.reconstructDecay("D*+:D0        -> pi+:slow D0:sig", cut="abs(dQ) < 0.0035", dmID=11, path=path)
+        ma.rankByLowest("D*+:D0", variable="abs(dQ)", numBest=15, path=path)
+        ma.copyLists("D*+:sig", ['D*+:D0'], path=path)
+
+# B reconstruction.  Use wide cut on cosThetaBY.
+
+        ma.reconstructDecay('anti-B0:Dpe  ->  e-:sig D+:sig ?nu ', BSLRecoCut, dmID=200, path=path)
+        ma.reconstructDecay('anti-B0:Dpmu -> mu-:sig D+:sig ?nu ', BSLRecoCut, dmID=201, path=path)
+        ma.copyLists('anti-B0:Dpl', ['anti-B0:Dpe', 'anti-B0:Dpmu'], path=path)
+        ma.rankByHighest('anti-B0:Dpl', variable='InvM', numBest=9, path=path)
+
+        ma.reconstructDecay('anti-B0:Dspe  ->  e-:sig D*+:sig ?nu ', BSLRecoCut, dmID=100, path=path)
+        ma.reconstructDecay('anti-B0:Dspmu -> mu-:sig D*+:sig ?nu ', BSLRecoCut, dmID=101, path=path)
+        ma.copyLists('anti-B0:Dspl', ['anti-B0:Dspe', 'anti-B0:Dspmu'], path=path)
+        ma.rankByHighest('anti-B0:Dspl', variable='InvM', numBest=9, path=path)
+
+        ma.reconstructDecay('B-:D0e  ->  e-:sig D0:sig     ?nu ', BSLRecoCut, dmID=400, path=path)
+        ma.reconstructDecay('B-:D0mu -> mu-:sig D0:sig     ?nu ', BSLRecoCut, dmID=401, path=path)
+        ma.copyLists('B-:D0l', ['B-:D0e', 'B-:D0mu'], path=path)
+        ma.rankByHighest('B-:D0l', variable='InvM', numBest=9, path=path)
+
+# master SL B lists
+        ma.copyLists('B-:SL', ['B-:D0l'], path=path)
+        ma.copyLists('anti-B0:SL', ['anti-B0:Dspl', 'anti-B0:Dpl'], path=path)
+
+# Build ROE and look for e-, mu-, charged multiplicity and E_ECL
+
+        for Btype in ['B-:SL', 'anti-B0:SL']:
+
+            roe_path = b2.create_path()
+            deadEndPath = b2.create_path()
+# Execute the filter module:
+            ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
+            ma.appendROEMasks(Btype, [cleanMask], path=path)
+            ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
+
+            ma.fillParticleList(
+                "e-:roeB",
+                f"isInRestOfEvent == 1 and {eIDCut} and {lepTrkCuts} and thetaInCDCAcceptance and {ePtCut} and {ePCut}",
+                path=roe_path)
+            ma.fillParticleList(
+                "mu-:roeB",
+                f"isInRestOfEvent == 1 and {muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}",
+                path=roe_path)
+            ma.fillParticleList("gamma:roeB", f'{gammaCuts} and ECM > {gammaSignalECut}', path=roe_path)
+            ma.rankByHighest('e-:roeB', 'pCM', numBest=1, path=roe_path)
+            ma.rankByHighest('mu-:roeB', 'pCM', numBest=1, path=roe_path)
+            ma.rankByHighest('gamma:roeB', 'ECM', numBest=1, path=roe_path)
+            ma.variableToSignalSideExtraInfo('e-:roeB', {'pCM': 'e_ROEB_pCM'}, path=roe_path)
+            ma.variableToSignalSideExtraInfo('mu-:roeB', {'pCM': 'mu_ROEB_pCM'}, path=roe_path)
+            ma.variableToSignalSideExtraInfo('gamma:roeB', {'ECM': 'gamma_ROEB_ECM'}, path=roe_path)
+            vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROEB_pCM)')
+            vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROEB_pCM)')
+            vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
+            vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
+            vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
+
+            path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
+
+#  Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
+
+        ma.applyCuts('B-:SL', f'passesCut({BSLSkimCut})', path=path)
+        ma.applyCuts('anti-B0:SL', f'passesCut({BSLSkimCut})', path=path)
+        b_sl_list = ['B-:SL', 'anti-B0:SL']
+
+        return b_sl_list
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
+
+        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
+        muIDCut = "muonID_noSVD > 0.9"
+        lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
+        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
+        gammaSignalECut = "1.4"
+        cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
+                     f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
+        roe_path = b2.create_path()
+        deadEndPath = b2.create_path()
+        for Btype in ['B-:SL', 'anti-B0:SL']:
+            ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
+            ma.appendROEMasks(Btype, [cleanMask], path=path)
+            ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
+
+            ma.fillParticleList(
+                "e-:roeB",
+                f"isInRestOfEvent == 1 and {eIDCut} and {lepTrkCuts} and thetaInCDCAcceptance and pt>0.3 and p>0.5",
+                path=roe_path)
+            ma.fillParticleList(
+                "mu-:roeB",
+                f"isInRestOfEvent == 1 and {muIDCut} and {lepTrkCuts} and pt>0.4 and p>0.7",
+                path=roe_path)
+            ma.fillParticleList("gamma:roeB", f"isInRestOfEvent == 1 and {gammaCuts} and ECM > {gammaSignalECut}", path=roe_path)
+            ma.rankByHighest('e-:roeB', 'pCM', numBest=1, path=roe_path)
+            ma.rankByHighest('mu-:roeB', 'pCM', numBest=1, path=roe_path)
+            ma.rankByHighest('gamma:roeB', 'ECM', numBest=1, path=roe_path)
+            ma.variableToSignalSideExtraInfo('e-:roeB', {'pCM': 'e_ROE_pCM'}, path=roe_path)
+            ma.variableToSignalSideExtraInfo('mu-:roeB', {'pCM': 'mu_ROE_pCM'}, path=roe_path)
+            ma.variableToSignalSideExtraInfo('gamma:roeB', {'ECM': 'gamma_ROE_ECM'}, path=roe_path)
+            vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROE_pCM)')
+            vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROE_pCM)')
+            vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
+            vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
+            vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanmask))')
+            path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
+
+        histogramFilename = f'{self}_Validation.root'
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist='B-:SL',
+            variables_1d=[
+                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', __liaison__, '', ''),
+                ('InvM', 100, 2.5, 5.3, 'M(D(*)+l)', __liaison__, '', ''),
+                ('useCMSFrame(d0_p)', 100, 0, 5.0, 'Tag lepton momentum in CMS', __liaison__, '', ''),
+                ('useCMSFrame(d1_p)', 100, 0, 5.0, 'Tag D(*) momentum in CMS', __liaison__, '', ''),
+                ('e_ROE_pCM', 100, 0, 5.0, 'ROE e momentum in CMS', __liaison__, '', ''),
+                ('mu_ROE_pCM', 100, 0, 5.0, 'ROE mu momentum in CMS', __liaison__, '', ''),
+                ('gamma_ROE_ECM', 100, 0, 5.0, 'ROE gamma energy in CMS', __liaison__, '', ''),
+                ('nROE_Ch', 20, 0, 20.0, 'N(trk) in ROE', __liaison__, '', ''),
+                ('E_extra_ROE', 100, 0, 2.5, 'E_ECL (CMS) in ROE', __liaison__, '', '')
+            ],
+            path=path)

@@ -189,6 +189,14 @@ namespace Belle2 {
     m_manualEvent = std::nullopt;
   }
 
+  std::set<std::string> DBStore::getAllEntryNames()
+  {
+    std::set<std::string> s{};
+    for (auto& [key, value] : m_dbEntries)
+      s.emplace(key);
+    return s;
+  };
+
   void DBStore::addConstantOverride(const std::string& name, TObject* obj, bool oneRun)
   {
     IntervalOfValidity iov = IntervalOfValidity::always();

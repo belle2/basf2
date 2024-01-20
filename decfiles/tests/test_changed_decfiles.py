@@ -70,6 +70,11 @@ if __name__ == '__main__':
                                   if (Path(new_file.a_path).suffix == '.dec')
                                   and (Path('decfiles/dec') in Path(new_file.a_path).parents)]
 
+    # in case some decfiles are removed, they end up in the list of modified files:
+    # let's keep only the decfiles that are actually found by basf2.find_file
+    added_or_modified_decfiles = [decfile for decfile in added_or_modified_decfiles
+                                  if basf2.find_file(decfile.as_posix(), silent=True)]
+
     steering_file = basf2.find_file('decfiles/tests/test_changed_decfiles.py_noexec')
     custom_evtpdl = basf2.find_file("decfiles/tests/test_changed_decfiles.pdl")
     default_evtpdl = basf2.find_file('data/framework/particledb/evt.pdl')

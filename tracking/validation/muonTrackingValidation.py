@@ -25,8 +25,6 @@ VALIDATION_OUTPUT_FILE = 'MuonTrackingValidation.root'
 N_EVENTS = 10000
 ACTIVE = True
 
-basf2.set_random_seed(1337)
-
 
 class Muon(TrackingValidationRun):
     """Validate the full track-finding chain with single-muon events"""
@@ -64,6 +62,7 @@ class Muon(TrackingValidationRun):
 
 
 def main():
+    basf2.set_random_seed(1337)
     validation_run = Muon()
     validation_run.configure_and_execute_from_commandline()
 
@@ -72,3 +71,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

@@ -558,8 +558,8 @@ void DQMHistAnalysisKLM2Module::event()
                         m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs in DQMHistAnalysisKLM2");
-  double procesedEvents = DQMHistAnalysisModule::getEventProcessed();
-  if (procesedEvents > m_minEvents) {
+  int procesedEvents = DQMHistAnalysisModule::getEventProcessed();
+  if (procesedEvents > (int)m_minEvents) {
     setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
     setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
   }

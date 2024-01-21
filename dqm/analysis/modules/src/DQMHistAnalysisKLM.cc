@@ -174,7 +174,7 @@ double DQMHistAnalysisKLMModule::getProcessedEvents()
     /* Set the minimal number of processed events to 0 if we can't determine the processed events. */
     m_MinProcessedEventsForMessages = 0.;
   }
-  return DQMHistAnalysisModule::getEventProcessed();
+  return (double) DQMHistAnalysisModule::getEventProcessed();
 }
 
 void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas)
@@ -533,7 +533,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       * and write an error message. */
       if (m_DeadBarrelModules.size() == 0) {
         colorizeCanvas(canvas, c_StatusGood);
-      } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+      } else if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
         for (KLMModuleNumber module : m_DeadBarrelModules) {
           m_ElementNumbers->moduleNumberToElementNumbers(
             module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
@@ -577,7 +577,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       * and write an error message. */
       if (m_DeadEndcapModules.size() == 0) {
         colorizeCanvas(canvas, c_StatusGood);
-      } else if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+      } else if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
         for (KLMModuleNumber module : m_DeadEndcapModules) {
           m_ElementNumbers->moduleNumberToElementNumbers(
             module, &moduleSubdetector, &moduleSection, &moduleSector, &moduleLayer);
@@ -707,7 +707,7 @@ void DQMHistAnalysisKLMModule::event()
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
   // only update PVs if there's enough statistics
-  if (m_ProcessedEvents >= m_MinProcessedEventsForMessages) {
+  if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
     setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
     setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
     setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());

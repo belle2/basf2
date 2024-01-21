@@ -247,6 +247,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         klmdqm = b2.register_module("KLMDQM")
         path.add_module(klmdqm)
 
+    # KLM2 (requires mu+ particle list from add_analysis_dqm)
+    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
+                        MinimalMatchingDigits=12,
+                        MinimalMatchingDigitsOuterLayers=0,
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")
+
     # TRG before all reconstruction runs (so on all events with all unpacked information)
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "before_filter"]):
         # TRGECL

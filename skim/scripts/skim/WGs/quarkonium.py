@@ -326,3 +326,62 @@ class InclusiveLambda(BaseSkim):
 
         # Return the lists.
         return ["Lambda0:merged"]
+
+
+@fancy_skim_header
+class InclusiveUpsilon(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * Upsilon(1S,2S,3S) -> l^+ l^- (l = e or mu)
+
+    Selection criteria:
+
+    * 3 charged tracks or 2 charged tracks + 1 std photon
+      8.5 < M < 10.6 for e+e- mode and M > 8.5 for mu+mu- mode
+    """
+
+    __authors__ = ["Sen Jia"]
+    __description__ = "Inclusive Upsilon(1S,2S,3S) skim"
+    __contact__ = __liaison__
+    __category__ = "physics, quarkonium"
+
+    def load_standard_lists(self, path):
+        stdPhotons("loose", path=path)
+
+    def build_lists(self, path):
+
+        # create and fill e/mu/pi/photon ParticleLists
+        ma.fillParticleList('e+:all', "", path=path)
+        ma.fillParticleList("mu+:all", "", path=path)
+        ma.fillParticleList("pi+:all", "", path=path)
+        ma.cutAndCopyList("gamma:skimsoft", "gamma:loose", "E>0.15", path=path)
+
+        # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
+        ma.reconstructDecay("Upsilon:llee -> e+:all e-:all", "M > 8 and M < 10.6", path=path)
+        ma.reconstructDecay("Upsilon:llmumu -> mu+:all mu-:all", "M > 8", path=path)
+        ma.copyLists("Upsilon:ll", ["Upsilon:llee", "Upsilon:llmumu"], path=path)
+
+        # Y(1S,2S) with pi+ or photon are reconstructed
+        InclusiveUpsilon_Channels = ["Upsilon:ll pi+:all",
+                                     "Upsilon:ll gamma:skimsoft"]
+
+        # define the Y(1S,2S) decay channel list
+        InclusiveUpsilon = []
+        InclusiveUpsilon_cuts = ""
+
+        # reconstruct the decay channel
+        for chID, channel in enumerate(InclusiveUpsilon_Channels):
+            ma.reconstructDecay(
+                "junction:InclusiveUpsilon" +
+                str(chID) +
+                " -> " +
+                channel,
+                InclusiveUpsilon_cuts,
+                chID,
+                path=path,
+                allowChargeViolation=True)
+            InclusiveUpsilon.append("junction:InclusiveUpsilon" + str(chID))
+
+        # reture the list
+        return InclusiveUpsilon

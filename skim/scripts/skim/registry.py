@@ -41,7 +41,7 @@ _RegisteredSkims = [
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
     ("11160200", "semileptonic", "SLUntagged"),
-    # ("11130301", "leptonic", "dilepton"), transferred to TDCPV WG skim file
+    # ("11130301", "leptonic", "dilepton"), transferred to TDCPV WG skim file. New skim code: 13130300
     ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11170100", "semileptonic", "BtoDl_and_ROE_e_or_mu_or_lowmult"),
     ("11180100", "fei", "feiHadronicB0"),

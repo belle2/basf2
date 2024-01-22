@@ -546,30 +546,84 @@ def add_phokhara_generator(path, finalstate=''):
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): One of the possible final state "mu+mu-", "pi+pi-", "pi+pi-pi0"
+        finalstate (str): One of the following final states: "mu+mu-", "pi+pi-", "pi+pi-pi0", "pi+pi-pi+pi-" (or "2(pi+pi-)"),
+          "pi+pi-pi0pi0" or ("pi+pi-2pi0"), "pi+pi-eta", "K+K-", "K0K0bar" or "ppbar"
     """
 
-    phokhara = path.add_module('PhokharaInput')
-
     if finalstate == 'mu+mu-':
-        phokhara.param('FinalState', 0)
-        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
-        phokhara.param('NLO', 1)  # use full two loop corrections
-        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+        path.add_module(
+            'PhokharaInput',
+            FinalState=0,        # mu+mu-
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_mumuISR')
 
     elif finalstate == 'pi+pi-':
-        phokhara.param('FinalState', 1)
-        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
-        phokhara.param('NLO', 1)  # use full two loop corrections
-        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+        path.add_module(
+            'PhokharaInput',
+            FinalState=1,        # pi+pi-
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipiISR')
 
     elif finalstate == 'pi+pi-pi0':
-        phokhara.param('FinalState', 8)
-        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
-        phokhara.param('NLO', 0)  # no two loop corrections
-        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+        path.add_module(
+            'PhokharaInput',
+            FinalState=8,        # pi+pi-pi0
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipipi0ISR')
+
+    elif finalstate == 'pi+pi-pi+pi-' or finalstate == '2(pi+pi-)':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=3,        # 2(pi+pi-)
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipipipiISR')
+
+    elif finalstate == 'pi+pi-pi0pi0' or finalstate == 'pi+pi-2pi0':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=2,        # pi+pi-2pi0
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipipi0pi0ISR')
+
+    elif finalstate == 'pi+pi-eta':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=10,       # pi+pi-eta
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipietaISR')
+
+    elif finalstate == 'K+K-':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=6,        # K+K-
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_KKISR')
+
+    elif finalstate == 'K0K0bar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=7,        # K0K0bar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_K0K0barISR')
+
+    elif finalstate == 'ppbar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=4,        # ppbar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_ppbarISR')
+
     else:
-        b2.B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL(f"add_phokhara_generator final state not supported: {finalstate}")
 
 
 def add_phokhara_evtgen_combination(

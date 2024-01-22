@@ -253,7 +253,7 @@ class LFVZpVisible(BaseSkim):
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
-        stdMu("loose", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         """

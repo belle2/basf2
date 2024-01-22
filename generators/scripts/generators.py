@@ -547,7 +547,7 @@ def add_phokhara_generator(path, finalstate=''):
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate (str): One of the following final states: "mu+mu-", "pi+pi-", "pi+pi-pi0", "pi+pi-pi+pi-" (or "2(pi+pi-)"),
-          "pi+pi-pi0pi0" or ("pi+pi-2pi0"), "pi+pi-eta", "K+K-", "K0K0bar" or "ppbar"
+          "pi+pi-pi0pi0" or ("pi+pi-2pi0"), "pi+pi-eta", "K+K-", "K0K0bar", "ppbar", "n0n0bar" or "Lambda0Lambda0bar"
     """
 
     if finalstate == 'mu+mu-':
@@ -621,6 +621,22 @@ def add_phokhara_generator(path, finalstate=''):
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
         ).set_name('PHOKHARA_ppbarISR')
+
+    elif finalstate == 'n0n0bar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=5,        # n0n0bar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_n0n0barISR')
+
+    elif finalstate == 'Lambda0Lambda0bar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=9,        # Lambda0Lambda0bar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_Lambda0Lambda0barISR')
 
     else:
         b2.B2FATAL(f"add_phokhara_generator final state not supported: {finalstate}")

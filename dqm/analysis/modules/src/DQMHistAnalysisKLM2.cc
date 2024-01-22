@@ -30,6 +30,8 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms (depends on tracking variables).");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
+  addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
+           std::string("ref/KLMEfficiencyDQM"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 50000.);
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
@@ -67,16 +69,44 @@ void DQMHistAnalysisKLM2Module::initialize()
   if (m_refFile && m_refFile->IsOpen()) {
     B2INFO("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
 
-    m_ref_efficiencies_bklm = (TH1F*)m_refFile->Get((m_histogramDirectoryName + "/eff_bklm_plane").data());
-    m_ref_efficiencies_bklm->SetLineColor(2);
-    m_ref_efficiencies_bklm->SetOption("HIST");
-    m_ref_efficiencies_bklm->SetStats(false);
+    m_ref_efficiencies_bklm = (TH1F*)m_refFile->Get((m_refHistogramDirectoryName + "/eff_bklm_plane").data());
+    if (m_ref_efficiencies_bklm != nullptr) {
+      B2INFO("DQMHistAnalysisKLM2: eff_bklm_plane histogram was found in reference");
+      m_ref_efficiencies_bklm->SetLineColor(2);
+      m_ref_efficiencies_bklm->SetOption("HIST");
+      m_ref_efficiencies_bklm->SetStats(false);
+    } else {
+      B2WARNING("DQMHistAnalysisKLM2: eff_bklm_plane histogram not found in reference");
+      m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
+                                         0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
+      for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
+        if (m_ratio) {
+          m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 1);
+        } else {
+          m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 0);
+        }
+      }
+    }
 
-    m_ref_efficiencies_eklm = (TH1F*)m_refFile->Get((m_histogramDirectoryName + "/eff_eklm_plane").data());
-    m_ref_efficiencies_eklm->SetLineColor(2);
-    m_ref_efficiencies_eklm->SetOption("HIST");
-    m_ref_efficiencies_eklm->SetStats(false);
 
+    m_ref_efficiencies_eklm = (TH1F*)m_refFile->Get((m_refHistogramDirectoryName + "/eff_eklm_plane").data());
+    if (m_ref_efficiencies_eklm != nullptr) {
+      B2INFO("DQMHistAnalysisKLM2: eff_eklm_plane histogram was found in reference");
+      m_ref_efficiencies_eklm->SetLineColor(2);
+      m_ref_efficiencies_eklm->SetOption("HIST");
+      m_ref_efficiencies_eklm->SetStats(false);
+    } else {
+      B2WARNING("DQMHistAnalysisKLM2: eff_eklm_plane histogram not found in reference");
+      m_ref_efficiencies_eklm = new TH1F("eff_eklm_plane", "Plane Efficiency in EKLM", EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
+                                         0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
+      for (int lay_id = 0; lay_id < EKLMElementNumbers::getMaximalPlaneGlobalNumber(); lay_id++) {
+        if (m_ratio) {
+          m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 1);
+        } else {
+          m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 0);
+        }
+      }
+    }
   } else {
     B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
 
@@ -430,16 +460,16 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         refErr = 0.;
       }
 
-      if ((mainEff == 0) and (refEff == 0)) {
+      if ((mainEff == 0.) and (refEff == 0.)) {
         // empty histograms, draw blank bin
-        eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
-      } else if ((refEff == 0) and (ratioPlot)) {
+        eff2dHist->SetBinContent(binx + 1, biny + 1, 0.);
+      } else if ((refEff == 0.) and (ratioPlot)) {
         // no reference, set maximum value
         eff2dHist->SetBinContent(binx + 1, biny + 1, maxVal);
-      } else if (mainEff == 0) {
+      } else if (mainEff == 0.) {
         // no data, set zero
-        eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
-        errHist->SetBinContent(binx + 1, biny + 1, 0);
+        eff2dHist->SetBinContent(binx + 1, biny + 1, 0.);
+        errHist->SetBinContent(binx + 1, biny + 1, 0.);
       } else {
 
         if (ratioPlot) {

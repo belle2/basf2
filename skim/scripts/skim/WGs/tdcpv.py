@@ -382,7 +382,7 @@ class TDCPV_ccs(BaseSkim):
 
 
 @fancy_skim_header
-class dilepton(BaseSkim):
+class TDCPV_dilepton(BaseSkim):
     """
     Reconstructed decays
         * :math:`B\\overline{B} \\to l^+l^-`

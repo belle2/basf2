@@ -180,13 +180,11 @@ double DQMHistAnalysisKLMModule::getProcessedEvents()
 void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas)
 {
   if (delta != nullptr) {
-    auto scale = delta->Integral();
-    if (scale > 0. && histogram->Integral() > 0) scale = histogram->Integral() / delta->Integral();
-    else scale = 1.0;
+    Double_t scale = (Double_t) histogram->Integral(); //want delta and histo to have same norm
 
     // delta != nullptr should take care of whether update condition is met.
     delta->SetLineColor(kCopper); //random choice of not green or blue
-    delta->DrawNormalized("SAME", scale);
+    delta->DrawNormalized("SAME", scale); //normalize delta to histo
     canvas->Modified();
     canvas->Update();
   }

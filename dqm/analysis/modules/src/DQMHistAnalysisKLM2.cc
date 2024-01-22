@@ -81,8 +81,8 @@ void DQMHistAnalysisKLM2Module::initialize()
     B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
-    m_alarmThr = 0;
-    m_warnThr = 0;
+    m_alarmThr = 0.0;
+    m_warnThr = 0.5; //contigency value to still spot some problems
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
                                        0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
     for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {

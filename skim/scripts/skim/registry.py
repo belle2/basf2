@@ -40,8 +40,8 @@ _RegisteredSkims = [
     # --- WG1: SL + missing energy ---
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
-    ("11130301", "leptonic", "dilepton"),
     ("11160200", "semileptonic", "SLUntagged"),
+    # ("11130301", "leptonic", "dilepton"), transferred to TDCPV WG skim file
     ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11170100", "semileptonic", "BtoDl_and_ROE_e_or_mu_or_lowmult"),
     ("11180100", "fei", "feiHadronicB0"),
@@ -60,6 +60,8 @@ _RegisteredSkims = [
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
+    ("13130300", "tdcpv", "TDCPV_dilepton"),
+
 
     # --- WG4: Charmed B decays ---
     ("14120300", "btocharm", "BtoD0h_Kspi0"),

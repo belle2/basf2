@@ -550,13 +550,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             ma.variableToSignalSideExtraInfo('e-:roeB', {'pCM': 'e_ROEB_pCM'}, path=roe_path)
             ma.variableToSignalSideExtraInfo('mu-:roeB', {'pCM': 'mu_ROEB_pCM'}, path=roe_path)
             ma.variableToSignalSideExtraInfo('gamma:roeB', {'ECM': 'gamma_ROEB_ECM'}, path=roe_path)
-            vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROEB_pCM)')
-            vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROEB_pCM)')
-            vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
-            vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
-            vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
             path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
+
+        vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROEB_pCM)')
+        vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROEB_pCM)')
+        vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_ECM)')
+        vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
+        vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
 #  Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
 

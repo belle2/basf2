@@ -28,8 +28,7 @@ main.add_module("EventInfoSetter", expList=1003, runList=0, evtNumList=num_event
 ge.add_evtgen_generator(path=main, finalstate='mixed')
 # ge.add_continuum_generator(path=main, finalstate='ccbar')
 
-# main.add_module('PrintMCParticles',showStatus=True, onlyPrimaries=False,maxLevel=3)
-# # GAT prediction
+# GAT prediction
 NNFilterModule_m = NNFilterModule(
         extra_info_var='GAT_AfterGen'
     )
@@ -44,17 +43,17 @@ mdst.add_mdst_output(
     additionalBranches=["EventExtraInfo"]
 )
 
-# # detector simulation
+# detector simulation
 si.add_simulation(path=main)
 
-# # reconstruction
+# reconstruction
 re.add_reconstruction(path=main)
 
-# # FEI skims from Leptonic WG
+# FEI skims from Leptonic WG
 fei_skim = feiHadronicB0(udstOutput=False, analysisGlobaltag=ma.getAnalysisGlobaltag())
 fei_skim(path=main)
 
-# # Create the mDST output file after Skim
+# Create the mDST output file after Skim
 mdst.add_mdst_output(
     path=main,
     filename=f'{out_dir}AfterFEI.root',

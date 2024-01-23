@@ -28,7 +28,7 @@ from basf2 import B2ERROR
 
 # ----- those parameters need to be adjusted before running -----------------------
 #
-globalTags = ['data_reprocessing_proc11']  # highest priority first
+globalTags = ['online']  # highest priority first
 localDBs = []  # highest priority first, local DB's have higher priority than global tags
 data_dir = '/ghi/fs01/belle2/bdata/group/detector/TOP/2019-*/data_sroot_global/'
 main_output_dir = 'top_calibration'
@@ -57,11 +57,14 @@ inputFiles = []
 expNo = 'e' + '{:0=4d}'.format(experiment)
 for run in run_numbers:
     expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
-    filename = f"{data_dir}/top.{expRun}.*.sroot"
+    if sroot_format:
+        filename = f"{data_dir}/top.{expRun}.*.sroot"
+    else:
+        filename = f"{data_dir}/top.{expRun}.*.root"
     inputFiles += glob.glob(filename)
 if len(inputFiles) == 0:
     runs = "".join([str(r) + "," for r in run_numbers])[:-1]
-    B2ERROR(f'No sroot files found in {data_dir} for exp={str(experiment)} runs={runs}')
+    B2ERROR(f'No root files found in {data_dir} for exp={str(experiment)} runs={runs}')
     sys.exit()
 
 # Check the existence of additional input files
@@ -80,14 +83,20 @@ output_dir = f"{main_output_dir}/channelT0-local-{expNo}-{run_range}"
 # basf2.set_log_level(basf2.LogLevel.WARNING)
 
 
-def channelT0_calibration():
-    ''' calibration of channel T0 with laser data '''
+def channelT0_calibration(sroot=False):
+    '''
+    calibration of channel T0 with laser data
+    :param sroot: True if input files are in sroot format, False if in root format
+    '''
 
     #   create path
     main = basf2.create_path()
 
     #   basic modules
-    main.add_module('SeqRootInput')
+    if sroot:
+        main.add_module('SeqRootInput')
+    else:
+        main.add_module('RootInput')
     main.add_module('TOPGeometryParInitializer')
     main.add_module('TOPUnpacker')
     main.add_module('TOPRawDigitConverter',

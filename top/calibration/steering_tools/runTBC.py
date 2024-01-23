@@ -23,7 +23,7 @@ import sys
 argvs = sys.argv
 if len(argvs) != 5:
     print('usage: basf2', argvs[0],
-          '-i <file_sroot> (pocket|local) <slot> <channel> <output_dir>')
+          '-i <file_root> (pocket|local) <slot> <channel> <output_dir>')
     sys.exit()
 
 datatype = argvs[1]      # data type (pocket, local)

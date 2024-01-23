@@ -445,7 +445,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('ECM', 'useCMSFrame(E)')
         vm.addAlias('cosBY', 'cosThetaBetweenParticleAndNominalB')
         # electrons and muons
-        ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and pt>0.3 and p>0.5", path=path)
+        ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and {ePtCut} and {ePCut}", path=path)
         ma.applyChargedPidMVA(
             particleLists=['e-:sig'],
             path=path,

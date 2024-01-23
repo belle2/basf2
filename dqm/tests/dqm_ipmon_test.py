@@ -27,9 +27,27 @@ with b2tu.clean_working_directory():
     # Modules
     main.add_module('DQMHistAnalysisEpicsEnable')  # enable EPICS output
     main.add_module('DQMHistAnalysisInputTest', Events=30, ConfigFiles=configs)
-    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_x", MonitorPrefix="ip", PVName="TEST:IP:X:")
-    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_y", MonitorPrefix="ip", PVName="TEST:IP:Y:")
-    main.add_module('DQMHistAnalysisIP', HistoDirectory="test", HistoName="ip_z", MonitorPrefix="ip", PVName="TEST:IP:Z:")
+    main.add_module(
+        'DQMHistAnalysisPeak',
+        HistoDirectory="test",
+        HistoName="ip_x",
+        MonitorObjectName="ip",
+        MonitorPrefix="ip",
+        PVName="TEST:IP:X:")
+    main.add_module(
+        'DQMHistAnalysisPeak',
+        HistoDirectory="test",
+        HistoName="ip_y",
+        MonitorObjectName="ip",
+        MonitorPrefix="ip",
+        PVName="TEST:IP:Y:")
+    main.add_module(
+        'DQMHistAnalysisPeak',
+        HistoDirectory="test",
+        HistoName="ip_z",
+        MonitorObjectName="ip",
+        MonitorPrefix="ip",
+        PVName="TEST:IP:Z:")
     main.add_module('DQMHistAnalysisEpicsOutput')  # flush EPICS output
 
     # Process all events

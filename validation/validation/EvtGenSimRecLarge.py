@@ -53,7 +53,11 @@ main.add_module('Progress')
 # memory profile
 main.add_module("Profile")
 
-# do not output to save storage space
+# output
+main.add_module("RootOutput",
+                outputFileName="../EvtGenSimRecLarge.root",
+                branchNames=["ProfileInfo"])
+
 process(main)
 
 # Print call statistics

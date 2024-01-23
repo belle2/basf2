@@ -1,3 +1,14 @@
+Changes in the analysis package in light-2402-ocicat
+----------------------------------------------------
+
+Variables
++++++++++
+* The variable `daughterDiffOf` accepts generalized daughter indices now so
+  that you can calculate the difference of any variable between particles of
+  different generations. The variable `grandDaughterDiffOf` is therefore not
+  needed anymore and declared deprecated. The variables `mcDaughterDiffOf`
+  and `daughterNormDiffOf` also accept generalized daughter indices now.
+
 Changes in the analysis package in light-2311-nebelung
 ------------------------------------------------------
 

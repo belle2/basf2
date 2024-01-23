@@ -27,7 +27,7 @@ variables.addAlias('q2', 'formula(daughterInvM(1, 2)**2)')
 
 path = basf2.Path()
 path.add_module('EventInfoSetter', evtNumList=[10000])
-add_evtgen_generator(path, 'signal', basf2.find_file('decfiles/dec/Bu_Dst0enu.dec'))
+add_evtgen_generator(path, 'signal', basf2.find_file('decfiles/dec/1263210000.dec'))
 findMCDecay('B+:sig', 'B+ -> [anti-D*0 -> anti-D0 pi0] e+ nu_e', path=path)
 create_validation_histograms(
     path, 'Validate_B2Vlnu.root', 'B+:sig',

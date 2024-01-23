@@ -80,10 +80,10 @@ namespace Belle2 {
 
     /**
      * Analyse channel hit histogram.
-     * @param[in]  subdetector  Subdetector.
-     * @param[in]  section      Section.
+     * @param[in]  subdetector  Subdetector (E or B-KLM).
+     * @param[in]  section      Section (Forward or Backward).
      * @param[in]  sector       Sector.
-     * @param[in]  index        Histogram Index.
+     * @param[in]  index        Histogram Index (The j'th histogram of a given sector).
      * @param[in]  histogram    Histogram.
      * @param[in]  delta        Delta Histogram.
      * @param[in]  canvas       Canvas.

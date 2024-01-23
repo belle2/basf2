@@ -379,7 +379,8 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
                                               trackFitHypotheses=[211],
                                               prune_temporary_tracks=False,
                                               fit_tracks=True,
-                                              append_full_grid_cdc_eventt0=True)
+                                              append_full_grid_cdc_eventt0=True,
+                                              skip_full_grid_cdc_eventt0_if_svd_time_present=False)
         reco_path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     reco_path.add_module('Progress')

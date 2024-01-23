@@ -31,7 +31,7 @@ class PerfectLCA(Metric, object):
     :type ignore_background: bool
     """
 
-    def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
+    def __init__(self, ignore_index, output_transform, device='cpu', ignore_background=False):
 
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
         self.device = device
@@ -121,7 +121,7 @@ class PerfectMasses(Metric, object):
     :type ignore_background: bool
     """
 
-    def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
+    def __init__(self, ignore_index, output_transform, device='cpu', ignore_background=False):
 
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
         self.device = device
@@ -213,7 +213,7 @@ class PerfectEvent(Metric, object):
     :type ignore_background: bool
     """
 
-    def __init__(self, ignore_index, output_transform=lambda x: x, device='cpu', ignore_background=False):
+    def __init__(self, ignore_index, output_transform, device='cpu', ignore_background=False):
 
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
         self.device = device

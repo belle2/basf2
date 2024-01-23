@@ -7,7 +7,7 @@ def get_object_list(pointerVec):
     Workaround to avoid memory problems in basf2.
 
     Args:
-        pointerVec (list or Belle2.ParticleList): Input particle list.
+        pointerVec: Input particle list.
 
     Returns:
         list: Output python list.

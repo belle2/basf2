@@ -145,6 +145,9 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
+    /** Message Threshold for expert pots */
+    int m_MessageThreshold;
+
     /** Input parameter for minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessagesInput;
 

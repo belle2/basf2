@@ -62,18 +62,7 @@ def charm_skim_std_charged(particle_type, path):
 @fancy_skim_header
 class XToD0_D0ToHpJm(BaseSkim):
     """
-    **Decay Modes**:
-        * :math:`D^{0}\\to \\pi^+ \\pi^-`,
-        * :math:`D^{0}\\to K^+ \\pi^-`,
-        * :math:`D^{0}\\to K^- \\pi^+`,
-        * :math:`D^{0}\\to K^+ K^-`,
-
-    **Selection Criteria**:
-        * Use tracks from the charm_skim_std_charged
-        * ``1.70 < M(D0) < 2.00, pcms(D0) > 2.0``
-        * `` K/pi binary ID > 0.2, pi_pionIDNN > 0.1``
-        * For more details, please check the source code of this skim.
-
+    Skims :math:`D^0`'s reconstructed by `XToD0_D0ToHpJm.D0ToHpJm`.
     """
 
     __authors__ = ["Dinura Hettiarachchi"]
@@ -93,11 +82,30 @@ class XToD0_D0ToHpJm(BaseSkim):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
 
-    def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
+    # Cached static method, so that its contents are only executed once for a single path.
+    # Factored out into a separate function here, so it is available to other skims.
 
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+    @staticmethod
+    @lru_cache()
+    def D0ToHpJm(path):
+        """
+        **Decay Modes**:
+            * :math:`D^{0} \\to \\pi^+ \\pi^-`,
+            * :math:`D^{0} \\to K^+ \\pi^-`,
+            * :math:`D^{0} \\to K^- \\pi^+`,
+            * :math:`D^{0} \\to K^+ K^-`,
+
+        **Selection Criteria**:
+            * Use tracks from the charm_skim_std_charged
+            * ``1.70 < M(D0) < 2.00, pcms(D0) > 2.0``
+            * `` K/pi binary ID > 0.2, pi_pionIDNN > 0.1``
+            * For more details, please check the source code of this skim.
+
+        """
+
+        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
 
         D0Cuts = "1.70 < M < 2.00 and useCMSFrame(p) > 2.0"
         D0Channels = ["pi+:charmSkim_pid pi-:charmSkim_pid",
@@ -110,8 +118,11 @@ class XToD0_D0ToHpJm(BaseSkim):
         for chID, channel in enumerate(D0Channels):
             ma.reconstructDecay("D0:HpJm" + str(chID) + " -> " + channel, D0Cuts, chID, path=path)
             D0List.append("D0:HpJm" + str(chID))
-
         return D0List
+
+    def build_lists(self, path):
+        """Builds :math:`D^0` skim lists defined in `XToD0_D0ToHpJm.D0ToHpJm`."""
+        return self.D0ToHpJm(path)
 
 
 @fancy_skim_header

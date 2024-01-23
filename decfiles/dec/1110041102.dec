@@ -18,7 +18,7 @@ Alias K10sig K_10
 Alias anti_K10sig anti-K_10
 ChargeConj K10sig anti_K10sig
 
-Decay Upsilon(4S)sig
+Decay Upsilon(4S)
 1.000    B0sig anti-B0sig B0  anti-B0  VSS_BMIX dm;
 Enddecay
 

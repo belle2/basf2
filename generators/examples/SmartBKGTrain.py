@@ -36,7 +36,6 @@ udst_columns = [
 
 def load_events(
     filenames,
-    columns=None,
     balenced=True,
     max_events=None,
 ):
@@ -45,7 +44,6 @@ def load_events(
 
     Args:
         filenames (list): List of file paths.
-        columns (list): List of columns to load.
         balanced (bool): Whether to balance the number of pass and fail events.
         max_events (int): Maximum number of events to load.
 
@@ -204,7 +202,7 @@ def test(model, ds_test):
 if __name__ == "__main__":
     # training process
     train_udst, info = load_events(
-        filenames=file_path.glob('pp*.parquet'),
+        filenames=file_path.glob('preprocessed*.parquet'),
         columns=needed_particle_columns + needed_event_columns + udst_columns,
         balenced=True
     )
@@ -223,7 +221,7 @@ if __name__ == "__main__":
 
     # test process
     test_udst, info = load_events(
-        filenames=file_path.glob('pp*.parquet'),
+        filenames=file_path.glob('preprocessed*.parquet'),
         columns=needed_particle_columns + needed_event_columns + udst_columns,
         balenced=False
     )

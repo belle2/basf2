@@ -24,7 +24,7 @@ f_input = f"./mdst{file_id}.root"
 
 main = b2.create_path()
 
-# input Mdst, skip num_events*(job_id-1) events used by previous jobs
+# input Mdst, skip num_events*(job_id-1) events used by previous batch jobs
 # job_id MUST at least start from 1
 ma.inputMdst(environmentType="default", filename=f_input, skipNEvents=num_events*((job_id-1) % 73), path=main)
 
@@ -38,7 +38,7 @@ mdst.add_mdst_output(
 skim = feiHadronicB0(analysisGlobaltag=ma.getAnalysisGlobaltag(), udstOutput=False)
 skim(main)
 ma.applyEventCuts("eventExtraInfo(passes_feiHadronicB0)", main)
-
+# Save the event number of each pass event as the flag for the training of NN
 main.add_module(SaveFlag(f'{out_dir}_flag{job_id}.parquet'))
 
 b2.process(path=main, max_event=num_events)

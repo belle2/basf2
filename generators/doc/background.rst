@@ -9,8 +9,8 @@ The computational resource used for steps between generation and skim will be sa
 For the inference part, a well trained neural network
 (parameters saved in global tag ``SmartBKG_GATGAP`` with payload ``GATGAPgen.pth``)
 to filter out events that can pass FEI hadronic B0 skim is available. The corresponding neural network
-built with PyTorch is stored in ``generators/script/smartBKG/models/gatgap.py`` while
-``generators/script/smartBKG/b2modules/NN_filter_module.py`` is a wrapper (``basf2.module``) suited in basf2
+built with PyTorch is stored in ``generators/scripts/smartBKG/models/gatgap.py`` while
+``generators/scripts/smartBKG/b2modules/NN_filter_module.py`` is a wrapper (``basf2.module``) suited in basf2
 framework. An example of how to generate skimmed events using SmartBKG can be found in 
 ``generators/examples/SmartBKGEvtGen.py``.
 
@@ -29,6 +29,7 @@ your custom skimming process.
     )
     # Arbitrary skimming process
     your_skimming(main)
+    # Save the event number of each pass event as the flag for the training of NN
     main.add_module(SaveFlag(f'{out_dir}_flag{job_id}.parquet'))
 
 Execute ``generators/examples/SmartBKGDataProduction.py`` following the completion of ``SmartBKGSkimTracking.py`` 
@@ -45,7 +46,7 @@ Alternatively, you can update the globaltag
 (refer to :numref:`framework/doc/development/tuppr:Updating the main globaltag`).
 
 If you wish to apply the project to particle lists other than Y(4S) and B, manual specification is required 
-in the script ``generators/script/smartBKG/b2modules/NN_trainer_module/data_production.py`` and 
+in the script ``generators/scripts/smartBKG/b2modules/NN_trainer_module/data_production.py`` and 
 ``generators/script/smartBKG/__init__.py``
 The modules are designed to handle continuum datasets as well.
 

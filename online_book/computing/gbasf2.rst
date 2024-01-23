@@ -13,7 +13,7 @@ Gbasf2
     **Prerequisites**:
 
     * See `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
-    * A system with SL6 or CentOS 7 (or access to KEKCC).
+    * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
     * A valid `grid certificate <https://confluence.desy.de/display/BI/Computing+Belle-II-Grid-Certificate>`_ installed in ``~/.globus`` and in a web browser.
     * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
@@ -58,7 +58,7 @@ The same basf2 steering files are used when running on the grid. The usual workf
 Go to `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_
 and verify that you have the prerequisites. You need:
 
-* A system with SL6 or CentOS 7 (or access to KEKCC).
+* Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
 * A valid grid certificate issued within a year and `installed <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
 * Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
   `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
@@ -75,7 +75,7 @@ Setting up gbasf2 via cvmfs
 ---------------------------
 
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
-gbasf2 can function. At this moment, only SL6 and CentOS 7 are supported.
+gbasf2 can function. At this moment, only CentOS 7 is supported.
 
 Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
@@ -114,8 +114,6 @@ It will request your certificate passphrase. If the command finishes without err
 
     Succeed with return value:
     0
-
-If you are not asked for your passphrase, you may need to initialize a proxy yourself using ``gb2_prxy_init -g belle``.
 
 That's it! You are ready to run grid jobs!
 
@@ -436,7 +434,7 @@ Now that you've checked to make sure it works, let's submit a gbasf2 project:
 .. code-block:: bash
 
     gbasf2 -p gb2Tutorial_Bd2JpsiKs_240101 -s light-2311-nebelung \
-           -i /belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst/sub00 \
+           -i /belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst \
            ~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
 
 A project summary and a confirmation prompt will be displayed after excecuting gbasf2

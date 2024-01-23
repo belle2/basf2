@@ -572,45 +572,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
-        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
-        muIDCut = "muonID_noSVD > 0.9"
-        lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
-        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
-        gammaSignalECut = "1.4"
-        cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
-                     f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
-        roe_path = b2.create_path()
-        deadEndPath = b2.create_path()
-        for Btype in ['B-:SL', 'anti-B0:SL']:
-            ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
-            ma.appendROEMasks(Btype, [cleanMask], path=path)
-            ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
-
-            ma.fillParticleList(
-                "e-:roeB",
-                f"isInRestOfEvent == 1 and {eIDCut} and {lepTrkCuts} and thetaInCDCAcceptance and pt>0.3 and p>0.5",
-                path=roe_path)
-            ma.fillParticleList(
-                "mu-:roeB",
-                f"isInRestOfEvent == 1 and {muIDCut} and {lepTrkCuts} and pt>0.4 and p>0.7",
-                path=roe_path)
-            ma.fillParticleList("gamma:roeB", f"isInRestOfEvent == 1 and {gammaCuts} and ECM > {gammaSignalECut}", path=roe_path)
-            ma.rankByHighest('e-:roeB', 'pCM', numBest=1, path=roe_path)
-            ma.rankByHighest('mu-:roeB', 'pCM', numBest=1, path=roe_path)
-            ma.rankByHighest('gamma:roeB', 'ECM', numBest=1, path=roe_path)
-            ma.variableToSignalSideExtraInfo('e-:roeB', {'pCM': 'e_ROE_pCM'}, path=roe_path)
-            ma.variableToSignalSideExtraInfo('mu-:roeB', {'pCM': 'mu_ROE_pCM'}, path=roe_path)
-            ma.variableToSignalSideExtraInfo('gamma:roeB', {'ECM': 'gamma_ROE_ECM'}, path=roe_path)
-            vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROE_pCM)')
-            vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROE_pCM)')
-            vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
-            vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
-            vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanmask))')
-            path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
+        vm.addAlias('d0_p', 'daughter(0, p)')
+        vm.addAlias('d1_p', 'daughter(1, p)')
 
         histogramFilename = f'{self}_Validation.root'
 

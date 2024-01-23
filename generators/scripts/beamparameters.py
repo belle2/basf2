@@ -331,12 +331,9 @@ def get_collisions_invariant_mass(experiment, run, verbose=False):
         return output
 
     # Run _get_collisions_invariant_mass with the helper function to avoid issues with basf2
-    collisions_invariant_mass = _run_function_in_process(
+    return _run_function_in_process(
         func=_get_collisions_invariant_mass, experiment=experiment, run=run, verbose=verbose
     )
-    if verbose:
-        B2INFO(f'The collisions invariant mass from BeamParameters is {collisions_invariant_mass} GeV')
-    return collisions_invariant_mass
 
 
 if __name__ == "__main__":

@@ -219,7 +219,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   if (m_refFile && m_refFile->IsOpen()) {
     ref_histogram = (TH1*)m_refFile->Get((m_refHistogramDirectoryPrefix + histogram->GetName()).data());
     if (!ref_histogram) {
-      B2WARNING("Unable to find " << histogram->GetName() << "in reference file.");
+      B2WARNING("Unable to find " << m_refHistogramDirectoryPrefix << histogram->GetName() << " in reference file.");
     }
   }
 

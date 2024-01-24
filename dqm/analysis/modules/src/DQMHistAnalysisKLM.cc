@@ -714,12 +714,14 @@ void DQMHistAnalysisKLMModule::event()
   } else
     B2WARNING("DQMHistAnalysisKLM: Cannot find KLMDataSize");
   if ((daqDataSize != nullptr) and (meanDAQDataSize != 0.)) {
-    setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
-    setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
-    setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
-    B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
-    B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
-    B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
+    if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
+      setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
+      setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
+      setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
+      B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
+      B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
+      B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
+    }
   } else
     B2INFO("DQMHistAnalysisKLM: KLM Not included. No PV Update. ");
 

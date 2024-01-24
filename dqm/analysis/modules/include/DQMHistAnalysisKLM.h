@@ -160,6 +160,9 @@ namespace Belle2 {
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;
 
+    /** Prefix to account for reference file*/
+    std::string m_refHistogramDirectoryPrefix;
+
     /** Reference Histogram Root file name */
     std::string m_refFileName;
 

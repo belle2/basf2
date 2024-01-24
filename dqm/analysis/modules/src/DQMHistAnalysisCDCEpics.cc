@@ -60,35 +60,38 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   registerEpicsPV(m_pvPrefix + "adc_median_window", "adcmedianwindow");
   registerEpicsPV(m_pvPrefix + "tdc_median_window", "tdcmedianwindow");
 
-  double unused = 0;
-  requestLimitsFromEpicsPVs("adcmedianwindow", unused, m_minadc, m_maxadc, unused);
-  requestLimitsFromEpicsPVs("tdcmedianwindow", unused, m_mintdc, m_maxtdc, unused);
-
-  //in case if something is wrong in config file
-  if (!std::isnan(m_minadc)) m_minadc = 60.0;
-  if (!std::isnan(m_maxadc)) m_maxadc = 130.0;
-  if (!std::isnan(m_mintdc)) m_mintdc = 4600.0;
-  if (!std::isnan(m_maxtdc)) m_maxtdc = 5000.0;
-
-  //creating box for normal adc and tdc windows
-  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
-  m_line_ladc->SetLineColor(kRed);
-  m_line_ladc->SetLineWidth(2);
-  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
-  m_line_hadc->SetLineColor(kRed);
-  m_line_hadc->SetLineWidth(2);
-  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
-  m_line_ltdc->SetLineColor(kRed);
-  m_line_ltdc->SetLineWidth(2);
-  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
-  m_line_htdc->SetLineColor(kRed);
-  m_line_htdc->SetLineWidth(2);
-
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: initialized.");
 }
 
 void DQMHistAnalysisCDCEpicsModule::beginRun()
 {
+  double unused = 0;
+  requestLimitsFromEpicsPVs("adcmedianwindow", unused, m_minadc, m_maxadc, unused);
+  requestLimitsFromEpicsPVs("tdcmedianwindow", unused, m_mintdc, m_maxtdc, unused);
+
+  //in case if something is wrong in config file
+  if (std::isnan(m_minadc)) m_minadc = 60.0;
+  if (std::isnan(m_maxadc)) m_maxadc = 130.0;
+  if (std::isnan(m_mintdc)) m_mintdc = 4600.0;
+  if (std::isnan(m_maxtdc)) m_maxtdc = 5000.0;
+
+  //creating box for normal adc and tdc windows
+  m_line_ladc = new TLine(0, m_minadc, 300, m_minadc);
+  m_line_ladc->SetLineColor(kRed);
+  m_line_ladc->SetLineWidth(2);
+
+  m_line_hadc = new TLine(0, m_maxadc, 300, m_maxadc);
+  m_line_hadc->SetLineColor(kRed);
+  m_line_hadc->SetLineWidth(2);
+
+  m_line_ltdc = new TLine(0, m_mintdc, 300, m_mintdc);
+  m_line_ltdc->SetLineColor(kRed);
+  m_line_ltdc->SetLineWidth(2);
+
+  m_line_htdc = new TLine(0, m_maxtdc, 300, m_maxtdc);
+  m_line_htdc->SetLineColor(kRed);
+  m_line_htdc->SetLineWidth(2);
+
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: beginRun run called");
 }
 
@@ -109,7 +112,9 @@ void DQMHistAnalysisCDCEpicsModule::event()
   int cadcgood = 0, ctdcgood = 0;
   int cadcbad = 0, ctdcbad = 0;
   double sumadcgood = 0, sumtdcgood = 0;
+
   for (int ic = 0; ic < 300; ++ic) {
+    if (ic == 0) continue; //299 boards only
     m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
     m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
     float md_adc = getHistMedian(m_hADCs[ic]);
@@ -130,10 +135,10 @@ void DQMHistAnalysisCDCEpicsModule::event()
 
   }
 
-  double adcfrac = cadcgood / 3.0; // (100.0/300) in %
+  double adcfrac = cadcgood / 2.99; // (100.0/299) in %
   setEpicsPV("adcboards", adcfrac);
 
-  double tdcfrac = ctdcgood / 3.0;
+  double tdcfrac = ctdcgood / 2.99;
   setEpicsPV("tdcboards", tdcfrac);
 
   updateEpicsPVs(5.0); // 5 is time in seconds
@@ -147,6 +152,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   m_hist_adc->Draw("");
   m_line_ladc->Draw("same");
   m_line_hadc->Draw("same");
+  c_hist_adc->Update();
 
   c_hist_tdc->Clear();
   c_hist_tdc->cd();
@@ -156,6 +162,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   m_hist_tdc->Draw("");
   m_line_ltdc->Draw("same");
   m_line_htdc->Draw("same");
+  c_hist_tdc->Update();
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");
 }

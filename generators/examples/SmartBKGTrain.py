@@ -87,6 +87,14 @@ def load_events(
 def get_loss(pred, label, retention_rate):
     """
     Compute the loss with retention rate applied. Can be extended for other losses.
+
+    Args:
+        pred (list): List of file paths.
+        label (bool): True labels (ground truth).
+        retention_rate (float): The rate at which events are retained by the filter.
+
+    Returns:
+        float: The speedup loss achieved by the filtering method.
     """
     return speedup(
         filter_prob=pred,

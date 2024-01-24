@@ -16,17 +16,15 @@ from smartBKG.b2modules.NN_trainer_module import SaveFlag
 
 # get job array id from batch job manager (slurm)
 job_id = int(sys.argv[1])
-file_id = int((job_id - 1)/73+1)
 
-num_events = 2500
+num_events = 1000
 out_dir = "./"
-f_input = f"./mdst{file_id}.root"
+f_input = "./mdst.root"
 
 main = b2.create_path()
 
-# input Mdst, skip num_events*(job_id-1) events used by previous batch jobs
-# job_id MUST at least start from 1
-ma.inputMdst(environmentType="default", filename=f_input, skipNEvents=num_events*((job_id-1) % 73), path=main)
+# input Mdst, skip num_events*job_id events used by previous batch jobs
+ma.inputMdst(environmentType="default", filename=f_input, skipNEvents=num_events*job_id, path=main)
 
 # Create the mDST output file before skimming
 mdst.add_mdst_output(

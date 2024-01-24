@@ -115,8 +115,8 @@ class NNFilterModule(b2.Module):
         """
         # Need to create the eventExtraInfo entry for each event
         self.EventExtraInfo.create()
-        self.df_dict = load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=self.EventInfo.getEvent(), label=True)
-        single_input = preprocessed(self.df_dict, particle_selection=self.preproc_config['cuts'])
+        df_dict = load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=self.EventInfo.getEvent(), label=True)
+        single_input = preprocessed(df_dict, particle_selection=self.preproc_config['cuts'])
         graph = ArrayDataset(single_input, batch_size=1)[0][0]
         # Output pass probability
         pred = torch.sigmoid(self.model(graph)).detach().numpy().squeeze()

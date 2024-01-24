@@ -36,6 +36,28 @@ namespace Belle2 {
 
   public:
     /**
+     * Status flag of histogram/canvas
+    */
+    enum EStatus {
+      c_StatusTooFew = 0, /**< Not enough entries/event to judge */
+      c_StatusDefault = 1, /**< default for non-coloring */
+      c_StatusGood = 2, /**< Analysis result: Good */
+      c_StatusWarning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_StatusError = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Status colors of histogram/canvas (corresponding to status)
+    */
+    enum EStatusColor {
+      c_ColorTooFew = kGray, /**< Not enough entries/event to judge */
+      c_ColorDefault = kWhite, /**< default for non-coloring */
+      c_ColorGood = kGreen, /**< Analysis result: Good */
+      c_ColorWarning = kYellow, /**< Analysis result: Warning, there may be minor issues */
+      c_ColorError = kRed /**< Analysis result: Severe issue found */
+    };
+
+    /**
      * The type of list of histograms.
      */
     typedef std::map<std::string, HistObject> HistList;
@@ -234,6 +256,11 @@ namespace Belle2 {
      * @return The MonitoringObject
      */
     static MonitoringObject* getMonitoringObject(const std::string& histname);
+
+    /**
+     * Clear content of all Canvases
+     */
+    void clearCanvases(void);
 
     /**
      * Reset the list of histograms.
@@ -486,19 +513,7 @@ namespace Belle2 {
      * set global Prefix for EPICS PVs
      * @param prefix Prefix to set
      */
-
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
-
-    /**
-     * Status flag of histogram
-    */
-    enum EStatus {
-      c_TooFew = 0, /**< Not enough entries/event to judge */
-      c_Default = 1, /**< default for non-coloring */
-      c_Good = 2, /**< Analysis result: Good */
-      c_Warning = 3, /**< Analysis result: Warning, there may be minor issues */
-      c_Error = 4 /**< Analysis result: Severe issue found */
-    };
 
     /**
      * Helper function to judge the status for coloring and EPICS
@@ -515,6 +530,13 @@ namespace Belle2 {
      * @param status status to color
      */
     void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Return color for canvas state
+     * @param status canvas status
+     * @return alarm color
+     */
+    EStatusColor getStatusColor(EStatus status);
 
     /**
      * Check the status of all PVs and report if disconnected or not found

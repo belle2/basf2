@@ -21,6 +21,8 @@
 import numpy
 import ROOT
 
+ACTIVE = True
+
 
 class V0ValidationPlots:
 
@@ -300,4 +302,9 @@ class V0ValidationPlots:
 
 
 if __name__ == '__main__':
-    V0ValidationPlots().collect_histograms().plot()
+    if ACTIVE:
+        V0ValidationPlots().collect_histograms().plot()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

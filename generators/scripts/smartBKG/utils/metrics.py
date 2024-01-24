@@ -11,9 +11,20 @@ import torch
 def speedup(y_true, filter_prob, retention_rate, balance_weights=None, from_logits=True,
             t_gen=0.08, t_NN=0.63, t_SR=97.04):
     """
-    For sampling method,
-    calculated by equalising statistical uncertainty with/without nn filter, processing times included.
-    Use from_logits=True by default if receiving filter_prob directly from nn outputs.
+    Calculate the speedup achieved by sampling method.
+
+    Args:
+        y_true (torch.Tensor): True labels (ground truth).
+        filter_prob (torch.Tensor): Probabilities predicted by the filter model.
+        retention_rate (float): The rate at which events are retained by the filter.
+        balance_weights (torch.Tensor, optional): Weights for balancing the dataset. Default is None.
+        from_logits (bool): If True, interpret `filter_prob` as logits and apply sigmoid. Default is True.
+        t_gen (float): Typical processing time for event generation (default is 0.08 ms/event).
+        t_NN (float): Typical processing time for neural network processing (default is 0.63 ms/event).
+        t_SR (float): Typical processing time for detector simulation and reconstruction (default is 97.04 ms/event).
+
+    Returns:
+        float: The speedup achieved by the filtering method.
     """
     if from_logits:
         filter_prob = torch.sigmoid(filter_prob)

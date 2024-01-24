@@ -9,7 +9,6 @@ import os
 import shutil
 import pandas as pd
 import awkward as ak
-from collections import defaultdict
 
 import basf2 as b2
 from ROOT import Belle2
@@ -17,7 +16,7 @@ import modularAnalysis as ma
 from skim.WGs.fei import feiHadronicB0
 from b2pandas_utils import VariablesToHDF5
 
-from smartBKG.utils.preprocess import check_status_bit, preprocessed
+from smartBKG.utils.preprocess import load_particle_list, preprocessed
 
 
 class SaveFlag(b2.Module):
@@ -107,73 +106,27 @@ class TrainDataSaver(b2.Module):
         self.eventinfo = Belle2.PyStoreObj('EventMetaData')
         #: Initialise event extra info from data store
         self.eventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
-        #: Dictionary to save particle features
-        self.df_dict = defaultdict(list)
-        #: record the production time(s) of root particle(s) for the correction of jitter
-        self.root_prodTime = defaultdict(list)
+        #: Pandas dataframe to save particle features
+        self.df_dict = pd.DataFrame()
+        # #: record the production time(s) of root particle(s) for the correction of jitter
+        # self.root_prodTime = defaultdict(list)
 
     def event(self):
         """
         Process each event and append event information to the dictionary.
         """
-        mcplist = Belle2.PyStoreArray("MCParticles")
-
         evtNum = self.eventinfo.getEvent()
-        skim = evtNum in self.flag_list
-
-        # Create particle features
-        for mcp in mcplist:
-            prodTime = mcp.getProductionTime()
-
-            # Collect indices for graph
-            arrayIndex = mcp.getArrayIndex()
-            mother = mcp.getMother()
-
-            if mother:
-                motherPDG = mother.getPDG()
-                motherArrayIndex = mother.getArrayIndex()
-                # pass the production time of root particle for the correction of jitter
-                self.root_prodTime[arrayIndex] = self.root_prodTime[motherArrayIndex]
-                if mother.isVirtual():
-                    motherArrayIndex = arrayIndex
-            else:
-                motherPDG = 0
-                motherArrayIndex = arrayIndex
-                # record the production time of root particle for the correction of jitter
-                self.root_prodTime[arrayIndex] = prodTime
-
-            if mcp.isPrimaryParticle() and check_status_bit(mcp.getStatus()):
-                four_vec = mcp.get4Vector()
-                prod_vec = mcp.getProductionVertex()
-
-                # indices
-                self.df_dict['label'].append(skim)
-                self.df_dict['evtNum'].append(evtNum)
-                self.df_dict['arrayIndex'].append(arrayIndex)
-                # features
-                self.df_dict['PDG'].append(mcp.getPDG())
-                self.df_dict['mass'].append(mcp.getMass())
-                self.df_dict['charge'].append(mcp.getCharge())
-                self.df_dict['energy'].append(mcp.getEnergy())
-                self.df_dict['prodTime'].append(prodTime-self.root_prodTime[arrayIndex])
-                self.df_dict['x'].append(prod_vec.x())
-                self.df_dict['y'].append(prod_vec.y())
-                self.df_dict['z'].append(prod_vec.z())
-                self.df_dict['px'].append(four_vec.Px())
-                self.df_dict['py'].append(four_vec.Py())
-                self.df_dict['pz'].append(four_vec.Pz())
-                self.df_dict['nDaughters'].append(mcp.getNDaughters())
-                self.df_dict['status'].append(mcp.getStatus())
-                self.df_dict['motherPDG'].append(motherPDG)
-                self.df_dict['motherIndex'].append(motherArrayIndex)
+        self.df_dict = pd.concat([
+            self.df_dict,
+            load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=evtNum, label=(evtNum in self.flag_list))
+            ])
 
     def terminate(self):
         """
         Append events to the DataFrame on disk and free memory.
         """
-        event_df = pd.DataFrame(self.df_dict)
-        event_df.to_hdf(self.output_file, key='mc_information', mode='a', format='table', append=True)
-        self.df_dict = defaultdict(list)
+        self.df_dict.to_hdf(self.output_file, key='mc_information', mode='a', format='table', append=True)
+        self.df_dict = pd.DataFrame()
 
 
 class data_production():
@@ -222,7 +175,7 @@ class data_production():
             'B': f'{self.out_temp}b.h5'
             }
         #: Final output Parquet file
-        self.out_file = f'{out_dir}pp{job_id}.parquet'
+        self.out_file = f'{out_dir}preprocessed{job_id}.parquet'
         #: Variables to save for different event levels
         self.save_vars = save_vars
 

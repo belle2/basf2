@@ -10,6 +10,8 @@ import random
 import string
 import awkward as ak
 import numpy as np
+import pandas as pd
+from collections import defaultdict
 
 from smartBKG import PREPROC_CONFIG, TOKENIZE_DICT, LIST_FIELDS
 
@@ -24,6 +26,48 @@ def check_status_bit(status_bit):
         (status_bit & 1 << 6 == 0) &  # ISRPhoton
         (status_bit & 1 << 7 == 0)  # FSRPhoton
     )
+
+
+def load_particle_list(mcplist, **meta_kwargs):
+    particle_dict = defaultdict(list)
+    root_prodTime = defaultdict(list)
+    # Create particle features
+    for mcp in mcplist:
+        prodTime = mcp.getProductionTime()
+        # Collect indices for graph building
+        arrayIndex = mcp.getArrayIndex()
+        mother = mcp.getMother()
+        if mother:
+            motherArrayIndex = mother.getArrayIndex()
+            # pass the production time of root particle for the correction of jitter
+            root_prodTime[arrayIndex] = root_prodTime[motherArrayIndex]
+            if mother.isVirtual():
+                motherArrayIndex = arrayIndex
+        else:
+            motherArrayIndex = arrayIndex
+            # record the production time of root particle for the correction of jitter
+            root_prodTime[arrayIndex] = prodTime
+
+        if mcp.isPrimaryParticle() and check_status_bit(mcp.getStatus()):
+            four_vec = mcp.get4Vector()
+            prod_vec = mcp.getProductionVertex()
+            # indices
+            particle_dict['arrayIndex'].append(arrayIndex)
+            # features
+            particle_dict['PDG'].append(mcp.getPDG())
+            particle_dict['mass'].append(mcp.getMass())
+            particle_dict['charge'].append(mcp.getCharge())
+            particle_dict['energy'].append(mcp.getEnergy())
+            particle_dict['prodTime'].append(prodTime-root_prodTime[arrayIndex])
+            particle_dict['x'].append(prod_vec.x())
+            particle_dict['y'].append(prod_vec.y())
+            particle_dict['z'].append(prod_vec.z())
+            particle_dict['px'].append(four_vec.Px())
+            particle_dict['py'].append(four_vec.Py())
+            particle_dict['pz'].append(four_vec.Pz())
+            particle_dict['motherIndex'].append(motherArrayIndex)
+            particle_dict.update(meta_kwargs)
+    return pd.DataFrame(particle_dict)
 
 
 def ak_from_df(
@@ -233,10 +277,6 @@ def preprocessed(df, decorr_df=None, particle_selection=PREPROC_CONFIG['cuts']):
     """
     array = ak_from_df(df, decorr_df)[:]
     array["particles"] = array.particles[evaluate_query(array, particle_selection)]
-    if "prodTime" in array.particles.fields:
-        # shift prodTime to be relative to first particle
-        # this removes the "trigger jitter" introduced by detector simulation in release 6
-        array["particles", "prodTime"] = array.particles.prodTime - array.particles.prodTime[:, 0]
     array["particles", "PDG"] = mapped_pdg_id(array.particles.PDG)
     array["particles", "motherIndex"] = mapped_mother_index(
         array.particles.arrayIndex,

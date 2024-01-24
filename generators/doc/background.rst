@@ -17,7 +17,7 @@ framework. An example of how to generate skimmed events using SmartBKG can be fo
 .. note:: Notice that each event generated through SmartBKG should be reweighted with the inversed neural network output.
 
 To train the neural network for a different skim, you can use the provided example as a guide. 
-Refer to ``generators/examples/SmartBKGSkimTracking.py`` and substitute the FEI hadronic B0 skim with 
+Refer to ``generators/examples/SmartBKGSkimFlag.py`` and substitute the FEI hadronic B0 skim with 
 your custom skimming process.
 
 .. code-block:: python
@@ -32,7 +32,7 @@ your custom skimming process.
     # Save the event number of each pass event as the flag for the training of NN
     main.add_module(SaveFlag(f'{out_dir}_flag{job_id}.parquet'))
 
-Execute ``generators/examples/SmartBKGDataProduction.py`` following the completion of ``SmartBKGSkimTracking.py`` 
+Execute ``generators/examples/SmartBKGDataProduction.py`` following the completion of ``SmartBKGSkimFlag.py`` 
 to prepare the training data. These two steps can be seamlessly executed on the same node of the batch system.
 
 .. note:: A substantial number of passing events (O(10^5)) is necessary for effective training of the neural network.

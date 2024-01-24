@@ -5,17 +5,19 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
-import os
 import numpy as np
-import pandas as pd
+import torch
 
-from collections import defaultdict
 import basf2 as b2
 from ROOT import Belle2
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 
-from smartBKG import TOKENIZE_DICT, PREPROC_CONFIG, MODEL_CONFIG
-from smartBKG.utils.preprocess import check_status_bit
+from smartBKG import PREPROC_CONFIG, MODEL_CONFIG
+from smartBKG.utils.preprocess import load_particle_list, preprocessed
+from smartBKG.models.gatgap import GATGAPModel
+from smartBKG.utils.dataset import ArrayDataset
+
+DEVICE = torch.device("cpu")
 
 
 class NNFilterModule(b2.Module):
@@ -86,11 +88,6 @@ class NNFilterModule(b2.Module):
         """
         Initialise module before any events are processed
         """
-        import torch
-        from smartBKG.models.gatgap import GATGAPModel
-
-        DEVICE = torch.device("cpu")
-
         # read trained model parameters from database
         if not self.model_file:
             accessor = DBAccessorBase(DBStoreEntry.c_RawFile, self.payload, True)
@@ -105,13 +102,8 @@ class NNFilterModule(b2.Module):
         self.EventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
         if not self.EventExtraInfo.isValid():
             self.EventExtraInfo.registerInDataStore()
-
-        #: generated variables
-        self.gen_vars = defaultdict(list)
-
-        #: record the production time(s) of root particle(s) for the correction of jitter
-        self.root_prodTime = defaultdict(list)
-
+        #: Initialise event metadata from data store
+        self.EventInfo = Belle2.PyStoreObj('EventMetaData')
         #: node features
         self.out_features = self.preproc_config['features']
         if 'PDG' in self.preproc_config['features']:
@@ -121,66 +113,11 @@ class NNFilterModule(b2.Module):
         """
         Collect information from database, build graphs, make predictions and select through sampling or threshold
         """
-        import torch
-        # Initialize for every event
-        self.gen_vars.clear()
-
         # Need to create the eventExtraInfo entry for each event
         self.EventExtraInfo.create()
-
-        mcplist = Belle2.PyStoreArray("MCParticles")
-
-        for mcp in mcplist:
-            prodTime = mcp.getProductionTime()
-
-            # Collect indices for graph
-            array_index = mcp.getArrayIndex()
-            mother = mcp.getMother()
-            if mother:
-                mother_index = mother.getArrayIndex()
-                # pass the production time of root particle for the correction of jitter
-                self.root_prodTime[array_index] = self.root_prodTime[mother_index]
-                if mother.isVirtual():
-                    mother_index = array_index
-            else:
-                mother_index = array_index
-                # record the production time of root particle for the correction of jitter
-                self.root_prodTime[array_index] = prodTime
-
-            if mcp.isPrimaryParticle() and check_status_bit(mcp.getStatus()):
-                self.gen_vars['array_indices'].append(array_index)
-                self.gen_vars['mother_indices'].append(mother_index)
-
-                four_vec = mcp.get4Vector()
-                prod_vec = mcp.getProductionVertex()
-
-                # build generated variables as node features
-                self.gen_vars['prodTime'].append(prodTime-self.root_prodTime[array_index])
-                self.gen_vars['energy'].append(mcp.getEnergy())
-                self.gen_vars['x'].append(prod_vec.x())
-                self.gen_vars['y'].append(prod_vec.y())
-                self.gen_vars['z'].append(prod_vec.z())
-                self.gen_vars['px'].append(four_vec.Px())
-                self.gen_vars['py'].append(four_vec.Py())
-                self.gen_vars['pz'].append(four_vec.Pz())
-                self.gen_vars['PDG'].append(
-                    TOKENIZE_DICT[int(mcp.getPDG())]
-                )
-
-                # Particle level cutting
-                df = pd.DataFrame(self.gen_vars).tail(1)
-                df.query(" and ".join(self.preproc_config["cuts"]), inplace=True)
-                if df.empty:
-                    for values in self.gen_vars.values():
-                        values.pop()
-                    continue
-
-        graph = self.build_graph(
-            array_indices=self.gen_vars['array_indices'], mother_indices=self.gen_vars['mother_indices'],
-            PDGs=self.gen_vars['PDG'], Features=[self.gen_vars[key] for key in self.out_features],
-            symmetrize=True, add_self_loops=True
-        )
-
+        self.df_dict = load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=self.EventInfo.getEvent(), label=True)
+        single_input = preprocessed(self.df_dict, particle_selection=self.preproc_config['cuts'])
+        graph = ArrayDataset(single_input, batch_size=1)[0][0]
         # Output pass probability
         pred = torch.sigmoid(self.model(graph)).detach().numpy().squeeze()
 
@@ -192,61 +129,3 @@ class NNFilterModule(b2.Module):
             self.return_value(int(pred >= self.threshold))
         else:
             self.return_value(int(pred >= np.random.rand()))
-
-    def mapped_mother_indices(self, array_indices, mother_indices):
-        """
-        Map the mother indices to an enumerated list. The one-hot encoded version
-        of that list then corresponds to the adjacency matrix.
-
-        Example:
-           >>> mapped_mother_indices(
-           ...    [0, 1, 3, 5, 6, 7, 8, 9, 10],
-           ...    [0, 0, 0, 1, 1, 1, 5, 5, 7]
-           ... )
-           [0, 0, 0, 1, 1, 1, 3, 3, 5]
-
-        Args:
-           array_indices: list or array of indices. Each index has to be unique.
-           mother_indices: list or array of mother indices.
-
-        Returns:
-           List of mapped indices
-        """
-        idx_dict = {v: i for i, v in enumerate(array_indices)}
-        return [idx_dict[m] for m in mother_indices]
-
-    def build_graph(self, array_indices, mother_indices, PDGs, Features,
-                    symmetrize=True, add_self_loops=True):
-        """
-        Build graph from preprocessed particle information
-        """
-        import torch
-        import dgl
-        os.environ["DGLBACKEND"] = "pytorch"
-
-        # Build adjacency mapping
-        adjacency = self.mapped_mother_indices(array_indices, mother_indices)
-
-        # Build graph
-        src = adjacency
-        dst = np.arange(len(src))
-        src_new, dst_new = src, dst
-        if symmetrize:
-            src_new, dst_new = (
-                np.concatenate([src, dst]),
-                np.concatenate([dst, src])
-            )
-        # remove self-loops (the Y(4S)) to avoid duplicated self loops
-        src_new, dst_new = map(
-            np.array, zip(*[(s, d) for s, d in zip(src_new, dst_new) if not s == d])
-        )
-        if add_self_loops:
-            src_new, dst_new = (
-                np.concatenate([src_new, dst]),
-                np.concatenate([dst_new, dst])
-            )
-        graph = dgl.graph((src_new, dst_new))
-        graph.ndata["x_pdg"] = torch.tensor(PDGs, dtype=torch.int32)
-        graph.ndata["x_feature"] = torch.tensor(np.transpose(Features), dtype=torch.float32)
-
-        return graph

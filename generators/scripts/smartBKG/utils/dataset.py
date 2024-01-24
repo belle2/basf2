@@ -136,7 +136,7 @@ class ArrayDataset(torch.utils.data.IterableDataset):
         Returns:
             array: Permuted or original array.
         """
-        if not self.shuffle:
+        if not self.shuffle or len(self.array) == 1:
             return array
         perm = np.random.default_rng(self.seed).permutation(len(array))
         return self.array[perm]

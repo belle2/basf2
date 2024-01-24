@@ -45,6 +45,7 @@ def load_events(
     Args:
         filenames (list): List of file paths.
         balanced (bool): Whether to balance the number of pass and fail events.
+        Should be set to `True` for training set and `False` for test set.
         max_events (int): Maximum number of events to load.
 
     Returns:
@@ -106,7 +107,7 @@ def get_loss(pred, label, retention_rate):
 def fit(model, name, ds_train, ds_val, retention_rate,
         min_epochs=1, patience=12, lr_start=1e-3, lr_end=1e-4, epochs=1000):
     """
-    Train the model on balenced dataset.
+    Train the model.
     """
     history = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
     lr = lr_start
@@ -186,7 +187,7 @@ def fit(model, name, ds_train, ds_val, retention_rate,
 
 def test(model, ds_test):
     """
-    Test the trained model on original dataset.
+    Test the trained model.
     """
     record = {"acc": [], "label": [], "pred": []}
     with torch.no_grad():

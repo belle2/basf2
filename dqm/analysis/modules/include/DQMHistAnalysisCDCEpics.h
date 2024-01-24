@@ -17,7 +17,7 @@
 #include <TH2F.h>
 #include <TH1F.h>
 #include <TStyle.h>
-#include <TBox.h>
+#include <TLine.h>
 #include <numeric>
 #include <iostream>
 
@@ -68,12 +68,11 @@ namespace Belle2 {
     /**
      * get histogram styles
      */
-    void getHistStyle(TH1F*& htemp, int color, int style) const
+    void getHistStyle(TH1F*& htemp, std::string label, double max) const
     {
       gStyle->SetOptStat("ne");
-      htemp->SetMarkerColor(color);
-      htemp->SetMarkerStyle(style);
-      htemp->SetMarkerSize(0.70);
+      if (strcmp(label.data(), "adc") == 0)htemp->GetYaxis()->SetRangeUser(max * 0.25, max * 2.25);
+      else if (strcmp(label.data(), "tdc") == 0)htemp->GetYaxis()->SetRangeUser(max * 0.90, max * 1.10);
       htemp->Sumw2(0);
     };
 
@@ -89,8 +88,11 @@ namespace Belle2 {
     TCanvas* c_hist_adc = nullptr; /**< canvas for adc board median */
     TCanvas* c_hist_tdc = nullptr; /**< canvas for tdc board median */
 
-    TBox* m_boxadc  = nullptr; /**< box for normal ADC window */
-    TBox* m_boxtdc  = nullptr; /**< box for normal ADC window */
+    TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
+    TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
+
+    TLine* m_line_ltdc  = nullptr; /**< line for lower TDC window */
+    TLine* m_line_htdc  = nullptr; /**< line for higher TDC window */
 
     std::string m_histoDir = ""; /**< histogram dir of CDC DQMs */
     std::string m_histoADC = ""; /**< ADC histogram names of CDC DQMs */

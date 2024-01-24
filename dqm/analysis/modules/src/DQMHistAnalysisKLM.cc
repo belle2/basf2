@@ -51,6 +51,7 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MessageThreshold", m_MessageThreshold,
            "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
+  addParam("RefHistogramDirectoryPrefix", m_refHistogramDirectoryPrefix, "Prefix to account for reference file", std::string("ref/"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
@@ -115,10 +116,10 @@ void DQMHistAnalysisKLMModule::initialize()
 
   //search for reference
   if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
+    B2INFO("DQMHistAnalysisKLM: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
 
   } else
-    B2WARNING("KLM DQMHistAnalysis: reference root file (" << m_refFileName << ") not found, or closed");
+    B2WARNING("DQMHistAnalysisKLM: reference root file (" << m_refFileName << ") not found, or closed");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
@@ -183,7 +184,8 @@ void DQMHistAnalysisKLMModule::deltaDrawer(TH1* delta, TH1* histogram, TCanvas* 
     Double_t scale = (Double_t) histogram->Integral(); //want delta and histo to have same norm
 
     // delta != nullptr should take care of whether update condition is met.
-    delta->SetLineColor(kCopper); //random choice of not green or blue
+    delta->SetLineColor(kBlackBody); //random choice of not green or blue
+    delta->SetLineStyle(4);
     delta->DrawNormalized("SAME", scale); //normalize delta to histo
     canvas->Modified();
     canvas->Update();
@@ -215,7 +217,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   TH1* ref_histogram = nullptr;
   float ref_average = 0;
   if (m_refFile && m_refFile->IsOpen()) {
-    ref_histogram = (TH1*)m_refFile->Get(histogram->GetName());
+    ref_histogram = (TH1*)m_refFile->Get((m_refHistogramDirectoryPrefix + histogram->GetName()).data());
     if (!ref_histogram) {
       B2WARNING("Unable to find " << histogram->GetName() << "in reference file.");
     }
@@ -704,13 +706,22 @@ void DQMHistAnalysisKLMModule::event()
   processTimeHistogram("time_scintillator_eklm");
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
-  // only update PVs if there's enough statistics
-  if (m_ProcessedEvents > m_MinProcessedEventsForMessages) {
+  // only update PVs if there's enough statistics and datasize != 0
+  auto* daqDataSize = findHist("DAQ/KLMDataSize");
+  double meanDAQDataSize = 0.;
+  if (daqDataSize != nullptr) {
+    meanDAQDataSize = daqDataSize->GetMean();
+  } else
+    B2WARNING("DQMHistAnalysisKLM: Cannot find KLMDataSize");
+  if ((daqDataSize != nullptr) and (meanDAQDataSize != 0.)) {
     setEpicsPV("MaskedChannels", (double)m_MaskedChannels.size());
     setEpicsPV("DeadBarrelModules", (double)m_DeadBarrelModules.size());
     setEpicsPV("DeadEndcapModules", (double)m_DeadEndcapModules.size());
     B2DEBUG(20, "DQMHistAnalysisKLM: MaskedChannels " << m_MaskedChannels.size());
     B2DEBUG(20, "DQMHistAnalysisKLM: DeadBarrelModules " << m_DeadBarrelModules.size());
     B2DEBUG(20, "DQMHistAnalysisKLM: DeadEndcapModules " << m_DeadEndcapModules.size());
-  }
+  } else
+    B2INFO("DQMHistAnalysisKLM: KLM Not included. No PV Update. ");
+
+
 }

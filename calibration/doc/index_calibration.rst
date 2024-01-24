@@ -3,8 +3,6 @@
 Calibration
 ===========
 
-.. _calibration_caf:
-
 Calibration processes at Belle II are designed to be run within the basf2 environment so that any
 basf2 user can develop and run them without needing to install anything else.
 The calibration package contains three main components:
@@ -17,6 +15,8 @@ The calibration package contains three main components:
 #. The prompt calibration scripts which define the processes that the automated calibration system will use.
 
 This document focuses on the Python CAF code and the vaious tools provided to run prompt calibrations. 
+
+.. _calibration_caf:
 
 Calibration Framework (CAF)
 ===========================

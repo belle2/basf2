@@ -39,9 +39,9 @@ int main(int argc, char** argv)
   //  char* conffile = getenv("RFARM_CONFFILE");
   //  RFConf conf(conffile);
 
-  char nodename[256];
+  char nodename[512];
   int nid = 0;
-  int idlist[256];
+  int idlist[256] = {};
   char item[256][7];
 
   if (argc >= 3) {

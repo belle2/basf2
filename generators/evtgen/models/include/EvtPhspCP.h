@@ -7,14 +7,14 @@
  **************************************************************************/
 #pragma once
 
-#include "EvtGenBase/EvtDecayAmp.hh"
+#include "EvtGenBase/EvtDecayProb.hh"
 #include "EvtGenBase/EvtParticle.hh"
 
 #include <fstream>
 
 namespace Belle2 {
 //! Register Decay model EvtPhspCP
-  class EvtPhspCP : public  EvtDecayAmp {
+  class EvtPhspCP : public  EvtDecayProb {
 
   public:
 
@@ -31,6 +31,6 @@ namespace Belle2 {
 
     void decay(EvtParticle* p); /**< Member of particle in EvtGen */
 
-  }; //! end of EvtDecayAmp
+  }; //! end of EvtDecayProb
 
 } // Belle 2 Namespace

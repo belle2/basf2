@@ -61,11 +61,11 @@ namespace Belle2 {
 
     /** function for printing relationBetweenStaticSectors:
      *
-     * - 'filters' contains the static sectors
-    * - configName is used for the fileName to be able to recognize the outputs
-    * - nHit-Combinations shows links of 2-, 3- or 4-static sectors in a row
-    * - print2File prints to a file if yes or to screen if no
-    * - suppressDeadSectors discards sectors without links if set to true
+     * @param filters contains the static sectors
+     * @param configName is used for the fileName to be able to recognize the outputs
+     * @param nHitCombinations shows links of 2-, 3- or 4-static sectors in a row
+     * @param print2File prints to a file if yes or to screen if no
+     * @param suppressDeadSectors discards sectors without links if set to true
      */
     template<class HitType>
     void printStaticSectorRelations(const VXDTFFilters<HitType>& filters, const std::string& configName,

@@ -18,6 +18,8 @@
 #include <simulation/dataobjects/SimClockState.h>
 #include <svd/dbobjects/SVDGlobalConfigParameters.h>
 #include <mdst/dataobjects/TRGSummary.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 
 namespace Belle2 {
@@ -64,6 +66,7 @@ namespace Belle2 {
   private:
     StoreObjPtr<SVDEventInfo> m_svdEventInfoPtr; /**< Output object. */
     StoreObjPtr<SimClockState> m_simClockState; /**< generated hardware clock state */
+    DBObjPtr<HardwareClockSettings> m_hwClock; /**< systems clock*/
 
     // SVDModeByte content */
     int m_runType; /**< run type */

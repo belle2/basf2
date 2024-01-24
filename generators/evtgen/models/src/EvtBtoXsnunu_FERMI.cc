@@ -217,16 +217,24 @@ namespace Belle2 {
         lepton1type == EvtPDL::getId("anti-nu_mu") ||
         lepton1type == EvtPDL::getId("anti-nu_tau")) {
       lpos++;
+    } else if (lepton1type == EvtPDL::getId("nu_e") ||
+               lepton1type == EvtPDL::getId("nu_mu") ||
+               lepton1type == EvtPDL::getId("nu_tau")) {
+      lneg++;
     }
     if (lepton2type == EvtPDL::getId("nu_e") ||
         lepton2type == EvtPDL::getId("nu_mu") ||
         lepton2type == EvtPDL::getId("nu_tau")) {
       lneg++;
+    } else if (lepton2type == EvtPDL::getId("anti-nu_e") ||
+               lepton2type == EvtPDL::getId("anti-nu_mu") ||
+               lepton2type == EvtPDL::getId("anti-nu_tau")) {
+      lpos++;
     }
 
     if (lpos != 1 || lneg != 1) {
 
-      std::cout << "Expect 2nd and 3rd particles to be anti-particle and particle of neutrinos in EvtBtoXsnunu.cc\n";
+      std::cout << "There should be one neutrino and one anti-neutrino in EvtBtoXsnunu.cc\n";
       ::abort();
     }
 

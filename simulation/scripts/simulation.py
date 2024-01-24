@@ -95,7 +95,12 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
                                                  '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
                                                  '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
                                                  '__ROIsvdRecoTracksToRecoHitInformations',
-                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI'])
+                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI',
+                                                 # not only prune the pxd_unfiltered_digits, but also their relations to
+                                                 # MCParticles, PXDDigits (the filtered ones), and PXDTrueHits
+                                                 f'{pxd_unfiltered_digits}ToMCParticles',
+                                                 f'{pxd_unfiltered_digits}ToPXDDigits',
+                                                 f'{pxd_unfiltered_digits}ToPXDTrueHits'])
         path.add_module(datastore_cleaner)
 
 
@@ -128,6 +133,8 @@ def add_simulation(
     @param save_slow_pions_in_mc: if True, additional Regions of Interest on the PXD are created to save the PXDDigits
       of slow pions from D* -> D pi^{\\pm} decays using the MCSlowPionPXDROICreator based on MC truth information
     """
+
+    path.add_module('StatisticsSummary').set_name('Sum_PreSimulation')
 
     # Check compoments.
     check_components(components)

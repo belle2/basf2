@@ -11,7 +11,7 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 #include <framework/logging/Logger.h>
-#include <framework/geometry/XYZVectorToTVector3Converter.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 

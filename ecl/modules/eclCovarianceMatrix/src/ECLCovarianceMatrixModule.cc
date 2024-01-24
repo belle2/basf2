@@ -48,7 +48,7 @@ void ECLCovarianceMatrixModule::initialize()
 {
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
+  m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
 }
 
 void ECLCovarianceMatrixModule::beginRun()

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -43,19 +42,26 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 mcTrackFinding=False, trackFitHypotheses=None,
                                 reco_tracks="RecoTracks", prune_temporary_tracks=True, fit_tracks=True,
                                 use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                svd_standalone_mode="VXDTF2",
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                                v0_finding=True, flip_recoTrack=True):
+                                pxd_filtering_offline=False,
+                                append_full_grid_cdc_eventt0=True,
+                                v0_finding=True, flip_recoTrack=True,
+                                skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds the **standard tracking reconstruction** modules
     to a path:
 
     #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
 
-    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
+    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD SpacePoint CKF<tracking_cdc2svd_ckf>`
 
     #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
+
+    #. CDC standalone tracks which don't have SVD hits attached to them from the \
+    :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>` are combined with SVD standalone tracks found in the previous step using the \
+    :ref:`CDC to SVD Seed CKF<tracking_svdcdc_merger_ckf>`
 
     #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
 
@@ -95,6 +101,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param fit_tracks: if false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: if true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: if true, add the MVA track quality estimation
@@ -112,6 +121,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                       and provides the CDC temporary EventT0.
     :param v0_finding: if false, the V0Finder module is not executed
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
     add_prefilter_tracking_reconstruction(
@@ -125,18 +138,21 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         fit_tracks=fit_tracks,
         use_second_cdc_hits=use_second_cdc_hits,
         skipHitPreparerAdding=skipHitPreparerAdding,
+        svd_standalone_mode=svd_standalone_mode,
         use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
         use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
         add_cdcTrack_QI=add_cdcTrack_QI,
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI,
         pxd_filtering_offline=pxd_filtering_offline,
-        append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
+        append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
                                            pruneTracks=pruneTracks,
                                            reco_tracks=reco_tracks,
+                                           use_second_cdc_hits=use_second_cdc_hits,
                                            prune_temporary_tracks=prune_temporary_tracks,
                                            v0_finding=v0_finding,
                                            flip_recoTrack=flip_recoTrack,
@@ -147,9 +163,12 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           mcTrackFinding=False, trackFitHypotheses=None, reco_tracks="RecoTracks",
                                           prune_temporary_tracks=True, fit_tracks=True,
                                           use_second_cdc_hits=False, skipHitPreparerAdding=False,
+                                          svd_standalone_mode="VXDTF2",
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
-                                          pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False):
+                                          pxd_filtering_offline=False,
+                                          append_full_grid_cdc_eventt0=True,
+                                          skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds the tracking reconstruction modules required to calculate HLT filter decision
     to a path.
@@ -169,6 +188,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
     :param fit_tracks: If false, the final track find and the TrackCreator module will no be executed
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param trackFitHypotheses: Which pdg hypothesis to fit. Defaults to [211, 321, 2212].
+    :param svd_standalone_mode: Which SVD standalone tracking is used.
+           Options are "VXDTF2", "SVDHough", "VXDTF2_and_SVDHough", and "SVDHough_and_VXDTF2".
+           Defaults to "VXDTF2"
     :param use_svd_to_cdc_ckf: if true, add SVD to CDC CKF module.
     :param use_ecl_to_cdc_ckf: if true, add ECL to CDC CKF module.
     :param add_cdcTrack_QI: If true, add the MVA track quality estimation
@@ -184,6 +206,10 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
     if not is_svd_used(components) and not is_cdc_used(components):
@@ -219,6 +245,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_track_finding(path, components=components, reco_tracks=reco_tracks,
                           prune_temporary_tracks=prune_temporary_tracks,
                           use_second_cdc_hits=use_second_cdc_hits,
+                          svd_standalone_mode=svd_standalone_mode,
                           use_svd_to_cdc_ckf=use_svd_to_cdc_ckf,
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
                           add_cdcTrack_QI=add_cdcTrack_QI,
@@ -227,10 +254,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
-    add_time_extraction(path, append_full_grid_cdc_eventt0, components=components)
-
-    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
-                   use_second_cdc_hits=use_second_cdc_hits)
+    add_time_extraction(path, append_full_grid_cdc_eventt0, components=components,
+                        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     if fit_tracks:
         add_prefilter_track_fit_and_track_creator(path,
@@ -240,7 +265,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, v0_finding=True,
+                                           use_second_cdc_hits=False, prune_temporary_tracks=True, v0_finding=True,
                                            flip_recoTrack=True, mcTrackFinding=False):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
@@ -250,6 +275,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
     :param v0_finding: If false, the V0 module will not be executed
@@ -261,16 +287,19 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     if components and not ('SVD' in components or 'CDC' in components):
         return
 
-    # V0 finding
-    if v0_finding:
-        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
     # flip & refit to fix the charge of some tracks
     if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+
     # estimate the track time
     path.add_module('TrackTimeEstimator')
+
+    add_mc_matcher(path, components=components, reco_tracks=reco_tracks,
+                   use_second_cdc_hits=use_second_cdc_hits)
 
     # prune
     if pruneTracks:
@@ -280,7 +309,8 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module("PruneRecoHits")
 
 
-def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None):
+def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=None,
+                        skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     Add time extraction components via tracking
 
@@ -288,12 +318,19 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param components: the list of geometry components in use or None for all components.
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
+
+    # Always run SVD EventT0 estimation first so that the CDC based medhod can check whether an SVD based EventT0 exists
     if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")
 
     if is_cdc_used(components) and append_full_grid_cdc_eventt0:
-        path.add_module("FullGridChi2TrackTimeExtractor")
+        path.add_module("FullGridChi2TrackTimeExtractor",
+                        skipIfSVDEventT0Present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
 
 def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
@@ -538,8 +575,7 @@ def add_cr_track_finding(path, reco_tracks="RecoTracks", components=None,
 
     if is_pxd_used(components):
         add_pxd_cr_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,
-                                 output_reco_tracks=full_reco_tracks, add_both_directions=True,
-                                 filter_cut=0.01)
+                                 output_reco_tracks=full_reco_tracks, add_both_directions=True)
 
     if merge_tracks:
         # merge the tracks together
@@ -613,14 +649,6 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
         'recoTrackListName': reco_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': roiName,
-        'tolerancePhi': 0.15,
-        'toleranceZ': 0.5,
-        'sigmaSystU': 0.02,
-        'sigmaSystV': 0.02,
-        'numSigmaTotU': 10,
-        'numSigmaTotV': 10,
-        'maxWidthU': 0.5,
-        'maxWidthV': 0.5,
     }
     pxdDataRed.param(param_pxdDataRed)
     path.add_module(pxdDataRed)
@@ -656,9 +684,8 @@ def add_vxd_standalone_cosmics_finder(
     if 'RegisterEventLevelTrackingInfo' not in path:
         path.add_module('RegisterEventLevelTrackingInfo')
 
-    sp_creator_pxd = b2.register_module('PXDSpacePointCreator')
-    sp_creator_pxd.param('SpacePoints', pxd_spacepoints_name)
-    path.add_module(sp_creator_pxd)
+    if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
+        path.add_module('PXDSpacePointCreator', SpacePoints=pxd_spacepoints_name)
 
     # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
 

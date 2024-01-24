@@ -40,6 +40,7 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                    "offip_calib": "offip_calib",
                                    "radmumu_calib": "radmumu_calib",
                                    "random_calib": "random_calib",
+                                   "delayedbhabha": "delayedbhabha",
                                    "single_gamma_mc": "single_gamma_mc"},
                       "Data Quality Tag": {">=30 Minute Run": ">=30 Minute Run",
                                            "Bad For Alignment": "Bad For Alignment",
@@ -255,3 +256,5 @@ class ValidationSettings(namedtuple('ValSet_Factory', ["name", "description", "d
         output_str += f"  download_files='{self.download_files}'\n"
         output_str += f"  expert_config={self.expert_config}"
         return output_str
+
+# @endcond

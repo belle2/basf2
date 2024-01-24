@@ -4,7 +4,7 @@
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-#pragma link C++ class Belle2::Particle+; // checksum=0x694ee2d8, version=16
+#pragma link C++ class Belle2::Particle+; // checksum=0xb9d445e0, version=17
 #pragma link C++ class Belle2::ParticleList+; // checksum=0xa5bad8a, version=4
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xf7b6169c, version=6
@@ -233,6 +233,7 @@
   version="[1]"                                                                                               \
   targetClass="Belle2::EventShapeContainer"                                                                   \
   target="m_forwardHemisphere4Momentum"                                                                       \
+  include="TLorentzVector.h"                                                                                  \
   code="{m_forwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_forwardHemisphere4Momentum.Px(),   \
                                                                   onfile.m_forwardHemisphere4Momentum.Py(),   \
                                                                   onfile.m_forwardHemisphere4Momentum.Pz(),   \
@@ -246,6 +247,7 @@
   version="[1]"                                                                                                 \
   targetClass="Belle2::EventShapeContainer"                                                                     \
   target="m_backwardHemisphere4Momentum"                                                                        \
+  include="TLorentzVector.h"                                                                                  \
   code="{m_backwardHemisphere4Momentum = ROOT::Math::PxPyPzEVector(onfile.m_backwardHemisphere4Momentum.Px(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Py(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Pz(),   \

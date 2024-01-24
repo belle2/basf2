@@ -31,7 +31,7 @@ we need to create a path and generate dummy events. Then, our module is added to
 the path and we run the path.
 
 .. literalinclude:: steering_files/081_module.py
-   :linenos:
+   :language: python        
 
 You can see that implementing a minimal python module just takes 5 lines of code
 (3 without documentation) so it's very nice for fast and quick prototyping.
@@ -53,7 +53,7 @@ show all methods which can be implemented by a Python module. As you have seen
 above all the member functions are optional.
 
 .. literalinclude:: steering_files/083_module.py
-   :linenos:
+   :language: python        
 
 Accessing Datastore Objects
 ---------------------------
@@ -86,7 +86,7 @@ MCParticles, namely the PDG code. To have tracks available, we will use the
    :class: toggle solution
 
    .. literalinclude:: steering_files/087_module.py
-    :linenos:
+    :language: python        
 
 .. note::
 

@@ -1,0 +1,77 @@
+# EventType: 1113042003
+# Descriptor: Y(4S) -> B0 anti-B0
+#                     [B0 -> [D*- -> [anti-D0 -> K+ pi-] pi-] [rho+ -> [pi0 -> gamma gamma] pi+]]
+#                      anti-B0 -> anything
+# NickName: Bd_Dstrho+_DsttoDpi-_rhotopi0pi+
+
+# Tested: Yes
+# PhysicsWG: BHADRONIC
+# Responsible: Vismaya
+# Email: ph20resch11010@iith.ac.in
+# Cuts: None
+# Date: 13/09/23
+
+#
+# Aliases
+#
+
+Alias rho+sig rho+
+Alias rho-sig rho-
+ChargeConj rho+sig rho-sig
+
+Alias pi0sig pi0
+
+#
+# Y(4S) -> B0 anti-B0 
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
+Enddecay
+
+#
+# B0 -> D*- rho+
+#
+
+Decay B0sig
+1.0000 D*-sig rho+sig PHOTOS SVV_HELAMP  0.317 0.19 0.936 0.0 0.152 1.47;
+Enddecay
+CDecay anti-B0sig
+
+#
+# D*- -> anti-D0 pi-
+#
+
+Decay D*-sig
+1.0000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+#
+# rho+ -> pi+ pi0
+#
+
+Decay rho+sig
+1.0000 pi+ pi0sig PHOTOS VSS;
+Enddecay
+CDecay rho-sig
+
+#
+# pi0 -> gamma gamma
+#
+
+Decay pi0sig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End
+

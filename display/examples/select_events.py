@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -31,21 +30,9 @@ main.add_module(eventinfosetter)
 
 main.add_module('EvtGenInput')
 
-# (no ECL because of unsupported solids)
-components = [
-    'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
-    'TOP',
-    'ARICH',
-    'EKLM',
-    'BKLM',
-]
-add_simulation(main, components)
+add_simulation(main)
 
-# add_reconstruction(main, components)
+# add_reconstruction(main)
 
 display = main.add_module('Display')
 conditionpath = b2.Path()

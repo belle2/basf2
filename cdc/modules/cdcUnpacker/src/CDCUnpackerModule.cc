@@ -344,7 +344,6 @@ void CDCUnpackerModule::event()
                           << LogVar("board id", board)
                           << LogVar("channel", ch));
               }
-              it += length;
               break;
             }
 

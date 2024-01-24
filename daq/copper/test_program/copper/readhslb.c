@@ -145,8 +145,8 @@ main()
 
         i++;
 
-        if(i % 1==0){
-            for( k = 0 ; k < 4 ; k ++ ){
+        if(i % 1==0) {
+            for( k = 0 ; k < 4 ; k ++ ) {
                if ( !use_slot[k] ) continue;
                err_check = rdmgt(fd[k], ERROR);
                if ( !use_slot[k] ) continue;
@@ -176,25 +176,25 @@ main()
 
 	    if (header->magic != COPPER_DRIVER_HEADER_MAGIC) {
 		printf("bad fotter %x\n", header->magic);
-                printf("xor = %08x\n", xor((unsigned long *)buffer, ret/4));
+                printf("xor = %08lx\n", xor((unsigned long *)buffer, ret/4));
                 show_event(buffer, ret);
 		break;
 	    }
 
 	    if (footer->magic != COPPER_DRIVER_FOOTER_MAGIC) {
 		printf("bad fotter %x\n", footer->magic);
-               printf("xor = %08x\n", xor((unsigned long *)buffer, ret/4));
+               printf("xor = %08lx\n", xor((unsigned long *)buffer, ret/4));
                show_event(buffer, ret);
 		break;
 	    }
 
 	    if (header->event_number != event) {
-		printf("bad copper evn = %x should be %x\n", buffer[1], event);
+		printf("bad copper evn = %lx should be %x\n", buffer[1], event);
 	    }
 	}
 
         if (event < 20) { /*  modified by sun */
-            printf("xor = %08x\n", xor((unsigned long *)buffer, ret/4));
+            printf("xor = %08lx\n", xor((unsigned long *)buffer, ret/4));
             show_event(buffer, ret);
         }     /*  modified by sun */
         event++;

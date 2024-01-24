@@ -20,6 +20,6 @@ at the very end of the tracking chain:
 2) flip these tracks and refit them
 3) for each of them, the orginal and flipped tracks are compared and the best one is kept
 
-Step 1 and 3 are achieved using two dedicated MVAs (one per step) that are trained on simulated events 
+Step 1 and 3 are achieved using two dedicated MVAs (one per step) that are trained on simulated events
 (details on training are :ref:`tracking_calibration_flipNrefit`).
 

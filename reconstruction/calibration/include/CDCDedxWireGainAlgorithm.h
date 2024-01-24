@@ -75,7 +75,7 @@ namespace Belle2 {
     /**
     * function to finally store new payload after full calibration
     */
-    void createPayload(std::vector<double>& vdedx_tmeans);
+    void createPayload(const std::vector<double>& vdedx_tmeans);
 
     /**
     * function to get bins of trunction from histogram
@@ -95,22 +95,22 @@ namespace Belle2 {
     /**
     * function to draw dE/dx histograms for each wire
     */
-    void plotWireDist(std::array<TH1D*, c_nwireCDC> hist, std::vector<double>& vrel_mean);
+    void plotWireDist(const std::vector<TH1D*>& hist, const std::vector<double>& vrel_mean);
 
     /**
     * function to draw wire gains
     */
-    void plotWireGain(std::vector<double>& vdedx_means, std::vector<double>& vrel_mean, double layeravg);
+    void plotWireGain(const std::vector<double>& vdedx_means, const std::vector<double>& vrel_mean, double layeravg);
 
     /**
     * function to draw layer gains
     */
-    void plotLayerGain(std::array<double, c_maxNSenseLayers>& layermean, double layeravg);
+    void plotLayerGain(const std::vector<double>& layermean, double layeravg);
 
     /**
     * function to draw WG per layer
     */
-    void plotWGPerLayer(std::vector<double>& vdedx_means, std::array<double, c_maxNSenseLayers>& layermean, double layeravg);
+    void plotWGPerLayer(const std::vector<double>& vdedx_means, const std::vector<double>& layermean, double layeravg);
 
     /**
     * function to draw statstics

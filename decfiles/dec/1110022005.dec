@@ -1,0 +1,60 @@
+# EventType: 1110022005
+# Descriptor: [B0 -> K+ pi- pi0] via pi(2S) or non-resonant
+# NickName: Bd_K+pi-pi0
+# Documentation: BToHadronic for [B0 -> K+ pi- pi0] Dalitz reweighting
+# Tested: Yes
+# PhysicsWG: BHADRONIC
+# Responsible: Markus Reif
+# Email: mreif@mpp.mpg.de
+# Cuts: None
+# Date: 28/03/2023
+
+Alias pi(2S)+sig pi(2S)+
+Alias pi(2S)-sig pi(2S)-
+ChargeConj pi(2S)+sig pi(2S)-sig
+
+Alias pi(2S)+sigK pi(2S)+
+Alias pi(2S)-sigK pi(2S)-
+ChargeConj pi(2S)+sigK pi(2S)-sigK
+
+Alias pi(2S)0sigK pi(2S)0 
+Alias anti-pi(2S)0sigK pi(2S)0
+ChargeConj pi(2S)0sigK anti-pi(2S)0sigK 
+
+
+Particle pi(2S)+sig        1.1      1.0
+Particle pi(2S)-sig        1.1      1.0
+Particle pi(2S)+sigK       1.1      1.0
+Particle pi(2S)-sigK       1.1      1.0
+Particle pi(2S)0sigK       1.1      1.0
+Particle anti-pi(2S)0sigK  1.1      1.0
+
+
+Decay Upsilon(4S)
+1.0     B0sig   anti-B0sig  B0  anti-B0     VSS_BMIX dm;
+Enddecay
+
+Decay B0sig
+0.32    pi(2S)0sigK     pi0    PHOTOS PHSP;
+0.32    pi(2S)+sigK     pi-    PHOTOS PHSP;
+0.32    pi(2S)-sig     K+     PHOTOS PHSP;
+0.04    K+   pi-   pi0     PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+Decay pi(2S)0sigK
+1.0     K+      pi-     PHOTOS PHSP;
+Enddecay
+CDecay anti-pi(2S)0sigK
+
+Decay pi(2S)-sig
+1.0    pi-      pi0     PHOTOS PHSP;
+Enddecay
+CDecay pi(2S)+sig
+
+Decay pi(2S)+sigK
+1.0     K+      pi0     PHOTOS PHSP;
+Enddecay
+CDecay pi(2S)-sigK
+
+End

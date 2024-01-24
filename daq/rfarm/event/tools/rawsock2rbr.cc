@@ -31,7 +31,6 @@ int main(int argc, char** argv)
 
   RawRevSock2Rb sr(a1, a2, a3, a4, a5);
 
-  int ncount = 0;
   int nevt = 0;
   for (;;) {
     int stat = sr.ReceiveEvent();

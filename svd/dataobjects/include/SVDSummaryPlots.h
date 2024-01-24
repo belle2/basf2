@@ -34,10 +34,14 @@ namespace Belle2 {
                                     19, 0, 19);
 
       for (int view = VIndex ; view < UIndex + 1; view++) {
-        TH2F h(*m_defaultHistogram);
-
-        customize(h, view);
-        m_histos[view] = new TH2F(h);
+        std::string hname = name.Data();
+        bool isU = (view == UIndex);
+        customizeString(hname, isU);
+        m_histos[view] = new TH2F(hname.c_str(), title.Data(),
+                                  16, 0.5, 16.5,
+                                  19, 0, 19);
+        customize(*m_histos[view], view);
+        m_Title[view] = m_histos[view]->GetTitle();
       }
     }
 
@@ -49,7 +53,7 @@ namespace Belle2 {
     isU methods defined by Peter Kv.*/
     enum E_side { VIndex = 0, UIndex = 1 };
 
-    /** get a reference to the histogram for @param vxdID side @param view
+    /** get a reference to the histogram for @param view
      * please, use the enumeration SVDSummaryPlots::Vindex and
      * SVDSummaryPlots::UIndex */
     TH2F* getHistogram(int view)
@@ -111,7 +115,37 @@ namespace Belle2 {
       int sensor = vxdID.getSensorNumber();
 
       getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
+    }
 
+    /** set run ids in title
+     * @param runID
+    */
+    void setRunID(const TString& runID)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++) {
+        // add blank if needed before adding runID
+        if (!m_Title[view].EndsWith(" "))
+          m_Title[view].Append(" ");
+
+        getHistogram(view)->SetTitle(m_Title[view] + runID);
+      }
+    }
+
+    /** Reset histograms
+     */
+    void reset()
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->Reset();
+    }
+
+    /** set histograms stat
+     * @param stats
+     */
+    void setStats(bool stats = true)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->SetStats(stats);
     }
 
     /** fill the histogram for @param vxdID side @param isU with @param value*/
@@ -140,10 +174,8 @@ namespace Belle2 {
     {
       delete m_histos[0];
       delete m_histos[1];
+      delete m_defaultHistogram;
     }
-
-
-
 
   private:
 
@@ -165,7 +197,9 @@ namespace Belle2 {
 
     TH2F* m_histos[2]; /**< vector containing the U and V histograms*/
 
-    TH2F* m_defaultHistogram; /**< default histograms*/
+    TH2F* m_defaultHistogram = nullptr; /**< default histograms*/
+
+    TString m_Title[2];    /**< Base title */
 
     /** customize the histogram with the sensor, view*/
     void customize(TH2F& histogram, int view)
@@ -173,9 +207,9 @@ namespace Belle2 {
 
       const int nY = 19;
       TString Ylabels[nY] = {"", "L3.x.1", "L3.x.2",
-                             "", "L4.x.1", "L4.x.2", "L4.x.3",
-                             "", "L5.x.1", "L5.x.2", "L5.x.3", "L5.x.4",
-                             "", "L6.x.1", "L6.x.2", "L6.x.3", "L6.x.4", "L6.x.5", ""
+                             " ", "L4.x.1", "L4.x.2", "L4.x.3",
+                             "  ", "L5.x.1", "L5.x.2", "L5.x.3", "L5.x.4",
+                             "   ", "L6.x.1", "L6.x.2", "L6.x.3", "L6.x.4", "L6.x.5", "    "
                             };
 
       histogram.SetMarkerSize(1.1);
@@ -185,10 +219,6 @@ namespace Belle2 {
         histogram.GetYaxis()->SetBinLabel(i + 1, Ylabels[i].Data());
 
       bool isU = view == UIndex;
-      std::string name = histogram.GetName();
-      customizeString(name, isU);
-      histogram.SetName(name.c_str());
-
       std::string title = histogram.GetTitle();
       customizeString(title, isU);
       histogram.SetTitle(title.c_str());
@@ -208,7 +238,7 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDSummaryPlots, 1);  /**< needed by root */
+    ClassDef(SVDSummaryPlots, 2);  /**< needed by root */
   };
 
 

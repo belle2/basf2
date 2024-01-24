@@ -31,20 +31,37 @@ PXDROIFinderModule::PXDROIFinderModule() : Module(), m_ROIinfo()
 
   addParam("recoTrackListName", m_recoTracksListName, " name of the list of the fitted tracks", std::string(""));
 
-  addParam("tolerancePhi", m_tolerancePhi, "Tolerance by finding sensor in phi coordinate (radians).", double(0.15));
-
-  addParam("toleranceZ", m_toleranceZ, "Tolerance by finding sensor in Z coordinate (cm).", double(0.5));
-
-  addParam("sigmaSystU", m_sigmaSystU, " systematic sigma in the u local coordinate ", double(0.025));
-  addParam("sigmaSystV", m_sigmaSystV, " systematic sigma in the V local coordinate ", double(0.025));
-  addParam("numSigmaTotU", m_numSigmaTotU, " number of sigmas (total) in the U local coordinate ", double(10));
-  addParam("numSigmaTotV", m_numSigmaTotV, " number of sigmas (total) in the V local coordinate ", double(10));
-  addParam("maxWidthU", m_maxWidthU, " upper limit on width of the ROI in the U local coordinate (cm) ", double(0.5));
-  addParam("maxWidthV", m_maxWidthV, " upper limit on width of the ROI in the V local coordinate (cm) ", double(0.5));
-
   addParam("PXDInterceptListName", m_PXDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
 
+
+  addParam("tolerancePhi", m_tolerancePhi,
+           "Tolerance by finding sensor in phi coordinate (radians). Will only be used if overrideDBROICalculation is set to True.",
+           double(0.15));
+  addParam("toleranceZ", m_toleranceZ,
+           "Tolerance by finding sensor in Z coordinate (cm). Will only be used if overrideDBROICalculation is set to True.",
+           double(0.5));
+  addParam("sigmaSystU", m_sigmaSystU,
+           "Systematic sigma in the u local coordinate. Will only be used if overrideDBROICalculation is set to True.",
+           double(0.025));
+  addParam("sigmaSystV", m_sigmaSystV,
+           "Systematic sigma in the V local coordinate. Will only be used if overrideDBROICalculation is set to True.",
+           double(0.025));
+  addParam("numSigmaTotU", m_numSigmaTotU,
+           "Number of sigmas (total) in the U local coordinate. Will only be used if overrideDBROICalculation is set to True.",
+           double(10));
+  addParam("numSigmaTotV", m_numSigmaTotV,
+           "Number of sigmas (total) in the V local coordinate. Will only be used if overrideDBROICalculation is set to True.",
+           double(10));
+  addParam("maxWidthU", m_maxWidthU,
+           "Upper limit on width of the ROI in the U local coordinate (cm). Will only be used if overrideDBROICalculation is set to True.",
+           double(0.5));
+  addParam("maxWidthV", m_maxWidthV,
+           "Upper limit on width of the ROI in the V local coordinate (cm). Will only be used if overrideDBROICalculation is set to True.",
+           double(0.5));
+  addParam("overrideDBROICalculation", m_overrideDBROICalculation,
+           "Override the parameters from DB for testing or debugging. Required to be True to use the other ROI calculation parameters.",
+           false);
 }
 
 
@@ -65,6 +82,24 @@ void PXDROIFinderModule::initialize()
 
 void PXDROIFinderModule::beginRun()
 {
+  if (m_overrideDBROICalculation) {
+    // Use ROI calculation parameters from module parameters.
+    B2WARNING("ROI calculation parameters from DB are valid, but they are overridden by the module parameters.\n"
+              "  --> Using module parameters instead of parameters from DB.");
+  } else if (m_ROICalculationParameters.isValid()) {
+    // Use ROI calculation parameters from DB.
+    m_tolerancePhi = m_ROICalculationParameters->getToleranceZ();
+    m_toleranceZ = m_ROICalculationParameters->getTolerancePhi();
+    m_numSigmaTotU = m_ROICalculationParameters->getNumSigmaTotU();
+    m_numSigmaTotV = m_ROICalculationParameters->getNumSigmaTotV();
+    m_sigmaSystU = m_ROICalculationParameters->getSigmaSystU();
+    m_sigmaSystV = m_ROICalculationParameters->getSigmaSystV();
+    m_maxWidthU = m_ROICalculationParameters->getMaxWidthU();
+    m_maxWidthV = m_ROICalculationParameters->getMaxWidthV();
+  } else {
+    // No valid ROI calculation parameters from DB, crash in any case, even though module parameters are provided.
+    B2FATAL("No ROI configuration for the current run found (missing ROICalculationParameters payload).");
+  }
 
   B2DEBUG(29, "||| PXDROIFinder Parameters:");
   B2DEBUG(29, "    tolerance: phi = " << m_tolerancePhi);

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -45,7 +44,7 @@ class CheckRelationBremClusterTestModule(b2.Module):
                 # is there a relation to our secondary cluster?
                 bremCluster = cluster.getRelated("ECLClusters")
 
-        bad_events = [1]
+        bad_events = []
         if (eventMetaData.getEvent() in bad_events):
             # the check fails on some events. Instead of finding new settings,
             # check if the bremCluster is None only for the bad_events

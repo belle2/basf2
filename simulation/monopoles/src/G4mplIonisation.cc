@@ -85,6 +85,3 @@ void G4mplIonisation::InitialiseEnergyLossProcess(const G4ParticleDefinition* p,
 
   isInitialised = true;
 }
-
-void G4mplIonisation::PrintInfo()
-{}

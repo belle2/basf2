@@ -25,7 +25,7 @@ using namespace std;
 using namespace Belle2;
 using namespace CDC;
 
-T0Correction::T0Correction():
+Belle2::CDC::T0Correction::T0Correction():
   m_firstExperiment(0), m_firstRun(0),
   m_lastExperiment(-1), m_lastRun(-1)
 {
@@ -41,7 +41,7 @@ T0Correction::T0Correction():
   */
 }
 
-void T0Correction::CreateHisto()
+void Belle2::CDC::T0Correction::CreateHisto()
 {
 
   B2INFO("CreateHisto");
@@ -113,7 +113,7 @@ void T0Correction::CreateHisto()
   B2INFO("Finish making histogram for all channels");
 }
 
-bool T0Correction::calibrate()
+bool Belle2::CDC::T0Correction::calibrate()
 {
   B2INFO("Start calibration");
 
@@ -218,7 +218,7 @@ bool T0Correction::calibrate()
   Write();
   return true;
 }
-void T0Correction::Write()
+void Belle2::CDC::T0Correction::Write()
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   ofstream ofs(m_outputT0FileName.c_str());

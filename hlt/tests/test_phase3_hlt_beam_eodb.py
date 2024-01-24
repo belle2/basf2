@@ -18,6 +18,6 @@ if __name__ == "__main__":
         os.chmod(working_dir, 0o744)  # To avoid potential writing issues on CI system
         test_folder(location=constants.Location.hlt,
                     run_type=constants.RunTypes.beam,
-                    exp_number=1003,
+                    exp_number=1004,
                     phase="phase3",
                     simulate_events_of_doom_buster=True)

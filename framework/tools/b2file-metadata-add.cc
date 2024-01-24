@@ -26,7 +26,7 @@ namespace prog = boost::program_options;
 int main(int argc, char* argv[])
 {
   std::string fileName;
-  std::string lfn;
+  std::string lfn, gt;
   std::vector<std::string> dataDescriptions;
   // define command line options
   prog::options_description options("Options");
@@ -34,6 +34,7 @@ int main(int argc, char* argv[])
   ("help,h", "print all available options")
   ("file", prog::value<string>(&fileName), "file name")
   ("lfn,l", prog::value<string>(&lfn), "logical file name")
+  ("globalTag,g", prog::value<string>(&gt), "global tag")
   ("description,d", prog::value<std::vector<std::string>>(&dataDescriptions),
    "data description to set of the form key=value. If the argument does not contain an equal sign it's interpeted as a key to delete from the dataDescriptions")
   ;
@@ -59,8 +60,8 @@ int main(int argc, char* argv[])
     B2ERROR("The filename is missing.");
     return 1;
   }
-  if (!varMap.count("lfn") && !varMap.count("description")) {
-    B2ERROR("Neither lfn nor data descriptions to be modified, nothing to do");
+  if (!varMap.count("lfn") &&  !varMap.count("globalTag") && !varMap.count("description")) {
+    B2ERROR("No metadata modificaton was requested, nothing to do");
     return 1;
   }
 
@@ -101,6 +102,7 @@ int main(int argc, char* argv[])
 
   // update the IDs and write the updated FileMetaData to the file
   if (varMap.count("lfn")) fileMetaData->setLfn(lfn);
+  if (varMap.count("globalTag")) fileMetaData->setDatabaseGlobalTag(gt);
   if (!dataDescriptions.empty()) {
     for (const auto& keyvalue : dataDescriptions) {
       size_t pos = keyvalue.find('=');
@@ -114,6 +116,8 @@ int main(int argc, char* argv[])
       }
     }
   }
+
+
   if (newTree) {
     newTree->Fill();
     newTree->Write(newTree->GetName(), TObject::kWriteDelete);

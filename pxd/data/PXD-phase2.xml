@@ -27,8 +27,8 @@
     <!-- Include the definition of all the components like ladders, sensors and
          chips -->
     <xi:include href="PXD-Components.xml"/>
-    <!-- include radiation sensor definition -->
-    <xi:include href="PXD-RadiationSensors.xml"/>
+    <!-- include radiation sensor definition, OBSOLETE, replaced by beast/beamabort -->
+    <!-- <xi:include href="PXD-RadiationSensors.xml"/> -->
 
     <!-- PXD is build as two half shells which will be attached to the beampipe
          from the sides. We follow this scheme in the simulation geometry for

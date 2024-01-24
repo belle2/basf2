@@ -687,6 +687,9 @@ namespace Belle2 {
     static const double uTherm;       /**< Thermal Voltage at room temperature */
     static const double eMobilitySi;  /**< Electron mobility in intrinsic Silicon at room temperature */
 
+    static const double doubleNaN; /**< quiet_NaN */
+    static const float  floatNaN;  /**< quiet_NaN */
+
   private:
     /**
      * @{

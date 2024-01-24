@@ -1055,7 +1055,7 @@ def flavorTagger(
     samplerFileId='',
     prefix='MC15ri_light-2207-bengal_0',
     useGNN=False,
-    identifierGNN='',
+    identifierGNN='GFlaT_MC15ri_light_2303_iriomote_0',
     path=None,
 ):
     """
@@ -1112,6 +1112,7 @@ def flavorTagger(
                                                Please specify the weight file with the option ``identifierGNN``.
                                                [Expert] In the sampler mode, training files for GNN-based Flavor Tagger is produced.
       @param identifierGNN                     The name of weight file of the GNN-based Flavor Tagger.
+                                               [Expert] Multiple identifiers can be given with list(str).
       @param path                              Modules are added to this path
 
     """
@@ -1143,8 +1144,7 @@ def flavorTagger(
                     '"Lambda", "FSC", "MaximumPstar" or "KaonPion" ')
 
     if mode == 'Expert' and useGNN and identifierGNN == '':
-        B2FATAL('The weight file of GNN-based Flavor Tagger is not set as default yet. '
-                'Please specify the name of the weight file with ``identifierGNN``')
+        B2FATAL('Please specify the name of the weight file with ``identifierGNN``')
 
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
@@ -1228,7 +1228,7 @@ def flavorTagger(
             B2FATAL('Flavor Tagger: ' + category + ' has been already given')
 
     for code in sorted(categoriesCombination):
-        categoriesCombinationCode = categoriesCombinationCode + '%02d' % code
+        categoriesCombinationCode = categoriesCombinationCode + f'{int(code):02}'
 
     # Create default ROE-mask
     if maskName == 'FTDefaultMask':
@@ -1303,13 +1303,32 @@ def flavorTagger(
                 ma.rankByHighest('pi+:inRoe', 'p', numBest=0, allowMultiRank=False,
                                  outputVariable='FT_p_rank', overwriteRank=True, path=roe_path)
                 ma.fillParticleListFromDummy('vpho:dummy', path=roe_path)
-                roe_path.add_module('MVAExpert',
-                                    listNames='vpho:dummy',
-                                    extraInfoName='qrGNN_raw',  # the range of qrGNN_raw is [0,1]
-                                    identifier=identifierGNN)
 
-                ma.variableToSignalSideExtraInfo('vpho:dummy', {'extraInfo(qrGNN_raw)*2-1': 'qrGNN'},
-                                                 path=roe_path)
+                if isinstance(identifierGNN, str):
+                    roe_path.add_module('MVAExpert',
+                                        listNames='vpho:dummy',
+                                        extraInfoName='qrGNN_raw',  # the range of qrGNN_raw is [0,1]
+                                        identifier=identifierGNN)
+
+                    ma.variableToSignalSideExtraInfo('vpho:dummy', {'extraInfo(qrGNN_raw)*2-1': 'qrGNN'},
+                                                     path=roe_path)
+
+                elif isinstance(identifierGNN, list):
+                    identifierGNN = list(set(identifierGNN))
+
+                    extraInfoNames = [f'qrGNN_{i_id}' for i_id in identifierGNN]
+                    roe_path.add_module('MVAMultipleExperts',
+                                        listNames='vpho:dummy',
+                                        extraInfoNames=extraInfoNames,
+                                        identifiers=identifierGNN)
+
+                    extraInfoDict = {}
+                    for extraInfoName in extraInfoNames:
+                        extraInfoDict[f'extraInfo({extraInfoName})*2-1'] = extraInfoName
+                        variables.variables.addAlias(extraInfoName, f'extraInfo({extraInfoName})')
+
+                    ma.variableToSignalSideExtraInfo('vpho:dummy', extraInfoDict,
+                                                     path=roe_path)
 
         path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
 

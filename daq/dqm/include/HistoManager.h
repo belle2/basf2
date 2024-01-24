@@ -23,28 +23,23 @@ namespace Belle2 {
     ~HistoManager();
 
     // Register histogram
-    bool add(std::string& subdir, const std::string& name, int pid, TH1* histo);
-    bool update(std::string& subdir, const std::string& name, int pid, TH1* histo);
+    bool add(const std::string& subdir, const std::string& name, int pid, TH1* histo);
+    bool update(const std::string& subdir, const std::string& name, int pid, TH1* histo);
 
     TH1* get(const std::string& subdir, const std::string& name, int pid);
 
-    //    int remove ( std::string& name );
-
-
-
-    bool merge();
-    void clear();
+    bool merge(void);
+    void clear(void);
+    void filedump(std::string outfile);
 
   private:
     // List to handle histograms sent from different nodes
     // <subdirname, map<histoname, map<pid, TH1*>>>
     std::map<std::string, std::map<std::string, std::map<int, TH1*>> > m_subdir;
-    //OBSOLETE    std::map<std::string, std::map<int, TH1*> > m_list;
 
     // List to handle histograms on TMapFile
     // <subdirname, map<histoname, TH1*>>
     std::map<std::string, std::map<std::string, TH1*>> m_mergedir;
-    //OBSOLETE    std::map<std::string, TH1*>  m_merge;
 
     // TMapFile
     DqmMemFile* m_memfile;

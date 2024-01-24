@@ -225,13 +225,17 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
 
       m_trackClusterMatch[chargedIdx] = 1;
 
-      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
-
       // The "signal" likelihood corresponds to the current chargedPdgId.
       const auto chargedStableSig = Const::chargedStableSet.find(std::abs(chargedPdgId));
       // For deltaLogL, we do a binary comparison sig/bkg.
       // If sig=pion, use bkg=kaon. Otherwise, bkg=pion.
       const auto chargedStableBkg = (chargedStableSig == Const::pion) ? Const::kaon : Const::pion;
+
+      // Very unlikely, but random failures due to missing ECLPidLikelihood have been observed
+      // Let's continue if this is a nullptr
+      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
+      if (not eclLikelihood)
+        continue;
 
       double lh_sig = eclLikelihood->getLikelihood(chargedStableSig);
       double lh_bkg = eclLikelihood->getLikelihood(chargedStableBkg);

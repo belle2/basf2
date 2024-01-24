@@ -72,22 +72,27 @@ def partial_fit(state, X, S, y, w, epoch, batch):
         def on_epoch_end(self, epoch, logs=None):
             loss, acc = state.model.evaluate(state.Xtest, state.ytest, verbose=0, batch_size=1000)
             loss2, acc2 = state.model.evaluate(X[:10000], y[:10000], verbose=0, batch_size=1000)
-            print('\nTesting loss: {}, acc: {}'.format(loss, acc))
-            print('Training loss: {}, acc: {}'.format(loss2, acc2))
+            print(f'\nTesting loss: {loss}, acc: {acc}')
+            print(f'Training loss: {loss2}, acc: {acc2}')
 
     state.model.fit(X, y, batch_size=500, epochs=10, callbacks=[TestCallback()])
     return False
 
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
     ]
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
 
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_identifier = "deep_keras"
     general_options.m_treename = "tree"
     variables = ['M', 'p', 'pt', 'pz',
@@ -116,8 +121,7 @@ if __name__ == "__main__":
 
     method = basf2_mva_util.Method(general_options.m_identifier)
     inference_start = time.time()
-    test_data = ["test.root"] * 10
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     inference_stop = time.time()
     inference_time = inference_stop - inference_start
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)

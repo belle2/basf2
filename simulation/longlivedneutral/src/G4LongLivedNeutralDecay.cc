@@ -172,9 +172,9 @@ G4VParticleChange* G4LongLivedNeutralDecay::DecayIt(const G4Track& aTrack, const
     G4cout << "G4LongLivedNeutralDecay::DoIt  : Decay vertex :";
     G4cout << " Time: " << finalGlobalTime / ns << "[ns]";
     G4cout << " proper time: " << finalLocalTime / ns << "[ns]";
-    G4cout << " X:" << (aTrack.GetPosition()).X() / cm << "[cm]";
-    G4cout << " Y:" << (aTrack.GetPosition()).Y() / cm << "[cm]";
-    G4cout << " Z:" << (aTrack.GetPosition()).Z() / cm << "[cm]";
+    G4cout << " X:" << (aTrack.GetPosition()).getX() / cm << "[cm]";
+    G4cout << " Y:" << (aTrack.GetPosition()).getY() / cm << "[cm]";
+    G4cout << " Z:" << (aTrack.GetPosition()).getZ() / cm << "[cm]";
     G4cout << G4endl;
     G4cout << "G4LongLivedNeutralDecay::DoIt  : decay products in Lab. Frame" << G4endl;
     products->DumpInfo();

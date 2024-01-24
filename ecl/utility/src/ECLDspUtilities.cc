@@ -6,18 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// ECL
-#include <ecl/utility/ECLDspUtilities.h>
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/dbobjects/ECLDspData.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
-// Framework
-#include <framework/logging/Logger.h>
-#include <framework/database/DBObjPtr.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dbobjects/ECLDspData.h>
+#include <ecl/mapper/ECLChannelMapper.h>
+#include <ecl/utility/ECLDspUtilities.h>
+
+/* Basf2 headers. */
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
-// ROOT
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 

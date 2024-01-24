@@ -28,7 +28,7 @@ namespace Belle2 {
 
       /**
        * Set window for fitting.
-       * @parm window [TDC_min, TDC_max]
+       * @param window [TDC_min, TDC_max]
        */
       void setFitWindow(std::vector<unsigned short> window)
       {

@@ -19,6 +19,7 @@ using namespace Belle2;
 
 PreRawCOPPERFormat_v2::PreRawCOPPERFormat_v2()
 {
+
 }
 
 PreRawCOPPERFormat_v2::~PreRawCOPPERFormat_v2()
@@ -369,7 +370,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int temp_ctime_trgtype_footer, temp_eve_footer;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
-  char err_buf[2500];
+  char err_buf[4000];
   int first_ch = 0;
 
   memset(utime, 0, sizeof(utime));
@@ -411,7 +412,7 @@ void PreRawCOPPERFormat_v2::CheckUtimeCtimeTRGType(int n)
             }
           }
 
-          char err_buf_1[2500], err_buf_2[2500], err_buf_3[2500];
+          char err_buf_1[2500], err_buf_2[3000], err_buf_3[3500];
           sprintf(err_buf_1,
                   "[FATAL] %s ch=%d : ERROR_EVENT : mismatch header value over FINESSEs. Exiting...",
                   hostname, -1);
@@ -618,7 +619,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
     if (ff55_lower_bits != 0) {
       const int linkdown_bit = 15;
       //      const int packet_crcerr_bit = 8;
-      char err_buf[500];
+      char err_buf[1000];
       char hostname[128];
       GetNodeName(hostname, m_node_id, sizeof(hostname));
 
@@ -683,7 +684,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
     }
 
     if (ff55_lower_bits != 0) {
-      char err_buf[500];
+      char err_buf[1000];
       const int linkdown_bit = 15;
       //      const int packet_crcerr_bit = 8;
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
@@ -747,7 +748,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
     }
 
     if (ff55_lower_bits != 0) {
-      char err_buf[500];
+      char err_buf[1000];
       const int linkdown_bit = 15;
 
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {
@@ -812,7 +813,7 @@ unsigned int PreRawCOPPERFormat_v2::FillTopBlockRawHeader(unsigned int m_node_id
     }
 
     if (ff55_lower_bits != 0) {
-      char err_buf[500];
+      char err_buf[1000];
       const int linkdown_bit = 15;
 
       if ((ff55_lower_bits & (1 << linkdown_bit)) != 0) {

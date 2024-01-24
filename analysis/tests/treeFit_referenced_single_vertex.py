@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -71,9 +70,9 @@ class TestTreeFits(unittest.TestCase):
 
         self.assertFalse(truePositives == 0, "No signal survived the fit.")
 
-        self.assertTrue(falsePositives < 1771, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
+        self.assertTrue(falsePositives == 1828, f"Too many false positives: {falsePositives} out of {allBkg} total bkg events.")
 
-        self.assertTrue(truePositives > 744, "Signal rejection too high")
+        self.assertTrue(truePositives == 745, "Signal rejection too high")
 
         self.assertFalse(mustBeZero, f"We should have dropped all candidates with confidence level less than {conf}.")
 

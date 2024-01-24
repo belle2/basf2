@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,7 +36,7 @@ class InspectorModule(b2.Module):
     def event(self):
         """reimplementation of Module::event()."""
 
-        self.info.newEvent()
+        self.info.update()
 
         print("Press Ctrl+D to exit.")
         import interactive

@@ -48,7 +48,7 @@
 #pragma link C++ class Belle2::ARICHMergerMapping+; // checksum=0x6559795c, version=2
 #pragma link C++ class Belle2::ARICHCopperMapping+; // checksum=0xcd9563a7, version=1
 #pragma link C++ class Belle2::ARICHSimulationPar+; // checksum=0x66eb312a, version=2
-#pragma link C++ class Belle2::ARICHReconstructionPar+; // checksum=0xfbffb0cf, version=1
+#pragma link C++ class Belle2::ARICHReconstructionPar+; // checksum=0xb565bf14, version=2
 #pragma link C++ class Belle2::ARICHChannelMask+; // checksum=0xf77f127, version=1
 #pragma link C++ class Belle2::ARICHModuleTest+; // checksum=0x88218b49, version=2
 #pragma link C++ class Belle2::ARICHMagnetTest+; // checksum=0x843ec14b, version=1
@@ -67,3 +67,5 @@
 #pragma link C++ class Belle2::ARICHMirrorAlignment+; // checksum=0xd4f6fc8d, version=1
 #pragma link C++ class Belle2::ARICHAeroTilesAlignment+; // checksum=0xe98f9a64, version=1
 #endif
+
+

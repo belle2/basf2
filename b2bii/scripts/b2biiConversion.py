@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ def setupBelleDatabaseServer():
     try:
         with open(belleDBServerFile) as f:
             belleDBServer = (f.read()).strip()
-    except IOError:
+    except OSError:
         pass
 
     os.environ['PGUSER'] = 'g0db'
@@ -38,6 +37,7 @@ def setupBelleDatabaseServer():
 
 
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
+                                  saveResultExtraInfo=False,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,
                                   generatorLevelReconstruction=False,
@@ -56,6 +56,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     Args:
         inputBelleMDSTFile (str): Name of the file(s) to be loaded.
         applySkim (bool): Apply skim conditions in B2BIIFixMdst.
+        saveResultExtraInfo (bool): Save B2BIIFixMdst module return value as EventExtraInfo.
         useBelleDBServer (str): None to use the recommended BelleDB server.
         convertBeamParameters (bool): Convert beam parameters or use information stored in Belle II database.
         generatorLevelReconstruction (bool): Enables to bypass skims and corrections applied in B2BIIFixMdst.
@@ -133,6 +134,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
         fix = b2.register_module('B2BIIFixMdst')
         # fix.logging.set_log_level(LogLevel.DEBUG)
         # fix.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
+        fix.param('SaveResultExtraInfo', saveResultExtraInfo)
         # Hadron skim settings
         fix.param('HadronA', HadronA)
         fix.param('HadronB', HadronB)
@@ -215,7 +217,7 @@ def parse_process_url(url):
             return [url]
         else:
             b2.B2ERROR(
-                "Could not parse url '{0}': no such file or directory".format(url))
+                f"Could not parse url '{url}': no such file or directory")
             return []
 
     # regular expression to find process_event lines in html response
@@ -228,7 +230,6 @@ def parse_process_url(url):
                 for e in process_event.findall(request.content)]
     except (requests.ConnectionError, requests.HTTPError) as e:
         b2.B2ERROR(
-            "Failed to connect to '{url}': {message}".format(
-                url=url, message=str(e)))
+            f"Failed to connect to '{url}': {str(e)}")
 
     return []

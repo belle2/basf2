@@ -330,7 +330,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       htemp->Reset();
     }
 
-    ibinEA = 0;
     for (int iea = 0; iea < fnEntaBinG; iea++) {
       ibinEA = iea;
       if (IsLocalBin)ibinEA = fEntaBinNums.at(iea);

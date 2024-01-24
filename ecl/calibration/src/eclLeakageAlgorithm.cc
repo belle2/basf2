@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <ecl/calibration/eclLeakageAlgorithm.h>
+#include <ecl/calibration/tools.h>
 #include <ecl/dbobjects/ECLLeakageCorrections.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -28,30 +29,23 @@ using namespace Calibration;
 /**************************************************************************
  * eclLeakageAlgorithm analyzes single photon MC to find the eclLeakage payload
  * After initial setup, the position dependent corrections are found using
- * photons with good reconstruction. This correction is then applied prior
- * to finding the correction that depends on the number of crystals.
+ * photons with good reconstruction.
+ * The correction that depends on the number of crystals has been replaced
+ * by the ECLnOptimal payload.
  *
  * Major steps in the process:
  * 1. Set up (read in parameters and tree, define histogram binning)
- * 2. Loop through data to histogram difference between true and reconstructed
- *    location. Determine cut for each thetaID/energy, used to select photons for
- *    all future steps.
- * 3. Fill and fit histograms of normalized reconstructed energy, one per
+ * 2. Fill and fit histograms of normalized reconstructed energy, one per
  *    thetaID/energy. Novosibirsk fit parameter eta is floated in this fit, then
  *    fixed for fits of data with finer location binning. Peak (i.e. overall correction
  *    for this thetaID/energy) is used to normalize position-dependent correction.
- * 4. Fill and fit histograms of normalized energy for each location (nominally 29
+ * 3. Fill and fit histograms of normalized energy for each location (nominally 29
  *    locations in theta and phi per thetaID) to get the position-dependent correction.
  *    Nominally 69 x 8 x 29 x 3 = 48,024 histograms. 3 = theta, phi next to mech, phi not
  *    next to mech.
- * 5. Fill and fit histograms of normalized reconstructed energy corrected for position
- *    dependent leakage, one per thetaID/energy. Resulting eta used for nCrys fits.
- * 6. Fill and fit histograms of normalized energy corrected for location for each value
- *    of nCrys, for each thetaID / energy (nominally 69 x 8 x 21 = 11,592 histograms).
- *    Fix up corrections for those values of nCrys without sufficient statistics.
- * 7. Pack payload quantities into vectors and histograms
- * 8. Fill and fit summary and resolution histograms
- * 9. Finish; close histogram file and and write payload
+ * 4. Pack payload quantities into vectors and histograms
+ * 5. Fill and fit summary and resolution histograms
+ * 6. Finish; close histogram file and and write payload
 
  **************************************************************************/
 
@@ -216,7 +210,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
 
   //..Energies
-  float generatedE[nLeakReg][nEnergies]; // 3 regions forward barrel backward
+  auto generatedE = create2Dvector<float>(nLeakReg, nEnergies); // 3 regions forward barrel backward
+
   int bin = 2; // bin 1 = nPositions, bin 2 = nEnergies, bin 3 = first energy
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
     B2INFO("Generated energies for ireg = " << ireg);
@@ -227,10 +222,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     }
   }
   B2INFO("Low energy threshold = " << m_lowEnergyThreshold);
-  B2INFO("No nCrys threshold = " << m_noNCrysThreshold);
 
   //..Energy per thetaID (in MeV, for use in titles etc)
-  int iEnergiesMeV[nEnergies][nThetaID];
+  auto iEnergiesMeV = create2Dvector<int>(nEnergies, nThetaID);
   for (int thID = 0; thID < nThetaID; thID++) {
     int ireg = 0;
     if (thID >= firstBarrelID and thID <= lastBarrelID) {
@@ -247,7 +241,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //..Bins for eFrac histograms (eFrac = uncorrected reconstructed E / E true)
   const double eFracLo = 0.4; // low edge of eFrac histograms
   const double eFracHi = 1.5; // high edge of eFrac histograms
-  int nEfracBins[nEnergies][nThetaID];
+  auto nEfracBins = create2Dvector<int>(nEnergies, nThetaID);
   for (int thID = 0; thID < nThetaID; thID++) {
     B2DEBUG(25, "eFrac nBins for thetaID " << thID);
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -315,116 +309,24 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   existingThetaCorrection.SetName("existingThetaCorrection");
   TH2F existingPhiCorrection = existingCorrections->getPhiCorrections();
   existingPhiCorrection.SetName("existingPhiCorrection");
-  TH2F existingCrysCorrection = existingCorrections->getnCrystalCorrections();
-  existingCrysCorrection.SetName("existingnCrystalCorrection");
 
   //..Write out the correction histograms
   histfile->cd();
   existingThetaCorrection.Write();
   existingPhiCorrection.Write();
-  existingCrysCorrection.Write();
+
 
   //====================================================================================
   //====================================================================================
-  //..Step 2. First loop. Derive location cut for each energy and thetaID
-
-  //-----------------------------------------------------------------------------------
-  //..Histograms of location error for each energy and thetaID
-  TH1F* locError[nEnergies][nThetaID];
-  TString name;
-  TString title;
-  for (int thID = 0; thID < nThetaID; thID++) {
-    for (int ie = 0; ie < nEnergies; ie++) {
-      name = "locError_" + std::to_string(ie) + "_" +  std::to_string(thID);
-      title = "Location error " + to_string(iEnergiesMeV[ie][thID]) + " MeV thetaID " + std::to_string(thID) + ";location error (cm)";
-      locError[ie][thID] = new TH1F(name, title, 300, 0, 30.);
-    }
-  }
-
-  //-----------------------------------------------------------------------------------
-  //..Loop over tree and histogram the location errors for useful thetaIDs
-  for (int i = 0; i < treeEntries; i++) {
-    tree->GetEntry(i);
-    if (t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0) {
-      locError[t_energyBin][t_thetaID]->Fill(t_locationError);
-    }
-  }
-
-  //-----------------------------------------------------------------------------------
-  //..Cut is location where the distribution drops below 2.5% of peak after pedestal subtraction
-  const double minLocEntries = 49.5; // Write to disk if sufficient entries
-  const double peakFrac = 0.025; // look for distribution to drop to this fraction of peak value
-  const double startOfPed = 10.0001; // cm
-
-  float maxLocCut[nEnergies][nThetaID]; // location cut for each energy and thetaID
-
-  //..Summary histograms of cut values and fraction of events passing cut
-  TH1F* locCutSummary = new TH1F("locCutSummary", "location cut for each thetaID/energy; xBin = thetaID + ie*nTheta", nbinX, 0,
-                                 nbinX);
-  TH1F* locCutEfficiency = new TH1F("locCutEfficiency",
-                                    "Fraction of events passing location cut for each thetaID/energy; xBin = thetaID + ie*nTheta", nbinX, 0, nbinX);
-
-  for (int thID = 0; thID < nThetaID; thID++) {
-    for (int ie = 0; ie < nEnergies; ie++) {
-      maxLocCut[ie][thID] = 0.;
-      if (locError[ie][thID]->Integral() < minLocEntries) {continue;}
-
-      //..Pedestal per bin is average from 10 cm onwards
-      const int i10cm = locError[ie][thID]->GetXaxis()->FindBin(startOfPed);
-      const int ifinal = locError[ie][thID]->GetNbinsX();
-      double pedestal = locError[ie][thID]->Integral(i10cm, ifinal) / (ifinal + 1 - i10cm);
-      double threshold = pedestal + peakFrac * (locError[ie][thID]->GetMaximum() - pedestal);
-      const int ipeak = locError[ie][thID]->GetMaximumBin();
-
-      //..Lower edge of 2nd consecutive bin below threshold
-      const int ix = 1 + thID + nThetaID * ie; // summary hist bin; +1 because first hist bin is 1, not 0
-      for (int ib = ipeak; ib <= ifinal; ib++) {
-        const double ibEnt = locError[ie][thID]->GetBinContent(ib);
-        const double ibMinus1 = locError[ie][thID]->GetBinContent(ib - 1);
-
-        //..This is the cut location. Record in array and in summary histogram
-        if (ibEnt < threshold and ibMinus1 < threshold) {
-          maxLocCut[ie][thID] = locError[ie][thID]->GetBinLowEdge(ib);
-          locCutSummary->SetBinContent(ix, maxLocCut[ie][thID]);
-          locCutSummary->SetBinError(ix, 0);
-
-          //..Efficiency, sort of
-          const double entries = locError[ie][thID]->GetEntries();
-          const double pass = locError[ie][thID]->Integral(1, ib - 1); // bin ib is not included
-          locCutEfficiency->SetBinContent(ix, pass / entries);
-          locCutEfficiency->SetBinError(ix, 0);
-
-          break;
-        }
-      }
-      B2DEBUG(25, "  thID " << thID << " E " << iEnergiesMeV[ie][thID] << " ped " << pedestal << " threshold " << threshold <<
-              " location cut " << maxLocCut[ie][thID]);
-
-      //..Write this one to disk, after supplementing the title with cut and efficiency
-      title = locError[ie][thID]->GetTitle();
-      TString sCut;
-      const double locEff = locCutEfficiency->GetBinContent(ix);
-      sCut.Form(" cut %0.1f cm, eff %0.2f", maxLocCut[ie][thID], locEff);
-      title += sCut;
-      locError[ie][thID]->SetTitle(title);
-      histfile->cd();
-      locError[ie][thID]->Write();
-    }
-  }
-
-  //..Write out the summary histogram
-  histfile->cd();
-  locCutSummary->Write();
-  locCutEfficiency->Write();
-
-  //====================================================================================
-  //====================================================================================
-  //..Step 3. Second loop, fill histograms of e/eTrue for each energy and thetaID
+  //..Step 2. First loop, fill histograms of e/eTrue for each energy and thetaID
 
   //-----------------------------------------------------------------------------------
   //..One histogram of e/eTrue per energy per thetaID.
   //  Used to fix eta in subsequent fits, and to get overall correction for that thetaID
-  TH1F* hELabUncorr[nEnergies][nThetaID];
+  //  (which should be very close to 1).
+  TString name;
+  TString title;
+  auto hELabUncorr = create2Dvector<TH1F*>(nEnergies, nThetaID);
   for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
     TString sthID = std::to_string(thID);
     for (int ie = 0; ie < nEnergies; ie++) {
@@ -442,8 +344,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     tree->GetEntry(i);
 
     //..Only events with good reconstruction
-    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0
-                    and t_locationError < maxLocCut[t_energyBin][t_thetaID];
+    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0;
     if (not goodReco) {continue;}
 
     //..Fill histogram for full thetaID
@@ -453,8 +354,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Fit each thetaID/energy histogram to get peak (overall correction) and eta (fixed
   //  in subsequent fits to individual locations).
-  float peakUncorr[nEnergies][nThetaID]; // store peak from each fit
-  float etaUncorr[nEnergies][nThetaID]; // store eta from each fit
+  auto peakUncorr = create2Dvector<float>(nEnergies, nThetaID); // store peak from each fit
+  auto etaUncorr  = create2Dvector<float>(nEnergies, nThetaID); // store eta from each fit
+
   std::vector<TString> failedELabUncorr; // names of hists with failed fits
   std::vector<int> statusELabUncorr; // status of failed fits
   int payloadStatus = 0; // Overall status of payload determination
@@ -589,7 +491,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //====================================================================================
   //====================================================================================
-  //..Step 4. Third loop, fill histograms of e/eTrue as a function of position.
+  //..Step 3. Second loop, fill histograms of e/eTrue as a function of position.
   //  29 locations in theta, 29 in phi.
   //  Crystals next to mechanical structure in phi are treated separately from
   //  crystals without mechanical structure.
@@ -599,7 +501,9 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   const int nDir = 3;
   const TString dirName[nDir] = {"theta", "phiMech", "phiNoMech"};
 
-  TH1F* eFracPosition[nEnergies][nThetaID][nDir][nPositions]; // the histograms
+  auto eFracPosition  = create4Dvector<TH1F*>(nEnergies, nThetaID, nDir, nPositions); // the histograms
+
+
   std::vector<TString> failedeFracPosition; // names of hists with failed fits
   std::vector<int> statuseFracPosition; // status of failed fits
 
@@ -634,8 +538,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     tree->GetEntry(i);
 
     //..Only events with good reconstruction
-    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0
-                    and t_locationError < maxLocCut[t_energyBin][t_thetaID];
+    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0;
     if (not goodReco) {continue;}
 
     //..Theta location (idir = 0)
@@ -649,8 +552,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //-----------------------------------------------------------------------------------
   //..Now fit many many histograms to get the position-dependent corrections
-  float positionCorrection[nEnergies][nThetaID][nDir][nPositions];
-  float positionCorrectionUnc[nEnergies][nThetaID][nDir][nPositions];
+  auto positionCorrection     = create4Dvector<float>(nEnergies, nThetaID, nDir, nPositions);
+  auto positionCorrectionUnc  = create4Dvector<float>(nEnergies, nThetaID, nDir, nPositions);
   int nHistToFit = 0;
 
 
@@ -788,340 +691,10 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   thetaCorSummary->Write();
   phiCorSummary->Write();
 
-  //====================================================================================
-  //====================================================================================
-  //..Step 5. Fourth loop, fill and fit histograms of ePos for each thetaID/energy,
-  //  where ePos = normalized energy after position correction.
-
-  //-----------------------------------------------------------------------------------
-  //..One histogram of ePos per energy per thetaID.
-  TH1F* hEPos[nEnergies][nThetaID];
-  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
-    TString sthID = std::to_string(thID);
-    for (int ie = 0; ie < nEnergies; ie++) {
-      name = "hEPos_" + std::to_string(ie) + "_" + sthID;
-      title = "ePos " + to_string(iEnergiesMeV[ie][thID]) + " MeV thetaID " + sthID + ";Position corrected E/Etrue";
-
-      //..High statistics for these plots; use more bins
-      hEPos[ie][thID] = new TH1F(name, title, 2 * nEfracBins[ie][thID], eFracLo, eFracHi);
-    }
-  }
-
-  //-----------------------------------------------------------------------------------
-  //..Loop over events and store ePos
-  for (int i = 0; i < treeEntries; i++) {
-    tree->GetEntry(i);
-
-    //..Only events with good reconstruction
-    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0
-                    and t_locationError < maxLocCut[t_energyBin][t_thetaID];
-    if (not goodReco) {continue;}
-
-    //..Position-dependent leakage corrections
-    int idir = 0;
-    float thetaPosCor = positionCorrection[t_energyBin][t_thetaID][idir][t_thetaBin];
-
-    idir = t_phiMech + 1;
-    float phiPosCor = positionCorrection[t_energyBin][t_thetaID][idir][t_phiBin];
-
-    float ePos = t_energyFrac / thetaPosCor / phiPosCor;
-
-    //..Fill histogram for full thetaID
-    hEPos[t_energyBin][t_thetaID]->Fill(ePos);
-  }
-
-  //-----------------------------------------------------------------------------------
-  //..Fit each thetaID/energy histogram to get eta (fixed for later nCrys fits)
-  float etaEpos[nEnergies][nThetaID]; // store eta from each fit
-  std::vector<TString> failedEPos; // names of hists with failed fits
-  std::vector<int> statusEPos; // status of failed fits
-
-  //..Record fit status
-  TH1F* statusOfhEPos = new TH1F("statusOfhEPos",
-                                 "status of hEPos fits for each thetaID/energy: -2 noData, -1 lowE, 0 good, 1 redo fit, 2 lowStat, 3 lowProb, 4 peakAtLimit, 5 sigmaAtLimit",
-                                 8, -2,
-                                 6);
-
-  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
-    TString sthID = std::to_string(thID);
-    for (int ie = 0; ie < nEnergies; ie++) {
-      double genE = iEnergiesMeV[ie][thID] / 1000.;
-      TH1F* hEnergy = (TH1F*)hEPos[ie][thID];
-      double eta = 0.4; // arbitrary but typical
-      int fitStatus = 2; // 2 = low stats
-      if (genE < m_lowEnergyThreshold or genE < m_noNCrysThreshold) {fitStatus = -1;} // low energy, don't fit
-      double entries = hEnergy->Integral();
-      int nIter = 0; // keep track of attempts to fit this histogram
-      bool fitHist = entries > minEntries and genE >= m_lowEnergyThreshold and genE >= m_noNCrysThreshold;
-
-      //..Possibly iterate fit starting from this point
-      while (fitHist) {
-
-        //..Fit parameters
-        double norm = hEnergy->GetMaximum();
-        double target = fracEnt[nIter] * entries; // fit range contains 68% or 50%
-        std::vector<double> startingParameters;// peak, sigma, eta, fitLow, fitHigh, nbins
-        startingParameters = eclLeakageFitParameters(hEnergy, target);
-        func->SetParameters(norm, startingParameters[0], startingParameters[1], startingParameters[2]);
-        func->SetParLimits(1, startingParameters[3], startingParameters[4]);
-        func->SetParLimits(2, 0., startingParameters[4] - startingParameters[3]);
-        func->SetParLimits(3, etaMin, etaMax);
-
-        //..Fit
-        name = hEnergy->GetName();
-        B2DEBUG(40, "Fitting " << name.Data());
-        hEnergy->Fit(func, "LIEQ", "", startingParameters[3], startingParameters[4]);
-        double peak = func->GetParameter(1);
-        double effSigma = func->GetParameter(2);
-        eta = func->GetParameter(3);
-        double prob = func->GetProb();
-
-        //..Check fit quality  0 = good, 1 = redo fit, 2 = lowStat, 3 = lowProb,
-        //  4 = peakAtLimit, 5 = sigmaAtLimit, 6 = etaAtLimit
-        double dEta = min((etaMax - eta), (eta - etaMin));
-        fitStatus = eclLeakageFitQuality(startingParameters[3], startingParameters[4], peak, effSigma, dEta, prob);
-
-        //..If the fit probability is low, refit using a smaller range (fracEnt)
-        if ((fitStatus == 1 or fitStatus == 3) and nIter == 0) {
-          nIter++;
-        } else {
-          fitHist = false;
-        }
-      }
-
-      //-----------------------------------------------------------------------------------
-      //..Record failures and fit results.
-      //  Mark payload as failed if low stats or a fit at limit.
-      statusOfhEPos->Fill(fitStatus + 0.00001);
-      nbadFit = statusEPos.size();
-      if (nbadFit > 0) {B2ERROR("hEPos fit failures (one histogram per energy/thetaID after position correction):");}
-      if (fitStatus >= 2) {
-        statusEPos.push_back(fitStatus);
-        failedEPos.push_back(hEnergy->GetName());
-        if (fitStatus == 2 or fitStatus >= 4) { payloadStatus = 1; }
-      }
-      etaEpos[ie][thID] = eta; // value for low-energy cases is never used
-
-      //..Write to disk
-      if (entries > minEntries) {
-        histfile->cd();
-        hEPos[ie][thID]->Write();
-      }
-    }
-  }
-
-  //..Write status summary to disk
-  histfile->cd();
-  statusOfhEPos->Write();
-
-  if (payloadStatus != 0) {
-    B2ERROR("ecLeakageAlgorithm: fit to hEPos failed. ");
-    histfile->Close();
-    return c_Failure;
-  }
-
 
   //====================================================================================
   //====================================================================================
-  //..Step 6. Fifth loop, fill and fit histograms of ePos for each nCrys, for each
-  //  thetaID/energy, where ePos = normalized energy after position correction.
-  const int maxN = 21; // maximum number of crystals in a cluster
-
-  //-----------------------------------------------------------------------------------
-  //..Histograms of ePos
-  TH1F* ePosnCry[nEnergies][nThetaID][maxN + 1]; // +1 to include 0
-  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
-    TString sthID = std::to_string(thID);
-    for (int ie = 0; ie < nEnergies; ie++) {
-      TString sie = std::to_string(ie);
-      for (int in = 0; in <= maxN; in++) {
-        name = "ePosnCry_" + sie + "_" + sthID + "_" + std::to_string(in);
-        title = "ePos " + to_string(iEnergiesMeV[ie][thID]) + " MeV thetaID " + sthID + " nCrys " + std::to_string(
-                  in) + "; corrected E/Etrue";
-        ePosnCry[ie][thID][in] = new TH1F(name, title, nEfracBins[ie][thID], eFracLo, eFracHi);
-      }
-    }
-  }
-
-  //-----------------------------------------------------------------------------------
-  //..Loop over events and store ePos
-  for (int i = 0; i < treeEntries; i++) {
-    tree->GetEntry(i);
-
-    //..Only events with good reconstruction
-    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0
-                    and t_locationError < maxLocCut[t_energyBin][t_thetaID];
-    if (not goodReco) {continue;}
-
-    //..Position-dependent leakage corrections
-    int idir = 0;
-    float thetaPosCor = positionCorrection[t_energyBin][t_thetaID][idir][t_thetaBin];
-
-    idir = t_phiMech + 1;
-    float phiPosCor = positionCorrection[t_energyBin][t_thetaID][idir][t_phiBin];
-
-    float ePos = t_energyFrac / thetaPosCor / phiPosCor;
-    ePosnCry[t_energyBin][t_thetaID][t_nCrys]->Fill(ePos);
-  }
-
-  //-----------------------------------------------------------------------------------
-  //..Fit ePos histograms for each value of nCrys. Many of these will not have enough stats
-  float nCrysCorrection[nEnergies][nThetaID][maxN + 1];
-  float nCrysCorrectionUnc[nEnergies][nThetaID][maxN + 1];
-
-  //..Keep track of the peak nCrys for each thetaID/energy. Use this later to fix up
-  //  values of nCrys without a successful fit
-  int maxNCry[nEnergies][nThetaID];
-
-  //..Keep track of fit status
-  TH1F* statusOfePosnCry = new TH1F("statusOfePosnCry",
-                                    "ePosnCry fit status: -2 noData, -1 lowE, 0 good, 1 redo fit, 2 lowStat, 3 lowProb, 4 peakAtLimit, 5 sigmaAtLimit", 8, -2,
-                                    6);
-
-  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
-    for (int ie = 0; ie < nEnergies; ie++) {
-      double genE = iEnergiesMeV[ie][thID] / 1000.;
-      double maxIntegral = 0;
-      maxNCry[ie][thID] = 0;
-      for (int in = 0; in <= maxN; in++) {
-
-        TH1F* hEnergy = (TH1F*)ePosnCry[ie][thID][in];
-        if (hEnergy->Integral() > minEntries) {nHistToFit++;}
-
-        //..Defaults for failed fits. Will fix up in the next step.
-        double correction = -1.;
-        double corrUnc = 0.05; // arbitrary uncertainty
-        int nIter = 0; // keep track of attempts to fit this histogram
-        double entries = hEnergy->Integral();
-        int fitStatus = -2; // low stats
-        if (genE < m_lowEnergyThreshold or genE < m_noNCrysThreshold) {
-          fitStatus = -1; // low energy
-          correction = 1.; // for low energy, nCrys correction = 1
-          corrUnc = 0.;
-        }
-        bool fitHist = entries > minEntries and genE >= m_lowEnergyThreshold and genE >= m_noNCrysThreshold;
-
-        //..nCrys with most entries
-        if (entries > maxIntegral) {
-          maxIntegral = entries;
-          maxNCry[ie][thID] = in;
-        }
-
-        //..Possibly iterate fit starting from this point
-        while (fitHist) {
-          fitHist = false;
-
-          //..Fit parameters
-          double target = fracEnt[nIter] * entries; // fit range contains 68%
-          std::vector<double> startingParameters;// peak, sigma, eta, fitLow, fitHigh, nbins
-          bool findParm = true;
-          while (findParm) {
-            startingParameters = eclLeakageFitParameters(hEnergy, target);
-
-            //..Rebin if stats are low and we have enough DOF
-            if (hEnergy->GetMaximum()<minMaxBin and startingParameters[5]>11.9) {
-              hEnergy->Rebin(2);
-            } else {
-              findParm = false;
-            }
-          }
-          double norm = hEnergy->GetMaximum(); // max bin after rebinning
-          double fitLow = startingParameters[3];
-          double fitHigh = startingParameters[4];
-
-          //..Eta from the fit to the full crystal after position-dependent leakage correction
-          double etaFix = etaEpos[ie][thID];
-          func->SetParameters(norm, startingParameters[0], startingParameters[1], etaFix);
-          func->SetParLimits(1, fitLow, fitHigh);
-          func->SetParLimits(2, 0., fitHigh - fitLow);
-
-          //..Fix eta, unless really good statistics
-          if (hEnergy->GetMaximum() < highMaxBin) {
-            func->SetParLimits(3, etaFix, etaFix);
-          } else {
-            func->SetParLimits(3, etaMin, etaMax);
-          }
-
-          //..Fit
-          name = hEnergy->GetName();
-          B2DEBUG(40, "Fitting " << name.Data());
-          hEnergy->Fit(func, "LIEQ", "", fitLow, fitHigh);
-          double peak = func->GetParameter(1);
-          double effSigma = func->GetParameter(2);
-          double eta = func->GetParameter(3);
-          double prob = func->GetProb();
-
-          //..Check fit quality  0 = good, 1 = redo fit, 2 = lowStat, 3 = lowProb,
-          //  4 = peakAtLimit, 5 = sigmaAtLimit, 6 = etaAtLimit.
-          double dEta = min((etaMax - eta), (eta - etaMin));
-          fitStatus = eclLeakageFitQuality(fitLow, fitHigh, peak, effSigma, dEta, prob);
-
-          //..If the fit probability is low, refit using a smaller range (fracEnt)
-          if ((fitStatus == 1 or fitStatus == 3) and nIter == 0) {
-            nIter++;
-            fitHist = true;
-
-            //  Store correction except for peak or sigma at limit.
-          } else if (fitStatus <= 3) {
-            correction = peak;
-            corrUnc = func->GetParError(1);
-          }
-        }
-
-        //..Store the correction for this position
-        statusOfePosnCry->Fill(fitStatus + 0.00001);
-        nCrysCorrection[ie][thID][in] = correction;
-        nCrysCorrectionUnc[ie][thID][in] = corrUnc;
-      }
-
-      //..Write histogram for maximum nCrys to disk
-      histfile->cd();
-      int highestN = maxNCry[ie][thID];
-      ePosnCry[ie][thID][highestN]->Write();
-    }
-  }
-
-  //..Write out fit status summary
-  histfile->cd();
-  statusOfePosnCry->Write();
-
-  //-----------------------------------------------------------------------------------
-  //..Now fix up corrections for nCrys values that did not have a successful fit.
-  //  The logic is that if "n" is not successful, then use the correction from either
-  //  n+1 or n-1, which ever is closer to the most likely value of nCrys
-  for (int thID = firstUsefulThID; thID <= lastUsefulThID; thID++) {
-    for (int ie = 0; ie < nEnergies; ie++) {
-
-      //..If the most likely value of nCrys does not have a successful correction,
-      //  mark the algorithm as failed. Recall that low-energy cases always have correction = 1.
-      int highestN = maxNCry[ie][thID];
-      if (nCrysCorrection[ie][thID][highestN] <= 0) {
-        B2ERROR("eclLeakageAlgorithm: no nCrys correction for ie " << ie << " thetaID " << thID);
-        histfile->Close();
-        return c_Failure;
-      }
-
-      //..Start at the highest and work upwards
-      for (int in = highestN + 1; in <= maxN; in++) {
-        if (nCrysCorrection[ie][thID][in] < 0) {
-          nCrysCorrection[ie][thID][in] = nCrysCorrection[ie][thID][in - 1];
-          nCrysCorrectionUnc[ie][thID][in] = nCrysCorrectionUnc[ie][thID][in - 1];
-        }
-      }
-
-      //..Start at the highest and move downwards
-      for (int in = highestN - 1; in >= 0; in--) {
-        if (nCrysCorrection[ie][thID][in] < 0) {
-          nCrysCorrection[ie][thID][in] = nCrysCorrection[ie][thID][in + 1];
-          nCrysCorrectionUnc[ie][thID][in] = nCrysCorrectionUnc[ie][thID][in + 1];
-        }
-      }
-    }
-  }
-
-  //====================================================================================
-  //====================================================================================
-  //..Step 7. Store quantities needed for the payloads
+  //..Step 4. Store quantities needed for the payloads
 
   //-----------------------------------------------------------------------------------
   //..First, we need to fix up the thetaID that have been so far missed.
@@ -1131,18 +704,11 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   for (int thID = firstUsefulThID - 1; thID >= 0; thID--) {
     for (int ie = 0; ie < nEnergies; ie++) {
 
-      //..Position dependent
       for (int idir = 0; idir < 3; idir++) {
         for (int ipos = 0; ipos < nPositions; ipos++) {
           positionCorrection[ie][thID][idir][ipos] = positionCorrection[ie][thID + 1][idir][ipos];
           positionCorrectionUnc[ie][thID][idir][ipos] = positionCorrectionUnc[ie][thID + 1][idir][ipos];
         }
-      }
-
-      //..nCrys
-      for (int in = 0; in <= maxN; in++) {
-        nCrysCorrection[ie][thID][in] = nCrysCorrection[ie][thID + 1][in];
-        nCrysCorrectionUnc[ie][thID][in] = nCrysCorrectionUnc[ie][thID + 1][in];
       }
     }
   }
@@ -1151,18 +717,11 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   for (int thID = lastUsefulThID + 1; thID < nThetaID; thID++) {
     for (int ie = 0; ie < nEnergies; ie++) {
 
-      //..Position dependent
       for (int idir = 0; idir < 3; idir++) {
         for (int ipos = 0; ipos < nPositions; ipos++) {
           positionCorrection[ie][thID][idir][ipos] = positionCorrection[ie][thID - 1][idir][ipos];
           positionCorrectionUnc[ie][thID][idir][ipos] = positionCorrectionUnc[ie][thID - 1][idir][ipos];
         }
-      }
-
-      //..nCrys
-      for (int in = 0; in <= maxN; in++) {
-        nCrysCorrection[ie][thID][in] = nCrysCorrection[ie][thID - 1][in];
-        nCrysCorrectionUnc[ie][thID][in] = nCrysCorrectionUnc[ie][thID - 1][in];
       }
     }
   }
@@ -1233,7 +792,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   }
 
   //-----------------------------------------------------------------------------------
-  //..nCrys dependent corrections
+  //..nCrys dependent corrections; not used since nOptimal was implemented.
+  const int maxN = 21; // maximum number of crystals in a cluster
   TH2F nCrystalCorrection("nCrystalCorrection", "nCrys correction vs bin;bin = thetaID + 69*energyBin;nCrys", nbinX, 0, nbinX,
                           maxN + 1, 0, maxN + 1);
 
@@ -1243,8 +803,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       ix++;
       for (int in = 0; in <= maxN; in++) {
         int iy = in + 1;
-        float correction = nCrysCorrection[ie][thID][in];
-        float corrUnc = nCrysCorrectionUnc[ie][thID][in];
+        float correction = 1.;
+        float corrUnc = 0.;
         nCrystalCorrection.SetBinContent(ix, iy, correction);
         nCrystalCorrection.SetBinError(ix, iy, corrUnc);
       }
@@ -1254,7 +814,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //====================================================================================
   //====================================================================================
-  //..Step 8. Diagnostic histograms
+  //..Step 5. Diagnostic histograms
 
   //..Start by storing the payload histograms
   histfile->cd();
@@ -1265,10 +825,12 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..One histogram of new and original reconstructed energy after leakage correction
   //  per generated energy per region. Also uncorrected.
+  //  The "Corrected no nCrys" and "Corrected measured" are identical, but keep both
+  //  for easier comparison with earlier results.
   const int nResType = 5;
   const TString resName[nResType] = {"Uncorrected", "Original", "Corrected no nCrys", "Corrected measured", "Corrected true"};
   const TString regName[nLeakReg] = {"forward", "barrel", "backward"};
-  TH1F* energyResolution[nLeakReg][nEnergies][nResType];
+  auto energyResolution = create3Dvector<TH1F*>(nLeakReg, nEnergies, nResType);
 
   //..Base number of bins on a typical thetaID for each region
   int thIDReg[nLeakReg];
@@ -1299,8 +861,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
     tree->GetEntry(i);
 
     //..Only events with good reconstruction
-    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0
-                    and t_locationError < maxLocCut[t_energyBin][t_thetaID];
+    bool goodReco = t_thetaID >= firstUsefulThID and t_thetaID <= lastUsefulThID and t_energyBin >= 0;
     if (not goodReco) {continue;}
 
     //-----------------------------------------------------------------------------------
@@ -1312,40 +873,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
     idir = t_phiMech + 1;
     float phiPosCor = positionCorrection[t_energyBin][t_thetaID][idir][t_phiBin];
-    float posCor = thetaPosCor * phiPosCor;
-
-    //..nCrystal-dependent leakage correction using true energy
-    float nCrysCor = nCrysCorrection[t_energyBin][t_thetaID][t_nCrys];
-    float corrTrue = posCor * nCrysCor;
-
-    //-----------------------------------------------------------------------------------
-    //..Find position-dependent correction (only) using measured energy. The correction is
-    //  a function of corrected energy, so will need to iterate
-    float corrNonCrys = 0.96; // typical correction as starting point
-    for (int iter = 0; iter < 2; iter++) {
-
-
-      //..Energy points that bracket this value
-      float energyRaw = t_energyFrac * generatedE[t_region][t_energyBin];
-      float logEnergy = log(energyRaw / corrNonCrys);
-      int ie0 = 0; // lower energy point
-      if (logEnergy < leakLogE[t_region][0]) {
-        ie0 = 0;
-      } else if (logEnergy > leakLogE[t_region][nEnergies - 1]) {
-        ie0 = nEnergies - 2;
-      } else {
-        while (logEnergy > leakLogE[t_region][ie0 + 1]) {ie0++;}
-      }
-
-      //..Corrections from lower and upper energy points
-      float cor0 = positionCorrection[ie0][t_thetaID][0][t_thetaBin] * positionCorrection[ie0][t_thetaID][t_phiMech + 1][t_phiBin];
-      float cor1 = positionCorrection[ie0 + 1][t_thetaID][0][t_thetaBin] * positionCorrection[ie0 + 1][t_thetaID][t_phiMech +
-                   1][t_phiBin];
-
-      //..Interpolate in logE
-      corrNonCrys = cor0 + (cor1 - cor0) * (logEnergy - leakLogE[t_region][ie0]) / (leakLogE[t_region][ie0 + 1] -
-                    leakLogE[t_region][ie0]);
-    }
+    float corrTrue = thetaPosCor * phiPosCor;
 
     //-----------------------------------------------------------------------------------
     //..Find correction using measured energy. The correction is a function of corrected
@@ -1367,15 +895,17 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
       }
 
       //..Corrections from lower and upper energy points
-      float cor0 = positionCorrection[ie0][t_thetaID][0][t_thetaBin] * positionCorrection[ie0][t_thetaID][t_phiMech + 1][t_phiBin] *
-                   nCrysCorrection[ie0][t_thetaID][t_nCrys];
+      float cor0 = positionCorrection[ie0][t_thetaID][0][t_thetaBin] * positionCorrection[ie0][t_thetaID][t_phiMech + 1][t_phiBin];
       float cor1 = positionCorrection[ie0 + 1][t_thetaID][0][t_thetaBin] * positionCorrection[ie0 + 1][t_thetaID][t_phiMech +
-                   1][t_phiBin] * nCrysCorrection[ie0 + 1][t_thetaID][t_nCrys];
+                   1][t_phiBin];
 
       //..Interpolate in logE
       corrMeasured = cor0 + (cor1 - cor0) * (logEnergy - leakLogE[t_region][ie0]) / (leakLogE[t_region][ie0 + 1] -
                      leakLogE[t_region][ie0]);
     }
+
+    //..No longer have a separate case that excludes the nCrys correction
+    float corrNonCrys = corrMeasured;
 
     //-----------------------------------------------------------------------------------
     //..Fill the histograms
@@ -1390,8 +920,8 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
   //..Fit each histogram to find peak, and extract resolution.
 
   //..Store the peak and resolution values for each histogram
-  float peakEnergy[nLeakReg][nEnergies][nResType];
-  float energyRes[nLeakReg][nEnergies][nResType];
+  auto peakEnergy = create3Dvector<float>(nLeakReg, nEnergies, nResType);
+  auto energyRes  = create3Dvector<float>(nLeakReg, nEnergies, nResType);
 
   //..Loop over the histograms to be fit
   for (int ireg = 0; ireg < nLeakReg; ireg++) {
@@ -1509,7 +1039,7 @@ CalibrationAlgorithm::EResult eclLeakageAlgorithm::calibrate()
 
   //====================================================================================
   //====================================================================================
-  //..Step 9. Finish up.
+  //..Step 6. Finish up.
 
   //-----------------------------------------------------------------------------------
   //..Close histogram file

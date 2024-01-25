@@ -203,7 +203,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
     **Selection Criteria**:
         * Use photons from `stdPhotons.loadStdSkimPhoton`
-        * Use electrons, muons and pions from loose lists in `stdCharged`
+        * Use electrons, muons, and pions from the `charm_skim_std_charged`
         * ``1.66 < M(D0) < 2.06``
         * No cut on the slow pion
         * ``0 < Q < 0.02``
@@ -420,7 +420,8 @@ class XToDp_DpToHpHmJp(BaseSkim):
           please check `XToDp_DpToKsHp`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged`
+        * Use traacks from the `charm_skim_std_charged`
+        * Additional cut: global PID > 0.5
         * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 
@@ -722,7 +723,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, \\eta\\to \\gamma \\gamma`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged` to reconstruct D^{0}
+        * Use tracks from the charm lists in `charm_skim_std_charged`
         * ``0.47 < M(eta) < 0.60, p(eta) > 0.24``
         * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
         * No cut on the slow pion
@@ -971,7 +972,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\omega \\gamma`
 
     **Selection Criteria**:
-        * Use charged tracks from the loose lists in `stdCharged` to reconstruct :math:`D^{0}`
+        * Use tracks from the charm lists in `charm_skim_std_charged`
         * Use :math:`\\gamma` from `stdPhotons.loadStdSkimPhoton`
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * Cut on :math:`\\phi`:

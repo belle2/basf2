@@ -82,30 +82,30 @@ void DQMHistAnalysisRunNrModule::beginRun()
 void DQMHistAnalysisRunNrModule::event()
 {
   if (!m_cRunNr) return;
-  double mean = 0.0; // must be double, mean of histogram -> runnr
-  int status = c_StatusTooFew; // must be int, epics alarm status 0 = no data, 2 = o.k., 4 = not o.k.
 
   auto leg = new TPaveText(0.6, 0.6, 0.95, 0.95, "NDC");
   leg->SetFillColor(kWhite);
 
   auto name = "hRunnr";
-  auto hh1 = findHist(m_histogramDirectoryName, name, true); // only if updated
-  if (hh1) {
+  auto hist = findHist(m_histogramDirectoryName, name, true); // only if updated
+  if (hist) {
+    double mean = 0.0; // must be double, mean of histogram -> runnr
+    int status = c_StatusTooFew; // must be int, epics alarm status 0 = no data, 2 = o.k., 4 = not o.k.
     m_cRunNr->Clear();
     m_cRunNr->cd();
-    hh1->SetStats(kFALSE); // get rid of annoying box, we have our own
-    hh1->Draw("hist");
-    mean = hh1->GetMean();
-    if (hh1->GetEntries() > 0) {
+    hist->SetStats(kFALSE); // get rid of annoying box, we have our own
+    hist->Draw("hist");
+    mean = hist->GetMean();
+    if (hist->GetEntries() > 0) {
       leg->AddText("Contains Run: Entries");
       // loop over bins and check if more than one is used
       int nfilled = 0;
-      for (int i = 0; i <= hh1->GetXaxis()->GetNbins() + 1; i++) {
+      for (int i = 0; i <= hist->GetXaxis()->GetNbins() + 1; i++) {
         // resizeable histogram, thus there should never be under or overflow. still we loop over them
-        if (hh1->GetBinContent(i) > 0) {
+        if (hist->GetBinContent(i) > 0) {
           nfilled++;
           TString tmp;
-          tmp.Form("%ld: %ld", (long int)hh1->GetXaxis()->GetBinCenter(i), (long int)hh1->GetBinContent(i));
+          tmp.Form("%ld: %ld", (long int)hist->GetXaxis()->GetBinCenter(i), (long int)hist->GetBinContent(i));
           leg->AddText(tmp);
         }
       }

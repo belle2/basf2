@@ -36,7 +36,7 @@ import variables as va
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi, stdCharged
 from stdPhotons import loadStdSkimPhoton
-from stdPi0s import loadStdSkimPi0
+from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts, stdLambdas
 from variables import variables as vm
 
@@ -497,6 +497,84 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
             DstList.append("D*+:HpPi0" + str(chID))
 
         return DstList
+
+
+@fancy_skim_header
+class DpToHpPi0(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\pi^+ \\pi^0`
+
+    **Selection Criteria**:
+        * Tracks: ``dr < 1, abs(dz) < 3, 0.296706 < theta < 2.61799, pcms(\\pi^{+}) > 0.5``
+        * Use :math:`\\pi^{0}` from `stdPi0s` require ``pcms(\\pi^{0}) > 0.5``
+        * ``1.57 < M(D+) < 2.17, pcms(D+) > 2.0``
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Yifan Jin"]
+    __description__ = "Skim list for D+ to h+ pi0 without D* tag."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        # loadStdSkimPi0(path=path)
+        stdPi0s(listtype='eff50_May2020Fit', path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList('pi+:HpPi0', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
+        ma.cutAndCopyList('pi0:HpPi0', 'pi0:eff50_May2020Fit', 'useCMSFrame(p) > 0.5', path=path)
+
+        Dpcuts = "1.57 < M < 2.17 and useCMSFrame(p) > 2.0"
+
+        DList = []
+        ma.reconstructDecay("D+:HpPi0 -> pi+:HpPi0 pi0:HpPi0", Dpcuts, path=path)
+        DList.append("D+:HpPi0")
+
+        return DList
+
+
+@fancy_skim_header
+class DpToKsHp(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^+ \\to \\Ks \\pi^+`
+
+    **Selection Criteria**:
+        * Tracks: ``dr < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``
+        * Use Ks from `stdKshorts`
+        * ``1.77 < M(D+) < 1.97, pcms(D+) > 2.0``
+        * For more details, please check the source code of this skim.
+
+    """
+
+    __authors__ = ["Yifan Jin"]
+    __description__ = "Skim list for D+ to Ks pi+."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        stdKshorts(path=path)
+
+    def build_lists(self, path):
+        ma.cutAndCopyList('pi+:KsPi+', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
+
+        Dpcuts = "1.77 < M < 1.97 and useCMSFrame(p) > 2.0"
+
+        DList = []
+        ma.reconstructDecay("D+:KsPi+ -> K_S0:merged pi+:KsPi+", Dpcuts, path=path)
+        DList.append("D+:KsPi+")
+
+        return DList
 
 
 @fancy_skim_header

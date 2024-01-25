@@ -19,14 +19,11 @@
 #include <iosfwd>
 #include <cmath>
 
-class TVector2;
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      * A two dimensional vector which is equipped with functions for correct handeling \n
      * of orientation related issues in addition to the expected vector methods. \n
-     * Also this vector can be passed to functions where a TVector2 is expected syntactically.
      */
     class Vector2D {
 
@@ -37,9 +34,6 @@ namespace Belle2 {
         , m_y(0.0)
       {
       }
-
-      /// Constructor translating from a TVector2 instance
-      explicit Vector2D(const TVector2& tVector2);
 
       /// Constructor from two coordinates
       Vector2D(const double x, const double y)
@@ -59,9 +53,6 @@ namespace Belle2 {
         , m_y(coordinateVec.y() * parallelCoor + coordinateVec.x() * orthoCoor)
       {
       }
-
-      /// Assignment translating from a TVector2 instance
-      Vector2D& operator=(const TVector2& tvector);
 
       /// Constucts a unit vector with azimuth angle equal to phi
       static Vector2D Phi(const double phi)
@@ -117,9 +108,6 @@ namespace Belle2 {
                           (one.y() + two.y() + three.y()) / 3.0);
         }
       }
-
-      /// Casting the back to TVector2 seamlessly
-      operator const TVector2();
 
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const

@@ -1,0 +1,35 @@
+# EventType: 1296030400 
+# Descriptor: [B+ -> anti-Xi_c0 [Lambda_c+ -> [Lambda0 -> p+ pi-] pi+]]
+# NickName: Bu_Xic0Lambdacp_Lambdacppi
+# Documentation: B to Charm phase3 study
+# Tested:yes
+# PhysicsWG: Hadronic BtoCharm WG
+# Responsible: Jianshe Zhou
+# Email: jszhou20@fudan.edu.cn
+# Cuts: None
+# Date: 20231201
+
+# Upsilon(4S) decay
+Decay Upsilon(4S)
+0.5 B+sig B-   VSS;
+0.5 B+   B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.00  anti-Xi_c0 Lambda_c+sig  PHSP;
+Enddecay
+
+CDecay B-sig
+
+Decay Lambda_c+sig
+1.0 Lambda0sig pi+ 	     PHSP;
+Enddecay
+
+CDecay anti-Lambda_c-sig
+
+Decay Lambda0sig
+1.0   p+  pi-                                      HypNonLepton 0.748 -6.5; #[PDG2023]
+Enddecay
+CDecay anti-Lambda0sig
+
+End

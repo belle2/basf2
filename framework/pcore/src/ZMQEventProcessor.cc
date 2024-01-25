@@ -386,7 +386,10 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
     // Test if we need more workers
     const unsigned int neededWorkers = m_processMonitor.needMoreWorkers();
     if (neededWorkers > 0) {
+      B2DEBUG(30, "restartFailedWorkers = " << restartFailedWorkers);
       if (restartFailedWorkers) {
+        B2DEBUG(30, ".... Restarting a new worker");
+        B2ERROR(".... Restarting a new worker process");
         runWorker(neededWorkers, inputPath, mainPath, terminateGlobally, maxEvent);
       } else if (failOnFailedWorkers) {
         B2ERROR("A worker failed. Will try to end the process smoothly now.");

@@ -45,7 +45,9 @@ PhysicsObjectsMiraBelleDstModule::PhysicsObjectsMiraBelleDstModule() : HistoModu
 void PhysicsObjectsMiraBelleDstModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("PhysicsObjectsMiraBelleDst")->cd();
+  oldDir->mkdir("PhysicsObjectsMiraBelleDst");
+  oldDir->cd("PhysicsObjectsMiraBelleDst");
+
   // Mass distributions
   m_h_D0_InvM = new TH1F("hist_D0_InvM", "Signal enhanced;m_h_D0_InvM;", 50, 1.81, 1.95);
   m_h_delta_m = new TH1F("hist_delta_m", "Signal enhanced;delta_m;", 50, 0.14, 0.16);

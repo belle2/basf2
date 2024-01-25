@@ -14,6 +14,7 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <TFile.h>
 #include <TText.h>
@@ -91,18 +92,18 @@ namespace Belle2 {
     TFile* m_refFile = nullptr;
 
     TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
-    TH2F* m_hOccupancyU = nullptr; /**< occupancy U histo */
-    TH2F* m_hOccupancyU3Samples = nullptr; /**< occupancy U histo  for 3 samples*/
-    TH2F* m_hOccupancyUGroupId0 = nullptr; /**< occupancy U histo  for cluster time group Id = 0*/
+
+    SVDSummaryPlots* m_hOccupancy = nullptr;  /**< occupancy histos */
+    SVDSummaryPlots* m_hOnlineOccupancy = nullptr;  /**< online occupancy histos */
+    SVDSummaryPlots* m_hOccupancyGroupId0 = nullptr;  /**< occupancy histos for cluster time group id=0*/
+    SVDSummaryPlots* m_hOccupancy3Samples = nullptr;  /**<  occupancy histos for 3 samples*/
+    SVDSummaryPlots* m_hOnlineOccupancy3Samples = nullptr;  /**< online occupancy histos for 3 sampels*/
+
     TCanvas* m_cOccupancyU = nullptr; /**< occupancy U histo canvas */
     TCanvas* m_cOccupancyU3Samples = nullptr; /**< occupancy U histo canvas for 3 sampes */
     TCanvas* m_cOccupancyUGroupId0 = nullptr; /**< occupancy U histo canvas  for cluster time group Id = 0*/
 
-    TH2F* m_hOccupancyV = nullptr; /**< occupancy V histo */
-    TH2F* m_hOccupancyV3Samples = nullptr; /**< occupancy V histo  for 3 samples*/
     TCanvas* m_cOccupancyV = nullptr; /**< occupancy V histo canvas */
-    TH2F* m_hOccupancyVGroupId0 = nullptr; /**< occupancy V histo  for cluster time group Id = 0*/
-
     TCanvas* m_cOccupancyV3Samples = nullptr; /**< occupancy V histo canvas  for 3 samples*/
     TCanvas* m_cOccupancyVGroupId0 = nullptr; /**< occupancy V histo canvas  for cluster time group Id = 0*/
 
@@ -113,15 +114,13 @@ namespace Belle2 {
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 
     TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
-    TH2F* m_hOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
     TCanvas* m_cOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo canvas for 3 samples*/
     TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
-    TH2F* m_hOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
     TCanvas* m_cOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
 
-    const int nSensors = 172; /**< total number of sensors */
+    int m_sensors = 0; /**< number of sensors to considired*/
     TH1F m_hStripOccupancyU[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyU = nullptr; /**< u-side strip chart occupancy canvas*/
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/
@@ -145,7 +144,14 @@ namespace Belle2 {
     TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */
     TPaveText* m_legOnEmpty = nullptr; /**< onlineOccupancy plot legend, empty */
     TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
-    TText* m_yTitle = nullptr; /**< y axis title text*/
+
+    TPaveText* m_legTiProblem = nullptr; /**< cluster time on tracks plot legend, problem */
+    TPaveText* m_legTiNormal = nullptr; /**< cluster time on tracks plot legend, normal */
+    TPaveText* m_legTiEmpty = nullptr; /**< cluster time on tracks plot legend, empty */
+
+    TPaveText* m_legTi3Problem = nullptr; /**< cluster time on tracks  for 3 samples plot legend, problem */
+    TPaveText* m_legTi3Normal = nullptr; /**< cluster time on tracks for 3 samples  plot legend, normal */
+    TPaveText* m_legTi3Empty = nullptr; /**< cluster time on tracks  for 3 samples plot legend, empty */
 
     Double_t m_unpackError = 0; /**< Maximum bin_content/ # events allowed before throwing ERROR*/
     Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
@@ -162,8 +168,7 @@ namespace Belle2 {
     Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
     Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
 
-    TH1* rtype = nullptr; /**< histogram from DQMInfo with runtype */
-    TString runtype = nullptr; /**< string with runtype: physics or cosmic */
+    TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 

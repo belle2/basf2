@@ -36,10 +36,21 @@ void DQMHistAnalysisEpicsOutputModule::initialize()
   }
 }
 
+void DQMHistAnalysisEpicsOutputModule::beginRun(void)
+{
+  checkPVStatus();
+}
+
+void DQMHistAnalysisEpicsOutputModule::endRun(void)
+{
+  checkPVStatus();
+}
+
 void DQMHistAnalysisEpicsOutputModule::event()
 {
   // -> now trigger flush to network
   // this is the reason we want to have this modul after all other Analysis modules
-  updateEpicsPVs(5.0); // 5 seconds
+  auto state = updateEpicsPVs(5.0); // 5 seconds
   // be aware that any "error" arising from a PV in an analysis module, may only show up here (timeout etc)
+  if (state != ECA_NORMAL) checkPVStatus();
 }

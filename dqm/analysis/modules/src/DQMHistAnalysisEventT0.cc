@@ -103,7 +103,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_topPad1ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_topPad1ECLTRG->SetFillColor(kGray);
   }
 
@@ -117,7 +117,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_topPad2ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_topPad2ECLTRG->SetFillColor(kGray);
   }
 
@@ -131,7 +131,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_topPad3ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_topPad3ECLTRG->SetFillColor(kGray);
   }
 
@@ -158,7 +158,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_topPad1CDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_topPad1CDCTRG->SetFillColor(kGray);
     m_cTOPTimeForCDCTRG->cd();
     m_topPad1CDCTRG->Draw();
@@ -176,7 +176,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_topPad2CDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_topPad2CDCTRG->SetFillColor(kGray);
     m_cTOPTimeForCDCTRG->cd();
     m_topPad2CDCTRG->Draw();
@@ -192,7 +192,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_topPad3CDCTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_topPad3CDCTRG->SetFillColor(kGray);
   }
 
@@ -218,7 +218,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad1ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_svdPad1ECLTRG->SetFillColor(kGray);
   }
 
@@ -232,7 +232,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad2ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_svdPad2ECLTRG->SetFillColor(kGray);
   }
 
@@ -246,7 +246,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad3ECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_svdPad3ECLTRG->SetFillColor(kGray);
   }
 
@@ -273,7 +273,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad1CDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_svdPad1CDCTRG->SetFillColor(kGray);
     m_cSVDTimeForCDCTRG->cd();
     m_svdPad1CDCTRG->Draw();
@@ -291,7 +291,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad2CDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_svdPad2CDCTRG->SetFillColor(kGray);
     m_cSVDTimeForCDCTRG->cd();
     m_svdPad2CDCTRG->Draw();
@@ -308,7 +308,7 @@ void DQMHistAnalysisEventT0Module::endRun()
     m_svdPad3CDCTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
+    if (h) h->Draw();
     m_svdPad3CDCTRG->SetFillColor(kGray);
   }
 

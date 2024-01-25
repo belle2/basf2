@@ -1,0 +1,32 @@
+# EventType: 1111428001
+# Descriptor: [B0 -> J/psi [-> mu+ mu-] eta [-> gamma gamma]]
+# NickName: Bd_Jpsieta_mumu_gg
+# Tested: Yes
+# PhysicsWG: TDCPV
+# Responsible: Chao Chun Chang
+# Email: 410166066@m365.fju.edu.tw
+# Cuts: None
+# Date: 20231208
+#
+Alias      etasig     eta
+ChargeConj etasig     etasig
+Define beta 0.3814 
+#
+Decay Upsilon(4S)
+1.000   B0  anti-B0  B0sig   anti-B0sig             VSS_BMIX dm;
+Enddecay
+#
+Decay B0sig
+1.000   J/psisig       etasig                       SVS;
+Enddecay
+CDecay anti-B0sig
+#
+Decay J/psisig
+1.000   mu+            mu-                          VLL;
+Enddecay
+#
+Decay etasig
+1.000   gamma   gamma                               PHSP;
+Enddecay
+#
+End

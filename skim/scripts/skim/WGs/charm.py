@@ -729,7 +729,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 
     """
 
-    __authors__ = []
+    __authors__ = ["Jaeyoung Kim"]
     __description__ = (
         "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds "
         "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is "
@@ -742,8 +742,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('K', path=path)
+        charm_skim_std_charged('pi', path=path)
         loadStdSkimPhoton(path=path)
         stdKshorts(path=path)
 
@@ -752,10 +752,10 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         charmcuts = "1.66 < M < 2.06"
         ma.reconstructDecay("eta:myskim -> gamma:loose gamma:loose", "0.47 < M < 0.60 and p > 0.24", path=path)
         D0_Channels = [
-            "pi-:loose pi+:loose eta:myskim",
-            "K-:loose pi+:loose eta:myskim",
-            "pi-:loose K+:loose eta:myskim",
-            "K-:loose K+:loose eta:myskim",
+            "pi-:charmSkim pi+:charmSkim eta:myskim",
+            "K-:charmSkim pi+:charmSkim eta:myskim",
+            "pi-:charmSkim K+:charmSkim eta:myskim",
+            "K-:charmSkim K+:charmSkim eta:myskim",
         ]
 
         DstList = []

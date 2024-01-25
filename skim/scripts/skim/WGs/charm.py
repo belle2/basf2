@@ -421,7 +421,7 @@ class XToDp_DpToHpHmJp(BaseSkim):
 
     **Selection Criteria**:
         * Use traacks from the `charm_skim_std_charged`
-        * Additional cut: global PID > 0.5
+        * Additional cut: global PID > 0.5(Temporary solution for Run1 re-skimming campaign. It might need to be modified.)
         * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 

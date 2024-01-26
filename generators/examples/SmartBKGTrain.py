@@ -104,10 +104,28 @@ def get_loss(pred, label, retention_rate):
     )
 
 
-def fit(model, name, ds_train, ds_val, retention_rate,
+def fit(model, name, ds_train, ds_val, retention_rate, device=device,
         min_epochs=1, patience=12, lr_start=1e-3, lr_end=1e-4, epochs=1000):
     """
-    Train the model.
+    Train the model with dynamic learning rate.
+
+    Args:
+        model (torch.nn.Module): The model used for the training.
+        name (str): File name to save the model.
+        ds_train (list): Dataset created with ArrayDataset for training.
+        ds_val (list): Dataset created with ArrayDataset for validation.
+        retention_rate (float): The rate at which events are retained by the filter.
+        device (torch.device): The place to save dataset and model (`cpu` or `cuda`) during processing.
+        min_epochs (int): The minimal number of epochs for the training.
+        patience (int): The maximal number of continious epochs allowed to have no update.
+        lr_start (float): The learning rate at the beginning of the training.
+        lr_end (float): The minimal learning rate for the training. The strategy of dynamic learning rate
+        is hard-coded with ReduceLROnPlateau scheduler and factor 1/2. This can be manually changed according
+        to the result of hyper-parameter fine-tuning.
+        epochs (int): The maximal number of epochs for the training.
+
+    Returns:
+        dict: The hitories of loss and accuracy for training and validation during the training.
     """
     history = {"loss": [], "val_loss": [], "acc": [], "val_acc": []}
     lr = lr_start
@@ -185,9 +203,18 @@ def fit(model, name, ds_train, ds_val, retention_rate,
     return history
 
 
-def test(model, ds_test):
+def test(model, ds_test, device=device):
     """
     Test the trained model.
+
+    Args:
+        model (torch.nn.Module): The model used for the training.
+        ds_test (list): Dataset created with ArrayDataset for test.
+        device (torch.device): The place to save dataset and model (`cpu` or `cuda`) during processing.
+
+    Returns:
+        dict: The test performance in terms of accuracy and the list of labels as well as predictions
+        for all the events in the dataset.
     """
     record = {"acc": [], "label": [], "pred": []}
     with torch.no_grad():

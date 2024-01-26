@@ -56,6 +56,16 @@ class GATModule(torch.nn.Module):
     def forward(self, graph, feat, feat_glob=None):
         """
         Forward pass of the GAT module.
+
+        Arguments:
+            graph (torch.Tensor): DGLGraph representing the decay tree.
+            feat (torch.Tensor): Node feataures attached to the graph.
+            feat_glob (torch.Tensor): Global features from previous layers.
+            `None` for initialized as the global average or attention pooling of the whole graph.
+
+        Returns:
+            torch.Tensor: updated node features.
+            torch.Tensor: updated global features.
         """
         h = F.leaky_relu(self.gat(graph, feat)).flatten(1)
         hg = feat_glob
@@ -143,6 +153,12 @@ class GATGAPModel(torch.nn.Module):
     def forward(self, graph):
         """
         Forward pass of the GATGAPModel.
+
+        Arguments:
+            graph (torch.Tensor): DGLGraph representing the decay tree.
+
+        Returns:
+            torch.Tensor: the final prediction with size 1.
         """
         h_pdg = graph.ndata["x_pdg"]
         h_feat = graph.ndata["x_feature"]

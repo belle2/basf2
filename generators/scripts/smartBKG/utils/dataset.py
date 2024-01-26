@@ -18,10 +18,10 @@ def get_batched_graph(array, node_features, index_column=("particles", "motherIn
     """
     Generate a batched DGL graph from an awkward array.
 
-    Args:
-        array: Awkward array containing particle information.
-        node_features: Dictionary mapping field names to columns in the array.
-        index_column: Column names for indexing.
+    Arguments:
+        array (awkward array): containing particle information.
+        node_features (dict): mapping field names to columns in the array.
+        index_column (list): Column names for indexing.
 
     Returns:
         dgl.DGLGraph: Batched DGL graph.
@@ -130,8 +130,8 @@ class ArrayDataset(torch.utils.data.IterableDataset):
         """
         Possibly permute the array based on the shuffle parameter.
 
-        Args:
-            array: Input array.
+        Arguments:
+            array (awkward array): Input array.
 
         Returns:
             array: Permuted or original array.
@@ -146,8 +146,8 @@ class ArrayDataset(torch.utils.data.IterableDataset):
         """
         Convert an awkward array to a torch tensor.
 
-        Args:
-            array: Input awkward array.
+        Arguments:
+            array (awkward array): Input awkward array.
 
         Returns:
             torch.Tensor: Converted tensor.
@@ -191,8 +191,8 @@ class ArrayDataset(torch.utils.data.IterableDataset):
         """
         Get a single instance or a new ArrayDataset for a slice.
 
-        Args:
-            slicer: Index or slice.
+        Arguments:
+            slicer (int or slice): Index or slice.
 
         Returns:
             ArrayDataset: New ArrayDataset instance.

@@ -13,7 +13,7 @@ def speedup(y_true, filter_prob, retention_rate, balance_weights=None, from_logi
     """
     Calculate the speedup achieved by sampling method.
 
-    Args:
+    Arguments:
         y_true (torch.Tensor): True labels (ground truth).
         filter_prob (torch.Tensor): Probabilities predicted by the filter model.
         retention_rate (float): The rate at which events are retained by the filter.

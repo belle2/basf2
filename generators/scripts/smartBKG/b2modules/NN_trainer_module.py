@@ -69,7 +69,7 @@ class TrainDataSaver(b2.Module):
     """
     Save MCParticles to Pandas Dataframe.
 
-    Args:
+    Arguments:
         output_file (str): Filename to save training data to.
         flag_file (str): Filename of the flag file indicating passing events.
 
@@ -133,7 +133,7 @@ class data_production():
     """
     Process data for training and save to Parquet file.
 
-    Args:
+    Arguments:
         in_dir (str): Input directory.
         out_dir (str): Output directory.
         job_id (int): Job ID for batch processing.
@@ -155,8 +155,6 @@ class data_production():
         :param job_id: Job ID for batch processing.
         :param save_vars: Variables to save for different event levels.
             By default having Y4S and B keys for the corresponding particle list.
-        :param dataName: Data file name prefix.
-        :param flagName: Flag file name prefix.
         """
         dataName = '_submdst'
         flagName = '_flag'

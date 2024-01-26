@@ -26,7 +26,8 @@ main = b2.create_path()
 # input Mdst, skip num_events*job_id events used by previous batch jobs
 ma.inputMdst(environmentType="default", filename=f_input, skipNEvents=num_events*job_id, path=main)
 
-# Create the mDST output file before skimming
+# Create the mDST output file before skimming, which will be used in the preprocessing.
+# Not necessary if the whole input mdst is used in one job.
 mdst.add_mdst_output(
     path=main,
     filename=f'{out_dir}_submdst{job_id}.root',

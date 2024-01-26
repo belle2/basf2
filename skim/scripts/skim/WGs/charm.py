@@ -34,14 +34,14 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables as va
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdE, stdK, stdMu, stdPi, stdCharged
+from stdCharged import stdK, stdPi, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0, stdPi0s
 from stdV0s import stdKshorts, stdLambdas
 from variables import variables as vm
 
 
-__liaison__ = "Kaikai He <20214008001@stu.suda.edu.cn>"
+__liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -203,7 +203,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
     **Selection Criteria**:
         * Use photons from `stdPhotons.loadStdSkimPhoton`
-        * Use electrons, muons and pions from loose lists in `stdCharged`
+        * Use electrons, muons, and pions from the `charm_skim_std_charged`
         * ``1.66 < M(D0) < 2.06``
         * No cut on the slow pion
         * ``0 < Q < 0.02``
@@ -212,7 +212,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
     """
 
-    __authors__ = ["Doris Yangsoo Kim", "Jaeyeon Kim"]
+    __authors__ = ["Jaeyoung Kim", "Doris Yangsoo Kim", "Jaeyeon Kim"]
     __description__ = "Skim list for D*+ to pi+ D0, D0 to rare decay."
     __contact__ = __liaison__
     __category__ = "physics, charm"
@@ -220,9 +220,9 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
 
     def load_standard_lists(self, path):
-        stdE("loose", path=path)
-        stdMu("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('e', path=path)
+        charm_skim_std_charged('mu', path=path)
+        charm_skim_std_charged('pi', path=path)
         loadStdSkimPhoton(path=path)
         loadStdSkimPi0(path=path)
 
@@ -231,11 +231,11 @@ class DstToD0Pi_D0ToRare(BaseSkim):
         Dstcuts = "0 < Q < 0.02 and 2.0 < useCMSFrame(p)"
 
         D0_Channels = ["gamma:skim gamma:skim",
-                       "e+:loose e-:loose",
-                       "e+:loose mu-:loose",
-                       "e-:loose mu+:loose",
-                       "mu+:loose mu-:loose",
-                       "pi+:loose pi-:loose"]
+                       "e+:charmSkim e-:charmSkim",
+                       "e+:charmSkim mu-:charmSkim",
+                       "e-:charmSkim mu+:charmSkim",
+                       "mu+:charmSkim mu-:charmSkim",
+                       "pi+:charmSkim pi-:charmSkim"]
         DstList = []
 
         for chID, channel in enumerate(D0_Channels):
@@ -420,13 +420,14 @@ class XToDp_DpToHpHmJp(BaseSkim):
           please check `XToDp_DpToKsHp`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged`
+        * Use traacks from the `charm_skim_std_charged`
+        * Additional cut: global PID > 0.5(Temporary solution for Run1 re-skimming campaign. It might need to be modified.)
         * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
 
     """
 
-    __authors__ = ["Aman Sangal"]
+    __authors__ = ["Jaeyoung Kim", "Aman Sangal"]
     __description__ = "Skim list for D_(s)+ to h+ h- j+."
     __contact__ = __liaison__
     __category__ = "physics, charm"
@@ -435,16 +436,18 @@ class XToDp_DpToHpHmJp(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('K', path=path)
+        charm_skim_std_charged('pi', path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionID > 0.5', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'kaonID > 0.5', path=path)
 
-        Dp_Channels = ["pi+:loose pi-:loose pi+:loose",
-                       "pi+:loose pi-:loose K+:loose",
-                       "pi+:loose K-:loose K+:loose",
-                       "K+:loose K-:loose pi+:loose",
+        Dp_Channels = ["pi+:charmSkim_pid pi-:charmSkim_pid pi+:charmSkim_pid",
+                       "pi+:charmSkim_pid pi-:charmSkim_pid K+:charmSkim_pid",
+                       "pi+:charmSkim_pid K-:charmSkim_pid K+:charmSkim_pid",
+                       "K+:charmSkim_pid K-:charmSkim_pid pi+:charmSkim_pid",
                        ]
 
         DpList = []
@@ -798,7 +801,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         * :math:`D^{*+}\\to \\pi^- D^{0}, D^{0}\\to K^+ K^- \\eta, \\eta\\to \\gamma \\gamma`
 
     **Selection Criteria**:
-        * Use tracks from the loose lists in `stdCharged` to reconstruct D^{0}
+        * Use tracks from the charm lists in `charm_skim_std_charged`
         * ``0.47 < M(eta) < 0.60, p(eta) > 0.24``
         * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
         * No cut on the slow pion
@@ -807,7 +810,7 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
 
     """
 
-    __authors__ = []
+    __authors__ = ["Jaeyoung Kim"]
     __description__ = (
         "Skim list for D*+ to pi+ D0, D0 to eta and two charged FSPs, where the kinds "
         "of two charged FSPs are different. The wrong sign(WS) mode, D*- to pi- D0, is "
@@ -820,8 +823,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
     ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('K', path=path)
+        charm_skim_std_charged('pi', path=path)
         loadStdSkimPhoton(path=path)
         stdKshorts(path=path)
 
@@ -830,10 +833,10 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         charmcuts = "1.66 < M < 2.06"
         ma.reconstructDecay("eta:myskim -> gamma:loose gamma:loose", "0.47 < M < 0.60 and p > 0.24", path=path)
         D0_Channels = [
-            "pi-:loose pi+:loose eta:myskim",
-            "K-:loose pi+:loose eta:myskim",
-            "pi-:loose K+:loose eta:myskim",
-            "K-:loose K+:loose eta:myskim",
+            "pi-:charmSkim pi+:charmSkim eta:myskim",
+            "K-:charmSkim pi+:charmSkim eta:myskim",
+            "pi-:charmSkim K+:charmSkim eta:myskim",
+            "K-:charmSkim K+:charmSkim eta:myskim",
         ]
 
         DstList = []
@@ -1047,7 +1050,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         * :math:`D^{*+}\\to \\pi^+ D^{0}, D^{0}\\to \\omega \\gamma`
 
     **Selection Criteria**:
-        * Use charged tracks from the loose lists in `stdCharged` to reconstruct :math:`D^{0}`
+        * Use tracks from the charm lists in `charm_skim_std_charged`
         * Use :math:`\\gamma` from `stdPhotons.loadStdSkimPhoton`
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * Cut on :math:`\\phi`:
@@ -1075,8 +1078,8 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
     ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
-        stdK("loose", path=path)
-        stdPi("loose", path=path)
+        charm_skim_std_charged('K', path=path)
+        charm_skim_std_charged('pi', path=path)
         loadStdSkimPhoton(path=path)
         loadStdSkimPi0(path=path)
 
@@ -1092,24 +1095,25 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         DstList = []
 
         # Omega mode
-        ma.reconstructDecay(decayString="omega:myOmega -> pi+:loose pi-:loose pi0:skim", cut=omegacut, path=path)
+        ma.reconstructDecay(decayString="omega:myOmega -> pi+:charmSkim pi-:charmSkim pi0:skim", cut=omegacut, path=path)
+
         ma.reconstructDecay(decayString="D0:ch1 -> omega:myOmega gamma:loose", cut=D0cuts, path=path)
-        ma.reconstructDecay(decayString="D*+:ch1 -> D0:ch1 pi+:loose", cut=Dstcuts, dmID=1, path=path)
+        ma.reconstructDecay(decayString="D*+:ch1 -> D0:ch1 pi+:charmSkim", cut=Dstcuts, dmID=1, path=path)
 
         # Phi mode
-        ma.reconstructDecay(decayString="phi:myPhi -> K+:loose K-:loose", cut=phicut, path=path)
+        ma.reconstructDecay(decayString="phi:myPhi -> K+:charmSkim K-:charmSkim", cut=phicut, path=path)
         ma.reconstructDecay(decayString="D0:ch2 -> phi:myPhi gamma:loose", cut=D0cuts,  path=path)
-        ma.reconstructDecay(decayString="D*+:ch2 -> D0:ch2 pi+:loose", cut=Dstcuts, dmID=2, path=path)
+        ma.reconstructDecay(decayString="D*+:ch2 -> D0:ch2 pi+:charmSkim", cut=Dstcuts, dmID=2, path=path)
 
         # Rho0 mode
-        ma.reconstructDecay(decayString="rho0:myRho -> pi+:loose pi-:loose", cut=rhocut, path=path)
+        ma.reconstructDecay(decayString="rho0:myRho -> pi+:charmSkim pi-:charmSkim", cut=rhocut, path=path)
         ma.reconstructDecay(decayString="D0:ch3 -> rho0:myRho gamma:loose", cut=D0cuts,  path=path)
-        ma.reconstructDecay(decayString="D*+:ch3 -> D0:ch3 pi+:loose", cut=Dstcuts, dmID=3, path=path)
+        ma.reconstructDecay(decayString="D*+:ch3 -> D0:ch3 pi+:charmSkim", cut=Dstcuts, dmID=3, path=path)
 
         # anti-K*0 mode
-        ma.reconstructDecay(decayString="anti-K*0:myantiKstar -> K-:loose pi+:loose", cut=antiKstarcut, path=path)
+        ma.reconstructDecay(decayString="anti-K*0:myantiKstar -> K-:charmSkim pi+:charmSkim", cut=antiKstarcut, path=path)
         ma.reconstructDecay(decayString="D0:ch4 -> anti-K*0:myantiKstar gamma:loose", cut=D0cuts,  path=path)
-        ma.reconstructDecay(decayString="D*+:ch4 -> D0:ch4 pi+:loose", cut=Dstcuts, dmID=4, path=path)
+        ma.reconstructDecay(decayString="D*+:ch4 -> D0:ch4 pi+:charmSkim", cut=Dstcuts, dmID=4, path=path)
 
         ma.copyLists(outputListName="D*+:all", inputListNames=["D*+:ch1", "D*+:ch2", "D*+:ch3", "D*+:ch4"], path=path)
 

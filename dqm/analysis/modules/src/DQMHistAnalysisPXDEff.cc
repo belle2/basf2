@@ -147,7 +147,7 @@ void DQMHistAnalysisPXDEffModule::initialize()
   m_monObj->addCanvas(m_cEffAllUpdate);
 
   registerEpicsPV("PXD:Eff:Status", "Status");
-  registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:Overall", "All");
   registerEpicsPV("PXD:Eff:L1", "L1");
   registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
@@ -600,7 +600,7 @@ void DQMHistAnalysisPXDEffModule::event()
     setEpicsPV("Status", stat_data);
     // only update if statistics is reasonable, we dont want "0" drops between runs!
     if (stat_data != c_StatusTooFew) {
-      setEpicsPV("Overall", var_efficiency);
+      setEpicsPV("All", var_efficiency);
       setEpicsPV("L1", var_efficiencyL1);
       setEpicsPV("L2", var_efficiencyL2);
     }

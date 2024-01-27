@@ -296,7 +296,8 @@ void ProcessMonitor::checkChildProcesses()
       m_hasEnded = true;
       return;
     } else if (pair.second == ProcType::c_Worker) {
-      B2WARNING("A worker process has died unexpected. If you have requested, I will now restart the workers.");
+      //      B2WARNING("A worker process has died unexpected. If you have requested, I will now restart the workers.");
+      B2ERROR("A worker process has died unexpectedly.");
       B2ASSERT("A worker died but none was present?", processesWithType(ProcType::c_Worker) != 0);
       auto pcbMulticastMessage = ZMQMessageFactory::createMessage(EMessageTypes::c_deleteWorkerMessage, pair.first);
       m_client.publish(std::move(pcbMulticastMessage));

@@ -15,7 +15,7 @@ Data Taking
     **Objectives**:
 
     * Understand the different detector systems in Belle II.
-    * Learn the definiton of triggers and their effects.
+    * Learn the definition of triggers and their effects.
     * Know the difference between proc and prompt data processing 
 
 One of the most important steps is of course to record the data we want to

@@ -543,7 +543,7 @@ class DpToHpPi0(BaseSkim):
 class DpToKsHp(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`D^+ \\to \\Ks \\pi^+`
+        * :math:`D^+ \\to K_S \\pi^+`
 
     **Selection Criteria**:
         * Tracks: ``dr < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``

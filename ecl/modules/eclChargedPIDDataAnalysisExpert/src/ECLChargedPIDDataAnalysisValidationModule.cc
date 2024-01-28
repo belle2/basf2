@@ -676,7 +676,7 @@ void ECLChargedPIDDataAnalysisValidationModule::dumpTrkClusMatchingEfficiency(TT
                                                              pdgIdDesc.c_str()).Data()));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Check",
                                                          "Shape should be consistent. Obviously, check for decreasing efficiency."));
-    t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Contact", "Frank Meier. frank.meier@desy.de"));
+    t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("Contact", "Priyanka Cheema. pche3675@uni.sydney.edu.au"));
     t_match_eff_pt->GetListOfFunctions()->Add(new TNamed("MetaOptions", (shifteropt + metaopts).c_str()));
 
     t_match_eff_pt->Write();

@@ -600,8 +600,8 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
             continue;
           }
           if (hits2D[he]->isOutOfTime()) {
-            continue;
             B2DEBUG(11, "hit isOutOfTime");
+            continue;
           }
           //if alreday used, skip
           if (m_pointUsed.find(he) != m_pointUsed.end()) {

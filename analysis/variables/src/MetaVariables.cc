@@ -8,6 +8,7 @@
 
 // Own header.
 #include <analysis/variables/MetaVariables.h>
+#include <analysis/variables/MCTruthVariables.h>
 
 #include <analysis/VariableManager/Utility.h>
 #include <analysis/dataobjects/Particle.h>
@@ -2341,47 +2342,20 @@ namespace Belle2 {
           auto mcps = cluster->getRelationsTo<MCParticle>();
           if (mcps.size() == 0) return Const::doubleNaN;
 
-
           std::map<int, double> mapMCParticleIndxAndWeight;
-
-          for (unsigned int i = 0; i < mcps.size(); ++i)
-          {
-            double weight = mcps.weight(i);
-            const MCParticle* mcp = mcps[i];
-
-            while (mcp) {
-              if (mcp->getPDG() == 130) {
-                int index = mcp->getArrayIndex();
-                if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
-                  mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
-                } else {
-                  mapMCParticleIndxAndWeight.insert({index, weight});
-                }
-                break;
-              } else {
-                mcp = mcp->getMother();
-              }
-            }
-          }
+          getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
 
           // Klong is not found
           if (mapMCParticleIndxAndWeight.size() == 0)
             return Const::doubleNaN;
 
-
           // find max totalWeight
-          double maxWeight = -1;
-          double indexAtMaxWeight = -1;
-          for (auto [index, weight] : mapMCParticleIndxAndWeight)
-          {
-            if (weight > maxWeight) {
-              maxWeight = weight;
-              indexAtMaxWeight = index;
-            }
-          }
+          auto maxMap = std::max_element(mapMCParticleIndxAndWeight.begin(), mapMCParticleIndxAndWeight.end(),
+          [](const auto & x, const auto & y) { return x.second < y.second; }
+                                        );
 
           StoreArray<MCParticle> mcparticles;
-          const MCParticle* mcKlong = mcparticles[indexAtMaxWeight];
+          const MCParticle* mcKlong = mcparticles[maxMap->first];
 
           Particle tmpPart(mcKlong);
           auto var_result = var->function(&tmpPart);

@@ -203,12 +203,10 @@ double KLMTrackFitter::globalDistanceToHit(KLMHit2d* hit,
 
     //EKLM GeometryData is needed for strip widths
     //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
-    hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin() + 1) /
-               sqrt(
-                 12);
-    hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin() + 1) /
-               sqrt(
-                 12);
+    hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) *
+               (hit->getXStripMax() - hit->getXStripMin() + 1) / sqrt(12);
+    hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) *
+               (hit->getYStripMax() - hit->getYStripMin() + 1) / sqrt(12);
     hit_zErr = 0.; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
 
     globalHitErr[0][0] = pow(hit_xErr, 2); //x
@@ -367,12 +365,10 @@ double KLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
       const EKLM::GeometryData* eklmGeo = m_GeoPar->EndcapInstance();
 
       //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
-      double hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin() +
-                        1) / sqrt(
-                          12);
-      double hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin() +
-                        1) / sqrt(
-                          12);
+      double hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) *
+                        (hit->getXStripMax() - hit->getXStripMin() + 1) / sqrt(12);
+      double hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) *
+                        (hit->getYStripMax() - hit->getYStripMin() + 1) / sqrt(12);
       double hit_zErr = 0; //KLMHit2d is always centred on the boundary between the x/y planes with ~0 uncertainty
 
       B2DEBUG(28, "KLMTrackFitter" << " Width: " << eklmGeo->getStripGeometry()->getWidth() << " Vec_x: " << hit_xErr * sqrt(

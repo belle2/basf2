@@ -76,14 +76,14 @@ bool KLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
     if ((*i)->isOnStaTrack() == false) {
       double distance, error, sigma;
       distance = m_Fitter->globalDistanceToHit(*i, error, sigma);
-      if (sigma < 5.0 && distance < 50) {
+      if (sigma < 5.0 && distance < 60) {
         B2DEBUG(20, "KLMTrackFinder" << " Error: " << error << " Sigma: " << sigma << " Distance: " << distance);
         track.push_back(*i);
       }
     }
   }
 
-  if (track.size() < 5)
+  if (track.size() < 3)
     return false;
 
   // Fit with new hits

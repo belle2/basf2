@@ -12,6 +12,7 @@
 /* KLM headers. */
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/modules/KLMTracking/KLMTrackFinder.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h> //TODO: Is this the right module
 
 /* Basf2 headers. */
 #include <framework/dataobjects/EventMetaData.h>
@@ -19,6 +20,10 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
+
+/* C++ standard libraries*/
+#include <set>
+#include <iostream>
 
 using namespace Belle2;
 using namespace Belle2::KLM;
@@ -56,6 +61,8 @@ KLMTrackingModule::KLMTrackingModule() : Module(),
            ", During track finding, a good track after initial seed hits must be larger than is (default 2); ", unsigned(2));
   addParam("MaxHitList", m_maxHitList,
            ", During track finding, a good track after initial seed hits must be smaller than is (default 60); ", unsigned(60));
+  addParam("MinNLayer", m_minNLayer,
+           ", Only look at tracks with more than n number of layers; ", int(4));
   addParam("StudyEffiMode", m_studyEffi, "[bool], run in efficieny study mode (default is false)", false);
   addParam("outputName", m_outPath, "[string],  output file name containing efficiencies plots ",
            std::string("standaloneKLMEffi.root"));
@@ -109,6 +116,30 @@ void KLMTrackingModule::initialize()
     }
   }
 
+  //EKLM Plots TODO: Not tested yet
+  /*
+  m_totalYXE  = new TH2F("totalYX", " denominator Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_passYXE  = new TH2F("passYX", " numerator Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_totalYZE  = new TH2F("totalYZ", " denominator Y vs. Z", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_passYZE  = new TH2F("passYZ", " numerator Y vs. Z", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_effiYXE  = new TH2F("effiYX", " effi. Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_effiYZE  = new TH2F("effiYZ", " effi. Y vs. X", gNbin, gmin, gmax, gNbin, gmin, gmax);
+  m_effiYXE->GetXaxis()->SetTitle("x (cm)");
+  m_effiYXE->GetYaxis()->SetTitle("y (cm)");
+  m_effiYZE->GetXaxis()->SetTitle("z (cm)");
+  m_effiYZE->GetYaxis()->SetTitle("y (cm)");
+  for (int iF = 0; iF < 2; iF++) {
+    for (int iS = 0; iS < 8; iS++) {
+      hname.Form("effi_%s%i", labelFB[iF].c_str(), iS);
+      m_effiVsLayer[iF][iS]  = new TEfficiency(hname, hname, Nbin, 0, 16);
+      hname.Form("total_%s%i", labelFB[iF].c_str(), iS);
+      m_total[iF][iS] = new TH1F(hname, hname, Nbin, 0, 16);
+      hname.Form("pass_%s%i", labelFB[iF].c_str(), iS);
+      m_pass[iF][iS] = new TH1F(hname, hname, Nbin, 0, 16);
+    }
+  } //end of EKLM layer info
+  */
+
 }
 
 void KLMTrackingModule::beginRun()
@@ -161,14 +192,14 @@ void KLMTrackingModule::runTracking(int mode, int iSubdetector, int iSection, in
     return;
   if (mode == 1) { //efficieny study
     for (int j = 0; j < hits2D.getEntries(); j++) {
-      if (hits2D[j]->getSubdetector() != iSubdetector) //TODO: Remove after testing
+      if (hits2D[j]->getSubdetector() != iSubdetector) //TODO: shoud we kee?
         continue;
       hits2D[j]->isOnStaTrack(false);
     }
   }
 
   for (int hi = 0; hi < hits2D.getEntries() - 1; ++hi) {
-    if (hits2D[hi]->getSubdetector() != iSubdetector) //TODO: Remove after testing
+    if (hits2D[hi]->getSubdetector() != iSubdetector) //TODO: Should we keep?
       continue;
 
     if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hi]))
@@ -204,6 +235,8 @@ void KLMTrackingModule::runTracking(int mode, int iSubdetector, int iSection, in
         // Exclude seed hits.
         if (ho == hi || ho == hj)
           continue;
+        if (mode == 1 && (hits2D[ho]->getSubdetector() != iSubdetector))
+          continue;
         if (mode == 1 && isLayerUnderStudy(iSection, iSector, iLayer, hits2D[hj]))
           continue;
         if (mode == 1 && !isSectorUnderStudy(iSection, iSector, hits2D[hj]))
@@ -211,10 +244,8 @@ void KLMTrackingModule::runTracking(int mode, int iSubdetector, int iSection, in
         if (hits2D[ho]->isOnStaTrack())
           continue;
         //TODO: consider removing the commented lines below
-        //if (!m_globalFit && !sameSector(hits2D[ho], hits2D[hi]))
-        //  continue;
-        // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer())
-        //   continue;
+        if (mode == 1 && !sameSector(hits2D[ho], hits2D[hi]))
+          continue;
         if (hits2D[ho]->isOutOfTime())
           continue;
         sectorHitList.push_back(hits2D[ho]);
@@ -222,6 +253,7 @@ void KLMTrackingModule::runTracking(int mode, int iSubdetector, int iSection, in
 
       /* Require at least four hits (minimum for good track, already two as seed, so here we require 2) but
        * no more than 60 (most likely noise, 60 would be four good tracks).
+       * TODO: Should be tuned since we have EKLM hits now. 60 was from BKLMTracking
        */
       if (sectorHitList.size() < m_minHitList || sectorHitList.size() > m_maxHitList)
         continue;
@@ -326,6 +358,14 @@ void KLMTrackingModule::terminate()
       }
     }
   }
+
+
+  m_totalYX->SetOption("colz");
+  m_passYX->SetOption("colz");
+  m_totalYZ->SetOption("colz");
+  m_passYZ->SetOption("colz");
+  m_effiYX->SetOption("colz");
+  m_effiYZ->SetOption("colz");
 
   m_totalYX->Write();
   m_passYX->Write();
@@ -436,9 +476,11 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
   //TODO: let's comment out during testing. remove this later
 
   std::set<int> m_pointUsed;
+  std::set<int> layerList;
   m_pointUsed.clear();
   if (m_storeTracks.getEntries() < 1)
     return;
+  B2DEBUG(10, "KLMTrackingModule:generateEffi: " << iSection << " " << iSector << " " << iLayer);
 
   for (int it = 0; it < m_storeTracks.getEntries(); it++) {
     //if(m_storeTracks[it]->getTrackChi2()>10) continue;
@@ -446,25 +488,40 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
     int cnt1 = 0;
     int cnt2 = 0;
 
+    layerList.clear();
+
+
     RelationVector<KLMHit2d> relatedHit2D = m_storeTracks[it]->getRelationsTo<KLMHit2d>();
     for (const KLMHit2d& hit2D : relatedHit2D) {
+      if (hit2D.getSubdetector() != iSubdetector)
+        continue;
       if (hit2D.getLayer() > iLayer + 1)
-        cnt1++;
+      {cnt1++; layerList.insert(hit2D.getLayer());}
       if (hit2D.getLayer() < iLayer + 1)
-        cnt2++;
+      {cnt2++; layerList.insert(hit2D.getLayer());}
+      if (hit2D.getLayer() == iLayer + 1) {
+        B2DEBUG(10, "generateEffi: Hit info. Secti/sector/Lay = " << hit2D.getSection()
+                << "/" << hit2D.getSector() - 1 << "/" << hit2D.getLayer() - 1);
+        B2DEBUG(11, "generateEffi: Hit info. x/y/z = " << hit2D.getPositionX()
+                << "/" << hit2D.getPositionY() << "/" << hit2D.getPositionZ());
+      }
     }
+
+    if ((int)layerList.size() < m_minNLayer)
+      continue;
 
     if (iLayer != 0 && cnt2 < 1)
       return;
     if (iLayer != 14 && cnt1 < 1)
       return;
     //TODO: Extend to includ EKLM?
-    //m_GeoPar = GeometryPar::instance();
+    //m_GeoPar = GeometryPar::instance(); w/ geometry cuts.
 
     if (iSubdetector == KLMElementNumbers::c_BKLM) {
 
       const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
       const bklm::Module* module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
+      const bklm::Module* refmodule = bklmGeo->findModule(iSection, iSector + 1, 1);
       int minPhiStrip = module->getPhiStripMin();
       int maxPhiStrip = module->getPhiStripMax();
       int minZStrip = module->getZStripMin();
@@ -489,35 +546,44 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
         minLocalZ = local[2];
       }
 
-      //TVectorD trkPar = m_storeTracks[it]->getLocalTrackParam();
-      //TODO: Need to rotate this to local coordiantes? m
+      //in global coordinates
       TVectorD trkPar = m_storeTracks[it]->getTrackParam();
 
+      //line in local coordinates
+      Hep3Vector point1(0, trkPar[0], trkPar[2]);
+      Hep3Vector point2(1, trkPar[0] + trkPar[1], trkPar[2] + trkPar[3]);
 
-      //TODO: how to generalize this...
+      Hep3Vector refPoint1(0., 0., 0.); Hep3Vector refPoint2(0., 0., 0.);
+      refPoint1 = refmodule->globalToLocal(point1);
+      refPoint2 = refmodule->globalToLocal(point2);
 
-      //first layer is the reference layer
-      //if (iSection == 1 && (iSector + 1 ) == 5)
-      //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
+      Hep3Vector refSlope(refPoint2[0] - refPoint1[0], refPoint2[1] - refPoint1[1], refPoint2[2] - refPoint1[2]);
+
+
+
+      //defined in coordinates relative to layer 1 of this sector.
       float reflocalX = fabs(bklmGeo->getActiveMiddleRadius(iSection, iSector + 1,
                                                             iLayer + 1) - bklmGeo->getActiveMiddleRadius(iSection, iSector + 1, 1));
-      //if (iSection == 1 && (iSector + 1 ) == 5)
-      //  cout<<" local X "<<m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, iLayer + 1) - m_GeoPar->getActiveMiddleRadius(iSection, iSector + 1, 1) << endl;
+      if (refmodule->isFlipped())
+        reflocalX = -reflocalX;
+      float X_coord = (reflocalX - refPoint1[0]) / refSlope[0];
+      float reflocalY = refPoint1[1] + refSlope[1] * X_coord;
+      float reflocalZ = refPoint1[2] + refSlope[2] * X_coord;
 
-      float reflocalY = trkPar[0] + trkPar[1] * reflocalX;
-      float reflocalZ = trkPar[2] + trkPar[3] * reflocalX;
-
-      //reference module is the first layer
-      //module = m_GeoPar->findModule(iSection, iSector + 1, 1);
-      reflocalX = 0.0;
+      //Hep3Vector global(globalX, globalY, globalZ);
       Hep3Vector reflocal(reflocalX, reflocalY, reflocalZ);
-      //Hep3Vector global(localX, localY, localZ);
-      Hep3Vector global(0, 0, 0);
-      module = bklmGeo->findModule(iSection, iSector + 1, iLayer + 1);
-      global = module->localToGlobal(reflocal);
-      //float localX = module->globalToLocal(global)[0];
+      Hep3Vector global(0., 0., 0.);
+      global = refmodule->localToGlobal(reflocal);
+
+
+      float localX = module->globalToLocal(global)[0];
       float localY = module->globalToLocal(global)[1];
       float localZ = module->globalToLocal(global)[2];
+
+      B2DEBUG(10, "KLMTrackingModule:generateEffi: RefLocal " << reflocalX << " " << reflocalY << " " << reflocalZ);
+      B2DEBUG(10, "KLMTrackingModule:generateEffi: Global " << global[0] << " " << global[1] << " " << global[2]);
+      B2DEBUG(10, "KLMTrackingModule:generateEffi: Local " << localX << " " << localY << " " << localZ);
+
 
 
       //geometry cut
@@ -529,24 +595,34 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
         m_totalYZ->Fill(global[2], global[1]);
 
         for (int he = 0; he < hits2D.getEntries(); ++he) {
-          if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he]))
+          if (!isLayerUnderStudy(iSection, iSector, iLayer, hits2D[he])) {
+            B2DEBUG(11, "not isLayerUnderStudy");
             continue;
-          if (hits2D[he]->isOutOfTime())
+          }
+          if (hits2D[he]->isOutOfTime()) {
             continue;
+            B2DEBUG(11, "hit isOutOfTime");
+          }
           //if alreday used, skip
-          if (m_pointUsed.find(he) != m_pointUsed.end())
+          if (m_pointUsed.find(he) != m_pointUsed.end()) {
+            B2DEBUG(11, "passed unused");
             continue;
-
+          }
+          B2DEBUG(11, "KLMTrackingModule:generateEffi: Reached Distance Check");
           double error, sigma;
           float distance = distanceToHit(m_storeTracks[it], hits2D[he], error, sigma);
-
-          if (distance < m_maxDistance && sigma < m_maxSigma)
+          float hitX = hits2D[he]->getPositionX();
+          float hitY = hits2D[he]->getPositionY();
+          float hitZ = hits2D[he]->getPositionZ();
+          float deltaX = hitX - global[0]; float deltaY = hitY - global[1];  float deltaZ = hitZ - global[2];
+          float dist = sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
+          B2DEBUG(10, "dist w/ hit = " << dist << ", dist func = " << distance << ", error = " << error);
+          if (distance < m_maxDistance && sigma < m_maxSigma) {
             m_iffound = true;
+            B2DEBUG(10, "KLMTrackingModule:generateEffi: Hit found!");
+          }
           if (m_iffound) {
             m_pointUsed.insert(he);
-            //global[0] = hits2D[he]->getPosition()[0];
-            //global[1] = hits2D[he]->getPosition()[1];
-            //global[2] = hits2D[he]->getPosition()[2];
             m_pass[iSection][iSector]->Fill(iLayer + 1);
             m_passYX->Fill(global[0], global[1]);
             m_passYZ->Fill(global[2], global[1]);
@@ -555,22 +631,15 @@ void KLMTrackingModule::generateEffi(int iSubdetector, int iSection, int iSector
         }
 
         m_effiVsLayer[iSection][iSector]->Fill(m_iffound, iLayer + 1);
-        //cout<<" global "<<global[0]<<", "<< global[1]<<" "<<global[2]<<endl;
-        //m_effiYX->Fill(m_iffound, global[1], global[0]);
-        //m_effiYZ->Fill(m_iffound, global[1], global[2]);
-        //m_effiYX->SetPassedHistogram(*m_passYX);
-        //m_effiYX->SetTotalHistogram(*m_totalYX);
-        //m_effiYZ->SetPassedHistogram(*m_passYZ);
-        //m_effiYZ->SetTotalHistogram(*m_totalYZ);
+        //efficiencies will be defined at terminate stage
       } //end of BKLM geometry cut
 
     } //end of BKLM section
 
 
   }//end of loop tracks
-
-
 }
+
 
 bool KLMTrackingModule::sortByLayer(KLMHit2d* hit1, KLMHit2d* hit2)
 {
@@ -611,31 +680,39 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
     const bklm::GeometryPar* bklmGeo = m_GeoPar->BarrelInstance();
     const Belle2::bklm::Module* corMod = bklmGeo->findModule(hit->getSection(), hit->getSector(), hit->getLayer());
 
-    x = hit->getPositionX();
-    y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
-    z = m_GlobalPar[ 2 ] + x * m_GlobalPar[ 3 ];
+    //x = hit->getPositionX();
+    //y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
+    //z = m_GlobalPar[ 2 ] + x * m_GlobalPar[ 3 ];
 
-    //dx = 0.;
+    //since there are z-planes, let's exploit this fact.
+    z = hit->getPositionZ();
+    x = (z - m_GlobalPar[ 2 ]) / m_GlobalPar[ 3 ];
+    y = m_GlobalPar[ 0 ] + x * m_GlobalPar[ 1 ];
+
+    dx = x - hit->getPositionX() ;
     dy = y - hit->getPositionY();
     dz = z - hit->getPositionZ();
 
-    // we will do a projection to get the shortest distance
-    // line = p0 + t * v
-    // || dr x v ||**2 = |(0, dy, dz) x (1, p1, p3)|**2
-    double numerator2 = pow(dy * m_GlobalPar[3] - dz * m_GlobalPar[1], 2);
-    numerator2 += dz * dz;
-    numerator2 += dy * dy;
-    // ||v||**2 = |(1, p1, p3)|**2
-    double denomator2 = 1 + m_GlobalPar[1] * m_GlobalPar[1] +  m_GlobalPar[3] * m_GlobalPar[3];
-    //|| dr x v || / ||v||
-    distance = sqrt(numerator2 / denomator2); //distance of closest approach for BKLM
+    double x2 = hit->getPositionX();
+    double y2 = m_GlobalPar[ 0 ] + x2 * m_GlobalPar[ 1 ];
+    double z2 = m_GlobalPar[ 2 ] + x2 * m_GlobalPar[ 3 ];
 
+    double dx2 = x2 - hit->getPositionX();
+    double dy2 = y2 - hit->getPositionY();
+    double dz2 = z2 - hit->getPositionZ();
+
+    double dist2 = sqrt(dx2 * dx2 + dy2 * dy2 + dz2 * dz2);
+
+
+    distance = sqrt(dx * dx + dy * dy + dz * dz);
     double hit_localPhiErr = corMod->getPhiStripWidth() / sqrt(12);
     double hit_localZErr = corMod->getZStripWidth() / sqrt(12);
 
     //error from tracking is ignored here
     error = sqrt(pow(hit_localPhiErr, 2) +
                  pow(hit_localZErr, 2));
+    B2DEBUG(11, "Dist = " << distance << ", error = " << error);
+    B2DEBUG(11, "Dist2 = " << dist2 << ", error = " << error);
   } //end of BKLM section
 
   else if (hit->getSubdetector() == KLMElementNumbers::c_EKLM) {
@@ -657,12 +734,10 @@ double KLMTrackingModule::distanceToHit(KLMTrack* track, KLMHit2d* hit,
 
 
     //here get the resolustion of a hit, repeated several times, ugly. should we store this in KLMHit2d object ?
-    double hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getXStripMax() - hit->getXStripMin()) /
-                      sqrt(
-                        12);
-    double hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) * (hit->getYStripMax() - hit->getYStripMin()) /
-                      sqrt(
-                        12);
+    double hit_xErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) *
+                      (hit->getXStripMax() - hit->getXStripMin()) / sqrt(12);
+    double hit_yErr = (eklmGeo->getStripGeometry()->getWidth()) * (Unit::cm / CLHEP::cm) *
+                      (hit->getYStripMax() - hit->getYStripMin()) / sqrt(12);
 
 
     //error from tracking is ignored here

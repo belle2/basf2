@@ -82,6 +82,9 @@ namespace Belle2 {
     //! max number of hits in sector for track finder to run
     unsigned int m_maxHitList = 60;
 
+    //! minimum number of layers for track finder to run
+    int m_minNLayer = 4;
+
     //! output file name containing efficiencies plots
     std::string m_outPath = "standaloneKLMEffi.root";
 
@@ -92,6 +95,10 @@ namespace Belle2 {
 
     //! TFile that store efficieny plots
     TFile* m_file = nullptr;
+
+    ////////////////////////////////////////////
+    //BKLM Efficiency Plots
+    ////////////////////////////////////////////
 
     //! Denominator of each layer
     TH1F* m_total[2][8];
@@ -121,6 +128,40 @@ namespace Belle2 {
 
     //! total event at global position Y vs Z
     TH2F* m_totalYZ;
+
+    ////////////////////////////////////////////
+    //EKLM Efficiency Plots
+    ////////////////////////////////////////////
+
+    //! Denominator of each layer
+    TH1F* m_totalE[2][8];
+
+    //! Numerator of each layer
+    TH1F* m_passE[2][8];
+
+    //! Efficieny of each layer
+    TEfficiency* m_effiVsLayerE[2][8];
+
+    //! Efficieny at global position Y vs X
+    //TEfficiency* m_effiYX;
+    TH2F* m_effiYXE;
+
+    //! Efficieny at global position Y vs Z
+    //TEfficiency* m_effiYZ;
+    TH2F* m_effiYZE;
+
+    //! passed event at global position Y vs X
+    TH2F* m_passYXE;
+
+    //! total event at global position Y vs X
+    TH2F* m_totalYXE;
+
+    //! passed event at global position Y vs Z
+    TH2F* m_passYZE;
+
+    //! total event at global position Y vs Z
+    TH2F* m_totalYZE;
+
     //! KLMTrack StoreArray
     StoreArray<KLMTrack> m_storeTracks;
 

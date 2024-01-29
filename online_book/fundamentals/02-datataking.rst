@@ -566,20 +566,20 @@ The difference between them relates to the level of calibrations that are applie
 processing. The relationship between each stage of processing 
 (described below) is represented schematically in :numref:`fig:data_overview`.  
 
-Prompt processing occurs when each new bucket of data is collected. A bucket typically comprises of 
-the data collected from physics runs between subsequent maintenance days of operation, and therefore 
-often spans a period of 2 weeks of runs. Prompt data is always obtained using the latest major 
-software release, and utilises the best initial guess for calibrations based on the information of 
-buckets and reprocessing campaigns. Each data bucket is available for use by analysts following prompt 
-processing, with a higher bucket number indicating newer data. 
+Prompt processing occurs just after the data-tacking.
+Data is collected for a given amount of time, typically two weeks (colloquially called a "bucket"),
+then it is calibrated and processed, and then the process is iterated.
+Prompt data is always obtained using the latest major software release, and its calibration is complete,
+with quality that is not different from the reprocessed data. For this reason, most of the calibration
+performed in prompt is kept also for reprocessing.
+Prompt data is available for analysis after prompt processing, with a timescale of about 2 months.
 
-Conversely, reprocessed data, labelled with the prefix "proc" (e.g. proc13), contains a combination of buckets 
-that have been processed again using the most refined knowledge of the required calibrations based on 
-dedicated performance studies and information from previous prompt data campaigns. Furthermore, all fixes 
-for bugs that were identified during the prompt processing are also included. 
+During a reprocessing, all data collected up to a given time is recalibrated and reprocessed.
+A reprocessing campaing, labelled with the prefix "proc" (e.g. proc13), is done every year or every two years (from 2023).
+The recalibration start from the prompt calibration, and it is refined if improved or new calibration were developed.
+A full reprocessing of data is perfromed using a major software release, so that all the dataset is available with a coherent processing.
 
-Both prompt and reprocessed datasets can be located on the grid 
-by specifying the campaign e.g. bucket17 campaign for prompt data, and proc13 campaign for reprocessed data. 
+Both prompt and reprocessed datasets can be accessed on the grid using the corresponding collections reported in the Data Production web page.
 
 .. _fig:data_overview:
 .. figure:: data_overview.png
@@ -587,7 +587,7 @@ by specifying the campaign e.g. bucket17 campaign for prompt data, and proc13 ca
     :width: 900px
     :alt: Diagram of relationship between prompt and reprocessed data
 
-    A diagram showing the relationship between data collected at run time, prompt datasets (e.g. buckets) 
+    A diagram showing the relationship between data collected at run time, prompt datasets, showing the incremental processing
     and reprocessed data (e.g. procXX).  
 
 .. include:: ../lesson_footer.rstinclude
@@ -599,4 +599,5 @@ Martin Ritter,
 Oskar Hartbrich,
 Michael Eliachevitch,
 Sam Cunliffe,
-Priyanka Cheema
+Priyanka Cheema,
+Stefano Lacaprara

@@ -38,7 +38,7 @@ momentum, with the electrons kept at around 7 GeV/c and the positrons at around
 into (almost) head-on collision, resulting in a center-of-mass energy of
 typically around 10.58 GeV, corresponding to the :math:`\Upsilon(4S)` resonance.
 The point of collision is named the "interaction region".
-The  center of mass energy can be changed to take data at other resonances of the
+The  center-of-mass energy can be changed to take data at other resonances of the
 :math:`\Upsilon` family, from around 9.4 to 11 GeV, for the non-B physics part
 of the physics program.
 
@@ -331,8 +331,8 @@ ECL
     through as a minimum-ionising particle. It therefore provides further
     orthogonal information to the particle-identification system.
 
-    The ECL consists of over 8000 Caesium Iodide crystsals which create
-    scintillalation light when a particle flies into them. The amount of
+    The ECL consists of over 8000 Caesium Iodide crystals which create
+    scintillation light when a particle flies into them. The amount of
     light is proportional to the energy deposited in the crystal so by measuring
     it we can measure the energy of the the particle. Of course this assumes the
     particle is fully stopped and deposits all of its energy in the ECL. This is
@@ -346,7 +346,7 @@ ECL
     :alt: Picture of ECL electronics
 
     Small part of the ECL electronics in the endcap. Boards do the mapping from
-    the preamps (which you can’t see) to the cables that go to the ShaperDSPs.
+    the preamps (which you can't see) to the cables that go to the ShaperDSPs.
     You can also see the cooling lines under the boards.
 
 KLM
@@ -382,7 +382,7 @@ On Resonance, Continuum, Cosmics
 --------------------------------
 
 We saw that to collect :math:`B` mesons one must collide electrons and positrons at the
-centre-of-mass energy of :math:`\sqrt{s} = 10.580` GeV, corresponding to the
+center-of-mass energy of :math:`\sqrt{s} = 10.580` GeV, corresponding to the
 :math:`\Upsilon(4S)` resonance mass. However this is not the only energy at
 which the SuperKEKB accelerator can work, and it's not the only kind of dataset
 that Belle II can collect.
@@ -504,7 +504,7 @@ storage by at least 60%.
    are discarded and lost forever. In the latter, all the events are kept regardless of the
    HLT decision (which is however stored, so analyses of the HLT filtering efficiency
    can be conducted).
-   On top of this, the HLT also performs a first, rought skimming producing the so-called
+   On top of this, the HLT also performs a first, rough skimming producing the so-called
    **HLT skims**. All the events that are satisfying the HLT conditions (regardless of the
    HLT operation mode), are then assigned according to a quick analysis into few
    possible categories: bhabha, hadronic, tau, mumu and so on attaching a flag to them,
@@ -566,20 +566,20 @@ The difference between them relates to the level of calibrations that are applie
 processing. The relationship between each stage of processing 
 (described below) is represented schematically in :numref:`fig:data_overview`.  
 
-Prompt processing occurs just after the data-tacking.
+Prompt processing occurs just after the data taking.
 Data is collected for a given amount of time, typically two weeks (colloquially called a "bucket"),
 then it is calibrated and processed, and then the process is iterated.
 Prompt data is always obtained using the latest major software release, and its calibration is complete,
-with quality that is not different from the reprocessed data. For this reason, most of the calibration
+with quality that is hardly different from the reprocessed data. For this reason, most of the calibration
 performed in prompt is kept also for reprocessing.
 Prompt data is available for analysis after prompt processing, with a timescale of about 2 months.
 
 During a reprocessing, all data collected up to a given time is recalibrated and reprocessed.
-A reprocessing campaing, labelled with the prefix "proc" (e.g. proc13), is done every year or every two years (from 2023).
-The recalibration start from the prompt calibration, and it is refined if improved or new calibration were developed.
-A full reprocessing of data is perfromed using a major software release, so that all the dataset is available with a coherent processing.
+A reprocessing campaign, labelled with the prefix "proc" (e.g. proc13), is done every year or every two years (from 2023).
+The recalibration starts from the prompt calibration, and it is refined if improved or new calibration algorithms were developed.
+A full reprocessing of data is performed using a major software release, so that the complete dataset is available with a coherent processing.
 
-Both prompt and reprocessed datasets can be accessed on the grid using the corresponding collections reported in the Data Production web page.
+Both prompt and reprocessed datasets can be accessed on the grid using the corresponding collections reported on the Data Production web page.
 
 .. _fig:data_overview:
 .. figure:: data_overview.png

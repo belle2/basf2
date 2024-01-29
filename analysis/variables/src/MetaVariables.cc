@@ -3600,7 +3600,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "If the variable is called for ``gamma`` that fails to match with an MCParticle, it provides the mdst-level MCMatching information abouth the ECLCluster.\n"
                       "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching MCParticles", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("clusterBestMatchedMCKlong(variable)", clusterBestMatchedMCKlong,
-                      "Returns variable output for the best-matched Klong of MCParticle with the ECLCluster of the given Particle.\n"
+                      "Returns variable output for the Klong MCParticle which has the best match with the ECLCluster of the given Particle.\n"
                       "Returns NaN if the particle is not matched to an ECLCluster, or if the ECLCluster has no matching Klong MCParticle", Manager::VariableDataType::c_double);
 
     REGISTER_METAVARIABLE("countInList(particleList, cut='')", countInList, "[Eventbased] "

@@ -133,7 +133,7 @@ void DQMHistReferenceModule::beginRun()
                 string histname = h->GetName();
                 if (h->GetDimension() == 1) {
                   auto n = new REFNODE;
-                  n->histo1 = histname;
+                  n->histo1 = dirname + "/" + histname;
                   n->histo2 = "ref/" + dirname + "/" + histname;
                   TH1* histo = (TH1*)h->Clone();
                   histo->SetName(n->histo2);

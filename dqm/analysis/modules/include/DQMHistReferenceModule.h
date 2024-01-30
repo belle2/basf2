@@ -21,7 +21,7 @@ namespace Belle2 {
    * Class to add DQM reference histograms
    */
 
-  class DQMHistReferenceModule : public DQMHistAnalysisModule {
+  class DQMHistReferenceModule final : public DQMHistAnalysisModule {
 
   public:
 

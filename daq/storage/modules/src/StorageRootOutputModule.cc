@@ -373,8 +373,8 @@ void StorageRootOutputModule::event()
   if (!m_file) {
     m_expno = m_eventMetaData->getExperiment();
     m_runno = m_eventMetaData->getRun();
-    m_disk = StringUtil::form("disk%02d", (m_processNumber%m_nDisk)+1);
     m_processNumber = atoi(getName().substr(0, getName().find(std::string("_"))).c_str());
+    m_disk = StringUtil::form("disk%02d", (m_processNumber%m_nDisk)+1);
     m_outputFileName = StringUtil::form("/rawdata/%s/belle/Raw/%4.4d/%5.5d/%s.%4.4d.%5.5d.%s.p%02d.root", 
                                         m_disk.c_str(), m_expno, m_runno, m_runType.c_str(), 
                                         m_expno, m_runno, m_HLTName.c_str(), m_processNumber);

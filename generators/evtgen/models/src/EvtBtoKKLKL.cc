@@ -118,7 +118,7 @@ namespace Belle2 {
     int KaonPlustyp = 0;
     int KaonZerotyp = 0;
 
-    if ((KaonPlusType == EvtPDL::getId("K+")) || (KaonPlusType == EvtPDL::getId("K-"))) KaonPlustype++;
+    if ((KaonPlusType == EvtPDL::getId("K+")) || (KaonPlusType == EvtPDL::getId("K-"))) KaonPlusType++;
     if ((KaonZeroType_1 == EvtPDL::getId("K0")) ||
         (KaonZeroType_1 == EvtPDL::getId("anti-K0")) ||
         (KaonZeroType_1 == EvtPDL::getId("K_S0")) ||
@@ -128,7 +128,7 @@ namespace Belle2 {
         (KaonZeroType_2 == EvtPDL::getId("K_S0")) ||
         (KaonZeroType_2 == EvtPDL::getId("K_L0"))) KaonZerotyp++;
 
-    if ((KaonPlustype != 1) || (KaonZerotyp != 2)) {
+    if ((KaonPlusType != 1) || (KaonZerotyp != 2)) {
 
       std::cout << "The first dauther should be charged Kaon. The second and third daughters should be K0, anti-K0, K_L0, or K_S0.\n";
       ::abort();

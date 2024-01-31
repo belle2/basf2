@@ -11,6 +11,7 @@
 #include "EvtGenBase/EvtDecayIncoherent.hh"
 #include "EvtGenBase/EvtParticle.hh"
 #include <string>
+#include <complex>
 
 namespace Belle2 {
 
@@ -24,7 +25,7 @@ namespace Belle2 {
     * 1.0 K+ K_L0 K_L0           BTOKKLKL;
     * Enddecay
     */
-  class EvtBtoXsnunu_FERMI : public  EvtDecayIncoherent {
+  class EvtBtoKKLKL : public  EvtDecayIncoherent {
 
 
   public:
@@ -199,7 +200,7 @@ namespace Belle2 {
     double c_f1525{ 0.00179 };
 
     /** isobar parameter phi of f1525   */
-    double phi_f1525{-58.0}
+    double phi_f1525{-58.0};
 
     /** spin of f1710   */
     int spin_f1710{ 0 };

@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <cmath>
+#include <cstring>
 #include "EvtGenBase/EvtRandom.hh"
 #include "EvtGenBase/EvtParticle.hh"
 #include "EvtGenBase/EvtGenKine.hh"
@@ -64,14 +65,14 @@ namespace Belle2 {
       double s_2 = mom_sum_2.mass2();
 
       // follow the index of PhysRevD.85.112010
-      double s12 = -1;
+      double s13 = -1;
       double s23 = -1;
       if (s_1 > s_2) {
         s23 = s_1;
-        s12 = s_2;
+        s13 = s_2;
       } else {
         s23 = s_2;
-        s12 = s_1;
+        s13 = s_1;
       }
 
       // the maximum value of probability is obtained by brute fource method. scan all region and find.

@@ -33,12 +33,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtBtoXsnunu_FERMI() {}
+    EvtBtoKKLKL() {}
 
     /**
      * Destructor.
      */
-    virtual ~EvtBtoXsnunu_FERMI();
+    virtual ~EvtBtoKKLKL();
 
     /**
      * The function which returns the name of the model.

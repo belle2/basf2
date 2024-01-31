@@ -141,6 +141,16 @@ namespace Belle2 {
      */
     double DegreeToRadian(double degree);
 
+    /**
+     * The function to get q0 and pstar0
+     */
+    void GetZeros();
+
+    /**
+     * The function to get mass for particles from evt.pdl
+     */
+    void GetMasses();
+
   private:
     /** spin of f980   */
     int spin_f980{ 0 };

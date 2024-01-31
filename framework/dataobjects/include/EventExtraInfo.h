@@ -68,7 +68,7 @@ namespace Belle2 {
   private:
     std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 
-    std::string m_eventType;
+    std::string m_eventType; /**< even type information, e.g. mixed, ccbar. */
 
     ClassDef(EventExtraInfo, 3); /**< Class to store event extra info. */
     // v3. Add m_eventType

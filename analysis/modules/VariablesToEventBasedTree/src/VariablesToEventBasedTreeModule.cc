@@ -133,6 +133,9 @@ void VariablesToEventBasedTreeModule::initialize()
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
+  if (m_eventExtraInfo.isOptional())
+    m_tree->get().Branch("__eventType__", &m_eventType);
+
   for (unsigned int i = 0; i < m_event_variables.size(); ++i) {
     auto varStr = m_event_variables[i];
 
@@ -242,6 +245,11 @@ void VariablesToEventBasedTreeModule::event()
     m_MCDecayString = m_stringWrapper->getString();
   else
     m_MCDecayString = "";
+
+  if (m_eventExtraInfo.isValid())
+    m_eventType = m_eventExtraInfo->getEventType();
+  else
+    m_eventType = "";
 
   StoreObjPtr<ParticleList> particlelist(m_particleList);
   m_ncandidates = particlelist->getListSize();

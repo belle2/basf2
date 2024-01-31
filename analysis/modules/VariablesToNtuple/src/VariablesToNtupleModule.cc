@@ -144,6 +144,9 @@ void VariablesToNtupleModule::initialize()
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
+  if (m_eventExtraInfo.isOptional())
+    m_tree->get().Branch("__eventType__", &m_eventType);
+
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
       B2WARNING("The counter '" << variable
@@ -260,6 +263,11 @@ void VariablesToNtupleModule::event()
     m_MCDecayString = m_stringWrapper->getString();
   else
     m_MCDecayString = "";
+
+  if (m_eventExtraInfo.isValid())
+    m_eventType = m_eventExtraInfo->getEventType();
+  else
+    m_eventType = "";
 
   if (not m_signalSideParticleList.empty()) {
     if (m_roe.isValid()) {

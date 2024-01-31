@@ -30,7 +30,7 @@ namespace Belle2 {
     GeneratorBaseModule()
     {
       //Generator common parameters
-      addParam("eventType", m_eventType, "Event type", Const::doubleNaN);
+      addParam("eventType", m_eventType, "Event type", std::string(""));
     };
 
     /** Initialize the module */
@@ -52,7 +52,8 @@ namespace Belle2 {
       if (not m_eventExtraInfo.isValid())
         m_eventExtraInfo.create();
 
-      m_eventExtraInfo->addExtraInfo("eventType", getEventType());
+      m_eventExtraInfo->setEventType(getEventType());
+
       for (auto [name, val] : m_generatorInfoMap)
         m_eventExtraInfo->addExtraInfo(name, val);
     };
@@ -66,8 +67,8 @@ namespace Belle2 {
       m_generatorInfoMap = generatorInfoMap;
     };
 
-    /** Convert m_eventType from string to int */
-    virtual double getEventType() const
+    /** Return m_eventType. */
+    virtual std::string getEventType() const
     {
       return m_eventType;
     }
@@ -77,7 +78,7 @@ namespace Belle2 {
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo;
 
     /** Event type */
-    double m_eventType = Const::doubleNaN;
+    std::string m_eventType;
     /** Generator information to be set on extraInfo */
     std::unordered_map<std::string, double> m_generatorInfoMap = {};
 

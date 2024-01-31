@@ -52,10 +52,26 @@ namespace Belle2 {
     /** Grab the names in this event extra info (for printing etc) */
     std::vector<std::string> getNames() const;
 
+    /** Set the event type information. It is supposed to be set by the GeneratorBaseModule. */
+    void setEventType(std::string eventType)
+    {
+      m_eventType = eventType;
+    };
+
+    /** Get the event type information. */
+    std::string getEventType() const
+    {
+      return m_eventType;
+    };
+
+
   private:
     std::map<std::string, float> eventExtraInfo; /**< map variable names to values. */
 
-    ClassDef(EventExtraInfo, 2); /**< Class to store event extra info. */
+    std::string m_eventType;
+
+    ClassDef(EventExtraInfo, 3); /**< Class to store event extra info. */
+    // v3. Add m_eventType
   };
 
 } // end namespace Belle2

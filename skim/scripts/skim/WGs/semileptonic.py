@@ -375,11 +375,11 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     * The logical OR of the following:
 
-        * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
-        * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
-        * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
-        * Two or fewer charged tracks
-        * :math:`E_{ECL} < 2.0` GeV
+      * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
+      * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
+      * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
+      * Two or fewer charged tracks
+      * :math:`E_{ECL} < 2.0` GeV
 
     Cuts on electrons:
 

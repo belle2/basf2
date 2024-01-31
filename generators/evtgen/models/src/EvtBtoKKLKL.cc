@@ -137,8 +137,8 @@ namespace Belle2 {
     }
 
     // initialize q0 and pstar0
-    GetZeros();
     GetMasses();
+    GetZeros();
 
   }
 

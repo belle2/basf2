@@ -140,13 +140,14 @@ void DQMHistAnalysisPXDEffModule::initialize()
                                     m_nrxbins, 0, m_nrxbins);
   m_eEffAllUpdate->SetConfidenceLevel(m_confidence);
 
+  m_eEffAllUpdate->Paint("AP");
   setLabels(m_eEffAllUpdate->GetPaintedGraph());
 
   m_monObj->addCanvas(m_cEffAll);
   m_monObj->addCanvas(m_cEffAllUpdate);
 
   registerEpicsPV("PXD:Eff:Status", "Status");
-  registerEpicsPV("PXD:Eff:Overall", "Overall");
+  registerEpicsPV("PXD:Eff:Overall", "All");
   registerEpicsPV("PXD:Eff:L1", "L1");
   registerEpicsPV("PXD:Eff:L2", "L2");
   B2DEBUG(1, "DQMHistAnalysisPXDEff: initialized.");
@@ -171,41 +172,48 @@ void DQMHistAnalysisPXDEffModule::beginRun()
 
   // Reset TEfficiency and get (new) alarm limits from PVs
   // no way to reset TEfficiency, do it bin by bin
-  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
-    int j = i + 1;
-    m_eEffAll->SetPassedEvents(j, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
-    m_eEffAll->SetTotalEvents(j, 0);
-    m_eEffAllUpdate->SetPassedEvents(j, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
-    m_eEffAllUpdate->SetTotalEvents(j, 0);
+  for (int i = 0; i < m_nrxbins; i++) {
+    int bin = i + 1;
+    m_eEffAll->SetPassedEvents(bin, 0); // order, otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_eEffAll->SetTotalEvents(bin, 0);
+    m_eEffAllUpdate->SetPassedEvents(bin, 0); // otherwise it might happen that SetTotalEvents is NOT filling the value!
+    m_eEffAllUpdate->SetTotalEvents(bin, 0);
 
-    m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
-    m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
+    if (i < int(m_PXDModules.size())) { // only for modules
+      m_warnlevelmod[m_PXDModules[i]] = m_warnlevel;
+      m_errorlevelmod[m_PXDModules[i]] = m_errorlevel;
 
-    // get warn and error limit
-    // as the same array as above, we assume chid exists
-    double dummy, loerr = 0, lowarn = 0;
-    if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
-      m_hErrorLine->SetBinContent(i + 1, loerr);
-      if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
-      m_hWarnLine->SetBinContent(i + 1, lowarn);
-      if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
+      // get warn and error limit
+      // as the same array as above, we assume chid exists
+      double dummy, loerr = 0, lowarn = 0;
+      if (requestLimitsFromEpicsPVs((std::string)m_PXDModules[i], loerr, lowarn, dummy, dummy)) {
+        m_hErrorLine->SetBinContent(bin, loerr);
+        if (m_perModuleAlarm) m_errorlevelmod[m_PXDModules[i]] = loerr;
+        m_hWarnLine->SetBinContent(bin, lowarn);
+        if (m_perModuleAlarm) m_warnlevelmod[m_PXDModules[i]] = lowarn;
+      }
     }
-
   }
   {
     double dummy, loerr = 0, lowarn = 0;
+    m_warnlevelmod["L1"] = m_warnlevel;
+    m_errorlevelmod["L1"] = m_errorlevel;
     if (requestLimitsFromEpicsPVs("L1", loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(m_PXDModules.size() + 1, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["L1"] = loerr;
       m_hWarnLine->SetBinContent(m_PXDModules.size() + 1, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["L1"] = lowarn;
     }
+    m_warnlevelmod["L2"] = m_warnlevel;
+    m_errorlevelmod["L2"] = m_errorlevel;
     if (requestLimitsFromEpicsPVs("L2", loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(m_PXDModules.size() + 2, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["L2"] = loerr;
       m_hWarnLine->SetBinContent(m_PXDModules.size() + 2, lowarn);
       if (m_perModuleAlarm) m_warnlevelmod["L2"] = lowarn;
     }
+    m_warnlevelmod["All"] = m_warnlevel;
+    m_errorlevelmod["All"] = m_errorlevel;
     if (requestLimitsFromEpicsPVs("All", loerr, lowarn, dummy, dummy)) {
       m_hErrorLine->SetBinContent(m_PXDModules.size() + 3, loerr);
       if (m_perModuleAlarm) m_errorlevelmod["All"] = loerr;
@@ -497,7 +505,7 @@ void DQMHistAnalysisPXDEffModule::event()
         }
 
 
-        EStatus all_stat = makeStatus(all >= 100., warn_flag, error_flag);
+        EStatus all_stat = makeStatus(all >= m_minEntries, warn_flag, error_flag);
         colorizeCanvas(m_cEffAll, all_stat);
 
         m_hWarnLine->Draw("same,hist");
@@ -592,7 +600,7 @@ void DQMHistAnalysisPXDEffModule::event()
     setEpicsPV("Status", stat_data);
     // only update if statistics is reasonable, we dont want "0" drops between runs!
     if (stat_data != c_StatusTooFew) {
-      setEpicsPV("Overall", var_efficiency);
+      setEpicsPV("All", var_efficiency);
       setEpicsPV("L1", var_efficiencyL1);
       setEpicsPV("L2", var_efficiencyL2);
     }

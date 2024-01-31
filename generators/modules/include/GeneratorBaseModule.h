@@ -29,18 +29,13 @@ namespace Belle2 {
      */
     GeneratorBaseModule()
     {
-
       //Generator common parameters
       addParam("eventType", m_eventType, "Event type", Const::doubleNaN);
-
     };
 
     /** Initialize the module */
     void initialize() override
     {
-      if (std::isnan(m_eventType))
-        B2FATAL("EventType is not set!");
-
       m_eventExtraInfo.registerInDataStore();
 
       generatorInitialize();

@@ -3,22 +3,62 @@ Changes in the skim package in light-2401-ocicat
 
 New skims
 +++++++++
-* SL&ME: ``11170100``
-* TDCPV: ``13130300``
-* Tau: ``18570800``
-* Bhadronic: ``19140500``, ``14160200``, ``14121500``, ``14121400``, ``14161400``, ``14121500``, ``14121600``, ``14121601``
-* Dark & low multi: ``18530600``, ``18020600``, ``18020700``
-* Charm: ``17230700``, ``17260100``, ``17260200``, ``17220100``, ``17220200``, ``17220300``, ``17230900``, ``17231000``, ``17231100``, ``17231200``, ``17232000``, ``17222100``
-* Quarkonium: ``15460400``, ``15410300``
-* EWP: /
+* SL&ME: 
+
+  * ``11170100``:  :math:`B \to D^{(*)} l`
+
+* TDCPV: 
+
+  * ``13130300``:  :math:`B\bar{B} \to ll`
+
+* Tau: 
+
+  * ``18570800``:  :math:`e^+ e^- \to \tau^+ \tau^-, \tau \to K_s \pi X`
+
+* Bhadronic: 
+
+  * ``19140500``:  :math:`B^{+} \to \eta^{'} K^{*+}`
+  * ``14160200``:  :math:`B^{0} \to D_{s1}^{+} D^-`
+  * ``14121500``:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \eta (\to \gamma \gamma) \pi^+`
+  * ``14121400``:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \pi^+ \pi^0`
+  * ``14161400``:  :math:`B^{+} \to D^{*-} (\to \overline{D}^{0} (\to K^+ \pi^-) \pi^-) \pi^+ \pi^+ \pi^0`
+  * ``14121500``:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \eta (\to \gamma \gamma) \pi^+`
+  * ``14121600``:  :math:`B^{+} \to \bar{D}^{0} (\to K^+ \pi^-) \eta (\to \gamma \gamma) \pi^+`
+  * ``14121601``:  :math:`B^{+} \to \bar{D}^{0} (\to K^+ \pi^-) \pi^+ \pi^0`
+
+* Dark & low multi: 
+
+  * ``18530600``: :math:`e^{+} e^{-} \to \gamma \pi^{+} \pi^{-}`,  :math:`e^{+} e^{-} \to \gamma \mu^{+} \mu^{-}`
+  * ``18020600``: :math:`e^+ e^- \to A' (\to \mu^+ \mu^-) h'`
+  * ``18020700``: :math:`e^+ e^- \to A' (\to e^+ e^-) h'`
+
+* Charm: 
+
+  * ``17230700``:  
+  * ``17260100``:  :math:`D^{+} \to K^{+} \omega (\to \pi^+ \pi^- \pi^0)`,  :math:`D^{+} \to \pi^{+} \omega (\to \pi^+ \pi^- \pi^0)`  (and CC)
+  * ``17260200``:  :math:`D_{s}^{+} \to K^{+} \omega (\to \pi^+ \pi^- \pi^0)`,  :math:`D_{s}^{+} \to \pi^{+} \omega (\to \pi^+ \pi^- \pi^0)`  (and CC)
+  * ``17220100``:  :math:`D^+ \to \pi^+ e^- e^+`
+  * ``17220200``:  :math:`D^+ \to \pi^+ \mu^- \mu^+`
+  * ``17220300``:  :math:`D^+ \to \pi^+ K^- K^+` 
+  * ``17230900``:  :math:`\Lambda_c^+ \to \Sigma^+ h^+ j^-`
+  * ``17231000``:  :math:`\Xi_c^+ \to p \pi^+ K^-`
+  * ``17231100``:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
+  * ``17231200``:  :math:`\Xi_c^0 \to \Lambda^0 h^+ j^-`
+  * ``17232000``:  :math:`D^{*+} \to \pi^{0} D^{+} (\to \pi^+ \pi^0)`
+  * ``17222100``:  :math:`D^+ \to K_S \pi^+`
+
+* Quarkonium: 
+
+  * ``15460400``:  :math:`\Upsilon(1S,2S,3S) \to l^+ l^- (l = e, \mu)`
+  * ``16460200``:  :math:`J/\psi \to l^+ l^- (l = e, \mu)`, :math:`\psi(2S) \to l^+ l^- (l = e, \mu)`
+
 
 Modified skims
 ++++++++++++++
-* SL&ME: /
 * TDCPV: ``13160200``, ``13160300``
 * Tau: ``18360100``
 * Bhadronic: ``14140200``
 * Dark & low multi: ``18520400``, ``18520500``, ``18020500``, ``18520300``
 * Charm: ``17230100``, ``17230200``, ``17240200``, ``17230300``, ``17230500``, ``17240500``, ``17241200``, ``17230600``
-* Quarkonium: ``16460200``
+* Quarkonium: ``15410300``
 * EWP: ``12160100``, ``12160200``, ``12160300``

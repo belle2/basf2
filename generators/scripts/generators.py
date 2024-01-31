@@ -108,7 +108,7 @@ def add_aafh_generator(
                                   which specify the relative weights for each of the four sub generators
         maxsubweight (float): maximum expected subgenerator weight for rejection scheme
         maxfinalweight (float): maximum expected final weight for rejection scheme
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     if finalstate == 'e+e-e+e-':
@@ -213,7 +213,7 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBelle2 is used.
                               It doesn't affect mu-mu+ decays.
         tauinputfile(str) : File to override KK2f_defaults. Only [sometimes] needed when tau decay is driven by TauolaBelle.
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     #: kkmc input file
@@ -287,7 +287,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
                         setting it False solves the internal limitation of Evtgen that allows to make a
                         coherent decay only starting from the Y(4S).
         parentParticle (str): initial state (used only if it is not Upsilon(4S).
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
     evtgen_userdecfile = b2.find_file('data/generators/evtgen/charged.dec')
 
@@ -358,7 +358,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
         userdecfile (str): EvtGen decfile used for particle decays
         skip_on_failure (bool): If True stop event processing right after
             fragmentation fails. Otherwise continue normally
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     #: kkmc input file, one for each qqbar mode
@@ -456,7 +456,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
             particle. If exceeded processing will be stopped with a
             `FATAL <LogLevel.FATAL>` error so for rare particles one might need a
             larger number.
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
     loop_path = b2.create_path()
     # we might run this more than once so make sure we remove any particles
@@ -513,7 +513,7 @@ def add_babayaganlo_generator(
         fmax (float): maximum of differential cross section weight. This parameter should be set only by experts.
         generateInECLAcceptance (bool): if True, the GeneratorPreselection module is used to select only events
           with both the primary particles within the ECL acceptance.
-        eventType (int) : event type number
+        eventType (double) : event type number
     '''
 
     babayaganlo = path.add_module('BabayagaNLOInput')
@@ -565,7 +565,7 @@ def add_phokhara_generator(path, finalstate='', eventType=0):
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate (str): One of the possible final state "mu+mu-", "pi+pi-", "pi+pi-pi0"
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     phokhara = path.add_module('PhokharaInput')
@@ -622,7 +622,7 @@ def add_phokhara_evtgen_combination(
         max_inv_mass_hadrons(float): Maximum invariant mass of the virtual
             photon. This parameter is used only if isr_events is true,
             otherwise the maximum mass is not restricted.
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     import pdg
@@ -709,7 +709,7 @@ def add_koralw_generator(path, finalstate='', enableTauDecays=True, eventType=0)
         path (basf2.Path): path where the generator should be added
         finalstate (str): either 'e+e-e+e-', 'e+e-mu+mu-', 'e+e-tau+tau-', 'mu+mu-mu+mu-', 'mu+mu-tau+tau-' or 'tau+tau-tau+tau-'
         enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     decayFile = ''
@@ -866,7 +866,7 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False, eventT
         path (basf2.Path):           path where the generator should be added
         finalstate(str):             "e+e-pi+pi-", "e+e-K+K-" or "e+e-ppbar"
         useDiscreteAndSortedW(bool): if True, wListTableFile is used for discrete and sorted W. evtNumList must be set proper value.
-        eventType (int) : event type number
+        eventType (double) : event type number
     """
 
     if finalstate == 'e+e-pi+pi-':

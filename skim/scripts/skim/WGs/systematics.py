@@ -551,18 +551,17 @@ class SystematicsPhiGamma(BaseSkim):
             "[[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]]"
         ]
 
-        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", writeOut=True, path=path)
+        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", path=path)
         ma.reconstructDecay('phi:charged -> K+:all K-:all', '0.9 < M < 1.2', path=path)
-        ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', writeOut=True, path=path)
+        ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', path=path)
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
         return ["gamma:PhiSystematics"]
 
     def validation_histograms(self, path):
-        ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
-        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
+        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', path=path)
 
-        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=path)
+        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', path=path)
 
         vm.addAlias("gamma_E_CMS", "useCMSFrame(E)")
         vm.addAlias("gamma_E", "E")

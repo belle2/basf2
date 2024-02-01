@@ -35,7 +35,6 @@ class GraFEIModel(torch.nn.Module):
             num_hid_layers (int): Number of hidden layers in every MetaLayer.
             num_ML (int): Number of intermediate MetaLayers.
             droput (float): Dropout rate :math:`r \\in [0,1]`.
-            normalize (str): Type of normalization used (layer/batch).
             symmetrize (bool): Whether to symmetrize LCAS matrix at the end.
             global_layer (bool): Whether to use global layer.
 
@@ -54,7 +53,6 @@ class GraFEIModel(torch.nn.Module):
         num_hid_layers=1,
         num_ML=1,
         dropout=0.0,
-        normalize=None,
         symmetrize=True,
         global_layer=True,
         **kwargs
@@ -74,7 +72,6 @@ class GraFEIModel(torch.nn.Module):
                 hidden_layer_dim,
                 num_hid_layers,
                 dropout,
-                normalize,
             ),
             NodeLayer(
                 nfeat_in_dim,
@@ -84,7 +81,6 @@ class GraFEIModel(torch.nn.Module):
                 hidden_layer_dim,
                 num_hid_layers,
                 dropout,
-                normalize,
             ),
             GlobalLayer(
                 hidden_layer_dim,
@@ -94,7 +90,6 @@ class GraFEIModel(torch.nn.Module):
                 hidden_layer_dim,
                 num_hid_layers,
                 dropout,
-                normalize,
             )
             if global_layer
             else None,
@@ -110,7 +105,6 @@ class GraFEIModel(torch.nn.Module):
                         hidden_layer_dim,
                         num_hid_layers,
                         dropout,
-                        normalize,
                     ),
                     NodeLayer(
                         hidden_layer_dim,
@@ -120,7 +114,6 @@ class GraFEIModel(torch.nn.Module):
                         hidden_layer_dim,
                         num_hid_layers,
                         dropout,
-                        normalize,
                     ),
                     GlobalLayer(
                         hidden_layer_dim,
@@ -130,7 +123,6 @@ class GraFEIModel(torch.nn.Module):
                         hidden_layer_dim,
                         num_hid_layers,
                         dropout,
-                        normalize,
                     )
                     if global_layer
                     else None,
@@ -147,7 +139,7 @@ class GraFEIModel(torch.nn.Module):
                 edge_classes,
                 num_hid_layers,
                 dropout,
-                normalize=None,  # Do not normalize output layer
+                normalize=False,  # Do not normalize output layer
             ),
             NodeLayer(
                 hidden_layer_dim,
@@ -157,7 +149,7 @@ class GraFEIModel(torch.nn.Module):
                 x_classes,
                 num_hid_layers,
                 dropout,
-                normalize=None,  # Do not normalize output layer
+                normalize=False,  # Do not normalize output layer
             ),
             GlobalLayer(
                 x_classes,
@@ -167,7 +159,7 @@ class GraFEIModel(torch.nn.Module):
                 1,
                 num_hid_layers,
                 dropout,
-                normalize=None,  # Do not normalize output layer
+                normalize=False,  # Do not normalize output layer
             )
             if global_layer
             else None,

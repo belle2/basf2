@@ -70,5 +70,3 @@ model:
   dropout: 0.3
   # Whether to symmetrize output LCAS matrices
   symmetrize: True
-  # 'batchnorm' for batch normalization, 'layernorm' for layer normalization
-  normalize: batchnorm

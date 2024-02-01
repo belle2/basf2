@@ -11,7 +11,7 @@ def _init_weights(layer, normalize):
     for m in layer.modules():
         if isinstance(m, nn.Linear):
             nn.init.xavier_normal_(m.weight.data)
-            if normalize is None:
+            if not normalize:
                 m.bias.data.fill_(0.1)
         elif isinstance(m, nn.BatchNorm1d) or isinstance(m, nn.LayerNorm):
             m.weight.data.fill_(1)
@@ -55,7 +55,7 @@ class EdgeLayer(nn.Module):
         efeat_out_dim,
         num_hid_layers,
         dropout,
-        normalize,
+        normalize=True,
     ):
         super(EdgeLayer, self).__init__()
 
@@ -63,9 +63,6 @@ class EdgeLayer(nn.Module):
         self.num_hid_layers = num_hid_layers
         self.dropout_prob = dropout
         self.normalize = normalize
-
-        # Bias in lin_out activated only if batchnorm/layernorm not used
-        out_bias = True if self.normalize is None else False
 
         self.lin_in = nn.Linear(
             efeat_in_dim + 2 * nfeat_in_dim + gfeat_in_dim, efeat_hid_dim
@@ -76,14 +73,12 @@ class EdgeLayer(nn.Module):
                 for _ in range(self.num_hid_layers)
             ]
         )
-        self.lin_out = nn.Linear(efeat_hid_dim, efeat_out_dim, bias=out_bias)
+        self.lin_out = nn.Linear(efeat_hid_dim, efeat_out_dim, bias=not normalize)
 
-        if self.normalize == "batchnorm":
+        if normalize:
             self.norm = nn.BatchNorm1d(efeat_out_dim)
-        elif self.normalize == "layernorm":
-            self.norm = nn.LayerNorm(efeat_out_dim)
 
-        _init_weights(self, self.normalize)
+        _init_weights(self, normalize)
 
     def forward(self, src, dest, edge_attr, u, batch):
         """"""
@@ -110,7 +105,7 @@ class EdgeLayer(nn.Module):
         if self.num_hid_layers > 1:
             out += out_skip
 
-        if self.normalize is not None:
+        if self.normalize:
             out = self.nonlin_function(self.norm(self.lin_out(out)))
         else:
             out = self.nonlin_function(self.lin_out(out))
@@ -159,7 +154,7 @@ class NodeLayer(nn.Module):
         nfeat_out_dim,
         num_hid_layers,
         dropout,
-        normalize,
+        normalize=True,
     ):
         super(NodeLayer, self).__init__()
 
@@ -167,9 +162,6 @@ class NodeLayer(nn.Module):
         self.num_hid_layers = num_hid_layers
         self.dropout_prob = dropout
         self.normalize = normalize
-
-        # Bias in lin_out activated only if batchnorm/layernorm not used
-        out_bias = True if self.normalize is None else False
 
         self.lin_in = nn.Linear(
             gfeat_in_dim + nfeat_in_dim + efeat_in_dim, nfeat_hid_dim
@@ -180,14 +172,12 @@ class NodeLayer(nn.Module):
                 for _ in range(self.num_hid_layers)
             ]
         )
-        self.lin_out = nn.Linear(nfeat_hid_dim, nfeat_out_dim, bias=out_bias)
+        self.lin_out = nn.Linear(nfeat_hid_dim, nfeat_out_dim, bias=not normalize)
 
-        if self.normalize == "batchnorm":
+        if normalize:
             self.norm = nn.BatchNorm1d(nfeat_out_dim)
-        elif self.normalize == "layernorm":
-            self.norm = nn.LayerNorm(nfeat_out_dim)
 
-        _init_weights(self, self.normalize)
+        _init_weights(self, normalize)
 
     def forward(self, x, edge_index, edge_attr, u, batch):
         """"""
@@ -220,7 +210,7 @@ class NodeLayer(nn.Module):
         if self.num_hid_layers > 1:
             out += out_skip
 
-        if self.normalize is not None:
+        if self.normalize:
             out = self.nonlin_function(self.norm(self.lin_out(out)))
         else:
             out = self.nonlin_function(self.lin_out(out))
@@ -270,7 +260,7 @@ class GlobalLayer(nn.Module):
         gfeat_out_dim,
         num_hid_layers,
         dropout,
-        normalize,
+        normalize=True,
     ):
         super(GlobalLayer, self).__init__()
 
@@ -281,9 +271,6 @@ class GlobalLayer(nn.Module):
         self.dropout_prob = dropout
         self.normalize = normalize
 
-        # Bias in lin_out activated only if batchnorm/layernorm not used
-        out_bias = True if self.normalize is None else False
-
         self.lin_in = nn.Linear(
             nfeat_in_dim + efeat_in_dim + gfeat_in_dim, gfeat_hid_dim
         )
@@ -293,13 +280,12 @@ class GlobalLayer(nn.Module):
                 for _ in range(self.num_hid_layers)
             ]
         )
-        self.lin_out = nn.Linear(gfeat_hid_dim, gfeat_out_dim, bias=out_bias)
-        if self.normalize == "batchnorm":
-            self.norm = nn.BatchNorm1d(gfeat_out_dim)
-        elif self.normalize == "layernorm":
-            self.norm = nn.LayerNorm(gfeat_out_dim)
+        self.lin_out = nn.Linear(gfeat_hid_dim, gfeat_out_dim, bias=not normalize)
 
-        _init_weights(self, self.normalize)
+        if normalize:
+            self.norm = nn.BatchNorm1d(gfeat_out_dim)
+
+        _init_weights(self, normalize)
 
     def forward(self, x, edge_index, edge_attr, u, batch):
         """"""
@@ -340,7 +326,7 @@ class GlobalLayer(nn.Module):
         if self.num_hid_layers > 1:
             out += out_skip
 
-        if self.normalize is not None:
+        if self.normalize:
             out = self.nonlin_function(self.norm(self.lin_out(out)))
         else:
             out = self.lin_out(out)

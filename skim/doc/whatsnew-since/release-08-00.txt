@@ -19,7 +19,7 @@ New skims
 
   * `19140500 <skim.WGs.btocharmless.BtoEtapKstp>`:  :math:`B^{+} \to \eta^{'} K^{*+}`
   * `14160200 <skim.WGs.btocharm.B0toDs1D>`:  :math:`B^{0} \to D_{s1}^{+} D^-`
-  * `14121500 <skim.WGs.btocharm.B0toDstaretapi_D0pi_Kpi>`:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \eta (\to \gamma \gamma) \pi^+`
+  * `14160201 <skim.WGs.btocharm.B0toDDs0star>`:  :math:`B^{0} \to D_{s0}^{*+} D^{-} (\to K^+ \pi^- \pi^-)`
   * `14121400 <skim.WGs.btocharm.B0toDstarpipi0_D0pi_Kpi>`:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \pi^+ \pi^0`
   * `14161400 <skim.WGs.btocharm.BtoDstarpipipi0_D0pi_Kpi>`:  :math:`B^{+} \to D^{*-} (\to \overline{D}^{0} (\to K^+ \pi^-) \pi^-) \pi^+ \pi^+ \pi^0`
   * `14121500 <skim.WGs.btocharm.B0toDstaretapi_D0pi_Kpi>`:  :math:`B^{0} \to \overline{D}^{*-} (\to \bar{D}^{0} (\to K^+ \pi^-) \pi^-) \eta (\to \gamma \gamma) \pi^+`
@@ -44,7 +44,7 @@ New skims
   * `17231000 <skim.WGs.charm.XicpTopHpJm>`:  :math:`\Xi_c^+ \to p \pi^+ K^-`
   * `17231100 <skim.WGs.charm.XictoXimpippim>`:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
   * `17231200 <skim.WGs.charm.Xic0ToLHpJm>`:  :math:`\Xi_c^0 \to \Lambda^0 h^+ j^-`
-  * `17232000 <skim.WGs.charm.DpToHpPi0>`:  :math:`D^{*+} \to \pi^{0} D^{+} (\to \pi^+ \pi^0)`
+  * `17232000 <skim.WGs.charm.DpToHpPi0>`:  :math:`D^{+} \to \pi^+ \pi^0`
   * `17222100 <skim.WGs.charm.DpToKsHp>`:  :math:`D^+ \to K_S \pi^+`
 
 * Quarkonium: 

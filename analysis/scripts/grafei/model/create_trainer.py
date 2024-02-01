@@ -209,15 +209,6 @@ class GraFEIIgniteTrainer:
             for metric_name, metric in zip(metrics.keys(), metrics.values()):
                 metric.attach(self.evaluators[tag], metric_name)
 
-            # Add GPU memory info
-            if self.configs["train"]["record_gpu_usage"] and device == torch.device("cuda"):
-                ignite.contrib.metrics.GpuInfo().attach(
-                    self.trainer, name="gpu"
-                )
-                ignite.contrib.metrics.GpuInfo().attach(
-                    self.evaluators[tag], name="gpu"
-                )
-
     def _score_fn(self, engine):
         """Metric to use for early stoppging"""
         return engine.state.metrics["loss"]
@@ -255,23 +246,6 @@ class GraFEIIgniteTrainer:
             ) as outfile:
                 cleaned_configs = self._clean_config_dict(self.configs)
                 yaml.dump(cleaned_configs, outfile, default_flow_style=False)
-
-        # Attach a progress bar
-        if self.configs["train"]["progress_bar"]:
-            progress_metrics = (
-                ["gpu:0 mem(%)", "gpu:0 util(%)"]
-                if (
-                    self.configs["train"]["record_gpu_usage"]
-                    and self.device == torch.device("cuda")
-                )
-                else None
-            )
-            pbar = ignite.contrib.handlers.ProgressBar(persist=True, bar_format="")
-            pbar.attach(
-                self.trainer,
-                metric_names=progress_metrics,
-                output_transform=lambda x: {"loss": x},
-            )
 
         # Setup early stopping
         early_handler = ignite.handlers.EarlyStopping(

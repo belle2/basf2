@@ -40,10 +40,6 @@ train:
   lr_scheduler: False
   # Whether to use mixed precision for faster training
   mixed_precision: True
-  # Show progress bar during training (slows down the process)
-  progress_bar: False
-  # Show GPU usage during training (slows down the process)
-  record_gpu_usage: False
   # Compile the model to have a speed-up (requires PyTorch >= 2.0)
   compile_model: False
   # Random seed

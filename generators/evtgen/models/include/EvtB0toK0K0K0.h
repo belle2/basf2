@@ -15,17 +15,17 @@
 
 namespace Belle2 {
 
-  /** The evtgen model to produce B+ -> K+ K0 K0 decay sample.
+  /** The evtgen model to produce B0 -> K0 K0 K0 decay sample.
     *
-    * In this model, Dalitz plot is calculated, based on [PhysRevD.85.112010]
+    * In this model, Dalitz plot is calculated, based on [PhysRevD.85.054023]
     *
     * You can use the model as follows:
     *
-    * Decay MyB+
-    * 1.0 K+ K_L0 K_L0           BTOKK0K0;
+    * Decay MyB0
+    * 1.0 K_S0 K_L0 K_L0           B0TOK0K0K0;
     * Enddecay
     */
-  class EvtBtoKK0K0 : public  EvtDecayIncoherent {
+  class EvtB0toK0K0K0 : public  EvtDecayIncoherent {
 
 
   public:
@@ -33,12 +33,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtBtoKK0K0() {}
+    EvtB0toK0K0K0() {}
 
     /**
      * Destructor.
      */
-    virtual ~EvtBtoKK0K0();
+    virtual ~EvtB0toK0K0K0();
 
     /**
      * The function which returns the name of the model.
@@ -74,7 +74,7 @@ namespace Belle2 {
     /**
      * The function to get amplitude of decay
      */
-    std::complex<double> Amplitude(double s13, double s23, const char* resonance, bool isobar);
+    std::complex<double> Amplitude(double s13, double s23, const char* resonance);
 
     /**
      * The function to get dynamic amplitude of decay
@@ -137,11 +137,6 @@ namespace Belle2 {
     double Calculate_q_dot_p_mag(double s13, double s23);
 
     /**
-     * The function to convert degree to radian
-     */
-    double DegreeToRadian(double degree);
-
-    /**
      * The function to get q0 and pstar0
      */
     void GetZeros();
@@ -161,65 +156,23 @@ namespace Belle2 {
     /** coupling constant g_pi of f980   */
     double gpi_f980{ 0.165 };
 
-    /** ratio of coupling constant g_k/g_pi of f980   */
-    double gKgpi_f980{ 4.21 };
+    /** ratio of coupling constant g_K of f980   */
+    double gK_f980{ 0.695 };
 
     /** isobar parameter c of f980   */
-    double c_f980{ 3.35 };
+    double c_f980{ 1.0 };
 
     /** isobar parameter phi of f980   */
-    double phi_f980{ 31.0 };
-
-    /** spin of f1500   */
-    int spin_f1500{ 0 };
-
-    /** nominal mass of f1500   */
-    double m0_f1500{ 1.505 };
-
-    /** nominal width of f1500   */
-    double Gamma0_f1500{ 0.109 };
-
-    /** q value when m = m0 for f1500. q is the momenta of one resonance daughter. It is initialized by `GetZeros()` function   */
-    double q0_f1500{ 0 };
-
-    /** pstar value when m = m0 for f1500. pstar is momentum of the ‘‘bachelor’’ particle evaluated in the rest frame of B. It is initialized by `GetZeros()` function   */
-    double pstar0_f1500{ 0 };
-
-    /** isobar parameter c of f1500   */
-    double c_f1500{ 0.2 };
-
-    /** isobar parameter phi of f1500   */
-    double phi_f1500{ -83.0 };
-
-    /** spin of f1525   */
-    int spin_f1525{ 2 };
-
-    /** nominal mass of f1525   */
-    double m0_f1525{ 1.525 };
-
-    /** nominal width of f1525   */
-    double Gamma0_f1525{ 0.073 };
-
-    /** q value when m = m0 for f1525. q is the momenta of one resonance daughter. It is initialized by `GetZeros()` function   */
-    double q0_f1525{ 0 };
-
-    /** pstar value when m = m0 for f1525. pstar is momentum of the ‘‘bachelor’’ particle evaluated in the rest frame of B. It is initialized by `GetZeros()` function   */
-    double pstar0_f1525{ 0 };
-
-    /** isobar parameter c of f1525   */
-    double c_f1525{ 0.00179 };
-
-    /** isobar parameter phi of f1525   */
-    double phi_f1525{-58.0};
+    double phi_f980{ 0.09 };
 
     /** spin of f1710   */
     int spin_f1710{ 0 };
 
     /** nominal mass of f1710   */
-    double m0_f1710{ 1.720 };
+    double m0_f1710{ 1.724 };
 
     /** nominal width of f1710   */
-    double Gamma0_f1710{ 0.135 };
+    double Gamma0_f1710{ 0.137 };
 
     /** q value when m = m0 for f1710. q is the momenta of one resonance daughter. It is initialized by `GetZeros()` function   */
     double q0_f1710{ 0 };
@@ -228,10 +181,31 @@ namespace Belle2 {
     double pstar0_f1710{ 0 };
 
     /** isobar parameter c of f1710   */
-    double c_f1710{ 0.24 };
+    double c_f1710{ 1.0 };
 
     /** isobar parameter phi of f1710   */
-    double phi_f1710{ -22.0 };
+    double phi_f1710{ 1.11 };
+
+    /** spin of f2010   */
+    int spin_f2010{ 2 };
+
+    /** nominal mass of f2010   */
+    double m0_f2010{ 2.011 };
+
+    /** nominal width of f2010   */
+    double Gamma0_f2010{ 0.202 };
+
+    /** q value when m = m0 for f2010. q is the momenta of one resonance daughter. It is initialized by `GetZeros()` function   */
+    double q0_f2010{ 0 };
+
+    /** pstar value when m = m0 for f2010. pstar is momentum of the ‘‘bachelor’’ particle evaluated in the rest frame of B. It is initialized by `GetZeros()` function   */
+    double pstar0_f2010{ 0 };
+
+    /** isobar parameter c of f2010   */
+    double c_f2010{ 1.0 };
+
+    /** isobar parameter phi of f2010   */
+    double phi_f2010{ 2.5 };
 
     /** spin of chic0   */
     int spin_chic0{ 0 };
@@ -240,7 +214,7 @@ namespace Belle2 {
     double m0_chic0{ 3.41475 };
 
     /** nominal width of chic0   */
-    double Gamma0_chic0{ 0.0103 };
+    double Gamma0_chic0{ 0.0102 };
 
     /** q value when m = m0 for chic0. q is the momenta of one resonance daughter. It is initialized by `GetZeros()` function   */
     double q0_chic0{ 0 };
@@ -249,43 +223,28 @@ namespace Belle2 {
     double pstar0_chic0{ 0 };
 
     /** isobar parameter c of chic0   */
-    double c_chic0{ 0.113 };
+    double c_chic0{ 1.0 };
 
     /** isobar parameter phi of chic0   */
-    double phi_chic0{ 45.0 };
+    double phi_chic0{ -0.63 };
 
-    /** isobar parameter delta of chic0   */
-    double delta_chic0{ -12.0 };
+    /** NR coefficient alpha_NR   */
+    double alpha_NR{ -0.14 };
 
-    /** NR coefficient b   */
-    double b_NR{ -0.018 };
+    /** NR coefficient c_NR   */
+    double c_NR{ 1.0 };
 
-    /** c of NR coefficient a_S0   */
-    double aS0_c_NR{ 1.0 };
-
-    /** phi of NR coefficient a_S0   */
-    double aS0_phi_NR{ 0.0 };
-
-    /** c of NR coefficient a_S1   */
-    double aS1_c_NR{ 1.0 };
-
-    /** phi of NR coefficient a_S1   */
-    double aS1_phi_NR{ 129.0 };
-
-    /** c of NR coefficient a_S2   */
-    double aS2_c_NR{ 0.51 };
-
-    /** phi of NR coefficient a_S2   */
-    double aS2_phi_NR{ -85.0 };
+    /** NR coefficient phi_NR   */
+    double phi_NR{ 0.0 };
 
     /** effective meson radii, r   */
-    double r{ 4.0 };
+    double r{ 1.5 };
 
     /** effective meson radii, r'   */
-    double rprime{ 0.0 };
+    double rprime{ 1.5 };
 
-    /** mass of B meson. Initialized by evt.pdl   */
-    double mB{ 0.0 };
+    /** mass of B0 meson. Initialized by evt.pdl   */
+    double mB0{ 0.0 };
 
     /** mass of charged Kaon. Initialized by evt.pdl   */
     double mKp{ 0.0 };
@@ -293,11 +252,17 @@ namespace Belle2 {
     /** mass of K_L0. Initialized by evt.pdl   */
     double mKL0{ 0.0 };
 
-    /** average of the mass between charged Kaon and neutral Kaon. Initialized by evt.pdl   */
-    double mK{ 0.0 };
+    /** mass of K_S0. Initialized by evt.pdl   */
+    double mKS0{ 0.0 };
 
-    /** mass of charged pion. Initialized by evt.pdl   */
+    /** mass of K0. Initialized by evt.pdl   */
+    double mK0{ 0.0 };
+
+    /** mass of pi+. Initialized by evt.pdl   */
     double mpic{ 0.0 };
+
+    /** mass of pi0. Initialized by evt.pdl   */
+    double mpi0{ 0.0 };
   };
 
 } // Belle 2 Namespace

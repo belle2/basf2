@@ -24,9 +24,11 @@ parser.add_argument('-f', type=str, required=False, default='./',
 parser.add_argument('-o', type=str, required=False, default='./',
                     help="Out dir", metavar="OUT_DIR",
                     dest='out_dir')
-parser.add_argument('-d', type=bool, required=False, default=True,
-                    help="Whether to save the preconfigured variables", metavar="SAVE_VARS",
-                    dest='save_vars')
+parser.add_argument('-d', type=bool, required=False, default=False,
+                    help="""Whether to save the preconfigured event-level variables
+                    (variables for a certain particle are also seen as event-level,
+                    since these variables are not attached to all the particles in the particle list)""",
+                    metavar="SAVE_VARS", dest='save_vars')
 parser.add_argument("--workers", type=int, default=False,
                     help="Number of workers (0 means no multiprocessing)")
 args = parser.parse_args()

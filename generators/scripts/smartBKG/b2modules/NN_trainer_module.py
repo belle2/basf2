@@ -71,6 +71,8 @@ class TrainDataSaver(b2.Module):
 
     Arguments:
         output_file (str): Filename to save training data to.
+            Ending with `parquet` indicating fast mode, which will generate the final parquet file for training.
+            Ending with `h5` indicating advanced mode, which will produce a temperary h5 file for further preprocessing.
         flag_file (str): Filename of the flag file indicating passing events.
 
     Returns:
@@ -93,6 +95,8 @@ class TrainDataSaver(b2.Module):
         self.output_file = output_file
         #: Filename of the flag file indicating passing events
         self.flag_list = ak.from_parquet(flag_file)
+        #: Whether use fast mode or advanced mode
+        self.fast_mode = output_file.endswith(".parquet")
 
         # delete output file if it already exists, since we will apend later
         if os.path.exists(output_file):
@@ -103,19 +107,17 @@ class TrainDataSaver(b2.Module):
         Initialize the data store and the dictionary to save particle features before processing events.
         """
         #: Initialise event metadata from data store
-        self.eventinfo = Belle2.PyStoreObj('EventMetaData')
+        self.eventInfo = Belle2.PyStoreObj('EventMetaData')
         #: Initialise event extra info from data store
         self.eventExtraInfo = Belle2.PyStoreObj('EventExtraInfo')
         #: Pandas dataframe to save particle features
         self.df_dict = pd.DataFrame()
-        # #: record the production time(s) of root particle(s) for the correction of jitter
-        # self.root_prodTime = defaultdict(list)
 
     def event(self):
         """
         Process each event and append event information to the dictionary.
         """
-        evtNum = self.eventinfo.getEvent()
+        evtNum = self.eventInfo.getEvent()
         self.df_dict = pd.concat([
             self.df_dict,
             load_particle_list(mcplist=Belle2.PyStoreArray("MCParticles"), evtNum=evtNum, label=(evtNum in self.flag_list))
@@ -123,22 +125,35 @@ class TrainDataSaver(b2.Module):
 
     def terminate(self):
         """
-        Append events to the DataFrame on disk and free memory.
+        Append events on disk in either of the two different ways and free memory.
+        In fast mode, the dataframe containing particle-level information and skim labels is preprocessed
+        and saved as a parquet file which is ready for NN training.
+        In advanced mode, the dataframe is saved as a h5 file and waits for combination with event-level information
+        before preprocessing.
         """
-        self.df_dict.to_hdf(self.output_file, key='mc_information', mode='a', format='table', append=True)
+        if self.fast_mode:
+            ak.to_parquet(preprocessed(self.df_dict), self.output_file)
+        else:
+            self.df_dict.to_hdf(self.output_file, key='mc_information', mode='a', format='table', append=True)
         self.df_dict = pd.DataFrame()
 
 
 class data_production():
     """
-    Process data for training and save to Parquet file.
+    Process data for training and save to Parquet file. Two modes are provided:
+    Fast mode: `save_vars` set to `None`, produce the dataset with only the necessary information for the training.
+    Advanced mode: `save_vars` set to a dictionary of event-level variables,
+        run through hard-coded b2 steering code in `self.process_b2script` to produce the required particle lists
+        and save the required variables, can be used for event-level cuts or evaluations of the NN performance.
 
     Arguments:
         in_dir (str): Input directory.
         out_dir (str): Output directory.
         job_id (int): Job ID for batch processing.
-        save_vars (dict): Variables to save for different event levels.
-            By default having Y4S and B keys for the corresponding particle list.
+        save_vars (dict): Event-level variables to save for different particles.
+            By default `None` for fast mode.
+            In the example script having Y4S and B keys for the corresponding particle list.
+
         dataName (str): Data file name prefix.
         flagName (str): Flag file name prefix.
 
@@ -153,8 +168,9 @@ class data_production():
         :param in_dir: Input directory.
         :param out_dir: Output directory.
         :param job_id: Job ID for batch processing.
-        :param save_vars: Variables to save for different event levels.
-            By default having Y4S and B keys for the corresponding particle list.
+        :param save_vars: Event-level variables to save for different particles.
+            By default `None` for fast mode.
+            In the example script having Y4S and B keys for the corresponding particle list.
         """
         dataName = '_submdst'
         flagName = '_flag'
@@ -162,16 +178,17 @@ class data_production():
         self.data = f'{in_dir}{dataName}{job_id}.root'
         #: Filename of the flag file indicating passing events
         self.flag = f'{in_dir}{flagName}{job_id}.parquet'
-        #: Temperary directory to keep intermediate files
-        self.out_temp = f'{out_dir}_temp{job_id}/'
-        os.makedirs(out_dir, exist_ok=True)
-        os.makedirs(self.out_temp, exist_ok=True)
-        #: Intermediate files
-        self.temp_file = {
-            'MC': f'{self.out_temp}mc.h5',
-            'Y4S': f'{self.out_temp}y4s.h5',
-            'B': f'{self.out_temp}b.h5'
-            }
+        if save_vars is not None:
+            #: Temperary directory to keep intermediate files for advanced mode
+            self.out_temp = f'{out_dir}_temp{job_id}/'
+            os.makedirs(out_dir, exist_ok=True)
+            os.makedirs(self.out_temp, exist_ok=True)
+            #: Intermediate files
+            self.temp_file = {
+                'MC': f'{self.out_temp}mc.h5',
+                'Y4S': f'{self.out_temp}y4s.h5',
+                'B': f'{self.out_temp}b.h5'
+                }
         #: Final output Parquet file
         self.out_file = f'{out_dir}preprocessed{job_id}.parquet'
         #: Variables to save for different event levels
@@ -182,7 +199,8 @@ class data_production():
         Process the b2 steering file and the data generation.
         """
         self.process_b2script()
-        self.preprocess_files()
+        if self.save_vars is not None:
+            self.merge_files()
 
     def process_b2script(self, num_events=2500):
         """
@@ -196,13 +214,13 @@ class data_production():
         ma.buildEventShape(path=path)
         ma.buildEventKinematics(path=path)
 
-        TrainDataSaver_module = TrainDataSaver(
-            output_file=self.temp_file['MC'],
-            flag_file=self.flag
-        )
-        path.add_module(TrainDataSaver_module)
-
+        # process with advance mode
         if self.save_vars is not None:
+            TrainDataSaver_module = TrainDataSaver(
+                output_file=self.temp_file['MC'],
+                flag_file=self.flag,
+            )
+            path.add_module(TrainDataSaver_module)
             ma.fillParticleListFromMC('Upsilon(4S):mc', '', path=path)
             v2hdf5_y4s = VariablesToHDF5(
                 'Upsilon(4S):mc',
@@ -227,29 +245,34 @@ class data_production():
                 filename=self.temp_file['B'],
             )
             fei_skim.postskim_path.add_module(v2hdf5_b)
-
+        # process with fast mode
+        else:
+            TrainDataSaver_module = TrainDataSaver(
+                output_file=self.out_file,
+                flag_file=self.flag,
+            )
+            path.add_module(TrainDataSaver_module)
         b2.process(path, max_event=num_events)
         print(b2.statistics)
 
-    def preprocess_files(self):
+    def merge_files(self):
         """
-        Merge decorrelation to DataFrame.
+        Merge file of particle-level information (`MC`) with those of event-level information (`Y4S`, `B`).
+        Preprocess and save to disk as Parquet file in form of Awkward Array.
         """
         df = pd.read_hdf(self.temp_file['MC'], key='mc_information')
-        if self.save_vars is not None:
-            df_y4s = pd.read_hdf(self.temp_file['Y4S'], key='Upsilon(4S):mc')
-            df_b = pd.read_hdf(self.temp_file['B'], key='B0:generic')
-            df_merged = df_y4s.merge(df_b.drop(axis=1, labels=['icand', 'ncand']), how="left")
-            decorr_df = df_merged.rename({'evt': 'evtNum'}, axis=1)
-        else:
-            decorr_df = None
-        df = preprocessed(df, decorr_df)
-        ak.to_parquet(df, self.out_file)
+        df_y4s = pd.read_hdf(self.temp_file['Y4S'], key='Upsilon(4S):mc')
+        df_b = pd.read_hdf(self.temp_file['B'], key='B0:generic')
+        df_merged = df_y4s.merge(df_b.drop(axis=1, labels=['icand', 'ncand']), how="left")
+        decorr_df = df_merged.rename({'evt': 'evtNum'}, axis=1)
+        ak.to_parquet(preprocessed(df, decorr_df), self.out_file)
 
     def clean_up(self):
         """
         Clean up temporary files.
         """
-        os.remove(self.data)
+        # uncomment if needed for batch job
+        # os.remove(self.data)
         os.remove(self.flag)
-        shutil.rmtree(self.out_temp)
+        if self.save_vars is not None:
+            shutil.rmtree(self.out_temp)

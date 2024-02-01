@@ -19,20 +19,6 @@ from smartBKG.utils.metrics import speedup
 file_path = Path("./")
 device = torch.device("cpu")
 
-needed_particle_columns = [
-    "PDG", "prodTime", "energy", "x", "y", "z", "px", "py", "pz",
-    "arrayIndex",
-    "motherIndex",
-]
-needed_event_columns = [
-    "evtNum",
-    "label",
-]
-udst_columns = [
-    "Mbc", "deltaE",
-    'aplanarity', 'sphericity', 'thrust', 'missingEnergyOfEventCMS', 'missingMass2OfEvent', 'missingMomentumOfEvent'
-]
-
 
 def load_events(
     filenames,
@@ -239,7 +225,6 @@ if __name__ == "__main__":
     # training process
     train_udst, info = load_events(
         filenames=file_path.glob('preprocessed*.parquet'),
-        columns=needed_particle_columns + needed_event_columns + udst_columns,
         balenced=True
     )
     retention_rate = info["total_loaded_pass"] / info["total_udst"]
@@ -258,7 +243,6 @@ if __name__ == "__main__":
     # test process
     test_udst, info = load_events(
         filenames=file_path.glob('preprocessed*.parquet'),
-        columns=needed_particle_columns + needed_event_columns + udst_columns,
         balenced=False
     )
     ds_test = ArrayDataset(test_udst, batch_size=1024, shuffle=False)

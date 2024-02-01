@@ -546,7 +546,7 @@ class SystematicsPhiGamma(BaseSkim):
 
     def build_lists(self, path):
         EventCuts = [
-            "[nTracks>=2] and [nTracks<=4]",
+            "[nTracks>=2] and [nTracks<=6]",
             "[nParticlesInList(gamma:PhiSystematics) > 0]",
             "[[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]]"
         ]

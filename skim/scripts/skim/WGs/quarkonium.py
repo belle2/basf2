@@ -43,7 +43,7 @@ class BottomoniumEtabExclusive(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
@@ -104,7 +104,7 @@ class BottomoniumUpsilon(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)
@@ -176,7 +176,7 @@ class CharmoniumPsi(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -314,7 +314,7 @@ class InclusiveLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdLambdas(path=path)
@@ -354,7 +354,7 @@ class InclusiveUpsilon(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, quarkonium"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPhotons("loose", path=path)

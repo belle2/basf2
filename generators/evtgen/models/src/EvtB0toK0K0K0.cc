@@ -72,7 +72,7 @@ namespace Belle2 {
       double smin = std::min(std::min(s12, s13), s23);
 
       // the maximum value of probability is obtained by brute fource method. scan all region and find.
-      const double Probability_max = 871.390583;
+      const double Probability_max = 0.409212;
       double Probability_value = Probability(smax, smin);
       double Probability_ratio = Probability_value / Probability_max;
 

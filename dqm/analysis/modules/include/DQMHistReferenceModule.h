@@ -66,10 +66,15 @@ namespace Belle2 {
      * Struct for refence histogram info
      */
     typedef struct {
+      /** online histogram name */
       TString histo1;
+      /** reference histogram name */
       TString histo2;
+      /** related canvas name name */
       TString canvas_name;
+      /** pointer to the histogram canvas */
       TCanvas* canvas{nullptr};
+      /** pointer to the reference histogram */
       TH1* ref_clone{nullptr};
     } REFNODE;
 

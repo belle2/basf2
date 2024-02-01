@@ -162,7 +162,7 @@ class TDCPV_qqs(BaseSkim):
             'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
         ]
 
-        bd_qqs_KL_Channels = ['eta\':all  K_L0:klmecl']
+        bd_qqs_KL_Channels = ['eta\':SkimHighEff  K_L0:klmecl']
 
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',

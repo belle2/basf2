@@ -116,7 +116,7 @@ def _process_graph(self, idx):
     # Find the unmatched particles
     unmatched_rows = evt_p_index == -1
 
-    if self.subset_unmatched and np.any(unmatched_rows) and self.B_reco:
+    if np.any(unmatched_rows) and self.B_reco:
         # Create a random boolean array the same size as the number of leaves
         rand_mask = np.random.choice(a=[False, True], size=unmatched_rows.size)
         # AND the mask with the unmatched leaves
@@ -259,7 +259,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
             root (str): Path to ROOT files.
             n_files (int): Load only ``n_files`` files.
             samples (int): Load only ``samples`` events.
-            subset_unmatched (bool): Assign a random subset of unmatched particles to each B.
             features (list): List of node features names.
             edge_features (list): List of edge features names.
             global_features (list): List of global features names.
@@ -272,7 +271,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         root,
         n_files=None,
         samples=None,
-        subset_unmatched=True,
         features=[],
         edge_features=[],
         global_features=[],
@@ -289,8 +287,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         self.root = Path(root)
 
         self.normalize = normalize
-
-        self.subset_unmatched = subset_unmatched
 
         self.n_files = n_files
         self.node_features = features

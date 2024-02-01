@@ -8,8 +8,6 @@ dataset:
     edge_features: [costheta, doca]
     # Global input features (null to not use global features)
     global_features: null
-    # True to assign random subset of unmatched particle to each B, False to assign all unmatched particles to each B
-    subset_unmatched: True
     # You can configure simple normalization of features
     # They will be executed in the order given
     # Supported processes:

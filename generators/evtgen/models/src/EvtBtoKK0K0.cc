@@ -19,7 +19,7 @@
 #include "EvtGenBase/EvtConst.hh"
 #include "EvtGenBase/EvtId.hh"
 
-#include "generators/evtgen/models/EvtBtoKKLKL.h"
+#include "generators/evtgen/models/EvtBtoKK0K0.h"
 
 using std::endl;
 using namespace std::complex_literals;
@@ -27,21 +27,21 @@ using namespace std::complex_literals;
 namespace Belle2 {
 
   /** register the model in EvtGen */
-  B2_EVTGEN_REGISTER_MODEL(EvtBtoKKLKL);
+  B2_EVTGEN_REGISTER_MODEL(EvtBtoKK0K0);
 
-  EvtBtoKKLKL::~EvtBtoKKLKL() {}
+  EvtBtoKK0K0::~EvtBtoKK0K0() {}
 
-  std::string EvtBtoKKLKL::getName()
+  std::string EvtBtoKK0K0::getName()
   {
-    return "BTOKKLKL";
+    return "BTOKK0K0";
   }
 
-  EvtDecayBase* EvtBtoKKLKL::clone()
+  EvtDecayBase* EvtBtoKK0K0::clone()
   {
-    return new EvtBtoKKLKL;
+    return new EvtBtoKK0K0;
   }
 
-  void EvtBtoKKLKL::decay(EvtParticle* p)
+  void EvtBtoKK0K0::decay(EvtParticle* p)
   {
     // follow PhysRevD.85.112010
 
@@ -97,13 +97,13 @@ namespace Belle2 {
   }
 
 
-  void EvtBtoKKLKL::initProbMax()
+  void EvtBtoKK0K0::initProbMax()
   {
     noProbMax();
   }
 
 
-  void EvtBtoKKLKL::init()
+  void EvtBtoKK0K0::init()
   {
 
     // check that there are no arguments
@@ -142,7 +142,7 @@ namespace Belle2 {
 
   }
 
-  double EvtBtoKKLKL::Probability(double s13, double s23)
+  double EvtBtoKK0K0::Probability(double s13, double s23)
   {
     std::complex<double> total_amplitude = Amplitude(s13, s23, "f980", false) + Amplitude(s13, s23, "f1500", false) + Amplitude(s13,
                                            s23, "f1525", false) + Amplitude(s13, s23, "f1710", false) + Amplitude(s13, s23, "chic0", false) + Amplitude(s13, s23, "NR", false);
@@ -153,7 +153,7 @@ namespace Belle2 {
   }
 
 
-  std::complex<double> EvtBtoKKLKL::Amplitude(double s13, double s23, const char* resonance, bool isobar = false)
+  std::complex<double> EvtBtoKK0K0::Amplitude(double s13, double s23, const char* resonance, bool isobar = false)
   {
 
     if (strcmp(resonance, "f980") == 0) {
@@ -209,7 +209,7 @@ namespace Belle2 {
 
   }
 
-  std::complex<double> EvtBtoKKLKL::DynamicalAmplitude(double s13, double s23, const char* resonance)
+  std::complex<double> EvtBtoKK0K0::DynamicalAmplitude(double s13, double s23, const char* resonance)
   {
 
     if (strcmp(resonance, "f980") == 0) {
@@ -234,7 +234,7 @@ namespace Belle2 {
 
   }
 
-  std::complex<double> EvtBtoKKLKL::Flatte(double s13, double s23, const char* resonance)
+  std::complex<double> EvtBtoKK0K0::Flatte(double s13, double s23, const char* resonance)
   {
     double m0;
     double gpi;
@@ -257,7 +257,7 @@ namespace Belle2 {
     return 1.0 / ((m0 * m0 - m * m) - 1i * (gpi * rho_pipi + gK * rho_KK));
   }
 
-  std::complex<double> EvtBtoKKLKL::RBW(double s13, double s23, const char* resonance)
+  std::complex<double> EvtBtoKK0K0::RBW(double s13, double s23, const char* resonance)
   {
     double m0;
     double Gamma0;
@@ -289,7 +289,7 @@ namespace Belle2 {
     return 1.0 / (m0 * m0 - m * m - 1i * m0 * MassDepWidth(s13, s23, resonance));
   }
 
-  double EvtBtoKKLKL::MassDepWidth(double s13, double s23, const char* resonance)
+  double EvtBtoKK0K0::MassDepWidth(double s13, double s23, const char* resonance)
   {
     // Gamma(m) when s12 and s23
     int spin = -1;
@@ -328,7 +328,7 @@ namespace Belle2 {
     return Gamma0 * std::pow(q_mag / q0, 2 * spin + 1) * (m0 / m) * std::pow(BlattWeisskopf_qr(s13, s23, resonance), 2);
   }
 
-  double EvtBtoKKLKL::BlattWeisskopf_pstarrprime(double s13, double s23, const char* resonance)
+  double EvtBtoKK0K0::BlattWeisskopf_pstarrprime(double s13, double s23, const char* resonance)
   {
     // X_L(|p*|r') when s12 and s23
     int spin = -1;
@@ -365,7 +365,7 @@ namespace Belle2 {
 
   }
 
-  double EvtBtoKKLKL::BlattWeisskopf_qr(double s13, double s23, const char* resonance)
+  double EvtBtoKK0K0::BlattWeisskopf_qr(double s13, double s23, const char* resonance)
   {
     // X_L(|q|r) when s12 and s23
     int spin = -1;
@@ -402,7 +402,7 @@ namespace Belle2 {
 
   }
 
-  double EvtBtoKKLKL::Zemach(double s13, double s23, const char* resonance)
+  double EvtBtoKK0K0::Zemach(double s13, double s23, const char* resonance)
   {
 
     int spin;
@@ -435,41 +435,41 @@ namespace Belle2 {
 
   }
 
-  double EvtBtoKKLKL::Calculate_m(double s13, double s23)
+  double EvtBtoKK0K0::Calculate_m(double s13, double s23)
   {
     return std::sqrt(mB * mB + mKp * mKp + mKL0 * mKL0 + mKL0 * mKL0 - s13 - s23);
   }
 
-  double EvtBtoKKLKL::Calculate_q_mag(double s13, double s23)
+  double EvtBtoKK0K0::Calculate_q_mag(double s13, double s23)
   {
     double m = Calculate_m(s13, s23);
     return std::sqrt(m * m / 4.0 - mKL0 * mKL0);
   }
 
-  double EvtBtoKKLKL::Calculate_pstar_mag(double s13, double s23)
+  double EvtBtoKK0K0::Calculate_pstar_mag(double s13, double s23)
   {
     double m = Calculate_m(s13, s23);
     return std::sqrt(std::pow(mB * mB - m * m - mKp * mKp, 2) / 4.0 - m * m * mKp * mKp) / mB;
   }
 
-  double EvtBtoKKLKL::Calculate_p_mag(double s13, double s23)
+  double EvtBtoKK0K0::Calculate_p_mag(double s13, double s23)
   {
     double m = Calculate_m(s13, s23);
     double s12 = m * m;
     return std::sqrt(std::pow(mB * mB - s12 - mKp * mKp, 2) / (4 * s12) - mKp * mKp);
   }
 
-  double EvtBtoKKLKL::Calculate_q_dot_p_mag(double s13, double s23)
+  double EvtBtoKK0K0::Calculate_q_dot_p_mag(double s13, double s23)
   {
     return std::abs((s13 - s23) / 4.0);
   }
 
-  double EvtBtoKKLKL::DegreeToRadian(double degree)
+  double EvtBtoKK0K0::DegreeToRadian(double degree)
   {
     return (3.141592 * degree) / 180.0;
   }
 
-  void EvtBtoKKLKL::GetZeros()
+  void EvtBtoKK0K0::GetZeros()
   {
 
     // get q0 and pstar0 for f1500
@@ -490,7 +490,7 @@ namespace Belle2 {
 
   }
 
-  void EvtBtoKKLKL::GetMasses()
+  void EvtBtoKK0K0::GetMasses()
   {
     mB = EvtPDL::getMass(EvtPDL::getId("B+"));
     mKp = EvtPDL::getMass(EvtPDL::getId("K+"));

@@ -22,10 +22,10 @@ namespace Belle2 {
     * You can use the model as follows:
     *
     * Decay MyB+
-    * 1.0 K+ K_L0 K_L0           BTOKKLKL;
+    * 1.0 K+ K_L0 K_L0           BTOKK0K0;
     * Enddecay
     */
-  class EvtBtoKKLKL : public  EvtDecayIncoherent {
+  class EvtBtoKK0K0 : public  EvtDecayIncoherent {
 
 
   public:
@@ -33,12 +33,12 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    EvtBtoKKLKL() {}
+    EvtBtoKK0K0() {}
 
     /**
      * Destructor.
      */
-    virtual ~EvtBtoKKLKL();
+    virtual ~EvtBtoKK0K0();
 
     /**
      * The function which returns the name of the model.

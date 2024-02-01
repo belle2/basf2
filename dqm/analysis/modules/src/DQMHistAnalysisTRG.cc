@@ -74,10 +74,18 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGGRL", "h_ECLL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_peak", "ECLTRG_peak");
 
+  //ECLTRG_deadch
+  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
+
   //CDCTRG_2D_peak
 //  m_canvas_CDCTRG_2D_peak = new TCanvas("CDC/TRG_2D_peak");
   addDeltaPar("TRGGRL", "h_CDCL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_2D_peak", "CDCTRG_2D_peak");
+
+  //CDCTRG_deadch
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
   //NN_peak
 //  m_canvas_NN_peak = new TCanvas("NN_peak");
@@ -115,15 +123,15 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
 
-  //deadch_c_h_TCId
-//  m_canvas_deadch_c_h_TCId = new TCanvas("deadch_c_h_TCId");
-  addDeltaPar("TRG", "c_h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
-  registerEpicsPV(m_pvPrefix + "deadch_c_h_TCId", "deadch_c_h_TCId");
+  //ECLTRG_deadch
+//  m_canvas_ECLTRG_deadch = new TCanvas("ECLTRG_deadch");
+  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 3); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
-  //deadch_c_NeuroHWInTSID
-//  m_canvas_deadch_c_NeuroHWInTSID = new TCanvas("deadch_c_NeuroHWInTSID");
-  addDeltaPar("TRGCDCTNN", "c_NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
-  registerEpicsPV(m_pvPrefix + "deadch_c_NeuroHWInTSID", "deadch_c_NeuroHWInTSID");
+  //CDCTRG_deadch
+//  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 3); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
   //update PV
 //  updateEpicsPVs(
@@ -214,6 +222,19 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+// update ECLTRG deadch
+  auto hist_ECLTRG_deadch =  getDelta("TRG", "h_TCId", 0, true);// only if updated
+  if (hist_ECLTRG_deadch) {
+    hist_ECLTRG_deadch->Draw();
+    int numberOfBins = hist_ECLTRG_deadch->GetNbinsX();
+    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
+    int ECLTRG_deadch = 0;
+    for (int i = 1; i < numberOfBins; i++) {
+      if (hist_ECLTRG_deadch->GetBinContent(i + 1) <  0.01 * YMax) { ECLTRG_deadch += 1; cout << " i= " << i << " ; 0.01*YMax = " << 0.01 * YMax << endl;}
+    }
+    B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
+    setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
+  }
 //  m_canvas_CDCTRG_2D_peak->Clear();
 //  m_canvas_CDCTRG_2D_peak->cd(0);
 // update CDCTRG 2D peak
@@ -254,6 +275,21 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     B2DEBUG(1, "CDCTRG_TSF_peak:" << CDCTRG_TSF_peak);
     setEpicsPV("CDCTRG_TSF_peak", CDCTRG_TSF_peak);
 
+  }
+
+// update CDCTRG deadch
+  auto hist_CDCTRG_deadch =  getDelta("TRGCDCTNN", "NeuroHWInTSID", 0, true);// only if updated
+  if (hist_CDCTRG_deadch) {
+    hist_CDCTRG_deadch->Draw();
+    int numberOfBins = hist_CDCTRG_deadch->GetNbinsX();
+    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
+    cout << "numberOfBins =" << numberOfBins << endl;
+    int CDCTRG_deadch = 0;
+    for (int i = 1; i < numberOfBins; i++) {
+      if (hist_CDCTRG_deadch->GetBinContent(i + 1) < 0.01 * YMax) {CDCTRG_deadch += 1; cout << " i =" << i << " ;0.01* YMax = " << 0.01 * YMax; }
+    }
+    B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
+    setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);
   }
 
 //  m_canvas_KLMTRG_peak->Clear();
@@ -330,31 +366,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
-//  m_canvas_deadch_c_h_TCId->Clear();
-//  m_canvas_deadch_c_h_TCId->cd(0);
-// update #deadch_c_h_TCId
-  auto hist_c_h_TCId =  getDelta("TRG", "c_h_TCId", 0, true);// only if updated
-  if (hist_c_h_TCId) {
-    double deadch_c_h_TCId = 0.0;
-    hist_c_h_TCId->Draw();
-    deadch_c_h_TCId = hist_c_h_TCId->GetMaximum() * 0.01;
-    B2DEBUG(1, "deadch_c_h_TCId:" << deadch_c_h_TCId);
-    setEpicsPV("deadch_c_h_TCId", deadch_c_h_TCId);
-
-  }
-
-//  m_canvas_deadch_c_NeuroHWInTSID->Clear();
-//  m_canvas_deadch_c_NeuroHWInTSID->cd(0);
-// update #deadch_c_NeuroHWInTSID
-  auto hist_c_NeuroHWInTSID =  getDelta("TRGCDCTNN", "c_NeuroHWInTSID", 0, true);// only if updated
-  if (hist_c_NeuroHWInTSID) {
-    double deadch_c_NeuroHWInTSID = 0.0;
-    hist_c_NeuroHWInTSID->Draw();
-    deadch_c_NeuroHWInTSID = hist_c_NeuroHWInTSID->GetMaximum() * 0.01;
-    B2DEBUG(1, "deadch_c_NeuroHWInTSID:" << deadch_c_NeuroHWInTSID);
-    setEpicsPV("deadch_c_NeuroHWInTSID", deadch_c_NeuroHWInTSID);
-
-  }
 
 
 // update #mumu_tight/#bhabha_all
@@ -426,8 +437,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     UpdateCanvas(m_canvas_hadronb2_over_bhabha_all->GetName(), hist != nullptr);
     UpdateCanvas(m_canvas_mumu2trk_over_bhabha_all->GetName(), hist != nullptr);
     UpdateCanvas(m_canvas_hadronb2_over_mumu2trk->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_deadch_c_h_TCId->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_deadch_c_NeuroHWInTSID->GetName(), hist != nullptr);
+    UpdateCanvas(m_canvas_ECLTRG_deadch->GetName(), hist != nullptr);
+    UpdateCanvas(m_canvas_CDCTRG_deadch->GetName(), hist != nullptr);
   */
 
   // this if left over from jsroot, may not be needed anymore (to check)
@@ -445,8 +456,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     m_canvas_hadronb2_over_bhabha_all->Update();
     m_canvas_mumu2trk_over_bhabha_all->Update();
     m_canvas_hadronb2_over_mumu2trk->Update();
-    m_canvas_deadch_c_h_TCId->Update();
-    m_canvas_deadch_c_NeuroHWInTSID->Update();
+    m_canvas_ECLTRG_deadch->Update();
+    m_canvas_CDCTRG_deadch->Update();
   */
 
 }

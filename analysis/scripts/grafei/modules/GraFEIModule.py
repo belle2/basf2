@@ -168,55 +168,24 @@ class GraFEIModule(b2.Module):
             graFEI_nOthers_preFit = graFEI_nCharged_preFit - \
                 (graFEI_nLeptons_preFit + graFEI_nPions_preFit + graFEI_nKaons_preFit + graFEI_nProtons_preFit)
 
+            candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
+            candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)
+            candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
+            candidate.addExtraInfo("graFEI_nElectrons_preFit", graFEI_nElectrons_preFit)
+            candidate.addExtraInfo("graFEI_nMuons_preFit", graFEI_nMuons_preFit)
+            candidate.addExtraInfo("graFEI_nPions_preFit", graFEI_nPions_preFit)
+            candidate.addExtraInfo("graFEI_nKaons_preFit", graFEI_nKaons_preFit)
+            candidate.addExtraInfo("graFEI_nProtons_preFit", graFEI_nProtons_preFit)
+            candidate.addExtraInfo("graFEI_nLeptons_preFit", graFEI_nLeptons_preFit)
+            candidate.addExtraInfo("graFEI_nOthers_preFit", graFEI_nOthers_preFit)
+
             # Trivial decay tree
             if n_nodes < 2:
                 b2.B2WARNING(
                     f"Skipping candidate with {n_nodes} reconstructed FSPs"
                 )
 
-                candidate.addExtraInfo("graFEI_probEdgeProd", np.nan)
-                candidate.addExtraInfo("graFEI_probEdgeMean", np.nan)
-                candidate.addExtraInfo("graFEI_probEdgeGeom", np.nan)
-                candidate.addExtraInfo("graFEI_validTree", np.nan)
-                candidate.addExtraInfo("graFEI_goodEvent", np.nan)
-                candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
-                candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)
-                candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
-                candidate.addExtraInfo("graFEI_nElectrons_preFit", graFEI_nElectrons_preFit)
-                candidate.addExtraInfo("graFEI_nMuons_preFit", graFEI_nMuons_preFit)
-                candidate.addExtraInfo("graFEI_nPions_preFit", graFEI_nPions_preFit)
-                candidate.addExtraInfo("graFEI_nKaons_preFit", graFEI_nKaons_preFit)
-                candidate.addExtraInfo("graFEI_nProtons_preFit", graFEI_nProtons_preFit)
-                candidate.addExtraInfo("graFEI_nLeptons_preFit", graFEI_nLeptons_preFit)
-                candidate.addExtraInfo("graFEI_nOthers_preFit", graFEI_nOthers_preFit)
-                candidate.addExtraInfo("graFEI_nPhotons_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nCharged_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nElectrons_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nMuons_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nPions_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nKaons_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nProtons_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nLeptons_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nOthers_postFit", np.nan)
-                candidate.addExtraInfo("graFEI_nPredictedUnmatched", np.nan)
-                candidate.addExtraInfo("graFEI_nPredictedUnmatched_noPhotons", np.nan)
-
-                # if self.storeTrueInfo and Belle2.Environment.Instance().isMC():
-                if self.storeTrueInfo:
-                    candidate.addExtraInfo("graFEI_truth_perfectLCA", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_perfectMasses", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_perfectEvent", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_isSemileptonic", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nFSP", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nPhotons", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nElectrons", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nMuons", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nPions", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nKaons", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nProtons", np.nan)
-                    candidate.addExtraInfo("graFEI_truth_nOthers", np.nan)
-
-                return
+                continue
 
             # Initialize node features array
             x_nodes = np.empty((n_nodes, len(self.node_features)))
@@ -398,16 +367,6 @@ class GraFEIModule(b2.Module):
             candidate.addExtraInfo("graFEI_probEdgeGeom", graFEI_probEdgeGeom)
             candidate.addExtraInfo("graFEI_validTree", graFEI_validTree)
             candidate.addExtraInfo("graFEI_goodEvent", graFEI_goodEvent)
-            candidate.addExtraInfo("graFEI_nFSP", graFEI_nFSP)
-            candidate.addExtraInfo("graFEI_nPhotons_preFit", graFEI_nPhotons_preFit)
-            candidate.addExtraInfo("graFEI_nCharged_preFit", graFEI_nCharged_preFit)
-            candidate.addExtraInfo("graFEI_nElectrons_preFit", graFEI_nElectrons_preFit)
-            candidate.addExtraInfo("graFEI_nMuons_preFit", graFEI_nMuons_preFit)
-            candidate.addExtraInfo("graFEI_nPions_preFit", graFEI_nPions_preFit)
-            candidate.addExtraInfo("graFEI_nKaons_preFit", graFEI_nKaons_preFit)
-            candidate.addExtraInfo("graFEI_nProtons_preFit", graFEI_nProtons_preFit)
-            candidate.addExtraInfo("graFEI_nLeptons_preFit", graFEI_nLeptons_preFit)
-            candidate.addExtraInfo("graFEI_nOthers_preFit", graFEI_nOthers_preFit)
             candidate.addExtraInfo("graFEI_nPhotons_postFit", graFEI_nPhotons_postFit)
             candidate.addExtraInfo("graFEI_nCharged_postFit", graFEI_nCharged_postFit)
             candidate.addExtraInfo("graFEI_nElectrons_postFit", graFEI_nElectrons_postFit)

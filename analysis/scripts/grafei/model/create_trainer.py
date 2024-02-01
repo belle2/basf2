@@ -7,7 +7,7 @@ import collections.abc
 from datetime import datetime
 from pathlib import Path
 import yaml
-from .metrics import PerfectLCA, PerfectEvent, PerfectMasses  # , IsTrueB
+from .metrics import PerfectLCA, PerfectEvent, PerfectMasses
 
 
 class GraFEIIgniteTrainer:
@@ -88,7 +88,8 @@ class GraFEIIgniteTrainer:
             scaler = GradScaler(enabled=True)
 
         def _update_model(engine, batch):
-            model.train()  # This just sets the training mode, doesn't actually run the training which is done "manually" below
+            # This just sets the training mode
+            model.train()
 
             optimizer.zero_grad()
 
@@ -127,7 +128,8 @@ class GraFEIIgniteTrainer:
             # Setup metrics
             metrics = {
                 # ignite.metrics.Loss takes (y_pred, y, **kwargs) arguments.
-                # MultiTrainLoss needs in total 6 arguments to be computed, so the additional ones are passed in a dictionary.
+                # MultiTrainLoss needs in total 6 arguments to be computed,
+                # so the additional ones are passed in a dictionary.
                 "loss": ignite.metrics.Loss(
                     loss_fn,
                     output_transform=lambda x: [
@@ -164,24 +166,6 @@ class GraFEIIgniteTrainer:
                     ignore_background=True,
                 ),
             }
-            # if self.configs["model"]["global_layer"]:
-            #     metrics.update(
-            #         {
-            #             "correct_class": IsTrueB(
-            #                 ignore_index=ignore_index,
-            #                 output_transform=lambda x: [x[2], x[5], x[8]],
-            #                 device=device,
-            #             ),
-            #             # "momentum_loss": ignite.metrics.Loss(
-            #             #     B_MomentumLoss(reduction="mean"),
-            #             #     output_transform=lambda x: [
-            #             #         x[2][:, :3],
-            #             #         x[5][:, :3],
-            #             #     ],
-            #             #     device=device,
-            #             # ),
-            #         }
-            #     )
 
             def _predict_on_batch(engine, batch):
                 model.eval()  # It just enables evaluation mode
@@ -226,23 +210,17 @@ class GraFEIIgniteTrainer:
                 metric.attach(self.evaluators[tag], metric_name)
 
             # Add GPU memory info
-            if self.configs["train"]["record_gpu_usage"] and device == torch.device(
-                "cuda"
-            ):
+            if self.configs["train"]["record_gpu_usage"] and device == torch.device("cuda"):
                 ignite.contrib.metrics.GpuInfo().attach(
                     self.trainer, name="gpu"
-                )  # metric names are 'gpu:X mem(%)', 'gpu:X util(%)'
+                )
                 ignite.contrib.metrics.GpuInfo().attach(
                     self.evaluators[tag], name="gpu"
-                )  # metric names are 'gpu:X mem(%)', 'gpu:X util(%)'
+                )
 
     def _score_fn(self, engine):
         """Metric to use for early stoppging"""
         return engine.state.metrics["loss"]
-
-    # def _lca_score_fn(self, engine):
-    #     """Metric to use for checkpoints"""
-    #     return engine.state.metrics["perfectLCA"]
 
     def _perfect_score_fn(self, engine):
         """Metric to use for checkpoints"""
@@ -289,8 +267,6 @@ class GraFEIIgniteTrainer:
                 else None
             )
             pbar = ignite.contrib.handlers.ProgressBar(persist=True, bar_format="")
-            # pbar.attach(self.trainer, output_transform=lambda x: {'loss': x})
-            # pbar.attach(self.trainer, metric_names='all')
             pbar.attach(
                 self.trainer,
                 metric_names=progress_metrics,
@@ -384,9 +360,7 @@ class GraFEIIgniteTrainer:
 
             # Need to wrap this in autocast since it caculates metrics (i.e. loss) without autocast switched on
             # This is mostly fine except it fails to correctly cast the class weights tensor passed to the loss
-            if self.configs["train"]["mixed_precision"] and self.device == torch.device(
-                "cuda"
-            ):
+            if self.configs["train"]["mixed_precision"] and self.device == torch.device("cuda"):
                 with torch.cuda.amp.autocast():
                     evaluator.run(values[2], epoch_length=None)
             else:
@@ -396,19 +370,3 @@ class GraFEIIgniteTrainer:
             message = [f"{tag} Results - Epoch: {trainer.state.epoch}"]
             message.extend([f"Avg {m}: {metrics[m]:.4f}" for m in metrics])
             print(message)
-
-            # Prints an example of a predicted LCA (for debugging only)
-            # evaluator.state.output holds (y_pred, y)
-            if (
-                "print_sample" in self.configs["train"]
-                and self.configs["train"]["print_sample"]
-            ):
-                y_pred, y = evaluator.state.output
-                probs = torch.softmax(y_pred, dim=1)  # (N, C, d1, d2)
-                winners = probs.argmax(dim=1)  # (N, d1, d2)
-                mask = y == -1
-                winners[mask] = -1
-                print(values[1][0][0])  # Input features
-                print(winners[0])
-                print(y[0])
-                # print(values[2][0])

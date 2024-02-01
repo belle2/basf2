@@ -2,9 +2,7 @@ import numpy as np
 import uproot
 
 
-def populate_avail_samples(X, Y, B_reco=0,
-                           # allow_background=False,
-                           ):
+def populate_avail_samples(X, Y, B_reco=0):
     """
     Shifts through the file metadata to populate a list of available dataset samples.
 
@@ -22,11 +20,13 @@ def populate_avail_samples(X, Y, B_reco=0,
     # Must iterate over Y because X contains a b_index of -1 for unmatched particles
     avail_samples = []
 
-    for i, f in enumerate(Y):  # iterate over files in self.y
+    # Iterate over files in self.y
+    for i, f in enumerate(Y):
         # Have to get event list differently
         events = X[i]["event"]
 
-        for evt_idx, _ in enumerate(events):  # iterate over events in current file
+        # Iterate over events in current file
+        for evt_idx, _ in enumerate(events):
             b_indices = [1] if not B_reco else [1, 2]
 
             for b_index in b_indices:
@@ -37,15 +37,9 @@ def populate_avail_samples(X, Y, B_reco=0,
                     continue
 
                 # Fetch relevant event properties
-                # isUps = f["isUps"][evt_idx]
-
                 x_attrs = X[i]
                 evt_b_index = x_attrs["b_index"][evt_idx]
                 evt_primary = x_attrs["primary"][evt_idx]
-
-                # Keeping only signal events
-                # if not allow_background and not isUps:
-                #     continue
 
                 # particles coming from one or both Bs
                 matched = np.logical_or((evt_b_index == 1), (evt_b_index == 2)) if not B_reco else (evt_b_index == int(b_index))
@@ -95,7 +89,6 @@ def preload_root_data(root_files, features, discarded):
             }
 
             # Need this to initialise numpy features array in __getitem__
-            # x_dict['n_particles'] = tree['n_particles'].array(library='np')
             x_dict["leaves"] = tree["leaves"].array(library="np")
             x_dict["primary"] = tree["primary"].array(library="np")
             x_dict["b_index"] = tree["b_index"].array(library="np")
@@ -108,7 +101,6 @@ def preload_root_data(root_files, features, discarded):
                 y_dict[i]["n_LCA"] = tree[f"n_LCA_leaves_{i}"].array(library="np")
                 y_dict[i]["LCA"] = tree[f"LCAS_{i}"].array(library="np")
                 y_dict[i]["LCA_leaves"] = tree[f"LCA_leaves_{i}"].array(library="np")
-                # y_dict[i]["isB"] = tree[f"isB_{i}"].array(library="np")
 
             x.append(x_dict)
             y.append(y_dict)

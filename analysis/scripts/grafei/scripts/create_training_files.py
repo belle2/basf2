@@ -26,9 +26,6 @@ def _get_args():
     parser.add_argument('-t', '--type', choices=['B0', 'B+', 'Ups'], required=True,
                         help='Training target', metavar='type',
                         dest='type')
-    # parser.add_argument('-b', '--bkg_prob', required=False, default=0., type=float,
-    #                     help="Choose probability of an event to be constructed as background",
-    #                     dest='bkg_prob')
     return parser.parse_args()
 
 
@@ -36,8 +33,6 @@ if __name__ == '__main__':
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
     args = _get_args()
-
-    # assert args.bkg_prob >= 0 and args.bkg_prob <= 1, "Background probability should be in [0, 1]"
 
     input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
 
@@ -132,9 +127,7 @@ if __name__ == '__main__':
         # 'E',
         'charge',
         # 'M',
-        # 'PDG',
         # Neutral variables
-        # 'clusterReg',
         'clusterNHits',
         'clusterTiming',
         'clusterE9E25',
@@ -166,7 +159,6 @@ if __name__ == '__main__':
         b_parent_var=b_parent_var,
         mcparticle_list=mc_particle_name[args.type],
         output_file=f'graFEI_train_{input_file.stem}.root',
-        # bkg_prob=args.bkg_prob,
     )
     path.add_module(root_saver_module)
 

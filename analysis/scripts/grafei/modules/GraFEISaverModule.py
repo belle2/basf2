@@ -357,7 +357,6 @@ class GraFEISaverModule(b2.Module):
 
             # Check if event is good, depending on the chosen sig-side LCA matrix/masses
             graFEI_goodEvent = 0
-            # graFEI_goodTopology = 0
             if graFEI_validTree:
                 # Check if the event is good
                 good_decay, root_level, sig_side_fsps = select_good_decay(predicted_LCA_square_matched,
@@ -392,7 +391,6 @@ class GraFEISaverModule(b2.Module):
             graFEI_probEdgeProd = edge_probability_unique.prod().item()
             graFEI_probEdgeMean = edge_probability_unique.mean().item()
             graFEI_probEdgeGeom = torch.pow(edge_probability_unique.prod(), 1/n_nodes).item()
-            # graFEI_B_probGlobal = torch.sigmoid(u_pred[0][0]).item()
 
             # Add extra info for each B candidate
             candidate.addExtraInfo("graFEI_probEdgeProd", graFEI_probEdgeProd)
@@ -469,9 +467,8 @@ class GraFEISaverModule(b2.Module):
                 graFEI_truth_perfectLCA = 0  # 1 if LCA perfectly reconstructed
                 graFEI_truth_isSemileptonic = -1  # 0 if hadronic, 1 is semileptonic, -1 if not matched
                 graFEI_truth_nFSP = -1  # Number of true FSPs
-                graFEI_truth_perfectMasses = int(
-                    (predicted_masses.numpy() == p_masses).all()
-                )  # Check if all the masses are predicted correctly
+                graFEI_truth_perfectMasses = int((predicted_masses.numpy() == p_masses).all()
+                                                 )  # Check if all the masses are predicted correctly
                 graFEI_truth_nPhotons = (p_masses == 6).sum()
                 graFEI_truth_nElectrons = (p_masses == 1).sum()
                 graFEI_truth_nMuons = (p_masses == 2).sum()
@@ -570,12 +567,14 @@ class GraFEISaverModule(b2.Module):
 
                         primaries_from_right_cand = np.logical_and(evt_primary, x_rows)
 
+                        # Set the rows
                         true_LCA_square = np.where(
                             primaries_from_right_cand, true_LCA_square, 0
-                        )  # Set the rows
+                        )
+                        # Set the columns
                         true_LCA_square = np.where(
                             primaries_from_right_cand[:, None], true_LCA_square, 0
-                        )  # Set the columns
+                        )
 
                         # Convert LCA to tensor
                         true_LCA_square = torch.tensor(true_LCA_square, dtype=int)

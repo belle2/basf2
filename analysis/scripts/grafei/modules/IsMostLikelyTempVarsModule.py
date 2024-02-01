@@ -97,6 +97,3 @@ class IsMostLikelyTempVars(b2.Module):
                     "IsMostLikelyTempVars",
                     1 if ordered_names[np.argmax(probs)] == p_name else 0,
                 )
-
-    # def terminate(self):
-    #     b2.B2INFO("Most likely selection finished")

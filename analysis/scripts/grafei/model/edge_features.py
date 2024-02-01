@@ -26,26 +26,28 @@ def compute_doca(name_values):
 
     n_parts = len(px)
 
-    v = np.cross(p, p[:, None]).reshape(-1, 3)  # Momenta cross-product
-    v_norm = np.linalg.norm(v, axis=1).reshape((-1, 1))  # Norm of each cross-product
-    v_norm[
-        v_norm == 0
-    ] = 1  # Suppress divide by 0 warnings in the diagonal (anyway it will be ignored)
+    # Momenta cross-product
+    v = np.cross(p, p[:, None]).reshape(-1, 3)
+    # Norm of each cross-product
+    v_norm = np.linalg.norm(v, axis=1).reshape((-1, 1))
+    # Suppress divide by 0 warnings in the diagonal (anyway it will be ignored)
+    v_norm[v_norm == 0] = 1
     v_u = v / v_norm
 
-    dr = np.subtract(r, r[:, None]).reshape(-1, 3)  # Difference in 3-positions
+    # Difference in 3-positions
+    dr = np.subtract(r, r[:, None]).reshape(-1, 3)
+    # Dot products between r and v_u
     dr_x_vu = (
         np.dot(dr, v_u.T).diagonal().reshape((1, -1))
-    )  # Dot products between r and v_u
+    )
 
     # Doca computed here
     doca = np.linalg.norm(v_u * dr_x_vu.T - dr * (v_norm < eps), axis=1).reshape(
         n_parts, n_parts
     )
 
-    return doca[
-        ~np.eye(doca.shape[0], dtype=bool)
-    ]  # Remove diagonal elements and flatten
+    # Remove diagonal elements and flatten
+    return doca[~np.eye(doca.shape[0], dtype=bool)]
 
 
 def compute_cosTheta(name_values):
@@ -66,12 +68,12 @@ def compute_cosTheta(name_values):
 
     costheta = np.inner(u, u)
 
-    return costheta[
-        ~np.eye(costheta.shape[0], dtype=bool)
-    ]  # remove diagonal elements and flatten
+    # Remove diagonal elements and flatten
+    return costheta[~np.eye(costheta.shape[0], dtype=bool)]
 
 
-available_features = {  # put here available features with respective functions (prepend edge_ to the name)
+# Put here available features with respective functions (prepend edge_ to the name)
+available_features = {
     "edge_costheta": compute_cosTheta,
     "edge_doca": compute_doca,
 }
@@ -103,8 +105,7 @@ def compute_edge_features(edge_feature_names, features, x):
     """
 
     # Will be filled and converted to np.ndarray of shape [E, F_e] with
-    # E=nodes*(nodes-1) (assume no self-interactions) and F_e number of edge
-    # features
+    # E=nodes*(nodes-1) (assume no self-interactions) and F_e number of edge features
     edge_features = []
     # Remove `feat_` from feature names
     features = [f.replace("feat_", "") for f in features]

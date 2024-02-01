@@ -142,7 +142,7 @@ def write_hist(
         # Only append primaries to history
         if particle.isPrimaryParticle():
             hist.append(particle.getArrayIndex())
-            # save all PDG values of the in between primary particles
+            # Save all PDG values of the in between primary particles
             pdg[particle.getArrayIndex()] = particle.getPDG()
 
         # Now iterate over daughters passing history down
@@ -200,11 +200,9 @@ class RootSaverModule(b2.Module):
         self.b_parent_var = b_parent_var
         self.mcparticle_list = mcparticle_list
         self.output_file = output_file
-        # self.bkg_probability = bkg_prob
 
         # Set a max num particles, it doesn't actually matter what this is as long as it's bigger than
         # any events we'll encounter. ROOT won't save all entries
-        # And yeah it's dumb but that's because root fucking sucks
         self.max_particles = 500
 
     def initialize(self):
@@ -212,7 +210,6 @@ class RootSaverModule(b2.Module):
         self.eventinfo = Belle2.PyStoreObj("EventMetaData")
 
         # Create the output file, fails if exists
-        # self.h5_outfile = h5py.File(self.output_file, 'w-')
         self.root_outfile = root.TFile(self.output_file, "recreate")
         self.tree = root.TTree("Tree", "tree")
 
@@ -230,9 +227,6 @@ class RootSaverModule(b2.Module):
 
         # LCA data
         self.truth_dict = {}
-
-        # self.truth_dict["isB"] = np.zeros(1, dtype=np.int32)
-        # self.tree.Branch("isB", self.truth_dict["isB"], "isB/b")
 
         # We assume at most two LCA matrices for event
         for i in [1, 2]:
@@ -259,8 +253,6 @@ class RootSaverModule(b2.Module):
             self.tree.Branch(
                 f"LCAS_{i}", self.truth_dict[f"LCAS_{i}"], f"LCAS_{i}[n_LCA_{i}]/b"
             )
-
-        # print(f'LCA dictionary initialized as {self.truth_dict}')
 
         # Feature data
         # Here use one number to indicate how many particles were reconstructed
@@ -311,9 +303,6 @@ class RootSaverModule(b2.Module):
         elif self.mcparticle_list == "B+:MC":
             self.isB[0] = 2
 
-        # Is background flag
-        # bkg_event = np.random.rand(1) > (1 - self.bkg_probability)
-
         # ### Create the LCA
         # IMPORTANT: The ArrayIndex is 0-based.
         # mcplist contains the root particles we are to create LCAs from
@@ -329,9 +318,6 @@ class RootSaverModule(b2.Module):
                 # while if we train on the Upsilon, _1 will correspond to it and _2 will remain empty
                 # becaus getArrayIndex() gives 0 for the Upsilon and 1, 2 for the B's
                 array_index = 1 if self.isB[0] == 0 else mcp.getArrayIndex()
-
-                # Get the B flag
-                # self.truth_dict["isB"][0] = int(not bkg_event)
 
                 # Call function to write history of leaves in the tree.
                 # It internally calls function update_levels to find and save the level of each particle in the tree.
@@ -355,7 +341,7 @@ class RootSaverModule(b2.Module):
                 for x, y in combinations(enumerate(lcas_leaf_hist), 2):
                     lcas_intersection = [
                         i for i in lcas_leaf_hist[x[1]] if i in lcas_leaf_hist[y[1]]
-                    ]  # Such pythonic, much order
+                    ]
                     lcas[x[0], y[0]] = lcas_levels[lcas_intersection[-1]]
                     lcas[y[0], x[0]] = lcas_levels[lcas_intersection[-1]]
 
@@ -396,18 +382,10 @@ class RootSaverModule(b2.Module):
                         p_primary = particle.getMCParticle().isPrimaryParticle()
                         # Save particle's PDG code
                         mc_pdg = particle.getMCParticle().getPDG()
-                        # Generate random b_index if event is background
-                        # if bkg_event:
-                        #     b_index = (
-                        #         int(1 if b_index == 2 else 2)
-                        #         if np.random.rand(1) > 0.5
-                        #         else b_index
-                        #     )
                     else:
                         p_index = -1
                         p_primary = False
                         mc_pdg = 0
-                        # Count the unmatched particle to both side
 
                     evt_leaf_dict["primary"].append(p_primary)
                     evt_leaf_dict["leaves"].append(p_index)
@@ -433,6 +411,5 @@ class RootSaverModule(b2.Module):
 
     def terminate(self):
         """"""
-        # self.h5_outfile.close()
         self.root_outfile.Write()
         self.root_outfile.Close()

@@ -31,10 +31,7 @@ def _preload(self):
     if len(self.x_files) == 0:
         raise RuntimeError(f"No files found in {self.root}")
 
-    # self.root_trees = [uproot.open(f)["Tree"] for f in self.x_files]
-    # Save the features, ignoring any specified
-    # NOTE: We are assuming all files have the same features
-    # self.features = [f for f in self.root_trees[0].keys() if f.startswith("feat_")]
+    # Save the features
     with uproot.open(self.x_files[0])["Tree"] as t:
         self.features = [f for f in t.keys() if f.startswith("feat_")]
         self.B_reco = int(stats.mode(t["isB"].array(library="np"), keepdims=False).mode)
@@ -59,7 +56,6 @@ def _preload(self):
 
     # Preload data
     self.x, self.y = preload_root_data(
-        # self.root_trees,
         self.x_files,
         self.features,
         self.discarded,
@@ -184,7 +180,7 @@ def _process_graph(self, idx):
             x_global,
         )
 
-    # ## Reorder LCA
+    # Reorder LCA
 
     # Get LCA indices in order that the leaves appear in reconstructed particles
     # Secondaries aren't in the LCA leaves list so they get a 0
@@ -200,8 +196,6 @@ def _process_graph(self, idx):
     # If we are this will contain duplicates (since secondary locs are set to 0)
     # We can't load the firs locs directly (i.e. y_item[locs, :]) because locs is (intentionally) unsorted
     y_edge = y_item["LCA"][evt].reshape((n_LCA, n_LCA)).astype(int)
-    # Get the Upsilon(4S) flag
-    # y_isUps = y_item["isUps"][evt]
     # Get the true mcPDG pf FSPs
     y_mass = masses_to_classes(x_item["mc_pdg"][evt][x_rows])
 
@@ -216,27 +210,26 @@ def _process_graph(self, idx):
     # Set diagonal to -1 (actually not necessary but ok...)
     np.fill_diagonal(y_edge, -1)
 
-    # # Ignore true LCA and masses on background events
-    # if not y_isUps:
-    #     y_edge.fill(-1)
-    #     y_mass.fill(-1)
-
     n_nodes = x.shape[0]
 
+    # Target edge tensor: shape [E]
     edge_y = torch.tensor(
         y_edge[np.eye(n_nodes) == 0],
         dtype=torch.long
-    )  # Target edge tensor: shape [E]
+    )
+    # Fill tensor with edge indices: shape [N*(N-1), 2] == [E, 2]
     edge_index = torch.tensor(
         list(itertools.permutations(range(n_nodes), 2)),
         dtype=torch.long,
-    )  # Fill tensor with edge indices: shape [N*(N-1), 2] == [E, 2]
+    )
 
+    # Target global tensor: shape [B, F_g]
     u_y = torch.tensor(
         [[1]], dtype=torch.float
-    )  # Target global tensor: shape [B, F_g]
+    )
 
-    x_y = torch.tensor(y_mass, dtype=torch.long)  # Target node tensor: shape [N]
+    # Target node tensor: shape [N]
+    x_y = torch.tensor(y_mass, dtype=torch.long)
 
     g = Data(
         x=torch.tensor(x, dtype=torch.float),

@@ -10,7 +10,6 @@ dataset:
     global_features: null
     # True to assign random subset of unmatched particle to each B, False to assign all unmatched particles to each B
     subset_unmatched: True
-    # allow_background: False (not used)
     # You can configure simple normalization of features
     # They will be executed in the order given
     # Supported processes:
@@ -20,22 +19,14 @@ dataset:
       clusterNHits: [[linear, 6.9, 3.2]]
       clusterTiming: [[power, 0.5], [linear, -0.5, 4.1]]
       clusterE9E25: [[linear, 0.96, 0.06]]
-      # p: [[power, 0.5], [linear, 0.6, 0.2]]
       pt: [[power, 0.5], [linear, 0.5, 0.2]]
-      # E: [[power, 0.5], [linear, 0.6, 0.25]]
       pz: [[power, 0.5], [linear, 0.42, 0.23]]
       dr: [[power, 0.25], [linear, 0.16, 0.19]]
       dz: [[power, 0.25], [linear, 0.41, 0.15]]
       doca: [[linear, 0.02, 0.04]]
-      #electronID : [[linear, 0.1, 0.25]]
-      #kaonID : [[linear, 0.14, 0.33]]
-      #muonID : [[linear, 0.19, 0.3]]
-      #protonID : [[linear, 0.03, 0.14]]
-      #pionID : [[linear, 0.53, 0.41]]
 output:
   # Top directory to save model (null to not save it, e.g. for testing). run_name as subdir and timestamp suffix will be added automatically
   path: null # /home/my_name/some_output_folder 
-  #tensorboard: null
   # Name of the training
   run_name: test
 train:
@@ -67,10 +58,6 @@ model:
   global_layer: True
   # compute 'mean' or 'sum' of losses across the batch. 'sum' is unstable and leads to errors during training
   loss_reduction: mean
-  # Parameter to tune the learning of B probability (not used)
-  # alpha_prob: 0 
-  # Parameter to tune the learning of B momentum (not used)
-  # alpha_momentum: 0 
   # Parameter to tune the learning of masses of FSP
   alpha_mass: 1 
   # Dimension of hidden layers

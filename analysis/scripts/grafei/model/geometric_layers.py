@@ -64,9 +64,8 @@ class EdgeLayer(nn.Module):
         self.dropout_prob = dropout
         self.normalize = normalize
 
-        out_bias = (
-            True if self.normalize is None else False
-        )  # Bias in lin_out activated only if batchnorm/layernorm not used
+        # Bias in lin_out activated only if batchnorm/layernorm not used
+        out_bias = True if self.normalize is None else False
 
         self.lin_in = nn.Linear(
             efeat_in_dim + 2 * nfeat_in_dim + gfeat_in_dim, efeat_hid_dim
@@ -169,9 +168,8 @@ class NodeLayer(nn.Module):
         self.dropout_prob = dropout
         self.normalize = normalize
 
-        out_bias = (
-            True if self.normalize is None else False
-        )  # Bias in lin_out activated only if batchnorm/layernorm not used
+        # Bias in lin_out activated only if batchnorm/layernorm not used
+        out_bias = True if self.normalize is None else False
 
         self.lin_in = nn.Linear(
             gfeat_in_dim + nfeat_in_dim + efeat_in_dim, nfeat_hid_dim
@@ -283,9 +281,8 @@ class GlobalLayer(nn.Module):
         self.dropout_prob = dropout
         self.normalize = normalize
 
-        out_bias = (
-            True if self.normalize is None else False
-        )  # Bias in lin_out activated only if batchnorm/layernorm not used
+        # Bias in lin_out activated only if batchnorm/layernorm not used
+        out_bias = True if self.normalize is None else False
 
         self.lin_in = nn.Linear(
             nfeat_in_dim + efeat_in_dim + gfeat_in_dim, gfeat_hid_dim
@@ -313,15 +310,18 @@ class GlobalLayer(nn.Module):
         # u: [B, F_u]
         # batch: [N] with max entry B - 1.
 
+        # Nodes are averaged over graph
         node_mean = scatter(
             x, batch, dim=0, reduce="mean"
-        )  # Nodes are averaged over graph
+        )
+        # Edges are averaged over nodes
         edge_mean = scatter(
             edge_attr, edge_index[1], dim=0, reduce="mean"
-        )  # Edges are averaged over nodes
+        )
+        # Edges are averaged over graph
         edge_mean = scatter(
             edge_mean, batch, dim=0, reduce="mean"
-        )  # Edges are averaged over graph
+        )
         out = (
             torch.cat([u, node_mean, edge_mean], dim=1)
             if u.shape != torch.Size([0])

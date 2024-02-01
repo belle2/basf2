@@ -111,7 +111,7 @@ class GraFEIModel(torch.nn.Module):
                         num_hid_layers,
                         dropout,
                         normalize,
-                    ),  # Increased input dimensionality because of skip connections
+                    ),
                     NodeLayer(
                         hidden_layer_dim,
                         hidden_layer_dim,
@@ -147,8 +147,8 @@ class GraFEIModel(torch.nn.Module):
                 edge_classes,
                 num_hid_layers,
                 dropout,
-                normalize=None,
-            ),  # Do not normalize output layer
+                normalize=None,  # Do not normalize output layer
+            ),
             NodeLayer(
                 hidden_layer_dim,
                 edge_classes,
@@ -157,7 +157,7 @@ class GraFEIModel(torch.nn.Module):
                 x_classes,
                 num_hid_layers,
                 dropout,
-                normalize=None,
+                normalize=None,  # Do not normalize output layer
             ),
             GlobalLayer(
                 x_classes,
@@ -167,7 +167,7 @@ class GraFEIModel(torch.nn.Module):
                 1,
                 num_hid_layers,
                 dropout,
-                normalize=None,
+                normalize=None,  # Do not normalize output layer
             )
             if global_layer
             else None,
@@ -198,10 +198,8 @@ class GraFEIModel(torch.nn.Module):
                 x=x, edge_index=edge_index, edge_attr=edge_attr, u=u, batch=torch_batch
             )
 
-            # x = torch.cat([x, x_skip], dim=1)  # Skip connections are concatenated
-            # edge_attr = torch.cat([edge_attr, edge_skip], dim=1)
-            # u = torch.cat([u, u_skip], dim=1)
-            x += x_skip  # Skip connections are added
+            # Skip connections are added
+            x += x_skip
             edge_attr += edge_skip
             u += u_skip
 
@@ -216,15 +214,18 @@ class GraFEIModel(torch.nn.Module):
             edge_index_t = edge_index[[1, 0]]  # edge_index transposed
 
             for i in range(edge_attr.shape[1]):
+                # edge_attr converted to sparse tensor...
                 edge_matrix = torch.sparse_coo_tensor(
                     edge_index, edge_attr[:, i]
-                )  # edge_attr converted to sparse tensor...
+                )
+                # ... and its transposed
                 edge_matrix_t = torch.sparse_coo_tensor(
                     edge_index_t, edge_attr[:, i]
-                )  # ... and its transposed
+                )
 
+                # Symmetrization happens here
                 edge_attr[:, i] = (
                     ((edge_matrix + edge_matrix_t) / 2.0).coalesce()
-                ).values()  # Symmetrization happens here
+                ).values()
 
         return x, edge_attr, u

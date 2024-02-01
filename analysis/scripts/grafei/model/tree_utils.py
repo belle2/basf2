@@ -55,9 +55,9 @@ def _connectedness_dfs(adjacency_matrix, index, reached):
     n = adjacency_matrix.shape[0]
     reached[index] = 1
 
-    # traverse through all
+    # Traverse through all
     for column in range(n):
-        # recursively search for connectedness nodes that are adjacent and avoid nodes already marked as reachable
+        # Recursively search for connectedness nodes that are adjacent and avoid nodes already marked as reachable
         if adjacency_matrix[index, column] != 0 and not reached[column]:
             _connectedness_dfs(adjacency_matrix, column, reached)
 

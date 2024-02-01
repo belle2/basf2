@@ -60,12 +60,6 @@ def main(
         samples=n_samples,
     )
 
-    # assert configs["model"]["global_layer"] or (
-    #     not configs["model"]["global_layer"]
-    #     and configs["model"]["alpha_momentum"] == 0
-    #     and configs["model"]["alpha_prob"] == 0
-    # ), "You can not learn B probability and/or B momentum without global layer"
-
     # Random seed
     if configs["train"]["seed"]:
         seed = configs["train"]["seed"]
@@ -120,10 +114,7 @@ def main(
     loss_fn = MultiTrainLoss(
         ignore_index=-1,
         reduction=configs["model"]["loss_reduction"],
-        # alpha_momentum=configs["model"]["alpha_momentum"],
         alpha_mass=configs["model"]["alpha_mass"],
-        # alpha_prob=configs["model"]["alpha_prob"],
-        # global_layer=configs["model"]["global_layer"],
     )
 
     # Set the optimiser

@@ -30,7 +30,6 @@ class Node:
         self.lca_index = lca_index
         self.lcas_level = lcas_level
 
-        # self.actual_level = level  # It won't be modified
         self.parent = None
         self.bfs_index = -1
         self.dfs_index = -1
@@ -93,11 +92,11 @@ def _breadth_first_enumeration(root, queue, adjacency_matrix):
     """
     Enumerates the tree breadth-first into a queue.
     """
-    # insert current root node into the queue
+    # Insert current root node into the queue
     level = root.level
     queue.setdefault(level, []).append(root)
 
-    # enumerate the children
+    # Enumerate the children
     for child in root.children:
         _breadth_first_enumeration(child, queue, adjacency_matrix)
 
@@ -110,14 +109,14 @@ def _breadth_first_adjacency(root, adjacency_matrix):
     """
     queue = _breadth_first_enumeration(root, {}, adjacency_matrix)
 
-    # on recursion end in the root node, traverse the tree once to assign bfs ids to each node
+    # On recursion end in the root node, traverse the tree once to assign bfs ids to each node
     index = 0
     for i in range(root.level, 0, -1):
         for node in queue[i]:
             node.bfs_index = index
             index += 1
 
-    # then traverse the tree again to fill in the adjacencies
+    # Then traverse the tree again to fill in the adjacencies
     for i in range(root.level, 0, -1):
         for node in queue[i]:
             for child in node.children:
@@ -171,31 +170,31 @@ def _reconstruct(lca_matrix):
     # Want to skip over leaves
     levels.remove(0)
 
-    # create nodes for all leaves
+    # Create nodes for all leaves
     leaves = [Node(1, [], lca_index=i) for i in range(n)]
 
-    # iterate level-by-level through the matrix, starting from immediate connections
+    # Iterate level-by-level through the matrix, starting from immediate connections
     # we can correct missing intermediate levels here too
     # Just use current_level to check the actual LCA entry, once we know which level it is
     # (ignoring missed levels) then use the index (corrected level)
     # for current_level in range(1, depths + 1):
     for idx, current_level in enumerate(levels, 1):
-        # iterate through each leaf in the LCA matrix
+        # Iterate through each leaf in the LCA matrix
         for column in range(n):
-            # iterate through all corresponding nodes
-            # the LCA matrix is symmetric, hence, check only the from the diagonal down
+            # Iterate through all corresponding nodes
+            # The LCA matrix is symmetric, hence, check only the from the diagonal down
             for row in range(column + 1, n):
-                # skip over entries not in current level
+                # Skip over entries not in current level
                 if lca_matrix[row, column] <= 0:
                     raise InvalidLCAMatrix
                 elif lca_matrix[row, column] != current_level:
                     continue
 
-                # get the nodes
+                # Get the nodes
                 a_node = leaves[column]
                 another_node = leaves[row]
 
-                # determine the ancestors of both nodes
+                # Determine the ancestors of both nodes
                 an_ancestor = _get_ancestor(a_node)
                 a_level = an_ancestor.level
 
@@ -220,7 +219,6 @@ def _reconstruct(lca_matrix):
                 # The nodes don't have an ancestor at the level we're inspecting.
                 # We need to make one and connect them to it
                 elif a_level < idx + 1 and another_level < idx + 1:
-                    # parent = Node(max(a_level, another_level) + 1, [an_ancestor, another_ancestor])
                     parent = Node(idx + 1, [an_ancestor, another_ancestor], lcas_level=current_level)
                     an_ancestor.parent = parent
                     another_ancestor.parent = parent
@@ -235,7 +233,7 @@ def _reconstruct(lca_matrix):
                     another_ancestor.parent = an_ancestor
                     an_ancestor.children.append(another_ancestor)
 
-                # same for right
+                # Same for right
                 elif a_level < idx + 1 and another_level == idx + 1:
                     an_ancestor.parent = another_ancestor
                     another_ancestor.children.append(an_ancestor)
@@ -249,7 +247,7 @@ def _reconstruct(lca_matrix):
     for leaf in leaves:
         _pull_down(leaf)
 
-    # we have created the tree structure, let's initialize the adjacency matrix and find the root to traverse from
+    # We have created the tree structure, let's initialize the adjacency matrix and find the root to traverse from
     root = _get_ancestor(leaves[0])
 
     return root, total_nodes
@@ -277,11 +275,11 @@ def lca_to_adjacency(lca_matrix, format="bfs"):
     Raises:
         InvalidLCAMatrix: If passed LCA matrix is malformed (e.g. not 2d or not square) or does not encode a tree.
     """
-    # sanitize the output format
+    # Sanitize the output format
     if format not in {"bfs", "dfs"}:
         raise ValueError(f"format must be one of bfs|dfs, but was {format}")
 
-    # ensure input is torch tensor or can be converted to it
+    # Ensure input is torch tensor or can be converted to it
     if not isinstance(lca_matrix, t.Tensor):
         try:
             lca_matrix = t.Tensor(lca_matrix)
@@ -289,16 +287,16 @@ def lca_to_adjacency(lca_matrix, format="bfs"):
             print(f"Input type must be compatible with torch Tensor: {err}")
             raise
 
-    # ensure two dimensions
+    # Ensure two dimensions
     if len(lca_matrix.shape) != 2:
         raise InvalidLCAMatrix
 
-    # ensure that it is square
+    # Ensure that it is square
     n, m = lca_matrix.shape
     if n != m:
         raise InvalidLCAMatrix
 
-    # check symmetry
+    # Check symmetry
     if not (lca_matrix == lca_matrix.T).all():
         raise InvalidLCAMatrix
 
@@ -307,7 +305,7 @@ def lca_to_adjacency(lca_matrix, format="bfs"):
     except IndexError:
         raise InvalidLCAMatrix
 
-    # allocate the adjacency matrix
+    # Allocate the adjacency matrix
     adjacency_matrix = t.zeros((total_nodes, total_nodes), dtype=t.int64)
     try:
         if format == "bfs":
@@ -317,7 +315,7 @@ def lca_to_adjacency(lca_matrix, format="bfs"):
     except IndexError:
         raise InvalidLCAMatrix
 
-    # check whether what we reconstructed is actually a tree - might be a regular graph for example
+    # Check whether what we reconstructed is actually a tree - might be a regular graph for example
     if not is_valid_tree(adjacency_matrix):
         raise InvalidLCAMatrix
 

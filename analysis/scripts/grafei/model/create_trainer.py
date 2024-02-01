@@ -1,5 +1,4 @@
 import ignite
-from ignite.contrib.handlers.tensorboard_logger import TensorboardLogger, OutputHandler, WeightsHistHandler
 import torch
 from torch_geometric.data import Batch
 import numpy as np
@@ -55,8 +54,6 @@ class GraFEIIgniteTrainer:
 
         # Output directory for checkpoints
         self.run_dir = None
-        # Output directory for Tensorboard logging
-        self.tb_dir = None
         if self.configs["output"] is not None:
             if ("path" in self.configs["output"].keys()) and (
                 self.configs["output"]["path"] is not None
@@ -64,16 +61,6 @@ class GraFEIIgniteTrainer:
                 self.run_dir = Path(
                     self.configs["output"]["path"],
                     self.configs["output"]["run_name"],
-                )
-
-            if ("tensorboard" in self.configs["output"].keys()) and (
-                self.configs["output"]["tensorboard"] is not None
-            ):
-                # Need a timestamp to organise runs in tensorboard
-                self.tb_dir = Path(
-                    self.configs["output"]["tensorboard"],
-                    self.configs["output"]["run_name"],
-                    self.timestamp,
                 )
 
         # Setup ignite trainer
@@ -283,36 +270,6 @@ class GraFEIIgniteTrainer:
             )
             self.evaluators["Validation"].add_event_handler(
                 ignite.engine.Events.EPOCH_COMPLETED, best_model_handler
-            )
-
-        # Attach Tensorboard logging
-        if self.tb_dir is not None:
-            tb_logger = TensorboardLogger(
-                log_dir=self.tb_dir, max_queue=1
-            )
-
-            # Attach the logger to the evaluator on the training and validation dataset and log NLL, Accuracy metrics after
-            # each epoch. We setup `global_step_transform=global_step_from_engine(trainer)` to take the epoch of the
-            # `trainer` instead of `evaluator`.
-            for tag in self.tags:
-                tb_logger.attach(
-                    self.evaluators[tag],
-                    event_name=ignite.engine.Events.EPOCH_COMPLETED,
-                    log_handler=OutputHandler(
-                        tag=tag,
-                        metric_names="all",
-                        global_step_transform=ignite.handlers.global_step_from_engine(
-                            self.trainer
-                        ),
-                    ),
-                )
-            # Attach logger to trainer in order to save model weights as histograms
-            tb_logger.attach(
-                self.trainer,
-                event_name=ignite.engine.Events.EPOCH_COMPLETED,
-                log_handler=WeightsHistHandler(
-                    self.model
-                ),
             )
 
         return

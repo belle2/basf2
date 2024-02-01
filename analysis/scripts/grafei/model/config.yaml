@@ -68,5 +68,3 @@ model:
   num_ML: 1
   # Dropout rate
   dropout: 0.3
-  # Whether to symmetrize output LCAS matrices
-  symmetrize: True

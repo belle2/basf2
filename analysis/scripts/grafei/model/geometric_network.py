@@ -35,7 +35,6 @@ class GraFEIModel(torch.nn.Module):
             num_hid_layers (int): Number of hidden layers in every MetaLayer.
             num_ML (int): Number of intermediate MetaLayers.
             droput (float): Dropout rate :math:`r \\in [0,1]`.
-            symmetrize (bool): Whether to symmetrize LCAS matrix at the end.
             global_layer (bool): Whether to use global layer.
 
         :return: Node, edge and global features after model evaluation.
@@ -53,13 +52,11 @@ class GraFEIModel(torch.nn.Module):
         num_hid_layers=1,
         num_ML=1,
         dropout=0.0,
-        symmetrize=True,
         global_layer=True,
         **kwargs
     ):
         super(GraFEIModel, self).__init__()
 
-        self.symmetrize = symmetrize
         self.x_classes = x_classes
         self.edge_classes = edge_classes
 
@@ -202,22 +199,21 @@ class GraFEIModel(torch.nn.Module):
         )
 
         # Edge labels are symmetrized
-        if self.symmetrize:
-            edge_index_t = edge_index[[1, 0]]  # edge_index transposed
+        edge_index_t = edge_index[[1, 0]]  # edge_index transposed
 
-            for i in range(edge_attr.shape[1]):
-                # edge_attr converted to sparse tensor...
-                edge_matrix = torch.sparse_coo_tensor(
-                    edge_index, edge_attr[:, i]
-                )
-                # ... and its transposed
-                edge_matrix_t = torch.sparse_coo_tensor(
-                    edge_index_t, edge_attr[:, i]
-                )
+        for i in range(edge_attr.shape[1]):
+            # edge_attr converted to sparse tensor...
+            edge_matrix = torch.sparse_coo_tensor(
+                edge_index, edge_attr[:, i]
+            )
+            # ... and its transposed
+            edge_matrix_t = torch.sparse_coo_tensor(
+                edge_index_t, edge_attr[:, i]
+            )
 
-                # Symmetrization happens here
-                edge_attr[:, i] = (
-                    ((edge_matrix + edge_matrix_t) / 2.0).coalesce()
-                ).values()
+            # Symmetrization happens here
+            edge_attr[:, i] = (
+                ((edge_matrix + edge_matrix_t) / 2.0).coalesce()
+            ).values()
 
         return x, edge_attr, u

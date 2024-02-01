@@ -138,6 +138,7 @@ class XToD0_D0ToNeutrals(BaseSkim):
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = None
 
     def load_standard_lists(self, path):
         loadStdSkimPi0(path=path)
@@ -218,6 +219,7 @@ class DstToD0Pi_D0ToRare(BaseSkim):
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = None
 
     def load_standard_lists(self, path):
         charm_skim_std_charged('e', path=path)
@@ -479,6 +481,7 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = None
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -873,6 +876,7 @@ class DstToD0Pi_D0ToNeutrals(XToD0_D0ToNeutrals):
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = None
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)

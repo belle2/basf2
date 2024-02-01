@@ -70,9 +70,9 @@ class TrainDataSaver(b2.Module):
     Save MCParticles to Pandas Dataframe.
 
     Arguments:
-        output_file (str): Filename to save training data to.
-            Ending with `parquet` indicating fast mode, which will generate the final parquet file for training.
-            Ending with `h5` indicating advanced mode, which will produce a temperary h5 file for further preprocessing.
+        output_file (str): Filename to save training data.
+            Ending with ``parquet`` indicating fast mode, which will generate the final parquet file for training.
+            Ending with ``h5`` indicating advanced mode, which will produce a temperary h5 file for further preprocessing.
         flag_file (str): Filename of the flag file indicating passing events.
 
     Returns:
@@ -126,8 +126,10 @@ class TrainDataSaver(b2.Module):
     def terminate(self):
         """
         Append events on disk in either of the two different ways and free memory.
+
         In fast mode, the dataframe containing particle-level information and skim labels is preprocessed
         and saved as a parquet file which is ready for NN training.
+
         In advanced mode, the dataframe is saved as a h5 file and waits for combination with event-level information
         before preprocessing.
         """
@@ -141,21 +143,18 @@ class TrainDataSaver(b2.Module):
 class data_production():
     """
     Process data for training and save to Parquet file. Two modes are provided:
-    Fast mode: `save_vars` set to `None`, produce the dataset with only the necessary information for the training.
-    Advanced mode: `save_vars` set to a dictionary of event-level variables,
-        run through hard-coded b2 steering code in `self.process_b2script` to produce the required particle lists
-        and save the required variables, can be used for event-level cuts or evaluations of the NN performance.
+    Fast mode: save_vars set to None, produce the dataset with only the necessary information for the training.
+    Advanced mode: save_vars set to a dictionary of event-level variables,
+    run through hard-coded b2 steering code in self.process_b2script to produce the required particle lists
+    and save the required variables, can be used for event-level cuts or evaluations of the NN performance.
 
     Arguments:
         in_dir (str): Input directory.
         out_dir (str): Output directory.
         job_id (int): Job ID for batch processing.
         save_vars (dict): Event-level variables to save for different particles.
-            By default `None` for fast mode.
+            By default None for fast mode.
             In the example script having Y4S and B keys for the corresponding particle list.
-
-        dataName (str): Data file name prefix.
-        flagName (str): Flag file name prefix.
 
     Returns:
         None
@@ -169,8 +168,8 @@ class data_production():
         :param out_dir: Output directory.
         :param job_id: Job ID for batch processing.
         :param save_vars: Event-level variables to save for different particles.
-            By default `None` for fast mode.
-            In the example script having Y4S and B keys for the corresponding particle list.
+        By default None for fast mode.
+        In the example script having Y4S and B keys for the corresponding particle list.
         """
         dataName = '_submdst'
         flagName = '_flag'
@@ -257,7 +256,7 @@ class data_production():
 
     def merge_files(self):
         """
-        Merge file of particle-level information (`MC`) with those of event-level information (`Y4S`, `B`).
+        Merge file of particle-level information (MC) with those of event-level information (Y4S, B).
         Preprocess and save to disk as Parquet file in form of Awkward Array.
         """
         df = pd.read_hdf(self.temp_file['MC'], key='mc_information')

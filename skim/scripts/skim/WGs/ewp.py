@@ -51,7 +51,7 @@ class BtoXgamma(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -158,7 +158,7 @@ class BtoXll(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -275,7 +275,7 @@ class BtoXll_LFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

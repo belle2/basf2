@@ -112,6 +112,7 @@ class TauLFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -327,6 +328,7 @@ class TauGeneric(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -457,6 +459,7 @@ class TauThrust(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 
@@ -561,6 +564,7 @@ class TauKshort(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, tau"
 
+    ApplyHLTHadronCut = False
     produce_on_tau_samples = False  # retention is too high on taupair
     validation_sample = _VALIDATION_SAMPLE
 

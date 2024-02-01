@@ -8,7 +8,7 @@ from ROOT import Belle2
 from variables import variables as vm
 import random
 import argparse
-from grafei import GraFEISaverModule
+from grafei import GraFEIModule
 from grafei import FlagBDecayModule
 
 # Random seeds
@@ -131,7 +131,7 @@ if mc:
     ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
     # ma.matchMCTruth("Upsilon(4S):graFEI", path=path)
 
-graFEI = GraFEISaverModule(
+graFEI = GraFEIModule(
     "Upsilon(4S):graFEI",
     cfg_path=cfg_file,
     param_file=weight_file,

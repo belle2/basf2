@@ -23,7 +23,7 @@ warnings.filterwarnings(
 )
 
 
-class GraFEISaverModule(b2.Module):
+class GraFEIModule(b2.Module):
     """
         Applies graFEI model to a particle list in basf2.
         GraFEI information is stored as extraInfos.

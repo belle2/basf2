@@ -72,7 +72,7 @@ Applying the model to data
 The model ``.yaml`` and ``.pt`` output files can be saved to a payload with the script ``grafei/scripts/save_model_to_payload.py`` 
 and uploaded to a global tag in order to run on the grid.
 
-Finally, the model can be included in a steering file via the modules `FlagBDecayModule <grafei.FlagBDecayModule>` and `GraFEISaverModule <grafei.GraFEISaverModule>`, 
+Finally, the model can be included in a steering file via the modules `FlagBDecayModule <grafei.FlagBDecayModule>` and `GraFEIModule <grafei.GraFEIModule>`, 
 in order to apply the model to Belle II data and MC.
 Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``grafei/scripts/steering_file_examples``.
 In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI`` can be added.
@@ -110,7 +110,7 @@ The ``PART:graFEI`` particle lists in the example are those used as input for th
 The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong to the signal-side, 0 for particles predicted to belong to the tag-side
 and -1 for particles in events with ``graFEI_goodEvent = 0``. Therefore, if you want meaningful distributions you should cut on events with ``graFEI_goodEvent = 1``.
 
-The variables added by the `GraFEISaverModule <grafei.GraFEISaverModule>` are filled with ``nan`` if there are less than two reconstructed particles in the event.
+The variables added by the `GraFEIModule <grafei.GraFEIModule>` are filled with ``nan`` if there are less than two reconstructed particles in the event.
 Otherwise, they are defined as follows:
 
 ======================================== ==================================================================================================================================

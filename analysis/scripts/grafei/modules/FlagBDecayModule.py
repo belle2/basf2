@@ -30,7 +30,7 @@ class FlagBDecayModule(b2.Module):
 
     .. note::
         Assumes MC matching has been run on the particle list.
-        When processing MC, this module must be put necessarily before `GraFEISaverModule` in order to save MC-truth information.
+        When processing MC, this module must be put necessarily before `GraFEIModule` in order to save MC-truth information.
 
     Args:
         particle_list (str): Name of source particle list.

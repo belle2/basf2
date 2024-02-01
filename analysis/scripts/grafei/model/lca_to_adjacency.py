@@ -124,38 +124,6 @@ def _breadth_first_adjacency(root, adjacency_matrix):
                 adjacency_matrix[child.bfs_index, node.bfs_index] = 1
 
 
-def _depth_first_enumeration(root, index):
-    """
-    Fills the passed adjacency matrix based on the tree spanned by ``root``.
-    """
-    root.dfs_index = index
-    branch_index = index
-
-    for child in root.children:
-        branch_index = _depth_first_enumeration(child, branch_index + 1)
-
-    return branch_index
-
-
-def _depth_first_labeling(root, adjacency_matrix):
-    """
-    Sets the adjacencies for the a node and its children depth-first.
-    """
-    for child in root.children:
-        adjacency_matrix[child.dfs_index, root.dfs_index] = 1
-        adjacency_matrix[root.dfs_index, child.dfs_index] = 1
-
-        _depth_first_labeling(child, adjacency_matrix)
-
-
-def _depth_first_adjacency(root, adjacency_matrix):
-    """
-    Fills the passed adjacency matrix based on the tree spanned by ``root``.
-    """
-    _depth_first_enumeration(root, index=0)
-    _depth_first_labeling(root, adjacency_matrix)
-
-
 def _reconstruct(lca_matrix):
     """
     Does the actual heavy lifting of the adjacency matrix reconstruction. Traverses the LCA matrix level-by-level,
@@ -253,7 +221,7 @@ def _reconstruct(lca_matrix):
     return root, total_nodes
 
 
-def lca_to_adjacency(lca_matrix, format="bfs"):
+def lca_to_adjacency(lca_matrix):
     """
     Converts a tree's LCA matrix representation, i.e. a square matrix (M, M) where each row/column corresponds to
     a leaf of the tree and each matrix entry is the level of the lowest-common-ancestor (LCA) of the two leaves, into
@@ -275,9 +243,6 @@ def lca_to_adjacency(lca_matrix, format="bfs"):
     Raises:
         InvalidLCAMatrix: If passed LCA matrix is malformed (e.g. not 2d or not square) or does not encode a tree.
     """
-    # Sanitize the output format
-    if format not in {"bfs", "dfs"}:
-        raise ValueError(f"format must be one of bfs|dfs, but was {format}")
 
     # Ensure input is torch tensor or can be converted to it
     if not isinstance(lca_matrix, t.Tensor):
@@ -308,10 +273,7 @@ def lca_to_adjacency(lca_matrix, format="bfs"):
     # Allocate the adjacency matrix
     adjacency_matrix = t.zeros((total_nodes, total_nodes), dtype=t.int64)
     try:
-        if format == "bfs":
-            _breadth_first_adjacency(root, adjacency_matrix)
-        else:
-            _depth_first_adjacency(root, adjacency_matrix)
+        _breadth_first_adjacency(root, adjacency_matrix)
     except IndexError:
         raise InvalidLCAMatrix
 

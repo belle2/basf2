@@ -25,8 +25,9 @@ print(r"""
                        / \     / \       \
                       x   x   x   x       x
 
-      Authors: Jacopo Cerasoli, Giulio Dujany, Lucas Martel, Corentin Santos 2022 - 2023
+      Authors: Jacopo Cerasoli, Giulio Dujany, Lucas Martel, Corentin Santos. 2022 - 2024
       Model description: https://indico.cern.ch/event/1106990/papers/4996235/files/12252-ACAT_2022_proceedings.pdf
-      Based on the work of Kahn et al: 10.1088/2632-2153/ac8de0 (https://github.com/Helmholtz-AI-Energy/BaumBauen)
+      Based on the work of Kahn et al: https://iopscience.iop.org/article/10.1088/2632-2153/ac8de0
       Please consider citing both articles.
+      Code adapted from https://github.com/Helmholtz-AI-Energy/BaumBauen
       """)

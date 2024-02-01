@@ -45,7 +45,7 @@ class SystematicsDstar(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -93,7 +93,7 @@ class SystematicsTracking(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -183,7 +183,7 @@ class Resonance(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -343,7 +343,7 @@ class SystematicsRadMuMu(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)
@@ -388,7 +388,7 @@ class SystematicsEELL(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, lepton ID"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -433,7 +433,7 @@ class SystematicsRadEE(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -510,7 +510,7 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdLambdas(path=path)
@@ -550,7 +550,7 @@ class SystematicsPhiGamma(BaseSkim):
     __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     TestSampleProcess = "ccbar"
     validation_sample = _VALIDATION_SAMPLE
@@ -607,7 +607,7 @@ class Random(BaseSkim):
     __description__ = "Random skim to select a fixed fraction of events."
     __category__ = "systematics, random"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def __init__(self, KeepPercentage=10, seed=None, **kwargs):
         """
@@ -701,7 +701,7 @@ class SystematicsJpsi(BaseSkim):
     __contact__ = __liaison_leptonID__
     __category__ = "systematics, leptonID"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)

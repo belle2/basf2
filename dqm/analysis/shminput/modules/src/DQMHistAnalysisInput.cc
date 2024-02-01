@@ -157,11 +157,12 @@ void DQMHistAnalysisInputModule::event()
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
     m_expno = 122;
     m_runno = 1;
-    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString()).c_str());
+    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString() + ", Last DQM event " + std::string(
+                                                  mbstr)).c_str());
   } else {
     if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "
                                                 + m_lastChange + ", Last Updated "
-                                                + mmt.AsString()).c_str());
+                                                + mmt.AsString() + ", Last DQM event " + std::string(mbstr)).c_str());
     m_expno = std::stoi(expno);
     m_runno = std::stoi(runno);
   }

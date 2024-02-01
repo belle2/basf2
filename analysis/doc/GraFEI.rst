@@ -195,6 +195,7 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.geometric_datasets
    :members:
+   :exclude-members: process
 
 .. automodule:: grafei.model.geometric_layers
    :members:

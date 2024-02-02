@@ -674,7 +674,7 @@ void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 
   canvas->Pad()->SetFillColor(color);
 
-  canvas->Pad()->SetFrameFillColor(10); // White
+  canvas->Pad()->SetFrameFillColor(10); // White (kWhite is not used since it results in transparent!)
   canvas->Pad()->SetFrameFillStyle(1001);// White
   canvas->Pad()->Modified();
   canvas->Pad()->Update();

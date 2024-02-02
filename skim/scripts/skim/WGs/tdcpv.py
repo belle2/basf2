@@ -418,6 +418,7 @@ class TDCPV_dilepton(BaseSkim):
     __category__ = "physics, leptonic"
 
     NoisyModules = ["EventShapeCalculator"]
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

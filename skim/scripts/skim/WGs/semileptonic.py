@@ -74,6 +74,8 @@ class PRsemileptonicUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
+    ApplyHLTHadronCut = False
+
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -188,6 +190,8 @@ class SLUntagged(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
+
+    ApplyHLTHadronCut = False
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -409,6 +413,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     __description__ = "Skim for semileptonic tags with an ROE electron, muon, photon or a low-multiplicity signal decay"
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
+
+    ApplyHLTHadronCut = False
 
     TestSampleProcess = "charged"
 

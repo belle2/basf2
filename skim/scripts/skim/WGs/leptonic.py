@@ -44,6 +44,7 @@ class LeptonicUntagged(BaseSkim):
     __category__ = "physics, leptonic"
 
     validation_sample = _VALIDATION_SAMPLE
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

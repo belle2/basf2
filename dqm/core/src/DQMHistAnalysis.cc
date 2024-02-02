@@ -245,7 +245,9 @@ void DQMHistAnalysisModule::clearCanvases(void)
 
   while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
     if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      (dynamic_cast<TCanvas*>(cobj))->Clear();
+      TCanvas* cnv = dynamic_cast<TCanvas*>(cobj);
+      cnv->Clear();
+      colorizeCanvas(cnv, c_StatusDefault);
     }
   }
 }
@@ -672,7 +674,7 @@ void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 
   canvas->Pad()->SetFillColor(color);
 
-  canvas->Pad()->SetFrameFillColor(kWhite - 1); // White
+  canvas->Pad()->SetFrameFillColor(10); // White (kWhite is not used since it results in transparent!)
   canvas->Pad()->SetFrameFillStyle(1001);// White
   canvas->Pad()->Modified();
   canvas->Pad()->Update();

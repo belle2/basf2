@@ -113,12 +113,12 @@ void DQMHistAnalysisTrackingHLTModule::event()
     if (abortRate > m_failureRateThreshold)
       hasError = true;
 
+    m_cAbortRate->cd();
+    hAbort->Draw();
+
     if (nEvents < m_statThreshold) colorizeCanvas(m_cAbortRate, EStatus::c_StatusTooFew);
     else if (hasError) colorizeCanvas(m_cAbortRate, EStatus::c_StatusError);
     else colorizeCanvas(m_cAbortRate, EStatus::c_StatusGood);
-
-    m_cAbortRate->cd();
-    hAbort->Draw();
 
   } else { // histogram not found
     B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");

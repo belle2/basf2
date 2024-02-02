@@ -214,7 +214,6 @@ class TDCPV_qqs(BaseSkim):
 
     def validation_histograms(self, path):
         ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
-        ma.reconstructMissingKlongDecayExpert("B0:etap_KL -> eta':SkimHighEff K_L0:klmecl", 'abs(deltaE) < 0.250', path=path)
 
         Kres = 'K_10'
         ma.applyCuts('gamma:E15', '1.4 < E < 4', path=path)
@@ -228,7 +227,7 @@ class TDCPV_qqs(BaseSkim):
         ma.variablesToHistogram('B0:etap', variableshisto, filename=filename, path=path, directory="etap")
         ma.variablesToHistogram('B0:Kspipig', variableshisto, filename=filename, path=path, directory="Kspipig")
         variableshisto = [('deltaE', 135, -0.020, 0.250)]
-        ma.variablesToHistogram('B0:etap_KL', variableshisto, filename=filename, path=path, directory="KL_etap")
+        ma.variablesToHistogram('B0:TDCPV_qqs_KL0', variableshisto, filename=filename, path=path, directory="KL_etap")
 
 
 @fancy_skim_header

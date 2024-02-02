@@ -242,23 +242,15 @@ namespace Belle2 {
   std::complex<double> EvtB0toK0K0K0::RBW(double s13, double s23, const char* resonance)
   {
     double m0;
-    double Gamma0;
-    int spin = -1;
 
     double m = Calculate_m(s13, s23);
 
     if (strcmp(resonance, "f1710") == 0) {
-      spin = spin_f1710;
       m0 = m0_f1710;
-      Gamma0 = Gamma0_f1710;
     } else if (strcmp(resonance, "f2010") == 0) {
-      spin = spin_f2010;
       m0 = m0_f2010;
-      Gamma0 = Gamma0_f2010;
     } else if (strcmp(resonance, "chic0") == 0) {
-      spin = spin_chic0;
       m0 = m0_chic0;
-      Gamma0 = Gamma0_chic0;
     } else {
       printf("[RBW] unsupported resonance\n");
       exit(1);

@@ -67,16 +67,16 @@ void DQMHistAnalysisECLSummaryModule::initialize()
     // By crate
     for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
       std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
-      registerEpicsPV(m_pvPrefix + pv_name, pv_name, false);
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
     // Totals
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = (boost::format("%s:%s") % ecl_part % alarm.name).str();
-      registerEpicsPV(m_pvPrefix + pv_name, pv_name, false);
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
     // Masked Cell IDs
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
-    registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name, false);
+    registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name);
   }
   updateEpicsPVs(5.0);
 

@@ -74,7 +74,7 @@ class PRsemileptonicUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -191,7 +191,7 @@ class SLUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = False
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -414,7 +414,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = None
+    ApplyHLTHadronCut = True
 
     TestSampleProcess = "charged"
 

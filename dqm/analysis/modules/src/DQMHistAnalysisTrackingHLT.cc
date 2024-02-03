@@ -81,14 +81,14 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   m_monObj = getMonitoringObject("trackingHLT");
 
   // register the PVs for setting thresholds
-  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents", false);
+  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents");
 
   // variables to be monitored via EPICS
-  registerEpicsPV("trackingHLT:nTracksPerEvent", "nTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:abortRate", "abortRate", false);
+  registerEpicsPV("trackingHLT:nTracksPerEvent", "nTracksPerEvent");
+  registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent");
+  registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent");
+  registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent");
+  registerEpicsPV("trackingHLT:abortRate", "abortRate");
 
 }
 

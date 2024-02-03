@@ -304,8 +304,17 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+{
+  return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
+}
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname, bool update_pvs)
+int DQMHistAnalysisModule::registerExternalEpicsPV(std::string pvname, std::string keyname)
+{
+  return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
+}
+
+int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -322,9 +331,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   // the subscribed name includes the prefix, the map below does *not*
-  SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
-
-  if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  SEVCHK(ca_create_channel((prefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;

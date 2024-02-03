@@ -163,16 +163,17 @@ void DQMHistAnalysisTOPModule::initialize()
 
 void DQMHistAnalysisTOPModule::beginRun()
 {
-  auto* h = findHist("DQMInfo/rtype");
-  std::string title = h ? h->GetTitle() : "";
-  m_IsNullRun = (title == "null");
-
   B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
 
 void DQMHistAnalysisTOPModule::event()
 {
+  // get type of the run (TODO: to be replaced with base class function when fixed)
+  auto* rtype = findHist("DQMInfo/rtype");
+  m_runType = rtype ? rtype->GetTitle() : "";
+  m_IsNullRun = (m_runType == "null");
+
   bool zeroSupp = gStyle->GetHistMinimumZero();
   gStyle->SetHistMinimumZero(true);
 
@@ -203,11 +204,13 @@ void DQMHistAnalysisTOPModule::event()
   setZAxisRange("TOP/good_hits_asics_", 3);
   setZAxisRange("TOP/bad_hits_asics_", 30);
 
-  // Background subtracted time distributions
-  auto* trackHits = (TH2F*) findHist("TOP/trackHits");
-  makeBGSubtractedTimimgPlot("goodHitTimes", trackHits, 0);
-  for (int slot = 1; slot <= 16; slot++) {
-    makeBGSubtractedTimimgPlot("good_timing_" + to_string(slot), trackHits, slot);
+  // Background subtracted time distributions (only for physics runs)
+  if (m_runType == "physics") {
+    auto* trackHits = (TH2F*) findHist("TOP/trackHits");
+    makeBGSubtractedTimimgPlot("goodHitTimes", trackHits, 0);
+    for (int slot = 1; slot <= 16; slot++) {
+      makeBGSubtractedTimimgPlot("good_timing_" + to_string(slot), trackHits, slot);
+    }
   }
 
   // Set Epics variables

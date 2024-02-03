@@ -219,6 +219,7 @@ namespace Belle2 {
     int m_alarmStateOverall = 0; /**< overall alarm state of histograms to be sent by EpicsPV */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
+    std::string m_runType; /**< Run type */
 
     TH1D* m_windowFractions = nullptr; /**< fraction of windows outside the band denoting good windows, per slot */
     double m_totalWindowFraction = 0;  /**< total fraction of windows outside the band */

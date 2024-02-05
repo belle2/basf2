@@ -10741,6 +10741,7 @@ c
       end
 c**************************************************************************
       subroutine ddvec(rk1,eck1,uupp1,uupp2,vv1,vv2,ddpl,ddmi,qq)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'     
       complex*16 gam(4),eck1(4),eck2(4),dd(4),dee(4),dmm(4),
      1               protF1,protF2

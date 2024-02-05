@@ -313,6 +313,18 @@ void ECLDigitCalibratorModule::event()
     aECLCalDigit->setTwoComponentTotalEnergy(-1);
     aECLCalDigit->setTwoComponentHadronEnergy(-1);
     aECLCalDigit->setTwoComponentDiodeEnergy(-1);
+    //copy online fit quality from ECLDigit
+    const int online_quality =  aECLDigit.getQuality();
+    if (online_quality == 1) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality1);
+    } else if (online_quality == 2) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality2);
+    } else if (online_quality == 3) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality3);
+    } else if (online_quality == 0) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality0);
+    }
+
     if (aECLDsp) {
       //require ECLDigit to have offline waveform
       if (aECLDsp->getTwoComponentChi2() > 0) {

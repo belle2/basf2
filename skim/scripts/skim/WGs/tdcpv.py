@@ -213,6 +213,10 @@ class TDCPV_qqs(BaseSkim):
         return bd_qqs_List + bu_qqs_List + bd_qqs_KL_List
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import ValidationMetadataSetter
+
         ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
         Kres = 'K_10'
@@ -224,6 +228,12 @@ class TDCPV_qqs(BaseSkim):
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
         filename = f'{self}_Validation.root'
+        metadata = []
+        for directory in ["etap", "Kspipig"]:
+            metadata.append(['deltaE', directory, '#Delta E', __liaison__,
+                            'Energy difference of B', '', '#Delta E [GeV]', 'Candidates'])
+            metadata.append(['Mbc', directory, 'Mbc', __liaison__, 'Beam-constrained mass', '', 'M_{bc} [GeV]', 'Candidates'])
+        path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:etap', variableshisto, filename=filename, path=path, directory="etap")
         ma.variablesToHistogram('B0:Kspipig', variableshisto, filename=filename, path=path, directory="Kspipig")
         variableshisto = [('deltaE', 135, -0.020, 0.250)]
@@ -389,11 +399,22 @@ class TDCPV_ccs(BaseSkim):
         return bd_ccs_List + bPlustoJPsiK_List + b0toJPsiKL_List
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import ValidationMetadataSetter
+
         ma.reconstructDecay('B0:jpsiee -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
         ma.reconstructDecay('B0:jpsimumu -> J/psi:mumu K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         filename = f'{self}_Validation.root'
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
+        metadata = []
+        for directory in ["jpsiee", "jpsimumu", "KLjpsimumu", "KLjpsiee"]:
+            metadata.append(['deltaE', directory, '#Delta E', __liaison__,
+                            'Energy difference of B', '', '#Delta E [GeV]', 'Candidates'])
+        for directory in ["jpsiee", "jpsimumu"]:
+            metadata.append(['Mbc', directory, 'Mbc', __liaison__, 'Beam-constrained mass', '', 'M_{bc} [GeV]', 'Candidates'])
+        path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:jpsiee', variableshisto, filename=filename, path=path, directory="jpsiee")
         ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
 

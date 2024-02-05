@@ -759,34 +759,80 @@ def rootobjects_from_file(
         if not root_object:
             continue
 
-        root_object_type = get_root_object_type(root_object)
-        if not root_object_type:
-            # get_root_object_type returns "" for any type that we're not
-            # interested in
+        # If a TDirectory is saved in the file, we step down into the subdirectory
+        if root_object.InheritsFrom("TDirectory"):
+            for sub_key in root_object.GetListOfKeys():
+                # Get ROOT object related to key
+                sub_root_object = sub_key.ReadObj()
+                if not sub_root_object:
+                    continue
+
+                sub_root_object_type = get_root_object_type(sub_root_object)
+                if not sub_root_object_type:
+                    # get_root_object_type returns "" for any type that we're not
+                    # interested in
+                    continue
+
+                # Ensure that the data read from the ROOT files lives on even
+                # after the ROOT file is closed
+                if sub_root_object.InheritsFrom("TH1"):
+                    sub_root_object.SetDirectory(0)
+
+                # Retrieve the metadata
+                metadata = get_metadata(sub_root_object)
+
+                if sub_root_object_type == "TNtuple":
+                    # Go to first entry in the n-tuple
+                    sub_root_object.GetEntry(0)
+
+                    # Storage for the values of the n-tuple. We use a dictionary,
+                    # because we can't access the n-tuple's values anymore after
+                    # closing the ROOT file (<=> histograms)
+                    ntuple_values = {}
+                    for leaf in sub_root_object.GetListOfLeaves():
+                        ntuple_values[leaf.GetName()] = leaf.GetValue()
+
+                    # Overwrite 'root_object' with the dictionary that contains the
+                    # values, because the values are what we want to save, and we
+                    # want to use the same RootObject()-call for both histograms and
+                    # n-tuples :-)
+                    sub_root_object = ntuple_values
+
+                sub_name = f"{name}_{sub_key.GetName()}"
+                key2object[sub_name].append(
+                    RootObject(
+                        revision,
+                        package,
+                        root_file,
+                        sub_name,
+                        sub_root_object,
+                        sub_root_object_type,
+                        dir_date,
+                        metadata["description"],
+                        metadata["check"],
+                        metadata["contact"],
+                        metadata["metaoptions"],
+                        is_reference,
+                    )
+                )
             continue
 
-        # Ensure that the data read from the ROOT files lives on even
-        # after the ROOT file is closed
+        root_object_type = get_root_object_type(root_object)
+        if not root_object_type:
+            continue
+
         if root_object.InheritsFrom("TH1"):
             root_object.SetDirectory(0)
 
         metadata = get_metadata(root_object)
 
         if root_object_type == "TNtuple":
-            # Go to first entry in the n-tuple
             root_object.GetEntry(0)
 
-            # Storage for the values of the n-tuple. We use a dictionary,
-            # because we can't access the n-tuple's values anymore after
-            # closing the ROOT file (<=> histograms)
             ntuple_values = {}
             for leaf in root_object.GetListOfLeaves():
                 ntuple_values[leaf.GetName()] = leaf.GetValue()
 
-            # Overwrite 'root_object' with the dictionary that contains the
-            # values, because the values are what we want to save, and we
-            # want to use the same RootObject()-call for both histograms and
-            # n-tuples :-)
             root_object = ntuple_values
 
         key2object[name].append(

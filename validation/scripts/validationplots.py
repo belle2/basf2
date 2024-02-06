@@ -700,6 +700,77 @@ def get_metadata(root_object: ROOT.TObject) -> Dict[str, Any]:
     return metadata
 
 
+def add_rootobject(
+    root_object: ROOT.TObject,
+    key2object: Dict[str, List[RootObject]],
+    name: str,
+    revision: str,
+    package: str,
+    root_file: str,
+    dir_date: str,
+    is_reference: bool,
+) -> None:
+    """
+    Add a root object with all its metadata to a dictionary
+
+    @param root_object      root object that shall be added to the dictionary
+    @param key2object       dictionary of all root objects
+    @param name             name of root object
+    @param revision         revision name
+    @param package          package
+    @param root_file        the *.root file for which the corresponding RootObjects shall be created
+    @param dir_date         time_stamp of the *.root file
+    @param is_reference     boolean value indicating if the object is a reference object or not.
+    """
+    root_object_type = get_root_object_type(root_object)
+    if not root_object_type:
+        # get_root_object_type returns "" for any type that we're not
+        # interested in
+        return
+
+    # Ensure that the data read from the ROOT files lives on even
+    # after the ROOT file is closed
+    if root_object.InheritsFrom("TH1"):
+        root_object.SetDirectory(0)
+
+    # Retrieve the metadata
+    metadata = get_metadata(root_object)
+
+    if root_object_type == "TNtuple":
+        # Go to first entry in the n-tuple
+        root_object.GetEntry(0)
+
+        # Storage for the values of the n-tuple. We use a dictionary,
+        # because we can't access the n-tuple's values anymore after
+        # closing the ROOT file (<=> histograms)
+        ntuple_values = {}
+        for leaf in root_object.GetListOfLeaves():
+            ntuple_values[leaf.GetName()] = leaf.GetValue()
+
+        # Overwrite 'root_object' with the dictionary that contains the
+        # values, because the values are what we want to save, and we
+        # want to use the same RootObject()-call for both histograms and
+        # n-tuples :-)
+        root_object = ntuple_values
+
+    key2object[name].append(
+        RootObject(
+            revision,
+            package,
+            root_file,
+            name,
+            root_object,
+            root_object_type,
+            dir_date,
+            metadata["description"],
+            metadata["check"],
+            metadata["contact"],
+            metadata["metaoptions"],
+            is_reference,
+        )
+    )
+
+
 def rootobjects_from_file(
     root_file: str,
     package: str,
@@ -767,89 +838,28 @@ def rootobjects_from_file(
                 if not sub_root_object:
                     continue
 
-                sub_root_object_type = get_root_object_type(sub_root_object)
-                if not sub_root_object_type:
-                    # get_root_object_type returns "" for any type that we're not
-                    # interested in
-                    continue
-
-                # Ensure that the data read from the ROOT files lives on even
-                # after the ROOT file is closed
-                if sub_root_object.InheritsFrom("TH1"):
-                    sub_root_object.SetDirectory(0)
-
-                # Retrieve the metadata
-                metadata = get_metadata(sub_root_object)
-
-                if sub_root_object_type == "TNtuple":
-                    # Go to first entry in the n-tuple
-                    sub_root_object.GetEntry(0)
-
-                    # Storage for the values of the n-tuple. We use a dictionary,
-                    # because we can't access the n-tuple's values anymore after
-                    # closing the ROOT file (<=> histograms)
-                    ntuple_values = {}
-                    for leaf in sub_root_object.GetListOfLeaves():
-                        ntuple_values[leaf.GetName()] = leaf.GetValue()
-
-                    # Overwrite 'root_object' with the dictionary that contains the
-                    # values, because the values are what we want to save, and we
-                    # want to use the same RootObject()-call for both histograms and
-                    # n-tuples :-)
-                    sub_root_object = ntuple_values
-
-                sub_name = f"{name}_{sub_key.GetName()}"
-                key2object[sub_name].append(
-                    RootObject(
-                        revision,
-                        package,
-                        root_file,
-                        sub_name,
-                        sub_root_object,
-                        sub_root_object_type,
-                        dir_date,
-                        metadata["description"],
-                        metadata["check"],
-                        metadata["contact"],
-                        metadata["metaoptions"],
-                        is_reference,
-                    )
+                add_rootobject(
+                    sub_root_object,
+                    key2object,
+                    f"{name}_{sub_key.GetName()}",
+                    revision,
+                    package,
+                    root_file,
+                    dir_date,
+                    is_reference,
                 )
+
             continue
 
-        root_object_type = get_root_object_type(root_object)
-        if not root_object_type:
-            continue
-
-        if root_object.InheritsFrom("TH1"):
-            root_object.SetDirectory(0)
-
-        metadata = get_metadata(root_object)
-
-        if root_object_type == "TNtuple":
-            root_object.GetEntry(0)
-
-            ntuple_values = {}
-            for leaf in root_object.GetListOfLeaves():
-                ntuple_values[leaf.GetName()] = leaf.GetValue()
-
-            root_object = ntuple_values
-
-        key2object[name].append(
-            RootObject(
-                revision,
-                package,
-                root_file,
-                name,
-                root_object,
-                root_object_type,
-                dir_date,
-                metadata["description"],
-                metadata["check"],
-                metadata["contact"],
-                metadata["metaoptions"],
-                is_reference,
-            )
+        add_rootobject(
+            root_object,
+            key2object,
+            name,
+            revision,
+            package,
+            root_file,
+            dir_date,
+            is_reference,
         )
 
     # Close the ROOT file before we open the next one!

@@ -103,6 +103,7 @@ namespace Belle2 {
     std::string m_MCDecayString; /**< MC decay string to be filled */
     StoreObjPtr<StringWrapper> m_stringWrapper; /**< string wrapper storing the MCDecayString */
 
+    bool m_printEventType;  /**< If true, the branch __eventType__ is added */
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
     std::string m_eventType; /**< EventType to be filled */
 

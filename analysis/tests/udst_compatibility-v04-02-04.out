@@ -32,7 +32,9 @@ Untested method Particle::setVertex
 Untested method Particle::updateJacobiMatrix
 Untested method Particle::updateMomentum
 Untested method Particle::writeExtraInfo
+Untested method EventExtraInfo::getEventType
 Untested method EventExtraInfo::removeExtraInfo
+Untested method EventExtraInfo::setEventType
 Untested method EventExtraInfo::setExtraInfo
 [INFO] ========================================================================
 [INFO] >>> Start new run: 0

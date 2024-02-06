@@ -185,7 +185,8 @@ for rank in range(5):
             variables.append(f'{variable}_{shortcut}{rank}')
 
 # Create output file.
-ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
+ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path,
+                     printEventType=False)  # uproot does not deal with a branch with the string type...
 
 # Loop over each possible ROE (1 for every B candidate) in every event
 firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)

@@ -68,6 +68,9 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("useFloat", m_useFloat,
            "Use float type for floating-point numbers.", false);
 
+  addParam("printEventType", m_printEventType,
+           "If true, the branch __eventType__ is added. The eventType information is available since MC16.", true);
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -144,8 +147,11 @@ void VariablesToNtupleModule::initialize()
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
-  if (m_eventExtraInfo.isOptional())
+  if (m_printEventType) {
     m_tree->get().Branch("__eventType__", &m_eventType);
+    if (not m_eventExtraInfo.isOptional())
+      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available since MC16.");
+  }
 
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
@@ -264,7 +270,7 @@ void VariablesToNtupleModule::event()
   else
     m_MCDecayString = "";
 
-  if (m_eventExtraInfo.isValid())
+  if (m_printEventType and m_eventExtraInfo.isValid())
     m_eventType = m_eventExtraInfo->getEventType();
   else
     m_eventType = "";

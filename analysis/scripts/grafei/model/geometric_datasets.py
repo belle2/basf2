@@ -1,7 +1,6 @@
 import itertools
 from pathlib import Path
 import numpy as np
-from scipy import stats
 import torch
 from .tree_utils import masses_to_classes
 from .dataset_utils import populate_avail_samples, preload_root_data
@@ -34,7 +33,7 @@ def _preload(self):
     # Save the features
     with uproot.open(self.x_files[0])["Tree"] as t:
         self.features = [f for f in t.keys() if f.startswith("feat_")]
-        self.B_reco = int(stats.mode(t["isB"].array(library="np"), keepdims=False).mode)
+        self.B_reco = t["isB"].array(library="np")[0]
         assert self.B_reco in [0, 1, 2], "B_reco should be 0, 1 or 2, something went wrong"
 
     # Keep only requested features

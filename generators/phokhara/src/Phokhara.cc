@@ -267,7 +267,6 @@ void Phokhara::term()
 {
 
   int mode = 2;
-  // int error_flag = 0;
   phokhara(&mode, m_xpar, m_npar);
 
 //   B2INFO("> Crosssection ")
@@ -335,7 +334,6 @@ void Phokhara::applySettings()
   m_xpar[30] = m_beamres;
 
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
-  // int error_flag = 0;
   phokhara(&mode, m_xpar, m_npar);
 }
 

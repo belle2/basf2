@@ -231,8 +231,11 @@ class TDCPV_qqs(BaseSkim):
         metadata = []
         for directory in ["etap", "Kspipig"]:
             metadata.append(['deltaE', directory, '#Delta E', __liaison__,
-                            'Energy difference of B', '', '#Delta E [GeV]', 'Candidates'])
-            metadata.append(['Mbc', directory, 'Mbc', __liaison__, 'Beam-constrained mass', '', 'M_{bc} [GeV]', 'Candidates'])
+                            f'Energy difference of B for {directory} mode', '', '#Delta E [GeV]', 'Candidates'])
+            metadata.append(['Mbc', directory, 'Mbc', __liaison__,
+                            f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
+        metadata.append(['deltaE', 'KL_etap', '#Delta E', __liaison__,
+                         "Energy difference of B for B0 -> eta' K_{L}", '', '#Delta E [GeV]', 'Candidates'])
         path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:etap', variableshisto, filename=filename, path=path, directory="etap")
         ma.variablesToHistogram('B0:Kspipig', variableshisto, filename=filename, path=path, directory="Kspipig")
@@ -411,9 +414,10 @@ class TDCPV_ccs(BaseSkim):
         metadata = []
         for directory in ["jpsiee", "jpsimumu", "KLjpsimumu", "KLjpsiee"]:
             metadata.append(['deltaE', directory, '#Delta E', __liaison__,
-                            'Energy difference of B', '', '#Delta E [GeV]', 'Candidates'])
+                            f'Energy difference of B for {directory} mode', '', '#Delta E [GeV]', 'Candidates'])
         for directory in ["jpsiee", "jpsimumu"]:
-            metadata.append(['Mbc', directory, 'Mbc', __liaison__, 'Beam-constrained mass', '', 'M_{bc} [GeV]', 'Candidates'])
+            metadata.append(['Mbc', directory, 'Mbc', __liaison__,
+                            f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
         path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:jpsiee', variableshisto, filename=filename, path=path, directory="jpsiee")
         ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")

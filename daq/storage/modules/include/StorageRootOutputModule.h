@@ -227,6 +227,7 @@ namespace Belle2 {
     DBInterface* m_db;
     std::string m_runType;
     std::string m_HLTName;
+    std::string m_disk;
     int m_nDisk;
     int m_processNumber;
     bool m_firstEvent{false};

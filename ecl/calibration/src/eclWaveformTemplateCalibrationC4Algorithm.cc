@@ -56,11 +56,20 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
     if (last > ECLElementNumbers::c_NCrystals) last = ECLElementNumbers::c_NCrystals;
 
     B2INFO("eclWaveformTemplateCalibrationC4Algorithm i " << i << " " << first << " " << last);
+    B2INFO("eclWaveformTemplateCalibrationC4Algorithm " << Form("PhotonParameters_CellID%d_CellID%d", first, last));
+    B2INFO("eclWaveformTemplateCalibrationC4Algorithm " << Form("HadronDiodeParameters_CellID%d_CellID%d", first, last));
 
     DBObjPtr<ECLDigitWaveformParameters> tempexistingPhotonWaveformParameters(Form("PhotonParameters_CellID%d_CellID%d", first,
         last));
     DBObjPtr<ECLDigitWaveformParameters> tempexistingHadronDiodeWaveformParameters(Form("HadronDiodeParameters_CellID%d_CellID%d",
         first, last));
+
+    auto runs = getRunList();
+    // Take the first run
+    ExpRun chosenRun = runs.front();
+    B2INFO("merging using the ExpRun (" << chosenRun.second << "," << chosenRun.first << ")");
+    // After here your DBObjPtrs are correct
+    updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
 
     for (int j = first; j <= last; j++) {
       B2INFO("Check Norm Parms CellID " << j);

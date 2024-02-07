@@ -988,9 +988,7 @@ class Calibration(CalibrationBase):
         with CAFDB(self._db_path, read_only=True) as db:
             initial_state = db.get_calibration_value(self.name, "checkpoint")
             initial_iteration = db.get_calibration_value(self.name, "iteration")
-        B2INFO("Initial status of {} found to be state={}, iteration={}".format(self.name,
-                                                                                initial_state,
-                                                                                initial_iteration))
+        B2INFO(f"Initial status of {self.name} found to be state={initial_state}, iteration={initial_iteration}")
         self.machine = CalibrationMachine(self,
                                           iov_to_calibrate=self.iov,
                                           initial_state=initial_state,

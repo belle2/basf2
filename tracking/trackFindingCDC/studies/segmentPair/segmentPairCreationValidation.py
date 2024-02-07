@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -55,7 +54,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
 
     def create_argument_parser(self, **kwds):
         """Convert command-line arguments to basf2 argument list"""
-        argument_parser = super(SegmentPairCreationValidationRun, self).create_argument_parser(**kwds)
+        argument_parser = super().create_argument_parser(**kwds)
         return argument_parser
 
     def create_path(self):
@@ -63,7 +62,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
         Sets up a path that plays back pregenerated events or generates events
         based on the properties in the base class.
         """
-        main_path = super(SegmentPairCreationValidationRun, self).create_path()
+        main_path = super().create_path()
 
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
         main_path.add_module(segment_finder_module)
@@ -89,8 +88,8 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
 
     def __init__(self, output_file_name):
         """Constructor"""
-        super(SegmentPairCreationValidationModule, self).__init__(foreach="CDCSegmentPairVector",
-                                                                  output_file_name=output_file_name)
+        super().__init__(foreach="CDCSegmentPairVector",
+                         output_file_name=output_file_name)
         #: defer reference to CDCMCSegment2dLookUp singleton until after it is constructed
         self.mc_segment_lookup = None
         #: defer reference to MCSegmentPairFilter until after it is constructed
@@ -100,7 +99,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
 
     def initialize(self):
         """Receive signal at the start of event processing"""
-        super(SegmentPairCreationValidationModule, self).initialize()
+        super().initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCSegmentPairFilter()
         self.segment_pair_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion

@@ -45,6 +45,8 @@ class SystematicsDstar(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdK("all", path=path)
         stdPi("all", path=path)
@@ -90,6 +92,8 @@ class SystematicsTracking(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "systematics"
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -178,6 +182,8 @@ class Resonance(BaseSkim):
     __description__ = ""
     __contact__ = __liaison__
     __category__ = "systematics"
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdK("loose", path=path)
@@ -337,6 +343,8 @@ class SystematicsRadMuMu(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdMu("all", path=path)
 
@@ -380,6 +388,8 @@ class SystematicsEELL(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics, lepton ID"
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
 
@@ -422,6 +432,8 @@ class SystematicsRadEE(BaseSkim):
     __description__ = "Radiative electron pairs for photon systematics"
     __contact__ = __liaison__
     __category__ = "systematics, photon calibration"
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -498,6 +510,8 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdLambdas(path=path)
 
@@ -536,6 +550,8 @@ class SystematicsPhiGamma(BaseSkim):
     __contact__ = "Giuseppe Finocchiaro <giuseppe.finocchiaro@lnf.infn.it>"
     __category__ = "systematics"
 
+    ApplyHLTHadronCut = False
+
     TestSampleProcess = "ccbar"
     validation_sample = _VALIDATION_SAMPLE
 
@@ -546,23 +562,22 @@ class SystematicsPhiGamma(BaseSkim):
 
     def build_lists(self, path):
         EventCuts = [
-            "[nTracks>=2] and [nTracks<=4]",
+            "[nTracks>=2] and [nTracks<=6]",
             "[nParticlesInList(gamma:PhiSystematics) > 0]",
             "[[nParticlesInList(phi:charged) > 0] or [nParticlesInList(K_S0:PhiSystematics) > 0]]"
         ]
 
-        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", writeOut=True, path=path)
+        ma.cutAndCopyList("gamma:PhiSystematics", "gamma:loose", "3 < E < 8", path=path)
         ma.reconstructDecay('phi:charged -> K+:all K-:all', '0.9 < M < 1.2', path=path)
-        ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', writeOut=True, path=path)
+        ma.copyList('K_S0:PhiSystematics', 'K_S0:merged', path=path)
 
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
         return ["gamma:PhiSystematics"]
 
     def validation_histograms(self, path):
-        ma.fillParticleList('K_L0:all', "", writeOut=True, path=path)
-        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', writeOut=True, path=path)
+        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', path=path)
 
-        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', writeOut=True, path=path)
+        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', path=path)
 
         vm.addAlias("gamma_E_CMS", "useCMSFrame(E)")
         vm.addAlias("gamma_E", "E")
@@ -590,6 +605,8 @@ class Random(BaseSkim):
     __contact__ = "Phil Grace <philip.grace@adelaide.edu.au>"
     __description__ = "Random skim to select a fixed fraction of events."
     __category__ = "systematics, random"
+
+    ApplyHLTHadronCut = False
 
     def __init__(self, KeepPercentage=10, seed=None, **kwargs):
         """
@@ -682,6 +699,8 @@ class SystematicsJpsi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison_leptonID__
     __category__ = "systematics, leptonID"
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)

@@ -267,7 +267,6 @@ void NSMCallback::vlistget(NSMCommunicator& com)
 
 struct vlistentry_t {
   std::string name;
-  int id;
   std::string type;
   bool useGet;
   bool useSet;
@@ -282,7 +281,7 @@ void NSMCallback::vlistset(NSMCommunicator& com)
   for (size_t i = 0; i < s.size(); i++) {
     StringList ss = StringUtil::split(s[i], ':');
     if (ss.size() > 4) {
-      vlistentry_t en = { ss[0], atoi(ss[4].c_str()),
+      vlistentry_t en = { ss[0],
                           ss[1], ss[2] == "1", ss[3] == "1"
                         };
       vlist.push_back(en);
@@ -310,8 +309,8 @@ void NSMCallback::alloc_open(NSMCommunicator& com)
   }
   for (NSMDataMap::iterator it = m_datas.begin();
        it != m_datas.end(); ++it) {
-    NSMData& data(it->second);
     try {
+      NSMData& data(it->second);
       if (!data.isAvailable() && data.getName().size() > 0 &&
           data.getFormat().size() > 0) {
         data.open(com);

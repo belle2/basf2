@@ -100,6 +100,7 @@ void DQMHistAnalysisTOPModule::initialize()
   registerEpicsPV(m_pvPrefix + "badAsics", "badAsics");
   registerEpicsPV(m_pvPrefix + "badPMTs", "badPMTs");
   registerEpicsPV(m_pvPrefix + "numExcludedBS", "numExcludedBS");
+  registerEpicsPV(m_pvPrefix + "histoAlarmState", "histoAlarmState"); // to pass overall state to central alarm overview panel
 
   // Epics used to get limits from configuration file - override module parameters (input only)
 
@@ -162,20 +163,25 @@ void DQMHistAnalysisTOPModule::initialize()
 
 void DQMHistAnalysisTOPModule::beginRun()
 {
-  auto* h = findHist("DQMInfo/rtype");
-  std::string title = h ? h->GetTitle() : "";
-  m_IsNullRun = (title == "null");
-
-  updateLimits();
-
   B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
 
 void DQMHistAnalysisTOPModule::event()
 {
+  // get type of the run (TODO: to be replaced with base class function when fixed)
+  auto* rtype = findHist("DQMInfo/rtype");
+  m_runType = rtype ? rtype->GetTitle() : "";
+  m_IsNullRun = (m_runType == "null");
+
   bool zeroSupp = gStyle->GetHistMinimumZero();
   gStyle->SetHistMinimumZero(true);
+
+  // update alarm levels and other parameters from EpicsPVs
+  updateLimits();
+
+  // reset overall alarm state
+  m_alarmStateOverall = c_Gray;
 
   // Update window_vs_slot canvas w/ alarming
   updateWindowVsSlotCanvas();
@@ -198,10 +204,13 @@ void DQMHistAnalysisTOPModule::event()
   setZAxisRange("TOP/good_hits_asics_", 3);
   setZAxisRange("TOP/bad_hits_asics_", 30);
 
-  // Background subtracted time distributions
-  makeBGSubtractedTimimgPlot("goodHitTimes");
-  for (int slot = 1; slot <= 16; slot++) {
-    makeBGSubtractedTimimgPlot("good_timing_" + to_string(slot));
+  // Background subtracted time distributions (only for physics runs)
+  if (m_runType == "physics") {
+    auto* trackHits = (TH2F*) findHist("TOP/trackHits");
+    makeBGSubtractedTimimgPlot("goodHitTimes", trackHits, 0);
+    for (int slot = 1; slot <= 16; slot++) {
+      makeBGSubtractedTimimgPlot("good_timing_" + to_string(slot), trackHits, slot);
+    }
   }
 
   // Set Epics variables
@@ -254,6 +263,8 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
     delete px;
   }
 
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
+
   auto* canvas = findCanvas("TOP/c_window_vs_slot");
   if (canvas) {
     canvas->cd();
@@ -281,6 +292,8 @@ void DQMHistAnalysisTOPModule::updateEventMonitorCanvas()
       m_text2->AddText(Form("Fraction: %.4f %%", badRatio * 100.0));
     }
   }
+
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   auto* canvas = findCanvas("TOP/c_BoolEvtMonitor");
   if (canvas) {
@@ -342,8 +355,10 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   int alarmState = c_Gray;
   if (m_activeFraction->Integral() > 0) {
     alarmState = getAlarmState(1 - m_activeFraction->GetMinimum(), m_deadChannelsAlarmLevels);
-    if (alarmState == 3) alarmState = std::max(getAlarmState(inactiveFract, m_deadChannelsAlarmLevels), 2);
+    if (alarmState == c_Red) alarmState = std::max(getAlarmState(inactiveFract, m_deadChannelsAlarmLevels), static_cast<int>(c_Yellow));
   }
+
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   m_deadFraction->SetFillColor(1);
   m_deadFraction->GetXaxis()->SetNdivisions(16);
@@ -409,10 +424,12 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   if (signalHits->GetEntries() > 0 and activeFraction->Integral() > 0) {
     double hmin = 1000;
     for (int i = 1; i <= m_photonYields->GetNbinsX(); i++) {
+      if (signalHits->GetBinEntries(i) < 10) continue;
       hmin = std::min(hmin, m_photonYields->GetBinContent(i) + 3 * m_photonYields->GetBinError(i));
     }
-    alarmState = getAlarmState(hmin, m_photonYieldsAlarmLevels, false);
+    if (hmin < 1000) alarmState = getAlarmState(hmin, m_photonYieldsAlarmLevels, false);
   }
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   m_photonYields->SetTitle("Number of photons per track");
   m_photonYields->SetYTitle("photons per track");
@@ -432,7 +449,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
 
   alarmState = c_Gray;
   m_text3->Clear();
-  if (backgroundHits->GetEntries() > 0 and activeFraction->Integral() > 0) {
+  if (backgroundHits->GetEntries() > 100 and activeFraction->Integral() > 0) {
     int status = m_backgroundRates->Fit("pol0", "Q0");
     if (status == 0) {
       auto* fun = m_backgroundRates->GetFunction("pol0");
@@ -444,6 +461,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
       }
     }
   }
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   m_backgroundRates->SetTitle("Background rates");
   m_backgroundRates->SetYTitle("background rate [MHz/PMT]");
@@ -484,15 +502,16 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
   int alarmState = c_Gray;
   if (allHits->Integral() > 0) {
     alarmState = getAlarmState(m_junkFraction->GetMaximum(), m_junkHitsAlarmLevels);
-    if (alarmState == 3) {
+    if (alarmState == c_Red) {
       double hmax = 0;
       for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
         if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
       }
-      alarmState = std::max(getAlarmState(hmax, m_junkHitsAlarmLevels), 2);
+      alarmState = std::max(getAlarmState(hmax, m_junkHitsAlarmLevels), static_cast<int>(c_Yellow));
     }
   }
   delete allHits;
+  m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   auto* canvas = m_c_junkFraction;
   canvas->Clear();
@@ -526,7 +545,7 @@ void DQMHistAnalysisTOPModule::setZAxisRange(const std::string& name, double sca
 }
 
 
-void DQMHistAnalysisTOPModule::makeBGSubtractedTimimgPlot(const std::string& name)
+void DQMHistAnalysisTOPModule::makeBGSubtractedTimimgPlot(const std::string& name, const TH2F* trackHits, int slot)
 {
   auto* canvas = findCanvas("TOP/c_" + name);
   if (not canvas) return;
@@ -537,14 +556,24 @@ void DQMHistAnalysisTOPModule::makeBGSubtractedTimimgPlot(const std::string& nam
   auto* hb = (TH1F*) findHist("TOP/" + name + "BG");
   if (not hb) return;
 
-  // use the content of bins at t < 0 to scale the background
+  if (trackHits) {
+    // use the ratio of events w/ and w/o track in the slot to scale the background
+    double s = (slot == 0) ? trackHits->Integral(1, 16, 2, 2) : trackHits->GetBinContent(slot, 2);
+    if (s == 0) return;
+    double sb = (slot == 0) ? trackHits->Integral(1, 16, 1, 1) : trackHits->GetBinContent(slot, 1);
+    if (sb == 0) return;
+    h->Add(h, hb, 1, -s / sb);
+  } else {
+    // use the content of bins at t < 0 to scale the background
+    int i0 = h->GetXaxis()->FindBin(0.); // bin at t = 0
+    double s = h->Integral(1, i0);
+    if (s == 0) return;
+    double sb = hb->Integral(1, i0);
+    if (sb == 0) return;
+    if (s / sb > 1) return; // this can happen due to low statistics and is not reliable
+    h->Add(h, hb, 1, -s / sb);
+  }
 
-  int i0 = h->GetXaxis()->FindBin(0.); // bin at t = 0
-  double s = h->Integral(1, i0);
-  if (s == 0) return;
-  double sb = hb->Integral(1, i0);
-  if (sb == 0) return;
-  h->Add(h, hb, 1, -s / sb);
   TString title = TString(h->GetTitle()) + " (BG subtracted)";
   h->SetTitle(title);
 
@@ -703,6 +732,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   int numBS = 0;
   for (auto included : m_includedBoardstacks) if (not included) numBS++;
   setEpicsPV("numExcludedBS", numBS);
+  setEpicsPV("histoAlarmState", getOffcialAlarmStatus(m_alarmStateOverall));
   updateEpicsPVs(5.0);
 
   B2DEBUG(20, "badBoardstacks: " << badBoardstacks);
@@ -710,6 +740,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   B2DEBUG(20, "badAsics: " << badAsics);
   B2DEBUG(20, "badPMTs: " << badPMTs);
   B2DEBUG(20, "excludedBS: " << numBS);
+  B2DEBUG(20, "histoAlarmState: " << getOffcialAlarmStatus(m_alarmStateOverall));
 }
 
 void DQMHistAnalysisTOPModule::updateLimits()

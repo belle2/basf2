@@ -419,14 +419,11 @@ class TauGeneric(BaseSkim):
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
         ma.copyLists('tau+:generic', self.SkimLists, path=path)
-        ma.rankByHighest(particleList='tau+:generic',
-                         variable='p',
-                         numBest=1,
-                         path=path)
+        ma.applyEventCuts('nParticlesInList(tau+:generic) > 0', path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:generic',
+            particlelist='',
             variables_1d=[
                 ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
                 ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),

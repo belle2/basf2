@@ -245,7 +245,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
 @fancy_skim_header
 class LFVZpVisible(BaseSkim):
-    __authors__ = ["Ilya Komarov"]
+    __authors__ = ["Ilya Komarov and Luigi Corona"]
     __description__ = "Lepton flavour violating Z' skim, Z' to visible FS."
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
@@ -253,7 +253,7 @@ class LFVZpVisible(BaseSkim):
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
-        stdE("loose", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         """
@@ -263,31 +263,28 @@ class LFVZpVisible(BaseSkim):
 
         # Here we just want four gpood tracks to be reconstructed
         track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
-        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 4"
+        electron_id_cut = "electronID > 0.2"
+        muon_id_cut = "muonID > 0.2"
 
-        ma.cutAndCopyList("e+:lfvzp", "e+:all", track_cuts, path=path)
+        ma.cutAndCopyList("e+:lfvzp", "e+:all", f"[{track_cuts} and {electron_id_cut}]", path=path)
+        ma.cutAndCopyList("mu+:lfvzp", "mu+:all", f"[{track_cuts} and {muon_id_cut}]", path=path)
+
+        nParticlesInList_selection = "formula(nParticlesInList(mu+:lfvzp) + nParticlesInList(e+:lfvzp)) > 1"
+        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) == 4 and {nParticlesInList_selection}]"
 
         # Z' to lfv: fully reconstructed
-        LFVZpVisChannel = "e+:lfvzp e+:lfvzp e-:lfvzp e-:lfvzp"
+        LFVZpVisChannel = "e+:lfvzp mu+:lfvzp e-:all mu-:all"
 
-        ma.reconstructDecay("vpho:vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:vislfvzp -> {LFVZpVisChannel}", Event_cuts_vis, path=path)
 
         lfvzp_list.append("vpho:vislfvzp")
 
+        LFVZpVisChannel = "e+:lfvzp mu+:lfvzp e+:all mu+:all"
+
         # Z' to lfv: part reco
-        LFVZpVisChannel = "e+:lfvzp e+:lfvzp e-:lfvzp"
-        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 3"
+        ma.reconstructDecay(f"vpho:ecv_vislfvzp -> {LFVZpVisChannel}", Event_cuts_vis, path=path, allowChargeViolation=True)
 
-        ma.reconstructDecay("vpho:3tr_vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path, allowChargeViolation=True)
-
-        lfvzp_list.append("vpho:3tr_vislfvzp")
-
-        # Z' to lfv: two same-sign tracks
-        LFVZpVisChannel = "e+:lfvzp e+:lfvzp"
-        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2"
-        ma.reconstructDecay("vpho:2tr_vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path, allowChargeViolation=True)
-
-        lfvzp_list.append("vpho:2tr_vislfvzp")
+        lfvzp_list.append("vpho:ecv_vislfvzp")
 
         return lfvzp_list
 

@@ -575,9 +575,9 @@ class SystematicsPhiGamma(BaseSkim):
         return ["gamma:PhiSystematics"]
 
     def validation_histograms(self, path):
-        ma.fillParticleList('gamma:sig', 'nTracks > 1 and 3. < E < 8.', path=path)
-
-        ma.reconstructDecay('phi:KK -> K+:all K-:all', '0.9 < M < 1.2', path=path)
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
 
         vm.addAlias("gamma_E_CMS", "useCMSFrame(E)")
         vm.addAlias("gamma_E", "E")
@@ -585,18 +585,18 @@ class SystematicsPhiGamma(BaseSkim):
         vm.addAlias("phi_mass", "M")
 
         histoRootFile = f'{self}_Validation.root'
-        variableshisto = [('gamma_E', 120, 2.5, 8.5),
-                          ('gamma_E_CMS', 100, 2.0, 7.0),
-                          ('nTracks', 15, 0, 15),
+        variableshisto = [('gamma_E', 120, 2.5, 8.5, 'gamma_E', self.__contact__, 'Photon energy', ''),
+                          ('gamma_E_CMS', 100, 2.0, 7.0, 'gamma_E_CMS', self.__contact__, 'Photon energy in CMS', ''),
+                          ('nTracks', 15, 0, 15, 'nTracks', self.__contact__, 'Number of tracks', ''),
                           ]
-        variableshistoKS = [('K_S0_mass', 200, 0.4, 0.6),
+        variableshistoKS = [('K_S0_mass', 200, 0.4, 0.6, 'K_S0_mass', self.__contact__, 'Invariant KS0 mass', ''),
                             ]
-        variableshistoPhi = [('phi_mass', 200, 0.8, 1.2),
+        variableshistoPhi = [('phi_mass', 200, 0.8, 1.2, 'phi_mass', self.__contact__, 'Invariant phi mass', ''),
                              ]
 
-        ma.variablesToHistogram('gamma:sig', variableshisto, filename=histoRootFile, path=path)
-        ma.variablesToHistogram('K_S0:merged', variableshistoKS, filename=histoRootFile, path=path)
-        ma.variablesToHistogram('phi:KK', variableshistoPhi, filename=histoRootFile, path=path)
+        create_validation_histograms(path, histoRootFile, 'gamma:PhiSystematics', variableshisto)
+        create_validation_histograms(path, histoRootFile, 'K_S0:merged', variableshistoKS)
+        create_validation_histograms(path, histoRootFile, 'phi:charged', variableshistoPhi)
 
 
 @fancy_skim_header

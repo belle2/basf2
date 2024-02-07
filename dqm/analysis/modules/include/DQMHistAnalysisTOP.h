@@ -115,8 +115,10 @@ namespace Belle2 {
     /**
      * Makes background subtracted time distribution plot
      * @param name the name of the histogram
+     * @param trackHits histogram used to scale background in case it is available
+     * @param slot slot number
      */
-    void makeBGSubtractedTimimgPlot(const std::string& name);
+    void makeBGSubtractedTimimgPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
@@ -143,6 +145,17 @@ namespace Belle2 {
     {
       if (alarmState < m_alarmColors.size()) return m_alarmColors[alarmState];
       return m_alarmColors[c_Gray];
+    }
+
+    /**
+     * Converts alarm state to official status (see EStatus of the base class)
+     * @param alarmState alarm state
+     * @return alarm status
+     */
+    int getOffcialAlarmStatus(unsigned alarmState) const
+    {
+      if (alarmState < m_officialStates.size()) return m_officialStates[alarmState];
+      return c_StatusDefault;
     }
 
     /**
@@ -199,9 +212,11 @@ namespace Belle2 {
 
     // other
 
-    std::vector<int> m_alarmColors = {kGray, kGreen, kYellow, kRed}; /**< alarm colors */
+    std::vector<int> m_alarmColors = {c_ColorTooFew, c_ColorGood, c_ColorWarning, c_ColorError}; /**< alarm colors (see base class) */
+    std::vector<int> m_officialStates = {c_StatusTooFew, c_StatusGood, c_StatusWarning, c_StatusError}; /**< official alarm states */
     std::vector<bool> m_includedBoardstacks; /**< boardstacks included in alarming */
     std::map<std::string, int> m_bsmap;  /**< a map of boardstack names to ID's */
+    int m_alarmStateOverall = 0; /**< overall alarm state of histograms to be sent by EpicsPV */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
 

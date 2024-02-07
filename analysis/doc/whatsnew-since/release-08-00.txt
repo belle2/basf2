@@ -1,3 +1,12 @@
+Changes in the analysis package in light-2403-persian
+-----------------------------------------------------
+
+Modules
++++++++
+* Added a new option ``printEventType`` in `VariablesToNtuple` and `VariablesToEventBasedTree` to store the MC event type
+  information in the branch ``__eventType`` with the string data type, e.g. ``mixed``, ``ccbar``. This information will be available 
+  since the MC16 samples. For the MC15 or older samples, or for data, the branch will be empty. By default, the option is true.
+
 Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------
 

@@ -201,7 +201,7 @@ double Phokhara::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector v
 
   // Check error flag increment during phokhara execution
   if (belle2_error_flag_.error_flag != 0) {
-    B2FATAL("Phokara returned a non-zero exit code. Check the output of phokara.");
+    B2FATAL("Phokhara returned a non-zero exit code. Check the output of phokara.");
   }
   //Store the initial particles as virtual particles into the MCParticleGraph
   double eMom[4] = {belle2_phokhara_particles.bp1[1], belle2_phokhara_particles.bp1[2], belle2_phokhara_particles.bp1[3], belle2_phokhara_particles.bp1[0]};
@@ -335,6 +335,9 @@ void Phokhara::applySettings()
 
   int mode = -1; //use mode to control init/generation/finalize in FORTRAN code
   phokhara(&mode, m_xpar, m_npar);
+  if (belle2_error_flag_.error_flag != 0) {
+    B2FATAL("Phokhara returned a non-zero exit code. Check the output of phokara.");
+  }
 }
 
 

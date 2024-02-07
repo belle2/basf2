@@ -81,6 +81,7 @@ _RegisteredSkims = [
     ("14121601", "btocharm", "BptoD0pipi0_Kpi"),
     ("14140100", "btocharm", "BtoD0h_hh"),
     ("14140101", "btocharm", "BtoD0h_Kpi"),
+    ("14121400", "btocharm", "B0toDstarpipi0_D0pi_Kpi"),
     # B+ -> anti-D0/anti-D0* (K- pi+ pi+ pi-, K- ""+ pi0) h+
     ("14140102", "btocharm", "BtoD0h_Kpipipi_Kpipi0"),
     ("14121500", "btocharm", "B0toDstaretapi_D0pi_Kpi"),

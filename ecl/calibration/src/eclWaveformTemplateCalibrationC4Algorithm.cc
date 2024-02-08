@@ -13,13 +13,12 @@
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLDigitWaveformParameters.h>
 
+/* Basf2 headers. */
+#include <framework/database/DBObjPtr.h>
+
 /* ROOT headers. */
 #include <TFile.h>
 #include <TGraph.h>
-#include <TTree.h>
-#include <TF1.h>
-
-#include <stdlib.h>
 
 using namespace std;
 using namespace Belle2;

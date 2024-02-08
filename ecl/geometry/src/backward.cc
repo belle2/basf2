@@ -27,7 +27,6 @@
 #include <G4Region.hh>
 #include <G4Trap.hh>
 #include <G4TwoVector.hh>
-#include <G4UserLimits.hh>
 #include <G4VisAttributes.hh>
 
 /* CLHEP headers. */

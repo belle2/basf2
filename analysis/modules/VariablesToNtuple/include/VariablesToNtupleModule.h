@@ -109,7 +109,7 @@ namespace Belle2 {
     unsigned int m_nSignalSideCandidates{0};   /**< total n signal-side candidates */
     StoreObjPtr<RestOfEvent> m_roe;            /**< ROE object */
 
-    bool m_printEventType;  /**< If true, the branch __eventType__ is added */
+    bool m_storeEventType;  /**< If true, the branch __eventType__ is added */
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
     std::string m_eventType; /**< EventType to be filled */
 

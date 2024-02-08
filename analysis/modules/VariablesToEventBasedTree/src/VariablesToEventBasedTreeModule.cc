@@ -63,8 +63,8 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
   addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
            string(""));
 
-  addParam("printEventType", m_printEventType,
-           "If true, the branch __eventType__ is added. The eventType information is available since MC16.", true);
+  addParam("storeEventType", m_storeEventType,
+           "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
 }
 
 void VariablesToEventBasedTreeModule::initialize()
@@ -136,7 +136,7 @@ void VariablesToEventBasedTreeModule::initialize()
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
-  if (m_printEventType) {
+  if (m_storeEventType) {
     m_tree->get().Branch("__eventType__", &m_eventType);
     if (not m_eventExtraInfo.isOptional())
       B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available since MC16.");
@@ -253,7 +253,7 @@ void VariablesToEventBasedTreeModule::event()
   else
     m_MCDecayString = "";
 
-  if (m_printEventType and m_eventExtraInfo.isValid())
+  if (m_storeEventType and m_eventExtraInfo.isValid())
     m_eventType = m_eventExtraInfo->getEventType();
   else
     m_eventType = "";

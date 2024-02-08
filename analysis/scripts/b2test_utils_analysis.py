@@ -65,14 +65,14 @@ def scanTTree(filename):
 
         if num_entries == 0:
             print("No entry found")
-            # print name all TBranch in the TTree
+            # print name all TBranches in the TTree
             for branch in ttree.GetListOfBranches():
                 branch_name = branch.GetName()
                 print(f"TBranch: {branch_name}")
 
         else:
             ttree.GetEntry(0)
-            # print name and value of all TBranch in the TTree
+            # print name and value of all TBranches in the TTree
             for branch in ttree.GetListOfBranches():
                 branch_name = branch.GetName()
                 branch_value = getattr(ttree, branch_name)

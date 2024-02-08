@@ -419,7 +419,7 @@ class TauGeneric(BaseSkim):
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
         ma.copyLists('tau+:generic', self.SkimLists, path=path)
-        ma.applyEventCuts('nParticlesInList(tau+:generic) > 0', path)
+        path = self.skim_event_cuts(cut='nParticlesInList(tau+:generic) > 0', path=path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
@@ -523,7 +523,7 @@ class TauThrust(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        ma.applyEventCuts('nParticlesInList(tau+:thrust) > 0', path)
+        path = self.skim_event_cuts(cut='nParticlesInList(tau+:thrust) > 0', path=path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',

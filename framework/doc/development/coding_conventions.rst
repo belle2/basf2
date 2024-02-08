@@ -376,7 +376,7 @@ All include statements must be at the top of the beginning of the file and shoul
   #include <package/dir/otherclass.h>
 
 Includes should be kept to a minimum: all necessary symbols in the header should be forward declared
-if possible (to reduce depedencies between the header files), or, if that is not possible, the
+if possible (to reduce dependencies between the header files), or, if that is not possible, the
 appropriate header needs to be included.
 
 You must add the following header to all C++ files::

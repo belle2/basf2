@@ -185,8 +185,7 @@ for rank in range(5):
             variables.append(f'{variable}_{shortcut}{rank}')
 
 # Create output file.
-ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path,
-                     printEventType=False)  # uproot does not deal with a branch with the string type...
+ma.variablesToNtuple('B0', variables + contVars, treename='tree', filename=outfile, path=roe_path)
 
 # Loop over each possible ROE (1 for every B candidate) in every event
 firstpath.for_each('RestOfEvent', 'RestOfEvents', roe_path)
@@ -199,7 +198,6 @@ try:
     with uproot.open(outfile) as outf:
         df = outf['tree'].arrays(library='pd')
     df = df.sample(frac=1)
-    with uproot.recreate(outfile) as outf:
-        outf['tree'] = df
+    df.to_csv(outfile+'.shuffled.csv')
 except OSError as e:
     print(e)

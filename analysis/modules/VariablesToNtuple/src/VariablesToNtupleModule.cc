@@ -150,7 +150,7 @@ void VariablesToNtupleModule::initialize()
   if (m_storeEventType) {
     m_tree->get().Branch("__eventType__", &m_eventType);
     if (not m_eventExtraInfo.isOptional())
-      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available since MC16.");
+      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available from MC16 on.");
   }
 
   for (const auto& variable : m_variables)

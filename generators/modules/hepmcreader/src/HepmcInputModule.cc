@@ -34,7 +34,7 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
-  addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", false);
+  addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", true);
 }
 
 

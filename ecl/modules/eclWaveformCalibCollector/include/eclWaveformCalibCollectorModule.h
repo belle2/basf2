@@ -14,9 +14,11 @@
 
 /* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
+/* ROOT headers. */
 #include <TFile.h>
 #include <TTree.h>
 

@@ -23,7 +23,6 @@
 /* Basf2 headers. */
 #include <framework/geometry/B2Vector3.h>
 #include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 /* C++ headers. */

@@ -74,18 +74,12 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGGRL", "h_ECLL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_peak", "ECLTRG_peak");
 
-  //ECLTRG_deadch
-  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
-  registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
   //CDCTRG_2D_peak
 //  m_canvas_CDCTRG_2D_peak = new TCanvas("CDC/TRG_2D_peak");
   addDeltaPar("TRGGRL", "h_CDCL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_2D_peak", "CDCTRG_2D_peak");
 
-  //CDCTRG_deadch
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
-  registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
   //NN_peak
 //  m_canvas_NN_peak = new TCanvas("NN_peak");

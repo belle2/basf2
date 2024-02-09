@@ -16,9 +16,9 @@ using namespace std;
 using namespace Belle2;
 
 
-// commented because not used (suppress warning)
-// uncomment if using s_event_number variable
-//static int s_event_number = 0;
+
+REG_MODULE(ZMQRxWorker);
+
 
 ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
 {

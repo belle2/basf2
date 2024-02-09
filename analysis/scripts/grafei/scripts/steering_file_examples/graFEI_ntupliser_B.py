@@ -34,7 +34,7 @@ cut_charged_graFEI = [
 ]
 cut_photons_graFEI = [
     "beamBackgroundSuppression>0.4",
-    "hadronicSplitOffSuppression>0.3",
+    "fakePhotonSuppression>0.3",
     "abs(clusterTiming)<100",
     "abs(formula(clusterTiming/clusterErrorTiming))<2.0",
     "[[clusterReg==1 and E>0.09] or [clusterReg==2 and E>0.09] or [clusterReg==3 and E>0.14]]",

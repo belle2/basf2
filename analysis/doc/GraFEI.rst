@@ -49,7 +49,7 @@ Model training
 
 The graFEI code is contained in ``analysis/scripts/grafei``.
 
-The model is trained with ``ROOT`` ntuples produced with the steering file ``grafei/scripts/create_training_files.py``.
+The model is trained with ``ROOT`` ntuples produced with the steering file ``grafei/scripts/create_training_files.py`` (you may want to modify this file with your own cuts).
 The file requires the argument ``-t`` to be set to either ``B+``, ``B0`` or ``Ups`` for :math:`B^{+}`, :math:`B^{0}` or :math:`\Upsilon (4S)` reconstruction respectively.
 This is the only place where you specify which reconstruction mode you wish to perform: the code will figure it out automatically in later steps.
 The output files used for training and evaluation must be placed in the folders ``root/train`` and ``root/val`` respectively, where ``root`` is a folder of your choice.

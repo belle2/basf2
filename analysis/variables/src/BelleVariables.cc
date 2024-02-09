@@ -445,7 +445,7 @@ Since the :math:`\pi^0`'s covariance matrix for B2BII is empty, the latter is ca
 )DOC", "cm");
 
     REGISTER_VARIABLE("BelleTofMass", BelleTofMass, R"DOC(
-[Legacy] Returns the TOF mass calulated from the time of flight and path length. (Belle only).
+[Legacy] Returns the TOF mass calculated from the time of flight and path length. (Belle only).
 )DOC", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("BelledEdx", BelledEdx, R"DOC(

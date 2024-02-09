@@ -321,13 +321,14 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_hadronb2_over_bhabha_all) {
     double hadronb2_over_bhabha_all = 0.0;
     hist_hadronb2_over_bhabha_all->Draw();
-    hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
-                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
-                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+    if (!hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
+                                   hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
+                                   hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
 
-    B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
-    setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
-
+      B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
+      setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
+    }
   }
 
 //  m_canvas_mumu2trk_over_bhabha_all->Clear();
@@ -337,11 +338,13 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_mumu2trk_over_bhabha_all) {
     double mumu2trk_over_bhabha_all = 0.0;
     hist_mumu2trk_over_bhabha_all->Draw();
-    mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->GetBinContent(
-                                 hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_mumu2trk_over_bhabha_all->GetBinContent(
-                                 hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
-    setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+    if (!hist_mumu2trk_over_bhabha_all->GetBinContent(hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->GetBinContent(
+                                   hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_mumu2trk_over_bhabha_all->GetBinContent(
+                                   hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
+      setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+    }
 
   }
 

@@ -15,15 +15,18 @@ import os
 import shutil
 import subprocess
 
-import basf2
 import b2test_utils
+import basf2
+import beamparameters
 
 
+#: Default number of iterations for WHIZARD integration
 _default_iterations = '25:10000:"gw", 10:10000:""'
 
+#: Refined number of iterations for WHIZARD integration
 _refined_iterations = '25:10000:"gw", 20:10000:""'
 
-#: Dictionary: key is process name, value is a dictionary with final_state, cuts and iterations
+#: Dictionary for WHIZARD: key is process name, value is a dictionary with final_state, cuts and iterations
 _processes_dict = {
     'eeee': {
         'final_state': '"e-", "e+", "e-", "e+"',
@@ -57,6 +60,7 @@ _processes_dict = {
     }
 }
 
+#: Template of SINDARIN file for the supported processes
 _sindarin_template = '''
 process {process} = "e-", "e+" => {final_state}
 
@@ -81,9 +85,9 @@ simulate ({process})
 '''
 
 
-def get_sindarin(process, events, cm_energy=10.579558, random_seed=114):
+def get_sindarin(process, events, cm_energy, random_seed=114):
     '''
-    Return a properly formatted sindarin file as a string.
+    Return a properly formatted SINDARIN file as a string.
     '''
     if process not in _processes_dict.keys():
         basf2.B2FATAL(f'The process {process} is currently not supported, you need to write a SINDARIN file yourself.')
@@ -99,18 +103,24 @@ def get_sindarin(process, events, cm_energy=10.579558, random_seed=114):
     return sindarin
 
 
-def run_whizard(process, experiment=None, run=None, events=None, print_sindarin=False):
+def run_whizard(process, experiment, run, events, print_sindarin=False):
     '''
     This function takes care of running WHIZARD.
     '''
     if process not in _processes_dict.keys():
         basf2.B2FATAL(f'The process {process} is currently not supported, you need to write a SINDARIN file yourself.')
 
-    b2_seed = basf2.get_random_seed().encode('utf-8')
-    seed = int(hashlib.sha256(b2_seed).hexdigest(), 16) % 10**8
+    cm_energy = beamparameters.get_collisions_invariant_mass(experiment, run)
+
+    basf2_seed = basf2.get_random_seed().encode('utf-8')
+    whizard_seed = int(hashlib.sha256(basf2_seed).hexdigest(), 16) % 10**8
+
+    sindarin = get_sindarin(process, events, cm_energy, whizard_seed)
+    if print_sindarin:
+        basf2.B2INFO(f'The SINDARIN file is:\n\n{sindarin}')
 
     cwd = os.getcwd()
-    path = os.path.join(cwd, f'{process}_{seed}')
+    path = os.path.join(cwd, f'{process}_{whizard_seed}')
     whizard = 'whizard'
     sin = f'{process}.sin'
     lhe = f'{process}.lhe'
@@ -121,10 +131,6 @@ def run_whizard(process, experiment=None, run=None, events=None, print_sindarin=
     else:
         shutil.rmtree(path, ignore_errors=True)
         os.mkdir(path)
-
-    sindarin = get_sindarin(process, events, random_seed=seed)
-    if print_sindarin:
-        basf2.B2INFO(f'The SINDARIN file is:\n\n{sindarin}')
 
     # Hacky solution for keeping track if WHIZARD failed or not
     # since we want to ensure that the working directory is actually cleaned

@@ -27,7 +27,6 @@
 #include <TH1F.h>
 #include <TH2F.h>
 #include <TMath.h>
-#include <TVector3.h>
 
 using namespace std;
 using namespace Belle2;

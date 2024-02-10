@@ -331,6 +331,7 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
         CDCTriggerTrack* neuroSimTrack = neuroHWTrack.getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
         if (!neuroSimTrack) {
           B2WARNING("No Simtrack related to HWTrack! This should not happen!");
+          continue;
         }
         std::vector<float> unpackedInput =
           neuroHWTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();

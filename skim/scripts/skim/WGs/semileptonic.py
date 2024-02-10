@@ -74,6 +74,8 @@ class PRsemileptonicUntagged(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
+    ApplyHLTHadronCut = False
+
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
@@ -82,8 +84,8 @@ class PRsemileptonicUntagged(BaseSkim):
         stdPi("all", path=path)
 
     def build_lists(self, path):
-        ma.fillParticleList(decayString="pi+:PRSL_eventshape",
-                            cut="pt> 0.1", path=path)
+        ma.cutAndCopyList("pi+:PRSL_eventshape", "pi+:all",
+                          cut="pt> 0.1", path=path)
         ma.fillParticleList(decayString="gamma:PRSL_eventshape",
                             cut="E > 0.1", path=path)
 
@@ -135,10 +137,9 @@ class PRsemileptonicUntagged(BaseSkim):
 
         ma.buildRestOfEvent('B0:all', path=path)
         ma.appendROEMask('B0:all', 'basic',
-                         'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
+                         'pt>0.05 and dr<2 and -4.0<dz<4.0',
                          'E>0.05',
                          path=path)
-        ma.buildContinuumSuppression('B0:all', 'basic', path=path)
 
         vm.addAlias('d0_p', 'daughter(0, p)')
         vm.addAlias('d1_p', 'daughter(1, p)')
@@ -151,8 +152,8 @@ class PRsemileptonicUntagged(BaseSkim):
             particlelist='B0:all',
             variables_1d=[
                 ('Mbc', 100, 4.0, 5.3, 'Mbc', __liaison__, '', ''),
-                ('d0_p', 100, 0, 5.2, 'Signal-side pion momentum', __liaison__, '', ''),
-                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', __liaison__, '', ''),
+                ('d0_p', 100, 0, 0.3, 'Signal-side pion momentum', __liaison__, '', ''),
+                ('d1_p', 100, 1, 4, 'Signal-side lepton momentum', __liaison__, '', ''),
                 ('MissM2', 100, -5, 5, 'Missing mass squared', __liaison__, '', '')
             ],
             variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
@@ -188,6 +189,8 @@ class SLUntagged(BaseSkim):
     )
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
+
+    ApplyHLTHadronCut = False
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -251,7 +254,6 @@ class SLUntagged(BaseSkim):
                          'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
                          'E>0.05',
                          path=path)
-        ma.buildContinuumSuppression('B+:all', 'basic', path=path)
 
         vm.addAlias('d1_p', 'daughter(1,p)')
         vm.addAlias('MissM2', 'weMissM2(basic,0)')
@@ -262,12 +264,12 @@ class SLUntagged(BaseSkim):
             rootfile=histogramFilename,
             particlelist='B+:all',
             variables_1d=[
-                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', __liaison__, '', ''),
-                ('Mbc', 100, 4.0, 5.3, 'Mbc', __liaison__, '', ''),
-                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', __liaison__, '', ''),
+                ('cosThetaBetweenParticleAndNominalB', 100, -3.0, 3.0, 'cosThetaBY', __liaison__, '', ''),
+                ('Mbc', 100, 5.24, 5.3, 'Mbc', __liaison__, '', ''),
+                ('d1_p', 100, 1, 4, 'Signal-side lepton momentum', __liaison__, '', ''),
                 ('MissM2', 100, -5, 5, 'Missing mass squared', __liaison__, '', '')
             ],
-            variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
+            variables_2d=[('deltaE', 100, -1, 1, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
             path=path)
 
 
@@ -375,11 +377,11 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     * The logical OR of the following:
 
-        * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
-        * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
-        * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
-        * Two or fewer charged tracks
-        * :math:`E_{ECL} < 2.0` GeV
+      * identified :math:`e^{\\pm}` with :math:`p(CM) < 3.0` GeV
+      * identified :math:`\\mu^{\\pm}` with :math:`p(CM) < 3.0` GeV
+      * identified :math:`\\gamma` with :math:`E(CM) > 1.4` GeV
+      * Two or fewer charged tracks
+      * :math:`E_{ECL} < 2.0` GeV
 
     Cuts on electrons:
 
@@ -409,6 +411,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     __description__ = "Skim for semileptonic tags with an ROE electron, muon, photon or a low-multiplicity signal decay"
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
+
+    ApplyHLTHadronCut = False
 
     TestSampleProcess = "charged"
 
@@ -445,7 +449,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('ECM', 'useCMSFrame(E)')
         vm.addAlias('cosBY', 'cosThetaBetweenParticleAndNominalB')
         # electrons and muons
-        ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and pt>0.3 and p>0.5", path=path)
+        ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and {ePtCut} and {ePCut}", path=path)
         ma.applyChargedPidMVA(
             particleLists=['e-:sig'],
             path=path,
@@ -550,13 +554,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             ma.variableToSignalSideExtraInfo('e-:roeB', {'pCM': 'e_ROEB_pCM'}, path=roe_path)
             ma.variableToSignalSideExtraInfo('mu-:roeB', {'pCM': 'mu_ROEB_pCM'}, path=roe_path)
             ma.variableToSignalSideExtraInfo('gamma:roeB', {'ECM': 'gamma_ROEB_ECM'}, path=roe_path)
-            vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROEB_pCM)')
-            vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROEB_pCM)')
-            vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
-            vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
-            vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
             path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
+
+        vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROEB_pCM)')
+        vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROEB_pCM)')
+        vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_ECM)')
+        vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
+        vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
 #  Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
 
@@ -571,45 +576,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
-        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
-        muIDCut = "muonID_noSVD > 0.9"
-        lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
-        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
-        gammaSignalECut = "1.4"
-        cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
-                     f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
-        roe_path = b2.create_path()
-        deadEndPath = b2.create_path()
-        for Btype in ['B-:SL', 'anti-B0:SL']:
-            ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
-            ma.appendROEMasks(Btype, [cleanMask], path=path)
-            ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
-
-            ma.fillParticleList(
-                "e-:roeB",
-                f"isInRestOfEvent == 1 and {eIDCut} and {lepTrkCuts} and thetaInCDCAcceptance and pt>0.3 and p>0.5",
-                path=roe_path)
-            ma.fillParticleList(
-                "mu-:roeB",
-                f"isInRestOfEvent == 1 and {muIDCut} and {lepTrkCuts} and pt>0.4 and p>0.7",
-                path=roe_path)
-            ma.fillParticleList("gamma:roeB", f"isInRestOfEvent == 1 and {gammaCuts} and ECM > {gammaSignalECut}", path=roe_path)
-            ma.rankByHighest('e-:roeB', 'pCM', numBest=1, path=roe_path)
-            ma.rankByHighest('mu-:roeB', 'pCM', numBest=1, path=roe_path)
-            ma.rankByHighest('gamma:roeB', 'ECM', numBest=1, path=roe_path)
-            ma.variableToSignalSideExtraInfo('e-:roeB', {'pCM': 'e_ROE_pCM'}, path=roe_path)
-            ma.variableToSignalSideExtraInfo('mu-:roeB', {'pCM': 'mu_ROE_pCM'}, path=roe_path)
-            ma.variableToSignalSideExtraInfo('gamma:roeB', {'ECM': 'gamma_ROE_ECM'}, path=roe_path)
-            vm.addAlias('e_ROE_pCM', 'extraInfo(e_ROE_pCM)')
-            vm.addAlias('mu_ROE_pCM', 'extraInfo(mu_ROE_pCM)')
-            vm.addAlias('gamma_ROE_ECM', 'extraInfo(gamma_ROEB_pEM)')
-            vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
-            vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanmask))')
-            path.for_each('RestOfEvent', 'RestOfEvents', path=roe_path)
+        vm.addAlias('d0_p', 'daughter(0, p)')
+        vm.addAlias('d1_p', 'daughter(1, p)')
 
         histogramFilename = f'{self}_Validation.root'
 
@@ -617,14 +585,24 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             rootfile=histogramFilename,
             particlelist='B-:SL',
             variables_1d=[
-                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', __liaison__, '', ''),
-                ('InvM', 100, 2.5, 5.3, 'M(D(*)+l)', __liaison__, '', ''),
-                ('useCMSFrame(d0_p)', 100, 0, 5.0, 'Tag lepton momentum in CMS', __liaison__, '', ''),
-                ('useCMSFrame(d1_p)', 100, 0, 5.0, 'Tag D(*) momentum in CMS', __liaison__, '', ''),
-                ('e_ROE_pCM', 100, 0, 5.0, 'ROE e momentum in CMS', __liaison__, '', ''),
-                ('mu_ROE_pCM', 100, 0, 5.0, 'ROE mu momentum in CMS', __liaison__, '', ''),
-                ('gamma_ROE_ECM', 100, 0, 5.0, 'ROE gamma energy in CMS', __liaison__, '', ''),
-                ('nROE_Ch', 20, 0, 20.0, 'N(trk) in ROE', __liaison__, '', ''),
-                ('E_extra_ROE', 100, 0, 2.5, 'E_ECL (CMS) in ROE', __liaison__, '', '')
+                ('cosBY', 90, -3.0, 1.5, 'cosThetaBY', __liaison__,
+                 'Cosine of angle between the reconstructed B and the nominal B', '',
+                 'cos#theta_{BY}', 'Candidates'),
+                ('InvM', 100, 2.5, 5.3, 'M(D(*)+l)', __liaison__,
+                 'Invariant mass distribution of D(*)l system', '', 'm(D(*)l) [GeV]', 'Candidates / 28 MeV'),
+                ('useCMSFrame(d0_p)', 100, 0, 3.0, 'Tag lepton momentum in CMS', __liaison__,
+                 'Momentum of tag-side lepton in CMS', '', 'p(l) [GeV]', 'Candidates / 30 MeV'),
+                ('useCMSFrame(d1_p)', 100, 0, 3.0, 'Tag D(*) momentum in CMS', __liaison__,
+                 'Momentum of tag-side D(*) meson in CMS', '', 'p(D(*)) [GeV]', 'Candidates / 30 MeV'),
+                ('e_ROE_pCM', 100, 0, 3.0, 'ROE e momentum in CMS', __liaison__,
+                 'Momentum of highest-momentum ROE electron in CMS', '', 'p(e) [GeV]', 'Candidates / 30 MeV'),
+                ('mu_ROE_pCM', 100, 0, 3.0, 'ROE mu momentum in CMS', __liaison__,
+                 'Momentum of highest-momentum ROE muon in CMS', '', 'p($\\mu$) [GeV]', 'Candidates / 30 MeV'),
+                ('gamma_ROE_ECM', 100, 0, 5.0, 'ROE gamma energy in CMS', __liaison__,
+                 'Energy of most-energetic ROE photon', '', 'E($\\gamma$) [GeV]', 'Candidates / 50 MeV'),
+                ('nROE_Ch', 20, 0, 20.0, 'N(trk) in ROE', __liaison__,
+                 'Number of tracks in ROE', '', 'tracks', 'Candidates'),
+                ('E_extra_ROE', 100, 0, 2.5, 'E_ECL (CMS) in ROE', __liaison__,
+                 'Extra energy in ROE', '', 'E_{extra} [GeV]', 'Candidates / 25 MeV'),
             ],
             path=path)

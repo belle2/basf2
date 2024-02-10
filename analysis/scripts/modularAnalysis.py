@@ -760,7 +760,7 @@ def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", 
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        correction (float): correction value to be substracted to the particle energy (0.0 -- no correction)
+        correction (float): correction value to be subtracted to the particle energy (0.0 -- no correction)
         payloadName (str): name of the payload which contains the phase-space dependent scaling factors
         correctionName (str): name of correction variable in the payload.
         path (basf2.Path): module is added to this path
@@ -787,7 +787,7 @@ def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear"
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        payloadName (str): name of the payload which contains the smearing valuess
+        payloadName (str): name of the payload which contains the smearing values
         smearingFactorName (str): name of smearing factor variable in the payload.
         path (basf2.Path): module is added to this path
     """

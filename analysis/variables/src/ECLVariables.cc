@@ -1108,7 +1108,7 @@ If there are no extrapolated hits found in the ECL for the event, NaN will be re
 
 )DOC","cm");
     REGISTER_VARIABLE("minC2TDistID", eclClusterIsolationID, R"DOC(
-Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculcated 
+Returns the track array index of the nearest track to the ECL cluster. The nearest track is calculated
 using the `minC2TDist` variable. 
 )DOC");
     REGISTER_METAVARIABLE("minC2TDistVar(variable,particleList=pi-:all)", eclClusterIsolationVar, R"DOC(

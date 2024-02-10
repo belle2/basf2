@@ -1,4 +1,4 @@
-Changes in the analysis package in light-2402-ocicat
+Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------
 
 Variables
@@ -8,6 +8,8 @@ Variables
   different generations. The variable `grandDaughterDiffOf` is therefore not
   needed anymore and declared deprecated. The variables `mcDaughterDiffOf`
   and `daughterNormDiffOf` also accept generalized daughter indices now.
+* Added the `BelleTofMass` variable (Belle only), which gives the mass of a track in :math:`GeV/c^2`, calculated using the TOF
+  information, the path length and the momentum of the particle.
 
 Changes in the analysis package in light-2311-nebelung
 ------------------------------------------------------
@@ -41,6 +43,7 @@ Variables
   `cosHelicityAngleMomentumPi0Dalitz` is recommended to use instead.
 * The variable `cosHelicityAngleMomentumPi0Dalitz` is extended to the case of pi0 two-body decay, where a photon is reconstructed
   from the photon conversion, :math:`\pi^0 \to \gamma (\to e^+ e^-) \gamma`.
+  
 
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------

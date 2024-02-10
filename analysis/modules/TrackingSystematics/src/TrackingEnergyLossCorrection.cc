@@ -31,12 +31,12 @@ TrackingEnergyLossCorrectionModule::TrackingEnergyLossCorrectionModule() : Modul
 
         mypath.add_module("TrackingEnergyLossCorrection", particleLists=['pi+:cut'], correction=0.001)
 
-    The module modifies the input particleLists by substracting the correction value to the track energy and rescaling the momentums 
+    The module modifies the input particleLists by subtracting the correction value to the track energy and rescaling the momenta 
 		     
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("correction", m_correction, "correction value to be substracted from the particle energy",
+  addParam("correction", m_correction, "correction value to be subtracted from the particle energy",
            nan(""));                                        // Nan
   addParam("payloadName", m_payloadName, "ID of table used for reweighing", std::string(""));
   addParam("correctionName", m_correctionName, "Label for the correction in the look up table", std::string(""));

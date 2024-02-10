@@ -12,14 +12,9 @@
 /* ECL headers. */
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
-#include <ecl/digitization/EclConfiguration.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-
-/* Basf2 headers. */
-#include <framework/gearbox/Const.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* ROOT headers. */
-#include <TFile.h>
 #include <TH2F.h>
 #include <TTree.h>
 

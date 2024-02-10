@@ -14,7 +14,7 @@
 #                                                                        #
 # This tutorial demonstrates how to include the charm flavor             #
 # tagging user interface into your analysis.                             #
-# The following decay is recontructed:                                   #
+# The following decay is reconstructed:                                  #
 #                                                                        #
 # D0 -> K- pi+                                                           #
 #                                                                        #

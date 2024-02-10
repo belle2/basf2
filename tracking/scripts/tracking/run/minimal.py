@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,7 +24,7 @@ def get_logger():
 # Provides a commandline interface to specify some parameters to an associated basf2 path execution
 
 
-class EmptyRun(object):
+class EmptyRun:
     """Configure for a bare-bones basf2 job"""
 
     # Declarative section which can be redefined in a subclass

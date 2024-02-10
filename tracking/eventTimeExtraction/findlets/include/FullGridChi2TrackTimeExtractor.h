@@ -39,5 +39,7 @@ namespace Belle2 {
     GridEventTimeExtractor<Chi2BasedEventTimeExtractor> m_gridExtractor;
     /// Refining extractor in the end
     IterativeChi2BasedEventTimeExtractor m_finalExtractor;
+    /// Skip FullGrid EventT0 extraction if SVD EventT0 is present
+    bool m_skipIfSVDEventT0Present = true;
   };
 }

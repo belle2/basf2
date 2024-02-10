@@ -54,7 +54,7 @@ def get(name):
 
     p = _get_instance().GetParticle(name)
     if not p:
-        raise LookupError("No particle with name '%s'" % name)
+        raise LookupError(f"No particle with name '{name}'")
 
     return p
 
@@ -159,8 +159,9 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
     particle = _get_instance().AddParticle(name, name, mass, False, width, charge * 3, "userdefined",
                                            pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
     if particle:
-        basf2.B2INFO("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
-                     (name, pdgCode, mass, width, charge, spin))
+        basf2.B2INFO(
+            f"Adding new particle '{name}' (pdg={int(pdgCode)}, mass={mass:.3g} GeV, width={width:.3g} GeV, " +
+            f"charge={int(charge)}, spin={int(spin)})")
 
         if define_anti_particle:
             anti_particle = _get_instance().AddParticle(
@@ -256,13 +257,13 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
 
         if not name_regex:
             if name[0] == "^" and name[-1] == "$":
-                name = "^{}$".format(re.escape(name[1:-1]))
+                name = f"^{re.escape(name[1:-1])}$"
             elif name[0] == "^":
-                name = "^{}.*".format(re.escape(name[1:]))
+                name = f"^{re.escape(name[1:])}.*"
             elif name[-1] == "$":
-                name = ".*{}$".format(re.escape(name[:-1]))
+                name = f".*{re.escape(name[:-1])}$"
             else:
-                name = ".*{}.*".format(re.escape(name))
+                name = f".*{re.escape(name)}.*"
 
         pattern = re.compile(name, options)
 

@@ -45,8 +45,11 @@ path = b2.Path()
     mc=True,
     {%- endif -%}
     {%- endif -%}
+    {%- if udst_output_name -%}
+    OutputFileName="{{ udst_output_name }}",
+    {%- endif -%}
     {%- if analysis_globaltag -%}
-    analysisGlobaltag="{{ analysis_globaltag }}",
+    {{ " " }}analysisGlobaltag="{{ analysis_globaltag }}"
     {%- endif -%}
 ){%- if hints %}  # pass udstOutput=False to disable udstOutput{%- endif %}
 {% else -%}
@@ -66,8 +69,11 @@ path = b2.Path()
     {{ "    " }}mc=True,
     {% endif -%}
     {% endif -%}
+    {%- if udst_output_name -%}
+    {{ "    " }}OutputFileName="{{ udst_output_name }}",
+    {% endif -%}
     {%- if analysis_globaltag -%}
-    {{ "    " }}analysisGlobaltag="{{ analysis_globaltag }}",
+    {{ "    " }}analysisGlobaltag="{{ analysis_globaltag }}"
     {% endif -%}
     )
 {% endif %}

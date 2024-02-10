@@ -48,7 +48,7 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
-
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
 }
 
@@ -179,13 +179,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 //   auto sg = m_rfws->var("sg");
 
   {
-    m_cTrackedClusters->Clear();
-    m_cTrackedClusters->cd();
-    m_hTrackedClusters->Reset();
-
     std::string name = "Tracked_Clusters"; // new name
-    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters");
-    if (hh2) {
+    TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
+    if (hh2) {// update only if histogram is updated
+      m_cTrackedClusters->Clear();
+      m_cTrackedClusters->cd();
+      m_hTrackedClusters->Reset();
+
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
         int j = 1;
@@ -224,6 +224,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 //       tt->SetTextAngle(90);// Rotated
 //       tt->SetTextAlign(12);// Centered
 //       tt->Draw();
+
+      UpdateCanvas(m_cTrackedClusters);
     }
   }
 
@@ -236,11 +238,11 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i];
     std::replace(name.begin(), name.end(), '.', '_');
 
-    canvas->cd();
-    canvas->Clear();
-
-    TH1* hh1 = findHist(m_histogramDirectoryName, name);
-    if (hh1) {
+    TH1* hh1 = findHist(m_histogramDirectoryName, name, true);
+    if (hh1) {// update only if histo was updated
+      canvas->cd();
+      canvas->Clear();
+      UpdateCanvas(canvas);
 
       if (hh1->GetEntries() > 50) {
 
@@ -266,6 +268,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         m_gCharge->SetPoint(p, i + 0.49, ml->getValV());
         m_gCharge->SetPointError(p, 0.1, ml->getError()); // error in x is useless
         m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), ml->getValV(), ml->getError());
+      } else {
+        hh1->Draw("hist"); // avoid to confuse people by showing nothing for low stat
       }
 
       // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
@@ -302,6 +306,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 
       canvas->Modified();
       canvas->Update();
+      UpdateCanvas(canvas);
 
       // means if ANY plot is > 100 entries, all plots are assumed to be o.k.
       if (hh1->GetEntries() >= 1000) enough = true;
@@ -355,6 +360,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     if (m_hChargeModASIC2d[aVxdID] && m_cChargeModASIC2d[aVxdID]) {
       m_cChargeModASIC2d[aVxdID]->cd();
       m_hChargeModASIC2d[aVxdID]->Draw("colz");
+      UpdateCanvas(m_cChargeModASIC2d[aVxdID]);
     }
   }
 
@@ -375,16 +381,18 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->SetLineWidth(2);
   m_gCharge->SetMarkerStyle(8);
   m_gCharge->Draw("AP");
-//   {
-  // keep this commented code as we may have excluded modules in phase4
-//     auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
-//     tt->SetTextAngle(90);// Rotated
-//     tt->SetTextAlign(12);// Centered
-//     tt->Draw();
-//   }
+
+  for (auto& it : m_excluded) {
+    auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+    tt->SetTextSize(0.035);
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+  }
   m_cCharge->cd(0);
   m_cCharge->Modified();
   m_cCharge->Update();
+  UpdateCanvas(m_cCharge);
 
   double data = 0;
   double diff = 0;

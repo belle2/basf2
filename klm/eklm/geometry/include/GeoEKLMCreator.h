@@ -125,12 +125,6 @@ namespace Belle2 {
      * @struct LogicalVolumes
      * Logical volumes of EKLM.
      *
-     * @var LogicalVolumes::shieldLayer
-     * Shield layer.
-     *
-     * @var LogicalVolumes::shieldLayerSector
-     * Shield layer sector.
-     *
      * @var LogicalVolumes::cover
      * Sector cover.
      *
@@ -489,24 +483,14 @@ namespace Belle2 {
       /**
        * Create layer.
        * @param[in] section Section logical volume.
-       * @param[in] layer   Layer logical volume.
        * @return Layer logical volume.
-       *
-       * If layer == nullptr, then new layer logical volume is created
-       * (for detector layers). If layer != nullptr, then the existing
-       * logical volume is used (for shield layers).
        */
       G4LogicalVolume* createLayer(G4LogicalVolume* section) const;
 
       /**
        * Create sector.
        * @param[in] layer  Layer logical volume.
-       * @param[in] sector Sector logical volume.
        * @return Sector logical volume.
-       *
-       * If sector == nullptr, then new sector logical volume is created
-       * (for detector layers). If sector != nullptr, then the existing
-       * logical volume is used (for shield layers).
        */
       G4LogicalVolume* createSector(G4LogicalVolume* layer) const;
 

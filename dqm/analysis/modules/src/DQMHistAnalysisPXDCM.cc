@@ -48,6 +48,7 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
 
   addParam("gateMaskModuleList", m_parModuleList, "Module List for Gate Masking");
   addParam("gateMaskGateList", m_parGateList, "Gate List for Gate Masking");
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
 
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
@@ -288,13 +289,15 @@ void DQMHistAnalysisPXDCMModule::event()
       m_lineA->Draw();
     }
 
-    // keep this commented code as we may have excluded modules in phase4
-//     auto tt = new TLatex(5.5, 3, "1.3.2 Module is excluded, please ignore");
-//     tt->SetTextAngle(90);// Rotated
-//     tt->SetTextAlign(12);// Centered
-//     tt->Draw();
+    for (auto& it : m_excluded) {
+      auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
+    }
 
-    UpdateCanvas(m_cCommonModeDelta->GetName());
+    UpdateCanvas(m_cCommonModeDelta);
     m_cCommonModeDelta->Modified();
     m_cCommonModeDelta->Update();
   }

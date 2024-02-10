@@ -12,6 +12,7 @@ import os
 import basf2
 from b2biiConversion import convertBelleMdstToBelleIIMdst
 
+os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 os.environ['PGUSER'] = 'g0db'
 
 main = basf2.create_path()

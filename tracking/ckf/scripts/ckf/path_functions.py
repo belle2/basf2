@@ -169,38 +169,21 @@ def add_svd_ckf(
             useBestNInSeed=1
         )
     else:
-        if direction == "forward":
-            module_parameters = dict(
-                firstHighFilterParameters={
-                    "direction": direction,
-                    'DBPayloadName': 'ckf_CDCSVDStateFilter_1_forward_Parameters'},
-                firstHighUseNStates=use_best_seeds,
-                secondHighFilterParameters={
-                    'DBPayloadName': 'ckf_CDCSVDStateFilter_2_forward_Parameters'},
-                secondHighUseNStates=use_best_seeds,
-                thirdHighFilterParameters={
-                    'DBPayloadName': 'ckf_CDCSVDStateFilter_3_forward_Parameters'},
-                thirdHighUseNStates=use_best_seeds,
-                filterParameters={
-                    'DBPayloadName': 'ckf_CDCToSVDResultParameters'},
-                useBestNInSeed=use_best_results,
-            )
-        else:
-            module_parameters = dict(
-                firstHighFilterParameters={
-                    "direction": direction,
-                    'DBPayloadName': 'ckf_CDCSVDStateFilter_1_backward_Parameters'},
-                firstHighUseNStates=use_best_seeds,
-                secondHighFilterParameters={
-                    'DBPayloadName': 'ckf_CDCSVDStateFilter_2_backward_Parameters'},
-                secondHighUseNStates=use_best_seeds,
-                thirdHighFilterParameters={
-                    'DBPayloadName': 'ckf_CDCSVDStateFilter_3_backward_Parameters'},
-                thirdHighUseNStates=use_best_seeds,
-                filterParameters={
-                    'DBPayloadName': 'ckf_CDCToSVDResultParameters'},
-                useBestNInSeed=use_best_results,
-            )
+        module_parameters = dict(
+            firstHighFilterParameters={
+                "direction": direction,
+                'DBPayloadName': f'ckf_CDCSVDStateFilter_1_{direction}_Parameters'},
+            firstHighUseNStates=use_best_seeds,
+            secondHighFilterParameters={
+                'DBPayloadName': f'ckf_CDCSVDStateFilter_2_{direction}_Parameters'},
+            secondHighUseNStates=use_best_seeds,
+            thirdHighFilterParameters={
+                'DBPayloadName': f'ckf_CDCSVDStateFilter_3_{direction}_Parameters'},
+            thirdHighUseNStates=use_best_seeds,
+            filterParameters={
+                'DBPayloadName': 'ckf_CDCToSVDResultParameters'},
+            useBestNInSeed=use_best_results,
+        )
 
     path.add_module("CDCToSVDSpacePointCKF",
                     inputRecoTrackStoreArrayName=cdc_reco_tracks,

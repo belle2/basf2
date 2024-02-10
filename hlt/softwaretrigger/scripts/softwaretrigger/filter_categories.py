@@ -90,6 +90,7 @@ LEVEL1 = [
     "filter L1 Bhabha veto",
     "filter L1 Bhabha select",
     "filter L1 trigger nn info",
+    "filter passthrough l1 trigger f",
     "filter dummy"
 ]
 

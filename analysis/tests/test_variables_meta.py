@@ -55,6 +55,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
         "daughterDiffOfPhi": "double",
         "daughterDiffOfClusterPhi": "double",
         "mcDaughterDiffOfPhi": "double",
+        "grandDaughterDiffOf": 'double',
         "grandDaughterDiffOfPhi": "double",
         "grandDaughterDiffOfClusterPhi": "double",
         "daughterDiffOfPhiCMS": "double",

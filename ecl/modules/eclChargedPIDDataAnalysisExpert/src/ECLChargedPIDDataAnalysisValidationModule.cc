@@ -194,11 +194,6 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       if (itrack_max < 0) continue; // Go to next particle if no track found.
 
       const auto track = particle.getRelationsFrom<Track>()[itrack_max];
-      // Very unlikely, but random failures due to missing ECLPidLikelihood have been observed
-      // Let's continue if this is a nullptr
-      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
-      if (not eclLikelihood)
-        continue;
       const auto fitRes = track->getTrackFitResultWithClosestMass(Const::pion);
 
       m_p[chargedIdx] = p_max;
@@ -235,6 +230,12 @@ void ECLChargedPIDDataAnalysisValidationModule::event()
       // For deltaLogL, we do a binary comparison sig/bkg.
       // If sig=pion, use bkg=kaon. Otherwise, bkg=pion.
       const auto chargedStableBkg = (chargedStableSig == Const::pion) ? Const::kaon : Const::pion;
+
+      // Very unlikely, but random failures due to missing ECLPidLikelihood have been observed
+      // Let's continue if this is a nullptr
+      const auto eclLikelihood = track->getRelated<ECLPidLikelihood>();
+      if (not eclLikelihood)
+        continue;
 
       double lh_sig = eclLikelihood->getLikelihood(chargedStableSig);
       double lh_bkg = eclLikelihood->getLikelihood(chargedStableBkg);

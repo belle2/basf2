@@ -38,10 +38,10 @@ namespace Belle2 {
        */
       struct TreeStruct {
         float layerAverageRates[4] = {0}; /**< layer average occupancy */
-        float layerLadderAverageRates[4][16] = {{0}}; /**< [#layer][#ladder] */
-        float layerSensorAverageRates[4][5] = {{0}}; /**< [#layer][#sensor] */
+        float layerLadderAverageRates[4][16] = {{0}}; /**< [\#layer][\#ladder] */
+        float layerSensorAverageRates[4][5] = {{0}}; /**< [\#layer][\#sensor] */
         float averageRate = 0; /**< total SVD average occupancy */
-        float l3LadderSensorAverageRates[7][2] = {{0}}; /**< Layer 3 sensors [#ladder][#sensor] */
+        float l3LadderSensorAverageRates[7][2] = {{0}}; /**< Layer 3 sensors [\#ladder][\#sensor] */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
 

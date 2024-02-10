@@ -332,13 +332,13 @@ void StorageRootOutputModule::openFile()
   try {
     m_db->connect();
     m_db->execute("INSERT INTO datafiles_root "
-                  "(name, path, host, runtype, expno, runno, compression_level, compression_algorithm, time_open, "
+                  "(name, path, host, disk, runtype, expno, runno, compression_level, compression_algorithm, time_open, "
                   "size, nevents, nfullevents, correct_close, renamed, used_for_merge, removed) "
-                  "VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d, '%s', 0, 0, 0, FALSE, FALSE, FALSE, FALSE);",
-                  out_notmp.filename().c_str(), out_notmp.c_str(), m_HLTName.c_str(),
+                  "VALUES ('%s', '%s', '%s', '%s','%s', %d, %d, %d, %d, '%s', 0, 0, 0, FALSE, FALSE, FALSE, FALSE);",
+                  out_notmp.filename().c_str(), out_notmp.c_str(), m_HLTName.c_str(), m_disk.c_str(),
                   m_runType.c_str(), m_expno, m_runno,
                   m_compressionLevel, m_compressionAlgorithm,
-                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str());
+                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())+std::string("+09")).c_str());
   } catch (const DBHandlerException &e) {
     B2WARNING(e.what());
   } 
@@ -373,9 +373,10 @@ void StorageRootOutputModule::event()
   if (!m_file) {
     m_expno = m_eventMetaData->getExperiment();
     m_runno = m_eventMetaData->getRun();
+    m_disk = StringUtil::form("disk%02d", (m_processNumber%m_nDisk)+1);
     m_processNumber = atoi(getName().substr(0, getName().find(std::string("_"))).c_str());
-    m_outputFileName = StringUtil::form("/rawdata/disk%02d/belle/Raw/%4.4d/%5.5d/%s.%4.4d.%5.5d.%s.p%02d.root", 
-                                        (m_processNumber%m_nDisk)+1, m_expno, m_runno, m_runType.c_str(), 
+    m_outputFileName = StringUtil::form("/rawdata/%s/belle/Raw/%4.4d/%5.5d/%s.%4.4d.%5.5d.%s.p%02d.root", 
+                                        m_disk.c_str(), m_expno, m_runno, m_runType.c_str(), 
                                         m_expno, m_runno, m_HLTName.c_str(), m_processNumber);
   }
 
@@ -574,7 +575,7 @@ void StorageRootOutputModule::closeFile()
                   "WHERE name = '%s' AND host = '%s';",
                   ((boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize || m_ramdiskBuffer) ? "true" : "false",
                   m_outputFileMetaData.getNEvents(), m_outputFileMetaData.getNFullEvents(), m_file->GetSize(),
-                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::universal_time())+std::string("+9")).c_str(),
+                  (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())+std::string("+09")).c_str(),
                   filename_path.filename().c_str(), m_HLTName.c_str());
   } catch (const DBHandlerException &e) {
     B2WARNING(e.what());

@@ -5,29 +5,37 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/geometry/GeoECLCreator.h>
-#include "ecl/geometry/BelleLathe.h"
-#include "ecl/geometry/BelleCrystal.h"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
-#include <G4VisAttributes.hh>
-#include <G4Tubs.hh>
-#include <G4Box.hh>
+
+/* ECL headers. */
+#include <ecl/geometry/BelleLathe.h>
+#include <ecl/geometry/BelleCrystal.h>
+#include <ecl/geometry/shapes.h>
+
+/* Basf2 headers. */
+#include <geometry/Materials.h>
+
+/* Geant4 headers. */
 #include <G4AssemblyVolume.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4Region.hh>
-#include <G4UnionSolid.hh>
-#include <G4TwoVector.hh>
+#include <G4Box.hh>
+#include <G4LogicalVolume.hh>
+#include <G4Point3D.hh>
+#include <G4PVPlacement.hh>
 #include <G4PVReplica.hh>
-#include "G4ReflectionFactory.hh"
+#include <G4ReflectionFactory.hh>
+#include <G4Region.hh>
+#include <G4SubtractionSolid.hh>
+#include <G4Tubs.hh>
+#include <G4TwoVector.hh>
+#include <G4UnionSolid.hh>
+#include <G4Vector3D.hh>
+#include <G4VisAttributes.hh>
 #include <G4Trap.hh>
 
+/* C++ headers. */
 #include <iostream>
-#include "CLHEP/Matrix/Vector.h"
-#include "G4Vector3D.hh"
-#include "G4Point3D.hh"
-#include "ecl/geometry/shapes.h"
-#include <geometry/Materials.h>
 
 using namespace std;
 using namespace Belle2;

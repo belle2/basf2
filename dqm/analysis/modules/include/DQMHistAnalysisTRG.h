@@ -74,62 +74,6 @@ namespace Belle2 {
 
     //! Final Canvas
     TCanvas* m_canvas = nullptr;
-    /**
-     * @Name of canvas of ECLTRG_timing_mean
-     */
-    TCanvas* m_canvas_ECLTRG_timing_mean = nullptr;
-    /**
-     * @Name of canvas of CDCTRG_timing_mean
-     */
-    TCanvas* m_canvas_CDCTRG_timing_mean = nullptr;
-    /**
-     * @Name of canvas of TOPTRG_timing_mean
-     */
-    TCanvas* m_canvas_TOPTRG_timing_mean = nullptr;
-    /**
-     * @Name of canvas of ECLTRG_peak
-     */
-    TCanvas* m_canvas_ECLTRG_peak = nullptr;
-    /**
-     * @Name of canvas of CDCTRG_2D_peak
-     */
-    TCanvas* m_canvas_CDCTRG_2D_peak = nullptr;
-    /**
-     * @Name of canvas of NN_peak
-     */
-    TCanvas* m_canvas_NN_peak = nullptr;
-    /**
-     * @Name of canvas of CDCTRG_TSF_peak
-     */
-    TCanvas* m_canvas_CDCTRG_TSF_peak = nullptr;
-    /**
-     * @Name of canvas of KLMTRG_peak
-     */
-    TCanvas* m_canvas_KLMTRG_peak = nullptr;
-    /**
-     * @Name of canvas of TOPTRG_peak
-     */
-    TCanvas* m_canvas_TOPTRG_peak = nullptr;
-    /**
-     * @Name of canvas of hadronb2_over_bhabha_all
-     */
-    TCanvas* m_canvas_hadronb2_over_bhabha_all = nullptr;
-    /**
-     * @Name of canvas of mumu2trk_over_bhabha_all
-     */
-    TCanvas* m_canvas_mumu2trk_over_bhabha_all = nullptr;
-    /**
-     * @Name of canvas of hadronb2_over_mumu2trk
-     */
-    TCanvas* m_canvas_hadronb2_over_mumu2trk = nullptr;
-    /**
-     * @Name of canvas of deadch_c_h_TCId
-     */
-    TCanvas* m_canvas_deadch_c_h_TCId = nullptr;
-    /**
-     * @Name of canvas of deadch_c_NeuroHWInTSID
-     */
-    TCanvas* m_canvas_deadch_c_NeuroHWInTSID = nullptr;
 
   };
 } // end namespace Belle2

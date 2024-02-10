@@ -45,14 +45,14 @@ def main(argv):
         Just to show that the function is correctly applied
         """
         b2.set_log_level(b2.LogLevel.DEBUG)
-        b2.B2INFO("Running Test Algorithm Setup For Iteration {}".format(iteration))
-        b2.B2INFO("Can access the {} class from Calibration().pre_algorithms.".format(algorithm.__cppname__))
+        b2.B2INFO(f"Running Test Algorithm Setup For Iteration {iteration}")
+        b2.B2INFO(f"Can access the {algorithm.__cppname__} class from Calibration().pre_algorithms.")
 
     # Make a bunch of test calibrations
     calibrations = []
     for i in range(1, 5):
         col_test = b2.register_module('CaTest')
-        col_test.set_name('Test{}'.format(i))   # Sets the prefix of the collected data in the datastore.
+        col_test.set_name(f'Test{i}')   # Sets the prefix of the collected data in the datastore.
         # Allows us to execute algorithm over all input data, in one big IoV.
         col_test.param('granularity', 'all')
         # Specific parameter to our test collector, proportional to the probability of algorithm requesting iteration.
@@ -62,10 +62,10 @@ def main(argv):
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have
         # different names. TestCalibrationAlgorithm outputs to the database using the prefix name so we change it
         # slightly for each calibration. Not something you'd usually have to do.
-        alg_test.setPrefix('Test{}'.format(i))  # Must be the same as colllector prefix
+        alg_test.setPrefix(f'Test{i}')  # Must be the same as colllector prefix
         alg_test.setDebugHisto(True)
 
-        cal_test = Calibration(name='TestCalibration{}'.format(i),
+        cal_test = Calibration(name=f'TestCalibration{i}',
                                collector=col_test,
                                algorithms=alg_test,
                                input_files=input_files_test)

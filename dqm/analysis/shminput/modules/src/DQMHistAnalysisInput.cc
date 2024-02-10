@@ -86,6 +86,7 @@ void DQMHistAnalysisInputModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInput: beginRun called.");
   clearHistList();
+  clearCanvases();
 }
 
 void DQMHistAnalysisInputModule::event()
@@ -187,15 +188,6 @@ void DQMHistAnalysisInputModule::event()
 void DQMHistAnalysisInputModule::endRun()
 {
   B2INFO("DQMHistAnalysisInput : endRun called");
-
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      (dynamic_cast<TCanvas*>(cobj))->Clear();
-    }
-  }
 }
 
 void DQMHistAnalysisInputModule::terminate()

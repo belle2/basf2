@@ -32,6 +32,8 @@ REG_MODULE(DQMHistAnalysisOutputMonObj);
 DQMHistAnalysisOutputMonObjModule::DQMHistAnalysisOutputMonObjModule()
   : DQMHistAnalysisModule()
 {
+  setDescription("Module to process run information.");
+
   //Parameter definition
   addParam("Filename", m_filename, "Output root filename (if not set mon_e{exp}r{run}.root is used", std::string(""));
   addParam("TreeFile", m_treeFile, "If set, entry to run summary TTree from TreeFile is made", std::string(""));

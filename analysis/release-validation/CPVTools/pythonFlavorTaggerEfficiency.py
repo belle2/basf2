@@ -1077,7 +1077,7 @@ for method in methods:
     plt.savefig(workingDirectory + '/' + method + '_WrongTagFraction.pdf')
     fig5.clear()
 
-    # --- Effiency and Mu plot ----------------------------- ##
+    # --- Efficiency and Mu plot ----------------------------- ##
 
     fig6 = plt.figure(13, figsize=(11, 15))
     ax6 = plt.axes([0.21, 0.53, 0.76, 0.45])

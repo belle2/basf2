@@ -44,52 +44,10 @@ namespace Belle2 {
      * */
     double getErrorInDeg() const { return m_error * TMath::RadToDeg(); }
 
-    /** Getter for the lower interval bound: angle-sigma*error.
-     * @param sigma width of the error interval in standard deviations
-     * @return angle - sigma * error
-     */
-    double getLowerIntervalBoundary(double sigma = 1) const { return m_angle - sigma * m_error; }
-
-    /** Getter for the upper interval bound: angle+sigma*error
-     * @param sigma width of the error interval in standard deviations
-     * @return angle + sigma * error
-     */
-    double getUpperIntervalBoundary(double sigma = 1) const { return m_angle + sigma * m_error; }
-
   protected:
-    typedef std::pair<double, double> Interval;  /**< Shortcut for std::pair used as interval. */
 
     double m_angle; /**< Angle in rad */
     double m_error; /**< Error in rad */
-
-    /**
-     * Checks if the intervals overlap at some point.
-     * If comparing phi angles, be sure to have the interval in a way this function can handle it, meaning always between [0, 2pi).
-     * @param x_interval first interval to check
-     * @param y_interval second interval
-     * @return true if x and y overlap
-     */
-    bool intervalsCompatible(const Interval& x_interval, const Interval& y_interval) const
-    {
-      const double xCenter = (x_interval.second + x_interval.first) / 2.;
-      const double yCenter = (y_interval.second + y_interval.first) / 2.;
-      const double delta = std::fabs(yCenter - xCenter);
-
-      if (delta >= 0) {
-        const double xArm = x_interval.second - xCenter;
-        const double yArm = yCenter - y_interval.first;
-        const double sigmaSum = xArm + yArm;
-        if (delta < sigmaSum) return true;
-        return false;
-      } else {
-        const double xArm = xCenter - x_interval.first;
-        const double yArm = y_interval.second - yCenter;
-        const double sigmaSum = xArm + yArm;
-        if (std::fabs(delta) < sigmaSum) return true;
-        return false;
-      }
-
-    }
 
   };
 
@@ -102,7 +60,7 @@ namespace Belle2 {
   public:
     /**
      * Constructor using radian units.
-     * Theta in [0, Pi)
+     * Theta in [0, pi].
      * @param angle theta angle to use
      * @param error error on the angle
      */
@@ -127,13 +85,13 @@ namespace Belle2 {
      */
     bool containsIn(const ThetaAngle& angle, double sigma) const
     {
-      const Interval x(getLowerIntervalBoundary(sigma), getUpperIntervalBoundary(sigma));
-      const Interval y(angle.getLowerIntervalBoundary(sigma), angle.getUpperIntervalBoundary(sigma));
-
-      if (intervalsCompatible(x, y)) return true;
-
-      return false;
+      double angularDistance, sigmaError;
+      /* Distance in the range [0, pi]. */
+      angularDistance = std::abs(m_angle - angle.getAngle());
+      sigmaError = sigma * (m_error + angle.getError());
+      return angularDistance < sigmaError;
     }
+
   };
 
 
@@ -145,13 +103,16 @@ namespace Belle2 {
   public:
     /**
      * Constructor using radian units.
-     * Phi in [0, 2pi]
+     * Phi in [0, 2 * pi).
      * @param angle phi angle
      * @param error error on the phi angle
      */
     PhiAngle(double angle, double error) : BaseAngle(angle, error)
     {
-      m_angle = std::fabs(std::fmod(m_angle, TMath::TwoPi()));
+      /* Angle in the range (-2 * pi, 2 * pi). */
+      m_angle = std::fmod(m_angle, TMath::TwoPi());
+      if (m_angle < 0)
+        m_angle = m_angle + TMath::TwoPi();
     }
 
     /** Check if two angles are compatible.
@@ -170,42 +131,18 @@ namespace Belle2 {
      */
     bool containsIn(const PhiAngle& angle, double sigma) const
     {
-      const double twoPi = TMath::TwoPi();
-      const Interval x(getLowerIntervalBoundary(sigma), getUpperIntervalBoundary(sigma));
-      const Interval y(angle.getLowerIntervalBoundary(sigma), angle.getUpperIntervalBoundary(sigma));
-
-      //Transform intervals
-      const double shift = x.first;
-      const Interval xShifted(x.first - shift, x.second - shift);
-      const Interval yShifted(y.first - shift, y.second - shift);
-
-      if (twoPi < xShifted.second) return true;  // x covers [0, 2Pi)
-
-      if ((yShifted.first <= 0) and (twoPi < yShifted.second)) return true;  // y covers [0, 2Pi)
-
-      if ((0. <= yShifted.first) and (yShifted.second < twoPi)) {
-        return intervalsCompatible(xShifted, yShifted);
-      }
-
-      if (!(0. <= yShifted.first) and (yShifted.second < twoPi)) {
-        const Interval y1(y.first + twoPi, twoPi);
-        const Interval y2(0., y.second);
-
-        if (intervalsCompatible(x, y1)) return true;
-        if (intervalsCompatible(x, y2)) return true;
-        return false;
-      }
-
-      if ((0 <= yShifted.first) and !(yShifted.second < twoPi)) {
-        const Interval y1(y.first, twoPi);
-        const Interval y2(0., y.second - twoPi);
-
-        if (intervalsCompatible(x, y1)) return true;
-        if (intervalsCompatible(x, y2)) return true;
-        return false;
-      }
-
-      return false;
+      double angularDistance, shortestAngularDistance, sigmaError;
+      /* Distance in the range [0, 2 * pi). */
+      angularDistance = std::abs(m_angle - angle.getAngle());
+      /* Distance in the range [0, pi]. */
+      if (angularDistance > TMath::Pi())
+        shortestAngularDistance = TMath::TwoPi() - angularDistance;
+      else
+        shortestAngularDistance = angularDistance;
+      sigmaError = sigma * (m_error + angle.getError());
+      return shortestAngularDistance < sigmaError;
     }
+
   };
+
 }

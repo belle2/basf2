@@ -59,7 +59,7 @@ class StylingWidget(IPythonWidget):
     def create(self):
         """Create the styling widget."""
         from IPython.core.display import HTML
-        html = HTML("<style>\n%s\n</style>" % self.css_string)
+        html = HTML(f"<style>\n{self.css_string}\n</style>")
         return html
 
 
@@ -112,14 +112,13 @@ class ProgressBarViewer(IPythonWidget):
                 # creates a human-readable time delta like '3 minutes 34 seconds'
                 attrs = ['years', 'months', 'days', 'hours', 'minutes', 'seconds']
 
-                def human_readable(delta): return ['%d %s' % (getattr(delta, attr), getattr(delta, attr) > 1 and attr or attr[:-1])
+                def human_readable(delta): return [f'{int(getattr(delta, attr))} {getattr(delta, attr) > 1 and attr or attr[:-1]}'
                                                    for attr in attrs if getattr(delta, attr)]
 
                 times_list = human_readable(relativedelta(seconds=time_delta_per_percentage * remaining_percentage))
                 human_readable_str = " ".join(times_list)
 
-                display_text = "%d %% Remaining time: %s" % (
-                    100 * current_percentage, human_readable_str)
+                display_text = f"{int(100 * current_percentage)} % Remaining time: {human_readable_str}"
 
                 self.progress_label.value = display_text
                 self.progress_bar.value = float(current_percentage)

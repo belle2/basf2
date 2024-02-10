@@ -2,12 +2,12 @@
 # Descriptor: [ccbar Dstarp2D0Pip D02PipPimPi0]
 # NickName: DstpToD0Pip_D0ToPipPimPi0
 # Cuts: None
-# Documentation: MC13a signal request
+# Documentation: MC15rd signal request with bugfix for EvtGen Dalitz model, 2610032001.xml is necessary
 # PhysicsWG: Charm
 # Tested: Yes
-# Responsible: Emma Oxford
-# Email: emma.oxford@desy.de
-# Date: 20191117 (YYYYMMDD)
+# Responsible: Ludovico Massaccesi
+# Email: ludovico.massaccesi@pi.infn.it
+# Date: 20230409 (YYYYMMDD)
 #
 # June 2021 Automated: Converted PYTHIA ids
 #   Automated conversion of all PYTHIA decay ids to Pythia 8 using conversion defined in evtgen/src/EvtGenExternal/EvtPythiaEngine.cpp
@@ -59,7 +59,7 @@ Decay D*+
 Enddecay
 
 Decay D0sig
-1.0000      pi+      pi-      pi0sig               PHOTOS    D_DALITZ;
+1.0000      pi+      pi-      pi0sig               PHOTOS    GENERIC_DALITZ ./2610032001.xml;
 Enddecay
 
 Decay pi0sig

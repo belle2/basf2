@@ -11,33 +11,45 @@ import sys
 import rawdata
 import tracking
 
+"""
+        Sample script to generate ASIC cross-talk library.  Usage:
+
+        basf2 AsicBackgroundLibraryGenerator.py <cosmic_raw_data_file> <output_asicbg_root_file> <data_type>
+
+          cosmic_raw_data_file : input raw data files
+
+          output_asicbg_root_file: output root files
+
+          data_type: 'mc' or 'data'
+    """
+
 
 def main():
-    """
-       Sample script to generte ASIC cross-talk library.  Usage:
 
-        basf2 AsicBackgroundLibraryGenerator.py <cosmic_raw_data_file> <output_asicbg_root_file>
-    """
-    global_tag = "data_reprocessing_prompt_rel4_patchb"
-    basf2.conditions.override_globaltags()
-    basf2.conditions.expert_settings(usable_globaltag_states={"TESTING", "VALIDATED",
-                                                              "PUBLISHED", "RUNNING", "OPEN"})
-    basf2.conditions.append_globaltag(global_tag)
+    GT = ['patch_main_release-07'][0]
+    basf2.B2WARNING(f'Current global tag is {GT}, please update the proper global tag to match the data')
+    basf2.conditions.prepend_globaltag(GT)
     path = basf2.create_path()
     path.add_module("Progress")
 
+    if len(sys.argv) != 4:
+        sys.exit("Three arguments are required: input_root, output_root, and data_type")
     # Input raw data file
     inputFilename = sys.argv[1]
     # Output file
     file_name = sys.argv[2]
+    # data or mc
+    sample_name = sys.argv[3]
+    print(inputFilename, '\n', file_name, '\n', sample_name)
 
-    branches = ['EventMetaData',  'RawCDCs']
+    cdc_type = {'data': 'RawCDCs', 'mc': 'CDCHits'}
+    branches = ['EventMetaData',  cdc_type[f'{sample_name}']]
     path.add_module("RootInput", inputFileNames=inputFilename, branchNames=branches)
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)
 
-    unpackers = ['CDC']
-    rawdata.add_unpackers(path, components=unpackers)
+    if sample_name == 'data':
+        rawdata.add_unpackers(path, components=['CDC'])
 
     tracking.add_track_finding(path, components=['CDC'])
 

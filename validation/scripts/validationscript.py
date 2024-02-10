@@ -181,8 +181,8 @@ class Script:
 
         if level > 50:
             self.log.error(
-                f"Recurisve dependency lookup reached level {level} and will "
-                f"quit now. Possibly circular dependcencies in the validation "
+                f"Recursive dependency lookup reached level {level} and will "
+                f"quit now. Possibly circular dependencies in the validation "
                 f"scripts ? "
             )
 
@@ -215,7 +215,7 @@ class Script:
     def unique_name(self):
         """
         Generates a unique name from the package and name of the script
-        which only occurs once in th whole validation suite
+        which only occurs once in the whole validation suite
         """
         return f"script_unique_name_{self.package}_{self.name}"
 
@@ -373,7 +373,7 @@ class Script:
 
     @property
     def interval(self) -> str:
-        """ Interval of script executation as set in header """
+        """ Interval of script execution as set in header """
         self.load_header()
         return self._header.get("interval", "nightly")
 

@@ -12,6 +12,7 @@
 <header>
   <contact>software-tracking@belle2.org</contact>
   <input>V0ValidationHarvested.root</input>
+  <output>V0Validation.root</output>
   <description>This module creates efficiency plots for the V0 validation.</description>
 </header>
 """
@@ -19,6 +20,8 @@
 
 import numpy
 import ROOT
+
+ACTIVE = True
 
 
 class V0ValidationPlots:
@@ -137,9 +140,8 @@ class V0ValidationPlots:
         """
         efficiency = ROOT.TEfficiency(found, all)
         efficiency.SetName("".join(title.split()))
-        ylabel = 'Efficiency / ({} {})'.format((found.GetXaxis().GetXmax() -
-                                                found.GetXaxis().GetXmin()) / found.GetNbinsX(), x_unit)
-        efficiency.SetTitle("{};{} / ({});{}".format(title, x_variable, x_unit, ylabel))
+        ylabel = f'Efficiency / ({(found.GetXaxis().GetXmax() - found.GetXaxis().GetXmin()) / found.GetNbinsX()} {x_unit})'
+        efficiency.SetTitle(f"{title};{x_variable} / ({x_unit});{ylabel}")
         efficiency.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         efficiency.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         efficiency.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -161,12 +163,11 @@ class V0ValidationPlots:
         :return: modified hist
         """
         hist.SetName("".join(title.split()))
-        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
-        ylabel = 'Entries / ({} {})'.format((hist.GetXaxis().GetXmax() -
-                                             hist.GetXaxis().GetXmin()) /
-                                            hist.GetNbinsX(), x_unit) if x_unit is not None \
-            else 'Entries / ({})'.format((hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX())
-        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        xlabel = f'{x_variable} / ({x_unit})' if x_unit is not None else f'{x_variable}'
+        ylabel = f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()} {x_unit})' \
+            if x_unit is not None \
+            else f'Entries / ({(hist.GetXaxis().GetXmax() - hist.GetXaxis().GetXmin()) / hist.GetNbinsX()})'
+        hist.SetTitle(f"{title};{xlabel};{ylabel}")
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -192,9 +193,9 @@ class V0ValidationPlots:
         :return:
         """
         hist.SetName("".join(title.split()))
-        xlabel = '{} / ({})'.format(x_variable, x_unit) if x_unit is not None else '{}'.format(x_variable)
-        ylabel = '{} / ({})'.format(y_variable, y_unit) if y_unit is not None else '{}'.format(y_variable)
-        hist.SetTitle("{};{};{}".format(title, xlabel, ylabel))
+        xlabel = f'{x_variable} / ({x_unit})' if x_unit is not None else f'{x_variable}'
+        ylabel = f'{y_variable} / ({y_unit})' if y_unit is not None else f'{y_variable}'
+        hist.SetTitle(f"{title};{xlabel};{ylabel}")
         hist.GetListOfFunctions().Add(ROOT.TNamed('Description', description))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Check', check))
         hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', contact))
@@ -301,4 +302,9 @@ class V0ValidationPlots:
 
 
 if __name__ == '__main__':
-    V0ValidationPlots().collect_histograms().plot()
+    if ACTIVE:
+        V0ValidationPlots().collect_histograms().plot()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

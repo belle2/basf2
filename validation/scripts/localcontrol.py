@@ -45,7 +45,7 @@ class Local:
     @staticmethod
     def name():
         """
-        Returns name of this job contol
+        Returns name of this job control
         """
         return "local"
 

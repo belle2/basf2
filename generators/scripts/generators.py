@@ -461,7 +461,7 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
     loop_path = b2.create_path()
     # we might run this more than once so make sure we remove any particles
     # before generating new ones
-    loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
+    loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles", "EventExtraInfo"])
     # add the generator but make sure it doesn't stop processing on
     # fragmentation failure as is this currently not supported by do_while
     add_continuum_generator(loop_path, finalstate, userdecfile, skip_on_failure=False, eventType=eventType)

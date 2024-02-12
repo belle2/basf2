@@ -55,6 +55,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("enable2ndHit", m_enable2ndHit, "Enable 2nd hit timing as a individual CDCHit object.", false);
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
   addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
+  addParam("relationRawHits", m_relationRawHits, "Enbale relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
 
 }
 
@@ -82,18 +83,19 @@ void CDCUnpackerModule::initialize()
   m_CDCRawHits.registerInDataStore(m_cdcRawHitName);
   m_CDCHits.registerInDataStore(m_cdcHitName);
 
-  // Relation.
-  m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);
-  m_CDCHits.registerRelationTo(m_CDCRawHits);
+  if (m_relationRawHits == true) {
+    m_CDCHits.registerRelationTo(m_CDCRawHitWaveForms);
+    m_CDCHits.registerRelationTo(m_CDCRawHits);
 
-  // Set default names for the relations.
-  m_relCDCRawHitToCDCHitName = DataStore::relationName(
-                                 DataStore::arrayName<CDCRawHit>(m_cdcRawHitName),
-                                 DataStore::arrayName<CDCHit>(m_cdcHitName));
-
-  m_relCDCRawHitWFToCDCHitName = DataStore::relationName(
-                                   DataStore::arrayName<CDCRawHitWaveForm>(m_cdcRawHitWaveFormName),
+    // Set default names for the relations.
+    m_relCDCRawHitToCDCHitName = DataStore::relationName(
+                                   DataStore::arrayName<CDCRawHit>(m_cdcRawHitName),
                                    DataStore::arrayName<CDCHit>(m_cdcHitName));
+
+    m_relCDCRawHitWFToCDCHitName = DataStore::relationName(
+                                     DataStore::arrayName<CDCRawHitWaveForm>(m_cdcRawHitWaveFormName),
+                                     DataStore::arrayName<CDCHit>(m_cdcHitName));
+  }
 
   if (m_enablePrintOut == true) {
     B2INFO("CDCUnpacker: " << LogVar("FADC threshold", m_fadcThreshold));
@@ -123,8 +125,10 @@ void CDCUnpackerModule::event()
   // Create Data objects.
   m_CDCHits.clear();
 
-  RelationArray rawCDCsToCDCHits(m_CDCRawHits, m_CDCHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
-  RelationArray rawCDCWFsToCDCHits(m_CDCRawHitWaveForms, m_CDCHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
+  if (m_relationRawHits == true) {
+    RelationArray rawCDCsToCDCHits(m_CDCRawHits, m_CDCHits, m_relCDCRawHitToCDCHitName); // CDCRawHit <-> CDCHit
+    RelationArray rawCDCWFsToCDCHits(m_CDCRawHitWaveForms, m_CDCHits, m_relCDCRawHitWFToCDCHitName); // CDCRawHitWaveForm <-> CDCHit
+  }
 
   if (m_enableStoreCDCRawHit == true) {
     m_CDCRawHits.clear();
@@ -304,9 +308,11 @@ void CDCUnpackerModule::event()
                 secondHit->set2ndHitFlag();
               }
               if (m_enableStoreCDCRawHit == true) {
-                for (int iSample = 0; iSample < nSamples; ++iSample) {
-                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(m_CDCRawHitWaveForms[m_CDCRawHitWaveForms.getEntries() - 1 + iSample -
-                                                                       (nSamples - 1) ]);
+                if (m_relationRawHits == true) {
+                  for (int iSample = 0; iSample < nSamples; ++iSample) {
+                    m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(m_CDCRawHitWaveForms[m_CDCRawHitWaveForms.getEntries() - 1 + iSample -
+                                                                         (nSamples - 1) ]);
+                  }
                 }
               }
             }
@@ -426,11 +432,16 @@ void CDCUnpackerModule::event()
 
                 if (m_enableStoreCDCRawHit == true) {
                   // Store to the CDCRawHit object.
-                  CDCRawHit* rawHit = m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
-                                                             trgTime, fadcSum, tdc1, tdc2, tot);
-                  m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(rawHit);
-                  if (m_enable2ndHit == true) {
-                    m_CDCHits[m_CDCHits.getEntries() - 2]->addRelationTo(rawHit);
+                  if (m_relationRawHits == true) {
+                    CDCRawHit* rawHit = m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                                               trgTime, fadcSum, tdc1, tdc2, tot);
+                    m_CDCHits[m_CDCHits.getEntries() - 1]->addRelationTo(rawHit);
+                    if (m_enable2ndHit == true) {
+                      m_CDCHits[m_CDCHits.getEntries() - 2]->addRelationTo(rawHit);
+                    }
+                  } else {
+                    m_CDCRawHits.appendNew(status, trgNumber, iNode, iFiness, board, ch,
+                                           trgTime, fadcSum, tdc1, tdc2, tot);
                   }
                 }
 

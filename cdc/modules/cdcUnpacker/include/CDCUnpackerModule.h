@@ -351,6 +351,11 @@ namespace Belle2 {
        */
       bool m_dataSizeError;
 
+      /**
+       * True if add relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms."
+       */
+      bool m_relationRawHits;
+
     };//end class declaration
 
 

@@ -94,10 +94,7 @@ namespace Belle2 {
     std::vector<REFNODE*> m_pnode;
 
     /** Reference Histogram Root file name */
-    std::map<std::string, std::string> m_listRefFiles;
-
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
+    std::string m_referenceFile;
 
   };
 } // end namespace Belle2

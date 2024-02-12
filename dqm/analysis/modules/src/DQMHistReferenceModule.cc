@@ -30,7 +30,7 @@ REG_MODULE(DQMHistReference);
 DQMHistReferenceModule::DQMHistReferenceModule() : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("ListRefFiles", m_listRefFiles, "List of reference histrogram files");
+  addParam("ReferenceFile", m_referenceFile, "Name of the reference histrogram files", string(""));
   B2DEBUG(1, "DQMHistReference: Constructor done.");
 }
 
@@ -92,16 +92,8 @@ void DQMHistReferenceModule::beginRun()
   if (hrtype != NULL) {
     run_type = string(hrtype->GetTitle());
     B2INFO("DQMHistReference: hrtype: " << string(hrtype->GetName()));
-    auto search = m_listRefFiles.find(run_type);
-    if (search == m_listRefFiles.end()) {
-      run_type = "default";
-    }
   }
   B2INFO("DQMHistReference: run_type " << run_type);
-
-  if (m_refFile != NULL) delete m_refFile;
-  m_refFile = new TFile(m_listRefFiles[run_type].c_str());
-  B2INFO("DQMHistReference: use reference file " << m_listRefFiles[run_type]);
 
   for (auto& it : m_pnode) {
     // clear ref histos from memory
@@ -111,48 +103,73 @@ void DQMHistReferenceModule::beginRun()
   m_pnode.clear();
   B2INFO("DQMHistReference: clear m_pnode. size: " << m_pnode.size());
 
+  //if (m_refFile != NULL) delete m_refFile;
+  TFile* m_refFile = new TFile(m_referenceFile.c_str());
+
+  if (m_refFile->IsZombie()) {
+    B2INFO("DQMHistReference: reference file " << m_referenceFile << " does not exist. No references will be used!");
+    m_refFile->Close();
+    delete m_refFile;
+    return;
+  }
+
+  B2INFO("DQMHistReference: use reference file " << m_referenceFile);
+
   TIter nextkey(m_refFile->GetListOfKeys());
   TKey* key;
   while ((key = (TKey*)nextkey())) {
     if (key->IsFolder() && string(key->GetName()) == string("ref")) {
       TDirectory* refdir = (TDirectory*)key->ReadObj();
-      TIter nextdir(refdir->GetListOfKeys());
-      TKey* dir;
+      TIter nextDetDir(refdir->GetListOfKeys());
+      TKey* detDir;
+      // detector folders
+      while ((detDir = (TKey*)nextDetDir())) {
+        if (!detDir->IsFolder())  continue;
+        TIter nextTypeDir(((TDirectory*)detDir->ReadObj())->GetListOfKeys());
+        TKey* typeDir;
+        TDirectory* foundDir = NULL;
 
-      while ((dir = (TKey*)nextdir())) {
-        if (dir->IsFolder()) {
-          string dirname = dir->GetName();
-          TIter next(((TDirectory*)dir->ReadObj())->GetListOfKeys());
-          TKey* hh;
+        while ((typeDir = (TKey*)nextTypeDir())) {
+          if (!typeDir->IsFolder()) continue;
+          if (string(typeDir->GetName()) == run_type) {
+            foundDir = (TDirectory*)typeDir->ReadObj();
+            break;
+          }
+          if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj();
+        }
+        string dirname = detDir->GetName();
+        B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
+        TIter next(((TDirectory*)typeDir->ReadObj())->GetListOfKeys());
+        TKey* hh;
 
-          while ((hh = (TKey*)next())) {
-            if (!hh->IsFolder()) {
-              TObject* obj = hh->ReadObj();
-              if (obj->IsA()->InheritsFrom("TH1")) {
-                TH1* h = (TH1*)obj;
-                string histname = h->GetName();
-                if (h->GetDimension() == 1) {
-                  auto n = new REFNODE;
-                  n->histo1 = dirname + "/" + histname;
-                  n->histo2 = "ref/" + dirname + "/" + histname;
-                  TH1* histo = (TH1*)h->Clone();
-                  histo->SetName(n->histo2);
-                  histo->SetDirectory(0);
-                  n->ref_clone = histo;
-                  n->canvas_name = dirname + "/c_" + histname;
-                  n->canvas = nullptr;
-                  m_pnode.push_back(n);
-                }
-              }
+        while ((hh = (TKey*)next())) {
+          if (hh->IsFolder()) continue;
+          TObject* obj = hh->ReadObj();
+          if (obj->IsA()->InheritsFrom("TH1")) {
+            TH1* h = (TH1*)obj;
+            string histname = h->GetName();
+            if (h->GetDimension() == 1) {
+              auto n = new REFNODE;
+              n->histo1 = dirname + "/" + histname;
+              n->histo2 = "ref/" + dirname + "/" + histname;
+              TH1* histo = (TH1*)h->Clone();
+              histo->SetName(n->histo2);
+              histo->SetDirectory(0);
+              n->ref_clone = histo;
+              n->canvas_name = dirname + "/c_" + histname;
+              n->canvas = nullptr;
+              m_pnode.push_back(n);
             }
           }
-
         }
       }
     }
   }
+
   B2INFO("DQMHistReference: insert reference to m_pnode. size: " << m_pnode.size());
   m_refFile->Close();
+  delete m_refFile;
+
 }
 
 void DQMHistReferenceModule::event()
@@ -234,6 +251,6 @@ void DQMHistReferenceModule::endRun()
 void DQMHistReferenceModule::terminate()
 {
   B2DEBUG(1, "DQMHistReference: terminate called");
-  if (m_refFile) delete m_refFile;
+  //  if (m_refFile) delete m_refFile;
 }
 

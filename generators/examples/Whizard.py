@@ -20,9 +20,9 @@ from ROOT import Belle2
 # get the relevant information from command line arguments
 experiment = Belle2.Environment.Instance().getExperimentOverride()  # --experiment
 run = Belle2.Environment.Instance().getRunOverride()                # --run
-last = Belle2.Environment.Instance().getNumberEventsOverride()      # -n
-first = Belle2.Environment.Instance().getSkipEventsOverride()       # --skip-events
-events = last - first
+lastEventNumber = Belle2.Environment.Instance().getNumberEventsOverride()      # -n
+firstEventNumber = Belle2.Environment.Instance().getSkipEventsOverride()       # --skip-events
+events = lastEventNumber - firstEventNumber
 
 # run WHIZARD using the `whizard` module
 path, lhe, log = whizard.run_whizard(process='mumumumu', experiment=experiment, run=run, events=events)

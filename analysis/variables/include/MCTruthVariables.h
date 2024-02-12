@@ -116,7 +116,10 @@ namespace Belle2 {
      */
     double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
     /**
-     * Calculate the generated q2 of the Nth daughter with respect to the B meson from which the particle originates. Calculated as q^2 = (p_B - p_d)^2, where p_d is the four momentum of the Nth daughter.
+     * Returns the generated four momentum transfer squared calculated as q^2 = (p_B - p_d)^2. Here p_B is the four momentum of the B meson from which the given particle originates,
+     * and  p_d is the four momentum of its Nth daughter in the decay defined in the respective DECAY.DEC file. The numbering of daughters starts at 0.
+     * Returns NaN if no related MCParticle could be found, or if the MCParticle does not originate from a B meson.
+     * Returns NaN if the given index (N) is larger than the number of daughters of the B meson.
      */
     double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& daughterIDs);
 

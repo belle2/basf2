@@ -900,7 +900,7 @@ namespace Belle2 {
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
 
     REGISTER_VARIABLE("calcMCNthBDaughterQ2", calcMCNthBDaughterQ2,
-                      "Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_B - p_d)^2`, where :math:`p_B` is the four momentum of the B meson from which the given particle originates, and :math:`p_d` is the four momentum of its Nth daughter. Returns NaN if no related MCParticle could be found, or if the MCParticle does not originate from a B meson.\n""Returns NaN if the given index (N) is larger than the number of daughters of the B meson.",
+                      "Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_B - p_d)^2`. Here :math:`p_B` is the four momentum of the B meson from which the given particle originates, and  math:`p_d` is the four momentum of its Nth daughter in the decay defined in the respective DECAY.DEC file. The numbering of daughters starts at :math:'N=0'. Returns NaN if no related MCParticle could be found, or if the MCParticle does not originate from a B meson.\n""Returns NaN if the given index (N) is larger than the number of daughters of the B meson.",
                       ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,

@@ -419,14 +419,11 @@ class TauGeneric(BaseSkim):
         contact = "kenji@hepl.phys.nagoya-u.ac.jp"
 
         ma.copyLists('tau+:generic', self.SkimLists, path=path)
-        ma.rankByHighest(particleList='tau+:generic',
-                         variable='p',
-                         numBest=1,
-                         path=path)
+        path = self.skim_event_cuts(cut='nParticlesInList(tau+:generic) > 0', path=path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:generic',
+            particlelist='',
             variables_1d=[
                 ('nGoodTracks', 7, 1, 8, '', contact, '', ''),
                 ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
@@ -526,20 +523,15 @@ class TauThrust(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        contact = "kenji@hepl.phys.nagoya-u.ac.jp"
-
-        ma.rankByHighest(particleList='tau+:thrust',
-                         variable='p',
-                         numBest=1,
-                         path=path)
+        path = self.skim_event_cuts(cut='nParticlesInList(tau+:thrust) > 0', path=path)
 
         create_validation_histograms(
             rootfile=f'{self}_Validation.root',
-            particlelist='tau+:thrust',
+            particlelist='',
             variables_1d=[
-                ('nGoodTracksThrust', 7, 1, 8, '', contact, '', ''),
-                ('visibleEnergyOfEventCMS', 40, 0, 12, '', contact, '', ''),
-                ('thrust', 50, 0.75, 1, '', contact, '', '')],
+                ('nGoodTracksThrust', 7, 1, 8, '', self.__contact__, '', ''),
+                ('visibleEnergyOfEventCMS', 40, 0, 12, '', self.__contact__, '', ''),
+                ('thrust', 50, 0.8, 1, '', self.__contact__, '', '')],
             path=path)
 
 ############################################################

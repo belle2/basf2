@@ -128,7 +128,7 @@ void DQMHistReferenceModule::beginRun()
         TIter nextTypeDir(((TDirectory*)detDir->ReadObj())->GetListOfKeys());
         TKey* typeDir;
         TDirectory* foundDir = NULL;
-
+        // run type folders (get the run type corresponding folder or use default one)
         while ((typeDir = (TKey*)nextTypeDir())) {
           if (!typeDir->IsFolder()) continue;
           if (string(typeDir->GetName()) == run_type) {
@@ -138,8 +138,13 @@ void DQMHistReferenceModule::beginRun()
           if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj();
         }
         string dirname = detDir->GetName();
-        B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
-        TIter next(((TDirectory*)typeDir->ReadObj())->GetListOfKeys());
+        if (foundDir) B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
+        else {
+          B2INFO("No run type specific or default references available for " << dirname);
+          continue;
+        }
+
+        TIter next(foundDir->GetListOfKeys());
         TKey* hh;
 
         while ((hh = (TKey*)next())) {

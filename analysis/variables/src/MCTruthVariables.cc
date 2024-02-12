@@ -809,10 +809,7 @@ namespace Belle2 {
        *
        * Note for electrons (or any track-based particle) this may not be the
        * same thing as the mc match of the particle (which is taken from the track).
-       0_2pi_distr_CUTS.pdf
-       3 days ago20.7 kB
-       KS0_pipi_distr.pdf
-       3 days ago20.7 kB
+       *
        * For photons (or any ECL-based particle) this will be the same as the mcPDG
        */
       const ECLCluster* cluster = particle->getECLCluster();

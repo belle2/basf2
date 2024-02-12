@@ -140,18 +140,18 @@ namespace Belle2 {
     double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& args)
     {
       const MCParticle* mcparticle = part->getMCParticle();
-      if (!mcparticle) return realNaN;
+      if (!mcparticle) return Const::doubleNaN;
 
       const MCParticle* curMotherB = mcparticle;
       int mcMotherPDG = 0;
       while (mcMotherPDG != 511 and mcMotherPDG != 521) {
         curMotherB = curMotherB->getMother();
-        if (!curMotherB) return realNaN;
+        if (!curMotherB) return Const::doubleNaN;
         mcMotherPDG = abs(curMotherB->getPDG());
       }
       auto daughtersB = curMotherB->getDaughters();
       unsigned int nthDaughter = args.empty() ? 0 : args[0];
-      if (nthDaughter >= daughtersB.size()) return realNaN;
+      if (nthDaughter >= daughtersB.size()) return Const::doubleNaN;
 
       auto p4Daughter = daughtersB[nthDaughter]->get4Vector();
       auto p4B = curMotherB->get4Vector();

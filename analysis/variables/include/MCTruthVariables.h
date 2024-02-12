@@ -115,11 +115,15 @@ namespace Belle2 {
      * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
      */
     double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
+    /**
+     * Calculate the generated q2 of the Nth daughter with respect to the B meson from which the particle originates. Calculated as q^2 = (p_B - p_d)^2, where p_d is the four momentum of the Nth daughter.
+     */
+    double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
-     * Calculate the q2 of the Nth daughter with respect to the B meson from which the particle originates
+     * Calculate the mass of the Nth daughter with respect to the B meson from which the particle originates
      */
-    double genNthBDaughterQ2(const Particle* part, const std::vector<double>& daughterIDs);
+    double calcMCNthBDaughterM(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
      * check the PDG code of a particles MC mother

@@ -137,8 +137,7 @@ namespace Belle2 {
       return curMCParticle->getArrayIndex();
     }
 
-    //debug
-    double genNthBDaughterQ2(const Particle* part, const std::vector<double>& args)
+    double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& args)
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return realNaN;
@@ -150,7 +149,6 @@ namespace Belle2 {
         if (!curMotherB) return realNaN;
         mcMotherPDG = abs(curMotherB->getPDG());
       }
-
       auto daughtersB = curMotherB->getDaughters();
       unsigned int nthDaughter = args.empty() ? 0 : args[0];
       if (nthDaughter >= daughtersB.size()) return realNaN;
@@ -811,7 +809,10 @@ namespace Belle2 {
        *
        * Note for electrons (or any track-based particle) this may not be the
        * same thing as the mc match of the particle (which is taken from the track).
-       *
+       0_2pi_distr_CUTS.pdf
+       3 days ago20.7 kB
+       KS0_pipi_distr.pdf
+       3 days ago20.7 kB
        * For photons (or any ECL-based particle) this will be the same as the mcPDG
        */
       const ECLCluster* cluster = particle->getECLCluster();
@@ -901,8 +902,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
 
-    REGISTER_VARIABLE("genNthBDaughterQ2", genNthBDaughterQ2,
-                      "fill me :");
+    REGISTER_VARIABLE("calcMCNthBDaughterQ2", calcMCNthBDaughterQ2,
+                      "Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_B - p_d)^2`, where :math:`p_B` is the four momentum of the B meson from which the given particle originates, and :math:`p_d` is the four momentum of its Nth daughter. Returns NaN if no related MCParticle could be found, or if the MCParticle does not originate from a B meson.\n""Returns NaN if the given index (N) is larger than the number of daughters of the B meson.",
+                      ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");

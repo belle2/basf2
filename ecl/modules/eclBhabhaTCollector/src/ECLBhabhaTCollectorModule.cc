@@ -16,20 +16,16 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
 /* Basf2 headers. */
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 /* ROOT headers. */
-#include <TFile.h>
 #include <TH2F.h>
 #include <TTree.h>
 

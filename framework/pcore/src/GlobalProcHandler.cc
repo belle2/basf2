@@ -245,7 +245,7 @@ void GlobalProcHandler::killAllProcesses()
   for (int& pid : s_pidVector) {
     if (pid != 0) {
       if (kill(pid, SIGKILL) >= 0) {
-        B2ERROR("hard killed process " << pid);
+        B2DEBUG(100, "hard killed process " << pid);
       } else {
         B2DEBUG(100, "no process " << pid << " found, already gone?");
       }

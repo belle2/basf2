@@ -67,9 +67,9 @@ namespace Belle2 {
      */
     typedef struct {
       /** online histogram name */
-      TString histo1;
+      TString orghist_name;
       /** reference histogram name */
-      TString histo2;
+      TString refhist_name;
       /** related canvas name name */
       TString canvas_name;
       /** pointer to the histogram canvas */

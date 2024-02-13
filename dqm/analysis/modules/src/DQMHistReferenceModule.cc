@@ -47,7 +47,7 @@ TH1* DQMHistReferenceModule::find_histo_in_canvas(REFNODE* node)
 
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == node->histo1) {
+      if (obj->GetName() == node->orghist_name) {
         return (TH1*)obj;
       }
     }
@@ -136,10 +136,10 @@ void DQMHistReferenceModule::beginRun()
             string histname = h->GetName();
             if (h->GetDimension() == 1) {
               auto n = new REFNODE;
-              n->histo1 = dirname + "/" + histname;
-              n->histo2 = "ref/" + dirname + "/" + histname;
+              n->orghist_name = dirname + "/" + histname;
+              n->refhist_name = "ref/" + dirname + "/" + histname;
               TH1* histo = (TH1*)h->Clone();
-              histo->SetName(n->histo2);
+              histo->SetName(n->refhist_name);
               histo->SetDirectory(0);
               n->ref_clone = histo;
               n->canvas_name = dirname + "/c_" + histname;
@@ -186,7 +186,7 @@ void DQMHistReferenceModule::event()
       continue;
     }
     if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it->histo1);
+      B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it->orghist_name);
       canvas->cd();
       hist2->Draw();
       canvas->Modified();
@@ -197,7 +197,7 @@ void DQMHistReferenceModule::event()
     if (hist1->GetDimension() != 1) continue;
     if (hist1->Integral() == 0) continue;
 
-    B2DEBUG(1, "Compare " << it->histo1 << " with ref " << it->histo2);
+    B2DEBUG(1, "Compare " << it->orghist_name << " with ref " << it->refhist_name);
 
     /* consider adding coloring option....
       double data = 0;

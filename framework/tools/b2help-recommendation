@@ -1,0 +1,125 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Get a summary of recommendations for analysis tools.
+"""
+
+import json
+import argparse
+import requests
+
+from basf2 import conditions as bc
+import conditions_db 
+
+class Tool:
+    """
+    Analysis tool information.
+    """
+    def __init__(self, name, tags=None, description="", recommendation=None ):
+        self.name = name
+        self.tags = tags if tags else []
+        self.description = description
+        self.recommendation = recommendation if recommendation else {}
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "tags": self.tags,
+            "description": self.description,
+            "recommendation": self.recommendation,
+        }
+
+
+def load_data(filename):
+    """
+    load a local json file.
+    """
+    with open(filename, 'r') as file:
+        data = json.load(file)
+        return [Tool(**tool_data) for tool_data in data] 
+
+def load_data_url(url):
+    """
+    load a json file from url.
+    """
+    text = requests.get(url).text
+    data = json.loads(text)
+    return [Tool(**tool_data) for tool_data in data] 
+
+
+def display_tool_info(tool):
+    """
+    display a tool's information.
+    """
+    print(f"  Tool: {tool.name}")
+    print(f"    Tags: {', '.join(tool.tags)}")
+    print(f"    Description: {tool.description}")
+
+    recommendation = "\n".join([f"      {key}: {value}" for key, value in tool.recommendation.items()])
+    print(f"    Recommendation:\n{recommendation}")
+
+    print()
+
+
+def get_available_tags(tools):
+    """
+    get all available tags.
+    """
+    tags = set()
+    for tool in tools:
+        tags.update(tool.tags)
+    return tags
+
+
+def main():
+
+    parser = argparse.ArgumentParser(description="Tool recommendation information")
+    parser.add_argument("--tags", help="Filter tools by specific tags", nargs='+', default=None)
+    parser.add_argument("--globaltag", help="Global tag name, if one wants to check another recommendation",
+                        default='user_yosato_recommendations') # temporal
+    parser.add_argument("--payload", help="Payload name, if one wants to check another recommendation",
+                        default='jsonPayload') # temporal
+    parser.add_argument("--localfile", help="If one wants to check a json file locally.", default=None)
+
+    args = parser.parse_args()
+    gt_name = args.globaltag
+    payload_name = args.payload
+
+    if args.localfile is None:
+        cdb = conditions_db.ConditionsDB()
+        payload = None
+        for p in cdb.get_all_iovs(gt_name, 0, 0, f", name={payload_name}"):
+            if p.name == payload_name and (payload is None or p.revision > payload.revision):
+                payload = p
+
+        if payload is None:
+            print("Recommendation information is not found")
+            return
+        else:
+            tools = load_data_url(payload.url)
+
+    else:
+        tools = load_data(args.localfile)
+
+    available_tags = get_available_tags(tools)
+    if args.tags is None:
+        print("Available Tags:")
+        for tag in available_tags:
+            print(f"  - {tag}")
+
+    else:        
+        for tool in tools:
+            if all(tag in tool.tags for tag in args.tags):
+                display_tool_info(tool)
+
+
+if __name__ == "__main__":
+    main()

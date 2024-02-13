@@ -168,15 +168,13 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool ap
     for (const int& pid : m_processList) {
       int count = 0;
       while (true) {
+        // Do not allow internal SIGKILL to prevent data loss in case of a numbered process
         if (kill(pid, 0) != 0) {
           break;
         }
         B2DEBUG(10, g_processNumber << ": Checking process termination, count = " << count);
         std::this_thread::sleep_for(1000ms);
-        // Force to leave the loop after 20min
-        // Before this, slow control app will send SIGKILL in normal case
         if (count % 5 == 1) kill(pid, SIGINT);
-        if (count == 1200) break;
         ++count;
       }
     }

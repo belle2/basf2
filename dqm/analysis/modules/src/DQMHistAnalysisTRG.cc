@@ -107,12 +107,12 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //ECLTRG_deadch
 //  m_canvas_ECLTRG_deadch = new TCanvas("ECLTRG_deadch");
-  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 3); // update each 1000 entries
+  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 3); // update each 1000 entries
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
   //update PV
@@ -201,10 +201,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_ECLTRG_deadch) {
     hist_ECLTRG_deadch->Draw();
     int numberOfBins = hist_ECLTRG_deadch->GetNbinsX();
-    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
+//    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
     int ECLTRG_deadch = 0;
-    for (int i = 1; i < numberOfBins; i++) {
-      if (hist_ECLTRG_deadch->GetBinContent(i + 1) <  0.01 * YMax) { ECLTRG_deadch += 1; cout << " i= " << i << " ; 0.01*YMax = " << 0.01 * YMax << endl;}
+    for (int i = 2; i <= numberOfBins; i++) {
+      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0) { ECLTRG_deadch += 1; cout << " i= " << i << " ; Y = " << hist_ECLTRG_deadch->GetBinContent(i) << endl;}
     }
     B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
     setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
@@ -255,8 +255,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
     cout << "numberOfBins =" << numberOfBins << endl;
     int CDCTRG_deadch = 0;
-    for (int i = 1; i < numberOfBins; i++) {
-      if (hist_CDCTRG_deadch->GetBinContent(i + 1) < 0.01 * YMax) {CDCTRG_deadch += 1; cout << " i =" << i << " ;0.01* YMax = " << 0.01 * YMax; }
+    for (int i = 3; i <= numberOfBins; i++) {
+      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1; cout << " i =" << i << " ;0.01* YMax = " << 0.01 * YMax; }
     }
     B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
     setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);
@@ -294,6 +294,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     double hadronb2_over_bhabha_all = 0.0;
     hist_hadronb2_over_bhabha_all->Draw();
     if (hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      cout << "accept_bhabha_all!=0" << endl;
       hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
                                    hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
                                    hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));

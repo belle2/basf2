@@ -90,10 +90,11 @@ def main():
     parser.add_argument("--localfile", help="If one wants to check a json file locally.", default=None)
 
     args = parser.parse_args()
-    gt_name = args.globaltag
-    payload_name = args.payload
 
     if args.localfile is None:
+        gt_name = args.globaltag
+    	payload_name = args.payload
+
         cdb = conditions_db.ConditionsDB()
         payload = None
         for p in cdb.get_all_iovs(gt_name, 0, 0, f", name={payload_name}"):

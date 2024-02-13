@@ -67,12 +67,10 @@ namespace Belle2 {
      */
     typedef struct {
       /** online histogram name */
-      TString orghist_name;
+      std::string orghist_name;
       /** reference histogram name */
-      TString refhist_name;
+      std::string refhist_name;
       /** related canvas name name */
-      TString canvas_name;
-      /** pointer to the histogram canvas */
       TCanvas* canvas{nullptr};
       /** pointer to the reference histogram */
       TH1* ref_clone{nullptr};

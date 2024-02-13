@@ -38,21 +38,11 @@ TH1* DQMHistReferenceModule::find_histo_in_canvas(REFNODE* node)
 {
 
   if (!node->canvas) {
-    node->canvas = findCanvas(node->canvas_name);
+    node->canvas = findCanvas(node->orghist_name);
   }
   if (!node->canvas) return nullptr;
 
-  TIter nextkey((node->canvas)->GetListOfPrimitives());
-  TObject* obj = nullptr;
-
-  while ((obj = (TObject*)nextkey())) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == node->orghist_name) {
-        return (TH1*)obj;
-      }
-    }
-  }
-  return nullptr;
+  return findHistInCanvas(node->orghist_name, node->canvas);
 }
 
 void DQMHistReferenceModule::initialize()
@@ -139,10 +129,9 @@ void DQMHistReferenceModule::beginRun()
               n->orghist_name = dirname + "/" + histname;
               n->refhist_name = "ref/" + dirname + "/" + histname;
               TH1* histo = (TH1*)h->Clone();
-              histo->SetName(n->refhist_name);
+              histo->SetName((n->refhist_name).c_str());
               histo->SetDirectory(0);
               n->ref_clone = histo;
-              n->canvas_name = dirname + "/c_" + histname;
               n->canvas = nullptr;
               m_pnode.push_back(n);
             }
@@ -182,7 +171,7 @@ void DQMHistReferenceModule::event()
 
     // if there is no histogram on canvas we plot the reference anyway.
     if (!canvas) {
-      B2DEBUG(1, "No canvas found for refernce histogram " << it->canvas_name);
+      B2DEBUG(1, "No canvas found for refernce histogram " << it->orghist_name);
       continue;
     }
     if (!hist1) {

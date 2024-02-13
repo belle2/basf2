@@ -161,27 +161,30 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas* cobj)
 {
-  // parse the dir+histo name and create the corresponding canvas name
-  auto s = StringSplit(histo_name, '/');
-  if (s.size() != 2) {
-    B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
-    return nullptr;
+  if (cobj == nullptr) {
+    // parse the dir+histo name and create the corresponding canvas name
+    auto s = StringSplit(histo_name, '/');
+    if (s.size() != 2) {
+      B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
+      return nullptr;
+    }
+    auto dirname = s.at(0);
+    auto hname = s.at(1);
+    std::string canvas_name = dirname + "/c_" + hname;
+
+    cobj = findCanvas(canvas_name);
   }
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
 
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
+  if (cobj != nullptr) {
+    TIter nextkey((cobj)->GetListOfPrimitives());
+    TObject* obj{};
+    while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        if (obj->GetName() == histo_name)
+          return  dynamic_cast<TH1*>(obj);
+      }
     }
   }
   return nullptr;

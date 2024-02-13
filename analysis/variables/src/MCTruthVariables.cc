@@ -143,7 +143,7 @@ namespace Belle2 {
       if (!mcparticle) return Const::doubleNaN;
 
       const MCParticle* curMotherB = mcparticle;
-      int mcMotherPDG = 0;
+      int mcMotherPDG = abs(curMotherB->getPDG());
       while (mcMotherPDG != 511 and mcMotherPDG != 521) {
         curMotherB = curMotherB->getMother();
         if (!curMotherB) return Const::doubleNaN;

@@ -10,9 +10,6 @@
 #include <TROOT.h>
 #include <TStyle.h>
 #include <TClass.h>
-#include <TDirectory.h>
-#include <TH1F.h>
-#include <TH2F.h>
 #include <TKey.h>
 
 using namespace std;

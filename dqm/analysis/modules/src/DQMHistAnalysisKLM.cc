@@ -707,6 +707,11 @@ void DQMHistAnalysisKLMModule::event()
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
   // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    return;
+  }
   auto* daqDataSize = findHist("DAQ/KLMDataSize");
   double meanDAQDataSize = 0.;
   if (daqDataSize != nullptr) {

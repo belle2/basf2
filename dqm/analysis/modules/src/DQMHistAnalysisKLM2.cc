@@ -26,6 +26,7 @@ REG_MODULE(DQMHistAnalysisKLM2);
 
 DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),
+    m_IsNullRun{false},
     m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms (depends on tracking variables).");
@@ -268,6 +269,7 @@ void DQMHistAnalysisKLM2Module::beginRun()
   m_RunType = findHist("DQMInfo/rtype");
   m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
   m_IsPhysicsRun = (m_RunTypeString == "physics");
+  m_IsNullRun = (getRunType() == "null");
 
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
@@ -593,6 +595,11 @@ void DQMHistAnalysisKLM2Module::event()
   /* Set EPICS PV Values*/
   B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs");
   // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    return;
+  }
   auto* daqDataSize = findHist("DAQ/KLMDataSize");
   double meanDAQDataSize = 0.;
   if (daqDataSize != nullptr) {

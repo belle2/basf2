@@ -41,7 +41,7 @@ TH1* DQMHistReferenceModule::find_histo_in_canvas(REFNODE* node)
 {
 
   if (!node->canvas) {
-    node->canvas = find_canvas(node->canvas_name);
+    node->canvas = findCanvas(node->canvas_name);
   }
   if (!node->canvas) return nullptr;
 
@@ -52,22 +52,6 @@ TH1* DQMHistReferenceModule::find_histo_in_canvas(REFNODE* node)
     if (obj->IsA()->InheritsFrom("TH1")) {
       if (obj->GetName() == node->histo1) {
         return (TH1*)obj;
-      }
-    }
-  }
-  return nullptr;
-}
-
-TCanvas* DQMHistReferenceModule::find_canvas(TString canvas_name)
-{
-
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = nullptr;
-
-  while ((cobj = (TObject*)nextckey())) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      if (cobj->GetName() == canvas_name) {
-        return (TCanvas*)cobj;
       }
     }
   }

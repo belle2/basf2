@@ -84,12 +84,6 @@ namespace Belle2 {
      */
     TH1* find_histo_in_canvas(REFNODE* node);
 
-    /**
-     * Finds canvas with a given name.
-     * @param name canvas name
-     */
-    TCanvas* find_canvas(TString name);
-
     /** Struct for reference histogram  */
     std::vector<REFNODE*> m_pnode;
 

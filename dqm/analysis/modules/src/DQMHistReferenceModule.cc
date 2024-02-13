@@ -183,10 +183,7 @@ void DQMHistReferenceModule::event()
       continue;
     }
 
-    if (hist1->GetDimension() != 1) continue;
     if (hist1->Integral() == 0) continue;
-
-    B2DEBUG(1, "Compare " << it->orghist_name << " with ref " << it->refhist_name);
 
     /* consider adding coloring option....
       double data = 0;

@@ -291,9 +291,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 // update #hadronb2/#bhabha_all
   auto hist_hadronb2_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_hadronb2_over_bhabha_all) {
-    double hadronb2_over_bhabha_all = 0.0;
     hist_hadronb2_over_bhabha_all->Draw();
     if (hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double hadronb2_over_bhabha_all = 0.0;
       cout << "accept_bhabha_all!=0" << endl;
       hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
                                    hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
@@ -307,9 +307,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 // update #mumu2trk/#bhabha_all
   auto hist_mumu2trk_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_mumu2trk_over_bhabha_all) {
-    double mumu2trk_over_bhabha_all = 0.0;
     hist_mumu2trk_over_bhabha_all->Draw();
     if (hist_mumu2trk_over_bhabha_all->GetBinContent(hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double mumu2trk_over_bhabha_all = 0.0;
       mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->GetBinContent(
                                    hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_mumu2trk_over_bhabha_all->GetBinContent(
                                    hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));

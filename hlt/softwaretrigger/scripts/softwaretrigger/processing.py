@@ -133,7 +133,7 @@ def start_zmq_path(args, location):
     reco_path = basf2.Path()
 
     if location == constants.Location.expressreco:
-        input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True, bufferSize=0)
+        input_module = path.add_module("HLTZMQ2Ds", input=args.input, addExpressRecoObjects=True)
     elif location == constants.Location.hlt:
         input_module = path.add_module("HLTZMQ2Ds", input=args.input)
     else:

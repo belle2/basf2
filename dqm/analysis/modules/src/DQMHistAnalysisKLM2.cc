@@ -266,8 +266,6 @@ void DQMHistAnalysisKLM2Module::initialize()
 
 void DQMHistAnalysisKLM2Module::beginRun()
 {
-  m_RunType = findHist("DQMInfo/rtype");
-  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
   m_IsPhysicsRun = (m_RunTypeString == "physics");
   m_IsNullRun = (getRunType() == "null");
 
@@ -597,7 +595,7 @@ void DQMHistAnalysisKLM2Module::event()
   // only update PVs if there's enough statistics and datasize != 0
   // Check if it's a null run, if so, don't update EPICS PVs
   if (m_IsNullRun) {
-    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    B2INFO("DQMHistAnalysisKLM2: Null run detected. No PV Update.");
     return;
   }
   auto* daqDataSize = findHist("DAQ/KLMDataSize");

@@ -11,9 +11,7 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/digitization/EclConfiguration.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
 /* Basf2 headers. */
 #include <framework/gearbox/Const.h>
@@ -24,10 +22,8 @@
 /* ROOT headers. */
 #include <TH2F.h>
 #include <TTree.h>
-#include <TFile.h>
 
 using namespace Belle2;
-using namespace ECL;
 using namespace std;
 
 //-----------------------------------------------------------------

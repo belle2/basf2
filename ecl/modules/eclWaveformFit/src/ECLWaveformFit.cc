@@ -22,9 +22,6 @@
 #include <TMatrixDSym.h>
 #include <TDecompChol.h>
 
-/* C++ headers. */
-#include <numeric>
-
 using namespace Belle2;
 using namespace ECL;
 

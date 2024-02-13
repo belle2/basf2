@@ -17,9 +17,7 @@
 #include <ecl/dataobjects/ECLShower.h>
 
 /* Basf2 headers. */
-#include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 /* C++ headers. */
 #include <string>

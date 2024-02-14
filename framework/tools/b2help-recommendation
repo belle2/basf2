@@ -110,9 +110,10 @@ def main():
     else:
         tools = load_data(args.localfile)
 
-    available_tags = get_available_tags(tools)
     if args.tags is None:
         print("Available Tags:")
+
+        available_tags = get_available_tags(tools)
         for tag in available_tags:
             print(f"  - {tag}")
 

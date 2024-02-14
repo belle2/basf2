@@ -266,7 +266,7 @@ void DQMHistAnalysisKLM2Module::initialize()
 
 void DQMHistAnalysisKLM2Module::beginRun()
 {
-  m_IsPhysicsRun = (m_RunTypeString == "physics");
+  m_IsPhysicsRun = (getRunType() == "physics");
   m_IsNullRun = (getRunType() == "null");
 
   double unused = NAN;

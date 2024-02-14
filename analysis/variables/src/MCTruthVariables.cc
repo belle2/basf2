@@ -826,10 +826,7 @@ namespace Belle2 {
     void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight)
     {
       const ECLCluster* cluster = particle->getECLCluster();
-      if (!cluster) return;
-
       auto mcps = cluster->getRelationsTo<MCParticle>();
-      if (mcps.size() == 0) return;
 
       for (unsigned int i = 0; i < mcps.size(); ++i) {
         double weight = mcps.weight(i);

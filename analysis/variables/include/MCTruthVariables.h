@@ -344,7 +344,7 @@ namespace Belle2 {
     void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight);
 
     /**
-     * returns the sum of weights of all MCParticles that are a K_L0 or its daughter of a K_L0
+     * returns the sum of weights of all MCParticles that are a K_L0 or daughter of a K_L0
      * of the Particle -> ECLCluster -> MCParticles relations.
      * For charged particles, the track from which the Particle was created,
      * must be matched to an ECLCluster
@@ -352,7 +352,7 @@ namespace Belle2 {
     double particleClusterTotalMCMatchWeightForKlong(const Particle*);
 
     /**
-     * returns the sum of weights of all MCParticles that are the same K_L0 or its daughter of the K_L0
+     * returns the sum of weights of all MCParticles that are the same K_L0 or daughter of the K_L0
      * of the Particle -> ECLCluster -> MCParticles relations.
      * If there are multiple K_L0s related to a ECLCluster, returns the sum of weights for the best matched K_L0.
      * For charged particles, the track from which the Particle was created,

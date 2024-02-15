@@ -2265,13 +2265,13 @@ namespace Belle2 {
 
       for (auto& mcdaughter : mcdaughters) {
         if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-        Particle particle(mcdaughter);
-        Particle* daughter = particles.appendNew(particle);
-        daughter->addRelationTo(mcdaughter);
-        mother->appendDaughter(daughter, false);
+        Particle tmp_daughter(mcdaughter);
+        Particle* new_daughter = particles.appendNew(tmp_daughter);
+        new_daughter->addRelationTo(mcdaughter);
+        mother->appendDaughter(new_daughter, false);
 
         if (mcdaughter->getNDaughters() > 0)
-          appendDaughtersRecursive(daughter);
+          appendDaughtersRecursive(new_daughter);
       }
 
     }

@@ -2252,6 +2252,30 @@ namespace Belle2 {
 
     }
 
+    void appendDaughtersRecursive(Particle* mother)
+    {
+
+      auto* mcmother = mother->getRelated<MCParticle>();
+
+      if (!mcmother)
+        return;
+
+      std::vector<MCParticle*> mcdaughters = mcmother->getDaughters();
+      StoreArray<Particle> particles;
+
+      for (auto& mcdaughter : mcdaughters) {
+        if (!mcdaughter->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+        Particle particle(mcdaughter);
+        Particle* daughter = particles.appendNew(particle);
+        daughter->addRelationTo(mcdaughter);
+        mother->appendDaughter(daughter, false);
+
+        if (mcdaughter->getNDaughters() > 0)
+          appendDaughtersRecursive(daughter);
+      }
+
+    }
+
     Manager::FunctionPtr matchedMC(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -2263,7 +2287,13 @@ namespace Belle2 {
             return Const::doubleNaN;
           }
           Particle tmpPart(mcp);
-          auto var_result = var->function(&tmpPart);
+          StoreArray<Particle> particles;
+          Particle* newPart = particles.appendNew(tmpPart);
+          newPart->addRelationTo(mcp);
+
+          appendDaughtersRecursive(newPart);
+
+          auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
           {
             return std::get<double>(var_result);
@@ -2306,7 +2336,13 @@ namespace Belle2 {
           const MCParticle* mcp = mcps.object(weightsAndIndices[0].second);
 
           Particle tmpPart(mcp);
-          auto var_result = var->function(&tmpPart);
+          StoreArray<Particle> particles;
+          Particle* newPart = particles.appendNew(tmpPart);
+          newPart->addRelationTo(mcp);
+
+          appendDaughtersRecursive(newPart);
+
+          auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
           {
             return std::get<double>(var_result);
@@ -3098,8 +3134,15 @@ namespace Belle2 {
           {
             i_p = i_p->getMother();
           }
+
           Particle m_p(i_p);
-          auto var_result = var->function(&m_p);
+          StoreArray<Particle> particles;
+          Particle* newPart = particles.appendNew(m_p);
+          newPart->addRelationTo(i_p);
+
+          appendDaughtersRecursive(newPart);
+
+          auto var_result = var->function(newPart);
           if (std::holds_alternative<double>(var_result))
           {
             return std::get<double>(var_result);

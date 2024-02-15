@@ -11,6 +11,7 @@
 //-
 
 #include <dqm/analysis/modules/DQMHistAutoCanvas.h>
+#include <TStyle.h>
 
 using namespace std;
 using namespace Belle2;
@@ -90,13 +91,14 @@ void DQMHistAutoCanvasModule::event()
           if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
           TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
           m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+          B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
         } else {
           // but this case is explicity excluded above?
           std::string hname = histoname.Data();
           TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
           m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+          B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
         }
-        B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
       }
       TCanvas* c = m_cs[name]; // access already created canvas
       c->cd();

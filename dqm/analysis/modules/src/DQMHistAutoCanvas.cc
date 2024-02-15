@@ -37,6 +37,10 @@ DQMHistAutoCanvasModule::DQMHistAutoCanvasModule()
 
 void DQMHistAutoCanvasModule::event()
 {
+  gStyle->SetOptStat(0);
+  gStyle->SetStatStyle(1);
+  gStyle->SetOptDate(22);// Date and Time in Bottom Right, does it work?
+
   // There may be a more clever way instead of doing the iteration my myself here
   // This only works because the getHistList is not const anymore
   for (auto& it : getHistList()) {
@@ -81,7 +85,7 @@ void DQMHistAutoCanvasModule::event()
       std::string name = histoname.Data();
       if (m_cs.find(name) == m_cs.end()) {
         // no canvas exists yet, create one
-        if (split_result.size() > 1) {
+        if (split_result.size() > 1) { // checked above already
           std::string hname = split_result.at(1);
           if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
           TCanvas* c = new TCanvas((dirname + "/c_" + hname).c_str(), ("c_" + hname).c_str());
@@ -92,10 +96,11 @@ void DQMHistAutoCanvasModule::event()
           TCanvas* c = new TCanvas(("c_" + hname).c_str(), ("c_" + hname).c_str());
           m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
         }
+        B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
       }
       TCanvas* c = m_cs[name]; // access already created canvas
-      B2DEBUG(1, "DQMHistAnalysisInput: new canvas " << c->GetName());
       c->cd();
+      // Maybe we want to have it Cleared? Otherwise colored boared could stay?
 
       // not so nice as we actually touch the histogram by iterator
       // we could use findHist function, but then we do another lookup within iteration

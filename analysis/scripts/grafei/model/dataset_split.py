@@ -21,7 +21,6 @@ def create_dataloader_mode_tags(configs, tags):
         dataset = BelleRecoSetGeometricInMemory(
             root=Path(path, mode),
             run_name=configs["output"]["run_name"],
-            overwrite=configs["model"]["overwrite"],
             **configs["dataset"]["config"],
         )
 

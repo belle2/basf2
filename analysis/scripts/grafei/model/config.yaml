@@ -45,9 +45,6 @@ train:
   # Random seed
   seed: 42
 model:
-  # Any previous .pt PyTorch file containing processed data is overwritten (recommended unless you want to use the same data with e.g. different hyperparameters)
-  # Those files are stored in root/train(val)/processed
-  overwrite: True
   # Whether to enable global layer in the model
   global_layer: True
   # compute 'mean' or 'sum' of losses across the batch. 'sum' is unstable and leads to errors during training

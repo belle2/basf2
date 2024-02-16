@@ -262,7 +262,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
             edge_features (list): List of edge features names.
             global_features (list): List of global features names.
             normalize (bool): Whether to normalize input features.
-            overwrite (bool): Overwrite graph files if already present.
     """
 
     def __init__(
@@ -274,7 +273,6 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         edge_features=[],
         global_features=[],
         normalize=None,
-        overwrite=True,
         **kwargs,
     ):
 
@@ -296,9 +294,8 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         # Delete processed files, in case
         file_path = Path(self.root, "processed")
         files = list(file_path.glob("*.pt"))
-        if overwrite:
-            for f in files:
-                f.unlink(missing_ok=True)
+        for f in files:
+            f.unlink(missing_ok=True)
 
         # Needs to be called after having assigned all attributes
         super().__init__(root, None, None, None)

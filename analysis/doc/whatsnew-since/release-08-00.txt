@@ -4,7 +4,7 @@ Changes in the analysis package in light-2403-persian
 Variables
 +++++++++
 * Added variables for the MCMatching of ECLCluster based Klong, `clusterTotalMCMatchWeightForKlong`,
-  `clusterTotalMCMatchWeightForBestKlong`, and `clusterBestMatchedMCKlong`.
+  `clusterTotalMCMatchWeightForBestKlong`, and `varForBestMatchedMCKlong`.
 
 Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------

@@ -126,15 +126,10 @@ def main(
         eps=0.001,
     )
 
-    scheduler = (
-        torch.optim.lr_scheduler.MultiStepLR(
-            optimizer=optimizer,
-            milestones=[6, 11],
-            gamma=0.5,
-        )
-        if configs["train"]["lr_scheduler"]
-        else None
-    )
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+        optimizer=optimizer,
+        T_max=10,
+    ) if configs["train"]["lr_scheduler"] else None
 
     grafei_ignite_trainer = GraFEIIgniteTrainer(
         model=model,

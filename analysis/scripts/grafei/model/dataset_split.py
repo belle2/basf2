@@ -1,4 +1,3 @@
-import torch
 import torch_geometric
 from pathlib import Path
 from .geometric_datasets import BelleRecoSetGeometricInMemory
@@ -30,13 +29,7 @@ def create_dataloader_mode_tags(configs, tags):
             f"{type(dataset).__name__} created for {mode} with {dataset.__len__()} samples\n"
         )
 
-        dataloader_type = (
-            torch_geometric.loader.DataListLoader
-            if (torch.cuda.is_available() and torch.cuda.device_count() > 1)
-            else torch_geometric.loader.DataLoader
-        )
-
-        dataloader = dataloader_type(
+        dataloader = torch_geometric.loader.DataLoader(
             dataset, batch_size=configs["train"]["batch_size"], shuffle=True
         )
 

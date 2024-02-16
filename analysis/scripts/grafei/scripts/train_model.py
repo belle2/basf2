@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 import click
 import torch
-import torch_geometric
 import ignite as ig
 import numpy as np
 import random
@@ -88,11 +87,6 @@ def main(
         gfeat_in_dim=g_infeatures,
         **configs["model"],
     )
-
-    # Parallelize on multiple GPUs
-    if torch.cuda.device_count() > 1:
-        print("We're going to use", torch.cuda.device_count(), "GPUs!")
-        base_model = torch_geometric.nn.DataParallel(base_model)
 
     print(f"Model: {base_model}\n")
     print(

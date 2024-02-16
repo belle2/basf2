@@ -3,14 +3,14 @@
 print_help() {
     echo "Usage: $0 [options] -i filename"
     echo ""
-    echo "This command prints the MCParticles of the input mdst file and output a ntuple including __MCDecayString__."
+    echo "This command prints the MCParticles of the input mdst file and outputs a ntuple including __MCDecayString__."
     echo "Default output file name is ntuple.root."
-    echo "You can use any basf2's options, e.g. -o, -n, and --skip-events."
+    echo "You can use any of basf2's options, e.g. -o, -n, and --skip-events."
     echo "Specifically, -i is required to select the input mdst file."
     echo ""
     echo "Options:"
     echo "  -i, --input    input mdst file name (required)"
-    echo "  -h, --help     show this this help message and exit"
+    echo "  -h, --help     show this help message and exit"
     echo ""
 }
 
@@ -24,10 +24,10 @@ for arg in "$@"; do
     fi
 done
 
-if [ "$input_specified" = false ]; then
+if [ $input_specified == false ]; then
     echo "ERROR: You must specify the input file with -i option." >&2
     print_help
     exit 1
 fi
 
-basf2 ${BELLE2_RELEASE_DIR}/analysis/examples/printMCParticleArray.py "$@"
+basf2 /analysis/examples/printMCParticleArray.py "$@"

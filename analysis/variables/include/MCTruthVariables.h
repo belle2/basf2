@@ -122,10 +122,9 @@ namespace Belle2 {
      * Returns NaN if the given index (N) is larger than the number of daughters of the B meson.
      */
     double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& daughterIDs);
-
     /**
-     * check the PDG code of a particles MC mother
-     */
+    * check the PDG code of a particles MC mother
+    */
     double genMotherPDG(const Particle* particle);
 
     /**

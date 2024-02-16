@@ -1,6 +1,6 @@
-# EventType: 1116063000
-# Descriptor: [B0 -> [D_s1+ -> [D_s*+ -> [D_s+ -> [phi->K+K-]pi+] gamma]pi0] [D- -> K+pi-pi-]]cc
-# NickName: B0_Ds1D-_phipi
+# EventType: 1146063100
+# Descriptor: [B0 -> [D_s1+ -> [D_s*+ -> D_s+ gamma]pi0] [D- -> K+pi-pi-]]cc
+# NickName: B0_Ds1D-_fourdecays
 # Tested: Yes
 # PhysicsWG: Bhadronic
 # Responsible: Chih Han Tseng
@@ -38,7 +38,10 @@ Enddecay
 CDecay D_s*-sig
 #
 Decay D_s+sig
-1.0     phisig            pi+                 SVS; 
+0.25    phisig            pi+                 SVS; 
+0.25    phisig     pi+  pi0           PHSP;
+0.25    anti-K*0T      K+               PHSP;
+0.25    K_S0sig        K+               PHSP;
 Enddecay
 CDecay D_s-sig
 #
@@ -46,10 +49,19 @@ Decay phisig
 1.0     K+              K-                  VSS;
 Enddecay
 #
+Decay anti-K*0T
+1.000          pi+            K-                  VSS;
+Enddecay
+CDecay K*0T
+#
 Decay D-sig
 1.000          K+     pi-     pi-           D_DALITZ;
 Enddecay
 CDecay D+sig
+#
+Decay K_S0sig
+1.000          pi+            pi-                 PHSP;
+Enddecay
 #
 
 End

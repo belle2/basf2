@@ -224,9 +224,19 @@ int main(int argc, char* argv[])
     } else if (varMap.count("steering")) {
       // steering file not misused as module name, so print it's name :D
       pythonFile = varMap["steering"].as<string>();
-      B2INFO("Steering file: " << pythonFile);
     }
 
+    if (!pythonFile.empty()) {
+      //Search in local or central lib/ if this isn't a direct path
+      if (!std::filesystem::exists(pythonFile)) {
+        std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
+        if (!libFile.empty())
+          pythonFile = libFile;
+      }
+      if (varMap.count("steering") and not varMap.count("modules")) {
+        B2INFO("Steering file: " << pythonFile);
+      }
+    }
 
     // -p
     // Do now so that we can override if profiling is requested
@@ -419,15 +429,6 @@ int main(int argc, char* argv[])
   //---------------------------------------------------
   //  If the python file is set, execute it
   //---------------------------------------------------
-  if (!pythonFile.empty()) {
-    //Search in local or central lib/ if this isn't a direct path
-    if (!std::filesystem::exists(pythonFile)) {
-      std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
-      if (!libFile.empty())
-        pythonFile = libFile;
-    }
-  }
-
   try {
     //Init Python interpreter
     Py_InitializeEx(0);

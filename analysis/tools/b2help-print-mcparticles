@@ -3,7 +3,7 @@
 print_help() {
     echo "Usage: $0 [options] -i filename"
     echo ""
-    echo "This command prints the MCParticles of the input mdst file and outputs a ntuple including __MCDecayString__."
+    echo "This command prints the MCParticles of the input mdst file and outputs an ntuple including __MCDecayString__."
     echo "Default output file name is ntuple.root."
     echo "You can use any of basf2's options, e.g. -o, -n, and --skip-events."
     echo "Specifically, -i is required to select the input mdst file."

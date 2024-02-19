@@ -9,7 +9,6 @@
 # # Cuts: None
 # # Date: 20240217 (YYYYMMDD)
 # Turn on PHOTOS for all decays
-yesPhotos
 
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 #JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup
@@ -43,8 +42,8 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias Sigma0sig  Sigma0sig
-Alias Lambda0sig  Lambda0sig
+Alias Sigma0sig  Sigma0
+Alias Lambda0sig  Lambda0
 
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")

@@ -187,7 +187,9 @@ def calculate_beamspot(pos_her, pos_ler, size_her, size_ler, angle_her, angle_le
 
 
 def add_beamparameters(path, name, E_cms=None, **argk):
-    """Add BeamParameter module to a given path
+    """Add BeamParameter module to a given path.
+       Note that if you append this to the path, you will not
+       read the configuration of BeamParameters from the database
 
     Args:
         path (basf2.Path instance): path to add the module to

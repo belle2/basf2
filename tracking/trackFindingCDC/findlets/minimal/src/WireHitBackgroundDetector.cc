@@ -11,6 +11,10 @@
 
 #include <framework/core/ModuleParamList.templateDetails.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <cdc/dataobjects/CDCHit.h>
+
 #include <vector>
 
 using namespace Belle2;
@@ -31,18 +35,50 @@ void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
                                                  const std::string& prefix)
 {
   m_wireHitFilter.exposeParameters(moduleParamList, prefix);
+
+  moduleParamList->addParameter(prefixed(prefix, "MVAcut"),
+                                m_mvaCutValue,
+                                "The cut value of the mva output below which the object is rejected",
+                                m_mvaCutValue);
 }
+
 
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
-  for (CDCWireHit& wireHit : wireHits) {
+  if (m_mvaCutValue == 0) {
+    for (CDCWireHit& wireHit : wireHits) {
 
-    Weight wireHitWeight = m_wireHitFilter(wireHit);
+      Weight wireHitWeight = m_wireHitFilter(wireHit);
 
-    if (std::isnan(wireHitWeight)) {
-      wireHit->setBackgroundFlag();
-      wireHit->setTakenFlag();
-      wireHit->setBadADCOrTOTFlag();
+      if (std::isnan(wireHitWeight)) {
+        wireHit->setBackgroundFlag();
+        wireHit->setTakenFlag();
+        wireHit->setBadADCOrTOTFlag();
+      }
+    }
+  }
+  // we will apply MVA classifier to all hits
+  else {
+    int nHits = wireHits.size();
+    int nFeature = 3;
+    auto X = std::unique_ptr<float[]>(new float[nHits * nFeature]);
+    size_t iHit = 0;
+    for (CDCWireHit& wireHit : wireHits) {
+      const auto* cdcHit = wireHit.getHit();
+      X[nFeature * iHit + 0] = cdcHit->getTOT();
+      X[nFeature * iHit + 1] = cdcHit->getADCCount();
+      X[nFeature * iHit + 2] = cdcHit->getTDCCount();
+      //      X[nFeature * iHit + 3] = wireHit.getISuperLayer() < 2; // Layer?
+      iHit++;
+    }
+    // evaluate:
+    auto probs = m_wireHitFilter.predict(X.get(), nFeature, nHits);
+    for (iHit = 0; iHit < probs.size(); iHit++) {
+      if (probs[iHit] < m_mvaCutValue) {
+        wireHits[iHit]->setTakenFlag();
+        wireHits[iHit]->setBackgroundFlag();
+        wireHits[iHit]->setBadADCOrTOTFlag();
+      }
     }
   }
 }

@@ -14,7 +14,10 @@
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <string>
+
 #include <memory>
+
+#include <vector>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -61,6 +64,9 @@ namespace Belle2 {
 
       /// Const version of operator
       Weight operator()(const Object& object) const;
+
+      /// Multiple predictions
+      std::vector<float> predict(float* test_data, int nFeature, int nRows);
 
     public:
       /// Return name of the selected filter

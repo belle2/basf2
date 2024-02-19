@@ -107,6 +107,13 @@ namespace Belle2 {
       }
     }
 
+    template <class AFilter>
+    std::vector<float> MVA<AFilter>::predict(float* test_data, int nFeature, int nRows)
+    {
+      return m_mvaExpert->predict(test_data, nFeature, nRows);
+    }
+
+
     template <class AVarSet>
     MVAFilter<AVarSet>::MVAFilter(const std::string& defaultTrainingName,
                                   double defaultCut,

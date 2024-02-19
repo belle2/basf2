@@ -50,5 +50,16 @@ namespace Belle2 {
     {
       return obj ? operator()(*obj) : NAN;
     }
+
+    template <class AObject>
+    std::vector<float> Filter<AObject>::predict([[maybe_unused]] float* test_data, [[maybe_unused]] int nFeature, int nRows)
+    {
+      std::vector<float> out;
+      out.resize(nRows);
+      for (auto& res : out) {
+        res = 1.0;
+      }
+      return out;
+    }
   }
 }

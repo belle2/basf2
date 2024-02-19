@@ -15,6 +15,8 @@
 
 #include <string>
 
+#include <vector>
+
 namespace Belle2 {
   class ModuleParamList;
 
@@ -70,6 +72,8 @@ namespace Belle2 {
        *             NAN if the object is rejected. Nullptr is always rejected.
        */
       Weight operator()(const Object* obj);
+
+      virtual std::vector<float> predict(float* test_data, int nFeature, int nRows);
     };
   }
 }

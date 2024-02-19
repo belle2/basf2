@@ -418,6 +418,30 @@ namespace Belle2 {
 
     }
 
+    std::vector<float> PythonExpert::apply(float* test_data, int nFeature, int nRows) const
+    {
+      npy_intp dimensions_X[2] = {static_cast<npy_intp>(nRows), static_cast<npy_intp>(nFeature)};
+      std::vector<float> probabilities(nRows, std::numeric_limits<float>::quiet_NaN());
+
+      try {
+        auto ndarray_X = boost::python::handle<>(PyArray_SimpleNewFromData(2, dimensions_X, NPY_FLOAT32, test_data));
+        auto result = m_framework.attr("apply")(m_state, ndarray_X);
+        for (int iRow = 0; iRow < nRows; ++iRow) {
+          // We have to do some nasty casting here, because the Python C-Api uses structs which are binary compatible
+          // to a PyObject but do not inherit from it!
+          probabilities[iRow] = static_cast<float>(*static_cast<float*>(PyArray_GETPTR1(reinterpret_cast<PyArrayObject*>(result.ptr()),
+                                                   iRow)));
+        }
+      } catch (...) {
+        PyErr_Print();
+        PyErr_Clear();
+        B2ERROR("Failed calling applying PythonExpert");
+        throw std::runtime_error("Failed calling applying PythonExpert");
+      }
+
+      return probabilities;
+    }
+
     std::vector<float> PythonExpert::apply(Dataset& test_data) const
     {
 

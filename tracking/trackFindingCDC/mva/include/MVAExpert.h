@@ -42,6 +42,9 @@ namespace Belle2 {
       /// Evaluate the MVA method and return the MVAOutput
       double predict();
 
+      /// Evaluate the MVA method and return the MVAOutput for multiple inputs at the same time
+      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int nRows);
+
     private:
       /// Forward declartion of implementation.
       class Impl;

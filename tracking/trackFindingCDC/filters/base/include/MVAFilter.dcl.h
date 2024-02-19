@@ -69,6 +69,9 @@ namespace Belle2 {
       /// Evaluate the mva method
       virtual double predict(const Object& obj);
 
+      /// Evaluate the MVA method over several inputs simultaneously
+      virtual std::vector<float> predict(float* test_data, int nFeature, int nRows) override;
+
     private:
       /// Database identifier of the expert or weight file name
       std::string m_identifier = "";

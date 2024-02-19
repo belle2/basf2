@@ -32,6 +32,7 @@ namespace Belle2 {
       void beginRun(); /**< Called once before a new run begins */
       std::unique_ptr<MVA::Weightfile> getWeightFile(); /**< Get the weight file */
       double predict(); /**< Get the MVA prediction */
+      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int /* nRows */); /** Get predictions for several inputs */
 
     private:
       /// References to the all named values from the source variable set.
@@ -157,6 +158,11 @@ double MVAExpert::Impl::predict()
   return m_expert->apply(*m_dataset)[0];
 }
 
+std::vector<float> MVAExpert::Impl::predict(float* test_data, int nFeature, int nRows)   /** Get predictions for several inputs */
+{
+  return m_expert->apply(test_data, nFeature, nRows);
+}
+
 /** PImpl Interface **/
 // Silence Doxygen which is complaining that "no matching class member found for"
 // But there should be a better way that I just don't know of / find
@@ -183,4 +189,9 @@ void MVAExpert::beginRun()
 double MVAExpert::predict()
 {
   return m_impl->predict();
+}
+
+std::vector<float> MVAExpert::predict(float* test_data, int nFeature, int nRows)
+{
+  return m_impl->predict(test_data, nFeature, nRows);
 }

@@ -43,8 +43,8 @@ PythiaBothParam StringZ:usePetersonH=off
 #JetSetPar PARJ(46)=1.0 ---> corresponding to Pythia8 StringZ:rFactC
 PythiaBothParam StringZ:rFactC=1.0
 
-Alias Xi-sig     Xi-sig
-Alias Lambda0sig Lambda0sig
+Alias Xi-sig     Xi-
+Alias Lambda0sig Lambda0
 
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")

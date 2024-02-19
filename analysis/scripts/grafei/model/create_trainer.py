@@ -101,12 +101,16 @@ class GraFEIIgniteTrainer:
                 loss.backward()
                 optimizer.step()
 
-            if scheduler:
-                scheduler.step()
+            # if scheduler:
+                # scheduler.step()
 
             return loss.item()
 
         self.trainer = ignite.engine.Engine(_update_model)
+
+        if scheduler:
+            ig_scheduler = ignite.handlers.param_scheduler.LRScheduler(scheduler)
+            self.trainer.add_event_handler(ignite.engine.Events.ITERATION_STARTED, ig_scheduler)
 
         # Setup train and validation evaluators
         self.evaluators = {}

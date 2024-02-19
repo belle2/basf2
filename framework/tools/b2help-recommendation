@@ -15,19 +15,23 @@ Get a summary of recommendations for analysis tools.
 import json
 import argparse
 import requests
+import sys
 
-from basf2 import conditions as bc
-import conditions_db 
+import conditions_db
+import basf2 as b2
+
 
 class Tool:
     """
     Analysis tool information.
     """
-    def __init__(self, name, tags=None, description="", recommendation=None ):
+
+    def __init__(self, name, tags=None, description="", recommendation=None, snippet=""):
         self.name = name
         self.tags = tags if tags else []
         self.description = description
         self.recommendation = recommendation if recommendation else {}
+        self.snippet = snippet
 
     def to_json(self):
         return {
@@ -35,6 +39,7 @@ class Tool:
             "tags": self.tags,
             "description": self.description,
             "recommendation": self.recommendation,
+            "snippet": self.snippet,
         }
 
 
@@ -44,7 +49,8 @@ def load_data(filename):
     """
     with open(filename, 'r') as file:
         data = json.load(file)
-        return [Tool(**tool_data) for tool_data in data] 
+        return [Tool(**tool_data) for tool_data in data]
+
 
 def load_data_url(url):
     """
@@ -52,19 +58,21 @@ def load_data_url(url):
     """
     text = requests.get(url).text
     data = json.loads(text)
-    return [Tool(**tool_data) for tool_data in data] 
+    return [Tool(**tool_data) for tool_data in data]
 
 
 def display_tool_info(tool):
     """
     display a tool's information.
     """
-    print(f"  Tool: {tool.name}")
-    print(f"    Tags: {', '.join(tool.tags)}")
-    print(f"    Description: {tool.description}")
+    print(f"Tool: {tool.name}")
+    print(f"  Tags: {', '.join(tool.tags)}")
+    print(f"  Description: {tool.description}")
 
-    recommendation = "\n".join([f"      {key}: {value}" for key, value in tool.recommendation.items()])
-    print(f"    Recommendation:\n{recommendation}")
+    recommendation = "\n".join([f"    {key}: {value}" for key, value in tool.recommendation.items()])
+    print(f"  Recommendation:\n{recommendation}")
+
+    print(f"  Snippet:\n\n{tool.snippet}")
 
     print()
 
@@ -79,21 +87,70 @@ def get_available_tags(tools):
     return tags
 
 
+def convert_json_to_payload(localfile='', payload=''):
+
+    from ROOT import Belle2
+
+    class ConvertJsonToPayload(b2.Module):
+        """
+        Module to convert model weight and yaml files to payload.
+        """
+
+        def __init__(self, filename, payloadname):
+            super().__init__()
+            self.filename = filename
+            self.payloadname = payloadname
+
+        def initialize(self):
+            b2.B2INFO('Creating local database...')
+
+        def beginRun(self):
+            iov = Belle2.IntervalOfValidity.always()
+
+            db = Belle2.Database.Instance()
+            db.addPayload(self.payloadname, self.filename, iov)
+
+        def terminate(self):
+            b2.B2INFO('Done!')
+
+    path = b2.create_path()
+
+    eventinfosetter = b2.register_module('EventInfoSetter')
+    eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
+    path.add_module(eventinfosetter)
+
+    modelSaver = b2.register_module(ConvertJsonToPayload(localfile, payload))
+    path.add_module(modelSaver)
+
+    b2.process(path)
+
+
 def main():
 
     parser = argparse.ArgumentParser(description="Tool recommendation information")
     parser.add_argument("--tags", help="Filter tools by specific tags", nargs='+', default=None)
     parser.add_argument("--globaltag", help="Global tag name, if one wants to check another recommendation",
-                        default='user_yosato_recommendations') # temporal
+                        default='user_yosato_recommendations')  # temporal
     parser.add_argument("--payload", help="Payload name, if one wants to check another recommendation",
-                        default='jsonPayload') # temporal
+                        default='recommendation_payload')  # temporal
     parser.add_argument("--localfile", help="If one wants to check a json file locally.", default=None)
+    parser.add_argument("--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
 
     args = parser.parse_args()
 
+    if args.convert:
+        b2.B2INFO("Convert the localfile to a payload")
+
+        if args.localfile is None:
+            b2.B2ERROR("The localfile is not provided!")
+            sys.exit(1)
+        else:
+            convert_json_to_payload(args.localfile, args.payload)
+            sys.exit(0)
+
     if args.localfile is None:
         gt_name = args.globaltag
-    	payload_name = args.payload
+        payload_name = args.payload
 
         cdb = conditions_db.ConditionsDB()
         payload = None
@@ -117,7 +174,7 @@ def main():
         for tag in available_tags:
             print(f"  - {tag}")
 
-    else:        
+    else:
         for tool in tools:
             if all(tag in tool.tags for tag in args.tags):
                 display_tool_info(tool)

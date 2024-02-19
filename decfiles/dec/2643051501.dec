@@ -1,14 +1,14 @@
-# EventType: 2610030171
-# # Descriptor: [ccbar Xi_cm2PmbarKs Ks2PipPim]
-# # NickName: Xi_cmToPmbarKs_KsToPipPim
+# EventType: 2643051500
+# # Descriptor: [ccbar Xi_cm2PmKs,Lambda0Pim,Sigma0Pim,XipPimPim]
+# # NickName: Xi_cm2PmKs,Lambda0Pim,Sigma0Pim,XipPimPim
 # # Cuts: None
 # # Documentation: MCrd signal request
 # # PhysicsWG: Charm
 # # Tested: Yes
 # # Responsible: Yang Li
 # # Email: y_li21@m.fudan.edu.cn
-# # Date: 20240217 (YYYYMMDD)
-# Turn on PHOTOS for all decays
+# # Date: 20240219 (YYYYMMDD)
+
 #JetSetPar PARJ(21)=0.28 ---> Pythia8 does not support this parameter, but a similar Pythia8 parameter may be available
 #JetSetPar PARJ(25)=0.27 ---> corresponding to Pythia8 StringFlav:etaSup
 PythiaBothParam StringFlav:etaSup=0.27
@@ -42,6 +42,8 @@ PythiaBothParam StringZ:usePetersonH=off
 PythiaBothParam StringZ:rFactC=1.0
 
 Alias K_S0sig  K_S0
+Alias anti-Sigma0sig  anti-Sigma0
+Alias anti-Xi+sig  anti-Xi+
 
 # Pythia6 definition "32" for "vpho -> q qbar" should be used.
 #   (this is automatically converted to Pythia8 definition "91")
@@ -49,12 +51,27 @@ Decay vpho
 1.000 c anti-c PYTHIA 32;
 Enddecay
 
-Decay Xi_c- 
-1.0   anti-p-  K_S0sig     PHSP; 
+Decay anti-Xi_c- 
+0.25  anti-p-  K_S0sig     PHSP;
+0.25  anti-Lambda0sig  pi-     PHSP;
+0.25  anti-Sigma0sig  pi-     PHSP;
+0.25  anti-Xi+sig  pi-  pi-     PHSP; 
 Enddecay
- 
+
 Decay K_S0sig
 1.0   pi+  pi-      PHSP;
 Enddecay
-End
 
+Decay anti-Sigma0sig
+1.0   anti-Lambda0sig  gamma   PHSP;
+Enddecay
+ 
+Decay anti-Xi+sig
+1.0   anti-Lambda0sig  pi+   PHSP;
+Enddecay
+ 
+Decay anti-Lambda0sig
+1.0   anti-p- pi+   PHSP;
+Enddecay
+
+End

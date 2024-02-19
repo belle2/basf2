@@ -1,5 +1,5 @@
-# EventType: 1110028000
-# Descriptor: [B0 -> [pi0 -> gamma gamma][eta -> pi+ pi- pi0]]
+# EventType: 1110008000
+# Descriptor: [B0 -> pi0 [eta -> gamma gamma] ]
 # NickName: B0_pi0eta_gammagamma
 # Tested: Yes
 # PhysicsWG: Bhadronic
@@ -15,12 +15,12 @@ Decay Upsilon(4S)
 Enddecay
 ##
 Decay B0sig
-1.0   pi0 etasig   PHSP;
+1.0   pi0 etasig  PHSP;
 Enddecay
 CDecay anti-B0sig
-##
+##====
 Decay etasig
-1.0   pi+ pi-  pi0   ETA_FULLDALITZ -1.128 0.153 0.0 0.085 0.0 0.173; 
+1.0   gamma gamma PHSP;
 Enddecay
 ##===
 End

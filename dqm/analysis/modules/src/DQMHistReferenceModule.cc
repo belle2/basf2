@@ -34,17 +34,6 @@ DQMHistReferenceModule::DQMHistReferenceModule() : DQMHistAnalysisModule()
 
 DQMHistReferenceModule::~DQMHistReferenceModule() { }
 
-TH1* DQMHistReferenceModule::find_histo_in_canvas(REFNODE* node)
-{
-
-  if (!node->canvas) {
-    node->canvas = findCanvas(node->orghist_name);
-  }
-  if (!node->canvas) return nullptr;
-
-  return findHistInCanvas(node->orghist_name, node->canvas);
-}
-
 void DQMHistReferenceModule::initialize()
 {
   gStyle->SetOptStat(0);
@@ -165,7 +154,7 @@ void DQMHistReferenceModule::event()
     hist2->SetFillColor(0);
     hist2->SetStats(kFALSE);
 
-    TH1* hist1 = find_histo_in_canvas(it);
+    TH1* hist1 = findHistInCanvas(it->orghist_name, &(it->canvas));
 
     TCanvas* canvas = it->canvas;
 

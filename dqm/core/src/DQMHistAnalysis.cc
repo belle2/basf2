@@ -161,9 +161,14 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas* cobj)
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-  if (cobj == nullptr) {
+
+  TCanvas* cnv = nullptr;
+  // try to get canvas from outside
+  if (cobj) cnv = *cobj;
+  // if no canvas search for it
+  if (cnv == nullptr) {
     // parse the dir+histo name and create the corresponding canvas name
     auto s = StringSplit(histo_name, '/');
     if (s.size() != 2) {
@@ -173,12 +178,14 @@ TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCan
     auto dirname = s.at(0);
     auto hname = s.at(1);
     std::string canvas_name = dirname + "/c_" + hname;
-
-    cobj = findCanvas(canvas_name);
+    cnv = findCanvas(canvas_name);
+    // set canvas pointer for outside
+    if (cnv && cobj) *cobj = cnv;
   }
 
-  if (cobj != nullptr) {
-    TIter nextkey((cobj)->GetListOfPrimitives());
+  // get histogram pointer
+  if (cnv != nullptr) {
+    TIter nextkey(cnv->GetListOfPrimitives());
     TObject* obj{};
     while ((obj = dynamic_cast<TObject*>(nextkey()))) {
       if (obj->IsA()->InheritsFrom("TH1")) {

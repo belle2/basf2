@@ -76,12 +76,6 @@ namespace Belle2 {
       TH1* ref_clone{nullptr};
     } REFNODE;
 
-    /**
-     * Finds "online" histogram in the corresponding canvas.
-     * @param node reference histogram node
-     */
-    TH1* find_histo_in_canvas(REFNODE* node);
-
     /** Struct for reference histogram  */
     std::vector<REFNODE*> m_pnode;
 

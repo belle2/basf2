@@ -237,7 +237,8 @@ namespace Belle2 {
     // 4: added offline fit variables (SL)
     // 5: added diode and pile-up photon offline fit hypothesis (SL)
     // 6: added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried (SL)
-    ClassDef(ECLCalDigit, 6); /**< ClassDef */
+    // 7: propagated status flags for the online fit from the ECLDigit object (JE)
+    ClassDef(ECLCalDigit, 7); /**< ClassDef */
   };
 
   // inline isCalibrated

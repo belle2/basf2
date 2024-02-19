@@ -101,9 +101,6 @@ class GraFEIIgniteTrainer:
                 loss.backward()
                 optimizer.step()
 
-            # if scheduler:
-                # scheduler.step()
-
             return loss.item()
 
         self.trainer = ignite.engine.Engine(_update_model)

@@ -9,6 +9,8 @@
 # Cuts: None
 # Date: 27/03/2023
 #
+Alias K_S0sig K_S0
+#
 
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
@@ -26,11 +28,11 @@ Enddecay
 CDecay D*0sig
 
 Decay anti-D0sig
-1.0 K_S0 pi+ pi- PHOTOS PHSP;
+1.0 K_S0sig pi+ pi- PHOTOS PHSP;
 Enddecay
 CDecay D0sig
 
-Decay K_S0
+Decay K_S0sig
 1.0 pi+ pi- PHSP;
 Enddecay
 

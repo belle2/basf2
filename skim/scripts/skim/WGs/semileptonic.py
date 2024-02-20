@@ -84,8 +84,8 @@ class PRsemileptonicUntagged(BaseSkim):
         stdPi("all", path=path)
 
     def build_lists(self, path):
-        ma.fillParticleList(decayString="pi+:PRSL_eventshape",
-                            cut="pt> 0.1", path=path)
+        ma.cutAndCopyList("pi+:PRSL_eventshape", "pi+:all",
+                          cut="pt> 0.1", path=path)
         ma.fillParticleList(decayString="gamma:PRSL_eventshape",
                             cut="E > 0.1", path=path)
 
@@ -137,10 +137,9 @@ class PRsemileptonicUntagged(BaseSkim):
 
         ma.buildRestOfEvent('B0:all', path=path)
         ma.appendROEMask('B0:all', 'basic',
-                         'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
+                         'pt>0.05 and dr<2 and -4.0<dz<4.0',
                          'E>0.05',
                          path=path)
-        ma.buildContinuumSuppression('B0:all', 'basic', path=path)
 
         vm.addAlias('d0_p', 'daughter(0, p)')
         vm.addAlias('d1_p', 'daughter(1, p)')
@@ -153,8 +152,8 @@ class PRsemileptonicUntagged(BaseSkim):
             particlelist='B0:all',
             variables_1d=[
                 ('Mbc', 100, 4.0, 5.3, 'Mbc', __liaison__, '', ''),
-                ('d0_p', 100, 0, 5.2, 'Signal-side pion momentum', __liaison__, '', ''),
-                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', __liaison__, '', ''),
+                ('d0_p', 100, 0, 0.3, 'Signal-side pion momentum', __liaison__, '', ''),
+                ('d1_p', 100, 1, 4, 'Signal-side lepton momentum', __liaison__, '', ''),
                 ('MissM2', 100, -5, 5, 'Missing mass squared', __liaison__, '', '')
             ],
             variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
@@ -255,7 +254,6 @@ class SLUntagged(BaseSkim):
                          'pt>0.05 and -2<dr<2 and -4.0<dz<4.0',
                          'E>0.05',
                          path=path)
-        ma.buildContinuumSuppression('B+:all', 'basic', path=path)
 
         vm.addAlias('d1_p', 'daughter(1,p)')
         vm.addAlias('MissM2', 'weMissM2(basic,0)')
@@ -266,12 +264,12 @@ class SLUntagged(BaseSkim):
             rootfile=histogramFilename,
             particlelist='B+:all',
             variables_1d=[
-                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, 'cosThetaBY', __liaison__, '', ''),
-                ('Mbc', 100, 4.0, 5.3, 'Mbc', __liaison__, '', ''),
-                ('d1_p', 100, 0, 5.2, 'Signal-side lepton momentum', __liaison__, '', ''),
+                ('cosThetaBetweenParticleAndNominalB', 100, -3.0, 3.0, 'cosThetaBY', __liaison__, '', ''),
+                ('Mbc', 100, 5.24, 5.3, 'Mbc', __liaison__, '', ''),
+                ('d1_p', 100, 1, 4, 'Signal-side lepton momentum', __liaison__, '', ''),
                 ('MissM2', 100, -5, 5, 'Missing mass squared', __liaison__, '', '')
             ],
-            variables_2d=[('deltaE', 100, -5, 5, 'Mbc', 100, 4.0, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
+            variables_2d=[('deltaE', 100, -1, 1, 'Mbc', 100, 5.2, 5.3, 'Mbc vs deltaE', __liaison__, '', '')],
             path=path)
 
 

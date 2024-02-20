@@ -15,9 +15,10 @@
 using namespace std;
 using namespace Belle2;
 
+
+
 REG_MODULE(ZMQRxWorker);
 
-static int s_event_number = 0;
 
 ZMQRxWorkerModule::ZMQRxWorkerModule() : Module()
 {
@@ -42,7 +43,6 @@ void ZMQRxWorkerModule::initialize()
 void ZMQRxWorkerModule::event()
 {
   try {
-    //    B2INFO ( "ZMQRxWorker :: event = " << s_event_number++ );
 
     if (m_firstEvent) {
       m_streamer.initialize(m_param_compressionLevel, m_param_handleMergeable);

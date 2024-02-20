@@ -52,7 +52,7 @@ namespace Belle2 {
     int m_nInitial;              /**< The number of particles in each event that should be flagges with c_Initial */
     int m_nVirtual;              /**< The number of particles in each event that should be flagged with c_IsVirtual */
     LHEReader m_lhe;                 /**< An instance of the LHE reader. */
-    MCParticleGraph mpg;             /**< The MCParticle graph object. */
+    MCParticleGraph m_pg;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
     bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */

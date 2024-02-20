@@ -11,7 +11,7 @@ Here we briefly describe the SVD objects that populate the Conditions Database. 
    * for run-dependent and data reconstruction revisions should be checked inspecting the content of the corresponding Global Tags.
    * you can also check the `SVD Payloads, Revisions and GT <https://confluence.desy.de/pages/viewpage.action?pageId=179781819>`_ Confluence Page.
 
-We add a string, the ``UniqueID``, to the payloads that provides informations on the content of the payload. In order to read the ``UniqueID`` you can setup basf2 and then:
+We add a string, the ``UniqueID``, to the payloads that provides information on the content of the payload. In order to read the ``UniqueID`` you can setup basf2 and then:
 
 .. code::
 

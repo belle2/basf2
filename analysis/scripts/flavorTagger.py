@@ -1101,7 +1101,7 @@ def flavorTagger(
       @param downloadFromDatabaseIfNotFound    [Expert] Weight files are downloaded from
                                                the conditions database if not available in workingDirectory.
       @param uploadToDatabaseAfterTraining     [Expert] For librarians only: uploads weight files to localdb after training.
-      @param samplerFileId                     Identifier to paralellize
+      @param samplerFileId                     Identifier to parallelize
                                                sampling. Only used in ``Sampler`` mode.  If you are training by yourself and
                                                want to parallelize the sampling, you can run several sampling scripts in
                                                parallel. By changing this parameter you will not overwrite an older sample.

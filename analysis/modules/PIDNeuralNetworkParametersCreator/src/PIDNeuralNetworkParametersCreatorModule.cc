@@ -52,7 +52,7 @@ void PIDNeuralNetworkParametersCreatorModule::initialize()
   const size_t nInputs = m_inputNames.size();
   const size_t nOutputs = m_outputSpeciesPdg.size();
 
-  // this performs some tests and raises an exception if a test failes
+  // this performs some tests and raises an exception if a test fails
   const auto model = fdeep::read_model_from_string(m_modelDefinition);
 
   const auto inputShapes = model.get_input_shapes();
@@ -117,7 +117,7 @@ void PIDNeuralNetworkParametersCreatorModule::initialize()
   }
 
   if (!isValid)
-    B2ERROR("The given neural-network parametes are invalid!");
+    B2ERROR("The given neural-network parameters are invalid!");
 
   Belle2::DBImportObjPtr<Belle2::PIDNeuralNetworkParameters> importer{m_neuralNetworkParametersName};
   importer.construct(

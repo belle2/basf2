@@ -143,7 +143,7 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
         mass (float): mass of the particle in GeV
         width (float): width of the particle in GeV
         charge (float): charge of the particle in e
-        sping (float): spin of the particle
+        spin (float): spin of the particle
         max_width (float): max width, if omitted 3*width will be used
         lifetime (float): lifetime in ns, should be 0 as geant4 cannot handle it correctly otherwise
         pythiaID (int): pythiaID of the particle (if any), if omitted 0 will be used
@@ -161,7 +161,7 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
     if particle:
         basf2.B2INFO(
             f"Adding new particle '{name}' (pdg={int(pdgCode)}, mass={mass:.3g} GeV, width={width:.3g} GeV, " +
-            f"charge={int(charge)}, spin={int(spin)})")
+            f"charge={int(charge)}, 2*spin={int(2*spin)})")
 
         if define_anti_particle:
             anti_particle = _get_instance().AddParticle(

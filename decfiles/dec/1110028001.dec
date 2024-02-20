@@ -1,5 +1,5 @@
 # EventType: 1110028000
-# Descriptor: [B0 -> [eta -> gamma gamma][eta -> pi+ pi- pi0]]
+# Descriptor: [B0 -> [pi0 -> gamma gamma][eta -> pi+ pi- pi0]]
 # NickName: B0_pi0eta_gammagamma
 # Tested: Yes
 # PhysicsWG: Bhadronic
@@ -20,7 +20,7 @@ Enddecay
 CDecay anti-B0sig
 ##
 Decay etasig
-1.0   pi+ pi-  pi0   ETA_FULLDALITZ -1.128 0.153 0.0 0.085 0.0 0.173; # New decay model
+1.0   pi+ pi-  pi0   ETA_FULLDALITZ -1.128 0.153 0.0 0.085 0.0 0.173; 
 Enddecay
 ##===
 End

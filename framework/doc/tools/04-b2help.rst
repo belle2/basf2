@@ -58,7 +58,10 @@ Specifically, ``-i`` is required to select the input mdst file.
 
     usage: b2help-print-mcparticles [-h] [-i INPUT]
 
+.. rubric:: Required Arguments
+
+-i INPUT, --input INPUT  input mdst file name
+
 .. rubric:: Optional Arguments
 
 -h, --help               show this help message and exit
--i INPUT, --input INPUT  input mdst file name (required)

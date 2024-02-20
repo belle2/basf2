@@ -11,6 +11,7 @@
 #include <Math/Vector4D.h>
 
 #include <vector>
+#include <map>
 
 namespace Belle2 {
   class MCParticle;
@@ -335,6 +336,29 @@ namespace Belle2 {
      * an ECLCluster
      */
     double particleClusterTotalMCMatchWeight(const Particle*);
+
+    /**
+     * Helper function for particleClusterTotalMCMatchWeightForKlong.
+     * Update the map of {arrayIndex : sum-of-weights} for MC Klong particles.
+     */
+    void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight);
+
+    /**
+     * returns the sum of weights of all MCParticles that are a K_L0 or daughter of a K_L0
+     * of the Particle -> ECLCluster -> MCParticles relations.
+     * For charged particles, the track from which the Particle was created,
+     * must be matched to an ECLCluster
+     */
+    double particleClusterTotalMCMatchWeightForKlong(const Particle*);
+
+    /**
+     * returns the sum of weights of all MCParticles that are the same K_L0 or daughter of the K_L0
+     * of the Particle -> ECLCluster -> MCParticles relations.
+     * If there are multiple K_L0s related to a ECLCluster, returns the sum of weights for the best matched K_L0.
+     * For charged particles, the track from which the Particle was created,
+     * must be matched to an ECLCluster
+     */
+    double particleClusterTotalMCMatchWeightForBestKlong(const Particle*);
 
     /**
      * returns 1 for crossfeed in reconstruction of a B meson, 0 for no crossfeed and

@@ -1,17 +1,20 @@
-# EventType: 1116062001
-# Descriptor: [B0 -> [D_s0*+ -> [D_s+ -> [phi -> pi+pi-]pi+]  pi0]  [D- -> K+pi-pi-]]cc
-# NickName: B2Ds0*+(2317)D-_2
+# EventType: 1146064000 
+# Descriptor: [B0 -> [D_s0*+ -> D_s+ pi0] [D- -> K+pi-pi-]] cc
+# NickName: B2Ds0*+(2317)D-_threedecays
 # Tested: Yes
 # PhysicsWG: Bhadronic
 # Responsible: WU KUAN YING
 # Email: 410280161@m365.fju.edu.tw
 # Cuts: None
-# Date: 20231215
-#
-#
+# Date: 20240216 #
+
 Alias          D_s0*+sig         D_s0*+
 Alias          D_s0*-sig         D_s0*-
 ChargeConj     D_s0*+sig         D_s0*-sig 
+
+Alias          K*0sig            K*0 
+Alias          anti-K*0sig       anti-K*0
+ChargeConj     K*0sig            anti-K*0sig 
 
 Alias          phisig            phi
 
@@ -35,12 +38,19 @@ Enddecay
 CDecay D+sig
 
 Decay D_s+sig
-1.0     phisig          pi+          PHSP;
+0.333     phisig          pi+          pi0        PHSP;
+0.333     phisig          pi+          PHSP;
+0.333     anti-K*0sig          K+           SVS;
 Enddecay
 CDecay D_s-sig
 
 Decay phisig
 1.0     K+               K-          VSS;
 Enddecay
+
+Decay K*0sig
+1.0     K+              pi-          VSS;
+Enddecay
+CDecay anti-K*0sig
 
 End

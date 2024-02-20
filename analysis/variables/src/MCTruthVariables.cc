@@ -822,6 +822,72 @@ namespace Belle2 {
       return weightsum;
     }
 
+    // Helper function for particleClusterTotalMCMatchWeightForKlong
+    void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i) {
+        double weight = mcps.weight(i);
+        const MCParticle* mcp = mcps[i];
+
+        while (mcp) {
+          if (mcp->getPDG() == 130) {
+            int index = mcp->getArrayIndex();
+            if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
+              mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
+            } else {
+              mapMCParticleIndxAndWeight.insert({index, weight});
+            }
+            break;
+          } else {
+            mcp = mcp->getMother();
+          }
+        }
+      }
+    }
+
+    double particleClusterTotalMCMatchWeightForKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      double totalWeight = 0;
+      for (const auto& map : mapMCParticleIndxAndWeight) {
+        totalWeight += map.second;
+      }
+
+      return totalWeight;
+    }
+
+    double particleClusterTotalMCMatchWeightForBestKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      if (mapMCParticleIndxAndWeight.size() == 0)
+        return 0.0;
+
+      auto maxMap = std::max_element(mapMCParticleIndxAndWeight.begin(), mapMCParticleIndxAndWeight.end(),
+      [](const auto & x, const auto & y) { return x.second < y.second; }
+                                    );
+
+      return maxMap->second;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
@@ -1110,6 +1176,12 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
+
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is the same Klong or daughter of the Klong. If multiple MC Klongs are related to the ECLCluster, returns the sum of weights for the best matched Klong.");
+
 
   }
 }

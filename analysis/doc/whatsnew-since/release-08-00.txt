@@ -1,6 +1,11 @@
 Changes in the analysis package in light-2403-persian
 -----------------------------------------------------
 
+Command line tools
+++++++++++++++++++
+* New command line tool :ref:`b2help-print-mcparticles` to print MCParticles on the input mdst file. This tool is helpful for
+  quickly checking MCParticles without writing a script.
+
 Variables
 +++++++++
 * Added variables for the MCMatching of ECLCluster based Klong, `clusterTotalMCMatchWeightForKlong`,

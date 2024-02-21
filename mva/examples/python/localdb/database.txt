@@ -1,0 +1,5 @@
+dbstore/XGBoost_ADCFilter_in_CDC 0c1baa 0,0,-1,-1
+dbstore/trackfindingcdc_XGBoost_ADCFilter_in_CDC cacd04 0,0,0,-1
+dbstore/trackfindingcdc_XGBoost_ADCFilter_in_CDC cacd04 1003,0,1003,-1
+dbstore/trackfindingcdc_XGBoost_ADCFilter_in_CDC cacd04 1004,0,1004,-1
+dbstore/trackfindingcdc_XGBoost_ADCFilter_in_CDC cacd04 26,0,26,-1

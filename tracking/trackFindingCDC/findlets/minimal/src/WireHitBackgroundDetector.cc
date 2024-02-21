@@ -15,7 +15,7 @@
 
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <vector>
+#include <iostream>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -41,7 +41,6 @@ void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
                                 "The cut value of the mva output below which the object is rejected",
                                 m_mvaCutValue);
 }
-
 
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
@@ -73,7 +72,19 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     }
     // evaluate:
     auto probs = m_wireHitFilter.predict(X.get(), nFeature, nHits);
+
+    // evaluate differently:
+    std::vector<CDCWireHit*> wireHitsPtr(wireHits.size());
+    for (auto& wireHit : wireHits) {
+      wireHitsPtr.push_back(&wireHit);
+    }
+
+    auto probs2 = m_wireHitFilter(wireHitsPtr);
+
     for (iHit = 0; iHit < probs.size(); iHit++) {
+
+      std::cout << "hit hit" << probs[iHit] << " " << probs2[iHit] << std::endl;
+
       if (probs[iHit] < m_mvaCutValue) {
         wireHits[iHit]->setTakenFlag();
         wireHits[iHit]->setBackgroundFlag();

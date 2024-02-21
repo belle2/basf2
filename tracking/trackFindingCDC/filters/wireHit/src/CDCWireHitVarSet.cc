@@ -29,6 +29,6 @@ bool CDCWireHitVarSet::extract(const CDCWireHit* wireHit)
   var<named("tot")>() = cdcHit->getTOT();
   var<named("adc")>() = cdcHit->getADCCount();
   var<named("tdc")>() = cdcHit->getTDCCount();
-
+  var<named("slayer")>() = cdcHit->getISuperLayer() == 0 ? 0 : 1;
   return true;
 }

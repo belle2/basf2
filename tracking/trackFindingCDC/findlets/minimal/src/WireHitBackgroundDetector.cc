@@ -60,7 +60,7 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
   // we will apply MVA classifier to all hits
   else {
     int nHits = wireHits.size();
-    int nFeature = 3;
+    int nFeature = 4;
     auto X = std::unique_ptr<float[]>(new float[nHits * nFeature]);
     size_t iHit = 0;
     for (CDCWireHit& wireHit : wireHits) {
@@ -68,7 +68,7 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
       X[nFeature * iHit + 0] = cdcHit->getTOT();
       X[nFeature * iHit + 1] = cdcHit->getADCCount();
       X[nFeature * iHit + 2] = cdcHit->getTDCCount();
-      //      X[nFeature * iHit + 3] = wireHit.getISuperLayer() < 2; // Layer?
+      X[nFeature * iHit + 3] = wireHit.getISuperLayer() == 0 ? 0 : 1; // Layer?
       iHit++;
     }
     // evaluate:

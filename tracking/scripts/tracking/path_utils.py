@@ -633,11 +633,19 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
         path.add_module('RegisterEventLevelTrackingInfo')
 
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
+    '''
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
                     filter="cuts_from_DB")
+    '''
+    path.add_module("TFCDC_WireHitPreparer",
+                    wirePosition="aligned",
+                    useSecondHits=use_second_hits,
+                    flightTimeEstimation="outwards",
+                    filter="mva",
+                    filterParameters={'DBPayloadName': 'trackfindingcdc_XGBoost_ADCFilter_in_CDC'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
@@ -837,15 +845,22 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     use_second_hits: bool
        If true, the second hit information will be used in the CDC track finding.
     """
-
+    '''
     # Init the geometry for cdc tracking and the hits
     path.add_module("TFCDC_WireHitPreparer",
                     useSecondHits=use_second_cdc_hits,
                     flightTimeEstimation="downwards",
                     filter="cuts_from_DB",
                     triggerPoint=trigger_point)
-
+    '''
     # Constructs clusters and reduce background hits
+    path.add_module("TFCDC_WireHitPreparer",
+                    useSecondHits=use_second_cdc_hits,
+                    flightTimeEstimation="downwards",
+                    filter="mva",
+                    triggerPoint=trigger_point,
+                    filterParameters={'DBPayloadName': 'trackfindingcdc_XGBoost_ADCFilter_in_CDC'})
+
     path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={'DBPayloadName': 'trackfindingcdc_ClusterFilterParameters'})

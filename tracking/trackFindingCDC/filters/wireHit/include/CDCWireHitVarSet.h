@@ -18,9 +18,10 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     constexpr
     static char const* const cdcWireHitVarNames[] = {
-      "tot",
       "adc",
+      "tot",
       "tdc",
+      "slayer",
     };
 
     /// Vehicle class to transport the variable names

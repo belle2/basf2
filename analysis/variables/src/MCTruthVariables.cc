@@ -137,26 +137,22 @@ namespace Belle2 {
       return curMCParticle->getArrayIndex();
     }
 
-    double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& args)
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices)
     {
       const MCParticle* mcparticle = part->getMCParticle();
       if (!mcparticle) return Const::doubleNaN;
 
-      const MCParticle* curMotherB = mcparticle;
-      int mcMotherPDG = abs(curMotherB->getPDG());
-      while (mcMotherPDG != 511 and mcMotherPDG != 521) {
-        curMotherB = curMotherB->getMother();
-        if (!curMotherB) return Const::doubleNaN;
-        mcMotherPDG = abs(curMotherB->getPDG());
+      auto daughters = mcparticle->getDaughters();
+
+      ROOT::Math::PxPyPzEVector  p4Daughters;
+      for (auto& double_daughter : daughter_indices) {
+        unsigned long daughter = std::lround(double_daughter);
+        if (daughter >= daughters.size()) return Const::doubleNaN;
+
+        p4Daughters += daughters[daughter]->get4Vector();
       }
-      auto daughtersB = curMotherB->getDaughters();
-      unsigned int nthDaughter = args.empty() ? 0 : args[0];
-      if (nthDaughter >= daughtersB.size()) return Const::doubleNaN;
-
-      auto p4Daughter = daughtersB[nthDaughter]->get4Vector();
-      auto p4B = curMotherB->get4Vector();
-
-      return (p4B - p4Daughter).mag2();
+      auto p4Mother = mcparticle->get4Vector();
+      return (p4Mother - p4Daughters).mag2();
     }
 
     double genMotherPDG(const Particle* part)
@@ -899,17 +895,17 @@ namespace Belle2 {
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
 
-    REGISTER_VARIABLE("calcMCNthBDaughterQ2(N)", calcMCNthBDaughterQ2, R"DOC(
-                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_B - p_d)^2`.
+    REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
+                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2`.
 
-                       Here :math:`p_B` is the four momentum of the B meson from which the given particle originates,
-                       and :math:`p_d` is the four momentum of its Nth daughter in the decay defined in the respective DECAY.DEC file.
-                       The numbering of daughters starts at :math:`N=0`.
+                       Here :math:`p_m` is the four momentum of the given (mother) particle,
+                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices given as arguments .
+                       The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at :math:`N=0`.
 
-                       Returns NaN if no related MCParticle could be found, or if the MCParticle does not originate from a B meson.
-                       Returns NaN if the given index (N) is larger than the number of daughters of the B meson.
+                       Returns NaN if no related MCParticle could be found.
+                       Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
 
-                       )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
+                       )DOC" ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");

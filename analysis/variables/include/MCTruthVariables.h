@@ -115,13 +115,15 @@ namespace Belle2 {
      * Check the array index of a particle n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.
      */
     double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
+
     /**
-     * Returns the generated four momentum transfer squared calculated as q^2 = (p_B - p_d)^2. Here p_B is the four momentum of the B meson from which the given particle originates,
-     * and  p_d is the four momentum of its Nth daughter in the decay defined in the respective DECAY.DEC file. The numbering of daughters starts at 0.
-     * Returns NaN if no related MCParticle could be found, or if the MCParticle does not originate from a B meson.
-     * Returns NaN if the given index (N) is larger than the number of daughters of the B meson.
-     */
-    double calcMCNthBDaughterQ2(const Particle* part, const std::vector<double>& daughterIDs);
+    * Returns the generated four momentum transfer squared calculated as q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2.
+    * Here p_m is the four momentum of the given (mother) particle,
+    *and p_{d_{i,j,...}} are the daughter particles with indices given as arguments .
+    * The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at N=0.
+    */
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices);
+
     /**
     * check the PDG code of a particles MC mother
     */

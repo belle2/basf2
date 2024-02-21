@@ -905,7 +905,7 @@ namespace Belle2 {
                        Returns NaN if no related MCParticle could be found.
                        Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
 
-                       )DOC" ":math:`[\\text{GeV}/\\text{c}]^2`");
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");

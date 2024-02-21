@@ -36,7 +36,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getChargeSeed();
     }
 
@@ -45,7 +45,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getFlipQualityIndicator();
     }
     //! @returns the quality indicator of the second MVA of the Flip&Refit
@@ -53,7 +53,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->get2ndFlipQualityIndicator();
     }
 
@@ -65,7 +65,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getTimeSeed();
     }
 
@@ -74,7 +74,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getNSVDHitsOfOutgoingArm();
     }
 
@@ -83,7 +83,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getOutgoingArmTime();
     }
 
@@ -92,7 +92,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getOutgoingArmTimeError();
     }
 
@@ -102,7 +102,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getNSVDHitsOfIngoingArm();
     }
 
@@ -111,7 +111,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getIngoingArmTime();
     }
 
@@ -120,7 +120,7 @@ namespace Belle2 {
     {
       RecoTrack* recoTrack = getRecoTrack(particle);
       if (!recoTrack)
-        return std::numeric_limits<double>::quiet_NaN();
+        return Const::doubleNaN;
       return recoTrack->getIngoingArmTimeError();
     }
 

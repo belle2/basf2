@@ -274,7 +274,7 @@ namespace Belle2 {
     double cmsAngleXZ = atan(m_boostedHER.X() / m_boostedHER.Z());
     double cmsAngleYZ = atan(m_boostedHER.Y() / m_boostedHER.Z());
     m_labToCMS = new ROOT::Math::LorentzRotation(
-      PCmsLabTransform::rotateLabToCms(beam.BoostToCM(), cmsAngleXZ, cmsAngleYZ)
+      PCmsLabTransform::rotateLabToCms(-beam.BoostToCM(), cmsAngleXZ, cmsAngleYZ)
     );
 
     //cache derived quantities

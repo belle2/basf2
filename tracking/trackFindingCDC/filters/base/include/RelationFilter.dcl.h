@@ -39,6 +39,11 @@ namespace Belle2 {
        */
       virtual Weight operator()(const AObject& from, const AObject& to);
 
+      virtual std::vector<float> operator()(const std::vector <Relation<AObject>*>& objs) override
+      {
+        return std::vector<float>(objs.size());
+      }
+
       /**
        *  Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to

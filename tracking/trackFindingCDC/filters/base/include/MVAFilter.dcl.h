@@ -72,6 +72,11 @@ namespace Belle2 {
       /// Evaluate the MVA method over several inputs simultaneously
       virtual std::vector<float> predict(float* test_data, int nFeature, int nRows) override;
 
+      /// Evaluate the MVA method over several inputs simultaneously
+      std::vector<float> predict(const std::vector<Object*>& objs);
+
+      /// Evaluate the MVA method over a vector of objects
+      virtual std::vector<float> operator()(const std::vector <Object*>& objs) override;
     private:
       /// Database identifier of the expert or weight file name
       std::string m_identifier = "";
@@ -84,6 +89,9 @@ namespace Belle2 {
 
       /// MVA Expert to examine the object
       std::unique_ptr<MVAExpert> m_mvaExpert;
+
+      /// Selected variables, following the order in the payload
+      std::vector<size_t> m_selectedVariablesOrder;
     };
 
     /// Convience template to create a mva filter for a set of variables.

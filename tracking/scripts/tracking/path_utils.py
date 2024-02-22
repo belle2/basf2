@@ -633,19 +633,11 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
         path.add_module('RegisterEventLevelTrackingInfo')
 
     # Init the geometry for cdc tracking and the hits and cut low ADC hits
-    '''
     path.add_module("TFCDC_WireHitPreparer",
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
                     filter="cuts_from_DB")
-    '''
-    path.add_module("TFCDC_WireHitPreparer",
-                    wirePosition="aligned",
-                    useSecondHits=use_second_hits,
-                    flightTimeEstimation="outwards",
-                    filter="mva",
-                    filterParameters={'DBPayloadName': 'trackfindingcdc_XGBoost_ADCFilter_in_CDC'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",

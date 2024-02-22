@@ -74,6 +74,8 @@ namespace Belle2 {
       Weight operator()(const Object* obj);
 
       virtual std::vector<float> predict(float* test_data, int nFeature, int nRows);
+
+      virtual std::vector<float> operator()(const std::vector <Object*>& objs);
     };
   }
 }

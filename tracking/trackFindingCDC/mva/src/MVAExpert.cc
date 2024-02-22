@@ -9,8 +9,8 @@
 
 /** Impl Declaration **/
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
+#include <mva/interface/Weightfile.h>
 #include <framework/database/DBObjPtr.h>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -33,7 +33,7 @@ namespace Belle2 {
       std::unique_ptr<MVA::Weightfile> getWeightFile(); /**< Get the weight file */
       double predict(); /**< Get the MVA prediction */
       std::vector<float> predict(float* /* test_data */, int /* nFeature */, int /* nRows */); /** Get predictions for several inputs */
-
+      std::vector<std::string> getVariableNames();
     private:
       /// References to the all named values from the source variable set.
       std::vector<Named<Float_t*> > m_allNamedVariables;
@@ -89,9 +89,10 @@ void MVAExpert::Impl::beginRun()
 {
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
-    if (weightfile->getElement<std::string>("method") == "FastBDT" and
-        (weightfile->getElement<int>("FastBDT_version") == 1 or
-         weightfile->getElement<int>("FastBDT_version") == 2)) {
+    if ((weightfile->getElement<std::string>("method") == "FastBDT" and
+         (weightfile->getElement<int>("FastBDT_version") == 1 or
+          weightfile->getElement<int>("FastBDT_version") == 2)) or
+        (weightfile->getElement<std::string>("method") == "Python")) {
 
       int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
 
@@ -163,6 +164,16 @@ std::vector<float> MVAExpert::Impl::predict(float* test_data, int nFeature, int 
   return m_expert->apply(test_data, nFeature, nRows);
 }
 
+std::vector<std::string> MVAExpert::Impl::getVariableNames()
+{
+  std::vector<std::string> out(m_selectedNamedVariables.size());
+  for (size_t iName = 0; iName < m_selectedNamedVariables.size(); iName += 1) {
+    out[iName] = m_selectedNamedVariables[iName].getName();
+  }
+  return out;
+}
+
+
 /** PImpl Interface **/
 // Silence Doxygen which is complaining that "no matching class member found for"
 // But there should be a better way that I just don't know of / find
@@ -195,3 +206,9 @@ std::vector<float> MVAExpert::predict(float* test_data, int nFeature, int nRows)
 {
   return m_impl->predict(test_data, nFeature, nRows);
 }
+
+std::vector<std::string> MVAExpert::getVariableNames()
+{
+  return m_impl->getVariableNames();
+}
+

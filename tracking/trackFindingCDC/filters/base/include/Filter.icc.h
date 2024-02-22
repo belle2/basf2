@@ -52,6 +52,16 @@ namespace Belle2 {
     }
 
     template <class AObject>
+    std::vector<float> Filter<AObject>::operator()(const std::vector <Object*>& objs)
+    {
+      std::vector<float> out(objs.size());
+      for (const auto& obj : objs) {
+        out.push_back(operator()(obj));
+      }
+      return out;
+    }
+
+    template <class AObject>
     std::vector<float> Filter<AObject>::predict([[maybe_unused]] float* test_data, [[maybe_unused]] int nFeature, int nRows)
     {
       std::vector<float> out;

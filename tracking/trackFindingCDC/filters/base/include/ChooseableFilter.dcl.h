@@ -68,6 +68,9 @@ namespace Belle2 {
       /// Multiple predictions
       std::vector<float> predict(float* test_data, int nFeature, int nRows);
 
+      /// Evaluate the MVA method over a vector of objects
+      virtual std::vector<float> operator()(const std::vector <Object*>& objs) override;
+
     public:
       /// Return name of the selected filter
       std::string getFilterName() const

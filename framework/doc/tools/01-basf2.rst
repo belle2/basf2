@@ -21,9 +21,14 @@ The main command line tool for the Belle2 Software is ``basf2``::
                           Set global log level (one of DEBUG, INFO, RESULT,
                           WARNING, or ERROR). Takes precedence over
                           set_log_level() in steering file.
+--package_log_level PACKAGELOGLEVEL
+                          Set a package log level (one of DEBUG, INFO, RESULT,
+                          WARNING, or ERROR). Syntax: packageName:LOGLEVEL.
+                          (Ex. cdc:ERROR or klm:DEBUG:20). Does not take
+                          precedence over  set_log_level() in steering file.
 --module_log_level MODULELOGLEVEL
                           Set a module log level (one of DEBUG, INFO, RESULT,
-                          WARNING, or ERROR). Syntax: ModuleName:LOGLEVEL. 
+                          WARNING, or ERROR). Syntax: ModuleName:LOGLEVEL.
                           (Ex. KLMUnpackers:INFO)
 --random-seed SEED        Set the default initial seed for the random number
                           generator. This does not take precedence over calls to

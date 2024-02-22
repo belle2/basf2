@@ -133,6 +133,8 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("package_log_level", prog::value<vector<string> >(),
+     "Set package log level. Can be specified multiple times to use more than one package. (Syntax Example: 'cdc:DEBUG') ")
     ("module_log_level", prog::value<vector<string> >(),
      "Set module log level. Can be specified multiple times to use more than one module. (Syntax Example: 'KLMUnpacker:INFO') ")
     ("random-seed", prog::value<string>(),
@@ -356,6 +358,41 @@ int main(int argc, char* argv[])
       Environment::Instance().setLogLevelOverride(level);
     }
 
+    // --package_log_level
+    if (varMap.count("package_log_level")) {
+      const auto& packLogList = varMap["package_log_level"].as<vector<string>>();
+      std::string delimiter = ":";
+      for (const std::string& packLog : packLogList) {
+        auto packageName = packLog.substr(0, packLog.find(delimiter));
+        std::string logName = packLog.substr(packLog.find(delimiter) + delimiter.length(), packLog.length());
+        int debugLevel = -1;
+        if ((logName.find("DEBUG") != std::string::npos) && logName.length() > 5) {
+          debugLevel = std::stoi(logName.substr(logName.find(delimiter) + delimiter.length(), logName.length()));
+          logName = "DEBUG";
+        }
+
+        int level = -1;
+        /* set log level for package */
+        for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
+          std::string thisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
+          if (boost::iequals(logName, thisLevel)) { //case-insensitive
+            level = i;
+            break;
+          }
+        }
+        if (level < 0) {
+          B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
+        }
+
+        /* set package log level*/
+        LogSystem::Instance().getPackageLogConfig(packageName).setLogLevel((LogConfig::ELogLevel)level);
+        if ((logName == "DEBUG") && (debugLevel >= 0)) {
+          LogSystem::Instance().getPackageLogConfig(packageName).setDebugLevel(debugLevel);
+        }
+
+      }
+    }
+
     // --module_log_level
     if (varMap.count("module_log_level")) {
       const auto& modLogList = varMap["module_log_level"].as<vector<string>>();
@@ -384,9 +421,10 @@ int main(int argc, char* argv[])
         }
 
         /* define module and set log level*/
-        std::shared_ptr<Module> modulePtr = ModuleManager::Instance().registerModule(moduleName);
+        ModulePtr modulePtr = ModuleManager::Instance().registerModule(moduleName);
         if (modulePtr) {
-          modulePtr->setLogLevel(level);
+          modulePtr->setLogLevel((LogConfig::ELogLevel)level);
+          LogSystem::Instance().updateModule(&(modulePtr->getLogConfig()), moduleName);
           if ((logName == "DEBUG") && (debugLevel >= 0)) {
             modulePtr->setDebugLevel(debugLevel);
           }

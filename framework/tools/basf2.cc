@@ -361,7 +361,7 @@ int main(int argc, char* argv[])
       const auto& packLogList = varMap["package_log_level"].as<vector<string>>();
       std::string delimiter = ":";
       for (const std::string& packLog : packLogList) {
-        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:DEBUGLEVEL*/
+        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:LEVEL*/
         auto packageName = packLog.substr(0, packLog.find(delimiter));
         std::string logName = packLog.substr(packLog.find(delimiter) + delimiter.length(), packLog.length());
         int debugLevel = -1;
@@ -382,12 +382,11 @@ int main(int argc, char* argv[])
         if (level < 0) {
           B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
         }
-
         /* set package log level*/
-        LogSystem::Instance().getPackageLogConfig(packageName).setLogLevel((LogConfig::ELogLevel)level);
         if ((logName == "DEBUG") && (debugLevel >= 0)) {
           LogSystem::Instance().getPackageLogConfig(packageName).setDebugLevel(debugLevel);
         }
+        LogSystem::Instance().getPackageLogConfig(packageName).setLogLevel((LogConfig::ELogLevel)level);
 
       }
     }

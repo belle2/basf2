@@ -62,7 +62,6 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     int nHits = wireHits.size();
     int nFeature = 4;
     auto X = std::unique_ptr<float[]>(new float[nHits * nFeature]);
-
     for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
       const auto* cdcHit = wireHits[iHit].getHit();
       X[nFeature * iHit + 0] = cdcHit->getADCCount();

@@ -58,34 +58,38 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
   }
   // we will apply MVA classifier to all hits
   else {
+    /*
     int nHits = wireHits.size();
     int nFeature = 4;
     auto X = std::unique_ptr<float[]>(new float[nHits * nFeature]);
-    size_t iHit = 0;
-    for (CDCWireHit& wireHit : wireHits) {
-      const auto* cdcHit = wireHit.getHit();
-      X[nFeature * iHit + 0] = cdcHit->getTOT();
-      X[nFeature * iHit + 1] = cdcHit->getADCCount();
+
+    for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
+      const auto* cdcHit = wireHits[iHit].getHit();
+      X[nFeature * iHit + 0] = cdcHit->getADCCount();
+      X[nFeature * iHit + 1] = cdcHit->getTOT();
       X[nFeature * iHit + 2] = cdcHit->getTDCCount();
-      X[nFeature * iHit + 3] = wireHit.getISuperLayer() == 0 ? 0 : 1; // Layer?
-      iHit++;
+      X[nFeature * iHit + 3] = wireHits[iHit].getISuperLayer() == 0 ? 0 : 1; // Layer?
+      //      std::cout << iHit << " " << X[nFeature * iHit + 0] << " " << X[nFeature * iHit + 1] << " "
+      //  << X[nFeature * iHit + 2] << " " << X[nFeature * iHit + 3] << std::endl;
     }
+
     // evaluate:
     auto probs = m_wireHitFilter.predict(X.get(), nFeature, nHits);
+    */
 
-    // evaluate differently:
     std::vector<CDCWireHit*> wireHitsPtr(wireHits.size());
-    for (auto& wireHit : wireHits) {
-      wireHitsPtr.push_back(&wireHit);
+    for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
+      wireHitsPtr[iHit] = &wireHits[iHit];
     }
 
-    auto probs2 = m_wireHitFilter(wireHitsPtr);
+    auto probs = m_wireHitFilter(wireHitsPtr);
 
-    for (iHit = 0; iHit < probs.size(); iHit++) {
+    for (size_t iHit = 0; iHit < probs.size(); iHit += 1) {
 
-      std::cout << "hit hit" << probs[iHit] << " " << probs2[iHit] << std::endl;
+      //      std::cout << "hit hit" << probs[iHit] << " " << probs2[iHit] << std::endl;
 
-      if (probs[iHit] < m_mvaCutValue) {
+      if (std::isnan(probs[iHit])) {
+        //      if (probs[iHit] < m_mvaCutValue) {
         wireHits[iHit]->setTakenFlag();
         wireHits[iHit]->setBackgroundFlag();
         wireHits[iHit]->setBadADCOrTOTFlag();

@@ -134,9 +134,7 @@ int main(int argc, char* argv[])
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("package_log_level", prog::value<vector<string> >(),
-     "Set package log level. Can be specified multiple times to use more than one package. (Syntax Example: 'cdc:DEBUG') ")
-    ("module_log_level", prog::value<vector<string> >(),
-     "Set module log level. Can be specified multiple times to use more than one module. (Syntax Example: 'KLMUnpacker:INFO') ")
+     "Set package log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
     ("random-seed", prog::value<string>(),
      "Set the default initial seed for the random number generator. "
      "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
@@ -363,6 +361,7 @@ int main(int argc, char* argv[])
       const auto& packLogList = varMap["package_log_level"].as<vector<string>>();
       std::string delimiter = ":";
       for (const std::string& packLog : packLogList) {
+        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:DEBUGLEVEL*/
         auto packageName = packLog.substr(0, packLog.find(delimiter));
         std::string logName = packLog.substr(packLog.find(delimiter) + delimiter.length(), packLog.length());
         int debugLevel = -1;
@@ -372,7 +371,7 @@ int main(int argc, char* argv[])
         }
 
         int level = -1;
-        /* set log level for package */
+        /* determine log level for package */
         for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
           std::string thisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
           if (boost::iequals(logName, thisLevel)) { //case-insensitive
@@ -391,51 +390,6 @@ int main(int argc, char* argv[])
         }
 
       }
-    }
-
-    // --module_log_level
-    if (varMap.count("module_log_level")) {
-      const auto& modLogList = varMap["module_log_level"].as<vector<string>>();
-      std::string delimiter = ":";
-      for (const std::string& modLog : modLogList) {
-        std::string moduleName = modLog.substr(0, modLog.find(delimiter));
-        std::string logName = modLog.substr(modLog.find(delimiter) + delimiter.length(), modLog.length());
-        int debugLevel = -1;
-        if ((logName.find("DEBUG") != std::string::npos) && logName.length() > 5) {
-          debugLevel = std::stoi(logName.substr(logName.find(delimiter) + delimiter.length(), logName.length()));
-          logName = "DEBUG";
-        }
-        std::cout << moduleName << " " << logName << " " << debugLevel <<  std::endl; //TODO: REMOVE ME
-
-        int level = -1;
-        /* set log level for module */
-        for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
-          std::string thisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
-          if (boost::iequals(logName, thisLevel)) { //case-insensitive
-            level = i;
-            break;
-          }
-        }
-        if (level < 0) {
-          B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
-        }
-
-        /* define module and set log level*/
-        ModulePtr modulePtr = ModuleManager::Instance().registerModule(moduleName);
-        if (modulePtr) {
-          modulePtr->setLogLevel((LogConfig::ELogLevel)level);
-          LogSystem::Instance().updateModule(&(modulePtr->getLogConfig()), moduleName);
-          if ((logName == "DEBUG") && (debugLevel >= 0)) {
-            modulePtr->setDebugLevel(debugLevel);
-          }
-          std::cout << modulePtr << " "  << modulePtr->getName() << " " << modulePtr->getLogConfig().getLogLevel() << " " << level <<
-                    std::endl;
-
-        } else {
-          B2WARNING("Having issues finding " << moduleName << " for module log setting.");
-        }
-      }
-
     }
 
     // -d

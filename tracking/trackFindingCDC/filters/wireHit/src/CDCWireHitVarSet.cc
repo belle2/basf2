@@ -26,8 +26,8 @@ void CDCWireHitVarSet::initialize()
 bool CDCWireHitVarSet::extract(const CDCWireHit* wireHit)
 {
   const auto* cdcHit = wireHit->getHit();
-  var<named("tot")>() = cdcHit->getTOT();
   var<named("adc")>() = cdcHit->getADCCount();
+  var<named("tot")>() = cdcHit->getTOT();
   var<named("tdc")>() = cdcHit->getTDCCount();
   var<named("slayer")>() = cdcHit->getISuperLayer() == 0 ? 0 : 1;
   return true;

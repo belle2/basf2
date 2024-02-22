@@ -65,8 +65,8 @@ void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
     size_t iHit = 0;
     for (CDCWireHit& wireHit : wireHits) {
       const auto* cdcHit = wireHit.getHit();
-      X[nFeature * iHit + 0] = cdcHit->getTOT();
-      X[nFeature * iHit + 1] = cdcHit->getADCCount();
+      X[nFeature * iHit + 0] = cdcHit->getADCCount();
+      X[nFeature * iHit + 1] = cdcHit->getTOT();
       X[nFeature * iHit + 2] = cdcHit->getTDCCount();
       X[nFeature * iHit + 3] = wireHit.getISuperLayer() == 0 ? 0 : 1; // Layer?
       iHit++;

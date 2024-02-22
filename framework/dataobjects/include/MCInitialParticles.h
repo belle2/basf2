@@ -9,6 +9,7 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
+#include <analysis/utility/PCmsLabTransform.h>
 
 #include <TMath.h>
 #include <TVector3.h>
@@ -218,7 +219,7 @@ namespace Belle2 {
 
   private:
 
-    /** Calculate the boost if necessary */
+    /** Calculate the Lorentz transformations LAB->CMS & CMS->LAB if necessary */
     void calculateBoost() const;
     /** Reset cached transformations after changing parameters. */
     void resetBoost();
@@ -269,16 +270,12 @@ namespace Belle2 {
       return;
     }
 
-    // Transformation from Lab system to CMS system
-    m_labToCMS = new ROOT::Math::LorentzRotation(ROOT::Math::Boost(beam.BoostToCM()));
-    // boost HER e- from Lab system to CMS system
-    m_boostedHER = (*m_labToCMS) * m_her;
-    // now rotate CMS such that incoming e- is parallel to z-axis
-    const ROOT::Math::XYZVector zaxis(0., 0., 1.);
-    ROOT::Math::XYZVector rotaxis = zaxis.Cross(m_boostedHER.Vect()) / m_boostedHER.P();
-    double rotangle = asin(rotaxis.R());
-    const ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotaxis, -rotangle));
-    *m_labToCMS = rotation * (*m_labToCMS);
+    m_boostedHER = ROOT::Math::LorentzRotation(ROOT::Math::Boost(beam.BoostToCM())) * m_her;
+    double cmsAngleXZ = atan(m_boostedHER.X() / m_boostedHER.Z());
+    double cmsAngleYZ = atan(m_boostedHER.Y() / m_boostedHER.Z());
+    m_labToCMS = new ROOT::Math::LorentzRotation(
+      PCmsLabTransform::rotateLabToCms(beam.BoostToCM(), cmsAngleXZ, cmsAngleYZ)
+    );
 
     //cache derived quantities
     m_CMSToLab = new ROOT::Math::LorentzRotation(m_labToCMS->Inverse());

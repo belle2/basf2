@@ -29,7 +29,9 @@ def create_dataloader_mode_tags(configs, tags):
         )
 
         dataloader = torch_geometric.loader.DataLoader(
-            dataset, batch_size=configs["train"]["batch_size"], shuffle=True
+            dataset, batch_size=configs["train"]["batch_size"],
+            shuffle=True,
+            drop_last=True,
         )
 
         mode_tags[tag] = (mode, dataset, dataloader)

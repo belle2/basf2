@@ -176,7 +176,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   //update TOPTRG timing
   auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", 0, true);// only if updated
+  cout << "TOPTRG_timing_mean Start 1" << endl;
   if (histTOPTRG) {
+    cout << "TOPTRG_timing_mean Start 2" << endl;
     double TOPTRG_timing_mean = 0.0;
     histTOPTRG->Draw();
     TOPTRG_timing_mean = histTOPTRG->GetMean();
@@ -322,13 +324,16 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 // update #hadronb2/#mumu2trk
   auto hist_hadronb2_over_mumu2trk =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_hadronb2_over_mumu2trk) {
-    double hadronb2_over_mumu2trk = 0.0;
     hist_hadronb2_over_mumu2trk->Draw();
-    hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->GetBinContent(
-                               hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_mumu2trk->GetBinContent(
-                               hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk"));
-    B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
-    setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
+    if (hist_hadronb2_over_mumu2trk->GetBinContent(
+          hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk")) != 0) {
+      double hadronb2_over_mumu2trk = 0.0;
+      hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->GetBinContent(
+                                 hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_mumu2trk->GetBinContent(
+                                 hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk"));
+      B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
+      setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
+    }
 
   }
 
@@ -337,52 +342,64 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 // update #mumu_tight/#bhabha_all
   auto hist_mumu_tight_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_mumu_tight_over_bhabha_all) {
-    double mumu_tight_over_bhabha_all = 0.0;
     hist_mumu_tight_over_bhabha_all->Draw();
-    mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->GetBinContent(
-                                   hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_mumutight")) / hist_mumu_tight_over_bhabha_all->GetBinContent(
-                                   hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
-    setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+    if (hist_mumu_tight_over_bhabha_all->GetBinContent(
+          hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double mumu_tight_over_bhabha_all = 0.0;
+      mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->GetBinContent(
+                                     hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_mumutight")) / hist_mumu_tight_over_bhabha_all->GetBinContent(
+                                     hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
+      setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+    }
 
   }
 
 // update #gammagamma/#bhabha_all
   auto hist_gammagamma_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_gammagamma_over_bhabha_all) {
-    double gammagamma_over_bhabha_all = 0.0;
     hist_gammagamma_over_bhabha_all->Draw();
-    gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->GetBinContent(
-                                   hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_gamma_gamma")) / hist_gammagamma_over_bhabha_all->GetBinContent(
-                                   hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
-    setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+    if (hist_gammagamma_over_bhabha_all->GetBinContent(
+          hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double gammagamma_over_bhabha_all = 0.0;
+      gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->GetBinContent(
+                                     hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_gamma_gamma")) / hist_gammagamma_over_bhabha_all->GetBinContent(
+                                     hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
+      setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+    }
 
   }
 
 // update #tautau2trk/#bhabha_all
   auto hist_tautau2trk_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_tautau2trk_over_bhabha_all) {
-    double tautau2trk_over_bhabha_all = 0.0;
     hist_tautau2trk_over_bhabha_all->Draw();
-    tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->GetBinContent(
-                                   hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_tau_2trk")) / hist_tautau2trk_over_bhabha_all->GetBinContent(
-                                   hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
-    setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+    if (hist_tautau2trk_over_bhabha_all->GetBinContent(
+          hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double tautau2trk_over_bhabha_all = 0.0;
+      tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->GetBinContent(
+                                     hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_tau_2trk")) / hist_tautau2trk_over_bhabha_all->GetBinContent(
+                                     hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
+      setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+    }
 
   }
 
 // update #hadron/#bhabha_all
   auto hist_hadron_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_hadron_over_bhabha_all) {
-    double hadron_over_bhabha_all = 0.0;
     hist_hadron_over_bhabha_all->Draw();
-    hadron_over_bhabha_all = hist_hadron_over_bhabha_all->GetBinContent(
-                               hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_hadron")) / hist_hadron_over_bhabha_all->GetBinContent(
-                               hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
-    setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+    if (hist_hadron_over_bhabha_all->GetBinContent(
+          hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double hadron_over_bhabha_all = 0.0;
+      hadron_over_bhabha_all = hist_hadron_over_bhabha_all->GetBinContent(
+                                 hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_hadron")) / hist_hadron_over_bhabha_all->GetBinContent(
+                                 hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
+      setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+    }
 
   }
 

@@ -490,8 +490,8 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
 
     Parameters:
         path (basf2.Path): path where the generator should be added.
-        finalstate (str): ee (e+e-) or gg (gammagamma).
-        minenergy (float): minimum particle (leptons for 'ee', photons for 'gg') energy in GeV.
+        finalstate (str): ee (e+e-), mm(mu+mu-) or gg (gammagamma).
+        minenergy (float): minimum particle (leptons for 'ee' or 'mm', photons for 'gg') energy in GeV.
         minangle (float): angular range from minangle to 180-minangle for primary particles (in degrees).
         fmax (float): maximum of differential cross section weight. This parameter should be set only by experts.
         generateInECLAcceptance (bool): if True, the GeneratorPreselection module is used to select only events
@@ -504,20 +504,13 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
         b2.B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
                      'Please do not do this, unless you are extremely sure about this choice.')
 
-    if finalstate == 'ee':
-        babayaganlo.param('FinalState', 'ee')
-        babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
-        babayaganlo.param('MinEnergy', minenergy)
-        babayaganlo.param('FMax', fmax)
-
-    elif finalstate == 'gg':
-        babayaganlo.param('FinalState', 'gg')
-        babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
-        babayaganlo.param('MinEnergy', minenergy)
-        babayaganlo.param('FMax', fmax)
-
-    else:
+    if finalstate != 'ee' and finalstate != 'gg' and finalstate != 'mm':
         b2.B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
+
+    babayaganlo.param('FinalState', finalstate)
+    babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
+    babayaganlo.param('MinEnergy', minenergy)
+    babayaganlo.param('FMax', fmax)
 
     if generateInECLAcceptance:
         b2.B2INFO(f'The final state {finalstate} is preselected requiring both primary particles within the ECL acceptance.')
@@ -525,18 +518,12 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
         add_generator_preselection(path=path,
                                    emptypath=emptypath,
                                    applyInCMS=False)
-        if finalstate == 'ee':
-            b2.set_module_parameters(path=path,
-                                     name='GeneratorPreselection',
-                                     nChargedMin=2,
-                                     MinChargedTheta=12.4,
-                                     MaxChargedTheta=155.1,)
-        elif finalstate == 'gg':
-            b2.set_module_parameters(path=path,
-                                     name='GeneratorPreselection',
-                                     nPhotonMin=2,
-                                     MinPhotonTheta=12.4,
-                                     MaxPhotonTheta=155.1)
+
+        b2.set_module_parameters(path=path,
+                                 name='GeneratorPreselection',
+                                 nChargedMin=2,
+                                 MinChargedTheta=12.4,
+                                 MaxChargedTheta=155.1)
 
 
 def add_phokhara_generator(path, finalstate=''):

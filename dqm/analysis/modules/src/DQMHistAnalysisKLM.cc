@@ -344,7 +344,6 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     std::string verbose_message = " more messages";
     verbose_message = std::to_string(message_counter - m_MessageThreshold) + verbose_message;
     latex.DrawLatexNDC(x, y, verbose_message.c_str());
-    y -= 0.05;
   }
 
 
@@ -601,7 +600,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       std::string verbose_string = " more messages";
       verbose_string = std::to_string(message_counter - m_MessageThreshold) + verbose_string;
       latex.DrawLatexNDC(xAlarm, yAlarm, verbose_string.c_str());
-      yAlarm -= 0.05;
     }
     canvas->Modified();
     canvas->Update();
@@ -707,6 +705,11 @@ void DQMHistAnalysisKLMModule::event()
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
   // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    return;
+  }
   auto* daqDataSize = findHist("DAQ/KLMDataSize");
   double meanDAQDataSize = 0.;
   if (daqDataSize != nullptr) {

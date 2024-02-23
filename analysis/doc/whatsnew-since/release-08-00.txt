@@ -10,6 +10,8 @@ Variables
 +++++++++
 * Added variables for the MCMatching of ECLCluster based Klong, `clusterTotalMCMatchWeightForKlong`,
   `clusterTotalMCMatchWeightForBestKlong`, and `varForBestMatchedMCKlong`.
+* Added variables for MC value of helix (track) parameters: `mcD0`, `mcPhi0`, `mcOmega`, `mcZ0`, `mcTanLambda`.
+  These variable work both on MC-matched track-based Particles and on Particles made from MCParticles.
 
 Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------
@@ -40,7 +42,7 @@ Modules
 * Added a new module `TwoBodyISRPhotonCorrector` which can be accessed in the new function `modularAnalysis.twoBodyISRPhotonCorrector`.
   This module is meant to be used in two-body decays involving a high-energy ISR photon that likely experiences ECL leakage leading to an
   inaccurate energy measurement. The energy is corrected kinematically based on the beam energy, the photon's direction, and the mass of the
-  other particle in the two-body decay. The corrected kinematics are stored in copied particles in a new ParticleList. The original 
+  other particle in the two-body decay. The corrected kinematics are stored in copied particles in a new ParticleList. The original
   kinematics of the ISR photon can be accessed using the metavariable `originalParticle`.
 * Added a new module `TrackingEnergyLossCorrection` alongside its helper function `modularAnalysis.correctTrackEnergy`.
   This module modifies the track energy of each particle inside a particle list according to the given correction value
@@ -57,7 +59,7 @@ Variables
   `cosHelicityAngleMomentumPi0Dalitz` is recommended to use instead.
 * The variable `cosHelicityAngleMomentumPi0Dalitz` is extended to the case of pi0 two-body decay, where a photon is reconstructed
   from the photon conversion, :math:`\pi^0 \to \gamma (\to e^+ e^-) \gamma`.
-  
+
 
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------

@@ -216,19 +216,19 @@ namespace Belle2 {
      */
     double trackFitHypothesisPDG(const Particle* part);
 
-    /** MC value of the respective helix parameter for the given particle */
+    /** MC value of the helix parameter d0 for the given particle */
     double getHelixMCD0(const Particle* part);
 
-    /** MC value of the respective helix parameter for the given particle */
+    /** MC value of the helix parameter phi0 for the given particle */
     double getHelixMCPhi0(const Particle* part);
 
-    /** MC value of the respective helix parameter for the given particle */
+    /** MC value of the helix parameter omega for the given particle */
     double getHelixMCOmega(const Particle* part);
 
-    /** MC value of the respective helix parameter for the given particle */
+    /** MC value of the helix parameter z0 for the given particle */
     double getHelixMCZ0(const Particle* part);
 
-    /** MC value of the respective helix parameter for the given particle */
+    /** MC value of the helix parameter tanLambda for the given particle */
     double getHelixMCTanLambda(const Particle* part);
 
     /** mc-meas/err_meas for the respective helix parameter for the given particle */

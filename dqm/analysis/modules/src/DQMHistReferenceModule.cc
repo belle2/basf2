@@ -46,13 +46,16 @@ void DQMHistReferenceModule::initialize()
 void DQMHistReferenceModule::beginRun()
 {
   B2DEBUG(1, "DQMHistReference: beginRun called.");
+  m_firstInRun = true;
+}
 
-  string run_type = "default";
-  TH1* hrtype = findHist("DQMInfo/rtype");
-  if (hrtype != NULL) {
-    run_type = string(hrtype->GetTitle());
-    B2INFO("DQMHistReference: hrtype: " << string(hrtype->GetName()));
-  }
+void DQMHistReferenceModule::loadReferenceHistos()
+{
+  B2DEBUG(1, "DQMHistReference: reading references from input root file");
+
+  string run_type = getRunType();
+  if (run_type == "") run_type = "default";
+
   B2INFO("DQMHistReference: run_type " << run_type);
 
   for (auto& it : m_pnode) {
@@ -138,6 +141,12 @@ void DQMHistReferenceModule::beginRun()
 
 void DQMHistReferenceModule::event()
 {
+
+  if (m_firstInRun) {
+    loadReferenceHistos();
+    m_firstInRun = false;
+  }
+
   char mbstr[100];
 
   time_t now = time(0);

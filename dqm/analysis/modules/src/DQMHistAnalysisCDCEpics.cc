@@ -127,6 +127,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_line_ladc->Draw("same");
     m_line_hadc->Draw("same");
     c_hist_adc->Update();
+    UpdateCanvas(c_hist_adc);
 
   }
 
@@ -159,6 +160,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_line_ltdc->Draw("same");
     m_line_htdc->Draw("same");
     c_hist_tdc->Update();
+    UpdateCanvas(c_hist_tdc);
   }
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");

@@ -134,7 +134,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   auto m_delta_tdc = (TH2F*)getDelta(m_histoDir, m_histoTDC, 0, true);
   if (m_delta_tdc) {
     m_hist_tdc->Reset();
-    int ctdcgood = 0; dqm / analysis / modules / src / DQMHistAnalysisCDCEpics.cc
+    int ctdcgood = 0;
     int ctdcbad = 0;
     double sumtdcgood = 0;
     for (int ic = 0; ic < 300; ++ic) {

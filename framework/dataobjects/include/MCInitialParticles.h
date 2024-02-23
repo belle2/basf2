@@ -9,11 +9,9 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
-#include <analysis/utility/PCmsLabTransform.h>
+#include <framework/utilities/LabToCms.h>
 
-#include <TMath.h>
 #include <TVector3.h>
-#include <Math/AxisAngle.h>
 #include <Math/Boost.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector3D.h>
@@ -274,7 +272,7 @@ namespace Belle2 {
     double cmsAngleXZ = atan(m_boostedHER.X() / m_boostedHER.Z());
     double cmsAngleYZ = atan(m_boostedHER.Y() / m_boostedHER.Z());
     m_labToCMS = new ROOT::Math::LorentzRotation(
-      PCmsLabTransform::rotateLabToCms(-beam.BoostToCM(), cmsAngleXZ, cmsAngleYZ)
+      LabToCms::rotateLabToCms(-beam.BoostToCM(), cmsAngleXZ, cmsAngleYZ)
     );
 
     //cache derived quantities

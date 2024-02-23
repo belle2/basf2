@@ -9,14 +9,9 @@
 #pragma once
 
 #include <generators/evtgen/EvtGenInterface.h>
-
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-
 #include <framework/core/Module.h>
 #include <framework/dataobjects/MCInitialParticles.h>
-
-#include <Math/Vector3D.h>
 
 #include <string>
 #include <utility>

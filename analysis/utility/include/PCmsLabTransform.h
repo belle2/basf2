@@ -13,9 +13,8 @@
 #include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/utilities/LabToCms.h>
 
-#include <Math/Boost.h>
-#include <Math/AxisAngle.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector4D.h>
 
@@ -57,48 +56,13 @@ namespace Belle2 {
       return rotateCmsToLab() * ROOT::Math::PxPyPzEVector(0, 0, 0, getCMSEnergy());
     }
 
-
-    /**
-     * Function takes 3D boostVector and angles of the HER momentum
-     * in the CM system obtained by pure boost.
-     * The angles are defined as cmsAngleXZ = atan(pxCM/pzCM)
-     *                           cmsAngleYZ = atan(pyCM/pzCM)
-     * Returns Lorentz transformation from Lab to CMS
-     * @return const reference to Lorentz rotation matrix
-     */
-    static ROOT::Math::LorentzRotation  rotateLabToCms(const ROOT::Math::XYZVector& boostVector,
-                                                       double cmsAngleXZ, double  cmsAngleYZ)
-    {
-      //boost to CM frame
-      ROOT::Math::LorentzRotation boost(ROOT::Math::Boost(-1.*boostVector));
-
-
-      //rotation such that the collision axis is aligned with z-axis
-      ROOT::Math::XYZVector zaxis(0., 0., 1.); //target collision axis
-
-      double tanAngleXZ = tan(cmsAngleXZ);
-      double tanAngleYZ = tan(cmsAngleYZ);
-      double Norm   = 1 / sqrt(1 + pow(tanAngleXZ, 2) + pow(tanAngleYZ, 2));
-      ROOT::Math::XYZVector electronCMS(Norm * tanAngleXZ, Norm * tanAngleYZ, Norm); //current collision axis
-
-      ROOT::Math::XYZVector rotAxis = zaxis.Cross(electronCMS);
-      double rotangle = asin(rotAxis.R());
-
-      ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotAxis, -rotangle));
-
-
-      ROOT::Math::LorentzRotation trans = rotation * boost;
-      return trans;
-    }
-
-
     /**
      * Returns Lorentz transformation from Lab to CMS
      * @return const reference to Lorentz rotation matrix
      */
     const ROOT::Math::LorentzRotation rotateLabToCms() const
     {
-      return rotateLabToCms(getBoostVector(), m_axisCmsDB->getAngleXZ(), m_axisCmsDB->getAngleYZ());
+      return LabToCms::rotateLabToCms(getBoostVector(), m_axisCmsDB->getAngleXZ(), m_axisCmsDB->getAngleYZ());
     }
 
     /**

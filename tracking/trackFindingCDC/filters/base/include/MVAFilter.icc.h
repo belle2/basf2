@@ -88,10 +88,10 @@ namespace Belle2 {
     {
       Super::beginRun();
       m_mvaExpert->beginRun();
-      /// Make sure that the sequence of columns is correct
+      /// Make sure that the sequence of columns (features) is correct and follows the one from the weightFile
       auto selectedVars = m_mvaExpert->getVariableNames();
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
-      m_selectedVariablesOrder.clear();
+      m_namedVariables.clear();
       for (const auto& name : selectedVars) {
 
         auto itNamedVariable = std::find_if(namedVariables.begin(),
@@ -103,8 +103,7 @@ namespace Belle2 {
           B2ERROR("Variable name " << name << " mismatch for MVA filter. " <<
                   "Could not find expected variable '" << name << "'");
         }
-        size_t index = std::distance(namedVariables.begin(), itNamedVariable);
-        m_selectedVariablesOrder.push_back(index);
+        m_namedVariables.push_back(*itNamedVariable);
       }
     }
 
@@ -136,15 +135,14 @@ namespace Belle2 {
     std::vector<float> MVA<AFilter>::predict(const std::vector<Object*>& objs)
     {
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
-      int nFeature = namedVariables.size();
+      int nFeature = m_namedVariables.size();
       int nRows    = objs.size();
       auto X = std::unique_ptr<float[]>(new float[nRows * nFeature]);
       size_t iRow = 0;
       for (const auto& obj : objs) {
         if (Super::getVarSet().extract(obj)) {
           for (int iFeature = 0; iFeature < nFeature; iFeature += 1) {
-            X[nFeature * iRow + iFeature] = *namedVariables[m_selectedVariablesOrder[iFeature]];             ;
-            //      std::cout << iRow << " " << iFeature << " " <<  X[nFeature * iRow + iFeature] << std::endl;
+            X[nFeature * iRow + iFeature] = *m_namedVariables[iFeature];
           }
           iRow += 1;
         }

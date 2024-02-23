@@ -90,8 +90,8 @@ namespace Belle2 {
       /// MVA Expert to examine the object
       std::unique_ptr<MVAExpert> m_mvaExpert;
 
-      /// Selected variables, following the order in the payload
-      std::vector<size_t> m_selectedVariablesOrder;
+      /// named variables, ordered as in the weightFile:
+      std::vector<Named<Float_t*>> m_namedVariables;
     };
 
     /// Convience template to create a mva filter for a set of variables.

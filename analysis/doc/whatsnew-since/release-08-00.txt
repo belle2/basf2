@@ -10,6 +10,7 @@ Variables
   and `daughterNormDiffOf` also accept generalized daughter indices now.
 * Added the `BelleTofMass` variable (Belle only), which gives the mass of a track in :math:`GeV/c^2`, calculated using the TOF
   information, the path length and the momentum of the particle.
+* Added the 'genQ2PmPd' variable which calculates the generated value of the four-momentum transfer squared using the four-momentum difference of the mother particle and given daughter particles: :math:'(p_m - p_{d_i} -  p_{d_j} - ...)^2'.
 
 Changes in the analysis package in light-2311-nebelung
 ------------------------------------------------------
@@ -43,7 +44,7 @@ Variables
   `cosHelicityAngleMomentumPi0Dalitz` is recommended to use instead.
 * The variable `cosHelicityAngleMomentumPi0Dalitz` is extended to the case of pi0 two-body decay, where a photon is reconstructed
   from the photon conversion, :math:`\pi^0 \to \gamma (\to e^+ e^-) \gamma`.
-  
+
 
 Changes in the analysis package in light-2309-munchkin
 ------------------------------------------------------

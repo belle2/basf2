@@ -18,7 +18,7 @@ from stdCharged import stdE, stdMu
 from variables import variables as vm
 
 
-__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au, Tommy Martinov <tommy.martinov@desy.de>"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

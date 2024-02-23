@@ -30,7 +30,7 @@ from stdV0s import stdKshorts
 from variables import variables as vm
 from ROOT import Belle2
 
-__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au, Tommy Martinov <tommy.martinov@desy.de>"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

@@ -122,7 +122,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     c_hist_adc->cd();
     if (cadcgood > 0)sumadcgood = sumadcgood * 1.0 / cadcgood;
     getHistStyle(m_hist_adc, "adc", sumadcgood);
-    m_hist_adc->SetTitle(Form("%s: Bad board count = %d (%0.01f%%)", m_hist_adc->GetTitle(), cadcbad, 100.0 - adcfrac));
+    m_hist_adc->SetTitle(Form("ADC Medians: Bad board count = %d (%0.01f%%)", cadcbad - 1, 100.0 - adcfrac));
     m_hist_adc->Draw("");
     m_line_ladc->Draw("same");
     m_line_hadc->Draw("same");
@@ -155,7 +155,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     c_hist_tdc->cd();
     if (ctdcgood > 0)sumtdcgood = sumtdcgood * 1.0 / ctdcgood;
     getHistStyle(m_hist_tdc, "tdc", sumtdcgood);
-    m_hist_tdc->SetTitle(Form("%s: Bad board count = %d (%0.01f%%)", m_hist_tdc->GetTitle(), ctdcbad, 100.0 - tdcfrac));
+    m_hist_tdc->SetTitle(Form("TDC Medians;: Bad board count = %d (%0.01f%%)", ctdcbad - 1, 100.0 - tdcfrac));
     m_hist_tdc->Draw("");
     m_line_ltdc->Draw("same");
     m_line_htdc->Draw("same");

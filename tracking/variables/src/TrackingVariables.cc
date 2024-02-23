@@ -125,7 +125,7 @@ namespace Belle2 {
     }
 
     //! @returns the SVDEventT0
-    double SVDEventT0(const Particle* particle)
+    double SVDEventT0(const Particle*)
     {
 
       StoreObjPtr<EventT0> m_evtT0;

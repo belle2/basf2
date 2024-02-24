@@ -287,6 +287,11 @@ namespace Belle2 {
     static void clearHistList(void);
 
     /**
+     * Reset Delta
+     */
+    void resetDeltaList(void);
+
+    /**
      * Get Delta histogram.
      * @param fullname directory+name of histogram
      * @param n index of delta histogram, 0 is most recent one

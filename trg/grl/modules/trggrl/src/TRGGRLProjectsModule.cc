@@ -977,7 +977,8 @@ void TRGGRLProjectsModule::event()
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
-    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    //else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    else bit = false;
 
     trgInfo->setInputBits(i, bit);
   }

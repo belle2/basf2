@@ -352,21 +352,29 @@ int main(int argc, char* argv[])
 
       //set log level
       LogSystem::Instance().getLogConfig()->setLogLevel((LogConfig::ELogLevel)level);
-      //and make sure it takes precedence over anything in the steeering file
+      //and make sure it takes precedence over anything in the steering file
       Environment::Instance().setLogLevelOverride(level);
     }
 
     // --package_log_level
     if (varMap.count("package_log_level")) {
       const auto& packLogList = varMap["package_log_level"].as<vector<string>>();
-      std::string delimiter = ":";
+      const std::string delimiter = ":";
       for (const std::string& packLog : packLogList) {
+        if (packLog.find(delimiter) == std::string::npos) {
+          B2FATAL("In --package_log_level input " << packLog << ", no colon detected. ");
+          break;
+        }
         /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:LEVEL*/
         auto packageName = packLog.substr(0, packLog.find(delimiter));
         std::string logName = packLog.substr(packLog.find(delimiter) + delimiter.length(), packLog.length());
         int debugLevel = -1;
         if ((logName.find("DEBUG") != std::string::npos) && logName.length() > 5) {
-          debugLevel = std::stoi(logName.substr(logName.find(delimiter) + delimiter.length(), logName.length()));
+          try {
+            debugLevel = std::stoi(logName.substr(logName.find(delimiter) + delimiter.length(), logName.length()));
+          } catch (std::exception& e) {
+            B2WARNING("In --package_log_level, issue parsing debugLevel. Still setting log level to DEBUG.");
+          }
           logName = "DEBUG";
         }
 

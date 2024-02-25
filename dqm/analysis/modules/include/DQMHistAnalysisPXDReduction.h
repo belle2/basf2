@@ -84,9 +84,13 @@ namespace Belle2 {
 
     //! Line in the Canvas to guide the eye
     TLine* m_meanLine = nullptr;
+    //! Line in the Canvas to indicate limits
     TLine* m_meanLowerWarnLine = nullptr;
+    //! Line in the Canvas to indicate limits
     TLine* m_meanUpperWarnLine = nullptr;
+    //! Line in the Canvas to indicate limits
     TLine* m_meanLowerAlarmLine = nullptr;
+    //! Line in the Canvas to indicate limits
     TLine* m_meanUpperAlarmLine = nullptr;
 
     /** Monitoring Object */

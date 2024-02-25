@@ -121,6 +121,7 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
 
   m_cReduction->Clear();
   m_hReduction->Reset(); // dont sum up!!!
+  colorizeCanvas(m_cReduction, c_StatusTooFew);
 
   requestLimitsFromEpicsPVs("Value", m_loerrorlimit, m_lowarnlimit, m_hiwarnlimit, m_hierrorlimit);
 }
@@ -138,7 +139,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = getDelta(m_histogramDirectoryName, name);
-    // no inital sampling, we should get lenty of statistics
+    // no inital sampling, we should get plenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();
       m_hReduction->SetBinContent(i + 1, mean);
@@ -163,31 +164,12 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
 
-  int status = 0;
-// not enough Entries
-  if (ireductioncnt < 15) { // still have to see how to handle masked modules
-    status = 0; // Grey
-    m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
-  } else {
-    if (value > m_hierrorlimit || value < m_loerrorlimit) {
-      m_cReduction->Pad()->SetFillColor(kRed);// Red
-      status = 4;
-    } else if (value >  m_hiwarnlimit ||  value < m_lowarnlimit) {
-      m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
-      status = 3;
-    } else {
-      m_cReduction->Pad()->SetFillColor(kGreen);// Green
-      status = 2;
-//   } else {
-// we wont use white anymore here
-//    m_cReduction->Pad()->SetFillColor(kWhite);// White
-//    status = 1; // White
-    }
-  }
+  auto stat_data = makeStatus(ireductioncnt >= 15, value >  m_hiwarnlimit ||  value < m_lowarnlimit, value > m_hierrorlimit
+                              || value < m_loerrorlimit);
 
   if (m_hReduction) {
     m_hReduction->Draw("");
-    if (status != 0) {
+    if (stat_data != c_StatusTooFew) {
       m_line1->SetY1(value);
       m_line1->SetY2(value); // aka SetHorizontal
       m_line1->Draw();
@@ -205,12 +187,13 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   m_monObj->setVariable("reduction", value);
 
+  colorizeCanvas(m_cReduction, stat_data);
   UpdateCanvas(m_cReduction);
   m_cReduction->Modified();
   m_cReduction->Update();
 
   // better only update if statistics is reasonable, we dont want "0" drops between runs!
-  setEpicsPV("Status", status);
+  setEpicsPV("Status", stat_data);
   setEpicsPV("Value", value);
 }
 

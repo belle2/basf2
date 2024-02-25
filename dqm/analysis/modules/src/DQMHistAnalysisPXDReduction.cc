@@ -36,10 +36,10 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
 
   // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
-  addParam("lowarnlimit", m_meanLowerWarn, "Mean Reduction Low Warn limit for alarms"); // default is NAN =disable
-  addParam("LowErrorlimit", m_meanLowerAlarm, "Mean Reduction Low limit for alarms"); // default is NAN =disable
-  addParam("HighWarnlimit", m_meanUpperWarn, "Mean Reduction High Warn limit for alarms"); // default is NAN =disable
-  addParam("HighErrorlimit", m_meanUpperAlarm, "Mean Reduction High limit for alarms"); // default is NAN =disable
+  addParam("LowerWarnLimit", m_meanLowerWarn, "Mean Reduction Low limit for warning", double(NAN)); // default is NAN =disable
+  addParam("LowerErrorLimit", m_meanLowerAlarm, "Mean Reduction Low limit for alarms", double(NAN)); // default is NAN =disable
+  addParam("UpperWarnLimit", m_meanUpperWarn, "Mean Reduction High limit for warning", double(NAN)); // default is NAN =disable
+  addParam("UpperErrorLimit", m_meanUpperAlarm, "Mean Reduction High limit for alarms", double(NAN)); // default is NAN =disable
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");

@@ -280,6 +280,13 @@ void DQMHistAnalysisModule::clearHistList(void)
   s_histList.clear();
 }
 
+void DQMHistAnalysisModule::resetDeltaList(void)
+{
+  for (auto d : s_deltaList) {
+    d.second->reset();
+  }
+}
+
 void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
 {
   s_canvasUpdatedList[name] = updated;

@@ -12,6 +12,9 @@ Variables
   `clusterTotalMCMatchWeightForBestKlong`, and `varForBestMatchedMCKlong`.
 * Added variables for MC value of helix (track) parameters: `mcD0`, `mcPhi0`, `mcOmega`, `mcZ0`, `mcTanLambda`.
   These variable work both on MC-matched track-based Particles and on Particles made from MCParticles.
+* Added the variable `genQ2PmPd`, which calculates the generated value of the four-momentum transfer squared using the
+  four-momentum difference of the mother particle and given daughter particles: :math:`(p_m - p_{d_i} -  p_{d_j} - ...)^2`.
+
 
 Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------

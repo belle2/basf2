@@ -118,8 +118,16 @@ namespace Belle2 {
     double genNthMotherIndex(const Particle* part, const std::vector<double>& daughterIDs);
 
     /**
-     * check the PDG code of a particles MC mother
-     */
+    * Returns the generated four momentum transfer squared calculated as q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2.
+    * Here p_m is the four momentum of the given (mother) particle,
+    *and p_{d_{i,j,...}} are the daughter particles with indices given as arguments .
+    * The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at N=0.
+    */
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices);
+
+    /**
+    * check the PDG code of a particles MC mother
+    */
     double genMotherPDG(const Particle* particle);
 
     /**

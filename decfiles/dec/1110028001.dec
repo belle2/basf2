@@ -12,6 +12,7 @@
 Alias      rho0sig  rho0
 Alias      etapsig  eta'
 Alias      pi0sig   pi0
+Alias 		 etasig eta
 #
 #
 Decay Upsilon(4S)

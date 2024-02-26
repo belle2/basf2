@@ -6,6 +6,7 @@ Modules
 * Added a new option ``storeEventType`` in `VariablesToNtuple` and `VariablesToEventBasedTree` to store the MC event type
   information in the branch ``__eventType__`` with the string data type, e.g. ``mixed``, ``ccbar``. This information is available
   from MC16 on. For MC15 or older and for data, the branch will be empty. By default, the option is true.
+
 Command line tools
 ++++++++++++++++++
 * New command line tool :ref:`b2help-print-mcparticles` to print MCParticles on the input mdst file. This tool is helpful for

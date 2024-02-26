@@ -1,6 +1,6 @@
-# EventType: 1110028000
-# Descriptor: [B0 -> [pi0 -> gamma gamma] [eta' -> pi+ pi- [eta -> gamma gamma]]]cc
-# NickName: Bd_pi0etap_ggeta
+# EventType: 1110023000
+# Descriptor: [B0 -> [pi0 -> gamma gamma] [eta' -> rho0 gamma]]cc
+# NickName: Bd_pi0etap_rho0gam
 # Tested: Yes
 # PhysicsWG: Bhadronic
 # Responsible: Longke Li
@@ -28,11 +28,11 @@ Decay pi0sig
 Enddecay
 #
 Decay etapsig
-1.00  pi+  pi-  etasig      ETAPRIME_DALITZ  -0.047  -0.069  0.0    0.073;  
+1.000   rho0sig   gamma             SVP_HELAMP  1.0 0.0 1.0 0.0;
 Enddecay
 #
-Decay etasig
-1.0 gamma  gamma    PHSP;
+Decay rho0sig
+1.0  pi+  pi-          VSS;
 Enddecay
 #
 End

@@ -107,7 +107,8 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
     time_t ts = lastEvtMeta->getTime() / 1e9;
     struct tm* timeinfo;
     timeinfo = localtime(&ts);
-    m_metaData->setRunDate(asctime(timeinfo));
+    char buf[50];
+    m_metaData->setRunDate(asctime_r(timeinfo, buf));
     m_metaData->Write();
   }
 

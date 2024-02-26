@@ -35,64 +35,23 @@ void WireHitBackgroundDetector::exposeParameters(ModuleParamList* moduleParamLis
                                                  const std::string& prefix)
 {
   m_wireHitFilter.exposeParameters(moduleParamList, prefix);
-
-  moduleParamList->addParameter(prefixed(prefix, "MVAcut"),
-                                m_mvaCutValue,
-                                "The cut value of the mva output below which the object is rejected",
-                                m_mvaCutValue);
 }
 
 void WireHitBackgroundDetector::apply(std::vector<CDCWireHit>& wireHits)
 {
-  if (m_mvaCutValue == 0) {
-    for (CDCWireHit& wireHit : wireHits) {
-
-      Weight wireHitWeight = m_wireHitFilter(wireHit);
-
-      if (std::isnan(wireHitWeight)) {
-        wireHit->setBackgroundFlag();
-        wireHit->setTakenFlag();
-        wireHit->setBadADCOrTOTFlag();
-      }
-    }
+  // we will apply classifier to all hits at once, this is much faster for python-based MVA
+  std::vector<CDCWireHit*> wireHitsPtr(wireHits.size());
+  for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
+    wireHitsPtr[iHit] = &wireHits[iHit];
   }
-  // we will apply MVA classifier to all hits
-  else {
-    /*
-    int nHits = wireHits.size();
-    int nFeature = 4;
-    auto X = std::unique_ptr<float[]>(new float[nHits * nFeature]);
-    for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
-      const auto* cdcHit = wireHits[iHit].getHit();
-      X[nFeature * iHit + 0] = cdcHit->getADCCount();
-      X[nFeature * iHit + 1] = cdcHit->getTOT();
-      X[nFeature * iHit + 2] = cdcHit->getTDCCount();
-      X[nFeature * iHit + 3] = wireHits[iHit].getISuperLayer() == 0 ? 0 : 1; // Layer?
-      //      std::cout << iHit << " " << X[nFeature * iHit + 0] << " " << X[nFeature * iHit + 1] << " "
-      //  << X[nFeature * iHit + 2] << " " << X[nFeature * iHit + 3] << std::endl;
-    }
 
-    // evaluate:
-    auto probs = m_wireHitFilter.predict(X.get(), nFeature, nHits);
-    */
+  auto probs = m_wireHitFilter(wireHitsPtr);
 
-    std::vector<CDCWireHit*> wireHitsPtr(wireHits.size());
-    for (size_t iHit = 0;  iHit < wireHits.size(); iHit += 1) {
-      wireHitsPtr[iHit] = &wireHits[iHit];
-    }
-
-    auto probs = m_wireHitFilter(wireHitsPtr);
-
-    for (size_t iHit = 0; iHit < probs.size(); iHit += 1) {
-
-      //      std::cout << "hit hit" << probs[iHit] << " " << probs2[iHit] << std::endl;
-
-      if (std::isnan(probs[iHit])) {
-        //      if (probs[iHit] < m_mvaCutValue) {
-        wireHits[iHit]->setTakenFlag();
-        wireHits[iHit]->setBackgroundFlag();
-        wireHits[iHit]->setBadADCOrTOTFlag();
-      }
+  for (size_t iHit = 0; iHit < probs.size(); iHit += 1) {
+    if (std::isnan(probs[iHit])) {
+      wireHits[iHit]->setTakenFlag();
+      wireHits[iHit]->setBackgroundFlag();
+      wireHits[iHit]->setBadADCOrTOTFlag();
     }
   }
 }

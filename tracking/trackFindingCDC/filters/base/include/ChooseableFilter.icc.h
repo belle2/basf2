@@ -93,12 +93,6 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    std::vector<float> Chooseable<AFilter>::predict(float* test_data, int nFeature, int nRows)
-    {
-      return (*m_filter).predict(test_data, nFeature, nRows);
-    }
-
-    template <class AFilter>
     Weight Chooseable<AFilter>::operator()(const Object& object) const
     {
       return (*m_filter)(object);

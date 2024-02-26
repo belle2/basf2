@@ -126,12 +126,6 @@ namespace Belle2 {
     }
 
     template <class AFilter>
-    std::vector<float> MVA<AFilter>::predict(float* test_data, int nFeature, int nRows)
-    {
-      return m_mvaExpert->predict(test_data, nFeature, nRows);
-    }
-
-    template <class AFilter>
     std::vector<float> MVA<AFilter>::predict(const std::vector<Object*>& objs)
     {
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();

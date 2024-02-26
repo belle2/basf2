@@ -65,9 +65,6 @@ namespace Belle2 {
       /// Const version of operator
       Weight operator()(const Object& object) const;
 
-      /// Multiple predictions
-      std::vector<float> predict(float* test_data, int nFeature, int nRows);
-
       /// Evaluate the MVA method over a vector of objects
       virtual std::vector<float> operator()(const std::vector <Object*>& objs) override;
 

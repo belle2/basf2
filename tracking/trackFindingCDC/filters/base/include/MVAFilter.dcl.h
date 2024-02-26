@@ -70,9 +70,6 @@ namespace Belle2 {
       virtual double predict(const Object& obj);
 
       /// Evaluate the MVA method over several inputs simultaneously
-      virtual std::vector<float> predict(float* test_data, int nFeature, int nRows) override;
-
-      /// Evaluate the MVA method over several inputs simultaneously
       std::vector<float> predict(const std::vector<Object*>& objs);
 
       /// Evaluate the MVA method over a vector of objects

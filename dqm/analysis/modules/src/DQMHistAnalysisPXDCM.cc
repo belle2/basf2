@@ -251,57 +251,35 @@ void DQMHistAnalysisPXDCMModule::event()
     }
   }
 
-  {
-    int status = 0;
-    m_cCommonModeDelta->cd();
-    // not enough Entries
+  auto status = makeStatus(all >= 100, warn_flag, error_flag);
 
-    if (all < 100.) { // delta cannot be more than all
-      m_cCommonModeDelta->Pad()->SetFillColor(kGray);// Magenta or Gray
-      status = 0; // default
-    } else {
-      /// use flags set above
-      if (error_flag) {
-        m_cCommonModeDelta->Pad()->SetFillColor(kRed);// Red
-        status = 4;
-      } else if (warn_flag) {
-        m_cCommonModeDelta->Pad()->SetFillColor(kYellow);// Yellow
-        status = 3;
-      } else {
-        m_cCommonModeDelta->Pad()->SetFillColor(kGreen);// Green
-        status = 2;
-        /*      } else { // between 0 and 50 ...
-                m_cCommonModeDelta->Pad()->SetFillColor(kWhite);// White
-                status = 1;*/
-      }
-    }
-    if (anyupdate) {
-      double dataoutside = all > 0 ? (all_outside / all) : 0;
-      double datacm = all > 0 ? (all_cm / all) : 0;
-      setEpicsPV("Status", status);
-      setEpicsPV("Outside", dataoutside);
-      setEpicsPV("CM63", datacm);
-    }
-    if (m_hCommonModeDelta) {
-      m_hCommonModeDelta->Draw("colz");
-      leg->Draw();
-      m_line10->Draw();
-      m_lineOutside->Draw();
-    }
+  colorizeCanvas(m_cCommonModeDelta, status);
 
-    for (auto& it : m_excluded) {
-      auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-      tt->SetTextSize(0.035);
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
-      tt->Draw();
-    }
-
-    UpdateCanvas(m_cCommonModeDelta);
-    m_cCommonModeDelta->Modified();
-    m_cCommonModeDelta->Update();
+  if (anyupdate) {
+    double dataoutside = all > 0 ? (all_outside / all) : 0;
+    double datacm = all > 0 ? (all_cm / all) : 0;
+    setEpicsPV("Status", status);
+    setEpicsPV("Outside", dataoutside);
+    setEpicsPV("CM63", datacm);
+  }
+  if (m_hCommonModeDelta) {
+    m_hCommonModeDelta->Draw("colz");
+    leg->Draw();
+    m_line10->Draw();
+    m_lineOutside->Draw();
   }
 
+  for (auto& it : m_excluded) {
+    auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+    tt->SetTextSize(0.035);
+    tt->SetTextAngle(90);// Rotated
+    tt->SetTextAlign(12);// Centered
+    tt->Draw();
+  }
+
+  UpdateCanvas(m_cCommonModeDelta);
+  m_cCommonModeDelta->Modified();
+  m_cCommonModeDelta->Update();
 }
 
 void DQMHistAnalysisPXDCMModule::terminate()

@@ -47,8 +47,6 @@ KLMNNmuidModule::KLMNNmuidModule() : Module()
   // Parameter definitions
   addParam("inputListName", m_inputListName,
            "list of input ParticleList name", std::string(""));
-  addParam("hitChiCut", m_hitChiCut,
-           "Hit chi cut", 3.5);
   addParam("identifier", m_identifier,
            "Database identifier or file used to load the weights.",
            m_identifier);
@@ -158,80 +156,38 @@ void KLMNNmuidModule::event()
     }
     int nklmexthits = ExtHitMap.size();
 
-    std::multimap<int, KLMHit2d*> Hit2dMap;
-    for (KLMHit2d& klmhit : track->getRelationsTo<KLMHit2d>("", "chidimx")) {
-      unsigned long int hit_inBKLM = (klmhit.getSubdetector() == KLMElementNumbers::c_BKLM);
-      unsigned long int hit_layer = klmhit.getLayer();
-      unsigned long int hit_sector = klmhit.getSector();
-      unsigned long int hit_section = klmhit.getSection();
+    RelationVector<KLMHit2d> KLMHit2drelation = track->getRelationsTo<KLMHit2d>();
+    std::map<int, int> Hit2dMap; // arrange KLMHit2d order in layer
+    for (long unsigned int ii = 0; ii < KLMHit2drelation.size(); ii++) {
+      KLMHit2d* klmhit = KLMHit2drelation[ii];
+      unsigned long int hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
+      unsigned long int hit_layer = klmhit->getLayer();
 
       int index = (1 - hit_inBKLM) * 100 + hit_layer; // BKLM hits are in front of EKLM hits
-      Hit2dMap.insert(std::pair<int, KLMHit2d*> {index,  &klmhit}); // multimap is used here so all hits are kept even if they have the same index
+      Hit2dMap.insert(std::pair<int, int> {index, ii});
     }
 
     int nklmhits = 0;
     //int nklmclusters = 0;
     float previoushitposition[3] = {0.};
-    RelationVector<KLMHit2d> KLMHit2drelationx = track->getRelationsTo<KLMHit2d>("", "chidimx");
-    RelationVector<KLMHit2d> KLMHit2drelationy = track->getRelationsTo<KLMHit2d>("", "chidimy");
-    RelationVector<KLMHit2d> KLMHit2drelationchi2 = track->getRelationsTo<KLMHit2d>("", "intersectchisq");
-    int KFndof = 0;
     for (auto itermap = Hit2dMap.begin(); itermap != Hit2dMap.end(); itermap ++) {
 
-      KLMHit2d* klmhitadd = itermap->second;
-      KLMHit2d klmhit = *klmhitadd;
-      int index = itermap->first;
+      KLMHit2d* klmhit = KLMHit2drelation[itermap->second];
 
       nklmhits += 1;
-      double  hit_Xposition = klmhit.getPositionX();
-      double  hit_Yposition = klmhit.getPositionY();
-      double  hit_Zposition = klmhit.getPositionZ();
-      double  hit_MinStripXposition = klmhit.getPositionXOfMinStrip();
-      double  hit_MinStripYposition = klmhit.getPositionYOfMinStrip();
-      double  hit_MinStripZposition = klmhit.getPositionZOfMinStrip();
-      unsigned long int hit_Phistripmin;
-      unsigned long int hit_Phistripmax;
-      unsigned long int hit_Zstripmin  ;
-      unsigned long int hit_Zstripmax  ;
+      double  hit_Xposition = klmhit->getPositionX();
+      double  hit_Yposition = klmhit->getPositionY();
+      double  hit_Zposition = klmhit->getPositionZ();
+      double  hit_MinStripXposition = klmhit->getPositionXOfMinStrip();
+      double  hit_MinStripYposition = klmhit->getPositionYOfMinStrip();
+      double  hit_MinStripZposition = klmhit->getPositionZOfMinStrip();
 
-      unsigned long int hit_inBKLM = (klmhit.getSubdetector() == KLMElementNumbers::c_BKLM);
-      if (hit_inBKLM) {
-        hit_Phistripmin = klmhit.getPhiStripMin();
-        hit_Phistripmax = klmhit.getPhiStripMax();
-        hit_Zstripmin   = klmhit.getZStripMin();
-        hit_Zstripmax   = klmhit.getZStripMax();
-      } else {
-        hit_Phistripmin = klmhit.getXStripMin();
-        hit_Phistripmax = klmhit.getXStripMax();
-        hit_Zstripmin = klmhit.getYStripMin();
-        hit_Zstripmax = klmhit.getYStripMax();
-      }
-      unsigned long int hit_layer = klmhit.getLayer();
-      //unsigned long int hit_sector = klmhit.getSector();
-      //unsigned long int hit_section = klmhit.getSection();
+      unsigned long int hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
+      unsigned long int hit_layer = klmhit->getLayer();
 
-      // find the hit index in relations
-      int targethit = -1;
-      float KFchix = 999.;
-      float KFchiy = 999.;
-      float KFchi2 = 999.;
-      for (unsigned int iHit = 0; iHit < KLMHit2drelationx.size(); iHit++) {
-        KLMHit2d* klmhit1 = KLMHit2drelationx[iHit];
-        if (klmhitadd == klmhit1) {
-          targethit = iHit;
-          break;
-        }
-      }
-      if (targethit > -1) {
-        KFchix = KLMHit2drelationx.weight(targethit);
-        KFchiy = KLMHit2drelationy.weight(targethit);
-        KFchi2 = KLMHit2drelationchi2.weight(targethit);
-        part->writeExtraInfo("Hitchix_" + std::to_string(nklmhits - 1), KFchix);
-        part->writeExtraInfo("Hitchiy_" + std::to_string(nklmhits - 1), KFchiy);
-        part->writeExtraInfo("Hitchi2_" + std::to_string(nklmhits - 1), KFchi2);
-      }
+      float KFchi2 = KLMHit2drelation.weight(itermap->second);
 
-      float width;
+      float width; // move the calculation to KLMReconstruction
       if (hit_inBKLM) {
         float phiwidth = sqrt(pow(hit_Xposition - hit_MinStripXposition, 2) + pow(hit_Yposition - hit_MinStripYposition, 2)) + 2;
         width = sqrt(pow(phiwidth, 2) + pow(fabs(hit_Zposition - hit_MinStripZposition) + 2, 2));
@@ -240,15 +196,9 @@ void KLMNNmuidModule::event()
       }
       part->writeExtraInfo("Hitwidth_" + std::to_string(nklmhits - 1), width);
 
-      int Hit_selected = (int)(KFchix < m_hitChiCut && KFchiy < m_hitChiCut);
-      part->writeExtraInfo("Hitselected_" + std::to_string(nklmhits - 1), Hit_selected);
-
-      if (not Hit_selected) continue;
-      KFndof += 2;
       // penetration depth calculation. only the first hit on each are used
       float steplength = 0.;
-      if (KFndof >
-          2) { // replace this with nklmhits after adjustment in extrapolation module. Since we don't calculate chi2 in this module any more.
+      if (nklmhits > 1) { // use vector to calculate distance
         steplength = sqrt(pow((hit_Xposition - previoushitposition[0]), 2) + pow((hit_Yposition - previoushitposition[1]),
                           2) + pow((hit_Zposition - previoushitposition[2]), 2));
       }
@@ -264,7 +214,6 @@ void KLMNNmuidModule::event()
     } // loop of Hit2dMap
 
     part->writeExtraInfo("nklmhits", nklmhits);
-    part->writeExtraInfo("KFndof", KFndof);
 
     ExtHitMap.clear();
     Hit2dMap.clear();

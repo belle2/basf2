@@ -110,9 +110,6 @@ namespace Belle2 {
     /** Name of charged particle candidates list. */
     std::string m_inputListName;
 
-    /** hit selection cut on chi2 (need to be removed at final version). */
-    double m_hitChiCut;
-
     /** KLMHit2d lists. */
     StoreArray<KLMHit2d> m_klmHit2ds;
 

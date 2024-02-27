@@ -135,7 +135,6 @@ void KLMNNmuidModule::event()
     }
 
     std::map<int, ExtHit*> ExtHitMap;
-
     for (ExtHit& exthit : track->getRelationsTo<ExtHit>()) {
 
       if (exthit.getDetectorID() < 0x100) continue; // BKLM = 0x107, EKLM = 0x207
@@ -157,38 +156,9 @@ void KLMNNmuidModule::event()
       int index = (1 - inBKLM) * 100 + layer; // make sure BKLM hits is in front of EKLM hits
       ExtHitMap[index] = &exthit; // only keep the last ext hit in each layer
     }
-
-    int nklmexthits = 0;
-    float extdepth = 0.;
-    float previousextposition[3] = {0.};
-    for (auto itermap = ExtHitMap.begin(); itermap != ExtHitMap.end(); itermap ++) {
-
-      ExtHit exthit = *(itermap->second);
-      int index = itermap->first;
-
-      ROOT::Math::XYZVector vector = exthit.getPosition(); // for release 8
-      double  hit_Zposition = vector.Z();
-      double  hit_Xposition = vector.X();
-      double  hit_Yposition = vector.Y();
-
-      nklmexthits += 1;
-
-      // extrapolation penetration depth calculation.
-      if (nklmexthits > 1) {
-        extdepth += sqrt(pow((hit_Xposition - previousextposition[0]), 2) + pow((hit_Yposition - previousextposition[1]),
-                         2) + pow((hit_Zposition - previousextposition[2]), 2));
-      }
-      previousextposition[0] = hit_Xposition;
-      previousextposition[1] = hit_Yposition;
-      previousextposition[2] = hit_Zposition;
-
-      part->writeExtraInfo("Extcopyid_" + std::to_string(nklmexthits - 1), (index));
-    }
-    part->writeExtraInfo("nklmexthits", nklmexthits);
-    part->writeExtraInfo("extdepth", extdepth);
+    int nklmexthits = ExtHitMap.size();
 
     std::multimap<int, KLMHit2d*> Hit2dMap;
-
     for (KLMHit2d& klmhit : track->getRelationsTo<KLMHit2d>("", "chidimx")) {
       unsigned long int hit_inBKLM = (klmhit.getSubdetector() == KLMElementNumbers::c_BKLM);
       unsigned long int hit_layer = klmhit.getLayer();

@@ -81,34 +81,42 @@ of mass hypotheses (following the convention outlined in the `select_good_decay`
 the code checks if a subset of particles in the tree matches the given LCAS and mass hypotheses 
 (the ordering of the final state particles does not matter because all the permutations are checked, however the mass hypotheses and the LCAS rows/columns should match). 
 If so, the ``graFEI_goodEvent`` variable is set to 1. This allows to get rid of badly reconstructed events. 
-Moreover, you can construct signal- and tag-side candidates with the following lines of code (as documented in the examples):
+Moreover, you can construct signal- and tag-side candidates with the following lines of code (as documented in the example):
 
 .. code:: python
 
-   part_types = ["e+", "mu+", "pi+", "K+", "p+", "gamma"]
+   charged_types = ["e+", "mu+", "pi+", "K+", "p+"]
+   particle_types = charged_types + ["gamma"]
 
-   for part in part_types:
-      ma.cutAndCopyList(
-         f"{part}:Bsig",
-         f"{part}:graFEI",
-         cut="extraInfo(graFEI_sigSide) == 1",
-         writeOut=True,
-         path=path,
-    )
-      ma.cutAndCopyList(
-         f"{part}:Btag",
-         f"{part}:graFEI",
-         cut="extraInfo(graFEI_sigSide) == 0",
-         writeOut=True,
-         path=path,
-    )
+   # Define sig-side B -> K+ (nu nu)
+   # Here we consider all charged basf2 mass hypotheses
+   # since not necessarily they coincide with those 
+   # predicted by graFEI which we require to be kaons
+   for part in charged_types:
+       ma.reconstructDecay(
+          f"B+:{part[:-1]} -> {part}:final",
+          "daughter(0, extraInfo(graFEI_sigSide)) == 1",
+          path=path,
+       )
+   ma.copyLists("B+:Bsgn", [f"B+:{part[:-1]}" for part in charged_types], path=path)
+    
+   # Define tag-side B
+   for part in particle_types:
+       ma.cutAndCopyList(
+          f"{part}:Btag",
+          f"{part}:final",
+          cut="extraInfo(graFEI_sigSide) == 0",
+          writeOut=True,
+          path=path,
+       )
+   ma.combineAllParticles([f"{part}:Btag" for part in particle_types], "B+:Btag", path=path)
 
-   ma.combineAllParticles([f"{part}:Bsig" for part in part_types], "B0:Bsig_graFEI", path=path)
-   ma.combineAllParticles([f"{part}:Btag" for part in part_types], "B0:Btag_graFEI", path=path)
+   ma.reconstructDecay("Upsilon(4S):graFEI -> B+:Bsgn B-:Btag", "", path=path)
 
-The ``PART:graFEI`` particle lists in the example are those used as input for the model.
+The ``PART:final`` particle lists in the example are those used as input for the model.
 The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong to the signal-side, 0 for particles predicted to belong to the tag-side
 and -1 for particles in events with ``graFEI_goodEvent = 0``. Therefore, if you want meaningful distributions you should cut on events with ``graFEI_goodEvent = 1``.
+However, if you reconstruct the signal-side as in the example, only good events are kept.
 
 The variables added by the `GraFEIModule <grafei.GraFEIModule>` are filled with ``nan`` if there are less than two reconstructed particles in the event.
 Otherwise, they are defined as follows:

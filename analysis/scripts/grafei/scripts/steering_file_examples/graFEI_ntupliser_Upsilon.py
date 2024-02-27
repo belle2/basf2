@@ -4,295 +4,341 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from ROOT import Belle2
 from variables import variables as vm
+import stdPhotons
+
+from ROOT import Belle2
+
+# Necessary to run argparse
+from ROOT import PyConfig
+
+PyConfig.IgnoreCommandLineOptions = True  # noqa
+
 import random
 import argparse
+from pathlib import Path
+
 from grafei import GraFEIModule
 from grafei import FlagBDecayModule
-
-# Random seeds
-b2.set_random_seed("Pino")
-random.seed(10)
-
-# ------------------------SETTINGS--------------------------------------------------------------------------
-# Sig-side LCAS and mass hypotheses
-sig_side_lcas = [[0, 5], [5, 0]]
-sig_side_masses = ["k", "i"]
-
-# graFEI cuts
-priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
-# f"pidIsMostLikely({','.join(str(p) for p in priors)})" #"pidIsMostLikely()"
-most_likely_tracks = f"pidIsMostLikely({','.join(str(p) for p in priors)})"
-# most_likely_tracks = "extraInfo(pidIsMostLikelyTempVars)"
-
-cut_charged_graFEI = [
-    "mostLikelyTracks>0",
-    "nCDCHits>20",
-    "thetaInCDCAcceptance",
-    "abs(dz)<1.0",
-    "dr<0.5",
-    "p<5",
-    "pt>0.2",
-]
-cut_photons_graFEI = [
-    "beamBackgroundSuppression>0.4",
-    "fakePhotonSuppression>0.3",
-    "abs(clusterTiming)<100",
-    "abs(formula(clusterTiming/clusterErrorTiming))<2.0",
-    "[[clusterReg==1 and E>0.09] or [clusterReg==2 and E>0.09] or [clusterReg==3 and E>0.14]]",
-]
-cut_KL0_graFEI = "PDG==0"  # Reject KL0 for the moment
-# graFEI globaltag name
-# graFEI_globaltag = "graFEI_mixed_LCAMassProb_v1"
-
-# Additional cuts from stdPhotons tight list are added
-cut_photons_graFEI += [
-    "inCDCAcceptance",
-    "[clusterErrorTiming < 1e6 and [clusterE1E9 > 0.4 or E > 0.075]]",
-]
-
-# ----------------------------------------------------------------------------------------------------------
-
-cut_charged_graFEI = " and ".join(cut_charged_graFEI)
-cut_photons_graFEI = " and ".join(cut_photons_graFEI)
+from grafei.modules.IsMostLikelyTempVarsModule import IsMostLikelyTempVars
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--cfg", type=str, default=None, help="graFEI config file")
-parser.add_argument("-w", "--weight", type=str, default=None, help="graFEI weight file")
-args = parser.parse_args()
-cfg_file = args.cfg
-weight_file = args.weight
+def _parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "-c", "--config", type=str, default=None, help="graFEI config file"
+    )
+    parser.add_argument(
+        "-w", "--weight", type=str, default=None, help="graFEI weight file"
+    )
+    parser.add_argument(
+        "-g",
+        "--globaltag",
+        type=str,
+        default="graFEI_mixed_LCAMassProb_v1",
+        help="Globaltag containing graFEI model",
+    )
+    parser.add_argument(
+        "-l",
+        "--lcas",
+        type=list,
+        default=[[0]],
+        help="Choose LCAS matrix of signal side",
+    )
+    parser.add_argument(
+        "-m",
+        "--masses",
+        type=list,
+        default=["k"],
+        help="Choose mass hypotheses of signal side",
+    )
+    return parser.parse_args()
 
-mc = True
 
-# Create path
-path = b2.Path()
+if __name__ == "__main__":
+    # Random seeds
+    b2.set_random_seed(42)
+    random.seed(42)
 
-# Load input data from mdst/udst file
-ma.inputMdstList(
-    filelist=[""],  # Specify input file in command line with -i
-    path=path,
-    environmentType="default",
-)
+    args = _parse_args()
 
-# Add globaltags
-# b2.conditions.prepend_globaltag(graFEI_globaltag)
-b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+    store_mc_truth = True
 
-# Alias for pidIsMostLikely depending on chosen priors
-vm.addAlias("mostLikelyTracks", most_likely_tracks)
+    b2.conditions.prepend_globaltag(args.globaltag)
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-# Load photons MVAs once and for all
-ma.fillParticleList(
-    "gamma:all",
-    "",
-    path=path,
-)
-ma.getBeamBackgroundProbability("gamma:all", "MC15ri", path=path)
-ma.getFakePhotonProbability("gamma:all", "MC15ri", path=path)
+    input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
 
-charged_types = ["e+", "mu+", "pi+", "K+", "p+"]
-part_types = charged_types + ["gamma"]
+    path = b2.create_path()
+    ma.inputMdst(str(input_file), path=path)
 
-for part in part_types:
-    # Fill lists
-    cut = cut_photons_graFEI if part == "gamma" else cut_charged_graFEI
+    #################################################################################################
+    # GraFEI requirements and reconstruction
+    # 1) Cuts on charged tracks and photons
+    # 2) Cut on isMostLikely with _noSVD(_noTOP) variables and custom priors
+    # 3) Keep only "good events" i.e. validTree + signal side matches chosen LCAS and mass hypotheses
+    #################################################################################################
 
-    ma.fillParticleList(
-        f"{part}:graFEI",
-        cut,
+    # 1) Cuts on charged tracks and photons
+    charged_cuts = [
+        "nCDCHits>20",
+        "thetaInCDCAcceptance",
+        "abs(dz)<1.0",
+        "dr<0.5",
+        "p<5",
+        "pt>0.2",
+    ]
+
+    photon_cuts = [
+        "beamBackgroundSuppression>0.4",
+        "fakePhotonSuppression>0.3",
+        "abs(clusterTiming)<100",
+        "abs(formula(clusterTiming/clusterErrorTiming))<2.0",
+        "[[clusterReg==1 and E>0.09] or [clusterReg==2 and E>0.09] or [clusterReg==3 and E>0.14]]",
+    ]
+
+    evt_cut = "n_gamma_in_evt<20 and n_charged_in_evt<20"
+
+    # Fill particle list with optimized cuts
+    charged_lists = [f"{c}:final" for c in ["p+", "e+", "pi+", "mu+", "K+"]]
+
+    ma.fillParticleLists(
+        [(c, " and ".join(charged_cuts)) for c in charged_lists],
+        writeOut=True,
         path=path,
     )
 
-    if mc:
-        # Create relations to MCParticles
-        ma.matchMCTruth(f"{part}:graFEI", path=path)
+    # 2) Cut on isMostLikely with _noSVD(_noTOP) variables and custom priors
+    # TODO: try to use NN PID when ready
+    priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
+    most_likely_module = IsMostLikelyTempVars(charged_lists, priors)
+    path.add_module(most_likely_module)
 
-        # Associate parent B to each FSP
-        flag_decay_module = FlagBDecayModule(
-            f"{part}:graFEI",
-            b_parent_var="BParentGenID",
+    for charged_list in charged_lists:
+        ma.applyCuts(charged_list, "extraInfo(IsMostLikelyTempVars)==1", path=path)
+
+    stdPhotons.stdPhotons(
+        listtype="tight",
+        beamBackgroundMVAWeight="MC15ri",
+        fakePhotonMVAWeight="MC15ri",
+        path=path,
+    )
+
+    ma.cutAndCopyList(
+        "gamma:final",
+        "gamma:tight",
+        " and ".join(photon_cuts),
+        writeOut=True,
+        path=path,
+    )
+
+    # Add requirements on total number of photons and charged in event
+    vm.addAlias("n_gamma_in_evt", "nParticlesInList(gamma:final)")
+    vm.addAlias("n_p_in_evt", "nParticlesInList(p+:final)")
+    vm.addAlias("n_e_in_evt", "nParticlesInList(e+:final)")
+    vm.addAlias("n_mu_in_evt", "nParticlesInList(mu+:final)")
+    vm.addAlias("n_pi_in_evt", "nParticlesInList(pi+:final)")
+    vm.addAlias("n_K_in_evt", "nParticlesInList(K+:final)")
+    vm.addAlias(
+        "n_charged_in_evt",
+        "formula(n_p_in_evt+n_e_in_evt+n_mu_in_evt+n_pi_in_evt+n_K_in_evt)",
+    )
+
+    ma.applyEventCuts(evt_cut, path=path)
+
+    particle_lists = charged_lists + ["gamma:final"]
+    particle_types = [x.split(":")[0] for x in particle_lists]
+    charged_types = [x.split(":")[0] for x in charged_lists]
+
+    ma.combineAllParticles(
+        [f"{part}:final" for part in particle_types], "Upsilon(4S):final", path=path
+    )
+
+    if store_mc_truth:
+        ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
+
+        b_parent_var = "BParentGenID"
+
+        # Flag each particle according to the B meson and decay it came from
+        for i, particle_list in enumerate(particle_lists):
+            # Match MC particles for all lists
+            ma.matchMCTruth(particle_list, path=path)
+
+            # Add extraInfo to each particle indicating parent B genID and
+            # whether it belongs to a semileptonic decay
+            flag_decay_module = FlagBDecayModule(
+                particle_list,
+                b_parent_var=b_parent_var,
+            )
+            path.add_module(flag_decay_module)
+
+    graFEI = GraFEIModule(
+        "Upsilon(4S):final",
+        cfg_path=args.config,
+        param_file=args.weight,
+        sig_side_lcas=args.lcas,
+        sig_side_masses=args.masses,
+    )
+    path.add_module(graFEI)
+
+    # Define signal-side B
+    # Here we consider all charged basf2 mass hypotheses
+    # since not necessarily they coincide with those
+    # predicted by graFEI which we require to be kaons
+    for part in charged_types:
+        ma.reconstructDecay(
+            f"B+:{part[:-1]} -> {part}:final",
+            "daughter(0, extraInfo(graFEI_sigSide)) == 1",
+            path=path,
         )
-        path.add_module(flag_decay_module)
+    ma.copyLists("B+:Bsgn", [f"B+:{part[:-1]}" for part in charged_types], path=path)
 
-# most_likely_module = IsMostLikelyTempVars([f"{part}:graFEI" for part in charged_types], priors)
-# path.add_module(most_likely_module)
+    # Define tag-side B
+    for part in particle_types:
+        ma.cutAndCopyList(
+            f"{part}:Btag",
+            f"{part}:final",
+            cut="extraInfo(graFEI_sigSide) == 0",
+            writeOut=True,
+            path=path,
+        )
+    ma.combineAllParticles([f"{part}:Btag" for part in particle_types], "B+:Btag", path=path)
 
-for c in charged_types:
-    ma.applyCuts(f"{c}:graFEI", "mostLikelyTracks>0", path=path)
+    # 3) Keep only "good events" i.e. validTree + signal side matches chosen LCAS and mass hypotheses
+    ma.reconstructDecay(
+        "Upsilon(4S):graFEI -> B+:Bsgn B-:Btag", "", path=path
+    )
 
-ma.combineAllParticles(
-    [f"{part}:graFEI" for part in part_types], "Upsilon(4S):graFEI", path=path
-)
+    if store_mc_truth:
+        ma.matchMCTruth("B+:Bsgn", path=path)
+        ma.matchMCTruth("B-:Btag", path=path)
+        ma.matchMCTruth("Upsilon(4S):graFEI", path=path)
 
-if mc:
-    ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
-    # ma.matchMCTruth("Upsilon(4S):graFEI", path=path)
+    ################################################################################
+    # Make ntuples
+    ################################################################################
 
-graFEI = GraFEIModule(
-    "Upsilon(4S):graFEI",
-    cfg_path=cfg_file,
-    param_file=weight_file,
-    sig_side_lcas=sig_side_lcas,
-    sig_side_masses=sig_side_masses,
-)
-path.add_module(graFEI)
+    input_file_path = Belle2.Environment.Instance().getInputFilesOverride()[0]
 
-for part in part_types:
-    ma.cutAndCopyList(
-        f"{part}:Bsig",
-        f"{part}:graFEI",
-        cut="extraInfo(graFEI_sigSide) == 1",
-        writeOut=True,
+    # Variables
+    momentum_vars = [
+        "p",
+        "px",
+        "py",
+        "pz",
+        "pt",
+        "E",
+    ]
+    default_vars = [
+        "PDG",
+        "M",
+        "Mbc",
+        "deltaE",
+        "phi",
+        "theta",
+        "cosTheta",
+        # "cosTBz",
+        # "cosTBTO",
+    ]
+    default_vars += momentum_vars
+
+    tm_vars = [
+        # "isSignal",
+        # "isSignalAcceptMissingNeutrino",
+        "mcErrors",
+        "genMotherPDG",
+        "mcPDG",
+    ]
+
+    # graFEI variables
+    graFEI_vars = [
+        "graFEI_probEdgeProd",
+        "graFEI_probEdgeMean",
+        "graFEI_probEdgeGeom",
+        # "graFEI_validTree", # Always 1
+        # "graFEI_goodEvent", # Always 1
+        "graFEI_nFSP",
+        "graFEI_nCharged_preFit",
+        "graFEI_nElectrons_preFit",
+        "graFEI_nMuons_preFit",
+        "graFEI_nPions_preFit",
+        "graFEI_nKaons_preFit",
+        "graFEI_nProtons_preFit",
+        "graFEI_nLeptons_preFit",
+        "graFEI_nPhotons_preFit",
+        "graFEI_nOthers_preFit",
+        "graFEI_nCharged_postFit",
+        "graFEI_nElectrons_postFit",
+        "graFEI_nMuons_postFit",
+        "graFEI_nPions_postFit",
+        "graFEI_nKaons_postFit",
+        "graFEI_nProtons_postFit",
+        "graFEI_nLeptons_postFit",
+        "graFEI_nPhotons_postFit",
+        "graFEI_nOthers_postFit",
+        "graFEI_nPredictedUnmatched",
+        "graFEI_nPredictedUnmatched_noPhotons",
+    ]
+
+    graFEI_tm_vars = [
+        "graFEI_truth_perfectLCA",
+        "graFEI_truth_perfectMasses",
+        "graFEI_truth_perfectEvent",
+        "graFEI_truth_isSemileptonic",
+        "graFEI_truth_nFSP",
+        "graFEI_truth_nPhotons",
+        "graFEI_truth_nElectrons",
+        "graFEI_truth_nMuons",
+        "graFEI_truth_nPions",
+        "graFEI_truth_nKaons",
+        "graFEI_truth_nProtons",
+        "graFEI_truth_nOthers",
+    ]
+
+    if store_mc_truth:
+        default_vars += tm_vars
+        graFEI_vars += graFEI_tm_vars
+
+    ma.variablesToEventExtraInfo(
+        "Upsilon(4S):final",
+        dict((f"extraInfo({var})", var) for var in graFEI_vars),
         path=path,
     )
-    ma.cutAndCopyList(
-        f"{part}:Btag",
-        f"{part}:graFEI",
-        cut="extraInfo(graFEI_sigSide) == 0",
-        writeOut=True,
+
+    # Aliases
+    for var in default_vars:
+        vm.addAlias(f"Bsgn_{var}", f"daughter(0, {var})")
+        vm.addAlias(f"Bsgn_d0_{var}", f"daughter(0, daughter(0, {var}))")
+        vm.addAlias(f"Btag_{var}", f"daughter(1, {var})")
+        vm.addAlias(f"Ups_{var}", var)
+    for var in momentum_vars:
+        vm.addAlias(
+            f"Bsgn_d0_CMS_{var}", f"useCMSFrame(daughter(0, daughter(0, {var})))"
+        )
+        vm.addAlias(f"Btag_CMS_{var}", f"useCMSFrame(daughter(1, {var}))")
+    for var in graFEI_vars:
+        vm.addAlias(var, f"eventExtraInfo({var})")
+
+    all_vars = (
+        graFEI_vars
+        + [f"Bsgn_{var}" for var in tm_vars]
+        + [f"Bsgn_d0_{var}" for var in default_vars]
+        + [f"Bsgn_d0_CMS_{var}" for var in momentum_vars]
+        + [f"Btag_{var}" for var in default_vars]
+        + [f"Btag_CMS_{var}" for var in momentum_vars]
+        + [f"Ups_{var}" for var in default_vars]
+    )
+
+    ma.variablesToNtuple(
+        "Upsilon(4S):graFEI",
+        sorted(list(set(all_vars))),
+        filename=f'graFEI_UpsReco_{input_file_path[input_file_path.rfind("/")+1:]}',
+        treename="tree",
         path=path,
     )
 
-ma.combineAllParticles(
-    [f"{part}:Bsig" for part in part_types], "B0:Bsig_graFEI", path=path
-)
-ma.combineAllParticles(
-    [f"{part}:Btag" for part in part_types], "B0:Btag_graFEI", path=path
-)
+    # Process
+    b2.process(path)
 
-# # Continuum suppression
-# csMask = (
-#     "csMask",
-#     "nCDCHits > 0 and useCMSFrame(p)<=3.2",
-#     "p >= 0.05 and useCMSFrame(p)<=3.2",
-# )
-
-# ma.appendROEMasks(list_name="B0:B_1_graFEI", mask_tuples=[csMask], path=path)
-# ma.appendROEMasks(list_name="B0:B_2_graFEI", mask_tuples=[csMask], path=path)
-
-# ma.buildContinuumSuppression(list_name="B0:B_1_graFEI", roe_mask="csMask", path=path)
-# ma.buildContinuumSuppression(list_name="B0:B_2_graFEI", roe_mask="csMask", path=path)
-
-if mc:
-    ma.matchMCTruth("B0:Bsig_graFEI", path=path)
-    ma.matchMCTruth("B0:Btag_graFEI", path=path)
-    ma.matchMCTruth("Upsilon(4S):graFEI", path=path)
-
-# ---------------- Write information to file ---------------------------
-input_file_path = Belle2.Environment.Instance().getInputFilesOverride()[0]
-
-# Variables
-default_vars = [
-    "M",
-    "Mbc",
-    "deltaE",
-    "p",
-    "px",
-    "py",
-    "pz",
-    "pt",
-    "E",
-    "phi",
-    "theta",
-    # "cosTBz",
-    # "cosTBTO",
-]
-if mc:
-    default_vars.extend(
-        [
-            # "isSignal",
-            # "isSignalAcceptMissingNeutrino",
-            "mcErrors",
-            "genMotherPDG",
-            "mcPDG",
-        ]
-    )
-
-ma.variablesToEventExtraInfo(
-    "B0:Bsig_graFEI",
-    dict((var, f"Bsig_{var}") for var in default_vars),
-    path=path,
-)
-ma.variablesToEventExtraInfo(
-    "B0:Btag_graFEI",
-    dict((var, f"Btag_{var}") for var in default_vars),
-    path=path,
-)
-
-# graFEI variables
-graFEI_vars = [
-    "graFEI_probEdgeProd",
-    "graFEI_probEdgeMean",
-    "graFEI_probEdgeGeom",
-    "graFEI_validTree",
-    "graFEI_goodEvent",
-    "graFEI_nFSP",
-    "graFEI_nCharged_preFit",
-    "graFEI_nElectrons_preFit",
-    "graFEI_nMuons_preFit",
-    "graFEI_nPions_preFit",
-    "graFEI_nKaons_preFit",
-    "graFEI_nProtons_preFit",
-    "graFEI_nLeptons_preFit",
-    "graFEI_nPhotons_preFit",
-    "graFEI_nOthers_preFit",
-    "graFEI_nCharged_postFit",
-    "graFEI_nElectrons_postFit",
-    "graFEI_nMuons_postFit",
-    "graFEI_nPions_postFit",
-    "graFEI_nKaons_postFit",
-    "graFEI_nProtons_postFit",
-    "graFEI_nLeptons_postFit",
-    "graFEI_nPhotons_postFit",
-    "graFEI_nOthers_postFit",
-    "graFEI_nPredictedUnmatched",
-    "graFEI_nPredictedUnmatched_noPhotons",
-]
-if mc:
-    graFEI_vars.extend(
-        [
-            "graFEI_truth_perfectLCA",
-            "graFEI_truth_perfectMasses",
-            "graFEI_truth_perfectEvent",
-            "graFEI_truth_isSemileptonic",
-            "graFEI_truth_nFSP",
-            "graFEI_truth_nPhotons",
-            "graFEI_truth_nElectrons",
-            "graFEI_truth_nMuons",
-            "graFEI_truth_nPions",
-            "graFEI_truth_nKaons",
-            "graFEI_truth_nProtons",
-            "graFEI_truth_nOthers",
-        ]
-    )
-
-# Aliases
-for var in default_vars:
-    vm.addAlias(f"Ups_Bsig_{var}", f"eventExtraInfo(Bsig_{var})")
-    vm.addAlias(f"Ups_Btag_{var}", f"eventExtraInfo(Btag_{var})")
-for var in graFEI_vars:
-    vm.addAlias(f"Ups_{var}", f"extraInfo({var})")
-
-graFEI_vars = (
-    [f"Ups_{var}" for var in graFEI_vars]
-    + [f"Ups_Bsig_{var}" for var in default_vars]
-    + [f"Ups_Btag_{var}" for var in default_vars]
-)
-graFEI_vars = sorted(list(set(graFEI_vars)))
-
-ma.variablesToNtuple(
-    "Upsilon(4S):graFEI",
-    graFEI_vars,
-    filename=f'graFEI_UpsReco_{input_file_path[input_file_path.rfind("/")+1:]}',
-    treename="tree",
-    path=path,
-)
-
-# Process
-b2.process(path)
-
-# print out the summary
-print(b2.statistics)
+    # print out the summary
+    print(b2.statistics)

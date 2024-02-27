@@ -13,8 +13,8 @@ from grafei import GraFEIModule
 from grafei import FlagBDecayModule
 
 # Random seeds
-b2.set_random_seed("Pino")
-random.seed(10)
+b2.set_random_seed(42)
+random.seed(42)
 
 # ------------------------SETTINGS--------------------------------------------------------------------------
 # graFEI cuts

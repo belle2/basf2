@@ -11,13 +11,8 @@
 #include <TObject.h>
 #include "TKey.h"
 #include "TFile.h"
-#include <iostream>
 #include <sstream>
 #include <iomanip>
-#include <fstream>
-#include <string>
-#include "TObjString.h"
-#include "TSystem.h"
 
 using namespace std;
 using namespace Belle2;
@@ -36,16 +31,18 @@ REG_MODULE(DQMHistAnalysisOutputFile);
 DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   : DQMHistAnalysisModule()
 {
+
+  setDescription("Module to save histograms from DQMHistAnalysisModules");
   //Parameter definition
 
-  addParam("OutputFolder", m_folder, "Output file path+prefix ()", std::string(""));
+  addParam("OutputFolder", m_folder, "Output file path", std::string(""));
   addParam("FilePrefix", m_prefix,
            "prefix of the output filename {prefix}dqm_e####r######.root is generated (unless Filename is set)", std::string(""));
   addParam("Filename", m_filename, "name of the output file (default is {prefix}dqm_e####r######.root)", std::string(""));
   addParam("SaveHistos", m_saveHistos, "Save Histos (not default)", false);
   addParam("SaveCanvases", m_saveCanvases, "Save Canvases (default)", true);
-  addParam("SavePerEvent", m_savePerEvent, "Whether save to file for each event", false);
-  addParam("SavePerRun", m_savePerRun, "Whether save to file for each run", true);
+  addParam("SavePerEvent", m_savePerEvent, "Whether save to file for each event", true);
+  addParam("SavePerRun", m_savePerRun, "Whether save to file for each run (not usable in online analysis!)", false);
   B2DEBUG(20, "DQMHistAnalysisOutputFile: Constructor done.");
 }
 

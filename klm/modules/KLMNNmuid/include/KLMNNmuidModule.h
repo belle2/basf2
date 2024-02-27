@@ -107,8 +107,6 @@ namespace Belle2 {
     /** Container of hit widths of one track. */
     float m_hitpattern_width[29];
 
-    float m_hitpattern_distance[29];
-
     /** Container of hit steplength of one track. */
     float m_hitpattern_steplength[29];
 
@@ -117,7 +115,6 @@ namespace Belle2 {
 
     /** Container of extrapolation situation at each KLM layer of one track. */
     int m_hitpattern_hasext[29];
-    int m_hitpattern_nhits[29];
 
   };
 }

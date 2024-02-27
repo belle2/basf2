@@ -130,11 +130,9 @@ void KLMNNmuidModule::event()
 
       // initialize hit pattern arrays
       for (int layer = 0; layer < 29; layer++) {
-        m_hitpattern_distance[layer] = -1;
         m_hitpattern_steplength[layer] = -1;
         m_hitpattern_width[layer] = -1;
         m_hitpattern_chi2[layer] = -1;
-        m_hitpattern_nhits[layer] = 0;
         m_hitpattern_hasext[layer] = 0;
       }
 
@@ -275,43 +273,6 @@ void KLMNNmuidModule::event()
         }
         part->writeExtraInfo("Hitwidth_" + std::to_string(nklmhits - 1), width);
 
-        // calculate distance
-        float distance = -9999;
-        if (ExtHitMap.count(index)) {
-          ExtHit exthit = *(ExtHitMap[index]);
-
-          ROOT::Math::XYZVector vector = exthit.getPosition(); // for release 8
-          double  ext_Zposition = vector.Z();
-          double  ext_Xposition = vector.X();
-          double  ext_Yposition = vector.Y();
-
-          float Xdiff = ext_Xposition - hit_Xposition;
-          float Ydiff = ext_Yposition - hit_Yposition;
-          float Zdiff = ext_Zposition - hit_Zposition;
-          distance = sqrt(pow(Xdiff, 2) + pow(Ydiff, 2) + pow(Zdiff, 2));
-        } else {
-
-          // find the distance to the closest exthit
-          for (auto iterext = ExtHitMap.begin(); iterext != ExtHitMap.end(); iterext ++) {
-
-            ExtHit exthit = *(iterext->second);
-
-            ROOT::Math::XYZVector vector = exthit.getPosition(); // for release 8
-            double  ext_Zposition = vector.Z();
-            double  ext_Xposition = vector.X();
-            double  ext_Yposition = vector.Y();
-
-            float Xdiff = ext_Xposition - hit_Xposition;
-            float Ydiff = ext_Yposition - hit_Yposition;
-            float Zdiff = ext_Zposition - hit_Zposition;
-            float tempdistance = (-1) * sqrt(pow(Xdiff, 2) + pow(Ydiff, 2) + pow(Zdiff,
-                                             2)); // set distance to minus if there's no ext hit in this layer
-            if (distance < tempdistance) distance = tempdistance;
-          }
-
-        }
-        part->writeExtraInfo("Hitdistance_" + std::to_string(nklmhits - 1), distance);
-
         int Hit_selected = (int)(KFchix < m_hitChiCut && KFchiy < m_hitChiCut);
         part->writeExtraInfo("Hitselected_" + std::to_string(nklmhits - 1), Hit_selected);
 
@@ -330,8 +291,6 @@ void KLMNNmuidModule::event()
 
         // hit pattern creation. All selected hits will be used
         int hitpatternindex = hit_layer - 1 + 15 * (1 - hit_inBKLM);
-        m_hitpattern_nhits[hitpatternindex] += 1;
-        m_hitpattern_distance[hitpatternindex] = fabs(distance);
         m_hitpattern_chi2[hitpatternindex] = KFchi2;
         m_hitpattern_steplength[hitpatternindex] = steplength;
         m_hitpattern_width[hitpatternindex] = width;

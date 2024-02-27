@@ -281,7 +281,7 @@ namespace Belle2 {
     bool findMatchingEndcapHit(Intersection&, const Track*);
 
     //! Nudge the track using the matching hit
-    void adjustIntersection(Intersection&, const double*, const KLMHit2d*, const G4ThreeVector&, const Track*);
+    void adjustIntersection(Intersection&, const double*, const G4ThreeVector&, const G4ThreeVector&);
 
     //! Complete muon identification after end of track extrapolation
     void finishTrack(const ExtState&, KLMMuidLikelihood*, bool);

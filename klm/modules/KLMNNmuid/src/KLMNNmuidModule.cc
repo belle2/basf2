@@ -52,6 +52,10 @@ KLMNNmuidModule::KLMNNmuidModule() : Module()
            m_identifier);
 }
 
+KLMNNmuidModule::~KLMNNmuidModule()
+{
+}
+
 void KLMNNmuidModule::initialize()
 {
   //m_klmMuidLikelihoods.isRequired();
@@ -340,12 +344,14 @@ void KLMNNmuidModule::event()
       ExtHitMap.clear();
       Hit2dMap.clear();
 
-      getApplicationVariables(part);
+      double muprob_nn = getNNmuProbability(part);
+      part->writeExtraInfo("muprob_nn", muprob_nn);
+
     } // has klmll
   } // loop of particles
 }
 
-void KLMNNmuidModule::getApplicationVariables(Particle* part)
+float KLMNNmuidModule::getNNmuProbability(const Particle* part)
 {
   m_dataset->m_input[0] = part->getExtraInfo("KFtotalchi2");
   m_dataset->m_input[1] = part->getExtraInfo("KFndof");
@@ -362,8 +368,8 @@ void KLMNNmuidModule::getApplicationVariables(Particle* part)
     m_dataset->m_input[5 + 4 * layer + 3] = m_hitpattern_hasext[layer]; // hasext
   }
 
-  double muprob_nn = m_expert->apply(*m_dataset)[0];
-  part->writeExtraInfo("muprob_nn", muprob_nn);
+  float muprob_nn = m_expert->apply(*m_dataset)[0];
+  return muprob_nn;
 }
 
 

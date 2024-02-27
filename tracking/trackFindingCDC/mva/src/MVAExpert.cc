@@ -50,6 +50,9 @@ namespace Belle2 {
       /// Pointer to the current dataset
       std::unique_ptr<MVA::Dataset> m_dataset;
 
+      /// General options
+      MVA::GeneralOptions m_generalOptions;
+
       /// DB identifier of the expert or file name
       std::string m_identifier;
     };
@@ -121,14 +124,13 @@ void MVAExpert::Impl::beginRun()
 
     std::map<std::string, MVA::AbstractInterface*> supportedInterfaces =
       MVA::AbstractInterface::getSupportedInterfaces();
-    MVA::GeneralOptions generalOptions;
-    weightfile->getOptions(generalOptions);
-    m_expert = supportedInterfaces[generalOptions.m_method]->getExpert();
+    weightfile->getOptions(m_generalOptions);
+    m_expert = supportedInterfaces[m_generalOptions.m_method]->getExpert();
     m_expert->load(*weightfile);
 
     std::vector<float> dummy;
     dummy.resize(m_selectedNamedVariables.size(), 0);
-    m_dataset = std::make_unique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
+    m_dataset = std::make_unique<MVA::SingleDataset>(m_generalOptions, std::move(dummy), 0);
   } else {
     B2ERROR("Could not find weight file for identifier " << m_identifier);
   }
@@ -161,7 +163,28 @@ double MVAExpert::Impl::predict()
 
 std::vector<float> MVAExpert::Impl::predict(float* test_data, int nFeature, int nRows)   /** Get predictions for several inputs */
 {
+  std::vector<std::vector<float>> spectators;
+  std::vector<std::vector <float> > data;
+  data.resize(nRows);
+  for (int iRow = 0; iRow < nRows; iRow += 1) {
+    data[iRow].resize(nFeature);
+    for (int iFeature = 0; iFeature < nFeature; iFeature += 1) {
+      data[iRow][iFeature] = test_data[nFeature * iRow + iFeature];
+    }
+  }
+
+  MVA::MultiDataset dataSet(m_generalOptions, data, spectators);
+
+  /*
+  auto a = m_expert->apply(test_data, nFeature, nRows);
+  auto b = m_expert->apply(dataSet);
+  for (size_t i=0; i<a.size(); i+=1) {
+    std::cout << a[i] << " hi " << b[i] << std::endl;
+  }
+
   return m_expert->apply(test_data, nFeature, nRows);
+  */
+  return m_expert->apply(dataSet);
 }
 
 std::vector<std::string> MVAExpert::Impl::getVariableNames()

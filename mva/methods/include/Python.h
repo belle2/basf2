@@ -120,9 +120,6 @@ namespace Belle2 {
        */
       virtual void load(Weightfile& weightfile) override;
 
-      /** Simple apply */
-      virtual std::vector<float> apply(float* test_data, int nFeature, int nRows) const  override;
-
       /**
        * Apply this expert onto a dataset
        * @param test_data dataset

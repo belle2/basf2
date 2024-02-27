@@ -38,22 +38,6 @@ namespace Belle2 {
       virtual void load(Weightfile& weightfile) = 0;
 
       /**
-       * Basic apply, may help to avoid wrappers of wrappers and save time. Empty in the base implementation
-       * @param test_data float*
-       * @param nFeature int
-       * @param nRows    int
-       */
-      virtual std::vector<float> apply([[maybe_unused]] float* test_data, [[maybe_unused]] int nFeature, int nRows) const
-      {
-        std::vector<float> out;
-        out.resize(nRows);
-        for (auto& res : out) {
-          res = 1.0;
-        }
-        return out;
-      }
-
-      /**
        * Apply this expert onto a dataset.
        * @param test_data dataset
        */

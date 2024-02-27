@@ -205,7 +205,6 @@ void KLMNNmuidModule::event()
     RelationVector<KLMHit2d> KLMHit2drelationx = track->getRelationsTo<KLMHit2d>("", "chidimx");
     RelationVector<KLMHit2d> KLMHit2drelationy = track->getRelationsTo<KLMHit2d>("", "chidimy");
     RelationVector<KLMHit2d> KLMHit2drelationchi2 = track->getRelationsTo<KLMHit2d>("", "intersectchisq");
-    float KFtotalchi2 = 0;
     int KFndof = 0;
     for (auto itermap = Hit2dMap.begin(); itermap != Hit2dMap.end(); itermap ++) {
 
@@ -275,11 +274,11 @@ void KLMNNmuidModule::event()
       part->writeExtraInfo("Hitselected_" + std::to_string(nklmhits - 1), Hit_selected);
 
       if (not Hit_selected) continue;
-      KFtotalchi2 += KFchi2;
       KFndof += 2;
       // penetration depth calculation. only the first hit on each are used
       float steplength = 0.;
-      if (KFndof > 2) {
+      if (KFndof >
+          2) { // replace this with nklmhits after adjustment in extrapolation module. Since we don't calculate chi2 in this module any more.
         steplength = sqrt(pow((hit_Xposition - previoushitposition[0]), 2) + pow((hit_Yposition - previoushitposition[1]),
                           2) + pow((hit_Zposition - previoushitposition[2]), 2));
       }
@@ -295,7 +294,6 @@ void KLMNNmuidModule::event()
     } // loop of Hit2dMap
 
     part->writeExtraInfo("nklmhits", nklmhits);
-    part->writeExtraInfo("KFtotalchi2", KFtotalchi2);
     part->writeExtraInfo("KFndof", KFndof);
 
     ExtHitMap.clear();

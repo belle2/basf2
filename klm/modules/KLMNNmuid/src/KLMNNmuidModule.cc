@@ -33,6 +33,8 @@
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mva/interface/Interface.h>
 
+#include <boost/algorithm/string/predicate.hpp>
+
 using namespace Belle2;
 
 REG_MODULE(KLMNNmuid);
@@ -58,11 +60,13 @@ KLMNNmuidModule::~KLMNNmuidModule()
 
 void KLMNNmuidModule::initialize()
 {
-  //m_klmMuidLikelihoods.isRequired();
-
   StoreObjPtr<ParticleList>().isRequired(m_inputListName);
   m_klmHit2ds.isRequired();
 
+  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
+    m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
+                                  DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
+  }
   MVA::AbstractInterface::initSupportedInterfaces();
 }
 
@@ -74,8 +78,16 @@ void KLMNNmuidModule::terminate()
 
 void KLMNNmuidModule::beginRun()
 {
-  auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
-  init_mva(weightfile);
+  if (m_weightfile_representation) {
+    if (m_weightfile_representation->hasChanged()) {
+      std::stringstream ss((*m_weightfile_representation)->m_data);
+      auto weightfile = MVA::Weightfile::loadFromStream(ss);
+      init_mva(weightfile);
+    }
+  } else {
+    auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
+    init_mva(weightfile);
+  }
 }
 
 void KLMNNmuidModule::endRun()

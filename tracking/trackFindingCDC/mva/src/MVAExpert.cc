@@ -174,16 +174,6 @@ std::vector<float> MVAExpert::Impl::predict(float* test_data, int nFeature, int 
   }
 
   MVA::MultiDataset dataSet(m_generalOptions, data, spectators);
-
-  /*
-  auto a = m_expert->apply(test_data, nFeature, nRows);
-  auto b = m_expert->apply(dataSet);
-  for (size_t i=0; i<a.size(); i+=1) {
-    std::cout << a[i] << " hi " << b[i] << std::endl;
-  }
-
-  return m_expert->apply(test_data, nFeature, nRows);
-  */
   return m_expert->apply(dataSet);
 }
 

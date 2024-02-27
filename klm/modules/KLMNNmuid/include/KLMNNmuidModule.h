@@ -19,8 +19,6 @@
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMHit2d.h>
 
-#include <klm/bklm/geometry/GeometryPar.h>
-
 #include <mdst/dataobjects/Track.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Expert.h>
@@ -84,11 +82,7 @@ namespace Belle2 {
 
     DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
-    //StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
-
     StoreArray<KLMHit2d> m_klmHit2ds;
-
-    bklm::GeometryPar* m_bklmGeoPar;
 
     float m_hitpattern_width[29];
     float m_hitpattern_distance[29];

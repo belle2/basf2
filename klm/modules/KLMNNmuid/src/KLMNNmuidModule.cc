@@ -10,8 +10,6 @@
 #include <fstream>
 #include <sstream>
 
-#include <tracking/dataobjects/ExtHit.h>
-
 #include <klm/modules/KLMNNmuid/KLMNNmuidModule.h>
 
 #include <klm/dataobjects/KLMHit2d.h>
@@ -23,6 +21,8 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
+
+#include <tracking/dataobjects/ExtHit.h>
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ParticleList.h>
@@ -37,7 +37,7 @@ using namespace Belle2;
 
 REG_MODULE(KLMNNmuid);
 
-KLMNNmuidModule::KLMNNmuidModule() : Module()//, m_bklmGeoPar(nullptr)
+KLMNNmuidModule::KLMNNmuidModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Get information from KLMMuIDLikelihood)DOC");
@@ -58,8 +58,6 @@ void KLMNNmuidModule::initialize()
 
   StoreObjPtr<ParticleList>().isRequired(m_inputListName);
   m_klmHit2ds.isRequired();
-
-  m_bklmGeoPar = bklm::GeometryPar::instance();
 
   MVA::AbstractInterface::initSupportedInterfaces();
 }

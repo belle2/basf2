@@ -69,7 +69,7 @@ kFit(
     smearing=0.002,
     path=my_path)
 
-# perform MC matching (MC truth asociation)
+# perform MC matching (MC truth association)
 matchMCTruth('B0:iptube', path=my_path)
 matchMCTruth('B0:iptube20um', path=my_path)
 

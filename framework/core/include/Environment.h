@@ -194,6 +194,14 @@ namespace Belle2 {
     /** Get the basf2 execution realm. */
     LogConfig::ELogRealm getRealm() const { return m_realm; }
 
+    /**
+     * Set the flag for writing the simulation steps into an output csv file.
+     * This is useful for simulating events for the Belle II Virtual Reality application.
+     */
+    void setWriteSimSteps(const bool writeSimSteps) { m_writeSimSteps = writeSimSteps; }
+    /** Get the flag for writing the simulation steps into an output csv file. */
+    bool getWriteSimSteps() const { return m_writeSimSteps; }
+
     /** Print information on input/output files in current steering file, used by --dry-run.
      *
      *  Function only relies on information available during module construction,
@@ -388,6 +396,7 @@ namespace Belle2 {
     int m_experiment; /**< override experiment for EventInfoSetter. */
     unsigned int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
     LogConfig::ELogRealm m_realm = LogConfig::c_None; /**< The realm in which basf2 is executed. */
+    bool m_writeSimSteps; /**< bool for writing out the simulation steps into a csv file. */
 
     // ZMQ specific settings
     bool m_useZMQ = false; /**< Set to true to use ZMQ instead of RingBuffer */
@@ -397,8 +406,8 @@ namespace Belle2 {
     unsigned int m_zmqEventBufferSize = 1; /**< Number of events to keep in flight for every worker */
     unsigned int m_zmqWorkerTimeout =
       0; /**< How long should a worker maximally need to process all of his events in the queue. Set to 0 to disable the check. */
-    bool m_zmqUseEventBackup = false; /**< If a worker dies, store its events in a backup. */
-    bool m_zmqRestartFailedWorkers = false; /**< If a worker dies, restart it. */
+    bool m_zmqUseEventBackup = true; /**< If a worker dies, store its events in a backup. */
+    bool m_zmqRestartFailedWorkers = true; /**< If a worker dies, restart it. */
     bool m_zmqFailOnFailedWorkers = true; /**< If a worker dies, fail also. Will not be used if restartFailedWorkers is true. */
     bool m_zmqDAQEnvironment = false;   /**< True in DAQ environment */
     int m_zmqDAQFirstEventExp = 42; /**< Exp no. for the special first event */

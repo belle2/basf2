@@ -28,14 +28,11 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 
 /* Basf2 headers. */
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
@@ -45,7 +42,6 @@
 /* ROOT headers. */
 #include <TH2F.h>
 #include <TTree.h>
-#include <TFile.h>
 
 using namespace Belle2;
 using namespace ECL;

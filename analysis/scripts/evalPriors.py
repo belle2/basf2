@@ -140,7 +140,7 @@ class Priors:
             pdg(int) (optional): The PDG value of the particles for which prior probabilities are needed.
 
         Returns:
-            A 1D array conatining prior probabilities for required particle in case PDG value is specified;
+            A 1D array containing prior probabilities for required particle in case PDG value is specified;
             else it will return a 2D array for all particles that were used during training.
         """
         if pdg is not None:

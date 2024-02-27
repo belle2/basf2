@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -88,11 +87,11 @@ class ShapeFitterModule(b2.Module):
 
             if amp != amp2 or time != time2 or qual != qual2:
                 print()
-                print('RealData: %4d %6d %6d %6d' % (cid, amp, time, qual))
-                print('Emulator: %4d %6d %6d %6d' % (cid, amp2, time2, qual2))
+                print(f'RealData: {cid:4} {amp:6} {time:6} {qual:6}')
+                print(f'Emulator: {cid:4} {amp2:6} {time2:6} {qual2:6}')
                 if verbose:
-                    print('Event : %d Trigger time: %d' % (self.evtn, trigger_time))
-                    print('CellID: %d AmpData: %d TimeData: %d QualityData: %d' % (cid, amp, time, qual))
+                    print(f'Event : {self.eventNumber} Trigger time: {trigger_time}')
+                    print(f'CellID: {cid} AmpData: {amp} TimeData: {time} QualityData: {qual}')
                     print(' '.join([str(x) for x in adc]), end='')
                     print(' ')
 

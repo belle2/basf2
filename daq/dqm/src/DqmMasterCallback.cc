@@ -6,6 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 #include <daq/dqm/DqmMasterCallback.h>
+#include <daq/slc/system/LogFile.h>
 #include <framework/pcore/EvtMessage.h>
 #include <framework/pcore/MsgHandler.h>
 
@@ -18,7 +19,7 @@
 using namespace Belle2;
 using namespace std;
 
-static int m_running = 0;
+int DqmMasterCallback::m_running = 0; // TODO
 
 //-----------------------------------------------------------------
 // Rbuf-Read Thread Interface
@@ -30,14 +31,17 @@ void* RunDqmMasterLogger(void*)
 
 DqmMasterCallback::DqmMasterCallback(ConfigFile& config)
 {
-  m_hltdir = config.get("dqmmaster.hltdir");
-  m_erecodir = config.get("dqmmaster.erecodir");
+  m_histodir = config.get("dqmmaster.histodir");
+  m_tmpdir = config.get("dqmmaster.tmpdir");
+  m_instance = config.get("dqmmaster.instance");
+  auto host = config.get("dqmmaster.host");
+  auto port = config.getInt("dqmmaster.port");
   m_running = 0;
-  printf("DqmMasterCallback : hltdir = %s, erecodir = %s\n", m_hltdir.c_str(), m_erecodir.c_str());
+  LogFile::info("DqmMasterCallback : instance = %s, histodir = %s, tmpdir = %s", m_instance.c_str(), m_histodir.c_str(),
+                m_tmpdir.c_str());
 
-  // Open sockets to hservers
-  m_sock_hlt = new EvtSocketSend("localhost", 9991);
-  m_sock_reco = new EvtSocketSend("localhost", 9992);
+  // Open sockets to hserver
+  m_sock = new EvtSocketSend(host.c_str(), port);
 }
 
 DqmMasterCallback::~DqmMasterCallback()
@@ -48,13 +52,43 @@ DqmMasterCallback::~DqmMasterCallback()
 void DqmMasterCallback::load(const DBObject& /* obj */, const std::string& runtype)
 {
   m_runtype = runtype;
-  printf("LOAD: runtype %s\n", m_runtype.c_str());
+  LogFile::info("LOAD: runtype %s", m_runtype.c_str());
+
+  {
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_runtype";
+    // workaround until we have a better solution
+    auto fh = fopen(filename.c_str(), "wt+");
+    if (fh) {
+      fprintf(fh, "%s", m_runtype.c_str());
+      fclose(fh);
+    }
+  }
 }
 
 void DqmMasterCallback::start(int expno, int runno)
 {
   m_expno = expno;
   m_runno = runno;
+
+  // currently, we do not (yet) use exp and run nr, just add it in case it may be needed later
+  {
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_expnr";
+    // workaround until we have a better solution
+    auto fh = fopen(filename.c_str(), "wt+");
+    if (fh) {
+      fprintf(fh, "%d", m_expno);
+      fclose(fh);
+    }
+  }
+  {
+    std::string filename = m_tmpdir + "/dqm_" + m_instance + "_runnr";
+    // workaround until we have a better solution
+    auto fh = fopen(filename.c_str(), "wt+");
+    if (fh) {
+      fprintf(fh, "%d", m_runno);
+      fclose(fh);
+    }
+  }
 
   MsgHandler hdl(0);
   int numobjs = 0;
@@ -85,17 +119,20 @@ void DqmMasterCallback::start(int expno, int runno)
   (msg->header())->reserved[0] = 0;
   (msg->header())->reserved[1] = numobjs;
 
-  m_sock_hlt->send(msg);
-  m_sock_reco->send(msg);
+  while (m_sock->send(msg) < 0) {
+    LogFile::error("Connection to histogramm server is missing in START: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                   m_runtype.c_str());
+    m_sock->sock()->reconnect(10); // each one waits 5s
+  }
   delete (msg);
 
-  printf("START: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
+  LogFile::info("START: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
   m_running = 1;
 }
 
 void DqmMasterCallback::stop(void)
 {
-  printf("STOP: expno = %d, runno = %d, runtype %s\n", m_expno, m_runno, m_runtype.c_str());
+  LogFile::info("STOP: expno = %d, runno = %d, runtype %s", m_expno, m_runno, m_runtype.c_str());
 
   if (m_running == 0) return;
 
@@ -103,42 +140,30 @@ void DqmMasterCallback::stop(void)
 
   char outfile[1024];
 
-  {
-    MsgHandler hdl(0);
-    int numobjs = 0;
+  MsgHandler hdl(0);
+  int numobjs = 0;
 
-    snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/hltdqm_e%4.4dr%6.6d.root", m_hltdir.c_str(), m_expno, m_runno);
+  snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/%sdqm_e%4.4dr%6.6d.root", m_histodir.c_str(), m_instance.c_str(), m_expno,
+           m_runno);
 
-    TText rc_save(0, 0, outfile);
-    hdl.add(&rc_save, outfile);
-    numobjs++;
+  TText rc_save(0, 0, outfile);
+  hdl.add(&rc_save, outfile);
+  numobjs++;
 
-    EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
-    (msg->header())->reserved[0] = 0;
-    (msg->header())->reserved[1] = numobjs;
+  EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
+  (msg->header())->reserved[0] = 0;
+  (msg->header())->reserved[1] = numobjs;
 
-    m_sock_hlt->send(msg);
-
-    m_sock_reco->send(msg);
-    delete (msg);
+  while (m_sock->send(msg) < 0) {
+    LogFile::error("Connection closed during STOP, file not saved: expno = %d, runno = %d, runtype %s", m_expno, m_runno,
+                   m_runtype.c_str());
+    m_sock->sock()->reconnect(10); // each one waits 5s
+    // we assume that the connection was terminated by a restart of the server
+    // depending on when this happened, we may have new histograms to dump
+    // EVEN if the DQM analysis could not handle it (because after restart there is no
+    // run information.
   }
-  {
-    MsgHandler hdl(0);
-    int numobjs = 0;
-
-    snprintf(outfile, sizeof(outfile), "DQMRC:SAVE:%s/erecodqm_e%4.4dr%6.6d.root", m_erecodir.c_str(), m_expno, m_runno);
-
-    TText rc_save(0, 0, outfile);
-    hdl.add(&rc_save, outfile);
-    numobjs++;
-
-    EvtMessage* msg = hdl.encode_msg(MSG_EVENT);
-    (msg->header())->reserved[0] = 0;
-    (msg->header())->reserved[1] = numobjs;
-
-    m_sock_reco->send(msg);
-    delete (msg);
-  }
+  delete (msg);
 }
 
 void DqmMasterCallback::abort(void)

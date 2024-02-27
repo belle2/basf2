@@ -118,7 +118,7 @@ if __name__ == "__main__":
     param = json.load(f)
 
     # Prepend the svd-only in geometry GT
-    b2conditions.prepend_globaltag('svd_onlySVDinGeoConfiguration')
+    # b2conditions.prepend_globaltag('svd_onlySVDinGeoConfiguration')
 
     main = b2.create_path()
 

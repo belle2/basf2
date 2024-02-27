@@ -77,6 +77,8 @@ namespace Belle2 {
     double m_rangeLow;
     //! fit range hi edge for landau
     double m_rangeHigh;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;

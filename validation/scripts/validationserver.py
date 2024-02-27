@@ -291,6 +291,8 @@ def search_project_issues(
         search=search_term,
         state='opened',
         lazy=True,
+        scope='all',
+        get_all=True,
     )
 
     return issues
@@ -346,7 +348,7 @@ def update_linked_issues(
         with open(comparison_json_path, "w") as jsonFile:
             json.dump(comparison_json, jsonFile, indent=4)
 
-    # get list of available revision lables
+    # get list of available revision labels
     rev_list = get_json_object_list(
             validationpath.get_results_folder(cwd_folder),
             validationpath.file_name_results_json,
@@ -389,7 +391,7 @@ def upload_file_gitlab(
 def get_librarians(package: str) -> List[str]:
     """
     Function to get package librarian(s)' GitLab usernames. Temp solution
-    until the .librarians file directly provdies Gitlab usernames.
+    until the .librarians file directly provides Gitlab usernames.
 
     Return:
         list of librarians' Gitlab usernames
@@ -471,6 +473,12 @@ def parse_contact(
             match = next(
                 (line for line in id_map if email.group() in line), None
             )
+            if not match:
+                logging.error(
+                    f"No userid found for {email} in the map, could it be that "
+                    "they are (sadly) no longer in the collaboration?"
+                )
+                continue
             username = match.split(' ')[1].rstrip()
             assignees['usernames'].append(username)
         except IndexError:
@@ -521,7 +529,7 @@ def create_gitlab_issue(
     using Gitlab API.
 
     Returns:
-        created isssue id
+        created issue id
     """
 
     issue = project.issues.create({"title": title,
@@ -529,8 +537,7 @@ def create_gitlab_issue(
                                    "labels": [package, 'validation_issue']})
 
     issue_note = issue.notes.create(
-        {"body": "View the [error plot/log file]({}).".format(
-            uploaded_file["url"])}
+        {"body": f'View the [error plot/log file]({uploaded_file["url"]}).'}
     )
 
     issue.assignee_ids = assignees['gitlab_ids']
@@ -571,10 +578,8 @@ def update_gitlab_issue(
         issue_type = 'script'
     issue.notes.create(
         {
-            "body": "Related observation in validation of `{0}` package, `{1}`\
-             {4} in `{2}` build. View the [error plot/log file]({3}).".format(
-                package, name, rev_label, uploaded_file["url"], issue_type
-            )
+            "body": f'Related observation in validation of `{package}` package, `{name}`' +
+            f'{issue_type} in `{rev_label}` build. View the [error plot/log file]({uploaded_file["url"]}).'
         }
     )
 
@@ -930,13 +935,9 @@ class ValidationRoot:
             assignees = parse_contact(
                 self.contact, self.gitlab_map, file_package, self.gitlab_object
             )
-        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n\
-            Relevant {2}: {0}\n\n\
-            Revision label: {1}\n\n---".format(
-            file_name,
-            self.revision_label,
-            issue_type
-        )
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n" + \
+            f"Relevant {issue_type}: {file_name}\n\n" + \
+            f"Revision label: {self.revision_label}\n\n---"
         issue_id = create_gitlab_issue(
             title, description, uploaded_file, assignees, file_package, project
         )
@@ -1183,8 +1184,8 @@ def run_server(
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
         sys.exit(
-            "Result folder {} does not exist, run validate_basf2 first "
-            "to create validation output".format(results_folder)
+            f"Result folder {results_folder} does not exist, run validate_basf2 first " +
+            "to create validation output"
         )
 
     results_count = sum(
@@ -1296,7 +1297,7 @@ def run_server(
                 update_linked_issues(gitlab_object, cwd_folder)
                 gitlab_map = usermap_file
                 logging.info(
-                    f"{gitlab_map} will be used to assign isues."
+                    f"{gitlab_map} will be used to assign issues."
                 )
 
         cherrypy.quickstart(

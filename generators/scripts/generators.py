@@ -490,8 +490,8 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
 
     Parameters:
         path (basf2.Path): path where the generator should be added.
-        finalstate (str): ee (e+e-) or gg (gammagamma).
-        minenergy (float): minimum particle (leptons for 'ee', photons for 'gg') energy in GeV.
+        finalstate (str): ee (e+e-), mm(mu+mu-) or gg (gammagamma).
+        minenergy (float): minimum particle (leptons for 'ee' or 'mm', photons for 'gg') energy in GeV.
         minangle (float): angular range from minangle to 180-minangle for primary particles (in degrees).
         fmax (float): maximum of differential cross section weight. This parameter should be set only by experts.
         generateInECLAcceptance (bool): if True, the GeneratorPreselection module is used to select only events
@@ -504,20 +504,13 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
         b2.B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
                      'Please do not do this, unless you are extremely sure about this choice.')
 
-    if finalstate == 'ee':
-        babayaganlo.param('FinalState', 'ee')
-        babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
-        babayaganlo.param('MinEnergy', minenergy)
-        babayaganlo.param('FMax', fmax)
-
-    elif finalstate == 'gg':
-        babayaganlo.param('FinalState', 'gg')
-        babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
-        babayaganlo.param('MinEnergy', minenergy)
-        babayaganlo.param('FMax', fmax)
-
-    else:
+    if finalstate != 'ee' and finalstate != 'gg' and finalstate != 'mm':
         b2.B2FATAL(f'add_babayaganlo_generator final state not supported: {finalstate}')
+
+    babayaganlo.param('FinalState', finalstate)
+    babayaganlo.param('ScatteringAngleRange', [minangle, 180.0 - minangle])
+    babayaganlo.param('MinEnergy', minenergy)
+    babayaganlo.param('FMax', fmax)
 
     if generateInECLAcceptance:
         b2.B2INFO(f'The final state {finalstate} is preselected requiring both primary particles within the ECL acceptance.')
@@ -525,18 +518,12 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
         add_generator_preselection(path=path,
                                    emptypath=emptypath,
                                    applyInCMS=False)
-        if finalstate == 'ee':
-            b2.set_module_parameters(path=path,
-                                     name='GeneratorPreselection',
-                                     nChargedMin=2,
-                                     MinChargedTheta=12.4,
-                                     MaxChargedTheta=155.1,)
-        elif finalstate == 'gg':
-            b2.set_module_parameters(path=path,
-                                     name='GeneratorPreselection',
-                                     nPhotonMin=2,
-                                     MinPhotonTheta=12.4,
-                                     MaxPhotonTheta=155.1)
+
+        b2.set_module_parameters(path=path,
+                                 name='GeneratorPreselection',
+                                 nChargedMin=2,
+                                 MinChargedTheta=12.4,
+                                 MaxChargedTheta=155.1)
 
 
 def add_phokhara_generator(path, finalstate=''):
@@ -546,35 +533,106 @@ def add_phokhara_generator(path, finalstate=''):
 
     Parameters:
         path (basf2.Path): path where the generator should be added
-        finalstate (str): One of the possible final state "mu+mu-", "pi+pi-", "pi+pi-pi0"
+        finalstate (str): One of the following final states: "mu+mu-", "pi+pi-", "pi+pi-pi0", "pi+pi-pi+pi-" (or "2(pi+pi-)"),
+          "pi+pi-pi0pi0" or ("pi+pi-2pi0"), "pi+pi-eta", "K+K-", "K0K0bar", "ppbar", "n0n0bar" or "Lambda0Lambda0bar"
     """
 
-    phokhara = path.add_module('PhokharaInput')
-
     if finalstate == 'mu+mu-':
-        phokhara.param('FinalState', 0)
-        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
-        phokhara.param('NLO', 1)  # use full two loop corrections
-        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+        path.add_module(
+            'PhokharaInput',
+            FinalState=0,        # mu+mu-
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_mumuISR')
 
     elif finalstate == 'pi+pi-':
-        phokhara.param('FinalState', 1)
-        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
-        phokhara.param('NLO', 1)  # use full two loop corrections
-        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+        path.add_module(
+            'PhokharaInput',
+            FinalState=1,        # pi+pi-
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipiISR')
 
     elif finalstate == 'pi+pi-pi0':
-        phokhara.param('FinalState', 8)
-        phokhara.param('LO', 0)  # force ISR production, no non-radiative production
-        phokhara.param('NLO', 0)  # no two loop corrections
-        phokhara.param('QED', 0)  # use ISR only, no FSR, no interference
+        path.add_module(
+            'PhokharaInput',
+            FinalState=8,        # pi+pi-pi0
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipipi0ISR')
+
+    elif finalstate == 'pi+pi-pi+pi-' or finalstate == '2(pi+pi-)':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=3,        # 2(pi+pi-)
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipipipiISR')
+
+    elif finalstate == 'pi+pi-pi0pi0' or finalstate == 'pi+pi-2pi0':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=2,        # pi+pi-2pi0
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipipi0pi0ISR')
+
+    elif finalstate == 'pi+pi-eta':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=10,       # pi+pi-eta
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_pipietaISR')
+
+    elif finalstate == 'K+K-':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=6,        # K+K-
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_KKISR')
+
+    elif finalstate == 'K0K0bar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=7,        # K0K0bar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_K0K0barISR')
+
+    elif finalstate == 'ppbar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=4,        # ppbar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_ppbarISR')
+
+    elif finalstate == 'n0n0bar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=5,        # n0n0bar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_n0n0barISR')
+
+    elif finalstate == 'Lambda0Lambda0bar':
+        path.add_module(
+            'PhokharaInput',
+            FinalState=9,        # Lambda0Lambda0bar
+            LO=0, NLO=1, QED=0,  # use full two loop corrections
+            MinInvMassHadrons=0.,
+        ).set_name('PHOKHARA_Lambda0Lambda0barISR')
+
     else:
-        b2.B2FATAL("add_phokhara_generator final state not supported: {}".format(finalstate))
+        b2.B2FATAL(f"add_phokhara_generator final state not supported: {finalstate}")
 
 
 def add_phokhara_evtgen_combination(
         path, final_state_particles, user_decay_file,
-        beam_energy_spread=True):
+        beam_energy_spread=True, isr_events=False, min_inv_mass_vpho=0.0,
+        max_inv_mass_vpho=0.0):
     """
     Add combination of PHOKHARA and EvtGen to the path. Phokhara is
     acting as ISR generator by generating e+ e- -> mu+ mu-, the muon pair is
@@ -590,7 +648,17 @@ def add_phokhara_evtgen_combination(
             it does not depend on subsequent J/psi or eta_c decays.
         user_decay_file (str): Name of EvtGen user decay file. The initial
             particle must be the virtual photon (vpho).
-        beam_energy_spread (bool): whether beam energy spread should be simulated
+        beam_energy_spread (bool): Whether beam-energy spread should be
+            simulated
+        isr_events (bool): If true, then PHOKHARA is used with ph0 (LO in
+            basf2) = 0, i.e. generation of processes with one photon.
+        min_inv_mass_hadrons(float): Minimum invariant mass of the virtual
+            photon. This parameter is used only if isr_events is true,
+            otherwise the minimum mass is computed from the masses of
+            the final-state particles.
+        max_inv_mass_hadrons(float): Maximum invariant mass of the virtual
+            photon. This parameter is used only if isr_events is true,
+            otherwise the maximum mass is not restricted.
     """
 
     import pdg
@@ -615,7 +683,10 @@ def add_phokhara_evtgen_combination(
     phokhara.param('nMaxTrials', 25000)
 
     # Use NNLO.
-    phokhara.param('LO', 1)
+    if isr_events:
+        phokhara.param('LO', 0)
+    else:
+        phokhara.param('LO', 1)
     phokhara.param('NLO', 1)
 
     # Use ISR only.
@@ -637,17 +708,25 @@ def add_phokhara_evtgen_combination(
     # Minimal invariant mass of the muons and tagged photon combination.
     phokhara.param('MinInvMassHadronsGamma', 0.)
 
-    # Minimal squared invariant mass of muons (final state).
-    # Force application of this cut.
-    mass = 0
-    for particle in final_state_particles:
-        p = pdg.get(particle)
-        mass = mass + p.Mass()
-    phokhara.param('MinInvMassHadrons', mass * mass)
-    phokhara.param('ForceMinInvMassHadronsCut', True)
-
-    # Maximal squared invariant mass of muons (final state) (st to lagre
-    phokhara.param('MaxInvMassHadrons', 200.0)
+    if isr_events:
+        # Minimum squared invariant mass of muons (final state).
+        phokhara.param('MinInvMassHadrons',
+                       min_inv_mass_vpho * min_inv_mass_vpho)
+        # Maximum squared invariant mass of muons (final state).
+        phokhara.param('MaxInvMassHadrons',
+                       max_inv_mass_vpho * max_inv_mass_vpho)
+    else:
+        # Minimum squared invariant mass of muons (final state).
+        # Force application of this cut.
+        mass = 0
+        for particle in final_state_particles:
+            p = pdg.get(particle)
+            mass = mass + p.Mass()
+        phokhara.param('MinInvMassHadrons', mass * mass)
+        phokhara.param('ForceMinInvMassHadronsCut', True)
+        # Maximum squared invariant mass of muons (final state).
+        # It is set to a large value, resulting in unrestricted mass.
+        phokhara.param('MaxInvMassHadrons', 200.0)
 
     # Minimal photon energy.
     phokhara.param('MinEnergyGamma', 0.01)

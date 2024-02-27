@@ -85,6 +85,16 @@ namespace Belle2 {
      */
     float getNNmuProbability(const Particle* part, const KLMMuidLikelihood* klmll);
 
+    int bitCount(unsigned int n)
+    {
+      int counter = 0;
+      while (n) {
+        counter += n % 2;
+        n >>= 1;
+      }
+      return counter;
+    }
+
     /** Database identifier or file used to load the weights. */
     std::string m_identifier = "NNKLMmuonProbability";
 

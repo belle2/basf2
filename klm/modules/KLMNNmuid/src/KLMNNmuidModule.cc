@@ -134,7 +134,7 @@ void KLMNNmuidModule::event()
       m_hitpattern_hasext[layer] = 0;
     }
 
-    std::map<int, ExtHit*> ExtHitMap;
+    std::map<int, ExtHit*> ExtHitMap; // study if using klmll ext pattern would have equivalent performance.
     for (ExtHit& exthit : track->getRelationsTo<ExtHit>()) {
 
       if (exthit.getDetectorID() < 0x100) continue; // BKLM = 0x107, EKLM = 0x207

@@ -21,10 +21,11 @@
 
 #include <klm/bklm/geometry/GeometryPar.h>
 
-#include <klm/muidgnn/MuidBuilder_fixed.h>
-
-#include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <mva/interface/Expert.h>
+#include <mva/interface/Weightfile.h>
+
 
 #include <string>
 
@@ -32,38 +33,29 @@ namespace Belle2 {
   /**
    * Get information from KLMMuidLikelihood
    */
-  class KLMMuIDGetterModule : public Module {
+  class KLMNNmuidModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    KLMMuIDGetterModule();
+    KLMNNmuidModule();
 
     /**  */
     void initialize() override;
 
     /** n */
+    void beginRun() override;
+
+    /** n */
     void event() override;
 
     /** n */
-    void getStripPosition();
+    void endRun() override;
 
     /** n */
-    int GetMatchedHits(KLMHit2d& klmhit, int hit_inBKLM, const MCParticle* mcpart);
-
-    /** n */
-    void CheckMCParticle(RelationVector<KLMDigit>& digitrelations, const MCParticle* mcpart, int& matchedHits);
-
-    /** n */
-    void CheckMCParticle(KLMDigit* digit, const MCParticle* mcpart, int& matchedHits);
-
-    /** n */
-    int IterateMCMother(MCParticle* mcpart1, const MCParticle* mcpart);
-
-    /** n */
-    int HitOnTrack(KLMHit2d* klmhit, const Track* track);
+    void terminate() override;
 
     /** n */
     void getApplicationVariables(Particle* part);
@@ -71,7 +63,24 @@ namespace Belle2 {
 
   private:
 
-    std::string  m_inputListName;
+    /**
+     * Initialize mva expert, dataset and features
+     * Called every time the weightfile in the database changes in begin run
+    */
+    void init_mva(MVA::Weightfile& weightfile);
+
+    /** Database identifier or file used to load the weights. */
+    std::string m_identifier = "NNKLMmuonID";
+
+    /** Pointer to the current MVA expert. */
+    std::unique_ptr<MVA::Expert> m_expert;
+
+    /** Pointer to the current dataset. */
+    std::unique_ptr<MVA::SingleDataset> m_dataset;
+
+    std::string m_inputListName;
+
+    double m_hitChiCut;
 
     DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
@@ -79,25 +88,14 @@ namespace Belle2 {
 
     StoreArray<KLMHit2d> m_klmHit2ds;
 
-    std::unique_ptr<MuidBuilder_fixed> mubuilder;
-    std::unique_ptr<MuidBuilder_fixed> pibuilder;
-
     bklm::GeometryPar* m_bklmGeoPar;
 
-    int get_binary(int number, int position)
-    {
-      if (number & (1 << position)) {
-        return 1;
-      } else {
-        return 0;
-      }
-    }
-
-    std::vector<std::vector<float>> m_attributelist_hit;
-    std::vector<std::vector<float>> m_attributelist_ext;
-    std::vector<int> m_layerinfo_hit;
-    std::vector<int> m_layerinfo_ext;
-
+    float m_hitpattern_width[29];
+    float m_hitpattern_distance[29];
+    float m_hitpattern_steplength[29];
+    float m_hitpattern_chi2[29];
+    int m_hitpattern_nhits[29];
+    int m_hitpattern_hasext[29];
 
   };
 }

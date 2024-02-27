@@ -18,6 +18,7 @@
 #include <klm/muid/MuidElementNumbers.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMHit1d.h>
 
 #include <klm/bklm/geometry/GeometryPar.h>
 
@@ -32,14 +33,14 @@ namespace Belle2 {
   /**
    * Get information from KLMMuidLikelihood
    */
-  class KLMMuIDGetterModule : public Module {
+  class KLMHitStudyModule : public Module {
 
   public:
 
     /**
      * Constructor: Sets the description, the properties and the parameters of the module.
      */
-    KLMMuIDGetterModule();
+    KLMHitStudyModule();
 
     /**  */
     void initialize() override;
@@ -51,7 +52,7 @@ namespace Belle2 {
     void getStripPosition();
 
     /** n */
-    int GetMatchedHits(KLMHit2d& klmhit, int hit_inBKLM, const MCParticle* mcpart);
+    int GetMatchedHits(KLMHit2d* klmhit, int hit_inBKLM, const MCParticle* mcpart);
 
     /** n */
     void CheckMCParticle(RelationVector<KLMDigit>& digitrelations, const MCParticle* mcpart, int& matchedHits);
@@ -73,11 +74,14 @@ namespace Belle2 {
 
     std::string  m_inputListName;
 
+    double m_hitChiCut;
+
     DBObjPtr<KLMLikelihoodParameters> m_LikelihoodParameters;
 
     //StoreArray<KLMMuidLikelihood> m_klmMuidLikelihoods;
 
     StoreArray<KLMHit2d> m_klmHit2ds;
+    StoreArray<BKLMHit1d> m_bklmHit1ds;
 
     std::unique_ptr<MuidBuilder_fixed> mubuilder;
     std::unique_ptr<MuidBuilder_fixed> pibuilder;
@@ -97,6 +101,12 @@ namespace Belle2 {
     std::vector<std::vector<float>> m_attributelist_ext;
     std::vector<int> m_layerinfo_hit;
     std::vector<int> m_layerinfo_ext;
+    float m_hitpattern_distance[29];
+    float m_hitpattern_steplength[29];
+    float m_hitpattern_width[29];
+    float m_hitpattern_chi2[29];
+    int m_hitpattern_nhits[29];
+    int m_hitpattern_hasext[29];
 
 
   };

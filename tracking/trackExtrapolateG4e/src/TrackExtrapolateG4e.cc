@@ -210,6 +210,9 @@ void TrackExtrapolateG4e::initialize(double meanDt, double maxDt, double maxKLMT
   m_tracks.registerRelationTo(m_klmMuidLikelihoods);
   m_tracks.registerRelationTo(m_klmMuidHits);
   m_tracks.registerRelationTo(m_klmHit2ds);
+  m_tracks.registerRelationTo(m_klmHit2ds, DataStore::c_Event, DataStore::c_WriteOut, "chidimx");
+  m_tracks.registerRelationTo(m_klmHit2ds, DataStore::c_Event, DataStore::c_WriteOut, "chidimy");
+  m_tracks.registerRelationTo(m_klmHit2ds, DataStore::c_Event, DataStore::c_WriteOut, "intersectchisq");
   m_tracks.registerRelationTo(m_trackClusterSeparations);
   m_tracks.registerRelationTo(m_klmClusters);
   m_klmClusters.registerRelationTo(m_trackClusterSeparations);
@@ -1556,7 +1559,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
     }
     G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(),
                          hit->getPositionZ());
-    adjustIntersection(intersection, localVariance, hitPos, extPos0);
+    adjustIntersection(intersection, localVariance, hit, extPos0, track);
     if (intersection.chi2 >= 0.0) {
       intersection.hit = bestHit;
       hit->isOnTrack(true);
@@ -1617,7 +1620,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
     nStrips = hit->getYStripMax() - hit->getYStripMin() + 1;
     localVariance[1] *= (nStrips * nStrips); // variance inflated for multi-strip hit
     G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(), hit->getPositionZ());
-    adjustIntersection(intersection, localVariance, hitPos, intersection.position);
+    adjustIntersection(intersection, localVariance, hit, intersection.position, track);
     if (intersection.chi2 >= 0.0) {
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
@@ -1637,7 +1640,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
 }
 
 void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const double localVariance[2],
-                                             const G4ThreeVector& hitPos, const G4ThreeVector& extPos0)
+                                             const KLMHit2d* hit, const G4ThreeVector& extPos0, const Track* track)
 {
   // Use the gain matrix formalism to get the corrected track parameters.
   // R. Fruhwirth, Application of Kalman Filtering, NIM A262 (1987) 444-450
@@ -1657,6 +1660,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
 
   // In most cases, extPos0 is the same as intersection.position.  They differ only when
   // the nearest BKLM hit is in the sector adjacent to that of intersection.position.
+  const G4ThreeVector hitPos(hit->getPositionX(), hit->getPositionY(), hit->getPositionZ());
   G4ThreeVector extPos(extPos0);
   G4ThreeVector extMom(intersection.momentum);
   G4ThreeVector extDir(extMom.unit());
@@ -1720,18 +1724,40 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   // 1st dimension = nB, 2nd dimension = nC.
   G4ErrorSymMatrix correction(extCov.similarity(jacobian) + hitCov);
   // Ignore the best hit if it is too far from the extrapolated-track intersection in the hit's plane
-  if (residual[0][0] * residual[0][0] > correction[0][0] * m_MaxDistSqInVariances)
-    return;
-  if (residual[1][0] * residual[1][0] > correction[1][1] * m_MaxDistSqInVariances)
-    return;
+  //std::cout << std::endl << "new hit" << std::endl;
+  //std::cout << "hit variance " << hitCov[0][0] << ", " << hitCov[1][1] << std::endl;
+  //std::cout << "check correction variance " << correction[0][0] << ", " << correction[1][1] << std::endl;
+  float chidim0 = sqrt(residual[0][0] * residual[0][0] / correction[0][0]);
+  float chidim1 = sqrt(residual[1][0] * residual[1][0] / correction[1][1]);
+  //if (residual[0][0] * residual[0][0] > correction[0][0] * m_MaxDistSqInVariances){
+  //  //std::cout << "hit rejected in dim0 " << std::endl;
+  //  return;
+  //}
+  //if (residual[1][0] * residual[1][0] > correction[1][1] * m_MaxDistSqInVariances){
+  //  //std::cout << "hit rejected in dim1" << std::endl;
+  //  return;
+  //}
+  bool passloosecut = (chidim0 < 50 && chidim1 < 50);
+  bool passtightcut = (chidim0 * chidim0 < m_MaxDistSqInVariances && chidim1 * chidim1 < m_MaxDistSqInVariances);
+  if (!passloosecut) return;
   int fail = 0;
   correction.invert(fail);
-  if (fail != 0)
+  if (fail != 0) {
+    //std::cout << "hit rejected in correction inv 0" << std::endl;
     return;
+  }
+  if (track != nullptr) {
+    //std::cout << "dim0 chi " << chidim0 << std::endl;
+    //std::cout << "dim1 chi " << chidim1 << std::endl;
+    track->addRelationTo(hit, chidim0, "chidimx");
+    track->addRelationTo(hit, chidim1, "chidimy");
+  }
   // Matrix inversion succeeeded and is reasonable.
   // Evaluate chi-squared increment assuming that the Kalman filter
   // won't be able to adjust the extrapolated track's position (fall-back).
-  intersection.chi2 = (correction.similarityT(residual))[0][0];
+  float intersect_chi2 = -1;
+  intersect_chi2 = (correction.similarityT(residual))[0][0];
+  //std::cout << "total chi " << sqrt(intersection.chi2) << std::endl;
   // Do the Kalman filtering
   G4ErrorMatrix gain((extCov * jacobian.T()) * correction);
   G4ErrorSymMatrix HRH(correction.similarityT(jacobian));
@@ -1742,21 +1768,35 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   // Calculate the chi-squared increment using the Kalman-filtered state
   correction = hitCov - extCov.similarity(jacobian);
   correction.invert(fail);
-  if (fail != 0)
+  if (fail != 0) {
+    //std::cout << "hit rejected in correction inv 1" << std::endl;
+    if (track != nullptr) {
+      track->addRelationTo(hit, intersect_chi2, "intersectchisq");
+      //std::cout << "total chi2 " << intersect_chi2 << std::endl;
+    }
+    if (passtightcut) intersection.chi2 = intersect_chi2;
     return;
+  }
   diffPos = hitPos - extPos;
   residual[0][0] = diffPos.x() * jacobian[0][0] + diffPos.y() * jacobian[0][1] + diffPos.z() * jacobian[0][2];
   residual[1][0] = diffPos.x() * jacobian[1][0] + diffPos.y() * jacobian[1][1] + diffPos.z() * jacobian[1][2];
-  intersection.chi2 = (correction.similarityT(residual))[0][0];
-  // Update the position, momentum and covariance of the point
-  // Project the corrected extrapolation to the plane of the original
-  // extrapolation's intersection.position. (Note: intersection.position is the same as
-  // extPos0 in all cases except when nearest BKLM hit is in adjacent
-  // sector, for which extPos0 is a projected position to the hit's plane.)
-  // Also, leave the momentum magnitude unchanged.
-  intersection.position = extPos + extDir * (((intersection.position - extPos) * nA) / extDirA);
-  intersection.momentum = intersection.momentum.mag() * extMom.unit();
-  intersection.covariance = extCov;
+  intersect_chi2 = (correction.similarityT(residual))[0][0];
+  if (track != nullptr) {
+    track->addRelationTo(hit, intersect_chi2, "intersectchisq");
+    //std::cout << "total chi2 " << intersect_chi2 << std::endl;
+  }
+  if (passtightcut) {
+    intersection.chi2 = intersect_chi2;
+    // Update the position, momentum and covariance of the point
+    // Project the corrected extrapolation to the plane of the original
+    // extrapolation's intersection.position. (Note: intersection.position is the same as
+    // extPos0 in all cases except when nearest BKLM hit is in adjacent
+    // sector, for which extPos0 is a projected position to the hit's plane.)
+    // Also, leave the momentum magnitude unchanged.
+    intersection.position = extPos + extDir * (((intersection.position - extPos) * nA) / extDirA);
+    intersection.momentum = intersection.momentum.mag() * extMom.unit();
+    intersection.covariance = extCov;
+  }
 }
 
 void TrackExtrapolateG4e::finishTrack(const ExtState& extState, KLMMuidLikelihood* klmMuidLikelihood, bool isForward)

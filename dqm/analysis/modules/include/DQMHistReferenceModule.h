@@ -82,6 +82,12 @@ namespace Belle2 {
     /** Reference Histogram Root file name */
     std::string m_referenceFile;
 
+    /** Is first event in run */
+    bool m_firstInRun = true;
+
+    /** Reads reference histograms from input root file */
+    void loadReferenceHistos();
+
   };
 } // end namespace Belle2
 

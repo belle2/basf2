@@ -27,6 +27,14 @@ from a different directory.
    a test script can write a line beginning with ``TEST SKIPPED:`` followed by the
    reason for skipping on stderr and exit with a non-zero return code.
 
+.. note::
+
+   On Unix/Linux systems, exit codes are defined to be 8-bit unsigned value.  
+   Values outside the 0-255 range are truncated by taking modulo 256. If the 
+   passed code happens to be a multiple of 256, the test will be a wrongly 
+   tagged as a ``SUCCESS``. Care should be taken when directly passing return 
+   codes from other processes. 
+
 .. seealso:: `b2test_utils.skip_test`
 
 --epilog--

@@ -392,7 +392,7 @@ namespace Belle2 {
      * Returns function which returns the variable of the nth Monte Carlo daughter of the given particle.
      * First argument in the argument vector must be an integer corresponding to the nth Monte Carlo daughter.
      * As the order of the Monte Carlo daughter generally differs from the order of the reconstructed
-     * daughters, one might need to write out additional information to identify the Monte Carlo Daugther
+     * daughters, one might need to write out additional information to identify the Monte Carlo Daughter
      * particles.
      * Second argument must be a valid variable.
      * If the particle is not matched to a MC particle or does not have a nth MC daughter NaN is returned.
@@ -502,7 +502,7 @@ namespace Belle2 {
     /**
     * Returns a function which returns the value of a variable obtained combining an arbitrary subset of particles in the decay tree, passed as
     * generalized indices. daughterCombination(M, 0, 3, 4) will return the invariant mass of the system made of the first, fourth and
-    * fifth daugther of a particle.
+    * fifth daughter of a particle.
     */
     Manager::FunctionPtr daughterCombination(const std::vector<std::string>& arguments);
 

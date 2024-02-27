@@ -7,19 +7,20 @@
  **************************************************************************/
 
 #include <framework/database/Downloader.h>
-#include <framework/logging/Logger.h>
+#include <framework/core/RandomNumbers.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/EnvironmentVariables.h>
 
 #include <curl/curl.h>
 #include <TMD5.h>
-#include <TRandom.h>
 
 #include <boost/algorithm/string.hpp>
 
 #include <chrono>
-#include <memory>
+#include <functional>
+#include <limits>
 #include <thread>
 
 namespace Belle2::Conditions {
@@ -258,10 +259,12 @@ namespace Belle2::Conditions {
 
   bool Downloader::download(const std::string& url, std::ostream& buffer, bool silentOnMissing)
   {
-    //make sure we have an active curl session ...
+    // make sure we have an active curl session ...
     auto session = ensureSession();
+    // and initialize the internal random number generator
+    initializeRandomGeneratorSeed();
     B2DEBUG(37, "Download started ..." << LogVar("url", url));
-    // we might need to try a few times in case of HTTP>=500
+    // we might need to try a few times in case of HTTP error >= 300
     for (unsigned int retry{1};; ++retry) {
       //rewind the stream to the beginning
       buffer.clear();
@@ -288,22 +291,32 @@ namespace Belle2::Conditions {
         const std::string error = len ? m_session->errbuf : curl_easy_strerror(res);
         if (m_maxRetries > 0 && res == CURLE_HTTP_RETURNED_ERROR) {
           if (retry <= m_maxRetries) {
-            // we treat everything below 500 as permanent error with the request,
-            // only retry on 500.
+            // we treat everything below 300 as permanent error with the request,
+            // while if 300 or above we retry
+            // 404 corresponds to Not Found and we want to treat it differently
             long responseCode{0};
             curl_easy_getinfo(m_session->curl, CURLINFO_RESPONSE_CODE, &responseCode);
-            if (responseCode >= 500) {
+            if (responseCode >= 300 and responseCode != 404) {
               // use exponential backoff but don't restrict to exact slots like
               // Ethernet, just use a random wait time between 1s and maxDelay =
               // 2^(retry)-1 * backoffFactor
               double maxDelay = (std::pow(2, retry) - 1) * m_backoffFactor;
-              double seconds = gRandom->Uniform(1., maxDelay);
+              // This is an exception in the whole basf2: instead of relying on gRandom for getting a random number,
+              // we rely on a different random number generator, and the reason is:
+              // since the request may fail because of several reasons independent from basf2 (bad connection,
+              // faulty squid cache, etc.), we might retry a new request altering the internal state of the gRandom
+              // instance, spoiling our capability to fully reproduce our results.
+              // In this way, relying on a different generator, we are safe.
+              m_rndDistribution->param(std::uniform_real_distribution<double>::param_type(1.0, maxDelay));
+              double seconds = (*m_rndDistribution)(*m_rnd);
               B2WARNING("Could not download url, retrying ..."
                         << LogVar("url", url) << LogVar("error", error)
                         << LogVar("try", retry) << LogVar("waiting time", seconds));
               std::this_thread::sleep_for(std::chrono::milliseconds((int)(seconds * 1e3)));
               continue;
             }
+            // special treatment for 404: if silentOnMissing is true we just return false silently
+            // this is useful when checking if a file exists on the server
             if (responseCode == 404 and silentOnMissing) return false;
           }
         }
@@ -314,5 +327,15 @@ namespace Belle2::Conditions {
     // all fine
     B2DEBUG(37, "Download finished successfully." << LogVar("url", url));
     return true;
+  }
+
+  void Downloader::initializeRandomGeneratorSeed()
+  {
+    if (not m_rndIsInitialized) {
+      // We need to provide a seed for m_rnd: let's take the basf2Seed and hash it
+      auto downloaderSeed = std::hash<std::string> {}(RandomNumbers::getSeed());
+      m_rnd->seed(downloaderSeed);
+      m_rndIsInitialized = true;
+    }
   }
 } // namespace Belle2::Conditions

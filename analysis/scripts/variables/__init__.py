@@ -127,7 +127,7 @@ class PythonVariableManager:
         instance.assertValidName(variable)
 
 
-#: Allow users to easily interact with the variable mananger.
+#: Allow users to easily interact with the variable manager.
 variables = PythonVariableManager()
 
 

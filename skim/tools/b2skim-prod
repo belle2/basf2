@@ -824,6 +824,7 @@ def make_combined_steering_file(
     mc,
     LocalModule=None,
     analysis_globaltag="",
+    pid_globaltag="",
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -855,6 +856,7 @@ def make_combined_steering_file(
         hints=False,
         mdstOutput=False,
         analysis_globaltag=analysis_globaltag,
+        pid_globaltag=pid_globaltag,
         backward_compatibility=True,
     )
 
@@ -985,6 +987,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             mc=[args.mcri if args.mcri else args.mcrd],
             LocalModule=args.local_skim_script,
             analysis_globaltag=args.analysis_globaltag,
+            pid_globaltag=args.pid_globaltag,
         )
         dry_run_steering_file(SteeringFile)
 
@@ -1136,6 +1139,15 @@ def get_argument_parser():
         metavar="AnalysisGlobaltag",
         help=(
             "Analysis globaltag to be passed to the skims."
+        ),
+    )
+    parser.add_argument(
+        "--pid-globaltag",
+        default="",
+        type=str,
+        metavar="PIDGlobaltag",
+        help=(
+            "PID globaltag to be passed to the skims."
         ),
     )
     parser.add_argument(

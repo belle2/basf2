@@ -805,9 +805,13 @@ void SVDDQMExpressRecoModule::beginRun()
   TIter nextH(m_histoList);
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
-      if (((TString)obj->GetTitle()).Contains(runID) == false) {
-        ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      }
+
+      TString tmp = (TString)obj->GetTitle();
+      Int_t pos = tmp.Last('~');
+      if (pos == -1) pos = tmp.Length() + 2;
+
+      TString title = tmp(0, pos - 2);
+      ((TH1F*)obj)->SetTitle(title + runID);
       ((TH1F*)obj)->Reset();
     }
 }

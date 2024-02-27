@@ -9,15 +9,12 @@
 #pragma once
 
 #include <generators/evtgen/EvtGenInterface.h>
-
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-
 #include <framework/core/Module.h>
-
-#include <Math/Vector3D.h>
+#include <framework/dataobjects/MCInitialParticles.h>
 
 #include <string>
+#include <utility>
 
 namespace Belle2 {
 
@@ -59,10 +56,9 @@ namespace Belle2 {
     MCInitialParticles  createBeamParticle(double minMass = 0.0,
                                            double maxMass = std::numeric_limits<double>::infinity());
 
-    MCParticleGraph mpg;        /**< An instance of the MCParticle graph. */
     EvtGenInterface m_Ievtgen;  /**< An instance of the EvtGen Interface. */
-    std::string m_DECFileName;     /**<  Standard input decay file.  */
     std::string m_userDECFileName; /**<  Standard input user decay file. */
+    std::string m_DECFileName;     /**<  Standard input decay file.  */
     std::string m_parentParticle;  /**<  Standard input parent particle. */
     int m_inclusiveType;        /**< Inclusive type 0 : generic, 1 : m_inclusiveParticle inclusive, 2 : m_inclusiveParticle + c.c. inclusive */
     bool m_coherentMixing = true;        /**< Decay the B's in coherent or incoherent mode*/

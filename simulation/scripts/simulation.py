@@ -109,8 +109,6 @@ def add_simulation(
         components=None,
         bkgfiles=None,
         bkgOverlay=True,
-        StoreAllSecondaries=False,
-        SecondariesEnergyCut=1.0,
         forceSetPXDDataReduction=False,
         usePXDDataReduction=True,
         cleanupPXDDataReduction=True,
@@ -188,8 +186,6 @@ def add_simulation(
     # detector simulation
     if 'FullSim' not in path:
         g4sim = b2.register_module('FullSim')
-        g4sim.param('StoreAllSecondaries', StoreAllSecondaries)
-        g4sim.param('SecondariesEnergyCut', SecondariesEnergyCut)
         path.add_module(g4sim)
 
     check_simulation(path)

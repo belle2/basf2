@@ -13,7 +13,6 @@
 #include <klm/modules/KLMNNmuid/KLMNNmuidModule.h>
 
 #include <klm/dataobjects/KLMHit2d.h>
-#include <klm/dataobjects/KLMDigit.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/muid/MuidElementNumbers.h>

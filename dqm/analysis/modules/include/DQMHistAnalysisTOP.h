@@ -122,6 +122,11 @@ namespace Belle2 {
     void makeBGSubtractedTimimgPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
+     * Makes plots of the number of PMT hits per event
+     */
+    void makePMTHitRatesPlots();
+
+    /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
      * @param variableName variable name
      * @param histogram histogram with bins corresponding to slot numbers
@@ -234,6 +239,9 @@ namespace Belle2 {
 
     TH1F* m_junkFraction = nullptr; /**< fraction of junk hits per boardstack */
     TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of junk hits per boardstack */
+
+    std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */
+    std::vector<TCanvas*> m_c_pmtHitRates; /**< Canvases of PMT hits per event (index = slot - 1) */
 
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */

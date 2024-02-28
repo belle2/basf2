@@ -138,6 +138,18 @@ void DQMHistAnalysisTOPModule::initialize()
   m_junkFraction->SetYTitle("fraction");
   m_c_junkFraction = new TCanvas("TOP/c_junkFraction", "c_junkFraction");
 
+  for (int slot = 1; slot <= 16; slot++) {
+    string hname = "TOP/pmtHitRates_" + to_string(slot);
+    string htitle = "PMT hits per event for slot #" + to_string(slot);
+    auto* h = new TH1F(hname.c_str(), htitle.c_str(), 32, 0.5, 32.5);
+    h->SetXTitle("PMT number");
+    h->SetYTitle("Number of good hits per event");
+    m_pmtHitRates.push_back(h);
+    string cname = "TOP/c_pmtHitRates_" + to_string(slot);
+    string ctitle = "c_pmtHitRates_" + to_string(slot);
+    m_c_pmtHitRates.push_back(new TCanvas(cname.c_str(), ctitle.c_str()));
+  }
+
   m_text1 = new TPaveText(1, 435, 12, 500, "NB");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
@@ -215,6 +227,9 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
 
+  // PMT hit rates
+  makePMTHitRatesPlots();
+
   // Set Epics variables
   setEpicsVariables();
 
@@ -226,7 +241,7 @@ void DQMHistAnalysisTOPModule::endRun()
 {
   // add MiraBelle monitoring
 
-  for (auto& var : m_mirabelleVariables) {
+  for (const auto& var : m_mirabelleVariables) {
     m_monObj->setVariable(var.first, var.second);
     B2DEBUG(20, var.first << " " << var.second);
   }
@@ -585,6 +600,38 @@ void DQMHistAnalysisTOPModule::makeBGSubtractedTimimgPlot(const std::string& nam
   canvas->cd();
   h->Draw();
   canvas->Modified();
+}
+
+
+void DQMHistAnalysisTOPModule::makePMTHitRatesPlots()
+{
+  auto* h0 = (TH1F*) findHist("TOP/goodHitsPerEventAll");
+  if (not h0) return;
+  double numEvents = h0->GetEntries();
+  if (numEvents == 0) return;
+
+  int numSlots = m_pmtHitRates.size();
+  for (int slot = 1; slot <= numSlots; slot++) {
+    string name = "TOP/good_hits_xy_" + to_string(slot);
+    auto* hxy = (TH2F*) findHist(name);
+    if (not hxy) continue;
+    std::vector<double> pmts(32, 0);
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 64; col++) {
+        int pmt = col / 4 + (row / 4) * 16;
+        pmts[pmt] += hxy->GetBinContent(col + 1, row + 1);
+      }
+    }
+    auto* h = m_pmtHitRates[slot - 1];
+    for (size_t i = 0; i < pmts.size(); i++) {
+      h->SetBinContent(i + 1, pmts[i] / numEvents);
+    }
+    auto* canvas = m_c_pmtHitRates[slot - 1];
+    canvas->Clear();
+    canvas->cd();
+    h->Draw();
+    canvas->Modified();
+  }
 }
 
 

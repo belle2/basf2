@@ -305,10 +305,13 @@ void KLMReconstructorModule::reconstructBKLMHits()
       // The second param in localToGlobal is whether do the alignment correction (true) or not (false)
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
       CLHEP::Hep3Vector globalMinStrip = m->localToGlobal(localMinStrip + m->getLocalReconstructionShift(), m_bklmIfAlign);
+      //Hit width calculation
+      float phiwidth = sqrt(pow(global.x() - globalMinStrip.x(), 2) + pow(global.y() - globalMinStrip.y(), 2)) + 2;
+      float width = sqrt(pow(phiwidth, 2) + pow(fabs(global.z() - globalMinStrip.z()) + 2, 2));
       double time = 0.5 * (phiTime + zTime);
       if (m_EventT0Correction)
         time -= m_EventT0Value;
-      KLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, globalMinStrip, time); // Also sets relation KLMHit2d -> BKLMHit1d
+      KLMHit2d* hit2d = m_Hit2ds.appendNew(phiHit, zHit, global, time, width); // Also sets relation KLMHit2d -> BKLMHit1d
       if (std::fabs(time - m_PromptTime) > m_PromptWindow)
         hit2d->isOutOfTime(true);
     }
@@ -495,7 +498,9 @@ void KLMReconstructorModule::reconstructEKLMHits()
             hit2d->setEnergyDeposit((*it8)->getEnergyDeposit() +
                                     (*it9)->getEnergyDeposit());
             hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
-            hit2d->setMinStripPosition(crossPointOfMinStrip.x(), crossPointOfMinStrip.y(), crossPointOfMinStrip.z());
+            float width = sqrt(pow(fabs(crossPoint.x() - crossPointOfMinStrip.x()) + 2,
+                                   2) + pow(fabs(crossPoint.y() - crossPointOfMinStrip.y()) + 2, 2));
+            hit2d->setWidth(width);
             double timeResolution = 1.0;
             if (m_TimeResolution.isValid()) {
               timeResolution *= m_TimeResolution->getTimeResolution(

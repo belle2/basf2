@@ -58,7 +58,7 @@ namespace Belle2 {
      * Reconstructed time of the hit.
      */
     KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ,
-             const CLHEP::Hep3Vector& globalPos, const CLHEP::Hep3Vector& minStripPos, double time);
+             const CLHEP::Hep3Vector& globalPos, double time, double width);
 
     /**
      * Destructor.
@@ -320,52 +320,21 @@ namespace Belle2 {
     //void setPosition(const ROOT::Math::XYZVector& pos);
 
     /**
-     * Set minimum strip global position.
-     * @param[in] x Minimum strip x coordinate.
-     * @param[in] y Minimum strip y coordinate.
-     * @param[in] z Minimum strip z coordinate.
+     * Get hit width.
+     * @return Hit width.
      */
-    void setMinStripPosition(float x, float y, float z)
+    float getWidth() const
     {
-      m_GlobalXOfMinStrip = x;
-      m_GlobalYOfMinStrip = y;
-      m_GlobalZOfMinStrip = z;
+      return m_Width;
     }
 
     /**
-     * Get hit global position x coordinate of minimum strip.
-     * @return Minimum strip x coordinate.
+     * Set hit width.
+     * @param[in] width hit width.
      */
-    float getPositionXOfMinStrip() const
+    void setWidth(float width)
     {
-      return m_GlobalXOfMinStrip;
-    }
-
-    /**
-     * Get hit global position y coordinate of minimum strip.
-     * @return Minimum strip y coordinate.
-     */
-    float getPositionYOfMinStrip() const
-    {
-      return m_GlobalYOfMinStrip;
-    }
-
-    /**
-     * Get hit global position z coordinate of minimum strip.
-     * @return Minimum strip z coordinate.
-     */
-    float getPositionZOfMinStrip() const
-    {
-      return m_GlobalZOfMinStrip;
-    }
-
-    /**
-     * Get Minimum strip global position.
-     * @return Minimum strip coordinates.
-     */
-    ROOT::Math::XYZVector getPositionOfMinStrip() const
-    {
-      return ROOT::Math::XYZVector(m_GlobalXOfMinStrip, m_GlobalYOfMinStrip, m_GlobalZOfMinStrip);
+      m_Width = width;
     }
 
     /**
@@ -423,7 +392,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get Chi^2 of the crossing point.
+     * Get Chi^2 of the crossing point time.
      * @return Chi^2.
      */
     float getChiSq() const
@@ -432,7 +401,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set Chi^2 of the crossing point.
+     * Set Chi^2 of the crossing point time.
      * @param[in] chisq Chi^2.
      */
     void setChiSq(float chisq)
@@ -519,14 +488,8 @@ namespace Belle2 {
     /** Global position Z coordinate. */
     float m_GlobalZ = 0.0;
 
-    /** Global position X coordinate of smallest strip. */
-    float m_GlobalXOfMinStrip = 0.0;
-
-    /** Global position Y coordinate of smallest strip. */
-    float m_GlobalYOfMinStrip = 0.0;
-
-    /** Global position Z coordinate of smallest strip. */
-    float m_GlobalZOfMinStrip = 0.0;
+    /** Width of the hit. */
+    float m_Width = 0.0;
 
     /** Time of the hit. */
     float m_Time = 0.0;
@@ -539,7 +502,7 @@ namespace Belle2 {
 
     /* From EKLMHit2d. */
 
-    /** Chi^2 of the hit. */
+    /** Chi^2 of 2 1d hit time. */
     float m_ChiSq = 0.0;
 
     /* From BKLMHit2d. */

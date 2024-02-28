@@ -153,7 +153,7 @@ void KLMNNmuidModule::event()
         m_hitpattern_hasext[15 + layer - 1] = 1;
       }
 
-      int index = (1 - inBKLM) * 100 + layer; // make sure BKLM hits is in front of EKLM hits
+      int index = layer - 1 + 15 * (1 - inBKLM); // make sure BKLM hits is in front of EKLM hits
       ExtHitMap[index] = ii; // only keep the last ext hit in each layer
     }
 
@@ -168,7 +168,7 @@ void KLMNNmuidModule::event()
       unsigned long int hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
       unsigned long int hit_layer = klmhit->getLayer();
 
-      int index = (1 - hit_inBKLM) * 100 + hit_layer; // BKLM hits are in front of EKLM hits
+      int index = hit_layer - 1 + 15 * (1 - hit_inBKLM); // BKLM hits are in front of EKLM hits
       Hit2dMap.insert(std::pair<int, int> {index, ii});
     }
 
@@ -176,31 +176,14 @@ void KLMNNmuidModule::event()
     ROOT::Math::XYZVector previousPosition(0., 0., 0.);
     for (auto itermap = Hit2dMap.begin(); itermap != Hit2dMap.end(); itermap ++) {
 
+      nklmhits += 1;
+
       KLMHit2d* klmhit = KLMHit2drelation[itermap->second];
 
-      nklmhits += 1;
-      double  hit_Xposition = klmhit->getPositionX();
-      double  hit_Yposition = klmhit->getPositionY();
-      double  hit_Zposition = klmhit->getPositionZ();
-      ROOT::Math::XYZVector hitPosition = klmhit->getPosition();
-      double  hit_MinStripXposition = klmhit->getPositionXOfMinStrip();
-      double  hit_MinStripYposition = klmhit->getPositionYOfMinStrip();
-      double  hit_MinStripZposition = klmhit->getPositionZOfMinStrip();
-
-      unsigned long int hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
-      unsigned long int hit_layer = klmhit->getLayer();
-
       float KFchi2 = KLMHit2drelation.weight(itermap->second);
+      float width = klmhit->getWidth();
 
-      float width; // move the calculation to KLMReconstruction
-      if (hit_inBKLM) {
-        float phiwidth = sqrt(pow(hit_Xposition - hit_MinStripXposition, 2) + pow(hit_Yposition - hit_MinStripYposition, 2)) + 2;
-        width = sqrt(pow(phiwidth, 2) + pow(fabs(hit_Zposition - hit_MinStripZposition) + 2, 2));
-      } else {
-        width = sqrt(pow(fabs(hit_Xposition - hit_MinStripXposition) + 2, 2) + pow(fabs(hit_Yposition - hit_MinStripYposition) + 2, 2));
-      }
-      part->writeExtraInfo("Hitwidth_" + std::to_string(nklmhits - 1), width);
-
+      ROOT::Math::XYZVector hitPosition = klmhit->getPosition();
       float steplength = 0.;
       if (nklmhits > 1) {
         steplength = (hitPosition - previousPosition).R();
@@ -208,13 +191,11 @@ void KLMNNmuidModule::event()
       previousPosition = hitPosition;
 
       // hit pattern creation. All selected hits will be used
-      int hitpatternindex = hit_layer - 1 + 15 * (1 - hit_inBKLM);
+      int hitpatternindex = itermap->first;
       m_hitpattern_chi2[hitpatternindex] = KFchi2;
       m_hitpattern_steplength[hitpatternindex] = steplength;
       m_hitpattern_width[hitpatternindex] = width;
     } // loop of Hit2dMap
-
-    part->writeExtraInfo("nklmhits", nklmhits);
 
     ExtHitMap.clear();
     Hit2dMap.clear();

@@ -132,14 +132,16 @@ void KLMNNmuidModule::event()
       m_hitpattern_hasext[layer] = 0;
     }
 
-    std::map<int, ExtHit*> ExtHitMap; // study if using klmll ext pattern would have equivalent performance.
-    for (ExtHit& exthit : track->getRelationsTo<ExtHit>()) {
+    std::map<int, int> ExtHitMap;
+    RelationVector<ExtHit> ExtHitrelation = track->getRelationsTo<ExtHit>();
+    for (unsigned long int ii = 0; ii < ExtHitrelation.size(); ii++) {
+      ExtHit* exthit = ExtHitrelation[ii];
 
-      if (exthit.getDetectorID() < 0x100) continue; // BKLM = 0x107, EKLM = 0x207
+      if (exthit->getDetectorID() < 0x100) continue; // BKLM = 0x107, EKLM = 0x207
 
       int layer;
-      int inBKLM = (exthit.getDetectorID() == Const::EDetector::BKLM);
-      int copyid = exthit.getCopyID();
+      int inBKLM = (exthit->getDetectorID() == Const::EDetector::BKLM);
+      int copyid = exthit->getCopyID();
 
       int section, sector, plane, strip;
 
@@ -152,11 +154,14 @@ void KLMNNmuidModule::event()
       }
 
       int index = (1 - inBKLM) * 100 + layer; // make sure BKLM hits is in front of EKLM hits
-      ExtHitMap[index] = &exthit; // only keep the last ext hit in each layer
+      ExtHitMap[index] = ii; // only keep the last ext hit in each layer
     }
-    int nklmexthits = ExtHitMap.size();
 
     RelationVector<KLMHit2d> KLMHit2drelation = track->getRelationsTo<KLMHit2d>();
+
+    // only apply NN muonID to tracks with at least one ExtHit or one KLMHit2d in KLM.
+    if (not(ExtHitMap.size() || KLMHit2drelation.size())) continue;
+
     std::map<int, int> Hit2dMap; // arrange KLMHit2d order in layer
     for (long unsigned int ii = 0; ii < KLMHit2drelation.size(); ii++) {
       KLMHit2d* klmhit = KLMHit2drelation[ii];
@@ -168,7 +173,6 @@ void KLMNNmuidModule::event()
     }
 
     int nklmhits = 0;
-    //int nklmclusters = 0;
     float previoushitposition[3] = {0.};
     for (auto itermap = Hit2dMap.begin(); itermap != Hit2dMap.end(); itermap ++) {
 

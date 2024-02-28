@@ -80,20 +80,10 @@ namespace Belle2 {
 
     /**
      * Get the NN-based muon probability.
-     * @param[in] part  target charged particle.
+     * @param[in] track  target track.
      * @param[in] klmll  KLMMuidLikelihood object related from the target track.
      */
-    float getNNmuProbability(const Particle* part, const KLMMuidLikelihood* klmll);
-
-    int bitCount(unsigned int n)
-    {
-      int counter = 0;
-      while (n) {
-        counter += n % 2;
-        n >>= 1;
-      }
-      return counter;
-    }
+    float getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll);
 
     /** Database identifier or file used to load the weights. */
     std::string m_identifier = "NNKLMmuonProbability";
@@ -109,9 +99,6 @@ namespace Belle2 {
 
     /** Name of charged particle candidates list. */
     std::string m_inputListName;
-
-    /** KLMHit2d lists. */
-    StoreArray<KLMHit2d> m_klmHit2ds;
 
     /** Container of hit widths of one track. */
     float m_hitpattern_width[29];

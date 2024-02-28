@@ -58,7 +58,6 @@ KLMNNmuidModule::~KLMNNmuidModule()
 void KLMNNmuidModule::initialize()
 {
   StoreObjPtr<ParticleList>().isRequired(m_inputListName);
-  m_klmHit2ds.isRequired();
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
@@ -199,18 +198,19 @@ void KLMNNmuidModule::event()
     ExtHitMap.clear();
     Hit2dMap.clear();
 
-    double muprob_nn = getNNmuProbability(part, klmll);
+    double muprob_nn = getNNmuProbability(track, klmll);
     part->writeExtraInfo("muprob_nn", muprob_nn);
   } // loop of particles
 }
 
-float KLMNNmuidModule::getNNmuProbability(const Particle* part, const KLMMuidLikelihood* klmll)
+float KLMNNmuidModule::getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll)
 {
   m_dataset->m_input[0] = klmll->getChiSquared();
   m_dataset->m_input[1] = klmll->getDegreesOfFreedom();
   m_dataset->m_input[2] = klmll->getExtLayer() - klmll->getHitLayer();
   m_dataset->m_input[3] = klmll->getExtLayer();
-  m_dataset->m_input[4] = Variable::particlePt(part);
+  Const::ChargedStable type(13);
+  m_dataset->m_input[4] = track->getTrackFitResultWithClosestMass(type)->getTransverseMomentum();
 
   int MAXLAYER = 29;
 

@@ -173,7 +173,7 @@ void KLMNNmuidModule::event()
     }
 
     int nklmhits = 0;
-    float previoushitposition[3] = {0.};
+    ROOT::Math::XYZVector previousPosition(0., 0., 0.);
     for (auto itermap = Hit2dMap.begin(); itermap != Hit2dMap.end(); itermap ++) {
 
       KLMHit2d* klmhit = KLMHit2drelation[itermap->second];
@@ -182,6 +182,7 @@ void KLMNNmuidModule::event()
       double  hit_Xposition = klmhit->getPositionX();
       double  hit_Yposition = klmhit->getPositionY();
       double  hit_Zposition = klmhit->getPositionZ();
+      ROOT::Math::XYZVector hitPosition = klmhit->getPosition();
       double  hit_MinStripXposition = klmhit->getPositionXOfMinStrip();
       double  hit_MinStripYposition = klmhit->getPositionYOfMinStrip();
       double  hit_MinStripZposition = klmhit->getPositionZOfMinStrip();
@@ -200,15 +201,11 @@ void KLMNNmuidModule::event()
       }
       part->writeExtraInfo("Hitwidth_" + std::to_string(nklmhits - 1), width);
 
-      // penetration depth calculation. only the first hit on each are used
       float steplength = 0.;
-      if (nklmhits > 1) { // use vector to calculate distance
-        steplength = sqrt(pow((hit_Xposition - previoushitposition[0]), 2) + pow((hit_Yposition - previoushitposition[1]),
-                          2) + pow((hit_Zposition - previoushitposition[2]), 2));
+      if (nklmhits > 1) {
+        steplength = (hitPosition - previousPosition).R();
       }
-      previoushitposition[0] = hit_Xposition;
-      previoushitposition[1] = hit_Yposition;
-      previoushitposition[2] = hit_Zposition;
+      previousPosition = hitPosition;
 
       // hit pattern creation. All selected hits will be used
       int hitpatternindex = hit_layer - 1 + 15 * (1 - hit_inBKLM);

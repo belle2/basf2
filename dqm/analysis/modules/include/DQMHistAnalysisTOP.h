@@ -19,6 +19,7 @@
 #include <TLegend.h>
 #include <vector>
 #include <string>
+#include <map>
 
 namespace Belle2 {
   /**
@@ -221,13 +222,7 @@ namespace Belle2 {
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
 
-    TH1D* m_windowFractions = nullptr; /**< fraction of windows outside the band denoting good windows, per slot */
-    double m_totalWindowFraction = 0;  /**< total fraction of windows outside the band */
-
-    TH1D* m_photonYields = nullptr; /**< photon yields per slot (corrected for active channels) */
     TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
-
-    TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
     TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
 
     TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot */
@@ -251,6 +246,7 @@ namespace Belle2 {
     TPaveText* m_text2 = nullptr; /**< text to be written to event desynchonization monitor */
     TPaveText* m_text3 = nullptr; /**< text to be written to background rates */
 
+    std::map<std::string, double> m_mirabelleVariables; /**< variables for MiraBelle */
     MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
 
   };

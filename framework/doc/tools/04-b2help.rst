@@ -41,3 +41,27 @@ Tools which will provide you help
 
 
 .. include:: ../../../decfiles/doc/decfiles-tools.rstinclude
+
+
+.. _b2help-print-mcparticles:
+
+``b2help-print-mcparticles``: Print the MCParticles in the input mdst file
+--------------------------------------------------------------------------
+
+This command prints the MCParticles of the input mdst file and outputs an ntuple including ``__MCDecayString__``.
+Default output file name is ``ntuple.root``.
+
+You can use any of basf2's options, e.g. ``-o``, ``-n``, and ``--skip-events``.
+Specifically, ``-i`` is required to select the input mdst file.
+
+::
+
+    usage: b2help-print-mcparticles [-h] [-i INPUT]
+
+.. rubric:: Required Arguments
+
+-i INPUT, --input INPUT  input mdst file name
+
+.. rubric:: Optional Arguments
+
+-h, --help               show this help message and exit

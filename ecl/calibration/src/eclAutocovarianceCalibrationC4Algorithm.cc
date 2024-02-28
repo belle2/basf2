@@ -11,10 +11,6 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-
-#include <framework/database/DBImportObjPtr.h>
-#include <ecl/dbobjects/ECLAutoCovariance.h>
 
 /* ROOT headers. */
 #include <TFile.h>

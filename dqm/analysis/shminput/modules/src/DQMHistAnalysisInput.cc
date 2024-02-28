@@ -86,6 +86,8 @@ void DQMHistAnalysisInputModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInput: beginRun called.");
   clearHistList();
+  resetDeltaList();
+  clearCanvases();
 }
 
 void DQMHistAnalysisInputModule::event()
@@ -118,6 +120,13 @@ void DQMHistAnalysisInputModule::event()
   strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
   B2INFO("[" << mbstr << "] before input loop");
 
+  // check if histograms were updated since last DQM event (based on number of processed events)
+  if (m_nevent != getEventProcessed()) {
+    m_lastChange = std::string(mbstr);
+  }
+  // update number of processed events
+  m_nevent = getEventProcessed();
+
   while ((key = (TKey*)next())) {
     auto obj = key->ReadObj();
     if (obj == nullptr) continue; // would be strange, but better check
@@ -147,12 +156,14 @@ void DQMHistAnalysisInputModule::event()
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
-    m_expno = 22;
+    m_expno = 122;
     m_runno = 1;
-    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString()).c_str());
+    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString() + ", Last DQM event " + std::string(
+                                                  mbstr)).c_str());
   } else {
-    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated "
-                                                + mmt.AsString()).c_str());
+    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "
+                                                + m_lastChange + ", Last Updated "
+                                                + mmt.AsString() + ", Last DQM event " + std::string(mbstr)).c_str());
     m_expno = std::stoi(expno);
     m_runno = std::stoi(runno);
   }
@@ -187,15 +198,6 @@ void DQMHistAnalysisInputModule::event()
 void DQMHistAnalysisInputModule::endRun()
 {
   B2INFO("DQMHistAnalysisInput : endRun called");
-
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      (dynamic_cast<TCanvas*>(cobj))->Clear();
-    }
-  }
 }
 
 void DQMHistAnalysisInputModule::terminate()

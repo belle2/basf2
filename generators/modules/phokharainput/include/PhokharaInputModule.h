@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/phokhara/Phokhara.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -25,7 +25,7 @@ namespace Belle2 {
    * The Phokhara Generator module.
    * Generates radiative return events using the Phokhara FORTRAN generator.
    */
-  class PhokharaInputModule : public Module {
+  class PhokharaInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -39,10 +39,10 @@ namespace Belle2 {
     virtual ~PhokharaInputModule();
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each event. */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;

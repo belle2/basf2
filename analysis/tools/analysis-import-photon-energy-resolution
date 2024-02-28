@@ -73,7 +73,7 @@ def read_resolution_result(
 def read_energy_bin_resolution(
     energyBinDict: Dict[str, float], maxTheta: float, minTheta: float, maxPhi: float, minPhi: float
 ) -> Tuple[EnergyResolutionType, BinningType]:
-    # Check for avaibility of requiered result columns
+    # Check for availability of required result columns
     neededColumns = [
         "RelativeResolution",
         "RelativeResolutionUncertaintyUp",

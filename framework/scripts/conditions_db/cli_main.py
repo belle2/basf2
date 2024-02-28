@@ -87,7 +87,7 @@ from conditions_db.iov import IntervalOfValidity
 # this if pylama/pylint is used to check
 from conditions_db.cli_upload import command_upload  # noqa
 from conditions_db.cli_download import command_download, command_legacydownload  # noqa
-from conditions_db.cli_management import command_tag_merge, command_tag_runningupdate  # noqa
+from conditions_db.cli_management import command_tag_merge, command_tag_runningupdate, command_iovs, command_iovs_delete, command_iovs_copy, command_iovs_modify  # noqa
 
 
 def escape_ctrl_chars(name):
@@ -568,8 +568,18 @@ def command_diff(args, db):
         if ntags != 2:
             return 1
         print()
-        listA = [e for e in db.get_all_iovs(args.tagA, message=str(iovfilter), run_range=args.run_range) if iovfilter.check(e.name)]
-        listB = [e for e in db.get_all_iovs(args.tagB, message=str(iovfilter), run_range=args.run_range) if iovfilter.check(e.name)]
+        listA = [
+            e for e in db.get_all_iovs(
+                args.tagA,
+                message=str(iovfilter),
+                run_range=args.run_range) if iovfilter.check(
+                e.name)]
+        listB = [
+            e for e in db.get_all_iovs(
+                args.tagB,
+                message=str(iovfilter),
+                run_range=args.run_range) if iovfilter.check(
+                e.name)]
 
         B2INFO("Comparing contents ...")
         diff = difflib.SequenceMatcher(a=listA, b=listB)
@@ -674,6 +684,11 @@ def command_iov(args, db):
     # check arguments
     if not iovfilter.check_arguments():
         return 1
+
+    # Check if the globaltag exists otherwise I get the same result for an emply global tag or for a non-existing one
+    if db.get_globalTagInfo(args.tag) is None:
+        B2ERROR(f"Globaltag '{args.tag}' doesn't exist.")
+        return False
 
     run_range_str = f' valid in {tuple(args.run_range)}' if args.run_range else ''
     args.run_range = IntervalOfValidity(args.run_range) if args.run_range else None

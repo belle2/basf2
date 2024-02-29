@@ -111,7 +111,17 @@ Moreover, you can construct signal- and tag-side candidates with the following l
        )
    ma.combineAllParticles([f"{part}:Btag" for part in particle_types], "B+:Btag", path=path)
 
-   ma.reconstructDecay("Upsilon(4S):graFEI -> B+:Bsgn B-:Btag", "", path=path)
+   ma.reconstructDecay("Upsilon(4S):neutral -> B+:Bsgn B-:Btag", "", path=path)
+   ma.reconstructDecay("Upsilon(4S):charged -> B+:Bsgn B+:Btag", "", allowChargeViolation=True, path=path)
+
+   ma.copyLists(
+           "Upsilon(4S):graFEI",
+           [
+               "Upsilon(4S):neutral",
+               "Upsilon(4S):charged",
+           ],
+           path=path,
+       )
 
 The ``PART:final`` particle lists in the example are those used as input for the model.
 The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong to the signal-side, 0 for particles predicted to belong to the tag-side
@@ -228,7 +238,3 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.modules.RootSaverModule
    :members:
-
-.. automodule:: grafei.modules.IsMostLikelyTempVarsModule
-   :members:
-

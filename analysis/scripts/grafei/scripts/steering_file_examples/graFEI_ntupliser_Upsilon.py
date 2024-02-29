@@ -20,7 +20,6 @@ from pathlib import Path
 
 from grafei import GraFEIModule
 from grafei import FlagBDecayModule
-from grafei.modules.IsMostLikelyTempVarsModule import IsMostLikelyTempVars
 
 
 def _parse_args():
@@ -75,12 +74,14 @@ if __name__ == "__main__":
     #################################################################################################
     # GraFEI requirements and reconstruction
     # 1) Cuts on charged tracks and photons
-    # 2) Cut on isMostLikely with _noSVD(_noTOP) variables and custom priors
-    # 3) Keep only "good events" i.e. validTree + signal side matches chosen LCAS and mass hypotheses
+    # 2) Keep only "good events" i.e. validTree + signal side matches chosen LCAS and mass hypotheses
     #################################################################################################
 
     # 1) Cuts on charged tracks and photons
+    priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
+
     charged_cuts = [
+        f"pidIsMostLikely({','.join(str(p) for p in priors)})>0",
         "nCDCHits>20",
         "thetaInCDCAcceptance",
         "abs(dz)<1.0",
@@ -107,15 +108,6 @@ if __name__ == "__main__":
         writeOut=True,
         path=path,
     )
-
-    # 2) Cut on isMostLikely with _noSVD(_noTOP) variables and custom priors
-    # TODO: try to use NN PID when ready
-    priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
-    most_likely_module = IsMostLikelyTempVars(charged_lists, priors)
-    path.add_module(most_likely_module)
-
-    for charged_list in charged_lists:
-        ma.applyCuts(charged_list, "extraInfo(IsMostLikelyTempVars)==1", path=path)
 
     stdPhotons.stdPhotons(
         listtype="tight",
@@ -206,8 +198,20 @@ if __name__ == "__main__":
 
     # 3) Keep only "good events" i.e. validTree + signal side matches chosen LCAS and mass hypotheses
     ma.reconstructDecay(
-        "Upsilon(4S):graFEI -> B+:Bsgn B-:Btag", "", path=path
+        "Upsilon(4S):neutral -> B+:Bsgn B-:Btag", "", path=path
     )
+    ma.reconstructDecay(
+        "Upsilon(4S):charged -> B+:Bsgn B+:Btag", "", allowChargeViolation=True, path=path
+    )
+
+    ma.copyLists(
+            "Upsilon(4S):graFEI",
+            [
+                "Upsilon(4S):neutral",
+                "Upsilon(4S):charged",
+            ],
+            path=path,
+        )
 
     if store_mc_truth:
         ma.matchMCTruth("B+:Bsgn", path=path)

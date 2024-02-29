@@ -14,7 +14,6 @@ import stdPhotons
 from variables import variables as vm
 
 from grafei.modules.FlagBDecayModule import FlagBDecayModule
-from grafei.modules.IsMostLikelyTempVarsModule import IsMostLikelyTempVars
 from grafei.modules.RootSaverModule import RootSaverModule
 
 
@@ -51,7 +50,7 @@ if __name__ == '__main__':
     # Fill particle list with optimized cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
 
-    charged_cuts = ['nCDCHits>20',
+    charged_cuts = [f"pidIsMostLikely({','.join(str(p) for p in priors)})>0", 'nCDCHits>20',
                     'thetaInCDCAcceptance', 'abs(dz)<1.0',
                     'dr<0.5', 'p<5', 'pt>0.2']
 
@@ -66,12 +65,6 @@ if __name__ == '__main__':
         writeOut=True,
         path=path,
     )
-
-    most_likely_module = IsMostLikelyTempVars(charged_lists, priors)
-    path.add_module(most_likely_module)
-
-    for list in charged_lists:
-        ma.applyCuts(list, 'extraInfo(IsMostLikelyTempVars)==1', path=path)
 
     stdPhotons.stdPhotons(
         listtype='tight',

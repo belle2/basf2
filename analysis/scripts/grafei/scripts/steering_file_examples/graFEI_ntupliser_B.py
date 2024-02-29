@@ -19,12 +19,9 @@ random.seed(42)
 # ------------------------SETTINGS--------------------------------------------------------------------------
 # graFEI cuts
 priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
-# f"pidIsMostLikely({','.join(str(p) for p in priors)})" #"pidIsMostLikely()"
-most_likely_tracks = f"pidIsMostLikely({','.join(str(p) for p in priors)})"
-# most_likely_tracks = "extraInfo(pidIsMostLikelyTempVars)"
 
 cut_charged_graFEI = [
-    "mostLikelyTracks>0",
+    f"pidIsMostLikely({','.join(str(p) for p in priors)})>0",
     "nCDCHits>20",
     "thetaInCDCAcceptance",
     "abs(dz)<1.0",
@@ -89,9 +86,6 @@ ma.fillParticleList(
 ma.getBeamBackgroundProbability("gamma:all", "MC15ri", path=path)
 ma.getFakePhotonProbability("gamma:all", "MC15ri", path=path)
 
-# Alias for pidIsMostLikely depending on chosen priors
-vm.addAlias("mostLikelyTracks", most_likely_tracks)
-
 # -----------------------Signal side reconstruction------------------------------------
 
 stdK("loose", path=path)
@@ -117,7 +111,7 @@ ma.buildRestOfEvent("B0:sig", path=path)
 # Basic cuts to evaluate truth-matching on ROE
 basicMask = (
     "basicMask",
-    "mostLikelyTracks>0 and nCDCHits>0 and thetaInCDCAcceptance and abs(dz)<4 and dr<2",
+    f"pidIsMostLikely({','.join(str(p) for p in priors)})>0 and nCDCHits>0 and thetaInCDCAcceptance and abs(dz)<4 and dr<2",
     "inCDCAcceptance and clusterErrorTiming<1e6 and [clusterE1E9>0.4 or E>0.075] and [[clusterReg == 1 and E > 0.05]"
     " or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]]",
 )

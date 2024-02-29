@@ -4,10 +4,6 @@ import argparse
 import basf2 as b2
 import modularAnalysis as ma
 
-# Necessary to run argparse
-from ROOT import PyConfig
-PyConfig.IgnoreCommandLineOptions = True  # noqa
-
 from ROOT import Belle2
 
 import stdPhotons

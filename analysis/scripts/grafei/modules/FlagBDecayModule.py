@@ -7,7 +7,6 @@
 ##########################################################################
 
 import basf2 as b2
-from ROOT import Belle2
 
 
 def get_object_list(pointerVec):
@@ -20,6 +19,8 @@ def get_object_list(pointerVec):
     Returns:
         list: Output python list.
     """
+    from ROOT import Belle2
+
     objList = []
     size = (
         pointerVec.getListSize()
@@ -51,11 +52,14 @@ class FlagBDecayModule(b2.Module):
         b_parent_var='BParentGenID',
     ):
         super().__init__()
+
         self.particle_list = particle_list
         self.b_parent_var = b_parent_var
 
     def event(self):
         """"""
+        from ROOT import Belle2
+
         p_list = get_object_list(Belle2.PyStoreObj(self.particle_list).obj())
 
         particles = []

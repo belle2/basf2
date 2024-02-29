@@ -4,7 +4,6 @@
 
 import basf2 as b2
 import modularAnalysis as ma
-from ROOT import Belle2
 from variables import variables as vm
 from stdCharged import stdK, stdPi
 import random
@@ -209,7 +208,6 @@ ma.reconstructDecay("Upsilon(4S):graFEI -> B0:tag B0:sig", "", path=path)
 
 
 # ---------------- Write information to file ---------------------------
-input_file_path = Belle2.Environment.Instance().getInputFilesOverride()[0]
 
 # Variables
 default_vars = [
@@ -310,7 +308,7 @@ graFEI_vars = sorted(list(set(graFEI_vars)))
 ma.variablesToNtuple(
     "Upsilon(4S):graFEI",
     graFEI_vars,
-    filename=f'graFEI_onROE_{input_file_path[input_file_path.rfind("/")+1:]}',
+    filename='graFEI_onROE_output.root',
     treename="tree",
     path=path,
 )

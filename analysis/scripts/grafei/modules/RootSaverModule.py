@@ -6,8 +6,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import ROOT as root
-from ROOT import Belle2
 import basf2 as b2
 import numpy as np
 import copy
@@ -215,11 +213,15 @@ class RootSaverModule(b2.Module):
 
     def initialize(self):
         """"""
+        from ROOT import Belle2
+
+        from ROOT import TFile, TTree
+
         self.eventinfo = Belle2.PyStoreObj("EventMetaData")
 
         # Create the output file, fails if exists
-        self.root_outfile = root.TFile(self.output_file, "recreate")
-        self.tree = root.TTree("Tree", "tree")
+        self.root_outfile = TFile(self.output_file, "recreate")
+        self.tree = TTree("Tree", "tree")
 
         # Reader's note: Root is weird in that we fill the same object with new values and call
         # Fill(), then it copies the values into the next entry (Leaf?) of the Branch
@@ -298,8 +300,10 @@ class RootSaverModule(b2.Module):
 
     def event(self):
         """"""
+        from ROOT.Belle2 import PyStoreObj
+
         # Get the particle list (note this is a regular Particle list, not MCParticle)
-        p_list = Belle2.PyStoreObj(self.mcparticle_list)
+        p_list = PyStoreObj(self.mcparticle_list)
 
         # Event number from EventMetaData -loaded with PyStoreObj
         self.event_num[0] = self.eventinfo.getEvent()
@@ -379,7 +383,7 @@ class RootSaverModule(b2.Module):
             # mcplist contains the root particles we are to create LCAs from
             for p_list_name in self.particle_lists:
                 # Get the particle list (note this is a regular Particle list, not MCParticle)
-                p_list = Belle2.PyStoreObj(p_list_name)
+                p_list = PyStoreObj(p_list_name)
 
                 for particle in p_list.obj():
                     # Get the B parent index, set to -1 if particle has no MC match

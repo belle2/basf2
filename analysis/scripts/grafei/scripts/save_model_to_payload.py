@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from ROOT import Belle2
 import sys
 import basf2 as b2
 
@@ -17,6 +16,8 @@ class SaveModelToPayload(b2.Module):
 
     def beginRun(self):
         """"""
+        from ROOT import Belle2
+
         iov = Belle2.IntervalOfValidity.always()
 
         db = Belle2.Database.Instance()

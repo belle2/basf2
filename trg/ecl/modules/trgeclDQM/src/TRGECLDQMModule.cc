@@ -74,7 +74,7 @@ void TRGECLDQMModule::defineHisto()
   h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "[TRGECL] ECL Trigger Bit",     29, 0, 29);
   h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "[TRGECL] Energy Sum of 2 Clusters (ADC)",       300, 0, 3000);
 
-  h_nTChit_injtime->GetXaxis()->SetTitle("The number of TC hits in an event");
+  h_nTChit_injtime->GetXaxis()->SetTitle("The number of TC hits");
   h_nTChit_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
 
 

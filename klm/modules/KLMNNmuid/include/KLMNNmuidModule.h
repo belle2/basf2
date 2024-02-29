@@ -15,9 +15,10 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
-#include <klm/muid/MuidElementNumbers.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
+#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
@@ -85,6 +86,9 @@ namespace Belle2 {
      */
     float getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll);
 
+    /** Total KLM layers  */
+    static constexpr int m_TotalKLMLayers = BKLMElementNumbers::getMaximalLayerNumber() + EKLMElementNumbers::getMaximalLayerNumber();
+
     /** Database identifier or file used to load the weights. */
     std::string m_identifier = "NNKLMmuonProbability";
 
@@ -101,16 +105,16 @@ namespace Belle2 {
     std::string m_inputListName;
 
     /** Container of hit widths of one track. */
-    float m_hitpattern_width[29];
+    float m_hitpattern_width[m_TotalKLMLayers];
 
     /** Container of hit steplength of one track. */
-    float m_hitpattern_steplength[29];
+    float m_hitpattern_steplength[m_TotalKLMLayers];
 
     /** Container of hit chi2 of one track. */
-    float m_hitpattern_chi2[29];
+    float m_hitpattern_chi2[m_TotalKLMLayers];
 
     /** Container of extrapolation situation at each KLM layer of one track. */
-    int m_hitpattern_hasext[29];
+    int m_hitpattern_hasext[m_TotalKLMLayers];
 
   };
 }

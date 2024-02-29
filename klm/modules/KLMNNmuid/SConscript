@@ -10,7 +10,6 @@ env['LIBS'] = [
     'klm',
     'klm_dataobjects', 
     'klm_dbobjects', 
-    'CLHEP', 
     'mva', 
     'mva_dataobjects',
 ]

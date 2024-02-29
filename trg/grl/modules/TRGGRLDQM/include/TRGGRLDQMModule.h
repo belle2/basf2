@@ -9,10 +9,13 @@
 #ifndef TRCGRLDQMMODULE_h
 #define TRCGRLDQMMODULE_h
 
+#include <rawdata/dataobjects/RawFTSW.h>
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
 
-#include <TH1I.h>
-#include <TH1F.h>
+class TH1I;
+class TH1F;
+class TH2F;
 
 namespace Belle2 {
 
@@ -37,6 +40,8 @@ namespace Belle2 {
     virtual void terminate() override {}
     //! Define Histogram
     virtual void defineHisto() override;
+
+    StoreArray<RawFTSW> m_rawTTD;
 
   protected:
     //! TDirectory
@@ -102,6 +107,40 @@ namespace Belle2 {
     TH1F* h_map_TSF1 = nullptr;
     /** TSF3 map */
     TH1F* h_map_TSF3 = nullptr;
+
+    /** Wirecnt from TSF0 */
+    TH1F* h_wc_TSF0 = nullptr;
+    /** Wirecnt from TSF1 */
+    TH1F* h_wc_TSF1 = nullptr;
+    /** Wirecnt from TSF2 */
+    TH1F* h_wc_TSF2 = nullptr;
+    /** Wirecnt from TSF3 */
+    TH1F* h_wc_TSF3 = nullptr;
+    /** Wirecnt from TSF4 */
+    TH1F* h_wc_TSF4 = nullptr;
+    /** Wirecnt from TSF5 */
+    TH1F* h_wc_TSF5 = nullptr;
+    /** Wirecnt from TSF6 */
+    TH1F* h_wc_TSF6 = nullptr;
+    /** Wirecnt from all TSFs */
+    TH1F* h_wc_sum = nullptr;
+
+    /** 2D plot: TSF0 cnt vs. time since injection (ms) */
+    TH2F* h_wc0_injtime = nullptr;
+    /** 2D plot: TSF1 cnt vs. time since injection (ms) */
+    TH2F* h_wc1_injtime = nullptr;
+    /** 2D plot: TSF2 cnt vs. time since injection (ms) */
+    TH2F* h_wc2_injtime = nullptr;
+    /** 2D plot: TSF3 cnt vs. time since injection (ms) */
+    TH2F* h_wc3_injtime = nullptr;
+    /** 2D plot: TSF4 cnt vs. time since injection (ms) */
+    TH2F* h_wc4_injtime = nullptr;
+    /** 2D plot: TSF5 cnt vs. time since injection (ms) */
+    TH2F* h_wc5_injtime = nullptr;
+    /** 2D plot: TSF6 cnt vs. time since injection (ms) */
+    TH2F* h_wc6_injtime = nullptr;
+    /** 2D plot: all TSFs cnt vs. time since injection (ms) */
+    TH2F* h_wcsum_injtime = nullptr;
   };
 
 }

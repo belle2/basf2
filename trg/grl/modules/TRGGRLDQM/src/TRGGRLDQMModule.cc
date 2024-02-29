@@ -112,7 +112,7 @@ void TRGGRLDQMModule::defineHisto()
   h_wc_TSF5->GetXaxis()->SetTitle("Number of wires for TSF 5 input");
   h_wc_TSF6 = new TH1F("h_wirecnt_TSF6", "The wire counter from TSF 6", 301, 0, 300);
   h_wc_TSF6->GetXaxis()->SetTitle("Number of wires for TSF 6 input");
-  h_wc_sum = new TH1F("h_wirecnt_sum", "The wire counter from TSF0-6", 2001, 0, 2000);
+  h_wc_sum = new TH1F("h_wirecnt_sum", "The wire counter from TSF0-6", 3001, 0, 3000);
   h_wc_sum->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
 
   h_wc0_injtime = new TH2F("h_wirecnt0_injtime", "The wire counter from TSF 0", 101, 0, 300, 100, 0, 50);
@@ -136,7 +136,7 @@ void TRGGRLDQMModule::defineHisto()
   h_wc6_injtime = new TH2F("h_wirecnt6_injtime", "The wire counter from TSF 6", 101, 0, 300, 100, 0, 50);
   h_wc6_injtime->GetXaxis()->SetTitle("Number of wires for TSF 6 input");
   h_wc6_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
-  h_wcsum_injtime = new TH2F("h_wirecntsum_injtime", "The wire counter from TSF0-6", 201, 0, 2000, 100, 0, 50);
+  h_wcsum_injtime = new TH2F("h_wirecntsum_injtime", "The wire counter from TSF0-6", 301, 0, 3000, 100, 0, 50);
   h_wcsum_injtime->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
   h_wcsum_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
 

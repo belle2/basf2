@@ -41,8 +41,6 @@ namespace Belle2 {
     //! Define Histogram
     virtual void defineHisto() override;
 
-    StoreArray<RawFTSW> m_rawTTD;
-
   protected:
     //! TDirectory
     TDirectory* oldDir = nullptr;
@@ -141,6 +139,10 @@ namespace Belle2 {
     TH2F* h_wc6_injtime = nullptr;
     /** 2D plot: all TSFs cnt vs. time since injection (ms) */
     TH2F* h_wcsum_injtime = nullptr;
+
+    //! Array to access the FTSW information
+    StoreArray<RawFTSW> m_rawTTD;
+
   };
 
 }

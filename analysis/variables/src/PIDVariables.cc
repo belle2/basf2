@@ -12,6 +12,8 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/KLMNNLikelihood.h>
+#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 // framework aux
@@ -597,6 +599,7 @@ namespace Belle2 {
       return std::get<double>(pidFunction(part));
     }
 
+
     double muonID(const Particle* part)
     {
       static Manager::FunctionPtr pidFunction =
@@ -1060,6 +1063,14 @@ namespace Belle2 {
       return std::get<double>(func(particle));
     }
 
+    double muonNNLikelihood(const Particle* part)
+    {
+      const Track* track = part->getTrack();
+      if (!track) return Const::doubleNaN;
+      KLMNNLikelihood* klmnn = track->getRelatedTo<KLMNNLikelihood>();
+      if (!klmnn) return Const::doubleNaN;
+      return klmnn->getKLMNNLikelihood();
+    }
 
     //*************
     // B2BII
@@ -1150,6 +1161,7 @@ namespace Belle2 {
                       "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("muonID", muonID,
                       "muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
+
     REGISTER_VARIABLE("pionID", pionID,
                       "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("kaonID", kaonID,
@@ -1323,6 +1335,8 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("muonNNLikelihood", muonNNLikelihood,
+                      "muon likelihood calculated from Neural Network with KLM information (expert use only)");
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

@@ -344,6 +344,11 @@ namespace Belle2 {
     double kaonIDNN(const Particle* particle);
 
     /**
+     * @return muon likelihoood from Neural Network (expert use only)
+     */
+    double muonNNLikelihood(const Particle* part);
+
+    /**
      * Parses the detector list for the PID metafunctions.
      **/
     Const::PIDDetectorSet parseDetectors(const std::vector<std::string>& arguments);

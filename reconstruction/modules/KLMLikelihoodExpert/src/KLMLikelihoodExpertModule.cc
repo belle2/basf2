@@ -188,7 +188,7 @@ void KLMLikelihoodExpertModule::event()
     KLMNNLikelihood* klmNNLikelihood = m_klmNNLikelihoods.appendNew();
     klmNNLikelihood->setKLMNNLikelihood(muprob_nn);
     track.addRelationTo(klmNNLikelihood);
-  } // loop of particles
+  } // loop of tracks
 }
 
 float KLMLikelihoodExpertModule::getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll)

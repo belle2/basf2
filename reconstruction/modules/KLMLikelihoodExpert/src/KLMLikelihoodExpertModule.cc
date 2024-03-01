@@ -22,10 +22,9 @@
 
 #include <tracking/dataobjects/ExtHit.h>
 
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
-
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/KLMNNLikelihood.h>
+
 #include <mva/interface/Interface.h>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -40,8 +39,6 @@ KLMLikelihoodExpertModule::KLMLikelihoodExpertModule() : Module()
   setDescription(R"DOC(Get information from KLMMuIDLikelihood)DOC");
 
   // Parameter definitions
-  addParam("inputListName", m_inputListName,
-           "list of input ParticleList name", std::string(""));
   addParam("identifier", m_identifier,
            "Database identifier or file used to load the weights.",
            m_identifier);
@@ -53,7 +50,9 @@ KLMLikelihoodExpertModule::~KLMLikelihoodExpertModule()
 
 void KLMLikelihoodExpertModule::initialize()
 {
-  StoreObjPtr<ParticleList>().isRequired(m_inputListName);
+  m_tracks.isRequired();
+  m_klmNNLikelihoods.registerInDataStore();
+  m_tracks.registerRelationTo(m_klmNNLikelihoods);
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
@@ -102,18 +101,9 @@ void KLMLikelihoodExpertModule::init_mva(MVA::Weightfile& weightfile)
 
 void KLMLikelihoodExpertModule::event()
 {
+  for (Track& track : m_tracks) {
 
-  const StoreObjPtr<ParticleList> plist(m_inputListName);
-
-  const unsigned int nParticles = plist->getListSize();
-
-  for (unsigned int iPart = 0; iPart < nParticles; iPart++) {
-
-    Particle* part = plist->getParticle(iPart);
-
-    auto track = part->getTrack();
-
-    KLMMuidLikelihood* klmll = track->getRelatedTo<KLMMuidLikelihood>();
+    KLMMuidLikelihood* klmll = track.getRelatedTo<KLMMuidLikelihood>();
 
     if (!klmll) continue;
 
@@ -126,7 +116,7 @@ void KLMLikelihoodExpertModule::event()
     }
 
     std::map<int, int> ExtHitMap;
-    RelationVector<ExtHit> ExtHitrelation = track->getRelationsTo<ExtHit>();
+    RelationVector<ExtHit> ExtHitrelation = track.getRelationsTo<ExtHit>();
     for (unsigned long int ii = 0; ii < ExtHitrelation.size(); ii++) {
       ExtHit* exthit = ExtHitrelation[ii];
 
@@ -151,7 +141,7 @@ void KLMLikelihoodExpertModule::event()
       ExtHitMap[index] = ii; // only keep the last ext hit in each layer
     }
 
-    RelationVector<KLMHit2d> KLMHit2drelation = track->getRelationsTo<KLMHit2d>();
+    RelationVector<KLMHit2d> KLMHit2drelation = track.getRelationsTo<KLMHit2d>();
 
     // only apply NN muonID to tracks with at least one KLMHit2d or one ExtHit in KLM.
     if (not(ExtHitMap.size() || KLMHit2drelation.size())) continue;
@@ -194,8 +184,10 @@ void KLMLikelihoodExpertModule::event()
     ExtHitMap.clear();
     Hit2dMap.clear();
 
-    double muprob_nn = getNNmuProbability(track, klmll);
-    part->writeExtraInfo("muprob_nn", muprob_nn);
+    double muprob_nn = getNNmuProbability(&track, klmll);
+    KLMNNLikelihood* klmNNLikelihood = m_klmNNLikelihoods.appendNew();
+    klmNNLikelihood->setKLMNNLikelihood(muprob_nn);
+    track.addRelationTo(klmNNLikelihood);
   } // loop of particles
 }
 

@@ -12,8 +12,6 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <analysis/dataobjects/Particle.h>
-
 #include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/KLMHit2d.h>
@@ -21,6 +19,7 @@
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 #include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/KLMNNLikelihood.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Expert.h>
 #include <mva/interface/Weightfile.h>
@@ -73,6 +72,12 @@ namespace Belle2 {
 
   private:
 
+    // Required array for Tracks
+    StoreArray<Track> m_tracks;
+
+    // Neural Network based KLM muon likelihood
+    StoreArray<KLMNNLikelihood> m_klmNNLikelihoods;
+
     /**
      * Initialize mva expert, dataset and features
      * Called every time the weightfile in the database changes in begin run
@@ -90,7 +95,7 @@ namespace Belle2 {
     static constexpr int m_TotalKLMLayers = BKLMElementNumbers::getMaximalLayerNumber() + EKLMElementNumbers::getMaximalLayerNumber();
 
     /** Database identifier or file used to load the weights. */
-    std::string m_identifier = "NNKLMmuonProbability";
+    std::string m_identifier = "NNmuidWeightFile.root";
 
     /** Database pointer to the database representation of the weightfile. */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;

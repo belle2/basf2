@@ -12,9 +12,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
-#include <klm/dbobjects/KLMLikelihoodParameters.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
-#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 

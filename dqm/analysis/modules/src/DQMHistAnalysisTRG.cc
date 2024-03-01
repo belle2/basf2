@@ -112,7 +112,7 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 2000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
   //update PV
@@ -172,13 +172,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     B2DEBUG(1, "CDCTRG_timing_mean:" << CDCTRG_timing_mean);
     setEpicsPV("CDCTRG_timing_mean", CDCTRG_timing_mean);
   }
-  cout << "histCDCTRG = " << histCDCTRG << endl;
 
   //update TOPTRG timing
   auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", 0, true);// only if updated
-  cout << "TOPTRG_timing_mean Start 1" << endl;
   if (histTOPTRG) {
-    cout << "TOPTRG_timing_mean Start 2" << endl;
     double TOPTRG_timing_mean = 0.0;
     histTOPTRG->Draw();
     TOPTRG_timing_mean = histTOPTRG->GetMean();
@@ -206,7 +203,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
     int ECLTRG_deadch = 0;
     for (int i = 2; i <= numberOfBins; i++) {
-      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0) { ECLTRG_deadch += 1; cout << " i= " << i << " ; Y = " << hist_ECLTRG_deadch->GetBinContent(i) << endl;}
+      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0) { ECLTRG_deadch += 1; }
     }
     B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
     setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
@@ -254,18 +251,15 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   if (hist_CDCTRG_deadch) {
     hist_CDCTRG_deadch->Draw();
     int numberOfBins = hist_CDCTRG_deadch->GetNbinsX();
-    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
-    cout << "numberOfBins =" << numberOfBins << endl;
+//    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
     int CDCTRG_deadch = 0;
     for (int i = 3; i <= numberOfBins; i++) {
-      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1; cout << " i =" << i << " ;0.01* YMax = " << 0.01 * YMax; }
+      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1; }
     }
     B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
     setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);
   }
 
-//  m_canvas_KLMTRG_peak->Clear();
-//  m_canvas_KLMTRG_peak->cd(0);
 // update KLMTRG
   auto hist_KLMTRG_peak =  getDelta("TRGGRL", "h_KLML1", 0, true);// only if updated
   if (hist_KLMTRG_peak) {
@@ -296,7 +290,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     hist_hadronb2_over_bhabha_all->Draw();
     if (hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
       double hadronb2_over_bhabha_all = 0.0;
-      cout << "accept_bhabha_all!=0" << endl;
       hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
                                    hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
                                    hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
@@ -407,41 +400,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   // Tag canvas as updated ONLY if things have changed.
   UpdateCanvas(m_canvas->GetName(), hist != nullptr);
-  /*
-    UpdateCanvas(m_canvas_ECLTRG_timing_mean->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_CDCTRG_timing_mean->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_TOPTRG_timing_mean->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_ECLTRG_peak->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_CDCTRG_2D_peak->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_NN_peak->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_CDCTRG_TSF_peak->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_KLMTRG_peak->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_TOPTRG_peak->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_hadronb2_over_bhabha_all->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_mumu2trk_over_bhabha_all->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_hadronb2_over_mumu2trk->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_ECLTRG_deadch->GetName(), hist != nullptr);
-    UpdateCanvas(m_canvas_CDCTRG_deadch->GetName(), hist != nullptr);
-  */
 
   // this if left over from jsroot, may not be needed anymore (to check)
   m_canvas->Update();
-  /*
-    m_canvas_ECLTRG_timing_mean->Update();
-    m_canvas_CDCTRG_timing_mean->Update();
-    m_canvas_TOPTRG_timing_mean->Update();
-    m_canvas_ECLTRG_peak->Update();
-    m_canvas_CDCTRG_2D_peak->Update();
-    m_canvas_NN_peak->Update();
-    m_canvas_CDCTRG_TSF_peak->Update();
-    m_canvas_KLMTRG_peak->Update();
-    m_canvas_TOPTRG_peak->Update();
-    m_canvas_hadronb2_over_bhabha_all->Update();
-    m_canvas_mumu2trk_over_bhabha_all->Update();
-    m_canvas_hadronb2_over_mumu2trk->Update();
-    m_canvas_ECLTRG_deadch->Update();
-    m_canvas_CDCTRG_deadch->Update();
-  */
 
 }
 

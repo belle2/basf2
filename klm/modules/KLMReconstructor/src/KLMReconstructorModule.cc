@@ -306,7 +306,7 @@ void KLMReconstructorModule::reconstructBKLMHits()
       CLHEP::Hep3Vector global = m->localToGlobal(local + m->getLocalReconstructionShift(), m_bklmIfAlign);
       CLHEP::Hep3Vector globalMinStrip = m->localToGlobal(localMinStrip + m->getLocalReconstructionShift(), m_bklmIfAlign);
       //Hit width calculation
-      float phiwidth = str::sqrt(pow(global.x() - globalMinStrip.x(), 2) + pow(global.y() - globalMinStrip.y(), 2)) + 2;
+      float phiwidth = std::sqrt(pow(global.x() - globalMinStrip.x(), 2) + pow(global.y() - globalMinStrip.y(), 2)) + 2;
       float width = std::sqrt(pow(phiwidth, 2) + pow(fabs(global.z() - globalMinStrip.z()) + 2, 2));
       double time = 0.5 * (phiTime + zTime);
       if (m_EventT0Correction)

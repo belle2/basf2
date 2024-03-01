@@ -91,44 +91,16 @@ def convert_json_to_payload(localfile='', payload=''):
 
     from ROOT import Belle2
 
-    class ConvertJsonToPayload(b2.Module):
-        """
-        Module to convert model weight and yaml files to payload.
-        """
-
-        def __init__(self, filename, payloadname):
-            super().__init__()
-            self.filename = filename
-            self.payloadname = payloadname
-
-        def initialize(self):
-            b2.B2INFO('Creating local database...')
-
-        def beginRun(self):
-            iov = Belle2.IntervalOfValidity.always()
-
-            db = Belle2.Database.Instance()
-            db.addPayload(self.payloadname, self.filename, iov)
-
-        def terminate(self):
-            b2.B2INFO('Done!')
-
-    path = b2.create_path()
-
-    eventinfosetter = b2.register_module('EventInfoSetter')
-    eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
-    path.add_module(eventinfosetter)
-
-    modelSaver = b2.register_module(ConvertJsonToPayload(localfile, payload))
-    path.add_module(modelSaver)
-
-    b2.process(path)
+    iov = Belle2.IntervalOfValidity.always()
+    db = Belle2.Database.Instance()
+    db.addPayload(payload, localfile, iov)
 
 
 def main():
 
     parser = argparse.ArgumentParser(description="Tool recommendation information")
-    parser.add_argument("--tags", help="Filter tools by specific tags", nargs='+', default=None)
+    parser.add_argument("--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
+                        nargs='+', default=None)
     parser.add_argument("--globaltag", help="Global tag name, if one wants to check another recommendation",
                         default='user_yosato_recommendations')  # temporal
     parser.add_argument("--payload", help="Payload name, if one wants to check another recommendation",
@@ -173,6 +145,12 @@ def main():
         available_tags = get_available_tags(tools)
         for tag in available_tags:
             print(f"  - {tag}")
+
+        print("\nYou can check all information with the 'all' tag.")
+
+    elif 'all' in args.tags:
+        for tool in tools:
+            display_tool_info(tool)
 
     else:
         for tool in tools:

@@ -14,10 +14,8 @@ Get a summary of recommendations for analysis tools.
 
 import json
 import argparse
-import requests
 import sys
 
-import conditions_db
 import basf2 as b2
 
 
@@ -52,15 +50,6 @@ def load_data(filename):
         return [Tool(**tool_data) for tool_data in data]
 
 
-def load_data_url(url):
-    """
-    load a json file from url.
-    """
-    text = requests.get(url).text
-    data = json.loads(text)
-    return [Tool(**tool_data) for tool_data in data]
-
-
 def display_tool_info(tool):
     """
     display a tool's information.
@@ -72,7 +61,9 @@ def display_tool_info(tool):
     recommendation = "\n".join([f"    {key}: {value}" for key, value in tool.recommendation.items()])
     print(f"  Recommendation:\n{recommendation}")
 
-    print(f"  Snippet:\n\n{tool.snippet}")
+    if tool.snippet:
+        # print only if it is written.
+        print(f"  Snippet:\n\n{tool.snippet}")
 
     print()
 
@@ -124,17 +115,24 @@ def main():
         gt_name = args.globaltag
         payload_name = args.payload
 
-        cdb = conditions_db.ConditionsDB()
-        payload = None
-        for p in cdb.get_all_iovs(gt_name, 0, 0, f", name={payload_name}"):
-            if p.name == payload_name and (payload is None or p.revision > payload.revision):
-                payload = p
+        b2.conditions.prepend_globaltag(gt_name)
 
-        if payload is None:
-            print("Recommendation information is not found")
-            return
+        # set a temporal EventMetaData to access database
+        from ROOT import Belle2
+        Belle2.DataStore.Instance().setInitializeActive(True)
+        event_meta_data = Belle2.PyStoreObj('EventMetaData')
+        event_meta_data.registerInDataStore()
+        event_meta_data.assign(Belle2.EventMetaData(0, 0, 0), True)
+        Belle2.DataStore.Instance().setInitializeActive(False)
+
+        # if it is not found, B2ERROR is given
+        payload = Belle2.DBAccessorBase(Belle2.DBStoreEntry.c_RawFile, payload_name, True).getFilename()
+
+        if payload == "":
+            print("\nRecommendation information is not found!")
+            sys.exit(1)
         else:
-            tools = load_data_url(payload.url)
+            tools = load_data(payload)
 
     else:
         tools = load_data(args.localfile)
@@ -148,7 +146,7 @@ def main():
 
         print("\nYou can check all information with the 'all' tag.")
 
-    elif 'all' in args.tags:
+    elif "all" in args.tags:
         for tool in tools:
             display_tool_info(tool)
 

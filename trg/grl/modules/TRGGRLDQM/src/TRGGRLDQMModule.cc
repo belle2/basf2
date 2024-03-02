@@ -304,9 +304,7 @@ void TRGGRLDQMModule::event()
   }
 
   double diff;
-  for (auto& i : m_rawTTD) {
-    diff = i.GetTimeSinceLastInjection(0) / 127. / 1000.;
-  }
+  diff = m_trgTime->getTimeSinceLastInjection();
 
   int wcsum = 0, nowcnt;
 

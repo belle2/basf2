@@ -9,9 +9,9 @@
 #ifndef TRCGRLDQMMODULE_h
 #define TRCGRLDQMMODULE_h
 
-#include <rawdata/dataobjects/RawFTSW.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 class TH1I;
 class TH1F;
@@ -140,8 +140,8 @@ namespace Belle2 {
     /** 2D plot: all TSFs cnt vs. time since injection (ms) */
     TH2F* h_wcsum_injtime = nullptr;
 
-    //! Array to access the FTSW information
-    StoreArray<RawFTSW> m_rawTTD;
+    //! Array to access the event time information from the trigger and FTSW
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
 
   };
 

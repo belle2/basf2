@@ -64,8 +64,8 @@ void TRGECLDQMModule::defineHisto()
   h_TCEnergy       = new TH1D("h_TCEnergy",      "[TRGECL] TC Energy (ADC)",     100, 0, 1500);
   h_Narrow_TotalEnergy    = new TH1D("h_Narrow_TotalEnergy",   "[TRGECL] Total TC Energy (ADC)",       100, 0, 500);
   h_Narrow_TCEnergy       = new TH1D("h_Narrow_TCEnergy",      "[TRGECL] TC Energy (ADC)",     100, 0, 100);
-  h_n_TChit_event  = new TH1D("h_n_TChit_event", "[TRGECL] N(TC) ",                40, 0, 40);
-  h_nTChit_injtime = new TH2D("h_nTChit_injtime", "[TRGECL] N(TC) vs. Time since injection", 101, 0, 100, 100, 0, 50);
+  h_n_TChit_event  = new TH1D("h_n_TChit_event", "[TRGECL] N(TC) ",                50, 0, 50);
+  h_nTChit_injtime = new TH2D("h_nTChit_injtime", "[TRGECL] N(TC) vs. Time since injection", 201, 0, 200, 100, 0, 50);
   h_Cluster        = new TH1D("h_Cluster",       "[TRGECL] N(Cluster) ",           20, 0, 20);
   h_TCTiming       = new TH1D("h_TCTiming",      "[TRGECL] TC Timing  (ns)",      100, 3010, 3210);
   h_TRGTiming      = new TH1D("h_TRGTiming",     "[TRGECL] TRG Timing  (ns)",     100, 3010, 3210);

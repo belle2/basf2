@@ -92,6 +92,37 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGGRL", "h_TOPL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_peak", "TOPTRG_peak");
 
+  //ecl timing –cdc timing
+  addDeltaPar("TRGGDL", "hGDL_ns_cdcTocecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "ecltiming_cdctiming", "ecltiming_cdctiming");
+
+  //top timing – ecl timing
+  addDeltaPar("TRGGDL", "hGDL_ns_topToecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "toptiming_ecltiming", "toptiming_ecltiming");
+
+  // top timing – cdc timing
+  addDeltaPar("TRGGDL", "hGDL_ns_topTocdc_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "toptiming_cdctiming", "toptiming_cdctiming");
+
+  // gdll1-ecl timing
+  addDeltaPar("TRGGDL", "hGDL_eclTogdlL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "gdll1_ecltiming", "gdll1_ecltiming");
+
+  //gdll1-cdctiming
+  addDeltaPar("TRGGDL", "hGDL_cdcTogdlL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "gdll1_cdctiming", "gdll1_cdctiming");
+
+  //gdll1-toptiming
+  addDeltaPar("TRGGDL", "hGDL_topTogdlL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "gdll1_toptiming", "gdll1_toptiming");
+
+  //barrel klm latency
+  addDeltaPar("TRGGDL", "hGDL_itd_klm_hit_rise_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "barrel_klm_latency", "barrel_klm_latency");
+
+  //endcap klm latency
+  addDeltaPar("TRGGDL", "hGDL_itd_eklm_hit_rise_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "endcap_klm_latency", "endcap_klm_latency");
 
   //hadronb2_over_bhabha_all
   addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
@@ -282,6 +313,94 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     B2DEBUG(1, "TOPTRG_peak:" << TOPTRG_peak);
     setEpicsPV("TOPTRG_peak", TOPTRG_peak);
 
+  }
+
+// update ecltiming_cdctiming
+  auto hist_ecltiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_cdcTocecl_all", 0, true);// only if updated
+  if (hist_ecltiming_cdctiming) {
+    double ecltiming_cdctiming = 0.0;
+    hist_ecltiming_cdctiming->Draw();
+    int bin_ecltiming_cdctiming = hist_ecltiming_cdctiming->GetMaximumBin();
+    ecltiming_cdctiming = hist_ecltiming_cdctiming->GetXaxis()->GetBinCenter(bin_ecltiming_cdctiming);
+    B2DEBUG(1, "ecltiming_cdctiming:" << ecltiming_cdctiming);
+    setEpicsPV("ecltiming_cdctiming", ecltiming_cdctiming);//Peak
+  }
+
+// update toptiming_ecltiming
+  auto hist_toptiming_ecltiming =  getDelta("TRGGDL", "hGDL_ns_topToecl_all", 0, true);// only if updated
+  if (hist_toptiming_ecltiming) {
+    double toptiming_ecltiming = 0.0;
+    hist_toptiming_ecltiming->Draw();
+    int bin_toptiming_ecltiming = hist_toptiming_ecltiming->GetMaximumBin();
+    toptiming_ecltiming = hist_toptiming_ecltiming->GetXaxis()->GetBinCenter(bin_toptiming_ecltiming);
+    B2DEBUG(1, "toptiming_ecltiming:" << toptiming_ecltiming);
+    setEpicsPV("toptiming_ecltiming", toptiming_ecltiming);//Peak
+  }
+
+// update toptiming_cdctiming
+  auto hist_toptiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_topTocdc_all", 0, true);// only if updated
+  if (hist_toptiming_cdctiming) {
+    double toptiming_cdctiming = 0.0;
+    hist_toptiming_cdctiming->Draw();
+    int bin_toptiming_cdctiming = hist_toptiming_cdctiming->GetMaximumBin();
+    toptiming_cdctiming = hist_toptiming_cdctiming->GetXaxis()->GetBinCenter(bin_toptiming_cdctiming);
+    B2DEBUG(1, "toptiming_cdctiming:" << toptiming_cdctiming);
+    setEpicsPV("toptiming_cdctiming", toptiming_cdctiming);//Peak
+  }
+
+// update gdll1_ecltiming
+  auto hist_gdll1_ecltiming =  getDelta("TRGGDL", "hGDL_eclTogdlL1_all", 0, true);// only if updated
+  if (hist_gdll1_ecltiming) {
+    double gdll1_ecltiming = 0.0;
+    hist_gdll1_ecltiming->Draw();
+    int bin_gdll1_ecltiming = hist_gdll1_ecltiming->GetMaximumBin();
+    gdll1_ecltiming = hist_gdll1_ecltiming->GetXaxis()->GetBinCenter(bin_gdll1_ecltiming);
+    B2DEBUG(1, "gdll1_ecltiming:" << gdll1_ecltiming);
+    setEpicsPV("gdll1_ecltiming", gdll1_ecltiming);//Peak
+  }
+
+// update gdll1_cdctiming
+  auto hist_gdll1_cdctiming =  getDelta("TRGGDL", "hGDL_cdcTogdlL1_all", 0, true);// only if updated
+  if (hist_gdll1_cdctiming) {
+    double gdll1_cdctiming = 0.0;
+    hist_gdll1_cdctiming->Draw();
+    int bin_gdll1_cdctiming = hist_gdll1_cdctiming->GetMaximumBin();
+    gdll1_cdctiming = hist_gdll1_cdctiming->GetXaxis()->GetBinCenter(bin_gdll1_cdctiming);
+    B2DEBUG(1, "gdll1_cdctiming:" << gdll1_cdctiming);
+    setEpicsPV("gdll1_cdctiming", gdll1_cdctiming);//Peak
+  }
+
+// update gdll1_toptiming
+  auto hist_gdll1_toptiming =  getDelta("TRGGDL", "hGDL_topTogdlL1_all", 0, true);// only if updated
+  if (hist_gdll1_toptiming) {
+    double gdll1_toptiming = 0.0;
+    hist_gdll1_toptiming->Draw();
+    int bin_gdll1_toptiming = hist_gdll1_toptiming->GetMaximumBin();
+    gdll1_toptiming = hist_gdll1_toptiming->GetXaxis()->GetBinCenter(bin_gdll1_toptiming);
+    B2DEBUG(1, "gdll1_toptiming:" << gdll1_toptiming);
+    setEpicsPV("gdll1_toptiming", gdll1_toptiming);//Peak
+  }
+
+// update barrel_klm_latency
+  auto hist_barrel_klm_latency =  getDelta("TRGGDL", "hGDL_itd_klm_hit_rise_all", 0, true);// only if updated
+  if (hist_barrel_klm_latency) {
+    double barrel_klm_latency = 0.0;
+    hist_barrel_klm_latency->Draw();
+    int bin_barrel_klm_latency = hist_barrel_klm_latency->GetMaximumBin();
+    barrel_klm_latency = hist_barrel_klm_latency->GetXaxis()->GetBinCenter(bin_barrel_klm_latency);
+    B2DEBUG(1, "barrel_klm_latency:" << barrel_klm_latency);
+    setEpicsPV("barrel_klm_latency", barrel_klm_latency);//Peak
+  }
+
+// update endcap_klm_latency
+  auto hist_endcap_klm_latency =  getDelta("TRGGDL", "hGDL_itd_eklm_hit_rise_all", 0, true);// only if updated
+  if (hist_endcap_klm_latency) {
+    double endcap_klm_latency = 0.0;
+    hist_endcap_klm_latency->Draw();
+    int bin_endcap_klm_latency = hist_endcap_klm_latency->GetMaximumBin();
+    endcap_klm_latency = hist_endcap_klm_latency->GetXaxis()->GetBinCenter(bin_endcap_klm_latency);
+    B2DEBUG(1, "endcap_klm_latency:" << endcap_klm_latency);
+    setEpicsPV("endcap_klm_latency", endcap_klm_latency);//Peak
   }
 
 // update #hadronb2/#bhabha_all

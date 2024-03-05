@@ -1,6 +1,6 @@
-# EventType: 4110424000
-# Descriptor: [Y4S->pi0pi0[Y1S->mu+mu-]]
-# NickName: Y4S_pipiY1S_mumu
+# EventType: 4110420001
+# Descriptor: [Y4S->eta[Y1S->mu+mu-]]
+# NickName: Y4S_etaY1S_mumu
 # Cuts: None
 # Documentation: Upsilon(4S) decay process
 # PhysicsWG: Quarkonium
@@ -10,7 +10,7 @@
 # Date: 20240121
 
 Decay  Upsilon(4S)
-1.0    Upsilonsig  pi0  pi0  VVPIPI;
+1.0    Upsilonsig  eta   PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
 Enddecay
 
 Decay  Upsilonsig

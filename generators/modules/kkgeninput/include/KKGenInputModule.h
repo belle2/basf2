@@ -8,14 +8,13 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
+
+#include <generators/modules/GeneratorBaseModule.h>
+#include <generators/kkmc/KKGenInterface.h>
+#include <generators/utilities/InitialParticleGeneration.h>
 
 #include <string>
-
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <generators/kkmc/KKGenInterface.h>
-
-#include <generators/utilities/InitialParticleGeneration.h>
 
 namespace Belle2 {
 
@@ -23,7 +22,7 @@ namespace Belle2 {
    *  interface for KK2f MC Event Generator
    *  stores generated particles in MCParticles.
    */
-  class KKGenInputModule : public Module {
+  class KKGenInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -37,17 +36,16 @@ namespace Belle2 {
     virtual ~KKGenInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each run. */
     virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;
-
 
   protected:
 

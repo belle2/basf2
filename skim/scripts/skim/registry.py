@@ -41,6 +41,7 @@ _RegisteredSkims = [
     ("11110100", "semileptonic", "PRsemileptonicUntagged"),
     ("11130300", "leptonic", "LeptonicUntagged"),
     ("11160200", "semileptonic", "SLUntagged"),
+    # ("11130301", "leptonic", "dilepton"), transferred to TDCPV WG skim file. New skim code: 13130300
     ("11160201", "semileptonic", "B0toDstarl_Kpi_Kpipi0_Kpipipi"),
     ("11170100", "semileptonic", "BtoDl_and_ROE_e_or_mu_or_lowmult"),
     ("11180100", "fei", "feiHadronicB0"),
@@ -59,7 +60,7 @@ _RegisteredSkims = [
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
-    ("13130300", "tdcpv", "dilepton"),
+    ("13130300", "tdcpv", "TDCPV_dilepton"),
 
 
     # --- WG4: Charmed B decays ---
@@ -112,9 +113,9 @@ _RegisteredSkims = [
     ("17230300", "charm", "DstToD0Pi_D0ToRare"),  # D0 -> g g/e e/mu mu
     ("17230400", "charm", "XToDp_DpToKsHp"),  # D+ -> Ks h+
     ("17230500", "charm", "XToDp_DpToHpHmJp"),  # D+ -> h+ h- j+
+    ("17230600", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h+ j-
     ("17230700", "charm", "DstToD0Pi_D0ToGeneric"),  # D* -> D0 -> generic decays
     # Charmed baryons
-    ("17230800", "charm", "LambdacTopHpJm"),  # Lambda_c+ -> proton h+ j-
     ("17230900", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
     ("17231100", "charm", "XictoXimpippim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
@@ -134,11 +135,15 @@ _RegisteredSkims = [
     ("17240800", "charm", "EarlyData_DstToD0Pi_D0ToHpJmPi0"),
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
     ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
+    ("17232000", "charm", "DpToHpPi0"),  # D+ -> h+ pi0
+    ("17222100", "charm", "DpToKsHp"),  # D+ -> Ks pi+
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
     ("17220100", "charm", "DpToPipepem"),  # D+ -> pi+ e+ e-
     ("17220200", "charm", "DpToPipmupmum"),  # D+ -> pi+ mu+ mu-
     ("17220300", "charm", "DpToPipKpKm"),  # D+ -> pi+ K+ K-
+    ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
+    ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
 
 
     # --- WG8: Dark matter searches and tau physics ---

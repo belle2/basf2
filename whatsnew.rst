@@ -18,6 +18,7 @@ Changes since release-08
 ========================
 
 .. include:: analysis/doc/whatsnew-since/release-08-00.txt
+.. include:: skim/doc/whatsnew-since/release-08-00.txt
 
 Changes since release-07
 ========================

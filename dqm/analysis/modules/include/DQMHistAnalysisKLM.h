@@ -145,6 +145,9 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
+    /** Message Threshold for expert pots */
+    int m_MessageThreshold;
+
     /** Input parameter for minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessagesInput;
 
@@ -156,6 +159,9 @@ namespace Belle2 {
 
     /** Name of histogram directory */
     std::string m_histogramDirectoryName;
+
+    /** Prefix to account for reference file*/
+    std::string m_refHistogramDirectoryPrefix;
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;

@@ -41,7 +41,7 @@ namespace Belle2 {
         m_nThetaBins(0)
       {}; /**< Default constructor */
 
-      bool m_isEmpty; /**< * Flag to indicate whether the internal containers wwere filled. */
+      bool m_isEmpty; /**< * Flag to indicate whether the internal containers were filled. */
 
       std::set<double> m_pBinEdges; /**< Set of p bins edges. */
       std::set<double> m_thetaBinEdges; /**< Set of theta bins edges. */
@@ -78,7 +78,7 @@ namespace Belle2 {
     /**
      * Constructor from CSV file of weights.
      * NB: please ensure all numeric types are stored as double in the CSV!
-     * @param  weightsCSVFileName the path to the CSV file conatining the detector weights per std charged particle hypothesis,
+     * @param  weightsCSVFileName the path to the CSV file containing the detector weights per std charged particle hypothesis,
      * in bins of p and theta.
     */
     PIDDetectorWeights(const std::string& weightsCSVFileName)

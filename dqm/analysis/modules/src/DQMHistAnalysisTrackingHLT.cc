@@ -81,14 +81,14 @@ void DQMHistAnalysisTrackingHLTModule::initialize()
   m_monObj = getMonitoringObject("trackingHLT");
 
   // register the PVs for setting thresholds
-  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents", false);
+  registerEpicsPV("TRACKING:minNoEvents", "minNoEvents");
 
   // variables to be monitored via EPICS
-  registerEpicsPV("trackingHLT:nTracksPerEvent", "nTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent", false);
-  registerEpicsPV("trackingHLT:abortRate", "abortRate", false);
+  registerEpicsPV("trackingHLT:nTracksPerEvent", "nTracksPerEvent");
+  registerEpicsPV("trackingHLT:nVXDTracksPerEvent", "nVXDTracksPerEvent");
+  registerEpicsPV("trackingHLT:nCDCTracksPerEvent", "nCDCTracksPerEvent");
+  registerEpicsPV("trackingHLT:nVXDCDCTracksPerEvent", "nVXDCDCTracksPerEvent");
+  registerEpicsPV("trackingHLT:abortRate", "abortRate");
 
 }
 
@@ -113,12 +113,12 @@ void DQMHistAnalysisTrackingHLTModule::event()
     if (abortRate > m_failureRateThreshold)
       hasError = true;
 
+    m_cAbortRate->cd();
+    hAbort->Draw();
+
     if (nEvents < m_statThreshold) colorizeCanvas(m_cAbortRate, EStatus::c_StatusTooFew);
     else if (hasError) colorizeCanvas(m_cAbortRate, EStatus::c_StatusError);
     else colorizeCanvas(m_cAbortRate, EStatus::c_StatusGood);
-
-    m_cAbortRate->cd();
-    hAbort->Draw();
 
   } else { // histogram not found
     B2WARNING("Histogram TrackingHLTDQM/NumberTrackingErrorFlags from Tracking DQM not found!");

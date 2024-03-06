@@ -96,7 +96,12 @@ void HLTZMQ2DsModule::event()
         B2DEBUG(10, "Received run change request");
 
         m_eventMetaData.create();
-        m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+        if (m_firstEventIsSpecialMessage) {
+          m_eventMetaData->setExperiment(m_lastExperiment);
+          m_eventMetaData->setRun(m_lastRun);
+        } else {
+          m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+        }
         return;
       } else if (eventMessage->isMessage(EMessageTypes::c_terminateMessage)) {
         B2DEBUG(10, "Received termination request");
@@ -115,6 +120,7 @@ void HLTZMQ2DsModule::event()
       B2ASSERT("There is still no event meta data present!", m_eventMetaData);
       m_lastRun = m_eventMetaData->getRun();
       m_lastExperiment = m_eventMetaData->getExperiment();
+      m_firstEventIsSpecialMessage = false;
     };
 
     bool result = ZMQConnection::poll({{m_input.get(), reactToInput}}, -1);

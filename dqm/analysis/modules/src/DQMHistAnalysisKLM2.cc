@@ -26,10 +26,13 @@ REG_MODULE(DQMHistAnalysisKLM2);
 
 DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   : DQMHistAnalysisModule(),
+    m_IsNullRun{false},
     m_EklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("Module used to analyze KLM Efficiency DQM histograms (depends on tracking variables).");
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
+  addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
+           std::string("ref/KLMEfficiencyDQM"));
   addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 50000.);
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
@@ -54,9 +57,9 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_monObj = getMonitoringObject("klm");
 
   //register EPICS PVs
-  registerEpicsPV("KLMEff:nEffBKLMLayers", "nEffBKLMLayers");
-  registerEpicsPV("KLMEff:nEffEKLMLayers", "nEffEKLMLayers");
-  registerEpicsPV("KLMEff:2DEffSettings", "2DEffSettings");
+  registerEpicsPV("KLM:Eff:nEffBKLMLayers", "nEffBKLMLayers");
+  registerEpicsPV("KLM:Eff:nEffEKLMLayers", "nEffEKLMLayers");
+  registerEpicsPV("KLM:Eff:2DEffSettings", "2DEffSettings");
   updateEpicsPVs(5.0);
 
   if (m_refFileName != "") {
@@ -67,22 +70,50 @@ void DQMHistAnalysisKLM2Module::initialize()
   if (m_refFile && m_refFile->IsOpen()) {
     B2INFO("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
 
-    m_ref_efficiencies_bklm = (TH1F*)m_refFile->Get((m_histogramDirectoryName + "/eff_bklm_plane").data());
-    m_ref_efficiencies_bklm->SetLineColor(2);
-    m_ref_efficiencies_bklm->SetOption("HIST");
-    m_ref_efficiencies_bklm->SetStats(false);
+    m_ref_efficiencies_bklm = (TH1F*)m_refFile->Get((m_refHistogramDirectoryName + "/eff_bklm_plane").data());
+    if (m_ref_efficiencies_bklm != nullptr) {
+      B2INFO("DQMHistAnalysisKLM2: eff_bklm_plane histogram was found in reference");
+      m_ref_efficiencies_bklm->SetLineColor(2);
+      m_ref_efficiencies_bklm->SetOption("HIST");
+      m_ref_efficiencies_bklm->SetStats(false);
+    } else {
+      B2WARNING("DQMHistAnalysisKLM2: eff_bklm_plane histogram not found in reference");
+      m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
+                                         0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
+      for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
+        if (m_ratio) {
+          m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 1);
+        } else {
+          m_ref_efficiencies_bklm->SetBinContent(lay_id + 1, 0);
+        }
+      }
+    }
 
-    m_ref_efficiencies_eklm = (TH1F*)m_refFile->Get((m_histogramDirectoryName + "/eff_eklm_plane").data());
-    m_ref_efficiencies_eklm->SetLineColor(2);
-    m_ref_efficiencies_eklm->SetOption("HIST");
-    m_ref_efficiencies_eklm->SetStats(false);
 
+    m_ref_efficiencies_eklm = (TH1F*)m_refFile->Get((m_refHistogramDirectoryName + "/eff_eklm_plane").data());
+    if (m_ref_efficiencies_eklm != nullptr) {
+      B2INFO("DQMHistAnalysisKLM2: eff_eklm_plane histogram was found in reference");
+      m_ref_efficiencies_eklm->SetLineColor(2);
+      m_ref_efficiencies_eklm->SetOption("HIST");
+      m_ref_efficiencies_eklm->SetStats(false);
+    } else {
+      B2WARNING("DQMHistAnalysisKLM2: eff_eklm_plane histogram not found in reference");
+      m_ref_efficiencies_eklm = new TH1F("eff_eklm_plane", "Plane Efficiency in EKLM", EKLMElementNumbers::getMaximalPlaneGlobalNumber(),
+                                         0.5, 0.5 + EKLMElementNumbers::getMaximalPlaneGlobalNumber());
+      for (int lay_id = 0; lay_id < EKLMElementNumbers::getMaximalPlaneGlobalNumber(); lay_id++) {
+        if (m_ratio) {
+          m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 1);
+        } else {
+          m_ref_efficiencies_eklm->SetBinContent(lay_id + 1, 0);
+        }
+      }
+    }
   } else {
     B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
-    m_alarmThr = 0;
-    m_warnThr = 0;
+    m_alarmThr = 0.0;
+    m_warnThr = 0.5; //contigency value to still spot some problems
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
                                        0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
     for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
@@ -199,15 +230,15 @@ void DQMHistAnalysisKLM2Module::initialize()
   m_eff2d_eklm = new TH2F((m_histogramDirectoryName + "/eff2d_eklm_sector").data(), eff2d_hist_eklm_title,
                           n_sectors_eklm, 0.5, n_sectors_eklm + 0.5,
                           EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),  0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
-  m_eff2d_eklm->GetXaxis()->SetTitle("Sector");
-  m_eff2d_eklm->GetYaxis()->SetTitle("Layer");
+  m_eff2d_eklm->GetXaxis()->SetTitle("Layer");
+  m_eff2d_eklm->GetYaxis()->SetTitle("Sector");
   m_eff2d_eklm->SetStats(false);
 
   m_err_eklm = new TH2F((m_histogramDirectoryName + "/err_eklm_sector").data(), eff2d_hist_eklm_title,
                         n_sectors_eklm, 0.5, n_sectors_eklm + 0.5,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),  0.5, EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 0.5);
-  m_err_eklm->GetXaxis()->SetTitle("Sector");
-  m_err_eklm->GetYaxis()->SetTitle("Layer");
+  m_err_eklm->GetXaxis()->SetTitle("Layer");
+  m_err_eklm->GetYaxis()->SetTitle("Sector");
   m_err_eklm->SetStats(false);
 
   std::string name;
@@ -235,9 +266,8 @@ void DQMHistAnalysisKLM2Module::initialize()
 
 void DQMHistAnalysisKLM2Module::beginRun()
 {
-  m_RunType = findHist("DQMInfo/rtype");
-  m_RunTypeString = m_RunType ? m_RunType->GetTitle() : "";
-  m_IsPhysicsRun = (m_RunTypeString == "physics");
+  m_IsPhysicsRun = (getRunType() == "physics");
+  m_IsNullRun = (getRunType() == "null");
 
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
@@ -247,8 +277,8 @@ void DQMHistAnalysisKLM2Module::beginRun()
     double tempAlarm = (double) m_alarmThr;
     double tempWarn = (double) m_warnThr;
     requestLimitsFromEpicsPVs("2DEffSettings", tempAlarm, tempWarn, unused, unused);
-    m_alarmThr = (float) std::min(tempAlarm, tempWarn);
-    m_warnThr = (float) std::max(tempAlarm, tempWarn);
+    m_alarmThr = (float) std::min(tempAlarm, tempWarn); //lolo
+    m_warnThr = (float) std::max(tempAlarm, tempWarn); //low
     // EPICS should catch if this happens but just in case
     if (m_alarmThr > m_warnThr) {
       B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr is greater than warnThr...");
@@ -331,6 +361,7 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
     if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
       B2INFO("DQMHistAnalysisKLM2: Eff Delta Num/Denom Entries is " << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
+      effClone->SetLineColor(kBlackBody);
       effClone->Draw("SAME");
       canvas->Modified();
       canvas->Update();
@@ -411,6 +442,8 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float refErr;
   float maxVal = m_max;
   float minVal = m_min;
+  float alarmThr = m_alarmThr;
+  float warnThr = m_warnThr;
   float eff2dVal;
   bool setAlarm = false;
   bool setWarn = false;
@@ -430,21 +463,21 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         refErr = 0.;
       }
 
-      if ((mainEff == 0) and (refEff == 0)) {
+      if ((mainEff == 0.) and (refEff == 0.)) {
         // empty histograms, draw blank bin
-        eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
-      } else if (refEff == 0) {
+        eff2dHist->SetBinContent(binx + 1, biny + 1, 0.);
+      } else if ((refEff == 0.) and (ratioPlot)) {
         // no reference, set maximum value
         eff2dHist->SetBinContent(binx + 1, biny + 1, maxVal);
-      } else if (mainEff == 0) {
+      } else if (mainEff == 0.) {
         // no data, set zero
-        eff2dHist->SetBinContent(binx + 1, biny + 1, 0);
-        errHist->SetBinContent(binx + 1, biny + 1, 0);
+        eff2dHist->SetBinContent(binx + 1, biny + 1, 0.);
+        errHist->SetBinContent(binx + 1, biny + 1, 0.);
       } else {
 
         if (ratioPlot) {
           eff2dVal = mainEff / refEff;
-          if (eff2dVal < m_alarmThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
+          if (eff2dVal < alarmThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
         } else {
           eff2dVal = (mainEff - refEff) / pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
         }
@@ -462,26 +495,26 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         }
 
         // set alarm
-        if (eff2dVal < m_warnThr) {
+        if (eff2dVal < warnThr) {
           *pvcount += 1;
         }
-        if (eff2dVal < m_alarmThr) {
+        if (eff2dVal < alarmThr) {
           setAlarm = true;
         }
 
       }
 
       i++;
-    }//end of layer loop
+    }//end of bin y
 
-  }//end of sector loop
+  }//end of bin x
 
   if (*pvcount > (int) layerLimit) {
     setWarn = true;
   }
 
-  eff2dHist->SetMinimum(m_min);
-  eff2dHist->SetMaximum(m_max);
+  eff2dHist->SetMinimum(minVal);
+  eff2dHist->SetMaximum(maxVal);
 
   eff2dCanv->cd();
   eff2dHist->Draw("COLZ");
@@ -490,8 +523,9 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
     colorizeCanvas(eff2dCanv, c_StatusError);
   } else if (setWarn) {
     colorizeCanvas(eff2dCanv, c_StatusWarning);
-  } else
+  } else {
     colorizeCanvas(eff2dCanv, c_StatusGood);
+  }
   eff2dCanv->Modified();
   eff2dCanv->Update();
 }
@@ -557,10 +591,27 @@ void DQMHistAnalysisKLM2Module::event()
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
                         m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
-  B2DEBUG(20, "Updating EPICS PVs in DQMHistAnalysisKLM2");
-  double procesedEvents = DQMHistAnalysisModule::getEventProcessed();
-  if (procesedEvents > m_minEvents) {
-    setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
-    setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+  B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs");
+  // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM2: Null run detected. No PV Update.");
+    return;
   }
+  auto* daqDataSize = findHist("DAQ/KLMDataSize");
+  double meanDAQDataSize = 0.;
+  if (daqDataSize != nullptr) {
+    meanDAQDataSize = daqDataSize->GetMean();
+    B2INFO("DAQ/KLMDataSize's mean is " << meanDAQDataSize);
+  } else
+    B2WARNING("DQMHistAnalysisKLM2: Cannot find KLMDataSize");
+  if ((daqDataSize != nullptr) and (meanDAQDataSize != 0.)) {
+    int procesedEvents = DQMHistAnalysisModule::getEventProcessed();
+    if (procesedEvents > (int)m_minEvents) {
+      setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
+      setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+    }
+  } else
+    B2INFO("DQMHistAnalysisKLM2: KLM Not included. No PV Update. ");
+
 }

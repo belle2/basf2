@@ -6,11 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <math.h>
-#include <algorithm>
-#include "TMath.h"
-
+/* Own header. */
 #include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
+
+/* ROOT headers. */
+#include <TMath.h>
+
+/* C++ headers. */
+#include <algorithm>
 
 using namespace Belle2;
 

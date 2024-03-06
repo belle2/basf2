@@ -22,7 +22,7 @@ from skim import BaseSkim, fancy_skim_header
 from skim.utils.misc import _sphinxify_decay
 from variables import variables as vm
 
-__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

@@ -470,6 +470,7 @@ class MakePlots(basf2.Module):
         trk2d_omega = "TRGCDC2DFinderTracks.m_omega"
         trk2d_phi = "TRGCDC2DFinderTracks.m_phi0"
 
+        ROOT.gROOT.SetBatch(True)
         ROOT.gStyle.SetOptStat(ROOT.kFALSE)
 
         #: validation histogram
@@ -477,7 +478,8 @@ class MakePlots(basf2.Module):
         self.hist_inbit = TH1F("hin", "trigger input bits", n_inbit_test, 0, n_inbit_test)
         self.hist_inbit.GetXaxis().SetRangeUser(0, n_inbit_test)
         self.hist_inbit.GetXaxis().SetLabelSize(0.04)
-        self.set_descr_shifter(self.hist_inbit, "trigger input bits for shifters", "")
+        self.set_descr_shifter(self.hist_inbit, "trigger input bits for shifter",
+                               "Efficiency should not drop significantly for any trigger bit")
         self.set_style(self.hist_inbit, "", "Efficiency")
 
         #: validation histogram
@@ -485,7 +487,10 @@ class MakePlots(basf2.Module):
         self.hist_outbit = TH1F("hout", "trigger output bits", n_oubit_test, 0, n_oubit_test)
         self.hist_outbit.GetXaxis().SetRangeUser(0, n_oubit_test)
         self.hist_outbit.GetXaxis().SetLabelSize(0.04)
-        self.set_descr_shifter(self.hist_outbit, "trigger ftdl bits for shifters", "")
+        self.set_descr_shifter(
+            self.hist_outbit,
+            "trigger ftdl bits for shifter",
+            "Efficiency should not drop significantly. For some output bits the efficiency is very low, close to zero.")
         self.set_style(self.hist_outbit, "", "Efficiency")
 
         for i in range(n_inbit_test):
@@ -496,28 +501,28 @@ class MakePlots(basf2.Module):
                  self.hist_outbit.GetXaxis().FindBin(i + 0.5), outputBits[i])
 
         #: validation histogram
-        self.h_E_ECL = TH1F("h_E_ECL", "ECL cluster energy [50 MeV]", 200, 0, 10)
-        self.set_descr_shifter(self.h_E_ECL, "TRG ECL cluster energy", "")
+        self.h_E_ECL = TH1F("h_E_ECL", "ECL cluster energy [50 MeV]", 100, 0, 5)
+        self.set_descr_shifter(self.h_E_ECL, "TRG ECL cluster energy", "Exponentially falling distribution")
         self.set_style(self.h_E_ECL, "ECL cluster energy (GeV)", "Events/(50 MeV)")
 
         #: validation histogram
-        self.h_Esum_ECL = TH1F("h_Esum_ECL", "sum of ECL cluster energy [50 MeV]", 200, 0, 10)
-        self.set_descr_shifter(self.h_Esum_ECL, "sum of TRG ECL cluster energy", "")
+        self.h_Esum_ECL = TH1F("h_Esum_ECL", "sum of ECL cluster energy [50 MeV]", 100, 0, 5)
+        self.set_descr_shifter(self.h_Esum_ECL, "sum of TRG ECL cluster energy", "Peak at 200 MeV with tail")
         self.set_style(self.h_Esum_ECL, "sum of ECL cluster energy (GeV)", "Events/(50 MeV)")
 
         #: validation histogram
         self.h_theta_ECL = TH1F("h_theta_ECL", "TRG ECL cluster #theta [1.4 degrees]", 128, 0, 180)
-        self.set_descr_shifter(self.h_theta_ECL, "TRG ECL cluster polar angle", "unform in barrel")
+        self.set_descr_shifter(self.h_theta_ECL, "TRG ECL cluster polar angle", "uniform in barrel")
         self.set_style(self.h_theta_ECL, "TRG ECL cluster polar angle (degree)", "Events/(1.4 degree)")
 
         #: validation histogram
         self.h_thetaID_ECL = TH1F("h_thetaID_ECL", "ECL cluster TC ID", 610, 0, 610)
-        self.set_descr_shifter(self.h_thetaID_ECL, "TRG ECL cluster theta ID", "unform in barrel")
+        self.set_descr_shifter(self.h_thetaID_ECL, "TRG ECL cluster theta ID", "uniform in barrel")
         self.set_style(self.h_thetaID_ECL, "ECL cluster TC ID", "Events/(1)")
 
         #: validation histogram
         self.h_phi_ECL = TH1F("h_phi_ECL", "TRG ECL cluster phi [2.0 degrees]", 180, -180, 180)
-        self.set_descr_shifter(self.h_phi_ECL, "TRG ECL cluster phi distribution", "distribute unformly")
+        self.set_descr_shifter(self.h_phi_ECL, "TRG ECL cluster phi distribution", "distribute uniformly")
         self.set_style(self.h_phi_ECL, "ECL cluster #phi (degree) ", "Events/(2.0 degrees)")
 
         #: validation histogram
@@ -707,25 +712,26 @@ class MakePlots(basf2.Module):
 
             h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
             self.set_style(h_eff_p, "Momentum", "Efficiency")
-            if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
-                self.set_descr_shifter(h_eff_p, "Momentum dependent efficiency for shifters", "")
-            else:
-                self.set_descr_expert(h_eff_p, "Momentum dependent efficiency for shifters", "")
+            self.set_descr_expert(h_eff_p, "Momentum dependent efficiency for experts", "")
 
             h_eff_E = self.get_relative(h_E, h_gen_E, 'E', part, bit)
             self.set_style(h_eff_E, "Energy", "Efficiency")
-            if (bit == 'ehigh' or bit == 'clst_0') and part == 'e':
-                self.set_descr_shifter(h_eff_E, "Energy dependent efficiency for shifters", "")
+            if bit == 'ehigh':
+                self.set_descr_shifter(h_eff_E, "Energy dependent efficiency for shifter",
+                                       "Efficiency around 40% below 1 GeV, then jump up to 100%")
+            elif bit == 'clst_0':
+                self.set_descr_shifter(h_eff_E, "Energy dependent efficiency for shifter",
+                                       "Turn-on curve from 40% efficiency at 0.5 GeV to nearly 100% above 1.5 GeV")
             else:
-                self.set_descr_expert(h_eff_E, "Energy dependent efficiency for shifters", "")
+                self.set_descr_expert(h_eff_E, "Energy dependent efficiency for experts", "")
 
             h_eff_theta = self.get_relative(h_theta, h_gen_theta, 'theta', part, bit)
             self.set_style(h_eff_theta, "Polar angle", "Efficiency")
-            self.set_descr_expert(h_eff_theta, "polar angle dependent efficiency for shifters", "")
+            self.set_descr_expert(h_eff_theta, "polar angle dependent efficiency for experts", "")
 
             h_eff_phi = self.get_relative(h_phi, h_gen_phi, 'phi', part, bit)
             self.set_style(h_eff_phi, "phi angle", "Efficiency")
-            self.set_descr_expert(h_eff_phi, "azimuth angle dependent efficiency for shifters", "")
+            self.set_descr_expert(h_eff_phi, "azimuth angle dependent efficiency for experts", "")
 
             h_eff_p.Write()
             h_eff_E.Write()
@@ -746,8 +752,12 @@ class MakePlots(basf2.Module):
 
             h_eff_p = self.get_relative(h_p, h_gen_p, 'p', part, bit)
             self.set_style(h_eff_p, "Momentum", "Efficiency")
-            if (bit == 'ty_0' or bit == 'klm_0') and part == 'mu':
-                self.set_descr_shifter(h_eff_p, "Momentum dependent efficiency for shifters", "")
+            if bit == 'ty_0':
+                self.set_descr_shifter(h_eff_p, "Momentum dependent efficiency for shifter",
+                                       "Efficiency should be above 90% for the whole momentum range")
+            elif bit == 'klm_0':
+                self.set_descr_shifter(h_eff_p, "Momentum dependent efficiency for shifter",
+                                       "Efficiency should rise to about 90% for momenta greater than 1 GeV")
             else:
                 self.set_descr_expert(h_eff_p, "Momentum dependent efficiency for experts", "")
 

@@ -7,12 +7,6 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# The VariablesToHistogram module saves variables from the VariableManager
-# to TH1F and TH2F here is an example of how to use it.
-#
-# For full documentation please refer to https://software.belle2.org
-# Anything unclear? Ask questions at https://questions.belle2.org
-
 """
 <header>
   <input>TRGValidationGen.root</input>
@@ -370,8 +364,9 @@ class MakePlots(basf2.Module):
     def set_descr_shifter(self, histogram, description, check):
         '''
         Sets description, check and contact to validation histogram.
-        :param h validation histogram
-        :param Descr description text
+        :param histogram validation histogram
+        :param description description text
+        :param check information on what to check in comparison with reference
         '''
 
         descr = TNamed("Description", description)
@@ -386,8 +381,9 @@ class MakePlots(basf2.Module):
     def set_descr_expert(self, histogram, description, check):
         '''
         Sets description, check and contact to validation histogram.
-        :param h validation histogram
-        :param Descr description text
+        :param histogram validation histogram
+        :param description description text
+        :param check information on what to check in comparison with reference
         '''
 
         descr = TNamed("Description", description)
@@ -402,6 +398,7 @@ class MakePlots(basf2.Module):
     def set_style(self, histogram, xtitle, ytitle):
         '''
         Sets x-y titles, and sets histogram style.
+        :param histogram validation histogram
         :param xtitle X-axis title
         :param xtitle Y-axis title
         '''
@@ -419,6 +416,8 @@ class MakePlots(basf2.Module):
         :param hist1 numerator
         :param hist2 denominator
         :param title new histogram title
+        :param particle particle name
+        :param trgbit trigger bit
         '''
 
         bin1 = hist1.GetXaxis().GetNbins()

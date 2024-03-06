@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,4 +36,5 @@ ma.inputMdstList(
 )
 skim(path)
 
+path.add_module('Progress')
 b2.process(path)

@@ -161,27 +161,37 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-  // parse the dir+histo name and create the corresponding canvas name
-  auto s = StringSplit(histo_name, '/');
-  if (s.size() != 2) {
-    B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
-    return nullptr;
+
+  TCanvas* cnv = nullptr;
+  // try to get canvas from outside
+  if (cobj) cnv = *cobj;
+  // if no canvas search for it
+  if (cnv == nullptr) {
+    // parse the dir+histo name and create the corresponding canvas name
+    auto s = StringSplit(histo_name, '/');
+    if (s.size() != 2) {
+      B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
+      return nullptr;
+    }
+    auto dirname = s.at(0);
+    auto hname = s.at(1);
+    std::string canvas_name = dirname + "/c_" + hname;
+    cnv = findCanvas(canvas_name);
+    // set canvas pointer for outside
+    if (cnv && cobj) *cobj = cnv;
   }
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
 
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
+  // get histogram pointer
+  if (cnv != nullptr) {
+    TIter nextkey(cnv->GetListOfPrimitives());
+    TObject* obj{};
+    while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        if (obj->GetName() == histo_name)
+          return  dynamic_cast<TH1*>(obj);
+      }
     }
   }
   return nullptr;
@@ -245,7 +255,9 @@ void DQMHistAnalysisModule::clearCanvases(void)
 
   while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
     if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      (dynamic_cast<TCanvas*>(cobj))->Clear();
+      TCanvas* cnv = dynamic_cast<TCanvas*>(cobj);
+      cnv->Clear();
+      colorizeCanvas(cnv, c_StatusDefault);
     }
   }
 }
@@ -266,6 +278,13 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 void DQMHistAnalysisModule::clearHistList(void)
 {
   s_histList.clear();
+}
+
+void DQMHistAnalysisModule::resetDeltaList(void)
+{
+  for (auto d : s_deltaList) {
+    d.second->reset();
+  }
 }
 
 void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
@@ -302,8 +321,17 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+{
+  return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
+}
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname, bool update_pvs)
+int DQMHistAnalysisModule::registerExternalEpicsPV(std::string pvname, std::string keyname)
+{
+  return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
+}
+
+int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -320,9 +348,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   // the subscribed name includes the prefix, the map below does *not*
-  SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
-
-  if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  SEVCHK(ca_create_channel((prefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;
@@ -672,7 +698,7 @@ void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
 
   canvas->Pad()->SetFillColor(color);
 
-  canvas->Pad()->SetFrameFillColor(kWhite - 1); // White
+  canvas->Pad()->SetFrameFillColor(10); // White (kWhite is not used since it results in transparent!)
   canvas->Pad()->SetFrameFillStyle(1001);// White
   canvas->Pad()->Modified();
   canvas->Pad()->Update();

@@ -6,24 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclCRFinder/ECLCRFinderModule.h>
 
-// FRAMEWORK
-#include <framework/core/Environment.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/logging/LogConfig.h>
-#include <framework/logging/Logger.h>
-
-//ECL
-#include <ecl/geometry/ECLNeighbours.h>
+/* ECL headeers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/geometry/ECLNeighbours.h>
 
-// MDST
+/* Basf2 headers. */
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
-// C++
+/* C++ headers. */
 #include <algorithm>
 #include <iostream>
 

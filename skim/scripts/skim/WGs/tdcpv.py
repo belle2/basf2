@@ -46,6 +46,7 @@ class TDCPV_qqs(BaseSkim):
     * ``B0 -> phi K_S0``
     * ``B0 -> eta K_S0``
     * ``B0 -> eta' K_S0``
+    * ``B0 -> eta' K_L0``
     * ``B0 -> eta K*``
     * ``B0 -> eta' K*``
     * ``B0 -> K_S0 K_S0 K_S0``
@@ -81,12 +82,15 @@ class TDCPV_qqs(BaseSkim):
     * ``gamma:ECMS16 , cut : 1.6 < useCMSFrame(E)``
     * ``K_S0:merged``
     * ``K+:1%``
+    * ``K_L0:allklm``
+    * ``K_L0:allecl``
 
     **Cuts used**:
 
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
+    * ``abs(deltaE) < 0.250 for KL``
     * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
     * ``E_ECL_TDCPV<9``
     """
@@ -120,9 +124,15 @@ class TDCPV_qqs(BaseSkim):
         loadStdSkimHighEffOmega(path=path)
         loadStdSkimHighEffF_0(path=path)
 
+        stdKlongs(listtype='allklm', path=path)
+        stdKlongs(listtype='allecl', path=path)
+
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
+        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'E>0.250', path=path)
+        ma.cutAndCopyList('K_L0:klmLayers', 'K_L0:allklm', '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]', path=path)
+        ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
@@ -130,10 +140,12 @@ class TDCPV_qqs(BaseSkim):
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
         btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.250'
 
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K_S0:merged',
+            'eta\':SkimHighEff K_L0:eclEcut',
             'eta:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K*0:SkimHighEff',
             'eta:SkimHighEff K*0:SkimHighEff',
@@ -150,6 +162,8 @@ class TDCPV_qqs(BaseSkim):
             'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
         ]
 
+        bd_qqs_KL_Channels = ['eta\':SkimHighEff  K_L0:klmecl']
+
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
             'phi:SkimHighEff K+:SkimHighEff',
@@ -160,6 +174,11 @@ class TDCPV_qqs(BaseSkim):
         for chID, channel in enumerate(bd_qqs_Channels):
             ma.reconstructDecay('B0:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
             bd_qqs_List.append('B0:TDCPV_qqs' + str(chID))
+
+        bd_qqs_KL_List = []
+        for chID, channel in enumerate(bd_qqs_KL_Channels):
+            ma.reconstructMissingKlongDecayExpert('B0:TDCPV_qqs_KL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
+            bd_qqs_KL_List.append('B0:TDCPV_qqs_KL' + str(chID))
 
         bu_qqs_List = []
         for chID, channel in enumerate(bu_qqs_Channels):
@@ -191,9 +210,13 @@ class TDCPV_qqs(BaseSkim):
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
 
-        return bd_qqs_List + bu_qqs_List
+        return bd_qqs_List + bu_qqs_List + bd_qqs_KL_List
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import ValidationMetadataSetter
+
         ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
         Kres = 'K_10'
@@ -205,8 +228,19 @@ class TDCPV_qqs(BaseSkim):
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
         filename = f'{self}_Validation.root'
+        metadata = []
+        for directory in ["etap", "Kspipig"]:
+            metadata.append(['deltaE', directory, '#Delta E', __liaison__,
+                            f'Energy difference of B for {directory} mode', '', '#Delta E [GeV]', 'Candidates'])
+            metadata.append(['Mbc', directory, 'Mbc', __liaison__,
+                            f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
+        metadata.append(['deltaE', 'KL_etap', '#Delta E', __liaison__,
+                         "Energy difference of B for B0 -> eta' K_{L}", '', '#Delta E [GeV]', 'Candidates'])
+        path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:etap', variableshisto, filename=filename, path=path, directory="etap")
         ma.variablesToHistogram('B0:Kspipig', variableshisto, filename=filename, path=path, directory="Kspipig")
+        variableshisto = [('deltaE', 135, -0.020, 0.250)]
+        ma.variablesToHistogram('B0:TDCPV_qqs_KL0', variableshisto, filename=filename, path=path, directory="KL_etap")
 
 
 @fancy_skim_header
@@ -368,11 +402,23 @@ class TDCPV_ccs(BaseSkim):
         return bd_ccs_List + bPlustoJPsiK_List + b0toJPsiKL_List
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import ValidationMetadataSetter
+
         ma.reconstructDecay('B0:jpsiee -> J/psi:ee K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
         ma.reconstructDecay('B0:jpsimumu -> J/psi:mumu K_S0:merged', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         filename = f'{self}_Validation.root'
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
+        metadata = []
+        for directory in ["jpsiee", "jpsimumu", "KLjpsimumu", "KLjpsiee"]:
+            metadata.append(['deltaE', directory, '#Delta E', __liaison__,
+                            f'Energy difference of B for {directory} mode', '', '#Delta E [GeV]', 'Candidates'])
+        for directory in ["jpsiee", "jpsimumu"]:
+            metadata.append(['Mbc', directory, 'Mbc', __liaison__,
+                            f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
+        path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:jpsiee', variableshisto, filename=filename, path=path, directory="jpsiee")
         ma.variablesToHistogram('B0:jpsimumu', variableshisto, filename=filename, path=path, directory="jpsimumu")
 
@@ -382,7 +428,7 @@ class TDCPV_ccs(BaseSkim):
 
 
 @fancy_skim_header
-class dilepton(BaseSkim):
+class TDCPV_dilepton(BaseSkim):
     """
     Reconstructed decays
         * :math:`B\\overline{B} \\to l^+l^-`
@@ -397,6 +443,7 @@ class dilepton(BaseSkim):
     __category__ = "physics, leptonic"
 
     NoisyModules = ["EventShapeCalculator"]
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

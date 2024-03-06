@@ -16,7 +16,7 @@
 [INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
-[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Saving run-by-run luminosity information to luminosityByRuns.csv
 [INFO] Need to get some runs from RunDB for exp [18]
 [INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
 [INFO] Read 302 runs from exp 18
@@ -134,7 +134,7 @@ Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Del
 [INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED online RunDB     : L =    3.951 +/- 0.000 /fb =   0.0040 +/- 0.000  /ab
-[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Saving run-by-run luminosity information to luminosityByRuns.csv
 [INFO] Need to get some runs from RunDB for exp [18]
 [INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
 [INFO] Read 60 runs from exp 18
@@ -150,7 +150,7 @@ Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Del
 [INFO] RECORDED online RunDB     : L =    2.763 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED online RunDB     : L =    2.763 +/- 0.000 /fb =   0.0028 +/- 0.000  /ab
-[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Saving run-by-run luminosity information to luminosityByRuns.csv
 [INFO] Need to get some runs from RunDB for exp [18]
 [INFO] Reading exp 18 from rundb (this can take a while depending on the size of the query)
 [INFO] Read 302 runs from exp 18
@@ -166,7 +166,7 @@ Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Del
 [INFO] RECORDED online RunDB     : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED online RunDB     : L =    1.172 +/- 0.000 /fb =   0.0012 +/- 0.000  /ab
-[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Saving run-by-run luminosity information to luminosityByRuns.csv
 [INFO] Need to get some runs from RunDB for exp [12, 14]
 [INFO] Read 2607 runs for experiment 12-14
 [INFO] Using processing proc13 (and prompt) for luminosity information
@@ -184,7 +184,7 @@ Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Del
 [INFO] RECORDED offline prompt    : L =    0.015 +/- 0.000 /fb =   0.0000 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED offline prompt    : L =   25.102 +/- 0.006 /fb =   0.0251 +/- 0.000  /ab
-[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Saving run-by-run luminosity information to luminosityByRuns.csv
 [INFO] Need to get some runs from RunDB for exp [12, 14]
 [INFO] Read 2607 runs for experiment 12-14
 [INFO] Using processing proc12 (and prompt) for luminosity information
@@ -203,4 +203,4 @@ Exp   Run Lumi [/pb] +/-             date length int Lumi [/fb] +/- int Lumi Del
 [INFO] RECORDED offline prompt    : L =   16.418 +/- 0.005 /fb =   0.0164 +/- 0.000  /ab
 [INFO] -------------------- Total Luminosity --------------------
 [INFO] RECORDED offline prompt    : L =   79.776 +/- 0.007 /fb =   0.0798 +/- 0.000  /ab
-[INFO] Saving run-by-run luminosity informations to luminosityByRuns.csv
+[INFO] Saving run-by-run luminosity information to luminosityByRuns.csv

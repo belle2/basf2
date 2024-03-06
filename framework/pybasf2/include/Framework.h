@@ -132,6 +132,13 @@ namespace Belle2 {
      */
     static void setIsCosmics(const bool isCosmics);
 
+    /**
+     * Function for writing the simulation steps of each event into csv files.
+     * This should not be used during production jobs, but only for producing events
+     * for the Belle II Virtual Reality application.
+     */
+    static void writeSimulationSteps();
+
     /** Find a file. This is a wrapper around FileSystem::findFile() to be able
      * to call it nicely from python and create a `FileNotFoundError` if the
      * file cannot be found.

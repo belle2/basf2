@@ -482,6 +482,28 @@ namespace Belle2 {
       return elti->hasAnErrorFlag();
     }
 
+    // Build a Helix from a MCParticle's kinematics. Does NOT check for null pointer!!!
+    Belle2::Helix getMCHelix(const MCParticle* mcparticle)
+    {
+      const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
+      const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
+      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
+      const double mcParticleCharge = mcparticle->getCharge();
+      return Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+    }
+
+    double getMCHelixParameterAtIndex(const Particle* particle, const int index)
+    {
+      if (!particle) return Const::doubleNaN;
+
+      const MCParticle* mcparticle = particle->getMCParticle();
+      if (!mcparticle) return Const::doubleNaN;
+
+      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
+      const std::vector<double> mcHelixPars{mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
+      return mcHelixPars.at(index);
+    }
+
     double getHelixParameterPullAtIndex(const Particle* particle, const int index)
     {
       if (!particle) return Const::doubleNaN;
@@ -493,20 +515,20 @@ namespace Belle2 {
       if (!trackfit) return Const::doubleNaN;
 
       const Belle2::UncertainHelix measHelix = trackfit->getUncertainHelix();
-      const TMatrixDSym measCovariance = measHelix.getCovariance();
-      const ROOT::Math::XYZVector mcProdVertex = mcparticle->getVertex();
-      const ROOT::Math::XYZVector mcMomentum = mcparticle->getMomentum();
-
-      const double BzAtProdVertex = Belle2::BFieldManager::getFieldInTesla(mcProdVertex).Z();
-      const double mcParticleCharge = mcparticle->getCharge();
-      const Belle2::Helix mcHelix = Belle2::Helix(mcProdVertex, mcMomentum, mcParticleCharge, BzAtProdVertex);
+      const TMatrixDSym& measCovariance = measHelix.getCovariance();
+      const Belle2::Helix mcHelix(getMCHelix(mcparticle));
 
       const std::vector<double> mcHelixPars   = {mcHelix.getD0(), mcHelix.getPhi0(), mcHelix.getOmega(), mcHelix.getZ0(), mcHelix.getTanLambda()};
       const std::vector<double> measHelixPars = {measHelix.getD0(), measHelix.getPhi0(), measHelix.getOmega(), measHelix.getZ0(), measHelix.getTanLambda()};
-      const std::vector<double> measErrSquare = {measCovariance[0][0], measCovariance[1][1], measCovariance[2][2], measCovariance[3][3], measCovariance[4][4]};
 
-      return (mcHelixPars.at(index) - measHelixPars.at(index)) / std::sqrt(measErrSquare.at(index));
+      return (mcHelixPars.at(index) - measHelixPars.at(index)) / std::sqrt(measCovariance(index, index));
     }
+
+    double getHelixMCD0(const Particle* part) { return getMCHelixParameterAtIndex(part, 0); }
+    double getHelixMCPhi0(const Particle* part) { return getMCHelixParameterAtIndex(part, 1); }
+    double getHelixMCOmega(const Particle* part) { return getMCHelixParameterAtIndex(part, 2); }
+    double getHelixMCZ0(const Particle* part) { return getMCHelixParameterAtIndex(part, 3); }
+    double getHelixMCTanLambda(const Particle* part) { return getMCHelixParameterAtIndex(part, 4); }
 
     double getHelixD0Pull(const Particle* part)
     {
@@ -527,10 +549,12 @@ namespace Belle2 {
     {
       return getHelixParameterPullAtIndex(part, 3);
     }
+
     double getHelixTanLambdaPull(const Particle* part)
     {
       return getHelixParameterPullAtIndex(part, 4);
     }
+
     double getTrackTime(const Particle* part)
     {
       const Track* track = part->getTrack();
@@ -561,6 +585,51 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("Tracking");
+
+    REGISTER_VARIABLE("mcD0", getHelixMCD0, R"DOC(
+Returns the MC value of :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
+
+.. seealso:: :b2:var:`d0`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("mcPhi0", getHelixMCPhi0, R"DOC(
+Returns the MC value of :math:`\phi_0`, the angle of the transverse momentum
+in the :math:`r-\phi` plane.
+
+.. seealso:: :b2:var:`phi0`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", "rad");
+    REGISTER_VARIABLE("mcOmega", getHelixMCOmega, R"DOC(
+Returns the MC value of :math:`\omega`, the curvature of the track.
+
+.. seealso:: :b2:var:`omega`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", ":math:`\\text{cm}^{-1}`");
+    REGISTER_VARIABLE("mcZ0", getHelixMCZ0, R"DOC(
+Returns the MC value of :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA).
+
+.. seealso:: :b2:var:`z0`
+
+Returns NaN if the particle is not related to any MCParticle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("mcTanLambda", getHelixMCTanLambda, R"DOC(
+Returns the MC value of :math:`\tan\lambda`, the slope of the track in the
+:math:`r-z` plane.
+
+.. seealso:: :b2:var:`tanLambda`
+
+Returns NaN if the particle is not related to any MCParticle.
+)DOC");
+
     REGISTER_VARIABLE("d0Pull", getHelixD0Pull,     R"DOC(
 The pull of the tracking parameter :math:`d_0` for the reconstructed
 pattern-recognition track, with respect to the MC track. That is:
@@ -884,7 +953,7 @@ at the end of the reconstruction chain, in particular after the outer detector r
     )DOC");
 
     REGISTER_VARIABLE("trackTime", getTrackTime, R"DOC(
-Returns the time at which the track is produced relative to the time of the collision (given by SVD EventT0). 
+Returns the time at which the track is produced relative to the time of the collision (given by SVD EventT0).
 Both the time of the collision and the track time are computed using only SVD hits.
 Returns NaN if SVD EventT0 is NaN, or if no SVD Hits are attached to the track.
 For more details, see :ref:`Time Extraction <tracking_eventTimeExtraction>` page.

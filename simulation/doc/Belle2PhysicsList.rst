@@ -156,10 +156,10 @@ If no cut values are specified in this file, the default value of 0.07 cm is
 used everywhere in the Belle2 geometry.  This global default can be changed by setting
 the parameter ``ProductionCut``.  Each detector envelope can have a cut value distinct from
 the global value by setting the parameters ``PXDProductionCut``, ``SVDProductionCut``, etc.
-Cut values which are not explicitly set for a given detetcor envelope assume the value
+Cut values which are not explicitly set for a given detector envelope assume the value
 set by the ``ProductionCut`` parameter.
 
-Example useage::
+Example usage::
 
    main.add_module("FullSim",PhysicsList="Belle2", RunEventVerbosity=0,
                   RegisterOptics=False,

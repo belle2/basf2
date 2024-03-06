@@ -218,6 +218,14 @@ void Framework::setIsCosmics(const bool isCosmics)
   Environment::Instance().setIsCosmics(isCosmics);
 }
 
+void Framework::writeSimulationSteps()
+{
+  B2WARNING("basf2 will write the simulation steps of each event into output csv files. "
+            "This is fine if you are producing events for the Belle II Virtual Reality application, "
+            "otherwise this function should not be used since the exeuction time will significantly increase.");
+  Environment::Instance().setWriteSimSteps(true);
+}
+
 std::string Framework::findFile(const std::string& filename, const std::string& type, bool ignore_errors)
 {
   std::string result;
@@ -409,6 +417,11 @@ Usually the realm does not have to be set explicitly. On the HLT or express reco
   def("declare_cosmics", &Framework::setIsCosmics, R"DOCSTRING(
 Set if the run is for cosmics data
 )DOCSTRING", args("isCosmics"));
+  def("write_simulation_steps", &Framework::writeSimulationSteps, R"DOCSTRING(
+Allow basf2 to write the simulation steps of each event into csv files.
+
+This function should not be used in production jobs because the exeuction time will significantly increase.
+)DOCSTRING");
   def("_process", &Framework::process, process_overloads(R"DOCSTRING(process(path, num_events=0)
 Processes up to max_events events by starting with the first module in the specified path.
 

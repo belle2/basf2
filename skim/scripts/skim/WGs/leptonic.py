@@ -17,7 +17,7 @@ from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
 from variables import variables as vm
 
-__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -44,6 +44,7 @@ class LeptonicUntagged(BaseSkim):
     __category__ = "physics, leptonic"
 
     validation_sample = _VALIDATION_SAMPLE
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -101,9 +102,8 @@ class LeptonicUntagged(BaseSkim):
                 ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
                 ("d0_electronID_noTOP", 100, 0, 1, "electronID_noTOP of signal-side lepton",
                  contact, "", ""),
-                ("d0_muonID", 100, 0, 1, "electronID_noTOP of signal-side lepton", contact,
+                ("d0_muonID", 100, 0, 1, "muonID of signal-side lepton", contact,
                  "", ""),
-                ("R2", 100, 0, 1, "R2", contact, "", ""),
                 ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
                  "", ""),
             ],

@@ -19,6 +19,7 @@
 #include <TLegend.h>
 #include <vector>
 #include <string>
+#include <map>
 
 namespace Belle2 {
   /**
@@ -121,6 +122,11 @@ namespace Belle2 {
     void makeBGSubtractedTimimgPlot(const std::string& name, const TH2F* trackHits, int slot);
 
     /**
+     * Makes plots of the number of PMT hits per event
+     */
+    void makePMTHitRatesPlots();
+
+    /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
      * @param variableName variable name
      * @param histogram histogram with bins corresponding to slot numbers
@@ -219,14 +225,9 @@ namespace Belle2 {
     int m_alarmStateOverall = 0; /**< overall alarm state of histograms to be sent by EpicsPV */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
+    std::string m_runType; /**< Run type */
 
-    TH1D* m_windowFractions = nullptr; /**< fraction of windows outside the band denoting good windows, per slot */
-    double m_totalWindowFraction = 0;  /**< total fraction of windows outside the band */
-
-    TH1D* m_photonYields = nullptr; /**< photon yields per slot (corrected for active channels) */
     TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
-
-    TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
     TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
 
     TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot */
@@ -239,6 +240,9 @@ namespace Belle2 {
     TH1F* m_junkFraction = nullptr; /**< fraction of junk hits per boardstack */
     TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of junk hits per boardstack */
 
+    std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */
+    std::vector<TCanvas*> m_c_pmtHitRates; /**< Canvases of PMT hits per event (index = slot - 1) */
+
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
     std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
@@ -250,6 +254,7 @@ namespace Belle2 {
     TPaveText* m_text2 = nullptr; /**< text to be written to event desynchonization monitor */
     TPaveText* m_text3 = nullptr; /**< text to be written to background rates */
 
+    std::map<std::string, double> m_mirabelleVariables; /**< variables for MiraBelle */
     MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
 
   };

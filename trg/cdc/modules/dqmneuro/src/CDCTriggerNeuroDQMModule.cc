@@ -3015,7 +3015,11 @@ void CDCTriggerNeuroDQMModule::event()
       std::string infostr2 = "     std. ETF vld:";
       infostr2 += std::to_string(m_eventTime.isValid());
       infostr2 += ", ETFT0: ";
-      infostr2 += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
+      if (m_eventTime.isValid()) {
+        infostr2 += std::to_string(m_eventTime->getBinnedEventT0(Const::CDC));
+      } else {
+        infostr2 += "  ";
+      }
       infostr2 += ", ETF in CC: ";
       infostr2 += std::to_string(ltrack.getETF_unpacked());
       infostr2 += ", ETF recalculated: ";

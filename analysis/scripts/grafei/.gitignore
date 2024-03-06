@@ -1,1 +1,7 @@
+# Yaml files #
+# ########## #
 *.yaml
+
+# PyTorch output #
+# ############## #
+*.pt

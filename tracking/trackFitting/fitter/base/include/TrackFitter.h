@@ -133,9 +133,7 @@ namespace Belle2 {
       m_measurementAdder(storeArrayNameOfPXDHits, storeArrayNameOfSVDHits, storeArrayNameOfCDCHits,
                          storeArrayNameOfBKLMHits, storeArrayNameOfEKLMHits, initializeCDCTranslators)
     {
-      if (false)
-        //      if (Environment::Instance().isCosmics())
-      {
+      if (Environment::Instance().isCosmics()) {
         // Resetting with parameters for cosmics data
         resetFitterToCosmicsSettings();
       } else {

@@ -127,6 +127,10 @@ namespace Belle2 {
     */
     static void setRealm(const std::string& realm);
 
+    /**
+     * Function to set if the script is running on cosmics data or not
+     */
+    static void setIsCosmics(const bool isCosmics);
 
     /** Find a file. This is a wrapper around FileSystem::findFile() to be able
      * to call it nicely from python and create a `FileNotFoundError` if the

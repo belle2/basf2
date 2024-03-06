@@ -95,6 +95,7 @@ Environment::Environment() :
   m_visualizeDataFlow(false),
   m_noStats(false),
   m_dryRun(false),
+  m_isCosmics(false),
   m_mcEvents(0),
   m_run(-1),
   m_experiment(-1),

@@ -37,7 +37,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_Bu2Knunu_graFEI_newParams_newCuts_v1",
+        default="graFEI_mixed_LCAMassProb_v1",
         help="Globaltag containing graFEI model",
     )
     return parser.parse_args()

@@ -288,7 +288,6 @@ if __name__ == "__main__":
         "graFEI_truth_perfectLCA",
         "graFEI_truth_perfectMasses",
         "graFEI_truth_perfectEvent",
-        "graFEI_truth_isSemileptonic",
         "graFEI_truth_nFSP",
         "graFEI_truth_nPhotons",
         "graFEI_truth_nElectrons",

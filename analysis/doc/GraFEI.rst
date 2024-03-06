@@ -74,7 +74,7 @@ and uploaded to a global tag in order to run on the grid.
 
 Finally, the model can be included in a steering file via the modules `FlagBDecayModule <grafei.FlagBDecayModule>` and `GraFEIModule <grafei.GraFEIModule>`, 
 in order to apply the model to Belle II data and MC.
-Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``grafei/scripts/steering_file_examples``.
+Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI/steering_file_examples``.
 In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI`` can be added.
 When using the model in :math:`\Upsilon (4S)` reconstruction mode you have also the possibility of specifying an LCAS matrix (in the form of a nested list) and a list
 of mass hypotheses (following the convention outlined in the `select_good_decay` class) for your **signal-side**: in the case where the predicted LCAS matrix describes a valid tree structure, 

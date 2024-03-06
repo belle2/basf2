@@ -23,11 +23,10 @@ import stdCharged as stdc
 import variables.utils as vu
 
 import ROOT
-from ROOT import Belle2, TH1F, TFile, TNamed, TEfficiency
+from ROOT import Belle2, TH1F, TFile, TNamed, TEfficiency, TMath
 from math import pi as PI
 
 
-Fac = 180.0 / PI
 inputBits = ["t3_0", "ty_0", "t2_0", "ts_0", "ta_0", "typ", "ehigh", "elow", "elum", "ecl_3dbha", "cdc_open90",
              "clst_0", "clst_1", "clst_2", "clst_3", "klm_hit", "klm_0", "klm_1", "klm_2", "eklm_0", "eklm_1", "eklm_2"]
 outputBits = ["fff", "ffy", "ffz", "fzo", "fso", "fyo", "ffb", "fsb", "ssb", "stt", "hie", "c4", "bha3d",
@@ -668,10 +667,10 @@ class MakePlots(basf2.Module):
             e = cluster.getEnergyDep()
             self.h_E_ECL.Fill(e)
             etot += e
-            vec = ROOT.TVector3(x, y, z)
-            self.h_theta_ECL.Fill(vec.Theta() * Fac)
+            vec = ROOT.Math.XYZVector(x, y, z)
+            self.h_theta_ECL.Fill(vec.Theta() * TMath.RadToDeg())
             self.h_thetaID_ECL.Fill(cluster.getMaxTCId())
-            self.h_phi_ECL.Fill(vec.Phi() * Fac)
+            self.h_phi_ECL.Fill(vec.Phi() * TMath.RadToDeg())
 
         if etot > 0:
             self.h_Esum_ECL.Fill(etot)

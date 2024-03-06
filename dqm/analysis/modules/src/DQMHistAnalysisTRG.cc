@@ -93,7 +93,7 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "TOPTRG_peak", "TOPTRG_peak");
 
   //ecl timing –cdc timing
-  addDeltaPar("TRGGDL", "hGDL_ns_cdcTocecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("TRGGDL", "hGDL_ns_cdcToecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ecltiming_cdctiming", "ecltiming_cdctiming");
 
   //top timing – ecl timing
@@ -316,7 +316,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   }
 
 // update ecltiming_cdctiming
-  auto hist_ecltiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_cdcTocecl_all", 0, true);// only if updated
+  auto hist_ecltiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_cdcToecl_all", 0, true);// only if updated
   if (hist_ecltiming_cdctiming) {
     double ecltiming_cdctiming = 0.0;
     hist_ecltiming_cdctiming->Draw();

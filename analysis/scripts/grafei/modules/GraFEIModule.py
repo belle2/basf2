@@ -15,7 +15,7 @@ from ROOT import Belle2
 from variables import variables as vm
 import torch
 from torch_geometric.data import Batch
-from grafei.modules.FlagBDecayModule import get_object_list
+from grafei.modules.RootSaverModule import get_object_list
 from grafei.model.geometric_network import GraFEIModel
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
@@ -387,7 +387,7 @@ class GraFEIModule(b2.Module):
             # Add MC truth information
             if self.storeTrueInfo:
                 # Get the true IDs of the ancestors (if it's a B)
-                parentID = np.array([p.getExtraInfo("BParentGenID") for p in p_list], dtype=int)
+                parentID = np.array([vm.evaluate("ancestorBIndex", p) for p in p_list], dtype=int)
                 b2.B2DEBUG(10, "Ancestor true ID:\n", parentID)
 
                 # Get particle indices
@@ -524,7 +524,7 @@ class GraFEIModule(b2.Module):
                         # Note we only consider the subset of leaves that made it into x_rows
                         x_rows = np.array(
                             [
-                                p.getExtraInfo("BParentGenID") == array_index
+                                vm.evaluate("ancestorBIndex", p) == array_index
                                 for p in p_list
                             ]
                         ) if self.mc_particle != "Upsilon(4S):MC" else evt_primary

@@ -9,7 +9,6 @@ from ROOT import Belle2
 import stdPhotons
 from variables import variables as vm
 
-from grafei.modules.FlagBDecayModule import FlagBDecayModule
 from grafei.modules.RootSaverModule import RootSaverModule
 
 
@@ -127,25 +126,15 @@ if __name__ == '__main__':
     p_names = [x.split(':')[0] for x in p_lists]
 
     # ##### TAG AND SAVE #######
-    b_parent_var = 'BParentGenID'
 
     # Flag each particle according to the B meson and decay it came from
     for i, p_list in enumerate(p_lists):
         # Match MC particles for all lists
         ma.matchMCTruth(p_list, path=path)
 
-        # Add extraInfo to each particle indicating parent B genID and
-        # whether it belongs to a semileptonic decay
-        flag_decay_module = FlagBDecayModule(
-            p_list,
-            b_parent_var=b_parent_var,
-        )
-        path.add_module(flag_decay_module)
-
     root_saver_module = RootSaverModule(
         particle_lists=p_lists,
         features=save_vars,
-        b_parent_var=b_parent_var,
         mcparticle_list=mc_particle_name[args.type],
         output_file=f'graFEI_train_{input_file.stem}.root',
     )

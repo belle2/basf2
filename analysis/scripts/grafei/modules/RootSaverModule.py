@@ -11,7 +11,29 @@ import numpy as np
 import copy
 from itertools import combinations
 from variables import variables as vm
-from grafei.modules.FlagBDecayModule import get_object_list
+
+
+def get_object_list(pointerVec):
+    """
+    Workaround to avoid memory problems in basf2.
+
+    Args:
+        pointerVec: Input particle list.
+
+    Returns:
+        list: Output python list.
+    """
+    from ROOT import Belle2
+
+    objList = []
+    size = (
+        pointerVec.getListSize()
+        if isinstance(pointerVec, Belle2.ParticleList)
+        else len(pointerVec)
+    )
+    for i in range(size):
+        objList.append(pointerVec[i])
+    return objList
 
 
 def pdg_to_lca_converter(pdg):
@@ -186,7 +208,6 @@ class RootSaverModule(b2.Module):
         Args:
             particle_lists (list): Name of particle lists to save features of.
             features (list): List of features to save for each particle.
-            b_parent_var (str): Name of variable used to flag ancestor B meson and split particles.
             mcparticle_list (str): Name of particle list to build LCAs from (will use as root).
             output_file (str): Path to output file to save.
     """
@@ -195,15 +216,12 @@ class RootSaverModule(b2.Module):
         self,
         particle_lists,
         features,
-        b_parent_var,
         mcparticle_list,
         output_file,
-        # bkg_prob=0.0,
     ):
         super().__init__()
         self.particle_lists = particle_lists
         self.features = features
-        self.b_parent_var = b_parent_var
         self.mcparticle_list = mcparticle_list
         self.output_file = output_file
 
@@ -213,9 +231,7 @@ class RootSaverModule(b2.Module):
 
     def initialize(self):
         """"""
-        from ROOT import Belle2
-
-        from ROOT import TFile, TTree
+        from ROOT import Belle2, TFile, TTree
 
         self.eventinfo = Belle2.PyStoreObj("EventMetaData")
 
@@ -387,7 +403,7 @@ class RootSaverModule(b2.Module):
 
                 for particle in p_list.obj():
                     # Get the B parent index, set to -1 if particle has no MC match
-                    b_index = int(particle.getExtraInfo(self.b_parent_var))
+                    b_index = int(vm.evaluate("ancestorBIndex", particle))
                     # Need this to reorder LCA later, returns -1 if no MC match
                     if b_index >= 0:
                         p_index = particle.getMCParticle().getArrayIndex()

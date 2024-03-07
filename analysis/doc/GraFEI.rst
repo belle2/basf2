@@ -72,7 +72,7 @@ Applying the model to data
 The model ``.yaml`` and ``.pt`` output files can be saved to a payload with the script ``grafei/scripts/save_model_to_payload.py`` 
 and uploaded to a global tag in order to run on the grid.
 
-Finally, the model can be included in a steering file via the modules `FlagBDecayModule <grafei.FlagBDecayModule>` and `GraFEIModule <grafei.GraFEIModule>`, 
+Finally, the model can be included in a steering file via the `GraFEIModule <grafei.GraFEIModule>`, 
 in order to apply the model to Belle II data and MC.
 Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI/steering_file_examples``.
 In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI`` can be added.
@@ -179,10 +179,10 @@ Code documentation
 
 This section describes the grafei code.
 
-Basf2 modules
-*************
+Core module
+***********
 
-You can import these modules in a steering file with ``from grafei import MODULENAME``.
+You can import this module in a steering file with ``from grafei import GraFEIModule``.
 
 .. automodule:: grafei
    :members:
@@ -193,8 +193,6 @@ Other modules and functions
 
 Here the core code of the graFEI is described. This section is intended for developers, 
 users usually do not need to manipulate these components.
-
-.. autofunction:: grafei.modules.FlagBDecayModule.get_object_list
 
 .. automodule:: grafei.model.config
    :members:

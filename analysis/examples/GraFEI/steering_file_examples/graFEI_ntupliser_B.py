@@ -18,7 +18,6 @@ import argparse
 from pathlib import Path
 
 from grafei import GraFEIModule
-from grafei import FlagBDecayModule
 
 # Random seeds
 b2.set_random_seed(42)
@@ -206,12 +205,6 @@ if __name__ == "__main__":
     if store_mc_truth:
         # Associate parent B to each FSP
         ma.matchMCTruth("B0:tag", path=path)
-
-        flag_decay_module = FlagBDecayModule(
-            "B0:tag",
-            b_parent_var="BParentGenID",
-        )
-        path.add_module(flag_decay_module)
 
     # Run graFEI
     graFEI = GraFEIModule(

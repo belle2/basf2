@@ -8,11 +8,10 @@
 
 # @cond internal
 # The only things imported by 'from grafei import *'
-__all__ = ["GraFEIModule", "FlagBDecayModule"]
+__all__ = ["GraFEIModule"]
 # @endcond
 
 from grafei.modules.GraFEIModule import GraFEIModule
-from grafei.modules.FlagBDecayModule import FlagBDecayModule
 
 print(r"""
                                                   ____  ____    _      ____  ____  _

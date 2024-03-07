@@ -19,7 +19,6 @@ import argparse
 from pathlib import Path
 
 from grafei import GraFEIModule
-from grafei import FlagBDecayModule
 
 
 def _parse_args():
@@ -51,6 +50,12 @@ def _parse_args():
         default=["k"],
         help="Choose mass hypotheses of signal side",
     )
+    parser.add_argument(
+        "-n",
+        "--no_mc_truth",
+        action="store_true",
+        help="Choose not to store MC-truth information",
+    )
     return parser.parse_args()
 
 
@@ -61,7 +66,7 @@ if __name__ == "__main__":
 
     args = _parse_args()
 
-    store_mc_truth = True
+    store_mc_truth = not args.no_mc_truth
 
     b2.conditions.prepend_globaltag(args.globaltag)
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
@@ -149,20 +154,10 @@ if __name__ == "__main__":
     if store_mc_truth:
         ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
 
-        b_parent_var = "BParentGenID"
-
         # Flag each particle according to the B meson and decay it came from
         for i, particle_list in enumerate(particle_lists):
             # Match MC particles for all lists
             ma.matchMCTruth(particle_list, path=path)
-
-            # Add extraInfo to each particle indicating parent B genID and
-            # whether it belongs to a semileptonic decay
-            flag_decay_module = FlagBDecayModule(
-                particle_list,
-                b_parent_var=b_parent_var,
-            )
-            path.add_module(flag_decay_module)
 
     graFEI = GraFEIModule(
         "Upsilon(4S):final",
@@ -252,7 +247,7 @@ if __name__ == "__main__":
         "mcErrors",
         "genMotherPDG",
         "mcPDG",
-    ]
+    ] if store_mc_truth else []
 
     # graFEI variables
     graFEI_vars = [
@@ -296,11 +291,10 @@ if __name__ == "__main__":
         "graFEI_truth_nKaons",
         "graFEI_truth_nProtons",
         "graFEI_truth_nOthers",
-    ]
+    ] if store_mc_truth else []
 
-    if store_mc_truth:
-        default_vars += tm_vars
-        graFEI_vars += graFEI_tm_vars
+    default_vars += tm_vars
+    graFEI_vars += graFEI_tm_vars
 
     ma.variablesToEventExtraInfo(
         "Upsilon(4S):final",

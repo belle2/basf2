@@ -186,6 +186,7 @@ You can import this module in a steering file with ``from grafei import GraFEIMo
 
 .. automodule:: grafei
    :members:
+   :exclude-members: event, initialize
 
 
 Other modules and functions
@@ -211,22 +212,26 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.geometric_datasets
    :members:
-   :exclude-members: process
+   :exclude-members: process, processed_file_names
 
 .. automodule:: grafei.model.geometric_layers
    :members:
+   :exclude-members: forward
 
 .. automodule:: grafei.model.geometric_network
    :members:
+   :exclude-members: forward
 
 .. automodule:: grafei.model.lca_to_adjacency
    :members:
 
 .. automodule:: grafei.model.metrics
    :members:
+   :exclude-members: compute, update, reset
 
 .. automodule:: grafei.model.multiTrain
    :members:
+   :exclude-members: forward
 
 .. automodule:: grafei.model.normalize_features
    :members:
@@ -236,3 +241,4 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.modules.RootSaverModule
    :members:
+   :exclude-members: event, initialize, terminate

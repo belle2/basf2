@@ -40,11 +40,13 @@ def _preload(self):
 
     # Save the features
     with uproot.open(self.x_files[0])["Tree"] as t:
+        # Features
         self.features = [f for f in t.keys() if f.startswith("feat_")]
+        # B reco flag
         self.B_reco = int(t["isB"].array(library="np")[0])
         assert self.B_reco in [0, 1, 2], "B_reco should be 0, 1 or 2, something went wrong"
 
-    # Keep only requested features
+    # Discarded features
     self.discarded = [
         f for f in self.features if not f[f.find("_") + 1:] in self.node_features
     ]
@@ -55,8 +57,9 @@ def _preload(self):
     print(f"Input node features: {self.features}")
     print(f"Discarded node features: {self.discarded}")
 
-    # Edge and global features for geometric model
+    # Edge features
     self.edge_features = [f"edge_{f}" for f in self.edge_features]
+    # Global features
     self.global_features = [f"glob_{f}" for f in self.global_features] if self.global_features else []
     print(f"Input edge features: {self.edge_features}")
     print(f"Input global features: {self.global_features}")
@@ -283,20 +286,29 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         normalize=None,
         **kwargs,
     ):
-
+        """
+        Initialization.
+        """
         assert isinstance(
             features, list
         ), f'Argument "features" must be a list and not {type(features)}'
         assert len(features) > 0, "You need to use at least one node feature"
 
+        # Root path
         self.root = Path(root)
 
+        # Normalize
         self.normalize = normalize
 
+        # Number of files
         self.n_files = n_files
+        # Node features
         self.node_features = features
+        # Edge features
         self.edge_features = edge_features
+        # Global features
         self.global_features = global_features
+        # Samples
         self.samples = samples
 
         # Delete processed files, in case
@@ -308,11 +320,14 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         # Needs to be called after having assigned all attributes
         super().__init__(root, None, None, None)
 
+        # Data and Slices
         self.data, self.slices = torch.load(self.processed_paths[0])
 
     @property
     def processed_file_names(self):
-        """"""
+        """
+        Name of processed file.
+        """
         return ["processed_data.pt"]
 
     def process(self):

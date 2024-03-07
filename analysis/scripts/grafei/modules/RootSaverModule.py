@@ -219,39 +219,46 @@ class RootSaverModule(b2.Module):
         mcparticle_list,
         output_file,
     ):
+        """
+        Initialization.
+        """
         super().__init__()
+        # Input particle lists
         self.particle_lists = particle_lists
+        # Features to save
         self.features = features
+        # MC particle list (Upsilon, B0, B+)
         self.mcparticle_list = mcparticle_list
+        # Output file name
         self.output_file = output_file
 
-        # Set a max num particles, it doesn't actually matter what this is as long as it's bigger than
-        # any events we'll encounter. ROOT won't save all entries
+        # Max number of particles
+        # It doesn't actually matter what this is as long as it's bigger than
+        # the number of particles in any events we'll encounter. ROOT won't save all entries.
         self.max_particles = 500
 
     def initialize(self):
-        """"""
+        """
+        Called once at the beginning.
+        """
         from ROOT import Belle2, TFile, TTree
 
+        # Event info
         self.eventinfo = Belle2.PyStoreObj("EventMetaData")
 
-        # Create the output file, fails if exists
+        # ROOT output file
         self.root_outfile = TFile(self.output_file, "recreate")
+        # ROOT tree
         self.tree = TTree("Tree", "tree")
 
-        # Reader's note: Root is weird in that we fill the same object with new values and call
-        # Fill(), then it copies the values into the next entry (Leaf?) of the Branch
-
-        # General data
+        # Event number
         self.event_num = np.zeros(1, dtype=np.int32)
         self.tree.Branch("event", self.event_num, "event/I")
+        # bool containing information whether we reconstruct B or Upsilon
         self.isB = np.zeros(1, dtype=bool)
         self.tree.Branch("isB", self.isB, "isB/b")
 
-        # We use a placeholder to point each Branch to initially, we'll use the n_xxx for vectors to tell ROOT
-        # how many entries in the array to save via the xxx[n_xxx] string
-
-        # LCA data
+        # Truth information
         self.truth_dict = {}
 
         # We assume at most two LCA matrices for event
@@ -282,19 +289,23 @@ class RootSaverModule(b2.Module):
 
         # Feature data
         # Here use one number to indicate how many particles were reconstructed
+        # Number of particles
         self.n_particles = np.zeros(1, dtype=np.int32)
         self.tree.Branch("n_particles", self.n_particles, "n_particles/I")
 
+        # Particle-is-primary flag
         self.primary = np.zeros(self.max_particles, dtype=np.bool)
         self.tree.Branch("primary", self.primary, "primary[n_particles]/O")
 
+        # Leaves in event
         self.leaves = np.zeros(self.max_particles, dtype=np.int32)
         self.tree.Branch("leaves", self.leaves, "leaves[n_particles]/I")
 
+        # B index
         self.b_index = np.zeros(self.max_particles, dtype=np.int32)
         self.tree.Branch("b_index", self.b_index, "b_index[n_particles]/I")
 
-        # Note the convention to identify features
+        # Features dictionary
         self.feat_dict = {}
         for feat in self.features:
             self.feat_dict[feat] = np.zeros(self.max_particles, np.float32)
@@ -307,7 +318,9 @@ class RootSaverModule(b2.Module):
         self.tree.Branch("mcPDG", self.mc_pdg, "mcPDG[n_particles]/F")
 
     def _reset_LCA(self):
-        """"""
+        """
+        Resets the value of the LCA to 0.
+        """
         for p_index in [1, 2]:
             self.truth_dict[f"LCAS_{p_index}"][: self.max_particles**2] *= 0
             self.truth_dict[f"n_LCA_leaves_{p_index}"][0] *= 0
@@ -315,14 +328,16 @@ class RootSaverModule(b2.Module):
             self.truth_dict[f"n_LCA_{p_index}"][0] *= 0
 
     def event(self):
-        """"""
+        """
+        Called for each event.
+        """
         from ROOT.Belle2 import PyStoreObj
 
         # Get the particle list (note this is a regular Particle list, not MCParticle)
         p_list = PyStoreObj(self.mcparticle_list)
 
-        # Event number from EventMetaData -loaded with PyStoreObj
         self.event_num[0] = self.eventinfo.getEvent()
+
         # Is Upsilon flag
         if self.mcparticle_list == "Upsilon(4S):MC":
             self.isB[0] = 0
@@ -331,7 +346,7 @@ class RootSaverModule(b2.Module):
         elif self.mcparticle_list == "B+:MC":
             self.isB[0] = 2
 
-        # ### Create the LCA
+        # Create the LCA
         # IMPORTANT: The ArrayIndex is 0-based.
         # mcplist contains the root particles we are to create LCAs from
         # Reset the LCA list so if only one B is there it does not carry an older version over
@@ -438,6 +453,8 @@ class RootSaverModule(b2.Module):
             self.tree.Fill()
 
     def terminate(self):
-        """"""
+        """
+        Called at the end.
+        """
         self.root_outfile.Write()
         self.root_outfile.Close()

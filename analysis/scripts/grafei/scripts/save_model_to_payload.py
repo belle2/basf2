@@ -11,11 +11,15 @@ class SaveModelToPayload(b2.Module):
     """
 
     def initialize(self):
-        """"""
+        """
+        Called at the beginning
+        """
         b2.B2INFO('Creating local database...')
 
     def beginRun(self):
-        """"""
+        """
+        Called at the beginning of each run.
+        """
         from ROOT import Belle2
 
         iov = Belle2.IntervalOfValidity.always()
@@ -25,7 +29,9 @@ class SaveModelToPayload(b2.Module):
         db.addPayload('graFEIConfigFile', config_file, iov)
 
     def terminate(self):
-        """"""
+        """
+        Called at the end.
+        """
         b2.B2INFO('Done!')
 
 

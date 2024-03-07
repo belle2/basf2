@@ -13,40 +13,40 @@ from .geometric_layers import NodeLayer, EdgeLayer, GlobalLayer
 
 class GraFEIModel(torch.nn.Module):
     """
-        Actual implementation of the model,
-        based on the
-        `MetaLayer <https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.MetaLayer.html>`_
-        class.
+    Actual implementation of the model,
+    based on the
+    `MetaLayer <https://pytorch-geometric.readthedocs.io/en/latest/generated/torch_geometric.nn.models.MetaLayer.html>`_
+    class.
 
-        .. seealso::
-            `Relational inductive biases, deep learning, and graph networks <https://arxiv.org/abs/1806.01261>`_
+    .. seealso::
+        `Relational inductive biases, deep learning, and graph networks <https://arxiv.org/abs/1806.01261>`_
 
-        The network is composed of:
+    The network is composed of:
 
-        1. A first MetaLayer to increase the number of nodes and edges features;
-        2. A number of intermediate MetaLayers (tunable in config file);
-        3. A last MetaLayer to decrease the number of node and edge features to the desired output dimension.
+    1. A first MetaLayer to increase the number of nodes and edges features;
+    2. A number of intermediate MetaLayers (tunable in config file);
+    3. A last MetaLayer to decrease the number of node and edge features to the desired output dimension.
 
-        .. figure:: figs/graFEI.png
-          :width: 42em
-          :align: center
+    .. figure:: figs/graFEI.png
+        :width: 42em
+        :align: center
 
-        Each MetaLayer is in turn composed of `EdgeLayer`, `NodeLayer` and `GlobalLayer` sub-blocks.
+    Each MetaLayer is in turn composed of `EdgeLayer`, `NodeLayer` and `GlobalLayer` sub-blocks.
 
-        Args:
-            nfeat_in_dim (int): Node features dimension (number of input node features).
-            efeat_in_dim (int): Edge features dimension (number of input edge features).
-            gfeat_in_dim (int): Global features dimension (number of input global features).
-            edge_classes (int): Edge features output dimension (i.e. number of different edge labels in the LCAS matrix).
-            x_classes (int): Node features output dimension (i.e. number of different mass hypotheses).
-            hidden_layer_dim (int): Intermediate features dimension (same for node, edge and global).
-            num_hid_layers (int): Number of hidden layers in every MetaLayer.
-            num_ML (int): Number of intermediate MetaLayers.
-            droput (float): Dropout rate :math:`r \\in [0,1]`.
-            global_layer (bool): Whether to use global layer.
+    Args:
+        nfeat_in_dim (int): Node features dimension (number of input node features).
+        efeat_in_dim (int): Edge features dimension (number of input edge features).
+        gfeat_in_dim (int): Global features dimension (number of input global features).
+        edge_classes (int): Edge features output dimension (i.e. number of different edge labels in the LCAS matrix).
+        x_classes (int): Node features output dimension (i.e. number of different mass hypotheses).
+        hidden_layer_dim (int): Intermediate features dimension (same for node, edge and global).
+        num_hid_layers (int): Number of hidden layers in every MetaLayer.
+        num_ML (int): Number of intermediate MetaLayers.
+        droput (float): Dropout rate :math:`r \\in [0,1]`.
+        global_layer (bool): Whether to use global layer.
 
-        :return: Node, edge and global features after model evaluation.
-        :rtype: tuple(`Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_)
+    :return: Node, edge and global features after model evaluation.
+    :rtype: tuple(`Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_)
     """
 
     def __init__(
@@ -63,11 +63,12 @@ class GraFEIModel(torch.nn.Module):
         global_layer=True,
         **kwargs
     ):
+        """
+        Initialization.
+        """
         super(GraFEIModel, self).__init__()
 
-        self.x_classes = x_classes
-        self.edge_classes = edge_classes
-
+        # First MetaLayer
         self.first_ML = MetaLayer(
             EdgeLayer(
                 nfeat_in_dim,
@@ -99,6 +100,8 @@ class GraFEIModel(torch.nn.Module):
             if global_layer
             else None,
         )
+
+        # Intermediate MetaLayers
         self.ML_list = torch.nn.ModuleList(
             [
                 MetaLayer(
@@ -135,6 +138,8 @@ class GraFEIModel(torch.nn.Module):
                 for _ in range(num_ML)
             ]
         )
+
+        # Output MetaLayer
         self.last_ML = MetaLayer(
             EdgeLayer(
                 hidden_layer_dim,
@@ -171,7 +176,9 @@ class GraFEIModel(torch.nn.Module):
         )
 
     def forward(self, batch):
-        """"""
+        """
+        Called internally by PyTorch to propagate the input through the network.
+        """
         x, u, edge_index, edge_attr, torch_batch = (
             batch.x,
             batch.u,

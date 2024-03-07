@@ -25,12 +25,19 @@ class MultiTrainLoss(nn.Module):
         ignore_index=-1,
         reduction="mean",
     ):
+        """
+        Initialization
+        """
         super().__init__()
+
+        # Parameter controlling the importance of mass term in loss
         self.alpha_mass = alpha_mass
 
+        # LCA cross-entropy
         self.LCA_CE = nn.CrossEntropyLoss(
             ignore_index=ignore_index, reduction=reduction
         )
+        # Mass cross-entropy
         self.mass_CE = nn.CrossEntropyLoss(
             ignore_index=ignore_index, reduction=reduction
         )
@@ -38,7 +45,9 @@ class MultiTrainLoss(nn.Module):
         assert alpha_mass >= 0, "Alpha should be positive"
 
     def forward(self, x_input, x_target, edge_input, edge_target, u_input, u_target):
-        """"""
+        """
+        Called internally by PyTorch to propagate the input.
+        """
 
         LCA_loss = self.LCA_CE(
             edge_input,

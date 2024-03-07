@@ -50,11 +50,20 @@ class GraFEIIgniteTrainer:
         scheduler=None,
         ignore_index=-1.0,
     ):
+        """
+        Initialization.
+        """
+        # Model
         self.model = model
+        # Optimizer
         self.optimizer = optimizer
+        # Configs
         self.configs = configs
+        # Tags
         self.tags = tags
+        # Index to ignore
         self.ignore_index = ignore_index
+        # CPU or GPU
         self.device = device
 
         # Run timestamp to distinguish trainings
@@ -111,6 +120,7 @@ class GraFEIIgniteTrainer:
 
             return loss.item()
 
+        # Ignite trainer
         self.trainer = ignite.engine.Engine(_update_model)
 
         if scheduler:
@@ -145,13 +155,11 @@ class GraFEIIgniteTrainer:
                     output_transform=lambda x: [
                         x[1], x[4], x[6], x[5], x[7], x[8],
                     ],
-                    ignore_background=True,
                 ),
                 "perfectMasses": PerfectMasses(
                     ignore_index=ignore_index,
                     device=device,
                     output_transform=lambda x: [x[0], x[3], x[5], x[7], x[8]],
-                    ignore_background=True,
                 ),
                 "perfectEvent": PerfectEvent(
                     ignore_index=ignore_index,
@@ -159,7 +167,6 @@ class GraFEIIgniteTrainer:
                     output_transform=lambda x: [
                         x[0], x[3], x[1], x[4], x[6], x[5], x[7], x[8],
                     ],
-                    ignore_background=True,
                 ),
             }
 

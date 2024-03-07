@@ -51,16 +51,27 @@ class GraFEIModule(b2.Module):
         sig_side_masses=None,
         gpu=False,
     ):
+        """
+        Initialization.
+        """
         super().__init__()
+        # Input particle list
         self.particle_list = particle_list
+        # Config yaml file path
         self.cfg_path = cfg_path
+        # PyTorch parameter file path
         self.param_file = param_file
+        # Chosen sig-side LCAS
         self.sig_side_lcas = torch.tensor(sig_side_lcas) if sig_side_lcas else None
+        # Chosen sig-side mass hypotheses
         self.sig_side_masses = sig_side_masses
+        # If running on GPU
         self.gpu = gpu
 
     def initialize(self):
-        """"""
+        """
+        Called at the beginning.
+        """
         # Get weights and configs from the DB if they are not provided from the user
         if not self.cfg_path:
             config = Belle2.DBAccessorBase(
@@ -76,15 +87,20 @@ class GraFEIModule(b2.Module):
         # Figure out if we re running on data or MC
         self.storeTrueInfo = Belle2.Environment.Instance().isMC()
 
-        # Figure out which device all this is running on
+        # Figure out which device all this is running on - CPU or GPU
         self.device = torch.device(
             "cuda" if (self.gpu and torch.cuda.is_available()) else "cpu"
         )
 
         # Load configs
         cfg_file = open(self.cfg_path, "r")
+        # Config file
         self.configs = yaml.safe_load(cfg_file)
 
+        # Top MC particle
+        self.mc_particle = None
+        # Max LCAS level
+        self.max_level = None
         # B or Ups reco? 0 = Ups, 1 = B0, 2 = B+
         if self.configs["model"]["B_reco"] == 0:
             self.mc_particle = "Upsilon(4S):MC"
@@ -106,15 +122,18 @@ class GraFEIModule(b2.Module):
             "mixed_precision"
         ] and self.device == torch.device("cuda")
 
-        # Get features
+        # Node features
         self.node_features = self.configs["dataset"]["config"]["features"]
+        # Edge features
         self.edge_features = self.configs["dataset"]["config"]["edge_features"]
+        # Global features
         self.glob_features = self.configs["dataset"]["config"]["global_features"]
 
-        # Set name convention
+        # Naming convention
         self.node_features = [f"feat_{name}" for name in self.node_features] if self.node_features else []
         self.edge_features = [f"edge_{name}" for name in self.edge_features] if self.edge_features else []
         self.glob_features = [f"glob_{name}" for name in self.glob_features] if self.glob_features else []
+        # Discarded node features
         self.discarded_features = ["feat_x", "feat_y", "feat_z", "feat_px", "feat_py", "feat_p"]
 
         # Extract the number of features
@@ -122,7 +141,8 @@ class GraFEIModule(b2.Module):
         e_infeatures = len(self.edge_features)
         g_infeatures = len(self.glob_features)
 
-        # Build the model (the correct edge_classes is taken from the config file)
+        # The model
+        # The correct edge_classes is taken from the config file
         self.model = GraFEIModel(
             nfeat_in_dim=n_infeatures,
             efeat_in_dim=e_infeatures,
@@ -143,7 +163,9 @@ class GraFEIModule(b2.Module):
         b2.B2DEBUG(10, "Model structure:\n", {self.model})
 
     def event(self):
-        """"""
+        """
+        Called at the beginning of each event.
+        """
         b2.B2DEBUG(10, "---- Processing new event ----")
 
         # Get the B candidate list

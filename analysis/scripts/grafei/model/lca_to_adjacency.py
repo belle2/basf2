@@ -17,7 +17,6 @@ class InvalidLCAMatrix(Exception):
     """
     Specialized Exception sub-class raised for malformed LCA matrices or LCA matrices not encoding trees.
     """
-
     pass
 
 
@@ -33,15 +32,24 @@ class Node:
     """
 
     def __init__(self, level, children, lca_index=None, lcas_level=0):
+        """
+        Initialization
+        """
+        # LCA level
         self.level = level
+        # Node children
         self.children = children
+        # LCA index
         self.lca_index = lca_index
+        # LCAS level
         self.lcas_level = lcas_level
 
+        # Parent nodes
         self.parent = None
+        # BFS index
         self.bfs_index = -1
+        # DFS index
         self.dfs_index = -1
-
 
 # def _print_history(node):
 #     """
@@ -51,6 +59,7 @@ class Node:
 #     print([child.lcas_level for child in node.children])
 #     for child in node.children:
 #         _print_history(child)
+
 
 def _get_ancestor(node):
     """

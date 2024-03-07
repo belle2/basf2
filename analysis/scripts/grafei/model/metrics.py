@@ -35,23 +35,28 @@ class PerfectLCA(Metric, object):
     :type output_transform: `function <https://docs.python.org/3/glossary.html#term-function>`_
     :param device: ``cpu`` or ``gpu``.
     :type device: str
-    :param ignore_background: Flag to ignore background events in computation (not used).
-    :type ignore_background: bool
     """
 
-    def __init__(self, ignore_index, output_transform, device='cpu', ignore_background=False):
-
+    def __init__(self, ignore_index, output_transform, device='cpu'):
+        """
+        Initialization.
+        """
+        # Ignore index
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
+        # CPU or GPU
         self.device = device
-        self.ignore_background = ignore_background
+        # Good samples
         self._per_corrects = None
+        # Total samples
         self._num_examples = None
 
         super(PerfectLCA, self).__init__(output_transform=output_transform, device=device)
 
     @reinit__is_reduced
     def reset(self):
-        """"""
+        """
+        Resets counters.
+        """
         self._per_corrects = 0
         self._num_examples = 0
 
@@ -59,7 +64,9 @@ class PerfectLCA(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
-        """"""
+        """
+        Updates counts.
+        """
         edge_pred, edge_y, edge_index, u_y, batch, num_graphs = output
 
         num_graphs = num_graphs.item()
@@ -86,16 +93,14 @@ class PerfectLCA(Metric, object):
         # Count the number of zero wrong predictions across the batch
         batch_perfect = truth.sum().item()
 
-        # Ignore background events (does nothing in the current setting)
-        ignored_num = torch.logical_and((u_y == 0), (truth == 1)).sum().item() if self.ignore_background else 0
-        ignored_den = (u_y == 0).sum().item() if self.ignore_background else 0
-
-        self._per_corrects += (batch_perfect - ignored_num)
-        self._num_examples += (num_graphs - ignored_den)
+        self._per_corrects += batch_perfect
+        self._num_examples += num_graphs
 
     @sync_all_reduce("_perfectLCA")
     def compute(self):
-        """"""
+        """
+        Final result.
+        """
         if self._num_examples == 0:
             raise NotComputableError(
                 "CustomAccuracy must have at least one example before it can be computed."
@@ -124,23 +129,28 @@ class PerfectMasses(Metric, object):
     :type output_transform: `function <https://docs.python.org/3/glossary.html#term-function>`_
     :param device: ``cpu`` or ``gpu``.
     :type device: str
-    :param ignore_background: Flag to ignore background events in computation (not used).
-    :type ignore_background: bool
     """
 
-    def __init__(self, ignore_index, output_transform, device='cpu', ignore_background=False):
-
+    def __init__(self, ignore_index, output_transform, device='cpu'):
+        """
+        Initialization.
+        """
+        # Ignore index
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
+        # CPU or GPU
         self.device = device
-        self.ignore_background = ignore_background
+        # Good samples
         self._per_corrects = None
+        # Total samples
         self._num_examples = None
 
         super(PerfectMasses, self).__init__(output_transform=output_transform, device=device)
 
     @reinit__is_reduced
     def reset(self):
-        """"""
+        """
+        Resets counts.
+        """
         self._per_corrects = 0
         self._num_examples = 0
 
@@ -148,7 +158,9 @@ class PerfectMasses(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
-        """"""
+        """
+        Updates counts.
+        """
         x_pred, x_y, u_y, batch, num_graphs = output
 
         num_graphs = num_graphs.item()
@@ -174,16 +186,14 @@ class PerfectMasses(Metric, object):
         # Count the number of zero wrong predictions across the batch
         batch_perfect = truth.sum().item()
 
-        # Ignore background events
-        ignored_num = torch.logical_and((u_y == 0), (truth == 1)).sum().item() if self.ignore_background else 0
-        ignored_den = (u_y == 0).sum().item() if self.ignore_background else 0
-
-        self._per_corrects += (batch_perfect - ignored_num)
-        self._num_examples += (num_graphs - ignored_den)
+        self._per_corrects += batch_perfect
+        self._num_examples += num_graphs
 
     @sync_all_reduce("_perfectMasses")
     def compute(self):
-        """"""
+        """
+        Final computation.
+        """
         if self._num_examples == 0:
             raise NotComputableError(
                 "CustomAccuracy must have at least one example before it can be computed."
@@ -216,23 +226,28 @@ class PerfectEvent(Metric, object):
     :type output_transform: `function <https://docs.python.org/3/glossary.html#term-function>`_
     :param device: ``cpu`` or ``gpu``.
     :type device: str
-    :param ignore_background: Flag to ignore background events in computation (not used).
-    :type ignore_background: bool
     """
 
-    def __init__(self, ignore_index, output_transform, device='cpu', ignore_background=False):
-
+    def __init__(self, ignore_index, output_transform, device='cpu'):
+        """
+        Initialization.
+        """
+        # Ignore index
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
+        # CPU or GPU
         self.device = device
-        self.ignore_background = ignore_background
+        # Good samples
         self._per_corrects = None
+        # Total samples
         self._num_examples = None
 
         super(PerfectEvent, self).__init__(output_transform=output_transform, device=device)
 
     @reinit__is_reduced
     def reset(self):
-        """"""
+        """
+        Resets counts.
+        """
         self._per_corrects = 0
         self._num_examples = 0
 
@@ -240,7 +255,9 @@ class PerfectEvent(Metric, object):
 
     @reinit__is_reduced
     def update(self, output):
-        """"""
+        """
+        Updates counts.
+        """
         x_pred, x_y, edge_pred, edge_y, edge_index, u_y, batch, num_graphs = output
 
         num_graphs = num_graphs.item()
@@ -279,16 +296,14 @@ class PerfectEvent(Metric, object):
         truth = x_truth.bool() & edge_truth.bool()
         batch_perfect = (truth + 0).sum().item()
 
-        # Ignore background events
-        ignored_num = torch.logical_and((u_y == 0), (truth == 1)).sum().item() if self.ignore_background else 0
-        ignored_den = (u_y == 0).sum().item() if self.ignore_background else 0
-
-        self._per_corrects += (batch_perfect - ignored_num)
-        self._num_examples += (num_graphs - ignored_den)
+        self._per_corrects += batch_perfect
+        self._num_examples += num_graphs
 
     @sync_all_reduce("_perfectEvent")
     def compute(self):
-        """"""
+        """
+        Final computation.
+        """
         if self._num_examples == 0:
             raise NotComputableError(
                 "CustomAccuracy must have at least one example before it can be computed."

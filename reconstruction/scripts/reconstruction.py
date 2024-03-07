@@ -350,6 +350,9 @@ def add_cosmics_reconstruction(
       MVA based charged particle ID (false).
     """
 
+    # Set the run for cosmics data
+    basf2.declare_cosmics(True)
+
     # Check components.
     check_components(components)
 

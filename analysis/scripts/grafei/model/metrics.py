@@ -41,13 +41,13 @@ class PerfectLCA(Metric, object):
         """
         Initialization.
         """
-        # Ignore index
+        #: Ignore index
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
-        # CPU or GPU
+        #: CPU or GPU
         self.device = device
-        # Good samples
+        #: Good samples
         self._per_corrects = None
-        # Total samples
+        #: Total samples
         self._num_examples = None
 
         super(PerfectLCA, self).__init__(output_transform=output_transform, device=device)
@@ -135,13 +135,13 @@ class PerfectMasses(Metric, object):
         """
         Initialization.
         """
-        # Ignore index
+        #: Ignore index
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
-        # CPU or GPU
+        #: CPU or GPU
         self.device = device
-        # Good samples
+        #: Good samples
         self._per_corrects = None
-        # Total samples
+        #: Total samples
         self._num_examples = None
 
         super(PerfectMasses, self).__init__(output_transform=output_transform, device=device)
@@ -232,13 +232,13 @@ class PerfectEvent(Metric, object):
         """
         Initialization.
         """
-        # Ignore index
+        #: Ignore index
         self.ignore_index = ignore_index if isinstance(ignore_index, list) else [ignore_index]
-        # CPU or GPU
+        #: CPU or GPU
         self.device = device
-        # Good samples
+        #: Good samples
         self._per_corrects = None
-        # Total samples
+        #: Total samples
         self._num_examples = None
 
         super(PerfectEvent, self).__init__(output_transform=output_transform, device=device)

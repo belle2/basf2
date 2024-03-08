@@ -223,16 +223,16 @@ class RootSaverModule(b2.Module):
         Initialization.
         """
         super().__init__()
-        # Input particle lists
+        #: Input particle lists
         self.particle_lists = particle_lists
-        # Features to save
+        #: Features to save
         self.features = features
-        # MC particle list (Upsilon, B0, B+)
+        #: MC particle list (Upsilon, B0, B+)
         self.mcparticle_list = mcparticle_list
-        # Output file name
+        #: Output file name
         self.output_file = output_file
 
-        # Max number of particles
+        #: Max number of particles
         # It doesn't actually matter what this is as long as it's bigger than
         # the number of particles in any events we'll encounter. ROOT won't save all entries.
         self.max_particles = 500
@@ -243,22 +243,22 @@ class RootSaverModule(b2.Module):
         """
         from ROOT import Belle2, TFile, TTree
 
-        # Event info
+        #: Event info
         self.eventinfo = Belle2.PyStoreObj("EventMetaData")
 
-        # ROOT output file
+        #: ROOT output file
         self.root_outfile = TFile(self.output_file, "recreate")
-        # ROOT tree
+        #: ROOT tree
         self.tree = TTree("Tree", "tree")
 
-        # Event number
+        #: Event number
         self.event_num = np.zeros(1, dtype=np.int32)
         self.tree.Branch("event", self.event_num, "event/I")
-        # bool containing information whether we reconstruct B or Upsilon
+        #: bool containing information whether we reconstruct B or Upsilon
         self.isB = np.zeros(1, dtype=bool)
         self.tree.Branch("isB", self.isB, "isB/b")
 
-        # Truth information
+        #: Truth information
         self.truth_dict = {}
 
         # We assume at most two LCA matrices for event
@@ -288,24 +288,23 @@ class RootSaverModule(b2.Module):
             )
 
         # Feature data
-        # Here use one number to indicate how many particles were reconstructed
-        # Number of particles
+        #: Number of particles
         self.n_particles = np.zeros(1, dtype=np.int32)
         self.tree.Branch("n_particles", self.n_particles, "n_particles/I")
 
-        # Particle-is-primary flag
+        #: Particle-is-primary flag
         self.primary = np.zeros(self.max_particles, dtype=np.bool)
         self.tree.Branch("primary", self.primary, "primary[n_particles]/O")
 
-        # Leaves in event
+        #: Leaves in event
         self.leaves = np.zeros(self.max_particles, dtype=np.int32)
         self.tree.Branch("leaves", self.leaves, "leaves[n_particles]/I")
 
-        # B index
+        #: B index
         self.b_index = np.zeros(self.max_particles, dtype=np.int32)
         self.tree.Branch("b_index", self.b_index, "b_index[n_particles]/I")
 
-        # Features dictionary
+        #: Features dictionary
         self.feat_dict = {}
         for feat in self.features:
             self.feat_dict[feat] = np.zeros(self.max_particles, np.float32)
@@ -313,7 +312,7 @@ class RootSaverModule(b2.Module):
                 f"feat_{feat}", self.feat_dict[feat], f"feat_{feat}[n_particles]/F"
             )
 
-        # True MC PDG
+        #: True MC PDG
         self.mc_pdg = np.zeros(self.max_particles, np.float32)
         self.tree.Branch("mcPDG", self.mc_pdg, "mcPDG[n_particles]/F")
 

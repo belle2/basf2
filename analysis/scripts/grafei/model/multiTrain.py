@@ -30,14 +30,14 @@ class MultiTrainLoss(nn.Module):
         """
         super().__init__()
 
-        # Parameter controlling the importance of mass term in loss
+        #: Parameter controlling the importance of mass term in loss
         self.alpha_mass = alpha_mass
 
-        # LCA cross-entropy
+        #: LCA cross-entropy
         self.LCA_CE = nn.CrossEntropyLoss(
             ignore_index=ignore_index, reduction=reduction
         )
-        # Mass cross-entropy
+        #: Mass cross-entropy
         self.mass_CE = nn.CrossEntropyLoss(
             ignore_index=ignore_index, reduction=reduction
         )

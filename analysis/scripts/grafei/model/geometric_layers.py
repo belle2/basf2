@@ -70,31 +70,31 @@ class EdgeLayer(nn.Module):
         """
         super(EdgeLayer, self).__init__()
 
-        # Non-linear activation
+        #: Non-linear activation
         self.nonlin_function = F.elu
-        # Number of hidden layers
+        #: Number of hidden layers
         self.num_hid_layers = num_hid_layers
-        # Dropout probability
+        #: Dropout probability
         self.dropout_prob = dropout
-        # Normalization
+        #: Normalization
         self.normalize = normalize
 
-        # Linear input layer
+        #: Linear input layer
         self.lin_in = nn.Linear(
             efeat_in_dim + 2 * nfeat_in_dim + gfeat_in_dim, efeat_hid_dim
         )
-        # Intermediate linear layers
+        #: Intermediate linear layers
         self.lins_hid = nn.ModuleList(
             [
                 nn.Linear(efeat_hid_dim, efeat_hid_dim)
                 for _ in range(self.num_hid_layers)
             ]
         )
-        # Output linear layer
+        #: Output linear layer
         self.lin_out = nn.Linear(efeat_hid_dim, efeat_out_dim, bias=not normalize)
 
         if normalize:
-            # Batch normalization
+            #: Batch normalization
             self.norm = nn.BatchNorm1d(efeat_out_dim)
 
         _init_weights(self, normalize)
@@ -181,31 +181,31 @@ class NodeLayer(nn.Module):
         """
         super(NodeLayer, self).__init__()
 
-        # Non-linear activation
+        #: Non-linear activation
         self.nonlin_function = F.elu
-        # Number of hidden layers
+        #: Number of hidden layers
         self.num_hid_layers = num_hid_layers
-        # Dropout probability
+        #: Dropout probability
         self.dropout_prob = dropout
-        # Normalize
+        #: Normalize
         self.normalize = normalize
 
-        # Input linear layer
+        #: Input linear layer
         self.lin_in = nn.Linear(
             gfeat_in_dim + nfeat_in_dim + efeat_in_dim, nfeat_hid_dim
         )
-        # Intermediate linear layers
+        #: Intermediate linear layers
         self.lins_hid = nn.ModuleList(
             [
                 nn.Linear(nfeat_hid_dim, nfeat_hid_dim)
                 for _ in range(self.num_hid_layers)
             ]
         )
-        # Output linear layer
+        #: Output linear layer
         self.lin_out = nn.Linear(nfeat_hid_dim, nfeat_out_dim, bias=not normalize)
 
         if normalize:
-            # Batch normalization
+            #: Batch normalization
             self.norm = nn.BatchNorm1d(nfeat_out_dim)
 
         _init_weights(self, normalize)
@@ -299,31 +299,31 @@ class GlobalLayer(nn.Module):
         """
         super(GlobalLayer, self).__init__()
 
-        # Non-linear activation
+        #: Non-linear activation
         self.nonlin_function = F.elu
-        # Number of hidden layers
+        #: Number of hidden layers
         self.num_hid_layers = num_hid_layers
-        # Dropout probability
+        #: Dropout probability
         self.dropout_prob = dropout
-        # Normalization
+        #: Normalization
         self.normalize = normalize
 
-        # Input linear layer
+        #: Input linear layer
         self.lin_in = nn.Linear(
             nfeat_in_dim + efeat_in_dim + gfeat_in_dim, gfeat_hid_dim
         )
-        # Intermediate linear layers
+        #: Intermediate linear layers
         self.lins_hid = nn.ModuleList(
             [
                 nn.Linear(gfeat_hid_dim, gfeat_hid_dim)
                 for _ in range(self.num_hid_layers)
             ]
         )
-        # Output linear layer
+        #: Output linear layer
         self.lin_out = nn.Linear(gfeat_hid_dim, gfeat_out_dim, bias=not normalize)
 
         if normalize:
-            # Batch normalization
+            #: Batch normalization
             self.norm = nn.BatchNorm1d(gfeat_out_dim)
 
         _init_weights(self, normalize)

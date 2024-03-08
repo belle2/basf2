@@ -68,7 +68,7 @@ class GraFEIModel(torch.nn.Module):
         """
         super(GraFEIModel, self).__init__()
 
-        # First MetaLayer
+        #: First MetaLayer
         self.first_ML = MetaLayer(
             EdgeLayer(
                 nfeat_in_dim,
@@ -101,7 +101,7 @@ class GraFEIModel(torch.nn.Module):
             else None,
         )
 
-        # Intermediate MetaLayers
+        #: Intermediate MetaLayers
         self.ML_list = torch.nn.ModuleList(
             [
                 MetaLayer(
@@ -139,7 +139,7 @@ class GraFEIModel(torch.nn.Module):
             ]
         )
 
-        # Output MetaLayer
+        #: Output MetaLayer
         self.last_ML = MetaLayer(
             EdgeLayer(
                 hidden_layer_dim,

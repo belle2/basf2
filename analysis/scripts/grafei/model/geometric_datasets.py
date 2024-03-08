@@ -23,7 +23,7 @@ def _preload(self):
     Creates graph objects and stores them into a python list.
     """
 
-    # Going to use x_files as an array that always exists
+    #: Going to use x_files as an array that always exists
     self.x_files = sorted(self.root.glob("**/*.root"))
 
     # Select the first N files (useful for testing)
@@ -40,13 +40,13 @@ def _preload(self):
 
     # Save the features
     with uproot.open(self.x_files[0])["Tree"] as t:
-        # Features
+        #: Features
         self.features = [f for f in t.keys() if f.startswith("feat_")]
-        # B reco flag
+        #: B reco flag
         self.B_reco = int(t["isB"].array(library="np")[0])
         assert self.B_reco in [0, 1, 2], "B_reco should be 0, 1 or 2, something went wrong"
 
-    # Discarded features
+    #: Discarded features
     self.discarded = [
         f for f in self.features if not f[f.find("_") + 1:] in self.node_features
     ]
@@ -57,21 +57,21 @@ def _preload(self):
     print(f"Input node features: {self.features}")
     print(f"Discarded node features: {self.discarded}")
 
-    # Edge features
+    #: Edge features
     self.edge_features = [f"edge_{f}" for f in self.edge_features]
-    # Global features
+    #: Global features
     self.global_features = [f"glob_{f}" for f in self.global_features] if self.global_features else []
     print(f"Input edge features: {self.edge_features}")
     print(f"Input global features: {self.global_features}")
 
-    # Preload data
+    #: Preload data
     self.x, self.y = preload_root_data(
         self.x_files,
         self.features,
         self.discarded,
     )
 
-    # Need to populate a list of available training samples
+    #: Need to populate a list of available training samples
     self.avail_samples = populate_avail_samples(
         self.x,
         self.y,
@@ -256,23 +256,23 @@ def _process_graph(self, idx):
 
 class BelleRecoSetGeometricInMemory(InMemoryDataset):
     """
-        Dataset handler for converting Belle II data to PyTorch geometric InMemoryDataset.
+    Dataset handler for converting Belle II data to PyTorch geometric InMemoryDataset.
 
-        The ROOT format expects the tree in every file to be named ``Tree``,
-        and all node features to have the format ``feat_FEATNAME``.
+    The ROOT format expects the tree in every file to be named ``Tree``,
+    and all node features to have the format ``feat_FEATNAME``.
 
-        .. note:: This expects the files under root to have the structure ``root/**/<file_name>.root``
-            where the root path is different for train and val.
-            The ``**/`` is to handle subdirectories, e.g. ``sub00``.
+    .. note:: This expects the files under root to have the structure ``root/**/<file_name>.root``
+        where the root path is different for train and val.
+        The ``**/`` is to handle subdirectories, e.g. ``sub00``.
 
-        Args:
-            root (str): Path to ROOT files.
-            n_files (int): Load only ``n_files`` files.
-            samples (int): Load only ``samples`` events.
-            features (list): List of node features names.
-            edge_features (list): List of edge features names.
-            global_features (list): List of global features names.
-            normalize (bool): Whether to normalize input features.
+    Args:
+        root (str): Path to ROOT files.
+        n_files (int): Load only ``n_files`` files.
+        samples (int): Load only ``samples`` events.
+        features (list): List of node features names.
+        edge_features (list): List of edge features names.
+        global_features (list): List of global features names.
+        normalize (bool): Whether to normalize input features.
     """
 
     def __init__(
@@ -294,21 +294,21 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         ), f'Argument "features" must be a list and not {type(features)}'
         assert len(features) > 0, "You need to use at least one node feature"
 
-        # Root path
+        #: Root path
         self.root = Path(root)
 
-        # Normalize
+        #: Normalize
         self.normalize = normalize
 
-        # Number of files
+        #: Number of files
         self.n_files = n_files
-        # Node features
+        #: Node features
         self.node_features = features
-        # Edge features
+        #: Edge features
         self.edge_features = edge_features
-        # Global features
+        #: Global features
         self.global_features = global_features
-        # Samples
+        #: Samples
         self.samples = samples
 
         # Delete processed files, in case
@@ -320,7 +320,7 @@ class BelleRecoSetGeometricInMemory(InMemoryDataset):
         # Needs to be called after having assigned all attributes
         super().__init__(root, None, None, None)
 
-        # Data and Slices
+        #: Data and Slices
         self.data, self.slices = torch.load(self.processed_paths[0])
 
     @property

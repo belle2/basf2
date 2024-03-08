@@ -35,21 +35,19 @@ class Node:
         """
         Initialization
         """
-        # LCA level
+        #: LCA level
         self.level = level
-        # Node children
+        #: Node children
         self.children = children
-        # LCA index
+        #: LCA index
         self.lca_index = lca_index
-        # LCAS level
+        #: LCAS level
         self.lcas_level = lcas_level
 
-        # Parent nodes
+        #: Parent nodes
         self.parent = None
-        # BFS index
+        #: BFS index
         self.bfs_index = -1
-        # DFS index
-        self.dfs_index = -1
 
 # def _print_history(node):
 #     """
@@ -251,8 +249,6 @@ def lca_to_adjacency(lca_matrix):
 
     :param lca_matrix: 2-dimensional LCA matrix (M, M).
     :type lca_matrix: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_
-    :param format: Output format of the generated adjacency matrix. Can be either one of the two 'bfs' or 'dfs'.
-    :type format: str
 
     :return: 2-dimensional matrix (N, N) encoding the graph's node adjacencies. Linked nodes have values unequal to zero.
     :rtype: `Tensor <https://pytorch.org/docs/stable/tensors.html#torch.Tensor>`_

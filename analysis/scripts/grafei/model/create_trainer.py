@@ -53,23 +53,23 @@ class GraFEIIgniteTrainer:
         """
         Initialization.
         """
-        # Model
+        #: Model
         self.model = model
-        # Optimizer
+        #: Optimizer
         self.optimizer = optimizer
-        # Configs
+        #: Configs
         self.configs = configs
-        # Tags
+        #: Tags
         self.tags = tags
-        # Index to ignore
+        #: Index to ignore
         self.ignore_index = ignore_index
-        # CPU or GPU
+        #: CPU or GPU
         self.device = device
 
-        # Run timestamp to distinguish trainings
+        #: Run timestamp to distinguish trainings
         self.timestamp = datetime.now().strftime("%Y.%m.%d_%H.%M")
 
-        # Output directory for checkpoints
+        #: Output directory for checkpoints
         self.run_dir = None
         if self.configs["output"] is not None:
             if ("path" in self.configs["output"].keys()) and (
@@ -120,14 +120,14 @@ class GraFEIIgniteTrainer:
 
             return loss.item()
 
-        # Ignite trainer
+        #: Ignite trainer
         self.trainer = ignite.engine.Engine(_update_model)
 
         if scheduler:
             ig_scheduler = ignite.handlers.param_scheduler.LRScheduler(scheduler)
             self.trainer.add_event_handler(ignite.engine.Events.ITERATION_STARTED, ig_scheduler)
 
-        # Setup train and validation evaluators
+        #: Setup train and validation evaluators
         self.evaluators = {}
 
         for tag in self.tags:

@@ -164,7 +164,8 @@ namespace Belle2 {
       uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
       uint64_t numberOfEvents = training_data.getNumberOfEvents();
 
-      auto numberOfValidationEvents = static_cast<uint64_t>(numberOfEvents * (1 - m_specific_options.m_training_fraction));
+      auto numberOfValidationEvents = static_cast<uint64_t>(numberOfEvents * 100 * (1 - m_specific_options.m_training_fraction));
+      numberOfValidationEvents = numberOfValidationEvents / 100 + (numberOfValidationEvents % 100 != 0);
       auto numberOfTrainingEvents = static_cast<uint64_t>(numberOfEvents * m_specific_options.m_training_fraction);
 
       uint64_t batch_size = m_specific_options.m_mini_batch_size;

@@ -14,15 +14,12 @@ import modularAnalysis as ma
 from variables import variables as vm
 from stdCharged import stdK, stdPi
 
-from ROOT import Belle2
-
 # Necessary to run argparse
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import random
 import argparse
-from pathlib import Path
 
 from grafei import GraFEIModule
 
@@ -43,7 +40,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="graFEI_mixed_LCAMassProb_v1",
+        default="user_jcerasol_mixed_graFEI_BReco_example",
         help="Globaltag containing graFEI model",
     )
     return parser.parse_args()
@@ -57,10 +54,8 @@ if __name__ == "__main__":
     b2.conditions.prepend_globaltag(args.globaltag)
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-    input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
-
     path = b2.create_path()
-    ma.inputMdst(str(input_file), path=path)
+    ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
 
     # graFEI cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
@@ -319,7 +314,7 @@ if __name__ == "__main__":
     ma.variablesToNtuple(
         "Upsilon(4S):graFEI",
         sorted(graFEI_vars),
-        filename='graFEI_onROE_output.root',
+        filename="graFEI_BReco_example.root",
         treename="tree",
         path=path,
     )

@@ -14,15 +14,12 @@ import modularAnalysis as ma
 from variables import variables as vm
 import stdPhotons
 
-from ROOT import Belle2
-
 # Necessary to run argparse
 from ROOT import PyConfig
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import random
 import argparse
-from pathlib import Path
 
 from grafei import GraFEIModule
 
@@ -44,7 +41,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_Bu2Knunu_graFEI_newParams_newCuts_v1",
+        default="user_jcerasol_Bu2Knunu_graFEI_UpsReco_example",
         help="Globaltag containing graFEI model",
     )
     parser.add_argument(
@@ -78,10 +75,8 @@ if __name__ == "__main__":
     b2.conditions.prepend_globaltag(args.globaltag)
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
-    input_file = Path(Belle2.Environment.Instance().getInputFilesOverride()[0])
-
     path = b2.create_path()
-    ma.inputMdst(str(input_file), path=path)
+    ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
 
     #################################################################################################
     # GraFEI requirements and reconstruction
@@ -224,8 +219,6 @@ if __name__ == "__main__":
     # Make ntuples
     ################################################################################
 
-    input_file_path = Belle2.Environment.Instance().getInputFilesOverride()[0]
-
     # Variables
     momentum_vars = [
         "p",
@@ -336,7 +329,7 @@ if __name__ == "__main__":
     ma.variablesToNtuple(
         "Upsilon(4S):graFEI",
         sorted(all_vars),
-        filename=f'graFEI_UpsReco_{input_file_path[input_file_path.rfind("/")+1:]}',
+        filename="graFEI_UpsReco_example.root",
         treename="tree",
         path=path,
     )

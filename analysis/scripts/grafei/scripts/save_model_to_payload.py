@@ -12,36 +12,7 @@
 import sys
 import basf2 as b2
 
-
-class SaveModelToPayload(b2.Module):
-    """
-    Module to save model weight and yaml files to payload.
-    """
-
-    def initialize(self):
-        """
-        Called at the beginning
-        """
-        b2.B2INFO('Creating local database...')
-
-    def beginRun(self):
-        """
-        Called at the beginning of each run.
-        """
-        from ROOT import Belle2
-
-        iov = Belle2.IntervalOfValidity.always()
-
-        db = Belle2.Database.Instance()
-        db.addPayload('graFEIModelFile', model_file, iov)
-        db.addPayload('graFEIConfigFile', config_file, iov)
-
-    def terminate(self):
-        """
-        Called at the end.
-        """
-        b2.B2INFO('Done!')
-
+from ROOT import Belle2
 
 if __name__ == "__main__":
     model_file = sys.argv[1]
@@ -53,7 +24,10 @@ if __name__ == "__main__":
     eventinfosetter.param({'evtNumList': [1], 'expList': 0, 'runList': 0})
     main.add_module(eventinfosetter)
 
-    modelSaver = b2.register_module(SaveModelToPayload())
-    main.add_module(modelSaver)
+    iov = Belle2.IntervalOfValidity.always()
+
+    db = Belle2.Database.Instance()
+    db.addPayload('graFEIModelFile', model_file, iov)
+    db.addPayload('graFEIConfigFile', config_file, iov)
 
     b2.process(main)

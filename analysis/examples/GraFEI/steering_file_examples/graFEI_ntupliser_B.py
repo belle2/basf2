@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 
 import basf2 as b2
@@ -43,10 +50,6 @@ def _parse_args():
 
 
 if __name__ == "__main__":
-    # Random seeds
-    b2.set_random_seed(42)
-    random.seed(42)
-
     args = _parse_args()
 
     store_mc_truth = True
@@ -117,7 +120,7 @@ if __name__ == "__main__":
     )
     ma.reconstructDecay(
         "B0:sig -> D-:Kpipi mu+:tight",
-        "cosThetaBetweenParticleAndNominalB>-2 and cosThetaBetweenParticleAndNominalB<2",
+        "abs(cosThetaBetweenParticleAndNominalB)<2",
         path=path,
     )
 
@@ -313,11 +316,9 @@ if __name__ == "__main__":
 
     graFEI_vars.extend(["Bsig_D_M", "Bsig_D_E", "Bsig_D_pt", "Bsig_D_p"])
 
-    graFEI_vars = sorted(list(set(graFEI_vars)))
-
     ma.variablesToNtuple(
         "Upsilon(4S):graFEI",
-        graFEI_vars,
+        sorted(graFEI_vars),
         filename='graFEI_onROE_output.root',
         treename="tree",
         path=path,

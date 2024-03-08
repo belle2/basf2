@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
 
 
 import basf2 as b2
@@ -11,7 +18,6 @@ from ROOT import Belle2
 
 # Necessary to run argparse
 from ROOT import PyConfig
-
 PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import random
@@ -19,6 +25,11 @@ import argparse
 from pathlib import Path
 
 from grafei import GraFEIModule
+
+
+# Random seeds
+b2.set_random_seed(42)
+random.seed(42)
 
 
 def _parse_args():
@@ -60,10 +71,6 @@ def _parse_args():
 
 
 if __name__ == "__main__":
-    # Random seeds
-    b2.set_random_seed(42)
-    random.seed(42)
-
     args = _parse_args()
 
     store_mc_truth = not args.no_mc_truth
@@ -328,7 +335,7 @@ if __name__ == "__main__":
 
     ma.variablesToNtuple(
         "Upsilon(4S):graFEI",
-        sorted(list(set(all_vars))),
+        sorted(all_vars),
         filename=f'graFEI_UpsReco_{input_file_path[input_file_path.rfind("/")+1:]}',
         treename="tree",
         path=path,

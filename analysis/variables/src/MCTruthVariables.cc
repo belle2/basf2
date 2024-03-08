@@ -944,7 +944,7 @@ namespace Belle2 {
         return 1;
     }
 
-    double ancestorBIndex(const Particle* particle)
+    int ancestorBIndex(const Particle* particle)
     {
       const MCParticle* mcpart = particle->getMCParticle();
 

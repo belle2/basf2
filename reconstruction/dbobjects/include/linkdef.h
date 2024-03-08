@@ -19,7 +19,7 @@
 #pragma link C++ class Belle2::CDCDedxMeanPars+; // checksum=0xd03db2ef, version=2
 #pragma link C++ class Belle2::CDCDedxSigmaPars+; // checksum=0x6e3a5ad9, version=2
 #pragma link C++ class Belle2::CDCDedxInjectionTime+; // checksum=0x67331ce, version=1
-#pragma link C++ class Belle2::DedxPDFs+; // checksum=0x329f51e9, version=2
+#pragma link C++ class Belle2::DedxPDFs; // checksum=0x329f51e9, version=2
 #pragma link C++ class Belle2::EventsOfDoomParameters+; // checksum=0xef74844b, version=1
 #pragma link C++ class Belle2::CDCDedxDatabaseImporter-;
 

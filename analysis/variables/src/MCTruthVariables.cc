@@ -946,13 +946,12 @@ namespace Belle2 {
 
     double ancestorBIndex(const Particle* particle)
     {
-      int partPDG = 0;
       const MCParticle* mcpart = particle->getMCParticle();
 
       while (mcpart) {
-        partPDG = std::abs(mcpart->getPDG());
+        int pdg = std::abs(mcpart->getPDG());
 
-        if ((partPDG == 521) || (partPDG == 511))
+        if ((pdg == 521) || (pdg == 511))
           return mcpart->getArrayIndex();
 
         mcpart = mcpart->getMother();

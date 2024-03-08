@@ -6,6 +6,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+
 import torch_geometric
 from pathlib import Path
 from .geometric_datasets import BelleRecoSetGeometricInMemory

@@ -936,7 +936,7 @@ void SVDLocalCalibrationsCheckModule::printMaskedSummaryPages()
   mask->cd(2);
   m_hMaskSummaryCHECK->getHistogram(1)->Draw("colztext");
   mask->cd(3);
-  m_hMaskSummary->getHistogram(1)->Draw("colztext");
+  m_hMaskSummary->getHistogram(0)->Draw("colztext");
   mask->cd(4);
   m_hMaskSummaryCHECK->getHistogram(0)->Draw("colztext");
   mask->Print(m_outputPdfName.c_str());

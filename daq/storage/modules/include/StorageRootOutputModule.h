@@ -53,6 +53,12 @@ namespace Belle2 {
      */
     virtual void initialize() override;
 
+    /** Issued by the lastEventMessage = DAQ STOP
+     *
+     *  Closing output file
+     */
+    virtual void endRun() override;
+
     /** Write data in c_Event DataStore maps.
      *
      *  Loops over all objects in event maps (in the first call of the function) and writes them to event-TTree.

@@ -90,6 +90,16 @@ namespace Belle2 {
     /// Return the number of stored event T0s
     unsigned long getNumberOfTemporaryEventT0s() const;
 
+    /// Return the best SVD-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestSVDTemporaryEventT0() const;
+    /// Return the best CDC-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestCDCTemporaryEventT0() const;
+    /// Return the best TOP-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestTOPTemporaryEventT0() const;
+    /// Return the best ECL-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestECLTemporaryEventT0() const;
+
+
     /// Clear the list of temporary event T0 estimations
     void clearTemporaries();
 

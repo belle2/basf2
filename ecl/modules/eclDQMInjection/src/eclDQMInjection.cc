@@ -81,10 +81,10 @@ void ECLDQMInjectionModule::defineHisto()
                               "Time since last injection in #mus;Time within beam cycle in #mus", 500, 0, 30000, 100, 0,
                               m_revolutionTime);
   hOccAfterInjLER = new TH2F("ECLOccAfterInjLER",
-                             "ECL Occupancy after LER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
+                             "ECL Occupancy after LER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
                              100, 0, 20000, 98, 2, 100);
   hOccAfterInjHER = new TH2F("ECLOccAfterInjHER",
-                             "ECL Occupancy after HER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/ECLElementNumbers::c_NCrystals) [%]",
+                             "ECL Occupancy after HER injection (E > 1 MeV);Time since last injection in #mus;Occupancy (Nhits/8736) [%]",
                              100, 0, 20000, 98, 2, 100);
 
   hInjkickTimeShift[0] = new TH2F("ECLInjkickTimeShiftLER",
@@ -250,14 +250,14 @@ void ECLDQMInjectionModule::event()
       hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
       hEBurstsAfterInjHER->Fill(diff2);
       hVetoAfterInjHER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
-      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
+      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / (ECLElementNumbers::c_NCrystals * 100.));
     } else {
       hHitsAfterInjLER->Fill(diff2, all);
       hEHitsAfterInjLER->Fill(diff2);
       hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
       hEBurstsAfterInjLER->Fill(diff2);
       hVetoAfterInjLER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
-      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / ECLElementNumbers::c_NCrystals * 100.);
+      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / (ECLElementNumbers::c_NCrystals * 100.));
     }
 
     //== Filling h_ped_peak histograms

@@ -38,11 +38,13 @@ HepevtInputModule::HepevtInputModule() : Module(), m_evtNum(-1)
 
 void HepevtInputModule::initialize()
 {
-  if (m_expNum < 0 or m_runNum < 0)
-    B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the HepevtInput module.");
+  if (m_makeMaster) {
+    if (m_expNum < 0 or m_runNum < 0)
+      B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the HepevtInput module.");
 
-  m_eventMetaData.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  B2INFO("HepevtInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+    m_eventMetaData.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    B2INFO("HepevtInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+  }
 
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {

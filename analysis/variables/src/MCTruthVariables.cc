@@ -137,6 +137,24 @@ namespace Belle2 {
       return curMCParticle->getArrayIndex();
     }
 
+    double genQ2PmPd(const Particle* part, const std::vector<double>& daughter_indices)
+    {
+      const MCParticle* mcparticle = part->getMCParticle();
+      if (!mcparticle) return Const::doubleNaN;
+
+      auto daughters = mcparticle->getDaughters();
+
+      ROOT::Math::PxPyPzEVector  p4Daughters;
+      for (auto& double_daughter : daughter_indices) {
+        unsigned long daughter = std::lround(double_daughter);
+        if (daughter >= daughters.size()) return Const::doubleNaN;
+
+        p4Daughters += daughters[daughter]->get4Vector();
+      }
+      auto p4Mother = mcparticle->get4Vector();
+      return (p4Mother - p4Daughters).mag2();
+    }
+
     double genMotherPDG(const Particle* part)
     {
       return genNthMotherPDG(part, {});
@@ -822,6 +840,72 @@ namespace Belle2 {
       return weightsum;
     }
 
+    // Helper function for particleClusterTotalMCMatchWeightForKlong
+    void getKlongWeightMap(const Particle* particle, std::map<int, double>& mapMCParticleIndxAndWeight)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+
+      for (unsigned int i = 0; i < mcps.size(); ++i) {
+        double weight = mcps.weight(i);
+        const MCParticle* mcp = mcps[i];
+
+        while (mcp) {
+          if (mcp->getPDG() == 130) {
+            int index = mcp->getArrayIndex();
+            if (mapMCParticleIndxAndWeight.find(index) != mapMCParticleIndxAndWeight.end()) {
+              mapMCParticleIndxAndWeight.at(index) = mapMCParticleIndxAndWeight.at(index) + weight;
+            } else {
+              mapMCParticleIndxAndWeight.insert({index, weight});
+            }
+            break;
+          } else {
+            mcp = mcp->getMother();
+          }
+        }
+      }
+    }
+
+    double particleClusterTotalMCMatchWeightForKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      double totalWeight = 0;
+      for (const auto& map : mapMCParticleIndxAndWeight) {
+        totalWeight += map.second;
+      }
+
+      return totalWeight;
+    }
+
+    double particleClusterTotalMCMatchWeightForBestKlong(const Particle* particle)
+    {
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (!cluster) return Const::doubleNaN;
+
+      auto mcps = cluster->getRelationsTo<MCParticle>();
+      if (mcps.size() == 0) return Const::doubleNaN;
+
+      std::map<int, double> mapMCParticleIndxAndWeight;
+      getKlongWeightMap(particle, mapMCParticleIndxAndWeight);
+
+      if (mapMCParticleIndxAndWeight.size() == 0)
+        return 0.0;
+
+      auto maxMap = std::max_element(mapMCParticleIndxAndWeight.begin(), mapMCParticleIndxAndWeight.end(),
+      [](const auto & x, const auto & y) { return x.second < y.second; }
+                                    );
+
+      return maxMap->second;
+    }
+
     double isBBCrossfeed(const Particle* particle)
     {
       if (particle == nullptr)
@@ -876,6 +960,18 @@ namespace Belle2 {
                       "Check the PDG code of a particles MC mother particle");
     REGISTER_VARIABLE("genMotherPDG(i)", genNthMotherPDG,
                       "Check the PDG code of a particles n-th MC mother particle by providing an argument. 0 is first mother, 1 is grandmother etc.  :noindex:");
+
+    REGISTER_VARIABLE("genQ2PmPd(i,j,...)", genQ2PmPd, R"DOC(
+                       Returns the generated four momentum transfer squared :math:`q^2` calculated as :math:`q^2 = (p_m - p_{d_i} - p_{d_j} - ...)^2`.
+
+                       Here :math:`p_m` is the four momentum of the given (mother) particle,
+                       and :math:`p_{d_{i,j,...}}` are the daughter particles with indices given as arguments .
+                       The ordering of daughters is as defined in the DECAY.DEC file used in the generation, with the numbering starting at :math:`N=0`.
+
+                       Returns NaN if no related MCParticle could be found.
+                       Returns NaN if any of the given indices is larger than the number of daughters of the given particle.
+
+                       )DOC", ":math:`[\\text{GeV}/\\text{c}]^2`");
 
     REGISTER_VARIABLE("genMotherID", genMotherIndex,
                       "Check the array index of a particles generated mother");
@@ -1110,6 +1206,12 @@ List of possible values (taken from the Geant4 source of
                       "Returns the PDG code of the MCParticle for the ECLCluster -> MCParticle relation with the largest weight.");
     REGISTER_VARIABLE("clusterTotalMCMatchWeight", particleClusterTotalMCMatchWeight,
                       "Returns the sum of all weights of the ECLCluster -> MCParticles relations.");
+
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForKlong", particleClusterTotalMCMatchWeightForKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is a Klong or daughter of a Klong");
+    REGISTER_VARIABLE("clusterTotalMCMatchWeightForBestKlong", particleClusterTotalMCMatchWeightForBestKlong,
+                      "Returns the sum of all weights of the ECLCluster -> MCParticles relations when MCParticle is the same Klong or daughter of the Klong. If multiple MC Klongs are related to the ECLCluster, returns the sum of weights for the best matched Klong.");
+
 
   }
 }

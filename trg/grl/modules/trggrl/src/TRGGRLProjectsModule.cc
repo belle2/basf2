@@ -176,6 +176,7 @@ void
 TRGGRLProjectsModule::beginRun()
 {
   B2DEBUG(20, "TRGGDLModule ... beginRun called ");
+  m_falsebits.clear();
   //...GDL config. name...
 }
 //-----------------------------------------------------------------------------------------
@@ -977,7 +978,12 @@ void TRGGRLProjectsModule::event()
 
     //DITTO: please don't change the WARNING message below.
     //If you change it, please update the test trg_tsim_check_warnings.py accordingly.
-    else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    //else B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    else {
+      bit = false;
+      bool notcontain = std::find(m_falsebits.begin(), m_falsebits.end(), bitname) == m_falsebits.end();
+      if (notcontain) m_falsebits.push_back(bitname);
+    }
 
     trgInfo->setInputBits(i, bit);
   }
@@ -988,6 +994,11 @@ void
 TRGGRLProjectsModule::endRun()
 {
   B2DEBUG(20, "TRGGRLProjectsModule ... endRun called ");
+  if (m_falsebits.size() > 0) {
+    for (const std::string& bitname : m_falsebits) {
+      B2WARNING("Unknown bitname" << LogVar("bitname", bitname));
+    }
+  }
 }
 
 

@@ -95,6 +95,12 @@ namespace Belle2 {
     /** The canvas hold the basic DQM info. */
     TCanvas* m_c_info = nullptr;
 
+    /** DAQ number of processed events */
+    int m_nevent = 0;
+
+    /** last change date/time of shm input file */
+    std::string m_lastChange;
+
     /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 

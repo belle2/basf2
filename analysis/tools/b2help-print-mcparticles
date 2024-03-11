@@ -1,0 +1,33 @@
+#!/bin/bash
+
+print_help() {
+    echo "Usage: $0 [options] -i filename"
+    echo ""
+    echo "This command prints the MCParticles of the input mdst file and outputs an ntuple including __MCDecayString__."
+    echo "Default output file name is ntuple.root."
+    echo "You can use any of basf2's options, e.g. -o, -n, and --skip-events."
+    echo "Specifically, -i is required to select the input mdst file."
+    echo ""
+    echo "Options:"
+    echo "  -i, --input    input mdst file name (required)"
+    echo "  -h, --help     show this help message and exit"
+    echo ""
+}
+
+input_specified=false
+for arg in "$@"; do    
+    if [[ $arg == "-h" || $arg == "--help" ]]; then
+	print_help
+	exit 0
+    elif [[ $arg == "-i" || $arg == "--input" ]]; then
+        input_specified=true
+    fi
+done
+
+if [ $input_specified == false ]; then
+    echo "ERROR: You must specify the input file with -i option." >&2
+    print_help
+    exit 1
+fi
+
+basf2 /analysis/examples/printMCParticleArray.py "$@"

@@ -271,6 +271,8 @@ void DQMHistAnalysisARICHModule::event()
   }
   setEpicsPV("badAPDs", nbadApd);
 
+  delete apdHits;
+
 }
 
 

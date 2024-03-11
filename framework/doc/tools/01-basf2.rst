@@ -21,6 +21,11 @@ The main command line tool for the Belle2 Software is ``basf2``::
                           Set global log level (one of DEBUG, INFO, RESULT,
                           WARNING, or ERROR). Takes precedence over
                           set_log_level() in steering file.
+--package_log_level PACKAGELOGLEVEL
+                          Set a package log level (one of DEBUG, INFO, RESULT,
+                          WARNING, or ERROR). Syntax: packageName:LOGLEVEL.
+                          (Ex. cdc:ERROR or klm:DEBUG:20). Does not take
+                          precedence over package.set_log_level() in steering file.
 --random-seed SEED        Set the default initial seed for the random number
                           generator. This does not take precedence over calls to
                           set_random_seed() in the steering file, but just
@@ -51,7 +56,7 @@ The main command line tool for the Belle2 Software is ``basf2``::
                           the shell.
 -S ARG, --sequence ARG    Override the number sequence (e.g. ``23:42,101``)
                           defining the entries (starting from 0) which are
-                          processed by RootInput.Must be specified exactly once
+                          processed by RootInput. Must be specified exactly once
                           for each file to be opened.This means one sequence
                           per input file AFTER wildcard expansion. This are not
                           event numbers but the entry numbers in the input

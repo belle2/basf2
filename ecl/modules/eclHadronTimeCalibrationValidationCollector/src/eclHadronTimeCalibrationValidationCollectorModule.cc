@@ -401,8 +401,8 @@ void eclHadronTimeCalibrationValidationCollectorModule::collect()
   // Fill the histogram for the event level variables
   getObjectPtr<TH1F>("eventT0")->Fill(evt_t0) ;
 
-  bool isCDCt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::CDC);
-  bool isECLt0 = (static_cast<EventT0::EventT0Component>(*m_eventT0->getEventT0Component())).detectorSet.contains(Const::ECL);
+  bool isCDCt0 = m_eventT0->isCDCEventT0();
+  bool isECLt0 = m_eventT0->isECLEventT0();
   string t0Detector = "UNKNOWN... WHY?";
   if (isCDCt0) {
     t0Detector = "CDC" ;

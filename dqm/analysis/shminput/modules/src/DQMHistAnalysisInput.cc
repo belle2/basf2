@@ -94,7 +94,6 @@ void DQMHistAnalysisInputModule::event()
 {
   initHistListBeforeEvent();
 
-  sleep(m_interval);
   std::vector<TH1*> hs;
   char mbstr[100];
 
@@ -190,6 +189,9 @@ void DQMHistAnalysisInputModule::event()
     anyupdate |= addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
+
+  // if there is no update, sleep a moment
+  if (!anyupdate) sleep(m_interval);
 
   // if no histogram was updated, we could stop processing
   setReturnValue(anyupdate);

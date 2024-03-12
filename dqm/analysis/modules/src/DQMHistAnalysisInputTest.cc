@@ -176,7 +176,7 @@ void DQMHistAnalysisInputTestModule::event()
   }
 
   for (auto h : m_testHisto) {
-    addHist("test", h->GetName(), h);
+    addHist("test", h->GetName(), h->Clone());
   }
 
   /*{

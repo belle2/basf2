@@ -592,7 +592,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_MeanSVD3EventT0 == NULL) {
     B2INFO("Histograms needed for SVD Event T0 (3 samples) not found");
-    m_monObj->setVariable("MeanSVD3EventT0", -1);
   } else {
     m_monObj->setVariable("MeanSVD3EventT0", MeanSVD3EventT0);
   }

@@ -150,7 +150,7 @@ void DQMHistAnalysisTOPModule::initialize()
     m_c_pmtHitRates.push_back(new TCanvas(cname.c_str(), ctitle.c_str()));
   }
 
-  m_text1 = new TPaveText(1, 435, 12, 500, "NB");
+  m_text1 = new TPaveText(0.125, 0.8, 0.675, 0.88, "NDC");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
   m_text2 = new TPaveText(0.55, 0.8, 0.85, 0.89, "NDC");
@@ -276,6 +276,7 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
       m_text1->AddText(Form("Fraction outside red lines: %.2f %%", totalWindowFraction * 100.0));
     }
     delete px;
+    delete band;
   }
 
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
@@ -457,7 +458,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   auto* canvas = m_c_photonYields;
   canvas->cd();
   photonYields->SetMinimum(0);
-  photonYields->Draw();
+  photonYields->DrawClone();
   for (auto* line : m_photonYieldsAlarmLines) line->Draw("same");
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
   canvas->Modified();
@@ -490,12 +491,14 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   canvas = m_c_backgroundRates;
   canvas->cd();
   backgroundRates->SetMinimum(0);
-  backgroundRates->Draw();
+  backgroundRates->DrawClone();
   for (auto* line : m_backgroundAlarmLines) line->Draw("same");
   m_text3->Draw();
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
   canvas->Modified();
 
+  delete photonYields;
+  delete backgroundRates;
   delete activeFract;
 }
 
@@ -629,6 +632,7 @@ void DQMHistAnalysisTOPModule::makePMTHitRatesPlots()
     auto* canvas = m_c_pmtHitRates[slot - 1];
     canvas->Clear();
     canvas->cd();
+    h->SetMinimum(0);
     h->Draw();
     canvas->Modified();
   }

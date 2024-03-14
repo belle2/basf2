@@ -92,6 +92,7 @@ void DQMHistAnalysisInputModule::beginRun()
 
 void DQMHistAnalysisInputModule::event()
 {
+  TH1::AddDirectory(false);
   initHistListBeforeEvent();
 
   std::vector<TH1*> hs;

@@ -543,6 +543,8 @@ void DQMHistAnalysisSVDGeneralModule::event()
   m_occVstatus = 0;
   m_onlineOccUstatus = 0;
   m_onlineOccVstatus = 0;
+  m_occUGroupId0 = 0;
+  m_occVGroupId0 = 0;
 
   m_onlineOccU3Samples = 0;
   m_onlineOccV3Samples = 0;

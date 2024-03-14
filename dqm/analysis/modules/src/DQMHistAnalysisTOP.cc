@@ -239,6 +239,10 @@ void DQMHistAnalysisTOPModule::event()
 
 void DQMHistAnalysisTOPModule::endRun()
 {
+  // these two histograms do not exist anymore since file is closed, therefore
+  m_photonYields = nullptr;
+  m_backgroundRates = nullptr;
+
   // add MiraBelle monitoring
 
   for (const auto& var : m_mirabelleVariables) {
@@ -430,49 +434,51 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   auto* backgroundHits = (TProfile*) findHist("TOP/backgroundHits");
   if (not backgroundHits) return;
 
-  auto* photonYields = signalHits->ProjectionX("TOP/photonYields");
-  auto* backgroundRates = backgroundHits->ProjectionX("TOP/backgroundRates");
+  if (m_photonYields) delete m_photonYields;
+  m_photonYields = signalHits->ProjectionX("TOP/photonYields");
+  if (m_backgroundRates) delete m_backgroundRates;
+  m_backgroundRates = backgroundHits->ProjectionX("TOP/backgroundRates");
   auto* activeFract = (TH1F*) activeFraction->Clone("tmp");
   for (int i = 1; i <= activeFract->GetNbinsX(); i++) activeFract->SetBinError(i, 0);
 
-  photonYields->Add(photonYields, backgroundRates, 1, -1);
-  photonYields->Divide(photonYields, activeFract);
-  setMiraBelleVariables("PhotonsPerTrack_slot", photonYields);
+  m_photonYields->Add(m_photonYields, m_backgroundRates, 1, -1);
+  m_photonYields->Divide(m_photonYields, activeFract);
+  setMiraBelleVariables("PhotonsPerTrack_slot", m_photonYields);
 
   int alarmState = c_Gray;
   if (signalHits->GetEntries() > 0 and activeFraction->Integral() > 0) {
     double hmin = 1000;
-    for (int i = 1; i <= photonYields->GetNbinsX(); i++) {
+    for (int i = 1; i <= m_photonYields->GetNbinsX(); i++) {
       if (signalHits->GetBinEntries(i) < 10) continue;
-      hmin = std::min(hmin, photonYields->GetBinContent(i) + 3 * photonYields->GetBinError(i));
+      hmin = std::min(hmin, m_photonYields->GetBinContent(i) + 3 * m_photonYields->GetBinError(i));
     }
     if (hmin < 1000) alarmState = getAlarmState(hmin, m_photonYieldsAlarmLevels, false);
   }
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
-  photonYields->SetTitle("Number of photons per track");
-  photonYields->SetYTitle("photons per track");
-  photonYields->SetMarkerStyle(24);
-  photonYields->GetXaxis()->SetNdivisions(16);
+  m_photonYields->SetTitle("Number of photons per track");
+  m_photonYields->SetYTitle("photons per track");
+  m_photonYields->SetMarkerStyle(24);
+  m_photonYields->GetXaxis()->SetNdivisions(16);
 
   auto* canvas = m_c_photonYields;
   canvas->cd();
-  photonYields->SetMinimum(0);
-  photonYields->DrawClone();
+  m_photonYields->SetMinimum(0);
+  m_photonYields->Draw();
   for (auto* line : m_photonYieldsAlarmLines) line->Draw("same");
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
   canvas->Modified();
 
-  backgroundRates->Scale(1.0 / 50.0e-3 / 32);  // measured in 50 ns window, 32 PMT's ==> rate in MHz/PMT
-  backgroundRates->Divide(backgroundRates, activeFract);
-  setMiraBelleVariables("BackgroundRate_slot", backgroundRates);
+  m_backgroundRates->Scale(1.0 / 50.0e-3 / 32);  // measured in 50 ns window, 32 PMT's ==> rate in MHz/PMT
+  m_backgroundRates->Divide(m_backgroundRates, activeFract);
+  setMiraBelleVariables("BackgroundRate_slot", m_backgroundRates);
 
   alarmState = c_Gray;
   m_text3->Clear();
   if (backgroundHits->GetEntries() > 100 and activeFraction->Integral() > 0) {
-    int status = backgroundRates->Fit("pol0", "Q0");
+    int status = m_backgroundRates->Fit("pol0", "Q0");
     if (status == 0) {
-      auto* fun = backgroundRates->GetFunction("pol0");
+      auto* fun = m_backgroundRates->GetFunction("pol0");
       if (fun) {
         double average = fun->GetParameter(0);
         double error = fun->GetParError(0);
@@ -483,22 +489,20 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   }
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
-  backgroundRates->SetTitle("Background rates");
-  backgroundRates->SetYTitle("background rate [MHz/PMT]");
-  backgroundRates->SetMarkerStyle(24);
-  backgroundRates->GetXaxis()->SetNdivisions(16);
+  m_backgroundRates->SetTitle("Background rates");
+  m_backgroundRates->SetYTitle("background rate [MHz/PMT]");
+  m_backgroundRates->SetMarkerStyle(24);
+  m_backgroundRates->GetXaxis()->SetNdivisions(16);
 
   canvas = m_c_backgroundRates;
   canvas->cd();
-  backgroundRates->SetMinimum(0);
-  backgroundRates->DrawClone();
+  m_backgroundRates->SetMinimum(0);
+  m_backgroundRates->Draw();
   for (auto* line : m_backgroundAlarmLines) line->Draw("same");
   m_text3->Draw();
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
   canvas->Modified();
 
-  delete photonYields;
-  delete backgroundRates;
   delete activeFract;
 }
 

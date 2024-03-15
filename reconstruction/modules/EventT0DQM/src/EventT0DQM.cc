@@ -154,6 +154,54 @@ void EventT0DQMModule::defineHisto()
                                                 "SVD EventT0, L1TRG from TOP, HLT mumu;EventT0 [ns];events / 0.5 ns",
                                                 nBins, minT0, maxT0);
 
+  m_histAlgorithmSourceFractionsHadronL1ECLTRG =
+    new TH1F("AlgorithmSourceFractionsHadronL1ECLTRG",
+             "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by ECL;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsHadronL1CDCTRG =
+    new TH1F("AlgorithmSourceFractionsHadronL1CDCTRG",
+             "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by CDC;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsHadronL1TOPTRG =
+    new TH1F("AlgorithmSourceFractionsHadronL1TOPTRG",
+             "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by TOP;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG =
+    new TH1F("AlgorithmSourceFractionsBhaBhaL1ECLTRG",
+             "Fraction of events with EventT0 from each algorithm for Bhabha events triggerd by ECL;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG =
+    new TH1F("AlgorithmSourceFractionsBhaBhaL1CDCTRG",
+             "Fraction of events with EventT0 from each algorithm for Bhabha events triggerd by CDC;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG =
+    new TH1F("AlgorithmSourceFractionsBhaBhaL1TOPTRG",
+             "Fraction of events with EventT0 from each algorithm for Bhabha events triggerd by TOP;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsMuMuL1ECLTRG =
+    new TH1F("AlgorithmSourceFractionsMuMuL1ECLTRG",
+             "Fraction of events with EventT0 from each algorithm for #mu#mu events triggerd by ECL;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsMuMuL1CDCTRG =
+    new TH1F("AlgorithmSourceFractionsMuMuL1CDCTRG",
+             "Fraction of events with EventT0 from each algorithm for #mu#mu events triggerd by CDC;Algorithm;Fraction",
+             5, 0, 5);
+  m_histAlgorithmSourceFractionsMuMuL1TOPTRG =
+    new TH1F("AlgorithmSourceFractionsMuMuL1TOPTRG",
+             "Fraction of events with EventT0 from each algorithm for #mu#mu events triggerd by TOP;Algorithm;Fraction",
+             5, 0, 5);
+
+  for (uint i = 0; i < 5; i++) {
+    m_histAlgorithmSourceFractionsHadronL1ECLTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsHadronL1CDCTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsHadronL1TOPTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsMuMuL1ECLTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsMuMuL1CDCTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceFractionsMuMuL1TOPTRG->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+  }
 
   oldDir->cd();
 
@@ -230,6 +278,16 @@ void EventT0DQMModule::beginRun()
   m_histEventT0_CDC_mumu_L1_TOPTRG->Reset();
   m_histEventT0_TOP_mumu_L1_TOPTRG->Reset();
   m_histEventT0_SVD_mumu_L1_TOPTRG->Reset();
+
+  m_histAlgorithmSourceFractionsHadronL1ECLTRG->Reset();
+  m_histAlgorithmSourceFractionsHadronL1CDCTRG->Reset();
+  m_histAlgorithmSourceFractionsHadronL1TOPTRG->Reset();
+  m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG->Reset();
+  m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG->Reset();
+  m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG->Reset();
+  m_histAlgorithmSourceFractionsMuMuL1ECLTRG->Reset();
+  m_histAlgorithmSourceFractionsMuMuL1CDCTRG->Reset();
+  m_histAlgorithmSourceFractionsMuMuL1TOPTRG->Reset();
 
 }
 

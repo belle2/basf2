@@ -422,6 +422,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_bhabha_L1_ECLTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_bhabha_L1_ECLTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_bhabha_L1_ECLTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
@@ -429,6 +431,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_hadron_L1_ECLTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_hadron_L1_ECLTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_hadron_L1_ECLTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsHadronL1ECLTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
@@ -436,6 +440,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_mumu_L1_ECLTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_mumu_L1_ECLTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_mumu_L1_ECLTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsMuMuL1ECLTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
   }
   // Fill the plots that used the TOP trigger as the L1 timing source
@@ -446,6 +452,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_bhabha_L1_TOPTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_bhabha_L1_TOPTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_bhabha_L1_TOPTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
@@ -453,6 +461,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_hadron_L1_TOPTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_hadron_L1_TOPTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_hadron_L1_TOPTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsHadronL1TOPTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
@@ -460,6 +470,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_mumu_L1_TOPTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_mumu_L1_TOPTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_mumu_L1_TOPTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsMuMuL1TOPTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
   }
   // Fill the plots that used the CDC trigger as the L1 timing source
@@ -470,6 +482,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_bhabha_L1_CDCTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_bhabha_L1_CDCTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_bhabha_L1_CDCTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
@@ -477,6 +491,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_hadron_L1_CDCTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_hadron_L1_CDCTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_hadron_L1_CDCTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsHadronL1CDCTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
@@ -484,6 +500,8 @@ void EventT0DQMModule::event()
       m_histEventT0_CDC_mumu_L1_CDCTRG->Fill(eventT0_CDC);
       m_histEventT0_TOP_mumu_L1_CDCTRG->Fill(eventT0_TOP);
       m_histEventT0_SVD_mumu_L1_CDCTRG->Fill(eventT0_SVD);
+      fillHistogram(m_histAlgorithmSourceFractionsMuMuL1CDCTRG, hasECLEventT0, hasSVDEventT0, hasCDCHitBasedEventT0,
+                    hasCDCFullGridEventT0, hasTOPEventT0);
     }
   }
 
@@ -491,4 +509,15 @@ void EventT0DQMModule::event()
   B2DEBUG(20, "eventT0_CDC = " << eventT0_CDC << " ns") ;
   B2DEBUG(20, "eventT0_TOP = " << eventT0_TOP << " ns") ;
   B2DEBUG(20, "eventT0_SVD = " << eventT0_SVD << " ns") ;
+}
+
+void EventT0DQMModule::fillHistogram(TH1F* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0,
+                                     const bool hasCDCGridT0, const bool hasTOPT0)
+{
+  hist->Fill(-1); // counting events for normalisation
+  hist->Fill(c_eventT0Algorithms[0], hasECLT0);
+  hist->Fill(c_eventT0Algorithms[1], hasSVDT0);
+  hist->Fill(c_eventT0Algorithms[2], hasCDCHitT0);
+  hist->Fill(c_eventT0Algorithms[3], hasCDCGridT0);
+  hist->Fill(c_eventT0Algorithms[4], hasTOPT0);
 }

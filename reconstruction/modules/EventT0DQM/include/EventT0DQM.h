@@ -128,6 +128,10 @@ namespace Belle2 {
     /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by TOP trigger
     TH1F* m_histAlgorithmSourceFractionsMuMuL1TOPTRG{nullptr};
 
+    /// Fill fraction histogram with values
+    void fillHistogram(TH1F* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0, const bool hasCDCGridT0,
+                       const bool hasTOPT0);
+
 
   };
 

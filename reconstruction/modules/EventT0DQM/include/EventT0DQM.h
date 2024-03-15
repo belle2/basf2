@@ -16,9 +16,6 @@
 
 #include <framework/dataobjects/EventT0.h>
 
-#include <array>
-#include <string>
-
 #include <TH1F.h>
 #include <TDirectory.h>
 

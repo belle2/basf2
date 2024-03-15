@@ -398,6 +398,22 @@ void EventT0DQMModule::event()
     eventT0_SVD = evtT0List_SVD.back().eventT0 ;
   }
 
+  const auto checkForCDCAlgorithm = [cdcEventT0s = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC)](
+  const std::string & algorithm) {
+    for (const auto& evtt0 : cdcEventT0s) {
+      if (evtt0.algorithm == algorithm) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const bool hasCDCHitBasedEventT0 = checkForCDCAlgorithm("hit based");
+  const bool hasCDCFullGridEventT0 = checkForCDCAlgorithm("chi2");
+  const bool hasECLEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL);
+  const bool hasSVDEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD);
+  const bool hasTOPEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP);
+
   // Fill the plots that used the ECL trigger as the L1 timing source
   if (IsECLL1TriggerSource) {
     // Fill the histograms with the event t0 values

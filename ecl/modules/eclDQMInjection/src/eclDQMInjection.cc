@@ -250,14 +250,14 @@ void ECLDQMInjectionModule::event()
       hBurstsAfterInjHER->Fill(diff2, discarded_wfs);
       hEBurstsAfterInjHER->Fill(diff2);
       hVetoAfterInjHER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
-      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV / (ECLElementNumbers::c_NCrystals * 100.));
+      if (all > 0) hOccAfterInjHER->Fill(diff2, ECLDigitsAboveThr1MeV * 100.0 / ECLElementNumbers::c_NCrystals);
     } else {
       hHitsAfterInjLER->Fill(diff2, all);
       hEHitsAfterInjLER->Fill(diff2);
       hBurstsAfterInjLER->Fill(diff2, discarded_wfs);
       hEBurstsAfterInjLER->Fill(diff2);
       hVetoAfterInjLER->Fill(diff2, time_in_cycle_us, ECLDigitsAboveThr);
-      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV / (ECLElementNumbers::c_NCrystals * 100.));
+      if (all > 0) hOccAfterInjLER->Fill(diff2, ECLDigitsAboveThr1MeV * 100.0 / ECLElementNumbers::c_NCrystals);
     }
 
     //== Filling h_ped_peak histograms

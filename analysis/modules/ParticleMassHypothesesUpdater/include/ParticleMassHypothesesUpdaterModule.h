@@ -8,7 +8,7 @@
 
 #pragma once
 #include <framework/core/Module.h>
-#include <string>
+//#include <string>
 
 namespace Belle2 {
 

@@ -7,6 +7,9 @@
  **************************************************************************/
 
 #include <analysis/dataobjects/ParticleList.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
+#include <mdst/dataobjects/MCParticle.h>
 #include <analysis/modules/ParticleMassHypothesesUpdater/ParticleMassHypothesesUpdaterModule.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -36,7 +39,7 @@ void ParticleMassHypothesesUpdaterModule::initialize() {}
 
 void ParticleMassHypothesesUpdaterModule::event()
 {
-
+  StoreArray<Track> trackArray;
   StoreObjPtr<ParticleList> originalList(m_particleList);
   if (!originalList) {
     B2FATAL("ParticleList " << m_particleList << " not found");
@@ -55,9 +58,15 @@ void ParticleMassHypothesesUpdaterModule::event()
     for (unsigned int i = 0; i < originalList->getListSize(); ++i) {
       Const::ChargedStable type(abs(m_pdgCode));
 
-      Particle* iParticle = originalList->getParticle(i);
+      const Particle* originalParticle = originalList->getParticle(i);
+      if (originalParticle->getParticleSource() != Particle::c_Track) {
+        B2WARNING("Particle not built from a track. Skipping.");
+        continue;
+      }
 
-      const Track* track = iParticle->getTrack();
+      unsigned trackIdx = originalParticle->getMdstArrayIndex();
+
+      const Track* track = trackArray[trackIdx];
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
       const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
@@ -72,21 +81,19 @@ void ParticleMassHypothesesUpdaterModule::event()
       //   continue;
       // }
 
-      Particle particle(track->getArrayIndex(), trackFit, type);
+      Particle particle(trackIdx, trackFit, type);
 
-      if (particle.getParticleSource() == Particle::c_Track) { // should always hold but...
-        StoreArray<Particle> m_particles;
-        Particle* newPart = m_particles.appendNew(particle);
-        if (pid)
-          newPart->addRelationTo(pid);
-        if (mcParticleWithWeight.first)
-          newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
-        newPart->addRelationTo(trackFit);
+      StoreArray<Particle> particleArray;
+      Particle* newPart = particleArray.appendNew(particle);
+      if (pid)
+        newPart->addRelationTo(pid);
+      if (mcParticleWithWeight.first)
+        newPart->addRelationTo(mcParticleWithWeight.first, mcParticleWithWeight.second);
+      newPart->addRelationTo(trackFit);
 
-        newList->addParticle(newPart);
-
-      } // sanity check correct particle type
+      newList->addParticle(newPart);
     } // loop over tracks
+    newList->setEditable(false);
   }
 }
 

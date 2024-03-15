@@ -92,65 +92,9 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_zs5countsU == NULL || h_zs5countsV == NULL || h_events == NULL) {
     if (h_zs5countsU == NULL) {
       B2INFO("Histograms needed for Average Offline Occupancy on U side are not found");
-      m_monObj->setVariable("avgOffOccL3U", -1);
-      m_monObj->setVariable("avgOffOccL4U", -1);
-      m_monObj->setVariable("avgOffOccL5U", -1);
-      m_monObj->setVariable("avgOffOccL6U", -1);
-      m_monObj->setVariable("avgOffOccL3X1U", -1);
-      m_monObj->setVariable("avgOffOccL3X2U", -1);
-      m_monObj->setVariable("avgOffOccL4X1U", -1);
-      m_monObj->setVariable("avgOffOccL4X2U", -1);
-      m_monObj->setVariable("avgOffOccL4X3U", -1);
-      m_monObj->setVariable("avgOffOccL5X1U", -1);
-      m_monObj->setVariable("avgOffOccL5X2U", -1);
-      m_monObj->setVariable("avgOffOccL5X3U", -1);
-      m_monObj->setVariable("avgOffOccL5X4U", -1);
-      m_monObj->setVariable("avgOffOccL6X1U", -1);
-      m_monObj->setVariable("avgOffOccL6X2U", -1);
-      m_monObj->setVariable("avgOffOccL6X3U", -1);
-      m_monObj->setVariable("avgOffOccL6X4U", -1);
-      m_monObj->setVariable("avgOffOccL6X5U", -1);
-      m_monObj->setVariable("avgOffOccL311U", -1);
-      m_monObj->setVariable("avgOffOccL312U", -1);
-      m_monObj->setVariable("avgOffOccL321U", -1);
-      m_monObj->setVariable("avgOffOccL322U", -1);
-      m_monObj->setVariable("avgOffOccL461U", -1);
-      m_monObj->setVariable("avgOffOccL462U", -1);
-      m_monObj->setVariable("avgOffOccL581U", -1);
-      m_monObj->setVariable("avgOffOccL582U", -1);
-      m_monObj->setVariable("avgOffOccL6101U", -1);
-      m_monObj->setVariable("avgOffOccL6102U", -1);
     }
     if (h_zs5countsV == NULL) {
       B2INFO("Histograms needed for Average Offline Occupancy on V side are not found");
-      m_monObj->setVariable("avgOffOccL3V", -1);
-      m_monObj->setVariable("avgOffOccL4V", -1);
-      m_monObj->setVariable("avgOffOccL5V", -1);
-      m_monObj->setVariable("avgOffOccL6V", -1);
-      m_monObj->setVariable("avgOffOccL3X1V", -1);
-      m_monObj->setVariable("avgOffOccL3X2V", -1);
-      m_monObj->setVariable("avgOffOccL4X1V", -1);
-      m_monObj->setVariable("avgOffOccL4X2V", -1);
-      m_monObj->setVariable("avgOffOccL4X3V", -1);
-      m_monObj->setVariable("avgOffOccL5X1V", -1);
-      m_monObj->setVariable("avgOffOccL5X2V", -1);
-      m_monObj->setVariable("avgOffOccL5X3V", -1);
-      m_monObj->setVariable("avgOffOccL5X4V", -1);
-      m_monObj->setVariable("avgOffOccL6X1V", -1);
-      m_monObj->setVariable("avgOffOccL6X2V", -1);
-      m_monObj->setVariable("avgOffOccL6X3V", -1);
-      m_monObj->setVariable("avgOffOccL6X4V", -1);
-      m_monObj->setVariable("avgOffOccL6X5V", -1);
-      m_monObj->setVariable("avgOffOccL311V", -1);
-      m_monObj->setVariable("avgOffOccL312V", -1);
-      m_monObj->setVariable("avgOffOccL321V", -1);
-      m_monObj->setVariable("avgOffOccL322V", -1);
-      m_monObj->setVariable("avgOffOccL461V", -1);
-      m_monObj->setVariable("avgOffOccL462V", -1);
-      m_monObj->setVariable("avgOffOccL581V", -1);
-      m_monObj->setVariable("avgOffOccL582V", -1);
-      m_monObj->setVariable("avgOffOccL6101V", -1);
-      m_monObj->setVariable("avgOffOccL6102V", -1);
     }
   } else {
     // average occupancy for each layer
@@ -293,67 +237,9 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_matched_clusU == NULL || h_matched_clusV == NULL || h_found_tracksU == NULL) {
     if (h_matched_clusU == NULL) {
       B2INFO("Histograms needed for Average Efficiency on U side are not found");
-      m_monObj->setVariable("avgEffL3U", -1);
-      m_monObj->setVariable("avgEffL4U", -1);
-      m_monObj->setVariable("avgEffL5U", -1);
-      m_monObj->setVariable("avgEffL6U", -1);
-      m_monObj->setVariable("avgEffL3456U", -1);
-      m_monObj->setVariable("avgEffL3X1U", -1);
-      m_monObj->setVariable("avgEffL3X2U", -1);
-      m_monObj->setVariable("avgEffL4X1U", -1);
-      m_monObj->setVariable("avgEffL4X2U", -1);
-      m_monObj->setVariable("avgEffL4X3U", -1);
-      m_monObj->setVariable("avgEffL5X1U", -1);
-      m_monObj->setVariable("avgEffL5X2U", -1);
-      m_monObj->setVariable("avgEffL5X3U", -1);
-      m_monObj->setVariable("avgEffL5X4U", -1);
-      m_monObj->setVariable("avgEffL6X1U", -1);
-      m_monObj->setVariable("avgEffL6X2U", -1);
-      m_monObj->setVariable("avgEffL6X3U", -1);
-      m_monObj->setVariable("avgEffL6X4U", -1);
-      m_monObj->setVariable("avgEffL6X5U", -1);
-      m_monObj->setVariable("avgEffL311U", -1);
-      m_monObj->setVariable("avgEffL312U", -1);
-      m_monObj->setVariable("avgEffL321U", -1);
-      m_monObj->setVariable("avgEffL322U", -1);
-      m_monObj->setVariable("avgEffL461U", -1);
-      m_monObj->setVariable("avgEffL462U", -1);
-      m_monObj->setVariable("avgEffL581U", -1);
-      m_monObj->setVariable("avgEffL582U", -1);
-      m_monObj->setVariable("avgEffL6101U", -1);
-      m_monObj->setVariable("avgEffL6102U", -1);
     }
     if (h_matched_clusV == NULL) {
       B2INFO("Histograms needed for Average Efficiency on V side are not found");
-      m_monObj->setVariable("avgEffL3V", -1);
-      m_monObj->setVariable("avgEffL4V", -1);
-      m_monObj->setVariable("avgEffL5V", -1);
-      m_monObj->setVariable("avgEffL6V", -1);
-      m_monObj->setVariable("avgEffL3456V", -1);
-      m_monObj->setVariable("avgEffL3X1V", -1);
-      m_monObj->setVariable("avgEffL3X2V", -1);
-      m_monObj->setVariable("avgEffL4X1V", -1);
-      m_monObj->setVariable("avgEffL4X2V", -1);
-      m_monObj->setVariable("avgEffL4X3V", -1);
-      m_monObj->setVariable("avgEffL5X1V", -1);
-      m_monObj->setVariable("avgEffL5X2V", -1);
-      m_monObj->setVariable("avgEffL5X3V", -1);
-      m_monObj->setVariable("avgEffL5X4V", -1);
-      m_monObj->setVariable("avgEffL6X1V", -1);
-      m_monObj->setVariable("avgEffL6X2V", -1);
-      m_monObj->setVariable("avgEffL6X3V", -1);
-      m_monObj->setVariable("avgEffL6X4V", -1);
-      m_monObj->setVariable("avgEffL6X5V", -1);
-      m_monObj->setVariable("avgEffL311V", -1);
-      m_monObj->setVariable("avgEffL312V", -1);
-      m_monObj->setVariable("avgEffL321V", -1);
-      m_monObj->setVariable("avgEffL322V", -1);
-      m_monObj->setVariable("avgEffL461V", -1);
-      m_monObj->setVariable("avgEffL462V", -1);
-      m_monObj->setVariable("avgEffL581V", -1);
-      m_monObj->setVariable("avgEffL582V", -1);
-      m_monObj->setVariable("avgEffL6101V", -1);
-      m_monObj->setVariable("avgEffL6102V", -1);
     }
   } else {
     // average efficiency in each layer for both side (U, V)
@@ -521,19 +407,25 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_clusterCharge_L456U) h_clusterCharge_L456U->Draw();
 
   // find abscissa of max Y in histograms
-  float MPVClusterChargeL3U = -1;
-  if (h_clusterCharge_L3U) MPVClusterChargeL3U = xForMaxY(h_clusterCharge_L3U);
-  float MPVClusterChargeL3V = -1;
-  if (h_clusterCharge_L3V) MPVClusterChargeL3V = xForMaxY(h_clusterCharge_L3V);
-  float MPVClusterChargeL456U = -1;
-  if (h_clusterCharge_L456U) MPVClusterChargeL456U = xForMaxY(h_clusterCharge_L456U);
-  float MPVClusterChargeL456V = -1;
-  if (h_clusterCharge_L456V) MPVClusterChargeL456V = xForMaxY(h_clusterCharge_L456V);
+  float MPVClusterChargeL3U = -99;
+  if (h_clusterCharge_L3U)
+    if (h_clusterCharge_L3U->GetEntries() != 0)
+      MPVClusterChargeL3U = xForMaxY(h_clusterCharge_L3U);
+  float MPVClusterChargeL3V = -99;
+  if (h_clusterCharge_L3V)
+    if (h_clusterCharge_L3V->GetEntries() != 0)
+      MPVClusterChargeL3V = xForMaxY(h_clusterCharge_L3V);
+  float MPVClusterChargeL456U = -99;
+  if (h_clusterCharge_L456U)
+    if (h_clusterCharge_L456U->GetEntries() != 0)
+      MPVClusterChargeL456U = xForMaxY(h_clusterCharge_L456U);
+  float MPVClusterChargeL456V = -99;
+  if (h_clusterCharge_L456V)
+    if (h_clusterCharge_L456V->GetEntries() != 0)
+      MPVClusterChargeL456V = xForMaxY(h_clusterCharge_L456V);
 
   if (h_clusterCharge_L3U == NULL || h_clusterCharge_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster charge on U side are not found");
-    m_monObj->setVariable("MPVClusterChargeL3U", -1);
-    m_monObj->setVariable("MPVClusterChargeL456U", -1);
   } else {
     m_monObj->setVariable("MPVClusterChargeL3U", MPVClusterChargeL3U);
     m_monObj->setVariable("MPVClusterChargeL456U", MPVClusterChargeL456U);
@@ -541,8 +433,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_clusterCharge_L3V == NULL || h_clusterCharge_L456V == NULL) {
     B2INFO("Histograms needed for MPV cluster charge on V side are not found");
-    m_monObj->setVariable("MPVClusterChargeL3V", -1);
-    m_monObj->setVariable("MPVClusterChargeL456V", -1);
   } else {
     m_monObj->setVariable("MPVClusterChargeL3V", MPVClusterChargeL3V);
     m_monObj->setVariable("MPVClusterChargeL456V", MPVClusterChargeL456V);
@@ -566,19 +456,25 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_MPVSNRClusterOnTrack->cd(4);
   if (h_clusterSNR_L456V) h_clusterSNR_L456V->Draw();
 
-  float MPVClusterSNRL3U = -1;
-  if (h_clusterSNR_L3U) MPVClusterSNRL3U = xForMaxY(h_clusterSNR_L3U);
-  float MPVClusterSNRL3V = -1;
-  if (h_clusterSNR_L3V) MPVClusterSNRL3V = xForMaxY(h_clusterSNR_L3V);
-  float MPVClusterSNRL456U = -1;
-  if (h_clusterSNR_L456U) MPVClusterSNRL456U = xForMaxY(h_clusterSNR_L456U);
-  float MPVClusterSNRL456V = -1;
-  if (h_clusterSNR_L456V) MPVClusterSNRL456V = xForMaxY(h_clusterSNR_L456V);
+  float MPVClusterSNRL3U = -99;
+  if (h_clusterSNR_L3U)
+    if (h_clusterSNR_L3U->GetEntries() != 0)
+      MPVClusterSNRL3U = xForMaxY(h_clusterSNR_L3U);
+  float MPVClusterSNRL3V = -99;
+  if (h_clusterSNR_L3V)
+    if (h_clusterSNR_L3V->GetEntries() != 0)
+      MPVClusterSNRL3V = xForMaxY(h_clusterSNR_L3V);
+  float MPVClusterSNRL456U = -99;
+  if (h_clusterSNR_L456U)
+    if (h_clusterSNR_L456U->GetEntries() != 0)
+      MPVClusterSNRL456U = xForMaxY(h_clusterSNR_L456U);
+  float MPVClusterSNRL456V = -99;
+  if (h_clusterSNR_L456V)
+    if (h_clusterSNR_L456V->GetEntries() != 0)
+      MPVClusterSNRL456V = xForMaxY(h_clusterSNR_L456V);
 
   if (h_clusterSNR_L3U == NULL || h_clusterSNR_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster SNR on U side are not found");
-    m_monObj->setVariable("MPVClusterSNRL3U", -1);
-    m_monObj->setVariable("MPVClusterSNRL456U", -1);
   } else {
     m_monObj->setVariable("MPVClusterSNRL3U", MPVClusterSNRL3U);
     m_monObj->setVariable("MPVClusterSNRL456U", MPVClusterSNRL456U);
@@ -586,8 +482,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_clusterSNR_L3V == NULL || h_clusterSNR_L456V == NULL) {
     B2INFO("Histograms needed for MPV cluster SNR on V side are not found");
-    m_monObj->setVariable("MPVClusterSNRL3V", -1);
-    m_monObj->setVariable("MPVClusterSNRL456V", -1);
   } else {
     m_monObj->setVariable("MPVClusterSNRL3V", MPVClusterSNRL3V);
     m_monObj->setVariable("MPVClusterSNRL456V", MPVClusterSNRL456V);
@@ -630,38 +524,56 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     h_MeanSVDEventT0->Draw();
   }
 
-  float MPVClusterTimeL3U = -1;
-  if (h_clusterTime_L3U) MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);
-  float MPVClusterTimeL3V = -1;
-  if (h_clusterTime_L3V) MPVClusterTimeL3V = xForMaxY(h_clusterTime_L3V);
-  float MPVClusterTimeL456U = -1;
-  if (h_clusterTime_L456U) MPVClusterTimeL456U = xForMaxY(h_clusterTime_L456U);
-  float MPVClusterTimeL456V = -1;
-  if (h_clusterTime_L456V) MPVClusterTimeL456V = xForMaxY(h_clusterTime_L456V);
-  float FWHMClusterTimeL3U = -1;
-  if (h_clusterTime_L3U) FWHMClusterTimeL3U = histFWHM(h_clusterTime_L3U);
-  float FWHMClusterTimeL3V = -1;
-  if (h_clusterTime_L3V) FWHMClusterTimeL3V = histFWHM(h_clusterTime_L3V);
-  float FWHMClusterTimeL456U = -1;
-  if (h_clusterTime_L456U) FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
-  float FWHMClusterTimeL456V = -1;
-  if (h_clusterTime_L456V) FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
+  float MPVClusterTimeL3U = -99;
+  if (h_clusterTime_L3U)
+    if (h_clusterTime_L3U->GetEntries() != 0)
+      MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);
+  float MPVClusterTimeL3V = -99;
+  if (h_clusterTime_L3V)
+    if (h_clusterTime_L3V->GetEntries() != 0)
+      MPVClusterTimeL3V = xForMaxY(h_clusterTime_L3V);
+  float MPVClusterTimeL456U = -99;
+  if (h_clusterTime_L456U)
+    if (h_clusterTime_L456U->GetEntries() != 0)
+      MPVClusterTimeL456U = xForMaxY(h_clusterTime_L456U);
+  float MPVClusterTimeL456V = -99;
+  if (h_clusterTime_L456V)
+    if (h_clusterTime_L456V->GetEntries() != 0)
+      MPVClusterTimeL456V = xForMaxY(h_clusterTime_L456V);
+  float FWHMClusterTimeL3U = -99;
+  if (h_clusterTime_L3U)
+    if (h_clusterTime_L3U->GetEntries() != 0)
+      FWHMClusterTimeL3U = histFWHM(h_clusterTime_L3U);
+  float FWHMClusterTimeL3V = -99;
+  if (h_clusterTime_L3V)
+    if (h_clusterTime_L3V->GetEntries() != 0)
+      FWHMClusterTimeL3V = histFWHM(h_clusterTime_L3V);
+  float FWHMClusterTimeL456U = -99;
+  if (h_clusterTime_L456U)
+    if (h_clusterTime_L456U->GetEntries() != 0)
+      FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
+  float FWHMClusterTimeL456V = -99;
+  if (h_clusterTime_L456V)
+    if (h_clusterTime_L456V->GetEntries() != 0)
+      FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
 
-  float MeanSVD3EventT0 = -1;
-  if (h_MeanSVD3EventT0) MeanSVD3EventT0 = xForMaxY(h_MeanSVD3EventT0);
+  float MeanSVD3EventT0 = -99;
+  if (h_MeanSVD3EventT0)
+    if (h_MeanSVD3EventT0->GetEntries() != 0)
+      MeanSVD3EventT0 = xForMaxY(h_MeanSVD3EventT0);
 
-  float MeanSVD6EventT0 = -1;
-  if (h_MeanSVD6EventT0) MeanSVD6EventT0 = xForMaxY(h_MeanSVD6EventT0);
+  float MeanSVD6EventT0 = -99;
+  if (h_MeanSVD6EventT0)
+    if (h_MeanSVD6EventT0->GetEntries() != 0)
+      MeanSVD6EventT0 = xForMaxY(h_MeanSVD6EventT0);
 
-  float MeanSVDEventT0 = -1;
-  if (h_MeanSVDEventT0) MeanSVDEventT0 = xForMaxY(h_MeanSVDEventT0);
+  float MeanSVDEventT0 = -99;
+  if (h_MeanSVDEventT0)
+    if (h_MeanSVDEventT0->GetEntries() != 0)
+      MeanSVDEventT0 = xForMaxY(h_MeanSVDEventT0);
 
   if (h_clusterTime_L3U == NULL || h_clusterTime_L456U == NULL) {
     B2INFO("Histograms needed for MPV cluster time on U side are not found");
-    m_monObj->setVariable("MPVClusterTimeL3U", -1);
-    m_monObj->setVariable("MPVClusterTimeL456U", -1);
-    m_monObj->setVariable("FWHMClusterTimeL3U", -1);
-    m_monObj->setVariable("FWHMClusterTimeL456U", -1);
   } else {
     m_monObj->setVariable("MPVClusterTimeL3U", MPVClusterTimeL3U);
     m_monObj->setVariable("MPVClusterTimeL456U", MPVClusterTimeL456U);
@@ -671,10 +583,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_clusterTime_L3V == NULL || h_clusterTime_L456V == NULL) {
     B2INFO("Histograms needed for MPV cluster time on V side are not found");
-    m_monObj->setVariable("MPVClusterTimeL3V", -1);
-    m_monObj->setVariable("MPVClusterTimeL456V", -1);
-    m_monObj->setVariable("FWHMClusterTimeL3V", -1);
-    m_monObj->setVariable("FWHMClusterTimeL456V", -1);
   } else {
     m_monObj->setVariable("MPVClusterTimeL3V", MPVClusterTimeL3V);
     m_monObj->setVariable("MPVClusterTimeL456V", MPVClusterTimeL456V);
@@ -684,21 +592,18 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_MeanSVD3EventT0 == NULL) {
     B2INFO("Histograms needed for SVD Event T0 (3 samples) not found");
-    m_monObj->setVariable("MeanSVD3EventT0", -1);
   } else {
     m_monObj->setVariable("MeanSVD3EventT0", MeanSVD3EventT0);
   }
 
   if (h_MeanSVD6EventT0 == NULL) {
     B2INFO("Histograms needed for SVD Event T0 (6 samples) not found");
-    m_monObj->setVariable("MeanSVD6EventT0", -1);
   } else {
     m_monObj->setVariable("MeanSVD6EventT0", MeanSVD6EventT0);
   }
 
   if (h_MeanSVDEventT0 == NULL) {
     B2INFO("Histograms needed for SVD Event T0 (all samples) not found");
-    m_monObj->setVariable("MeanSVDEventT0", -1);
   } else {
     m_monObj->setVariable("MeanSVDEventT0", MeanSVDEventT0);
   }
@@ -716,7 +621,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_maxBinU == NULL) {
     B2INFO("Histogram needed for Average MaxBin on U side is not found");
-    m_monObj->setVariable("avgMaxBinU", -1);
   } else {
     float avgMaxBinU = h_maxBinU->GetMean();
     m_monObj->setVariable("avgMaxBinU", avgMaxBinU);
@@ -724,7 +628,6 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
   if (h_maxBinV == NULL) {
     B2INFO("Histogram needed for Average MaxBin on V side is not found");
-    m_monObj->setVariable("avgMaxBinV", -1);
   } else {
     float avgMaxBinV = h_maxBinV->GetMean();
     m_monObj->setVariable("avgMaxBinV", avgMaxBinV);
@@ -746,12 +649,13 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L%d.x.%d", layer, sensor);
     TString title = Form("MPVClusterCharge_L%d.x.%d", layer, sensor);
     TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
-    float MPVClusterCharge = -1;
-    if (h_clusterCharge) MPVClusterCharge = xForMaxY(h_clusterCharge);
+    float MPVClusterCharge = -99;
+    if (h_clusterCharge)
+      if (h_clusterCharge->GetEntries() != 0)
+        MPVClusterCharge = xForMaxY(h_clusterCharge);
 
     if (h_clusterCharge == NULL) {
       B2INFO("Histograms needed for cluster charge not found");
-      m_monObj->setVariable(title.Data(), -1);
     } else {
       m_monObj->setVariable(title.Data(), MPVClusterCharge);
     }
@@ -759,12 +663,13 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L%d.x.%d", layer, sensor);
     title = Form("MPVClusterSNR_L%d.x.%d", layer, sensor);
     TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
-    float MPVClusterSNR = -1;
-    if (h_clusterSNR) MPVClusterSNR = xForMaxY(h_clusterSNR);
+    float MPVClusterSNR = -99;
+    if (h_clusterSNR)
+      if (h_clusterSNR->GetEntries() != 0)
+        MPVClusterSNR = xForMaxY(h_clusterSNR);
 
     if (h_clusterSNR == NULL) {
       B2INFO("Histograms needed for cluster SNR not found");
-      m_monObj->setVariable(title.Data(), -1);
     } else {
       m_monObj->setVariable(title.Data(), MPVClusterSNR);
     }
@@ -775,13 +680,14 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
       TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L3.%d.%d", ladder, sensor);
       TString  title =  Form("MPVClusterCharge_L3.%d.%d", ladder, sensor);
-      float MPVClusterCharge = -1;
+      float MPVClusterCharge = -99;
       TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
-      if (h_clusterCharge) MPVClusterCharge = xForMaxY(h_clusterCharge);
+      if (h_clusterCharge)
+        if (h_clusterCharge->GetEntries() != 0)
+          MPVClusterCharge = xForMaxY(h_clusterCharge);
 
       if (h_clusterCharge == NULL) {
         B2INFO("Histograms needed for cluster charge not found");
-        m_monObj->setVariable(title.Data(), -1);
       } else {
         m_monObj->setVariable(title.Data(), MPVClusterCharge);
       }
@@ -789,12 +695,13 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
       name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L3.%d.%d", ladder, sensor);
       title = Form("MPVClusterSNR_L3.%d.%d", ladder, sensor);
       TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
-      float MPVClusterSNR = -1;
-      if (h_clusterSNR) MPVClusterSNR = xForMaxY(h_clusterSNR);
+      float MPVClusterSNR = -99;
+      if (h_clusterSNR)
+        if (h_clusterSNR->GetEntries() != 0)
+          MPVClusterSNR = xForMaxY(h_clusterSNR);
 
       if (h_clusterSNR == NULL) {
         B2INFO("Histograms needed for cluster SNR not found");
-        m_monObj->setVariable(title.Data(), -1);
       } else {
         m_monObj->setVariable(title.Data(), MPVClusterSNR);
       }

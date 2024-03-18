@@ -29,8 +29,8 @@ a JWT is can be found on
 .. warning::
 
     By default, users  can only create globaltags whose name starts with
-    `user_<username>_` or `temp_<username>_`, where `username` is the B2MMS
-    username.
+    ``user_<username>_`` or ``temp_<username>_``, where ``username`` is the
+    B2MMS username.
 
 The tool automatically queries the JWT issuing server
 (https://token.belle2.org) and gets a valid token by asking the B2MMS username
@@ -286,13 +286,13 @@ def command_tag_create(args, db=None):
 
     This command creates a new globaltag in the database with the given name
     and description. The name can only contain alpha-numeric characters and the
-    characters '+-_:'.
+    characters ``+-_:``.
 
     .. warning::
 
         By default, users  can only create globaltags whose name starts with
-        `user_<username>_` or `temp_<username>_`, where `username` is the B2MMS
-        username.
+        ``user_<username>_`` or ``temp_<username>_``, where ``username`` is the
+        B2MMS username.
     """
 
     if db is None:

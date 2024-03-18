@@ -93,7 +93,7 @@ void KLMLikelihoodExpertModule::init_mva(MVA::Weightfile& weightfile)
   m_expert = supported_interfaces[general_options.m_method]->getExpert();
   m_expert->load(weightfile);
   std::vector<float> dummy;
-  int nInputVariables = 121;
+  int nInputVariables = general_options.m_variables.size();
   dummy.resize(nInputVariables, 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 }

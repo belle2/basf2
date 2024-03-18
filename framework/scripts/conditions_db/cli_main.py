@@ -17,11 +17,20 @@ The usage of this tool is similar to git: there are sub commands like for
 example ``tag`` which groups all actions related to the management of
 globaltags. All the available commands are listed below.
 
-Users need a valid JSON Web Token (JWT) to authenticate to the conditions
-database when using this tool. For practical purposes, it is only necessary
-to know that a JWT is a string containing crypted information, and that string
-is stored in a file. More informations about what a JWT is can be found on
+While the read access to the conditions database is always allowed (e.g.
+for downloading globaltags and payloads), users need a valid JSON Web Token
+(JWT) to authenticate to the conditions database when using this tool for
+creating/manpipulating globaltags or uploading payloads. For practical purposes,
+it is only necessary to know that a JWT is a string containing crypted
+information, and that string is stored in a file. More informations about what
+a JWT is can be found on
 `Wikipedia <https://en.wikipedia.org/wiki/JSON_Web_Token>`_.
+
+.. warning::
+
+    Note that users, by default, can only create globaltags whose name starts
+    with `user_<username>_` or `temp_<username>_*`, where `username` is the
+    B2MMS username.
 
 The tool automatically queries the JWT issuing server
 (https://token.belle2.org) and gets a valid token by asking the B2MMS username
@@ -278,6 +287,12 @@ def command_tag_create(args, db=None):
     This command creates a new globaltag in the database with the given name
     and description. The name can only contain alpha-numeric characters and the
     characters '+-_:'.
+
+    .. warning::
+
+        Note that users, by default, can only create globaltags whose name starts
+        with `user_<username>_` or `temp_<username>_*`, where `username` is the
+        B2MMS username.
     """
 
     if db is None:

@@ -22,6 +22,9 @@ namespace Belle2 {
     /** Name of the list */
     std::string m_particleList;
 
+    /** Name of the new created list */
+    std::string m_newParticleList;
+
   public:
     /** Constructor. */
     ParticleMassHypothesesUpdaterModule();

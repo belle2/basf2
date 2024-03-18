@@ -120,7 +120,7 @@ def command_tag(args, db=None):
 
     This command allows to list, show, create modify or clone globaltags in the
     central database. If no other command is given it will list all tags as if
-    "%(prog)s show" was given.
+    ``%(prog)s show`` was given.
     """
 
     # no arguments to define, just a group command
@@ -136,11 +136,11 @@ def command_tag_list(args, db=None):
     This command allows to list all globaltags, optionally limiting the output
     to ones matching a given search term. By default invalidated globaltags
     will not be included in the list, to show them as well please add
-    --with-invalid as option. Alternatively one can use --only-published to show
-    only tags which have been published
+    ``--with-invalid`` as option. Alternatively one can use ``--only-published``
+    to show only tags which have been published
 
-    If the --regex option is supplied the search term will be interpreted as a
-    python regular expression where the case is ignored.
+    If the ``--regex`` option is supplied the search term will be interpreted
+    as a Python regular expression where the case is ignored.
     """
 
     tagfilter = ItemFilter(args)
@@ -532,7 +532,8 @@ def remove_repeated_values(table, columns, keep=None):
 
 
 def command_diff(args, db):
-    """Compare two globaltags
+    """
+    Compare two globaltags
 
     This command allows to compare two globaltags. It will show the changes in
     a format similar to a unified diff but by default it will not show any
@@ -661,9 +662,9 @@ def command_iov(args, db):
     List all IoVs defined in a globaltag, optionally limited to a run range
 
     This command lists all IoVs defined in a given globaltag. The list can be
-    limited to a given run and optionally searched using --filter or --exclude.
-    If the --regex option is supplied the search term will be interpreted as a
-    python regular expression where the case is ignored.
+    limited to a given run and optionally searched using ``--filter`` or
+    ``--exclude``. If the ``--regex`` option is supplied the search term will
+    be interpreted as a Python regular expression where the case is ignored.
 
     .. versionchanged:: release-03-00-00
        modified output structure and added ``--human-readable``
@@ -800,17 +801,17 @@ def command_dump(args, db):
     .. versionadded:: release-03-00-00
 
     This command will dump the payload contents stored in a given payload. One
-    can either specify the payloadId (from a previous output of
+    can either specify the ``payloadId`` (from a previous output of
     ``b2conditionsdb iov``), the payload name and its revision in the central
     database, or directly specify a local database payload file.
 
     .. rubric:: Examples
 
-    Dump the content of a previously downloaded payload file:
+    Dump the content of a previously downloaded payload file::
 
         $ b2conditionsdb dump -f centraldb/dbstore_BeamParameters_rev_59449.root
 
-    Dump the content of a payload by name and revision directly from the central database:
+    Dump the content of a payload by name and revision directly from the central database::
 
         $ b2conditionsdb dump -r BeamParameters 59449
 
@@ -819,7 +820,7 @@ def command_dump(args, db):
 
         $ b2conditionsdb dump -g BeamParameters main_2021-08-04 0 0
 
-    Or directly by payload id from a previous call to ``b2conditionsdb iov``:
+    Or directly by payload id from a previous call to ``b2conditionsdb iov``::
 
         $ b2conditionsdb dump -i 59685
 

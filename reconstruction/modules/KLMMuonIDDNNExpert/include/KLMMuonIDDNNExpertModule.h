@@ -93,7 +93,7 @@ namespace Belle2 {
     static constexpr int m_TotalKLMLayers = BKLMElementNumbers::getMaximalLayerNumber() + EKLMElementNumbers::getMaximalLayerNumber();
 
     /** Database identifier or file used to load the weights. */
-    std::string m_identifier = "NNmuidWeightFile.root";
+    std::string m_identifier = "NNmuidWeightFile";
 
     /** Database pointer to the database representation of the weightfile. */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;

@@ -11,7 +11,7 @@
 //-
 
 
-#include <dqm/analysis/shminput/modules/DQMHistAnalysisInput2.h>
+#include <dqm/analysis/modules/DQMHistAnalysisInput2.h>
 
 #include <TROOT.h>
 #include <TKey.h>

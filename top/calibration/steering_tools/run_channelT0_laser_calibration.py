@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -54,9 +53,9 @@ run_last = run_numbers[-1]
 
 # Make list of files
 inputFiles = []
-expNo = 'e' + '{:0=4d}'.format(experiment)
+expNo = 'e' + f'{experiment:04d}'
 for run in run_numbers:
-    expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
+    expRun = f'{experiment:04d}' + '.' + f'{run:05d}'
     if sroot_format:
         filename = f"{data_dir}/top.{expRun}.*.sroot"
     else:
@@ -76,7 +75,7 @@ if not os.path.isfile(laser_mc_fit):
     sys.exit()
 
 # Output folder name
-run_range = 'r' + '{:0=5d}'.format(run_first) + '-' + '{:0=5d}'.format(run_last)
+run_range = 'r' + f'{run_first:05d}' + '-' + f'{run_last:05d}'
 output_dir = f"{main_output_dir}/channelT0-local-{expNo}-{run_range}"
 
 # Suppress messages during processing

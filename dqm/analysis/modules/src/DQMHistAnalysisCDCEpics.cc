@@ -106,6 +106,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     double sumadcgood = 0;
     for (int ic = 0; ic < 300; ++ic) {
       if (ic == 0) continue; //299 boards only
+      if (m_hADCs[ic]) delete m_hADCs[ic];
       m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
       m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
       float md_adc = getHistMedian(m_hADCs[ic]);
@@ -139,6 +140,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     double sumtdcgood = 0;
     for (int ic = 0; ic < 300; ++ic) {
       if (ic == 0) continue; //299 boards only
+      if (m_hTDCs[ic]) delete m_hTDCs[ic];
       m_hTDCs[ic] = m_delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
       m_hTDCs[ic]->SetTitle(Form("hTDC%d", ic));
       float md_tdc = getHistMedian(m_hTDCs[ic]);

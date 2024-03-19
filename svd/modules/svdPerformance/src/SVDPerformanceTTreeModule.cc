@@ -272,7 +272,7 @@ void SVDPerformanceTTreeModule::event()
           const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
           const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X()); // maybe use svdGlobal_1.Phi()
+          double svdPhi_1 = svdGlobal_1.Phi();
           double svdZ_1 = svdGlobal_1.Z();
 
           m_svdFF = svd_1->getFirstFrame();
@@ -350,7 +350,7 @@ void SVDPerformanceTTreeModule::event()
           const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
           const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
           const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi()
+          double svdPhi_1 = svdGlobal_1.Phi();
           double svdZ_1 = svdGlobal_1.Z();
 
           m_svdFF = svd_1->getFirstFrame();

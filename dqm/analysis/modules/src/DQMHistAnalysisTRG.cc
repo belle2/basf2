@@ -233,8 +233,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     int numberOfBins = hist_ECLTRG_deadch->GetNbinsX();
 //    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
     int ECLTRG_deadch = 0;
-    for (int i = 2; i <= numberOfBins; i++) {
-      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0) { ECLTRG_deadch += 1; }
+    for (int i = 2; i <= numberOfBins - 1; i++) {
+      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0.01 * hist_ECLTRG_deadch->GetMaximum()) { ECLTRG_deadch += 1; }
     }
     B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
     setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
@@ -285,7 +285,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
     int CDCTRG_deadch = 0;
     for (int i = 3; i <= numberOfBins; i++) {
-      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1; }
+//      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0.01*hist_CDCTRG_deadch->GetMaximum()) {CDCTRG_deadch += 1;}
+      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1;}
     }
     B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
     setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);

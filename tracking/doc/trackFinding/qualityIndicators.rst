@@ -22,7 +22,7 @@ The CDC QI rejection cut is conducted just after the :ref:`CDC Track Finding<tra
 to the SVD track finding which means that less SVD hits are connected to these tracks and more SVD hits remain "free" for the
 :ref:`SVD Track Finding<tracking_trackFindingSVD>`. It was shown that several truth tracks, that were rejected by the CDC QI cut, are found again
 in the SVD. Due to less "noise" due to fake and clone CDCTracks, the SVD track finding seems to find even more truth tracks than without CDC QI cut.
-As a consequence, **the overall track finding efficiency increases** slighty (by up to 0.5%). This could be improved to more than 2% while
+As a consequence, **the overall track finding efficiency increases** slightly (by up to 0.5%). This could be improved to more than 2% while
 the fake and clone rate are reduced further by choosing a tighter cut on the CDC QI as mentioned above.
 
 

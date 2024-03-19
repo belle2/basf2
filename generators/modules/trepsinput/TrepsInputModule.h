@@ -8,9 +8,9 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/treps/Treps3B.h>
 #include <generators/treps/UtrepsB.h>
 
@@ -23,7 +23,7 @@ namespace Belle2 {
   /**
    * Input from TREPS generator for ee->eeff
    */
-  class TrepsInputModule : public Module {
+  class TrepsInputModule : public GeneratorBaseModule {
 
   public:
     /**
@@ -32,13 +32,13 @@ namespace Belle2 {
     TrepsInputModule();
 
     /** initialization for trepsinput */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** initialization for trepsinput */
     virtual void terminate() override;
 
     /** input event from TREPS */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** Simulate W distribution according to given input file of cross section table */
     double simulateW();

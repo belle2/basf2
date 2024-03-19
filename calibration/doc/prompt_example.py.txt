@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 """Docstring explaining what this calibration script does. Maybe a description of payloads?
 This can be a long as you want."""
 
@@ -41,7 +39,7 @@ def get_calibrations(input_data, **kwargs):
     # Calibration objects running in parallel you might want to set  it lower per Calibration so that the total
     # number of a jobs from all parallel Calibrations is ~1000 -> 2500
     
-    # The expert_config receieved here will be the combination of your defaults in the settings variable above,
+    # The expert_config received here will be the combination of your defaults in the settings variable above,
     # with any values set in your caf_config.json taking precedence.
     expert_config = kwargs.get("expert_config")
 

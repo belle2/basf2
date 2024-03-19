@@ -8,7 +8,7 @@
 from .constants import EventCode, EventCode_CrossSection, EventCodes
 
 from basf2 import B2FATAL, Module
-from generators import add_aafh_generator, add_koralw_generator, add_treps_generator
+from generators import add_aafh_generator, add_koralw_generator, add_phokhara_generator, add_treps_generator
 
 
 def add_low_multiplicity_generator(path, event_code):
@@ -45,29 +45,21 @@ def add_low_multiplicity_generator(path, event_code):
         add_treps_generator(path, 'e+e-ppbar')
         rename_module_in_path(path, 'TrepsInput', 'TREPS_eepp')
     elif event_code is EventCode.pipiISR:
-        m = path.add_module('PhokharaInput', FinalState=1, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_pipiISR')
+        add_phokhara_generator(path, 'pi+pi-')
     elif event_code is EventCode.pipipi0ISR:
-        m = path.add_module('PhokharaInput', FinalState=8, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_pipipi0ISR')
+        add_phokhara_generator(path, 'pi+pi-pi0')
     elif event_code is EventCode.pipipipiISR:
-        m = path.add_module('PhokharaInput', FinalState=3, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_pipipipiISR')
+        add_phokhara_generator(path, 'pi+pi-pi+pi-')
     elif event_code is EventCode.pipipi0pi0ISR:
-        m = path.add_module('PhokharaInput', FinalState=2, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_pipipi0pi0ISR')
-    elif event_code is EventCode.etapipiISR:
-        m = path.add_module('PhokharaInput', FinalState=10, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_etapipiISR')
+        add_phokhara_generator(path, 'pi+pi-pi0pi0')
+    elif event_code is EventCode.pipietaISR:
+        add_phokhara_generator(path, 'pi+pi-eta')
     elif event_code is EventCode.KKISR:
-        m = path.add_module('PhokharaInput', FinalState=6, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_KKISR')
+        add_phokhara_generator(path, 'K+K-')
     elif event_code is EventCode.K0K0barISR:
-        m = path.add_module('PhokharaInput', FinalState=7, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_K0K0barISR')
+        add_phokhara_generator(path, 'K0K0bar')
     elif event_code is EventCode.ppbarISR:
-        m = path.add_module('PhokharaInput', FinalState=4, LO=0, NLO=1, QED=0, MinInvMassHadrons=0.)
-        m.set_name('PHOKHARA_ppbarISR')
+        add_phokhara_generator(path, 'ppbar')
 
 
 def get_event_ranges(events, event_codes=None):
@@ -124,7 +116,7 @@ class EventRangePathSplitter(Module):
             event_codes (Iterable): tuple or list of EventCode.
         """
         import ROOT  # noqa
-        super(EventRangePathSplitter, self).__init__()
+        super().__init__()
         #: tuple or list of event codes
         self.event_codes = event_codes
         #: PyStoreObj off EventExtraInfo
@@ -178,7 +170,7 @@ class ExtraInfoPathSplitter(Module):
             event_codes (Iterable): tuple or list of EventCode.
         """
         import ROOT  # noqa
-        super(ExtraInfoPathSplitter, self).__init__()
+        super().__init__()
         #: list of event codes
         self.event_codes = [e.value for e in event_codes]
         #: PyStoreObj for EventExtraInfo to save event codes

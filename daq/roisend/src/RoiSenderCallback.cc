@@ -75,7 +75,15 @@ void RoiSenderCallback::load(const DBObject&, const std::string&)
 
   char idbuf[11]; // maximum length by cppcheck
   sprintf(idbuf, "%2.2d", 0);
+
+  // Execute merger_merge
   m_pid_merger = m_proc->Execute(merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
+  if (m_pid_merger <= 0) {
+    LogFile::error("loading %s %s %s %s %s %s failed!", merger, (char*)shmname.c_str(), idbuf, onsenhost, onsenport, mergerport);
+    setState(RCState::ERROR_ES);
+    return;
+  }
+
   sleep(2); // WHY a sleep? if it is a race condition find & destroy!
 
   // 6. Start Logger -- only on first load
@@ -91,26 +99,32 @@ void RoiSenderCallback::load(const DBObject&, const std::string&)
 
 void RoiSenderCallback::start(int /*expno*/, int /*runno*/)
 {
-  if (m_pid_merger != 0) {
+  if (m_pid_merger > 0) {
     int pid = m_pid_merger;
     kill(pid, SIGUSR1);
     LogFile::info("Send SIGUSR1 to (pid=%d)", pid);// attention, race condition!
+  } else {
+    LogFile::error("No merger_merge in start!");
+    setState(RCState::ERROR_ES);
   }
 }
 
 void RoiSenderCallback::stop(void)
 {
-  if (m_pid_merger != 0) {
+  if (m_pid_merger > 0) {
     int pid = m_pid_merger;
     kill(pid, SIGUSR2);
     LogFile::info("Send SIGUSR2 to (pid=%d)", pid);// attention, race condition!
+  } else {
+    LogFile::error("No merger_merge in stop!");
+    setState(RCState::ERROR_ES);
   }
 }
 
 void RoiSenderCallback::abort(void)
 {
   // Kill processes
-  if (m_pid_merger != 0) {
+  if (m_pid_merger > 0) {
     int pid = m_pid_merger;
     kill(pid, SIGINT);
     LogFile::info("kill merger (pid=%d) with SIGINT ", pid);// attention, race condition!
@@ -119,7 +133,7 @@ void RoiSenderCallback::abort(void)
   for (int i = 0; m_pid_merger; i++) {
     sleep(1);
     int pid = m_pid_merger;
-    if (i == 5) {
+    if (i == 5 && m_pid_merger > 0) {
       kill(pid, SIGKILL); // force!
       LogFile::warning("kill merger (pid=%d) with SIGKILL", pid);
     }

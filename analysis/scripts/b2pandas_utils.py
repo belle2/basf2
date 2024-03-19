@@ -14,7 +14,7 @@ import warnings
 
 
 """
-Python uilities to help create or manage ntuples and work with them in pandas
+Python utilities to help create or manage ntuples and work with them in pandas
 """
 
 
@@ -130,7 +130,7 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
     import ROOT  # noqa
 
     if column not in dataframe:
-        raise KeyError(f"Cannot find coulumn '{column}'")
+        raise KeyError(f"Cannot find column '{column}'")
 
     # convert mcErrors to int to be able to logical operate on it
     mcErrors = dataframe[column].astype(int)

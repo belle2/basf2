@@ -5,18 +5,18 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include "ecl/geometry/BelleCrystal.h"
 
-#include "globals.hh"
+/* Own header. */
+#include <ecl/geometry/BelleCrystal.h>
 
-#include "G4VoxelLimits.hh"
-#include "G4AffineTransform.hh"
+/* Geant4 headers. */
+#include <G4AffineTransform.hh>
+#include <G4VoxelLimits.hh>
+#include <G4VGraphicsScene.hh>
+#include <G4VPVParameterisation.hh>
 
-#include "G4VPVParameterisation.hh"
-
-#include "G4VGraphicsScene.hh"
-
-#include "CLHEP/Random/RandFlat.h"
+/* CLHEP headers. */
+#include <CLHEP/Random/RandFlat.h>
 
 using namespace Belle2;
 using namespace std;

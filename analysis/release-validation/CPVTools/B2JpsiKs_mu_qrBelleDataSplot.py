@@ -15,7 +15,7 @@
 # * The signal component of Mbc is first fitted on converted Belle MC using a              *
 # * 2 Gaussian function. The Mbc component is used together with an Argus function         *
 # * to fit the mbc distribution of converted Belle data.                                   *
-# * An Splot is performed and its output variable used to weigth the qr                    *
+# * An Splot is performed and its output variable used to weight the qr                    *
 # * distribution.                                                                          *
 # * For more information see Sec. 4.8 in BELLE2-PTHESIS-2018-003                           *
 # * Usage:                                                                                 *

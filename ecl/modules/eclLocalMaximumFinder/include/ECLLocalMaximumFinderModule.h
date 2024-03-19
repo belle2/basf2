@@ -10,8 +10,8 @@
 
 /* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/B2Vector3.h>
 #include <mdst/dataobjects/EventLevelClusteringInfo.h>

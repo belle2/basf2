@@ -10,7 +10,6 @@
 
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
-#include <ecl/calibration/eclGammaGammaEAlgorithm.h>
 
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>

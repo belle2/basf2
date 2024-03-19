@@ -6,16 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module`
+/* Own header. */
 #include <ecl/modules/eclAutocovarianceCalibrationC1Collector/eclAutocovarianceCalibrationC1Collector.h>
 
-//Framework
-#include <framework/dataobjects/EventMetaData.h>
-
-//ECL
-#include <ecl/dataobjects/ECLDigit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
+#include <framework/dataobjects/EventMetaData.h>
 
 using namespace std;
 using namespace Belle2;

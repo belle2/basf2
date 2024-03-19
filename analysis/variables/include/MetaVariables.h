@@ -115,6 +115,12 @@ namespace Belle2 {
     Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns a function which returns the abs(phi difference) to the most back-to-back
+     * in phi (closest to 180 degrees) particle in the provided particle list.
+     */
+    Manager::FunctionPtr deltaPhiToMostB2BPhiInList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */

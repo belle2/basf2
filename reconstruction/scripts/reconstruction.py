@@ -691,7 +691,7 @@ def add_pid_module(path, components=None):
     if components is None or 'SVD' in components or 'CDC' in components:
         path.add_module('MdstPID')
     if components is None or 'KLM' in components:
-        path.add_module('KLMLikelihoodExpert')
+        path.add_module('KLMMuonIDDNNExpert')
 
 
 def add_klm_modules(path, components=None):

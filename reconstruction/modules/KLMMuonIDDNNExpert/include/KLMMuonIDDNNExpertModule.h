@@ -29,19 +29,19 @@ namespace Belle2 {
   /**
    * Get information from KLMMuidLikelihood
    */
-  class KLMLikelihoodExpertModule : public Module {
+  class KLMMuonIDDNNExpertModule : public Module {
 
   public:
 
     /**
      * Constructor.
      */
-    KLMLikelihoodExpertModule();
+    KLMMuonIDDNNExpertModule();
 
     /**
      * Destructor.
      */
-    ~KLMLikelihoodExpertModule();
+    ~KLMMuonIDDNNExpertModule();
 
     /**
      * Initializer.

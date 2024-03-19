@@ -10,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-#include <reconstruction/modules/KLMLikelihoodExpert/KLMLikelihoodExpertModule.h>
+#include <reconstruction/modules/KLMMuonIDDNNExpert/KLMMuonIDDNNExpertModule.h>
 
 #include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
@@ -31,9 +31,9 @@
 
 using namespace Belle2;
 
-REG_MODULE(KLMLikelihoodExpert);
+REG_MODULE(KLMMuonIDDNNExpert);
 
-KLMLikelihoodExpertModule::KLMLikelihoodExpertModule() : Module()
+KLMMuonIDDNNExpertModule::KLMMuonIDDNNExpertModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Get information from KLMMuIDLikelihood)DOC");
@@ -44,11 +44,11 @@ KLMLikelihoodExpertModule::KLMLikelihoodExpertModule() : Module()
            m_identifier);
 }
 
-KLMLikelihoodExpertModule::~KLMLikelihoodExpertModule()
+KLMMuonIDDNNExpertModule::~KLMMuonIDDNNExpertModule()
 {
 }
 
-void KLMLikelihoodExpertModule::initialize()
+void KLMMuonIDDNNExpertModule::initialize()
 {
   m_tracks.isRequired();
   m_klmNNLikelihoods.registerInDataStore();
@@ -61,13 +61,13 @@ void KLMLikelihoodExpertModule::initialize()
   MVA::AbstractInterface::initSupportedInterfaces();
 }
 
-void KLMLikelihoodExpertModule::terminate()
+void KLMMuonIDDNNExpertModule::terminate()
 {
   m_expert.reset();
   m_dataset.reset();
 }
 
-void KLMLikelihoodExpertModule::beginRun()
+void KLMMuonIDDNNExpertModule::beginRun()
 {
   if (m_weightfile_representation) {
     if (m_weightfile_representation->hasChanged()) {
@@ -81,11 +81,11 @@ void KLMLikelihoodExpertModule::beginRun()
   }
 }
 
-void KLMLikelihoodExpertModule::endRun()
+void KLMMuonIDDNNExpertModule::endRun()
 {
 }
 
-void KLMLikelihoodExpertModule::init_mva(MVA::Weightfile& weightfile)
+void KLMMuonIDDNNExpertModule::init_mva(MVA::Weightfile& weightfile)
 {
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;
@@ -99,7 +99,7 @@ void KLMLikelihoodExpertModule::init_mva(MVA::Weightfile& weightfile)
 }
 
 
-void KLMLikelihoodExpertModule::event()
+void KLMMuonIDDNNExpertModule::event()
 {
   for (Track& track : m_tracks) {
 
@@ -191,7 +191,7 @@ void KLMLikelihoodExpertModule::event()
   } // loop of tracks
 }
 
-float KLMLikelihoodExpertModule::getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll)
+float KLMMuonIDDNNExpertModule::getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll)
 {
   m_dataset->m_input[0] = klmll->getChiSquared();
   m_dataset->m_input[1] = klmll->getDegreesOfFreedom();

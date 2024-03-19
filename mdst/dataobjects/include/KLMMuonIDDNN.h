@@ -16,30 +16,30 @@ namespace Belle2 {
    * KLM muon likelihood (KLMLikelihood) datastore object to store results
    * from Neural Network based KLM muon likelihood calculations.
    */
-  class KLMNNLikelihood : public RelationsObject {
+  class KLMMuonIDDNN : public RelationsObject {
 
   public:
 
     /** constructor */
-    KLMNNLikelihood() {};
+    KLMMuonIDDNN() {};
 
     /** destructor */
-    virtual ~KLMNNLikelihood() {};
+    virtual ~KLMMuonIDDNN() {};
 
     /** set the NN KLM muon likelihood output  */
-    void setKLMNNLikelihood(double muprob)
+    void setKLMMuonIDDNN(double klmMuonIDDNN)
     {
-      m_muprobnn = muprob;
+      m_klmMuonIDDNN = klmMuonIDDNN;
     }
 
-    /** get the NN KLM muon likelihood output  */
-    double getKLMNNLikelihood() const {return m_muprobnn;}
+    /** get the DNN based KLM muonID output  */
+    double getKLMMuonIDDNN() const {return m_klmMuonIDDNN;}
 
   private:
 
-    double m_muprobnn;
+    double m_klmMuonIDDNN;
 
     /** ClassDef. */
-    ClassDef(KLMNNLikelihood, 1);
+    ClassDef(KLMMuonIDDNN, 1);
   };
 }

@@ -23,7 +23,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/KLMNNLikelihood.h>
+#include <mdst/dataobjects/KLMMuonIDDNN.h>
 
 #include <mva/interface/Interface.h>
 
@@ -51,8 +51,8 @@ KLMMuonIDDNNExpertModule::~KLMMuonIDDNNExpertModule()
 void KLMMuonIDDNNExpertModule::initialize()
 {
   m_tracks.isRequired();
-  m_klmNNLikelihoods.registerInDataStore();
-  m_tracks.registerRelationTo(m_klmNNLikelihoods);
+  m_KLMMuonIDDNNs.registerInDataStore();
+  m_tracks.registerRelationTo(m_KLMMuonIDDNNs);
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
@@ -185,9 +185,9 @@ void KLMMuonIDDNNExpertModule::event()
     Hit2dMap.clear();
 
     double muprob_nn = getNNmuProbability(&track, klmll);
-    KLMNNLikelihood* klmNNLikelihood = m_klmNNLikelihoods.appendNew();
-    klmNNLikelihood->setKLMNNLikelihood(muprob_nn);
-    track.addRelationTo(klmNNLikelihood);
+    KLMMuonIDDNN* klmMuonIDDNNobject = m_KLMMuonIDDNNs.appendNew();
+    klmMuonIDDNNobject->setKLMMuonIDDNN(muprob_nn);
+    track.addRelationTo(klmMuonIDDNNobject);
   } // loop of tracks
 }
 

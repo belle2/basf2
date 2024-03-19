@@ -12,7 +12,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/KLMNNLikelihood.h>
+#include <mdst/dataobjects/KLMMuonIDDNN.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -1063,13 +1063,13 @@ namespace Belle2 {
       return std::get<double>(func(particle));
     }
 
-    double muonNNLikelihood(const Particle* part)
+    double klmMuonIDDNN(const Particle* part)
     {
       const Track* track = part->getTrack();
       if (!track) return Const::doubleNaN;
-      KLMNNLikelihood* klmnn = track->getRelatedTo<KLMNNLikelihood>();
+      KLMMuonIDDNN* klmnn = track->getRelatedTo<KLMMuonIDDNN>();
       if (!klmnn) return Const::doubleNaN;
-      return klmnn->getKLMNNLikelihood();
+      return klmnn->getKLMMuonIDDNN();
     }
 
     //*************
@@ -1335,7 +1335,7 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);
-    REGISTER_VARIABLE("muonNNLikelihood", muonNNLikelihood,
+    REGISTER_VARIABLE("klmMuonIDDNN", klmMuonIDDNN,
                       "muon likelihood calculated from Neural Network with KLM information (expert use only)");
 
     // B2BII PID

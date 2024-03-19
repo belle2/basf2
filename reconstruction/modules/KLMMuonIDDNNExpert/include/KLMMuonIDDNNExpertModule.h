@@ -17,7 +17,7 @@
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/KLMNNLikelihood.h>
+#include <mdst/dataobjects/KLMMuonIDDNN.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Expert.h>
 #include <mva/interface/Weightfile.h>
@@ -73,8 +73,8 @@ namespace Belle2 {
     // Required array for Tracks
     StoreArray<Track> m_tracks;
 
-    // Neural Network based KLM muon likelihood
-    StoreArray<KLMNNLikelihood> m_klmNNLikelihoods;
+    // Neural Network based KLM muonID dataobjects
+    StoreArray<KLMMuonIDDNN> m_KLMMuonIDDNNs;
 
     /**
      * Initialize mva expert, dataset and features

@@ -346,7 +346,7 @@ namespace Belle2 {
     /**
      * @return muon likelihoood from Neural Network (expert use only)
      */
-    double muonNNLikelihood(const Particle* part);
+    double klmMuonIDDNN(const Particle* part);
 
     /**
      * Parses the detector list for the PID metafunctions.

@@ -208,11 +208,16 @@ def fancy_skim_header(SkimClass):
     if isinstance(category, list):
         category = ", ".join(category)
 
+    # If multiple contacts were given, split them up:
+    contacts = re.split(r",\s+and\s+|\s+and\s+|,\s+&\s+|\s+&\s+|,\s+|\s*\n\s*", contact)
     # If the contact is of the form "NAME <EMAIL>" or "NAME (EMAIL)", then make it a link
-    match = re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact)
-    if match:
-        name, email = match[1], match[2]
-        contact = f"`{name} <mailto:{email}>`_"
+    matches = [re.match("([^<>()`]+) [<(]([^<>()`]+@[^<>()`]+)[>)]", contact) for contact in contacts]
+    for i, match in enumerate(matches):
+        if match:
+            name, email = match[1], match[2]
+            contacts[i] = f"`{name} <mailto:{email}>`_"
+        else:
+            contacts[i] = contacts[i]
 
     header = f"""
     Note:
@@ -221,7 +226,7 @@ def fancy_skim_header(SkimClass):
         * **Skim LFN code**: {SkimCode}
         * **Category**: {category}
         * **Author{"s"*(len(authors) > 1)}**: {", ".join(authors)}
-        * **Contact**: {contact}
+        * **Contact{"s"*(len(contacts) > 1)}**: {", ".join(contacts)}
     """
 
     if SkimClass.ApplyHLTHadronCut:

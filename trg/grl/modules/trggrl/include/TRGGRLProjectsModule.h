@@ -113,6 +113,8 @@ namespace Belle2 {
     /**convert the unit of angle from rad to degree*/
     //double m_RtD;
 
+    /**the collection of unknown bits (not ready in TSIM)*/
+    std::vector<std::string> m_falsebits;
 
   };
 

@@ -101,6 +101,11 @@ class BaseSkim(ABC):
     Analysis globaltag.
     """
 
+    pidGlobaltag = None
+    """
+    PID globaltag.
+    """
+
     @property
     @abstractmethod
     def __description__(self):
@@ -135,6 +140,7 @@ class BaseSkim(ABC):
         validation=False,
         mc=True,
         analysisGlobaltag=None,
+        pidGlobaltag=None,
     ):
         """Initialise the BaseSkim class.
 
@@ -147,6 +153,7 @@ class BaseSkim(ABC):
                 instead of writing uDSTs.
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
+            pidGlobaltag (str): PID globaltag.
         """
         self.name = self.__class__.__name__
         self.OutputFileName = OutputFileName
@@ -155,6 +162,7 @@ class BaseSkim(ABC):
         self._validation = validation
         self.mc = mc
         self.analysisGlobaltag = analysisGlobaltag
+        self.pidGlobaltag = pidGlobaltag
 
         if self.NoisyModules is None:
             self.NoisyModules = []
@@ -508,6 +516,7 @@ class CombinedSkim(BaseSkim):
             OutputFileName=None,
             mc=None,
             analysisGlobaltag=None,
+            pidGlobaltag=None,
     ):
         """Initialise the CombinedSkim class.
 
@@ -525,6 +534,7 @@ class CombinedSkim(BaseSkim):
                 If mdstOutput=False, this option does nothing.
             mc (bool): If True, include MC quantities in output.
             analysisGlobaltag (str): Analysis globaltag.
+            pidGlobaltag (str): PID globaltag.
         """
 
         if NoisyModules is None:
@@ -561,6 +571,11 @@ class CombinedSkim(BaseSkim):
         if analysisGlobaltag is not None:
             for skim in self:
                 skim.analysisGlobaltag = analysisGlobaltag
+
+        self.pidGlobaltag = pidGlobaltag
+        if pidGlobaltag is not None:
+            for skim in self:
+                skim.pidGlobaltag = pidGlobaltag
 
         self._mdstOutput = mdstOutput
         self.mdst_kwargs = mdst_kwargs or {}

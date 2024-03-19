@@ -127,6 +127,16 @@ def get_argument_parser():
         ),
     )
 
+    parser.add_argument(
+        "--pid-globaltag",
+        default="",
+        type=str,
+        metavar="PIDGlobaltag",
+        help=(
+            "PID globaltag to be passed to the skims."
+        ),
+    )
+
     return parser
 
 
@@ -175,6 +185,7 @@ def main():
         mdstOutput=args.skimmed_mdst_output,
         backward_compatibility=(not args.no_backward_compatibility),
         analysis_globaltag=args.analysis_globaltag,
+        pid_globaltag=args.pid_globaltag,
         udst_output_name = args.udst_output_name
     )
 

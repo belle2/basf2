@@ -23,7 +23,7 @@ def check_execute(cmd, terminate_on_error=True):
     if not res == 0:
         print("FATAL: Exit code is not 0")
         if terminate_on_error:
-            sys.exit(res)
+            sys.exit(1)
         return False
 
     return True

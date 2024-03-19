@@ -41,8 +41,9 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
   }
   if (logl != logl or logl == INFINITY) {
     B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is " << logl <<
-            " (i.e. +inf or NaN)! Ignoring this value. (" << Const::CDC << "=CDC, " << Const::TOP << "=TOP, " << Const::ARICH << "=ARICH, " <<
-            Const::ECL << "=ECL)");
+            " (i.e. +inf or NaN)! Ignoring this value. ("
+            << Const::SVD << "=SVD, " << Const::CDC << "=CDC, " << Const::TOP << "=TOP, "
+            << Const::ARICH << "=ARICH, " << Const::ECL << "=ECL, " << Const::KLM << "=KLM)");
 
     return;
   }

@@ -1891,7 +1891,9 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), -1.5004894);
 
-    EXPECT_B2FATAL(Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)"));
+    var = Manager::Instance().getVariable("daughterDiffOf(0, NOTINT, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
   }
 
 
@@ -1942,7 +1944,9 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
-    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
   }
 
 
@@ -3532,7 +3536,9 @@ namespace {
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0);
 
-    EXPECT_B2FATAL(Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)"));
+    var = Manager::Instance().getVariable("mcDaughterDiffOf(0, NOTINT, PDG)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_TRUE(std::isnan(std::get<double>(var->function(p))));
 
     // Test azimuthal angle as well
     var = Manager::Instance().getVariable("mcDaughterDiffOf(0, 1, phi)");

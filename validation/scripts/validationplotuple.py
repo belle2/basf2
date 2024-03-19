@@ -36,27 +36,23 @@ class Plotuple:
     A Plotuple is either a Plot or an N-Tuple
 
     @var work_folder: the work folder containing the results and plots
-    @var root_objects: A list of Root-objects which belong
+    @var _root_objects: A list of Root-objects which belong
         together (i.e. should be drawn into one histogram or one table)
-    @var revisions: The list of revisions
+    @var _revisions: The list of revisions
     @var warnings: A list of warnings that occurred while creating the
         plots/tables for this Plotuple object
-    @var reference: The reference RootObject for this Plotuple
-    @var elements: The elements (RootObject of different revisions) for this
+    @var _reference: The reference RootObject for this Plotuple
+    @var _elements: The elements (RootObject of different revisions) for this
         Plotuple
-    @var newest: The newest element in elements
+    @var _newest: The newest element in elements
     @var key: The key of the object within the corresponding ROOT file
     @var type: The type of the elements (TH1, TH2, TNtuple)
-    @var description: The description of this Plotuple object
-    @var check: Hint how the Plotuple object should look like
+    @var _description: The description of this Plotuple object
+    @var _check: Hint how the Plotuple object should look like
     @var contact: The contact person for this Plotuple object
     @var package: The package to which this Plotuple object belongs to
     @var rootfile: The rootfile to which the Plotuple object belongs to
-    @var chi2test_result: The result of the Chi^2-Test. By default, there is no
-        such result. If the Chi^2-Test has been performed, this variable holds
-        the information between which objects it has been performed.
-    @var pvalue: The p-value that the Chi^2-Test returned
-    @var file: The file, in which the histogram or the HMTL-table (for
+    @var _file: The file, in which the histogram or the HMTL-table (for
         n-tuples) are stored (without the file extension!)
     """
 

@@ -137,7 +137,7 @@ void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
   // Split the path into input, main and output. A nullptr means, the path should not be used
   PathPtr inputPath, mainPath, outputPath;
   std::tie(inputPath, mainPath, outputPath) = PathUtils::splitPath(path);
-  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath, mainPath, outputPath);
+  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath);
 
   // Check for existence of HLTZMQ2Ds module in input path to set DAQ environment
   for (const ModulePtr& module : inputPath->getModules()) {
@@ -386,7 +386,10 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
     // Test if we need more workers
     const unsigned int neededWorkers = m_processMonitor.needMoreWorkers();
     if (neededWorkers > 0) {
+      B2DEBUG(30, "restartFailedWorkers = " << restartFailedWorkers);
       if (restartFailedWorkers) {
+        B2DEBUG(30, ".... Restarting a new worker");
+        B2ERROR(".... Restarting a new worker process");
         runWorker(neededWorkers, inputPath, mainPath, terminateGlobally, maxEvent);
       } else if (failOnFailedWorkers) {
         B2ERROR("A worker failed. Will try to end the process smoothly now.");

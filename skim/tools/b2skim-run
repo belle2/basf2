@@ -141,6 +141,15 @@ def get_argument_parser():
                 "Analysis globaltag to be passed to the skims."
             ),
         )
+        subparser.add_argument(
+            "--pid-globaltag",
+            default=None,
+            type=str,
+            metavar="PIDGlobaltag",
+            help=(
+                "PID globaltag to be passed to the skims."
+            ),
+        )
 
     return parser
 
@@ -158,6 +167,7 @@ def main():
             OutputFileName=args.OutputFilename,
             mc=(not args.data),
             analysisGlobaltag=args.analysis_globaltag,
+            pidGlobaltag=args.pid_globaltag,
         )
     elif args.action == "combined":
         skims = list({*args.skims})
@@ -168,6 +178,7 @@ def main():
             *SkimObjects,
             mc=(not args.data),
             analysisGlobaltag=args.analysis_globaltag,
+            pidGlobaltag=args.pid_globaltag,
         )
     elif args.action == "module":
         SkimObjects = [
@@ -178,6 +189,7 @@ def main():
             *SkimObjects,
             mc=(not args.data),
             analysisGlobaltag=args.analysis_globaltag,
+            pidGlobaltag=args.pid_globaltag,
         )
 
     InputFileList = args.InputFileList or Skim.TestFiles

@@ -47,14 +47,15 @@ LHEInputModule::LHEInputModule() : Module(),
   addParam("pdg_displaced", m_pdg_displaced, "PDG code of the displaced particle being studied", 9000008);
 }
 
-
 void LHEInputModule::initialize()
 {
-  if (m_expNum < 0 or m_runNum < 0)
-    B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the LHEInput module.");
+  if (m_makeMaster) {
+    if (m_expNum < 0 or m_runNum < 0)
+      B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the LHEInput module.");
 
-  m_eventMetaData.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
-  B2INFO("LHEInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+    m_eventMetaData.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
+    B2INFO("LHEInput acts as input module for this process. This means the exp., run and event numbers will be set by this module.");
+  }
 
   m_iFile = 0;
   if (m_inputFileNames.size() == 0) {
@@ -99,9 +100,9 @@ void LHEInputModule::event()
   if (!m_eventMetaData)
     m_eventMetaData.create();
   try {
-    mpg.clear();
+    m_pg.clear();
     double weight = 1;
-    int id = m_lhe.getEvent(mpg, weight);
+    int id = m_lhe.getEvent(m_pg, weight);
     if (m_makeMaster) {
       if (id > -1) {
         m_evtNum = id;
@@ -114,7 +115,7 @@ void LHEInputModule::event()
     }
     if (m_useWeights)
       m_eventMetaData->setGeneratedWeight(weight);
-    mpg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
+    m_pg.generateList("", MCParticleGraph::c_setDecayInfo | MCParticleGraph::c_checkCyclic);
   } catch (LHEReader::LHEEmptyEventError&) {
     B2DEBUG(100, "Reached end of LHE file.");
     m_lhe.closeCurrentInputFile();

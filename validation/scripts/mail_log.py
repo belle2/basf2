@@ -19,7 +19,7 @@ from typing import Dict, Union, List, Optional
 
 # ours
 import validationpath
-from validationfunctions import available_revisions
+from validationfunctions import get_latest_nightly
 
 # martin's mail utils
 import mail_utils
@@ -72,9 +72,13 @@ class Mails:
 
         # read contents from comparison.json
         work_folder = self._validator.work_folder
-        revisions = ["reference"] + available_revisions(work_folder)
+
+        # choose latest nighly if available, else 'current'
+        revision = get_latest_nightly(work_folder)
+        self._validator.set_tag(revision)
+
         comparison_json_file = validationpath.get_html_plots_tag_comparison_json(
-            work_folder, revisions
+            work_folder, ['reference', revision]
         )
         with open(comparison_json_file) as f:
             comparison_json = json.load(f)

@@ -141,7 +141,7 @@ for method in methods:
                                       'Histogram for not tagged events',
                                       1, -3.0, -1.0)
 
-    # calibration plot for B0. If we get a linaer line our MC is fine, than the assumption r ~ 1- 2w is reasonable
+    # calibration plot for B0. If we get a linear line our MC is fine, than the assumption r ~ 1- 2w is reasonable
     # expectation is, that for B0 calibration plot:  qr=0  half B0 and half B0bar, qr = 1 only B0 and qr = -1
     # no B0. Inverse for B0bar calibration plot
     histo_calib_B0 = ROOT.TH1F('Calibration_B0', 'CalibrationPlot for true B0', 100, -1.0, 1.0)
@@ -229,7 +229,7 @@ for method in methods:
     print('****************************** CALIBRATION CHECK FOR COMBINER USING ' +
           method + ' ***************************************')
     print(' ')
-    print('Fit ploynomial of first order to the calibration plot. Expected value ~0.5')
+    print('Fit polynomial of first order to the calibration plot. Expected value ~0.5')
     print(' ')
     histo_calib_B0.Fit(diag, 'TEST')
     print('       ')
@@ -482,7 +482,7 @@ for method in methods:
     print('****************************************************************************************************')
     print('*                                                                                                  *')
 
-    # not that imortant
+    # not that important
     print('* ---------------------------------                                                                *')
     print('* Efficiency Determination - easiest way                                                           *')
     print('* ---------------------------------                                                                *')

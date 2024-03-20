@@ -2883,15 +2883,15 @@ namespace Belle2 {
 
         // respect the current frame and get the momentum of our input
         const auto& frame = ReferenceFrame::GetCurrent();
-        const auto p_this = B2Vector3D(frame.getMomentum(particle).Vect());
+        const auto phi_this = frame.getMomentum(particle).Phi();
 
         // find the most back-to-back in phi (largest absolute value of delta phi)
         double maxAngle = 0;
         for (unsigned int i = 0; i < list->getListSize(); ++i)
         {
           const Particle* compareme = list->getParticle(i);
-          const auto p_compare = B2Vector3D(frame.getMomentum(compareme).Vect());
-          double angle = std::abs(p_compare.Phi() - p_this.Phi());
+          const auto phi_compare = frame.getMomentum(compareme).Phi();
+          double angle = std::abs(phi_compare - phi_this);
           if (angle > M_PI) {angle = 2 * M_PI - angle;}
           if (maxAngle < angle) maxAngle = angle;
         }

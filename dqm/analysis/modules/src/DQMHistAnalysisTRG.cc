@@ -285,8 +285,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
     int CDCTRG_deadch = 0;
     for (int i = 3; i <= numberOfBins; i++) {
-//      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0.01*hist_CDCTRG_deadch->GetMaximum()) {CDCTRG_deadch += 1;}
-      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1;}
+      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0.01 * hist_CDCTRG_deadch->GetMaximum()) {CDCTRG_deadch += 1;}
+//      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1;}
     }
     B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
     setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);

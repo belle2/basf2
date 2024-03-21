@@ -41,6 +41,8 @@ class GraFEIModule(b2.Module):
         sig_side_lcas (list): List containing LCAS matrix of signal-side.
         sig_side_masses (list): List containing mass hypotheses of signal-side.
         gpu (bool): Whether to run on a GPU.
+        payload_config_name (str): Name of config file payload. The default should be kept, except in basf2 examples.
+        payload_model_name (str): Name of model file payload. The default should be kept, except in basf2 examples.
     """
 
     def __init__(
@@ -51,6 +53,8 @@ class GraFEIModule(b2.Module):
         sig_side_lcas=None,
         sig_side_masses=None,
         gpu=False,
+        payload_config_name="graFEIConfigFile",
+        payload_model_name="graFEIModelFile",
     ):
         """
         Initialization.
@@ -68,6 +72,10 @@ class GraFEIModule(b2.Module):
         self.sig_side_masses = sig_side_masses
         #: If running on GPU
         self.gpu = gpu
+        #: Config file name in the payload
+        self.payload_config_name = payload_config_name
+        #: Model file name in the payload
+        self.payload_model_name = payload_model_name
 
     def initialize(self):
         """
@@ -76,12 +84,12 @@ class GraFEIModule(b2.Module):
         # Get weights and configs from the DB if they are not provided from the user
         if not self.cfg_path:
             config = Belle2.DBAccessorBase(
-                Belle2.DBStoreEntry.c_RawFile, "graFEIConfigFile", True
+                Belle2.DBStoreEntry.c_RawFile, self.payload_config_name, True
             )
             self.cfg_path = config.getFilename()
         if not self.param_file:
             model = Belle2.DBAccessorBase(
-                Belle2.DBStoreEntry.c_RawFile, "graFEIModelFile", True
+                Belle2.DBStoreEntry.c_RawFile, self.payload_model_name, True
             )
             self.param_file = model.getFilename()
 

@@ -40,7 +40,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_mixed_graFEI_BReco_example",
+        default="user_jcerasol_graFEI_example",
         help="Globaltag containing graFEI model",
     )
     return parser.parse_args()
@@ -51,11 +51,12 @@ if __name__ == "__main__":
 
     store_mc_truth = True
 
-    b2.conditions.prepend_globaltag(args.globaltag)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-
     path = b2.create_path()
     ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
+
+    if args.globaltag:
+        b2.conditions.prepend_globaltag(args.globaltag)
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
     # graFEI cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
@@ -209,6 +210,8 @@ if __name__ == "__main__":
         "B0:tag",
         cfg_path=args.config,
         param_file=args.weight,
+        payload_config_name="graFEIConfigFile_Breco_example",  # If you default payload name just remove this argument
+        payload_model_name="graFEIModelFile_Breco_example",  # If you use default payload name just remove this argument
     )
     path.add_module(graFEI)
 

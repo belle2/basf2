@@ -41,7 +41,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_Bu2Knunu_graFEI_UpsReco_example",
+        default="user_jcerasol_graFEI_example",
         help="Globaltag containing graFEI model",
     )
     parser.add_argument(
@@ -72,11 +72,12 @@ if __name__ == "__main__":
 
     store_mc_truth = not args.no_mc_truth
 
-    b2.conditions.prepend_globaltag(args.globaltag)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-
     path = b2.create_path()
     ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
+
+    if args.globaltag:
+        b2.conditions.prepend_globaltag(args.globaltag)
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
     #################################################################################################
     # GraFEI requirements and reconstruction
@@ -167,6 +168,9 @@ if __name__ == "__main__":
         param_file=args.weight,
         sig_side_lcas=args.lcas,
         sig_side_masses=args.masses,
+        payload_config_name="graFEIConfigFile_Upsreco_example",  # If you use default payload name just remove this argument
+        payload_model_name="graFEIModelFile_Upsreco_example",  # If you use default payload name just remove this argument
+
     )
     path.add_module(graFEI)
 

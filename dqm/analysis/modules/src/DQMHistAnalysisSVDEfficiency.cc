@@ -162,7 +162,9 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 
   //Retrieve limits from EPICS
   double effErrorLo = 0.;
-  requestLimitsFromEpicsPVs("effLimits", effErrorLo, m_statThreshold, m_effWarning,  m_effError);
+  double effWarnLo = 0.;
+
+  requestLimitsFromEpicsPVs("effLimits", effErrorLo, effWarnLo, m_effWarning,  m_effError);
 
   B2DEBUG(10, " SVD efficiency thresholds taken from EPICS configuration file:");
   B2DEBUG(10, "  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
@@ -228,8 +230,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyU->Draw();
     m_cEfficiencyU->cd();
-    if (m_hEfficiency)
-      m_hEfficiency->getHistogram(1)->Draw("text");
+    m_hEfficiency->getHistogram(1)->Draw("text");
     colorizeCanvas(m_cEfficiencyU, c_StatusDefault);
   } else {
     B2DEBUG(10, "U-side Before loop on sensors, size :" << m_SVDModules.size());
@@ -273,8 +274,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     B2INFO("Histograms needed for Efficiency computation are not found");
     m_cEfficiencyV->cd();
     m_cEfficiencyV->Draw();
-    if (m_hEfficiency)
-      m_hEfficiency->getHistogram(0)->Draw("text");
+    m_hEfficiency->getHistogram(0)->Draw("text");
     colorizeCanvas(m_cEfficiencyV, c_StatusDefault);
   } else {
     B2DEBUG(10, "V-side Before loop on sensors, size :" << m_SVDModules.size());

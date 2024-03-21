@@ -227,6 +227,8 @@ namespace Belle2 {
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
 
+    TH1D* m_photonYields = nullptr; /**< photon yields per slot */
+    TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
     TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
     TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
 

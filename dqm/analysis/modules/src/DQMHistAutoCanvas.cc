@@ -12,6 +12,7 @@
 
 #include <dqm/analysis/modules/DQMHistAutoCanvas.h>
 #include <TStyle.h>
+#include <fstream>
 
 using namespace std;
 using namespace Belle2;
@@ -29,7 +30,7 @@ DQMHistAutoCanvasModule::DQMHistAutoCanvasModule()
   : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("IncludeFolders", m_acfolders, "List of histograms to automatically create canvases, empty for all",
+  addParam("IncludeFolders", m_inclfolders, "List of histograms to automatically create canvases, empty for all",
            std::vector<std::string>());
   addParam("ExcludeFolders", m_exclfolders, "List of folders to exclude from create canvases, empty for none, \"all\" for all",
            std::vector<std::string>());
@@ -40,12 +41,12 @@ DQMHistAutoCanvasModule::DQMHistAutoCanvasModule()
 
 void DQMHistAutoCanvasModule::beginRun()
 {
-  m_canvaslist.Clear()
+  m_canvaslist.clear();
   if (m_listfile != "") {
     std::ifstream inputFile(m_listfile);
     // Check if the file is open
     if (!inputFile.is_open()) {
-      B2WARNING("cannot open histogram list file " << m_listfile)
+      B2WARNING("cannot open histogram list file " << m_listfile);
       return;
     }
     // Read lines from the file and store them in the vector
@@ -57,39 +58,6 @@ void DQMHistAutoCanvasModule::beginRun()
     // Close the file
     inputFile.close();
   }
-}
-
-
-
-TFile* inFile = new TFile(fname);
-TIter nexthisto(inFile->GetListOfKeys());
-TKey* key;
-int i = 1;
-TCanvas* cnv = new TCanvas("dummy");
-while ((key = (TKey*)nexthisto()))
-{
-  if (TString(key->GetClassName()) != "TCanvas") continue;
-  //std::cout << key->GetName() << std::endl;
-  TCanvas* obj1;
-  if (i == 1) {i = 0; obj1 = new TCanvas("DQMInfo/c_info", ""); obj1->SetTitle(key->GetTitle());}
-  else obj1 = (TCanvas*)key->ReadObj();
-  //std::cout << obj1->GetTitle() << std::endl;
-
-  // The list contains "_" but canvas name may contain ".", thus find will fail!
-  TString nn(obj1->GetName());
-  if (nn.Contains(".")) nn.ReplaceAll(".", "_");
-  // this will also translate in folder names. lets hope nobody use a "." in there
-  if (m_canvaslist.find(nn.Data()) == m_canvaslist.end()) continue;
-  TObjArray* tokens = nn.Tokenize("/");
-  if (tokens->GetEntries() != 2) continue;
-  TString folder = ((TObjString*)tokens->At(0))->GetString();
-  TString canvas = ((TObjString*)tokens->At(1))->GetString();
-  // if(canvas.Contains(".")) canvas.ReplaceAll(".","_");
-  int no_exist = gSystem->AccessPathName(jsonFolder + "/" + folder);
-  if (no_exist) gSystem->Exec("mkdir " + jsonFolder + "/" + folder);
-  if (i == 1) {i = 0;  cnv->SaveAs("/tmp/dummy.json");}
-  obj1->SaveAs(jsonFolder + "/" + folder + "/" + canvas + ".json");
-}
 }
 
 void DQMHistAutoCanvasModule::event()
@@ -109,17 +77,16 @@ void DQMHistAutoCanvasModule::event()
     if (split_result.size() <= 1) continue;
     auto dirname = split_result.at(0); // extract dirname, get hist name is in histogram itself
     std::string cname;
-    std::string tname;
+    std::string hname;
     if (split_result.size() > 1) { // checked above already
       hname = split_result.at(1);
       if ((dirname + "/" + hname) == "softwaretrigger/skim") hname = "skim_hlt";
-      cname = dirname + "/c_" + hname
-              tname = "c_" + hname;
+      cname = dirname + "/c_" + hname;
     } else {
       hname = histoname.Data();
       cname = "c_" + hname;
     }
-    if (cname.Contains(".")) canme.ReplaceAll(".", "_");
+    std::replace(cname.begin(), cname.end(), '.', '_');
 
     // Now find out if we want to have a canvas at all
 
@@ -127,7 +94,8 @@ void DQMHistAutoCanvasModule::event()
     if (m_listfile != "") {
       give_canvas = m_canvaslist.find(cname.c_str()) != m_canvaslist.end();
     } else {
-      // case 2: include/exclude
+      // case 2: include/exclude      tname = "c_" + hname;
+
       if (m_exclfolders.size() == 0) { //If none specified, canvases for all histograms
         give_canvas = true;
       } else {

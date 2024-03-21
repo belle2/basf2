@@ -13,6 +13,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <set>
 
 namespace Belle2 {
   /** Class definition for the reference histogram display. */
@@ -44,7 +45,7 @@ namespace Belle2 {
     /** The list of folders which are excluded from automatically generate canvases. */
     std::vector<std::string> m_exclfolders;
     /** The filename of a list canvas names to auto generate. */
-    std::vector<std::string> m_listfile;
+    std::string m_listfile;
 
     /** list of wanted canvas name if included as list file*/
     std::set<std::string> m_canvaslist;

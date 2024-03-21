@@ -128,6 +128,10 @@ The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong 
 and -1 for particles in events with ``graFEI_goodEvent = 0``. Therefore, if you want meaningful distributions you should cut on events with ``graFEI_goodEvent = 1``.
 However, if you reconstruct the signal-side as in the example, only good events are kept.
 
+.. warning::
+   For the time being, the mass hypotheses defined at the beginning are not changed, even if new hypotheses are predicted by the model. 
+   Thus you'll have to consider all of them when creating your signal-side candidates. This behavior will change in future versions of the tool.
+
 The variables added by the `GraFEIModule <grafei.GraFEIModule>` are filled with ``nan`` if there are less than two reconstructed particles in the event.
 Otherwise, they are defined as follows:
 
@@ -186,8 +190,7 @@ You can import this module in a steering file with ``from grafei import GraFEIMo
 
 .. automodule:: grafei
    :members:
-   :exclude-members: event, initialize
-
+   :exclude-members: event, initialize, cfg_path, gpu, param_file, particle_list, payload_config_name, payload_model_name, sig_side_lcas, sig_side_masses
 
 Other modules and functions
 ***************************
@@ -200,6 +203,7 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.create_trainer
    :members:
+   :exclude-members: configs, device, evaluators, ignore_index, log_results, model, optimizer, run_dir, setup_handlers, tags, timestamp, trainer
 
 .. automodule:: grafei.model.dataset_split
    :members:
@@ -212,26 +216,27 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.geometric_datasets
    :members:
-   :exclude-members: process, processed_file_names
+   :exclude-members: process, processed_file_names, data, edge_features, global_features, n_files, node_features, normalize, root, samples, slices
 
 .. automodule:: grafei.model.geometric_layers
    :members:
-   :exclude-members: forward
+   :exclude-members: forward, dropout_prob, lin_in, lin_out, lins_hid, nonlin_function, norm, normalize, num_hid_layers
 
 .. automodule:: grafei.model.geometric_network
    :members:
-   :exclude-members: forward
+   :exclude-members: forward, ML_list, first_ML, last_ML
 
 .. automodule:: grafei.model.lca_to_adjacency
    :members:
+   :exclude-members: bfs_index, children, lca_index, lcas_level, level, parent
 
 .. automodule:: grafei.model.metrics
    :members:
-   :exclude-members: compute, update, reset
+   :exclude-members: compute, update, reset, device, ignore_index
 
 .. automodule:: grafei.model.multiTrain
    :members:
-   :exclude-members: forward
+   :exclude-members: forward, LCA_CE, alpha_mass, mass_CE
 
 .. automodule:: grafei.model.normalize_features
    :members:
@@ -241,4 +246,4 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.modules.RootSaverModule
    :members:
-   :exclude-members: event, initialize, terminate
+   :exclude-members: event, initialize, terminate, features, mcparticle_list, output_file, particle_lists

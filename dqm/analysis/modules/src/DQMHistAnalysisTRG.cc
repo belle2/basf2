@@ -138,12 +138,12 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //ECLTRG_deadch
 //  m_canvas_ECLTRG_deadch = new TCanvas("ECLTRG_deadch");
-  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 159778, 1); // update each 2000 entries
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 2000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
   //update PV

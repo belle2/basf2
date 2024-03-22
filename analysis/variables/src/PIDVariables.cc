@@ -599,7 +599,6 @@ namespace Belle2 {
       return std::get<double>(pidFunction(part));
     }
 
-
     double muonID(const Particle* part)
     {
       static Manager::FunctionPtr pidFunction =
@@ -1161,7 +1160,6 @@ namespace Belle2 {
                       "electron identification probability defined as :math:`\\mathcal{L}_e/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("muonID", muonID,
                       "muon identification probability defined as :math:`\\mathcal{L}_\\mu/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
-
     REGISTER_VARIABLE("pionID", pionID,
                       "pion identification probability defined as :math:`\\mathcal{L}_\\pi/(\\mathcal{L}_e+\\mathcal{L}_\\mu+\\mathcal{L}_\\pi+\\mathcal{L}_K+\\mathcal{L}_p+\\mathcal{L}_d)`, using info from all available detectors");
     REGISTER_VARIABLE("kaonID", kaonID,

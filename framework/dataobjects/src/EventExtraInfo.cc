@@ -104,9 +104,8 @@ std::vector<std::string> EventExtraInfo::getStringInfoNames() const
 
 std::string EventExtraInfo::getEventType() const
 {
-  try {
+  if (hasExtraStringInfo(std::string("eventType")))
     return getExtraStringInfo(std::string("eventType"));
-  } catch (std::runtime_error) {
+  else
     return std::string("");
-  }
 }

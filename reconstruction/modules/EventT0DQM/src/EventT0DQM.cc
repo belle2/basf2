@@ -29,7 +29,7 @@ void EventT0DQMModule::defineHisto()
 {
 
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("EventT0DQMdir")->cd();
+  oldDir->mkdir("EventT0")->cd();
 
   int nBins = 400 ;
   double minT0 = -100 ;

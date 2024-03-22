@@ -145,7 +145,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   // --- TOP EventT0 plots for ECLTRG ---
 
   // find TOP EventT0 Hadrons ECLTRG histogram and process it
-  TH1* h = findHist("EventT0DQMdir/m_histEventT0_TOP_hadron_L1_ECLTRG");
+  TH1* h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_ECLTRG");
   TString tag = "hadronECLTRG";
   m_topPad1ECLTRG->cd();
   if (processHistogram(h, tag)) {
@@ -159,7 +159,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find TOP EventT0 Bhabhas ECLTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_TOP_bhabha_L1_ECLTRG");
+  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG";
   m_topPad2ECLTRG->cd();
   if (processHistogram(h, tag)) {
@@ -173,7 +173,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find TOP EventT0 Mumus ECLTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_TOP_mumu_L1_ECLTRG");
+  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
   tag = "mumuECLTRG";
   m_topPad3ECLTRG->cd();
   if (processHistogram(h, tag)) {
@@ -198,7 +198,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   // --- TOP EventT0 plots for CDCTRG ---
 
   // find TOP EventT0 Hadrons CDCTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_TOP_hadron_L1_CDCTRG");
+  h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_CDCTRG");
   tag = "hadronCDCTRG";
   m_topPad1CDCTRG->cd();
   if (processHistogram(h, tag)) {
@@ -216,7 +216,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find TOP EventT0 Bhabhas CDCTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_TOP_bhabha_L1_CDCTRG");
+  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_CDCTRG");
   tag = "bhabhaCDCTRG";
   m_topPad2CDCTRG->cd();
   if (processHistogram(h, tag)) {
@@ -234,7 +234,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find TOP EventT0 Mumus CDCTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_TOP_mumu_L1_CDCTRG");
+  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_CDCTRG");
   tag = "mumuCDCTRG";
   m_topPad3CDCTRG->cd();
   if (processHistogram(h, tag)) {
@@ -260,7 +260,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   // --- SVD EventT0 plots for ECLTRG ---
 
   // find SVD EventT0 Hadrons ECLTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_SVD_hadron_L1_ECLTRG");
+  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_ECLTRG");
   tag = "hadronECLTRG";
   m_svdPad1ECLTRG->cd();
   if (processHistogram(h, tag)) {
@@ -274,7 +274,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find SVD EventT0 Bhabhas ECLTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_SVD_bhabha_L1_ECLTRG");
+  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG";
   m_svdPad2ECLTRG->cd();
   if (processHistogram(h, tag)) {
@@ -288,7 +288,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find SVD EventT0 Mumus ECLTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_SVD_mumu_L1_ECLTRG");
+  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
   tag = "mumuECLTRG";
   m_svdPad3ECLTRG->cd();
   if (processHistogram(h, tag)) {
@@ -313,7 +313,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   // --- SVD EventT0 plots for CDCTRG ---
 
   // find SVD EventT0 Hadrons CDCTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_SVD_hadron_L1_CDCTRG");
+  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_CDCTRG");
   tag = "hadronCDCTRG";
   m_svdPad1CDCTRG->cd();
   if (processHistogram(h, tag)) {
@@ -331,7 +331,7 @@ void DQMHistAnalysisEventT0Module::endRun()
   }
 
   // find SVD EventT0 Bhabhas CDCTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_SVD_bhabha_L1_CDCTRG");
+  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_CDCTRG");
   tag = "bhabhaCDCTRG";
   m_svdPad2CDCTRG->cd();
   if (processHistogram(h, tag)) {
@@ -350,7 +350,7 @@ void DQMHistAnalysisEventT0Module::endRun()
 
 
   // find SVD EventT0 Mumus CDCTRG histogram and process it
-  h = findHist("EventT0DQMdir/m_histEventT0_SVD_mumu_L1_CDCTRG");
+  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_CDCTRG");
   tag = "mumuCDCTRG";
   m_svdPad3CDCTRG->cd();
   if (processHistogram(h, tag)) {
@@ -474,7 +474,7 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
 
 void DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff)
 {
-  TH1* h = findHist("EventT0DQMdir/" + histname);
+  TH1* h = findHist("EventT0/" + histname);
   if (not h) {
     return;
   }

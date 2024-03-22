@@ -66,7 +66,7 @@ void DQMHistAnalysisPhysicsModule::initialize()
   m_ratio_text->SetTextSize(0.026);
 
   //new ratio hadronb2_tight/bhabha_all
-  addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Events, 100000, 1); // update each 100000 events
+  addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Events, 10000, 1); // update each 10000 events
   registerEpicsPV(m_pvPrefix + "hadronb2_tight_over_bhabha_all", "hadronb2_tight_over_bhabha_all");
 
   B2DEBUG(20, "DQMHistAnalysisPhysics: initialized.");

@@ -90,10 +90,16 @@ namespace Belle2 {
     float getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll);
 
     /** Total KLM layers  */
-    static constexpr int m_TotalKLMLayers = BKLMElementNumbers::getMaximalLayerNumber() + EKLMElementNumbers::getMaximalLayerNumber();
+    static constexpr int m_maxBKLMLayers = BKLMElementNumbers::getMaximalLayerNumber();
+
+    /** Total KLM layers  */
+    static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
+
+    /** Total KLM layers  */
+    static constexpr int m_TotalKLMLayers = m_maxBKLMLayers + m_maxEKLMLayers;
 
     /** Database identifier or file used to load the weights. */
-    std::string m_identifier = "NNmuidWeightFile";
+    std::string m_identifier = "NNmuidWeightFile.root";
 
     /** Database pointer to the database representation of the weightfile. */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;

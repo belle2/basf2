@@ -115,7 +115,7 @@ void KLMMuonIDDNNExpertModule::event()
       m_hitpattern_hasext[layer] = 0;
     }
 
-    std::map<int, int> ExtHitMap;
+    bool hasExtInKLM = false;
     RelationVector<ExtHit> ExtHitrelation = track.getRelationsTo<ExtHit>();
     for (unsigned long int ii = 0; ii < ExtHitrelation.size(); ii++) {
       ExtHit* exthit = ExtHitrelation[ii];
@@ -131,20 +131,22 @@ void KLMMuonIDDNNExpertModule::event()
 
       if (inBKLM) {
         BKLMElementNumbers::moduleNumberToElementNumbers(copyid, &section, &sector, &layer);
+        if (layer > m_maxBKLMLayers) continue;
         m_hitpattern_hasext[layer - 1] = 1;
       } else {
         EKLMElementNumbers::Instance().stripNumberToElementNumbers(copyid, &section, &layer, &sector, &plane, &strip);
-        m_hitpattern_hasext[15 + layer - 1] = 1;
+        if (layer > m_maxEKLMLayers) continue;
+        m_hitpattern_hasext[m_maxBKLMLayers + layer - 1] = 1;
       }
 
-      int index = layer - 1 + 15 * (1 - inBKLM); // make sure BKLM hits is in front of EKLM hits
-      ExtHitMap[index] = ii; // only keep the last ext hit in each layer
+      hasExtInKLM = true;
+
     }
 
     RelationVector<KLMHit2d> KLMHit2drelation = track.getRelationsTo<KLMHit2d>();
 
     // only apply NN muonID to tracks with at least one KLMHit2d or one ExtHit in KLM.
-    if (not(ExtHitMap.size() || KLMHit2drelation.size())) continue;
+    if (not(hasExtInKLM || KLMHit2drelation.size())) continue;
 
     std::map<int, int> Hit2dMap; // arrange KLMHit2d order in layer
     for (long unsigned int ii = 0; ii < KLMHit2drelation.size(); ii++) {
@@ -152,7 +154,8 @@ void KLMMuonIDDNNExpertModule::event()
       bool hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
       unsigned long int hit_layer = klmhit->getLayer();
 
-      int index = hit_layer - 1 + 15 * (1 - hit_inBKLM); // BKLM hits are in front of EKLM hits
+      int index = hit_layer - 1 + m_maxBKLMLayers * (1 - hit_inBKLM); // BKLM hits are in front of EKLM hits
+      if (index > m_TotalKLMLayers) continue;
       Hit2dMap.insert(std::pair<int, int> {index, ii});
     }
 
@@ -181,7 +184,6 @@ void KLMMuonIDDNNExpertModule::event()
       m_hitpattern_width[hitpatternindex] = width;
     } // loop of Hit2dMap
 
-    ExtHitMap.clear();
     Hit2dMap.clear();
 
     double muprob_nn = getNNmuProbability(&track, klmll);

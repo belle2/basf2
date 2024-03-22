@@ -92,7 +92,7 @@ void DQMHistAutoCanvasModule::event()
 
     // case 1: list file
     if (m_listfile != "") {
-      give_canvas = m_canvaslist.find(cname.c_str()) != m_canvaslist.end();
+      give_canvas = m_canvaslist.find(cname) != m_canvaslist.end();
     } else {
       // case 2: include/exclude      tname = "c_" + hname;
 
@@ -132,7 +132,7 @@ void DQMHistAutoCanvasModule::event()
       if (m_cs.find(name) == m_cs.end()) {
         // no canvas exists yet, create one
         TCanvas* c = new TCanvas(cname.c_str(), ("c_" + hname).c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(cname, c));
+        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
         B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
       }
 

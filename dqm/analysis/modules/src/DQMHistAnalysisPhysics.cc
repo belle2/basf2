@@ -66,7 +66,7 @@ void DQMHistAnalysisPhysicsModule::initialize()
   m_ratio_text->SetTextSize(0.026);
 
   //new ratio hadronb2_tight/bhabha_all
-  addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("PhysicsObjects", "physicsresults", HistDelta::c_Events, 100000, 1); // update each 100000 events
   registerEpicsPV(m_pvPrefix + "hadronb2_tight_over_bhabha_all", "hadronb2_tight_over_bhabha_all");
 
   B2DEBUG(20, "DQMHistAnalysisPhysics: initialized.");
@@ -102,21 +102,16 @@ void DQMHistAnalysisPhysicsModule::event()
     double mumu_tight_ntot = m_hphysicsresults->GetBinContent(5);
     double bhabha_all_ntot = m_hphysicsresults->GetBinContent(6);
 
-    double ratio_hadron_bhabha = -1.;
-    double ratio_hadronb2_bhabha = -1.;
-    double ratio_hadronb2_tight_bhabha = -1.;
-    double ratio_mumu_tight_bhabha = -1.;
+    double ratio_hadron_bhabha = 0.;
+    double ratio_hadronb2_bhabha = 0.;
+    double ratio_hadronb2_tight_bhabha = 0.;
+    double ratio_mumu_tight_bhabha = 0.;
 
     if (bhabha_all_ntot != 0) {
       ratio_hadron_bhabha = had_ntot / bhabha_all_ntot;
       ratio_hadronb2_bhabha = hadb2_ntot / bhabha_all_ntot;
       ratio_hadronb2_tight_bhabha = hadb2_tight_ntot / bhabha_all_ntot;
       ratio_mumu_tight_bhabha = mumu_tight_ntot / bhabha_all_ntot;
-    } else {
-      ratio_hadron_bhabha = 0.;
-      ratio_hadronb2_bhabha = 0.;
-      ratio_hadronb2_tight_bhabha = 0.;
-      ratio_mumu_tight_bhabha = 0.;
     }
     m_ratio_text->AddText(Form("hadronb2_tight/bhabha: %.4f", float(ratio_hadronb2_tight_bhabha)));
     m_ratio_text->AddText(Form("hadronb2/bhabha: %.4f", float(ratio_hadronb2_bhabha)));
@@ -127,11 +122,9 @@ void DQMHistAnalysisPhysicsModule::event()
   // for pv #new hadronb2_tight/#bhabha_all
   auto hist_hadronb2_tight_over_bhabha_all =  getDelta("PhysicsObjects", "physicsresults", 0, true);// only if updated
   if (hist_hadronb2_tight_over_bhabha_all) {
-    hist_hadronb2_tight_over_bhabha_all->Draw();
     if (hist_hadronb2_tight_over_bhabha_all->GetBinContent(6) != 0) {
-      double hadronb2_tight_over_bhabha_all = 0.0;
-      hadronb2_tight_over_bhabha_all = hist_hadronb2_tight_over_bhabha_all->GetBinContent(4) /
-                                       hist_hadronb2_tight_over_bhabha_all->GetBinContent(6);
+      double hadronb2_tight_over_bhabha_all = hist_hadronb2_tight_over_bhabha_all->GetBinContent(4) /
+                                              hist_hadronb2_tight_over_bhabha_all->GetBinContent(6);
       B2DEBUG(1, "hadronb2_tight_over_bhabha_all:" << hadronb2_tight_over_bhabha_all);
       setEpicsPV("hadronb2_tight_over_bhabha_all", hadronb2_tight_over_bhabha_all);
     }
@@ -168,20 +161,16 @@ void DQMHistAnalysisPhysicsModule::endRun()
     double hadb2_tight_ntot = m_hphysicsresults->GetBinContent(4);
     double mumu_tight_ntot = m_hphysicsresults->GetBinContent(5);
     double bhabha_all_ntot = m_hphysicsresults->GetBinContent(6);
-    double ratio_hadron_bhabha_final = -1.;
-    double ratio_hadronb2_bhabha_final = -1.;
-    double ratio_hadronb2_tight_bhabha_final = -1.;
-    double ratio_mumu_tight_bhabha_final = -1.;
+    double ratio_hadron_bhabha_final = 0.;
+    double ratio_hadronb2_bhabha_final = 0.;
+    double ratio_hadronb2_tight_bhabha_final = 0.;
+    double ratio_mumu_tight_bhabha_final = 0.;
+
     if (bhabha_all_ntot != 0) {
       ratio_hadron_bhabha_final = had_ntot / bhabha_all_ntot;
       ratio_hadronb2_bhabha_final = hadb2_ntot / bhabha_all_ntot;
       ratio_hadronb2_tight_bhabha_final = hadb2_tight_ntot / bhabha_all_ntot;
       ratio_mumu_tight_bhabha_final = mumu_tight_ntot / bhabha_all_ntot;
-    } else {
-      ratio_hadron_bhabha_final = 0.;
-      ratio_hadronb2_bhabha_final = 0.;
-      ratio_hadronb2_tight_bhabha_final = 0.;
-      ratio_mumu_tight_bhabha_final = 0.;
     }
     m_monObj->setVariable("ratio_hadron_bhabha_hlt", ratio_hadron_bhabha_final);
     m_monObj->setVariable("ratio_hadronb2_bhabha_hlt", ratio_hadronb2_bhabha_final);

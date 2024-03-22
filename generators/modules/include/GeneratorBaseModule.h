@@ -20,7 +20,7 @@ namespace Belle2 {
 
   class Module;
 
-  /** The base module for generator modules to set the generator information on the EventExtraInfo.
+  /** The base module for generator modules, which sets the generator information as EventExtraInfo.
    */
   class GeneratorBaseModule : public Module {
   public:
@@ -42,7 +42,7 @@ namespace Belle2 {
     };
 
     /** Initialize the module. To be defined in each generator module. */
-    virtual void generatorInitialize() {};
+    virtual void generatorInitialize() = 0;
 
     /** Method is called for each event. */
     void event() override
@@ -59,7 +59,7 @@ namespace Belle2 {
     };
 
     /** Method is called for each event. To be defined in each generator module.*/
-    virtual void generatorEvent() {};
+    virtual void generatorEvent() = 0;
 
     /** Set the generator information  */
     void setGeneratorInfoMap(std::unordered_map<std::string, double> generatorInfoMap)
@@ -79,7 +79,7 @@ namespace Belle2 {
 
     /** Event type */
     std::string m_eventType;
-    /** Generator information to be set on extraInfo */
+    /** Generator information to be set as extraInfo */
     std::unordered_map<std::string, double> m_generatorInfoMap = {};
 
   };

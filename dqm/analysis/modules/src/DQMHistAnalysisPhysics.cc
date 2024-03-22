@@ -81,18 +81,18 @@ void DQMHistAnalysisPhysicsModule::beginRun()
 void DQMHistAnalysisPhysicsModule::event()
 {
 
-  auto m_hmUPS = (TH1*)findHist("PhysicsObjects/mUPS", true);// check if updated
+  auto m_hmUPS = findHist("PhysicsObjects/mUPS", true);// check if updated
   if (m_hmUPS) {
     double mean_mUPS = m_hmUPS->GetMean();
     m_cmUPS_text->AddText(Form("mean : %.2f", float(mean_mUPS)));
 
   }
-  auto m_hmUPSe = (TH1*)findHist("PhysicsObjects/mUPSe", true);// check if updated
+  auto m_hmUPSe = findHist("PhysicsObjects/mUPSe", true);// check if updated
   if (m_hmUPSe) {
     double mean_mUPSe = m_hmUPSe->GetMean();
     m_cmUPSe_text->AddText(Form("mean : %.2f", float(mean_mUPSe)));
   }
-  auto m_hphysicsresults = (TH1*)findHist("PhysicsObjects/physicsresults", true);// check if updated
+  auto m_hphysicsresults = findHist("PhysicsObjects/physicsresults", true);// check if updated
   if (m_hphysicsresults) {
     double had_ntot = m_hphysicsresults->GetBinContent(2);
     double hadb2_ntot = m_hphysicsresults->GetBinContent(3);
@@ -148,7 +148,7 @@ void DQMHistAnalysisPhysicsModule::event()
 }
 void DQMHistAnalysisPhysicsModule::endRun()
 {
-  auto m_hphysicsresults = (TH1*)findHist("PhysicsObjects/physicsresults");
+  auto m_hphysicsresults = findHist("PhysicsObjects/physicsresults");
   if (m_hphysicsresults) {
     double had_ntot = m_hphysicsresults->GetBinContent(2);
     double hadb2_ntot = m_hphysicsresults->GetBinContent(3);

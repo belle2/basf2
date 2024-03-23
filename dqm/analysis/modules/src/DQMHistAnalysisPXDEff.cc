@@ -493,7 +493,7 @@ void DQMHistAnalysisPXDEffModule::event()
         gr->Draw("AP");
 
         for (auto& it : m_excluded) {
-          std::map <int, TLatex*> ltmap;
+          static std::map <int, TLatex*> ltmap;
           auto tt = ltmap[it];
           if (!tt) {
             tt = new TLatex(it + 0.5, scale_min, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());

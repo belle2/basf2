@@ -253,7 +253,7 @@ void DQMHistAnalysisPXDCMModule::event()
     }
   }
 
-  auto status = makeStatus(all >= 100, warn_flag, error_flag);
+  auto status = makeStatus(all >= 10000, warn_flag, error_flag);
 
   colorizeCanvas(m_cCommonModeDelta, status);
 

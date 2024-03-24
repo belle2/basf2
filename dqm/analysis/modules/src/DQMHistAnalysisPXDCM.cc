@@ -255,6 +255,7 @@ void DQMHistAnalysisPXDCMModule::event()
 
   auto status = makeStatus(all >= 10000, warn_flag, error_flag);
 
+  m_cCommonModeDelta->cd();
   colorizeCanvas(m_cCommonModeDelta, status);
 
   if (anyupdate) {
@@ -265,7 +266,6 @@ void DQMHistAnalysisPXDCMModule::event()
     setEpicsPV("CM63", datacm);
   }
   if (m_hCommonModeDelta) {
-    m_cCommonModeDelta->cd();
     m_hCommonModeDelta->Draw("colz");
     leg->Draw();
     m_line10->Draw();

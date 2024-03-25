@@ -17,6 +17,7 @@
 #include <framework/dataobjects/EventT0.h>
 
 #include <TH1F.h>
+#include <TH1D.h>
 #include <TDirectory.h>
 
 namespace Belle2 {
@@ -107,26 +108,26 @@ namespace Belle2 {
     /// EventT0 algorithms for which to calculate fractions of abundance
     const char* c_eventT0Algorithms[5] = {"ECL", "SVD", "CDC hit based", "CDC full grid chi2", "TOP"};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
-    TH1F* m_histAlgorithmSourceFractionsHadronL1ECLTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsHadronL1ECLTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger
-    TH1F* m_histAlgorithmSourceFractionsHadronL1CDCTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsHadronL1CDCTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by TOP trigger
-    TH1F* m_histAlgorithmSourceFractionsHadronL1TOPTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsHadronL1TOPTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by ECL trigger
-    TH1F* m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by CDC trigger
-    TH1F* m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by TOP trigger
-    TH1F* m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by ECL trigger
-    TH1F* m_histAlgorithmSourceFractionsMuMuL1ECLTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsMuMuL1ECLTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by CDC trigger
-    TH1F* m_histAlgorithmSourceFractionsMuMuL1CDCTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsMuMuL1CDCTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by TOP trigger
-    TH1F* m_histAlgorithmSourceFractionsMuMuL1TOPTRG{nullptr};
+    TH1D* m_histAlgorithmSourceFractionsMuMuL1TOPTRG{nullptr};
 
     /// Fill fraction histogram with values
-    void fillHistogram(TH1F* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0, const bool hasCDCGridT0,
+    void fillHistogram(TH1D* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0, const bool hasCDCGridT0,
                        const bool hasTOPT0);
 
 

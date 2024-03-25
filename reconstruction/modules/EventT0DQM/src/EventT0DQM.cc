@@ -155,39 +155,39 @@ void EventT0DQMModule::defineHisto()
                                                 nBins, minT0, maxT0);
 
   m_histAlgorithmSourceFractionsHadronL1ECLTRG =
-    new TH1F("AlgorithmSourceFractionsHadronL1ECLTRG",
+    new TH1D("AlgorithmSourceFractionsHadronL1ECLTRG",
              "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by ECL;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsHadronL1CDCTRG =
-    new TH1F("AlgorithmSourceFractionsHadronL1CDCTRG",
+    new TH1D("AlgorithmSourceFractionsHadronL1CDCTRG",
              "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by CDC;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsHadronL1TOPTRG =
-    new TH1F("AlgorithmSourceFractionsHadronL1TOPTRG",
+    new TH1D("AlgorithmSourceFractionsHadronL1TOPTRG",
              "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by TOP;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsBhaBhaL1ECLTRG =
-    new TH1F("AlgorithmSourceFractionsBhaBhaL1ECLTRG",
+    new TH1D("AlgorithmSourceFractionsBhaBhaL1ECLTRG",
              "Fraction of events with EventT0 from each algorithm for Bhabha events triggerd by ECL;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsBhaBhaL1CDCTRG =
-    new TH1F("AlgorithmSourceFractionsBhaBhaL1CDCTRG",
+    new TH1D("AlgorithmSourceFractionsBhaBhaL1CDCTRG",
              "Fraction of events with EventT0 from each algorithm for Bhabha events triggerd by CDC;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsBhaBhaL1TOPTRG =
-    new TH1F("AlgorithmSourceFractionsBhaBhaL1TOPTRG",
+    new TH1D("AlgorithmSourceFractionsBhaBhaL1TOPTRG",
              "Fraction of events with EventT0 from each algorithm for Bhabha events triggerd by TOP;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsMuMuL1ECLTRG =
-    new TH1F("AlgorithmSourceFractionsMuMuL1ECLTRG",
+    new TH1D("AlgorithmSourceFractionsMuMuL1ECLTRG",
              "Fraction of events with EventT0 from each algorithm for #mu#mu events triggerd by ECL;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsMuMuL1CDCTRG =
-    new TH1F("AlgorithmSourceFractionsMuMuL1CDCTRG",
+    new TH1D("AlgorithmSourceFractionsMuMuL1CDCTRG",
              "Fraction of events with EventT0 from each algorithm for #mu#mu events triggerd by CDC;Algorithm;Fraction",
              5, 0, 5);
   m_histAlgorithmSourceFractionsMuMuL1TOPTRG =
-    new TH1F("AlgorithmSourceFractionsMuMuL1TOPTRG",
+    new TH1D("AlgorithmSourceFractionsMuMuL1TOPTRG",
              "Fraction of events with EventT0 from each algorithm for #mu#mu events triggerd by TOP;Algorithm;Fraction",
              5, 0, 5);
 
@@ -511,7 +511,7 @@ void EventT0DQMModule::event()
   B2DEBUG(20, "eventT0_SVD = " << eventT0_SVD << " ns") ;
 }
 
-void EventT0DQMModule::fillHistogram(TH1F* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0,
+void EventT0DQMModule::fillHistogram(TH1D* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0,
                                      const bool hasCDCGridT0, const bool hasTOPT0)
 {
   hist->Fill(-1); // counting events for normalisation

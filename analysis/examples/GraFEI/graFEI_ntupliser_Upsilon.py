@@ -41,7 +41,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_graFEI_example",
+        default="analysis_tools_light-2403-persian",
         help="Globaltag containing graFEI model",
     )
     parser.add_argument(
@@ -75,9 +75,9 @@ if __name__ == "__main__":
     path = b2.create_path()
     ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
 
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     if args.globaltag:
         b2.conditions.prepend_globaltag(args.globaltag)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
     #################################################################################################
     # GraFEI requirements and reconstruction

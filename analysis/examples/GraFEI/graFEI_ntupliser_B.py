@@ -40,7 +40,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_graFEI_example",
+        default="analysis_tools_light-2403-persian",
         help="Globaltag containing graFEI model",
     )
     return parser.parse_args()
@@ -54,9 +54,9 @@ if __name__ == "__main__":
     path = b2.create_path()
     ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
 
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     if args.globaltag:
         b2.conditions.prepend_globaltag(args.globaltag)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
 
     # graFEI cuts
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]

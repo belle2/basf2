@@ -26,7 +26,7 @@
 
 namespace Belle2 {
   /**
-   * Get information from KLMMuidLikelihood
+   * KLMMuonIDDNNExpert for calculating Neural Network based muonID.
    */
   class KLMMuonIDDNNExpertModule : public Module {
 
@@ -69,15 +69,15 @@ namespace Belle2 {
 
   private:
 
-    // Required array for Tracks
+    // Required array for Tracks.
     StoreArray<Track> m_tracks;
 
-    // Neural Network based KLM muonID dataobjects
+    // Neural Network based KLM muonID dataobjects to be stored in mdst.
     StoreArray<KLMMuonIDDNN> m_KLMMuonIDDNNs;
 
     /**
-     * Initialize mva expert, dataset and features
-     * Called every time the weightfile in the database changes in begin run
+     * Initialize mva expert, dataset and features.
+     * Called every time the weightfile in the database changes in begin run.
     */
     void init_mva(MVA::Weightfile& weightfile);
 
@@ -85,13 +85,14 @@ namespace Belle2 {
      * Get the NN-based muon probability.
      * @param[in] track  target track.
      * @param[in] klmll  KLMMuidLikelihood object related from the target track.
+     * @return Neural Networkd based muonID.
      */
     float getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll);
 
-    /** Total BKLM layers  */
+    /** Total BKLM layers. */
     static constexpr int m_maxBKLMLayers = BKLMElementNumbers::getMaximalLayerNumber();
 
-    /** Total EKLM layers  */
+    /** Total EKLM layers. */
     static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
 
     /** Database identifier or file used to load the weights. */
@@ -106,20 +107,17 @@ namespace Belle2 {
     /** Pointer to the current dataset. */
     std::unique_ptr<MVA::SingleDataset> m_dataset;
 
-    /** Name of charged particle candidates list. */
-    std::string m_inputListName;
-
     /** Container of hit widths of one track. */
-    float m_hitpattern_width[m_maxBKLMLayers + m_maxEKLMLayers];
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_width;
 
     /** Container of hit steplength of one track. */
-    float m_hitpattern_steplength[m_maxBKLMLayers + m_maxEKLMLayers];
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_steplength;
 
     /** Container of hit chi2 of one track. */
-    float m_hitpattern_chi2[m_maxBKLMLayers + m_maxEKLMLayers];
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_chi2;
 
     /** Container of extrapolation situation at each KLM layer of one track. */
-    int m_hitpattern_hasext[m_maxBKLMLayers + m_maxEKLMLayers];
+    std::array < bool, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_hasext;
 
   };
 }

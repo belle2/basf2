@@ -112,12 +112,10 @@ void KLMMuonIDDNNExpertModule::event()
     if (!klmll) continue;
 
     // initialize hit pattern arrays
-    for (int layer = 0; layer < (m_maxBKLMLayers + m_maxEKLMLayers); layer++) {
-      m_hitpattern_steplength[layer] = -1;
-      m_hitpattern_width[layer] = -1;
-      m_hitpattern_chi2[layer] = -1;
-      m_hitpattern_hasext[layer] = 0;
-    }
+    m_hitpattern_steplength.fill(-1.);
+    m_hitpattern_width.fill(-1.);
+    m_hitpattern_chi2.fill(-1.);
+    m_hitpattern_hasext.fill(0);
 
     bool hasExtInKLM = false;
     RelationVector<ExtHit> ExtHitrelation = track.getRelationsTo<ExtHit>();
@@ -136,11 +134,11 @@ void KLMMuonIDDNNExpertModule::event()
       if (inBKLM) {
         BKLMElementNumbers::moduleNumberToElementNumbers(copyid, &section, &sector, &layer);
         if (layer > m_maxBKLMLayers) continue;
-        m_hitpattern_hasext[layer - 1] = 1;
+        m_hitpattern_hasext.at(layer - 1) = 1;
       } else {
         EKLMElementNumbers::Instance().stripNumberToElementNumbers(copyid, &section, &layer, &sector, &plane, &strip);
         if (layer > m_maxEKLMLayers) continue;
-        m_hitpattern_hasext[m_maxBKLMLayers + layer - 1] = 1;
+        m_hitpattern_hasext.at(m_maxBKLMLayers + layer - 1) = 1;
       }
 
       hasExtInKLM = true;
@@ -183,9 +181,9 @@ void KLMMuonIDDNNExpertModule::event()
 
       // hit pattern creation.
       int hitpatternindex = itermap->first;
-      m_hitpattern_chi2[hitpatternindex] = KFchi2;
-      m_hitpattern_steplength[hitpatternindex] = steplength;
-      m_hitpattern_width[hitpatternindex] = width;
+      m_hitpattern_chi2.at(hitpatternindex) = KFchi2;
+      m_hitpattern_steplength.at(hitpatternindex) = steplength;
+      m_hitpattern_width.at(hitpatternindex) = width;
     } // loop of Hit2dMap
 
     Hit2dMap.clear();
@@ -206,10 +204,10 @@ float KLMMuonIDDNNExpertModule::getNNmuProbability(const Track* track, const KLM
   m_dataset->m_input[4] = track->getTrackFitResultWithClosestMass(Const::muon)->getTransverseMomentum();
 
   for (int layer = 0; layer < (m_maxBKLMLayers + m_maxEKLMLayers); layer ++) {
-    m_dataset->m_input[5 + 4 * layer + 0] = m_hitpattern_width[layer]; // width
-    m_dataset->m_input[5 + 4 * layer + 1] = m_hitpattern_steplength[layer]; // steplength
-    m_dataset->m_input[5 + 4 * layer + 2] = m_hitpattern_chi2[layer]; // chi2
-    m_dataset->m_input[5 + 4 * layer + 3] = m_hitpattern_hasext[layer]; // hasext
+    m_dataset->m_input[5 + 4 * layer + 0] = m_hitpattern_width.at(layer); // width
+    m_dataset->m_input[5 + 4 * layer + 1] = m_hitpattern_steplength.at(layer); // steplength
+    m_dataset->m_input[5 + 4 * layer + 2] = m_hitpattern_chi2.at(layer); // chi2
+    m_dataset->m_input[5 + 4 * layer + 3] = m_hitpattern_hasext.at(layer); // hasext
   }
 
   float muprob_nn = m_expert->apply(*m_dataset)[0];

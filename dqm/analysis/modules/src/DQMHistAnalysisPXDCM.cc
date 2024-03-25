@@ -53,10 +53,6 @@ DQMHistAnalysisPXDCMModule::DQMHistAnalysisPXDCMModule()
   B2DEBUG(99, "DQMHistAnalysisPXDCM: Constructor done.");
 }
 
-DQMHistAnalysisPXDCMModule::~DQMHistAnalysisPXDCMModule()
-{
-}
-
 void DQMHistAnalysisPXDCMModule::initialize()
 {
   m_monObj = getMonitoringObject("pxd");
@@ -156,9 +152,15 @@ void DQMHistAnalysisPXDCMModule::event()
   bool warn_flag = false;
   bool anyupdate = false;
 
-  auto leg = new TPaveText(0.1, 0.6, 0.90, 0.95, "NDC");
-  leg->SetFillStyle(0);
-  leg->SetBorderSize(0);
+  static TPaveText* leg = nullptr;
+
+  if (leg == nullptr) {
+    leg = new TPaveText(0.1, 0.6, 0.90, 0.95, "NDC");
+    leg->SetFillStyle(0);
+    leg->SetBorderSize(0);
+  } else {
+    leg->Clear();
+  }
 
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     auto modname = (std::string)m_PXDModules[i];
@@ -251,8 +253,9 @@ void DQMHistAnalysisPXDCMModule::event()
     }
   }
 
-  auto status = makeStatus(all >= 100, warn_flag, error_flag);
+  auto status = makeStatus(all >= 10000, warn_flag, error_flag);
 
+  m_cCommonModeDelta->cd();
   colorizeCanvas(m_cCommonModeDelta, status);
 
   if (anyupdate) {
@@ -267,14 +270,17 @@ void DQMHistAnalysisPXDCMModule::event()
     leg->Draw();
     m_line10->Draw();
     m_lineOutside->Draw();
-  }
-
-  for (auto& it : m_excluded) {
-    auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-    tt->SetTextSize(0.035);
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
-    tt->Draw();
+    for (auto& it : m_excluded) {
+      static std::map <int, TLatex*> ltmap;
+      auto tt = ltmap[it];
+      if (!tt) {
+        tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextSize(0.035);
+        tt->SetTextAngle(90);// Rotated
+        tt->SetTextAlign(12);// Centered
+      }
+      tt->Draw();
+    }
   }
 
   UpdateCanvas(m_cCommonModeDelta);

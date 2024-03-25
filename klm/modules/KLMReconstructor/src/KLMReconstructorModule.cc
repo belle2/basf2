@@ -327,7 +327,6 @@ void KLMReconstructorModule::reconstructEKLMHits()
   uint16_t nKLMDigitsMultiStripBWD{0};
   int i, n;
   double d1, d2, time, t1, t2, sd;
-  double d1_trashcan, d2_trashcan, sd_trashcan; // trash can when calculating minimum strip crosspoint
   std::vector<KLMDigit*> digitVector;
   std::vector<KLMDigit*>::iterator it1, it2, it3, it4, it5, it6, it7, it8, it9;
   n = m_Digits.getEntries();
@@ -469,8 +468,10 @@ void KLMReconstructorModule::reconstructEKLMHits()
                 plane2MinStripDigit = plane2Digit;
                 plane1MinStripDigit.setStrip(s1First);
                 plane2MinStripDigit.setStrip(s2First);
+
+                double d1_dummy, d2_dummy, sd_dummy; // dummy numbers when calculating minimum strip crosspoint
                 m_eklmTransformData->intersection(&plane1MinStripDigit, &plane2MinStripDigit, &crossPointOfMinStrip,
-                                                  &d1_trashcan, &d2_trashcan, &sd_trashcan,
+                                                  &d1_dummy, &d2_dummy, &sd_dummy,
                                                   false);
               }
             } else {

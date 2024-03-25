@@ -89,8 +89,24 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
+    TCanvas* m_cT0FractionsForHadrons = nullptr; /**< EventT0 fractions plots canvas for hadron events */
+    TCanvas* m_cT0FractionsForBhaBhas = nullptr; /**< EventT0 fractions plots canvas for BhaBha events */
+    TCanvas* m_cT0FractionsForMuMus   = nullptr; /**< EventT0 fractions plots canvas for MuMu events */
+
+    TPad* m_pHadronECLTRG = nullptr; /**< pad for time fractions for ECLTRG hadrons */
+    TPad* m_pHadronCDCTRG = nullptr; /**< pad for time fractions for CDCTRG hadrons */
+    TPad* m_pHadronTOPTRG = nullptr; /**< pad for time fractions for TOPTRG hadrons */
+
+    TPad* m_pBhaBhaECLTRG = nullptr; /**< pad for time fractions for ECLTRG bhabhas */
+    TPad* m_pBhaBhaCDCTRG = nullptr; /**< pad for time fractions for CDCTRG bhabhas */
+    TPad* m_pBhaBhaTOPTRG = nullptr; /**< pad for time fractions for TOPTRG bhabhas */
+
+    TPad* m_pMuMuECLTRG = nullptr; /**< pad for time fractions for ECLTRG mumu */
+    TPad* m_pMuMuCDCTRG = nullptr; /**< pad for time fractions for CDCTRG mumu */
+    TPad* m_pMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
+
     /// EventT0 algorithms for which to calculate fractions of abundance
-    const char* c_eventT0Algorithms[5] = {"ECL", "SVD", "CDC hit based", "CDC full grid chi2", "TOP"};
+    const char* c_eventT0Algorithms[5] = {"ECL", "SVD", "CDC HitBased", "CDC FullGridChi2", "TOP"};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
     TEfficiency* m_eAlgorithmSourceFractionsHadronL1ECLTRG = nullptr;
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger
@@ -110,7 +126,7 @@ namespace Belle2 {
     /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by TOP trigger
     TEfficiency* m_eAlgorithmSourceFractionsMuMuL1TOPTRG = nullptr;
     /// Fill the TEfficiency plots
-    void FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff);
+    bool FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff);
   };
 } // end namespace Belle2
 

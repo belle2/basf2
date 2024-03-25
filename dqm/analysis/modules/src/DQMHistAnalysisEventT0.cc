@@ -498,7 +498,7 @@ void DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& hi
   }
 
   auto ax = graph->GetXaxis();
-  if (ax) {
+  if (not ax) {
     return;
   }
   // Print x-axis bin labels horizontally

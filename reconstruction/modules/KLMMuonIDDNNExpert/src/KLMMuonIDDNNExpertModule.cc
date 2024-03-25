@@ -94,6 +94,10 @@ void KLMMuonIDDNNExpertModule::init_mva(MVA::Weightfile& weightfile)
   m_expert->load(weightfile);
   std::vector<float> dummy;
   int nInputVariables = general_options.m_variables.size();
+  if (nInputVariables != 5 + 4 * (m_maxBKLMLayers + m_maxEKLMLayers)) {
+    B2FATAL("Number of input variables mismatch. Required " << 5 + 4 * (m_maxBKLMLayers + m_maxEKLMLayers) << " but " << nInputVariables
+            << " given. ");
+  }
   dummy.resize(nInputVariables, 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 }
@@ -108,7 +112,7 @@ void KLMMuonIDDNNExpertModule::event()
     if (!klmll) continue;
 
     // initialize hit pattern arrays
-    for (int layer = 0; layer < m_TotalKLMLayers; layer++) {
+    for (int layer = 0; layer < (m_maxBKLMLayers + m_maxEKLMLayers); layer++) {
       m_hitpattern_steplength[layer] = -1;
       m_hitpattern_width[layer] = -1;
       m_hitpattern_chi2[layer] = -1;
@@ -155,7 +159,7 @@ void KLMMuonIDDNNExpertModule::event()
       unsigned long int hit_layer = klmhit->getLayer();
 
       int index = hit_layer - 1 + m_maxBKLMLayers * (1 - hit_inBKLM); // BKLM hits are in front of EKLM hits
-      if (index > m_TotalKLMLayers) continue;
+      if (index > (m_maxBKLMLayers + m_maxEKLMLayers)) continue;
       Hit2dMap.insert(std::pair<int, int> {index, ii});
     }
 
@@ -201,7 +205,7 @@ float KLMMuonIDDNNExpertModule::getNNmuProbability(const Track* track, const KLM
   m_dataset->m_input[3] = klmll->getExtLayer();
   m_dataset->m_input[4] = track->getTrackFitResultWithClosestMass(Const::muon)->getTransverseMomentum();
 
-  for (int layer = 0; layer < m_TotalKLMLayers; layer ++) {
+  for (int layer = 0; layer < (m_maxBKLMLayers + m_maxEKLMLayers); layer ++) {
     m_dataset->m_input[5 + 4 * layer + 0] = m_hitpattern_width[layer]; // width
     m_dataset->m_input[5 + 4 * layer + 1] = m_hitpattern_steplength[layer]; // steplength
     m_dataset->m_input[5 + 4 * layer + 2] = m_hitpattern_chi2[layer]; // chi2

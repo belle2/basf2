@@ -89,14 +89,11 @@ namespace Belle2 {
      */
     float getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll);
 
-    /** Total KLM layers  */
+    /** Total BKLM layers  */
     static constexpr int m_maxBKLMLayers = BKLMElementNumbers::getMaximalLayerNumber();
 
-    /** Total KLM layers  */
+    /** Total EKLM layers  */
     static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
-
-    /** Total KLM layers  */
-    static constexpr int m_TotalKLMLayers = m_maxBKLMLayers + m_maxEKLMLayers;
 
     /** Database identifier or file used to load the weights. */
     std::string m_identifier = "NNmuidWeightFile.root";
@@ -114,16 +111,16 @@ namespace Belle2 {
     std::string m_inputListName;
 
     /** Container of hit widths of one track. */
-    float m_hitpattern_width[m_TotalKLMLayers];
+    float m_hitpattern_width[m_maxBKLMLayers + m_maxEKLMLayers];
 
     /** Container of hit steplength of one track. */
-    float m_hitpattern_steplength[m_TotalKLMLayers];
+    float m_hitpattern_steplength[m_maxBKLMLayers + m_maxEKLMLayers];
 
     /** Container of hit chi2 of one track. */
-    float m_hitpattern_chi2[m_TotalKLMLayers];
+    float m_hitpattern_chi2[m_maxBKLMLayers + m_maxEKLMLayers];
 
     /** Container of extrapolation situation at each KLM layer of one track. */
-    int m_hitpattern_hasext[m_TotalKLMLayers];
+    int m_hitpattern_hasext[m_maxBKLMLayers + m_maxEKLMLayers];
 
   };
 }

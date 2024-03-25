@@ -214,6 +214,13 @@ if __name__ == "__main__":
             path=path,
         )
 
+    # Reject events with no signal candidates
+    skimfilter = b2.register_module("SkimFilter")
+    skimfilter.param("particleLists", ["Upsilon(4S):graFEI"])
+    empty_path = b2.create_path()
+    skimfilter.if_value("=0", empty_path, b2.AfterConditionPath.END)
+    path.add_module(skimfilter)
+
     if store_mc_truth:
         ma.matchMCTruth("B+:Bsgn", path=path)
         ma.matchMCTruth("B-:Btag", path=path)

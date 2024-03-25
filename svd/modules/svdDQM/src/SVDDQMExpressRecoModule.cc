@@ -397,20 +397,20 @@ void SVDDQMExpressRecoModule::defineHisto()
 
 
   //----------------------------------------------------------------
-  // Cluster time group Id vs cluster time for 3-6 samples
+  // Cluster time group Id vs cluster time for u/V sensors
   //----------------------------------------------------------------
   Name = "SVDDQM_Cluster3TimeGroupId";
-  Title = Form("SVD cluster Time GourpId %s vs cluster time for 3 samples", refFrame.Data());
-  m_cluster3TimeGroupId = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
-  m_cluster3TimeGroupId->GetXaxis()->SetTitle("cluster time (ns)");
-  m_cluster3TimeGroupId->GetYaxis()->SetTitle("cluster group id");
-  m_histoList->Add(m_cluster3TimeGroupId);
+  Title = Form("SVD cluster Time GroupId0 %s vs cluster time for U/P Side", refFrame.Data());
+  m_clusterTimeGroupIdU = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_clusterTimeGroupIdU->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeGroupIdU->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_clusterTimeGroupIdU);
   Name = "SVDDQM_Cluster6TimeGroupId";
-  Title =  Form("SVD cluster Time GourpId %s vs cluster time for 6 samples", refFrame.Data());
-  m_cluster6TimeGroupId = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
-  m_cluster6TimeGroupId->GetXaxis()->SetTitle("cluster time (ns)");
-  m_cluster6TimeGroupId->GetYaxis()->SetTitle("cluster group id");
-  m_histoList->Add(m_cluster6TimeGroupId);
+  Title =  Form("SVD cluster Time GroupId0 %s vs cluster time for V/N Side", refFrame.Data());
+  m_clusterTimeGroupIdV = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_clusterTimeGroupIdV->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTimeGroupIdV->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_clusterTimeGroupIdV);
 
   //----------------------------------------------------------------
   // MaxBin of strips for all sensors (offline ZS)
@@ -998,10 +998,10 @@ void SVDDQMExpressRecoModule::event()
     if (vec.size() > 0) {
       groupId = *minElement;
 
-      if (iLayer == 3) {
-        if (m_cluster3TimeGroupId != nullptr) m_cluster3TimeGroupId->Fill(time, groupId);
+      if (cluster.isUCluster()) {
+        if (m_clusterTimeGroupIdU != nullptr) m_clusterTimeGroupIdU->Fill(time, groupId);
       } else {
-        if (m_cluster6TimeGroupId != nullptr) m_cluster6TimeGroupId->Fill(time, groupId);
+        if (m_clusterTimeGroupIdV != nullptr) m_clusterTimeGroupIdV->Fill(time, groupId);
       }
     }
 

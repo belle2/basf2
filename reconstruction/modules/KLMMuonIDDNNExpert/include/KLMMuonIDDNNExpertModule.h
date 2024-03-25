@@ -22,7 +22,6 @@
 #include <mva/interface/Expert.h>
 #include <mva/interface/Weightfile.h>
 
-
 #include <string>
 
 namespace Belle2 {

@@ -73,21 +73,21 @@ void DQMHistAnalysisInput2Module::event()
   char mbstr[100];
 
   time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Close File");
 
   if (m_file) {
     m_file->Close();
 
     now = time(0);
-    strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
     B2INFO("[" << mbstr << "] before delete File");
     delete m_file;
     m_file = nullptr;
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Load File");
 
   m_file = new TFile(m_mempath.c_str(), "READ");
@@ -98,7 +98,7 @@ void DQMHistAnalysisInput2Module::event()
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after LoadFile");
 
   const TDatime& mt = m_file->GetModificationDate();
@@ -110,7 +110,7 @@ void DQMHistAnalysisInput2Module::event()
   TKey* key = nullptr;
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before input loop");
 
   // check if histograms were updated since last DQM event (based on number of processed events)
@@ -145,7 +145,7 @@ void DQMHistAnalysisInput2Module::event()
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {

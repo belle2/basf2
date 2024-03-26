@@ -99,13 +99,13 @@ void DQMHistAnalysisInputModule::event()
   char mbstr[100];
 
   time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before LoadMemFile");
 
   TMemFile* file = m_memory->LoadMemFile();
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after LoadMemFile");
 
   const TDatime& mt = file->GetModificationDate();
@@ -117,7 +117,7 @@ void DQMHistAnalysisInputModule::event()
   TKey* key = nullptr;
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before input loop");
 
   // check if histograms were updated since last DQM event (based on number of processed events)
@@ -152,7 +152,7 @@ void DQMHistAnalysisInputModule::event()
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {

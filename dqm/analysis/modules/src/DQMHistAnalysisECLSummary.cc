@@ -78,7 +78,6 @@ void DQMHistAnalysisECLSummaryModule::initialize()
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
     registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name);
   }
-  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -549,8 +548,6 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       }
     }
   }
-
-  if (!update_mirabelle) updateEpicsPVs(5.0);
 
   return alarm_counts;
 }

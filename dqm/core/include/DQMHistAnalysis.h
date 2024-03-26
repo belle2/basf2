@@ -137,10 +137,6 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param prefix prefix to PV name
      * @param pvname full PV name without prefix
      * @param keyname key name for easier access
@@ -356,10 +352,6 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param pvname full PV name
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
@@ -368,10 +360,6 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param pvname full PV name
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure

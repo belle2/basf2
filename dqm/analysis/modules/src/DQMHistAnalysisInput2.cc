@@ -73,21 +73,21 @@ void DQMHistAnalysisInput2Module::event()
   char mbstr[100];
 
   time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Close File");
 
   if (m_file) {
     m_file->Close();
 
     now = time(0);
-    strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
     B2INFO("[" << mbstr << "] before delete File");
     delete m_file;
     m_file = nullptr;
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Load File");
 
   m_file = new TFile(m_mempath.c_str(), "READ");
@@ -98,7 +98,7 @@ void DQMHistAnalysisInput2Module::event()
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after LoadFile");
 
   const TDatime& mt = m_file->GetModificationDate();
@@ -110,7 +110,7 @@ void DQMHistAnalysisInput2Module::event()
   TKey* key = nullptr;
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before input loop");
 
   // check if histograms were updated since last DQM event (based on number of processed events)
@@ -121,12 +121,18 @@ void DQMHistAnalysisInput2Module::event()
   m_nevent = getEventProcessed();
 
   while ((key = (TKey*)next())) {
-    auto obj = key->ReadObj();
+    auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
     if (obj == nullptr) continue; // would be strange, but better check
-    if (!obj->IsA()->InheritsFrom("TH1")) continue; // other non supported (yet?)
+    if (!obj->IsA()->InheritsFrom("TH1")) {
+      delete obj;
+      continue; // other non supported (yet?)
+    }
     TH1* h = (TH1*)obj; // we are sure its a TH1
 
-    if (m_remove_empty && h->GetEntries() == 0) continue;
+    if (m_remove_empty && h->GetEntries() == 0) {
+      delete obj;
+      continue;
+    }
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
     a.ReplaceAll(":", "");
@@ -134,8 +140,12 @@ void DQMHistAnalysisInput2Module::event()
     B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
 
     // the following line prevent any histogram outside a directory to be processed
-    if (StringSplit(a.Data(), '/').size() <= 1) continue;
+    if (StringSplit(a.Data(), '/').size() <= 1) {
+      delete obj;
+      continue;
+    }
 
+    // only Histograms in the hs list will be taken care off
     hs.push_back(h);
 
     // the following workaround need to be improved
@@ -145,13 +155,14 @@ void DQMHistAnalysisInput2Module::event()
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
     B2WARNING("DQMHistAnalysisInput: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
               mmt.AsString());
     setReturnValue(false);
+    for (auto& h : hs)  delete h;
     return;
   } else {
     if (m_c_info != NULL) m_c_info->SetTitle((m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "

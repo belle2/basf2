@@ -150,7 +150,7 @@ void DQMHistReferenceModule::event()
   char mbstr[100];
 
   time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before ref loop");
 
   for (auto& it : m_pnode) {
@@ -206,7 +206,7 @@ void DQMHistReferenceModule::event()
 
   }
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after ref loop");
 
 

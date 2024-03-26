@@ -128,12 +128,18 @@ void DQMHistAnalysisInputModule::event()
   m_nevent = getEventProcessed();
 
   while ((key = (TKey*)next())) {
-    auto obj = key->ReadObj();
+    auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
     if (obj == nullptr) continue; // would be strange, but better check
-    if (!obj->IsA()->InheritsFrom("TH1")) continue; // other non supported (yet?)
+    if (!obj->IsA()->InheritsFrom("TH1")) {
+      delete obj;
+      continue; // other non supported (yet?)
+    }
     TH1* h = (TH1*)obj; // we are sure its a TH1
 
-    if (m_remove_empty && h->GetEntries() == 0) continue;
+    if (m_remove_empty && h->GetEntries() == 0) {
+      delete obj;
+      continue;
+    }
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
     a.ReplaceAll(":", "");
@@ -141,8 +147,12 @@ void DQMHistAnalysisInputModule::event()
     B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
 
     // the following line prevent any histogram outside a directory to be processed
-    if (StringSplit(a.Data(), '/').size() <= 1) continue;
+    if (StringSplit(a.Data(), '/').size() <= 1) {
+      delete obj;
+      continue;
+    }
 
+    // only Histograms in the hs list will be taken care off
     hs.push_back(h);
 
     // the following workaround need to be improved
@@ -160,6 +170,9 @@ void DQMHistAnalysisInputModule::event()
     m_runno = 1;
     if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString() + ", Last DQM event " + std::string(
                                                   mbstr)).c_str());
+    setReturnValue(false);
+    for (auto& h : hs)  delete h;
+    return;
   } else {
     if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "
                                                 + m_lastChange + ", Last Updated "

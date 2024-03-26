@@ -40,6 +40,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
   addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
+  addParam("MinEntries", m_minEntries, "Minimum entries for 2D delta histogram update", 10000.);
 
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
@@ -447,7 +448,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float eff2dVal;
   bool setAlarm = false;
   bool setWarn = false;
+  bool setFew = false;
+  int mainEntries;
+
   *pvcount = 0; //initialize to zero
+  mainEntries = mainHist->GetEntries();
 
   for (int binx = 0; binx < sectors; binx++) {
 
@@ -499,7 +504,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           *pvcount += 1;
         }
         if (eff2dVal < alarmThr) {
-          setAlarm = true;
+          if (mainEntries < (int)m_minEntries) {
+            setFew = true;
+          } else {
+            setAlarm = true;
+          }
         }
 
       }
@@ -510,7 +519,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   }//end of bin x
 
   if (*pvcount > (int) layerLimit) {
-    setWarn = true;
+    if (mainEntries < (int)m_minEntries) {
+      setFew = true;
+    } else {
+      setWarn = true;
+    }
   }
 
   eff2dHist->SetMinimum(minVal);
@@ -519,7 +532,9 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   eff2dCanv->cd();
   eff2dHist->Draw("COLZ");
   errHist->Draw("TEXT SAME");
-  if (setAlarm) {
+  if (setFew) {
+    colorizeCanvas(eff2dCanv, c_StatusTooFew);
+  } else if (setAlarm) {
     colorizeCanvas(eff2dCanv, c_StatusError);
   } else if (setWarn) {
     colorizeCanvas(eff2dCanv, c_StatusWarning);

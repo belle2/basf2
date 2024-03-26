@@ -185,6 +185,9 @@ namespace Belle2 {
     /** Minimal number of entries for delta histogram update. */
     double m_minEvents;
 
+    /** Minimal number of entries for 2D histogram status. */
+    double m_minEntries;
+
     /** Number of inefficient BKLM layers. */
     int m_nEffBKLMLayers;
 

@@ -87,6 +87,8 @@ def get_calibrations(input_data, **kwargs):
 
     cal_ecl_Auto_C3.pre_collector_path = delayed_Bhabha_pre_path
 
+    cal_ecl_Auto_C3.depends_on(cal_ecl_Auto_C1)
+
     # ..Algorithm
     algo_C4 = Belle2.ECL.eclAutocovarianceCalibrationC4Algorithm()
 

@@ -90,7 +90,6 @@ void DQMHistAnalysisKLMModule::initialize()
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
   registerEpicsPV("KLM:DeadBarrelModules", "DeadBarrelModules");
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
-  updateEpicsPVs(5.0);
 
   gROOT->cd();
 

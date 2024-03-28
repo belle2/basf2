@@ -116,13 +116,13 @@ for category in categories:
     if category not in times.keys():
         continue
     time = times[category]
-    message = f'Execution time per event for {category} is {time:.f} ms'
+    message = f'Execution time per event for {category} is {time:.0f} ms'
     fraction = -1
     if category in limits.keys():
         fraction = time / limits[category]
         if fraction > max_fraction:
             max_fraction = fraction
-        message += f' = {100 * fraction:.f}% of the limit.'
+        message += f' = {fraction:.0%} of the limit.'
         if fraction <= 0.9:
             b2.B2INFO(message)
         elif fraction <= 1:

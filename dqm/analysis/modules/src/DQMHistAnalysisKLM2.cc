@@ -60,7 +60,6 @@ void DQMHistAnalysisKLM2Module::initialize()
   registerEpicsPV("KLM:Eff:nEffBKLMLayers", "nEffBKLMLayers");
   registerEpicsPV("KLM:Eff:nEffEKLMLayers", "nEffEKLMLayers");
   registerEpicsPV("KLM:Eff:2DEffSettings", "2DEffSettings");
-  updateEpicsPVs(5.0);
 
   if (m_refFileName != "") {
     m_refFile = TFile::Open(m_refFileName.data(), "READ");

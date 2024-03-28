@@ -2863,6 +2863,43 @@ namespace Belle2 {
       return func;
     }
 
+    Manager::FunctionPtr deltaPhiToMostB2BPhiInList(const std::vector<std::string>& arguments)
+    {
+      // expecting the list name
+      if (arguments.size() != 1)
+        B2FATAL("Wrong number of arguments for meta function deltaPhiToMostB2BPhiInList");
+
+      std::string listname = arguments[0];
+
+      auto func = [listname](const Particle * particle) -> double {
+        // get the list and check it's valid
+        StoreObjPtr<ParticleList> list(listname);
+        if (not list.isValid())
+          B2FATAL("Invalid particle list name " << listname << " given to deltaPhiToMostB2BPhiInList");
+
+        // check the list isn't empty
+        if (list->getListSize() == 0)
+          return Const::doubleNaN;
+
+        // respect the current frame and get the momentum of our input
+        const auto& frame = ReferenceFrame::GetCurrent();
+        const auto phi_this = frame.getMomentum(particle).Phi();
+
+        // find the most back-to-back in phi (largest absolute value of delta phi)
+        double maxAngle = 0;
+        for (unsigned int i = 0; i < list->getListSize(); ++i)
+        {
+          const Particle* compareme = list->getParticle(i);
+          const auto phi_compare = frame.getMomentum(compareme).Phi();
+          double angle = std::abs(phi_compare - phi_this);
+          if (angle > M_PI) {angle = 2 * M_PI - angle;}
+          if (maxAngle < angle) maxAngle = angle;
+        }
+        return maxAngle;
+      };
+      return func;
+    }
+
     Manager::FunctionPtr mostB2BInList(const std::vector<std::string>& arguments)
     {
       // expecting the list name and a variable name
@@ -3699,6 +3736,8 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
                       "Returns `variable` for the closest particle (smallest opening angle) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("angleToMostB2BInList(particleListName)", angleToMostB2BInList,
                       "Returns the angle between this particle and the most back-to-back particle (closest opening angle to 180) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
+  REGISTER_METAVARIABLE("deltaPhiToMostB2BPhiInList(particleListName)", deltaPhiToMostB2BPhiInList,
+                    "Returns the abs(delta phi) between this particle and the most back-to-back particle in phi (closest opening angle to 180) in the list provided. The unit of the angle is ``rad`` ", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("mostB2BInList(particleListName, variable)", mostB2BInList,
                       "Returns `variable` for the most back-to-back particle (closest opening angle to 180) in the list provided.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("maxOpeningAngleInList(particleListName)", maxOpeningAngleInList,

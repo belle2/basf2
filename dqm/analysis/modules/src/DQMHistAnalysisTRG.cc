@@ -138,17 +138,14 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //ECLTRG_deadch
 //  m_canvas_ECLTRG_deadch = new TCanvas("ECLTRG_deadch");
-  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 159778, 1); // update each 2000 entries
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 2000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
-  //update PV
-//  updateEpicsPVs(
-//    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
 }
 
 void DQMHistAnalysisTRGModule::beginRun()
@@ -179,8 +176,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     comL1_GDLL1_mean = hist_comL1_GDLL1->GetMean();
     B2DEBUG(1, "comL1_GDLL1_mean:" << comL1_GDLL1_mean);
     setEpicsPV("comL1_GDLL1_mean", comL1_GDLL1_mean);
-//    updateEpicsPVs(
-//      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
 
   //update ECLTRG timing
@@ -233,8 +228,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     int numberOfBins = hist_ECLTRG_deadch->GetNbinsX();
 //    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
     int ECLTRG_deadch = 0;
-    for (int i = 2; i <= numberOfBins; i++) {
-      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0) { ECLTRG_deadch += 1; }
+    for (int i = 2; i <= numberOfBins - 1; i++) {
+      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0.01 * hist_ECLTRG_deadch->GetMaximum()) { ECLTRG_deadch += 1; }
     }
     B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
     setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
@@ -285,7 +280,8 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 //    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
     int CDCTRG_deadch = 0;
     for (int i = 3; i <= numberOfBins; i++) {
-      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1; }
+      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0.01 * hist_CDCTRG_deadch->GetMaximum()) {CDCTRG_deadch += 1;}
+//      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1;}
     }
     B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
     setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);

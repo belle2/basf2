@@ -64,8 +64,6 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::initialize()
   registerEpicsPV(m_pvPrefix + "mean", "mean");
   registerEpicsPV(m_pvPrefix + "width", "width");
   registerEpicsPV(m_pvPrefix + "alarm", "alarm");
-  updateEpicsPVs(
-    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
 
   m_meanLowerAlarmLine = new TLine();
   m_meanLowerAlarmLine->SetLineColor(kRed + 3);
@@ -230,8 +228,6 @@ void DQMHistAnalysisDeltaEpicsMonObjExampleModule::doHistAnalysis(bool forMiraBe
       setEpicsPV("width", data_width);
       setEpicsPV("alarm", data_alarm);
       // until now, chnages are buffered only locally, not written out to network for performance reason
-      updateEpicsPVs(
-        5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
     }
   }
 }

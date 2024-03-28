@@ -113,8 +113,6 @@ void DQMHistAnalysisTOPModule::initialize()
   registerEpicsPV(m_pvPrefix + "photonYieldsAlarmLevels", "photonYieldsAlarmLevels");
   registerEpicsPV(m_pvPrefix + "excludedBoardstacks", "excludedBoardstacks");
 
-  updateEpicsPVs(5.0);
-
   // new canvases, histograms and graphic primitives
 
   gROOT->cd();
@@ -790,7 +788,6 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   for (auto included : m_includedBoardstacks) if (not included) numBS++;
   setEpicsPV("numExcludedBS", numBS);
   setEpicsPV("histoAlarmState", getOffcialAlarmStatus(m_alarmStateOverall));
-  updateEpicsPVs(5.0);
 
   B2DEBUG(20, "badBoardstacks: " << badBoardstacks);
   B2DEBUG(20, "badCarriers: " << badCarriers);

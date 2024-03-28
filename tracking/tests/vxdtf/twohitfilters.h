@@ -115,10 +115,12 @@ namespace Belle2 {
     B2Vector3D innerHit(1e300, 0, 0);
     B2Vector3D outerHit(0, 0, 0);
 
+    // \cond Doxygen is confused
     TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
 
 //     EXPECT_DOUBLE_EQ(1e600, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
     EXPECT_DOUBLE_EQ(innerHit * innerHit, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+    // \endcond
 
   }
 

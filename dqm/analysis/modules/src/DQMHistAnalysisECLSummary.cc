@@ -733,19 +733,25 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
 void DQMHistAnalysisECLSummaryModule::drawGrid(TH2* hist)
 {
-  int x_min = hist->GetXaxis()->GetXmin();
-  int x_max = hist->GetXaxis()->GetXmax();
-  int y_min = hist->GetYaxis()->GetXmin();
-  int y_max = hist->GetYaxis()->GetXmax();
-  for (int x = x_min + 1; x < x_max; x++) {
-    auto l = new TLine(x, 0, x, 5);
-    l->SetLineStyle(kDashed);
-    l->Draw();
+  static std::map<TH2*, std::vector<TLine*> > lines;
+  if (lines[hist].empty()) {
+    int x_min = hist->GetXaxis()->GetXmin();
+    int x_max = hist->GetXaxis()->GetXmax();
+    int y_min = hist->GetYaxis()->GetXmin();
+    int y_max = hist->GetYaxis()->GetXmax();
+    for (int x = x_min + 1; x < x_max; x++) {
+      auto l = new TLine(x, 0, x, 5);
+      l->SetLineStyle(kDashed);
+      lines[hist].push_back(l);
+    }
+    for (int y = y_min + 1; y < y_max; y++) {
+      auto l = new TLine(1, y, ECL::ECL_CRATES + 1, y);
+      l->SetLineStyle(kDashed);
+      lines[hist].push_back(l);
+    }
   }
-  for (int y = y_min + 1; y < y_max; y++) {
-    auto l = new TLine(1, y, ECL::ECL_CRATES + 1, y);
-    l->SetLineStyle(kDashed);
-    l->Draw();
+  for (auto line : lines[hist]) {
+    line->Draw();
   }
 }
 

@@ -402,7 +402,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   //=== Get number of fit inconsistencies
 
-  TH1* h_fail_crateid = findHist("ECL/fail_crateid", m_onlyIfUpdated);
+  TH1* h_fail_crateid = findHist("ECL/fail_crateid", false);
 
   const int fit_alarm_index = getAlarmByName("bad_fit").first;
   for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {

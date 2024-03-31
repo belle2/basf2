@@ -51,7 +51,6 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_evtMetaData; /**< dataStore EventMetaData */
     DBObjPtr<ECLCrystalCalib> m_ECLAutocovarianceCalibrationC1Threshold;  /**< thresholds obtained from C1 stage */
     std::vector<float> m_PeakToPeakThresholds; /**< vector of thresholds obtained from DB object */
-    std::vector<float> m_Baselines; /**< vector of thresholds obtained from DB object */
     TH2F* CovarianceMatrixInfoVsCrysID;  /**< result returned by collector that contains the coveriance matrix for each crystal  */
     static constexpr int m_nADCWaveformPoints = 31;  /**< length of ECLDSP waveforms  */
     float m_CovarianceMatrixInfoVsCrysIDHistogram[ECLElementNumbers::c_NCrystals][m_nADCWaveformPoints + 1] = {}; /**< container for coveriance matrix  */

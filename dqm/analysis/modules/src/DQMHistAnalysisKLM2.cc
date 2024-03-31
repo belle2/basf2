@@ -33,14 +33,13 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLMEfficiencyDQM"));
   addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
            std::string("ref/KLMEfficiencyDQM"));
-  addParam("MinEvents", m_minEvents, "Minimum events for delta histogram update", 50000.);
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
   addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
-  addParam("MinEntries", m_minEntries, "Minimum entries for 2D delta histogram update", 10000.);
+  addParam("MinEntries", m_minEntries, "Minimum entries for delta histogram update", 10000.);
 
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
@@ -175,16 +174,16 @@ void DQMHistAnalysisKLM2Module::initialize()
 
   /* register plots for delta histogramming */
   // all ext hits
-  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsBKLM", HistDelta::c_Events, m_minEvents, 1);
-  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsEKLM", HistDelta::c_Events, m_minEvents, 1);
-  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsBKLMSector", HistDelta::c_Events, m_minEvents, 1);
-  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsEKLMSector", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsBKLM", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsEKLM", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsBKLMSector", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "all_ext_hitsEKLMSector", HistDelta::c_Entries, m_minEntries, 1);
 
   // matched hits
-  addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLM", HistDelta::c_Events, m_minEvents, 1);
-  addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLM", HistDelta::c_Events, m_minEvents, 1);
-  addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLMSector", HistDelta::c_Events, m_minEvents, 1);
-  addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLMSector", HistDelta::c_Events, m_minEvents, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLM", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLM", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsBKLMSector", HistDelta::c_Entries, m_minEntries, 1);
+  addDeltaPar(m_histogramDirectoryName, "matched_hitsEKLMSector", HistDelta::c_Entries, m_minEntries, 1);
 
   // 2D Efficiency Histograms
   TString eff2d_hist_bklm_title;
@@ -506,8 +505,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         if (eff2dVal < alarmThr) {
           if (mainEntries < (int)m_minEntries) {
             setFew = true;
+            B2INFO("Alarm Set to be grey for alrarm threshold");
           } else {
             setAlarm = true;
+            B2INFO("Alarm Set to be red for alrarm threshold");
           }
         }
 
@@ -521,8 +522,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   if (*pvcount > (int) layerLimit) {
     if (mainEntries < (int)m_minEntries) {
       setFew = true;
+      B2INFO("Alarm Set to be grey for alrarm warn");
     } else {
       setWarn = true;
+      B2INFO("Alarm Set to be yellow for alrarm warn");
     }
   }
 
@@ -622,7 +625,7 @@ void DQMHistAnalysisKLM2Module::event()
     B2WARNING("DQMHistAnalysisKLM2: Cannot find KLMDataSize");
   if ((daqDataSize != nullptr) and (meanDAQDataSize != 0.)) {
     int procesedEvents = DQMHistAnalysisModule::getEventProcessed();
-    if (procesedEvents > (int)m_minEvents) {
+    if (procesedEvents > (int)m_minEntries) {
       setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
       setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
     }

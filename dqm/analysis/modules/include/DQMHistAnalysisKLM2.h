@@ -182,10 +182,7 @@ namespace Belle2 {
     /** Name of histogram directory for reference file*/
     std::string m_refHistogramDirectoryName;
 
-    /** Minimal number of entries for delta histogram update. */
-    double m_minEvents;
-
-    /** Minimal number of entries for 2D histogram status. */
+    /** Minimal number of entries for delta histogram and PV update. */
     double m_minEntries;
 
     /** Number of inefficient BKLM layers. */

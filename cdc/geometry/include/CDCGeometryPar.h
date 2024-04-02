@@ -551,8 +551,8 @@ namespace Belle2 {
       float getT0(const WireID& wireID) const
       {
         //  std::cout << wireID.getICLayer() <<" "<< wireID.getIWire() << std::endl;
-        int iclayer = 0;
-        int iwire = 0;
+        int iclayer = wireID.getICLayer();
+        int iwire = wireID.getIWire();
         if (wireID.getICLayer() >= c_maxNSenseLayers) iclayer = c_maxNSenseLayers - 1;
         if (wireID.getIWire() >= c_maxNDriftCells) iwire = c_maxNDriftCells - 1;
         return m_t0[iclayer][iwire];

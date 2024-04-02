@@ -505,10 +505,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         if (eff2dVal < alarmThr) {
           if (mainEntries < (int)m_minEntries) {
             setFew = true;
-            B2INFO("Alarm Set to be grey for alrarm threshold");
+            B2INFO("Alarm Set to be grey for alarm threshold");
           } else {
             setAlarm = true;
-            B2INFO("Alarm Set to be red for alrarm threshold");
+            B2INFO("Alarm Set to be red for alarm threshold");
           }
         }
 
@@ -522,10 +522,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   if (*pvcount > (int) layerLimit) {
     if (mainEntries < (int)m_minEntries) {
       setFew = true;
-      B2INFO("Alarm Set to be grey for alrarm warn");
+      B2INFO("Alarm Set to be grey for alarm warning.");
     } else {
       setWarn = true;
-      B2INFO("Alarm Set to be yellow for alrarm warn");
+      B2INFO("Alarm Set to be yellow for alarm warning.");
     }
   }
 
@@ -626,8 +626,12 @@ void DQMHistAnalysisKLM2Module::event()
   if ((daqDataSize != nullptr) and (meanDAQDataSize != 0.)) {
     int procesedEvents = DQMHistAnalysisModule::getEventProcessed();
     if (procesedEvents > (int)m_minEntries) {
-      setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
-      setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+      if (static_cast<int>(m_eff_bklm->GetEntries()) > (int)m_minEntries) {
+        setEpicsPV("nEffBKLMLayers", m_nEffBKLMLayers);
+      }
+      if (static_cast<int>(m_eff_eklm->GetEntries()) > (int)m_minEntries) {
+        setEpicsPV("nEffEKLMLayers", m_nEffEKLMLayers);
+      }
     }
   } else
     B2INFO("DQMHistAnalysisKLM2: KLM Not included. No PV Update. ");

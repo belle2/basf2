@@ -133,7 +133,7 @@ void CDCDQMModule::event()
     for (int j = 0; j < nEntriesRawCDC; ++j) {
       int MaxNumOfCh = m_rawCDCs[i]->GetMaxNumOfCh(j);
       if (MaxNumOfCh != 4 && MaxNumOfCh != 48) {
-        B2FATAL("CDCDQM: Invalid value of GetMaxNumOfCh");
+        B2ERROR("CDCDQM: Invalid value of GetMaxNumOfCh");
       } else if (MaxNumOfCh == 48) {
         for (int k = 0; k < MaxNumOfCh; ++k) {
           if (m_rawCDCs[i]->CheckOnlineRemovedDataBit(j, k) == true)m_hBit->SetBinContent(i + 1, k + 1, -0.5);
@@ -182,14 +182,12 @@ void CDCDQMModule::event()
       UShort_t IWire = hit->getIWire();
       UShort_t adc = hit->getADCCount();
       unsigned short tdc = hit->getTDCCount();
-      unsigned short tot = hit->getTOT();
       WireID wireid(lay, IWire);
       unsigned short bid = cdcgeo.getBoardID(wireid);
 
-      if (tot > 4)m_hADC->Fill(bid, adc);
-      if (adc > 50 && tot > 1)m_hTDC->Fill(bid, tdc);
-      if (adc > 50 && tot > 4)m_h2HitPhi->Fill(fitresult->getPhi() / Unit::deg, lay);
-
+      m_hADC->Fill(bid, adc);
+      m_hTDC->Fill(bid, tdc);
+      m_h2HitPhi->Fill(fitresult->getPhi() / Unit::deg, lay);
     }
   }
 }

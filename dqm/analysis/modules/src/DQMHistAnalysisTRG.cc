@@ -125,15 +125,15 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "endcap_klm_latency", "endcap_klm_latency");
 
   //hadronb2_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_bhabha_all", "hadronb2_over_bhabha_all");
 
   //mumu2trk_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_all", "mumu2trk_over_bhabha_all");
 
   //hadronb2_over_mumu2trk
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
 
   //ECLTRG_deadch

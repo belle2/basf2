@@ -204,6 +204,12 @@ void CDCUnpackerModule::event()
 
         setCDCPacketHeader(ibuf);
 
+        // Skip invalid boardsIDs
+        if (m_boardId > 300) {
+          B2WARNING("Invalid board " << std::hex << m_boardId);
+          continue;
+        }
+
         const int dataType = getDataType();
         const int dataLength = getDataLength() / 4; // Data length in int word (4bytes).
         const int swDataLength = dataLength * 2;   // Data length in short word (2bytes).
@@ -420,6 +426,11 @@ void CDCUnpackerModule::event()
               const unsigned short status = trigType; // temporally trigger type is stored, here.
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
+
+              if (board == 12289) {
+                std::cout << "BBB " << board << " CH " << ch << " ID " << wireId << std::endl;
+                exit(0);
+              }
 
               if (isValidBoardChannel(wireId)) {
                 if (wireTopology.isValidWireID(wireId)) {

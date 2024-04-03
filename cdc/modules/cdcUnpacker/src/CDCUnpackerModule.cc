@@ -427,11 +427,6 @@ void CDCUnpackerModule::event()
               // Store to the CDCHit.
               const WireID  wireId = getWireID(board, ch);
 
-              if (board == 12289) {
-                std::cout << "BBB " << board << " CH " << ch << " ID " << wireId << std::endl;
-                exit(0);
-              }
-
               if (isValidBoardChannel(wireId)) {
                 if (wireTopology.isValidWireID(wireId)) {
 

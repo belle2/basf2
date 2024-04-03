@@ -26,7 +26,7 @@ Each element of this matrix corresponds to a pair of final state particles, and 
 To avoid the use of a unique identifier for each ancestor, a system of classes is used: 
 6 for :math:`\Upsilon (4S)` resonances, 5 for :math:`B^{\pm,0}` mesons, 4 for :math:`{D^{*}_{(s)}}^{\pm, 0}`, 3 for :math:`D^{\pm,0}`, 
 2 for :math:`K_{s}^{0}`, 1 for :math:`\pi^{0}`` or :math:`J/\psi` and 0 for particles not belonging to the decay tree. 
-This new representation of the LC.A is called LCAS matrix, where the S stands for "stage".
+This new representation of the LCA is called LCAS matrix, where the S stands for "stage".
 An example of decay tree with its corresponding LCAS matrix is:
 
 .. figure:: figs/decay_tree.png
@@ -74,8 +74,8 @@ and uploaded to a global tag in order to run on the grid.
 
 Finally, the model can be included in a steering file via the `grafei <grafei.grafei>` wrapper, 
 in order to apply the model to Belle II data and MC.
-Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI/steering_file_examples``.
-In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI`` can be added.
+Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI``.
+In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI_`` can be added.
 When using the model in :math:`\Upsilon (4S)` reconstruction mode you have also the possibility of specifying an LCAS matrix (in the form of a nested list) and a list
 of mass hypotheses (following the convention outlined in the `select_good_decay` class) for your **signal-side**: in the case where the predicted LCAS matrix describes a valid tree structure, 
 the code checks if a subset of particles in the tree matches the given LCAS and mass hypotheses 

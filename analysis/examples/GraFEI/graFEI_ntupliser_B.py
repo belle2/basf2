@@ -21,7 +21,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 import random
 import argparse
 
-from grafei import GraFEIModule
+from grafei import grafei
 
 # Random seeds
 b2.set_random_seed(42)
@@ -207,14 +207,14 @@ if __name__ == "__main__":
         ma.matchMCTruth("B0:tag", path=path)
 
     # Run graFEI
-    graFEI = GraFEIModule(
+    grafei(
         "B0:tag",
         cfg_path=args.config,
         param_file=args.weight,
         payload_config_name="graFEIConfigFile_Breco_example",  # If you default payload name just remove this argument
         payload_model_name="graFEIModelFile_Breco_example",  # If you use default payload name just remove this argument
+        path=path,
     )
-    path.add_module(graFEI)
 
     # Reconstructin Upsilon(4S)
     ma.reconstructDecay("Upsilon(4S):graFEI -> B0:tag B0:sig", "", path=path)

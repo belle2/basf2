@@ -21,7 +21,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 import random
 import argparse
 
-from grafei import GraFEIModule
+from grafei import grafei
 
 
 # Random seeds
@@ -164,7 +164,7 @@ if __name__ == "__main__":
             # Match MC particles for all lists
             ma.matchMCTruth(particle_list, path=path)
 
-    graFEI = GraFEIModule(
+    grafei(
         "Upsilon(4S):final",
         cfg_path=args.config,
         param_file=args.weight,
@@ -172,9 +172,8 @@ if __name__ == "__main__":
         sig_side_masses=args.masses,
         payload_config_name="graFEIConfigFile_Upsreco_example",  # If you use default payload name just remove this argument
         payload_model_name="graFEIModelFile_Upsreco_example",  # If you use default payload name just remove this argument
-
+        path=path,
     )
-    path.add_module(graFEI)
 
     # Define signal-side B
     # Here we consider all charged basf2 mass hypotheses

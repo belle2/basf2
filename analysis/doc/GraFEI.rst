@@ -19,7 +19,7 @@ You can find a brief description of the model in the documentation of the `GraFE
    `'Learning tree structures from leaves for particle decay reconstruction' <https://iopscience.iop.org/article/10.1088/2632-2153/ac8de0>`_ 
    by Kahn et al. Please consider citing both papers. 
    The code is adapted from the work of Kahn et al (available `here <https://github.com/Helmholtz-AI-Energy/BaumBauen>`_).
-   A detailed description of the model is also available in this `Belle II internal note <https://docs.belle2.org/record/3649>`_.
+   A detailed description of the model is also available in this `Belle II internal note <https://docs.belle2.org/record/3649>`_ (restricted access).
 
 The network is trained to predict the mass hypotheses of final state particles and the **Lowest Common Ancestor** (LCA) matrix of the event.
 Each element of this matrix corresponds to a pair of final state particles, and contains the lowest ancestor common to both particles. 
@@ -72,7 +72,7 @@ Applying the model to data
 The model ``.yaml`` and ``.pt`` output files can be saved to a payload with the script ``grafei/scripts/save_model_to_payload.py`` 
 and uploaded to a global tag in order to run on the grid.
 
-Finally, the model can be included in a steering file via the `GraFEIModule <grafei.GraFEIModule>`, 
+Finally, the model can be included in a steering file via the `grafei <grafei.grafei>` wrapper, 
 in order to apply the model to Belle II data and MC.
 Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI/steering_file_examples``.
 In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI`` can be added.
@@ -132,7 +132,7 @@ However, if you reconstruct the signal-side as in the example, only good events 
    For the time being, the mass hypotheses defined at the beginning are not changed, even if new hypotheses are predicted by the model. 
    Thus you'll have to consider all of them when creating your signal-side candidates. This behavior will change in future versions of the tool.
 
-The variables added by the `GraFEIModule <grafei.GraFEIModule>` are filled with ``nan`` if there are less than two reconstructed particles in the event.
+The variables added by the GraFEI are filled with ``nan`` if there are less than two reconstructed particles in the event.
 Otherwise, they are defined as follows:
 
 ======================================== ==================================================================================================================================
@@ -186,11 +186,12 @@ This section describes the grafei code.
 Core module
 ***********
 
-You can import this module in a steering file with ``from grafei import GraFEIModule``.
+You can import the core GraFEI module in a steering file with ``from grafei import grafei``. 
+This is a wrapper function that internally calls the GraFEIModule and add it the the basf2 path.
 
 .. automodule:: grafei
-   :members:
-   :exclude-members: event, initialize, cfg_path, gpu, param_file, particle_list, payload_config_name, payload_model_name, sig_side_lcas, sig_side_masses
+   :members: grafei
+
 
 Other modules and functions
 ***************************

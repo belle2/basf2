@@ -181,11 +181,11 @@ namespace Belle2 {
     void setAlarmLines();
 
     /**
-     * Returns histogram mean by excluding bins with zero content
-     * @param h 2D histogram
-     * @return mean
+     * Returns cut levels for dead and hot channels
+     * @param h pixel or channel distribution of hits (1D or 2D histogram)
+     * @return cut levels (first = dead, second = hot)
      */
-    double getMean(const TH2* h);
+    std::pair<double, double> getDeadAndHotCuts(const TH1* h);
 
     /**
      * Calculates and sets epics variables

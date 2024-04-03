@@ -53,7 +53,8 @@ if __name__ == '__main__':
     # ###### BUILD MC B/Ups FOR LCA/TAGGING ######
     ma.fillParticleListFromMC(mc_particle_name[args.type], '', path=path)
 
-    # Fill particle list with optimized cuts
+    # These priors were obtained by counting truth-matched tracks in BB mixed MC
+    # It could be modified by the user if needed
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
 
     charged_cuts = [f"pidIsMostLikely({','.join(str(p) for p in priors)})>0", 'nCDCHits>20',
@@ -100,11 +101,6 @@ if __name__ == '__main__':
     # Set up variables to save to NTuple
     save_vars = [
         # Charged variables
-        # 'electronID',
-        # 'kaonID',
-        # 'protonID',
-        # 'muonID',
-        # 'pionID',
         'electronID_noSVD_noTOP',
         'kaonID_noSVD',
         'protonID_noSVD',
@@ -116,16 +112,11 @@ if __name__ == '__main__':
         'py',
         'pz',
         'dr',
-        # 'dx',
-        # 'dy',
         'dz',
         'x',
         'y',
         'z',
-        # 'chiProb',
-        # 'E',
         'charge',
-        # 'M',
         # Neutral variables
         'clusterNHits',
         'clusterTiming',

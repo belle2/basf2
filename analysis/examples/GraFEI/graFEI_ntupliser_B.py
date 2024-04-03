@@ -58,7 +58,8 @@ if __name__ == "__main__":
     if args.globaltag:
         b2.conditions.prepend_globaltag(args.globaltag)
 
-    # graFEI cuts
+    # These priors were obtained by counting truth-matched tracks in BB mixed MC
+    # It could be modified by the user if needed
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
 
     cut_charged_graFEI = [
@@ -234,7 +235,6 @@ if __name__ == "__main__":
         "phi",
         "theta",
         "cosTBz",
-        # "cosTBTO",
         "cosThetaBetweenParticleAndNominalB",
     ]
     if store_mc_truth:

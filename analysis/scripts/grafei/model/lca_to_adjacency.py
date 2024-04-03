@@ -50,15 +50,6 @@ class Node:
         #: BFS index
         self.bfs_index = -1
 
-# def _print_history(node):
-#     """
-#     Debug function to print history of node.
-#     """
-
-#     print([child.lcas_level for child in node.children])
-#     for child in node.children:
-#         _print_history(child)
-
 
 def _get_ancestor(node):
     """

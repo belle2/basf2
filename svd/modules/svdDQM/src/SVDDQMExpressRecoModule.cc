@@ -397,20 +397,49 @@ void SVDDQMExpressRecoModule::defineHisto()
 
 
   //----------------------------------------------------------------
-  // Cluster time group Id vs cluster time for u/V sensors
+  // Cluster time group Id vs cluster time for U/V sensors
   //----------------------------------------------------------------
-  Name = "SVDDQM_Cluster3TimeGroupId";
-  Title = Form("SVD cluster Time GroupId0 %s vs cluster time for U/P Side", refFrame.Data());
-  m_clusterTimeGroupIdU = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  Name = "SVDDQM_ClusterTimeGroupIdU";
+  Title = Form("SVD cluster Time Group Id %s vs cluster time for U/P Side", refFrame.Data());
+  m_clusterTimeGroupIdU = new TH2F(Name.Data(), Title.Data(), TimeBins / 2, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
   m_clusterTimeGroupIdU->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeGroupIdU->GetYaxis()->SetTitle("cluster group id");
   m_histoList->Add(m_clusterTimeGroupIdU);
-  Name = "SVDDQM_Cluster6TimeGroupId";
-  Title =  Form("SVD cluster Time GroupId0 %s vs cluster time for V/N Side", refFrame.Data());
-  m_clusterTimeGroupIdV = new TH2F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  Name = "SVDDQM_ClusterTimeGroupIdV";
+  Title =  Form("SVD cluster Time Group Id %s vs cluster time for V/N Side", refFrame.Data());
+  m_clusterTimeGroupIdV = new TH2F(Name.Data(), Title.Data(), TimeBins / 2, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
   m_clusterTimeGroupIdV->GetXaxis()->SetTitle("cluster time (ns)");
   m_clusterTimeGroupIdV->GetYaxis()->SetTitle("cluster group id");
   m_histoList->Add(m_clusterTimeGroupIdV);
+
+  //----------------------------------------------------------------
+  // Cluster time group Id vs cluster time for U/V sensors for coarse and fine trigger
+  //----------------------------------------------------------------
+  Name = "SVDDQM_cluster6TimeGroupIdU";
+  Title = Form("SVD cluster Time Group Id %s vs cluster time for U/P Side for coarse trigger", refFrame.Data());
+  m_clusterTime6GroupIdU = new TH2F(Name.Data(), Title.Data(), TimeBins / 2, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_clusterTime6GroupIdU->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTime6GroupIdU->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_clusterTime6GroupIdU);
+  Name = "SVDDQM_cluster6TimeGroupIdV";
+  Title =  Form("SVD cluster Time Group Id %s vs cluster time for V/N Side for coarse trigger", refFrame.Data());
+  m_clusterTime6GroupIdV = new TH2F(Name.Data(), Title.Data(), TimeBins / 2, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_clusterTime6GroupIdV->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTime6GroupIdV->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_clusterTime6GroupIdV);
+
+  Name = "SVDDQM_cluster3TimeGroupIdU";
+  Title = Form("SVD cluster Time Group Id %s vs cluster time for U/P Side for fine trigger", refFrame.Data());
+  m_clusterTime3GroupIdU = new TH2F(Name.Data(), Title.Data(), TimeBins / 2, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_clusterTime3GroupIdU->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTime3GroupIdU->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_clusterTime3GroupIdU);
+  Name = "SVDDQM_cluster3TimeGroupIdV";
+  Title =  Form("SVD cluster Time Group Id %s vs cluster time for V/N Side for fine trigger", refFrame.Data());
+  m_clusterTime3GroupIdV = new TH2F(Name.Data(), Title.Data(), TimeBins / 2, TimeMin, TimeMax, GroupIdBins, GroupIdMin, GroupIdMax);
+  m_clusterTime3GroupIdV->GetXaxis()->SetTitle("cluster time (ns)");
+  m_clusterTime3GroupIdV->GetYaxis()->SetTitle("cluster group id");
+  m_histoList->Add(m_clusterTime3GroupIdV);
 
   //----------------------------------------------------------------
   // MaxBin of strips for all sensors (offline ZS)
@@ -787,6 +816,8 @@ void SVDDQMExpressRecoModule::initialize()
     //Store names to speed up creation later
     m_storeSVDShaperDigitsName = storeSVDShaperDigits.getName();
   }
+
+  m_objTrgSummary.isOptional();
 }
 
 void SVDDQMExpressRecoModule::beginRun()
@@ -998,10 +1029,27 @@ void SVDDQMExpressRecoModule::event()
     if (vec.size() > 0) {
       groupId = *minElement;
 
+
       if (cluster.isUCluster()) {
         if (m_clusterTimeGroupIdU != nullptr) m_clusterTimeGroupIdU->Fill(time, groupId);
+        if (m_objTrgSummary.isValid()) {
+          int trgQuality = m_objTrgSummary->getTimQuality();
+          if (trgQuality == 1)
+            if (m_clusterTime6GroupIdU != nullptr) m_clusterTime6GroupIdU->Fill(time, groupId);
+          if (trgQuality == 2)
+            if (m_clusterTime3GroupIdU != nullptr) m_clusterTime3GroupIdU->Fill(time, groupId);
+        }
+
+
       } else {
         if (m_clusterTimeGroupIdV != nullptr) m_clusterTimeGroupIdV->Fill(time, groupId);
+        if (m_objTrgSummary.isValid()) {
+          int trgQuality = m_objTrgSummary->getTimQuality();
+          if (trgQuality == 1)
+            if (m_clusterTime6GroupIdV != nullptr) m_clusterTime6GroupIdV->Fill(time, groupId);
+          if (trgQuality == 2)
+            if (m_clusterTime3GroupIdV != nullptr) m_clusterTime3GroupIdV->Fill(time, groupId);
+        }
       }
     }
 

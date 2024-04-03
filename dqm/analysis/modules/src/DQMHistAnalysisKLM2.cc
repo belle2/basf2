@@ -505,10 +505,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         if (eff2dVal < alarmThr) {
           if (mainEntries < (int)m_minEntries) {
             setFew = true;
-            B2DEBUG(1, "Alarm Set to be grey for low statistics threshold");
+            B2DEBUG(1, "Alarm Set to be grey for 2D Canvas: Low Statistics");
           } else {
             setAlarm = true;
-            B2DEBUG(1, "Alarm Set to be red for layer efficiency threshold");
+            B2DEBUG(1, "Alarm Set to be red for threshold warning.");
           }
         }
 
@@ -522,10 +522,10 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   if (*pvcount > (int) layerLimit) {
     if (mainEntries < (int)m_minEntries) {
       setFew = true;
-      B2DEBUG(1, "Alarm Set to be grey for low statistics warning.");
+      B2DEBUG(1, "Alarm Set to be grey for ineff Layer Count: Low statistics");
     } else {
       setWarn = true;
-      B2DEBUG(1, "Alarm Set to be yellow for PVs warning.");
+      B2DEBUG(1, "Alarm Set to be yellow for ineff Layer Count warning.");
     }
   }
 

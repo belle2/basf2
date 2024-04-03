@@ -336,18 +336,10 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   for (int slot = 1; slot <= 16; slot++) {
     auto* h = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
     if (not h) continue;
-    double mean = 0;
-    int n = 0;
-    for (int chan = 0; chan < h->GetNbinsX(); chan++) {
-      double y = h->GetBinContent(chan + 1);
-      if (y > 0) {
-        mean += y;
-        n++;
-      }
-    }
-    if (n > 0) mean /= n;
-    double deadCut = mean / 10;
-    double hotCut = mean * 10;
+
+    auto cuts = getDeadAndHotCuts(h);
+    double deadCut = cuts.first;
+    double hotCut = cuts.second;
     double deadFract = 0;
     double hotFract = 0;
     double deadFractIncl = 0;
@@ -376,8 +368,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
 
   int alarmState = c_Gray;
   if (m_activeFraction->Integral() > 0) {
-    alarmState = getAlarmState(1 - m_activeFraction->GetMinimum(), m_deadChannelsAlarmLevels);
-    if (alarmState == c_Red) alarmState = std::max(getAlarmState(inactiveFract, m_deadChannelsAlarmLevels), static_cast<int>(c_Yellow));
+    alarmState = getAlarmState(inactiveFract, m_deadChannelsAlarmLevels);
   }
 
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
@@ -527,14 +518,11 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
 
   int alarmState = c_Gray;
   if (allHits->Integral() > 0) {
-    alarmState = getAlarmState(m_junkFraction->GetMaximum(), m_junkHitsAlarmLevels);
-    if (alarmState == c_Red) {
-      double hmax = 0;
-      for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
-        if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
-      }
-      alarmState = std::max(getAlarmState(hmax, m_junkHitsAlarmLevels), static_cast<int>(c_Yellow));
+    double hmax = 0;
+    for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
+      if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
     }
+    alarmState = getAlarmState(hmax, m_junkHitsAlarmLevels);
   }
   delete allHits;
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
@@ -708,21 +696,33 @@ void DQMHistAnalysisTOPModule::setAlarmLines()
 }
 
 
-double DQMHistAnalysisTOPModule::getMean(const TH2* h)
+std::pair<double, double> DQMHistAnalysisTOPModule::getDeadAndHotCuts(const TH1* h)
 {
-  double mean = 0;
-  int n = 0;
-  for (int col = 1; col <= h->GetNbinsX(); col++) {
-    for (int row = 1; row <= h->GetNbinsY(); row++) {
-      double y = h->GetBinContent(col, row);
-      if (y > 0) {
-        mean += y;
-        n++;
-      }
+  std::vector<double> binContents;
+  for (int k = 1; k <= h->GetNbinsY(); k++) {
+    for (int i = 1; i <= h->GetNbinsX(); i++) {
+      binContents.push_back(h->GetBinContent(i, k));
     }
   }
-  if (n > 0) mean /= n;
-  return mean;
+
+  double mean = 0;
+  double rms = h->GetMaximum();
+  for (int iter = 0; iter < 5; iter++) {
+    double sumy = 0;
+    double sumyy = 0;
+    int n = 0;
+    for (auto y : binContents) {
+      if (y == 0 or fabs(y - mean) > 3 * rms) continue;
+      sumy += y;
+      sumyy += y * y;
+      n++;
+    }
+    if (n == 0) continue;
+    mean = sumy / n;
+    rms = sqrt(sumyy / n - mean * mean);
+  }
+
+  return std::make_pair(mean / 5, std::max(mean * 2, mean + 6 * rms));
 }
 
 
@@ -736,9 +736,9 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
     auto* h = (TH2F*) findHist(hname);
     if (not h) continue;
 
-    double mean = getMean(h);
-    double deadCut = mean / 10;
-    double hotCut = mean * 10;
+    auto cuts = getDeadAndHotCuts(h);
+    double deadCut = cuts.first;
+    double hotCut = cuts.second;
     std::vector<int> asics(64, 0);
     std::vector<int> carriers(16, 0);
     std::vector<int> boardstacks(4, 0);
@@ -747,7 +747,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
       int boardstack = carrier / 4;
       for (int chan = 0; chan < 8; chan++) {
         double y = h->GetBinContent(asic + 1, chan + 1);
-        if (y > deadCut and y < hotCut) {
+        if (y > deadCut and y <= hotCut) {
           asics[asic]++;
           carriers[carrier]++;
           boardstacks[boardstack]++;
@@ -767,15 +767,15 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
     auto* h = (TH2F*) findHist(hname);
     if (not h) continue;
 
-    double mean = getMean(h);
-    double deadCut = mean / 10;
-    double hotCut = mean * 10;
+    auto cuts = getDeadAndHotCuts(h);
+    double deadCut = cuts.first;
+    double hotCut = cuts.second;
     std::vector<int> pmts(32, 0);
     for (int row = 0; row < 8; row++) {
       for (int col = 0; col < 64; col++) {
         int pmt = col / 4 + (row / 4) * 16;
         double y = h->GetBinContent(col + 1, row + 1);
-        if (y > deadCut and y < hotCut) pmts[pmt]++;
+        if (y > deadCut and y <= hotCut) pmts[pmt]++;
       }
     }
     for (int n : pmts) if (n == 0) badPMTs++;

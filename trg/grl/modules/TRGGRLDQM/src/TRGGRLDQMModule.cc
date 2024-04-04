@@ -136,7 +136,7 @@ void TRGGRLDQMModule::defineHisto()
   h_wc6_injtime = new TH2F("h_wirecnt6_injtime", "The wire counter from TSF 6", 201, 0, 1000, 100, 0, 50);
   h_wc6_injtime->GetXaxis()->SetTitle("Number of wires for TSF 6 input");
   h_wc6_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
-  h_wcsum_injtime = new TH2F("h_wirecntsum_injtime", "The wire counter from TSF0-6", 501, 0, 5000, 100, 0, 50);
+  h_wcsum_injtime = new TH2F("h_wirecntsum_injtime", "The wire counter from TSF0-6", 601, 0, 6000, 100, 0, 50);
   h_wcsum_injtime->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
   h_wcsum_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
 
@@ -304,7 +304,7 @@ void TRGGRLDQMModule::event()
   }
 
   double diff;
-  diff = m_trgTime->getTimeSinceLastInjection();
+  diff = m_trgTime->getTimeSinceLastInjection() / 127. / 1000.;
 
   int wcsum = 0, nowcnt;
 

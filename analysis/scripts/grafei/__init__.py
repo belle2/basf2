@@ -60,16 +60,16 @@ def lcaSaver(
         path,
         ):
     """
-        Wrapper function to add the LCASaverModule to the path.
+    Wrapper function to add the LCASaverModule to the path.
 
-        Save Lowest Common Ancestor matrix of each MC Particle in the given list.
+    Save Lowest Common Ancestor matrix of each MC Particle in the given list.
 
-        Args:
-            particle_lists (list): Name of particle lists to save features of.
-            features (list): List of features to save for each particle.
-            mcparticle_list (str): Name of particle list to build LCAs from (will use as root).
-            output_file (str): Path to output file to save.
-            path (basf2.Path): Module is added to this path.
+    Args:
+        particle_lists (list): Name of particle lists to save features of.
+        features (list): List of features to save for each particle.
+        mcparticle_list (str): Name of particle list to build LCAs from (will use as root).
+        output_file (str): Path to output file to save.
+        path (basf2.Path): Module is added to this path.
     """
     lca_saver_module = LCASaverModule(
         particle_lists=particle_lists,

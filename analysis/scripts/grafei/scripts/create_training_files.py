@@ -20,7 +20,7 @@ from ROOT import Belle2
 import stdPhotons
 from variables import variables as vm
 
-from grafei.modules.RootSaverModule import RootSaverModule
+from grafei import lcaSaver
 
 
 def _get_args():
@@ -134,13 +134,13 @@ if __name__ == '__main__':
         # Match MC particles for all lists
         ma.matchMCTruth(p_list, path=path)
 
-    root_saver_module = RootSaverModule(
+    lcaSaver(
         particle_lists=p_lists,
         features=save_vars,
         mcparticle_list=mc_particle_name[args.type],
         output_file=f'graFEI_train_{input_file.stem}.root',
+        path=path,
     )
-    path.add_module(root_saver_module)
 
     # Actually run everything
     b2.process(path)

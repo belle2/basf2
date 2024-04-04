@@ -16,13 +16,12 @@ from ROOT import Belle2
 from variables import variables as vm
 import torch
 from torch_geometric.data import Batch
-from grafei.modules.LCASaverModule import get_object_list
+from grafei.modules.LCASaverModule import get_object_list, write_hist
 from grafei.model.geometric_network import GraFEIModel
 from grafei.model.normalize_features import normalize_features
 from grafei.model.edge_features import compute_edge_features
 from grafei.model.lca_to_adjacency import lca_to_adjacency, InvalidLCAMatrix, select_good_decay
 from grafei.model.tree_utils import masses_to_classes
-from grafei.modules.LCASaverModule import write_hist
 
 warnings.filterwarnings(
     action="ignore", category=RuntimeWarning, message="Mean of empty slice.*"

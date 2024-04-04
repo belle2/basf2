@@ -7,20 +7,23 @@
 ##########################################################################
 
 
+__all__ = ["graFEI"]
+
+
 from grafei.modules.GraFEIModule import GraFEIModule
 
 
-def grafei(
-            particle_list,
-            path,
-            cfg_path=None,
-            param_file=None,
-            sig_side_lcas=None,
-            sig_side_masses=None,
-            gpu=False,
-            payload_config_name="graFEIConfigFile",
-            payload_model_name="graFEIModelFile",
-        ):
+def graFEI(
+    particle_list,
+    path,
+    cfg_path=None,
+    param_file=None,
+    sig_side_lcas=None,
+    sig_side_masses=None,
+    gpu=False,
+    payload_config_name="graFEIConfigFile",
+    payload_model_name="graFEIModelFile",
+):
     """
     Wrapper function to add the GraFEIModule to the path in a single call.
 

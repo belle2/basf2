@@ -44,7 +44,6 @@ from grafei.model.create_trainer import GraFEIIgniteTrainer
 @click.option("--quiet", "log_level", flag_value=logging.WARNING, default=True)
 @click.option("-v", "--verbose", "log_level", flag_value=logging.INFO)
 @click.option("-vv", "--very-verbose", "log_level", flag_value=logging.DEBUG)
-# @click.version_option(grafei.__version__)
 def main(
     cfg_path: Path,
     n_samples: int,

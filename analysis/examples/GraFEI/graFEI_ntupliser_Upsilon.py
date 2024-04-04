@@ -21,7 +21,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 import random
 import argparse
 
-from grafei import grafei
+from grafei import graFEI
 
 
 # Random seeds
@@ -164,7 +164,7 @@ if __name__ == "__main__":
             # Match MC particles for all lists
             ma.matchMCTruth(particle_list, path=path)
 
-    grafei(
+    graFEI(
         "Upsilon(4S):final",
         cfg_path=args.config,
         param_file=args.weight,

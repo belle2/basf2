@@ -21,7 +21,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 import random
 import argparse
 
-from grafei import grafei
+from grafei import graFEI
 
 # Random seeds
 b2.set_random_seed(42)
@@ -207,7 +207,7 @@ if __name__ == "__main__":
         ma.matchMCTruth("B0:tag", path=path)
 
     # Run graFEI
-    grafei(
+    graFEI(
         "B0:tag",
         cfg_path=args.config,
         param_file=args.weight,

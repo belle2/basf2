@@ -183,14 +183,16 @@ Code documentation
 
 This section describes the grafei code.
 
-Core module
-***********
+Core modules
+************
 
+If you want to write your own steering file to save the LCAS matrix to ROOT ntuples you can use the
+LCASaverModule by calling ``from grafei import lcaSaver``.
 You can import the core GraFEI module in a steering file with ``from grafei import grafei``. 
-This is a wrapper function that internally calls the module and add it to the basf2 path.
+These are wrapper functions that internally call the modules and add them to the basf2 path.
 
 .. automodule:: grafei
-   :members: grafei
+   :members:
 
 
 Other modules and functions
@@ -244,6 +246,3 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.tree_utils
    :members:
-
-.. automodule:: grafei.modules.LCASaverModule
-   :members: lcaSaver

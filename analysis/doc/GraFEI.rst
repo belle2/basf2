@@ -245,6 +245,6 @@ users usually do not need to manipulate these components.
 .. automodule:: grafei.model.tree_utils
    :members:
 
-.. automodule:: grafei.modules.RootSaverModule
+.. automodule:: grafei.modules.LCASaverModule
    :members:
    :exclude-members: event, initialize, terminate, features, mcparticle_list, output_file, particle_lists

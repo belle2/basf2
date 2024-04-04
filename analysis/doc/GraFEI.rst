@@ -192,7 +192,7 @@ You can import the core GraFEI module in a steering file with ``from grafei impo
 These are wrapper functions that internally call the modules and add them to the basf2 path.
 
 .. automodule:: grafei
-   :members:
+   :members: grafei, lcaSaver
 
 
 Other modules and functions

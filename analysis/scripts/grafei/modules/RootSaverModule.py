@@ -202,7 +202,7 @@ def write_hist(
     )
 
 
-class LCASaverModule(b2.Module):
+class RootSaverModule(b2.Module):
     """
         Save Lowest Common Ancestor matrix of each MC Particle in the given list.
 

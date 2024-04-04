@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # -------------------------------------------------------------------------------------------------------
 # Example on how to simulate/reconstruct single particle events w/o intoducing bunch finder inefficiency.

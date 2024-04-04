@@ -28,19 +28,19 @@ class RootObject:
     objects from a certain revision.
 
     @var data: A dict with all information about the Root-object
-    @var revision: The revision to which the object belongs to
+    @cvar revision: The revision to which the object belongs to
     @var package: The package to which the object belongs to
     @var rootfile: The root file to which the object belongs to
     @var key: The key (more precisely: the name of the key) which the object
         has within the root file
-    @var object: The root object itself
+    @cvar object: The root object itself
     @var type: The type, i.e. whether its a histogram or an n-tuple
-    @var description: The description, what the histogram/n-tuple contains
-    @var check: A brief description how the histogram or the values should
+    @cvar description: The description, what the histogram/n-tuple contains
+    @cvar check: A brief description how the histogram or the values should
         look like
     @var contact: A contact person for this histogram/n-tuple
-    @var date: The date of the object (identical with the date of its rootfile)
-    @var is_reference: Boolean value if it is an object from a reference file
+    @cvar date: The date of the object (identical with the date of its rootfile)
+    @cvar is_reference: Boolean value if it is an object from a reference file
         or not
     """
 

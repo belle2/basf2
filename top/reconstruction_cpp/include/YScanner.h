@@ -404,24 +404,12 @@ namespace Belle2 {
       void integrate(const EnergyMask* energyMask, double Ecp, Result& result) const;
 
       /**
-       * Calculates projections of a pixel to prism entrance window
-       * (going down-stream the photon).
-       *
-       * @param[in] yc
-       * Pixel center in y.
-       *
-       * @param[in] size
-       * Pixel size in y.
-       *
-       * @param[in] k
-       * Valid index of vector of unfolded prism exit windows.
-       *
-       * @param[in] dydz
-       * Photon slope at prism entrance; dydz is used for even projections and
-       * -dydz is used for odd projections.
-       *
-       * @param[in] proj
-       * Projections of a pixel to prism entrance.
+       * Calculates projections of a pixel to prism entrance window (going down-stream the photon).
+       * @param yc Pixel center in y.
+       * @param size Pixel size in y.
+       * @param k Valid index of vector of unfolded prism exit windows.
+       * @param dydz Photon slope at prism entrance; dydz is used for even projections and -dydz is used for odd projections.
+       * @param proj Projections of a pixel to prism entrance (results)
        */
       void projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const;
 

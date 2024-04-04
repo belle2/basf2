@@ -110,12 +110,6 @@ namespace Belle2 {
         int k0 = 0; /**< index of true prism in the vector 'unfoldedWindows' */
         std::vector<TOPGeoPrism::UnfoldedWindow> unfoldedWindows; /**< unfolded prism exit windows */
 
-        /** win = unfoldedWindows[i]; win.y0 + win.ny * fabs(zD - zFlat). */
-        double* projectedY = nullptr;
-
-        /** win = unfoldedWindows[i]; win.z0 + win.nz * fabs(zD - zFlat). */
-        double* projectedZ = nullptr;
-
         /**
          * default constructor
          */
@@ -127,22 +121,6 @@ namespace Belle2 {
          * @param module module object from TOPGeometry
          */
         explicit Prism(const TOPGeoModule& module);
-
-        /**
-         * Destructor.
-         */
-        ~Prism();
-
-        /**
-         * Copy constructor.
-         */
-        Prism(const Prism& prism);
-
-        /**
-         * Operator =.
-         */
-        Prism& operator=(const Prism& prism);
-
       };
 
 

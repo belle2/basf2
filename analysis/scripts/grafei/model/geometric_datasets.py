@@ -255,7 +255,7 @@ def _process_graph(self, idx):
     return g
 
 
-class BelleRecoSetGeometricInMemory(InMemoryDataset):
+class GraphDataSet(InMemoryDataset):
     """
     Dataset handler for converting Belle II data to PyTorch geometric InMemoryDataset.
 

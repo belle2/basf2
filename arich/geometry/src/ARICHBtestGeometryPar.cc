@@ -128,7 +128,6 @@ namespace Belle2 {
   void ARICHBtestGeometryPar::setFrameRotation(double v)
   {
     m_frameRotation = ROOT::Math::Rotation3D() * ROOT::Math::RotationY(v);
-    // m_frameRotation.RotateY(v);
     B2INFO("ARICHBtestGeometryPar::setFrameRotation=" << v);
 
   }

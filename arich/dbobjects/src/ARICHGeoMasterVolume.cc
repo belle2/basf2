@@ -42,15 +42,10 @@ void ARICHGeoMasterVolume::setPlacement(double x, double y, double z, double rx,
   ROOT::Math::XYZVector  translation(x, y, z);
 
   m_rotation =  new ROOT::Math::Rotation3D();
-  // m_rotation->RotateX(rx);
-  // m_rotation->RotateY(ry);
-  // m_rotation->RotateZ(rz);
   ROOT::Math::RotationX rotX(m_rx);
   ROOT::Math::RotationY rotY(m_ry);
   ROOT::Math::RotationZ rotZ(m_rz);
-  (*m_rotation) = (*m_rotation) * rotX;
-  (*m_rotation) = (*m_rotation) * rotY;
-  (*m_rotation) = (*m_rotation) * rotZ;
+  (*m_rotation) *= rotZ * rotY * rotX;
 
   m_rotationInverse = new ROOT::Math::Rotation3D(m_rotation->Inverse());
   m_translation = new ROOT::Math::XYZVector(x, y, z);

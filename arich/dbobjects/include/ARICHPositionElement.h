@@ -165,10 +165,7 @@ namespace Belle2 {
       ROOT::Math::RotationX rotX(m_alpha);
       ROOT::Math::RotationY rotY(m_beta);
       ROOT::Math::RotationZ rotZ(m_gamma);
-      rot *= rotX;
-      rot *= rotY;
-      rot *= rotZ;
-      // rot.RotateX(m_alpha).RotateY(m_beta).RotateZ(m_gamma);
+      rot *= rotZ * rotY * rotX;
       return rot;
     }
 

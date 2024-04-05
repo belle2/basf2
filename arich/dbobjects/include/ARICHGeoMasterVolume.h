@@ -90,14 +90,10 @@ namespace Belle2 {
     ROOT::Math::Rotation3D getRotation() const
     {
       ROOT::Math::Rotation3D rot;
-      // With "TRotation rot" the call was
-      // rot.RotateX(m_rx).RotateY(m_ry).RotateZ(m_rz);
       ROOT::Math::RotationX rotX(m_rx);
       ROOT::Math::RotationY rotY(m_ry);
       ROOT::Math::RotationZ rotZ(m_rz);
-      rot *= rotX;
-      rot *= rotY;
-      rot *= rotZ;
+      rot *= rotZ * rotY * rotX;
       return rot;
     }
 
@@ -166,7 +162,7 @@ namespace Belle2 {
 
     std::string m_material;
 
-    mutable  ROOT::Math::Rotation3D* m_rotation = nullptr ;
+    mutable ROOT::Math::Rotation3D* m_rotation = nullptr ;
     mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr;
     mutable ROOT::Math::XYZVector*  m_translation = nullptr;
 

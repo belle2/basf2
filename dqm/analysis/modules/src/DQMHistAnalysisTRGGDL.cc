@@ -659,6 +659,7 @@ void DQMHistAnalysisTRGGDLModule::event()
 
   m_IsPhysicsRun = (getRunType() == "physics");
   if (m_IsPhysicsRun == true) {
+    int error_check = 0;
     for (int i = 0; i < n_eff_shifter; i++) {
       double eff = m_h_eff_shifter->GetBinContent(i + 1);
       double err = m_h_eff_shifter->GetBinError(i + 1);
@@ -671,31 +672,33 @@ void DQMHistAnalysisTRGGDLModule::event()
       if (
         (eff_err_max < m_limit_low_shifter[i]) || (eff_err_min > m_limit_high_shifter[i]) ||
         (eff_err_max_fast < m_limit_low_shifter[i]) || (eff_err_min_fast > m_limit_high_shifter[i])
-      ) {
-        m_c_eff_shifter->SetFillColor(2);
-        m_c_eff_shifter_fast->SetFillColor(2);
-        m_c_eff_shifter->SetFrameFillColor(10);
-        m_c_eff_shifter_fast->SetFrameFillColor(10);
-        m_h_eff_shifter->SetTitle("Call TRG expert: bad efficiency");
-        m_h_eff_shifter_fast->SetTitle("Call TRG expert: bad efficiency");
-        m_c_eff_shifter->SetFrameLineColor(1);
-        m_h_eff_shifter->GetXaxis()->SetLabelColor(1);
-        m_h_eff_shifter->GetXaxis()->SetAxisColor(1);
-        m_h_eff_shifter->GetYaxis()->SetTitleColor(1);
-        m_h_eff_shifter->GetYaxis()->SetLabelColor(1);
-        m_h_eff_shifter->GetYaxis()->SetAxisColor(1);
-        m_c_eff_shifter_fast->SetFrameLineColor(1);
-        m_h_eff_shifter_fast->GetXaxis()->SetLabelColor(1);
-        m_h_eff_shifter_fast->GetXaxis()->SetAxisColor(1);
-        m_h_eff_shifter_fast->GetYaxis()->SetTitleColor(1);
-        m_h_eff_shifter_fast->GetYaxis()->SetLabelColor(1);
-        m_h_eff_shifter_fast->GetYaxis()->SetAxisColor(1);
-      } else {
-        m_c_eff_shifter->SetFillColor(kGreen);
-        m_c_eff_shifter->SetFrameFillColor(10);
-        m_c_eff_shifter_fast->SetFillColor(kGreen);
-        m_c_eff_shifter_fast->SetFrameFillColor(10);
-      }
+      ) {error_check = 1;}
+    }
+
+    if (error_check == 1) {
+      m_c_eff_shifter->SetFillColor(2);
+      m_c_eff_shifter_fast->SetFillColor(2);
+      m_c_eff_shifter->SetFrameFillColor(10);
+      m_c_eff_shifter_fast->SetFrameFillColor(10);
+      m_h_eff_shifter->SetTitle("Call TRG expert: bad efficiency");
+      m_h_eff_shifter_fast->SetTitle("Call TRG expert: bad efficiency");
+      m_c_eff_shifter->SetFrameLineColor(1);
+      m_h_eff_shifter->GetXaxis()->SetLabelColor(1);
+      m_h_eff_shifter->GetXaxis()->SetAxisColor(1);
+      m_h_eff_shifter->GetYaxis()->SetTitleColor(1);
+      m_h_eff_shifter->GetYaxis()->SetLabelColor(1);
+      m_h_eff_shifter->GetYaxis()->SetAxisColor(1);
+      m_c_eff_shifter_fast->SetFrameLineColor(1);
+      m_h_eff_shifter_fast->GetXaxis()->SetLabelColor(1);
+      m_h_eff_shifter_fast->GetXaxis()->SetAxisColor(1);
+      m_h_eff_shifter_fast->GetYaxis()->SetTitleColor(1);
+      m_h_eff_shifter_fast->GetYaxis()->SetLabelColor(1);
+      m_h_eff_shifter_fast->GetYaxis()->SetAxisColor(1);
+    } else {
+      m_c_eff_shifter->SetFillColor(kGreen);
+      m_c_eff_shifter->SetFrameFillColor(10);
+      m_c_eff_shifter_fast->SetFillColor(kGreen);
+      m_c_eff_shifter_fast->SetFrameFillColor(10);
     }
   } else {
     m_h_eff_shifter->SetTitle("Ignore this plot during non-physic run");

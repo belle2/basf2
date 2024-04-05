@@ -115,7 +115,7 @@ namespace Belle2 {
         fY = ROOT::Math::XYZVector(1, 0, 0);
       }
       ROOT::Math::Rotation3D transform;
-      // transform.RotateAxes(fX, fY, fZ); TODO
+      transform.SetComponents(fX, fY, fZ);
       transform.Invert();
       return transform;
     }
@@ -138,7 +138,7 @@ namespace Belle2 {
         fY = ROOT::Math::XYZVector(1, 0, 0);
       }
       ROOT::Math::Rotation3D transform;
-      // transform.RotateAxes(fX, fY, fZ); TODO
+      transform.SetComponents(fX, fY, fZ);
       return transform;
     }
 

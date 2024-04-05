@@ -401,7 +401,7 @@ namespace Belle2 {
     void YScanner::projectPixel(double yc, double size, int k, double dydz, PixelProjection proj[2]) const
     {
       double halfSize = (k - m_prism.k0) % 2 == 0 ? size / 2 : -size / 2;
-      double ypix[2] =  {yc - halfSize, yc + halfSize}; // pixel edges in y
+      const double ypix[2] =  {yc - halfSize, yc + halfSize}; // pixel edges in y
       double yproj[2][2] = {{0}}; // pixel projections to prism entrance window (second index corresponds to pixel edges)
 
       const auto& win = m_prism.unfoldedWindows[k];

@@ -388,9 +388,9 @@ namespace Belle2 {
       sprintf(mnodestr, "tracking/shift/run[@id=\"%d\"]", m_runno);
       if (content.exists(mnodestr)) {
         GearDir runtrackingshift(content, mnodestr);
-        trackingshift.SetX(runtrackingshift.getLength("x"));
-        trackingshift.SetY(runtrackingshift.getLength("y"));
-        trackingshift.SetZ(runtrackingshift.getLength("z"));
+        trackingshift.SetXYZ(runtrackingshift.getLength("x"),
+                             runtrackingshift.getLength("y"),
+                             runtrackingshift.getLength("z"));
       }
       m_arichbtgp->setTrackingShift(trackingshift);
       ARICHTracking* m_mwpc = new ARICHTracking[4];

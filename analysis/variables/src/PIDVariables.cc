@@ -35,6 +35,9 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
+    // local declaration as there is not header file
+    double eclClusterEoP(const Particle* part);
+    double eclPulseShapeDiscriminationMVA(const Particle* part);
 
 
     //*************
@@ -438,6 +441,15 @@ namespace Belle2 {
       inputsAllNames.push_back("cosTheta");
       inputsAllNames.push_back("phi");
       inputsAllNames.push_back("charge");
+      inputsAllNames.push_back("clusterEoP");
+      inputsAllNames.push_back("clusterE1E9");
+      inputsAllNames.push_back("clusterE9E21");
+      inputsAllNames.push_back("clusterLAT");
+      inputsAllNames.push_back("clusterAbsZernikeMoment40");
+      inputsAllNames.push_back("clusterAbsZernikeMoment51");
+      inputsAllNames.push_back("clusterZernikeMVA");
+      inputsAllNames.push_back("clusterDeltaLTemp");
+      inputsAllNames.push_back("clusterPulseShapeDiscriminationMVA");
       const size_t inputsAllSize = inputsAllNames.size();
 
       //build mapping for neural-network inputs
@@ -494,6 +506,24 @@ namespace Belle2 {
         inputsAll.push_back(cos(mom.Theta()));
         inputsAll.push_back(mom.Phi());
         inputsAll.push_back(part->getCharge());
+
+        const ECLCluster* cluster = part->getECLCluster();
+        if (cluster)
+        {
+          inputsAll.push_back(eclClusterEoP(part));
+          inputsAll.push_back(cluster->getE1oE9());
+          inputsAll.push_back(cluster->getE9oE21());
+          inputsAll.push_back(cluster->getLAT());
+          inputsAll.push_back(cluster->getAbsZernike40());
+          inputsAll.push_back(cluster->getAbsZernike51());
+          inputsAll.push_back(cluster->getZernikeMVA());
+          inputsAll.push_back(cluster->getDeltaL());
+          inputsAll.push_back(eclPulseShapeDiscriminationMVA(part));
+        } else   // fill NaNs if not cluster information exists
+        {
+          for (size_t i = 0; i < 9; ++i) inputsAll.push_back(Const::doubleNaN);
+        }
+
 
         // collect only those inputs needed for the neural network in the correct order
         std::vector<float> inputsNN;

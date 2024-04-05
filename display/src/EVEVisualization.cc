@@ -1772,8 +1772,8 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   ROOT::Math::XYZVector  centerPos3D =  hit->getPosition();
 
   ROOT::Math::RotationZ rotZ(fi);
-  ROOT::Math::XYZVector channelX(1, 0, 0);//    channelX.RotateZ(fi);
-  ROOT::Math::XYZVector channelY(0, 1, 0);//    channelY.RotateZ(fi);
+  ROOT::Math::XYZVector channelX(1, 0, 0);
+  ROOT::Math::XYZVector channelY(0, 1, 0);
   channelX = rotZ * channelX;
   channelY = rotZ * channelY;
 

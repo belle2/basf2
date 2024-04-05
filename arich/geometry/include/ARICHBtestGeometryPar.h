@@ -168,13 +168,13 @@ namespace Belle2 {
     //! Pointer to the tracking chambers
     ARICHTracking* m_mwpc;
     //! Global offset
-    ROOT::Math::XYZVector       m_offset;
+    ROOT::Math::XYZVector   m_offset;
     //! Tracking shift
-    ROOT::Math::XYZVector       m_trackingShift;
+    ROOT::Math::XYZVector   m_trackingShift;
     //! rotation center of the Aerogel RICH frame
-    ROOT::Math::XYZVector       m_rotationCenter;
+    ROOT::Math::XYZVector   m_rotationCenter;
     //! rotation matrix of the Aerogel RICH frame
-    ROOT::Math::Rotation3D      m_frameRotation;
+    ROOT::Math::Rotation3D  m_frameRotation;
     //! flag for the reconstruction by using the average aerogel refractive index
     bool           m_averageAgel;
     //! the position of the HAPD channels

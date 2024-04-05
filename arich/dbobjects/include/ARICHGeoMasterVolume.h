@@ -81,7 +81,7 @@ namespace Belle2 {
      * Get position of ARICH master volume center point in global Belle II coordinates
      * @return center point of ARICH volume
      */
-    ROOT::Math::XYZVector  getPosition() const {return ROOT::Math::XYZVector(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
+    ROOT::Math::XYZVector getPosition() const {return ROOT::Math::XYZVector(m_x / s_unit, m_y / s_unit, m_z / s_unit);}
 
     /**
      * Get rotation matrix of ARICH master volume in global Belle II coordinates
@@ -139,10 +139,10 @@ namespace Belle2 {
      */
     const std::string& getMaterial() const {return m_material;}
 
-    ROOT::Math::XYZVector  pointToGlobal(const ROOT::Math::XYZVector& point) const;
-    ROOT::Math::XYZVector  momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
-    ROOT::Math::XYZVector  pointToLocal(const ROOT::Math::XYZVector& point) const;
-    ROOT::Math::XYZVector  momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
+    ROOT::Math::XYZVector pointToGlobal(const ROOT::Math::XYZVector& point) const;
+    ROOT::Math::XYZVector momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
+    ROOT::Math::XYZVector pointToLocal(const ROOT::Math::XYZVector& point) const;
+    ROOT::Math::XYZVector momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
 
 
   private:

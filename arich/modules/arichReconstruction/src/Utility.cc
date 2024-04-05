@@ -101,7 +101,7 @@ namespace Belle2 {
     {
       // Description: Calculates the base vectors of the track system
       // Output:
-      ROOT::Math::XYZVector  fX, fY, fZ;// base vectors
+      ROOT::Math::XYZVector fX, fY, fZ;// base vectors
 
       double ss = 1 - r.Y() * r.Y();
       if (ss > 0) {
@@ -124,7 +124,7 @@ namespace Belle2 {
     {
       // Description: Calculates the base vectors of the track system
       // Output:
-      ROOT::Math::XYZVector  fX, fY, fZ;// base vectors
+      ROOT::Math::XYZVector fX, fY, fZ;// base vectors
 
       double ss = 1 - r.Y() * r.Y();
       if (ss > 0) {

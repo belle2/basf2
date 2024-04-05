@@ -20,7 +20,7 @@ from ROOT import Belle2
 import stdPhotons
 from variables import variables as vm
 
-from grafei.modules.LCASaverModule import lcaSaver
+from grafei import lcaSaver
 
 
 def _get_args():

@@ -7,10 +7,11 @@
 ##########################################################################
 
 
-__all__ = ["graFEI"]
+__all__ = ["graFEI", "lcaSaver"]
 
 
 from grafei.modules.GraFEIModule import GraFEIModule
+from grafei.modules.LCASaverModule import LCASaverModule
 
 
 def graFEI(
@@ -52,6 +53,34 @@ def graFEI(
         payload_model_name=payload_model_name,
     )
     path.add_module(graFEI)
+
+
+def lcaSaver(
+    particle_lists,
+    features,
+    mcparticle_list,
+    output_file,
+    path,
+):
+    """
+    Wrapper function to add the LCASaverModule to the path.
+
+    Save Lowest Common Ancestor matrix of each MC Particle in the given list.
+
+    Args:
+        particle_lists (list): Name of particle lists to save features of.
+        features (list): List of features to save for each particle.
+        mcparticle_list (str): Name of particle list to build LCAs from (will use as root).
+        output_file (str): Path to output file to save.
+        path (basf2.Path): Module is added to this path.
+    """
+    root_saver_module = LCASaverModule(
+        particle_lists=particle_lists,
+        features=features,
+        mcparticle_list=mcparticle_list,
+        output_file=output_file,
+    )
+    path.add_module(root_saver_module)
 
 
 print(r"""

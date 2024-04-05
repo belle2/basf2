@@ -72,7 +72,7 @@ Applying the model to data
 The model ``.yaml`` and ``.pt`` output files can be saved to a payload with the script ``grafei/scripts/save_model_to_payload.py`` 
 and uploaded to a global tag in order to run on the grid.
 
-Finally, the model can be included in a steering file via the `grafei <grafei.graFEI>` wrapper, 
+Finally, the model can be included in a steering file via the `graFEI <grafei.graFEI>` wrapper function, 
 in order to apply the model to Belle II data and MC.
 Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI``.
 In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI_`` can be added.
@@ -183,14 +183,15 @@ Code documentation
 
 This section describes the grafei code.
 
-Core module
-***********
+Core modules
+************
 
-You can import the core GraFEI module in a steering file with ``from grafei import graFEI``. 
-This is a wrapper function that internally calls the GraFEIModule and add it the the basf2 path.
+If you want to use a custom steering file to create training data, you can import the `LCASaverModule <LCASaverModule.LCASaverModule>` with ``from grafei import lcaSaver``. 
+You can import the core `GraFEIModule <GraFEIModule.GraFEIModule>` in a steering file with ``from grafei import graFEI``. 
+These are wrapper functions that internally call the modules and add them to the basf2 path.
 
 .. automodule:: grafei
-   :members: graFEI
+   :members: graFEI, lcaSaver
 
 
 Other modules and functions
@@ -248,3 +249,7 @@ users usually do not need to manipulate these components.
 .. automodule:: grafei.modules.LCASaverModule
    :members:
    :exclude-members: event, initialize, terminate, features, mcparticle_list, output_file, particle_lists
+
+.. automodule:: grafei.modules.GraFEIModule
+   :members:
+   :exclude-members: cfg_path, event, gpu, initialize, param_file, particle_list, payload_config_name, payload_model_name, sig_side_lcas, sig_side_masses

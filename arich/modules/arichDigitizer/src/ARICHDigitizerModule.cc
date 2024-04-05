@@ -192,19 +192,14 @@ namespace Belle2 {
     double z = m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness();
     hitGlob.SetXY(r * std::cos(phi), r * std::sin(phi));
     ROOT::Math::XYVector shift = hit;
-    // anonymous function to rotate a 2D vector by an angle
-    auto rotate = [](const ROOT::Math::XYVector & aVector, const double angle) {
-      const double newX = aVector.X() * std::cos(angle) - aVector.Y() * std::sin(angle);
-      const double newY = aVector.X() * std::sin(angle) + aVector.Y() * std::cos(angle);
-      return ROOT::Math::XYVector(newX, newY);
-    };
-    hitGlob += rotate(shift, phi);
+    shift.Rotate(phi);
+    hitGlob += shift;
     ROOT::Math::XYZVector Bfield = BFieldManager::getField(m_geoPar->getMasterVolume().pointToGlobal(ROOT::Math::XYZVector(hitGlob.X(),
                                                            hitGlob.Y(), z)));
     double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
     shift.SetX(cc * Bfield.X());
     shift.SetY(cc * Bfield.Y());
-    shift = rotate(shift, -phi);
+    shift.Rotate(phi);
     hit.SetX(hit.X() + shift.X());
     hit.SetY(hit.Y() + shift.Y());
   }

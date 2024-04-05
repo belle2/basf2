@@ -111,9 +111,7 @@ namespace Belle2 {
     ROOT::Math::XYVector a2(a);
     double phi = m_arichgp->getDetectorPlane().getSlotPhi(copyno);
     ROOT::Math::XYVector diff = a2 - origin;
-    const double newX = diff.X() * std::cos(-phi) - diff.Y() * sin(-phi);
-    const double newY = diff.Y() * std::sin(-phi) + diff.Y() * cos(-phi);
-    diff.SetXY(newX, newY);
+    diff.Rotate(-phi);
     const double size = m_arichgp->getHAPDGeometry().getAPDSizeX();
     if (fabs(diff.X()) < size / 2. && fabs(diff.Y()) < size / 2.) {
       int chX, chY;

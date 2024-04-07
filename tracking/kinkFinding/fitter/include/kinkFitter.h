@@ -108,12 +108,36 @@ namespace Belle2 {
                                             double& timeSeed);
 
     /**
+     * Refit the daughter track blocking hits if required.
+     * @param recoTrack recoTrack to refit
+     * @param momentumSeed momentum seed
+     * @param positionSeed position seed
+     * @param timeSeed time seed
+     * @param block block the hits in the first stereo layer and all before
+     * @param useAnotherFitter use ordinary KalmanFilter
+     * @return
+     */
+    RecoTrack* copyRecoTrackForRefit(RecoTrack* recoTrack,
+                                     ROOT::Math::XYZVector& momentumSeed,
+                                     ROOT::Math::XYZVector positionSeed,
+                                     double& timeSeed,
+                                     bool block, bool useAnotherFitter);
+
+    /**
+     * check if the refit of filter 6 daughter tracks improves the distance between mother and daughter
+     * @param recoTrackDaughterRefit refitted daughter recoTrack
+     * @param motherPosLast position of the mother state at last hit
+     * @return
+     */
+    bool isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, TVector3& motherPosLast);
+
+    /**
      * Fit kink vertex using RecoTrack's as inputs.
      * Return true (false) if the vertex fit has done well (failed).
      * If the vertex is inside one of the RecoTracks, bits in reassignHitStatus are set.
      * @param recoTrackMother RecoTrack of mother
      * @param recoTrackDaughter RecoTrack of daughter
-     * @param hasInnerHitStatus store a result of this function. if the plus(minus) track has hits inside the V0 vertex position, 0x1(0x2) bit is set.
+     * @param hasInnerHitStatus store a result of this function. if the plus(minus) track has hits inside the Kink vertex position, 0x1(0x2) bit is set.
      * @param vertexPos store a result of this function. The fitted vertex position is stored.
      * @param distance store a distance between tracks at the decay vertex
      * @param vertexPosSeed a seed of the vertex position
@@ -157,7 +181,7 @@ namespace Belle2 {
     StoreArray <TrackFitResult> m_trackFitResults;  ///< TrackFitResult (output).
     StoreArray <Kink> m_kinks;  ///< Kink (output).
 
-    // variables used for output tmp (to be removed in final version)
+    // variables used for output tmp (to be removed in the final version)
     StoreArray <RecoTrack> m_motherKinkRecoTracks;
     StoreArray <RecoTrack> m_daughterKinkRecoTracks;
 

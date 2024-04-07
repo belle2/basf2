@@ -27,9 +27,9 @@ KinkFinderModule::KinkFinderModule() : Module()
                  "fitting a vertex for each pair. "
                  "Depending on the outcome of each fit, a corresponding "
                  "Belle2::Kink is stored or not.\n\n"
-                 "A loose cut on the pair vertex is applied before the fit (not considering material effects); "
+                 "A loose cut on the pair is applied before the fit; "
                  "then, a vertex fit is performed, and only pairs passing a chi^2 (``vertexChi2Cut``) "
-                 "and distance (``m_vertexDistanceCut``) "
+                 "and distance (``vertexDistanceCut``) "
                  "are stored as Belle2::Kink.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -68,13 +68,13 @@ KinkFinderModule::KinkFinderModule() : Module()
   addParam("precutDistance", m_precutDistance, "Preselection cut on distance between ending points of two tracks. ",
            10.);
   addParam("precutDistance2D", m_precutDistance2D,
-           "Preselection cut on 2D distance between ending points of two tracks (for bad z cases). ", 5.);
+           "Preselection cut on 2D distance between ending points of two tracks (for bad z cases). ", 10.);
 
   // final cuts used in kinkFitter to decide if the kink candidate should be stored
   addParam("vertexChi2Cut", m_vertexChi2Cut,
            "Cut on Chi2 for the Kink vertex. ", 10000.);
   addParam("vertexDistanceCut", m_vertexDistanceCut,
-           "Cut on distance between tracks at the Kink vertex. ", 1.);
+           "Cut on distance between tracks at the Kink vertex. ", 2.);
 
 }
 
@@ -119,10 +119,33 @@ void KinkFinderModule::event()
     }
   }
 
-  // Reject boring events.
+  // Try to find kink among mother candidates and reject boring events.
   if (tracksMother.empty() || tracksDaughter.empty()) {
-    B2INFO("No interesting track pairs. tracksMother " << tracksMother.size() << ", tracksDaughter "
-           << tracksDaughter.size());
+
+    // Try to find kink among mother candidates.
+    bool foundAmongMothersFlag = false;
+    if (tracksDaughter.empty() && tracksMother.size() > 1) {
+      for (auto itTrackMother = tracksMother.begin(); itTrackMother != tracksMother.end(); ++itTrackMother) {
+        for (auto itTrackMother2 = std::next(itTrackMother); itTrackMother2 != tracksMother.end(); ++itTrackMother2) {
+
+          short filterFlag = isTrackPairSelected(*itTrackMother, *itTrackMother2);
+          if (filterFlag != 2) continue;
+          B2DEBUG(29, "Found kink candidate among mothers with filterFlag " << filterFlag);
+          foundAmongMothersFlag = true;
+          // Particle with large momentum (smaller curvature) should be mother.
+          if ((*itTrackMother)->getTrackFitResultWithClosestMass(Const::pion)->getOmega() <
+              (*itTrackMother2)->getTrackFitResultWithClosestMass(Const::pion)->getOmega())
+            fitAndStore(*itTrackMother, *itTrackMother2, filterFlag);
+          else
+            fitAndStore(*itTrackMother2, *itTrackMother, filterFlag);
+        }
+      }
+    }
+    // Reject boring events.
+    if (!foundAmongMothersFlag) {
+      B2DEBUG(29, "No interesting track pairs. tracksMother " << tracksMother.size() << ", tracksDaughter "
+              << tracksDaughter.size());
+    }
     return;
   }
 
@@ -131,7 +154,7 @@ void KinkFinderModule::event()
     for (auto& trackDaughter : tracksDaughter) {
       short filterFlag = isTrackPairSelected(trackMother, trackDaughter);
       if (!filterFlag) continue;
-      B2INFO("Found kink candidate with filterFlag " << filterFlag);
+      B2DEBUG(29, "Found kink candidate with filterFlag " << filterFlag);
       fitAndStore(trackMother, trackDaughter, filterFlag);
     }
   }
@@ -144,7 +167,7 @@ void KinkFinderModule::terminate()
   B2INFO("===KinkFinder summary===========================================================");
   B2INFO("In total " << m_allStored << " kinks saved.");
   B2INFO("Among them with filter1 " << m_f1Stored << ", f2 " << m_f2Stored << ", f3 " << m_f3Stored << ", f4 "
-         << m_f4Stored);
+         << m_f4Stored << ", f5 " << m_f5Stored << ", f6 " << m_f6Stored);
 }
 
 /// Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall.
@@ -214,7 +237,7 @@ bool KinkFinderModule::preFilterDaughterTracks(RecoTrack const* const recoTrack)
 
 }
 
-/// Track pair preselection based on distance between two tracks with four different options.
+/// Track pair preselection based on distance between two tracks with six different options.
 short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Track* daughterTrack)
 {
 
@@ -234,7 +257,9 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
 
   // Filter 3 check. Here the same direction of daughter and mother is checked to exclude intersection of tracks
   // from different hemispheres.
-  if (daughterPosLast.Angle(motherPosLast) < M_PI / 6 || daughterPosFirst.Angle(motherPosLast) < M_PI / 6) {
+  if (daughterPosLast.Angle(motherPosLast) < M_PI / 6 || daughterPosFirst.Angle(motherPosLast) < M_PI / 6 ||
+      daughterPosLast.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6
+      || daughterPosFirst.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6) {
 
     TVector3 daughterPosClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
     TVector3 daughterMomClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom();
@@ -254,10 +279,35 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
       return 3;
   }
 
-  // Filter 4 check. TODO: try to extend to any place in CDC, not only near VXD
-  if ((motherRecoTrack->getNumberOfCDCHits()) < 10 &&
-      ((daughterPosFirst.XYvector() - motherPosLast.XYvector()).Mod() < m_precutDistance2D))
+  // Filter 4 check.
+  if ((daughterPosFirst.XYvector() - motherPosLast.XYvector()).Mod() < m_precutDistance2D)
     return 4;
+
+  // Filter 5 check.
+  if ((daughterPosLast.XYvector() - motherPosLast.XYvector()).Mod() < m_precutDistance2D)
+    return 5;
+
+  // Filter 6 check. sHere the same direction of daughter and mother is checked to exclude intersection of tracks
+  // from different hemispheres.
+  if (daughterPosLast.Angle(motherPosLast) < M_PI / 6 || daughterPosFirst.Angle(motherPosLast) < M_PI / 6 ||
+      daughterPosLast.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6
+      || daughterPosFirst.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6) {
+
+    TVector3 daughterPosClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
+    TVector3 daughterMomClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom();
+    const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
+                                                      daughterPosClosestToMotherPosLast.Y(),
+                                                      daughterPosClosestToMotherPosLast.Z()}).Z();
+    // daughter Helix with move to mother last point
+    Helix daughterHelixClosestToMotherPosLast(ROOT::Math::XYZVector(daughterPosClosestToMotherPosLast),
+                                              ROOT::Math::XYZVector(daughterMomClosestToMotherPosLast),
+                                              static_cast<short>(daughterRecoTrack->getTrackFitStatus()->getCharge()),
+                                              Bz);
+    daughterHelixClosestToMotherPosLast.passiveMoveBy(ROOT::Math::XYZVector(motherPosLast));
+
+    if (fabs(daughterHelixClosestToMotherPosLast.getD0()) < m_precutDistance2D)
+      return 6;
+  }
 
   // No filter is passed.
   return 0;
@@ -282,6 +332,12 @@ void KinkFinderModule::fitAndStore(const Track* trackMother, const Track* trackD
         break;
       case 4:
         ++m_f4Stored;
+        break;
+      case 5:
+        ++m_f5Stored;
+        break;
+      case 6:
+        ++m_f6Stored;
         break;
     }
   }

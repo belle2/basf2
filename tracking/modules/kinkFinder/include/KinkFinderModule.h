@@ -99,7 +99,12 @@ namespace Belle2 {
      * Filter 3: Distance between the daughter Helix extrapolation to last point of the mother
      * and last point of the mother < m_precutDistance (lost layers for daughter, second largest contribution).
      * Filter 4: 2D distance between first point of the daughter and last point of the mother < m_precutDistance2D
-     * if the mother has less than 10 CDC hits (bad daughter resolution recovered by hit reassignment).
+     * (bad daughter resolution recovered by hit reassignment).
+     * Filter 5: 2D distance between last point of the daughter and last point of the mother < m_precutDistance2D
+     * (bad daughter resolution and wrong daughter sign, almost no events).
+     * Filter 6: Distance between the daughter Helix extrapolation to last point of the mother
+     * and last point of the mother < m_precutDistance2D
+     * (lost layers for daughter combined with bad daughter resolution).
      * @param motherTrack mother track
      * @param daughterTrack daughter track
      * @return flag of the satisfied preselection criteria, or 0 otherwise.
@@ -120,5 +125,7 @@ namespace Belle2 {
     int m_f2Stored = 0;    ///< counter for filter 2 saved Kinks
     int m_f3Stored = 0;    ///< counter for filter 3 saved Kinks
     int m_f4Stored = 0;    ///< counter for filter 4 saved Kinks
+    int m_f5Stored = 0;    ///< counter for filter 5 saved Kinks
+    int m_f6Stored = 0;    ///< counter for filter 6 saved Kinks
   };
 }

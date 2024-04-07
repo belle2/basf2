@@ -70,7 +70,7 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
   m_daughterKinkRecoTracks.registerInDataStore("daughterKinkRecoTracks", DataStore::c_ErrorIfAlreadyRegistered);
   RecoTrack::registerRequiredRelations(m_daughterKinkRecoTracks);
   m_daughterKinkRecoTracks.registerRelationTo(m_recoTracks);
-
+  m_daughterKinkRecoTracks.registerRelationTo(m_copiedRecoTracks);
 
 
   B2ASSERT("Material effects not set up.  Please use SetupGenfitExtrapolationModule.",
@@ -81,7 +81,7 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
 
 void kinkFitter::setFitterMode(int fitterMode)
 {
-  if (not(0 <= fitterMode && fitterMode <= 5)) {
+  if (not(0 <= fitterMode && fitterMode <= 3)) {
     B2FATAL("Invalid fitter mode!");
   } else {
     m_kinkFitterMode = fitterMode;
@@ -155,6 +155,7 @@ int kinkFitter::findHitPositionForReassignment(RecoTrack* recoTrack,
   if (direction > 0) {
     for (int ri = 0; ri < static_cast<int>(cdcHits.size()); ++ri) {
       auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[ri]);
+      if (!recoHitInfo->useInFit()) continue;
       try {
         const genfit::MeasuredStateOnPlane& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInfo);
         const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - vertexPos).Mag2();
@@ -165,6 +166,9 @@ int kinkFitter::findHitPositionForReassignment(RecoTrack* recoTrack,
         }
         // if cannot find minimum in 3 iterations, stop searching
         if (ri - minimalIndex > 3) break;
+      } catch (const NoTrackFitResult& exception) {
+        B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+        continue;
       } catch (const genfit::Exception& exception) {
         B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
         continue;
@@ -177,6 +181,7 @@ int kinkFitter::findHitPositionForReassignment(RecoTrack* recoTrack,
   } else {
     for (int ri = cdcHits.size()  - 1; ri >= 0; --ri) {
       auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[ri]);
+      if (!recoHitInfo->useInFit()) continue;
       try {
         const genfit::MeasuredStateOnPlane& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInfo);
         const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - vertexPos).Mag2();
@@ -187,6 +192,9 @@ int kinkFitter::findHitPositionForReassignment(RecoTrack* recoTrack,
         }
         // if cannot find minimum in 3 iterations, stop searching
         if (minimalIndex - ri > 3) break;
+      } catch (const NoTrackFitResult& exception) {
+        B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
+        continue;
       } catch (const genfit::Exception& exception) {
         B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
         continue;
@@ -263,6 +271,7 @@ RecoTrack* kinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
     sortingParameterOffset = recoTrack->getNumberOfTotalHits();
     for (size_t di = 0; di < static_cast<unsigned int>(deltaDaughter); ++di) {
       auto recoHitInfo = daughterRecoTrack->getRecoHitInformation(daughterCDCHit[di]);
+      /*if (!recoHitInfo->useInFit()) recoHitInfo->setUseInFit(true);*/
       recoTrack->addCDCHit(daughterCDCHit[di],
                            recoHitInfo->getSortingParameter() + sortingParameterOffset,
                            recoHitInfo->getRightLeftInformation(),
@@ -336,7 +345,7 @@ bool kinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, Re
   trackFitter.fit(*recoTrackDaughterRefit);
 
   if (!recoTrackMotherRefit->wasFitSuccessful() || !recoTrackDaughterRefit->wasFitSuccessful()) {
-    B2INFO("Fit failed ");
+    B2DEBUG(29, "Refit of the tracks with reassigned hits failed ");
     return false;
   }
 
@@ -369,7 +378,7 @@ RecoTrack* kinkFitter::copyRecoTrackForFlipAndRefit(RecoTrack* recoTrack,
   // fitter initialization
   TrackFitter trackFitter;
 
-  // DAF fitter usually bad with flipped tracks, so kalmanFitter is used instead
+  // DAF fitter usually works badly with flipped tracks, so kalmanFitter is used instead
   std::shared_ptr<genfit::KalmanFitterRefTrack> kalmanFitter = std::make_shared<genfit::KalmanFitterRefTrack>();
   kalmanFitter->setMinIterations(static_cast<unsigned int>(3));
   kalmanFitter->setMaxIterations(static_cast<unsigned int>(10));
@@ -377,6 +386,7 @@ RecoTrack* kinkFitter::copyRecoTrackForFlipAndRefit(RecoTrack* recoTrack,
 
   trackFitter.resetFitter(kalmanFitter);
 
+  // copy recoTracks to a separate StoreArray using seed information
   RecoTrack* newRecoTrack = m_copiedRecoTracks.appendNew(positionSeed,
                                                          -momentumSeed,
                                                          static_cast<short>(-recoTrack->getChargeSeed()));
@@ -384,9 +394,83 @@ RecoTrack* kinkFitter::copyRecoTrackForFlipAndRefit(RecoTrack* recoTrack,
   newRecoTrack->setSeedCovariance(recoTrack->getSeedCovariance());
   newRecoTrack->addHitsFromRecoTrack(recoTrack, newRecoTrack->getNumberOfTotalHits(), true);
 
+  // fit the new track
   trackFitter.fit(*newRecoTrack);
 
   return newRecoTrack;
+}
+
+/// Refit the daughter track blocking hits if required.
+RecoTrack* kinkFitter::copyRecoTrackForRefit(RecoTrack* recoTrack,
+                                             ROOT::Math::XYZVector& momentumSeed,
+                                             ROOT::Math::XYZVector positionSeed,
+                                             double& timeSeed,
+                                             bool block = false, bool useAnotherFitter = false)
+{
+
+  // fitter initialization
+  TrackFitter trackFitter;
+
+  // if true, set ordinary KalmanFilter (for filter 6 it performs better than DAF)
+  if (useAnotherFitter) {
+    std::shared_ptr<genfit::KalmanFitterRefTrack> kalmanFitter = std::make_shared<genfit::KalmanFitterRefTrack>();
+    kalmanFitter->setMinIterations(static_cast<unsigned int>(3));
+    kalmanFitter->setMaxIterations(static_cast<unsigned int>(10));
+    kalmanFitter->setMaxFailedHits(static_cast<unsigned int>(5));
+
+    trackFitter.resetFitter(kalmanFitter);
+  }
+
+  // copy recoTracks to a separate StoreArray using seed information
+  RecoTrack* newRecoTrack = m_copiedRecoTracks.appendNew(positionSeed,
+                                                         momentumSeed,
+                                                         static_cast<short>(recoTrack->getChargeSeed()));
+  newRecoTrack->setTimeSeed(timeSeed);
+  newRecoTrack->setSeedCovariance(recoTrack->getSeedCovariance());
+  newRecoTrack->addHitsFromRecoTrack(recoTrack, newRecoTrack->getNumberOfTotalHits());
+
+  // block the hits in the first stereo layer and all before (leave at least 6 hits for fit)
+  // (usually, wrong assignment of first stereo layer is responsible for wrong z coordinate)
+  if (block) {
+    bool passedStereo = false;
+    auto newCDCHitRefit = newRecoTrack->getSortedCDCHitList();
+    int di = 0;
+    for (; di < static_cast<int>(newCDCHitRefit.size()) - 6; ++di) {
+      if (!passedStereo && (newCDCHitRefit[di]->getISuperLayer() % 2 != 0))
+        passedStereo = true;
+      if (passedStereo && (newCDCHitRefit[di]->getISuperLayer() % 2 == 0))
+        break;
+      auto recoHitInfo = newRecoTrack->getRecoHitInformation(newCDCHitRefit[di]);
+      recoHitInfo->setUseInFit(false);
+    }
+    B2DEBUG(29, "Blocked hits for refit: " << di);
+  }
+
+  // fit the new track
+  trackFitter.fit(*newRecoTrack);
+
+  return newRecoTrack;
+}
+
+/// check if the refit of filter 6 daughter tracks improves the distance between mother and daughter
+bool kinkFitter::isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, TVector3& motherPosLast)
+{
+  // get the values near the mother last point
+  TVector3 daughterPosClosestToMotherPosLast = recoTrackDaughterRefit->getMeasuredStateOnPlaneFromFirstHit().getPos();
+  TVector3 daughterMomClosestToMotherPosLast = recoTrackDaughterRefit->getMeasuredStateOnPlaneFromFirstHit().getMom();
+  const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
+                                                    daughterPosClosestToMotherPosLast.Y(),
+                                                    daughterPosClosestToMotherPosLast.Z()}).Z();
+  // daughter Helix with move to mother last point
+  Helix daughterHelixClosestToMotherPosLast(ROOT::Math::XYZVector(daughterPosClosestToMotherPosLast),
+                                            ROOT::Math::XYZVector(daughterMomClosestToMotherPosLast),
+                                            static_cast<short>(recoTrackDaughterRefit->getTrackFitStatus()->getCharge()),
+                                            Bz);
+  daughterHelixClosestToMotherPosLast.passiveMoveBy(ROOT::Math::XYZVector(motherPosLast));
+
+  // check if the 3D distance passes loose criteria (in default fit this test is failed)
+  return (sqrt(daughterHelixClosestToMotherPosLast.getD0() * daughterHelixClosestToMotherPosLast.getD0() +
+               daughterHelixClosestToMotherPosLast.getZ0() * daughterHelixClosestToMotherPosLast.getZ0()) < 10);
 }
 
 /// Fit and store kink.
@@ -395,35 +479,158 @@ RecoTrack* kinkFitter::copyRecoTrackForFlipAndRefit(RecoTrack* recoTrack,
 bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag)
 {
 
-  //if (filterFlag != 2) return false;
-
   // Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
 
+  // temporary StoreArrays for studies (to be removed)
+  RecoTrack* motherKinkRecoTrack = recoTrackMother->copyToStoreArray(m_motherKinkRecoTracks);
+  motherKinkRecoTrack->addHitsFromRecoTrack(recoTrackMother, motherKinkRecoTrack->getNumberOfTotalHits());
+  motherKinkRecoTrack->addRelationTo(recoTrackMother);
+
+  RecoTrack* daughterKinkRecoTrack = recoTrackDaughter->copyToStoreArray(m_daughterKinkRecoTracks);
+  daughterKinkRecoTrack->addHitsFromRecoTrack(recoTrackDaughter, daughterKinkRecoTrack->getNumberOfTotalHits());
+  daughterKinkRecoTrack->addRelationTo(recoTrackDaughter);
+
+  // Tracks selected with filter from 4 to 6 are selected by 2D distance cut assuming bad z coordinate.
+  // Refit is required for such tracks in the majority of the cases.
+  // If the refit successful, use new RecoTrack for the vertex fit.
+
+  // Refit filteFlag 4 and 6, which do not require flipping.
+  bool refitBadFlag = false;
+  if (filterFlag == 4 || filterFlag == 6) {
+    B2DEBUG(29, "Try to refit filter " << filterFlag);
+
+    // initialize seeds for the refit
+    // position of the last mother state and the first daughter state
+    TVector3 motherPosLast = recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos();
+    TVector3 daughterPosFirst = recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getPos();
+    // use mother last state time as a seed for the daughter track
+    double timeSeedDaughterRefit = recoTrackMother->getCardinalRepresentation()->getTime(
+                                     recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
+    // use fitted state at the first hit for a momentum seed
+    ROOT::Math::XYZVector momSeedDaughterRefit(recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getMom());
+
+    // initialize refit conditions
+    // remove hits until the first stereo layer is passed
+    bool blockHits = false;
+    if (filterFlag == 4) blockHits = true;
+    // use ordinary KalmanFilter
+    bool anotherFitter = false;
+    if (filterFlag == 6) anotherFitter = true;
+
+    // create a copy of the daughter track and refit it
+    RecoTrack* recoTrackDaughterRefit = copyRecoTrackForRefit(recoTrackDaughter,
+                                                              momSeedDaughterRefit,
+                                                              ROOT::Math::XYZVector(motherPosLast),
+                                                              timeSeedDaughterRefit, blockHits, anotherFitter);
+
+    // if the new track fit is successful, and in addition, the distance for the filter 6 is improved,
+    // use it for the vertex fit
+    if (recoTrackDaughterRefit->wasFitSuccessful()) {
+      if (filterFlag == 4 ||
+          (filterFlag == 6 && isRefitImproveFilter6(recoTrackDaughterRefit, motherPosLast)))
+        recoTrackDaughter = recoTrackDaughterRefit;
+      B2DEBUG(29, "Refit successful");
+      refitBadFlag = true;
+    }
+  }
+
+  // Flip and refit filter 5.
+  if ((m_kinkFitterMode == 2 || m_kinkFitterMode == 3) && (filterFlag == 5)) {
+    B2DEBUG(29, "Try to flip and refit filter " << filterFlag);
+
+    // initialize seeds for the refit
+    // use position of the last mother state as a seed for the daughter track
+    ROOT::Math::XYZVector motherPosLastXYZ = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
+    // use mother last state time as a seed for the daughter track
+    double timeSeedDaughterFlipAndRefit = recoTrackMother->getCardinalRepresentation()->getTime(
+                                            recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
+    // use fitted state at the last hit for a momentum seed
+    ROOT::Math::XYZVector momSeedDaughterFlipAndRefit(recoTrackDaughter->getMeasuredStateOnPlaneFromLastHit().getMom());
+
+    // create a copy of the daughter track, flipped and refitted
+    RecoTrack* recoTrackDaughterFlipAndRefit = copyRecoTrackForFlipAndRefit(recoTrackDaughter,
+                                               motherPosLastXYZ, momSeedDaughterFlipAndRefit,
+                                               timeSeedDaughterFlipAndRefit);
+
+    // if the new track fit is successful, use it for the vertex fit
+    if (recoTrackDaughterFlipAndRefit->wasFitSuccessful()) {
+      recoTrackDaughter = recoTrackDaughterFlipAndRefit;
+      B2DEBUG(29, "Flip and refit successful");
+    }
+  }
+
   // fitted vertex position
-  ROOT::Math::XYZVector vertexPos(0, 0, 0);
+  ROOT::Math::XYZVector vertexPos = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
 
   // flag to reassign hits, final hit to reassign, and distance at the fitted vertex
   unsigned int reassignHitStatus = 0;
   int finalHitPositionForReassignment = 0;
-  double distanceAtVertex = 0;
+  double distanceAtVertex = 10000;
 
-  // Try kink vertex fit. If the fit fails, return false.
+  // Try kink vertex fit. If the fit fails, return false immediately for all except filter 1 and 3.
+  bool failedFitFlag = false;
   if (!vertexFitWithRecoTracks(recoTrackMother, recoTrackDaughter, reassignHitStatus, vertexPos, distanceAtVertex,
                                ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos())))
+    failedFitFlag = true;
+
+  if (failedFitFlag && (filterFlag != 1 && filterFlag != 3))
     return false;
 
+  // If the fit fails for filter 1, try to refit daughter track blocking the first stereo superlayer.
+  if (failedFitFlag && filterFlag == 1) {
+    B2DEBUG(29, "Try to refit filter " << filterFlag);
+
+    // initialize seeds for the refit
+    // position of the last mother state and the first daughter state
+    TVector3 motherPosLast = recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos();
+    TVector3 daughterPosFirst = recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getPos();
+    // use mother last state time as a seed for the daughter track
+    double timeSeedDaughterRefit = recoTrackMother->getCardinalRepresentation()->getTime(
+                                     recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
+    // use fitted state at the first hit for a momentum seed
+    ROOT::Math::XYZVector momSeedDaughterRefit(recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getMom());
+
+    // initialize refit conditions
+    // remove hits until the first stereo layer is passed
+    bool blockHits = true;
+    // do not use ordinary KalmanFilter
+    bool anotherFitter = false;
+
+    // create a copy of the daughter track and refit it
+    RecoTrack* recoTrackDaughterRefit = copyRecoTrackForRefit(recoTrackDaughter,
+                                                              momSeedDaughterRefit,
+                                                              ROOT::Math::XYZVector(motherPosLast),
+                                                              timeSeedDaughterRefit, blockHits, anotherFitter);
+
+    // if the new track fit is successful, and in addition, the vertex fit is successful,
+    // use a new fit and proceed. Otherwise, return false.
+    if (recoTrackDaughterRefit->wasFitSuccessful() &&
+        vertexFitWithRecoTracks(recoTrackMother, recoTrackDaughterRefit, reassignHitStatus, vertexPos, distanceAtVertex,
+                                ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos()))) {
+      recoTrackDaughter = recoTrackDaughterRefit;
+      B2DEBUG(29, "Refit successful");
+      refitBadFlag = true;
+    } else return false;
+  }
+
+  // If the filter 4 or 1 (if required) was refitted successfully, reassignHitStatus may not be assigned due to blocked hits.
+  // In this case, reassignment from daughter to mother is required, so we set it manually.
+  if ((filterFlag == 4 || (failedFitFlag && filterFlag == 1)) && (refitBadFlag) && (reassignHitStatus == 0))
+    reassignHitStatus |= 0x1;
+
+  // Cache the objects used in vertex fit
   // Mother and daughter States extrapolated to the fitted vertex
   genfit::MeasuredStateOnPlane stMother = m_stMotherBuffer;
   genfit::MeasuredStateOnPlane stDaughter = m_stDaughterBuffer;
-
   // recoTracks used to fit the vertex
   m_motherKinkRecoTrackCache = recoTrackMother;
   m_daughterKinkRecoTrackCache = recoTrackDaughter;
 
   // if the corresponding fitterMode is used, try to reassign hits between mother and daughter tracks
   if ((m_kinkFitterMode % 2 == 1) && (filterFlag == 1 || filterFlag == 4) && (reassignHitStatus != 0)) {
+    B2DEBUG(29, "Start of the hits reassignment for filter " << filterFlag);
 
     // initialize counter for reassigning tries
     unsigned int count_reassign_tries = 0;
@@ -440,6 +647,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     // The number of tries is limited to 3
     while (reassignHitStatus != 0 && count_reassign_tries < 3) {
       ++count_reassign_tries;
+      B2DEBUG(29, "Try number " << count_reassign_tries);
 
       // find threshold hit position in the track
       // hit bellow the threshold are to be reassigned
@@ -448,14 +656,10 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       if (reassignHitStatus & 0x1) {
 
         // daughter hits to be reassigned
-        /*hitPositionForReassignment = findHitPositionForReassignment(recoTrackDaughter, vertexPosTmp, 1);*/
         hitPositionForReassignment = findHitPositionForReassignment(recoTrackDaughterBuffer, vertexPosTmp, 1);
 
         // test if the number of hits to be reassigned larger than the number of CDC hits in daughter tracks
         // minus number degree of freedom required for the fit
-        /*if (static_cast<unsigned int>(-hitPositionForReassignment + 5) >
-            recoTrackDaughter->getNumberOfCDCHits())
-            break;*/
         if (static_cast<unsigned int>(-hitPositionForReassignment + 5) >
             recoTrackDaughterBuffer->getNumberOfCDCHits())
           break;
@@ -463,20 +667,10 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       } else if (reassignHitStatus & 0x2) {
 
         // mother hits to be reassigned
-        /*hitPositionForReassignment = findHitPositionForReassignment(recoTrackMother, vertexPosTmp, -1);*/
         hitPositionForReassignment = findHitPositionForReassignment(recoTrackMotherBuffer, vertexPosTmp, -1);
 
         // test if the number of hits to be reassigned larger than the number of CDC hits in mother tracks
         // minus number degree of freedom required for the fit
-        /*if (static_cast<unsigned int>(hitPositionForReassignment + 5) > recoTrackMother->getNumberOfCDCHits()) {
-
-            // if number of SVD hits is enough for the fit, reassign all the CDC hits
-            if (recoTrackMother->getNumberOfSVDHits() > 5)
-                hitPositionForReassignment = recoTrackMother->getNumberOfCDCHits();
-            else
-                break;
-
-        }*/
         if (static_cast<unsigned int>(hitPositionForReassignment + 5) > recoTrackMotherBuffer->getNumberOfCDCHits()) {
 
           // if number of SVD hits is enough for the fit, reassign all the CDC hits
@@ -489,22 +683,11 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       }
       B2DEBUG(29, "Found hit index to reassign " << hitPositionForReassignment);
 
-      // if the found hit position is the same as at previous iteration, give up
-      /*if (hitPositionForReassignment == previousHitPositionForReassignment)
-          break;
-      previousHitPositionForReassignment = hitPositionForReassignment;*/
-
       // refit of the new tracks can fail when the position is too far
       // try positions closer to the end until reach it
       while (abs(hitPositionForReassignment) > 0) {
 
         // create new RecoTracks with reassigned hits in the separate StoreArray
-        /*recoTrackMotherRefit = copyRecoTrackAndReassignCDCHits(recoTrackMother,
-                                                               recoTrackDaughter,
-                                                               true, hitPositionForReassignment);
-        recoTrackDaughterRefit = copyRecoTrackAndReassignCDCHits(recoTrackMother,
-                                                                 recoTrackDaughter,
-                                                                 false, hitPositionForReassignment);*/
         recoTrackMotherRefit = copyRecoTrackAndReassignCDCHits(recoTrackMotherBuffer,
                                                                recoTrackDaughterBuffer,
                                                                true, hitPositionForReassignment);
@@ -523,16 +706,16 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
             ++hitPositionForReassignment;
         } else
           break;
-        B2DEBUG(29, "Fit of the tracks failed, try with smaller hit index: " << hitPositionForReassignment);
+        B2DEBUG(29, "Refit of the tracks failed, try with smaller hit index: " << hitPositionForReassignment);
       }
 
       // if hit position reaches end, the trial failed. Continue with default tracks.
       if (hitPositionForReassignment == 0) {
-        B2DEBUG(29, "Reassign hits and refit failed");
+        B2DEBUG(29, "Reassigning of hits and refitting failed");
         break;
       }
 
-      // Try to fit vertex, using previous result as a seed. If the fit fails, continue with default tracks.
+      // Try to fit vertex, using previous result as a seed. If the fit fails, continue with current tracks.
       if (!vertexFitWithRecoTracks(recoTrackMotherRefit, recoTrackDaughterRefit, reassignHitStatus,
                                    vertexPosTmp, distanceAtVertexTmp, vertexPosTmp))
         break;
@@ -554,10 +737,9 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     }
   }
 
-  // if the corresponding fitterMode is used, try to flip the daughter track and refit it
+  // if the corresponding fitterMode is used, try to flip the daughter track from filter 2 and refit it
   if ((m_kinkFitterMode == 2 || m_kinkFitterMode == 3) && (filterFlag == 2)) {
-
-    B2INFO("Try to flip and refit");
+    B2DEBUG(29, "Try to flip and refit filter " << filterFlag);
 
     // variables to store temporary values
     double distanceAtVertexTmp = 1000;
@@ -586,30 +768,67 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
         stDaughter = m_stDaughterBuffer;
         m_daughterKinkRecoTrackCache = recoTrackDaughterFlipAndRefit;
 
-        B2INFO("Flip and refit successful");
+        B2DEBUG(29, "Flip and refit successful");
       }
   }
 
-  B2INFO("Distance between tracks at fitted vertex " << distanceAtVertex);
-  B2INFO("Radius of the vertex " << vertexPos.Rho());
-  B2INFO("Reassigned hit " << finalHitPositionForReassignment);
+  // try to refit daughter track for filter 3. If it improves the vertex fit, which might even fail before,
+  // use a new result
+  if (filterFlag == 3) {
+    B2DEBUG(29, "Try to refit filter " << filterFlag);
+
+    // initialize seeds for the refit
+    // position of the last mother state and the first daughter state
+    TVector3 motherPosLast = recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos();
+    // use mother last state time as a seed for the daughter track
+    double timeSeedDaughterRefit = recoTrackMother->getCardinalRepresentation()->getTime(
+                                     recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
+    // use fitted state at the first hit for a momentum seed
+    ROOT::Math::XYZVector momSeedDaughterRefit(recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getMom());
+
+    // variables to store temporary values
+    double distanceAtVertexTmp = 1000;
+    ROOT::Math::XYZVector vertexPosTmp(vertexPos);
+
+    // initialize refit conditions
+    // do not remove hits until the first stereo layer is passed
+    bool blockHits = false;
+    // use ordinary KalmanFilter
+    bool anotherFitter = true;
+
+    // create a copy of the daughter track and refit it
+    RecoTrack* recoTrackDaughterRefit = copyRecoTrackForRefit(recoTrackDaughter,
+                                                              momSeedDaughterRefit,
+                                                              ROOT::Math::XYZVector(motherPosLast),
+                                                              timeSeedDaughterRefit, blockHits, anotherFitter);
+
+    // if the vertex fit is successful and the result is improved, store it
+    if (recoTrackDaughterRefit->wasFitSuccessful() &&
+        vertexFitWithRecoTracks(recoTrackMother, recoTrackDaughterRefit, reassignHitStatus,
+                                vertexPosTmp, distanceAtVertexTmp, vertexPosTmp)) {
+      if ((distanceAtVertexTmp < distanceAtVertex) || failedFitFlag) {
+        distanceAtVertex = distanceAtVertexTmp;
+        vertexPos = vertexPosTmp;
+        stMother = m_stMotherBuffer;
+        stDaughter = m_stDaughterBuffer;
+        m_daughterKinkRecoTrackCache = recoTrackDaughterRefit;
+
+        B2DEBUG(29, "Refit successful");
+      }
+    } else if (failedFitFlag) return false;
+  }
+
+  B2DEBUG(29, "Distance between tracks at fitted vertex " << distanceAtVertex);
+  B2DEBUG(29, "Radius of the vertex " << vertexPos.Rho());
+  B2DEBUG(29, "Reassigned hit " << finalHitPositionForReassignment);
 
   // test the distance cut
   if (distanceAtVertex > m_vertexDistanceCut)
     return false;
 
-  // check if the fitted vertex is inside CDC
-  if (vertexPos.Rho() < 17)
+  // check if the fitted vertex is inside CDC or just after SVD
+  if (vertexPos.Rho() < 14)
     return false;
-
-  // temporary StoreArrays for studies (to be removed)
-  RecoTrack* motherKinkRecoTrack = recoTrackMother->copyToStoreArray(m_motherKinkRecoTracks);
-  motherKinkRecoTrack->addHitsFromRecoTrack(recoTrackMother, motherKinkRecoTrack->getNumberOfTotalHits());
-  motherKinkRecoTrack->addRelationTo(recoTrackMother);
-
-  RecoTrack* daughterKinkRecoTrack = recoTrackDaughter->copyToStoreArray(m_daughterKinkRecoTracks);
-  daughterKinkRecoTrack->addHitsFromRecoTrack(recoTrackDaughter, daughterKinkRecoTrack->getNumberOfTotalHits());
-  daughterKinkRecoTrack->addRelationTo(recoTrackDaughter);
 
   // extrapolate the mother state to IP
   genfit::MeasuredStateOnPlane stMotherIP = recoTrackMother->getMeasuredStateOnPlaneFromFirstHit();
@@ -627,6 +846,18 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   TrackFitResult* tfrMotherIP = buildTrackFitResult(m_motherKinkRecoTrackCache, stMotherIP, BzIP, Const::pion);
   TrackFitResult* tfrMotherVtx = buildTrackFitResult(m_motherKinkRecoTrackCache, stMother, BzVtx, Const::pion);
   TrackFitResult* tfrDaughterVtx = buildTrackFitResult(m_daughterKinkRecoTrackCache, stDaughter, BzVtx, Const::pion);
+
+  // write to the filter flag number of reassigned hits (minus for daughter to mother, plus vice-versa)
+  if (abs(finalHitPositionForReassignment) < 32) {
+    if (finalHitPositionForReassignment >= 0)
+      filterFlag += finalHitPositionForReassignment * 1000;
+    else {
+      filterFlag *= -1;
+      filterFlag += finalHitPositionForReassignment * 1000;
+    }
+  } else {
+    filterFlag += 32 * 1000;
+  }
 
   // save the kink to the StoreArray
   auto kink = m_kinks.appendNew(std::make_pair(trackMother, std::make_pair(tfrMotherIP, tfrMotherVtx)),
@@ -647,7 +878,6 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
 {
 
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
-  genfit::Track gfTrackMother = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMother);
   genfit::AbsTrackRep* motherRepresentation = recoTrackMother->getCardinalRepresentation();
   if ((motherRepresentation == nullptr) || !(recoTrackMother->wasFitSuccessful(motherRepresentation))) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
@@ -658,7 +888,6 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   double motherCharge = recoTrackMother->getTrackFitStatus()->getCharge();
 
   // make a clone, not use the reference so that the genfit::Track and its TrackReps will not be altered.
-  genfit::Track gfTrackDaughter = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackDaughter);
   genfit::AbsTrackRep* daughterRepresentation = recoTrackDaughter->getCardinalRepresentation();
   if ((daughterRepresentation == nullptr) || !(recoTrackDaughter->wasFitSuccessful(daughterRepresentation))) {
     B2ERROR("Track hypothesis with closest mass not available. Should never happen, but I can continue savely anyway.");
@@ -672,6 +901,8 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   genfit::MeasuredStateOnPlane stMother = recoTrackMother->getMeasuredStateOnPlaneFromLastHit(motherRepresentation);
   genfit::MeasuredStateOnPlane stDaughter = recoTrackDaughter->getMeasuredStateOnPlaneClosestTo(vertexPosSeed,
                                             daughterRepresentation);
+  m_stMotherBuffer = stMother;
+  m_stDaughterBuffer = stDaughter;
 
   // initialize KVertexFitter
   kinkVertexFitterKFit kvf;
@@ -691,13 +922,13 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   // do the fit
   int err = kvf.doFit();
   if (err != 0) {
-    B2INFO("Fit finished with error");
+    B2DEBUG(29, "Fit finished with error");
     return false;
   }
 
   // test the chi2 cut
   if (kvf.getCHIsq() > m_vertexChi2Cut) {
-    B2INFO("chi^2 too large " << kvf.getCHIsq());
+    B2DEBUG(29, "chi^2 too large " << kvf.getCHIsq());
     return false;
   }
 

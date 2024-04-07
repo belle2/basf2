@@ -18,6 +18,9 @@
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/KLMMuonIDDNN.h>
+
+#include <reconstruction/dataobjects/KLMMuonIDDNNInputVariable.h>
+
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
 #include <mva/interface/Expert.h>
 #include <mva/interface/Weightfile.h>
@@ -75,6 +78,9 @@ namespace Belle2 {
     // Neural Network based KLM muonID dataobjects to be stored in mdst.
     StoreArray<KLMMuonIDDNN> m_KLMMuonIDDNNs;
 
+    // Input variables of DNN. This should only be used for retraining purpose (m_retrain = true).
+    StoreArray<KLMMuonIDDNNInputVariable> m_inputVariable;
+
     /**
      * Initialize mva expert, dataset and features.
      * Called every time the weightfile in the database changes in begin run.
@@ -97,6 +103,9 @@ namespace Belle2 {
 
     /** Database identifier or file used to load the weights. */
     std::string m_identifier = "NNmuidWeightFile";
+
+    /** If set true, this model will write the input variables to KLMMuonIDDNNInputVariable dataobject. */
+    bool m_retrain = false;
 
     /** Database pointer to the database representation of the weightfile. */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;

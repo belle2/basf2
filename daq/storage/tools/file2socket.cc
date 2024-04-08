@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     if (sstat + rstat != evtbuf[0]) continue;
     unsigned int nbyte_hton = htonl(nbyte);
     //socket.write(data.getBuffer()+1, nbyte + sizeof(int));
-    printf("nbyte = %d\n", nbyte);
+    printf("nbyte = %u\n", nbyte);
     socket.write(&nbyte_hton, sizeof(int));
     socket.write(evtbuf, nbyte);
     nrec++;

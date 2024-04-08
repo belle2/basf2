@@ -86,24 +86,26 @@ void DQMHistAnalysisInputModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInput: beginRun called.");
   clearHistList();
+  resetDeltaList();
+  clearCanvases();
 }
 
 void DQMHistAnalysisInputModule::event()
 {
+  TH1::AddDirectory(false);
   initHistListBeforeEvent();
 
-  sleep(m_interval);
   std::vector<TH1*> hs;
   char mbstr[100];
 
   time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before LoadMemFile");
 
   TMemFile* file = m_memory->LoadMemFile();
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after LoadMemFile");
 
   const TDatime& mt = file->GetModificationDate();
@@ -115,16 +117,29 @@ void DQMHistAnalysisInputModule::event()
   TKey* key = nullptr;
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before input loop");
 
+  // check if histograms were updated since last DQM event (based on number of processed events)
+  if (m_nevent != getEventProcessed()) {
+    m_lastChange = std::string(mbstr);
+  }
+  // update number of processed events
+  m_nevent = getEventProcessed();
+
   while ((key = (TKey*)next())) {
-    auto obj = key->ReadObj();
+    auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
     if (obj == nullptr) continue; // would be strange, but better check
-    if (!obj->IsA()->InheritsFrom("TH1")) continue; // other non supported (yet?)
+    if (!obj->IsA()->InheritsFrom("TH1")) {
+      delete obj;
+      continue; // other non supported (yet?)
+    }
     TH1* h = (TH1*)obj; // we are sure its a TH1
 
-    if (m_remove_empty && h->GetEntries() == 0) continue;
+    if (m_remove_empty && h->GetEntries() == 0) {
+      delete obj;
+      continue;
+    }
     // Remove ":" from folder name, workaround!
     TString a = h->GetName();
     a.ReplaceAll(":", "");
@@ -132,8 +147,12 @@ void DQMHistAnalysisInputModule::event()
     B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
 
     // the following line prevent any histogram outside a directory to be processed
-    if (StringSplit(a.Data(), '/').size() <= 1) continue;
+    if (StringSplit(a.Data(), '/').size() <= 1) {
+      delete obj;
+      continue;
+    }
 
+    // only Histograms in the hs list will be taken care off
     hs.push_back(h);
 
     // the following workaround need to be improved
@@ -143,16 +162,21 @@ void DQMHistAnalysisInputModule::event()
   }
 
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
-    m_expno = 22;
+    m_expno = 122;
     m_runno = 1;
-    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString()).c_str());
+    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Last Updated " + mmt.AsString() + ", Last DQM event " + std::string(
+                                                  mbstr)).c_str());
+    setReturnValue(false);
+    for (auto& h : hs)  delete h;
+    return;
   } else {
-    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated "
-                                                + mmt.AsString()).c_str());
+    if (m_c_info != NULL) m_c_info->SetTitle((m_memname + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Changed "
+                                                + m_lastChange + ", Last Updated "
+                                                + mmt.AsString() + ", Last DQM event " + std::string(mbstr)).c_str());
     m_expno = std::stoi(expno);
     m_runno = std::stoi(runno);
   }
@@ -180,6 +204,9 @@ void DQMHistAnalysisInputModule::event()
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
 
+  // if there is no update, sleep a moment
+  if (!anyupdate) sleep(m_interval);
+
   // if no histogram was updated, we could stop processing
   setReturnValue(anyupdate);
 }
@@ -187,15 +214,6 @@ void DQMHistAnalysisInputModule::event()
 void DQMHistAnalysisInputModule::endRun()
 {
   B2INFO("DQMHistAnalysisInput : endRun called");
-
-  TIter nextckey(gROOT->GetListOfCanvases());
-  TObject* cobj = NULL;
-
-  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
-    if (cobj->IsA()->InheritsFrom("TCanvas")) {
-      (dynamic_cast<TCanvas*>(cobj))->Clear();
-    }
-  }
 }
 
 void DQMHistAnalysisInputModule::terminate()

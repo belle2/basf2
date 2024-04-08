@@ -13,6 +13,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <set>
 
 namespace Belle2 {
   /** Class definition for the reference histogram display. */
@@ -28,6 +29,11 @@ namespace Belle2 {
     DQMHistAutoCanvasModule();
 
     /**
+     * This method is called for each run.
+     */
+    void beginRun() override final;
+
+    /**
      * This method is called for each event.
      */
     void event() override final;
@@ -35,13 +41,17 @@ namespace Belle2 {
     // Data members
   private:
     /** The list of folders for which automatically generate canvases. */
-    std::vector<std::string> m_acfolders;
+    std::vector<std::string> m_inclfolders;
     /** The list of folders which are excluded from automatically generate canvases. */
     std::vector<std::string> m_exclfolders;
+    /** The filename of a list canvas names to auto generate. */
+    std::string m_listfile;
 
-    /** The map of histogram names to canvas pointers for output. */
+    /** list of wanted canvas name if included as list file*/
+    std::set<std::string> m_canvaslist;
+
+    /** The map of histogram names to canvas pointers for buffering. */
     std::map<std::string, TCanvas*> m_cs;
-
   };
 } // end namespace Belle2
 

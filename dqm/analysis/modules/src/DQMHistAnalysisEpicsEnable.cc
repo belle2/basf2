@@ -50,10 +50,3 @@ void DQMHistAnalysisEpicsEnableModule::initialize()
   setPVPrefix(m_locPVPrefix);
 #endif
 }
-
-void DQMHistAnalysisEpicsEnableModule::event()
-{
-  // -> now trigger flush to network
-  // it wont harm to do this more often than needed.
-  updateEpicsPVs(5.0); // 5 seconds timeout
-}

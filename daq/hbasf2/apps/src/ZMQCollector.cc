@@ -104,7 +104,7 @@ void ZMQOutputAdapter::handleInput()
   }
 
   if (message->isMessage(EMessageTypes::c_rawDataMessage) or message->isMessage(EMessageTypes::c_eventMessage)) {
-    B2INFO(message->getDataMessage().size());
+    B2DEBUG(30, message->getDataMessage().size());
     m_output->handleEvent(std::move(message->getDataMessage()));
   }
 }

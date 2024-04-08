@@ -286,8 +286,8 @@ void DQMHistoModuleBase::DefineHelixParametersAndCorrelations()
 
   m_PhiD0 = factory.xAxis(phi).yAxis(D0_2d).CreateTH2F("Helix2dPhiD0",
                                                        "d0 vs Phi0, the signed distance of the perigee in the r-phi plane vs. momentum azymuthal angle at the perigee");
-  m_D0Z0 =  factory.xAxis(D0_2d).yAxis(Z0_2d).CreateTH2F("Helix2dD0Z0",
-                                                         "z0 vs d0, z0 of the perigee vs the signed distance of the perigee in r-phi");
+  m_D0Z0 =  factory.xAxis(Z0_2d).yAxis(D0_2d).CreateTH2F("Helix2dD0Z0",
+                                                         "d0 vs z0, the signed distance of the perigee in r-phi vs. z0 of the perigee");
 
 }
 

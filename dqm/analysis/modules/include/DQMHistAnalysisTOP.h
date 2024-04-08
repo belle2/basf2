@@ -19,6 +19,7 @@
 #include <TLegend.h>
 #include <vector>
 #include <string>
+#include <map>
 
 namespace Belle2 {
   /**
@@ -115,8 +116,15 @@ namespace Belle2 {
     /**
      * Makes background subtracted time distribution plot
      * @param name the name of the histogram
+     * @param trackHits histogram used to scale background in case it is available
+     * @param slot slot number
      */
-    void makeBGSubtractedTimimgPlot(const std::string& name);
+    void makeBGSubtractedTimimgPlot(const std::string& name, const TH2F* trackHits, int slot);
+
+    /**
+     * Makes plots of the number of PMT hits per event
+     */
+    void makePMTHitRatesPlots();
 
     /**
      * Sets MiraBelle variables from the histogram with bins corresponding to slot numbers.
@@ -146,6 +154,17 @@ namespace Belle2 {
     }
 
     /**
+     * Converts alarm state to official status (see EStatus of the base class)
+     * @param alarmState alarm state
+     * @return alarm status
+     */
+    int getOffcialAlarmStatus(unsigned alarmState) const
+    {
+      if (alarmState < m_officialStates.size()) return m_officialStates[alarmState];
+      return c_StatusDefault;
+    }
+
+    /**
      * Sets alarm lines.
      * @param alarmLevels alarm levels
      * @param xmin minimal x
@@ -162,11 +181,11 @@ namespace Belle2 {
     void setAlarmLines();
 
     /**
-     * Returns histogram mean by excluding bins with zero content
-     * @param h 2D histogram
-     * @return mean
+     * Returns cut levels for dead and hot channels
+     * @param h pixel or channel distribution of hits (1D or 2D histogram)
+     * @return cut levels (first = dead, second = hot)
      */
-    double getMean(const TH2* h);
+    std::pair<double, double> getDeadAndHotCuts(const TH1* h);
 
     /**
      * Calculates and sets epics variables
@@ -199,19 +218,18 @@ namespace Belle2 {
 
     // other
 
-    std::vector<int> m_alarmColors = {kGray, kGreen, kYellow, kRed}; /**< alarm colors */
+    std::vector<int> m_alarmColors = {c_ColorTooFew, c_ColorGood, c_ColorWarning, c_ColorError}; /**< alarm colors (see base class) */
+    std::vector<int> m_officialStates = {c_StatusTooFew, c_StatusGood, c_StatusWarning, c_StatusError}; /**< official alarm states */
     std::vector<bool> m_includedBoardstacks; /**< boardstacks included in alarming */
     std::map<std::string, int> m_bsmap;  /**< a map of boardstack names to ID's */
+    int m_alarmStateOverall = 0; /**< overall alarm state of histograms to be sent by EpicsPV */
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
+    std::string m_runType; /**< Run type */
 
-    TH1D* m_windowFractions = nullptr; /**< fraction of windows outside the band denoting good windows, per slot */
-    double m_totalWindowFraction = 0;  /**< total fraction of windows outside the band */
-
-    TH1D* m_photonYields = nullptr; /**< photon yields per slot (corrected for active channels) */
-    TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
-
+    TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
+    TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
     TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
 
     TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot */
@@ -224,6 +242,9 @@ namespace Belle2 {
     TH1F* m_junkFraction = nullptr; /**< fraction of junk hits per boardstack */
     TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of junk hits per boardstack */
 
+    std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */
+    std::vector<TCanvas*> m_c_pmtHitRates; /**< Canvases of PMT hits per event (index = slot - 1) */
+
     std::vector<TLine*> m_asicWindowsBandLines; /**< lines denoting a band of good windows */
     std::vector<TLine*> m_verticalLines; /**< vertical lines splitting slots */
     std::vector<TLine*> m_junkHitsAlarmLines; /**< lines representing alarm levels */
@@ -235,6 +256,7 @@ namespace Belle2 {
     TPaveText* m_text2 = nullptr; /**< text to be written to event desynchonization monitor */
     TPaveText* m_text3 = nullptr; /**< text to be written to background rates */
 
+    std::map<std::string, double> m_mirabelleVariables; /**< variables for MiraBelle */
     MonitoringObject* m_monObj = nullptr; /**< MiraBelle monitoring object */
 
   };

@@ -34,12 +34,17 @@ NeuroTriggerParameters::loadconfigtxt(const std::string& filename)
   try {
     confile.open(filename, std::ifstream::in);
   } catch (int e) {
-    B2ERROR("ERROR! While opening file: " + filename + "    Error code: " + e);
+    saveconfigtxt("neuroconfig_example.conf");
+    B2ERROR("Configuration file " + filename + " could not be loaded! Make sure to give the configuration file as a parameter. \
+              An example file neuroconfig_example.conf has been saved.");
+
     exit(EXIT_FAILURE);
   }
   std::string line_all;
   if (!confile.is_open()) {
-    B2ERROR("ERROR! While opening file: " + filename);
+    saveconfigtxt("neuroconfig_example.conf");
+    B2ERROR("Configuration file " + filename + " could not be loaded! Make sure to give the configuration file as a parameter. \
+              An example file neuroconfig_example.conf has been saved.");
     exit(EXIT_FAILURE);
   }
   while (std::getline(confile, line_all)) {

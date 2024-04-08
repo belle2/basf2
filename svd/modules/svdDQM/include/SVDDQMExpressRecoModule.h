@@ -12,6 +12,7 @@
 #include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <vxd/dataobjects/VxdID.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <svd/geometry/SensorInfo.h>
 #include <vxd/geometry/GeoCache.h>
 #include <svd/dataobjects/SVDEventInfo.h>
@@ -52,6 +53,9 @@ namespace Belle2 {
     void defineHisto() override final;
 
   private:
+
+    /** Trigger Summary data object */
+    StoreObjPtr<TRGSummary> m_objTrgSummary;
 
     StoreObjPtr<SVDEventInfo> m_svdEventInfo ;  /**< SVDEventInfo data object */
     /** if TRUE: svdTime back in SVD time reference*/
@@ -206,11 +210,21 @@ namespace Belle2 {
     /** v size */
     TH1F** m_clusterSizeV = nullptr;
 
-    /** time group id for 3 samples**/
-    TH2F* m_cluster3TimeGroupId = nullptr;
+    /** time group id for  U side**/
+    TH2F* m_clusterTimeGroupIdU = nullptr;
+    /** time group id for  V side**/
+    TH2F* m_clusterTimeGroupIdV = nullptr;
 
-    /** time group id for 6 samples**/
-    TH2F* m_cluster6TimeGroupId = nullptr;
+
+    /** time group id for  U side for fine trigger**/
+    TH2F* m_clusterTime3GroupIdU = nullptr;
+    /** time group id for  V side for fine trigger**/
+    TH2F* m_clusterTime3GroupIdV = nullptr;
+
+    /** time group id for  U side for coarse trigger**/
+    TH2F* m_clusterTime6GroupIdU = nullptr;
+    /** time group id for  V side for coarse trigger**/
+    TH2F* m_clusterTime6GroupIdV = nullptr;
 
     /** u time */
     TH1F** m_clusterTimeU = nullptr;

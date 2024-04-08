@@ -15,6 +15,9 @@
 
 #include <TDirectory.h>
 
+#include <TH1D.h>
+#include <TH2D.h>
+
 using namespace Belle2;
 
 REG_MODULE(TRGECLDQM);
@@ -61,7 +64,8 @@ void TRGECLDQMModule::defineHisto()
   h_TCEnergy       = new TH1D("h_TCEnergy",      "[TRGECL] TC Energy (ADC)",     100, 0, 1500);
   h_Narrow_TotalEnergy    = new TH1D("h_Narrow_TotalEnergy",   "[TRGECL] Total TC Energy (ADC)",       100, 0, 500);
   h_Narrow_TCEnergy       = new TH1D("h_Narrow_TCEnergy",      "[TRGECL] TC Energy (ADC)",     100, 0, 100);
-  h_n_TChit_event  = new TH1D("h_n_TChit_event", "[TRGECL] N(TC) ",                40, 0, 40);
+  h_n_TChit_event  = new TH1D("h_n_TChit_event", "[TRGECL] N(TC) ",                50, 0, 50);
+  h_nTChit_injtime = new TH2D("h_nTChit_injtime", "[TRGECL] N(TC) vs. Time since injection", 201, 0, 200, 100, 0, 50);
   h_Cluster        = new TH1D("h_Cluster",       "[TRGECL] N(Cluster) ",           20, 0, 20);
   h_TCTiming       = new TH1D("h_TCTiming",      "[TRGECL] TC Timing  (ns)",      100, 3010, 3210);
   h_TRGTiming      = new TH1D("h_TRGTiming",     "[TRGECL] TRG Timing  (ns)",     100, 3010, 3210);
@@ -70,6 +74,8 @@ void TRGECLDQMModule::defineHisto()
   h_ECL_TriggerBit      = new TH1D("h_ECL_TriggerBit",     "[TRGECL] ECL Trigger Bit",     29, 0, 29);
   h_Cluster_Energy_Sum    = new TH1D("h_Cluster_Energy_Sum",   "[TRGECL] Energy Sum of 2 Clusters (ADC)",       300, 0, 3000);
 
+  h_nTChit_injtime->GetXaxis()->SetTitle("The number of TC hits");
+  h_nTChit_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
 
 
   const char* label[44] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "Low multi bit 12", "Low multi bit 13", "mumu bit", "prescale bit", "ECL burst bit", "2D Bhabha bit 1", "2D Bhabha bit 2", "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
@@ -353,6 +359,11 @@ void TRGECLDQMModule::event()
   TrgEclMapping* a = new TrgEclMapping();
   double max = 0;
   double caltrgtiming = 0;
+  double diff = -1;
+
+  for (auto& i : m_rawTTD) {
+    diff = i.GetTimeSinceLastInjection(0) / 127. / 1000.;
+  }
 
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {
     h_TCId -> Fill(TCId[ihit]);
@@ -378,6 +389,7 @@ void TRGECLDQMModule::event()
 
     totalEnergy += TCEnergy[ihit];
     h_n_TChit_event -> Fill(NofTCHit);
+    h_nTChit_injtime->Fill(NofTCHit, diff);
     double timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
     if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);

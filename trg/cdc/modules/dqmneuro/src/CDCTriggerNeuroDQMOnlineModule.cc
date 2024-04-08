@@ -85,22 +85,22 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   // histograms with recotracks (and hwsimtracks):
 
   m_neuroHWOutdzall = new TH1F("NeuroHWOutZ-RecoZ",
-                               "z Resolution of unpacked and valid neuro tracks; z [cm]",
+                               "z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                                200, -100, 100);
   m_neuroHWOutdz0 = new TH1F("Q0NeuroHWOutZ-RecoZ",
-                             "Quadrant0 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant0 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWOutdz1 = new TH1F("Q1NeuroHWOutZ-RecoZ",
-                             "Quadrant1 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant1 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWOutdz2 = new TH1F("Q2NeuroHWOutZ-RecoZ",
-                             "Quadrant2 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant2 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWOutdz3 = new TH1F("Q3NeuroHWOutZ-RecoZ",
-                             "Quadrant3 z Resolution of unpacked and valid neuro tracks; z [cm]",
+                             "Quadrant3 z Resolution of unpacked and valid neuro tracks; delta z [cm]",
                              200, -100, 100);
   m_neuroHWSimRecodZ = new TH1F("NeuroHWSimZ-RecoZ",
-                                "z Resolution of Simulated HW Tracks; z [cm]",
+                                "z Resolution of Simulated HW Tracks; delta z [cm]",
                                 200, -100, 100);
 
   // histograms wih just hwneuro and hw2dtracks:
@@ -146,6 +146,8 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
                                48, 0, 48);
   m_neuroHWIn2DTracksNumber = new TH1F("NeuroHWIn2DTracksNumber", "number of incoming 2dtracks per event; track count",
                                        20, 0, 20);
+  m_neuroHWValTSCountAx = new TH1F("NeuroHWValTSCountAx", "Number of axial TS related to a valid NNTrack", 6, 0, 6);
+  m_neuroHWValTSCountSt = new TH1F("NeuroHWValTSCountSt", "Number of stereo TS related to a valid NNTrack", 5, 0, 5);
 
   // now the histograms with hwsim neurotracks:
 
@@ -158,6 +160,7 @@ void CDCTriggerNeuroDQMOnlineModule::defineHisto()
   m_neuroHWSimCosTheta = new TH1F("NeuroHWSimCosTheta",
                                   "cos theta Distribution of Simulated HW Tracks; cos(#theta) ",
                                   100, -1, 1);
+  m_errcount = m_errdict.size();
   m_neuroErrors = new TH1F("Neurotrigger-Errors", "Errors in the Neuro Hardware", m_errcount, 0, m_errcount);
   // cd back to root directory
   oldDir->cd();
@@ -302,6 +305,23 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
       valtrack = isValidPattern(getPattern(&neuroHWTrack, m_unpackedNeuroInputSegmentHitsName));
     }
     if (valtrack) {
+      int nTsAx = 0;
+      int nTsSt = 0;
+      for (auto ts : neuroHWTrack.getRelationsTo<CDCTriggerSegmentHit>(m_unpackedNeuroInputSegmentHitsName)) {
+        if (ts.getISuperLayer() % 2 == 0) {
+          nTsAx ++;
+        } else {
+          nTsSt ++;
+        }
+      }
+      m_neuroHWValTSCountAx->Fill(nTsAx);
+      m_neuroHWValTSCountSt->Fill(nTsSt);
+      if (nTsAx < 4) {
+        neuroHWTrack.setQualityVector(256);
+      }
+      if (nTsSt < 3) {
+        neuroHWTrack.setQualityVector(512);
+      }
       valtrackcount ++;
       m_neuroHWOutZ->Fill(neuroHWTrack.getZ0());
       m_neuroHWOutCosTheta->Fill(copysign(1.0,
@@ -331,6 +351,7 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
         CDCTriggerTrack* neuroSimTrack = neuroHWTrack.getRelatedTo<CDCTriggerTrack>(m_simNeuroTracksName);
         if (!neuroSimTrack) {
           B2WARNING("No Simtrack related to HWTrack! This should not happen!");
+          continue;
         }
         std::vector<float> unpackedInput =
           neuroHWTrack.getRelatedTo<CDCTriggerMLPInput>(m_unpackedNeuroInputVectorName)->getInput();
@@ -339,35 +360,38 @@ void CDCTriggerNeuroDQMOnlineModule::fillHWPlots()
         bool sameInputId = true;
         bool sameInputAlpha = true;
         bool scaleErr = false;
-        bool missingTS = false;
+        bool missingHwTS = false;
+        bool missingSwTS = false;
         bool timeErr = false;
         for (unsigned ii = 0; ii < unpackedInput.size(); ii += 3) {
-          bool hwZero = false;
-          bool hwSimZero = false;
+          int hwZero = 0;
+          int hwSimZero = 0;
           if (unpackedInput[ii] != simInput[ii]) {sameInputId = false;}
           if (unpackedInput[ii + 2] != simInput[ii + 2]) {sameInputAlpha = false;}
           if (unpackedInput[ii + 1] != simInput[ii + 1]) {timeErr = true;}
           if (unpackedInput[ii + 1] == 0 && fabs(simInput[ii + 1] > 0.99)) {scaleErr = true;}
           if (simInput[ii + 1] == 0 && fabs(unpackedInput[ii + 1] > 0.99)) {scaleErr = true;}
-          if (unpackedInput[ii] == 0 && unpackedInput[ii + 1] == 0 && unpackedInput[ii + 2] == 0) {hwZero = true;}
-          if (simInput[ii] == 0 && simInput[ii + 1] == 0 && simInput[ii + 2] == 0) {hwSimZero = true;}
-          if (hwZero != hwSimZero) {missingTS = true;}
+          if (unpackedInput[ii] == 0 && unpackedInput[ii + 1] == 0 && unpackedInput[ii + 2] == 0) {hwZero = 1;}
+          if (simInput[ii] == 0 && simInput[ii + 1] == 0 && simInput[ii + 2] == 0) {hwSimZero = 1;}
+          if (hwZero > hwSimZero) {missingSwTS = true;}
+          if (hwZero < hwSimZero) {missingHwTS = true;}
         }
         double diff = neuroHWTrack.getZ0() - neuroSimTrack->getZ0();
         if (abs(diff) > 1.) {neuroHWTrack.setQualityVector(2);}
         if (!sameInputId) {neuroHWTrack.setQualityVector(4);}
         if (!sameInputAlpha) {neuroHWTrack.setQualityVector(8);}
         if (scaleErr) {neuroHWTrack.setQualityVector(16);}
-        if (missingTS) {neuroHWTrack.setQualityVector(32);}
-        if (timeErr) {neuroHWTrack.setQualityVector(64);}
+        if (missingSwTS) {neuroHWTrack.setQualityVector(32);}
+        if (missingHwTS) {neuroHWTrack.setQualityVector(64);}
+        if (timeErr) {neuroHWTrack.setQualityVector(1024);}
 
-        // now fill the error histogram:
-        unsigned qvec = neuroHWTrack.getQualityVector();
-        //m_neuroErrorsRaw->Fill(qvec);
-        m_neuroErrors->Fill(8);
-        for (unsigned k = 0; k < m_errcount; k++) {
-          if (qvec & (1 << k)) {m_neuroErrors->Fill(k);}
-        }
+      }
+      // now fill the error histogram:
+      unsigned qvec = neuroHWTrack.getQualityVector();
+      //m_neuroErrorsRaw->Fill(qvec);
+      m_neuroErrors->Fill(m_errcount - 1);
+      for (unsigned k = 0; k < m_errcount; k++) {
+        if (qvec & (1 << k)) {m_neuroErrors->Fill(k);}
       }
     }
 
@@ -522,7 +546,11 @@ void CDCTriggerNeuroDQMOnlineModule::makeDebugOutput()
     for (CDCTriggerTrack& track : m_simNeuroTracks) {
       countswn++;
       if (have_relation(track, xhit, m_unpackedNeuroInputSegmentHitsName)) {
-        l.strline += std::to_string(countswn);
+        if (track.getValidStereoBit()) {
+          l.strline += std::to_string(countswn);
+        } else {
+          l.strline += "x";
+        }
       } else {
         l.strline += ".";
       }

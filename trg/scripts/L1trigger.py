@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -53,7 +52,6 @@ def add_trigger_simulation(
         Belle2Phase=Belle2Phase,
         simulateT0jitter=simulateT0jitter,
         components=components)
-    path.add_module('StatisticsSummary').set_name('Sum_TriggerSimulation')
     if PrintInfo:
         B2INFO('The L1 trigger simulation (TSIM) is set up with the following configuration:',
                SimulationMode=SimulationMode,

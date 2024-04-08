@@ -27,6 +27,14 @@ from a different directory.
    a test script can write a line beginning with ``TEST SKIPPED:`` followed by the
    reason for skipping on stderr and exit with a non-zero return code.
 
+.. note::
+
+   On Unix/Linux systems, exit codes are defined to be 8-bit unsigned value.  
+   Values outside the 0-255 range are truncated by taking modulo 256. If the 
+   passed code happens to be a multiple of 256, the test will be a wrongly 
+   tagged as a ``SUCCESS``. Care should be taken when directly passing return 
+   codes from other processes. 
+
 .. seealso:: `b2test_utils.skip_test`
 
 --epilog--
@@ -60,10 +68,9 @@ import re
 import datetime
 import tempfile
 import timeit
-import xml.etree.cElementTree as ET
+import xml.etree.ElementTree as ET
 from collections import defaultdict
-from functools import partial
-from b2test_utils import is_ci, temporary_set_environment
+from b2test_utils import temporary_set_environment
 
 # allow stopping tests with Ctrl+c
 import signal
@@ -117,11 +124,11 @@ def format_output(name, out, err):
         return ""
     output = []
     if out and out.strip():
-        output += ["=== stdout of %s ===\n" % name, out.decode(errors="replace")]
+        output += [f"=== stdout of {name} ===\n", out.decode(errors="replace")]
     if err and err.strip():
-        output += ["=== stderr of %s ===\n" % name, err.decode(errors="replace")]
+        output += [f"=== stderr of {name} ===\n", err.decode(errors="replace")]
     if len(output):
-        output.append("=== end %s ===\n" % name)
+        output.append(f"=== end {name} ===\n")
     return "".join(output)
 
 
@@ -132,19 +139,15 @@ def report_test_result(result, extra, name, message, time):
           flush=True)
 
 
-def run_test(prepare_step, argument):
+def run_test(argument):
     """ run either regurlar python tests (with basf2) or as jupyter notebooks """
 
     name, release_dir = argument
     ext = os.path.splitext(name)[1]
     if ext == ".ipynb":
-        # FIXME: we temporarily ignore the jupyter tests on our CI pipeline
-        if is_ci() or prepare_step:
-            return (None, "Temporarily skipped on our CI pipeline", 0, "")
-        else:
-            return run_test_ipynb(argument)
+        return run_test_ipynb(argument)
     elif ext == ".py":
-        return run_test_py(argument, prepare_step)
+        return run_test_py(argument)
     else:
         print(f"Testfile {name} with extension {ext} not supported")
 
@@ -176,7 +179,8 @@ def run_test_ipynb(argument):
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
         result = False
-        message = "A CellExecutionError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
+        message = "A CellExecutionError happened. Please re-run the run-tests stage if this failure happened in the GitLab" \
+            " pipeline."
         extra = str(ce)
     except TimeoutError as te:
         result = False
@@ -195,7 +199,7 @@ def run_test_ipynb(argument):
     return (result, message, time, extra)
 
 
-def run_test_py(argument, prepare_step=False):
+def run_test_py(argument):
     """Run the test for the given steering file"""
 
     global options
@@ -236,7 +240,7 @@ def run_test_py(argument, prepare_step=False):
                 message = skipped.group(1).decode()
             else:
                 result = False
-                message = "exited with return code %d" % process.returncode
+                message = f"exited with return code {int(process.returncode)}"
                 extra = format_output(name, process.stdout, process.stderr)
         else:
             log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),
@@ -402,18 +406,17 @@ def executor(options, prepare_step):
     for t in reversed(slowest_tests):
         if t in all_tests:
             all_tests.insert(0, all_tests.pop(all_tests.index(t)))
-    print(f"Collected {len(all_tests)} tests...", flush=True)
+    print(f'Collected {len(all_tests)} {"prepare steps" if prepare_step else "tests"}...', flush=True)
 
     # now let's run them, either in multiprocessing or in a single process
-    run_test_partial = partial(run_test, prepare_step)
     if options.nprocess > 1:
         with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
             # run tests in multiple threads but consume the iterator right away to
             # avoid a bug in python 3.5 when zipping over a futures result iterator
             # and then exiting using sys.exit().
-            results = list(pool.map(run_test_partial, all_tests))
+            results = list(pool.map(run_test, all_tests))
     else:
-        results = map(run_test_partial, all_tests)
+        results = map(run_test, all_tests)
 
     # and present the results
     test_results = TestSuite()
@@ -457,7 +460,8 @@ def executor(options, prepare_step):
     if test_results.failed > 0:
         print("\n    ".join(["FAILED tests: "] + ["%s (%s)" % e for e in tests_failed]), flush=True)
     # print summary and exit
-    print(f'{test_results.failed} out of {len(test_results)} tests failed, {test_results.skipped} were skipped', flush=True)
+    print(f'{test_results.failed} out of {len(test_results)} {"prepare steps" if prepare_step else "tests"} '
+          f'failed, {test_results.skipped} were skipped\n', flush=True)
     return len(tests_failed)
 
 

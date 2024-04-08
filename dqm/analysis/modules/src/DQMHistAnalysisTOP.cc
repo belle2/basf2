@@ -186,6 +186,10 @@ void DQMHistAnalysisTOPModule::event()
   m_runType = rtype ? rtype->GetTitle() : "";
   m_IsNullRun = (m_runType == "null");
 
+  // get number of events processed with TOPDQM module
+  auto* goodHitsPerEvent = findHist("TOP/goodHitsPerEventAll");
+  m_numEvents = goodHitsPerEvent ? goodHitsPerEvent->GetEntries() : 0;
+
   bool zeroSupp = gStyle->GetHistMinimumZero();
   gStyle->SetHistMinimumZero(true);
 
@@ -641,7 +645,7 @@ void DQMHistAnalysisTOPModule::setMiraBelleVariables(const std::string& variable
 
 int DQMHistAnalysisTOPModule::getAlarmState(double value, const std::vector<double>& alarmLevels, bool bigRed) const
 {
-  if (m_IsNullRun) return c_Gray;
+  if (m_IsNullRun or m_numEvents < 1000) return c_Gray;
 
   if (bigRed) {
     if (value < alarmLevels[0]) return c_Green;

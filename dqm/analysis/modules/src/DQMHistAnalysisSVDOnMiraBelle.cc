@@ -6,6 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+#include <numeric>
+#include <limits>
+#include <vxd/geometry/GeoCache.h>
 #include <dqm/analysis/modules/DQMHistAnalysisSVDOnMiraBelle.h>
 
 using namespace std;
@@ -55,6 +58,18 @@ void DQMHistAnalysisSVDOnMiraBelleModule::initialize()
   m_monObj->addCanvas(m_c_avgMaxBinClusterOnTrack);
   m_monObj->addCanvas(m_c_MeanSVDEventT0);
 
+  const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
+
+  //collect the list of all SVD Modules in the geometry here
+  std::vector<VxdID> sensors = geo.getListOfSensors();
+  for (VxdID& aVxdID : sensors) {
+    VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
+    // B2INFO("VXD " << aVxdID);
+    if (info.getType() != VXD::SensorInfoBase::SVD) continue;
+    m_SVDModules.push_back(aVxdID); // reorder, sort would be better
+  }
+  std::sort(m_SVDModules.begin(), m_SVDModules.end());  // back to natural order
+
   B2DEBUG(20, "DQMHistAnalysisSVDOnMiraBelle: initialized.");
 }
 
@@ -70,6 +85,8 @@ void DQMHistAnalysisSVDOnMiraBelleModule::event()
 
 void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 {
+  float nan = numeric_limits<float>::quiet_NaN();
+
   // offline occupancy - integrated number of ZS5 fired strips
   TH1F* h_zs5countsU = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsU"); // made by SVDDQMExperssRecoModule
   TH1F* h_zs5countsV = (TH1F*)findHist("SVDExpReco/SVDDQM_StripCountsV");
@@ -105,6 +122,15 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     std::vector<float> avgOffOccL5UV = avgOccupancyUV(5, h_zs5countsU, h_zs5countsV, 0, 48, 45, 1, nE);
 
     std::vector<float> avgOffOccL6UV = avgOccupancyUV(6, h_zs5countsU, h_zs5countsV, 0, 80, 93, 1, nE);
+
+    // average occupancy for each layer
+    std::vector<float> avgOffGrpId0OccL3UV = avgOccupancyGrpId0UV(3, nE);
+
+    std::vector<float> avgOffGrpId0OccL4UV = avgOccupancyGrpId0UV(4, nE);
+
+    std::vector<float> avgOffGrpId0OccL5UV = avgOccupancyGrpId0UV(5, nE);
+
+    std::vector<float> avgOffGrpId0OccL6UV = avgOccupancyGrpId0UV(6, nE);
 
     // occupancy averaged over ladders
     std::vector<float> avgOffOccL3X1UV = avgOccupancyUV(3, h_zs5countsU, h_zs5countsV, 0, 7, 0, 2, nE); // L3.X.1
@@ -160,6 +186,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4U", avgOffOccL4UV[0]);
     m_monObj->setVariable("avgOffOccL5U", avgOffOccL5UV[0]);
     m_monObj->setVariable("avgOffOccL6U", avgOffOccL6UV[0]);
+
+    m_monObj->setVariable("avgOffGrpId0OccL3U", avgOffGrpId0OccL3UV[0]);
+    m_monObj->setVariable("avgOffGrpId0OccL4U", avgOffGrpId0OccL4UV[0]);
+    m_monObj->setVariable("avgOffGrpId0OccL5U", avgOffGrpId0OccL5UV[0]);
+    m_monObj->setVariable("avgOffGrpId0OccL6U", avgOffGrpId0OccL6UV[0]);
+
     m_monObj->setVariable("avgOffOccL3X1U", avgOffOccL3X1UV[0]);
     m_monObj->setVariable("avgOffOccL3X2U", avgOffOccL3X2UV[0]);
     m_monObj->setVariable("avgOffOccL4X1U", avgOffOccL4X1UV[0]);
@@ -189,6 +221,12 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     m_monObj->setVariable("avgOffOccL4V", avgOffOccL4UV[1]);
     m_monObj->setVariable("avgOffOccL5V", avgOffOccL5UV[1]);
     m_monObj->setVariable("avgOffOccL6V", avgOffOccL6UV[1]);
+
+    m_monObj->setVariable("avgOffGrpId0OccL3V", avgOffGrpId0OccL3UV[1]);
+    m_monObj->setVariable("avgOffGrpId0OccL4V", avgOffGrpId0OccL4UV[1]);
+    m_monObj->setVariable("avgOffGrpId0OccL5V", avgOffGrpId0OccL5UV[1]);
+    m_monObj->setVariable("avgOffGrpId0OccL6V", avgOffGrpId0OccL6UV[1]);
+
     m_monObj->setVariable("avgOffOccL3X1V", avgOffOccL3X1UV[1]);
     m_monObj->setVariable("avgOffOccL3X2V", avgOffOccL3X2UV[1]);
     m_monObj->setVariable("avgOffOccL4X1V", avgOffOccL4X1UV[1]);
@@ -407,19 +445,19 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   if (h_clusterCharge_L456U) h_clusterCharge_L456U->Draw();
 
   // find abscissa of max Y in histograms
-  float MPVClusterChargeL3U = -99;
+  float MPVClusterChargeL3U = nan;
   if (h_clusterCharge_L3U)
     if (h_clusterCharge_L3U->GetEntries() != 0)
       MPVClusterChargeL3U = xForMaxY(h_clusterCharge_L3U);
-  float MPVClusterChargeL3V = -99;
+  float MPVClusterChargeL3V = nan;
   if (h_clusterCharge_L3V)
     if (h_clusterCharge_L3V->GetEntries() != 0)
       MPVClusterChargeL3V = xForMaxY(h_clusterCharge_L3V);
-  float MPVClusterChargeL456U = -99;
+  float MPVClusterChargeL456U = nan;
   if (h_clusterCharge_L456U)
     if (h_clusterCharge_L456U->GetEntries() != 0)
       MPVClusterChargeL456U = xForMaxY(h_clusterCharge_L456U);
-  float MPVClusterChargeL456V = -99;
+  float MPVClusterChargeL456V = nan;
   if (h_clusterCharge_L456V)
     if (h_clusterCharge_L456V->GetEntries() != 0)
       MPVClusterChargeL456V = xForMaxY(h_clusterCharge_L456V);
@@ -456,19 +494,19 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   m_c_MPVSNRClusterOnTrack->cd(4);
   if (h_clusterSNR_L456V) h_clusterSNR_L456V->Draw();
 
-  float MPVClusterSNRL3U = -99;
+  float MPVClusterSNRL3U = nan;
   if (h_clusterSNR_L3U)
     if (h_clusterSNR_L3U->GetEntries() != 0)
       MPVClusterSNRL3U = xForMaxY(h_clusterSNR_L3U);
-  float MPVClusterSNRL3V = -99;
+  float MPVClusterSNRL3V = nan;
   if (h_clusterSNR_L3V)
     if (h_clusterSNR_L3V->GetEntries() != 0)
       MPVClusterSNRL3V = xForMaxY(h_clusterSNR_L3V);
-  float MPVClusterSNRL456U = -99;
+  float MPVClusterSNRL456U = nan;
   if (h_clusterSNR_L456U)
     if (h_clusterSNR_L456U->GetEntries() != 0)
       MPVClusterSNRL456U = xForMaxY(h_clusterSNR_L456U);
-  float MPVClusterSNRL456V = -99;
+  float MPVClusterSNRL456V = nan;
   if (h_clusterSNR_L456V)
     if (h_clusterSNR_L456V->GetEntries() != 0)
       MPVClusterSNRL456V = xForMaxY(h_clusterSNR_L456V);
@@ -524,50 +562,50 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     h_MeanSVDEventT0->Draw();
   }
 
-  float MPVClusterTimeL3U = -99;
+  float MPVClusterTimeL3U = nan;
   if (h_clusterTime_L3U)
     if (h_clusterTime_L3U->GetEntries() != 0)
       MPVClusterTimeL3U = xForMaxY(h_clusterTime_L3U);
-  float MPVClusterTimeL3V = -99;
+  float MPVClusterTimeL3V = nan;
   if (h_clusterTime_L3V)
     if (h_clusterTime_L3V->GetEntries() != 0)
       MPVClusterTimeL3V = xForMaxY(h_clusterTime_L3V);
-  float MPVClusterTimeL456U = -99;
+  float MPVClusterTimeL456U = nan;
   if (h_clusterTime_L456U)
     if (h_clusterTime_L456U->GetEntries() != 0)
       MPVClusterTimeL456U = xForMaxY(h_clusterTime_L456U);
-  float MPVClusterTimeL456V = -99;
+  float MPVClusterTimeL456V = nan;
   if (h_clusterTime_L456V)
     if (h_clusterTime_L456V->GetEntries() != 0)
       MPVClusterTimeL456V = xForMaxY(h_clusterTime_L456V);
-  float FWHMClusterTimeL3U = -99;
+  float FWHMClusterTimeL3U = nan;
   if (h_clusterTime_L3U)
     if (h_clusterTime_L3U->GetEntries() != 0)
       FWHMClusterTimeL3U = histFWHM(h_clusterTime_L3U);
-  float FWHMClusterTimeL3V = -99;
+  float FWHMClusterTimeL3V = nan;
   if (h_clusterTime_L3V)
     if (h_clusterTime_L3V->GetEntries() != 0)
       FWHMClusterTimeL3V = histFWHM(h_clusterTime_L3V);
-  float FWHMClusterTimeL456U = -99;
+  float FWHMClusterTimeL456U = nan;
   if (h_clusterTime_L456U)
     if (h_clusterTime_L456U->GetEntries() != 0)
       FWHMClusterTimeL456U = histFWHM(h_clusterTime_L456U);
-  float FWHMClusterTimeL456V = -99;
+  float FWHMClusterTimeL456V = nan;
   if (h_clusterTime_L456V)
     if (h_clusterTime_L456V->GetEntries() != 0)
       FWHMClusterTimeL456V = histFWHM(h_clusterTime_L456V);
 
-  float MeanSVD3EventT0 = -99;
+  float MeanSVD3EventT0 = nan;
   if (h_MeanSVD3EventT0)
     if (h_MeanSVD3EventT0->GetEntries() != 0)
       MeanSVD3EventT0 = xForMaxY(h_MeanSVD3EventT0);
 
-  float MeanSVD6EventT0 = -99;
+  float MeanSVD6EventT0 = nan;
   if (h_MeanSVD6EventT0)
     if (h_MeanSVD6EventT0->GetEntries() != 0)
       MeanSVD6EventT0 = xForMaxY(h_MeanSVD6EventT0);
 
-  float MeanSVDEventT0 = -99;
+  float MeanSVDEventT0 = nan;
   if (h_MeanSVDEventT0)
     if (h_MeanSVDEventT0->GetEntries() != 0)
       MeanSVDEventT0 = xForMaxY(h_MeanSVDEventT0);
@@ -649,7 +687,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L%d.x.%d", layer, sensor);
     TString title = Form("MPVClusterCharge_L%d.x.%d", layer, sensor);
     TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
-    float MPVClusterCharge = -99;
+    float MPVClusterCharge = nan;
     if (h_clusterCharge)
       if (h_clusterCharge->GetEntries() != 0)
         MPVClusterCharge = xForMaxY(h_clusterCharge);
@@ -663,7 +701,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
     name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L%d.x.%d", layer, sensor);
     title = Form("MPVClusterSNR_L%d.x.%d", layer, sensor);
     TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
-    float MPVClusterSNR = -99;
+    float MPVClusterSNR = nan;
     if (h_clusterSNR)
       if (h_clusterSNR->GetEntries() != 0)
         MPVClusterSNR = xForMaxY(h_clusterSNR);
@@ -680,7 +718,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
 
       TString  name = Form("SVDClsTrk/SVDTRK_ClusterCharge_L3.%d.%d", ladder, sensor);
       TString  title =  Form("MPVClusterCharge_L3.%d.%d", ladder, sensor);
-      float MPVClusterCharge = -99;
+      float MPVClusterCharge = nan;
       TH1F* h_clusterCharge = (TH1F*)findHist(name.Data());
       if (h_clusterCharge)
         if (h_clusterCharge->GetEntries() != 0)
@@ -695,7 +733,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
       name = Form("SVDClsTrk/SVDTRK_ClusterSNR_L3.%d.%d", ladder, sensor);
       title = Form("MPVClusterSNR_L3.%d.%d", ladder, sensor);
       TH1F* h_clusterSNR = (TH1F*)findHist(name.Data());
-      float MPVClusterSNR = -99;
+      float MPVClusterSNR = nan;
       if (h_clusterSNR)
         if (h_clusterSNR->GetEntries() != 0)
           MPVClusterSNR = xForMaxY(h_clusterSNR);
@@ -759,10 +797,62 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyUV(int iLaye
   return avgOffOccUV;
 }
 
+std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyGrpId0UV(int iLayer, int nEvents) const
+{
+  int nStripsV = -1;
+  if (iLayer == 3) {
+    nStripsV = 768;
+  } else if (iLayer >= 4 && iLayer <= 6) {
+    nStripsV = 512;
+  } else {
+    B2DEBUG(20, "Layer out of range [3,6].");
+  }
+
+  Int_t nStripsU = 768;
+
+  std::vector<float> avgOffOccU;
+  std::vector<float> avgOffOccV;
+
+  for (unsigned int i = 0; i < m_SVDModules.size(); i++) {
+    int tmp_layer = m_SVDModules[i].getLayerNumber();
+    int tmp_ladder = m_SVDModules[i].getLadderNumber();
+    int tmp_sensor = m_SVDModules[i].getSensorNumber();
+
+    TString tmpnameGrpId0U = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0U", tmp_layer, tmp_ladder, tmp_sensor);
+    TH1F* htmpU = (TH1F*)findHist(tmpnameGrpId0U.Data());
+    if (htmpU == NULL) {
+      B2INFO("Occupancy U histogram for group Id0 not found");
+    } else {
+      if (tmp_layer == iLayer)
+        avgOffOccU.push_back(htmpU->GetEntries() / nStripsU / nEvents * 100);
+    }
+
+    TString tmpnameGrpId0V = Form("SVDExpReco/SVDDQM_%d_%d_%d_StripCountGroupId0V", tmp_layer, tmp_ladder, tmp_sensor);
+    TH1F* htmpV = (TH1F*)findHist(tmpnameGrpId0V.Data());
+    if (htmpV == NULL) {
+      B2INFO("Occupancy V histogram for group Id0 not found");
+    } else {
+      if (tmp_layer == iLayer)
+        avgOffOccV.push_back(htmpV->GetEntries() / nStripsV / nEvents * 100);
+    }
+  }
+
+  std::vector<float> avgOffOccUV(2, 0.);
+
+  avgOffOccUV[0] = accumulate(avgOffOccU.begin(), avgOffOccU.end(), 0.0);
+  avgOffOccUV[0] /= float(avgOffOccU.size());
+
+  avgOffOccUV[1] = accumulate(avgOffOccV.begin(), avgOffOccV.end(), 0.0);
+  avgOffOccUV[1] /= float(avgOffOccV.size());
+
+  return avgOffOccUV;
+}
 
 std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int minX,
     int maxX, int minY, int maxY) const
 {
+  float nan = numeric_limits<float>::quiet_NaN();
+
   std::vector<float> avgEffUV(2, 0.0);
   std::vector<float> sumMatchedClustersUV(2, 0.0);
   std::vector<float> sumFoundTracksUV(2, 0.0);
@@ -778,12 +868,12 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hM
   if (sumFoundTracksUV[0] > 0) {
     avgEffUV[0] = sumMatchedClustersUV[0] / sumFoundTracksUV[0] * 100;
   } else {
-    avgEffUV[0] = -1;
+    avgEffUV[0] = nan;
   }
   if (sumFoundTracksUV[1] > 0) {
     avgEffUV[1] = sumMatchedClustersUV[1] / sumFoundTracksUV[1] * 100;
   } else {
-    avgEffUV[1] = -1;
+    avgEffUV[1] = nan;
   }
   return avgEffUV;
 }

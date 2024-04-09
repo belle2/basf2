@@ -11,7 +11,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 #include <tracking/roiFinding/ROIGeometry.h>
-#include <genfit/KalmanFitter.h>
 
 
 namespace Belle2 {
@@ -43,7 +42,6 @@ namespace Belle2 {
   private:
 
     const float m_pxdLayerRadius[2] = {1.42854, 2.21218}; /**< mean PXD layer radius for both layers */
-    genfit::KalmanFitter m_kalmanFilter; /**< kalman filter object to fit the track */
 
     ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
 

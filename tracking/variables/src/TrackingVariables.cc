@@ -130,13 +130,12 @@ namespace Belle2 {
 
       StoreObjPtr<EventT0> m_evtT0;
       if (m_evtT0.isValid()) {
-        auto svdHypos = m_evtT0->getTemporaryEventT0s(Const::EDetector::SVD);
-        if (svdHypos.size() > 0) {
-          const auto svdBestT0 = svdHypos.back();
-          return svdBestT0.eventT0;
-        }     else return Const::doubleNaN;
-      } else return Const::doubleNaN;
-
+        const auto bestSVDHypo = m_evtT0->getBestSVDTemporaryEventT0();
+        if (bestSVDHypo) {
+          return bestSVDHypo->eventT0;
+        }
+      }
+      return Const::doubleNaN;
     }
 
 

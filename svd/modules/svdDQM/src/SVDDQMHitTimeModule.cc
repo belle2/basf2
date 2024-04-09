@@ -319,9 +319,9 @@ void SVDDQMHitTimeModule::event()
   int nSamples = m_svdEventInfo->getNSamples();
 
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
-    auto evtT0List_SVD = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD) ;
+    const auto bestSVDEvtT0 = m_eventT0->getBestSVDTemporaryEventT0() ;
     //    There is only one estimate of SVD EVentT0 for the moment
-    float svdEventT0 = evtT0List_SVD.back().eventT0 ;
+    float svdEventT0 = bestSVDEvtT0->eventT0 ;
 
     if (nSamples == 3) {
       m_SVD3EventT0->Fill(svdEventT0);

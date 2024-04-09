@@ -125,15 +125,15 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "endcap_klm_latency", "endcap_klm_latency");
 
   //hadronb2_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_bhabha_all", "hadronb2_over_bhabha_all");
 
   //mumu2trk_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_all", "mumu2trk_over_bhabha_all");
 
   //hadronb2_over_mumu2trk
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
 
   //ECLTRG_deadch
@@ -146,9 +146,6 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 2000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
-  //update PV
-//  updateEpicsPVs(
-//    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
 }
 
 void DQMHistAnalysisTRGModule::beginRun()
@@ -179,8 +176,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     comL1_GDLL1_mean = hist_comL1_GDLL1->GetMean();
     B2DEBUG(1, "comL1_GDLL1_mean:" << comL1_GDLL1_mean);
     setEpicsPV("comL1_GDLL1_mean", comL1_GDLL1_mean);
-//    updateEpicsPVs(
-//      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
 
   //update ECLTRG timing

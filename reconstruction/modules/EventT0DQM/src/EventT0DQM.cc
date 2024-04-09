@@ -297,124 +297,91 @@ void EventT0DQMModule::event()
   B2DEBUG(20, "mumu trigger comparison bool = "   << IsEvtAcceptedMumu) ;
 
 
-  // default values of the event t0 given that there may not be a value for every event depending on the detector measuring it.
-  double eventT0_ECL = -1000 ;
-  double eventT0_CDC = -1000 ;
-  double eventT0_TOP = -1000 ;
-  double eventT0_SVD = -1000 ;
-
-  // Set the CDC event t0 value if it exists
-  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-    auto evtT0List_CDC = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
-
-    // set the CDC event t0 value for filling into the histogram
-    //    The most accurate CDC event t0 value is the last one in the list.
-    eventT0_CDC = evtT0List_CDC.back().eventT0 ;
-  }
-
-  // Set the ECL event t0 value if it exists
-  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL)) {
-    // Get the list of ECL event t0 values.  There are several event t0 values, not just one.
-    auto evtT0List_ECL = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
-
-    auto eclBestT0 = std::min_element(evtT0List_ECL.begin(), evtT0List_ECL.end(), [](EventT0::EventT0Component c1,
-    EventT0::EventT0Component c2) {return c1.quality < c2.quality;});
-
-    // set the ECL event t0 value for filling into the histogram
-    //    It is the value found to have the small chi square
-    eventT0_ECL = eclBestT0->eventT0 ;
-  }
-
-  // Set the TOP event t0 value if it exists
-  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP)) {
-    auto evtT0List_TOP = m_eventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
-
-    // set the TOP event t0 value for filling into the histogram
-    //    There should only be at most one value in the list per event
-    eventT0_TOP = evtT0List_TOP.back().eventT0 ;
-  }
-
-  if (m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
-    auto evtT0List_SVD = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD) ;
-    //    There is only one estimate of SVD EVentT0 for the moment
-    eventT0_SVD = evtT0List_SVD.back().eventT0 ;
-  }
+  // Set the different EventT0 values, default is -1000 in case there are no information based on a given detector
+  const double eventT0ECL =
+    m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL) ? m_eventT0->getBestECLTemporaryEventT0()->eventT0 : -1000;
+  const double eventT0CDC =
+    m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC) ? m_eventT0->getBestCDCTemporaryEventT0()->eventT0 : -1000;
+  const double eventT0TOP =
+    m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP) ? m_eventT0->getBestTOPTemporaryEventT0()->eventT0 : -1000;
+  const double eventT0SVD =
+    m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD) ? m_eventT0->getBestSVDTemporaryEventT0()->eventT0 : -1000;
 
   // Fill the plots that used the ECL trigger as the L1 timing source
   if (IsECLL1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
-      m_histEventT0_ECL_bhabha_L1_ECLTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_bhabha_L1_ECLTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_bhabha_L1_ECLTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_bhabha_L1_ECLTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_bhabha_L1_ECLTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_bhabha_L1_ECLTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_bhabha_L1_ECLTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_bhabha_L1_ECLTRG->Fill(eventT0SVD);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
-      m_histEventT0_ECL_hadron_L1_ECLTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_hadron_L1_ECLTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_hadron_L1_ECLTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_hadron_L1_ECLTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_hadron_L1_ECLTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_hadron_L1_ECLTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_hadron_L1_ECLTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_hadron_L1_ECLTRG->Fill(eventT0SVD);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
-      m_histEventT0_ECL_mumu_L1_ECLTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_mumu_L1_ECLTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_mumu_L1_ECLTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_mumu_L1_ECLTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_mumu_L1_ECLTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_mumu_L1_ECLTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_mumu_L1_ECLTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_mumu_L1_ECLTRG->Fill(eventT0SVD);
     }
   }
   // Fill the plots that used the TOP trigger as the L1 timing source
   else if (IsTOPL1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
-      m_histEventT0_ECL_bhabha_L1_TOPTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_bhabha_L1_TOPTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_bhabha_L1_TOPTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_bhabha_L1_TOPTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_bhabha_L1_TOPTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_bhabha_L1_TOPTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_bhabha_L1_TOPTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_bhabha_L1_TOPTRG->Fill(eventT0SVD);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
-      m_histEventT0_ECL_hadron_L1_TOPTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_hadron_L1_TOPTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_hadron_L1_TOPTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_hadron_L1_TOPTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_hadron_L1_TOPTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_hadron_L1_TOPTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_hadron_L1_TOPTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_hadron_L1_TOPTRG->Fill(eventT0SVD);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
-      m_histEventT0_ECL_mumu_L1_TOPTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_mumu_L1_TOPTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_mumu_L1_TOPTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_mumu_L1_TOPTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_mumu_L1_TOPTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_mumu_L1_TOPTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_mumu_L1_TOPTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_mumu_L1_TOPTRG->Fill(eventT0SVD);
     }
   }
   // Fill the plots that used the CDC trigger as the L1 timing source
   else if (IsCDCL1TriggerSource) {
     // Fill the histograms with the event t0 values
     if (IsEvtAcceptedBhabha) {   // fill the bha bha skim event t0s
-      m_histEventT0_ECL_bhabha_L1_CDCTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_bhabha_L1_CDCTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_bhabha_L1_CDCTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_bhabha_L1_CDCTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_bhabha_L1_CDCTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_bhabha_L1_CDCTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_bhabha_L1_CDCTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_bhabha_L1_CDCTRG->Fill(eventT0SVD);
     }
 
     if (IsEvtAcceptedHadron) {    // fill the hadron skim event t0s
-      m_histEventT0_ECL_hadron_L1_CDCTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_hadron_L1_CDCTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_hadron_L1_CDCTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_hadron_L1_CDCTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_hadron_L1_CDCTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_hadron_L1_CDCTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_hadron_L1_CDCTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_hadron_L1_CDCTRG->Fill(eventT0SVD);
     }
 
     if (IsEvtAcceptedMumu) {    // fill the mumu skim event t0s
-      m_histEventT0_ECL_mumu_L1_CDCTRG->Fill(eventT0_ECL);
-      m_histEventT0_CDC_mumu_L1_CDCTRG->Fill(eventT0_CDC);
-      m_histEventT0_TOP_mumu_L1_CDCTRG->Fill(eventT0_TOP);
-      m_histEventT0_SVD_mumu_L1_CDCTRG->Fill(eventT0_SVD);
+      m_histEventT0_ECL_mumu_L1_CDCTRG->Fill(eventT0ECL);
+      m_histEventT0_CDC_mumu_L1_CDCTRG->Fill(eventT0CDC);
+      m_histEventT0_TOP_mumu_L1_CDCTRG->Fill(eventT0TOP);
+      m_histEventT0_SVD_mumu_L1_CDCTRG->Fill(eventT0SVD);
     }
   }
 
-  B2DEBUG(20, "eventT0_ECL = " << eventT0_ECL << " ns") ;
-  B2DEBUG(20, "eventT0_CDC = " << eventT0_CDC << " ns") ;
-  B2DEBUG(20, "eventT0_TOP = " << eventT0_TOP << " ns") ;
-  B2DEBUG(20, "eventT0_SVD = " << eventT0_SVD << " ns") ;
+  B2DEBUG(20, "eventT0ECL = " << eventT0ECL << " ns") ;
+  B2DEBUG(20, "eventT0CDC = " << eventT0CDC << " ns") ;
+  B2DEBUG(20, "eventT0TOP = " << eventT0TOP << " ns") ;
+  B2DEBUG(20, "eventT0SVD = " << eventT0SVD << " ns") ;
 }

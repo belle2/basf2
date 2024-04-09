@@ -231,7 +231,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       16
 [INFO] Loading new input file
 	filename = chaintest_2.root
-	metadata LFN = /gpfs/home/belle2/fmeier/git/basf2-all/chaintest_2.root
+	metadata LFN = 
 [INFO] EXP:        0        RUN:        1        EVT:        7
 [INFO] EXP:        0        RUN:        1        EVT:        6
 [INFO] EXP:        0        RUN:        1        EVT:        3
@@ -276,7 +276,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       16
 [INFO] Loading new input file
 	filename = chaintest_2.root
-	metadata LFN = /gpfs/home/belle2/fmeier/git/basf2-all/chaintest_2.root
+	metadata LFN = 
 [INFO] EXP:        0        RUN:        1        EVT:        7
 [INFO] EXP:        0        RUN:        1        EVT:        6
 [INFO] EXP:        0        RUN:        1        EVT:        3
@@ -294,7 +294,7 @@
 [INFO] EXP:        0        RUN:        1        EVT:       15
 [INFO] Loading new input file
 	filename = chaintest_1.root
-	metadata LFN = /gpfs/home/belle2/fmeier/git/basf2-all/chaintest_1.root
+	metadata LFN = 
 [INFO] EXP:        0        RUN:        1        EVT:        2
 [INFO] EXP:        0        RUN:        1        EVT:        6
 [INFO] EXP:        0        RUN:        1        EVT:        5

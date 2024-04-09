@@ -1,4 +1,0 @@
-Error in <TBufferFile::CheckByteCount>: object of class vector<Belle2::TOPNominalTTS::Gauss> read too few bytes: 6 instead of 48
-Error in <TBufferFile::CheckByteCount>: object of class vector<Belle2::TOPNominalTTS::Gauss> read too few bytes: 6 instead of 48
-Error in <TBufferFile::CheckByteCount>: object of class vector<Belle2::TOPNominalTTS::Gauss> read too few bytes: 6 instead of 60
-Error in <TBufferFile::CheckByteCount>: object of class vector<Belle2::TOPNominalTTS::Gauss> read too few bytes: 6 instead of 60

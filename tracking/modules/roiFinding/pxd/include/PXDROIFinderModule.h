@@ -67,7 +67,7 @@ namespace Belle2 {
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/
 
-    ROIToUnitTranslator* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
+    ROIToUnitTranslator<PXDIntercept>* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
     PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
 
     double m_toleranceZ; /**< tolerance for finding sensor in Z coordinate (cm) */

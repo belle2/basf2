@@ -98,7 +98,7 @@ void SVDROIFinderModule::beginRun()
 
   m_theSVDInterceptor = new SVDInterceptor(m_toleranceZ, m_tolerancePhi);
 
-  m_theStripTranslator = new ROIStripTranslator(&m_ROIinfo);
+  m_theStripTranslator = new ROIToUnitTranslator<SVDIntercept>(&m_ROIinfo);
 
 }
 

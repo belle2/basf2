@@ -10,7 +10,7 @@
 
 #include <framework/core/Module.h>
 #include <tracking/roiFinding/SVDInterceptor.h>
-#include <tracking/roiFinding/ROIStripTranslator.h>
+#include <tracking/roiFinding/ROIToUnitTranslator.h>
 #include <tracking/roiFinding/ROIinfo.h>
 
 #include <string>
@@ -66,7 +66,7 @@ namespace Belle2 {
     void terminate() override;
 
   protected:
-    ROIStripTranslator* m_theStripTranslator = nullptr; /**< the strip translator object*/
+    ROIToUnitTranslator<SVDIntercept>* m_theStripTranslator = nullptr; /**< the strip translator object*/
 
     SVDInterceptor* m_theSVDInterceptor = nullptr; /**< the svd interceptor object*/
     std::string m_SVDInterceptListName; /**< intercept list name*/

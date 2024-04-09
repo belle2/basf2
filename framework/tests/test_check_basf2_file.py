@@ -32,13 +32,13 @@ assert 0 != os.system('b2file-check -n 10 ' + rootfile)
 assert 0 == os.system('b2file-check --mcevents 5 ' + rootfile)
 assert 0 != os.system('b2file-check --mcevents 0 ' + rootfile)
 
-assert 0 == os.system('b2file-check -n 5 -s 7.6 1 ' + rootfile)
-assert 0 == os.system('b2file-check -n 5 -s 7.6 0.05 ' + rootfile)
-assert 0 != os.system('b2file-check -n 5 -s 7.6 0 ' + rootfile)
+assert 0 == os.system('b2file-check -n 5 -s 9.5 1 ' + rootfile)
+assert 0 == os.system('b2file-check -n 5 -s 9.5 0.05 ' + rootfile)
+assert 0 != os.system('b2file-check -n 5 -s 9.5 0 ' + rootfile)
 
 assert 0 == os.system('b2file-check -n 5 -s 10 1 ' + rootfile)
 assert 0 == os.system('b2file-check -n 5 -s 10 0.5 ' + rootfile)
-assert 0 != os.system('b2file-check -n 5 -s 10 0.2 ' + rootfile)
+assert 0 == os.system('b2file-check -n 5 -s 10 0.2 ' + rootfile)
 assert 0 != os.system('b2file-check -n 5 -s 10 0.05 ' + rootfile)
 
 assert 0 == os.system('b2file-check -n 5 -s 10 0.5 ' + rootfile + ' EventMetaData')

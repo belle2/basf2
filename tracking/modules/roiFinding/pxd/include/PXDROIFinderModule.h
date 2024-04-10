@@ -8,7 +8,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/roiFinding/PXDInterceptor.h>
+#include <tracking/roiFinding/VXDInterceptor.h>
 #include <tracking/roiFinding/ROIToUnitTranslator.h>
 #include <tracking/roiFinding/ROIinfo.h>
 #include <framework/database/DBObjPtr.h>
@@ -68,7 +68,7 @@ namespace Belle2 {
     std::string m_recoTracksListName; /**< track list name*/
 
     ROIToUnitTranslator<PXDIntercept>* m_thePixelTranslator = nullptr; /**< the pixel translator object*/
-    PXDInterceptor* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
+    VXDInterceptor<PXDIntercept>* m_thePXDInterceptor = nullptr; /**< the pxd interceptor object*/
 
     double m_toleranceZ; /**< tolerance for finding sensor in Z coordinate (cm) */
     double m_tolerancePhi; /**< tolerance for finding sensor in phi coordinate (radians) */

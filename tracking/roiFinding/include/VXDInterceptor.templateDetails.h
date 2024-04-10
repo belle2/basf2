@@ -101,10 +101,8 @@ namespace Belle2 {
         tmpIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
         tmpIntercept.setLambda(lambda);
         tmpIntercept.setVxdID(itPlanes->getVxdID());
-        if (m_detector == VXD::SensorInfoBase::SVD) {
-          tmpIntercept.setUprime(predictedIntersect[1]);
-          tmpIntercept.setVprime(predictedIntersect[2]);
-        }
+        tmpIntercept.setUprime(predictedIntersect[1]);
+        tmpIntercept.setVprime(predictedIntersect[2]);
 
         B2DEBUG(20, "coordinates with getPos = " << state.getPos().X()
                 << ", " << state.getPos().Y()

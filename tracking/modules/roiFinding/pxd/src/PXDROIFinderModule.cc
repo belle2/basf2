@@ -17,6 +17,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
+#include <tracking/roiFinding/VXDInterceptor.templateDetails.h>
 
 using namespace Belle2;
 
@@ -128,8 +129,9 @@ void PXDROIFinderModule::beginRun()
   m_ROIinfo.ROIListName = m_ROIListName;
   m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
-  m_thePXDInterceptor = new PXDInterceptor(m_toleranceZ, m_tolerancePhi);
-
+  m_thePXDInterceptor = new VXDInterceptor<PXDIntercept>(m_toleranceZ, m_tolerancePhi,
+                                                         std::vector<float> {1.42854, 2.21218},
+                                                         VXD::SensorInfoBase::PXD);
   m_thePixelTranslator = new ROIToUnitTranslator<PXDIntercept>(&m_ROIinfo);
 
 }

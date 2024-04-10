@@ -226,6 +226,7 @@ namespace Belle2 {
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
+    double m_numEvents = 0; /**< number of events processed with TOPDQM module */
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */

@@ -12,7 +12,10 @@
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/roiFinding/VXDInterceptor.templateDetails.h>
 #include <genfit/MaterialEffects.h>
+
+#include <vector>
 
 using namespace Belle2;
 
@@ -96,7 +99,9 @@ void SVDROIFinderModule::beginRun()
   m_ROIinfo.ROIListName = m_ROIListName;
   m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
-  m_theSVDInterceptor = new SVDInterceptor(m_toleranceZ, m_tolerancePhi);
+  m_theSVDInterceptor = new VXDInterceptor<SVDIntercept>(m_toleranceZ, m_tolerancePhi,
+                                                         std::vector<float> {3.9, 8.0, 10.4, 13.5},
+                                                         VXD::SensorInfoBase::SVD);
 
   m_theStripTranslator = new ROIToUnitTranslator<SVDIntercept>(&m_ROIinfo);
 

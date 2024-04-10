@@ -9,7 +9,7 @@
 #pragma once
 
 #include <framework/core/Module.h>
-#include <tracking/roiFinding/SVDInterceptor.h>
+#include <tracking/roiFinding/VXDInterceptor.h>
 #include <tracking/roiFinding/ROIToUnitTranslator.h>
 #include <tracking/roiFinding/ROIinfo.h>
 
@@ -68,7 +68,7 @@ namespace Belle2 {
   protected:
     ROIToUnitTranslator<SVDIntercept>* m_theStripTranslator = nullptr; /**< the strip translator object*/
 
-    SVDInterceptor* m_theSVDInterceptor = nullptr; /**< the svd interceptor object*/
+    VXDInterceptor<SVDIntercept>* m_theSVDInterceptor = nullptr; /**< the svd interceptor object*/
     std::string m_SVDInterceptListName; /**< intercept list name*/
     std::string m_ROIListName; /**< ROI list name*/
     std::string m_recoTracksListName; /**< track list name*/

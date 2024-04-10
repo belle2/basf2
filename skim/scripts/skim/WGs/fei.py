@@ -655,7 +655,7 @@ class feiHadronic(BaseFEISkim):
 
 
 @_FEI_skim_header(["B0", "B+"])
-class feiHadronicDstEllNu(BaseFEISkim):
+class feiHadronic_DstEllNu(BaseFEISkim):
     """
     Tag side :math:`B` cuts:
 

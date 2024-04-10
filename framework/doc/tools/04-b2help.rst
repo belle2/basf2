@@ -29,8 +29,8 @@ Tools which will provide you help
 
 .. _b2help-recommendation:
 
-``b2help-recommendation``: Outputs recommendation for data/MC corrections and systematics
------------------------------------------------------------------------------------------
+``b2help-recommendation``: Tool to print analysis recommendations
+-----------------------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2help-recommendation

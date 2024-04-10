@@ -15,7 +15,7 @@ Get a summary of recommendations for analysis tools.
 import json
 import argparse
 import sys
-
+import versioning
 import basf2 as b2
 
 
@@ -86,20 +86,24 @@ def convert_json_to_payload(localfile='', payload=''):
     db = Belle2.Database.Instance()
     db.addPayload(payload, localfile, iov)
 
-
-def main():
-
+def get_argument_parser():
+    """
+    Get the argument parser.
+    """
     parser = argparse.ArgumentParser(description="Tool recommendation information")
     parser.add_argument("--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
                         nargs='+', default=None)
     parser.add_argument("--globaltag", help="Global tag name, if one wants to check another recommendation",
-                        default='user_yosato_recommendations')  # temporal
+                        default=None)
     parser.add_argument("--payload", help="Payload name, if one wants to check another recommendation",
-                        default='recommendation_payload')  # temporal
+                        default=None)
     parser.add_argument("--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
+    return parser
 
-    args = parser.parse_args()
+def main():
+ 
+    args = get_argument_parser().parse_args()
 
     if args.convert:
         b2.B2INFO("Convert the localfile to a payload")
@@ -113,8 +117,12 @@ def main():
 
     if args.localfile is None:
         gt_name = args.globaltag
+        if gt_name is None:
+            gt_name = versioning.performance_recommendation_global_tag()['global_tag']
         payload_name = args.payload
-
+        if payload_name is None:
+            payload_name = versioning.performance_recommendation_global_tag()['payload']
+            
         b2.conditions.prepend_globaltag(gt_name)
 
         # set a temporal EventMetaData to access database

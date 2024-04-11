@@ -1,6 +1,6 @@
 # EventType: 1121848000
 # Descriptor: [B0 -> J/psi [-> mu+ mu- or e+ e-] eta [-> pi+ pi- pi0(-> gamma gamma) or gamma gamma]]
-# NickName: Bd_Jpsieta_mumu_pipipi0
+# NickName: Bd_Jpsieta_ll_pipipi0_or_gg
 # Tested: Yes
 # PhysicsWG: TDCPV
 # Responsible: Chao Chun Chang
@@ -20,7 +20,7 @@ Decay Upsilon(4S)
 Enddecay
 #
 Decay B0sig
-1.000   J/psisig       etasig                       SVS;
+1.000   J/psisig       etasig                       SSD_CP dm 0.0 1.0 minusTwoBeta 1.0 0.0 1.0 0.0;
 Enddecay
 CDecay anti-B0sig
 #

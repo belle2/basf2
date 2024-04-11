@@ -116,10 +116,10 @@ void SVDTimeCalibrationCollectorModule::collect()
   float eventT0 = 0;
   // Set the CDC event t0 value if it exists
   if (m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-    auto evtT0List_CDC = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
+    auto evtT0CDC = m_eventT0->getBestCDCTemporaryEventT0();
     // Set the CDC event t0 value for filling into the histogram
     // The most accurate CDC event t0 value is the last one in the list.
-    eventT0 = evtT0List_CDC.back().eventT0;
+    eventT0 = evtT0CDC->eventT0;
     getObjectPtr<TH1F>("hEventT0FromCDC")->Fill(eventT0);
   } else {return;}
 

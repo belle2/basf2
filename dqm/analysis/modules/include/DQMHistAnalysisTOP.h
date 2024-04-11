@@ -181,11 +181,11 @@ namespace Belle2 {
     void setAlarmLines();
 
     /**
-     * Returns histogram mean by excluding bins with zero content
-     * @param h 2D histogram
-     * @return mean
+     * Returns cut levels for dead and hot channels
+     * @param h pixel or channel distribution of hits (1D or 2D histogram)
+     * @return cut levels (first = dead, second = hot)
      */
-    double getMean(const TH2* h);
+    std::pair<double, double> getDeadAndHotCuts(const TH1* h);
 
     /**
      * Calculates and sets epics variables
@@ -226,6 +226,7 @@ namespace Belle2 {
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
+    double m_numEvents = 0; /**< number of events processed with TOPDQM module */
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */

@@ -182,10 +182,9 @@ void SVDPerformanceTTreeModule::event()
   if (m_EventT0.isValid())
     if (m_EventT0->hasEventT0()) {
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-        auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
-        //    The most accurate CDC event t0 value is the last one in the list.
-        m_cdcEventT0 = evtT0List_CDC.back().eventT0 ;
-        m_cdcEventT0Err = evtT0List_CDC.back().eventT0Uncertainty;
+        const auto bestCDCEvtT0 = m_EventT0->getBestCDCTemporaryEventT0();
+        m_cdcEventT0 = bestCDCEvtT0->eventT0 ;
+        m_cdcEventT0Err = bestCDCEvtT0->eventT0Uncertainty;
       }
     }
 

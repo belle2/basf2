@@ -24,7 +24,7 @@ class Tool:
     Analysis tool information.
     """
 
-    def __init__(self, name, tags=None, description="", recommendation=None, snippet=""):
+    def __init__(self, name, tags=None, description=None, recommendation=None, snippet=None):
         self.name = name
         self.tags = tags if tags else []
         self.description = description
@@ -41,7 +41,7 @@ class Tool:
         }
 
 
-def load_data(filename):
+def load_data(filename: str):
     """
     load a local json file.
     """
@@ -50,7 +50,7 @@ def load_data(filename):
         return [Tool(**tool_data) for tool_data in data]
 
 
-def display_tool_info(tool):
+def display_tool_info(tool: Tool):
     """
     display a tool's information.
     """
@@ -68,18 +68,21 @@ def display_tool_info(tool):
     print()
 
 
-def get_available_tags(tools):
+def get_available_tags(tools: list):
     """
-    get all available tags.
+    Get all available tags.
     """
     tags = set()
     for tool in tools:
         tags.update(tool.tags)
-    return tags
+    # Sort the tags for the tests
+    return sorted(tags)
 
 
-def convert_json_to_payload(localfile='', payload=''):
-
+def convert_json_to_payload(localfile: str, payload: str):
+    """
+    Convert json to payload and store it in localdb
+    """
     from ROOT import Belle2
 
     iov = Belle2.IntervalOfValidity.always()
@@ -112,7 +115,10 @@ def main():
             b2.B2ERROR("The localfile is not provided!")
             sys.exit(1)
         else:
-            convert_json_to_payload(args.localfile, args.payload)
+            payload_name = args.payload
+            if payload_name is None:
+                payload_name = versioning.performance_recommendation_global_tag()['payload']
+            convert_json_to_payload(args.localfile, payload_name)
             sys.exit(0)
 
     if args.localfile is None:

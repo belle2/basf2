@@ -100,6 +100,8 @@ def get_argument_parser():
                         default=None)
     parser.add_argument("-p", "--payload", help="Payload name, if one wants to check another recommendation",
                         default=None)
+    parser.add_argument("-m", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
+                        default='MC15')
     parser.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
     return parser
@@ -124,10 +126,10 @@ def main():
     if args.localfile is None:
         gt_name = args.globaltag
         if gt_name is None:
-            gt_name = versioning.performance_recommendation_global_tag()['global_tag']
+            gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']
         payload_name = args.payload
         if payload_name is None:
-            payload_name = versioning.performance_recommendation_global_tag()['payload']
+            payload_name = versioning.performance_recommendation_global_tag(args.mccampaign)['payload']
             
         b2.conditions.prepend_globaltag(gt_name)
 

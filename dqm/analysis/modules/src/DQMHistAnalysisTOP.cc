@@ -289,7 +289,9 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
 
   auto* canvas = findCanvas("TOP/c_window_vs_slot");
   if (canvas) {
+    canvas->Clear();
     canvas->cd();
+    if (hraw) hraw->Draw();
     m_text1->Draw();
     for (auto* line : m_asicWindowsBandLines) line->Draw();
     canvas->Pad()->SetFrameFillColor(10);

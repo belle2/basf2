@@ -212,6 +212,7 @@ void CDCUnpackerModule::event()
           if (m_recoverBoardIdError) {
             m_boardId = m_boardId & 0x01ff;
             if (m_boardId > 300) {
+              B2WARNING("Unrecoverable board " << std::hex << m_boardId);
               continue;
             }
           } else {
@@ -402,12 +403,6 @@ void CDCUnpackerModule::event()
               break;
             }
 
-            if (ch >= 48) {
-              B2WARNING("Invalid channel" << LogVar("channel", ch));
-              it += length;
-              continue;
-            }
-
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
 
@@ -431,6 +426,20 @@ void CDCUnpackerModule::event()
               tdcFlag = (m_buffer.at(it + 4) & 0x8000) >> 15;
             } else {
               B2ERROR("CDCUnpacker : Undefined data length (should be 4 or 5 short words) ");
+            }
+
+            if (ch >= 48) {
+              B2WARNING("Invalid channel "
+                        << LogVar("channel", ch)
+                        << LogVar("board", board)
+                        << LogVar("buffer total size", m_buffer.size())
+                        << LogVar("length", length)
+                        << LogVar("tdc", tdc1)
+                        << LogVar("adc", fadcSum)
+                        << LogVar("tot", tot)
+                       );
+              it += length;
+              continue;
             }
 
             if (m_enablePrintOut == true) {

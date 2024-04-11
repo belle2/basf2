@@ -7,14 +7,12 @@
  **************************************************************************/
 
 #include <tracking/roiFinding/VXDInterceptor.h>
+#include <tracking/roiFinding/ROIDetPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
-
-// using namespace std;
-// using namespace Belle2;
 
 namespace Belle2 {
 

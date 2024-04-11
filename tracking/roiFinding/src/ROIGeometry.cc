@@ -7,7 +7,8 @@
  **************************************************************************/
 
 
-#include "tracking/roiFinding/ROIGeometry.h"
+#include <tracking/roiFinding/ROIGeometry.h>
+#include <tracking/roiFinding/ROIDetPlane.h>
 #include <framework/logging/Logger.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>

@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <tracking/roiFinding/ROIDetPlane.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
 #include <list>

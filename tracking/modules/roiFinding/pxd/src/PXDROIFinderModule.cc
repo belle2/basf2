@@ -17,6 +17,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/PXDIntercept.h>
+#include <tracking/roiFinding/ROIToUnitTranslator.templateDetails.h>
 #include <tracking/roiFinding/VXDInterceptor.templateDetails.h>
 
 using namespace Belle2;

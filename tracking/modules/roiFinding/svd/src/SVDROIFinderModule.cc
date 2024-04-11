@@ -12,6 +12,7 @@
 #include <tracking/dataobjects/ROIid.h>
 #include <tracking/dataobjects/SVDIntercept.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/roiFinding/ROIToUnitTranslator.templateDetails.h>
 #include <tracking/roiFinding/VXDInterceptor.templateDetails.h>
 #include <genfit/MaterialEffects.h>
 

@@ -24,7 +24,7 @@ namespace Belle2 {
     static ModulePtrList preparePaths(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath);
 
     /** Find the histogram manager in the paths and return it. */
-    static ModulePtr getHistogramManager(PathPtr& inputPath, PathPtr& mainPath, PathPtr& outputPath);
+    static ModulePtr getHistogramManager(PathPtr& inputPath);
 
     /** Return only modules which have the TerminateGlobally Module flag set. */
     static ModulePtrList getTerminateGloballyModules(const ModulePtrList& modules);

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -50,6 +49,8 @@ class BtoXgamma(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -155,6 +156,8 @@ class BtoXll(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -270,6 +273,8 @@ class BtoXll_LFV(BaseSkim):
     __description__ = ":math:`B\\to X\\ell\\ell` (LFV modes only) inclusive skim."
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

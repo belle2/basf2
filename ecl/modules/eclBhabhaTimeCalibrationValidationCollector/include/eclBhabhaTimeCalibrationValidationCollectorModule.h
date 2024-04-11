@@ -13,7 +13,6 @@
 
 /* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventT0.h>

@@ -195,7 +195,7 @@ def draw_bklmhists(file_chain):
 
     nPE = TH1F('nGenPE', 'Generated PE in BKLM', 200, 0.0, 200)
     file_chain.Draw('KLMDigits.getNGeneratedPhotoelectrons()>>nGenPE',
-                    subdetector_selection + ' && KLMDigits.getLayer() < 3')
+                    'KLMDigits.m_Subdetector==1 && KLMDigits.getLayer() < 3')
     nPE.GetXaxis().SetTitle('# generated PE')
     nPE.GetListOfFunctions().Add(TNamed('Description', 'Number of generated photoelectrons in BKLM'))
     nPE.GetListOfFunctions().Add(TNamed('Check', 'Peak around 50.'))

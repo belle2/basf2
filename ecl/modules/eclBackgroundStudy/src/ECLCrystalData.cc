@@ -10,7 +10,6 @@
 #include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 
 /* Basf2 headers. */
-#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
 /* ROOT headers. */

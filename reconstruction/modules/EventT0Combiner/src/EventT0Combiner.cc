@@ -40,36 +40,34 @@ void EventT0CombinerModule::event()
   }
 
   // check if a SVD hypothesis exists
-  auto svdHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::SVD);
+  const auto bestSVDHypo = m_eventT0->getBestSVDTemporaryEventT0();
 
-  // check if a CDC hypothesis exists
-  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-
-  if (svdHypos.size() == 0) {
+  if (not bestSVDHypo) {
     B2DEBUG(20, "No SVD time hypotheses available, stopping");
     // if no SVD value was found, the best t0 has already been set by the ECL t0 module.
     return;
   }
 
-  // get the latest SVD hypothesis information, this is also the most accurate t0 value the SVD can provide
-  const auto svdBestT0 = svdHypos.back();
-
-  B2DEBUG(20, "Best SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty);
+  B2DEBUG(20, "Best SVD time hypothesis t0 = " << bestSVDHypo->eventT0 << " +- " << bestSVDHypo->eventT0Uncertainty);
 
   if (m_paramCombinationMode == m_combinationModePreferSVD) {
     // we have a SVD value, so set this as new best global value
-    B2DEBUG(20, "Setting SVD time hypothesis t0 = " << svdBestT0.eventT0 << " +- " << svdBestT0.eventT0Uncertainty <<
+    B2DEBUG(20, "Setting SVD time hypothesis t0 = " << bestSVDHypo->eventT0 << " +- " << bestSVDHypo->eventT0Uncertainty <<
             " as new final value.");
     //set SVD value, if available
-    m_eventT0->setEventT0(svdBestT0);
+    m_eventT0->setEventT0(*bestSVDHypo);
   } else if (m_paramCombinationMode == m_combinationModePreferCDC) {
-    // get the latest CDC hypothesis information, this is also the most accurate t0 value the CDC can provide
-    const auto cdcBestT0 = cdcHypos.back();
+    // get best CDC hypothesis
+    const auto bestCDCHypo = m_eventT0->getBestCDCTemporaryEventT0();
+    if (not bestCDCHypo) {
+      B2DEBUG(20, "No CDC EventT0 candiate, exiting.");
+      return;
+    }
     // we have a CDC value, so set this as new best global value
-    B2DEBUG(20, "Setting CDC time hypothesis t0 = " << cdcBestT0.eventT0 << " +- " << cdcBestT0.eventT0Uncertainty <<
+    B2DEBUG(20, "Setting CDC time hypothesis t0 = " << bestCDCHypo->eventT0 << " +- " << bestCDCHypo->eventT0Uncertainty <<
             " as new final value.");
     //set CDC value, if available
-    m_eventT0->setEventT0(cdcBestT0);
+    m_eventT0->setEventT0(*bestCDCHypo);
   } else if (m_paramCombinationMode == m_combinationModeCombineSVDandECL) {
     // start comparing with all available ECL hypothesis
     auto eclHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);
@@ -84,7 +82,7 @@ void EventT0CombinerModule::event()
     bool foundMatch = false;
     for (auto const& eclHypo : eclHypos) {
       // compute distance
-      double dist = std::abs(eclHypo.eventT0 - svdBestT0.eventT0);
+      double dist = std::abs(eclHypo.eventT0 - bestSVDHypo->eventT0);
       B2DEBUG(20, "Checking compatibility of ECL  t0 = " << eclHypo.eventT0 << " +- " << eclHypo.eventT0Uncertainty << " distance = " <<
               dist);
       if (dist < bestDistance) {
@@ -98,16 +96,16 @@ void EventT0CombinerModule::event()
 
     // combine and update final value
     if (foundMatch) {
-      const auto combined = computeCombination({ eclBestMatch, svdBestT0 });
+      const auto combined = computeCombination({ eclBestMatch, *bestSVDHypo });
       m_eventT0->setEventT0(combined);
       B2DEBUG(20, "Combined T0 from SVD and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
     } else {
 
       //set SVD value, if available
-      m_eventT0->setEventT0(svdBestT0);
+      m_eventT0->setEventT0(*bestSVDHypo);
 
-      B2DEBUG(20, "No sufficient match found between SVD and ECL timing, setting best SVD t0 = " << svdBestT0.eventT0 << " +- " <<
-              svdBestT0.eventT0Uncertainty);
+      B2DEBUG(20, "No sufficient match found between SVD and ECL timing, setting best SVD t0 = " << bestSVDHypo->eventT0 << " +- " <<
+              bestSVDHypo->eventT0Uncertainty);
     }
   } else {
     B2FATAL("Event t0 combination mode " << m_paramCombinationMode << " not supported.");

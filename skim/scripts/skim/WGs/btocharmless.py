@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -73,8 +72,8 @@ class BtoHadTracks(BaseSkim):
     Reconstructed decay modes:
 
     * :math:`B^{0}\\to \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to \\K^+ \\pi^-`
-    * :math:`B^{0}\\to \\K^+ K^-`
+    * :math:`B^{0}\\to K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^-`
     * :math:`B^{+}\\to \\pi^+ \\pi^+ \\pi^-`
     * :math:`B^{+}\\to K_{\\rm S}^0 \\pi^+`
     * :math:`B^{+}\\to K_{\\rm S}^0 K^+`
@@ -83,22 +82,22 @@ class BtoHadTracks(BaseSkim):
     * :math:`B^{+}\\to K^+ K^- \\pi^+`
     * :math:`B^{+}\\to K^+ K^+ K^-`
     * :math:`B^{0}\\to \\pi^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ \\pi^- \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ K^- \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ \\pi^- K^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ K^- K^+ \\pi^-`
-    * :math:`B^{0}\\to -> K^+ K^- K^+ K^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 \\pi^+ \\pi^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 K^+ \\pi^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 K^+ K^-`
-    * :math:`B^{0}\\to -> K_{\\rm S}^0 K_{\\rm S}^0`
-    * :math:`B^{0}\\to -> K^{*0} K^- K^+`
-    * :math:`B^{0}\\to -> K^{*0} \\pi^- \\pi^+`
-    * :math:`B^{0}\\to -> K^{*0} K^+ \\pi^-`
-    * :math:`B^{0}\\to -> \\rho^0 \\rho^0`
-    * :math:`B^{+}\\to -> K^{*+} K^- K^+`
-    * :math:`B^{+}\\to -> K^{*+} \\pi^- \\pi^+`
-    * :math:`B^{+}\\to -> K^{*+} K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ \\pi^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^- \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ \\pi^- K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^- K^+ \\pi^-`
+    * :math:`B^{0}\\to K^+ K^- K^+ K^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 \\pi^+ \\pi^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 K^+ \\pi^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 K^+ K^-`
+    * :math:`B^{0}\\to K_{\\rm S}^0 K_{\\rm S}^0`
+    * :math:`B^{0}\\to K^{*0} K^- K^+`
+    * :math:`B^{0}\\to K^{*0} \\pi^- \\pi^+`
+    * :math:`B^{0}\\to K^{*0} K^+ \\pi^-`
+    * :math:`B^{0}\\to \\rho^0 \\rho^0`
+    * :math:`B^{+}\\to K^{*+} K^- K^+`
+    * :math:`B^{+}\\to K^{*+} \\pi^- \\pi^+`
+    * :math:`B^{+}\\to K^{*+} K^+ \\pi^-`
 
     Cuts applied:
 
@@ -307,6 +306,7 @@ class BtoRhopRhom(BaseSkim):
         return BsigList
 
 
+@fancy_skim_header
 class BtoEtapKstp(BaseSkim):
     """
     Reconstructed decay mode:

@@ -56,7 +56,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcAuxOffset", m_tdcAuxOffset, "TDC auxiliary offset (in TDC count).", 0);
   addParam("pedestalSubtraction", m_pedestalSubtraction, "Enbale ADC pedestal subtraction.", m_pedestalSubtraction);
   addParam("relationRawHits", m_relationRawHits, "Enbale relation of CDCHits, CDCRawHits, and CDCRawHitWaveForms.", false);
-
+  addParam("recoverBoardIdError", m_recoverBoardIdError, "Recover boardID errors", true);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -146,12 +146,14 @@ void CDCUnpackerModule::event()
   const int nEntries = m_rawCDCs.getEntries();
 
   B2DEBUG(99, "nEntries of RawCDCs : " << nEntries);
+
   for (int i = 0; i < nEntries; ++i) {
     const int subDetectorId = m_rawCDCs[i]->GetNodeID(0);
     const int iNode = (subDetectorId & 0xFFFFFF);
     const int nEntriesRawCDC = m_rawCDCs[i]->GetNumEntries();
 
     B2DEBUG(99, LogVar("nEntries of rawCDC[i]", nEntriesRawCDC));
+
     for (int j = 0; j < nEntriesRawCDC; ++j) {
       int trigType = m_rawCDCs[i]->GetTRGType(j); // Get event type of L1 trigger.
       int nWords[48];
@@ -203,6 +205,20 @@ void CDCUnpackerModule::event()
         }
 
         setCDCPacketHeader(ibuf);
+
+        // Skip invalid boardsIDs
+        if (m_boardId > 300) {
+          B2WARNING("Invalid board " << std::hex << m_boardId << std::dec << " readout buffer block: " << i << " block channel: " << iFiness);
+          if (m_recoverBoardIdError) {
+            m_boardId = m_boardId & 0x01ff;
+            if (m_boardId > 300) {
+              B2WARNING("Unrecoverable board " << std::hex << m_boardId);
+              continue;
+            }
+          } else {
+            continue;
+          }
+        }
 
         const int dataType = getDataType();
         const int dataLength = getDataLength() / 4; // Data length in int word (4bytes).
@@ -360,8 +376,8 @@ void CDCUnpackerModule::event()
             m_buffer.push_back(static_cast<unsigned short>(ibuf[index] & 0xffff));
           }
 
-          const int bufSize = static_cast<int>(m_buffer.size());
-          for (int it = 0; it < bufSize;) {
+          const size_t bufSize = m_buffer.size();
+          for (size_t it = 0; it < bufSize;) {
             unsigned short header = m_buffer.at(it);     // Header.
             unsigned short ch = (header & 0xff00) >> 8;  // Channel ID in FE.
             unsigned short length = (header & 0xff) / 2; // Data length in short word.
@@ -389,6 +405,7 @@ void CDCUnpackerModule::event()
 
             unsigned short tot = m_buffer.at(it + 1);     // Time over threshold.
             unsigned short fadcSum = m_buffer.at(it + 2);  // FADC sum.
+
             if (m_pedestalSubtraction == true) {
               int diff = fadcSum - (*m_adcPedestalFromDB)->getPedestal(board, ch);
               if (diff <= m_fadcThreshold) {
@@ -409,6 +426,20 @@ void CDCUnpackerModule::event()
               tdcFlag = (m_buffer.at(it + 4) & 0x8000) >> 15;
             } else {
               B2ERROR("CDCUnpacker : Undefined data length (should be 4 or 5 short words) ");
+            }
+
+            if (ch >= 48) {
+              B2WARNING("Invalid channel "
+                        << LogVar("channel", ch)
+                        << LogVar("board", board)
+                        << LogVar("buffer total size", m_buffer.size())
+                        << LogVar("length", length)
+                        << LogVar("tdc", tdc1)
+                        << LogVar("adc", fadcSum)
+                        << LogVar("tot", tot)
+                       );
+              it += length;
+              continue;
             }
 
             if (m_enablePrintOut == true) {
@@ -460,7 +491,7 @@ void CDCUnpackerModule::event()
                 B2WARNING("Undefined board id is fired: " << LogVar("board id", board) << " " << LogVar("channel", ch));
               }
             }
-            it += static_cast<int>(length);
+            it += length;
           }
 
         } else {

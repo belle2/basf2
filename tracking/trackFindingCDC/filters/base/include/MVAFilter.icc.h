@@ -131,17 +131,17 @@ namespace Belle2 {
       std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
       int nFeature = m_namedVariables.size();
       int nRows    = objs.size();
-      auto X = std::unique_ptr<float[]>(new float[nRows * nFeature]);
+      auto allFeatures = std::unique_ptr<float[]>(new float[nRows * nFeature]);
       size_t iRow = 0;
       for (const auto& obj : objs) {
         if (Super::getVarSet().extract(obj)) {
           for (int iFeature = 0; iFeature < nFeature; iFeature += 1) {
-            X[nFeature * iRow + iFeature] = *m_namedVariables[iFeature];
+            allFeatures[nFeature * iRow + iFeature] = *m_namedVariables[iFeature];
           }
           iRow += 1;
         }
       }
-      return m_mvaExpert->predict(X.get(), nFeature, nRows);
+      return m_mvaExpert->predict(allFeatures.get(), nFeature, nRows);
     }
 
     template <class AFilter>

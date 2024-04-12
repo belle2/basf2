@@ -19,7 +19,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  /// MVA filter for svd states
+  /// MVA filter for CDC states
   using MVACDCWireHitFilter = MVAFilter<CDCWireHitVarSet>;
 }
 

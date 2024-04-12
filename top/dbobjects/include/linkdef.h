@@ -28,6 +28,7 @@
 #pragma link C++ class Belle2::TOPGeoFrontEnd+; // checksum=0x837c7a0d, version=1
 #pragma link C++ class Belle2::TOPNominalQE+; // checksum=0xcef14fd6, version=1
 #pragma link C++ class Belle2::TOPNominalTTS+; // checksum=0x6483feaa, version=2
+#pragma link C++ class Belle2::TOPNominalTTS::Gauss+; // checksum=0xcca234bf, version=1
 #pragma link C++ class Belle2::TOPNominalTDC+; // checksum=0xe442a86f, version=3
 #pragma link C++ class Belle2::TOPGeometry+; // checksum=0xe5c8a3eb, version=8
 #pragma link C++ class Belle2::TOPPmtGainPar+; // checksum=0x218dd8f1, version=3

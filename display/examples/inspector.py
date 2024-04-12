@@ -28,6 +28,7 @@ class InspectorModule(b2.Module):
         from ROOT import Belle2
 
         root = gClient.GetRoot()
+        #: initialize InfoWidget
         self.info = Belle2.InfoWidget(root)
         self.info.MapSubwindows()
         self.info.Resize()

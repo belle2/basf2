@@ -29,17 +29,16 @@ assert 0 == os.system('b2file-check -n 5 ' + rootfile)
 assert 0 == os.system('b2file-check --events 5 ' + rootfile)
 assert 0 != os.system('b2file-check -n 10 ' + rootfile)
 
-# sadly, our input file doesn't have mcEvents stored (==0)
-assert 0 == os.system('b2file-check --mcevents 0 ' + rootfile)
-assert 0 != os.system('b2file-check --mcevents 123 ' + rootfile)
+assert 0 == os.system('b2file-check --mcevents 5 ' + rootfile)
+assert 0 != os.system('b2file-check --mcevents 0 ' + rootfile)
 
-assert 0 == os.system('b2file-check -n 5 -s 12.4 1 ' + rootfile)
-assert 0 == os.system('b2file-check -n 5 -s 12.4 0.05 ' + rootfile)
-assert 0 != os.system('b2file-check -n 5 -s 12.4 0 ' + rootfile)
+assert 0 == os.system('b2file-check -n 5 -s 9.5 1 ' + rootfile)
+assert 0 == os.system('b2file-check -n 5 -s 9.5 0.05 ' + rootfile)
+assert 0 != os.system('b2file-check -n 5 -s 9.5 0 ' + rootfile)
 
 assert 0 == os.system('b2file-check -n 5 -s 10 1 ' + rootfile)
 assert 0 == os.system('b2file-check -n 5 -s 10 0.5 ' + rootfile)
-assert 0 != os.system('b2file-check -n 5 -s 10 0.2 ' + rootfile)
+assert 0 == os.system('b2file-check -n 5 -s 10 0.2 ' + rootfile)
 assert 0 != os.system('b2file-check -n 5 -s 10 0.05 ' + rootfile)
 
 assert 0 == os.system('b2file-check -n 5 -s 10 0.5 ' + rootfile + ' EventMetaData')

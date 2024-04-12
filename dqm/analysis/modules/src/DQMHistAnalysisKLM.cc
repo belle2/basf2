@@ -90,7 +90,6 @@ void DQMHistAnalysisKLMModule::initialize()
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
   registerEpicsPV("KLM:DeadBarrelModules", "DeadBarrelModules");
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
-  updateEpicsPVs(5.0);
 
   gROOT->cd();
 
@@ -160,7 +159,7 @@ void DQMHistAnalysisKLMModule::endRun()
     m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
   }
 
-  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_bklm");
+  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_eklm");
   if (time_scint_eklm) {
     hist_max_bin = time_scint_eklm->GetMaximumBin();
     max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);

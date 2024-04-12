@@ -11,6 +11,8 @@ Advanced Topics
 
 .. toctree:: FullEventInterpretation
 
+.. toctree:: GraFEI
+
 .. toctree:: EventShape
 
 .. toctree:: ContinuumSuppression

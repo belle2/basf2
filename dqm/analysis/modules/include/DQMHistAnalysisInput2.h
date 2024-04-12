@@ -15,7 +15,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-#include <daq/dqm/DqmMemFile.h>
 #include <dqm/core/DQMHistAnalysis.h>
 
 #include <TCanvas.h>
@@ -28,7 +27,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisInputModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisInput2Module : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -36,56 +35,43 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    DQMHistAnalysisInputModule();
+    DQMHistAnalysisInput2Module();
 
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisInputModule();
+    ~DQMHistAnalysisInput2Module();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
-    /** The map of histogram names to canvas pointers for output. */
-    std::map<std::string, TCanvas*> m_cs;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
     // Data members
   private:
-    /** Memory file to hold histograms. */
-    DqmMemFile* m_memory = nullptr;
     /** The name of the shared memory for the histograms. */
     std::string m_mempath;
     /** The name of the memory file (HLT or ExpressReco). */
-    std::string m_memname;
-    /** The owner of the memory file (HLT or ExpressReco). */
-    std::string m_username;
-    /** The shmid for the shared memory. */
-    int m_shm_id{-1};
-    /** The semid for the shared memory. */
-    int m_sem_id{-1};
-    /** The size of the shared memory. */
-//    int m_memsize; // this is not used in code!!! it is hard coded in DqmMemFile to 4*128MB
     /** The refresh interval. */
     int m_interval;
     /** Whether to remove empty histograms. */
@@ -97,6 +83,9 @@ namespace Belle2 {
 
     /** DAQ number of processed events */
     int m_nevent = 0;
+
+    /** The opened file */
+    TFile* m_file{nullptr};
 
     /** last change date/time of shm input file */
     std::string m_lastChange;

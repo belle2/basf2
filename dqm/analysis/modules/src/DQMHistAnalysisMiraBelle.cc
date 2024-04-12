@@ -951,7 +951,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double bh_sigma68_dd0 = getSigma68(histbh_dD0);
   double bh_sigma68_dz0 = getSigma68(histbh_dZ0);
   double bh_sigma68_dpt = getSigma68(histbh_dPtcms);
-  int bh_ntot = histbh_nsvd->GetEntries();
+  int bh_ntot = histbh_nECLClusters->GetEntries();
   double bh_neve_bhabha = bh_ntot;
   double bh_goode_frac = -1.;
   double bh_pval_frac_0 = -1.;

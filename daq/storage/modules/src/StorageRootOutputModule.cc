@@ -194,6 +194,15 @@ void StorageRootOutputModule::initialize()
   m_db = db;
 }
 
+// For online storage
+void StorageRootOutputModule::endRun() {
+  if (m_file) {
+    closeFile();
+    while (m_file) closeFile(); // I hope that this will not be failed
+    m_fileIndex = 0;
+  }
+}
+
 void StorageRootOutputModule::openFile()
 {
   // Since we open a new file, we also have to reset the number of full events

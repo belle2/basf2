@@ -156,7 +156,7 @@ CDCTriggerNeuroModule::event()
     // check, if enough axials are there. first, we select the axial bits from the
     // hitpattern (341 = int('101010101',base=2)) and then check if the number of
     // ones is equal or greater than 4.
-    bool valtrack = true;
+    bool valtrack = (m_neuroTrackInputMode) ? m_tracks2D[itrack]->getValidStereoBit() : true;
     if ((chitPattern & 341) != 341 && // this is an ugly workaround, because popcount is only
         (chitPattern & 341) != 340 && // available with c++20 and newer
         (chitPattern & 341) != 337 &&

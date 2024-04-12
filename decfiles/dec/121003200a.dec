@@ -1,7 +1,7 @@
-# EventType: 1210018001
-# Descriptor: [B+ -> eta pi+ ]cc
-# NickName: B+_etapi+
-# Documentation: Study of Acp in B0 -> eta pi+
+# EventType: 121003200a
+# Descriptor: [B+ -> eta(pipipi0) K+ ]cc
+# NickName: B+_etaK+
+# Documentation: Study of Acp in B0 -> eta(pipipi0) K+
 # Responsible: Wen-Yi Chen
 # Email: r09222054@ntu.edu.tw
 # Tested: yes
@@ -18,12 +18,12 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0   etasig pi+ PHSP;
+1.0   etasig K+ PHSP;
 Enddecay
 CDecay B-sig
 
 Decay etasig
-1.0 gamma gamma PHSP;
+1.0   pi-  pi+  pi0                                ETA_FULLDALITZ  -1.128  0.153  0.0  0.085  0.0  0.173; 
 Enddecay
 
 End

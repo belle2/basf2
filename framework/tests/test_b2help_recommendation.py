@@ -12,7 +12,7 @@ Test for checking:
     - b2help-recommendation -t gamma
 '''
 
-
+import basf2
 import subprocess
 import shlex
 
@@ -31,10 +31,11 @@ def call_command(command):
 
 if __name__ == '__main__':
     check_tags = ['all', 'gamma', 'Tracking']
+    filename = basf2.find_file('framework/tests/test_b2help_recommendation_payload.json')
     # List available tags
-    call_command('b2help-recommendation -l framework/tests/test_b2help_recommendation_payload.json')
+    call_command(f'b2help-recommendation -l {filename}')
     # Call the script for tags
     for tag in check_tags:
-        call_command(f'b2help-recommendation -t {tag} -l framework/tests/test_b2help_recommendation_payload.json')
+        call_command(f'b2help-recommendation -t {tag} -l {filename}')
     # Call convert to payload
-    call_command(f'b2help-recommendation -l framework/tests/test_b2help_recommendation_payload.json -t {check_tags[1]} -c -p test')
+    call_command(f'b2help-recommendation -l {filename} -t {check_tags[1]} -c -p test')

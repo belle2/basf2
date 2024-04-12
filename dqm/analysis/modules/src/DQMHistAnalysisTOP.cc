@@ -113,8 +113,6 @@ void DQMHistAnalysisTOPModule::initialize()
   registerEpicsPV(m_pvPrefix + "photonYieldsAlarmLevels", "photonYieldsAlarmLevels");
   registerEpicsPV(m_pvPrefix + "excludedBoardstacks", "excludedBoardstacks");
 
-  updateEpicsPVs(5.0);
-
   // new canvases, histograms and graphic primitives
 
   gROOT->cd();
@@ -138,7 +136,19 @@ void DQMHistAnalysisTOPModule::initialize()
   m_junkFraction->SetYTitle("fraction");
   m_c_junkFraction = new TCanvas("TOP/c_junkFraction", "c_junkFraction");
 
-  m_text1 = new TPaveText(1, 435, 12, 500, "NB");
+  for (int slot = 1; slot <= 16; slot++) {
+    string hname = "TOP/pmtHitRates_" + to_string(slot);
+    string htitle = "PMT hits per event for slot #" + to_string(slot);
+    auto* h = new TH1F(hname.c_str(), htitle.c_str(), 32, 0.5, 32.5);
+    h->SetXTitle("PMT number");
+    h->SetYTitle("Number of good hits per event");
+    m_pmtHitRates.push_back(h);
+    string cname = "TOP/c_pmtHitRates_" + to_string(slot);
+    string ctitle = "c_pmtHitRates_" + to_string(slot);
+    m_c_pmtHitRates.push_back(new TCanvas(cname.c_str(), ctitle.c_str()));
+  }
+
+  m_text1 = new TPaveText(0.125, 0.8, 0.675, 0.88, "NDC");
   m_text1->SetFillColorAlpha(kWhite, 0);
   m_text1->SetBorderSize(0);
   m_text2 = new TPaveText(0.55, 0.8, 0.85, 0.89, "NDC");
@@ -163,6 +173,8 @@ void DQMHistAnalysisTOPModule::initialize()
 
 void DQMHistAnalysisTOPModule::beginRun()
 {
+  m_mirabelleVariables.clear();
+
   B2DEBUG(20, "DQMHistAnalysisTOP: beginRun called.");
 }
 
@@ -173,6 +185,10 @@ void DQMHistAnalysisTOPModule::event()
   auto* rtype = findHist("DQMInfo/rtype");
   m_runType = rtype ? rtype->GetTitle() : "";
   m_IsNullRun = (m_runType == "null");
+
+  // get number of events processed with TOPDQM module
+  auto* goodHitsPerEvent = findHist("TOP/goodHitsPerEventAll");
+  m_numEvents = goodHitsPerEvent ? goodHitsPerEvent->GetEntries() : 0;
 
   bool zeroSupp = gStyle->GetHistMinimumZero();
   gStyle->SetHistMinimumZero(true);
@@ -213,6 +229,9 @@ void DQMHistAnalysisTOPModule::event()
     }
   }
 
+  // PMT hit rates
+  makePMTHitRatesPlots();
+
   // Set Epics variables
   setEpicsVariables();
 
@@ -222,13 +241,16 @@ void DQMHistAnalysisTOPModule::event()
 
 void DQMHistAnalysisTOPModule::endRun()
 {
+  // these two histograms do not exist anymore since file is closed, therefore
+  m_photonYields = nullptr;
+  m_backgroundRates = nullptr;
+
   // add MiraBelle monitoring
 
-  setMiraBelleVariables("RateBadRaw_slot", m_windowFractions);
-  m_monObj->setVariable("RateBadRaw_all", m_totalWindowFraction);
-  setMiraBelleVariables("PhotonsPerTrack_slot", m_photonYields);
-  setMiraBelleVariables("BackgroundRate_slot", m_backgroundRates);
-  setMiraBelleVariables("ActiveChannelFraction_slot", m_activeFraction);
+  for (const auto& var : m_mirabelleVariables) {
+    m_monObj->setVariable(var.first, var.second);
+    B2DEBUG(20, var.first << " " << var.second);
+  }
 
   B2DEBUG(20, "DQMHistAnalysisTOP : endRun called");
 }
@@ -242,8 +264,6 @@ void DQMHistAnalysisTOPModule::terminate()
 
 void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
 {
-  m_totalWindowFraction = 0;   // used also for MiraBelle
-  m_windowFractions = nullptr; // used also for MiraBelle
   int alarmState = c_Gray;
   m_text1->Clear();
 
@@ -253,14 +273,16 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
     auto* band = hraw->ProjectionX("TOP/windowFractions", m_asicWindowsBand[0], m_asicWindowsBand[1]);
     band->Add(px, band, 1, -1);
     double total = px->Integral();
-    m_totalWindowFraction = (total != 0) ? band->Integral() / total : 0;
+    double totalWindowFraction = (total != 0) ? band->Integral() / total : 0;
     band->Divide(band, px);
-    m_windowFractions = band;
+    setMiraBelleVariables("RateBadRaw_slot", band);
+    m_mirabelleVariables["RateBadRaw_all"] = totalWindowFraction;
     if (total > 0) {
-      alarmState = getAlarmState(m_totalWindowFraction, m_asicWindowsAlarmLevels);
-      m_text1->AddText(Form("Fraction outside red lines: %.2f %%", m_totalWindowFraction * 100.0));
+      alarmState = getAlarmState(totalWindowFraction, m_asicWindowsAlarmLevels);
+      m_text1->AddText(Form("Fraction outside red lines: %.2f %%", totalWindowFraction * 100.0));
     }
     delete px;
+    delete band;
   }
 
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
@@ -316,18 +338,10 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   for (int slot = 1; slot <= 16; slot++) {
     auto* h = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
     if (not h) continue;
-    double mean = 0;
-    int n = 0;
-    for (int chan = 0; chan < h->GetNbinsX(); chan++) {
-      double y = h->GetBinContent(chan + 1);
-      if (y > 0) {
-        mean += y;
-        n++;
-      }
-    }
-    if (n > 0) mean /= n;
-    double deadCut = mean / 10;
-    double hotCut = mean * 10;
+
+    auto cuts = getDeadAndHotCuts(h);
+    double deadCut = cuts.first;
+    double hotCut = cuts.second;
     double deadFract = 0;
     double hotFract = 0;
     double deadFractIncl = 0;
@@ -352,10 +366,11 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     inactiveFract = std::max(inactiveFract, (deadFractIncl + hotFractIncl) / h->GetNbinsX());
   }
 
+  setMiraBelleVariables("ActiveChannelFraction_slot", m_activeFraction);
+
   int alarmState = c_Gray;
   if (m_activeFraction->Integral() > 0) {
-    alarmState = getAlarmState(1 - m_activeFraction->GetMinimum(), m_deadChannelsAlarmLevels);
-    if (alarmState == c_Red) alarmState = std::max(getAlarmState(inactiveFract, m_deadChannelsAlarmLevels), static_cast<int>(c_Yellow));
+    alarmState = getAlarmState(inactiveFract, m_deadChannelsAlarmLevels);
   }
 
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
@@ -412,13 +427,16 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
   auto* backgroundHits = (TProfile*) findHist("TOP/backgroundHits");
   if (not backgroundHits) return;
 
+  if (m_photonYields) delete m_photonYields;
   m_photonYields = signalHits->ProjectionX("TOP/photonYields");
+  if (m_backgroundRates) delete m_backgroundRates;
   m_backgroundRates = backgroundHits->ProjectionX("TOP/backgroundRates");
   auto* activeFract = (TH1F*) activeFraction->Clone("tmp");
   for (int i = 1; i <= activeFract->GetNbinsX(); i++) activeFract->SetBinError(i, 0);
 
   m_photonYields->Add(m_photonYields, m_backgroundRates, 1, -1);
   m_photonYields->Divide(m_photonYields, activeFract);
+  setMiraBelleVariables("PhotonsPerTrack_slot", m_photonYields);
 
   int alarmState = c_Gray;
   if (signalHits->GetEntries() > 0 and activeFraction->Integral() > 0) {
@@ -446,6 +464,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
 
   m_backgroundRates->Scale(1.0 / 50.0e-3 / 32);  // measured in 50 ns window, 32 PMT's ==> rate in MHz/PMT
   m_backgroundRates->Divide(m_backgroundRates, activeFract);
+  setMiraBelleVariables("BackgroundRate_slot", m_backgroundRates);
 
   alarmState = c_Gray;
   m_text3->Clear();
@@ -501,14 +520,11 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
 
   int alarmState = c_Gray;
   if (allHits->Integral() > 0) {
-    alarmState = getAlarmState(m_junkFraction->GetMaximum(), m_junkHitsAlarmLevels);
-    if (alarmState == c_Red) {
-      double hmax = 0;
-      for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
-        if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
-      }
-      alarmState = std::max(getAlarmState(hmax, m_junkHitsAlarmLevels), static_cast<int>(c_Yellow));
+    double hmax = 0;
+    for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
+      if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
     }
+    alarmState = getAlarmState(hmax, m_junkHitsAlarmLevels);
   }
   delete allHits;
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
@@ -584,21 +600,52 @@ void DQMHistAnalysisTOPModule::makeBGSubtractedTimimgPlot(const std::string& nam
 }
 
 
+void DQMHistAnalysisTOPModule::makePMTHitRatesPlots()
+{
+  auto* h0 = (TH1F*) findHist("TOP/goodHitsPerEventAll");
+  if (not h0) return;
+  double numEvents = h0->GetEntries();
+  if (numEvents == 0) return;
+
+  int numSlots = m_pmtHitRates.size();
+  for (int slot = 1; slot <= numSlots; slot++) {
+    string name = "TOP/good_hits_xy_" + to_string(slot);
+    auto* hxy = (TH2F*) findHist(name);
+    if (not hxy) continue;
+    std::vector<double> pmts(32, 0);
+    for (int row = 0; row < 8; row++) {
+      for (int col = 0; col < 64; col++) {
+        int pmt = col / 4 + (row / 4) * 16;
+        pmts[pmt] += hxy->GetBinContent(col + 1, row + 1);
+      }
+    }
+    auto* h = m_pmtHitRates[slot - 1];
+    for (size_t i = 0; i < pmts.size(); i++) {
+      h->SetBinContent(i + 1, pmts[i] / numEvents);
+    }
+    auto* canvas = m_c_pmtHitRates[slot - 1];
+    canvas->Clear();
+    canvas->cd();
+    h->SetMinimum(0);
+    h->Draw();
+    canvas->Modified();
+  }
+}
+
+
 void DQMHistAnalysisTOPModule::setMiraBelleVariables(const std::string& variableName, const TH1* histogram)
 {
   for (int slot = 1; slot <= 16; slot++) {
     auto vname = variableName + std::to_string(slot);
     double value = histogram ? histogram->GetBinContent(slot) : 0;
-    m_monObj->setVariable(vname, value);
-
-    B2DEBUG(20, vname << " " << value);
+    m_mirabelleVariables[vname] = value;
   }
 }
 
 
 int DQMHistAnalysisTOPModule::getAlarmState(double value, const std::vector<double>& alarmLevels, bool bigRed) const
 {
-  if (m_IsNullRun) return c_Gray;
+  if (m_IsNullRun or m_numEvents < 1000) return c_Gray;
 
   if (bigRed) {
     if (value < alarmLevels[0]) return c_Green;
@@ -651,21 +698,33 @@ void DQMHistAnalysisTOPModule::setAlarmLines()
 }
 
 
-double DQMHistAnalysisTOPModule::getMean(const TH2* h)
+std::pair<double, double> DQMHistAnalysisTOPModule::getDeadAndHotCuts(const TH1* h)
 {
-  double mean = 0;
-  int n = 0;
-  for (int col = 1; col <= h->GetNbinsX(); col++) {
-    for (int row = 1; row <= h->GetNbinsY(); row++) {
-      double y = h->GetBinContent(col, row);
-      if (y > 0) {
-        mean += y;
-        n++;
-      }
+  std::vector<double> binContents;
+  for (int k = 1; k <= h->GetNbinsY(); k++) {
+    for (int i = 1; i <= h->GetNbinsX(); i++) {
+      binContents.push_back(h->GetBinContent(i, k));
     }
   }
-  if (n > 0) mean /= n;
-  return mean;
+
+  double mean = 0;
+  double rms = h->GetMaximum();
+  for (int iter = 0; iter < 5; iter++) {
+    double sumy = 0;
+    double sumyy = 0;
+    int n = 0;
+    for (auto y : binContents) {
+      if (y == 0 or fabs(y - mean) > 3 * rms) continue;
+      sumy += y;
+      sumyy += y * y;
+      n++;
+    }
+    if (n == 0) continue;
+    mean = sumy / n;
+    rms = sqrt(sumyy / n - mean * mean);
+  }
+
+  return std::make_pair(mean / 5, std::max(mean * 2, mean + 6 * rms));
 }
 
 
@@ -679,9 +738,9 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
     auto* h = (TH2F*) findHist(hname);
     if (not h) continue;
 
-    double mean = getMean(h);
-    double deadCut = mean / 10;
-    double hotCut = mean * 10;
+    auto cuts = getDeadAndHotCuts(h);
+    double deadCut = cuts.first;
+    double hotCut = cuts.second;
     std::vector<int> asics(64, 0);
     std::vector<int> carriers(16, 0);
     std::vector<int> boardstacks(4, 0);
@@ -690,7 +749,7 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
       int boardstack = carrier / 4;
       for (int chan = 0; chan < 8; chan++) {
         double y = h->GetBinContent(asic + 1, chan + 1);
-        if (y > deadCut and y < hotCut) {
+        if (y > deadCut and y <= hotCut) {
           asics[asic]++;
           carriers[carrier]++;
           boardstacks[boardstack]++;
@@ -710,15 +769,15 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
     auto* h = (TH2F*) findHist(hname);
     if (not h) continue;
 
-    double mean = getMean(h);
-    double deadCut = mean / 10;
-    double hotCut = mean * 10;
+    auto cuts = getDeadAndHotCuts(h);
+    double deadCut = cuts.first;
+    double hotCut = cuts.second;
     std::vector<int> pmts(32, 0);
     for (int row = 0; row < 8; row++) {
       for (int col = 0; col < 64; col++) {
         int pmt = col / 4 + (row / 4) * 16;
         double y = h->GetBinContent(col + 1, row + 1);
-        if (y > deadCut and y < hotCut) pmts[pmt]++;
+        if (y > deadCut and y <= hotCut) pmts[pmt]++;
       }
     }
     for (int n : pmts) if (n == 0) badPMTs++;
@@ -733,7 +792,6 @@ void DQMHistAnalysisTOPModule::setEpicsVariables()
   for (auto included : m_includedBoardstacks) if (not included) numBS++;
   setEpicsPV("numExcludedBS", numBS);
   setEpicsPV("histoAlarmState", getOffcialAlarmStatus(m_alarmStateOverall));
-  updateEpicsPVs(5.0);
 
   B2DEBUG(20, "badBoardstacks: " << badBoardstacks);
   B2DEBUG(20, "badCarriers: " << badCarriers);

@@ -74,19 +74,19 @@ class VxdCdcMergerValidationPlots:
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_merged_hits, "Number of hits of merged tracks", "Number of Hits", None,
                                                    description='Number of hits of merged tracks',
                                                    check='',
-                                                   contact='',
+                                                   contact='software-tracking@belle2.org',
                                                    meta_options='').Write()
 
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_good_over_pt, "Good Merge over Pt", "MC Track Pt (GeV)", None,
                                                    description='Good Merge over Pt',
                                                    check='',
-                                                   contact='',
+                                                   contact='software-tracking@belle2.org',
                                                    meta_options='').Write()
 
         VxdCdcMergerValidationPlots.histogram_plot(self.hist_good_over_theta, "Good Merge over Theta", "MC Track Theta (1)", None,
                                                    description='Good Merge over Theta',
                                                    check='',
-                                                   contact='',
+                                                   contact='software-tracking@belle2.org',
                                                    meta_options='').Write()
 
         output_root_file.Write()

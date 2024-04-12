@@ -12,7 +12,7 @@
 <header>
     <input>MCvalidationMixed.root</input>
     <output>MultiplicityPlotsMixed.root</output>
-    <contact>Frank Meier; frank.meier@belle2.org</contact>
+    <contact>Swagato Banerjee; swagato.banerjee@gmail.com</contact>
     <description>Comparing generated particle multiplicities</description>
 </header>
 """
@@ -48,7 +48,7 @@ def PlottingHistos(particle):
     hist.SetTitle(f";{axis_dic[particle]}; Events")
     hist.GetListOfFunctions().Add(ROOT.TNamed('Description', f'{axis_dic[particle]} multiplicity'))
     hist.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Shape should not change drastically.'))
-    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'frank.meier@belle2.org'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'swagato.banerjee@gmail.com'))
     hist.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
     hist.Write()
 

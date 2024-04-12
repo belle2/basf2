@@ -62,6 +62,8 @@ namespace Belle2 {
     int m_minEvent;                    /**< Start at event number x. */
     int m_maxEvent;                    /**< Stop after processing n events. */
     int m_totalEvents;                    /**< totla number of events to read */
+    bool m_makeMaster;                /**< Parameter to signal if the modul should act as master */
+
   private:
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< event meta data pointer to control event nubmer etc */
   };

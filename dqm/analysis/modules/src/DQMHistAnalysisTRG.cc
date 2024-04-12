@@ -70,9 +70,11 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGGRL", "h_ECLL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_peak", "ECLTRG_peak");
 
+
   //CDCTRG_2D_peak
   addDeltaPar("TRGGRL", "h_CDCL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_2D_peak", "CDCTRG_2D_peak");
+
 
   //NN_peak
   addDeltaPar("TRGGRL", "h_CDCNNL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
@@ -90,30 +92,60 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGGRL", "h_TOPL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_peak", "TOPTRG_peak");
 
+  //ecl timing –cdc timing
+  addDeltaPar("TRGGDL", "hGDL_ns_cdcToecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "ecltiming_cdctiming", "ecltiming_cdctiming");
+
+  //top timing – ecl timing
+  addDeltaPar("TRGGDL", "hGDL_ns_topToecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "toptiming_ecltiming", "toptiming_ecltiming");
+
+  // top timing – cdc timing
+  addDeltaPar("TRGGDL", "hGDL_ns_topTocdc_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "toptiming_cdctiming", "toptiming_cdctiming");
+
+  // gdll1-ecl timing
+  addDeltaPar("TRGGDL", "hGDL_eclTogdlL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "gdll1_ecltiming", "gdll1_ecltiming");
+
+  //gdll1-cdctiming
+  addDeltaPar("TRGGDL", "hGDL_cdcTogdlL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "gdll1_cdctiming", "gdll1_cdctiming");
+
+  //gdll1-toptiming
+  addDeltaPar("TRGGDL", "hGDL_topTogdlL1_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "gdll1_toptiming", "gdll1_toptiming");
+
+  //barrel klm latency
+  addDeltaPar("TRGGDL", "hGDL_itd_klm_hit_rise_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "barrel_klm_latency", "barrel_klm_latency");
+
+  //endcap klm latency
+  addDeltaPar("TRGGDL", "hGDL_itd_eklm_hit_rise_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  registerEpicsPV(m_pvPrefix + "endcap_klm_latency", "endcap_klm_latency");
 
   //hadronb2_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_bhabha_all", "hadronb2_over_bhabha_all");
 
   //mumu2trk_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_all", "mumu2trk_over_bhabha_all");
 
   //hadronb2_over_mumu2trk
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
 
-  //deadch_c_h_TCId
-  addDeltaPar("TRG", "c_h_TCId", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
-  registerEpicsPV(m_pvPrefix + "deadch_c_h_TCId", "deadch_c_h_TCId");
+  //ECLTRG_deadch
+//  m_canvas_ECLTRG_deadch = new TCanvas("ECLTRG_deadch");
+  addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
-  //deadch_c_NeuroHWInTSID
-  addDeltaPar("TRGCDCTNN", "c_NeuroHWInTSID", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
-  registerEpicsPV(m_pvPrefix + "deadch_c_NeuroHWInTSID", "deadch_c_NeuroHWInTSID");
+  //CDCTRG_deadch
+//  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 2000 entries
+  registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
-  //update PV
-//  updateEpicsPVs(
-//    5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
 }
 
 void DQMHistAnalysisTRGModule::beginRun()
@@ -144,8 +176,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     comL1_GDLL1_mean = hist_comL1_GDLL1->GetMean();
     B2DEBUG(1, "comL1_GDLL1_mean:" << comL1_GDLL1_mean);
     setEpicsPV("comL1_GDLL1_mean", comL1_GDLL1_mean);
-//    updateEpicsPVs(
-//      5.0); // -> now trigger update. this may be optional, framework can take care unless we want to now the result immediately
   }
 
   //update ECLTRG timing
@@ -168,7 +198,6 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     B2DEBUG(1, "CDCTRG_timing_mean:" << CDCTRG_timing_mean);
     setEpicsPV("CDCTRG_timing_mean", CDCTRG_timing_mean);
   }
-  cout << "histCDCTRG = " << histCDCTRG << endl;
 
   //update TOPTRG timing
   auto histTOPTRG =  getDelta("EventT0DQMdir", "m_histEventT0_TOP_hadron_L1_TOPTRG", 0, true);// only if updated
@@ -192,6 +221,21 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+// update ECLTRG deadch
+  auto hist_ECLTRG_deadch =  getDelta("TRG", "h_TCId", 0, true);// only if updated
+  if (hist_ECLTRG_deadch) {
+    hist_ECLTRG_deadch->Draw();
+    int numberOfBins = hist_ECLTRG_deadch->GetNbinsX();
+//    int YMax = hist_ECLTRG_deadch->GetBinContent(hist_ECLTRG_deadch->GetMaximumBin());
+    int ECLTRG_deadch = 0;
+    for (int i = 2; i <= numberOfBins - 1; i++) {
+      if (hist_ECLTRG_deadch->GetBinContent(i) <= 0.01 * hist_ECLTRG_deadch->GetMaximum()) { ECLTRG_deadch += 1; }
+    }
+    B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
+    setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
+  }
+//  m_canvas_CDCTRG_2D_peak->Clear();
+//  m_canvas_CDCTRG_2D_peak->cd(0);
 // update CDCTRG 2D peak
   auto hist_CDCTRG_2D_peak =  getDelta("TRGGRL", "h_CDCL1", 0, true);// only if updated
   if (hist_CDCTRG_2D_peak) {
@@ -228,6 +272,21 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+// update CDCTRG deadch
+  auto hist_CDCTRG_deadch =  getDelta("TRGCDCTNN", "NeuroHWInTSID", 0, true);// only if updated
+  if (hist_CDCTRG_deadch) {
+    hist_CDCTRG_deadch->Draw();
+    int numberOfBins = hist_CDCTRG_deadch->GetNbinsX();
+//    int YMax = hist_CDCTRG_deadch->GetBinContent(hist_CDCTRG_deadch->GetMaximumBin());
+    int CDCTRG_deadch = 0;
+    for (int i = 3; i <= numberOfBins; i++) {
+      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0.01 * hist_CDCTRG_deadch->GetMaximum()) {CDCTRG_deadch += 1;}
+//      if (hist_CDCTRG_deadch->GetBinContent(i) <= 0) {CDCTRG_deadch += 1;}
+    }
+    B2DEBUG(1, "CDCTRG_deadch:" << CDCTRG_deadch);
+    setEpicsPV("CDCTRG_deadch", CDCTRG_deadch);
+  }
+
 // update KLMTRG
   auto hist_KLMTRG_peak =  getDelta("TRGGRL", "h_KLML1", 0, true);// only if updated
   if (hist_KLMTRG_peak) {
@@ -252,118 +311,203 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+// update ecltiming_cdctiming
+  auto hist_ecltiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_cdcToecl_all", 0, true);// only if updated
+  if (hist_ecltiming_cdctiming) {
+    double ecltiming_cdctiming = 0.0;
+    hist_ecltiming_cdctiming->Draw();
+    int bin_ecltiming_cdctiming = hist_ecltiming_cdctiming->GetMaximumBin();
+    ecltiming_cdctiming = hist_ecltiming_cdctiming->GetXaxis()->GetBinCenter(bin_ecltiming_cdctiming);
+    B2DEBUG(1, "ecltiming_cdctiming:" << ecltiming_cdctiming);
+    setEpicsPV("ecltiming_cdctiming", ecltiming_cdctiming);//Peak
+  }
+
+// update toptiming_ecltiming
+  auto hist_toptiming_ecltiming =  getDelta("TRGGDL", "hGDL_ns_topToecl_all", 0, true);// only if updated
+  if (hist_toptiming_ecltiming) {
+    double toptiming_ecltiming = 0.0;
+    hist_toptiming_ecltiming->Draw();
+    int bin_toptiming_ecltiming = hist_toptiming_ecltiming->GetMaximumBin();
+    toptiming_ecltiming = hist_toptiming_ecltiming->GetXaxis()->GetBinCenter(bin_toptiming_ecltiming);
+    B2DEBUG(1, "toptiming_ecltiming:" << toptiming_ecltiming);
+    setEpicsPV("toptiming_ecltiming", toptiming_ecltiming);//Peak
+  }
+
+// update toptiming_cdctiming
+  auto hist_toptiming_cdctiming =  getDelta("TRGGDL", "hGDL_ns_topTocdc_all", 0, true);// only if updated
+  if (hist_toptiming_cdctiming) {
+    double toptiming_cdctiming = 0.0;
+    hist_toptiming_cdctiming->Draw();
+    int bin_toptiming_cdctiming = hist_toptiming_cdctiming->GetMaximumBin();
+    toptiming_cdctiming = hist_toptiming_cdctiming->GetXaxis()->GetBinCenter(bin_toptiming_cdctiming);
+    B2DEBUG(1, "toptiming_cdctiming:" << toptiming_cdctiming);
+    setEpicsPV("toptiming_cdctiming", toptiming_cdctiming);//Peak
+  }
+
+// update gdll1_ecltiming
+  auto hist_gdll1_ecltiming =  getDelta("TRGGDL", "hGDL_eclTogdlL1_all", 0, true);// only if updated
+  if (hist_gdll1_ecltiming) {
+    double gdll1_ecltiming = 0.0;
+    hist_gdll1_ecltiming->Draw();
+    int bin_gdll1_ecltiming = hist_gdll1_ecltiming->GetMaximumBin();
+    gdll1_ecltiming = hist_gdll1_ecltiming->GetXaxis()->GetBinCenter(bin_gdll1_ecltiming);
+    B2DEBUG(1, "gdll1_ecltiming:" << gdll1_ecltiming);
+    setEpicsPV("gdll1_ecltiming", gdll1_ecltiming);//Peak
+  }
+
+// update gdll1_cdctiming
+  auto hist_gdll1_cdctiming =  getDelta("TRGGDL", "hGDL_cdcTogdlL1_all", 0, true);// only if updated
+  if (hist_gdll1_cdctiming) {
+    double gdll1_cdctiming = 0.0;
+    hist_gdll1_cdctiming->Draw();
+    int bin_gdll1_cdctiming = hist_gdll1_cdctiming->GetMaximumBin();
+    gdll1_cdctiming = hist_gdll1_cdctiming->GetXaxis()->GetBinCenter(bin_gdll1_cdctiming);
+    B2DEBUG(1, "gdll1_cdctiming:" << gdll1_cdctiming);
+    setEpicsPV("gdll1_cdctiming", gdll1_cdctiming);//Peak
+  }
+
+// update gdll1_toptiming
+  auto hist_gdll1_toptiming =  getDelta("TRGGDL", "hGDL_topTogdlL1_all", 0, true);// only if updated
+  if (hist_gdll1_toptiming) {
+    double gdll1_toptiming = 0.0;
+    hist_gdll1_toptiming->Draw();
+    int bin_gdll1_toptiming = hist_gdll1_toptiming->GetMaximumBin();
+    gdll1_toptiming = hist_gdll1_toptiming->GetXaxis()->GetBinCenter(bin_gdll1_toptiming);
+    B2DEBUG(1, "gdll1_toptiming:" << gdll1_toptiming);
+    setEpicsPV("gdll1_toptiming", gdll1_toptiming);//Peak
+  }
+
+// update barrel_klm_latency
+  auto hist_barrel_klm_latency =  getDelta("TRGGDL", "hGDL_itd_klm_hit_rise_all", 0, true);// only if updated
+  if (hist_barrel_klm_latency) {
+    double barrel_klm_latency = 0.0;
+    hist_barrel_klm_latency->Draw();
+    int bin_barrel_klm_latency = hist_barrel_klm_latency->GetMaximumBin();
+    barrel_klm_latency = hist_barrel_klm_latency->GetXaxis()->GetBinCenter(bin_barrel_klm_latency);
+    B2DEBUG(1, "barrel_klm_latency:" << barrel_klm_latency);
+    setEpicsPV("barrel_klm_latency", barrel_klm_latency);//Peak
+  }
+
+// update endcap_klm_latency
+  auto hist_endcap_klm_latency =  getDelta("TRGGDL", "hGDL_itd_eklm_hit_rise_all", 0, true);// only if updated
+  if (hist_endcap_klm_latency) {
+    double endcap_klm_latency = 0.0;
+    hist_endcap_klm_latency->Draw();
+    int bin_endcap_klm_latency = hist_endcap_klm_latency->GetMaximumBin();
+    endcap_klm_latency = hist_endcap_klm_latency->GetXaxis()->GetBinCenter(bin_endcap_klm_latency);
+    B2DEBUG(1, "endcap_klm_latency:" << endcap_klm_latency);
+    setEpicsPV("endcap_klm_latency", endcap_klm_latency);//Peak
+  }
+
 // update #hadronb2/#bhabha_all
   auto hist_hadronb2_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_hadronb2_over_bhabha_all) {
-    double hadronb2_over_bhabha_all = 0.0;
     hist_hadronb2_over_bhabha_all->Draw();
-    hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
-                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
-                                 hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+    if (hist_hadronb2_over_bhabha_all->GetBinContent(hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double hadronb2_over_bhabha_all = 0.0;
+      hadronb2_over_bhabha_all = hist_hadronb2_over_bhabha_all->GetBinContent(
+                                   hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_bhabha_all->GetBinContent(
+                                   hist_hadronb2_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
 
-    B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
-    setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
-
+      B2DEBUG(1, "hadronb2_over_bhabha_all:" << hadronb2_over_bhabha_all);
+      setEpicsPV("hadronb2_over_bhabha_all", hadronb2_over_bhabha_all);
+    }
   }
 
 // update #mumu2trk/#bhabha_all
   auto hist_mumu2trk_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_mumu2trk_over_bhabha_all) {
-    double mumu2trk_over_bhabha_all = 0.0;
     hist_mumu2trk_over_bhabha_all->Draw();
-    mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->GetBinContent(
-                                 hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_mumu2trk_over_bhabha_all->GetBinContent(
-                                 hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
-    setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+    if (hist_mumu2trk_over_bhabha_all->GetBinContent(hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double mumu2trk_over_bhabha_all = 0.0;
+      mumu2trk_over_bhabha_all = hist_mumu2trk_over_bhabha_all->GetBinContent(
+                                   hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_mumu_2trk")) / hist_mumu2trk_over_bhabha_all->GetBinContent(
+                                   hist_mumu2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "mumu2trk_over_bhabha_all:" << mumu2trk_over_bhabha_all);
+      setEpicsPV("mumu2trk_over_bhabha_all", mumu2trk_over_bhabha_all);
+    }
 
   }
 
 // update #hadronb2/#mumu2trk
   auto hist_hadronb2_over_mumu2trk =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_hadronb2_over_mumu2trk) {
-    double hadronb2_over_mumu2trk = 0.0;
     hist_hadronb2_over_mumu2trk->Draw();
-    hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->GetBinContent(
-                               hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_mumu2trk->GetBinContent(
-                               hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk"));
-    B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
-    setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
+    if (hist_hadronb2_over_mumu2trk->GetBinContent(
+          hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk")) != 0) {
+      double hadronb2_over_mumu2trk = 0.0;
+      hadronb2_over_mumu2trk = hist_hadronb2_over_mumu2trk->GetBinContent(
+                                 hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_hadronb2")) / hist_hadronb2_over_mumu2trk->GetBinContent(
+                                 hist_hadronb2_over_mumu2trk->GetXaxis()->FindBin("accept_mumu_2trk"));
+      B2DEBUG(1, "hadronb2_over_mumu2trk:" << hadronb2_over_mumu2trk);
+      setEpicsPV("hadronb2_over_mumu2trk", hadronb2_over_mumu2trk);
+    }
 
   }
 
-// update #deadch_c_h_TCId
-  auto hist_c_h_TCId =  getDelta("TRG", "c_h_TCId", 0, true);// only if updated
-  if (hist_c_h_TCId) {
-    double deadch_c_h_TCId = 0.0;
-    hist_c_h_TCId->Draw();
-    deadch_c_h_TCId = hist_c_h_TCId->GetMaximum() * 0.01;
-    B2DEBUG(1, "deadch_c_h_TCId:" << deadch_c_h_TCId);
-    setEpicsPV("deadch_c_h_TCId", deadch_c_h_TCId);
-
-  }
-
-// update #deadch_c_NeuroHWInTSID
-  auto hist_c_NeuroHWInTSID =  getDelta("TRGCDCTNN", "c_NeuroHWInTSID", 0, true);// only if updated
-  if (hist_c_NeuroHWInTSID) {
-    double deadch_c_NeuroHWInTSID = 0.0;
-    hist_c_NeuroHWInTSID->Draw();
-    deadch_c_NeuroHWInTSID = hist_c_NeuroHWInTSID->GetMaximum() * 0.01;
-    B2DEBUG(1, "deadch_c_NeuroHWInTSID:" << deadch_c_NeuroHWInTSID);
-    setEpicsPV("deadch_c_NeuroHWInTSID", deadch_c_NeuroHWInTSID);
-
-  }
 
 
 // update #mumu_tight/#bhabha_all
   auto hist_mumu_tight_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_mumu_tight_over_bhabha_all) {
-    double mumu_tight_over_bhabha_all = 0.0;
     hist_mumu_tight_over_bhabha_all->Draw();
-    mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->GetBinContent(
-                                   hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_mumutight")) / hist_mumu_tight_over_bhabha_all->GetBinContent(
-                                   hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
-    setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+    if (hist_mumu_tight_over_bhabha_all->GetBinContent(
+          hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double mumu_tight_over_bhabha_all = 0.0;
+      mumu_tight_over_bhabha_all = hist_mumu_tight_over_bhabha_all->GetBinContent(
+                                     hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_mumutight")) / hist_mumu_tight_over_bhabha_all->GetBinContent(
+                                     hist_mumu_tight_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "mumu_tight_over_bhabha_all:" << mumu_tight_over_bhabha_all);
+      setEpicsPV("mumu_tight_over_bhabha_all", mumu_tight_over_bhabha_all);
+    }
 
   }
 
 // update #gammagamma/#bhabha_all
   auto hist_gammagamma_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_gammagamma_over_bhabha_all) {
-    double gammagamma_over_bhabha_all = 0.0;
     hist_gammagamma_over_bhabha_all->Draw();
-    gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->GetBinContent(
-                                   hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_gamma_gamma")) / hist_gammagamma_over_bhabha_all->GetBinContent(
-                                   hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
-    setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+    if (hist_gammagamma_over_bhabha_all->GetBinContent(
+          hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double gammagamma_over_bhabha_all = 0.0;
+      gammagamma_over_bhabha_all = hist_gammagamma_over_bhabha_all->GetBinContent(
+                                     hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_gamma_gamma")) / hist_gammagamma_over_bhabha_all->GetBinContent(
+                                     hist_gammagamma_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "gammagamma_over_bhabha_all:" << gammagamma_over_bhabha_all);
+      setEpicsPV("gammagamma_over_bhabha_all", gammagamma_over_bhabha_all);
+    }
 
   }
 
 // update #tautau2trk/#bhabha_all
   auto hist_tautau2trk_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_tautau2trk_over_bhabha_all) {
-    double tautau2trk_over_bhabha_all = 0.0;
     hist_tautau2trk_over_bhabha_all->Draw();
-    tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->GetBinContent(
-                                   hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_tau_2trk")) / hist_tautau2trk_over_bhabha_all->GetBinContent(
-                                   hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
-    setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+    if (hist_tautau2trk_over_bhabha_all->GetBinContent(
+          hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double tautau2trk_over_bhabha_all = 0.0;
+      tautau2trk_over_bhabha_all = hist_tautau2trk_over_bhabha_all->GetBinContent(
+                                     hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_tau_2trk")) / hist_tautau2trk_over_bhabha_all->GetBinContent(
+                                     hist_tautau2trk_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "tautau2trk_over_bhabha_all:" << tautau2trk_over_bhabha_all);
+      setEpicsPV("tautau2trk_over_bhabha_all", tautau2trk_over_bhabha_all);
+    }
 
   }
 
 // update #hadron/#bhabha_all
   auto hist_hadron_over_bhabha_all =  getDelta("softwaretrigger", "skim", 0, true);// only if updated
   if (hist_hadron_over_bhabha_all) {
-    double hadron_over_bhabha_all = 0.0;
     hist_hadron_over_bhabha_all->Draw();
-    hadron_over_bhabha_all = hist_hadron_over_bhabha_all->GetBinContent(
-                               hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_hadron")) / hist_hadron_over_bhabha_all->GetBinContent(
-                               hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
-    B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
-    setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+    if (hist_hadron_over_bhabha_all->GetBinContent(
+          hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all")) != 0) {
+      double hadron_over_bhabha_all = 0.0;
+      hadron_over_bhabha_all = hist_hadron_over_bhabha_all->GetBinContent(
+                                 hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_hadron")) / hist_hadron_over_bhabha_all->GetBinContent(
+                                 hist_hadron_over_bhabha_all->GetXaxis()->FindBin("accept_bhabha_all"));
+      B2DEBUG(1, "hadron_over_bhabha_all:" << hadron_over_bhabha_all);
+      setEpicsPV("hadron_over_bhabha_all", hadron_over_bhabha_all);
+    }
 
   }
 

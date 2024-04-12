@@ -90,7 +90,6 @@ void DQMHistAnalysisKLMModule::initialize()
   registerEpicsPV("KLM:MaskedChannels", "MaskedChannels");
   registerEpicsPV("KLM:DeadBarrelModules", "DeadBarrelModules");
   registerEpicsPV("KLM:DeadEndcapModules", "DeadEndcapModules");
-  updateEpicsPVs(5.0);
 
   gROOT->cd();
 
@@ -160,7 +159,7 @@ void DQMHistAnalysisKLMModule::endRun()
     m_monObj->setVariable("BKLM_Scint_Time_Peak", max_position);
   }
 
-  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_bklm");
+  TH1* time_scint_eklm = findHist(m_histogramDirectoryName + "/time_scintillator_eklm");
   if (time_scint_eklm) {
     hist_max_bin = time_scint_eklm->GetMaximumBin();
     max_position = time_scint_eklm->GetXaxis()->GetBinCenter(hist_max_bin);
@@ -344,7 +343,6 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
     std::string verbose_message = " more messages";
     verbose_message = std::to_string(message_counter - m_MessageThreshold) + verbose_message;
     latex.DrawLatexNDC(x, y, verbose_message.c_str());
-    y -= 0.05;
   }
 
 
@@ -601,7 +599,6 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
       std::string verbose_string = " more messages";
       verbose_string = std::to_string(message_counter - m_MessageThreshold) + verbose_string;
       latex.DrawLatexNDC(xAlarm, yAlarm, verbose_string.c_str());
-      yAlarm -= 0.05;
     }
     canvas->Modified();
     canvas->Update();
@@ -707,6 +704,11 @@ void DQMHistAnalysisKLMModule::event()
 
   B2DEBUG(20, "Updating EPICS PVs for DQMHistAnalysisKLM");
   // only update PVs if there's enough statistics and datasize != 0
+  // Check if it's a null run, if so, don't update EPICS PVs
+  if (m_IsNullRun) {
+    B2INFO("DQMHistAnalysisKLM: Null run detected. No PV Update.");
+    return;
+  }
   auto* daqDataSize = findHist("DAQ/KLMDataSize");
   double meanDAQDataSize = 0.;
   if (daqDataSize != nullptr) {

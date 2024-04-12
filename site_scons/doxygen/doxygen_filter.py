@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -48,7 +47,7 @@ for line in open(filename):
     # python comments
     try:
         line = line.replace('#: ', '## ')
-    except IOError:
+    except OSError:
         pass  # doxygen closes pipe for whatever reason
 
     # module io plot
@@ -65,7 +64,7 @@ for line in open(filename):
         if re.match(r'^}.*', line) and belle2ns:
             belle2ns = False
             print('  /*! @} */')
-    except IOError:
+    except OSError:
         pass  # doxygen closes pipe for whatever reason
 
     # addtogroup
@@ -74,18 +73,18 @@ for line in open(filename):
             print('/**')
         elif not re.match(r'.*\\addtogroup.*', line):
             sys.stdout.write(line)  # print raw, without added \n
-    except IOError:
+    except OSError:
         pass  # doxygen closes pipe for whatever reason
 
     # beginning of belle2 namespace -> start grouping
     try:
         if re.match(r'namespace Belle2 {.*', line):
             belle2ns = True
-            print("""  /**
-   * @addtogroup %s
-   * @{
-   */""" % group)
-    except IOError:
+            print(f"""  /**
+   * @addtogroup {group}
+   * @{{
+   */""")
+    except OSError:
         pass  # doxygen closes pipe for whatever reason
 
 # avoid some further errors with lost stdout/stderr

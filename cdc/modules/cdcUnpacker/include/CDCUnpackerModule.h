@@ -340,6 +340,11 @@ namespace Belle2 {
        */
       bool m_dataSizeError;
 
+      /**
+       * Recover boardID error if true, skip information otherwise
+       */
+      bool m_recoverBoardIdError;
+
     };//end class declaration
 
 

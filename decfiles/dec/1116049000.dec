@@ -1,0 +1,78 @@
+# EventType: 1116049000
+# Description: [B0 -> (D*- -> (anti-D0 -> K+ pi-) pi-) (D_s+ -> (eta -> gamma gamma) pi+)]
+# NickName: Bd_Dst-Dsst+_D0pi_Kpi_etapig
+# Documentation: MC15rd signal request 
+# Tested: Yes
+# Physics WG: BHadronic 
+# Responsible: Vismaya
+# Cuts: None
+# Date: 20240207
+#
+#
+Alias etasig eta
+
+Alias D_s*+sig D_s*+
+Alias D_s*-sig D_s*-
+ChargeConj D_s*+sig D_s*-sig
+#
+# Y(4S) -> B0 anti-B0 
+#
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
+Enddecay
+
+#
+# B0 -> D*- eta pi+
+#
+
+Decay B0sig
+1.0000 D*-sig D_s*+sig PHOTOS SVV_HELAMP 0.4904 0.0 0.7204 0.0 0.4904 0.0;
+Enddecay
+CDecay anti-B0sig
+
+#
+# D*- -> anti-D0 pi-
+#
+
+Decay D*-sig
+1.0000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+#
+# anti-D0 -> K+ pi-
+#
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+#
+### Ds*+ -> Ds+ gamma
+###
+##
+#
+
+Decay D_s*+sig
+1.0000 D_s+sig gamma PHOTOS VSP_PWAVE;
+Enddecay
+CDecay D_s*-sig
+#
+## Ds+ -> eta pi+
+##
+#
+Decay D_s+sig
+1.0000 etasig pi+ PHOTOS PHSP;
+Enddecay
+CDecay D_s-sig
+#
+# eta -> gamma gamma
+#
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

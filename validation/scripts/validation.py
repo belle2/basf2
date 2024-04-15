@@ -1058,6 +1058,13 @@ class Validation:
             key=lambda x: x.runtime or x.package == "validation", reverse=True
         )
 
+    def set_tag(self, tag):
+        """
+        Update the validation tag to enable utils to fetch revision-wise files
+        from the same validation instance.
+        """
+        self.tag = tag
+
     # todo: if you have to indent by 9 tabs, you know that it's time to refactor /klieret
     def run_validation(self):
         """!
@@ -1562,28 +1569,27 @@ def execute(tag=None, is_test=None):
             validation.log.note("Start creating plots...")
             validation.create_plots()
             validation.log.note("Plots have been created...")
-            # send mails
-            if cmd_arguments.send_mails:
-                mails = mail_log.Mails(validation)
-                validation.log.note("Start sending mails...")
-                # send mails to all users with failed scripts/comparison
-                if cmd_arguments.send_mails_mode == "incremental":
-                    incremental = True
-                elif cmd_arguments.send_mails_mode == "full":
-                    incremental = False
-                else:
-                    incremental = None
-                mails.send_all_mails(incremental=incremental)
-                validation.log.note(
-                    f"Save mail data to {validation.get_log_folder()}"
-                )
-                # save json with data about outgoing mails
-                mails.write_log()
         else:
             validation.log.note(
-                "Skipping plot creation and mailing " "(dry run)..."
+                "Skipping plot creation " "(dry run)..."
             )
-
+        # send mails
+        if cmd_arguments.send_mails:
+            mails = mail_log.Mails(validation)
+            validation.log.note("Start sending mails...")
+            # send mails to all users with failed scripts/comparison
+            if cmd_arguments.send_mails_mode == "incremental":
+                incremental = True
+            elif cmd_arguments.send_mails_mode == "full":
+                incremental = False
+            else:
+                incremental = None
+            mails.send_all_mails(incremental=incremental)
+            validation.log.note(
+                f"Save mail data to {validation.get_log_folder()}"
+            )
+            # save json with data about outgoing mails
+            mails.write_log()
         validation.report_on_scripts()
 
         validation.save_metadata()

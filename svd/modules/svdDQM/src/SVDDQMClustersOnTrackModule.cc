@@ -352,12 +352,25 @@ void SVDDQMClustersOnTrackModule::beginRun()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
+  // Add experiment and run number to the title of selected histograms (CR shifter plots)
+  StoreObjPtr<EventMetaData> evtMetaData;
+  m_expNumber = evtMetaData->getExperiment();
+  m_runNumber = evtMetaData->getRun();
+  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
+
   //reset histograms
   TObject* obj;
   TIter nextH(m_histoList);
   while ((obj = nextH()))
     if (obj->InheritsFrom("TH1")) {
       ((TH1F*)obj)->Reset();
+
+      TString tmp = (TString)obj->GetTitle();
+      Int_t pos = tmp.Last('~');
+      if (pos == -1) pos = tmp.Length() + 2;
+
+      TString title = tmp(0, pos - 2);
+      ((TH1F*)obj)->SetTitle(title + runID);
     }
 }
 
@@ -376,10 +389,6 @@ void SVDDQMClustersOnTrackModule::event()
       if (m_svdEventInfo->getModeByte().getTriggerBin() != m_tb)
         return;
   }
-
-  StoreObjPtr<EventMetaData> evtMetaData;
-  m_expNumber = evtMetaData->getExperiment();
-  m_runNumber = evtMetaData->getRun();
 
   int nSamples = 0;
   if (m_svdEventInfo.isValid())
@@ -408,16 +417,6 @@ void SVDDQMClustersOnTrackModule::event()
   auto gTools = VXD::GeoCache::getInstance().getGeoTools();
   if (gTools->getNumberOfSVDLayers() == 0) return;
 
-  // Add experiment and run number to the title of selected histograms (CR shifter plots)
-  TString runID = TString::Format(" ~ Exp%d Run%d", m_expNumber, m_runNumber);
-  TObject* obj;
-  TIter nextH(m_histoList);
-  while ((obj = nextH()))
-    if (obj->InheritsFrom("TH1")) {
-      if (((TString)obj->GetTitle()).Contains(runID) == false) {
-        ((TH1F*)obj)->SetTitle(obj->GetTitle() + runID);
-      }
-    }
 
   for (const Track& track : m_tracks) {
 

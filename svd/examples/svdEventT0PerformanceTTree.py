@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -133,7 +132,8 @@ else:
         main,
         mcTrackFinding=MCTracking,
         append_full_grid_cdc_eventt0=True,
-        trackFitHypotheses=[211])  # ,
+        trackFitHypotheses=[211],
+        skip_full_grid_cdc_eventt0_if_svd_time_present=False)  # ,
     #    skipHitPreparerAdding=True)
 
 

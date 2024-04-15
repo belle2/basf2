@@ -138,7 +138,8 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], fileFormat=
         # reconstruction
         add_reconstruction(reco_path,
                            components=components,
-                           append_full_grid_cdc_eventt0=True)
+                           append_full_grid_cdc_eventt0=True,
+                           skip_full_grid_cdc_eventt0_if_svd_time_present=False)
     if fileFormat == "mdst":
         from modularAnalysis import inputMdst
         inputMdst(filename="", path=reco_path, environmentType='default', skipNEvents=0, entrySequence=['0:{}'.format(max_events)])

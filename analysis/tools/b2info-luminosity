@@ -137,7 +137,7 @@ def argparser():
                         dest="username",
                         type=str,
                         required=False,
-                        help="Provide DESY username for crediantial access")
+                        help="Provide DESY username for credential access")
 
     return parser
 
@@ -553,7 +553,7 @@ class Luminosity:
 
         # df = df[df['exp'].isin(args.exp)]
 
-        # fix integreated lumi considering only requested exp
+        # fix integrated lumi considering only requested exp
 
         # df['intLumi'] -= intLumiPrevoiousExp
 
@@ -661,7 +661,7 @@ class Luminosity:
             )
 
         # store luminosity values for each run in a .csv file
-        b2.B2INFO("Saving run-by-run luminosity informations to luminosityByRuns.csv")
+        b2.B2INFO("Saving run-by-run luminosity information to luminosityByRuns.csv")
         dfRuns.to_csv("luminosityByRuns.csv")
 
         pass

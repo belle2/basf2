@@ -70,10 +70,10 @@ namespace TreeFitter {
       return m_globalState;
     }
 
-    /** reset the staevector */
+    /** reset the statevector */
     void resetStateVector();
 
-    /** reset the staevector */
+    /** reset the statevector */
     void resetCovariance();
 
     /** get the states dimension */
@@ -85,7 +85,7 @@ namespace TreeFitter {
     /** get chi2 of statevector*/
     double chiSquare() const {return m_chiSquare;};
 
-    /** get numer of degrees of freedom */
+    /** get number of degrees of freedom */
     int nDof() const;
 
     /** increment global chi2 */
@@ -118,7 +118,7 @@ namespace TreeFitter {
     /** chi2 */
     double m_chiSquare;
 
-    /** number of conatraints */
+    /** number of constraints */
     int m_nConstraints;
 
     /** reduce the ndf used in the chi2 by this count */

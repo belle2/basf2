@@ -56,7 +56,6 @@ namespace Belle2 {
       G4int Z;
 
       G4String name, symbol;
-      G4double fractionmass;
 
       A = 1.01 * CLHEP::g / CLHEP::mole;
       G4Element* elH  = new G4Element(name = "Hydrogen", symbol = "H", Z = 1, A);
@@ -90,16 +89,16 @@ namespace Belle2 {
 
       density = 2.03 * CLHEP::g / CLHEP::cm3;
       G4Material* Concrete = new G4Material("Concrete", density, 10);
-      Concrete->AddElement(elH, fractionmass = 0.01);
-      Concrete->AddElement(elO, fractionmass = 0.529);
-      Concrete->AddElement(elNa, fractionmass = 0.016);
-      Concrete->AddElement(elHg, fractionmass = 0.002);
-      Concrete->AddElement(elAl, fractionmass = 0.034);
-      Concrete->AddElement(elSi, fractionmass = 0.337);
-      Concrete->AddElement(elK, fractionmass = 0.013);
-      Concrete->AddElement(elCa, fractionmass = 0.044);
-      Concrete->AddElement(elFe, fractionmass = 0.014);
-      Concrete->AddElement(elC, fractionmass = 0.001);
+      Concrete->AddElementByMassFraction(elH, 0.01);
+      Concrete->AddElementByMassFraction(elO, 0.529);
+      Concrete->AddElementByMassFraction(elNa, 0.016);
+      Concrete->AddElementByMassFraction(elHg, 0.002);
+      Concrete->AddElementByMassFraction(elAl, 0.034);
+      Concrete->AddElementByMassFraction(elSi, 0.337);
+      Concrete->AddElementByMassFraction(elK, 0.013);
+      Concrete->AddElementByMassFraction(elCa, 0.044);
+      Concrete->AddElementByMassFraction(elFe, 0.014);
+      Concrete->AddElementByMassFraction(elC, 0.001);
 
 
       //lets get the stepsize parameter with a default value of 5 µm

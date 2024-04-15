@@ -529,11 +529,13 @@ class GenerateSimTask(Basf2PathTask):
         # path.add_module("ActivatePXDPixelMasker")
         # path.add_module("ActivatePXDGainCalibrator")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # \cond suppress doxygen warning
         if self.experiment_number == 1002:
             # remove KLM because of bug in background files with release 4
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
         else:
             components = None
+        # \endcond
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)  # , usePXDDataReduction=False)
 
         path.add_module(

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -41,7 +40,7 @@ class BtoXgamma(BaseSkim):
     Cuts on photons:
 
     * :math:`\\text{clusterE9E21}>0.9`
-    * :math:`1.4\\,\\text{GeV}<\\E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
+    * :math:`1.4\\,\\text{GeV}< E_{\\gamma}<3.4\\,\\text{GeV}` in CMS frame
     """
 
     __authors__ = ["Trevor Shillington"]
@@ -50,6 +49,8 @@ class BtoXgamma(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -60,6 +61,9 @@ class BtoXgamma(BaseSkim):
         # event level cuts: R2 and require a minimum number of tracks + decent photons
         ma.fillParticleList(decayString='pi+:BtoXgamma_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXgamma_eventshape', cut='E > 0.1', path=path)
+
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         ma.buildEventShape(inputListNames=['pi+:BtoXgamma_eventshape', 'gamma:BtoXgamma_eventshape'],
                            allMoments=False,
@@ -73,8 +77,8 @@ class BtoXgamma(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
         ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
@@ -114,37 +118,37 @@ class BtoXgamma(BaseSkim):
 @fancy_skim_header
 class BtoXll(BaseSkim):
     """
-        Reconstructed decay modes:
+    Reconstructed decay modes:
 
-      * :math:`B^+ \\to X e^+ e^-`
-      * :math:`B^+ \\to X e^+ e^+`
-      * :math:`B^+ \\to X \\mu^+ \\mu^-`
-      * :math:`B^+ \\to X \\mu^+ \\mu^+`
-
-
-      Event-level cuts:
-
-      * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
-        :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
-      * :math:`n_{\\text{tracks}} \\geq 3`
-
-      Cuts on electrons:
-
-      * :math:`\\text{electronID} > 0.1`
-      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:`dr<0.5 and abs(dz)<2`
-
-      Cuts on muons:
-
-      * :math:`\\text{muonID} > 0.5`
-      * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-      * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`B^+ \\to X e^+ e^-`
+    * :math:`B^+ \\to X e^+ e^+`
+    * :math:`B^+ \\to X \\mu^+ \\mu^-`
+    * :math:`B^+ \\to X \\mu^+ \\mu^+`
 
 
-      Cut on dilepton energy:
+    Event-level cuts:
 
-      * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
-      """
+    * :math:`\\text{foxWolframR2} < 0.7` constructed using tracks with
+      :math:`p_T>0.1\\,\\text{GeV}` and clusters with :math:`E>0.1\\,\\text{GeV}`.
+    * :math:`n_{\\text{tracks}} \\geq 3`
+
+    Cuts on electrons:
+
+    * :math:`\\text{electronID} > 0.1`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
+
+    Cuts on muons:
+
+    * :math:`\\text{muonID} > 0.5`
+    * :math:`p > 0.395\\,\\text{GeV}` in lab frame
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
+
+
+    Cut on dilepton energy:
+
+    * :math:`E_{\\ell\\ell}>1.5\\,\\text{GeV}` in CMS frame.
+    """
 
     __authors__ = ["Trevor Shillington"]
     __description__ = ":math:`B\\to X\\ell\\ell` (no LFV modes) inclusive skim."
@@ -152,6 +156,8 @@ class BtoXll(BaseSkim):
     __category__ = "physics, electroweak penguins, radiative decays"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -166,6 +172,9 @@ class BtoXll(BaseSkim):
         ma.fillParticleList(decayString='pi+:BtoXll_eventshape', cut='pt > 0.1', path=path)
         ma.fillParticleList(decayString='gamma:BtoXll_eventshape', cut='E > 0.1', path=path)
 
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
+
         ma.buildEventShape(inputListNames=['pi+:BtoXll_eventshape', 'gamma:BtoXll_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
@@ -178,8 +187,8 @@ class BtoXll(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
@@ -229,7 +238,7 @@ class BtoXll(BaseSkim):
 @fancy_skim_header
 class BtoXll_LFV(BaseSkim):
     """
-      Reconstructed decay modes:
+    Reconstructed decay modes:
 
     * :math:`B^+ \\to X e^+ \\mu^-`
     * :math:`B^+ \\to X \\mu^+ e^-`
@@ -246,13 +255,13 @@ class BtoXll_LFV(BaseSkim):
 
     * :math:`\\text{electronID} > 0.1`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
 
     Cuts on muons:
 
     * :math:`\\text{muonID} > 0.5`
     * :math:`p > 0.395\\,\\text{GeV}` in lab frame
-    * :math:`dr<0.5 and abs(dz)<2`
+    * :math:`dr<0.5` and :math:`abs(dz)<2`
 
 
     Cut on dilepton energy:
@@ -265,6 +274,8 @@ class BtoXll_LFV(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, electroweak penguins, radiative decays"
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
@@ -276,6 +287,9 @@ class BtoXll_LFV(BaseSkim):
         # Create lists for buildEventShape (basically all tracks and clusters)
         ma.cutAndCopyList('pi+:BtoXllLFV_eventshape', 'pi+:all', 'pt> 0.1', path=path)
         ma.cutAndCopyList('gamma:BtoXllLFV_eventshape', 'gamma:all', 'E > 0.1', path=path)
+
+        # Event cleanup
+        Event_cleanup = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2) >= 3"
 
         # buildEventShape to access R2
         ma.buildEventShape(inputListNames=['pi+:BtoXllLFV_eventshape', 'gamma:BtoXllLFV_eventshape'],
@@ -290,8 +304,8 @@ class BtoXll_LFV(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        # Apply event cuts R2 < 0.7 and nTracks >= 3
-        path = self.skim_event_cuts('foxWolframR2 < 0.7 and nTracks >= 3', path=path)
+        # Apply event cuts R2 < 0.7
+        path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply electron cut p > 0.395 GeV, electronID > 0.1 + fairTrack
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack

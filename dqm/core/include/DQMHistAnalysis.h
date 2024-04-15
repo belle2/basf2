@@ -36,6 +36,28 @@ namespace Belle2 {
 
   public:
     /**
+     * Status flag of histogram/canvas
+    */
+    enum EStatus {
+      c_StatusTooFew = 0, /**< Not enough entries/event to judge */
+      c_StatusDefault = 1, /**< default for non-coloring */
+      c_StatusGood = 2, /**< Analysis result: Good */
+      c_StatusWarning = 3, /**< Analysis result: Warning, there may be minor issues */
+      c_StatusError = 4 /**< Analysis result: Severe issue found */
+    };
+
+    /**
+     * Status colors of histogram/canvas (corresponding to status)
+    */
+    enum EStatusColor {
+      c_ColorTooFew = kGray, /**< Not enough entries/event to judge */
+      c_ColorDefault = kWhite, /**< default for non-coloring */
+      c_ColorGood = kGreen, /**< Analysis result: Good */
+      c_ColorWarning = kYellow, /**< Analysis result: Warning, there may be minor issues */
+      c_ColorError = kRed /**< Analysis result: Severe issue found */
+    };
+
+    /**
      * The type of list of histograms.
      */
     typedef std::map<std::string, HistObject> HistList;
@@ -112,6 +134,15 @@ namespace Belle2 {
     //! Map of (key)names to EPICS PVs
     std::map <std::string, chid> m_epicsNameToChID;
 #endif
+
+    /**
+     * Register a PV with its name and a key name
+     * @param prefix prefix to PV name
+     * @param pvname full PV name without prefix
+     * @param keyname key name for easier access
+     * @return an index which can be used to access the PV instead of key name, -1 if failure
+     */
+    int registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname = "");
 
   public:
     /**
@@ -198,9 +229,10 @@ namespace Belle2 {
     /**
      * Find histogram in corresponding canvas.
      * @param hname Name of the histogram (dir+name)
+     * @param canvas ptr to specific canvas ptr or nullptr
      * @return The pointer to the histogram, or nullptr if not found.
      */
-    TH1* findHistInCanvas(const std::string& hname);
+    TH1* findHistInCanvas(const std::string& hname, TCanvas** canvas = nullptr);
 
     /**
      * Find MonitoringObject.
@@ -236,6 +268,11 @@ namespace Belle2 {
     static MonitoringObject* getMonitoringObject(const std::string& histname);
 
     /**
+     * Clear content of all Canvases
+     */
+    void clearCanvases(void);
+
+    /**
      * Reset the list of histograms.
      */
     static void initHistListBeforeEvent(void);
@@ -244,6 +281,11 @@ namespace Belle2 {
      * Clears the list of histograms.
      */
     static void clearHistList(void);
+
+    /**
+     * Reset Delta
+     */
+    void resetDeltaList(void);
 
     /**
      * Get Delta histogram.
@@ -310,16 +352,19 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param pvname full PV name
      * @param keyname key name for easier access
-     * @param update_pvs if true, update all PVs (flush network) after new PV is registered
      * @return an index which can be used to access the PV instead of key name, -1 if failure
      */
-    int registerEpicsPV(std::string pvname, std::string keyname = "", bool update_pvs = true);
+    int registerEpicsPV(std::string pvname, std::string keyname = "");
+
+    /**
+     * Register a PV with its name and a key name
+     * @param pvname full PV name
+     * @param keyname key name for easier access
+     * @return an index which can be used to access the PV instead of key name, -1 if failure
+     */
+    int registerExternalEpicsPV(std::string pvname, std::string keyname = "");
 
     /**
      * Write value to a EPICS PV
@@ -486,19 +531,7 @@ namespace Belle2 {
      * set global Prefix for EPICS PVs
      * @param prefix Prefix to set
      */
-
     void setPVPrefix(std::string& prefix) { m_PVPrefix = prefix;};
-
-    /**
-     * Status flag of histogram
-    */
-    enum EStatus {
-      c_TooFew = 0, /**< Not enough entries/event to judge */
-      c_Default = 1, /**< default for non-coloring */
-      c_Good = 2, /**< Analysis result: Good */
-      c_Warning = 3, /**< Analysis result: Warning, there may be minor issues */
-      c_Error = 4 /**< Analysis result: Severe issue found */
-    };
 
     /**
      * Helper function to judge the status for coloring and EPICS
@@ -515,6 +548,13 @@ namespace Belle2 {
      * @param status status to color
      */
     void colorizeCanvas(TCanvas* canvas, EStatus status);
+
+    /**
+     * Return color for canvas state
+     * @param status canvas status
+     * @return alarm color
+     */
+    EStatusColor getStatusColor(EStatus status);
 
     /**
      * Check the status of all PVs and report if disconnected or not found

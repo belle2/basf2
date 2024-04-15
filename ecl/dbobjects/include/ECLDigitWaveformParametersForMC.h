@@ -8,9 +8,8 @@
 
 #pragma once
 
+/* ROOT headers. */
 #include <TObject.h>
-#include <framework/logging/Logger.h>
-
 
 namespace Belle2 {
 

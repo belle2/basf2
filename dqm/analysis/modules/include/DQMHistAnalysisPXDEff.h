@@ -33,11 +33,6 @@ namespace Belle2 {
     DQMHistAnalysisPXDEffModule();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisPXDEffModule();
-
-    /**
      * Initializer.
      */
     void initialize(void) override final;
@@ -56,6 +51,39 @@ namespace Belle2 {
      * This method is called at the end of the event processing.
      */
     void terminate(void) override final;
+
+  private:
+    /**
+     * Update bin in efficiency plots with condition on nhits
+     * @param bin Bin number
+     * @param nhit Number of hits
+     * @param nmatch Number of matched hits
+     * @param minentries Number of minimal entries required ofr update
+     * @return if (delta) plot was updated
+     */
+    bool updateEffBins(int bin, int nhit, int nmatch, int minentries);
+
+    /**
+     * Check bin/name for error condition
+     * @param bin Bin number
+     * @param name Name of bin (Module, layer, ..)
+     * @return If error condition was met
+     */
+    bool check_error_level(int bin, std::string name);
+
+    /**
+     * Check bin/name for warn condition
+     * @param bin Bin number
+     * @param name Name of bin (Module, layer, ..)
+     * @return If warn condition was met
+     */
+    bool check_warn_level(int bin, std::string name);
+
+    /**
+     * Set module labels for TGraphAsymmErrors
+     * @param gr the TGraphAsymmErrors to update
+     */
+    void setLabels(TGraphAsymmErrors* gr);
 
   private:
 
@@ -85,12 +113,12 @@ namespace Belle2 {
     std::vector<VxdID> m_PXDModules;
 
     //! Individual efficiency for each module, 2d histogram
-    std::map<VxdID, TEfficiency*> m_hEffModules;
+    std::map<VxdID, TEfficiency*> m_eEffModules;
     //! Individual efficiency for each module, canvas
     std::map<VxdID, TCanvas*> m_cEffModules;
 
     //! One bin for each module in the geometry
-    TEfficiency* m_hEffAll = nullptr;
+    TEfficiency* m_eEffAll = nullptr;
     //! Final Canvas
     TCanvas* m_cEffAll = nullptr;
     //! TH1, last state, total
@@ -98,7 +126,7 @@ namespace Belle2 {
     //! TH1, last state, passed
     TH1* m_hEffAllLastPassed = nullptr;
     //! Efficiency, last state, updated
-    TEfficiency* m_hEffAllUpdate = nullptr;
+    TEfficiency* m_eEffAllUpdate = nullptr;
     //! Final Canvas for Update
     TCanvas* m_cEffAllUpdate = nullptr;
 
@@ -116,9 +144,11 @@ namespace Belle2 {
     /** TLine object for error error */
     TH1F* m_hErrorLine{};
     //! warn level for alarm per module
-    std::map<VxdID, double> m_warnlevelmod;
+    std::map<std::string, double> m_warnlevelmod;
     //! error level for alarm per module
-    std::map<VxdID, double> m_errorlevelmod;
+    std::map<std::string, double> m_errorlevelmod;
+    //! Number of bins in efficiency plot, all modules plus layer and summary
+    int m_nrxbins;
 
     /** Monitoring Object */
     MonitoringObject* m_monObj {};

@@ -11,7 +11,7 @@
 """
 <header>
   <input>PartGunChargedStableGenSim.root</input>
-  <contact>Marco Milesi, marco.milesi@unimelb.edu.au</contact>
+  <contact>Marcel Hohmann, mhohmann@student.unimelb.edu.au</contact>
   <description> This steering script fully reconstructs particle gun events for a set of charged stable particles,
 and dumps ECL PID validation info in an ntuple and a set of histograms (one file for each pdgId).</description>
 </header>

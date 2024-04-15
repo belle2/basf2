@@ -14,6 +14,8 @@
 
 #include <vector>
 
+class G4Track;
+
 namespace Belle2 {
 
   namespace Simulation {
@@ -63,6 +65,13 @@ namespace Belle2 {
       bool m_storeTrajectories = false;
       std::vector<float> m_absorbers; /**< The absorbers defined at given radii where tracks across them will be destroyed. */
 
+    private:
+
+      /** Method to write (almost) each G4Step to the VR event file. */
+      void writeVREventStep(const G4Step*, const G4Track*);
+
+      /** Flag for writing out the simulation steps. */
+      bool m_writeSimSteps{false};
 
     };
 

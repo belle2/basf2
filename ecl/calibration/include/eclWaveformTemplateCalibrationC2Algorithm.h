@@ -8,13 +8,8 @@
 
 #pragma once
 
-/* ECL headers. */
-#include <ecl/calibration/eclWaveformTemplateCalibrationC2Algorithm.h>
-#include <ecl/dbobjects/ECLDigitWaveformParameters.h>
-
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-#include <framework/database/DBObjPtr.h>
 
 namespace Belle2 {
   namespace ECL {

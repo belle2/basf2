@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # basf2 documentation build configuration file, created by
 # sphinx-quickstart on Mon May 23 17:26:16 2016.
@@ -136,7 +135,7 @@ language = None
 exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
 # If we want to create the light release documentation then we need t exclude anything not in the light release.
 if tags.has('light'):  # noqa
-    light_packages = set([entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')])
+    light_packages = {entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')}
     for entry in os.listdir("../../"):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:
             continue
@@ -420,7 +419,7 @@ def improve_docstring(obj):
     doxygen_url = 'https://software.belle2.org/development/class'
     doxygen_url += '_1_1'.join(classname.split('::'))
     doxygen_url += '.html'
-    pyclass.__doc__ += '\n`Doxygen page for %s <%s>`_' % (classname, doxygen_url)
+    pyclass.__doc__ += f'\n`Doxygen page for {classname} <{doxygen_url}>`_'
 
     # TODO put this into the member docstrings directly? (sadly, readonly)
     members = tclass.GetListOfMethods()
@@ -428,19 +427,19 @@ def improve_docstring(obj):
         pyclass.__doc__ += '\n\nMember functions:'
     for f in members:
         # getattr(pyclass, f.GetName()).__doc__ = "test"
-        pyclass.__doc__ += '\n * %s %s%s' % (f.GetReturnTypeName(), f.GetName(), f.GetSignature())
+        pyclass.__doc__ += f'\n * {f.GetReturnTypeName()} {f.GetName()}{f.GetSignature()}'
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += ' (%s)' % (title)
+            pyclass.__doc__ += f' ({title})'
 
     members = tclass.GetListOfAllPublicDataMembers()
     if members.GetEntries() > 0:
         pyclass.__doc__ += '\n\nPublic data members'
     for f in members:
-        pyclass.__doc__ += '\n * %s' % (f.GetName())
+        pyclass.__doc__ += f'\n * {f.GetName()}'
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += ' (%s)' % (title)
+            pyclass.__doc__ += f' ({title})'
 
 
 def skipmember(app, what, name, obj, skip, options):

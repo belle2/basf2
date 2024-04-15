@@ -307,7 +307,7 @@ or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
 When new payloads are created via ``Belle2::Database::storeData`` the new
 payloads will be assigned a revision number consisting of the first few
 characters of the checksum of the payload file. This is done for efficient
-creation of payload files but also to distuingish locally created payload files
+creation of payload files but also to distinguish locally created payload files
 from payloads downloaded from the database.
 
 * If a payload has an alphanumeric string similar to a git commit hash as

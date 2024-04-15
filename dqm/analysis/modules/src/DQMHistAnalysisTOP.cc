@@ -686,11 +686,18 @@ void DQMHistAnalysisTOPModule::setAlarmLines(const std::vector<double>& alarmLev
 
 void DQMHistAnalysisTOPModule::setAlarmLines()
 {
-  for (auto y : m_asicWindowsBand) {
-    auto* line = new TLine(0.5, y, 16.5, y);
-    line->SetLineWidth(2);
-    line->SetLineColor(kRed);
-    m_asicWindowsBandLines.push_back(line);
+  for (size_t i = 0; i < m_asicWindowsBand.size(); i++) {
+    double y = m_asicWindowsBand[i];
+    if (i < m_asicWindowsBandLines.size()) {
+      auto* line = m_asicWindowsBandLines[i];
+      line->SetY1(y);
+      line->SetY2(y);
+    } else {
+      auto* line = new TLine(0.5, y, 16.5, y);
+      line->SetLineWidth(2);
+      line->SetLineColor(kRed);
+      m_asicWindowsBandLines.push_back(line);
+    }
   }
 
   setAlarmLines(m_junkHitsAlarmLevels, 0.5, 16.5, m_junkHitsAlarmLines);

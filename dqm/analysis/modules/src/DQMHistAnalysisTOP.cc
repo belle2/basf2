@@ -120,12 +120,15 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_photonYields = new TCanvas("TOP/c_photonYields", "c_photonYields");
   m_c_backgroundRates = new TCanvas("TOP/c_backgroundRates", "c_backgroundRates");
 
-  m_deadFraction = new TH1F("TOP/deadFraction", "Fraction of dead channels", 16, 0.5, 16.5);
+  m_deadFraction = new TH1F("TOP/deadFraction", "Fraction of dead channels in included boardstacks", 16, 0.5, 16.5);
   m_deadFraction->SetXTitle("slot number");
   m_deadFraction->SetYTitle("fraction");
-  m_hotFraction = new TH1F("TOP/hotFraction", "Fraction of hot channels", 16, 0.5, 16.5);
+  m_hotFraction = new TH1F("TOP/hotFraction", "Fraction of hot channels in included boardstacks", 16, 0.5, 16.5);
   m_hotFraction->SetXTitle("slot number");
   m_hotFraction->SetYTitle("fraction");
+  m_excludedFraction = new TH1F("TOP/excludedFraction", "Fraction of hot and dead channels in excluded bordstacks", 16, 0.5, 16.5);
+  m_excludedFraction->SetXTitle("slot number");
+  m_excludedFraction->SetYTitle("fraction");
   m_activeFraction = new TH1F("TOP/activeFraction", "Fraction of active channels", 16, 0.5, 16.5);
   m_activeFraction->SetXTitle("slot number");
   m_activeFraction->SetYTitle("fraction");
@@ -334,6 +337,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
 {
   m_deadFraction->Reset();
   m_hotFraction->Reset();
+  m_excludedFraction->Reset();
   m_activeFraction->Reset();
   double inactiveFract = 0; // max inactive channel fraction when some boardstacks are excluded from alarming
 
@@ -362,10 +366,13 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     }
     deadFract /= h->GetNbinsX();
     hotFract /= h->GetNbinsX();
-    m_deadFraction->SetBinContent(slot, deadFract);
-    m_hotFraction->SetBinContent(slot, hotFract);
+    deadFractIncl /= h->GetNbinsX();
+    hotFractIncl /= h->GetNbinsX();
+    m_deadFraction->SetBinContent(slot, deadFractIncl);
+    m_hotFraction->SetBinContent(slot, hotFractIncl);
+    m_excludedFraction->SetBinContent(slot, deadFract - deadFractIncl + hotFract - hotFractIncl);
     m_activeFraction->SetBinContent(slot, 1 - deadFract - hotFract);
-    inactiveFract = std::max(inactiveFract, (deadFractIncl + hotFractIncl) / h->GetNbinsX());
+    inactiveFract = std::max(inactiveFract, deadFractIncl + hotFractIncl);
   }
 
   setMiraBelleVariables("ActiveChannelFraction_slot", m_activeFraction);
@@ -378,10 +385,16 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   m_deadFraction->SetFillColor(1);
+  m_deadFraction->SetLineColor(1);
   m_deadFraction->GetXaxis()->SetNdivisions(16);
 
   m_hotFraction->SetFillColor(2);
+  m_hotFraction->SetLineColor(2);
   m_hotFraction->GetXaxis()->SetNdivisions(16);
+
+  m_excludedFraction->SetFillColor(kGray);
+  m_excludedFraction->SetLineColor(kGray);
+  m_excludedFraction->GetXaxis()->SetNdivisions(16);
 
   m_activeFraction->SetFillColor(0);
   m_activeFraction->GetXaxis()->SetNdivisions(16);
@@ -394,6 +407,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     m_stack = new THStack("TOP/stack", "Fraction of dead and hot channels");
     m_stack->Add(m_deadFraction);
     m_stack->Add(m_hotFraction);
+    m_stack->Add(m_excludedFraction);
     m_stack->Add(m_activeFraction);
   }
   m_stack->Draw();
@@ -404,6 +418,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     m_legend = new TLegend(0.8, 0.87, 0.99, 0.99);
     m_legend->AddEntry(m_hotFraction, "hot");
     m_legend->AddEntry(m_deadFraction, "dead");
+    m_legend->AddEntry(m_excludedFraction, "excluded");
   }
   m_legend->Draw("same");
 

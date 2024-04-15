@@ -705,7 +705,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
         )
 
         for BList in HadronicBLists:
-            ma.applyCuts(BList, "Mbc>5.272", path=path)
+            ma.applyCuts(BList, "Mbc>5.27", path=path)
             ma.applyCuts(BList, "-0.150 <= deltaE <= 0.100", path=path)
             # Need to build Btag_ROE to build continuum suppression variables i.e. cosTBTO
             self._build_continuum_suppression(particle_list=BList, path=path)

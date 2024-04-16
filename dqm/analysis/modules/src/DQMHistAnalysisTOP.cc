@@ -137,6 +137,10 @@ void DQMHistAnalysisTOPModule::initialize()
   m_junkFraction = new TH1F("TOP/junkFraction", "Fraction of junk hits per boardstack", 64, 0.5, 16.5);
   m_junkFraction->SetXTitle("slot number");
   m_junkFraction->SetYTitle("fraction");
+  // note: titles are intentionally the same since this one is plotted first
+  m_excludedBSHisto = new TH1F("TOP/excludedBSHisto", "Fraction of junk hits per boardstack", 64, 0.5, 16.5);
+  m_excludedBSHisto->SetXTitle("slot number");
+  m_excludedBSHisto->SetYTitle("fraction");
   m_c_junkFraction = new TCanvas("TOP/c_junkFraction", "c_junkFraction");
 
   for (int slot = 1; slot <= 16; slot++) {
@@ -520,6 +524,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
 void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
 {
   m_junkFraction->Reset();
+  m_excludedBSHisto->Reset();
   auto* allHits = (TH1D*) m_junkFraction->Clone("tmp");
   for (int slot = 1; slot <= 16; slot++) {
     auto* good = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
@@ -540,6 +545,7 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
     double hmax = 0;
     for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
       if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
+      else m_excludedBSHisto->SetBinContent(i + 1, 1);
     }
     alarmState = getAlarmState(hmax, m_junkHitsAlarmLevels);
   }
@@ -551,10 +557,15 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
   canvas->cd();
   canvas->Pad()->SetFrameFillColor(10);
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
+  m_excludedBSHisto->SetFillColor(kGray);
+  m_excludedBSHisto->SetLineColor(kGray);
+  m_excludedBSHisto->GetXaxis()->SetNdivisions(16);
+  m_excludedBSHisto->GetYaxis()->SetRangeUser(0, 1);
+  m_excludedBSHisto->Draw();
   m_junkFraction->SetMarkerStyle(24);
   m_junkFraction->GetXaxis()->SetNdivisions(16);
   m_junkFraction->GetYaxis()->SetRangeUser(0, 1); // Note: m_junkFraction->GetMaximum() will now give 1 and not the histogram maximum!
-  m_junkFraction->Draw();
+  m_junkFraction->Draw("same");
   for (auto* line : m_verticalLines) line->Draw("same");
   for (auto* line : m_junkHitsAlarmLines) line->Draw("same");
   canvas->Modified();

@@ -242,6 +242,7 @@ namespace Belle2 {
     TCanvas* m_c_deadAndHot = nullptr; /**< Canvas: fractin of dead and hot channels */
 
     TH1F* m_junkFraction = nullptr; /**< fraction of junk hits per boardstack */
+    TH1F* m_excludedBSHisto = nullptr; /**< histogram to show excluded boardstacks on junk fraction plot */
     TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of junk hits per boardstack */
 
     std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */

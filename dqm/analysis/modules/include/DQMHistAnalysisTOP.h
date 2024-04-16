@@ -233,8 +233,9 @@ namespace Belle2 {
     TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
     TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
 
-    TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot */
-    TH1F* m_deadFraction = nullptr; /**< fraction of dead channels per slot */
+    TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot (included boardstacks only) */
+    TH1F* m_deadFraction = nullptr; /**< fraction of dead channels per slot (included boardstacks only) */
+    TH1F* m_excludedFraction = nullptr; /**< fraction of dead and hot channels per slot in excluded boardstacks only */
     TH1F* m_activeFraction = nullptr; /**< fraction of active channels per slot */
     THStack* m_stack = nullptr;  /**< stack for drawing dead, hot and active channel fractions */
     TLegend* m_legend = nullptr; /**< legend for dead and hot channels */

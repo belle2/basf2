@@ -90,6 +90,48 @@ namespace Belle2 {
     /// Return the number of stored event T0s
     unsigned long getNumberOfTemporaryEventT0s() const;
 
+    /// Return the best SVD-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestSVDTemporaryEventT0() const;
+    /// Return the best CDC-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestCDCTemporaryEventT0() const;
+    /// Return the best TOP-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestTOPTemporaryEventT0() const;
+    /// Return the best ECL-based EventT0 candidate if it exists
+    std::optional<EventT0Component> getBestECLTemporaryEventT0() const;
+
+    /// Is the current EventT0 value based on information of the detector
+    /// @param detector The detector for which one wants to know whether m_eventT0 is based on it
+    /// @returns true if m_eventT0 is based on the detector under question, false otherwise
+    bool isEventT0Of(Const::EDetector detector) const
+    {
+      if (hasTemporaryEventT0(detector)) {
+        return m_eventT0.detectorSet.contains(detector);
+      }
+      return false;
+    }
+
+    /// Is m_eventT0 based on SVD information?
+    bool isSVDEventT0() const
+    {
+      return isEventT0Of(Const::EDetector::SVD);
+    }
+    /// Is m_eventT0 based on CDC information?
+    bool isCDCEventT0() const
+    {
+      return isEventT0Of(Const::EDetector::CDC);
+    }
+    /// Is m_eventT0 based on TOP information?
+    bool isTOPEventT0() const
+    {
+      return isEventT0Of(Const::EDetector::TOP);
+    }
+    /// Is m_eventT0 based on ECL information?
+    bool isECLEventT0() const
+    {
+      return isEventT0Of(Const::EDetector::ECL);
+    }
+
+
     /// Clear the list of temporary event T0 estimations
     void clearTemporaries();
 

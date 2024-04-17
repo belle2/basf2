@@ -1,7 +1,7 @@
 .. _onlinebook_workflowmanagement_checkpointing:
 
 Checkpointing for Machine Learning
-=======
+==================================
    
 .. sidebar:: Overview
     :class: overview

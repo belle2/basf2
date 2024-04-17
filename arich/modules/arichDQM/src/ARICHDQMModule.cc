@@ -24,7 +24,7 @@
 #include <framework/datastore/StoreArray.h>
 
 #include <TF1.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TDirectory.h>
 
 #include <fstream>
@@ -295,7 +295,7 @@ namespace Belle2 {
       if (arichTrack.getMomentum() > 0.5) ntrk++; // count tracks with momentum larger than 0.5 GeV
       if (arichTrack.getMomentum() < m_momDnLim || arichTrack.getMomentum() > m_momUpLim) continue;
 
-      TVector3 recPos = arichTrack.getPosition();
+      ROOT::Math::XYZVector recPos = arichTrack.getPosition();
       int trSector = 0;
       double dPhi = 0;
       if (recPos.Phi() >= 0) {
@@ -307,7 +307,7 @@ namespace Belle2 {
         dPhi -= M_PI / 3;
         trSector++;
       }
-      double trR = recPos.XYvector().Mod();
+      double trR = recPos.Rho();
       double trPhi = 0;
       if (recPos.Phi() >= 0) {
         trPhi = recPos.Phi();

@@ -69,7 +69,7 @@ namespace Belle2 {
      * @param hit local position of simhit
      * @param copyno copy number of hapd
      */
-    void magFieldDistorsion(TVector2& hit, int copyno);
+    void magFieldDistorsion(ROOT::Math::XYVector& hit, int copyno);
 
   private:
 

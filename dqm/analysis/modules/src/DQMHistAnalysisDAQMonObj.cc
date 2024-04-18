@@ -10,8 +10,6 @@
 #include <dqm/analysis/modules/DQMHistAnalysisDAQMonObj.h>
 
 // DAQ geometry
-#include <cdc/geometry/DAQGeometryPar.h>
-
 #include <TROOT.h>
 #include <TEllipse.h>
 #include <TF1.h>

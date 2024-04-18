@@ -65,6 +65,12 @@ namespace Belle2 {
     //! N of TC Hit / event
     TH1* h_n_TChit_event = nullptr;
     //! N of TC Hit / event vs. time since injection
+    TH1* h_n_TChit_clean = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection
+    TH1* h_n_TChit_injHER = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection
+    TH1* h_n_TChit_injLER = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection
     TH2* h_nTChit_injtime = nullptr;
     //! N of Cluster / event
     TH1* h_Cluster = nullptr;

@@ -122,6 +122,12 @@ namespace Belle2 {
     TH1F* h_wc_TSF6 = nullptr;
     /** Wirecnt from all TSFs */
     TH1F* h_wc_sum = nullptr;
+    /** Wirecnt from all TSFs from the injection BG clean region*/
+    TH1F* h_wcsum_clean = nullptr;
+    /** Wirecnt from all TSFs from the HER injection BG region*/
+    TH1F* h_wcsum_injHER = nullptr;
+    /** Wirecnt from all TSFs from the LER injection BG region*/
+    TH1F* h_wcsum_injLER = nullptr;
 
     /** 2D plot: TSF0 cnt vs. time since injection (ms) */
     TH2F* h_wc0_injtime = nullptr;

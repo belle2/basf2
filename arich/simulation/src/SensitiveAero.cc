@@ -16,7 +16,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 using namespace std;
 
@@ -72,8 +72,8 @@ namespace Belle2 {
         int trackID = aTrack->GetTrackID();
         int PDGEncoding = particle->GetPDGEncoding();
 
-        TVector3 TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
-        TVector3 TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV, momentum.z() * Unit::MeV);
+        ROOT::Math::XYZVector TPosition(worldPosition.x() * Unit::mm, worldPosition.y() * Unit::mm, worldPosition.z() * Unit::mm);
+        ROOT::Math::XYZVector TMomentum(momentum.x() * Unit::MeV, momentum.y() * Unit::MeV, momentum.z() * Unit::MeV);
 
         // write the hit in datastore"
         StoreArray<ARICHAeroHit> aeroHits;

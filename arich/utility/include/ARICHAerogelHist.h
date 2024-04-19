@@ -10,7 +10,7 @@
 
 //root
 #include <TH2Poly.h>
-#include <TVector2.h>
+#include <Math/Vector2D.h>
 
 //c, c++
 #include <vector>
@@ -96,12 +96,12 @@ namespace Belle2 {
     double m_aerogelTileGap; /**< Distance between aerogel tiles. */
 
     ////Aerogel vertices map Int_t -> aerogel ring number
-    std::map<Int_t, std::vector<TVector2>> m_verticesMap; /**< Aerogel vertices map. */
+    std::map<Int_t, std::vector<ROOT::Math::XYVector>> m_verticesMap; /**< Aerogel vertices map. */
 
     TString m_histName;  /**< Histogram name. */
     TString m_histTitle; /**< Histogram title. */
 
-    ClassDef(ARICHAerogelHist, 1); /**< ClassDef */
+    ClassDef(ARICHAerogelHist, 2); /**< ClassDef */
 
   };
 

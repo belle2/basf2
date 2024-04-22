@@ -116,3 +116,17 @@ class f_dark_p2(BaseSkim):
     """
     Skim for flagged dark, part 2
     """
+
+
+@fancy_skim_header
+class f_tau_p1(BaseSkim):
+    """
+    Skim for flagged dark, part 1
+    """
+
+
+@fancy_skim_header
+class f_tau_p2(BaseSkim):
+    """
+    Skim for flagged dark, part 2
+    """

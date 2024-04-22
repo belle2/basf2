@@ -104,16 +104,16 @@ namespace Belle2 {
 
     /** Evaluate TrackNodes in the ActiveSectors and link them if they fulfill the filter criteria of the SectorMap.
      *  The linked TrackNodes are stored in the DirectedNodeNetwork<TrackNode>.
-     *  The boolean return value will be false, if the network cration is aborted prematurely.
-     *  @param ObserverType: type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
+     *  The template class is the type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
+     *  @return boolean whether the network creation is successful or aborted prematurely.
      */
     template <class ObserverType>
     bool buildTrackNodeNetwork();
 
 
     /** Use connected SpacePoints to form segments which will stored and linked in a DirectedNodeNetwork<Segment>
-    @param ObserverType : type  of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
-    */
+     *  The template class is the type of the observer which is used to monitor the Filters, use VoidObserver for deactivating observation
+     */
     template <class ObserverType>
     void buildSegmentNetwork();
 

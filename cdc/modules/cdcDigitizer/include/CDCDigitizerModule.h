@@ -110,16 +110,14 @@ namespace Belle2 {
     double getDriftTime(double driftLength, bool addTof, bool addDelay);
 
 
-    /** Function to make signals after shapers
+    /** Function to write ADC-count and conversion factor for threshold
      *
      *  @param wid wire id.
      *  @param edep energy deposit (GeV).
      *  @param dx step length (cm).
      *  @param costh cos(theta) of particle.
      *  @param adcCount ADC-count.
-     *  @param convFactorForThreshold conversin factor needed for threshold setting.
-     *
-     *  @return ADC-count and conversion factor for threshold.
+     *  @param convFactorForThreshold conversion factor needed for threshold setting.
      *
      */
     void makeSignalsAfterShapers(const WireID& wid, double edep, double dx, double costh, unsigned short& adcCount,

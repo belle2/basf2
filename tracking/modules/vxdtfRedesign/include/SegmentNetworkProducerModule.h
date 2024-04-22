@@ -60,7 +60,7 @@ namespace Belle2 {
     /// Constructor of the module.
     SegmentNetworkProducerModule();
 
-    /// Modul initialization: performing checks on input parameter and registration of network container in data store.
+    /// Module initialization: performing checks on input parameter and registration of network container in data store.
     void initialize() override;
 
     /// Begin Run which load the filters from the provided SectorMap and checks if this was successful.
@@ -185,7 +185,7 @@ namespace Belle2 {
     /// Access to the DirectedNodeNetwork, which will be produced by this module.
     StoreObjPtr<DirectedNodeNetworkContainer> m_network;
 
-    /// Acccess to the EventLevelTrackingInfo object in the datastore.
+    /// Access to the EventLevelTrackingInfo object in the datastore.
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
 

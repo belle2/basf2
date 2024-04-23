@@ -440,8 +440,7 @@ def add_prefilter_posttracking_reconstruction(path,
                                               components=None,
                                               add_muid_hits=False,
                                               for_cdst_analysis=False,
-                                              add_eventt0_combiner_for_cdst=False,
-                                              eventt0_combiner_mode="prefer_svd"):
+                                              add_eventt0_combiner_for_cdst=False):
     """
     This function adds to the path the standard reconstruction modules after prefilter tracking
     whoose outputs are also needed in the filter.
@@ -455,14 +454,13 @@ def add_prefilter_posttracking_reconstruction(path,
            for_cdst_analysis is False. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
-    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
     add_ext_module(path, components)
 
     # Add EventT0Combiner, if this function is not called from prepare_cdst_analysis() or if requested also there.
     if not for_cdst_analysis or add_eventt0_combiner_for_cdst:
-        path.add_module("EventT0Combiner", combinationLogic=eventt0_combiner_mode)
+        path.add_module("EventT0Combiner")
     add_ecl_finalizer_module(path, components)
     add_ecl_mc_matcher_module(path, components)
     add_klm_modules(path, components)
@@ -521,7 +519,6 @@ def add_posttracking_reconstruction(path,
                                     cosmics=False,
                                     for_cdst_analysis=False,
                                     add_eventt0_combiner_for_cdst=False,
-                                    eventt0_combiner_mode="prefer_svd",
                                     legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules after tracking
@@ -541,7 +538,6 @@ def add_posttracking_reconstruction(path,
            for_cdst_analysis is True. This is useful for validation purposes for avoiding to run the full
            add_reconstruction(). Note that, with the default settings (for_cdst_analysis=False and
            add_eventt0_combiner_for_cdst=False), the EventT0Combiner module is added to the path.
-    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
@@ -550,8 +546,7 @@ def add_posttracking_reconstruction(path,
                                               components=components,
                                               add_muid_hits=add_muid_hits,
                                               for_cdst_analysis=for_cdst_analysis,
-                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner_for_cdst,
-                                              eventt0_combiner_mode=eventt0_combiner_mode)
+                                              add_eventt0_combiner_for_cdst=add_eventt0_combiner_for_cdst)
 
     add_postfilter_posttracking_reconstruction(path,
                                                components=components,

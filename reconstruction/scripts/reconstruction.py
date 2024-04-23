@@ -317,7 +317,6 @@ def add_cosmics_reconstruction(
         add_muid_hits=False,
         reconstruct_cdst=False,
         posttracking=True,
-        eventt0_combiner_mode="prefer_cdc",
         legacy_ecl_charged_pid=False,
         ):
     """
@@ -344,7 +343,6 @@ def add_cosmics_reconstruction(
 
     :param reconstruct_cdst: run only the minimal reconstruction needed to produce the cdsts (raw+tracking+dE/dx)
     :param posttracking: run reconstruction for outer detectors.
-    :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
@@ -382,7 +380,6 @@ def add_cosmics_reconstruction(
                                             addClusterExpertModules=addClusterExpertModules,
                                             add_muid_hits=add_muid_hits,
                                             cosmics=True,
-                                            eventt0_combiner_mode=eventt0_combiner_mode,
                                             legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
 

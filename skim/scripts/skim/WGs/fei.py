@@ -659,7 +659,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
     """
     Tag side :math:`B` cuts:
 
-    * :math:`M_{\\text{bc}} > 5.272~{\\rm GeV}`
+    * :math:`M_{\\text{bc}} > 5.27~{\\rm GeV}`
     * :math:`-0.150 < \\Delta E < 0.100~{\\rm GeV}`
     * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
       :math:`B^+`, and decay mode 25 for :math:`B^0`)
@@ -679,9 +679,9 @@ class feiHadronic_DstEllNu(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
 
-    __description__ = (
-        "FEI-tagged neutral and charged :math:`B`'s decaying hadronically."
-    )
+    __description__ = ("FEI-tagged neutral and charged: math: `B`'s decaying hadronically",
+                       "Analysis specific cuts applied during skimming. Best 2 candidates ranked by sigProb kept"
+                       )
 
     FEIChannelArgs = {
         "neutralB": True,

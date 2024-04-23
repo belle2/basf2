@@ -546,7 +546,9 @@ class feiSLB0_RDstar(BaseFEISkim):
         `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
         event-level cuts made before applying the FEI.
     """
-    __description__ = "FEI-tagged neutral :math:`B`'s decaying semileptonically."
+    __description__ = ("FEI-tagged neutral :math:`B`'s decaying semileptonically",
+                       "Analysis cuts included, best sigProb candidate kept"
+                       )
     validation_sample = _VALIDATION_SAMPLE
 
     FEIChannelArgs = {

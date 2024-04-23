@@ -55,77 +55,37 @@ void EventT0CombinerModule::event()
     }
   }
 
-  // check if a SVD hypothesis exists
-  const auto bestSVDHypo = m_eventT0->getBestSVDTemporaryEventT0();
+  const auto& bestECLT0 = m_eventT0->getBestECLTemporaryEventT0();
+  const auto& cdcT0Candidates = m_eventT0->getTemporaryEventT0s(Const::CDC);
+  const auto hitBasedCDCT0Candiate = std::find_if(cdcT0Candidates.begin(), cdcT0Candidates.end(), [](const auto & a) { return a.algorithm == "hit based";});
 
-  if (not bestSVDHypo) {
-    B2DEBUG(20, "No SVD time hypotheses available, stopping");
-    // if no SVD value was found, the best t0 has already been set by the ECL t0 module.
+  // Strategy in case none of the SVD based or the CDC chi2 based EventT0 values is available:
+  // 1) If we have both an EventT0 estimate from ECL and a CDC hit based value, combine the two
+  // 2) If we only have one of the two, take that value
+  // 3) If we don't have either, we have a problem -> issue a B2WARNING and clear the EventT0
+  // If we arrive at 3), this means that we could only have TOP EventT0, or an EventT0 from a
+  // CDC based algorithm other than "hit based" or "chi2", and so far we don't want to use these.
+  if (bestECLT0 and hitBasedCDCT0Candiate != cdcT0Candidates.end()) {
+    const auto combined = computeCombination({ *bestECLT0, *hitBasedCDCT0Candiate });
+    m_eventT0->setEventT0(combined);
     return;
-  }
-
-  B2DEBUG(20, "Best SVD time hypothesis t0 = " << bestSVDHypo->eventT0 << " +- " << bestSVDHypo->eventT0Uncertainty);
-
-  if (m_paramCombinationMode == m_combinationModePreferSVD) {
-    // we have a SVD value, so set this as new best global value
-    B2DEBUG(20, "Setting SVD time hypothesis t0 = " << bestSVDHypo->eventT0 << " +- " << bestSVDHypo->eventT0Uncertainty <<
-            " as new final value.");
-    //set SVD value, if available
-    m_eventT0->setEventT0(*bestSVDHypo);
-  } else if (m_paramCombinationMode == m_combinationModePreferCDC) {
-    // get best CDC hypothesis
-    const auto bestCDCHypo = m_eventT0->getBestCDCTemporaryEventT0();
-    if (not bestCDCHypo) {
-      B2DEBUG(20, "No CDC EventT0 candiate, exiting.");
-      return;
-    }
-    // we have a CDC value, so set this as new best global value
-    B2DEBUG(20, "Setting CDC time hypothesis t0 = " << bestCDCHypo->eventT0 << " +- " << bestCDCHypo->eventT0Uncertainty <<
-            " as new final value.");
-    //set CDC value, if available
-    m_eventT0->setEventT0(*bestCDCHypo);
-  } else if (m_paramCombinationMode == m_combinationModeCombineSVDandECL) {
-    // start comparing with all available ECL hypothesis
-    auto eclHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);
-
-    if (eclHypos.size() == 0) {
-      B2DEBUG(20, "No ECL t0 hypothesis available, exiting");
-      return;
-    }
-
-    EventT0::EventT0Component eclBestMatch;
-    double bestDistance = std::numeric_limits<double>::max();
-    bool foundMatch = false;
-    for (auto const& eclHypo : eclHypos) {
-      // compute distance
-      double dist = std::abs(eclHypo.eventT0 - bestSVDHypo->eventT0);
-      B2DEBUG(20, "Checking compatibility of ECL  t0 = " << eclHypo.eventT0 << " +- " << eclHypo.eventT0Uncertainty << " distance = " <<
-              dist);
-      if (dist < bestDistance) {
-        eclBestMatch = eclHypo;
-        bestDistance = dist;
-        foundMatch = true;
-      }
-    }
-
-    B2DEBUG(20, "Best Matching ECL timing is t0 = " << eclBestMatch.eventT0 << " +- " << eclBestMatch.eventT0Uncertainty);
-
-    // combine and update final value
-    if (foundMatch) {
-      const auto combined = computeCombination({ eclBestMatch, *bestSVDHypo });
-      m_eventT0->setEventT0(combined);
-      B2DEBUG(20, "Combined T0 from SVD and ECL is t0 = " << combined.eventT0 << " +- " << combined.eventT0Uncertainty);
-    } else {
-
-      //set SVD value, if available
-      m_eventT0->setEventT0(*bestSVDHypo);
-
-      B2DEBUG(20, "No sufficient match found between SVD and ECL timing, setting best SVD t0 = " << bestSVDHypo->eventT0 << " +- " <<
-              bestSVDHypo->eventT0Uncertainty);
-    }
+  } else if (bestECLT0 and hitBasedCDCT0Candiate == cdcT0Candidates.end()) {
+    m_eventT0->setEventT0(*bestECLT0);
+    return;
+  } else if (hitBasedCDCT0Candiate != cdcT0Candidates.end() and not bestECLT0) {
+    m_eventT0->setEventT0(*hitBasedCDCT0Candiate);
+    return;
   } else {
-    B2FATAL("Event t0 combination mode " << m_paramCombinationMode << " not supported.");
+    B2WARNING("There is no EventT0 from neither \n" \
+              " * the SVD based algorithm\n" \
+              " * the CDC based chi^2 algorithm\n" \
+              " * the CDC based hit-based algorithm\n" \
+              " * the ECL algorithm.\n" \
+              "Thus, no EventT0 value can be calculated.");
+    m_eventT0->clearEventT0();
   }
+
+
 }
 
 EventT0::EventT0Component EventT0CombinerModule::computeCombination(std::vector<EventT0::EventT0Component> measurements) const

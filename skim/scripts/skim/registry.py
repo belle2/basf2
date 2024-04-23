@@ -32,8 +32,8 @@ _RegisteredSkims = [
     ("27000200", "flagged", "f_charm_p2"),
     ("28000100", "flagged", "f_dark_p1"),
     ("28000200", "flagged", "f_dark_p2"),
-    ("28000200", "flagged", "f_tau_p1"),
-    ("28000200", "flagged", "f_tau_p2"),
+    ("29000100", "flagged", "f_tau_p1"),
+    ("29000200", "flagged", "f_tau_p2"),
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),

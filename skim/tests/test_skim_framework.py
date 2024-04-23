@@ -108,6 +108,10 @@ class TestSkimRegistry(unittest.TestCase):
         in the modules.
         """
         for ModuleName in Registry.modules:
+
+            if ModuleName == 'flagged':
+                continue  # flagged category are not actual skims
+
             SkimModule = import_module(f"skim.WGs.{ModuleName}")
             for SkimName in Registry.get_skims_in_module(ModuleName):
                 # Check the skim is defined in the module
@@ -135,6 +139,10 @@ class TestSkimRegistry(unittest.TestCase):
         incorrect skim information in the registry.
         """
         for ModuleName in self.ExistentModules:
+
+            if ModuleName == 'flagged':
+                continue  # flagged category are not actual skims
+
             SkimModule = import_module(f"skim.WGs.{ModuleName}")
 
             # Inspect the module, and find all BaseSkim subclasses

@@ -39,6 +39,11 @@ void EventT0CombinerModule::event()
     return;
   }
 
+  // We have an SVD based EventT0 and it currently is set as *THE* EventT0 -> nothing to do
+  if (m_eventT0->isSVDEventT0()) {
+    return;
+  }
+
   // check if a SVD hypothesis exists
   const auto bestSVDHypo = m_eventT0->getBestSVDTemporaryEventT0();
 

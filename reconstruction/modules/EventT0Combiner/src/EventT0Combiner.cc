@@ -18,17 +18,6 @@ EventT0CombinerModule::EventT0CombinerModule() : Module()
 {
   setDescription("Module to combine the EventT0 values from multiple sub-detectors");
 
-  addParam("combinationLogic", m_paramCombinationMode, "Method of how the final T0 is selected.\n"
-           "Currently '" + m_combinationModePreferSVD + ", " + m_combinationModePreferCDC + "' and '" + m_combinationModeCombineSVDandECL +
-           "' is available\n" +
-           m_combinationModePreferSVD + ": the SVD t0 value (if available) will be set as the final T0 value."
-           "Only if no SVD value could be found "
-           "(which is very rare for BBbar events, and around 5% of low multiplicity events), the best ECL value will be set\n" +
-           m_combinationModeCombineSVDandECL + ": In this mode, the SVD t0 value (if available) will be used to "
-           "select the ECL t0 information which is closest in time "
-           "to the best SVD value and these two values will be combined to one final value." +
-           m_paramCombinationMode);
-
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 

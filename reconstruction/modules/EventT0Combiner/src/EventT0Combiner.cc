@@ -30,6 +30,7 @@ void EventT0CombinerModule::event()
 
   // We have an SVD based EventT0 and it currently is set as *THE* EventT0 -> nothing to do
   if (m_eventT0->isSVDEventT0()) {
+    B2DEBUG(20, "EventT0 already based on SVD information, nothing to do.");
     return;
   }
 
@@ -38,15 +39,18 @@ void EventT0CombinerModule::event()
   // "grid" and "chi2". We are only interested in the latter one.
   // If no SVD based EventT0 is present, but a CDC based one using the "chi2" algorithm is available -> nothing to do
   if (m_eventT0->isCDCEventT0()) {
-    const auto bestCDCT0 = m_eventT0->getBestCDCTemporaryEventT0();
+    const auto& bestCDCT0 = m_eventT0->getBestCDCTemporaryEventT0();
     if ((*bestCDCT0).algorithm == "chi2") {
+      B2DEBUG(20, "Using CDC chi2 EventT0.");
       return;
     }
+    B2DEBUG(20, "Current EventT0 is based on CDC, but it's not the chi2 value. Continue Search.");
   }
 
+  // No CDC chi2 EventT0 present -> try to combine ECL and CDC hit based EventT0
   const auto& bestECLT0 = m_eventT0->getBestECLTemporaryEventT0();
   const auto& cdcT0Candidates = m_eventT0->getTemporaryEventT0s(Const::CDC);
-  const auto hitBasedCDCT0Candiate = std::find_if(cdcT0Candidates.begin(), cdcT0Candidates.end(), [](const auto & a) { return a.algorithm == "hit based";});
+  const auto& hitBasedCDCT0Candiate = std::find_if(cdcT0Candidates.begin(), cdcT0Candidates.end(), [](const auto & a) { return a.algorithm == "hit based";});
 
   // Strategy in case none of the SVD based or the CDC chi2 based EventT0 values is available:
   // 1) If we have both an EventT0 estimate from ECL and a CDC hit based value, combine the two
@@ -55,13 +59,16 @@ void EventT0CombinerModule::event()
   // If we arrive at 3), this means that we could only have TOP EventT0, or an EventT0 from a
   // CDC based algorithm other than "hit based" or "chi2", and so far we don't want to use these.
   if (bestECLT0 and hitBasedCDCT0Candiate != cdcT0Candidates.end()) {
+    B2DEBUG(20, "Combining ECL EventT0 and CDC hit based EventT0.");
     const auto combined = computeCombination({ *bestECLT0, *hitBasedCDCT0Candiate });
     m_eventT0->setEventT0(combined);
     return;
   } else if (bestECLT0 and hitBasedCDCT0Candiate == cdcT0Candidates.end()) {
+    B2DEBUG(20, "Using ECL EventT0, as CDC hit based EventT0 is not available.");
     m_eventT0->setEventT0(*bestECLT0);
     return;
   } else if (hitBasedCDCT0Candiate != cdcT0Candidates.end() and not bestECLT0) {
+    B2DEBUG(20, "Using CDC hit based EventT0, as ECL EventT0 is not available.");
     m_eventT0->setEventT0(*hitBasedCDCT0Candiate);
     return;
   } else {

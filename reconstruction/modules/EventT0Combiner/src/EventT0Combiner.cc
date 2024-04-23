@@ -44,6 +44,17 @@ void EventT0CombinerModule::event()
     return;
   }
 
+  // If we don't have an SVD based EventT0, the second choice is the EventT0 estimate using CDC information calculabed by the
+  // FullGridChi2TrackTimeExtractor method. In principle, this algorithm can create EventT0 estimates using two methods:
+  // "grid" and "chi2". We are only interested in the latter one.
+  // If no SVD based EventT0 is present, but a CDC based one using the "chi2" algorithm is available -> nothing to do
+  if (m_eventT0->isCDCEventT0()) {
+    const auto bestCDCT0 = m_eventT0->getBestCDCTemporaryEventT0();
+    if ((*bestCDCT0).algorithm == "chi2") {
+      return;
+    }
+  }
+
   // check if a SVD hypothesis exists
   const auto bestSVDHypo = m_eventT0->getBestSVDTemporaryEventT0();
 

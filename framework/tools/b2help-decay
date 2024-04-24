@@ -28,12 +28,19 @@ def get_argparse():
     """
     import argparse
     parser = argparse.ArgumentParser(
-        description='Script that provides decay file information'
+        description="""Script that provides decay file information.
+        Use cases:
+        1. Print out the signal decay file. For example, ``b2help-decay print 1141540100.dec`` with or without file extention.
+        2. Find the signal decay file. For example, ``b2help-decay find -d K_S0 J/psi B0`` outputs the list of decay files that contain K_S0, J/psi, and B0.
+        One can print out the decay file information by ``b2help-decay print <decay_file_name>``.
+        3. Find the signal decay line in BELLE2_DECAY.DEC. For example, ``b2help-decay find -d K_S0 J/psi -m B0 -b`` outputs the list of decay lines 
+        that contain K_S0, J/psi coming from mother particle B0. No charge conjugation is considered.
+        """
     )
     subparsers = parser.add_subparsers(dest="command")
-    parser_print = subparsers.add_parser('print')
+    parser_print = subparsers.add_parser('print', description='Print out a signal decay file')
     parser_print.add_argument("signal", help="Name of the decay file")
-    parser_find = subparsers.add_parser('find')
+    parser_find = subparsers.add_parser('find', description='Find a signal decay file or a decay inside DECAY_BELLE2.DEC')
     parser_find.add_argument("-m", "--mother", help="Name of the mother particle", default=None)
     parser_find.add_argument("-d", "--daughters", nargs='+', help="Names of the daughter particles", required=True)
     parser_find.add_argument("-b", "--decay_belle2", action='store_true', help="Search for decay in the DECAY_BELLE2.DEC")
@@ -43,8 +50,9 @@ def print_file(signal_name: str):
     """
     Print the decay file information.
     """
-    if not signal_name.endswith('.dec'):
-        signal_name = signal_name + '.dec'
+    ext = '.dec'
+    if not signal_name.endswith(ext):
+        signal_name = signal_name + ext
     file_name = os.path.join(_dec_directory, signal_name)
     if os.path.exists(b2.find_file(file_name, silent=True)):
         with open(b2.find_file(file_name), 'r') as f:
@@ -72,7 +80,7 @@ def find_signal_decay(mother: str, daughters: list):
                 descriptor = 'Not found'
                 with open(os.path.join(local_dec_directory, file), 'r') as f:
                     for line in f.readlines():
-                        if line.startswith('#') and 'Descriptor:' in line:
+                        if line.startswith('#') and ('Descriptor:' in line or 'Description:' in line):
                             descriptor = line.split(':')[1].strip()
                 print(f"Found decay file: {file} Descriptor: {descriptor}")
                 found = True

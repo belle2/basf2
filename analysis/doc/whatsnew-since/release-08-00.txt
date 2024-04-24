@@ -1,3 +1,11 @@
+Changes in the analysis package in light-2405-quaxo
+---------------------------------------------------
+
+Command line tools
+++++++++++++++++++
+* New command line tool :ref:`b2help-decay` which prints out signal decay files and helps to find decay information.
+
+
 Changes in the analysis package in light-2403-persian
 -----------------------------------------------------
 
@@ -11,6 +19,7 @@ Command line tools
 ++++++++++++++++++
 * New command line tool :ref:`b2help-print-mcparticles` to print MCParticles on the input mdst file. This tool is helpful for
   quickly checking MCParticles without writing a script.
+* New command line tool :ref:`b2help-recommendation` to print recommendations for analysis tools and systematics.
 
 Variables
 +++++++++

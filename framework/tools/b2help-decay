@@ -30,7 +30,7 @@ def get_argparse():
     parser = argparse.ArgumentParser(
         description="""Script that provides decay file information.
         Use cases:
-        1. Print out the signal decay file. For example, ``b2help-decay print 1141540100.dec`` with or without file extention.
+        1. Print out the signal decay file. For example, ``b2help-decay print 1141540100.dec`` with or without file extension.
         2. Find the signal decay file. For example, ``b2help-decay find -d K_S0 J/psi B0`` outputs the list of decay files that contain K_S0, J/psi, and B0.
         One can print out the decay file information by ``b2help-decay print <decay_file_name>``.
         3. Find the signal decay line in BELLE2_DECAY.DEC. For example, ``b2help-decay find -d K_S0 J/psi -m B0 -b`` outputs the list of decay lines 

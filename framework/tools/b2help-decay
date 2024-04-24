@@ -36,7 +36,7 @@ def get_argparse():
     parser_find = subparsers.add_parser('find')
     parser_find.add_argument("-m", "--mother", help="Name of the mother particle", default=None)
     parser_find.add_argument("-d", "--daughters", nargs='+', help="Names of the daughter particles", required=True)
-    parser_find.add_argument("-b2", "--decay_belle2", action='store_true', help="Search for decay in the DECAY_BELLE2.DEC")
+    parser_find.add_argument("-b", "--decay_belle2", action='store_true', help="Search for decay in the DECAY_BELLE2.DEC")
     return parser
 
 def print_file(signal_name: str):
@@ -58,7 +58,7 @@ def find_signal_decay(mother: str, daughters: list):
     Find the signal decay file.
     """
     found = False
-    local_dec_directory = os.path.dirname(b2.find_file(os.path.join(_dec_directory, _main_decay_file)))
+    local_dec_directory = b2.find_file(_dec_directory)
 
     for file in os.listdir(local_dec_directory):
         if file.endswith('.dec'):
@@ -69,7 +69,12 @@ def find_signal_decay(mother: str, daughters: list):
                 # to avoid confusion with aliases and charge conjugations
                 if mother and mother not in lines:
                     continue
-                print(f"Found decay file: {file}")
+                descriptor = 'Not found'
+                with open(os.path.join(local_dec_directory, file), 'r') as f:
+                    for line in f.readlines():
+                        if line.startswith('#') and 'Descriptor:' in line:
+                            descriptor = line.split(':')[1].strip()
+                print(f"Found decay file: {file} Descriptor: {descriptor}")
                 found = True
     if not found:
         print(f"Decay file for mother {mother} and daughters {daughters} not found.")

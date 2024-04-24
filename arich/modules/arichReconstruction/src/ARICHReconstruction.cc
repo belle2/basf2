@@ -568,7 +568,6 @@ namespace Belle2 {
             int ifi = int (fi_cer * 20 / 2. / M_PI);
             ROOT::Math::XYZVector photonAtAerogelExit = photonDirection1 * (m_thickness[iAerogel] / photonDirection1.Z());
             ROOT::Math::XYZVector trackAtAerogelExit = edirr * (m_thickness[iAerogel] / edirr.Z());
-            ROOT::Math::XYZVector dtrackphoton = photonAtAerogelExit - trackAtAerogelExit;
             ROOT::Math::XYZVector detector_position;
 
             detector_position = FastTracking(photonDirection1, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],

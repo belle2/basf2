@@ -27,8 +27,10 @@ Tools which will provide you help
     :nogroupsections:
 
 
-``b2help-decay``: Find decays in decay files
---------------------------------------------
+.. _b2help-decay:
+
+``b2help-decay``: Tool to find decays in decay files
+----------------------------------------------------
 
 .. argparse::
     :filename: framework/tools/b2help-decay

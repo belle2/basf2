@@ -77,7 +77,7 @@ namespace Belle2 {
        * Function to evaluate a vector of objects
        * Base implementation applies the function to each object. Can be optimized for MVA filters
        * @param objs A vector of pointers to objects
-       * @return A float value or NAN. See above
+       * @return A vector of float or NAN values. See above
        */
       virtual std::vector<float> operator()(const std::vector <Object*>& objs);
     };

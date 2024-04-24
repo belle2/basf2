@@ -24,7 +24,6 @@
 #include <string>
 #include <memory>
 #include <cmath>
-#include <iostream>
 
 namespace Belle2 {
 

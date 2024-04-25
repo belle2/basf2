@@ -40,18 +40,18 @@ def get_argparse():
         description="""Script that provides decay file information.
         Use cases:
         1. Print out the signal decay file. For example, ``b2help-decay print 1141540100.dec`` with or without file extension.
-        2. Find the signal decay file. For example, ``b2help-decay find -d K_S0 J/psi B0`` outputs the list of decay files that contain K_S0, J/psi, and B0.
+        2. Find the signal decay file. For example, ``b2help-decay find K_S0 J/psi B0`` outputs the list of decay files that contain K_S0, J/psi, and B0.
         One can print out the decay file information by ``b2help-decay print <decay_file_name>``.
-        3. Find the signal decay line in BELLE2_DECAY.DEC. For example, ``b2help-decay find -d K_S0 J/psi -m B0 -b`` outputs the list of decay lines 
+        3. Find the signal decay line in BELLE2_DECAY.DEC. For example, ``b2help-decay find K_S0 J/psi -m B0 -b`` outputs the list of decay lines 
         that contain K_S0, J/psi coming from mother particle B0. No charge conjugation is considered.
         """
     )
-    subparsers = parser.add_subparsers(dest="command")
+    subparsers = parser.add_subparsers(dest="command", required=True)
     parser_print = subparsers.add_parser('print', description='Print out a signal decay file')
     parser_print.add_argument("signal", help="Name of the decay file")
     parser_find = subparsers.add_parser('find', description='Find a signal decay file or a decay inside DECAY_BELLE2.DEC')
+    parser_find.add_argument("daughters", nargs='+', help="Names of the daughter particles")
     parser_find.add_argument("-m", "--mother", help="Name of the mother particle", default=None)
-    parser_find.add_argument("-d", "--daughters", nargs='+', help="Names of the daughter particles", required=True)
     parser_find.add_argument("-b", "--decay_belle2", action='store_true', help="Search for decay in the DECAY_BELLE2.DEC")
     return parser
 

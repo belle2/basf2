@@ -33,7 +33,7 @@ Tools which will provide you help
 ----------------------------------------------------
 
 .. argparse::
-    :filename: framework/tools/b2help-decay
+    :filename: decfiles/tools/b2help-decay
     :func: get_argparse
     :prog: b2help-decay
     :nodefault:

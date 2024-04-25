@@ -17,7 +17,7 @@ if __name__ == '__main__':
     assert len(output) > 10
     output = call_command('b2help-decay print 1111440100.dec')
     assert len(output) > 10
-    output = call_command('b2help-decay find -d K_S0 J/psi B0')
+    output = call_command('b2help-decay find K_S0 J/psi B0')
     assert len(output) > 10
-    output = call_command('b2help-decay find -d K_S0 J/psi -m B0 -b')
+    output = call_command('b2help-decay find K_S0 J/psi -m B0 -b')
     assert len(output) > 2

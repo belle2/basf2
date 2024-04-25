@@ -21,6 +21,30 @@ import pdg
 _dec_directory = 'decfiles/dec/'
 _main_decay_file = 'DECAY_BELLE2.DEC'
 
+def find_release_file(filename: str):
+    """
+    Gets the full path to a file in full basf2 release
+    """
+    release_directory = None
+    if 'BELLE2_RELEASE' in os.environ:
+        release = os.environ['BELLE2_RELEASE']
+        this_release_dir = os.environ['BELLE2_RELEASE_DIR']
+        if release.startswith('light'):
+            base_release_dir = os.path.dirname(this_release_dir)
+            full_releases = sorted([rel for rel in os.listdir(base_release_dir) if rel.startswith('release')])
+            if len(full_releases) > 0:
+                release_directory = os.path.join(base_release_dir, full_releases[-1])
+                print(f'Current basf2 release is light, but a full basf2 release was found: {full_releases[-1]}')
+        else:
+            release_directory = this_release_dir
+    # Perhaps, we are in a development release:
+    elif 'BELLE2_LOCAL_DIR' in os.environ:
+        release_directory = os.environ['BELLE2_LOCAL_DIR']
+    if not release_directory:
+        print('Full basf2 release has not been found, please run the script on a machine with access to CVMFS'
+              ' or where full releases are available.')
+        sys.exit(1)
+    return os.path.join(release_directory, filename)
 
 def get_argparse():
     """
@@ -53,9 +77,9 @@ def print_file(signal_name: str):
     ext = '.dec'
     if not signal_name.endswith(ext):
         signal_name = signal_name + ext
-    file_name = os.path.join(_dec_directory, signal_name)
-    if os.path.exists(b2.find_file(file_name, silent=True)):
-        with open(b2.find_file(file_name), 'r') as f:
+    file_name = find_release_file(os.path.join(_dec_directory, signal_name))
+    if os.path.exists(file_name):
+        with open(file_name, 'r') as f:
             print(f.read())
     else:
         print(f"Decay file {signal_name} not found.")
@@ -66,7 +90,7 @@ def find_signal_decay(mother: str, daughters: list):
     Find the signal decay file.
     """
     found = False
-    local_dec_directory = b2.find_file(_dec_directory)
+    local_dec_directory = find_release_file(_dec_directory)
 
     for file in os.listdir(local_dec_directory):
         if file.endswith('.dec'):
@@ -95,8 +119,8 @@ def find_signal_decay_belle2(mother: str, daughters: list):
     if not mother:
         print("Mother particle is required for the search in the DECAY_BELLE2.DEC file.")
         sys.exit(1)
-    print(f"Searching for decay file for mother {mother} and daughters {daughters} in the DECAY_BELLE2.DEC file...")
-    dec_file = b2.find_file(os.path.join(_dec_directory, _main_decay_file))
+    dec_file = find_release_file(os.path.join(_dec_directory, _main_decay_file))
+    print(f"Searching for decays of {mother} mother to {daughters} daughters in the DECAY_BELLE2.DEC file...")
     with open(dec_file, 'r') as f:
         lines = f.readlines()
     start_line = -1
@@ -108,7 +132,7 @@ def find_signal_decay_belle2(mother: str, daughters: list):
             end_line = i
             break
     if start_line < 0 or end_line < 0:
-        print(f"Decay file for mother {mother} not found in the DECAY_BELLE2.DEC file.")
+        print(f"Decay for mother {mother} have not been found in the DECAY_BELLE2.DEC file.")
         sys.exit(1) 
     found = False
     total_br = 0
@@ -120,7 +144,7 @@ def find_signal_decay_belle2(mother: str, daughters: list):
             total_br += float(line.split(' ')[0])
             found = True
     if not found:
-        print(f"Decay file for mother {mother} and daughters {daughters} not found in the DECAY_BELLE2.DEC file.")
+        print(f"Decays of {mother} to {daughters} daughters have not been found in the DECAY_BELLE2.DEC file.")
         sys.exit(1)
     print(f'Total Branching Ratio: {total_br:0.5f}')
 

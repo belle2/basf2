@@ -28,7 +28,6 @@ class TestSkimRules(unittest.TestCase):
         SkimsWithApplyEventCuts = set()
 
         for skim in Registry.names:
-
             if skim[:2] == "f_":
                 continue  # these are the flagged skims, they are not actual skims
 

@@ -1,11 +1,11 @@
 # EventType: 1111441000
 # Descriptor: [B0 -> chi_c1 [-> J/psi [-> mu+ mu-] gamma] pi- K+]
-# NickName: Bd_chic1piK_Jpsigamma_mumu
+# NickName: Bd_chic1pimKp_Jpsigamma_mumu
 # Documentation: B -> charmonium decays.
 # Tested: Yes
-# PhysicsWG: Charmonium
+# PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
-# Email: chilikin@lebedev.ru
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
 # Date: 20220601
 #

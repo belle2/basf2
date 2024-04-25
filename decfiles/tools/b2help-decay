@@ -85,7 +85,10 @@ def find_signal_decay(mother: str, daughters: list):
                 print(f"Found decay file: {file} Descriptor: {descriptor}")
                 found = True
     if not found:
-        print(f"Decay file for mother {mother} and daughters {daughters} not found.")
+        if mother:
+            print(f"Decay file for mother {mother} and daughters {daughters} not found.")
+        else:
+            print(f"Decay file for daughters {daughters} not found.")
         sys.exit(1)
 
 def find_signal_decay_belle2(mother: str, daughters: list):

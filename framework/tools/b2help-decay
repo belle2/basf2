@@ -23,28 +23,13 @@ _main_decay_file = 'DECAY_BELLE2.DEC'
 
 def find_release_file(filename: str):
     """
-    Gets the full path to a file in full basf2 release
+    Gets the full path to a file and ensure that full basf2 release is defined
     """
-    release_directory = None
     if 'BELLE2_RELEASE' in os.environ:
-        release = os.environ['BELLE2_RELEASE']
-        this_release_dir = os.environ['BELLE2_RELEASE_DIR']
-        if release.startswith('light'):
-            base_release_dir = os.path.dirname(this_release_dir)
-            full_releases = sorted([rel for rel in os.listdir(base_release_dir) if rel.startswith('release')])
-            if len(full_releases) > 0:
-                release_directory = os.path.join(base_release_dir, full_releases[-1])
-                print(f'Current basf2 release is light, but a full basf2 release was found: {full_releases[-1]}')
-        else:
-            release_directory = this_release_dir
-    # Perhaps, we are in a development release:
-    elif 'BELLE2_LOCAL_DIR' in os.environ:
-        release_directory = os.environ['BELLE2_LOCAL_DIR']
-    if not release_directory:
-        print('Full basf2 release has not been found, please run the script on a machine with access to CVMFS'
-              ' or where full releases are available.')
+        if os.environ['BELLE2_RELEASE'].startswith('light'):
+            print('Light releases are not supported, use full release instead.')
         sys.exit(1)
-    return os.path.join(release_directory, filename)
+    return b2.find_file(filename)
 
 def get_argparse():
     """

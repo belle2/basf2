@@ -12,7 +12,7 @@
 #include <string>
 
 //root
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -250,16 +250,16 @@ namespace Belle2 {
     double getEnvelopeThickness() const {return m_envelopeThickness;}
 
     /**
-     * Returns position vector (TVector3) of merger PCB assembly envelope
-     * @return position vector (TVector3) of merger PCB assembly envelope
+     * Returns position vector (ROOT::Math::XYZVector) of merger PCB assembly envelope
+     * @return position vector (ROOT::Math::XYZVector) of merger PCB assembly envelope
      */
-    TVector3 getEnvelopeCenterPosition() const {return TVector3(m_envelopeX0, m_envelopeY0, m_envelopeZ0);}
+    ROOT::Math::XYZVector getEnvelopeCenterPosition() const {return ROOT::Math::XYZVector(m_envelopeX0, m_envelopeY0, m_envelopeZ0);}
 
     /**
-     * Returns position vector (TVector3) of merger PCB inside the single merger envelope
-     * @return position vector (TVector3) of merger PCB inside the single merger envelope
+     * Returns position vector (ROOT::Math::XYZVector) of merger PCB inside the single merger envelope
+     * @return position vector (ROOT::Math::XYZVector) of merger PCB inside the single merger envelope
      */
-    TVector3 getSingleMergeEnvelopePosition() const {return TVector3(m_envelopePosX0, m_envelopePosY0, m_envelopePosZ0);}
+    ROOT::Math::XYZVector getSingleMergeEnvelopePosition() const {return ROOT::Math::XYZVector(m_envelopePosX0, m_envelopePosY0, m_envelopePosZ0);}
 
     /**
      * Returns vector of merger boards slot numbers

@@ -11,9 +11,6 @@
 #include <framework/logging/Logger.h>
 #include <iostream>
 
-//root
-#include <TVector3.h>
-
 using namespace std;
 using namespace Belle2;
 

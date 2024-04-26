@@ -220,7 +220,7 @@ namespace Belle2 {
     double getWeightedSumInvDists(const Particle* iParticle, const std::string& detName, const float detWeight) const;
 
     /**
-     * Get the threshold value per detctor layer for the distance to closest ext. helix
+     * Get the threshold value per detector layer for the distance to closest ext. helix
      * that is used to define locally isolated particles at that layer.
      * @param det the input PID detector.
      * @param layer the input detector layer.

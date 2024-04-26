@@ -12,7 +12,7 @@
 #include <string>
 
 //root
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -253,10 +253,13 @@ namespace Belle2 {
     double getEnvelopeThickness() const { return m_envelopeThickness; }
 
     /**
-     * Get position vector (TVector3) of cooling system assembly envelope.
-     * @return Position vector (TVector3) of cooling system assembly envelope.
+     * Get position vector (ROOT::Math::XYZVector) of cooling system assembly envelope.
+     * @return Position vector (ROOT::Math::XYZVector) of cooling system assembly envelope.
      */
-    TVector3 getEnvelopeCenterPosition() const { return TVector3(m_envelopeX0, m_envelopeY0, m_envelopeZ0); }
+    ROOT::Math::XYZVector getEnvelopeCenterPosition() const
+    {
+      return ROOT::Math::XYZVector(m_envelopeX0, m_envelopeY0, m_envelopeZ0);
+    }
 
     /**
      * Get vector of cooling system object geometry ID.
@@ -308,10 +311,13 @@ namespace Belle2 {
     const std::string& getColdTubeMaterialName() const { return m_coldTubeMaterialName; }
 
     /**
-     * Get sizes vector (TVector3) of cooling test plates.
-     * @return Sizes vector (TVector3) of cooling test plates.
+     * Get sizes vector (ROOT::Math::XYZVector) of cooling test plates.
+     * @return Sizes vector (ROOT::Math::XYZVector) of cooling test plates.
      */
-    TVector3 getCoolingTestPlateslengths() const { return TVector3(m_coolingTestPlateslengthX, m_coolingTestPlateslengthY, m_coolingTestPlateslengthZ); }
+    ROOT::Math::XYZVector getCoolingTestPlateslengths() const
+    {
+      return ROOT::Math::XYZVector(m_coolingTestPlateslengthX, m_coolingTestPlateslengthY, m_coolingTestPlateslengthZ);
+    }
 
     /**
      * Get radius of cold tubes.

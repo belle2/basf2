@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -14,8 +13,6 @@
 # Called by the wrapper scripts runTBCpocket.sh and runTBClocal.sh, which
 # sets the proper directories for the output.
 #
-# Note: check the global tag!
-#
 
 import basf2 as b2
 import sys
@@ -25,7 +22,7 @@ import sys
 argvs = sys.argv
 if len(argvs) != 5:
     print('usage: basf2', argvs[0],
-          '-i <file_sroot> (pocket|local) <slot> <channel> <output_dir>')
+          '-i <file_root> (pocket|local) <slot> <channel> <output_dir>')
     sys.exit()
 
 datatype = argvs[1]      # data type (pocket, local)
@@ -36,11 +33,6 @@ outdir = argvs[4]        # output directory path
 print('data type:', datatype, ' slot:', slot, ' calibration channel:', channel,
       ' output to:', outdir)
 
-# Database
-b2.conditions.override_globaltags()
-b2.conditions.append_globaltag('online')
-# b2.conditions.append_testing_payloads('localDB-FEMaps/localDB.txt')  # SCROD mapping from local database
-
 # Suppress messages and warnings during processing
 b2.set_log_level(b2.LogLevel.ERROR)
 
@@ -48,7 +40,7 @@ b2.set_log_level(b2.LogLevel.ERROR)
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawDetector objects
@@ -60,13 +52,9 @@ if datatype == 'pocket':
 # Initialize TOP geometry parameters (creation of Geant geometry is not needed)
 main.add_module('TOPGeometryParInitializer')
 
-# Unpacking (format auto detection works now)
+# Unpacking
 unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
-
-# Add multiple hits by running feature extraction offline
-featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
-main.add_module(featureExtractor)
 
 # Convert to TOPDigits
 converter = b2.register_module('TOPRawDigitConverter')
@@ -75,11 +63,12 @@ converter.param('useChannelT0Calibration', False)
 converter.param('useModuleT0Calibration', False)
 converter.param('useCommonT0Calibration', False)
 converter.param('calibrationChannel', channel)  # if set, cal pulses will be flagged
-converter.param('calpulseHeightMin', 450)  # in [ADC counts]
+converter.param('calpulseHeightMin', 200)  # in [ADC counts]
 converter.param('calpulseHeightMax', 900)  # in [ADC counts]
-converter.param('calpulseWidthMin', 2.0)  # in [ns]
-converter.param('calpulseWidthMax', 8.0)  # in [ns]
-converter.param('lookBackWindows', 29)  # in number of windows
+converter.param('calpulseWidthMin', 0.5)  # in [ns]
+converter.param('calpulseWidthMax', 4.0)  # in [ns]
+converter.param('minPulseWidth', 0.5)  # in [ns]
+converter.param('lookBackWindows', 30)  # in number of windows
 main.add_module(converter)
 
 # TB calibrator

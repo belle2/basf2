@@ -43,11 +43,9 @@ class ItemFilter:
           name: Name of the objects to be filtered in the help text
         """
         self._args.add_argument("-f", "--filter", metavar="SEARCHTERM",
-                                help="only {} matching this pattern will be "
-                                "included. Pattern is case insensitive".format(name))
+                                help=f"only {name} matching this pattern will be included. Pattern is case insensitive")
         self._args.add_argument("-e", "--exclude", default=None, type=str,
-                                help="{} matching this pattern will be excluded. "
-                                "Pattern is case insensitive".format(name))
+                                help=f"{name} matching this pattern will be excluded. Pattern is case insensitive")
         self._args.add_argument("-r", "--regex", action="store_true", default=False,
                                 help="if given, --filter or --exclude options will be "
                                 "interpreted as a python regular expression "
@@ -75,7 +73,7 @@ class ItemFilter:
         if getattr(self._args, "regex", False):
             text.insert(0, "regex")
 
-        return " [{}]".format(" ".join(text))
+        return f" [{' '.join(text)}]"
 
     def check_arguments(self):
         """

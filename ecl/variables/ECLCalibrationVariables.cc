@@ -6,25 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own header.
+/* Own header. */
 #include <ecl/variables/ECLCalibrationVariables.h>
 
-// analysis
+/* Basf2 headers. */
 #include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/ECLEnergyCloseToTrack.h>
 #include <analysis/dataobjects/ECLTRGInformation.h>
 #include <analysis/dataobjects/ECLTriggerCell.h>
-#include <analysis/utility/ReferenceFrame.h>
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/VariableManager/Utility.h>
-
-// framework
-#include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
-
-// dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 

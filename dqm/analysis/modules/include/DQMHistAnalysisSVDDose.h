@@ -37,7 +37,7 @@ namespace Belle2 {
    * Sends the occupancies averaged over the run to MiraBelle (via the
    * `svd` MonitoringObject).
    *
-   * @sa https://agira.desy.de/browse/BII-7853
+   * @sa [BII-7853]: https://gitlab.desy.de/belle2/software/basf2/-/issues/7721
    */
   class DQMHistAnalysisSVDDoseModule final : public DQMHistAnalysisModule {
   public:
@@ -91,20 +91,26 @@ namespace Belle2 {
     inline T* findHistT(TString name) { return dynamic_cast<T*>(findHist(name.Data())); }
 
     /** Divide two histograms, ignoring errors on the second histogram.
-     * @param num The numerator histogram. Will be overwritten with the result.
+     * @param num The numerator histogram.
      * @param den The denominator histogram. Must have the same bins as num.
      * @param scale Optional rescaling factor.
-     * @return The result of the division, a new histogram owned by the caller.
+     * @param res The resulting histogram. If this parameter is null, a new
+     *    histogram will be created and returned; otherwise, this histogram
+     *    will be overwritten and returned.
+     * @return The result of the division, see parameter ``res``.
      *
-     * In short, for each bin we have
-     *  - `result_bin = scale * num_bin / den_bin`
-     *  - `result_err = scale * num_err / den_bin`
+     * In short, for each bin we have:
+     *
+     *    * ``result_bin = scale * num_bin / den_bin``
+     *    * ``result_err = scale * num_err / den_bin``
      */
     template<typename T>
-    static T* divide(T* num, T* den, float scale = 1.0f)
+    static T* divide(T* num, T* den, float scale = 1.0f, T* res = nullptr)
     {
-      TString name = TString("occu_from_") + num->GetName();
-      T* res = (T*)num->Clone(name);
+      if (!res) {
+        TString name = TString("occu_from_") + num->GetName();
+        res = (T*)num->Clone(name);
+      }
       for (int i = 0; i < num->GetNcells(); i++) {
         float n = num->GetBinContent(i), d = den->GetBinContent(i), e = num->GetBinError(i);
         res->SetBinContent(i, d ? scale * n / d : 0.0f);
@@ -129,15 +135,23 @@ namespace Belle2 {
     // Canvases & output histos for Poisson trigger (TTYP_POIS) events
     std::vector<TCanvas*> m_c_instOccu; /**< Canvases for the instantaneous occupancy */
     std::vector<TCanvas*> m_c_occuLER; /**< Canvases for the occu. vs time after LER inj. */
+    std::vector<TH2F*> m_h_occuLER; /**< Histograms for the occ. vs time after LER inj. */
     std::vector<TCanvas*> m_c_occuHER; /**< Canvases for the occu. vs time after HER inj. */
+    std::vector<TH2F*> m_h_occuHER; /**< Histograms for the occu. vs time after HER inj. */
     std::vector<TCanvas*> m_c_occuLER1; /**< Canvases for the 1D occu. vs time after LER inj. */
+    std::vector<TH1F*> m_h_occuLER1; /**< Histograms for the 1D occu. vs time after LER inj. */
     std::vector<TCanvas*> m_c_occuHER1; /**< Canvases for the 1D occu. vs time after HER inj. */
+    std::vector<TH1F*> m_h_occuHER1; /**< Histograms for the 1D occu. vs time after HER inj. */
     // Canvases & output histos for all events
     std::vector<TCanvas*> m_c_instOccuAll; /**< Canvases for the instantaneous occupancy */
     std::vector<TCanvas*> m_c_occuLERAll; /**< Canvases for the occu. vs time after LER inj. */
+    std::vector<TH2F*> m_h_occuLERAll; /**< Histograms for the occu. vs time after LER inj. */
     std::vector<TCanvas*> m_c_occuHERAll; /**< Canvases for the occu. vs time after HER inj. */
+    std::vector<TH2F*> m_h_occuHERAll; /**< Histograms for the occu. vs time after HER inj. */
     std::vector<TCanvas*> m_c_occuLER1All; /**< Canvases for the 1D occu. vs time after LER inj. */
+    std::vector<TH1F*> m_h_occuLER1All; /**< Histograms for the 1D occu. vs time after LER inj. */
     std::vector<TCanvas*> m_c_occuHER1All; /**< Canvases for the 1D occu. vs time after HER inj. */
+    std::vector<TH1F*> m_h_occuHER1All; /**< Histograms for the 1D occu. vs time after HER inj. */
 
 #ifdef _BELLE2_EPICS
     std::vector<MyPV> m_myPVs; /**< EPICS stuff for each sensor group / PV */

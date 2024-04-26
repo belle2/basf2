@@ -9,23 +9,22 @@
 
 #include <string>
 
-#include <daq/rfarm/manager/SharedMem.h>
+#include <daq/dqm/DqmSharedMem.h>
 #include <framework/pcore/EvtMessage.h>
 
 #include "TMemFile.h"
 #include "TDirectory.h"
-
-#define MEMFILESIZE 128000000
 
 namespace Belle2 {
   class MsgHandler;
 
   class DqmMemFile {
   public:
+    enum {c_memFileSize = 128000000};
+  public:
     DqmMemFile(std::string name = "dqmhisto",
-               const std::string& mode = "readonly", int size = MEMFILESIZE);
-    DqmMemFile(int shm_id, int sem_id,
-               const std::string& mode = "readonly", int size = MEMFILESIZE);
+               const std::string& mode = "readonly", int size = c_memFileSize);
+    DqmMemFile(int shm_id, int sem_id, int size = c_memFileSize);
     ~DqmMemFile();
 
     // Sender function
@@ -37,11 +36,13 @@ namespace Belle2 {
     // Receiver functions
     EvtMessage* StreamMemFile();
 
+    bool SaveToFile(std::string outfile);
+
   private:
     int StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& nobjs);
 
   private:
-    SharedMem* m_shm;
+    DqmSharedMem* m_shm;
     TMemFile* m_memfile;
     char* m_buf;
     std::string m_name;

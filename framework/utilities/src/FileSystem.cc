@@ -121,7 +121,7 @@ std::string FileSystem::findFile(const string& path, const std::vector<std::stri
       continue;
     if (fs::path(path).is_absolute())
       fullpath = (fs::path(dir) += path).string();
-    else fullpath = (fs::path(dir) / path).string();
+    else fullpath = (fs::path(dir) /= path).string();
     if (fileExists(fullpath)) {
       if (isSymLink(fullpath) or isSymLink(dir))
         return fullpath;
@@ -219,17 +219,19 @@ bool FileSystem::Lock::lock(int timeout, bool ignoreErrors)
 
 FileSystem::TemporaryFile::TemporaryFile(std::ios_base::openmode mode): std::fstream()
 {
-  char temporaryFileName[] = "/tmp/basf2_XXXXXX";
+  char* temporaryFileName = strdup((std::filesystem::temp_directory_path() / "basf2_XXXXXX").c_str());
   int fileDescriptor = mkstemp(temporaryFileName);
   if (fileDescriptor == -1) {
     B2ERROR("Cannot create temporary file: " << strerror(errno));
+    free(temporaryFileName);
     return;
   }
-  m_filename = temporaryFileName;
+  m_filename = std::string(temporaryFileName);
   open(temporaryFileName, mode);
   if (!is_open()) {
     B2ERROR("Cannot open temporary file: " << strerror(errno));
   }
+  free(temporaryFileName);
   ::close(fileDescriptor);
 }
 

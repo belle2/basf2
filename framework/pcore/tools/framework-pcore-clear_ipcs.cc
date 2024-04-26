@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <cstring>
 #include <cstdlib>
+#include <filesystem>
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -39,7 +40,7 @@ int main(int argc, char** argv)
   }
 
   DIR* dir;
-  if ((dir = opendir("/tmp")) != nullptr) {
+  if ((dir = opendir(std::filesystem::temp_directory_path().c_str())) != nullptr) {
     int ret = 0;
     struct dirent* ent;
     while ((ent = readdir(dir)) != nullptr) {
@@ -64,7 +65,8 @@ int main(int argc, char** argv)
               //Don't remove SHM segments which still have a process attached
               //Note that nattch counter is decreased by both shmdt() and exit()
               if (shmInfo.shm_nattch != 0) {
-                printf("/tmp/%s still has %ld processes attached, skipped.\n", ent->d_name, shmInfo.shm_nattch);
+                printf("%s/%s still has %ld processes attached, skipped.\n", std::filesystem::temp_directory_path().c_str(), ent->d_name,
+                       shmInfo.shm_nattch);
                 continue;
               }
 
@@ -88,10 +90,10 @@ int main(int argc, char** argv)
           ret = 1;
           printf("\n");
           char strbuf[1024];
-          snprintf(strbuf, 1024, "/tmp/%s", ent->d_name);
+          snprintf(strbuf, 1024,  "%s/%s", std::filesystem::temp_directory_path().c_str(), ent->d_name);
           unlink(strbuf);
           if (unnamed != 0) {
-            snprintf(strbuf, 1024, "/tmp/%s_%s", getenv("USER"), name);
+            snprintf(strbuf, 1024, "%s/%s_%s", std::filesystem::temp_directory_path().c_str(), getenv("USER"), name);
             unlink(strbuf);
           }
         }

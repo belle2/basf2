@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 Test HepMC reader and writer by reading in a hepmc file and writing out one
@@ -15,13 +14,16 @@ import modularAnalysis as ma
 from tempfile import TemporaryDirectory
 
 # analogous to lhereader.py
+#: \cond Doxygen_suppress
 input_filename = b2.find_file("generators/tests/event.hepmc")
+#: \endcond
 if len(input_filename) == 0:
     sys.stderr.write("TEST SKIPPED: input file " + input_filename + " not found.")
     sys.exit(-1)
 
 with TemporaryDirectory() as tmp:
 
+    #: \cond Doxygen_suppress
     output_filename = "event.hepmc.out"
 
     os.chdir(tmp)
@@ -29,6 +31,7 @@ with TemporaryDirectory() as tmp:
     path.add_module("HepMCInput", inputFileList=[input_filename], expNum=0, runNum=0)
     path.add_module("HepMCOutput", OutputFilename=output_filename)
     b2.process(path)
+    #: \endcond
 
     def valid_line(li):
         """
@@ -42,6 +45,7 @@ with TemporaryDirectory() as tmp:
         """
         return li.split()[0] in ["E", "V", "P"]
 
+    #: \cond Doxygen_suppress
     def parse_line(li):
         tokens = li.split()
         start_index = 1
@@ -64,3 +68,4 @@ with TemporaryDirectory() as tmp:
                 numbers_output = parse_line(line_output)
                 for number_input, number_output in zip(numbers_input, numbers_output):
                     assert math.isclose(number_input, number_output, rel_tol=1e-5)
+    #: \endcond

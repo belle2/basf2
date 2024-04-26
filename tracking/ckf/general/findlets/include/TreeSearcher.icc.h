@@ -92,6 +92,14 @@ namespace Belle2 {
       childStates.emplace_back(childState, weight);
     }
 
+    if (childStates.empty()) {
+      B2DEBUG(29, "Terminating this route, as there are no possible child states.");
+      if (not m_param_endEarly) {
+        results.emplace_back(path);
+      }
+      return;
+    }
+
     // Do everything with child states, linking, extrapolation, teaching, discarding, what have
     // you.
     const std::vector<TrackFindingCDC::WithWeight<const AState*>>& constPath = path;

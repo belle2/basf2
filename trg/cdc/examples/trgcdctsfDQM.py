@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -49,7 +48,7 @@ else:
 
 main.add_module(input)
 histo = b2.register_module('HistoManager')
-histo.param("histoFileName", "dqm.%s.root" % basename)
+histo.param("histoFileName", f"dqm.{basename}.root")
 
 
 nmod = [0, 1, 2, 3, 4, 5, 6]

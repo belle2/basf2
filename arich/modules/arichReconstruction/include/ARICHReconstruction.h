@@ -20,8 +20,7 @@
 #include "arich/dataobjects/ARICHLikelihood.h"
 #include <framework/database/DBObjPtr.h>
 
-
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -113,8 +112,8 @@ namespace Belle2 {
     DBObjPtr<ARICHMirrorAlignment> m_mirrAlign; /**< global alignment parameters from the DB */
     OptionalDBObjPtr<ARICHAeroTilesAlignment> m_tileAlign; /**< alignment of aerogel tiles from DB */
 
-    std::vector<TVector3> m_mirrorPoints; /**< vector of points on all mirror plates */
-    std::vector<TVector3> m_mirrorNorms;  /**< vector of nomal vectors of all mirror plates */
+    std::vector<ROOT::Math::XYZVector > m_mirrorPoints; /**< vector of points on all mirror plates */
+    std::vector<ROOT::Math::XYZVector > m_mirrorNorms;  /**< vector of nomal vectors of all mirror plates */
 
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
@@ -126,7 +125,7 @@ namespace Belle2 {
     double  m_thickness[c_noOfAerogels]; /**< thicknesses of areogel layers */
     double  m_transmissionLen[c_noOfAerogels]; /**< transmission lengths of aerogel layers */
     double  m_n0[c_noOfAerogels];  /**< number of emmited photons per unit length */
-    TVector3 m_anorm[c_noOfAerogels]; /**< normal vector of the aerogle plane */
+    ROOT::Math::XYZVector m_anorm[c_noOfAerogels]; /**< normal vector of the aerogle plane */
     int m_storePhot; /**< set to 1 to store individual reconstructed photon information */
     double m_tilePars[124][2] = {{0}};
 
@@ -134,7 +133,7 @@ namespace Belle2 {
      * Returns 1 if vector "a" lies on "copyno"-th detector active surface
      * of detector and 0 else.
      */
-    int InsideDetector(TVector3 a, int copyno);
+    int InsideDetector(ROOT::Math::XYZVector a, int copyno);
 
     /**
      * Returns the hit virtual position, assuming that it was reflected
@@ -142,7 +141,7 @@ namespace Belle2 {
      * @param[in] hitpos   Vector of hit positions.
      * @param[in] mirrorID Id of mirror from which the photon was reflected.
      */
-    TVector3 HitVirtualPosition(const TVector3& hitpos, int mirrorID);
+    ROOT::Math::XYZVector HitVirtualPosition(const ROOT::Math::XYZVector& hitpos, int mirrorID);
 
     /**
      * Calculates the intersection of the Cherenkov photon emitted
@@ -154,7 +153,9 @@ namespace Belle2 {
      * @param[in] n      Number of aerogel layers through which photon passes.
      * @param[in] opt    Parameter can be set to 1 to return empty TVector3 in case of errors
      */
-    TVector3 FastTracking(TVector3 dirf, TVector3 r,  double* refind, double* z, int n, int opt);
+    ROOT::Math::XYZVector FastTracking(ROOT::Math::XYZVector dirf, ROOT::Math::XYZVector r,  double* refind, double* z, int n,
+                                       int opt);
+//    ROOT::Math::XYZVector FastTracking(ROOT::Math::XYZVector dirf, ROOT::Math::XYZVector r,  double* refind, double* z, int n);
 
     /**
      * Calculates the intersection of the Cherenkov photon emitted
@@ -166,7 +167,7 @@ namespace Belle2 {
      * @param[in] z      Array of z coordinates of borders between layers.
      * @param[in] n      Number of aerogel layers through which photon passes.
      */
-    TVector3 FastTrackingSimple(TVector3 dirf, TVector3 r,  double* refind, double* z, int n);
+    ROOT::Math::XYZVector FastTrackingSimple(ROOT::Math::XYZVector dirf, ROOT::Math::XYZVector r,  double* refind, double* z, int n);
 
     /**
      * Calculates the direction of photon emission.
@@ -200,8 +201,8 @@ namespace Belle2 {
      * @param[in] mirrorID
      * Id of mirror from which the photon was reflected (assumption).
      */
-    int  CherenkovPhoton(TVector3 r, TVector3 rh,
-                         TVector3& rf, TVector3& dirf,
+    int  CherenkovPhoton(ROOT::Math::XYZVector r, ROOT::Math::XYZVector rh,
+                         ROOT::Math::XYZVector& rf, ROOT::Math::XYZVector& dirf,
                          double* refind, double* z, int n, int mirrorID = 0);
 
     /**
@@ -211,29 +212,29 @@ namespace Belle2 {
      * @param[in] dir      Photon direction.
      * @param[in] mirrorID ID of mirror plate.
      */
-    bool HitsMirror(const TVector3& pos, const TVector3& dir, int mirrorID);
+    bool HitsMirror(const ROOT::Math::XYZVector& pos, const ROOT::Math::XYZVector& dir, int mirrorID);
 
     /**
      * Returns mean emission position of Cherenkov photons
      * from i-th aerogel layer.
      */
-    TVector3 getTrackMeanEmissionPosition(const ARICHTrack& track, int iAero);
+    ROOT::Math::XYZVector getTrackMeanEmissionPosition(const ARICHTrack& track, int iAero);
 
     /**
      * Returns track direction at point with z coordinate "zout"
      * (assumes straight track).
      */
-    TVector3 getTrackPositionAtZ(const ARICHTrack& track, double zout);
+    ROOT::Math::XYZVector getTrackPositionAtZ(const ARICHTrack& track, double zout);
 
     /**
      * Returns point on the mirror plate with id mirrorID.
      */
-    TVector3 getMirrorPoint(int mirrorID);
+    ROOT::Math::XYZVector getMirrorPoint(int mirrorID);
 
     /**
      * Returns normal vector of the mirror plate with id mirrorID.
      */
-    TVector3 getMirrorNorm(int mirrorID);
+    ROOT::Math::XYZVector getMirrorNorm(int mirrorID);
 
   };
 

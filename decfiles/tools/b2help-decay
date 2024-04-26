@@ -34,7 +34,7 @@ def get_argparse():
         2. Find the signal decay file. For example, ``b2help-decay find K_S0 J/psi B0`` outputs the list of decay files that contain K_S0, J/psi, and B0.
         One can print out the decay file information by ``b2help-decay print <decay_file_name>``.
         3. Find the signal decay line in BELLE2_DECAY.DEC. For example, ``b2help-decay find K_S0 J/psi -m B0 -b`` outputs the list of decay lines 
-        that contain K_S0, J/psi coming from mother particle B0. No charge conjugation is considered.
+        that contain K_S0, J/psi coming from mother particle B0. Particle multiplicity is considered but charge conjugation is not.
         """
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -101,10 +101,10 @@ def find_signal_decay_belle2(mother: str, daughters: list):
         lines = f.readlines()
     start_line = -1
     end_line = -1
-    for i, line in enumerate(lines):
-        if line.startswith('Decay') and mother in line:
+    for i, content_line in enumerate(lines):
+        if content_line.startswith('Decay') and mother in content_line:
             start_line = i
-        if start_line >= 0 and 'Enddecay' in line:
+        if start_line >= 0 and 'Enddecay' in content_line:
             end_line = i
             break
     if start_line < 0 or end_line < 0:
@@ -112,17 +112,27 @@ def find_signal_decay_belle2(mother: str, daughters: list):
         sys.exit(1) 
     found = False
     total_br = 0
+    duplicates = [particle for particle in set(daughters) if daughters.count(particle) > 1]
     for line in lines[start_line + 1:end_line]:
-        if all(daughter in line for daughter in daughters):
-            if line.startswith('#'):
+        if content_line.startswith('#'):
+            continue
+        # Remove comments for particle finding, but print them later
+        content_line = line.split('#')[0]
+        if all(daughter in content_line for daughter in daughters):
+            # Make sure that the all duplicate particles are present in the line
+            skip = False
+            for duplicate in duplicates:
+                if daughters.count(duplicate) != content_line.count(duplicate):
+                    skip = True
+            if skip:
                 continue
             print(line.strip())
-            total_br += float(line.split(' ')[0])
+            total_br += float(content_line.split(' ')[0])
             found = True
     if not found:
         print(f"Decays of {mother} to {daughters} daughters have not been found in the DECAY_BELLE2.DEC file.")
         sys.exit(1)
-    print(f'Total Branching Ratio: {total_br:0.5f}')
+    print(f'Total Branching Ratio: {total_br:0.9f}')
 
 def main():
     """

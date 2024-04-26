@@ -1,6 +1,6 @@
 .. _onlinebook_workflowmanagement_checkpointing:
 
-Checkpointing for Machine Learning
+Checkpointing for machine learning
 ==================================
    
 .. sidebar:: Overview
@@ -15,29 +15,29 @@ Checkpointing for Machine Learning
     **Questions**:
 
     * What is Checkpointing?
-    * How can I use Checkpointing in my Machine Learning workflow?
+    * How can I use Checkpointing in my machine learning workflow?
 
     **Objectives**:
 
     * Understand the concept of Checkpointing
-    * Learn how to use Checkpointing in your Machine Learning workflow
+    * Learn how to use Checkpointing in your machine learning workflow
 
 Checkpointing describes the process of storing the current state of the program to be able to continue the work at a different time and/or place.
-Haveing checkpoints of workflows is helpfull in case of failures or crashes and can save time and resource when not everything has to be re-run.
+Haveing checkpoints of workflows is helpful in case of failures or crashes and can save time and resource when not everything has to be re-run.
 
 Checkpointing an arbitrary workflow however can be almost endlessly complex.
 However, very repetetive workflows can be checkpointed with little effort.
-Common examples in the context of High Energy Physics are event loops and machine learning workflows.
-For event loops, checkpointing is not so interresting, since this work is trivially parallelizable:
-The workload can be split in independent batches to minimize the risk of loosing work.
+Common examples in the context of high energy physics are event loops and machine learning workflows.
+For event loops, Checkpointing is not so interesting, since this work is trivially parallelizable:
+the workload can be split in independent batches to minimize the risk of loosing work.
 
-Training Machine Learning models however can not be parallelized, since one epoch depends on the epoch before.
-Additionally trainings can run very long and are therefore prone to crashes or can run into time constraints on their host site.
-Therefore, checkpointing can be very useful.
+Training machine learning models however can not be parallelized, since one epoch depends on the epoch before.
+Additionally, the training time can be very long, which makes crashes more severe and time constraints on host sites a big issue.
+Therefore, Checkpointing can be very useful.
 
-A tool to help with checkpointing can be found on the DESY gitlab: [cehckpointer](https://gitlab.desy.de/jonas.eppelt/checkpointer).
+A tool to help with Checkpointing can be found on `github <https://github.com/JonasEppelt/Checkpointer>`.
 
-To learn how to use it, please refer to the [documentation](https://gitlab.desy.de/jonas.eppelt/checkpointer/-/blob/master/README.md) and consult the [examples](https://gitlab.desy.de/jonas.eppelt/checkpointer/-/tree/master/examples).
+To learn how to use it, please refer to the `documentation <https://github.com/JonasEppelt/Checkpointer/blob/main/README.md>` and consult the `examples <https://github.com/JonasEppelt/Checkpointer/tree/main/examples>`.
 
 .. include:: ../lesson_footer.rstinclude
 

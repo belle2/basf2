@@ -35,9 +35,9 @@ Training machine learning models however can not be parallelized, since one epoc
 Additionally, the training time can be very long, which makes crashes more severe and time constraints on host sites a big issue.
 Therefore, Checkpointing can be very useful.
 
-A tool to help with Checkpointing can be found on `github <https://github.com/JonasEppelt/Checkpointer>`.
+A tool to help with Checkpointing can be found on `github <https://github.com/JonasEppelt/Checkpointer>`_.
 
-To learn how to use it, please refer to the `documentation <https://github.com/JonasEppelt/Checkpointer/blob/main/README.md>` and consult the `examples <https://github.com/JonasEppelt/Checkpointer/tree/main/examples>`.
+To learn how to use it, please refer to the `documentation <https://github.com/JonasEppelt/Checkpointer/blob/main/README.md>`_ and consult the `examples <https://github.com/JonasEppelt/Checkpointer/tree/main/examples>`_.
 
 .. include:: ../lesson_footer.rstinclude
 

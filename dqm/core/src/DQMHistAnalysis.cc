@@ -31,6 +31,9 @@ DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
+#ifdef _BELLE2_EPICS
+std::vector <chid>  DQMHistAnalysisModule::m_epicsChID;
+#endif
 
 bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
 bool DQMHistAnalysisModule::m_epicsReadOnly =

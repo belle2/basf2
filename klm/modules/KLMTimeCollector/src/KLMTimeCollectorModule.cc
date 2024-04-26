@@ -149,8 +149,8 @@ void KLMTimeCollectorModule::collect()
       return;
     if (!m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC))
       return;
-    const std::vector<EventT0::EventT0Component> evtT0C = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-    m_Event.t0 = evtT0C.back().eventT0;
+    const auto bestCDCEvtT0C = m_eventT0->getBestCDCTemporaryEventT0();
+    m_Event.t0 = bestCDCEvtT0C->eventT0;
   }
 
   /* Read event metadata. */

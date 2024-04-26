@@ -278,12 +278,6 @@ namespace Belle2 {
     }
 
     /**
-     * Set hit global position.
-     * @param[in] pos Position.
-     */
-    //void setPosition(const ROOT::Math::XYZVector& pos);
-
-    /**
      * Get hit global position x coordinate.
      * @return Hit x coordinate.
      */

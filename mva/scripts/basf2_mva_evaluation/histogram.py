@@ -88,11 +88,14 @@ class Histograms:
             if len(bins) == 1:
                 bins = numpy.array([bins[0]-1, bins[0]+1])
 
+        #: create histogram
         self.hist, self.bins = numpy.histogram(data[column][isfinite], bins=bins,
                                                weights=None if weight_column is None else data[weight_column])
+        #: bin centers
         self.bin_centers = (self.bins + numpy.roll(self.bins, 1))[1:] / 2.0
-        # Subtract a small number from the bin width, otherwise the errorband plot is unstable.
+        #: Subtract a small number from the bin width, otherwise the errorband plot is unstable.
         self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
+        #: initialize empty dictionary for histograms
         self.hists = dict()
         for name, mask in masks.items():
             self.hists[name] = numpy.histogram(data[column][mask & isfinite], bins=self.bins,

@@ -226,20 +226,23 @@ namespace Belle2 {
 
     bool m_IsNullRun = false; /**< Run type flag for null runs. */
     std::string m_runType; /**< Run type */
+    double m_numEvents = 0; /**< number of events processed with TOPDQM module */
 
     TH1D* m_photonYields = nullptr; /**< photon yields per slot */
     TH1D* m_backgroundRates = nullptr; /**< background rates per slot */
     TCanvas* m_c_photonYields = nullptr; /**< Canvas: photon yields per slot */
     TCanvas* m_c_backgroundRates = nullptr; /**< Canvas: background rates per slot */
 
-    TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot */
-    TH1F* m_deadFraction = nullptr; /**< fraction of dead channels per slot */
+    TH1F* m_hotFraction = nullptr; /**< fraction of hot channels per slot (included boardstacks only) */
+    TH1F* m_deadFraction = nullptr; /**< fraction of dead channels per slot (included boardstacks only) */
+    TH1F* m_excludedFraction = nullptr; /**< fraction of dead and hot channels per slot in excluded boardstacks only */
     TH1F* m_activeFraction = nullptr; /**< fraction of active channels per slot */
     THStack* m_stack = nullptr;  /**< stack for drawing dead, hot and active channel fractions */
     TLegend* m_legend = nullptr; /**< legend for dead and hot channels */
     TCanvas* m_c_deadAndHot = nullptr; /**< Canvas: fractin of dead and hot channels */
 
     TH1F* m_junkFraction = nullptr; /**< fraction of junk hits per boardstack */
+    TH1F* m_excludedBSHisto = nullptr; /**< histogram to show excluded boardstacks on junk fraction plot */
     TCanvas* m_c_junkFraction = nullptr; /**< Canvas: fraction of junk hits per boardstack */
 
     std::vector<TH1F*> m_pmtHitRates; /**< histograms of PMT hits per event (index = slot - 1) */

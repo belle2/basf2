@@ -12,9 +12,6 @@
 #include <iostream>
 #include <iomanip>
 
-//root
-#include <TVector3.h>
-
 using namespace std;
 using namespace Belle2;
 

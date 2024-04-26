@@ -234,10 +234,12 @@ class GenerateSimTask(Basf2PathTask):
         )
         path.add_module("EvtGenInput")
         bkg_files = ""
+        # \cond suppress doxygen warning
         if self.experiment_number == 0:
             bkg_files = background.get_background_files()
         else:
             bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # \endcond
 
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, usePXDDataReduction=False)
 

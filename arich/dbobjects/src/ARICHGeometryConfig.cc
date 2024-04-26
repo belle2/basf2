@@ -375,12 +375,17 @@ void ARICHGeometryConfig::modulesPosition(const GearDir& content)
   }
   }*/
 
-TVector2 ARICHGeometryConfig::getChannelPosition(unsigned moduleID, unsigned chX, unsigned chY) const
+ROOT::Math::XYVector ARICHGeometryConfig::getChannelPosition(unsigned moduleID, unsigned chX, unsigned chY) const
 {
-  TVector2 origin;
-  origin.SetMagPhi(m_detectorPlane.getSlotR(moduleID), m_detectorPlane.getSlotPhi(moduleID));
+  const double radius = m_detectorPlane.getSlotR(moduleID);
+  const double phi = m_detectorPlane.getSlotPhi(moduleID);
+  const double cosPhi = std::cos(phi);
+  const double sinPhi = std::sin(phi);
+  ROOT::Math::XYVector origin(radius * cosPhi, radius * sinPhi);
   double x, y;
   m_hapd.getXYChannelPos(chX, chY, x, y);
-  TVector2 locPos(x, y);
-  return origin + locPos.Rotate(m_detectorPlane.getSlotPhi(moduleID));
+  // create a vector from x, y that is rotated by phi
+  ROOT::Math::XYVector locPos(x * cosPhi - y * sinPhi,
+                              x * sinPhi + y * cosPhi);
+  return origin + locPos;
 }

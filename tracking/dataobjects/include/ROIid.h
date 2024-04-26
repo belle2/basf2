@@ -50,8 +50,8 @@ namespace Belle2 {
     void setSensorID(VxdID::baseType user_sensorID) { m_sensorID = user_sensorID;} /**< set the sensor ID of the ROI*/
     void setSensorID(VxdID user_sensorID) { m_sensorID = user_sensorID.getID();} /**< set the sensor ID of the ROI*/
 
-    bool Contains(const Belle2::PXDRawHit& thePXDRawHit) const; /**< true if the ROI contains the thePXDRawHit*/
-    bool Contains(const Belle2::PXDDigit& thePXDDigit) const; /**< true if the ROI contains the thePXDDigit*/
+    bool Contains(const PXDRawHit& thePXDRawHit) const; /**< true if the ROI contains the thePXDRawHit*/
+    bool Contains(const PXDDigit& thePXDDigit) const; /**< true if the ROI contains the thePXDDigit*/
     bool Contains(const Belle2::SVDShaperDigit& theSVDDigit) const; /**< true if the ROI contains the theSVDDigit*/
 
   private:

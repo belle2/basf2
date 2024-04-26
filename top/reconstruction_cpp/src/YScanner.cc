@@ -119,12 +119,17 @@ namespace Belle2 {
       m_beta = beta;
       m_length = length;
 
+      // check for Cherenkov threshold, return if below
+
+      const auto* topgp = TOPGeometryPar::Instance();
+      if (beta * topgp->getPhaseIndex(m_meanE0) < 1) return;
+
       // set photon energy distribution, and the mean and r.m.s of photon energy
 
       auto area = setEnergyDistribution(beta);
       if (area == 0) return;
 
-      // set number of Cerenkov photons per azimuthal angle
+      // set number of Cerenkov photons per azimuthal angle per centimeter
 
       m_numPhotons = 370 * area / (2 * M_PI);
 
@@ -133,7 +138,6 @@ namespace Belle2 {
       const double radLength = 12.3; // quartz radiation length [cm]
       double thetaScat = 13.6e-3 / beta / momentum * sqrt(length / 2 / radLength); // r.m.s of multiple scattering angle
 
-      const auto* topgp = TOPGeometryPar::Instance();
       double n = topgp->getPhaseIndex(m_meanE);
       if (beta * n < 1) {
         B2ERROR("TOP::YScanner::prepare: beta * n < 1 ==> must be a bug!");
@@ -175,7 +179,7 @@ namespace Belle2 {
       for (auto& entry : m_energyDistribution.entries) entry.y /= s;
 
       m_meanE = se / s;
-      m_rmsE = sqrt(see / s - m_meanE * m_meanE);
+      m_rmsE = sqrt(std::max(see / s - m_meanE * m_meanE, 0.0));
 
       return s * m_energyDistribution.step;
     }

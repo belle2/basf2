@@ -37,16 +37,11 @@ DQMHistAnalysisDeltaTestModule::DQMHistAnalysisDeltaTestModule()
   addParam("histogramName", m_histogramName, "Name of Histogram", std::string("testHist"));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("TEST:"));
   B2DEBUG(1, "DQMHistAnalysisDeltaTest: Constructor done.");
-
 }
 
 DQMHistAnalysisDeltaTestModule::~DQMHistAnalysisDeltaTestModule()
 {
-#ifdef _BELLE2_EPICS
-  if (getUseEpics()) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
+  B2DEBUG(1, "DQMHistAnalysisDeltaTest: Destructor done.");
 }
 
 void DQMHistAnalysisDeltaTestModule::initialize()

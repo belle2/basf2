@@ -243,13 +243,24 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 // update ECLTRG peak
   auto hist_ECLTRG_peak =  getDelta("TRGGRL", "h_ECLL1", 0, true);// only if updated
   if (hist_ECLTRG_peak) {
+//    TH1F* hist_ECLTRG_clone = (TH1F*)hist_ECLTRG_peak->Clone();//Clone the histogram.
     double ECLTRG_peak = 0.0;
     hist_ECLTRG_peak->Draw();
-    int bin_ECLTRG_peak = hist_ECLTRG_peak->GetMaximumBin();
-    ECLTRG_peak = hist_ECLTRG_peak->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
+//    int bin_ECLTRG_peak = hist_ECLTRG_peak->GetMaximumBin();
+//    ECLTRG_peak = hist_ECLTRG_peak->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
+    ECLTRG_peak = hist_ECLTRG_peak->GetMean();
+
+    /*
+        while(ECLTRG_peak<-1310){
+           hist_ECLTRG_clone->SetBinContent(bin_ECLTRG_peak, 0);
+           bin_ECLTRG_peak = hist_ECLTRG_clone->GetMaximumBin();
+           ECLTRG_peak = hist_ECLTRG_clone->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
+        }
+    */
+
     B2DEBUG(1, "ECLTRG_peak:" << ECLTRG_peak);
     setEpicsPV("ECLTRG_peak", ECLTRG_peak);
-
+//    delete hist_ECLTRG_clone;
   }
 
 // update ECLTRG deadch

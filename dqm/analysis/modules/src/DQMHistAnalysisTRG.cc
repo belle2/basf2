@@ -141,15 +141,15 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "endcap_klm_latency", "endcap_klm_latency");
 
   //hadronb2_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 100000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 1000000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_bhabha_all", "hadronb2_over_bhabha_all");
 
   //mumu2trk_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 100000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 1000000 entries
   registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_all", "mumu2trk_over_bhabha_all");
 
   //hadronb2_over_mumu2trk
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 100000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 1000000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
 
   //ECLTRG_deadch
@@ -174,7 +174,7 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 2000 entries
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
 }

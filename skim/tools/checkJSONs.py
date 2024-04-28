@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 import os
 import argparse
@@ -26,6 +25,9 @@ parser.add_argument('--verbose', type=bool, default=False,
 parser.add_argument('--MAXEventCPUTime', type=float, required=False,
                     help='Maximum value for ExpectedEventCPUTime to be compared with.')
 
+parser.add_argument('--path', type=str, default='/gpfs/group/belle2/dataprod/skim/re-skim-campaign-proc13-prompt-mc15rd/skimProd/',
+                    help='absolute path of the main directory where the output file are created. Default=reskimming campaign')
+
 args = parser.parse_args()
 
 # =========================================================
@@ -38,7 +40,7 @@ if args.dataset:
 else:
     print('Cheking both Data and MC')
 
-base_path = f'/gpfs/group/belle2/dataprod/skim/re-skim-campaign-proc13-prompt-mc15rd/skimProd/{dataset_type}/skim/'
+base_path = f'{args.path}/{dataset_type}/skim/'
 
 valueLIM = 2.5
 if args.MAXEventCPUTime:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 '''
 This script will get all the "Done" skim productions for a given campaign, check which ones already have
@@ -75,11 +74,6 @@ for camp in campaign:
     failed_meta_fn = '{2}_{0}_metadata_failed_{1}.txt'.format(camp, prod_count, skim)
     reg_fn = '{2}_{0}_registered_{1}.txt'.format(camp, prod_count, skim)
     failed_reg_fn = '{2}_{0}_registered_failed_{1}.txt'.format(camp, prod_count, skim)
-
-    # need grep -v Merge because some merge productions were submitted under skim group that aren't really skims
-    # Ask Trevor about the NR>2 ---> for us it doesn't seem to work
-    # prod_command = "gb2_prod_status -g skim -c {0} -s Done | grep -v Merge | awk '{{print $1}}' | " \
-    # " awk 'NR>2' > {1}".format(camp, prod_fn)
 
     # need grep -v reference in order to skim ref productions
     prod_command = "gb2_prod_status -g skim -c {0} -s Done | grep {1} | grep -v reference | " \

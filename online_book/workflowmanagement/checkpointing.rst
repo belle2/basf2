@@ -23,7 +23,7 @@ Checkpointing for machine learning
     * Learn how to use Checkpointing in your machine learning workflow
 
 Checkpointing describes the process of storing the current state of the program to be able to continue the work at a different time and/or place.
-Haveing checkpoints of workflows is helpful in case of failures or crashes and can save time and resource when not everything has to be re-run.
+Having checkpoints of workflows is helpful in case of failures or crashes and can save time and resource when not everything has to be re-run.
 
 Checkpointing an arbitrary workflow however can be almost endlessly complex.
 However, very repetetive workflows can be checkpointed with little effort.

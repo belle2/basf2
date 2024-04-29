@@ -397,9 +397,7 @@ namespace Belle2 {
 
     /**
      * Get vector of numbers of aerogel slots in individual ring.
-     *
-     * @param[in] nAeroSlotsIndividualRing
-     * Vector of numbers of aerogel slots in individual ring.
+     * @return Vector of numbers of aerogel slots in individual ring.
      */
     const std::vector<int>& getNAeroSlotsIndividualRing() const
     {

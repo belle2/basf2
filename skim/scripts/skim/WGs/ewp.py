@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -20,7 +21,7 @@ from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 
-__liaison__ = "Rahul Tiwary <rahul.tiwary@tifr.res.in>"
+__liaison__ = "Ihor Prudiiev <Ihor.Prudiiev@ijs.si>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -327,3 +328,192 @@ class BtoXll_LFV(BaseSkim):
         ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
         return ['B+:lfv']
+
+
+@fancy_skim_header
+class B0TwoBody(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`B^0 \\to e^+ e^-`
+        * :math:`B^0 \\to e^+ \\mu^-`
+        * :math:`B^0 \\to e^- \\mu^+`
+        * :math:`B^0 \\to \\mu^+ \\mu^-`
+        * :math:`B^0 \\to \\pi^+ \\pi^-`
+
+    Cuts applied
+        * :math:`n_{\\text{tracks}} \\geq 3`
+        * :math:`|\\delta E| < 0.5 \\text{GeV}`
+        * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+    """
+
+    __authors__ = ["Ryan Mueller and Santi Naylor"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Skim for 2 body B0 decays"
+        ":math:`B_{\\text{sig}}^-\\to\\ell\\ell'`, where :math:`\\ell(')=e,\\mu + \\pi`(as no lepton ID) is applied"
+    )
+    __category__ = "Physics, 2 Body, no pID"
+
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+
+        cut_evt = "nTracks>=3"
+        cut_b = "abs(deltaE) < 0.5 and Mbc > 5.2"
+        path = self.skim_event_cuts(cut_evt, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_1 -> e+:all e-:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_2 -> e+:all mu-:all", cut_b, dmID=2, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_3 -> e-:all mu+:all", cut_b, dmID=3, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_4 -> mu-:all mu+:all", cut_b, dmID=4, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_5 -> pi-:all pi+:all", cut_b, dmID=5, path=path)
+
+        return ['B0:B0TwoBody_1', 'B0:B0TwoBody_2', 'B0:B0TwoBody_3', 'B0:B0TwoBody_4', 'B0:B0TwoBody_5']
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B0:B0TwoBody", "B0:B0TwoBody_5", "", path=path)
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B0:B0TwoBody",
+            variables_1d=[
+                ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
+                 "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
+                ("R2", 100, 0, 1, "R2", __liaison__, "", ""),
+                ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
+                 "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -0.6, 0.6, "Mbc", 100, 5.19, 5.3, "Mbc vs deltaE", __liaison__,
+                 "", "")
+            ],
+            path=path,
+        )
+
+
+@fancy_skim_header
+class FourLepton(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`B^0 \\to e^- e^+ e^- e^+`
+
+    Cuts applied
+        * :math:`n_{\\text{tracks}} \\geq 5`
+        * :math:`-1.5 < \\delta E < 0.5 \\text{GeV}`
+        * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+    """
+
+    __authors__ = ["Santi Naylor and Ryan Mueller"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Skim for 4 body leptonic analyses"
+    )
+    __category__ = "Physics, Leptonic, 4 Body, no pID"
+
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+
+    def build_lists(self, path):
+
+        cut_evt = "nTracks>=5"
+        cut_b = "deltaE < 0.5 and deltaE > -1.5 and Mbc > 5.2"
+        path = self.skim_event_cuts(cut_evt, path=path)
+
+        ma.reconstructDecay("B0:FourLepton -> e+:all e-:all e+:all e-:all", cut_b, dmID=1, path=path)
+        return ["B0:FourLepton"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B0:FourLepton",
+            variables_1d=[
+                ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
+                 "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
+                ("R2", 100, 0, 1, "R2", __liaison__, "", ""),
+                ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
+                 "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -0.6, 0.6, "Mbc", 100, 5.19, 5.3, "Mbc vs deltaE", __liaison__,
+                 "", "")
+            ],
+            path=path,
+        )
+
+
+@fancy_skim_header
+class RadiativeDilepton(BaseSkim):
+    """
+    Reconstructed decays
+        * :math:`B^0 \\to e^- e^+ \\gamma`
+
+    Cuts applied
+        * :math:`n_{\\text{tracks}} \\geq 3`
+        * :math:`-1.0 < \\delta E < 0.5 \\text{GeV}`
+        * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+    """
+
+    __authors__ = ["Santi Naylor and Ryan Mueller"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Skim for 3 body leptonic analyses "
+
+    )
+    __category__ = "Physics, Leptonic, 3 body, no pID"
+
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        stdE("all", path=path)
+        stdPhotons("all", path=path)
+
+    def build_lists(self, path):
+
+        cut_evt = "nTracks>=3"
+        cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2"
+        path = self.skim_event_cuts(cut_evt, path=path)
+
+        ma.reconstructDecay("B0:RadiativeDilepton -> e+:all e-:all gamma:all", cut_b, dmID=1, path=path)
+        return ["B0:RadiativeDilepton"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist="B0:RadiativeDilepton",
+            variables_1d=[
+                ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
+                 "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
+                ("R2", 100, 0, 1, "R2", __liaison__, "", ""),
+                ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
+                 "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
+            ],
+            variables_2d=[
+                ("deltaE", 100, -0.6, 0.6, "Mbc", 100, 5.19, 5.3, "Mbc vs deltaE", __liaison__,
+                 "", "")
+            ],
+            path=path,
+        )

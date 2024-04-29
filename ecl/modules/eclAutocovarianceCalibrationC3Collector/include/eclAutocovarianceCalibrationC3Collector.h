@@ -54,7 +54,7 @@ namespace Belle2 {
     TH2F* CovarianceMatrixInfoVsCrysID;  /**< result returned by collector that contains the coveriance matrix for each crystal  */
     static constexpr int m_nADCWaveformPoints = 31;  /**< length of ECLDSP waveforms  */
     float m_CovarianceMatrixInfoVsCrysIDHistogram[ECLElementNumbers::c_NCrystals][m_nADCWaveformPoints + 1] = {}; /**< container for coveriance matrix  */
-    int m_BaselineLimit;  /**< length used to compute baseline */
+    int m_BaselineLimit = 10;  /**< length used to compute baseline */
 
   };
 } // end Belle2 namespace

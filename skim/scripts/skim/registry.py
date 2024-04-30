@@ -195,6 +195,7 @@ _RegisteredSkims = [
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
     ("19120400", "btocharmless", "BtoRhopRhom"),
     ("19140500", "btocharmless", "BtoEtapKstp"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

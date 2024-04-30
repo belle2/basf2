@@ -14,7 +14,9 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
-#include "rawdata/dataobjects/RawFTSW.h"
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 class TH1;
 class TH2;
@@ -110,8 +112,9 @@ namespace Belle2 {
     //! Trg ECL Cluster output
     StoreArray<TRGECLCluster> trgeclCluster;
     //! Array to access the FTSW information
-    StoreArray<RawFTSW> m_rawTTD;
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
 
+    DBObjPtr<HardwareClockSettings> m_hwclkdb;
   };
 
 }

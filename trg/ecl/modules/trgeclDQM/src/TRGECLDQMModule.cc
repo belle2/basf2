@@ -365,10 +365,8 @@ void TRGECLDQMModule::event()
   double diff = -1;
   bool isHER;
 
-  for (auto& i : m_rawTTD) {
-    diff = i.GetTimeSinceLastInjection(0) / 127. / 1000.;
-    isHER = i.GetIsHER(0);
-  }
+  diff = m_trgTime->getTimeSinceLastInjectionInMicroSeconds() / 1000.;
+  isHER = m_trgTime->isHER();
 
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {
     h_TCId -> Fill(TCId[ihit]);
@@ -400,7 +398,7 @@ void TRGECLDQMModule::event()
     h_TCTiming->Fill(timing);
 
 
-    const double revotime_in_us = 5120. / 508.;
+    const double revotime_in_us = 5120. / m_hwclkdb->getAcceleratorRF();
     int quotient;
     double running_in_us, diff_in_us;
 

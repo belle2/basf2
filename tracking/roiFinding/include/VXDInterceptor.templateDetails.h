@@ -124,6 +124,11 @@ namespace Belle2 {
       }
     }
 
+    // Manually set the propagation direction back to 0, which represents auto-modus.
+    // This might be expected to be the case by the following algorithms without checking
+    // or setting the value themselves.
+    gfTrack.getCardinalRep()->setPropDir(0);
+
 
   }
 

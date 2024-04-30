@@ -56,7 +56,7 @@ class CustomArgumentParser(argparse.ArgumentParser):
 
     def __init__(self, **kwargs):
         kwargs["formatter_class"] = CustomHelpFormatter
-        super(CustomArgumentParser, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def error(self, message):
         sys.stderr.write(f"Error: {message}\n")

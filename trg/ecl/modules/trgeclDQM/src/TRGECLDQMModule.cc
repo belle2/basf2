@@ -398,7 +398,7 @@ void TRGECLDQMModule::event()
     h_TCTiming->Fill(timing);
 
 
-    const double revotime_in_us = 5120. / m_hwclkdb->getAcceleratorRF();
+    const double revotime_in_us = 5.120 / m_hwclkdb->getAcceleratorRF();
     int quotient;
     double running_in_us, diff_in_us;
 

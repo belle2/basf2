@@ -15,9 +15,9 @@
 namespace Belle2 {
 
   /**
-   * KFitConst is a container of constant names.
+   * kinkVertexFitterKFitConst is a container of constant names.
    */
-  struct KFitConst {
+  struct kinkVertexFitterKFitConst {
     /** Constant 3 to check matrix size (internal use) */
     static const int    kNumber3 = 3;
     /** Constant 6 to check matrix size (internal use) */

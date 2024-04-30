@@ -61,6 +61,20 @@ namespace Belle2 {
   private:
 
     /**
+     * Combine daughter and mother tracks in one and fit.
+     * @param trackMother mother Track
+     * @param trackDaughter daughter Track
+     * @return The filled bits of the fit result.
+     * first bit: combined pValue > mother pValue;
+     * second bit: combined pValue > daughter pValue
+     * third bit: combined NDF > daughter NDF;
+     * fourth bit: combined pValue > 10^-7;
+     * 18: combined NDF < mother NDF;
+     * 19: fit failed;
+     */
+    int combineTracksAndFit(const Track* trackMother, const Track* trackDaughter);
+
+    /**
      * Find hit position closest to the vertex.
      * @param recoTrack RecoTrack
      * @param vertexPos vertex
@@ -188,7 +202,13 @@ namespace Belle2 {
     // cut variables
     double m_vertexDistanceCut;  ///< cut on the distance at the found vertex.
     double m_vertexChi2Cut;  ///< Chi2 cut.
-    int m_kinkFitterMode;  ///< 0: find vertex only, 1: reassign hits, 2: flip and refit filter 2 tracks, 3: 1 + 2
+
+    // fitter working mode variables
+    int m_kinkFitterMode;  ///< fitter mode written in bits
+    ///< first: reassign hits; second: flip and refit filter 2 tracks; third: combine tracks and fit them to find clones
+    bool m_kinkFitterModeHitsReassignment; ///< fitter mode first bit
+    bool m_kinkFitterModeFlipAndRefit; ///< fitter mode second bit
+    bool m_kinkFitterModeCombineAndFit; ///< fitter mode third bit
 
     // helper variables
     StoreArray <RecoTrack> m_copiedRecoTracks; ///< RecoTrack used to refit tracks

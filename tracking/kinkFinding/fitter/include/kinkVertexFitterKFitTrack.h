@@ -16,7 +16,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/kinkFinding/fitter/KFitConst.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitConst.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -26,10 +26,10 @@ typedef HepGeom::Point3D<double> HepPoint3D;
 namespace Belle2 {
 
   /**
-   * KFitTrack is a container of the track information (Lorentz vector, position, and error matrix),
+   * kinkVertexFitterKFitTrack is a container of the track information (Lorentz vector, position, and error matrix),
    * and a set of macro functions to set/get the contents.
    */
-  class KFitTrack {
+  class kinkVertexFitterKFitTrack {
   public:
     /**
      * KFitPXE is a container of the track information (Lorentz vector, position, and error matrix).
@@ -44,49 +44,49 @@ namespace Belle2 {
     };
 
     /** Construct an object with no argument. */
-    KFitTrack(void);
+    kinkVertexFitterKFitTrack(void);
     /** Construct the object as a copy constructor. */
-    KFitTrack(const KFitTrack& kp);
+    kinkVertexFitterKFitTrack(const kinkVertexFitterKFitTrack& kp);
     /** Construct the object with track properties.
      * @param p Lorentz vector of the track
      * @param x position of the track
      * @param e (7x7) error matrix of the track
      * @param q charge of the track
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      */
-    KFitTrack(
+    kinkVertexFitterKFitTrack(
       const CLHEP::HepLorentzVector& p,
       const HepPoint3D&       x,
       const CLHEP::HepSymMatrix&     e,
       const double           q,
-      const int              flag = KFitConst::kBeforeFit
+      const int              flag = kinkVertexFitterKFitConst::kBeforeFit
     );
 
     /** Destruct the object. */
-    ~KFitTrack(void);
+    ~kinkVertexFitterKFitTrack(void);
 
 
   public:
     /** Operator: assignment operator */
-    KFitTrack& operator = (const KFitTrack&);
+    kinkVertexFitterKFitTrack& operator = (const kinkVertexFitterKFitTrack&);
 
 
   public:
     /** Set a Lorentz vector of the track.
      * @param p Lorentz vector of the track
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      */
-    void setMomentum(const CLHEP::HepLorentzVector& p, const int flag = KFitConst::kBeforeFit);
+    void setMomentum(const CLHEP::HepLorentzVector& p, const int flag = kinkVertexFitterKFitConst::kBeforeFit);
     /** Set a position of the track.
      * @param x position of the track
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      */
-    void setPosition(const HepPoint3D& x,       const int flag = KFitConst::kBeforeFit);
+    void setPosition(const HepPoint3D& x,       const int flag = kinkVertexFitterKFitConst::kBeforeFit);
     /** Set an error matrix of the track.
      * @param e error matrix of the track
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      */
-    void setError(const CLHEP::HepSymMatrix& e,     const int flag = KFitConst::kBeforeFit);
+    void setError(const CLHEP::HepSymMatrix& e,     const int flag = kinkVertexFitterKFitConst::kBeforeFit);
     /** Set a charge of the track.
      * @param q charge of the track
      */
@@ -101,20 +101,20 @@ namespace Belle2 {
     void setVertexError(const CLHEP::HepSymMatrix& ve);
 
     /** Get a Lorentz vector of the track.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return Lorentz vector of the track
      */
-    const CLHEP::HepLorentzVector getMomentum(const int flag = KFitConst::kAfterFit) const;
+    const CLHEP::HepLorentzVector getMomentum(const int flag = kinkVertexFitterKFitConst::kAfterFit) const;
     /** Get a position of the track.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return position of the track
      */
-    const HepPoint3D       getPosition(const int flag = KFitConst::kAfterFit) const;
+    const HepPoint3D       getPosition(const int flag = kinkVertexFitterKFitConst::kAfterFit) const;
     /** Get an error matrix of the track.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return error matrix of the track
      */
-    const CLHEP::HepSymMatrix     getError(const int flag = KFitConst::kAfterFit) const;
+    const CLHEP::HepSymMatrix     getError(const int flag = kinkVertexFitterKFitConst::kAfterFit) const;
     /** Get a charge of the track.
      */
     double                 getCharge(void) const;
@@ -130,34 +130,34 @@ namespace Belle2 {
 
     /** Get a parameter of the track.  Not intended for end user's use.
      * @param which (0,1,2,3,4,5) = (Px,Py,Pz,Xx,Xy,Xz)
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return corresponding parameter
      */
     double                 getFitParameter(const int which, const int flag) const;
     /** Get a parameter set of the track.  Not intended for end user's use.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return array of getFitParameter(0,flag) ... getFitParameter(5,flag)
      */
     const CLHEP::HepMatrix        getFitParameter(const int flag) const;
     /** Get an error matrix of the track.  Not intended for end user's use.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return fitted error matrix
      */
     const CLHEP::HepSymMatrix     getFitError(const int flag) const;
     /** Get a combination of Lorentz vector and position of the track.  Not intended for end user's use.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return combination of Lorentz vector and position
      */
     const CLHEP::HepMatrix        getMomPos(const int flag) const;
 
 
   private:
-    /** Check if the flag is one of KFitConst::kBeforeFit or KFitConst::kAfterFit.  If check fails, abort the program.
+    /** Check if the flag is one of kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit.  If check fails, abort the program.
      * @param flag
      */
     inline void checkFlag(const int flag) const
     {
-      if (flag != KFitConst::kBeforeFit && flag != KFitConst::kAfterFit) B2FATAL("checkFlag");
+      if (flag != kinkVertexFitterKFitConst::kBeforeFit && flag != kinkVertexFitterKFitConst::kAfterFit) B2FATAL("checkFlag");
     }
 
     /** Check if the matrix size is intended one.  If check fails, abort the program.

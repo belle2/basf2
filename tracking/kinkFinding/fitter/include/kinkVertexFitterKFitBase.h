@@ -18,9 +18,9 @@
 
 #include <genfit/MeasuredStateOnPlane.h>
 
-#include <tracking/kinkFinding/fitter/KFitConst.h>
-#include <tracking/kinkFinding/fitter/KFitError.h>
-#include <tracking/kinkFinding/fitter/KFitTrack.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitConst.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitError.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitTrack.h>
 
 #ifndef ENABLE_BACKWARDS_COMPATIBILITY
 typedef HepGeom::Point3D<double> HepPoint3D;
@@ -28,15 +28,15 @@ typedef HepGeom::Point3D<double> HepPoint3D;
 
 namespace Belle2 {
   /**
-   * KFitBase is a base class for kinematical fitters.
+   * kinkVertexFitterKFitBase is a base class for kinematical fitters.
    */
-  class KFitBase {
+  class kinkVertexFitterKFitBase {
   public:
     /** Construct an object with no argument. */
-    KFitBase(void);
+    kinkVertexFitterKFitBase(void);
 
     /** Destruct the object. */
-    virtual ~KFitBase(void);
+    virtual ~kinkVertexFitterKFitBase(void);
 
 
   public:
@@ -44,44 +44,44 @@ namespace Belle2 {
      * @param kp object of the track
      * @return error code (zero if success)
      */
-    enum KFitError::ECode addTrack(const KFitTrack& kp);
+    enum kinkVertexFitterKFitError::ECode addTrack(const kinkVertexFitterKFitTrack& kp);
 
     /** Add a track to the fitter object with specifying its momentum, position, error matrix, and charge.
-     *  This function internally calls addTrack(const KFitTrack &kp).
+     *  This function internally calls addTrack(const kinkVertexFitterKFitTrack &kp).
      * @param p Lorentz vector of the track
      * @param x position of the track
      * @param e (7x7) error matrix of the track
      * @param q charge of the track
      * @return error code (zero if success)
      */
-    enum KFitError::ECode
+    enum kinkVertexFitterKFitError::ECode
     addTrack(const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e,
              const double q);
 
-    enum KFitError::ECode addState(genfit::MeasuredStateOnPlane& state, double mass, double charge);
+    enum kinkVertexFitterKFitError::ECode addState(genfit::MeasuredStateOnPlane& state, double mass, double charge);
 
     /** Set a correlation matrix.  Not intended for end user's use.
      * @param c (7x7) correlation matrix
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode setCorrelation(const CLHEP::HepMatrix& c);
+    virtual enum kinkVertexFitterKFitError::ECode setCorrelation(const CLHEP::HepMatrix& c);
 
     /** Indicate no correlation between tracks.  Not intended for end user's use.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode setZeroCorrelation(void);
+    virtual enum kinkVertexFitterKFitError::ECode setZeroCorrelation(void);
 
-    /** Change a magnetic field from the default value KFitConst::kDefaultMagneticField.
+    /** Change a magnetic field from the default value kinkVertexFitterKFitConst::kDefaultMagneticField.
      * @param mf magnetic field to set
      * @return error code (zero if success)
      */
-    enum KFitError::ECode setMagneticField(const double mf);
+    enum kinkVertexFitterKFitError::ECode setMagneticField(const double mf);
 
 
     /** Get a code of the last error.
      * @return the last error code
      */
-    enum KFitError::ECode getErrorCode(void) const;
+    enum kinkVertexFitterKFitError::ECode getErrorCode(void) const;
 
     /** Get the number of added tracks.
      * @return the number of added tracks
@@ -131,16 +131,16 @@ namespace Belle2 {
      * @param id track id
      * @return specified track object
      */
-    const KFitTrack getTrack(const int id) const;
+    const kinkVertexFitterKFitTrack getTrack(const int id) const;
 
     /** Get a correlation matrix between two tracks.
      * @param id1 first track id
      * @param id2 second track id
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return (7x7) correlation matrix
      */
     virtual const CLHEP::HepMatrix getCorrelation(const int id1, const int id2,
-                                                  const int flag = KFitConst::kAfterFit) const;
+                                                  const int flag = kinkVertexFitterKFitConst::kAfterFit) const;
 
 
   public:
@@ -206,44 +206,44 @@ namespace Belle2 {
     /** Build grand matrices for minimum search from input-track properties.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode prepareInputMatrix(void) = 0;
+    virtual enum kinkVertexFitterKFitError::ECode prepareInputMatrix(void) = 0;
 
     /** Build sub-matrices for minimum search from input-track properties.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode prepareInputSubMatrix(void) = 0;
+    virtual enum kinkVertexFitterKFitError::ECode prepareInputSubMatrix(void) = 0;
 
     /** Build a grand correlation matrix from input-track properties.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode prepareCorrelation(void);
+    virtual enum kinkVertexFitterKFitError::ECode prepareCorrelation(void);
 
     /** Build an output error matrix.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode prepareOutputMatrix(void) = 0;
+    virtual enum kinkVertexFitterKFitError::ECode prepareOutputMatrix(void) = 0;
 
     /** Build matrices using the kinematical constraint.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode makeCoreMatrix(void) = 0;
+    virtual enum kinkVertexFitterKFitError::ECode makeCoreMatrix(void) = 0;
 
     /** Calculate an NDF of the fit.
      * @return error code (zero if success)
      */
-    virtual enum KFitError::ECode calculateNDF(void) = 0;
+    virtual enum kinkVertexFitterKFitError::ECode calculateNDF(void) = 0;
 
 
   protected:
     /** Perform a fit (used in MassFitKFit::doFit()).
      * @return error code (zero if success)
      */
-    enum KFitError::ECode doFit1(void);
+    enum kinkVertexFitterKFitError::ECode doFit1(void);
 
     /** Perform a fit (used in VertexFitKFit::doFit() and MassVertexFitKFit::doFit()).
      * @return error code (zero if success)
      */
-    enum KFitError::ECode doFit2(void);
+    enum kinkVertexFitterKFitError::ECode doFit2(void);
 
 
   protected:
@@ -261,13 +261,13 @@ namespace Belle2 {
 
 
     /** Error code. */
-    enum KFitError::ECode m_ErrorCode;
+    enum kinkVertexFitterKFitError::ECode m_ErrorCode;
     /** Flag to indicate if the fit is performed and succeeded. */
     bool m_FlagFitted;
 
 
     /** Container of input tracks. */
-    std::vector <KFitTrack> m_Tracks;
+    std::vector <kinkVertexFitterKFitTrack> m_Tracks;
     /** Container of input correlation matrices. */
     std::vector <CLHEP::HepMatrix> m_BeforeCorrelation;
 

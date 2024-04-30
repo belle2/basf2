@@ -10,21 +10,21 @@
 
 #include <cstdio>
 
-#include <tracking/kinkFinding/fitter/KFitTrack.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitTrack.h>
 
 using namespace CLHEP;
 using namespace std;
 using namespace Belle2;
 
 
-KFitTrack::KFitTrack()
+kinkVertexFitterKFitTrack::kinkVertexFitterKFitTrack()
 {
   this->m_PXEBefore.m_P  = HepLorentzVector();
   this->m_PXEBefore.m_X  = HepPoint3D();
-  this->m_PXEBefore.m_E  = HepSymMatrix(KFitConst::kNumber7, 0);
+  this->m_PXEBefore.m_E  = HepSymMatrix(kinkVertexFitterKFitConst::kNumber7, 0);
   this->m_PXEAfter. m_P  = HepLorentzVector();
   this->m_PXEAfter. m_X  = HepPoint3D();
-  this->m_PXEAfter. m_E  = HepSymMatrix(KFitConst::kNumber7, 0);
+  this->m_PXEAfter. m_E  = HepSymMatrix(kinkVertexFitterKFitConst::kNumber7, 0);
   this->m_Charge         = 0.;
   this->m_Mass           = 0.;
   this->m_Vertex         = HepPoint3D();
@@ -32,32 +32,32 @@ KFitTrack::KFitTrack()
 }
 
 
-KFitTrack::KFitTrack(const KFitTrack& a)  = default;
+kinkVertexFitterKFitTrack::kinkVertexFitterKFitTrack(const kinkVertexFitterKFitTrack& a)  = default;
 
 
-KFitTrack::KFitTrack
+kinkVertexFitterKFitTrack::kinkVertexFitterKFitTrack
 (
   const CLHEP::HepLorentzVector& p, const HepPoint3D& x, const CLHEP::HepSymMatrix& e, const double charge,
   const int flag
 )
 {
   checkFlag(flag);
-  checkMatrixDimension(e, KFitConst::kNumber7);
+  checkMatrixDimension(e, kinkVertexFitterKFitConst::kNumber7);
 
   switch (flag) {
-    case KFitConst::kBeforeFit:
+    case kinkVertexFitterKFitConst::kBeforeFit:
       m_PXEBefore.m_P = p;
       m_PXEBefore.m_X = x;
       m_PXEBefore.m_E = e;
       m_PXEAfter.m_P  = HepLorentzVector();
       m_PXEAfter.m_X  = HepPoint3D();
-      m_PXEAfter.m_E  = HepSymMatrix(KFitConst::kNumber7, 0);
+      m_PXEAfter.m_E  = HepSymMatrix(kinkVertexFitterKFitConst::kNumber7, 0);
       break;
 
-    case KFitConst::kAfterFit:
+    case kinkVertexFitterKFitConst::kAfterFit:
       m_PXEBefore.m_P = HepLorentzVector();
       m_PXEBefore.m_X = HepPoint3D();
-      m_PXEBefore.m_E = HepSymMatrix(KFitConst::kNumber7, 0);
+      m_PXEBefore.m_E = HepSymMatrix(kinkVertexFitterKFitConst::kNumber7, 0);
       m_PXEAfter.m_P  = p;
       m_PXEAfter.m_X  = x;
       m_PXEAfter.m_E  = e;
@@ -71,11 +71,11 @@ KFitTrack::KFitTrack
 }
 
 
-KFitTrack::~KFitTrack() = default;
+kinkVertexFitterKFitTrack::~kinkVertexFitterKFitTrack() = default;
 
 
-KFitTrack&
-KFitTrack::operator = (const KFitTrack& a)
+kinkVertexFitterKFitTrack&
+kinkVertexFitterKFitTrack::operator = (const kinkVertexFitterKFitTrack& a)
 {
   if (this != &a) {
     this->m_PXEBefore   = a.m_PXEBefore;
@@ -91,11 +91,11 @@ KFitTrack::operator = (const KFitTrack& a)
 
 
 void
-KFitTrack::setMomentum(const HepLorentzVector& p, const int flag)
+kinkVertexFitterKFitTrack::setMomentum(const HepLorentzVector& p, const int flag)
 {
   checkFlag(flag);
 
-  if (flag == KFitConst::kBeforeFit)
+  if (flag == kinkVertexFitterKFitConst::kBeforeFit)
     m_PXEBefore.m_P = p;
   else
     m_PXEAfter.m_P = p;
@@ -105,11 +105,11 @@ KFitTrack::setMomentum(const HepLorentzVector& p, const int flag)
 
 
 void
-KFitTrack::setPosition(const HepPoint3D& x, const int flag)
+kinkVertexFitterKFitTrack::setPosition(const HepPoint3D& x, const int flag)
 {
   checkFlag(flag);
 
-  if (flag == KFitConst::kBeforeFit)
+  if (flag == kinkVertexFitterKFitConst::kBeforeFit)
     m_PXEBefore.m_X = x;
   else
     m_PXEAfter.m_X = x;
@@ -117,12 +117,12 @@ KFitTrack::setPosition(const HepPoint3D& x, const int flag)
 
 
 void
-KFitTrack::setError(const HepSymMatrix& e, const int flag)
+kinkVertexFitterKFitTrack::setError(const HepSymMatrix& e, const int flag)
 {
   checkFlag(flag);
-  checkMatrixDimension(e, KFitConst::kNumber7);
+  checkMatrixDimension(e, kinkVertexFitterKFitConst::kNumber7);
 
-  if (flag == KFitConst::kBeforeFit)
+  if (flag == kinkVertexFitterKFitConst::kBeforeFit)
     m_PXEBefore.m_E = e;
   else
     m_PXEAfter.m_E = e;
@@ -130,21 +130,21 @@ KFitTrack::setError(const HepSymMatrix& e, const int flag)
 
 
 void
-KFitTrack::setCharge(const double charge)
+kinkVertexFitterKFitTrack::setCharge(const double charge)
 {
   m_Charge = charge;
 }
 
 
 void
-KFitTrack::setVertex(const HepPoint3D& v)
+kinkVertexFitterKFitTrack::setVertex(const HepPoint3D& v)
 {
   m_Vertex = v;
 }
 
 
 void
-KFitTrack::setVertexError(const HepSymMatrix& ve)
+kinkVertexFitterKFitTrack::setVertexError(const HepSymMatrix& ve)
 {
   checkMatrixDimension(ve, 3);
   m_VertexError = ve;
@@ -152,63 +152,63 @@ KFitTrack::setVertexError(const HepSymMatrix& ve)
 
 
 const HepLorentzVector
-KFitTrack::getMomentum(const int flag) const
+kinkVertexFitterKFitTrack::getMomentum(const int flag) const
 {
   checkFlag(flag);
-  return flag == KFitConst::kBeforeFit ? m_PXEBefore.m_P : m_PXEAfter.m_P;
+  return flag == kinkVertexFitterKFitConst::kBeforeFit ? m_PXEBefore.m_P : m_PXEAfter.m_P;
 }
 
 
 const HepPoint3D
-KFitTrack::getPosition(const int flag) const
+kinkVertexFitterKFitTrack::getPosition(const int flag) const
 {
   checkFlag(flag);
-  return flag == KFitConst::kBeforeFit ? m_PXEBefore.m_X : m_PXEAfter.m_X;
+  return flag == kinkVertexFitterKFitConst::kBeforeFit ? m_PXEBefore.m_X : m_PXEAfter.m_X;
 }
 
 
 const HepSymMatrix
-KFitTrack::getError(const int flag) const
+kinkVertexFitterKFitTrack::getError(const int flag) const
 {
   checkFlag(flag);
-  return flag == KFitConst::kBeforeFit ? m_PXEBefore.m_E : m_PXEAfter.m_E;
+  return flag == kinkVertexFitterKFitConst::kBeforeFit ? m_PXEBefore.m_E : m_PXEAfter.m_E;
 }
 
 
 double
-KFitTrack::getCharge() const
+kinkVertexFitterKFitTrack::getCharge() const
 {
   return m_Charge;
 }
 
 
 double
-KFitTrack::getMass() const
+kinkVertexFitterKFitTrack::getMass() const
 {
   return m_Mass;
 }
 
 
 const HepPoint3D
-KFitTrack::getVertex() const
+kinkVertexFitterKFitTrack::getVertex() const
 {
   return m_Vertex;
 }
 
 
 const HepSymMatrix
-KFitTrack::getVertexError() const
+kinkVertexFitterKFitTrack::getVertexError() const
 {
   return m_VertexError;
 }
 
 
 double
-KFitTrack::getFitParameter(const int which, const int flag) const
+kinkVertexFitterKFitTrack::getFitParameter(const int which, const int flag) const
 {
   checkFlag(flag);
 
-  const struct KFitPXE& pxe = flag == KFitConst::kBeforeFit ? m_PXEBefore : m_PXEAfter;
+  const struct KFitPXE& pxe = flag == kinkVertexFitterKFitConst::kBeforeFit ? m_PXEBefore : m_PXEAfter;
 
   switch (which) {
     case 0: return pxe.m_P.x();
@@ -230,9 +230,9 @@ KFitTrack::getFitParameter(const int which, const int flag) const
 
 
 const HepMatrix
-KFitTrack::getFitParameter(const int flag) const
+kinkVertexFitterKFitTrack::getFitParameter(const int flag) const
 {
-  HepMatrix a(KFitConst::kNumber6, 1, 0);
+  HepMatrix a(kinkVertexFitterKFitConst::kNumber6, 1, 0);
 
   for (int i = 0; i <= 5; i++)
     a[i][0] = getFitParameter(i, flag);
@@ -242,12 +242,12 @@ KFitTrack::getFitParameter(const int flag) const
 
 
 const HepSymMatrix
-KFitTrack::getFitError(const int flag) const
+kinkVertexFitterKFitTrack::getFitError(const int flag) const
 {
   checkFlag(flag);
-  HepSymMatrix err(KFitConst::kNumber6, 0);
+  HepSymMatrix err(kinkVertexFitterKFitConst::kNumber6, 0);
 
-  const HepSymMatrix& e = flag == KFitConst::kBeforeFit ? m_PXEBefore.m_E : m_PXEAfter.m_E;
+  const HepSymMatrix& e = flag == kinkVertexFitterKFitConst::kBeforeFit ? m_PXEBefore.m_E : m_PXEAfter.m_E;
 
 
   for (int i = 0; i < 3; i++) {
@@ -268,12 +268,12 @@ KFitTrack::getFitError(const int flag) const
 
 
 const HepMatrix
-KFitTrack::getMomPos(const int flag) const
+kinkVertexFitterKFitTrack::getMomPos(const int flag) const
 {
-  HepMatrix a(KFitConst::kNumber7, 1, 0);
+  HepMatrix a(kinkVertexFitterKFitConst::kNumber7, 1, 0);
 
   switch (flag) {
-    case KFitConst::kBeforeFit:
+    case kinkVertexFitterKFitConst::kBeforeFit:
       a[0][0] = m_PXEBefore.m_P.x();
       a[1][0] = m_PXEBefore.m_P.y();
       a[2][0] = m_PXEBefore.m_P.z();
@@ -283,7 +283,7 @@ KFitTrack::getMomPos(const int flag) const
       a[6][0] = m_PXEBefore.m_X.z();
       break;
 
-    case KFitConst::kAfterFit:
+    case kinkVertexFitterKFitConst::kAfterFit:
       a[0][0] = m_PXEAfter.m_P.x();
       a[1][0] = m_PXEAfter.m_P.y();
       a[2][0] = m_PXEAfter.m_P.z();

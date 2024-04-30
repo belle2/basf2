@@ -9,9 +9,9 @@
 
 #pragma once
 
-#include <tracking/kinkFinding/fitter/KFitConst.h>
-#include <tracking/kinkFinding/fitter/KFitError.h>
-#include <tracking/kinkFinding/fitter/KFitBase.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitConst.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitError.h>
+#include <tracking/kinkFinding/fitter/kinkVertexFitterKFitBase.h>
 
 #include <framework/geometry/B2Vector3.h>
 
@@ -24,9 +24,9 @@ namespace Belle2 {
 
 
   /**
-   * kinkVertexFitterKFit is a derived class from KFitBase to perform vertex-constraint kinematical fit.
+   * kinkVertexFitterKFit is a derived class from kinkVertexFitterKFitBase to perform vertex-constraint kinematical fit.
    */
-  class kinkVertexFitterKFit : public KFitBase {
+  class kinkVertexFitterKFit : public kinkVertexFitterKFitBase {
   public:
     /** Construct an object with no argument. */
     kinkVertexFitterKFit(void);
@@ -40,33 +40,33 @@ namespace Belle2 {
      * @param v initial vertex point
      * @return error code (zero if success)
      */
-    enum KFitError::ECode setInitialVertex(const HepPoint3D& v);
+    enum kinkVertexFitterKFitError::ECode setInitialVertex(const HepPoint3D& v);
 
     /** Set an initial vertex point for the mass-vertex constraint fit.
      * @param v initial vertex point
      * @return error code (zero if success)
      */
-    enum KFitError::ECode setInitialVertex(const B2Vector3D& v);
+    enum kinkVertexFitterKFitError::ECode setInitialVertex(const B2Vector3D& v);
 
     /** Tell the object to perform a fit with vertex position fixed.
      * @param flag true for fixed vertex, false for otherwise
      * @return error code (zero if success)
      */
-    enum KFitError::ECode setKnownVertex(const bool flag = true);
+    enum kinkVertexFitterKFitError::ECode setKnownVertex(const bool flag = true);
 
     /** Tell the object to perform a fit with track correlations.
      * @param m true for with correlation, false for otherwise
      * @return error code (zero if success)
      */
-    enum KFitError::ECode setCorrelationMode(const bool m);
+    enum kinkVertexFitterKFitError::ECode setCorrelationMode(const bool m);
 
 
   public:
     /** Get a vertex position.
-     * @param flag KFitConst::kBeforeFit or KFitConst::kAfterFit
+     * @param flag kinkVertexFitterKFitConst::kBeforeFit or kinkVertexFitterKFitConst::kAfterFit
      * @return vertex position
      */
-    const HepPoint3D getVertex(const int flag = KFitConst::kAfterFit) const;
+    const HepPoint3D getVertex(const int flag = kinkVertexFitterKFitConst::kAfterFit) const;
 
     /** Get a fitted vertex error matrix.
      * @return vertex error matrix
@@ -104,45 +104,45 @@ namespace Belle2 {
     /** Perform a vertex-constraint fit.
      * @return error code (zero if success)
      */
-    enum KFitError::ECode doFit(void);
+    enum kinkVertexFitterKFitError::ECode doFit(void);
 
     /**
      * Update mother particle.
      * @param[in] mother Mother particle.
      */
-    //enum KFitError::ECode updateMother(Particle* mother);
+    //enum kinkVertexFitterKFitError::ECode updateMother(Particle* mother);
 
   private:
 
     /** Perform a standard vertex-constraint fit including IP-tube constraint.
     * @return error code (zero if success)
     */
-    enum KFitError::ECode doFit3(void);
+    enum kinkVertexFitterKFitError::ECode doFit3(void);
 
 
     /** Perform a fixed-vertex-position fit mainly for slow pion.
     * @return error code (zero if success)
     */
-    enum KFitError::ECode doFit5(void);
+    enum kinkVertexFitterKFitError::ECode doFit5(void);
 
 
   private:
-    enum KFitError::ECode prepareInputMatrix(void) override;
+    enum kinkVertexFitterKFitError::ECode prepareInputMatrix(void) override;
 
-    enum KFitError::ECode prepareInputSubMatrix(void) override;
+    enum kinkVertexFitterKFitError::ECode prepareInputSubMatrix(void) override;
 
-    enum KFitError::ECode prepareOutputMatrix(void) override;
+    enum kinkVertexFitterKFitError::ECode prepareOutputMatrix(void) override;
 
-    enum KFitError::ECode makeCoreMatrix(void) override;
+    enum kinkVertexFitterKFitError::ECode makeCoreMatrix(void) override;
 
-    enum KFitError::ECode calculateNDF(void) override;
+    enum kinkVertexFitterKFitError::ECode calculateNDF(void) override;
 
 
   private:
     /** Flag controlled by setCorrelationMode(). */
     bool m_CorrelationMode;
     /** Container of chi-square's of the input tracks. */
-    double m_EachCHIsq[KFitConst::kMaxTrackCount2];
+    double m_EachCHIsq[kinkVertexFitterKFitConst::kMaxTrackCount2];
     /** chi-square of the fit excluding IP-constraint part. */
     double m_CHIsqVertex;
 

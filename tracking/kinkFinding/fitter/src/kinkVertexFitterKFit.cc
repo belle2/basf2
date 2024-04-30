@@ -35,57 +35,57 @@ kinkVertexFitterKFit::kinkVertexFitterKFit():
   m_v   = HepMatrix(3, 1, 0);
   m_v_a = HepMatrix(3, 1, 0);
 
-  fill_n(m_EachCHIsq, KFitConst::kMaxTrackCount2, 0);
+  fill_n(m_EachCHIsq, kinkVertexFitterKFitConst::kMaxTrackCount2, 0);
 }
 
 kinkVertexFitterKFit::~kinkVertexFitterKFit() = default;
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::setInitialVertex(const HepPoint3D& v) {
   m_BeforeVertex = v;
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
-enum KFitError::ECode kinkVertexFitterKFit::setInitialVertex(const B2Vector3D& v)
+enum kinkVertexFitterKFitError::ECode kinkVertexFitterKFit::setInitialVertex(const B2Vector3D& v)
 {
   m_BeforeVertex = HepPoint3D(v.X(), v.Y(), v.Z());
-  m_ErrorCode = KFitError::kNoError;
+  m_ErrorCode = kinkVertexFitterKFitError::kNoError;
   return m_ErrorCode;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::setKnownVertex(const bool flag) {
   m_FlagKnownVertex = flag;
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::setCorrelationMode(const bool m) {
   m_CorrelationMode = m;
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
 const HepPoint3D
 kinkVertexFitterKFit::getVertex(const int flag) const
 {
-  if (flag == KFitConst::kAfterFit && !isFitted()) return HepPoint3D();
+  if (flag == kinkVertexFitterKFitConst::kAfterFit && !isFitted()) return HepPoint3D();
 
   switch (flag) {
-    case KFitConst::kBeforeFit:
+    case kinkVertexFitterKFitConst::kBeforeFit:
       return m_BeforeVertex;
 
-    case KFitConst::kAfterFit:
+    case kinkVertexFitterKFitConst::kAfterFit:
       return m_AfterVertex;
 
     default:
-      KFitError::displayError(__FILE__, __LINE__, __func__, KFitError::kOutOfRange);
+      kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, kinkVertexFitterKFitError::kOutOfRange);
       return HepPoint3D();
   }
 }
@@ -101,7 +101,7 @@ kinkVertexFitterKFit::getVertexError() const
 double
 kinkVertexFitterKFit::getCHIsq() const
 {
-  return KFitBase::getCHIsq();
+  return kinkVertexFitterKFitBase::getCHIsq();
 }
 
 
@@ -116,7 +116,7 @@ kinkVertexFitterKFit::getCHIsqVertex() const
 const HepMatrix
 kinkVertexFitterKFit::getTrackVertexError(const int id) const
 {
-  if (!isTrackIDInRange(id)) return HepMatrix(3, KFitConst::kNumber7, 0);
+  if (!isTrackIDInRange(id)) return HepMatrix(3, kinkVertexFitterKFitConst::kNumber7, 0);
   return m_AfterTrackVertexError[id];
 }
 
@@ -127,7 +127,7 @@ kinkVertexFitterKFit::getTrackCHIsq(const int id) const
   if (!isTrackIDInRange(id)) return -1;
 
   if (!m_FlagKnownVertex && m_CorrelationMode) {
-    return KFitBase::getTrackCHIsq(id);
+    return kinkVertexFitterKFitBase::getTrackCHIsq(id);
   }
 
   return m_EachCHIsq[id];
@@ -137,13 +137,13 @@ kinkVertexFitterKFit::getTrackCHIsq(const int id) const
 double
 kinkVertexFitterKFit::getTrackPartCHIsq() const
 {
-  if (m_ErrorCode != KFitError::kNoError) {
-    KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) {
+    kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return -1;
   }
 
   if (m_TrackCount == 0) {
-    KFitError::displayError(__FILE__, __LINE__, __func__, KFitError::kBadTrackSize);
+    kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, kinkVertexFitterKFitError::kBadTrackSize);
     return -1;
   }
 
@@ -160,13 +160,13 @@ kinkVertexFitterKFit::getTrackPartCHIsq() const
 int
 kinkVertexFitterKFit::getTrackPartNDF() const
 {
-  if (m_ErrorCode != KFitError::kNoError) {
-    KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) {
+    kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return 0;
   }
 
   if (m_TrackCount == 0) {
-    KFitError::displayError(__FILE__, __LINE__, __func__, KFitError::kBadTrackSize);
+    kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, kinkVertexFitterKFitError::kBadTrackSize);
     return 0;
   }
 
@@ -174,7 +174,7 @@ kinkVertexFitterKFit::getTrackPartNDF() const
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::doFit() {
 
   if (m_FlagKnownVertex)
@@ -182,31 +182,31 @@ kinkVertexFitterKFit::doFit() {
   else
     m_ErrorCode = this->doFit3();
 
-  const enum KFitError::ECode tmp_ErrorCode = m_ErrorCode;
+  const enum kinkVertexFitterKFitError::ECode tmp_ErrorCode = m_ErrorCode;
 
-  if (tmp_ErrorCode == KFitError::kNoError) m_FlagFitted = true;
+  if (tmp_ErrorCode == kinkVertexFitterKFitError::kNoError) m_FlagFitted = true;
 
   return m_ErrorCode = tmp_ErrorCode;
 }
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::doFit3() {
   // use small Matrix --> No Correlation
-  if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
   if (m_TrackCount < m_NecessaryTrackCount)
   {
-    m_ErrorCode = KFitError::kBadTrackSize;
-    KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+    m_ErrorCode = kinkVertexFitterKFitError::kBadTrackSize;
+    kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
   }
 
-  if (prepareInputMatrix() != KFitError::kNoError) return m_ErrorCode;
-  if (calculateNDF() != KFitError::kNoError) return m_ErrorCode;
+  if (prepareInputMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
+  if (calculateNDF() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
 
   double chisq = 0;
-  double tmp2_chisq = KFitConst::kInitialCHIsq;
+  double tmp2_chisq = kinkVertexFitterKFitConst::kInitialCHIsq;
   int err_inverse = 0;
 
   m_al_a = m_al_0;
@@ -223,36 +223,37 @@ kinkVertexFitterKFit::doFit3() {
   std::vector<double> tmp_each_chisq(m_TrackCount);
   std::vector<double> tmp2_each_chisq(m_TrackCount);
 
-  for (int j = 0; j < KFitConst::kMaxIterationCount; j++)   // j'th loop start
+  for (int j = 0; j < kinkVertexFitterKFitConst::kMaxIterationCount; j++)   // j'th loop start
   {
 
-    double tmp_chisq = KFitConst::kInitialCHIsq;
+    double tmp_chisq = kinkVertexFitterKFitConst::kInitialCHIsq;
 
-    for (int i = 0; i < KFitConst::kMaxIterationCount; i++) { // i'th loop start
+    for (int i = 0; i < kinkVertexFitterKFitConst::kMaxIterationCount; i++) { // i'th loop start
 
-      if (prepareInputSubMatrix() != KFitError::kNoError) return m_ErrorCode;
-      if (makeCoreMatrix() != KFitError::kNoError) return m_ErrorCode;
+      if (prepareInputSubMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
+      if (makeCoreMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
       HepMatrix tV_Ein(3, 3, 0);
       chisq = 0;
 
       for (int k = 0; k < m_TrackCount; k++) { // k'th loop start
 
-        HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1,
-                               KFitConst::kNumber6 * (k + 1)); // 2x6
-        HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
-                                        (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(
+        HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), kinkVertexFitterKFitConst::kNumber6 * k + 1,
+                               kinkVertexFitterKFitConst::kNumber6 * (k + 1)); // 2x6
+        HepMatrix tV_D = ((m_V_al_0.sub(kinkVertexFitterKFitConst::kNumber6 * k + 1,
+                                        (int)(kinkVertexFitterKFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(
                                           err_inverse); // 2x2
         if (err_inverse) {
-          m_ErrorCode = KFitError::kCannotGetMatrixInverse;
-          KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+          m_ErrorCode = kinkVertexFitterKFitError::kCannotGetMatrixInverse;
+          kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
           return m_ErrorCode;
         }
 
         m_V_D.sub(2 * k + 1, 2 * k + 1, tV_D);
         HepMatrix tE = m_E.sub(2 * k + 1, 2 * (k + 1), 1, 3); // 2x3
         tV_Ein += (tE.T()) * tV_D * tE; // 3x3
-        HepMatrix tDeltaAl = (m_al_0 - m_al_1).sub(KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1),
+        HepMatrix tDeltaAl = (m_al_0 - m_al_1).sub(kinkVertexFitterKFitConst::kNumber6 * k + 1,
+                                                   kinkVertexFitterKFitConst::kNumber6 * (k + 1),
                                                    1, 1); // 6x1
         HepMatrix td = m_d.sub(2 * k + 1, 2 * (k + 1), 1, 1); // 2x1
         HepMatrix tlam0 = tV_D * (tD * tDeltaAl + td); // 2x2x(2x6x6x1+2x1) = 2x1
@@ -264,8 +265,8 @@ kinkVertexFitterKFit::doFit3() {
 
       m_V_E = tV_Ein.inverse(err_inverse);
       if (err_inverse) {
-        m_ErrorCode = KFitError::kCannotGetMatrixInverse;
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+        m_ErrorCode = kinkVertexFitterKFitError::kCannotGetMatrixInverse;
+        kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }
 
@@ -273,7 +274,7 @@ kinkVertexFitterKFit::doFit3() {
 
       if (tmp_chisq <= chisq) {
         if (i == 0) {
-          m_ErrorCode = KFitError::kBadInitialCHIsq;
+          m_ErrorCode = kinkVertexFitterKFitError::kBadInitialCHIsq;
         } else {
           for (int k = 0; k < m_TrackCount; k++) m_EachCHIsq[k] = tmp_each_chisq[k];
           chisq = tmp_chisq;
@@ -294,7 +295,7 @@ kinkVertexFitterKFit::doFit3() {
         tmp_lam0 = m_lam0;
         tmp_E = m_E;
         tmp_D = m_D;
-        if (i == KFitConst::kMaxIterationCount - 1) {
+        if (i == kinkVertexFitterKFitConst::kMaxIterationCount - 1) {
           m_FlagOverIteration = true;
         }
       }
@@ -344,7 +345,7 @@ kinkVertexFitterKFit::doFit3() {
   } // j'th loop over
 
 
-  if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
   m_lam = m_lam0 - m_V_D * m_E * m_V_E * (m_E.T()) * m_lam0;
   m_al_1 = m_al_0 - m_V_al_0 * (m_D.T()) * m_lam;
@@ -352,33 +353,33 @@ kinkVertexFitterKFit::doFit3() {
   m_V_al_1 = m_V_al_0 - m_V_al_0 * (m_D.T()) * m_V_Dt * m_D * m_V_al_0;
   m_Cov_v_al_1 = -m_V_E * (m_E.T()) * m_V_D * m_D * m_V_al_0;
 
-  if (prepareOutputMatrix() != KFitError::kNoError) return m_ErrorCode;
+  if (prepareOutputMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
   m_CHIsq = chisq;
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::doFit5() {
   // known vertex --> do not find vertex. (only no correlation)
-  if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
   if (m_TrackCount < m_NecessaryTrackCount - 1)
   {
-    m_ErrorCode = KFitError::kBadTrackSize;
-    KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+    m_ErrorCode = kinkVertexFitterKFitError::kBadTrackSize;
+    kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
     return m_ErrorCode;
   }
 
-  if (prepareInputMatrix() != KFitError::kNoError) return m_ErrorCode;
-  if (calculateNDF() != KFitError::kNoError)       return m_ErrorCode;
+  if (prepareInputMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
+  if (calculateNDF() != kinkVertexFitterKFitError::kNoError)       return m_ErrorCode;
 
 
   double chisq = 0;
-  double tmp_chisq = KFitConst::kInitialCHIsq;
+  double tmp_chisq = kinkVertexFitterKFitConst::kInitialCHIsq;
   int err_inverse = 0;
 
   m_al_a = m_al_0;
@@ -389,25 +390,27 @@ kinkVertexFitterKFit::doFit5() {
 
   std::vector<double> tmp_each_chisq(m_TrackCount);
 
-  for (int i = 0; i < KFitConst::kMaxIterationCount; i++)
+  for (int i = 0; i < kinkVertexFitterKFitConst::kMaxIterationCount; i++)
   {
 
-    if (makeCoreMatrix() != KFitError::kNoError) return m_ErrorCode;
+    if (makeCoreMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
     chisq = 0;
 
     for (int k = 0; k < m_TrackCount; k++) {
-      HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1)); // 2x6
-      HepMatrix tV_D = ((m_V_al_0.sub(KFitConst::kNumber6 * k + 1,
-                                      (int)(KFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
+      HepMatrix tD = m_D.sub(2 * k + 1, 2 * (k + 1), kinkVertexFitterKFitConst::kNumber6 * k + 1,
+                             kinkVertexFitterKFitConst::kNumber6 * (k + 1)); // 2x6
+      HepMatrix tV_D = ((m_V_al_0.sub(kinkVertexFitterKFitConst::kNumber6 * k + 1,
+                                      (int)(kinkVertexFitterKFitConst::kNumber6 * (k + 1)))).similarity(tD)).inverse(err_inverse); // 2x2
       if (err_inverse) {
-        m_ErrorCode = KFitError::kCannotGetMatrixInverse;
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+        m_ErrorCode = kinkVertexFitterKFitError::kCannotGetMatrixInverse;
+        kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }
       m_V_D.sub(2 * k + 1, 2 * k + 1, tV_D);
 
-      HepMatrix tDeltaAl = (m_al_0 - m_al_1).sub(KFitConst::kNumber6 * k + 1, KFitConst::kNumber6 * (k + 1), 1, 1); // 6x1
+      HepMatrix tDeltaAl = (m_al_0 - m_al_1).sub(kinkVertexFitterKFitConst::kNumber6 * k + 1,
+                                                 kinkVertexFitterKFitConst::kNumber6 * (k + 1), 1, 1); // 6x1
       HepMatrix td = m_d.sub(2 * k + 1, 2 * (k + 1), 1, 1); // 2x1
       HepMatrix tlam = tV_D * (tD * tDeltaAl + td); // 2x2x(2x6x6x1+2x1) = 2x1
       m_lam.sub(2 * k + 1, 1, tlam);
@@ -421,7 +424,7 @@ kinkVertexFitterKFit::doFit5() {
 
     if (tmp_chisq <= chisq) {
       if (i == 0) {
-        m_ErrorCode = KFitError::kBadInitialCHIsq;
+        m_ErrorCode = kinkVertexFitterKFitError::kBadInitialCHIsq;
       } else {
         for (int k = 0; k < m_TrackCount; k++) m_EachCHIsq[k] = tmp_each_chisq[k];
         chisq    = tmp_chisq;
@@ -436,55 +439,55 @@ kinkVertexFitterKFit::doFit5() {
       tmp_al_0   = m_al_1;
       tmp_V_al_0 = m_V_al_1;
       tmp_al_a   = m_al_a;
-      if (i == KFitConst::kMaxIterationCount - 1) {
+      if (i == kinkVertexFitterKFitConst::kMaxIterationCount - 1) {
         m_FlagOverIteration = true;
       }
     }
   }
 
 
-  if (m_ErrorCode != KFitError::kNoError) return m_ErrorCode;
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
-  if (prepareOutputMatrix() != KFitError::kNoError) return m_ErrorCode;
+  if (prepareOutputMatrix() != kinkVertexFitterKFitError::kNoError) return m_ErrorCode;
 
   m_CHIsq = chisq;
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::prepareInputMatrix() {
   if (!m_CorrelationMode || m_FlagKnownVertex)
   {
-    if (m_TrackCount > KFitConst::kMaxTrackCount2) {
-      m_ErrorCode = KFitError::kBadTrackSize;
-      KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+    if (m_TrackCount > kinkVertexFitterKFitConst::kMaxTrackCount2) {
+      m_ErrorCode = kinkVertexFitterKFitError::kBadTrackSize;
+      kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
   } else
   {
-    if (m_TrackCount > KFitConst::kMaxTrackCount) {
-      m_ErrorCode = KFitError::kBadTrackSize;
-      KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+    if (m_TrackCount > kinkVertexFitterKFitConst::kMaxTrackCount) {
+      m_ErrorCode = kinkVertexFitterKFitError::kBadTrackSize;
+      kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
   }
 
 
   int index = 0;
-  HepMatrix    tmp_al_0(KFitConst::kNumber6 * m_TrackCount, 1, 0);
-  HepSymMatrix tmp_V_al_0(KFitConst::kNumber6 * m_TrackCount, 0);
+  HepMatrix    tmp_al_0(kinkVertexFitterKFitConst::kNumber6 * m_TrackCount, 1, 0);
+  HepSymMatrix tmp_V_al_0(kinkVertexFitterKFitConst::kNumber6 * m_TrackCount, 0);
   HepMatrix    tmp_property(m_TrackCount, 3, 0);
 
 
   for (auto& track : m_Tracks)
   {
     // momentum x,y,z and position x,y,z
-    for (int j = 0; j < KFitConst::kNumber6; j++)
-      tmp_al_0[index * KFitConst::kNumber6 + j][0] = track.getFitParameter(j, KFitConst::kBeforeFit);
+    for (int j = 0; j < kinkVertexFitterKFitConst::kNumber6; j++)
+      tmp_al_0[index * kinkVertexFitterKFitConst::kNumber6 + j][0] = track.getFitParameter(j, kinkVertexFitterKFitConst::kBeforeFit);
     // these error
-    tmp_V_al_0.sub(index * KFitConst::kNumber6 + 1, track.getFitError(KFitConst::kBeforeFit));
+    tmp_V_al_0.sub(index * kinkVertexFitterKFitConst::kNumber6 + 1, track.getFitError(kinkVertexFitterKFitConst::kBeforeFit));
     // charge , mass , a
     tmp_property[index][0] =  track.getCharge();
     tmp_property[index][1] =  track.getMass();
@@ -499,8 +502,8 @@ kinkVertexFitterKFit::prepareInputMatrix() {
   {
     if (m_FlagCorrelation) {
       this->prepareCorrelation();
-      if (m_ErrorCode != KFitError::kNoError) {
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+      if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) {
+        kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }
     }
@@ -517,32 +520,32 @@ kinkVertexFitterKFit::prepareInputMatrix() {
   m_property = tmp_property;
 
   // define size of matrix
-  m_V_al_1 = HepMatrix(KFitConst::kNumber6 * m_TrackCount, KFitConst::kNumber6 * m_TrackCount, 0);
-  m_D    = m_V_al_1.sub(1, m_TrackCount * 2, 1, KFitConst::kNumber6 * m_TrackCount);
+  m_V_al_1 = HepMatrix(kinkVertexFitterKFitConst::kNumber6 * m_TrackCount, kinkVertexFitterKFitConst::kNumber6 * m_TrackCount, 0);
+  m_D    = m_V_al_1.sub(1, m_TrackCount * 2, 1, kinkVertexFitterKFitConst::kNumber6 * m_TrackCount);
   m_E    = m_V_al_1.sub(1, m_TrackCount * 2, 1, 3);
   m_d    = m_V_al_1.sub(1, m_TrackCount * 2, 1, 1);
   m_V_D  = m_V_al_1.sub(1, m_TrackCount * 2, 1, m_TrackCount * 2);
   m_lam  = m_V_al_1.sub(1, m_TrackCount * 2, 1, 1);
   m_lam0 = m_V_al_1.sub(1, m_TrackCount * 2, 1, 1);
   m_V_Dt = m_V_al_1.sub(1, m_TrackCount * 2, 1, m_TrackCount * 2);
-  m_Cov_v_al_1 = m_V_al_1.sub(1, 3, 1, KFitConst::kNumber6 * m_TrackCount);
+  m_Cov_v_al_1 = m_V_al_1.sub(1, 3, 1, kinkVertexFitterKFitConst::kNumber6 * m_TrackCount);
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::prepareInputSubMatrix() {
   // vertex
   for (int i = 0; i < 3; i++)
   {
     m_v[i][0] = m_v_a[i][0];
   }
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::prepareOutputMatrix() {
   Hep3Vector h3v;
   unsigned index = 0;
@@ -551,24 +554,24 @@ kinkVertexFitterKFit::prepareOutputMatrix() {
   {
     // tracks
     // momentum
-    h3v.setX(m_al_1[index * KFitConst::kNumber6 + 0][0]);
-    h3v.setY(m_al_1[index * KFitConst::kNumber6 + 1][0]);
-    h3v.setZ(m_al_1[index * KFitConst::kNumber6 + 2][0]);
-    pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), KFitConst::kAfterFit);
+    h3v.setX(m_al_1[index * kinkVertexFitterKFitConst::kNumber6 + 0][0]);
+    h3v.setY(m_al_1[index * kinkVertexFitterKFitConst::kNumber6 + 1][0]);
+    h3v.setZ(m_al_1[index * kinkVertexFitterKFitConst::kNumber6 + 2][0]);
+    pdata.setMomentum(HepLorentzVector(h3v, sqrt(h3v.mag2() + pdata.getMass()*pdata.getMass())), kinkVertexFitterKFitConst::kAfterFit);
     // position
     pdata.setPosition(HepPoint3D(
-                        m_al_1[index * KFitConst::kNumber6 + 3][0],
-                        m_al_1[index * KFitConst::kNumber6 + 4][0],
-                        m_al_1[index * KFitConst::kNumber6 + 5][0]), KFitConst::kAfterFit);
+                        m_al_1[index * kinkVertexFitterKFitConst::kNumber6 + 3][0],
+                        m_al_1[index * kinkVertexFitterKFitConst::kNumber6 + 4][0],
+                        m_al_1[index * kinkVertexFitterKFitConst::kNumber6 + 5][0]), kinkVertexFitterKFitConst::kAfterFit);
     // error of the tracks
     pdata.setError(makeError1(pdata.getMomentum(),
                               m_V_al_1.sub(
-                                index    * KFitConst::kNumber6 + 1,
-                                (index + 1)*KFitConst::kNumber6,
-                                index    * KFitConst::kNumber6 + 1,
-                                (index + 1)*KFitConst::kNumber6)),
-                   KFitConst::kAfterFit);
-    if (m_ErrorCode != KFitError::kNoError) break;
+                                index    * kinkVertexFitterKFitConst::kNumber6 + 1,
+                                (index + 1)*kinkVertexFitterKFitConst::kNumber6,
+                                index    * kinkVertexFitterKFitConst::kNumber6 + 1,
+                                (index + 1)*kinkVertexFitterKFitConst::kNumber6)),
+                   kinkVertexFitterKFitConst::kAfterFit);
+    if (m_ErrorCode != kinkVertexFitterKFitError::kNoError) break;
     index++;
   }
 
@@ -586,18 +589,18 @@ kinkVertexFitterKFit::prepareOutputMatrix() {
   // error between vertex and tracks
   for (int i = 0; i < m_TrackCount; i++)
   {
-    HepMatrix hm(3, KFitConst::kNumber6, 0);
-    for (int j = 0; j < 3; j++) for (int k = 0; k < KFitConst::kNumber6; k++) {
-        hm[j][k] = m_Cov_v_al_1[j][KFitConst::kNumber6 * i + k];
+    HepMatrix hm(3, kinkVertexFitterKFitConst::kNumber6, 0);
+    for (int j = 0; j < 3; j++) for (int k = 0; k < kinkVertexFitterKFitConst::kNumber6; k++) {
+        hm[j][k] = m_Cov_v_al_1[j][kinkVertexFitterKFitConst::kNumber6 * i + k];
       }
     m_AfterTrackVertexError.push_back(makeError2(m_Tracks[i].getMomentum(), hm));
   }
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::makeCoreMatrix() {
   // vertex fit
   for (int i = 0; i < m_TrackCount; i++)
@@ -605,18 +608,18 @@ kinkVertexFitterKFit::makeCoreMatrix() {
     double S, U;
     double sininv;
 
-    double px = m_al_1[i * KFitConst::kNumber6 + 0][0];
-    double py = m_al_1[i * KFitConst::kNumber6 + 1][0];
-    double pz = m_al_1[i * KFitConst::kNumber6 + 2][0];
-    double x  = m_al_1[i * KFitConst::kNumber6 + 3][0];
-    double y  = m_al_1[i * KFitConst::kNumber6 + 4][0];
-    double z  = m_al_1[i * KFitConst::kNumber6 + 5][0];
+    double px = m_al_1[i * kinkVertexFitterKFitConst::kNumber6 + 0][0];
+    double py = m_al_1[i * kinkVertexFitterKFitConst::kNumber6 + 1][0];
+    double pz = m_al_1[i * kinkVertexFitterKFitConst::kNumber6 + 2][0];
+    double x  = m_al_1[i * kinkVertexFitterKFitConst::kNumber6 + 3][0];
+    double y  = m_al_1[i * kinkVertexFitterKFitConst::kNumber6 + 4][0];
+    double z  = m_al_1[i * kinkVertexFitterKFitConst::kNumber6 + 5][0];
     double a  = m_property[i][2];
 
     double pt =  sqrt(px * px + py * py);
     if (pt == 0) {
-      m_ErrorCode = KFitError::kDivisionByZero;
-      KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+      m_ErrorCode = kinkVertexFitterKFitError::kDivisionByZero;
+      kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
       return m_ErrorCode;
     }
 
@@ -635,17 +638,17 @@ kinkVertexFitterKFit::makeCoreMatrix() {
 
       double B = a * a2 * invPt2;
       if (fabs(B) > 1) {
-        m_ErrorCode = KFitError::kCannotGetARCSIN;
-        B2DEBUG(10, "KFitError: Cannot calculate arcsin");
-        //KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+        m_ErrorCode = kinkVertexFitterKFitError::kCannotGetARCSIN;
+        B2DEBUG(10, "kinkVertexFitterKFitError: Cannot calculate arcsin");
+        //kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }
       // sin^(-1)(B)
       sininv = asin(B);
       double tmp0 = 1.0 - B * B;
       if (tmp0 == 0) {
-        m_ErrorCode = KFitError::kDivisionByZero;
-        KFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
+        m_ErrorCode = kinkVertexFitterKFitError::kDivisionByZero;
+        kinkVertexFitterKFitError::displayError(__FILE__, __LINE__, __func__, m_ErrorCode);
         return m_ErrorCode;
       }
       // 1/sqrt(1-B^2)
@@ -665,18 +668,18 @@ kinkVertexFitterKFit::makeCoreMatrix() {
     m_d[i * 2 + 1][0] = U * pt;
 
     // D
-    m_D[i * 2 + 0][i * KFitConst::kNumber6 + 0] =  dly;
-    m_D[i * 2 + 0][i * KFitConst::kNumber6 + 1] = -dlx;
-    m_D[i * 2 + 0][i * KFitConst::kNumber6 + 2] =  0.0;
-    m_D[i * 2 + 0][i * KFitConst::kNumber6 + 3] =  py + a * dlx;
-    m_D[i * 2 + 0][i * KFitConst::kNumber6 + 4] = -px + a * dly;
-    m_D[i * 2 + 0][i * KFitConst::kNumber6 + 5] =  0.0;
-    m_D[i * 2 + 1][i * KFitConst::kNumber6 + 0] = -pz * pt * S * Rx + U * px * invPt;
-    m_D[i * 2 + 1][i * KFitConst::kNumber6 + 1] = -pz * pt * S * Ry + U * py * invPt;
-    m_D[i * 2 + 1][i * KFitConst::kNumber6 + 2] = a != 0 ? -sininv * pt / a : -a2 * invPt;
-    m_D[i * 2 + 1][i * KFitConst::kNumber6 + 3] =  px * pz * pt * S;
-    m_D[i * 2 + 1][i * KFitConst::kNumber6 + 4] =  py * pz * pt * S;
-    m_D[i * 2 + 1][i * KFitConst::kNumber6 + 5] = -pt;
+    m_D[i * 2 + 0][i * kinkVertexFitterKFitConst::kNumber6 + 0] =  dly;
+    m_D[i * 2 + 0][i * kinkVertexFitterKFitConst::kNumber6 + 1] = -dlx;
+    m_D[i * 2 + 0][i * kinkVertexFitterKFitConst::kNumber6 + 2] =  0.0;
+    m_D[i * 2 + 0][i * kinkVertexFitterKFitConst::kNumber6 + 3] =  py + a * dlx;
+    m_D[i * 2 + 0][i * kinkVertexFitterKFitConst::kNumber6 + 4] = -px + a * dly;
+    m_D[i * 2 + 0][i * kinkVertexFitterKFitConst::kNumber6 + 5] =  0.0;
+    m_D[i * 2 + 1][i * kinkVertexFitterKFitConst::kNumber6 + 0] = -pz * pt * S * Rx + U * px * invPt;
+    m_D[i * 2 + 1][i * kinkVertexFitterKFitConst::kNumber6 + 1] = -pz * pt * S * Ry + U * py * invPt;
+    m_D[i * 2 + 1][i * kinkVertexFitterKFitConst::kNumber6 + 2] = a != 0 ? -sininv * pt / a : -a2 * invPt;
+    m_D[i * 2 + 1][i * kinkVertexFitterKFitConst::kNumber6 + 3] =  px * pz * pt * S;
+    m_D[i * 2 + 1][i * kinkVertexFitterKFitConst::kNumber6 + 4] =  py * pz * pt * S;
+    m_D[i * 2 + 1][i * kinkVertexFitterKFitConst::kNumber6 + 5] = -pt;
 
     // E
     m_E[i * 2 + 0][0] = -py - a * dlx;
@@ -687,19 +690,19 @@ kinkVertexFitterKFit::makeCoreMatrix() {
     m_E[i * 2 + 1][2] =  pt;
   }
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
 
-enum KFitError::ECode
+enum kinkVertexFitterKFitError::ECode
 kinkVertexFitterKFit::calculateNDF() {
   if (m_FlagKnownVertex) m_NDF = 2 * m_TrackCount;
   else m_NDF = 2 * m_TrackCount - 3;
 
-  return m_ErrorCode = KFitError::kNoError;
+  return m_ErrorCode = kinkVertexFitterKFitError::kNoError;
 }
 
-/*enum KFitError::ECode kinkVertexFitterKFit::updateMother(Particle* mother)
+/*enum kinkVertexFitterKFitError::ECode kinkVertexFitterKFit::updateMother(Particle* mother)
 {
   MakeMotherKFit kmm;
   kmm.setMagneticField(m_MagneticField);
@@ -715,7 +718,7 @@ kinkVertexFitterKFit::calculateNDF() {
   kmm.setVertex(getVertex());
   kmm.setVertexError(getVertexError());
   m_ErrorCode = kmm.doMake();
-  if (m_ErrorCode != KFitError::kNoError)
+  if (m_ErrorCode != kinkVertexFitterKFitError::kNoError)
     return m_ErrorCode;
   double chi2 = getCHIsq();
   int ndf = getNDF();
@@ -735,6 +738,6 @@ kinkVertexFitterKFit::calculateNDF() {
     CLHEPToROOT::getXYZVector(kmm.getMotherPosition()),
     CLHEPToROOT::getTMatrixFSym(kmm.getMotherError()),
     prob);
-  m_ErrorCode = KFitError::kNoError;
+  m_ErrorCode = kinkVertexFitterKFitError::kNoError;
   return m_ErrorCode;
 }*/

@@ -18,9 +18,9 @@
 namespace Belle2 {
 
   /**
-   * KFitError is a container of error codes and a macro function.
+   * kinkVertexFitterKFitError is a container of error codes and a macro function.
    */
-  class KFitError {
+  class kinkVertexFitterKFitError {
   public:
     /**
      * ECode is a error code enumerate.

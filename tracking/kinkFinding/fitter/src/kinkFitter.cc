@@ -81,10 +81,16 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
 
 void kinkFitter::setFitterMode(int fitterMode)
 {
-  if (not(0 <= fitterMode && fitterMode <= 3)) {
+  if (not(0 <= fitterMode && fitterMode <= 7)) {
     B2FATAL("Invalid fitter mode!");
   } else {
     m_kinkFitterMode = fitterMode;
+    // filling bits of the fitter mode
+    m_kinkFitterModeHitsReassignment = fitterMode & 1;
+    fitterMode >>= 1;
+    m_kinkFitterModeFlipAndRefit = fitterMode & 1;
+    fitterMode >>= 1;
+    m_kinkFitterModeCombineAndFit = fitterMode & 1;
   }
 }
 
@@ -473,6 +479,50 @@ bool kinkFitter::isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, TVecto
                daughterHelixClosestToMotherPosLast.getZ0() * daughterHelixClosestToMotherPosLast.getZ0()) < 10);
 }
 
+/// combine daughter and mother tracks and fit the result to check for clones
+int kinkFitter::combineTracksAndFit(const Track* trackMother, const Track* trackDaughter)
+{
+  RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
+  RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
+
+  // create a combined track by reassigning all daughter track hits to mother track
+  RecoTrack* recoTrackCombinedRefit = copyRecoTrackAndReassignCDCHits(recoTrackMother,
+                                      recoTrackDaughter, true, -recoTrackDaughter->getNumberOfCDCHits());
+
+  // fitter initialization
+  TrackFitter trackFitter;
+  // fit the new track
+  trackFitter.fit(*recoTrackCombinedRefit);
+
+  // return 99 if the track fit failed
+  if (!recoTrackCombinedRefit->wasFitSuccessful()) {
+    B2DEBUG(29, "Refit of the combined track failed ");
+    return 19;
+  }
+
+  // fit results of daughter, mother, and new combined tracks
+  const genfit::FitStatus* motherTrackFitStatus = recoTrackMother->getTrackFitStatus();
+  const genfit::FitStatus* daughterTrackFitStatus = recoTrackDaughter->getTrackFitStatus();
+  const genfit::FitStatus* combinedTrackFitStatus = recoTrackCombinedRefit->getTrackFitStatus();
+
+  B2DEBUG(29, "Initial mother fit result " << motherTrackFitStatus->getPVal() << " " << motherTrackFitStatus->getNdf());
+  B2DEBUG(29, "Initial daughter fit result " << daughterTrackFitStatus->getPVal() << " "
+          << daughterTrackFitStatus->getNdf());
+  B2DEBUG(29, "Combined track fit result " << combinedTrackFitStatus->getPVal() << " " << combinedTrackFitStatus->getNdf());
+
+  // return 98 if the combined track has NDF less than mother track
+  if (combinedTrackFitStatus->getNdf() < motherTrackFitStatus->getNdf())
+    return 18;
+
+  // filling bits according to the fit result of the combined track
+  int motherFlag = (combinedTrackFitStatus->getPVal() > motherTrackFitStatus->getPVal());
+  int daughterFlag = 2 * (combinedTrackFitStatus->getPVal() > daughterTrackFitStatus->getPVal());
+  int daughterNdfFlag = 4 * (combinedTrackFitStatus->getNdf() > daughterTrackFitStatus->getNdf());
+  int pValueFlag = 8 * (combinedTrackFitStatus->getPVal() > 0.0000001);
+
+  return motherFlag + daughterFlag + daughterNdfFlag + pValueFlag;
+}
+
 /// Fit and store kink.
 /// If the fitterMode requires, tries to reassign hits between daughter and mother tracks.
 /// If the fitterMode requires, tries to flip and refit the tracks.
@@ -629,7 +679,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   m_daughterKinkRecoTrackCache = recoTrackDaughter;
 
   // if the corresponding fitterMode is used, try to reassign hits between mother and daughter tracks
-  if ((m_kinkFitterMode % 2 == 1) && (filterFlag == 1 || filterFlag == 4) && (reassignHitStatus != 0)) {
+  if (m_kinkFitterModeHitsReassignment && (filterFlag == 1 || filterFlag == 4) && (reassignHitStatus != 0)) {
     B2DEBUG(29, "Start of the hits reassignment for filter " << filterFlag);
 
     // initialize counter for reassigning tries
@@ -738,7 +788,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   }
 
   // if the corresponding fitterMode is used, try to flip the daughter track from filter 2 and refit it
-  if ((m_kinkFitterMode == 2 || m_kinkFitterMode == 3) && (filterFlag == 2)) {
+  if (m_kinkFitterModeFlipAndRefit && (filterFlag == 2)) {
     B2DEBUG(29, "Try to flip and refit filter " << filterFlag);
 
     // variables to store temporary values
@@ -857,6 +907,16 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     }
   } else {
     filterFlag += 32 * 1000;
+  }
+
+  // try to combine tracks and fit them to find clones. The result is written to filter flag
+  if (m_kinkFitterModeCombineAndFit) {
+    int combinedFitFlag = combineTracksAndFit(trackMother, trackDaughter);
+    if (filterFlag >= 0) {
+      filterFlag += combinedFitFlag * 10;
+    } else {
+      filterFlag -= combinedFitFlag * 10;
+    }
   }
 
   // save the kink to the StoreArray

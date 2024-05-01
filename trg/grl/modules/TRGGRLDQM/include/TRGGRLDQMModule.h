@@ -12,6 +12,8 @@
 #include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 class TH1I;
 class TH1F;
@@ -149,6 +151,8 @@ namespace Belle2 {
     //! Array to access the event time information from the trigger and FTSW
     StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
 
+    //! DB pointerto access the hardware clock information
+    DBObjPtr<HardwareClockSettings> m_hwclkdb;
   };
 
 }

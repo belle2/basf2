@@ -114,6 +114,7 @@ namespace Belle2 {
     //! Array to access the FTSW information
     StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
 
+    //! DB pointerto access the hardware clock information
     DBObjPtr<HardwareClockSettings> m_hwclkdb;
   };
 

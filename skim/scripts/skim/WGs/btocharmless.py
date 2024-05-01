@@ -77,7 +77,7 @@ class BtoPi0Eta(BaseSkim):
     Cuts applied:
 
     * ``5.20 < Mbc < 5.29``
-    * ``abs(deltaE) < 0.45``
+    * ``abs(deltaE) < 0.5``
 
     """
     __authors__ = ["Longke Li", "Yinghui Guan"]
@@ -97,7 +97,7 @@ class BtoPi0Eta(BaseSkim):
         loadStdSkimHighEffEtaPrime(path=path)
 
     def build_lists(self, path):
-        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.45'
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
         BsigList = []
         ma.reconstructDecay('B0:Pi0Eta -> pi0:charmlessFit eta:SkimHighEff', Bcuts, path=path)
         ma.reconstructDecay('B0:Pi0Etap -> pi0:charmlessFit eta\':SkimHighEff', Bcuts, path=path)

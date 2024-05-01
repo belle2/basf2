@@ -55,7 +55,7 @@ namespace Belle2 {
     ~ARICHReconstruction() {};
 
     /**
-     * Read geomerty parameters from xml and initialize class members.
+     * Read geometry parameters from xml and initialize class members.
      */
     void initialize();
 
@@ -113,7 +113,7 @@ namespace Belle2 {
     OptionalDBObjPtr<ARICHAeroTilesAlignment> m_tileAlign; /**< alignment of aerogel tiles from DB */
 
     std::vector<ROOT::Math::XYZVector > m_mirrorPoints; /**< vector of points on all mirror plates */
-    std::vector<ROOT::Math::XYZVector > m_mirrorNorms;  /**< vector of nomal vectors of all mirror plates */
+    std::vector<ROOT::Math::XYZVector > m_mirrorNorms;  /**< vector of normal vectors of all mirror plates */
 
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */
@@ -122,12 +122,12 @@ namespace Belle2 {
     unsigned int m_nAerogelLayers; /**< number of aerogel layers */
     double  m_refractiveInd[c_noOfAerogels]; /**< refractive indices of aerogel layers */
     double  m_zaero[c_noOfAerogels]; /**< z-positions of aerogel layers */
-    double  m_thickness[c_noOfAerogels]; /**< thicknesses of areogel layers */
+    double  m_thickness[c_noOfAerogels]; /**< thicknesses of aerogel layers */
     double  m_transmissionLen[c_noOfAerogels]; /**< transmission lengths of aerogel layers */
-    double  m_n0[c_noOfAerogels];  /**< number of emmited photons per unit length */
-    ROOT::Math::XYZVector m_anorm[c_noOfAerogels]; /**< normal vector of the aerogle plane */
+    double  m_n0[c_noOfAerogels];  /**< number of emitted photons per unit length */
+    ROOT::Math::XYZVector m_anorm[c_noOfAerogels]; /**< normal vector of the aerogel plane */
     int m_storePhot; /**< set to 1 to store individual reconstructed photon information */
-    double m_tilePars[124][2] = {{0}};
+    double m_tilePars[124][2] = {{0}}; /**< array of tile parameters */
 
     /**
      * Returns 1 if vector "a" lies on "copyno"-th detector active surface

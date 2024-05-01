@@ -43,7 +43,9 @@ namespace Belle2 {
                           const std::vector<std::string>& inputFilesAsicTxt, const std::vector<std::string>& inputFilesHapdQE,
                           const std::vector<std::string>& inputFilesFebTest);
 
-
+    /**
+     * Constructor from experiment and run number
+     */
     ARICHDatabaseImporter(int experiment, int run);
 
 
@@ -52,8 +54,14 @@ namespace Belle2 {
      */
     virtual ~ARICHDatabaseImporter() {};
 
+    /**
+     * Set Interval of Validity
+     */
     void SetIOV(int experimentLow, int runLow, int experimentHigh, int runHigh);
 
+    /**
+     * Set experiment and run number
+     */
     void setExperimentAndRun(int experiment, int run);
 
     // classes used in simulation/reconstruction software

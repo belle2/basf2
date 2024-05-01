@@ -243,8 +243,21 @@ namespace Belle2 {
      */
     unsigned getSlotRing(unsigned slotID) const;
 
+    /**
+     * Get slot ID based on x-y coordinates
+     * @param x x-coordinate of point
+     * @param y y-coordinate of point
+     * @return slot ID matching x-y coordinates
+     */
     unsigned pointSlotID(double x, double y) const;
 
+    /**
+     * Get slot ID based on sector, ring, and azimuth
+     * @param sector sector
+     * @param ring ring
+     * @param azimuth azimuth
+     * @return slot ID matching sector, ring, and azimuth
+     */
     unsigned getSlotIDFromSRF(unsigned sector, unsigned ring, unsigned azimuth) const;
 
   private:

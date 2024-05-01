@@ -93,8 +93,8 @@ namespace Belle2 {
 
   protected:
 
-    TLine lines[6];
-    TText labels[6];
+    TLine lines[6]; /**< array of lines */
+    TText labels[6]; /**< array of labels */
     int m_type = 0; /**< histogram type */
     std::vector<unsigned> m_hapd2binMap; /**< map of bins*/
     ClassDefOverride(ARICHChannelHist, 2); /**< ClassDef */

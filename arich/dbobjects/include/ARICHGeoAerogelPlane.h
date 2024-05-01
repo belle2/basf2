@@ -610,8 +610,8 @@ namespace Belle2 {
     unsigned m_dPhiSize = 0;       /**< size of m_dPhi vector */
     unsigned m_nLayers = 0;        /**< number of aerogel tile layers */
 
-    bool m_simple = 0;
-    std::vector<double> m_simpleParams;
+    bool m_simple = 0;             /**< switch to simple mode */
+    std::vector<double> m_simpleParams; /**< vector of simple parameters */
 
     int m_fullAerogelMaterialDescriptionKey =
       0; /**< Full aerogel material description key : 1 - use material explicitly for each aerogel tile, 0 - use two types of aerogel material */

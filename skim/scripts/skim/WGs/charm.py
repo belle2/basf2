@@ -1316,6 +1316,60 @@ class XicpTopHpJm(BaseSkim):
 
 
 @fancy_skim_header
+class XicpToLKsHp(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`\\Xi_c^+ \\to Lambda K_S^0 \\pi^+ `
+        * :math:`\\Xi_c^+ \\to Lambda K_S^0 K^+`
+        * :math:`\\Xi_c^+ \\to \\Xi^- \\pi^+ \\pi^+`
+        * :math:`\\Xi_c^+ \\to \\Xi^- \\pi^+ K^+`
+
+    **Selection Criteria**:
+        * Use tracks from the charm_skim_std_charged
+        * ``2.35 < M(Xi_c) < 2.59, pcms(Xi_c) > 2.0``
+
+    """
+
+    __authors__ = ["Suravinda Kospalage"]
+    __description__ = "Skim list for Xi_c+ decaying to Lambda Ks h+, Xi- pi+ h+."
+    __contact__ = __liaison__
+    __category__ = "physics, charm, cascade"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        charm_skim_std_charged('pi', path=path)
+        charm_skim_std_charged('K', path=path)
+        stdLambdas(path=path)
+        stdKshorts(path=path)
+
+    def build_lists(self, path):
+        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
+
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('Lambda0:charmSkim', 'Lambda0:merged', '1.10 < M < 1.13 and daughter(0,trinaryID) > 0.2', path=path)
+        ma.reconstructDecay("Xi-:Lambda0pi -> Lambda0:charmSkim pi-:all", cut="1.295 < M < 1.35", path=path)
+        ma.cutAndCopyList('K_S0:charmSkim', 'K_S0:merged', '0.46 < M < 0.54', path=path)
+
+        XicCuts = "2.35 < M < 2.59 and useCMSFrame(p) > 2.0"
+        XicChannels = ["Lambda0:charmSkim K_S0:charmSkim pi+:charmSkim_pid",
+                       "Lambda0:charmSkim K_S0:charmSkim K+:charmSkim_pid",
+                       "Xi-:Lambda0pi pi+:charmSkim_pid pi+:charmSkim_pid",
+                       "Xi-:Lambda0pi pi+:charmSkim_pid K+:charmSkim_pid"
+                       ]
+
+        XicList = []
+        for chID, channel in enumerate(XicChannels):
+            ma.reconstructDecay("Xi_c+:LKsHp" + str(chID) + " -> " + channel, XicCuts, chID, path=path)
+            XicList.append("Xi_c+:LKsHp" + str(chID))
+
+        return XicList
+
+
+@fancy_skim_header
 class XictoXimpippim(BaseSkim):
     """
     **Decay Modes**

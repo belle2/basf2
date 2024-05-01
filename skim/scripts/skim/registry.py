@@ -137,6 +137,7 @@ _RegisteredSkims = [
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
     ("17231100", "charm", "XictoXimpippim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
     ("17231200", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
+    ("17231300", "charm", "XicpToLKsHp"),  # Xi_c+ -> Lambda Ks h+, Xi- pi+ h+
     # D* -> D0
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)

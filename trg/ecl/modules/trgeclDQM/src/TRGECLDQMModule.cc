@@ -368,6 +368,9 @@ void TRGECLDQMModule::event()
   diff = m_trgTime->getTimeSinceLastInjectionInMicroSeconds() / 1000.;
   isHER = m_trgTime->isHER();
 
+  h_n_TChit_event -> Fill(NofTCHit);
+  h_nTChit_injtime->Fill(NofTCHit, diff);
+
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {
     h_TCId -> Fill(TCId[ihit]);
     h_TCthetaId -> Fill(a -> getTCThetaIdFromTCId(TCId[ihit]));
@@ -391,35 +394,32 @@ void TRGECLDQMModule::event()
     }
 
     totalEnergy += TCEnergy[ihit];
-    h_n_TChit_event -> Fill(NofTCHit);
-    h_nTChit_injtime->Fill(NofTCHit, diff);
     double timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
     if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);
+  }
 
+  const double revotime_in_us = 5.120 / m_hwclkdb->getAcceleratorRF();
+  int quotient;
+  double running_in_us, diff_in_us;
 
-    const double revotime_in_us = 5.120 / m_hwclkdb->getAcceleratorRF();
-    int quotient;
-    double running_in_us, diff_in_us;
+  diff_in_us = diff * 1000.;
+  quotient = diff_in_us / revotime_in_us;
+  running_in_us = diff_in_us - quotient * revotime_in_us;
 
-    diff_in_us = diff * 1000.;
-    quotient = diff_in_us / revotime_in_us;
-    running_in_us = diff_in_us - quotient * revotime_in_us;
+  bool cond_clean, cond_injHER, cond_injLER;
 
-    bool cond_clean, cond_injHER, cond_injLER;
+  cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff && diff < 70);
 
-    cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff && diff < 70);
+  cond_injHER =  isHER && ((diff < 0.5) || ((diff < 20) && (2 < running_in_us && running_in_us < 3)));
+  cond_injLER = !isHER && ((diff < 0.5) || ((diff < 20) && (1 < running_in_us && running_in_us < 2)));
 
-    cond_injHER =  isHER && ((diff < 0.5) || ((diff < 20) && (1 < running_in_us && running_in_us < 2)));
-    cond_injLER = !isHER && ((diff < 0.5) || ((diff < 20) && (2 < running_in_us && running_in_us < 3)));
-
-    if (cond_clean) {
-      h_n_TChit_clean->Fill(NofTCHit);
-    } else if (cond_injHER) {
-      h_n_TChit_injHER->Fill(NofTCHit);
-    } else if (cond_injLER) {
-      h_n_TChit_injLER->Fill(NofTCHit);
-    }
+  if (cond_clean) {
+    h_n_TChit_clean->Fill(NofTCHit);
+  } else if (cond_injHER) {
+    h_n_TChit_injHER->Fill(NofTCHit);
+  } else if (cond_injLER) {
+    h_n_TChit_injLER->Fill(NofTCHit);
   }
   double trgtiming = 8 * HitRevoTrg - (128 *     HitRevoEvtTiming + HitFineTiming);
 

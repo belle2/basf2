@@ -314,10 +314,10 @@ void TRGGRLDQMModule::event()
 
   int wcsum = 0, nowcnt;
 
-  const double revotime_in_us = 5120. / 508.;
+  const double revotime_in_us = 5.120 / m_hwclkdb->getAcceleratorRF();
 
   double diff_in_ms, diff_in_us;
-  diff_in_us = m_trgTime->getTimeSinceLastInjection() / 127.;
+  diff_in_us = m_trgTime->getTimeSinceLastInjectionInMicroSeconds();
   diff_in_ms = diff_in_us / 1000.;
 
   nowcnt = evtinfo->get_wirecnt_tsf0();
@@ -367,8 +367,8 @@ void TRGGRLDQMModule::event()
 
   cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff_in_ms && diff_in_ms < 70);
 
-  cond_injHER =  m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (1 < running_in_us && running_in_us < 2)));
-  cond_injLER = !m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (2 < running_in_us && running_in_us < 3)));
+  cond_injHER =  m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (2 < running_in_us && running_in_us < 3)));
+  cond_injLER = !m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (1 < running_in_us && running_in_us < 2)));
 
   if (cond_clean) {
     h_wcsum_clean->Fill(wcsum);

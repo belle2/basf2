@@ -1060,12 +1060,12 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   double ratio_hadron_bhabha = 0.;
   //pull
   double ratio_pull_hadBhabha = -10.;
-  double ratio_reference = 0.206;
   double error_ratio = -10.;
 
   if (bh_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
     //pull
+    double ratio_reference = 0.206;
     error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
     ratio_pull_hadBhabha = (ratio_hadron_bhabha - ratio_reference) / error_ratio;
   }

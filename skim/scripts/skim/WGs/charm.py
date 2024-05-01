@@ -1347,6 +1347,7 @@ class XicpToLKsHp(BaseSkim):
 
     def build_lists(self, path):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
 
         ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)

@@ -1319,7 +1319,7 @@ class XicpTopHpJm(BaseSkim):
 class XicpToLKsHp(BaseSkim):
     """
     **Decay Modes**:
-        * :math:`\\Xi_c^+ \\to Lambda K_S^0 \\pi^+ `
+        * :math:`\\Xi_c^+ \\to Lambda K_S^0 \\pi^+`
         * :math:`\\Xi_c^+ \\to Lambda K_S^0 K^+`
         * :math:`\\Xi_c^+ \\to \\Xi^- \\pi^+ \\pi^+`
         * :math:`\\Xi_c^+ \\to \\Xi^- \\pi^+ K^+`
@@ -1330,10 +1330,10 @@ class XicpToLKsHp(BaseSkim):
 
     """
 
-    __authors__ = ["Suravinda Kospalage"]
+    __authors__ = ["Longke Li"]
     __description__ = "Skim list for Xi_c+ decaying to Lambda Ks h+, Xi- pi+ h+."
     __contact__ = __liaison__
-    __category__ = "physics, charm, cascade"
+    __category__ = "physics, charm, Xi_c"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True

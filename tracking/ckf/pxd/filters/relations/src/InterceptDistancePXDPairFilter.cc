@@ -32,8 +32,13 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
 
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD / CDC-SVD track, so we can use its position to only look for matching ladders
-    const RecoTrack* recoTrack = fromState.getSeed();
-    const auto& relatedIntercepts = recoTrack->getRelationsTo<PXDIntercept>("");
+    const RecoTrack* seedRecoTrack = fromState.getSeed();
+    const auto& relatedIntercepts = seedRecoTrack->getRelationsTo<PXDIntercept>(m_param_PXDInterceptsName);
+
+    // Don't accept relation of no intercept was created for a RecoTrack
+    if (relatedIntercepts.size() == 0) {
+      return NAN;
+    }
 
     for (const auto& intercept : relatedIntercepts) {
       const VxdID& fromStateSensorID(intercept.getSensorID());
@@ -92,4 +97,6 @@ void InterceptDistancePXDPairFilter::exposeParameters(ModuleParamList* modulePar
                                 "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitCut,
                                 "Cut in theta between two hit-based states.", m_param_ThetaHitHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "PXDInterceptsName"), m_param_PXDInterceptsName,
+                                "Name of the PXDIntercepts StoreArray.", m_param_PXDInterceptsName);
 }

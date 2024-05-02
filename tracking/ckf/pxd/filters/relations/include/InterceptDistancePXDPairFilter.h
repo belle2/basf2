@@ -28,5 +28,7 @@ namespace Belle2 {
     double m_param_PhiHitHitCut = 0.2;
     /// Filter potential relations in theta between hit states
     double m_param_ThetaHitHitCut = 0.2;
+    /// Name of the PXDIntercepts StoreArray
+    std::string m_param_PXDInterceptsName = "PXDIntercepts";
   };
 }

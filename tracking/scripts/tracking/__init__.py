@@ -374,7 +374,7 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
     if not skip_geometry_adding:
         add_geometry_modules(path, components)
 
-    add_hit_preparation_modules(path, components=components)
+    add_hit_preparation_modules(path, components=components, create_intercepts_for_pxd_ckf=False)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:

@@ -46,6 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False,
+                                create_intercepts_for_pxd_ckf=True,
                                 append_full_grid_cdc_eventt0=True,
                                 v0_finding=True, flip_recoTrack=True,
                                 skip_full_grid_cdc_eventt0_if_svd_time_present=True):
@@ -117,6 +118,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         (Both other QIs needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param v0_finding: if false, the V0Finder module is not executed
@@ -145,6 +149,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_vxdTrack_QI=add_vxdTrack_QI,
         add_recoTrack_QI=add_recoTrack_QI,
         pxd_filtering_offline=pxd_filtering_offline,
+        create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
@@ -167,6 +172,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                           pxd_filtering_offline=False,
+                                          create_intercepts_for_pxd_ckf=True,
                                           append_full_grid_cdc_eventt0=True,
                                           skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
@@ -204,6 +210,9 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         (Both other QIs needed as input.)
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
@@ -231,7 +240,10 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
         add_geometry_modules(path, components=components)
 
     if not skipHitPreparerAdding:
-        add_hit_preparation_modules(path, components=components, pxd_filtering_offline=pxd_filtering_offline)
+        add_hit_preparation_modules(path,
+                                    components=components,
+                                    pxd_filtering_offline=pxd_filtering_offline,
+                                    create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf)
 
     # Material effects for all track extrapolations
     if 'SetupGenfitExtrapolation' not in path:
@@ -250,7 +262,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                           use_ecl_to_cdc_ckf=use_ecl_to_cdc_ckf,
                           add_cdcTrack_QI=add_cdcTrack_QI,
                           add_vxdTrack_QI=add_vxdTrack_QI,
-                          pxd_filtering_offline=pxd_filtering_offline)
+                          pxd_filtering_offline=pxd_filtering_offline,
+                          create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf)
 
     # Only run the track time extraction on the full reconstruction chain for now. Later, we may
     # consider to do the CDC-hit based method already during the fast reconstruction stage
@@ -407,7 +420,8 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       svd_standalone_mode="VXDTF2",
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
-                      pxd_filtering_offline=False, use_HLT_ROIs=False):
+                      pxd_filtering_offline=False, use_HLT_ROIs=False,
+                      create_intercepts_for_pxd_ckf=True):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to
@@ -434,6 +448,9 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
     :param use_HLT_ROIs: Don't calculate the ROIs here but use the ones from the HLT (does obviously not work for simulation)
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -507,14 +524,22 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         latest_reco_tracks = combined_ecl_reco_tracks
 
     if is_pxd_used(components):
-        if pxd_filtering_offline:
+        """
+        In case we want to use offline PXD hit filtering ('pxd_filtering_offline == True'), we can decide to either use ROIs
+        created by HLT ('use_HLT_ROIs == True') or to create ROIs on the fly ('use_HLT_ROIs == False').
+        In addition, we can also just run the ROI finder to create PXDIntercepts ('create_intercepts_for_pxd_ckf == True')
+        that can be used in the ToPXDCKF relation filters to reduce the number of relations that are created. In this case
+        there is no need to apply the ROI filtering.
+        """
+        if pxd_filtering_offline or create_intercepts_for_pxd_ckf:
             roiName = "ROIs"
-            if not use_HLT_ROIs:
+            if not use_HLT_ROIs or create_intercepts_for_pxd_ckf:
                 path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
 
                 roiName = "ROIs_offline"
                 add_roiFinder(path, reco_tracks=latest_reco_tracks, roiName=roiName)
 
+        if pxd_filtering_offline:
             pxd_digifilter = b2.register_module('PXDdigiFilter')
             pxd_digifilter.param('ROIidsName', roiName)
             pxd_digifilter.param('PXDDigitsName', 'PXDDigits')
@@ -523,6 +548,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
             pxd_digifilter.param('usePXDDataReduction', True)
             path.add_module(pxd_digifilter)
 
+        if pxd_filtering_offline or create_intercepts_for_pxd_ckf:
             add_pxd_reconstruction(path)
 
         add_pxd_track_finding(path, components=components, input_reco_tracks=latest_reco_tracks,

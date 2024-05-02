@@ -77,7 +77,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False, append_full_grid_cdc_eventt0=True,
+                       pxd_filtering_offline=False,
+                       create_intercepts_for_pxd_ckf=True,
+                       append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
@@ -119,6 +121,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
@@ -150,6 +155,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  reconstruct_cdst=reconstruct_cdst,
                                  event_abort=event_abort,
                                  pxd_filtering_offline=pxd_filtering_offline,
+                                 create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
@@ -181,6 +187,7 @@ def add_prefilter_reconstruction(path,
                                  reconstruct_cdst=None,
                                  event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
+                                 create_intercepts_for_pxd_ckf=True,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
@@ -207,6 +214,9 @@ def add_prefilter_reconstruction(path,
         but just remove all data except for the event information.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
@@ -238,6 +248,7 @@ def add_prefilter_reconstruction(path,
         trackFitHypotheses=trackFitHypotheses,
         use_second_cdc_hits=use_second_cdc_hits,
         pxd_filtering_offline=pxd_filtering_offline,
+        create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 

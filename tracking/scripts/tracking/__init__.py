@@ -533,11 +533,16 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
         """
         if pxd_filtering_offline or create_intercepts_for_pxd_ckf:
             roiName = "ROIs"
+            intercepts_name = "PXDIntercepts"
             if not use_HLT_ROIs or create_intercepts_for_pxd_ckf:
                 path.add_module("DAFRecoFitter", recoTracksStoreArrayName=latest_reco_tracks)
 
                 roiName = "ROIs_offline"
-                add_roiFinder(path, reco_tracks=latest_reco_tracks, roiName=roiName)
+                intercepts_name = "CKF" + intercepts_name
+                add_roiFinder(path,
+                              reco_tracks=latest_reco_tracks,
+                              intercepts_name=intercepts_name,
+                              roiName=roiName)
 
         if pxd_filtering_offline:
             pxd_digifilter = b2.register_module('PXDdigiFilter')
@@ -662,7 +667,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components, svd_cluster='
     path.add_module(dafRecoFitter)
 
 
-def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
+def add_roiFinder(path, reco_tracks="RecoTracks", intercepts_name="PXDIntercepts", roiName="ROIs"):
     """
     Add the ROI finding to the path creating ROIs out of reco tracks by extrapolating them to the PXD volume.
     :param path: Where to add the module to.
@@ -673,7 +678,7 @@ def add_roiFinder(path, reco_tracks="RecoTracks", roiName="ROIs"):
     pxdDataRed = b2.register_module('PXDROIFinder')
     param_pxdDataRed = {
         'recoTrackListName': reco_tracks,
-        'PXDInterceptListName': 'PXDIntercepts',
+        'PXDInterceptListName': intercepts_name,
         'ROIListName': roiName,
     }
     pxdDataRed.param(param_pxdDataRed)

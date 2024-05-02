@@ -1338,6 +1338,11 @@ class XicpToLKsHp(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
+    def additional_setup(self, path):
+        if self.analysisGlobaltag is None:
+            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> Lambda Ks h+, Xi- pi+ h+.")
+        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
+
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         charm_skim_std_charged('pi', path=path)
@@ -1352,8 +1357,8 @@ class XicpToLKsHp(BaseSkim):
         ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
         ma.cutAndCopyList('Lambda0:charmSkim', 'Lambda0:merged', '1.10 < M < 1.13 and daughter(0,trinaryID) > 0.2', path=path)
-        ma.reconstructDecay("Xi-:Lambda0pi -> Lambda0:charmSkim pi-:all", cut="1.295 < M < 1.35", path=path)
         ma.cutAndCopyList('K_S0:charmSkim', 'K_S0:merged', '0.46 < M < 0.54', path=path)
+        ma.reconstructDecay("Xi-:Lambda0pi -> Lambda0:charmSkim pi-:all", cut="1.295 < M < 1.35", path=path)
 
         XicCuts = "2.35 < M < 2.59 and useCMSFrame(p) > 2.0"
         XicChannels = ["Lambda0:charmSkim K_S0:charmSkim pi+:charmSkim_pid",

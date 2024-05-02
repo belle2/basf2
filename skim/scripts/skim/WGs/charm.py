@@ -1323,6 +1323,7 @@ class XicpToLKsHp(BaseSkim):
         * :math:`\\Xi_c^+ \\to Lambda K_S^0 K^+`
         * :math:`\\Xi_c^+ \\to \\Xi^- \\pi^+ \\pi^+`
         * :math:`\\Xi_c^+ \\to \\Xi^- \\pi^+ K^+`
+        * :math:`\\Xi_c^+ \\to \\Omega^- \\pi^+ K^+`
 
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
@@ -1331,7 +1332,7 @@ class XicpToLKsHp(BaseSkim):
     """
 
     __authors__ = ["Longke Li"]
-    __description__ = "Skim list for Xi_c+ decaying to Lambda Ks h+, Xi- pi+ h+."
+    __description__ = "Skim list for Xi_c+ decaying to Lambda Ks h+, Xi- pi+ h+, Omega- pi+ K+."
     __contact__ = __liaison__
     __category__ = "physics, charm, Xi_c"
 
@@ -1340,11 +1341,12 @@ class XicpToLKsHp(BaseSkim):
 
     def additional_setup(self, path):
         if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> Lambda Ks h+, Xi- pi+ h+.")
+            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> Lambda Ks h+, Xi- pi+ h+, Omega- pi+ K+.")
         b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
+        stdK("all", path=path)
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         stdLambdas(path=path)
@@ -1358,13 +1360,15 @@ class XicpToLKsHp(BaseSkim):
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
         ma.cutAndCopyList('Lambda0:charmSkim', 'Lambda0:merged', '1.10 < M < 1.13 and daughter(0,trinaryID) > 0.2', path=path)
         ma.cutAndCopyList('K_S0:charmSkim', 'K_S0:merged', '0.46 < M < 0.54', path=path)
-        ma.reconstructDecay("Xi-:Lambda0pi -> Lambda0:charmSkim pi-:all", cut="1.295 < M < 1.35", path=path)
+        ma.reconstructDecay("Xi-:LamPi -> Lambda0:charmSkim pi-:all", cut="1.295 < M < 1.35", path=path)
+        ma.reconstructDecay("Omega-:LamK -> Lambda0:charmSkim K-:all", cut="1.622 < M < 1.722", path=path)
 
         XicCuts = "2.35 < M < 2.59 and useCMSFrame(p) > 2.0"
         XicChannels = ["Lambda0:charmSkim K_S0:charmSkim pi+:charmSkim_pid",
                        "Lambda0:charmSkim K_S0:charmSkim K+:charmSkim_pid",
-                       "Xi-:Lambda0pi pi+:charmSkim_pid pi+:charmSkim_pid",
-                       "Xi-:Lambda0pi pi+:charmSkim_pid K+:charmSkim_pid"
+                       "Xi-:LamPi pi+:charmSkim_pid pi+:charmSkim_pid",
+                       "Xi-:LamPi pi+:charmSkim_pid K+:charmSkim_pid",
+                       "Omega-:LamK pi+:charmSkim_pid K+:charmSkim_pid"
                        ]
 
         XicList = []

@@ -9,6 +9,7 @@
 #include <tracking/ckf/pxd/filters/relations/SensorPXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/AngularDistancePXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/LoosePXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/InterceptDistancePXDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -44,6 +45,7 @@ std::map<std::string, std::string> PXDPairFilterFactory::getValidFilterNamesAndD
     {"sensor", "use sensor/ladder information"},
     {"angulardistance", "based on the angular distance of the hit positions"},
     {"loose", "loose prefilter"},
+    {"intercept", "intercept filter"},
   };
 }
 
@@ -70,6 +72,10 @@ PXDPairFilterFactory::create(const std::string& filterName) const
 
   if (filterName == "loose") {
     return std::make_unique<LoosePXDPairFilter>();
+  }
+
+  if (filterName == "intercept") {
+    return std::make_unique<InterceptDistancePXDPairFilter>();
   }
 
   return Super::create(filterName);

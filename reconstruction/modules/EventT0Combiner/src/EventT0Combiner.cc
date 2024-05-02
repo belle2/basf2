@@ -28,6 +28,14 @@ void EventT0CombinerModule::event()
     return;
   }
 
+  // NOT checking for m_eventT0.hasEventT0() here, as this would only indicate that so far no EventT0 has been set.
+  // However, this does not mean that we can't set one from the temporary values.
+  // But of course nothing can be done if no temporary EventT0s are present.
+  if (m_eventT0->getTemporaryEventT0s().empty()) {
+    B2DEBUG(20, "No temporary EventT0s available, can't chose the best one.");
+    return;
+  }
+
   // We have an SVD based EventT0 and it currently is set as *THE* EventT0 -> nothing to do
   if (m_eventT0->isSVDEventT0()) {
     B2DEBUG(20, "EventT0 already based on SVD information, nothing to do.");

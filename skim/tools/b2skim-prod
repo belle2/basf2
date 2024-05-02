@@ -412,10 +412,9 @@ def get_output_directory(args, sampleRegistry):
         outputDirectory (pathlib.Path): The directory to write the JSON files into.
     """
     baseDirectory = get_base_directory(args)
-    DBGlobalTag = get_DBGlobalTag_argparse_wrapper(args.release, args.DBGlobalTagRelease)
     beamEnergy = get_beam_energy_from_registry(sampleRegistry)
 
-    return Path(baseDirectory, "skim", args.campaign, args.release, DBGlobalTag, beamEnergy)
+    return Path(baseDirectory, "skim", args.campaign, args.release, beamEnergy)
 
 
 def get_lpn_list(sampleInfo, mcri, mcrd):
@@ -568,151 +567,12 @@ def get_lpn_list(sampleInfo, mcri, mcrd):
 
 
 @lru_cache()
-def get_DBGlobalTag(releaseNumber, try_earlier=True):
-    """Query the conditions database for the global tag to be used with a release.
-    This function will look for global tags associated with all releases between
-    the given release and the latest major release prior to it.
 
-    * If only one global tag is used, then that is returned.
+def get_DBGlobalTag(inputDBGlobalTag):
+    if not str(inputDBGlobalTag).startswith("DB"):
+        inputDBGlobalTag = "DB" + str(inputDBGlobalTag).zfill(8)
+    return inputDBGlobalTag
 
-    * If more than one global tag is found, then the user ir prompted to select
-      the one they want to use.
-
-    * If no global tags are found, then an error is printed, and the script exits.
-
-    Args:
-        releaseNumber (str): The label of the release being used for the skims.
-        try_earlier (bool): Count back releases to last major release. If False, only
-            try the release passed, and return a ``RuntimeError`` if no associated
-            global tag is found.
-
-    Returns:
-        DBGlobalTag (str): the database global tag, in the format DBxxxxxxxx.
-    """
-    db = ConditionsDB()
-
-    print('rel:', releaseNumber)
-    
-    if releaseNumber == 'build-light-2401o':
-       print('Setting DBGlobalTag to DB00003049')
-       return "DB00003049"
-    
-    if not try_earlier:
-        try:
-            # Only try the exact release passed
-            req = db.request("GET", f"/globalTag/{encode_name(releaseNumber)}")
-            globalTagID = req.json()["globalTagId"]
-            return "DB" + str(globalTagID).zfill(8)
-        except ConditionsDB.RequestError as e:
-            raise RuntimeError(f"Could not find global tag for {releaseNumber}.") from e
-
-    r = re.compile("^release(-[0-9]{2}){3}$")
-    prer =  re.compile(r"^prerelease(-[0-9]{2}){3}[a-zA-Z]$")
-    lightr = re.compile(r"^light-\d{4}-[a-zA-Z]+$")
-    specr = re.compile(r"^build-light-\d{4}[a-zA-Z]$")
-    if not (r.match(releaseNumber) or prer.match(releaseNumber) or lightr.match(releaseNumber) or specr.match(releaseNumber)):
-        B2ERROR("Release number must be of the form 'release-XX-XX-XX' or 'prerelease-XX-XX-XXx' or 'light-XXXX-string' or 'build-light-XXXX'.")
-        sys.exit(1)
-
-    pre_or_light = None
-
-    if  (prer.match(releaseNumber) or lightr.match(releaseNumber) or specr.match(releaseNumber)):
-        pre_or_light = True
-
-    initialReleaseNumber = releaseNumber  # noqa F841
-
-    _, majorNumber, minorNumber, patchNumber = releaseNumber.split("-")
-    # Check if patchNumber ends in a letter, if so, remove it
-    if patchNumber[-1].isalpha():
-        patchNumber = patchNumber[:-1]
-    patchNumber = int(patchNumber)
-    minorNumber = int(minorNumber)
-
-    globalTags = []
-
-    while minorNumber >= 0:
-        if pre_or_light:
-            releaseNumber = initialReleaseNumber
-        else:
-            releaseNumber = (
-                f"release-{majorNumber}-{str(minorNumber).zfill(2)}-"
-                f"{str(patchNumber).zfill(2)}"
-            )
-
-        try:
-
-            req = db.request("GET", f"/globalTag/{encode_name(releaseNumber)}")
-            globalTagID = req.json()["globalTagId"]
-
-            DBGlobalTag = "DB" + str(globalTagID).zfill(8)
-
-            globalTags.append((DBGlobalTag, releaseNumber))
-
-        except ConditionsDB.RequestError:
-            B2WARNING(f"Could not find global tag for {releaseNumber}.")
-            pass
-
-        if patchNumber == 0:
-            # Decrease minor release number, set patch release number to 5
-            # (can be set higher to check for more patch releases)
-            minorNumber -= 1
-            patchNumber = 5
-        else:
-            patchNumber -= 1
-
-    if len(globalTags) == 1:
-        # If only one available, use that
-        DBGlobalTag, releaseNumber = globalTags[0]
-        B2INFO(
-            f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}."
-        )
-        return DBGlobalTag
-
-    elif len(globalTags) >= 1:
-        # If multiple available, ask user what they want
-        nGlobalTags = len(globalTags)
-        B2INFO(
-            "Multiple conditions database global tags found.\n"
-            f"Please select (one of 1--{nGlobalTags})."
-        )
-        for iGlobalTag, (DBGlobalTag, releaseNumber) in enumerate(globalTags):
-            print(f"  [{iGlobalTag+1}] {releaseNumber}: {DBGlobalTag}")
-
-        # Wait for user to select a global tag
-        while True:
-            selection = input()
-            try:
-                selection = int(selection) - 1
-            except ValueError:
-                pass
-
-            if selection in range(nGlobalTags):
-                break
-
-        DBGlobalTag, releaseNumber = globalTags[selection]
-        B2INFO(
-            f"Using conditions database global tag {DBGlobalTag} for {releaseNumber}."
-        )
-        return DBGlobalTag
-
-    else:
-        # If none available, throw an error
-        if minorNumber == -1:
-            minorNumber = "00"
-        B2ERROR(
-            "Could not find any conditions database global tags for releases between\n"
-            f"release-{majorNumber}-{minorNumber}-00 and {initialReleaseNumber}."
-        )
-        sys.exit(1)
-
-
-def get_DBGlobalTag_argparse_wrapper(releaseNumber, DBGlobalTagRelease):
-    """Wrapper around get_DBGlobalTag to parse release and DBGlobalTagRelease arguments."""
-
-    if DBGlobalTagRelease:
-        return get_DBGlobalTag(DBGlobalTagRelease, try_earlier=False)
-
-    return get_DBGlobalTag(releaseNumber)
 
 
 def get_beam_energy_from_registry(sampleRegistry):
@@ -963,7 +823,7 @@ def make_request_dict(
         "ProductionGroup": "skim",
         "Description": f"{skimName} skim on {key}",
         "Release": args.release,
-        "DBGlobalTag": get_DBGlobalTag_argparse_wrapper(args.release, args.DBGlobalTagRelease),
+        "DBGlobalTag": get_DBGlobalTag(sampleInfo["inputDBGlobalTag"]),
         "Campaign": campaign,
         "BeamEnergy": get_beam_energy_from_registry(sampleRegistry),
         "TargetFileSize": 1024,
@@ -1211,15 +1071,6 @@ def get_argument_parser():
         "--release",
         required=True,
         help="The basf2 to release to be used, *e.g.* release-04-00-03.",
-    )
-    parser.add_argument(
-        "--DBGlobalTagRelease",
-        help=(
-            "Release number to use associated DB global tag for. If provided, the "
-            "script will try to find the global tag and raise an error if none is "
-            "found. Otherwise, a range of global tags will be searched for, and the "
-            "user will be presented with a prompt to select the one they want."
-        ),
     )
     parser.add_argument(
         "-l",

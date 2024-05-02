@@ -20,9 +20,9 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
-    /// Pre-filter relations in phi between seed states and hit states
+    /// Filter potential relations in phi between seed states and hit states
     double m_param_PhiRecoTrackToHitCut = 0.8;
-    /// Pre-filter relations in phi between hit states
+    /// Filter potential relations in phi between hit states
     double m_param_PhiHitHitCut = 1.0;
   };
 }

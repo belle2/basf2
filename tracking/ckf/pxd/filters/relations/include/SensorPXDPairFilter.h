@@ -20,10 +20,10 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
-    /// Pre-filter relations in phi between seed states and hit states
+    /// Filter potential relations in phi between seed states and hit states
     /// Here we compare RecoTrack -> mSoP -> getPos().Phi() with the phi value of the centre of the sensor the hit is on.
     double m_param_PhiRecoTrackToHitCut = 0.8;
-    /// Pre-filter relations in phi between hit states
+    /// Filter potential relations in phi between hit states
     /// We compare hitA.sensorCenterPhi with hitB.sensorCenterPhi
     double m_param_PhiHitHitCut = 1.0;
   };

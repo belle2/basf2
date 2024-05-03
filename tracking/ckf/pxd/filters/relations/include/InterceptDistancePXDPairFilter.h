@@ -20,10 +20,14 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
-    /// Filter potential relations in phi between seed states and hit states
+    /// Filter potential relations in phi between seed states (based on PXDIntercepts) and hit states
     double m_param_PhiInterceptToHitCut = 0.1;
-    /// Filter potential relations in theta between seed states and hit states
+    /// Filter potential relations in theta between seed states (based on PXDIntercepts) and hit states
     double m_param_ThetaInterceptToHitCut = 0.1;
+    /// Filter potential relations in phi between seed states (based on RecoTracks) and hit states
+    double m_param_PhiRecoTrackToHitCut = 0.5;
+    /// Filter potential relations in theta between seed states (based on RecoTracks) and hit states
+    double m_param_ThetaRecoTrackToHitCut = 0.5;
     /// Filter potential relations in phi between hit states
     double m_param_PhiHitHitCut = 0.2;
     /// Filter potential relations in theta between hit states

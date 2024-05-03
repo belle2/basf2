@@ -35,29 +35,44 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
     const RecoTrack* seedRecoTrack = fromState.getSeed();
     const auto& relatedIntercepts = seedRecoTrack->getRelationsTo<PXDIntercept>(m_param_PXDInterceptsName);
 
-    // Don't accept relation of no intercept was created for a RecoTrack
-    if (relatedIntercepts.size() == 0) {
-      return NAN;
-    }
+    // // Don't accept relation of no intercept was created for a RecoTrack
+    // if (relatedIntercepts.size() == 0) {
+    //   return NAN;
+    // }
 
-    for (const auto& intercept : relatedIntercepts) {
-      const VxdID& fromStateSensorID(intercept.getSensorID());
-      if (fromStateSensorID.getLayerNumber() != toStateCache.geoLayer) {
-        continue;
+    if (relatedIntercepts.size() > 0) {
+      // We have PXDIntercepts for this Seed (RecoTrack), so use their information for filtering
+      for (const auto& intercept : relatedIntercepts) {
+        const VxdID& fromStateSensorID(intercept.getSensorID());
+        if (fromStateSensorID.getLayerNumber() != toStateCache.geoLayer) {
+          continue;
+        }
+        const PXD::SensorInfo& sensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(fromStateSensorID));
+        const auto& interceptGlobalPoint = sensorInfo.pointToGlobal({intercept.getCoorU(), intercept.getCoorV(), 0});
+
+        float phiDiff = interceptGlobalPoint.Phi() - toStateCache.phi;
+        while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
+        while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
+        const float thetaDiff = interceptGlobalPoint.Theta() - toStateCache.theta;
+        if (abs(phiDiff) < static_cast<float>(m_param_PhiInterceptToHitCut) and
+            abs(thetaDiff) < static_cast<float>(m_param_ThetaInterceptToHitCut)) {
+          return 1.0;
+        }
       }
-      const PXD::SensorInfo& sensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(fromStateSensorID));
-      const auto& interceptGlobalPoint = sensorInfo.pointToGlobal({intercept.getCoorU(), intercept.getCoorV(), 0});
-
-      float phiDiff = interceptGlobalPoint.Phi() - toStateCache.phi;
+      // We have PXD for this Seed (RecoTrack), but the toState isn't close to any of them -> discard combination
+      return NAN;
+    } else {
+      // We don't have PXDIntercepts for this Seed (RecoTrack), so use simple angular filters.
+      float phiDiff = fromStateCache.phi - toStateCache.phi;
       while (phiDiff > M_PI) phiDiff -= 2. * M_PI;
       while (phiDiff < -M_PI) phiDiff += 2. * M_PI;
-      const float thetaDiff = interceptGlobalPoint.Theta() - toStateCache.theta;
-      if (abs(phiDiff) < static_cast<float>(m_param_PhiInterceptToHitCut) and
-          abs(thetaDiff) < static_cast<float>(m_param_ThetaInterceptToHitCut)) {
+      const float thetaDiff = fromStateCache.theta - toStateCache.theta;
+      if (abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut) and
+          abs(thetaDiff) < static_cast<float>(m_param_ThetaRecoTrackToHitCut)) {
         return 1.0;
       }
+      return NAN;
     }
-    return NAN;
   }
 
 
@@ -93,6 +108,12 @@ void InterceptDistancePXDPairFilter::exposeParameters(ModuleParamList* modulePar
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaInterceptToHitCut"), m_param_ThetaInterceptToHitCut,
                                 "Cut in theta for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state.",
                                 m_param_ThetaInterceptToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiRecoTrackToHitCut"), m_param_PhiRecoTrackToHitCut,
+                                "Cut in phi for the difference between RecoTrack information and current hit-based state.",
+                                m_param_PhiRecoTrackToHitCut);
+  moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaRecoTrackToHitCut"), m_param_ThetaRecoTrackToHitCut,
+                                "Cut in theta for the difference between RecoTrack information and current hit-based state.",
+                                m_param_ThetaRecoTrackToHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiHitHitCut"), m_param_PhiHitHitCut,
                                 "Cut in phi between two hit-based states.", m_param_PhiHitHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "thetaHitHitCut"), m_param_ThetaHitHitCut,

@@ -1363,18 +1363,20 @@ class XicpToLKsHp(BaseSkim):
         ma.reconstructDecay("Xi-:LamPi -> Lambda0:charmSkim pi-:all", cut="1.295 < M < 1.35", path=path)
         ma.reconstructDecay("Omega-:LamK -> Lambda0:charmSkim K-:all", cut="1.622 < M < 1.722", path=path)
 
-        XicCuts = "2.35 < M < 2.59 and useCMSFrame(p) > 2.0"
-        XicChannels = ["Lambda0:charmSkim K_S0:charmSkim pi+:charmSkim_pid",
-                       "Lambda0:charmSkim K_S0:charmSkim K+:charmSkim_pid",
-                       "Xi-:LamPi pi+:charmSkim_pid pi+:charmSkim_pid",
-                       "Xi-:LamPi pi+:charmSkim_pid K+:charmSkim_pid",
-                       "Omega-:LamK pi+:charmSkim_pid K+:charmSkim_pid"
-                       ]
+        XicCuts1 = "2.20 < M < 2.60 and useCMSFrame(p) > 2.0"
+        XicCuts2 = "2.35 < M < 2.60 and useCMSFrame(p) > 2.0"
 
         XicList = []
-        for chID, channel in enumerate(XicChannels):
-            ma.reconstructDecay("Xi_c+:LKsHp" + str(chID) + " -> " + channel, XicCuts, chID, path=path)
-            XicList.append("Xi_c+:LKsHp" + str(chID))
+        ma.reconstructDecay("Xi_c+:LKsHp1 -> Lambda0:charmSkim K_S0:charmSkim pi+:charmSkim_pid", XicCuts1, 1, path=path)
+        XicList.append("Xi_c+:LKsHp1")
+        ma.reconstructDecay("Xi_c+:LKsHp2 -> Lambda0:charmSkim K_S0:charmSkim K+:charmSkim_pid", XicCuts1, 2, path=path)
+        XicList.append("Xi_c+:LKsHp2")
+        ma.reconstructDecay("Xi_c+:XiPiHp1 -> Xi-:LamPi pi+:charmSkim_pid pi+:charmSkim_pid", XicCuts2, 3, path=path)
+        XicList.append("Xi_c+:XiPiHp1")
+        ma.reconstructDecay("Xi_c+:XiPiHp2 -> Xi-:LamPi pi+:charmSkim_pid K+:charmSkim_pid", XicCuts2, 4, path=path)
+        XicList.append("Xi_c+:XiPiHp2")
+        ma.reconstructDecay("Xi_c+:OmgPiHp1 -> Omega-:LamK pi+:charmSkim_pid K+:charmSkim_pid", XicCuts2, 5, path=path)
+        XicList.append("Xi_c+:OmgPiHp1")
 
         return XicList
 

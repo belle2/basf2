@@ -30,15 +30,12 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
   const CKFToPXDState::stateCache& fromStateCache = fromState.getStateCache();
   const CKFToPXDState::stateCache& toStateCache = toState.getStateCache();
 
+  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
+
   if (not fromStateCache.isHitState) {
     // We are coming from an SVD / CDC-SVD track, so we can use its position to only look for matching ladders
     const RecoTrack* seedRecoTrack = fromState.getSeed();
     const auto& relatedIntercepts = seedRecoTrack->getRelationsTo<PXDIntercept>(m_param_PXDInterceptsName);
-
-    // // Don't accept relation of no intercept was created for a RecoTrack
-    // if (relatedIntercepts.size() == 0) {
-    //   return NAN;
-    // }
 
     if (relatedIntercepts.size() > 0) {
       // We have PXDIntercepts for this Seed (RecoTrack), so use their information for filtering
@@ -74,9 +71,6 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
       return NAN;
     }
   }
-
-
-  B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
   // On same layer we already know from LayerPXDRelationFilter, that we only deal with overlaps in r-phi.
   // So it's sufficient here to check for same layer number to accept states in the overlap region.

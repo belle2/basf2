@@ -74,6 +74,16 @@ namespace Belle2 {
     TH1* h_n_TChit_injLER = nullptr;
     //! N of TC Hit / events in the LER injection BG region vs. time since injection
     TH2* h_nTChit_injtime = nullptr;
+    //! N of TC Hit / event per two ETM clocks
+    TH1* h_n_TChit_event_2clk = nullptr;
+    //! N of TC Hit / event vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_clean_2clk = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injHER_2clk = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injLER_2clk = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks
+    TH2* h_nTChit_injtime_2clk = nullptr;
     //! N of Cluster / event
     TH1* h_Cluster = nullptr;
     //! TC Timing / event
@@ -91,6 +101,8 @@ namespace Belle2 {
 
     //! Hit TCId
     std::vector<int> TCId;
+    //! Hit TCHitWin
+    std::vector<int> TCHitWin;
     //! Hit TC Energy
     std::vector<double> TCEnergy;
     //! Hit TC Timing

@@ -8,6 +8,8 @@
 
 #include <reconstruction/modules/EventT0Validation/EventT0Validation.h>
 
+#include <TEfficiency.h>
+
 using namespace Belle2;
 
 REG_MODULE(EventT0Validation);
@@ -17,6 +19,7 @@ EventT0ValidationModule::EventT0ValidationModule(): Module()
 {
   setPropertyFlags(c_ParallelProcessingCertified); // parallel processing
   setDescription("Make data quality monitoring plots for EventT0 for bhabha, mu mu, and hadron samples for different trigger (time) sources.");
+  addParam("RootFileName", m_RootFileName, "Name of the ROOT output file.", m_RootFileName);
 }
 
 //---------------------------------
@@ -26,39 +29,42 @@ EventT0ValidationModule::~EventT0ValidationModule() { }
 //---------------------------------
 void EventT0ValidationModule::initialize()
 {
+  m_outputFile = new TFile(m_RootFileName.c_str(), "RECREATE");
+  if (m_outputFile != nullptr) {
+    m_outputFile->cd();
 
-  TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("EventT0")->cd();
+    int nBins = 400 ;
+    double minT0 = -100 ;
+    double maxT0 =  100 ;
 
-  int nBins = 400 ;
-  double minT0 = -100 ;
-  double maxT0 =  100 ;
+    m_histECLEventT0 = new TH1F("m_histECLEventT0", "ECL EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histSVDEventT0 = new TH1F("m_histSVDEventT0", "SVD EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histTOPEventT0 = new TH1F("m_histTOPEventT0", "TOP EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histCDCEventT0 = new TH1F("m_histCDCEventT0", "CDC EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histCDCHitBasedEventT0 = new TH1F("m_histCDCHitBasedEventT0", "CDC hit based EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
+                                        maxT0);
+    m_histCDCChi2EventT0 = new TH1F("m_histCDCChi2EventT0", "CDC FullGrid #Chi^2 EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
+                                    maxT0);
+    m_histCDCGridEventT0 = new TH1F("m_histCDCGridEventT0", "CDC Grid EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
 
-  m_histECLEventT0 = new TH1F("m_histECLEventT0", "ECL EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
-  m_histSVDEventT0 = new TH1F("m_histSVDEventT0", "SVD EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
-  m_histTOPEventT0 = new TH1F("m_histTOPEventT0", "TOP EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
-  m_histCDCEventT0 = new TH1F("m_histCDCEventT0", "CDC EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
-  m_histCDCHitBasedEventT0 = new TH1F("m_histCDCHitBasedEventT0", "CDC hit based EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
-                                      maxT0);
-  m_histCDCChi2EventT0 = new TH1F("m_histCDCChi2EventT0", "CDC FullGrid #Chi^2 EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
-                                  maxT0);
-  m_histCDCGridEventT0 = new TH1F("m_histCDCGridEventT0", "CDC Grid EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histAlgorithmSourceCounts =
+      new TH1D("m_histAlgorithmSourceCounts",
+               "Number of events with EventT0 from each algorithm;Algorithm;Count",
+               11, 0, 11);
+    m_histAlgorithmSourceCountsActive =
+      new TH1D("m_histAlgorithmSourceCountsActive",
+               "Number of events with EventT0 from each algorithm where it was active;Algorithm;Count",
+               11, 0, 11);
 
-  m_histAlgorithmSourceCounts =
-    new TH1D("m_histAlgorithmSourceCounts",
-             "Number of events with EventT0 from each algorithm;Algorithm;Count",
-             11, 0, 11);
-  m_histAlgorithmSourceCountsActive =
-    new TH1D("m_histAlgorithmSourceCountsActive",
-             "Number of events with EventT0 from each algorithm where it was active;Algorithm;Count",
-             11, 0, 11);
-
-  for (uint i = 0; i < 11; i++) {
-    m_histAlgorithmSourceCounts->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
-    m_histAlgorithmSourceCountsActive->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    for (uint i = 0; i < 11; i++) {
+      m_histAlgorithmSourceCounts->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+      m_histAlgorithmSourceCountsActive->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    }
+    m_histAlgorithmSourceCounts->GetXaxis()->CenterTitle(kTRUE);
+    m_histAlgorithmSourceCounts->GetXaxis()->SetTitleOffset(1.2);
+    m_histAlgorithmSourceCountsActive->GetXaxis()->CenterTitle(kTRUE);
+    m_histAlgorithmSourceCountsActive->GetXaxis()->SetTitleOffset(1.2);
   }
-
-  oldDir->cd();
 
   m_eventT0.isRequired();
 }
@@ -131,15 +137,62 @@ void EventT0ValidationModule::event()
   m_histCDCChi2EventT0->Fill(chi2CDCT0.empty() ? -1000 : chi2CDCT0.back().eventT0);
   m_histCDCGridEventT0->Fill(gridCDCT0.empty() ? -1000 : gridCDCT0.back().eventT0);
 
-  const bool hasCDCHitBasedEventT0 = hitBasedCDCT0.empty();
-  const bool hasCDCFullGridChi2EventT0 = chi2CDCT0.empty();
-  const bool hasCDCGridEventT0 = gridCDCT0.empty();
-  const bool hasECLEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL);
-  const bool hasSVDEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD);
-  const bool hasTOPEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP);
-
   B2DEBUG(20, "eventT0ECL = " << eventT0ECL << " ns") ;
   B2DEBUG(20, "eventT0CDC = " << eventT0CDC << " ns") ;
   B2DEBUG(20, "eventT0TOP = " << eventT0TOP << " ns") ;
   B2DEBUG(20, "eventT0SVD = " << eventT0SVD << " ns") ;
+
+  const bool hasECLEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL);
+  const bool hasSVDEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD);
+  const bool hasTOPEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP);
+  const bool hasCDCEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::CDC);
+  const bool hasCDCHitBasedEventT0 = not hitBasedCDCT0.empty();
+  const bool hasCDCFullGridChi2EventT0 = not chi2CDCT0.empty();
+  const bool hasCDCGridEventT0 = not gridCDCT0.empty();
+
+  m_histAlgorithmSourceCounts->Fill(-1);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[0], m_eventT0->hasEventT0());
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[1], hasECLEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[2], hasSVDEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[3], hasTOPEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[4], hasCDCEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[5], hasCDCHitBasedEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[6], hasCDCHitBasedEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[7], hasCDCFullGridChi2EventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[8], hasCDCFullGridChi2EventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[9], hasCDCGridEventT0);
+  m_histAlgorithmSourceCounts->Fill(c_eventT0Algorithms[10], hasCDCGridEventT0);
+
+  m_histAlgorithmSourceCountsActive->Fill(-1);
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[0], 1);
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[1], 1);
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[2], 1);
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[3], 1);
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[4], 1);
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[5], 1); // We always execute hit based search
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[6], 1); // We always execute hit based search
+  // We only execute the chi2 algorithm if no SVD value is found, but this is the "all" column
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[7], 1);
+  // We only execute the chi2 algorithm if no SVD value is found
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[8], not hasSVDEventT0);
+  // We only execute the chi2 algorithm if no SVD value is found, but this is the "all" column
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[9], 1);
+  // We only execute the grid algorithm if no SVD value is found
+  m_histAlgorithmSourceCountsActive->Fill(c_eventT0Algorithms[10], not hasSVDEventT0);
+}
+
+
+void EventT0ValidationModule::endRun()
+{
+  if (m_outputFile != nullptr) {
+    m_outputFile->cd();
+
+    TEfficiency* algorithmEffi = new TEfficiency(*m_histAlgorithmSourceCounts, *m_histAlgorithmSourceCountsActive);
+    algorithmEffi->SetTitle("Efficiency of finding an EventT0 per Algorithm");
+    algorithmEffi->Write("EventT0AlgorithmEfficiency");
+
+    m_outputFile->Write();
+    m_outputFile->Close();
+  }
+
 }

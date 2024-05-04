@@ -44,13 +44,18 @@ void EventT0ValidationModule::initialize()
                                   maxT0);
   m_histCDCGridEventT0 = new TH1F("m_histCDCGridEventT0", "CDC Grid EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
 
-  m_histAlgorithmSourceFractions =
-    new TH1D("m_histAlgorithmSourceFractions",
-             "Fraction of events with EventT0 from each algorithm for hadronic events triggerd by ECL;Algorithm;Fraction",
-             10, 0, 10);
+  m_histAlgorithmSourceCounts =
+    new TH1D("m_histAlgorithmSourceCounts",
+             "Number of events with EventT0 from each algorithm;Algorithm;Count",
+             11, 0, 11);
+  m_histAlgorithmSourceCountsActive =
+    new TH1D("m_histAlgorithmSourceCountsActive",
+             "Number of events with EventT0 from each algorithm where it was active;Algorithm;Count",
+             11, 0, 11);
 
-  for (uint i = 0; i < 10; i++) {
-    m_histAlgorithmSourceFractions->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+  for (uint i = 0; i < 11; i++) {
+    m_histAlgorithmSourceCounts->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
+    m_histAlgorithmSourceCountsActive->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
   }
 
   oldDir->cd();
@@ -76,7 +81,8 @@ void EventT0ValidationModule::beginRun()
   m_histCDCChi2EventT0->Reset();
   m_histCDCGridEventT0->Reset();
 
-  m_histAlgorithmSourceFractions->Reset();
+  m_histAlgorithmSourceCounts->Reset();
+  m_histAlgorithmSourceCountsActive->Reset();
 
 }
 

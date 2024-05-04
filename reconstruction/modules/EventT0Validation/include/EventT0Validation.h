@@ -62,9 +62,13 @@ namespace Belle2 {
     TH1F* m_histCDCGridEventT0{nullptr};
 
     /// EventT0 algorithms for which to calculate fractions of abundance
-    const char* c_eventT0Algorithms[10] = {"ECL", "SVD", "TOP", "CDC (all)" "CDC hit based (all)", "CDC hit based (active)", "CDC full grid chi2 (all)", "CDC full grid chi2 (active)", "CDC grid (all)", "CDC grid (active)"};
-    /// Fraction of events with EventT0 from a given algorithm
-    TH1D* m_histAlgorithmSourceFractions{nullptr};
+    const char* c_eventT0Algorithms[11] = {"Any", "ECL", "SVD", "TOP", "CDC (all)" "CDC hit based (all)", "CDC hit based (active)",
+                                           "CDC full grid chi2 (all)", "CDC full grid chi2 (active)", "CDC grid (all)", "CDC grid (active)"
+                                          };
+    /// Count of events with EventT0 from a given algorithm, numerator for efficiency calculation
+    TH1D* m_histAlgorithmSourceCounts{nullptr};
+    /// Counts of events with EventT0 from a given algorithm, denominator for efficiency calculation
+    TH1D* m_histAlgorithmSourceCountsActive{nullptr};
 
   };
 

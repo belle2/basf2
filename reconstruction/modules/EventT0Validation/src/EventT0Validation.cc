@@ -107,27 +107,36 @@ void EventT0ValidationModule::event()
   const double eventT0SVD =
     m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD) ? m_eventT0->getBestSVDTemporaryEventT0()->eventT0 : -1000;
 
-  const auto checkForCDCAlgorithm = [cdcEventT0s = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC)](
+  const auto getCDCEventT0sForAlgorithm = [cdcEventT0s = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC)](
   const std::string & algorithm) {
+    std::vector<EventT0::EventT0Component> temporaries;
+    temporaries.reserve(cdcEventT0s.size());
     for (const auto& evtt0 : cdcEventT0s) {
       if (evtt0.algorithm == algorithm) {
-        return true;
+        temporaries.push_back(evtt0);
       }
     }
-    return false;
+    return temporaries;
   };
-
-  const bool hasCDCHitBasedEventT0 = checkForCDCAlgorithm("hit based");
-  const bool hasCDCFullGridChi2EventT0 = checkForCDCAlgorithm("chi2");
-  const bool hasCDCGridEventT0 = checkForCDCAlgorithm("grid");
-  const bool hasECLEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL);
-  const bool hasSVDEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD);
-  const bool hasTOPEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP);
 
   m_histECLEventT0->Fill(eventT0ECL);
   m_histSVDEventT0->Fill(eventT0SVD);
   m_histTOPEventT0->Fill(eventT0TOP);
   m_histCDCEventT0->Fill(eventT0CDC);
+
+  const auto hitBasedCDCT0 = getCDCEventT0sForAlgorithm("hit based");
+  const auto chi2CDCT0 = getCDCEventT0sForAlgorithm("chi2");
+  const auto gridCDCT0 = getCDCEventT0sForAlgorithm("grid");
+  m_histCDCHitBasedEventT0->Fill(hitBasedCDCT0.empty() ? -1000 : hitBasedCDCT0.back().eventT0);
+  m_histCDCChi2EventT0->Fill(chi2CDCT0.empty() ? -1000 : chi2CDCT0.back().eventT0);
+  m_histCDCGridEventT0->Fill(gridCDCT0.empty() ? -1000 : gridCDCT0.back().eventT0);
+
+  const bool hasCDCHitBasedEventT0 = hitBasedCDCT0.empty();
+  const bool hasCDCFullGridChi2EventT0 = chi2CDCT0.empty();
+  const bool hasCDCGridEventT0 = gridCDCT0.empty();
+  const bool hasECLEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::ECL);
+  const bool hasSVDEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::SVD);
+  const bool hasTOPEventT0 = m_eventT0->hasTemporaryEventT0(Const::EDetector::TOP);
 
   B2DEBUG(20, "eventT0ECL = " << eventT0ECL << " ns") ;
   B2DEBUG(20, "eventT0CDC = " << eventT0CDC << " ns") ;

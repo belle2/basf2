@@ -129,9 +129,9 @@ namespace Belle2 {
 
 
 #ifdef _BELLE2_EPICS
-    //! Vector of EPICS PVs
-    std::vector <chid>  m_epicsChID;
-    //! Map of (key)names to EPICS PVs
+    //! Vector of EPICS PVs, static as it contains all
+    static std::vector <chid>  m_epicsChID;
+    //! Map of (key)names to EPICS PVs, non static, as per module
     std::map <std::string, chid> m_epicsNameToChID;
 #endif
 

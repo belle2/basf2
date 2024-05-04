@@ -139,12 +139,12 @@ void TrackingHLTDQMModule::DefineAbortFlagsHistograms()
   //tracking abort VS time after HER/LER injection and time within a beam cycle
   m_abortVStimeHER = new TH2F(
     "TrkAbortVsTimeHER",
-    "Tracking Abort vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events with Tracking Aborts vs HER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_abortVStimeLER = new TH2F(
     "TrkAbortVsTimeLER",
-    "Tracking Abort vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events with Tracking Aborts vs LER Injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   //tracking all VS time after HER/LER injection and time within a beam cycle

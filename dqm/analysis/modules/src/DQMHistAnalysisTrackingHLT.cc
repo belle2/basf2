@@ -179,7 +179,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
         else  hAbortRateLER->SetBinContent(i + 1, j + 1, 0);
       }
 
-    m_cAbortRateLER->cd();;
+    m_cAbortRateLER->cd();
     m_cAbortRateLER->SetFillColor(kWhite);
     hAbortRateLER->SetTitle("Fraction of Events with Tracking Aborts vs LER Injection");
     hAbortRateLER->Draw("colz");

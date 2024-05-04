@@ -11,6 +11,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventT0.h>
 
+#include <TFile.h>
 #include <TH1F.h>
 #include <TH1D.h>
 #include <TEfficiency.h>
@@ -42,9 +43,18 @@ namespace Belle2 {
      * takes place in this method. */
     virtual void event() override;
 
+    /** This method is called for each run */
+    virtual void endRun() override;
+
   private:
 
     StoreObjPtr<EventT0> m_eventT0 ;  /**< Store array for event t0 */
+
+    /// Name of the output ROOT file
+    std::string m_RootFileName = "EventT0Validation.root";
+
+    /// Output ROOT file
+    TFile* m_outputFile;
 
     /// ECL based EventT0 histograms
     TH1F* m_histECLEventT0{nullptr};
@@ -62,7 +72,7 @@ namespace Belle2 {
     TH1F* m_histCDCGridEventT0{nullptr};
 
     /// EventT0 algorithms for which to calculate fractions of abundance
-    const char* c_eventT0Algorithms[11] = {"Any", "ECL", "SVD", "TOP", "CDC (all)" "CDC hit based (all)", "CDC hit based (active)",
+    const char* c_eventT0Algorithms[11] = {"Any", "ECL", "SVD", "TOP", "CDC (all)", "CDC hit based (all)", "CDC hit based (active)",
                                            "CDC full grid chi2 (all)", "CDC full grid chi2 (active)", "CDC grid (all)", "CDC grid (active)"
                                           };
     /// Count of events with EventT0 from a given algorithm, numerator for efficiency calculation

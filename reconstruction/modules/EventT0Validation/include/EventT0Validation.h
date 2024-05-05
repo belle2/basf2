@@ -73,13 +73,19 @@ namespace Belle2 {
 
     /// EventT0 algorithms for which to calculate fractions of abundance
     const char* c_eventT0Algorithms[11] = {"Any", "ECL", "SVD", "TOP", "CDC (all)", "CDC hit based (all)", "CDC hit based (active)",
-                                           "CDC full grid chi2 (all)", "CDC full grid chi2 (active)", "CDC grid (all)", "CDC grid (active)"
+                                           "CDC full grid #chi^{2} (all)", "CDC full grid #chi^{2} (active)", "CDC grid (all)", "CDC grid (active)"
                                           };
     /// Count of events with EventT0 from a given algorithm, numerator for efficiency calculation
     TH1D* m_histAlgorithmSourceCounts{nullptr};
     /// Counts of events with EventT0 from a given algorithm, denominator for efficiency calculation
     TH1D* m_histAlgorithmSourceCountsActive{nullptr};
 
+    /// Set additional plot info: contact, description, shifter
+    void setPlotMetaData(TH1* hist, const std::string& description, const std::string& check,
+                         const std::string& contact, const std::string& shifter = "shifter");
+
+    /// For simplicity, just set the contact once
+    std::string m_contact = "christian.wessel@desy.de";
   };
 
 } // Belle2 namespace

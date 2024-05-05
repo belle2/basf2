@@ -38,23 +38,39 @@ void EventT0ValidationModule::initialize()
     double maxT0 =  100 ;
 
     m_histECLEventT0 = new TH1F("m_histECLEventT0", "ECL EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    setPlotMetaData(m_histECLEventT0, "Distribution of ECL EventT0s.", "Should be centered around 0.", m_contact);
     m_histSVDEventT0 = new TH1F("m_histSVDEventT0", "SVD EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    setPlotMetaData(m_histSVDEventT0, "Distribution of SVD EventT0s.", "Should be centered around 0.", m_contact);
     m_histTOPEventT0 = new TH1F("m_histTOPEventT0", "TOP EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    setPlotMetaData(m_histTOPEventT0, "Distribution of TOP EventT0s.", "Should be centered around 0.", m_contact);
     m_histCDCEventT0 = new TH1F("m_histCDCEventT0", "CDC EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
-    m_histCDCHitBasedEventT0 = new TH1F("m_histCDCHitBasedEventT0", "CDC hit based EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
-                                        maxT0);
-    m_histCDCChi2EventT0 = new TH1F("m_histCDCChi2EventT0", "CDC FullGrid #Chi^2 EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
+    setPlotMetaData(m_histCDCEventT0, "Distribution of CDC EventT0s.", "Should be centered around 0.", m_contact);
+    m_histCDCHitBasedEventT0 = new TH1F("m_histCDCHitBasedEventT0", "CDC hit based EventT0;EventT0 [ns];events / 0.5 ns",
+                                        nBins, minT0, maxT0);
+    setPlotMetaData(m_histCDCHitBasedEventT0, "Distribution of CDC hit based EventT0s.", "Should be centered around 0.", m_contact);
+    m_histCDCChi2EventT0 = new TH1F("m_histCDCChi2EventT0", "CDC FullGrid #chi^{2} EventT0;EventT0 [ns];events / 0.5 ns",
+                                    nBins, minT0, maxT0);
+    setPlotMetaData(m_histCDCChi2EventT0, "Distribution of CDC FullGrid #chi^{2} EventT0s.", "Should be centered around 0.", m_contact);
+    m_histCDCGridEventT0 = new TH1F("m_histCDCGridEventT0", "CDC Grid search EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
                                     maxT0);
-    m_histCDCGridEventT0 = new TH1F("m_histCDCGridEventT0", "CDC Grid EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    setPlotMetaData(m_histCDCGridEventT0, "Distribution of CDC Grid search EventT0s.", "Should be centered around 0.", m_contact);
 
     m_histAlgorithmSourceCounts =
       new TH1D("m_histAlgorithmSourceCounts",
                "Number of events with EventT0 from each algorithm;Algorithm;Count",
                11, 0, 11);
+    setPlotMetaData(m_histAlgorithmSourceCounts,
+                    "Number of events in which an EventT0 was found by each algorithm. "\
+                    "Some of the CDC algorithms are only executed if no SVD EventT0 is found.",
+                    "Values should be around 1000 (1000 events in validation).", m_contact);
     m_histAlgorithmSourceCountsActive =
       new TH1D("m_histAlgorithmSourceCountsActive",
                "Number of events with EventT0 from each algorithm where it was active;Algorithm;Count",
                11, 0, 11);
+    setPlotMetaData(m_histAlgorithmSourceCountsActive,
+                    "Number of events in which an EventT0 was found by each algorithm if they are executed. "\
+                    "Some of the CDC algorithms are only executed if no SVD EventT0 is found.",
+                    "Values should be around 1000 (1000 events in validation).", m_contact);
 
     for (uint i = 0; i < 11; i++) {
       m_histAlgorithmSourceCounts->GetXaxis()->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
@@ -190,9 +206,23 @@ void EventT0ValidationModule::endRun()
     TEfficiency* algorithmEffi = new TEfficiency(*m_histAlgorithmSourceCounts, *m_histAlgorithmSourceCountsActive);
     algorithmEffi->SetTitle("Efficiency of finding an EventT0 per Algorithm");
     algorithmEffi->Write("EventT0AlgorithmEfficiency");
+    algorithmEffi->GetListOfFunctions()->Add(new TNamed("Contact", m_contact));
+    algorithmEffi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiencies of the various EventT0 algorithms."));
+    algorithmEffi->GetListOfFunctions()->Add(new TNamed("Check", "Efficiency should be close to 1 for all active algorithms."));
+    algorithmEffi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
 
     m_outputFile->Write();
     m_outputFile->Close();
   }
 
+}
+
+
+void EventT0ValidationModule::setPlotMetaData(TH1* hist, const std::string& description, const std::string& check,
+                                              const std::string& contact, const std::string& shifter)
+{
+  hist->GetListOfFunctions()->Add(new TNamed("Contact", contact));
+  hist->GetListOfFunctions()->Add(new TNamed("Description", description));
+  hist->GetListOfFunctions()->Add(new TNamed("Check", check));
+  hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", shifter));
 }

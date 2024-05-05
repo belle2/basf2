@@ -77,7 +77,7 @@ double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*>
   }
   m_results.chiSquared = chi2;
 
-  //m_results.p = B2Vector3<double>(1, slopeY, slopeZ);
+  //m_results.p = B2Vector3D(1, slopeY, slopeZ);
 
   return TMath::Prob(chi2,  measurements.size() - 1);
 }

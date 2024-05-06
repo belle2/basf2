@@ -604,19 +604,21 @@ class feiSLB0_RDstar(BaseFEISkim):
         empty_path = b2.create_path()
         eselect.if_value('<1', empty_path)
 
-        ma.applyCuts("B0:semileptonic", "dmID<8", path=path)
+        ma.copyList("B0:SLRDstar", "B0:semileptonic", path=path)
+
+        ma.applyCuts("B0:SLRDstar", "dmID<8", path=path)
         # tightened cut on sigprob
-        ma.applyCuts("B0:semileptonic", "log10(sigProb)>-2.0", path=path)
+        ma.applyCuts("B0:SLRDstar", "log10(sigProb)>-2.0", path=path)
         # tightened cut on cosThetaBY
-        ma.applyCuts("B0:semileptonic", "-1.75<cosThetaBY<1.1", path=path)
-        ma.applyCuts("B0:semileptonic", "p_lepton_CMSframe>1.0", path=path)
+        ma.applyCuts("B0:SLRDstar", "-1.75<cosThetaBY<1.1", path=path)
+        ma.applyCuts("B0:SLRDstar", "p_lepton_CMSframe>1.0", path=path)
 
         # best candidate selection on signal probability
-        ma.rankByHighest("B0:semileptonic", "sigProb", numBest=1,
+        ma.rankByHighest("B0:SLRDstar", "sigProb", numBest=1,
                          allowMultiRank=True, outputVariable='sigProb_rank_tag',
                          path=path)
 
-        return ["B0:semileptonic"]
+        return ["B0:SLRDstar"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -634,7 +636,7 @@ class feiSLB0_RDstar(BaseFEISkim):
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist='B0:semileptonic',
+            particlelist='B0:SLRDstar',
             variables_1d=[
                 ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
                  'Signal probability of the reconstructed tag B candidates', 'Most around zero, with a tail at non-zero values.',

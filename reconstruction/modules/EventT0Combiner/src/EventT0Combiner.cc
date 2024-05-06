@@ -58,7 +58,7 @@ void EventT0CombinerModule::event()
   // No CDC chi2 EventT0 present -> try to combine ECL and CDC hit based EventT0
   const auto& bestECLT0 = m_eventT0->getBestECLTemporaryEventT0();
   const auto& cdcT0Candidates = m_eventT0->getTemporaryEventT0s(Const::CDC);
-  const auto& hitBasedCDCT0Candiate = std::find_if(cdcT0Candidates.begin(), cdcT0Candidates.end(), [](const auto & a) { return a.algorithm == "hit based";});
+  const auto& hitBasedCDCT0Candidate = std::find_if(cdcT0Candidates.begin(), cdcT0Candidates.end(), [](const auto & a) { return a.algorithm == "hit based";});
 
   // Strategy in case none of the SVD based or the CDC chi2 based EventT0 values is available:
   // 1) If we have both an EventT0 estimate from ECL and a CDC hit based value, combine the two
@@ -66,18 +66,18 @@ void EventT0CombinerModule::event()
   // 3) If we don't have either, we have a problem -> issue a B2WARNING and clear the EventT0
   // If we arrive at 3), this means that we could only have TOP EventT0, or an EventT0 from a
   // CDC based algorithm other than "hit based" or "chi2", and so far we don't want to use these.
-  if (bestECLT0 and hitBasedCDCT0Candiate != cdcT0Candidates.end()) {
+  if (bestECLT0 and hitBasedCDCT0Candidate != cdcT0Candidates.end()) {
     B2DEBUG(20, "Combining ECL EventT0 and CDC hit based EventT0.");
-    const auto combined = computeCombination({ *bestECLT0, *hitBasedCDCT0Candiate });
+    const auto combined = computeCombination({ *bestECLT0, *hitBasedCDCT0Candidate });
     m_eventT0->setEventT0(combined);
     return;
-  } else if (bestECLT0 and hitBasedCDCT0Candiate == cdcT0Candidates.end()) {
+  } else if (bestECLT0 and hitBasedCDCT0Candidate == cdcT0Candidates.end()) {
     B2DEBUG(20, "Using ECL EventT0, as CDC hit based EventT0 is not available.");
     m_eventT0->setEventT0(*bestECLT0);
     return;
-  } else if (hitBasedCDCT0Candiate != cdcT0Candidates.end() and not bestECLT0) {
+  } else if (hitBasedCDCT0Candidate != cdcT0Candidates.end() and not bestECLT0) {
     B2DEBUG(20, "Using CDC hit based EventT0, as ECL EventT0 is not available.");
-    m_eventT0->setEventT0(*hitBasedCDCT0Candiate);
+    m_eventT0->setEventT0(*hitBasedCDCT0Candidate);
     return;
   } else {
     B2WARNING("There is no EventT0 from neither \n" \

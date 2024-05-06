@@ -692,7 +692,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
         "baryonic": True,
     }
 
-    def build_lists(self, path: b2.Path):
+    def build_lists(self, path):
         ma.copyList("B0:feiHadronic", "B0:generic", path=path)
         ma.copyList("B+:feiHadronic", "B+:generic", path=path)
         HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]

@@ -152,6 +152,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRateHER->cd();
     m_cAbortRateHER->SetFillColor(kWhite);
     hAbortRateHER->SetTitle("Fraction of Events with Tracking Aborts vs HER Injection");
+    hAbortRateHER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateHER->Draw("colz");
 
 
@@ -182,6 +183,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRateLER->cd();
     m_cAbortRateLER->SetFillColor(kWhite);
     hAbortRateLER->SetTitle("Fraction of Events with Tracking Aborts vs LER Injection");
+    hAbortRateLER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateLER->Draw("colz");
 
   } else { // histogram not found

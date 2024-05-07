@@ -50,6 +50,11 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 {
   gROOT->SetBatch(true);
   // get the DB dEdx PDFs
+
+  const auto exprun = getRunList()[0];
+  B2INFO("ExpRun used for calibration: " << exprun.first << " " << exprun.second);
+  updateDBObjPtrs(1, exprun.second, exprun.first);
+
   DBObjPtr<DedxPDFs> m_DBDedxPDFs;
   if (!m_DBDedxPDFs)
     B2FATAL("No VXD dEdx PDFs available");
@@ -76,6 +81,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   candEdx->Divide(3, 2);
   gStyle->SetOptStat(11);
 
+  TFile* fout = new TFile("hDedxPDFs_payload.root", "RECREATE");
   for (const auto& idet : det) {
     for (bool trunmean : {false, true}) {
       for (int iPart = 0; iPart < 6; iPart++) {
@@ -95,24 +101,32 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
             hDedxPDFs[iPart] = &h_LambdaP;
           else
             hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getSVDPDF(iPart, trunmean);
+
+          candEdx->cd(iPart + 1);
+          hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
+          hDedxPDFs[iPart]->DrawCopy("colz");
+          if (m_isMakePlots) {
+            candEdx->SaveAs("Plots_SVDDedxPDFs_wTruncMean.pdf");
+          }
         } else if (idet.compare("CDC") == 0)
           hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getCDCPDF(iPart, trunmean);
-
-        candEdx->cd(iPart + 1);
-        //           hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
-        hDedxPDFs[iPart]->DrawCopy("colz");
+        hDedxPDFs[iPart]->Write();
       }
-      //       candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
-      //     candEdx->SaveAs(Form("Plots_%sDedxPDFs_wTrucMean_%s_%s.pdf", idet.data(), check.str().data(), suffix.data()));
+      // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
     }
   }
 
-  const auto exprun = getRunList()[0];
-  B2INFO("ExpRun used for calibration: " << exprun.first << " " << exprun.second);
+  fout->Close();
 
-  updateDBObjPtrs(1, exprun.second, exprun.first);
+  TFile* fout_read = new TFile("hDedxPDFs_payload.root", "READ"); // not sure if it's the best way to handle this
+  // TClonesArray dedxPDFs("Belle2::DedxPDFs");
+  auto payload = new Belle2::DedxPDFs(fout_read);
+  // new (dedxPDFs[0]) DedxPDFs(fout_read);
+  saveCalibration(payload, "DedxPDFs");
+
   B2INFO("SVD dE/dx calibration done!");
 
+  fout_read->Close();
   return c_OK;
 }
 

@@ -10,6 +10,7 @@
 #include <tracking/ckf/pxd/filters/relations/AngularDistancePXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/LoosePXDPairFilter.h>
 #include <tracking/ckf/pxd/filters/relations/InterceptDistancePXDPairFilter.h>
+#include <tracking/ckf/pxd/filters/relations/CylinderDistancePXDPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/base/Filter.icc.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.icc.h>
@@ -46,6 +47,7 @@ std::map<std::string, std::string> PXDPairFilterFactory::getValidFilterNamesAndD
     {"angulardistance", "based on the angular distance of the hit positions"},
     {"loose", "loose prefilter"},
     {"intercept", "intercept filter"},
+    {"cylinderextrapolation", "filter based selection using an extrapolation to a cylinder with radius of the ToState"},
   };
 }
 
@@ -76,6 +78,10 @@ PXDPairFilterFactory::create(const std::string& filterName) const
 
   if (filterName == "intercept") {
     return std::make_unique<InterceptDistancePXDPairFilter>();
+  }
+
+  if (filterName == "cylinderextrapolation") {
+    return std::make_unique<CylinderDistancePXDPairFilter>();
   }
 
   return Super::create(filterName);

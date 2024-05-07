@@ -133,8 +133,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRate->Print("c_AbortRate.pdf");
 
 
-  // check tracking abort rate VS time after last HER pre-injection signal");
-  hAbortRateHER->GetZaxis()->SetTitle("Fraction of events / bin"); and time within a beam cycle HER
+  // check tracking abort rate VS time after last HER pre-injection signal and time within a beam cycle HER
   TH2F* hAbortHER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeHER"));
   TH2F* hAllHER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeHER"));
   if (hAbortHER != nullptr && hAllHER != nullptr) {
@@ -165,8 +164,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
     m_cAbortRateHER->Print("c_AbortRateHER.pdf");
 
 
-  // check tracking abort rate VS time after last LER pre-injection signal");
-  hAbortRateHER->GetZaxis()->SetTitle("Fraction of events / bin"); and time within a beam cycle LER
+  // check tracking abort rate VS time after last LER pre-injection signal and time within a beam cycle LER
   TH2F* hAbortLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeLER"));
   TH2F* hAllLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeLER"));
   if (hAbortLER != nullptr && hAllLER != nullptr) {

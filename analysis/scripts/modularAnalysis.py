@@ -741,13 +741,42 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     if b2bii.isB2BII():
         B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('scale', scale)
-    trackingmomentum.param('payloadName', payloadName)
-    trackingmomentum.param('scalingFactorName', scalingFactorName)
+    TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
+    TrackingMomentumScaleFactors.param('particleLists', inputListNames)
+    TrackingMomentumScaleFactors.param('scale', scale)
+    TrackingMomentumScaleFactors.param('payloadName', payloadName)
+    TrackingMomentumScaleFactors.param('scalingFactorName', scalingFactorName)
 
-    path.add_module(trackingmomentum)
+    path.add_module(TrackingMomentumScaleFactors)
+
+
+def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", correctionName="SF", path=None):
+    """
+    Correct the energy loss of tracks according to a 'correction' value.
+    This correction can either be given as constant number or as the name of the payload which contains
+    the variable corrections.
+    If the particle list contains composite particles, the momenta of the track-based daughters are corrected.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        correction (float): correction value to be subtracted to the particle energy (0.0 -- no correction)
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        correctionName (str): name of correction variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The tracking energy correction can only be run over Belle II data.")
+
+    TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')
+    TrackingEnergyLossCorrection.param('particleLists', inputListNames)
+    TrackingEnergyLossCorrection.param('correction', correction)
+    TrackingEnergyLossCorrection.param('payloadName', payloadName)
+    TrackingEnergyLossCorrection.param('correctionName', correctionName)
+
+    path.add_module(TrackingEnergyLossCorrection)
 
 
 def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
@@ -758,17 +787,17 @@ def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear"
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        payloadName (str): name of the payload which contains the smearing valuess
+        payloadName (str): name of the payload which contains the smearing values
         smearingFactorName (str): name of smearing factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('payloadName', payloadName)
-    trackingmomentum.param('smearingFactorName',  smearingFactorName)
+    TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
+    TrackingMomentumScaleFactors.param('particleLists', inputListNames)
+    TrackingMomentumScaleFactors.param('payloadName', payloadName)
+    TrackingMomentumScaleFactors.param('smearingFactorName',  smearingFactorName)
 
-    path.add_module(trackingmomentum)
+    path.add_module(TrackingMomentumScaleFactors)
 
 
 def mergeListsWithBestDuplicate(outputListName,
@@ -1996,7 +2025,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix="", useFloat=False):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False, storeEventType=True):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2014,6 +2043,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
         useFloat (bool): Use single precision (float) instead of double precision (double)
                          for floating-point numbers.
+        storeEventType (bool) : if true, the branch __eventType__ is added for the MC event type information.
+                                The information is available from MC16 on.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2028,6 +2059,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
     output.param('useFloat', useFloat)
+    output.param('storeEventType', storeEventType)
     path.add_module(output)
 
 
@@ -3342,8 +3374,8 @@ def getBeamBackgroundProbability(particleList, weight, path=None):
     """
 
     import b2bii
-    if b2bii.isB2BII():
-        B2ERROR("The beam background MVA is not trained for Belle data.")
+    if b2bii.isB2BII() and weight != "Belle":
+        B2WARNING("weight type must be 'Belle' for b2bii.")
 
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -3360,8 +3392,8 @@ def getFakePhotonProbability(particleList, weight, path=None):
     """
 
     import b2bii
-    if b2bii.isB2BII():
-        B2ERROR("The fake photon MVA is not trained for Belle data.")
+    if b2bii.isB2BII() and weight != "Belle":
+        B2WARNING("weight type must be 'Belle' for b2bii.")
 
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -4390,7 +4422,7 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
 
 
 func_requiring_analysisGT = [
-    scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
+    correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
     addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
 for _ in func_requiring_analysisGT:

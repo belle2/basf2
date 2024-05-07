@@ -297,6 +297,9 @@ def add_expressreco_processing(path,
         else:
             basf2.B2FATAL(f"Run Type {run_type} not supported.")
 
+        basf2.set_module_parameters(path, "SVDTimeGrouping", forceGroupingFromDB=False,
+                                    isEnabledIn6Samples=True, isEnabledIn3Samples=True)
+
     path_utils.add_expressreco_dqm(path, run_type, components=reco_components)
 
     if prune_output:
@@ -352,8 +355,8 @@ def finalize_zmq_path(path, args, location):
     basf2.set_streamobjs(save_objects)
 
     if location == constants.Location.expressreco:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=False)
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=False, outputConfirmation=False)
     elif location == constants.Location.hlt:
-        path.add_module("HLTDs2ZMQ", output=args.output, raw=True)
+        path.add_module("HLTDs2ZMQ", output=args.output, raw=True, outputConfirmation=True)
     else:
         basf2.B2FATAL(f"Does not know location {location}")

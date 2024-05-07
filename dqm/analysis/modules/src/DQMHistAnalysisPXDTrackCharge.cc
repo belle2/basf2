@@ -179,13 +179,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 //   auto sg = m_rfws->var("sg");
 
   {
-    m_cTrackedClusters->Clear();
-    m_cTrackedClusters->cd();
-    m_hTrackedClusters->Reset();
-
     std::string name = "Tracked_Clusters"; // new name
     TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
     if (hh2) {// update only if histogram is updated
+      m_cTrackedClusters->Clear();
+      m_cTrackedClusters->cd();
+      m_hTrackedClusters->Reset();
+
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
         int j = 1;
@@ -238,11 +238,11 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i];
     std::replace(name.begin(), name.end(), '.', '_');
 
-    canvas->cd();
-    canvas->Clear();
-
     TH1* hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {// update only if histo was updated
+      canvas->cd();
+      canvas->Clear();
+      UpdateCanvas(canvas);
 
       if (hh1->GetEntries() > 50) {
 
@@ -268,6 +268,8 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         m_gCharge->SetPoint(p, i + 0.49, ml->getValV());
         m_gCharge->SetPointError(p, 0.1, ml->getError()); // error in x is useless
         m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), ml->getValV(), ml->getError());
+      } else {
+        hh1->Draw("hist"); // avoid to confuse people by showing nothing for low stat
       }
 
       // get ref histogram, assumes no m_histogramDirectoryName directory in ref file

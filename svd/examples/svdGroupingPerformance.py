@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -119,7 +118,7 @@ class SVDGroupingPerformance(b2.Module):
 
         timeBin = int(maxTime - minTime)
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.TH1F_Index = {}
         self.TH1F_Store = []
         TH1F_Store_Count = 0
@@ -694,7 +693,8 @@ else:
 trk.add_tracking_reconstruction(
     main,
     mcTrackFinding=MCTracking,
-    append_full_grid_cdc_eventt0=True)
+    append_full_grid_cdc_eventt0=True,
+    skip_full_grid_cdc_eventt0_if_svd_time_present=False)
 
 main.add_module(SVDGroupingPerformance())
 

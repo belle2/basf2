@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #ifndef __nsm2_h__
 #define __nsm2_h__
 
@@ -15,8 +16,8 @@ extern "C" {
 /* -- version info */
 
 #define NSM_REQUIRED_VERSION  1999 /* required version */
-#define NSM_LIBRARY_VERSION   2003 /* library version */
-#define NSM_PACKAGE_VERSION   2006 /* package version */
+#define NSM_LIBRARY_VERSION   2008 /* library version */
+#define NSM_PACKAGE_VERSION   2008 /* package version */
 
 /*
   20120723 1900 file created
@@ -121,6 +122,8 @@ extern "C" {
   20200520 2004 fix: close fd 0,1,2 before running in background
   20200522 2005 fix: allow udp socket == 0, eliminate log at startup with -b
   20200603 2006 fix: corelib nnod fix
+  20210315 2007 fix: corelib nsmlib_parsefree fix for nsmlib_allocmem
+  20220425 2008 mod: nsmd2 ackdaemon format and handling, allocmem handling
  */
 
 /* -- DATA TYPES ----------------------------------------------------- */

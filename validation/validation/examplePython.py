@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 """
 <header>
-<contact>Kilian Lieret, Kilian.Lieret@campus.lmu.de</contact>
+<contact>arul.prakash@physik.uni-muenchen.de</contact>
 <description>
 This file contains example for generating validation plots using python
 </description>

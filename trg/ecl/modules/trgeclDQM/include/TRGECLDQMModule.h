@@ -14,8 +14,10 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
+#include "rawdata/dataobjects/RawFTSW.h"
 
-#include <TH1F.h>
+class TH1;
+class TH2;
 
 namespace Belle2 {
 
@@ -62,6 +64,8 @@ namespace Belle2 {
     TH1* h_Narrow_TotalEnergy = nullptr;
     //! N of TC Hit / event
     TH1* h_n_TChit_event = nullptr;
+    //! N of TC Hit / event vs. time since injection
+    TH2* h_nTChit_injtime = nullptr;
     //! N of Cluster / event
     TH1* h_Cluster = nullptr;
     //! TC Timing / event
@@ -76,7 +80,6 @@ namespace Belle2 {
     TH1* h_ECL_TriggerBit = nullptr;
     //! Energy sum of 2 Top energetic clusters when 3D bhabnha bit on
     TH1* h_Cluster_Energy_Sum = nullptr;
-
 
     //! Hit TCId
     std::vector<int> TCId;
@@ -100,6 +103,9 @@ namespace Belle2 {
     StoreArray<TRGECLUnpackerSumStore> trgeclSumArray;
     //! Trg ECL Cluster output
     StoreArray<TRGECLCluster> trgeclCluster;
+    //! Array to access the FTSW information
+    StoreArray<RawFTSW> m_rawTTD;
+
   };
 
 }

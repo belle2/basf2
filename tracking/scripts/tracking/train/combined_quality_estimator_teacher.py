@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -530,11 +529,13 @@ class GenerateSimTask(Basf2PathTask):
         # path.add_module("ActivatePXDPixelMasker")
         # path.add_module("ActivatePXDGainCalibrator")
         bkg_files = background.get_background_files(self.bkgfiles_dir)
+        # \cond suppress doxygen warning
         if self.experiment_number == 1002:
             # remove KLM because of bug in background files with release 4
             components = ['PXD', 'SVD', 'CDC', 'ECL', 'TOP', 'ARICH', 'TRG']
         else:
             components = None
+        # \endcond
         simulation.add_simulation(path, bkgfiles=bkg_files, bkgOverlay=True, components=components)  # , usePXDDataReduction=False)
 
         path.add_module(
@@ -1918,7 +1919,7 @@ class TrackQEEvaluationBaseTask(Task):
         stderr_log_file_path = log_file_dir + "stderr"
         stdout_log_file_path = log_file_dir + "stdout"
         with open(stdout_log_file_path, "w") as stdout_file:
-            stdout_file.write("stdout output of the command:\n{}\n\n".format(" ".join(cmd)))
+            stdout_file.write(f'stdout output of the command:\n{" ".join(cmd)}\n\n')
         if os.path.exists(stderr_log_file_path):
             # remove stderr file if it already exists b/c in the following it will be opened in appending mode
             os.remove(stderr_log_file_path)

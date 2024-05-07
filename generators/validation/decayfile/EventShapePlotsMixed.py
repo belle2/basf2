@@ -12,7 +12,7 @@
 <header>
     <input>MCvalidationMixed.root</input>
     <output>EventShapePlotsMixed.root</output>
-    <contact>Frank Meier; frank.meier@belle2.org</contact>
+    <contact>Swagato Banerjee; swagato.banerjee@gmail.com</contact>
     <description>Comparing event shape variables</description>
 </header>
 """
@@ -46,7 +46,7 @@ def PlottingHistos(var):
     hist.SetTitle(f";{axis_dic[var]}; Events")
     hist.GetListOfFunctions().Add(ROOT.TNamed('Description', axis_dic[var]))
     hist.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Shape should not change drastically.'))
-    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'frank.meier@belle2.org'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'swagato.banerjee@gmail.com'))
     hist.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
     hist.Write()
 

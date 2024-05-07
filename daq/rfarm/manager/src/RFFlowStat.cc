@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include "daq/rfarm/manager/RFFlowStat.h"
+#include <ctime>
 
 using namespace Belle2;
 using namespace std;

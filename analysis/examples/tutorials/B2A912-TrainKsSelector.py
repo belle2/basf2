@@ -11,7 +11,7 @@
 ##########################################################################
 #                                                                        #
 # This tutorial demonstrates how to train weight file for KsSelector     #
-# Data sample for this trainig is created by                             #
+# Data sample for this training is created by                            #
 # B2A911-CreateTrainData.py                                              #
 #                                                                        #
 ##########################################################################

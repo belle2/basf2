@@ -10,6 +10,7 @@ import torch.nn.functional as F
 import dgl
 import dgl.nn.pytorch as dglnn
 from dgl.nn.pytorch.glob import GlobalAttentionPooling
+
 from smartBKG import TOKENIZE_DICT
 
 NUM_PDG = len(TOKENIZE_DICT)
@@ -31,29 +32,40 @@ class GATModule(torch.nn.Module):
     ):
         """
         Initialise the class.
-        :param in_feats:  TODO
-        :param units:  TODO
-        :param num_heads:  TODO
-        :param in_feats_glob:  TODO
-        :param use_gap:  TODO
+
+        :param in_feats: Number of features for each node.
+        :param units: Number of output units for the GAT layer.
+        :param num_heads: Number of attention heads in the GAT layer.
+        :param in_feats_glob: Current dimension of global features. Initialized as 0.
+        :param use_gap: Whether to use Global Attention Pooling (GAP) for the production of global features.
         """
         super().__init__()
-        #: TODO
+        #: GAT layer to update node features
         self.gat = dglnn.GATConv(in_feats, units, num_heads)
         out_feats = units * num_heads
-        #: TODO
+        #: Fully connected layer for feature aggregation to update global features
         self.fc = torch.nn.Linear(in_feats_glob + out_feats, units)
-        #: TODO
+        #: Whether to use Global Attention Pooling (GAP) for the production of global features
         self.use_gap = use_gap
         if self.use_gap:
-            #: TODO
+            #: Linear gate to produce global features
             self.gap_gate = torch.nn.Linear(out_feats, 1)
-            #: TODO
+            #: Global Attention Pooling layer to produce global features
             self.gap = GlobalAttentionPooling(self.gap_gate)
 
     def forward(self, graph, feat, feat_glob=None):
         """
-        TODO
+        Forward pass of the GAT module.
+
+        Arguments:
+            graph (torch.Tensor): DGLGraph representing the decay tree.
+            feat (torch.Tensor): Node feataures attached to the graph.
+            feat_glob (torch.Tensor): Global features from previous layers.
+            `None` for initialized as the global average or attention pooling of the whole graph.
+
+        Returns:
+            torch.Tensor: updated node features.
+            torch.Tensor: updated global features.
         """
         h = F.leaky_relu(self.gat(graph, feat)).flatten(1)
         hg = feat_glob
@@ -66,9 +78,9 @@ class GATModule(torch.nn.Module):
         if hg is None:
             hg = hmean
         else:
-            # concatenate previous state with new aggregation
+            # Concatenate previous global features with new aggregation
             hg = torch.cat((hg, hmean), axis=1)
-        # update global state
+        # Update global features
         hg = F.leaky_relu(self.fc(hg))
         return h, hg
 
@@ -86,7 +98,7 @@ class GATGAPModel(torch.nn.Module):
        emb_size(int): Dimension of embedded PDG space
        attention_heads(int): Number of attention heads for GAT Convolutional layers
        n_layers(int): Number of GAT Convolutional layers
-       use_gap(bool): Whether use Global Attention Pooling or Global Average
+       use_gap(bool): Whether to use Global Attention Pooling (GAP) for the production of global features
 
     Returns:
        logits(float): Indicating the probability of an event being able to pass the
@@ -105,19 +117,21 @@ class GATGAPModel(torch.nn.Module):
     ):
         """
         Initialise the class.
-        :param units: TODO
-        :param num_features: TODO
-        :param num_pdg: TODO
-        :param emb_size: TODO
-        :param attention_heads: TODO
-        :param n_layers: TODO
-        :param use_gap: TODO
+
+        :param units: Number of units for the output dimension of GAT Convolutional layers
+        as well as the dimension of global features.
+        :param num_features: Number of features attached to each node or particle as NN input.
+        :param num_pdg: Number of all possible PDG IDs.
+        :param emb_size: Dimension of embedded PDG space.
+        :param attention_heads: Number of attention heads for GAT Convolutional layers.
+        :param n_layers: Number of GAT Convolutional layers.
+        :param use_gap: Whether to use Global Attention Pooling (GAP) for the production of global features.
         """
         super().__init__()
-        #: TODO
+        #: Embedding layer for PDG IDs
         self.pdg_embedding = torch.nn.Embedding(num_pdg + 1, emb_size)
         in_feats = num_features + emb_size
-        #: TODO
+        #: List of GAT modules to update node features
         self.gat_layers = torch.nn.ModuleList()
         in_feats_glob = 0
         for i in range(n_layers):
@@ -133,12 +147,18 @@ class GATGAPModel(torch.nn.Module):
             in_feats = units * attention_heads
             in_feats_glob = units
 
-        #: TODO
+        #: Output layer for final prediction
         self.fc_output = torch.nn.Linear(units, 1)
 
     def forward(self, graph):
         """
-        TODO
+        Forward pass of the GATGAPModel.
+
+        Arguments:
+            graph (torch.Tensor): DGLGraph representing the decay tree.
+
+        Returns:
+            torch.Tensor: the final prediction with size 1.
         """
         h_pdg = graph.ndata["x_pdg"]
         h_feat = graph.ndata["x_feature"]

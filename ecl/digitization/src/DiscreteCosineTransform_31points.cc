@@ -16,7 +16,7 @@
  *    DCT-II or "the" DCT transformation of 31-point signal
  *    void e10_31(const double *A, double *C){
  *      for(int i=0;i<31;i++){
- *        double c = 0; for(int j=0;j<31;j++) c += A[j]*cos(M_PI/31*(j+0.5)*i);
+ *        double c = 0; for(int j=0;j<31;j++) c += A[j]*cos(M_PI/31 * (j+0.5) * i);
  *        C[i] = 2*c;
  *      }
  *    }
@@ -24,7 +24,7 @@
  *    and DCT-III or "the inverse" DCT transformation of 31-point signal
  *    void e01_31(const double *C, double *A){
  *      for(int i=0;i<31;i++){
- *        double a = 0.5*C[0]; for(int j=1;j<31;j++) a += C[j]*cos(M_PI/31*j*(i+0.5));
+ *        double a = 0.5*C[0]; for(int j=1;j<31;j++) a += C[j]*cos(M_PI/31*j * (i+0.5));
  *        A[i] = 2*a;
  *      }
  *    }

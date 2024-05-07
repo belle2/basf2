@@ -19,8 +19,8 @@ void ARICHGeoMirrors::initializeDefault()
 {
   double rmir = m_radius - m_plateThickness / 2.;
   for (unsigned i = 0; i < m_nMirrors; i++) {
-    TVector3 norm(cos(i * 2.*M_PI / m_nMirrors + m_startAngle),
-                  sin(i * 2.*M_PI / m_nMirrors + m_startAngle), 0);
+    ROOT::Math::XYZVector norm(cos(i * 2.*M_PI / m_nMirrors + m_startAngle),
+                               sin(i * 2.*M_PI / m_nMirrors + m_startAngle), 0);
     m_normVector.push_back(norm);
     m_point.push_back(rmir * norm);
     m_installed.push_back(true);

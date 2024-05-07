@@ -997,7 +997,7 @@ class AlgorithmMachine(Machine):
         Returns:
             bool: Whether or not this machine has been set up correctly with all its necessary attributes.
         """
-        B2INFO("Checking validity of current setup of AlgorithmMachine for {}.".format(self.algorithm.name))
+        B2INFO(f"Checking validity of current setup of AlgorithmMachine for {self.algorithm.name}.")
         # Check if we're somehow missing a required attribute (should be impossible since they get initialised in init)
         for attribute_name in self.required_attrs:
             if not hasattr(self, attribute_name):

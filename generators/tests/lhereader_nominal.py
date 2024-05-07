@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # Test LHEReader and LHEInputModule
 
@@ -28,7 +27,7 @@ add_particle('A', 9000008, 5.5, 0.1329, 0, 0)
 
 # configure the LHE reade
 lhereader = register_module('LHEInput')
-lhereader.param('makeMaster', True)
+lhereader.param('createEventMetaData', True)
 lhereader.param('runNum', 1337)
 lhereader.param('expNum', 0)
 lhereader.param('inputFileList', [inputfile])
@@ -71,8 +70,8 @@ with TemporaryDirectory() as tmp:
     t1 = fi.Get('darkphoton')
     t2 = fi.Get('gammas')
 
-    assert t1.GetEntries() == 1, 'Output contains %i entries' % t1.GetEntries()
-    assert t2.GetEntries() == 1, 'Output contains %i entries' % t1.GetEntries()
+    assert t1.GetEntries() == 1, f'Output contains {int(t1.GetEntries())} entries'
+    assert t2.GetEntries() == 1, f'Output contains {int(t1.GetEntries())} entries'
 
     t1.GetEntry(0)
     t2.GetEntry(0)

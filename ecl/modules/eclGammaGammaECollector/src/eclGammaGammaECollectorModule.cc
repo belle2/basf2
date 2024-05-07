@@ -18,7 +18,6 @@
 #include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/RelationVector.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/VectorUtil.h>
 #include <mdst/dataobjects/ECLCluster.h>

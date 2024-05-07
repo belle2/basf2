@@ -112,7 +112,7 @@ plt.savefig(f'{OutputPath}/xTalkProb_{exp}_{data_type}.pdf')
 #: variables to write out
 names = ["Board", "Channel", 'Nhit', 'asic']
 for i in range(8):
-    names += ['Asic_ADC{:d}'.format(i), 'Asic_TDC{:d}'.format(i), 'Asic_TOT{:d}'.format(i)]
+    names += [f'Asic_ADC{i:d}', f'Asic_TDC{i:d}', f'Asic_TOT{i:d}']
 #: do not write index
 with uproot.recreate(f'{OutputPath}/xTalkProb_{exp}_{data_type}.root') as output:
     df_tmp = df.query('nhit>3 & asic==1')

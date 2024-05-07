@@ -40,5 +40,6 @@
 #pragma link C++ class Belle2::SVDCrossTalkCalibrationsAlgorithm-; // checksum=0x71ffb51b, version=-1
 #pragma link C++ class Belle2::SVDClusterTimeShifterAlgorithm-;
 #pragma link C++ class Belle2::SVDTimeValidationAlgorithm-;
+#pragma link C++ class Belle2::SVDdEdxCalibrationAlgorithm-;
 
 #endif

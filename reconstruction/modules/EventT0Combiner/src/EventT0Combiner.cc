@@ -56,6 +56,8 @@ void EventT0CombinerModule::event()
   }
 
   // No CDC chi2 EventT0 present -> try to combine ECL and CDC hit based EventT0
+  // First, clear the EventT0 so that EventT0::hasEventT0() will return false
+  m_eventT0->clearEventT0();
   const auto& bestECLT0 = m_eventT0->getBestECLTemporaryEventT0();
   const auto& cdcT0Candidates = m_eventT0->getTemporaryEventT0s(Const::CDC);
   const auto& hitBasedCDCT0Candidate = std::find_if(cdcT0Candidates.begin(), cdcT0Candidates.end(), [](const auto & a) { return a.algorithm == "hit based";});
@@ -86,7 +88,6 @@ void EventT0CombinerModule::event()
               " * the CDC based hit-based algorithm\n" \
               " * the ECL algorithm.\n" \
               "Thus, no EventT0 value can be calculated.");
-    m_eventT0->clearEventT0();
   }
 
 

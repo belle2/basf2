@@ -1,4 +1,0 @@
----
-database_io:
-  download_from_database: False # download from db if weight files not found
-  upload_to_database: False # upload weight files to db after training

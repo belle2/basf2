@@ -628,8 +628,9 @@ bool DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& hi
   // Admittedly quite a hacky way to obtain the normalisation values: Create a new histogram and fill each of the bins with
   // the bin content of the -1 bin of h which is used for bin counting, and at the same time set the corresponding bin label.
   const auto totalEntries = h->GetBinContent(-1);
-  TH1D* totalHist = new TH1D("total", "total;Algorithm;Fraction #epsilon", 6, 0, 6);
-  for (uint i = 0; i < 6; i++) {
+  const auto nBins = h->GetNbinsX();
+  TH1D* totalHist = new TH1D("total", "total;Algorithm;Fraction #epsilon", nBins, 0, nBins);
+  for (int i = 0; i < nBins; i++) {
     totalHist->SetBinContent(i + 1, totalEntries);
   }
   eff->SetPassedHistogram(*h, "f");
@@ -649,8 +650,8 @@ bool DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& hi
   // Print x-axis bin labels horizontally
   ax->SetTitleOffset(1.0);
   ax->CenterTitle(kTRUE);
-  ax->Set(6, 0, 6);
-  for (uint i = 0; i < 6; i++) {
+  ax->Set(nBins, 0, nBins);
+  for (int i = 0; i < nBins; i++) {
     ax->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
   }
 

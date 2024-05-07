@@ -484,10 +484,10 @@ void EventT0DQMModule::fillHistogram(TH1D* hist, const bool hasAnyT0, const bool
                                      const bool hasCDCHitT0, const bool hasCDCGridT0, const bool hasTOPT0)
 {
   hist->Fill(-1); // counting events for normalisation
-  hist->Fill(c_eventT0Algorithms[0], hasAnyT0);
-  hist->Fill(c_eventT0Algorithms[1], hasECLT0);
-  hist->Fill(c_eventT0Algorithms[2], hasSVDT0);
-  hist->Fill(c_eventT0Algorithms[3], hasCDCHitT0);
-  hist->Fill(c_eventT0Algorithms[4], hasCDCGridT0);
-  hist->Fill(c_eventT0Algorithms[5], hasTOPT0);
+  hist->Fill(c_eventT0Algorithms[0], hasECLT0);
+  hist->Fill(c_eventT0Algorithms[1], hasSVDT0);
+  hist->Fill(c_eventT0Algorithms[2], hasCDCHitT0);
+  hist->Fill(c_eventT0Algorithms[3], hasCDCGridT0);
+  hist->Fill(c_eventT0Algorithms[4], hasTOPT0);
+  hist->Fill(c_eventT0Algorithms[5], hasAnyT0);
 }

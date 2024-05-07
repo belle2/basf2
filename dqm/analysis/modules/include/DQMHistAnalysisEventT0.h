@@ -106,7 +106,7 @@ namespace Belle2 {
     TPad* m_pMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
 
     /// EventT0 algorithms for which to calculate fractions of abundance
-    const char* c_eventT0Algorithms[6] = {"Any", "ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP"};
+    const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP", "Any"};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
     TEfficiency* m_eAlgorithmSourceFractionsHadronL1ECLTRG = nullptr;
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger

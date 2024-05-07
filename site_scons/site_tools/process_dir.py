@@ -48,7 +48,7 @@ def get_python_files_recursive(topdir_path):
 
     for (dir_path, dir_names, file_names) in os.walk(topdir_path):
         for file_name in file_names:
-            if file_name.endswith('.py'):
+            if file_name.endswith('.py') or file_name.endswith('.yaml'):
                 file_path = os.path.join(dir_path, file_name)
                 file_node = File(file_path)
                 python_file_nodes.append(file_node)

@@ -19,14 +19,14 @@ You can find a brief description of the model in the documentation of the `GraFE
    `'Learning tree structures from leaves for particle decay reconstruction' <https://iopscience.iop.org/article/10.1088/2632-2153/ac8de0>`_ 
    by Kahn et al. Please consider citing both papers. 
    The code is adapted from the work of Kahn et al (available `here <https://github.com/Helmholtz-AI-Energy/BaumBauen>`_).
-   A detailed description of the model is also available in this `Belle II internal note <https://docs.belle2.org/record/3649>`_.
+   A detailed description of the model is also available in this `Belle II internal note <https://docs.belle2.org/record/3649>`_ (restricted access).
 
 The network is trained to predict the mass hypotheses of final state particles and the **Lowest Common Ancestor** (LCA) matrix of the event.
 Each element of this matrix corresponds to a pair of final state particles, and contains the lowest ancestor common to both particles. 
 To avoid the use of a unique identifier for each ancestor, a system of classes is used: 
 6 for :math:`\Upsilon (4S)` resonances, 5 for :math:`B^{\pm,0}` mesons, 4 for :math:`{D^{*}_{(s)}}^{\pm, 0}`, 3 for :math:`D^{\pm,0}`, 
 2 for :math:`K_{s}^{0}`, 1 for :math:`\pi^{0}`` or :math:`J/\psi` and 0 for particles not belonging to the decay tree. 
-This new representation of the LC.A is called LCAS matrix, where the S stands for "stage".
+This new representation of the LCA is called LCAS matrix, where the S stands for "stage".
 An example of decay tree with its corresponding LCAS matrix is:
 
 .. figure:: figs/decay_tree.png
@@ -72,10 +72,10 @@ Applying the model to data
 The model ``.yaml`` and ``.pt`` output files can be saved to a payload with the script ``grafei/scripts/save_model_to_payload.py`` 
 and uploaded to a global tag in order to run on the grid.
 
-Finally, the model can be included in a steering file via the `GraFEIModule <grafei.GraFEIModule>`, 
+Finally, the model can be included in a steering file via the `graFEI <grafei.graFEI>` wrapper function, 
 in order to apply the model to Belle II data and MC.
-Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI/steering_file_examples``.
-In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI`` can be added.
+Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI``.
+In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI_`` can be added.
 When using the model in :math:`\Upsilon (4S)` reconstruction mode you have also the possibility of specifying an LCAS matrix (in the form of a nested list) and a list
 of mass hypotheses (following the convention outlined in the `select_good_decay` class) for your **signal-side**: in the case where the predicted LCAS matrix describes a valid tree structure, 
 the code checks if a subset of particles in the tree matches the given LCAS and mass hypotheses 
@@ -128,7 +128,11 @@ The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong 
 and -1 for particles in events with ``graFEI_goodEvent = 0``. Therefore, if you want meaningful distributions you should cut on events with ``graFEI_goodEvent = 1``.
 However, if you reconstruct the signal-side as in the example, only good events are kept.
 
-The variables added by the `GraFEIModule <grafei.GraFEIModule>` are filled with ``nan`` if there are less than two reconstructed particles in the event.
+.. warning::
+   For the time being, the mass hypotheses defined at the beginning are not changed, even if new hypotheses are predicted by the model. 
+   Thus you'll have to consider all of them when creating your signal-side candidates. This behavior will change in future versions of the tool.
+
+The variables added by the GraFEI are filled with ``nan`` if there are less than two reconstructed particles in the event.
 Otherwise, they are defined as follows:
 
 ======================================== ==================================================================================================================================
@@ -179,14 +183,15 @@ Code documentation
 
 This section describes the grafei code.
 
-Core module
-***********
+Core modules
+************
 
-You can import this module in a steering file with ``from grafei import GraFEIModule``.
+If you want to use a custom steering file to create training data, you can import the `LCASaverModule <LCASaverModule.LCASaverModule>` with ``from grafei import lcaSaver``. 
+You can import the core `GraFEIModule <GraFEIModule.GraFEIModule>` in a steering file with ``from grafei import graFEI``. 
+These are wrapper functions that internally call the modules and add them to the basf2 path.
 
 .. automodule:: grafei
-   :members:
-   :exclude-members: event, initialize
+   :members: graFEI, lcaSaver
 
 
 Other modules and functions
@@ -200,6 +205,7 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.create_trainer
    :members:
+   :exclude-members: configs, device, evaluators, ignore_index, log_results, model, optimizer, run_dir, setup_handlers, tags, timestamp, trainer
 
 .. automodule:: grafei.model.dataset_split
    :members:
@@ -212,26 +218,27 @@ users usually do not need to manipulate these components.
 
 .. automodule:: grafei.model.geometric_datasets
    :members:
-   :exclude-members: process, processed_file_names
+   :exclude-members: process, processed_file_names, data, edge_features, global_features, n_files, node_features, normalize, root, samples, slices
 
 .. automodule:: grafei.model.geometric_layers
    :members:
-   :exclude-members: forward
+   :exclude-members: forward, dropout_prob, lin_in, lin_out, lins_hid, nonlin_function, norm, normalize, num_hid_layers
 
 .. automodule:: grafei.model.geometric_network
    :members:
-   :exclude-members: forward
+   :exclude-members: forward, ML_list, first_ML, last_ML
 
 .. automodule:: grafei.model.lca_to_adjacency
    :members:
+   :exclude-members: bfs_index, children, lca_index, lcas_level, level, parent
 
 .. automodule:: grafei.model.metrics
    :members:
-   :exclude-members: compute, update, reset
+   :exclude-members: compute, update, reset, device, ignore_index
 
 .. automodule:: grafei.model.multiTrain
    :members:
-   :exclude-members: forward
+   :exclude-members: forward, LCA_CE, alpha_mass, mass_CE
 
 .. automodule:: grafei.model.normalize_features
    :members:
@@ -239,6 +246,10 @@ users usually do not need to manipulate these components.
 .. automodule:: grafei.model.tree_utils
    :members:
 
-.. automodule:: grafei.modules.RootSaverModule
+.. automodule:: grafei.modules.LCASaverModule
    :members:
-   :exclude-members: event, initialize, terminate
+   :exclude-members: event, initialize, terminate, features, mcparticle_list, output_file, particle_lists
+
+.. automodule:: grafei.modules.GraFEIModule
+   :members:
+   :exclude-members: cfg_path, event, gpu, initialize, param_file, particle_list, payload_config_name, payload_model_name, sig_side_lcas, sig_side_masses

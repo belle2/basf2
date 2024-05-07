@@ -92,30 +92,35 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   if (hnevt) m_metaData->setNEvents(hnevt->GetEntries());
   else m_metaData->setNEvents(m_nevt);
 
-  TFile f(fname, "NEW");
-
-  if (f.IsZombie()) {
+  TFile* f = new TFile(fname, "NEW");
+  int exist = 0;
+  if (f->IsZombie()) {
     B2WARNING("File " << LogVar("MonitoringObject file",
-                                fname) << " already exists and it will not be rewritten. If desired please delete file and re-run.");
-    return;
+                                fname) << " already exists additional data will be appended! previous metadata is keept.");
+    f = new TFile(fname, "UPDATE");
+    exist = 1;
   }
 
-  // set meta data info
-  //  m_metaData->setNEvents(lastEvtMeta->getEvent());
-  m_metaData->setExperimentRun(exp, run);
-  time_t ts = lastEvtMeta->getTime() / 1e9;
-  struct tm* timeinfo;
-  timeinfo = localtime(&ts);
-  // cppcheck-suppress asctimeCalled
-  m_metaData->setRunDate(asctime(timeinfo));
+  // set and write meta data info if first input
+  if (!exist) {
+    m_metaData->setExperimentRun(exp, run);
+    time_t ts = lastEvtMeta->getTime() / 1e9;
+    struct tm* timeinfo;
+    timeinfo = localtime(&ts);
+    char buf[50];
+    m_metaData->setRunDate(asctime_r(timeinfo, buf));
+    m_metaData->Write();
+  }
 
-  m_metaData->Write();
   // get list of existing monitoring objects
   const MonObjList& objts =  getMonObjList();
   // write them to the output file
-  for (const auto& obj : objts)(obj.second)->Write();
-
-  f.Close();
+  for (const auto& obj : objts) {
+    // of object already exists rewrite it
+    if (exist) f->Delete((obj.second)->GetName() + TString(";*"));
+    (obj.second)->Write();
+  }
+  f->Close();
 
   if (m_treeFile.length() > 0) addTreeEntry();
 

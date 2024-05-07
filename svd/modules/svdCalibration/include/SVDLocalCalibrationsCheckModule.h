@@ -150,10 +150,22 @@ namespace Belle2 {
     void printLayerPage(int layer);  /**< print layer-number page*/
     void printPage(VxdID theVxdID, TList* listUBAD, TList* listVBAD, TList* listUGOOD, TList* listVGOOD, TString variable,
                    bool isL3);  /**< print the page relative to a sensor with problematic APVs*/
-    void printSummaryPages();  /**< summary page with 2D summary plot*/
+    void printMaskedSummaryPages();  /**< summary page with Masked strips summary plot*/
+    void printAPVSummaryPages();  /**< summary page with 2D summary plot with problemtic APVs*/
     void printLastPage();  /**< print last empty page*/
 
     int hasAnyProblem(TH1F* h, float cutAve, float cutCOUNT);  /**< return True if the APV has a problem, given a variable*/
+
+    /** MASKS */
+    SVDHistograms<TH2F>* m_h2MaskREF = nullptr; /**< mask VS strip 2D histo */
+    SVDHistograms<TH2F>* m_h2MaskCHECK = nullptr; /**< mask VS strip 2D histo */
+    SVDAPVHistograms<TH1F>* m_hMaskDIFF = nullptr; /**< mask histo */
+    SVDSummaryPlots* m_hMaskSummary = nullptr; /**< mask summary  histo */
+    SVDSummaryPlots* m_hMaskSummaryCHECK = nullptr; /**< mask summary  histo */
+    int m_nMaskedUREF = 0; /**< number of masked strips in the reference calibration (u side)*/
+    int m_nMaskedVREF = 0; /**< number of masked strips in the reference calibration (v side)*/
+    int m_nMaskedUCHECK = 0; /**< number of masked strips in the check calibration (u side)*/
+    int m_nMaskedVCHECK = 0; /**< number of masked strips in the check calibration (v side)*/
 
     /** NOISES */
     SVDHistograms<TH2F>* m_h2NoiseREF = nullptr; /**< noise VS strip 2D histo */

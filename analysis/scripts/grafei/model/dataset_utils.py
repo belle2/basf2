@@ -51,7 +51,7 @@ def populate_avail_samples(X, Y, B_reco=0):
                 evt_primary = x_attrs["primary"][evt_idx]
 
                 # particles coming from one or both Bs
-                matched = np.logical_or((evt_b_index == 1), (evt_b_index == 2)) if not B_reco else (evt_b_index == int(b_index))
+                matched = (evt_b_index != -1) if not B_reco else (evt_b_index == int(b_index))
 
                 # Keeping only those where there are reconstructed particles
                 if matched.sum() == 0:

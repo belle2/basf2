@@ -21,7 +21,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 import random
 import argparse
 
-from grafei import GraFEIModule
+from grafei import graFEI
 
 
 # Random seeds
@@ -41,7 +41,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_Bu2Knunu_graFEI_UpsReco_example",
+        default="analysis_tools_light-2403-persian",
         help="Globaltag containing graFEI model",
     )
     parser.add_argument(
@@ -72,11 +72,12 @@ if __name__ == "__main__":
 
     store_mc_truth = not args.no_mc_truth
 
-    b2.conditions.prepend_globaltag(args.globaltag)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-
     path = b2.create_path()
     ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
+
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+    if args.globaltag:
+        b2.conditions.prepend_globaltag(args.globaltag)
 
     #################################################################################################
     # GraFEI requirements and reconstruction
@@ -85,6 +86,8 @@ if __name__ == "__main__":
     #################################################################################################
 
     # 1) Cuts on charged tracks and photons
+    # These priors were obtained by counting truth-matched tracks in BB mixed MC
+    # It could be modified by the user if needed
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
 
     charged_cuts = [
@@ -161,14 +164,16 @@ if __name__ == "__main__":
             # Match MC particles for all lists
             ma.matchMCTruth(particle_list, path=path)
 
-    graFEI = GraFEIModule(
+    graFEI(
         "Upsilon(4S):final",
         cfg_path=args.config,
         param_file=args.weight,
         sig_side_lcas=args.lcas,
         sig_side_masses=args.masses,
+        payload_config_name="graFEIConfigFile_Upsreco_example",  # If you use default payload name just remove this argument
+        payload_model_name="graFEIModelFile_Upsreco_example",  # If you use default payload name just remove this argument
+        path=path,
     )
-    path.add_module(graFEI)
 
     # Define signal-side B
     # Here we consider all charged basf2 mass hypotheses
@@ -210,6 +215,13 @@ if __name__ == "__main__":
             path=path,
         )
 
+    # Reject events with no signal candidates
+    skimfilter = b2.register_module("SkimFilter")
+    skimfilter.param("particleLists", ["Upsilon(4S):graFEI"])
+    empty_path = b2.create_path()
+    skimfilter.if_value("=0", empty_path, b2.AfterConditionPath.END)
+    path.add_module(skimfilter)
+
     if store_mc_truth:
         ma.matchMCTruth("B+:Bsgn", path=path)
         ma.matchMCTruth("B-:Btag", path=path)
@@ -233,17 +245,10 @@ if __name__ == "__main__":
         "M",
         "Mbc",
         "deltaE",
-        "phi",
-        "theta",
-        "cosTheta",
-        # "cosTBz",
-        # "cosTBTO",
     ]
     default_vars += momentum_vars
 
     tm_vars = [
-        # "isSignal",
-        # "isSignalAcceptMissingNeutrino",
         "mcErrors",
         "genMotherPDG",
         "mcPDG",
@@ -254,8 +259,8 @@ if __name__ == "__main__":
         "graFEI_probEdgeProd",
         "graFEI_probEdgeMean",
         "graFEI_probEdgeGeom",
-        # "graFEI_validTree", # Always 1
-        # "graFEI_goodEvent", # Always 1
+        # "graFEI_validTree", # Always 1 in this case
+        # "graFEI_goodEvent", # Always 1 in this case
         "graFEI_nFSP",
         "graFEI_nCharged_preFit",
         "graFEI_nElectrons_preFit",

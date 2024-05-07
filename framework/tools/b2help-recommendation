@@ -1,0 +1,176 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+"""
+Get a summary of recommendations for analysis tools.
+"""
+
+import json
+import argparse
+import sys
+import versioning
+import basf2 as b2
+
+
+class Tool:
+    """
+    Analysis tool information.
+    """
+
+    def __init__(self, name, tags=None, description=None, recommendation=None, snippet=None):
+        self.name = name
+        self.tags = tags if tags else []
+        self.description = description
+        self.recommendation = recommendation if recommendation else {}
+        self.snippet = snippet
+
+    def to_json(self):
+        return {
+            "name": self.name,
+            "tags": self.tags,
+            "description": self.description,
+            "recommendation": self.recommendation,
+            "snippet": self.snippet,
+        }
+
+
+def load_data(filename: str):
+    """
+    load a local json file.
+    """
+    with open(filename, 'r') as file:
+        data = json.load(file)
+        return [Tool(**tool_data) for tool_data in data]
+
+
+def display_tool_info(tool: Tool):
+    """
+    display a tool's information.
+    """
+    print(f"Tool: {tool.name}")
+    print(f"  Tags: {', '.join(tool.tags)}")
+    print(f"  Description: {tool.description}")
+
+    recommendation = "\n".join([f"    {key}: {value}" for key, value in tool.recommendation.items()])
+    print(f"  Recommendation:\n{recommendation}")
+
+    if tool.snippet:
+        # print only if it is written.
+        print(f"  Snippet:\n\n{tool.snippet}")
+
+    print()
+
+
+def get_available_tags(tools: list):
+    """
+    Get all available tags.
+    """
+    tags = set()
+    for tool in tools:
+        tags.update(tool.tags)
+    # Sort the tags for the tests
+    return sorted(tags)
+
+
+def convert_json_to_payload(localfile: str, payload: str):
+    """
+    Convert json to payload and store it in localdb
+    """
+    from ROOT import Belle2
+
+    iov = Belle2.IntervalOfValidity.always()
+    db = Belle2.Database.Instance()
+    db.addPayload(payload, localfile, iov)
+
+def get_argument_parser():
+    """
+    Get the argument parser.
+    """
+    parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate.")
+    parser.add_argument("-t", "--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
+                        nargs='+', default=None)
+    parser.add_argument("-gt", "--globaltag", help="Global tag name, if one wants to check another recommendation",
+                        default=None)
+    parser.add_argument("-p", "--payload", help="Payload name, if one wants to check another recommendation",
+                        default=None)
+    parser.add_argument("-m", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
+                        default='MC15')
+    parser.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
+    parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
+    return parser
+
+def main():
+ 
+    args = get_argument_parser().parse_args()
+
+    if args.convert:
+        b2.B2INFO("Convert the localfile to a payload")
+
+        if args.localfile is None:
+            b2.B2ERROR("The localfile is not provided!")
+            sys.exit(1)
+        else:
+            payload_name = args.payload
+            if payload_name is None:
+                payload_name = versioning.performance_recommendation_global_tag()['payload']
+            convert_json_to_payload(args.localfile, payload_name)
+            sys.exit(0)
+
+    if args.localfile is None:
+        gt_name = args.globaltag
+        if gt_name is None:
+            gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']
+        payload_name = args.payload
+        if payload_name is None:
+            payload_name = versioning.performance_recommendation_global_tag(args.mccampaign)['payload']
+            
+        b2.conditions.prepend_globaltag(gt_name)
+
+        # set a temporal EventMetaData to access database
+        from ROOT import Belle2
+        Belle2.DataStore.Instance().setInitializeActive(True)
+        event_meta_data = Belle2.PyStoreObj('EventMetaData')
+        event_meta_data.registerInDataStore()
+        event_meta_data.assign(Belle2.EventMetaData(0, 0, 0), True)
+        Belle2.DataStore.Instance().setInitializeActive(False)
+
+        # if it is not found, B2ERROR is given
+        payload = Belle2.DBAccessorBase(Belle2.DBStoreEntry.c_RawFile, payload_name, True).getFilename()
+
+        if payload == "":
+            print("\nRecommendation information is not found!")
+            sys.exit(1)
+        else:
+            tools = load_data(payload)
+
+    else:
+        tools = load_data(args.localfile)
+
+    if args.tags is None:
+        print("Available Tags:")
+
+        available_tags = get_available_tags(tools)
+        for tag in available_tags:
+            print(f"  - {tag}")
+
+        print("\nYou can check all information with the 'all' tag.")
+
+    elif "all" in args.tags:
+        for tool in tools:
+            display_tool_info(tool)
+
+    else:
+        for tool in tools:
+            if all(tag in tool.tags for tag in args.tags):
+                display_tool_info(tool)
+
+
+if __name__ == "__main__":
+    main()

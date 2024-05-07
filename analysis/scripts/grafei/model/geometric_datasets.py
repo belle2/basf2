@@ -112,7 +112,7 @@ def _process_graph(self, idx):
     x_item = self.x[file_id]
     y_item = self.y[file_id][p_index]
 
-    evt_p_index = x_item["b_index"][evt]
+    evt_b_index = x_item["b_index"][evt]
     evt_leaves = x_item["leaves"][evt]
     evt_primary = x_item["primary"][evt]
 
@@ -122,10 +122,10 @@ def _process_graph(self, idx):
 
     # Get the rows of the X inputs to fetch
     # This is a boolean numpy array
-    x_rows = np.logical_or(evt_p_index == 1, evt_p_index == 2) if not self.B_reco else evt_p_index == int(p_index)
+    x_rows = (evt_b_index != -1) if not self.B_reco else evt_b_index == int(p_index)
 
     # Find the unmatched particles
-    unmatched_rows = evt_p_index == -1
+    unmatched_rows = evt_b_index == -1
 
     if np.any(unmatched_rows) and self.B_reco:
         # Create a random boolean array the same size as the number of leaves
@@ -255,7 +255,7 @@ def _process_graph(self, idx):
     return g
 
 
-class BelleRecoSetGeometricInMemory(InMemoryDataset):
+class GraphDataSet(InMemoryDataset):
     """
     Dataset handler for converting Belle II data to PyTorch geometric InMemoryDataset.
 

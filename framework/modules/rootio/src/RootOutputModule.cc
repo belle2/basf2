@@ -131,7 +131,10 @@ Warning:
 }
 
 
-RootOutputModule::~RootOutputModule() = default;
+RootOutputModule::~RootOutputModule()
+{
+  delete m_outputFileMetaData;
+}
 
 void RootOutputModule::initialize()
 {

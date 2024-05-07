@@ -21,7 +21,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 import random
 import argparse
 
-from grafei import GraFEIModule
+from grafei import graFEI
 
 # Random seeds
 b2.set_random_seed(42)
@@ -40,7 +40,7 @@ def _parse_args():
         "-g",
         "--globaltag",
         type=str,
-        default="user_jcerasol_mixed_graFEI_BReco_example",
+        default="analysis_tools_light-2403-persian",
         help="Globaltag containing graFEI model",
     )
     return parser.parse_args()
@@ -51,13 +51,15 @@ if __name__ == "__main__":
 
     store_mc_truth = True
 
-    b2.conditions.prepend_globaltag(args.globaltag)
-    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-
     path = b2.create_path()
     ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
 
-    # graFEI cuts
+    b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
+    if args.globaltag:
+        b2.conditions.prepend_globaltag(args.globaltag)
+
+    # These priors were obtained by counting truth-matched tracks in BB mixed MC
+    # It could be modified by the user if needed
     priors = [0.068, 0.050, 0.7326, 0.1315, 0.0183, 0.00006]
 
     cut_charged_graFEI = [
@@ -205,12 +207,14 @@ if __name__ == "__main__":
         ma.matchMCTruth("B0:tag", path=path)
 
     # Run graFEI
-    graFEI = GraFEIModule(
+    graFEI(
         "B0:tag",
         cfg_path=args.config,
         param_file=args.weight,
+        payload_config_name="graFEIConfigFile_Breco_example",  # If you default payload name just remove this argument
+        payload_model_name="graFEIModelFile_Breco_example",  # If you use default payload name just remove this argument
+        path=path,
     )
-    path.add_module(graFEI)
 
     # Reconstructin Upsilon(4S)
     ma.reconstructDecay("Upsilon(4S):graFEI -> B0:tag B0:sig", "", path=path)
@@ -231,7 +235,6 @@ if __name__ == "__main__":
         "phi",
         "theta",
         "cosTBz",
-        # "cosTBTO",
         "cosThetaBetweenParticleAndNominalB",
     ]
     if store_mc_truth:

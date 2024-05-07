@@ -106,6 +106,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     double sumadcgood = 0;
     for (int ic = 0; ic < 300; ++ic) {
       if (ic == 0) continue; //299 boards only
+      if (m_hADCs[ic]) delete m_hADCs[ic];
       m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
       m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
       float md_adc = getHistMedian(m_hADCs[ic]);
@@ -139,6 +140,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     double sumtdcgood = 0;
     for (int ic = 0; ic < 300; ++ic) {
       if (ic == 0) continue; //299 boards only
+      if (m_hTDCs[ic]) delete m_hTDCs[ic];
       m_hTDCs[ic] = m_delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
       m_hTDCs[ic]->SetTitle(Form("hTDC%d", ic));
       float md_tdc = getHistMedian(m_hTDCs[ic]);
@@ -177,11 +179,15 @@ float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
 {
   TH1D* hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
-  if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only TCD/ADC=0 entries
-  double quantiles[1] = {0.0}; // One element to store median
-  double probSums[1] = {0.5}; // Median definition
-  hist->GetQuantiles(1, quantiles, probSums);
-  float median = quantiles[0];
+  float median = 0.0;
+  if (hist->GetMean() != 0) {
+    // Avoid an error if only TCD/ADC=0 entries
+    double quantiles[1] = {0.0}; // One element to store median
+    double probSums[1] = {0.5}; // Median definition
+    hist->GetQuantiles(1, quantiles, probSums);
+    median = quantiles[0];
+  }
+  delete hist;
   return median;
 }
 

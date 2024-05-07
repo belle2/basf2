@@ -9,7 +9,7 @@
 
 import torch_geometric
 from pathlib import Path
-from .geometric_datasets import BelleRecoSetGeometricInMemory
+from .geometric_datasets import GraphDataSet
 
 
 def create_dataloader_mode_tags(configs, tags):
@@ -27,7 +27,7 @@ def create_dataloader_mode_tags(configs, tags):
     mode_tags = {}
 
     for tag, path, mode in tags:
-        dataset = BelleRecoSetGeometricInMemory(
+        dataset = GraphDataSet(
             root=Path(path, mode),
             run_name=configs["output"]["run_name"],
             **configs["dataset"]["config"],

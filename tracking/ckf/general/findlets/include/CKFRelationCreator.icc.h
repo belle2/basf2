@@ -35,8 +35,18 @@ namespace Belle2 {
 
     moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "onlyUseHitStatesRelatedToSeeds"),
                                   m_onlyUseHitStatesRelatedToSeeds,
-                                  "Only use hit states related to seed states to build the inter hit relations to reduce combinatorics.",
+                                  "Only use hit states related to seed states to build the inter hit relations to reduce combinatorics. "\
+                                  "By default, only the \"FromStates\" will be the ones related to seeds. If also the \"ToStates\" should be "\
+                                  "related to the seeds, also m_onlyCombineRelatedHitStates (name in Python: " + \
+                                  TrackFindingCDC::prefixed(prefix, "onlyCombineRelatedHitStates") + ") should be set to true.",
                                   m_onlyUseHitStatesRelatedToSeeds);
+    moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "onlyCombineRelatedHitStates"),
+                                  m_onlyCombineRelatedHitStates,
+                                  "Only use hit states related to seed states to build the inter hit relations to reduce combinatorics. "\
+                                  "If true, both \"FromStates\" and \"ToStates\" will be those that are already related to seeds. "\
+                                  "Only works if also m_onlyUseHitStatesRelatedToSeeds (name in Python: " + \
+                                  TrackFindingCDC::prefixed(prefix, "onlyUseHitStatesRelatedToSeeds") + ") is set to true.",
+                                  m_onlyCombineRelatedHitStates);
   }
 
   template<class AState, class ASeedRelationFilter, class AHitRelationFilter>
@@ -66,7 +76,14 @@ namespace Belle2 {
           selectedStatePointers.push_back(relation.getTo());
         }
       }
-      TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, statePointers, relations, 1000000);
+
+      if (m_onlyCombineRelatedHitStates) {
+        // Reduce combinatorics a lot by only combining selectedStatePointers with other selectedStatePointers
+        TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, selectedStatePointers, relations, 1000000);
+      } else {
+        // Reduce combinatorics a bit less by only combining selectedStatePointers essentially all statePointers
+        TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, selectedStatePointers, statePointers, relations, 1000000);
+      }
     } else {
       // use all of hit states for inter hit state relation creation
       TrackFindingCDC::RelationFilterUtil::appendUsing(m_hitFilter, statePointers, statePointers, relations, 1000000);

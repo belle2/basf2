@@ -38,6 +38,9 @@ namespace Belle2 {
     void setMonitoringPlots(bool value = false) {m_isMakePlots = value;}
 
   protected:
+    /**
+    * run algorithm on data
+    */
     virtual EResult calibrate() override;
 
   private:

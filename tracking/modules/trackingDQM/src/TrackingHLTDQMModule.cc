@@ -136,26 +136,26 @@ void TrackingHLTDQMModule::DefineAbortFlagsHistograms()
   m_trackingErrorFlags->GetXaxis()->SetBinLabel(1, "No Error");
   m_trackingErrorFlags->GetXaxis()->SetBinLabel(2, "Error occured");
 
-  //tracking abort VS time after HER/LER pre-injection signal and time within a beam cycle
+  //tracking abort VS time after HER/LER injection and time within a beam cycle
   m_abortVStimeHER = new TH2F(
     "TrkAbortVsTimeHER",
-    "Number of Events with Tracking Aborts vs HER pre-injection signal;Time since last pre-injection signal [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events with Tracking Aborts vs HER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_abortVStimeLER = new TH2F(
     "TrkAbortVsTimeLER",
-    "Number of Events with Tracking Aborts vs LER pre-injection signal;Time since last pre-injection signal [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events with Tracking Aborts vs LER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
-  //tracking all VS time after HER/LER pre-injection signal and time within a beam cycle
+  //tracking all VS time after HER/LER injection and time within a beam cycle
   m_allVStimeHER = new TH2F(
     "allEvtsVsTimeHER",
-    "Number Of Events vs HER pre-injection signal;Time since last pre-injection signal [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number Of Events vs HER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
   m_allVStimeLER = new TH2F(
     "allEvtsVsTimeLER",
-    "Number of Events vs LER pre-injection signal;Time since last pre-injection signal [#mus];Time in beam cycle [#mus];Events / bin",
+    "Number of Events vs LER injection;Time since last injection [#mus];Time in beam cycle [#mus];Events / bin",
     100, 0, c_noInjectionTime, 50, 0, c_revolutionTime);
 
 }

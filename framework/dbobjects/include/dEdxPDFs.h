@@ -40,7 +40,7 @@ namespace Belle2 {
      */
     const TH2F* getPDF(const unsigned int hypothesis, const bool truncated) const
     {
-      return truncated ? &m_dEdxPDFsTruncated.at(hypothesis) : &m_dEdxPDFs.at(hypothesis);
+      return truncated ? &(m_dEdxPDFsTruncated.at(hypothesis)) : &(m_dEdxPDFs.at(hypothesis));
     }
 
     /**
@@ -49,52 +49,12 @@ namespace Belle2 {
      * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
      * @param truncated If true, set the truncated dE/dx PDF
      */
-    void setPDF(const TH2F pdf, const unsigned int hypothesis, const bool truncated)
+    void setPDF(const TH2F& pdf, const unsigned int hypothesis, const bool truncated)
     {
       if (truncated)
         m_dEdxPDFsTruncated.at(hypothesis) = pdf;
       else
         m_dEdxPDFs.at(hypothesis) = pdf;
-    }
-
-    /**
-     * Set the dE/dx PDF for the given particle hypothesis.
-     * @param pdf dE/dx PDF as a pointer to the 2D histogram (`TH2F*`)
-     * @param hypothesis Particle hypothesis (as in Const::ChargedStable::c_SetSize)
-     * @param truncated If true, set the truncated dE/dx PDF
-     */
-    void setPDF(const TH2F* pdf, const unsigned int hypothesis, const bool truncated)
-    {
-      TH2F temp{};
-      pdf->Copy(temp);
-      setPDF(temp, hypothesis, truncated);
-    }
-
-    /**
-     * Set the dE/dx PDF for all the particle hypothesis.
-     * @param pdfs Array of dE/dx PDF as a 2D histogram (`TH2F`) for all the particle hypotheses
-     * @param truncated If true, set the truncated dE/dx PDFs
-     */
-    void setPDFs(const std::array<TH2F, Const::ChargedStable::c_SetSize>& pdfs, const bool truncated)
-    {
-      if (truncated)
-        m_dEdxPDFsTruncated = pdfs;
-      else
-        m_dEdxPDFs = pdfs;
-    }
-
-    /**
-     * Set the dE/dx PDF for all the particle hypothesis.
-     * @param pdfs Array of dE/dx PDF as a pointer to the 2D histogram (`TH2F*`) for all the particle hypotheses
-     * @param truncated If true, set the truncated dE/dx PDFs
-     */
-    void setPDFs(const std::array<TH2F*, Const::ChargedStable::c_SetSize>& pdfs, const bool truncated)
-    {
-      for (auto hypothesis = 0; hypothesis < Const::ChargedStable::c_SetSize; ++hypothesis) {
-        TH2F temp{};
-        (pdfs.at(hypothesis))->Copy(temp);
-        setPDF(temp, hypothesis, truncated);
-      }
     }
 
   private:

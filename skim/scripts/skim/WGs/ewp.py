@@ -344,6 +344,7 @@ class B0TwoBody(BaseSkim):
         * :math:`n_{\\text{tracks}} \\geq 3`
         * :math:`|\\delta E| < 0.5 \\text{GeV}`
         * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+        * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
     """
 
     __authors__ = ["Ryan Mueller and Santi Naylor"]
@@ -363,14 +364,19 @@ class B0TwoBody(BaseSkim):
 
     def build_lists(self, path):
 
-        cut_evt = "nTracks>=3"
+        cut_trk = 'dr < 0.5 and abs(dz) < 2'
+        ma.cutAndCopyList('e+:ewp', 'e+:all', cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp', 'mu+:all', cut_trk, path=path)
+        ma.cutAndCopyList('pi+:ewp', 'pi+:all', cut_trk, path=path)
+
+        cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
         cut_b = "abs(deltaE) < 0.5 and Mbc > 5.2"
         path = self.skim_event_cuts(cut_evt, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_1 -> e+:all e-:all", cut_b, dmID=1, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_2 -> e+:all mu-:all", cut_b, dmID=2, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_3 -> e-:all mu+:all", cut_b, dmID=3, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_4 -> mu-:all mu+:all", cut_b, dmID=4, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_5 -> pi-:all pi+:all", cut_b, dmID=5, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_1 -> e+:ewp e-:ewp", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_2 -> e+:ewp mu-:ewp", cut_b, dmID=2, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_3 -> e-:ewp mu+:ewp", cut_b, dmID=3, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_4 -> mu-:ewp mu+:ewp", cut_b, dmID=4, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_5 -> pi-:ewp pi+:ewp", cut_b, dmID=5, path=path)
 
         return ['B0:B0TwoBody_1', 'B0:B0TwoBody_2', 'B0:B0TwoBody_3', 'B0:B0TwoBody_4', 'B0:B0TwoBody_5']
 
@@ -389,7 +395,6 @@ class B0TwoBody(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
                  "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
-                ("R2", 100, 0, 1, "R2", __liaison__, "", ""),
                 ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
                  "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
             ],
@@ -411,6 +416,7 @@ class FourLepton(BaseSkim):
         * :math:`n_{\\text{tracks}} \\geq 5`
         * :math:`-1.5 < \\delta E < 0.5 \\text{GeV}`
         * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+        * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -427,11 +433,14 @@ class FourLepton(BaseSkim):
 
     def build_lists(self, path):
 
-        cut_evt = "nTracks>=5"
+        cut_trk = 'dr < 0.5 and abs(dz) < 2'
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+
+        cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=5"
         cut_b = "deltaE < 0.5 and deltaE > -1.5 and Mbc > 5.2"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.reconstructDecay("B0:FourLepton -> e+:all e-:all e+:all e-:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:FourLepton -> e+:ewp e-:ewp e+:ewp e-:ewp", cut_b, dmID=1, path=path)
         return ["B0:FourLepton"]
 
     def validation_histograms(self, path):
@@ -447,8 +456,7 @@ class FourLepton(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
                  "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
-                ("R2", 100, 0, 1, "R2", __liaison__, "", ""),
-                ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
+                ("deltaE", 100, -1.5, 0.5, "Signal B deltaE", __liaison__,
                  "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
             ],
             variables_2d=[
@@ -469,6 +477,7 @@ class RadiativeDilepton(BaseSkim):
         * :math:`n_{\\text{tracks}} \\geq 3`
         * :math:`-1.0 < \\delta E < 0.5 \\text{GeV}`
         * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+        * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -484,14 +493,18 @@ class RadiativeDilepton(BaseSkim):
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdPhotons("all", path=path)
+        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
 
-        cut_evt = "nTracks>=3"
+        cut_trk = 'dr < 0.5 and abs(dz) < 2'
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+
+        cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
         cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.reconstructDecay("B0:RadiativeDilepton -> e+:all e-:all gamma:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:RadiativeDilepton -> e+:ewp e-:ewp gamma:loose", cut_b, dmID=1, path=path)
         return ["B0:RadiativeDilepton"]
 
     def validation_histograms(self, path):
@@ -507,8 +520,7 @@ class RadiativeDilepton(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
                  "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
-                ("R2", 100, 0, 1, "R2", __liaison__, "", ""),
-                ("deltaE", 100, -0.5, 0.5, "Signal B deltaE", __liaison__,
+                ("deltaE", 100, -1.0, 0.5, "Signal B deltaE", __liaison__,
                  "deltaE of the Signal B", "", "deltaE [GeV]", "Candidates"),
             ],
             variables_2d=[

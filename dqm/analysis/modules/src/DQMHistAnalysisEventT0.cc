@@ -93,39 +93,39 @@ void DQMHistAnalysisEventT0Module::initialize()
   m_eAlgorithmSourceFractionsHadronL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1ECLTRG",
                     "EventT0 source fractions, hadronic events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsHadronL1CDCTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1CDCTRG",
                     "EventT0 source fractions, hadronic events, L1CDCTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsHadronL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1TOPTRG",
                     "EventT0 source fractions, hadronic events, L1TOPTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1ECLTRG",
                     "EventT0 source fractions, Bhabha events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1ECLTRG",
                     "EventT0 source fractions, Bhabha events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1TOPTRG",
                     "EventT0 source fractions, Bhabha events, L1TOPTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsMuMuL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsMuMuL1ECLTRG",
                     "EventT0 source fractions, #mu#mu events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsMuMuL1CDCTRG =
     new TEfficiency("effAlgorithmSourceFractionsMuMuL1CDCTRG",
                     "EventT0 source fractions, #mu#mu events, L1CDCTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
   m_eAlgorithmSourceFractionsMuMuL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsMuMuL1TOPTRG",
                     "EventT0 source fractions, #mu#mu events, L1TOPTRG;Algorithm;Fraction #epsilon",
-                    5, 0, 5);
+                    6, 0, 6);
 
   m_monObj = getMonitoringObject("eventT0");
   m_monObj->addCanvas(m_cTOPTimeForECLTRG);
@@ -628,8 +628,9 @@ bool DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& hi
   // Admittedly quite a hacky way to obtain the normalisation values: Create a new histogram and fill each of the bins with
   // the bin content of the -1 bin of h which is used for bin counting, and at the same time set the corresponding bin label.
   const auto totalEntries = h->GetBinContent(-1);
-  TH1D* totalHist = new TH1D("total", "total;Algorithm;Fraction #epsilon", 5, 0, 5);
-  for (uint i = 0; i < 5; i++) {
+  const auto nBins = h->GetNbinsX();
+  TH1D* totalHist = new TH1D("total", "total;Algorithm;Fraction #epsilon", nBins, 0, nBins);
+  for (int i = 0; i < nBins; i++) {
     totalHist->SetBinContent(i + 1, totalEntries);
   }
   eff->SetPassedHistogram(*h, "f");
@@ -649,8 +650,8 @@ bool DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& hi
   // Print x-axis bin labels horizontally
   ax->SetTitleOffset(1.0);
   ax->CenterTitle(kTRUE);
-  ax->Set(5, 0, 5);
-  for (uint i = 0; i < 5; i++) {
+  ax->Set(nBins, 0, nBins);
+  for (int i = 0; i < nBins; i++) {
     ax->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
   }
 

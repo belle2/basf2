@@ -140,6 +140,10 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
+  //TOPTRG_deadch
+  addDeltaPar("TRGGRL", "h_slot_TOP", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "TOPTRG_deadch", "TOPTRG_deadch");
+
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
   addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
@@ -249,6 +253,20 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
     B2DEBUG(1, "ECLTRG_deadch:" << ECLTRG_deadch);
     setEpicsPV("ECLTRG_deadch", ECLTRG_deadch);
   }
+
+// update TOPTRG deadch
+  auto hist_TOPTRG_deadch =  getDelta("TRGGRL", "h_slot_TOP", 0, true);// only if updated
+  if (hist_TOPTRG_deadch) {
+    hist_TOPTRG_deadch->Draw();
+    int numberOfBins = hist_TOPTRG_deadch->GetNbinsX();
+    int TOPTRG_deadch = 0;
+    for (int i = 2; i <= numberOfBins - 1; i++) {
+      if (hist_TOPTRG_deadch->GetBinContent(i) <= 0.01 * hist_TOPTRG_deadch->GetMaximum()) { TOPTRG_deadch += 1; }
+    }
+    B2DEBUG(1, "TOPTRG_deadch:" << TOPTRG_deadch);
+    setEpicsPV("TOPTRG_deadch", TOPTRG_deadch);
+  }
+
 //  m_canvas_CDCTRG_2D_peak->Clear();
 //  m_canvas_CDCTRG_2D_peak->cd(0);
 // update CDCTRG 2D peak

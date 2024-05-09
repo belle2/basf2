@@ -693,15 +693,15 @@ class feiHadronic_DstEllNu(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiHadronic", "B0:generic", path=path)
-        ma.copyList("B+:feiHadronic", "B+:generic", path=path)
-        HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]
+        ma.copyList("B0:feiHadronicDstEllNu", "B0:generic", path=path)
+        ma.copyList("B+:feiHadronicDstEllNu", "B+:generic", path=path)
+        HadronicBLists = ["B0:feiHadronicDstEllNu", "B+:feiHadronicDstEllNu"]
 
         ma.applyCuts(
-            "B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path
+            "B+:feiHadronicDstEllNu", "sigProb>0.001 or extraInfo(dmID)==25", path=path
         )
         ma.applyCuts(
-            "B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path
+            "B0:feiHadronicDstEllNu", "sigProb>0.001 or extraInfo(dmID)==23", path=path
         )
 
         for BList in HadronicBLists:

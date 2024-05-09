@@ -193,6 +193,9 @@ def main():
         )
 
     df.rename(columns=columns, inplace=True)
+    if args.data:
+        if 'generalSkimName' not in df.columns:
+            df['generalSkimName'] = ""
     verify_dataframe(df, args.mcri)
 
     if args.mcri or args.mcrd:
@@ -216,13 +219,22 @@ def main():
 
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
+                scan = beamEnergy == "5S_scan"
                 if onres:
                     label = f"{campaign}_exp{expInteger}r{iGroup+1}"
+                elif scan:
+                    # more complicated process to retrieve the exact 5S_scan energy from output filename...
+                    pattern = r"_5Sscan_(\d+)"
+                    match = re.search(pattern, args.output)
+                    scanEnergy = match.group(1)
+                    label = f"{campaign}_{beamEnergy}_{scanEnergy}_exp{expInteger}r{iGroup+1}"
                 else:
                     label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
 
                 if "generalSkimName" in df.columns:
                     generalSkim = list(group["generalSkimName"])[0]
+                    if generalSkim == '':
+                        generalSkim = 'hadron'
                 else:
                     generalSkim = "all"
 
@@ -268,9 +280,9 @@ def main():
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
                 if onres:
-                    label = f"{campaign}_exp{expInteger}r{iGroup+1}"
+                    label = f"{campaign}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
                 else:
-                    label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
+                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
 
                 # Add everything to our mega dict
                 DataBlocks[label] = {

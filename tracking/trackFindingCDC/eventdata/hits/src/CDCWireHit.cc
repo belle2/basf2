@@ -65,8 +65,8 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
 }
 
 CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
-                       TDCCountTranslatorBase* ptrTDCCountTranslator,
-                       ADCCountTranslatorBase* ptrADCCountTranslator)
+                       CDC::TDCCountTranslatorBase* ptrTDCCountTranslator,
+                       CDC::ADCCountTranslatorBase* ptrADCCountTranslator)
   : m_wireID(ptrHit->getID())
   , m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr)
   , m_automatonCell(1)

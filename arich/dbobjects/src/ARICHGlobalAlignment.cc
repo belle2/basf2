@@ -14,25 +14,25 @@ using namespace Belle2;
 
 
 
-TVector3 ARICHGlobalAlignment::pointToGlobal(const TVector3& point) const
+ROOT::Math::XYZVector ARICHGlobalAlignment::pointToGlobal(const ROOT::Math::XYZVector& point) const
 {
   if (!m_rotation) setTransformation();
   return (*m_rotation) * point + (*m_translation);
 }
 
-TVector3 ARICHGlobalAlignment::momentumToGlobal(const TVector3& momentum) const
+ROOT::Math::XYZVector ARICHGlobalAlignment::momentumToGlobal(const ROOT::Math::XYZVector& momentum) const
 {
   if (!m_rotation) setTransformation();
   return (*m_rotation) * momentum;
 }
 
-TVector3 ARICHGlobalAlignment::pointToLocal(const TVector3& point) const
+ROOT::Math::XYZVector ARICHGlobalAlignment::pointToLocal(const ROOT::Math::XYZVector& point) const
 {
   if (!m_translation) setTransformation();
   return (*m_rotationInverse) * (point - (*m_translation));
 }
 
-TVector3 ARICHGlobalAlignment::momentumToLocal(const TVector3& momentum) const
+ROOT::Math::XYZVector ARICHGlobalAlignment::momentumToLocal(const ROOT::Math::XYZVector& momentum) const
 {
   if (!m_rotationInverse) setTransformation();
   return (*m_rotationInverse) * momentum;
@@ -40,10 +40,10 @@ TVector3 ARICHGlobalAlignment::momentumToLocal(const TVector3& momentum) const
 
 void ARICHGlobalAlignment::setTransformation() const
 {
-  TRotation Rot = m_alignPars.getRotation();
-  m_rotation =  new TRotation(Rot);
-  m_rotationInverse = new TRotation(Rot.Inverse());
-  m_translation = new TVector3(m_alignPars.getTranslation());
+  ROOT::Math::Rotation3D Rot = m_alignPars.getRotation();
+  m_rotation =  new ROOT::Math::Rotation3D(Rot);
+  m_rotationInverse = new ROOT::Math::Rotation3D(Rot.Inverse());
+  m_translation = new ROOT::Math::XYZVector(m_alignPars.getTranslation());
 }
 
 void ARICHGlobalAlignment::print(const std::string& title) const

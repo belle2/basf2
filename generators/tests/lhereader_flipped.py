@@ -27,7 +27,7 @@ add_particle('A', 9000008, 5.5, 0.1329, 0, 0)
 
 # configure the LHE reade
 lhereader = register_module('LHEInput')
-lhereader.param('makeMaster', True)
+lhereader.param('createEventMetaData', True)
 lhereader.param('runNum', 1337)
 lhereader.param('expNum', 0)
 lhereader.param('inputFileList', [inputfile])

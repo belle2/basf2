@@ -81,6 +81,7 @@ else:
 # now do reconstruction:
 trk.add_tracking_reconstruction(
     main,
+    mcTrackFinding=MCTracking,
     trackFitHypotheses=[211],
     append_full_grid_cdc_eventt0=True,
     skip_full_grid_cdc_eventt0_if_svd_time_present=False)

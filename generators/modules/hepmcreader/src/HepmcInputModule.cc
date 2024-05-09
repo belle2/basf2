@@ -34,13 +34,14 @@ HepMCInputModule::HepMCInputModule() : Module(), m_evtNum(0), m_minEvent(-1), m_
   addParam("useWeights", m_useWeights, "Set to 'true' to if generator weights should be propagated.", false);
   addParam("nVirtualParticles", m_nVirtual, "Number of particles at the beginning of the events that should be made virtual.", 0);
   addParam("wrongSignPz", m_wrongSignPz, "Boolean to signal that directions of HER and LER were switched", false);
-  addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", true);
+  addParam("createEventMetaData", m_createEventMetaData,
+           "Boolean to indicate whether the event numbers from input file should be used.", true);
 }
 
 
 void HepMCInputModule::initialize()
 {
-  if (m_makeMaster) {
+  if (m_createEventMetaData) {
     if (m_expNum < 0 or m_runNum < 0)
       B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the HepMCInput module.");
 
@@ -85,7 +86,7 @@ void HepMCInputModule::event()
     m_mcParticleGraph.clear();
     double weight = 1;
     int id = m_hepmcreader->getEvent(m_mcParticleGraph, weight);
-    if (m_makeMaster) {
+    if (m_createEventMetaData) {
       if (id > -1 && !m_ignorereadEventNr) {
         m_evtNum = id;
       } else {

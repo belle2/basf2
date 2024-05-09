@@ -27,6 +27,19 @@ Tools which will provide you help
     :nogroupsections:
 
 
+.. _b2help-decay:
+
+``b2help-decay``: Tool to find decays in decay files
+----------------------------------------------------
+
+.. argparse::
+    :filename: decfiles/tools/b2help-decay
+    :func: get_argparse
+    :prog: b2help-decay
+    :nodefault:
+    :nogroupsections:
+
+
 .. _b2help-recommendation:
 
 ``b2help-recommendation``: Tool to print analysis recommendations

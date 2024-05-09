@@ -92,6 +92,22 @@ void DQMHistAnalysisTRGModule::initialize()
   addDeltaPar("TRGGRL", "h_TOPL1", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "TOPTRG_peak", "TOPTRG_peak");
 
+  //CDCTRG nTSFHits total
+  addDeltaPar("TRGGRL", "h_wirecnt_sum", HistDelta::c_Entries, 1000, 1);
+  registerEpicsPV(m_pvPrefix + "CDCTRG_meanTSFHits_total", "CDCTRG_meanTSFHits_total");
+
+  //CDCTRG nTSFHits Injection BG Clean region
+  addDeltaPar("TRGGRL", "h_wirecnt_sum_clean", HistDelta::c_Entries, 1000, 1);
+  registerEpicsPV(m_pvPrefix + "CDCTRG_meanTSFHits_clean", "CDCTRG_meanTSFHits_clean");
+
+  //CDCTRG nTSFHits HER Injection region
+  addDeltaPar("TRGGRL", "h_wirecnt_sum_injHER", HistDelta::c_Entries, 1000, 1);
+  registerEpicsPV(m_pvPrefix + "CDCTRG_meanTSFHits_injHER", "CDCTRG_meanTSFHits_injHER");
+
+  //CDCTRG nTSFHits LER Injection region
+  addDeltaPar("TRGGRL", "h_wirecnt_sum_injLER", HistDelta::c_Entries, 1000, 1);
+  registerEpicsPV(m_pvPrefix + "CDCTRG_meanTSFHits_injLER", "CDCTRG_meanTSFHits_injLER");
+
   //ecl timing –cdc timing
   addDeltaPar("TRGGDL", "hGDL_ns_cdcToecl_all", HistDelta::c_Entries, 1000, 1); // update each 1000 entries
   registerEpicsPV(m_pvPrefix + "ecltiming_cdctiming", "ecltiming_cdctiming");
@@ -125,25 +141,40 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "endcap_klm_latency", "endcap_klm_latency");
 
   //hadronb2_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 1000000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_bhabha_all", "hadronb2_over_bhabha_all");
 
   //mumu2trk_over_bhabha_all
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 1000000 entries
   registerEpicsPV(m_pvPrefix + "mumu2trk_over_bhabha_all", "mumu2trk_over_bhabha_all");
 
   //hadronb2_over_mumu2trk
-  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
+  addDeltaPar("softwaretrigger", "skim", HistDelta::c_Entries, 1000000, 1); // update each 1000000 entries
   registerEpicsPV(m_pvPrefix + "hadronb2_over_mumu2trk", "hadronb2_over_mumu2trk");
 
   //ECLTRG_deadch
-//  m_canvas_ECLTRG_deadch = new TCanvas("ECLTRG_deadch");
   addDeltaPar("TRG", "h_TCId", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
+  //ECLTRG N(TC) total
+  addDeltaPar("TRG", "h_n_TChit_event", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_total", "ECLTRG_meanTC_total");
+
+  //ECLTRG N(TC) clean
+  addDeltaPar("TRG", "h_n_TChit_clean", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_clean", "ECLTRG_meanTC_clean");
+
+  //ECLTRG N(TC) HER Injection region
+  addDeltaPar("TRG", "h_n_TChit_injHER", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_injHER", "ECLTRG_meanTC_injHER");
+
+  //ECLTRG N(TC) LER Injection region
+  addDeltaPar("TRG", "h_n_TChit_injLER", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_injLER", "ECLTRG_meanTC_injLER");
+
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
-  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 2000 entries
+  addDeltaPar("TRGCDCTNN", "NeuroHWInTSID", HistDelta::c_Entries, 100000, 1); // update each 100000 entries
   registerEpicsPV(m_pvPrefix + "CDCTRG_deadch", "CDCTRG_deadch");
 
 }
@@ -212,13 +243,24 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 // update ECLTRG peak
   auto hist_ECLTRG_peak =  getDelta("TRGGRL", "h_ECLL1", 0, true);// only if updated
   if (hist_ECLTRG_peak) {
+//    TH1F* hist_ECLTRG_clone = (TH1F*)hist_ECLTRG_peak->Clone();//Clone the histogram.
     double ECLTRG_peak = 0.0;
     hist_ECLTRG_peak->Draw();
-    int bin_ECLTRG_peak = hist_ECLTRG_peak->GetMaximumBin();
-    ECLTRG_peak = hist_ECLTRG_peak->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
+//    int bin_ECLTRG_peak = hist_ECLTRG_peak->GetMaximumBin();
+//    ECLTRG_peak = hist_ECLTRG_peak->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
+    ECLTRG_peak = hist_ECLTRG_peak->GetMean();
+
+    /*
+        while(ECLTRG_peak<-1310){
+           hist_ECLTRG_clone->SetBinContent(bin_ECLTRG_peak, 0);
+           bin_ECLTRG_peak = hist_ECLTRG_clone->GetMaximumBin();
+           ECLTRG_peak = hist_ECLTRG_clone->GetXaxis()->GetBinCenter(bin_ECLTRG_peak);
+        }
+    */
+
     B2DEBUG(1, "ECLTRG_peak:" << ECLTRG_peak);
     setEpicsPV("ECLTRG_peak", ECLTRG_peak);
-
+//    delete hist_ECLTRG_clone;
   }
 
 // update ECLTRG deadch
@@ -511,6 +553,61 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
 
   }
 
+  auto hist_nTSFHits_total = getDelta("TRGGRL", "h_wirecnt_sum", 0, true);
+  if (hist_nTSFHits_total) {
+    double mean = hist_nTSFHits_total->GetMean();
+    B2DEBUG(1, "CDCTRG_meanTSFHits_total:" << mean);
+    setEpicsPV("CDCTRG_meanTSFHits_total", mean);
+  }
+
+  auto hist_nTSFHits_clean = getDelta("TRGGRL", "h_wirecnt_sum_clean", 0, true);
+  if (hist_nTSFHits_clean) {
+    double mean = hist_nTSFHits_clean->GetMean();
+    B2DEBUG(1, "CDCTRG_meanTSFHits_clean:" << mean);
+    setEpicsPV("CDCTRG_meanTSFHits_clean", mean);
+  }
+
+  auto hist_nTSFHits_injHER = getDelta("TRGGRL", "h_wirecnt_sum_injHER", 0, true);
+  if (hist_nTSFHits_injHER) {
+    double mean = hist_nTSFHits_injHER->GetMean();
+    B2DEBUG(1, "CDCTRG_meanTSFHits_injHER:" << mean);
+    setEpicsPV("CDCTRG_meanTSFHits_injHER", mean);
+  }
+
+  auto hist_nTSFHits_injLER = getDelta("TRGGRL", "h_wirecnt_sum_injLER", 0, true);
+  if (hist_nTSFHits_injLER) {
+    double mean = hist_nTSFHits_injLER->GetMean();
+    B2DEBUG(1, "CDCTRG_meanTSFHits_injLER:" << mean);
+    setEpicsPV("CDCTRG_meanTSFHits_injLER", mean);
+  }
+
+  auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event", 0, true);
+  if (hist_nTC_total) {
+    double mean = hist_nTC_total->GetMean();
+    B2DEBUG(1, "ECLTRG_meanTC_total:" << mean);
+    setEpicsPV("ECLTRG_meanTC_total", mean);
+  }
+
+  auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean", 0, true);
+  if (hist_nTC_clean) {
+    double mean = hist_nTC_clean->GetMean();
+    B2DEBUG(1, "ECLTRG_meanTC_clean:" << mean);
+    setEpicsPV("ECLTRG_meanTC_clean", mean);
+  }
+
+  auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER", 0, true);
+  if (hist_nTC_injHER) {
+    double mean = hist_nTC_injHER->GetMean();
+    B2DEBUG(1, "ECLTRG_meanTC_injHER:" << mean);
+    setEpicsPV("ECLTRG_meanTC_injHER", mean);
+  }
+
+  auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER", 0, true);
+  if (hist_nTC_injLER) {
+    double mean = hist_nTC_injLER->GetMean();
+    B2DEBUG(1, "ECLTRG_meanTC_injLER:" << mean);
+    setEpicsPV("ECLTRG_meanTC_injLER", mean);
+  }
 
 
   // Tag canvas as updated ONLY if things have changed.

@@ -1769,14 +1769,17 @@ void EVEVisualization::addARICHHit(const ARICHHit* hit)
   int hitModule = hit->getModule();
   float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
 
-  B2Vector3D centerPos3D =  hit->getPosition();
+  ROOT::Math::XYZVector  centerPos3D =  hit->getPosition();
 
-  B2Vector3D channelX(1, 0, 0);    channelX.RotateZ(fi);
-  B2Vector3D channelY(0, 1, 0);    channelY.RotateZ(fi);
+  ROOT::Math::RotationZ rotZ(fi);
+  ROOT::Math::XYZVector channelX(1, 0, 0);
+  ROOT::Math::XYZVector channelY(0, 1, 0);
+  channelX = rotZ * channelX;
+  channelY = rotZ * channelY;
 
   auto* arichbox = boxCreator(centerPos3D,
-                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelX)),
-                              ROOT::Math::XYZVector(arichGeo->getMasterVolume().momentumToGlobal(channelY)),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelX),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelY),
                               0.49, 0.49, 0.05);
   arichbox->SetMainColor(kOrange + 10);
   arichbox->SetName((std::to_string(hitModule)).c_str());

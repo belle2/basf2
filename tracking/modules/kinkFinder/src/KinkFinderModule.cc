@@ -22,6 +22,7 @@ REG_MODULE(KinkFinder);
 
 KinkFinderModule::KinkFinderModule() : Module()
 {
+
   setDescription("This is a simple Kink finder"
                  "which matches all mother candidate tracks with all daughter candidate tracks, "
                  "fitting a vertex for each pair. "
@@ -55,27 +56,6 @@ KinkFinderModule::KinkFinderModule() : Module()
   // output: Kinks
   addParam("Kinks", m_arrayNameKink, "Kink StoreArray name (output).", std::string(""));
 
-  // mode of the kinkFitter
-  addParam("kinkFitterMode", m_kinkFitterMode,
-           "kinkFitter fitting mode "
-           "0: find vertex only; 1: reassign hits; 2: flip and refit filter 2 tracks; 3: 1 + 2", 1);
-
-  // preselection cuts
-  addParam("precutRho", m_precutRho,
-           "Preselection cut on transverse shift from the outer CDC wall for the track ending points. ", 10.);
-  addParam("precutZ", m_precutZ, "Preselection cut on z shift from the outer CDC wall for the track ending points. ",
-           0.);
-  addParam("precutDistance", m_precutDistance, "Preselection cut on distance between ending points of two tracks. ",
-           10.);
-  addParam("precutDistance2D", m_precutDistance2D,
-           "Preselection cut on 2D distance between ending points of two tracks (for bad z cases). ", 10.);
-
-  // final cuts used in kinkFitter to decide if the kink candidate should be stored
-  addParam("vertexChi2Cut", m_vertexChi2Cut,
-           "Cut on Chi2 for the Kink vertex. ", 10000.);
-  addParam("vertexDistanceCut", m_vertexDistanceCut,
-           "Cut on distance between tracks at the Kink vertex. ", 2.);
-
 }
 
 
@@ -85,6 +65,19 @@ void KinkFinderModule::initialize()
   StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
   m_tracks.requireRelationTo(recoTracks);
   //All the other required StoreArrays are checked in the Construtor of the kinkFitter.
+
+  if (!m_kinkFinderParameters.isValid())
+    B2FATAL("kinkFinder parameters are not available.");
+  // mode of the kinkFitter
+  m_kinkFitterMode = m_kinkFinderParameters->getKinkFitterMode();
+  // preselection cuts
+  m_precutRho = m_kinkFinderParameters->getPrecutRho();
+  m_precutZ = m_kinkFinderParameters->getPrecutZ();
+  m_precutDistance = m_kinkFinderParameters->getPrecutDistance();
+  m_precutDistance2D = m_kinkFinderParameters->getPrecutDistance2D();
+  // final cuts used in kinkFitter to decide if the kink candidate should be stored
+  m_vertexChi2Cut = m_kinkFinderParameters->getVertexChi2Cut();
+  m_vertexDistanceCut = m_kinkFinderParameters->getVertexDistanceCut();
 
 
   m_kinkFitter = std::make_unique<kinkFitter>(m_arrayNameTFResult, m_arrayNameKink,

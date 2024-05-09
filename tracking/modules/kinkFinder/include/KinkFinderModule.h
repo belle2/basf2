@@ -15,6 +15,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
 
+#include <tracking/dbobjects/KinkFinderParameters.h>
+
 #include <TVector3.h>
 
 #include <string>
@@ -59,6 +61,8 @@ namespace Belle2 {
     std::string m_arrayNameCopiedRecoTrack;  ///< StoreArray name of the RecoTrack used for creating copies.
     std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResult (In- and Output).
     std::string m_arrayNameKink;  ///< StoreArray name of the Kink (Output).
+
+    DBObjPtr<KinkFinderParameters> m_kinkFinderParameters; ///< kinkFinder parameters Database ObjPtr
 
     double m_vertexChi2Cut;  ///< Cut on Chi2 for the Kink vertex.
     double m_vertexDistanceCut;  ///< Cut on distance between tracks at the Kink vertex.

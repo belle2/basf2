@@ -297,7 +297,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
 
     # Kink finding
     if kink_finding:
-        path.add_module('KinkFinder', RecoTracks=reco_tracks, kinkFitterMode=7)
+        path.add_module('KinkFinder', RecoTracks=reco_tracks)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')

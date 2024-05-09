@@ -533,7 +533,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
 
-  // temporary StoreArrays for studies (to be removed)
+  // temporary StoreArrays for studies (to be removed) TODO: remove
   RecoTrack* motherKinkRecoTrack = recoTrackMother->copyToStoreArray(m_motherKinkRecoTracks);
   motherKinkRecoTrack->addHitsFromRecoTrack(recoTrackMother, motherKinkRecoTrack->getNumberOfTotalHits());
   motherKinkRecoTrack->addRelationTo(recoTrackMother);

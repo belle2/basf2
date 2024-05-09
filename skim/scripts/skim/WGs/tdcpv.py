@@ -138,7 +138,7 @@ class TDCPV_qqs(BaseSkim):
         vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_eventshape)')
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
-        btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        btotcpvcuts = '5.18 < Mbc and abs(deltaE) < 0.52'
         btotcpvcuts_KL = 'abs(deltaE) < 0.250'
 
         bd_qqs_Channels = [
@@ -161,7 +161,9 @@ class TDCPV_qqs(BaseSkim):
             'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
         ]
 
-        bd_qqs_KL_Channels = ['eta\':SkimHighEff  K_L0:klmecl']
+        bd_qqs_KL_Channels = [
+            'eta\':SkimHighEff  K_L0:klmecl',
+            'phi:SkimHighEff K_L0:klmecl']
 
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
@@ -330,7 +332,7 @@ class TDCPV_ccs(BaseSkim):
         vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_eventshape)')
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
-        btotcpvcuts = '5.2 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        btotcpvcuts = 'Mbc > 5.18 and abs(deltaE) < 0.52'
         btotcpvcuts_KL = 'abs(deltaE) < 0.3'
 
         bd_ccs_Channels = ['J/psi:ee K_S0:merged',

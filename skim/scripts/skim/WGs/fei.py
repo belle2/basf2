@@ -679,7 +679,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
         event-level cuts made before applying the FEI.
     """
 
-    __description__ = ("FEI-tagged neutral and charged: math: `B`'s decaying hadronically",
+    __description__ = ("FEI-tagged neutral and charged :math:`B`'s decaying hadronically. "
                        "Analysis specific cuts applied during skimming. Best 2 candidates ranked by sigProb kept"
                        )
 

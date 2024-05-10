@@ -12,13 +12,7 @@ _weight_cols = ['data_MC_ratio',
                 'data_MC_uncertainty_stat_dn',
                 'data_MC_uncertainty_stat_up',
                 'data_MC_uncertainty_sys_dn',
-                'data_MC_uncertainty_sys_up',
-                # 'data_MC_uncertainty_statsys_dn',
-                # 'data_MC_uncertainty_statsys_up',
-                # 'rel_data_MC_uncertainty_stat_dn',
-                # 'rel_data_MC_uncertainty_stat_up','rel_data_MC_uncertainty_sys_dn',
-                # 'rel_data_MC_uncertainty_sys_up','rel_data_MC_uncertainty_statsys_dn',
-                # 'rel_data_MC_uncertainty_statsys_up'
+                'data_MC_uncertainty_sys_up'
                 ]
 
 
@@ -32,6 +26,45 @@ class ReweighterParticle:
     pdg_binning: dict
     pid_threshold: dict
     variable_aliases: dict
+    weight_name: str
+    column_names: list = None
+
+    def generate_variations(self,
+                            n_variations: int,
+                            syscorr: bool = True,
+                            rho_sys: np.ndarray = None,
+                            rho_stat: np.ndarray = None) -> None:
+        """
+        Generates variations of weights according to the uncertainties
+        """
+        self.merged_table['stat_error'] = self.merged_table[["data_MC_uncertainty_stat_up",
+                                                             "data_MC_uncertainty_stat_dn"]].max(axis=1)
+        self.merged_table['sys_error'] = self.merged_table[["data_MC_uncertainty_sys_up",
+                                                            "data_MC_uncertainty_sys_dn"]].max(axis=1)
+        self.merged_table["error"] = np.sqrt(self.merged_table["stat_error"] ** 2 + self.merged_table["sys_error"] ** 2)
+        means = self.merged_table["data_MC_ratio"].values
+        self.column_names = [f"{self.weight_name}_{i}" for i in range(n_variations)]
+        if rho_sys is None:
+            if syscorr:
+                rho_sys = np.ones((len(means), len(means)))
+            else:
+                rho_sys = np.identity(len(means))
+        if rho_stat is None:
+            rho_stat = np.identity(len(means))
+
+        zeros = np.zeros(len(means))
+        sys_cov = np.matmul(
+            np.matmul(np.diag(self.merged_table['sys_error']), rho_sys), np.diag(self.merged_table['sys_error'])
+        )
+        stat_cov = np.matmul(
+            np.matmul(np.diag(self.merged_table['stat_error']), rho_stat), np.diag(self.merged_table['stat_error'])
+        )
+        sys = np.random.multivariate_normal(zeros, sys_cov, n_variations)
+        stat = np.random.multivariate_normal(zeros, stat_cov, n_variations)
+        weights = sys + stat + means
+        self.merged_table[self.weight_name] = self.merged_table["data_MC_ratio"]
+        self.merged_table[self.column_names] = weights.T
+        self.column_names.insert(0, self.weight_name)
 
     def __str__(self) -> str:
         """
@@ -52,10 +85,12 @@ class Reweighter:
     Class that reweights the dataframe.
     """
 
-    def __init__(self, n_variations: int = 100) -> None:
+    def __init__(self, n_variations: int = 100, weight_name: str = "Weight") -> None:
         self.n_variations = n_variations
         self.particles = []
         self.correlations = []
+        self.weight_name = weight_name
+        self.weights_generated = False
 
     def get_bin_columns(self, weight_df) -> list:
         """
@@ -155,9 +190,12 @@ class Reweighter:
                                                               var].str[1]  # Oh uff
                 binning_df.drop(var, axis=1, inplace=True)
         # merge the weight table with the ntuple on binning columns
-        binning_df = binning_df.merge(particle.merged_table[_weight_cols + binning_df.columns.tolist()],
+        weight_cols = _weight_cols
+        if particle.column_names:
+            weight_cols = particle.column_names
+        binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
-        for col in _weight_cols:
+        for col in weight_cols:
             ntuple_df[f'{particle.prefix}{col}'] = binning_df[col]
 
     def add_pid_particle(self,
@@ -197,11 +235,14 @@ class Reweighter:
                     del pdg_binning[pdg]['iso_score']
         if not variable_aliases:
             variable_aliases = {pid_variable_name: pid_variable_name}
-        self.particles += [ReweighterParticle(prefix,
-                                              merged_table=merged_weight_df,
-                                              pdg_binning=pdg_binning,
-                                              pid_threshold={pid_variable_name: threshold},
-                                              variable_aliases=variable_aliases)]
+        particle = ReweighterParticle(prefix,
+                                      merged_table=merged_weight_df,
+                                      pdg_binning=pdg_binning,
+                                      pid_threshold={pid_variable_name: threshold},
+                                      variable_aliases=variable_aliases,
+                                      weight_name=self.weight_name)
+        particle.generate_variations(n_variations=self.n_variations)
+        self.particles += [particle]
 
     def get_particle(self, prefix: str) -> ReweighterParticle:
         """
@@ -229,50 +270,3 @@ class Reweighter:
         for particle in self.particles:
             self.add_weight_columns(df, particle)
         return df
-
-
-if __name__ == "__main__":
-    import uproot
-    with uproot.open("~/belle2/sutclw_b_sll_bonn/AnalysisSelections/mc15v16B0eeB0/Upsilon4SB0candee.root") as f:
-        df = f["variables"].arrays(library="pd")
-    pv_path = '~/belle2/pidvar/examples/'
-    efftable_e = pd.read_csv(f'{pv_path}/v0b/efficiency/e_efficiency_table.csv')
-    efftable_mu = pd.read_csv(f'{pv_path}/v0b/efficiency/mu_efficiency_table.csv')
-    faketable_pi_e = pd.read_csv(f'{pv_path}/v0b/fakeRate/pi_e_fakeRate_table.csv')
-    faketable_pi_mu = pd.read_csv(f'{pv_path}/v0b/fakeRate/pi_mu_fakeRate_table.csv')
-    faketable_K_e = pd.read_csv(f'{pv_path}/v0b/fakeRate/K_e_fakeRate_table.csv')
-    faketable_K_mu = pd.read_csv(f'{pv_path}/v0b/fakeRate/K_mu_fakeRate_table.csv')
-
-    best_available_query = "is_best_available == True"
-    exclude_e_bins_query = "not (theta_min == 0.56 and theta_max == 2.23) "
-    exclude_e_bins_query += "and not (theta_min == 0.22 and theta_max == 2.71)"
-    exclude_e_bins_query += "and not (p_min == 0.2 and p_max == 7.0)"
-    exclude_mu_bins_query = "not (theta_min == 0.82 and theta_max == 2.22) "
-    exclude_mu_bins_query += "and not (theta_min == 0.4 and theta_max == 0.82) "
-    exclude_mu_bins_query += "and not (theta_min == 0.4 and theta_max == 2.6)"
-    e_query = f"({best_available_query}) and ({exclude_e_bins_query})"
-    mu_query = f"({best_available_query}) and ({exclude_mu_bins_query})"
-    fake_query = f"({best_available_query}) and not (theta_min == 0.22 and theta_max == 2.71) "
-    fake_query += " and not (theta_min == 0.56 and theta_max == 2.23)"
-    fake_query += " and not (theta_min == 0.82 and theta_max == 2.22)"
-    fake_query += " and not (theta_min == 0.4 and theta_max == 2.6)"
-    fake_query += " and not (theta_min == 0.4 and theta_max == 0.82)"
-    fake_query += " and not (p_min == 0.2 and p_max == 5.)"
-
-    efftables = {11: efftable_e.query(e_query), 13: efftable_mu.query(mu_query)}
-    faketables = {
-        211: faketable_pi_e.query(fake_query),
-        # (211,13) :faketable_pi_mu.query(fake_query),
-        321: faketable_K_e.query(fake_query),
-        # (321,13) :faketable_K_mu.query(fake_query)
-    }
-    df['lepminus_charge'] = -1
-    df['lepplus_charge'] = 1
-    df['lepplus_mcPDG'] = df['lepplus_MC_PDG'].fillna(0).astype(int)
-    df['lepminus_mcPDG'] = df['lepminus_MC_PDG'].fillna(0).astype(int)
-    reweighter = Reweighter()
-    reweighter.add_pid_particle({11: efftable_e.query(e_query)}, faketables, 'pidChargedBDTScore_e', 0.9, 'lepminus_')
-    reweighter.add_pid_particle({11: efftable_e.query(e_query)}, faketables, 'pidChargedBDTScore_e', 0.9, 'lepplus_')
-    reweighter.reweight(df)
-    print(reweighter.get_particle('lepminus_'))
-    print(df.columns)

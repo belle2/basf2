@@ -74,14 +74,21 @@ CalibrationAlgorithm::EResult eclAutocovarianceCalibrationC3Algorithm::calibrate
     }
 
     double tempAutoCov[m_numberofADCPoints];
-
     for (int i = 0; i < m_numberofADCPoints; i++) tempAutoCov[i] = NoiseMatrix(0, i);
-    Autocovariances->setAutoCovariance(ID + 1, tempAutoCov);
 
     TDecompChol dc(NoiseMatrix);
     bool InvertStatus = dc.Invert(NoiseMatrix);
-    if (InvertStatus == false)  B2INFO("eclAutocovarianceCalibrationC3Algorithm ID InvertStatus [0][0] totalCounts: " << ID <<
-                                         " " << InvertStatus << " " << NoiseMatrix(0, 0) << " " << totalCounts);
+    if (InvertStatus == false && ID > 0) {
+      B2INFO("eclAutocovarianceCalibrationC3Algorithm iD InvertStatus [0][0] totalCounts: " << ID << " " << InvertStatus << " " <<
+             NoiseMatrix(0, 0) << " " << totalCounts);
+      B2INFO("eclAutocovarianceCalibrationC3Algorithm Setting ID " << ID << " Autocovariance to Autocovariance from ID " << ID - 1);
+      B2INFO("eclAutocovarianceCalibrationC3Algorithm B: " << tempAutoCov[0]);
+      Autocovariances->getAutoCovariance(ID + 1 - 1, tempAutoCov);
+      B2INFO("eclAutocovarianceCalibrationC3Algorithm A: " << tempAutoCov[0]);
+    }
+
+    Autocovariances->setAutoCovariance(ID + 1, tempAutoCov);
+
     cryIDs.push_back(ID + 1);
     invertStatusVector.push_back(InvertStatus);
     noiseMatrix00Vector.push_back(NoiseMatrix(0, 0));

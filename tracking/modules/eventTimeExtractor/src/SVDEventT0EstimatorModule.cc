@@ -10,6 +10,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/geometry/B2Vector3.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <mdst/dataobjects/TrackFitResult.h>
 
 #include <cmath>
 
@@ -37,6 +38,10 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   addParam("absPzMinSelection", m_absPzSelection,
            "Cut on minimum absolute value of the longitudinal momentum, abs(pz), for RecoTrack selection",
            m_absPzSelection);
+  addParam("absD0Selection", m_absD0Selection,
+           "Cut on maximum absolute value of the d0 for RecoTrack selection", m_absD0Selection);
+  addParam("absZ0Selection", m_absZ0Selection,
+           "Cut on maximum absolute value of the z0 for RecoTrack selection", m_absD0Selection);
 }
 
 
@@ -74,9 +79,12 @@ void SVDEventT0EstimatorModule::event()
   // loop on recotracks
   for (auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
-
+    const TrackFitResult seedTrackFitResult = setSeedTrackFitResult(recoTrack);
+    double d0 = seedTrackFitResult.getD0();
+    double z0 = seedTrackFitResult.getZ0();
     // selection on recoTracks
-    if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
+    if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection || std::fabs(d0) > m_absD0Selection
+        || std::fabs(z0) > m_absZ0Selection) continue;
 
     // use outgoing/ingoing arm time to compute SVD EventT0
     // if both outgoing and ingoing are estimated we take the smallest one
@@ -139,4 +147,26 @@ void SVDEventT0EstimatorModule::event()
   m_eventT0->addTemporaryEventT0(evtT0Component);
   m_eventT0->setEventT0(evtT0Component);
 
+}
+
+const TrackFitResult SVDEventT0EstimatorModule::setSeedTrackFitResult(const RecoTrack& recoTrack)
+{
+
+  const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
+  const B2Vector3D& momentum = recoTrack.getMomentumSeed();
+  const TMatrixDSym& cartesianCovariance = recoTrack.getSeedCovariance();
+  short int chargeSign = recoTrack.getChargeSeed();
+  const Const::ParticleType& particleType = Belle2::Const::pion;
+  if (chargeSign < 0) chargeSign = -1;
+  else chargeSign = 1;
+  const float pValue = float(std::numeric_limits<double>::quiet_NaN());
+  const float bField = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
+  int cdcHitPattern = 0;
+  int svdHitPattern = 0;
+  uint16_t ndf = 0xFFFF;
+
+  const TrackFitResult trackFitResult = Belle2::TrackFitResult(position, momentum, cartesianCovariance, chargeSign, particleType,
+                                        pValue, bField, cdcHitPattern, svdHitPattern, ndf);
+
+  return trackFitResult;
 }

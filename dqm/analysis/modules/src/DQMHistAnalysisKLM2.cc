@@ -39,7 +39,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
   addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
-  addParam("MinEntries", m_minEntries, "Minimum entries for delta histogram update", 10000.);
+  addParam("MinEntries", m_minEntries, "Minimum entries for delta histogram update", 30000.);
 
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
@@ -449,6 +449,8 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   bool setFew = false;
   int mainEntries;
 
+  errHist->Reset(); // Reset histogram
+
   *pvcount = 0; //initialize to zero
   mainEntries = mainHist->GetEntries();
 
@@ -499,15 +501,16 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
         // set alarm
         if (eff2dVal < warnThr) {
-          *pvcount += 1;
-        }
-        if (eff2dVal < alarmThr) {
           if (mainEntries < (int)m_minEntries) {
             setFew = true;
             B2DEBUG(1, "Alarm Set to be grey for 2D Canvas: Low Statistics");
+          } else if (eff2dVal < alarmThr) {
+            *pvcount += 1;
+            setWarn = true;
+            B2DEBUG(1, "Alarm Set to be yellow for few layers that below alarm threshold.");
           } else {
-            setAlarm = true;
-            B2DEBUG(1, "Alarm Set to be red for threshold warning.");
+            setWarn = true;
+            B2DEBUG(1, "Alarm Set to be yellow for few layers that below warn threshold.");
           }
         }
 
@@ -519,13 +522,8 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   }//end of bin x
 
   if (*pvcount > (int) layerLimit) {
-    if (mainEntries < (int)m_minEntries) {
-      setFew = true;
-      B2DEBUG(1, "Alarm Set to be grey for ineff Layer Count: Low statistics");
-    } else {
-      setWarn = true;
-      B2DEBUG(1, "Alarm Set to be yellow for ineff Layer Count warning.");
-    }
+    setAlarm = true;
+    B2DEBUG(1, "Alarm Set to be yellow for ineff Layer Count warning.");
   }
 
   eff2dHist->SetMinimum(minVal);

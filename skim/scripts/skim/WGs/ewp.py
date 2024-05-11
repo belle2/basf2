@@ -411,12 +411,15 @@ class FourLepton(BaseSkim):
     """
     Reconstructed decays
         * :math:`B^0 \\to e^- e^+ e^- e^+`
+        * :math:`B^0 \\to e^- e^+ mu^- mu^+`
 
     Cuts applied
         * :math:`n_{\\text{tracks}} \\geq 5`
         * :math:`-1.5 < \\delta E < 0.5 \\text{GeV}`
-        * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+        * :math:`5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
         * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
+        * :math:`muonID>0.1`
+        * :math:`electronID_noTOP>0.1 , 0.387 < \\theta_{track} < 2.421`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -424,24 +427,28 @@ class FourLepton(BaseSkim):
     __description__ = (
         "Skim for 4 body leptonic analyses"
     )
-    __category__ = "Physics, Leptonic, 4 Body, no pID"
+    __category__ = "Physics, Leptonic, 4 Body, with soft PID for e and mu"
 
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
-
-        cut_trk = 'dr < 0.5 and abs(dz) < 2'
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        # tracks should point to the IP
+        cut_trk = 'dr < 0.5 and abs(dz) < 2 '
+        # pt of tracks at least 100 MeV + electronID > 0.1 + muonID > 0.1
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=5"
-        cut_b = "deltaE < 0.5 and deltaE > -1.5 and Mbc > 5.2"
+        cut_b = "deltaE < 0.5 and deltaE > -1.5 and Mbc > 5.2 and Mbc < 5.3"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.reconstructDecay("B0:FourLepton -> e+:ewp e-:ewp e+:ewp e-:ewp", cut_b, dmID=1, path=path)
-        return ["B0:FourLepton"]
+        ma.reconstructDecay("B0:FourLepton_1 -> e+:ewp e-:ewp e+:ewp e-:ewp", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:FourLepton_2 -> e+:ewp e-:ewp mu+:ewp mu-:ewp", cut_b, dmID=2, path=path)
+        return ["B0:FourLepton_1", "B0:FourLepton_2"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -452,7 +459,7 @@ class FourLepton(BaseSkim):
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist="B0:FourLepton",
+            particlelist="B0:FourLepton_2",
             variables_1d=[
                 ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
                  "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
@@ -478,6 +485,8 @@ class RadiativeDilepton(BaseSkim):
         * :math:`-1.0 < \\delta E < 0.5 \\text{GeV}`
         * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
         * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
+        * :math:`E_{\\gamma}>0.1 \\text{GeV}`
+        * :math:`electronID_noTOP>0.1 , 0.387 < \\theta_{track} < 2.421`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -486,25 +495,25 @@ class RadiativeDilepton(BaseSkim):
         "Skim for 3 body leptonic analyses "
 
     )
-    __category__ = "Physics, Leptonic, 3 body, no pID"
+    __category__ = "Physics, Leptonic, 3 body, soft PID"
 
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdPhotons("all", path=path)
-        stdPhotons("loose", path=path)
 
     def build_lists(self, path):
 
         cut_trk = 'dr < 0.5 and abs(dz) < 2'
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('e+:ewp', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
         cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.reconstructDecay("B0:RadiativeDilepton -> e+:ewp e-:ewp gamma:loose", cut_b, dmID=1, path=path)
+        ma.cutAndCopyList('gamma:ewp', 'gamma:all', 'E > 0.1', path=path)
+        ma.reconstructDecay("B0:RadiativeDilepton -> e+:ewp e-:ewp gamma:ewp", cut_b, dmID=1, path=path)
         return ["B0:RadiativeDilepton"]
 
     def validation_histograms(self, path):

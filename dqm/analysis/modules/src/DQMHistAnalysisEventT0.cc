@@ -107,8 +107,8 @@ void DQMHistAnalysisEventT0Module::initialize()
                     "EventT0 source fractions, Bhabha events, L1ECLTRG;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG =
-    new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1ECLTRG",
-                    "EventT0 source fractions, Bhabha events, L1ECLTRG;Algorithm;Fraction #epsilon",
+    new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1CDCTRG",
+                    "EventT0 source fractions, Bhabha events, L1CDCTRG;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1TOPTRG",
@@ -245,7 +245,7 @@ void DQMHistAnalysisEventT0Module::event()
     m_pMuMuECLTRG->Modified();
     m_pMuMuECLTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2WARNING("Histogram EventT0 source fractions for MuMu from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
     m_pMuMuECLTRG->SetFillColor(kGray);
   }
 
@@ -256,7 +256,7 @@ void DQMHistAnalysisEventT0Module::event()
     m_pMuMuCDCTRG->Modified();
     m_pMuMuCDCTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2WARNING("Histogram EventT0 source fractions for MuMu from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
     m_pMuMuCDCTRG->SetFillColor(kGray);
   }
 

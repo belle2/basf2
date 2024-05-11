@@ -419,7 +419,7 @@ class FourLepton(BaseSkim):
         * :math:`5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
         * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
         * :math:`muonID>0.1`
-        * :math:`electronID_noTOP>0.1 , 0.387 < \\theta_{track} < 2.421`
+        * :math:`electronID_noTOP>0.1`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -427,7 +427,7 @@ class FourLepton(BaseSkim):
     __description__ = (
         "Skim for 4 body leptonic analyses"
     )
-    __category__ = "Physics, Leptonic, 4 Body, with soft PID for e and mu"
+    __category__ = "Physics, Leptonic, 4 Body"
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -436,9 +436,8 @@ class FourLepton(BaseSkim):
         stdMu("all", path=path)
 
     def build_lists(self, path):
-        # tracks should point to the IP
         cut_trk = 'dr < 0.5 and abs(dz) < 2 '
-        # pt of tracks at least 100 MeV + electronID > 0.1 + muonID > 0.1
+
         ma.cutAndCopyList('e+:ewp', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
         ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
@@ -455,11 +454,13 @@ class FourLepton(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
+        ma.cutAndCopyLists("B0:FourLepton", "B0:FourLepton_2", "", path=path)
+
         histogramFilename = f"{self}_Validation.root"
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist="B0:FourLepton_2",
+            particlelist=["B0:FourLepton"],
             variables_1d=[
                 ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
                  "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),
@@ -479,14 +480,15 @@ class RadiativeDilepton(BaseSkim):
     """
     Reconstructed decays
         * :math:`B^0 \\to e^- e^+ \\gamma`
+        * :math:`B^0 \\to mu^- mu^+ \\gamma`
 
     Cuts applied
         * :math:`n_{\\text{tracks}} \\geq 3`
         * :math:`-1.0 < \\delta E < 0.5 \\text{GeV}`
-        * :math:`M_{bc} > 5.2 \\text{GeV}/c^2`
+        * :math:` 5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
         * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
-        * :math:`E_{\\gamma}>0.1 \\text{GeV}`
-        * :math:`electronID_noTOP>0.1 , 0.387 < \\theta_{track} < 2.421`
+        * :math:`muonID>0.1`
+        * :math:`electronID_noTOP>0.1`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -495,31 +497,35 @@ class RadiativeDilepton(BaseSkim):
         "Skim for 3 body leptonic analyses "
 
     )
-    __category__ = "Physics, Leptonic, 3 body, soft PID"
+    __category__ = "Physics, Leptonic, 3 body"
 
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
+        stdMu("all", path=path)
         stdPhotons("all", path=path)
 
     def build_lists(self, path):
 
         cut_trk = 'dr < 0.5 and abs(dz) < 2'
         ma.cutAndCopyList('e+:ewp', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
-        cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2"
+        cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2 and Mbc < 5.3"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.cutAndCopyList('gamma:ewp', 'gamma:all', 'E > 0.1', path=path)
-        ma.reconstructDecay("B0:RadiativeDilepton -> e+:ewp e-:ewp gamma:ewp", cut_b, dmID=1, path=path)
-        return ["B0:RadiativeDilepton"]
+        ma.reconstructDecay("B0:RadiativeDilepton_1 -> e+:ewp e-:ewp gamma:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:RadiativeDilepton_2 -> mu+:ewp mu-:ewp gamma:all", cut_b, dmID=1, path=path)
+        return ["B0:RadiativeDilepton_1", "B0:RadiativeDilepton_2"]
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
+
+        ma.cutAndCopyLists("B0:RadiativeDilepton", "B0:RadiativeDilepton_2", "", path=path)
 
         histogramFilename = f"{self}_Validation.root"
 

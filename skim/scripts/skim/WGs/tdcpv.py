@@ -130,7 +130,7 @@ class TDCPV_qqs(BaseSkim):
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
-        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'E>0.250', path=path)
+        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'clusterE>0.250', path=path)
         ma.cutAndCopyList('K_L0:klmLayers', 'K_L0:allklm', '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]', path=path)
         ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
 
@@ -320,7 +320,7 @@ class TDCPV_ccs(BaseSkim):
         ma.applyCuts('pi0:eff60_May2020', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
+        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'clusterE>0.15', path=path)
         ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
 
     def build_lists(self, path):

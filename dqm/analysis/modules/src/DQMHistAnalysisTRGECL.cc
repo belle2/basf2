@@ -45,17 +45,6 @@ void DQMHistAnalysisTRGECLModule::initialize()
 
   gROOT->cd();
 
-  gStyle->SetOptStat(kFALSE);
-  gStyle->SetOptTitle(1);
-  gStyle->SetStatW(0.5);
-  gStyle->SetStatH(0.3);
-  gStyle->SetStatFontSize(0.05);
-
-  gStyle->SetPadTopMargin(0.10);
-  gStyle->SetPadBottomMargin(0.14);
-  gStyle->SetPadRightMargin(0.08);
-  gStyle->SetPadLeftMargin(0.14);
-
   // canvas for event timing related histograms
   c_TCEFraction =
     new TCanvas("TRGECLEventTiming/c_a_EventTimingFraction",

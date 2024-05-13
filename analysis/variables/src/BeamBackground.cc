@@ -6,10 +6,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/VariableManager/Manager.h>
+#include <analysis/variables/BeamBackground.h>
 
+#include <analysis/VariableManager/Manager.h>
 #include <framework/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -26,9 +27,9 @@ namespace Belle2::Variable {
       if (bkgInfo->getMethod() != BackgroundInfo::c_Overlay)
         return nullptr;
       const auto bkgDescriptions = bkgInfo->getBackgrounds();
-      // It's basically guaranteed that there is only one BackgroundDescr with the type "RandomTrigger"
-      // Also: in mdsts we only care about "RandomTrigger"
-      auto bkgDescription = std::find_if(bkgDescriptions.begin(), bkgDescriptions.end(), [](const auto & d) { return d.type == "RandomTrigger"; });
+      // In mdsts we are supposed to have only the "default" type.
+      // Also: we should have only one type, but let's be safe here.
+      auto bkgDescription = std::find_if(bkgDescriptions.begin(), bkgDescriptions.end(), [](const auto & d) { return d.type == BackgroundMetaData::getDefaultBackgroundOverlayType(); });
       if (bkgDescription != bkgDescriptions.end())
         return &(*bkgDescription);
       else

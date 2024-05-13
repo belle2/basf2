@@ -10,7 +10,9 @@
 
 #include <framework/pcore/Mergeable.h>
 #include <framework/core/FrameworkExceptions.h>
+
 #include <string>
+#include <string_view>
 
 namespace Belle2 {
 
@@ -127,6 +129,8 @@ namespace Belle2 {
      */
     EFileType getFileType() const {return m_fileType;}
 
+    static constexpr std::string_view getDefaultBackgroundOverlayType() { return c_defaultBackgroundOverlayType; }
+
     /**
      * Implementation of abstract class function
      */
@@ -151,6 +155,7 @@ namespace Belle2 {
     BG_TAG m_backgroundTag = bg_other; /**< background tag */
     float m_realTime = 0; /**< real time that corresponds to beam background sample */
     EFileType m_fileType = c_Usual; /**< file type */
+    static constexpr std::string_view c_defaultBackgroundOverlayType = "RandomTrigger"; /**< default name for background overlay type */
 
     /**
      * Class definition required for creation of ROOT dictionary.

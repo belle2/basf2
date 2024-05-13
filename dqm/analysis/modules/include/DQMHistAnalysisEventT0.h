@@ -93,17 +93,17 @@ namespace Belle2 {
     TCanvas* m_cT0FractionsForBhaBhas = nullptr; /**< EventT0 fractions plots canvas for BhaBha events */
     TCanvas* m_cT0FractionsForMuMus   = nullptr; /**< EventT0 fractions plots canvas for MuMu events */
 
-    TPad* m_pHadronECLTRG = nullptr; /**< pad for time fractions for ECLTRG hadrons */
-    TPad* m_pHadronCDCTRG = nullptr; /**< pad for time fractions for CDCTRG hadrons */
-    TPad* m_pHadronTOPTRG = nullptr; /**< pad for time fractions for TOPTRG hadrons */
+    TCanvas* m_cHadronECLTRG = nullptr; /**< pad for time fractions for ECLTRG hadrons */
+    TCanvas* m_cHadronCDCTRG = nullptr; /**< pad for time fractions for CDCTRG hadrons */
+    TCanvas* m_cHadronTOPTRG = nullptr; /**< pad for time fractions for TOPTRG hadrons */
 
-    TPad* m_pBhaBhaECLTRG = nullptr; /**< pad for time fractions for ECLTRG bhabhas */
-    TPad* m_pBhaBhaCDCTRG = nullptr; /**< pad for time fractions for CDCTRG bhabhas */
-    TPad* m_pBhaBhaTOPTRG = nullptr; /**< pad for time fractions for TOPTRG bhabhas */
+    TCanvas* m_cBhaBhaECLTRG = nullptr; /**< pad for time fractions for ECLTRG bhabhas */
+    TCanvas* m_cBhaBhaCDCTRG = nullptr; /**< pad for time fractions for CDCTRG bhabhas */
+    TCanvas* m_cBhaBhaTOPTRG = nullptr; /**< pad for time fractions for TOPTRG bhabhas */
 
-    TPad* m_pMuMuECLTRG = nullptr; /**< pad for time fractions for ECLTRG mumu */
-    TPad* m_pMuMuCDCTRG = nullptr; /**< pad for time fractions for CDCTRG mumu */
-    TPad* m_pMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
+    TCanvas* m_cMuMuECLTRG = nullptr; /**< pad for time fractions for ECLTRG mumu */
+    TCanvas* m_cMuMuCDCTRG = nullptr; /**< pad for time fractions for CDCTRG mumu */
+    TCanvas* m_cMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
 
     /// EventT0 algorithms for which to calculate fractions of abundance
     const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP", "Any"};

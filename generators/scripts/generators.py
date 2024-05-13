@@ -93,7 +93,8 @@ def add_aafh_generator(
         minmass=0.5,
         subweights=[],
         maxsubweight=1,
-        maxfinalweight=3.0):
+        maxfinalweight=3.0,
+        eventType=''):
     """
     Add the default two photon generator for four fermion final states
 
@@ -107,6 +108,7 @@ def add_aafh_generator(
                                   which specify the relative weights for each of the four sub generators
         maxsubweight (float): maximum expected subgenerator weight for rejection scheme
         maxfinalweight (float): maximum expected final weight for rejection scheme
+        eventType (str) : event type information
     """
 
     if finalstate == 'e+e-e+e-':
@@ -176,7 +178,8 @@ def add_aafh_generator(
         maxFinalWeight=aafh_maxFinalWeight,
         subgeneratorWeights=aafh_subgeneratorWeights,
         suppressionLimits=[1e100] * 4,
-        minMass=minmass
+        minMass=minmass,
+        eventType=eventType,
     )
 
     if preselection:
@@ -196,7 +199,7 @@ def add_aafh_generator(
             b2.B2WARNING("The tau decays will not be generated.")
 
 
-def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False, tauinputfile=''):
+def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=False, tauinputfile='', eventType=''):
     """
     Add the default muon pair and tau pair generator KKMC.
     For tau decays, TauolaBelle and TauolaBelle2 are available.
@@ -210,6 +213,7 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         useTauolaBelle(bool): If true, tau decay is driven by TauolaBelle. Otherwise TauolaBelle2 is used.
                               It doesn't affect mu-mu+ decays.
         tauinputfile(str) : File to override KK2f_defaults. Only [sometimes] needed when tau decay is driven by TauolaBelle.
+        eventType (str) : event type information
     """
 
     #: kkmc input file
@@ -264,10 +268,11 @@ def add_kkmc_generator(path, finalstate='', signalconfigfile='', useTauolaBelle=
         KKdefaultFile=kkmc_config,
         taudecaytableFile=kkmc_tauconfigfile,
         kkmcoutputfilename=kkmc_logfile,
+        eventType=eventType,
     )
 
 
-def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing=True, parentParticle='Upsilon(4S)'):
+def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing=True, parentParticle='Upsilon(4S)', eventType=''):
     """
     Add EvtGen for mixed and charged BB
 
@@ -282,6 +287,7 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
                         setting it False solves the internal limitation of Evtgen that allows to make a
                         coherent decay only starting from the Y(4S).
         parentParticle (str): initial state (used only if it is not Upsilon(4S).
+        eventType (str) : event type information
     """
     evtgen_userdecfile = b2.find_file('data/generators/evtgen/charged.dec')
 
@@ -334,11 +340,12 @@ def add_evtgen_generator(path, finalstate='', signaldecfile=None, coherentMixing
         'EvtGenInput',
         userDECFile=evtgen_userdecfile,
         CoherentMixing=coherentMixing,
-        ParentParticle=parentParticle
+        ParentParticle=parentParticle,
+        eventType=eventType,
     )
 
 
-def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure=True):
+def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure=True, eventType=''):
     """
     Add the default continuum generators KKMC + PYTHIA including their default decfiles and PYTHIA settings
 
@@ -351,6 +358,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
         userdecfile (str): EvtGen decfile used for particle decays
         skip_on_failure (bool): If True stop event processing right after
             fragmentation fails. Otherwise continue normally
+        eventType (str) : event type information
     """
 
     #: kkmc input file, one for each qqbar mode
@@ -398,6 +406,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
         KKdefaultFile=kkmc_config,
         taudecaytableFile='',
         kkmcoutputfilename=kkmc_logfile,
+        eventType=eventType,
     )
 
     # add the fragmentation module to fragment the generated quarks into hadrons
@@ -419,7 +428,7 @@ def add_continuum_generator(path, finalstate, userdecfile='', *, skip_on_failure
 
 
 def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='',
-                                      *, include_conjugates=True, max_iterations=100000):
+                                      *, include_conjugates=True, max_iterations=100000, eventType=''):
     """
     Add continuum generation but require at least one of the given particles be
     present in the event.
@@ -447,14 +456,15 @@ def add_inclusive_continuum_generator(path, finalstate, particles, userdecfile='
             particle. If exceeded processing will be stopped with a
             `FATAL <LogLevel.FATAL>` error so for rare particles one might need a
             larger number.
+        eventType (str) : event type information
     """
     loop_path = b2.create_path()
     # we might run this more than once so make sure we remove any particles
     # before generating new ones
-    loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles"])
+    loop_path.add_module("PruneDataStore", keepMatchedEntries=False, matchEntries=["MCParticles", "EventExtraInfo"])
     # add the generator but make sure it doesn't stop processing on
     # fragmentation failure as is this currently not supported by do_while
-    add_continuum_generator(loop_path, finalstate, userdecfile, skip_on_failure=False)
+    add_continuum_generator(loop_path, finalstate, userdecfile, skip_on_failure=False, eventType=eventType)
     # check for the particles we want
     loop_path.add_module("InclusiveParticleChecker", particles=particles, includeConjugates=include_conjugates)
     # Done, add this to the path and iterate it until we found our particle
@@ -484,7 +494,14 @@ def add_bhwide_generator(path, minangle=0.5):
     bhwide.param('WtMax', 3.0)
 
 
-def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0, fmax=-1.0, generateInECLAcceptance=False):
+def add_babayaganlo_generator(
+        path,
+        finalstate='',
+        minenergy=0.01,
+        minangle=10.0,
+        fmax=-1.0,
+        generateInECLAcceptance=False,
+        eventType=''):
     '''
     Add the high precision QED generator BabaYaga@NLO to the path.
 
@@ -496,10 +513,11 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
         fmax (float): maximum of differential cross section weight. This parameter should be set only by experts.
         generateInECLAcceptance (bool): if True, the GeneratorPreselection module is used to select only events
           with both the primary particles within the ECL acceptance.
+        eventType (str) : event type information
     '''
 
     babayaganlo = path.add_module('BabayagaNLOInput')
-
+    babayaganlo.param('eventType', eventType)
     if not (fmax == -1.0):
         b2.B2WARNING(f'The BabayagaNLOInput parameter "FMax" will be set to {fmax} instead to the default value (-1.0). '
                      'Please do not do this, unless you are extremely sure about this choice.')
@@ -539,7 +557,7 @@ def add_babayaganlo_generator(path, finalstate='', minenergy=0.01, minangle=10.0
                                      MaxPhotonTheta=155.1)
 
 
-def add_phokhara_generator(path, finalstate=''):
+def add_phokhara_generator(path, finalstate='', eventType=''):
     """
     Add the high precision QED generator PHOKHARA to the path. Almost full
     acceptance settings for photons and hadrons/muons.
@@ -547,9 +565,11 @@ def add_phokhara_generator(path, finalstate=''):
     Parameters:
         path (basf2.Path): path where the generator should be added
         finalstate (str): One of the possible final state "mu+mu-", "pi+pi-", "pi+pi-pi0"
+        eventType (str) : event type information
     """
 
     phokhara = path.add_module('PhokharaInput')
+    phokhara.param('eventType', eventType)
 
     if finalstate == 'mu+mu-':
         phokhara.param('FinalState', 0)
@@ -575,7 +595,7 @@ def add_phokhara_generator(path, finalstate=''):
 def add_phokhara_evtgen_combination(
         path, final_state_particles, user_decay_file,
         beam_energy_spread=True, isr_events=False, min_inv_mass_vpho=0.0,
-        max_inv_mass_vpho=0.0):
+        max_inv_mass_vpho=0.0, eventType=''):
     """
     Add combination of PHOKHARA and EvtGen to the path. Phokhara is
     acting as ISR generator by generating e+ e- -> mu+ mu-, the muon pair is
@@ -602,11 +622,13 @@ def add_phokhara_evtgen_combination(
         max_inv_mass_hadrons(float): Maximum invariant mass of the virtual
             photon. This parameter is used only if isr_events is true,
             otherwise the maximum mass is not restricted.
+        eventType (str) : event type information
     """
 
     import pdg
 
     phokhara = path.add_module('PhokharaInput')
+    phokhara.param('eventType', eventType)
 
     # Generate muons and replace them by a virtual photon.
     phokhara.param('FinalState', 0)
@@ -679,7 +701,7 @@ def add_phokhara_evtgen_combination(
     evtgen_decay.param('UserDecFile', user_decay_file)
 
 
-def add_koralw_generator(path, finalstate='', enableTauDecays=True):
+def add_koralw_generator(path, finalstate='', enableTauDecays=True, eventType=''):
     """
     Add KoralW generator for radiative four fermion final states (only four leptons final states are currently supported).
 
@@ -687,6 +709,7 @@ def add_koralw_generator(path, finalstate='', enableTauDecays=True):
         path (basf2.Path): path where the generator should be added
         finalstate (str): either 'e+e-e+e-', 'e+e-mu+mu-', 'e+e-tau+tau-', 'mu+mu-mu+mu-', 'mu+mu-tau+tau-' or 'tau+tau-tau+tau-'
         enableTauDecays (bool): if True, allow tau leptons to decay (using EvtGen)
+        eventType (str) : event type information
     """
 
     decayFile = ''
@@ -706,7 +729,8 @@ def add_koralw_generator(path, finalstate='', enableTauDecays=True):
         b2.B2FATAL(f'add_koralw_generator final state not supported: {finalstate}')
 
     path.add_module('KoralWInput',
-                    UserDataFile=decayFile)
+                    UserDataFile=decayFile,
+                    eventType=eventType)
 
     if 'tau+tau-' in finalstate:
         if enableTauDecays:
@@ -834,7 +858,7 @@ in your steering file (the module parameter "acceptance" has to be set, see the 
         cosmics_selector.if_false(empty_path)
 
 
-def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
+def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False, eventType=''):
     """
     Add TREPS generator to produce hadronic two-photon processes.
 
@@ -842,6 +866,7 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
         path (basf2.Path):           path where the generator should be added
         finalstate(str):             "e+e-pi+pi-", "e+e-K+K-" or "e+e-ppbar"
         useDiscreteAndSortedW(bool): if True, wListTableFile is used for discrete and sorted W. evtNumList must be set proper value.
+        eventType (str) : event type information
     """
 
     if finalstate == 'e+e-pi+pi-':
@@ -871,4 +896,5 @@ def add_treps_generator(path, finalstate='', useDiscreteAndSortedW=False):
         ApplyCosThetaCutCharged=True,
         MinimalTransverseMomentum=0,
         ApplyTransverseMomentumCutCharged=True,
+        eventType=eventType,
     )

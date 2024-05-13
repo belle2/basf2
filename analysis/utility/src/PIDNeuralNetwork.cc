@@ -21,11 +21,6 @@ void PIDNeuralNetwork::loadParametersFromDB()
   if (!(*m_pidNeuralNetworkParametersDB))
     B2FATAL("The dbobject PIDNeuralNetworkParameters, " << m_pidNeuralNetworkParametersName <<
             ", could not be found! It is necessary for the neural network based PID variables.");
-
-  m_model = std::make_unique<fdeep::model>(fdeep::read_model_from_string((*m_pidNeuralNetworkParametersDB)->getModelDefinition(),
-                                           false,
-  [](const std::string&) {}  // disable logger
-                                                                        ));
 }
 
 

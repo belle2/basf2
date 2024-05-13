@@ -351,7 +351,7 @@ class B0TwoBody(BaseSkim):
     __contact__ = __liaison__
     __description__ = (
         "Skim for 2 body B0 decays"
-        ":math:`B_{\\text{sig}}^-\\to\\ell\\ell'`, where :math:`\\ell(')=e,\\mu + \\pi`(as no lepton ID) is applied"
+        ":math:`B_{\\text{sig}}^0 \\to \\ell \\ell'`, where :math:`\\ell (')=e,\\mu + \\pi `(as no lepton ID) is applied"
     )
     __category__ = "Physics, 2 Body, no pID"
 

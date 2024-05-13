@@ -129,6 +129,9 @@ namespace Belle2 {
      */
     EFileType getFileType() const {return m_fileType;}
 
+    /**
+     * Returns the default name for background overlay type.
+     */
     static constexpr std::string_view getDefaultBackgroundOverlayType() { return c_defaultBackgroundOverlayType; }
 
     /**

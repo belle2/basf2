@@ -17,9 +17,15 @@ HistDelta::HistDelta(EDeltaType t, int p, unsigned int a)
   m_type = t;
   m_parameter = p;
   m_amountDeltas = a;
-  m_lastHist = nullptr;
-  m_lastValue = 0;
+  m_lastHist = nullptr; // implied
+  m_lastValue = 0; // implied
 };
+
+HistDelta::~HistDelta()
+{
+  reset();
+  if (m_lastHist) delete (m_lastHist);
+}
 
 void HistDelta::set(EDeltaType t, int p, unsigned int a)
 {

@@ -41,7 +41,7 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
   addParam("absD0Selection", m_absD0Selection,
            "Cut on maximum absolute value of the d0 for RecoTrack selection", m_absD0Selection);
   addParam("absZ0Selection", m_absZ0Selection,
-           "Cut on maximum absolute value of the z0 for RecoTrack selection", m_absD0Selection);
+           "Cut on maximum absolute value of the z0 for RecoTrack selection", m_absZ0Selection);
 }
 
 

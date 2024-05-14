@@ -76,19 +76,19 @@ void DQMHistAnalysisEventT0Module::initialize()
 
   // EventT0 source fractions
   m_cT0FractionsForHadrons = new TCanvas("EventT0/c_T0FractionsForHadrons", "EventT0 source fractions for hadron events", 1200, 400);
-  m_cHadronECLTRG = new TCanvas("EventT0/c_HadronECLTRG", "Fractions ECLTRG", 0.03, 0.02, 0.33, 0.98);
-  m_cHadronCDCTRG = new TCanvas("EventT0/c_HadronCDCTRG", "Fractions CDCTRG", 0.35, 0.02, 0.65, 0.98);
-  m_cHadronTOPTRG = new TCanvas("EventT0/c_HadronTOPTRG", "Fractions TOPTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cHadronECLTRG = new TCanvas("EventT0/c_HadronECLTRG", "Fractions ECLTRG");
+  m_cHadronCDCTRG = new TCanvas("EventT0/c_HadronCDCTRG", "Fractions CDCTRG");
+  m_cHadronTOPTRG = new TCanvas("EventT0/c_HadronTOPTRG", "Fractions TOPTRG");
 
   m_cT0FractionsForBhaBhas = new TCanvas("EventT0/c_T0FractionsForBhaBhas", "EventT0 source fractions for bhabha events", 1200, 400);
-  m_cBhaBhaECLTRG = new TCanvas("EventT0/c_BhaBhaECLTRG", "Fractions ECLTRG", 0.03, 0.02, 0.33, 0.98);
-  m_cBhaBhaCDCTRG = new TCanvas("EventT0/c_BhaBhaCDCTRG", "Fractions CDCTRG", 0.35, 0.02, 0.65, 0.98);
-  m_cBhaBhaTOPTRG = new TCanvas("EventT0/c_BhaBhaTOPTRG", "Fractions TOPTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cBhaBhaECLTRG = new TCanvas("EventT0/c_BhaBhaECLTRG", "Fractions ECLTRG");
+  m_cBhaBhaCDCTRG = new TCanvas("EventT0/c_BhaBhaCDCTRG", "Fractions CDCTRG");
+  m_cBhaBhaTOPTRG = new TCanvas("EventT0/c_BhaBhaTOPTRG", "Fractions TOPTRG");
 
   m_cT0FractionsForMuMus = new TCanvas("EventT0/c_T0FractionsForMuMus", "EventT0 source fractions for #mu#mu events", 1200, 400);
-  m_cMuMuECLTRG = new TCanvas("EventT0/c_MuMuECLTRG", "Fractions ECLTRG", 0.03, 0.02, 0.33, 0.98);
-  m_cMuMuCDCTRG = new TCanvas("EventT0/c_MuMuCDCTRG", "Fractions CDCTRG", 0.35, 0.02, 0.65, 0.98);
-  m_cMuMuTOPTRG = new TCanvas("EventT0/c_MuMuTOPTRG", "Fractions TOPTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cMuMuECLTRG = new TCanvas("EventT0/c_MuMuECLTRG", "Fractions ECLTRG");
+  m_cMuMuCDCTRG = new TCanvas("EventT0/c_MuMuCDCTRG", "Fractions CDCTRG");
+  m_cMuMuTOPTRG = new TCanvas("EventT0/c_MuMuTOPTRG", "Fractions TOPTRG");
 
   m_eAlgorithmSourceFractionsHadronL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1ECLTRG",

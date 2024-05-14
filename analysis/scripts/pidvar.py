@@ -20,39 +20,46 @@ _weight_cols = ['data_MC_ratio',
 class ReweighterParticle:
     """
     Class that stores the information of a particle.
-    Args:
-        prefix (str): Prefix of the particle in the ntuple
-        merged_table (pd.DataFrame): Merged table of the weights
-        pdg_binning (dict): Kinematic binning of the weight table per particle
-        pid_threshold (dict): PID threshold of the weight table
-        variable_aliases (dict): Variable aliases of the weight table
-        weight_name (str): Name of the resulting weight column
-        column_names (list): Internal list of the names of the weight columns
     """
-    # @var prefix
-    # @brief Prefix of the particle in the ntuple.
+    #: Prefix of the particle in the ntuple
     prefix: str
 
-    # @var merged_table
-    # @brief Merged table of the weights.
+    #: Merged table of the weights
     merged_table: pd.DataFrame
-    # @var pdg_binning
-    # @brief Dictionary containing binning configurations for different PDG codes.
-    # @details The keys of the dictionary are PDG codes, and the values are dictionaries
-    # containing binning configurations for different variables.
+
+    #: Kinematic binning of the weight table per particle
     pdg_binning: dict
 
-    # @var variable_aliases
-    # @brief Dictionary containing variable aliases for the weight table.
+    #: Variable aliases of the weight table
     variable_aliases: dict
 
-    # @var weight_name
-    # @brief Name of the resulting weight column.
+    #: Weight column name that will be added to the ntuple
     weight_name: str
 
-    # @var column_names
-    # @brief Internal list of the names of the weight columns.
+    #: Internal list of the names of the weight columns
     column_names: list = None
+
+    def get_varname(self, varname: str) -> str:
+        """
+        Returns the variable name with the prefix and use alias if defined.
+        """
+        if self.variable_aliases and varname in self.variable_aliases:
+            return f'{self.prefix}{self.variable_aliases[varname]}'
+        return f'{self.prefix}{varname}'
+
+    def get_binning_variables(self) -> list:
+        """
+        Returns the list of variables that are used for the binning
+        """
+        variables = set(sum([list(d.keys()) for d in self.pdg_binning.values()], []))
+        return [f'{self.get_varname(var)}' for var in variables]
+
+    def get_pdg_variables(self) -> list:
+        """
+        Returns the list of variables that are used for the PDG codes
+        """
+        pdg_vars = ['PDG', 'mcPDG']
+        return [f'{self.get_varname(var)}' for var in pdg_vars]
 
     def generate_variations(self,
                             n_variations: int,
@@ -77,7 +84,6 @@ class ReweighterParticle:
                 rho_sys = np.identity(len(means))
         if rho_stat is None:
             rho_stat = np.identity(len(means))
-
         zeros = np.zeros(len(means))
         sys_cov = np.matmul(
             np.matmul(np.diag(self.merged_table['sys_error']), rho_sys), np.diag(self.merged_table['sys_error'])
@@ -152,11 +158,7 @@ class Reweighter:
 
     def get_ntuple_variables(self,
                              ntuple_df: pd.DataFrame,
-                             bin_variables: list,
-                             pid_variable_name: str,
-                             mc_pdg_name: str,
-                             reco_pdg_name: str,
-                             prefix: str) -> None:
+                             particle: ReweighterParticle) -> None:
         """
         Checks if the variables are in the ntuple and returns them.
         Parameters:
@@ -165,16 +167,11 @@ class Reweighter:
             pid_variable_name (str): Name of the PID variable.
             prefix (str): Prefix for the new columns.
         """
-        ntuple_variables = [f'{prefix}_{var}' for var in bin_variables]
-        if pid_variable_name:
-            ntuple_variables += [f'{prefix}_{pid_variable_name}']
-        if mc_pdg_name:
-            ntuple_variables += [f'{prefix}_{mc_pdg_name}']
-        if reco_pdg_name:
-            ntuple_variables += [f'{prefix}_{reco_pdg_name}']
+        ntuple_variables = particle.get_binning_variables()
+        ntuple_variables += particle.get_pdg_variables()
         for var in ntuple_variables:
             if var not in ntuple_df.columns:
-                raise ValueError(f'Variable {var} not in ntuple! Required variables are {ntuple_variables}')
+                raise ValueError(f'Variable {var} is not in the ntuple! Required variables are {ntuple_variables}')
         return ntuple_variables
 
     def merge_weight_tables(self,
@@ -189,12 +186,22 @@ class Reweighter:
         """
         weight_dfs = []
         for reco_pdg, mc_pdg in weights_dict:
-            weights_dict[(reco_pdg, mc_pdg)]['mcPDG'] = mc_pdg
-            weights_dict[(reco_pdg, mc_pdg)]['PDG'] = reco_pdg
+            weight_df = weights_dict[(reco_pdg, mc_pdg)]
+            weight_df['mcPDG'] = mc_pdg
+            weight_df['PDG'] = reco_pdg
+            if reco_pdg not in pdg_pid_variable_dict:
+                raise ValueError(f'Reconstructed PDG code {reco_pdg} not found in thresholds!')
+            # Check if these are legacy tables:
+            if 'charge' in weight_df.columns:
+                charge_dict = {'+': [0, 2], '-': [-2, 0]}
+                weight_df[['charge_min', 'charge_max']] = [charge_dict[val] for val in weight_df['charge'].values]
+                weight_df = weight_df.drop(columns=['charge'])
+                # If iso_score is a single value, drop the min and max columns
+                if 'iso_score_min' in weight_df.columns and len(weight_df['iso_score_min'].unique()) == 1:
+                    weight_df = weight_df.drop(columns=['iso_score_min', 'iso_score_max'])
             pid_variable_name = pdg_pid_variable_dict[reco_pdg][0]
             threshold = pdg_pid_variable_dict[reco_pdg][1]
-            selected_weights = weights_dict[(reco_pdg, mc_pdg)].query(
-                f'variable == "{pid_variable_name}" and threshold == {threshold}')
+            selected_weights = weight_df.query(f'variable == "{pid_variable_name}" and threshold == {threshold}')
             weight_dfs.append(selected_weights)
         return pd.concat(weight_dfs, ignore_index=True)
 
@@ -210,19 +217,16 @@ class Reweighter:
         # Apply a weight value from the weight table to the ntuple, based on the binning
         binning_df = pd.DataFrame(index=ntuple_df.index)
         # Take absolute value of mcPDG for binning because we have charge already
-        binning_df['mcPDG'] = ntuple_df[f'{particle.prefix}mcPDG'].abs()
-        binning_df['PDG'] = ntuple_df[f'{particle.prefix}PDG'].abs()
+        binning_df['mcPDG'] = ntuple_df[f'{particle.get_varname("mcPDG")}'].abs()
+        binning_df['PDG'] = ntuple_df[f'{particle.get_varname("PDG")}'].abs()
         for reco_pdg, mc_pdg in particle.pdg_binning:
+            ntuple_cut = f'abs({particle.get_varname("mcPDG")}) == {mc_pdg} and abs({particle.get_varname("PDG")}) == {reco_pdg}'
             for var in particle.pdg_binning[(reco_pdg, mc_pdg)]:
-                print(reco_pdg, mc_pdg, var)
-                ntuple_cut = f'abs({particle.prefix}mcPDG) == {mc_pdg} and abs({particle.prefix}PDG) == {reco_pdg}'
                 labels = [(particle.pdg_binning[(reco_pdg, mc_pdg)][var][i-1], particle.pdg_binning[(reco_pdg, mc_pdg)][var][i])
                           for i in range(1, len(particle.pdg_binning[(reco_pdg, mc_pdg)][var]))]
                 binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg), var] = pd.cut(ntuple_df.query(
-                    ntuple_cut)[f'{particle.prefix}{var}'],
+                    ntuple_cut)[f'{particle.get_varname(var)}'],
                     particle.pdg_binning[(reco_pdg, mc_pdg)][var], labels=labels)
-                print(binning_df.query(f'mcPDG == {mc_pdg}')[var])
-                print(ntuple_df.query(f'{particle.prefix}mcPDG == {mc_pdg}')[f'{particle.prefix}{var}'])
                 binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
                                f'{var}_min'] = binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
                                                               var].str[0]  # Uh oh
@@ -237,7 +241,7 @@ class Reweighter:
         binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
         for col in weight_cols:
-            ntuple_df[f'{particle.prefix}{col}'] = binning_df[col]
+            ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
 
     def add_pid_particle(self,
                          prefix: str,
@@ -259,10 +263,11 @@ class Reweighter:
         # Add underscore if not present
         if prefix and not prefix.endswith('_'):
             prefix += '_'
+        if variable_aliases is None:
+            variable_aliases = {}
         merged_weight_df = self.merge_weight_tables(weights_dict, pdg_pid_variable_dict)
         pdg_binning = {(reco_pdg, mc_pdg): self.get_binning(merged_weight_df.query(f'PDG == {reco_pdg} and mcPDG == {mc_pdg}'))
                        for reco_pdg, mc_pdg in merged_weight_df[['PDG', 'mcPDG']].value_counts().index.to_list()}
-        print(pdg_binning)
         # Check if these are legacy tables:
         if 'charge' in merged_weight_df.columns:
             charge_dict = {'+': [0, 2], '-': [-2, 0]}
@@ -304,5 +309,6 @@ class Reweighter:
             df (pd.DataFrame): Dataframe containing the analysis ntuple.
         """
         for particle in self.particles:
+            print(f'Required variables: {self.get_ntuple_variables(df, particle)}')
             self.add_weight_columns(df, particle)
         return df

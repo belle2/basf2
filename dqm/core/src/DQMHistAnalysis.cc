@@ -60,7 +60,7 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
     auto it = s_deltaList.find(fullname);
     if (it != s_deltaList.end()) {
       B2DEBUG(20, "Found Delta" << fullname);
-      it->second->update(h); // update
+      it->second.update(h); // update
     }
     return true; // histogram changed
   }
@@ -77,7 +77,7 @@ void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::s
   } else {
     fullname = histname;
   }
-  s_deltaList[fullname] = new HistDelta(t, p, a);
+  s_deltaList[fullname].set(t, p, a);
 }
 
 bool DQMHistAnalysisModule::hasDeltaPar(const std::string& dirname, const std::string& histname)
@@ -106,7 +106,7 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool on
 {
   auto it = s_deltaList.find(fullname);
   if (it != s_deltaList.end()) {
-    return it->second->getDelta(n, onlyIfUpdated);
+    return it->second.getDelta(n, onlyIfUpdated);
   }
   B2WARNING("Delta hist " << fullname << " not found");
   return nullptr;
@@ -256,7 +256,7 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
     h.second.resetBeforeEvent();
   }
   for (auto d : s_deltaList) {
-    d.second->setNotUpdated();
+    d.second.setNotUpdated();
   }
 
   s_canvasUpdatedList.clear();
@@ -270,7 +270,7 @@ void DQMHistAnalysisModule::clearHistList(void)
 void DQMHistAnalysisModule::resetDeltaList(void)
 {
   for (auto d : s_deltaList) {
-    d.second->reset();
+    d.second.reset();
   }
 }
 

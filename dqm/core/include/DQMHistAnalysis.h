@@ -69,7 +69,7 @@ namespace Belle2 {
     /**
      * The type of list of delta settings and histograms.
      */
-    typedef std::map<std::string, HistDelta*> DeltaList;
+    typedef std::map<std::string, HistDelta> DeltaList;
 
     /**
      * The type of list of canvas updated status.

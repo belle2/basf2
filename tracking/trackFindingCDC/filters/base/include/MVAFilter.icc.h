@@ -88,8 +88,8 @@ namespace Belle2 {
       Super::beginRun();
       m_mvaExpert->beginRun();
       /// Make sure that the sequence of columns (features) is correct and follows the one from the weightFile
-      auto selectedVars = m_mvaExpert->getVariableNames();
-      std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
+      const auto& selectedVars = m_mvaExpert->getVariableNames();
+      const std::vector<Named<Float_t*>>& namedVariables = Super::getVarSet().getNamedVariables();
       m_namedVariables.clear();
       for (const auto& name : selectedVars) {
 
@@ -127,9 +127,9 @@ namespace Belle2 {
     template <class AFilter>
     std::vector<float> MVA<AFilter>::predict(const std::vector<Object*>& objs)
     {
-      std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
-      int nFeature = m_namedVariables.size();
-      int nRows    = objs.size();
+      const std::vector<Named<Float_t*>>& namedVariables = Super::getVarSet().getNamedVariables();
+      const int nFeature = m_namedVariables.size();
+      const int nRows    = objs.size();
       auto allFeatures = std::unique_ptr<float[]>(new float[nRows * nFeature]);
       size_t iRow = 0;
       for (const auto& obj : objs) {

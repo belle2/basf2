@@ -186,8 +186,8 @@ namespace Belle2 {
     int getRawZ() const {return m_rawz;}
     int getRawTheta() const {return m_rawtheta;}
     std::vector<int> getRawInput() const {return m_rawinput;}
-    bool getNNTtoGDL() const {return m_nntgdl;}
-    bool getSTTtoGDL() const {return m_sttgdl;}
+    bool getNNTToGDL() const {return m_nntgdl;}
+    bool getSTTToGDL() const {return m_sttgdl;}
 
   protected:
     float m_chi2D;

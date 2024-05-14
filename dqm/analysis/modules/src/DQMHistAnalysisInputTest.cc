@@ -206,7 +206,8 @@ void DQMHistAnalysisInputTestModule::event()
 void DQMHistAnalysisInputTestModule::PlotDelta(void)
 {
   B2INFO("Delta");
-  for (auto a : getDeltaList()) {
+  for (auto& a : getDeltaList()) {
+    // must be reference iterator
     B2INFO(a.first << " " << a.second.m_type << " " << a.second.m_parameter
            << " " << a.second.m_amountDeltas << " " << a.second.m_deltaHists.size());
   }
@@ -259,7 +260,7 @@ void DQMHistAnalysisInputTestModule::endRun()
   B2INFO("DQMHistAnalysisInputTest: endRun called. Run: " << m_runno);
 
   B2INFO("DQMHistAnalysisInputTest: endRun: Histos");
-  for (auto a : getHistList()) {
+  for (auto& a : getHistList()) {
     B2INFO(a.first);
   }
   // The following will produce errors, as the histograms may not exist in endRun

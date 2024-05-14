@@ -251,12 +251,13 @@ void DQMHistAnalysisModule::clearCanvases(void)
 
 void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 {
-  for (auto& h : s_histList) {
-    // attention, we need the reference, otherwise we work on a copy
-    h.second.resetBeforeEvent();
+  for (auto& it : s_histList) {
+    // attention, we must use reference, otherwise we work on a copy
+    it.second.resetBeforeEvent();
   }
-  for (auto d : s_deltaList) {
-    d.second.setNotUpdated();
+  for (auto& it : s_deltaList) {
+    // attention, we must use reference, otherwise we work on a copy
+    it.second.setNotUpdated();
   }
 
   s_canvasUpdatedList.clear();

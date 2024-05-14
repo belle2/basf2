@@ -34,7 +34,7 @@ void HistDelta::set(EDeltaType t, int p, unsigned int a)
   m_amountDeltas = a;
 };
 
-void HistDelta::update(TH1* currentHist)
+void HistDelta::update(const TH1* currentHist)
 {
   m_updated = false;
   if (currentHist == nullptr) return; // this wont make sense

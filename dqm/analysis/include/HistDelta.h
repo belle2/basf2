@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Check if update of delta histogram is necessary
      * @param hist pointer to histogram
      */
-    void update(TH1* hist);
+    void update(const TH1* hist);
 
     /** Reset histogram and deltas, not the parameters
      */

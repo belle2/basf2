@@ -353,6 +353,19 @@ namespace Belle2 {
       }
       return res;
     }
+    bool decodebool(const std::string& boolstring)
+    {
+      bool res;
+      if (boolstring == "1") {
+        res = true;
+      } else if (boolstring == "0") {
+        res = false;
+      } else {
+        B2WARNING("Invalid input in NNBitstream, appending 'false'!");
+        res = false;
+      }
+      return res;
+    }
     /**
      *  Calculate the local TS ID (continuous ID in a super layer)
      *
@@ -1294,6 +1307,18 @@ namespace Belle2 {
                     iclock);
             continue;
           }
+          B2LDataField  p_nntgdl(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("nntgdl"));
+          if ((p_nntgdl.name != "None") && (p_nntgdl.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_nntgdl.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+          B2LDataField  p_sttgdl(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("sttgdl"));
+          if ((p_sttgdl.name != "None") && (p_sttgdl.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_sttgdl.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
 
           // B2LDataField  (bitsNN, iclock, iTracker, neurodb->getB2FormatLine(""));
 
@@ -1507,6 +1532,12 @@ namespace Belle2 {
                   trackNN->addRelationTo(hit);
                   if (iSL % 2 == 0) {
                     track2D->addRelationTo(hit);
+                  }
+                  if (p_nntgdl.name != "None") {
+                    trackNN->setNNTToGDL(decodebool(p_nntgdl.data));
+                  }
+                  if (p_sttgdl.name != "None") {
+                    trackNN->setSTTToGDL(decodebool(p_sttgdl.data));
                   }
                 }
               }

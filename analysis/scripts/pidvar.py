@@ -39,6 +39,12 @@ class ReweighterParticle:
     #: Internal list of the names of the weight columns
     column_names: list = None
 
+    #: Random seed for systematics
+    sys_seed: int = None
+
+    #: When true assume systematics are 100% correlated
+    syscorr: bool = True
+
     def get_varname(self, varname: str) -> str:
         """
         Returns the variable name with the prefix and use alias if defined.
@@ -63,7 +69,6 @@ class ReweighterParticle:
 
     def generate_variations(self,
                             n_variations: int,
-                            syscorr: bool = True,
                             rho_sys: np.ndarray = None,
                             rho_stat: np.ndarray = None) -> None:
         """
@@ -78,7 +83,7 @@ class ReweighterParticle:
         #: Names of the varied weight columns
         self.column_names = [f"{self.weight_name}_{i}" for i in range(n_variations)]
         if rho_sys is None:
-            if syscorr:
+            if self.syscorr:
                 rho_sys = np.ones((len(means), len(means)))
             else:
                 rho_sys = np.identity(len(means))
@@ -91,7 +96,9 @@ class ReweighterParticle:
         stat_cov = np.matmul(
             np.matmul(np.diag(self.merged_table['stat_error']), rho_stat), np.diag(self.merged_table['stat_error'])
         )
+        np.random.seed(self.sys_seed)
         sys = np.random.multivariate_normal(zeros, sys_cov, n_variations)
+        np.random.seed(None)
         stat = np.random.multivariate_normal(zeros, stat_cov, n_variations)
         weights = sys + stat + means
         self.merged_table[self.weight_name] = self.merged_table["data_MC_ratio"]
@@ -247,7 +254,9 @@ class Reweighter:
                          prefix: str,
                          weights_dict: dict,
                          pdg_pid_variable_dict: str,
-                         variable_aliases: dict = None) -> None:
+                         variable_aliases: dict = None,
+                         sys_seed: int = None,
+                         syscorr: bool = True) -> None:
         """
         Adds weight variations according to the total uncertainty for easier error propagation.
         Parameters:
@@ -256,6 +265,9 @@ class Reweighter:
             weights_dict (pd.DataFrame): Dataframe containing the efficiency weights.
             pdg_pid_variable_dict (dict): Dictionary containing the PID variables and thresholds.
             variable_aliases (dict): Dictionary containing variable aliases.
+            sys_seed (int): Seed for the systematic variations.
+            syscorr (bool): When true assume systematics are 100% correlated defaults to
+                true. Note this is overridden by provision of a none None value rho_sys
         """
         # Empty prefix means no prefix
         if prefix is None:
@@ -268,21 +280,13 @@ class Reweighter:
         merged_weight_df = self.merge_weight_tables(weights_dict, pdg_pid_variable_dict)
         pdg_binning = {(reco_pdg, mc_pdg): self.get_binning(merged_weight_df.query(f'PDG == {reco_pdg} and mcPDG == {mc_pdg}'))
                        for reco_pdg, mc_pdg in merged_weight_df[['PDG', 'mcPDG']].value_counts().index.to_list()}
-        # Check if these are legacy tables:
-        if 'charge' in merged_weight_df.columns:
-            charge_dict = {'+': [0, 2], '-': [-2, 0]}
-            merged_weight_df[['charge_min', 'charge_max']] = [charge_dict[val] for val in merged_weight_df['charge'].values]
-            merged_weight_df = merged_weight_df.drop(columns=['charge'])
-            for pdg in pdg_binning:
-                pdg_binning[pdg]['charge'] = np.array([-2, 0, 2])
-                if 'iso_score' in pdg_binning[pdg] and len(pdg_binning[pdg]['iso_score']) == 2:
-                    del pdg_binning[pdg]['iso_score']
         particle = ReweighterParticle(prefix,
                                       merged_table=merged_weight_df,
                                       pdg_binning=pdg_binning,
                                       variable_aliases=variable_aliases,
-                                      weight_name=self.weight_name)
-        particle.generate_variations(n_variations=self.n_variations)
+                                      weight_name=self.weight_name,
+                                      sys_seed=sys_seed,
+                                      syscorr=syscorr)
         self.particles += [particle]
 
     def get_particle(self, prefix: str) -> ReweighterParticle:
@@ -302,13 +306,18 @@ class Reweighter:
         particle_right = self.get_particle(prefix_right)
         self.correlations += [(particle_left, particle_right, rho)]
 
-    def reweight(self, df: pd.DataFrame):
+    def reweight(self,
+                 df: pd.DataFrame,
+                 generate_variations: bool = True):
         """
         Reweights the dataframe according to the weight tables.
         Parameters:
             df (pd.DataFrame): Dataframe containing the analysis ntuple.
+            generate_variations (bool): When true generate weight variations.
         """
         for particle in self.particles:
             print(f'Required variables: {self.get_ntuple_variables(df, particle)}')
+            if generate_variations:
+                particle.generate_variations(n_variations=self.n_variations)
             self.add_weight_columns(df, particle)
         return df

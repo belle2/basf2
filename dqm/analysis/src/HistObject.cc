@@ -9,6 +9,11 @@
 
 using namespace Belle2;
 
+HistObject::~HistObject()
+{
+  resetBeforeEvent();
+}
+
 bool HistObject::update(TH1* hist)
 {
   if (hist) {

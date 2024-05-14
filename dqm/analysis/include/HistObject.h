@@ -25,6 +25,10 @@ namespace Belle2 {
      */
     HistObject(void) : m_hist(nullptr), m_updated(false), m_entries(-1) {};
 
+    /** Destructor
+     */
+    ~HistObject(void);
+
     /** Check if update of histogram is necessary
      * @param hist pointer to histogram
      * @return histogram was updated flag (return m_updated)

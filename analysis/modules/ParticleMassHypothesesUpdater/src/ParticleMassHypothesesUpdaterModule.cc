@@ -61,7 +61,7 @@ void ParticleMassHypothesesUpdaterModule::initialize()
   string pName = mother->getName();
   pName.pop_back();
   string sign = mother->getName().substr(pName.length());
-  m_newParticleList = allowedPDGs[m_pdgCode] + sign + ":" + label + "_from_" + pName + "_to_" + allowedPDGs[m_pdgCode];
+  m_newParticleList = allowedPDGs[m_pdgCode] + sign + ":" + label + "_derived_from_" + pName;
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
 

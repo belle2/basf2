@@ -114,18 +114,7 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool on
 
 MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
 {
-  if (s_monObjList.find(objName) != s_monObjList.end()) {
-    if (s_monObjList[objName]) {
-      return s_monObjList[objName];
-    } else {
-      B2WARNING("MonitoringObject " << objName << " listed as being in memfile but points to nowhere. New Object will be made.");
-      s_monObjList.erase(objName);
-    }
-  }
-
-  MonitoringObject* obj = new MonitoringObject(objName);
-  s_monObjList.insert(MonObjList::value_type(objName, obj));
-  return obj;
+  return &s_monObjList[objName];
 }
 
 TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)
@@ -224,12 +213,7 @@ TH1* DQMHistAnalysisModule::findHistInFile(TFile* file, const std::string& histn
 MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string& objName)
 {
   if (s_monObjList.find(objName) != s_monObjList.end()) {
-    if (s_monObjList[objName]) {
-      //Want to search elsewhere if null-pointer saved in map
-      return s_monObjList[objName];
-    } else {
-      B2ERROR("MonitoringObject " << objName << " listed as being in memfile but points to nowhere.");
-    }
+    return &s_monObjList[objName];
   }
   B2INFO("MonitoringObject " << objName << " not in memfile.");
   return NULL;

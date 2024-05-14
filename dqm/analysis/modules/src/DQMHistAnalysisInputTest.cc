@@ -207,8 +207,8 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
 {
   B2INFO("Delta");
   for (auto a : getDeltaList()) {
-    B2INFO(a.first << " " << a.second->m_type << " " << a.second->m_parameter
-           << " " << a.second->m_amountDeltas << " " << a.second->m_deltaHists.size());
+    B2INFO(a.first << " " << a.second.m_type << " " << a.second.m_parameter
+           << " " << a.second.m_amountDeltas << " " << a.second.m_deltaHists.size());
   }
 
   for (auto n : m_myNames) {
@@ -225,12 +225,12 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
     c->cd(2);
     auto it = getDeltaList().find(name);
     if (it != getDeltaList().end()) {
-      h = it->second->m_lastHist;
+      h = it->second.m_lastHist;
       if (h) h->Draw("hist");
 
-      for (unsigned int i = 0; i < it->second->m_amountDeltas; i++) {
+      for (unsigned int i = 0; i < it->second.m_amountDeltas; i++) {
         c->cd(i + 4);
-        h = it->second->getDelta(i);
+        h = nullptr ; //it->second.getDelta(i); // this is not possible from object
         if (h) {
           h->Draw("hist");
           c->cd(3);

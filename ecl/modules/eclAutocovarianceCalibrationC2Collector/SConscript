@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'ecl_dbobjects', 'ecl_dataobjects', 'calibration', '$ROOT_LIBS']
-
-Return('env')

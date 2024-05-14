@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ from stdV0s import stdKshorts
 from variables import variables as vm
 from ROOT import Belle2
 
-__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

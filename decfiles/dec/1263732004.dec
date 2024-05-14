@@ -1,0 +1,113 @@
+# EventType: 1263732004
+# Descriptor: [B- -> [D0 -> K- pi+ (K- pi+ pi0)(K pi+ pi+ pi-)] e(mu) nu]cc
+# NickName: Bu_D0lnu
+# Documentation: B- -> D0 e(mu) nu, D0 -> K- pi+ (K- pi+ pi0)(K pi+ pi+ pi-), signal mode for inclusive tagging R(D(*)).
+# Dominant channel: B- -> D0(->a1+(-> rho0 pi+) K-) l- anti-nu
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Tia Crane
+# Email: tia.crane@desy.de
+# Cuts: None
+# Date: 20240308
+
+Alias K0sig K0
+Alias anti-K0sig anti-K0
+ChargeConj K0sig anti-K0sig
+
+Alias K*0sig K*0
+Alias anti-K*0sig anti-K*0
+ChargeConj K*0sig anti-K*0sig
+
+Alias K_1-sig K_1-
+Alias K_1+sig K_1+
+ChargeConj K_1-sig K_1+sig
+
+Alias K*-sig K*-
+Alias K*+sig K*+
+ChargeConj K*-sig K*+sig
+
+Alias a_1-sig a_1-
+Alias a_1+sig a_1+
+ChargeConj a_1-sig a_1+sig
+
+Alias omegasig omega
+Alias K_S0sig K_S0
+
+
+Decay Upsilon(4S)
+0.5 B+ B-sig VSS;
+0.5 B- B+sig VSS;
+Enddecay
+
+
+Decay B-sig
+0.023100000   D0sig  e-  anti-nu_e                            BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
+0.023100000   D0sig  mu-  anti-nu_mu                          BGL 0.0126 -0.094 0.34 -0.1 0.0115 -0.057 0.12 0.4;
+Enddecay
+CDecay B+sig
+
+
+Decay D0sig
+0.039500000   K-  pi+                                      PHSP;
+0.144000000   K-  pi+  pi0                                 D_DALITZ;
+0.005328000   K-  rho0  pi+                                PHSP;
+0.019000000   K-  omegasig  pi+                               PHSP;
+0.008800000   K-  pi+  pi+  pi-                            PHSP;
+0.078000000   a_1+sig  K-                                     SVS;
+0.016000000   K_1-sig  pi+                                    SVS;
+0.004574000   K*+sig  K-                                      SVS; # [PDG2019] - calculated to give correct K+ K- pi0 contribution
+0.001698000   K_S0sig  K-  pi+                                PHSP; # [PDG2019] - subtract anti-K*0 K_S0 and K*+ K- BFs from PDG value of 0.0033
+0.024000000   anti-K*0sig  pi+  pi-                           PHSP;
+0.011000000   anti-K*0sig  omegasig                              SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.015800000   anti-K*0sig  rho0                               SVV_HELAMP  1.0 0.0 1.0 0.0 1.0 0.0;
+0.000123000   anti-K*0sig  K_S0sig                               SVS; # [PDG2019] - calculated to give correct K_S0 K- pi+ contribution
+Enddecay
+CDecay anti-D0sig
+# eta -> pi+ pi- CPV, PV
+
+
+Decay K_1+sig
+0.140000000   rho0  K+                                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.106700000   K*0sig  pi+                                     VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.144400000   K+  pi+  pi-                                 PHSP;
+0.110000000   omegasig  K+                                    VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+CDecay K_1-sig
+
+
+Decay K*0sig
+1.0   K+  pi-                                      VSS;
+Enddecay
+CDecay anti-K*0sig
+
+
+Decay K*+sig
+1.0   K0sig  pi+                                      VSS;
+Enddecay
+CDecay K*-sig
+
+
+Decay K0sig
+1.0   K_S0sig                                         PHSP;
+Enddecay
+CDecay anti-K0sig
+
+
+Decay K_S0sig
+1.0   pi+  pi-                                     PHSP;
+Enddecay
+# K_L0 is decayed in GEANT
+
+
+Decay a_1+sig
+0.308750000   rho0  pi+                                    VVS_PWAVE .9788 0.0 0.0 0.0 .0212 0.0; # S- and D-wave
+0.097300000   pi+  pi+  pi-                                PHSP; # added to fix the sum of the BF to 1. f_2(1270) and f_0(1370) contributions should be present
+Enddecay
+CDecay a_1-sig
+
+
+Decay omegasig
+1.0   pi-  pi+                                     VSS;  # includes pi+ pi- gamma, never directly observed
+Enddecay
+
+End

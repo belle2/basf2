@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -568,25 +567,6 @@ def add_posttracking_reconstruction(path,
             add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
-
-
-def add_mdst_output(*args, **kwargs):
-    """
-        .. deprecated:: release-08-00-00
-
-    This function simply returns a FATAL message.
-
-    Please use the equivalent function from the mdst package if you want to store
-    the output in a mDST file:
-
-    .. code-block:: python
-
-        import mdst
-        mdst.add_mdst_output(path=mypath)
-    """
-
-    basf2.B2FATAL("This function is deprecated and it will be removed in release-09.\n"
-                  "Please use the equivalent function from the mdst package.")
 
 
 def add_cdst_output(path,

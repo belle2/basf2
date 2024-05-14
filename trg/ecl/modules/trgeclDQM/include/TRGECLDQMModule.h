@@ -14,8 +14,12 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
-#include <TH1F.h>
+class TH1;
+class TH2;
 
 namespace Belle2 {
 
@@ -62,6 +66,24 @@ namespace Belle2 {
     TH1* h_Narrow_TotalEnergy = nullptr;
     //! N of TC Hit / event
     TH1* h_n_TChit_event = nullptr;
+    //! N of TC Hit / event vs. time since injection
+    TH1* h_n_TChit_clean = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection
+    TH1* h_n_TChit_injHER = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection
+    TH1* h_n_TChit_injLER = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection
+    TH2* h_nTChit_injtime = nullptr;
+    //! N of TC Hit / event per two ETM clocks
+    TH1* h_n_TChit_event_2clk = nullptr;
+    //! N of TC Hit / event vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_clean_2clk = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injHER_2clk = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injLER_2clk = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks
+    TH2* h_nTChit_injtime_2clk = nullptr;
     //! N of Cluster / event
     TH1* h_Cluster = nullptr;
     //! TC Timing / event
@@ -77,9 +99,10 @@ namespace Belle2 {
     //! Energy sum of 2 Top energetic clusters when 3D bhabnha bit on
     TH1* h_Cluster_Energy_Sum = nullptr;
 
-
     //! Hit TCId
     std::vector<int> TCId;
+    //! Hit TCHitWin
+    std::vector<int> TCHitWin;
     //! Hit TC Energy
     std::vector<double> TCEnergy;
     //! Hit TC Timing
@@ -100,6 +123,11 @@ namespace Belle2 {
     StoreArray<TRGECLUnpackerSumStore> trgeclSumArray;
     //! Trg ECL Cluster output
     StoreArray<TRGECLCluster> trgeclCluster;
+    //! Array to access the FTSW information
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
+
+    //! DB pointerto access the hardware clock information
+    DBObjPtr<HardwareClockSettings> m_hwclkdb;
   };
 
 }

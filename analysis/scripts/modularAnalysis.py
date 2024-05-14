@@ -2025,7 +2025,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix="", useFloat=False):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False, storeEventType=True):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2043,6 +2043,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
         useFloat (bool): Use single precision (float) instead of double precision (double)
                          for floating-point numbers.
+        storeEventType (bool) : if true, the branch __eventType__ is added for the MC event type information.
+                                The information is available from MC16 on.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2057,6 +2059,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
     output.param('useFloat', useFloat)
+    output.param('storeEventType', storeEventType)
     path.add_module(output)
 
 

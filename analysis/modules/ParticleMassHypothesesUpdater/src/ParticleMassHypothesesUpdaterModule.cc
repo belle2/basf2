@@ -18,7 +18,7 @@
 #include <mdst/dataobjects/Track.h>
 
 #include <algorithm>
-#include <vector>
+#include <map>
 
 using namespace std;
 using namespace Belle2;
@@ -45,22 +45,23 @@ void ParticleMassHypothesesUpdaterModule::initialize()
   DecayDescriptor decayDescriptor;
   const bool valid = decayDescriptor.init(m_particleList);
   if (!valid)
-    B2ERROR("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_particleList);
+    B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_particleList);
+
+  map<int, string> allowedPDGs = {{11, "e"}, {13, "mu"}, {211, "pi"}, {321, "K"}, {2212, "p"}};
 
   const DecayDescriptorParticle* mother = decayDescriptor.getMother();
   int pdgCode = abs(mother->getPDGCode());
-  vector<int> allowedPDGs = {11, 13, 211, 321, 2212};
-  if (std::find(allowedPDGs.begin(), allowedPDGs.end(), pdgCode) == allowedPDGs.end())
-    B2ERROR("ParticleMassHypothesesUpdaterModule::initialize Chosen particle list contains unsupported particles with PDG code " <<
+  if (allowedPDGs.find(pdgCode) == allowedPDGs.end())
+    B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen particle list contains unsupported particles with PDG code " <<
             pdgCode);
-  if (std::find(allowedPDGs.begin(), allowedPDGs.end(), m_pdgCode) == allowedPDGs.end())
-    B2ERROR("ParticleMassHypothesesUpdaterModule::initialize Chosen target PDG code " << pdgCode << " not supported.");
+  if (allowedPDGs.find(m_pdgCode) == allowedPDGs.end())
+    B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen target PDG code " << m_pdgCode << " not supported.");
 
   string label = mother->getLabel();
   string pName = mother->getName();
   pName.pop_back();
   string sign = mother->getName().substr(pName.length());
-  m_newParticleList = "mu" + sign + ":" + label + "_from_" + pName + "_to_mu";
+  m_newParticleList = allowedPDGs[m_pdgCode] + sign + ":" + label + "_from_" + pName + "_to_" + allowedPDGs[m_pdgCode];
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
 
@@ -118,7 +119,7 @@ void ParticleMassHypothesesUpdaterModule::event()
       unsigned trackIdx = originalParticle->getMdstArrayIndex();  // Get track
       const Track* track = trackArray[trackIdx];
       if (track == nullptr) {
-        B2ERROR("Associated track not valid. Skipping.");
+        B2WARNING("Associated track not valid. Skipping.");
         continue;
       }
 

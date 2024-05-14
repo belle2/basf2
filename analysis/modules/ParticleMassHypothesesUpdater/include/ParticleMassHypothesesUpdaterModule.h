@@ -22,8 +22,15 @@ namespace Belle2 {
     /** Name of the list */
     std::string m_particleList;
 
-    /** Name of the new created list */
+    /** Writeout flag */
+    bool m_writeOut;
+
+    /** Name of the new created list and anti-list */
     std::string m_newParticleList;
+    std::string m_newAntiParticleList;
+
+    /** Anti-list flag */
+    bool m_isSelfConjugatedParticle;
 
   public:
     /** Constructor. */

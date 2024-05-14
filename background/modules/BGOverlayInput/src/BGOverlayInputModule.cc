@@ -11,10 +11,7 @@
 
 /* Basf2 headers. */
 #include <framework/dataobjects/BackgroundInfo.h>
-#include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/io/RootFileInfo.h>
 #include <framework/io/RootIOUtilities.h>
 #include <framework/logging/Logger.h>
@@ -44,7 +41,10 @@ BGOverlayInputModule::BGOverlayInputModule() : Module()
 
 {
   // module description
-  setDescription("Input for BG overlay, either in form of Digits or raw data.");
+  setDescription("Input for BG overlay, either in form of Digits or raw data. For run-dependent MC (experiments 1 to 999) "
+                 "the overlay samples corresponding to the simulated run are automatically selected from the input list "
+                 "at each beginRun(), enabling production of multiple runs in a single job. "
+                 "This feature can be turned off by setting skipExperimentCheck to true.");
 
   // Add parameters
   addParam("inputFileNames", m_inputFileNames,
@@ -53,7 +53,9 @@ BGOverlayInputModule::BGOverlayInputModule() : Module()
            "Name added to default branch names", string("_beamBG"));
   addParam("bkgInfoName", m_BackgroundInfoInstanceName, "Name of the BackgroundInfo StoreObjPtr", string(""));
   addParam("skipExperimentCheck", m_skipExperimentCheck,
-           "If true, skip the check on the experiment number consistency between the basf2 process and the beam background files. By default, it is set to false, since the check should be skipped only by experts.",
+           "If true, skip the check on the experiment number consistency between the basf2 process and the beam background files; "
+           "in case of run-dependent MC ignore also run numbers. "
+           "By default, it is set to false, since the check should be skipped only by experts.",
            false);
 }
 
@@ -63,14 +65,16 @@ BGOverlayInputModule::~BGOverlayInputModule()
 
 void BGOverlayInputModule::initialize()
 {
-  if (m_skipExperimentCheck)
+  if (m_skipExperimentCheck) {
     B2WARNING(R"RAW(The BGOverlayInput module will skip the check on the experiment number
     consistency between the basf2 process and the beam background files.
+    It will also ingnore run numbers in case of run-dependent MC.
 
     This should be done only if you are extremely sure about what you are doing.
 
     Be aware that you are not protected by the possible usage of beam background
     files not suitabile for the experiment number you selected.)RAW");
+  }
 
   // expand possible wildcards
   m_inputFileNames = RootIOUtilities::expandWordExpansions(m_inputFileNames);
@@ -79,25 +83,27 @@ void BGOverlayInputModule::initialize()
   }
 
   // get the experiment number from the EventMetaData
-  StoreObjPtr<EventMetaData> eventMetaData;
-  int experiment{eventMetaData->getExperiment()};
+  int experiment = m_eventMetaData->getExperiment();
 
   // check files
   for (const string& fileName : m_inputFileNames) {
     try {
       RootIOUtilities::RootFileInfo fileInfo{fileName};
       const std::set<std::string>& branchNames = fileInfo.getBranchNames(true);
-      if (branchNames.count("BackgroundMetaData"))
-        B2FATAL("The BG sample used is aimed for BG mixing, not for BG mixing."
+      if (branchNames.count("BackgroundMetaData")) {
+        B2FATAL("The BG sample used is aimed for BG mixing, not for BG overlay."
                 << LogVar("File name", fileName));
+      }
       if (not m_skipExperimentCheck) {
         const FileMetaData& fileMetaData = fileInfo.getFileMetaData();
-        // we assume lowest experiment number is enough
-        if (experiment != fileMetaData.getExperimentLow())
+        // we assume lowest experiment/run numbers are enough
+        if (experiment != fileMetaData.getExperimentLow()) {
           B2FATAL("The BG sample used is aimed for a different experiment number. Please check what you are doing."
                   << LogVar("File name", fileName)
                   << LogVar("Experiment number of the basf2 process", experiment)
                   << LogVar("Experiment number of the BG file", fileMetaData.getExperimentLow()));
+        }
+        m_runFileNamesMap[fileMetaData.getRunLow()].push_back(fileName);
       }
     } catch (const std::invalid_argument& e) {
       B2FATAL("One of the BG files can not be opened."
@@ -109,21 +115,18 @@ void BGOverlayInputModule::initialize()
     }
   }
 
-  // get event TTree
+  // make a chain including all overlay files; get number of entries
   m_tree = new TChain(RootIOUtilities::c_treeNames[DataStore::c_Event].c_str());
   for (const string& fileName : m_inputFileNames) {
     m_tree->AddFile(fileName.c_str());
   }
   m_numEvents = m_tree->GetEntries();
   if (m_numEvents == 0) B2ERROR(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entires");
-  m_firstEvent = gRandom->Integer(m_numEvents);
-  B2INFO("BGOverlayInput: starting with event " << m_firstEvent);
-  m_eventCount = m_firstEvent;
 
-  // connect selected branches to DataStore
-  bool ok = connectBranches();
+  // register selected branches to DataStore
+  bool ok = registerBranches();
   if (!ok) {
-    B2ERROR("No branches found to be connected");
+    B2ERROR("No branches found to be registered and connected");
   }
 
   // add BackgroundInfo to persistent tree
@@ -138,11 +141,45 @@ void BGOverlayInputModule::initialize()
   descr.numEvents = m_numEvents;
   m_index = bkgInfo->appendBackgroundDescr(descr);
   bkgInfo->setExtensionName(m_extensionName);
+
+  // set flag for steering between run-independent (false) and run-dependent (true) overlay
+  m_runByRun = experiment > 0 and experiment < 1000 and not m_runFileNamesMap.empty();
+  if (m_runByRun) return;
+
+  // run-independent overlay: choose randomly the first event and connect branches
+  m_firstEvent = gRandom->Integer(m_numEvents);
+  B2INFO("BGOverlayInput: run-independent overlay starting with event " << m_firstEvent << " of " << m_numEvents);
+  m_eventCount = m_firstEvent;
+  m_start = true;
+  connectBranches();
+
 }
 
 
 void BGOverlayInputModule::beginRun()
 {
+  if (not m_runByRun) return;
+
+  // run-dependent overlay: delete the old one and make new chain with overlay files for the current run; get number of entries
+  if (m_tree) delete m_tree;
+  m_tree = new TChain(RootIOUtilities::c_treeNames[DataStore::c_Event].c_str());
+  int run = m_eventMetaData->getRun();
+  int numFiles = 0;
+  for (const string& fileName : m_runFileNamesMap[run]) {
+    numFiles += m_tree->AddFile(fileName.c_str());
+  }
+  if (numFiles == 0) B2FATAL("No overlay files for run " << run);
+
+  m_numEvents = m_tree->GetEntries();
+  if (m_numEvents == 0) B2FATAL(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entires for run " << run);
+
+  // choose randomly the first event and connect branches
+  m_firstEvent = gRandom->Integer(m_numEvents);
+  B2INFO("BGOverlayInput: run " << run << " starting with event " << m_firstEvent << " of " << m_numEvents);
+  m_eventCount = m_firstEvent;
+  m_start = true;
+  connectBranches();
+
 }
 
 
@@ -185,12 +222,12 @@ void BGOverlayInputModule::endRun()
 void BGOverlayInputModule::terminate()
 {
 
-  delete m_tree;
+  if (m_tree) delete m_tree;
 
 }
 
 
-bool BGOverlayInputModule::connectBranches()
+bool BGOverlayInputModule::registerBranches()
 {
 
   auto durability = DataStore::c_Event;
@@ -220,7 +257,7 @@ bool BGOverlayInputModule::connectBranches()
 
       const std::string className = objClass->GetName();
       if (className.find("Belle2::") == std::string::npos) { // only Belle2 classes
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
+        m_otherBranchNames.push_back(branchName);
         continue;
       }
 
@@ -228,11 +265,11 @@ bool BGOverlayInputModule::connectBranches()
       bool ok = DataStore::Instance().registerEntry(name, durability, objClass,
                                                     true, storeFlags);
       if (!ok) {
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
+        m_otherBranchNames.push_back(branchName);
         continue;
       }
       DataStore::StoreEntry& entry = (map.find(name))->second;
-      m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
+      m_branchNames.push_back(branchName);
       m_storeEntries.push_back(&entry);
     } else if (objPtrNames.find(objName) != objPtrNames.end()) {
       std::string name = branchName;// + m_extensionName;
@@ -242,15 +279,14 @@ bool BGOverlayInputModule::connectBranches()
       delete objectPtr;
 
       if (!ok) {
-        m_tree->SetBranchStatus(branchName.c_str(), 0);
+        m_otherBranchNames.push_back(branchName);
         continue;
       }
       DataStore::StoreEntry& entry = (map.find(name))->second;
-      m_tree->SetBranchAddress(branchName.c_str(), &(entry.object));
+      m_branchNames.push_back(branchName);
       m_storeEntries.push_back(&entry);
-
     } else {
-      m_tree->SetBranchStatus(branchName.c_str(), 0);
+      m_otherBranchNames.push_back(branchName);
       branch->ResetAddress();
       delete objectPtr;
     }
@@ -260,3 +296,14 @@ bool BGOverlayInputModule::connectBranches()
   return !m_storeEntries.empty();
 }
 
+
+void BGOverlayInputModule::connectBranches()
+{
+  for (size_t i = 0; i < m_storeEntries.size(); i++) {
+    m_tree->SetBranchAddress(m_branchNames[i].c_str(), &(m_storeEntries[i]->object));
+  }
+
+  for (const auto& branchName : m_otherBranchNames) {
+    m_tree->SetBranchStatus(branchName.c_str(), 0);
+  }
+}

@@ -8,9 +8,10 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from pathlib import Path
+
 import basf2_mva
 import tracking.root_utils as root_utils
+from basf2 import conditions
 
 
 def my_basf2_mva_teacher(
@@ -21,6 +22,11 @@ def my_basf2_mva_teacher(
     exclude_variables=None,
     fast_bdt_option=[200, 8, 3, 0.1]
 ):
+
+    conditions.testing_payloads = [
+        'localdb/database.txt'
+    ]
+
     """
     Custom wrapper for basf2 mva teacher. Adapted from code in ``trackfindingcdc_teacher``.
 
@@ -39,9 +45,11 @@ def my_basf2_mva_teacher(
     if exclude_variables is None:
         exclude_variables = []
 
+    '''
     weightfile_extension = Path(weightfile_identifier).suffix
     if weightfile_extension not in {".xml", ".root"}:
         raise ValueError(f"Weightfile Identifier should end in .xml or .root, but ends in {weightfile_extension}")
+    '''
 
     # extract names of all variables from one record file
     with root_utils.root_open(records_files[0]) as records_tfile:
@@ -83,6 +91,7 @@ def my_basf2_mva_teacher(
     fastbdt_options.m_shrinkage = fast_bdt_option[3]
     # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
     basf2_mva.teacher(general_options, fastbdt_options)
+    # basf2_mva.download(weightfile_identifier, weightfile_identifier + '.root')
 
 
 def create_fbdt_option_string(fast_bdt_option):

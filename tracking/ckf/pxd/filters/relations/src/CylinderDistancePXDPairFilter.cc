@@ -38,10 +38,9 @@ CylinderDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*, 
     genfit::MeasuredStateOnPlane measuredStateOnPlane =
       m_param_isBackwardCKF ? seedRecoTrack->getMeasuredStateOnPlaneFromFirstHit() : seedRecoTrack->getMeasuredStateOnPlaneFromLastHit();
 
-    bool extrapolationSuccessful = false;
+    bool extrapolationSuccessful = true;
     try {
       measuredStateOnPlane.extrapolateToCylinder(c_PXDLayerRadii[toStateCache.geoLayer - 1]);
-      extrapolationSuccessful = true;
     }  catch (...) {
       B2DEBUG(20, "ToPXDCKF CylinderDistancePXDPairFilter: extrapolation to cylinder of layer " << toStateCache.geoLayer <<
               " with radius of " << c_PXDLayerRadii[toStateCache.geoLayer - 1] << " failed");

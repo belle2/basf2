@@ -40,8 +40,6 @@ ParticleMassHypothesesUpdaterModule::ParticleMassHypothesesUpdaterModule(): Modu
 
 void ParticleMassHypothesesUpdaterModule::initialize()
 {
-  m_pdgCode = abs(m_pdgCode);
-
   DecayDescriptor decayDescriptor;
   const bool valid = decayDescriptor.init(m_particleList);
   if (!valid)
@@ -50,18 +48,18 @@ void ParticleMassHypothesesUpdaterModule::initialize()
   map<int, string> allowedPDGs = {{11, "e"}, {13, "mu"}, {211, "pi"}, {321, "K"}, {2212, "p"}};
 
   const DecayDescriptorParticle* mother = decayDescriptor.getMother();
-  int pdgCode = abs(mother->getPDGCode());
-  if (allowedPDGs.find(pdgCode) == allowedPDGs.end())
+  int pdgCode = mother->getPDGCode();
+  if (allowedPDGs.find(abs(pdgCode)) == allowedPDGs.end())
     B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen particle list contains unsupported particles with PDG code " <<
             pdgCode);
-  if (allowedPDGs.find(m_pdgCode) == allowedPDGs.end())
+  if (allowedPDGs.find(abs(m_pdgCode)) == allowedPDGs.end())
     B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen target PDG code " << m_pdgCode << " not supported.");
 
   string label = mother->getLabel();
   string pName = mother->getName();
+  string sign = string(1, pName.back());
   pName.pop_back();
-  string sign = mother->getName().substr(pName.length());
-  m_newParticleList = allowedPDGs[m_pdgCode] + sign + ":" + label + "_derived_from_" + pName;
+  m_newParticleList = allowedPDGs[abs(m_pdgCode)] + sign + ":" + label + "_converted_from_" + pName;
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
 
@@ -80,6 +78,7 @@ void ParticleMassHypothesesUpdaterModule::initialize()
 
 void ParticleMassHypothesesUpdaterModule::event()
 {
+
   StoreObjPtr<ParticleList> originalList(m_particleList);
   if (!originalList) {
     B2ERROR("ParticleList " << m_particleList << " not found");
@@ -88,10 +87,18 @@ void ParticleMassHypothesesUpdaterModule::event()
     if (originalList->getListSize() == 0)  // Do nothing if empty
       return;
 
+    DecayDescriptor newDecayDescriptor;
+    const bool valid = newDecayDescriptor.init(m_newParticleList);
+    if (!valid)
+      B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_newParticleList);
+
+    const DecayDescriptorParticle* newMother = newDecayDescriptor.getMother();
+    int newPdgCode = newMother->getPDGCode();
+
     StoreObjPtr<ParticleList> newList(m_newParticleList);
     if (!newList.isValid()) { // Check whether it already exists in this path
       newList.create();  // Create and initialize the list
-      newList->initialize(m_pdgCode, m_newParticleList);
+      newList->initialize(newPdgCode, m_newParticleList);
       newList->setEditable(true);
     }
 
@@ -99,14 +106,13 @@ void ParticleMassHypothesesUpdaterModule::event()
       StoreObjPtr<ParticleList> newAntiList(m_newAntiParticleList);
       if (!newAntiList.isValid()) { // Check whether it already exists in this path
         newAntiList.create();  // Create and initialize the list
-        newAntiList->initialize(-1 * m_pdgCode, m_newAntiParticleList);
+        newAntiList->initialize(-1 * newPdgCode, m_newAntiParticleList);
         newAntiList->setEditable(true);
       }
       newAntiList->bindAntiParticleList(*(newList));
     }
 
     for (unsigned int i = 0; i < originalList->getListSize(); ++i) {
-      Const::ChargedStable type(m_pdgCode);
 
       const Particle* originalParticle = originalList->getParticle(i);  // Get particle and check it comes from a track
       if (originalParticle->getParticleSource() != Particle::c_Track) {
@@ -122,6 +128,8 @@ void ParticleMassHypothesesUpdaterModule::event()
         B2WARNING("Associated track not valid. Skipping.");
         continue;
       }
+
+      Const::ChargedStable type(abs(newPdgCode));
 
       const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();  // Get related objects
       const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);

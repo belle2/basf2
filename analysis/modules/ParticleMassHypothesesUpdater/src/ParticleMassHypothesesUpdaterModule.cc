@@ -152,11 +152,14 @@ void ParticleMassHypothesesUpdaterModule::event()
       StoreArray<Particle> particleArray;
       Particle* newPart = particleArray.appendNew(particle);
 
-      if (pid) newPart->addRelationTo(pid);
-      if (mcParticleWithWeight.first)
+      if (pid) newPart->addRelationTo(pid); // Add PID
+      if (mcParticleWithWeight.first) // Add MCParticle
         newPart->addRelationTo(mcParticleWithWeight.first,
                                mcParticleWithWeight.second);
-      newPart->addRelationTo(trackFit);
+      newPart->addRelationTo(trackFit); // Add fit
+      for (auto info : originalParticle->getExtraInfoNames()) { // Add extraInfos
+        newPart->addExtraInfo(info, originalParticle->getExtraInfo(info));
+      }
 
       newList->addParticle(newPart);  // Add particle to list
     }  // Close loop over tracks

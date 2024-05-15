@@ -165,22 +165,17 @@ if __name__ == "__main__":
     )
 
     # Define signal-side B
-    # Here we consider all charged basf2 mass hypotheses
-    # since not necessarily they coincide with those
-    # predicted by graFEI which we require to be kaons
-    for part in charged_types:
-        ma.reconstructDecay(
-            f"B+:{part[:-1]} -> {part}:final",
-            "daughter(0, extraInfo(graFEI_sigSide)) == 1",
-            path=path,
-        )
-    ma.copyLists("B+:Bsgn", [f"B+:{part[:-1]}" for part in charged_types], path=path)
+    ma.reconstructDecay(
+        "B+:Bsgn -> K+:graFEI",
+        "daughter(0, extraInfo(graFEI_sigSide)) == 1",
+        path=path,
+    )
 
     # Define tag-side B
     for part in particle_types:
         ma.cutAndCopyList(
             f"{part}:Btag",
-            f"{part}:final",
+            f"{part}:graFEI",
             cut="extraInfo(graFEI_sigSide) == 0",
             writeOut=True,
             path=path,

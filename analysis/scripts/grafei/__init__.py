@@ -14,6 +14,7 @@ from grafei.modules.GraFEIModule import GraFEIModule
 from grafei.modules.LCASaverModule import LCASaverModule
 
 import modularAnalysis as ma
+from ROOT import Belle2 as b2
 
 
 def graFEI(
@@ -33,6 +34,8 @@ def graFEI(
 
     Applies graFEI model to a (list of) particle list(s) in basf2.
     GraFEI information is stored as eventExtraInfos.
+
+    If `particle_list` is a list of particle lists, the conversion to graFEI predicted mass hypotheses is performed.
 
     Args:
         particle_list (str or list): Name of particle list (B reconstruction) or list of FSP lists (for Upsilon reconstruction).
@@ -119,14 +122,52 @@ def graFEI(
                 "graFEI_truth_nKaons",
                 "graFEI_truth_nProtons",
                 "graFEI_truth_nOthers",
-                ]
-            )
+            ]
+        )
 
     ma.variablesToEventExtraInfo(
         input_list,
         dict((f"extraInfo({var})", var) for var in graFEI_vars),
         path=path,
     )
+
+    # Update mass hypotheses
+    if isinstance(particle_list, list):
+        charged_lists = [ls for ls in particle_list if "gamma:" not in ls]
+        photon_lists = [ls for ls in particle_list if "gamma:" in ls]
+        if len(photon_lists) != 1:
+            b2.B2FATAL("grafei.graFEI You should use exactly one photon list as input to the graFEI.")
+        masses = {  # PDG code and graFEI class for each mass hypothesis
+            "K": (321, 4),
+            "pi": (211, 3),
+            "mu": (13, 2),
+            "e": (11, 1),
+            "p": (2212, 5),
+        }
+        for mass in masses:  # Loop over all possible final mass hypotheses
+            for ls in charged_lists:  # Loop over all charged particle lists
+                ma.cutAndCopyList(  # Retain only particles with predicted mass hypothesis equal to `mass`
+                    f"{ls}_to_{mass}_",
+                    ls,
+                    f"extraInfo(graFEI_massHypothesis) == {masses[mass][1]}",
+                    path=path,
+                )
+                ma.updateMassHypothesis(  # Update basf2 mass hypothesis to `mass`
+                    f"{ls}_to_{mass}_", masses[mass][0], path=path
+                )
+            ma.copyLists(  # Merge all temporary lists into final `mass` list
+                f"{mass}+:graFEI",
+                [f"{mass}+:{ls[ls.find(':')+1:]}_to_{mass}__converted_from_{ls[:ls.find(':')-1]}" for ls in charged_lists],
+                writeOut=True,
+                path=path,
+            )
+        ma.cutAndCopyList(  # Take care of photons
+            "gamma:graFEI",
+            photon_lists[0],
+            "extraInfo(graFEI_massHypothesis) == 6",
+            writeOut=True,
+            path=path,
+        )
 
     return graFEI_vars
 
@@ -159,7 +200,8 @@ def lcaSaver(
     path.add_module(root_saver_module)
 
 
-print(r"""
+print(
+    r"""
                                                   ____  ____    _      ____  ____  _
                                                   |  _  |__|   /_\     |___  |___  |
                                                   |__|  |  \  /   \    |     |___  |
@@ -181,4 +223,5 @@ print(r"""
       Based on the work of Kahn et al: https://iopscience.iop.org/article/10.1088/2632-2153/ac8de0
       Please consider citing both articles.
       Code adapted from https://github.com/Helmholtz-AI-Energy/BaumBauen
-      """)
+      """
+)

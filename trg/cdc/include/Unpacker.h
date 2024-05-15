@@ -1533,16 +1533,16 @@ namespace Belle2 {
                   if (iSL % 2 == 0) {
                     track2D->addRelationTo(hit);
                   }
-                  if (p_nntgdl.name != "None") {
-                    bool dbool = decodebool(p_nntgdl.data);
-                    trackNN->setNNTToGDL(dbool);
-                    B2DEBUG(20, "NNT to GDL Bit decision for this track is: " << dbool);
-                  }
-                  if (p_sttgdl.name != "None") {
-                    bool dbool = decodebool(p_sttgdl.data);
-                    trackNN->setSTTToGDL(dbool);
-                    B2DEBUG(20, "STT to GDL Bit decision for this track is: " << dbool);
-                  }
+                }
+                if (p_nntgdl.name != "None") {
+                  bool dbool = decodebool(p_nntgdl.data);
+                  trackNN->setNNTToGDL(dbool);
+                  B2DEBUG(20, "NNT to GDL Bit decision for this track is: " << dbool);
+                }
+                if (p_sttgdl.name != "None") {
+                  bool dbool = decodebool(p_sttgdl.data);
+                  trackNN->setSTTToGDL(dbool);
+                  B2DEBUG(20, "STT to GDL Bit decision for this track is: " << dbool);
                 }
               }
             }

@@ -6,16 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own header. */
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
-
-/* Basf2 headers. */
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
 #include <klm/muid/MuidElementNumbers.h>
-
-/* C++ headers. */
-#include <string>
 
 using namespace std;
 using namespace Belle2;
@@ -27,6 +19,13 @@ MdstPIDModule::MdstPIDModule() : Module(),
 {
   setDescription("Create MDST PID format (PIDLikelihood objects) from subdetector PID info.");
   setPropertyFlags(c_ParallelProcessingCertified);
+
+  m_chargedNames[Const::electron] = "electron";
+  m_chargedNames[Const::muon] = "muon";
+  m_chargedNames[Const::pion] = "pion";
+  m_chargedNames[Const::kaon] = "kaon";
+  m_chargedNames[Const::proton] = "proton";
+  m_chargedNames[Const::deuteron] = "deuteron";
 }
 
 MdstPIDModule::~MdstPIDModule()
@@ -108,6 +107,7 @@ void MdstPIDModule::event()
 void MdstPIDModule::setLikelihoods(const TOPLikelihood* logl)
 {
   if (logl->getFlag() != 1) return;
+  if (not areLikelihoodsValid(logl)) return;
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::TOP, chargedStable, logl->getLogL(chargedStable));
@@ -119,6 +119,7 @@ void MdstPIDModule::setLikelihoods(const TOPLikelihood* logl)
 void MdstPIDModule::setLikelihoods(const ARICHLikelihood* logl)
 {
   if (logl->getFlag() != 1) return;
+  if (not areLikelihoodsValid(logl)) return;
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::ARICH, chargedStable, logl->getLogL(chargedStable));
@@ -129,6 +130,7 @@ void MdstPIDModule::setLikelihoods(const ARICHLikelihood* logl)
 
 void MdstPIDModule::setLikelihoods(const CDCDedxLikelihood* logl)
 {
+  if (not areLikelihoodsValid(logl)) return;
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::CDC, chargedStable, logl->getLogL(chargedStable));
@@ -139,6 +141,7 @@ void MdstPIDModule::setLikelihoods(const CDCDedxLikelihood* logl)
 
 void MdstPIDModule::setLikelihoods(const VXDDedxLikelihood* logl)
 {
+  if (not areLikelihoodsValid(logl)) return;
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::SVD, chargedStable, logl->getLogL(chargedStable));
@@ -149,6 +152,7 @@ void MdstPIDModule::setLikelihoods(const VXDDedxLikelihood* logl)
 
 void MdstPIDModule::setLikelihoods(const ECLPidLikelihood* logl)
 {
+  if (not areLikelihoodsValid(logl)) return;
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::ECL, chargedStable, logl->getLogLikelihood(chargedStable));
@@ -169,6 +173,8 @@ void MdstPIDModule::setLikelihoods(const KLMMuidLikelihood* muid)
 
   if (muid->getJunkPDFValue())
     return; // unclassifiable track (all likelihoods were zero), extremely rare
+
+  if (not areLikelihoodsValid(muid)) return;
 
   for (const auto& chargedStable : Const::chargedStableSet) {
     m_pid->setLogLikelihood(Const::KLM, chargedStable, muid->getLogL(chargedStable.getPDGCode()));

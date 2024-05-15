@@ -10,6 +10,8 @@
 
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+#include <framework/gearbox/Const.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
@@ -20,6 +22,10 @@
 #include <reconstruction/dataobjects/VXDDedxLikelihood.h>
 #include <ecl/dataobjects/ECLPidLikelihood.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
+
+#include <string>
+#include <cmath>
+#include <map>
 
 namespace Belle2 {
 
@@ -118,7 +124,62 @@ namespace Belle2 {
      */
     void setLikelihoods(const KLMMuidLikelihood* muid);
 
+    /**
+     * Get log likelihood for a given particle
+     * @param logl detector log likelihoods
+     * @param chargedStable particle
+     * @return log likelihood
+     */
+    template<class T>
+    double getLogL(const T* logl, const Const::ChargedStable& chargedStable) const
+    {
+      return logl->getLogL(chargedStable);
+    }
+
+    /**
+     * Get log likelihood for a given particle (ECL specialization)
+     * @param logl detector log likelihoods
+     * @param chargedStable particle
+     * @return log likelihood
+     */
+    double getLogL(const ECLPidLikelihood* logl, const Const::ChargedStable& chargedStable) const
+    {
+      return logl->getLogLikelihood(chargedStable);
+    }
+
+    /**
+     * Get log likelihood for a given particle (KLM specialization)
+     * @param logl detector log likelihoods
+     * @param chargedStable particle
+     * @return log likelihood
+     */
+    double getLogL(const KLMMuidLikelihood* logl, const Const::ChargedStable& chargedStable) const
+    {
+      return logl->getLogL(chargedStable.getPDGCode());
+    }
+
+    /**
+     * Check for validity of log likelihood values
+     * @param logl detector log likelihoods
+     * @return true if all likelihoods valid
+     */
+    template<class T>
+    bool areLikelihoodsValid(const T* logl)
+    {
+      for (const auto& chargedStable : Const::chargedStableSet) {
+        auto value = getLogL(logl, chargedStable);
+        if (isnan(value) or value == INFINITY) {
+          B2ERROR("MdstPID::setLikelihoods: invalid " << logl->ClassName() << " for " << m_chargedNames[chargedStable]
+                  << ", is " << value
+                  << ". Likelihoods ignored.");
+          return false;
+        }
+      }
+      return true;
+    }
+
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
+    std::map<Const::ChargedStable, std::string> m_chargedNames; /**< names of charged particles */
 
   };
 

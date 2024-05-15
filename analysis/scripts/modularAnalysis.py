@@ -4421,6 +4421,29 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
     path.add_module(module)
 
 
+def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
+    """
+    Module to update the mass hypothesis of a given input particle list with the chosen PDG.
+    A new particle list is created with updated mass hypothesis.
+    The allowed mass hypotheses for both input and output are electrons, muons, pions, kaons and protons.
+
+    .. note:
+        The new particle list is named after the input one, with the additional suffix ``_conferted_from_OLDHYPOTHESIS``,
+        e.g. ``e+:all`` converted to muons becomes ``mu+:all_converted_from_e``.
+
+    @param particleList The input particle list name
+    @param pdg          The PDG code for the new mass hypothesis, in [11, 13, 211, 321, 2212]
+    @param writeOut     Whether `RootOutput` module should save the new particle list
+    @param path         Modules are added to this path
+    """
+    mass_updater = register_module("ParticleMassHypothesesUpdater")
+    mass_updater.set_name("ParticleMassHypothesesUpdater_" + particleList)
+    mass_updater.param("particleList", particleList)
+    mass_updater.param("writeOut", writeOut)
+    mass_updater.param("pdgCode", pdg)
+    path.add_module(mass_updater)
+
+
 func_requiring_analysisGT = [
     correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,

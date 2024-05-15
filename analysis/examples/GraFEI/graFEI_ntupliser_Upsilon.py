@@ -152,20 +152,9 @@ if __name__ == "__main__":
     particle_types = [x.split(":")[0] for x in particle_lists]
     charged_types = [x.split(":")[0] for x in charged_lists]
 
-    ma.combineAllParticles(
-        [f"{part}:final" for part in particle_types], "Upsilon(4S):final", path=path
-    )
-
-    if store_mc_truth:
-        ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
-
-        # Flag each particle according to the B meson and decay it came from
-        for i, particle_list in enumerate(particle_lists):
-            # Match MC particles for all lists
-            ma.matchMCTruth(particle_list, path=path)
-
-    graFEI(
-        "Upsilon(4S):final",
+    graFEI_vars = graFEI(
+        particle_lists,
+        store_mc_truth=store_mc_truth,
         cfg_path=args.config,
         param_file=args.weight,
         sig_side_lcas=args.lcas,
@@ -254,58 +243,7 @@ if __name__ == "__main__":
         "mcPDG",
     ] if store_mc_truth else []
 
-    # graFEI variables
-    graFEI_vars = [
-        "graFEI_probEdgeProd",
-        "graFEI_probEdgeMean",
-        "graFEI_probEdgeGeom",
-        # "graFEI_validTree", # Always 1 in this case
-        # "graFEI_goodEvent", # Always 1 in this case
-        "graFEI_nFSP",
-        "graFEI_nCharged_preFit",
-        "graFEI_nElectrons_preFit",
-        "graFEI_nMuons_preFit",
-        "graFEI_nPions_preFit",
-        "graFEI_nKaons_preFit",
-        "graFEI_nProtons_preFit",
-        "graFEI_nLeptons_preFit",
-        "graFEI_nPhotons_preFit",
-        "graFEI_nOthers_preFit",
-        "graFEI_nCharged_postFit",
-        "graFEI_nElectrons_postFit",
-        "graFEI_nMuons_postFit",
-        "graFEI_nPions_postFit",
-        "graFEI_nKaons_postFit",
-        "graFEI_nProtons_postFit",
-        "graFEI_nLeptons_postFit",
-        "graFEI_nPhotons_postFit",
-        "graFEI_nOthers_postFit",
-        "graFEI_nPredictedUnmatched",
-        "graFEI_nPredictedUnmatched_noPhotons",
-    ]
-
-    graFEI_tm_vars = [
-        "graFEI_truth_perfectLCA",
-        "graFEI_truth_perfectMasses",
-        "graFEI_truth_perfectEvent",
-        "graFEI_truth_nFSP",
-        "graFEI_truth_nPhotons",
-        "graFEI_truth_nElectrons",
-        "graFEI_truth_nMuons",
-        "graFEI_truth_nPions",
-        "graFEI_truth_nKaons",
-        "graFEI_truth_nProtons",
-        "graFEI_truth_nOthers",
-    ] if store_mc_truth else []
-
     default_vars += tm_vars
-    graFEI_vars += graFEI_tm_vars
-
-    ma.variablesToEventExtraInfo(
-        "Upsilon(4S):final",
-        dict((f"extraInfo({var})", var) for var in graFEI_vars),
-        path=path,
-    )
 
     # Aliases
     for var in default_vars:

@@ -13,10 +13,13 @@ __all__ = ["graFEI", "lcaSaver"]
 from grafei.modules.GraFEIModule import GraFEIModule
 from grafei.modules.LCASaverModule import LCASaverModule
 
+import modularAnalysis as ma
+
 
 def graFEI(
     particle_list,
     path,
+    store_mc_truth=False,
     cfg_path=None,
     param_file=None,
     sig_side_lcas=None,
@@ -28,12 +31,13 @@ def graFEI(
     """
     Wrapper function to add the GraFEIModule to the path in a single call.
 
-    Applies graFEI model to a particle list in basf2.
-    GraFEI information is stored as extraInfos.
+    Applies graFEI model to a (list of) particle list(s) in basf2.
+    GraFEI information is stored as eventExtraInfos.
 
     Args:
-        particle_list (str): Name of particle list.
+        particle_list (str or list): Name of particle list (B reconstruction) or list of FSP lists (for Upsilon reconstruction).
         path (basf2.Path): Module is added to this path.
+        store_mc_truth (bool): Whether to store MC truth information.
         cfg_path (str): Path to config file. If `None` the config file in the global tag is used.
         param_file (str): Path to parameter file containing the model. If `None` the parameter file in the global tag is used.
         sig_side_lcas (list): List containing LCAS matrix of signal-side.
@@ -41,9 +45,27 @@ def graFEI(
         gpu (bool): Whether to run on a GPU.
         payload_config_name (str): Name of config file payload. The default should be kept, except in basf2 examples.
         payload_model_name (str): Name of model file payload. The default should be kept, except in basf2 examples.
+
+    Returns:
+        list: List of graFEI variables.
     """
+    if isinstance(particle_list, list):
+        input_list = "Upsilon(4S):final"
+        ma.combineAllParticles(particle_list, input_list, path=path)
+        if store_mc_truth:
+            for ls in particle_list:
+                ma.matchMCTruth(ls, path=path)
+    elif isinstance(particle_list, str):
+        input_list = particle_list
+        if store_mc_truth:
+            ma.matchMCTruth(particle_list, path=path)
+
+    if store_mc_truth:
+        ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
+        ma.fillParticleListFromMC("B0:MC", "", path=path)
+
     graFEI = GraFEIModule(
-        particle_list,
+        input_list,
         cfg_path=cfg_path,
         param_file=param_file,
         sig_side_lcas=sig_side_lcas,
@@ -53,6 +75,60 @@ def graFEI(
         payload_model_name=payload_model_name,
     )
     path.add_module(graFEI)
+
+    graFEI_vars = [
+        "graFEI_probEdgeProd",
+        "graFEI_probEdgeMean",
+        "graFEI_probEdgeGeom",
+        "graFEI_validTree",
+        "graFEI_goodEvent",
+        "graFEI_nFSP",
+        "graFEI_nCharged_preFit",
+        "graFEI_nElectrons_preFit",
+        "graFEI_nMuons_preFit",
+        "graFEI_nPions_preFit",
+        "graFEI_nKaons_preFit",
+        "graFEI_nProtons_preFit",
+        "graFEI_nLeptons_preFit",
+        "graFEI_nPhotons_preFit",
+        "graFEI_nOthers_preFit",
+        "graFEI_nCharged_postFit",
+        "graFEI_nElectrons_postFit",
+        "graFEI_nMuons_postFit",
+        "graFEI_nPions_postFit",
+        "graFEI_nKaons_postFit",
+        "graFEI_nProtons_postFit",
+        "graFEI_nLeptons_postFit",
+        "graFEI_nPhotons_postFit",
+        "graFEI_nOthers_postFit",
+        "graFEI_nPredictedUnmatched",
+        "graFEI_nPredictedUnmatched_noPhotons",
+    ]
+    if store_mc_truth:
+        graFEI_vars.extend(
+            [
+                "graFEI_truth_perfectLCA",
+                "graFEI_truth_perfectMasses",
+                "graFEI_truth_perfectEvent",
+                "graFEI_truth_isSemileptonic",
+                "graFEI_truth_nFSP",
+                "graFEI_truth_nPhotons",
+                "graFEI_truth_nElectrons",
+                "graFEI_truth_nMuons",
+                "graFEI_truth_nPions",
+                "graFEI_truth_nKaons",
+                "graFEI_truth_nProtons",
+                "graFEI_truth_nOthers",
+                ]
+            )
+
+    ma.variablesToEventExtraInfo(
+        input_list,
+        dict((f"extraInfo({var})", var) for var in graFEI_vars),
+        path=path,
+    )
+
+    return graFEI_vars
 
 
 def lcaSaver(

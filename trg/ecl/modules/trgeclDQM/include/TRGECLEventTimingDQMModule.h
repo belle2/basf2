@@ -18,6 +18,7 @@
 #include <TH1F.h>
 #include <TDirectory.h>
 #include <iostream>
+#include <iomanip>
 #include <string>
 namespace Belle2 {
   //!

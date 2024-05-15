@@ -68,6 +68,9 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("useFloat", m_useFloat,
            "Use float type for floating-point numbers.", false);
 
+  addParam("storeEventType", m_storeEventType,
+           "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -143,6 +146,12 @@ void VariablesToNtupleModule::initialize()
 
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
+
+  if (m_storeEventType) {
+    m_tree->get().Branch("__eventType__", &m_eventType);
+    if (not m_eventExtraInfo.isOptional())
+      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available from MC16 on.");
+  }
 
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
@@ -260,6 +269,11 @@ void VariablesToNtupleModule::event()
     m_MCDecayString = m_stringWrapper->getString();
   else
     m_MCDecayString = "";
+
+  if (m_storeEventType and m_eventExtraInfo.isValid())
+    m_eventType = m_eventExtraInfo->getEventType();
+  else
+    m_eventType = "";
 
   if (not m_signalSideParticleList.empty()) {
     if (m_roe.isValid()) {

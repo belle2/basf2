@@ -157,8 +157,9 @@ list to an output uDST file. If you would like to disable the uDST output, you
 can do so via:
 
 .. code-block:: python
-
-    skim(path, udstOutput=False)
+    
+    skim = LeptonicUntagged(udstOutput=False)
+    skim(path)
 
 Once the skim modules have been added to the path, you can retrieve a Python
 list of particle lists:

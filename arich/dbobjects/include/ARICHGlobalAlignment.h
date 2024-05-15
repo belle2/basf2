@@ -11,8 +11,8 @@
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <arich/dbobjects/ARICHPositionElement.h>
 #include <string>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 
 namespace Belle2 {
 
@@ -38,9 +38,9 @@ namespace Belle2 {
     ARICHGlobalAlignment(const ARICHGlobalAlignment& align): ARICHGeoBase()
     {
       *this = align;
-      m_rotation = 0;
-      m_rotationInverse = 0;
-      m_translation = 0;
+      m_rotation = nullptr;
+      m_rotationInverse = nullptr;
+      m_translation = nullptr;
     }
 
 
@@ -55,9 +55,9 @@ namespace Belle2 {
         if (m_rotation) delete m_rotation;
         if (m_rotationInverse) delete m_rotationInverse;
         if (m_translation) delete m_translation;
-        m_rotation = 0;
-        m_rotationInverse = 0;
-        m_translation = 0;
+        m_rotation = nullptr;
+        m_rotationInverse = nullptr;
+        m_translation = nullptr;
       }
       return *this;
     }
@@ -102,22 +102,22 @@ namespace Belle2 {
      * Get position of ARICH master volume center point in global Belle II coordinates
      * @return center point of ARICH volume
      */
-    const TVector3& getTranslation() const {if (!m_translation) setTransformation(); return *m_translation;}
+    const ROOT::Math::XYZVector& getTranslation() const {if (!m_translation) setTransformation(); return *m_translation;}
 
     /**
      * Get rotation matrix of ARICH master volume in global Belle II coordinates
      * @return rotation matrix of ARICH master volume
      */
-    const TRotation& getRotation() const
+    const ROOT::Math::Rotation3D& getRotation() const
     {
       if (!m_rotation) setTransformation();
       return *m_rotation;
     }
 
-    TVector3 pointToGlobal(const TVector3& point) const;
-    TVector3 momentumToGlobal(const TVector3& momentum) const;
-    TVector3 pointToLocal(const TVector3& point) const;
-    TVector3 momentumToLocal(const TVector3& momentum) const;
+    ROOT::Math::XYZVector pointToGlobal(const ROOT::Math::XYZVector& point) const;
+    ROOT::Math::XYZVector momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
+    ROOT::Math::XYZVector pointToLocal(const ROOT::Math::XYZVector& point) const;
+    ROOT::Math::XYZVector momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
 
   private:
 
@@ -125,11 +125,11 @@ namespace Belle2 {
 
     ARICHPositionElement m_alignPars;
 
-    mutable TRotation* m_rotation = 0 ;
-    mutable TRotation* m_rotationInverse = 0;
-    mutable TVector3*  m_translation = 0;
+    mutable ROOT::Math::Rotation3D* m_rotation = nullptr;
+    mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr;
+    mutable ROOT::Math::XYZVector*  m_translation = nullptr;
 
-    ClassDef(ARICHGlobalAlignment, 1); /**< ClassDef */
+    ClassDef(ARICHGlobalAlignment, 2); /**< ClassDef */
 
   };
 

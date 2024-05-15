@@ -259,6 +259,10 @@ class ValidationMetadataSetter(basf2.Module):
         del self._tfile
 
 
+# End suppression of doxygen checks
+# @endcond
+
+
 def create_validation_histograms(
     path: basf2.Path,
     rootfile: Union[str, pathlib.PurePath],
@@ -335,7 +339,3 @@ def create_validation_histograms(
         variables_2d=histograms_2d,
         fileName=rootfile,
     )
-
-
-# End suppression of doxygen checks
-# @endcond

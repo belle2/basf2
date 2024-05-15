@@ -31,6 +31,9 @@ DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
+#ifdef _BELLE2_EPICS
+std::vector <chid>  DQMHistAnalysisModule::m_epicsChID;
+#endif
 
 bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
 bool DQMHistAnalysisModule::m_epicsReadOnly =
@@ -161,27 +164,37 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-  // parse the dir+histo name and create the corresponding canvas name
-  auto s = StringSplit(histo_name, '/');
-  if (s.size() != 2) {
-    B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
-    return nullptr;
+
+  TCanvas* cnv = nullptr;
+  // try to get canvas from outside
+  if (cobj) cnv = *cobj;
+  // if no canvas search for it
+  if (cnv == nullptr) {
+    // parse the dir+histo name and create the corresponding canvas name
+    auto s = StringSplit(histo_name, '/');
+    if (s.size() != 2) {
+      B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
+      return nullptr;
+    }
+    auto dirname = s.at(0);
+    auto hname = s.at(1);
+    std::string canvas_name = dirname + "/c_" + hname;
+    cnv = findCanvas(canvas_name);
+    // set canvas pointer for outside
+    if (cnv && cobj) *cobj = cnv;
   }
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
 
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
+  // get histogram pointer
+  if (cnv != nullptr) {
+    TIter nextkey(cnv->GetListOfPrimitives());
+    TObject* obj{};
+    while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        if (obj->GetName() == histo_name)
+          return  dynamic_cast<TH1*>(obj);
+      }
     }
   }
   return nullptr;
@@ -268,6 +281,13 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 void DQMHistAnalysisModule::clearHistList(void)
 {
   s_histList.clear();
+}
+
+void DQMHistAnalysisModule::resetDeltaList(void)
+{
+  for (auto d : s_deltaList) {
+    d.second->reset();
+  }
 }
 
 void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)

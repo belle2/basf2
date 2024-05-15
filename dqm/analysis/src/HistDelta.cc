@@ -91,10 +91,12 @@ void HistDelta::update(TH1* currentHist)
 
 void HistDelta::reset(void)
 {
-  // m_deltaHists.clear(); // loop and delete? to be checked what is left in memory
-  // by intention, we may not want to delete old m_deltaHists, thus having them from m_lastHist run? tbd
+  for (auto h : m_deltaHists) {
+    if (h) delete h;
+  }
+  m_deltaHists.clear();
   if (m_lastHist) m_lastHist->Reset();
-  m_updated = true;
+  m_lastValue = 0;
 }
 
 TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated)

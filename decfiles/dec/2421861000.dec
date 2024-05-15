@@ -1,0 +1,43 @@
+##############################################################
+# EventType: 2421861000
+# Descriptor: [e+ e- -> omega[-> pi+ pi- pi0] X_1(3872)[-> J/psi[-> e+ e- / mu+ mu-] rho[-> pi+ pi-]] are generated via ISR
+# NickName: ISR_omegaX_1(3872)
+# Test : Yes
+# Documentation: MC15rd signal request
+# PhysicsWG: Quarkonium
+# Responsible: Youwen Xue
+# Email: youwen@mail.nankai.edu.cn
+# Cuts: None
+# Date: 2024/03/30
+###############################################################
+Alias omegasig omega
+Alias pi0sig pi0
+Alias rho0sig rho0
+
+Decay vpho
+1.0 X_1(3872)sig omegasig PHSP;
+Enddecay
+
+Decay omegasig
+1.0 pi+ pi- pi0sig OMEGA_DALITZ;
+Enddecay
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+
+Decay X_1(3872)sig
+1.0 rho0sig J/psisig PHSP;
+Enddecay
+
+Decay rho0sig
+1.0 pi+ pi- VSS;
+Enddecay
+
+Decay J/psisig
+0.5 mu+ mu- PHOTOS VLL;
+0.5 e+ e-   PHOTOS VLL;
+Enddecay
+
+End
+

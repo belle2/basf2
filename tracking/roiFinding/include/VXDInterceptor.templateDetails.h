@@ -35,23 +35,39 @@ namespace Belle2 {
         const unsigned int layerOffset = (m_detector == VXD::SensorInfoBase::SVD ? 3 : 1);
 
         B2DEBUG(20, " .fill intercept List, Layer: " << layer + layerOffset);
-        // get current state of track
-        genfit::MeasuredStateOnPlane gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromFirstHit();
+        for (int firstOrLast : {-1, 1}) {
+          std::list<ROIDetPlane> selectedPlanes;
+          genfit::MeasuredStateOnPlane gfTrackState;
+          switch (firstOrLast) {
+            case -1:
+              gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromFirstHit();
+              break;
+            case 1:
+              gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromLastHit();
+              gfTrackState.setPosMom(gfTrackState.getPos(), -gfTrackState.getMom());
+              gfTrackState.setChargeSign(-gfTrackState.getCharge());
+              break;
+            default:
+              break;
+          }
 
-        try {
-          gfTrackState.extrapolateToCylinder(m_layerRadii[layer]);
-        }  catch (...) {
-          B2DEBUG(20, " .-extrapolation to cylinder failed");
-          continue;
+          try {
+            gfTrackState.extrapolateToCylinder(m_layerRadii[layer]);
+          } catch (...) {
+            B2DEBUG(20, " .-extrapolation to cylinder failed");
+            continue;
+          }
+
+          B2DEBUG(20, " ..append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
+                  gfTrackState.getPos().Z());
+
+          m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, ROOT::Math::XYZVector(gfTrackState.getPos()), layer + layerOffset);
+          B2DEBUG(20, "selectedPlanes length now: " << firstOrLast << " the size of the selectedPlanes : " << selectedPlanes.size());
+          B2DEBUG(20, " ...append intercepts for track " << i);
+          B2DEBUG(20, " ...the size of the selectedPlanes : " << selectedPlanes.size());
+          appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToIntercepts, firstOrLast);
         }
 
-        std::list<ROIDetPlane> selectedPlanes;
-        B2DEBUG(20, " ..append selected planes, position " << gfTrackState.getPos().X() << ", " << gfTrackState.getPos().Y() << ", " <<
-                gfTrackState.getPos().Z());
-        m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, ROOT::Math::XYZVector(gfTrackState.getPos()), layer + layerOffset);
-
-        B2DEBUG(20, " ...append intercepts for track " << i);
-        appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToIntercepts);
       } //loop on layers
     } //loop on the track list
 
@@ -60,74 +76,84 @@ namespace Belle2 {
 
   template<class aIntercept>
   void VXDInterceptor<aIntercept>::appendIntercepts(StoreArray<aIntercept>* interceptList,
-                                                    std::list<ROIDetPlane> planeList, RecoTrack* recoTrack,
-                                                    int recoTrackIndex, RelationArray* recoTrackToIntercepts)
+                                                    std::list<ROIDetPlane> planeList,
+                                                    RecoTrack* recoTrack,
+                                                    int recoTrackIndex, RelationArray* recoTrackToIntercepts, int firstOrLast)
   {
     aIntercept tmpIntercept;
 
-    const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+    //const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
     B2DEBUG(20, " ...-appendIntercepts, checking " << planeList.size() << " planes");
 
     double lambda = 0;
 
-    for (int propDir = -1; propDir <= 1; propDir += 2) {
-      gfTrack.getCardinalRep()->setPropDir(propDir);
-      std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
+    //for (int propDir = -1; propDir <= 1; propDir += 2) {
+    //gfTrack.getCardinalRep()->setPropDir(firstOrLast);
+    std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
+    // B2DEBUG(20," ...-appendIntercepts, propDir "<<propDir  );
+    while (itPlanes != planeList.end()) {
 
-      while (itPlanes != planeList.end()) {
-
-        genfit::MeasuredStateOnPlane state;
-
-        try {
-          state = gfTrack.getFittedState();
-          lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
-        }  catch (...) {
-          B2DEBUG(20, " ...-extrapolation to plane failed");
-          ++itPlanes;
-          continue;
-        }
-
-        const TVectorD& predictedIntersect = state.getState();
-        const TMatrixDSym& covMatrix = state.getCov();
-
-        tmpIntercept.setCoorU(predictedIntersect[3]);
-        tmpIntercept.setCoorV(predictedIntersect[4]);
-        tmpIntercept.setSigmaU(sqrt(covMatrix(3, 3)));
-        tmpIntercept.setSigmaV(sqrt(covMatrix(4, 4)));
-        tmpIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
-        tmpIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
-        tmpIntercept.setLambda(lambda);
-        tmpIntercept.setVxdID(itPlanes->getVxdID());
-        tmpIntercept.setUprime(predictedIntersect[1]);
-        tmpIntercept.setVprime(predictedIntersect[2]);
-
-        B2DEBUG(20, "coordinates with getPos = " << state.getPos().X()
-                << ", " << state.getPos().Y()
-                << ", " << state.getPos().Z());
-        B2DEBUG(20, "coordinates with predInter = " << predictedIntersect[3]
-                << ", " << predictedIntersect[4]);
-        B2DEBUG(20, "momentum with getMom = " << state.getMom().X()
-                << ", " << state.getMom().Y()
-                << ", " << state.getMom().Z());
-        B2DEBUG(20, "U/V prime momentum with getMom = " << state.getMom().Z() / state.getMom().X()
-                << ", " << state.getMom().Z() / state.getMom().Y());
-        B2DEBUG(20, "U/V prime momentum with predInter = " << predictedIntersect[1]
-                << ", " << predictedIntersect[2]);
-
-        interceptList->appendNew(tmpIntercept);
-
-        recoTrackToIntercepts->add(recoTrackIndex, interceptList->getEntries() - 1);
-
-        ++itPlanes;
-
+      genfit::MeasuredStateOnPlane state;
+      switch (firstOrLast) {
+        case -1:
+          state = recoTrack->getMeasuredStateOnPlaneFromFirstHit();
+          break;
+        case 1:
+          state = recoTrack->getMeasuredStateOnPlaneFromLastHit();
+          state.setPosMom(state.getPos(), -state.getMom());
+          state.setChargeSign(-state.getCharge());
+          break;
+        default:
+          break;
       }
-    }
+      B2DEBUG(20, " searching in appendIntercepts :  " << (itPlanes->getVxdID()));
 
-    // Manually set the propagation direction back to 0, which represents auto-modus.
-    // This might be expected to be the case by the following algorithms without checking
-    // or setting the value themselves.
-    gfTrack.getCardinalRep()->setPropDir(0);
+      try {
+        //state = gfTrack.getFittedState(firstOrLast);
+        //state.Print();
+        lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
+      }  catch (...) {
+        B2DEBUG(20, " ...-extrapolation to plane failed");
+        ++itPlanes;
+        continue;
+      }
+
+      const TVectorD& predictedIntersect = state.getState();
+      const TMatrixDSym& covMatrix = state.getCov();
+
+      tmpIntercept.setCoorU(predictedIntersect[3]);
+      tmpIntercept.setCoorV(predictedIntersect[4]);
+      tmpIntercept.setSigmaU(sqrt(covMatrix(3, 3)));
+      tmpIntercept.setSigmaV(sqrt(covMatrix(4, 4)));
+      tmpIntercept.setSigmaUprime(sqrt(covMatrix(1, 1)));
+      tmpIntercept.setSigmaVprime(sqrt(covMatrix(2, 2)));
+      tmpIntercept.setLambda(lambda);
+      tmpIntercept.setVxdID(itPlanes->getVxdID());
+      tmpIntercept.setUprime(predictedIntersect[1]);
+      tmpIntercept.setVprime(predictedIntersect[2]);
+
+      B2DEBUG(20, "extrapolate to plane!!! >>> coordinates with getPos = " << state.getPos().X()
+              << ", " << state.getPos().Y()
+              << ", " << state.getPos().Z());
+      B2DEBUG(20, "coordinates with predInter = " << predictedIntersect[3]
+              << ", " << predictedIntersect[4]);
+      B2DEBUG(20, "momentum with getMom = " << state.getMom().X()
+              << ", " << state.getMom().Y()
+              << ", " << state.getMom().Z());
+      B2DEBUG(20, "U/V prime momentum with getMom = " << state.getMom().Z() / state.getMom().X()
+              << ", " << state.getMom().Z() / state.getMom().Y());
+      B2DEBUG(20, "U/V prime momentum with predInter = " << predictedIntersect[1]
+              << ", " << predictedIntersect[2]);
+
+      interceptList->appendNew(tmpIntercept);
+
+      recoTrackToIntercepts->add(recoTrackIndex, interceptList->getEntries() - 1);
+
+      ++itPlanes;
+
+    }
+    //}
 
 
   }

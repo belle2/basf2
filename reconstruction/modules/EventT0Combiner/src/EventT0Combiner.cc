@@ -82,12 +82,12 @@ void EventT0CombinerModule::event()
     m_eventT0->setEventT0(*hitBasedCDCT0Candidate);
     return;
   } else {
-    B2WARNING("There is no EventT0 from neither \n" \
-              " * the SVD based algorithm\n" \
-              " * the CDC based chi^2 algorithm\n" \
-              " * the CDC based hit-based algorithm\n" \
-              " * the ECL algorithm.\n" \
-              "Thus, no EventT0 value can be calculated.");
+    B2DEBUG(20, "There is no EventT0 from neither \n" \
+            " * the SVD based algorithm\n" \
+            " * the CDC based chi^2 algorithm\n" \
+            " * the CDC based hit-based algorithm\n" \
+            " * the ECL algorithm.\n" \
+            "Thus, no EventT0 value can be calculated.");
   }
 
 

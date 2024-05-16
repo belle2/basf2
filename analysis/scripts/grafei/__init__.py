@@ -18,8 +18,9 @@ from ROOT import Belle2 as b2
 
 
 def graFEI(
-    particle_list,
+    list_name,
     path,
+    particle_lists=None,
     store_mc_truth=False,
     cfg_path=None,
     param_file=None,
@@ -35,11 +36,17 @@ def graFEI(
     Applies graFEI model to a (list of) particle list(s) in basf2.
     GraFEI information is stored as eventExtraInfos.
 
-    If `particle_list` is a list of particle lists, the conversion to graFEI predicted mass hypotheses is performed.
+    .. note::
+        ``list_name`` should always be provided. This is the name of the particle list to be given as input to the graFEI.
+        If ``list_name`` refers to an existing particle list, its final state particles will be used to evaluate the model.
+        If also a list of particle lists is provided in ``particle_lists``, these will be combined to form
+        a new list called ``list_name`` and used as input for the model (if ``list_name`` already exists an error is thrown).
+        If ``particle_list`` is provided, the mass hypotheses of final state particles are updated to match graFEI predictions.
 
     Args:
-        particle_list (str or list): Name of particle list (B reconstruction) or list of FSP lists (for Upsilon reconstruction).
+        list_name (str): Name of particle list given as input to the model.
         path (basf2.Path): Module is added to this path.
+        particle_lists (list): List of particle lists. If provided, these are combined to form ``list_name``.
         store_mc_truth (bool): Whether to store MC truth information.
         cfg_path (str): Path to config file. If `None` the config file in the global tag is used.
         param_file (str): Path to parameter file containing the model. If `None` the parameter file in the global tag is used.
@@ -52,24 +59,16 @@ def graFEI(
     Returns:
         list: List of graFEI variables.
     """
-    if isinstance(particle_list, list):
-        input_list = "Upsilon(4S):final"
-        ma.combineAllParticles(particle_list, input_list, path=path)
-        if store_mc_truth:
-            for ls in particle_list:
-                ma.matchMCTruth(ls, path=path)
-    elif isinstance(particle_list, str):
-        input_list = particle_list
-        if store_mc_truth:
-            ma.matchMCTruth(particle_list, path=path)
-
+    if particle_lists:
+        ma.combineAllParticles(particle_lists, list_name, path=path)
     if store_mc_truth:
+        ma.matchMCTruth(list_name, path=path)
         ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
         ma.fillParticleListFromMC("B0:MC", "", path=path)
         ma.fillParticleListFromMC("B+:MC", "", path=path)
 
     graFEI = GraFEIModule(
-        input_list,
+        list_name,
         cfg_path=cfg_path,
         param_file=param_file,
         sig_side_lcas=sig_side_lcas,
@@ -127,15 +126,15 @@ def graFEI(
         )
 
     ma.variablesToEventExtraInfo(
-        input_list,
+        list_name,
         dict((f"extraInfo({var})", var) for var in graFEI_vars),
         path=path,
     )
 
     # Update mass hypotheses
-    if isinstance(particle_list, list):
-        charged_lists = [ls for ls in particle_list if "gamma:" not in ls]
-        photon_lists = [ls for ls in particle_list if "gamma:" in ls]
+    if particle_lists:
+        charged_lists = [ls for ls in particle_lists if "gamma:" not in ls]
+        photon_lists = [ls for ls in particle_lists if "gamma:" in ls]
 
         hypotheses = {  # PDG code and graFEI class for each mass hypothesis
             "K": (321, 4),

@@ -153,7 +153,8 @@ if __name__ == "__main__":
     charged_types = [x.split(":")[0] for x in charged_lists]
 
     graFEI_vars = graFEI(
-        particle_lists,
+        "Upsilon(4S):final",
+        particle_lists=particle_lists,
         store_mc_truth=store_mc_truth,
         cfg_path=args.config,
         param_file=args.weight,

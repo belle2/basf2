@@ -60,17 +60,19 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
     B2FATAL("No VXD dEdx PDFs available");
 
   // Get data objects
-  auto ttree_Lambda = getObjectPtr<TTree>("Lambda");
-  auto ttree_Dstar = getObjectPtr<TTree>("Dstar");
-  auto ttree_Gamma = getObjectPtr<TTree>("Gamma");
+  auto ttreeLambda = getObjectPtr<TTree>("Lambda");
+  auto ttreeDstar = getObjectPtr<TTree>("Dstar");
+  auto ttreeGamma = getObjectPtr<TTree>("Gamma");
 
-  if (ttree_Lambda->GetEntries() < 400)
+  if (ttreeLambda->GetEntries() < 100) {
+    B2WARNING("Not enough data for calibration.");
     return c_NotEnoughData;
+  }
 
   // call the calibration functions
-  TH2F h_LambdaP = LambdaMassFit(ttree_Lambda);
-  auto [h_DstarK, h_DstarPi, h_DstarMu] = DstarMassFit(ttree_Dstar);
-  TH2F h_GammaE = GammaHistogram(ttree_Gamma);
+  TH2F h_LambdaP = LambdaMassFit(ttreeLambda);
+  auto [h_DstarK, h_DstarPi, h_DstarMu] = DstarMassFit(ttreeDstar);
+  TH2F h_GammaE = GammaHistogram(ttreeGamma);
   //    Belle2::DedxPDFs* pdfs = (Belle2::DedxPDFs*)runfile->Get("DedxPDFs");
   std::vector<TH2F*> hDedxPDFs(6);
 
@@ -138,21 +140,26 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   RooRealVar InvM("InvM", "M_{p^{+}#pi^{-}}", 1.1, 1.13, "GeV/c^{2}");
 
-  RooRealVar Pi_pSVD("Pi_pSVD", "momentum for pi", -1.e8, 1.e8);
   RooRealVar p_pSVD("p_pSVD", "momentum for p", -1.e8, 1.e8);
-  RooRealVar Pi_SVDdEdx("Pi_SVDdEdx", "", -1.e8, 1.e8);
   RooRealVar p_SVDdEdx("p_SVDdEdx", "", -1.e8, 1.e8);
+
+  RooRealVar exp("exp", "experiment number", 0, 1.e5);
+  RooRealVar run("run", "run number", 0, 1.e7);
 
   auto variables = new RooArgSet();
 
   variables->add(InvM);
 
-  variables->add(Pi_pSVD);
   variables->add(p_pSVD);
-  variables->add(Pi_SVDdEdx);
   variables->add(p_SVDdEdx);
+  variables->add(exp);
+  variables->add(run);
 
   RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
+
+  if (LambdaDataset->sumEntries() == 0) {
+    B2FATAL("The Lambda dataset is empty, stopping here");
+  }
 
   // the signal PDF; might be revisited at a later point
 
@@ -209,8 +216,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   if ((status > 0) || (TMath::Abs(diff) > 1.) || (nSignalLambda.getError() < sqrt(nSignalLambda.getValV()))
       || (nSignalLambda.getError() > (nSignalLambda.getValV()))) {
-    B2INFO("Lambda: Fit problem: fit status " << status << "; sum of component yields minus the dataset yield is " << diff <<
-           "; signal yield is " << nSignalLambda.getValV() << ", while its uncertainty is " << nSignalLambda.getError());
+    B2WARNING("Lambda: Fit problem: fit status " << status << "; sum of component yields minus the dataset yield is " << diff <<
+              "; signal yield is " << nSignalLambda.getValV() << ", while its uncertainty is " << nSignalLambda.getError());
   }
   if (covqual < 2) {
     B2INFO("Lambda: Fit warning: covariance quality " << covqual);
@@ -316,11 +323,12 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   RooRealVar K_pSVD("K_pSVD", "momentum for Kaon(GeV)", -1.e8, 1.e8);
   RooRealVar K_SVDdEdx("K_SVDdEdx", "", -1.e8, 1.e8);
   RooRealVar pi_pSVD("pi_pSVD", "momentum for pion(GeV)", -1.e8, 1.e8);
-
   RooRealVar pi_SVDdEdx("pi_SVDdEdx", "", -1.e8, 1.e8);
   RooRealVar piS_pSVD("piS_pSVD", "momentum for slow pion(GeV)", -1.e8, 1.e8);
-
   RooRealVar piS_SVDdEdx("piS_SVDdEdx", "", -1.e8, 1.e8);
+
+  RooRealVar exp("exp", "experiment number", 0, 1.e5);
+  RooRealVar run("run", "run number", 0, 1.e8);
 
   auto variables = new RooArgSet();
   variables->add(deltaM);
@@ -330,8 +338,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   variables->add(pi_SVDdEdx);
   variables->add(piS_pSVD);
   variables->add(piS_SVDdEdx);
+  variables->add(exp);
+  variables->add(run);
 
   RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
+
+  if (DstarDataset->sumEntries() == 0) {
+    B2FATAL("The Dstar dataset is empty, stopping here");
+  }
 
   RooPlot* myframe = DstarDataset->plotOn(deltaM.frame());
 
@@ -373,8 +387,8 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
 
   if ((status > 0) || (TMath::Abs(diff) > 1.) || (nSignalDstar.getError() < sqrt(nSignalDstar.getValV()))
       || (nSignalDstar.getError() > (nSignalDstar.getValV()))) {
-    B2INFO("Dstar: Fit problem: fit status " << status << "; sum of component yields minus the dataset yield is " << diff <<
-           "; signal yield is " << nSignalDstar.getValV() << ", while its uncertainty is " << nSignalDstar.getError());
+    B2WARNING("Dstar: Fit problem: fit status " << status << "; sum of component yields minus the dataset yield is " << diff <<
+              "; signal yield is " << nSignalDstar.getValV() << ", while its uncertainty is " << nSignalDstar.getError());
   }
   if (covqual < 2) {
     B2INFO("Dstar: Fit warning: covariance quality " << covqual);
@@ -534,6 +548,10 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   B2INFO("Histogramming the converted photon selection...");
   gROOT->SetBatch(true);
 
+  if (preselTree->GetEntries() == 0) {
+    B2FATAL("The Gamma tree is empty, stopping here");
+  }
+
   const int numDEdxBins = 100;
   const int numPBins = 69;
   double pbins[numPBins + 1];
@@ -587,7 +605,7 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   if (m_isMakePlots) {
     TCanvas* ca1 = new TCanvas("ca1", "ca1");
     h_GammaE->Draw("COLZ");
-    ca1->Print("SVDdEdxCalibrationHistoLambda.pdf");
+    ca1->Print("SVDdEdxCalibrationHistoGamma.pdf");
   }
 
   return *h_GammaE;

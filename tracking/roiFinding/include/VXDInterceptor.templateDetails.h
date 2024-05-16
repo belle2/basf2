@@ -67,7 +67,7 @@ namespace Belle2 {
           B2DEBUG(20, "selectedPlanes length now: " << firstOrLast << " the size of the selectedPlanes : " << selectedPlanes.size());
           B2DEBUG(20, " ...append intercepts for track " << i);
           B2DEBUG(20, " ...the size of the selectedPlanes : " << selectedPlanes.size());
-          appendIntercepts(interceptList, selectedPlanes, gfTrackState, i, recoTrackToIntercepts, firstOrLast);
+          appendIntercepts(interceptList, selectedPlanes, gfTrackState, i, recoTrackToIntercepts);
         }
 
       } //loop on layers
@@ -80,7 +80,8 @@ namespace Belle2 {
   void VXDInterceptor<aIntercept>::appendIntercepts(StoreArray<aIntercept>* interceptList,
                                                     std::list<ROIDetPlane> planeList,
                                                     genfit::MeasuredStateOnPlane state,
-                                                    int recoTrackIndex, RelationArray* recoTrackToIntercepts, int firstOrLast)
+                                                    int recoTrackIndex,
+                                                    RelationArray* recoTrackToIntercepts)
   {
     aIntercept tmpIntercept;
 

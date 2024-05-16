@@ -35,12 +35,18 @@ namespace Belle2 {
       // extrapolate track to cylinders (VXD layers)
       for (unsigned int layer = 0; layer < m_layerRadii.size(); layer++) {
         const unsigned int layerOffset = (m_detector == VXD::SensorInfoBase::SVD ? 3 : 1);
+        // define two vectors for directions of extrapolation with -1 for backwards and +1 for forwards
+        const std::vector<short> backwards = {-1};
+        const std::vector<short> both = {-1, 1};
 
         B2DEBUG(20, " .fill intercept List, Layer: " << layer + layerOffset);
-        for (int firstOrLast : {-1, 1}) {
+        // if this ROI / intercept finding is for DQM, only extrapolate backwards, starting from first hit
+        // if it's for actual ROI finding (or any other case), extrapolate in both directions, once starting
+        // from the first hit extrapolating backwards, and once starting from the last hit extrapolating forwards
+        for (short direction : m_ForDQM ? backwards : both) {
           std::list<ROIDetPlane> selectedPlanes;
           genfit::MeasuredStateOnPlane gfTrackState;
-          switch (firstOrLast) {
+          switch (direction) {
             case -1:
               gfTrackState = trackList[i]->getMeasuredStateOnPlaneFromFirstHit();
               break;
@@ -64,7 +70,7 @@ namespace Belle2 {
                   gfTrackState.getPos().Z());
 
           m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, ROOT::Math::XYZVector(gfTrackState.getPos()), layer + layerOffset);
-          B2DEBUG(20, "selectedPlanes length now: " << firstOrLast << " the size of the selectedPlanes : " << selectedPlanes.size());
+          B2DEBUG(20, "selectedPlanes length now: " << direction << " the size of the selectedPlanes : " << selectedPlanes.size());
           B2DEBUG(20, " ...append intercepts for track " << i);
           B2DEBUG(20, " ...the size of the selectedPlanes : " << selectedPlanes.size());
           appendIntercepts(interceptList, selectedPlanes, gfTrackState, i, recoTrackToIntercepts);

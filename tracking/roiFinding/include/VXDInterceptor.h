@@ -29,8 +29,9 @@ namespace Belle2 {
   public:
 
     /** Constructor */
-    VXDInterceptor(double toleranceZ, double tolerancePhi, std::vector<float> layerRadii, VXD::SensorInfoBase::SensorType det)
-      : m_layerRadii(layerRadii), m_detector(det)
+    VXDInterceptor(double toleranceZ, double tolerancePhi, std::vector<float> layerRadii, VXD::SensorInfoBase::SensorType det,
+                   bool forDQM = false)
+      : m_layerRadii(layerRadii), m_detector(det), m_ForDQM(forDQM)
     {
       B2ASSERT("Can't create VXDIntercepts if no layer radii are provided.", not layerRadii.empty());
       m_theROIGeometry.fillPlaneList(toleranceZ, tolerancePhi, det);
@@ -55,7 +56,11 @@ namespace Belle2 {
     /// The detector we are creating intercepts for
     VXD::SensorInfoBase::SensorType m_detector;
 
-    ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
+    /// the geometry of the Region Of Interest
+    ROIGeometry m_theROIGeometry;
+
+    /// ROI finding for DQM or for data reduction
+    bool m_ForDQM = false;
 
     /** Append the Intercept infos related to the track theTrack to the listToBeFilled.
      */

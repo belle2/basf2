@@ -82,6 +82,7 @@ def tauskim_particle_selection(label, path):
                             Pi0Cut, path=path)
 
     ma.copyLists(f'pi0:{label}', Pi0lists, path=path)
+    ma.cutAndCopyList(f'gamma:pi0_{label}', 'gamma:all', f'isDescendantOfList(pi0:{label}) == 1', path=path)
 
     # gamma
     gammaCuts = 'E > 0.2'
@@ -90,7 +91,9 @@ def tauskim_particle_selection(label, path):
     gammaCuts += ' and thetaInCDCAcceptance'
     gammaCuts += ' and clusterNHits > 1.5'
     gammaCuts += f' and isDescendantOfList(pi0:{label}) == 0'
-    ma.cutAndCopyList(f'gamma:{label}', 'gamma:all', gammaCuts, path=path)
+    ma.cutAndCopyList(f'gamma:nonpi0_{label}', 'gamma:all', gammaCuts, path=path)
+
+    ma.copyLists(f'gamma:{label}', [f'gamma:pi0_{label}', f'gamma:nonpi0_{label}'], path=path)
 
 
 @fancy_skim_header
@@ -339,7 +342,8 @@ class TauGeneric(BaseSkim):
         """
         Set particle lists and variables for TauGeneric skim.
 
-        **Output particle lists**: ``pi+:tauskim, pi0:tauskim, gamma:tauskim, pi+:S1/S2, pi0:S1/S2, gamma:S1/S2``
+        **Output particle lists**:
+        * ``pi+:tauskim, pi0:tauskim, gamma:pi0_tauskim, gamma:nonpi0_tauskim, gamma:tauskim, pi+:S1/S2, pi0:S1/S2, gamma:S1/S2``
 
         **Variables**:
 
@@ -354,10 +358,10 @@ class TauGeneric(BaseSkim):
         tauskim_particle_selection("tauskim", path)
 
         # Get EventShape variables
-        ma.buildEventShape(["pi+:tauskim", "pi0:tauskim", "gamma:tauskim"],
+        ma.buildEventShape(["pi+:tauskim", "gamma:tauskim"],
                            allMoments=False, foxWolfram=False, cleoCones=False,
                            sphericity=False, jets=False, path=path)
-        ma.buildEventKinematics(["pi+:tauskim", "pi0:tauskim", "gamma:tauskim"], path=path)
+        ma.buildEventKinematics(["pi+:tauskim", "gamma:tauskim"], path=path)
 
         # Split in signal and tag
         ma.cutAndCopyList("pi+:S1", "pi+:tauskim", "cosToThrustOfEvent > 0", path=path)
@@ -467,7 +471,8 @@ class TauThrust(BaseSkim):
         """
         Set particle lists and variables for TauThrust skim.
 
-        **Constructed particle lists**: ``pi+:thrust, gamma:thrust, pi+:thrustS1/thrustS2, pi0:thrust``
+        **Constructed particle lists**:
+        * ``pi+:thrust, pi0:thust, gamma:pi0_thrust, gamma:nonpi0_thrust, gamma:thrust, pi+:thrustS1/thrustS2``
 
         **Variables**:
 
@@ -479,10 +484,10 @@ class TauThrust(BaseSkim):
         tauskim_particle_selection("thrust", path)
 
         # Get EventShape variables
-        ma.buildEventShape(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'],
+        ma.buildEventShape(['pi+:thrust', 'gamma:thrust'],
                            allMoments=False, foxWolfram=False, cleoCones=False,
                            sphericity=False, jets=False, path=path)
-        ma.buildEventKinematics(['pi+:thrust', 'pi0:thrust', 'gamma:thrust'], path=path)
+        ma.buildEventKinematics(['pi+:thrust', 'gamma:thrust'], path=path)
 
         # Split in signal and tag
         ma.cutAndCopyList('pi+:thrustS1', 'pi+:thrust', 'cosToThrustOfEvent > 0', path=path)
@@ -572,7 +577,8 @@ class TauKshort(BaseSkim):
         """
         Set particle lists and variables for TauKshort skim.
 
-        **Constructed particle lists**: ``pi+:tauKs, gamma:tauKs, pi+:tauKsS1/tauKsS2, pi0:tauKs``
+        **Constructed particle lists**:
+        * ``pi+:tauKs, pi0:tauKs, gamma:pi0_tauKs, gamma:nonpi0_tauKs, gamma:tauKs, pi+:tauKsS1/tauKsS2``
 
         **Variables**:
 
@@ -594,11 +600,11 @@ class TauKshort(BaseSkim):
 
         # Get EventShape variables
         ma.buildEventShape(
-            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'pi0:tauKs', 'gamma:tauKs'],
+            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'gamma:tauKs'],
             allMoments=False, foxWolfram=False, cleoCones=False,
             sphericity=False, jets=False, path=path)
         ma.buildEventKinematics(
-            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'pi0:tauKs', 'gamma:tauKs'],
+            ['pi+:tauKs_notKs', 'pi+:tauKs_kshort', 'gamma:tauKs'],
             path=path)
 
         # reconstruct

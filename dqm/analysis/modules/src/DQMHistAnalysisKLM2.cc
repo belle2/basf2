@@ -34,6 +34,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
            std::string("ref/KLMEfficiencyDQM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
+  addParam("StopThreshold", m_stopThr, "Set stop threshold", float(0.20));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
@@ -111,6 +112,7 @@ void DQMHistAnalysisKLM2Module::initialize()
     B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
+    m_stopThr = 0.0;
     m_alarmThr = 0.0;
     m_warnThr = 0.5; //contigency value to still spot some problems
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
@@ -273,14 +275,16 @@ void DQMHistAnalysisKLM2Module::beginRun()
   if (m_refFile && m_refFile->IsOpen()) {
     // values for LOLO and LOW error are used for alarmThr and warnThr settings
     // default values should be initially defined in input parameters?
+    double tempStop = (double) m_stopThr;
     double tempAlarm = (double) m_alarmThr;
     double tempWarn = (double) m_warnThr;
-    requestLimitsFromEpicsPVs("2DEffSettings", tempAlarm, tempWarn, unused, unused);
-    m_alarmThr = (float) std::min(tempAlarm, tempWarn); //lolo
-    m_warnThr = (float) std::max(tempAlarm, tempWarn); //low
+    requestLimitsFromEpicsPVs("2DEffSettings", tempStop, tempAlarm, tempWarn, unused);
+    m_stopThr = (float) std::min(tempAlarm, tempStop); //lolo
+    m_alarmThr = (float) std::min(tempAlarm, tempWarn); //low
+    m_warnThr = (float) std::max(tempAlarm, tempWarn); //high
     // EPICS should catch if this happens but just in case
-    if (m_alarmThr > m_warnThr) {
-      B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr is greater than warnThr...");
+    if (m_alarmThr > m_warnThr || m_stopThr > m_warnThr || m_stopThr > m_alarmThr) {
+      B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr or alarmStop is greater than warnThr...");
     }
   }
   m_BKLMLayerWarn = 5;
@@ -443,6 +447,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float minVal = m_min;
   float alarmThr = m_alarmThr;
   float warnThr = m_warnThr;
+  float stopThr = m_stopThr;
   float eff2dVal;
   bool setAlarm = false;
   bool setWarn = false;
@@ -500,22 +505,26 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         }
 
         // set alarm
-        if (eff2dVal < warnThr) {
-          if (mainEntries < (int)m_minEntries) {
-            setFew = true;
-            B2DEBUG(1, "Alarm Set to be grey for 2D Canvas: Low Statistics");
-          } else if (eff2dVal < alarmThr) {
-            *pvcount += 1;
-            setWarn = true;
-            B2DEBUG(1, "Alarm Set to be yellow for few layers that below alarm threshold.");
-          } else {
-            setWarn = true;
-            B2DEBUG(1, "Alarm Set to be yellow for few layers that below warn threshold.");
+        if (mainEntries < (int)m_minEntries) {
+          setFew = true;
+        } else {
+          if (eff2dVal < warnThr) {
+            if (eff2dVal < alarmThr) {
+              if (eff2dVal < stopThr) {
+                *pvcount += 1;
+                setAlarm = true;
+              } else {
+                *pvcount += 1;
+                setWarn = true;
+              }
+            } else {
+              *pvcount += 1;
+              setWarn = true;
+            }
           }
         }
 
       }
-
       i++;
     }//end of bin y
 
@@ -523,7 +532,6 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
   if (*pvcount > (int) layerLimit) {
     setAlarm = true;
-    B2DEBUG(1, "Alarm Set to be yellow for ineff Layer Count warning.");
   }
 
   eff2dHist->SetMinimum(minVal);

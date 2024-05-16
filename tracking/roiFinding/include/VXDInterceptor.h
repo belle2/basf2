@@ -61,6 +61,11 @@ namespace Belle2 {
 
     /// ROI finding for DQM or for data reduction
     bool m_ForDQM = false;
+    /// define two arrays for directions of extrapolation with -1 for backwards and +1 for forwards
+    /// vector for backward extrapolation
+    const std::vector<short> c_backwards = {-1};
+    /// vector for both backward and forward extrapolation
+    const std::vector<short> c_both = {-1, 1};
 
     /** Append the Intercept infos related to the track theTrack to the listToBeFilled.
      */

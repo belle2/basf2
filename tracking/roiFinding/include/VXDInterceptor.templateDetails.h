@@ -35,15 +35,12 @@ namespace Belle2 {
       // extrapolate track to cylinders (VXD layers)
       for (unsigned int layer = 0; layer < m_layerRadii.size(); layer++) {
         const unsigned int layerOffset = (m_detector == VXD::SensorInfoBase::SVD ? 3 : 1);
-        // define two vectors for directions of extrapolation with -1 for backwards and +1 for forwards
-        const std::vector<short> backwards = {-1};
-        const std::vector<short> both = {-1, 1};
 
         B2DEBUG(20, " .fill intercept List, Layer: " << layer + layerOffset);
         // if this ROI / intercept finding is for DQM, only extrapolate backwards, starting from first hit
         // if it's for actual ROI finding (or any other case), extrapolate in both directions, once starting
         // from the first hit extrapolating backwards, and once starting from the last hit extrapolating forwards
-        for (short direction : m_ForDQM ? backwards : both) {
+        for (short direction : m_ForDQM ? c_backwards : c_both) {
           std::list<ROIDetPlane> selectedPlanes;
           genfit::MeasuredStateOnPlane gfTrackState;
           switch (direction) {

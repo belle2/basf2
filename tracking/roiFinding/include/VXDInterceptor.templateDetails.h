@@ -70,9 +70,9 @@ namespace Belle2 {
                   gfTrackState.getPos().Z());
 
           m_theROIGeometry.appendSelectedPlanes(&selectedPlanes, ROOT::Math::XYZVector(gfTrackState.getPos()), layer + layerOffset);
-          B2DEBUG(20, "selectedPlanes length now: " << direction << " the size of the selectedPlanes : " << selectedPlanes.size());
-          B2DEBUG(20, " ...append intercepts for track " << i);
-          B2DEBUG(20, " ...the size of the selectedPlanes : " << selectedPlanes.size());
+          B2DEBUG(20, " ...append intercepts for track " << i << "\n"\
+                  " ...the size of the selectedPlanes : " << selectedPlanes.size() << "\n"\
+                  " ...extrapolating in direction " << direction << " (-1 for backwards from first hit, +1 for forwards from last hit)");
           appendIntercepts(interceptList, selectedPlanes, gfTrackState, i, recoTrackToIntercepts);
         }
 

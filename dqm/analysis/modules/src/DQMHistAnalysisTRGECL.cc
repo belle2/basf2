@@ -118,16 +118,13 @@ void DQMHistAnalysisTRGECLModule::beginRun()
 
 void DQMHistAnalysisTRGECLModule::endRun()
 {
-  B2DEBUG(20, "endRun called");
 }
 
 void DQMHistAnalysisTRGECLModule::event()
 {
 
-  TH1F* hhh = (TH1F*) findHist("TRGECLEventTiming/h_MaxTCE");
-  if (hhh == nullptr) {
-    B2DEBUG(20, "hist == nullptr");
-  } else {
+  auto hhh = (TH1F*) findHist("TRGECLEventTiming/h_MaxTCE");
+  if (hhh != nullptr) {
     // calculate fraction of event timing with max TC E threshold
     int n_bin = hhh->GetNbinsX();
     float n_entry_all = (float) hhh->GetEffectiveEntries();
@@ -221,7 +218,6 @@ void DQMHistAnalysisTRGECLModule::fitEventT0(TH1* hist,
 
   // check if histogram is null or not
   if (hist == nullptr) {
-    B2DEBUG(20, "hist == nullptr");
     return;
   }
 
@@ -229,7 +225,6 @@ void DQMHistAnalysisTRGECLModule::fitEventT0(TH1* hist,
   int nToFit = hist->GetEffectiveEntries();
   if (nToFit < m_MinEntryForFit ||
       nToFit < 200) {
-    B2DEBUG(20, "No enough entries to fit.");
     return;
   }
 

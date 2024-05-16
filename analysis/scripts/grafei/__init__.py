@@ -30,7 +30,7 @@ def graFEI(
     payload_model_name="graFEIModelFile",
 ):
     """
-    Wrapper function to add the GraFEIModule to the path in a single call.
+    Wrapper function to add the GraFEIModule to the path and perform other actions behind the scenes.
 
     Applies graFEI model to a (list of) particle list(s) in basf2.
     GraFEI information is stored as eventExtraInfos.
@@ -66,6 +66,7 @@ def graFEI(
     if store_mc_truth:
         ma.fillParticleListFromMC("Upsilon(4S):MC", "", path=path)
         ma.fillParticleListFromMC("B0:MC", "", path=path)
+        ma.fillParticleListFromMC("B+:MC", "", path=path)
 
     graFEI = GraFEIModule(
         input_list,
@@ -135,39 +136,53 @@ def graFEI(
     if isinstance(particle_list, list):
         charged_lists = [ls for ls in particle_list if "gamma:" not in ls]
         photon_lists = [ls for ls in particle_list if "gamma:" in ls]
-        if len(photon_lists) != 1:
-            b2.B2FATAL("grafei.graFEI You should use exactly one photon list as input to the graFEI.")
-        masses = {  # PDG code and graFEI class for each mass hypothesis
+
+        hypotheses = {  # PDG code and graFEI class for each mass hypothesis
             "K": (321, 4),
             "pi": (211, 3),
             "mu": (13, 2),
             "e": (11, 1),
             "p": (2212, 5),
         }
-        for mass in masses:  # Loop over all possible final mass hypotheses
-            for ls in charged_lists:  # Loop over all charged particle lists
-                ma.cutAndCopyList(  # Retain only particles with predicted mass hypothesis equal to `mass`
-                    f"{ls}_to_{mass}_",
-                    ls,
-                    f"extraInfo(graFEI_massHypothesis) == {masses[mass][1]}",
+        for newHyp in hypotheses:  # Loop over all possible final mass hypotheses
+            newPDG = hypotheses[newHyp][0]
+            newClass = hypotheses[newHyp][1]
+            final_lists = []
+            for oldList in charged_lists:  # Loop over all charged particle lists
+                ma.cutAndCopyList(  # Retain only particles with predicted mass hypothesis equal to `newClass`
+                    f"{oldList}_to_{newHyp}_",
+                    oldList,
+                    f"extraInfo(graFEI_massHypothesis) == {newClass}",
                     path=path,
                 )
-                ma.updateMassHypothesis(  # Update basf2 mass hypothesis to `mass`
-                    f"{ls}_to_{mass}_", masses[mass][0], path=path
+                ma.updateMassHypothesis(  # Update basf2 mass hypothesis
+                    f"{oldList}_to_{newHyp}_", newPDG, path=path
                 )
-            ma.copyLists(  # Merge all temporary lists into final `mass` list
-                f"{mass}+:graFEI",
-                [f"{mass}+:{ls[ls.find(':')+1:]}_to_{mass}__converted_from_{ls[:ls.find(':')-1]}" for ls in charged_lists],
+
+                label = oldList[oldList.find(':')+1:]
+                oldHyp = oldList[:oldList.find(':')-1]
+                final_lists.append(f"{newHyp}+:{label}_to_{newHyp}__converted_from_{oldHyp}")
+
+            ma.copyLists(  # Merge all temporary lists into final `newHyp` list
+                f"{newHyp}+:graFEI",
+                final_lists,
                 writeOut=True,
                 path=path,
             )
-        ma.cutAndCopyList(  # Take care of photons
-            "gamma:graFEI",
-            photon_lists[0],
-            "extraInfo(graFEI_massHypothesis) == 6",
-            writeOut=True,
-            path=path,
-        )
+
+        # Take care of photons
+        if len(photon_lists) > 0:
+            ma.cutAndCopyList(
+                "gamma:graFEI",
+                photon_lists[0],
+                "extraInfo(graFEI_massHypothesis) == 6",
+                writeOut=True,
+                path=path,
+            )
+        elif len(photon_lists) == 0:
+            b2.B2WARNING("grafei.graFEI You did not define any photon input list. Therefore you don't have one as output.")
+        if len(photon_lists) > 1:
+            b2.B2WARNING("grafei.graFEI You defined more than one photon input list. Using the first one.")
 
     return graFEI_vars
 

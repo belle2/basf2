@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 import pandas as pd
 import numpy as np
 from dataclasses import dataclass
@@ -112,11 +122,12 @@ class ReweighterParticle:
         separator = '------------------'
         title = 'ReweighterParticle'
         prefix_str = f'Prefix: {self.prefix}'
-        merged_table_str = f'Merged table:\n{self.merged_table.describe()}'
+        columns = _weight_cols
+        merged_table_str = f'Merged table:\n{self.merged_table[columns].describe()}'
         pdg_binning_str = 'PDG binning:\n'
         for pdg in self.pdg_binning:
             pdg_binning_str += f'{pdg}: {self.pdg_binning[pdg]}\n'
-        return f'{separator}\n{title}\n{prefix_str}\n{merged_table_str}\n{pdg_binning_str}\n{separator}'
+        return '\n'.join([separator, title, prefix_str, merged_table_str, pdg_binning_str]) + separator
 
 
 class Reweighter:
@@ -193,11 +204,11 @@ class Reweighter:
         """
         weight_dfs = []
         for reco_pdg, mc_pdg in weights_dict:
+            if reco_pdg not in pdg_pid_variable_dict:
+                raise ValueError(f'Reconstructed PDG code {reco_pdg} not found in thresholds!')
             weight_df = weights_dict[(reco_pdg, mc_pdg)]
             weight_df['mcPDG'] = mc_pdg
             weight_df['PDG'] = reco_pdg
-            if reco_pdg not in pdg_pid_variable_dict:
-                raise ValueError(f'Reconstructed PDG code {reco_pdg} not found in thresholds!')
             # Check if these are legacy tables:
             if 'charge' in weight_df.columns:
                 charge_dict = {'+': [0, 2], '-': [-2, 0]}
@@ -209,6 +220,13 @@ class Reweighter:
             pid_variable_name = pdg_pid_variable_dict[reco_pdg][0]
             threshold = pdg_pid_variable_dict[reco_pdg][1]
             selected_weights = weight_df.query(f'variable == "{pid_variable_name}" and threshold == {threshold}')
+            if len(selected_weights) == 0:
+                available_variables = weight_df['variable'].unique()
+                available_thresholds = weight_df['threshold'].unique()
+                raise ValueError(f'No weights found for PDG code {reco_pdg}, mcPDG {mc_pdg},'
+                                 f' variable {pid_variable_name} and threshold {threshold}!\n'
+                                 f' Available variables: {available_variables}\n'
+                                 f' Available thresholds: {available_thresholds}')
             weight_dfs.append(selected_weights)
         return pd.concat(weight_dfs, ignore_index=True)
 
@@ -236,10 +254,10 @@ class Reweighter:
                     particle.pdg_binning[(reco_pdg, mc_pdg)][var], labels=labels)
                 binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
                                f'{var}_min'] = binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
-                                                              var].str[0]  # Uh oh
+                                                              var].str[0]
                 binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
                                f'{var}_max'] = binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
-                                                              var].str[1]  # Oh uff
+                                                              var].str[1]
                 binning_df.drop(var, axis=1, inplace=True)
         # merge the weight table with the ntuple on binning columns
         weight_cols = _weight_cols
@@ -275,6 +293,8 @@ class Reweighter:
         # Add underscore if not present
         if prefix and not prefix.endswith('_'):
             prefix += '_'
+        if self.get_particle(prefix):
+            raise ValueError(f"Particle with prefix '{prefix}' already exists!")
         if variable_aliases is None:
             variable_aliases = {}
         merged_weight_df = self.merge_weight_tables(weights_dict, pdg_pid_variable_dict)
@@ -295,16 +315,8 @@ class Reweighter:
         """
         cands = [particle for particle in self.particles if particle.prefix.strip('_') == prefix.strip('_')]
         if len(cands) == 0:
-            raise ValueError(f"No particle with prefix {prefix.strip('_')} found.")
+            return None
         return cands[0]
-
-    def add_correlation(self, prefix_left, prefix_right, rho: float):
-        """
-        Add a correlation between two PID particles.
-        """
-        particle_left = self.get_particle(prefix_left)
-        particle_right = self.get_particle(prefix_right)
-        self.correlations += [(particle_left, particle_right, rho)]
 
     def reweight(self,
                  df: pd.DataFrame,

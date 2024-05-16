@@ -195,10 +195,6 @@ namespace Belle2 {
     StoreArray <TrackFitResult> m_trackFitResults;  ///< TrackFitResult (output).
     StoreArray <Kink> m_kinks;  ///< Kink (output).
 
-    // variables used for output tmp (to be removed in the final version) TODO: remove
-    StoreArray <RecoTrack> m_motherKinkRecoTracks;
-    StoreArray <RecoTrack> m_daughterKinkRecoTracks;
-
     // cut variables
     double m_vertexDistanceCut;  ///< cut on the distance at the found vertex.
     double m_vertexChi2Cut;  ///< Chi2 cut.

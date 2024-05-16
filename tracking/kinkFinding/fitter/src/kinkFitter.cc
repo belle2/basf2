@@ -63,16 +63,6 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
   /// relation : m_recoTracks <--> m_copiedRecoTracks
   m_copiedRecoTracks.registerRelationTo(m_recoTracks);
 
-  m_motherKinkRecoTracks.registerInDataStore("motherKinkRecoTracks", DataStore::c_ErrorIfAlreadyRegistered);
-  RecoTrack::registerRequiredRelations(m_motherKinkRecoTracks);
-  m_motherKinkRecoTracks.registerRelationTo(m_recoTracks);
-
-  m_daughterKinkRecoTracks.registerInDataStore("daughterKinkRecoTracks", DataStore::c_ErrorIfAlreadyRegistered);
-  RecoTrack::registerRequiredRelations(m_daughterKinkRecoTracks);
-  m_daughterKinkRecoTracks.registerRelationTo(m_recoTracks);
-  m_daughterKinkRecoTracks.registerRelationTo(m_copiedRecoTracks);
-
-
   B2ASSERT("Material effects not set up.  Please use SetupGenfitExtrapolationModule.",
            genfit::MaterialEffects::getInstance()->isInitialized());
   B2ASSERT("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
@@ -532,15 +522,6 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   // Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
-
-  // temporary StoreArrays for studies (to be removed) TODO: remove
-  RecoTrack* motherKinkRecoTrack = recoTrackMother->copyToStoreArray(m_motherKinkRecoTracks);
-  motherKinkRecoTrack->addHitsFromRecoTrack(recoTrackMother, motherKinkRecoTrack->getNumberOfTotalHits());
-  motherKinkRecoTrack->addRelationTo(recoTrackMother);
-
-  RecoTrack* daughterKinkRecoTrack = recoTrackDaughter->copyToStoreArray(m_daughterKinkRecoTracks);
-  daughterKinkRecoTrack->addHitsFromRecoTrack(recoTrackDaughter, daughterKinkRecoTrack->getNumberOfTotalHits());
-  daughterKinkRecoTrack->addRelationTo(recoTrackDaughter);
 
   // Tracks selected with filter from 4 to 6 are selected by 2D distance cut assuming bad z coordinate.
   // Refit is required for such tracks in the majority of the cases.

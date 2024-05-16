@@ -159,7 +159,7 @@ def add_hlt_processing(path,
     """
 
     # Check if the run is cosmic and set the Environment accordingly
-    if run_type == "cosmics":
+    if run_type == constants.RunTypes.cosmic:
         basf2.declare_cosmics(True)
 
     # Always avoid the top-level 'import ROOT'.
@@ -266,7 +266,7 @@ def add_expressreco_processing(path,
     """
 
     # Check if the run is cosmic and set the Environment accordingly
-    if run_type == "cosmics":
+    if run_type == constants.RunTypes.cosmic:
         basf2.declare_cosmics(True)
 
     if unpacker_components is None:

@@ -14,6 +14,8 @@
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <genfit/MeasuredStateOnPlane.h>
+
 namespace Belle2 {
 
   template<class aIntercept>
@@ -30,7 +32,7 @@ namespace Belle2 {
         continue;
       }
 
-      // extrapolate track to cylinders (SVD layers)
+      // extrapolate track to cylinders (VXD layers)
       for (unsigned int layer = 0; layer < m_layerRadii.size(); layer++) {
         const unsigned int layerOffset = (m_detector == VXD::SensorInfoBase::SVD ? 3 : 1);
 
@@ -65,7 +67,7 @@ namespace Belle2 {
           B2DEBUG(20, "selectedPlanes length now: " << firstOrLast << " the size of the selectedPlanes : " << selectedPlanes.size());
           B2DEBUG(20, " ...append intercepts for track " << i);
           B2DEBUG(20, " ...the size of the selectedPlanes : " << selectedPlanes.size());
-          appendIntercepts(interceptList, selectedPlanes, trackList[i], i, recoTrackToIntercepts, firstOrLast);
+          appendIntercepts(interceptList, selectedPlanes, gfTrackState, i, recoTrackToIntercepts, firstOrLast);
         }
 
       } //loop on layers
@@ -77,41 +79,20 @@ namespace Belle2 {
   template<class aIntercept>
   void VXDInterceptor<aIntercept>::appendIntercepts(StoreArray<aIntercept>* interceptList,
                                                     std::list<ROIDetPlane> planeList,
-                                                    RecoTrack* recoTrack,
+                                                    genfit::MeasuredStateOnPlane state,
                                                     int recoTrackIndex, RelationArray* recoTrackToIntercepts, int firstOrLast)
   {
     aIntercept tmpIntercept;
-
-    //const genfit::Track& gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
     B2DEBUG(20, " ...-appendIntercepts, checking " << planeList.size() << " planes");
 
     double lambda = 0;
 
-    //for (int propDir = -1; propDir <= 1; propDir += 2) {
-    //gfTrack.getCardinalRep()->setPropDir(firstOrLast);
     std::list<ROIDetPlane>::iterator itPlanes = planeList.begin();
-    // B2DEBUG(20," ...-appendIntercepts, propDir "<<propDir  );
     while (itPlanes != planeList.end()) {
-
-      genfit::MeasuredStateOnPlane state;
-      switch (firstOrLast) {
-        case -1:
-          state = recoTrack->getMeasuredStateOnPlaneFromFirstHit();
-          break;
-        case 1:
-          state = recoTrack->getMeasuredStateOnPlaneFromLastHit();
-          state.setPosMom(state.getPos(), -state.getMom());
-          state.setChargeSign(-state.getCharge());
-          break;
-        default:
-          break;
-      }
       B2DEBUG(20, " searching in appendIntercepts :  " << (itPlanes->getVxdID()));
 
       try {
-        //state = gfTrack.getFittedState(firstOrLast);
-        //state.Print();
         lambda = state.extrapolateToPlane(itPlanes->getSharedPlanePtr());
       }  catch (...) {
         B2DEBUG(20, " ...-extrapolation to plane failed");
@@ -153,8 +134,6 @@ namespace Belle2 {
       ++itPlanes;
 
     }
-    //}
-
 
   }
 

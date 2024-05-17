@@ -38,9 +38,9 @@ def graFEI(
 
     .. note::
         ``list_name`` should always be provided. This is the name of the particle list to be given as input to the graFEI.
-        If ``list_name`` refers to an existing particle list, its final state particles will be used to evaluate the model.
-        If also a list of particle lists is provided in ``particle_lists``, these will be combined to form
-        a new list called ``list_name`` and used as input for the model (if ``list_name`` already exists an error is thrown).
+        If ``list_name`` refers to an existing particle list, it is used as input to the model.
+        If also a list of final state particle lists is provided in ``particle_lists``, these are combined to form
+        a new list called ``list_name`` (if ``list_name`` already exists an error is thrown).
         If ``particle_list`` is provided, the mass hypotheses of final state particles are updated to match graFEI predictions.
 
     Args:
@@ -201,7 +201,7 @@ def lcaSaver(
     Args:
         particle_lists (list): Name of particle lists to save features of.
         features (list): List of features to save for each particle.
-        mcparticle_list (str): Name of particle list to build LCAs from (will use as root).
+        mcparticle_list (str): Name of particle list to build LCAs from (used as root).
         output_file (str): Path to output file to save.
         path (basf2.Path): Module is added to this path.
     """

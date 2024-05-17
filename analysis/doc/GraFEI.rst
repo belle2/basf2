@@ -56,7 +56,7 @@ The output files used for training and evaluation must be placed in the folders 
 
 The training is performed with the python script ``grafei/scripts/train_model.py``. It requires a ``.yaml`` config file with the ``-c`` argument.
 You can find a prototype of config file at ``analysis/data/grafei_config.yaml``, where all options are documented.
-The training will output a copy of the config file used and a weight file in the format ``.pt`` that can be used to apply the model to some other data.
+The training outputs a copy of the config file used and a weight file in the format ``.pt`` that can be used to apply the model to some other data.
 The output folder is defined in the config file.
 
 The loss function is of the form
@@ -75,13 +75,15 @@ and uploaded to a global tag in order to run on the grid.
 Finally, the model can be included in a steering file via the `graFEI <grafei.graFEI>` wrapper function, 
 in order to apply the model to Belle II data and MC.
 Example of steering files for :math:`B` and :math:`\Upsilon (4S)` reconstruction modes are available in ``analysis/examples/GraFEI``.
-In both cases the LCAS matrix and mass hypotheses are not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI_`` can be added.
+In both cases the LCAS matrix is not directly saved in the final ntuples, but several variables labelled with the prefix ``graFEI_`` are available.
 When using the model in :math:`\Upsilon (4S)` reconstruction mode you have also the possibility of specifying an LCAS matrix (in the form of a nested list) and a list
 of mass hypotheses (following the convention outlined in the `select_good_decay` class) for your **signal-side**: in the case where the predicted LCAS matrix describes a valid tree structure, 
 the code checks if a subset of particles in the tree matches the given LCAS and mass hypotheses 
 (the ordering of the final state particles does not matter because all the permutations are checked, however the mass hypotheses and the LCAS rows/columns should match). 
-If so, the ``graFEI_goodEvent`` variable is set to 1. This allows to get rid of badly reconstructed events. 
-Moreover, you can construct signal- and tag-side candidates with the following lines of code (as documented in the example):
+If so, the ``graFEI_goodEvent`` variable is set to 1. This allows to get rid of badly reconstructed events.
+If you pass a list of particle lists as input to the model (more information in the `graFEI <grafei.graFEI>` documentation) the mass hypotheses of final state particles
+are updated to match those predicted by the model and stored in new particle lists called ``PART:graFEI``. 
+In this case you can construct signal- and tag-side candidates with the following lines of code (as documented in the example):
 
 .. code:: python
 
@@ -89,22 +91,17 @@ Moreover, you can construct signal- and tag-side candidates with the following l
    particle_types = charged_types + ["gamma"]
 
    # Define sig-side B -> K+ (nu nu)
-   # Here we consider all charged basf2 mass hypotheses
-   # since not necessarily they coincide with those 
-   # predicted by graFEI which we require to be kaons
-   for part in charged_types:
-       ma.reconstructDecay(
-          f"B+:{part[:-1]} -> {part}:final",
-          "daughter(0, extraInfo(graFEI_sigSide)) == 1",
-          path=path,
-       )
-   ma.copyLists("B+:Bsgn", [f"B+:{part[:-1]}" for part in charged_types], path=path)
+   ma.reconstructDecay(
+      f"B+:sgn -> K+:graFEI",
+      "daughter(0, extraInfo(graFEI_sigSide)) == 1",
+      path=path,
+   )
     
    # Define tag-side B
    for part in particle_types:
        ma.cutAndCopyList(
           f"{part}:Btag",
-          f"{part}:final",
+          f"{part}:graFEI",
           cut="extraInfo(graFEI_sigSide) == 0",
           writeOut=True,
           path=path,
@@ -123,14 +120,9 @@ Moreover, you can construct signal- and tag-side candidates with the following l
            path=path,
        )
 
-The ``PART:final`` particle lists in the example are those used as input for the model.
 The ``extraInfo(graFEI_sigSide)`` is set to 1 for particles predicted to belong to the signal-side, 0 for particles predicted to belong to the tag-side
 and -1 for particles in events with ``graFEI_goodEvent = 0``. Therefore, if you want meaningful distributions you should cut on events with ``graFEI_goodEvent = 1``.
 However, if you reconstruct the signal-side as in the example, only good events are kept.
-
-.. warning::
-   For the time being, the mass hypotheses defined at the beginning are not changed, even if new hypotheses are predicted by the model. 
-   Thus you'll have to consider all of them when creating your signal-side candidates. This behavior will change in future versions of the tool.
 
 The variables added by the GraFEI are filled with ``nan`` if there are less than two reconstructed particles in the event.
 Otherwise, they are defined as follows:

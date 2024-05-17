@@ -65,7 +65,7 @@ namespace Belle2 {
     /**
      * Struct for refence histogram info
      */
-    typedef struct {
+    struct REFNODE {
       /** online histogram name */
       std::string orghist_name;
       /** reference histogram name */
@@ -74,7 +74,7 @@ namespace Belle2 {
       TCanvas* canvas{nullptr};
       /** pointer to the reference histogram */
       TH1* ref_clone{nullptr};
-    } REFNODE;
+    };
 
     /** Struct for reference histogram  */
     std::vector<REFNODE*> m_pnode;

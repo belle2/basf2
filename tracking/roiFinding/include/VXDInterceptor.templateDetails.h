@@ -40,7 +40,7 @@ namespace Belle2 {
         // if this ROI / intercept finding is for DQM, only extrapolate backwards, starting from first hit
         // if it's for actual ROI finding (or any other case), extrapolate in both directions, once starting
         // from the first hit extrapolating backwards, and once starting from the last hit extrapolating forwards
-        for (short direction : m_ForDQM ? c_backwards : c_both) {
+        for (short direction : (m_ForDQM ? c_backwards : c_both)) {
           std::list<ROIDetPlane> selectedPlanes;
           genfit::MeasuredStateOnPlane gfTrackState;
           switch (direction) {

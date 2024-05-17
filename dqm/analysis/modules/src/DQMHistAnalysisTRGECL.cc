@@ -145,6 +145,7 @@ void DQMHistAnalysisTRGECLModule::event()
     h_EventTimingEnergyFraction->Draw("AP");
     c_TCEFraction->Modified();
     c_TCEFraction->Update();
+    UpdateCanvas(c_TCEFraction);
   }
 
   // EventT0 mean canvas
@@ -160,6 +161,7 @@ void DQMHistAnalysisTRGECLModule::event()
   h_EventT0Mean->Draw("AP");
   c_EventT0Mean->Modified();
   c_EventT0Mean->Update();
+  UpdateCanvas(c_EventT0Mean);
 
   // EventT0 width canvas
   c_EventT0Width->cd();
@@ -169,6 +171,8 @@ void DQMHistAnalysisTRGECLModule::event()
   h_EventT0Width->Draw("AP");
   c_EventT0Width->Modified();
   c_EventT0Width->Update();
+  UpdateCanvas(c_EventT0Width);
+
 
 }
 
@@ -198,35 +202,36 @@ void DQMHistAnalysisTRGECLModule::getEventT0(std::vector<std::string> s_HistName
   for (int iii = 0; iii < 15; iii++) {
 
     TH1* hhh = findHist(s_HistName[iii]);
-    // fit 6 parameters (yield, yieled err, mean, mean err, sigma, sigma err)
-    std::vector<double> par_fit(6, 0.0);
-    fitEventT0(hhh, par_fit);
-    // set mean parameter to TGraphErrors
-    h_tge_mean->SetPoint(iii, (iii + 1) * 20, par_fit[2]);
-    h_tge_mean->SetPointError(iii, 10, par_fit[3]);
-    // set width parameter to TGraphErrors
-    h_tge_width->SetPoint(iii, (iii + 1) * 20, par_fit[4]);
-    h_tge_width->SetPointError(iii, 10, par_fit[5]);
 
+    if (hhh != nullptr) {
+
+      // fit 6 parameters (yield, yieled err, mean, mean err, sigma, sigma err)
+      std::vector<double> par_fit(6, 0.0);
+
+      // check the number of entry in histogram to fit
+      int nToFit = hhh->GetEffectiveEntries();
+      if (nToFit > m_MinEntryForFit &&
+          nToFit > 200) {
+
+        // peform fit on EventT0 and get peak position and width
+        fitEventT0(hhh, par_fit);
+
+      }
+
+      // set mean parameter to TGraphErrors
+      h_tge_mean->SetPoint(iii, (iii + 1) * 20, par_fit[2]);
+      h_tge_mean->SetPointError(iii, 10, par_fit[3]);
+      // set width parameter to TGraphErrors
+      h_tge_width->SetPoint(iii, (iii + 1) * 20, par_fit[4]);
+      h_tge_width->SetPointError(iii, 10, par_fit[5]);
+
+    }
   }
-
 }
 
 void DQMHistAnalysisTRGECLModule::fitEventT0(TH1* hist,
                                              std::vector<double>& fit_par)
 {
-
-  // check if histogram is null or not
-  if (hist == nullptr) {
-    return;
-  }
-
-  // check the number of entry to fit
-  int nToFit = hist->GetEffectiveEntries();
-  if (nToFit < m_MinEntryForFit ||
-      nToFit < 200) {
-    return;
-  }
 
   // initial parameters to fit on EventT0 from histogram statistics
   float v_mean = hist->GetMean();

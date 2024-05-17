@@ -20,6 +20,7 @@ class TestPIDVar(unittest.TestCase):
     """Test case of PIDVar module"""
 
     def __init__(self, *args, **kwargs):
+        """Constructor"""
         super().__init__(*args, **kwargs)
         cosTheta_min = [-0.7, -0.5,   0, 0.2, 0.5, 0.8, 0.9]
         cosTheta_max = [-0.5,    0, 0.2, 0.5, 0.8, 0.9, 0.95]
@@ -51,7 +52,7 @@ class TestPIDVar(unittest.TestCase):
         fake_df['data_MC_uncertainty_sys_dn'] = np.random.uniform(0.01, 0.02, size=len(fake_df))
         fake_df['variable'] = 'electronID'
         fake_df['threshold'] = 0.8
-
+        #: PID Tables for testing
         self.tables = {(11, 11): eff_df, (11, 211): fake_df}
 
         user_data_dict = {
@@ -62,11 +63,13 @@ class TestPIDVar(unittest.TestCase):
             'PDG': np.array([11, -11, -11, -11]),
             'mcPDG': np.array([11, 211, -11, 211])
         }
+        #: User data for testing
         self.user_data = pd.DataFrame(user_data_dict)
         print(self.tables)
         print(self.user_data)
 
     def test_merge_tables(self):
+        """Tests merging of PID tables"""
         reweighter = Reweighter()
         thresholds = {11: ('electronID', 0.8)}
         merged_table = reweighter.merge_weight_tables(self.tables, thresholds)
@@ -78,6 +81,7 @@ class TestPIDVar(unittest.TestCase):
             reweighter.merge_weight_tables(self.tables, wrong_thresholds)
 
     def test_binning(self):
+        """Tests binning of PID tables"""
         reweighter = Reweighter()
         binning = reweighter.get_binning(self.tables[(11, 11)])
         print(binning)
@@ -91,6 +95,7 @@ class TestPIDVar(unittest.TestCase):
         self.assertEqual(len(binning['p']), 6)
 
     def test_add_pid_particle(self):
+        """Tests adding PID particle"""
         reweighter = Reweighter()
         thresholds = {11: ('electronID', 0.8)}
         reweighter.add_pid_particle('', self.tables, thresholds)
@@ -103,6 +108,7 @@ class TestPIDVar(unittest.TestCase):
             reweighter.add_pid_particle('', self.tables, thresholds)
 
     def test_reweight(self):
+        """Tests reweighting of PID particle"""
         n_variations = 100
         reweighter = Reweighter(n_variations=n_variations)
         thresholds = {11: ('electronID', 0.8)}

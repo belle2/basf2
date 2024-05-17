@@ -66,19 +66,18 @@ void DQMHistReferenceModule::loadReferenceHistos()
   m_pnode.clear();
   B2INFO("DQMHistReference: clear m_pnode. size: " << m_pnode.size());
 
-  //if (m_refFile != NULL) delete m_refFile;
-  TFile* m_refFile = new TFile(m_referenceFile.c_str());
+  TFile* refFile = new TFile(m_referenceFile.c_str(), "READ");
 
-  if (m_refFile->IsZombie()) {
+  if (refFile->IsZombie()) {
     B2INFO("DQMHistReference: reference file " << m_referenceFile << " does not exist. No references will be used!");
-    m_refFile->Close();
-    delete m_refFile;
+    refFile->Close();
+    delete refFile;
     return;
   }
 
   B2INFO("DQMHistReference: use reference file " << m_referenceFile);
 
-  TIter nextkey(m_refFile->GetListOfKeys());
+  TIter nextkey(refFile->GetListOfKeys());
   TKey* key;
   while ((key = (TKey*)nextkey())) {
     if (key->IsFolder() && string(key->GetName()) == string("ref")) {
@@ -120,23 +119,28 @@ void DQMHistReferenceModule::loadReferenceHistos()
               auto n = new REFNODE;
               n->orghist_name = dirname + "/" + histname;
               n->refhist_name = "ref/" + dirname + "/" + histname;
-              TH1* histo = (TH1*)h->Clone();
+              TH1* histo = (TH1*)h; // ->Clone();
               histo->SetName((n->refhist_name).c_str());
               histo->SetDirectory(0);
               n->ref_clone = histo;
               n->canvas = nullptr;
               m_pnode.push_back(n);
+            } else {
+              delete h;
             }
+          } else {
+            delete obj;
           }
         }
+        if (foundDir) delete foundDir;
       }
+      if (refdir) delete refdir;
     }
   }
 
   B2INFO("DQMHistReference: insert reference to m_pnode. size: " << m_pnode.size());
-  m_refFile->Close();
-  delete m_refFile;
-
+  refFile->Close();
+  delete refFile;
 }
 
 void DQMHistReferenceModule::event()
@@ -221,6 +225,11 @@ void DQMHistReferenceModule::endRun()
 void DQMHistReferenceModule::terminate()
 {
   B2DEBUG(1, "DQMHistReference: terminate called");
-  //  if (m_refFile) delete m_refFile;
+  for (auto& it : m_pnode) {
+    // clear ref histos from memory
+    delete it->ref_clone;
+    delete it;
+  }
+  m_pnode.clear();
 }
 

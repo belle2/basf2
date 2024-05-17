@@ -17,7 +17,6 @@
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <mdst/dataobjects/Track.h>
 
-#include <algorithm>
 #include <map>
 
 using namespace std;
@@ -29,7 +28,7 @@ REG_MODULE(ParticleMassHypothesesUpdater);
 ParticleMassHypothesesUpdaterModule::ParticleMassHypothesesUpdaterModule(): Module()
 {
   // Set module properties
-  setDescription("This module replaces the mass hypotheses of the particles inside the given particleList with the given pdgCode.");
+  setDescription("This module creates a new particle list with the desired pdg code using tracks from an input particle list (basically updates the mass hypotheses of the input list).");
   setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definition
   addParam("particleList", m_particleList, "Input ParticleList", string());

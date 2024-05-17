@@ -8,11 +8,10 @@
 
 #pragma once
 #include <framework/core/Module.h>
-//#include <string>
 
 namespace Belle2 {
 
-  /** This module replaces the mass hypotheses of the particles inside the given particleList with the given pdgCode. */
+  /** This module creates a new particle list with the desired pdg code using tracks from an input particle list (basically updates the mass hypotheses of the input list). */
 
   class ParticleMassHypothesesUpdaterModule : public Module {
   private:
@@ -25,8 +24,9 @@ namespace Belle2 {
     /** Writeout flag */
     bool m_writeOut;
 
-    /** Name of the new created list and anti-list */
+    /** Name of the new created list */
     std::string m_newParticleList;
+    /** Name of the new created anti-list */
     std::string m_newAntiParticleList;
 
     /** Anti-list flag */
@@ -36,8 +36,7 @@ namespace Belle2 {
     /** Constructor. */
     ParticleMassHypothesesUpdaterModule();
 
-    /** Initialises the module.
-     */
+    /** Initialises the module. */
     virtual void initialize() override;
     /** Method called for each event. */
     virtual void event() override;

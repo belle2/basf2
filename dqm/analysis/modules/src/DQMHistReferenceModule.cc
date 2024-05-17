@@ -100,41 +100,41 @@ void DQMHistReferenceModule::loadReferenceHistos()
           if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj();
         }
         string dirname = detDir->GetName();
-        if (foundDir) B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
-        else {
+        if (!foundDir) {
           B2INFO("No run type specific or default references available for " << dirname);
-          continue;
-        }
+        } else {
+          B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
 
-        TIter next(foundDir->GetListOfKeys());
-        TKey* hh;
+          TIter next(foundDir->GetListOfKeys());
+          TKey* hh;
 
-        while ((hh = (TKey*)next())) {
-          if (hh->IsFolder()) continue;
-          TObject* obj = hh->ReadObj();
-          if (obj->IsA()->InheritsFrom("TH1")) {
-            TH1* h = (TH1*)obj;
-            string histname = h->GetName();
-            if (h->GetDimension() == 1) {
-              auto n = new REFNODE;
-              n->orghist_name = dirname + "/" + histname;
-              n->refhist_name = "ref/" + dirname + "/" + histname;
-              TH1* histo = (TH1*)h; // ->Clone();
-              histo->SetName((n->refhist_name).c_str());
-              histo->SetDirectory(0);
-              n->ref_clone = histo;
-              n->canvas = nullptr;
-              m_pnode.push_back(n);
+          while ((hh = (TKey*)next())) {
+            if (hh->IsFolder()) continue;
+            TObject* obj = hh->ReadObj();
+            if (obj->IsA()->InheritsFrom("TH1")) {
+              TH1* h = (TH1*)obj;
+              string histname = h->GetName();
+              if (h->GetDimension() == 1) {
+                auto n = new REFNODE;
+                n->orghist_name = dirname + "/" + histname;
+                n->refhist_name = "ref/" + dirname + "/" + histname;
+                TH1* histo = (TH1*)h; // ->Clone();
+                histo->SetName((n->refhist_name).c_str());
+                histo->SetDirectory(0);
+                n->ref_clone = histo;
+                n->canvas = nullptr;
+                m_pnode.push_back(n);
+              } else {
+                delete h;
+              }
             } else {
-              delete h;
+              delete obj;
             }
-          } else {
-            delete obj;
           }
+          delete foundDir;
         }
-        if (foundDir) delete foundDir;
       }
-      if (refdir) delete refdir;
+      delete refdir; // always non-zero
     }
   }
 

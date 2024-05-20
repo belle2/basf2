@@ -43,20 +43,10 @@ namespace Belle2 {
     MdstPIDModule();
 
     /**
-     * Destructor
-     */
-    virtual ~MdstPIDModule();
-
-    /**
      * Initialize the module.
      * data store registration of PIDLikelihoods and relations to Tracks
      */
     virtual void initialize() override;
-
-    /**
-     * Called when a new run is started.
-     */
-    virtual void beginRun() override;
 
     /**
      * Called for each event.
@@ -64,29 +54,7 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-    /**
-     * Called when run ended.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Terminates the module.
-     */
-    virtual void terminate() override;
-
   private:
-
-    // required input
-    StoreArray<Track> m_tracks; /**< Required array for Tracks */
-    StoreArray<PIDLikelihood> m_pidLikelihoods; /**< Required array for PIDLikelihoods */
-
-    // optional input
-    StoreArray<TOPLikelihood> m_topLikelihoods; /**< Optional array for TOPLikelihoods */
-    StoreArray<ARICHLikelihood> m_arichLikelihoods; /**< Optional array for ARICHLikelihoods */
-    StoreArray<CDCDedxLikelihood> m_cdcDedxLikelihoods; /**< Optional array for CDCDedxLikelihoods */
-    StoreArray<VXDDedxLikelihood> m_vxdDedxLikelihoods; /**< Optional array for VXDDedxLikelihoods */
-    StoreArray<ECLPidLikelihood> m_eclLikelihoods; /**< Optional array for ECLPidLikelihoods */
-    StoreArray<KLMMuidLikelihood> m_muid; /**< Optional array for KLMMuidLikelihood */
 
     /**
      * Set TOP log likelihoods and corresponding reconstruction flag
@@ -131,7 +99,7 @@ namespace Belle2 {
      * @return log likelihood
      */
     template<class T>
-    double getLogL(const T* logl, const Const::ChargedStable& chargedStable) const
+    float getLogL(const T* logl, const Const::ChargedStable& chargedStable) const
     {
       return logl->getLogL(chargedStable);
     }
@@ -142,7 +110,7 @@ namespace Belle2 {
      * @param chargedStable particle
      * @return log likelihood
      */
-    double getLogL(const ECLPidLikelihood* logl, const Const::ChargedStable& chargedStable) const
+    float getLogL(const ECLPidLikelihood* logl, const Const::ChargedStable& chargedStable) const
     {
       return logl->getLogLikelihood(chargedStable);
     }
@@ -153,7 +121,7 @@ namespace Belle2 {
      * @param chargedStable particle
      * @return log likelihood
      */
-    double getLogL(const KLMMuidLikelihood* logl, const Const::ChargedStable& chargedStable) const
+    float getLogL(const KLMMuidLikelihood* logl, const Const::ChargedStable& chargedStable) const
     {
       return logl->getLogL(chargedStable.getPDGCode());
     }
@@ -178,8 +146,24 @@ namespace Belle2 {
       return true;
     }
 
+    // module parameters
+    bool m_subtractMaximum; /**< if true subtract the maximum of log likelihoods */
+
+    // input collections
+    StoreArray<Track> m_tracks; /**< Required collection of Tracks */
+    StoreArray<TOPLikelihood> m_topLikelihoods; /**< Optional collection of TOPLikelihoods */
+    StoreArray<ARICHLikelihood> m_arichLikelihoods; /**< Optional collection of ARICHLikelihoods */
+    StoreArray<CDCDedxLikelihood> m_cdcDedxLikelihoods; /**< Optional collection of CDCDedxLikelihoods */
+    StoreArray<VXDDedxLikelihood> m_vxdDedxLikelihoods; /**< Optional collection of VXDDedxLikelihoods */
+    StoreArray<ECLPidLikelihood> m_eclLikelihoods; /**< Optional collection of ECLPidLikelihoods */
+    StoreArray<KLMMuidLikelihood> m_muid; /**< Optional collection of KLMMuidLikelihood */
+
+    // output collection
+    StoreArray<PIDLikelihood> m_pidLikelihoods; /**< collection of PIDLikelihoods */
+
+    // other
     PIDLikelihood* m_pid; /**< pointer to the object to be filled */
-    std::map<Const::ChargedStable, std::string> m_chargedNames; /**< names of charged particles */
+    std::map<Const::ChargedStable, std::string> m_chargedNames; /**< names of charged particles (used in error messages) */
 
   };
 

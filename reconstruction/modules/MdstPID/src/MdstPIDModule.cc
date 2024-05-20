@@ -26,11 +26,11 @@ MdstPIDModule::MdstPIDModule() : Module(),
   m_chargedNames[Const::kaon] = "kaon";
   m_chargedNames[Const::proton] = "proton";
   m_chargedNames[Const::deuteron] = "deuteron";
+
+  addParam("subtractMaximum", m_subtractMaximum,
+           "if set to True, subtract the maximum of log likelihoods to reduce the range of values", true);
 }
 
-MdstPIDModule::~MdstPIDModule()
-{
-}
 
 void MdstPIDModule::initialize()
 {
@@ -50,18 +50,6 @@ void MdstPIDModule::initialize()
   m_muid.isOptional();
 }
 
-
-void MdstPIDModule::beginRun()
-{
-}
-
-void MdstPIDModule::endRun()
-{
-}
-
-void MdstPIDModule::terminate()
-{
-}
 
 void MdstPIDModule::event()
 {
@@ -99,6 +87,7 @@ void MdstPIDModule::event()
     const KLMMuidLikelihood* muid = track->getRelatedTo<KLMMuidLikelihood>();
     if (muid) setLikelihoods(muid);
 
+    if (m_subtractMaximum) m_pid->subtractMaximum();
   }
 
 }

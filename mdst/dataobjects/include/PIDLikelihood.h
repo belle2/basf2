@@ -39,11 +39,25 @@ namespace Belle2 {
                           float logl);
 
     /**
-     * Check whether PID information from a given set of detectors is available
-     * @param set a set of PID detectors
-     * @return true if the given set of detectors contributed to the PID information
+     * Subtract the maximum of log likelihoods (for each detector component).
      */
-    bool isAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
+    void subtractMaximum();
+
+    /**
+     * Check whether PID information is available for at least one of the detectors in a given set.
+     * Redefined after release-8.
+     * @param set a set of PID detectors
+     * @return true if at least one of the detectors in the set provides likelihoods
+     */
+    bool isAvailable(Const::PIDDetectorSet set) const;
+
+    /**
+     * Check whether PID information is available for all detectors in a given set.
+     * Was named isAvailable in release-8 or older.
+     * @param set a set of PID detectors
+     * @return true if all detectors in the set provide likelihoods
+     */
+    bool areAllAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
 
     /**
      * Return log likelihood for a given detector set and particle

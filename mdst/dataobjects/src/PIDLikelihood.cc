@@ -16,6 +16,7 @@
 #include <cmath>
 #include <iostream>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 using namespace Belle2;
@@ -49,6 +50,25 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
   }
   m_detectors += det;
   m_logl[index][part.getIndex()] = logl;
+}
+
+
+void PIDLikelihood::subtractMaximum()
+{
+  for (auto& detectorLLs : m_logl) {
+    auto maxLL = detectorLLs[0];
+    for (auto LL : detectorLLs) maxLL = std::max(maxLL, LL);
+    for (auto& LL : detectorLLs) LL -= maxLL;
+  }
+}
+
+
+bool PIDLikelihood::isAvailable(Const::PIDDetectorSet set) const
+{
+  for (const auto& detector : set) {
+    if (m_detectors.contains(detector)) return true;
+  }
+  return false;
 }
 
 

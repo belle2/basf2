@@ -34,7 +34,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
            std::string("ref/KLMEfficiencyDQM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
-  addParam("StopThreshold", m_stopThr, "Set stop threshold", float(0.20));
+  addParam("RunStopThreshold", m_stopThr, "Set stop threshold", float(0.20));
   addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
@@ -113,8 +113,8 @@ void DQMHistAnalysisKLM2Module::initialize()
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
     m_stopThr = 0.0;
-    m_alarmThr = 0.0;
-    m_warnThr = 0.5; //contigency value to still spot some problems
+    m_alarmThr = 0.5;
+    m_warnThr = 0.7; //contigency value to still spot some problems
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
                                        0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
     for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
@@ -273,7 +273,7 @@ void DQMHistAnalysisKLM2Module::beginRun()
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
   if (m_refFile && m_refFile->IsOpen()) {
-    // values for LOLO and LOW error are used for alarmThr and warnThr settings
+    // values for LOLO, LOW & High error are used for (run-)stopThr, alarmThr and warnThr settings
     // default values should be initially defined in input parameters?
     double tempStop = (double) m_stopThr;
     double tempAlarm = (double) m_alarmThr;
@@ -509,17 +509,12 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
           setFew = true;
         } else {
           if (eff2dVal < warnThr) {
-            if (eff2dVal < alarmThr) {
-              if (eff2dVal < stopThr) {
-                *pvcount += 1;
-                setAlarm = true;
-              } else {
-                *pvcount += 1;
-                setWarn = true;
-              }
-            } else {
-              *pvcount += 1;
+            *pvcount += 1;
+            setWarn = true;
+            if ((eff2dVal < alarmThr) && (eff2dVal > stopThr)) {
               setWarn = true;
+            } else if (eff2dVal < stopThr) {
+              setAlarm = true;
             }
           }
         }

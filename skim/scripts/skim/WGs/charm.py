@@ -105,12 +105,11 @@ class XToD0_D0ToHpJm(BaseSkim):
 
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
 
         D0Cuts = "1.70 < M < 2.00 and useCMSFrame(p) > 2.0"
-        D0Channels = ["pi+:charmSkim_pid pi-:charmSkim_pid",
-                      "pi+:charmSkim_pid K-:charmSkim_pid",
-                      "K+:charmSkim_pid pi-:charmSkim_pid",
+        D0Channels = ["pi+:charmSkim pi-:charmSkim",
+                      "pi+:charmSkim K-:charmSkim_pid",
+                      "K+:charmSkim_pid pi-:charmSkim",
                       "K+:charmSkim_pid K-:charmSkim_pid",
                       ]
 
@@ -674,15 +673,13 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     def build_lists(self, path):
         D0_cuts = "1.70 < M < 2.10"
         Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
 
         Dst_lists = []
         for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:
             lst = f"{h1}{h2}Pi0"
-            ma.reconstructDecay(f"D0:{lst} -> {h1}+:charmSkim_pid {h2}-:charmSkim_pid pi0:skim", D0_cuts, path=path)
-            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:charmSkim_pid", Dst_cuts, path=path)
-            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:charmSkim_pid", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D0:{lst} -> {h1}+:charmSkim {h2}-:charmSkim pi0:skim", D0_cuts, path=path)
+            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:charmSkim", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:charmSkim", Dst_cuts, path=path)
             ma.copyLists(f"D*+:{lst}", [f"D*+:{lst}_RS", f"D*+:{lst}_WS"], path=path)
             Dst_lists.append(f"D*+:{lst}")
 
@@ -1167,14 +1164,13 @@ class LambdacTopHpJm(BaseSkim):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
 
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
         ma.cutAndCopyList('p+:charmSkim_pid', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["p+:charmSkim_pid pi+:charmSkim_pid pi-:charmSkim_pid",
-                           "p+:charmSkim_pid pi+:charmSkim_pid K-:charmSkim_pid",
-                           "p+:charmSkim_pid K+:charmSkim_pid pi-:charmSkim_pid",
+        LambdacChannels = ["p+:charmSkim_pid pi+:charmSkim pi-:charmSkim",
+                           "p+:charmSkim_pid pi+:charmSkim K-:charmSkim_pid",
+                           "p+:charmSkim_pid K+:charmSkim_pid pi-:charmSkim",
                            "p+:charmSkim_pid K+:charmSkim_pid K-:charmSkim_pid",
                            ]
 
@@ -1231,7 +1227,6 @@ class LambdacToSHpJm(BaseSkim):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
 
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
         ma.fillParticleList('p+:loose', 'trinaryID > 0.2', path=path)
@@ -1239,7 +1234,7 @@ class LambdacToSHpJm(BaseSkim):
         ma.cutAndCopyList(
             'K_S0:charmSkim',
             'K_S0:merged',
-            'significanceOfDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
+            'significanceOfDistance > 2.0',
             path=path)
 
         ma.cutAndCopyList('pi0:charmSkim', 'pi0:skim', '0.120<InvM<0.145', True, path=path)
@@ -1248,9 +1243,9 @@ class LambdacToSHpJm(BaseSkim):
                             cut='1.166 < M < 1.211 and significanceOfDistance > 2', path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["Sigma+:charmSkim pi+:charmSkim_pid pi-:charmSkim_pid",
-                           "Sigma+:charmSkim pi+:charmSkim_pid K-:charmSkim_pid",
-                           "Sigma+:charmSkim K+:charmSkim_pid pi-:charmSkim_pid",
+        LambdacChannels = ["Sigma+:charmSkim pi+:charmSkim pi-:charmSkim",
+                           "Sigma+:charmSkim pi+:charmSkim K-:charmSkim_pid",
+                           "Sigma+:charmSkim K+:charmSkim_pid pi-:charmSkim",
                            "Sigma+:charmSkim K+:charmSkim_pid K-:charmSkim_pid",
                            "Sigma+:charmSkim K_S0:charmSkim",
                            ]
@@ -1299,12 +1294,11 @@ class XicpTopHpJm(BaseSkim):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
 
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
         ma.cutAndCopyList('p+:charmSkim_pid', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
 
         XicCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        XicChannels = ["p+:charmSkim_pid pi+:charmSkim_pid K-:charmSkim_pid",
+        XicChannels = ["p+:charmSkim_pid pi+:charmSkim K-:charmSkim_pid",
                        ]
 
         XicList = []
@@ -1359,7 +1353,6 @@ class XictoXimpippim(BaseSkim):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
 
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
         ma.fillParticleList('pi+:loose', 'pionIDNN > 0.1', path=path)
@@ -1370,24 +1363,24 @@ class XictoXimpippim(BaseSkim):
         ma.cutAndCopyList(
             'Lambda0:charmSkim',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfDistance > 3 and daughter(0,trinaryID) > 0.2 and daughter(1,pionIDNN) > 0.1',
+            '1.114 < M < 1.118 and significanceOfDistance > 3 and daughter(0,trinaryID) > 0.2',
             path=path)
 
         ma.reconstructDecay("Sigma+:charmSkim -> p+:loose pi0:charmSkim",
                             cut="1.166 < M < 1.211 and significanceOfDistance > 2", path=path)
         ma.reconstructDecay(
-            "Xi-:Lambda0pi -> Lambda0:charmSkim pi-:loose",
+            "Xi-:Lambda0pi -> Lambda0:charmSkim pi-:charmSkim",
             cut="1.318 < M < 1.325 and significanceOfDistance > 1.4",
             path=path)
         ma.reconstructDecay("Xi0:Lambda0pi0 -> Lambda0:charmSkim pi0:charmSkim",
                             cut="1.294 < M < 1.335 and significanceOfDistance > 2", path=path)
 
         XicCuts = "2.3 < M < 2.65 and useCMSFrame(p) > 2.0"
-        XicChannels = ["Sigma+:charmSkim pi+:charmSkim_pid K-:charmSkim_pid",
-                       "Sigma+:charmSkim pi+:charmSkim_pid pi-:charmSkim_pid",
+        XicChannels = ["Sigma+:charmSkim pi+:charmSkim K-:charmSkim_pid",
+                       "Sigma+:charmSkim pi+:charmSkim pi-:charmSkim",
                        "Sigma+:charmSkim K+:charmSkim_pid K-:charmSkim_pid",
-                       "Xi-:Lambda0pi pi+:charmSkim_pid pi+:charmSkim_pid",
-                       "Xi0:Lambda0pi0 pi+:charmSkim_pid pi+:charmSkim_pid pi-:charmSkim_pid"
+                       "Xi-:Lambda0pi pi+:charmSkim pi+:charmSkim",
+                       "Xi0:Lambda0pi0 pi+:charmSkim pi+:charmSkim pi-:charmSkim"
                        ]
 
         XicList = []

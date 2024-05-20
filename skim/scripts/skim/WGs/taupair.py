@@ -44,7 +44,6 @@ def tauskim_particle_selection(label, path):
         gammaForPi0Cuts += ' and abs(clusterTiming) < 200'
         gammaForPi0Cuts += ' and thetaInCDCAcceptance'
         gammaForPi0Cuts += ' and clusterNHits > 1.5'
-        gammaForPi0Cuts += ' and [[minC2TDist > 40] or [E > 0.4]]'  # new
         gammaForPi0 = f'gamma:looseForPi0{label}{g}'
         gammaForPi0lists.append(gammaForPi0)
         ma.cutAndCopyLists(gammaForPi0, 'gamma:all', gammaForPi0Cuts, path=path)
@@ -86,7 +85,6 @@ def tauskim_particle_selection(label, path):
 
     # gamma
     gammaCuts = 'E > 0.2'
-    gammaCuts += ' and [[minC2TDist > 40] or [E > 0.4]]'
     gammaCuts += ' and abs(clusterTiming) < 200'
     gammaCuts += ' and thetaInCDCAcceptance'
     gammaCuts += ' and clusterNHits > 1.5'

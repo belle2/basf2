@@ -35,7 +35,7 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
            std::string("ref/KLMEfficiencyDQM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
   addParam("RunStopThreshold", m_stopThr, "Set stop threshold", float(0.20));
-  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
+  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.5));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
@@ -113,8 +113,8 @@ void DQMHistAnalysisKLM2Module::initialize()
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
     m_stopThr = 0.0;
-    m_alarmThr = 0.5;
-    m_warnThr = 0.7; //contigency value to still spot some problems
+    m_alarmThr = 0.35;
+    m_warnThr = 0.5; //contigency value to still spot some problems
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
                                        0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
     for (int lay_id = 0; lay_id < BKLMElementNumbers::getMaximalLayerGlobalNumber(); lay_id++) {
@@ -279,9 +279,18 @@ void DQMHistAnalysisKLM2Module::beginRun()
     double tempAlarm = (double) m_alarmThr;
     double tempWarn = (double) m_warnThr;
     requestLimitsFromEpicsPVs("2DEffSettings", tempStop, tempAlarm, tempWarn, unused);
-    m_stopThr = (float) std::min(tempAlarm, tempStop); //lolo
-    m_alarmThr = (float) std::min(tempAlarm, tempWarn); //low
-    m_warnThr = (float) std::max(tempAlarm, tempWarn); //high
+
+    // Create an array of the Thresholds
+    double valuesThr[] = { tempStop, tempAlarm, tempWarn };
+
+    // Sort the array from lowest to highest
+    std::sort(std::begin(valuesThr), std::end(valuesThr));
+
+    // Assign the sorted threshold values
+    m_stopThr = (float)(valuesThr[0]);   // lowest value i.e, //lolo
+    m_alarmThr = (float)(valuesThr[1]);  // middle value i.e, //low
+    m_warnThr = (float)(valuesThr[2]);   // highest value i.e, //high
+
     // EPICS should catch if this happens but just in case
     if (m_alarmThr > m_warnThr || m_stopThr > m_warnThr || m_stopThr > m_alarmThr) {
       B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr or alarmStop is greater than warnThr...");
@@ -510,8 +519,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         } else {
           if (eff2dVal < warnThr) {
             *pvcount += 1;
-            setWarn = true;
-            if ((eff2dVal < alarmThr) && (eff2dVal > stopThr)) {
+            if ((eff2dVal <= alarmThr) && (eff2dVal >= stopThr)) {
               setWarn = true;
             } else if (eff2dVal < stopThr) {
               setAlarm = true;

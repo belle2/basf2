@@ -221,7 +221,10 @@ class Plotter:
                 xerr = xerr*numpy.ones(len(x))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
-            e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
+            e = axis.errorbar(
+                x[mask], y[mask], xerr=numpy.where(
+                    xerr[mask] < 0, 0.0, xerr[mask]), yerr=numpy.where(
+                    yerr[mask] < 0, 0.0, yerr[mask]), rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:

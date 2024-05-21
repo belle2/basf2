@@ -160,7 +160,7 @@ void DQMHistAnalysisInput2Module::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Close File");
 
-  if (pFile) {// we are done with readin, so close it
+  if (pFile) {// we are done with reading, so close it
     pFile->Close();
 
     now = time(0);
@@ -191,7 +191,7 @@ void DQMHistAnalysisInput2Module::event()
 
 
   m_count++;
-  m_eventMetaDataPtr.create();
+  // Override with updated values
   m_eventMetaDataPtr->setExperiment(m_expno);
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);

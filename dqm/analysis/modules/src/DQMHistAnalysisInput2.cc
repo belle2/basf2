@@ -160,14 +160,13 @@ void DQMHistAnalysisInput2Module::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Close File");
 
-  if (pFile) {// we are done with reading, so close it
-    pFile->Close();
+  // we are done with reading, so close it
+  pFile->Close();
 
-    now = time(0);
-    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-    B2INFO("[" << mbstr << "] before delete File");
-    pFile = nullptr;
-  }
+  now = time(0);
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+  B2INFO("[" << mbstr << "] before delete File");
+  pFile = nullptr;
 
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));

@@ -787,6 +787,137 @@ class feiHadronic(BaseFEISkim):
 
 
 @_FEI_skim_header(["B0", "B+"])
+class feiHadronic_DstEllNu(BaseFEISkim):
+    """
+    Tag side :math:`B` cuts:
+
+    * :math:`M_{\\text{bc}} > 5.27~{\\rm GeV}`
+    * :math:`-0.150 < \\Delta E < 0.100~{\\rm GeV}`
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
+      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+    * :math:`\\cos{TBTO} < 0.9`
+    * Selects only the two best candidates that survive based on the signalProbability
+
+    All available FEI :math:`B^0` and :math:`B^+` hadronic tags are reconstructed. From
+    `Thomas Keck's thesis
+    <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_, "the
+    channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used by the FR, but is not yet
+    used in the FEI due to unexpected technical restrictions in the KFitter algorithm".
+
+    <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
+    """
+
+    __description__ = ("FEI-tagged neutral and charged :math:`B`'s decaying hadronically. "
+                       "Analysis specific cuts applied during skimming. Best 2 candidates ranked by sigProb kept"
+                       )
+
+    FEIChannelArgs = {
+        "neutralB": True,
+        "chargedB": True,
+        "hadronic": True,
+        "semileptonic": False,
+        "KLong": False,
+        "baryonic": True,
+    }
+
+    def build_lists(self, path):
+        ma.copyList("B0:feiHadronicDstEllNu", "B0:generic", path=path)
+        ma.copyList("B+:feiHadronicDstEllNu", "B+:generic", path=path)
+        HadronicBLists = ["B0:feiHadronicDstEllNu", "B+:feiHadronicDstEllNu"]
+
+        ma.applyCuts(
+            "B+:feiHadronicDstEllNu", "sigProb>0.001 or extraInfo(dmID)==25", path=path
+        )
+        ma.applyCuts(
+            "B0:feiHadronicDstEllNu", "sigProb>0.001 or extraInfo(dmID)==23", path=path
+        )
+
+        for BList in HadronicBLists:
+            ma.applyCuts(BList, "Mbc>5.27", path=path)
+            ma.applyCuts(BList, "-0.150 <= deltaE <= 0.100", path=path)
+            # Need to build Btag_ROE to build continuum suppression variables i.e. cosTBTO
+            self._build_continuum_suppression(particle_list=BList, path=path)
+            ma.applyCuts(BList, "cosTBTO < 0.9", path=path)
+            # Keep only the best 2 candidates that survive based on the Signal probability.
+            # The second candidate is kept just in case an analyst wishes to
+            # perform some tag sipyde studies
+            ma.rankByHighest(
+                particleList=BList,
+                variable="extraInfo(SignalProbability)",
+                numBest=2,
+                path=path,
+            )
+
+        return HadronicBLists
+
+    def _build_continuum_suppression(self, particle_list: str, path: b2.Path):
+        """Builds continuum suppression for a given b-meson list.
+        This module is required to save the CS variables.
+
+        Args:2
+        list_name (str) : name of the b meson list. Can be list of signal or tag b meson lists
+        path (b2.Path): the basf2 path to append modules
+
+
+        """
+
+        mask_name = "btag_cs"
+
+        # First build the rest of the event for the b meson
+        ma.buildRestOfEvent(target_list_name=particle_list, path=path)
+
+        # Append the ROE mask
+        ma.appendROEMasks(
+            particle_list,
+            [self._build_btag_roe_mask(mask_name=mask_name)],
+            path=path,
+        )
+        # Build the continuum object for the given b meson
+        ma.buildContinuumSuppression(
+            list_name=particle_list, roe_mask=mask_name, path=path
+        )
+
+    @staticmethod
+    def _build_btag_roe_mask(mask_name: str):
+        """Prepares a tuple with the ROE mask name and the ROE cuts for tracks and clusters
+        The actual cuts are read from a selections dictionary
+
+            The cuts are aligning with the continuum rejection that is applied for the centrally
+            produced FEI calibration
+
+            Args:
+            mask_name (str): The name of the mask. This is the name that will be used to append the mask
+
+            Return:
+            tuple of mask_name, tracking cuts and cluster_cuts
+        """
+
+        selections = {
+            "tracks": [
+                "abs(dr) < 2",
+                "abs(dz) < 4",
+                "pt > 0.2",
+                "thetaInCDCAcceptance == 1",
+            ],
+            "clusters": [
+                "clusterNHits > 1.5",
+                "[[clusterReg==1 and E > 0.080] or [clusterReg==2 and E > 0.030] or [clusterReg==3 and E > 0.060]]",
+                "[[clusterTheta > 0.2967] and [clusterTheta < 2.6180]]",
+                "abs(clusterTiming) < 200",
+            ],
+        }
+
+        track_cuts = "".join(["[", " and ".join(selections["tracks"]), "]"])
+        cluster_cuts = "".join(["[", " and ".join(selections["clusters"]), "]"])
+
+        return (mask_name, track_cuts, cluster_cuts)
+
+
+@_FEI_skim_header(["B0", "B+"])
 class feiSL(BaseFEISkim):
     """
     Tag side :math:`B` cuts:

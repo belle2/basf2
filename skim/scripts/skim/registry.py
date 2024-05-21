@@ -64,6 +64,7 @@ _RegisteredSkims = [
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
     ("11180300", "fei", "feiSLB0"),
+    ("11180301", "fei", "feiSLB0_RDstar"),
     ("11180400", "fei", "feiSLBplus"),
     ("11180500", "fei", "feiHadronic"),
     ("11180501", "fei", "feiHadronic_DstEllNu"),

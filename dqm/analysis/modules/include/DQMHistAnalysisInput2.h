@@ -25,25 +25,21 @@
 #include <vector>
 
 namespace Belle2 {
-  /*! Class definition for the output module of Sequential ROOT I/O */
+  /**
+   * Class to read histograms from a root file for online analysis modules.
+   */
 
   class DQMHistAnalysisInput2Module : public DQMHistAnalysisModule {
 
-    // Public functions
   public:
 
     /**
-     * Constructor.
+     * Constructor
      */
     DQMHistAnalysisInput2Module();
 
     /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisInput2Module();
-
-    /**
-     * Initializer.
+     * Initialize the module.
      */
     void initialize() override final;
 
@@ -79,7 +75,7 @@ namespace Belle2 {
     /** Whether to enable the run info to be displayed. */
     bool m_enable_run_info;
     /** The canvas hold the basic DQM info. */
-    TCanvas* m_c_info = nullptr;
+    TCanvas* m_c_info{nullptr};
 
     /** DAQ number of processed events */
     int m_nevent = 0;

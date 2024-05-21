@@ -32,7 +32,7 @@ main = b2.Path()
 main.add_module('EventInfoSetter')
 main.add_module('LHEInput',
                 inputFileList=lhe,
-                makeMaster=False,
+                createEventMetaData=False,
                 nInitialParticles=2,
                 nVirtualParticles=2,
                 wrongSignPz=False)

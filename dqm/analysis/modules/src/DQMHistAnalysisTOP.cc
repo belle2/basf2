@@ -120,12 +120,15 @@ void DQMHistAnalysisTOPModule::initialize()
   m_c_photonYields = new TCanvas("TOP/c_photonYields", "c_photonYields");
   m_c_backgroundRates = new TCanvas("TOP/c_backgroundRates", "c_backgroundRates");
 
-  m_deadFraction = new TH1F("TOP/deadFraction", "Fraction of dead channels", 16, 0.5, 16.5);
+  m_deadFraction = new TH1F("TOP/deadFraction", "Fraction of dead channels in included boardstacks", 16, 0.5, 16.5);
   m_deadFraction->SetXTitle("slot number");
   m_deadFraction->SetYTitle("fraction");
-  m_hotFraction = new TH1F("TOP/hotFraction", "Fraction of hot channels", 16, 0.5, 16.5);
+  m_hotFraction = new TH1F("TOP/hotFraction", "Fraction of hot channels in included boardstacks", 16, 0.5, 16.5);
   m_hotFraction->SetXTitle("slot number");
   m_hotFraction->SetYTitle("fraction");
+  m_excludedFraction = new TH1F("TOP/excludedFraction", "Fraction of hot and dead channels in excluded bordstacks", 16, 0.5, 16.5);
+  m_excludedFraction->SetXTitle("slot number");
+  m_excludedFraction->SetYTitle("fraction");
   m_activeFraction = new TH1F("TOP/activeFraction", "Fraction of active channels", 16, 0.5, 16.5);
   m_activeFraction->SetXTitle("slot number");
   m_activeFraction->SetYTitle("fraction");
@@ -134,6 +137,10 @@ void DQMHistAnalysisTOPModule::initialize()
   m_junkFraction = new TH1F("TOP/junkFraction", "Fraction of junk hits per boardstack", 64, 0.5, 16.5);
   m_junkFraction->SetXTitle("slot number");
   m_junkFraction->SetYTitle("fraction");
+  // note: titles are intentionally the same since this one is plotted first
+  m_excludedBSHisto = new TH1F("TOP/excludedBSHisto", "Fraction of junk hits per boardstack", 64, 0.5, 16.5);
+  m_excludedBSHisto->SetXTitle("slot number");
+  m_excludedBSHisto->SetYTitle("fraction");
   m_c_junkFraction = new TCanvas("TOP/c_junkFraction", "c_junkFraction");
 
   for (int slot = 1; slot <= 16; slot++) {
@@ -185,6 +192,10 @@ void DQMHistAnalysisTOPModule::event()
   auto* rtype = findHist("DQMInfo/rtype");
   m_runType = rtype ? rtype->GetTitle() : "";
   m_IsNullRun = (m_runType == "null");
+
+  // get number of events processed with TOPDQM module
+  auto* goodHitsPerEvent = findHist("TOP/goodHitsPerEventAll");
+  m_numEvents = goodHitsPerEvent ? goodHitsPerEvent->GetEntries() : 0;
 
   bool zeroSupp = gStyle->GetHistMinimumZero();
   gStyle->SetHistMinimumZero(true);
@@ -285,7 +296,9 @@ void DQMHistAnalysisTOPModule::updateWindowVsSlotCanvas()
 
   auto* canvas = findCanvas("TOP/c_window_vs_slot");
   if (canvas) {
+    canvas->Clear();
     canvas->cd();
+    if (hraw) hraw->Draw();
     m_text1->Draw();
     for (auto* line : m_asicWindowsBandLines) line->Draw();
     canvas->Pad()->SetFrameFillColor(10);
@@ -328,6 +341,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
 {
   m_deadFraction->Reset();
   m_hotFraction->Reset();
+  m_excludedFraction->Reset();
   m_activeFraction->Reset();
   double inactiveFract = 0; // max inactive channel fraction when some boardstacks are excluded from alarming
 
@@ -356,10 +370,13 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     }
     deadFract /= h->GetNbinsX();
     hotFract /= h->GetNbinsX();
-    m_deadFraction->SetBinContent(slot, deadFract);
-    m_hotFraction->SetBinContent(slot, hotFract);
+    deadFractIncl /= h->GetNbinsX();
+    hotFractIncl /= h->GetNbinsX();
+    m_deadFraction->SetBinContent(slot, deadFractIncl);
+    m_hotFraction->SetBinContent(slot, hotFractIncl);
+    m_excludedFraction->SetBinContent(slot, deadFract - deadFractIncl + hotFract - hotFractIncl);
     m_activeFraction->SetBinContent(slot, 1 - deadFract - hotFract);
-    inactiveFract = std::max(inactiveFract, (deadFractIncl + hotFractIncl) / h->GetNbinsX());
+    inactiveFract = std::max(inactiveFract, deadFractIncl + hotFractIncl);
   }
 
   setMiraBelleVariables("ActiveChannelFraction_slot", m_activeFraction);
@@ -372,10 +389,16 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
   m_alarmStateOverall = std::max(m_alarmStateOverall, alarmState);
 
   m_deadFraction->SetFillColor(1);
+  m_deadFraction->SetLineColor(1);
   m_deadFraction->GetXaxis()->SetNdivisions(16);
 
   m_hotFraction->SetFillColor(2);
+  m_hotFraction->SetLineColor(2);
   m_hotFraction->GetXaxis()->SetNdivisions(16);
+
+  m_excludedFraction->SetFillColor(kGray);
+  m_excludedFraction->SetLineColor(kGray);
+  m_excludedFraction->GetXaxis()->SetNdivisions(16);
 
   m_activeFraction->SetFillColor(0);
   m_activeFraction->GetXaxis()->SetNdivisions(16);
@@ -388,6 +411,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     m_stack = new THStack("TOP/stack", "Fraction of dead and hot channels");
     m_stack->Add(m_deadFraction);
     m_stack->Add(m_hotFraction);
+    m_stack->Add(m_excludedFraction);
     m_stack->Add(m_activeFraction);
   }
   m_stack->Draw();
@@ -398,6 +422,7 @@ const TH1F* DQMHistAnalysisTOPModule::makeDeadAndHotFractionsPlot()
     m_legend = new TLegend(0.8, 0.87, 0.99, 0.99);
     m_legend->AddEntry(m_hotFraction, "hot");
     m_legend->AddEntry(m_deadFraction, "dead");
+    m_legend->AddEntry(m_excludedFraction, "excluded");
   }
   m_legend->Draw("same");
 
@@ -499,6 +524,7 @@ void DQMHistAnalysisTOPModule::makePhotonYieldsAndBGRatePlots(const TH1F* active
 void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
 {
   m_junkFraction->Reset();
+  m_excludedBSHisto->Reset();
   auto* allHits = (TH1D*) m_junkFraction->Clone("tmp");
   for (int slot = 1; slot <= 16; slot++) {
     auto* good = (TH1F*) findHist("TOP/good_channel_hits_" + std::to_string(slot));
@@ -519,6 +545,7 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
     double hmax = 0;
     for (size_t i = 0; i < m_includedBoardstacks.size(); i++) {
       if (m_includedBoardstacks[i]) hmax = std::max(hmax, m_junkFraction->GetBinContent(i + 1));
+      else m_excludedBSHisto->SetBinContent(i + 1, 1);
     }
     alarmState = getAlarmState(hmax, m_junkHitsAlarmLevels);
   }
@@ -530,10 +557,15 @@ void DQMHistAnalysisTOPModule::makeJunkFractionPlot()
   canvas->cd();
   canvas->Pad()->SetFrameFillColor(10);
   canvas->Pad()->SetFillColor(getAlarmColor(alarmState));
+  m_excludedBSHisto->SetFillColor(kGray);
+  m_excludedBSHisto->SetLineColor(kGray);
+  m_excludedBSHisto->GetXaxis()->SetNdivisions(16);
+  m_excludedBSHisto->GetYaxis()->SetRangeUser(0, 1);
+  m_excludedBSHisto->Draw();
   m_junkFraction->SetMarkerStyle(24);
   m_junkFraction->GetXaxis()->SetNdivisions(16);
   m_junkFraction->GetYaxis()->SetRangeUser(0, 1); // Note: m_junkFraction->GetMaximum() will now give 1 and not the histogram maximum!
-  m_junkFraction->Draw();
+  m_junkFraction->Draw("same");
   for (auto* line : m_verticalLines) line->Draw("same");
   for (auto* line : m_junkHitsAlarmLines) line->Draw("same");
   canvas->Modified();
@@ -641,7 +673,7 @@ void DQMHistAnalysisTOPModule::setMiraBelleVariables(const std::string& variable
 
 int DQMHistAnalysisTOPModule::getAlarmState(double value, const std::vector<double>& alarmLevels, bool bigRed) const
 {
-  if (m_IsNullRun) return c_Gray;
+  if (m_IsNullRun or m_numEvents < 1000) return c_Gray;
 
   if (bigRed) {
     if (value < alarmLevels[0]) return c_Green;
@@ -680,11 +712,18 @@ void DQMHistAnalysisTOPModule::setAlarmLines(const std::vector<double>& alarmLev
 
 void DQMHistAnalysisTOPModule::setAlarmLines()
 {
-  for (auto y : m_asicWindowsBand) {
-    auto* line = new TLine(0.5, y, 16.5, y);
-    line->SetLineWidth(2);
-    line->SetLineColor(kRed);
-    m_asicWindowsBandLines.push_back(line);
+  for (size_t i = 0; i < m_asicWindowsBand.size(); i++) {
+    double y = m_asicWindowsBand[i];
+    if (i < m_asicWindowsBandLines.size()) {
+      auto* line = m_asicWindowsBandLines[i];
+      line->SetY1(y);
+      line->SetY2(y);
+    } else {
+      auto* line = new TLine(0.5, y, 16.5, y);
+      line->SetLineWidth(2);
+      line->SetLineColor(kRed);
+      m_asicWindowsBandLines.push_back(line);
+    }
   }
 
   setAlarmLines(m_junkHitsAlarmLevels, 0.5, 16.5, m_junkHitsAlarmLines);

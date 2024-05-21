@@ -37,28 +37,23 @@ DQMHistAnalysisInput2Module::DQMHistAnalysisInput2Module()
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
-  B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
+  B2DEBUG(1, "DQMHistAnalysisInput2: Constructor done.");
 }
-
-
-DQMHistAnalysisInput2Module::~DQMHistAnalysisInput2Module() { }
 
 void DQMHistAnalysisInput2Module::initialize()
 {
   if (m_enable_run_info) {
     m_c_info = new TCanvas("DQMInfo/c_info", "");
     m_c_info->SetTitle("");
-  } else {
-    m_c_info = NULL;
   }
   m_eventMetaDataPtr.registerInDataStore();
-  B2INFO("DQMHistAnalysisInput: initialized.");
+  B2DEBUG(1, "DQMHistAnalysisInput2: initialized.");
 }
 
 
 void DQMHistAnalysisInput2Module::beginRun()
 {
-  B2INFO("DQMHistAnalysisInput: beginRun called.");
+  B2DEBUG(1, "DQMHistAnalysisInput2: beginRun called.");
   clearHistList();
   resetDeltaList();
   clearCanvases();
@@ -69,7 +64,6 @@ void DQMHistAnalysisInput2Module::event()
   TH1::AddDirectory(false);
   initHistListBeforeEvent();
 
-  std::vector<TH1*> hs;
   char mbstr[100];
 
   time_t now = time(0);
@@ -92,7 +86,7 @@ void DQMHistAnalysisInput2Module::event()
 
   m_file = new TFile(m_mempath.c_str(), "READ");
   if (m_file->IsZombie()) {
-    B2WARNING("DQMHistAnalysisInput: " << m_mempath + " is Zombie");
+    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + " is Zombie");
     setReturnValue(false);
     return;
   }
@@ -120,6 +114,8 @@ void DQMHistAnalysisInput2Module::event()
   // update number of processed events
   m_nevent = getEventProcessed();
 
+  std::vector<TH1*> hs; // temporary histograms storage vector
+
   while ((key = (TKey*)next())) {
     auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
     if (obj == nullptr) continue; // would be strange, but better check
@@ -137,7 +133,7 @@ void DQMHistAnalysisInput2Module::event()
     TString a = h->GetName();
     a.ReplaceAll(":", "");
     h->SetName(a);
-    B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
+    B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
 
     // the following line prevent any histogram outside a directory to be processed
     if (StringSplit(a.Data(), '/').size() <= 1) {
@@ -159,7 +155,7 @@ void DQMHistAnalysisInput2Module::event()
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
-    B2WARNING("DQMHistAnalysisInput: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
+    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
               mmt.AsString());
     setReturnValue(false);
     for (auto& h : hs)  delete h;
@@ -171,7 +167,7 @@ void DQMHistAnalysisInput2Module::event()
     m_expno = std::stoi(expno);
     m_runno = std::stoi(runno);
   }
-  B2INFO("DQMHistAnalysisInput: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
+  B2INFO("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
          mmt.AsString());
 
 
@@ -204,11 +200,12 @@ void DQMHistAnalysisInput2Module::event()
 
 void DQMHistAnalysisInput2Module::endRun()
 {
-  B2INFO("DQMHistAnalysisInput : endRun called");
+  B2DEBUG(1, "DQMHistAnalysisInput2: endRun called");
 }
 
 void DQMHistAnalysisInput2Module::terminate()
 {
-  B2INFO("terminate called");
+  B2DEBUG(1, "DQMHistAnalysisInput2: terminate called");
+  if (m_c_info) delete m_c_info;
 }
 

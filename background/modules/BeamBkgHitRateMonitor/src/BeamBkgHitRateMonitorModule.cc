@@ -103,7 +103,7 @@ BeamBkgHitRateMonitorModule::BeamBkgHitRateMonitorModule() : Module()
   addParam("cdcEnableMarkBackgroundHit", m_cdcEnableMarkBackgroundHit,
            "CDC: flag to enable to mark background flag on CDCHit (set 0x100 bit for CDCHit::m_status).", false);
   addParam("detectors", m_detectors,
-           "detectors collection name", string(""));
+           "Detectors to be included in the output tree, if empty, all detectors are included", m_detectors);
 }
 
 BeamBkgHitRateMonitorModule::~BeamBkgHitRateMonitorModule()
@@ -125,19 +125,21 @@ void BeamBkgHitRateMonitorModule::initialize()
   m_fileMetaData.isOptional(); // enables to run the module with simulation
 
   // create, set and append hit rate monitoring classes
-  if (m_detectors.find("pxd") != string::npos || m_detectors.empty()) {
+  std::string detectors;
+  for (const auto& detector : m_detectors) detectors += detector + " ";
+  if (detectors.find("PXD") != string::npos or detectors.empty()) {
     auto* pxd = new Background::PXDHitRateCounter();
     m_monitors.push_back(pxd);
   }
 
-  if (m_detectors.find("svd") != string::npos || m_detectors.empty()) {
+  if (detectors.find("SVD") != string::npos or detectors.empty()) {
     auto* svd = new Background::SVDHitRateCounter(m_svdShaperDigitsName, m_svdThrCharge,
                                                   m_svdIgnoreHotStripsPayload,
                                                   m_svdIgnoreMaskedStripsPayload);
     m_monitors.push_back(svd);
   }
 
-  if (m_detectors.find("cdc") != string::npos || m_detectors.empty()) {
+  if (detectors.find("CDC") != string::npos or detectors.empty()) {
     auto* cdc = new Background::CDCHitRateCounter(m_cdcTimeWindowLowerEdgeSmallCell,  m_cdcTimeWindowUpperEdgeSmallCell,
                                                   m_cdcTimeWindowLowerEdgeNormalCell, m_cdcTimeWindowUpperEdgeNormalCell,
                                                   m_cdcEnableBadWireTreatment, m_cdcEnableBackgroundHitFilter,
@@ -145,22 +147,22 @@ void BeamBkgHitRateMonitorModule::initialize()
     m_monitors.push_back(cdc);
   }
 
-  if (m_detectors.find("top") != string::npos || m_detectors.empty()) {
+  if (detectors.find("TOP") != string::npos or detectors.empty()) {
     auto* top = new Background::TOPHitRateCounter(m_topTimeOffset, m_topTimeWindow);
     m_monitors.push_back(top);
   }
 
-  if (m_detectors.find("arich") != string::npos || m_detectors.empty()) {
+  if (detectors.find("ARICH") != string::npos or detectors.empty()) {
     auto* arich = new Background::ARICHHitRateCounter();
     m_monitors.push_back(arich);
   }
 
-  if (m_detectors.find("ecl") != string::npos || m_detectors.empty()) {
+  if (detectors.find("ECL") != string::npos or detectors.empty()) {
     auto* ecl = new Background::ECLHitRateCounter();
     m_monitors.push_back(ecl);
   }
 
-  if (m_detectors.find("klm") != string::npos || m_detectors.empty()) {
+  if (detectors.find("KLM") != string::npos or detectors.empty()) {
     auto* klm = new Background::KLMHitRateCounter();
     m_monitors.push_back(klm);
   }

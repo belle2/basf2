@@ -26,8 +26,8 @@ namespace Belle2 {
       m_secID(fullSecID) {}
 
     /** constructor needed for the Virtual IP */
-    SecMapTrainerHit(const FullSecID& fullSecID, const B2Vector3<double>& position):
-      SpacePoint(position, B2Vector3<double> (0., 0., 0.),
+    SecMapTrainerHit(const FullSecID& fullSecID, const B2Vector3D& position):
+      SpacePoint(position, B2Vector3D(0., 0., 0.),
                  std::pair<double, double> (0., 0.),
                  std::pair<bool, bool>(), VxdID(),
                  Belle2::VXD::SensorInfoBase::SensorType()),
@@ -35,8 +35,8 @@ namespace Belle2 {
 
     /** another constructor needed for the Virtual IP... eccpp*/
     SecMapTrainerHit(double x, double y, double z):
-      SpacePoint(B2Vector3<double> (x, y, z),
-                 B2Vector3<double> (0., 0., 0.),
+      SpacePoint(B2Vector3D(x, y, z),
+                 B2Vector3D(0., 0., 0.),
                  std::pair<double, double> (0., 0.),
                  std::pair<bool, bool>(), VxdID(),
                  Belle2::VXD::SensorInfoBase::SensorType()),

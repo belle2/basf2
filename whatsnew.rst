@@ -17,6 +17,50 @@ be adapted when changing to the new release.
 Changes since release-08
 ========================
 
+.. admonition:: New and updated packages in externals
+   :class: toggle
+
+   .. list-table:: New and updated packages in externals from v02-00-02 to v02-01-00
+      :widths: 50 25 25
+      :header-rows: 1
+
+      * - package
+        - old version
+        - new version
+      * - doxygen
+        - 1.9.1
+        - 1.9.6
+      * - ROOT
+        - 6.24/06
+        - 6.26/14
+      * - TBB
+        -
+        - 2021.9.0
+      * - click
+        -
+        - 8.1.6
+      * - PyJWT
+        -
+        - 2.8.0
+      * - pyroofit
+        - 0.9.6
+        - removed
+      * - pytorch-ignite
+        -
+        - 0.4.12
+      * - root-numpy
+        - 4.8.0
+        - removed
+      * - root-pandas
+        - 0.7.0
+        - removed
+      * - splinter
+        -
+        - 0.19.0
+      * - urllib3
+        - 1.26.8
+        - 1.26.16
+
 .. include:: analysis/doc/whatsnew-since/release-08-00.txt
 .. include:: skim/doc/whatsnew-since/release-08-00.txt
 
@@ -26,7 +70,7 @@ Changes since release-07
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-01
+   .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-02
       :widths: 50 25 25
       :header-rows: 1
 
@@ -51,6 +95,9 @@ Changes since release-07
       * - VGM
         - 4.6
         - 5.0
+      * - WHIZARD
+        -
+        - 3.1.2
       * - beautifulsoup4
         -
         - 4.11.1

@@ -15,10 +15,6 @@ from ROOT import Belle2
 import simulation
 import reconstruction
 
-b2.set_random_seed(42)
-
-main = b2.create_path()
-
 
 class CheckTrackClusterMatching(b2.Module):
     """
@@ -49,6 +45,10 @@ class CheckTrackClusterMatching(b2.Module):
                     assert track.getRelatedTo(
                         "ECLClusters", "AngularDistance") is not None, "Relation set with AngularDistance method does not exist"
 
+
+b2.set_random_seed(42)
+
+main = b2.create_path()
 
 main.add_module('EventInfoSetter', evtNumList=[10])
 

@@ -40,7 +40,6 @@ namespace Belle2 {
 
       /**
        * Constructor.
-       * @param sensorInfo SensorInfo instance of the Sensor
        */
       SensitiveDetector();
 

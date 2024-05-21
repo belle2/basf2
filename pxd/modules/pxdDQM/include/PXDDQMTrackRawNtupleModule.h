@@ -20,7 +20,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 
 #include "TFile.h"
 #include "TNtuple.h"

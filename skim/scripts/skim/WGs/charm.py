@@ -1355,7 +1355,6 @@ class XictoXimpippim(BaseSkim):
 
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
-        ma.fillParticleList('pi+:loose', 'pionIDNN > 0.1', path=path)
         ma.fillParticleList('p+:loose', 'trinaryID > 0.2', path=path)
 
         ma.cutAndCopyList('pi0:charmSkim', 'pi0:skim', '0.120<InvM<0.145', path=path)

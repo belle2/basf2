@@ -532,11 +532,13 @@ class feiSLB0(BaseFEISkim):
 class feiSLB0_RDstar(BaseFEISkim):
     """
     Tag side :math:`B` cuts:
+
     * :math:`\\text{FoxWolframR2} < 0.4`
     * :math:`-1.75 < \\cos\\theta_{BY} < 1.1`
     * :math:`\\log_{10}(\\text{signal probability}) > -2.0`
     * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
     * :math:`\\text{BCS:signal probability}`
+
     SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with SL :math:`D` are not
     reconstructed, as these are rare and time-intensive.
 

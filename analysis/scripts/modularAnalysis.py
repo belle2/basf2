@@ -4428,7 +4428,7 @@ def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
     The allowed mass hypotheses for both input and output are electrons, muons, pions, kaons and protons.
 
     .. note:
-        The new particle list is named after the input one, with the additional suffix ``_conferted_from_OLDHYPOTHESIS``,
+        The new particle list is named after the input one, with the additional suffix ``_converted_from_OLDHYPOTHESIS``,
         e.g. ``e+:all`` converted to muons becomes ``mu+:all_converted_from_e``.
 
     @param particleList The input particle list name
@@ -4437,7 +4437,7 @@ def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
     @param path         Modules are added to this path
     """
     mass_updater = register_module("ParticleMassHypothesesUpdater")
-    mass_updater.set_name("ParticleMassHypothesesUpdater_" + particleList)
+    mass_updater.set_name("ParticleMassHypothesesUpdater_" + particleList + "_to_" + str(pdg))
     mass_updater.param("particleList", particleList)
     mass_updater.param("writeOut", writeOut)
     mass_updater.param("pdgCode", pdg)

@@ -17,6 +17,7 @@
 #include <TKey.h>
 
 #include <ctime>
+#include <filesystem>
 
 using namespace Belle2;
 
@@ -64,29 +65,34 @@ void DQMHistAnalysisInput2Module::event()
   TH1::AddDirectory(false);
   initHistListBeforeEvent();
 
-  char mbstr[100];
+// we create a metadata and set the latest exp/run
+// if do not, execution will be terminate if file is not updated/zombie
+// if we only put dummy exp/run, we trigger begin/endRun ...
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(m_expno);
+  m_eventMetaDataPtr->setRun(m_runno);
+  m_eventMetaDataPtr->setEvent(m_count);
 
-  time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-  B2INFO("[" << mbstr << "] before Close File");
+  static std::filesystem::file_time_type lasttime;
+  const std::filesystem::file_time_type ftime = std::filesystem::last_write_time(m_mempath);
 
-  if (m_file) {
-    m_file->Close();
-
-    now = time(0);
-    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-    B2INFO("[" << mbstr << "] before delete File");
-    delete m_file;
-    m_file = nullptr;
+  if (lasttime == ftime) {
+    B2INFO("File not updated! -> Sleep");
+    sleep(m_interval);
+    setReturnValue(false);
+    return;
   }
+  lasttime = ftime;
 
-  now = time(0);
+  char mbstr[100];
+  time_t now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Load File");
 
-  m_file = new TFile(m_mempath.c_str(), "READ");
-  if (m_file->IsZombie()) {
-    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + " is Zombie");
+  std::unique_ptr<TFile> pFile = std::unique_ptr<TFile> (new TFile(m_mempath.c_str(), "READ"));
+  if (pFile->IsZombie()) {
+    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + " is Zombie -> Sleep");
+    sleep(m_interval);
     setReturnValue(false);
     return;
   }
@@ -95,12 +101,12 @@ void DQMHistAnalysisInput2Module::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after LoadFile");
 
-  const TDatime& mt = m_file->GetModificationDate();
+  const TDatime& mt = pFile->GetModificationDate();
   TDatime mmt(mt.Convert());
   std::string expno("UNKNOWN"), runno("UNKNOWN"), rtype("UNKNOWN");
 
-  m_file->cd();
-  TIter next(m_file->GetListOfKeys());
+  pFile->cd();
+  TIter next(pFile->GetListOfKeys());
   TKey* key = nullptr;
 
   now = time(0);
@@ -148,6 +154,19 @@ void DQMHistAnalysisInput2Module::event()
     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
     if (std::string(h->GetName()) == std::string("DQMInfo/runno")) runno = h->GetTitle();
     if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) rtype = h->GetTitle();
+  }
+
+  now = time(0);
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+  B2INFO("[" << mbstr << "] before Close File");
+
+  if (pFile) {// we are done with readin, so close it
+    pFile->Close();
+
+    now = time(0);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+    B2INFO("[" << mbstr << "] before delete File");
+    pFile = nullptr;
   }
 
   now = time(0);

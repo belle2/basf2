@@ -80,9 +80,6 @@ namespace Belle2 {
     /** DAQ number of processed events */
     int m_nevent = 0;
 
-    /** The opened file */
-    TFile* m_file{nullptr};
-
     /** last change date/time of shm input file */
     std::string m_lastChange;
 

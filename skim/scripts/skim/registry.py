@@ -49,6 +49,7 @@ _RegisteredSkims = [
     ("11180301", "fei", "feiSLB0_RDstar"),
     ("11180400", "fei", "feiSLBplus"),
     ("11180500", "fei", "feiHadronic"),
+    ("11180501", "fei", "feiHadronic_DstEllNu"),
     ("11180600", "fei", "feiSL"),
 
     # --- WG2: Electroweak penguins ---

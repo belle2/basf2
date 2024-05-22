@@ -1,6 +1,6 @@
 # EventType: 1121848001
 # Descriptor: [B0 -> (J/psi(1S) -> e+ e- or mu+ mu-) (eta- -> pi+ pi- eta or rho0 gamma)]
-# NickName: Bd_to_jpsi_etaprime_etaprime_to_pippimetaprime_or_rhogamma
+# NickName: Bd_to_jpsi_etaprime_etaprime_to_pippimetaprime_or_rho0gamma
 # Documentation: B0 decay to J/psi eta', and eta' to pi+ pi- eta, rho0 gamma
 # Tested: Yes
 # Physics WG: TDCPV
@@ -15,8 +15,8 @@ ChargeConj etasig     etasig
 Alias      eta'sig     eta'
 ChargeConj eta'sig     eta'sig
 
-Alias      rhosig     rho
-ChargeConj rhosig     rhosig
+Alias      rho0sig     rho0
+ChargeConj rho0sig     rho0sig
 
 Define beta 0.3814
 #

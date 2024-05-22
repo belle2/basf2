@@ -60,6 +60,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   for (auto& it : m_pnode) {
     // clear ref histos from memory
+    if (it.ref_org) delete it.ref_org;
     if (it.ref_clone) delete it.ref_clone;
   }
   m_pnode.clear();
@@ -120,8 +121,8 @@ void DQMHistReferenceModule::loadReferenceHistos()
                 n.refhist_name = "ref/" + dirname + "/" + histname;
                 h->SetName((n.refhist_name).c_str());
                 h->SetDirectory(0);
-                n.ref_clone = h;
-                B2INFO("ref add " << h);
+                n.ref_org = h;
+                n.ref_clone = nullptr;
                 n.canvas = nullptr;
               } else {
                 delete h;
@@ -158,14 +159,7 @@ void DQMHistReferenceModule::event()
   B2INFO("[" << mbstr << "] before ref loop");
 
   for (auto& it : m_pnode) {
-
-    TH1* hist2 = it.ref_clone;
-    if (!hist2) continue;
-
-    hist2->SetLineStyle(2);
-    hist2->SetLineColor(3);
-    hist2->SetFillColor(0);
-    hist2->SetStats(kFALSE);
+    if (!it.ref_org) continue; // No reference, continue
 
     TH1* hist1 = findHistInCanvas(it.orghist_name, &(it.canvas));
 
@@ -177,15 +171,17 @@ void DQMHistReferenceModule::event()
       continue;
     }
     if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.orghist_name);
-      canvas->cd();
-      hist2->Draw();
-      canvas->Modified();
-      canvas->Update();
+      B2DEBUG(1, "Canvas is without histogram -> no display " << it.orghist_name);
+      // Display something could be confusing for shifters
+//       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.orghist_name);
+//       canvas->cd();
+//       hist2->Draw();
+//       canvas->Modified();
+//       canvas->Update();
       continue;
     }
 
-    if (hist1->Integral() == 0) continue;
+    if (hist1->Integral() == 0) continue; // empty histogram -> continue
 
     /* consider adding coloring option....
       double data = 0;
@@ -194,16 +190,27 @@ void DQMHistReferenceModule::event()
       }
     */
 
-    if (abs(hist2->Integral()) > 0) {
-      hist2->Scale(hist1->Integral() / hist2->Integral());
+    if (abs(it.ref_org->Integral()) > 0) { // onyl if we have entries in reference
+      if (it.ref_clone) {
+        it.ref_clone->Reset();
+        it.ref_clone->Add(it.ref_org);
+      } else {
+        it.ref_clone = (TH1*) it.ref_org->Clone();
+        it.ref_clone->SetLineStyle(2);
+        it.ref_clone->SetLineColor(3);
+        it.ref_clone->SetFillColor(0);
+        it.ref_clone->SetStats(kFALSE);
+      }
+      it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
     }
 
     canvas->cd();
 
-    if (hist2->GetMaximum() > hist1->GetMaximum())
-      hist1->SetMaximum(1.1 * hist2->GetMaximum());
+    // Adjust the y scale to cover the reference
+    if (it.ref_clone->GetMaximum() > hist1->GetMaximum())
+      hist1->SetMaximum(1.1 * it.ref_clone->GetMaximum());
 
-    hist2->Draw("hist,same");
+    it.ref_clone->Draw("hist,same");
 
     canvas->Modified();
     canvas->Update();
@@ -227,6 +234,7 @@ void DQMHistReferenceModule::terminate()
   B2DEBUG(1, "DQMHistReference: terminate called");
   for (auto& it : m_pnode) {
     // clear ref histos from memory
+    if (it.ref_org) delete it.ref_org;
     if (it.ref_clone) delete it.ref_clone;
   }
   m_pnode.clear();

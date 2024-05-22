@@ -90,6 +90,11 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   TH1* chDigit = findHist("ARICH/chDigit");
   TH1* hapdDigit = findHist("ARICH/hapdDigit");
 
+  double bin0 = bits->GetBinContent(0);
+  double bin1 = bits->GetBinContent(1);
+  double bin2 = bits->GetBinContent(2);
+  double bin3 = bits->GetBinContent(3);
+
   if (chHit == NULL) {m_monObj->setVariable("comment", "No arich histograms in file");  B2INFO("Histogram named chHit is not found.");  return;}
   if (chHit->GetEntries() == 0) {m_monObj->setVariable("comment", "No arich hits in histograms"); B2INFO("No arich hits in histograms.");  return;}
 
@@ -365,6 +370,10 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   // set values of monitoring variables (if variable already exists this will change its value, otherwise it will insert new variable)
   // with error (also asymmetric error can be used as m_monObj->setVariable(name, value, upError, downError))
   m_monObj->setVariable("hitsPerEvent", hitsPerEvent ? hitsPerEvent->GetMean() : 0, hitsPerEvent ? hitsPerEvent->GetMeanError() : -1);
+
+  m_monObj->setVariable("signalHitsPerEvent", bits ? (bin1 + bin2 - bin0 - bin3) / nevt : 0);
+  m_monObj->setVariable("backgroundHitsPerEvent", bits ? (bin0 + bin3) / nevt : 0);
+
   // without error
   m_monObj->setVariable("bitsMean", bits ? bits->GetMean() : 0);
   B2DEBUG(20, "DQMHistAnalysisARICHMonObj : endRun called");

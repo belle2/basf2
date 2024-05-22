@@ -50,7 +50,7 @@ namespace Belle2 {
     ///   1: hit reassignment between mother and daughter tracks
     ///   2: track flipping
     ///   3: option 1 and 2
-    void setFitterMode(int fitterMode);
+    void setFitterMode(unsigned char fitterMode);
 
     /// Fit kink with cardinal hypothesis and store it if the fit was successful.
     /// If the corresponding flag is set, try to reassign hits between mother and daughter tracks.
@@ -79,7 +79,8 @@ namespace Belle2 {
      * @param recoTrack RecoTrack
      * @param vertexPos vertex
      * @param direction direction (positive for daughter track, negative for mother track)
-     * @return
+     * @return for daughter track, returns negative index of the hit, closest to the vertex
+     * for mother track, returns positive index of the hit, closest to the vertex, counting from the end of the track
      */
     int findHitPositionForReassignment(RecoTrack* recoTrack,
                                        ROOT::Math::XYZVector& vertexPos,
@@ -114,7 +115,7 @@ namespace Belle2 {
      * @param momentumSeed momentum seed (with the initial sign)
      * @param positionSeed position seed
      * @param timeSeed time seed
-     * @return
+     * @return pointer to a new copied flipped and refitted daughter RecoTrack
      */
     RecoTrack* copyRecoTrackForFlipAndRefit(RecoTrack* recoTrack,
                                             ROOT::Math::XYZVector& momentumSeed,
@@ -129,7 +130,7 @@ namespace Belle2 {
      * @param timeSeed time seed
      * @param block block the hits in the first stereo layer and all before
      * @param useAnotherFitter use ordinary KalmanFilter
-     * @return
+     * @return pointer to a new copied refitted daughter RecoTrack
      */
     RecoTrack* copyRecoTrackForRefit(RecoTrack* recoTrack,
                                      ROOT::Math::XYZVector& momentumSeed,
@@ -141,7 +142,8 @@ namespace Belle2 {
      * check if the refit of filter 6 daughter tracks improves the distance between mother and daughter
      * @param recoTrackDaughterRefit refitted daughter recoTrack
      * @param motherPosLast position of the mother state at last hit
-     * @return
+     * @return true if the refit of filter 6 daughter tracks improves the distance between mother and daughter;
+     * false otherwise
      */
     bool isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, TVector3& motherPosLast);
 
@@ -155,7 +157,9 @@ namespace Belle2 {
      * @param vertexPos store a result of this function. The fitted vertex position is stored.
      * @param distance store a distance between tracks at the decay vertex
      * @param vertexPosSeed a seed of the vertex position
-     * @return
+     * @return true if the vertex fit succeed;
+     * false if one of the tracks is not fitted (should not happen), kFit finishes with error,
+     * chi^2 of the fit is too large, or extrapolation of one of the tracks to decay vertex fails
      */
     bool vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
                                  unsigned int& reassignHitStatus,
@@ -169,18 +173,19 @@ namespace Belle2 {
      * @param stDaughter daughter MeasuredStateOnPlane
      * @param vertexPosition vertex tracks to be extrapolated to
      * @param reassignHitStatus bits to be set in case of vertex being inside one of the tracks
-     * @return
+     * @return false if can not extrapolate one of the tracks to vertex;
+     * true otherwise
      */
     bool extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, genfit::MeasuredStateOnPlane& stDaughter,
                              const ROOT::Math::XYZVector& vertexPosition, unsigned int& reassignHitStatus);
 
     /**
-     * Build TrackFitResult of Kink Track.
+     * Build TrackFitResult of the Kink Track.
      * @param recoTrack input RecoTrack
      * @param msop MeasuredStateOnPlane extrapolated to the vertex (mother and daughter) or IP (mother)
      * @param Bz z component of the magnetic field at vertex or IP
      * @param trackHypothesis track hypothesis
-     * @return
+     * @return pointer to created TrackFitResult of the Kink Track
      */
     TrackFitResult* buildTrackFitResult(RecoTrack* recoTrack, const genfit::MeasuredStateOnPlane& msop,
                                         const double Bz, const Const::ParticleType trackHypothesis);
@@ -200,7 +205,7 @@ namespace Belle2 {
     double m_vertexChi2Cut;  ///< Chi2 cut.
 
     // fitter working mode variables
-    int m_kinkFitterMode;  ///< fitter mode written in bits
+    unsigned char m_kinkFitterMode;  ///< fitter mode written in bits
     ///< first: reassign hits; second: flip and refit filter 2 tracks; third: combine tracks and fit them to find clones
     bool m_kinkFitterModeHitsReassignment; ///< fitter mode first bit
     bool m_kinkFitterModeFlipAndRefit; ///< fitter mode second bit

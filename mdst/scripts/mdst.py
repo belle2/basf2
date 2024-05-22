@@ -18,6 +18,7 @@ MDST_OBJECTS = (
     'EventLevelTrackingInfo',
     'EventLevelTriggerTimeInfo',
     'KLMClusters',
+    'Kinks',
     'KlIds',
     'PIDLikelihoods',
     'SoftwareTriggerResult',
@@ -109,6 +110,11 @@ def add_mdst_dump(path, print_untested=False):
             ], {
             "getRelationsWith": ["MCParticles"],
         }),
+        DataStorePrinter("Kinks", [
+            "getMotherTrack", "getDaughterTrack", "getMotherTrackFitResultStart",
+            "getMotherTrackFitResultEnd", "getDaughterTrackFitResult",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ", "getFilterFlag"
+            ]),
         DataStorePrinter("TrackFitResult", [
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",

@@ -28,25 +28,32 @@ namespace Belle2 {
     /** Constructor without arguments; needed for I/O. */
     Kink();
 
-    /** Constructor taking two pairs of tracks and trackFitResults, the fitted vertex coordinates, and filter flag. */
+    /**
+     * Constructor taking two pairs of tracks and trackFitResults, the fitted vertex coordinates, and filter flag.
+     * @param trackPairMother a pair of mother particle Belle2::Track and a pair of Belle2::TrackFitResult,
+     * the first Belle2::TrackFitResult is determined at IP, and the second one is determined at the kink vertex
+     * @param trackPairDaughter a pair of daughter particle Belle2::Track and Belle2::TrackFitResult determined
+     * at the kink vertex
+     * @param vertexX X coordinate of kink vertex
+     * @param vertexY Y coordinate of kink vertex
+     * @param vertexZ Z coordinate of kink vertex
+     * @param filterFlag a flag containing the following information:
+     * the first digit is a flag of filter used to preselect the kink candidate (from 1 to 6);
+     * the second and third digits form a flag of the two tracks combined fit result (from 0 to 19);
+     * the thousands show the number of reassigned hits between tracks (from 0 to 32);
+     * the sign shows from which track the hits were taken (- from daughter, + from mother).
+     * The content of the filterFlag may change, please, refer for the details to kinkFitter.cc
+     */
     Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >&
          trackPairMother,
          const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairDaughter,
-         double vertexX, double vertexY, double vertexZ, short filterFlag);
+         Double32_t vertexX, Double32_t vertexY, Double32_t vertexZ, short filterFlag);
 
     /** Get mother Track.*/
-    Track* getMotherTrack() const
-    {
-      StoreArray<Track> tracks;
-      return tracks[m_trackIndexMother];
-    }
+    Track* getMotherTrack() const;
 
     /** Get daughter Track.*/
-    Track* getDaughterTrack() const
-    {
-      StoreArray<Track> tracks;
-      return tracks[m_trackIndexDaughter];
-    }
+    Track* getDaughterTrack() const;
 
     /** Get indices of the mother Track. */
     short getMotherTrackIndex() const
@@ -61,25 +68,13 @@ namespace Belle2 {
     }
 
     /** Get the TrackFitResult of mother at the starting point.*/
-    TrackFitResult* getMotherTrackFitResultStart() const
-    {
-      StoreArray <TrackFitResult> trackFitResults;
-      return trackFitResults[m_trackFitResultIndexMotherStart];
-    }
+    TrackFitResult* getMotherTrackFitResultStart() const;
 
     /** Get the TrackFitResult of mother at the ending point.*/
-    TrackFitResult* getMotherTrackFitResultEnd() const
-    {
-      StoreArray <TrackFitResult> trackFitResults;
-      return trackFitResults[m_trackFitResultIndexMotherEnd];
-    }
+    TrackFitResult* getMotherTrackFitResultEnd() const;
 
     /** Get the TrackFitResult of daughter.*/
-    TrackFitResult* getDaughterTrackFitResult() const
-    {
-      StoreArray <TrackFitResult> trackFitResults;
-      return trackFitResults[m_trackFitResultIndexDaughter];
-    }
+    TrackFitResult* getDaughterTrackFitResult() const;
 
     /** Get index of the TrackFitResult of mother at the starting point. */
     short getTrackFitResultIndexMotherStart() const
@@ -99,30 +94,14 @@ namespace Belle2 {
       return m_trackFitResultIndexDaughter;
     }
 
-    /** Get the hypothesis under which the mother particle was created.
-     * This does not use the MC information, but just checks the particle type in the corresponding TrackFitResults.*/
-    Const::ParticleType getMotherHypothesis() const
-    {
-      StoreArray<TrackFitResult> trackFitResults{};
-      return trackFitResults[m_trackFitResultIndexMotherEnd]->getParticleType();
-    }
-
-    /** Get the hypothesis under which the daughter particle was created.
-     * This does not use the MC information, but just checks the particle type in the corresponding TrackFitResults.*/
-    Const::ParticleType getDaughterHypothesis() const
-    {
-      StoreArray<TrackFitResult> trackFitResults{};
-      return trackFitResults[m_trackFitResultIndexDaughter]->getParticleType();
-    }
-
     /** Get the X coordinate of the fitted vertex. */
-    double getFittedVertexX() const { return m_fittedVertexX; }
+    Double32_t getFittedVertexX() const { return m_fittedVertexX; }
 
     /** Get the Y coordinate of the fitted vertex. */
-    double getFittedVertexY() const { return m_fittedVertexY; }
+    Double32_t getFittedVertexY() const { return m_fittedVertexY; }
 
     /** Get the Z coordinate of the fitted vertex. */
-    double getFittedVertexZ() const { return m_fittedVertexZ; }
+    Double32_t getFittedVertexZ() const { return m_fittedVertexZ; }
 
     /** Get the fitted vertex position. */
     ROOT::Math::XYZVector getFittedVertexPosition() const

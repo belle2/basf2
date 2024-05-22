@@ -69,7 +69,7 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
            genfit::FieldManager::getInstance()->isInitialized());
 }
 
-void kinkFitter::setFitterMode(int fitterMode)
+void kinkFitter::setFitterMode(unsigned char fitterMode)
 {
   if (not(0 <= fitterMode && fitterMode <= 7)) {
     B2FATAL("Invalid fitter mode!");

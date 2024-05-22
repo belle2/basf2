@@ -1,7 +1,6 @@
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * External Contributor: J. Tanaka                                        *
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
@@ -105,12 +104,6 @@ namespace Belle2 {
      * @return error code (zero if success)
      */
     enum kinkVertexFitterKFitError::ECode doFit(void);
-
-    /**
-     * Update mother particle.
-     * @param[in] mother Mother particle.
-     */
-    //enum kinkVertexFitterKFitError::ECode updateMother(Particle* mother);
 
   private:
 

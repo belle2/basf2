@@ -17,8 +17,6 @@
 
 #include <tracking/dbobjects/KinkFinderParameters.h>
 
-#include <TVector3.h>
-
 #include <string>
 #include <memory>
 
@@ -66,32 +64,36 @@ namespace Belle2 {
 
     double m_vertexChi2Cut;  ///< Cut on Chi2 for the Kink vertex.
     double m_vertexDistanceCut;  ///< Cut on distance between tracks at the Kink vertex.
-    int    m_kinkFitterMode;  ///< Fitter mode.
+    unsigned char m_kinkFitterMode;  ///< Fitter mode.
     double m_precutRho;  ///< Preselection cut on transverse shift from the outer CDC wall for the track ending points.
     double m_precutZ;  ///< Preselection cut on z shift from the outer CDC wall for the track ending points.
     double m_precutDistance;  ///< Preselection cut on distance between ending points of two tracks.
     double m_precutDistance2D;  ///< Preselection cut on 2D distance between ending points of two tracks (for bad z cases).
+    double m_precutDistance_2;  ///< m_precutDistance squared for convenience
+    double m_precutDistance2D_2;  ///< m_precutDistance2D squared for convenience
 
     /**
-     * Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall.
-     * @param pos point in space (TVector3 for MeasuredStateOnPlane)
-     * @param shiftR transverse shift from the outer CDC wall
-     * @param shiftZ z shift from the outer CDC wall
-     * @return
+     * Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall,
+     * passed as parameters of the module.
+     * @param pos point in space
+     * @return true if the pos is inside the required volume of the CDC;
+     * false if outside
      */
-    bool ifInCDC(TVector3& pos, double shiftR, double shiftZ);
+    bool ifInCDC(ROOT::Math::XYZVector& pos);
 
     /**
      * Check if the track can be a mother candidate based on some simple selections.
      * @param recoTrack track of the candidate
-     * @return
+     * @return true if recoTrack pass the criteria;
+     * false otherwise
      */
     bool preFilterMotherTracks(RecoTrack const* const recoTrack);
 
     /**
      * Check if the track can be a daughter candidate based on some simple selections.
      * @param recoTrack track of the candidate
-     * @return
+     * @return true if recoTrack pass the criteria;
+     * false otherwise
      */
     bool preFilterDaughterTracks(RecoTrack const* const recoTrack);
 

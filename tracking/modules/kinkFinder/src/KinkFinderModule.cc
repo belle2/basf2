@@ -9,12 +9,10 @@
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-#include <framework/core/ModuleParam.templateDetails.h> // needed for complicated parameter types
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
 #include <genfit/MeasuredStateOnPlane.h>
-
 
 using namespace Belle2;
 
@@ -75,6 +73,8 @@ void KinkFinderModule::initialize()
   m_precutZ = m_kinkFinderParameters->getPrecutZ();
   m_precutDistance = m_kinkFinderParameters->getPrecutDistance();
   m_precutDistance2D = m_kinkFinderParameters->getPrecutDistance2D();
+  m_precutDistance_2 = m_precutDistance * m_precutDistance;
+  m_precutDistance2D_2 = m_precutDistance2D * m_precutDistance2D;
   // final cuts used in kinkFitter to decide if the kink candidate should be stored
   m_vertexChi2Cut = m_kinkFinderParameters->getVertexChi2Cut();
   m_vertexDistanceCut = m_kinkFinderParameters->getVertexDistanceCut();
@@ -121,7 +121,7 @@ void KinkFinderModule::event()
       for (auto itTrackMother = tracksMother.begin(); itTrackMother != tracksMother.end(); ++itTrackMother) {
         for (auto itTrackMother2 = std::next(itTrackMother); itTrackMother2 != tracksMother.end(); ++itTrackMother2) {
 
-          short filterFlag = isTrackPairSelected(*itTrackMother, *itTrackMother2);
+          const short filterFlag = isTrackPairSelected(*itTrackMother, *itTrackMother2);
           if (filterFlag != 2) continue;
           B2DEBUG(29, "Found kink candidate among mothers with filterFlag " << filterFlag);
           foundAmongMothersFlag = true;
@@ -145,7 +145,7 @@ void KinkFinderModule::event()
   // Pair up each mother track with each daughter track.
   for (auto& trackMother : tracksMother) {
     for (auto& trackDaughter : tracksDaughter) {
-      short filterFlag = isTrackPairSelected(trackMother, trackDaughter);
+      const short filterFlag = isTrackPairSelected(trackMother, trackDaughter);
       if (!filterFlag) continue;
       B2DEBUG(29, "Found kink candidate with filterFlag " << filterFlag);
       fitAndStore(trackMother, trackDaughter, filterFlag);
@@ -164,68 +164,76 @@ void KinkFinderModule::terminate()
 }
 
 /// Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall.
-bool KinkFinderModule::ifInCDC(TVector3& pos, double shiftR = 0, double shiftZ = 0)
+bool KinkFinderModule::ifInCDC(ROOT::Math::XYZVector& pos)
 {
 
-  double z = (pos.Z() > 0) ? (pos.Z() + shiftZ) : (pos.Z() - shiftZ);
-  double r = pos.Perp() + shiftR;
+  double z = (pos.Z() > 0) ? (pos.Z() + m_precutZ) : (pos.Z() - m_precutZ);
+  double r = sqrt(pos.Perp2()) + m_precutRho;
 
-  bool r_part = (r < 112) && (r > 17 + shiftR);
+  bool r_part = (r < 112) && (r > 17 + m_precutRho);
   bool z_part;
   if (z > 0) {
     z_part = (r > (tan(17. / 180 * M_PI) * z)) && (r > (4.97 * z - 670));
   } else {
     z_part = (r > (-tan(30. / 180 * M_PI) * z)) && (r > (-4.2 * z - 192.5));
   }
-  return ((r_part && z_part) || (pos.Perp() < 17 && pos.Perp() > 15));
+  return ((r_part && z_part) || (pos.Perp2() < 289 && pos.Perp2() > 225));
 }
 
 /// Check if the track can be a mother candidate based on some simple selections.
+/// They are conservative enough to reduces the combinatorial background and save as much signal events as possible.
 bool KinkFinderModule::preFilterMotherTracks(RecoTrack const* const recoTrack)
 {
   // track is fitted
   if (!recoTrack->hasTrackFitStatus() || !recoTrack->wasFitSuccessful()) return false;
 
   // last point of the track is > m_precutRho and > m_precutZ from outer walls of CDC
-  TVector3 posLast = recoTrack->getMeasuredStateOnPlaneFromLastHit().getPos();
-  if (!ifInCDC(posLast, m_precutRho, m_precutZ) && recoTrack->getNumberOfCDCHits()) return false;
+  ROOT::Math::XYZVector posLast(recoTrack->getMeasuredStateOnPlaneFromLastHit().getPos());
+  if (!ifInCDC(posLast) && recoTrack->getNumberOfCDCHits()) return false;
 
   // track is not curled back to IP
+  // The first layer of CDC has 16.8 cm radius; thus, the track which ends inside 17 cm cylinder is either short or curler.
+  // The requirement of >= 10 hits ensures that it is a curler (obtained empirically)
   int nCDCHits = recoTrack->getNumberOfCDCHits();
-  if (nCDCHits >= 10 && posLast.Perp() < 17) return false;
+  if (nCDCHits >= 10 && posLast.Perp2() < 289) return false;
 
   // first point of the track is inside inner layers of VXD
-  TVector3 posFirst = recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
-  if (posFirst.Perp() > 12) return false;
+  // The mother candidate should start inside VXD. The radius of outer two SVD layers are 10.4 and 13.5 cm,
+  // so we set 12 cm cut (between these layers).
+  ROOT::Math::XYZVector posFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
+  if (posFirst.Perp2() > 144) return false;
 
   // impact parameter in rphi < 1 cm
-  TVector3 momFirst = recoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom();
-  Helix helixIP(ROOT::Math::XYZVector(posFirst),
-                ROOT::Math::XYZVector(momFirst),
-                static_cast<short>(recoTrack->getTrackFitStatus()->getCharge()),
-                1.5);
+  // conservative enough assuming possible bad resolution of mother track due to daughter hits assignment
+  ROOT::Math::XYZVector momFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
+  const double Bz = BFieldManager::getFieldInTesla({momFirst.X(),
+                                                    momFirst.Y(),
+                                                    momFirst.Z()}).Z();
+  Helix helixIP(posFirst, momFirst, static_cast<short>(recoTrack->getTrackFitStatus()->getCharge()), Bz);
   if (fabs(helixIP.getD0()) > 1) return false;
   return true;
 }
 
 /// Check if the track can be a daughter candidate based on some simple selections.
+/// They are conservative enough to reduces the combinatorial background and save as much signal events as possible.
 bool KinkFinderModule::preFilterDaughterTracks(RecoTrack const* const recoTrack)
 {
   // track is fitted
   if (!recoTrack->hasTrackFitStatus() || !recoTrack->wasFitSuccessful()) return false;
 
   // first and last points of the track are > m_precutRho and > m_precutZ from outer walls of CDC (against back splashes)
-  TVector3 posLast = recoTrack->getMeasuredStateOnPlaneFromLastHit().getPos();
-  TVector3 posFirst = recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
-  if (!ifInCDC(posLast, m_precutRho, m_precutZ) && !ifInCDC(posFirst, m_precutRho, m_precutZ)) return false;
+  ROOT::Math::XYZVector posLast(recoTrack->getMeasuredStateOnPlaneFromLastHit().getPos());
+  ROOT::Math::XYZVector posFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
+  if (!ifInCDC(posLast) && !ifInCDC(posFirst)) return false;
 
   // first point of the track is outside inner layers of VXD, or impact parameter in rphi > 1 cm
-  TVector3 momFirst = recoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom();
-  Helix helixIP(ROOT::Math::XYZVector(posFirst),
-                ROOT::Math::XYZVector(momFirst),
-                static_cast<short>(recoTrack->getTrackFitStatus()->getCharge()),
-                1.5);
-  if (posFirst.Perp() < 12 && fabs(helixIP.getD0()) < 1) return false;
+  // inverse criteria for mother
+  ROOT::Math::XYZVector momFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
+  const double Bz = BFieldManager::getFieldInTesla({momFirst.X(),
+                                                    momFirst.Y(),
+                                                    momFirst.Z()}).Z();
+  Helix helixIP(posFirst, momFirst, static_cast<short>(recoTrack->getTrackFitStatus()->getCharge()), Bz);
+  if (posFirst.Perp2() < 144 && fabs(helixIP.getD0()) < 1) return false;
   return true;
 
 }
@@ -233,6 +241,8 @@ bool KinkFinderModule::preFilterDaughterTracks(RecoTrack const* const recoTrack)
 /// Track pair preselection based on distance between two tracks with six different options.
 short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Track* daughterTrack)
 {
+  constexpr double M_PI_over_6 = M_PI / 6.;
+  constexpr double cos_M_PI_over_6 = cos(M_PI_over_6);
 
   // get recoTracks and check that they are not the same
   RecoTrack const* const motherRecoTrack = motherTrack->getRelated<RecoTrack>(m_arrayNameRecoTrack);
@@ -240,63 +250,67 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
   if (motherRecoTrack == daughterRecoTrack) return 0;
 
   // Filter 1 check.
-  TVector3 motherPosLast = motherRecoTrack->getMeasuredStateOnPlaneFromLastHit().getPos();
-  TVector3 daughterPosFirst = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
-  if ((daughterPosFirst - motherPosLast).Mag() < m_precutDistance) return 1;
+  ROOT::Math::XYZVector motherPosLast(motherRecoTrack->getMeasuredStateOnPlaneFromLastHit().getPos());
+  ROOT::Math::XYZVector daughterPosFirst(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
+  if ((daughterPosFirst - motherPosLast).Mag2() < m_precutDistance_2) return 1;
 
   // Filter 2 check.
-  TVector3 daughterPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromLastHit().getPos();
-  if ((daughterPosLast - motherPosLast).Mag() < m_precutDistance) return 2;
+  ROOT::Math::XYZVector daughterPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromLastHit().getPos());
+  if ((daughterPosLast - motherPosLast).Mag2() < m_precutDistance_2) return 2;
 
   // Filter 3 check. Here the same direction of daughter and mother is checked to exclude intersection of tracks
   // from different hemispheres.
-  if (daughterPosLast.Angle(motherPosLast) < M_PI / 6 || daughterPosFirst.Angle(motherPosLast) < M_PI / 6 ||
-      daughterPosLast.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6
-      || daughterPosFirst.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6) {
+  // Here and further M_PI_over_6 criteria was obtained empirically: it conservatively reduces the combinatorial
+  // background while saving as much signal events as possible.
+  if (daughterPosLast.Unit().Dot(motherPosLast.Unit()) > cos_M_PI_over_6 ||
+      daughterPosFirst.Unit().Dot(motherPosLast.Unit()) > cos_M_PI_over_6 ||
+      fabs(daughterPosLast.Phi() - motherPosLast.Phi()) < M_PI_over_6 ||
+      fabs(daughterPosFirst.Phi() - motherPosLast.Phi()) < M_PI_over_6) {
 
-    TVector3 daughterPosClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
-    TVector3 daughterMomClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom();
+    ROOT::Math::XYZVector daughterPosClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
+    ROOT::Math::XYZVector daughterMomClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
     const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
                                                       daughterPosClosestToMotherPosLast.Y(),
                                                       daughterPosClosestToMotherPosLast.Z()}).Z();
     // daughter Helix with move to mother last point
-    Helix daughterHelixClosestToMotherPosLast(ROOT::Math::XYZVector(daughterPosClosestToMotherPosLast),
-                                              ROOT::Math::XYZVector(daughterMomClosestToMotherPosLast),
+    Helix daughterHelixClosestToMotherPosLast(daughterPosClosestToMotherPosLast,
+                                              daughterMomClosestToMotherPosLast,
                                               static_cast<short>(daughterRecoTrack->getTrackFitStatus()->getCharge()),
                                               Bz);
-    daughterHelixClosestToMotherPosLast.passiveMoveBy(ROOT::Math::XYZVector(motherPosLast));
+    daughterHelixClosestToMotherPosLast.passiveMoveBy(motherPosLast);
 
-    if (sqrt(daughterHelixClosestToMotherPosLast.getD0() * daughterHelixClosestToMotherPosLast.getD0() +
-             daughterHelixClosestToMotherPosLast.getZ0() * daughterHelixClosestToMotherPosLast.getZ0()) <
-        m_precutDistance)
+    if ((daughterHelixClosestToMotherPosLast.getD0() * daughterHelixClosestToMotherPosLast.getD0() +
+         daughterHelixClosestToMotherPosLast.getZ0() * daughterHelixClosestToMotherPosLast.getZ0()) <
+        m_precutDistance_2)
       return 3;
   }
 
   // Filter 4 check.
-  if ((daughterPosFirst.XYvector() - motherPosLast.XYvector()).Mod() < m_precutDistance2D)
+  if ((daughterPosFirst - motherPosLast).Perp2() < m_precutDistance2D_2)
     return 4;
 
   // Filter 5 check.
-  if ((daughterPosLast.XYvector() - motherPosLast.XYvector()).Mod() < m_precutDistance2D)
+  if ((daughterPosLast - motherPosLast).Perp2() < m_precutDistance2D_2)
     return 5;
 
   // Filter 6 check. sHere the same direction of daughter and mother is checked to exclude intersection of tracks
   // from different hemispheres.
-  if (daughterPosLast.Angle(motherPosLast) < M_PI / 6 || daughterPosFirst.Angle(motherPosLast) < M_PI / 6 ||
-      daughterPosLast.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6
-      || daughterPosFirst.XYvector().DeltaPhi(motherPosLast.XYvector()) < M_PI / 6) {
+  if (daughterPosLast.Unit().Dot(motherPosLast.Unit()) > cos_M_PI_over_6 ||
+      daughterPosFirst.Unit().Dot(motherPosLast.Unit()) > cos_M_PI_over_6 ||
+      fabs(daughterPosLast.Phi() - motherPosLast.Phi()) < M_PI_over_6 ||
+      fabs(daughterPosFirst.Phi() - motherPosLast.Phi()) < M_PI_over_6) {
 
-    TVector3 daughterPosClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos();
-    TVector3 daughterMomClosestToMotherPosLast = daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom();
+    ROOT::Math::XYZVector daughterPosClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
+    ROOT::Math::XYZVector daughterMomClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
     const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
                                                       daughterPosClosestToMotherPosLast.Y(),
                                                       daughterPosClosestToMotherPosLast.Z()}).Z();
     // daughter Helix with move to mother last point
-    Helix daughterHelixClosestToMotherPosLast(ROOT::Math::XYZVector(daughterPosClosestToMotherPosLast),
-                                              ROOT::Math::XYZVector(daughterMomClosestToMotherPosLast),
+    Helix daughterHelixClosestToMotherPosLast(daughterPosClosestToMotherPosLast,
+                                              daughterMomClosestToMotherPosLast,
                                               static_cast<short>(daughterRecoTrack->getTrackFitStatus()->getCharge()),
                                               Bz);
-    daughterHelixClosestToMotherPosLast.passiveMoveBy(ROOT::Math::XYZVector(motherPosLast));
+    daughterHelixClosestToMotherPosLast.passiveMoveBy(motherPosLast);
 
     if (fabs(daughterHelixClosestToMotherPosLast.getD0()) < m_precutDistance2D)
       return 6;

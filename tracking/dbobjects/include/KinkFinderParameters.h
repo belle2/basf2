@@ -27,7 +27,7 @@ namespace Belle2 {
      * @param cutFirst the cut for the 1st MVA
      * @param cutSecond the cut for the 2nd MVA
      */
-    void setParameters(const int kinkFitterMode, const double vertexChi2Cut, const double vertexDistanceCut,
+    void setParameters(const unsigned char kinkFitterMode, const double vertexChi2Cut, const double vertexDistanceCut,
                        const double precutRho, const double precutZ, const double precutDistance, const double precutDistance2D)
     {
       m_kinkFitterMode = kinkFitterMode;
@@ -41,7 +41,7 @@ namespace Belle2 {
 
 
     /** get kinkFitter working mode */
-    int getKinkFitterMode() const
+    unsigned char getKinkFitterMode() const
     {
       return m_kinkFitterMode;
     }
@@ -88,7 +88,7 @@ namespace Belle2 {
      * second bit: flip tracks with close end points (1 is On, 0 is Off)
      * third bit: fit both tracks as one (1 is On, 0 is Off)
      * fitter mode is written in decimal representation */
-    int m_kinkFitterMode = 7;
+    unsigned char m_kinkFitterMode = 0b111;
     /** Cut on Chi2 for the Kink vertex. */
     double m_vertexChi2Cut = 10000.;
     /** Cut on distance between tracks at the Kink vertex. */

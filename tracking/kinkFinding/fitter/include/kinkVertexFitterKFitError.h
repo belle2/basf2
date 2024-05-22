@@ -1,7 +1,6 @@
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
- * External Contributor: J. Tanaka                                        *
  *                                                                        *
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
@@ -65,22 +64,44 @@ namespace Belle2 {
      */
     static void displayError(const char* file, const int line, const char* func, const enum ECode code)
     {
-      const char* str_error =
-        code == kNoError                ? "No error" :
-        code == kNotFittedYet           ? "Not fitted yet" :
-        code == kOutOfRange             ? "Out of range" :
-        code == kBadTrackSize           ? "Bad track count" :
-        code == kBadMatrixSize          ? "Bad matrix size" :
-        code == kBadCorrelationSize     ? "Bad correlation size" :
-        code == kBadInitialCHIsq        ? "Bad initial chisq" :
-        code == kDivisionByZero         ? "Division by zero" :
-        code == kCannotGetMatrixInverse ? "Cannot calculate matrix inverse" :
-        code == kCannotGetARCSIN        ? "Cannot calculate arcsin" :
-        "Unknown error";
 
-      char buf[1024];
-      sprintf(buf, "%s:%d:%s(): %s", file, line, func, str_error);
-      B2WARNING(buf);
+      std::string str_error = "";
+      switch (code) {
+        case kNoError:
+          str_error = "No error";
+          break;
+        case kNotFittedYet:
+          str_error = "Not fitted yet";
+          break;
+        case kOutOfRange:
+          str_error = "Out of range";
+          break;
+        case kBadTrackSize:
+          str_error = "Bad track count";
+          break;
+        case kBadMatrixSize:
+          str_error = "Bad matrix size";
+          break;
+        case kBadCorrelationSize:
+          str_error = "Bad correlation size";
+          break;
+        case kBadInitialCHIsq:
+          str_error = "Bad initial chisq";
+          break;
+        case kDivisionByZero:
+          str_error = "Division by zero";
+          break;
+        case kCannotGetMatrixInverse:
+          str_error = "Cannot calculate matrix inverse";
+          break;
+        case kCannotGetARCSIN:
+          str_error = "Cannot calculate arcsin";
+          break;
+        default:
+          str_error = "Unknown error";
+      }
+
+      B2WARNING(std::string(file) << ":" << line << ":" << std::string(func) << "(): " << str_error);
     }
   };
 

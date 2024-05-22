@@ -8,7 +8,6 @@
 #include <mdst/dataobjects/Kink.h>
 
 using namespace Belle2;
-using namespace std;
 
 Kink::Kink():
   m_trackIndexMother(-1),
@@ -25,7 +24,7 @@ Kink::Kink():
 Kink::Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >&
            trackPairMother,
            const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairDaughter,
-           double vertexX, double vertexY, double vertexZ, short filterFlag) :
+           Double32_t vertexX, Double32_t vertexY, Double32_t vertexZ, short filterFlag) :
   m_trackIndexMother(trackPairMother.first->getArrayIndex()),
   m_trackIndexDaughter(trackPairDaughter.first->getArrayIndex()),
   m_trackFitResultIndexMotherStart(trackPairMother.second.first->getArrayIndex()),
@@ -36,3 +35,33 @@ Kink::Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFi
   m_fittedVertexZ(vertexZ),
   m_filterFlag(filterFlag)
 {}
+
+Track* Kink::getMotherTrack() const
+{
+  StoreArray<Track> tracks;
+  return tracks[m_trackIndexMother];
+}
+
+Track* Kink::getDaughterTrack() const
+{
+  StoreArray<Track> tracks;
+  return tracks[m_trackIndexDaughter];
+}
+
+TrackFitResult* Kink::getMotherTrackFitResultStart() const
+{
+  StoreArray <TrackFitResult> trackFitResults;
+  return trackFitResults[m_trackFitResultIndexMotherStart];
+}
+
+TrackFitResult* Kink::getMotherTrackFitResultEnd() const
+{
+  StoreArray <TrackFitResult> trackFitResults;
+  return trackFitResults[m_trackFitResultIndexMotherEnd];
+}
+
+TrackFitResult* Kink::getDaughterTrackFitResult() const
+{
+  StoreArray <TrackFitResult> trackFitResults;
+  return trackFitResults[m_trackFitResultIndexDaughter];
+}

@@ -77,7 +77,7 @@ namespace Belle2 {
     } REFNODE;
 
     /** Struct for reference histogram  */
-    std::vector<REFNODE*> m_pnode;
+    std::vector<REFNODE> m_pnode;
 
     /** Reference Histogram Root file name */
     std::string m_referenceFile;

@@ -203,25 +203,22 @@ void DQMHistReferenceModule::event()
         it.ref_clone->SetStats(kFALSE);
       }
       it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
+
+      // Adjust the y scale to cover the reference
+      if (it.ref_clone->GetMaximum() > hist1->GetMaximum())
+        hist1->SetMaximum(1.1 * it.ref_clone->GetMaximum());
+
+      canvas->cd();
+      it.ref_clone->Draw("hist,same");
+
+      canvas->Modified();
+      canvas->Update();
     }
-
-    canvas->cd();
-
-    // Adjust the y scale to cover the reference
-    if (it.ref_clone->GetMaximum() > hist1->GetMaximum())
-      hist1->SetMaximum(1.1 * it.ref_clone->GetMaximum());
-
-    it.ref_clone->Draw("hist,same");
-
-    canvas->Modified();
-    canvas->Update();
-
   }
+
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after ref loop");
-
-
 }
 
 void DQMHistReferenceModule::endRun()

@@ -195,7 +195,8 @@ void DQMHistReferenceModule::event()
         it.ref_clone->Reset();
         it.ref_clone->Add(it.ref_org);
       } else {
-        it.ref_clone = (TH1*) it.ref_org->Clone();
+        it.ref_clone = new TH1F(); // we want it a float for better scaling
+        it.ref_org->Copy(*it.ref_clone);
         it.ref_clone->SetLineStyle(2);
         it.ref_clone->SetLineColor(3);
         it.ref_clone->SetFillColor(0);

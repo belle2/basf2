@@ -121,7 +121,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
                 n.refhist_name = "ref/" + dirname + "/" + histname;
                 h->SetName((n.refhist_name).c_str());
                 h->SetDirectory(0);
-                n.ref_org = h;
+                n.ref_org = h; // transfer ownership!
                 n.ref_clone = nullptr;
                 n.canvas = nullptr;
               } else {

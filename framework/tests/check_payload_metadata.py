@@ -73,6 +73,8 @@ def testing_path(use_testing_payloads=False, remove_default_globaltag=False, tes
 
 
 if __name__ == '__main__':
+    if not os.path.isdir('/cvmfs'):
+        b2tu.skip_test("Will not execute test since /cvmfs/ is not mounted")
 
     with b2tu.clean_working_directory():
 

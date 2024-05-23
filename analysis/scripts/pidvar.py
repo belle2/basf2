@@ -25,6 +25,8 @@ _weight_cols = ['data_MC_ratio',
                 'data_MC_uncertainty_sys_up'
                 ]
 
+_correction_types = ['PID', 'FEI']
+
 
 @dataclass
 class ReweighterParticle:
@@ -33,6 +35,9 @@ class ReweighterParticle:
     """
     #: Prefix of the particle in the ntuple
     prefix: str
+
+    #: Type of the particle (PID or FEI)
+    type: str
 
     #: Merged table of the weights
     merged_table: pd.DataFrame
@@ -51,6 +56,9 @@ class ReweighterParticle:
 
     #: Random seed for systematics
     sys_seed: int = None
+
+    #: Covariance matrix corresponds to the total uncertainty
+    cov: np.ndarray = None
 
     #: When true assume systematics are 100% correlated
     syscorr: bool = True
@@ -92,28 +100,43 @@ class ReweighterParticle:
         means = self.merged_table["data_MC_ratio"].values
         #: Names of the varied weight columns
         self.column_names = [f"{self.weight_name}_{i}" for i in range(n_variations)]
-        if rho_sys is None:
-            if self.syscorr:
-                rho_sys = np.ones((len(means), len(means)))
-            else:
-                rho_sys = np.identity(len(means))
-        if rho_stat is None:
-            rho_stat = np.identity(len(means))
-        zeros = np.zeros(len(means))
-        sys_cov = np.matmul(
-            np.matmul(np.diag(self.merged_table['sys_error']), rho_sys), np.diag(self.merged_table['sys_error'])
-        )
-        stat_cov = np.matmul(
-            np.matmul(np.diag(self.merged_table['stat_error']), rho_stat), np.diag(self.merged_table['stat_error'])
-        )
-        np.random.seed(self.sys_seed)
-        sys = np.random.multivariate_normal(zeros, sys_cov, n_variations)
-        np.random.seed(None)
-        stat = np.random.multivariate_normal(zeros, stat_cov, n_variations)
-        weights = sys + stat + means
+        cov = self.get_covariance(n_variations, rho_sys, rho_stat)
+        weights = cov + means
+        print(weights.shape)
         self.merged_table[self.weight_name] = self.merged_table["data_MC_ratio"]
         self.merged_table[self.column_names] = weights.T
         self.column_names.insert(0, self.weight_name)
+
+    def get_covariance(self,
+                       n_variations: int,
+                       rho_sys: np.ndarray = None,
+                       rho_stat: np.ndarray = None) -> np.ndarray:
+        """
+        Returns the covariance matrix of the weights
+        """
+        len_means = len(self.merged_table["data_MC_ratio"])
+        zeros = np.zeros(len_means)
+        if self.cov is None:
+            if rho_sys is None:
+                if self.syscorr:
+                    rho_sys = np.ones((len_means, len_means))
+                else:
+                    rho_sys = np.identity(len_means)
+            if rho_stat is None:
+                rho_stat = np.identity(len_means)
+            sys_cov = np.matmul(
+                np.matmul(np.diag(self.merged_table['sys_error']), rho_sys), np.diag(self.merged_table['sys_error'])
+            )
+            stat_cov = np.matmul(
+                np.matmul(np.diag(self.merged_table['stat_error']), rho_stat), np.diag(self.merged_table['stat_error'])
+            )
+            np.random.seed(self.sys_seed)
+            sys = np.random.multivariate_normal(zeros, sys_cov, n_variations)
+            np.random.seed(None)
+            stat = np.random.multivariate_normal(zeros, stat_cov, n_variations)
+            return sys + stat
+        errors = np.random.multivariate_normal(zeros, self.cov, n_variations)
+        return errors
 
     def __str__(self) -> str:
         """
@@ -121,7 +144,7 @@ class ReweighterParticle:
         """
         separator = '------------------'
         title = 'ReweighterParticle'
-        prefix_str = f'Prefix: {self.prefix}'
+        prefix_str = f'Type: {self.type} Prefix: {self.prefix}'
         columns = _weight_cols
         merged_table_str = f'Merged table:\n{self.merged_table[columns].describe()}'
         pdg_binning_str = 'PDG binning:\n'
@@ -174,6 +197,12 @@ class Reweighter:
             bin_dict[var_name] = np.array(sorted(set(bin_dict[var_name])))
         return bin_dict
 
+    def get_fei_binning(self, weight_df) -> dict:
+        """
+        Returns the irregular binning of the dataframe.
+        """
+        return {'dec_mode': weight_df.loc[weight_df['dec_mode'].str.startswith('mode'), 'dec_mode'].value_counts().index.to_list()}
+
     def get_ntuple_variables(self,
                              ntuple_df: pd.DataFrame,
                              particle: ReweighterParticle) -> None:
@@ -192,9 +221,9 @@ class Reweighter:
                 raise ValueError(f'Variable {var} is not in the ntuple! Required variables are {ntuple_variables}')
         return ntuple_variables
 
-    def merge_weight_tables(self,
-                            weights_dict: dict,
-                            pdg_pid_variable_dict: dict) -> pd.DataFrame:
+    def merge_pid_weight_tables(self,
+                                weights_dict: dict,
+                                pdg_pid_variable_dict: dict) -> pd.DataFrame:
         """
         Merges the efficiency and fake rate weight tables.
         Parameters:
@@ -230,9 +259,9 @@ class Reweighter:
             weight_dfs.append(selected_weights)
         return pd.concat(weight_dfs, ignore_index=True)
 
-    def add_weight_columns(self,
-                           ntuple_df: pd.DataFrame,
-                           particle: ReweighterParticle) -> None:
+    def add_pid_weight_columns(self,
+                               ntuple_df: pd.DataFrame,
+                               particle: ReweighterParticle) -> None:
         """
         Adds a weight and uncertainty columns to the dataframe.
         Parameters:
@@ -279,7 +308,6 @@ class Reweighter:
         Adds weight variations according to the total uncertainty for easier error propagation.
         Parameters:
             prefix (str): Prefix for the new columns.
-            ntuple_df (pd.DataFrame): Dataframe containing the analysis ntuple.
             weights_dict (pd.DataFrame): Dataframe containing the efficiency weights.
             pdg_pid_variable_dict (dict): Dictionary containing the PID variables and thresholds.
             variable_aliases (dict): Dictionary containing variable aliases.
@@ -297,10 +325,11 @@ class Reweighter:
             raise ValueError(f"Particle with prefix '{prefix}' already exists!")
         if variable_aliases is None:
             variable_aliases = {}
-        merged_weight_df = self.merge_weight_tables(weights_dict, pdg_pid_variable_dict)
+        merged_weight_df = self.merge_pid_weight_tables(weights_dict, pdg_pid_variable_dict)
         pdg_binning = {(reco_pdg, mc_pdg): self.get_binning(merged_weight_df.query(f'PDG == {reco_pdg} and mcPDG == {mc_pdg}'))
                        for reco_pdg, mc_pdg in merged_weight_df[['PDG', 'mcPDG']].value_counts().index.to_list()}
         particle = ReweighterParticle(prefix,
+                                      type='PID',
                                       merged_table=merged_weight_df,
                                       pdg_binning=pdg_binning,
                                       variable_aliases=variable_aliases,
@@ -318,6 +347,92 @@ class Reweighter:
             return None
         return cands[0]
 
+    def convert_fei_table(self, table: pd.DataFrame, threshold: float):
+        """
+        Checks if the tables are provided in a legacy format and converts them to the standard format.
+        """
+        result = None
+        if 'cal' in table.columns:
+            result = pd.DataFrame(index=table.index)
+            result['data_MC_ratio'] = table['cal']
+            str_to_pdg = {'B+': 521, 'B0': 511}
+            result['PDG'] = table['Btag'].apply(lambda x: str_to_pdg.get(x))
+            # Assume these are only efficiency tables
+            result['mcPDG'] = result['PDG']
+            result['threshold'] = table['sig_prob_threshold']
+            result['dec_mode'] = table['dec_mode']
+            result['data_MC_uncertainty_stat_dn'] = table['cal_stat_error']
+            result['data_MC_uncertainty_stat_up'] = table['cal_stat_error']
+            result['data_MC_uncertainty_sys_dn'] = table['cal_sys_error']
+            result['data_MC_uncertainty_sys_up'] = table['cal_sys_error']
+        else:
+            result = table
+        result = result.query(f'threshold == {threshold}')
+        if len(result) == 0:
+            raise ValueError(f'No weights found for threshold {threshold}!')
+        return result
+
+    def add_fei_particle(self, prefix: str,
+                         table: pd.DataFrame,
+                         threshold: float,
+                         cov: np.ndarray = None,
+                         variable_aliases: dict = None,
+                         ) -> None:
+        """
+        Adds weight variations according to the total uncertainty for easier error propagation.
+        Parameters:
+            prefix (str): Prefix for the new columns.
+            weights_dict (pd.DataFrame): Dataframe containing the efficiency weights.
+            variable_aliases (dict): Dictionary containing variable aliases.
+        """
+        # Empty prefix means no prefix
+        if prefix is None:
+            prefix = ''
+        if prefix and not prefix.endswith('_'):
+            prefix += '_'
+        if self.get_particle(prefix):
+            raise ValueError(f"Particle with prefix '{prefix}' already exists!")
+        if variable_aliases is None:
+            variable_aliases = {}
+        if table is None or len(table) == 0:
+            raise ValueError('No weights provided!')
+        converted_table = self.convert_fei_table(table, threshold)
+        pdg_binning = {(reco_pdg, mc_pdg): self.get_fei_binning(converted_table.query(f'PDG == {reco_pdg} and mcPDG == {mc_pdg}'))
+                       for reco_pdg, mc_pdg in converted_table[['PDG', 'mcPDG']].value_counts().index.to_list()}
+        particle = ReweighterParticle(prefix,
+                                      type='FEI',
+                                      merged_table=converted_table,
+                                      pdg_binning=pdg_binning,
+                                      variable_aliases=variable_aliases,
+                                      weight_name=self.weight_name,
+                                      cov=cov)
+        self.particles += [particle]
+
+    def add_fei_weight_columns(self, ntuple_df: pd.DataFrame, particle: ReweighterParticle):
+        """
+        Adds weight columns according to the FEI calibration tables
+        """
+        rest_str = 'Rest'
+        # Apply a weight value from the weight table to the ntuple, based on the binning
+        binning_df = pd.DataFrame(index=ntuple_df.index)
+        # Take absolute value of mcPDG for binning because we have charge already
+        binning_df['PDG'] = ntuple_df[f'{particle.get_varname("PDG")}'].abs()
+        binning_df['mode'] = ntuple_df[particle.get_varname("mode")].astype(int)
+        binning_df['dec_mode'] = np.nan
+        for pdg, mc_pdg in particle.pdg_binning:
+            binning_df.loc[binning_df['PDG'] == pdg, 'dec_mode'] = particle.merged_table.query(
+                f'PDG == {pdg} and dec_mode == "{rest_str}"')['dec_mode'].values[0]
+            for mode in particle.pdg_binning[(pdg, mc_pdg)]['dec_mode']:
+                binning_df.loc[(binning_df['PDG'] == pdg) & (binning_df['mode'] == int(mode[4:])), 'dec_mode'] = mode
+        # merge the weight table with the ntuple on binning columns
+        weight_cols = _weight_cols
+        if particle.column_names:
+            weight_cols = particle.column_names
+        binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', 'dec_mode']],
+                                      on=['PDG', 'dec_mode'], how='left')
+        for col in weight_cols:
+            ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
+
     def reweight(self,
                  df: pd.DataFrame,
                  generate_variations: bool = True):
@@ -328,8 +443,13 @@ class Reweighter:
             generate_variations (bool): When true generate weight variations.
         """
         for particle in self.particles:
-            print(f'Required variables: {self.get_ntuple_variables(df, particle)}')
+            if particle.type not in _correction_types:
+                raise ValueError(f'Particle type {particle.type} not supported!')
             if generate_variations:
                 particle.generate_variations(n_variations=self.n_variations)
-            self.add_weight_columns(df, particle)
+            if particle.type == 'PID':
+                print(f'Required variables: {self.get_ntuple_variables(df, particle)}')
+                self.add_pid_weight_columns(df, particle)
+            elif particle.type == 'FEI':
+                self.add_fei_weight_columns(df, particle)
         return df

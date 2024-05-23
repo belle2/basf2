@@ -147,15 +147,20 @@ namespace Belle2 {
   class VXDGeoSensorPlacement {
   public:
     /** Constructor */
-    VXDGeoSensorPlacement(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
+    VXDGeoSensorPlacement(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0, double shift = 0, double shiftR = 0,
                           bool flipU = false, bool flipV = false, bool flipW = false):
-      m_sensorID(sensorID), m_sensorTypeID(sensorTypeID), m_z(z), m_flipU(flipU), m_flipV(flipV), m_flipW(flipW) {}
+      m_sensorID(sensorID), m_sensorTypeID(sensorTypeID), m_z(z), m_shift(shift), m_shiftR(shiftR), m_flipU(flipU), m_flipV(flipV),
+      m_flipW(flipW) {}
     /** get the sensor id inside the ladder */
     int getSensorID() const { return m_sensorID; }
     /** get the sensor type id, internal id only needed for construction */
     const std::string& getSensorTypeID() const { return m_sensorTypeID; }
     /** get the z position of the sensor */
     double getZ() const { return m_z; }
+    /** get the shift of the sensor in rphi tangential direction */
+    double getShift() const { return m_shift; }
+    /** get the shift of the sensor in radial direction */
+    double getShiftR() const { return m_shiftR; }
     /** check whether or not the sensor should be flipped around the U coordinate */
     bool getFlipU() const { return m_flipU; }
     /** check whether or not the sensor should be flipped around the V coordinate */
@@ -169,6 +174,10 @@ namespace Belle2 {
     std::string m_sensorTypeID;
     /** global z position of the center of the sensor */
     double m_z;
+    /** shift of the sensor relative to ladder in rphi tangential direction */
+    double m_shift;
+    /** shift of the sensor relative to ladder in radial direction */
+    double m_shiftR;
     /** flip sensor along u? */
     bool m_flipU;
     /** flip sensor along v? */

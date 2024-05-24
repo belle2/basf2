@@ -72,13 +72,13 @@ class TestPIDVar(unittest.TestCase):
         """Tests merging of PID tables"""
         reweighter = Reweighter()
         thresholds = {11: ('electronID', 0.8)}
-        merged_table = reweighter.merge_weight_tables(self.tables, thresholds)
+        merged_table = reweighter.merge_pid_weight_tables(self.tables, thresholds)
         self.assertEqual(len(merged_table), 154)
         self.assertIn('PDG', merged_table.columns)
         self.assertIn('mcPDG', merged_table.columns)
         with self.assertRaises(ValueError):
             wrong_thresholds = {11: ('electronID', 0.9)}
-            reweighter.merge_weight_tables(self.tables, wrong_thresholds)
+            reweighter.merge_pid_weight_tables(self.tables, wrong_thresholds)
 
     def test_binning(self):
         """Tests binning of PID tables"""

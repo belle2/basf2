@@ -1680,7 +1680,6 @@ def reconstructMissingKlongDecayExpert(decayString,
     pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
     pcalc.param('cut', "")
-    pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
     path.add_module(pcalc)

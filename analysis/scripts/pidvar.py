@@ -26,6 +26,7 @@ _weight_cols = ['data_MC_ratio',
                 ]
 
 _correction_types = ['PID', 'FEI']
+_fei_mode_col = 'dec_mode'
 
 
 @dataclass
@@ -82,7 +83,10 @@ class ReweighterParticle:
         """
         Returns the list of variables that are used for the PDG codes
         """
-        pdg_vars = ['PDG', 'mcPDG']
+        pdg_vars = ['PDG']
+        #: Add the mcPDG code requirement for PID particle
+        if self.type == "PID":
+            pdg_vars += ['mcPDG']
         return [f'{self.get_varname(var)}' for var in pdg_vars]
 
     def generate_variations(self,
@@ -102,7 +106,6 @@ class ReweighterParticle:
         self.column_names = [f"{self.weight_name}_{i}" for i in range(n_variations)]
         cov = self.get_covariance(n_variations, rho_sys, rho_stat)
         weights = cov + means
-        print(weights.shape)
         self.merged_table[self.weight_name] = self.merged_table["data_MC_ratio"]
         self.merged_table[self.column_names] = weights.T
         self.column_names.insert(0, self.weight_name)
@@ -201,7 +204,8 @@ class Reweighter:
         """
         Returns the irregular binning of the dataframe.
         """
-        return {'dec_mode': weight_df.loc[weight_df['dec_mode'].str.startswith('mode'), 'dec_mode'].value_counts().index.to_list()}
+        return {_fei_mode_col: weight_df.loc[weight_df[_fei_mode_col].str.startswith('mode'),
+                                             _fei_mode_col].value_counts().index.to_list()}
 
     def get_ntuple_variables(self,
                              ntuple_df: pd.DataFrame,
@@ -355,12 +359,12 @@ class Reweighter:
         if 'cal' in table.columns:
             result = pd.DataFrame(index=table.index)
             result['data_MC_ratio'] = table['cal']
-            str_to_pdg = {'B+': 521, 'B0': 511}
+            str_to_pdg = {'B+': 521, 'B-': 521, 'B0': 511}
             result['PDG'] = table['Btag'].apply(lambda x: str_to_pdg.get(x))
             # Assume these are only efficiency tables
             result['mcPDG'] = result['PDG']
             result['threshold'] = table['sig_prob_threshold']
-            result['dec_mode'] = table['dec_mode']
+            result[_fei_mode_col] = table[_fei_mode_col]
             result['data_MC_uncertainty_stat_dn'] = table['cal_stat_error']
             result['data_MC_uncertainty_stat_up'] = table['cal_stat_error']
             result['data_MC_uncertainty_sys_dn'] = table['cal_sys_error']
@@ -417,19 +421,21 @@ class Reweighter:
         binning_df = pd.DataFrame(index=ntuple_df.index)
         # Take absolute value of mcPDG for binning because we have charge already
         binning_df['PDG'] = ntuple_df[f'{particle.get_varname("PDG")}'].abs()
-        binning_df['mode'] = ntuple_df[particle.get_varname("mode")].astype(int)
-        binning_df['dec_mode'] = np.nan
-        for pdg, mc_pdg in particle.pdg_binning:
-            binning_df.loc[binning_df['PDG'] == pdg, 'dec_mode'] = particle.merged_table.query(
-                f'PDG == {pdg} and dec_mode == "{rest_str}"')['dec_mode'].values[0]
-            for mode in particle.pdg_binning[(pdg, mc_pdg)]['dec_mode']:
-                binning_df.loc[(binning_df['PDG'] == pdg) & (binning_df['mode'] == int(mode[4:])), 'dec_mode'] = mode
+        # Copy the mode ID from the ntuple
+        binning_df['num_mode'] = ntuple_df[particle.get_varname(_fei_mode_col)].astype(int)
+        # Default value in case if reco PDG is not a B-meson PDG
+        binning_df[_fei_mode_col] = np.nan
+        for reco_pdg, mc_pdg in particle.pdg_binning:
+            binning_df.loc[binning_df['PDG'] == reco_pdg, _fei_mode_col] = particle.merged_table.query(
+                f'PDG == {reco_pdg} and {_fei_mode_col} == "{rest_str}"')[_fei_mode_col].values[0]
+            for mode in particle.pdg_binning[(reco_pdg, mc_pdg)][_fei_mode_col]:
+                binning_df.loc[(binning_df['PDG'] == reco_pdg) & (binning_df['num_mode'] == int(mode[4:])), _fei_mode_col] = mode
         # merge the weight table with the ntuple on binning columns
         weight_cols = _weight_cols
         if particle.column_names:
             weight_cols = particle.column_names
-        binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', 'dec_mode']],
-                                      on=['PDG', 'dec_mode'], how='left')
+        binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', _fei_mode_col]],
+                                      on=['PDG', _fei_mode_col], how='left')
         for col in weight_cols:
             ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
 
@@ -445,10 +451,10 @@ class Reweighter:
         for particle in self.particles:
             if particle.type not in _correction_types:
                 raise ValueError(f'Particle type {particle.type} not supported!')
+            print(f'Required variables: {self.get_ntuple_variables(df, particle)}')
             if generate_variations:
                 particle.generate_variations(n_variations=self.n_variations)
             if particle.type == 'PID':
-                print(f'Required variables: {self.get_ntuple_variables(df, particle)}')
                 self.add_pid_weight_columns(df, particle)
             elif particle.type == 'FEI':
                 self.add_fei_weight_columns(df, particle)

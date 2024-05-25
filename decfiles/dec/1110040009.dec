@@ -1,4 +1,13 @@
+# EventType: 1110040009 
 # Descriptor: B0 -> [K*0 -> K+ pi-] [rho0 -> pi+ pi-] 
+# NickName: B0_Kstar0rho0_Kpi_pipi
+# Documentation:  
+# Tested: Yes
+# PhysicsWG: BHadronic
+# Responsible: Renu
+# Email: renu2@andrew.cmu.edu
+# Cuts: None
+# Date: 20240525
 
 Alias rho0sig rho0
 
@@ -11,7 +20,7 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B0sig
-1.0   rho0sig  K*0sig                    PHOTOS SVV_HELAMP  0.64 0.0 0.42 0.0 0.64 0.0; 
+1.0   rho0sig  K*0sig      PHOTOS SVV_HELAMP  0.64 0.0 0.42 0.0 0.64 0.0; 
 Enddecay
 
 CDecay anti-B0sig
@@ -25,6 +34,5 @@ Decay K*0sig
 Enddecay
 
 CDecay anti-K*0sig
-
 
 End

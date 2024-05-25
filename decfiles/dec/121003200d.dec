@@ -1,6 +1,13 @@
-# Descriptor: B+ -> [K*+] [rho0 -> pi+ pi-] 
-#                    |   
-#                    -> K+ pi0
+# EventType: 121003200d
+# Descriptor: B+ -> [K*+ -> K+ pi0] [rho0 -> pi+ pi-] 
+# NickName: B+_Kstar+rho0_Kpi_pipi
+# Documentation:  
+# Tested: Yes
+# PhysicsWG: BHadronic
+# Responsible: Renu
+# Email: renu2@andrew.cmu.edu
+# Cuts: None
+# Date: 20240525
 
 Alias rho0sig rho0
 

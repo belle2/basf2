@@ -172,7 +172,7 @@ namespace Belle2 {
           const auto& chargedStable = pdfConstructor->getHypothesis();
           auto LL = pdfConstructor->getLogL();
           auto expBkgPhotons = pdfConstructor->getExpectedBkgPhotons();
-          topLL->set(chargedStable, LL.numPhotons, LL.logL, LL.expPhotons, expBkgPhotons);
+          topLL->set(chargedStable, LL.numPhotons, LL.logL, LL.expPhotons, expBkgPhotons, LL.effectiveSignalYield);
 
           nfotSet.insert(LL.numPhotons);
           nbkgSet.insert(expBkgPhotons);
@@ -185,6 +185,9 @@ namespace Belle2 {
           }
         }
         topLL->setFlag(1);
+        topLL->setModuleID(trk->getModuleID());
+        const auto& emi = trk->getEmissionPoint();
+        topLL->setXZ(emi.position.X(), emi.position.Z());
 
         if (nfotSet.size() > 1) B2ERROR("Bug in TOP::PDFConstructor: number of photons differs between particle hypotheses");
         if (nbkgSet.size() > 1) B2ERROR("Bug in TOP::PDFConstructor: estimated background differs between particle hypotheses");

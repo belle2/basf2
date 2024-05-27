@@ -354,7 +354,8 @@ void DQMHistAnalysisKLM2Module::endRun()
 void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
 {
   effHist->Reset();
-  TH1* effClone = (TH1*)effHist->Clone(); //will be useful for delta plots
+  std::unique_ptr<TH1> effClone(static_cast<TH1*>
+                                (effHist->Clone()));  //used unique pointer to free the memory & will be useful for delta plots
   canvas->cd();
   if (denominator != nullptr && numerator != nullptr) {
     effHist->Divide(numerator, denominator, 1, 1, "B");

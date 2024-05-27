@@ -356,7 +356,7 @@ namespace Belle2 {
           sensorPlacement = G4TranslateX3D(m_ladder.getSlantedRadius() - m_ladder.getRadius()) * G4RotateY3D(
                               -m_ladder.getSlantedAngle()) * sensorPlacement;
         }
-        sensorPlacement = G4Translate3D(0.0, 0.0, p.getZ()) * sensorPlacement;
+        sensorPlacement = G4Translate3D(p.getShiftR(), p.getShift(), p.getZ()) * sensorPlacement;
         // Remember the placement of sensor into ladder
         VXD::GeoCache::getInstance().addSensorPlacement(ladder, sensorID, sensorPlacement * activePosition * reflection);
         sensorPlacement = ladderPlacement * sensorPlacement;
@@ -455,6 +455,8 @@ namespace Belle2 {
                              sensorInfo.getSensorID(),
                              sensorInfo.getSensorTypeID(),
                              sensorInfo.getZ() / Unit::mm,
+                             sensorInfo.getShift() / Unit::mm,
+                             sensorInfo.getShiftR() / Unit::mm,
                              sensorInfo.getFlipU(),
                              sensorInfo.getFlipV(),
                              sensorInfo.getFlipW()
@@ -603,15 +605,31 @@ namespace Belle2 {
                                             );
 
       for (const GearDir& sensorInfo : paramsLadder.getNodes("Sensor")) {
+        if (GearDir(sensorInfo, "shift/")) {
 
-        geoparameters.getLadderMap()[layer].addSensor(VXDGeoSensorPlacementPar(
-                                                        sensorInfo.getInt("@id"),
-                                                        sensorInfo.getString("@type"),
-                                                        sensorInfo.getLength("."),
-                                                        sensorInfo.getBool("@flipU", false),
-                                                        sensorInfo.getBool("@flipV", false),
-                                                        sensorInfo.getBool("@flipW", false)
-                                                      ));
+          geoparameters.getLadderMap()[layer].addSensor(VXDGeoSensorPlacementPar(
+                                                          sensorInfo.getInt("@id"),
+                                                          sensorInfo.getString("@type"),
+                                                          sensorInfo.getLength("z"),
+                                                          sensorInfo.getLength("shift"),
+                                                          sensorInfo.getLength("shiftR"),
+                                                          sensorInfo.getBool("@flipU", false),
+                                                          sensorInfo.getBool("@flipV", false),
+                                                          sensorInfo.getBool("@flipW", false)
+                                                        ));
+        } else {
+
+          geoparameters.getLadderMap()[layer].addSensor(VXDGeoSensorPlacementPar(
+                                                          sensorInfo.getInt("@id"),
+                                                          sensorInfo.getString("@type"),
+                                                          sensorInfo.getLength("."),
+                                                          0.0,
+                                                          0.0,
+                                                          sensorInfo.getBool("@flipU", false),
+                                                          sensorInfo.getBool("@flipV", false),
+                                                          sensorInfo.getBool("@flipW", false)
+                                                        ));
+        }
       }
     }
 

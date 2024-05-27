@@ -64,13 +64,19 @@ class ReweighterParticle:
     #: When true assume systematics are 100% correlated
     syscorr: bool = True
 
+    #: Coverage of the user ntuple
+    coverage: float = None
+
     def get_varname(self, varname: str) -> str:
         """
         Returns the variable name with the prefix and use alias if defined.
         """
+        name = varname
         if self.variable_aliases and varname in self.variable_aliases:
-            return f'{self.prefix}{self.variable_aliases[varname]}'
-        return f'{self.prefix}{varname}'
+            name = self.variable_aliases[varname]
+        if name.startswith(self.prefix):
+            return name
+        return f'{self.prefix}{name}'
 
     def get_binning_variables(self) -> list:
         """
@@ -298,6 +304,7 @@ class Reweighter:
             weight_cols = particle.column_names
         binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
+        particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
         for col in weight_cols:
             ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
 
@@ -436,6 +443,7 @@ class Reweighter:
             weight_cols = particle.column_names
         binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', _fei_mode_col]],
                                       on=['PDG', _fei_mode_col], how='left')
+        particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
         for col in weight_cols:
             ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
 
@@ -459,3 +467,11 @@ class Reweighter:
             elif particle.type == 'FEI':
                 self.add_fei_weight_columns(df, particle)
         return df
+
+    def print_coverage(self):
+        """
+        Prints the coverage of each particle.
+        """
+        print('Coverage:')
+        for particle in self.particles:
+            print(f'{particle.type} {particle.prefix.strip("_")}: {particle.coverage*100 :0.1f}%')

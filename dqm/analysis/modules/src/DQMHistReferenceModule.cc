@@ -195,8 +195,16 @@ void DQMHistReferenceModule::event()
         it.ref_clone->Reset();
         it.ref_clone->Add(it.ref_org);
       } else {
-        it.ref_clone = new TH1F(); // we want it a float for better scaling
-        it.ref_org->Copy(*it.ref_clone);
+        if (hist1->InheritsFrom("TH1C") or hist1->InheritsFrom("TH1S")) {
+          it.ref_clone = new TH1F(); // we want it a float for better scaling
+          it.ref_org->Copy(*it.ref_clone);
+        } else if (hist1->InheritsFrom("TH1I") or hist1->InheritsFrom("TH1L")) {
+          it.ref_clone = new TH1D(); // we want it a float for better scaling
+          it.ref_org->Copy(*it.ref_clone);
+        } else {
+          // keep TProfile, TH1F or TH1D
+          it.ref_clone = (TH1*)it.ref_org->Clone();
+        }
         it.ref_clone->SetLineStyle(2);
         it.ref_clone->SetLineColor(3);
         it.ref_clone->SetFillColor(0);

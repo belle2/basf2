@@ -137,7 +137,7 @@ namespace Belle2 {
 
 inline void Belle2::PIDNeuralNetwork::check()
 {
-  for (const auto name : getInputBasf2Names()) {
+  for (const auto& name : getInputBasf2Names()) {
     if (!Variable::Manager::Instance().getVariable(name))
       B2FATAL("PID neural network needs input '" + name + "', but this input is not available!");
   }

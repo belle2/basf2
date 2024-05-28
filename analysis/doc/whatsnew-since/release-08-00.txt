@@ -1,3 +1,12 @@
+Changes in the analysis package in light-2405-quaxo
+---------------------------------------------------
+
+Variables
++++++++++
+* Added the variables `beamBackgroundReuseRate` and `beamBackgroundEvents` for studying the Beam Background Overlay events
+  used for producing MC samples.
+
+
 Changes in the analysis package in light-2403-persian
 -----------------------------------------------------
 
@@ -24,8 +33,6 @@ Variables
   (closest to 180 degrees) particle in the provided particle list.  
 * Added the variable `ancestorBIndex`, which returns the array index of the B ancestor of the particle if a MC-match is found and the B exists,
   and -1 if not.
-* Added the variables `beamBackgroundReuseRate` and `beamBackgroundEvents` for studying the Beam Background Overlay events
-  used for producing MC samples.
 
 GraFEI
 ++++++

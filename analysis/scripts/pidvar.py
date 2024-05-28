@@ -11,7 +11,8 @@
 import pandas as pd
 import numpy as np
 from dataclasses import dataclass
-
+import matplotlib.pyplot as plt
+import pdg
 
 """
 A module that adds corrections to analysis dataframe.
@@ -66,6 +67,9 @@ class ReweighterParticle:
 
     #: Coverage of the user ntuple
     coverage: float = None
+
+    #: Values for the plots
+    plot_values: dict = None
 
     def get_varname(self, varname: str) -> str:
         """
@@ -157,9 +161,54 @@ class ReweighterParticle:
         columns = _weight_cols
         merged_table_str = f'Merged table:\n{self.merged_table[columns].describe()}'
         pdg_binning_str = 'PDG binning:\n'
-        for pdg in self.pdg_binning:
-            pdg_binning_str += f'{pdg}: {self.pdg_binning[pdg]}\n'
+        for pdgs in self.pdg_binning:
+            pdg_binning_str += f'{pdgs}: {self.pdg_binning[pdgs]}\n'
         return '\n'.join([separator, title, prefix_str, merged_table_str, pdg_binning_str]) + separator
+
+    def plot_coverage(self, fig=None, axs=None):
+        """
+        Plots the coverage of the ntuple.
+        """
+        if self.plot_values is None:
+            return
+        vars = set(sum([list(d.keys()) for d in self.plot_values.values()], []))
+        if fig is None:
+            fig, axs = plt.subplots(len(self.plot_values), len(vars), figsize=(5*len(vars), 3*len(self.plot_values)), dpi=120)
+        axs = np.array(axs)
+        if len(axs.shape) < 1:
+            axs = axs.reshape(len(self.plot_values), len(vars))
+        bin_plt = {'linewidth': 3, 'linestyle': '--', 'color': '0.5'}
+        fig.suptitle(f'{self.type} particle {self.prefix.strip("_")}')
+        for (reco_pdg, mc_pdg), ax_row in zip(self.plot_values, axs):
+            for var, ax in zip(self.plot_values[(reco_pdg, mc_pdg)], ax_row):
+                # Plot values
+                widths = (self.plot_values[(reco_pdg, mc_pdg)][var][0][1:] - self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1])
+                centers = self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1] + widths/2
+                ax.bar(centers,
+                       self.plot_values[(reco_pdg, mc_pdg)][var][1],
+                       width=widths,
+                       label='Values',
+                       alpha=0.8)
+                # Plot binning
+                if self.type == 'PID':
+                    ymin = 0
+                    ymax = self.plot_values[(reco_pdg, mc_pdg)][var][1].max()*1.1
+                    ax.vlines(self.pdg_binning[(reco_pdg, mc_pdg)][var], ymin, ymax,
+                              label='Binning',
+                              **bin_plt)
+                elif self.type == 'FEI':
+                    values = np.array([int(val[4:]) for val in self.pdg_binning[(reco_pdg, mc_pdg)][var]])
+                    ax.bar(values+0.5,
+                           np.ones(len(values))*np.max(self.plot_values[(reco_pdg, mc_pdg)][var][1]),
+                           width=1,
+                           alpha=0.5,
+                           label='Binning',
+                           **bin_plt)
+                ax.set_title(f'True {pdg.to_name(mc_pdg)} to reco {pdg.to_name(reco_pdg)} coverage')
+                ax.set_xlabel(var)
+        axs[-1][-1].legend()
+        fig.tight_layout()
+        return fig, axs
 
 
 class Reweighter:
@@ -170,7 +219,11 @@ class Reweighter:
         weight_name (str): Name of the weight column.
     """
 
-    def __init__(self, n_variations: int = 100, weight_name: str = "Weight") -> None:
+    def __init__(self,
+                 n_variations: int = 100,
+                 weight_name: str = "Weight",
+                 evaluate_plots: bool = True,
+                 nbins: int = 50) -> None:
         """
         Initializes the Reweighter class.
         """
@@ -184,6 +237,10 @@ class Reweighter:
         self.weight_name = weight_name
         #: Flag to indicate if the weights have been generated
         self.weights_generated = False
+        #: Flag to indicate if the plots should be evaluated
+        self.evaluate_plots = evaluate_plots
+        #: Number of bins for the plots
+        self.nbins = nbins
 
     def get_bin_columns(self, weight_df) -> list:
         """
@@ -283,8 +340,12 @@ class Reweighter:
         # Take absolute value of mcPDG for binning because we have charge already
         binning_df['mcPDG'] = ntuple_df[f'{particle.get_varname("mcPDG")}'].abs()
         binning_df['PDG'] = ntuple_df[f'{particle.get_varname("PDG")}'].abs()
+        plot_values = {}
         for reco_pdg, mc_pdg in particle.pdg_binning:
             ntuple_cut = f'abs({particle.get_varname("mcPDG")}) == {mc_pdg} and abs({particle.get_varname("PDG")}) == {reco_pdg}'
+            if ntuple_df.query(ntuple_cut).empty:
+                continue
+            plot_values[(reco_pdg, mc_pdg)] = {}
             for var in particle.pdg_binning[(reco_pdg, mc_pdg)]:
                 labels = [(particle.pdg_binning[(reco_pdg, mc_pdg)][var][i-1], particle.pdg_binning[(reco_pdg, mc_pdg)][var][i])
                           for i in range(1, len(particle.pdg_binning[(reco_pdg, mc_pdg)][var]))]
@@ -298,6 +359,13 @@ class Reweighter:
                                f'{var}_max'] = binning_df.loc[(binning_df['mcPDG'] == mc_pdg) & (binning_df['PDG'] == reco_pdg),
                                                               var].str[1]
                 binning_df.drop(var, axis=1, inplace=True)
+                if self.evaluate_plots:
+                    values = ntuple_df.query(ntuple_cut)[f'{particle.get_varname(var)}']
+                    if len(values.unique()) < 2:
+                        print(f'Skip {var} for plotting!')
+                        continue
+                    x_range = np.linspace(values.min(), values.max(), self.nbins)
+                    plot_values[(reco_pdg, mc_pdg)][var] = x_range, np.histogram(values, bins=x_range, density=True)[0]
         # merge the weight table with the ntuple on binning columns
         weight_cols = _weight_cols
         if particle.column_names:
@@ -305,6 +373,7 @@ class Reweighter:
         binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
         particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
+        particle.plot_values = plot_values
         for col in weight_cols:
             ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
 
@@ -432,11 +501,18 @@ class Reweighter:
         binning_df['num_mode'] = ntuple_df[particle.get_varname(_fei_mode_col)].astype(int)
         # Default value in case if reco PDG is not a B-meson PDG
         binning_df[_fei_mode_col] = np.nan
+        plot_values = {}
         for reco_pdg, mc_pdg in particle.pdg_binning:
+            plot_values[(reco_pdg, mc_pdg)] = {}
             binning_df.loc[binning_df['PDG'] == reco_pdg, _fei_mode_col] = particle.merged_table.query(
                 f'PDG == {reco_pdg} and {_fei_mode_col} == "{rest_str}"')[_fei_mode_col].values[0]
             for mode in particle.pdg_binning[(reco_pdg, mc_pdg)][_fei_mode_col]:
                 binning_df.loc[(binning_df['PDG'] == reco_pdg) & (binning_df['num_mode'] == int(mode[4:])), _fei_mode_col] = mode
+            if self.evaluate_plots:
+                values = ntuple_df[f'{particle.get_varname(_fei_mode_col)}']
+                x_range = np.linspace(values.min(), values.max(), int(values.max())+1)
+                plot_values[(reco_pdg, mc_pdg)][_fei_mode_col] = x_range, np.histogram(values, bins=x_range, density=True)[0]
+
         # merge the weight table with the ntuple on binning columns
         weight_cols = _weight_cols
         if particle.column_names:
@@ -444,6 +520,7 @@ class Reweighter:
         binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', _fei_mode_col]],
                                       on=['PDG', _fei_mode_col], how='left')
         particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
+        particle.plot_values = plot_values
         for col in weight_cols:
             ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
 
@@ -475,3 +552,10 @@ class Reweighter:
         print('Coverage:')
         for particle in self.particles:
             print(f'{particle.type} {particle.prefix.strip("_")}: {particle.coverage*100 :0.1f}%')
+
+    def plot_coverage(self):
+        """
+        Plots the coverage of each particle.
+        """
+        for particle in self.particles:
+            particle.plot_coverage()

@@ -181,6 +181,29 @@ class ReweighterParticle:
         fig.suptitle(f'{self.type} particle {self.prefix.strip("_")}')
         for (reco_pdg, mc_pdg), ax_row in zip(self.plot_values, axs):
             for var, ax in zip(self.plot_values[(reco_pdg, mc_pdg)], ax_row):
+                ymin = 0
+                ymax = self.plot_values[(reco_pdg, mc_pdg)][var][1].max()*1.1
+                # Plot binning
+                if self.type == 'PID':
+                    ax.vlines(self.pdg_binning[(reco_pdg, mc_pdg)][var], ymin, ymax,
+                              label='Binning',
+                              alpha=0.8,
+                              **bin_plt)
+                elif self.type == 'FEI':
+                    values = np.array([int(val[4:]) for val in self.pdg_binning[(reco_pdg, mc_pdg)][var]])
+                    ax.bar(values+0.5,
+                           np.ones(len(values))*ymax,
+                           width=1,
+                           alpha=0.5,
+                           label='Binning',
+                           **bin_plt)
+                    rest = np.setdiff1d(self.plot_values[(reco_pdg, mc_pdg)][var][0], values)
+                    ax.bar(rest+0.5,
+                           np.ones(len(rest))*ymax,
+                           width=1,
+                           alpha=0.2,
+                           label='Rest category',
+                           **bin_plt)
                 # Plot values
                 widths = (self.plot_values[(reco_pdg, mc_pdg)][var][0][1:] - self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1])
                 centers = self.plot_values[(reco_pdg, mc_pdg)][var][0][:-1] + widths/2
@@ -189,21 +212,6 @@ class ReweighterParticle:
                        width=widths,
                        label='Values',
                        alpha=0.8)
-                # Plot binning
-                if self.type == 'PID':
-                    ymin = 0
-                    ymax = self.plot_values[(reco_pdg, mc_pdg)][var][1].max()*1.1
-                    ax.vlines(self.pdg_binning[(reco_pdg, mc_pdg)][var], ymin, ymax,
-                              label='Binning',
-                              **bin_plt)
-                elif self.type == 'FEI':
-                    values = np.array([int(val[4:]) for val in self.pdg_binning[(reco_pdg, mc_pdg)][var]])
-                    ax.bar(values+0.5,
-                           np.ones(len(values))*np.max(self.plot_values[(reco_pdg, mc_pdg)][var][1]),
-                           width=1,
-                           alpha=0.5,
-                           label='Binning',
-                           **bin_plt)
                 ax.set_title(f'True {pdg.to_name(mc_pdg)} to reco {pdg.to_name(reco_pdg)} coverage')
                 ax.set_xlabel(var)
         axs[-1][-1].legend()

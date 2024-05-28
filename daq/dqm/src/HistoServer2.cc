@@ -114,7 +114,7 @@ int HistoServer2::server()
               // no update to histograms ...
             } else {
               m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
-              updated = true; // histograms have been pdated
+              updated = true; // histograms have been updated
             }
           }
         }

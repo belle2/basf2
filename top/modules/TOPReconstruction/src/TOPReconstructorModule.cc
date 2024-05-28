@@ -49,7 +49,7 @@ namespace Belle2 {
     addParam("maxTime", m_maxTime,
              "upper limit for photon time [ns] (if minTime >= maxTime use the default from DB)", 0.0);
     addParam("PDGCode", m_PDGCode,
-             "PDG code of hypothesis to construct pulls (0 means: use MC truth)", 211);
+             "PDG code of hypothesis to construct pulls (0 means: use MC truth, -1: switched off)", -1);
     addParam("deltaRayModeling", m_deltaRayModeling,
              "include (True) or exclude (False) delta-ray modeling in log likelihood calculation", false);
     addParam("pTCut", m_pTCut,

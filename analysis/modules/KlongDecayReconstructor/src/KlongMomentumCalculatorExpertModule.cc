@@ -56,7 +56,6 @@ kinematic constraints of the initial state.
   // Add parameters
   addParam("decayString", m_decayString,
            "Input DecayDescriptor string.");
-  addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
   addParam("maximumNumberOfCandidates", m_maximumNumberOfCandidates,
            "Don't reconstruct channel if more candidates than given are produced.", -1);
   addParam("writeOut", m_writeOut,
@@ -68,9 +67,6 @@ kinematic constraints of the initial state.
 void KlongMomentumCalculatorExpertModule::initialize()
 {
   StoreArray<Particle>().isRequired();
-
-  // clear everything, initialize private members
-  m_generator = nullptr;
 
   // obtain the input and output particle lists from the decay string
   bool valid = m_decaydescriptor.init(m_decayString);
@@ -101,12 +97,10 @@ void KlongMomentumCalculatorExpertModule::initialize()
   if (!k_check)
     B2FATAL("This module is meant to reconstruct decays with a K_L0 in the final state. There is no K_L0 in this decay!");
 
-  m_generator = std::make_unique<ParticleGenerator>(m_decayString, m_cutParameter);
+  m_generator = std::make_unique<ParticleGenerator>(m_decayString);
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
   m_koutputList.registerInDataStore(m_klistName, flags);
-
-  m_cut = Variable::Cut::compile(m_cutParameter);
 }
 
 void KlongMomentumCalculatorExpertModule::event()
@@ -129,11 +123,6 @@ void KlongMomentumCalculatorExpertModule::event()
     bool is_physical = KlongCalculatorUtils::calculateBtoKlongX(MotherMomentum, KMomentum, daughters, motherMass, idx);
 
     if (!is_physical)
-      continue;
-
-    particle.set4Vector(MotherMomentum);
-
-    if (!m_cut->check(&particle))
       continue;
 
     numberOfCandidates++;

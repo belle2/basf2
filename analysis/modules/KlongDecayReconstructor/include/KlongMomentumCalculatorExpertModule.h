@@ -10,10 +10,8 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/VariableManager/Utility.h>
-#include <analysis/ParticleCombiner/ParticleCombiner.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <string>
 
@@ -53,13 +51,9 @@ namespace Belle2 {
 
     std::string m_klistName;   /**< output K_L0 particle list name */
 
-    std::string m_cutParameter;  /**< selection criteria */
-    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
-
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
     std::string m_recoList; /**< Suffix attached to the output K_L list, if not defined it is set to '_reco'  */
-
 
     int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
 

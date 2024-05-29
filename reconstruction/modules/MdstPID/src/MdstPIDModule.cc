@@ -28,7 +28,7 @@ MdstPIDModule::MdstPIDModule() : Module(),
   m_chargedNames[Const::deuteron] = "deuteron";
 
   addParam("subtractMaximum", m_subtractMaximum,
-           "if set to True, subtract the maximum of log likelihoods to reduce the range of values", true);
+           "if set to True, subtract the maximum of log likelihoods to reduce the range of values", false);
 }
 
 

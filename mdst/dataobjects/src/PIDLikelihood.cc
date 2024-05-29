@@ -17,6 +17,7 @@
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -97,18 +98,16 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
   if (ratio == 0) return 0;
 
   double dlogl = getLogL(p2, set) - getLogL(p1, set);
-  double res;
+  double result = 0;
   if (dlogl < 0) {
     double elogl = exp(dlogl);
-    res = ratio / (ratio + elogl);
+    result = ratio / (ratio + elogl);
   } else {
     double elogl = exp(-dlogl) * ratio; // to prevent overflow for very large dlogl
-    res = elogl / (1.0 + elogl);
+    result = elogl / (1.0 + elogl);
   }
-  //TODO: only necessary if one wants to use mcprod1405 MC sample. Remove when there's a good replacement.
-  if (std::isfinite(res))
-    return res;
-  return 0;
+
+  return result;
 }
 
 double PIDLikelihood::getProbability(const Const::ChargedStable& part,
@@ -124,6 +123,40 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
   return prob[k];
 
 }
+
+double PIDLikelihood::getDeltaLogLGlobal(const Const::ChargedStable& part,
+                                         const double* fractions,
+                                         Const::PIDDetectorSet detSet) const
+{
+  // Defined as log(p / (1 - p)) where p is global PID probability.
+  // In order to save the range of return values it must be implemented as below.
+
+  int k = part.getIndex();
+  if (k < 0) return -INFINITY; // p = 0
+
+  if (fractions and fractions[k] <= 0) return -INFINITY; // p = 0
+
+  double logL_part = getLogL(part, detSet);
+  std::vector<double> logLs; // all other log likelihoods with priors > 0
+  std::vector<double> priorRatios;
+  for (int i = 0; i < static_cast<int>(Const::ChargedStable::c_SetSize); i++) {
+    if (i == k) continue;
+    double ratio = fractions ? fractions[i] / fractions[k] : 1;
+    if (ratio <= 0) continue;
+    priorRatios.push_back(ratio);
+    logLs.push_back(getLogL(Const::chargedStableSet.at(i), detSet));
+  }
+  if (logLs.empty()) return +INFINITY; // p = 1
+
+  double logL_max = logLs[0]; // maximal log likelihood of the others
+  for (auto logl : logLs) logL_max = std::max(logl, logL_max);
+
+  double sum = 0;
+  for (size_t i = 0; i < logLs.size(); i++) sum += priorRatios[i] * exp(logLs[i] - logL_max);
+
+  return logL_part - logL_max - log(sum);
+}
+
 
 Const::ChargedStable PIDLikelihood::getMostLikely(const double* fractions,
                                                   Const::PIDDetectorSet detSet) const

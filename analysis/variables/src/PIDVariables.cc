@@ -35,8 +35,6 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
-
-
     //*************
     // Utilities
     //*************
@@ -413,103 +411,34 @@ namespace Belle2 {
 
       neuralNetworkPtr->hasPdgCode(pdgCode, true); // raise exception if pdg code is not predicted
 
-      /**
-       * Input mapping:
-       * Preparing the set of input variables is done by first creating a
-       * list `inputsAll` of all possible input variables in an order defined by this function.
-       * Then only those variables that are needed by the used neural network are selected
-       * and ordered accordingly. This allows to employ different neural networks with different
-       * inputs using the same code. For performance reasons, we first create a mapping between the
-       * index in the neural-network input array and the inputsAll here once, as this requires
-       * time-consuming string comparisons, and then use this mapping in the code that collects the inputs
-       * for each track below.
-       * CAUTION: If you change the list of inputsAll here, you have to change it also in the loop that
-       *          collects the input variables of each track in the code below.
-       */
-      // build list of all input names
-      std::vector<std::string> inputsAllNames;
-      for (const Const::EDetector& detector : Const::PIDDetectorSet::set()) {
-        for (const auto& hypeType : Const::chargedStableSet) {
-          inputsAllNames.push_back("pidLogLikelihood_Of_" + std::to_string(abs(hypeType.getPDGCode())) + "_From_" + Const::parseDetectors(
-                                     detector));
-        }
-      }
-      inputsAllNames.push_back("momentum");
-      inputsAllNames.push_back("cosTheta");
-      inputsAllNames.push_back("phi");
-      inputsAllNames.push_back("charge");
-      const size_t inputsAllSize = inputsAllNames.size();
-
-      //build mapping for neural-network inputs
-      std::vector<size_t> mapInputsNN2InputsAll;  // mapInputsNN2InputsAll[<NN-index>] = <all-index>
-      for (const auto& inputName : neuralNetworkPtr->getInputNames()) {
-        const auto itr = std::find(inputsAllNames.begin(), inputsAllNames.end(), inputName);
-        if (itr == inputsAllNames.end()) {
-          B2ERROR("Neural network needs input '" + inputName + "', but this input is not (yet) available!");
-          return nullptr;
-        }
-        mapInputsNN2InputsAll.push_back(static_cast<size_t>(itr - inputsAllNames.begin()));
-      }
-
-      std::map<int, std::string> extraInfoNames; // mapping from pdg code to extra info names
-      for (const auto outputPdgCode : neuralNetworkPtr->getOutputSpeciesPdg()) {
-        extraInfoNames[outputPdgCode] = "pidNeuralNetworkValueExpert(" + std::to_string(outputPdgCode) \
-                                        + ((arguments.size() == 2) ? ("," + arguments[1]) : "") + ")";
-      }
-
-
-      auto func = [neuralNetworkPtr, pdgCode, mapInputsNN2InputsAll, inputsAllSize, extraInfoNames](const Particle * part) -> double {
-        const std::string extraInfoName = extraInfoNames.at(pdgCode);
+      auto func = [neuralNetworkPtr, pdgCode](const Particle * part) -> double {
+        const auto& extraInfoName = neuralNetworkPtr->getExtraInfoName(pdgCode);
         if (part->hasExtraInfo(extraInfoName))
           return part->getExtraInfo(extraInfoName);
 
-        const auto& neuralNetwork = *neuralNetworkPtr;
         const PIDLikelihood* pid = part->getPIDLikelihood();
         if (!pid)
           return Const::doubleNaN;
+
         {
           auto hypType = Const::ChargedStable(pdgCode);
           if (pid->getLogL(hypType) == 0)
             return Const::doubleNaN;
         }
 
-
-        /**
-         * prepare inputs
-         * CAUTION: If you change the inputs stored in `inputsAll` or their order,
-         * you have to change the input mapping created above
-         */
-        std::vector<float> inputsAll;
-        inputsAll.reserve(inputsAllSize);
-        const auto mom = part->getTrackFitResult()->getMomentum();
-        for (const Const::EDetector& detector : Const::PIDDetectorSet::set())
-        {
-          for (const auto& hypType : Const::chargedStableSet) {
-            const float logL = pid->getLogL(hypType, detector);
-            if (logL == 0) inputsAll.push_back(Const::doubleNaN);
-            else inputsAll.push_back(logL);
-          }
-        }
-        inputsAll.push_back(mom.R());
-        inputsAll.push_back(cos(mom.Theta()));
-        inputsAll.push_back(mom.Phi());
-        inputsAll.push_back(part->getCharge());
-
         // collect only those inputs needed for the neural network in the correct order
         std::vector<float> inputsNN;
-        inputsNN.reserve(neuralNetwork.getInputSize());
-        for (const auto& indexAll : mapInputsNN2InputsAll)
-        {
-          inputsNN.push_back(inputsAll[indexAll]);
-        }
+        inputsNN.reserve(neuralNetworkPtr->getInputSize());
+        for (const auto& inputName : neuralNetworkPtr->getInputBasf2Names())
+          inputsNN.push_back(std::get<double>(Variable::Manager::Instance().getVariable(inputName)->function(part)));
 
-        const auto probabilities = neuralNetwork.predict(inputsNN);
+        const auto probabilities = neuralNetworkPtr->predict(inputsNN);
 
         // store all probabilities for all hypotheses in extraInfo
         for (const auto element : probabilities)
         {
           const auto [pdgCodeElement, probability] = element;
-          const_cast<Particle*>(part)->addExtraInfo(extraInfoNames.at(pdgCodeElement), probability);
+          const_cast<Particle*>(part)->addExtraInfo(neuralNetworkPtr->getExtraInfoName(pdgCodeElement), probability);
         }
 
         return probabilities.at(pdgCode);

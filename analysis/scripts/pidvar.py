@@ -222,9 +222,12 @@ class ReweighterParticle:
 class Reweighter:
     """
     Class that reweights the dataframe.
+
     Args:
         n_variations (int): Number of weight variations to generate.
         weight_name (str): Name of the weight column.
+        evaluate_plots (bool): Flag to indicate if the plots should be evaluated.
+        nbins (int): Number of bins for the plots.
     """
 
     def __init__(self,
@@ -283,11 +286,10 @@ class Reweighter:
                              particle: ReweighterParticle) -> None:
         """
         Checks if the variables are in the ntuple and returns them.
-        Parameters:
+
+        Args:
             ntuple_df (pd.DataFrame): Dataframe containing the analysis ntuple.
-            bin_variables (list): List of kinematic bin variables.
-            pid_variable_name (str): Name of the PID variable.
-            prefix (str): Prefix for the new columns.
+            particle (ReweighterParticle): Particle object containing the necessary variables.
         """
         ntuple_variables = particle.get_binning_variables()
         ntuple_variables += particle.get_pdg_variables()
@@ -301,10 +303,10 @@ class Reweighter:
                                 pdg_pid_variable_dict: dict) -> pd.DataFrame:
         """
         Merges the efficiency and fake rate weight tables.
-        Parameters:
-            eff_weights_df (pd.DataFrame): Dataframe containing the efficiency weights.
-            fake_weights_dict (pd.DataFrame): Dataframe containing the fake rate weights.
-            mc_pdg_name (str): Name of the MC particle PDG ID.
+
+        Args:
+            weights_dict (dict): Dictionary containing the weight tables.
+            pdg_pid_variable_dict (dict): Dictionary containing the PDG codes and variable names.
         """
         weight_dfs = []
         for reco_pdg, mc_pdg in weights_dict:
@@ -339,7 +341,8 @@ class Reweighter:
                                particle: ReweighterParticle) -> None:
         """
         Adds a weight and uncertainty columns to the dataframe.
-        Parameters:
+
+        Args:
             ntuple_df (pd.DataFrame): Dataframe containing the analysis ntuple.
             particle (ReweighterParticle): Particle object.
         """
@@ -394,14 +397,15 @@ class Reweighter:
                          syscorr: bool = True) -> None:
         """
         Adds weight variations according to the total uncertainty for easier error propagation.
-        Parameters:
+
+        Args:
             prefix (str): Prefix for the new columns.
             weights_dict (pd.DataFrame): Dataframe containing the efficiency weights.
             pdg_pid_variable_dict (dict): Dictionary containing the PID variables and thresholds.
             variable_aliases (dict): Dictionary containing variable aliases.
             sys_seed (int): Seed for the systematic variations.
             syscorr (bool): When true assume systematics are 100% correlated defaults to
-                true. Note this is overridden by provision of a none None value rho_sys
+        true. Note this is overridden by provision of a None value rho_sys
         """
         # Empty prefix means no prefix
         if prefix is None:
@@ -468,9 +472,12 @@ class Reweighter:
                          ) -> None:
         """
         Adds weight variations according to the total uncertainty for easier error propagation.
-        Parameters:
+
+        Args:
             prefix (str): Prefix for the new columns.
-            weights_dict (pd.DataFrame): Dataframe containing the efficiency weights.
+            table (pd.DataFrame): Dataframe containing the efficiency weights.
+            threshold (float): Threshold for the efficiency weights.
+            cov (np.ndarray): Covariance matrix for the efficiency weights.
             variable_aliases (dict): Dictionary containing variable aliases.
         """
         # Empty prefix means no prefix
@@ -537,7 +544,8 @@ class Reweighter:
                  generate_variations: bool = True):
         """
         Reweights the dataframe according to the weight tables.
-        Parameters:
+
+        Args:
             df (pd.DataFrame): Dataframe containing the analysis ntuple.
             generate_variations (bool): When true generate weight variations.
         """

@@ -1,6 +1,10 @@
 Changes in the analysis package in light-2405-quaxo
 ---------------------------------------------------
 
+Modules
++++++++
+* Removed the cut functionality from the `KlongMomentumCalculatorExpert` module.
+
 Variables
 +++++++++
 * Added the variables `beamBackgroundReuseRate` and `beamBackgroundEvents` for studying the Beam Background Overlay events

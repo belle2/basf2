@@ -288,7 +288,7 @@ class Reweighter:
         Checks if the variables are in the ntuple and returns them.
 
         Args:
-            ntuple_df (pd.DataFrame): Dataframe containing the analysis ntuple.
+            ntuple_df (pandas.DataFrame): Dataframe containing the analysis ntuple.
             particle (ReweighterParticle): Particle object containing the necessary variables.
         """
         ntuple_variables = particle.get_binning_variables()
@@ -343,7 +343,7 @@ class Reweighter:
         Adds a weight and uncertainty columns to the dataframe.
 
         Args:
-            ntuple_df (pd.DataFrame): Dataframe containing the analysis ntuple.
+            ntuple_df (pandas.DataFrame): Dataframe containing the analysis ntuple.
             particle (ReweighterParticle): Particle object.
         """
         # Apply a weight value from the weight table to the ntuple, based on the binning
@@ -400,7 +400,7 @@ class Reweighter:
 
         Args:
             prefix (str): Prefix for the new columns.
-            weights_dict (pd.DataFrame): Dataframe containing the efficiency weights.
+            weights_dict (pandas.DataFrame): Dataframe containing the efficiency weights.
             pdg_pid_variable_dict (dict): Dictionary containing the PID variables and thresholds.
             variable_aliases (dict): Dictionary containing variable aliases.
             sys_seed (int): Seed for the systematic variations.
@@ -475,9 +475,9 @@ class Reweighter:
 
         Args:
             prefix (str): Prefix for the new columns.
-            table (pd.DataFrame): Dataframe containing the efficiency weights.
+            table (pandas.DataFrame): Dataframe containing the efficiency weights.
             threshold (float): Threshold for the efficiency weights.
-            cov (np.ndarray): Covariance matrix for the efficiency weights.
+            cov (numpy.ndarray): Covariance matrix for the efficiency weights.
             variable_aliases (dict): Dictionary containing variable aliases.
         """
         # Empty prefix means no prefix
@@ -546,7 +546,7 @@ class Reweighter:
         Reweights the dataframe according to the weight tables.
 
         Args:
-            df (pd.DataFrame): Dataframe containing the analysis ntuple.
+            df (pandas.DataFrame): Dataframe containing the analysis ntuple.
             generate_variations (bool): When true generate weight variations.
         """
         for particle in self.particles:

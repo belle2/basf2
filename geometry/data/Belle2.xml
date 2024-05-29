@@ -156,6 +156,9 @@
   <DetectorComponent name="VTX-CMOS-6layer-plus2inCDC" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS6-plus2inCDC.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>
+  <DetectorComponent name="VTX-CMOS-6layer-new" isDefault="false">
+    <xi:include href="../vtx/VTX-CMOS6-new.xml" xpointer="xpointer(/DetectorComponent/*)" />
+  </DetectorComponent>
   <DetectorComponent name="VTX-CMOS-7layer" isDefault="false">
     <xi:include href="../vtx/VTX-CMOS7.xml" xpointer="xpointer(/DetectorComponent/*)" />
   </DetectorComponent>

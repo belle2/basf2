@@ -13,7 +13,8 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
-#include <TCanvas.h>
+#include <TPaveText.h>
+
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Common Modes */
@@ -67,6 +68,8 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
+    /** Legend */
+    TPaveText* m_legend = nullptr;
   };
 } // end namespace Belle2
 

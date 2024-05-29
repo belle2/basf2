@@ -82,6 +82,9 @@ void KlongMomentumCalculatorExpertModule::initialize()
   // Daughters
   bool k_check = false;
   int nProducts = m_decaydescriptor.getNDaughters();
+  if (nProducts !=2)
+    B2FATAL("The module currently only works for final states with exactly two particles!");
+
   for (int i = 0; i < nProducts; ++i) {
     const DecayDescriptorParticle* daughter =
       m_decaydescriptor.getDaughter(i)->getMother();
@@ -119,12 +122,6 @@ void KlongMomentumCalculatorExpertModule::event()
     Particle particle = m_generator->getCurrentParticle();
     const double motherMass = particle.getPDGMass();
     const std::vector<Particle*> daughters = particle.getDaughters();
-
-    if (daughters.size() < 2)
-      B2FATAL("Reconstructing particle as a daughter of a decay with less then 2 daughters!");
-
-    if (daughters.size() > 3)
-      B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
 
     ROOT::Math::PxPyPzEVector MotherMomentum;
     ROOT::Math::PxPyPzEVector KMomentum;

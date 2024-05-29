@@ -117,7 +117,7 @@ void KlongMomentumCalculatorExpertModule::event()
   while (m_generator->loadNext()) {
 
     Particle particle = m_generator->getCurrentParticle();
-    const double m_b = particle.getPDGMass();
+    const double motherMass = particle.getPDGMass();
     const std::vector<Particle*> daughters = particle.getDaughters();
 
     if (daughters.size() < 2)
@@ -126,15 +126,15 @@ void KlongMomentumCalculatorExpertModule::event()
     if (daughters.size() > 3)
       B2FATAL("Higher multiplicity (>2) missing momentum decays not implemented yet!");
 
-    ROOT::Math::PxPyPzEVector BMomentum;
+    ROOT::Math::PxPyPzEVector MotherMomentum;
     ROOT::Math::PxPyPzEVector KMomentum;
     int idx = 0;
-    bool is_physical = KlongCalculatorUtils::calculateBtoKlongX(BMomentum, KMomentum, daughters, m_b, idx);
+    bool is_physical = KlongCalculatorUtils::calculateBtoKlongX(MotherMomentum, KMomentum, daughters, motherMass, idx);
 
     if (!is_physical)
       continue;
 
-    particle.set4Vector(BMomentum);
+    particle.set4Vector(MotherMomentum);
 
     if (!m_cut->check(&particle))
       continue;

@@ -429,7 +429,7 @@ namespace Belle2 {
         // collect only those inputs needed for the neural network in the correct order
         std::vector<float> inputsNN;
         inputsNN.reserve(neuralNetworkPtr->getInputSize());
-        for (const auto inputName : neuralNetworkPtr->getInputBasf2Names())
+        for (const auto& inputName : neuralNetworkPtr->getInputBasf2Names())
           inputsNN.push_back(std::get<double>(Variable::Manager::Instance().getVariable(inputName)->function(part)));
 
         const auto probabilities = neuralNetworkPtr->predict(inputsNN);

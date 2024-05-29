@@ -12,12 +12,12 @@
 import unittest
 import numpy as np
 import pandas as pd
-from pidvar import Reweighter
+from sysvar import Reweighter
 import itertools
 
 
-class TestPIDVar(unittest.TestCase):
-    """Test case of PIDVar module"""
+class TestSysVar(unittest.TestCase):
+    """Test case of SysVar module"""
 
     def __init__(self, *args, **kwargs):
         """Constructor"""

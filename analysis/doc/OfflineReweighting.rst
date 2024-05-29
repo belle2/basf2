@@ -11,7 +11,7 @@ The selection on simulated data (MC) will result in different efficiency if the 
 hence a data/MC corrections are necessary. 
 The data/MC tables can be applied online, i.e. during basf2 processing, or offline, on the resulting analysis ntuples. 
 These data/MC corrections depend on particle properties, so they are typically provided in bins of kinematics, channel IDs or other properties.
-The `Reweighter <pidvar.Reweighter>` class can add the data/MC corrections to the ntuples according to the defined binning 
+The `Reweighter <sysvar.Reweighter>` class can add the data/MC corrections to the ntuples according to the defined binning 
 and it can simplify the uncertainty propagation. 
 
 Charged Particle Identification corrections
@@ -34,7 +34,7 @@ The following code snipppet provides an example of reweighting particles with pr
 
 .. code-block:: python
 
-  from pidvar import Reweighter
+  from sysvar import Reweighter
   tables = {(11, 11): efftable_e,
             (11, 211): faketable_pi_e,
             (11, 321): faketable_K_e}
@@ -52,7 +52,7 @@ The following code snipppet provides an example of reweighting particles with pr
     Please make sure that the correction tables and the ntuple are compatible before application of the weights!
     In the example above, it is expected that ``pidChargedBDTScore_e > 0.9`` cut has been already applied on ``user_df``.
 
-By default, the `Reweighter <pidvar.Reweighter>` will add ``lepminus_Weight`` and ``lepplus_Weight`` 
+By default, the `Reweighter <sysvar.Reweighter>` will add ``lepminus_Weight`` and ``lepplus_Weight`` 
 columns to the ``user_df`` and it will add additional columns of ``lepminus_Weight_0`` to ``lepminus_Weight_99`` and 
 ``lepplus_Weight_0`` to ``lepplus_Weight_99``, which are the variations of the nominal weights according to the total PID uncertainty.
 The systematic uncertainties can be correlated by providing the same seed value to the particles 
@@ -73,7 +73,7 @@ as columns within the table.
 
 .. code-block:: python
 
-  from pidvar import Reweighter
+  from sysvar import Reweighter
   reweighter.add_fei_particle('Btag', 
                               table, 
                               0.01, 
@@ -84,7 +84,7 @@ as columns within the table.
 In the snippet above, the reweighting is performed for ``Btag`` particle in ``user_df`` DataFrame.
 The FEI correction table in loaded as ``table`` DataFrame via ``pandas.from_csv()`` function and the covariance matrix ``cov``
 is loaded as a separate ``numpy.ndarray`` via ``numpy.load()`` method. 
-The `Reweighter <pidvar.Reweighter>` class expects that the  FEI decay mode ID is provided in ``{prefix}_dec_mode`` column of the ``user_df``,
+The `Reweighter <sysvar.Reweighter>` class expects that the  FEI decay mode ID is provided in ``{prefix}_dec_mode`` column of the ``user_df``,
 but if this is not the case, one can provide a variable alias to point the object to the existing column.
 
 Modules and functions
@@ -92,5 +92,5 @@ Modules and functions
 
 This section provides the documentation for the classes that are used for offline reweighting.
 
-.. automodule:: pidvar
+.. automodule:: sysvar
    :members: Reweighter, ReweighterParticle

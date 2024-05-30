@@ -127,10 +127,10 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   double signalHitsPerEvent = 0;
   double backgroundHitsPerEvent = 0;
   if (bits and nevt) {
-    double bin0 = bits->GetBinContent(1);
-    double bin1 = bits->GetBinContent(2);
-    double bin2 = bits->GetBinContent(3);
-    double bin3 = bits->GetBinContent(4);
+    double bin0 = bits->GetBinContent(2);
+    double bin1 = bits->GetBinContent(3);
+    double bin2 = bits->GetBinContent(4);
+    double bin3 = bits->GetBinContent(5);
     signalHitsPerEvent = (bin1 + bin2 - bin0 - bin3) / nevt;
     backgroundHitsPerEvent = (bin0 + bin3) / nevt;
   }

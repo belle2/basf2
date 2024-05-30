@@ -25,7 +25,7 @@
     <!--xi:include href="VTX-Support.xml"/-->
     <!-- Include the definition of all the components like ladders, sensors and
          chips -->
-    <xi:include href="VTX-Components-CMOS6-new.xml"/>
+    <xi:include href="VTX-Components-CMOS6.xml"/>
     <!-- include radiation sensor definition -->
     <!--xi:include href="VTX-RadiationSensors.xml"/-->
 

@@ -8,9 +8,11 @@ import math
 f = open('/Users/cfinck/Belle2/basf2/basf2_upd/vtx/data/VTX-Components-CMOS6-new.xml', 'w')
 
 Material = "Si"
+X0Si = 0.0937
+X = 0.00439
 sensorL = 30.168
 sensorW = 18.812
-sensorH = 0.400
+sensorH = str(X0Si*X*1e3)  # 0.400
 offsetU = 3.5
 offsetV = 0.3
 
@@ -195,7 +197,7 @@ f.write('<Sensor type=\"layer14'+'\">\n')
 f.write('  <Material>' + Material + '</Material>\n')
 f.write('  <width unit=\"mm\">' + str(sensorW) + '</width>\n')
 f.write('  <length unit=\"mm\">' + str(sensorL*4) + '</length>\n')
-f.write('  <height unit=\"mm\">' + str(sensorH) + '</height>\n')
+f.write('  <height unit=\"mm\">' + sensorH[0:7] + '</height>\n')
 f.write('  <!-- definition of the active area of the module which is a part of the\n')
 f.write('       whole thing. The position is given relative to the lower left edge of\n')
 f.write('       the module (the point with the most negative local coordinates). -->\n')
@@ -294,7 +296,7 @@ f.write('<Sensor type=\"layer12'+'\">\n')
 f.write('  <Material>' + Material + '</Material>\n')
 f.write('  <width unit=\"mm\">' + str(sensorW) + '</width>\n')
 f.write('  <length unit=\"mm\">' + str(sensorL*2) + '</length>\n')
-f.write('  <height unit=\"mm\">' + str(sensorH) + '</height>\n')
+f.write('  <height unit=\"mm\">' + sensorH[0:7] + '</height>\n')
 f.write('  <!-- definition of the active area of the module which is a part of the\n')
 f.write('       whole thing. The position is given relative to the lower left edge of\n')
 f.write('       the module (the point with the most negative local coordinates). -->\n')

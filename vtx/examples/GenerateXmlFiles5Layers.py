@@ -8,7 +8,7 @@ X0Si = 0.0937
 X = 0.00439
 sensorL = 30.168
 sensorW = 18.812
-sensorH = 0.400  # str(X0Si*X*1e6)
+sensorH = 0.400  # str(X0Si*X*1e3)
 offsetU = 3.5
 offsetV = 0.3
 

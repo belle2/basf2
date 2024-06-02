@@ -200,7 +200,7 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
   m_canvas->Clear();
   m_canvas->cd(0);
 
-  bool m_IsPhysicsRun = (getRunType() == "physics" || "cosmic" || "debug");
+  bool m_IsPhysicsRun = (getRunType() == "physics || cosmic || debug");
   if (m_IsPhysicsRun == true) {
 
     //update comL1-GDLL1

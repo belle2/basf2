@@ -195,7 +195,6 @@ namespace {
     },
     {}, {0.0, 1.0, 0.0, 1.0, 0.0, 1.0});
 
-    // cppcheck-suppress unreadVariable
     auto expert = interface.getExpert();
 
     auto weightfile_v3 = MVA::Weightfile::loadFromFile(FileSystem::findFile("mva/methods/tests/FastBDTv3.xml"));

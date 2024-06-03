@@ -172,29 +172,29 @@ for layer in range(1, nlayer+1):
     for id in range(0, nsensor):
 
         if (layer == 4):
-            pos = start + (3*sensorL)*id
+            pos = start + (3*sensorL+gap)*id
         else:
-            pos = start + (4*sensorL)*id
+            pos = start + (4*sensorL+gap)*id
 
         if not OptL3Mod:
             if layer == 3 and id == 1:
-                pos = start + (3*sensorL)*id
+                pos = start + (3*sensorL+gap)*id
 
         posZ = str(pos)
 
         cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + '\" flipV=\"true\"><z unit=\"mm\">' + \
-            posZ[0:6] + '</z><shift unit=\"mm\">' + shift[0:6] + '</shift><shiftR unit=\"mm\">' + shiftR0 + '</shiftR></Sensor>\n'
+            posZ[0:7] + '</z><shift unit=\"mm\">' + shift[0:6] + '</shift><shiftR unit=\"mm\">' + shiftR0 + '</shiftR></Sensor>\n'
 
         f.write(cmd1)
 
     if (layer == 5):
         for id in range(0, nsensor):
 
-            pos = start + (4*sensorL)*id
+            pos = start + (4*sensorL+gap)*id
             posZ = str(pos)
 
             cmd2 = '    <Sensor id=\"' + str(id+nsensor+1) + '\"' + ' type=\"' + type + '\" flipV=\"true\"><z unit=\"mm\">' + \
-                posZ[0:6] + '</z><shift unit=\"mm\">' + shift1 + '</shift><shiftR unit=\"mm\">' + shiftR1 + '</shiftR></Sensor>\n'
+                posZ[0:7] + '</z><shift unit=\"mm\">' + shift1 + '</shift><shiftR unit=\"mm\">' + shiftR1 + '</shiftR></Sensor>\n'
 
             f.write(cmd2)
 

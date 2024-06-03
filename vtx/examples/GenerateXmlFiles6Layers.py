@@ -202,7 +202,7 @@ for layer in range(1, nlayer+1):
         posZ = str(pos)
 
         cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + \
-            '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:6] + '</z><shift unit=\"mm\">' + shift[0:6]
+            '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:9] + '</z><shift unit=\"mm\">' + shift[0:6]
         cmd1 += '</shift><shiftR unit=\"mm\">' + str(shiftR) + '</shiftR></Sensor>\n'
 
         f.write(cmd1)
@@ -217,7 +217,7 @@ for layer in range(1, nlayer+1):
             posZ = str(pos)
 
             cmd2 = '    <Sensor id=\"' + str(id+nsensor+1) + '\"' + ' type=\"' + type + \
-                '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:6] + '</z><shift unit=\"mm\">' + shift1[0:6]
+                '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:9] + '</z><shift unit=\"mm\">' + shift1[0:6]
             cmd2 += '</shift><shiftR unit=\"mm\">' + str(shiftR1) + '</shiftR></Sensor>\n'
             f.write(cmd2)
 

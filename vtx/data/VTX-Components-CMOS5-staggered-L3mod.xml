@@ -28,35 +28,35 @@
   <Ladder layer="3">
     <shift  unit="mm">8.635</shift>
     <radius unit="mm">39.0</radius>
-    <Sensor id="1" type="layer14" flipV="true"><z unit="mm">0.1859</z><shift unit="mm">8.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="2" type="layer14" flipV="true"><z unit="mm">120.85</z><shift unit="mm">8.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="1" type="layer14" flipV="true"><z unit="mm">0.18599</z><shift unit="mm">8.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="2" type="layer14" flipV="true"><z unit="mm">120.907</z><shift unit="mm">8.0</shift><shiftR unit="mm">0.0</shiftR></Sensor>
   </Ladder>
 
   <Ladder layer="4">
     <shift  unit="mm">12.084</shift>
     <radius unit="mm">89.0</radius>
-    <Sensor id="1" type="layer13" flipV="true"><z unit="mm">-96.62</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="2" type="layer13" flipV="true"><z unit="mm">-6.118</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="3" type="layer13" flipV="true"><z unit="mm">84.385</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="4" type="layer13" flipV="true"><z unit="mm">174.88</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="5" type="layer13" flipV="true"><z unit="mm">265.39</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="1" type="layer13" flipV="true"><z unit="mm">-96.622</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="2" type="layer13" flipV="true"><z unit="mm">-6.0680</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="3" type="layer13" flipV="true"><z unit="mm">84.4859</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="4" type="layer13" flipV="true"><z unit="mm">175.039</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="5" type="layer13" flipV="true"><z unit="mm">265.593</z><shift unit="mm">12.042</shift><shiftR unit="mm">0.0</shiftR></Sensor>
   </Ladder>
 
   <Ladder layer="5">
     <shift  unit="mm">0</shift>
     <radius unit="mm">140.0</radius>
-    <Sensor id="1" type="layer14" flipV="true"><z unit="mm">-177.5</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="2" type="layer14" flipV="true"><z unit="mm">-56.85</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="3" type="layer14" flipV="true"><z unit="mm">63.820</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="4" type="layer14" flipV="true"><z unit="mm">184.49</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="5" type="layer14" flipV="true"><z unit="mm">305.16</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="6" type="layer14" flipV="true"><z unit="mm">425.83</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
-    <Sensor id="7" type="layer14" flipV="true"><z unit="mm">-177.5</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="8" type="layer14" flipV="true"><z unit="mm">-56.85</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="9" type="layer14" flipV="true"><z unit="mm">63.820</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="10" type="layer14" flipV="true"><z unit="mm">184.49</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="11" type="layer14" flipV="true"><z unit="mm">305.16</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
-    <Sensor id="12" type="layer14" flipV="true"><z unit="mm">425.83</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <Sensor id="1" type="layer14" flipV="true"><z unit="mm">-177.52</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="2" type="layer14" flipV="true"><z unit="mm">-56.801</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="3" type="layer14" flipV="true"><z unit="mm">63.9209</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="4" type="layer14" flipV="true"><z unit="mm">184.642</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="5" type="layer14" flipV="true"><z unit="mm">305.364</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="6" type="layer14" flipV="true"><z unit="mm">426.087</z><shift unit="mm">5.818</shift><shiftR unit="mm">0.0</shiftR></Sensor>
+    <Sensor id="7" type="layer14" flipV="true"><z unit="mm">-177.52</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <Sensor id="8" type="layer14" flipV="true"><z unit="mm">-56.801</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <Sensor id="9" type="layer14" flipV="true"><z unit="mm">63.9209</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <Sensor id="10" type="layer14" flipV="true"><z unit="mm">184.642</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <Sensor id="11" type="layer14" flipV="true"><z unit="mm">305.364</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
+    <Sensor id="12" type="layer14" flipV="true"><z unit="mm">426.087</z><shift unit="mm">23.518</shift><shiftR unit="mm">1.5</shiftR></Sensor>
   </Ladder>
 
 <Sensor type="layer14">

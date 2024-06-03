@@ -9,7 +9,6 @@
 #include "framework/logging/Logger.h"
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
-
 using namespace Belle2;
 using namespace std;
 
@@ -147,7 +146,6 @@ Clusterizend::expandCluster(vector<cell_index>& N, SimpleCluster& C)
   }
 }
 
-
 vector<cell_index>
 Clusterizend::getCandidates()
 {
@@ -164,4 +162,108 @@ Clusterizend::getCandidates()
     }
   }
   return candidates;
+}
+
+std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax()
+{
+  unsigned long maxValue = 0;
+  cell_index max_index = {0, 0, 0};
+  for (c3index iom = 0; iom < 40; iom++) {
+    for (c3index iph = 0; iph < 384; iph++) {
+      for (c3index ith = 0; ith < 9; ith++) {
+        if ((*m_houghVals)[iom][iph][ith] > maxValue) {
+          maxValue = (*m_houghVals)[iom][iph][ith];
+          max_index = {iom, iph, ith};
+        }
+      }
+    }
+  }
+  return {max_index, maxValue};
+}
+
+void Clusterizend::deleteMax(cell_index max_index)
+{
+  c3index omIndex = max_index[0];
+  c3index phIndex = max_index[1];
+  c3index thIndex = max_index[2];
+  for (c3index ith = std::max<int>(0, thIndex - m_params.thetatrim); ith < std::min<int>(9, thIndex + m_params.thetatrim + 1);
+       ith++) {
+    for (c3index iom = std::max<int>(0, omIndex - m_params.omegatrim); iom < std::min<int>(40, omIndex + m_params.omegatrim + 1);
+         iom++) {
+      c3index phiIndex = phIndex + omIndex - iom;
+      c3index relativePhi = phiIndex - phIndex;
+      if (relativePhi > 0) {
+        for (c3index iph = phiIndex - m_params.phitrim; iph < phiIndex + m_params.phitrim + std::floor(2.4 * relativePhi); iph++) {
+          c3index iphMod = (iph + 384) % 384;
+          (*m_houghVals)[iom][iphMod][ith] = 0;
+        }
+      } else if (relativePhi < 0) {
+        for (c3index iph = phiIndex - m_params.phitrim + std::ceil(2.4 * relativePhi); iph < phiIndex + m_params.phitrim + 1; iph++) {
+          c3index iphMod = (iph + 384) % 384;
+          (*m_houghVals)[iom][iphMod][ith] = 0;
+        }
+      } else {
+        for (c3index iph = phiIndex - m_params.phitrim; iph < phiIndex + m_params.phitrim + 1; iph++) {
+          c3index iphMod = (iph + 384) % 384;
+          (*m_houghVals)[iom][iphMod][ith] = 0;
+        }
+      }
+    }
+  }
+}
+
+std::vector<SimpleCluster> Clusterizend::makeClusters()
+{
+  std::vector<SimpleCluster> candidates;
+  for (unsigned long iter = 0; iter < m_params.iterations; iter++) {
+    auto [globalmax, peakweight] = getGlobalMax();
+    if (peakweight < m_params.minpeakweight || peakweight == 0) {
+      break;
+    }
+    auto [new_cluster, totalweight] = createCluster(globalmax);
+    if (totalweight >= m_params.mintotalweight) {
+      candidates.push_back(new_cluster);
+    }
+    deleteMax(globalmax);
+  }
+  return candidates;
+}
+
+std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(cell_index max_index)
+{
+  SimpleCluster fixedCluster;
+  c3index omIndex = max_index[0];
+  c3index phIndex = max_index[1];
+  c3index thIndex = max_index[2];
+  unsigned long totalClusterWeight = 0;
+
+  for (c3index ith = std::max<int>(0, thIndex - 1); ith < std::min<int>(9, thIndex + 2); ith++) {
+    for (c3index iph = phIndex - 1; iph < phIndex + 2; iph++) {
+      c3index iphMod = (iph + 384) % 384;
+      cell_index newMemberIndex = {omIndex, iphMod, ith};
+      fixedCluster.append(newMemberIndex);
+      totalClusterWeight += (*m_houghVals)[omIndex][iphMod][ith];
+    }
+  }
+  if (omIndex - 1 >= 0) {
+    for (c3index ith = std::max<int>(0, thIndex - 1); ith < std::min<int>(9, thIndex + 2); ith++) {
+      for (c3index iph = phIndex + 1; iph < phIndex + 4; iph++) {
+        c3index iphMod = (iph + 384) % 384;
+        cell_index newMemberIndex = {omIndex - 1, iphMod, ith};
+        fixedCluster.append(newMemberIndex);
+        totalClusterWeight += (*m_houghVals)[omIndex - 1][iphMod][ith];
+      }
+    }
+  }
+  if (omIndex + 1 < 40) {
+    for (c3index ith = std::max<int>(0, thIndex - 1); ith < std::min<int>(9, thIndex + 2); ith++) {
+      for (c3index iph = phIndex - 3; iph < phIndex; iph++) {
+        c3index iphMod = (iph + 384) % 384;
+        cell_index newMemberIndex = {omIndex + 1, iphMod, ith};
+        fixedCluster.append(newMemberIndex);
+        totalClusterWeight += (*m_houghVals)[omIndex + 1][iphMod][ith];
+      }
+    }
+  }
+  return {fixedCluster, totalClusterWeight};
 }

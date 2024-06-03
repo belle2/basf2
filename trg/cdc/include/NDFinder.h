@@ -12,6 +12,8 @@
 #include <cmath>
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
+#include <TVector3.h>
+#include <iostream>
 
 namespace Belle2 {
 
@@ -23,12 +25,15 @@ namespace Belle2 {
   /** Store track parameters of found tracks. */
   class NDFinderTrack {
   public:
-    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster):
+    NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster,
+                  std::vector<TVector3> houghspace, std::vector<TVector3> ndreadout):
       m_cluster(cluster)
     {
       m_omega = values[0];
       m_phi = values[1];
       m_cotTheta = values[2];
+      m_houghspace = houghspace;
+      m_ndreadout = ndreadout;
     }
 
     /** Default destructor. */
@@ -63,6 +68,18 @@ namespace Belle2 {
       m_phi = 0.;
       m_cotTheta = 0.;
     }
+    SimpleCluster getCluster()
+    {
+      return m_cluster;
+    }
+    std::vector<TVector3> getHoughSpace()
+    {
+      return m_houghspace;
+    }
+    std::vector<TVector3> getNDReadout()
+    {
+      return m_ndreadout;
+    }
 
   private:
     /** 2D track curvature */
@@ -77,6 +94,8 @@ namespace Belle2 {
     /** vector of the weights for each related hit. */
     std::vector<double> m_hitWeights;
     SimpleCluster m_cluster;
+    std::vector<TVector3> m_houghspace;
+    std::vector<TVector3> m_ndreadout;
   };
 
 
@@ -93,30 +112,56 @@ namespace Belle2 {
       std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
 
       /** Clustering options */
-      /**  Only accept clusters with minhits */
-      long unsigned int minhits  = 4;
-      /**  Required number of axial hits per track */
-      long unsigned int minhits_axial  = 0;
-      /**  Members must have thresh x maxweight of cluster */
-      float thresh            = 0.85;
+      /**  Only accept clusters with minsuper_axial */
+      long unsigned int minsuper_axial  = 4;
+
+      /**  Required number of stereo super layers */
+      long unsigned int minsuper_stereo  = 3;
+
+      /**  houghspace must have thresh x maxweight of cluster */
+      float thresh = 0.85;
 
       /** Required relative weight contribution to assign a hit to a cluster */
       float minassign = 0.2;
 
+      /** Determines at what point a cluster with to few hits gets removed */
+      long unsigned int clustercut = 2;
+
       /** Minimum numeber of cells in the track parameter space */
       long unsigned int mincells  = 5;
 
+      /** Clustering method: When true: dbscan, when false: fixed 3d volume */
+      bool dbscanning = false;
+
+      /** Clustering: minimum of the total weight in all cells of the 3d volume */
+      long unsigned int mintotalweight = 500;
+
+      /** Clustering: minimum peak cell weight */
+      long unsigned int minpeakweight = 0;
+
+      /** Clustering: number of iterations for the cluster search in each Hough space */
+      long unsigned int iterations = 5;
+
+      /** Clustering: number of deleted cells in each omega direction from the maximum */
+      long int omegatrim = 5;
+
+      /** Clustering: number of deleted cells in each phi direction from the maximum */
+      long int phitrim = 5;
+
+      /** Clustering: number of deleted cells in each theta direction from the maximum */
+      long int thetatrim = 5;
+
       /** CDC symmetry: repeat wire pattern 32 times in phi */
       unsigned short phigeo = 32;
+
       ///** CDC symmetry: phi range covered by hit data [0 .. phigeo] */
       unsigned short parcels = 7;
+
       /** CDC symmetry: phi range covered by expanded hit data [0 .. phigeo] */
       unsigned short parcelsExp = 11;
     };
     std::vector<std::vector<float>> m_acceptRanges;
     std::vector<float> m_slotsizes;
-
-
 
     /** Default constructor. */
     NDFinder() {}
@@ -141,18 +186,27 @@ namespace Belle2 {
      * @param minweight minimum weight of cluster member cells
      * @param minpts minimum neighboring cells with minweight for core cells
      * @param diagonal consider diagonal neighbor cells in the clustering
-     * @param minhits minimum number of hits per cluster
-     * @param minhits_axial minimum number of axial hits per cluster
+     * @param minsuper_axial minimum number of axial super layers per cluster
+     * @param minsuper_stereo minimum number of stereo super layers per cluster
      * @param thresh selection of cells for weighted mean track estimation
      * @param minassign hit to cluster assigment critical limit
+     * @param clustercut removing clusters with to few hits in hit to cluster relation
      * @param mincells minumum number of cells per cluster
+     * @param dbscanning when true: dbscan, when false: fixed three dim volume
+     * @param mintotalweight minimum total weight of all cells in the 3d volume
+     * @param minpeakweight minimum peak cell weight
+     * @param iterations number of cluster searches in each Hough space
+     * @param omegatrim number deleted cells in each omega direction from the maximum
+     * @param phitrim number deleted cells in each phi direction from the maximum
+     * @param thetatrim number deleted cells in each theta direction from the maximum
      * @param verbose print Hough planes and verbose output
      * @param axialFile axial hit data
      * @param stereoFile stereo hit data
      * */
     void init(int minweight, int minpts, bool diagonal,
-              int minhits, int minhits_axial, double thresh, double minassign,
-              int mincells, bool verbose, std::string& axialFile, std::string& stereoFile);
+              int minsuper_axial, int minsuper_stereo, double thresh, double minassign, int clustercut,
+              int mincells, bool dbscanning, int mintotalweight, int minpeakweight, int iterations, int omegatrim, int phitrim, int thetatrim,
+              bool verbose, std::string& axialFile, std::string& stereoFile);
 
     /** Initialize the binnings and reserve the arrays */
     void initBins();
@@ -166,15 +220,8 @@ namespace Belle2 {
     void restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray);
 
     /** Squeeze phi-axis in a 2D (omega,phi) plane
-     * @param writeArray write into this array
-     * @param readArray read from this array
-     * @param outparcels number of 1/32 sectors in output plane
      * @param inparcels number of 1/32 sectors in input plane
-     * @param ihit hit index
-     * @param iprio prio index
-     * @param itheta theta index
-     * @param nomega number of omega points
-     */
+     * @param outparcels number of 1/32 sectors in output plane */
     void squeezeOne(c5array& writeArray, c5array& readArray, int outparcels, int inparcels, c5index ihit, c5index iprio, c5index itheta,
                     c5elem nomega);
 
@@ -190,7 +237,9 @@ namespace Belle2 {
     {
       m_NDFinderTracks.clear();
       m_hitIds.clear();
+      m_hitSLIds.clear();
       m_prioPos.clear();
+      m_prioTime.clear();
       m_nHits = 0;
       m_vecDstart.clear();
       m_hitOrients.clear();
@@ -202,11 +251,13 @@ namespace Belle2 {
     void printParams();
 
     /** fill hit info of the event */
-    void addHit(unsigned short hitId, unsigned short hitPrioPos)
+    void addHit(unsigned short hitId, unsigned short hitSLId, unsigned short hitPrioPos, long hitPrioTime)
     {
       if (hitPrioPos > 0) { // skip "no hit"
         m_hitIds.push_back(hitId);
+        m_hitSLIds.push_back(hitSLId);
         m_prioPos.push_back(3 - hitPrioPos);
+        m_prioTime.push_back(hitPrioTime);
         m_nHits++;
       }
     }
@@ -256,6 +307,12 @@ namespace Belle2 {
       std::vector<std::vector<unsigned short>>& hitsVsClusters,
       std::vector<SimpleCluster>& clusters);
 
+    /** Relate all hits in a cluster to the cluster
+     * Remove small clusters with less than minsuper related hits. */
+    std::vector<SimpleCluster> allHitsToClusters(
+      std::vector<std::vector<unsigned short>>& hitsVsClusters,
+      std::vector<SimpleCluster>& clusters);
+
     /** Determine the best cluster for a single hit,
      * given hitsVsClusters confusion matrix */
     int hitToCluster(std::vector<std::vector<unsigned short>>& hitsVsClusters,
@@ -276,6 +333,8 @@ namespace Belle2 {
     {
       return pt * 1e11 / (3e8 * 1.5); // div (c * B)
     }
+
+    float m_pi_deg = 3.141592653589793 / 180.;
 
     /** Calculate physical units */
     float transformVar(float estVal, int idx);
@@ -314,10 +373,17 @@ namespace Belle2 {
      * elements: [0,2335] for 2336 TS in total*/
     std::vector<unsigned short> m_hitIds;
 
+    /** SL-Ids of the hits in the current event
+     * elements: super layer number in [0,1,...,8]*/
+    std::vector<unsigned short> m_hitSLIds;
+
     /** Priority positon within the TS in the current event
      * elements basf2: [0,3] first, left, right, no hit
      * elements stored: 3 - basf2prio*/
     std::vector<unsigned short> m_prioPos;
+
+    /** Drift time of the priority wire */
+    std::vector<long> m_prioTime;
 
     /** Orients
      * TS-Ids of the hits in the current event
@@ -364,6 +430,7 @@ namespace Belle2 {
 
     /** Clustering module */
     Belle2::Clusterizend m_clusterer;
+    Belle2::Clusterizend m_clusterer_2;
 
     /** Print Hough planes and verbose output */
     bool m_verbose{false};

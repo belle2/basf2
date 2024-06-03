@@ -9,6 +9,7 @@
 #include <string>
 #include <cmath>
 #include <iostream>
+#include <set>
 #include <fstream>
 #include "framework/logging/Logger.h"
 #include "boost/iostreams/filter/gzip.hpp"
@@ -16,29 +17,37 @@
 #include "boost/iostreams/filtering_stream.hpp"
 #include "trg/cdc/NDFinder.h"
 
-#include <TMath.h>
-
 using namespace Belle2;
 using namespace std;
 
 
 void NDFinder::init(int minweight, int minpts,
-                    bool diagonal, int minhits, int minhits_axial,
+                    bool diagonal, int minsuper_axial, int minsuper_stereo,
                     double thresh,
                     double minassign,
-                    int mincells, bool verbose,
+                    int clustercut,
+                    int mincells, bool dbscanning, int mintotalweight, int minpeakweight, int iterations, int omegatrim, int phitrim, int thetatrim,
+                    bool verbose,
                     string& axialFile, string& stereoFile)
 {
-  m_params.minhits = (long unsigned int) minhits;
-  m_params.minhits_axial = (long unsigned int) minhits_axial;
+  m_params.minsuper_axial = (long unsigned int) minsuper_axial;
+  m_params.minsuper_stereo = (long unsigned int) minsuper_stereo;
   m_params.thresh = (float) thresh;
   m_params.minassign = (float) minassign;
+  m_params.clustercut = (long unsigned int) clustercut;
   m_params.mincells = (long unsigned int) mincells;
+  m_params.dbscanning = (bool) dbscanning;
   m_params.axialFile = axialFile;
   m_params.stereoFile = stereoFile;
   m_clusterer_params.minweight = (unsigned short) minweight;
   m_clusterer_params.minpts = (unsigned short) minpts;
   m_clusterer_params.diagonal = diagonal;
+  m_clusterer_params.mintotalweight = (unsigned short) mintotalweight;
+  m_clusterer_params.minpeakweight = (unsigned short) minpeakweight;
+  m_clusterer_params.iterations = (unsigned short) iterations;
+  m_clusterer_params.omegatrim = (long int) omegatrim;
+  m_clusterer_params.phitrim = (long int) phitrim;
+  m_clusterer_params.thetatrim = (long int) thetatrim;
   m_verbose = verbose;
 
 
@@ -418,101 +427,217 @@ std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClusters(std::vector
   return hitsVsClusters;
 }
 
-vector<SimpleCluster>
-NDFinder::relateHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClusters, std::vector<SimpleCluster>& clusters)
-{
-  vector<SimpleCluster> useclusters;
-  vector<unsigned long> restHits;
-  if (hitsVsClusters.size() > 0) {
-    for (unsigned long ihit = 0; ihit < m_hitIds.size(); ihit++) {
-      int cid = hitToCluster(hitsVsClusters, ihit);
-      if (cid != -1) { // add hit to cluster
-        clusters[cid].add_hit(ihit, hitsVsClusters[cid][ihit], m_hitOrients[ihit]);
-      } else {
-        restHits.push_back(ihit);
-      }
-    }
+// Old hit-to-cluster relation (uses minhits and minhits_axial, iterative approach)
+/*vector<SimpleCluster> */
+/*NDFinder::relateHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClusters, std::vector<SimpleCluster>& clusters) */
+/*{ */
+/*  vector<SimpleCluster> useclusters; */
+/*  vector<unsigned long> restHits; */
+/*  if (hitsVsClusters.size() > 0) { */
+/*    for (unsigned long ihit = 0; ihit < m_hitIds.size(); ihit++) { */
+/*      int cid = hitToCluster(hitsVsClusters, ihit); */
+/*      if (cid != -1) { // add hit to cluster */
+/*        clusters[cid].add_hit(ihit, hitsVsClusters[cid][ihit], m_hitOrients[ihit]); */
+/*      } else { */
+/*        restHits.push_back(ihit); */
+/*      } */
+/*    } */
+/*    // select clusters, try to reassign rest hits */
+/*    vector<bool> processed(hitsVsClusters.size(), false); */
+/*    for (long unsigned int iround = 0; iround <= (m_params.minhits - 2); iround++) { */
+/*      if (iround > 0) { */
+/*        vector<unsigned long> stillRest; */
+/*        for (unsigned long irhit = 0; irhit < restHits.size(); irhit++) { */
+/*          unsigned long ihit = restHits[irhit]; */
+/*          int cid = hitToCluster(hitsVsClusters, ihit); */
+/*          if (cid != -1) { // add hit to cluster */
+/*            clusters[cid].add_hit(ihit, hitsVsClusters[cid][ihit], m_hitOrients[ihit]); */
+/*          } else { */
+/*            stillRest.push_back(ihit); */
+/*          } */
+/*        } */
+/*        restHits = stillRest; */
+/*      } */
+/*      stringstream msg; */
+/*      for (long unsigned int iclus = 0; iclus < hitsVsClusters.size(); iclus++) { */
+/*        if (processed[iclus]) */
+/*          continue; */
+/*        SimpleCluster& clu = clusters[iclus]; */
+/*        //if (clu.get_hits().size() >= m_params.minhits) { */
+/*        if (clu.get_hits().size() >= m_params.minhits && clu.get_naxial() >= m_params.minhits_axial) { */
+/*          useclusters.push_back(clusters[iclus]); */
+/*          processed[iclus] = true; */
+/*          msg << ", add iclu=" << iclus << "(nHits=" << clu.get_hits().size() << ",round=" << iround << ")"; */
+/*        } else if (clu.get_hits().size() < ((m_params.minhits - 2) + iround)) { //remove small clusters */
+/*          msg << ", skip iclu=" << iclus << "(nHits=" << clu.get_hits().size() << ",round=" << iround << ")"; */
+/*          for (unsigned long int ihics = 0; ihics < hitsVsClusters[0].size(); ihics++) { */
+/*            hitsVsClusters[iclus][ihics] = 0; */
+/*          } */
+/*          processed[iclus] = true; */
+/*          for (unsigned short ihirs : clu.get_hits()) { */
+/*            restHits.push_back(ihirs); */
+/*          } */
+/*        } */
+/*      } */
+/*      if (m_verbose) { */
+/*        /1** hit assignment *1/ */
+/*        B2DEBUG(55, "iround=" << iround << */
+/*                ", restHits: " << restHits.size() << ", useclusters: " << */
+/*                useclusters.size() << ", msg=" << msg.str()); */
+/*      } */
+/*    } */
+/*  } */
+/*  return useclusters; */
+/*} */
 
-    // select clusters, try to reassign rest hits
-    vector<bool> processed(hitsVsClusters.size(), false);
-    for (long unsigned int iround = 0; iround <= (m_params.minhits - 2); iround++) {
-      if (iround > 0) {
-        vector<unsigned long> stillRest;
-        for (unsigned long irhit = 0; irhit < restHits.size(); irhit++) {
-          unsigned long ihit = restHits[irhit];
-          int cid = hitToCluster(hitsVsClusters, ihit);
-          if (cid != -1) { // add hit to cluster
-            clusters[cid].add_hit(ihit, hitsVsClusters[cid][ihit], m_hitOrients[ihit]);
-          } else {
-            stillRest.push_back(ihit);
+// New hit-to-cluster relation, replaces relateHitsToClusters
+std::vector<SimpleCluster>
+NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClusters, std::vector<SimpleCluster>& clusters)
+{
+  std::vector<SimpleCluster> useclusters;
+  if (hitsVsClusters.size() > 0) {
+    // Iteration over the number of clusters
+    for (unsigned long iclus = 0; iclus < hitsVsClusters.size(); iclus++) {
+      std::vector<std::vector<long>> super_layer_numbers;
+      // Iteration over all track segment hits
+      for (unsigned long ihit = 0; ihit < m_hitIds.size(); ihit++) {
+        unsigned short contribution = hitsVsClusters[iclus][ihit];
+        if (contribution > 0) {
+          super_layer_numbers.push_back({static_cast<long>(ihit), contribution, m_hitSLIds[ihit], m_prioTime[ihit]});
+        }
+      }
+      // Iteration over all super layers
+      for (unsigned short sl = 0; sl < 9; sl++) {
+        std::vector<std::vector<long>> one_super_layer_contributions;
+        for (unsigned long n_ts = 0; n_ts < super_layer_numbers.size(); n_ts++) {
+          if (super_layer_numbers[n_ts][2] == sl) {
+            one_super_layer_contributions.push_back({super_layer_numbers[n_ts][0], super_layer_numbers[n_ts][1], super_layer_numbers[n_ts][3]});
           }
         }
-        restHits = stillRest;
-      }
-      stringstream msg;
-      for (long unsigned int iclus = 0; iclus < hitsVsClusters.size(); iclus++) {
-        if (processed[iclus])
+        // Continue if there are no hits in the current super layer
+        if (one_super_layer_contributions.size() == 0) {
           continue;
-        SimpleCluster& clu = clusters[iclus];
-        //if (clu.get_hits().size() >= m_params.minhits) {
-        if (clu.get_hits().size() >= m_params.minhits && clu.get_naxial() >= m_params.minhits_axial) {
-          useclusters.push_back(clusters[iclus]);
-          processed[iclus] = true;
-          msg << ", add iclu=" << iclus << "(nHits=" << clu.get_hits().size() << ",round=" << iround << ")";
-        } else if (clu.get_hits().size() < ((m_params.minhits - 2) + iround)) { //remove small clusters
-          msg << ", skip iclu=" << iclus << "(nHits=" << clu.get_hits().size() << ",round=" << iround << ")";
-          for (unsigned long int ihics = 0; ihics < hitsVsClusters[0].size(); ihics++) {
-            hitsVsClusters[iclus][ihics] = 0;
-          }
-          processed[iclus] = true;
-          for (unsigned short ihirs : clu.get_hits()) {
-            restHits.push_back(ihirs);
+        }
+        // Sorting after the drift times
+        struct sortingClass {
+          bool operator()(std::vector<long> i, std::vector<long> j) {return (i[2] < j[2]);}
+        } sortingTimes;
+        sort(one_super_layer_contributions.begin(), one_super_layer_contributions.end(), sortingTimes);
+        long max_hit = one_super_layer_contributions[0][0];
+        long max_contribution = one_super_layer_contributions[0][1];
+        // Iteration over all track segments in this super layer
+        for (size_t index = 0; index < one_super_layer_contributions.size(); index++) {
+          // The maximum weight contribution gets identified
+          if (one_super_layer_contributions[index][1] > max_contribution) {
+            max_contribution = one_super_layer_contributions[index][1];
+            max_hit = one_super_layer_contributions[index][0];
           }
         }
+        clusters[iclus].add_hit(max_hit, max_contribution, m_hitOrients[max_hit]);
       }
-      if (m_verbose) {
-        /** hit assignment */
-        B2DEBUG(55, "iround=" << iround <<
-                ", restHits: " << restHits.size() << ", useclusters: " <<
-                useclusters.size() << ", msg=" << msg.str());
+      SimpleCluster& clu = clusters[iclus];
+      // The hits of the current cluster get extracted
+      std::vector<unsigned short> cluster_hits = clu.get_hits();
+      std::vector<unsigned short> cluster_sl_numbers;
+      for (const auto& element : cluster_hits) {
+        cluster_sl_numbers.push_back(m_hitSLIds[element]);
+      }
+      // A cut on the super layer numbers is applied
+      std::set<unsigned short> unique_sl_numbers(cluster_sl_numbers.begin(), cluster_sl_numbers.end());
+      size_t n_sl = unique_sl_numbers.size();
+      unique_sl_numbers.insert({0, 2, 4, 6, 8});
+      size_t with_axial_sls = unique_sl_numbers.size();
+      size_t axial_number = 5 - (with_axial_sls - n_sl);
+      size_t stereo_number = n_sl - axial_number;
+      if (axial_number >= m_params.minsuper_axial && stereo_number >= m_params.minsuper_stereo) {
+        useclusters.push_back(clusters[iclus]);
       }
     }
   }
   return useclusters;
 }
 
-
 void NDFinder::getCM()
 {
   c3array& houghPlane = *m_phoughPlane;
-  m_clusterer.setNewPlane(houghPlane);
-  std::vector<SimpleCluster> allClusters = m_clusterer.dbscan();
+  std::vector<SimpleCluster> allClusters;
+  std::vector<TVector3> houghspace;
+  if (m_params.dbscanning) {
+    m_clusterer.setNewPlane(houghPlane);
+    allClusters = m_clusterer.dbscan();
+  } else {
+    c3array copiedPlane = houghPlane;
+    m_clusterer.setNewPlane(copiedPlane);
+    std::vector<SimpleCluster> fixedClusters = m_clusterer.makeClusters();
+    allClusters = fixedClusters;
+  }
   std::vector<SimpleCluster> clusters;
   for (SimpleCluster& clu : allClusters) {
     if (clu.getEntries().size() > m_params.mincells) {
       clusters.push_back(clu);
     }
   }
-
   std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(clusters);
-  vector<SimpleCluster> useclusters = relateHitsToClusters(hitsVsClusters, clusters);
+  // New hit to cluster relation
+  std::vector<SimpleCluster> useclusters = allHitsToClusters(hitsVsClusters, clusters);
 
   for (unsigned long iclus = 0; iclus < useclusters.size(); iclus++) {
     SimpleCluster cli = useclusters[iclus];
-    vector<cell_index> entries = cli.getEntries();
+    std::vector<cell_index> entries = cli.getEntries();
     cell_index maxid = getMax(entries);
     ushort maxval = houghPlane[maxid[0]][maxid[1]][maxid[2]];
     float cutoff = m_params.thresh * maxval;
-    vector<cellweight> highWeight = getHighWeight(entries, cutoff);
-    vector<vector<long int>> flatHW;
+    std::vector<cellweight> highWeight = getHighWeight(entries, cutoff);
+    std::vector<std::vector<long int>> flatHW;
     for (auto cx : highWeight) {
       flatHW.push_back({cx.index[0], cx.index[1], cx.index[2], (unsigned short int)cx.weight});
     }
-    vector<double> result = getWeightedMean(highWeight);
-    vector<double> estimate = getBinToVal(result);
-    vector<double> transformed = transform(estimate);
-    /** pt, phiRad, cotTheta, cluster */
-    m_NDFinderTracks.push_back(NDFinderTrack(transformed, cli));
+    std::vector<double> result = getWeightedMean(highWeight);
+    std::vector<double> estimate = getBinToVal(result);
+    std::vector<double> transformed = transform(estimate);
+
+    // READOUTS, uncomment what needed:
+    std::vector<TVector3> ndreadout;
+
+    // Readout of the peak weight
+    /* ndreadout.push_back(TVector3(maxval, 0, 0)); */
+
+    // Readout of the total weight
+    /* unsigned long total_weight = 0; */
+    /* for (const cell_index& cellIndex : entries) { */
+    /*   total_weight += houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
+    /* } */
+    /* ndreadout.push_back(TVector3(total_weight, 0, 0)); */
+
+    // Readout of the number of cluster cells
+    /* int ncells = entries.size(); */
+    /* ndreadout.push_back(TVector3(ncells, 0, 0)); */
+
+    // Readout of the cluster center of gravity
+    /* ndreadout.push_back(TVector3(result[0], result[1], result[2])); */
+
+    // Readout of the cluster weights
+    /* for (const cell_index& cellIndex : entries) { */
+    /*   c3elem element = houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
+    /*   ndreadout.push_back(TVector3(element, 0, 0)); */
+    /* } */
+
+    // Readout of the cluster cell indices
+    /* for (const cell_index& cellIndex : entries) { */
+    /*   ndreadout.push_back(TVector3(cellIndex[0], cellIndex[1], cellIndex[2])); */
+    /* } */
+
+    // Readout of the complete Hough space:
+    /* for (c3index i = 0; i < static_cast<c3index>(houghPlane.shape()[0]); ++i) { */
+    /*   for (c3index j = 0; j < static_cast<c3index>(houghPlane.shape()[1]); ++j) { */
+    /*     for (c3index k = 0; k < static_cast<c3index>(houghPlane.shape()[2]); ++k) { */
+    /*       c3elem element = houghPlane[i][j][k]; */
+    /*       houghspace.push_back(TVector3(element, 0, 0)); */
+    /*     } */
+    /*   } */
+    /* } */
+
+    m_NDFinderTracks.push_back(NDFinderTrack(transformed, cli, houghspace, ndreadout));
   }
 }
 
@@ -529,9 +654,9 @@ float NDFinder::transformVar(float estVal, int idx)
     if (estVal > 180) {
       phiMod -= 360.;
     }
-    return phiMod * TMath::DegToRad();
+    return phiMod * m_pi_deg;
   } else { // theta
-    float thetRad = estVal * TMath::DegToRad();
+    float thetRad = estVal * m_pi_deg;
     return cos(thetRad) / sin(thetRad);
   }
 }
@@ -560,12 +685,14 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<cellweight> highWeight
   double axomega = 0.;
   double axphi = 0.;
   double axtheta = 0.;
+  int ncells = 0;
   long weightSum = 0;
 
   for (cellweight& elem : highWeight) {
     axomega += elem.index[0] * elem.weight;
     axphi += elem.index[1] * elem.weight;
     axtheta += elem.index[2] * elem.weight;
+    ncells++;
     weightSum += elem.weight;
   }
   axomega /= weightSum;
@@ -595,7 +722,8 @@ int NDFinder::hitToCluster(std::vector<std::vector<unsigned short>>& hitsVsClust
     sort(candWeights.begin(), candWeights.end(), mySortObject);
 
     if (candWeights[0][1] > 0) { // the hit contributes non-zero weight
-      float crit = fabs((float)candWeights[0][1] - (float)candWeights[1][1]) / ((float)candWeights[0][1]);
+      float crit = fabs((float)candWeights[0][1] - (float)candWeights[1][1]) / ((float)
+                   candWeights[0][1]); // (7-5)/7 = 0.286 (ok), 6 (0.143) and 7 (0) fail if minassign = 0.2 (default)
       if (crit > m_params.minassign) {
         cur_clus = candWeights[0][0];
       }
@@ -673,8 +801,11 @@ NDFinder::printParams()
 {
   clusterer_params cpa = m_clusterer.getParams();
   B2DEBUG(55, "clusterer_params minweight=" << cpa.minweight << ", minpts=" << cpa.minpts << ", diagonal=" << cpa.diagonal);
-  B2DEBUG(55, "ndFinderParams minhits=" << m_params.minhits <<
-          ", minhits_axial=" << m_params.minhits_axial << ", thresh=" << m_params.thresh << ", minassign=" <<
-          m_params.minassign <<
-          ", mincells=" << m_params.mincells);
+  B2DEBUG(55, "ndFinderParams minsuper_axial=" << m_params.minsuper_axial <<
+          ", minsuper_stereo=" << m_params.minsuper_stereo << ", thresh=" << m_params.thresh << ", minassign=" <<
+          m_params.minassign << ", clustercut=" << m_params.clustercut <<
+          ", mincells=" << m_params.mincells << ", dbscanning=" << m_params.dbscanning << ", mintotalweight=" << m_params.mintotalweight <<
+          ", minpeakweight=" << m_params.minpeakweight <<
+          ", iterations=" << m_params.iterations << ", omegatrim=" << m_params.omegatrim << ", phitrim=" << m_params.phitrim << ", thetatrim="
+          << m_params.thetatrim);
 }

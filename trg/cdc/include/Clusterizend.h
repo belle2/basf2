@@ -10,7 +10,8 @@
 #define CLUSTERIZEND_H
 
 #include <cmath>
-
+#include <TVector3.h>
+#include <iostream>
 
 namespace Belle2 {
   struct clusterer_params  {
@@ -20,6 +21,18 @@ namespace Belle2 {
     unsigned short minpts         =    1;
     /** Consider diagonal adjacent cells as neighbors */
     bool diagonal                 =    true;
+    /** Cut on the total weight of all cells in the 3d volume */
+    unsigned long mintotalweight  =    500;
+    /** Cut on the peak cell weight */
+    unsigned long minpeakweight   =    0;
+    /** Number of iterations of the cluster searching for each Hough space */
+    unsigned long iterations      =    5;
+    /** Number of deleted cells in omega in each direction of the maximum */
+    long omegatrim                =    5;
+    /** Number of deleted cells in phi in each direction of the maximum */
+    long phitrim                  =    5;
+    /** Number of deleted cells in theta in each direction of the maximum */
+    long thetatrim                =    5;
     /** Ordering of track parameters and position of cyclic variable (phi) */
     std::vector<bool> var_cyclic = {false, true, false};
     std::vector<std::string> var_labels = {"omega", "phi", "theta"};
@@ -163,6 +176,15 @@ namespace Belle2 {
 
     std::vector<cell_index> getCandidates();
 
+    std::pair<cell_index, unsigned long> getGlobalMax();
+
+    void deleteMax(cell_index max_index);
+
+    std::vector<SimpleCluster> makeClusters();
+
+    std::pair<SimpleCluster, unsigned long> createCluster(cell_index max_index);
+
+    unsigned long checkSurroundings(cell_index max_index);
 
     template<class T>
     std::string printVector(std::vector<T> vecX)

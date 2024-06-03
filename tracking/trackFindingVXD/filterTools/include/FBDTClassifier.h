@@ -17,11 +17,7 @@
 #include <vector>
 #include <iostream>
 
-#if FastBDT_VERSION_MAJOR >= 3
 typedef FastBDT::Forest<unsigned int> FBDTForest;
-#else
-typedef FastBDT::Forest FBDTForest;
-#endif
 
 namespace Belle2 {
 

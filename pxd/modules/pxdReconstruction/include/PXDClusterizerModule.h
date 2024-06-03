@@ -21,6 +21,7 @@
 namespace Belle2 {
   class RelationArray;
   class RelationElement;
+  class EventLevelTrackingInfo;
 
 
   namespace PXD {
@@ -156,6 +157,8 @@ namespace Belle2 {
       std::unique_ptr<DBObjPtr<PXDClusterPositionErrorPar>> m_clusterPositionErrorUPar;
       /** DB object for cluster posotion errors in V */
       std::unique_ptr<DBObjPtr<PXDClusterPositionErrorPar>> m_clusterPositionErrorVPar;
+      /** StoreObject to access the event level tracking information */
+      StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
 
     };//end class declaration

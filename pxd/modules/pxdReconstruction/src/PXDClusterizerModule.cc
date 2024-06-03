@@ -16,6 +16,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -157,6 +158,8 @@ void PXDClusterizerModule::initialize()
     }
   }
 
+  m_eventLevelTrackingInfo.isOptional();
+
 }
 
 void PXDClusterizerModule::beginRun()
@@ -169,6 +172,14 @@ void PXDClusterizerModule::beginRun()
 
 void PXDClusterizerModule::event()
 {
+  // Abort in case SVDSpacePointCreator was aborted (high occupancy events)
+  // as we do not add PXD hits to CDC standalone tracks, so we don't need to run the PXDClusterizer
+  if (m_eventLevelTrackingInfo.isValid()) {
+    if (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag()) {
+      return;
+    }
+  }
+
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);

@@ -16,7 +16,7 @@ namespace Belle2 {
    */
   class HistObject {
   public:
-    TH1* m_hist{};/**< Pointer to histogram */
+    std::unique_ptr <TH1> m_hist;/**< Pointer to histogram */
     bool m_updated = false; /**< flag if update since last event */
     double m_entries = -1; /**< entries in previous/current for update check */
   public:
@@ -47,7 +47,7 @@ namespace Belle2 {
     /** Get hist pointer
     * @return hist ptr
     */
-    TH1* getHist(void) { return m_hist;};
+    TH1* getHist(void) { return m_hist.get();};
 
   };
 }

@@ -29,9 +29,9 @@ namespace Belle2 {
     EDeltaType m_type{c_Disabled}; /**< type of delta algo */
     int m_parameter{0}; /**< parameter depending on algo, e.g. nr of entries or events */
     unsigned int m_amountDeltas{}; /**< amount of past histograms, at least 1*/
-    TH1* m_lastHist{nullptr};/**< Pointer to last histogram state for check */
+    std::unique_ptr<TH1> m_lastHist{nullptr};/**< Pointer to last histogram state for check */
     int m_lastValue{0}; /**< last value for comparison, depending on type */
-    std::vector<TH1*> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
+    std::vector<std::unique_ptr<TH1>> m_deltaHists;/**< vector of histograms (max m_amountDeltas) */
     bool m_updated{false};/**< if any delta was updated in this event */
   public:
 

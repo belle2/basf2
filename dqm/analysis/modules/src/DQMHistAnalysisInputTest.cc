@@ -226,7 +226,7 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
     c->cd(2);
     auto it = getDeltaList().find(name);
     if (it != getDeltaList().end()) {
-      h = it->second.m_lastHist;
+      h = it->second.m_lastHist.get();
       if (h) h->Draw("hist");
 
       for (unsigned int i = 0; i < it->second.m_amountDeltas; i++) {

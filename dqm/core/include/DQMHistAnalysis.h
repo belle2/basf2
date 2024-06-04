@@ -76,6 +76,11 @@ namespace Belle2 {
      */
     typedef std::map<std::string, bool> CanvasUpdatedList;
 
+    /**
+     * Clear all static global lists
+    */
+    void clearlist(void);
+
   private:
     /**
      * The list of Histograms.

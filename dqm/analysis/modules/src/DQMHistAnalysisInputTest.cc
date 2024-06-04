@@ -272,4 +272,5 @@ void DQMHistAnalysisInputTestModule::endRun()
 void DQMHistAnalysisInputTestModule::terminate()
 {
   B2INFO("DQMHistAnalysisInputTest: terminate called. Run: " << m_runno);
+  clearlist(); // necessary in the Input Module! Otherwise ROOT may clean before we do
 }

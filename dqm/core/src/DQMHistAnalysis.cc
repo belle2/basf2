@@ -46,6 +46,14 @@ DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
   setDescription("Histogram Analysis module base class");
 }
 
+void DQMHistAnalysisModule::clearlist()
+{
+  s_histList.clear();
+// s_monObjList;
+  s_deltaList.clear();
+  s_canvasUpdatedList.clear();
+}
+
 bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::string& histname, TH1* h)
 {
   std::string fullname;

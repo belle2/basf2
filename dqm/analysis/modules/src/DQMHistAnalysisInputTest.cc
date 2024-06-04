@@ -231,15 +231,15 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
 
       for (unsigned int i = 0; i < it->second.m_amountDeltas; i++) {
         c->cd(i + 4);
-        h = nullptr ; //it->second.getDelta(i); // this is not possible from object
-        if (h) {
-          h->Draw("hist");
+        auto hist = it->second.getDelta(i); // this is not possible from object
+        if (hist) {
+          hist->Draw("hist");
           c->cd(3);
           if (i == 0) {
-            h->Draw();
+            hist->Draw();
           } else {
-            h->SetLineColor(i + 2);
-            h->Draw("same");
+            hist->SetLineColor(i + 2);
+            hist->Draw("same");
           }
         }
         if (i + 4 == 9) break;

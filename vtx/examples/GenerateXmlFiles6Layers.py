@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 ##########################################################################
@@ -44,7 +44,7 @@ Xi = 0.001  # 0.002
 sensorL = 30.168
 sensorW = 18.812
 sensorH = 0.400  # str(X0Si*X*1e3)
-sensorHi = 0.95  # str(X0Si*Xi*1e3)
+sensorHi = 0.095  # str(X0Si*Xi*1e3)
 offsetU = 3.5
 offsetV = 0.3
 
@@ -123,7 +123,7 @@ for layer in range(1, nlayer+1):
         nsensor = 1
         start = 0
         shift = str(6.0)
-        gap = 0.
+        gap = 0.1
         shiftL = 6
         radius = 22.0
 
@@ -132,7 +132,7 @@ for layer in range(1, nlayer+1):
         nsensor = 3
         start = -111.474 + 2*sensorL
         shift = str(11.0)
-        gap = 0.
+        gap = 0.1
         shiftL = 11
         radius = 69.0
 
@@ -140,7 +140,7 @@ for layer in range(1, nlayer+1):
         type = 'layer14'
         nsensor = 4
         start = -157.144 + 2*sensorL
-        gap = 0.
+        gap = 0.1
         shiftL = 0
         radius = 82.5
         radius1 = radius + shiftR1
@@ -151,7 +151,7 @@ for layer in range(1, nlayer+1):
         type = 'layer12'
         nsensor = 10
         start = -207.546 + sensorL
-        gap = 0.0
+        gap = 0.1
         shiftL = 0
         radius = 106.0
         radius1 = radius + shiftR1
@@ -162,7 +162,7 @@ for layer in range(1, nlayer+1):
         type = 'layer14'
         nsensor = 6
         start = -249.082 + 2*sensorL
-        gap = 0.00
+        gap = 0.1
         shiftL = 0
         radius = 133.5
         radius1 = radius + shiftR1
@@ -172,7 +172,6 @@ for layer in range(1, nlayer+1):
     shift = str(radius*math.sin(math.radians(phi)))
     shift1 = str(radius1*math.sin(math.radians(phi1)))
 
-    gap = 0
     f.write('  <Ladder layer=\"' + str(layer) + '\">\n')
     if (layer == 1):
         f.write('    <!-- shift defines the shift of the sensor center along the rphi direction\n')
@@ -196,13 +195,13 @@ for layer in range(1, nlayer+1):
 
         pos = 0
         if (layer == 5):
-            pos = start + (2*sensorL)*id
+            pos = start + (2*sensorL+gap)*id
         else:
-            pos = start + (4*sensorL)*id
+            pos = start + (4*sensorL+gap)*id
         posZ = str(pos)
 
         cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + \
-            '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:9] + '</z><shift unit=\"mm\">' + shift[0:6]
+            '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:7] + '</z><shift unit=\"mm\">' + shift[0:6]
         cmd1 += '</shift><shiftR unit=\"mm\">' + str(shiftR) + '</shiftR></Sensor>\n'
 
         f.write(cmd1)
@@ -211,13 +210,13 @@ for layer in range(1, nlayer+1):
         for id in range(0, nsensor):
             pos = 0
             if (layer == 5):
-                pos = start + (2*sensorL)*id
+                pos = start + (2*sensorL+gap)*id
             else:
-                pos = start + (4*sensorL)*id
+                pos = start + (4*sensorL+gap)*id
             posZ = str(pos)
 
             cmd2 = '    <Sensor id=\"' + str(id+nsensor+1) + '\"' + ' type=\"' + type + \
-                '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:9] + '</z><shift unit=\"mm\">' + shift1[0:6]
+                '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:7] + '</z><shift unit=\"mm\">' + shift1[0:6]
             cmd2 += '</shift><shiftR unit=\"mm\">' + str(shiftR1) + '</shiftR></Sensor>\n'
             f.write(cmd2)
 

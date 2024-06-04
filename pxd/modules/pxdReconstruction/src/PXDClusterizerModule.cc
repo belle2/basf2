@@ -71,6 +71,9 @@ PXDClusterizerModule::PXDClusterizerModule() : Module()
            string("PXDClusterPositionErrorUPar"));
   addParam("PositionErrorVPayloadName", m_positionErrorVName, "Payload name for cluster position error in V",
            string("PXDClusterPositionErrorVPar"));
+  addParam("createPXDClustersForAbortedTrackingEvents", m_createPXDClustersForAbortedTrackingEvents,
+           "Create PXDClusters for events where either the SVDSpacePointCreator abort flag or the VXDTF2 and SVDCKF abort flags are set.",
+           m_createPXDClustersForAbortedTrackingEvents);
 
 }
 
@@ -172,10 +175,13 @@ void PXDClusterizerModule::beginRun()
 
 void PXDClusterizerModule::event()
 {
-  // Abort in case SVDSpacePointCreator was aborted (high occupancy events)
-  // as we do not add PXD hits to CDC standalone tracks, so we don't need to run the PXDClusterizer
+  // Abort in case SVDSpacePointCreator was aborted (high occupancy events) or if both VXDTF2 and SVDCKF were aborted
+  // as we do not add PXD hits to CDC standalone tracks, so we don't need to run the PXDClusterizer.
+  // This veto can be overwritten by setting m_createPXDClustersForAbortedTrackingEvents to true to create them regardless.
   if (m_eventLevelTrackingInfo.isValid()) {
-    if (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag()) {
+    if (not m_createPXDClustersForAbortedTrackingEvents and
+        (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag() or
+         (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag() and m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag()))) {
       return;
     }
   }

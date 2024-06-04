@@ -223,42 +223,12 @@ void TrackingAbortDQMModule::event()
 
     if (hit.passesZS(1, cutMinSignal)) nStripsL3VZS5++;
   }
-  m_svdL3vZS5Occupancy[index]->Fill(nStripsL3VZS5 / nStripsL3V * 100);
+  m_svdL3vZS5Occupancy[index]->Fill(std::min((double)nStripsL3VZS5 / nStripsL3V * 100, (double)5.82));
 
   //fill the nCDCExtraHits
-  m_nCDCExtraHits[index]->Fill(m_eventLevelTrackingInfo->getNCDCHitsNotAssigned());
+  m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 
-
-
-  // add overflows to the last bin
-  int nBins = m_svdL3vZS5Occupancy[0]->GetNbinsX();
-  int nOverflow = m_svdL3vZS5Occupancy[0]->GetBinContent(nBins + 1);
-  int nLastBin = m_svdL3vZS5Occupancy[0]->GetBinContent(nBins);
-  m_svdL3vZS5Occupancy[0]->SetBinContent(nBins, nLastBin + nOverflow);
-  m_svdL3vZS5Occupancy[0]->SetBinContent(nBins + 1, 0);
-  nBins = m_svdL3vZS5Occupancy[1]->GetNbinsX();
-  nOverflow = m_svdL3vZS5Occupancy[1]->GetBinContent(nBins + 1);
-  nLastBin = m_svdL3vZS5Occupancy[1]->GetBinContent(nBins);
-  m_svdL3vZS5Occupancy[1]->SetBinContent(nBins, nLastBin + nOverflow);
-  m_svdL3vZS5Occupancy[1]->SetBinContent(nBins + 1, 0);
-
-  nBins = m_nCDCExtraHits[0]->GetNbinsX();
-  nOverflow = m_nCDCExtraHits[0]->GetBinContent(nBins + 1);
-  nLastBin = m_nCDCExtraHits[0]->GetBinContent(nBins);
-  m_nCDCExtraHits[0]->SetBinContent(nBins, nLastBin + nOverflow);
-  m_nCDCExtraHits[0]->SetBinContent(nBins + 1, 0);
-  nBins = m_nCDCExtraHits[1]->GetNbinsX();
-  nOverflow = m_nCDCExtraHits[1]->GetBinContent(nBins + 1);
-  nLastBin = m_nCDCExtraHits[1]->GetBinContent(nBins);
-  m_nCDCExtraHits[1]->SetBinContent(nBins, nLastBin + nOverflow);
-  m_nCDCExtraHits[1]->SetBinContent(nBins + 1, 0);
-
-}
-
-void TrackingAbortDQMModule::endRun()
-{
 
 
 }
-
 

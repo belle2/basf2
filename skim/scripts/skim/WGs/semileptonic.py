@@ -462,9 +462,9 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             return []
 
         # charged K and pi candidates
-        ma.fillParticleList("K-:loose", f"binaryPID(321,211) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1", path=path)
+        ma.fillParticleList("K-:BtoDl", f"binaryPID(321,211) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1", path=path)
         ma.fillParticleList(
-            "pi+:loose",
+            "pi+:BtoDl",
             f"binaryPID(211,321) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1",
             path=path)
         ma.fillParticleList("pi+:slow", f"{hadTrkCuts} and thetaInCDCAcceptance and p>0.05", path=path)
@@ -478,27 +478,27 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.cutAndCopyList('K_S0:good', 'K_S0:merged', cut='significanceOfDistance>2.5', path=path)
 
         # D reconstruction - only clean modes
-        ma.reconstructDecay("D0:Kpi       -> K-:loose pi+:loose", cut="abs(dM) < 0.025", dmID=1, path=path)
-        ma.rankByLowest("D0:Kpi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:KK        -> K-:loose K+:loose", cut="abs(dM) < 0.020", dmID=2, path=path)
+        ma.reconstructDecay("D0:Kpi_BtoDl -> K-:BtoDl pi+:BtoDl", cut="abs(dM) < 0.025", dmID=1, path=path)
+        ma.rankByLowest("D0:Kpi_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:KK        -> K-:BtoDl K+:BtoDl", cut="abs(dM) < 0.020", dmID=2, path=path)
         ma.rankByLowest("D0:KK", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:K3pi      -> K-:loose pi+:loose pi-:loose pi+:loose", cut="abs(dM) < 0.020", dmID=3, path=path)
+        ma.reconstructDecay("D0:K3pi      -> K-:BtoDl pi+:BtoDl pi-:BtoDl pi+:BtoDl", cut="abs(dM) < 0.020", dmID=3, path=path)
         ma.rankByLowest("D0:K3pi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:Kpi0pi    -> K-:loose pi0:e90 pi+:loose", cut="abs(dM)-0.005 < 0.050", dmID=4, path=path)
+        ma.reconstructDecay("D0:Kpi0pi    -> K-:BtoDl pi0:e90 pi+:BtoDl", cut="abs(dM)-0.005 < 0.050", dmID=4, path=path)
         ma.rankByLowest("D0:Kpi0pi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:piKspi      -> pi+:loose K_S0:good pi-:loose", cut="abs(dM) < 0.020", dmID=5, path=path)
+        ma.reconstructDecay("D0:piKspi      -> pi+:BtoDl K_S0:good pi-:BtoDl", cut="abs(dM) < 0.020", dmID=5, path=path)
         ma.rankByLowest("D0:piKspi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:Kspi0       -> K_S0:good pi0:e90", cut="abs(dM)-0.005 < 0.050", dmID=6, path=path)
-        ma.rankByLowest("D0:Kspi0", variable="abs(dM)", numBest=15, path=path)
-        ma.copyLists("D0:sig", ['D0:Kpi', 'D0:KK', 'D0:K3pi', 'D0:Kpi0pi', 'D0:piKspi', 'D0:Kspi0'], path=path)
+        ma.reconstructDecay("D0:Kspi0_BtoDl -> K_S0:good pi0:e90", cut="abs(dM)-0.005 < 0.050", dmID=6, path=path)
+        ma.rankByLowest("D0:Kspi0_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.copyLists("D0:sig", ['D0:Kpi_BtoDl', 'D0:KK', 'D0:K3pi', 'D0:Kpi0pi', 'D0:piKspi', 'D0:Kspi0_BtoDl'], path=path)
 
-        ma.reconstructDecay("D+:Kpipi     -> K-:loose pi+:loose pi+:loose", cut="abs(dM) < 0.020", dmID=1, path=path)
-        ma.rankByLowest("D+:Kpipi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D+:Kspi     -> K_S0:good pi+:loose", cut="abs(dM) < 0.020", dmID=2, path=path)
-        ma.rankByLowest("D+:Kspi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D+:KKpi     -> K-:loose K+:loose pi+:loose", cut="abs(dM) < 0.015", dmID=3, path=path)
+        ma.reconstructDecay("D+:Kpipi_BtoDl -> K-:BtoDl pi+:BtoDl pi+:BtoDl", cut="abs(dM) < 0.020", dmID=1, path=path)
+        ma.rankByLowest("D+:Kpipi_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D+:Kspi_BtoDl -> K_S0:good pi+:BtoDl", cut="abs(dM) < 0.020", dmID=2, path=path)
+        ma.rankByLowest("D+:Kspi_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D+:KKpi     -> K-:BtoDl K+:BtoDl pi+:BtoDl", cut="abs(dM) < 0.015", dmID=3, path=path)
         ma.rankByLowest("D+:KKpi", variable="abs(dM)", numBest=15, path=path)
-        ma.copyLists("D+:sig", ['D+:Kpipi', 'D+:Kspi', 'D+:KKpi'], path=path)
+        ma.copyLists("D+:sig", ['D+:Kpipi_BtoDl', 'D+:Kspi_BtoDl', 'D+:KKpi'], path=path)
 
 # No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
 

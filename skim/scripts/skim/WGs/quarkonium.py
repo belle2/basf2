@@ -167,7 +167,7 @@ class CharmoniumPsi(BaseSkim):
 
     Selection criteria:
 
-    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.7 < M < 4.
+    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.85 < M < 3.9.
       Track-quality requirements are not applied.
     """
     __authors__ = ["Kirill Chilikin"]

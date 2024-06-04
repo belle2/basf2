@@ -39,9 +39,9 @@ def loadStdPi0ForBToHadrons(persistent=True, path=None):
 def loadStdSkimHighEffTracks(particletype, path):
     """
     Function to prepare high eff charged particle lists (:SkimHighEff).
-    We require only fiducial the cuts
-    :b2:var:`thetaInCDCAcceptance` and :b2:var:`chiProb` :math:`> 0` and
-    abs(:b2:var:`dr`) :math:`< 0.5~{\\rm cm}` and abs(dz) :math:` < 3~{\\rm cm}`
+    We require only the fiducial cuts
+    :b2:var:`thetaInCDCAcceptance`, :b2:var:`chiProb` :math:`> 0`,
+    abs(:b2:var:`dr`) :math:`< 0.5~{\\rm cm}` and abs(dz) :math:` < 3~{\\rm cm}`,
     and (global) PID>0.01
 
     @param particletype type of charged particle to make a list of

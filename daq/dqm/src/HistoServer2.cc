@@ -67,7 +67,6 @@ int HistoServer2::server()
             m_man->remove(fd);
             break;
           }
-          updated = true;
           //    printf ( "EvtMessage received : size = %d from fd=%d\n", is, fd );
 
           EvtMessage* hmsg = new EvtMessage(buffer);
@@ -87,18 +86,18 @@ int HistoServer2::server()
             if (objname == string("DQMRC:CLEAR")) {
               m_hman->clear();
               m_hman->merge();
+              updated = false; // have merged, thus reset updated
               now = time(0);
               strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
               printf("[%s] HistoServer2: CLEAR\n", mbstr);
-              updated = false;
               continue;
             }
             if (objname == string("DQMRC:MERGE")) {
               m_hman->merge();
+              updated = false; // have merged, thus reset updated
               now = time(0);
               strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
               printf("[%s] HistoServer2: MERGE\n", mbstr);
-              updated = false;
               continue;
             }
             auto lpos = objname.find("DQMRC:SAVE:");
@@ -112,8 +111,10 @@ int HistoServer2::server()
               subdir = objname.substr(7);
               if (subdir == "EXIT") subdir = "";
               //              printf("HistoServer2 : subdirectory set to %s (%s)\n", subdir.c_str(), objname.c_str());
+              // no update to histograms ...
             } else {
               m_hman->update(subdir, strlist.at(i), fd, (TH1*)objlist.at(i));
+              updated = true; // histograms have been updated
             }
           }
         }
@@ -126,7 +127,7 @@ int HistoServer2::server()
       strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
       printf("[%s] HistoServer2: merging histograms\n", mbstr);
       m_hman->merge();
-      updated = false;
+      updated = false; // have merged, thus reset updated
     }
   }
   return 0;

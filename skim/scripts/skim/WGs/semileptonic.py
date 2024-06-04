@@ -458,8 +458,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.fillParticleList("mu-:sig", f"{muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}", path=path)
         total_leptons = "formula( nParticlesInList(e-:sig) + nParticlesInList(mu-:sig) )"
         # don't waste time if there are no leptons
-        if (f"{total_leptons}" == "0"):
-            return []
+        path = self.skim_event_cuts(f"{total_leptons} > 0", path=path)
 
         # charged K and pi candidates
         ma.fillParticleList("K-:loose", f"binaryPID(321,211) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1", path=path)

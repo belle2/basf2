@@ -34,7 +34,8 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons,
                                             loadStdSkimHighEffPhi,
-                                            loadStdSkimHighEffKstar0,)
+                                            loadStdSkimHighEffKstar0,
+                                            loadStdPhotonCutEta)
 from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
 from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
@@ -295,12 +296,11 @@ class BptoD0etapi_Kpi(BaseSkim):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B+:BptoD0etapi_Kpi -> anti-D0:Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B+:BptoD0etapi_Kpi"]
@@ -417,12 +417,11 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
         loadStdDstarPlus_D0pi_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B0:B0toDstaretapi_D0pi_Kpi -> D*-:D0_Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B0:B0toDstaretapi_D0pi_Kpi"]

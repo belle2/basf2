@@ -124,9 +124,9 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& part,
 
 }
 
-double PIDLikelihood::getDeltaLogLGlobal(const Const::ChargedStable& part,
-                                         const double* fractions,
-                                         Const::PIDDetectorSet detSet) const
+double PIDLikelihood::getLogarithmicProbability(const Const::ChargedStable& part,
+                                                const double* fractions,
+                                                Const::PIDDetectorSet detSet) const
 {
   // Defined as log(p / (1 - p)) where p is global PID probability.
   // In order to save the range of return values it must be implemented as below.

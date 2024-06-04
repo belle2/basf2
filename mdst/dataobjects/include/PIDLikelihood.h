@@ -50,7 +50,7 @@ namespace Belle2 {
      * @param set a set of PID detectors
      * @return true if at least one of the detectors in the set provides likelihoods
      */
-    bool isAvailable(Const::PIDDetectorSet set) const;
+    bool isAvailable(Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
      * Check whether PID information is available for all detectors in a given set.
@@ -58,7 +58,10 @@ namespace Belle2 {
      * @param set a set of PID detectors
      * @return true if all detectors in the set provide likelihoods
      */
-    bool areAllAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
+    bool areAllAvailable(Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const
+    {
+      return  m_detectors.contains(set);
+    }
 
     /**
      * Return log likelihood for a given detector set and particle
@@ -74,7 +77,7 @@ namespace Belle2 {
      * @param p1 charged stable particle
      * @param p2 charged stable particle
      * @param set  a set of PID detectors to use
-     * @return log likelihood difference between two particles
+     * @return log likelihood difference between p1 and p2: logL(p1) - logL(p2)
      */
     float getDeltaLogL(const Const::ChargedStable& p1,
                        const Const::ChargedStable& p2,
@@ -82,20 +85,6 @@ namespace Belle2 {
     {
       return getLogL(p1, set) - getLogL(p2, set);
     }
-
-    /**
-     * Return global log likelihood difference defined as log(p/(1-p)),
-     * where p is the combined likelihood probability of a particle according to chargedStableSet.
-     * This gives a smooth peak-like distribution, opposite to probability distribution which has spikes at 0 and 1.
-     * If prior fractions are not given, equal prior probabilities are assumed.
-     * @param part charged stable particle
-     * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
-     * @param set  a set of PID detectors to use
-     * @return global log likelihood difference
-     */
-    double getDeltaLogLGlobal(const Const::ChargedStable& part,
-                              const double* fractions = nullptr,
-                              Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
      * Return combined likelihood probability for a particle being p1 and not p2,
@@ -137,6 +126,20 @@ namespace Belle2 {
     double getProbability(const Const::ChargedStable& part,
                           const double* fractions = nullptr,
                           Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+
+    /**
+     * Return logarithmic equivalent of likelihood probability; defined as log(p/(1-p)),
+     * where p is the combined likelihood probability of a particle according to chargedStableSet.
+     * This one gives a smooth peak-like distribution (opposite to probability distribution which has spikes at 0 and 1).
+     * If prior fractions are not given, equal prior probabilities are assumed.
+     * @param part charged stable particle
+     * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
+     * @param set  a set of PID detectors to use
+     * @return global log likelihood difference
+     */
+    double getLogarithmicProbability(const Const::ChargedStable& part,
+                                     const double* fractions = nullptr,
+                                     Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
      * Return most likely particle among chargedStableSet;

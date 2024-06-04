@@ -6,8 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TrackingPreFilterDQMModule_H
-#define TrackingPreFilterDQMModule_H
+#ifndef TrackingAbortDQMModule_H
+#define TrackingAbortDQMModule_H
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -27,15 +27,15 @@
 namespace Belle2 {
 
   /** SVD DQM Module for the Unpacker*/
-  class TrackingPreFilterDQMModule : public HistoModule {
+  class TrackingAbortDQMModule : public HistoModule {
 
   public:
 
     /** Constructor */
-    TrackingPreFilterDQMModule();
+    TrackingAbortDQMModule();
 
     /* Destructor */
-    virtual ~TrackingPreFilterDQMModule();
+    virtual ~TrackingAbortDQMModule();
 
     /** Module function initialize */
     void initialize() override final;
@@ -80,5 +80,5 @@ namespace Belle2 {
 
 }
 
-#endif // TrackingPreFilterDQMModule_H
+#endif // TrackingAbortDQMModule_H
 

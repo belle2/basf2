@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "tracking/modules/trackingDQM/TrackingPreFilterDQMModule.h"
+#include "tracking/modules/trackingDQM/TrackingAbortDQMModule.h"
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -25,25 +25,25 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(TrackingPreFilterDQM);
+REG_MODULE(TrackingAbortDQM);
 
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrackingPreFilterDQMModule::TrackingPreFilterDQMModule() : HistoModule()
+TrackingAbortDQMModule::TrackingAbortDQMModule() : HistoModule()
 {
   setDescription("DQM Module to monitor Tracking-related quantities before the HLT filter.");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
-           std::string("TrackingPreFilter"));
+           std::string("TrackingAbort"));
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 
-TrackingPreFilterDQMModule::~TrackingPreFilterDQMModule()
+TrackingAbortDQMModule::~TrackingAbortDQMModule()
 {
 }
 
@@ -51,7 +51,7 @@ TrackingPreFilterDQMModule::~TrackingPreFilterDQMModule()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void TrackingPreFilterDQMModule::defineHisto()
+void TrackingAbortDQMModule::defineHisto()
 {
 
   // Create a separate histogram directories and cd into it.
@@ -136,7 +136,7 @@ void TrackingPreFilterDQMModule::defineHisto()
   oldDir->cd();
 }
 
-void TrackingPreFilterDQMModule::initialize()
+void TrackingAbortDQMModule::initialize()
 {
   m_eventLevelTrackingInfo.isOptional();
   m_eventMetaData.isOptional();
@@ -146,7 +146,7 @@ void TrackingPreFilterDQMModule::initialize()
 }
 
 
-void TrackingPreFilterDQMModule::beginRun()
+void TrackingAbortDQMModule::beginRun()
 {
 
   m_expNumber = m_eventMetaData->getExperiment();
@@ -162,7 +162,7 @@ void TrackingPreFilterDQMModule::beginRun()
 }
 
 
-void TrackingPreFilterDQMModule::event()
+void TrackingAbortDQMModule::event()
 {
   //skip the empty events
   bool eventIsEmpty = false;
@@ -257,7 +257,7 @@ void TrackingPreFilterDQMModule::event()
 
 }
 
-void TrackingPreFilterDQMModule::endRun()
+void TrackingAbortDQMModule::endRun()
 {
 
 

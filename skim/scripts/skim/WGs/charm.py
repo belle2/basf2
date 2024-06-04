@@ -1374,7 +1374,7 @@ class XictoXimpippim(BaseSkim):
         ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
-        ma.fillParticleList('pi+:loose', 'pionIDNN > 0.1', path=path)
+        ma.fillParticleList('pi+:loosePIDNN', 'pionIDNN > 0.1', path=path)
 
         ma.cutAndCopyList(
             'Lambda0:charmSkim',
@@ -1383,7 +1383,7 @@ class XictoXimpippim(BaseSkim):
             path=path)
 
         ma.reconstructDecay(
-            "Xi-:Lambda0pi -> Lambda0:charmSkim pi-:loose",
+            "Xi-:Lambda0pi -> Lambda0:charmSkim pi-:loosePIDNN",
             cut="1.318 < M < 1.325 and significanceOfDistance > 1.4",
             path=path)
         ma.reconstructDecay("Xi0:Lambda0pi0 -> Lambda0:charmSkim pi0:charmSkim",

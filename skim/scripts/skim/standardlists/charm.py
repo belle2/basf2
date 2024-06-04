@@ -103,7 +103,8 @@ def loadStdD0_Kpi(path=None):
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D0:Kpi -> K-:GoodTrack pi+:GoodTrack', cut='1.7 < M < 2.0', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D0:Kpi -> K-:GoodTrack pi+:GoodTrack', cut='1.7 < M < 2.0',
+                        dmID=1, path=path, standardParticleList=True)
     return ['D0:Kpi']
 
 
@@ -323,7 +324,8 @@ def loadStdDplus_Kpipi(path=None):
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kpipi -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack', cut='1.8 < M < 1.9', dmID=1, path=path)
+    ma.reconstructDecay(decayString='D+:Kpipi -> K-:GoodTrack pi+:GoodTrack pi+:GoodTrack',
+                        cut='1.8 < M < 1.9', dmID=1, path=path, standardParticleList=True)
     return ['D+:Kpipi']
 
 
@@ -336,7 +338,8 @@ def loadStdDplus_Kspi(path=None):
 
     @param path     modules are added to this path
     """
-    ma.reconstructDecay(decayString='D+:Kspi -> K_S0:merged pi+:GoodTrack', cut='1.8 < M < 1.9', dmID=2, path=path)
+    ma.reconstructDecay(decayString='D+:Kspi -> K_S0:merged pi+:GoodTrack', cut='1.8 < M < 1.9',
+                        dmID=2, path=path, standardParticleList=True)
     return ['D+:Kspi']
 
 

@@ -42,15 +42,15 @@ class SinglePhotonDark(BaseSkim):
 
     def build_lists(self, path):
 
-        # start with all photons with E* above 500 MeV in the tracking acceptance
+        # start with all photons with E* above 500 MeV and decent time in the tracking acceptance
         in_tracking_acceptance = "0.296706 < theta < 2.61799"  # rad = [17, 150] degrees
         ma.cutAndCopyList(
             "gamma:singlePhoton", "gamma:all",
-            f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance}", path=path)
+            f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance} and abs(clusterTime)<200.", path=path)
 
-        # require a region-dependent minimum energy of the candidate, we have
-        # a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
-        region_dependent = " [clusterTheta < 1.65457213 and clusterTheta > 0.77143553] or "
+        # require a region-dependent minimum energy of the candidate
+        # 0.5 GeV trigger in the inner barrel: [44, 98] degrees @ HLT
+        region_dependent = " [clusterTheta < 1.71042267 and clusterTheta > 0.76794487] or "
         region_dependent += "[clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
         region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
         region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd

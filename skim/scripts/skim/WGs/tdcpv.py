@@ -91,7 +91,7 @@ class TDCPV_qqs(BaseSkim):
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
     * ``abs(deltaE) < 0.250 for KL``
-    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``E_ECL_TDCPV<9``
     """
 
@@ -188,7 +188,7 @@ class TDCPV_qqs(BaseSkim):
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
-                            cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+                            cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'],
                            allMoments=False,
@@ -205,7 +205,7 @@ class TDCPV_qqs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
+            "nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1",
             "E_ECL_TDCPV<9"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
@@ -279,7 +279,7 @@ class TDCPV_ccs(BaseSkim):
     * ``abs(deltaE) < 0.3 for KL``
     * ``abs(deltaE) < 0.5``
     * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
-    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``visibleEnergyOfEventCMS>4"``,
     * ``E_ECL_TDCPV<9``
     """
@@ -372,7 +372,7 @@ class TDCPV_ccs(BaseSkim):
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
-                            cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+                            cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'],
                            allMoments=False,
@@ -390,7 +390,7 @@ class TDCPV_ccs(BaseSkim):
 
         EventCuts = [
             "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",
-            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
+            "nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"
         ]

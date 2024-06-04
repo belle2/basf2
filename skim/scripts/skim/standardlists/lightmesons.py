@@ -343,6 +343,23 @@ def loadStdLooseOmega(persistent=True, path=None):
     return 'omega:loose'
 
 
+def loadStdWideOmega(persistent=True, path=None):
+    """
+    Create the list 'omega:wide' of omega mesons within the wide mass range :math:`0.71 < M < 0.85~GeV`
+    from two oppositely charged pions that come from close to the IP, are inside the CDC acceptance,
+    and fulfill a loose PID criterion, and a neutral pion from the 'pi0:skim' list, which isn't
+    slow :math:`p > 0.25~GeV` and whose mass is above :math:`0.11~GeV`.
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    ma.fillParticleList('pi+:wideOmega', 'dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance and pionID > 0.1', path=path)
+    ma.cutAndCopyList('pi0:wideOmega', 'pi0:skim', 'p > 0.25 and 0.11 < InvM < 0.15', path=path)
+    ma.reconstructDecay('omega:wide -> pi+:wideOmega pi-:wideOmega pi0:wideOmega', '0.71 < M < 0.85',
+                        writeOut=persistent, standardParticleList=True, path=path)
+    return 'omega:wide'
+
+
 def loadStdAllEta(persistent=True, path=None):
     """
     Create a list of 'eta:all' list from 'gamma:all gamma:all' (dmID=1) and 'pi0:eff40_May2020 pi-:all pi+:all'

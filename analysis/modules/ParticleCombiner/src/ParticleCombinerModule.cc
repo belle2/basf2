@@ -71,6 +71,8 @@ In the case of the following decay chain M -> D1 D2 ... Dn and
            "If true, the charge-conjugated mode will be reconstructed as well", true);
   addParam("allowChargeViolation", m_allowChargeViolation,
            "If true the decay string does not have to conserve electric charge", false);
+  addParam("standardParticleList", m_standardParticleList,
+           "If true, existing particle list with same name will be used instead of recreating it.", false);
 
   // initializing the rest of private members
   m_pdgCode   = 0;
@@ -145,6 +147,9 @@ void ParticleCombinerModule::initialize()
 
 void ParticleCombinerModule::event()
 {
+  if (m_standardParticleList and m_outputList.isValid())
+    return;
+
   m_outputList.create();
   m_outputList->initialize(m_pdgCode, m_listName);
 

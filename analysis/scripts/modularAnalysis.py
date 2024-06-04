@@ -1569,7 +1569,8 @@ def reconstructDecay(decayString,
                      candidate_limit=None,
                      ignoreIfTooManyCandidates=True,
                      chargeConjugation=True,
-                     allowChargeViolation=False):
+                     allowChargeViolation=False,
+                     standardParticleList=False):
     r"""
     Creates new Particles by making combinations of existing Particles - it reconstructs unstable particles via their specified
     decay mode, e.g. in form of a :ref:`DecayString`: :code:`D0 -> K- pi+` or :code:`B+ -> anti-D0 pi+`, ... All possible
@@ -1615,6 +1616,7 @@ def reconstructDecay(decayString,
                        otherwise, number of candidates in candidate_limit is reconstructed.
     @param chargeConjugation boolean to decide whether charge conjugated mode should be reconstructed as well (on by default)
     @param allowChargeViolation whether the decay string needs to conserve the electric charge
+    @param standardParticleList whether a standard particle list is reconstructed (expert use only)
     """
 
     pmake = register_module('ParticleCombiner')
@@ -1628,6 +1630,7 @@ def reconstructDecay(decayString,
     pmake.param("ignoreIfTooManyCandidates", ignoreIfTooManyCandidates)
     pmake.param('chargeConjugation', chargeConjugation)
     pmake.param("allowChargeViolation", allowChargeViolation)
+    pmake.param("standardParticleList", standardParticleList)
     path.add_module(pmake)
 
 

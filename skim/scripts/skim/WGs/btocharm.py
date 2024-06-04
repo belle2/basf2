@@ -1266,15 +1266,15 @@ class B0toDDs0star(BaseSkim):
         loadStdPi0ForBToHadrons(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",
+        ma.reconstructDecay("phi:KK -> K+:GoodTrack K-:GoodTrack",
                             cut="[1.01 < M < 1.03]", path=path)
         ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",
                             cut="[0.793 < M < 1.015]", path=path)
-        ma.reconstructDecay("D_s+:phipipi0 -> phi pi+:GoodTrack pi0:bth_skim",
+        ma.reconstructDecay("D_s+:phipipi0 -> phi:KK pi+:GoodTrack pi0:bth_skim",
                             cut="[1.942 < M < 1.978]", path=path)
         ma.reconstructDecay("D_s+:antiKK -> anti-K*0 K+:GoodTrack",
                             cut="[1.944 < M < 1.992]", path=path)
-        ma.reconstructDecay("D_s+:phipi -> phi pi+:GoodTrack",
+        ma.reconstructDecay("D_s+:phipi -> phi:KK pi+:GoodTrack",
                             cut="[1.935 < M < 1.999]", path=path)
         Dslist = ['D_s+:phipipi0', 'D_s+:antiKK', 'D_s+:phipi']
         ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)

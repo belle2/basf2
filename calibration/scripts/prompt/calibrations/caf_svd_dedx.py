@@ -18,9 +18,6 @@ from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm
 import modularAnalysis as ma
 import vertex as vx
 
-import reconstruction as re
-
-ROOT.gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
 
 
@@ -95,9 +92,6 @@ def get_calibrations(input_data, **kwargs):
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
 
-    # Get the expert configurations if you have something you might configure from them. It should always be available
-    # expert_config = kwargs.get("expert_config")
-
     from caf.utils import IoV
     # The actual value our output IoV payload should have. Notice that we've set it open ended.
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, -1, -1)
@@ -118,25 +112,8 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Calibration
 
     rec_path = b2.Path()
-    rec_path.add_module(
-        'RootInput',
-        branchNames=[
-            'RawARICHs',
-            'RawCDCs',
-            'RawECLs',
-            'RawFTSWs',
-            'RawKLMs',
-            'RawPXDs',
-            'RawSVDs',
-            'RawTOPs',
-            'RawTRGs',
-            'RawDataBlock',
-            'RawCOPPER'],
-        logLevel=b2.LogLevel.ERROR)
+    rec_path.add_module('RootInput')
 
-    re.add_unpackers(path=rec_path)
-    re.add_reconstruction(path=rec_path, pruneTracks=False)
-    rec_path.add_module('VXDDedxPID')
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)
     ma.fillParticleList("pi+:lam", "nCDCHits>0", path=rec_path)  # pi without track quality for reconstructing lambda

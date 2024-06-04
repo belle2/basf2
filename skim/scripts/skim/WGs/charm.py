@@ -1674,16 +1674,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         sigDst_fromD0 = []
         for chID, channel in enumerate(Dst0_Xfrag):
             n = len(Dst0_Xfrag)
-            ma.reconstructDecay("D*+:dsz_" + str(chID) + " -> D*0:skim " + channel, sigCuts, chID, path=path)
-            ma.reconstructDecay("D*+:dsz_" + str(chID + n) + " -> D*0:skim " + channel +
-                                " K+:hadtag K-:hadtag", sigCuts, chID + n, path=path)
-            sigDst_fromDst0.append("D*+:dsz_" + str(chID))
-            sigDst_fromDst0.append("D*+:dsz_" + str(chID + n))
-        ma.copyLists("D*+:fromDstz", sigDst_fromDst0, path=path)
-
-        sigDst_fromD0 = []
-        for chID, channel in enumerate(Dst0_Xfrag):
-            n = len(Dst0_Xfrag)
             ma.reconstructDecay("D*+:dz_" + str(chID) + " -> D0:skim " + channel, sigCuts, chID, path=path)
             ma.reconstructDecay("D*+:dz_" + str(chID + n) + " -> D0:skim " + channel +
                                 " K+:hadtag K-:hadtag", sigCuts, chID, path=path)

@@ -42,7 +42,7 @@ class SinglePhotonDark(BaseSkim):
     def build_lists(self, path):
 
         # start with all photons with E* above 500 MeV in the tracking acceptance
-        in_tracking_acceptance = "0.296706 < theta < 2.61799"  # rad = [17, 150] degrees
+        in_tracking_acceptance = "thetaInCDCAcceptance"  # rad = [17, 150] degrees
         ma.cutAndCopyList(
             "gamma:singlePhoton", "gamma:all",
             f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance}", path=path)
@@ -117,7 +117,7 @@ class ALP3Gamma(BaseSkim):
         # applying a lab frame energy cut to the daughter photons
         ma.fillParticleList(
             'gamma:cdcAndMinimumEnergy',
-            'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
+            'E >= 0.1 and thetaInCDCAcceptance',
             True, path=path)
 
         # defining the decay string
@@ -320,7 +320,7 @@ class EGammaControlDark(BaseSkim):
 
         # exactly 1 good photon in the event
         photon_energy_cut = '0.45'
-        good_photon = 'theta > 0.296706 and theta < 2.61799' +\
+        good_photon = 'thetaInCDCAcceptance' +\
             f' and useCMSFrame(E) > {photon_energy_cut}'
         ma.cutAndCopyList(f'gamma:{internal_skim_label}', 'gamma:all', good_photon, path=path)
         one_good_photon = f'[eventCached(nParticlesInList(gamma:{internal_skim_label})) == 1]'

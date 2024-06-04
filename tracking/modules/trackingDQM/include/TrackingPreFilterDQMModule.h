@@ -43,6 +43,8 @@ namespace Belle2 {
     void beginRun() override final;
     /** Module function event */
     void event() override final;
+    /** Module function endRun */
+    void endRun() override final;
 
     /**
      * Defines Histograms
@@ -59,6 +61,9 @@ namespace Belle2 {
 
     int const nStripsL3V = 768 * 2 * 7; /**< number of V-side L3 strips*/
 
+    int m_runNumber; /**< run number*/
+    int m_expNumber; /**< experiment number*/
+
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo; /**< tracking abort info*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data*/
 
@@ -70,7 +75,7 @@ namespace Belle2 {
     TH1F* m_nEventsWithAbort[2]; /**< 0: no abort; 1: at least one abort*/;
     TH1F* m_trackingErrorFlagsReasons[2]; /**< stores the reason of the abort */
     TH1F* m_svdL3vZS5Occupancy[2]; /**<distribution of the SVD L3 V ZS5 occupancy*/
-
+    TH1F* m_nCDCExtraHits[2]; /**< distribution of the number of extra CDC hits */
   };
 
 }

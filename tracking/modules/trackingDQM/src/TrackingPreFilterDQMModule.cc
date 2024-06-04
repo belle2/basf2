@@ -75,17 +75,19 @@ void TrackingPreFilterDQMModule::defineHisto()
                                    2, -0.5, 1.5);
   m_nEventsWithAbort[0]->GetXaxis()->SetBinLabel(1, "No Abort");
   m_nEventsWithAbort[0]->GetXaxis()->SetBinLabel(2, "At Least One Abort");
+  m_nEventsWithAbort[0]->SetMinimum(0.1);
+
   //inside active_veto window:
   m_nEventsWithAbort[1] = new TH1F(*m_nEventsWithAbort[0]);
   m_nEventsWithAbort[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_nEventsWithAbort[1]->SetTitle(TString::Format("%s_%s", histoTitle.c_str(), title[1].c_str()));
+  m_nEventsWithAbort[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
   //abort flag reason
   //outside active_veto window:
   histoName = "TrkAbortReason";
   histoTitle = "Tracking Abort Reason";
   m_trackingErrorFlagsReasons[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
-                                            TString::Format("%s_%s", histoTitle.c_str(), title[0].c_str()),
+                                            TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                                             5, -0.5, 4.5);
   m_trackingErrorFlagsReasons[0]->GetXaxis()->SetTitle("Type of error occurred");
   m_trackingErrorFlagsReasons[0]->GetYaxis()->SetTitle("Number of events");
@@ -97,7 +99,7 @@ void TrackingPreFilterDQMModule::defineHisto()
   //inside active_veto window:
   m_trackingErrorFlagsReasons[1] = new TH1F(*m_trackingErrorFlagsReasons[0]);
   m_trackingErrorFlagsReasons[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_trackingErrorFlagsReasons[1]->SetTitle(TString::Format("%s_%s", histoTitle.c_str(), title[1].c_str()));
+  m_trackingErrorFlagsReasons[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
 
   //SVD L3 occupancy - see SVDDQMDose module for details
@@ -105,19 +107,30 @@ void TrackingPreFilterDQMModule::defineHisto()
   histoTitle = "SVD L3 v-side ZS5 Occupancy (%)";
   //outside active_veto window:
   m_svdL3vZS5Occupancy[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
-                                     TString::Format("%s_%s", histoTitle.c_str(), title[0].c_str()),
+                                     TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                                      90, 0, 100.0 / 1536.0 * 90);
   m_svdL3vZS5Occupancy[0]->GetXaxis()->SetTitle("occupancy [%]");
   m_svdL3vZS5Occupancy[0]->GetYaxis()->SetTitle("Number Of Events");
   //inside active_veto window:
   m_svdL3vZS5Occupancy[1] = new TH1F(*m_svdL3vZS5Occupancy[0]);
   m_svdL3vZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_svdL3vZS5Occupancy[1]->SetTitle(TString::Format("%s_%s", histoTitle.c_str(), title[1].c_str()));
+  m_svdL3vZS5Occupancy[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
 
   //CDC extra hits
+  histoName = "nCDCExtraHits";
+  histoTitle = "Number of CDC Extra Hits";
+  //outside active_veto window:
+  m_nCDCExtraHits[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                200, 0, 5000);
+  m_nCDCExtraHits[0]->GetXaxis()->SetTitle("nCDCExtraHits");
+  m_nCDCExtraHits[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_nCDCExtraHits[1] = new TH1F(*m_nCDCExtraHits[0]);
+  m_nCDCExtraHits[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_nCDCExtraHits[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
-  //
 
 
   oldDir->cd();
@@ -136,8 +149,8 @@ void TrackingPreFilterDQMModule::initialize()
 void TrackingPreFilterDQMModule::beginRun()
 {
 
-  int expNumber = m_eventMetaData->getExperiment();
-  int runNumber = m_eventMetaData->getRun();
+  m_expNumber = m_eventMetaData->getExperiment();
+  m_runNumber = m_eventMetaData->getRun();
 
   if (m_trackingErrorFlagsReasons[0] != nullptr) m_trackingErrorFlagsReasons[0]->Reset();
   if (m_trackingErrorFlagsReasons[1] != nullptr) m_trackingErrorFlagsReasons[1]->Reset();
@@ -213,6 +226,40 @@ void TrackingPreFilterDQMModule::event()
     if (hit.passesZS(1, cutMinSignal)) nStripsL3VZS5++;
   }
   m_svdL3vZS5Occupancy[index]->Fill(nStripsL3VZS5 / nStripsL3V * 100);
+
+  //fill the nCDCExtraHits
+  m_nCDCExtraHits[index]->Fill(m_eventLevelTrackingInfo->getNCDCHitsNotAssigned());
+
+
+
+  // add overflows to the last bin
+  int nBins = m_svdL3vZS5Occupancy[0]->GetNbinsX();
+  int nOverflow = m_svdL3vZS5Occupancy[0]->GetBinContent(nBins + 1);
+  int nLastBin = m_svdL3vZS5Occupancy[0]->GetBinContent(nBins);
+  m_svdL3vZS5Occupancy[0]->SetBinContent(nBins, nLastBin + nOverflow);
+  m_svdL3vZS5Occupancy[0]->SetBinContent(nBins + 1, 0);
+  nBins = m_svdL3vZS5Occupancy[1]->GetNbinsX();
+  nOverflow = m_svdL3vZS5Occupancy[1]->GetBinContent(nBins + 1);
+  nLastBin = m_svdL3vZS5Occupancy[1]->GetBinContent(nBins);
+  m_svdL3vZS5Occupancy[1]->SetBinContent(nBins, nLastBin + nOverflow);
+  m_svdL3vZS5Occupancy[1]->SetBinContent(nBins + 1, 0);
+
+  nBins = m_nCDCExtraHits[0]->GetNbinsX();
+  nOverflow = m_nCDCExtraHits[0]->GetBinContent(nBins + 1);
+  nLastBin = m_nCDCExtraHits[0]->GetBinContent(nBins);
+  m_nCDCExtraHits[0]->SetBinContent(nBins, nLastBin + nOverflow);
+  m_nCDCExtraHits[0]->SetBinContent(nBins + 1, 0);
+  nBins = m_nCDCExtraHits[1]->GetNbinsX();
+  nOverflow = m_nCDCExtraHits[1]->GetBinContent(nBins + 1);
+  nLastBin = m_nCDCExtraHits[1]->GetBinContent(nBins);
+  m_nCDCExtraHits[1]->SetBinContent(nBins, nLastBin + nOverflow);
+  m_nCDCExtraHits[1]->SetBinContent(nBins + 1, 0);
+
+}
+
+void TrackingPreFilterDQMModule::endRun()
+{
+
 
 }
 

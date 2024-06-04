@@ -34,13 +34,12 @@ REG_MODULE(TrackingPreFilterDQM);
 
 TrackingPreFilterDQMModule::TrackingPreFilterDQMModule() : HistoModule()
 {
-  //Set module properties
   setDescription("DQM Module to monitor Tracking-related quantities before the HLT filter.");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("TrackingPreFilter"));
 
-  setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 
@@ -61,28 +60,59 @@ void TrackingPreFilterDQMModule::defineHisto()
     oldDir->mkdir(m_histogramDirectoryName.c_str());
     oldDir->cd(m_histogramDirectoryName.c_str());
   }
+  //histogram index:
+  // 0 if the event is triggered OUTSIDE the active_veto window
+  string tag[2] = {"OUT", "IN"};
+  string title[2] = {"[Outside Active Veto Window]", "[Inside Active Veto Window]"};
+
 
   //number of events with and without at least one abort
-  m_nEventsWithAbort = new TH1F("EventsWithAborts", "Events With at Least one Abort", 2, -0.5, 1.5);
-  m_nEventsWithAbort->GetXaxis()->SetBinLabel(1, "No Abort");
-  m_nEventsWithAbort->GetXaxis()->SetBinLabel(2, "At Least One Abort");
+  //outside active_veto window:
+  string histoName = "EventsWithAborts";
+  string histoTitle = "Events With at Least one Abort";
+  m_nEventsWithAbort[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                   TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                   2, -0.5, 1.5);
+  m_nEventsWithAbort[0]->GetXaxis()->SetBinLabel(1, "No Abort");
+  m_nEventsWithAbort[0]->GetXaxis()->SetBinLabel(2, "At Least One Abort");
+  //inside active_veto window:
+  m_nEventsWithAbort[1] = new TH1F(*m_nEventsWithAbort[0]);
+  m_nEventsWithAbort[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_nEventsWithAbort[1]->SetTitle(TString::Format("%s_%s", histoTitle.c_str(), title[1].c_str()));
 
   //abort flag reason
-  m_trackingErrorFlagsReasons = new TH1F("TrackingErrorFlagsReasons",
-                                         "Tracking errors by reason. A single event may fall in multiple bins.", 5, -0.5, 4.5);
-  m_trackingErrorFlagsReasons->GetXaxis()->SetTitle("Type of error occurred");
-  m_trackingErrorFlagsReasons->GetYaxis()->SetTitle("Number of events");
-  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(1, "Unspecified PR");
-  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(2, "VXDTF2");
-  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(3, "SVDCKF");
-  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(4, "PXDCKF");
-  m_trackingErrorFlagsReasons->GetXaxis()->SetBinLabel(5, "SpacePoint");
+  //outside active_veto window:
+  histoName = "TrkAbortReason";
+  histoTitle = "Tracking Abort Reason";
+  m_trackingErrorFlagsReasons[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                            TString::Format("%s_%s", histoTitle.c_str(), title[0].c_str()),
+                                            5, -0.5, 4.5);
+  m_trackingErrorFlagsReasons[0]->GetXaxis()->SetTitle("Type of error occurred");
+  m_trackingErrorFlagsReasons[0]->GetYaxis()->SetTitle("Number of events");
+  m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(1, "Unspecified PR");
+  m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(2, "VXDTF2");
+  m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(3, "SVDCKF");
+  m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(4, "PXDCKF");
+  m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(5, "SpacePoint");
+  //inside active_veto window:
+  m_trackingErrorFlagsReasons[1] = new TH1F(*m_trackingErrorFlagsReasons[0]);
+  m_trackingErrorFlagsReasons[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_trackingErrorFlagsReasons[1]->SetTitle(TString::Format("%s_%s", histoTitle.c_str(), title[1].c_str()));
 
-  //SVD L3 occupancy
-  //see SVDDQMDose module for details
-  m_svdL3vZS5Occupancy = new TH1F("SVDL3Occ", "SVD L3 v-side ZS5 Occupancy [%]", 90, 0, 100.0 / 1536.0 * 90);
-  m_svdL3vZS5Occupancy->GetXaxis()->SetTitle("occupancy [%]");
-  m_svdL3vZS5Occupancy->GetYaxis()->SetTitle("Number Of Events");
+
+  //SVD L3 occupancy - see SVDDQMDose module for details
+  histoName = "SVDL3VOcc";
+  histoTitle = "SVD L3 v-side ZS5 Occupancy (%)";
+  //outside active_veto window:
+  m_svdL3vZS5Occupancy[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                     TString::Format("%s_%s", histoTitle.c_str(), title[0].c_str()),
+                                     90, 0, 100.0 / 1536.0 * 90);
+  m_svdL3vZS5Occupancy[0]->GetXaxis()->SetTitle("occupancy [%]");
+  m_svdL3vZS5Occupancy[0]->GetYaxis()->SetTitle("Number Of Events");
+  //inside active_veto window:
+  m_svdL3vZS5Occupancy[1] = new TH1F(*m_svdL3vZS5Occupancy[0]);
+  m_svdL3vZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdL3vZS5Occupancy[1]->SetTitle(TString::Format("%s_%s", histoTitle.c_str(), title[1].c_str()));
 
 
   //CDC extra hits
@@ -109,22 +139,18 @@ void TrackingPreFilterDQMModule::beginRun()
   int expNumber = m_eventMetaData->getExperiment();
   int runNumber = m_eventMetaData->getRun();
 
-  TString histoTitle = TString::Format("SVD Data Format Monitor, Exp %d Run %d", expNumber, runNumber);
-
-  if (m_trackingErrorFlagsReasons != nullptr) {
-    m_trackingErrorFlagsReasons->Reset();
-    m_trackingErrorFlagsReasons->SetTitle(histoTitle.Data());
-  }
-
-  if (m_nEventsWithAbort != nullptr)  m_nEventsWithAbort->Reset();
-  if (m_svdL3vZS5Occupancy != nullptr)  m_svdL3vZS5Occupancy->Reset();
+  if (m_trackingErrorFlagsReasons[0] != nullptr) m_trackingErrorFlagsReasons[0]->Reset();
+  if (m_trackingErrorFlagsReasons[1] != nullptr) m_trackingErrorFlagsReasons[1]->Reset();
+  if (m_nEventsWithAbort[0] != nullptr)  m_nEventsWithAbort[0]->Reset();
+  if (m_nEventsWithAbort[1] != nullptr)  m_nEventsWithAbort[1]->Reset();
+  if (m_svdL3vZS5Occupancy[0] != nullptr)  m_svdL3vZS5Occupancy[0]->Reset();
+  if (m_svdL3vZS5Occupancy[1] != nullptr)  m_svdL3vZS5Occupancy[1]->Reset();
 
 }
 
 
 void TrackingPreFilterDQMModule::event()
 {
-
   //skip the empty events
   bool eventIsEmpty = false;
 
@@ -142,27 +168,36 @@ void TrackingPreFilterDQMModule::event()
 
   if (eventIsEmpty) return;
 
+
+  //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
+  int index = 0; //events accepted in the passive veto window but not in the active
+
+  int trgBit_rejectedBy_AV = m_trgSummary->getInputBitNumber("cdcecl_veto"); // 53
+  int trgBit_rejectedBy_PV = m_trgSummary->getInputBitNumber("passive_veto"); // 28
+  if (m_trgSummary->testInput(trgBit_rejectedBy_PV) == 1 &&  m_trgSummary->testInput(trgBit_rejectedBy_AV) == 0) index = 1;
+
+
   //fill the tracking abort reason histogram & nEvents with Abort
   if (m_eventLevelTrackingInfo.isValid()) {
     if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
 
-      m_nEventsWithAbort->Fill(1);
+      m_nEventsWithAbort[index]->Fill(1);
 
       if (m_eventLevelTrackingInfo->hasUnspecifiedTrackFindingFailure())
-        m_trackingErrorFlagsReasons->Fill(0);
+        m_trackingErrorFlagsReasons[index]->Fill(0);
       if (m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag())
-        m_trackingErrorFlagsReasons->Fill(1);
+        m_trackingErrorFlagsReasons[index]->Fill(1);
       if (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag())
-        m_trackingErrorFlagsReasons->Fill(2);
+        m_trackingErrorFlagsReasons[index]->Fill(2);
       if (m_eventLevelTrackingInfo->hasPXDCKFAbortionFlag())
-        m_trackingErrorFlagsReasons->Fill(3);
+        m_trackingErrorFlagsReasons[index]->Fill(3);
       if (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag())
-        m_trackingErrorFlagsReasons->Fill(4);
+        m_trackingErrorFlagsReasons[index]->Fill(4);
     } else { //EventLevelTrackingIinfo valid but no error
-      m_nEventsWithAbort->Fill(0);
+      m_nEventsWithAbort[index]->Fill(0);
     }
   } else //EventLevelTrackingIinfo not valid
-    m_nEventsWithAbort->Fill(0);
+    m_nEventsWithAbort[index]->Fill(0);
 
 
   // fill the svd L3 v ZS5 occupancy
@@ -177,7 +212,7 @@ void TrackingPreFilterDQMModule::event()
 
     if (hit.passesZS(1, cutMinSignal)) nStripsL3VZS5++;
   }
-  m_svdL3vZS5Occupancy->Fill(nStripsL3VZS5 / nStripsL3V * 100);
+  m_svdL3vZS5Occupancy[index]->Fill(nStripsL3VZS5 / nStripsL3V * 100);
 
 }
 

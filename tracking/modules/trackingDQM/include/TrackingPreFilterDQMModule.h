@@ -18,6 +18,7 @@
 #include <svd/calibration/SVDNoiseCalibrations.h>
 #include <cdc/dataobjects/CDCHit.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include <framework/core/HistoModule.h>
 #include <string>
@@ -56,17 +57,19 @@ namespace Belle2 {
 //calibration objects
     SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibration db object*/
 
-    int const nStripsL3V = 768 * 2 * 7;
+    int const nStripsL3V = 768 * 2 * 7; /**< number of V-side L3 strips*/
 
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo; /**< tracking abort info*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data*/
 
     StoreArray<SVDShaperDigit> m_strips; /**< strips*/
     StoreArray<CDCHit> m_cdcHits; /**< CDC hits*/
+    StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
-    TH1F* m_nEventsWithAbort; /**< 0: no abort; 1: at least one abort*/;
-    TH1F* m_trackingErrorFlagsReasons; /**< stores the reason of the abort */
-    TH1F* m_svdL3vZS5Occupancy; /**<distribution of the SVD L3 V ZS5 occupancy*/
+    //vector: 0 = passive veto; 1 = active veto
+    TH1F* m_nEventsWithAbort[2]; /**< 0: no abort; 1: at least one abort*/;
+    TH1F* m_trackingErrorFlagsReasons[2]; /**< stores the reason of the abort */
+    TH1F* m_svdL3vZS5Occupancy[2]; /**<distribution of the SVD L3 V ZS5 occupancy*/
 
   };
 

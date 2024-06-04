@@ -231,7 +231,7 @@ void DQMHistAnalysisInputTestModule::PlotDelta(void)
 
       for (unsigned int i = 0; i < it->second.m_amountDeltas; i++) {
         c->cd(i + 4);
-        auto hist = it->second.getDelta(i); // this is not possible from object
+        auto hist = it->second.getDelta(i);
         if (hist) {
           hist->Draw("hist");
           c->cd(3);

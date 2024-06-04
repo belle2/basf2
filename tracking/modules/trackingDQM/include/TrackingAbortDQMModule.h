@@ -11,20 +11,19 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <mdst/dataobjects/TRGSummary.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/calibration/SVDNoiseCalibrations.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-#include <mdst/dataobjects/TRGSummary.h>
 
 #include <framework/core/HistoModule.h>
 #include <string>
 #include <TH2S.h>
 
 namespace Belle2 {
+
+  class EventMetaData;
+  class SVDShaperDigit;
+  class EventLevelTrackingInfo;
+  class TRGSummary;
 
   /** SVD DQM Module for the Unpacker*/
   class TrackingAbortDQMModule : public HistoModule {
@@ -49,12 +48,13 @@ namespace Belle2 {
     */
     void defineHisto() override final;
 
+  private:
+
     /** Name of the histogram directory in ROOT file */
     std::string m_histogramDirectoryName;
 
-  private:
 
-//calibration objects
+    //calibration objects
     SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibration db object*/
 
     int const nStripsL3V = 768 * 2 * 7; /**< number of V-side L3 strips*/
@@ -63,7 +63,6 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data*/
 
     StoreArray<SVDShaperDigit> m_strips; /**< strips*/
-    StoreArray<CDCHit> m_cdcHits; /**< CDC hits*/
     StoreObjPtr<TRGSummary> m_trgSummary; /**< trg summary */
 
     //vector: 0 = passive veto; 1 = active veto

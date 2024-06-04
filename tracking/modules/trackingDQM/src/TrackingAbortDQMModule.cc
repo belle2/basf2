@@ -8,8 +8,10 @@
 
 #include "tracking/modules/trackingDQM/TrackingAbortDQMModule.h"
 
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <svd/dataobjects/SVDShaperDigit.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+#include <mdst/dataobjects/TRGSummary.h>
 
 #include <TDirectory.h>
 #include <TLine.h>
@@ -19,7 +21,6 @@
 #include <string>
 
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -34,7 +35,7 @@ REG_MODULE(TrackingAbortDQM);
 
 TrackingAbortDQMModule::TrackingAbortDQMModule() : HistoModule()
 {
-  setDescription("DQM Module to monitor Tracking-related quantities before the HLT filter.");
+  setDescription("DQM Module to monitor Tracking Aborts and detector-related quantities.");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("TrackingAbort"));
@@ -62,17 +63,18 @@ void TrackingAbortDQMModule::defineHisto()
   }
   //histogram index:
   // 0 if the event is triggered OUTSIDE the active_veto window
-  string tag[2] = {"OUT", "IN"};
-  string title[2] = {"[Outside Active Veto Window]", "[Inside Active Veto Window]"};
+  std::string tag[2] = {"OUT", "IN"};
+  std::string title[2] = {"[Outside Active Veto Window]", "[Inside Active Veto Window]"};
 
 
   //number of events with and without at least one abort
   //outside active_veto window:
-  string histoName = "EventsWithAborts";
-  string histoTitle = "Events With at Least one Abort";
+  std::string histoName = "EventsWithAborts";
+  std::string histoTitle = "Events With at Least one Abort";
   m_nEventsWithAbort[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
                                    TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                                    2, -0.5, 1.5);
+  m_nEventsWithAbort[0]->GetYaxis()->SetTitle("Number of Events");
   m_nEventsWithAbort[0]->GetXaxis()->SetBinLabel(1, "No Abort");
   m_nEventsWithAbort[0]->GetXaxis()->SetBinLabel(2, "At Least One Abort");
   m_nEventsWithAbort[0]->SetMinimum(0.1);
@@ -90,7 +92,7 @@ void TrackingAbortDQMModule::defineHisto()
                                             TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                                             5, -0.5, 4.5);
   m_trackingErrorFlagsReasons[0]->GetXaxis()->SetTitle("Type of error occurred");
-  m_trackingErrorFlagsReasons[0]->GetYaxis()->SetTitle("Number of events");
+  m_trackingErrorFlagsReasons[0]->GetYaxis()->SetTitle("Number of Events");
   m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(1, "Unspecified PR");
   m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(2, "VXDTF2");
   m_trackingErrorFlagsReasons[0]->GetXaxis()->SetBinLabel(3, "SVDCKF");
@@ -110,7 +112,7 @@ void TrackingAbortDQMModule::defineHisto()
                                      TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                                      90, 0, 100.0 / 1536.0 * 90);
   m_svdL3vZS5Occupancy[0]->GetXaxis()->SetTitle("occupancy [%]");
-  m_svdL3vZS5Occupancy[0]->GetYaxis()->SetTitle("Number Of Events");
+  m_svdL3vZS5Occupancy[0]->GetYaxis()->SetTitle("Number of Events");
   //inside active_veto window:
   m_svdL3vZS5Occupancy[1] = new TH1F(*m_svdL3vZS5Occupancy[0]);
   m_svdL3vZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
@@ -140,6 +142,7 @@ void TrackingAbortDQMModule::initialize()
 {
   m_eventLevelTrackingInfo.isOptional();
   m_eventMetaData.isOptional();
+  m_trgSummary.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -162,29 +165,26 @@ void TrackingAbortDQMModule::beginRun()
 
 void TrackingAbortDQMModule::event()
 {
-  //skip the empty events
-  bool eventIsEmpty = false;
+  if (! m_eventMetaData->isValid()) return;
+  if (! m_trgSummary->isValid()) return;
 
+  //skip the empty events
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkPacketCRCError)
-    eventIsEmpty = true;
+    return;
 
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkEventCRCError)
-    eventIsEmpty = true;
+    return;
 
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_HLTCrash)
-    eventIsEmpty = true;
+    return;
 
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_ReconstructionAbort)
-    eventIsEmpty = true;
-
-  if (eventIsEmpty) return;
-
+    return;
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
-
-  int trgBit_rejectedBy_AV = m_trgSummary->getInputBitNumber("cdcecl_veto"); // 53
-  int trgBit_rejectedBy_PV = m_trgSummary->getInputBitNumber("passive_veto"); // 28
+  const int trgBit_rejectedBy_AV = m_trgSummary->getInputBitNumber("cdcecl_veto"); // 53
+  const int trgBit_rejectedBy_PV = m_trgSummary->getInputBitNumber("passive_veto"); // 28
   if (m_trgSummary->testInput(trgBit_rejectedBy_PV) == 1 &&  m_trgSummary->testInput(trgBit_rejectedBy_AV) == 0) index = 1;
 
 
@@ -217,16 +217,16 @@ void TrackingAbortDQMModule::event()
     const VxdID& sensorID = hit.getSensorID();
     if (sensorID.getLayerNumber() != 3) continue;
     if (hit.isUStrip()) continue;
-    float noise = m_NoiseCal.getNoise(sensorID, 0, hit.getCellID());
-    float cutMinSignal = 5 * noise + 0.5;
-    cutMinSignal = (int)cutMinSignal;
+    const float noise = m_NoiseCal.getNoise(sensorID, 0, hit.getCellID());
+    const float cutMinSignal = std::round(5 * noise);
 
     if (hit.passesZS(1, cutMinSignal)) nStripsL3VZS5++;
   }
   m_svdL3vZS5Occupancy[index]->Fill(std::min((double)nStripsL3VZS5 / nStripsL3V * 100, (double)5.82));
 
   //fill the nCDCExtraHits
-  m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
+  if (m_eventLevelTrackingInfo.isValid())
+    m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 
 
 

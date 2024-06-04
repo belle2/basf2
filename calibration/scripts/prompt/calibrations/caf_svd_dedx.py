@@ -36,7 +36,15 @@ settings = CalibrationSettings(
                                          INPUT_DATA_FILTERS["Run Type"]["physics"],
                                          INPUT_DATA_FILTERS["Magnet"]["On"]]},
 
-    expert_config={},
+    expert_config={
+        "MaxFilesPerRun": 5,
+        "MinEvtsPerFile": 1,
+        "MaxEvtsPerRun": 1.e6,
+        "MinEvtsPerTree": 100,
+        "NBinsP": 69,
+        "NBinsdEdx": 100,
+        "dedxCutoff": 5.e6
+        },
     depends_on=[])
 
 
@@ -69,12 +77,13 @@ def get_calibrations(input_data, **kwargs):
     # Get the input files  from the input_data variable
     file_to_iov_hadron_calib = input_data["hadron_calib"]
 
-    max_files_per_run = 1000000
+    expert_config = kwargs.get("expert_config")
+    max_files_per_run = expert_config["MaxFilesPerRun"]
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
     # Currently we don't have a good way of filtering this on the automated side, so we can check here.
-    min_events_per_file = 1
+    min_events_per_file = expert_config["MinEvtsPerFile"]
 
     from prompt.utils import filter_by_max_files_per_run
 
@@ -96,8 +105,12 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
-    alg_test = SVDdEdxCalibrationAlgorithm()
-    alg_test.setMonitoringPlots(True)
+    algo = SVDdEdxCalibrationAlgorithm()
+    algo.setMonitoringPlots(True)
+    algo.setNumPBins(expert_config['NBinsP'])
+    algo.setNumDEdxBins(expert_config['NBinsdEdx'])
+    algo.setDEdxCutoff(expert_config['dedxCutoff'])
+    algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
 
     ###################################################
     # Calibration setup
@@ -199,7 +212,7 @@ def get_calibrations(input_data, **kwargs):
 
     cal_test = Calibration("SVDdEdxCalibration",
                            collector="SVDdEdxCollector",
-                           algorithms=[alg_test],
+                           algorithms=[algo],
                            input_files=input_files_hadron_calib,
                            pre_collector_path=rec_path)
     # Do this for the default AlgorithmStrategy to force the output payload IoV

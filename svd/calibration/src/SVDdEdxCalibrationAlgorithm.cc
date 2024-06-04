@@ -64,7 +64,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   auto ttreeDstar = getObjectPtr<TTree>("Dstar");
   auto ttreeGamma = getObjectPtr<TTree>("Gamma");
 
-  if (ttreeLambda->GetEntries() < 100) {
+  if (ttreeLambda->GetEntries() < m_MinEvtsPerTree) {
     B2WARNING("Not enough data for calibration.");
     return c_NotEnoughData;
   }
@@ -138,7 +138,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   gROOT->SetBatch(true);
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
-  RooRealVar InvM("InvM", "M_{p^{+}#pi^{-}}", 1.1, 1.13, "GeV/c^{2}");
+  RooRealVar InvM("InvM", "m(p^{+}#pi^{-})", 1.1, 1.13, "GeV/c^{2}");
 
   RooRealVar p_pSVD("p_pSVD", "momentum for p", -1.e8, 1.e8);
   RooRealVar p_SVDdEdx("p_SVDdEdx", "", -1.e8, 1.e8);
@@ -223,7 +223,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
     B2INFO("Lambda: Fit warning: covariance quality " << covqual);
   }
 
-  TCanvas* ca1 = new TCanvas("ca1", "ca1");
+  TCanvas* canvLambda = new TCanvas("canvLambda", "canvLambda");
   RooPlot* LambdaFitFrame = LambdaDataset->plotOn(InvM.frame(130));
   totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
@@ -235,12 +235,12 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   totalPDFLambda.plotOn(LambdaFitFrame, Components("BkgPolyPDF"), LineColor(TColor::GetColor("#fc8d59")));
   totalPDFLambda.plotOn(LambdaFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
-  LambdaFitFrame->GetXaxis()->SetTitle("M_{p#pi^{-}} (GeV/c^{2})");
+  LambdaFitFrame->GetXaxis()->SetTitle("m(p#pi^{-}) (GeV/c^{2})");
 
   LambdaFitFrame->Draw();
 
   if (m_isMakePlots) {
-    ca1->Print("SVDdEdxCalibrationFitLambda.pdf");
+    canvLambda->Print("SVDdEdxCalibrationFitLambda.pdf");
   }
   RooStats::SPlot* sPlotDatasetLambda = new RooStats::SPlot("sData", "An SPlot", *LambdaDataset, &totalPDFLambda,
                                                             RooArgList(nSignalLambda, nBkgLambda));
@@ -260,33 +260,34 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   B2INFO("Lambda: sPlot done. Proceed to histogramming");
 
-  const int numDEdxBins = 100;
-  const int numPBins = 69;
+  // const int m_numDEdxBins = 100;
+  // const int m_numPBins = 69;
 
-  double pbins[numPBins + 1];
-  pbins[0] = 0.0;
-  pbins[1] = 0.05;
+  // double pbins[m_numPBins + 1];
+  // pbins[0] = 0.0;
+  // pbins[1] = 0.05;
 
-  for (int iBin = 2; iBin <= numPBins; iBin++) {
-    if (iBin <= 19)
-      pbins[iBin] = 0.025 + 0.025 * iBin;
-    else if (iBin <= 59)
-      pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
-    else
-      pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
-  }
+  // for (int iBin = 2; iBin <= m_numPBins; iBin++) {
+  //   if (iBin <= 19)
+  //     pbins[iBin] = 0.025 + 0.025 * iBin;
+  //   else if (iBin <= 59)
+  //     pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
+  //   else
+  //     pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
+  // }
+  std::vector<double> pbins = CreatePBinningScheme();
 
-  double dedxCutoff = 5.e6;
+  // double m_dedxCutoff = 5.e6;
 
-  TH2F* h_LambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", numPBins, pbins, numDEdxBins, 0, dedxCutoff);
+  TH2F* h_LambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
   treeLambda_sw->Draw("p_SVDdEdx:p_pSVD>>hist_d1_2212_trunc", "nSignalLambda_sw * (p_pSVD>0.15) * (p_SVDdEdx>0)", "goff");
 
   // for each momentum bin, normalize the pdf
 
   // h_LambdaP normalisation
-  for (int pbin = 1; pbin <= numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
       if (h_LambdaP->GetBinContent(pbin, dedxbin) < 0) {
         h_LambdaP->SetBinContent(pbin, dedxbin, 0);
@@ -299,14 +300,14 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       h_LambdaP->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   if (m_isMakePlots) {
     h_LambdaP->Draw("COLZ");
-    ca1->Print("SVDdEdxCalibrationHistoLambda.pdf");
+    canvLambda->Print("SVDdEdxCalibrationHistoLambda.pdf");
   }
 
   return *h_LambdaP;
@@ -318,7 +319,7 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   gROOT->SetBatch(true);
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
 
-  RooRealVar deltaM("deltaM", "", 0.139545, 0.151, "GeV/c^{2}");
+  RooRealVar deltaM("deltaM", "m(D*)-m(D^{0})", 0.139545, 0.151, "GeV/c^{2}");
 
   RooRealVar K_pSVD("K_pSVD", "momentum for Kaon(GeV)", -1.e8, 1.e8);
   RooRealVar K_SVDdEdx("K_SVDdEdx", "", -1.e8, 1.e8);
@@ -404,17 +405,17 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   totalPDFDstar.plotOn(myframe, Components("DstarBkgPDF"), LineColor(TColor::GetColor("#fc8d59")));
   totalPDFDstar.plotOn(myframe, LineColor(TColor::GetColor("#4575b4")));
 
-  myframe->GetXaxis()->SetTitle("#Delta m [GeV]");
-  TCanvas* ca1 = new TCanvas("ca1", "ca1");
-  ca1->cd();
+  myframe->GetXaxis()->SetTitle("#Deltam [GeV/c^2]");
+  TCanvas* canvDstar = new TCanvas("canvDstar", "canvDstar");
+  canvDstar->cd();
 
   myframe->Draw();
 
   if (m_isMakePlots) {
-    ca1->Print("SVDdEdxCalibrationFitDstar.pdf");
+    canvDstar->Print("SVDdEdxCalibrationFitDstar.pdf");
   }
 
-  /////////////////// Splot ///////////////////////////////////////////////////////////
+  /////////////////// SPlot ///////////////////////////////////////////////////////////
 
   RooStats::SPlot* sPlotDatasetDstar = new RooStats::SPlot("sData", "An SPlot", *DstarDataset, &totalPDFDstar,
                                                            RooArgList(nSignalDstar, nBkgDstar));
@@ -433,29 +434,30 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
 
   B2INFO("Dstar: sPlot done. Proceed to histogramming");
 
-  const int numDEdxBins = 100;
-  const int numPBins = 69;
+  std::vector<double> pbins = CreatePBinningScheme();
+  // const int m_numDEdxBins = 100;
+  // const int m_numPBins = 69;
 
-  double pbins[numPBins + 1];
-  pbins[0] = 0.0;
-  pbins[1] = 0.05;
+  // double pbins[m_numPBins + 1];
+  // pbins[0] = 0.0;
+  // pbins[1] = 0.05;
 
-  for (int iBin = 2; iBin <= numPBins; iBin++) {
-    if (iBin <= 19)
-      pbins[iBin] = 0.025 + 0.025 * iBin;
-    else if (iBin <= 59)
-      pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
-    else
-      pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
-  }
+  // for (int iBin = 2; iBin <= m_numPBins; iBin++) {
+  //   if (iBin <= 19)
+  //     pbins[iBin] = 0.025 + 0.025 * iBin;
+  //   else if (iBin <= 59)
+  //     pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
+  //   else
+  //     pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
+  // }
 
-  double dedxCutoff = 5.e6;
+  // double m_dedxCutoff = 5.e6;
   // the kaon payload
-  TH2F* h_DstarK = new TH2F("hist_d1_321_trunc", "hist_d1_321_trunc", numPBins, pbins,
-                            numDEdxBins, 0, dedxCutoff);
+  TH2F* h_DstarK = new TH2F("hist_d1_321_trunc", "hist_d1_321_trunc", m_numPBins, pbins.data(),
+                            m_numDEdxBins, 0, m_dedxCutoff);
   // the pion payload
-  TH2F* h_DstarPi = new TH2F("hist_d1_211_trunc", "hist_d1_211_trunc", numPBins, pbins,
-                             numDEdxBins, 0, dedxCutoff);
+  TH2F* h_DstarPi = new TH2F("hist_d1_211_trunc", "hist_d1_211_trunc", m_numPBins, pbins.data(),
+                             m_numDEdxBins, 0, m_dedxCutoff);
 
   treeDstar_sw->Draw("K_SVDdEdx:K_pSVD>>hist_d1_321_trunc", "nSignalDstar_sw * (K_SVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
@@ -473,8 +475,8 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   // h_DstarK normalisation
   // for each momentum bin, normalize the pdf
 
-  for (int pbin = 1; pbin <= numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
       if (h_DstarK->GetBinContent(pbin, dedxbin) < 0) {
         h_DstarK->SetBinContent(pbin, dedxbin, 0);
@@ -487,14 +489,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       h_DstarK->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   // h_DstarPi normalisation
-  for (int pbin = 1; pbin <= numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
       if (h_DstarPi->GetBinContent(pbin, dedxbin) < 0) {
         h_DstarPi->SetBinContent(pbin, dedxbin, 0);
@@ -507,14 +509,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       h_DstarPi->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   // h_DstarMu normalisation
-  for (int pbin = 1; pbin <= numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
       if (h_DstarMu->GetBinContent(pbin, dedxbin) < 0) {
         h_DstarMu->SetBinContent(pbin, dedxbin, 0);
@@ -527,17 +529,17 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       h_DstarMu->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
   if (m_isMakePlots) {
     h_DstarK->Draw("COLZ");
-    ca1->Print("SVDdEdxCalibrationHistoDstarK.pdf");
+    canvDstar->Print("SVDdEdxCalibrationHistoDstarK.pdf");
     h_DstarPi->Draw("COLZ");
-    ca1->Print("SVDdEdxCalibrationHistoDstarPi.pdf");
+    canvDstar->Print("SVDdEdxCalibrationHistoDstarPi.pdf");
     h_DstarMu->Draw("COLZ");
-    ca1->Print("SVDdEdxCalibrationHistoDstarMu.pdf");
+    canvDstar->Print("SVDdEdxCalibrationHistoDstarMu.pdf");
   }
 
   return std::make_tuple(*h_DstarK, *h_DstarPi, *h_DstarMu);
@@ -551,26 +553,26 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   if (preselTree->GetEntries() == 0) {
     B2FATAL("The Gamma tree is empty, stopping here");
   }
+  std::vector<double> pbins = CreatePBinningScheme();
+  // const int m_numDEdxBins = 100;
+  // const int m_numPBins = 69;
+  // double pbins[m_numPBins + 1];
+  // pbins[0] = 0.0;
+  // pbins[1] = 0.05;
 
-  const int numDEdxBins = 100;
-  const int numPBins = 69;
-  double pbins[numPBins + 1];
-  pbins[0] = 0.0;
-  pbins[1] = 0.05;
+  // for (int bin = 2; bin <= m_numPBins; bin++) {
+  //   if (bin <= 19)
+  //     pbins[bin] = 0.025 + 0.025 * bin;
+  //   else if (bin <= 59)
+  //     pbins[bin] = pbins[19] + 0.05 * (bin - 19);
+  //   else
+  //     pbins[bin] = pbins[59] + 0.3 * (bin - 59);
+  // }
 
-  for (int bin = 2; bin <= numPBins; bin++) {
-    if (bin <= 19)
-      pbins[bin] = 0.025 + 0.025 * bin;
-    else if (bin <= 59)
-      pbins[bin] = pbins[19] + 0.05 * (bin - 19);
-    else
-      pbins[bin] = pbins[59] + 0.3 * (bin - 59);
-  }
+  // double m_dedxCutoff = 0;
+  // m_dedxCutoff = 5e6;
 
-  double dedxCutoff = 0;
-  dedxCutoff = 5e6;
-
-  TH2F* h_GammaE = new TH2F("hist_d1_11_trunc", "hist_d1_11_trunc", numPBins, pbins, numDEdxBins, 0, dedxCutoff);
+  TH2F* h_GammaE = new TH2F("hist_d1_11_trunc", "hist_d1_11_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
   TH2F* h_GammaEPart1 = (TH2F*)h_GammaE->Clone("hist_d1_11_truncPart1");
   TH2F* h_GammaEPart2 = (TH2F*)h_GammaE->Clone("hist_d1_11_truncPart2");
@@ -582,8 +584,8 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
 
   // for each momentum bin, normalize the pdf
   // h_GammaE normalisation
-  for (int pbin = 1; pbin <= numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
       if (h_GammaE->GetBinContent(pbin, dedxbin) < 0) {
         h_GammaE->SetBinContent(pbin, dedxbin, 0);
@@ -597,15 +599,15 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= numDEdxBins; dedxbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       h_GammaE->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   if (m_isMakePlots) {
-    TCanvas* ca1 = new TCanvas("ca1", "ca1");
+    TCanvas* canvGamma = new TCanvas("canvGamma", "canvGamma");
     h_GammaE->Draw("COLZ");
-    ca1->Print("SVDdEdxCalibrationHistoGamma.pdf");
+    canvGamma->Print("SVDdEdxCalibrationHistoGamma.pdf");
   }
 
   return *h_GammaE;

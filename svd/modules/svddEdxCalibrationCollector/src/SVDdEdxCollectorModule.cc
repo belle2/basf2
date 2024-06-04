@@ -40,13 +40,13 @@ SVDdEdxCollectorModule::SVDdEdxCollectorModule() : CalibrationCollectorModule()
 void SVDdEdxCollectorModule::prepare()
 {
   B2INFO("Initialisation of the trees");
-  std::string objectName_Lambda = "Lambda";
-  std::string objectName_Dstar = "Dstar";
-  std::string objectName_Gamma = "Gamma";
+  std::string objectNameLambda = "Lambda";
+  std::string objectNameDstar = "Dstar";
+  std::string objectNameGamma = "Gamma";
   // Data object creation --------------------------------------------------
-  TTree* LambdaTree = new TTree(objectName_Lambda.c_str(), "");
-  TTree* DstarTree = new TTree(objectName_Dstar.c_str(), "");
-  TTree* GammaTree = new TTree(objectName_Gamma.c_str(), "");
+  TTree* LambdaTree = new TTree(objectNameLambda.c_str(), "");
+  TTree* DstarTree = new TTree(objectNameDstar.c_str(), "");
+  TTree* GammaTree = new TTree(objectNameGamma.c_str(), "");
 
   // Event info for all trees
   LambdaTree->Branch<int>("event", &m_evt);
@@ -93,9 +93,9 @@ void SVDdEdxCollectorModule::prepare()
   // We register the objects so that our framework knows about them.
   // Don't try and hold onto the pointers or fill these objects directly
   // Use the getObjectPtr functions to access collector objects
-  registerObject<TTree>(objectName_Lambda, LambdaTree);
-  registerObject<TTree>(objectName_Dstar, DstarTree);
-  registerObject<TTree>(objectName_Gamma, GammaTree);
+  registerObject<TTree>(objectNameLambda, LambdaTree);
+  registerObject<TTree>(objectNameDstar, DstarTree);
+  registerObject<TTree>(objectNameGamma, GammaTree);
 }
 
 VXDDedxTrack const* getSVDDedxFromParticle(Particle const* particle)

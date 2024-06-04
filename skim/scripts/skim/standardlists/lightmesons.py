@@ -357,6 +357,18 @@ def loadStdAllEta(persistent=True, path=None):
     return 'eta:all'
 
 
+def loadStdPhotonCutEta(persistent=True, path=None):
+    """
+    Create the list 'eta:gm' of eta mesons with :math:`0.35 < M < 0.7~GeV` from two photons with minimal energy of :math:`50~MeV`
+
+    @param persistent   whether RootOutput module should save the created ParticleLists (default True)
+    @param path         modules are added to this path
+    """
+    etacuts = "0.35 < M < 0.7 and daughterLowest(E) > 0.05"
+    ma.reconstructDecay('eta:gm -> gamma:all gamma:all', etacuts, 1, persistent, path, standardParticleList=True)
+    return 'eta:gm'
+
+
 def loadStdSkimHighEffEta(persistent=True, path=None):
     """
     Create a list of 'eta:SkimHighEff' list from 'gamma:tight gamma:tight' (dmID=1) and

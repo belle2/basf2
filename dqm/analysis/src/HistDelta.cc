@@ -104,7 +104,7 @@ void HistDelta::reset(void)
   m_lastValue = 0;
 }
 
-TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated)
+TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated) const
 {
   if (onlyIfUpdated && !m_updated) return nullptr;// not updated, but requested
   if (n >= m_deltaHists.size()) return nullptr;

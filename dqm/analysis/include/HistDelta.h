@@ -71,6 +71,6 @@ namespace Belle2 {
      * @param onlyIfUpdated req only updated deltas, return nullptr otherwise
      * @return Found histogram or nullptr
      */
-    TH1* getDelta(unsigned int n = 0, bool onlyIfUpdated = true);
+    TH1* getDelta(unsigned int n = 0, bool onlyIfUpdated = true) const;
   };
 }

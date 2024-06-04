@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef TrackingAbortDQMModule_H
-#define TrackingAbortDQMModule_H
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -57,7 +56,7 @@ namespace Belle2 {
     //calibration objects
     SVDNoiseCalibrations m_NoiseCal; /**<SVDNoise calibration db object*/
 
-    int const nStripsL3V = 768 * 2 * 7; /**< number of V-side L3 strips*/
+    static constexpr int m_nStripsL3V = 768 * 2 * 7; /**< number of V-side L3 strips*/
 
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo; /**< tracking abort info*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data*/
@@ -74,5 +73,4 @@ namespace Belle2 {
 
 }
 
-#endif // TrackingAbortDQMModule_H
 

@@ -56,11 +56,9 @@ void TrackingAbortDQMModule::defineHisto()
 {
 
   // Create a separate histogram directories and cd into it.
-  TDirectory* oldDir = gDirectory;
-  if (m_histogramDirectoryName != "") {
-    oldDir->mkdir(m_histogramDirectoryName.c_str());
-    oldDir->cd(m_histogramDirectoryName.c_str());
-  }
+  TDirectory* newDirectory{gDirectory->mkdir(m_histogramDirectoryName.c_str())};
+  TDirectory::TContext context{gDirectory, newDirectory};
+
   //histogram index:
   // 0 if the event is triggered OUTSIDE the active_veto window
   std::string tag[2] = {"OUT", "IN"};
@@ -134,8 +132,6 @@ void TrackingAbortDQMModule::defineHisto()
   m_nCDCExtraHits[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
 
-
-  oldDir->cd();
 }
 
 void TrackingAbortDQMModule::initialize()
@@ -143,6 +139,7 @@ void TrackingAbortDQMModule::initialize()
   m_eventLevelTrackingInfo.isOptional();
   m_eventMetaData.isOptional();
   m_trgSummary.isOptional();
+  m_strips.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -165,8 +162,6 @@ void TrackingAbortDQMModule::beginRun()
 
 void TrackingAbortDQMModule::event()
 {
-  if (! m_eventMetaData->isValid()) return;
-  if (! m_trgSummary->isValid()) return;
 
   //skip the empty events
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkPacketCRCError)
@@ -183,9 +178,7 @@ void TrackingAbortDQMModule::event()
 
   //find out if we are in the passive veto (i=0) or in the active veto window (i=1)
   int index = 0; //events accepted in the passive veto window but not in the active
-  const int trgBit_rejectedBy_AV = m_trgSummary->getInputBitNumber("cdcecl_veto"); // 53
-  const int trgBit_rejectedBy_PV = m_trgSummary->getInputBitNumber("passive_veto"); // 28
-  if (m_trgSummary->testInput(trgBit_rejectedBy_PV) == 1 &&  m_trgSummary->testInput(trgBit_rejectedBy_AV) == 0) index = 1;
+  if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
 
 
   //fill the tracking abort reason histogram & nEvents with Abort
@@ -222,7 +215,7 @@ void TrackingAbortDQMModule::event()
 
     if (hit.passesZS(1, cutMinSignal)) nStripsL3VZS5++;
   }
-  m_svdL3vZS5Occupancy[index]->Fill(std::min((double)nStripsL3VZS5 / nStripsL3V * 100, (double)5.82));
+  m_svdL3vZS5Occupancy[index]->Fill(std::min((double)nStripsL3VZS5 / m_nStripsL3V * 100, (double)5.82));
 
   //fill the nCDCExtraHits
   if (m_eventLevelTrackingInfo.isValid())

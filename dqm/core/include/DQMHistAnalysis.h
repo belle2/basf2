@@ -86,10 +86,12 @@ namespace Belle2 {
      */
     static MonObjList s_monObjList;
 
+  public:
     /**
      * The list of Delta Histograms and settings.
      */
     static DeltaList s_deltaList;
+  private:
 
     /**
      * The list of canvas updated status.

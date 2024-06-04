@@ -270,7 +270,7 @@ void DQMHistAnalysisModule::clearHistList(void)
 
 void DQMHistAnalysisModule::resetDeltaList(void)
 {
-  for (auto d : s_deltaList) {
+  for (auto& d : s_deltaList) {
     d.second.reset();
   }
 }

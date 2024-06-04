@@ -33,6 +33,7 @@ import basf2 as b2
 import modularAnalysis as ma
 import variables as va
 from skim import BaseSkim, fancy_skim_header
+from skim.standardlists.lightmesons import loadStdWideOmega
 from stdCharged import stdK, stdPi, stdCharged
 from stdPhotons import loadStdSkimPhoton
 from stdPi0s import loadStdSkimPi0, stdPi0s
@@ -1754,18 +1755,16 @@ class DpToHpOmega(BaseSkim):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
+        loadStdWideOmega(path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
         ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
-        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and [0.11 < InvM < 0.15]", path=path)
-
-        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
 
         Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
 
-        ma.reconstructDecay("D+:Kpomega -> K+:my omega:3pi", Dpcuts, path=path)
-        ma.reconstructDecay("D+:pipomega -> pi+:my omega:3pi", Dpcuts, path=path)
+        ma.reconstructDecay("D+:Kpomega -> K+:my omega:wide", Dpcuts, path=path)
+        ma.reconstructDecay("D+:pipomega -> pi+:my omega:wide", Dpcuts, path=path)
 
         DList = []
         DList.append("D+:Kpomega")
@@ -1803,17 +1802,15 @@ class DspToHpOmega(BaseSkim):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         loadStdSkimPi0(path=path)
+        loadStdWideOmega(path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList("pi+:my", "pi+:charmSkim", "pionID>0.1", path=path)
         ma.cutAndCopyList("K+:my", "K+:charmSkim", "kaonID>0.1", path=path)
-        ma.cutAndCopyList("pi0:my", "pi0:skim", "p>0.25 and [0.11 < InvM < 0.15]", path=path)
-
-        ma.reconstructDecay("omega:3pi -> pi+:my pi-:my pi0:my", "[0.71 < M < 0.85 ]", path=path)
 
         Dspcuts = "1.77 < M < 2.17 and useCMSFrame(p) > 2.0"
-        ma.reconstructDecay("D_s+:Kpomega -> K+:my omega:3pi", Dspcuts, path=path)
-        ma.reconstructDecay("D_s+:pipomega -> pi+:my omega:3pi", Dspcuts, path=path)
+        ma.reconstructDecay("D_s+:Kpomega -> K+:my omega:wide", Dspcuts, path=path)
+        ma.reconstructDecay("D_s+:pipomega -> pi+:my omega:wide", Dspcuts, path=path)
 
         DsList = []
         DsList.append("D_s+:Kpomega")

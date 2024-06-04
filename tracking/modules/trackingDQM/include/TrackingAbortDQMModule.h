@@ -61,9 +61,6 @@ namespace Belle2 {
 
     int const nStripsL3V = 768 * 2 * 7; /**< number of V-side L3 strips*/
 
-    int m_runNumber; /**< run number*/
-    int m_expNumber; /**< experiment number*/
-
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo; /**< tracking abort info*/
     StoreObjPtr<EventMetaData> m_eventMetaData; /**< event meta data*/
 

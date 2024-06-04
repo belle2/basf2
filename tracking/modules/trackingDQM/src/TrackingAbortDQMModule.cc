@@ -149,16 +149,14 @@ void TrackingAbortDQMModule::initialize()
 void TrackingAbortDQMModule::beginRun()
 {
 
-  m_expNumber = m_eventMetaData->getExperiment();
-  m_runNumber = m_eventMetaData->getRun();
-
   if (m_trackingErrorFlagsReasons[0] != nullptr) m_trackingErrorFlagsReasons[0]->Reset();
   if (m_trackingErrorFlagsReasons[1] != nullptr) m_trackingErrorFlagsReasons[1]->Reset();
   if (m_nEventsWithAbort[0] != nullptr)  m_nEventsWithAbort[0]->Reset();
   if (m_nEventsWithAbort[1] != nullptr)  m_nEventsWithAbort[1]->Reset();
   if (m_svdL3vZS5Occupancy[0] != nullptr)  m_svdL3vZS5Occupancy[0]->Reset();
   if (m_svdL3vZS5Occupancy[1] != nullptr)  m_svdL3vZS5Occupancy[1]->Reset();
-
+  if (m_nCDCExtraHits[0] != nullptr) m_nCDCExtraHits[0]->Reset();
+  if (m_nCDCExtraHits[1] != nullptr) m_nCDCExtraHits[1]->Reset();
 }
 
 

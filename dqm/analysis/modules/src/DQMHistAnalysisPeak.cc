@@ -84,6 +84,12 @@ void DQMHistAnalysisPeakModule::initialize()
   }
 }
 
+void DQMHistAnalysisPeakModule::terminate()
+{
+  if (m_lineMean) delete m_lineMean;
+  if (m_lineMedian) delete m_lineMedian;
+  if (m_canvas) delete m_canvas;
+}
 
 void DQMHistAnalysisPeakModule::beginRun()
 {

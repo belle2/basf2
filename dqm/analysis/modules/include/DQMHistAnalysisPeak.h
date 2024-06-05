@@ -36,6 +36,11 @@ namespace Belle2 {
     void initialize() override final;
 
     /**
+     * Terminate.
+     */
+    void terminate() override final;
+
+    /**
      * Called when entering a new run.
      */
     void beginRun() override final;

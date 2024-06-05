@@ -391,7 +391,7 @@ class Reweighter:
     def add_pid_particle(self,
                          prefix: str,
                          weights_dict: dict,
-                         pdg_pid_variable_dict: str,
+                         pdg_pid_variable_dict: dict,
                          variable_aliases: dict = None,
                          sys_seed: int = None,
                          syscorr: bool = True) -> None:
@@ -575,3 +575,65 @@ class Reweighter:
         """
         for particle in self.particles:
             particle.plot_coverage()
+
+
+def add_weights_to_dataframe(prefix: str,
+                             df: pd.DataFrame,
+                             systematic: str,
+                             custom_tables: dict = None,
+                             custom_thresholds: dict = None,
+                             **kw_args) -> pd.DataFrame:
+    """
+    Helper method that adds weights to a dataframe.
+
+    Args:
+        prefix (str): Prefix for the new columns.
+        df (pandas.DataFrame): Dataframe containing the analysis ntuple.
+        systematic (str): Type  of the systematic corrections, options: "custom_PID" and "custom_FEI".
+        MC_production (str): Name of the MC production.
+        custom_tables (dict): Dictionary containing the custom efficiency weights.
+        custom_thresholds (dict): Dictionary containing the custom thresholds for the  custom efficiency weights.
+        n_variations (int): Number of variations to generate.
+        weight_name (str): Name of the weight column.
+        show_plots (bool): When true show the coverage plots.
+        variable_aliases (dict): Dictionary containing variable aliases.
+        cov_matrix (numpy.ndarray): Covariance matrix for the custom efficiency weights.
+        sys_seed (int): Seed for the systematic variations.
+        syscorr (bool): When true assume systematics are 100% correlated defaults to true.
+        **kw_args: Additional arguments for the Reweighter class.
+    """
+    n_variations = 100
+    if kw_args.get('n_variations'):
+        n_variations = kw_args.get('n_variations')
+    weight_name = "Weight"
+    if kw_args.get('weight_name'):
+        weight_name = kw_args.get('weight_name')
+    reweighter = Reweighter(n_variations=n_variations,
+                            weight_name=weight_name)
+    variable_aliases = kw_args.get('variable_aliases')
+    cov_matrix = kw_args.get('cov_matrix')
+    if systematic.lower() == 'custom_fei':
+        reweighter.add_fei_particle(prefix=prefix,
+                                    table=custom_tables,
+                                    threshold=custom_thresholds,
+                                    variable_aliases=variable_aliases,
+                                    cov=cov_matrix)
+    elif systematic.lower() == 'custom_pid':
+        sys_seed = kw_args.get('sys_seed')
+        syscorr = kw_args.get('syscorr')
+        if syscorr is None:
+            syscorr = True
+        reweighter.add_pid_particle(prefix=prefix,
+                                    weights_dict=custom_tables,
+                                    pdg_pid_variable_dict=custom_thresholds,
+                                    variable_aliases=variable_aliases,
+                                    sys_seed=sys_seed,
+                                    syscorr=syscorr)
+    else:
+        raise ValueError(f'Systematic {systematic} is not supported!')
+
+    result = reweighter.reweight(df)
+    if kw_args.get('show_plots'):
+        reweighter.print_coverage()
+        reweighter.plot_coverage()
+    return result

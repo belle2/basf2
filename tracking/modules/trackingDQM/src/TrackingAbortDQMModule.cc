@@ -10,6 +10,8 @@
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
+#include <svd/dataobjects/SVDCluster.h>
+#include <cdc/dataobjects/CDCHit.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
@@ -103,18 +105,18 @@ void TrackingAbortDQMModule::defineHisto()
 
 
   //SVD L3 occupancy - see SVDDQMDose module for details
-  histoName = "SVDL3VOcc";
-  histoTitle = "SVD L3 v-side ZS5 Occupancy (%)";
+  histoName = "SVDL3UOcc";
+  histoTitle = "SVD L3 u-side ZS5 Occupancy (%)";
   //outside active_veto window:
-  m_svdL3vZS5Occupancy[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+  m_svdL3uZS5Occupancy[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
                                      TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
                                      90, 0, 100.0 / 1536.0 * 90);
-  m_svdL3vZS5Occupancy[0]->GetXaxis()->SetTitle("occupancy [%]");
-  m_svdL3vZS5Occupancy[0]->GetYaxis()->SetTitle("Number of Events");
+  m_svdL3uZS5Occupancy[0]->GetXaxis()->SetTitle("occupancy [%]");
+  m_svdL3uZS5Occupancy[0]->GetYaxis()->SetTitle("Number of Events");
   //inside active_veto window:
-  m_svdL3vZS5Occupancy[1] = new TH1F(*m_svdL3vZS5Occupancy[0]);
-  m_svdL3vZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_svdL3vZS5Occupancy[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+  m_svdL3uZS5Occupancy[1] = new TH1F(*m_svdL3uZS5Occupancy[0]);
+  m_svdL3uZS5Occupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdL3uZS5Occupancy[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
 
   //CDC extra hits
@@ -131,6 +133,38 @@ void TrackingAbortDQMModule::defineHisto()
   m_nCDCExtraHits[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_nCDCExtraHits[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
+  //SVD L3 v-side cluster time
+  histoName = "svdL3VTime";
+  histoTitle = "Layer3 v-side Cluster Time Distribution";
+  //outside active_veto window:
+  m_svdTime[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                          TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                          300, -150, 150);
+  m_svdTime[0]->GetXaxis()->SetTitle("cluster time (ns)");
+  m_svdTime[0]->GetYaxis()->SetTitle("Number of Events");
+  //inside active_veto window:
+  m_svdTime[1] = new TH1F(*m_svdTime[0]);
+  m_svdTime[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_svdTime[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+
+  //SVD, CDC Averages
+  histoName = "averages";
+  histoTitle = "Averages from SVD and CDC";
+  //outside active_veto window:
+  m_integratedAverages[0] = new TH1D(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
+                                     TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+                                     5, 0, 5);
+  m_integratedAverages[0]->GetYaxis()->SetTitle("Number of X [bin-dependent]");
+  m_integratedAverages[0]->GetXaxis()->SetBinLabel(1, "nCDCHitsInner");
+  m_integratedAverages[0]->GetXaxis()->SetBinLabel(2, "nCDCHitsOuter");
+  m_integratedAverages[0]->GetXaxis()->SetBinLabel(3, "nStripsZS5_L3V");
+  m_integratedAverages[0]->GetXaxis()->SetBinLabel(4, "nStripsZS5_L4U");
+  m_integratedAverages[0]->GetXaxis()->SetBinLabel(5, "nStripsZS5_L4V");
+  //inside active_veto window:
+  m_integratedAverages[1] = new TH1D(*m_integratedAverages[0]);
+  m_integratedAverages[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
+  m_integratedAverages[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+
 
 }
 
@@ -140,6 +174,7 @@ void TrackingAbortDQMModule::initialize()
   m_eventMetaData.isOptional();
   m_trgSummary.isOptional();
   m_strips.isOptional();
+  m_cdcHits.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -153,10 +188,14 @@ void TrackingAbortDQMModule::beginRun()
   if (m_trackingErrorFlagsReasons[1] != nullptr) m_trackingErrorFlagsReasons[1]->Reset();
   if (m_nEventsWithAbort[0] != nullptr)  m_nEventsWithAbort[0]->Reset();
   if (m_nEventsWithAbort[1] != nullptr)  m_nEventsWithAbort[1]->Reset();
-  if (m_svdL3vZS5Occupancy[0] != nullptr)  m_svdL3vZS5Occupancy[0]->Reset();
-  if (m_svdL3vZS5Occupancy[1] != nullptr)  m_svdL3vZS5Occupancy[1]->Reset();
+  if (m_svdL3uZS5Occupancy[0] != nullptr)  m_svdL3uZS5Occupancy[0]->Reset();
+  if (m_svdL3uZS5Occupancy[1] != nullptr)  m_svdL3uZS5Occupancy[1]->Reset();
   if (m_nCDCExtraHits[0] != nullptr) m_nCDCExtraHits[0]->Reset();
   if (m_nCDCExtraHits[1] != nullptr) m_nCDCExtraHits[1]->Reset();
+  if (m_svdTime[0] != nullptr) m_svdTime[0]->Reset();
+  if (m_svdTime[1] != nullptr) m_svdTime[1]->Reset();
+  if (m_integratedAverages[0] != nullptr) m_integratedAverages[0]->Reset();
+  if (m_integratedAverages[1] != nullptr) m_integratedAverages[1]->Reset();
 }
 
 
@@ -207,25 +246,67 @@ void TrackingAbortDQMModule::event()
   } else //EventLevelTrackingInfo not valid
     m_nEventsWithAbort[index]->Fill(0);
 
-
-  // fill the svd L3 v ZS5 occupancy, add the overflow in the last bin to make them visible in the plot
+  //compute the number of ZS5 strips of L3 and L4, both sides
+  float nStripsL3UZS5 = 0;
   float nStripsL3VZS5 = 0;
+  float nStripsL4UZS5 = 0;
+  float nStripsL4VZS5 = 0;
   for (const SVDShaperDigit& hit : m_strips) {
     const VxdID& sensorID = hit.getSensorID();
-    if (sensorID.getLayerNumber() != 3) continue;
-    if (hit.isUStrip()) continue;
-    const float noise = m_NoiseCal.getNoise(sensorID, 0, hit.getCellID());
+    if (sensorID.getLayerNumber() > 4) continue;
+    const float noise = m_NoiseCal.getNoise(sensorID, hit.isUStrip(), hit.getCellID());
     const float cutMinSignal = std::round(5 * noise);
 
-    if (hit.passesZS(1, cutMinSignal)) nStripsL3VZS5++;
+    if (hit.passesZS(1, cutMinSignal)) {
+      if (sensorID.getLayerNumber() == 3) {
+        if (hit.isUStrip()) nStripsL3UZS5++;
+        else nStripsL3VZS5++;
+      } else if (hit.isUStrip()) nStripsL4UZS5++;
+      else nStripsL4VZS5++;
+    }
   }
-  m_svdL3vZS5Occupancy[index]->Fill(std::min((double)nStripsL3VZS5 / m_nStripsL3V * 100, (double)5.82));
+
+  //fill the SVD L3 v-side cluster time
+  for (const SVDCluster& hit : m_clusters) {
+    const VxdID& sensorID = hit.getSensorID();
+    if (sensorID.getLayerNumber() != 3) continue;
+    if (hit.isUCluster()) continue;
+
+    m_svdTime[index]->Fill(hit.getClsTime());
+  }
+
+  // fill the svd L3 v ZS5 occupancy, add the overflow in the last bin to make them visible in the plot
+  m_svdL3uZS5Occupancy[index]->Fill(std::min((double)nStripsL3UZS5 / m_nStripsL3U * 100, (double)5.82));
 
   //fill the nCDCExtraHits, add the overflow in the last bin to make them visible in the plot
   if (m_eventLevelTrackingInfo.isValid())
     m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 
+  //compute number of CDC hits in the inner and outer layers
+  int nCDCHitsInner = 0;
+  int nCDCHitsOuter = 0;
+  for (const CDCHit& hit : m_cdcHits) {
+    if (hit.getISuperLayer() == 0) nCDCHitsInner++;
+    else nCDCHitsOuter++;
+  }
+
+  // fill the integrated averages TH1F
+  // bin 1: nCDCHits Inner layers
+  updateBinContent(index, 1, nCDCHitsInner);
+  // bin 2: nCDCHits Outer layers
+  updateBinContent(index, 2, nCDCHitsOuter);
+  // bin 3: nStrips L3 V-side
+  updateBinContent(index, 3, nStripsL3VZS5);
+  // bin 4: nStrips L4 U-side
+  updateBinContent(index, 4, nStripsL4UZS5);
+  // bin 5: nStrips L4 V-side
+  updateBinContent(index, 5, nStripsL4VZS5);
 
 
 }
 
+void TrackingAbortDQMModule::updateBinContent(int index, int bin, float valueToBeAdded)
+{
+  float oldValue = m_integratedAverages[index]->GetBinContent(bin);
+  m_integratedAverages[index]->SetBinContent(bin, oldValue + valueToBeAdded);
+}

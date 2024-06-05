@@ -188,7 +188,7 @@
   <Material>Si</Material>
   <width unit="mm">18.812</width>
   <length unit="mm">120.672</length>
-  <height unit="mm">0.095</height>
+  <height unit="mm">0.19</height>
   <!-- definition of the active area of the module which is a part of the
        whole thing. The position is given relative to the lower left edge of
        the module (the point with the most negative local coordinates). -->

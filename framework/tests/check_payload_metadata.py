@@ -43,7 +43,8 @@ class CheckPayloadMetadata(b2.Module):
         else:
             assert(self.beam_parameters.getGlobaltag() == b2.conditions.default_globaltags[0])
             assert(self.beam_parameters.getRevision() > 0)
-            assert(self.beam_parameters.getFilename().startswith('/cvmfs'))
+            if not os.path.isdir('/cvmfs'):
+                assert(self.beam_parameters.getFilename().startswith('/cvmfs'))
             assert(self.beam_parameters.getIoV() == B2.IntervalOfValidity(0, 0, 0, -1))
 
 
@@ -73,8 +74,6 @@ def testing_path(use_testing_payloads=False, remove_default_globaltag=False, tes
 
 
 if __name__ == '__main__':
-    if not os.path.isdir('/cvmfs'):
-        b2tu.skip_test("Will not execute test since /cvmfs/ is not mounted")
 
     with b2tu.clean_working_directory():
 

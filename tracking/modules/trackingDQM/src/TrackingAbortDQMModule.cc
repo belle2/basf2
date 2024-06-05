@@ -201,14 +201,14 @@ void TrackingAbortDQMModule::event()
         m_trackingErrorFlagsReasons[index]->Fill(3);
       if (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag())
         m_trackingErrorFlagsReasons[index]->Fill(4);
-    } else { //EventLevelTrackingIinfo valid but no error
+    } else { //EventLevelTrackingInfo valid but no error
       m_nEventsWithAbort[index]->Fill(0);
     }
-  } else //EventLevelTrackingIinfo not valid
+  } else //EventLevelTrackingInfo not valid
     m_nEventsWithAbort[index]->Fill(0);
 
 
-  // fill the svd L3 v ZS5 occupancy
+  // fill the svd L3 v ZS5 occupancy, add the overflow in the last bin to make them visible in the plot
   float nStripsL3VZS5 = 0;
   for (const SVDShaperDigit& hit : m_strips) {
     const VxdID& sensorID = hit.getSensorID();
@@ -221,7 +221,7 @@ void TrackingAbortDQMModule::event()
   }
   m_svdL3vZS5Occupancy[index]->Fill(std::min((double)nStripsL3VZS5 / m_nStripsL3V * 100, (double)5.82));
 
-  //fill the nCDCExtraHits
+  //fill the nCDCExtraHits, add the overflow in the last bin to make them visible in the plot
   if (m_eventLevelTrackingInfo.isValid())
     m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 

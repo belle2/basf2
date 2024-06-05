@@ -61,8 +61,8 @@ namespace Belle2 {
       po::options_description description("Python options");
       description.add_options()
       ("framework", po::value<std::string>(&m_framework),
-       "Framework which should be used. Currently supported are sklearn, tensorflow and theano")
-      ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes")
+       "Framework which should be used. Currently supported are sklearn, xgboost, tensorflow, keras, torch,  and theano")
+      ("steering_file", po::value<std::string>(&m_steering_file), "Steering file which describes the model")
       ("mini_batch_size", po::value<unsigned int>(&m_mini_batch_size), "Size of the mini batch given to partial_fit function")
       ("nIterations", po::value<unsigned int>(&m_nIterations), "Number of iterations")
       ("normalize", po::value<bool>(&m_normalize), "Normalize input data (shift mean to 0 and std to 1)")

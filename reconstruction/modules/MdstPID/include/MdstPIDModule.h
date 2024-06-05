@@ -127,15 +127,17 @@ namespace Belle2 {
     }
 
     /**
-     * Check for validity of log likelihood values
+     * Check for validity of log likelihood values (NaN and +Inf are not alowed).
      * @param logl detector log likelihoods
-     * @return true if all likelihoods valid
+     * @return true if all likelihoods are valid and not being the same
      */
     template<class T>
     bool areLikelihoodsValid(const T* logl)
     {
+      std::vector<float> values;
       for (const auto& chargedStable : Const::chargedStableSet) {
         auto value = getLogL(logl, chargedStable);
+        values.push_back(value);
         if (isnan(value) or value == INFINITY) {
           B2ERROR("MdstPID::setLikelihoods: invalid " << logl->ClassName() << " for " << m_chargedNames[chargedStable]
                   << ", is " << value
@@ -143,7 +145,11 @@ namespace Belle2 {
           return false;
         }
       }
-      return true;
+      // check if log likelihoods differ
+      for (auto value : values) {
+        if (value != values.back()) return true; // values differ
+      }
+      return false; // values are all the same - ignore Likelihoods
     }
 
     // module parameters

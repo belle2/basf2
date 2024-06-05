@@ -24,42 +24,42 @@ def add_low_multiplicity_generator(path, event_code):
     if event_code not in EventCodes:
         B2FATAL(f'The event code {event_code} is unknown.')
     if event_code is EventCode.eetautau:
-        add_aafh_generator(path, 'e+e-tau+tau-', enableTauDecays=False)
+        add_aafh_generator(path, 'e+e-tau+tau-', enableTauDecays=False, eventType='e+e-tau+tau-')
         rename_module_in_path(path, 'AafhInput', 'AAFH_eetautau')
     elif event_code is EventCode.mumumumu:
-        add_aafh_generator(path, 'mu+mu-mu+mu-')
+        add_aafh_generator(path, 'mu+mu-mu+mu-', eventType='mu+mu-mu+mu-')
         rename_module_in_path(path, 'AafhInput', 'AAFH_mumumumu')
     elif event_code is EventCode.mumutautau:
-        add_aafh_generator(path, 'mu+mu-tau+tau-', enableTauDecays=False)
+        add_aafh_generator(path, 'mu+mu-tau+tau-', enableTauDecays=False, eventType='mu+mu-tau+tau-')
         rename_module_in_path(path, 'AafhInput', 'AAFH_mumutautau')
     elif event_code is EventCode.tautautautau:
-        add_koralw_generator(path, 'tau+tau-tau+tau-', enableTauDecays=False)
+        add_koralw_generator(path, 'tau+tau-tau+tau-', enableTauDecays=False, eventType='tau+tau-tau+tau-')
         rename_module_in_path(path, 'KoralWInput', 'KoralW_tautautautau')
     elif event_code is EventCode.eepipi:
-        add_treps_generator(path, 'e+e-pi+pi-')
+        add_treps_generator(path, 'e+e-pi+pi-', eventType='e+e-pi+pi-')
         rename_module_in_path(path, 'TrepsInput', 'TREPS_eepipi')
     elif event_code is EventCode.eeKK:
-        add_treps_generator(path, 'e+e-K+K-')
+        add_treps_generator(path, 'e+e-K+K-', eventType='e+e-K+K-')
         rename_module_in_path(path, 'TrepsInput', 'TREPS_eeKK')
     elif event_code is EventCode.eepp:
-        add_treps_generator(path, 'e+e-ppbar')
+        add_treps_generator(path, 'e+e-ppbar', eventType='e+e-ppbar')
         rename_module_in_path(path, 'TrepsInput', 'TREPS_eepp')
     elif event_code is EventCode.pipiISR:
-        add_phokhara_generator(path, 'pi+pi-')
+        add_phokhara_generator(path, 'pi+pi-', eventType='pi+pi-')
     elif event_code is EventCode.pipipi0ISR:
-        add_phokhara_generator(path, 'pi+pi-pi0')
+        add_phokhara_generator(path, 'pi+pi-pi0', eventType='pi+pi-pi0')
     elif event_code is EventCode.pipipipiISR:
-        add_phokhara_generator(path, 'pi+pi-pi+pi-')
+        add_phokhara_generator(path, 'pi+pi-pi+pi-', eventType='pi+pi-pi+pi-')
     elif event_code is EventCode.pipipi0pi0ISR:
-        add_phokhara_generator(path, 'pi+pi-pi0pi0')
+        add_phokhara_generator(path, 'pi+pi-pi0pi0', eventType='pi+pi-pi0pi0')
     elif event_code is EventCode.pipietaISR:
-        add_phokhara_generator(path, 'pi+pi-eta')
+        add_phokhara_generator(path, 'pi+pi-eta', eventType='pi+pi-eta')
     elif event_code is EventCode.KKISR:
-        add_phokhara_generator(path, 'K+K-')
+        add_phokhara_generator(path, 'K+K-', eventType='K+K-')
     elif event_code is EventCode.K0K0barISR:
-        add_phokhara_generator(path, 'K0K0bar')
+        add_phokhara_generator(path, 'K0K0bar', eventType='K0K0bar')
     elif event_code is EventCode.ppbarISR:
-        add_phokhara_generator(path, 'ppbar')
+        add_phokhara_generator(path, 'ppbar', eventType='ppbar')
 
 
 def get_event_ranges(events, event_codes=None):

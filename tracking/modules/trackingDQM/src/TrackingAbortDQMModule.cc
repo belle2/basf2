@@ -163,6 +163,10 @@ void TrackingAbortDQMModule::beginRun()
 void TrackingAbortDQMModule::event()
 {
 
+  //skip events in which we do not have EvenTMetaData or TRGSummary
+  if (!m_eventMetaData.isValid()) return;
+  if (!m_trgSummary.isValid()) return;
+
   //skip the empty events
   if (m_eventMetaData->getErrorFlag() & EventMetaData::EventErrorFlag::c_B2LinkPacketCRCError)
     return;

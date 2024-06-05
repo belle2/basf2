@@ -11,11 +11,11 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/geometry/VectorUtil.h>
 #include <framework/geometry/BFieldManager.h>
+#include <framework/utilities/IOIntercept.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/trackFitting/trackBuilder/factories/TrackBuilder.h>
-#include <tracking/kinkFinding/fitter/kinkVertexFitterKFit.h>
 
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
@@ -36,12 +36,12 @@
 #include <genfit/KalmanFitterInfo.h>
 #include <genfit/KalmanFitterRefTrack.h>
 
+#include <analysis/VertexFitting/KFit/VertexFitKFit.h>
+#include <analysis/utility/ROOTToCLHEP.h>
 #include <CLHEP/Matrix/Matrix.h>
 #include <CLHEP/Matrix/SymMatrix.h>
 #include <CLHEP/Vector/LorentzVector.h>
 #include <CLHEP/Geometry/Point3D.h>
-
-#include <framework/utilities/IOIntercept.h>
 
 using namespace Belle2;
 
@@ -71,7 +71,7 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
 
 void kinkFitter::setFitterMode(unsigned char fitterMode)
 {
-  if (not(0 <= fitterMode && fitterMode <= 7)) {
+  if (not(fitterMode <= 7)) {
     B2FATAL("Invalid fitter mode!");
   } else {
     m_kinkFitterMode = fitterMode;
@@ -329,13 +329,6 @@ bool kinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, Re
   // fitter initialization
   TrackFitter trackFitter;
 
-  const genfit::FitStatus* motherTrackFitStatus = recoTrackMother->getTrackFitStatus();
-  const genfit::FitStatus* daughterTrackFitStatus = recoTrackDaughter->getTrackFitStatus();
-
-  B2DEBUG(29, "Initial mother fit result " << motherTrackFitStatus->getPVal() << " " << motherTrackFitStatus->getNdf());
-  B2DEBUG(29, "Initial daughter fit result " << daughterTrackFitStatus->getPVal() << " "
-          << daughterTrackFitStatus->getNdf());
-
   // fit the new tracks
   trackFitter.fit(*recoTrackMotherRefit);
   trackFitter.fit(*recoTrackDaughterRefit);
@@ -345,23 +338,35 @@ bool kinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, Re
     return false;
   }
 
+  const genfit::FitStatus* motherTrackFitStatus = recoTrackMother->getTrackFitStatus();
+  const genfit::FitStatus* daughterTrackFitStatus = recoTrackDaughter->getTrackFitStatus();
+  double chi2MotherInit = motherTrackFitStatus->getChi2();
+  double chi2DaughterInit = daughterTrackFitStatus->getChi2();
+  double ndfMotherInit = motherTrackFitStatus->getNdf();
+  double ndfDaughterInit = daughterTrackFitStatus->getNdf();
+  B2DEBUG(29, "Initial mother fit result " << motherTrackFitStatus->getPVal() << " " << motherTrackFitStatus->getChi2()
+          << " " << motherTrackFitStatus->getNdf());
+  B2DEBUG(29, "Initial daughter fit result " << daughterTrackFitStatus->getPVal() << " "
+          << daughterTrackFitStatus->getChi2() << " " << daughterTrackFitStatus->getNdf());
+
   const genfit::FitStatus* motherNewTrackFitStatus = recoTrackMotherRefit->getTrackFitStatus();
   const genfit::FitStatus* daughterNewTrackFitStatus = recoTrackDaughterRefit->getTrackFitStatus();
-
-  B2DEBUG(29, "New mother fit result " << motherNewTrackFitStatus->getPVal() << " " << motherNewTrackFitStatus->getNdf());
+  double chi2Mother = motherNewTrackFitStatus->getChi2();
+  double chi2Daughter = daughterNewTrackFitStatus->getChi2();
+  double ndfMother = motherNewTrackFitStatus->getNdf();
+  double ndfDaughter = daughterNewTrackFitStatus->getNdf();
+  B2DEBUG(29, "New mother fit result " << motherNewTrackFitStatus->getPVal() << " " << motherNewTrackFitStatus->getChi2()
+          << " " << motherNewTrackFitStatus->getNdf());
   B2DEBUG(29, "New daughter fit result " << daughterNewTrackFitStatus->getPVal() << " "
-          << daughterNewTrackFitStatus->getNdf());
+          << daughterNewTrackFitStatus->getChi2() << " " << daughterNewTrackFitStatus->getNdf());
 
-  // Fit is assumed to be successful if it improves PValue of one of the tracks, while not decreasing the second track
-  // Pvalue much. If the daughter was fitted badly initially, ignore its PValue.
-  if ((motherNewTrackFitStatus->getPVal() > motherTrackFitStatus->getPVal() &&
-       (daughterNewTrackFitStatus->getPVal() / daughterTrackFitStatus->getPVal() > 0.5 ||
-        daughterTrackFitStatus->getPVal() < 0.0001)) ||
-      (daughterNewTrackFitStatus->getPVal() > daughterTrackFitStatus->getPVal() &&
-       motherNewTrackFitStatus->getPVal() / motherTrackFitStatus->getPVal() > 0.5))
+  // Fit is assumed to be successful if it improves sum of the chi2 divided by sum of ndf of two tracks
+  if ((chi2Mother + chi2Daughter) / (ndfMother + ndfDaughter) < (chi2MotherInit + chi2DaughterInit) /
+      (ndfMotherInit + ndfDaughterInit))
     return true;
   else
     return false;
+
 }
 
 /// Flip and refit the daughter track.
@@ -449,20 +454,22 @@ RecoTrack* kinkFitter::copyRecoTrackForRefit(RecoTrack* recoTrack,
 }
 
 /// check if the refit of filter 6 daughter tracks improves the distance between mother and daughter
-bool kinkFitter::isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, TVector3& motherPosLast)
+bool kinkFitter::isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, const ROOT::Math::XYZVector& motherPosLast)
 {
   // get the values near the mother last point
-  TVector3 daughterPosClosestToMotherPosLast = recoTrackDaughterRefit->getMeasuredStateOnPlaneFromFirstHit().getPos();
-  TVector3 daughterMomClosestToMotherPosLast = recoTrackDaughterRefit->getMeasuredStateOnPlaneFromFirstHit().getMom();
+  ROOT::Math::XYZVector daughterPosClosestToMotherPosLast = ROOT::Math::XYZVector(
+                                                              recoTrackDaughterRefit->getMeasuredStateOnPlaneFromFirstHit().getPos());
+  ROOT::Math::XYZVector daughterMomClosestToMotherPosLast = ROOT::Math::XYZVector(
+                                                              recoTrackDaughterRefit->getMeasuredStateOnPlaneFromFirstHit().getMom());
   const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
                                                     daughterPosClosestToMotherPosLast.Y(),
                                                     daughterPosClosestToMotherPosLast.Z()}).Z();
   // daughter Helix with move to mother last point
-  Helix daughterHelixClosestToMotherPosLast(ROOT::Math::XYZVector(daughterPosClosestToMotherPosLast),
-                                            ROOT::Math::XYZVector(daughterMomClosestToMotherPosLast),
+  Helix daughterHelixClosestToMotherPosLast(daughterPosClosestToMotherPosLast,
+                                            daughterMomClosestToMotherPosLast,
                                             static_cast<short>(recoTrackDaughterRefit->getTrackFitStatus()->getCharge()),
                                             Bz);
-  daughterHelixClosestToMotherPosLast.passiveMoveBy(ROOT::Math::XYZVector(motherPosLast));
+  daughterHelixClosestToMotherPosLast.passiveMoveBy(motherPosLast);
 
   // check if the 3D distance passes loose criteria (in default fit this test is failed)
   return (sqrt(daughterHelixClosestToMotherPosLast.getD0() * daughterHelixClosestToMotherPosLast.getD0() +
@@ -484,7 +491,7 @@ int kinkFitter::combineTracksAndFit(const Track* trackMother, const Track* track
   // fit the new track
   trackFitter.fit(*recoTrackCombinedRefit);
 
-  // return 99 if the track fit failed
+  // return 19 if the track fit failed
   if (!recoTrackCombinedRefit->wasFitSuccessful()) {
     B2DEBUG(29, "Refit of the combined track failed ");
     return 19;
@@ -500,7 +507,7 @@ int kinkFitter::combineTracksAndFit(const Track* trackMother, const Track* track
           << daughterTrackFitStatus->getNdf());
   B2DEBUG(29, "Combined track fit result " << combinedTrackFitStatus->getPVal() << " " << combinedTrackFitStatus->getNdf());
 
-  // return 98 if the combined track has NDF less than mother track
+  // return 18 if the combined track has NDF less than mother track
   if (combinedTrackFitStatus->getNdf() < motherTrackFitStatus->getNdf())
     return 18;
 
@@ -533,9 +540,8 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     B2DEBUG(29, "Try to refit filter " << filterFlag);
 
     // initialize seeds for the refit
-    // position of the last mother state and the first daughter state
-    TVector3 motherPosLast = recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos();
-    TVector3 daughterPosFirst = recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getPos();
+    // position of the last mother state
+    ROOT::Math::XYZVector motherPosLast = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
     // use mother last state time as a seed for the daughter track
     double timeSeedDaughterRefit = recoTrackMother->getCardinalRepresentation()->getTime(
                                      recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
@@ -553,7 +559,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     // create a copy of the daughter track and refit it
     RecoTrack* recoTrackDaughterRefit = copyRecoTrackForRefit(recoTrackDaughter,
                                                               momSeedDaughterRefit,
-                                                              ROOT::Math::XYZVector(motherPosLast),
+                                                              motherPosLast,
                                                               timeSeedDaughterRefit, blockHits, anotherFitter);
 
     // if the new track fit is successful, and in addition, the distance for the filter 6 is improved,
@@ -573,7 +579,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 
     // initialize seeds for the refit
     // use position of the last mother state as a seed for the daughter track
-    ROOT::Math::XYZVector motherPosLastXYZ = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
+    ROOT::Math::XYZVector motherPosLast = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
     // use mother last state time as a seed for the daughter track
     double timeSeedDaughterFlipAndRefit = recoTrackMother->getCardinalRepresentation()->getTime(
                                             recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
@@ -582,7 +588,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 
     // create a copy of the daughter track, flipped and refitted
     RecoTrack* recoTrackDaughterFlipAndRefit = copyRecoTrackForFlipAndRefit(recoTrackDaughter,
-                                               motherPosLastXYZ, momSeedDaughterFlipAndRefit,
+                                               motherPosLast, momSeedDaughterFlipAndRefit,
                                                timeSeedDaughterFlipAndRefit);
 
     // if the new track fit is successful, use it for the vertex fit
@@ -614,9 +620,8 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     B2DEBUG(29, "Try to refit filter " << filterFlag);
 
     // initialize seeds for the refit
-    // position of the last mother state and the first daughter state
-    TVector3 motherPosLast = recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos();
-    TVector3 daughterPosFirst = recoTrackDaughter->getMeasuredStateOnPlaneFromFirstHit().getPos();
+    // position of the last mother state
+    ROOT::Math::XYZVector motherPosLast = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
     // use mother last state time as a seed for the daughter track
     double timeSeedDaughterRefit = recoTrackMother->getCardinalRepresentation()->getTime(
                                      recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
@@ -632,14 +637,14 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     // create a copy of the daughter track and refit it
     RecoTrack* recoTrackDaughterRefit = copyRecoTrackForRefit(recoTrackDaughter,
                                                               momSeedDaughterRefit,
-                                                              ROOT::Math::XYZVector(motherPosLast),
+                                                              motherPosLast,
                                                               timeSeedDaughterRefit, blockHits, anotherFitter);
 
     // if the new track fit is successful, and in addition, the vertex fit is successful,
     // use a new fit and proceed. Otherwise, return false.
     if (recoTrackDaughterRefit->wasFitSuccessful() &&
         vertexFitWithRecoTracks(recoTrackMother, recoTrackDaughterRefit, reassignHitStatus, vertexPos, distanceAtVertex,
-                                ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos()))) {
+                                motherPosLast)) {
       recoTrackDaughter = recoTrackDaughterRefit;
       B2DEBUG(29, "Refit successful");
       refitBadFlag = true;
@@ -664,7 +669,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     B2DEBUG(29, "Start of the hits reassignment for filter " << filterFlag);
 
     // initialize counter for reassigning tries
-    unsigned int count_reassign_tries = 0;
+    unsigned short countReassignTries = 0;
 
     // variables to store temporary values
     int finalHitPositionForReassignmentTmp = 0;
@@ -676,9 +681,12 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     RecoTrack* recoTrackDaughterBuffer = recoTrackDaughter;
 
     // The number of tries is limited to 3
-    while (reassignHitStatus != 0 && count_reassign_tries < 3) {
-      ++count_reassign_tries;
-      B2DEBUG(29, "Try number " << count_reassign_tries);
+    while (reassignHitStatus != 0 && countReassignTries < 3) {
+      ++countReassignTries;
+      B2DEBUG(29, "Try number " << countReassignTries);
+
+      // counter for failed retries
+      unsigned short countBadReassignTries = 0;
 
       // find threshold hit position in the track
       // hit bellow the threshold are to be reassigned
@@ -727,14 +735,19 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
                                                                  false, hitPositionForReassignment);
 
         // try to fit new RecoTracks assuming improvement of the result
-        // if fit fails, try position closer to the end
+        // if fit fails, try position closer to the end (no more than 5 tries)
         // if fit is successful, break the loop
         if (!refitRecoTrackAfterReassign(recoTrackMotherRefit, recoTrackDaughterRefit,
                                          recoTrackMother, recoTrackDaughter)) {
-          if (hitPositionForReassignment > 0)
+          if (hitPositionForReassignment > 0) {
             --hitPositionForReassignment;
-          else
+            ++countBadReassignTries;
+          } else {
             ++hitPositionForReassignment;
+            ++countBadReassignTries;
+          }
+
+          if (countBadReassignTries > 5) hitPositionForReassignment = 0;
         } else
           break;
         B2DEBUG(29, "Refit of the tracks failed, try with smaller hit index: " << hitPositionForReassignment);
@@ -755,7 +768,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       finalHitPositionForReassignmentTmp += hitPositionForReassignment;
 
       // Remember the result leading to the smallest distance between tracks.
-      if (distanceAtVertexTmp < distanceAtVertex) {
+      if (distanceAtVertexTmp < m_vertexDistanceCut) {
         distanceAtVertex = distanceAtVertexTmp;
         vertexPos = vertexPosTmp;
         stMother = m_stMotherBuffer;
@@ -810,7 +823,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 
     // initialize seeds for the refit
     // position of the last mother state and the first daughter state
-    TVector3 motherPosLast = recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos();
+    ROOT::Math::XYZVector motherPosLast = ROOT::Math::XYZVector(recoTrackMother->getMeasuredStateOnPlaneFromLastHit().getPos());
     // use mother last state time as a seed for the daughter track
     double timeSeedDaughterRefit = recoTrackMother->getCardinalRepresentation()->getTime(
                                      recoTrackMother->getMeasuredStateOnPlaneFromLastHit());
@@ -830,7 +843,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     // create a copy of the daughter track and refit it
     RecoTrack* recoTrackDaughterRefit = copyRecoTrackForRefit(recoTrackDaughter,
                                                               momSeedDaughterRefit,
-                                                              ROOT::Math::XYZVector(motherPosLast),
+                                                              motherPosLast,
                                                               timeSeedDaughterRefit, blockHits, anotherFitter);
 
     // if the vertex fit is successful and the result is improved, store it
@@ -878,6 +891,12 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   TrackFitResult* tfrMotherVtx = buildTrackFitResult(m_motherKinkRecoTrackCache, stMother, BzVtx, Const::pion);
   TrackFitResult* tfrDaughterVtx = buildTrackFitResult(m_daughterKinkRecoTrackCache, stDaughter, BzVtx, Const::pion);
 
+  // try to combine tracks and fit them to find clones. The result is written to filter flag
+  if (m_kinkFitterModeCombineAndFit) {
+    int combinedFitFlag = combineTracksAndFit(trackMother, trackDaughter);
+    filterFlag += combinedFitFlag * 10;
+  }
+
   // write to the filter flag number of reassigned hits (minus for daughter to mother, plus vice-versa)
   if (abs(finalHitPositionForReassignment) < 32) {
     if (finalHitPositionForReassignment >= 0)
@@ -888,16 +907,6 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
     }
   } else {
     filterFlag += 32 * 1000;
-  }
-
-  // try to combine tracks and fit them to find clones. The result is written to filter flag
-  if (m_kinkFitterModeCombineAndFit) {
-    int combinedFitFlag = combineTracksAndFit(trackMother, trackDaughter);
-    if (filterFlag >= 0) {
-      filterFlag += combinedFitFlag * 10;
-    } else {
-      filterFlag -= combinedFitFlag * 10;
-    }
   }
 
   // save the kink to the StoreArray
@@ -946,7 +955,7 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   m_stDaughterBuffer = stDaughter;
 
   // initialize KVertexFitter
-  kinkVertexFitterKFit kvf;
+  analysis::VertexFitKFit kvf;
 
   // set magnetic field at the seed position
   const double Bz = BFieldManager::getFieldInTesla({vertexPosSeed.X(), vertexPosSeed.Y(), vertexPosSeed.Z()}).Z();
@@ -956,9 +965,39 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   HepPoint3D vertexPosSeedHepPoint(vertexPosSeed.X(), vertexPosSeed.Y(), vertexPosSeed.Z());
   kvf.setInitialVertex(vertexPosSeedHepPoint);
 
-  // add mother and daughter states for the fit
-  kvf.addState(stMother, motherMass, motherCharge);
-  kvf.addState(stDaughter, daughterMass, daughterCharge);
+  // add mother state for the fit
+  TVector3 motherPosition, motherMomentum;
+  TMatrixDSym motherCovMatrix6(6, 6);
+  stMother.getPosMomCov(motherPosition, motherMomentum, motherCovMatrix6);
+
+  const double motherEnergy = sqrt(motherMomentum.Mag2() + motherMass * motherMass);
+  ROOT::Math::PxPyPzEVector motherFourMomentum(motherMomentum.X(), motherMomentum.Y(),
+                                               motherMomentum.Z(), motherEnergy);
+
+  TMatrixDSym motherErrMatrixForKFit(7);
+  errMatrixForKFit(motherFourMomentum, motherCovMatrix6, motherErrMatrixForKFit);
+
+  kvf.addTrack(ROOTToCLHEP::getHepLorentzVector(motherFourMomentum),
+               ROOTToCLHEP::getPoint3D(ROOT::Math::XYZVector(motherPosition)),
+               ROOTToCLHEP::getHepSymMatrix(motherErrMatrixForKFit),
+               motherCharge);
+
+  // add daughter state for the fit
+  TVector3 daughterPosition, daughterMomentum;
+  TMatrixDSym daughterCovMatrix6(6, 6);
+  stDaughter.getPosMomCov(daughterPosition, daughterMomentum, daughterCovMatrix6);
+
+  const double daughterEnergy = sqrt(daughterMomentum.Mag2() + daughterMass * daughterMass);
+  ROOT::Math::PxPyPzEVector daughterFourMomentum(daughterMomentum.X(), daughterMomentum.Y(),
+                                                 daughterMomentum.Z(), daughterEnergy);
+
+  TMatrixDSym daughterErrMatrixForKFit(7);
+  errMatrixForKFit(daughterFourMomentum, daughterCovMatrix6, daughterErrMatrixForKFit);
+
+  kvf.addTrack(ROOTToCLHEP::getHepLorentzVector(daughterFourMomentum),
+               ROOTToCLHEP::getPoint3D(ROOT::Math::XYZVector(daughterPosition)),
+               ROOTToCLHEP::getHepSymMatrix(daughterErrMatrixForKFit),
+               daughterCharge);
 
   // do the fit
   int err = kvf.doFit();
@@ -984,19 +1023,19 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
   }
 
   // prepare mother Helix at the fitted vertex to calculate the distance between tracks
-  TVector3 motherPos = stMother.getPos();
-  TVector3 motherMom = stMother.getMom();
-  Helix motherHelix(ROOT::Math::XYZVector(motherPos),
-                    ROOT::Math::XYZVector(motherMom),
+  ROOT::Math::XYZVector motherPos = ROOT::Math::XYZVector(stMother.getPos());
+  ROOT::Math::XYZVector motherMom = ROOT::Math::XYZVector(stMother.getMom());
+  Helix motherHelix(motherPos,
+                    motherMom,
                     static_cast<short>(recoTrackMother->getTrackFitStatus()->getCharge()),
                     Bz);
   motherHelix.passiveMoveBy(vertexPos);
 
   // prepare daughter Helix at the fitted vertex to calculate the distance between tracks
-  TVector3 daughterPos = stDaughter.getPos();
-  TVector3 daughterMom = stDaughter.getMom();
-  Helix daughterHelix(ROOT::Math::XYZVector(daughterPos),
-                      ROOT::Math::XYZVector(daughterMom),
+  ROOT::Math::XYZVector daughterPos = ROOT::Math::XYZVector(stDaughter.getPos());
+  ROOT::Math::XYZVector daughterMom = ROOT::Math::XYZVector(stDaughter.getMom());
+  Helix daughterHelix(daughterPos,
+                      daughterMom,
                       static_cast<short>(recoTrackDaughter->getTrackFitStatus()->getCharge()),
                       Bz);
   daughterHelix.passiveMoveBy(vertexPos);
@@ -1011,6 +1050,61 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
 
   B2DEBUG(29, "Vertex fit with chi2 " << kvf.getCHIsq() << " and distance between tracks " << distance);
   return true;
+}
+
+/// Prepare the error matrix for the kFit
+void kinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+                                  TMatrixDSym& errMatrix7)
+{
+
+  enum {
+    c_Px, c_Py, c_Pz, c_E, c_X, c_Y, c_Z
+  };
+  constexpr unsigned order[] = {c_X, c_Y, c_Z, c_Px, c_Py, c_Pz};
+
+  for (int i = 0; i < 6; i++) {
+    for (int j = i; j < 6; j++) {
+      errMatrix7(order[j], order[i]) = errMatrix7(order[i], order[j]) = covMatrix6(i, j);
+    }
+  }
+
+  const double dEdp[] = {fourMomentum.X() / fourMomentum.E(),
+                         fourMomentum.Y() / fourMomentum.E(),
+                         fourMomentum.Z() / fourMomentum.E()
+                        };
+  constexpr unsigned componentMom[] = {c_Px, c_Py, c_Pz};
+  constexpr unsigned componentPos[] = {c_X, c_Y, c_Z};
+
+
+  // covariances (p,E)
+  for (unsigned int comp : componentMom) {
+    double covariance = 0;
+    for (int k = 0; k < 3; k++) {
+      covariance += errMatrix7(comp, componentMom[k]) * dEdp[k];
+    }
+    errMatrix7(comp, c_E) = covariance;
+  }
+
+  // covariances (x,E)
+  for (unsigned int comp : componentPos) {
+    double covariance = 0;
+    for (int k = 0; k < 3; k++) {
+      covariance += errMatrix7(comp, componentMom[k]) * dEdp[k];
+    }
+    errMatrix7(c_E, comp) = covariance;
+  }
+
+  // variance (E,E)
+  double covariance = 0;
+  for (int i = 0; i < 3; i++) {
+    covariance += errMatrix7(componentMom[i], componentMom[i]) * dEdp[i] * dEdp[i];
+  }
+  for (int i = 0; i < 3; i++) {
+    int k = (i + 1) % 3;
+    covariance += 2 * errMatrix7(componentMom[i], componentMom[k]) * dEdp[i] * dEdp[k];
+  }
+  errMatrix7(c_E, c_E) = covariance;
+
 }
 
 

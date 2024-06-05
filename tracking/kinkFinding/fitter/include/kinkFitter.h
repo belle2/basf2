@@ -14,8 +14,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Track.h>
 
-#include <Math/Vector3D.h>
-
 #include <utility>
 
 namespace genfit {
@@ -145,7 +143,7 @@ namespace Belle2 {
      * @return true if the refit of filter 6 daughter tracks improves the distance between mother and daughter;
      * false otherwise
      */
-    bool isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, TVector3& motherPosLast);
+    bool isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, const ROOT::Math::XYZVector& motherPosLast);
 
     /**
      * Fit kink vertex using RecoTrack's as inputs.
@@ -189,6 +187,15 @@ namespace Belle2 {
      */
     TrackFitResult* buildTrackFitResult(RecoTrack* recoTrack, const genfit::MeasuredStateOnPlane& msop,
                                         const double Bz, const Const::ParticleType trackHypothesis);
+
+    /**
+     * Prepare the error matrix for the kFit.
+     * @param fourMomentum four momentum of the track state to be used in kFit
+     * @param covMatrix6 covariance matrix of the track state to be used in kFit
+     * @param errMatrix7 error matrix of the track state to be prepared and used in kFit
+     */
+    void errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+                          TMatrixDSym& errMatrix7);
 
 
   private:

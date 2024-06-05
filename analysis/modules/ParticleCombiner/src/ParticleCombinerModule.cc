@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleCombiner/ParticleCombinerModule.h>
 
 // framework aux
@@ -56,16 +56,17 @@ ParticleCombinerModule::ParticleCombinerModule() :
            0);
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
-  addParam("recoilParticleType", m_recoilParticleType,
-           "If not equal 0, the mother Particle is reconstructed in the recoil against the daughter particles.\n"
-           "In the case of the following decay chain M -> D1 D2 ... Dn and\n\n"
-           ""
-           "  a) recoilParticleType = 1: \n\n"
-           "    - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)\n"
-           "    - D1, D2, ..., DN are attached as daughters of M\n\n"
-           "  b) recoilParticleType = 2: \n\n"
-           "    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)\n"
-           "    - D1, D2, ..., DN are attached as daughters of M\n\n", 0);
+  addParam("recoilParticleType", m_recoilParticleType, R"DOC(If not equal 0,
+the mother Particle is reconstructed in the recoil against the daughter particles.
+In the case of the following decay chain M -> D1 D2 ... Dn and
+
+- recoilParticleType = 1:
+    - the mother momentum is given by: p(M) = p(e+e-) - p(D1) - p(D2) - ... - p(DN)
+    - D1, D2, ..., DN are attached as daughters of M
+- recoilParticleType = 2:
+    - the mother momentum is given by: p(M) = p(D1) - p(D2) - ... - p(DN)
+    - D1, D2, ..., DN are attached as daughters of M
+  )DOC", 0);
   addParam("chargeConjugation", m_chargeConjugation,
            "If true, the charge-conjugated mode will be reconstructed as well", true);
   addParam("allowChargeViolation", m_allowChargeViolation,
@@ -112,7 +113,8 @@ void ParticleCombinerModule::initialize()
     }
   }
 
-  if (daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
+  // The electric charge check makes no sense for an inclusive decay
+  if (!m_decaydescriptor.isIgnoreMassive() and daughtersNetCharge != EvtPDLUtil::charge(m_pdgCode)) {
     if (!m_allowChargeViolation) {
       B2FATAL("Your decay string " << m_decayString << " violates electric charge conservation!\n"
               "If you want to allow this you can set the argument 'allowChargeViolation' to True. Something like:\n"

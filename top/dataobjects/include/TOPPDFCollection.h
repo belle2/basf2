@@ -16,6 +16,8 @@
 #include <vector>
 #include <tuple>
 #include <utility>
+#include <Math/Vector3D.h>
+#include <Math/Point3D.h>
 
 namespace Belle2 {
 
@@ -30,14 +32,17 @@ namespace Belle2 {
   public:
 
     /**
-     * parameters to describe a Gaussian
+     * Parameters to describe a Gaussian
      */
     struct Gaussian {
       float mean = 0;  /**< position */
       float width = 0; /**< width (sigma) */
       float area = 0;  /**< area (number of photons) */
       /**
-       * useful constructor
+       * Useful constructor
+       * @param m mean
+       * @param w width
+       * @param a area
        */
       Gaussian(float m, float w, float a): mean(m), width(w), area(a)
       {}
@@ -47,12 +52,15 @@ namespace Belle2 {
     typedef std::array<channelPDF_t, 512> modulePDF_t; /**< the PDF of the module is a list of 512 channel PDFs*/
 
     /**
-     * default constructor
+     * Default constructor
      */
     TOPPDFCollection() { }
 
     /**
-     * adds the pdf for the given hypothesis (PDG code)
+     * Adds the pdf for the given hypothesis (PDG code)
+     * @param pdf pdf of a given hypothesis
+     * @param hypothesis PDG code
+     * @return true on success
      */
     bool addHypothesisPDF(const modulePDF_t& pdf, const int hypothesis)
     {
@@ -64,7 +72,9 @@ namespace Belle2 {
     }
 
     /**
-     * returns the pdf for the given hypothesis (PDG code)
+     * Returns the pdf for the given hypothesis (PDG code)
+     * @param hypothesis PDG code
+     * @return pdf
      */
     const modulePDF_t& getHypothesisPDF(const int hypothesis) const
     {
@@ -72,33 +82,39 @@ namespace Belle2 {
     }
 
     /**
-     * sets the position and momentum of the exthit in local coordinates
+     * Sets the position and momentum of the exthit in local coordinates
+     * @param pos position
+     * @param mom momentum
+     * @param moduleID slot ID
      */
-    void setLocalPositionMomentum(const TVector3& pos, const TVector3& mom, int moduleID)
+    void setLocalPositionMomentum(const ROOT::Math::XYZPoint& pos, const ROOT::Math::XYZVector& mom, int moduleID)
     {
-      m_localHitPosition.SetXYZ(pos.X(), pos.Y(), pos.Z());
-      m_localHitMomentum.SetXYZ(mom.X(), mom.Y(), mom.Z());
+      m_localHitPosition = pos;
+      m_localHitMomentum = mom;
       m_moduleID = moduleID;
     }
 
     /**
-     * returns the local coordinates of the exthit associated with this PDF
+     * Returns the local coordinates of the exthit associated with this PDF
+     * @return local coordinates of the exthit
      */
-    const TVector3& getAssociatedLocalHit() const
+    const ROOT::Math::XYZPoint& getAssociatedLocalHit() const
     {
       return m_localHitPosition;
     }
 
     /**
-     * returns the momentum of the associated exthit in local coordinates
+     * Returns the momentum of the associated exthit in local coordinates
+     * @return local momentum of the associated exthit
      */
-    const TVector3& getAssociatedLocalMomentum() const
+    const ROOT::Math::XYZVector& getAssociatedLocalMomentum() const
     {
       return m_localHitMomentum;
     }
 
     /**
-     * returns slot ID of the associated exthit
+     * Returns slot ID of the associated exthit
+     * @return slot ID
      */
     int getModuleID() const {return m_moduleID;}
 
@@ -106,10 +122,10 @@ namespace Belle2 {
     std::map<int, modulePDF_t> m_data; /**< collection of samples of the pdf */
     // The following two members are useful for python modules (with no access
     // to TOPGeometryPar)
-    TVector3 m_localHitPosition; /**< position of the exthit in local coordinates */
-    TVector3 m_localHitMomentum; /**< momentum of the exthit in local coordinates */
+    ROOT::Math::XYZPoint m_localHitPosition; /**< position of the exthit in local coordinates */
+    ROOT::Math::XYZVector m_localHitMomentum; /**< momentum of the exthit in local coordinates */
     int m_moduleID = 0; /**< slot ID of the exthit */
-    ClassDef(TOPPDFCollection, 3); /**< ClassDef */
+    ClassDef(TOPPDFCollection, 4); /**< ClassDef */
   };
 } // end namespace Belle2
 

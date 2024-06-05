@@ -6,12 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <generators/modules/evtgeninput/EvtGenInputModule.h>
-#include <generators/evtgen/EvtGenInterface.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <framework/utilities/FileSystem.h>
 
+/* Generators headers. */
+#include <generators/evtgen/EvtGenInterface.h>
+#include <generators/evtgen/EvtGenUtilities.h>
+
+/* Basf2 headers. */
+#include <framework/utilities/FileSystem.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 using namespace std;
 using namespace Belle2;
@@ -25,7 +30,7 @@ REG_MODULE(EvtGenInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtGenInputModule::EvtGenInputModule() : Module(),
+EvtGenInputModule::EvtGenInputModule() : GeneratorBaseModule(),
   m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
@@ -43,31 +48,16 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
   addParam("maxTries", m_maxTries, "Number of tries to generate a parent "
            "particle from the beam energies which fits inside the mass window "
            "before giving up", 100000);
-
-  m_PrimaryVertex = TVector3(0., 0., 0.);
-
 }
 
 
-void EvtGenInputModule::initialize()
+void EvtGenInputModule::generatorInitialize()
 {
-  const std::string defaultDecFile = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
-  if (m_DECFileName.empty()) {
-    B2ERROR("No global decay file defined, please make sure the parameter 'DECFile' is set correctly");
-    return;
-  }
-  if (defaultDecFile.empty()) {
-    B2WARNING("Cannot find default decay file");
-  } else if (defaultDecFile != m_DECFileName) {
-    B2INFO("Using non-standard DECAY file \"" << m_DECFileName << "\"");
-  }
-  //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
-
-  //initial particle for beam parameters
+  generators::checkEvtGenDecayFile(m_DECFileName);
+  // Initial particle for beam parameters.
   m_initial.initialize();
-
 }
 
 
@@ -76,19 +66,15 @@ void EvtGenInputModule::beginRun()
 
 }
 
-ROOT::Math::PxPyPzEVector EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
+MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double maxMass)
 {
   // try to generate the 4 momentum a m_maxTries amount of times before we give up
   for (int i = 0; i < m_maxTries; ++i) {
-    const MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles initial = m_initial.generate();
 
     // check if we fullfill the mass window
-    if (initial.getMass() >= minMass && initial.getMass() < maxMass) {
-
-      ROOT::Math::PxPyPzEVector beam = initial.getLER() + initial.getHER();
-      m_PrimaryVertex = initial.getVertex();
-      return beam;
-    }
+    if (minMass <= initial.getMass() && initial.getMass() < maxMass)
+      return initial;
   }
 
   //Apparently the beam energies don't match the particle mass we want to generate
@@ -97,10 +83,14 @@ ROOT::Math::PxPyPzEVector EvtGenInputModule::createBeamParticle(double minMass, 
           << "maxMass=" << maxMass << " GeV");
 
   //This will never be reached so return empty to avoid warning
-  return ROOT::Math::PxPyPzEVector(0, 0, 0, 0);
+  return MCInitialParticles();
 }
 
-void EvtGenInputModule::event()
+
+
+
+
+void EvtGenInputModule::generatorEvent()
 {
   B2DEBUG(10, "Starting event generation");
 
@@ -113,25 +103,23 @@ void EvtGenInputModule::event()
     }
   }
 
-  ROOT::Math::PxPyPzEVector pParentParticle;
+  MCInitialParticles initial;
 
   //Initialize the beam energy for each event separatly
   if (EvtPDL::getStdHep(m_parentId) == 10022) {
     //virtual photon (vpho), no mass window, we accept everything
-    pParentParticle = createBeamParticle();
+    initial = createBeamParticle();
   } else {
     //everything else needs to be in the mass window
-    pParentParticle = createBeamParticle(EvtPDL::getMinMass(m_parentId),
-                                         EvtPDL::getMaxMass(m_parentId));
+    initial = createBeamParticle(EvtPDL::getMinMass(m_parentId),
+                                 EvtPDL::getMaxMass(m_parentId));
   }
+
   //end initialization
 
-  //clear existing MCParticles
-  mpg.clear();
 
   //generate event.
-  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle, m_PrimaryVertex,
-                                       m_inclusiveType, m_inclusiveParticle);
+  int nPart =  m_Ievtgen.simulateEvent(initial, m_inclusiveType, m_inclusiveParticle);
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }

@@ -9,7 +9,7 @@
 /* Own header. */
 #include <online_book/awesome/simulation/AWESOMESensitiveDetector.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/geometry/B2Vector3.h>
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -16,6 +15,11 @@ See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fa
 
 CHANGES since release-05-00-00:
 
+- EventLevelClusteringInfo
+  + nKLMDigitsMultiStrip
+  + nECLShowers
+  + nECLLocalMaximums
+  + nECLTriggerCells
 - EventLevelTrackingInfo:
   + hasSVDSpacePointCreatorAbortionFlag/setSVDSpacePointCreatorAbortionFlag
 - TrackFitResult:

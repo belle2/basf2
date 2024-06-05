@@ -8,23 +8,26 @@
 
 #pragma once
 
-//FRAMEWORK
-#include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-//OTHER
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
+#include <framework/core/HistoModule.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+/* ROOT headers. */
 #include <TH1.h>
 #include <TH2.h>
+
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
@@ -46,7 +49,7 @@ namespace Belle2 {
     private:
       std::string m_histogramDirectoryName; /**< Name of the histogram directory in ROOT file */
       std::string m_ECLDigitsName;  /**< The name of the StoreArray of ECLRawHits to be generated */
-      double m_revolutionTime;  /**< The beam revolution cycle time in #mus */
+      double m_revolutionTime;  /**< The beam revolution cycle time in \f$\mu s\f$ */
       double m_ECLThresholdforVetoTuning; /**< ECL threshold for injection veto tuning, ADC channels */
 
 
@@ -80,11 +83,11 @@ namespace Belle2 {
       std::vector<int> v_totalthrApsd = {};
 
 
-      TH1F* hHitsAfterInjLER{};          /**< Histogram Hits after LER injection */
-      TH1F* hHitsAfterInjHER{};          /**< Histogram Hits after HER injection */
+      TH1F* hHitsAfterInjLER{};         /**< Histogram Hits after LER injection */
+      TH1F* hHitsAfterInjHER{};         /**< Histogram Hits after HER injection */
 
-      TH1F* hEHitsAfterInjLER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
-      TH1F* hEHitsAfterInjHER{};         /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
+      TH1F* hEHitsAfterInjLER{};        /**< Histogram for Nr Entries (=Triggrs) for normalization after LER injection */
+      TH1F* hEHitsAfterInjHER{};        /**< Histogram for Nr Entries (=Triggrs) for normalization after HER injection */
 
       TH1F* hBurstsAfterInjLER{};       /**< Histogram Bursts suppression after LER injection */
       TH1F* hBurstsAfterInjHER{};       /**< Histogram Bursts suppression after HER injection */
@@ -95,8 +98,10 @@ namespace Belle2 {
       TH2F* hVetoAfterInjLER{};         /**< Histogram Veto tuning w/ ECL hits after LER injection */
       TH2F* hVetoAfterInjHER{};         /**< Histogram Veto tuning w/ ECL hits after HER injection */
 
-      TH2F* hOccAfterInjLER{};         /**< Histogram Occupancy after LER injection */
-      TH2F* hOccAfterInjHER{};         /**< Histogram Occupancy after HER injection */
+      TH2F* hOccAfterInjLER{};          /**< Histogram Occupancy after LER injection */
+      TH2F* hOccAfterInjHER{};          /**< Histogram Occupancy after HER injection */
+
+      TH2F* hInjkickTimeShift[2] = {};  /**< Histograms to determine injkick signal time offset for LER/HER injections */
 
       /**
        * Injection time range (in ms) for h_ped_peak histograms

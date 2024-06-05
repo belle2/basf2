@@ -83,21 +83,21 @@ namespace Belle2 {
     TH1F* h_TracksnSVDhits = nullptr; /**< Number of SVDhits for a track. */
 
     // Cluster charge.
-    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster charge. */
-    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster charge vs. track momentum. */
-    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster charge vs. incident angle. */
-    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster charge vs. SVDCluster SNR. */
+    TH1F* h_clCharge[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster charge. */
+    TH2F* h_clChargeVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster charge vs. track momentum. */
+    TH2F* h_clChargeVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster charge vs. incident angle. */
+    TH2F* h_clChargeVsSNR[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster charge vs. SVDCluster SNR. */
 
     // Cluster size.
-    TH1F* h_clSize[m_nSensorTypes][m_nSides] = {nullptr}; /**< SVDCluster size */
-    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides] = {nullptr}; /**< SVDCluster size vs. track momentum. */
-    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides] = {nullptr}; /**< SVDCluster size vs. incident angle. */
-    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides] = {nullptr}; /**< SVDCluster size vs. SVDCluster SNR. */
+    TH1F* h_clSize[m_nSensorTypes][m_nSides] = {{nullptr}}; /**< SVDCluster size */
+    TH2F* h_clSizeVsMomentum[m_nSensorTypes][m_nSides] = {{nullptr}}; /**< SVDCluster size vs. track momentum. */
+    TH2F* h_clSizeVsIncidentAngle[m_nSensorTypes][m_nSides] = {{nullptr}}; /**< SVDCluster size vs. incident angle. */
+    TH2F* h_clSizeVsSNR[m_nSensorTypes][m_nSides] = {{nullptr}}; /**< SVDCluster size vs. SVDCluster SNR. */
 
     // cluster SNR.
-    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster SNR. */
-    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster SNR vs. track momentum. */
-    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes] = {nullptr}; /**< SVDCluster SNR vs. incident angle. */
+    TH1F* h_clSNR[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster SNR. */
+    TH2F* h_clSNRVsMomentum[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster SNR vs. track momentum. */
+    TH2F* h_clSNRVsIncidentAngle[m_nSensorTypes][m_nSides][m_nClSizes] = {{{nullptr}}}; /**< SVDCluster SNR vs. incident angle. */
 
     // histogram lists.
     /** List of all histograms concerning track information: nTracks, Track P Value, momentum and SVD hits */

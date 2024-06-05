@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,6 +24,8 @@ from tracking.harvest.peelers import peel_mc_particle, peel_reco_track_hit_conte
 
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
+
+ACTIVE = True
 
 
 class VxdCdcPartFinderHarvester(HarvestingModule):
@@ -52,9 +53,9 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         """
         Extract the information.
         """
-        this_best_track_cdc = self.mc_track_matcher_cdc.getMatchedPRRecoTrack(mc_track)
-        this_best_track_vxd = self.mc_track_matcher_vxd.getMatchedPRRecoTrack(mc_track)
-        # reco_track = self.mc_track_matcher.getMatchedPRRecoTrack(mc_track)
+        this_best_track_cdc = self.mc_track_matcher_cdc.getAnyChargeMatchedPRRecoTrack(mc_track)
+        this_best_track_vxd = self.mc_track_matcher_vxd.getAnyChargeMatchedPRRecoTrack(mc_track)
+        # reco_track = self.mc_track_matcher.getAnyChargeMatchedPRRecoTrack(mc_track)
 
         mc_particle = mc_track.getRelated("MCParticles")
 
@@ -78,15 +79,15 @@ class VxdCdcPartFinderHarvester(HarvestingModule):
         return_dict.update(peel_mc_particle(mc_particle))
 
         return_dict.update(dict(
-            is_matched=self.mc_track_matcher.isMatchedMCRecoTrack(mc_track),
-            is_merged=self.mc_track_matcher.isMergedMCRecoTrack(mc_track),
+            is_matched=self.mc_track_matcher.isAnyChargeMatchedMCRecoTrack(mc_track),
+            is_merged=self.mc_track_matcher.isAnyChargeMergedMCRecoTrack(mc_track),
             is_missing=self.mc_track_matcher.isMissingMCRecoTrack(mc_track),
             hit_efficiency=self.mc_track_matcher.getRelatedEfficiency(mc_track),
         ))
 
         return_dict.update(dict(
-            fitted_is_matched=self.fitted_mc_track_matcher.isMatchedMCRecoTrack(mc_track),
-            fitted_is_merged=self.fitted_mc_track_matcher.isMergedMCRecoTrack(mc_track),
+            fitted_is_matched=self.fitted_mc_track_matcher.isAnyChargeMatchedMCRecoTrack(mc_track),
+            fitted_is_merged=self.fitted_mc_track_matcher.isAnyChargeMergedMCRecoTrack(mc_track),
             fitted_is_missing=self.fitted_mc_track_matcher.isMissingMCRecoTrack(mc_track),
             fitted_hit_efficiency=self.fitted_mc_track_matcher.getRelatedEfficiency(mc_track),
         ))
@@ -137,10 +138,15 @@ def run():
     # Gather the results into ROOT files
     path.add_module(VxdCdcPartFinderHarvester("../matching_validation.root"))
 
-    path.add_module("ProgressBar")
+    path.add_module("Progress")
     basf2.process(path)
     print(basf2.statistics)
 
 
 if __name__ == "__main__":
-    run()
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

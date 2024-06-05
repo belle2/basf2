@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -9,9 +8,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-from root_numpy import hist2array
 from matplotlib import pyplot as pl
 from basf2 import logging, LogLevel, create_path, process
+from hist_utils import hist2array
 import ROOT as root
 import numpy as np
 import matplotlib as mpl
@@ -69,14 +68,12 @@ rmaterial_file = root.TFile("MaterialRay.root")
 
 def plot_hist(region, **argk):
     """Get the histogram for a given region from the file and plot it. Return the histogram data and edges"""
-    h = rmaterial_file.Get("Ray/%s_x0" % region)
+    h = rmaterial_file.Get(f"Ray/{region}_x0")
     if not h:
         return None
     data, edges = hist2array(h, return_edges=True)
-    # Now we have to play around a bit: pl.plot(edges[:-1], data, drawstyle="steps-post") does work but
-    # the last bin does not get a top line so we need to add a 0 to the
-    # histogram to go back down to where we were
     data = np.append(data, 0)
+    edges[-1][-1] = h.GetXaxis().GetXmax()
     # now plot
     pl.plot(edges[0], data, drawstyle="steps-post", **argk)
     return data, edges[0]
@@ -94,7 +91,7 @@ for region in ["BeamPipe", "PXD", "SVD", "CDC", "ARICH", "TOP", "ECL", "EKLM", "
 pl.ylim(ymin=0)
 pl.xlim(xmin=mat_edges[0], xmax=mat_edges[-1] + 1)
 pl.xlabel("Flight length [cm]")
-pl.ylabel("Radiation length [$X_0 / %.3g$ cm]" % (mat_edges[1] - mat_edges[0]))
+pl.ylabel(f"Radiation length [$X_0 / {mat_edges[1] - mat_edges[0]:.3g}$ cm]")
 pl.legend(loc="best")
 pl.tight_layout()
 pl.savefig("MaterialRay.pdf")

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,8 +26,6 @@ import basf2
 VALIDATION_OUTPUT_FILE = 'VXDTF2TrackingValidationBkg.root'
 N_EVENTS = 1000
 ACTIVE = True
-
-basf2.set_random_seed(1337)
 
 
 def setupFinderModule(path):
@@ -64,6 +61,8 @@ class VXDTF2TrackingValidationBkg(TrackingValidationRun):
     fit_tracks = True
     #: plot pull distributions
     pulls = True
+    #: do not create expert-level output histograms in dedicated folder but in the main folder
+    use_expert_folder = False
     #: output file of plots
     output_file_name = VALIDATION_OUTPUT_FILE
 
@@ -78,6 +77,7 @@ def main():
     """
     create SVD validation class and execute
     """
+    basf2.set_random_seed(1337)
     validation_run = VXDTF2TrackingValidationBkg()
     validation_run.configure_and_execute_from_commandline()
 
@@ -86,3 +86,7 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     if ACTIVE:
         main()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

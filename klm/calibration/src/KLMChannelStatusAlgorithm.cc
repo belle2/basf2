@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/calibration/KLMChannelStatusAlgorithm.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* ROOT headers. */

@@ -215,7 +215,7 @@ class LocalMetadataProvider:
 
         self._database.executemany("INSERT OR REPLACE INTO payloads VALUES (?,?,?,?,?,?)", all_payloads.values())
         self._database.executemany("INSERT INTO iovs VALUES (?,?,?,?,?,?)", all_iovs)
-        # make sure everything is comitted
+        # make sure everything is committed
         self._database.commit()
         self._database.execute("VACUUM")
 

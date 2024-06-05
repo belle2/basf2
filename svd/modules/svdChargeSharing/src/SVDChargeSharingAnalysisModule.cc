@@ -186,7 +186,7 @@ void SVDChargeSharingAnalysisModule::event()
 
     if (tfr) {
       h_TracksPvalue->Fill(tfr->getPValue());
-      h_TracksMomentum->Fill(tfr->getMomentum().Mag());
+      h_TracksMomentum->Fill(tfr->getMomentum().R());
       h_TracksnSVDhits->Fill((tfr->getHitPatternVXD()).getNSVDHits());
     } // trf
 

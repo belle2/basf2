@@ -3,7 +3,7 @@
 PID Calibration Weights
 =======================
 
-The PID calibration weights were introduced in 
+The PID calibration weights were introduced in
 `BELLE2-NOTE-TE-2021-27 <https://docs.belle2.org/record/2721>`_ as a novel means
 for improving PID performance without low-level variables.
 
@@ -24,8 +24,8 @@ saving out only the information necessary for training. This is done with severa
 methods that are provided in the ``pidDataUtils`` module.
 
 1. Read your data into a DataFrame. We provide a ``read_root()`` method to do
-   this (it is just a wrapper around the root_pandas method of the same name,
-   but it can read several files and automatically concatenate them all
+   this (it is just a wrapper around the uproot.concatenate method,
+   which can read several files and automatically concatenate them all
    together.) You can use whatever method you like, though. All that is required
    is that your DataFrame **must** contain momentum ('p'), cosine-theta
    ('cosTheta'), phi ('phi'), and detector log-likelihood data for any particles
@@ -37,7 +37,7 @@ methods that are provided in the ``pidDataUtils`` module.
    'DST_D0_K', and for pions the tags are 'DST_D0_pi' and 'DST_pi'.  There are
    two nuances here to beware of, however.
 
-   1. If your DataFrame is from simulation and contains the 'mcPDG' column, you 
+   1. If your DataFrame is from simulation and contains the 'mcPDG' column, you
       can provide the argument ``pdg=None`` and the 'pdg' column in the HDF5
       file will be filled with the 'mcPDG' data. However, if you'd prefer to use
       the kinematic tags *or* you don't have 'mcPDG' data, provide the PDG code
@@ -91,11 +91,11 @@ using
 In this snippet, we assume that ``split_h5()`` has been run and the output files
 were written into the folder ``data/``. We then specify that we want our final
 model to be saved to ``models/net.pt`` and that we want the model to be trained
-for 100 epochs. Note that just the six-by-six array of weights will also be 
+for 100 epochs. Note that just the six-by-six array of weights will also be
 written to ``models/net_wgt.npy``.
 
 .. note::
-    The output filename needs to end in ``.pt`` or else the script will fail 
+    The output filename needs to end in ``.pt`` or else the script will fail
     when attempting to write the weights to a ``.npy`` file.
 
 To train a model on the training dataset in ``data/`` but only over events
@@ -111,21 +111,21 @@ argument.
 1. Omitting ``--resume`` means that a fresh set of weights will be trained
    and written to the output filepath, overwriting any existing model at that
    location.
-2. Including only ``--resume`` (as a flag) means that the network at the 
-   output filepath will be loaded, trained, and saved again, overwriting the 
+2. Including only ``--resume`` (as a flag) means that the network at the
+   output filepath will be loaded, trained, and saved again, overwriting the
    model at the output location.
 3. Including ``--resume path/to/existing/model.pt`` allows one to load and train
    the network at the given filepath, but the final model is saved to the output
    location (so the existing model is not overwritten).
 
-A fresh, new network is initialized with all weights equal to 1 by default. One 
+A fresh, new network is initialized with all weights equal to 1 by default. One
 can instead start the network with weights sampled from a normal distribution of
 mean 1 and width 0.5 if desired by using the ``--random`` flag.
 
 Lastly, one can limit the allowed particle types using the ``--only`` flag. For
-example, if we are studying D* decays and only care about pions and kaons, and 
+example, if we are studying D* decays and only care about pions and kaons, and
 therefore want the non-{pi, K} particle types to have zero weight in the PID
-computations, we can specify ``--only 211 321`` to zero and freeze the weights 
+computations, we can specify ``--only 211 321`` to zero and freeze the weights
 for the other hypotheses. Not specifying ``--only`` means that all particle
 types will be used.
 
@@ -146,41 +146,41 @@ We also, through ``pidDataUtils`` provide methods for *applying* a set of
 trained weights to a data sample for analysis. Here's what that workflow might
 look like.
 
-1. Read your data into a DataFrame. Much like when preparing data samples, you 
+1. Read your data into a DataFrame. Much like when preparing data samples, you
    can use our ``read_root()`` method. We also provide ``read_h5()`` and
    ``read_npz()``, which will read in the slim format H5 files or the train,
    validation, or test set ``npz`` files used for training.
-2. Use ``prepare_df()`` to prepare the data. This method will apply weights to 
+2. Use ``prepare_df()`` to prepare the data. This method will apply weights to
    the detector log-likelihoods and create a number of additional, useful
    columns in the DataFrame. These columns include likelihood ratios, binary
    likelihood ratios, single-detector and ablation PID, contribution metrics,
    and more. It does, however, have several arguments and features to be aware
    of.
 
-   1. The weights are specified with the ``weights`` keyword argument. This 
+   1. The weights are specified with the ``weights`` keyword argument. This
       argument expects a six-by-six NumPy array (which could be obtained by
       using ``np.load()`` on the ``_wgt.npy`` file produced during training) or
-      a dict, if there are individual weights for various momentum and theta 
-      bins. The dict should have int-tuples as keys and six-by-six NumPy arrays 
+      a dict, if there are individual weights for various momentum and theta
+      bins. The dict should have int-tuples as keys and six-by-six NumPy arrays
       as values, where the int-tuple keys are ``(p_bin, theta_bin)``.
-   2. Even if you are not using per-bin weights, you should still specify 
-      momentum and theta bins for the analysis. These are done by giving 1D 
-      NumPy arrays to the ``p_bins`` and ``theta_bins`` keyword arguments. By 
+   2. Even if you are not using per-bin weights, you should still specify
+      momentum and theta bins for the analysis. These are done by giving 1D
+      NumPy arrays to the ``p_bins`` and ``theta_bins`` keyword arguments. By
       default, the bins will be the standard Belle II systematics bins. Any
       events with momentum or theta outside of the bins will have their
       ``'p_bin'`` or ``'theta_bin'`` value set to -1. By default, these events
-      are then cut from the DataFrame, but this can be disabled by setting 
+      are then cut from the DataFrame, but this can be disabled by setting
       ``drop_outside_bins=False``.
    3. If there are certain particle types that you want to exclude entirely
-      from PID computations, you can do so by setting a list of allowed particles 
-      with the ``allowed_particles`` keyword argument. This expects a list of 
+      from PID computations, you can do so by setting a list of allowed particles
+      with the ``allowed_particles`` keyword argument. This expects a list of
       particle *names* (not PDG codes).
    4. As with the ``make_h5()`` function, there is again a keyword argument
       ``column`` for the case where your DataFrame contains detector
       log-likelihoods that are named in a special way. For this function, it is
-      assumed by default that the detector log-likelihoods are simply named 
-      f"{detector}_{particle}", since that is the format used when we read in 
-      the slim h5 or npz files. If you're using a ROOT file that was read with 
+      assumed by default that the detector log-likelihoods are simply named
+      f"{detector}_{particle}", since that is the format used when we read in
+      the slim h5 or npz files. If you're using a ROOT file that was read with
       ``read_root()`` and has columns in the format
       f"pidLogLikelyhoodOf{pdg}From{detector}", use ``column=root_column``.
       Otherwise, make your own function and give it here.
@@ -188,9 +188,9 @@ look like.
 After using ``prepare_df()``, you should have a DataFrame with a number of
 additional columns, including labels, likelihood ratios, binary likelihood
 ratios, PID predictions, single-detector and ablation PID predictions, momentum
-and theta bins, and contribution metrics. Feel free to analyze these however you 
-like; however, there exists a Python package that expects DataFrames with these 
-specific columns and produces a wide range of plots. It is ``pidplots``, which 
+and theta bins, and contribution metrics. Feel free to analyze these however you
+like; however, there exists a Python package that expects DataFrames with these
+specific columns and produces a wide range of plots. It is ``pidplots``, which
 can be found `here <https://gitlab.desy.de/connor.hainje/pidanalysis>`_.
 
 

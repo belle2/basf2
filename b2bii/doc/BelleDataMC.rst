@@ -1,3 +1,31 @@
+Belle MDST samples
+==================
+The most important argument in `convertBelleMdstToBelleIIMdst` function is the first
+one, specifying the input Belle MDST sample to be converted and analysed. You can
+either specify the location of the input Belle MDST file (e.g. when running over
+your privately produced signal MC):
+
+.. code-block:: python
+
+   convertBelleMdstToBelleIIMdst('/location_to_my_mdst_files/myMDSTFile.mdst', path=mypath)
+
+or specify the url of real data or generic MC samples. For example:
+
+.. code-block:: python
+
+   convertBelleMdstToBelleIIMdst('http://bweb3/montecarlo.php?ex=37&rs=100&re=200&ty=evtgen-mixed&dt=on_resonance&bl=caseB&st=0', path=mypath)
+
+The form of the url is the same as used in BASF. More information is available
+at `the Belle analysis software page`_.
+
+.. note::
+   Belle index files cannot be used in the conversion, please use HadronB(J) skim
+   files, or convert your index files to mdst files first and then perform b2bii conversion.
+
+.. _the Belle analysis software page: https://belle.kek.jp/secured/wiki/doku.php?id=software:data_search
+
+There are different kind of MC/data samples available at Belle.
+
 .. _belledatamc:
 
 -------------------------
@@ -102,6 +130,8 @@ experiment-dependent, but not run-dependent.
 Moreover, ``RunNo`` for these events will be set to 0 in the ``mcproduzh`` package,
 hence it doesn't work for off-resonance or :math:`\Upsilon(nS)`.
 
+If one wants to generate run-dependent MC samples, ``gsim/gsim/gsim.*.dat`` have 
+to be modified with corresponding ``RunNo`` accordingly.
 
 .. seealso::
    More information of generating Belle MC in ``basf`` can be found
@@ -123,20 +153,14 @@ Here are several notes while using ``BelleMCOutput``.
 
 .. rubric:: Beam energy for MC generation
 
-The default global tag for MC generation is set to be the default gt for MC jobs,
-``B2BII_MC``. The beam energy spread is not considered when the payloads were
-created from the Belle DB; therefore, if you would like to include the energy
-spread in MC generation, please modify the prepended global tag:
-``b2bii_beamParameters_with_smearing``.
+The default global tag for analysis jobs is ``B2BII_MC``; however, this does not take into
+account beam smearing.
+Therefore, for the MC generation one must use ``b2bii_beamParameters_with_smearing``.
 
 .. code-block:: python
 
    # Use B2BII global tag.
    basf2.conditions.prepend_globaltag('b2bii_beamParameters_with_smearing')
-
-
-.. warning::
-   To generate run-independent MC, one must use ``B2BII_MC`` for now.
 
 
 .. rubric:: Run dependent MC
@@ -147,19 +171,46 @@ more information regarding the list of runs for your analysis.
 
 Then modify the following line in your generation script:
 
-.. code-block:: python3
+.. code-block:: python
 
    # Generate for experiment 55, run 402 (run-dependent MC).
    main.add_module('EventInfoSetter', expList=55, runList=402, evtNumList=100)
 
 This will generate signal MC using the beam energy from run 402 in experiment 55.
 
+.. rubric:: Simulation with run-dependent MC
+
+If one wants to generate run-dependent MC samples, ``gsim/gsim/gsim.*.dat`` have
+to be modified with corresponding ``RunNo`` accordingly.
+
+For example, in ``gsim/gsim/gsim.55.dat`` under ``mcproduzh``:
+
+.. code-block:: none
+
+   C Set run number (format "RUNG IDRUN IDEV")
+   C   Run#  = 0 : for run-independence MC
+   C   Run# != 0 : for run-dependent MC
+   RUNG 0 1
+
+one need to modify ``.dat`` file to set up the correct ``RunNo`` as:
+
+.. code-block:: none
+
+   C Set run number (format "RUNG IDRUN IDEV")
+   C   Run#  = 0 : for run-independence MC
+   C   Run# != 0 : for run-dependent MC
+   RUNG 402 1
+
+.. warning::
+   If ``RunNo`` is not correctly set in ``gsim.*.dat``, it will be overwritten by gsim.
+   As a result, incorrect beam energies will be used for your MC files.
+
 
 .. rubric:: User signal decay files
 
 To generate user-defined decay files (aka signal decay files), use the following line in the script:
 
-.. code-block:: python3
+.. code-block:: python
 
    from generators import add_evtgen_generator
    add_evtgen_generator(path=mypath,
@@ -169,6 +220,6 @@ To generate user-defined decay files (aka signal decay files), use the following
 
 
 .. note::
-   Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can 
+   Because the Belle detector geometry is not and will not be implemented in basf2, the simulation part can
    only be done in basf.
 

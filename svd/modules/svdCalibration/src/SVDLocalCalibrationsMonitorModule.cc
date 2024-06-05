@@ -643,6 +643,7 @@ void SVDLocalCalibrationsMonitorModule::endRun()
     m_rootFilePtr->mkdir("expert");
 
     m_rootFilePtr->cd("expert");
+    m_h2Mask->Write("h2Mask");
     m_h2Noise->Write("h2Noise");
     m_h2Occupancy->Write("h2Occupancy");
     m_h2PulseWidth->Write("h2PulseShape");

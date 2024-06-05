@@ -6,11 +6,9 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef SENSITIVEDETECTOR_H_
-#define SENSITIVEDETECTOR_H_
+#pragma once
 
 #include <framework/datastore/RelationArray.h>
-#include <mdst/dataobjects/MCParticle.h>
 #include <simulation/kernel/UserInfo.h>
 #include <G4VSensitiveDetector.hh>
 class G4Step;
@@ -100,5 +98,3 @@ namespace Belle2 {
 
   }  // end namespace Simulation
 } // end namespace Belle2
-
-#endif /* SENSITIVEDETECTOR_H_ */

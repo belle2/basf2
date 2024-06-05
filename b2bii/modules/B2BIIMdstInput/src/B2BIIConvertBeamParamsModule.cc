@@ -16,11 +16,16 @@
 #include <framework/database/EventDependency.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/dbobjects/BeamParameters.h>
+#include <framework/geometry/B2Vector3.h>
 #include <framework/utilities/FileSystem.h>
 #include <mdst/dbobjects/BeamSpot.h>
+#include <mdst/dbobjects/CollisionAxisCMS.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
+#include <Math/VectorUtil.h>
+
+#include <cmath>
 #include <list>
 
 namespace Belle {
@@ -63,6 +68,9 @@ namespace Belle2 {
     addParam("smearVertex", m_SmearVertex, "Allow IP position smearing for MC generation", true);
     addParam("generateCMS", m_GenerateCMS, "Generate events in CMS, not lab system.", false);
     addParam("storeBeamParameters", m_storeBeamParameters, "Store the BeamParameters payloads in the localDB", true);
+    addParam("storeCollisionAxisCMS", m_storeCollisionAxisCMS,
+             "Store the CollisionAxisCMS payloads in the localDB",
+             true);
     addParam("storeCollisionInvariantMass", m_storeCollisionInvariantMass, "Store the CollisionInvariantMass payloads in the localDB",
              true);
     addParam("storeCollisionBoostVector", m_storeCollisionBoostVector, "Store the CollisionBoostVector payloads in the localDB", true);
@@ -135,18 +143,34 @@ namespace Belle2 {
       flags |= BeamParameters::c_smearVertex;
     beamParams.setGenerationFlags(flags);
 
+    CollisionAxisCMS collisionAxisCMS;
     CollisionBoostVector collisionBoostVector;
     CollisionInvariantMass collisionInvM;
-    ROOT::Math::PxPyPzEVector cms = beamParams.getLER() + beamParams.getHER();
-    collisionBoostVector.setBoost(B2Vector3D(-cms.BoostToCM()), TMatrixTSym<double>(3));
+    ROOT::Math::PxPyPzEVector momentumHER = beamParams.getHER();
+    ROOT::Math::PxPyPzEVector cms = momentumHER + beamParams.getLER();
+    ROOT::Math::XYZVector boost = -cms.BoostToCM();
+    ROOT::Math::VectorUtil::boost(momentumHER, boost);
+    double angleXZ = std::atan(momentumHER.X() / momentumHER.Z());
+    double angleYZ = std::atan(momentumHER.Y() / momentumHER.Z());
+    collisionAxisCMS.setAngles(angleXZ, angleYZ, TMatrixTSym<double>(2));
+    collisionAxisCMS.setSpread(TMatrixTSym<double>(2), 0, 0, 0);
+    collisionBoostVector.setBoost(B2Vector3D(boost), TMatrixTSym<double>(3));
     //note: maybe we could use Belle::BeamEnergy::E_beam_corr(), Belle::BeamEnergy::E_beam_err()
     collisionInvM.setMass(cms.M(), 0.0, 0.0);
 
     // Boost vector and invariant mass are not intra-run dependent, store now
-    if (m_storeCollisionBoostVector)
-      Database::Instance().storeData("CollisionBoostVector", &collisionBoostVector, iov);
-    if (m_storeCollisionInvariantMass)
-      Database::Instance().storeData("CollisionInvariantMass", &collisionInvM, iov);
+    if (m_storeCollisionAxisCMS) {
+      Database::Instance().storeData(
+        "CollisionAxisCMS", &collisionAxisCMS, iov);
+    }
+    if (m_storeCollisionBoostVector) {
+      Database::Instance().storeData(
+        "CollisionBoostVector", &collisionBoostVector, iov);
+    }
+    if (m_storeCollisionInvariantMass) {
+      Database::Instance().storeData(
+        "CollisionInvariantMass", &collisionInvM, iov);
+    }
 
     // and now we continue with the vertex
     if (!Belle::IpProfile::usable()) {
@@ -158,7 +182,7 @@ namespace Belle2 {
         file << m_event->getExperiment() << "," << m_event->getRun() << std::endl;
       }
       std::vector<double> covariance; // 0 = no error
-      beamParams.setVertex(TVector3(
+      beamParams.setVertex(ROOT::Math::XYZVector(
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN(),
                              std::numeric_limits<double>::quiet_NaN()), covariance);
@@ -206,7 +230,7 @@ namespace Belle2 {
       HepPoint3D ip = Belle::IpProfile::e_position();
       HepSymMatrix ipErr = Belle::IpProfile::e_position_err();
 
-      beamParams.setVertex(CLHEPtoROOT(ip));
+      beamParams.setVertex(ROOT::Math::XYZVector(ip.x(), ip.y(), ip.z()));
       beamParams.setCovVertex(CLHEPtoROOT(ipErr));
       beamparamsList.emplace_back(beamParams);
 

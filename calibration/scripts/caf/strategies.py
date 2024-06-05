@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -809,8 +808,8 @@ class SequentialBoundaries(AlgorithmStrategy):
             if first_exprun not in run_boundaries:
                 B2WARNING(f"No boundary found at ({current_experiment}, 0), adding it.")
                 run_boundaries[0:0] = [first_exprun]
-            B2INFO((f"Found {len(run_boundaries)} boundaries for this experiment. "
-                    "Checking if we have some data for all boundary IoVs..."))
+            B2INFO(f"Found {len(run_boundaries)} boundaries for this experiment. "
+                   "Checking if we have some data for all boundary IoVs...")
             # First figure out the run lists to use for each execution (potentially different from the applied IoVs)
             # We use the boundaries and the run_list
             boundary_iovs_to_run_lists = find_run_lists_from_boundaries(run_boundaries, run_list)
@@ -1060,3 +1059,5 @@ class StrategyError(Exception):
     """
     Basic Exception for this type of class.
     """
+
+# @endcond

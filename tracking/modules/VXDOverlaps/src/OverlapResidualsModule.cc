@@ -20,7 +20,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <TDirectory.h>
 #include <Math/Boost.h>
 #include <math.h>
@@ -520,16 +520,16 @@ void OverlapResidualsModule::event()
           const double res_V_2 = resUnBias_PXD_2.GetMatrixArray()[1] * Unit::convertValueToUnit(1.0, "um");
           const float over_U_PXD = res_U_2 - res_U_1;
           const float over_V_PXD = res_V_2 - res_V_1;
-          const TVector3 pxdLocal_1(pxd_1->getU(), pxd_1->getV(), 0.);
-          const TVector3 pxdLocal_2(pxd_2->getU(), pxd_2->getV(), 0.);
+          const ROOT::Math::XYZVector pxdLocal_1(pxd_1->getU(), pxd_1->getV(), 0.);
+          const ROOT::Math::XYZVector pxdLocal_2(pxd_2->getU(), pxd_2->getV(), 0.);
           const VXD::SensorInfoBase& pxdSensor_1 = geo.get(pxd_id_1);
           const VXD::SensorInfoBase& pxdSensor_2 = geo.get(pxd_id_2);
-          const TVector3& pxdGlobal_1 = pxdSensor_1.pointToGlobal(pxdLocal_1);
-          const TVector3& pxdGlobal_2 = pxdSensor_2.pointToGlobal(pxdLocal_2);
-          double pxdPhi_1 = atan2(pxdGlobal_1(1), pxdGlobal_1(0));
-          double pxdPhi_2 = atan2(pxdGlobal_2(1), pxdGlobal_2(0));
-          double pxdZ_1 = pxdGlobal_1(2);
-          double pxdZ_2 = pxdGlobal_2(2);
+          const ROOT::Math::XYZVector& pxdGlobal_1 = pxdSensor_1.pointToGlobal(pxdLocal_1);
+          const ROOT::Math::XYZVector& pxdGlobal_2 = pxdSensor_2.pointToGlobal(pxdLocal_2);
+          double pxdPhi_1 = atan2(pxdGlobal_1.Y(), pxdGlobal_1.X());  // maybe use pxdGlobal_1.Phi() instead
+          double pxdPhi_2 = atan2(pxdGlobal_2.Y(), pxdGlobal_2.X());  // maybe use pxdGlobal_2.Phi() instead
+          double pxdZ_1 = pxdGlobal_1.Z();
+          double pxdZ_2 = pxdGlobal_2.Z();
           B2DEBUG(29, "PXD: difference of residuals " << over_U_PXD << "   " << over_V_PXD);
           //Fill PXD tree for overlaps if required by the user
           if (m_ExpertLevel) {
@@ -561,8 +561,10 @@ void OverlapResidualsModule::event()
           h_V_DeltaRes_PXD->Fill(over_V_PXD);
           //Fill sensor hit-maps and 2D histograms with PXD clusters
           if (pxd_Layer_1 == 1 && pxd_Layer_2 == 1) {
-            h_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
-            h_Lyr1[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            if (m_ExpertLevel) {
+              h_Lyr1[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
+              h_Lyr1[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            }
             h_U_DeltaRes_PXD_Lyr1->Fill(over_U_PXD);
             h_V_DeltaRes_PXD_Lyr1->Fill(over_V_PXD);
             h_DeltaResUPhi_Lyr1->Fill(pxdPhi_1, over_U_PXD);
@@ -575,8 +577,10 @@ void OverlapResidualsModule::event()
             h_DeltaResUz_Lyr1->Fill(pxdZ_2, over_U_PXD);
           }
           if (pxd_Layer_1 == 2 && pxd_Layer_2 == 2) {
-            h_Lyr2[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
-            h_Lyr2[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            if (m_ExpertLevel) {
+              h_Lyr2[pxd_Ladder_1][pxd_Sensor_1]->Fill(pxd_1->getU(), pxd_1->getV());
+              h_Lyr2[pxd_Ladder_2][pxd_Sensor_2]->Fill(pxd_2->getU(), pxd_2->getV());
+            }
             h_U_DeltaRes_PXD_Lyr2->Fill(over_U_PXD);
             h_V_DeltaRes_PXD_Lyr2->Fill(over_V_PXD);
             h_DeltaResUPhi_Lyr2->Fill(pxdPhi_1, over_U_PXD);
@@ -600,7 +604,7 @@ void OverlapResidualsModule::event()
     if (tfr) {
       svdTrkd0 = tfr->getD0();
       svdTrkz0 = tfr->getZ0();
-      svdTrkpT = tfr->getMomentum().Perp();
+      svdTrkpT = tfr->getMomentum().Rho();
       ROOT::Math::PxPyPzEVector pStar = tfr->get4Momentum();
       ROOT::Math::BoostZ boost(3. / 11);
       pStar = boost(pStar);
@@ -675,16 +679,16 @@ void OverlapResidualsModule::event()
             const double res_U_1 = resUnBias_SVD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const double res_U_2 = resUnBias_SVD_2.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const float over_U_SVD = res_U_2 - res_U_1;
-            const TVector3 svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
-            const TVector3 svdLocal_2(svd_2->getPosition(), svd_predIntersect_2[4], 0.);
+            const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
+            const ROOT::Math::XYZVector svdLocal_2(svd_2->getPosition(), svd_predIntersect_2[4], 0.);
             const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
             const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
-            const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-            const TVector3& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
-            double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-            double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
-            double svdZ_1 = svdGlobal_1(2);
-            double svdZ_2 = svdGlobal_2(2);
+            const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+            const ROOT::Math::XYZVector& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
+            double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi() instead
+            double svdPhi_2 = atan2(svdGlobal_2.Y(), svdGlobal_2.X());  // maybe use svdGlobal_2.Phi() instead
+            double svdZ_1 = svdGlobal_1.Z();
+            double svdZ_2 = svdGlobal_2.Z();
             B2DEBUG(29, "SVD: difference of u-residuals =========> " << over_U_SVD);
             //Fill SVD tree for u-overlaps if required by the user
             if (m_ExpertLevel) {
@@ -813,8 +817,10 @@ void OverlapResidualsModule::event()
             }
             //Fill sensor hit-maps and 2D histograms with SVD u clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
-              h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr3->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr3->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr3->Fill(svdPhi_2, over_U_SVD);
@@ -822,8 +828,10 @@ void OverlapResidualsModule::event()
               h_DeltaResUz_Lyr3->Fill(svdZ_2, over_U_SVD);
             }
             if (svd_Layer_1 == 4 && svd_Layer_2 == 4) {
-              h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr4->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr4->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr4->Fill(svdPhi_2, over_U_SVD);
@@ -831,8 +839,10 @@ void OverlapResidualsModule::event()
               h_DeltaResUz_Lyr4->Fill(svdZ_2, over_U_SVD);
             }
             if (svd_Layer_1 == 5 && svd_Layer_2 == 5) {
-              h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr5[svd_Ladder_2][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr5[svd_Ladder_2][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr5->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr5->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr5->Fill(svdPhi_2, over_U_SVD);
@@ -840,8 +850,10 @@ void OverlapResidualsModule::event()
               h_DeltaResUz_Lyr5->Fill(svdZ_2, over_U_SVD);
             }
             if (svd_Layer_1 == 6 && svd_Layer_2 == 6) {
-              h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
-              h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              if (m_ExpertLevel) {
+                h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(svd_1->getPosition(), 0.);
+                h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(svd_2->getPosition(), 0.);
+              }
               h_U_DeltaRes_SVD_Lyr6->Fill(over_U_SVD);
               h_DeltaResUPhi_Lyr6->Fill(svdPhi_1, over_U_SVD);
               h_DeltaResUPhi_Lyr6->Fill(svdPhi_2, over_U_SVD);
@@ -858,16 +870,16 @@ void OverlapResidualsModule::event()
             const double res_V_1 = resUnBias_SVD_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const double res_V_2 = resUnBias_SVD_2.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
             const float over_V_SVD = res_V_2 - res_V_1;
-            const TVector3 svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
-            const TVector3 svdLocal_2(svd_predIntersect_2[3], svd_2->getPosition(), 0.);
+            const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
+            const ROOT::Math::XYZVector svdLocal_2(svd_predIntersect_2[3], svd_2->getPosition(), 0.);
             const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
             const VXD::SensorInfoBase& svdSensor_2 = geo.get(svd_id_2);
-            const TVector3& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-            const TVector3& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
-            double svdPhi_1 = atan2(svdGlobal_1(1), svdGlobal_1(0));
-            double svdPhi_2 = atan2(svdGlobal_2(1), svdGlobal_2(0));
-            double svdZ_1 = svdGlobal_1(2);
-            double svdZ_2 = svdGlobal_2(2);
+            const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
+            const ROOT::Math::XYZVector& svdGlobal_2 = svdSensor_2.pointToGlobal(svdLocal_2);
+            double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi() instead
+            double svdPhi_2 = atan2(svdGlobal_2.Y(), svdGlobal_2.X());  // maybe use svdGlobal_2.Phi() instead
+            double svdZ_1 = svdGlobal_1.Z();
+            double svdZ_2 = svdGlobal_2.Z();
             B2DEBUG(29, "SVD: difference of v-residuals =========> " << over_V_SVD);
             //Fill SVD tree for v-overlaps if required by the user
             if (m_ExpertLevel) {
@@ -995,8 +1007,10 @@ void OverlapResidualsModule::event()
             }
             //Fill sensor hit-maps and 2D histograms with SVD v clusters
             if (svd_Layer_1 == 3 && svd_Layer_2 == 3) {
-              h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr3[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr3[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr3->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr3->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr3->Fill(svdPhi_2, over_V_SVD);
@@ -1004,8 +1018,10 @@ void OverlapResidualsModule::event()
               h_DeltaResVz_Lyr3->Fill(svdZ_2, over_V_SVD);
             }
             if (svd_Layer_1 == 4 && svd_Layer_2 == 4) {
-              h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr4[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr4[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr4->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr4->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr4->Fill(svdPhi_2, over_V_SVD);
@@ -1013,8 +1029,10 @@ void OverlapResidualsModule::event()
               h_DeltaResVz_Lyr4->Fill(svdZ_2, over_V_SVD);
             }
             if (svd_Layer_1 == 5 && svd_Layer_2 == 5) {
-              h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr5[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr5[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr5->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr5->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr5->Fill(svdPhi_2, over_V_SVD);
@@ -1022,8 +1040,10 @@ void OverlapResidualsModule::event()
               h_DeltaResVz_Lyr5->Fill(svdZ_2, over_V_SVD);
             }
             if (svd_Layer_1 == 6 && svd_Layer_2 == 6) {
-              h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
-              h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              if (m_ExpertLevel) {
+                h_Lyr6[svd_Ladder_1][svd_Sensor_1]->Fill(0., svd_1->getPosition());
+                h_Lyr6[svd_Ladder_2][svd_Sensor_2]->Fill(0., svd_2->getPosition());
+              }
               h_V_DeltaRes_SVD_Lyr6->Fill(over_V_SVD);
               h_DeltaResVPhi_Lyr6->Fill(svdPhi_1, over_V_SVD);
               h_DeltaResVPhi_Lyr6->Fill(svdPhi_2, over_V_SVD);

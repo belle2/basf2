@@ -10,7 +10,6 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <TVector3.h>
 #include <TMatrixDSym.h>
 
 using namespace Belle2;

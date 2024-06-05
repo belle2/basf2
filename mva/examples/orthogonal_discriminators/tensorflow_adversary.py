@@ -178,7 +178,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 
 if __name__ == "__main__":
-    from basf2 import conditions
+    from basf2 import conditions, find_file
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
         'localdb/database.txt'
@@ -209,8 +209,14 @@ if __name__ == "__main__":
                   'daughter(2, daughter(0, clusterE9E25))', 'daughter(2, daughter(1, clusterE9E25))',
                   'daughter(2, daughter(0, minC2TDist))', 'daughter(2, daughter(1, minC2TDist))']
 
+    train_file = find_file("mva/train_D0toKpipi.root", "examples")
+    test_file = find_file("mva/test_D0toKpipi.root", "examples")
+
+    training_data = basf2_mva.vector(train_file)
+    testing_data = basf2_mva.vector(test_file)
+
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafiles = basf2_mva.vector("train.root")
+    general_options.m_datafiles = training_data
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_spectators = basf2_mva.vector('daughterInvM(0, 1)', 'daughterInvM(0, 2)')
@@ -228,8 +234,7 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
-    test_data = ["test.root"]
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     results = {}
     results['adversarial'] = {'p': p, 't': t, 'auc': auc}
@@ -242,8 +247,7 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
-    test_data = ["test.root"]
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     results['baseline'] = {'p': p, 't': t, 'auc': auc}
 
@@ -256,12 +260,11 @@ if __name__ == "__main__":
     basf2_mva.teacher(general_options, specific_options)
 
     method = basf2_mva_util.Method(general_options.m_identifier)
-    test_data = ["test.root"]
-    p, t = method.apply_expert(basf2_mva.vector(*test_data), general_options.m_treename)
+    p, t = method.apply_expert(testing_data, general_options.m_treename)
     auc = basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t)
     results['featureDrop'] = {'p': p, 't': t, 'auc': auc}
 
-    test_tree = uproot.open('test.root')['tree']
+    test_tree = uproot.open(test_file)['tree']
     invMassDaughter01 = test_tree.array('daughterInvM__bo0__cm__sp1__bc')
     invMassDaughter02 = test_tree.array('daughterInvM__bo0__cm__sp2__bc')
     isSignal = test_tree.array('isSignal').astype(np.int)

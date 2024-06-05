@@ -1,3 +1,14 @@
+===================
+Conditions Database
+===================
+
+The conditions database is the place where we store additional data needed to
+interpret and analyse the data that can change over time, for example the
+detector configuration or calibration constants.
+
+In many cases it should not be necessary to change the configuration but except for
+maybe adding an extra globaltag to the list via `conditions.globaltags <ConditionsConfiguration.globaltags>`
+
 .. _conditionsdb_overview:
 
 Conditions Database Overview
@@ -73,6 +84,12 @@ globaltag selection completely and disable globaltag replay.
 If multiple globaltags are selected the software will look for all necessary
 payloads in each of them in turn and always take each payload from the first
 globaltag it can be found in.
+
+.. tip::
+   A set of tools is provided with basf2 for interacting with the conditions
+   database via command line and operating actions such as creating globaltags,
+   uploading payloads, etc. Such tools, called ``b2conditionsdb`` tools, are
+   properly documented in :ref:`b2conditionsdb <b2conditionsdb>`.
 
 .. _configuring_cdb:
 
@@ -290,7 +307,7 @@ or :ref:`b2conditionsdb-request <b2conditionsdb-request>`
 When new payloads are created via ``Belle2::Database::storeData`` the new
 payloads will be assigned a revision number consisting of the first few
 characters of the checksum of the payload file. This is done for efficient
-creation of payload files but also to distuingish locally created payload files
+creation of payload files but also to distinguish locally created payload files
 from payloads downloaded from the database.
 
 * If a payload has an alphanumeric string similar to a git commit hash as

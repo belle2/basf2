@@ -18,7 +18,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -102,6 +102,24 @@ namespace Belle2 {
     /** Number of channel hit histograms per sector for EKLM. */
     const int m_ChannelHitHistogramsEKLM = 3;
 
+    /** Min time for RPC */
+    double m_RPCTimeMin;
+
+    /** Max time for RPC */
+    double m_RPCTimeMax;
+
+    /** Min time for BKLM Scint */
+    double m_BKLMScintTimeMin;
+
+    /** Max time for BKLM Scint */
+    double m_BKLMScintTimeMax;
+
+    /** Min time for EKLM Scint */
+    double m_EKLMScintTimeMin;
+
+    /** Max time for EKLM Scint */
+    double m_EKLMScintTimeMax;
+
     /** Directory for KLM DQM histograms in ROOT file. */
     std::string m_HistogramDirectoryName;
 
@@ -128,8 +146,8 @@ namespace Belle2 {
 
     /** Number of hits per channel. */
     TH1F** m_ChannelHits[
-      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+    EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+    BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
 
     /** Masked channels per sector. */
     TH1F* m_MaskedChannelsPerSector;

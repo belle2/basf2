@@ -39,7 +39,7 @@ namespace Belle2 {
     // Simple Getters
     /// get if stored information is valid
     bool isValid() const {return m_isValid;}
-    /// get if injection in HER/LER
+    /// get if last injection was in HER/LER
     bool isHER() const {return m_isHER;}
     /// get lowest bit of revolution counter
     bool isRevo2() const {return m_revo2;}

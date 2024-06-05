@@ -6,17 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclDisplay/EclPainter1D.h>
 
-//Root
-#include <TPad.h>
-#include <TH1.h>
-
-//ECL
+/* ECL headers. */
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/modules/eclDisplay/geometry.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/modules/eclDisplay/MultilineWidget.h>
+
+/* ROOT headers. */
+#include <TH1.h>
+#include <TPad.h>
 
 using namespace Belle2;
 using namespace ECLDisplayUtility;

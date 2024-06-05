@@ -41,8 +41,9 @@ void PIDLikelihood::setLogLikelihood(Const::EDetector det,
   }
   if (logl != logl or logl == INFINITY) {
     B2ERROR("PIDLikelihood::setLogLikelihood: log-likelihood for detector " << det << " is " << logl <<
-            " (i.e. +inf or NaN)! Ignoring this value. (" << Const::CDC << "=CDC, " << Const::TOP << "=TOP, " << Const::ARICH << "=ARICH, " <<
-            Const::ECL << "=ECL)");
+            " (i.e. +inf or NaN)! Ignoring this value. ("
+            << Const::SVD << "=SVD, " << Const::CDC << "=CDC, " << Const::TOP << "=TOP, "
+            << Const::ARICH << "=ARICH, " << Const::ECL << "=ECL, " << Const::KLM << "=KLM)");
 
     return;
   }
@@ -55,9 +56,10 @@ float PIDLikelihood::getLogL(const Const::ChargedStable& part,
                              Const::PIDDetectorSet set) const
 {
   float result = 0;
-  for (unsigned int index = 0; index < Const::PIDDetectorSet::set().size(); ++index) {
-    if (set.contains(Const::PIDDetectorSet::set()[index]))
-      result += m_logl[index][part.getIndex()];
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
+    if (set.contains(it))
+      result += m_logl[it.getIndex()][part.getIndex()];
   }
   return result;
 }
@@ -238,9 +240,10 @@ std::string PIDLikelihood::getInfoHTML() const
   }
   stream << "</tr></table></td></tr>";
 
-  for (unsigned k = 0; k < Const::PIDDetectors::c_size; k++) {
-    auto det = Const::PIDDetectorSet::set()[k];
-    stream << "<tr><td>" << detectorName[k] << "</td><td>";
+  for (Const::DetectorSet::Iterator it = Const::PIDDetectorSet::set().begin();
+       it != Const::PIDDetectorSet::set().end(); ++it) {
+    auto det = *it;
+    stream << "<tr><td>" << detectorName[it.getIndex()] << "</td><td>";
     if (!isAvailable(det)) {
       stream << "</td></tr>";
       continue;

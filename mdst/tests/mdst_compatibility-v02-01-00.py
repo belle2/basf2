@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,6 +14,12 @@ Test backwards compatibility for an mdst file produced with release-02-01-00.
 See https://confluence.desy.de/display/BI/Backward+Compatibility if this test fails.
 
 CHANGES since release-02-01-00:
+
+- EventLevelClusteringInfo
+  + nKLMDigitsMultiStrip
+  + nECLShowers
+  + nECLLocalMaximums
+  + nECLTriggerCells
 - EventMetaData:
   + isEndOfRun
 - EventLevelTrackingInfo:

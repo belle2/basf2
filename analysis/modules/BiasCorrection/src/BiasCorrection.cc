@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/BiasCorrection/BiasCorrection.h>
 #include <iostream>
 
@@ -36,9 +36,9 @@ EnergyBiasCorrectionModule::EnergyBiasCorrectionModule() : Module()
   setDescription(
     R"DOC(Module to modify energy from the lists. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("EnergyBiasCorrection", particleLists=['gamma:cut'], scale=tableName_Weight)
+    mypath.add_module("EnergyBiasCorrection", particleLists=['gamma:cut'], scale=tableName_Weight)
 
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     

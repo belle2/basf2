@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -85,8 +84,7 @@ class TwoTrackLeptonsForLuminosity(BaseSkim):
 
         # Reconstruct the event candidates with one track plus one cluster
         ma.fillParticleList('e+:' + skim_label_1, single_track_cut + ' and ' + nTracks_cut_1, path=path)
-        ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path,
-                            loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList('gamma:' + skim_label_1, single_cluster_cut + ' and ' + nTracks_cut_1, path=path)
         ma.reconstructDecay(
             'vpho:' +
             skim_label_1 +
@@ -117,12 +115,13 @@ class LowMassTwoTrack(BaseSkim):
 
     **Decay Modes**
 
-        1. :math:`e^{+}e^{-} \\to \\gamma \\pi^{+} \\pi^{-} X`,
-        2. :math:`e^{+}e^{-} \\to \\gamma K^{+} K^{-} X`,
-        3. :math:`e^{+}e^{-} \\to \\gamma K^{+} \\pi^{-} X`,
-        4. :math:`e^{+}e^{-} \\to \\gamma p \\overline{p} X`,
-        5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
-        6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
+    1. :math:`e^{+}e^{-} \\to \\gamma \\pi^{+} \\pi^{-} X`,
+    2. :math:`e^{+}e^{-} \\to \\gamma K^{+} K^{-} X`,
+    3. :math:`e^{+}e^{-} \\to \\gamma K^{+} \\pi^{-} X`,
+    4. :math:`e^{+}e^{-} \\to \\gamma p \\overline{p} X`,
+    5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
+    6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
+    7. :math:`e^{+}e^{-} \\to \\gamma \\mu^{+} \\mu^{-} X`,
     """
     __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
@@ -157,7 +156,8 @@ class LowMassTwoTrack(BaseSkim):
         ma.fillParticleList(f"pi+:{label}", pCut, path=path)
         ma.fillParticleList(f"K+:{label}", pCut, path=path)
         ma.fillParticleList(f"p+:{label}", pCut, path=path)
-        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path, loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(f"gamma:{label}_ISR", ISRECut, path=path)
+        ma.fillParticleList(f"mu+:{label}", pCut, path=path)
 
         # the mass hypothesis is different for p+, pi+ and K+ lists, so it is good to write them separately.
         ModesAndCuts = [
@@ -172,6 +172,7 @@ class LowMassTwoTrack(BaseSkim):
             (f"vpho:{label}_ppi", f" -> gamma:{label}_ISR p+:{label} pi-:{label}", hhMassWindow),
             # Might be useful when one wants to reconstruct ISR p K and missing other final state particles
             (f"vpho:{label}_pK", f" -> gamma:{label}_ISR p+:{label} K-:{label}", hhMassWindow),
+            (f"vpho:{label}_mumu", f" -> gamma:{label}_ISR mu+:{label} mu-:{label}", hhMassWindow),
         ]
 
         ParticleLists = []
@@ -217,12 +218,12 @@ class SingleTagPseudoScalar(BaseSkim):
 
     **Decay Modes**
 
-        1. :math:`\\pi^{0}\\to \\gamma \\gamma`,
-        2. :math:`\\eta \\to \\gamma\\gamma`,
-        3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
-        4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
-        5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \\gamma\\gamma)`,
-        6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
+    1. :math:`\\pi^{0}\\to \\gamma \\gamma`,
+    2. :math:`\\eta \\to \\gamma\\gamma`,
+    3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
+    4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
+    5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \\gamma\\gamma)`,
+    6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
     """
 
     __authors__ = ["Hisaki Hayashii"]
@@ -234,7 +235,7 @@ class SingleTagPseudoScalar(BaseSkim):
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
 
@@ -243,7 +244,7 @@ class SingleTagPseudoScalar(BaseSkim):
 
         ma.fillParticleList(f"e+:{label}", f"{TrackCuts} and E > 1.5 and clusterEoP > 0.7", path=path)
         ma.fillParticleList(f"pi+:{label}", f"{TrackCuts} and [not isInList(e+:{label})]", path=path)
-        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path, loadPhotonBeamBackgroundMVA=False)
+        ma.fillParticleList(f"gamma:{label}", "clusterE > 0.1", path=path)
 
         pi0MassWindow = "0.04 < InvM < 0.4"
         etaMassWindow = "0.50 < InvM < 0.60"
@@ -280,3 +281,58 @@ class SingleTagPseudoScalar(BaseSkim):
         path = self.skim_event_cuts(EventCuts, path=path)
 
         return [f"e+:{label}"]
+
+
+@fancy_skim_header
+class LowMassOneTrack(BaseSkim):
+    """
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\gamma \\pi^{+}\\pi^{-}` and :math:`e^{+}e^{-} \\to \\gamma \\mu^{+}\\mu^{-}`
+    """
+    __authors__ = ["Gaurav Sharma", "Qingyuan Liu"]
+    __description__ = "Skim list for low mass events with one track and one hard photon in final state."
+    __contact__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
+    __category__ = "physics, low multiplicity"
+
+    TestSampleProcess = "mumu"
+    ApplyHLTHadronCut = False
+
+    def build_lists(self, path):
+        label = "LowMassOneTrack"
+
+        # Momenta of tracks greater than 0.3 GeV in the Lab frame
+        track_cut = "[p > 0.5] and [clusterEoP < 0.9] and [abs(dz) < 5.0] and [abs(dr) < 2.0] and inCDCAcceptance"
+        # Energy of hard ISR gamma greater than 2 GeV in the CMS frame
+        isr_cut = "useCMSFrame(E) > 2"
+
+        singleTrack_cut = f"nCleanedTracks({track_cut}) == 1"
+
+        # Require at least one hard photon
+        nHardISRPhotonCut = f"nCleanedECLClusters({isr_cut}) > 0"
+
+        # Apply event based cuts
+        path = self.skim_event_cuts(f"{singleTrack_cut} and {nHardISRPhotonCut}", path=path)
+
+        # two_track_cut = f"{track_cut} and {nTracksCut}"
+        # one_track_cut = f"{track_cut} and {singleTrack_cut}"
+        # negative_one_track_cut = f"{track_cut} and {singleTrack_cut} and [charge < 0]"
+
+        track_list = ['pi', 'mu']
+        ParticleLists = []
+
+        ma.fillParticleList(f"gamma:isr_{label}", isr_cut, path=path)
+        ma.rankByHighest(f"gamma:isr_{label}",
+                         "useCMSFrame(E)",
+                         outputVariable="highestE_rank",
+                         numBest=1,
+                         path=path
+                         )
+        for tracks in track_list:
+            ma.fillParticleList(f"{tracks}+:{label}", track_cut, path=path)
+            ma.reconstructDecay(f"vpho:g_{tracks}{label} -> gamma:isr_{label} {tracks}+:{label}",
+                                cut="",
+                                allowChargeViolation=True,
+                                path=path,
+                                )
+            ParticleLists.append(f"vpho:g_{tracks}{label}")
+
+        return ParticleLists

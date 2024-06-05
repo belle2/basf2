@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //ARICH
 #include <arich/utility/ARICHChannelHist.h>
@@ -25,7 +25,7 @@ namespace Belle2 {
   /**
    * Make summary of data quality from reconstruction
    */
-  class DQMHistAnalysisARICHModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisARICHModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -37,41 +37,51 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisARICHModule();
+    ~DQMHistAnalysisARICHModule();
 
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
      */
-    virtual void initialize() override;
-
-    /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
+    void initialize() override final;
 
     /**
      * Event processor.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */
-    virtual void endRun() override;
+    void endRun() override final;
+
+    /**
+     * begin-of-run action.
+     * read limits, etc.
+     */
+    void beginRun() override final;
 
     /**
      * Termination action.
      * Clean-up, close files, summarize statistics, etc.
      */
-    virtual void terminate() override;
+    void terminate() override final;
+
+    /**
+     * Returns ring number of HAPD with given moduleID
+     * @param modID HAPD module ID
+     */
+    int getRing(int modID);
+
 
   protected:
     bool m_debug;/**<debug*/
     bool m_enableAlert;/**<Enable alert by base color of canvases*/
-
+    double m_hotLimit; /**<Occupancy limit for hot channels*/
+    double m_badApdOccLimit; /**<Occupancy threshold for bad APDs, in units of average APD occupancy*/
+    double m_sigBitFracLowWarn; /**<Warning limit for overall signal/background fraction*/
+    double m_sigBitFracLowAlarm; /**<Alarm limit for overall signal/background fraction*/
     int alertColor[3] = {kWhite, kYellow, kRed};/**<Alert color of canvases*/
 
     int m_minStats = 10000;/**<The lower limit on the number of events to enable the alert*/

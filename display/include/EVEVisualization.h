@@ -18,9 +18,8 @@
 #include <pxd/dataobjects/PXDSimHit.h>
 #include <svd/dataobjects/SVDSimHit.h>
 #include <svd/dataobjects/SVDCluster.h>
-#include <klm/dataobjects/bklm/BKLMSimHit.h>
-#include <klm/dataobjects/eklm/EKLMSimHit.h>
 #include <klm/dataobjects/KLMHit2d.h>
+#include <klm/dataobjects/KLMSimHit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 #include <vxd/geometry/GeoCache.h>
@@ -31,6 +30,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/GFRaveVertex.h>
 
+#include <Math/Vector3D.h>
 #include <TEveStraightLineSet.h>
 #include <TVector3.h>
 #include <TEveTrack.h>
@@ -149,14 +149,11 @@ namespace Belle2 {
     /** Add a SVDSimHit. */
     void addSimHit(const SVDSimHit* hit, const MCParticle* particle);
 
-    /** Add a BKLMSimHit. */
-    void addSimHit(const BKLMSimHit* hit, const MCParticle* particle);
-
-    /** Add a EKLMSimHit. */
-    void addSimHit(const EKLMSimHit* hit, const MCParticle* particle);
+    /** Add a KLMSimHit. */
+    void addSimHit(const KLMSimHit* hit, const MCParticle* particle);
 
     /** Add simhit as a simple point. */
-    void addSimHit(const TVector3& v, const MCParticle* particle);
+    void addSimHit(const ROOT::Math::XYZVector& v, const MCParticle* particle);
 
     /** Return MCTrack for given particle, add it if it doesn't exist yet.
      *
@@ -277,7 +274,8 @@ namespace Belle2 {
     /** @brief Create a box around o, oriented along u and v with widths ud, vd and depth and
      *  return a pointer to the box object.
      */
-    TEveBox* boxCreator(const TVector3& o, TVector3 u, TVector3 v, float ud, float vd, float depth);
+    TEveBox* boxCreator(const ROOT::Math::XYZVector& o, ROOT::Math::XYZVector u, ROOT::Math::XYZVector v, float ud, float vd,
+                        float depth);
 
     /** Create hit visualisation for the given options, and add them to 'eveTrack'. */
     void makeLines(TEveTrack* eveTrack, const genfit::StateOnPlane* prevState, const genfit::StateOnPlane* state,
@@ -289,10 +287,10 @@ namespace Belle2 {
     {
       static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
-      const TVector3 local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
+      const ROOT::Math::XYZVector local_pos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
       const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
-      const TVector3 global_pos = sensor.pointToGlobal(local_pos);
-      lines->AddMarker(global_pos.x(), global_pos.y(), global_pos.z());
+      const ROOT::Math::XYZVector global_pos = sensor.pointToGlobal(local_pos);
+      lines->AddMarker(global_pos.X(), global_pos.Y(), global_pos.Z());
 
       m_shownRecohits.insert(hit);
     }

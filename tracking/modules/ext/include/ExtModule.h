@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/core/Module.h>
 

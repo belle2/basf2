@@ -16,4 +16,8 @@
 #pragma link C++ class Belle2::GenDTag-;
 #pragma link C++ class Belle2::GenTauTag-;
 #pragma link C++ class Belle2::PIDCalibrationWeightUtil-;
+#pragma link C++ class Belle2::KlongCalculatorUtils-;
+#pragma link C++ class Belle2::DetectorSurface-;
+#pragma link C++ class Belle2::PostProcessingParticleWeighting-;
+
 #endif

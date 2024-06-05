@@ -48,7 +48,7 @@ namespace Belle2 {
         m_dataCache.yConformal = hit->Y() * conformalTransform;
         m_dataCache.localNormalizedu = hit->getNormalizedLocalU();
         m_dataCache.localNormalizedv = hit->getNormalizedLocalV();
-        m_dataCache.sensorCenterPhi = sensorInfo.pointToGlobal(TVector3(0., 0., 0.), true).Phi();
+        m_dataCache.sensorCenterPhi = sensorInfo.pointToGlobal(ROOT::Math::XYZVector(0., 0., 0.), true).Phi();
         m_dataCache.phi = hit->getPosition().Phi();
         m_dataCache.theta = hit->getPosition().Theta();
         m_dataCache.uTime = hit->TimeU();

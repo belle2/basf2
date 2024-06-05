@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 <header>
     <input>PhokharaEvtgenAnalysis.root</input>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Analysis of e+ e- -> J/psi eta_c events.</description>
 </header>
 """
 
 import ROOT
 import math
+
+#: \cond Doxygen_suppress
 
 nbins_ratio = 91
 emin_ratio = 6.05
@@ -233,7 +234,7 @@ for i in range(nbins_ratio, 0, -1):
     h_ratio.SetBinContent(i, val / exp)
     h_ratio.SetBinError(i, err / exp)
 
-contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
+contact = 'Kirill Chilikin (K.A.Chilikin@inp.nsk.su)'
 functions = h_ratio.GetListOfFunctions()
 functions.Add(ROOT.TNamed('Description', 'Number of events / theoretical expectation'))
 functions.Add(ROOT.TNamed('Check', 'Should be consistent with 1'))
@@ -249,6 +250,8 @@ functions.Add(ROOT.TNamed('Description', 'J/psi helicity angle'))
 functions.Add(ROOT.TNamed('Check', 'Should be distributed as (1 + cos^2 theta)'))
 functions.Add(ROOT.TNamed('Contact', contact))
 functions.Add(ROOT.TNamed('MetaOptions', 'shifter'))
+
+#: \endcond
 
 output_file.cd()
 h_ratio.Write()

@@ -50,9 +50,10 @@ float Cluster::getLogL(const Const::Cluster& cluster,
                        Const::ClusterDetectorSet set) const
 {
   float result = 0;
-  for (unsigned int index = 0; index < Const::ClusterDetectorSet::set().size(); ++index) {
-    if (set.contains(Const::ClusterDetectorSet::set()[index]))
-      result += m_logl[index][cluster.getIndex()];
+  for (Const::DetectorSet::Iterator it = Const::ClusterDetectorSet::set().begin();
+       it != Const::ClusterDetectorSet::set().end(); ++it) {
+    if (set.contains(it))
+      result += m_logl[it.getIndex()][cluster.getIndex()];
   }
   return result;
 }

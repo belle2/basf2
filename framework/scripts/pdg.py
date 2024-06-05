@@ -32,6 +32,7 @@ particles to generate. See `from_name`, `from_names`, `to_name` and `to_names`
 
 import re
 import basf2
+from fractions import Fraction
 
 
 def _get_instance():
@@ -54,7 +55,7 @@ def get(name):
 
     p = _get_instance().GetParticle(name)
     if not p:
-        raise LookupError("No particle with name '%s'" % name)
+        raise LookupError(f"No particle with name '{name}'")
 
     return p
 
@@ -130,7 +131,8 @@ def load_default():
     _get_instance().ReadEvtGenTable()
 
 
-def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifetime=0, pythiaID=0):
+def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifetime=0, pythiaID=0,
+                 define_anti_particle=False):
     """
     Add a new particle to the list of known particles.
 
@@ -142,10 +144,11 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
         mass (float): mass of the particle in GeV
         width (float): width of the particle in GeV
         charge (float): charge of the particle in e
-        sping (float): spin of the particle
+        spin (float): spin of the particle
         max_width (float): max width, if omitted 3*width will be used
         lifetime (float): lifetime in ns, should be 0 as geant4 cannot handle it correctly otherwise
         pythiaID (int): pythiaID of the particle (if any), if omitted 0 will be used
+        define_anti_particle (bool): if True, an anti-particle with the default name anti-{name} is defined and added.
     """
     if lifetime > 0:
         basf2.B2WARNING("Userdefined particle with non-zero lifetime will not be simulated correctly")
@@ -157,8 +160,18 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
     particle = _get_instance().AddParticle(name, name, mass, False, width, charge * 3, "userdefined",
                                            pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
     if particle:
-        basf2.B2INFO("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
-                     (name, pdgCode, mass, width, charge, spin))
+        basf2.B2INFO(
+            f"Adding new particle '{name}' (pdg={int(pdgCode)}, mass={mass:.3g} GeV, width={width:.3g} GeV, " +
+            f"charge={int(charge)}, spin={Fraction(spin)})")
+
+        if define_anti_particle:
+            anti_particle = _get_instance().AddParticle(
+                f'anti-{name}', f'anti-{name}', mass, False, width, -charge * 3, "userdefined", -pdgCode, 0, 0,
+                lifetime, spin, max_width, pythiaID
+            )
+            particle.SetAntiParticle(anti_particle)
+            basf2.B2INFO(f"Adding new particle 'anti-{name}' as anti-particle of '{name}'")
+
         return True
 
     return False
@@ -245,13 +258,13 @@ def search(name=None, min_mass=None, max_mass=None, name_regex=False, include_wi
 
         if not name_regex:
             if name[0] == "^" and name[-1] == "$":
-                name = "^{}$".format(re.escape(name[1:-1]))
+                name = f"^{re.escape(name[1:-1])}$"
             elif name[0] == "^":
-                name = "^{}.*".format(re.escape(name[1:]))
+                name = f"^{re.escape(name[1:])}.*"
             elif name[-1] == "$":
-                name = ".*{}$".format(re.escape(name[:-1]))
+                name = f".*{re.escape(name[:-1])}$"
             else:
-                name = ".*{}.*".format(re.escape(name))
+                name = f".*{re.escape(name)}.*"
 
         pattern = re.compile(name, options)
 

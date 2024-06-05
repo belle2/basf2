@@ -13,9 +13,9 @@ using namespace Belle2;
 
 KLMMuidHit::KLMMuidHit() :
   m_PdgCode(0),
-  m_ExtPosition(0, 0, 0),
+  m_ExtPosition{0.0, 0.0, 0.0},
   m_ExtTime(0.0),
-  m_HitPosition(0, 0, 0),
+  m_HitPosition{0.0, 0.0, 0.0},
   m_HitTime(0.0),
   m_InBarrel(false),
   m_IsForward(false),
@@ -25,12 +25,11 @@ KLMMuidHit::KLMMuidHit() :
 {
 }
 
-KLMMuidHit::KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer, const TVector3& extPosition,
-                       const TVector3& hitPosition, double extTime, double hitTime, double chiSquared) :
+KLMMuidHit::KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, int layer,
+                       const ROOT::Math::XYZVector& extPosition, const ROOT::Math::XYZVector& hitPosition,
+                       double extTime, double hitTime, double chiSquared) :
   m_PdgCode(pdgCode),
-  m_ExtPosition(extPosition),
   m_ExtTime(extTime),
-  m_HitPosition(hitPosition),
   m_HitTime(hitTime),
   m_InBarrel(inBarrel),
   m_IsForward(isForward),
@@ -38,4 +37,10 @@ KLMMuidHit::KLMMuidHit(int pdgCode, bool inBarrel, bool isForward, int sector, i
   m_Layer(layer),
   m_ChiSquared(chiSquared)
 {
+  m_ExtPosition[0] = extPosition.X();
+  m_ExtPosition[1] = extPosition.Y();
+  m_ExtPosition[2] = extPosition.Z();
+  m_HitPosition[0] = hitPosition.X();
+  m_HitPosition[1] = hitPosition.Y();
+  m_HitPosition[2] = hitPosition.Z();
 }

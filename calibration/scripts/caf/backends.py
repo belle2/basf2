@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 # disable doxygen check for this file
 # @cond
@@ -42,6 +41,15 @@ _input_data_file_path = Path("__BACKEND_INPUT_FILES__.json")
 _STDOUT_FILE = "stdout"
 #: stderr file name
 _STDERR_FILE = "stderr"
+#: Environment variables to export in each Backend job
+_backend_job_envvars = (
+    "TMPDIR",
+    "BELLE2_CONFIG_DIR",
+    "VO_BELLE2_SW_DIR",
+    "BELLE2_EXTERNALS_TOPDIR",
+    "BELLE2_CONDB_METADATA",
+    "BELLE2_CONDB_PROXY",
+)
 
 
 def get_input_data():
@@ -49,7 +57,7 @@ def get_input_data():
     Simple JSON load of the default input data file. Will contain a list of string file paths
     for use by the job process.
     """
-    with open(_input_data_file_path, mode="r") as input_data_file:
+    with open(_input_data_file_path) as input_data_file:
         input_data = json.load(input_data_file)
     return input_data
 
@@ -182,8 +190,8 @@ class SubjobSplitter(ABC):
                     try:
                         args = arg_gen.send(subjob)
                     except StopIteration:
-                        B2ERROR((f"StopIteration called when getting args for {subjob}, "
-                                 "setting all subsequent subjobs to have empty argument tuples."))
+                        B2ERROR(f"StopIteration called when getting args for {subjob}, "
+                                "setting all subsequent subjobs to have empty argument tuples.")
                         args = tuple()  # If our generator finishes before the subjobs we use empty argument tuples
                         generating = False
                 else:
@@ -192,8 +200,8 @@ class SubjobSplitter(ABC):
                 subjob.args = args
             return
 
-        B2INFO((f"No ArgumentsGenerator assigned to the {self} so subjobs of {job} "
-                "won't automatically have arguments assigned."))
+        B2INFO(f"No ArgumentsGenerator assigned to the {self} so subjobs of {job} "
+               "won't automatically have arguments assigned.")
 
     def __repr__(self):
         return f"{self.__class__.__name__}"
@@ -528,7 +536,7 @@ class Job:
 
     @classmethod
     def from_json(cls, file_path):
-        with open(file_path, mode="r") as job_file:
+        with open(file_path) as job_file:
             job_dict = json.load(job_file)
         return cls(job_dict["name"], job_dict=job_dict)
 
@@ -624,20 +632,20 @@ class Job:
         Note that this *doesn't mean that every environment variable is inherited* from the submitting
         process environment.
         """
+        def append_environment_variable(cmds, envvar):
+            """
+            Append a command for setting an environment variable.
+            """
+            if envvar in os.environ:
+                cmds.append(f"""if [ -z "${{{envvar}}}" ]; then""")
+                cmds.append(f"  export {envvar}={os.environ[envvar]}")
+                cmds.append("fi")
+
         if "BELLE2_TOOLS" not in os.environ:
             raise BackendError("No BELLE2_TOOLS found in environment")
-        if "BELLE2_CONFIG_DIR" in os.environ:
-            self.setup_cmds.append(f"""if [ -z "${{BELLE2_CONFIG_DIR}}" ]; then
-              export BELLE2_CONFIG_DIR={os.environ['BELLE2_CONFIG_DIR']}
-            fi""")
-        if "VO_BELLE2_SW_DIR" in os.environ:
-            self.setup_cmds.append(f"""if [ -z "${{VO_BELLE2_SW_DIR}}" ]; then
-              export VO_BELLE2_SW_DIR={os.environ['VO_BELLE2_SW_DIR']}
-            fi""")
-        if "BELLE2_EXTERNALS_TOPDIR" in os.environ:
-            self.setup_cmds.append(f"""if [ -z "${{BELLE2_EXTERNALS_TOPDIR}}" ]; then
-              export BELLE2_EXTERNALS_TOPDIR={os.environ['BELLE2_EXTERNALS_TOPDIR']}
-            fi""")
+        # Export all the environment variables defined via _backend_job_envvars
+        for envvar in _backend_job_envvars:
+            append_environment_variable(self.setup_cmds, envvar)
         if "BELLE2_RELEASE" in os.environ:
             self.setup_cmds.append(f"source {os.environ['BELLE2_TOOLS']}/b2setup {os.environ['BELLE2_RELEASE']}")
         elif 'BELLE2_LOCAL_DIR' in os.environ:
@@ -892,7 +900,7 @@ class Result():
         if not self.exit_code_file_initial_time:
             self.exit_code_file_initial_time = datetime.now()
         exit_code_path = Path(self.job.working_dir, Backend.exit_code_file)
-        with open(exit_code_path, "r") as f:
+        with open(exit_code_path) as f:
             exit_code = int(f.read().strip())
             B2DEBUG(29, f"Exit code from file for {self.job} was {exit_code}")
             return exit_code
@@ -991,8 +999,8 @@ class Local(Backend):
     def submit(self, job):
         """
         """
-        raise NotImplementedError(("This is an abstract submit(job) method that shouldn't have been called. "
-                                   "Did you submit a (Sub)Job?"))
+        raise NotImplementedError("This is an abstract submit(job) method that shouldn't have been called. "
+                                  "Did you submit a (Sub)Job?")
 
     @submit.register(SubJob)
     def _(self, job):
@@ -1148,8 +1156,8 @@ class Batch(Backend):
         Should be implemented in a derived class to write a batch submission script to the job.working_dir.
         You should think about where the stdout/err should go, and set the queue name.
         """
-        raise NotImplementedError(("Need to implement a _add_batch_directives(self, job, file) "
-                                   f"method in {self.__class__.__name__} backend."))
+        raise NotImplementedError("Need to implement a _add_batch_directives(self, job, file) "
+                                  f"method in {self.__class__.__name__} backend.")
 
     def _make_submit_file(self, job, submit_file_path):
         """
@@ -1179,8 +1187,8 @@ class Batch(Backend):
     def submit(self, job, check_can_submit=True, jobs_per_check=100):
         """
         """
-        raise NotImplementedError(("This is an abstract submit(job) method that shouldn't have been called. "
-                                   "Did you submit a (Sub)Job?"))
+        raise NotImplementedError("This is an abstract submit(job) method that shouldn't have been called. "
+                                  "Did you submit a (Sub)Job?")
 
     @submit.register(SubJob)
     def _(self, job, check_can_submit=True, jobs_per_check=100):
@@ -1284,9 +1292,9 @@ class Batch(Backend):
         # equal to or smaller than the gloabl limit. Otherwise nothing will ever submit.
 
         if jobs_per_check > self.global_job_limit:
-            B2INFO((f"jobs_per_check (={jobs_per_check}) but this is higher than the global job "
-                    f"limit for this backend (={self.global_job_limit}). Will instead use the "
-                    " value of the global job limit."))
+            B2INFO(f"jobs_per_check (={jobs_per_check}) but this is higher than the global job "
+                   f"limit for this backend (={self.global_job_limit}). Will instead use the "
+                   " value of the global job limit.")
             jobs_per_check = self.global_job_limit
 
         # We group the jobs list into chunks of length jobs_per_check
@@ -2271,3 +2279,5 @@ class SplitterError(Exception):
     """
     Base exception class for SubjobSplitter objects.
     """
+
+# @endcond

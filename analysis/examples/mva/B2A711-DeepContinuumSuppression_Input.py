@@ -33,7 +33,7 @@ from stdPi0s import stdPi0s
 from vertex import TagV
 import sys
 import variables as v
-from root_pandas import read_root
+import uproot
 
 basf2.set_log_level(basf2.LogLevel.ERROR)
 
@@ -195,8 +195,9 @@ print(basf2.statistics)
 
 # Shuffle Data. Use only if enough Ram is available
 try:
-    df = read_root(outfile)
+    with uproot.open(outfile) as outf:
+        df = outf['tree'].arrays(library='pd')
     df = df.sample(frac=1)
-    df.to_root(outfile, key='tree')
+    df.to_csv(outfile+'.shuffled.csv')
 except OSError as e:
     print(e)

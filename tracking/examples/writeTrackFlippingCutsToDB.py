@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,8 +12,8 @@ from ROOT import Belle2
 
 
 parameters = Belle2.TrackFlippingCuts()
-parameters.setCuts(0.01, 0.8)
-
+# Boolean on/off, float cutOnPt, float cutonFirstMVA,float cutonSecondMVA
+parameters.setCuts(True, 999.9, 0.01, 0.8)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
 # write db object to 'localdb/'

@@ -8,7 +8,10 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -74,6 +77,19 @@ namespace Belle2 {
      * Acoplanarity angle (see Particle::getAcoplanarity) assuming a two body decay of the particle and its daughters
      */
     double acoplanarityAngle(const Particle* part);
+
+    /**
+     * Cosine of the helicity angle between the momentum of the provided particle and the momentum of the first selected
+     * daughter in the reference frame of the sum of two selected daughters.
+     * The variable is supposed to be used for the analysis of a quasi-two-body decay. The number of daughters of the given particle
+     * must be three. Otherwise, this variable returns NaN.
+     */
+    double cosHelicityAngleForQuasiTwoBodyDecay(const Particle* mother, const std::vector<double>& indices);
+
+    /**
+     * return a triple-product of three momenta of offspring (i,j,k) in the mother rest frame:  C_T = p_i * (p_j x p_k)
+     */
+    Manager::FunctionPtr momentaTripleProduct(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

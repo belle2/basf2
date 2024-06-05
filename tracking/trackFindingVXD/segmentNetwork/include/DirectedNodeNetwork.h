@@ -7,13 +7,13 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
-#include <unordered_map>
-
 #include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNode.h>
 
+#include <cstdint>
+#include <unordered_map>
+#include <vector>
 
 namespace Belle2 {
   /** Network of directed nodes of the type EntryType

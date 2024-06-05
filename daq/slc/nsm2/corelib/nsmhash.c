@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /* ---------------------------------------------------------------------- *\
    nsmhash.c
 
@@ -21,11 +22,11 @@
 #include <netinet/in.h> /* for ntoha etc */
 #include <arpa/inet.h>  /* for ntoha etc */
 
-#include "nsm2.h"
+#include "nsm2/nsm2.h"
 
 #define HASHMAX 2039
 
-//static char *hashtable[HASHMAX]; //TODO can this be removed?
+static char *hashtable[HASHMAX];
 static int deltatable[HASHMAX];
 
 struct NSMsys;

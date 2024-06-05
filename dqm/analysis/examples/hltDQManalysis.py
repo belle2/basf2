@@ -10,6 +10,7 @@ import basf2
 path = basf2.create_path()
 
 path.add_module('DQMHistAnalysisInputRootFile', FileList="dqm_histo.root")
+# path.add_module("DQMHistAutoCanvas") # Plot all Histo from Input not needed
 path.add_module('DQMHistAnalysisHLT', bhabhaName="accept_bhabha_all", columnMapping={
     "accept_hadron": "hadron",
     "accept_bhabha_all": "bhabha_all",

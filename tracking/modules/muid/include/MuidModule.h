@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/gearbox/Const.h>
 
@@ -79,7 +79,7 @@ namespace Belle2 {
     //! Maximum step size in cm (0 for no upper limit)
     double m_MaxStep;
 
-    //! user-defined maximum squared-distance (#variances) for matching hit to extrapolation
+    //! user-defined maximum squared-distance (in number of variances) for matching hit to extrapolation
     double m_MaxDistSqInVariances;
 
     //! user-defined maximum distance in cm between KLMCluster and associated track

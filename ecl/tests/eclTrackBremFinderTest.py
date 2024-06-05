@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -47,7 +46,7 @@ class CheckRelationBremClusterTestModule(b2.Module):
 
         bad_events = []
         if (eventMetaData.getEvent() in bad_events):
-            # the check fails on  some events. Instead of finding new settings,
+            # the check fails on some events. Instead of finding new settings,
             # check if the bremCluster is None only for the bad_events
             assert(not bremCluster)
         else:

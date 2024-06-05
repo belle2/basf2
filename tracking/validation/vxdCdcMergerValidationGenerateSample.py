@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,6 +22,8 @@ from ROOT import Belle2
 from tracking import add_tracking_reconstruction
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
+
+ACTIVE = True
 
 
 def run():
@@ -59,6 +60,7 @@ def run():
 
     path.add_module(VxdCdcMergerHarvester())
 
+    path.add_module('Progress')
     basf2.process(path)
     print(basf2.statistics)
 
@@ -101,7 +103,7 @@ class VxdCdcMergerHarvester(HarvestingModule):
         mc_track = mc_particle.getRelatedFrom("MCRecoTracks")
 
         mc_nhits = mc_track.getNumberOfTotalHits()
-        mc_pt = mc_particle.getMomentum().Pt()
+        mc_pt = mc_particle.getMomentum().Rho()
         mc_theta = mc_particle.getMomentum().Theta()
 
         # reco_tracks = Belle2.PyStoreArray('RecoTracks')
@@ -145,4 +147,9 @@ class VxdCdcMergerHarvester(HarvestingModule):
 
 
 if __name__ == '__main__':
-    run()
+    if ACTIVE:
+        run()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

@@ -22,6 +22,8 @@
 // ANALYSIS
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dbobjects/ChargedPidMVAWeights.h>
+#include <analysis/VariableManager/Utility.h>
+
 
 namespace Belle2 {
 
@@ -38,6 +40,7 @@ namespace Belle2 {
 
     typedef std::vector<std::unique_ptr<MVA::Expert> > ExpertsList; /**< Typedef */
     typedef std::vector<std::unique_ptr<MVA::SingleDataset> > DatasetsList; /**< Typedef */
+    typedef std::vector<std::unique_ptr<Variable::Cut>> CutsList; /**< Typedef */
     typedef std::vector< std::vector<const Variable::Manager::Var*> > VariablesLists; /**< Typedef */
 
   public:
@@ -97,10 +100,15 @@ namespace Belle2 {
      * The input background mass hypothesis' pdgId.
      */
     int m_bkg_pdg;
+
     /**
-     * The input list of decay strings to which MVA weights will be applied.
+     * The input list of DecayStrings, where each selected (^) daughter should correspond to a standard charged ParticleList,
+     * e.g. `['Lambda0:sig -> ^p+ ^pi-', 'J/psi:sig -> ^mu+ ^mu-']`. One can also directly pass a list of
+     * standard charged ParticleLists, e.g. `['e+:my_electrons', 'pi+:my_pions']`.
+     * Note that charge-conjugated ParticleLists will automatically be included.
      */
     std::vector<std::string> m_decayStrings;
+
     /**
      * The name of the database payload object with the MVA weights.
      */
@@ -129,21 +137,29 @@ namespace Belle2 {
     /**
      * Interface to get the database payload with the MVA weight files.
      * The payload class has a method to retrieve the correct weightfile representation
-     * given a reconstructed particle's (clusterTheta, p).
+     * given a reconstructed particle's (polar angle, p, charge).
+     * Note that the theta of the track helix extraplolated at the ECL entry surface
+     * is used if the particle doesn't have an ECL cluster match.
      */
     std::unique_ptr<DBObjPtr<ChargedPidMVAWeights>> m_weightfiles_representation;
 
     /**
      * List of MVA::Expert objects.
-     * One Expert to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * For the given signal mass hypothesis, one Expert to be stored for each xml file found in the database, i.e. for each training category.
      */
     ExpertsList m_experts;
 
     /**
      * List of MVA::SingleDataset objects.
-     * One DS to be stored for each xml file found in the database for the given signal mass hypothesis.
+     * For the given signal mass hypothesis, one DS to be stored for each xml file found in the database, i.e. for each training category.
      */
     DatasetsList m_datasets;
+
+    /**
+     * List of Cut objects.
+     * One Cut to be stored for each training category.
+     */
+    CutsList m_cuts;
 
     /**
      * List of lists of feature variables.
@@ -156,6 +172,28 @@ namespace Belle2 {
      * One list of lists to be stored for each xml file found in the database for the given signal mass hypothesis.
      */
     VariablesLists m_spectators;
+
+    /**
+     * Map with standard charged particles' info. For convenience.
+     */
+    std::map<int, std::tuple<std::string, std::string, int>> m_stdChargedInfo = {
+      { Const::electron.getPDGCode(), std::make_tuple("e", "pi", Const::pion.getPDGCode()) },
+      { Const::muon.getPDGCode(), std::make_tuple("mu", "pi", Const::pion.getPDGCode()) },
+      { Const::pion.getPDGCode(), std::make_tuple("pi", "K", Const::kaon.getPDGCode()) },
+      { Const::kaon.getPDGCode(), std::make_tuple("K", "pi", Const::pion.getPDGCode()) },
+      { Const::proton.getPDGCode(), std::make_tuple("p", "pi", Const::pion.getPDGCode()) },
+      { Const::deuteron.getPDGCode(), std::make_tuple("d", "pi", Const::pion.getPDGCode()) }
+    };
+
+    /**
+     * Set variable aliases needed by the MVA. Fallback to this if no aliases map found in payload.
+     */
+    void registerAliasesLegacy();
+
+    /**
+     * Set variable aliases needed by the MVA.
+     */
+    void registerAliases();
 
   };
 }

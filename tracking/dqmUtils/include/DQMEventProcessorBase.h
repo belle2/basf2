@@ -135,11 +135,11 @@ namespace Belle2 {
     VxdID m_sensorIDPrev = VxdID(0);
 
     /** local coordinates of the hit position (u, v, w) */
-    TVector3 m_position = TVector3();
+    ROOT::Math::XYZVector m_position = ROOT::Math::XYZVector();
     /** unbiased residual for the hit in micrometers in local coordinates (u, v, w) */
-    TVector3 m_residual_um = TVector3();
+    ROOT::Math::XYZVector m_residual_um = ROOT::Math::XYZVector();
     /** unbiased residual for the hit in micrometers in global coordinates (x, y, z) */
-    TVector3 m_globalResidual_um = TVector3();
+    ROOT::Math::XYZVector m_globalResidual_um = ROOT::Math::XYZVector();
     /** global phi in degrees of the hit */
     float m_phi_deg = .0;
     /** global phi in degrees of the previous hit*/

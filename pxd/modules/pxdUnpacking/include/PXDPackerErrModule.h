@@ -216,7 +216,7 @@ namespace Belle2 {
       std::map <VxdID, int> startOfVxdID;
 
       /** temporary hitmap buffer for pixel to raw data conversion */
-      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] = {0};
+      unsigned char halfladder_pixmap[PACKER_NUM_ROWS][PACKER_NUM_COLS] = {{0}};
 
       unsigned int dhe_byte_count{0}; /**< Byte count in current DHE package */
       unsigned int dhc_byte_count{0}; /**< Byte count in current DHC package */

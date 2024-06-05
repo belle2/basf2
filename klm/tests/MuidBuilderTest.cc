@@ -13,7 +13,7 @@
 #include <klm/muid/MuidBuilder.h>
 #include <klm/muid/MuidElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/Database.h>
 #include <framework/database/DBStore.h>
 #include <framework/dataobjects/EventMetaData.h>

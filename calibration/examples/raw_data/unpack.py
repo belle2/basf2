@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,7 +20,6 @@ roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
 # Required setup modules
-ma.loadGearbox(main)
 main.add_module("Geometry")
 
 add_unpackers(main)

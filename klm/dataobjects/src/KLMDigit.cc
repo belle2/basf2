@@ -9,7 +9,7 @@
 /* Own header. */
 #include <klm/dataobjects/KLMDigit.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -36,36 +36,14 @@ KLMDigit::KLMDigit() :
 {
 }
 
-KLMDigit::KLMDigit(const EKLMSimHit* simHit) :
+KLMDigit::KLMDigit(const KLMSimHit* simHit) :
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_Subdetector(KLMElementNumbers::c_EKLM),
+  m_Subdetector(simHit->getSubdetector()),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
   m_Strip(simHit->getStrip()),
-  m_LastStrip(0),
-  m_Charge(0),
-  m_CTime(0),
-  m_TDC(0),
-  m_Time(0),
-  m_EnergyDeposit(simHit->getEnergyDeposit()),
-  m_NPhotoelectrons(0),
-  m_NGeneratedPhotoelectrons(0),
-  m_FitStatus(0),
-  m_MCTime(simHit->getTime()),
-  m_SiPMMCTime(0)
-{
-}
-
-KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
-  m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_Subdetector(KLMElementNumbers::c_BKLM),
-  m_Section(simHit->getSection()),
-  m_Sector(simHit->getSector()),
-  m_Layer(simHit->getLayer()),
-  m_Plane(simHit->getPlane()),
-  m_Strip(strip),
   m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),
@@ -80,14 +58,14 @@ KLMDigit::KLMDigit(const BKLMSimHit* simHit, int strip) :
 {
 }
 
-KLMDigit::KLMDigit(const BKLMSimHit* simHit) :
+KLMDigit::KLMDigit(const KLMSimHit* simHit, int strip) :
   m_ElementNumbers(&(KLMElementNumbers::Instance())),
-  m_Subdetector(KLMElementNumbers::c_BKLM),
+  m_Subdetector(simHit->getSubdetector()),
   m_Section(simHit->getSection()),
   m_Sector(simHit->getSector()),
   m_Layer(simHit->getLayer()),
   m_Plane(simHit->getPlane()),
-  m_Strip(simHit->getStrip()),
+  m_Strip(strip),
   m_LastStrip(0),
   m_Charge(0),
   m_CTime(0),

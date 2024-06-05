@@ -28,8 +28,8 @@ void RunInfo::Print(Option_t*) const
             << ", Sent nevents " << m_sentNevent << std::endl;
 
   std::cout << "Detector used " << std::endl;
-  for (int i = 0; i < int(m_Belle2Detector.size()); ++i) {
-    std::cout << m_Belle2Detector[i] << "  :   " ;
+  for (const Const::EDetector& det : m_Belle2Detector) {
+    std::cout << det << "  :   " ;
   }
   std::cout << std::endl;
 

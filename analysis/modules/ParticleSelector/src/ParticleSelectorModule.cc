@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/ParticleSelector/ParticleSelectorModule.h>
 
 // framework aux
@@ -63,13 +63,15 @@ void ParticleSelectorModule::initialize()
   // Some labels are reserved for the particle loader which loads all particles of the corresponding type.
   // If people applied cuts on these particle lists, very dangerous bugs could be introduced.
   // An exception is made for the gamma:all list. This can be limited to photons from the ECL only.
-  if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(pdgCode))) and listLabel == "all"
-      and not(abs(pdgCode) == Const::photon.getPDGCode() and m_cutParameter == "isFromECL")) {
-    B2FATAL("You are trying to apply a cut on the list " << m_listName <<
-            " but the label 'all' is protected for lists of final-state particles." <<
-            " It could introduce *very* dangerous bugs.");
-  } else if (listLabel == "MC" or listLabel == "V0") {
-    // the labels MC and V0 are also protected
+  if (Const::finalStateParticlesSet.contains(Const::ParticleType(abs(pdgCode))) and listLabel == "all") {
+    if (abs(pdgCode) == Const::photon.getPDGCode() and m_cutParameter == "isFromECL")
+      m_exceptionForGammaAll = true;
+    else
+      B2FATAL("You are trying to apply a cut on the list " << m_listName <<
+              " but the label 'all' is protected for lists of final-state particles." <<
+              " It could introduce *very* dangerous bugs.");
+  } else if (listLabel == "V0") {
+    // the label V0 is also protected
     B2FATAL("You are trying to apply a cut on the list " << m_listName <<
             " but the label " << listLabel << " is protected and can not be reduced.");
   }
@@ -84,6 +86,9 @@ void ParticleSelectorModule::initialize()
 
 void ParticleSelectorModule::event()
 {
+  if (m_exceptionForGammaAll)
+    m_particleList->setEditable(true);
+
   // loop over list only if cuts should be applied
   if (!m_cutParameter.empty()) {
     std::vector<unsigned int> toRemove;
@@ -94,4 +99,7 @@ void ParticleSelectorModule::event()
     }
     m_particleList->removeParticles(toRemove);
   }
+
+  if (m_exceptionForGammaAll)
+    m_particleList->setEditable(false);
 }

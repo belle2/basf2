@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -161,8 +160,8 @@ def get_sensor_maps(
     """
     hists = {}
     for sensorID in sensorID_list:
-        hname = name + "_{}_run_{:d}".format(sensorID.get_name(), run)
-        htitle = title + " Sensor={:d} Run={:d}".format(sensorID.get_pxdid(), run)
+        hname = name + f"_{sensorID.get_name()}_run_{run:d}"
+        htitle = title + f" Sensor={sensorID.get_pxdid():d} Run={run:d}"
         h2 = ROOT.TH2F(hname, htitle, nUCells, 0, nUCells, nVCells, 0, nVCells)
         h2.GetXaxis().SetTitle("uCell")
         h2.GetYaxis().SetTitle("vCell")
@@ -183,7 +182,7 @@ def df_calculate_eff(df, num="nTrackClusters", den="nTrackPoints", output_var="e
     """
     nums = df[num].to_numpy()
     dens = df[den].to_numpy()
-    from root_numpy import array2hist
+    from hist_utils import array2hist
     nBins = len(nums)
     assert len(nums) == len(dens), "len(numerators) != len(denominators)"
     h_num = ROOT.TH1I("h_num", "h_num", nBins, 0, nBins)
@@ -191,7 +190,7 @@ def df_calculate_eff(df, num="nTrackClusters", den="nTrackPoints", output_var="e
     array2hist(nums, h_num)
     array2hist(dens, h_den)
     h_eff = ROOT.TEfficiency(h_num, h_den)
-    df[output_var] = df[num]/df[den]
+    df[output_var] = df[num] / df[den]
     df[output_var+"_err_low"] = [h_eff.GetEfficiencyErrorLow(i+1) for i in range(nBins)]
     df[output_var+"_err_up"] = [h_eff.GetEfficiencyErrorUp(i+1) for i in range(nBins)]
 

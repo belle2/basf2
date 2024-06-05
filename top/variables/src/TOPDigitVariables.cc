@@ -29,6 +29,7 @@
 #include <algorithm> // for sort
 
 using namespace std;
+using namespace ROOT::Math;
 
 namespace Belle2 {
   namespace Variable {
@@ -89,12 +90,12 @@ namespace Belle2 {
         return barHit ? barHit->getModuleID() : std::numeric_limits<double>::quiet_NaN();
       }
 
-      bool getLocalPosition(const Particle* particle, TVector3& result)
+      bool getLocalPosition(const Particle* particle, XYZPoint& result)
       {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return false;
         int slotID = extHit->getCopyID();
-        const auto position = extHit->getPositionTVector3();
+        const auto& position = static_cast<XYZPoint>(extHit->getPosition());
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if (not geo or not geo->isModuleIDValid(slotID)) return false;
         const auto& module = geo->getModule(slotID);
@@ -104,7 +105,7 @@ namespace Belle2 {
 
       double getTOPLocalX(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPosition(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.X();
@@ -112,7 +113,7 @@ namespace Belle2 {
 
       double getTOPLocalY(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPosition(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Y();
@@ -120,13 +121,13 @@ namespace Belle2 {
 
       double getTOPLocalZ(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPosition(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Z();
       }
 
-      bool getLocalPositionMCMatch(const Particle* particle, TVector3& result)
+      bool getLocalPositionMCMatch(const Particle* particle, XYZPoint& result)
       {
         const auto* barHit = getBarHit(particle);
         if (not barHit) return false;
@@ -141,7 +142,7 @@ namespace Belle2 {
 
       double getTOPLocalXMCMatch(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPositionMCMatch(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.X();
@@ -149,7 +150,7 @@ namespace Belle2 {
 
       double getTOPLocalYMCMatch(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPositionMCMatch(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Y();
@@ -157,18 +158,18 @@ namespace Belle2 {
 
       double getTOPLocalZMCMatch(const Particle* particle)
       {
-        TVector3 position;
+        XYZPoint position;
         bool ok = TOPVariable::getLocalPositionMCMatch(particle, position);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return position.Z();
       }
 
-      bool getLocalMomentum(const Particle* particle, TVector3& result)
+      bool getLocalMomentum(const Particle* particle, XYZVector& result)
       {
         const auto* extHit = getExtHit(particle);
         if (not extHit) return false;
         int slotID = extHit->getCopyID();
-        const auto& momentum = extHit->getMomentumTVector3();
+        const auto& momentum = extHit->getMomentum();
         const auto* geo = TOP::TOPGeometryPar::Instance()->getGeometry();
         if ((not geo) or (not geo->isModuleIDValid(slotID))) return false;
         const auto& module = geo->getModule(slotID);
@@ -178,7 +179,7 @@ namespace Belle2 {
 
       double getTOPLocalPhi(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentum(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Phi();
@@ -186,13 +187,13 @@ namespace Belle2 {
 
       double getTOPLocalTheta(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentum(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Theta();
       }
 
-      bool getLocalMomentumMCMatch(const Particle* particle, TVector3& result)
+      bool getLocalMomentumMCMatch(const Particle* particle, XYZVector& result)
       {
         const auto* barHit = getBarHit(particle);
         if (not barHit) return false;
@@ -207,7 +208,7 @@ namespace Belle2 {
 
       double getTOPLocalPhiMCMatch(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentumMCMatch(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Phi();
@@ -215,7 +216,7 @@ namespace Belle2 {
 
       double getTOPLocalThetaMCMatch(const Particle* particle)
       {
-        TVector3 momentum;
+        XYZVector momentum;
         bool ok = TOPVariable::getLocalMomentumMCMatch(particle, momentum);
         if (not ok) return std::numeric_limits<double>::quiet_NaN();
         return momentum.Theta();
@@ -269,7 +270,7 @@ namespace Belle2 {
         auto helix = trkfit->getHelix();
         double arcLength = helix.getArcLength2DAtCylindricalR(120);
         const auto& result = helix.getPositionAtArcLength2D(arcLength);
-        return result.z();
+        return result.Z();
       }
 
       double extrapTrackToTOPtheta(const Particle* particle)
@@ -438,6 +439,24 @@ namespace Belle2 {
         return (topLikelihood->getFlag() == 1);
       }
 
+      double getModuleID(const Particle* particle)
+      {
+        const auto* topLikelihood = TOPVariable::getTOPLikelihood(particle);
+        return topLikelihood ? topLikelihood->getModuleID() : std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double getEmissionX(const Particle* particle)
+      {
+        const auto* topLikelihood = TOPVariable::getTOPLikelihood(particle);
+        return topLikelihood ? topLikelihood->getX() : std::numeric_limits<double>::quiet_NaN();
+      }
+
+      double getEmissionZ(const Particle* particle)
+      {
+        const auto* topLikelihood = TOPVariable::getTOPLikelihood(particle);
+        return topLikelihood ? topLikelihood->getZ() : std::numeric_limits<double>::quiet_NaN();
+      }
+
       double getTOPPhotonCount(const Particle* particle)
       {
         const auto* topLikelihood = TOPVariable::getTOPLikelihood(particle);
@@ -467,6 +486,31 @@ namespace Belle2 {
           B2FATAL("Need exactly one parameter (pdg id).");
         }
         return TOPVariable::expectedPhotonCount(particle, static_cast<int>(vars[0]));
+      }
+
+      double effectiveSignalYield(const Particle* particle, int pdg)
+      {
+        const auto* topLikelihood = getTOPLikelihood(particle);
+        if (not topLikelihood) return std::numeric_limits<double>::quiet_NaN();
+
+        pdg = pdg != 0 ? pdg : particle->getPDGCode();
+        const auto& chargedStable = Const::chargedStableSet.find(abs(pdg));
+        if (chargedStable == Const::invalidParticle) return std::numeric_limits<double>::quiet_NaN();
+
+        return topLikelihood->getEffectiveSignalYield(chargedStable);
+      }
+
+      double getEffectiveSignalYield(const Particle* particle)
+      {
+        return TOPVariable::effectiveSignalYield(particle, 0);
+      }
+
+      double getEffectiveSignalYieldExpert(const Particle* particle, const vector<double>& vars)
+      {
+        if (vars.size() != 1) {
+          B2FATAL("Need exactly one parameter (pdg id).");
+        }
+        return TOPVariable::effectiveSignalYield(particle, static_cast<int>(vars[0]));
       }
 
       double getEstimatedBkgCount(const Particle* particle)
@@ -564,6 +608,22 @@ namespace Belle2 {
         if (not recBunch.isValid()) return std::numeric_limits<double>::quiet_NaN();
         if (not recBunch->isReconstructed()) return std::numeric_limits<double>::quiet_NaN();
         return recBunch->getBunchNo();
+      }
+
+      double TOPRecBucketNumber([[maybe_unused]] const Particle* particle)
+      {
+        StoreObjPtr<TOPRecBunch> recBunch;
+        if (not recBunch.isValid()) return std::numeric_limits<double>::quiet_NaN();
+        auto bucket = recBunch->getBucketNumber();
+        if (bucket == TOPRecBunch::c_Unknown) return std::numeric_limits<double>::quiet_NaN();
+        return bucket;
+      }
+
+      double isTOPRecBunchFilled([[maybe_unused]] const Particle* particle)
+      {
+        StoreObjPtr<TOPRecBunch> recBunch;
+        if (not recBunch.isValid()) return std::numeric_limits<double>::quiet_NaN();
+        return recBunch->getBucketFillStatus();
       }
 
       double isTOPRecBunchNumberEQsim([[maybe_unused]] const Particle* particle)
@@ -706,6 +766,12 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("topLogLFlag", TOPVariable::getFlag,
                       "reconstruction flag: 1 if log likelihoods available, 0 otherwise");
+    REGISTER_VARIABLE("topLogLSlotID", TOPVariable::getModuleID,
+                      "slot ID of the particle (from TOPLikelihoods)");
+    REGISTER_VARIABLE("topLogLEmiX", TOPVariable::getEmissionX,
+                      "photon emission point assumed in PDF construction: coordinate x in local frame");
+    REGISTER_VARIABLE("topLogLEmiZ", TOPVariable::getEmissionZ,
+                      "photon emission point assumed in PDF construction: coordinate z in local frame");
     REGISTER_VARIABLE("topLogLPhotonCount", TOPVariable::getTOPPhotonCount,
                       "number of photons used for log likelihood calculation");
     REGISTER_VARIABLE("topLogLExpectedPhotonCount", TOPVariable::getExpectedPhotonCount,
@@ -714,6 +780,10 @@ namespace Belle2 {
                       "expected number of photons (including bkg) for a given PDG code");
     REGISTER_VARIABLE("topLogLEstimatedBkgCount", TOPVariable::getEstimatedBkgCount,
                       "estimated number of background photons");
+    REGISTER_VARIABLE("topLogLSignalYield", TOPVariable::getEffectiveSignalYield,
+                      "effective number of signal photons for this particle (sum of sPlot weights)");
+    REGISTER_VARIABLE("topLogLSignalYieldExpert(pdg)", TOPVariable::getEffectiveSignalYieldExpert,
+                      "effective number of signal photons for a given PDG code (sum of sPlot weights)");
     REGISTER_VARIABLE("topLogLElectron", TOPVariable::getElectronLogL,
                       "electron log likelihood");
     REGISTER_VARIABLE("topLogLMuon", TOPVariable::getMuonLogL,
@@ -740,8 +810,12 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("topBunchIsReconstructed", TOPVariable::isTOPRecBunchReconstructed,
                       "reconstruction flag: 1 if reconstructed, 0 otherwise");
+    REGISTER_VARIABLE("topBunchIsFilled", TOPVariable::isTOPRecBunchFilled,
+                      "bunch fill status: 0 empty, 1 filled, -1 unknown");
     REGISTER_VARIABLE("topBunchNumber", TOPVariable::TOPRecBunchNumber,
                       "reconstructed bunch number relative to L1 trigger");
+    REGISTER_VARIABLE("topBucketNumber", TOPVariable::TOPRecBucketNumber,
+                      "reconstructed bucket number within the ring");
     REGISTER_VARIABLE("topBunchMCMatch", TOPVariable::isTOPRecBunchNumberEQsim,
                       "MC matching status: 1 if reconstructed bunch equal to simulated bunch, 0 otherwise");
     REGISTER_VARIABLE("topBunchOffset", TOPVariable::TOPRecBunchCurrentOffset,

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -78,7 +77,13 @@ def add_mdst_dump(path, print_untested=False):
     from ROOT.Belle2 import Const  # noqa
 
     # prepare a list of PID detector sets and charged stable particles
-    pid_detectors = [Const.PIDDetectorSet(Const.PIDDetectors.c_set[index]) for index in range(Const.PIDDetectors.c_size)]
+    pid_detectors = []
+    it = Const.PIDDetectors.c_set.begin()
+    while True:
+        pid_detectors.append(Const.PIDDetectorSet(it.getDetector()))
+        it.increment()
+        if it == Const.PIDDetectors.c_set.end():
+            break
     charged_stables = [Const.ChargedStable(Const.chargedStableSet.at(index)) for index in range(Const.chargedStableSet.size())]
 
     # Now we define a list of all the mdst_dataobjects we want to print out and all
@@ -98,7 +103,10 @@ def add_mdst_dump(path, print_untested=False):
             "getTrackFitResultWithClosestMass": charged_stables,
             "getRelationsWith": ["ECLClusters", "KLMClusters", "MCParticles", "PIDLikelihoods"],
         }),
-        DataStorePrinter("V0", ["getTracks", "getTrackFitResults", "getV0Hypothesis"], {
+        DataStorePrinter("V0", [
+            "getTracks", "getTrackFitResults", "getV0Hypothesis",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ"
+            ], {
             "getRelationsWith": ["MCParticles"],
         }),
         DataStorePrinter("TrackFitResult", [
@@ -121,7 +129,7 @@ def add_mdst_dump(path, print_untested=False):
         }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",
-            "getClusterId", "getMinTrkDistance", "getDeltaL",
+            "getClusterId", "getUniqueClusterId", "getMinTrkDistance", "getDeltaL",
             "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getE1oE9",
             "getE9oE21", "getNumberOfHadronDigits", "getR", "getHypotheses",
             "getSecondMoment", "getLAT", "getNumberOfCrystals", "getTime",
@@ -140,7 +148,15 @@ def add_mdst_dump(path, print_untested=False):
             "getNECLCalDigitsOutOfTimeFWD", "getNECLCalDigitsOutOfTimeBarrel",
             "getNECLCalDigitsOutOfTimeBWD", "getNECLCalDigitsOutOfTime",
             "getNECLShowersRejectedFWD", "getNECLShowersRejectedBarrel",
-            "getNECLShowersRejectedBWD", "getNECLShowersRejected"
+            "getNECLShowersRejectedBWD", "getNECLShowersRejected",
+            "getNKLMDigitsMultiStripFWD", "getNKLMDigitsMultiStripBarrel",
+            "getNKLMDigitsMultiStripBWD", "getNKLMDigitsMultiStrip",
+            "getNECLShowersFWD", "getNECLShowersBarrel",
+            "getNECLShowersBWD", "getNECLShowers",
+            "getNECLLocalMaximumsFWD", "getNECLLocalMaximumsBarrel",
+            "getNECLLocalMaximumsBWD", "getNECLLocalMaximums",
+            "getNECLTriggerCellsFWD", "getNECLTriggerCellsBarrel",
+            "getNECLTriggerCellsBWD", "getNECLTriggerCells"
         ], array=False),
         DataStorePrinter("KLMCluster", [
             "getTime", "getLayers", "getInnermostLayer",

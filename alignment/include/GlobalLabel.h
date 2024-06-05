@@ -87,7 +87,6 @@ namespace Belle2 {
      * @param dbObjId id of the DB object in global calibration
      * @param element Element id in DB object (wire, sensor etc.)
      * @param param Paremetr id of the element (shift, angle, etc.)
-     * @return GlobalLabel
      */
     void construct(gidTYPE dbObjId, gidTYPE element, gidTYPE param)
     {

@@ -35,7 +35,6 @@ def addDetails(h, descr, check, contact_str, isShifter):
 # constants
 SVDContact = "SVD Software Group, svd-software@belle2.org"
 
-
 # selection of different parts of detector
 cut_L3 = R.TCut('layer==3')
 cut_L4 = R.TCut('layer==4')
@@ -44,18 +43,18 @@ cut_L6 = R.TCut('layer==6')
 cut_L456 = R.TCut('(layer==4)||(layer==5)||(layer==6)')
 cut_s = R.TCut('sensor_type==0')  # slanted
 cut_b = R.TCut('sensor_type==1')  # barrel
+cut_matched = R.TCut('matched==1')  # (cluster) matched to TrueHit
+cut_reco = R.TCut('reconstructed==1')  # (trueHit) matched to Cluster
 cut_U = R.TCut('strip_dir==0')  # U_P
 cut_V = R.TCut('strip_dir==1')  # V_N
-cut_noU = R.TCut('strip_dir!=0')  # V_P or -1
-cut_noV = R.TCut('strip_dir!=1')  # U_N or -1
+cut_notV = R.TCut('strip_dir!=1')  # not V (U or a true Hit)
+cut_notU = R.TCut('strip_dir!=0')  # not U (V or a true Hit)
 cut_size1 = R.TCut('(cluster_size==1)')
 cut_size2 = R.TCut('(cluster_size==2)')
 cut_size3plus = R.TCut('(cluster_size>2)')
-cut_oneTH = R.TCut('cluster_truehits_number==1')  # one TrueHit associated with SVDCluster
-cut_noUV = R.TCut('strip_dir==-1')  # no U, no V
 
 
-# default granurality
+# default granularity
 gD = ((cut_L3 + cut_b + cut_U, 'L3_barrel_U_side'),
       (cut_L3 + cut_b + cut_V, 'L3_barrel_V_side'),
       (cut_L456 + cut_b + cut_U, 'L456_barrel_U_side'),
@@ -67,7 +66,7 @@ gD2 = ((cut_L3 + cut_b, 'L3_barrel'),
        (cut_L456 + cut_b, 'L456_barrel'),
        (cut_L456 + cut_s, 'L456_slanted'))
 
-# granurality taking into account layers and type of sensor;
+# granularity taking into account layers and type of sensor;
 granulesLayersTypes = ((cut_L3 + cut_b, 'L3_barrel'),
                        (cut_L4 + cut_b, 'L4_barrel'),
                        (cut_L4 + cut_s, 'L4_slanted'),

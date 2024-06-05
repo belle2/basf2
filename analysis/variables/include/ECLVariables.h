@@ -29,14 +29,40 @@ namespace Belle2 {
     double eclPulseShapeDiscriminationMVA(const Particle* particle);
 
     /**
+     * DEPRECATED since light-2302-genetta
      * return MVA output that uses shower-related variables to distinguish between true photon and hadronic splitoff clusters
      */
     double hadronicSplitOffSuppression(const Particle* particle);
 
     /**
+     * return MVA output that uses shower-related variables to distinguish between true photon and fake photon clusters
+     */
+    double fakePhotonSuppression(const Particle* particle);
+
+    /**
      * return MVA output that uses shower-related variables to distinguish between true photon and beam background clusters
      */
     double beamBackgroundSuppression(const Particle* particle);
+
+    /**
+     * return distance to the nearest MC KL extrapolated to the radius of the cluster
+     */
+    double distanceToMcKl(const Particle* particle);
+
+    /**
+     * return distance to the nearest MC neutron extrapolated to the radius of the cluster
+     */
+    double distanceToMcNeutron(const Particle* particle);
+
+    /**
+     * return mdstIndex of the nearest MC KL
+     */
+    int mdstIndexMcKl(const Particle* particle);
+
+    /**
+     * return mdstIndex of the nearest MC neutron
+     */
+    int mdstIndexMcNeutron(const Particle* particle);
 
     /**
      * returns the weighted sum of digits in cluster with significant scintillation emission (> 3 MeV) in the hadronic scintillation component
@@ -109,7 +135,7 @@ namespace Belle2 {
     double eclClusterTheta(const Particle* particle);
 
     /**
-     * return ECL cluster's timing
+     * return ECL cluster's timing in Belle II and ECL cluster's TC timing in Belle
      */
     double eclClusterTiming(const Particle* particle);
 
@@ -220,7 +246,7 @@ namespace Belle2 {
     /**
      * return the ConnectedRegion ID of this cluster
      */
-    double eclClusterConnectedRegionId(const Particle* particle);
+    double eclClusterConnectedRegionID(const Particle* particle);
 
     /**
      * return the Cluster ID within the connected region of this cluster
@@ -316,6 +342,86 @@ namespace Belle2 {
      * return the number of showers in the ECL that do not become clusters
      */
     double nRejectedECLShowers(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM forward endcap
+     */
+    double nKLMMultistripHitsFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM barrel
+     */
+    double nKLMMultistripHitsBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM backward endcap
+     */
+    double nKLMMultistripHitsBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of multi-strip hits in the KLM
+     */
+    double nKLMMultistripHits(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers in the forward endcap
+     */
+    double nECLShowersFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers in the barrel
+     */
+    double nECLShowersBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers in the backward endcap
+     */
+    double nECLShowersBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECLShowers
+     */
+    double nECLShowers(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL forward endcap
+     */
+    double nECLLocalMaximumsFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL barrel
+     */
+    double nECLLocalMaximumsBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL backward endcap
+     */
+    double nECLLocalMaximumsBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of LocalMaximums in the ECL
+     */
+    double nECLLocalMaximums(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV in the forward endcap
+     */
+    double nECLTriggerCellsFWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV in the barrel
+     */
+    double nECLTriggerCellsBarrel(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV in the backward endcap
+     */
+    double nECLTriggerCellsBWDEndcap(const Particle*);
+
+    /**
+     * [Eventbased] Returns the number of ECL trigger cells above 100 MeV
+     */
+    double nECLTriggerCells(const Particle*);
 
     /** energy over momentum can be used to separate electrons from muons*/
     double eclClusterEoP(const Particle* part);

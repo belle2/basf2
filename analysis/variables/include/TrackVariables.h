@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
 #include <framework/gearbox/Const.h>
 #include <framework/geometry/B2Vector3.h>
 
@@ -199,9 +200,36 @@ namespace Belle2 {
     double trackHelixExtPhi(const Particle* part, const std::vector<double>& pars);
 
     /**
+    * returns extrapolated theta position based on helix parameters
+    * parameter is the name of the detector surface until where the track is extrapolated
+    */
+    Manager::FunctionPtr trackHelixExtThetaOnDet(const std::vector<std::string>& arguments);
+
+    /**
+    * returns extrapolated phi position based on helix parameters
+    * parameter is the name of the detector surface until where the track is extrapolated
+    */
+    Manager::FunctionPtr trackHelixExtPhiOnDet(const std::vector<std::string>& arguments);
+
+    /**
      * returns the PDG code of the track fit hypothesis actually used for the particle
      */
     double trackFitHypothesisPDG(const Particle* part);
+
+    /** MC value of the helix parameter d0 for the given particle */
+    double getHelixMCD0(const Particle* part);
+
+    /** MC value of the helix parameter phi0 for the given particle */
+    double getHelixMCPhi0(const Particle* part);
+
+    /** MC value of the helix parameter omega for the given particle */
+    double getHelixMCOmega(const Particle* part);
+
+    /** MC value of the helix parameter z0 for the given particle */
+    double getHelixMCZ0(const Particle* part);
+
+    /** MC value of the helix parameter tanLambda for the given particle */
+    double getHelixMCTanLambda(const Particle* part);
 
     /** mc-meas/err_meas for the respective helix parameter for the given particle */
     double getHelixD0Pull(const Particle* part);
@@ -229,4 +257,3 @@ namespace Belle2 {
 
   }
 } // Belle2 namespace
-

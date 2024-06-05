@@ -6,14 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/database/DBImportObjPtr.h>
+/* ECL headers. */
+#include <ecl/dbobjects/ECLChannelMap.h>
+#include <ecl/mapper/ECLChannelMapper.h>
+
+/* Basf2 headers. */
 #include <framework/database/Configuration.h>
+#include <framework/database/DBImportObjPtr.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
-// ecl
-#include <ecl/dbobjects/ECLChannelMap.h>
-#include <ecl/utility/ECLChannelMapper.h>
-// std
+
+/* C++ headers. */
 #include <iostream>
 
 using namespace Belle2;

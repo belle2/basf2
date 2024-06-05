@@ -19,9 +19,14 @@ import logging
 import sys
 import queue
 import webbrowser
+import re
+import collections
+import configparser
+import requests
 
 # 3rd
 import cherrypy
+import gitlab
 
 # ours
 import json_objects
@@ -45,7 +50,9 @@ def get_revision_label_from_json_filename(json_filename: str) -> str:
     return last_folder
 
 
-def get_json_object_list(results_folder: str, json_file_name: str) -> List[str]:
+def get_json_object_list(
+    results_folder: str, json_file_name: str
+) -> List[str]:
     """
     Searches one folder's sub-folder for json files of a
     specific name and returns a combined list of the
@@ -123,7 +130,7 @@ def warn_wrong_directory():
         )
 
 
-# todo: limit the number of running plotting requests and terminate hanging ones
+# todo: limit the number of running plotting requests & terminate hanging ones
 def start_plotting_request(
     revision_names: List[str], results_folder: str
 ) -> str:
@@ -166,6 +173,474 @@ def start_plotting_request(
     return rev_key
 
 
+"""
+Gitlab Integration
+
+Under here are functions that enable the validationserver to
+interact directly with the Gitlab project page to track and
+update issues.
+
+Requirement:
+Config file with project information and access token in the local
+machine. This is expected to be in the validation/config folder, in
+the same root directory as the html_static files.
+
+A check is performed to see if the config file exists with all the
+relevant details and all of Gitlab functionalities are enabled/disabled
+accordingly.
+
+When the server is being set up, a Gitlab object is created, which
+will be used subsequently to make all the API calls.
+
+As a final server initialization step, the project is queried to
+check if any of the current results are linked to existing issues
+and the result files are updated accordingly.
+
+The create/update issue functionality is accessible from the plot
+container. All the relevant pages are part of the
+validationserver cherry object.
+
+Issues created by the validation server will contain a block of
+automated code at the end of description and can be easily
+filtered from the GitLab issues page using the search string
+"Automated code, please do not delete". Relevant plots will be
+listed as a note in the issue page, along with the revision label.
+
+Function to upload files to Gitlab helps with pushing error plots
+to the project.
+"""
+
+
+def get_gitlab_config(
+    config_path: str
+) -> configparser.ConfigParser:
+    """
+    Parse the configuration file to be used to authenticate
+    GitLab API and retrieve relevant project info.
+
+    Returns:
+        gitlab configparser object
+    """
+
+    gitlab_config = configparser.ConfigParser()
+    gitlab_config.read(config_path)
+
+    return gitlab_config
+
+
+def create_gitlab_object(config_path: str) -> gitlab.Gitlab:
+    """
+    Establish connection with Gitlab using a private access key and return
+    a Gitlab object that can be used to make API calls. Default config
+    from the passed ini file will be used.
+
+    Returns:
+        gitlab object
+    """
+
+    gitlab_object = gitlab.Gitlab.from_config(
+        config_files=[config_path]
+    )
+    try:
+        gitlab_object.auth()
+        logging.info("Established connection with Gitlab")
+    except gitlab.exceptions.GitlabAuthenticationError:
+        gitlab_object = None
+        logging.warning(
+            "Issue with authenticating GitLab. "
+            "Please ensure access token is correct and valid. "
+            "GitLab Integration will be disabled."
+        )
+    except requests.exceptions.Timeout:
+        gitlab_object = None
+        logging.warning(
+            "GitLab servers feeling under the weather, DESY outage? "
+            "GitLab Integration will be disabled."
+        )
+
+    return gitlab_object
+
+
+def get_project_object(
+    gitlab_object: gitlab.Gitlab, project_id: str
+) -> 'gitlab.project':
+    """
+    Fetch Gitlab project associated with the project ID.
+
+    Returns:
+        gitlab project object
+    """
+
+    project = gitlab_object.projects.get(project_id, lazy=True)
+
+    return project
+
+
+def search_project_issues(
+    gitlab_object: gitlab.Gitlab, search_term: str
+) -> 'list[gitlab.issues]':
+    """
+    Search in the Gitlab for open issues that contain the
+    key phrase.
+
+    Returns:
+        gitlab project issues
+    """
+
+    issues = gitlab_object.issues.list(
+        search=search_term,
+        state='opened',
+        lazy=True,
+        scope='all',
+        get_all=True,
+    )
+
+    return issues
+
+
+def update_linked_issues(
+    gitlab_object: gitlab.Gitlab, cwd_folder: str
+) -> None:
+    """
+    Fetch linked issues and update the comparison json files.
+
+    Returns:
+        None
+    """
+
+    # collect list of issues validation server has worked with
+    search_key = "Automated code, please do not delete"
+    issues = search_project_issues(gitlab_object, search_key)
+
+    # find out the plots/scripts linked to the issues
+    plot_issues = collections.defaultdict(list)
+    script_issues = collections.defaultdict(list)
+    pattern = r"Relevant ([a-z]+): (\w+.*\w*)"
+    for issue in issues:
+        match = re.search(pattern, issue.description)
+        if match:
+            if match.groups()[0] == 'plot':
+                plot_issues[match.groups()[1]].append(issue.iid)
+            else:
+                script_issues[match.groups()[1]].append(issue.iid)
+
+    # get list of available revision hashes
+    rev_list = get_json_object_list(
+        validationpath.get_html_plots_folder(cwd_folder),
+        validationpath.file_name_comparison_json,
+    )
+
+    for r in rev_list:
+        comparison_json_path = os.path.join(
+            validationpath.get_html_plots_folder(cwd_folder),
+            r,
+            validationpath.file_name_comparison_json,
+        )
+        comparison_json = deliver_json(comparison_json_path)
+        for package in comparison_json["packages"]:
+            for plotfile in package.get("plotfiles"):
+                for plot in plotfile.get("plots"):
+                    if plot["png_filename"] in plot_issues.keys():
+                        plot["issue"] = plot_issues[plot["png_filename"]]
+                    else:
+                        plot["issue"] = []
+
+        with open(comparison_json_path, "w") as jsonFile:
+            json.dump(comparison_json, jsonFile, indent=4)
+
+    # get list of available revision labels
+    rev_list = get_json_object_list(
+            validationpath.get_results_folder(cwd_folder),
+            validationpath.file_name_results_json,
+        )
+    for r in rev_list:
+        revision_json_path = os.path.join(
+                validationpath.get_results_folder(cwd_folder),
+                r,
+                validationpath.file_name_results_json,
+            )
+        revision_json = deliver_json(revision_json_path)
+        for package in revision_json["packages"]:
+            for scriptfile in package.get("scriptfiles"):
+                if scriptfile["name"] in script_issues.keys():
+                    scriptfile["issues"] = script_issues[scriptfile['name']]
+                else:
+                    scriptfile["issues"] = []
+
+        with open(revision_json_path, "w") as jsonFile:
+            json.dump(revision_json, jsonFile, indent=4)
+
+
+def upload_file_gitlab(
+    file_path: str, project: 'gitlab.project'
+) -> Dict[str, str]:
+    """
+    Upload the passed file to the Gitlab project.
+
+    Returns:
+        uploaded gitlab project file object
+    """
+
+    uploaded_file = project.upload(
+        file_path.split("/")[-1], filepath=file_path
+    )
+
+    return uploaded_file
+
+
+def get_librarians(package: str) -> List[str]:
+    """
+    Function to get package librarian(s)' GitLab usernames. Temp solution
+    until the .librarians file directly provides Gitlab usernames.
+
+    Return:
+        list of librarians' Gitlab usernames
+    """
+
+    usernames = []
+    librarian_file = os.path.join(
+        validationpath.get_basepath()['local'],
+        package,
+        '.librarians'
+    )
+    try:
+        with open(librarian_file, 'r') as f:
+            librarians = f.readlines()
+    except FileNotFoundError:
+        logging.exception(
+            f"{librarian_file} couldn't be found. Corrupted package/librarian file?"
+        )
+        return usernames
+    # Temp workaround to fetch DESY -> Gitlab map
+    import importlib
+    desy_map_path = os.path.join(
+        "/home/b2soft/gitlab",
+        "account_map.py"
+    )
+    spec = importlib.util.spec_from_file_location('account_map', desy_map_path)
+    desy_map = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(desy_map)
+    except FileNotFoundError:
+        logging.exception(
+            f"{desy_map_path} couldn't be found. Have you setup Gitlab Webhook?"
+        )
+        return usernames
+
+    for librarian in librarians:
+        usernames.append(desy_map.get_gitlab_account(librarian.rstrip()))
+
+    return usernames
+
+
+def parse_contact(
+        contact: str,
+        map_file: str,
+        package: str,
+        gitlab_object: gitlab.Gitlab
+) -> List[str]:
+    """
+    Parse string to find email id(s) and then match them with their Gitlab ids
+    using the userid map.
+
+    Returns :
+        Dictionary with list of Gitlab IDs and corresponding list of
+        Gitlab usernames.
+    """
+
+    email_regex = re.compile(r"([-!#-'*+/-9=?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*"
+                             r"|\"([]!#-[^-~ \t]|(\\[\t -~]))+\")@([-!#-'*+/-9="
+                             r"?A-Z^-~]+(\.[-!#-'*+/-9=?A-Z^-~]+)*|\[[\t -Z^-~]"
+                             r"*])"
+                             )
+    email_ids = re.finditer(email_regex, contact)
+    assignees = {
+        'gitlab_ids': [],
+        'usernames': [],
+    }
+
+    try:
+        with open(map_file, 'r') as f:
+            id_map = f.readlines()
+    except FileNotFoundError:
+        logging.exception(
+            f"{map_file} couldn't be found. Did you get the location right?"
+        )
+        email_ids = []
+
+    for email in email_ids:
+        try:
+            match = next(
+                (line for line in id_map if email.group() in line), None
+            )
+            if not match:
+                logging.error(
+                    f"No userid found for {email} in the map, could it be that "
+                    "they are (sadly) no longer in the collaboration?"
+                )
+                continue
+            username = match.split(' ')[1].rstrip()
+            assignees['usernames'].append(username)
+        except IndexError:
+            logging.error(
+                f"Map info {match} does not match the required format for map "
+                "'email gitlab_username'."
+            )
+            continue
+
+    # Assign to librarian(s) if no contact found
+    if not assignees['usernames']:
+        assignees['usernames'] = get_librarians(package)
+        logging.info(
+            "Couldn't find contact/id so assigning issue to the"
+            " package librarians."
+        )
+
+    for user in assignees['usernames']:
+        try:
+            assignees['gitlab_ids'].append(
+                gitlab_object.users.list(username=user)[0].id
+                )
+        except IndexError:
+            logging.error(
+                f"Could not find {user} in Gitlab."
+            )
+            continue
+    logging.info(
+        "Issue will be assigned to "
+        f"{[gitlab_object.users.get(id) for id in assignees['gitlab_ids']]}."
+    )
+
+    # to-do: add comment/note if no ids matched
+
+    return assignees
+
+
+def create_gitlab_issue(
+    title: str,
+    description: str,
+    uploaded_file: Dict[str, str],
+    assignees: Dict[str, List],
+    package: str,
+    project: 'gitlab.project'
+) -> str:
+    """
+    Create a new project issue with the passed title, description and package,
+    using Gitlab API.
+
+    Returns:
+        created issue id
+    """
+
+    issue = project.issues.create({"title": title,
+                                   "description": description,
+                                   "labels": [package, 'validation_issue']})
+
+    issue_note = issue.notes.create(
+        {"body": f'View the [error plot/log file]({uploaded_file["url"]}).'}
+    )
+
+    issue.assignee_ids = assignees['gitlab_ids']
+
+    # Workaround for Gitlab not allowing multiple assignees
+    if len(assignees['gitlab_ids']) > 1:
+        related_users = [f'@{user} ' for user in assignees['usernames'][1:]]
+        issue_note.body += f"\n\nPinging {' '.join(related_users)}"
+        issue_note.save()
+
+    issue.save()
+
+    logging.info(f"Created a new Gitlab issue - {issue.iid}")
+
+    return issue.iid
+
+
+def update_gitlab_issue(
+    issue_iid: str,
+    uploaded_file: Dict[str, str],
+    project: 'gitlab.project',
+    file_path: str,
+    rev_label: str
+) -> None:
+    """
+    Update an existing project issue with the passed plotfile.
+
+    Returns:
+        None
+    """
+
+    issue = project.issues.get(issue_iid)
+    name = file_path.split("/")[-1].split(".")[0]
+    package = file_path.split("/")[-2]
+    # check if this is a plot/script based on file format
+    issue_type = 'plot'
+    if 'log' == file_path.split("/")[-1].split(".")[-1]:
+        issue_type = 'script'
+    issue.notes.create(
+        {
+            "body": f'Related observation in validation of `{package}` package, `{name}`' +
+            f'{issue_type} in `{rev_label}` build. View the [error plot/log file]({uploaded_file["url"]}).'
+        }
+    )
+
+    issue.save()
+
+    logging.info(f"Updated existing Gitlab issue {issue.iid}")
+
+
+def update_scriptfile_issues_json(
+        revision_json_path: str,
+        scritptfile_name: str,
+        scritptfile_package: str,
+        issue_id: str
+) -> None:
+    """
+    Update the scriptfile's linked issues key in the relevant revision's
+    json file.
+
+    Returns:
+        None
+    """
+
+    revision_json = deliver_json(revision_json_path)
+    for package in revision_json["packages"]:
+        if package["name"] == scritptfile_package:
+            for scriptfile in package.get("scriptfiles"):
+                if (scriptfile["name"] == scritptfile_name):
+                    scriptfile["issues"].append(issue_id)
+                    break
+
+    with open(revision_json_path, "w") as jsonFile:
+        json.dump(revision_json, jsonFile, indent=4)
+
+
+def update_plot_issues_json(
+        comparison_json_path: str,
+        plot_name: str,
+        plot_package: str,
+        issue_id: str
+) -> None:
+    """
+    Update the plotfile's linked issues key in the relevant comparison
+    json file.
+
+    Returns:
+        None
+    """
+
+    comparison_json = deliver_json(comparison_json_path)
+    for package in comparison_json["packages"]:
+        if package["name"] == plot_package:
+            for plotfile in package.get("plotfiles"):
+                for plot in plotfile.get("plots"):
+                    if (plot["png_filename"] == plot_name):
+                        plot["issue"].append(issue_id)
+                        break
+
+    with open(comparison_json_path, "w") as jsonFile:
+        json.dump(comparison_json, jsonFile, indent=4)
+
+
 class ValidationRoot:
 
     """
@@ -176,10 +651,11 @@ class ValidationRoot:
 
     """
 
-    def __init__(self, working_folder):
+    def __init__(self, working_folder, gitlab_object, gitlab_config, gitlab_map):
         """
         class initializer, which takes the path to the folders containing the
-        validation run results and plots (aka comparison)
+        validation run results and plots (aka comparison), gitlab object and
+        config
         """
 
         #: html folder that contains plots etc.
@@ -193,6 +669,22 @@ class ValidationRoot:
             os.environ["BELLE2_LOCAL_DIR"]
         )
 
+        #: Gitlab object
+        self.gitlab_object = gitlab_object
+
+        #: Gitlab config
+        self.gitlab_config = gitlab_config
+
+        #: Gitlab usermap
+        self.gitlab_map = gitlab_map
+
+        #: placeholder variable for path
+        self.file_path = None
+        #: placeholder variable for revision label
+        self.revision_label = None
+        #: placeholder variable for contact
+        self.contact = None
+
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
@@ -204,7 +696,8 @@ class ValidationRoot:
         rev_list = cherrypy.request.json["revision_list"]
         logging.debug("Creating plots for revisions: " + str(rev_list))
         progress_key = start_plotting_request(
-            rev_list, validationpath.get_results_folder(self.working_folder),
+            rev_list,
+            validationpath.get_results_folder(self.working_folder),
         )
         return {"progress_key": progress_key}
 
@@ -286,7 +779,7 @@ class ValidationRoot:
 
         # Sorting
 
-        # Order by categories (nightly, build, etc.) first, then by date
+        # Order by categories (nightly, release, etc.) first, then by date
         # A pure chronological order doesn't make sense, because we do not
         # have a linear history ((pre)releases branch off) and for the builds
         # the date corresponds to the build date, not to the date of the
@@ -303,7 +796,7 @@ class ValidationRoot:
             # Will later reverse order to bring items in the same category
             # in reverse chronological order, so the following list will have
             # the items in reverse order as well:
-            order = ["release", "prerelease", "build", "nightly"]
+            order = ["release", "prerelease", "nightly"]
             try:
                 index = order.index(category)
             except ValueError:
@@ -404,6 +897,144 @@ class ValidationRoot:
             ),
         }
 
+    @cherrypy.expose
+    def retrieve_file_metadata(self, filename):
+        """
+        Returns:
+            Metadata(str) of the file
+        """
+        cherrypy.response.headers['Content-Type'] = 'text/plain'
+        metadata = validationfunctions.get_file_metadata(filename)
+        return metadata
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    @cherrypy.tools.json_out()
+    def create_issue(self, title, description):
+        """
+        Call the functions to create the issue and redirect
+        to the created Gitlab issue page.
+        """
+
+        # check if this is a plot/script based on file format
+        issue_type = 'plot'
+        if 'log' == self.file_path.split("/")[-1].split(".")[-1]:
+            issue_type = 'script'
+        default_section = self.gitlab_config['global']['default']
+        project_id = self.gitlab_config[default_section]['project_id']
+        # Create issue in the Gitlab project and save it
+        project = get_project_object(self.gitlab_object, project_id)
+        uploaded_file = upload_file_gitlab(self.file_path, project)
+        assignees = {
+            'gitlab_ids': [],
+            'usernames': [],
+        }
+        file_name = self.file_path.split("/")[-1].split(".log")[0]
+        file_package = self.file_path.split("/")[-2]
+        if self.gitlab_map:
+            assignees = parse_contact(
+                self.contact, self.gitlab_map, file_package, self.gitlab_object
+            )
+        description += "\n\n---\n\n:robot: Automated code, please do not delete\n\n" + \
+            f"Relevant {issue_type}: {file_name}\n\n" + \
+            f"Revision label: {self.revision_label}\n\n---"
+        issue_id = create_gitlab_issue(
+            title, description, uploaded_file, assignees, file_package, project
+        )
+        project.save()
+
+        # Update JSON with created issue id - script and plot info reside
+        # in different locations and also have different structures.
+        # todo - maybe this can be combined?
+        if issue_type == 'script':
+            revision_json_path = os.path.join(
+                validationpath.get_results_folder(self.working_folder),
+                self.revision_label,
+                validationpath.file_name_results_json,
+            )
+            update_scriptfile_issues_json(
+                revision_json_path, file_name, file_package, issue_id)
+        else:
+            comparison_json_path = os.path.join(
+                validationpath.get_html_plots_folder(self.working_folder),
+                self.file_path.split("/")[-3],
+                "comparison.json",
+            )
+            update_plot_issues_json(
+                comparison_json_path, file_name, file_package, issue_id)
+
+        issue_url = self.gitlab_config[default_section]['project_url'] \
+            + "/-/issues/" \
+            + str(issue_id)
+        raise cherrypy.HTTPRedirect(
+            issue_url
+        )
+
+    @cherrypy.expose
+    def issue(self, file_path, rev_label, contact):
+        """
+        Return a template issue creation interface
+        for the user to add title and description.
+        """
+        self.file_path = os.path.join(
+            validationpath.get_html_folder(self.working_folder), file_path
+        )
+
+        self.revision_label = rev_label
+        self.contact = contact
+
+        if not self.gitlab_object:
+            return "ERROR: Gitlab integration not set up, verify config file."
+
+        raise cherrypy.HTTPRedirect("/static/validation_issue.html")
+
+    @cherrypy.expose
+    def issue_redirect(self, iid):
+        """
+        Redirect to the Gitlab issue page.
+        """
+        default_section = self.gitlab_config['global']['default']
+        if not self.gitlab_config[default_section]['project_url']:
+            return "ERROR: Gitlab integration not set up, verify config file."
+
+        issue_url = self.gitlab_config[default_section]['project_url'] \
+            + "/-/issues/" \
+            + str(iid)
+        raise cherrypy.HTTPRedirect(
+                issue_url
+            )
+
+    @cherrypy.expose
+    def update_issue(self, id, file_path, rev_label):
+        """
+        Update existing issue in Gitlab with current result plot
+        and redirect to the updated Gitlab issue page.
+        """
+
+        if not self.gitlab_object:
+            return "ERROR: Gitlab integration not set up, verify config file."
+
+        plot_path = os.path.join(
+            validationpath.get_html_folder(self.working_folder), file_path
+        )
+
+        default_section = self.gitlab_config['global']['default']
+        project_id = self.gitlab_config[default_section]['project_id']
+        project = get_project_object(self.gitlab_object, project_id)
+        uploaded_file = upload_file_gitlab(plot_path, project)
+        update_gitlab_issue(
+            id, uploaded_file, project, plot_path, rev_label
+        )
+        project.save()
+
+        issue_url = self.gitlab_config[default_section]['project_url'] \
+            + "/-/issues/" \
+            + str(id)
+
+        raise cherrypy.HTTPRedirect(
+            issue_url
+        )
+
 
 def setup_gzip_compression(path, cherry_config):
     """
@@ -426,7 +1057,9 @@ def setup_gzip_compression(path, cherry_config):
 
 
 def get_argument_parser():
-    """Prepare a parser for all the known command line arguments"""
+    """
+    Prepare a parser for all the known command line arguments
+    """
 
     # Set up the command line parser
     parser = argparse.ArgumentParser()
@@ -459,6 +1092,13 @@ def get_argument_parser():
         help="Run in production environment: "
         "no log/error output via website and no auto-reload",
         action="store_true",
+    )
+    parser.add_argument(
+        "-u",
+        "--usermap",
+        help="Path of file containing <email gitlab_username> map.",
+        type=str,
+        default=None,
     )
 
     return parser
@@ -530,7 +1170,7 @@ def run_server(
 
     if static_folder is None:
         sys.exit(
-            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet "
+            "Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to set "
             "to provide static HTML content. Did you run b2setup ?"
         )
 
@@ -544,8 +1184,8 @@ def run_server(
     # check if the results folder exists and has at least one folder
     if not os.path.isdir(results_folder):
         sys.exit(
-            "Result folder {} does not exist, run validate_basf2 first "
-            "to create validation output".format(results_folder)
+            f"Result folder {results_folder} does not exist, run validate_basf2 first " +
+            "to create validation output"
         )
 
     results_count = sum(
@@ -567,6 +1207,13 @@ def run_server(
 
     if not os.path.exists("plots"):
         os.mkdir("plots")
+
+    if os.path.exists("plots/rainbow.json"):
+        logging.info("Removing old plots and unpopular combinations")
+        validationfunctions.clear_plots(
+            comparison_folder,
+            validationfunctions.get_popular_revision_combinations(cwd_folder)
+        )
 
     # export js, css and html templates
     cherry_config["/static"] = {
@@ -590,8 +1237,8 @@ def run_server(
     cherry_config["/results"] = {
         "tools.staticdir.on": True,
         "tools.staticdir.dir": results_folder,
-        # only serve root files
-        "tools.staticdir.match": r"^.*\.(log|root)$",
+        # only serve root, log and txt files
+        "tools.staticdir.match": r"^.*\.(log|root|txt)$",
         # server the log files as plain text files, and make sure to use
         # utf-8 encoding. Firefox might decide different, if the files
         # are located on a .jp domain and use Shift_JIS
@@ -614,9 +1261,13 @@ def run_server(
         port = int(cmd_arguments.port)
         open_site = cmd_arguments.view
         production_env = cmd_arguments.production
+        usermap_file = cmd_arguments.usermap
 
     cherrypy.config.update(
-        {"server.socket_host": ip, "server.socket_port": port, }
+        {
+            "server.socket_host": ip,
+            "server.socket_port": port,
+        }
     )
     if production_env:
         cherrypy.config.update({"environment": "production"})
@@ -626,9 +1277,38 @@ def run_server(
     if open_site:
         webbrowser.open("http://" + ip + ":" + str(port))
 
+    config_path = os.path.join(static_folder, '../config/gl.cfg')
+
     if not dry_run:
+        # gitlab toggle
+        gitlab_object = None
+        gitlab_config = None
+        gitlab_map = None
+        if not os.path.exists(config_path):
+            logging.warning(
+                "ERROR: Expected to find config folder with Gitlab config,"
+                f" but {config_path} doesn't exist. "
+                "Gitlab features will not work."
+            )
+        else:
+            gitlab_config = get_gitlab_config(config_path)
+            gitlab_object = create_gitlab_object(config_path)
+            if gitlab_object:
+                update_linked_issues(gitlab_object, cwd_folder)
+                gitlab_map = usermap_file
+                logging.info(
+                    f"{gitlab_map} will be used to assign issues."
+                )
+
         cherrypy.quickstart(
-            ValidationRoot(working_folder=cwd_folder), "/", cherry_config
+            ValidationRoot(
+                working_folder=cwd_folder,
+                gitlab_object=gitlab_object,
+                gitlab_config=gitlab_config,
+                gitlab_map=gitlab_map,
+            ),
+            "/",
+            cherry_config,
         )
 
 

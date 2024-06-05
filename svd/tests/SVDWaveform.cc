@@ -140,11 +140,9 @@ namespace Belle2 {
       double time = 40.0e-9; // 40 ns
       // expected function value
       double expected_value = 0;
-      int i = 0;
       for (SVDWaveform::ElementaryWaveform wave : waveform.getElementaryWaveforms()) {
         double value = waveform.waveform(time, wave);
         expected_value += value;
-        i++;
       }
       double function_value = waveform(time);
       EXPECT_EQ(function_value, expected_value);

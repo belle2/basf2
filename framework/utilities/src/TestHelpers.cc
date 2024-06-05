@@ -12,15 +12,15 @@
 #include <framework/gearbox/Gearbox.h>
 
 #include <TVector3.h>
-#include <cmath>
+#include <filesystem>
 
-#include <boost/filesystem.hpp>
 #include <boost/math/special_functions/sign.hpp>
 
+#include <cmath>
 #include <vector>
 
 using namespace Belle2::TestHelpers;
-using namespace boost::filesystem;
+using namespace std::filesystem;
 
 void TestWithGearbox::SetUpTestCase()
 {
@@ -45,10 +45,17 @@ void TestWithGearbox::TearDownTestCase()
 TempDirCreator::TempDirCreator():
   m_oldpwd(current_path().string())
 {
-  path tmpdir = temp_directory_path() / unique_path();
-  create_directories(tmpdir);
+  char* temporaryDirName = strdup((temp_directory_path() / "basf2_XXXXXX").c_str());
+  auto directory = mkdtemp(temporaryDirName);
+  if (!directory) {
+    B2ERROR("Cannot create temporary directory: " << strerror(errno));
+    free(temporaryDirName);
+    return;
+  }
+  path tmpdir = directory;
   current_path(tmpdir);
   m_tmpdir = tmpdir.string();
+  free(temporaryDirName);
 }
 
 TempDirCreator::~TempDirCreator()
@@ -87,9 +94,9 @@ bool Belle2::TestHelpers::isNegative(double expected)
 }
 
 template<>
-bool Belle2::TestHelpers::allNear<TVector3>(const TVector3& expected,
-                                            const TVector3& actual,
-                                            double tolerance)
+bool Belle2::TestHelpers::allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected,
+                                                         const ROOT::Math::XYZVector& actual,
+                                                         double tolerance)
 {
   bool xNear = std::fabs(expected.X() - actual.X()) < tolerance;
   bool yNear = std::fabs(expected.Y() - actual.Y()) < tolerance;

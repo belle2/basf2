@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -54,6 +53,7 @@ output.param('branchNames', ['MCParticles', 'MCInitialParticles', 'Tracks', 'Tra
                              'TOPLikelihoods', 'TOPBarHits', 'ExtHits', 'TOPRecBunch'])
 main.add_module(output)
 
+main.add_module('Progress')
 b2.process(main)
 
 # Print call statistics

@@ -65,8 +65,8 @@ namespace Belle2 {
 
     for (const auto& result : results) {
 
-      const TVector3& trackPosition = result.getPosition();
-      const TVector3& trackMomentum = result.getMomentum();
+      const ROOT::Math::XYZVector& trackPosition = result.getPosition();
+      const ROOT::Math::XYZVector& trackMomentum = result.getMomentum();
       const short& trackCharge = result.getCharge();
 
       RecoTrack* newRecoTrack = m_outputRecoTracks.appendNew(trackPosition, trackMomentum, trackCharge);

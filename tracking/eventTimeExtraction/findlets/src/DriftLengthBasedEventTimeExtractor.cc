@@ -14,6 +14,8 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <Math/VectorUtil.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -26,8 +28,8 @@ namespace {
   {
     WireID wireID(cdcHit.getID());
     unsigned short iCLayer = wireID.getICLayer();
-    const TVector3& pos = mSoP.getPos();
-    const TVector3& mom = mSoP.getMom();
+    const ROOT::Math::XYZVector& pos = ROOT::Math::XYZVector(mSoP.getPos());
+    const ROOT::Math::XYZVector& mom = ROOT::Math::XYZVector(mSoP.getMom());
 
     // measured time = channel t0 - tdc * tdc bin width (ok)
     const bool smear = false;
@@ -49,8 +51,8 @@ namespace {
 
     // The state at index 3 is equivalent to the drift length -> see CDCRecoHit HMatrix
     // The rest is handled by the CDCGeometryPar
-    const TVector3& wirePositon = mSoP.getPlane()->getO();
-    const double alpha = -wirePositon.DeltaPhi(mom);
+    const ROOT::Math::XYZVector& wirePositon = ROOT::Math::XYZVector(mSoP.getPlane()->getO());
+    const double alpha = ROOT::Math::VectorUtil::DeltaPhi(wirePositon, mom);
     const double theta = mom.Theta();
 
     const TVectorD& stateOnPlane = mSoP.getState();

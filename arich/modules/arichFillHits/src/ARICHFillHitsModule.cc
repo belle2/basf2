@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichFillHits/ARICHFillHitsModule.h>
 
 // framework - DataStore
@@ -21,8 +21,6 @@
 #include <arich/dataobjects/ARICHHit.h>
 // magnetic field manager
 #include <framework/geometry/BFieldManager.h>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -62,10 +60,6 @@ namespace Belle2 {
     arichHits.registerInDataStore();
 
     arichHits.registerRelationTo(digits);
-  }
-
-  void ARICHFillHitsModule::beginRun()
-  {
   }
 
   void ARICHFillHitsModule::event()
@@ -116,8 +110,9 @@ namespace Belle2 {
           continue;
         }
 
-        TVector2 hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
-        TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+        ROOT::Math::XYVector hitpos2D = m_geoPar->getChannelPosition(modID, xCh, yCh);
+        ROOT::Math::XYZVector hitpos3D(hitpos2D.X(), hitpos2D.Y(),
+                                       m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
         hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
 
         if (m_bcorrect) magFieldCorrection(hitpos3D);
@@ -141,8 +136,9 @@ namespace Belle2 {
             continue;
           }
 
-          TVector2 hitpos2D = m_geoPar->getChannelPosition(imod, xCh, yCh);
-          TVector3 hitpos3D(hitpos2D.X(), hitpos2D.Y(), m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
+          ROOT::Math::XYVector hitpos2D = m_geoPar->getChannelPosition(imod, xCh, yCh);
+          ROOT::Math::XYZVector hitpos3D(hitpos2D.X(), hitpos2D.Y(),
+                                         m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness());
           hitpos3D = m_geoPar->getMasterVolume().pointToGlobal(hitpos3D);
           if (m_bcorrect) magFieldCorrection(hitpos3D);
           arichHits.appendNew(hitpos3D, imod, ichn);
@@ -152,22 +148,13 @@ namespace Belle2 {
 
   }
 
-  void ARICHFillHitsModule::magFieldCorrection(TVector3& hitpos)
+  void ARICHFillHitsModule::magFieldCorrection(ROOT::Math::XYZVector& hitpos)
   {
-    TVector3 Bfield = BFieldManager::getField(hitpos);
-    TVector3 shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(hitpos);
+    ROOT::Math::XYZVector shift = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z()) * Bfield;
     hitpos.SetX(hitpos.X() - shift.X());
     hitpos.SetY(hitpos.Y() - shift.Y());
   }
-
-  void ARICHFillHitsModule::endRun()
-  {
-  }
-
-  void ARICHFillHitsModule::terminate()
-  {
-  }
-
 
 } // end Belle2 namespace
 

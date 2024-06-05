@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <TFile.h>
@@ -22,7 +22,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDEfficiencyModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDEfficiencyModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -35,39 +35,41 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~DQMHistAnalysisSVDEfficiencyModule();
+    ~DQMHistAnalysisSVDEfficiencyModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 
     //parameters
-    float m_effError; /**<error level of the efficiency */
-    float m_effWarning; /**< warning level of the efficiency */
-    float m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
+    double m_effError; /**<error level of the efficiency */
+    double m_effWarning; /**< warning level of the efficiency */
+    double m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
+    bool m_3Samples; /**< if true enable 3 samples histograms analysis */
+
     //! Data members
 
     /** Reference Histogram Root file name */
@@ -81,6 +83,13 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrU = nullptr; /**<efficiency U error plot canvas */
     TCanvas* m_cEfficiencyErrV = nullptr; /**<efficiency V error plot canvas */
     SVDSummaryPlots* m_hEfficiencyErr = nullptr; /**< efficiency error histo */
+
+    TCanvas* m_cEfficiencyU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
+    TCanvas* m_cEfficiencyV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
+    SVDSummaryPlots* m_hEfficiency3Samples = nullptr; /**< efficiency histo for 3 samples */
+    TCanvas* m_cEfficiencyErrU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
+    TCanvas* m_cEfficiencyErrV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
+    SVDSummaryPlots* m_hEfficiencyErr3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
 
@@ -101,6 +110,9 @@ namespace Belle2 {
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
+
+    std::string m_pvPrefix; /**< string prefix for EPICS PVs */
+
 
   };
 } // end namespace Belle2

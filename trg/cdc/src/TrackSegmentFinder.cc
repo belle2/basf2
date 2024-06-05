@@ -28,6 +28,7 @@
 #include "trg/cdc/TrackSegmentFinder.h"
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
+#include <framework/geometry/B2Vector3.h>
 #include "cdc/dataobjects/CDCSimHit.h"
 #include "mdst/dataobjects/MCParticle.h"
 #include "trg/cdc/FrontEnd.h"
@@ -52,8 +53,6 @@ namespace Belle2 {
     m_makeRootFile(makeRootFile),
     _type(), _tosbE(), _tosbT() // 2019/07/31 by ytlai
   {
-
-    m_Trg_PI = 3.141592653589793;
 
     m_hitPatternInformation = new TClonesArray("TVectorD");
     m_particleEfficiency = new TClonesArray("TVectorD");
@@ -88,10 +87,9 @@ namespace Belle2 {
                                                      const TRGClock& dataClock,
                                                      const TRGClock& userClockInput,
                                                      const TRGClock& userClockOutput,
-                                                     const std::vector<TCSegment*>& tsSL)
+                                                     const std::vector<TRGCDCSegment*>& tsSL)
     : TRGBoard(name, systemClock, dataClock, userClockInput, userClockOutput),
       _cdc(TRGCDC),
-      m_Trg_PI(), // 2019/07/31 by ytlai
       m_logicLUTFlag(),
       m_rootTSFFilename(),
       m_fileTSF(),
@@ -194,7 +192,7 @@ namespace Belle2 {
 
 
   vector <TRGSignalVector*>
-  TSFinder::findTSHit(TRGSignalVector* eachInput, int tsid)
+  TRGCDCTrackSegmentFinder::findTSHit(TRGSignalVector* eachInput, int tsid)
   {
 
     //variables for common
@@ -253,7 +251,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
-        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) |
+        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) or
                               (*Hitmap)[8].riseEdge(changeTime[i]));
 
         /// output for Tracker & N.N
@@ -315,9 +313,9 @@ namespace Belle2 {
   }
 
   TRGSignalVector*
-  TSFinder::packerOuterTracker(vector<TRGSignalVector*>& hitList,
-                               vector<int>& cList,
-                               const unsigned maxHit)
+  TRGCDCTrackSegmentFinder::packerOuterTracker(vector<TRGSignalVector*>& hitList,
+                                               vector<int>& cList,
+                                               const unsigned maxHit)
   {
     TRGSignalVector* result =
       new TRGSignalVector("", (* hitList[0]).clock(), 21 * maxHit);
@@ -350,8 +348,8 @@ namespace Belle2 {
   }
 
   TRGSignalVector*
-  TSFinder::packerOuterEvt(vector<TRGSignalVector*> hitList, vector<int> cList,
-                           int maxHit)
+  TRGCDCTrackSegmentFinder::packerOuterEvt(vector<TRGSignalVector*> hitList, vector<int> cList,
+                                           int maxHit)
   {
 
     //TRGSignalVector * result = new TRGSignalVector("",(*hitList[0]).clock() ,N+9*maxHit);
@@ -376,7 +374,7 @@ namespace Belle2 {
   }
 
   double
-  TSFinder::mkint(TRGState bitInput)
+  TRGCDCTrackSegmentFinder::mkint(TRGState bitInput)
   {
     double r = 0;
     bool* binput = new bool[bitInput.size()];
@@ -390,7 +388,7 @@ namespace Belle2 {
   }
 
   vector<bool>
-  TSFinder::mkbool(int N, int bitSize)
+  TRGCDCTrackSegmentFinder::mkbool(int N, int bitSize)
   {
     vector<bool> boutput;
     boutput.resize(bitSize);
@@ -446,14 +444,14 @@ namespace Belle2 {
       // Find L/R, phi of priority wires
       vector<int> priorityLRs(3);
       vector<float> priorityPhis(3);
-      TVector3 posOnTrack;
-      TVector3 posOnWire;
+      B2Vector3D posOnTrack;
+      B2Vector3D posOnWire;
       if (priority->hit() != 0) {
         int iSimHit = priority->hit()->iCDCSimHit();
         priorityLRs[0] = SimHits[iSimHit]->getPosFlag();
         posOnTrack = SimHits[iSimHit]->getPosTrack();
         posOnWire = SimHits[iSimHit]->getPosWire();
-        priorityPhis[0] = (posOnTrack - posOnWire).Phi() + m_Trg_PI / 2 -
+        priorityPhis[0] = (posOnTrack - posOnWire).Phi() + M_PI_2 -
                           posOnWire.Phi();
         //cout<<ts.name()<<endl;
         //cout<<"Track: "<<posOnTrack.x()<<" "<<posOnTrack.y()<<" "<<posOnTrack.z()<<endl;
@@ -469,7 +467,7 @@ namespace Belle2 {
         priorityLRs[1] = SimHits[iSimHit]->getPosFlag();
         posOnTrack = SimHits[iSimHit]->getPosTrack();
         posOnWire = SimHits[iSimHit]->getPosWire();
-        priorityPhis[1] = (posOnTrack - posOnWire).Phi() + m_Trg_PI / 2 -
+        priorityPhis[1] = (posOnTrack - posOnWire).Phi() + M_PI_2 -
                           posOnWire.Phi();
       } else {
         priorityLRs[1] = -1;
@@ -480,7 +478,7 @@ namespace Belle2 {
         priorityLRs[2] = SimHits[iSimHit]->getPosFlag();
         posOnTrack = SimHits[iSimHit]->getPosTrack();
         posOnWire = SimHits[iSimHit]->getPosWire();
-        priorityPhis[2] = (posOnTrack - posOnWire).Phi() + m_Trg_PI / 2 -
+        priorityPhis[2] = (posOnTrack - posOnWire).Phi() + M_PI_2 -
                           posOnWire.Phi();
       } else {
         priorityLRs[2] = -1;
@@ -648,7 +646,7 @@ namespace Belle2 {
         bitset<9> hitSuperLayers(particleNHitTS[iMCParticle]);
         int numberHitSuperLayers = hitSuperLayers.count();
         //cout<<"iMCParticle: "<< iMCParticle << " # hit TS: "<<numberHitSuperLayers<<" MC # TS: "<<lastSLHit<<endl;
-        float mcPt = mcParticles[iMCParticle]->getMomentum().Perp();
+        float mcPt = mcParticles[iMCParticle]->getMomentum().Rho();
         float efficiency;
         if (lastSLHit == 0) efficiency = -1;
         else efficiency = float(numberHitSuperLayers) / lastSLHit;
@@ -1043,7 +1041,7 @@ namespace Belle2 {
   }
 
   vector <TRGSignalVector*>
-  TSFinder::simulateOuter(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateOuter(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common
@@ -1105,7 +1103,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = (*Hitmap)[6].riseEdge(changeTime[i]);
-        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) |
+        bool priority2rise = ((*Hitmap)[7].riseEdge(changeTime[i]) or
                               (*Hitmap)[8].riseEdge(changeTime[i]));
 
         /// output for Tracker & N.N
@@ -2380,9 +2378,9 @@ namespace Belle2 {
   }
 
   TRGSignalVector*
-  TSFinder::packerForTracker(vector<TRGSignalVector*>& hitList,
-                             vector<int>& cList,
-                             const unsigned maxHit)
+  TRGCDCTrackSegmentFinder::packerForTracker(vector<TRGSignalVector*>& hitList,
+                                             vector<int>& cList,
+                                             const unsigned maxHit)
   {
 
     TRGSignalVector* result =
@@ -2416,7 +2414,7 @@ namespace Belle2 {
   }
 
   vector <TRGSignalVector*>
-  TSFinder::simulateTSFOld(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateTSFOld(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common
@@ -2505,7 +2503,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = pri0->riseEdge(ct);
-        bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+        bool priority2rise = pri1->riseEdge(ct) or pri2->riseEdge(ct);
 
         /// output for Tracker & N.N
         //ready for output
@@ -2582,7 +2580,7 @@ namespace Belle2 {
   }
 
   vector <TRGSignalVector*>
-  TSFinder::simulateTSF(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateTSF(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common
@@ -2691,7 +2689,7 @@ namespace Belle2 {
         }
 
         bool priority1rise = pri0->riseEdge(ct);
-        bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+        bool priority2rise = pri1->riseEdge(ct) or pri2->riseEdge(ct);
 
         /// output for Tracker & N.N
         //ready for output
@@ -2789,7 +2787,7 @@ namespace Belle2 {
         if (found3 && (lv[i] == 3))
           cout << "!!! simulateTSF something wrong(found3)" << endl;
 
-        if ((lv[i] == 1) & (lv[i] == 2))
+        if ((lv[i] == 1) or (lv[i] == 2))
           found1or2 = true;
         else if (lv[i] == 3)
           found3 = true;
@@ -2806,7 +2804,7 @@ namespace Belle2 {
     return result;
   }
   vector <TRGSignalVector*>
-  TSFinder::simulateTSF2(TRGSignalVector* in, unsigned tsid)
+  TRGCDCTrackSegmentFinder::simulateTSF2(TRGSignalVector* in, unsigned tsid)
   {
 
     //variables for common

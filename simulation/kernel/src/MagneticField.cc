@@ -31,11 +31,11 @@ namespace Belle2 {
       static const double pos_conversion{Unit::mm / CLHEP::mm};
       static const double mag_conversion{CLHEP::tesla / Unit::T};
       //Get the magnetic field vector from the central magnetic field map (Geant4 uses [mm] as a length unit)
-      const B2Vector3D point = B2Vector3D{Point} * pos_conversion;
+      const ROOT::Math::XYZVector point = ROOT::Math::XYZVector(Point[0], Point[1], Point[2]) * pos_conversion;
       // get the field in Geant4 units
-      B2Vector3D magField = BFieldManager::getField(point) * mag_conversion;
+      ROOT::Math::XYZVector magField = BFieldManager::getField(point) * mag_conversion;
       // and set it
-      magField.GetXYZ(Bfield);
+      magField.GetCoordinates(Bfield);
     }
 
   }

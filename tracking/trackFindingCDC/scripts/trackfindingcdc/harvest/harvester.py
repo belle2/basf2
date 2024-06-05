@@ -21,9 +21,7 @@ class ReconstructionPositionHarvester(HarvestingModule):
     def __init__(self, output_file_name, tracks_store_vector_name="CDCTrackVector"):
         """ Initiialize with the output file name of the root file and the store obj with the
         CDCTrack vector to use. MC track cands are needed. """
-        super(
-            ReconstructionPositionHarvester,
-            self).__init__(
+        super().__init__(
             foreach=tracks_store_vector_name,
             output_file_name=output_file_name)
 
@@ -164,9 +162,7 @@ class SegmentFakeRatesModule(HarvestingModule):
           mc_track_cands_store_array_name Name of the StoreArray for MC track cands
           legendre_track_cand_store_array_name Name of the StoreArray for legendre track cands
         """
-        super(
-            SegmentFakeRatesModule,
-            self).__init__(
+        super().__init__(
             foreach=local_track_cands_store_array_name,
             output_file_name=output_file_name)
 
@@ -197,8 +193,8 @@ class SegmentFakeRatesModule(HarvestingModule):
 
         is_background = mc_track_matcher_local.isBackgroundPRRecoTrack(local_track_cand)
         is_ghost = mc_track_matcher_local.isGhostPRRecoTrack(local_track_cand)
-        is_matched = mc_track_matcher_local.isMatchedPRRecoTrack(local_track_cand)
-        is_clone = mc_track_matcher_local.isClonePRRecoTrack(local_track_cand)
+        is_matched = mc_track_matcher_local.isAnyChargeMatchedPRRecoTrack(local_track_cand)
+        is_clone = mc_track_matcher_local.isAnyChargeClonePRRecoTrack(local_track_cand)
         is_clone_or_matched = is_matched or is_clone
         hit_purity = abs(mc_track_matcher_local.getRelatedPurity(local_track_cand))
 
@@ -220,8 +216,8 @@ class SegmentFakeRatesModule(HarvestingModule):
 
         if is_clone_or_matched:
             related_mc_track_cand = mc_track_matcher_local.getRelatedMCRecoTrack(local_track_cand)
-            has_partner = (mc_track_matcher_legendre.isMatchedMCRecoTrack(related_mc_track_cand) or
-                           mc_track_matcher_legendre.isMergedMCRecoTrack(related_mc_track_cand))
+            has_partner = (mc_track_matcher_legendre.isAnyChargeMatchedMCRecoTrack(related_mc_track_cand) or
+                           mc_track_matcher_legendre.isAnyChargeMergedMCRecoTrack(related_mc_track_cand))
             mc_track_pt = related_mc_track_cand.getMomSeed().Pt()
             mc_track_dist = related_mc_track_cand.getPosSeed().Mag()
             if has_partner:
@@ -285,9 +281,7 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
         """ Init the harvester with the local track candidates StoreArray name and the one for MC track cands
         and the output file name for the result root file.
         """
-        super(
-            SegmentFinderParameterExtractorModule,
-            self).__init__(
+        super().__init__(
             foreach=local_track_cands_store_array_name,
             output_file_name=output_file_name)
 
@@ -302,7 +296,7 @@ class SegmentFinderParameterExtractorModule(HarvestingModule):
         """ Extract the information from the local track candidate. """
         mc_track_matcher = self.mc_track_matcher
 
-        is_matched = mc_track_matcher.isMatchedPRRecoTrack(local_track_cand)
+        is_matched = mc_track_matcher.isAnyChargeMatchedPRRecoTrack(local_track_cand)
         is_background = mc_track_matcher.isBackgroundPRRecoTrack(local_track_cand)
         is_ghost = mc_track_matcher.isGhostPRRecoTrack(local_track_cand)
 
@@ -382,7 +376,7 @@ class SeedsAnalyser(HarvestingModule):
             helix = Belle2.Helix(legendre_track_cand.getPosSeed(), legendre_track_cand.getMomSeed(), -1, 1.5)
 
         matcher = Belle2.TrackMatchLookUp("MCTrackCands", self.foreach)
-        mc_track_cand = matcher.getMatchedMCRecoTrack(legendre_track_cand)
+        mc_track_cand = matcher.getAnyChargeMatchedMCRecoTrack(legendre_track_cand)
 
         pxd_clusters = Belle2.PyStoreArray("PXDClusters")
         svd_clusters = Belle2.PyStoreArray("SVDClusters")

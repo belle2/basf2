@@ -147,6 +147,10 @@ CDCTriggerHoughETFModule::CDCTriggerHoughETFModule() : Module()
   addParam("suppressClone", m_suppressClone,
            "Switch to send only the first found track and suppress the "
            "subsequent clones.", false);
+
+  addParam("offset", m_offset,
+           "Set certain time offset for ETFHough simulation"
+           "Default as -10", -10);
 }
 
 void
@@ -233,7 +237,7 @@ CDCTriggerHoughETFModule::event()
     phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
     double r = radius[iSL][int(m_usePriority &&
                                m_segmentHits[iHit]->getPriorityPosition() < 3)];
-    TVector2 pos(cos(phi) / r, sin(phi) / r);
+    ROOT::Math::XYVector pos(cos(phi) / r, sin(phi) / r);
     hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
   }
 
@@ -326,7 +330,7 @@ CDCTriggerHoughETFModule::event()
   /* merge track candidates */
   if (m_clusterPattern) {
     if (patternClustering(fastHitMap))
-      m_eventTime->addBinnedEventT0(calcEventTiming(), Const::CDC);
+      m_eventTime->addBinnedEventT0(calcEventTiming() + m_offset, Const::CDC);
   } else {
     connectedRegions();
   }

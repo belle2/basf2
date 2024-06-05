@@ -6,32 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisCDCMonObj.h>
-
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 // CDC geometry
 #include <cdc/geometry/CDCGeometryPar.h>
 
-#include <TH1.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH2Poly.h>
+#include <TROOT.h>
 #include <TEllipse.h>
 #include <TF1.h>
-#include <TCanvas.h>
 #include <TLine.h>
-#include <TClass.h>
-#include <TROOT.h>
-#include <TString.h>
-#include <TFile.h>
 #include <TStyle.h>
 
-#include <fstream>
-#include <vector>
-#include <algorithm>
 #include <numeric>
 
 using namespace std;
@@ -58,7 +44,6 @@ DQMHistAnalysisCDCMonObjModule::DQMHistAnalysisCDCMonObjModule()
 
 DQMHistAnalysisCDCMonObjModule::~DQMHistAnalysisCDCMonObjModule()
 {
-
 }
 
 void DQMHistAnalysisCDCMonObjModule::initialize()
@@ -85,7 +70,7 @@ void DQMHistAnalysisCDCMonObjModule::initialize()
   gStyle->SetPadBottomMargin(0.1);
   gStyle->SetPadLeftMargin(0.15);
 
-  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1000);
+  m_cMain = new TCanvas("cdc_main", "cdc_main", 1500, 1200);
   m_monObj->addCanvas(m_cMain);
 
   m_cADC = new TCanvas("cdc_adc", "cdc_adc", 2000, 10000);
@@ -136,9 +121,6 @@ void DQMHistAnalysisCDCMonObjModule::beginRun()
 
 }
 
-void DQMHistAnalysisCDCMonObjModule::event()
-{
-}
 
 void DQMHistAnalysisCDCMonObjModule::configureBins(TH2Poly* h)
 {
@@ -180,14 +162,25 @@ void DQMHistAnalysisCDCMonObjModule::makeBadChannelList()
   B2DEBUG(20, "num bad wires " << m_badChannels.size());
 }
 
-float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h)
+float DQMHistAnalysisCDCMonObjModule::getHistMean(TH1D* h) const
 {
   TH1D* hist = (TH1D*)h->Clone();
-  hist->SetBinContent(1, 0.0);
+  hist->SetBinContent(1, 0.0); // Exclude 0-th bin
   float m = hist->GetMean();
   return m;
 }
 
+float DQMHistAnalysisCDCMonObjModule::getHistMedian(TH1D* h) const
+{
+  TH1D* hist = (TH1D*)h->Clone();
+  hist->SetBinContent(1, 0.0); // Exclude 0-th bin
+  if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only ADC=0 entries
+  double quantiles[1] = {0.0}; // One element to store median
+  double probSums[1] = {0.5}; // Median definition
+  hist->GetQuantiles(1, quantiles, probSums);
+  float median = quantiles[0];
+  return median;
+}
 
 std::pair<int, int> DQMHistAnalysisCDCMonObjModule::getBoardChannel(unsigned short layer, unsigned short wire)
 {
@@ -234,7 +227,10 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   TH1F* hADC1000 = new TH1F("ADC1000", "ADC1000", 300, 0, 300);
   TH1F* hADC0 = new TH1F("ADC0", "ADC0", 300, 0, 300);
 
+  // Collect ADC mean/median for each board
   std::vector<float> means = {};
+  std::vector<float> medians = {};
+
   for (int i = 0; i < 300; ++i) {
     m_hADCs[i] = m_hADC->ProjectionY(Form("hADC%d", i), i + 1, i + 1, "");
     m_hADCs[i]->SetTitle(Form("hADC%d", i));
@@ -250,7 +246,9 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       }
       float bin1 = m_hADCs[i]->GetBinContent(1);
       float m = getHistMean(m_hADCs[i]);
+      float md = getHistMedian(m_hADCs[i]);
       means.push_back(m);
+      medians.push_back(md);
       hADCMean->SetBinContent(i + 1, m);
       hADCMean->SetBinError(i + 1, 0);
       double overflow = m_hADCs[i]->GetBinContent(m_hADCs[i]->GetNbinsX() + 1);
@@ -278,16 +276,16 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
       fitFunc[i]->SetParameters(init_p0, 100, 0.01, 4700, 4900, 2, 0.01);
       fitFunc[i]->SetParameter(6, 0.02);
       fitFunc[i]->SetParLimits(0, init_p0 - 200, init_p0 + 200);
-      int xxx = -1;
+      int TDCfitstatus = -1;
       if (i < 28) {
-        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
+        TDCfitstatus = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4850, 5000);
       } else {
-        xxx = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
+        TDCfitstatus = m_hTDCs[i]->Fit(fitFunc[i], "qM0", "", 4800, 5000);
       }
       float p4 = fitFunc[i]->GetParameter(4);
       float p5 = fitFunc[i]->GetParameter(5);
 
-      if (xxx != -1 && 4850 < p4 && p4 < 5000) {
+      if (TDCfitstatus != -1 && 4850 < p4 && p4 < 5000) {
         hTDCEdge->SetBinContent(i + 1, p4);
         hTDCEdge->SetBinError(i + 1, 0);
         hTDCSlope->SetBinContent(i + 1, p5);
@@ -302,8 +300,13 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   // Hit related
   B2DEBUG(20, "hit related");
   TH1F* hHitPerLayer = new TH1F("hHitPerLayer", "hit/Layer;layer", 56, 0, 56);
+  TH1F* hHitRatePerWire = new TH1F("hHitRatePerWire", "hit rate (kHz)/Wire;layer", 56, 0, 56);
   int nHits = 0;
   for (int i = 0; i < 56; ++i) {
+    int tdcwindow;
+    double tdcclock = 0.98255764; //unit: ns
+    if (i < 8) tdcwindow = 416;
+    else tdcwindow = 768;
     m_hHits[i] = m_hHit->ProjectionY(Form("hHit%d", i), i + 1, i + 1);
     m_hHits[i]->SetTitle(Form("hHit%d", i));
     if (m_hHits[i]->GetEntries() > 0 && m_hHits[i] != nullptr) {
@@ -313,9 +316,14 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
         nhitSumL += m_hHits[i]->GetBinContent(j + 1);
       }
       if (neve > 0) {
-        hHitPerLayer->SetBinContent(i + 1, static_cast<float>(1.0 * nhitSumL / neve));
-      } else hHitPerLayer->SetBinContent(i + 1, static_cast<float>(nhitSumL));
+        hHitPerLayer->SetBinContent(i + 1, 1.0 * nhitSumL / neve);
+        hHitRatePerWire->SetBinContent(i + 1, (1.0 * nhitSumL / neve) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6));
+      } else {
+        hHitPerLayer->SetBinContent(i + 1, nhitSumL);
+        hHitRatePerWire->SetBinContent(i + 1, (1.0 * nhitSumL) / (1.0 * nBins * tdcwindow * tdcclock * 1e-6));
+      }
       hHitPerLayer->SetBinError(i + 1, 0);
+      hHitRatePerWire->SetBinError(i + 1, 0);
       nHits += nhitSumL;
     }
   }
@@ -358,7 +366,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   }
 
   B2DEBUG(20, "writing");
-  m_cMain->Divide(3, 3);
+  m_cMain->Divide(4, 3);
 
   m_cMain->cd(1);
   hADCMean->SetMinimum(0);
@@ -374,17 +382,24 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   hTDCSlope->SetMinimum(0);
   hTDCSlope->SetMaximum(50);
   hTDCSlope->DrawCopy();
+
   m_cMain->cd(4);
   hBadChannel->DrawCopy("col");
 
   m_cMain->cd(5);
   hBadChannelBC->DrawCopy("col");
-  m_cMain->cd(9);
-  hHitPerLayer->DrawCopy();
+
   m_cMain->cd(7);
   hADC1000->DrawCopy();
+
   m_cMain->cd(8);
   hADC0->DrawCopy();
+
+  m_cMain->cd(9);
+  hHitPerLayer->DrawCopy();
+
+  m_cMain->cd(10);
+  hHitRatePerWire->DrawCopy();
 
   m_cHit->Divide(4, 14);
   for (int i = 0; i < 56; i++) {
@@ -433,6 +448,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   m_monObj->setVariable("nHits", nHits / neve);
   m_monObj->setVariable("nBadWires", m_badChannels.size());
   m_monObj->setVariable("adcMean", std::accumulate(means.begin(), means.end(), 0.0) / means.size());
+  m_monObj->setVariable("adcMeanMedianBoard", std::accumulate(medians.begin(), medians.end(), 0.0) / medians.size());
   m_monObj->setVariable("nDeadADC", nDeadADC);
   m_monObj->setVariable("nBadADC", nBadADC); //???? n_0/n_tot>0.9
   m_monObj->setVariable("tdcEdge", std::accumulate(tdcEdges.begin(), tdcEdges.end(), 0.0) / (tdcEdges.size() - 1 - nDeadTDC));
@@ -445,6 +461,7 @@ void DQMHistAnalysisCDCMonObjModule::endRun()
   delete hTDCEdge;
   delete hTDCSlope;
   delete hHitPerLayer;
+  delete hHitRatePerWire;
 
 }
 

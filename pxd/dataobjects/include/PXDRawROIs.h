@@ -37,7 +37,6 @@ namespace Belle2 {
     ~PXDRawROIs();
 
     /** Get the nr of ROIs.
-     * @param j Index of ROI
      * @return Nr of ROIs.
      */
     unsigned int getNrROIs() const

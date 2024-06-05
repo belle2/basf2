@@ -8,6 +8,7 @@
 
 #include <generators/kkmc/KKGenInterface.h>
 #include <generators/modules/kkgeninput/KKGenInputModule.h>
+#include <framework/utilities/ConditionalGaussGenerator.h>
 #include <mdst/dataobjects/MCParticleGraph.h>
 #include <framework/utilities/FileSystem.h>
 
@@ -20,6 +21,7 @@
 #include <framework/utilities/IOIntercept.h>
 
 #include <boost/filesystem.hpp>
+#include <Math/Vector3D.h>
 
 #include <stdio.h>
 
@@ -35,7 +37,7 @@ REG_MODULE(KKGenInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+KKGenInputModule::KKGenInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("KKGenInput module. This an interface for KK2f Event Generator for basf2. The generated events are stored into MCParticles. You can find an expample of its decay file (tau_decaytable.dat) for tau-pair events at ${BELLE2_RELEASE_DIR}/data/generators/kkmc. On the other hand, when you like to generate mu-pair events, ${BELLE2_RELEASE_DIR}/data/generators/kkmc/mu.input.dat should be set to tauinputFile in your steering file.");
@@ -49,10 +51,11 @@ KKGenInputModule::KKGenInputModule() : Module(), m_initial(BeamParameters::c_sme
   addParam("taudecaytableFile", m_taudecaytableFileName, "tau-decay-table file name",
            FileSystem::findFile("/data/generators/kkmc/tau.input.dat"));
   addParam("kkmcoutputfilename", m_KKMCOutputFileName, "KKMC output filename", string(""));
+
 }
 
 
-void KKGenInputModule::initialize()
+void KKGenInputModule::generatorInitialize()
 {
   //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;
@@ -68,7 +71,7 @@ void KKGenInputModule::beginRun()
 
 }
 
-void KKGenInputModule::event()
+void KKGenInputModule::generatorEvent()
 {
 
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
@@ -83,11 +86,12 @@ void KKGenInputModule::event()
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
   //generate an MCInitialEvent (for vertex smearing)
-  const MCInitialParticles& initial = m_initial.generate();
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = m_initial.getVertexConditional();
+
+  const ConditionalGaussGenerator& lorentzGenerator = m_initial.getLorentzGenerator();
 
   mpg.clear();
-  int nPart =  m_Ikkgen.simulateEvent(mpg, vertex);
+  int nPart =  m_Ikkgen.simulateEvent(mpg, lorentzGenerator, vertex);
 
   // to check surely generated events are received or not
   for (int i = 0; i < nPart; ++i) {
@@ -113,6 +117,7 @@ void KKGenInputModule::terminate()
 
 void KKGenInputModule::initializeGenerator()
 {
+
   FILE* fp;
 
   if (m_KKMCOutputFileName.empty()) {
@@ -145,17 +150,24 @@ void KKGenInputModule::initializeGenerator()
     B2FATAL("KKGenInputModule::initializeGenerator(): " << m_taudecaytableFileName << " not found!");
   }
 
+
+
+  //m_initial.initialize();
+  m_initial.getVertexConditional();
+  double E0cms       = m_initial.getNominalEcms();
+  double E0cmsSpread = m_initial.getNominalEcmsSpread();
+
+
+
   IOIntercept::OutputToLogMessages initLogCapture("EvtGen", LogConfig::c_Debug, LogConfig::c_Info, 100, 100);
   initLogCapture.start();
   m_Ikkgen.setup(m_KKdefaultFileName, m_tauinputFileName,
                  m_taudecaytableFileName, m_KKMCOutputFileName);
 
-  const MCInitialParticles& initial = m_initial.generate();
-  ROOT::Math::PxPyPzEVector v_ler = initial.getLER();
-  ROOT::Math::PxPyPzEVector v_her = initial.getHER();
+
 
   //set the beam parameters, ignoring beam energy spread for the moment
-  m_Ikkgen.set_beam_info(v_ler, 0.0, v_her, 0.0);
+  m_Ikkgen.set_beam_info(E0cms, E0cmsSpread);
   initLogCapture.finish();
 
   m_initialized = true;

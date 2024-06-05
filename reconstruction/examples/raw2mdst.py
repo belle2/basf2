@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -10,7 +9,7 @@
 ##########################################################################
 
 import basf2 as b2
-from reconstruction import add_mdst_output
+from mdst import add_mdst_output
 from softwaretrigger.constants import SoftwareTriggerModes
 from softwaretrigger.processing import add_hlt_processing
 

@@ -14,7 +14,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TH1.h>
 #include <TCanvas.h>
 #include <time.h>
@@ -25,7 +25,7 @@
 namespace Belle2 {
   /** Class for generating snapshots for histograms. */
 
-  class DQMHistDeltaHistoModule : public DQMHistAnalysisModule {
+  class DQMHistDeltaHistoModule final : public DQMHistAnalysisModule {
 
     /**
      * The struct for the snapshots.
@@ -50,32 +50,32 @@ namespace Belle2 {
     /**
      * Destructor.
      */
-    virtual ~DQMHistDeltaHistoModule();
+    ~DQMHistDeltaHistoModule();
 
     /**
      * Initializer.
      */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    virtual void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
     /**
      * Clear content of SSNODE
@@ -86,9 +86,9 @@ namespace Belle2 {
     // Data members
   private:
     /** Names of the histograms that should be monitored */
-    std::vector<std::string> m_monitored_histos;
+    std::vector<std::string> m_monitoredHistos;
     /** Map of histogram names to queues of monitoring objects */
-    std::map<std::string, std::queue<SSNODE*> > m_histos_queues;
+    std::map<std::string, std::queue<SSNODE*> > m_histosQueues;
     /** Interval between checks in second. */
     int m_interval;
     /** The metadata for each event. */

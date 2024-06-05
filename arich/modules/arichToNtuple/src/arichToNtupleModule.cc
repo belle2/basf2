@@ -35,7 +35,6 @@
 
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 
 // Register module in the framework
@@ -49,7 +48,7 @@ arichToNtupleModule::arichToNtupleModule() :
   setDescription("Local arich extension of VariblesToNtuple module to append detailed arich information to reconstructed candidates in the analysis output Ntuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved separate rows.");
   setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
 
-  vector<string> emptylist;
+  std::vector<std::string> emptylist;
   addParam("particleList", m_particleList,
            "Name of particle list with reconstructed particles. If no list is provided the variables are saved once per event (only possible for event-type variables)",
            std::string(""));
@@ -62,8 +61,8 @@ arichToNtupleModule::arichToNtupleModule() :
            "List of aliases for particles to which arich info will be appended (used for tree branch names)",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("arichToNtuple.root"));
-  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output.", std::string("arichToNtuple.root"));
+  addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", std::string("ntuple"));
 
   std::tuple<std::string, std::map<int, unsigned int>> default_sampling{"", {}};
   addParam("sampling", m_sampling,
@@ -143,9 +142,9 @@ void arichToNtupleModule::initialize()
   m_branchAddresses.resize(m_variables.size() + 1);
   m_tree->get().Branch("__weight__", &m_branchAddresses[0], "__weight__/D");
   size_t enumerate = 1;
-  for (const string& varStr : m_variables) {
+  for (const std::string& varStr : m_variables) {
 
-    string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
+    std::string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     m_tree->get().Branch(branchName.c_str(), &m_branchAddresses[enumerate], (branchName + "/D").c_str());
 
     // also collection function pointers
@@ -159,8 +158,8 @@ void arichToNtupleModule::initialize()
   }
 
   // add arich related branches
-  for (const string& varStr : m_arichVariables) {
-    string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
+  for (const std::string& varStr : m_arichVariables) {
+    std::string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
     addARICHBranches(branchName);
   }
 
@@ -174,8 +173,8 @@ void arichToNtupleModule::initialize()
     if (m_sampling_variable == nullptr) {
       B2FATAL("Couldn't find sample variable " << m_sampling_name << " via the Variable::Manager. Check the name!");
     }
-    for (const auto& pair : m_sampling_rates)
-      m_sampling_counts[pair.first] = 0;
+    for (const auto& samplingPair : m_sampling_rates)
+      m_sampling_counts[samplingPair.first] = 0;
   } else {
     m_sampling_variable = nullptr;
   }
@@ -298,20 +297,19 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
       if (!atrk) continue;
 
       if (atrk->hitsWindow()) {
-        TVector2 winHit = atrk->windowHitPosition();
-        m_arich[iTree]->winHit[0] = winHit.X();
-        m_arich[iTree]->winHit[1] = winHit.Y();
+        m_arich[iTree]->winHit[0] = atrk->windowHitPosition().X();
+        m_arich[iTree]->winHit[1] = atrk->windowHitPosition().Y();
       }
 
       m_arich[iTree]->photons = atrk->getPhotons();
 
-      TVector3 recPos = atrk->getPosition();
+      ROOT::Math::XYZVector recPos = atrk->getPosition();
       m_arich[iTree]->recHit.x = recPos.X();
       m_arich[iTree]->recHit.y = recPos.Y();
       m_arich[iTree]->recHit.z = recPos.Z();
 
-      TVector3 recMom = atrk->getDirection() * atrk->getMomentum();
-      m_arich[iTree]->recHit.p = recMom.Mag();
+      ROOT::Math::XYZVector recMom = atrk->getDirection() * atrk->getMomentum();
+      m_arich[iTree]->recHit.p = recMom.R();
       m_arich[iTree]->recHit.theta = recMom.Theta();
       m_arich[iTree]->recHit.phi = recMom.Phi();
 
@@ -337,13 +335,13 @@ void arichToNtupleModule::fillARICHTree(const Particle* particle)
 
       const ARICHAeroHit* aeroHit = atrk->getRelated<ARICHAeroHit>();
       if (aeroHit) {
-        TVector3 truePos = aeroHit->getPosition();
+        ROOT::Math::XYZVector truePos = aeroHit->getPosition();
         m_arich[iTree]->mcHit.x = truePos.X();
         m_arich[iTree]->mcHit.y = truePos.Y();
         m_arich[iTree]->mcHit.z = truePos.Z();
 
-        TVector3 trueMom = aeroHit->getMomentum();
-        m_arich[iTree]->mcHit.p = trueMom.Mag();
+        ROOT::Math::XYZVector trueMom = aeroHit->getMomentum();
+        m_arich[iTree]->mcHit.p = trueMom.R();
         m_arich[iTree]->mcHit.theta = trueMom.Theta();
         m_arich[iTree]->mcHit.phi = trueMom.Phi();
         m_arich[iTree]->mcHit.PDG = aeroHit->getPDG();

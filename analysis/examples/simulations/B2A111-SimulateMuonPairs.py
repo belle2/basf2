@@ -20,9 +20,10 @@
 ##########################################################################
 
 import basf2 as b2
-import simulation as si
-import reconstruction as re
-import beamparameters as bp
+from simulation import add_simulation
+from reconstruction import add_reconstruction
+from beamparameters import add_beamparameters
+from mdst import add_mdst_output
 
 # create path
 main = b2.create_path()
@@ -30,7 +31,7 @@ main = b2.create_path()
 # Setting up number of events to generate
 main.add_module('EventInfoSetter', evtNumList=[10])
 
-beamparameters = bp.add_beamparameters(main, "Y4S")
+beamparameters = add_beamparameters(main, "Y4S")
 beamparameters.param("smearVertex", False)
 beamparameters.param("smearEnergy", False)
 b2.print_params(beamparameters)
@@ -47,13 +48,13 @@ main.add_module('BabayagaNLOInput',
                 VPUncertainty=True)
 
 # detector simulation
-si.add_simulation(path=main)
+add_simulation(path=main)
 
 # reconstruction
-re.add_reconstruction(path=main)
+add_reconstruction(path=main)
 
 # mdst output
-re.add_mdst_output(
+add_mdst_output(
     path=main,
     mc=True,
     filename='B2A111-SimulateMuonPairs.root',

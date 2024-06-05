@@ -89,8 +89,8 @@ class CDCPlotModule(Module):
             # add simhit to the list corresponding to this particle
             idx = mcparts.index(mcpart)
             hitpos = hit.getPosWire()  # TVector3
-            trackhits_x[idx].append(hitpos.x())
-            trackhits_y[idx].append(hitpos.y())
+            trackhits_x[idx].append(hitpos.X())
+            trackhits_y[idx].append(hitpos.Y())
 
         npart = len(mcparts)
         if npart > 0:
@@ -98,7 +98,7 @@ class CDCPlotModule(Module):
             col = [colormap.jet(1.0 * c / (npart - 1)) for c in range(npart)]
             fig = plot(trackhits_x, trackhits_y, col)
 
-            filename = 'cdchits_%i.png' % (self.num_events)
+            filename = f'cdchits_{self.num_events}.png'
             if os.path.lexists(filename):
                 B2WARNING(filename + ' exists, overwriting ...')
             else:

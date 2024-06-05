@@ -7,21 +7,21 @@
  **************************************************************************/
 #pragma once
 
-#include "TVector3.h"
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
   namespace CDC {
     /**
      * Returns a closest distance between a track and a wire.
-     * @param bwp[in] wire position at backward
-     * @param fwp[in] wire position at forward
-     * @param posIn[in] entrance position
-     * @param posOut[in] exit position
-     * @param hitPosition[out] track position corresp. to the closetst distance
-     * @param wirePosition[out] wire position corresp. to the closetst distance
+     * @param[in]  bwp wire position at backward
+     * @param[in]  fwp wire position at forward
+     * @param[in]  posIn entrance position
+     * @param[in]  posOut exit position
+     * @param[out] hitPosition track position corresp. to the closetst distance
+     * @param[out] wirePosition wire position corresp. to the closetst distance
      */
-    double ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
-                           TVector3& hitPosition, TVector3& wirePosition);
+    double ClosestApproach(const B2Vector3D& bwp, const B2Vector3D& fwp, const B2Vector3D& posIn, const B2Vector3D& posOut,
+                           B2Vector3D& hitPosition, B2Vector3D& wirePosition);
 
   } // end of namespace CDC
 } // end of namespace Belle2

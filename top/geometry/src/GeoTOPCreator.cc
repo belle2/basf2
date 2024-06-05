@@ -105,8 +105,8 @@ namespace Belle2 {
       importObj.construct(*geo);
       importObj.import(iov);
 
-      m_topgp->getChannelMapper().import(iov);
-      m_topgp->getFrontEndMapper().import(iov);
+      m_topgp->getChannelMapper().importPayload(iov);
+      m_topgp->getFrontEndMapper().importPayload(iov);
 
       B2RESULT("TOP: geometry and mappers imported to database");
 
@@ -145,7 +145,7 @@ namespace Belle2 {
       double backwardLength = geo.getQBB().getPrismEnclosure().getLength();
       double prismPosition = geo.getQBB().getPrismPosition();
 
-      G4Region* aRegion = new G4Region("TOPEnvelope");
+      G4Region* aRegion = 0;
 
       for (const auto& geoModule : geo.getModules()) {
         int moduleID = geoModule.getModuleID();
@@ -179,6 +179,7 @@ namespace Belle2 {
         std::string name = geoModule.getName();
 
         // Set up region for production cuts
+        if (not aRegion) aRegion = new G4Region("TOPEnvelope"); // allocation moved inside the loop to prevent memory leak warning
         module->SetRegion(aRegion);
         aRegion->AddRootLogicalVolume(module);
 

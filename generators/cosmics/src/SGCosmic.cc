@@ -120,15 +120,15 @@ bool SGCosmic::generateEvent(MCParticleGraph& graph)
     if (isnan(arcLength)) continue;
 
     // Calculate coordinates and momentum at ToP radius
-    TVector3 vector;
+    ROOT::Math::XYZVector vector;
     vector = CosmicMCHelix.getPositionAtArcLength2D(- arcLength);
-    double vx = vector[0];
-    double vy = vector[1];
-    double vz = vector[2];
+    double vx = vector.x();
+    double vy = vector.y();
+    double vz = vector.z();
     vector = CosmicMCHelix.getMomentumAtArcLength2D(- arcLength, bz);
-    double px = vector[0];
-    double py = vector[1];
-    double pz = vector[2];
+    double px = vector.x();
+    double py = vector.y();
+    double pz = vector.z();
     double m = p.getMass();
     double e  = sqrt(px * px + py * py + pz * pz + m * m);
 

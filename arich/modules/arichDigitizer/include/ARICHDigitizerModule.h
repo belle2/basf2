@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ARICHDIGITIZERMODULE_H
-#define ARICHDIGITIZERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHSimulationPar.h>
 #include <arich/dbobjects/ARICHModulesInfo.h>
@@ -20,6 +20,9 @@
 #include <string>
 
 namespace Belle2 {
+  class ARICHDigit;
+  class ARICHSimHit;
+
   /** ARICH digitizer module.
     *
     * This module takes the hits form GEANT4 simulation (ARICHSimHit),
@@ -66,26 +69,7 @@ namespace Belle2 {
      * @param hit local position of simhit
      * @param copyno copy number of hapd
      */
-    void magFieldDistorsion(TVector2& hit, int copyno);
-
-    /**
-     * End-of-run action.
-     *
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     *
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
-    /**
-     *Prints module parameters.
-     */
-    void printModuleParams() const {};
+    void magFieldDistorsion(ROOT::Math::XYVector& hit, int copyno);
 
   private:
 
@@ -100,14 +84,16 @@ namespace Belle2 {
     DBObjPtr<ARICHChannelMask> m_chnMask;     /**< list of dead channels from the DB */
     DBObjPtr<ARICHChannelMapping> m_chnMap;   /**< HAPD (x,y) to asic channel mapping */
 
+    StoreArray<ARICHDigit> m_ARICHDigits;     /**< StoreArray containing the ARICHDigits */
+    StoreArray<ARICHSimHit> m_ARICHSimHits;   /**< StoreArray containing the ARICHSimHits */
+
     /* Other members.*/
     double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
-    double m_timeWindow;             /**< Readout time window width */
+    double m_timeWindow;             /**< Readout time window width in ns */
+    double m_timeWindowStart;        /**< Readout time window shift w.r.t. the global time zero in ns */
     double m_bkgLevel;               /**< Number of background hits ped hapd per readout (electronics noise) */
     int m_bdistort;                  /**< apply distorsion due to magnetic field */
 
   };
 
 } // Belle2 namespace
-
-#endif // ARICHDIGITIZERMODULE_H

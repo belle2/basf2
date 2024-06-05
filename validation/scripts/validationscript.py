@@ -64,11 +64,12 @@ class Script:
     @var path: The path to the steering file
     @var name: The name of the file, but without special chars or spaces
     @var package: The package to which the steering file belongs to
-    @var header: The contents of the XML file header
+    @var _header: The contents of the XML file header
     @var dependencies: On which scripts does the steering file depend
     @var status: The current status, e.g. 'running' or 'finished'
     @var control: Execute locally or on the cluster?
     @var returncode: The returncode of the steering file
+    @type returncode: Optional[int]
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
@@ -127,7 +128,7 @@ class Script:
         self.control = None
 
         # The returncode of the script. Should be 0 if all went well.
-        self.returncode: Optional[int] = None
+        self.returncode = None
 
         #: Id of job for job submission. This is set by some of the
         #: cluster controls in order to terminate the job if it exceeds the
@@ -158,6 +159,10 @@ class Script:
         elif self.status == ScriptStatus.cached:
             string_status = "cached"
 
+        # filter for simulated files
+        input_file_names = [ip.split('/')[-1] for ip in self.input_files if '../' in ip]
+        output_file_names = [op.split('/')[-1] for op in self.output_files if '../' in op]
+
         return json_objects.Script(
             self.name_not_sanitized,
             self.path,
@@ -165,6 +170,8 @@ class Script:
             log_url=os.path.join(self.package, self.name_not_sanitized)
             + ".log",
             return_code=self.returncode,
+            input=input_file_names,
+            output=output_file_names,
         )
 
     def get_recursive_dependencies(self, scripts, level=0):
@@ -175,8 +182,8 @@ class Script:
 
         if level > 50:
             self.log.error(
-                f"Recurisve dependency lookup reached level {level} and will "
-                f"quit now. Possibly circular dependcencies in the validation "
+                f"Recursive dependency lookup reached level {level} and will "
+                f"quit now. Possibly circular dependencies in the validation "
                 f"scripts ? "
             )
 
@@ -209,7 +216,7 @@ class Script:
     def unique_name(self):
         """
         Generates a unique name from the package and name of the script
-        which only occurs once in th whole validation suite
+        which only occurs once in the whole validation suite
         """
         return f"script_unique_name_{self.package}_{self.name}"
 
@@ -367,7 +374,7 @@ class Script:
 
     @property
     def interval(self) -> str:
-        """ Interval of script executation as set in header """
+        """ Interval of script execution as set in header """
         self.load_header()
         return self._header.get("interval", "nightly")
 

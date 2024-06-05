@@ -5,8 +5,14 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/digitization/EclConfigurationPure.h>
+
+/* ECL headers. */
 #include <ecl/digitization/ECLSampledShaper.h>
+
+/* C++ headers. */
 #include <algorithm>
 #include <iostream>
 #include <cassert>

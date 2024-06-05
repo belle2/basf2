@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,12 +10,12 @@
 
 """
 <header>
-  <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>
     This module is used for the SVD validation.
     It gets information about digits, saving
     in a ttree in a ROOT file.
   </description>
+  <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 import xml.etree.ElementTree as ET
@@ -49,7 +48,7 @@ class SVDValidationTTreeStrip(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(SVDValidationTTreeStrip, self).__init__()
+        super().__init__()
         #: output file
         self.file = ROOT.TFile('../SVDValidationTTreeStrip.root', 'recreate')
         #: output ttree

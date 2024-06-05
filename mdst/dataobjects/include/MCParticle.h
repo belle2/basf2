@@ -11,10 +11,8 @@
 #include <framework/gearbox/Const.h>
 #include <framework/core/FrameworkExceptions.h>
 #include <framework/datastore/RelationsObject.h>
-#include <framework/geometry/B2Vector3.h>
 
 #include <TClonesArray.h>
-#include <TVector3.h>
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 
@@ -193,9 +191,9 @@ namespace Belle2 {
      * Return momentum.
      * @return The momentum of the MonteCarlo particle in GeV.
      */
-    TVector3 getMomentum() const
+    ROOT::Math::XYZVector getMomentum() const
     {
-      return TVector3(m_momentum_x, m_momentum_y, m_momentum_z);
+      return ROOT::Math::XYZVector(m_momentum_x, m_momentum_y, m_momentum_z);
     }
 
     /**
@@ -214,9 +212,9 @@ namespace Belle2 {
      *         If the particle crosses the simulation volume boundary,
      *         it is set to the crossing position.
      */
-    TVector3 getDecayVertex() const
+    ROOT::Math::XYZVector getDecayVertex() const
     {
-      return TVector3(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
+      return ROOT::Math::XYZVector(m_decayVertex_x, m_decayVertex_y, m_decayVertex_z);
     }
 
     /**
@@ -389,9 +387,9 @@ namespace Belle2 {
 
     /**
      * Set production vertex position.
-     * @param vertex The position of the production vertex given as TVector3.
+     * @param vertex The position of the production vertex given as XYZVector.
      */
-    void setProductionVertex(const TVector3& vertex)
+    void setProductionVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_productionVertex_x = vertex.X(); m_productionVertex_y = vertex.Y(), m_productionVertex_z = vertex.Z();
     }
@@ -410,9 +408,9 @@ namespace Belle2 {
 
     /**
      * Set particle momentum.
-     * @param momentum The momentum of the MonteCarlo particle given as TVector3.
+     * @param momentum The momentum of the MonteCarlo particle given as XYZVector.
      */
-    void setMomentum(const TVector3& momentum)
+    void setMomentum(const ROOT::Math::XYZVector& momentum)
     {
       m_momentum_x = momentum.X(); m_momentum_y = momentum.Y(), m_momentum_z = momentum.Z();
     }
@@ -440,9 +438,9 @@ namespace Belle2 {
 
     /**
      * Set decay vertex.
-     * @param vertex The position of the decay vertex given as TVector3.
+     * @param vertex The position of the decay vertex given as XYZVector.
      */
-    void setDecayVertex(const TVector3& vertex)
+    void setDecayVertex(const ROOT::Math::XYZVector& vertex)
     {
       m_decayVertex_x = vertex.X(); m_decayVertex_y = vertex.Y(), m_decayVertex_z = vertex.Z();
     }
@@ -565,6 +563,8 @@ namespace Belle2 {
     Const::DetectorSet m_seenIn;  /**< Each bit is a seen-in flag for the corresoponding subdetector of Belle II */
 
     ClassDefOverride(MCParticle, 5); /**< A Class to store the Monte Carlo particle information. */
+
+    friend class FixMergedObjectsModule;
   };
 
 

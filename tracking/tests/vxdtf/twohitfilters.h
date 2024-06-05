@@ -47,8 +47,8 @@ namespace Belle2 {
   /** Test simple Setters and Getters by filling non-zero-values */
   TEST_F(TwoHitFiltersTest, TestFilledFilter)
   {
-    TVector3 innerHit(1, 2, 3);
-    TVector3 outerHit(2, 3, 4);
+    B2Vector3D innerHit(1, 2, 3);
+    B2Vector3D outerHit(2, 3, 4);
 
     TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
 
@@ -93,10 +93,10 @@ namespace Belle2 {
   /** Test simple Setters and Getters by filling extreme values */
   TEST_F(TwoHitFiltersTest, testLargeFilter)
   {
-    TVector3 innerHit(1e150, 0, 0);
-    TVector3 outerHit(0, 0, 0);
-    TVector3 innerHit2(1, 2, 3);
-    TVector3 outerHit2(2, 3, 4);
+    B2Vector3D innerHit(1e150, 0, 0);
+    B2Vector3D outerHit(0, 0, 0);
+    B2Vector3D innerHit2(1, 2, 3);
+    B2Vector3D outerHit2(2, 3, 4);
 
     TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
 
@@ -105,20 +105,22 @@ namespace Belle2 {
     aFilter.resetValues(innerHit2, outerHit2);
 
     // does currently give an error at the clang-build:
-//     EXPECT_DOUBLE_EQ(-atan(sqrt(2.)), aFilter.calcSlopeRZ());
+    // EXPECT_DOUBLE_EQ(-atan(sqrt(2.)), aFilter.calcSlopeRZ());
   }
 
 
   /** testing out of range behavior */
   TEST_F(TwoHitFiltersTest, testOutOfRangeFilter) //approx 1.8e308 ... largest possible value of a double
   {
-    TVector3 innerHit(1e300, 0, 0);
-    TVector3 outerHit(0, 0, 0);
+    B2Vector3D innerHit(1e300, 0, 0);
+    B2Vector3D outerHit(0, 0, 0);
 
+    // \cond Doxygen is confused
     TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
 
-//     EXPECT_DOUBLE_EQ(1e600, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+    // EXPECT_DOUBLE_EQ(1e600, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
     EXPECT_DOUBLE_EQ(innerHit * innerHit, aFilter.calcDist3D()); // does calc dist (outer - innerHit)^2!
+    // \endcond
 
   }
 
@@ -126,10 +128,10 @@ namespace Belle2 {
   TEST_F(TwoHitFiltersTest,
          TestOutOfRangeNormedDistFilter) //FAILS, because both calcDistXY() and calcDist3D() are too large to be stored in a double.
   {
-    TVector3 innerHit(1e300, 0, 1e300);
-    TVector3 outerHit(0, 0, 0);
+    B2Vector3D innerHit(1e300, 0, 1e300);
+    B2Vector3D outerHit(0, 0, 0);
     double correctResult = 1. / 2.; // this should be the result which is analytically correct
-    double wrongResult = 0.; // this is the result because of out of range of double precission
+    double wrongResult = 0.; // this is the result because of out of range of double precision
 
     TwoHitFilters aFilter = TwoHitFilters(outerHit, innerHit); // correct order
 

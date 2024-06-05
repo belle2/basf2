@@ -138,10 +138,8 @@ namespace Photospp {
       hepevt_.jmohep[i][1] = p->getSecondMotherIndex() + 1;
       hepevt_.jdahep[i][0] = p->getDaughterRangeStart() + 1;
       hepevt_.jdahep[i][1] = p->getDaughterRangeEnd()  + 1;
-      hepevt_.vhep  [i][0] = 0.0;
-      hepevt_.vhep  [i][1] = 0.0;
-      hepevt_.vhep  [i][2] = 0.0;
-      hepevt_.vhep  [i][3] = 0.0;
+
+      p->getVertexPosition(&hepevt_.vhep[i][0], &hepevt_.vhep[i][1], &hepevt_.vhep[i][2], &hepevt_.vhep[i][3]);
     }
   }
 

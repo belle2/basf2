@@ -10,7 +10,7 @@
 
 #include <analysis/variables/ROEVariables.h>
 #include <analysis/VariableManager/Manager.h>
-#include <analysis/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -41,7 +41,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
         const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
         if (!qq)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return qq->getR2();
       };
@@ -58,7 +58,7 @@ namespace Belle2 {
         if (continuumSuppressionRelations.size() > 1) {
           B2ERROR("The return value of R2 is ambiguous. Please provide the mask name as argument.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -71,7 +71,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
         const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
         if (!qq)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return qq->getThrustBm();
       };
@@ -88,7 +88,7 @@ namespace Belle2 {
         if (continuumSuppressionRelations.size() > 1) {
           B2ERROR("The return value of thrustBm is ambiguous. Please provide the mask name as argument.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -101,7 +101,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
         const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
         if (!qq)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return qq->getThrustOm();
       };
@@ -118,7 +118,7 @@ namespace Belle2 {
         if (continuumSuppressionRelations.size() > 1) {
           B2ERROR("The return value of thrustOm is ambiguous. Please provide the mask name as argument.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -131,7 +131,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
         const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
         if (!qq)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return qq->getCosTBTO();
       };
@@ -148,7 +148,7 @@ namespace Belle2 {
         if (continuumSuppressionRelations.size() > 1) {
           B2ERROR("The return value of cosTBTO is ambiguous. Please provide the mask name as argument.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -161,7 +161,7 @@ namespace Belle2 {
       auto func = [maskName](const Particle * particle) -> double {
         const ContinuumSuppression* qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
         if (!qq)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         return qq->getCosTBz();
       };
@@ -178,7 +178,7 @@ namespace Belle2 {
         if (continuumSuppressionRelations.size() > 1) {
           B2ERROR("The return value of cosTBz is ambiguous. Please provide the mask name as argument.");
         }
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
     }
 
@@ -241,7 +241,7 @@ namespace Belle2 {
           {
             qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
           }
-          if (!qq) return std::numeric_limits<double>::quiet_NaN();
+          if (!qq) return Const::doubleNaN;
 
           // get the KSFW moments
           std::vector<float> ksfw = qq->getKsfwFS0();
@@ -303,7 +303,7 @@ namespace Belle2 {
             qq = particle->getRelatedTo<ContinuumSuppression>(maskName);
           }
           if (!qq)
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
 
           std::vector<float> cleoCones = qq->getCleoConesALL();
           if (useROE)
@@ -338,7 +338,7 @@ namespace Belle2 {
             if (eventExtraInfo->hasExtraInfo(extraInfoName)) {
               return eventExtraInfo->getExtraInfo(extraInfoName);
             } else {
-              return std::numeric_limits<double>::quiet_NaN();
+              return Const::doubleNaN;
             }
           }
           if (particle->hasExtraInfo(extraInfoName))
@@ -346,7 +346,7 @@ namespace Belle2 {
             return std::log(((particle->getExtraInfo(extraInfoName)) - low) / (high - (particle->getExtraInfo(extraInfoName))));
           } else
           {
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
           }
         };
         return func;
@@ -388,7 +388,7 @@ namespace Belle2 {
             qq = Bparticle->getRelatedTo<ContinuumSuppression>(maskName);
           }
           if (!qq)
-            return std::numeric_limits<double>::quiet_NaN();
+            return Const::doubleNaN;
 
           bool isinROE = isInRestOfEvent(particle);
           ROOT::Math::XYZVector newZ;
@@ -398,12 +398,12 @@ namespace Belle2 {
             newZ = qq->getThrustO();
 
           ROOT::Math::XYZVector newY(0, 0, 0);
-          if (newZ.z() == 0 and newZ.y() == 0)
+          if (newZ.Z() == 0 and newZ.Y() == 0)
             newY.SetX(1);
           else
           {
-            newY.SetY(newZ.z());
-            newY.SetZ(-newZ.y());
+            newY.SetY(newZ.Z());
+            newY.SetZ(-newZ.Y());
           }
           ROOT::Math::XYZVector newX = newY.Cross(newZ);
 

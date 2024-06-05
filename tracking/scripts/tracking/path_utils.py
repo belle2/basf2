@@ -1,3 +1,4 @@
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -16,8 +17,7 @@ from tracking.adjustments import adjust_module
 
 
 def use_local_sectormap(path, pathToLocalSM):
-    """
-    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
+    """    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
     loaded instead the one from the DB. Has to be applied on the path after the SectorMapBootstrap was
     put into the path (usually in add_reconstructin)
 
@@ -70,7 +70,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
 
 
 def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, trackFitHypotheses=None,
-                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False):
+                                    reco_tracks="RecoTracks", add_mva_quality_indicator=False, v0_finding=True):
     """
     Helper function to add the modules performing the
     track fit, the V0 fit and the Belle2 track creation to the path.
@@ -79,6 +79,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
+    :param v0_finding: if false, the V0Finder module is not executed
     :param add_mva_quality_indicator: If true, add the MVA track quality estimation
         to the path that sets the quality indicator property of the found tracks.
     """
@@ -88,7 +89,12 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, tr
                                               reco_tracks=reco_tracks,
                                               add_mva_quality_indicator=add_mva_quality_indicator)
 
-    add_postfilter_track_fit(path, components=components, pruneTracks=pruneTracks, reco_tracks=reco_tracks)
+    # V0 finding
+    if v0_finding:
+        path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+
+    if pruneTracks:
+        add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
 def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
@@ -111,6 +117,7 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
         "Combined_DAFRecoFitter")
     # Add MVA classifier that uses information not included in the calculation of the fit p-value
     # to add a track quality indicator for classification of fake vs. MC-matched tracks
+
     if add_mva_quality_indicator:
         path.add_module("TrackQualityEstimatorMVA", collectEventFeatures=True)
     # create Belle2 Tracks from the genfit Tracks
@@ -122,25 +129,6 @@ def add_prefilter_track_fit_and_track_creator(path, trackFitHypotheses=None,
     # implementation.
     path.add_module('TrackCreator', recoTrackColName=reco_tracks,
                     pdgCodes=[211, 321, 2212] if not trackFitHypotheses else trackFitHypotheses)
-
-
-def add_postfilter_track_fit(path, components=None, pruneTracks=False, reco_tracks="RecoTracks"):
-    """
-    Helper function to add the modules not requred to calcualte HLT filter decision: performing
-    the V0 fit to the path.
-
-    :param path: The path to add the tracking reconstruction modules to
-    :param components: the list of geometry components in use or None for all components.
-    :param pruneTracks: Delete all hits expect the first and the last from the found tracks.
-    :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
-    """
-
-    # V0 finding
-    path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
-
-    # prune genfit tracks
-    if pruneTracks:
-        add_prune_tracks(path, components=components, reco_tracks=reco_tracks)
 
 
 def add_cr_track_fit_and_track_creator(path, components=None,
@@ -262,6 +250,9 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         UsePXDHits=is_pxd_used(components),
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
+
+        path.add_module('TrackToMCParticleRelator')
+
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
         path.add_module('Chi2MCTrackMatcherModule',
@@ -375,7 +366,7 @@ def add_svd_track_finding(
         components,
         input_reco_tracks,
         output_reco_tracks,
-        svd_ckf_mode="VXDTF2_after",
+        svd_ckf_mode="SVD_after",
         use_mc_truth=False,
         add_both_directions=True,
         temporary_reco_tracks="SVDRecoTracks",
@@ -462,21 +453,21 @@ def add_svd_track_finding(
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "only_ckf":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "SVD_after":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
         add_svd_standalone_tracking(path, components=["SVD"],
                                     svd_standalone_mode=svd_standalone_mode,
@@ -654,7 +645,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     ClusterFilterParameters={})
 
     # Find segments within the clusters
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton")
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+                    SegmentRelationFilterParameters={'DBPayloadName': 'trackfindingcdc_RealisticSegmentRelationFilterParameters'})
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
@@ -669,9 +661,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     # Combine segments with axial tracks
     path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.74},
+                    segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'},
                     trackFilter="mva",
-                    trackFilterParameters={"cut": 0.1})
+                    trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'})
 
     output_tracks = "CDCTrackVector"
 
@@ -707,7 +699,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
-            filterParameters={"cut": 0.7},
+            filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
             deleteTracks=True,
             resetTakenFlag=True
         )
@@ -856,7 +848,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     # Constructs clusters and reduce background hits
     path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2})
+                    ClusterFilterParameters={'DBPayloadName': 'trackfindingcdc_ClusterFilterParameters'})
 
     # Find segments within the clusters
     path.add_module("TFCDC_SegmentFinderFacetAutomaton",
@@ -875,9 +867,9 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     # Combine segments with axial tracks
     path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.74},
+                    segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'},
                     trackFilter="mva",
-                    trackFilterParameters={"cut": 0.1})
+                    trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'})
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",

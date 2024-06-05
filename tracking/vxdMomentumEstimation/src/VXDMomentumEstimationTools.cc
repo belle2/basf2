@@ -23,15 +23,15 @@ double VXDMomentumEstimationTools<PXDCluster>::getCalibration() const
 
 /** We have to handle PXD and SVD differently here */
 template <>
-TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const
+ROOT::Math::XYZVector VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(const PXDCluster& cluster) const
 {
   PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
   if (trueHit == nullptr) {
-    return TVector3();
+    return ROOT::Math::XYZVector();
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
+    const ROOT::Math::XYZVector& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
 
     return momentum;
   }
@@ -39,15 +39,15 @@ TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryMomentumOfMCParticle(co
 
 /** We have to handle PXD and SVD differently here */
 template <>
-TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const
+ROOT::Math::XYZVector VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(const SVDCluster& cluster) const
 {
   SVDTrueHit* trueHit = cluster.getRelated<SVDTrueHit>("SVDTrueHits");
   if (trueHit == nullptr) {
-    return TVector3();
+    return ROOT::Math::XYZVector();
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
+    const ROOT::Math::XYZVector& momentum = sensorInfoBase.vectorToGlobal(trueHit->getEntryMomentum(), true);
 
     return momentum;
   }
@@ -55,16 +55,16 @@ TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryMomentumOfMCParticle(co
 
 /** We have to handle PXD and SVD differently here */
 template <>
-TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const
+ROOT::Math::XYZVector VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(const PXDCluster& cluster) const
 {
   PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("PXDTrueHits");
   if (trueHit == nullptr) {
-    return TVector3();
+    return ROOT::Math::XYZVector();
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()),
-                                                            true);
+    const ROOT::Math::XYZVector& momentum =
+      sensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()), true);
 
     return momentum;
   }
@@ -72,16 +72,16 @@ TVector3 VXDMomentumEstimationTools<PXDCluster>::getEntryPositionOfMCParticle(co
 
 /** We have to handle PXD and SVD differently here */
 template <>
-TVector3 VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const
+ROOT::Math::XYZVector VXDMomentumEstimationTools<SVDCluster>::getEntryPositionOfMCParticle(const SVDCluster& cluster) const
 {
   PXDTrueHit* trueHit = cluster.getRelated<PXDTrueHit>("SVDTrueHits");
   if (trueHit == nullptr) {
-    return TVector3();
+    return ROOT::Math::XYZVector();
   } else {
     const VxdID& vxdID = cluster.getSensorID();
     const VXD::SensorInfoBase& sensorInfoBase = VXD::GeoCache::getInstance().getSensorInfo(vxdID);
-    const TVector3& momentum = sensorInfoBase.pointToGlobal(TVector3(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()),
-                                                            true);
+    const ROOT::Math::XYZVector& momentum =
+      sensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(trueHit->getEntryU(), trueHit->getEntryV(), trueHit->getEntryW()), true);
 
     return momentum;
   }

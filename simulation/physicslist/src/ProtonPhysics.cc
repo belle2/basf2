@@ -9,7 +9,7 @@
 #include <simulation/physicslist/ProtonPhysics.h>
 
 #include "G4ProcessManager.hh"
-#include "G4ProtonInelasticProcess.hh"
+#include "G4HadronInelasticProcess.hh"
 #include "G4HadronElasticProcess.hh"
 
 #include "G4CascadeInterface.hh"
@@ -80,7 +80,7 @@ void ProtonPhysics::ConstructProcess()
   procMan->AddDiscreteProcess(pProcEl);
 
   // Inelastic process
-  G4ProtonInelasticProcess* pProcInel = new G4ProtonInelasticProcess;
+  G4HadronInelasticProcess* pProcInel = new G4HadronInelasticProcess("protonInelastic", G4Proton::Definition());
   pProcInel->RegisterMe(loInelModel);
   pProcInel->RegisterMe(m_ftfp);
   pProcInel->AddDataSet(inelCS);

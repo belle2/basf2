@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -24,7 +22,7 @@ from prompt.calibrations.caf_beamspot import settings as beamspot_calibration
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(name="PXD gain calibration",
-                               expert_username="qyliu",
+                               expert_username="takaham",
                                description=__doc__,
                                input_data_formats=["cdst"],
                                input_data_names=["physics"],
@@ -106,7 +104,7 @@ def get_calibrations(input_data, **kwargs):
 
     # input_files_physics = list(reduced_file_to_iov_physics.keys())
     input_iov_set_physics = set(reduced_file_to_iov_physics.values())
-    exp_set = set([iov.exp_low for iov in input_iov_set_physics])
+    exp_set = {iov.exp_low for iov in input_iov_set_physics}
 
     # boundaries setting for run chunks (At certain runs, gain was tuned)
     payload_boundaries = [ExpRun(output_iov.exp_low, output_iov.run_low)]

@@ -1248,7 +1248,7 @@ namespace Belle2 {
       }
 
       /**
-       * Get nonscintillating layer thickness..
+       * Get nonscintillating layer thickness.
        */
       double getNoScintillationThickness() const
       {
@@ -1256,7 +1256,7 @@ namespace Belle2 {
       }
 
       /**
-       * Set nonscintillating layer thickness..
+       * Set nonscintillating layer thickness.
        * @param[in] thickness Nonscintillating layer thickness.
        */
       void setNoScintillationThickness(double thickness)
@@ -1274,7 +1274,7 @@ namespace Belle2 {
 
       /**
        * Set "SiPM" size.
-       * @param[in]
+       * @param[in] rssSize SiPM size.
        */
       void setRSSSize(double rssSize)
       {
@@ -1668,6 +1668,14 @@ namespace Belle2 {
     EKLMGeometry& operator=(const EKLMGeometry& geometry);
 
     /**
+     * Whether to perform beam-background study.
+     */
+    bool beamBackgroundStudy() const
+    {
+      return m_BeamBackgroundStudy;
+    }
+
+    /**
      * Get number of sections.
      */
     int getNSections() const
@@ -1880,6 +1888,9 @@ namespace Belle2 {
     /** Element numbers. */
     const EKLMElementNumbers* m_ElementNumbers; //! ROOT streamer
 
+    /** Whether to perform beam-background study. */
+    bool m_BeamBackgroundStudy = false;
+
     /** Number of sections. */
     int m_NSections;
 
@@ -1950,7 +1961,7 @@ namespace Belle2 {
     ShieldGeometry m_ShieldGeometry;
 
     /** Class version. */
-    ClassDef(Belle2::EKLMGeometry, 5);
+    ClassDef(Belle2::EKLMGeometry, 6);
 
   };
 

@@ -17,6 +17,7 @@ all tags already exist.
 """
 
 from basf2 import LogInfo, LogLevel, logging
+from conditions_db import set_cdb_authentication_token
 
 
 def command_upload(args, db=None):
@@ -59,6 +60,8 @@ def command_upload(args, db=None):
                           "doesn't need to be downloaded. Can be used on first upload "
                           "but the script cannot resume an upload if this option is given")
         return
+
+    set_cdb_authentication_token(db, args.auth_token)
 
     # modify logging to remove the useless module: lines
     for level in LogLevel.values.values():

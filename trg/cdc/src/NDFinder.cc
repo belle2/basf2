@@ -16,6 +16,8 @@
 #include "boost/iostreams/filtering_stream.hpp"
 #include "trg/cdc/NDFinder.h"
 
+#include <TMath.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -527,9 +529,9 @@ float NDFinder::transformVar(float estVal, int idx)
     if (estVal > 180) {
       phiMod -= 360.;
     }
-    return phiMod * m_pi_deg;
+    return phiMod * TMath::DegToRad();
   } else { // theta
-    float thetRad = estVal * m_pi_deg;
+    float thetRad = estVal * TMath::DegToRad();
     return cos(thetRad) / sin(thetRad);
   }
 }
@@ -558,14 +560,12 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<cellweight> highWeight
   double axomega = 0.;
   double axphi = 0.;
   double axtheta = 0.;
-  int ncells = 0;
   long weightSum = 0;
 
   for (cellweight& elem : highWeight) {
     axomega += elem.index[0] * elem.weight;
     axphi += elem.index[1] * elem.weight;
     axtheta += elem.index[2] * elem.weight;
-    ncells++;
     weightSum += elem.weight;
   }
   axomega /= weightSum;

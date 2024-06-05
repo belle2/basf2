@@ -75,7 +75,7 @@ G4PrimaryVertex*  MCParticleGenerator::determineVertex(const MCParticleGraph::Gr
 {
   // We want to determine the simulation vertex for the given particle.
   // So lets see where it is
-  B2Vector3D mcProdVtx = p.getProductionVertex();
+  ROOT::Math::XYZVector mcProdVtx = p.getProductionVertex();
   G4ThreeVector pos(mcProdVtx.X() / Unit::mm * CLHEP::mm,
                     mcProdVtx.Y() / Unit::mm * CLHEP::mm,
                     mcProdVtx.Z() / Unit::mm * CLHEP::mm);
@@ -152,7 +152,7 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
   graphParticle.setValidVertex(mcParticle.hasValidVertex());
   graphParticle.setProductionTime(mcParticle.getProductionTime());
   graphParticle.setDecayTime(mcParticle.getDecayTime());
-  graphParticle.setProductionVertex(B2Vector3D(mcParticle.getProductionVertex()));
+  graphParticle.setProductionVertex(mcParticle.getProductionVertex());
   graphParticle.setMomentum(mcParticle.getMomentum());
   graphParticle.setDecayVertex(mcParticle.getDecayVertex());
   graphParticle.setFirstDaughter(mcParticle.getFirstDaughter());
@@ -187,7 +187,7 @@ void MCParticleGenerator::addParticle(const MCParticle& mcParticle,
                                     mcPartMom4.E() / Unit::MeV * CLHEP::MeV);
     newPart->SetMass(graphParticle.getMass() / Unit::MeV * CLHEP::MeV);
     if (opticalPhoton) {
-      TVector3 polarization = graphParticle.getDecayVertex(); // temporary stored here
+      ROOT::Math::XYZVector polarization = graphParticle.getDecayVertex(); // temporary stored here
       newPart->SetPolarization(polarization.X(), polarization.Y(), polarization.Z());
     }
     newPart->SetUserInformation(new ParticleInfo(graphParticle));

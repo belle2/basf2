@@ -36,15 +36,12 @@
 #include <TH2F.h>
 #include <TFile.h>
 #include <TNtuple.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 #include <TAxis.h>
 
 // ifstream constructor.
 #include <fstream>
-
-const char* record_strings[] = { "Event", "Begin_run", "Pause", "Resume", "End_run" };
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -65,10 +62,10 @@ namespace Belle2 {
     setDescription("Module for the ARICH Beamtest data analysis. It creates track form the MWPC hits and reads the HAPD hits");
 
     //Parameter definition
-    addParam("outputFileName", m_outFile, "Output Root Filename", string("output.root"));
-    vector<string> defaultList;
+    addParam("outputFileName", m_outFile, "Output Root Filename", std::string("output.root"));
+    std::vector<std::string> defaultList;
     addParam("runList", m_runList, "Data Filenames.", defaultList);
-    vector<int> defaultMask;
+    std::vector<int> defaultMask;
     addParam("mwpcTrackMask", m_MwpcTrackMask, "Create track from MWPC layers", defaultMask);
     m_fp = NULL;
     addParam("beamMomentum", m_beamMomentum, "Momentum of the beam [GeV]", 0.0);
@@ -136,8 +133,8 @@ namespace Belle2 {
      dout.open ("ChannelCenterGlob.txt");
      for (int i=0;i<6;i++){
       for (int k=0;k<144;k++){
-        TVector3 r = _arichgp->getChannelCenterGlob(i + 1, k);
-        dout  << r.x() << " " << r.y() << endl;
+        ROOT::Math::XYZVector r = _arichgp->getChannelCenterGlob(i + 1, k);
+        dout  << r.X() << " " << r.Y() << endl;
       }
      }
      dout.close();
@@ -290,20 +287,20 @@ namespace Belle2 {
               double globalTime = 0;
 
               double rposx = 0, rposy = 0;
-              pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
+              std::pair<int, int> eposhapd(_arichbtgp->GetHapdElectronicMap(module * 144 + channelID));
               int channel = eposhapd.second;
 
               if ((channel < 108 && channel > 71) || channel < 36) channel = 108 - (int(channel / 6) * 2 + 1) * 6 +
                     channel;
               else channel = 144 - (int((channel - 36) / 6) * 2 + 1) * 6 + channel - 36;
-              TVector2 loc = _arichgp->getChannelCenterLoc(channel);
+              ROOT::Math::XYVector loc = _arichgp->getChannelCenterLoc(channel);
               if (abs(loc.X()) > 2.3 || abs(loc.Y()) > 2.3) continue;
 
               arichDigits.appendNew(module + 1, channel, globalTime);
 
-              TVector3 rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
-              pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
-              m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.x(), rechit.y(), module, channelID, rposx, rposy);
+              ROOT::Math::XYZVector rechit = _arichgp->getChannelCenterGlob(module + 1, channel);
+              std::pair<double, double> poshapd(_arichbtgp->GetHapdChannelPosition(module * 144 + channelID));
+              m_tuple ->Fill(-poshapd.first, poshapd.second, rechit.X(), rechit.Y(), module, channelID, rposx, rposy);
             }
           }
         }
@@ -314,7 +311,7 @@ namespace Belle2 {
   }
 
 
-  int arichBtestModule::getTrack(int mask, TVector3& r, TVector3& dir)
+  int arichBtestModule::getTrack(int mask, ROOT::Math::XYZVector& r, ROOT::Math::XYZVector& dir)
   {
     int retval = 0;
     //const int trgch = 13;
@@ -372,20 +369,20 @@ namespace Belle2 {
     dir = dir.Unit();
 
 // end replace by fitter
-    if (dir.z() != 0) {
+    if (dir.Z() != 0) {
       for (int i = 0; i < 4; i++) {
         ARICHTracking* w = &m_mwpc[i];
-        double l = (w->reco[2] - r.z()) / dir.z() ;
-        TVector3 rext = r + dir * l;
-        if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.y());
-        if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.x());
+        double l = (w->reco[2] - r.Z()) / dir.Z() ;
+        ROOT::Math::XYZVector rext = r + dir * l;
+        if (!w->status[0])  mwpc_residuals[i][0]->Fill(w->reco[0] - rext.Y());
+        if (!w->status[1])  mwpc_residuals[i][1]->Fill(w->reco[1] - rext.X());
 
         TAxis* axis =  mwpc_residualsz[i][1]->GetYaxis();
         for (int k = 0; k < axis->GetNbins(); k++) {
-          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.z()) / dir.z();
-          TVector3 rextt = r + dir * ll;
-          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.y(), axis->GetBinCenter(k + 1));
-          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.x(), axis->GetBinCenter(k + 1));
+          double ll = (w->reco[2] + axis->GetBinCenter(k + 1) - r.Z()) / dir.Z();
+          ROOT::Math::XYZVector rextt = r + dir * ll;
+          mwpc_residualsz[i][0]->Fill(w->reco[0] - rextt.Y(), axis->GetBinCenter(k + 1));
+          mwpc_residualsz[i][1]->Fill(w->reco[1] - rextt.X(), axis->GetBinCenter(k + 1));
 
         }
       }
@@ -402,12 +399,12 @@ namespace Belle2 {
     //if (print) printf( "[%3d]   %d: ", len, rec_id );
     gzread(fp, data, sizeof(unsigned int)*len);
 
-    TVector3 r;
-    TVector3 dir;
+    ROOT::Math::XYZVector r;
+    ROOT::Math::XYZVector dir;
     if (rec_id == 1) {
       readmwpc(data, len);
       int retval = getTrack(*(m_MwpcTrackMask.begin()), r, dir);
-      //dir = TVector3(0,0,1);
+      //dir = ROOT::Math::XYZVector(0,0,1);
 
       if (!retval) {
         // global transf, add track to datastore
@@ -417,17 +414,17 @@ namespace Belle2 {
         dir *= m_beamMomentum * Unit::GeV;
         r *= Unit::mm /*/ CLHEP::mm*/;
         static ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
-        static TVector3 dr =  _arichbtgp->getTrackingShift();
+        static ROOT::Math::XYZVector dr =  _arichbtgp->getTrackingShift();
 
         r += dr;
 
         //----------------------------------------
         // Track rotation
         //
-        TRotation rot  =  _arichbtgp->getFrameRotation();
-        TVector3  rc   =  _arichbtgp->getRotationCenter();
+        ROOT::Math::Rotation3D rot  =  _arichbtgp->getFrameRotation();
+        ROOT::Math::XYZVector  rc   =  _arichbtgp->getRotationCenter();
 
-        TVector3 rrel  =  rc - rot * rc;
+        ROOT::Math::XYZVector rrel  =  rc - rot * rc;
         r = rot * r + rrel;
         dir = rot * dir;
         r.SetX(-r.X()); dir.SetX(-dir.X());
@@ -435,11 +432,11 @@ namespace Belle2 {
         //
         // end track rotation
         //----------------------------------------
-        r[1]  = -r.y();
-        dir[1] = -dir.y();
-        B2DEBUG(50, "-----------> " <<  rc.x() <<  " " << rc.y() << " " <<   rc.z() << "::::" << rrel.x() <<  " " << rrel.y() << " " <<
-                rrel.z()  << " ----> R " <<   r.x() <<  " " << r.y() << " " <<   r.z() << " ----> S " <<   dir.x() <<  " " << dir.y() << " " <<
-                dir.z());
+        r.SetY(-r.Y());
+        dir.SetY(-dir.Y());
+        B2DEBUG(50, "-----------> " <<  rc.X() <<  " " << rc.Y() << " " <<   rc.Z() << "::::" << rrel.X() <<  " " << rrel.Y() << " " <<
+                rrel.Z()  << " ----> R " <<   r.X() <<  " " << r.Y() << " " <<   r.Z() << " ----> S " <<   dir.X() <<  " " << dir.Y() << " " <<
+                dir.Z());
 
         // Add new ARIHCAeroHit to datastore
         arichAeroHits.appendNew(particleId, r, dir);
@@ -567,7 +564,7 @@ namespace Belle2 {
   void arichBtestModule::terminate()
   {
     int j = 1;
-    BOOST_FOREACH(const string & fname, m_runList) {
+    BOOST_FOREACH(const std::string & fname, m_runList) {
       B2INFO(m_eveList[j] << " events processed from file " << fname);
       j++;
     }

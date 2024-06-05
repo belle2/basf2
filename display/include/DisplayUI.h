@@ -135,7 +135,7 @@ namespace Belle2 {
     void pollNewEvents();
 
     /** Close window and exit immediately. */
-    void exit();
+    void closeAndExit();
 
     /** Add user-defined data (histograms, etc.). */
     void showUserData(const DisplayData& displayData);
@@ -211,7 +211,7 @@ namespace Belle2 {
     /** show event/run/exp number for current event. */
     TGLabel* m_eventLabel{nullptr};
 
-    /** File name prefix (prefix + #event + "_" + projection + ".png"). */
+    /** File name prefix (prefix + event number + "_" + projection + ".png"). */
     TGTextEntry* m_autoFileNamePrefix{nullptr};
 
     /** width of saved PNGs. */

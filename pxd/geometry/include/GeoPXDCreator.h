@@ -47,7 +47,8 @@ namespace Belle2 {
       virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
       {
         DBImportObjPtr<PXDGeometryPar> importObj;
-        importObj.construct(createConfiguration(content));
+        PXDGeometryPar config = createConfiguration(content);
+        importObj.construct(config);
         importObj.import(iov);
       }
 
@@ -64,15 +65,11 @@ namespace Belle2 {
 
       /**
        * Create support structure for a PXD Layer
-       * @param layer Layer ID to create the support
-       * @param support Reference to the database containing the parameters
        */
       virtual VXD::GeoVXDAssembly createLayerSupport();
 
       /**
        * Create support structure for a PXD Ladder
-       * @param layer Layer ID to create the support
-       * @param support Reference to the database containing the parameters
        */
       virtual VXD::GeoVXDAssembly createLadderSupport();
 

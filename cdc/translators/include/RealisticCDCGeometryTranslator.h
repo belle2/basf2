@@ -23,32 +23,32 @@ namespace Belle2 {
       ~RealisticCDCGeometryTranslator() {}
 
       /** Get wire position at forward end. */
-      const TVector3 getWireForwardPosition(const WireID& wireID) override
+      const B2Vector3D getWireForwardPosition(const WireID& wireID) override
       {
         return CDCGeometryPar::Instance().wireForwardPosition(wireID, CDCGeometryPar::c_Aligned);
       }
 
       /** Get virtual wire position at forward end, corresponding to tangent line to wire at input z-position. */
-      const TVector3 getWireForwardPosition(const WireID& wireID, float z) override
+      const B2Vector3D getWireForwardPosition(const WireID& wireID, float z) override
       {
-        TVector3 wPos = (m_wireSag) ?
-                        CDCGeometryPar::Instance().wireForwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
-                        CDCGeometryPar::Instance().wireForwardPosition(wireID,    CDCGeometryPar::c_Aligned);
+        B2Vector3D wPos = (m_wireSag) ?
+                          CDCGeometryPar::Instance().wireForwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
+                          CDCGeometryPar::Instance().wireForwardPosition(wireID,    CDCGeometryPar::c_Aligned);
         return wPos;
       }
 
       /** Get wire position at backward end. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID) override
+      const B2Vector3D getWireBackwardPosition(const WireID& wireID) override
       {
         return CDCGeometryPar::Instance().wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
       }
 
       /** Get virtual wire position at backward end, corresponding to tangent line to wire at input z-position. */
-      const TVector3 getWireBackwardPosition(const WireID& wireID, float z) override
+      const B2Vector3D getWireBackwardPosition(const WireID& wireID, float z) override
       {
-        TVector3 wPos = m_wireSag ?
-                        CDCGeometryPar::Instance().wireBackwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
-                        CDCGeometryPar::Instance().wireBackwardPosition(wireID,    CDCGeometryPar::c_Aligned);
+        B2Vector3D wPos = m_wireSag ?
+                          CDCGeometryPar::Instance().wireBackwardPosition(wireID, z, CDCGeometryPar::c_Aligned) :
+                          CDCGeometryPar::Instance().wireBackwardPosition(wireID,    CDCGeometryPar::c_Aligned);
         return wPos;
       }
 

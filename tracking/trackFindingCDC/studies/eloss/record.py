@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -191,7 +190,7 @@ class ElossHarvestingModule(harvesting.HarvestingModule):
         if mc_particle is None:
             return False
 
-        if mc_particle.getMomentum().Perp() < 0.250:
+        if mc_particle.getMomentum().Rho() < 0.250:
             return False
 
         return is_primary(mc_particle)

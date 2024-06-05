@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -34,5 +33,6 @@ ecldataanalysis.param('rootFileName', '../ECLEvtGenOutput.root')
 ecldataanalysis.param('doTracking', 1)
 main.add_module(ecldataanalysis)
 
+main.add_module('Progress')
 b2.process(main)
 # print(statistics)

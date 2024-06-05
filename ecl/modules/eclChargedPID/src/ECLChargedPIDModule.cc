@@ -6,11 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <math.h>
-#include <algorithm>
-#include "TMath.h"
-
+/* Own header. */
 #include <ecl/modules/eclChargedPID/ECLChargedPIDModule.h>
+
+/* ROOT headers. */
+#include <TMath.h>
+
+/* C++ headers. */
+#include <algorithm>
 
 using namespace Belle2;
 
@@ -70,7 +73,7 @@ void ECLChargedPIDModule::event()
     const auto relShowers = track.getRelationsTo<ECLShower>();
     if (relShowers.size() == 0) continue;
 
-    const double p     = fitRes->getMomentum().Mag();
+    const double p     = fitRes->getMomentum().R();
     const double theta = fitRes->getMomentum().Theta();
     const auto charge  = fitRes->getChargeSign();
 

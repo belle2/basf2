@@ -16,8 +16,6 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
-#include <TVector3.h>
-
 #include <ostream>
 
 using namespace Belle2;

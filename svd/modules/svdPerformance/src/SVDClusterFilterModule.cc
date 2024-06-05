@@ -147,7 +147,7 @@ void SVDClusterFilterModule::create_outVxdID_set()
         bool yShell_IN = true;
 
         const VXD::SensorInfoBase& theSensorInfo = geoCache.getSensorInfo(sensor);
-        const TVector3 globPos = theSensorInfo.pointToGlobal(TVector3(0, 0, 0));
+        const ROOT::Math::XYZVector globPos = theSensorInfo.pointToGlobal(ROOT::Math::XYZVector(0, 0, 0));
         if (globPos.X()*m_xShell < 0)
           xShell_IN = false;
 

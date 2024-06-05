@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 <header>
   <output>BabayagaNLOBhabhaSimRec.root</output>
   <cacheable/>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <description>
     This steering file produces 1000 radiative Bhabha events with
     Babayaga.NLO, runs the detector simulation with mixed in background, and
@@ -68,6 +67,7 @@ main.add_module("Profile")
 # output
 main.add_module("RootOutput", outputFileName="../BabayagaNLOBhabhaSimRec.root")
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics
@@ -75,7 +75,7 @@ print(statistics)
 
 statistics_plots(
     "BabayagaNLOBhabhaSimRec_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation and reconstruction job with radiative "
     "Bhabha events using Babayaga.NLO",
     prefix="BabayagaNLOBhabhaSimRec",
@@ -83,7 +83,7 @@ statistics_plots(
 event_timing_plot(
     "../BabayagaNLOBhabhaSimRec.root",
     "BabayagaNLOBhabhaSimRec_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation and reconstruction job with radiative "
     "Bhabha events using Babayaga.NLO",
     prefix="BabayagaNLOBhabhaSimRec",

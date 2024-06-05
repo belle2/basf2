@@ -37,14 +37,14 @@ namespace Belle2 {
         float averageRate = 0; /**< total detector average hit rate in KHz */
         float superLayerHitRate[f_nSuperLayer] = {0}; /**< SuperLayer average hit rate in kHz */
         float layerHitRate[f_nLayer] = {0}; /**< Layer average hit rate in kHz*/
-        float layerPhiHitRate[f_nLayer][f_nPhiDivision] = {0}; /**< Layer (in the phi bin) average hit rate in kHz*/
+        float layerPhiHitRate[f_nLayer][f_nPhiDivision] = {{0}}; /**< Layer (in the phi bin) average hit rate in kHz*/
         int   timeWindowForSmallCell  = -1;/**< time window for the small cells in 2*508.887 MHz clock ( 1 clock = 0.982536 ns) */
         int   timeWindowForNormalCell = -1;/**< time window for the normal cells in 2*508.887 MHz clock ( 1 clock = 0.982536 ns) */
 
         int   nActiveWireInTotal = 0; /**<  number of wires used in this analysis in the whole CDC*/
         int   nActiveWireInSuperLayer[f_nSuperLayer] = {0}; /**<  number of wires used in this analysis in each super layer*/
         int   nActiveWireInLayer[f_nLayer] = {0}; /**<  number of wires used in this analysis in each layer */
-        int   nActiveWireInLayerPhi[f_nLayer][f_nPhiDivision] = {0}; /**<  number of wires used in this analysis in each phi bin in each layer */
+        int   nActiveWireInLayerPhi[f_nLayer][f_nPhiDivision] = {{0}}; /**<  number of wires used in this analysis in each phi bin in each layer */
 
         int   numEvents = 0; /**< number of events accumulated */
         bool  valid = false;  /**< status: true = rates valid */
@@ -189,7 +189,7 @@ namespace Belle2 {
         0;                             /**< the number of wires used in this hit-rate calculation in the whole CDC */
       int m_nActiveWireInSuperLayer[f_nSuperLayer] = {0};       /**< the number of wires used in this hit-rate calculation in each suler layer */
       int m_nActiveWireInLayer[f_nLayer] = {0};                 /**< the number of wires used in this hit-rate calculation in each layer */
-      int m_nActiveWireInLayerPhi[f_nLayer][f_nPhiDivision] = {0}; /**< the number of wires used in this hit-rate calculation in each phi bin in each layer */
+      int m_nActiveWireInLayerPhi[f_nLayer][f_nPhiDivision] = {{0}}; /**< the number of wires used in this hit-rate calculation in each phi bin in each layer */
 
       /**
        * set m_nActiveWireInTotal, m_nActiveWireInLayer[] and m_nActiveWireInSuperLayer[].

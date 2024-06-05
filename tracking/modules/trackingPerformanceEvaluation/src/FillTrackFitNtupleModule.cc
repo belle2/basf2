@@ -121,8 +121,8 @@ void FillTrackFitNtupleModule::event()
       trk_px[pdgIter] = fitResult->getMomentum().X();
       trk_py[pdgIter] = fitResult->getMomentum().Y();
       trk_pz[pdgIter] = fitResult->getMomentum().Z();
-      trk_p[pdgIter] = fitResult->getMomentum().Mag();
-      trk_pt[pdgIter] = fitResult->getMomentum().Pt();
+      trk_p[pdgIter] = fitResult->getMomentum().R();
+      trk_pt[pdgIter] = fitResult->getMomentum().Rho();
       trk_theta[pdgIter] = fitResult->getMomentum().Theta() * TMath::RadToDeg();
       trk_phi[pdgIter] = fitResult->getMomentum().Phi() * TMath::RadToDeg();
       trk_charge[pdgIter] = fitResult->getChargeSign();
@@ -130,7 +130,7 @@ void FillTrackFitNtupleModule::event()
       if (isnan(chi2)) chi2 = -10;
       if (isinf(chi2)) chi2 = -20;
       trk_chi2[pdgIter] =  chi2;
-      trk_ndf[pdgIter] =  recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(pdgIter.getPDGCode()))->getNdf();
+      trk_ndf[pdgIter] =  fitResult->getNDF();
       trk_pvalue[pdgIter] =  fitResult->getPValue();
       trk_nfailed[pdgIter] = recoTrack->getTrackFitStatus(recoTrack->getTrackRepresentationForPDG(
                                                             pdgIter.getPDGCode()))->getNFailedPoints();
@@ -147,7 +147,7 @@ void FillTrackFitNtupleModule::event()
     Float_t buffer[] = {event_num, event_run, event_exp, event_prod,
                         nhits, ncdc, npxd, nsvd,
                         (Float_t)recoTrack->getPositionSeed().X(), (Float_t)recoTrack->getPositionSeed().Y(), (Float_t)recoTrack->getPositionSeed().Z(),
-                        (Float_t)recoTrack->getMomentumSeed().X(), (Float_t)recoTrack->getMomentumSeed().Y(), (Float_t)recoTrack->getMomentumSeed().Z(), (Float_t)recoTrack->getMomentumSeed().Mag(), (Float_t)recoTrack->getMomentumSeed().Perp(),
+                        (Float_t)recoTrack->getMomentumSeed().X(), (Float_t)recoTrack->getMomentumSeed().Y(), (Float_t)recoTrack->getMomentumSeed().Z(), (Float_t)recoTrack->getMomentumSeed().R(), (Float_t)recoTrack->getMomentumSeed().Rho(),
                         (Float_t)(recoTrack->getMomentumSeed().Theta()* TMath::RadToDeg()), (Float_t)(recoTrack->getMomentumSeed().Phi()* TMath::RadToDeg()), (Float_t)recoTrack->getChargeSeed(),
                         nhits_pid[Const::pion], ncdc_pid[Const::pion], npxd_pid[Const::pion], nsvd_pid[Const::pion],
                         nhits_pid[Const::kaon], ncdc_pid[Const::kaon], npxd_pid[Const::kaon], nsvd_pid[Const::kaon],

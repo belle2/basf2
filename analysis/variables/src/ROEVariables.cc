@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/variables/ROEVariables.h>
 
 #include <analysis/variables/Variables.h>
@@ -59,7 +59,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (not roe.isValid()) {
         B2WARNING("Please use isCloneOfSignalSide variable in for_each ROE loop!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       auto* particleMC = particle->getMCParticle();
       if (!particleMC) {
@@ -81,7 +81,7 @@ namespace Belle2 {
       StoreObjPtr<RestOfEvent> roe;
       if (!roe.isValid()) {
         B2WARNING("Please use hasAncestorFromSignalSide variable in for_each ROE loop!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       auto* particleMC = particle->getMCParticle();
       if (!particleMC) {
@@ -122,7 +122,7 @@ namespace Belle2 {
         if (particle == nullptr)
         {
           B2ERROR("Relation between particle and ROE doesn't exist! currentROEIsInList() variable has to be called from ROE loop");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         return particleList->contains(particle) ? 1 : 0;
 
@@ -141,13 +141,13 @@ namespace Belle2 {
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
         if (not roe.isValid())
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         auto* particle = roe->getRelatedFrom<Particle>();
         if (particle == nullptr)
         {
           B2ERROR("Relation between particle and ROE doesn't exist! particleRelatedToCurrentROE() variable has to be called from ROE loop");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         if (std::holds_alternative<double>(var->function(particle)))
         {
@@ -158,7 +158,7 @@ namespace Belle2 {
         } else if (std::holds_alternative<bool>(var->function(particle)))
         {
           return std::get<bool>(var->function(particle));
-        } else return std::numeric_limits<double>::quiet_NaN();
+        } else return Const::doubleNaN;
 
       };
       return func;
@@ -182,7 +182,7 @@ namespace Belle2 {
           if (roe == nullptr)
           {
             B2ERROR("Neither relation between particle and ROE doesn't exist nor ROE object has not been found!");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
           PCmsLabTransform T;
           ROOT::Math::PxPyPzEVector pRecoil = T.getBeamFourMomentum() - roe->get4Vector();
@@ -197,7 +197,7 @@ namespace Belle2 {
           } else if (std::holds_alternative<bool>(var->function(particle)))
           {
             return std::get<bool>(var->function(particle));
-          } else return std::numeric_limits<double>::quiet_NaN();
+          } else return Const::doubleNaN;
         };
         return func;
       } else {
@@ -250,7 +250,7 @@ namespace Belle2 {
 
       if (!roe) {
         B2ERROR("Relation between particle and ROE doesn't exist!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       return roe->getNKLMClusters();
@@ -261,7 +261,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -276,7 +276,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -291,7 +291,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -307,7 +307,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -323,7 +323,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -339,7 +339,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -355,7 +355,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -371,7 +371,7 @@ namespace Belle2 {
       const MCParticle* mcp = particle->getMCParticle();
 
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       PCmsLabTransform T;
       ROOT::Math::PxPyPzEVector boostvec = T.getBeamFourMomentum();
@@ -396,19 +396,19 @@ namespace Belle2 {
         const MCParticle* mcParticle = particle->getMCParticle();
 
         if (!mcParticle)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         // Get Mother
         const MCParticle* mcMother = mcParticle->getMother();
 
         if (!mcMother)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         // Get daughters
         std::vector<MCParticle*> mcDaughters = mcMother->getDaughters();
 
         if (mcDaughters.size() != 2)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         // Get the companion B meson
         MCParticle* mcROE = nullptr;
@@ -455,7 +455,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return roe->getNTracks(maskName);
@@ -480,7 +480,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return roe->getNECLClusters(maskName);
@@ -505,7 +505,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return roe->getPhotons(maskName).size();
@@ -530,7 +530,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         // Get unused ECLClusters in ROE
@@ -563,7 +563,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return roe->getHadrons(maskName).size();
@@ -596,7 +596,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return roe->getChargedParticles(maskName, abs(pdgCode)).size();
@@ -621,7 +621,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         int result = 0;
         auto particles = roe->getParticles(maskName, false);
@@ -659,7 +659,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         int nPart = 0;
@@ -698,7 +698,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         // Get tracks in ROE
@@ -732,7 +732,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         double extraE = 0.0;
@@ -773,7 +773,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         auto roephotons = roe->getPhotons(maskName);
         ROOT::Math::PxPyPzEVector total4vector;
@@ -802,7 +802,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
         const auto& frame = ReferenceFrame::GetCurrent();
         auto frameRoe4Vector = frame.getMomentum(roe->get4Vector(maskName));
@@ -828,7 +828,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return roe->get4Vector(maskName).M();
@@ -853,7 +853,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -880,7 +880,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -907,7 +907,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -934,7 +934,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -961,7 +961,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -988,7 +988,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         const auto& frame = ReferenceFrame::GetCurrent();
@@ -1015,7 +1015,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         PCmsLabTransform T;
@@ -1042,7 +1042,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         PCmsLabTransform T;
@@ -1103,7 +1103,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector neutrino4vec = missing4Vector(particle, maskName, "1");
         ROOT::Math::PxPyPzEVector neutrino4vecLAB = missing4Vector(particle, maskName, "6");
 
-        double deltaE = std::numeric_limits<float>::quiet_NaN();
+        double deltaE = Const::doubleNaN;
 
         // Definition 0: CMS
         if (opt == "0")
@@ -1151,7 +1151,7 @@ namespace Belle2 {
         ROOT::Math::PxPyPzEVector sig4vecLAB = particle->get4Vector();
         ROOT::Math::PxPyPzEVector neutrino4vec;
 
-        double mbc = std::numeric_limits<float>::quiet_NaN();
+        double mbc = Const::doubleNaN;
 
         // Definition 0: CMS
         if (opt == "0")
@@ -1235,7 +1235,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, opt).Theta();
@@ -1265,7 +1265,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, opt).P();
@@ -1295,7 +1295,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, opt).Px();
@@ -1325,7 +1325,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, opt).Py();
@@ -1355,7 +1355,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, opt).Pz();
@@ -1385,7 +1385,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, opt).energy();
@@ -1410,7 +1410,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         double pz = 0;
@@ -1456,7 +1456,7 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         return missing4Vector(particle, maskName, "5").M2() / (2.0 * missing4Vector(particle, maskName, "5").energy());
@@ -1486,13 +1486,13 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         int n = particle->getNDaughters();
 
         if (n < 1)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         // Assumes lepton is the last particle in the reco decay chain!
         PCmsLabTransform T;
@@ -1527,13 +1527,13 @@ namespace Belle2 {
         if (!roe)
         {
           B2ERROR("Relation between particle and ROE doesn't exist!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
 
         int n = particle->getNDaughters();
 
         if (n < 1)
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         PCmsLabTransform T;
         const Particle* lep = particle->getDaughter(n - 1);
@@ -1650,7 +1650,7 @@ namespace Belle2 {
 
         StoreObjPtr<RestOfEvent> roe("RestOfEvent");
         if (not roe.isValid())
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
 
         if (roe->hasParticle(particle, maskName))
         {
@@ -1677,7 +1677,7 @@ namespace Belle2 {
       unsigned nDaughters = particle->getNDaughters();
       if (nDaughters < 2) {
         B2ERROR("The particle must have at least two daughters.");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       for (unsigned i = 0; i < particle->getNDaughters(); i++) {
@@ -1700,7 +1700,7 @@ namespace Belle2 {
       }
 
       B2ERROR("There is no daughter particle loaded from the ROE object.");
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
     }
 
     Manager::FunctionPtr pi0Prob(const std::vector<std::string>& arguments)
@@ -1722,7 +1722,7 @@ namespace Belle2 {
           } else {
             B2WARNING("Pi0ProbOrigin is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else if (mode == "tight")
         {
@@ -1731,7 +1731,7 @@ namespace Belle2 {
           } else {
             B2WARNING("Pi0ProbTightEnergyThreshold is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else if (mode == "cluster")
         {
@@ -1740,7 +1740,7 @@ namespace Belle2 {
           } else {
             B2WARNING("Pi0ProbLargeClusterSize is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else if (mode == "both")
         {
@@ -1749,11 +1749,11 @@ namespace Belle2 {
           } else {
             B2WARNING("Pi0ProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       };
       return func;
@@ -1778,7 +1778,7 @@ namespace Belle2 {
           } else {
             B2WARNING("EtaProbOrigin is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else if (mode == "tight")
         {
@@ -1787,7 +1787,7 @@ namespace Belle2 {
           } else {
             B2WARNING("EtaProbTightEnergyThreshold is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else if (mode == "cluster")
         {
@@ -1796,7 +1796,7 @@ namespace Belle2 {
           } else {
             B2WARNING("EtaProbLargeClusterSize is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else if (mode == "both")
         {
@@ -1805,11 +1805,11 @@ namespace Belle2 {
           } else {
             B2WARNING("EtaProbTightEnergyThresholdAndLargeClusterSize is not registerted in extraInfo! \n"
                       "the function writePi0EtaVeto has to be executed to register this extraInfo.");
-            return std::numeric_limits<float>::quiet_NaN();
+            return Const::doubleNaN;
           }
         } else
         {
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       };
       return func;
@@ -1871,7 +1871,7 @@ namespace Belle2 {
         B2Vector3D pB = - roe4vec.Vect();
         pB.SetMag(0.340);
         pB -= rec4vec.Vect();
-        miss4vec.SetPxPyPzE(pB.x(), pB.y(), pB.z(), E_beam_cms - rec4vec.E());
+        miss4vec.SetPxPyPzE(pB.X(), pB.Y(), pB.Z(), E_beam_cms - rec4vec.E());
       }
 
       // Definition 5: LAB, use energy and momentum of tracks and clusters from whole event
@@ -2057,29 +2057,33 @@ namespace Belle2 {
                           "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.", Manager::VariableDataType::c_double);
 
     REGISTER_VARIABLE("roeMC_E", ROE_MC_E,
-                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV");
+                      "Returns true energy of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n", "GeV");
 
     REGISTER_VARIABLE("roeMC_M", ROE_MC_M,
-                      "Returns true invariant mass of unused tracks and clusters in ROE", "GeV/:math:`\\text{c}^2`");
+                      "Returns true invariant mass of unused tracks and clusters in ROE\n\n", "GeV/:math:`\\text{c}^2`");
 
     REGISTER_VARIABLE("roeMC_P", ROE_MC_P,
-                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n", "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Px", ROE_MC_Px,
-                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns x component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Py", ROE_MC_Py,
-                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns y component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Pz", ROE_MC_Pz,
-                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "GeV/c");
+                      "Returns z component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "GeV/c");
 
     REGISTER_VARIABLE("roeMC_Pt", ROE_MC_Pt,
-                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.",
+                      "Returns transverse component of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
                       "GeV/c");
 
     REGISTER_VARIABLE("roeMC_PTheta", ROE_MC_PTheta,
-                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.", "rad");
+                      "Returns polar angle of true momentum of unused tracks and clusters in ROE, can be used with ``use***Frame()`` function.\n\n",
+                      "rad");
 
     REGISTER_METAVARIABLE("roeMC_MissFlags(maskName)", ROE_MC_MissingFlags,
                           "Returns flags corresponding to missing particles on ROE side.", Manager::VariableDataType::c_double);

@@ -43,11 +43,11 @@ if __name__ == "__main__":
     # get metadata and base_tags from input file
     if args.input_file:
         if not os.path.isfile(args.input_file):
-            basf2.B2FATAL("No input file %s" % args.input_file)
+            basf2.B2FATAL(f"No input file {args.input_file}")
         process = subprocess.Popen(['b2file-metadata-show', '--json', args.input_file], stdout=subprocess.PIPE)
         out = process.communicate()[0]
         if process.returncode != 0:
-            basf2.B2FATAL("Could not get metadata from file %s" % args.input_file)
+            basf2.B2FATAL(f"Could not get metadata from file {args.input_file}")
         metadata = [json.loads(out)]
         base_tags = metadata[0]['globalTag'].split()
 

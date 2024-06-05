@@ -10,7 +10,7 @@
 
 # make sure belle2 is setup
 if [ -z ${BELLE2_LOCAL_DIR} ] && [ -z ${BELLE2_RELEASE_DIR} ]; then
-  echo "Please setup the Belle 2 Software before calling this script by sourcing b2setup"
+  echo "Please setup the Belle II software before calling this script by sourcing b2setup"
   exit 1
 fi
 # take release directory or local directory as base
@@ -67,5 +67,6 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 cd ${SOFTWARE_DIR}
 # make sure the link to the tools exists
 ln -sfT ${BELLE2_TOOLS}/doc build/tools_doc
+ln -sfT ${BELLE2_TOOLS} build/belle2_tools
 # and run sphinx and forward all extra arguments
 sphinx-build -ENT -b ${TARGET} -c site_scons/sphinx -d ${OUTPUT}/doctrees . ${OUTPUT}/${TARGET} ${EXTRA_SPHINX_ARGS} "$@"

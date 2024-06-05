@@ -10,7 +10,7 @@
 #pragma once
 
 #include <string>
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 
 namespace Belle2 {
@@ -24,7 +24,8 @@ namespace Belle2 {
     typedef unsigned int uInt;
 
     /** Standard constructor. */
-    ExporterHitInfo(TVector3 globalHitPosition, TVector3 covValues, int layerID, uShort vID, uInt sID, double angleOfSensor, int hitID,
+    ExporterHitInfo(B2Vector3D globalHitPosition, B2Vector3D covValues, int layerID, uShort vID, uInt sID, double angleOfSensor,
+                    int hitID,
                     int hitType, int classification = -1, int particleID = -1, int pdg = -1):
       m_hitPos(globalHitPosition),
       m_covVal(covValues),
@@ -84,8 +85,8 @@ namespace Belle2 {
   protected:
 
 
-    TVector3 m_hitPos; /**< global coordinates of hit */
-    TVector3 m_covVal; /**< carries relevant values of the covariance matrix for the hit. entries are (CovUU, CovUV, CoVV) */
+    B2Vector3D m_hitPos; /**< global coordinates of hit */
+    B2Vector3D m_covVal; /**< carries relevant values of the covariance matrix for the hit. entries are (CovUU, CovUV, CoVV) */
     int m_layerID; /**< layerID, for PXD, this is normally 1 or 2, for SVD its typically 3-6 */
     uShort m_vxdID; /**< vxdID for sensor-identification */
     uInt m_sectorID; /**< stores the sector ID on current sensor for current hit */

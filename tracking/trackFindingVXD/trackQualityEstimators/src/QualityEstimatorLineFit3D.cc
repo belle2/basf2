@@ -14,7 +14,6 @@ using namespace Belle2;
 
 double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*> const& measurements)
 {
-  TVector3 directionVector;
   double sumWyi = 0, // sum of weights for Yi
          sumWzi = 0, // sum of weights for Zi
          sumWyiXi = 0, // sum of (y-weights times x-values)
@@ -77,8 +76,6 @@ double QualityEstimatorLineFit3D::estimateQuality(std::vector<SpacePoint const*>
             + pow(((aHit->getPosition().Z() - slopeZ * aHit->getPosition().X() - interceptZ) / aHit->getPositionError().Z()), 2);
   }
   m_results.chiSquared = chi2;
-
-  //m_results.p = B2Vector3<double>(1, slopeY, slopeZ);
 
   return TMath::Prob(chi2,  measurements.size() - 1);
 }

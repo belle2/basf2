@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BHWIDEINPUTMODULE_H
-#define BHWIDEINPUTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
@@ -110,5 +109,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif /* BHWIDEINPUTMODULE_H */

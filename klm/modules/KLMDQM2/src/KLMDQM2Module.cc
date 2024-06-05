@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Belle 2 headers. */
+/* Own header. */
 #include <klm/modules/KLMDQM2/KLMDQM2Module.h>
+
+/* Basf2 headers. */
 #include <mdst/dataobjects/Track.h>
 
 /* ROOT headers. */
@@ -46,11 +48,11 @@ KLMDQM2Module::KLMDQM2Module() :
   m_AllExtHitsEKLMSector{nullptr}
 {
   // Set module properties
-  setDescription(R"DOC("Additional Module for KLMDQM plots after HLT filters
+  setDescription(R"DOC(Additional Module for KLMDQM plots after HLT filters
 
-    An additional module developed to display plane efficiencies for the KLM dduring runs (i.e. for online analyses). 
-    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events. 
-    The output histograms would be plane efficiences = MatchedDigits/AllExtits.
+    An additional module developed to display plane efficiencies for the KLM during runs (i.e. for online analyses).
+    This module would be called after HLT filter in order to use mumu-tight skim to select reasonable events.
+    The output histograms would be plane efficiencies = MatchedDigits/AllExtits.
     )DOC");
 
   // Parameter definitions
@@ -58,7 +60,7 @@ KLMDQM2Module::KLMDQM2Module() :
            std::string("mu+:all"));
   addParam("AllowedDistance1D", m_AllowedDistance1D,
            "Maximal distance in the units of strip number from ExtHit to "
-           "matching KLMDigit.", double(8));
+           "matching KLMDigit (not for multi-strip hits).", double(8));
   addParam("MinimalMatchingDigits", m_MinimalMatchingDigits,
            "Minimal number of matching digits.", 0);
   addParam("MinimalMatchingDigitsOuterLayers",
@@ -74,6 +76,9 @@ KLMDQM2Module::KLMDQM2Module() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLMEfficiencyDQM"));
+  addParam("SoftwareTriggerName", m_SoftwareTriggerName,
+           "Software Trigger for event selection",
+           std::string("software_trigger_cut&skim&accept_mumutight"));
 
 }
 
@@ -98,13 +103,11 @@ void KLMDQM2Module::defineHisto()
                                "Matched Hits in BKLM Plane",
                                m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
   m_MatchedHitsBKLM->GetXaxis()->SetTitle("Layer Number");
-  //m_MatchedHitsBKLM->SetOption("LIVE");
 
   m_AllExtHitsBKLM = new TH1F("all_ext_hitsBKLM",
                               "All ExtHits in BKLM Plane",
                               m_PlaneNumBKLM, 0.5, 0.5 + m_PlaneNumBKLM);
   m_AllExtHitsBKLM->GetXaxis()->SetTitle("Layer number");
-  //m_AllExtHitsBKLM->SetOption("LIVE");
 
 
 
@@ -112,13 +115,11 @@ void KLMDQM2Module::defineHisto()
                                "Matched Hits in EKLM Plane",
                                m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
   m_MatchedHitsEKLM->GetXaxis()->SetTitle("Plane number");
-  //m_MatchedHitsEKLM->SetOption("LIVE");
 
   m_AllExtHitsEKLM = new TH1F("all_ext_hitsEKLM",
                               "All ExtHits in EKLM Plane",
                               m_PlaneNumEKLM, 0.5, m_PlaneNumEKLM + 0.5);
   m_AllExtHitsEKLM->GetXaxis()->SetTitle("Plane number");
-  //m_AllExtHitsEKLM->SetOption("LIVE");
 
 
 
@@ -132,13 +133,11 @@ void KLMDQM2Module::defineHisto()
                                      "Matched Hits in BKLM Sector",
                                      BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_MatchedHitsBKLMSector->GetXaxis()->SetTitle("Sector Number");
-  //m_MatchedHitsBKLMSector->SetOption("LIVE");
 
   m_AllExtHitsBKLMSector = new TH1F("all_ext_hitsBKLMSector",
                                     "All ExtHits in BKLM Sector",
                                     BKLMMaxSectors, 0.5, 0.5 + BKLMMaxSectors);
   m_AllExtHitsBKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_AllExtHitsBKLMSector->SetOption("LIVE");
 
 
 
@@ -146,13 +145,11 @@ void KLMDQM2Module::defineHisto()
                                      "Matched Hits in EKLM Sector",
                                      EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_MatchedHitsEKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_MatchedHitsEKLMSector->SetOption("LIVE");
 
   m_AllExtHitsEKLMSector = new TH1F("all_ext_hitsEKLMSector",
                                     "All ExtHits in EKLM Sector",
                                     EKLMMaxSectors, 0.5, EKLMMaxSectors + 0.5);
   m_AllExtHitsEKLMSector->GetXaxis()->SetTitle("Sector number");
-  //m_AllExtHitsEKLMSector->SetOption("LIVE");
 
 }//end of defineHisto
 
@@ -184,7 +181,7 @@ void KLMDQM2Module::beginRun()
 
 void KLMDQM2Module::event()
 {
-  if (triggerFlag()) {
+  if (triggerFlag() || m_SoftwareTriggerName == "") {
     unsigned int nMuons = m_MuonList->getListSize();
     for (unsigned int i = 0; i < nMuons; ++i) {
       const Particle* muon = m_MuonList->getParticle(i);
@@ -212,7 +209,7 @@ bool KLMDQM2Module::triggerFlag()
   bool passed = false;
   if (m_softwareTriggerResult) {
     try {
-      passed = (m_softwareTriggerResult->getResult("software_trigger_cut&skim&accept_mumutight") == SoftwareTriggerCutResult::c_accept) ?
+      passed = (m_softwareTriggerResult->getResult(m_SoftwareTriggerName) == SoftwareTriggerCutResult::c_accept) ?
                true : false;
     } catch (const std::out_of_range&) {
       passed = false;
@@ -226,19 +223,23 @@ void KLMDQM2Module::findMatchingDigit(
   struct HitData* hitData)
 {
   for (const KLMDigit& digit : m_Digits) {
-    /*
-     * TODO: multi-strip digits are ignored for now.
-     * It is necessary to take them into account.
-     */
-    if (digit.isMultiStrip())
-      continue;
     if (!(digit.getSubdetector() == hitData->subdetector &&
           digit.getSection() == hitData->section &&
           digit.getLayer() == hitData->layer &&
           digit.getSector() == hitData->sector &&
           digit.getPlane() == hitData->plane))
       continue;
-    if (fabs(digit.getStrip() - hitData->strip) < m_AllowedDistance1D) {
+
+    // Defining quantities for distance cut
+    double stripPosition = digit.getStrip();
+    double allowedDistance1D = m_AllowedDistance1D;
+
+    if (digit.isMultiStrip()) {
+      // Due to a firmware bug, we have to be wary with the allowed distance...
+      stripPosition = 0.5 * (digit.getLastStrip() + digit.getStrip());
+      allowedDistance1D *= (digit.getLastStrip() - digit.getStrip() + 1);
+    }
+    if (fabs(stripPosition - hitData->strip) < allowedDistance1D) {
       hitData->digit = &digit;
       return;
     }
@@ -280,7 +281,11 @@ bool KLMDQM2Module::collectDataTrack(
   int layer;
   int extHitLayer[nExtrapolationLayers] = {0};
   int digitLayer[nExtrapolationLayers] = {0};
+  // initialize hitDataPrevious components
   hitDataPrevious.subdetector = -1;
+  hitDataPrevious.section = -1;
+  hitDataPrevious.sector = -1;
+  hitDataPrevious.layer = -1;
   for (const ExtHit& hit : extHits) {
     /*
      * Choose hits that exit the sensitive volume.
@@ -370,10 +375,10 @@ bool KLMDQM2Module::collectDataTrack(
          * not available in ExtHit. For now, 2 entries are created (one for
          * each plane) for the first hit, and the second one is removed.
          */
-        if (hitData.subdetector == hitDataPrevious.subdetector &&
-            hitData.section == hitDataPrevious.section &&
-            hitData.sector == hitDataPrevious.sector &&
-            hitData.layer == hitDataPrevious.layer)
+        if ((hitData.subdetector == hitDataPrevious.subdetector) &&
+            (hitData.section == hitDataPrevious.section) &&
+            (hitData.sector == hitDataPrevious.sector) &&
+            (hitData.layer == hitDataPrevious.layer))
           continue;
         std::memcpy(&hitDataPrevious, &hitData, sizeof(struct HitData));
         /* The returned strip may be out of the valid range. */

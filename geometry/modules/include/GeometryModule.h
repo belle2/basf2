@@ -13,7 +13,7 @@
 #include <geometry/dbobjects/GeoConfiguration.h>
 
 namespace Belle2 {
-  /** Module to faciliate Geometry creation. */
+  /** Module to facilitate Geometry creation. */
   class GeometryModule: public Module {
   public:
     /** Constructor */

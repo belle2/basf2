@@ -15,6 +15,7 @@
 #include <framework/core/ModuleParamList.h>
 
 #include <framework/gearbox/Const.h>
+#include <framework/geometry/VectorUtil.h>
 
 using namespace Belle2;
 
@@ -94,8 +95,8 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     const double sinPhi = sin(phiClus);
     const double cosPhi = cos(phiClus);
 
-    TVector3 pos(rClus * sinTheta * cosPhi, rClus * sinTheta * sinPhi, rClus * cosTheta);
-    const double tanLambda = pos.Z() / pos.Perp();
+    ROOT::Math::XYZVector pos(rClus * sinTheta * cosPhi, rClus * sinTheta * sinPhi, rClus * cosTheta);
+    const double tanLambda = pos.Z() / pos.Rho();
 
     // restrict to forward seeds
     if (m_param_restrictToForwardSeeds) {
@@ -105,22 +106,22 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     }
 
     // Correction if shower is assumed to start in a certain depth
-    pos = pos - m_param_showerDepth / pos.Mag() * pos;
+    pos = pos - m_param_showerDepth / pos.R() * pos;
 
-    TVector3 mom = Eclus / pos.Mag() * pos;
+    ROOT::Math::XYZVector mom = Eclus / pos.R() * pos;
 
     // Calculate helix trajectory for negative and positive charge seeds
     // Find center of circular trajectory
     // factor 1. for charge // speed of light in [cm per ns] // const magnetic field
-    double rad = std::abs(mom.Pt() / (Const::speedOfLight * 1e-4 * 1. * 1.5));
+    double rad = std::abs(mom.Rho() / (Const::speedOfLight * 1e-4 * 1. * 1.5));
 
     // Particle would not be able to reach ECL (underestimation of shower energy)
-    if (2. * rad < pos.Perp()) {
-      rad = pos.Perp() / 2.0 + 1.0;
+    if (2. * rad < pos.Rho()) {
+      rad = pos.Rho() / 2.0 + 1.0;
     }
 
     // Use pq formula (center of circle has to be on perpendicular line through center of line between (0,0) and seed position)
-    double q = pos.Perp();
+    double q = pos.Rho();
     double y3 = pos.Y() / 2.0;
     double x3 = pos.X() / 2.0;
 
@@ -157,8 +158,8 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     momx2 = momx2 / mom2abs;
     momy2 = momy2 / mom2abs;
 
-    TVector3 mom1(momx1 * mom.Perp(), momy1 * mom.Perp(), mom.Z());
-    TVector3 mom2(momx2 * mom.Perp(), momy2 * mom.Perp(), mom.Z());
+    ROOT::Math::XYZVector mom1(momx1 * mom.Rho(), momy1 * mom.Rho(), mom.Z());
+    ROOT::Math::XYZVector mom2(momx2 * mom.Rho(), momy2 * mom.Rho(), mom.Z());
 
     // Pick the right momentum for positive/negative charge
     // Use cross product if momentum vector is (counter)clockwise wrt position vector
@@ -176,8 +177,8 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
       continue;
     }
 
-    TVector3 mompos;
-    TVector3 momneg;
+    ROOT::Math::XYZVector mompos;
+    ROOT::Math::XYZVector momneg;
     if (clockwise1) {
       mompos = mom2;
       momneg = mom1;
@@ -222,11 +223,11 @@ void CDCCKFEclSeedCreator::apply(std::vector<CDCCKFPath>& seeds)
     cov(5, 5) = dpz2;
 
     // set properties of genfit objects
-    genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(pos, pos));
-    genfit::SharedPlanePtr planePos(new genfit::DetPlane(pos, pos));
-    msopNeg.setPosMomCov(pos, momneg, cov);
+    genfit::SharedPlanePtr planeNeg(new genfit::DetPlane(XYZToTVector(pos), XYZToTVector(pos)));
+    genfit::SharedPlanePtr planePos(new genfit::DetPlane(XYZToTVector(pos), XYZToTVector(pos)));
+    msopNeg.setPosMomCov(XYZToTVector(pos), XYZToTVector(momneg), cov);
     msopNeg.setPlane(planeNeg);
-    msopPos.setPosMomCov(pos, mompos, cov);
+    msopPos.setPosMomCov(XYZToTVector(pos), XYZToTVector(mompos), cov);
     msopPos.setPlane(planePos);
 
     // create CDCCKF states

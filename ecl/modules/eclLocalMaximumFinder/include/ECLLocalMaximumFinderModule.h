@@ -8,11 +8,13 @@
 
 #pragma once
 
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
-#include <framework/geometry/B2Vector3.h> // faster than TVector3
+#include <framework/geometry/B2Vector3.h>
+#include <mdst/dataobjects/EventLevelClusteringInfo.h>
 
 class TTree;
 class TFile;
@@ -73,6 +75,9 @@ namespace Belle2 {
 
     /** Store array: ECLLocalMaximum. */
     StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
+
+    /** EventLevelClusteringInfo. */
+    StoreObjPtr<EventLevelClusteringInfo> m_eventLevelClusteringInfo;
 
     /** MCParticles.*/
     virtual const char* mcParticleArrayName() const
@@ -137,7 +142,7 @@ namespace Belle2 {
     // Constants
     const double c_minEnergyCut = 5.0 * Belle2::Unit::MeV; /**< Minimum LM energy */
 
-    /** vector (8736+1 entries) with cell id to store array positions */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_StoreArrPosition;
 
     /** Neighbour maps. */

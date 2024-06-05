@@ -26,7 +26,7 @@ class ItemFilter:
     """
 
     def __init__(self, args):
-        """initilization, just remember the arguments or parser"""
+        """initialization, just remember the arguments or parser"""
         #: arguments, either :class:`argparse.ArgumentParser` on initialization
         # or :class:`argparse.Namespace` after argument parsing
         self._args = args
@@ -43,11 +43,9 @@ class ItemFilter:
           name: Name of the objects to be filtered in the help text
         """
         self._args.add_argument("-f", "--filter", metavar="SEARCHTERM",
-                                help="only {} matching this pattern will be "
-                                "included. Pattern is case insensitive".format(name))
+                                help=f"only {name} matching this pattern will be included. Pattern is case insensitive")
         self._args.add_argument("-e", "--exclude", default=None, type=str,
-                                help="{} matching this pattern will be excluded. "
-                                "Pattern is case insensitive".format(name))
+                                help=f"{name} matching this pattern will be excluded. Pattern is case insensitive")
         self._args.add_argument("-r", "--regex", action="store_true", default=False,
                                 help="if given, --filter or --exclude options will be "
                                 "interpreted as a python regular expression "
@@ -57,7 +55,7 @@ class ItemFilter:
         """
         Convert to a text representation of the form ' [regex filter=TERM exclude=TERM]'.
 
-        The space in the beginnin is intentional to allow easy adding to a
+        The space in the beginning is intentional to allow easy adding to a
         description without extra spaces
 
         If no filtering is performed an empty string is returned. If the
@@ -75,7 +73,7 @@ class ItemFilter:
         if getattr(self._args, "regex", False):
             text.insert(0, "regex")
 
-        return " [{}]".format(" ".join(text))
+        return f" [{' '.join(text)}]"
 
     def check_arguments(self):
         """

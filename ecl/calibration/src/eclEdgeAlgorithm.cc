@@ -5,13 +5,20 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/calibration/eclEdgeAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include "TH1F.h"
-#include "TMath.h"
-#include "TString.h"
-#include "TFile.h"
-#include "TDirectory.h"
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1F.h>
+#include <TMath.h>
+
+/* C++ headers. */
 #include <iostream>
 
 using namespace std;
@@ -74,15 +81,17 @@ CalibrationAlgorithm::EResult eclEdgeAlgorithm::calibrate()
   }
 
   //..Histograms of width payloads
-  TH1F* eclCrystalWidthTheta = new TH1F("eclCrystalWidthTheta", "Width of each crystal in theta;cellID;crystal width (rad)", 8736, 1,
+  TH1F* eclCrystalWidthTheta = new TH1F("eclCrystalWidthTheta", "Width of each crystal in theta;cellID;crystal width (rad)",
+                                        ECLElementNumbers::c_NCrystals, 1,
                                         8737);
-  TH1F* eclCrystalWidthPhi = new TH1F("eclCrystalWidthPhi", "Width of each crystal in phi;cellID;crystal width (rad)", 8736, 1, 8737);
+  TH1F* eclCrystalWidthPhi = new TH1F("eclCrystalWidthPhi", "Width of each crystal in phi;cellID;crystal width (rad)",
+                                      ECLElementNumbers::c_NCrystals, 1, 8737);
 
   //-----------------------------------------------------------------------------------
   //..Edges of the crystals in theta
   std::vector<float> tempThetaEdge;
-  std::vector<float> tempUnc(8736, 0.);
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  std::vector<float> tempUnc(ECLElementNumbers::c_NCrystals, 0.);
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     tempThetaEdge.push_back(eclCrystalEdgeTheta->GetBinContent(cellID) / nCalls);
   }
   ECLCrystalCalib* crystalThetaEdge = new ECLCrystalCalib();
@@ -93,7 +102,7 @@ CalibrationAlgorithm::EResult eclEdgeAlgorithm::calibrate()
   //-----------------------------------------------------------------------------------
   //..Edges of the crystals in phi
   std::vector<float> tempPhiEdge;
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     tempPhiEdge.push_back(eclCrystalEdgePhi->GetBinContent(cellID) / nCalls);
   }
   ECLCrystalCalib* crystalPhiEdge = new ECLCrystalCalib();
@@ -122,7 +131,7 @@ CalibrationAlgorithm::EResult eclEdgeAlgorithm::calibrate()
   B2RESULT("eclEdgeAlgorithm: successfully stored payload ECLCrystalPhiWidth");
 
   //..Also store in histogram
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     eclCrystalWidthPhi->SetBinContent(cellID, tempPhiWidth[cellID - 1]);
     eclCrystalWidthPhi->SetBinError(cellID, 0.);
   }
@@ -178,7 +187,7 @@ CalibrationAlgorithm::EResult eclEdgeAlgorithm::calibrate()
   B2RESULT("eclEdgeAlgorithm: successfully stored payload ECLCrystalThetaWidth");
 
   //..Also store in histogram
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     eclCrystalWidthTheta->SetBinContent(cellID, tempThetaWidth[cellID - 1]);
     eclCrystalWidthTheta->SetBinError(cellID, 0.);
   }

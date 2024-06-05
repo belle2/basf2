@@ -18,7 +18,7 @@ using namespace Belle2;
 
 namespace {
   struct PointRThetaPhi { double r; double theta; double phi; };
-  struct PointXYZ { double x; double y; double z; };
+  struct PointXYZ { double X; double Y; double Z; };
   std::vector<PointRThetaPhi> test_vectors(const std::vector<double>& R = {1}, int nTheta = 3, int nPhi = 4, bool prune = true)
   {
     std::vector<PointRThetaPhi> result;
@@ -73,9 +73,9 @@ namespace {
       EXPECT_DOUBLE_EQ(bvec.Py(), tvec.Py()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.Pz(), tvec.Pz()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.Theta(), tvec.Theta()) << bvec.PrintString();
-      EXPECT_DOUBLE_EQ(bvec.x(), tvec.x()) << bvec.PrintString();
-      EXPECT_DOUBLE_EQ(bvec.y(), tvec.y()) << bvec.PrintString();
-      EXPECT_DOUBLE_EQ(bvec.z(), tvec.z()) << bvec.PrintString();
+      EXPECT_DOUBLE_EQ(bvec.X(), tvec.X()) << bvec.PrintString();
+      EXPECT_DOUBLE_EQ(bvec.Y(), tvec.Y()) << bvec.PrintString();
+      EXPECT_DOUBLE_EQ(bvec.Z(), tvec.Z()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.X(), tvec.X()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.Y(), tvec.Y()) << bvec.PrintString();
       EXPECT_DOUBLE_EQ(bvec.Z(), tvec.Z()) << bvec.PrintString();
@@ -126,26 +126,26 @@ namespace {
     tvec.SetXYZ(1., 0., 0.);
     bvec.Rotate(M_PI_2, B2Vector3D(0., 0., 1.));
     tvec.Rotate(M_PI_2, TVector3(0., 0., 1.));
-    EXPECT_NEAR(bvec.x(), 0., 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.y(), 1., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.X(), 0., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Y(), 1., 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.x(), tvec.x(), 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.y(), tvec.y(), 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.z(), tvec.z(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.X(), tvec.X(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Y(), tvec.Y(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Z(), tvec.Z(), 1e-14) << bvec.PrintString();
 
     // rotate \vec{e_x} by 180deg around \vec{e_z} to become -\vec{e_x}
     bvec.SetXYZ(1., 0., 0.);
     tvec.SetXYZ(1., 0., 0.);
     bvec.Rotate(M_PI, B2Vector3D(0., 0., 1.));
     tvec.Rotate(M_PI, TVector3(0., 0., 1.));
-    EXPECT_NEAR(bvec.x(), -1., 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.y(), 0., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.X(), -1., 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Y(), 0., 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.Phi(), tvec.Phi(), 1e-14) << bvec.PrintString();
     EXPECT_NEAR(bvec.Theta(), tvec.Theta(), 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.x(), tvec.x(), 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.y(), tvec.y(), 1e-14) << bvec.PrintString();
-    EXPECT_NEAR(bvec.z(), tvec.z(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.X(), tvec.X(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Y(), tvec.Y(), 1e-14) << bvec.PrintString();
+    EXPECT_NEAR(bvec.Z(), tvec.Z(), 1e-14) << bvec.PrintString();
 
     // just test a "random" case
     bvec.SetXYZ(4., 3., 2.);

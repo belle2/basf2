@@ -92,7 +92,17 @@ class Script(JsonBase):
     Contains information about a script and its execution output
     """
 
-    def __init__(self, name, path, status, log_url=None, return_code=None):
+    def __init__(
+            self,
+            name,
+            path,
+            status,
+            log_url=None,
+            return_code=None,
+            input=None,
+            output=None,
+            issues=None
+    ):
         """
         Create a new Script object and fill all members
         """
@@ -111,6 +121,16 @@ class Script(JsonBase):
         #: integer which is the return code of the script
         #  execution
         self.return_code = return_code
+        #: input files for the script as declared in the
+        #  header
+        self.input = input
+        #: output files produced by the script as declared in
+        #  the header
+        self.output = output
+        #: linked issues
+        if not issues:
+            issues = []
+        self.issues = issues
 
 
 class PlotFile(JsonBase):
@@ -142,7 +162,7 @@ class PlotFile(JsonBase):
 class Plot(JsonBase):
 
     """
-    Wrapper for one specfic plot.
+    Wrapper for one specific plot.
     """
 
     def __init__(
@@ -153,6 +173,7 @@ class Plot(JsonBase):
         contact=None,
         width=None,
         height=None,
+        issue=None,
     ):
         """
         Create a new Plot object and fill all members
@@ -170,6 +191,10 @@ class Plot(JsonBase):
         self.width = width
         #: height of the plot in pixels
         self.height = height
+        #: linked issues
+        if not issue:
+            issue = []
+        self.issue = issue
 
 
 class NTuple(JsonBase):
@@ -260,7 +285,7 @@ class ComparisonState(enum.Enum):
     #: The two distributions did not comply with the allowed
     #  differences
     FailureStastical = "statistical_failure"
-    #: The two distrubtions were equal in the envelope given by the
+    #: The two distributions were equal in the envelope given by the
     #  comparison configuration of this plot
     Equal = "equal"
 

@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <generators/modules/trepsinput/TrepsInputModule.h>
+#include <framework/geometry/B2Vector3.h>
 #include <string.h>
 #include <string>
 #include <boost/filesystem.hpp>
@@ -26,7 +27,7 @@ REG_MODULE(TrepsInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+TrepsInputModule::TrepsInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   // Set module properties
   setDescription("Input from TREPS generator (No-tag), Input from TREPS generator for ee->ee hadrons");
@@ -61,13 +62,13 @@ TrepsInputModule::TrepsInputModule() : Module(), m_initial(BeamParameters::c_sme
 
 }
 
-void TrepsInputModule::initialize()
+void TrepsInputModule::generatorInitialize()
 {
   m_initial.initialize();
   m_mcparticles.registerInDataStore();
 }
 
-void TrepsInputModule::event()
+void TrepsInputModule::generatorEvent()
 {
   /*
    * Check if the BeamParameters have changed (if they do, abort the job;
@@ -85,7 +86,7 @@ void TrepsInputModule::event()
 
   /* Generation of the initial particle from beam parameters. */
   const MCInitialParticles& initial = m_initial.generate();
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   if (m_useDiscreteAndSortedW) {
     if (m_generator.inmode != 0) return;
@@ -111,14 +112,14 @@ void TrepsInputModule::event()
   MCParticleGraph::GraphParticle& electron = m_mpg.addParticle();
   electron.addStatus(MCParticle::c_Initial | MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
   electron.setPDG(11);
-  electron.setMomentum(m_generator.getElectronMomentum());
+  electron.setMomentum(ROOT::Math::XYZVector(m_generator.getElectronMomentum()));
   electron.setMass(m_generator.me);
   electron.setEnergy(sqrt(m_generator.me * m_generator.me + m_generator.getElectronMomentum().Mag2()));
 
   MCParticleGraph::GraphParticle& positron = m_mpg.addParticle();
   positron.addStatus(MCParticle::c_Initial | MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator);
   positron.setPDG(-11);
-  positron.setMomentum(m_generator.getPositronMomentum());
+  positron.setMomentum(ROOT::Math::XYZVector(m_generator.getPositronMomentum()));
   positron.setMass(m_generator.me);
   positron.setEnergy(sqrt(m_generator.me * m_generator.me + m_generator.getPositronMomentum().Mag2()));
 

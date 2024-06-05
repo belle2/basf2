@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -16,11 +14,12 @@ from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
 from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 
-from basf2 import create_path, register_module, B2INFO
+from basf2 import create_path, register_module, get_file_metadata, B2INFO, B2WARNING
 import modularAnalysis as ma
 import vertex
 import stdCharged
 import stdPi0s
+import os
 
 
 #: Tells the automated system some details of this script
@@ -256,6 +255,20 @@ def get_data_info(inData, kwargs):
     return input_files_physics, output_iov
 
 
+def is_cDST_file(fName):
+    """ Check if the file is cDST based on the metadata """
+
+    metaData = get_file_metadata(fName)
+    description = metaData.getDataDescription()
+
+    # if dataLevel is missing, determine from file name
+    if 'dataLevel' not in description:
+        B2WARNING('The cdst/mdst info is not stored in file metadata')
+        return ('cdst' in os.path.basename(fName))
+
+    return (description['dataLevel'] == 'cdst')
+
+
 def get_calibrations(input_data, **kwargs):
     """
     Required function used by b2caf-prompt-run tool.
@@ -287,10 +300,12 @@ def get_calibrations(input_data, **kwargs):
     input_files_MuMu4S, output_iov_MuMu4S = get_data_info(input_data["mumu4S"], kwargs)
     input_files_MuMuOff, output_iov_MuMuOff = get_data_info(input_data["mumuOff"], kwargs)
 
-    isCDST = 'mdst' not in (input_files_MuMu4S + input_files_MuMuOff)[0]
+    # Determine if the input files are cDSTs
+    isCDST_had = is_cDST_file(input_files_Had[0]) if len(input_files_Had) > 0 else True
+    isCDST_mumu = is_cDST_file((input_files_MuMu4S + input_files_MuMuOff)[0])
 
-    rec_path_HadB = get_hadB_path(isCDST)
-    rec_path_MuMu = get_mumu_path(isCDST)
+    rec_path_HadB = get_hadB_path(isCDST_had)
+    rec_path_MuMu = get_mumu_path(isCDST_mumu)
 
     collector_HadB = register_module('EcmsCollector')
     collector_MuMu = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')

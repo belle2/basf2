@@ -20,11 +20,6 @@ FileDescriptor::FileDescriptor()
   m_fd = -1;
 }
 
-FileDescriptor::FileDescriptor(const FileDescriptor& fd)
-{
-  m_fd = fd.m_fd;
-}
-
 FileDescriptor::FileDescriptor(int fd)
 {
   m_fd = fd;

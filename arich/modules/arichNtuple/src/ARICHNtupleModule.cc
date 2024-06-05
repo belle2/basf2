@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichNtuple/ARICHNtupleModule.h>
 
 // Hit classes
@@ -32,10 +32,8 @@
 #include <framework/logging/Logger.h>
 
 // ROOT
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 #include <vector>
-
-using namespace std;
 
 namespace Belle2 {
 
@@ -57,7 +55,7 @@ namespace Belle2 {
     setDescription("The module saves variables needed for performance analysis, such as postion and momentum of the hit, likelihoods for hypotheses and number of photons.");
 
     // Add parameters
-    addParam("outputFile", m_outputFile, "ROOT output file name", string("ARICHNtuple.root"));
+    addParam("outputFile", m_outputFile, "ROOT output file name", std::string("ARICHNtuple.root"));
   }
 
   ARICHNtupleModule::~ARICHNtupleModule()
@@ -133,10 +131,6 @@ namespace Belle2 {
 
   }
 
-  void ARICHNtupleModule::beginRun()
-  {
-  }
-
   void ARICHNtupleModule::event()
   {
 
@@ -185,9 +179,8 @@ namespace Belle2 {
 
       // set hapd window hit if available
       if (arichTrack.hitsWindow()) {
-        TVector2 winHit = arichTrack.windowHitPosition();
-        m_arich.winHit[0] = winHit.X();
-        m_arich.winHit[1] = winHit.Y();
+        m_arich.winHit[0] = arichTrack.windowHitPosition().X();
+        m_arich.winHit[1] = arichTrack.windowHitPosition().Y();
       }
 
       if (lkh->getFlag() == 1) m_arich.inAcc = 1;
@@ -224,16 +217,16 @@ namespace Belle2 {
         const TrackFitResult* fitResult = mdstTrack->getTrackFitResultWithClosestMass(Const::pion);
         if (fitResult) {
           m_arich.pValue = fitResult->getPValue();
-          TVector3 trkPos = fitResult->getPosition();
+          ROOT::Math::XYZVector trkPos = fitResult->getPosition();
           m_arich.charge = fitResult->getChargeSign();
           m_arich.z0 = trkPos.Z();
-          m_arich.d0 = (trkPos.XYvector()).Mod();
+          m_arich.d0 = trkPos.Rho();
           m_arich.nCDC = fitResult->getHitPatternCDC().getNHits();
 #ifdef ALIGNMENT_USING_BHABHA
-          TVector3 trkMom = fitResult->getMomentum();
+          ROOT::Math::XYZVector trkMom = fitResult->getMomentum();
           const ECLCluster* eclTrack = mdstTrack->getRelated<ECLCluster>();
           if (eclTrack) {
-            m_arich.eop = eclTrack->getEnergy() / trkMom.Mag();
+            m_arich.eop = eclTrack->getEnergy() / trkMom.R();
             m_arich.e9e21 = eclTrack->getE9oE21();
           }
 #endif
@@ -246,12 +239,12 @@ namespace Belle2 {
           m_arich.PDG = particle->getPDG();
           m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
           m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-          B2Vector3D prodVertex = particle->getProductionVertex();
-          m_arich.rhoProd = prodVertex.Perp();
+          ROOT::Math::XYZVector prodVertex = particle->getProductionVertex();
+          m_arich.rhoProd = prodVertex.Rho();
           m_arich.zProd = prodVertex.Z();
           m_arich.phiProd = prodVertex.Phi();
-          TVector3 decVertex = particle->getDecayVertex();
-          m_arich.rhoDec = decVertex.Perp();
+          ROOT::Math::XYZVector decVertex = particle->getDecayVertex();
+          m_arich.rhoDec = decVertex.Rho();
           m_arich.zDec = decVertex.Z();
           m_arich.phiDec = decVertex.Phi();
 
@@ -271,7 +264,6 @@ namespace Belle2 {
       // get reconstructed photons associated with track
       const std::vector<ARICHPhoton>& photons = arichTrack.getPhotons();
       m_arich.nRec = photons.size();
-      int nphot = 0;
       for (auto it = photons.begin(); it != photons.end(); ++it) {
         ARICHPhoton iph = *it;
         if (iph.getHitID() < arichHits.getEntries()) {
@@ -282,27 +274,26 @@ namespace Belle2 {
           iph.setHitID(chid);
         }
         m_arich.photons.push_back(iph);
-        nphot++;
       }
 
-      TVector3 recPos = arichTrack.getPosition();
+      ROOT::Math::XYZVector recPos = arichTrack.getPosition();
       m_arich.recHit.x = recPos.X();
       m_arich.recHit.y = recPos.Y();
       m_arich.recHit.z = recPos.Z();
 
-      TVector3 recMom = arichTrack.getDirection() * arichTrack.getMomentum();
-      m_arich.recHit.p = recMom.Mag();
+      ROOT::Math::XYZVector recMom = arichTrack.getDirection() * arichTrack.getMomentum();
+      m_arich.recHit.p = recMom.R();
       m_arich.recHit.theta = recMom.Theta();
       m_arich.recHit.phi = recMom.Phi();
 
       if (aeroHit) {
-        TVector3 truePos = aeroHit->getPosition();
+        ROOT::Math::XYZVector truePos = aeroHit->getPosition();
         m_arich.mcHit.x = truePos.X();
         m_arich.mcHit.y = truePos.Y();
         m_arich.mcHit.z = truePos.Z();
 
-        TVector3 trueMom = aeroHit->getMomentum();
-        m_arich.mcHit.p = trueMom.Mag();
+        ROOT::Math::XYZVector trueMom = aeroHit->getMomentum();
+        m_arich.mcHit.p = trueMom.R();
         m_arich.mcHit.theta = trueMom.Theta();
         m_arich.mcHit.phi = trueMom.Phi();
 
@@ -317,12 +308,12 @@ namespace Belle2 {
             if (mother) m_arich.motherPDG = mother->getPDG();
             m_arich.primary = particle->getStatus(MCParticle::c_PrimaryParticle);
             m_arich.seen = particle->hasSeenInDetector(Const::ARICH);
-            B2Vector3D prodVertex = particle->getProductionVertex();
-            m_arich.rhoProd = prodVertex.Perp();
+            ROOT::Math::XYZVector prodVertex = particle->getProductionVertex();
+            m_arich.rhoProd = prodVertex.Rho();
             m_arich.zProd = prodVertex.Z();
             m_arich.phiProd = prodVertex.Phi();
-            TVector3 decVertex = particle->getDecayVertex();
-            m_arich.rhoDec = decVertex.Perp();
+            ROOT::Math::XYZVector decVertex = particle->getDecayVertex();
+            m_arich.rhoDec = decVertex.Rho();
             m_arich.zDec = decVertex.Z();
             m_arich.phiDec = decVertex.Phi();
 
@@ -335,12 +326,6 @@ namespace Belle2 {
       }
       m_tree->Fill();
     }
-  }
-
-
-
-  void ARICHNtupleModule::endRun()
-  {
   }
 
   void ARICHNtupleModule::terminate()

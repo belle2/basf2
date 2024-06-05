@@ -105,10 +105,10 @@ void PXDClusterPositionCollectorModule::collect() // Do your event() stuff here
 
       auto mom = truehit.getMomentum();
 
-      if (mom[2] == 0 ||  mom.Mag() < 0.02) continue;
+      if (mom.Z() == 0 ||  mom.R() < 0.02) continue;
 
-      double thetaU = TMath::ATan2(mom[0] / mom[2], 1.0) * 180.0 / M_PI;
-      double thetaV = TMath::ATan2(mom[1] / mom[2], 1.0) * 180.0 / M_PI;
+      double thetaU = TMath::ATan2(mom.X() / mom.Z(), 1.0) * TMath::RadToDeg();
+      double thetaV = TMath::ATan2(mom.Y() / mom.Z(), 1.0) * TMath::RadToDeg();
       int uBin = grid->GetXaxis()->FindBin(thetaU);
       int vBin = grid->GetYaxis()->FindBin(thetaV);
 

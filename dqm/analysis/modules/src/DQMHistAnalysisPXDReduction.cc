@@ -13,6 +13,7 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisPXDReduction.h>
 #include <TROOT.h>
+#include <TLatex.h>
 #include <vxd/geometry/GeoCache.h>
 
 using namespace std;
@@ -31,21 +32,21 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("PXD DQM analysis module for ONSEN Data Reduction Monitoring");
 
-  //Parameter definition
+  // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
-  addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("DQM:PXD:Red:"));
-  addParam("useEpics", m_useEpics, "Whether to update EPICS PVs.", false);
+  addParam("LowerWarnLimit", m_meanLowerWarn, "Mean Reduction Low limit for warning", double(NAN)); // default is NAN =disable
+  addParam("LowerErrorLimit", m_meanLowerAlarm, "Mean Reduction Low limit for alarms", double(NAN)); // default is NAN =disable
+  addParam("UpperWarnLimit", m_meanUpperWarn, "Mean Reduction High limit for warning", double(NAN)); // default is NAN =disable
+  addParam("UpperErrorLimit", m_meanUpperAlarm, "Mean Reduction High limit for alarms", double(NAN)); // default is NAN =disable
+  addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
+  addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
 }
 
 DQMHistAnalysisPXDReductionModule::~DQMHistAnalysisPXDReductionModule()
 {
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (ca_current_context()) ca_context_destroy();
-  }
-#endif
 }
 
 void DQMHistAnalysisPXDReductionModule::initialize()
@@ -59,14 +60,25 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   std::vector<VxdID> sensors = geo.getListOfSensors();
   for (VxdID& aVxdID : sensors) {
     VXD::SensorInfoBase info = geo.getSensorInfo(aVxdID);
-    // B2DEBUG(20,"VXD " << aVxdID);
     if (info.getType() != VXD::SensorInfoBase::PXD) continue;
     m_PXDModules.push_back(aVxdID); // reorder, sort would be better
-
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
   gROOT->cd(); // this seems to be important, or strange things happen
+
+  if (m_PXDModules.size() == 0) {
+    // Backup if no geometry is present (testing...)
+    B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
+    std::vector <string> mod = {
+      "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
+      "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
+      "2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.3.1", "2.3.2", "2.4.1", "2.4.2",
+      "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
+      "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
+    };
+    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
+  }
 
   m_cReduction = new TCanvas((m_histogramDirectoryName + "/c_Reduction").data());
   m_hReduction = new TH1F("hPXDReduction", "PXD Reduction; Module; Reduction", m_PXDModules.size(), 0, m_PXDModules.size());
@@ -75,35 +87,38 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     TString ModuleName = (std::string)m_PXDModules[i];
     m_hReduction->GetXaxis()->SetBinLabel(i + 1, ModuleName);
+    if (!hasDeltaPar(m_histogramDirectoryName,
+                     "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i])) addDeltaPar(m_histogramDirectoryName,
+                           "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i], HistDelta::c_Entries, m_minEntries,
+                           1); // register delta
   }
   //Unfortunately this only changes the labels, but can't fill the bins by the VxdIDs
   m_hReduction->Draw("");
   m_monObj->addCanvas(m_cReduction);
 
-  /// FIXME were to put the lines depends ...
-  m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
-//   m_line2 = new TLine(0, 16, m_PXDModules.size(), 16);
-//   m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
-  m_line1->SetHorizontal(true);
-  m_line1->SetLineColor(3);// Green
-  m_line1->SetLineWidth(3);
-//   m_line2->SetHorizontal(true);
-//   m_line2->SetLineColor(1);// Black
-//   m_line2->SetLineWidth(3);
-//   m_line3->SetHorizontal(true);
-//   m_line3->SetLineColor(1);
-//   m_line3->SetLineWidth(3);
+  m_meanLine = new TLine(0, 10, m_PXDModules.size(), 10);
+  m_meanUpperWarnLine = new TLine(0, 16, m_PXDModules.size(), 16);
+  m_meanLowerWarnLine = new TLine(0, 0.9, m_PXDModules.size(), 0.9);
+  m_meanUpperAlarmLine = new TLine(0, 20, m_PXDModules.size(), 20);
+  m_meanLowerAlarmLine = new TLine(0, 0.5, m_PXDModules.size(), 0.5);
+  m_meanLine->SetHorizontal(true);
+  m_meanLine->SetLineColor(kBlue);
+  m_meanLine->SetLineWidth(3);
+  m_meanUpperWarnLine->SetHorizontal(true);
+  m_meanUpperWarnLine->SetLineColor(c_ColorWarning + 2);
+  m_meanUpperWarnLine->SetLineWidth(3);
+  m_meanLowerWarnLine->SetHorizontal(true);
+  m_meanLowerWarnLine->SetLineColor(c_ColorWarning + 2);
+  m_meanLowerWarnLine->SetLineWidth(3);
+  m_meanUpperAlarmLine->SetHorizontal(true);
+  m_meanUpperAlarmLine->SetLineColor(c_ColorError + 2);
+  m_meanUpperAlarmLine->SetLineWidth(3);
+  m_meanLowerAlarmLine->SetHorizontal(true);
+  m_meanLowerAlarmLine->SetLineColor(c_ColorError + 2);
+  m_meanLowerAlarmLine->SetLineWidth(3);
 
-
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
-    mychid.resize(2);
-    SEVCHK(ca_create_channel((m_pvPrefix + "Status").data(), NULL, NULL, 10, &mychid[0]), "ca_create_channel failure");
-    SEVCHK(ca_create_channel((m_pvPrefix + "Value").data(), NULL, NULL, 10, &mychid[1]), "ca_create_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+  registerEpicsPV("PXD:Red:Status", "Status");
+  registerEpicsPV("PXD:Red:Value", "Value");
 }
 
 
@@ -112,92 +127,107 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: beginRun called.");
 
   m_cReduction->Clear();
+  m_hReduction->Reset(); // dont sum up!!!
+  colorizeCanvas(m_cReduction, c_StatusTooFew);
+
+  // override with limits from EPICS. if they are set
+  requestLimitsFromEpicsPVs("Value", m_meanLowerAlarm, m_meanLowerWarn, m_meanUpperWarn, m_meanUpperAlarm);
+
+  if (!std::isnan(m_meanLowerAlarm)) {
+    m_meanLowerAlarmLine->SetY1(m_meanLowerAlarm);
+    m_meanLowerAlarmLine->SetY2(m_meanLowerAlarm);
+  }
+  if (!std::isnan(m_meanLowerWarn)) {
+    m_meanLowerWarnLine->SetY1(m_meanLowerWarn);
+    m_meanLowerWarnLine->SetY2(m_meanLowerWarn);
+  }
+  if (!std::isnan(m_meanUpperWarn)) {
+    m_meanUpperWarnLine->SetY1(m_meanUpperWarn);
+    m_meanUpperWarnLine->SetY2(m_meanUpperWarn);
+  }
+  if (!std::isnan(m_meanUpperAlarm)) {
+    m_meanUpperAlarmLine->SetY1(m_meanUpperAlarm);
+    m_meanUpperAlarmLine->SetY2(m_meanUpperAlarm);
+  }
 }
 
 void DQMHistAnalysisPXDReductionModule::event()
 {
   if (!m_cReduction) return;
-  m_hReduction->Reset(); // dont sum up!!!
 
-  bool enough = false;
   double ireduction = 0.0;
   int ireductioncnt = 0;
 
+  bool anyupdate = false;
   for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
     std::string name = "PXDDAQDHEDataReduction_" + (std::string)m_PXDModules[i ];
     // std::replace( name.begin(), name.end(), '.', '_');
 
-    TH1* hh1 = findHist(name);
-    if (hh1 == NULL) {
-      hh1 = findHist(m_histogramDirectoryName, name);
-    }
+    TH1* hh1 = getDelta(m_histogramDirectoryName, name);
+    // no inital sampling, we should get plenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();
-      m_hReduction->Fill(i, mean);
-      if (hh1->GetEntries() > 100) enough = true;
-      if (mean > 0) {
-        ireduction += mean; // well fit would be better
-        ireductioncnt++;
-      }
+      m_hReduction->SetBinContent(i + 1, mean);
+      anyupdate = true;
     }
   }
-  m_cReduction->cd();
 
-  int status = 0;
-  // not enough Entries
-  if (!enough) {
-    status = 0; // Grey
-    m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
-  } else {
-    status = 1; // White
-    /// FIXME: absolute numbers or relative numbers and what is the accpetable limit?
-//   if (value > m_up_err_limit || value < m_low_err_limit ) {
-//     m_cReduction->Pad()->SetFillColor(kRed);// Red
-//   } else if (value >  m_up_warn_limit ||  value < m_low_warn_limit ) {
-//     m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
-//   } else {
-//     m_cReduction->Pad()->SetFillColor(kGreen);// Green
-//   } else {
-    m_cReduction->Pad()->SetFillColor(kWhite);// White
-//   }
+  if (!anyupdate) return; // nothing new -> no update
+
+  // calculate the mean of the mean
+  for (unsigned int i = 0; i < m_PXDModules.size(); i++) {
+    // ignore modules in exclude list
+    if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
+    auto mean = m_hReduction->GetBinContent(i + 1);
+    if (mean > 0) { // onyl for valid values
+      ireduction += mean; // well fit would be better
+      ireductioncnt++;
+    }
   }
+
+  m_cReduction->cd();
 
   double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
 
+  // if any if NaN, the comparison is false
+  auto stat_data = makeStatus(ireductioncnt >= 15,
+                              value > m_meanUpperWarn || value < m_meanLowerWarn,
+                              value > m_meanUpperAlarm || value < m_meanLowerAlarm);
+
   if (m_hReduction) {
     m_hReduction->Draw("");
-    if (status != 0) {
-      m_line1->SetY1(value);
-      m_line1->SetY2(value); // aka SetHorizontal
-      m_line1->Draw();
+    if (stat_data != c_StatusTooFew) {
+      m_meanLine->SetY1(value);
+      m_meanLine->SetY2(value); // aka SetHorizontal
+      m_meanLine->Draw();
     }
-//     m_line2->Draw();
-//     m_line3->Draw();
+    if (!std::isnan(m_meanLowerAlarm)) m_meanLowerAlarmLine->Draw();
+    if (!std::isnan(m_meanLowerWarn)) m_meanLowerWarnLine->Draw();
+    if (!std::isnan(m_meanUpperWarn)) m_meanUpperWarnLine->Draw();
+    if (!std::isnan(m_meanUpperAlarm)) m_meanUpperAlarmLine->Draw();
+    for (auto& it : m_excluded) {
+      auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      tt->Draw();
+    }
   }
 
   m_monObj->setVariable("reduction", value);
 
+  colorizeCanvas(m_cReduction, stat_data);
+  UpdateCanvas(m_cReduction);
   m_cReduction->Modified();
   m_cReduction->Update();
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    SEVCHK(ca_put(DBR_INT, mychid[0], (void*)&status), "ca_set failure");
-    SEVCHK(ca_put(DBR_DOUBLE, mychid[1], (void*)&value), "ca_set failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
+
+  // better only update if statistics is reasonable, we dont want "0" drops between runs!
+  setEpicsPV("Status", stat_data);
+  setEpicsPV("Value", value);
 }
 
 void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
-  // m_cReduction->Print("c1.pdf");
-  // should delete canvas here, maybe hist, too? Who owns it?
-#ifdef _BELLE2_EPICS
-  if (m_useEpics) {
-    for (auto m : mychid) SEVCHK(ca_clear_channel(m), "ca_clear_channel failure");
-    SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
-  }
-#endif
 }
 

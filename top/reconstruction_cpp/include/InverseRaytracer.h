@@ -12,7 +12,7 @@
 #include <top/reconstruction_cpp/PhotonState.h>
 #include <top/reconstruction_cpp/TOPTrack.h>
 #include <vector>
-#include <TVector3.h>
+#include <Math/Point3D.h>
 #include <cmath>
 
 namespace Belle2 {
@@ -264,7 +264,7 @@ namespace Belle2 {
       double m_cosTotal = 0; /**< cosine of total reflection angle */
       mutable std::vector<Solution> m_solutions[2]; /**< storage for the two solutions */
       mutable bool m_ok[2] = {false, false}; /**< status of solutions */
-      mutable TVector3 m_emiPoint; /**< temporary storage of emission point */
+      mutable ROOT::Math::XYZPoint m_emiPoint; /**< temporary storage of emission point */
       mutable CerenkovAngle m_cer; /**< temporary storage of Cerenkov angle */
       mutable TOPTrack::TrackAngles m_trk; /**< temporary storage of track polar and azimuthal angles */
 

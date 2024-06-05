@@ -12,6 +12,7 @@
 #include <framework/database/DBArray.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/dbobjects/CDCTimeZeros.h>
@@ -34,8 +35,6 @@
 #include <string>
 #include <map>
 //#include <fstream>
-
-#include "TVector3.h"
 
 
 namespace Belle2 {
@@ -326,7 +325,7 @@ namespace Belle2 {
           \param position The given position to calculate cell id.
           \return Cell id.
       */
-      unsigned cellId(unsigned layerId, const TVector3& position) const;
+      unsigned cellId(unsigned layerId, const B2Vector3D& position) const;
 
       //! Returns the inner radius of the outer wall.
       /*!
@@ -445,10 +444,10 @@ namespace Belle2 {
           \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
           \return The forward position of the wire.
       */
-      const TVector3 wireForwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
+      const B2Vector3D wireForwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
-      const TVector3 wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
+      const B2Vector3D wireForwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
       {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
@@ -461,10 +460,10 @@ namespace Belle2 {
       \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
       \return The virtual forward position of the wire.
       */
-      const TVector3 wireForwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      const B2Vector3D wireForwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
-      const TVector3 wireForwardPosition(const WireID& wireID, double z,
-                                         EWirePosition set = c_Base) const
+      const B2Vector3D wireForwardPosition(const WireID& wireID, double z,
+                                           EWirePosition set = c_Base) const
       {
         return wireForwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
@@ -476,10 +475,10 @@ namespace Belle2 {
           \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
           \return The backward position of the wire.
       */
-      const TVector3 wireBackwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
+      const B2Vector3D wireBackwardPosition(uint layerId, int cellId, EWirePosition set = c_Base) const;
 
       /** The same function but in a different input format. */
-      const TVector3 wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
+      const B2Vector3D wireBackwardPosition(const WireID& wireID, EWirePosition set = c_Base) const
       {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), set);
       }
@@ -492,9 +491,9 @@ namespace Belle2 {
       \param set     Wire position set; =c_Base, c_Misaligned or c_Aligned
       \return The virtual backward position of the wire.
       */
-      const TVector3 wireBackwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
+      const B2Vector3D wireBackwardPosition(uint layerId, int cellId, double z, EWirePosition set = c_Base) const;
       /** The same function but in a different input format. */
-      const TVector3 wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const
+      const B2Vector3D wireBackwardPosition(const WireID& wireID, double z, EWirePosition set = c_Base) const
       {
         return wireBackwardPosition(wireID.getICLayer(), wireID.getIWire(), z, set);
       }
@@ -677,7 +676,7 @@ namespace Belle2 {
 
       /**
        * Return wire offset in phi direction at endplate.
-       * @parm layerID layerID(0-55).
+       * @param layerID layerID(0-55).
        * @return offset value.
        */
       double offset(int layerID) const;
@@ -948,7 +947,7 @@ namespace Belle2 {
        * @param posOnTrack Position on the track at the closest point.
        * @param momentum   Track 3-momentum.
        */
-      unsigned short getOldLeftRight(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+      unsigned short getOldLeftRight(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack, const B2Vector3D& momentum) const;
 
       /**
        * Returns new left/right_raw.
@@ -957,7 +956,7 @@ namespace Belle2 {
        * @param momentum   Track 3-momentum.
        */
 
-      unsigned short getNewLeftRightRaw(const TVector3& posOnWire, const TVector3& posOnTrack, const TVector3& momentum) const;
+      unsigned short getNewLeftRightRaw(const B2Vector3D& posOnWire, const B2Vector3D& posOnTrack, const B2Vector3D& momentum) const;
 
       /**
        * Returns track incident angle in rphi plane (alpha in rad.).
@@ -965,13 +964,13 @@ namespace Belle2 {
        * @param momentum  Track momentum at the closest point.
        */
 
-      double getAlpha(const TVector3& posOnWire, const TVector3& momentum) const;
+      double getAlpha(const B2Vector3D& posOnWire, const B2Vector3D& momentum) const;
 
       /**
        * Returns track incident angle (theta in rad.).
        * @param momentum Track momentum at the closest point.
        */
-      double getTheta(const TVector3& momentum) const;
+      double getTheta(const B2Vector3D& momentum) const;
 
 
       /**
@@ -1156,7 +1155,7 @@ namespace Belle2 {
       float m_FWirPosAlign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
       float m_BWirPosAlign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[c_maxNSenseLayers][c_maxNDriftCells]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
-      float m_eDepToADCParams[c_maxNSenseLayers][c_maxNDriftCells][7] = {0}; /*!< edep-to-ADC conv. params. */
+      float m_eDepToADCParams[c_maxNSenseLayers][c_maxNDriftCells][7] = {}; /*!< edep-to-ADC conv. params. */
 
       float m_alphaPoints[c_maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
       float m_thetaPoints[c_maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
@@ -1166,7 +1165,7 @@ namespace Belle2 {
       float m_XT[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       float m_Sigma[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nSigmaParams];      /*!< position resulution for each layer. */
       float m_propSpeedInv[c_maxNSenseLayers];  /*!< Inverse of propagation speed of the sense wire. */
-      float m_t0[c_maxNSenseLayers][c_maxNDriftCells] = {0};  /*!< t0 for each sense-wire (in nsec). */
+      float m_t0[c_maxNSenseLayers][c_maxNDriftCells] = {};  /*!< t0 for each sense-wire (in nsec). */
       float m_timeWalkCoef[c_nBoards][2];  /*!< coefficients for time walk. */
 
       //      float m_meanT0;  /*!< mean t0 over all wires. */

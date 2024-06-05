@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -144,7 +143,7 @@ def getArgumentParser():
         metavar="OutputFilename",
         help=(
             "Save a markdown table in a format that can be copied into "
-            "pull request comments."
+            "merge request comments."
         ),
     )
     OutputGroup.add_argument(
@@ -469,14 +468,14 @@ def averageCandidateMultiplicity(skim, sample, TestingCombined):
     )
     joinedBlocks = "\n".join([block[0] for block in multiplicityBlocks])
 
-    # Get the second numbers in each line, which are the average candidate
+    # Get the third numbers in each line, which are the average candidate
     # multiplicities of passed events for each particle list.
     floatRegexp = r"\d+\.\d+"
     multiplicityLines = [
         line for line in joinedBlocks.split("\n") if re.findall(floatRegexp, line)
     ]
     multiplicities = [
-        float(re.findall(floatRegexp, line)[1]) for line in multiplicityLines
+        float(re.findall(floatRegexp, line)[2]) for line in multiplicityLines
     ]
 
     averageCandidateMultiplicity = sum(multiplicities) / len(multiplicities)
@@ -1059,8 +1058,8 @@ def addWeightedMC(allSkimStats, statSpecifier, samples, verbose=False):
             dict, with an extra entry for combined MC samples.
     """
 
-    beamBackgrounds = list(set(s.beam_background for s in samples.mc_samples))
-    mcCampaigns = list(set(s.campaign for s in samples.mc_samples))
+    beamBackgrounds = list({s.beam_background for s in samples.mc_samples})
+    mcCampaigns = list({s.campaign for s in samples.mc_samples})
 
     for (skim, skimStats), (stat, statSpec), beamBackground, mcCampaign in product(
         allSkimStats.items(), statSpecifier.items(), beamBackgrounds, mcCampaigns
@@ -1169,9 +1168,9 @@ def printToScreen(allSkimStats, samples):
         print(table)
 
     print(
-        "\nNote: If you are producing these stats for a skim pull request, please\n"
+        "\nNote: If you are producing these stats for a skim merge request, please\n"
         "    consider using the `--markdown` option to produce a Markdown table\n"
-        "    which BitBucket will display nicely."
+        "    which GitLab will display nicely."
     )
 
 
@@ -1247,7 +1246,7 @@ def printToConfluence(allSkimStats, samples, *, OutputFilename=None):
 
 def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
     """Format the skim performance statistics as a markdown table, which will be
-    formatted nicely if pasted into a pull request on BitBucket.
+    formatted nicely if pasted into a merge request on GitLab.
 
     Args:
         allSkimStats (dict): A nested dict of statistics, as returned by
@@ -1291,7 +1290,7 @@ def printToMarkdown(allSkimStats, samples, *, OutputFilename=None):
 
     print(
         f"Wrote tables to {OutputFilename}. This format is suitable for including "
-        "in pull request comments."
+        "in merge request comments."
     )
 
 

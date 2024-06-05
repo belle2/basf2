@@ -6,11 +6,8 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisARICHMonObj.h>
-
-//DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
 
 #include <TF1.h>
 #include <TH1F.h>
@@ -70,15 +67,6 @@ void DQMHistAnalysisARICHMonObjModule::initialize()
 
 }
 
-void DQMHistAnalysisARICHMonObjModule::beginRun()
-{
-}
-
-void DQMHistAnalysisARICHMonObjModule::event()
-{
-  // can put the analysis code here or in endRun() function
-  // for the start tests we will store output only end of run so better to put code there
-}
 
 void DQMHistAnalysisARICHMonObjModule::endRun()
 {
@@ -134,6 +122,17 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   if (nevt) {
     m_apdHist->Scale(1. / float(nevt));
     // m_chHist->Scale(1. / float(nevt));
+  }
+
+  double signalHitsPerEvent = 0;
+  double backgroundHitsPerEvent = 0;
+  if (bits and nevt) {
+    double bin0 = bits->GetBinContent(2);
+    double bin1 = bits->GetBinContent(3);
+    double bin2 = bits->GetBinContent(4);
+    double bin3 = bits->GetBinContent(5);
+    signalHitsPerEvent = (bin1 + bin2 - bin0 - bin3) / nevt;
+    backgroundHitsPerEvent = (bin0 + bin3) / nevt;
   }
 
   pp1->SetMaximum(0.1);
@@ -377,6 +376,10 @@ void DQMHistAnalysisARICHMonObjModule::endRun()
   // set values of monitoring variables (if variable already exists this will change its value, otherwise it will insert new variable)
   // with error (also asymmetric error can be used as m_monObj->setVariable(name, value, upError, downError))
   m_monObj->setVariable("hitsPerEvent", hitsPerEvent ? hitsPerEvent->GetMean() : 0, hitsPerEvent ? hitsPerEvent->GetMeanError() : -1);
+
+  m_monObj->setVariable("signalHitsPerEvent", signalHitsPerEvent);
+  m_monObj->setVariable("backgroundHitsPerEvent", backgroundHitsPerEvent);
+
   // without error
   m_monObj->setVariable("bitsMean", bits ? bits->GetMean() : 0);
   B2DEBUG(20, "DQMHistAnalysisARICHMonObj : endRun called");

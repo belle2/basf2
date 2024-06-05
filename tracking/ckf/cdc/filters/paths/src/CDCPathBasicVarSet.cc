@@ -77,15 +77,15 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
   var<named("flipPos3")>() = flipPos[3];
 
   // seed properties
-  TVector3 seedPos = seedRecoTrack->getPositionSeed();
-  TVector3 seedMom = seedRecoTrack->getMomentumSeed();
-  var<named("seed_r")>() = seedPos.Perp();
+  ROOT::Math::XYZVector seedPos = seedRecoTrack->getPositionSeed();
+  ROOT::Math::XYZVector seedMom = seedRecoTrack->getMomentumSeed();
+  var<named("seed_r")>() = seedPos.Rho();
   var<named("seed_z")>() = seedPos.Z();
   var<named("seed_x")>() = seedPos.X();
   var<named("seed_y")>() = seedPos.Y();
-  var<named("seed_p")>() = seedMom.Mag();
+  var<named("seed_p")>() = seedMom.R();
   var<named("seed_theta")>() = seedMom.Theta() * 180. / M_PI;
-  var<named("seed_pt")>() = seedMom.Perp();
+  var<named("seed_pt")>() = seedMom.Rho();
   var<named("seed_pz")>() = seedMom.Z();
   var<named("seed_px")>() = seedMom.X();
   var<named("seed_py")>() = seedMom.Y();
@@ -105,7 +105,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
     seedICLayer = 56;
   } else {
     // do straight extrapolation of seed momentum to CDC outer walls
-    TVector3 seedMomZOne(seedMom * (1. / seedMom.Z()));
+    ROOT::Math::XYZVector seedMomZOne(seedMom * (1. / seedMom.Z()));
 
     // find closest iCLayer
     float minDist = 99999;
@@ -123,7 +123,7 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
 
 
   // track representation
-  TVector3 trackMom(0, 0, 0);
+  ROOT::Math::XYZVector trackMom(0, 0, 0);
   int trackCharge = 0;
   float firstChi2 = 0;
   float lastChi2 = 0;
@@ -142,8 +142,8 @@ bool CDCPathBasicVarSet::extract(const BaseCDCPathFilter::Object* path)
     lastICLayer = path->back().getWireHit()->getWire().getICLayer();
   }
   var<named("track_theta")>() = trackMom.Theta() * 180. / M_PI;
-  var<named("track_p")>() = trackMom.Mag();
-  var<named("track_pt")>() = trackMom.Perp();
+  var<named("track_p")>() = trackMom.R();
+  var<named("track_pt")>() = trackMom.Rho();
   var<named("track_pz")>() = trackMom.Z();
   var<named("track_px")>() = trackMom.X();
   var<named("track_py")>() = trackMom.Y();

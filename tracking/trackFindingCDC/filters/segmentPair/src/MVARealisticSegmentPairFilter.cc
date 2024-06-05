@@ -1,3 +1,4 @@
+
 /**************************************************************************
  * basf2 (Belle II Analysis Software Framework)                           *
  * Author: The Belle II Collaboration                                     *
@@ -15,7 +16,7 @@ using namespace TrackFindingCDC;
 template class TrackFindingCDC::MVAFilter<MVARealisticSegmentPairVarSet>;
 
 MVARealisticSegmentPairFilter::MVARealisticSegmentPairFilter()
-  : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02)
+  : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02, "trackfindingcdc_RealisticSegmentPairFilterParameters")
 {
   this->addProcessingSignalListener(&m_feasibleSegmentPairFilter);
 }

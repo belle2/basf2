@@ -3,9 +3,9 @@
 # NickName: ee_Jpsichic0_mumu
 # Documentation: Double charmonium production.
 # Tested: Yes
-# PhysicsWG: Charmonium
+# PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
-# Email: chilikin@lebedev.ru
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
 # Date: 20220113
 #
@@ -20,4 +20,7 @@ Decay vpho
 Enddecay
 
 Decay MyJ/psi
-1.0   mu+ mu-         PHOTOS PHSP
+1.0   mu+ mu-         PHOTOS PHSP;
+Enddecay
+
+End

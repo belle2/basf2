@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/KlongDecayReconstructor/KlongDecayReconstructorExpertModule.h>
 
 // framework aux
@@ -19,6 +19,7 @@
 #include <analysis/DecayDescriptor/ParticleListName.h>
 
 #include <Math/Vector4D.h>
+#include <TMath.h>
 
 #include <memory>
 
@@ -40,7 +41,13 @@ KlongDecayReconstructorExpertModule::KlongDecayReconstructorExpertModule() :
 
 {
   // set module description (e.g. insert text)
-  setDescription("This module is used to employ kinematic constraints to determine the momentum of Klongs for two body B decays containing a K_L0 and something else. The module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed by combining the reconstructed direction (from either the ECL or KLM) of the K_L0 and kinematic constraints of the initial state.");
+  setDescription(R"DOC(
+This module is used to employ kinematic constraints to determine the momentum
+of Klongs for two body B decays containing a K_L0 and something else. The
+module creates a list of K_L0 candidates whose K_L0 momentum is reconstructed
+by combining the reconstructed direction (from either the ECL or KLM) of the
+K_L0 and kinematic constraints of the initial state.
+                )DOC");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
@@ -85,24 +92,27 @@ void KlongDecayReconstructorExpertModule::initialize()
   std::string kListName;
   newDecayString = m_listName + " -> ";
 
-  bool k_check = false;
-
   // Daughters
+  bool k_check = false;
   int nProducts = m_decaydescriptor.getNDaughters();
   for (int i = 0; i < nProducts; ++i) {
     const DecayDescriptorParticle* daughter = m_decaydescriptor.getDaughter(i)->getMother();
-    if (daughter->getPDGCode() != Const::Klong.getPDGCode()) {
-      StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
-      newDecayString = newDecayString + daughter->getFullName() + " ";
-    } else {
+    if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
+      if (k_check)
+        B2FATAL("More than one K_L is detected! This module accepts only one K_L in the final state.");
+
       StoreObjPtr<ParticleList>().isRequired(daughter->getFullName() + m_recoList);
       kListName = daughter->getFullName() + m_recoList;
       k_check = true;
+    } else {
+      StoreObjPtr<ParticleList>().isRequired(daughter->getFullName());
+      newDecayString = newDecayString + daughter->getFullName() + " ";
     }
   }
 
   if (!k_check)
     B2FATAL("This module is meant to reconstruct decays with a K_L0 in the final state. There is no K_L0 in this decay!");
+
   newDecayString = newDecayString + kListName;
 
   m_generator = std::make_unique<ParticleGenerator>(newDecayString, m_cutParameter);

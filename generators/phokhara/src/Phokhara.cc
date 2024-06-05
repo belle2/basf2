@@ -173,7 +173,7 @@ void Phokhara::init(const std::string& paramFile)
 }
 
 
-double Phokhara::generateEvent(MCParticleGraph& mcGraph, TVector3 vertex, ROOT::Math::LorentzRotation boost)
+double Phokhara::generateEvent(MCParticleGraph& mcGraph, ROOT::Math::XYZVector vertex, ROOT::Math::LorentzRotation boost)
 {
 
   //Generate event
@@ -329,7 +329,7 @@ void Phokhara::applySettings()
 }
 
 
-void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, TVector3 vertex,
+void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pdg, ROOT::Math::XYZVector vertex,
                              ROOT::Math::LorentzRotation boost, bool isVirtual, bool isInitial)
 {
 
@@ -357,7 +357,7 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
   part.setPDG(pdg);
   part.setFirstDaughter(0);
   part.setLastDaughter(0);
-  part.setMomentum(TVector3(mom[0], mom[1], mom[2]));
+  part.setMomentum(ROOT::Math::XYZVector(mom[0], mom[1], mom[2]));
   // part.get4Vector() uses mass, need to set invariant mass for virtual photons
   if ((m_finalState == 0) && m_replaceMuonsByVirtualPhoton && (pdg == 10022))
     part.setMass(sqrt(mom[3] * mom[3] - mom[0] * mom[0] - mom[1] * mom[1] -
@@ -373,7 +373,7 @@ void Phokhara::storeParticle(MCParticleGraph& mcGraph, const double* mom, int pd
 
   //set vertex
   if (!isInitial) {
-    B2Vector3D v3 = part.getProductionVertex();
+    ROOT::Math::XYZVector v3 = part.getProductionVertex();
     v3 = v3 + vertex;
     part.setProductionVertex(v3);
     part.setValidVertex(true);

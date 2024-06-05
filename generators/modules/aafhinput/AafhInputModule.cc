@@ -7,7 +7,10 @@
  **************************************************************************/
 
 #include <generators/modules/aafhinput/AafhInputModule.h>
+#include <generators/utilities/scaleParticleEnergies.h>
 #include <framework/logging/Logger.h>
+
+#include <Math/Vector3D.h>
 
 using namespace Belle2;
 
@@ -20,7 +23,7 @@ REG_MODULE(AafhInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+AafhInputModule::AafhInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearALL)
 {
   // Set module properties
   setDescription("AAFH Generator to generate non-radiative two-photon events like e+e- -> e+e-e+e-");
@@ -83,7 +86,7 @@ AafhInputModule::AafhInputModule() : Module(), m_initial(BeamParameters::c_smear
            m_generator.getParticle());
 }
 
-void AafhInputModule::initialize()
+void AafhInputModule::generatorInitialize()
 {
   m_mcparticles.registerInDataStore();
 
@@ -91,7 +94,7 @@ void AafhInputModule::initialize()
   m_initial.initialize();
 }
 
-void AafhInputModule::event()
+void AafhInputModule::generatorEvent()
 {
 
   // Check if the BeamParameters have changed (if they do, abort the job! otherwise cross section calculation will be a nightmare.)
@@ -106,22 +109,25 @@ void AafhInputModule::event()
   // Initial particle from beam parameters (for random vertex)
   const MCInitialParticles& initial = m_initial.generate();
 
-  // True boost.
+  // get Lorentz transformation from CMS to LAB
   ROOT::Math::LorentzRotation boost = initial.getCMSToLab();
 
   // vertex.
-  TVector3 vertex = initial.getVertex();
+  ROOT::Math::XYZVector vertex = initial.getVertex();
 
   MCParticleGraph mpg;
 
-  //Generate event.
+  // generate event
   m_generator.generateEvent(mpg);
 
-  //Boost to lab and set vertex.
+  // scale CMS energy of generated particles to initial.getMass()
+  scaleParticleEnergies(mpg, initial.getMass());
+
+  // transform to lab and set vertex.
   for (size_t i = 0; i < mpg.size(); ++i) {
     mpg[i].set4Vector(boost * mpg[i].get4Vector());
 
-    B2Vector3D v3 = mpg[i].getProductionVertex();
+    ROOT::Math::XYZVector v3 = mpg[i].getProductionVertex();
     v3 = v3 + vertex;
     mpg[i].setProductionVertex(v3);
     mpg[i].setValidVertex(true);

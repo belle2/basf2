@@ -1,4 +1,7 @@
-.. tip:: 
+Information for skim experts
+----------------------------
+
+.. tip::
     The functions and tools documented here are intended for skim liaisons and developers. If you are only interested in the selection criteria, then this section is probably not relevant for you.
 
 .. _writing-skims:
@@ -52,7 +55,7 @@ To write a new skim, please follow these steps:
 
 3. If you require any standard lists to be loaded for your skim, override the method ``load_standard_lists``. This will be run before ``build_lists`` and ``additional_setup``.
 
-   This step is separated into its own function so that the `CombinedSkim` class can do special handling of these functions to avoid accidentally loading a standard list twice when combinining skims.
+   This step is separated into its own function so that the `CombinedSkim` class can do special handling of these functions to avoid accidentally loading a standard list twice when combining skims.
 
 4. If any further setup is required, then override the ``additional_setup`` method.
 
@@ -257,12 +260,6 @@ In the skim package, there are command-line tools available for running skims, d
    :nodefaultconst:
    :nogroupsections:
 
-
-Skim tutorial
-~~~~~~~~~~~~~
-
-A Jupyter notebook skimming tutorial can be found in ``skim/tutorial/Skimming_Tutorial.ipynb`` in basf2.
-
 .. _skim-registry:
 
 Skim registry
@@ -282,7 +279,7 @@ The skim numbering convention is defined on the `Confluence skim page`_.
 .. _testing-skims:
 
 Testing skim performance
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 When skims are developed, it is important to test the performance of the skim on a data and on a range of background MC samples. Two command-line tools are provided in the skim package to aid in this: :ref:`b2skim-stats-submit<b2skim-stats-submit>` and :ref:`b2skim-stats-print<b2skim-stats-print>`. They are available in the ``PATH`` after setting up the ``basf2`` environment after calling ``b2setup``. The former submits a series of test jobs for a skim on data and MC samples, and the latter uses the output files of the jobs to calculate performance statistics for each sample including retention rate, CPU time, and uDST size per event. ``b2skim-stats-print`` also provides estimates for combined MC samples, where the statistics are weighted by the cross-section of each background process.
 
@@ -302,7 +299,7 @@ This will read the output files of the test jobs, and produce tables of statisti
 
 * By default, a subset of the statistics are printed to the screen.
 
-* If the ``-M`` flag is provided, a Markdown table will be written to ``SkimStats.md``. This table is in a format that can be copied into the comment fields of pull requests (where BitBucket will format the table nicely for you). Use this flag when asked to produce a table of stats in a pull request.
+* If the ``-M`` flag is provided, a Markdown table will be written to ``SkimStats.md``. This table is in a format that can be copied into the comment fields of merge requests (where GitLab will format the table nicely for you). Use this flag when asked to produce a table of stats in a merge request.
 
 * If the ``-C`` flag is provided, a text file ``SkimStats.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
 
@@ -437,7 +434,7 @@ Miscellaneous utility functions
 .. _b2skim-prod:
 
 ``b2skim-prod``: Produce grid production requests
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. argparse::
    :filename: skim/tools/b2skim-prod

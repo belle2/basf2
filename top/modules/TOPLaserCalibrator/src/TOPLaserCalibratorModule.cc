@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPLaserCalibrator/TOPLaserCalibratorModule.h>
+
+// TOP headers.
 #include <top/modules/TOPLaserCalibrator/LaserCalibratorFit.h>
 
 // framework - DataStore

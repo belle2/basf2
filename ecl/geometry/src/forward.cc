@@ -5,29 +5,37 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
+/* Own header. */
 #include <ecl/geometry/GeoECLCreator.h>
-#include "ecl/geometry/BelleLathe.h"
-#include "ecl/geometry/BelleCrystal.h"
-#include "G4LogicalVolume.hh"
-#include "G4PVPlacement.hh"
-#include <G4VisAttributes.hh>
-#include <G4Tubs.hh>
-#include <G4Box.hh>
+
+/* ECL headers. */
+#include <ecl/geometry/BelleLathe.h>
+#include <ecl/geometry/BelleCrystal.h>
+#include <ecl/geometry/shapes.h>
+
+/* Basf2 headers. */
+#include <geometry/Materials.h>
+
+/* Geant4 headers. */
 #include <G4AssemblyVolume.hh>
-#include <G4SubtractionSolid.hh>
-#include <G4Region.hh>
-#include <G4UnionSolid.hh>
-#include <G4TwoVector.hh>
+#include <G4Box.hh>
+#include <G4LogicalVolume.hh>
+#include <G4Point3D.hh>
+#include <G4PVPlacement.hh>
 #include <G4PVReplica.hh>
-#include "G4ReflectionFactory.hh"
+#include <G4ReflectionFactory.hh>
+#include <G4Region.hh>
+#include <G4SubtractionSolid.hh>
+#include <G4Tubs.hh>
+#include <G4TwoVector.hh>
+#include <G4UnionSolid.hh>
+#include <G4Vector3D.hh>
+#include <G4VisAttributes.hh>
 #include <G4Trap.hh>
 
+/* C++ headers. */
 #include <iostream>
-#include "CLHEP/Matrix/Vector.h"
-#include "G4Vector3D.hh"
-#include "G4Point3D.hh"
-#include "ecl/geometry/shapes.h"
-#include <geometry/Materials.h>
 
 using namespace std;
 using namespace Belle2;
@@ -269,6 +277,10 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLForwardWrappedCrystal_Physical", indx), crystalvolume_logical,
                         false, indx, overlap);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_preamplifier) {
@@ -368,6 +380,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     // for (int i = 0; i < 8; i++)
     //   new G4PVPlacement(G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1415 - 165 + 420. / 2,
     //                     1960 + ZT + (97. + 160.) / 2)*tp * t4, l4, suf("support_leg_p4_physical", i), top, false, i, overlap);
+
+    delete support_leg;
   }
 
 
@@ -696,6 +710,8 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->MakeImprint(innervolumesector_logical,  tr, 0, overlap);
     tr = G4RotateZ3D(-M_PI / 16);
     acs->MakeImprint(innervolumesector_logical,  tr, 1, overlap);
+
+    delete acs;
   }
 
   if (b_support_structure_15) { // numbering scheme as in ECL-004K102.pdf page 15

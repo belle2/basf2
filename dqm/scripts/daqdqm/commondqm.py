@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -14,6 +13,7 @@ from svd import add_svd_create_recodigits
 from svd.dqm_utils import add_svd_dqm_dose
 from geometry import check_components
 from analysisDQM import add_analysis_dqm, add_mirabelle_dqm
+import neurotrigger
 
 
 def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mode="dont_care", create_hlt_unit_histograms=False):
@@ -230,6 +230,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(ecldqm)
         ecldqmext = b2.register_module('ECLDQMEXTENDED')
         path.add_module(ecldqmext)
+        path.add_module('ECLDQMOutOfTimeDigits')
+        path.add_module('ECLDQMConnectedRegions')
         # we dont want to create large histograms on HLT, thus ERECO only
         if dqm_environment == "expressreco":
             path.add_module('ECLDQMInjection', histogramDirectoryName='ECLINJ')
@@ -249,6 +251,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # TRGECL
         trgecldqm = b2.register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+        trgecltimingdqm = b2.register_module('TRGECLEventTimingDQM')
+        path.add_module(trgecltimingdqm)
         # TRGGDL
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
@@ -284,7 +288,23 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             isVerbose=0)
             path.add_module('TRGCDCT3DDQM', T3DMOD=mod_t3d)
         # CDCTriggerNeuro
+        if dqm_environment != "expressreco":
+            neurotrigger.add_neurotrigger_hw(path)
+            path.add_module('CDCTriggerNeuroDQMOnline', histogramDirectoryName="TRGCDCTNN2", useRecoTracks=False)
         path.add_module('CDCTriggerNeuroDQM')
+
+    # TRG for expressreco:
+    if dqm_environment == "expressreco" and (components is None or 'TRG' in components) and (dqm_mode in ["dont_care"]):
+        # TRGCDCTNN
+        neurotrigger.add_neurotrigger_hw(path)
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneurotracks,
+                        hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwsimneurotracks,
+                        hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+        path.add_module('CDCTriggerRecoMatcher', TrgTrackCollectionName=neurotrigger.hwneuroinput2dfindertracks,
+                        hitCollectionName=neurotrigger.hwneuroinputsegmenthits, axialOnly=True)
+        path.add_module('CDCTriggerNeuroDQMOnline', histogramDirectoryName="TRGCDCTNN2", useRecoTracks=True)
+
     # TRG after skim
     if (components is None or 'TRG' in components) and (dqm_mode in ["dont_care", "filtered"]):
         # TRGGDL
@@ -321,12 +341,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_mirabelle_dqm(path)
 
     # KLM2 (requires mu+ particle list from add_analysis_dqm)
-    if (components is None or 'KLM' in components) and (dqm_mode in ["dont_care", "filtered"]):
-        klmdqm2 = b2.register_module("KLMDQM2")
-        path.add_module(klmdqm2, MuonListName='mu+:KLMDQM',
+    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
                         MinimalMatchingDigits=12,
                         MinimalMatchingDigitsOuterLayers=0,
-                        MinimalMomentumNoOuterLayers=4.0)
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

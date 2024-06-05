@@ -448,6 +448,10 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBarrelWrappedCrystal_Physical", indx), sectorlogical, false,
                         72 + 9 * (indx / 2) + (indx % 2), overlap);
     }
+
+    for (shape_t* shape : cryst) {
+      delete shape;
+    }
   }
 
   if (b_crystal_support) {

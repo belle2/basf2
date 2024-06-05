@@ -64,18 +64,20 @@ namespace Belle2 {
     EXPECT_DOUBLE_EQ(aVxdID, testPoint.getVxdID());
 
     // needing globalized position and error:
-    TVector3 aPosition = sensorInfoBase.pointToGlobal(TVector3(aCluster.getU(), aCluster.getV(), 0), true);
-    TVector3 globalizedVariances = sensorInfoBase.vectorToGlobal(
-                                     TVector3(
-                                       aCluster.getUSigma() * aCluster.getUSigma(),
-                                       aCluster.getVSigma() * aCluster.getVSigma(),
-                                       0
-                                     ),
-                                     true
-                                   );
+    ROOT::Math::XYZVector aPosition = sensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(aCluster.getU(), aCluster.getV(), 0), true);
+    ROOT::Math::XYZVector globalizedVariances = sensorInfoBase.vectorToGlobal(
+                                                  ROOT::Math::XYZVector(
+                                                    aCluster.getUSigma() * aCluster.getUSigma(),
+                                                    aCluster.getVSigma() * aCluster.getVSigma(),
+                                                    0
+                                                  ),
+                                                  true
+                                                );
 
-    TVector3 globalError;
-    for (int i = 0; i < 3; i++) { globalError[i] = sqrt(abs(globalizedVariances[i])); }
+    ROOT::Math::XYZVector globalError;
+    globalError.SetX(sqrt(abs(globalizedVariances.X())));
+    globalError.SetY(sqrt(abs(globalizedVariances.Y())));
+    globalError.SetZ(sqrt(abs(globalizedVariances.Z())));
 
     EXPECT_DOUBLE_EQ(aPosition.X(), testPoint.getPosition().X());
     EXPECT_DOUBLE_EQ(aPosition.Y(), testPoint.getPosition().Y());
@@ -136,17 +138,20 @@ namespace Belle2 {
 
 
     // check results for full 2D cluster-combi:
-    TVector3 aPositionFor2D = sensorInfoBase.pointToGlobal(TVector3(clusterU1.getPosition(), clusterV1.getPosition(), 0), true);
-    TVector3 globalizedVariancesFor2D = sensorInfoBase.vectorToGlobal(
-                                          TVector3(
-                                            clusterU1.getPositionSigma() * clusterU1.getPositionSigma(),
-                                            clusterV1.getPositionSigma() * clusterV1.getPositionSigma(),
-                                            0
-                                          ),
-                                          true
-                                        );
-    TVector3 globalErrorFor2D;
-    for (int i = 0; i < 3; i++) { globalErrorFor2D[i] = sqrt(abs(globalizedVariancesFor2D[i])); }
+    ROOT::Math::XYZVector aPositionFor2D = sensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(clusterU1.getPosition(),
+                                           clusterV1.getPosition(), 0), true);
+    ROOT::Math::XYZVector globalizedVariancesFor2D = sensorInfoBase.vectorToGlobal(
+                                                       ROOT::Math::XYZVector(
+                                                         clusterU1.getPositionSigma() * clusterU1.getPositionSigma(),
+                                                         clusterV1.getPositionSigma() * clusterV1.getPositionSigma(),
+                                                         0
+                                                       ),
+                                                       true
+                                                     );
+    ROOT::Math::XYZVector globalErrorFor2D;
+    globalErrorFor2D.SetX(sqrt(abs(globalizedVariancesFor2D.X())));
+    globalErrorFor2D.SetY(sqrt(abs(globalizedVariancesFor2D.Y())));
+    globalErrorFor2D.SetZ(sqrt(abs(globalizedVariancesFor2D.Z())));
 
     // vxdID:
     EXPECT_EQ(aVxdID, testPoint2D.getVxdID());
@@ -164,17 +169,20 @@ namespace Belle2 {
 
 
     // check results for single-cluster-only-case:
-    TVector3 aPositionFor1D = anotherSensorInfoBase.pointToGlobal(TVector3(clusterU3.getPosition(), 0, 0), true);
-    TVector3 globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
-                                          TVector3(
-                                            clusterU3.getPositionSigma() * clusterU3.getPositionSigma(),
-                                            anotherSensorInfoBase.getVSize() * anotherSensorInfoBase.getVSize() / 12.,
-                                            0
-                                          ),
-                                          true
-                                        );
-    TVector3 globalErrorFor1D;
-    for (int i = 0; i < 3; i++) { globalErrorFor1D[i] = sqrt(abs(globalizedVariancesFor1D[i])); }
+    ROOT::Math::XYZVector aPositionFor1D = anotherSensorInfoBase.pointToGlobal(ROOT::Math::XYZVector(clusterU3.getPosition(), 0, 0),
+                                           true);
+    ROOT::Math::XYZVector globalizedVariancesFor1D = anotherSensorInfoBase.vectorToGlobal(
+                                                       ROOT::Math::XYZVector(
+                                                         clusterU3.getPositionSigma() * clusterU3.getPositionSigma(),
+                                                         anotherSensorInfoBase.getVSize() * anotherSensorInfoBase.getVSize() / 12.,
+                                                         0
+                                                       ),
+                                                       true
+                                                     );
+    ROOT::Math::XYZVector globalErrorFor1D;
+    globalErrorFor1D.SetX(sqrt(abs(globalizedVariancesFor1D.X())));
+    globalErrorFor1D.SetY(sqrt(abs(globalizedVariancesFor1D.Y())));
+    globalErrorFor1D.SetZ(sqrt(abs(globalizedVariancesFor1D.Z())));
 
 
     // vxdID:
@@ -610,9 +618,9 @@ namespace Belle2 {
 //  B2INFO("testGenfitCompatibility: preparing genfit track filled with arbitrary input")
 //  // preparing genfit track filled with arbitrary input
 //  genfit::AbsTrackRep* trackRep = new genfit::RKTrackRep(211);
-// //   TVector3 posSeed =
-// //   TVector3 posSeed =
-//  genfit::Track track(trackRep, newSP->getPosition(), TVector3(23., 42., 5.));
+// //   ROOT::Math::XYZVector posSeed =
+// //   ROOT::Math::XYZVector posSeed =
+//  genfit::Track track(trackRep, newSP->getPosition(), ROOT::Math::XYZVector(23., 42., 5.));
 //
 //  B2INFO("testGenfitCompatibility: feed the track with spacePoints ported to genfit compatible stuff")
 //  // feed the track with spacePoints ported to genfit compatible stuff:

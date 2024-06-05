@@ -8,13 +8,8 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
-
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
 //std
 #include <set>
@@ -28,7 +23,7 @@ namespace Belle2 {
    * This module is for analysis of ECL DQM histograms.
    */
 
-  class DQMHistAnalysisECLShapersModule : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
+  class DQMHistAnalysisECLShapersModule final : public DQMHistAnalysisModule { /**< derived from DQMHistAnalysisModule class. */
 
   public:
 
@@ -36,35 +31,28 @@ namespace Belle2 {
     DQMHistAnalysisECLShapersModule();
 
     /** Destructor. */
-    virtual ~DQMHistAnalysisECLShapersModule();
+    ~DQMHistAnalysisECLShapersModule();
 
     /** Initialize the module. */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Call when a run begins. */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Event processor. */
-    virtual void event() override;
+    void event() override final;
     /** Call when a run ends. */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Terminate. */
-    virtual void terminate() override;
+    void terminate() override final {}
 
   private:
-
-    /** flag if to export to EPICS */
-    bool m_useEpics;
+    /** Prefix to use for PVs registered by this module */
+    std::string m_pvPrefix;
 
     /** Number of ECLCollector modules (normally 52) */
     const static int c_collector_count = ECL::ECL_CRATES;
 
     /** Remove upper 10% of the values, return the maximum in the remaining 90% */
     double robust_max(std::multiset<double> values);
-
-#ifdef _BELLE2_EPICS
-    /** EPICS channels for logic_summary histogram */
-    chid chid_logic[c_collector_count];
-    /** EPICS channels for pedestal width */
-    chid chid_pedwidth[4];
 
     /** Max pedestal width array
      * [0] -> Max pedestal width in FWD endcap
@@ -79,7 +67,6 @@ namespace Belle2 {
 
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
     TCanvas* m_c_main = nullptr; /**< main panel for monitoring object */
-#endif
   };
 } // end namespace Belle2
 

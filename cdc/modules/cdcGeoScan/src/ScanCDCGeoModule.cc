@@ -74,19 +74,19 @@ void ScanCDCGeoModule::initialize()
     h_nwires->SetBinContent(i + 1, fnWires);
 
     // forward position of the input sense wire
-    const TVector3& wirePosF = cdcgeo.wireForwardPosition(i, 0);
+    const B2Vector3D& wirePosF = cdcgeo.wireForwardPosition(i, 0);
     fswire_posF_phi = wirePosF.Phi();
     h_swire_posF_phi->SetBinContent(i + 1, fswire_posF_phi);
     fswire_posF_theta = wirePosF.Theta();
     h_swire_posF_theta->SetBinContent(i + 1, fswire_posF_theta);
 
-    const TVector3& wirePosB = cdcgeo.wireBackwardPosition(i, 0);
+    const B2Vector3D& wirePosB = cdcgeo.wireBackwardPosition(i, 0);
     fswire_posB_phi = wirePosB.Phi();
     h_swire_posB_phi->SetBinContent(i + 1, fswire_posB_phi);
     fswire_posB_theta = wirePosB.Theta();
     h_swire_posB_theta->SetBinContent(i + 1, fswire_posB_theta);
 
-    const TVector3 wireDir = (wirePosF - wirePosB);
+    const B2Vector3D wireDir = (wirePosF - wirePosB);
     fstereoAng = wireDir.Theta();
     if (wirePosF.Phi() < wirePosB.Phi())fstereoAng *= -1;
     h_stereo->SetBinContent(i + 1, fstereoAng);

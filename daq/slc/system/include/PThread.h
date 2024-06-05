@@ -61,7 +61,7 @@ namespace Belle2 {
   public:
     PThread() : m_th(0) {}
     template<class WORKER>
-    PThread(WORKER* worker, bool destroyed = true, bool detached = true, const std::string& thread_name = "")
+    PThread(WORKER* worker, bool destroyed = true, bool detached = true, [[maybe_unused]] const std::string& thread_name = "")
     {
       m_th = 0;
       if (destroyed) {

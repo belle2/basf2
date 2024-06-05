@@ -135,8 +135,10 @@ namespace {
     }
     auto cov = beamparams.getCovVertex();
     auto pos = beamparams.getVertex();
+    EXPECT_NEAR(mean.getMean(0), pos.x(), 1e-4);
+    EXPECT_NEAR(mean.getMean(1), pos.y(), 1e-4);
+    EXPECT_NEAR(mean.getMean(2), pos.z(), 1e-4);
     for (int i = 0; i < 3; ++i) {
-      EXPECT_NEAR(mean.getMean(i), pos(i), 1e-4);
       for (int j = 0; j < 3; ++j) {
         EXPECT_NEAR(mean.getCovariance(i, j), cov(i, j), 1e-6);
       }
@@ -216,7 +218,7 @@ namespace {
     MCInitialParticles& initial = generator.generate();
     ROOT::Math::PxPyPzEVector her = initial.getHER();
     ROOT::Math::PxPyPzEVector ler = initial.getLER();
-    TVector3 vertex = initial.getVertex();
+    ROOT::Math::XYZVector vertex = initial.getVertex();
     for (int i = 0; i < 10; ++i) {
       initial = generator.generate();
       EXPECT_EQ(her, initial.getHER());
@@ -241,26 +243,26 @@ namespace {
     beamparams.setGenerationFlags(BeamParameters::c_smearBeam);
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     // first run but no smearing allowed, should return the nominal vertex
-    TVector3 shift = generator.updateVertex();
-    EXPECT_EQ(shift, TVector3(0, 1, 2));
+    ROOT::Math::XYZVector shift = generator.updateVertex();
+    EXPECT_EQ(shift, ROOT::Math::XYZVector(0, 1, 2));
     // create a new initial particle. Particle exists now, no smearing allowed so no change in shift
     const MCInitialParticles& initial = generator.generate();
     auto nominal = initial.getVertex();
     shift = generator.updateVertex();
-    EXPECT_EQ(shift, TVector3(0, 0, 0));
+    EXPECT_EQ(shift, ROOT::Math::XYZVector(0, 0, 0));
     // ok, allow smearing, now we expect shift
     beamparams.setGenerationFlags(BeamParameters::c_smearALL);
     DBStore::Instance().addConstantOverride("BeamParameters", new BeamParameters(beamparams));
     shift = generator.updateVertex();
-    EXPECT_NE(shift, TVector3(0, 0, 0));
+    EXPECT_NE(shift, ROOT::Math::XYZVector(0, 0, 0));
     EXPECT_EQ(nominal + shift, initial.getVertex());
     // but running again should not shift again
     shift = generator.updateVertex();
-    EXPECT_EQ(shift, TVector3(0, 0, 0));
+    EXPECT_EQ(shift, ROOT::Math::XYZVector(0, 0, 0));
     // unless we force regeneration
     auto previous = initial.getVertex();
     shift = generator.updateVertex(true);
-    EXPECT_NE(shift, TVector3(0, 0, 0));
+    EXPECT_NE(shift, ROOT::Math::XYZVector(0, 0, 0));
     EXPECT_EQ(previous + shift, initial.getVertex());
   }
 }

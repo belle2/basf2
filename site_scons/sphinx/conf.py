@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # basf2 documentation build configuration file, created by
 # sphinx-quickstart on Mon May 23 17:26:16 2016.
@@ -42,11 +41,18 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosectionlabel',
+    'sphinx_codeautolink',
     'sphinxarg.ext',
     'basf2ext',
     'nbsphinx',
+    'sphinxcontrib.programoutput',
     'IPython.sphinxext.ipython_console_highlighting',
 ]
+
+# Codeautolink warnings for compilation. Turned off due to conflicts with line
+# numbering.
+codeautolink_warn_on_missing_inventory = False
+codeautolink_warn_on_failed_resolve = False
 
 nbsphinx_allow_errors = True
 # Anything that ends with .jupy.py will be understood as a jupyter
@@ -62,7 +68,7 @@ nbsphinx_custom_formats = {
 # prefix each section with the name of the document it is in followed by a
 # colon
 autosectionlabel_prefix_document = True
-suppress_warnings = ['autosectionlabel.*']
+suppress_warnings = ['autosectionlabel.*', 'codeautolink.*']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_sphinxtemplates']
@@ -90,9 +96,9 @@ author = 'Belle II Software Group'
 # The short X.Y version.
 version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 # Used for links to the repository
-basf2_repository = "https://stash.desy.de/projects/B2/repos/basf2"
+basf2_repository = "https://gitlab.desy.de/belle2/software/basf2/"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
-basf2_jira = "https://agira.desy.de"
+basf2_issues = "https://gitlab.desy.de/belle2/software/basf2/-/issues/"
 
 # The full version, including alpha/beta/rc tags.
 release = os.environ.get('BELLE2_RELEASE', 'development')
@@ -129,7 +135,7 @@ language = None
 exclude_patterns = ['.*', '_sphinxbuild', 'Thumbs.db', 'build', 'include', 'lib', 'bin', 'modules', 'data', 'site_scons']
 # If we want to create the light release documentation then we need t exclude anything not in the light release.
 if tags.has('light'):  # noqa
-    light_packages = set([entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')])
+    light_packages = {entry.strip('/') for entry in open('../../.light').read().split() if entry.endswith('/')}
     for entry in os.listdir("../../"):
         if entry.find('.') > -1 or os.path.isfile(entry) or entry in exclude_patterns or entry in light_packages:
             continue
@@ -139,7 +145,7 @@ if tags.has('light'):  # noqa
 # now we need to exclude everything in the build dir except for the tools_doc
 # sub dir but there's no negative exclusion pattern so do it manually
 exclude_patterns.remove("build")
-exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*']
+exclude_patterns += ['build/html', 'build/latex', 'build/json', 'build/Linux*', 'build/belle2_tools']
 # Ignore jupyter notebooks by default, we only want the ones meant for documentation
 exclude_patterns += ['**/*.ipynb', '*.ipynb']
 
@@ -179,7 +185,7 @@ numfig = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'sphinx_book_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -295,7 +301,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'Belle 2 Software Documentation',
+    (master_doc, 'basf2.tex', 'Belle II Software Documentation',
      author, 'manual'),
 ]
 
@@ -363,7 +369,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
-                       'matplotlib': ('https://matplotlib.org/stable/', None)}
+                       'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
 def process_sig(app, what, name, obj, options, signature, return_annotation):
@@ -412,7 +419,7 @@ def improve_docstring(obj):
     doxygen_url = 'https://software.belle2.org/development/class'
     doxygen_url += '_1_1'.join(classname.split('::'))
     doxygen_url += '.html'
-    pyclass.__doc__ += '\n`Doxygen page for %s <%s>`_' % (classname, doxygen_url)
+    pyclass.__doc__ += f'\n`Doxygen page for {classname} <{doxygen_url}>`_'
 
     # TODO put this into the member docstrings directly? (sadly, readonly)
     members = tclass.GetListOfMethods()
@@ -420,19 +427,19 @@ def improve_docstring(obj):
         pyclass.__doc__ += '\n\nMember functions:'
     for f in members:
         # getattr(pyclass, f.GetName()).__doc__ = "test"
-        pyclass.__doc__ += '\n * %s %s%s' % (f.GetReturnTypeName(), f.GetName(), f.GetSignature())
+        pyclass.__doc__ += f'\n * {f.GetReturnTypeName()} {f.GetName()}{f.GetSignature()}'
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += ' (%s)' % (title)
+            pyclass.__doc__ += f' ({title})'
 
     members = tclass.GetListOfAllPublicDataMembers()
     if members.GetEntries() > 0:
         pyclass.__doc__ += '\n\nPublic data members'
     for f in members:
-        pyclass.__doc__ += '\n * %s' % (f.GetName())
+        pyclass.__doc__ += f'\n * {f.GetName()}'
         title = f.GetTitle()
         if title:
-            pyclass.__doc__ += ' (%s)' % (title)
+            pyclass.__doc__ += f' ({title})'
 
 
 def skipmember(app, what, name, obj, skip, options):

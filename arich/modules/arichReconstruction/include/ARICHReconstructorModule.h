@@ -6,14 +6,20 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef ARICHRECONSTRUCTORMODULE_H
-#define ARICHRECONSTRUCTORMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 #include <arich/modules/arichReconstruction/ARICHReconstruction.h>
 
 namespace Belle2 {
+  class ARICHHit;
+  class Track;
+  class ExtHit;
+  class ARICHAeroHit;
+  class ARICHLikelihood;
+  class ARICHTrack;
 
   /** ARICH subdetector main module
    *
@@ -56,26 +62,19 @@ namespace Belle2 {
      */
     virtual void event() override;
 
-    /**
-     * End-of-run action.
-     *
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     *
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
   protected:
 
     /*! Print module parameters.*/
     void printModuleParams();
 
   private:
+
+    StoreArray<ARICHHit> m_ARICHHits;
+    StoreArray<Track> m_Tracks;
+    StoreArray<ExtHit> m_ExtHits;
+    StoreArray<ARICHAeroHit> m_aeroHits;
+    StoreArray<ARICHLikelihood> m_ARICHLikelihoods;
+    StoreArray<ARICHTrack> m_ARICHTracks;
 
     // Other members.
     ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
@@ -88,5 +87,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif // ARICHRECONSTRUCTORMODULE

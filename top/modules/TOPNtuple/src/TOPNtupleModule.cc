@@ -6,10 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPNtuple/TOPNtupleModule.h>
 
+// TOP headers.
 #include <top/geometry/TOPGeometryPar.h>
+#include <top/reconstruction_cpp/TOPRecoManager.h>
 
 // framework - DataStore
 #include <framework/datastore/StoreArray.h>
@@ -26,6 +28,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <top/dataobjects/TOPLikelihood.h>
 #include <top/dataobjects/TOPBarHit.h>
+#include <top/dataobjects/TOPDigit.h>
 #include <tracking/dataobjects/ExtHit.h>
 
 // ROOT
@@ -91,10 +94,13 @@ namespace Belle2 {
     m_tree->Branch("rhoDec", &m_top.rhoDec, "rhoDec/F");
     m_tree->Branch("zDec",   &m_top.zDec,   "zDec/F");
     m_tree->Branch("phiDec", &m_top.phiDec, "phiDec/F");
+    m_tree->Branch("yieldMC", &m_top.yieldMC, "yieldMC/I");
 
     m_tree->Branch("numPhot", &m_top.numPhot, "numPhot/I");
     m_tree->Branch("numBkg", &m_top.numBkg, "numBkg/F");
+    m_tree->Branch("moduleID", &m_top.moduleID, "moduleID/I");
     m_tree->Branch("phot",  &m_top.phot,  "e/F:mu:pi:K:p:d");
+    m_tree->Branch("yield",  &m_top.yield,  "e/F:mu:pi:K:p:d");
     m_tree->Branch("logL",  &m_top.logL,  "e/F:mu:pi:K:p:d");
 
     m_tree->Branch("extHit",  &m_top.extHit,  "moduleID/I:PDG:x/F:y:z:p:theta:phi:time");
@@ -140,16 +146,24 @@ namespace Belle2 {
       const TOPBarHit* barHit = top->getRelated<TOPBarHit>();
       const MCParticle* mcParticle = track.getRelated<MCParticle>();
       const MCParticle* mother = 0;
-      if (mcParticle) mother = mcParticle->getMother();
+      if (mcParticle) {
+        mother = mcParticle->getMother();
+        if (not barHit) { // Track MC matching probably done after TOPReconstructor so no relation from TOPLikelihood
+          const auto barHits = mcParticle->getRelationsWith<TOPBarHit>();
+          for (const auto& bHit : barHits) {
+            if (bHit.getModuleID() == extHit->getCopyID()) barHit = &bHit;
+          }
+        }
+      }
 
       m_top.clear();
 
       m_top.evt = evtMetaData->getEvent();
       m_top.run = evtMetaData->getRun();
 
-      TVector3 mom = trackFit->getMomentum();
-      m_top.p = mom.Mag();
-      m_top.cth = mom.CosTheta();
+      ROOT::Math::XYZVector mom = trackFit->getMomentum();
+      m_top.p = mom.R();
+      m_top.cth = cos(mom.Theta());
       m_top.phi = mom.Phi();
       m_top.pValue = trackFit->getPValue();
 
@@ -158,24 +172,43 @@ namespace Belle2 {
         if (mother) m_top.motherPDG = mother->getPDG();
         m_top.primary = mcParticle->getStatus(MCParticle::c_PrimaryParticle);
         m_top.seen = mcParticle->hasSeenInDetector(Const::TOP);
-        B2Vector3D prodVertex = mcParticle->getProductionVertex();
-        m_top.rhoProd = prodVertex.Perp();
+        ROOT::Math::XYZVector prodVertex = mcParticle->getProductionVertex();
+        m_top.rhoProd = prodVertex.Rho();
         m_top.zProd = prodVertex.Z();
         m_top.phiProd = prodVertex.Phi();
-        TVector3 decVertex = mcParticle->getDecayVertex();
-        m_top.rhoDec = decVertex.Perp();
+        ROOT::Math::XYZVector decVertex = mcParticle->getDecayVertex();
+        m_top.rhoDec = decVertex.Rho();
         m_top.zDec = decVertex.Z();
         m_top.phiDec = decVertex.Phi();
+        const auto digits = mcParticle->getRelationsWith<TOPDigit>();
+        for (size_t i = 0; i < digits.size(); i++) {
+          double wt = digits.weight(i);
+          if (wt <= 0) continue; // photon not from this MC particle
+          const auto* digit = digits[i];
+          if (digit->getHitQuality() != TOPDigit::c_Good) continue;
+          if (digit->getModuleID() != top->getModuleID()) continue;
+          if (digit->getTime() < TOPRecoManager::getMinTime() or digit->getTime() > TOPRecoManager::getMaxTime()) continue;
+          m_top.yieldMC++;
+        }
       }
 
       m_top.numPhot = top->getNphot();
       m_top.numBkg = top->getEstBkg();
+      m_top.moduleID = top->getModuleID();
+
       m_top.phot.e  = top->getEstPhot(Const::electron);
       m_top.phot.mu = top->getEstPhot(Const::muon);
       m_top.phot.pi = top->getEstPhot(Const::pion);
       m_top.phot.K  =  top->getEstPhot(Const::kaon);
       m_top.phot.p  = top->getEstPhot(Const::proton);
       m_top.phot.d  = top->getEstPhot(Const::deuteron);
+
+      m_top.yield.e  = top->getEffectiveSignalYield(Const::electron);
+      m_top.yield.mu = top->getEffectiveSignalYield(Const::muon);
+      m_top.yield.pi = top->getEffectiveSignalYield(Const::pion);
+      m_top.yield.K  =  top->getEffectiveSignalYield(Const::kaon);
+      m_top.yield.p  = top->getEffectiveSignalYield(Const::proton);
+      m_top.yield.d  = top->getEffectiveSignalYield(Const::deuteron);
 
       m_top.logL.e  = top->getLogL(Const::electron);
       m_top.logL.mu = top->getLogL(Const::muon);
@@ -186,8 +219,8 @@ namespace Belle2 {
 
       if (extHit) {
         int moduleID = extHit->getCopyID();
-        TVector3 position = extHit->getPositionTVector3();
-        TVector3 momentum = extHit->getMomentumTVector3();
+        auto position = static_cast<ROOT::Math::XYZPoint>(extHit->getPosition());
+        auto momentum = extHit->getMomentum();
         if (geo->isModuleIDValid(moduleID)) {
           const auto& module = geo->getModule(moduleID);
           position = module.pointToLocal(position);
@@ -198,7 +231,7 @@ namespace Belle2 {
         m_top.extHit.x = position.X();
         m_top.extHit.y = position.Y();
         m_top.extHit.z = position.Z();
-        m_top.extHit.p = momentum.Mag();
+        m_top.extHit.p = momentum.R();
         m_top.extHit.theta = momentum.Theta();
         m_top.extHit.phi = momentum.Phi();
         m_top.extHit.time = extHit->getTOF();
@@ -206,8 +239,8 @@ namespace Belle2 {
 
       if (barHit) {
         int moduleID = barHit->getModuleID();
-        TVector3 position = barHit->getPosition();
-        TVector3 momentum = barHit->getMomentum();
+        auto position = barHit->getPosition();
+        auto momentum = barHit->getMomentum();
         if (geo->isModuleIDValid(moduleID)) {
           const auto& module = geo->getModule(moduleID);
           position = module.pointToLocal(position);
@@ -218,7 +251,7 @@ namespace Belle2 {
         m_top.barHit.x = position.X();
         m_top.barHit.y = position.Y();
         m_top.barHit.z = position.Z();
-        m_top.barHit.p = momentum.Mag();
+        m_top.barHit.p = momentum.R();
         m_top.barHit.theta = momentum.Theta();
         m_top.barHit.phi = momentum.Phi();
         m_top.barHit.time = barHit->getTime() - trueEventT0;

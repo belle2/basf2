@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 """
 <header>
     <input>PhokharaEvtgenData.root</input>
     <output>PhokharaEvtgenAnalysis.root</output>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Analysis of e+ e- -> J/psi eta_c events.</description>
 </header>
 """
@@ -21,7 +20,7 @@ class PhokharaEvtgenAnalysisModule(b2.Module):
 
     def __init__(self):
         """Initialization."""
-        super(PhokharaEvtgenAnalysisModule, self).__init__()
+        super().__init__()
         #: Output file.
         self.output_file = ROOT.TFile('PhokharaEvtgenAnalysis.root', 'recreate')
         #: Output tree.
@@ -101,6 +100,8 @@ class PhokharaEvtgenAnalysisModule(b2.Module):
         self.output_file.Close()
 
 
+#: \cond Doxygen_suppress
+
 # Input.
 root_input = b2.register_module('RootInput')
 root_input.param('inputFileName', 'PhokharaEvtgenData.root')
@@ -111,10 +112,13 @@ phokhara_evtgen = PhokharaEvtgenAnalysisModule()
 # Create main path.
 main = b2.create_path()
 
+#: \endcond
+
 # Add modules to main path
 main.add_module(root_input)
 main.add_module(phokhara_evtgen)
 
+main.add_module('Progress')
 # Run.
 b2.process(main)
 

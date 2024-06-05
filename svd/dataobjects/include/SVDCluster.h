@@ -15,6 +15,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <sstream>
+#include <vector>
 
 namespace Belle2 {
 
@@ -173,6 +174,16 @@ namespace Belle2 {
     */
     double getQualityError() const { return m_qualityIndicatorError; }
 
+    /** Get ID of the time-group.
+     * @return time-group ID
+     */
+    const std::vector<int>& getTimeGroupId() const { return m_timeGroupId; }
+
+    /** Get time-group parameters.
+     * @return time-group parameters (integral, center, sigma)
+     */
+    const std::vector<std::tuple<float, float, float>>& getTimeGroupInfo() const { return m_timeGroupInfo; }
+
     /** Set position of the cluster
     *
     */
@@ -205,7 +216,15 @@ namespace Belle2 {
       m_qualityIndicatorError = qualityIndicatorError;
     }
 
+    /** Set ID of the time-group.
+     * @return reference to time-group ID
+     */
+    std::vector<int>& setTimeGroupId() { return m_timeGroupId; }
 
+    /** Set time-group parameters.
+     * @return reference to the time-group parameters (integral, center, sigma)
+     */
+    std::vector<std::tuple<float, float, float>>& setTimeGroupInfo() { return m_timeGroupInfo; }
 
     /** Get a string representation of the cluster. */
     std::string print() const
@@ -235,10 +254,13 @@ namespace Belle2 {
     float m_clsSN;             /**< Cluster S/N ratio */
     float m_clsChi2;           /**< Chi2 for time/amplitude fit */
     int m_firstFrame;           /**< firstFrame computed with the MaxSum algorithm */
+    std::vector<int> m_timeGroupId;    /**< Grouping of clusters in time */
+    std::vector<std::tuple<float, float, float>> m_timeGroupInfo; /**< TimeGroup Gaussian Parameters,
+                   (integral, center, sigma) */
     double m_qualityIndicator = {0.};  /**< Probability of signal cluster */
     double m_qualityIndicatorError = {0.};  /**< Error associated with probability calcualtion */
 
-    ClassDef(SVDCluster, 7)
+    ClassDef(SVDCluster, 8)
 
   };
 

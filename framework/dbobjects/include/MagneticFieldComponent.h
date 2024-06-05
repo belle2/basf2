@@ -7,7 +7,8 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/geometry/B2Vector3.h>
+#include <Math/Vector3D.h>
+#include <TObject.h>
 
 namespace Belle2 {
   /** Abstract base class for BField components.
@@ -33,9 +34,9 @@ namespace Belle2 {
     /** returns whether the field is set to exclusive mode */
     bool isExclusive() const { return m_exclusive; }
     /** check whether the point pos is inside the volume covered by the component */
-    virtual bool inside(const B2Vector3D& pos) const = 0;
+    virtual bool inside(const ROOT::Math::XYZVector& pos) const = 0;
     /** return the field at point pos */
-    virtual B2Vector3D getField(const B2Vector3D& pos) const = 0;
+    virtual ROOT::Math::XYZVector getField(const ROOT::Math::XYZVector& pos) const = 0;
     /** destructor */
     virtual ~MagneticFieldComponent() {}
 

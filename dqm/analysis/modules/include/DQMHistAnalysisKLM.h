@@ -9,9 +9,9 @@
 #pragma once
 
 /* DQM headers. */
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
@@ -36,7 +36,7 @@ namespace Belle2 {
   /**
    * Analysis of KLM DQM histograms.
    */
-  class DQMHistAnalysisKLMModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisKLMModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -45,35 +45,31 @@ namespace Belle2 {
      */
     DQMHistAnalysisKLMModule();
 
-    /**
-     * Destructor.
-     */
-    ~DQMHistAnalysisKLMModule();
 
     /**
      * Initializer.
      */
-    void initialize() override;
+    void initialize() override final;
 
     /**
      * Called when entering a new run.
      */
-    void beginRun() override;
+    void beginRun() override final;
 
     /**
      * This method is called for each event.
      */
-    void event() override;
+    void event() override final;
 
     /**
      * This method is called if the current run ends.
      */
-    void endRun() override;
+    void endRun() override final;
 
     /**
      * This method is called at the end of the event processing.
      */
-    void terminate() override;
+    void terminate() override final;
 
   private:
 
@@ -84,16 +80,18 @@ namespace Belle2 {
 
     /**
      * Analyse channel hit histogram.
-     * @param[in]  subdetector  Subdetector.
-     * @param[in]  section      Section.
+     * @param[in]  subdetector  Subdetector (E or B-KLM).
+     * @param[in]  section      Section (Forward or Backward).
      * @param[in]  sector       Sector.
+     * @param[in]  index        Histogram Index (The j'th histogram of a given sector).
      * @param[in]  histogram    Histogram.
+     * @param[in]  delta        Delta Histogram.
      * @param[in]  canvas       Canvas.
      * @param[out] latex        TLatex to draw messages.
      */
     void analyseChannelHitHistogram(
-      int subdetector, int section, int sector,
-      TH1* histogram, TCanvas* canvas, TLatex& latex);
+      int subdetector, int section, int sector, int index,
+      TH1* histogram, TH1* delta, TCanvas* canvas, TLatex& latex);
 
     /**
      * Process spatial 2D hits histograms for endcap.
@@ -105,17 +103,32 @@ namespace Belle2 {
       uint16_t section, TH2F* histogram, TCanvas* canvas);
 
     /**
+     * Process histogram containing the hit times.
+     * @param[in]  histName  Histogram name.
+     */
+    void processTimeHistogram(const std::string& histName);
+
+    /**
      * Process histogram containing the number of hits in plane.
      * @param[in]  histName  Histogram name.
      * @param[out] latex     TLatex to draw messages.
      */
     void processPlaneHistogram(const std::string& histName, TLatex& latex);
 
+
     /**
      * Fill histogram containing masked channels per sector.
      * @param[in] histName  Histogram name.
      */
     void fillMaskedChannelsHistogram(const std::string& histName);
+
+    /**
+     * Scales and draws desired delta histogram for current canvas.
+     * @param[in] delta  Delta histogram.
+     * @param[in] histogram  Base histogram (for normalization).
+     * @param[in] canvas  Canvas with delta histogram.
+     */
+    void deltaDrawer(TH1* delta, TH1* histogram, TCanvas* canvas);
 
     /** Number of processed events. */
     double m_ProcessedEvents;
@@ -132,11 +145,23 @@ namespace Belle2 {
     /** Minimal number of hits for flagging. */
     int m_MinHitsForFlagging;
 
+    /** Message Threshold for expert pots */
+    int m_MessageThreshold;
+
     /** Input parameter for minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessagesInput;
 
     /** Minimal number of processed events for error messages. */
     double m_MinProcessedEventsForMessages;
+
+    /** Minimal number of entries for delta histogram update. */
+    double m_minEntries;
+
+    /** Name of histogram directory */
+    std::string m_histogramDirectoryName;
+
+    /** Prefix to account for reference file*/
+    std::string m_refHistogramDirectoryPrefix;
 
     /** Reference Histogram Root file name */
     std::string m_refFileName;
@@ -162,12 +187,6 @@ namespace Belle2 {
     /** TText for names in plane histograms. */
     TText m_PlaneText;
 
-    /** Histogram from DQMInfo with run type. */
-    TH1* m_RunType = nullptr;
-
-    /** String with run type. */
-    TString m_RunTypeString;
-
     /** Run type flag for null runs. */
     bool m_IsNullRun;
 
@@ -185,6 +204,9 @@ namespace Belle2 {
 
     /** Electronics map. */
     DBObjPtr<KLMElectronicsMap> m_ElectronicsMap;
+
+    /** Monitoring object. */
+    MonitoringObject* m_monObj {};
 
   };
 

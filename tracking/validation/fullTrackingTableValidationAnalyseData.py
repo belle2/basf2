@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,7 +20,9 @@ import basf2
 from ROOT import TFile, TNamed
 import os
 
-VALIDATION_OUTPUT_FILE = "fullTrackingTableValidation.root"
+ACTIVE = True
+
+VALIDATION_OUTPUT_FILE = "fullTrackingValidationTable.root"
 
 try:
     import uproot  # noqa
@@ -92,10 +93,10 @@ def write_value_cell(key, value):
     else:
         color = "white"
 
-    return """
+    return f"""
         <td style="border: 1px solid black" colspan={colspan}
         align="center" valign=middle bgcolor="{color}">{value}</td>
-    """.format(colspan=colspan, color=color, value=value)
+    """
 
 
 def make_html_row(x):
@@ -133,19 +134,24 @@ def get_html(df, test):
 
 
 if __name__ == '__main__':
-    # These are the categories to be tested successively
-    test = [
-        ("all", None),
-        ("has_vxd", lambda x: (x.n_svd_hits >= 2)),
-        ("vxd_was_found", lambda x: x["vxd_was_found"] == 1),
-        ("has_cdc", lambda x: x.n_cdc_hits >= 3),
-        ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
-    ]
+    if ACTIVE:
+        # These are the categories to be tested successively
+        test = [
+            ("all", None),
+            ("has_vxd", lambda x: (x.n_svd_hits >= 2)),
+            ("vxd_was_found", lambda x: x["vxd_was_found"] == 1),
+            ("has_cdc", lambda x: x.n_cdc_hits >= 3),
+            ("cdc_was_found", lambda x: x["cdc_was_found"] == 1),
+        ]
 
-    df = uproot.open("../matching_validation.root")['VxdCdcPartFinderHarvester_tree'].arrays(library='pd')
-    html = get_html(df, test)
+        df = uproot.open("../matching_validation.root")['VxdCdcPartFinderHarvester_tree'].arrays(library='pd')
+        html = get_html(df, test)
 
-    tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
-    html_content = TNamed("Tracking Table Validation", html)
-    html_content.Write()
-    tfile.Close()
+        tfile = TFile(VALIDATION_OUTPUT_FILE, "RECREATE")
+        html_content = TNamed("Tracking Table Validation", html)
+        html_content.Write()
+        tfile.Close()
+    else:
+        print("This validation deactivated and thus basf2 is not executed.\n"
+              "If you want to run this validation, please set the 'ACTIVE' flag above to 'True'.\n"
+              "Exiting.")

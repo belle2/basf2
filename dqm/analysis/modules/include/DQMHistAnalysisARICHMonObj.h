@@ -9,7 +9,7 @@
 #pragma once
 
 //DQM
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
 #include <TCanvas.h>
 
 //ARICH
@@ -20,7 +20,7 @@ namespace Belle2 {
   /**
    * Example module of how to use MonitoringObject in DQMHistAnalysis module
    */
-  class DQMHistAnalysisARICHMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisARICHMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -32,32 +32,22 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisARICHMonObjModule();
+    ~DQMHistAnalysisARICHMonObjModule();
 
     /**
      * Initialize the Module.
      */
-    virtual void initialize() override;
-
-    /**
-     * Begin run function
-     */
-    virtual void beginRun() override;
-
-    /**
-     * Event processor.
-     */
-    virtual void event() override;
+    void initialize() override final;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   protected:
 

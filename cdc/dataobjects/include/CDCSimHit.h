@@ -10,8 +10,7 @@
 
 #include <cdc/dataobjects/WireID.h>
 #include <simulation/dataobjects/SimHitBase.h>
-
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 namespace Belle2 {
   //! Example Detector
@@ -41,23 +40,18 @@ namespace Belle2 {
     float m_stepLength;
 
     //! The momentum at closest point.
-    //    TVector3 m_momentum;
     float m_momentum[3];
 
     //! The position on wire which is closest to this hit.
-    //    TVector3 m_posWire;
     float m_posWire[3];
 
     //! Position of pre-step.
-    //    TVector3 m_posIn;
     float m_posIn[3];
 
     //! Position of post-step.
-    //    TVector3 m_posOut;
     float m_posOut[3];
 
     //! Position on the track.
-    //    TVector3 m_posTrack;
     float m_posTrack[3];
 
     /**
@@ -105,7 +99,7 @@ namespace Belle2 {
     void setStepLength(double stepLength) { m_stepLength = stepLength; }
 
     //! The method to set momentum
-    void setMomentum(TVector3 momentum)
+    void setMomentum(const B2Vector3D& momentum)
     {
       m_momentum[0] = momentum.X();
       m_momentum[1] = momentum.Y();
@@ -113,7 +107,7 @@ namespace Belle2 {
     }
 
     //! The method to set position on wire
-    void setPosWire(TVector3 posWire)
+    void setPosWire(const B2Vector3D& posWire)
     {
       m_posWire[0] = posWire.X();
       m_posWire[1] = posWire.Y();
@@ -121,7 +115,7 @@ namespace Belle2 {
     }
 
     //! The method to set position of pre-step
-    void setPosIn(TVector3 posIn)
+    void setPosIn(const B2Vector3D& posIn)
     {
       m_posIn[0] = posIn.X();
       m_posIn[1] = posIn.Y();
@@ -129,7 +123,7 @@ namespace Belle2 {
     }
 
     //! The method to set position of post-step.
-    void setPosOut(TVector3 posOut)
+    void setPosOut(const B2Vector3D& posOut)
     {
       m_posOut[0] = posOut.X();
       m_posOut[1] = posOut.Y();
@@ -137,7 +131,7 @@ namespace Belle2 {
     }
 
     //! The method to set position on the track.
-    void setPosTrack(TVector3 posTrack)
+    void setPosTrack(const B2Vector3D& posTrack)
     {
       m_posTrack[0] = posTrack.X();
       m_posTrack[1] = posTrack.Y();
@@ -192,33 +186,33 @@ namespace Belle2 {
     double getStepLength() const { return m_stepLength; }
 
     //! The method to get momentum.
-    TVector3 getMomentum() const
+    B2Vector3D getMomentum() const
     {
-      return TVector3(m_momentum[0], m_momentum[1], m_momentum[2]);
+      return B2Vector3D(m_momentum[0], m_momentum[1], m_momentum[2]);
     }
 
     //! The method to get position on wire.
-    TVector3 getPosWire() const
+    B2Vector3D getPosWire() const
     {
-      return TVector3(m_posWire[0], m_posWire[1], m_posWire[2]);
+      return B2Vector3D(m_posWire[0], m_posWire[1], m_posWire[2]);
     }
 
     //! The method to get position of pre-step.
-    TVector3 getPosIn() const
+    B2Vector3D getPosIn() const
     {
-      return TVector3(m_posIn[0], m_posIn[1], m_posIn[2]);
+      return B2Vector3D(m_posIn[0], m_posIn[1], m_posIn[2]);
     }
 
     //! The method to get position of post-step.
-    TVector3 getPosOut() const
+    B2Vector3D getPosOut() const
     {
-      return TVector3(m_posOut[0], m_posOut[1], m_posOut[2]);
+      return B2Vector3D(m_posOut[0], m_posOut[1], m_posOut[2]);
     }
 
     //! The method to get position on the track
-    TVector3 getPosTrack() const
+    B2Vector3D getPosTrack() const
     {
-      return TVector3(m_posTrack[0], m_posTrack[1], m_posTrack[2]);
+      return B2Vector3D(m_posTrack[0], m_posTrack[1], m_posTrack[2]);
     }
 
     //! The method to get old left/right info.
@@ -270,11 +264,11 @@ namespace Belle2 {
               double flightTime,
               double edep,
               double stepLength,
-              TVector3 momentum,
-              TVector3 posWire,
-              TVector3 posIn,
-              TVector3 posOut,
-              TVector3 posTrack,
+              B2Vector3D momentum,
+              B2Vector3D posWire,
+              B2Vector3D posIn,
+              B2Vector3D posOut,
+              B2Vector3D posTrack,
               int leftRight,
               double globalTime): SimHitBase()
     {

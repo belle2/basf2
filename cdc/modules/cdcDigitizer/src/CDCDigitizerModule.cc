@@ -400,11 +400,11 @@ void CDCDigitizerModule::event()
     //basically align flag should be always on since on/off is controlled by the input alignment.xml file itself.
     m_align = true;
 
-    TVector3 bwpAlign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
-    TVector3 fwpAlign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
+    B2Vector3D bwpAlign = m_cdcgp->wireBackwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
+    B2Vector3D fwpAlign = m_cdcgp->wireForwardPosition(m_wireID, CDCGeometryPar::c_Aligned);
 
-    TVector3 bwp = m_cdcgp->wireBackwardPosition(m_wireID);
-    TVector3 fwp = m_cdcgp->wireForwardPosition(m_wireID);
+    B2Vector3D bwp = m_cdcgp->wireBackwardPosition(m_wireID);
+    B2Vector3D fwp = m_cdcgp->wireForwardPosition(m_wireID);
 
     //skip correction for wire-position alignment if unnecessary
     if ((bwpAlign - bwp).Mag() == 0. && (fwpAlign - fwp).Mag() == 0.) m_align = false;
@@ -416,9 +416,9 @@ void CDCDigitizerModule::event()
       fwp = fwpAlign;
 
       if (m_correctForWireSag) {
-        double zpos = m_posWire.z();
-        double bckYSag = bwp.y();
-        double forYSag = fwp.y();
+        double zpos = m_posWire.Z();
+        double bckYSag = bwp.Y();
+        double forYSag = fwp.Y();
 
         //        CDCGeometryPar::EWirePosition set = m_align ?
         //                                            CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
@@ -430,11 +430,11 @@ void CDCDigitizerModule::event()
         fwp.SetY(forYSag);
       }
 
-      const TVector3 L = 5. * m_momentum.Unit(); //(cm) tentative
-      TVector3 posIn  = m_posTrack - L;
-      TVector3 posOut = m_posTrack + L;
-      TVector3 posTrack = m_posTrack;
-      TVector3 posWire = m_posWire;
+      const B2Vector3D L = 5. * m_momentum.Unit(); //(cm) tentative
+      B2Vector3D posIn  = m_posTrack - L;
+      B2Vector3D posOut = m_posTrack + L;
+      B2Vector3D posTrack = m_posTrack;
+      B2Vector3D posWire = m_posWire;
 
       //      m_driftLength = m_cdcgp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
       m_driftLength = ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
@@ -486,7 +486,7 @@ void CDCDigitizerModule::event()
 
     //Sum ADC count
     const double stepLength  = m_aCDCSimHit->getStepLength() * Unit::cm;
-    const double costh = m_momentum.z() / m_momentum.Mag();
+    const double costh = m_momentum.Z() / m_momentum.Mag();
     double hitdE = m_aCDCSimHit->getEnergyDep();
     if (m_cdcgp->getMaterialDefinitionMode() != 2) {  // for non wire-by-wire mode
       static EDepInGas& edpg = EDepInGas::getInstance();
@@ -561,7 +561,7 @@ void CDCDigitizerModule::event()
     const double a = bwpAlign.X();
     const double b = bwpAlign.Y();
     const double c = bwpAlign.Z();
-    const TVector3 fmbAlign = fwpAlign - bwpAlign;
+    const B2Vector3D fmbAlign = fwpAlign - bwpAlign;
     const double lmn = 1. / fmbAlign.Mag();
     const double l = fmbAlign.X() * lmn;
     const double m = fmbAlign.Y() * lmn;
@@ -1005,7 +1005,7 @@ double CDCDigitizerModule::getDriftTime(const double driftLength, const bool add
   if (addDelay) {
     //calculate signal propagation length in the wire
     CDCGeometryPar::EWirePosition set = m_align ? CDCGeometryPar::c_Aligned : CDCGeometryPar::c_Base;
-    TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
+    B2Vector3D backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();
     //    if (m_cdcgp->getSenseWireZposMode() == 1) {

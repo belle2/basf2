@@ -13,7 +13,7 @@
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/dbobjects/BeamParameters.h>

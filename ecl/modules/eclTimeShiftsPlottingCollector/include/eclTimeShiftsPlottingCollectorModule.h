@@ -17,20 +17,19 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
-#include <ecl/utility/ECLChannelMapper.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
-
 
 class TTree;
 
 namespace Belle2 {
   class ECLCrystalCalib;
   class ECLReferenceCrystalPerCrateCalib;
-  class ECLChannelMapper;
 
 
   /**
@@ -96,7 +95,7 @@ namespace Belle2 {
                                           several runs.  Different initial value
                                           from the current run number variable. */
 
-    const int NUM_CRYSTALS = 8736;    /**< Number of crystals in the ECL */
+    const int NUM_CRYSTALS = ECLElementNumbers::c_NCrystals;    /**< Number of crystals in the ECL */
 
   };
 }

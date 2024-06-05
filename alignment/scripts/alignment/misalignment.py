@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -245,7 +244,7 @@ class CreateMisalignmentModule(b2.Module):
             # new_global_pos = helper._xyz_to_rphiz(new_global_pos)
 
             txt.write(
-                '{0} {1} {2} {3} {4} {5} {6} {7} {8} {9} {10} {11}\n'.format(
+                '{} {} {} {} {} {} {} {} {} {} {} {}\n'.format(
                     str(sensor.getLayerNumber()),
                     str(sensor.getLadderNumber()),
                     str(sensor.getSensorNumber()),

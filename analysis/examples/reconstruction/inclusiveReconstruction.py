@@ -8,13 +8,13 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Doxygen should skip this script
-# @cond
-
 """
 An example script to reconstruct unspecified particles and the use of MC
 matching tools for inclusive analyses with sum-of-exclusive method.
 """
+
+# Doxygen should skip this script
+# @cond
 
 import basf2
 from modularAnalysis import inputMdst, reconstructDecay, matchMCTruth, \

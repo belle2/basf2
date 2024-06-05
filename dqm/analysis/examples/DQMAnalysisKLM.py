@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -25,6 +24,8 @@ main.add_module('DQMHistAnalysisInputRootFile',
                 EventInterval=1,
                 FileList=['KLMDQM.root'],
                 SelectHistograms=['KLM/*', 'DAQ/*'])
+
+main.add_module("DQMHistAutoCanvas")  # Plot all Histo from Input
 
 # KLM DQM analysis module.
 main.add_module('DQMHistAnalysisKLM')

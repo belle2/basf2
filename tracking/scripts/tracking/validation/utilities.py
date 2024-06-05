@@ -102,7 +102,7 @@ def get_det_hit_ids(reco_track, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Bel
 
         # Working around a bug in ROOT where you should not access empty std::vectors
         if len(hits) != 0:
-            det_hit_ids |= set((det_id, hit.getArrayIndex()) for hit in hits)
+            det_hit_ids |= {(det_id, hit.getArrayIndex()) for hit in hits}
 
     return det_hit_ids
 
@@ -164,8 +164,7 @@ def getHelixFromMCParticle(mc_particle):
     charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
     b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
 
-    # workaround for the position vector due to change of types. Can be removed once this is figured out.
-    seed_helix = Belle2.Helix(Belle2.B2Vector3D(position).GetTVector3(), momentum, charge_sign, b_field)
+    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
     return seed_helix
 
 
@@ -177,7 +176,7 @@ def getSeedTrackFitResult(reco_track):
     # It does not matter, which particle we put in here, so we just use a pion
     particle_type = Belle2.Const.pion
     p_value = float('nan')
-    b_field = Belle2.BFieldManager.getField(position).Z() / Belle2.Unit.T
+    b_field = Belle2.BFieldManager.getField(ROOT.Math.XYZVector(position)).Z() / Belle2.Unit.T
     cdc_hit_pattern = 0
     svd_hit_pattern = 0
     # the value 0xFFFF will cause the TrackFitResult::getNDF() to return -1

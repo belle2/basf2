@@ -44,9 +44,9 @@ namespace Belle2 {
      * Calculates the magnetic field vector at the specified space point.
      *
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
-     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
+     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
+    virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
 
     /**
      * Terminates the magnetic field component.
@@ -59,10 +59,10 @@ namespace Belle2 {
      * the detector coordinate frame
      *
      * @param point The space point in Cartesian coordinates (x,y,z)
-     * in [cm] at which the magnetic field presence is chcked
+     * in [cm] at which the magnetic field presence is checked
      * @return true is in case of the magnetic field false -- otherwise
      */
-    bool isInRange(const B2Vector3D& point) const;
+    bool isInRange(const ROOT::Math::XYZVector& point) const;
 
     /**
      * BFieldComponentBeamline instance
@@ -73,8 +73,8 @@ namespace Belle2 {
 
     /**
      * Sets the filename of the magnetic field map.
-     * @param filename_her The filname of the HER magnetic field map.
-     * @param filename_ler The filname of the LER magnetic field map.
+     * @param filename_her The filename of the HER magnetic field map.
+     * @param filename_ler The filename of the LER magnetic field map.
      */
     void setMapFilename(const std::string& filename_her, const std::string& filename_ler)
     {

@@ -9,12 +9,13 @@
 
 #include <cstdio>
 
-#include <TMatrixFSym.h>
-
 #include <analysis/VertexFitting/KFit/MakeMotherKFit.h>
 #include <analysis/VertexFitting/KFit/MassFitKFit.h>
 #include <analysis/utility/CLHEPToROOT.h>
+#include <framework/gearbox/Const.h>
 
+#include <TMath.h>
+#include <TMatrixFSym.h>
 
 using namespace std;
 using namespace Belle2;
@@ -325,8 +326,7 @@ MassFitKFit::prepareInputMatrix() {
       // charge, mass, a
       m_property[index][0] =  track.getCharge();
       m_property[index][1] =  track.getMass();
-      const double c = KFitConst::kLightSpeed; // C++ bug?
-      // m_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
+      const double c = Belle2::Const::speedOfLight * 1e-4;
       m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }
@@ -369,8 +369,7 @@ MassFitKFit::prepareInputMatrix() {
       // charge, mass, a
       m_property[index][0] =  track.getCharge();
       m_property[index][1] =  track.getMass();
-      const double c = KFitConst::kLightSpeed; // C++ bug?
-      // m_property[index][2] = -KFitConst::kLightSpeed * m_MagneticField * it->getCharge();
+      const double c = Belle2::Const::speedOfLight * 1e-4;
       m_property[index][2] = -c * m_MagneticField * track.getCharge();
       index++;
     }
@@ -541,7 +540,7 @@ MassFitKFit::makeCoreMatrix() {
 
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(4, 1, 0);
-    double energy[KFitConst::kMaxTrackCount2];
+    std::vector<double> energy(m_TrackCount);
     double a;
 
     for (int i = 0; i < m_TrackCount; i++) {
@@ -553,14 +552,13 @@ MassFitKFit::makeCoreMatrix() {
                        al_1_prime[i * KFitConst::kNumber7 + 1][0] * al_1_prime[i * KFitConst::kNumber7 + 1][0] +
                        al_1_prime[i * KFitConst::kNumber7 + 2][0] * al_1_prime[i * KFitConst::kNumber7 + 2][0] +
                        m_property[i][1] * m_property[i][1]);
-    }
-
-    for (int i = 0; i < m_TrackCount; i++) {
       if (m_IsFixMass[i])
         Sum_al_1[3][0] += energy[i];
       else
         Sum_al_1[3][0] += al_1_prime[i * KFitConst::kNumber7 + 3][0];
+    }
 
+    for (int i = 0; i < m_TrackCount; i++) {
       for (int j = 0; j < 3; j++) Sum_al_1[j][0] += al_1_prime[i * KFitConst::kNumber7 + j][0];
     }
 
@@ -605,7 +603,7 @@ MassFitKFit::makeCoreMatrix() {
     // m_FlagFitIncludingVertex == true
     HepMatrix al_1_prime(m_al_1);
     HepMatrix Sum_al_1(7, 1, 0);
-    double energy[KFitConst::kMaxTrackCount2];
+    std::vector<double> energy(m_TrackCount);
     double a;
 
     for (int i = 0; i < m_TrackCount; i++) {

@@ -15,6 +15,8 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/TRandomWrapper.h>
+
 #include <fstream>
 #include <numeric>
 
@@ -162,8 +164,14 @@ namespace Belle2 {
       uint64_t numberOfSpectators = training_data.getNumberOfSpectators();
       uint64_t numberOfEvents = training_data.getNumberOfEvents();
 
-      auto numberOfValidationEvents = static_cast<uint64_t>(numberOfEvents * (1 - m_specific_options.m_training_fraction));
-      auto numberOfTrainingEvents = static_cast<uint64_t>(numberOfEvents * m_specific_options.m_training_fraction);
+      if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
+        B2ERROR("Please provide a positive training fraction");
+        throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
+      }
+
+      auto numberOfTrainingEvents = static_cast<uint64_t>(numberOfEvents * 100 * m_specific_options.m_training_fraction);
+      numberOfTrainingEvents = numberOfTrainingEvents / 100 + (numberOfTrainingEvents % 100 != 0);
+      auto numberOfValidationEvents = numberOfEvents - numberOfTrainingEvents;
 
       uint64_t batch_size = m_specific_options.m_mini_batch_size;
       if (batch_size == 0) {
@@ -175,11 +183,6 @@ namespace Belle2 {
                   " The batch size has been set equal to the number of training events.");
         batch_size = numberOfTrainingEvents;
       };
-
-      if (m_specific_options.m_training_fraction <= 0.0 or m_specific_options.m_training_fraction > 1.0) {
-        B2ERROR("Please provide a positive training fraction");
-        throw std::runtime_error("Please provide a training fraction between (0.0,1.0]");
-      }
 
       auto X = std::unique_ptr<float[]>(new float[batch_size * numberOfFeatures]);
       auto S = std::unique_ptr<float[]>(new float[batch_size * numberOfSpectators]);
@@ -221,13 +224,11 @@ namespace Belle2 {
         auto weights = training_data.getWeights();
         for (uint64_t iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
           double wSum = 0.0;
-          double wSum2 = 0.0;
           double mean = 0.0;
           double running_std = 0.0;
           auto feature = training_data.getFeature(iFeature);
           for (uint64_t i = 0; i < weights.size(); ++i) {
             wSum += weights[i];
-            wSum2 += weights[i] * weights[i];
             double meanOld = mean;
             mean += (weights[i] / wSum) * (feature[i] - meanOld);
             running_std += weights[i] * (feature[i] - meanOld) * (feature[i] - mean);

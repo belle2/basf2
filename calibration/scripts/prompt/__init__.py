@@ -40,6 +40,7 @@ INPUT_DATA_FILTERS = {"Magnet": {"On": "On",
                                    "offip_calib": "offip_calib",
                                    "radmumu_calib": "radmumu_calib",
                                    "random_calib": "random_calib",
+                                   "delayedbhabha_calib": "delayedbhabha_calib",
                                    "single_gamma_mc": "single_gamma_mc"},
                       "Data Quality Tag": {">=30 Minute Run": ">=30 Minute Run",
                                            "Bad For Alignment": "Bad For Alignment",
@@ -66,7 +67,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
     Parameters:
         name (str): The unique calibration name, not longer than 64 characters.
 
-        expert_username (str): The JIRA username of the expert to contact about this script.
+        expert_username (str): The GitLab username of the expert to contact about this script.
             This username will be used to assign the default responsible person for submitting and checking prompt
             calibration jobs.
 
@@ -255,3 +256,5 @@ class ValidationSettings(namedtuple('ValSet_Factory', ["name", "description", "d
         output_str += f"  download_files='{self.download_files}'\n"
         output_str += f"  expert_config={self.expert_config}"
         return output_str
+
+# @endcond

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 <header>
   <output>EvtGenSim.root</output>
   <cacheable/>
-  <contact>Software team b2soft@mail.desy.de</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <description>This steering file produces 1000 generic BBbar events with EvtGen
   and runs the detector simulation with mixed in background.</description>
 </header>
@@ -43,6 +42,7 @@ main.add_module("Profile")
 # output
 main.add_module("RootOutput", outputFileName="../EvtGenSim.root")
 
+main.add_module('Progress')
 process(main)
 
 # Print call statistics
@@ -50,14 +50,14 @@ print(statistics)
 
 statistics_plots(
     "EvtGenSim_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with generic EvtGen events",
     prefix="EvtGenSim",
 )
 event_timing_plot(
     "../EvtGenSim.root",
     "EvtGenSim_statistics.root",
-    contact="Software team b2soft@mail.desy.de",
+    contact="arul.prakash@physik.uni-muenchen.de",
     job_desc="a standard simulation job with generic EvtGen events",
     prefix="EvtGenSim",
 )

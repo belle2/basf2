@@ -53,20 +53,13 @@ namespace TreeFitter {
     return ok;
   }
 
-  double FitParams::chiSquare() const
-  {
-    return m_chiSquare;
-  }
-
   int FitParams::nDof() const
   {
-    const int nConstr = nConstraints();
-    const int nPars = dim();
-    const int ndf = nConstr - nPars;
+    const int ndf = m_nConstraints - m_dim;
     if (ndf < 1) {
       const std::string error_string =
         "Not enough constraints for this fit. Try adding a mass or beam constraint. constraints: " + std::to_string(
-          nConstr) + " parameters to extract: " + std::to_string(nPars) + " ndf: " + std::to_string(ndf);
+          m_nConstraints) + " parameters to extract: " + std::to_string(m_dim) + " ndf: " + std::to_string(ndf);
       throw FitParameterDimensionException(error_string);
     }
     return ndf;

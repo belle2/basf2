@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -60,7 +59,7 @@ class CompareTransformationsModule(b2.Module):
         """ test that moving a ladder moves the sensor in the event processing """
         cache = Belle2.VXD.GeoCache.getInstance()
 
-        original_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.TVector3(0, 0, 0), True)[2]
+        original_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.Math.XYZVector(0, 0, 0), True).Z()
 
         # Now move ladder... we need a copy of the current alignment
         alignment = Belle2.PyDBObj("VXDAlignment").obj().Clone()
@@ -69,7 +68,7 @@ class CompareTransformationsModule(b2.Module):
         # and add the object to the database store. This will run the callback
         Belle2.DBStore.Instance().addConstantOverride("VXDAlignment", alignment)
 
-        new_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.TVector3(0, 0, 0), True)[2]
+        new_global_sensor_z = cache.get(Belle2.VxdID("1.1.1")).pointToGlobal(ROOT.Math.XYZVector(0, 0, 0), True).Z()
 
         # expect that sensor moved with the ladder
         print("Now testing that moving a ladder moves a sensor correspondingly...")
@@ -80,6 +79,6 @@ main = b2.create_path()
 # No params for EventInfoSetter means exp=0, run=0 --> Monte Carlo, no alignment corrections
 main.add_module('EventInfoSetter')
 main.add_module('Gearbox')
-main.add_module('Geometry', components=['PXD', 'SVD'])
+main.add_module('Geometry')
 main.add_module(CompareTransformationsModule())
 b2.process(main)

@@ -7,10 +7,12 @@
  **************************************************************************/
 
 #pragma once
-#include <ecl/calibration/eclBhabhaTAlgorithm.h>
-#include <calibration/CalibrationAlgorithm.h>
-#include <string>
 
+/* Basf2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
+
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
   namespace ECL {

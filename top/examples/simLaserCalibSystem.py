@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -75,7 +74,8 @@ main.add_module('TOPDigitizer')
 
 # Output
 main.add_module('RootOutput',
-                outputFileName='opticalGun.root')
+                outputFileName='opticalGun.root',
+                additionalBranchNames=['TOPSimPhotons', 'TOPSimHitsToTOPSimPhotons'])
 
 # Show progress of processing
 main.add_module('Progress')

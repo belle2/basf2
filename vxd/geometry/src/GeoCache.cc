@@ -11,6 +11,7 @@
 #include <vxd/simulation/SensitiveDetectorBase.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <TMath.h>
 
 #include <stack>
 #include <memory>

@@ -281,7 +281,7 @@ void RawSecMapMergerModule::printData(
   for (unsigned i = 0 ;  i < nEntries; i++) {
     if (percentMark > 1 and (i % percentMark) != 0) { continue; }
     progressCounter += 2;
-    B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ":");
+    B2INFO("RawSecMapMerger::printData(): entry " << i << " of " << nEntries << ": " << progressCounter << " \% of data printed.");
 
     auto thisEntry = chain->LoadTree(i);
 

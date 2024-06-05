@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #pragma once
-#ifndef GENERATORS_MODULES_BEAMPARAMETERSMODULE_H
-#define GENERATORS_MODULES_BEAMPARAMETERSMODULE_H
 
 #include <framework/core/Module.h>
 #include <framework/dbobjects/BeamParameters.h>
@@ -52,5 +50,3 @@ namespace Belle2 {
     bool m_createPayload; /**< if true create a new payload with the given parameters */
   };
 }
-
-#endif /* BEAMPARAMETERSMODULE_H */

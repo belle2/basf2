@@ -169,8 +169,8 @@ namespace {
     /** Create charged particles from tracks for first ROE. */
     for (unsigned i = 0; i < roeTRFCharges.size(); ++i) {
 
-      B2Vector3D position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
-      B2Vector3D momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
+      ROOT::Math::XYZVector position(roeTFRProperties[i][0], roeTFRProperties[i][1], roeTFRProperties[i][2]);
+      ROOT::Math::XYZVector momentum(roeTFRProperties[i][3], roeTFRProperties[i][4], roeTFRProperties[i][5]);
 
       testsTFRs.appendNew(position, momentum, cov6, roeTRFCharges[i], Const::pion, roeTFRProperties[i][6], bField, roeTRFCDCValues[i],
                           roeTRFVXDValues[i], 0);
@@ -281,7 +281,7 @@ namespace {
     var = Manager::Instance().getVariable("BtagToWBosonVariables(pMissCMS)");
     ASSERT_NE(var, nullptr);
 
-    double refsBtagToWBosonPMissCMS = 0.542734;
+    double refsBtagToWBosonPMissCMS =  0.5425695;
 
     for (auto& roeChargedParticle : roeChargedParticles) {
 

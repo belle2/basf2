@@ -7,9 +7,9 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/database/DBObjPtr.h>
+
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
 
 namespace Belle2 {
   namespace ECL {

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -32,11 +31,16 @@ if len(argvs) > 3:
     num = 'MC-' + argvs[3]
 
 # output file name
-expRun = '{:0=4d}'.format(experiment) + '.' + '{:0=5d}'.format(run)
+expRun = f'{experiment:04d}' + '.' + f'{run:05d}'
 filename = f"top.{expRun}.{num}.sroot"
 
-# global tag for run dependent simulation (the latest one recommended!)
-conditions.append_globaltag('data_reprocessing_proc11')
+# global tags for run dependent simulation
+conditions.append_globaltag('patch_main_release-07_noTOP')
+if experiment < 20:
+    conditions.append_globaltag('data_reprocessing_proc13')  # experiments 8 - 18
+else:
+    conditions.append_globaltag('data_reprocessing_prompt')  # experiments 20 - 26
+conditions.append_globaltag('online')
 
 
 def addLaserSource(x, angle, slotID, path):

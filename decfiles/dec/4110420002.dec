@@ -1,0 +1,19 @@
+# EventType: 4110420002
+# Descriptor: [Y4S->eta'[Y1S->mu+mu-]]
+# NickName: Y4S_etapY1S_mumu
+# Cuts: None
+# Documentation: Upsilon(4S) decay process
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20240121
+
+Decay  Upsilon(4S)
+1.0    Upsilonsig  eta'   PARTWAVE 0.0 0.0 1.0 0.0 0.0 0.0;
+Enddecay
+
+Decay  Upsilonsig
+1.0    mu+  mu-  VLL;
+Enddecay
+End

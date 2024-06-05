@@ -8,6 +8,8 @@
 #ifndef CDCTRIGGERTSFModule_H
 #define CDCTRIGGERTSFModule_H
 
+#pragma once
+
 #include "framework/core/Module.h"
 #include <string>
 
@@ -19,6 +21,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <framework/database/DBObjPtr.h>
 #include <trg/cdc/dbobjects/CDCTriggerDeadch.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 namespace Belle2 {
   typedef HepGeom::Point3D<double> Point3D;
@@ -78,6 +81,13 @@ namespace Belle2 {
     OptionalDBObjPtr<CDCTriggerDeadch> m_db_deadchannel;
     /** TDC based crosstalk filtering logic on CDCFE. True:enable False:disable */
     bool m_crosstalk_tdcfilter;
+    bool m_makeRecoLRTable;
+    /** filename for the table which contains the number of reconstructed left/right
+     *  for each pattern in the inner-most super layer */
+    std::string m_innerRecoLRTableFilename;
+    /** filename for the table which contains the number of reconstructed left/right
+     *  for each pattern in the outer super layers */
+    std::string m_outerRecoLRTableFilename;
     /** remove hits with lower ADC than cut threshold. True:enable False:disable */
     bool m_adcflag;
     /** threshold for the adc cut. Default: -1 */
@@ -100,11 +110,22 @@ namespace Belle2 {
     const static int MAX_N_LAYERS = c_maxWireLayersPerSuperLayer;
     /** bad channel mapping */
     bool deadch_map[c_nSuperLayers][MAX_N_LAYERS][c_maxNDriftCells] = {};
+    /** list of (# reconstructed right, # reconstructed left, # unrelated background)
+     *  for the inner-most super layer */
+    std::vector<std::vector<unsigned>> innerRecoLRTable = {};
+    /** list of (# true right, # true left, # true background)
+     *  for the outer super layers */
+    std::vector<std::vector<unsigned>> outerRecoLRTable = {};
 
     /** list of input CDC hits */
     StoreArray<CDCHit> m_cdcHits;
+    /** list of recotracks, needed for recolrtable */
+    StoreArray<RecoTrack> m_recoTracks;
     /** list of output track segment hits */
     StoreArray<CDCTriggerSegmentHit> m_segmentHits;
+    /** relate all cdchtis to ts, not just opriority wire */
+    bool m_relateAllHits;
+
 
   };
 

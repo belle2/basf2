@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,8 +36,7 @@ beamparameters = add_beamparameters(main, "Y4S")
 basf2.print_params(beamparameters)
 
 # generate BBbar events
-evtgeninput = basf2.register_module('EvtGenInput')
-main.add_module(evtgeninput)
+main.add_module('EvtGenInput')
 
 # detector simulation,  digitisers and clusterisers
 add_simulation(main)
@@ -51,6 +49,7 @@ output = basf2.register_module('RootOutput')
 output.param('outputFileName', '../GenericB_GENSIMRECtoDST.dst.root')
 main.add_module(output)
 
+main.add_module('Progress')
 # Go!
 basf2.process(main)
 

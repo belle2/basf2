@@ -1536,7 +1536,24 @@ C      CALL INIOFC ! dummy for now anyway
       REAL*4            BRA1,BRK0,BRK0B,BRKS
       REAL*8            GAMPRT
       COMMON / TAUBRA / GAMPRT(NBMC),JLIST(NBMC),NCHAN
-C this is a prototype, at present it is inactive, blocked by RETURN
+      COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
+      INTEGER CHCONJUGATE
+      COMMON /CHCONJUGATE/ CHCONJUGATE
+      INTEGER JAKT ! temporary place holder for JAK1
+      DATA    JAKT /-1/
+      SAVE    JAKT
+      REAL    RRR(1)
+      IF (KTO.EQ.1) THEN  
+         IF (CHCONJUGATE.EQ.1) THEN  
+            CALL KKMC_RANMAR(RRR,1)
+            IF (RRR(1).GT.0.5) THEN ! swap JAK1/JAK2 for alternate events
+               JAKT = JAK1
+               JAK1 = JAK2
+               JAK2 = JAKT
+            ENDIF
+         ENDIF
+      ENDIF
+C this is a prototype, at present rest of this subroutine is inactive, blocked by RETURN
       RETURN
      
       IF (KTO.EQ.1) THEN

@@ -25,7 +25,7 @@ REG_MODULE(AllParticleCombiner);
 AllParticleCombinerModule::AllParticleCombinerModule() : Module()
 {
   // Set module properties
-  setDescription(R"DOC("This module combines all particles of the provided list to one mother particle.
+  setDescription(R"DOC(This module combines all particles of the provided list to one mother particle.
   )DOC");
 
   // Parameter definitions

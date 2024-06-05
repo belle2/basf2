@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,18 +17,35 @@
 # a reco particle list as input.
 #############################################################
 
+"""
+<header>
+    <noexecute>Definition of helper class</noexecute>
+</header>
+"""
 
 from ROOT import Belle2
 import basf2
 
 
 class SplitMultiplicities(basf2.Module):
-    def __init__(self, listname, pdgcode):
+    """
+    Module to determine the multiplicities of a particle of a certain pdg code
+    """
+
+    def __init__(self, pdgcode):
+        """
+        Initialise the class.
+        :param pdgcode: pdg code to be studied
+        """
         super().__init__()
-        self.listname = listname
+        #: pdg code to be studied
         self.pdgcode = pdgcode
+        #: event extra info object
+        self.eventExtraInfo = Belle2.PyStoreObj("EventExtraInfo")
 
     def event(self):
+        """ Event function """
+
         # set counters to 0
         gen_counter = 0
         Bp_counter = 0
@@ -60,35 +76,16 @@ class SplitMultiplicities(basf2.Module):
                     else:
                         mcMother = mcMother.getMother()
 
-        # set the extra info names and save them to the reconstructed  particles
-        extraInfoName = 'nGen_{}'.format(self.pdgcode)
-        extraInfoName_Bp = 'nGen_{}_Bp'.format(self.pdgcode)
-        extraInfoName_Bm = 'nGen_{}_Bm'.format(self.pdgcode)
-        extraInfoName_B0 = 'nGen_{}_B0'.format(self.pdgcode)
-        extraInfoName_antiB0 = 'nGen_{}_antiB0'.format(self.pdgcode)
+        # create the extra info names and save the corresponding multiplicities
+        extraInfoName = f'nGen_{self.pdgcode}'
+        extraInfoName_Bp = f'nGen_{self.pdgcode}_Bp'
+        extraInfoName_Bm = f'nGen_{self.pdgcode}_Bm'
+        extraInfoName_B0 = f'nGen_{self.pdgcode}_B0'
+        extraInfoName_antiB0 = f'nGen_{self.pdgcode}_antiB0'
 
-        for particle in Belle2.PyStoreObj(self.listname).obj():
-            if particle.hasExtraInfo(extraInfoName):
-                particle.setExtraInfo(extraInfoName, gen_counter)
-            else:
-                particle.addExtraInfo(extraInfoName, gen_counter)
-
-            if particle.hasExtraInfo(extraInfoName_Bp):
-                particle.setExtraInfo(extraInfoName_Bp, Bp_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_Bp, Bp_counter)
-
-            if particle.hasExtraInfo(extraInfoName_Bm):
-                particle.setExtraInfo(extraInfoName_Bm, Bm_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_Bm, Bm_counter)
-
-            if particle.hasExtraInfo(extraInfoName_B0):
-                particle.setExtraInfo(extraInfoName_B0, B0_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_B0, B0_counter)
-
-            if particle.hasExtraInfo(extraInfoName_antiB0):
-                particle.setExtraInfo(extraInfoName_antiB0, antiB0_counter)
-            else:
-                particle.addExtraInfo(extraInfoName_antiB0, antiB0_counter)
+        self.eventExtraInfo.create()
+        self.eventExtraInfo.setExtraInfo(extraInfoName, gen_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_Bp, Bp_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_Bm, Bm_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_B0, B0_counter)
+        self.eventExtraInfo.setExtraInfo(extraInfoName_antiB0, antiB0_counter)

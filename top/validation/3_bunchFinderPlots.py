@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -149,6 +148,7 @@ main.add_module('RootInput', inputFileNames=['../EvtGenSimRec_B2Kpi.root', '../E
 # Make plots
 main.add_module(MakePlots())
 
+main.add_module('Progress')
 # Process events
 process(main)
 

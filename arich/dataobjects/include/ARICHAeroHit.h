@@ -10,7 +10,7 @@
 #define ARICHAEROHIT_H
 
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -45,26 +45,26 @@ namespace Belle2 {
       \param momentum vector of track momentum on aerogel plane
     */
     ARICHAeroHit(int particleId,
-                 TVector3 position,
-                 TVector3 momentum)
+                 ROOT::Math::XYZVector position,
+                 ROOT::Math::XYZVector momentum)
     {
       m_particleID = particleId;
-      m_x = (float) position.x();
-      m_y = (float) position.y();
-      m_z = (float) position.z();
-      m_px = (float) momentum.x();
-      m_py = (float) momentum.y();
-      m_pz = (float) momentum.z();
+      m_x = (float) position.X();
+      m_y = (float) position.Y();
+      m_z = (float) position.Z();
+      m_px = (float) momentum.X();
+      m_py = (float) momentum.Y();
+      m_pz = (float) momentum.Z();
     }
 
     //! Get particle PDG identity number
     int getPDG() const { return m_particleID; }
 
     //! Get track position (at entrance in 1. aerogel plane)
-    TVector3 getPosition() const { TVector3 vec(m_x, m_y, m_z); return vec; }
+    ROOT::Math::XYZVector getPosition() const { return ROOT::Math::XYZVector(m_x, m_y, m_z); }
 
     //! Get track momentum  (at entrance in 1. aerogel plane)
-    TVector3 getMomentum() const { TVector3 vec(m_px, m_py, m_pz); return vec; }
+    ROOT::Math::XYZVector getMomentum() const { return ROOT::Math::XYZVector(m_px, m_py, m_pz); }
 
   private:
 

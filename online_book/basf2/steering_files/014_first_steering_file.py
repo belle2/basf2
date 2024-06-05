@@ -27,7 +27,7 @@ stdV0s.stdKshorts(path=main)
 
 # combine final state particles to form composite particles
 ma.reconstructDecay(
-    "J/psi:ee -> e+:uncorrected e-:uncorrected", cut="dM < 0.11", path=main
+    "J/psi:ee -> e+:uncorrected e-:uncorrected", cut="abs(dM) < 0.11", path=main
 )
 
 # combine J/psi and KS candidates to form B0 candidates
@@ -40,7 +40,7 @@ ma.reconstructDecay(
 # match reconstructed with MC particles
 ma.matchMCTruth("B0", path=main)
 
-# Save variables to an output file (ntuple)
+# save variables to an output file (ntuple)
 ma.variablesToNtuple(
     "B0",
     variables=['Mbc', 'isSignal'],
@@ -49,7 +49,7 @@ ma.variablesToNtuple(
     path=main,
 )
 
-# Start the event loop (actually start processing things)
+# start the event loop (actually start processing things)
 b2.process(main)
 
 # print out the summary

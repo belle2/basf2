@@ -100,6 +100,29 @@ namespace Belle2 {
       return m_finess;
     }
 
+    /**
+     * Getter for ADC.
+     */
+    inline unsigned short getADC(void) const
+    {
+      return m_adc;
+    }
+
+    /**
+     * Getter for TDC.
+     */
+    inline unsigned short getTDC(void) const
+    {
+      return m_tdc;
+    }
+
+    /**
+     * Getter for samplint point.
+     */
+    inline unsigned short getSample(void) const
+    {
+      return m_sample;
+    }
 
   private:
     /**

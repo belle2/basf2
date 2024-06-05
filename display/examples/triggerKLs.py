@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -59,7 +58,7 @@ eventinfoprinter = main.add_module('EventInfoPrinter')
 
 evtgeninput = main.add_module('EvtGenInput')
 
-components = ['CDC', 'KLM', 'MagneticField']
+components = ['CDC', 'KLM']
 add_simulation(main, components)
 
 ########################################

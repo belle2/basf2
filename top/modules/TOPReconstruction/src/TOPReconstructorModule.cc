@@ -6,8 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <top/modules/TOPReconstruction/TOPReconstructorModule.h>
+
+// TOP headers.
 #include <top/reconstruction_cpp/TOPRecoManager.h>
 #include <top/geometry/TOPGeometryPar.h>
 
@@ -47,7 +49,7 @@ namespace Belle2 {
     addParam("maxTime", m_maxTime,
              "upper limit for photon time [ns] (if minTime >= maxTime use the default from DB)", 0.0);
     addParam("PDGCode", m_PDGCode,
-             "PDG code of hypothesis to construct pulls (0 means: use MC truth)", 211);
+             "PDG code of hypothesis to construct pulls (0 means: use MC truth, -1: switched off)", -1);
     addParam("deltaRayModeling", m_deltaRayModeling,
              "include (True) or exclude (False) delta-ray modeling in log likelihood calculation", false);
     addParam("pTCut", m_pTCut,
@@ -170,7 +172,7 @@ namespace Belle2 {
           const auto& chargedStable = pdfConstructor->getHypothesis();
           auto LL = pdfConstructor->getLogL();
           auto expBkgPhotons = pdfConstructor->getExpectedBkgPhotons();
-          topLL->set(chargedStable, LL.numPhotons, LL.logL, LL.expPhotons, expBkgPhotons);
+          topLL->set(chargedStable, LL.numPhotons, LL.logL, LL.expPhotons, expBkgPhotons, LL.effectiveSignalYield);
 
           nfotSet.insert(LL.numPhotons);
           nbkgSet.insert(expBkgPhotons);
@@ -183,6 +185,9 @@ namespace Belle2 {
           }
         }
         topLL->setFlag(1);
+        topLL->setModuleID(trk->getModuleID());
+        const auto& emi = trk->getEmissionPoint();
+        topLL->setXZ(emi.position.X(), emi.position.Z());
 
         if (nfotSet.size() > 1) B2ERROR("Bug in TOP::PDFConstructor: number of photons differs between particle hypotheses");
         if (nbkgSet.size() > 1) B2ERROR("Bug in TOP::PDFConstructor: estimated background differs between particle hypotheses");

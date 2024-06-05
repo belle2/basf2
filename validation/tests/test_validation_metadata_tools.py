@@ -69,8 +69,6 @@ class TestValidationMetadataSetter(unittest.TestCase):
             signaldecfile=basf2.find_file(str(dec_path)),
         )
 
-        modularAnalysis.loadGearbox(path=path)
-
         modularAnalysis.fillParticleListFromMC("Upsilon(4S)", "", path=path)
 
         out_file_path = tmp_dir_path / "out.root"

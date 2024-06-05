@@ -19,7 +19,7 @@ from typing import Dict, Union, List, Optional
 
 # ours
 import validationpath
-from validationfunctions import available_revisions
+from validationfunctions import get_latest_nightly
 
 # martin's mail utils
 import mail_utils
@@ -72,9 +72,13 @@ class Mails:
 
         # read contents from comparison.json
         work_folder = self._validator.work_folder
-        revisions = ["reference"] + available_revisions(work_folder)
+
+        # choose latest nighly if available, else 'current'
+        revision = get_latest_nightly(work_folder)
+        self._validator.set_tag(revision)
+
         comparison_json_file = validationpath.get_html_plots_tag_comparison_json(
-            work_folder, revisions
+            work_folder, ['reference', revision]
         )
         with open(comparison_json_file) as f:
             comparison_json = json.load(f)
@@ -139,6 +143,13 @@ class Mails:
             # this is called comparison_result but it is handled as error
             # type when composing mail
             failed_script["comparison_result"] = "script failed to execute"
+            # feat. adding links to plot/log files
+            failed_script["file_url"] = os.path.join(
+                'results',
+                self._validator.tag,
+                script.package,
+                script.name_not_sanitized
+            ) + ".log"
             # add contact of failed script to mail_log
             try:
                 for contact in parse_mail_address(script.contact):
@@ -168,7 +179,8 @@ class Mails:
                          "comparison_text": str,
                          "description": str,
                          "comparison_result": str,
-                         "warnings": str
+                         "warnings": str,
+                         "file_url": str
                      },
                  "title2": {...}
              },
@@ -205,6 +217,10 @@ class Mails:
                             list(
                                 set(plot["warnings"]) - {"No reference object"}
                             )
+                        ),
+                        "file_url": os.path.join(
+                            plot['plot_path'],
+                            plot['png_filename']
                         ),
                     }
                     # every contact gets an email
@@ -288,13 +304,13 @@ class Mails:
         """
 
         # link to validation page
-        url = "https://b2-master.belle2.org/validation/static/validation.html"
+        url = "https://validation.belle2.org/static/validation.html"
         # url = "http://localhost:8000/static/validation.html"
 
         if incremental:
             body = (
-                "You are receiving this email, because additional"
-                " validation plots/scripts (that include you as contact "
+                "You are receiving this email, because additional "
+                "validation plots/scripts (that include you as contact "
                 "person) produced warnings/errors or "
                 "because their warning/error status "
                 "changed. \n"
@@ -302,8 +318,8 @@ class Mails:
             )
         else:
             body = (
-                "This is a full list of validation plots/scripts that"
-                " produced warnings/errors and include you as contact"
+                "This is a full list of validation plots/scripts that "
+                "produced warnings/errors and include you as contact "
                 "person (sent out once a week).\n\n"
             )
 
@@ -350,6 +366,7 @@ class Mails:
             warnings_str = ", ".join(plots[plot]["warnings"]).strip()
             if warnings_str:
                 body_plot += f"<b>Warnings:</b> {warnings_str}<br>"
+            body_plot += "<b>Error plot/log file:</b> <a href='{file_url}'>Click me</a><br>"
             # URLs are currently not working.
             # if plots[plot]["rootfile"] != "--":
             #     body_plot += '<a href="{url}#{package}-{rootfile}">' \
@@ -363,6 +380,7 @@ class Mails:
                 rootfile=plots[plot]["rootfile"],
                 description=plots[plot]["description"],
                 comparison_text=plots[plot]["comparison_text"],
+                file_url=url.split('static')[0]+plots[plot]["file_url"],
                 url=url,
             )
 

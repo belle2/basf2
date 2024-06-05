@@ -11,6 +11,7 @@
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -52,9 +53,9 @@ namespace Belle2 {
      * Calculates the magnetic field vector at the specified space point.
      *
      * @param point The space point in Cartesian coordinates (x,y,z) in [cm] at which the magnetic field vector should be calculated.
-     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
+     * @return The magnetic field vector at the given space point in [T]. Returns a zero vector XYZVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual B2Vector3D calculate(const B2Vector3D& point) const override;
+    virtual ROOT::Math::XYZVector calculate(const ROOT::Math::XYZVector& point) const override;
 
     /**
      * Terminates the magnetic field component.
@@ -64,7 +65,7 @@ namespace Belle2 {
 
     /**
      * Sets the filename of the magnetic field map.
-     * @param filename The filname of the magnetic field map.
+     * @param filename The filename of the magnetic field map.
      */
     void setMapFilename(const std::string& filename) { m_mapFilename = filename; };
 
@@ -99,7 +100,7 @@ namespace Belle2 {
 
 
     /**
-     * Sets prameter for EKLM
+     * Sets parameter for EKLM
      * @param srmin minimum radius for the gap in endyoke [cm].
      * @param zyoke minimum Z of endyoke [cm].
      * @param gaph height of the gap in endyoke [cm].

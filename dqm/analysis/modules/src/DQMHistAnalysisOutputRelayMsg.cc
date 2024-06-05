@@ -37,6 +37,7 @@ DQMHistAnalysisOutputRelayMsgModule::DQMHistAnalysisOutputRelayMsgModule()
   //Parameter definition
   addParam("Hostname", m_hostname, "Hostname of THTTP", std::string("localhost"));
   addParam("Port", m_port, "Port number to THTTP", 9191);
+  addParam("CanvasSendDefault", m_canvasSendDefault, "Send untagged canvases", false);
   B2DEBUG(20, "DQMHistAnalysisOutputRelayMsg: Constructor done.");
 }
 
@@ -68,13 +69,25 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
 
   time_t now = time(0);
   char mbstr[100];
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+
+  auto& clist = getCanvasUpdatedList();
+  int sent_canvases = 0;
 
   B2INFO("[" << mbstr << "] before sending " << seq->GetEntries() << " objects.");
   bool first_try = true;
   while ((obj = (TObject*)nextkey())) {
     if (obj->IsA()->InheritsFrom("TCanvas")) {
       TCanvas* c = (TCanvas*) obj;
+      auto process_canvas = m_canvasSendDefault;
+
+      auto it = clist.find(c->GetName());
+      if (it != clist.end()) {
+        process_canvas = it->second;
+      }
+      if (!process_canvas) continue;
+      sent_canvases++;
+
       mess.Reset();
       mess.WriteObject(c);     // write object in message buffer
       if (m_sock->Send(mess) < 0) {
@@ -95,8 +108,8 @@ void DQMHistAnalysisOutputRelayMsgModule::event()
     }
   }
   now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%c", localtime(&now));
-  B2INFO("[" << mbstr << "] after sending " << seq->GetEntries() << " objects.");
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+  B2INFO("[" << mbstr << "] after sending " << sent_canvases << " of " << seq->GetEntries() << " objects.");
 }
 
 void DQMHistAnalysisOutputRelayMsgModule::endRun()

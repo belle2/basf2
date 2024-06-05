@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -21,9 +20,13 @@ running the script.
 --epilog--
 .. rubric:: Example usage
 
-* Convert list of BGx1 MC LPNs into YAML format and print to screen::
+* Convert list of BGx1 MCri LPNs into YAML format and print to screen::
 
-    $ %(prog)s my_MC_LPNs.txt --mc --bg BGx1
+    $ %(prog)s my_MCri_LPNs.txt --mcri --bg BGx1
+
+* Convert list of BGx1 MCrd LPNs into YAML format and print to screen::
+
+    $ %(prog)s my_MCrd_LPNs.txt --mcrd --bg BGx1
 
 * Convert list of data LPNs into YAML format and save to file::
 
@@ -65,19 +68,22 @@ def get_argument_parser():
         "--data", action="store_true", help="Flag to indicate the LPNs are for data."
     )
     DataMCGroup.add_argument(
-        "--mc", action="store_true", help="Flag to indicate the LPNs are for MC."
+         "--mcri", action="store_true", help="Flag to indicate the LPNs are for run-independent MC."
+    )
+    DataMCGroup.add_argument(
+        "--mcrd", action="store_true", help="Flag to indicate the LPNs are for run-dependent MC."
     )
 
     parser.add_argument(
         "--bg",
         choices=("BGx0", "BGx1"),
-        required=("--mc" in sys.argv),
+        required=("--mcri" in sys.argv or "--mcrd" in sys.argv),
         help="Beam background level of MC samples. Only required for MC.",
     )
     return parser
 
 
-def verify_dataframe(df, mc):
+def verify_dataframe(df, mcri):
     # Check that we got the names of the columns right
     if not (
         all(df["release"].str.startswith("release-"))
@@ -94,7 +100,7 @@ def verify_dataframe(df, mc):
         raise ValueError("Input LPNs must all be mdst.")
     if "generalSkimName" in df.columns and len(set(df["generalSkimName"])) > 1:
         raise ValueError("More than one GeneralSkimName in input data LPNs.")
-    if mc and len(set(df["runNumber"])) > 1:
+    if mcri and len(set(df["runNumber"])) > 1:
         raise ValueError("More than one run number listed for MC LPNs.")
 
 
@@ -151,7 +157,7 @@ def main():
                 )
             )
         elif len(df.columns) == 9:
-            # If nine components to LPN, then we're dealing with the old data LPN schema,
+            # If nine components to LPN, then we're dealing with the new data LPN schema,
             # which includes an additional GeneralSkimName component
             columns = dict(
                 enumerate(
@@ -187,9 +193,12 @@ def main():
         )
 
     df.rename(columns=columns, inplace=True)
-    verify_dataframe(df, args.mc)
+    if args.data:
+        if 'generalSkimName' not in df.columns:
+            df['generalSkimName'] = ""
+    verify_dataframe(df, args.mcri)
 
-    if args.mc:
+    if args.mcri or args.mcrd:
         df.loc[:, "expNumber"] = df["s00"] + "/" + df["expNumber"]
         df.drop("s00", axis=1, inplace=True)
 
@@ -210,13 +219,22 @@ def main():
 
                 # If beam energy is not 4S, then point it out in label
                 onres = beamEnergy == "4S"
+                scan = beamEnergy == "5S_scan"
                 if onres:
                     label = f"{campaign}_exp{expInteger}r{iGroup+1}"
+                elif scan:
+                    # more complicated process to retrieve the exact 5S_scan energy from output filename...
+                    pattern = r"_5Sscan_(\d+)"
+                    match = re.search(pattern, args.output)
+                    scanEnergy = match.group(1)
+                    label = f"{campaign}_{beamEnergy}_{scanEnergy}_exp{expInteger}r{iGroup+1}"
                 else:
                     label = f"{campaign}_{beamEnergy}_exp{expInteger}r{iGroup+1}"
 
                 if "generalSkimName" in df.columns:
                     generalSkim = list(group["generalSkimName"])[0]
+                    if generalSkim == '':
+                        generalSkim = 'hadron'
                 else:
                     generalSkim = "all"
 
@@ -247,10 +265,44 @@ def main():
                     DataBlocks[label]["generalSkimName"] = list(
                         group["generalSkimName"]
                     )[0]
+    elif args.mcrd:
+        ExpGroups = df.groupby(["campaign", "MCEventType", "expNumber"])
+        for (campaign, MCEventType, expNumber), ExpGroup in ExpGroups:
+            groups = ExpGroup.groupby(["beamEnergy", "release", "DBGT", "prodNumber"])
+            for (iGroup, ((beamEnergy, release, DBGT, prodNumber), group)) in enumerate(
+                groups
+            ):
+                # Extract integers from columns
+                prodNumber = int(re.sub(r"^prod0*", "", prodNumber))
+                DBGT = int(re.sub(r"^DB0*", "", DBGT))
+                expInteger = int(re.sub(r"^s00/e0*", "", expNumber))
+
+                # If beam energy is not 4S, then point it out in label
+                onres = beamEnergy == "4S"
+                if onres:
+                    label = f"{campaign}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
+                else:
+                    label = f"{campaign}_{beamEnergy}_exp{expInteger}_{MCEventType}_{prodNumber}r{iGroup+1}"
+
+                # Add everything to our mega dict
+                DataBlocks[label] = {
+                    "sampleLabel": (f"MC-{campaign}-{beamEnergy}-{MCEventType}-{args.bg}"),
+                    "LPNPrefix": prefix,
+                    "inputReleaseNumber": release,
+                    "mcCampaign": campaign,
+                    "prodNumber": prodNumber,
+                    "inputDBGlobalTag": DBGT,
+                    "experimentNumber": expNumber,
+                    "beamEnergy": beamEnergy,
+                    "mcType": MCEventType,
+                    "mcBackground": args.bg,
+                    "inputDataLevel": "mdst",
+                    "runNumbers": list(group["runNumber"]),
+                }
     else:
         # Extract integers from columns
         df.loc[:, "prodNumber"] = (
-            df["prodNumber"].str.replace("^prod0*", "").astype(int)
+            df["prodNumber"].str.replace("^prod0*", "", regex=True).astype(int)
         )
 
         MCTypeGroups = df.groupby(["campaign", "MCEventType"])
@@ -291,7 +343,7 @@ def main():
                     "mcType": MCEventType,
                     "mcBackground": args.bg,
                     "inputDataLevel": "mdst",
-                    "runNumber": runNumber,
+                    "runNumbers": runNumber,
                 }
 
     to_yaml(DataBlocks, args.output)

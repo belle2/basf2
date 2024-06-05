@@ -8,7 +8,7 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -17,6 +17,9 @@ namespace Belle2 {
   class KLMDigitRaw;
 
   namespace KLM {
+
+    /** Number of channels in ASIC. */
+    const int c_NChannelsAsic = 15;
 
     /**
      * Channel group.
@@ -62,6 +65,14 @@ namespace Belle2 {
        * Destructor.
        */
       ~RawData();
+
+      /**
+       * Get packet type.
+       */
+      uint16_t getType() const
+      {
+        return m_Type;
+      }
 
       /**
        * Get lane.
@@ -120,6 +131,14 @@ namespace Belle2 {
       }
 
       /**
+       * Get feature-extraction mode.
+       */
+      uint16_t getFE() const
+      {
+        return m_FE;
+      }
+
+      /**
        * Check whether this hit corresponds to multiple strips.
        */
       bool multipleStripHit() const
@@ -132,6 +151,15 @@ namespace Belle2 {
        * @param[out] channelGroups Channel groups.
        */
       void getChannelGroups(std::vector<ChannelGroup>& channelGroups) const;
+
+      /**
+       * Unpack packet type.
+       * @param[in] raw Raw-data word.
+       */
+      static uint16_t unpackType(uint16_t raw)
+      {
+        return (raw >> 13) & 0x7;
+      }
 
       /**
        * Unpack lane.
@@ -195,7 +223,18 @@ namespace Belle2 {
         return raw & 0xFFF;
       }
 
+      /**
+       * Unpack feature-extraction bit.
+       */
+      static uint16_t unpackFE(uint16_t raw)
+      {
+        return (raw >> 15) & 0x1;
+      }
+
     protected:
+
+      /** Packet type (3 bits). */
+      uint16_t m_Type;
 
       /** Lane (5 bits). */
       uint16_t m_Lane;
@@ -217,6 +256,9 @@ namespace Belle2 {
 
       /** Charge (12 bits). */
       uint16_t m_Charge;
+
+      /** Feature extraction mode (1 bit). */
+      uint16_t m_FE;
 
     };
 

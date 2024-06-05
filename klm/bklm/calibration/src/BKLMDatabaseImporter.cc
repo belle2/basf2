@@ -13,7 +13,7 @@
 #include <klm/dbobjects/bklm/BKLMGeometryPar.h>
 #include <klm/dbobjects/bklm/BKLMSimulationPar.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/Database.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -32,16 +32,6 @@ void BKLMDatabaseImporter::setIOV(int experimentLow, int runLow,
   m_RunLow = runLow;
   m_ExperimentHigh = experimentHigh;
   m_RunHigh = runHigh;
-}
-
-void BKLMDatabaseImporter::importGeometryPar()
-{
-  GearDir content(Gearbox::getInstance().getDetectorComponent("KLM"));
-  BKLMGeometryPar bklmGeometryPar(content);
-  IntervalOfValidity iov(m_ExperimentLow, m_RunLow,
-                         m_ExperimentHigh, m_RunHigh);
-  Database::Instance().storeData("BKLMGeometryPar", &bklmGeometryPar, iov);
-
 }
 
 void BKLMDatabaseImporter::importSimulationPar()

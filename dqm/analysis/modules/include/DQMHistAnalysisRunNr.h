@@ -12,18 +12,14 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-// EPICS
-#include "cadef.h"
-#endif
+#include <dqm/core/DQMHistAnalysis.h>
+#include <TPaveText.h>
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
-#include <TCanvas.h>
 
 namespace Belle2 {
   /*! DQM Histogram Analysis for PXD Common Modes */
 
-  class DQMHistAnalysisRunNrModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisRunNrModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -63,8 +59,8 @@ namespace Belle2 {
     // Data members
     //! name of histogram directory
     std::string m_histogramDirectoryName;
-    //! prefix for EPICS PVs
-    std::string m_pvPrefix;
+    //! HLT/ERECO prefix for EPICS PVs
+    std::string m_prefix;
 
     //! Final Canvas
     TCanvas* m_cRunNr = nullptr;
@@ -72,13 +68,8 @@ namespace Belle2 {
     /** Monitoring Object */
     MonitoringObject* m_monObj {};
 
-    /** flag if to export to EPICS */
-    bool m_useEpics;
-
-#ifdef _BELLE2_EPICS
-    //! epics PVs
-    std::vector <chid> mychid;
-#endif
+    /** Legend */
+    TPaveText* m_legend = nullptr;
   };
 } // end namespace Belle2
 

@@ -273,7 +273,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
   unsigned iCLayer = 4;
 
   // Middle of the layer four
-  TVector3 posInMiddle(0, 0, 20.8);
+  B2Vector3D posInMiddle(0, 0, 20.8);
 
   unsigned iWireInFourthLayer = CDC::CDCGeometryPar::Instance().cellId(iCLayer, posInMiddle);
   EXPECT_TRUE(iWireInFourthLayer < 160);

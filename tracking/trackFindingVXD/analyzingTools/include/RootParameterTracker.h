@@ -17,7 +17,7 @@
 // root:
 #include <TTree.h>
 #include <TFile.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 // stl:
 #include <string>
@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
     /** short-cut for typical algorithm-types used */
-    template<class DataType> using AnalyzingAlgorithm = AnalyzingAlgorithmBase<DataType, AnalizerTCInfo, TVector3>;
+    template<class DataType> using AnalyzingAlgorithm = AnalyzingAlgorithmBase<DataType, AnalizerTCInfo, ROOT::Math::XYZVector>;
 
 
     /** contains algorithms and its raw data to be streamed into ttrees.

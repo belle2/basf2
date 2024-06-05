@@ -86,6 +86,7 @@ indep2.add_module(CheckData()).set_name("checkdata 2")
 main.add_independent_path(indep2, merge_back_event=['obj', 'array'])
 main.add_module(CheckData()).set_name("checkdata 3")
 
+basf2.print_path(main)
 basf2.process(main)
 
 print(basf2.statistics)

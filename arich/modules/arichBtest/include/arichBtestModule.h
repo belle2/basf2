@@ -6,9 +6,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHBTESTMODULE_H
-#define ARICHBTESTMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 
@@ -17,8 +15,8 @@
 #include <time.h>
 #include <zlib.h>
 
+#include <Math/Vector3D.h>
 class TFile;
-class TVector3;
 
 namespace Belle2 {
 
@@ -105,7 +103,7 @@ namespace Belle2 {
     //! raw MWPC TDC buffer
     int m_tdc[32];
     //! Beamtest Track reconstruction
-    int getTrack(int mask, TVector3& r, TVector3& dir);
+    int getTrack(int mask, ROOT::Math::XYZVector& r, ROOT::Math::XYZVector& dir);
 
   private:
 
@@ -115,4 +113,3 @@ namespace Belle2 {
 
 } // end namespace Belle2
 
-#endif // ARICHBTESTMODULE_H

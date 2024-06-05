@@ -27,7 +27,7 @@ namespace TreeFitter {
 
     /** constructor  */
     FitManager() : m_particle(0), m_decaychain(0), m_status(VertexStatus::UnFitted),
-      m_chiSquare(-1), m_niter(-1), m_prec(0.01), m_updateDaugthers(false), m_ndf(0),
+      m_chiSquare(-1), m_prec(0.01), m_updateDaugthers(false), m_ndf(0),
       m_fitparams(0), m_useReferencing(false)
     {}
 
@@ -50,9 +50,6 @@ namespace TreeFitter {
 
     /** main fit function that uses the kalman filter */
     bool fit();
-
-    /** add extrainfo to particle */
-    void setExtraInfo(Belle2::Particle* part, const std::string& name, const double value) const;
 
     /** update particles parameters with the fit results */
     bool updateCand(Belle2::Particle& particle, const bool isTreeHead) const;
@@ -78,33 +75,6 @@ namespace TreeFitter {
     /**get decay length */
     std::tuple<double, double> getDecayLength(Belle2::Particle& cand) const;
 
-    /** getter for the index of the vertex position in the state vector */
-    int posIndex(Belle2::Particle* particle) const;
-
-    /** getter for the index of the momentum in the state vector */
-    int momIndex(Belle2::Particle* particle) const;
-
-    /** getter for the index of tau, the lifetime in the statevector*/
-    int tauIndex(Belle2::Particle* particle) const;
-
-    /** getter for chi2 of the newton iteration */
-    double chiSquare() const { return m_chiSquare ; }
-
-    /** getter for degrees of freedom of the fitparameters */
-    int nDof() const;
-
-    /** getter for the status of the newton iteration  */
-    int status() const { return m_status; }
-
-    /** getter for the current iteration number of the newton iteration  */
-    int nIter() const { return m_niter; }
-
-    /** getter for some errorcode flag  FIXME isn't this covered by the status-flag?*/
-    const ErrCode& errCode() { return m_errCode; }
-
-    /** const getter for the decay chain */
-    const DecayChain* decaychain() const { return m_decaychain; }
-
     /**  getter for the head of the tree*/
     Belle2::Particle* particle() { return m_particle; }
 
@@ -120,9 +90,6 @@ namespace TreeFitter {
 
     /** chi2 of the current iteration */
     double m_chiSquare;
-
-    /** iteration index */
-    int m_niter;
 
     /** precision that is needed for status:converged (delta chi2) */
     double m_prec;

@@ -1,0 +1,10 @@
+{
+   "HistogramList": [
+	{"Dir": "test", "Name": "testHist2", 
+		"Delta": {"Type": 1, "Parameter": 1000, "Amount": 5}, 
+		"Analysis": {"Type": "SimpleFit"},
+		"Simulation": {"HPar": [1000,-200,300], "Fill": 600, "Function":"TMath::Landau(x,[0],[1],0)", "FPar": [-200,300,2,10,-150,1,10]},
+		"EPICS": [{"pvname": "Test:hist2", "low": 0.2, "high": 0.8, "lolo": 0.1, "hihi": 0.9}] 
+	}
+]
+}

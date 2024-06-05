@@ -8,8 +8,7 @@
 
 #pragma once
 #include <TObject.h>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Transform3D.h>
 #include <vector>
 
 namespace Belle2 {
@@ -205,18 +204,12 @@ namespace Belle2 {
     bool isUnusable(int moduleID) const;
 
     /**
-     * Returns the rotation from local to nominal frame
+     * Returns transformation from local to nominal frame.
      * Transformation is: rotation first then translation.
-     * @return rotation
+     * @param moduleID module ID (1-based)
+     * @return transformation
      */
-    const TRotation& getRotation(int moduleID) const;
-
-    /**
-     * Returns the translation from local to nominal frame
-     * Transformation is: rotation first then translation.
-     * @return translation
-     */
-    const TVector3& getTranslation(int moduleID) const;
+    const ROOT::Math::Transform3D& getTransformation(int moduleID) const;
 
     /**
      * Returns true if all modules are calibrated
@@ -259,10 +252,8 @@ namespace Belle2 {
 
     EStatus m_status[c_numModules] = {c_Default}; /**< calibration status */
 
-    /** cache for rotations (from local to nominal) */
-    mutable std::vector<TRotation> m_rotations; //! do not write out
-    /** cache for translations (from local to nominal) */
-    mutable std::vector<TVector3> m_translations; //! do not write out
+    /** cache for transformations (from local to nominal) */
+    mutable std::vector<ROOT::Math::Transform3D> m_transforms; //! do not write out
 
     ClassDef(TOPCalModuleAlignment, 3); /**< ClassDef */
 

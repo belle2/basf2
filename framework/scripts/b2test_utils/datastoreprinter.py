@@ -9,6 +9,7 @@
 ##########################################################################
 
 from ROOT import Belle2, kIsPublic, kIsStatic, TVector3, TLorentzVector
+from ROOT.Belle2 import Const
 from ROOT.Math import XYZVector
 from basf2 import Module, B2FATAL
 
@@ -160,7 +161,7 @@ class DataStorePrinter:
         """
         # print array index? If yes then add it to the output
         if index is not None:
-            index = "#%d" % index
+            index = f"#{int(index)}"
         else:
             index = ""
 
@@ -182,7 +183,7 @@ class DataStorePrinter:
                 if isinstance(all_args, list):
                     all_args = (all_args,)
             else:
-                # if arguments is not callable we asume it's one set of
+                # if arguments is not callable we assume it's one set of
                 # arguments
                 all_args = (arguments,)
 
@@ -194,7 +195,7 @@ class DataStorePrinter:
                     print("  " + display + ": ", end="")
                 else:
                     # otherwise just print name and arguments
-                    print("  {}({}): ".format(name, ",".join(map(str, args))), end="")
+                    print(f"  {name}({','.join(map(str, args))}): ", end="")
                 # if a callback is set the callback is used to print the result
                 if callback is not None:
                     print("", end="", flush=True)
@@ -221,41 +222,43 @@ class DataStorePrinter:
             print("  " * (depth + 1), end="")
 
         if weight is not None:
-            weight = " (weight: %.6g)" % weight
+            weight = f" (weight: {weight:.6g})"
         else:
             weight = ""
 
         # is it another RelationsObject? print array name and index
         if hasattr(result, "getArrayName") and hasattr(result, "getArrayIndex"):
             if not result:
-                print("-> NULL%s" % weight)
+                print(f"-> NULL{weight}")
             else:
-                print("-> %s#%d%s" % (result.getArrayName(), result.getArrayIndex(), weight))
+                print(f"-> {result.getArrayName()}#{int(result.getArrayIndex())}{weight}")
         # special case for TMatrix like types to make them more space efficient
         elif hasattr(result, "GetNrows") and hasattr(result, "GetNcols"):
             print(weight, end="")
             for row in range(result.GetNrows()):
                 print("\n" + "  " * (depth + 2), end="")
                 for col in range(result.GetNcols()):
-                    print("%13.6e " % result(row, col), end="")
+                    print(f"{result(row, col):13.6e} ", end="")
 
             print()
         # or is it a TVector3 or TLorentzVector?
         elif isinstance(result, TVector3):
-            print("(" + ",".join("%.6g" % result[i] for i in range(3)) + ")")
+            print("(" + ",".join(f"{result[i]:.6g}" for i in range(3)) + ")")
         elif isinstance(result, XYZVector):
-            print("(" + ",".join("%.6g" % Belle2.B2Vector3D(result)[i] for i in range(3)) + ")")
+            print("(" + ",".join(f"{Belle2.B2Vector3D(result)[i]:.6g}" for i in range(3)) + ")")
             # print("(" + ",".join("%.6g" % x for x in [result.X(), result.Y(), result.Z()]) + ")")
         elif isinstance(result, TLorentzVector):
-            print("(" + ",".join("%.6g" % result[i] for i in range(4)) + ")")
+            print("(" + ",".join(f"{result[i]:.6g}" for i in range(4)) + ")")
         # or, does it look like a std::pair?
         elif hasattr(result, "first") and hasattr(result, "second"):
-            print("pair%s" % weight)
+            print(f"pair{weight}")
             self._printResult(result.first, depth + 1)
             self._printResult(result.second, depth + 1)
         # or, could it be a std::vector like container? But ROOT might wrap a std::string so if it has npos assume it's a string
-        elif (hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end")) and not hasattr(result, "npos"):
-            print("size(%d)%s" % (result.size(), weight))
+        elif (hasattr(result, "size") and hasattr(result, "begin")
+              and hasattr(result, "end")) and not hasattr(result, "npos") \
+                and not isinstance(result, Const.DetectorSet):
+            print(f"size({int(result.size())}){weight}")
             # if it is a RelationVector we also want to print the weights. So
             # check whether we have weights and pass them to the _printResult
             weight_getter = getattr(result, "weight", None)

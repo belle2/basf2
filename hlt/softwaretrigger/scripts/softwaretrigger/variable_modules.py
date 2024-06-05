@@ -39,7 +39,7 @@ class PickleHarvestingModule(HarvestingModule):
             except GeneratorExit:
                 pass
 
-        elif isinstance(crop, collections.MutableMapping):
+        elif isinstance(crop, collections.abc.MutableMapping):
             try:
                 while True:
                     crops.append(crop)
@@ -48,10 +48,7 @@ class PickleHarvestingModule(HarvestingModule):
                 pass
 
         else:
-            msg = "Unrecognised crop {} of type {}".format(
-                crop,
-                type(crop)
-            )
+            msg = f"Unrecognised crop {crop} of type {type(crop)}"
             raise ValueError(msg)
 
         #: The gathered crops until now

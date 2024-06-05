@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include <dqm/analysis/modules/DQMHistAnalysis.h>
+#include <dqm/core/DQMHistAnalysis.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
 
@@ -20,24 +21,24 @@
 namespace Belle2 {
 
   /** Class derived from HistoModule, for SVD monitoring variables at MiraBelle */
-  class DQMHistAnalysisSVDOnMiraBelleModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDOnMiraBelleModule final : public DQMHistAnalysisModule {
 
   public:
 
     /** Constructor */
     DQMHistAnalysisSVDOnMiraBelleModule();
     /** Destructor */
-    virtual ~DQMHistAnalysisSVDOnMiraBelleModule();
+    ~DQMHistAnalysisSVDOnMiraBelleModule();
     /** Module function initialize */
-    virtual void initialize() override;
+    void initialize() override final;
     /** Module function beginRun */
-    virtual void beginRun() override;
+    void beginRun() override final;
     /** Module function event */
-    virtual void event() override;
+    void event() override final;
     /** Module function endRun */
-    virtual void endRun() override;
+    void endRun() override final;
     /** Module function terminate */
-    virtual void terminate() override;
+    void terminate() override final;
 
   private:
 
@@ -49,9 +50,14 @@ namespace Belle2 {
     TCanvas* m_c_MPVTimeClusterOnTrack = nullptr; /**< time for clusters on track */
     TCanvas* m_c_avgMaxBinClusterOnTrack =
       nullptr; /**< average number of the APV sample which corresponds to the maximum amplitude for clusters on track */
+    TCanvas* m_c_MeanSVDEventT0 = nullptr; /**< Mean Event T0 from SVD */
 
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
+
+    //! IDs of all SVD Modules to iterate over
+    std::vector<VxdID> m_SVDModules;
+
 
     /**
     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
@@ -74,6 +80,16 @@ namespace Belle2 {
     * @return vector with values for U and V sides
     */
     std::vector<float> avgOccupancyUV(int iLayer, TH1F* hU, TH1F* hV, int min, int max, int offset, int step, int nEvents) const;
+
+
+    /**
+     * Calculate avg offline occupancy for specified layer for time group id = 0
+     * @param iLayer index of layer
+     * @param nEvents number of events
+     * @return vector with values for U and V sides
+     */
+    std::vector<float>  avgOccupancyGrpId0UV(int iLayer, int nEvents) const;
+
 
     /**
     * Calculate avg efficiency for specified sensors

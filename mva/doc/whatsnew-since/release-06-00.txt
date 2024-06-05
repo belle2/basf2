@@ -1,11 +1,15 @@
 Changes in the mva package since release-06-00
 ----------------------------------------------
 
- * Deprecated ``basf2_mva_utils.calculate_roc_auc`` as it calculated the efficiency-purity auc not the roc
-   (efficiency-background retention) auc. Use instead ``basf2_mva_utils.calculate_auc_efficiency_vs_purity`` or 
-   ``basf2_mva_utils.calculate_auc_efficiency_vs_backround_retention``.
- * Added an argument ``overwriteExistingExtraInfo`` to ``MVAExpert`` and ``MVAMultipleExperts`` modules so that
-   one can choose to overwrite or keep the old value if the given extraInfo is already defined.
- * Updated the ``partial_fit(...)`` function for python based methods. Previously the ``epoch`` parameter was confusingly defined as 
-   ``iEpoch * nBatches + iBatch``. It now returns correctly ``iEpoch`` with a new ``batch`` argument giving the index of the current batch.
-   Additionally added the ``nBatches`` argument to ``begin_fit(...)`` to provide the number of batches per epoch to user methods.  In combination the two additions can be used to for example run the validation set after the final batch of each epoch and return the accuracy for monitoring or early stopping. For an example of this use case see ``mva/examples/tensorflow/simple.py`` User scripts must be updated to overwrite ``partial_fit(state, X, S, y, w, epoch, batch)`` and ``begin_fit(state, Xtest, Stest, ytest, wtest, nBatches)``. 
+* Deprecated ``basf2_mva_utils.calculate_roc_auc`` as it calculated the efficiency-purity auc not the roc
+  (efficiency-background retention) auc. Use instead ``basf2_mva_utils.calculate_auc_efficiency_vs_purity`` or
+  ``basf2_mva_utils.calculate_auc_efficiency_vs_backround_retention``.
+* Added an argument ``overwriteExistingExtraInfo`` to ``MVAExpert`` and ``MVAMultipleExperts`` modules so that
+  one can choose to overwrite or keep the old value if the given extraInfo is already defined.
+* Updated the ``partial_fit(...)`` function for python based methods. Previously the ``epoch`` parameter was confusingly defined as
+  ``iEpoch * nBatches + iBatch``. It now returns correctly ``iEpoch`` with a new ``batch`` argument giving the index of the current
+  batch. Additionally added the ``nBatches`` argument to ``begin_fit(...)`` to provide the number of batches per epoch to user
+  methods.  In combination the two additions can be used to for example run the validation set after the final batch of each epoch
+  and return the accuracy for monitoring or early stopping. For an example of this uase case see
+  ``mva/examples/tensorflow/simple.py`` User scripts must be updated to overwrite ``partial_fit(state, X, S, y, w, epoch, batch)``
+  and ``begin_fit(state, Xtest, Stest, ytest, wtest, nBatches)``.

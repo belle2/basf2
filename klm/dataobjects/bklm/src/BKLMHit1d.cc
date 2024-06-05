@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/bklm/BKLMStatus.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
 /* C++ headers. */
@@ -65,6 +65,10 @@ BKLMHit1d::BKLMHit1d(const std::vector<std::pair<const KLMDigit*, double>>& digi
     int strip = digit->getStrip();
     stripMin = std::min(stripMin, strip);
     stripMax = std::max(stripMax, strip);
+    if (digit->isMultiStrip()) {
+      m_Time += correctedTime * (digit->getLastStrip() - strip);
+      stripMax = std::max(stripMax, digit->getLastStrip());
+    }
     addRelationTo(digit);
   }
 

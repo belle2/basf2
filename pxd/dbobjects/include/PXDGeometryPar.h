@@ -22,6 +22,61 @@ namespace Belle2 {
   public:
     //! Default constructor
     PXDGeometryPar() {}
+    //! Copy constructor
+    PXDGeometryPar(PXDGeometryPar& geo)
+    {
+      for (PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
+        m_SensorInfo.push_back(new PXDSensorInfoPar(*pxdSensor));
+      }
+      m_endflanges = geo.getEndflanges();
+      m_nCutouts = geo.getNCutOuts();
+      m_cutOutWidth = geo.getCutOutWidth();
+      m_cutOutHeight = geo.getCutOutHeight();
+      m_cutOutRphi = geo.getCutOutRPhi();
+      m_cutOutStartPhi = geo.getCutOutStartPhi();
+      m_cutOutDeltaPhi = geo.getCutOutDeltaPhi();
+      m_nTubes = geo.getNTubes();
+      m_tubesMinZ = geo.getTubesMinZ();
+      m_tubesMaxZ = geo.getTubesMaxZ();
+      m_tubesMinR = geo.getTubesMinR();
+      m_tubesMaxR = geo.getTubesMaxR();
+      m_tubesRPhi = geo.getTubesRPhi();
+      m_tubesStartPhi = geo.getTubesStartPhi();
+      m_tubesDeltaPhi = geo.getTubesDeltaPhi();
+      m_tubesMaterial = geo.getTubesMaterial();
+    }
+    //! Assignemnt operator
+    PXDGeometryPar& operator=(PXDGeometryPar& geo)
+    {
+      for (PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
+        m_SensorInfo.push_back(new PXDSensorInfoPar(*pxdSensor));
+      }
+      m_endflanges = geo.getEndflanges();
+      m_nCutouts = geo.getNCutOuts();
+      m_cutOutWidth = geo.getCutOutWidth();
+      m_cutOutHeight = geo.getCutOutHeight();
+      m_cutOutRphi = geo.getCutOutRPhi();
+      m_cutOutStartPhi = geo.getCutOutStartPhi();
+      m_cutOutDeltaPhi = geo.getCutOutDeltaPhi();
+      m_nTubes = geo.getNTubes();
+      m_tubesMinZ = geo.getTubesMinZ();
+      m_tubesMaxZ = geo.getTubesMaxZ();
+      m_tubesMinR = geo.getTubesMinR();
+      m_tubesMaxR = geo.getTubesMaxR();
+      m_tubesRPhi = geo.getTubesRPhi();
+      m_tubesStartPhi = geo.getTubesStartPhi();
+      m_tubesDeltaPhi = geo.getTubesDeltaPhi();
+      m_tubesMaterial = geo.getTubesMaterial();
+      return *this;
+    }
+    //! Destructor
+    ~PXDGeometryPar()
+    {
+      for (PXDSensorInfoPar* pxdSensor : m_SensorInfo) {
+        delete pxdSensor;
+      }
+      m_SensorInfo.clear();
+    }
     /** build support */
     bool getBuildSupport() const { return (m_nCutouts > 0); }
     /** get number of cutouts */
@@ -52,7 +107,6 @@ namespace Belle2 {
     double getCutOutDeltaPhi() const { return m_cutOutDeltaPhi; }
     /** set deltaphi of cutouts */
     void setCutOutDeltaPhi(double delta) { m_cutOutDeltaPhi = delta; }
-
     /** get number of tubes */
     int getNTubes() const { return m_nTubes; }
     /** set number of tubes */
@@ -89,12 +143,12 @@ namespace Belle2 {
     const std::string& getTubesMaterial() const { return m_tubesMaterial; }
     /** set tubes tubes material*/
     void setTubesMaterial(const std::string& material) { m_tubesMaterial = material; }
-    /** get  Endflanges */
+    /** get Endflanges */
     const std::vector<VXDPolyConePar>& getEndflanges() const {return m_endflanges;}
-    /** get  sensorInfos */
-    std::vector<PXDSensorInfoPar*>& getSensorInfos()  {return m_SensorInfo;}
-    /** get  Endflanges */
+    /** get Endflanges */
     std::vector<VXDPolyConePar>& getEndflanges() {return m_endflanges;}
+    /** get sensorInfos */
+    std::vector<PXDSensorInfoPar*>& getSensorInfos() {return m_SensorInfo;}
 
   private:
 
@@ -118,7 +172,6 @@ namespace Belle2 {
     double m_cutOutStartPhi {0};
     /** Delta Rphi of PXD endflange coutOuts */
     double m_cutOutDeltaPhi {0};
-
     /** Number of PXD carbon tubes */
     int m_nTubes {0};
     /** MinZ of PXD carbon tubes */

@@ -77,6 +77,7 @@ We now want to reconstruct the Rest of Event of the :math:`B^0`.
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S10
          :end-at: E10
+         :language: python        
 
 That's it, the ROE has been reconstructed!
 Behind these python curtains, a ``RestOfEvent`` object is created for each particle in the :math:`B^0`
@@ -118,6 +119,7 @@ Let's include the following lines to have a useful selection of them:
 .. literalinclude:: steering_files/029_roe.py
      :start-at: S20
      :end-at: E20
+     :language: python        
 
 .. admonition:: Exercise
      :class: exercise
@@ -148,6 +150,7 @@ For our example, let's start by defining the following selection cut strings:
 .. literalinclude:: steering_files/029_roe.py
      :start-at: S30
      :end-at: E30
+     :language: python        
 
 Here we created different cuts for charged particles, like electrons or charged pions, and for photons,
 because of different methods of measurement used to detect these particles.
@@ -177,6 +180,7 @@ because of different methods of measurement used to detect these particles.
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S40
          :end-at: E40
+         :language: python        
 
 Now we have created a mask with a name ``my_mask``, that will only allow track-based
 particles that pass selection cuts ``track_based_cuts`` and ECL-based particles, that pass
@@ -228,6 +232,7 @@ loop to insert this argument.
      .. literalinclude:: steering_files/029_roe.py
          :start-at: S50
          :end-at: E50
+         :language: python        
 
 
 .. tip::
@@ -248,7 +253,7 @@ loop to insert this argument.
      Your steering file should look like this:
 
      .. literalinclude:: steering_files/029_roe.py
-         :linenos:
+         :language: python        
 
 
 Quick plots
@@ -299,11 +304,14 @@ Quick plots
 
      .. code-block:: python
 
-        import root_pandas
+        import uproot
         import matplotlib.pyplot as plt
 
         plt.style.use('belle2')
-        df = root_pandas.read_root('Bd2JpsiKS.root')
+        
+        var_list = ['roeM__bo__bc', 'roeM__bomy_mask__bc', 'nROE_Charged__bo__bc', 'nROE_Charged__bomy_mask__bc']
+        df = uproot.open('Bd2JpsiKS.root:tree').arrays(var_list, library='pd')
+        
         m_bins = 50
         m_range = (0, 10)
         fig, ax = plt.subplots(1,2, figsize=(15, 7))
@@ -328,11 +336,14 @@ Quick plots
 
      .. code-block:: python
 
-        import root_pandas
+        import uproot
         import matplotlib.pyplot as plt
 
         plt.style.use('belle2')
-        df = root_pandas.read_root('Bd2JpsiKS.root')
+        
+        var_list = ['roeM__bo__bc', 'roeM__bomy_mask__bc', 'nROE_Charged__bo__bc', 'nROE_Charged__bomy_mask__bc']
+        df = uproot.open('Bd2JpsiKS.root:tree').arrays(var_list, library='pd')
+        
         m_bins = 50
         m_range = (0, 10)
         fig, ax = plt.subplots(1,2, figsize=(15, 7))
@@ -415,7 +426,7 @@ This concludes the Rest of Event setup as a middle stage algorithm to run :ref:`
 
 .. include:: ../lesson_footer.rstinclude
 
-.. topic:: Authors of this lesson
+.. rubric:: Authors of this lesson
 
-    Sviatoslav Bilokin,
-    Kilian Lieret
+Sviatoslav Bilokin,
+Kilian Lieret

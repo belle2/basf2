@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,7 +36,7 @@ import os
 ROOT.gSystem.Load("libtracking")
 
 
-class FilterProperties(object):
+class FilterProperties:
     """
     contains all informations necessary for track filters to decide whether
     track will be included into the processed list of tracks
@@ -88,7 +87,7 @@ class FilterProperties(object):
 #    mcParticle is guaranteed to be != None
 #
 
-class AlwaysPassFilter(object):
+class AlwaysPassFilter:
     """Filter that always passes"""
 
     def doesPrPass(self, filterProperties):
@@ -125,7 +124,7 @@ class TrackingValidationModule(basf2.Module):
     ):
         """Constructor"""
 
-        super(TrackingValidationModule, self).__init__()
+        super().__init__()
 
         #: cached value of the tracking-validation name
         self.validation_name = name
@@ -190,12 +189,12 @@ class TrackingValidationModule(basf2.Module):
         #: list of PR-track fakes
         self.pr_fakes = collections.deque()
 
+        #: list of PR-track seed pt values
+        self.pr_seed_pt = collections.deque()
         #: list of PR-track seed tan(lambda) values
         self.pr_seed_tan_lambdas = collections.deque()
         #: list of PR-track seed phi values
         self.pr_seed_phi = collections.deque()
-        #: list of PR-track seed theta values
-        self.pr_seed_theta = collections.deque()
 
         #: list of PR-track seed omega-truth values
         self.pr_omega_truths = collections.deque()
@@ -245,8 +244,6 @@ class TrackingValidationModule(basf2.Module):
         self.mc_d0s = collections.deque()
         #: list of MC-track tan(lambda) values
         self.mc_tan_lambdas = collections.deque()
-        #: direction of the track in theta
-        self.mc_theta = collections.deque()
         #: direction of the track in phi
         self.mc_phi = collections.deque()
         #: list of MC-track pt values
@@ -276,8 +273,8 @@ class TrackingValidationModule(basf2.Module):
             return
 
         for trackCand in trackCands:
-            is_matched = trackMatchLookUp.isMatchedPRRecoTrack(trackCand)
-            is_clone = trackMatchLookUp.isClonePRRecoTrack(trackCand)
+            is_matched = trackMatchLookUp.isAnyChargeMatchedPRRecoTrack(trackCand)
+            is_clone = trackMatchLookUp.isAnyChargeClonePRRecoTrack(trackCand)
 
             pt_truth = float('nan')
             omega_truth = float('nan')
@@ -292,7 +289,7 @@ class TrackingValidationModule(basf2.Module):
                 mcHelix = getHelixFromMCParticle(mcParticle)
                 omega_truth = mcHelix.getOmega()
                 tan_lambda_truth = mcHelix.getTanLambda()
-                pt_truth = mcParticle.getMomentum().Perp()
+                pt_truth = mcParticle.getMomentum().Rho()
                 d0_truth = mcHelix.getD0()
                 z0_truth = mcHelix.getZ0()
 
@@ -328,12 +325,11 @@ class TrackingValidationModule(basf2.Module):
             # store seed information, they are always available from the pattern reco
             # even if the fit was no successful
             # this information can we used when plotting fake tracks, for example
-            seed_position = trackCand.getPositionSeed()
             seed_momentum = trackCand.getMomentumSeed()
             # Avoid zero division exception
             seed_tan_lambda = np.divide(1.0, math.tan(seed_momentum.Theta()))
-            seed_phi = seed_position.Phi()
-            seed_theta = seed_position.Theta()
+            seed_phi = seed_momentum.Phi()
+            seed_pt = seed_momentum.Rho()
 
             if prTrackFitResult:
                 omega_estimate = prTrackFitResult.getOmega()
@@ -348,12 +344,12 @@ class TrackingValidationModule(basf2.Module):
                 z0_estimate = prTrackFitResult.getZ0()
 
                 momentum = prTrackFitResult.getMomentum()
-                pt_estimate = momentum.Perp()
+                pt_estimate = momentum.Rho()
 
             # store properties of the seed
+            self.pr_seed_pt.append(seed_pt)
             self.pr_seed_tan_lambdas.append(seed_tan_lambda)
             self.pr_seed_phi.append(seed_phi)
-            self.pr_seed_theta.append(seed_theta)
 
             self.pr_bining_pt.append(pt_truth)
 
@@ -401,7 +397,7 @@ class TrackingValidationModule(basf2.Module):
         n_matched_minus = 0
 
         for mcTrackCand in mcTrackCands:
-            is_matched = trackMatchLookUp.isMatchedMCRecoTrack(mcTrackCand)
+            is_matched = trackMatchLookUp.isAnyChargeMatchedMCRecoTrack(mcTrackCand)
 
             relatedPRtrackCand = trackMatchLookUp.getRelatedPRRecoTrack(mcTrackCand)
             if relatedPRtrackCand:
@@ -431,7 +427,7 @@ class TrackingValidationModule(basf2.Module):
                 continue
 
             momentum = mcParticle.getMomentum()
-            pt = momentum.Perp()
+            pt = momentum.Rho()
             tan_lambda = np.divide(1.0, math.tan(momentum.Theta()))  # Avoid zero division exception
             d0 = mcHelix.getD0()
             det_hit_ids = get_det_hit_ids(mcTrackCand)
@@ -445,7 +441,6 @@ class TrackingValidationModule(basf2.Module):
             self.mc_d0s.append(d0)
             self.mc_tan_lambdas.append(tan_lambda)
             self.mc_multiplicities.append(multiplicity)
-            self.mc_theta.append(momentum.Theta())
             self.mc_phi.append(momentum.Phi())
             self.mc_ndf.append(ndf)
             if not is_primary(mcParticle):
@@ -472,7 +467,12 @@ class TrackingValidationModule(basf2.Module):
         mc_matched_primaries = np.logical_and(self.mc_primaries, self.mc_matches)
 
         charge_asymmetry = np.average(self.mc_charge_asymmetry, weights=self.mc_charge_asymmetry_weights)
-        charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+        if len(mc_matched_primaries) > 0 and sum(mc_matched_primaries) > 0:
+            charge_efficiency = np.average(self.mc_charge_matches, weights=mc_matched_primaries)
+            hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
+        else:
+            charge_efficiency = float('nan')
+            hit_efficiency = float('nan')
         finding_charge_efficiency = np.average(self.mc_charge_matches, weights=self.mc_primaries)
         finding_efficiency = np.average(self.mc_matches, weights=self.mc_primaries)
         fake_rate = 1.0 - np.mean(self.pr_clones_and_matches)
@@ -483,10 +483,7 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        hit_efficiency = np.average(self.mc_hit_efficiencies, weights=mc_matched_primaries)
-
-        figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
-                                                    % name)
+        figures_of_merit = ValidationFiguresOfMerit(f'{name}_figures_of_merit')
         figures_of_merit['finding_charge_efficiency'] = finding_charge_efficiency
         figures_of_merit['finding_efficiency'] = finding_efficiency
         figures_of_merit['charge_efficiency'] = charge_efficiency
@@ -556,15 +553,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                                weights=self.mc_charge_asymmetry_weights,
                                                is_asymmetry=True)
 
-        validation_plots.extend(plots)
-
-        # Fake rate (all tracks not matched or clone            #
-        # use TrackCand seeds for the fake track plotting       #
-        # as the fit (if successful) is probably not meaningful #
-        #########################################################
-        print('fake list: ' + str(self.pr_fakes.count(1)))
-        plots = self.profiles_by_pr_parameters(self.pr_fakes, 'fake rate',
-                                               make_hist=False)
         validation_plots.extend(plots)
 
         # Hit efficiency #
@@ -728,7 +716,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'tan_lambda',
             'multiplicity',
             'phi',
-            'theta',
             'ndf',
         ],
         make_hist=True,
@@ -747,7 +734,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             'p_{t}': self.mc_pts,
             'tan #lambda': self.mc_tan_lambdas,
             '#phi': self.mc_phi,
-            '#theta': self.mc_theta,
             'multiplicity': self.mc_multiplicities,
             'ndf': self.mc_ndf,
         }
@@ -768,7 +754,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         xs,
         quantity_name,
         unit=None,
-        parameter_names=['Seed tan #lambda', 'Seed #phi', 'Seed #theta'],
+        parameter_names=['Seed_p_t', 'Seed tan #lambda', 'Seed #phi'],
         make_hist=True,
     ):
         """Create profile histograms by PR-track parameters"""
@@ -778,9 +764,9 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                                not in self.exclude_profile_pr_parameter]
 
         # Profile versus the various parameters
-        profile_parameters = {'Seed tan #lambda': self.pr_seed_tan_lambdas,
-                              'Seed #phi': self.pr_seed_phi,
-                              'Seed #theta': self.pr_seed_theta}
+        profile_parameters = {'Seed p_{t}': self.pr_seed_pt,
+                              'Seed tan #lambda': self.pr_seed_tan_lambdas,
+                              'Seed #phi': self.pr_seed_phi}
 
         return self.profiles_by_parameters_base(
             xs,
@@ -829,17 +815,36 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
 
                 is_expert = not(parameter_name in self.non_expert_parameters)
 
+                parameter_root_name = root_save_name(parameter_name)
+
                 # Apply some boundaries for the maximal tracking acceptance
                 # such that the plots look more instructive
-                if root_save_name(parameter_name) == 'tan_lambda':
-                    lower_bound = -1.73
-                    upper_bound = 3.27
-                elif root_save_name(parameter_name) == 'theta':
-                    lower_bound = 17 * math.pi / 180
-                    upper_bound = 150 * math.pi / 180
-                elif root_save_name(parameter_name) == 'ndf':
+                if 'tan_lambda' in parameter_root_name:
+                    lower_bound = -2.0
+                    upper_bound = 5.0
+                    # need different bounds for cosmics
+                    if 'cosmics' in self.validation_name.lower() or \
+                       'cosmics' in self.output_file_name.lower():
+                        lower_bound = -1.5
+                        upper_bound = 1.5
+                elif 'ndf' in parameter_root_name:
                     lower_bound = 0
                     upper_bound = min(200, np.max(parameter_values))
+                elif 'p_t' in parameter_root_name:
+                    lower_bound = 0
+                    upper_bound = 2.5
+                    # need different upper_bound for cosmics
+                    if 'cosmics' in self.validation_name.lower() or \
+                       'cosmics' in self.output_file_name.lower():
+                        upper_bound = 30
+                elif 'd_0' in parameter_root_name:
+                    lower_bound = -0.06
+                    upper_bound = 0.06
+                    # need different bounds for cosmics
+                    if 'cosmics' in self.validation_name.lower() or \
+                       'cosmics' in self.output_file_name.lower():
+                        lower_bound = -20
+                        upper_bound = 20
                 else:
                     lower_bound = None
                     upper_bound = None

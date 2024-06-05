@@ -7,12 +7,11 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef BABAYAGANLOINPUTMODULE_H
-#define BABAYAGANLOINPUTMODULE_H
+#pragma once
 
-#include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/babayaganlo/BabayagaNLO.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -29,7 +28,7 @@ namespace Belle2 {
    * The Babayaga.NLO Generator module.
    * Generates radiative Bhabha scattering and exlcusive photon pairs events using the Babayaga.NLO FORTRAN generator.
    */
-  class BabayagaNLOInputModule : public Module {
+  class BabayagaNLOInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -43,10 +42,10 @@ namespace Belle2 {
     virtual ~BabayagaNLOInputModule();
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each event. */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** Method is called at the end of the event processing. */
     virtual void terminate() override;
@@ -138,5 +137,3 @@ namespace Belle2 {
   }
 
 } // end namespace Belle2
-
-#endif /* BABAYAGANLOINPUTMODULE_H */

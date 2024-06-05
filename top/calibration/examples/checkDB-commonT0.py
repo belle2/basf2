@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -52,7 +51,7 @@ class CheckCalibDB(b2.Module):
         ''' event processing '''
 
         evtMetaData = Belle2.PyStoreObj('EventMetaData')
-        runNo = 'r' + '{:0=5d}'.format(evtMetaData.getRun())
+        runNo = 'r' + f'{evtMetaData.getRun():05d}'
 
         if not self.db:
             b2.B2ERROR(runNo + ': payload not found')
@@ -92,9 +91,9 @@ class CheckCalibDB(b2.Module):
 
 # Database
 if '.txt' in tag:
-    b2.use_local_database(tag)
+    b2.conditions.append_testing_payloads(tag)
 else:
-    b2.use_central_database(tag)
+    b2.conditions.append_globaltag(tag)
 
 # Create path
 main = b2.create_path()

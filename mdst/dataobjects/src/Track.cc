@@ -95,7 +95,7 @@ const TrackFitResult* Track::getTrackFitResultWithClosestMassByName(const Const:
     return massDiffA < massDiffB;
   });
 
-  if (isnan(bestMassFit->second->getPValue())) {
+  if (std::isnan(bestMassFit->second->getPValue())) {
     return nullptr;
   }
   return bestMassFit->second;

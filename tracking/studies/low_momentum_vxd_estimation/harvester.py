@@ -9,6 +9,7 @@
 from tracking.harvest.harvesting import HarvestingModule
 from tracking.harvest import refiners
 from ROOT import Belle2
+from ROOT.Math import XYZVector
 import numpy as np
 
 from tracking.ipython_tools.wrapper import QueueHarvester
@@ -104,17 +105,17 @@ class MCParticleHarvester(HarvestingModule):
 
         truncated, first4, first6 = VXDMomentumEnergyEstimator.generate_truncated(normalized_charge_list)
 
-        result.update({"sum_%s_charges" % name: sum(charge_list)})
-        result.update({"mean_%s_charges" % name: np.mean(charge_list)})
-        result.update({"sum_%s_normalized_charges" % name: sum(normalized_charge_list)})
-        result.update({"mean_%s_normalized_charges" % name: np.mean(normalized_charge_list)})
+        result.update({f"sum_{name}_charges": sum(charge_list)})
+        result.update({f"mean_{name}_charges": np.mean(charge_list)})
+        result.update({f"sum_{name}_normalized_charges": sum(normalized_charge_list)})
+        result.update({f"mean_{name}_normalized_charges": np.mean(normalized_charge_list)})
 
-        result.update({"sum_%s_normalized_charges_truncated" % name: sum(truncated)})
-        result.update({"mean_%s_normalized_charges_truncated" % name: np.mean(truncated)})
-        result.update({"sum_%s_normalized_charges_first4" % name: sum(first4)})
-        result.update({"mean_%s_normalized_charges_first4" % name: np.mean(first4)})
-        result.update({"sum_%s_normalized_charges_first6" % name: sum(first6)})
-        result.update({"mean_%s_normalized_charges_first6" % name: np.mean(first6)})
+        result.update({f"sum_{name}_normalized_charges_truncated": sum(truncated)})
+        result.update({f"mean_{name}_normalized_charges_truncated": np.mean(truncated)})
+        result.update({f"sum_{name}_normalized_charges_first4": sum(first4)})
+        result.update({f"mean_{name}_normalized_charges_first4": np.mean(first4)})
+        result.update({f"sum_{name}_normalized_charges_first6": sum(first6)})
+        result.update({f"mean_{name}_normalized_charges_first6": np.mean(first6)})
 
         return result
 
@@ -223,7 +224,7 @@ class VXDHarvester(QueueHarvester):
                         track_position = track_cand.getPosSeed()
                         track_charge = track_cand.getChargeSeed()
 
-                    b_field = Belle2.BFieldManager.getField(track_position).Z() / Belle2.Unit.T
+                    b_field = Belle2.BFieldManager.getField(XYZVector(track_position)).Z() / Belle2.Unit.T
                     track_helix = Belle2.Helix(track_position, track_momentum, int(track_charge), b_field)
 
                     cluster_charge = tools.getCalibratedCharge(cluster)
@@ -294,7 +295,7 @@ class VXDHarvester(QueueHarvester):
                                      track_charge=track_charge,
                                      path_length=path_length,
                                      mc_path_length=mc_path_length,
-                                     p_origin=mc_particle.getMomentum().Mag())
+                                     p_origin=mc_particle.getMomentum().R())
 
                     track_dict = dict(track_helix_perigee_x=track_helix.getPerigeeX(),
                                       track_helix_perigee_y=track_helix.getPerigeeY(),

@@ -49,6 +49,11 @@ namespace Belle2 {
     void addRootNtupleFile(const std::string& fileName);
 
     /**
+     * Add the metadata of a HDF5 file
+     */
+    void addHDF5File(const std::string& fileName);
+
+    /**
      * Add metadata of basf2 status
      */
     void addBasf2Status(const std::string& message = "");

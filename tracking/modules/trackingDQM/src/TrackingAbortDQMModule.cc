@@ -20,7 +20,6 @@
 #include <TStyle.h>
 
 #include <algorithm>
-#include <string>
 
 
 using namespace Belle2;

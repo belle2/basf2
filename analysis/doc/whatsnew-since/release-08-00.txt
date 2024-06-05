@@ -1,3 +1,18 @@
+Changes in the analysis package in light-2405-quaxo
+---------------------------------------------------
+
+Modules
++++++++
+* Removed the cut functionality from the `KlongMomentumCalculatorExpert` module.
+
+Variables
++++++++++
+* Added the variables `beamBackgroundReuseRate` and `beamBackgroundEvents` for studying the Beam Background Overlay events
+  used for producing MC samples.
+* Added the metavariables `sumValueInList` and `productValueInList`, which return the sum and product
+  of the given variable of the particles in the given particle list.
+
+
 Changes in the analysis package in light-2403-persian
 -----------------------------------------------------
 

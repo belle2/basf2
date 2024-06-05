@@ -251,6 +251,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # TRGECL
         trgecldqm = b2.register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+        trgecltimingdqm = b2.register_module('TRGECLEventTimingDQM')
+        path.add_module(trgecltimingdqm)
         # TRGGDL
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)

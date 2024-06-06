@@ -234,7 +234,8 @@ class Reweighter:
                  n_variations: int = 100,
                  weight_name: str = "Weight",
                  evaluate_plots: bool = True,
-                 nbins: int = 50) -> None:
+                 nbins: int = 50,
+                 fillna: float = 1.0) -> None:
         """
         Initializes the Reweighter class.
         """
@@ -252,6 +253,8 @@ class Reweighter:
         self.evaluate_plots = evaluate_plots
         #: Number of bins for the plots
         self.nbins = nbins
+        #: Value to fill NaN values
+        self.fillna = fillna
 
     def get_bin_columns(self, weight_df) -> list:
         """
@@ -381,6 +384,7 @@ class Reweighter:
         weight_cols = _weight_cols
         if particle.column_names:
             weight_cols = particle.column_names
+        binning_df = binning_df.fillna(self.fillna)
         binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
         particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
@@ -532,6 +536,7 @@ class Reweighter:
         weight_cols = _weight_cols
         if particle.column_names:
             weight_cols = particle.column_names
+        binning_df = binning_df.fillna(self.fillna)
         binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', _fei_mode_col]],
                                       on=['PDG', _fei_mode_col], how='left')
         particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
@@ -598,6 +603,7 @@ def add_weights_to_dataframe(prefix: str,
         show_plots (bool): When true show the coverage plots.
         variable_aliases (dict): Dictionary containing variable aliases.
         cov_matrix (numpy.ndarray): Covariance matrix for the custom efficiency weights.
+        fillna (int): Value to fill NaN values with.
         sys_seed (int): Seed for the systematic variations.
         syscorr (bool): When true assume systematics are 100% correlated defaults to true.
         **kw_args: Additional arguments for the Reweighter class.
@@ -608,8 +614,12 @@ def add_weights_to_dataframe(prefix: str,
     weight_name = "Weight"
     if kw_args.get('weight_name'):
         weight_name = kw_args.get('weight_name')
+    fillna = 1.0
+    if kw_args.get('fillna'):
+        fillna = kw_args.get('fillna')
     reweighter = Reweighter(n_variations=n_variations,
-                            weight_name=weight_name)
+                            weight_name=weight_name,
+                            fillna=fillna)
     variable_aliases = kw_args.get('variable_aliases')
     cov_matrix = kw_args.get('cov_matrix')
     if systematic.lower() == 'custom_fei':
@@ -617,7 +627,8 @@ def add_weights_to_dataframe(prefix: str,
                                     table=custom_tables,
                                     threshold=custom_thresholds,
                                     variable_aliases=variable_aliases,
-                                    cov=cov_matrix)
+                                    cov=cov_matrix
+                                    )
     elif systematic.lower() == 'custom_pid':
         sys_seed = kw_args.get('sys_seed')
         syscorr = kw_args.get('syscorr')
@@ -628,7 +639,8 @@ def add_weights_to_dataframe(prefix: str,
                                     pdg_pid_variable_dict=custom_thresholds,
                                     variable_aliases=variable_aliases,
                                     sys_seed=sys_seed,
-                                    syscorr=syscorr)
+                                    syscorr=syscorr
+                                    )
     else:
         raise ValueError(f'Systematic {systematic} is not supported!')
 

@@ -418,9 +418,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
-    def load_particle_lists(self, path):
-
-        return
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
 
     def build_lists(self, path):
 
@@ -473,8 +472,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.reconstructDecay("pi0:eff50 -> gamma:eff50 gamma:eff50", '0.114<InvM<0.150', path=path)
         ma.cutAndCopyList("gamma:e90", "gamma:eff50", "E>0.090", path=path)
         ma.reconstructDecay("pi0:e90 -> gamma:e90 gamma:e90", '0.118<InvM<0.148', path=path)
-        # K0s -> pi+pi- candidates
-        stdKshorts(path=path)
         ma.cutAndCopyList('K_S0:good', 'K_S0:merged', cut='significanceOfDistance>2.5', path=path)
 
         # D reconstruction - only clean modes

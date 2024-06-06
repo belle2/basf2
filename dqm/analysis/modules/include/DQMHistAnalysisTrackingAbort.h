@@ -50,7 +50,7 @@ namespace Belle2 {
     TCanvas* m_cAbortRateOUT_BF = nullptr;  /**< canvas for the abort rate outside the active veto region BEFORE FILTER*/
 
     /** scale hAverage and send bin contents to Mirabelle */
-    void scaleAndSendToMirabelle(TH1F* hAverage, int nEvents, TString tag);
+    void scaleAndSendToMirabelle(TH1F* hAverage, const int nEvents, const TString& tag);
   };
 } // end namespace Belle2
 

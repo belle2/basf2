@@ -92,6 +92,9 @@ namespace Belle2 {
     unsigned int m_runno = 0;
     /** Event number */
     unsigned int m_count = 0;
+
+    void iterateKeys(TIter& next, std::vector<TH1*>& hs, std::string dirname = "");
+
   };
 } // end namespace Belle2
 

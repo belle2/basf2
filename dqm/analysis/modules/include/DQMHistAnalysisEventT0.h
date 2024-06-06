@@ -66,10 +66,7 @@ namespace Belle2 {
     */
     static double fDoubleGaus(double* x, double* par);
 
-    TCanvas* m_cTOPTimeForECLTRG = nullptr; /**< TOP EventT0 for ECLTRG plots canvas */
-    TCanvas* m_cTOPTimeForCDCTRG = nullptr; /**< TOP EventT0 for CDCTRG plots canvas */
-    TCanvas* m_cSVDTimeForECLTRG = nullptr; /**< SVD EventT0 for ECLTRG plots canvas */
-    TCanvas* m_cSVDTimeForCDCTRG = nullptr; /**< SVD EventT0 for CDCTRG plots canvas */
+    MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
     TCanvas* m_cTOPTimeHadronsECLTRG = nullptr; /**< Canvas for TOP time ECLTRG hadrons */
     TCanvas* m_cTOPTimeBhaBhaECLTRG = nullptr; /**< Canvas for TOP time ECLTRG bhabhas */
@@ -86,12 +83,6 @@ namespace Belle2 {
     TCanvas* m_cSVDTimeHadronsCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG hadrons */
     TCanvas* m_cSVDTimeBhaBhaCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG bhabhas */
     TCanvas* m_cSVDTimeMuMuCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG mumu */
-
-    MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
-
-    TCanvas* m_cT0FractionsForHadrons = nullptr; /**< EventT0 fractions plots canvas for hadron events */
-    TCanvas* m_cT0FractionsForBhaBhas = nullptr; /**< EventT0 fractions plots canvas for BhaBha events */
-    TCanvas* m_cT0FractionsForMuMus   = nullptr; /**< EventT0 fractions plots canvas for MuMu events */
 
     TCanvas* m_cT0FractionsHadronECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG hadrons */
     TCanvas* m_cT0FractionsHadronCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG hadrons */

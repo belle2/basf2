@@ -92,6 +92,12 @@ namespace Belle2 {
     /** Get the run type (beam or cosmic) */
     Const::ERunType getRunType() const { return m_runType; }
 
+    /** Is the run for cosmics data? */
+    bool isCosmicRun() const { return (m_runType == Const::c_Cosmic); }
+
+    /** Is the run for beam data? */
+    bool isBeamRun() const { return (m_runType == Const::c_Beam); }
+
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
 

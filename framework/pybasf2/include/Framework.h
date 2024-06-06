@@ -134,9 +134,17 @@ namespace Belle2 {
     static void setRunType(const Const::ERunType runType);
 
     /**
-     * Function to set if the script is running on cosmics data or not
+     * Function to set that the script is running on cosmics data
+     * (by default it runs on beam data)
      */
-    static void setCosmicRun(const bool isCosmics = true);
+    static void setCosmicRun();
+
+    /**
+     * Function to set that the script is running on beam data
+     * (by default it runs on beam data, no need to use it if the
+     * run type has not been changed before).
+     */
+    static void setBeamRun();
 
     /**
      * Function for writing the simulation steps of each event into csv files.

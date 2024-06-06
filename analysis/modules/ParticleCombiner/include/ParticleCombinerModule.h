@@ -84,8 +84,6 @@ namespace Belle2 {
 
     bool m_allowChargeViolation; /**< switch to turn on and off the requirement of electric charge conservation */
 
-    bool m_standardParticleList; /**< set to True for standard particle lists, which can be treated differently */
-
   };
 
 } // Belle2 namespace

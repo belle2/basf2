@@ -160,7 +160,7 @@ def add_hlt_processing(path,
 
     # Check if the run is cosmic and set the Environment accordingly
     if run_type == constants.RunTypes.cosmic:
-        basf2.declare_cosmics(True)
+        basf2.declare_cosmics()
 
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
@@ -267,7 +267,7 @@ def add_expressreco_processing(path,
 
     # Check if the run is cosmic and set the Environment accordingly
     if run_type == constants.RunTypes.cosmic:
-        basf2.declare_cosmics(True)
+        basf2.declare_cosmics()
 
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS

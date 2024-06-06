@@ -61,39 +61,39 @@ void DQMHistAnalysisEventT0EfficiencyModule::initialize()
 
   m_eAlgorithmSourceFractionsHadronL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1ECLTRG",
-                    "EventT0 source fractions, hadronic events, L1ECLTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, hadronic events, L1TRG timing from ECL;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsHadronL1CDCTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1CDCTRG",
-                    "EventT0 source fractions, hadronic events, L1CDCTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, hadronic events, L1TRG timing from CDC;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsHadronL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1TOPTRG",
-                    "EventT0 source fractions, hadronic events, L1TOPTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, hadronic events, L1TRG timing from TOP;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1ECLTRG",
-                    "EventT0 source fractions, Bhabha events, L1ECLTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, Bhabha events, L1TRG timing from ECL;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1CDCTRG",
-                    "EventT0 source fractions, Bhabha events, L1CDCTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, Bhabha events, L1TRG timing from CDC;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1TOPTRG",
-                    "EventT0 source fractions, Bhabha events, L1TOPTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, Bhabha events, L1TRG timing from TOP;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsMuMuL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsMuMuL1ECLTRG",
-                    "EventT0 source fractions, #mu#mu events, L1ECLTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, #mu#mu events, L1TRG timing from ECL;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsMuMuL1CDCTRG =
     new TEfficiency("effAlgorithmSourceFractionsMuMuL1CDCTRG",
-                    "EventT0 source fractions, #mu#mu events, L1CDCTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, #mu#mu events, L1TRG timing from CDC;Algorithm;Fraction #epsilon",
                     6, 0, 6);
   m_eAlgorithmSourceFractionsMuMuL1TOPTRG =
     new TEfficiency("effAlgorithmSourceFractionsMuMuL1TOPTRG",
-                    "EventT0 source fractions, #mu#mu events, L1TOPTRG;Algorithm;Fraction #epsilon",
+                    "EventT0 source fractions, #mu#mu events, L1TRG timing from TOP;Algorithm;Fraction #epsilon",
                     6, 0, 6);
 
   m_monObj = getMonitoringObject("eventT0");

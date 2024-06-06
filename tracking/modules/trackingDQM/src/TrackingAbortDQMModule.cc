@@ -57,8 +57,11 @@ void TrackingAbortDQMModule::defineHisto()
 {
 
   // Create a separate histogram directories and cd into it.
-  TDirectory* newDirectory{gDirectory->mkdir(m_histogramDirectoryName.c_str())};
-  TDirectory::TContext context{gDirectory, newDirectory};
+  TDirectory* oldDir = gDirectory;
+  if (m_histogramDirectoryName != "") {
+    oldDir->mkdir(m_histogramDirectoryName.c_str());
+    oldDir->cd(m_histogramDirectoryName.c_str());
+  }
 
   //histogram index:
   // 0 if the event is triggered OUTSIDE the active_veto window
@@ -164,6 +167,7 @@ void TrackingAbortDQMModule::defineHisto()
   m_integratedAverages[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_integratedAverages[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
+  oldDir->cd();
 
 }
 

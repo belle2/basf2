@@ -147,7 +147,7 @@ class SystematicsTracking(BaseSkim):
 
     def DstarToD0PiPartList(self, path):
         """Build DstarToD0PiPartList lists for systematics skims."""
-        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
+        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and dr > 0.1", path=path)
 
         # D-
         DminusCuts = "1.0 < M < 1.75"

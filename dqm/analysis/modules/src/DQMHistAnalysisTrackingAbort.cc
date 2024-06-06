@@ -109,13 +109,14 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
   int nEventsIN;
   int nEventsOUT;
-  int nEvents;
 
   if (hAbort_in != nullptr && hAbort_out) {
 
     nEventsIN = hAbort_in->GetEntries();
+    m_monObj->setVariable("nEvents_inActiveVeto", nEventsIN);
     nEventsOUT = hAbort_out->GetEntries();
-    nEvents = nEventsIN + nEventsOUT;
+    m_monObj->setVariable("nEvents_outActiveVeto", nEventsOUT);
+    const int nEvents = nEventsIN + nEventsOUT;
 
     TH1F* hAbort = (TH1F*)hAbort_in->Add((TH1F*)hAbort_out, 1);
     bool hasError = false;
@@ -173,13 +174,14 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
   int nEventsIN_BF;
   int nEventsOUT_BF;
-  int nEvents_BF;
 
   if (hAbort_in_BF != nullptr && hAbort_out_BF) {
 
     nEventsIN_BF = hAbort_in_BF->GetEntries();
+    m_monObj->setVariable("nEventsBeforeFilter_inActiveVeto", nEventsIN_BF);
     nEventsOUT_BF = hAbort_out_BF->GetEntries();
-    nEvents_BF = nEventsIN_BF + nEventsOUT_BF;
+    m_monObj->setVariable("nEventsBeforeFilter_outActiveVeto", nEventsOUT);
+    const int nEvents_BF = nEventsIN_BF + nEventsOUT_BF;
 
     TH1F* hAbort_BF = (TH1F*)hAbort_in_BF->Add((TH1F*)hAbort_out_BF, 1);
     double abortRate_BF = hAbort_BF->GetMean();

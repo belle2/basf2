@@ -71,21 +71,21 @@ namespace Belle2 {
     TCanvas* m_cSVDTimeForECLTRG = nullptr; /**< SVD EventT0 for ECLTRG plots canvas */
     TCanvas* m_cSVDTimeForCDCTRG = nullptr; /**< SVD EventT0 for CDCTRG plots canvas */
 
-    TPad* m_topPad1ECLTRG = nullptr; /**< pad for TOP time ECLTRG hadrons */
-    TPad* m_topPad2ECLTRG = nullptr; /**< pad for TOP time ECLTRG bhabhas */
-    TPad* m_topPad3ECLTRG = nullptr; /**< pad for TOP time ECLTRG mumu */
+    TCanvas* m_cTOPTimeHadronsECLTRG = nullptr; /**< Canvas for TOP time ECLTRG hadrons */
+    TCanvas* m_cTOPTimeBhaBhaECLTRG = nullptr; /**< Canvas for TOP time ECLTRG bhabhas */
+    TCanvas* m_cTOPTimeMuMuECLTRG = nullptr; /**< Canvas for TOP time ECLTRG mumu */
 
-    TPad* m_topPad1CDCTRG = nullptr; /**< pad for TOP time CDCTRG hadrons */
-    TPad* m_topPad2CDCTRG = nullptr; /**< pad for TOP time CDCTRG bhabhas */
-    TPad* m_topPad3CDCTRG = nullptr; /**< pad for TOP time CDCTRG mumu */
+    TCanvas* m_cTOPTimeHadronsCDCTRG = nullptr; /**< Canvas for TOP time CDCTRG hadrons */
+    TCanvas* m_cTOPTimeBhaBhaCDCTRG = nullptr; /**< Canvas for TOP time CDCTRG bhabhas */
+    TCanvas* m_cTOPTimeMuMuCDCTRG = nullptr; /**< Canvas for TOP time CDCTRG mumu */
 
-    TPad* m_svdPad1ECLTRG = nullptr; /**< pad for SVD time ECLTRG hadrons */
-    TPad* m_svdPad2ECLTRG = nullptr; /**< pad for SVD time ECLTRG bhabhas */
-    TPad* m_svdPad3ECLTRG = nullptr; /**< pad for SVD time ECLTRG mumu */
+    TCanvas* m_cSVDTimeHadronsECLTRG = nullptr; /**< Canvas for SVD time ECLTRG hadrons */
+    TCanvas* m_cSVDTimeBhaBhaECLTRG = nullptr; /**< Canvas for SVD time ECLTRG bhabhas */
+    TCanvas* m_cSVDTimeMuMuECLTRG = nullptr; /**< Canvas for SVD time ECLTRG mumu */
 
-    TPad* m_svdPad1CDCTRG = nullptr; /**< pad for SVD time CDCTRG hadrons */
-    TPad* m_svdPad2CDCTRG = nullptr; /**< pad for SVD time CDCTRG bhabhas */
-    TPad* m_svdPad3CDCTRG = nullptr; /**< pad for SVD time CDCTRG mumu */
+    TCanvas* m_cSVDTimeHadronsCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG hadrons */
+    TCanvas* m_cSVDTimeBhaBhaCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG bhabhas */
+    TCanvas* m_cSVDTimeMuMuCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG mumu */
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
@@ -93,17 +93,17 @@ namespace Belle2 {
     TCanvas* m_cT0FractionsForBhaBhas = nullptr; /**< EventT0 fractions plots canvas for BhaBha events */
     TCanvas* m_cT0FractionsForMuMus   = nullptr; /**< EventT0 fractions plots canvas for MuMu events */
 
-    TCanvas* m_cHadronECLTRG = nullptr; /**< pad for time fractions for ECLTRG hadrons */
-    TCanvas* m_cHadronCDCTRG = nullptr; /**< pad for time fractions for CDCTRG hadrons */
-    TCanvas* m_cHadronTOPTRG = nullptr; /**< pad for time fractions for TOPTRG hadrons */
+    TCanvas* m_cT0FractionsHadronECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG hadrons */
+    TCanvas* m_cT0FractionsHadronCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG hadrons */
+    TCanvas* m_cT0FractionsHadronTOPTRG = nullptr; /**< Canvas for time fractions for TOPTRG hadrons */
 
-    TCanvas* m_cBhaBhaECLTRG = nullptr; /**< pad for time fractions for ECLTRG bhabhas */
-    TCanvas* m_cBhaBhaCDCTRG = nullptr; /**< pad for time fractions for CDCTRG bhabhas */
-    TCanvas* m_cBhaBhaTOPTRG = nullptr; /**< pad for time fractions for TOPTRG bhabhas */
+    TCanvas* m_cT0FractionsBhaBhaECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG bhabhas */
+    TCanvas* m_cT0FractionsBhaBhaCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG bhabhas */
+    TCanvas* m_cT0FractionsBhaBhaTOPTRG = nullptr; /**< Canvas for time fractions for TOPTRG bhabhas */
 
-    TCanvas* m_cMuMuECLTRG = nullptr; /**< pad for time fractions for ECLTRG mumu */
-    TCanvas* m_cMuMuCDCTRG = nullptr; /**< pad for time fractions for CDCTRG mumu */
-    TCanvas* m_cMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
+    TCanvas* m_cT0FractionsMuMuECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG mumu */
+    TCanvas* m_cT0FractionsMuMuCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG mumu */
+    TCanvas* m_cT0FractionsMuMuTOPTRG = nullptr; /**< Canvas for time fractions for TOPTRG mumu */
 
     /// EventT0 algorithms for which to calculate fractions of abundance
     const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP", "Any"};

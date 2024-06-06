@@ -51,44 +51,44 @@ void DQMHistAnalysisEventT0Module::initialize()
 
   //ECLTRG canvas
   m_cTOPTimeForECLTRG = new TCanvas("EventT0/c_TOPTimeECLTRGjitter", "ECLTRG jitter based on TOP time", 1200, 400);
-  m_topPad1ECLTRG = new TPad("topPad1ECLTRG", "TOP pad1 ECLTRG", 0.03, 0.02, 0.33, 0.98);
-  m_topPad2ECLTRG = new TPad("topPad2ECLTRG", "TOP pad2 ECLTRG", 0.35, 0.02, 0.65, 0.98);
-  m_topPad3ECLTRG = new TPad("topPad3ECLTRG", "TOP pad3 ECLTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cTOPTimeHadronsECLTRG = new TCanvas("TOPTimeHadronsECLTRG", "TOP pad1 ECLTRG");
+  m_cTOPTimeBhaBhaECLTRG = new TCanvas("TOPTimeBhaBhaECLTRG", "TOP pad2 ECLTRG");
+  m_cTOPTimeMuMuECLTRG = new TCanvas("TOPTimeMuMuECLTRG", "TOP pad3 ECLTRG");
 
   //CDCTRG canvases
   m_cTOPTimeForCDCTRG = new TCanvas("EventT0/c_TOPTimeCDCTRGjitter", "CDCTRG jitter based on TOP time", 1200, 400);
-  m_topPad1CDCTRG = new TPad("topPad1CDCTRG", "TOP pad1 CDCTRG", 0.03, 0.02, 0.33, 0.98);
-  m_topPad2CDCTRG = new TPad("topPad2CDCTRG", "TOP pad2 CDCTRG", 0.35, 0.02, 0.65, 0.98);
-  m_topPad3CDCTRG = new TPad("topPad3CDCTRG", "TOP pad3 CDCTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cTOPTimeHadronsCDCTRG = new TCanvas("TOPTimeHadronsCDCTRG", "TOP pad1 CDCTRG");
+  m_cTOPTimeBhaBhaCDCTRG = new TCanvas("TOPTimeBhaBhaCDCTRG", "TOP pad2 CDCTRG");
+  m_cTOPTimeMuMuCDCTRG = new TCanvas("TOPTimeMuMuCDCTRG", "TOP pad3 CDCTRG");
 
   //SVD canvases
   //ECLTRG canvas
   m_cSVDTimeForECLTRG = new TCanvas("EventT0/c_SVDTimeECLTRGjitter", "ECLTRG jitter based on SVD time", 1200, 400);
-  m_svdPad1ECLTRG = new TPad("svdPad1ECLTRG", "SVD pad1 ECLTRG", 0.03, 0.02, 0.33, 0.98);
-  m_svdPad2ECLTRG = new TPad("svdPad2ECLTRG", "SVD pad2 ECLTRG", 0.35, 0.02, 0.65, 0.98);
-  m_svdPad3ECLTRG = new TPad("svdPad3ECLTRG", "SVD pad3 ECLTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cSVDTimeHadronsECLTRG = new TCanvas("SVDTimeHadronsECLTRG", "SVD pad1 ECLTRG");
+  m_cSVDTimeBhaBhaECLTRG = new TCanvas("SVDTimeBhaBhaECLTRG", "SVD pad2 ECLTRG");
+  m_cSVDTimeMuMuECLTRG = new TCanvas("SVDTimeMuMuECLTRG", "SVD pad3 ECLTRG");
 
   // CDC TRG canvas
   m_cSVDTimeForCDCTRG = new TCanvas("EventT0/c_SVDTimeCDCTRGjitter", "CDCTRG jitter based on SVD time", 1200, 400);
-  m_svdPad1CDCTRG = new TPad("svdPad1CDCTRG", "SVD pad1 CDCTRG", 0.03, 0.02, 0.33, 0.98);
-  m_svdPad2CDCTRG = new TPad("svdPad2CDCTRG", "SVD pad2 CDCTRG", 0.35, 0.02, 0.65, 0.98);
-  m_svdPad3CDCTRG = new TPad("svdPad3CDCTRG", "SVD pad3 CDCTRG", 0.67, 0.02, 0.97, 0.98);
+  m_cSVDTimeHadronsCDCTRG = new TCanvas("SVDTimeHadronsCDCTRG", "SVD pad1 CDCTRG");
+  m_cSVDTimeBhaBhaCDCTRG = new TCanvas("SVDTimeBhaBhaCDCTRG", "SVD pad2 CDCTRG");
+  m_cSVDTimeMuMuCDCTRG = new TCanvas("SVDTimeMuMuCDCTRG", "SVD pad3 CDCTRG");
 
   // EventT0 source fractions
   m_cT0FractionsForHadrons = new TCanvas("EventT0/c_T0FractionsForHadrons", "EventT0 source fractions for hadron events", 1200, 400);
-  m_cHadronECLTRG = new TCanvas("EventT0/c_HadronECLTRG", "Fractions ECLTRG");
-  m_cHadronCDCTRG = new TCanvas("EventT0/c_HadronCDCTRG", "Fractions CDCTRG");
-  m_cHadronTOPTRG = new TCanvas("EventT0/c_HadronTOPTRG", "Fractions TOPTRG");
+  m_cT0FractionsHadronECLTRG = new TCanvas("EventT0/c_HadronECLTRG", "Fractions ECLTRG for hadron events");
+  m_cT0FractionsHadronCDCTRG = new TCanvas("EventT0/c_HadronCDCTRG", "Fractions CDCTRG for hadron events");
+  m_cT0FractionsHadronTOPTRG = new TCanvas("EventT0/c_HadronTOPTRG", "Fractions TOPTRG for hadron events");
 
   m_cT0FractionsForBhaBhas = new TCanvas("EventT0/c_T0FractionsForBhaBhas", "EventT0 source fractions for bhabha events", 1200, 400);
-  m_cBhaBhaECLTRG = new TCanvas("EventT0/c_BhaBhaECLTRG", "Fractions ECLTRG");
-  m_cBhaBhaCDCTRG = new TCanvas("EventT0/c_BhaBhaCDCTRG", "Fractions CDCTRG");
-  m_cBhaBhaTOPTRG = new TCanvas("EventT0/c_BhaBhaTOPTRG", "Fractions TOPTRG");
+  m_cT0FractionsBhaBhaECLTRG = new TCanvas("EventT0/c_BhaBhaECLTRG", "Fractions ECLTRG for BhaBha events");
+  m_cT0FractionsBhaBhaCDCTRG = new TCanvas("EventT0/c_BhaBhaCDCTRG", "Fractions CDCTRG for BhaBha events");
+  m_cT0FractionsBhaBhaTOPTRG = new TCanvas("EventT0/c_BhaBhaTOPTRG", "Fractions TOPTRG for BhaBha events");
 
   m_cT0FractionsForMuMus = new TCanvas("EventT0/c_T0FractionsForMuMus", "EventT0 source fractions for #mu#mu events", 1200, 400);
-  m_cMuMuECLTRG = new TCanvas("EventT0/c_MuMuECLTRG", "Fractions ECLTRG");
-  m_cMuMuCDCTRG = new TCanvas("EventT0/c_MuMuCDCTRG", "Fractions CDCTRG");
-  m_cMuMuTOPTRG = new TCanvas("EventT0/c_MuMuTOPTRG", "Fractions TOPTRG");
+  m_cT0FractionsMuMuECLTRG = new TCanvas("EventT0/c_MuMuECLTRG", "Fractions ECLTRG for #mu#mu events");
+  m_cT0FractionsMuMuCDCTRG = new TCanvas("EventT0/c_MuMuCDCTRG", "Fractions CDCTRG for #mu#mu events");
+  m_cT0FractionsMuMuTOPTRG = new TCanvas("EventT0/c_MuMuTOPTRG", "Fractions TOPTRG for #mu#mu events");
 
   m_eAlgorithmSourceFractionsHadronL1ECLTRG =
     new TEfficiency("effAlgorithmSourceFractionsHadronL1ECLTRG",
@@ -128,10 +128,6 @@ void DQMHistAnalysisEventT0Module::initialize()
                     6, 0, 6);
 
   m_monObj = getMonitoringObject("eventT0");
-  m_monObj->addCanvas(m_cTOPTimeForECLTRG);
-  m_monObj->addCanvas(m_cTOPTimeForCDCTRG);
-  m_monObj->addCanvas(m_cSVDTimeForECLTRG);
-  m_monObj->addCanvas(m_cSVDTimeForCDCTRG);
 }
 
 
@@ -145,136 +141,147 @@ void DQMHistAnalysisEventT0Module::beginRun()
   m_cT0FractionsForHadrons->Clear();
   m_cT0FractionsForBhaBhas->Clear();
   m_cT0FractionsForMuMus->Clear();
+
+  m_cT0FractionsHadronECLTRG->Clear();
+  m_cT0FractionsHadronCDCTRG->Clear();
+  m_cT0FractionsHadronTOPTRG->Clear();
+  m_cT0FractionsBhaBhaECLTRG->Clear();
+  m_cT0FractionsBhaBhaCDCTRG->Clear();
+  m_cT0FractionsBhaBhaTOPTRG->Clear();
+  m_cT0FractionsMuMuECLTRG->Clear();
+  m_cT0FractionsMuMuCDCTRG->Clear();
+  m_cT0FractionsMuMuTOPTRG->Clear();
+
 }
 
 void DQMHistAnalysisEventT0Module::event()
 {
   std::string histname = "AlgorithmSourceFractionsHadronL1ECLTRG";
-  m_cHadronECLTRG->cd();
+  m_cT0FractionsHadronECLTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsHadronL1ECLTRG)) {
-    m_cHadronECLTRG->SetFillColor(0);
-    m_cHadronECLTRG->Modified();
-    m_cHadronECLTRG->Update();
+    m_cT0FractionsHadronECLTRG->SetFillColor(0);
+    m_cT0FractionsHadronECLTRG->Modified();
+    m_cT0FractionsHadronECLTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for hadrons from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cHadronECLTRG->SetFillColor(kGray);
+    m_cT0FractionsHadronECLTRG->SetFillColor(kGray);
   }
 
   histname = "AlgorithmSourceFractionsHadronL1CDCTRG";
-  m_cHadronCDCTRG->cd();
+  m_cT0FractionsHadronCDCTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsHadronL1CDCTRG)) {
-    m_cHadronCDCTRG->SetFillColor(0);
-    m_cHadronCDCTRG->Modified();
-    m_cHadronCDCTRG->Update();
+    m_cT0FractionsHadronCDCTRG->SetFillColor(0);
+    m_cT0FractionsHadronCDCTRG->Modified();
+    m_cT0FractionsHadronCDCTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for hadrons from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cHadronCDCTRG->SetFillColor(kGray);
+    m_cT0FractionsHadronCDCTRG->SetFillColor(kGray);
   }
 
   histname = "AlgorithmSourceFractionsHadronL1TOPTRG";
-  m_cHadronTOPTRG->cd();
+  m_cT0FractionsHadronTOPTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsHadronL1TOPTRG)) {
-    m_cHadronTOPTRG->SetFillColor(0);
-    m_cHadronTOPTRG->Modified();
-    m_cHadronTOPTRG->Update();
+    m_cT0FractionsHadronTOPTRG->SetFillColor(0);
+    m_cT0FractionsHadronTOPTRG->Modified();
+    m_cT0FractionsHadronTOPTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for hadrons from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cHadronTOPTRG->SetFillColor(kGray);
+    m_cT0FractionsHadronTOPTRG->SetFillColor(kGray);
   }
 
   // anonymous helper to draw the pads consistently without repeating oneself
-  const auto drawPad = [](TPad * pad) {
-    pad->SetMargin(0.07, 0.0, 0.07, 0.07);
-    pad->Draw();
+  const auto drawCanvas = [](TCanvas * canvas) {
+    canvas->SetMargin(0.07, 0.0, 0.07, 0.07);
+    canvas->Draw();
   };
   m_cT0FractionsForHadrons->cd();
-  drawPad(m_cHadronECLTRG);
-  drawPad(m_cHadronCDCTRG);
-  drawPad(m_cHadronTOPTRG);
+  drawCanvas(m_cT0FractionsHadronECLTRG);
+  drawCanvas(m_cT0FractionsHadronCDCTRG);
+  drawCanvas(m_cT0FractionsHadronTOPTRG);
 
   if (m_printCanvas)
     m_cT0FractionsForHadrons->Print(Form("%s_EventT0FractionsHadron.pdf", m_prefixCanvas.c_str()));
 
 
   histname = "AlgorithmSourceFractionsBhaBhaL1ECLTRG";
-  m_cBhaBhaECLTRG->cd();
+  m_cT0FractionsBhaBhaECLTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG)) {
-    m_cBhaBhaECLTRG->SetFillColor(0);
-    m_cBhaBhaECLTRG->Modified();
-    m_cBhaBhaECLTRG->Update();
+    m_cT0FractionsBhaBhaECLTRG->SetFillColor(0);
+    m_cT0FractionsBhaBhaECLTRG->Modified();
+    m_cT0FractionsBhaBhaECLTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for BhaBha from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cBhaBhaECLTRG->SetFillColor(kGray);
+    m_cT0FractionsBhaBhaECLTRG->SetFillColor(kGray);
   }
 
   histname = "AlgorithmSourceFractionsBhaBhaL1CDCTRG";
-  m_cBhaBhaCDCTRG->cd();
+  m_cT0FractionsBhaBhaCDCTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG)) {
-    m_cBhaBhaCDCTRG->SetFillColor(0);
-    m_cBhaBhaCDCTRG->Modified();
-    m_cBhaBhaCDCTRG->Update();
+    m_cT0FractionsBhaBhaCDCTRG->SetFillColor(0);
+    m_cT0FractionsBhaBhaCDCTRG->Modified();
+    m_cT0FractionsBhaBhaCDCTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for BhaBha from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cBhaBhaCDCTRG->SetFillColor(kGray);
+    m_cT0FractionsBhaBhaCDCTRG->SetFillColor(kGray);
   }
 
   histname = "AlgorithmSourceFractionsBhaBhaL1TOPTRG";
-  m_cBhaBhaTOPTRG->cd();
+  m_cT0FractionsBhaBhaTOPTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG)) {
-    m_cBhaBhaTOPTRG->SetFillColor(0);
-    m_cBhaBhaTOPTRG->Modified();
-    m_cBhaBhaTOPTRG->Update();
+    m_cT0FractionsBhaBhaTOPTRG->SetFillColor(0);
+    m_cT0FractionsBhaBhaTOPTRG->Modified();
+    m_cT0FractionsBhaBhaTOPTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for BhaBha from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cBhaBhaTOPTRG->SetFillColor(kGray);
+    m_cT0FractionsBhaBhaTOPTRG->SetFillColor(kGray);
   }
 
   m_cT0FractionsForBhaBhas->cd();
-  drawPad(m_cBhaBhaECLTRG);
-  drawPad(m_cBhaBhaCDCTRG);
-  drawPad(m_cBhaBhaTOPTRG);
+  drawCanvas(m_cT0FractionsBhaBhaECLTRG);
+  drawCanvas(m_cT0FractionsBhaBhaCDCTRG);
+  drawCanvas(m_cT0FractionsBhaBhaTOPTRG);
 
   if (m_printCanvas)
     m_cT0FractionsForBhaBhas->Print(Form("%s_EventT0FractionsBhaBha.pdf", m_prefixCanvas.c_str()));
 
 
   histname = "AlgorithmSourceFractionsMuMuL1ECLTRG";
-  m_cMuMuECLTRG->cd();
+  m_cT0FractionsMuMuECLTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsMuMuL1ECLTRG)) {
-    m_cMuMuECLTRG->SetFillColor(0);
-    m_cMuMuECLTRG->Modified();
-    m_cMuMuECLTRG->Update();
+    m_cT0FractionsMuMuECLTRG->SetFillColor(0);
+    m_cT0FractionsMuMuECLTRG->Modified();
+    m_cT0FractionsMuMuECLTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for MuMu from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cMuMuECLTRG->SetFillColor(kGray);
+    m_cT0FractionsMuMuECLTRG->SetFillColor(kGray);
   }
 
   histname = "AlgorithmSourceFractionsMuMuL1CDCTRG";
-  m_cMuMuCDCTRG->cd();
+  m_cT0FractionsMuMuCDCTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsMuMuL1CDCTRG)) {
-    m_cMuMuCDCTRG->SetFillColor(0);
-    m_cMuMuCDCTRG->Modified();
-    m_cMuMuCDCTRG->Update();
+    m_cT0FractionsMuMuCDCTRG->SetFillColor(0);
+    m_cT0FractionsMuMuCDCTRG->Modified();
+    m_cT0FractionsMuMuCDCTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for MuMu from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cMuMuCDCTRG->SetFillColor(kGray);
+    m_cT0FractionsMuMuCDCTRG->SetFillColor(kGray);
   }
 
   histname = "AlgorithmSourceFractionsMuMuL1TOPTRG";
-  m_cMuMuTOPTRG->cd();
+  m_cT0FractionsMuMuTOPTRG->cd();
   if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsMuMuL1TOPTRG)) {
-    m_cMuMuTOPTRG->SetFillColor(0);
-    m_cMuMuTOPTRG->Modified();
-    m_cMuMuTOPTRG->Update();
+    m_cT0FractionsMuMuTOPTRG->SetFillColor(0);
+    m_cT0FractionsMuMuTOPTRG->Modified();
+    m_cT0FractionsMuMuTOPTRG->Update();
   } else {
     B2WARNING("Histogram EventT0 source fractions for MuMu from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cMuMuTOPTRG->SetFillColor(kGray);
+    m_cT0FractionsMuMuTOPTRG->SetFillColor(kGray);
   }
 
   m_cT0FractionsForMuMus->cd();
-  drawPad(m_cMuMuECLTRG);
-  drawPad(m_cMuMuCDCTRG);
-  drawPad(m_cMuMuTOPTRG);
+  drawCanvas(m_cT0FractionsMuMuECLTRG);
+  drawCanvas(m_cT0FractionsMuMuCDCTRG);
+  drawCanvas(m_cT0FractionsMuMuTOPTRG);
 
   if (m_printCanvas)
     m_cT0FractionsForMuMus->Print(Form("%s_EventT0FractionsMuMu.pdf", m_prefixCanvas.c_str()));
@@ -288,49 +295,49 @@ void DQMHistAnalysisEventT0Module::endRun()
   // find TOP EventT0 Hadrons ECLTRG histogram and process it
   TH1* h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_ECLTRG");
   TString tag = "hadronECLTRG";
-  m_topPad1ECLTRG->cd();
+  m_cTOPTimeHadronsECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_topPad1ECLTRG->SetFillColor(0);
-    m_topPad1ECLTRG->Modified();
-    m_topPad1ECLTRG->Update();
+    m_cTOPTimeHadronsECLTRG->SetFillColor(0);
+    m_cTOPTimeHadronsECLTRG->Modified();
+    m_cTOPTimeHadronsECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_topPad1ECLTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cTOPTimeHadronsECLTRG->SetFillColor(kGray);
   }
 
   // find TOP EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG";
-  m_topPad2ECLTRG->cd();
+  m_cTOPTimeBhaBhaECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_topPad2ECLTRG->SetFillColor(0);
-    m_topPad2ECLTRG->Modified();
-    m_topPad2ECLTRG->Update();
+    m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
+    m_cTOPTimeBhaBhaECLTRG->Modified();
+    m_cTOPTimeBhaBhaECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_topPad2ECLTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cTOPTimeBhaBhaECLTRG->SetFillColor(kGray);
   }
 
   // find TOP EventT0 Mumus ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
   tag = "mumuECLTRG";
-  m_topPad3ECLTRG->cd();
+  m_cTOPTimeMuMuECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_topPad3ECLTRG->SetFillColor(0);
-    m_topPad3ECLTRG->Modified();
-    m_topPad3ECLTRG->Update();
+    m_cTOPTimeMuMuECLTRG->SetFillColor(0);
+    m_cTOPTimeMuMuECLTRG->Modified();
+    m_cTOPTimeMuMuECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_topPad3ECLTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cTOPTimeMuMuECLTRG->SetFillColor(kGray);
   }
 
   m_cTOPTimeForECLTRG->cd();
-  m_topPad1ECLTRG->Draw();
-  m_topPad2ECLTRG->Draw();
-  m_topPad3ECLTRG->Draw();
+  m_cTOPTimeHadronsECLTRG->Draw();
+  m_cTOPTimeBhaBhaECLTRG->Draw();
+  m_cTOPTimeMuMuECLTRG->Draw();
 
   if (m_printCanvas)
     m_cTOPTimeForECLTRG->Print(Form("%s_ECLTRG.pdf", m_prefixCanvas.c_str()));
@@ -341,57 +348,57 @@ void DQMHistAnalysisEventT0Module::endRun()
   // find TOP EventT0 Hadrons CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_CDCTRG");
   tag = "hadronCDCTRG";
-  m_topPad1CDCTRG->cd();
+  m_cTOPTimeHadronsCDCTRG->cd();
   if (processHistogram(h, tag)) {
-    m_topPad1CDCTRG->SetFillColor(0);
-    m_topPad1CDCTRG->Modified();
-    m_topPad1CDCTRG->Update();
+    m_cTOPTimeHadronsCDCTRG->SetFillColor(0);
+    m_cTOPTimeHadronsCDCTRG->Modified();
+    m_cTOPTimeHadronsCDCTRG->Update();
     m_cTOPTimeForCDCTRG->cd();
-    m_topPad1CDCTRG->Draw();
+    m_cTOPTimeHadronsCDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_topPad1CDCTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cTOPTimeHadronsCDCTRG->SetFillColor(kGray);
     m_cTOPTimeForCDCTRG->cd();
-    m_topPad1CDCTRG->Draw();
+    m_cTOPTimeHadronsCDCTRG->Draw();
   }
 
   // find TOP EventT0 Bhabhas CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_CDCTRG");
   tag = "bhabhaCDCTRG";
-  m_topPad2CDCTRG->cd();
+  m_cTOPTimeBhaBhaCDCTRG->cd();
   if (processHistogram(h, tag)) {
-    m_topPad2CDCTRG->SetFillColor(0);
-    m_topPad2CDCTRG->Modified();
-    m_topPad2CDCTRG->Update();
+    m_cTOPTimeBhaBhaCDCTRG->SetFillColor(0);
+    m_cTOPTimeBhaBhaCDCTRG->Modified();
+    m_cTOPTimeBhaBhaCDCTRG->Update();
     m_cTOPTimeForCDCTRG->cd();
-    m_topPad2CDCTRG->Draw();
+    m_cTOPTimeBhaBhaCDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_topPad2CDCTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cTOPTimeBhaBhaCDCTRG->SetFillColor(kGray);
     m_cTOPTimeForCDCTRG->cd();
-    m_topPad2CDCTRG->Draw();
+    m_cTOPTimeBhaBhaCDCTRG->Draw();
   }
 
   // find TOP EventT0 Mumus CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_CDCTRG");
   tag = "mumuCDCTRG";
-  m_topPad3CDCTRG->cd();
+  m_cTOPTimeMuMuCDCTRG->cd();
   if (processHistogram(h, tag)) {
-    m_topPad3CDCTRG->SetFillColor(0);
-    m_topPad3CDCTRG->Modified();
-    m_topPad3CDCTRG->Update();
+    m_cTOPTimeMuMuCDCTRG->SetFillColor(0);
+    m_cTOPTimeMuMuCDCTRG->Modified();
+    m_cTOPTimeMuMuCDCTRG->Update();
   } else {
     B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_topPad3CDCTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cTOPTimeMuMuCDCTRG->SetFillColor(kGray);
   }
 
   m_cTOPTimeForCDCTRG->cd();
-  m_topPad1CDCTRG->Draw();
-  m_topPad2CDCTRG->Draw();
-  m_topPad3CDCTRG->Draw();
+  m_cTOPTimeHadronsCDCTRG->Draw();
+  m_cTOPTimeBhaBhaCDCTRG->Draw();
+  m_cTOPTimeMuMuCDCTRG->Draw();
 
   if (m_printCanvas)
     m_cTOPTimeForCDCTRG->Print(Form("%s_CDCTRG.pdf", m_prefixCanvas.c_str()));
@@ -403,49 +410,49 @@ void DQMHistAnalysisEventT0Module::endRun()
   // find SVD EventT0 Hadrons ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_ECLTRG");
   tag = "hadronECLTRG";
-  m_svdPad1ECLTRG->cd();
+  m_cSVDTimeHadronsECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_svdPad1ECLTRG->SetFillColor(0);
-    m_svdPad1ECLTRG->Modified();
-    m_svdPad1ECLTRG->Update();
+    m_cSVDTimeHadronsECLTRG->SetFillColor(0);
+    m_cSVDTimeHadronsECLTRG->Modified();
+    m_cSVDTimeHadronsECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_svdPad1ECLTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cSVDTimeHadronsECLTRG->SetFillColor(kGray);
   }
 
   // find SVD EventT0 Bhabhas ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
   tag = "bhabhaECLTRG";
-  m_svdPad2ECLTRG->cd();
+  m_cSVDTimeBhaBhaECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_svdPad2ECLTRG->SetFillColor(0);
-    m_svdPad2ECLTRG->Modified();
-    m_svdPad2ECLTRG->Update();
+    m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
+    m_cSVDTimeBhaBhaECLTRG->Modified();
+    m_cSVDTimeBhaBhaECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_svdPad2ECLTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cSVDTimeBhaBhaECLTRG->SetFillColor(kGray);
   }
 
   // find SVD EventT0 Mumus ECLTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
   tag = "mumuECLTRG";
-  m_svdPad3ECLTRG->cd();
+  m_cSVDTimeMuMuECLTRG->cd();
   if (processHistogram(h, tag)) {
-    m_svdPad3ECLTRG->SetFillColor(0);
-    m_svdPad3ECLTRG->Modified();
-    m_svdPad3ECLTRG->Update();
+    m_cSVDTimeMuMuECLTRG->SetFillColor(0);
+    m_cSVDTimeMuMuECLTRG->Modified();
+    m_cSVDTimeMuMuECLTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_svdPad3ECLTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cSVDTimeMuMuECLTRG->SetFillColor(kGray);
   }
 
   m_cSVDTimeForECLTRG->cd();
-  m_svdPad1ECLTRG->Draw();
-  m_svdPad2ECLTRG->Draw();
-  m_svdPad3ECLTRG->Draw();
+  m_cSVDTimeHadronsECLTRG->Draw();
+  m_cSVDTimeBhaBhaECLTRG->Draw();
+  m_cSVDTimeMuMuECLTRG->Draw();
 
   if (m_printCanvas)
     m_cSVDTimeForECLTRG->Print(Form("%s_SVDECLTRG.pdf", m_prefixCanvas.c_str()));
@@ -456,58 +463,58 @@ void DQMHistAnalysisEventT0Module::endRun()
   // find SVD EventT0 Hadrons CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_CDCTRG");
   tag = "hadronCDCTRG";
-  m_svdPad1CDCTRG->cd();
+  m_cSVDTimeHadronsCDCTRG->cd();
   if (processHistogram(h, tag)) {
-    m_svdPad1CDCTRG->SetFillColor(0);
-    m_svdPad1CDCTRG->Modified();
-    m_svdPad1CDCTRG->Update();
+    m_cSVDTimeHadronsCDCTRG->SetFillColor(0);
+    m_cSVDTimeHadronsCDCTRG->Modified();
+    m_cSVDTimeHadronsCDCTRG->Update();
     m_cSVDTimeForCDCTRG->cd();
-    m_svdPad1CDCTRG->Draw();
+    m_cSVDTimeHadronsCDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_svdPad1CDCTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cSVDTimeHadronsCDCTRG->SetFillColor(kGray);
     m_cSVDTimeForCDCTRG->cd();
-    m_svdPad1CDCTRG->Draw();
+    m_cSVDTimeHadronsCDCTRG->Draw();
   }
 
   // find SVD EventT0 Bhabhas CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_CDCTRG");
   tag = "bhabhaCDCTRG";
-  m_svdPad2CDCTRG->cd();
+  m_cSVDTimeBhaBhaCDCTRG->cd();
   if (processHistogram(h, tag)) {
-    m_svdPad2CDCTRG->SetFillColor(0);
-    m_svdPad2CDCTRG->Modified();
-    m_svdPad2CDCTRG->Update();
+    m_cSVDTimeBhaBhaCDCTRG->SetFillColor(0);
+    m_cSVDTimeBhaBhaCDCTRG->Modified();
+    m_cSVDTimeBhaBhaCDCTRG->Update();
     m_cSVDTimeForCDCTRG->cd();
-    m_svdPad2CDCTRG->Draw();
+    m_cSVDTimeBhaBhaCDCTRG->Draw();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_svdPad2CDCTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cSVDTimeBhaBhaCDCTRG->SetFillColor(kGray);
     m_cSVDTimeForCDCTRG->cd();
-    m_svdPad2CDCTRG->Draw();
+    m_cSVDTimeBhaBhaCDCTRG->Draw();
   }
 
 
   // find SVD EventT0 Mumus CDCTRG histogram and process it
   h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_CDCTRG");
   tag = "mumuCDCTRG";
-  m_svdPad3CDCTRG->cd();
+  m_cSVDTimeMuMuCDCTRG->cd();
   if (processHistogram(h, tag)) {
-    m_svdPad3CDCTRG->SetFillColor(0);
-    m_svdPad3CDCTRG->Modified();
-    m_svdPad3CDCTRG->Update();
+    m_cSVDTimeMuMuCDCTRG->SetFillColor(0);
+    m_cSVDTimeMuMuCDCTRG->Modified();
+    m_cSVDTimeMuMuCDCTRG->Update();
   } else {
     B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    h->Draw();
-    m_svdPad3CDCTRG->SetFillColor(kGray);
+    if (h) h->Draw();
+    m_cSVDTimeMuMuCDCTRG->SetFillColor(kGray);
   }
 
   m_cSVDTimeForCDCTRG->cd();
-  m_svdPad1CDCTRG->Draw();
-  m_svdPad2CDCTRG->Draw();
-  m_svdPad3CDCTRG->Draw();
+  m_cSVDTimeHadronsCDCTRG->Draw();
+  m_cSVDTimeBhaBhaCDCTRG->Draw();
+  m_cSVDTimeMuMuCDCTRG->Draw();
 
   if (m_printCanvas)
     m_cSVDTimeForCDCTRG->Print(Form("%s_SVDCDCTRG.pdf", m_prefixCanvas.c_str()));

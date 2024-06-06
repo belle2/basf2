@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
+#include <framework/gearbox/Const.h>
 
 #include <string>
 
@@ -128,9 +129,9 @@ namespace Belle2 {
     static void setRealm(const std::string& realm);
 
     /**
-     * Function to set if the script is running on cosmics data or not
+     * Function to set the run type (beam or cosmic)
      */
-    static void setIsCosmics(const bool isCosmics);
+    static void setRunType(const Const::ERunType runType);
 
     /**
      * Function for writing the simulation steps of each event into csv files.

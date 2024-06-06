@@ -213,9 +213,9 @@ void Framework::setRealm(const std::string& realm)
   }
 }
 
-void Framework::setIsCosmics(const bool isCosmics)
+void Framework::setRunType(const Const::ERunType runType)
 {
-  Environment::Instance().setIsCosmics(isCosmics);
+  Environment::Instance().setRunType(runType);
 }
 
 void Framework::writeSimulationSteps()
@@ -414,9 +414,9 @@ The severity of log messages sometimes depends on where basf2 runs. This is cont
 
 Usually the realm does not have to be set explicitly. On the HLT or express reco it should be set to 'online' and for official productions to 'production'.
 )DOCSTRING", args("realm"));
-  def("declare_cosmics", &Framework::setIsCosmics, R"DOCSTRING(
+  def("declare_cosmics", &Framework::setRunType, R"DOCSTRING(
 Set if the run is for cosmics data
-)DOCSTRING", args("isCosmics"));
+)DOCSTRING", args("Const::runType"));
   def("write_simulation_steps", &Framework::writeSimulationSteps, R"DOCSTRING(
 Allow basf2 to write the simulation steps of each event into csv files.
 

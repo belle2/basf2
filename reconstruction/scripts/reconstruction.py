@@ -351,7 +351,7 @@ def add_cosmics_reconstruction(
     """
 
     # Set the run for cosmics data
-    basf2.declare_cosmics(True)
+    basf2.declare_cosmics()
 
     # Check components.
     check_components(components)

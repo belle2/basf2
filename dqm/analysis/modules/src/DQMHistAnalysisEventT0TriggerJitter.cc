@@ -14,12 +14,10 @@
 #include <dqm/analysis/modules/DQMHistAnalysisEventT0TriggerJitter.h>
 
 #include <TROOT.h>
-#include <TGraphAsymmErrors.h>
 #include <TStyle.h>
 #include <TF1.h>
 #include <TMath.h>
 
-using namespace std;
 using namespace Belle2;
 
 //-----------------------------------------------------------------
@@ -34,7 +32,7 @@ REG_MODULE(DQMHistAnalysisEventT0TriggerJitter);
 DQMHistAnalysisEventT0TriggerJitterModule::DQMHistAnalysisEventT0TriggerJitterModule()
   : DQMHistAnalysisModule()
 {
-  setDescription("Determining and processing EventT0s from different subdetector (TOP and SVD for now) for different L1 trigger sources (ECL and CDC for now) to estimate trigger jitter information.");
+  setDescription("Determining and processing EventT0s from different subdetectors (ECL, CDC, TOP, SVD) for different L1 trigger sources (ECL, CDC, and TOP) to estimate trigger jitter information for different HLT event types (hadron, BhaBha, µµ).");
 
   //Parameter definition
   addParam("min_nEntries", m_nEntriesMin, "Minimum number of entries to process the histogram.", m_nEntriesMin);
@@ -49,26 +47,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::initialize()
 {
   gROOT->cd();
 
-  //ECLTRG canvas
-  m_cTOPTimeHadronsECLTRG = new TCanvas("TOPTimeHadronsECLTRG", "TOP pad1 ECLTRG");
-  m_cTOPTimeBhaBhaECLTRG = new TCanvas("TOPTimeBhaBhaECLTRG", "TOP pad2 ECLTRG");
-  m_cTOPTimeMuMuECLTRG = new TCanvas("TOPTimeMuMuECLTRG", "TOP pad3 ECLTRG");
-
-  //CDCTRG canvases
-  m_cTOPTimeHadronsCDCTRG = new TCanvas("TOPTimeHadronsCDCTRG", "TOP pad1 CDCTRG");
-  m_cTOPTimeBhaBhaCDCTRG = new TCanvas("TOPTimeBhaBhaCDCTRG", "TOP pad2 CDCTRG");
-  m_cTOPTimeMuMuCDCTRG = new TCanvas("TOPTimeMuMuCDCTRG", "TOP pad3 CDCTRG");
-
-  //SVD canvases
-  //ECLTRG canvas
-  m_cSVDTimeHadronsECLTRG = new TCanvas("SVDTimeHadronsECLTRG", "SVD pad1 ECLTRG");
-  m_cSVDTimeBhaBhaECLTRG = new TCanvas("SVDTimeBhaBhaECLTRG", "SVD pad2 ECLTRG");
-  m_cSVDTimeMuMuECLTRG = new TCanvas("SVDTimeMuMuECLTRG", "SVD pad3 ECLTRG");
-
-  // CDC TRG canvas
-  m_cSVDTimeHadronsCDCTRG = new TCanvas("SVDTimeHadronsCDCTRG", "SVD pad1 CDCTRG");
-  m_cSVDTimeBhaBhaCDCTRG = new TCanvas("SVDTimeBhaBhaCDCTRG", "SVD pad2 CDCTRG");
-  m_cSVDTimeMuMuCDCTRG = new TCanvas("SVDTimeMuMuCDCTRG", "SVD pad3 CDCTRG");
+  initializeCanvases();
 
   m_monObj = getMonitoringObject("eventT0");
 }
@@ -76,258 +55,23 @@ void DQMHistAnalysisEventT0TriggerJitterModule::initialize()
 
 void DQMHistAnalysisEventT0TriggerJitterModule::beginRun()
 {
-  m_cTOPTimeHadronsECLTRG->Clear();
-  m_cTOPTimeBhaBhaECLTRG->Clear();
-  m_cTOPTimeMuMuECLTRG->Clear();
-  m_cTOPTimeHadronsCDCTRG->Clear();
-  m_cTOPTimeBhaBhaCDCTRG->Clear();
-  m_cTOPTimeMuMuCDCTRG->Clear();
-  m_cSVDTimeHadronsECLTRG->Clear();
-  m_cSVDTimeBhaBhaECLTRG->Clear();
-  m_cSVDTimeMuMuECLTRG->Clear();
-  m_cSVDTimeHadronsCDCTRG->Clear();
-  m_cSVDTimeBhaBhaCDCTRG->Clear();
-  m_cSVDTimeMuMuCDCTRG->Clear();
-
-}
-
-void DQMHistAnalysisEventT0TriggerJitterModule::event()
-{
-
+  clearCanvases();
 }
 
 void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
 {
-  // --- TOP EventT0 plots for ECLTRG ---
-
-  // find TOP EventT0 Hadrons ECLTRG histogram and process it
-  TH1* h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_ECLTRG");
-  TString tag = "hadronECLTRG";
-  m_cTOPTimeHadronsECLTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cTOPTimeHadronsECLTRG->SetFillColor(0);
-    m_cTOPTimeHadronsECLTRG->Modified();
-    m_cTOPTimeHadronsECLTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cTOPTimeHadronsECLTRG->SetFillColor(kGray);
-    m_cTOPTimeHadronsECLTRG->Draw();
-  }
-
-  // find TOP EventT0 Bhabhas ECLTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
-  tag = "bhabhaECLTRG";
-  m_cTOPTimeBhaBhaECLTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
-    m_cTOPTimeBhaBhaECLTRG->Modified();
-    m_cTOPTimeBhaBhaECLTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cTOPTimeBhaBhaECLTRG->SetFillColor(kGray);
-    m_cTOPTimeBhaBhaECLTRG->Draw();
-  }
-
-  // find TOP EventT0 Mumus ECLTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
-  tag = "mumuECLTRG";
-  m_cTOPTimeMuMuECLTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cTOPTimeMuMuECLTRG->SetFillColor(0);
-    m_cTOPTimeMuMuECLTRG->Modified();
-    m_cTOPTimeMuMuECLTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cTOPTimeMuMuECLTRG->SetFillColor(kGray);
-    m_cTOPTimeMuMuECLTRG->Draw();
-  }
-
-  // --- TOP EventT0 plots for CDCTRG ---
-
-  // find TOP EventT0 Hadrons CDCTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_CDCTRG");
-  tag = "hadronCDCTRG";
-  m_cTOPTimeHadronsCDCTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cTOPTimeHadronsCDCTRG->SetFillColor(0);
-    m_cTOPTimeHadronsCDCTRG->Modified();
-    m_cTOPTimeHadronsCDCTRG->Update();
-    m_cTOPTimeHadronsCDCTRG->Draw();
-  } else {
-    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cTOPTimeHadronsCDCTRG->SetFillColor(kGray);
-    m_cTOPTimeHadronsCDCTRG->Draw();
-  }
-
-  // find TOP EventT0 Bhabhas CDCTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_CDCTRG");
-  tag = "bhabhaCDCTRG";
-  m_cTOPTimeBhaBhaCDCTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cTOPTimeBhaBhaCDCTRG->SetFillColor(0);
-    m_cTOPTimeBhaBhaCDCTRG->Modified();
-    m_cTOPTimeBhaBhaCDCTRG->Update();
-    m_cTOPTimeBhaBhaCDCTRG->Draw();
-  } else {
-    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cTOPTimeBhaBhaCDCTRG->SetFillColor(kGray);
-    m_cTOPTimeBhaBhaCDCTRG->Draw();
-  }
-
-  // find TOP EventT0 Mumus CDCTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_CDCTRG");
-  tag = "mumuCDCTRG";
-  m_cTOPTimeMuMuCDCTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cTOPTimeMuMuCDCTRG->SetFillColor(0);
-    m_cTOPTimeMuMuCDCTRG->Modified();
-    m_cTOPTimeMuMuCDCTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cTOPTimeMuMuCDCTRG->SetFillColor(kGray);
-    m_cTOPTimeMuMuCDCTRG->Draw();
-  }
-
-
-  // --- SVD EventT0 plots for ECLTRG ---
-
-  // find SVD EventT0 Hadrons ECLTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_ECLTRG");
-  tag = "hadronECLTRG";
-  m_cSVDTimeHadronsECLTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cSVDTimeHadronsECLTRG->SetFillColor(0);
-    m_cSVDTimeHadronsECLTRG->Modified();
-    m_cSVDTimeHadronsECLTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cSVDTimeHadronsECLTRG->SetFillColor(kGray);
-    m_cSVDTimeHadronsECLTRG->Draw();
-  }
-
-  // find SVD EventT0 Bhabhas ECLTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
-  tag = "bhabhaECLTRG";
-  m_cSVDTimeBhaBhaECLTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
-    m_cSVDTimeBhaBhaECLTRG->Modified();
-    m_cSVDTimeBhaBhaECLTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cSVDTimeBhaBhaECLTRG->SetFillColor(kGray);
-    m_cSVDTimeBhaBhaECLTRG->Draw();
-  }
-
-  // find SVD EventT0 Mumus ECLTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
-  tag = "mumuECLTRG";
-  m_cSVDTimeMuMuECLTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cSVDTimeMuMuECLTRG->SetFillColor(0);
-    m_cSVDTimeMuMuECLTRG->Modified();
-    m_cSVDTimeMuMuECLTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cSVDTimeMuMuECLTRG->SetFillColor(kGray);
-    m_cSVDTimeMuMuECLTRG->Draw();
-  }
-
-
-  // --- SVD EventT0 plots for CDCTRG ---
-
-  // find SVD EventT0 Hadrons CDCTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_CDCTRG");
-  tag = "hadronCDCTRG";
-  m_cSVDTimeHadronsCDCTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cSVDTimeHadronsCDCTRG->SetFillColor(0);
-    m_cSVDTimeHadronsCDCTRG->Modified();
-    m_cSVDTimeHadronsCDCTRG->Update();
-    m_cSVDTimeHadronsCDCTRG->Draw();
-  } else {
-    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cSVDTimeHadronsCDCTRG->SetFillColor(kGray);
-    m_cSVDTimeHadronsCDCTRG->Draw();
-  }
-
-  // find SVD EventT0 Bhabhas CDCTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_CDCTRG");
-  tag = "bhabhaCDCTRG";
-  m_cSVDTimeBhaBhaCDCTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cSVDTimeBhaBhaCDCTRG->SetFillColor(0);
-    m_cSVDTimeBhaBhaCDCTRG->Modified();
-    m_cSVDTimeBhaBhaCDCTRG->Update();
-    m_cSVDTimeBhaBhaCDCTRG->Draw();
-  } else {
-    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cSVDTimeBhaBhaCDCTRG->SetFillColor(kGray);
-    m_cSVDTimeBhaBhaCDCTRG->Draw();
-  }
-
-
-  // find SVD EventT0 Mumus CDCTRG histogram and process it
-  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_CDCTRG");
-  tag = "mumuCDCTRG";
-  m_cSVDTimeMuMuCDCTRG->cd();
-  if (processHistogram(h, tag)) {
-    m_cSVDTimeMuMuCDCTRG->SetFillColor(0);
-    m_cSVDTimeMuMuCDCTRG->Modified();
-    m_cSVDTimeMuMuCDCTRG->Update();
-  } else {
-    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
-    if (h) h->Draw();
-    m_cSVDTimeMuMuCDCTRG->SetFillColor(kGray);
-    m_cSVDTimeMuMuCDCTRG->Draw();
-  }
+  analyseECLTRGEventT0Distributions();
+  analyseCDCTRGEventT0Distributions();
+  analyseTOPTRGEventT0Distributions();
 
   if (m_printCanvas) {
-    m_cTOPTimeHadronsECLTRG->Print(Form("%s_TOPTimeHadronsECLTRG.pdf[", m_prefixCanvas.c_str()));
-    m_cTOPTimeBhaBhaECLTRG->Print(Form("%s_TOPTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cTOPTimeMuMuECLTRG->Print(Form("%s_TOPTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
-
-    m_cTOPTimeHadronsCDCTRG->Print(Form("%s_TOPTimeHadronsCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cTOPTimeBhaBhaCDCTRG->Print(Form("%s_TOPTimeBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cTOPTimeMuMuCDCTRG->Print(Form("%s_TOPTimeMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
-
-    m_cSVDTimeHadronsECLTRG->Print(Form("%s_SVDTimeHadronsECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cSVDTimeBhaBhaECLTRG->Print(Form("%s_SVDTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cSVDTimeMuMuECLTRG->Print(Form("%s_SVDTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
-
-    m_cSVDTimeHadronsCDCTRG->Print(Form("%s_SVDTimeHadronsCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cSVDTimeBhaBhaCDCTRG->Print(Form("%s_SVDTimeBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cSVDTimeMuMuCDCTRG->Print(Form("%s_SVDTimeMuMuCDCTRG.pdf]", m_prefixCanvas.c_str()));
+    printCanvases();
   }
-
-
 }
 
 void DQMHistAnalysisEventT0TriggerJitterModule::terminate()
 {
-  delete m_cTOPTimeHadronsECLTRG;
-  delete m_cTOPTimeBhaBhaECLTRG;
-  delete m_cTOPTimeMuMuECLTRG;
-  delete m_cTOPTimeHadronsCDCTRG;
-  delete m_cTOPTimeBhaBhaCDCTRG;
-  delete m_cTOPTimeMuMuCDCTRG;
-  delete m_cSVDTimeHadronsECLTRG;
-  delete m_cSVDTimeBhaBhaECLTRG;
-  delete m_cSVDTimeMuMuECLTRG;
-  delete m_cSVDTimeHadronsCDCTRG;
-  delete m_cSVDTimeBhaBhaCDCTRG;
-  delete m_cSVDTimeMuMuCDCTRG;
+  deleteCanvases();
 }
 
 double DQMHistAnalysisEventT0TriggerJitterModule::fDoubleGaus(double* x, double* par)
@@ -417,4 +161,776 @@ bool DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TStrin
 
   return true;
 
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::analyseECLTRGEventT0Distributions()
+{
+  // --- ECL EventT0 plots for ECLTRG ---
+
+  // find ECL EventT0 Hadrons ECLTRG histogram and process it
+  TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_ECLTRG");
+  TString tag = "hadronECLTRG";
+  m_cECLTimeHadronsECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeHadronsECLTRG->SetFillColor(0);
+    m_cECLTimeHadronsECLTRG->Modified();
+    m_cECLTimeHadronsECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeHadronsECLTRG->SetFillColor(kGray);
+    m_cECLTimeHadronsECLTRG->Draw();
+  }
+
+  // find ECL EventT0 Bhabhas ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_ECLTRG");
+  tag = "bhabhaECLTRG";
+  m_cECLTimeBhaBhaECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeBhaBhaECLTRG->SetFillColor(0);
+    m_cECLTimeBhaBhaECLTRG->Modified();
+    m_cECLTimeBhaBhaECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeBhaBhaECLTRG->SetFillColor(kGray);
+    m_cECLTimeBhaBhaECLTRG->Draw();
+  }
+
+  // find ECL EventT0 Mumus ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_ECLTRG");
+  tag = "mumuECLTRG";
+  m_cECLTimeMuMuECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeMuMuECLTRG->SetFillColor(0);
+    m_cECLTimeMuMuECLTRG->Modified();
+    m_cECLTimeMuMuECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeMuMuECLTRG->SetFillColor(kGray);
+    m_cECLTimeMuMuECLTRG->Draw();
+  }
+
+
+  // --- CDC EventT0 plots for ECLTRG ---
+
+  // find CDC EventT0 Hadrons ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_ECLTRG");
+  tag = "hadronECLTRG";
+  m_cCDCTimeHadronsECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeHadronsECLTRG->SetFillColor(0);
+    m_cCDCTimeHadronsECLTRG->Modified();
+    m_cCDCTimeHadronsECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeHadronsECLTRG->SetFillColor(kGray);
+    m_cCDCTimeHadronsECLTRG->Draw();
+  }
+
+  // find CDC EventT0 Bhabhas ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_ECLTRG");
+  tag = "bhabhaECLTRG";
+  m_cCDCTimeBhaBhaECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeBhaBhaECLTRG->SetFillColor(0);
+    m_cCDCTimeBhaBhaECLTRG->Modified();
+    m_cCDCTimeBhaBhaECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeBhaBhaECLTRG->SetFillColor(kGray);
+    m_cCDCTimeBhaBhaECLTRG->Draw();
+  }
+
+  // find CDC EventT0 Mumus ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_ECLTRG");
+  tag = "mumuECLTRG";
+  m_cCDCTimeMuMuECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeMuMuECLTRG->SetFillColor(0);
+    m_cCDCTimeMuMuECLTRG->Modified();
+    m_cCDCTimeMuMuECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeMuMuECLTRG->SetFillColor(kGray);
+    m_cCDCTimeMuMuECLTRG->Draw();
+  }
+
+
+  // --- TOP EventT0 plots for ECLTRG ---
+
+  // find TOP EventT0 Hadrons ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_ECLTRG");
+  tag = "hadronECLTRG";
+  m_cTOPTimeHadronsECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeHadronsECLTRG->SetFillColor(0);
+    m_cTOPTimeHadronsECLTRG->Modified();
+    m_cTOPTimeHadronsECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeHadronsECLTRG->SetFillColor(kGray);
+    m_cTOPTimeHadronsECLTRG->Draw();
+  }
+
+  // find TOP EventT0 Bhabhas ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_ECLTRG");
+  tag = "bhabhaECLTRG";
+  m_cTOPTimeBhaBhaECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeBhaBhaECLTRG->SetFillColor(0);
+    m_cTOPTimeBhaBhaECLTRG->Modified();
+    m_cTOPTimeBhaBhaECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeBhaBhaECLTRG->SetFillColor(kGray);
+    m_cTOPTimeBhaBhaECLTRG->Draw();
+  }
+
+  // find TOP EventT0 Mumus ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_ECLTRG");
+  tag = "mumuECLTRG";
+  m_cTOPTimeMuMuECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeMuMuECLTRG->SetFillColor(0);
+    m_cTOPTimeMuMuECLTRG->Modified();
+    m_cTOPTimeMuMuECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeMuMuECLTRG->SetFillColor(kGray);
+    m_cTOPTimeMuMuECLTRG->Draw();
+  }
+
+
+  // --- SVD EventT0 plots for ECLTRG ---
+
+  // find SVD EventT0 Hadrons ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_ECLTRG");
+  tag = "hadronECLTRG";
+  m_cSVDTimeHadronsECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeHadronsECLTRG->SetFillColor(0);
+    m_cSVDTimeHadronsECLTRG->Modified();
+    m_cSVDTimeHadronsECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeHadronsECLTRG->SetFillColor(kGray);
+    m_cSVDTimeHadronsECLTRG->Draw();
+  }
+
+  // find SVD EventT0 Bhabhas ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_ECLTRG");
+  tag = "bhabhaECLTRG";
+  m_cSVDTimeBhaBhaECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeBhaBhaECLTRG->SetFillColor(0);
+    m_cSVDTimeBhaBhaECLTRG->Modified();
+    m_cSVDTimeBhaBhaECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeBhaBhaECLTRG->SetFillColor(kGray);
+    m_cSVDTimeBhaBhaECLTRG->Draw();
+  }
+
+  // find SVD EventT0 Mumus ECLTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_ECLTRG");
+  tag = "mumuECLTRG";
+  m_cSVDTimeMuMuECLTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeMuMuECLTRG->SetFillColor(0);
+    m_cSVDTimeMuMuECLTRG->Modified();
+    m_cSVDTimeMuMuECLTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeMuMuECLTRG->SetFillColor(kGray);
+    m_cSVDTimeMuMuECLTRG->Draw();
+  }
+
+
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::analyseCDCTRGEventT0Distributions()
+{
+  // --- ECL EventT0 plots for CDCTRG ---
+
+  // find ECL EventT0 Hadrons CDCTRG histogram and process it
+  TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_CDCTRG");
+  TString tag = "hadronCDCTRG";
+  m_cECLTimeHadronsCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeHadronsCDCTRG->SetFillColor(0);
+    m_cECLTimeHadronsCDCTRG->Modified();
+    m_cECLTimeHadronsCDCTRG->Update();
+    m_cECLTimeHadronsCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeHadronsCDCTRG->SetFillColor(kGray);
+    m_cECLTimeHadronsCDCTRG->Draw();
+  }
+
+  // find ECL EventT0 Bhabhas CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_CDCTRG");
+  tag = "bhabhaCDCTRG";
+  m_cECLTimeBhaBhaCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeBhaBhaCDCTRG->SetFillColor(0);
+    m_cECLTimeBhaBhaCDCTRG->Modified();
+    m_cECLTimeBhaBhaCDCTRG->Update();
+    m_cECLTimeBhaBhaCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeBhaBhaCDCTRG->SetFillColor(kGray);
+    m_cECLTimeBhaBhaCDCTRG->Draw();
+  }
+
+  // find ECL EventT0 Mumus CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_CDCTRG");
+  tag = "mumuCDCTRG";
+  m_cECLTimeMuMuCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeMuMuCDCTRG->SetFillColor(0);
+    m_cECLTimeMuMuCDCTRG->Modified();
+    m_cECLTimeMuMuCDCTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeMuMuCDCTRG->SetFillColor(kGray);
+    m_cECLTimeMuMuCDCTRG->Draw();
+  }
+
+
+  // --- CDC EventT0 plots for CDCTRG ---
+
+  // find CDC EventT0 Hadrons CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_CDCTRG");
+  tag = "hadronCDCTRG";
+  m_cCDCTimeHadronsCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeHadronsCDCTRG->SetFillColor(0);
+    m_cCDCTimeHadronsCDCTRG->Modified();
+    m_cCDCTimeHadronsCDCTRG->Update();
+    m_cCDCTimeHadronsCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeHadronsCDCTRG->SetFillColor(kGray);
+    m_cCDCTimeHadronsCDCTRG->Draw();
+  }
+
+  // find CDC EventT0 Bhabhas CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_CDCTRG");
+  tag = "bhabhaCDCTRG";
+  m_cCDCTimeBhaBhaCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeBhaBhaCDCTRG->SetFillColor(0);
+    m_cCDCTimeBhaBhaCDCTRG->Modified();
+    m_cCDCTimeBhaBhaCDCTRG->Update();
+    m_cCDCTimeBhaBhaCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeBhaBhaCDCTRG->SetFillColor(kGray);
+    m_cCDCTimeBhaBhaCDCTRG->Draw();
+  }
+
+  // find CDC EventT0 Mumus CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_CDCTRG");
+  tag = "mumuCDCTRG";
+  m_cCDCTimeMuMuCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeMuMuCDCTRG->SetFillColor(0);
+    m_cCDCTimeMuMuCDCTRG->Modified();
+    m_cCDCTimeMuMuCDCTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeMuMuCDCTRG->SetFillColor(kGray);
+    m_cCDCTimeMuMuCDCTRG->Draw();
+  }
+
+
+  // --- TOP EventT0 plots for CDCTRG ---
+
+  // find TOP EventT0 Hadrons CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_CDCTRG");
+  tag = "hadronCDCTRG";
+  m_cTOPTimeHadronsCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeHadronsCDCTRG->SetFillColor(0);
+    m_cTOPTimeHadronsCDCTRG->Modified();
+    m_cTOPTimeHadronsCDCTRG->Update();
+    m_cTOPTimeHadronsCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeHadronsCDCTRG->SetFillColor(kGray);
+    m_cTOPTimeHadronsCDCTRG->Draw();
+  }
+
+  // find TOP EventT0 Bhabhas CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_CDCTRG");
+  tag = "bhabhaCDCTRG";
+  m_cTOPTimeBhaBhaCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeBhaBhaCDCTRG->SetFillColor(0);
+    m_cTOPTimeBhaBhaCDCTRG->Modified();
+    m_cTOPTimeBhaBhaCDCTRG->Update();
+    m_cTOPTimeBhaBhaCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeBhaBhaCDCTRG->SetFillColor(kGray);
+    m_cTOPTimeBhaBhaCDCTRG->Draw();
+  }
+
+  // find TOP EventT0 Mumus CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_CDCTRG");
+  tag = "mumuCDCTRG";
+  m_cTOPTimeMuMuCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeMuMuCDCTRG->SetFillColor(0);
+    m_cTOPTimeMuMuCDCTRG->Modified();
+    m_cTOPTimeMuMuCDCTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeMuMuCDCTRG->SetFillColor(kGray);
+    m_cTOPTimeMuMuCDCTRG->Draw();
+  }
+
+
+  // --- SVD EventT0 plots for CDCTRG ---
+
+  // find SVD EventT0 Hadrons CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_CDCTRG");
+  tag = "hadronCDCTRG";
+  m_cSVDTimeHadronsCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeHadronsCDCTRG->SetFillColor(0);
+    m_cSVDTimeHadronsCDCTRG->Modified();
+    m_cSVDTimeHadronsCDCTRG->Update();
+    m_cSVDTimeHadronsCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeHadronsCDCTRG->SetFillColor(kGray);
+    m_cSVDTimeHadronsCDCTRG->Draw();
+  }
+
+  // find SVD EventT0 Bhabhas CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_CDCTRG");
+  tag = "bhabhaCDCTRG";
+  m_cSVDTimeBhaBhaCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeBhaBhaCDCTRG->SetFillColor(0);
+    m_cSVDTimeBhaBhaCDCTRG->Modified();
+    m_cSVDTimeBhaBhaCDCTRG->Update();
+    m_cSVDTimeBhaBhaCDCTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeBhaBhaCDCTRG->SetFillColor(kGray);
+    m_cSVDTimeBhaBhaCDCTRG->Draw();
+  }
+
+  // find SVD EventT0 Mumus CDCTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_CDCTRG");
+  tag = "mumuCDCTRG";
+  m_cSVDTimeMuMuCDCTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeMuMuCDCTRG->SetFillColor(0);
+    m_cSVDTimeMuMuCDCTRG->Modified();
+    m_cSVDTimeMuMuCDCTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeMuMuCDCTRG->SetFillColor(kGray);
+    m_cSVDTimeMuMuCDCTRG->Draw();
+  }
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::analyseTOPTRGEventT0Distributions()
+{
+  // --- ECL EventT0 plots for TOPTRG ---
+
+  // find ECL EventT0 Hadrons TOPTRG histogram and process it
+  TH1* h = findHist("EventT0/m_histEventT0_ECL_hadron_L1_TOPTRG");
+  TString tag = "hadronTOPTRG";
+  m_cECLTimeHadronsTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeHadronsTOPTRG->SetFillColor(0);
+    m_cECLTimeHadronsTOPTRG->Modified();
+    m_cECLTimeHadronsTOPTRG->Update();
+    m_cECLTimeHadronsTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeHadronsTOPTRG->SetFillColor(kGray);
+    m_cECLTimeHadronsTOPTRG->Draw();
+  }
+
+  // find ECL EventT0 Bhabhas TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_ECL_bhabha_L1_TOPTRG");
+  tag = "bhabhaTOPTRG";
+  m_cECLTimeBhaBhaTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeBhaBhaTOPTRG->SetFillColor(0);
+    m_cECLTimeBhaBhaTOPTRG->Modified();
+    m_cECLTimeBhaBhaTOPTRG->Update();
+    m_cECLTimeBhaBhaTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeBhaBhaTOPTRG->SetFillColor(kGray);
+    m_cECLTimeBhaBhaTOPTRG->Draw();
+  }
+
+  // find ECL EventT0 Mumus TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_ECL_mumu_L1_TOPTRG");
+  tag = "mumuTOPTRG";
+  m_cECLTimeMuMuTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cECLTimeMuMuTOPTRG->SetFillColor(0);
+    m_cECLTimeMuMuTOPTRG->Modified();
+    m_cECLTimeMuMuTOPTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram ECL EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cECLTimeMuMuTOPTRG->SetFillColor(kGray);
+    m_cECLTimeMuMuTOPTRG->Draw();
+  }
+
+
+  // --- CDC EventT0 plots for TOPTRG ---
+
+  // find CDC EventT0 Hadrons TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_hadron_L1_TOPTRG");
+  tag = "hadronTOPTRG";
+  m_cCDCTimeHadronsTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeHadronsTOPTRG->SetFillColor(0);
+    m_cCDCTimeHadronsTOPTRG->Modified();
+    m_cCDCTimeHadronsTOPTRG->Update();
+    m_cCDCTimeHadronsTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeHadronsTOPTRG->SetFillColor(kGray);
+    m_cCDCTimeHadronsTOPTRG->Draw();
+  }
+
+  // find CDC EventT0 Bhabhas TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_bhabha_L1_TOPTRG");
+  tag = "bhabhaTOPTRG";
+  m_cCDCTimeBhaBhaTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeBhaBhaTOPTRG->SetFillColor(0);
+    m_cCDCTimeBhaBhaTOPTRG->Modified();
+    m_cCDCTimeBhaBhaTOPTRG->Update();
+    m_cCDCTimeBhaBhaTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeBhaBhaTOPTRG->SetFillColor(kGray);
+    m_cCDCTimeBhaBhaTOPTRG->Draw();
+  }
+
+  // find CDC EventT0 Mumus TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_CDC_mumu_L1_TOPTRG");
+  tag = "mumuTOPTRG";
+  m_cCDCTimeMuMuTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cCDCTimeMuMuTOPTRG->SetFillColor(0);
+    m_cCDCTimeMuMuTOPTRG->Modified();
+    m_cCDCTimeMuMuTOPTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram CDC EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cCDCTimeMuMuTOPTRG->SetFillColor(kGray);
+    m_cCDCTimeMuMuTOPTRG->Draw();
+  }
+
+
+  // --- TOP EventT0 plots for TOPTRG ---
+
+  // find TOP EventT0 Hadrons TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_hadron_L1_TOPTRG");
+  tag = "hadronTOPTRG";
+  m_cTOPTimeHadronsTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeHadronsTOPTRG->SetFillColor(0);
+    m_cTOPTimeHadronsTOPTRG->Modified();
+    m_cTOPTimeHadronsTOPTRG->Update();
+    m_cTOPTimeHadronsTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeHadronsTOPTRG->SetFillColor(kGray);
+    m_cTOPTimeHadronsTOPTRG->Draw();
+  }
+
+  // find TOP EventT0 Bhabhas TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_bhabha_L1_TOPTRG");
+  tag = "bhabhaTOPTRG";
+  m_cTOPTimeBhaBhaTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeBhaBhaTOPTRG->SetFillColor(0);
+    m_cTOPTimeBhaBhaTOPTRG->Modified();
+    m_cTOPTimeBhaBhaTOPTRG->Update();
+    m_cTOPTimeBhaBhaTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeBhaBhaTOPTRG->SetFillColor(kGray);
+    m_cTOPTimeBhaBhaTOPTRG->Draw();
+  }
+
+  // find TOP EventT0 Mumus TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_TOP_mumu_L1_TOPTRG");
+  tag = "mumuTOPTRG";
+  m_cTOPTimeMuMuTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cTOPTimeMuMuTOPTRG->SetFillColor(0);
+    m_cTOPTimeMuMuTOPTRG->Modified();
+    m_cTOPTimeMuMuTOPTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram TOP EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cTOPTimeMuMuTOPTRG->SetFillColor(kGray);
+    m_cTOPTimeMuMuTOPTRG->Draw();
+  }
+
+
+  // --- SVD EventT0 plots for TOPTRG ---
+
+  // find SVD EventT0 Hadrons TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_hadron_L1_TOPTRG");
+  tag = "hadronTOPTRG";
+  m_cSVDTimeHadronsTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeHadronsTOPTRG->SetFillColor(0);
+    m_cSVDTimeHadronsTOPTRG->Modified();
+    m_cSVDTimeHadronsTOPTRG->Update();
+    m_cSVDTimeHadronsTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeHadronsTOPTRG->SetFillColor(kGray);
+    m_cSVDTimeHadronsTOPTRG->Draw();
+  }
+
+  // find SVD EventT0 Bhabhas TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_bhabha_L1_TOPTRG");
+  tag = "bhabhaTOPTRG";
+  m_cSVDTimeBhaBhaTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeBhaBhaTOPTRG->SetFillColor(0);
+    m_cSVDTimeBhaBhaTOPTRG->Modified();
+    m_cSVDTimeBhaBhaTOPTRG->Update();
+    m_cSVDTimeBhaBhaTOPTRG->Draw();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeBhaBhaTOPTRG->SetFillColor(kGray);
+    m_cSVDTimeBhaBhaTOPTRG->Draw();
+  }
+
+  // find SVD EventT0 Mumus TOPTRG histogram and process it
+  h = findHist("EventT0/m_histEventT0_SVD_mumu_L1_TOPTRG");
+  tag = "mumuTOPTRG";
+  m_cSVDTimeMuMuTOPTRG->cd();
+  if (processHistogram(h, tag)) {
+    m_cSVDTimeMuMuTOPTRG->SetFillColor(0);
+    m_cSVDTimeMuMuTOPTRG->Modified();
+    m_cSVDTimeMuMuTOPTRG->Update();
+  } else {
+    B2WARNING(Form("Histogram SVD EventT0 for %s from EventT0 DQM not processed!", tag.Data()));
+    if (h) h->Draw();
+    m_cSVDTimeMuMuTOPTRG->SetFillColor(kGray);
+    m_cSVDTimeMuMuTOPTRG->Draw();
+  }
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::initializeCanvases()
+{
+  //ECLTRG canvas
+  m_cECLTimeHadronsECLTRG = new TCanvas("ECLTimeHadronsECLTRG", "ECL time hadrons ECLTRG jitter");
+  m_cECLTimeBhaBhaECLTRG = new TCanvas("ECLTimeBhaBhaECLTRG", "ECL time BhaBha ECLTRG jitter");
+  m_cECLTimeMuMuECLTRG = new TCanvas("ECLTimeMuMuECLTRG", "ECL time #mu#mu ECLTRG jitter");
+  m_cCDCTimeHadronsECLTRG = new TCanvas("CDCTimeHadronsECLTRG", "CDC time hadrons ECLTRG jitter");
+  m_cCDCTimeBhaBhaECLTRG = new TCanvas("CDCTimeBhaBhaECLTRG", "CDC time BhaBha ECLTRG jitter");
+  m_cCDCTimeMuMuECLTRG = new TCanvas("CDCTimeMuMuECLTRG", "CDC time #mu#mu ECLTRG jitter");
+  m_cTOPTimeHadronsECLTRG = new TCanvas("TOPTimeHadronsECLTRG", "TOP time hadrons ECLTRG jitter");
+  m_cTOPTimeBhaBhaECLTRG = new TCanvas("TOPTimeBhaBhaECLTRG", "TOP time BhaBha ECLTRG jitter");
+  m_cTOPTimeMuMuECLTRG = new TCanvas("TOPTimeMuMuECLTRG", "TOP time #mu#mu ECLTRG jitter");
+  m_cSVDTimeHadronsECLTRG = new TCanvas("SVDTimeHadronsECLTRG", "SVD time hadrons ECLTRG jitter");
+  m_cSVDTimeBhaBhaECLTRG = new TCanvas("SVDTimeBhaBhaECLTRG", "SVD time BhaBha ECLTRG jitter");
+  m_cSVDTimeMuMuECLTRG = new TCanvas("SVDTimeMuMuECLTRG", "SVD time #mu#mu ECLTRG jitter");
+
+  //CDCTRG canvas
+  m_cECLTimeHadronsCDCTRG = new TCanvas("ECLTimeHadronsCDCTRG", "ECL time hadrons CDCTRG jitter");
+  m_cECLTimeBhaBhaCDCTRG = new TCanvas("ECLTimeBhaBhaCDCTRG", "ECL time BhaBha CDCTRG jitter");
+  m_cECLTimeMuMuCDCTRG = new TCanvas("ECLTimeMuMuCDCTRG", "ECL time #mu#mu CDCTRG jitter");
+  m_cCDCTimeHadronsCDCTRG = new TCanvas("CDCTimeHadronsCDCTRG", "CDC time hadrons CDCTRG jitter");
+  m_cCDCTimeBhaBhaCDCTRG = new TCanvas("CDCTimeBhaBhaCDCTRG", "CDC time BhaBha CDCTRG jitter");
+  m_cCDCTimeMuMuCDCTRG = new TCanvas("CDCTimeMuMuCDCTRG", "CDC time #mu#mu CDCTRG jitter");
+  m_cTOPTimeHadronsCDCTRG = new TCanvas("TOPTimeHadronsCDCTRG", "TOP time hadrons CDCTRG jitter");
+  m_cTOPTimeBhaBhaCDCTRG = new TCanvas("TOPTimeBhaBhaCDCTRG", "TOP time BhaBha CDCTRG jitter");
+  m_cTOPTimeMuMuCDCTRG = new TCanvas("TOPTimeMuMuCDCTRG", "TOP time #mu#mu CDCTRG jitter");
+  m_cSVDTimeHadronsCDCTRG = new TCanvas("SVDTimeHadronsCDCTRG", "SVD time hadrons CDCTRG jitter");
+  m_cSVDTimeBhaBhaCDCTRG = new TCanvas("SVDTimeBhaBhaCDCTRG", "SVD time BhaBha CDCTRG jitter");
+  m_cSVDTimeMuMuCDCTRG = new TCanvas("SVDTimeMuMuCDCTRG", "SVD time #mu#mu CDCTRG jitter");
+
+  //TOPTRG canvas
+  m_cECLTimeHadronsTOPTRG = new TCanvas("ECLTimeHadronsTOPTRG", "ECL time hadrons TOPTRG jitter");
+  m_cECLTimeBhaBhaTOPTRG = new TCanvas("ECLTimeBhaBhaTOPTRG", "ECL time BhaBha TOPTRG jitter");
+  m_cECLTimeMuMuTOPTRG = new TCanvas("ECLTimeMuMuTOPTRG", "ECL time #mu#mu TOPTRG jitter");
+  m_cCDCTimeHadronsTOPTRG = new TCanvas("CDCTimeHadronsTOPTRG", "CDC time hadrons TOPTRG jitter");
+  m_cCDCTimeBhaBhaTOPTRG = new TCanvas("CDCTimeBhaBhaTOPTRG", "CDC time BhaBha TOPTRG jitter");
+  m_cCDCTimeMuMuTOPTRG = new TCanvas("CDCTimeMuMuTOPTRG", "CDC time #mu#mu TOPTRG jitter");
+  m_cTOPTimeHadronsTOPTRG = new TCanvas("TOPTimeHadronsTOPTRG", "TOP time hadrons TOPTRG jitter");
+  m_cTOPTimeBhaBhaTOPTRG = new TCanvas("TOPTimeBhaBhaTOPTRG", "TOP time BhaBha TOPTRG jitter");
+  m_cTOPTimeMuMuTOPTRG = new TCanvas("TOPTimeMuMuTOPTRG", "TOP time #mu#mu TOPTRG jitter");
+  m_cSVDTimeHadronsTOPTRG = new TCanvas("SVDTimeHadronsTOPTRG", "SVD time hadrons TOPTRG jitter");
+  m_cSVDTimeBhaBhaTOPTRG = new TCanvas("SVDTimeBhaBhaTOPTRG", "SVD time BhaBha TOPTRG jitter");
+  m_cSVDTimeMuMuTOPTRG = new TCanvas("SVDTimeMuMuTOPTRG", "SVD time #mu#mu TOPTRG jitter");
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::clearCanvases()
+{
+  m_cECLTimeHadronsECLTRG->Clear();
+  m_cECLTimeBhaBhaECLTRG->Clear();
+  m_cECLTimeMuMuECLTRG->Clear();
+  m_cCDCTimeHadronsECLTRG->Clear();
+  m_cCDCTimeBhaBhaECLTRG->Clear();
+  m_cCDCTimeMuMuECLTRG->Clear();
+  m_cTOPTimeHadronsECLTRG->Clear();
+  m_cTOPTimeBhaBhaECLTRG->Clear();
+  m_cTOPTimeMuMuECLTRG->Clear();
+  m_cSVDTimeHadronsECLTRG->Clear();
+  m_cSVDTimeBhaBhaECLTRG->Clear();
+  m_cSVDTimeMuMuECLTRG->Clear();
+
+  m_cECLTimeHadronsCDCTRG->Clear();
+  m_cECLTimeBhaBhaCDCTRG->Clear();
+  m_cECLTimeMuMuCDCTRG->Clear();
+  m_cCDCTimeHadronsCDCTRG->Clear();
+  m_cCDCTimeBhaBhaCDCTRG->Clear();
+  m_cCDCTimeMuMuCDCTRG->Clear();
+  m_cTOPTimeHadronsCDCTRG->Clear();
+  m_cTOPTimeBhaBhaCDCTRG->Clear();
+  m_cTOPTimeMuMuCDCTRG->Clear();
+  m_cSVDTimeHadronsCDCTRG->Clear();
+  m_cSVDTimeBhaBhaCDCTRG->Clear();
+  m_cSVDTimeMuMuCDCTRG->Clear();
+
+  m_cECLTimeHadronsTOPTRG->Clear();
+  m_cECLTimeBhaBhaTOPTRG->Clear();
+  m_cECLTimeMuMuTOPTRG->Clear();
+  m_cCDCTimeHadronsTOPTRG->Clear();
+  m_cCDCTimeBhaBhaTOPTRG->Clear();
+  m_cCDCTimeMuMuTOPTRG->Clear();
+  m_cTOPTimeHadronsTOPTRG->Clear();
+  m_cTOPTimeBhaBhaTOPTRG->Clear();
+  m_cTOPTimeMuMuTOPTRG->Clear();
+  m_cSVDTimeHadronsTOPTRG->Clear();
+  m_cSVDTimeBhaBhaTOPTRG->Clear();
+  m_cSVDTimeMuMuTOPTRG->Clear();
+}
+
+void DQMHistAnalysisEventT0TriggerJitterModule::printCanvases()
+{
+  m_cECLTimeHadronsECLTRG->Print(Form("%s_ECLTimeHadronsECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeBhaBhaECLTRG->Print(Form("%s_ECLTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeMuMuECLTRG->Print(Form("%s_ECLTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeHadronsECLTRG->Print(Form("%s_CDCTimeHadronsECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeBhaBhaECLTRG->Print(Form("%s_CDCTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeMuMuECLTRG->Print(Form("%s_CDCTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cTOPTimeHadronsECLTRG->Print(Form("%s_TOPTimeHadronsECLTRG.pdf[", m_prefixCanvas.c_str()));
+  m_cTOPTimeBhaBhaECLTRG->Print(Form("%s_TOPTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cTOPTimeMuMuECLTRG->Print(Form("%s_TOPTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeHadronsECLTRG->Print(Form("%s_SVDTimeHadronsECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeBhaBhaECLTRG->Print(Form("%s_SVDTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeMuMuECLTRG->Print(Form("%s_SVDTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
+
+  m_cECLTimeHadronsCDCTRG->Print(Form("%s_ECLTimeHadronsCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeBhaBhaCDCTRG->Print(Form("%s_ECLTimeBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeMuMuCDCTRG->Print(Form("%s_ECLTimeMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeHadronsCDCTRG->Print(Form("%s_CDCTimeHadronsCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeBhaBhaCDCTRG->Print(Form("%s_CDCTimeBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeMuMuCDCTRG->Print(Form("%s_CDCTimeMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cTOPTimeHadronsCDCTRG->Print(Form("%s_TOPTimeHadronsCDCTRG.pdf[", m_prefixCanvas.c_str()));
+  m_cTOPTimeBhaBhaCDCTRG->Print(Form("%s_TOPTimeBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cTOPTimeMuMuCDCTRG->Print(Form("%s_TOPTimeMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeHadronsCDCTRG->Print(Form("%s_SVDTimeHadronsCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeBhaBhaCDCTRG->Print(Form("%s_SVDTimeBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeMuMuCDCTRG->Print(Form("%s_SVDTimeMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
+
+  m_cECLTimeHadronsTOPTRG->Print(Form("%s_ECLTimeHadronsTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeBhaBhaTOPTRG->Print(Form("%s_ECLTimeBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeMuMuTOPTRG->Print(Form("%s_ECLTimeMuMuTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeHadronsTOPTRG->Print(Form("%s_CDCTimeHadronsTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeBhaBhaTOPTRG->Print(Form("%s_CDCTimeBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cCDCTimeMuMuTOPTRG->Print(Form("%s_CDCTimeMuMuTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cTOPTimeHadronsTOPTRG->Print(Form("%s_TOPTimeHadronsTOPTRG.pdf[", m_prefixCanvas.c_str()));
+  m_cTOPTimeBhaBhaTOPTRG->Print(Form("%s_TOPTimeBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cTOPTimeMuMuTOPTRG->Print(Form("%s_TOPTimeMuMuTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeHadronsTOPTRG->Print(Form("%s_SVDTimeHadronsTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeBhaBhaTOPTRG->Print(Form("%s_SVDTimeBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeMuMuTOPTRG->Print(Form("%s_SVDTimeMuMuTOPTRG.pdf", m_prefixCanvas.c_str()));
+}
+
+
+void DQMHistAnalysisEventT0TriggerJitterModule::deleteCanvases()
+{
+  delete m_cECLTimeHadronsECLTRG;
+  delete m_cECLTimeBhaBhaECLTRG ;
+  delete m_cECLTimeMuMuECLTRG;
+  delete m_cCDCTimeHadronsECLTRG;
+  delete m_cCDCTimeBhaBhaECLTRG ;
+  delete m_cCDCTimeMuMuECLTRG;
+  delete m_cTOPTimeHadronsECLTRG;
+  delete m_cTOPTimeBhaBhaECLTRG ;
+  delete m_cTOPTimeMuMuECLTRG;
+  delete m_cSVDTimeHadronsECLTRG;
+  delete m_cSVDTimeBhaBhaECLTRG ;
+  delete m_cSVDTimeMuMuECLTRG;
+
+  delete m_cECLTimeHadronsCDCTRG;
+  delete m_cECLTimeBhaBhaCDCTRG ;
+  delete m_cECLTimeMuMuCDCTRG;
+  delete m_cCDCTimeHadronsCDCTRG;
+  delete m_cCDCTimeBhaBhaCDCTRG ;
+  delete m_cCDCTimeMuMuCDCTRG;
+  delete m_cTOPTimeHadronsCDCTRG;
+  delete m_cTOPTimeBhaBhaCDCTRG ;
+  delete m_cTOPTimeMuMuCDCTRG;
+  delete m_cSVDTimeHadronsCDCTRG;
+  delete m_cSVDTimeBhaBhaCDCTRG ;
+  delete m_cSVDTimeMuMuCDCTRG;
+
+  delete m_cTOPTimeHadronsTOPTRG;
+  delete m_cTOPTimeBhaBhaTOPTRG ;
+  delete m_cTOPTimeMuMuTOPTRG;
+  delete m_cECLTimeHadronsTOPTRG;
+  delete m_cECLTimeBhaBhaTOPTRG ;
+  delete m_cECLTimeMuMuTOPTRG;
+  delete m_cSVDTimeHadronsTOPTRG;
+  delete m_cSVDTimeBhaBhaTOPTRG ;
+  delete m_cSVDTimeMuMuTOPTRG;
+  delete m_cCDCTimeHadronsTOPTRG;
+  delete m_cCDCTimeBhaBhaTOPTRG ;
+  delete m_cCDCTimeMuMuTOPTRG;
 }

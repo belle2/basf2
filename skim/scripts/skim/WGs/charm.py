@@ -1435,11 +1435,12 @@ class Xic0ToLHpJm(BaseSkim):
 
     def build_lists(self, path):
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('significanceOfflightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList(
             'Lambda0:charmSkim',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfDistance > 3 and daughter(0,trinaryID) > 0.2',
+            '1.114 < M < 1.118 and significanceOfflightDistance > 3 and daughter(0,trinaryID) > 0.2',
             path=path)
 
         XicCuts = "2.3 < M < 2.65 and useCMSFrame(p) > 2.0"

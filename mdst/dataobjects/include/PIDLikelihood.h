@@ -128,14 +128,14 @@ namespace Belle2 {
                           Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
-     * Return logarithmic equivalent of likelihood probability; defined as log(p/(1-p)),
+     * Return logarithmic equivalent of likelihood probability defined as log(p/(1-p)),
      * where p is the combined likelihood probability of a particle according to chargedStableSet.
      * This one gives a smooth peak-like distribution (opposite to probability distribution which has spikes at 0 and 1).
      * If prior fractions are not given, equal prior probabilities are assumed.
      * @param part charged stable particle
      * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
      * @param set  a set of PID detectors to use
-     * @return global log likelihood difference
+     * @return logarithmic equivalent of global likelihood probability
      */
     double getLogarithmicProbability(const Const::ChargedStable& part,
                                      const double* fractions = nullptr,

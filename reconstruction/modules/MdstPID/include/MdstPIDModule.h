@@ -138,7 +138,7 @@ namespace Belle2 {
       for (const auto& chargedStable : Const::chargedStableSet) {
         auto value = getLogL(logl, chargedStable);
         values.push_back(value);
-        if (isnan(value) or value == INFINITY) {
+        if (std::isnan(value) or value == INFINITY) {
           B2ERROR("MdstPID::setLikelihoods: invalid " << logl->ClassName() << " for " << m_chargedNames[chargedStable]
                   << ", is " << value
                   << ". Likelihoods ignored.");

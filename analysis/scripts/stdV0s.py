@@ -56,7 +56,7 @@ def stdKshorts(prioritiseV0=True, fitter='TreeFit', path=None, updateAllDaughter
     ma.applyCuts('K_S0:V0_ToFit', '0.450 < M < 0.550', path=path)
     # Reconstruct a second list
     stdPi('all', path=path, writeOut=writeOut)  # no quality cuts
-    ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, writeOut=writeOut, path=path, standardParticleList=True)
+    ma.reconstructDecay('K_S0:RD -> pi+:all pi-:all', '0.3 < M < 0.7', 1, writeOut=writeOut, path=path)
     # Again perform vertex fit and apply tighter mass window
     if fitter == 'TreeFit':
         vertex.treeFit('K_S0:RD', conf_level=0.0, path=path, updateAllDaughters=updateAllDaughters)

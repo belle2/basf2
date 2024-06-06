@@ -6,12 +6,12 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisEventT0.cc
+// File : DQMHistAnalysisEventT0TriggerJitter.cc
 // Description : module for trigger jitter/EventT0 DQM histogram analysis
 //-
 
 
-#include <dqm/analysis/modules/DQMHistAnalysisEventT0.h>
+#include <dqm/analysis/modules/DQMHistAnalysisEventT0TriggerJitter.h>
 
 #include <TROOT.h>
 #include <TGraphAsymmErrors.h>
@@ -25,13 +25,13 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(DQMHistAnalysisEventT0);
+REG_MODULE(DQMHistAnalysisEventT0TriggerJitter);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-DQMHistAnalysisEventT0Module::DQMHistAnalysisEventT0Module()
+DQMHistAnalysisEventT0TriggerJitterModule::DQMHistAnalysisEventT0TriggerJitterModule()
   : DQMHistAnalysisModule()
 {
   setDescription("Determining and processing EventT0s from different subdetector (TOP and SVD for now) for different L1 trigger sources (ECL and CDC for now) to estimate trigger jitter information.");
@@ -43,9 +43,9 @@ DQMHistAnalysisEventT0Module::DQMHistAnalysisEventT0Module()
 }
 
 
-DQMHistAnalysisEventT0Module::~DQMHistAnalysisEventT0Module() { }
+DQMHistAnalysisEventT0TriggerJitterModule::~DQMHistAnalysisEventT0TriggerJitterModule() { }
 
-void DQMHistAnalysisEventT0Module::initialize()
+void DQMHistAnalysisEventT0TriggerJitterModule::initialize()
 {
   gROOT->cd();
 
@@ -70,61 +70,11 @@ void DQMHistAnalysisEventT0Module::initialize()
   m_cSVDTimeBhaBhaCDCTRG = new TCanvas("SVDTimeBhaBhaCDCTRG", "SVD pad2 CDCTRG");
   m_cSVDTimeMuMuCDCTRG = new TCanvas("SVDTimeMuMuCDCTRG", "SVD pad3 CDCTRG");
 
-  // EventT0 source fractions
-  m_cT0FractionsHadronECLTRG = new TCanvas("EventT0/c_HadronECLTRG", "Fractions ECLTRG for hadron events");
-  m_cT0FractionsHadronCDCTRG = new TCanvas("EventT0/c_HadronCDCTRG", "Fractions CDCTRG for hadron events");
-  m_cT0FractionsHadronTOPTRG = new TCanvas("EventT0/c_HadronTOPTRG", "Fractions TOPTRG for hadron events");
-
-  m_cT0FractionsBhaBhaECLTRG = new TCanvas("EventT0/c_BhaBhaECLTRG", "Fractions ECLTRG for BhaBha events");
-  m_cT0FractionsBhaBhaCDCTRG = new TCanvas("EventT0/c_BhaBhaCDCTRG", "Fractions CDCTRG for BhaBha events");
-  m_cT0FractionsBhaBhaTOPTRG = new TCanvas("EventT0/c_BhaBhaTOPTRG", "Fractions TOPTRG for BhaBha events");
-
-  m_cT0FractionsMuMuECLTRG = new TCanvas("EventT0/c_MuMuECLTRG", "Fractions ECLTRG for #mu#mu events");
-  m_cT0FractionsMuMuCDCTRG = new TCanvas("EventT0/c_MuMuCDCTRG", "Fractions CDCTRG for #mu#mu events");
-  m_cT0FractionsMuMuTOPTRG = new TCanvas("EventT0/c_MuMuTOPTRG", "Fractions TOPTRG for #mu#mu events");
-
-  m_eAlgorithmSourceFractionsHadronL1ECLTRG =
-    new TEfficiency("effAlgorithmSourceFractionsHadronL1ECLTRG",
-                    "EventT0 source fractions, hadronic events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsHadronL1CDCTRG =
-    new TEfficiency("effAlgorithmSourceFractionsHadronL1CDCTRG",
-                    "EventT0 source fractions, hadronic events, L1CDCTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsHadronL1TOPTRG =
-    new TEfficiency("effAlgorithmSourceFractionsHadronL1TOPTRG",
-                    "EventT0 source fractions, hadronic events, L1TOPTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG =
-    new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1ECLTRG",
-                    "EventT0 source fractions, Bhabha events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG =
-    new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1CDCTRG",
-                    "EventT0 source fractions, Bhabha events, L1CDCTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG =
-    new TEfficiency("effAlgorithmSourceFractionsBhaBhaL1TOPTRG",
-                    "EventT0 source fractions, Bhabha events, L1TOPTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsMuMuL1ECLTRG =
-    new TEfficiency("effAlgorithmSourceFractionsMuMuL1ECLTRG",
-                    "EventT0 source fractions, #mu#mu events, L1ECLTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsMuMuL1CDCTRG =
-    new TEfficiency("effAlgorithmSourceFractionsMuMuL1CDCTRG",
-                    "EventT0 source fractions, #mu#mu events, L1CDCTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-  m_eAlgorithmSourceFractionsMuMuL1TOPTRG =
-    new TEfficiency("effAlgorithmSourceFractionsMuMuL1TOPTRG",
-                    "EventT0 source fractions, #mu#mu events, L1TOPTRG;Algorithm;Fraction #epsilon",
-                    6, 0, 6);
-
   m_monObj = getMonitoringObject("eventT0");
 }
 
 
-void DQMHistAnalysisEventT0Module::beginRun()
+void DQMHistAnalysisEventT0TriggerJitterModule::beginRun()
 {
   m_cTOPTimeHadronsECLTRG->Clear();
   m_cTOPTimeBhaBhaECLTRG->Clear();
@@ -139,138 +89,14 @@ void DQMHistAnalysisEventT0Module::beginRun()
   m_cSVDTimeBhaBhaCDCTRG->Clear();
   m_cSVDTimeMuMuCDCTRG->Clear();
 
-  m_cT0FractionsHadronECLTRG->Clear();
-  m_cT0FractionsHadronCDCTRG->Clear();
-  m_cT0FractionsHadronTOPTRG->Clear();
-  m_cT0FractionsBhaBhaECLTRG->Clear();
-  m_cT0FractionsBhaBhaCDCTRG->Clear();
-  m_cT0FractionsBhaBhaTOPTRG->Clear();
-  m_cT0FractionsMuMuECLTRG->Clear();
-  m_cT0FractionsMuMuCDCTRG->Clear();
-  m_cT0FractionsMuMuTOPTRG->Clear();
-
 }
 
-void DQMHistAnalysisEventT0Module::event()
+void DQMHistAnalysisEventT0TriggerJitterModule::event()
 {
-  std::string histname = "AlgorithmSourceFractionsHadronL1ECLTRG";
-  m_cT0FractionsHadronECLTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsHadronL1ECLTRG)) {
-    m_cT0FractionsHadronECLTRG->SetFillColor(0);
-    m_cT0FractionsHadronECLTRG->Modified();
-    m_cT0FractionsHadronECLTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for hadrons from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsHadronECLTRG->SetFillColor(kGray);
-  }
-
-  histname = "AlgorithmSourceFractionsHadronL1CDCTRG";
-  m_cT0FractionsHadronCDCTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsHadronL1CDCTRG)) {
-    m_cT0FractionsHadronCDCTRG->SetFillColor(0);
-    m_cT0FractionsHadronCDCTRG->Modified();
-    m_cT0FractionsHadronCDCTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for hadrons from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsHadronCDCTRG->SetFillColor(kGray);
-  }
-
-  histname = "AlgorithmSourceFractionsHadronL1TOPTRG";
-  m_cT0FractionsHadronTOPTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsHadronL1TOPTRG)) {
-    m_cT0FractionsHadronTOPTRG->SetFillColor(0);
-    m_cT0FractionsHadronTOPTRG->Modified();
-    m_cT0FractionsHadronTOPTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for hadrons from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsHadronTOPTRG->SetFillColor(kGray);
-  }
-
-
-  histname = "AlgorithmSourceFractionsBhaBhaL1ECLTRG";
-  m_cT0FractionsBhaBhaECLTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG)) {
-    m_cT0FractionsBhaBhaECLTRG->SetFillColor(0);
-    m_cT0FractionsBhaBhaECLTRG->Modified();
-    m_cT0FractionsBhaBhaECLTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for BhaBha from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsBhaBhaECLTRG->SetFillColor(kGray);
-  }
-
-  histname = "AlgorithmSourceFractionsBhaBhaL1CDCTRG";
-  m_cT0FractionsBhaBhaCDCTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG)) {
-    m_cT0FractionsBhaBhaCDCTRG->SetFillColor(0);
-    m_cT0FractionsBhaBhaCDCTRG->Modified();
-    m_cT0FractionsBhaBhaCDCTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for BhaBha from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsBhaBhaCDCTRG->SetFillColor(kGray);
-  }
-
-  histname = "AlgorithmSourceFractionsBhaBhaL1TOPTRG";
-  m_cT0FractionsBhaBhaTOPTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG)) {
-    m_cT0FractionsBhaBhaTOPTRG->SetFillColor(0);
-    m_cT0FractionsBhaBhaTOPTRG->Modified();
-    m_cT0FractionsBhaBhaTOPTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for BhaBha from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsBhaBhaTOPTRG->SetFillColor(kGray);
-  }
-
-
-  histname = "AlgorithmSourceFractionsMuMuL1ECLTRG";
-  m_cT0FractionsMuMuECLTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsMuMuL1ECLTRG)) {
-    m_cT0FractionsMuMuECLTRG->SetFillColor(0);
-    m_cT0FractionsMuMuECLTRG->Modified();
-    m_cT0FractionsMuMuECLTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsMuMuECLTRG->SetFillColor(kGray);
-  }
-
-  histname = "AlgorithmSourceFractionsMuMuL1CDCTRG";
-  m_cT0FractionsMuMuCDCTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsMuMuL1CDCTRG)) {
-    m_cT0FractionsMuMuCDCTRG->SetFillColor(0);
-    m_cT0FractionsMuMuCDCTRG->Modified();
-    m_cT0FractionsMuMuCDCTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsMuMuCDCTRG->SetFillColor(kGray);
-  }
-
-  histname = "AlgorithmSourceFractionsMuMuL1TOPTRG";
-  m_cT0FractionsMuMuTOPTRG->cd();
-  if (FillEfficiencyHistogram(histname, m_eAlgorithmSourceFractionsMuMuL1TOPTRG)) {
-    m_cT0FractionsMuMuTOPTRG->SetFillColor(0);
-    m_cT0FractionsMuMuTOPTRG->Modified();
-    m_cT0FractionsMuMuTOPTRG->Update();
-  } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
-    m_cT0FractionsMuMuTOPTRG->SetFillColor(kGray);
-  }
-
-  if (m_printCanvas) {
-    m_cT0FractionsHadronECLTRG->Print(Form("%s_EventT0FractionsHardronECLTRG.pdf[", m_prefixCanvas.c_str()));
-    m_cT0FractionsHadronCDCTRG->Print(Form("%s_EventT0FractionsHardronCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsHadronTOPTRG->Print(Form("%s_EventT0FractionsHardronTOPTRG.pdf", m_prefixCanvas.c_str()));
-
-    m_cT0FractionsBhaBhaECLTRG->Print(Form("%s_EventT0FractionsBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsBhaBhaCDCTRG->Print(Form("%s_EventT0FractionsBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsBhaBhaTOPTRG->Print(Form("%s_EventT0FractionsBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
-
-    m_cT0FractionsMuMuECLTRG->Print(Form("%s_EventT0FractionsMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsMuMuCDCTRG->Print(Form("%s_EventT0FractionsMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsMuMuTOPTRG->Print(Form("%s_EventT0FractionsMuMuTOPTRG.pdf]", m_prefixCanvas.c_str()));
-  }
 
 }
 
-void DQMHistAnalysisEventT0Module::endRun()
+void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
 {
   // --- TOP EventT0 plots for ECLTRG ---
 
@@ -488,7 +314,7 @@ void DQMHistAnalysisEventT0Module::endRun()
 
 }
 
-void DQMHistAnalysisEventT0Module::terminate()
+void DQMHistAnalysisEventT0TriggerJitterModule::terminate()
 {
   delete m_cTOPTimeHadronsECLTRG;
   delete m_cTOPTimeBhaBhaECLTRG;
@@ -502,20 +328,9 @@ void DQMHistAnalysisEventT0Module::terminate()
   delete m_cSVDTimeHadronsCDCTRG;
   delete m_cSVDTimeBhaBhaCDCTRG;
   delete m_cSVDTimeMuMuCDCTRG;
-
-  delete m_cT0FractionsHadronECLTRG;
-  delete m_cT0FractionsHadronCDCTRG;
-  delete m_cT0FractionsHadronTOPTRG;
-  delete m_cT0FractionsBhaBhaECLTRG;
-  delete m_cT0FractionsBhaBhaCDCTRG;
-  delete m_cT0FractionsBhaBhaTOPTRG;
-  delete m_cT0FractionsMuMuECLTRG;
-  delete m_cT0FractionsMuMuCDCTRG;
-  delete m_cT0FractionsMuMuTOPTRG;
-
 }
 
-double DQMHistAnalysisEventT0Module::fDoubleGaus(double* x, double* par)
+double DQMHistAnalysisEventT0TriggerJitterModule::fDoubleGaus(double* x, double* par)
 {
   double N = par[0];
   double frac = par[1];
@@ -527,7 +342,7 @@ double DQMHistAnalysisEventT0Module::fDoubleGaus(double* x, double* par)
   return N * frac * TMath::Gaus(x[0], mean, sigma) + N * (1 - frac) * TMath::Gaus(x[0], mean2, sigma2);
 }
 
-bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
+bool DQMHistAnalysisEventT0TriggerJitterModule::processHistogram(TH1* h,  TString tag)
 {
 
   if (h == nullptr) {
@@ -552,7 +367,7 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
   h->GetXaxis()->SetRangeUser(-50, 50);
 
   //define the fitting function
-  TF1 fitf("fit", DQMHistAnalysisEventT0Module::fDoubleGaus, -50, 50, 6);
+  TF1 fitf("fit", DQMHistAnalysisEventT0TriggerJitterModule::fDoubleGaus, -50, 50, 6);
   fitf.SetParNames("N", "f_{1}", "#mu_{1}", "#sigma_{1}", "#mu_{2}", "#sigma_{2}");
   fitf.SetParameters(0.1, 0.8, 0, 5, 0, 15);
   fitf.SetParLimits(1, 0, 1); //fraction
@@ -603,56 +418,3 @@ bool DQMHistAnalysisEventT0Module::processHistogram(TH1* h,  TString tag)
   return true;
 
 }
-
-bool DQMHistAnalysisEventT0Module::FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff)
-{
-  B2DEBUG(20, "Begin processing histogram " << histname << " ...");
-  TH1* h = findHist("EventT0/" + histname);
-  if (not h) {
-    return false;
-  }
-
-  // Admittedly quite a hacky way to obtain the normalisation values: Create a new histogram and fill each of the bins with
-  // the bin content of the -1 bin of h which is used for bin counting, and at the same time set the corresponding bin label.
-  const auto totalEntries = h->GetBinContent(-1);
-  const auto nBins = h->GetNbinsX();
-  TH1D* totalHist = new TH1D("total", "total;Algorithm;Fraction #epsilon", nBins, 0, nBins);
-  for (int i = 0; i < nBins; i++) {
-    totalHist->SetBinContent(i + 1, totalEntries);
-  }
-  eff->SetPassedHistogram(*h, "f");
-  eff->SetTotalHistogram(*totalHist, "f");
-
-  eff->Paint("AP");
-
-  TGraphAsymmErrors* graph = eff->GetPaintedGraph();
-  if (not graph) {
-    return false;
-  }
-
-  auto ax = graph->GetXaxis();
-  if (not ax) {
-    return false;
-  }
-  // Print x-axis bin labels horizontally
-  ax->SetTitleOffset(1.0);
-  ax->CenterTitle(kTRUE);
-  ax->Set(nBins, 0, nBins);
-  for (int i = 0; i < nBins; i++) {
-    ax->SetBinLabel(i + 1, c_eventT0Algorithms[i]);
-  }
-
-  auto ay = graph->GetYaxis();
-  if (not ay) {
-    return false;
-  }
-  ay->SetTitleOffset(1.0);
-  ay->SetRangeUser(0, 1.05);
-
-  graph->Draw("AP");
-
-  B2DEBUG(20, "Finished processing histogram " << histname << "!");
-
-  return true;
-}
-

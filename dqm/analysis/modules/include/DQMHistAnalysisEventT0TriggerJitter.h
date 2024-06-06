@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisEventT0.h
+// File : DQMHistAnalysisEventT0TriggerJitter.h
 // Description : module for DQM histogram analysis of trigger jitter
 //-
 
@@ -18,15 +18,15 @@
 namespace Belle2 {
 
   /** Class definition */
-  class DQMHistAnalysisEventT0Module final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisEventT0TriggerJitterModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
 
     /** Constructor */
-    DQMHistAnalysisEventT0Module();
+    DQMHistAnalysisEventT0TriggerJitterModule();
     /** Destructor */
-    ~DQMHistAnalysisEventT0Module();
+    ~DQMHistAnalysisEventT0TriggerJitterModule();
 
     /** create TCanvas and MonitoringObject */
     void initialize() override final;
@@ -95,6 +95,7 @@ namespace Belle2 {
     TCanvas* m_cSVDTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for SVD time CDCTRG time jitter bhabhas */
     TCanvas* m_cSVDTimeMuMuCDCTRG    = nullptr; /**< Canvas for SVD time CDCTRG time jitter mumu */
 
+
     TCanvas* m_cTOPTimeHadronsTOPTRG = nullptr; /**< Canvas for TOP time TOPTRG time jitter hadrons */
     TCanvas* m_cTOPTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for TOP time TOPTRG time jitter bhabhas */
     TCanvas* m_cTOPTimeMuMuTOPTRG    = nullptr; /**< Canvas for TOP time TOPTRG time jitter mumu */
@@ -107,42 +108,6 @@ namespace Belle2 {
     TCanvas* m_cCDCTimeHadronsTOPTRG = nullptr; /**< Canvas for SVD time TOPTRG time jitter hadrons */
     TCanvas* m_cCDCTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG time jitter bhabhas */
     TCanvas* m_cCDCTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG time jitter mumu */
-
-
-    TCanvas* m_cT0FractionsHadronECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG hadrons */
-    TCanvas* m_cT0FractionsHadronCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG hadrons */
-    TCanvas* m_cT0FractionsHadronTOPTRG = nullptr; /**< Canvas for time fractions for TOPTRG hadrons */
-
-    TCanvas* m_cT0FractionsBhaBhaECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG bhabhas */
-    TCanvas* m_cT0FractionsBhaBhaCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG bhabhas */
-    TCanvas* m_cT0FractionsBhaBhaTOPTRG = nullptr; /**< Canvas for time fractions for TOPTRG bhabhas */
-
-    TCanvas* m_cT0FractionsMuMuECLTRG = nullptr; /**< Canvas for time fractions for ECLTRG mumu */
-    TCanvas* m_cT0FractionsMuMuCDCTRG = nullptr; /**< Canvas for time fractions for CDCTRG mumu */
-    TCanvas* m_cT0FractionsMuMuTOPTRG = nullptr; /**< Canvas for time fractions for TOPTRG mumu */
-
-    /// EventT0 algorithms for which to calculate fractions of abundance
-    const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP", "Any"};
-    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
-    TEfficiency* m_eAlgorithmSourceFractionsHadronL1ECLTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger
-    TEfficiency* m_eAlgorithmSourceFractionsHadronL1CDCTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by TOP trigger
-    TEfficiency* m_eAlgorithmSourceFractionsHadronL1TOPTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by ECL trigger
-    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by CDC trigger
-    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by TOP trigger
-    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by ECL trigger
-    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1ECLTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by CDC trigger
-    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1CDCTRG = nullptr;
-    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by TOP trigger
-    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1TOPTRG = nullptr;
-    /// Fill the TEfficiency plots
-    bool FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff);
   };
 } // end namespace Belle2
 

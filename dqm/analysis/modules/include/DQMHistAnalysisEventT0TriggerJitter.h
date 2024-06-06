@@ -34,9 +34,6 @@ namespace Belle2 {
     /** clear TCanvas */
     void beginRun() override final;
 
-    /** Event */
-    void event() override final;
-
     /** fit the histograms */
     void endRun() override final;
 
@@ -66,48 +63,57 @@ namespace Belle2 {
     */
     static double fDoubleGaus(double* x, double* par);
 
+    void analyseECLTRGEventT0Distributions(); /**< Analyse the ECLTRG EventT0 distributions*/
+    void analyseCDCTRGEventT0Distributions(); /**< Analyse the CDCTRG EventT0 distributions*/
+    void analyseTOPTRGEventT0Distributions(); /**< Analyse the TOPTRG EventT0 distributions*/
+    void initializeCanvases(); /**< Initialise canvases */
+    void clearCanvases(); /**< Initialise canvases */
+    void printCanvases(); /**< Print canvases if required */
+    void deleteCanvases(); /**< Delete canvases */
+
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
 
-    TCanvas* m_cECLTimeHadronsECLTRG = nullptr; /**< Canvas for SVD time ECLTRG time jitter hadrons */
-    TCanvas* m_cECLTimeBhaBhaECLTRG  = nullptr; /**< Canvas for SVD time ECLTRG time jitter bhabhas */
-    TCanvas* m_cECLTimeMuMuECLTRG    = nullptr; /**< Canvas for SVD time ECLTRG time jitter mumu */
-    TCanvas* m_cCDCTimeHadronsECLTRG = nullptr; /**< Canvas for SVD time ECLTRG time jitter hadrons */
-    TCanvas* m_cCDCTimeBhaBhaECLTRG  = nullptr; /**< Canvas for SVD time ECLTRG time jitter bhabhas */
-    TCanvas* m_cCDCTimeMuMuECLTRG    = nullptr; /**< Canvas for SVD time ECLTRG time jitter mumu */
-    TCanvas* m_cTOPTimeHadronsECLTRG = nullptr; /**< Canvas for TOP time ECLTRG time jitter hadrons */
-    TCanvas* m_cTOPTimeBhaBhaECLTRG  = nullptr; /**< Canvas for TOP time ECLTRG time jitter bhabhas */
-    TCanvas* m_cTOPTimeMuMuECLTRG    = nullptr; /**< Canvas for TOP time ECLTRG time jitter mumu */
-    TCanvas* m_cSVDTimeHadronsECLTRG = nullptr; /**< Canvas for SVD time ECLTRG time jitter hadrons */
-    TCanvas* m_cSVDTimeBhaBhaECLTRG  = nullptr; /**< Canvas for SVD time ECLTRG time jitter bhabhas */
-    TCanvas* m_cSVDTimeMuMuECLTRG    = nullptr; /**< Canvas for SVD time ECLTRG time jitter mumu */
+    // ECLTRG jitter canvases
+    TCanvas* m_cECLTimeHadronsECLTRG = nullptr; /**< Canvas for ECL time ECLTRG jitter hadrons */
+    TCanvas* m_cECLTimeBhaBhaECLTRG  = nullptr; /**< Canvas for ECL time ECLTRG jitter bhabhas */
+    TCanvas* m_cECLTimeMuMuECLTRG    = nullptr; /**< Canvas for ECL time ECLTRG jitter mumu */
+    TCanvas* m_cCDCTimeHadronsECLTRG = nullptr; /**< Canvas for CDC time ECLTRG jitter hadrons */
+    TCanvas* m_cCDCTimeBhaBhaECLTRG  = nullptr; /**< Canvas for CDC time ECLTRG jitter bhabhas */
+    TCanvas* m_cCDCTimeMuMuECLTRG    = nullptr; /**< Canvas for CDC time ECLTRG jitter mumu */
+    TCanvas* m_cTOPTimeHadronsECLTRG = nullptr; /**< Canvas for TOP time ECLTRG jitter hadrons */
+    TCanvas* m_cTOPTimeBhaBhaECLTRG  = nullptr; /**< Canvas for TOP time ECLTRG jitter bhabhas */
+    TCanvas* m_cTOPTimeMuMuECLTRG    = nullptr; /**< Canvas for TOP time ECLTRG jitter mumu */
+    TCanvas* m_cSVDTimeHadronsECLTRG = nullptr; /**< Canvas for SVD time ECLTRG jitter hadrons */
+    TCanvas* m_cSVDTimeBhaBhaECLTRG  = nullptr; /**< Canvas for SVD time ECLTRG jitter bhabhas */
+    TCanvas* m_cSVDTimeMuMuECLTRG    = nullptr; /**< Canvas for SVD time ECLTRG jitter mumu */
 
+    // CDCTRG jitter canvases
+    TCanvas* m_cECLTimeHadronsCDCTRG = nullptr; /**< Canvas for ECL time CDCTRG jitter hadrons */
+    TCanvas* m_cECLTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for ECL time CDCTRG jitter bhabhas */
+    TCanvas* m_cECLTimeMuMuCDCTRG    = nullptr; /**< Canvas for ECL time CDCTRG jitter mumu */
+    TCanvas* m_cCDCTimeHadronsCDCTRG = nullptr; /**< Canvas for CDC time CDCTRG jitter hadrons */
+    TCanvas* m_cCDCTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for CDC time CDCTRG jitter bhabhas */
+    TCanvas* m_cCDCTimeMuMuCDCTRG    = nullptr; /**< Canvas for CDC time CDCTRG jitter mumu */
+    TCanvas* m_cTOPTimeHadronsCDCTRG = nullptr; /**< Canvas for TOP time CDCTRG jitter hadrons */
+    TCanvas* m_cTOPTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for TOP time CDCTRG jitter bhabhas */
+    TCanvas* m_cTOPTimeMuMuCDCTRG    = nullptr; /**< Canvas for TOP time CDCTRG jitter mumu */
+    TCanvas* m_cSVDTimeHadronsCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG jitter hadrons */
+    TCanvas* m_cSVDTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for SVD time CDCTRG jitter bhabhas */
+    TCanvas* m_cSVDTimeMuMuCDCTRG    = nullptr; /**< Canvas for SVD time CDCTRG jitter mumu */
 
-    TCanvas* m_cECLTimeHadronsCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG time jitter hadrons */
-    TCanvas* m_cECLTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for SVD time CDCTRG time jitter bhabhas */
-    TCanvas* m_cECLTimeMuMuCDCTRG    = nullptr; /**< Canvas for SVD time CDCTRG time jitter mumu */
-    TCanvas* m_cCDCTimeHadronsCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG time jitter hadrons */
-    TCanvas* m_cCDCTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for SVD time CDCTRG time jitter bhabhas */
-    TCanvas* m_cCDCTimeMuMuCDCTRG    = nullptr; /**< Canvas for SVD time CDCTRG time jitter mumu */
-    TCanvas* m_cTOPTimeHadronsCDCTRG = nullptr; /**< Canvas for TOP time CDCTRG time jitter hadrons */
-    TCanvas* m_cTOPTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for TOP time CDCTRG time jitter bhabhas */
-    TCanvas* m_cTOPTimeMuMuCDCTRG    = nullptr; /**< Canvas for TOP time CDCTRG time jitter mumu */
-    TCanvas* m_cSVDTimeHadronsCDCTRG = nullptr; /**< Canvas for SVD time CDCTRG time jitter hadrons */
-    TCanvas* m_cSVDTimeBhaBhaCDCTRG  = nullptr; /**< Canvas for SVD time CDCTRG time jitter bhabhas */
-    TCanvas* m_cSVDTimeMuMuCDCTRG    = nullptr; /**< Canvas for SVD time CDCTRG time jitter mumu */
-
-
-    TCanvas* m_cTOPTimeHadronsTOPTRG = nullptr; /**< Canvas for TOP time TOPTRG time jitter hadrons */
-    TCanvas* m_cTOPTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for TOP time TOPTRG time jitter bhabhas */
-    TCanvas* m_cTOPTimeMuMuTOPTRG    = nullptr; /**< Canvas for TOP time TOPTRG time jitter mumu */
-    TCanvas* m_cECLTimeHadronsTOPTRG = nullptr; /**< Canvas for SVD time TOPTRG time jitter hadrons */
-    TCanvas* m_cECLTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG time jitter bhabhas */
-    TCanvas* m_cECLTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG time jitter mumu */
-    TCanvas* m_cSVDTimeHadronsTOPTRG = nullptr; /**< Canvas for SVD time TOPTRG time jitter hadrons */
-    TCanvas* m_cSVDTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG time jitter bhabhas */
-    TCanvas* m_cSVDTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG time jitter mumu */
-    TCanvas* m_cCDCTimeHadronsTOPTRG = nullptr; /**< Canvas for SVD time TOPTRG time jitter hadrons */
-    TCanvas* m_cCDCTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG time jitter bhabhas */
-    TCanvas* m_cCDCTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG time jitter mumu */
+    // TOPTRG jitter canvases
+    TCanvas* m_cECLTimeHadronsTOPTRG = nullptr; /**< Canvas for ECL time TOPTRG jitter hadrons */
+    TCanvas* m_cECLTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for ECL time TOPTRG jitter bhabhas */
+    TCanvas* m_cECLTimeMuMuTOPTRG    = nullptr; /**< Canvas for ECL time TOPTRG jitter mumu */
+    TCanvas* m_cCDCTimeHadronsTOPTRG = nullptr; /**< Canvas for CDC time TOPTRG jitter hadrons */
+    TCanvas* m_cCDCTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for CDC time TOPTRG jitter bhabhas */
+    TCanvas* m_cCDCTimeMuMuTOPTRG    = nullptr; /**< Canvas for CDC time TOPTRG jitter mumu */
+    TCanvas* m_cTOPTimeHadronsTOPTRG = nullptr; /**< Canvas for TOP time TOPTRG jitter hadrons */
+    TCanvas* m_cTOPTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for TOP time TOPTRG jitter bhabhas */
+    TCanvas* m_cTOPTimeMuMuTOPTRG    = nullptr; /**< Canvas for TOP time TOPTRG jitter mumu */
+    TCanvas* m_cSVDTimeHadronsTOPTRG = nullptr; /**< Canvas for SVD time TOPTRG jitter hadrons */
+    TCanvas* m_cSVDTimeBhaBhaTOPTRG  = nullptr; /**< Canvas for SVD time TOPTRG jitter bhabhas */
+    TCanvas* m_cSVDTimeMuMuTOPTRG    = nullptr; /**< Canvas for SVD time TOPTRG jitter mumu */
   };
 } // end namespace Belle2
 

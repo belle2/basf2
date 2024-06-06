@@ -134,6 +134,11 @@ namespace Belle2 {
     static void setRunType(const Const::ERunType runType);
 
     /**
+     * Function to set if the script is running on cosmics data or not
+     */
+    static void setCosmicRun(const bool isCosmics = true);
+
+    /**
      * Function for writing the simulation steps of each event into csv files.
      * This should not be used during production jobs, but only for producing events
      * for the Belle II Virtual Reality application.

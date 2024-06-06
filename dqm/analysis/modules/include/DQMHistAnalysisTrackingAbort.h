@@ -43,6 +43,7 @@ namespace Belle2 {
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
 
+    //abort canvases
     TCanvas* m_cAbortRate = nullptr;  /**< canvas for the abort rate plot */
     TCanvas* m_cAbortRateIN = nullptr;  /**< canvas for the abort rate inside the active veto region */
     TCanvas* m_cAbortRateOUT = nullptr;  /**< canvas for the abort rate outside the active veto region */

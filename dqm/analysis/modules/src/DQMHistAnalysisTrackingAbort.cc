@@ -196,7 +196,18 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
   }
 
-  //scale average istograms
+  //scale tracking abort reason histograms
+  TH1F* hAbortReason_in = (TH1F*)findHist("TrackingAbort/TrkAbortReason_IN");
+  if (hAbortReason_in != nullptr) scaleAndSendToMirabelle(hAbortReason_in, nEventsIN, "_inActiveVeto");
+  TH1F* hAbortReason_out = (TH1F*)findHist("TrackingAbort/TrkAbortReason_OUT");
+  if (hAbortReason_out != nullptr) scaleAndSendToMirabelle(hAbortReason_out, nEventsOUT, "_outActiveVeto");
+  TH1F* hAbortReason_in_BF = (TH1F*)findHist("TrackingAbort_before_filter/TrkAbortReason_IN");
+  if (hAbortReason_in != nullptr) scaleAndSendToMirabelle(hAbortReason_in_BF, nEventsIN, "BeforeFilter_inActiveVeto");
+  TH1F* hAbortReason_out_BF = (TH1F*)findHist("TrackingAbort_before_filter/TrkAbortReason_OUT");
+  if (hAbortReason_out != nullptr) scaleAndSendToMirabelle(hAbortReason_out_BF, nEventsOUT, "BeforeFilter_outActiveVeto");
+
+
+  //scale average histograms
   TH1F* hAverage_in = (TH1F*)findHist("TrackingAbort/averages_IN");
   if (hAverage_in != nullptr) scaleAndSendToMirabelle(hAverage_in, nEventsIN, "_inActiveVeto");
 
@@ -208,6 +219,27 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
   TH1F* hAverage_out_BF = (TH1F*)findHist("TrackingAbort_before_filter/averages_OUT");
   if (hAverage_out_BF != nullptr) scaleAndSendToMirabelle(hAverage_out_BF, nEventsOUTbf, "BeforeFilter_outActiveVeto");
+
+  // average SVD L3V Occupancy to Mirabelle
+  TH1* hL3VOccIn = findHist("TrackingAbort/SVDL3UOcc_IN");
+  if (hL3VOccIn != nullptr) m_monObj->setVariable("svdL3VOcc_inActiveVeto", hL3VOccIn->GetMean());
+  TH1* hL3VOccOut = findHist("TrackingAbort/SVDL3UOcc_OUT");
+  if (hL3VOccOut != nullptr) m_monObj->setVariable("svdL3VOcc_outActiveVeto", hL3VOccOut->GetMean());
+  TH1* hL3VOccIn_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_IN");
+  if (hL3VOccIn_BF != nullptr) m_monObj->setVariable("svdL3VOccBeforeFilter_inActiveVeto", hL3VOccIn_BF->GetMean());
+  TH1* hL3VOccOut_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_OUT");
+  if (hL3VOccOut_BF != nullptr) m_monObj->setVariable("svdL3VOccBeforeFilter_outActiveVeto", hL3VOccOut_BF->GetMean());
+
+
+  // average n CDC extra hits to Mirabelle
+  TH1* hCDCExtraHitsIn = findHist("TrackingAbort/nCDCExtraHits_IN");
+  if (hCDCExtraHitsIn != nullptr) m_monObj->setVariable("nCDCExtraHits_inActiveVeto", hCDCExtraHitsIn->GetMean());
+  TH1* hCDCExtraHitsOut = findHist("TrackingAbort/nCDCExtraHits_OUT");
+  if (hCDCExtraHitsOut != nullptr) m_monObj->setVariable("nCDCExtraHits_outActiveVeto", hCDCExtraHitsOut->GetMean());
+  TH1* hCDCExtraHitsIn_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_IN");
+  if (hCDCExtraHitsIn_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_inActiveVeto", hCDCExtraHitsIn_BF->GetMean());
+  TH1* hCDCExtraHitsOut_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_OUT");
+  if (hL3VOccOut_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_outActiveVeto", hCDCExtraHitsOut_BF->GetMean());
 
   if (m_printCanvas) {
     m_cAbortRate->Print("c_TrackingAbort.pdf[");
@@ -228,11 +260,11 @@ void DQMHistAnalysisTrackingAbortModule::scaleAndSendToMirabelle(TH1F* hAverage,
   //scale the histogram to the number of events
   hAverage->Scale(1. / nEvents);
 
-  int nBins = hAverage->GetNbinsX();
+  const int nBins = hAverage->GetNbinsX();
   for (int bin = 1; bin < nBins + 1; bin++) {
-    TString binLabel = hAverage->GetXaxis()->GetBinLabel(bin);
-    TString varName = TString::Format("%s%s", binLabel.Data(), tag.Data());
-    float varValue = hAverage->GetBinContent(bin);
+    const TString binLabel = hAverage->GetXaxis()->GetBinLabel(bin);
+    const TString varName = TString::Format("%s%s", binLabel.Data(), tag.Data());
+    const float varValue = hAverage->GetBinContent(bin);
     m_monObj->setVariable(varName.Data(), varValue);
   }
 

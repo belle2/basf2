@@ -153,6 +153,7 @@ double PIDLikelihood::getLogarithmicProbability(const Const::ChargedStable& part
 
   double sum = 0;
   for (size_t i = 0; i < logLs.size(); i++) sum += priorRatios[i] * exp(logLs[i] - logL_max);
+  if (sum == 0) return +INFINITY; // to suppress cppckeck warning although this can never happen (see prev. return)
 
   return logL_part - logL_max - log(sum);
 }

@@ -47,7 +47,7 @@ void DQMHistAnalysisTrackingHLTModule::beginRun()
 {
   // get the abort rate and statThreshold from epics
   double buffMinEvents(NAN);
-  double dummyLowerAlarm, dummyLowerWarn, dummyUpperWarn, dummyUpperAlarm;
+  double dummyLowerAlarm, dummyUpperWarn, dummyUpperAlarm;
 
   // read thresholds from EPICS
   requestLimitsFromEpicsPVs("minNoEvents", dummyLowerAlarm, buffMinEvents, dummyUpperWarn, dummyUpperAlarm);
@@ -101,13 +101,14 @@ void DQMHistAnalysisTrackingHLTModule::event()
       }
 
     m_cAbortRateHER->cd();
-    m_cAbortRateHER->SetFillColor(kWhite);
+    colorizeCanvas(m_cAbortRateHER, EStatus::c_StatusDefault);
     hAbortRateHER->SetTitle("Fraction of Events with Tracking Aborts vs HER injection");
     hAbortRateHER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateHER->Draw("colz");
 
 
-  }
+  } else
+    colorizeCanvas(m_cAbortRateHER, EStatus::c_StatusTooFew);
 
   if (m_printCanvas)
     m_cAbortRateHER->Print("c_AbortRateHER.pdf");
@@ -116,6 +117,7 @@ void DQMHistAnalysisTrackingHLTModule::event()
   // check tracking abort rate VS time after last LER injection and time within a beam cycle LER
   TH2F* hAbortLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/TrkAbortVsTimeLER"));
   TH2F* hAllLER = dynamic_cast<TH2F*>(findHist("TrackingHLTDQM/allEvtsVsTimeLER"));
+
   if (hAbortLER != nullptr && hAllLER != nullptr) {
 
     TH2F* hAbortRateLER = new TH2F(*hAbortLER);
@@ -130,12 +132,13 @@ void DQMHistAnalysisTrackingHLTModule::event()
       }
 
     m_cAbortRateLER->cd();
-    m_cAbortRateLER->SetFillColor(kWhite);
+    colorizeCanvas(m_cAbortRateLER, EStatus::c_StatusDefault);
     hAbortRateLER->SetTitle("Fraction of Events with Tracking Aborts vs LER injection");
     hAbortRateLER->GetZaxis()->SetTitle("Fraction of events / bin");
     hAbortRateLER->Draw("colz");
 
-  }
+  } else
+    colorizeCanvas(m_cAbortRateLER, EStatus::c_StatusTooFew);
 
   if (m_printCanvas)
     m_cAbortRateLER->Print("c_AbortRateLER.pdf");

@@ -103,8 +103,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1* hAbortIn = findHist("TrackingAbort/EventsWithAborts_IN");
   TH1* hAbortOut = findHist("TrackingAbort/EventsWithAborts_OUT");
 
-  int nEventsIN;
-  int nEventsOUT;
+  int nEventsIN = 0;
+  int nEventsOUT = 0;
 
   if (hAbortIn != nullptr && hAbortOut) {
 
@@ -150,7 +150,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
     else colorizeCanvas(m_cAbortRate, EStatus::c_StatusGood);
 
   } else { // histograms not found
-    m_cAbortRate->SetFillColor(kGray);
+    colorizeCanvas(m_cAbortRate, EStatus::c_StatusTooFew);
   }
 
   m_cAbortRate->Modified();
@@ -161,8 +161,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1* hAbortIn_BF = findHist("TrackingAbort_before_filter/EventsWithAborts_IN");
   TH1* hAbortOut_BF = findHist("TrackingAbort_before_filter/EventsWithAborts_OUT");
 
-  int nEventsINbf;
-  int nEventsOUTbf;
+  int nEventsINbf = 0;
+  int nEventsOUTbf = 0;
 
   if (hAbortIn_BF != nullptr && hAbortOut_BF) {
 

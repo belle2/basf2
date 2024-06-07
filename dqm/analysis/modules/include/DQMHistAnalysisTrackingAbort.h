@@ -32,10 +32,9 @@ namespace Belle2 {
     /** Module function doing stuff at beginning of a run */
     void beginRun() override final;
 
-    // parameters
-    bool m_printCanvas = false; /**< if true print the pdf of the canvases */
-
   private:
+
+    bool m_printCanvas = false; /**< if true print the pdf of the canvases */
 
     int m_statThreshold = 1000; /**< minimal number of events to judge */
     double m_failureRateThreshold = 0.01; /**< above this rate, there is maybe a problem?*/

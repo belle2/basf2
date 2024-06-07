@@ -599,6 +599,7 @@ def add_weights_to_dataframe(prefix: str,
         custom_tables (dict): Dictionary containing the custom efficiency weights.
         custom_thresholds (dict): Dictionary containing the custom thresholds for the  custom efficiency weights.
         n_variations (int): Number of variations to generate.
+        generate_variations (bool): When true generate weight variations.
         weight_name (str): Name of the weight column.
         show_plots (bool): When true show the coverage plots.
         variable_aliases (dict): Dictionary containing variable aliases.
@@ -608,21 +609,16 @@ def add_weights_to_dataframe(prefix: str,
         syscorr (bool): When true assume systematics are 100% correlated defaults to true.
         **kw_args: Additional arguments for the Reweighter class.
     """
-    n_variations = 100
-    if kw_args.get('n_variations'):
-        n_variations = kw_args.get('n_variations')
-    weight_name = "Weight"
-    if kw_args.get('weight_name'):
-        weight_name = kw_args.get('weight_name')
-    fillna = 1.0
-    if kw_args.get('fillna'):
-        fillna = kw_args.get('fillna')
+    generate_variations = kw_args.get('generate_variations', True)
+    n_variations = kw_args.get('n_variations', 100)
+    weight_name = kw_args.get('weight_name', "Weight")
+    fillna = kw_args.get('fillna', 1.0)
     reweighter = Reweighter(n_variations=n_variations,
                             weight_name=weight_name,
                             fillna=fillna)
     variable_aliases = kw_args.get('variable_aliases')
-    cov_matrix = kw_args.get('cov_matrix')
     if systematic.lower() == 'custom_fei':
+        cov_matrix = kw_args.get('cov_matrix')
         reweighter.add_fei_particle(prefix=prefix,
                                     table=custom_tables,
                                     threshold=custom_thresholds,
@@ -644,7 +640,7 @@ def add_weights_to_dataframe(prefix: str,
     else:
         raise ValueError(f'Systematic {systematic} is not supported!')
 
-    result = reweighter.reweight(df)
+    result = reweighter.reweight(df, generate_variations=generate_variations)
     if kw_args.get('show_plots'):
         reweighter.print_coverage()
         reweighter.plot_coverage()

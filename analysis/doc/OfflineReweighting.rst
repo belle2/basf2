@@ -55,8 +55,8 @@ The following code snippet provides an example of reweighting particles with pre
     Please make sure that the correction tables and the ntuple are compatible before application of the weights!
     In the example above, it is expected that ``pidChargedBDTScore_e > 0.9`` cut has been already applied on ``user_df``.
 
-By default, the `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` fucntion will add ``lepminus_Weight`` and ``lepplus_Weight``
-columns to the ``user_df`` and it will add additional columns of ``lepminus_Weight_0`` to ``lepminus_Weight_99`` and
+By default, the `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` function calls will add ``lepminus_Weight`` and ``lepplus_Weight``
+columns to the ``user_df`` and they will add additional columns of ``lepminus_Weight_0`` to ``lepminus_Weight_99`` and
 ``lepplus_Weight_0`` to ``lepplus_Weight_99``, which are the variations of the nominal weights according to the total PID uncertainty.
 The systematic uncertainties can be correlated by providing the same seed value to the particles
 by providing the same ``sys_seed`` argument value to the ``add_weights_to_dataframe`` method calls.

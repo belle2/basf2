@@ -34,8 +34,8 @@ namespace Belle2 {
     /** clear TCanvas */
     void beginRun() override final;
 
-    /** fit the histograms */
-    void endRun() override final;
+    /** fit the histograms in the event */
+    void event() override final;
 
     /** delete pointers */
     void terminate() override final;

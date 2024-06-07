@@ -58,7 +58,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::beginRun()
   clearCanvases();
 }
 
-void DQMHistAnalysisEventT0TriggerJitterModule::endRun()
+void DQMHistAnalysisEventT0TriggerJitterModule::event()
 {
   analyseECLTRGEventT0Distributions();
   analyseCDCTRGEventT0Distributions();

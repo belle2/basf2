@@ -852,7 +852,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::clearCanvases()
 
 void DQMHistAnalysisEventT0TriggerJitterModule::printCanvases()
 {
-  m_cECLTimeHadronsECLTRG->Print(Form("%s_ECLTimeHadronsECLTRG.pdf", m_prefixCanvas.c_str()));
+  m_cECLTimeHadronsECLTRG->Print(Form("%s_ECLTimeHadronsECLTRG.pdf[", m_prefixCanvas.c_str()));
   m_cECLTimeBhaBhaECLTRG->Print(Form("%s_ECLTimeBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
   m_cECLTimeMuMuECLTRG->Print(Form("%s_ECLTimeMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
   m_cCDCTimeHadronsECLTRG->Print(Form("%s_CDCTimeHadronsECLTRG.pdf", m_prefixCanvas.c_str()));
@@ -889,7 +889,7 @@ void DQMHistAnalysisEventT0TriggerJitterModule::printCanvases()
   m_cTOPTimeMuMuTOPTRG->Print(Form("%s_TOPTimeMuMuTOPTRG.pdf", m_prefixCanvas.c_str()));
   m_cSVDTimeHadronsTOPTRG->Print(Form("%s_SVDTimeHadronsTOPTRG.pdf", m_prefixCanvas.c_str()));
   m_cSVDTimeBhaBhaTOPTRG->Print(Form("%s_SVDTimeBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
-  m_cSVDTimeMuMuTOPTRG->Print(Form("%s_SVDTimeMuMuTOPTRG.pdf", m_prefixCanvas.c_str()));
+  m_cSVDTimeMuMuTOPTRG->Print(Form("%s_SVDTimeMuMuTOPTRG.pdf]", m_prefixCanvas.c_str()));
 }
 
 

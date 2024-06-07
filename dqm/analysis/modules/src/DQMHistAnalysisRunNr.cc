@@ -13,7 +13,6 @@
 
 #include <dqm/analysis/modules/DQMHistAnalysisRunNr.h>
 #include <TROOT.h>
-#include <TPaveText.h>
 
 using namespace std;
 using namespace Belle2;
@@ -53,6 +52,7 @@ void DQMHistAnalysisRunNrModule::initialize()
   m_cRunNr = new TCanvas((m_histogramDirectoryName + "/c_RunNr").data());
 
   // m_monObj->addCanvas(m_cRunNr);// useful?
+  m_legend = new TPaveText(0.6, 0.6, 0.95, 0.95, "NDC");
 
   registerEpicsPV("DAQ:" + m_prefix + ":RunNr:RunNr", "RunNr");
   registerEpicsPV("DAQ:" + m_prefix + ":RunNr:Alarm", "Alarm");
@@ -66,10 +66,10 @@ void DQMHistAnalysisRunNrModule::beginRun()
 
   m_cRunNr->Clear();
   m_cRunNr->Pad()->SetFillColor(c_ColorTooFew);// Magenta or Gray
-  auto leg = new TPaveText(0.6, 0.6, 0.95, 0.95, "NDC");
-  leg->SetFillColor(kWhite);
-  leg->AddText("No data yet");
-  leg->Draw();
+  m_legend->Clear();
+  m_legend->SetFillColor(kWhite);
+  m_legend->AddText("No data yet");
+  m_legend->Draw();
 
   // make sure we reset at run start to retrigger the alarm
   double mean = 0.0; // must be double, mean of histogram -> runnr
@@ -83,9 +83,6 @@ void DQMHistAnalysisRunNrModule::event()
 {
   if (!m_cRunNr) return;
 
-  auto leg = new TPaveText(0.6, 0.6, 0.95, 0.95, "NDC");
-  leg->SetFillColor(kWhite);
-
   auto name = "hRunnr";
   auto hist = findHist(m_histogramDirectoryName, name, true); // only if updated
   if (hist) {
@@ -93,11 +90,13 @@ void DQMHistAnalysisRunNrModule::event()
     int status = c_StatusTooFew; // must be int, epics alarm status 0 = no data, 2 = o.k., 4 = not o.k.
     m_cRunNr->Clear();
     m_cRunNr->cd();
+    m_legend->Clear();
+    m_legend->SetFillColor(kWhite);
     hist->SetStats(kFALSE); // get rid of annoying box, we have our own
     hist->Draw("hist");
     mean = hist->GetMean();
     if (hist->GetEntries() > 0) {
-      leg->AddText("Contains Run: Entries");
+      m_legend->AddText("Contains Run: Entries");
       // loop over bins and check if more than one is used
       int nfilled = 0;
       for (int i = 0; i <= hist->GetXaxis()->GetNbins() + 1; i++) {
@@ -106,7 +105,7 @@ void DQMHistAnalysisRunNrModule::event()
           nfilled++;
           TString tmp;
           tmp.Form("%ld: %ld", (long int)hist->GetXaxis()->GetBinCenter(i), (long int)hist->GetBinContent(i));
-          leg->AddText(tmp);
+          m_legend->AddText(tmp);
         }
       }
       // Check number of bins filled
@@ -122,7 +121,7 @@ void DQMHistAnalysisRunNrModule::event()
     if (status == c_StatusTooFew) {
       // no data (empty) or no histogram
       m_cRunNr->Pad()->SetFillColor(c_ColorTooFew);// Magenta or Gray
-      leg->AddText("No data yet");
+      m_legend->AddText("No data yet");
     } else if (status == c_StatusGood) {
       // only one run
       m_cRunNr->Pad()->SetFillColor(c_ColorGood);// Green
@@ -131,7 +130,7 @@ void DQMHistAnalysisRunNrModule::event()
       m_cRunNr->Pad()->SetFillColor(c_ColorError);// Red
     }
 
-    leg->Draw();
+    m_legend->Draw();
 
     m_cRunNr->Modified();
     m_cRunNr->Update();
@@ -145,5 +144,7 @@ void DQMHistAnalysisRunNrModule::event()
 void DQMHistAnalysisRunNrModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisRunNr: terminate called");
+  if (m_cRunNr) delete m_cRunNr;
+  if (m_legend) delete m_legend;
 }
 

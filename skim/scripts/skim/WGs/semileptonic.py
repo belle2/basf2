@@ -280,7 +280,7 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     * ``SkimHighEff tracks thetaInCDCAcceptance AND dr < 2 AND abs(dz) < 5 AND PID>=0.01``
     * ``slowPi tracks thetaInCDCAcceptance AND dr < 2 AND abs(dz) < 5 AND useCMSFrame(p) < 0.4``
     * :math:`2.5 > p_{\\ell} > 1.1\\,\\text{GeV}`
-    * ``lepton with abs(d0) < 0.5 AND abs(z0) < 2 AND thetaInCDCAcceptance AND ID >= 0.95 AND 1.1 < useCMSFrame(p) < 2.5``
+    * ``lepton with abs(dr) < 0.5 AND abs(dz) < 2 AND thetaInCDCAcceptance AND ID >= 0.95 AND 1.1 < useCMSFrame(p) < 2.5``
     * ``1.8 < M_D0 < 2.0``
     * ``DM_Dstar_D < 0.16``
 
@@ -337,12 +337,12 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
         ma.cutAndCopyList(
             'e+:sig',
             'e+:all',
-            'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and electronID_noTOP >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
+            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and electronID_noTOP >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
             path=path)
         ma.cutAndCopyList(
             'mu+:sig',
             'mu+:all',
-            'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and muonID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5',
+            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and muonID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5',
             path=path)
 
         B0_channels = ["D*-:D0_Kpi_skimhigheff e+:sig",
@@ -411,7 +411,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     TestSampleProcess = "charged"
 

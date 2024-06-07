@@ -44,7 +44,7 @@ class SystematicsDstar(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -507,7 +507,7 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdLambdas(path=path)
@@ -696,8 +696,6 @@ class SystematicsJpsi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison_leptonID__
     __category__ = "systematics, leptonID"
-
-    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)

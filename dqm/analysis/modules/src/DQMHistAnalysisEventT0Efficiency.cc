@@ -232,10 +232,6 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
 
 }
 
-void DQMHistAnalysisEventT0EfficiencyModule::endRun()
-{
-
-}
 
 void DQMHistAnalysisEventT0EfficiencyModule::terminate()
 {

@@ -10,7 +10,8 @@ The majority of physics analyses at Belle II rely on simulation for setting up t
 The selection on simulated data (MC) will often result in a different efficiency if the same selection is applied on the real experimental data,
 hence data/MC corrections are necessary.
 The data/MC tables can be applied online, i.e. during basf2 processing, or offline, on the resulting analysis ntuples.
-These data/MC corrections depend on particle properties, so they are typically provided in bins of kinematics, channel IDs, or other properties.
+One can find the latest approved correction tables for offline reweighting in the following `Git repository <https://gitlab.desy.de/belle2/performance/correction-tables>`_.
+These data/MC corrections often depend on particle properties, so they are typically provided in bins of kinematics, channel IDs, or other properties.
 The `add_weights_to_dataframe <sysvar.add_weights_to_dataframe>` helper function can add the data/MC corrections to the ntuples according to the defined binning
 and it can simplify the uncertainty propagation. 
 
@@ -86,7 +87,7 @@ as columns within the table.
 
   from sysvar import add_weights_to_dataframe
   add_weights_to_dataframe('Btag',
-                           df,
+                           user_df,
                            systematic='custom_FEI',
                            custom_tables=table,
                            custom_thresholds=0.01,

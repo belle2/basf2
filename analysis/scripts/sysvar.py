@@ -384,13 +384,13 @@ class Reweighter:
         weight_cols = _weight_cols
         if particle.column_names:
             weight_cols = particle.column_names
-        binning_df = binning_df.fillna(self.fillna)
         binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
         particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)
         particle.plot_values = plot_values
         for col in weight_cols:
             ntuple_df[f'{particle.get_varname(col)}'] = binning_df[col]
+            ntuple_df[f'{particle.get_varname(col)}'] = ntuple_df[f'{particle.get_varname(col)}'].fillna(self.fillna)
 
     def add_pid_particle(self,
                          prefix: str,
@@ -536,7 +536,6 @@ class Reweighter:
         weight_cols = _weight_cols
         if particle.column_names:
             weight_cols = particle.column_names
-        binning_df = binning_df.fillna(self.fillna)
         binning_df = binning_df.merge(particle.merged_table[weight_cols + ['PDG', _fei_mode_col]],
                                       on=['PDG', _fei_mode_col], how='left')
         particle.coverage = 1 - binning_df[weight_cols[0]].isna().sum() / len(binning_df)

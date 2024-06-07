@@ -37,9 +37,6 @@ namespace Belle2 {
     /** Event */
     void event() override final;
 
-    /** fit the histograms */
-    void endRun() override final;
-
     /** delete pointers */
     void terminate() override final;
 

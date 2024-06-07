@@ -217,17 +217,17 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
   }
 
   if (m_printCanvas) {
-    m_cT0FractionsHadronECLTRG->Print(Form("%s_EventT0FractionsHardronECLTRG.pdf[", m_prefixCanvas.c_str()));
-    m_cT0FractionsHadronCDCTRG->Print(Form("%s_EventT0FractionsHardronCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsHadronTOPTRG->Print(Form("%s_EventT0FractionsHardronTOPTRG.pdf", m_prefixCanvas.c_str()));
+    m_cT0FractionsHadronECLTRG->Print("EventT0_Algorithm_Efficiency.pdf(");
+    m_cT0FractionsHadronCDCTRG->Print("EventT0_Algorithm_Efficiency.pdf");
+    m_cT0FractionsHadronTOPTRG->Print("EventT0_Algorithm_Efficiency.pdf");
 
-    m_cT0FractionsBhaBhaECLTRG->Print(Form("%s_EventT0FractionsBhaBhaECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsBhaBhaCDCTRG->Print(Form("%s_EventT0FractionsBhaBhaCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsBhaBhaTOPTRG->Print(Form("%s_EventT0FractionsBhaBhaTOPTRG.pdf", m_prefixCanvas.c_str()));
+    m_cT0FractionsBhaBhaECLTRG->Print("EventT0_Algorithm_Efficiency.pdf");
+    m_cT0FractionsBhaBhaCDCTRG->Print("EventT0_Algorithm_Efficiency.pdf");
+    m_cT0FractionsBhaBhaTOPTRG->Print("EventT0_Algorithm_Efficiency.pdf");
 
-    m_cT0FractionsMuMuECLTRG->Print(Form("%s_EventT0FractionsMuMuECLTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsMuMuCDCTRG->Print(Form("%s_EventT0FractionsMuMuCDCTRG.pdf", m_prefixCanvas.c_str()));
-    m_cT0FractionsMuMuTOPTRG->Print(Form("%s_EventT0FractionsMuMuTOPTRG.pdf]", m_prefixCanvas.c_str()));
+    m_cT0FractionsMuMuECLTRG->Print("EventT0_Algorithm_Efficiency.pdf");
+    m_cT0FractionsMuMuCDCTRG->Print("EventT0_Algorithm_Efficiency.pdf");
+    m_cT0FractionsMuMuTOPTRG->Print("EventT0_Algorithm_Efficiency.pdf)");
   }
 
 }

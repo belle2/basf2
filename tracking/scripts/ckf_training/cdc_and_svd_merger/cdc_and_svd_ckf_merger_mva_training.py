@@ -152,7 +152,7 @@ import simulation
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
 
 basf2.conditions.prepend_testing_payloads("localdb/database.txt")
-basf2.conditions.payload_locations = ["/localdb/"]
+basf2.conditions.prepend_globatags = ["user_ftesta_testing_CKFMVAFilter"]
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -545,6 +545,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
 class ValidationAndOptimisationTask(Basf2PathTask):
 
+    basf2.conditions.prepend_globaltag("user_ftesta_testing_CKFMVAFilter")
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
     the states, the number of best candidates kept after each filter, and similar for the result filter.
@@ -624,7 +625,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         direction = "backward"
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
-        result_filter_parameters = {"DBPayloadName": f"ckf_CDCToSVDResultFilter{fbdt_string}"}
+        result_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSeedResultFilterP{fbdt_string}"}
 
         path.add_module(
             "CDCToSVDSeedCKF",

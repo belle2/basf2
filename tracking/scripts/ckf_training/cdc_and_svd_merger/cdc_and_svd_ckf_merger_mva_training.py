@@ -149,10 +149,12 @@ from tracking.harvesting_validation.combined_module import CombinedTrackingValid
 import background
 import simulation
 
-from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
+from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string, write_tracking_mva_filter_payloads_to_db
 
+# basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+basf2.conditions.testing_payloads = ["localdb/database.txt"]
 basf2.conditions.prepend_testing_payloads("localdb/database.txt")
-basf2.conditions.prepend_globatags = ["user_ftesta_testing_CKFMVAFilter"]
+# basf2.conditions.prepend_globatags = ["user_ftesta_testing_CKFMVAFilter"]
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -545,7 +547,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
 class ValidationAndOptimisationTask(Basf2PathTask):
 
-    basf2.conditions.prepend_globaltag("user_ftesta_testing_CKFMVAFilter")
+    # basf2.conditions.prepend_globaltag("user_ftesta_testing_CKFMVAFilter")
+    basf2.conditions.testing_payloads = ["localdb/database.txt"]
+    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
     the states, the number of best candidates kept after each filter, and similar for the result filter.
@@ -625,7 +629,17 @@ class ValidationAndOptimisationTask(Basf2PathTask):
 
         direction = "backward"
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
-        result_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSeedResultFilterP{fbdt_string}"}
+
+        # write the tracking MVA filter paramaters and the cut on MVA classifier to be applied on a local db
+        iov = [0, 0, 0, -1]
+        write_tracking_mva_filter_payloads_to_db(
+            f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}",
+            iov,
+            f"trk_CDCToSVDSeedResultFilter{fbdt_string}",
+            self.result_filter_cut)
+        # basf2.conditions.testing_payloads = ["localdb/database.txt"]
+        basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+        result_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}"}
 
         path.add_module(
             "CDCToSVDSeedCKF",

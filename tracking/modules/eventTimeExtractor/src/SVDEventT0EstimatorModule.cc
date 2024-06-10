@@ -42,6 +42,10 @@ SVDEventT0EstimatorModule::SVDEventT0EstimatorModule() : Module()
            "Cut on maximum absolute value of the d0 for RecoTrack selection", m_absD0Selection);
   addParam("absZ0Selection", m_absZ0Selection,
            "Cut on maximum absolute value of the z0 for RecoTrack selection", m_absZ0Selection);
+  addParam("selectTracksFromIP", m_selectTracksFromIP,
+           "Apply the selection based on the absolute values of d0 and z0 to select tracks from the IP to compute SVDEventT0",
+           m_selectTracksFromIP);
+  addParam("useDB", m_useDB, "To compute EvetT0, use configuration of selections stored in the DB", m_useDB);
 }
 
 
@@ -82,9 +86,27 @@ void SVDEventT0EstimatorModule::event()
     const TrackFitResult seedTrackFitResult = setSeedTrackFitResult(recoTrack);
     double d0 = seedTrackFitResult.getD0();
     double z0 = seedTrackFitResult.getZ0();
+
+    bool selectTracksFromIP = m_selectTracksFromIP;
+    double ptSelection = m_ptSelection;
+    double absPzSelection = m_absPzSelection;
+    double absD0Selection = m_absD0Selection;
+    double absZ0Selection = m_absZ0Selection;
+
+    if (m_useDB) {
+      selectTracksFromIP = m_svdEventT0Config->getSelectTracksFromIP();
+      ptSelection = m_svdEventT0Config->getMinimumPtSelection();
+      absPzSelection = m_svdEventT0Config->getAbsPzSelection();
+      absD0Selection = m_svdEventT0Config->getAbsD0Selection();
+      absZ0Selection = m_svdEventT0Config->getAbsZ0Selection();
+    }
+
     // selection on recoTracks
-    if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection || std::fabs(d0) > m_absD0Selection
-        || std::fabs(z0) > m_absZ0Selection) continue;
+    if (p.Perp() < ptSelection || std::fabs(p.Z()) < absPzSelection) continue;
+
+    if (selectTracksFromIP) {
+      if (std::fabs(d0) > absD0Selection || std::fabs(z0) > absZ0Selection) continue;
+    }
 
     // use outgoing/ingoing arm time to compute SVD EventT0
     // if both outgoing and ingoing are estimated we take the smallest one

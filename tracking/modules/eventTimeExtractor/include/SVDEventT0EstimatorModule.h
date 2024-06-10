@@ -15,6 +15,7 @@
 #include <framework/dataobjects/EventT0.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dbobjects/SVDEventT0Configuration.h>
 
 #include <string>
 
@@ -43,6 +44,8 @@ namespace Belle2 {
 
   private:
 
+    DBObjPtr<SVDEventT0Configuration> m_svdEventT0Config; /**< SVD EventT0 Reconstruction Configuration payload */
+
     std::string m_eventT0Name = "EventT0"; /**< name of StoreObj EventT0  */
     std::string m_recoTracksName = "RecoTracks"; /**< name of RecoTracks StoreArray */
     StoreObjPtr<EventT0> m_eventT0; /**< EventT0 StoreObjPtr */
@@ -51,6 +54,9 @@ namespace Belle2 {
     double m_absPzSelection = 0.; /**< Cut on abs(pz) for RecoTrack selection */
     double m_absD0Selection = 0.5; /**< Cut on abs(d0), in cm, for RecoTrack selection */
     double m_absZ0Selection = 2.0; /**< Cut on abs(z0), in cm, for RecoTrack selection */
+    bool m_selectTracksFromIP = true; /**< Apply the selection based on the absolute values of d0
+    and z0 to select tracks from the IP to compute SVDEventT0 */
+    bool m_useDB = true; /**< To compute EvetT0, use configuration of selections stored in the DB */
     std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
     /** return the trackFitResult */
     const TrackFitResult setSeedTrackFitResult(const RecoTrack&

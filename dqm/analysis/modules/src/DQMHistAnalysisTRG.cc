@@ -637,6 +637,8 @@ void DQMHistAnalysisTRGModule::terminate()
 
 double DQMHistAnalysisTRGModule::getThreshold(const TH1* hist, const double lower_bound, const double widthFraction)
 {
+  if (hist == nullptr) return 0.;
+
   double movsum = 0;
   int nbins     = hist->GetNbinsX();
   int width     = nbins * widthFraction;

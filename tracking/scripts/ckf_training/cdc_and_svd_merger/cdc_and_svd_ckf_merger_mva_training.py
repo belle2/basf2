@@ -548,8 +548,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
 class ValidationAndOptimisationTask(Basf2PathTask):
 
     # basf2.conditions.prepend_globaltag("user_ftesta_testing_CKFMVAFilter")
-    basf2.conditions.testing_payloads = ["localdb/database.txt"]
-    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
+
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
     the states, the number of best candidates kept after each filter, and similar for the result filter.
@@ -568,6 +567,10 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     n_events_testing = b2luigi.IntParameter()
     #: Value of the cut on the MVA classifier output for a result candidate.
     result_filter_cut = b2luigi.FloatParameter()
+
+    #: location of the testing payloads
+    basf2.conditions.testing_payloads = ["localdb/database.txt"]
+    basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
         """

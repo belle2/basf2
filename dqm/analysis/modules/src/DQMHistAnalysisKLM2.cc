@@ -355,7 +355,7 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
 {
   effHist->Reset();
   std::unique_ptr<TH1> effClone(static_cast<TH1*>
-                                (effHist->Clone()));  //used unique pointer to free the memory & will be useful for delta plots
+                                (effHist->Clone()));   // Clone effHist, will be useful for delta plots & Smart pointer will mange memory leak
   canvas->cd();
   if (denominator != nullptr && numerator != nullptr) {
     effHist->Divide(numerator, denominator, 1, 1, "B");
@@ -374,13 +374,12 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
     if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
       B2INFO("DQMHistAnalysisKLM2: Eff Delta Num/Denom Entries is " << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
-      effClone->SetLineColor(kBlackBody);
-      effClone->Draw("SAME");
+      effClone->SetLineColor(kOrange);
+      effClone->DrawCopy("SAME"); // managed by ROOT, so it helpes in plotting even if obj deleted by smart pointer
       canvas->Modified();
       canvas->Update();
     }
   }
-
 }
 
 void DQMHistAnalysisKLM2Module::processPlaneHistogram(

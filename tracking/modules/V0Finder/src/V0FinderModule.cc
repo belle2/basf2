@@ -160,20 +160,11 @@ void V0FinderModule::event()
     const TrackFitResult* fitResult = track.getTrackFitResultWithClosestMass(Const::pion);
     B2ASSERT("No TrackFitResult available for given Track.", fitResult);
 
-    if (fitResult != nullptr) { // If the TrackFitResult exists
-      if (fitResult->getChargeSign() > 0) {
-        tracksPlus.push_back(&track);
-      }
-      if (fitResult->getChargeSign() < 0) {
-        tracksMinus.push_back(&track);
-      }
-    } else { // If the TrackFitResult does not exist
-      if (recoTrack->getChargeSeed() > 0) {
-        tracksPlus.push_back(&track);
-      }
-      if (recoTrack->getChargeSeed() < 0) {
-        tracksMinus.push_back(&track);
-      }
+    if (fitResult->getChargeSign() > 0) {
+      tracksPlus.push_back(&track);
+    }
+    if (fitResult->getChargeSign() < 0) {
+      tracksMinus.push_back(&track);
     }
 
   } // End of Track loop

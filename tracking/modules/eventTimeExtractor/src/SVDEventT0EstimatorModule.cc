@@ -64,6 +64,22 @@ void SVDEventT0EstimatorModule::initialize()
   m_recoTracks.isRequired(m_recoTracksName);
 }
 
+void SVDEventT0EstimatorModule::beginRun()
+{
+  if (m_useDB) {
+    if (!m_svdEventT0Config.isValid())
+      B2FATAL("no valid configuration found for SVD EventT0 computation");
+    else
+      B2DEBUG(20, "SVDEventT0Configuration: from now on we are using " << m_svdEventT0Config->get_uniqueID());
+
+
+    m_selectTracksFromIP = m_svdEventT0Config->getSelectTracksFromIP();
+    m_ptSelection = m_svdEventT0Config->getMinimumPtSelection();
+    m_absPzSelection = m_svdEventT0Config->getAbsPzSelection();
+    m_absD0Selection = m_svdEventT0Config->getAbsD0Selection();
+    m_absZ0Selection = m_svdEventT0Config->getAbsZ0Selection();
+  }
+}
 
 void SVDEventT0EstimatorModule::event()
 {
@@ -87,25 +103,11 @@ void SVDEventT0EstimatorModule::event()
     double d0 = seedTrackFitResult.getD0();
     double z0 = seedTrackFitResult.getZ0();
 
-    bool selectTracksFromIP = m_selectTracksFromIP;
-    double ptSelection = m_ptSelection;
-    double absPzSelection = m_absPzSelection;
-    double absD0Selection = m_absD0Selection;
-    double absZ0Selection = m_absZ0Selection;
-
-    if (m_useDB) {
-      selectTracksFromIP = m_svdEventT0Config->getSelectTracksFromIP();
-      ptSelection = m_svdEventT0Config->getMinimumPtSelection();
-      absPzSelection = m_svdEventT0Config->getAbsPzSelection();
-      absD0Selection = m_svdEventT0Config->getAbsD0Selection();
-      absZ0Selection = m_svdEventT0Config->getAbsZ0Selection();
-    }
-
     // selection on recoTracks
-    if (p.Perp() < ptSelection || std::fabs(p.Z()) < absPzSelection) continue;
+    if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
 
-    if (selectTracksFromIP) {
-      if (std::fabs(d0) > absD0Selection || std::fabs(z0) > absZ0Selection) continue;
+    if (m_selectTracksFromIP) {
+      if (std::fabs(d0) > m_absD0Selection || std::fabs(z0) > m_absZ0Selection) continue;
     }
 
     // use outgoing/ingoing arm time to compute SVD EventT0

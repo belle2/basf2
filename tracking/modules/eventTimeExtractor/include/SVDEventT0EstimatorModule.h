@@ -39,6 +39,9 @@ namespace Belle2 {
     /** Initialize the SVDEventT0Estimator.*/
     virtual void initialize() override;
 
+    /** Configure */
+    void beginRun() override;
+
     /** This method is the core of the SVDEventT0Estimator. */
     virtual void event() override;
 
@@ -58,7 +61,7 @@ namespace Belle2 {
     and z0 to select tracks from the IP to compute SVDEventT0 */
     bool m_useDB = true; /**< To compute EvetT0, use configuration of selections stored in the DB */
     std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
-    /** return the trackFitResult */
+
     const TrackFitResult setSeedTrackFitResult(const RecoTrack&
                                                recoTrack); /**< return the TrackFitResult from the seed quantities of the RecoTrack */
   };

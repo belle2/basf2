@@ -12,14 +12,14 @@
 
 namespace Belle2 {
   /**
-  *    * This class store the reconstruction configuration of SVD
-  *       */
+   * This class store the configuration of the selections applied on the tracks used to compute the SVD EventT0
+   */
 
   class SVDEventT0Configuration: public TObject {
   public:
     /**
-    *     * Default constructor
-    *         */
+     * Default constructor
+     */
     SVDEventT0Configuration(const TString& uniqueID = "")
       : m_uniqueID(uniqueID)
       , m_selectTracksFromIP(true)
@@ -93,7 +93,7 @@ namespace Belle2 {
 
   private:
 
-    /** unique identifier of the SVD reconstruction configuration payload */
+    /** unique identifier of the SVD EventT0 configuration payload */
     TString m_uniqueID;
 
     bool m_selectTracksFromIP; /**< Apply the selection based on the absolute values of d0 */

@@ -496,13 +496,13 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.rankByLowest("D+:KKpi", variable="abs(dM)", numBest=15, path=path)
         ma.copyLists("D+:sig", ['D+:Kpipi_BtoDl', 'D+:Kspi_BtoDl', 'D+:KKpi'], path=path)
 
-# No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
+        # No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
 
         ma.reconstructDecay("D*+:D0        -> pi+:slow D0:sig", cut="abs(dQ) < 0.0035", dmID=11, path=path)
         ma.rankByLowest("D*+:D0", variable="abs(dQ)", numBest=15, path=path)
         ma.copyLists("D*+:sig", ['D*+:D0'], path=path)
 
-# B reconstruction.  Use wide cut on cosThetaBY.
+        # B reconstruction.  Use wide cut on cosThetaBY.
 
         ma.reconstructDecay('anti-B0:Dpe  ->  e-:sig D+:sig ?nu ', BSLRecoCut, dmID=200, path=path)
         ma.reconstructDecay('anti-B0:Dpmu -> mu-:sig D+:sig ?nu ', BSLRecoCut, dmID=201, path=path)
@@ -519,17 +519,17 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.copyLists('B-:D0l', ['B-:D0e', 'B-:D0mu'], path=path)
         ma.rankByHighest('B-:D0l', variable='InvM', numBest=9, path=path)
 
-# master SL B lists
+        # main SL B lists
         ma.copyLists('B-:SL', ['B-:D0l'], path=path)
         ma.copyLists('anti-B0:SL', ['anti-B0:Dspl', 'anti-B0:Dpl'], path=path)
 
-# Build ROE and look for e-, mu-, charged multiplicity and E_ECL
+        # Build ROE and look for e-, mu-, charged multiplicity and E_ECL
 
         for Btype in ['B-:SL', 'anti-B0:SL']:
 
             roe_path = b2.create_path()
             deadEndPath = b2.create_path()
-# Execute the filter module:
+            # Execute the filter module:
             ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
             ma.appendROEMasks(Btype, [cleanMask], path=path)
             ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
@@ -558,7 +558,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
         vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
-#  Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
+        # Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
 
         ma.applyCuts('B-:SL', f'passesCut({BSLSkimCut})', path=path)
         ma.applyCuts('anti-B0:SL', f'passesCut({BSLSkimCut})', path=path)

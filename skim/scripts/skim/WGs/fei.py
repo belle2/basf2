@@ -556,18 +556,6 @@ class feiSLB0_RDstar(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
-
-        ma.fillParticleList(decayString="pi+:FEI_cleaned",
-                            cut=CleanedTrackCuts, path=path)
-        ma.fillParticleList(decayString="gamma:FEI_cleaned",
-                            cut=CleanedClusterCuts, path=path)
-
-        ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
-                                                "gamma:FEI_cleaned"],
-                                path=path)
-
         ma.buildEventShape(inputListNames=['pi+:FEI_cleaned', 'gamma:FEI_cleaned'],
                            allMoments=True,
                            foxWolfram=True,

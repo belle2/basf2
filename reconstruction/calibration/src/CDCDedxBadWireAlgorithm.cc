@@ -76,12 +76,16 @@ CalibrationAlgorithm::EResult CDCDedxBadWireAlgorithm::calibrate()
   m_amean = hvarall.GetMean();
   m_arms = hvarall.GetRMS();
 
-  //return if >5% bad wire or null histogram
-  int minstat = 0;
-  for (unsigned int jw = 0; jw < c_nwireCDC; ++jw)
-    if (vhitvar[jw].size() <= 100) minstat++;
+  // Commenting minstat cut on March 2024,
+  //it is not worth to skip the calibration if there is more than 5% bad/dead wires
 
-  if (minstat > 0.05 * c_nwireCDC || m_amean == 0 || m_arms == 0)  return c_NotEnoughData;
+  //return if >5% bad wire or null histogram
+  // int minstat = 0;
+  // for (unsigned int jw = 0; jw < c_nwireCDC; ++jw)
+  //   if (vhitvar[jw].size() <= 100) minstat++;
+  // if (minstat > 0.05 * c_nwireCDC) return c_NotEnoughData;
+
+  if (m_amean == 0 || m_arms == 0)  return c_NotEnoughData;
 
   map<int, vector<double>> qapars;
   vector<double> vdefectwires, vbadwires, vdeadwires;

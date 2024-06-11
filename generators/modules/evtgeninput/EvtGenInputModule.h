@@ -8,9 +8,9 @@
 
 #pragma once
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/evtgen/EvtGenInterface.h>
 #include <generators/utilities/InitialParticleGeneration.h>
-#include <framework/core/Module.h>
 #include <framework/dataobjects/MCInitialParticles.h>
 
 #include <string>
@@ -22,7 +22,7 @@ namespace Belle2 {
    * interface for EvtGen Event Generator
    * stores generated particles in MCParticles.
    */
-  class EvtGenInputModule : public Module {
+  class EvtGenInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -36,13 +36,13 @@ namespace Belle2 {
     virtual ~EvtGenInputModule() {}
 
     /** Initializes the module. */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** Method is called for each run. */
     virtual void beginRun() override;
 
     /** Method is called for each event. */
-    virtual  void event() override;
+    virtual void generatorEvent() override;
 
   protected:
 

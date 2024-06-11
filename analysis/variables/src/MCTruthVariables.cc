@@ -944,6 +944,22 @@ namespace Belle2 {
         return 1;
     }
 
+    int ancestorBIndex(const Particle* particle)
+    {
+      const MCParticle* mcpart = particle->getMCParticle();
+
+      while (mcpart) {
+        int pdg = std::abs(mcpart->getPDG());
+
+        if ((pdg == 521) || (pdg == 511))
+          return mcpart->getArrayIndex();
+
+        mcpart = mcpart->getMother();
+      }
+
+      return -1;
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
@@ -982,6 +998,8 @@ namespace Belle2 {
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
                       "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
+    REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
+                      "Returns array index of B ancestor, or -1 if no B or no MC-matching is found.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle\n\n", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,

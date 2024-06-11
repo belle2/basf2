@@ -72,15 +72,23 @@ namespace Belle2 {
       std::string refhist_name;
       /** related canvas name name */
       TCanvas* canvas{nullptr};
-      /** pointer to the reference histogram */
+      /** pointer to the org reference histogram */
+      TH1* ref_org{nullptr};
+      /** pointer to the cloned/scaled reference histogram */
       TH1* ref_clone{nullptr};
     } REFNODE;
 
     /** Struct for reference histogram  */
-    std::vector<REFNODE*> m_pnode;
+    std::vector<REFNODE> m_pnode;
 
     /** Reference Histogram Root file name */
     std::string m_referenceFile;
+
+    /** Is first event in run */
+    bool m_firstInRun = true;
+
+    /** Reads reference histograms from input root file */
+    void loadReferenceHistos();
 
   };
 } // end namespace Belle2

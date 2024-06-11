@@ -1,5 +1,26 @@
+Changes in the analysis package in light-2405-quaxo
+---------------------------------------------------
+
+Modules
++++++++
+* Removed the cut functionality from the `KlongMomentumCalculatorExpert` module.
+
+Variables
++++++++++
+* Added the variables `beamBackgroundReuseRate` and `beamBackgroundEvents` for studying the Beam Background Overlay events
+  used for producing MC samples.
+* Added the metavariables `sumValueInList` and `productValueInList`, which return the sum and product
+  of the given variable of the particles in the given particle list.
+
+
 Changes in the analysis package in light-2403-persian
 -----------------------------------------------------
+
+Modules
++++++++
+* Added a new option ``storeEventType`` in `VariablesToNtuple` and `VariablesToEventBasedTree` to store the MC event type
+  information in the branch ``__eventType__`` with the string data type, e.g. ``mixed``, ``ccbar``. This information is available
+  from MC16 on. For MC15 or older and for data, the branch will be empty. By default, the option is true.
 
 Command line tools
 ++++++++++++++++++
@@ -14,7 +35,15 @@ Variables
   These variable work both on MC-matched track-based Particles and on Particles made from MCParticles.
 * Added the variable `genQ2PmPd`, which calculates the generated value of the four-momentum transfer squared using the
   four-momentum difference of the mother particle and given daughter particles: :math:`(p_m - p_{d_i} -  p_{d_j} - ...)^2`.
+* Added MetaVariable `deltaPhiToMostB2BPhiInList`, which returns the abs(phi difference) to the most back-to-back in phi 
+  (closest to 180 degrees) particle in the provided particle list.  
+* Added the variable `ancestorBIndex`, which returns the array index of the B ancestor of the particle if a MC-match is found and the B exists,
+  and -1 if not.
 
+GraFEI
+++++++
+* A first version of the :ref:`GraFEI` (GraFEI) is introduced. The basic principles and instructions on 
+  how to train and apply the model are available in the dedicated page.
 
 Changes in the analysis package in light-2401-ocicat
 ----------------------------------------------------

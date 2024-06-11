@@ -30,7 +30,7 @@ REG_MODULE(EvtGenInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtGenInputModule::EvtGenInputModule() : Module(),
+EvtGenInputModule::EvtGenInputModule() : GeneratorBaseModule(),
   m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
@@ -51,7 +51,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 }
 
 
-void EvtGenInputModule::initialize()
+void EvtGenInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
@@ -90,7 +90,7 @@ MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double
 
 
 
-void EvtGenInputModule::event()
+void EvtGenInputModule::generatorEvent()
 {
   B2DEBUG(10, "Starting event generation");
 

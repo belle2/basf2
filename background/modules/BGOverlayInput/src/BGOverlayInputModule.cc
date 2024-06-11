@@ -11,6 +11,7 @@
 
 /* Basf2 headers. */
 #include <framework/dataobjects/BackgroundInfo.h>
+#include <framework/dataobjects/BackgroundMetaData.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/datastore/DataStore.h>
@@ -133,7 +134,7 @@ void BGOverlayInputModule::initialize()
   bkgInfo->setMethod(BackgroundInfo::c_Overlay);
   BackgroundInfo::BackgroundDescr descr;
   descr.tag = BackgroundMetaData::bg_other;
-  descr.type = string("RandomTrigger");
+  descr.type = std::string(BackgroundMetaData::getDefaultBackgroundOverlayType());
   descr.fileNames = m_inputFileNames;
   descr.numEvents = m_numEvents;
   m_index = bkgInfo->appendBackgroundDescr(descr);

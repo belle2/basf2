@@ -591,11 +591,7 @@ class feiSLB0_RDstar(BaseFEISkim):
                 "foxWolframR2_maskedNaN<0.40",
             ]
         )
-        eselect = b2.register_module('VariableToReturnValue')
-        eselect.param('variable', 'passesEventCut(' + EventCuts + ')')
-        path.add_module(eselect)
-        empty_path = b2.create_path()
-        eselect.if_value('<1', empty_path)
+        path = self.skim_event_cuts(EventCuts, path=path)
 
         # tightened cuts on sigprob and cosThetaBY
         TighterCuts = " and ".join(

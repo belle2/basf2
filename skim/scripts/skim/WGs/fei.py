@@ -224,7 +224,7 @@ class BaseFEISkim(BaseSkim):
 
     def additional_setup(self, path):
         """Apply pre-FEI event-level cuts and apply the FEI. This setup function is run
-        by all FEI skims, so they all have the save event-level pre-cuts.
+        by all FEI skims, so they all have the same event-level pre-cuts.
 
         This function passes `FEIChannelArgs` to the cached function `run_fei_for_skims`
         to avoid applying the FEI twice.
@@ -363,7 +363,7 @@ class feiHadronicB0(BaseFEISkim):
                           ('decayModeID', 26, 0, 26, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -440,7 +440,7 @@ class feiHadronicBplus(BaseFEISkim):
                           ('decayModeID', 29, 0, 29, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -515,7 +515,7 @@ class feiSLB0(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -634,7 +634,7 @@ class feiSLB0_RDstar(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -709,7 +709,7 @@ class feiSLBplus(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -805,7 +805,7 @@ class feiHadronic_DstEllNu(BaseFEISkim):
             ma.applyCuts(BList, "cosTBTO < 0.9", path=path)
             # Keep only the best 2 candidates that survive based on the Signal probability.
             # The second candidate is kept just in case an analyst wishes to
-            # perform some tag sipyde studies
+            # perform some tag side studies
             ma.rankByHighest(
                 particleList=BList,
                 variable="extraInfo(SignalProbability)",

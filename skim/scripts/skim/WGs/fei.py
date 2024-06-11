@@ -580,22 +580,11 @@ class feiSLB0_RDstar(BaseFEISkim):
                            checkForDuplicates=True,
                            path=path)
 
-        # additional cut on Fox WR R2
+        # tightened cuts on sigprob and cosThetaBY as well as additional cut on Fox WR R2
         vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-
-        EventCuts = " and ".join(
-            [
-                f"nCleanedTracks({CleanedTrackCuts})>=3",
-                f"nCleanedECLClusters({CleanedClusterCuts})>=3",
-                "visibleEnergyOfEventCMS>4",
-                "foxWolframR2_maskedNaN<0.40",
-            ]
-        )
-        path = self.skim_event_cuts(EventCuts, path=path)
-
-        # tightened cuts on sigprob and cosThetaBY
         TighterCuts = " and ".join(
             [
+                "foxWolframR2_maskedNaN<0.4",
                 "dmID < 8",
                 "log10(sigProb) > -2.0",
                 "-1.75 < cosThetaBY < 1.1",

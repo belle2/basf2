@@ -321,10 +321,7 @@ class feiHadronicB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:generic", "Mbc>5.2", path=path)
-        ma.applyCuts("B0:generic", "abs(deltaE)<0.300", path=path)
-        ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
-
+        ma.applyCuts("B0:generic", "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==23]", path=path)
         return ["B0:generic"]
 
     def validation_histograms(self, path):
@@ -401,10 +398,7 @@ class feiHadronicBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:generic", "Mbc>5.2", path=path)
-        ma.applyCuts("B+:generic", "abs(deltaE)<0.300", path=path)
-        ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-
+        ma.applyCuts("B+:generic", "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==25]", path=path)
         return ["B+:generic"]
 
     def validation_histograms(self, path):
@@ -483,11 +477,8 @@ class feiSLB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:semileptonic", "dmID<8", path=path)
-        ma.applyCuts("B0:semileptonic", "log10(sigProb)>-2.4", path=path)
-        ma.applyCuts("B0:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
-        ma.applyCuts("B0:semileptonic", "p_lepton_CMSframe>1.0", path=path)
-
+        Bcuts = " and ".join(["dmID < 8", "log10(sigProb) > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.applyCuts("B0:semileptonic", Bcuts, path=path)
         return ["B0:semileptonic"]
 
     def validation_histograms(self, path):
@@ -561,11 +552,8 @@ class feiSLBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:semileptonic", "dmID<8", path=path)
-        ma.applyCuts("B+:semileptonic", "log10_sigProb>-2.4", path=path)
-        ma.applyCuts("B+:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
-        ma.applyCuts("B+:semileptonic", "p_lepton_CMSframe>1.0", path=path)
-
+        Bcuts = " and ".join(["dmID < 8", "log10_sigProb > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.applyCuts("B+:semileptonic", Bcuts, path=path)
         return ["B+:semileptonic"]
 
     def validation_histograms(self, path):
@@ -641,18 +629,11 @@ class feiHadronic(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiHadronic", "B0:generic", path=path)
-        ma.copyList("B+:feiHadronic", "B+:generic", path=path)
-        HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]
-
-        for BList in HadronicBLists:
-            ma.applyCuts(BList, "Mbc>5.2", path=path)
-            ma.applyCuts(BList, "abs(deltaE)<0.300", path=path)
-
-        ma.applyCuts("B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-        ma.applyCuts("B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
-
-        return HadronicBLists
+        ma.cutAndCopyList("B0:feiHadronic", "B0:generic",
+                          "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==23]", path=path)
+        ma.cutAndCopyList("B+:feiHadronic", "B+:generic",
+                          "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==25]", path=path)
+        return ["B0:feiHadronic", "B+:feiHadronic"]
 
 
 @_FEI_skim_header(["B0", "B+"])
@@ -686,14 +667,7 @@ class feiSL(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiSL", "B0:semileptonic", path=path)
-        ma.copyList("B+:feiSL", "B+:semileptonic", path=path)
-        SLBLists = ["B0:feiSL", "B+:feiSL"]
-
-        Bcuts = ["log10_sigProb>-2.4", "-4.0<cosThetaBY<3.0", "p_lepton_CMSframe>1.0"]
-
-        for BList in SLBLists:
-            for cut in Bcuts:
-                ma.applyCuts(BList, cut, path=path)
-
-        return SLBLists
+        Bcuts = " and ".join(["log10_sigProb > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.cutAndCopyList("B0:feiSL", "B0:semileptonic", Bcuts, path=path)
+        ma.cutAndCopyList("B+:feiSL", "B+:semileptonic", Bcuts, path=path)
+        return ["B0:feiSL", "B+:feiSL"]

@@ -212,6 +212,7 @@ class SLUntagged(BaseSkim):
         loadStdDstarPlus(path=path)
 
     def build_lists(self, path):
+        path = self.skim_event_cuts("nTracks > 4", path=path)
         ma.cutAndCopyList("e+:SLUntagged", "e+:all", "p>0.35", True, path=path)
         ma.cutAndCopyList("mu+:SLUntagged", "mu+:all", "p>0.35", True, path=path)
         Bcuts = "5.24 < Mbc < 5.29 and abs(deltaE) < 0.5"
@@ -231,13 +232,11 @@ class SLUntagged(BaseSkim):
         bplusList = []
         for chID, channel in enumerate(BplusChannels):
             ma.reconstructDecay(f"B+:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
-            ma.applyCuts(f"B+:SLUntagged_{chID}", "nTracks>4", path=path)
             bplusList.append(f"B+:SLUntagged_{chID}")
 
         b0List = []
         for chID, channel in enumerate(B0Channels):
             ma.reconstructDecay(f"B0:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
-            ma.applyCuts(f"B0:SLUntagged_{chID}", "nTracks>4", path=path)
             b0List.append(f"B0:SLUntagged_{chID}")
 
         return b0List + bplusList

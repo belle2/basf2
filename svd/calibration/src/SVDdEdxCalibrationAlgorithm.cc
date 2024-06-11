@@ -7,8 +7,9 @@
  **************************************************************************/
 
 #include <svd/calibration/SVDdEdxCalibrationAlgorithm.h>
-#include <framework/database/DBObjPtr.h>
-#include <reconstruction/dbobjects/DedxPDFs.h>
+// #include <framework/database/DBObjPtr.h>
+// #include <reconstruction/dbobjects/DedxPDFs.h>
+#include <svd/dbobjects/SVDdEdxPDFs.h>
 #include <tuple>
 
 #include <TROOT.h>
@@ -53,11 +54,12 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 
   const auto exprun = getRunList()[0];
   B2INFO("ExpRun used for calibration: " << exprun.first << " " << exprun.second);
-  updateDBObjPtrs(1, exprun.second, exprun.first);
+  // updateDBObjPtrs(1, exprun.second, exprun.first);
 
-  DBObjPtr<DedxPDFs> m_DBDedxPDFs;
-  if (!m_DBDedxPDFs)
-    B2FATAL("No VXD dEdx PDFs available");
+  // DBObjPtr<DedxPDFs> m_DBDedxPDFs;
+  // if (!m_DBDedxPDFs)
+  //   B2FATAL("No VXD dEdx PDFs available");
+  auto payload = new Belle2::SVDdEdxPDFs();
 
   // Get data objects
   auto ttreeLambda = getObjectPtr<TTree>("Lambda");
@@ -73,62 +75,85 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   TH2F h_LambdaP = LambdaMassFit(ttreeLambda);
   auto [h_DstarK, h_DstarPi, h_DstarMu] = DstarMassFit(ttreeDstar);
   TH2F h_GammaE = GammaHistogram(ttreeGamma);
+  std::vector<double> pbins = CreatePBinningScheme();
+  TH2F h_Empty("h_Empty", "A histogram returned if we cannot calibrate", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
+  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
+    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+      h_Empty.SetBinContent(pbin, dedxbin, 0.01);
+    };
+  }
+
+  B2INFO("Histograms are ready, proceed to creating the payload object...");
   //    Belle2::DedxPDFs* pdfs = (Belle2::DedxPDFs*)runfile->Get("DedxPDFs");
   std::vector<TH2F*> hDedxPDFs(6);
 
   std::array<std::string, 6> part = {"Electron", "Muon", "Pion", "Kaon", "Proton", "Deuteron"};
-  std::array<std::string, 3> det = {"PXD", "VXD", "CDC"};
+  // std::array<std::string, 3> det = {"PXD", "VXD", "CDC"};
 
   TCanvas* candEdx = new TCanvas("candEdx", "SVD dEdx payloads", 1200, 700);
   candEdx->Divide(3, 2);
   gStyle->SetOptStat(11);
+  // TFile* fout = new TFile("hDedxPDFs_payload.root", "RECREATE");
+  // for (const auto& idet : det) {
+  for (bool trunmean : {false, true}) {
+    for (int iPart = 0; iPart < 6; iPart++) {
+      // if (idet.compare("PXD") == 0)
+      //   hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getPXDPDF(iPart, trunmean);
+      // else if (idet.compare("VXD") == 0) {
 
-  TFile* fout = new TFile("hDedxPDFs_payload.root", "RECREATE");
-  for (const auto& idet : det) {
-    for (bool trunmean : {false, true}) {
-      for (int iPart = 0; iPart < 6; iPart++) {
-        if (idet.compare("PXD") == 0)
-          hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getPXDPDF(iPart, trunmean);
-        else if (idet.compare("VXD") == 0) {
-
-          if (iPart == 0 && trunmean)
-            hDedxPDFs[iPart] = &h_GammaE;
-          else if (iPart == 1 && trunmean)
-            hDedxPDFs[iPart] = &h_DstarMu;
-          else if (iPart == 2 && trunmean)
-            hDedxPDFs[iPart] = &h_DstarPi;
-          else if (iPart == 3 && trunmean)
-            hDedxPDFs[iPart] = &h_DstarK;
-          else if (iPart == 4 && trunmean)
-            hDedxPDFs[iPart] = &h_LambdaP;
-          else
-            hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getSVDPDF(iPart, trunmean);
-
-          candEdx->cd(iPart + 1);
-          hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
-          hDedxPDFs[iPart]->DrawCopy("colz");
-          if (m_isMakePlots) {
-            candEdx->SaveAs("Plots_SVDDedxPDFs_wTruncMean.pdf");
-          }
-        } else if (idet.compare("CDC") == 0)
-          hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getCDCPDF(iPart, trunmean);
-        hDedxPDFs[iPart]->Write();
+      if (iPart == 0 && trunmean) {
+        hDedxPDFs[iPart] = &h_GammaE;
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 1 && trunmean) {
+        hDedxPDFs[iPart] = &h_DstarMu;
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 2 && trunmean) {
+        hDedxPDFs[iPart] = &h_DstarPi;
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 3 && trunmean) {
+        hDedxPDFs[iPart] = &h_DstarK;
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 4 && trunmean) {
+        hDedxPDFs[iPart] = &h_LambdaP;
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       }
-      // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
+      // else if (iPart == 5 && trunmean)
+      // { // for deuteron, set equal to that of the proton
+
+      //   hDedxPDFs[iPart] = &h_LambdaP;
+      //   hDedxPDFs[iPart]->SetTitle("hist_d1_1000010020_trunc");
+      //   payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+
+      // }
+      else
+        hDedxPDFs[iPart] = &h_Empty;//(TH2F*)m_DBDedxPDFs->getSVDPDF(iPart, trunmean);
+
+      candEdx->cd(iPart + 1);
+      hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
+      hDedxPDFs[iPart]->DrawCopy("colz");
+
+      if (m_isMakePlots) {
+        candEdx->SaveAs("Plots_SVDDedxPDFs_wTruncMean.pdf");
+      }
+      // } else if (idet.compare("CDC") == 0)
+      //   hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getCDCPDF(iPart, trunmean);
+      // hDedxPDFs[iPart]->Write();
     }
+    // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
   }
+  // }
 
-  fout->Close();
+  // fout->Close();
 
-  TFile* fout_read = new TFile("hDedxPDFs_payload.root", "READ"); // not sure if it's the best way to handle this
+  // TFile* fout_read = new TFile("hDedxPDFs_payload.root", "READ"); // not sure if it's the best way to handle this
   // TClonesArray dedxPDFs("Belle2::DedxPDFs");
-  auto payload = new Belle2::DedxPDFs(fout_read);
+  // auto payload = new Belle2::DedxPDFs(fout_read);
   // new (dedxPDFs[0]) DedxPDFs(fout_read);
-  saveCalibration(payload, "DedxPDFs");
+  saveCalibration(payload, "SVDdEdxPDFs"); //"DedxPDFs");
 
   B2INFO("SVD dE/dx calibration done!");
 
-  fout_read->Close();
+  // fout_read->Close();
   return c_OK;
 }
 
@@ -140,7 +165,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   RooRealVar InvM("InvM", "m(p^{+}#pi^{-})", 1.1, 1.13, "GeV/c^{2}");
 
-  RooRealVar p_pSVD("p_pSVD", "momentum for p", -1.e8, 1.e8);
+  RooRealVar p_p("p_p", "momentum for p", -1.e8, 1.e8);
   RooRealVar p_SVDdEdx("p_SVDdEdx", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
@@ -150,7 +175,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   variables->add(InvM);
 
-  variables->add(p_pSVD);
+  variables->add(p_p);
   variables->add(p_SVDdEdx);
   variables->add(exp);
   variables->add(run);
@@ -260,28 +285,11 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   B2INFO("Lambda: sPlot done. Proceed to histogramming");
 
-  // const int m_numDEdxBins = 100;
-  // const int m_numPBins = 69;
-
-  // double pbins[m_numPBins + 1];
-  // pbins[0] = 0.0;
-  // pbins[1] = 0.05;
-
-  // for (int iBin = 2; iBin <= m_numPBins; iBin++) {
-  //   if (iBin <= 19)
-  //     pbins[iBin] = 0.025 + 0.025 * iBin;
-  //   else if (iBin <= 59)
-  //     pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
-  //   else
-  //     pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
-  // }
   std::vector<double> pbins = CreatePBinningScheme();
-
-  // double m_dedxCutoff = 5.e6;
 
   TH2F* h_LambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
-  treeLambda_sw->Draw("p_SVDdEdx:p_pSVD>>hist_d1_2212_trunc", "nSignalLambda_sw * (p_pSVD>0.15) * (p_SVDdEdx>0)", "goff");
+  treeLambda_sw->Draw("p_SVDdEdx:p_p>>hist_d1_2212_trunc", "nSignalLambda_sw * (p_p>0.15) * (p_SVDdEdx>0)", "goff");
 
   // for each momentum bin, normalize the pdf
 
@@ -321,11 +329,11 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
 
   RooRealVar deltaM("deltaM", "m(D*)-m(D^{0})", 0.139545, 0.151, "GeV/c^{2}");
 
-  RooRealVar K_pSVD("K_pSVD", "momentum for Kaon(GeV)", -1.e8, 1.e8);
+  RooRealVar K_p("K_p", "momentum for Kaon(GeV)", -1.e8, 1.e8);
   RooRealVar K_SVDdEdx("K_SVDdEdx", "", -1.e8, 1.e8);
-  RooRealVar pi_pSVD("pi_pSVD", "momentum for pion(GeV)", -1.e8, 1.e8);
+  RooRealVar pi_p("pi_p", "momentum for pion(GeV)", -1.e8, 1.e8);
   RooRealVar pi_SVDdEdx("pi_SVDdEdx", "", -1.e8, 1.e8);
-  RooRealVar piS_pSVD("piS_pSVD", "momentum for slow pion(GeV)", -1.e8, 1.e8);
+  RooRealVar piS_p("piS_p", "momentum for slow pion(GeV)", -1.e8, 1.e8);
   RooRealVar piS_SVDdEdx("piS_SVDdEdx", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
@@ -333,11 +341,11 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
 
   auto variables = new RooArgSet();
   variables->add(deltaM);
-  variables->add(K_pSVD);
+  variables->add(K_p);
   variables->add(K_SVDdEdx);
-  variables->add(pi_pSVD);
+  variables->add(pi_p);
   variables->add(pi_SVDdEdx);
-  variables->add(piS_pSVD);
+  variables->add(piS_p);
   variables->add(piS_SVDdEdx);
   variables->add(exp);
   variables->add(run);
@@ -435,23 +443,7 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   B2INFO("Dstar: sPlot done. Proceed to histogramming");
 
   std::vector<double> pbins = CreatePBinningScheme();
-  // const int m_numDEdxBins = 100;
-  // const int m_numPBins = 69;
 
-  // double pbins[m_numPBins + 1];
-  // pbins[0] = 0.0;
-  // pbins[1] = 0.05;
-
-  // for (int iBin = 2; iBin <= m_numPBins; iBin++) {
-  //   if (iBin <= 19)
-  //     pbins[iBin] = 0.025 + 0.025 * iBin;
-  //   else if (iBin <= 59)
-  //     pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
-  //   else
-  //     pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
-  // }
-
-  // double m_dedxCutoff = 5.e6;
   // the kaon payload
   TH2F* h_DstarK = new TH2F("hist_d1_321_trunc", "hist_d1_321_trunc", m_numPBins, pbins.data(),
                             m_numDEdxBins, 0, m_dedxCutoff);
@@ -459,13 +451,13 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   TH2F* h_DstarPi = new TH2F("hist_d1_211_trunc", "hist_d1_211_trunc", m_numPBins, pbins.data(),
                              m_numDEdxBins, 0, m_dedxCutoff);
 
-  treeDstar_sw->Draw("K_SVDdEdx:K_pSVD>>hist_d1_321_trunc", "nSignalDstar_sw * (K_SVDdEdx>0)", "goff");
+  treeDstar_sw->Draw("K_SVDdEdx:K_p>>hist_d1_321_trunc", "nSignalDstar_sw * (K_SVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
   TH2F* h_DstarPiPart1 = (TH2F*)h_DstarPi->Clone("hist_d1_211_truncPart1");
   TH2F* h_DstarPiPart2 = (TH2F*)h_DstarPi->Clone("hist_d1_211_truncPart2");
 
-  treeDstar_sw->Draw("pi_SVDdEdx:pi_pSVD>>hist_d1_211_truncPart1", "nSignalDstar_sw * (pi_SVDdEdx>0)", "goff");
-  treeDstar_sw->Draw("piS_SVDdEdx:piS_pSVD>>hist_d1_211_truncPart2", "nSignalDstar_sw * (piS_SVDdEdx>0)", "goff");
+  treeDstar_sw->Draw("pi_SVDdEdx:pi_p>>hist_d1_211_truncPart1", "nSignalDstar_sw * (pi_SVDdEdx>0)", "goff");
+  treeDstar_sw->Draw("piS_SVDdEdx:piS_p>>hist_d1_211_truncPart2", "nSignalDstar_sw * (piS_SVDdEdx>0)", "goff");
   h_DstarPi->Add(h_DstarPiPart1);
   h_DstarPi->Add(h_DstarPiPart2);
 
@@ -554,31 +546,14 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
     B2FATAL("The Gamma tree is empty, stopping here");
   }
   std::vector<double> pbins = CreatePBinningScheme();
-  // const int m_numDEdxBins = 100;
-  // const int m_numPBins = 69;
-  // double pbins[m_numPBins + 1];
-  // pbins[0] = 0.0;
-  // pbins[1] = 0.05;
-
-  // for (int bin = 2; bin <= m_numPBins; bin++) {
-  //   if (bin <= 19)
-  //     pbins[bin] = 0.025 + 0.025 * bin;
-  //   else if (bin <= 59)
-  //     pbins[bin] = pbins[19] + 0.05 * (bin - 19);
-  //   else
-  //     pbins[bin] = pbins[59] + 0.3 * (bin - 59);
-  // }
-
-  // double m_dedxCutoff = 0;
-  // m_dedxCutoff = 5e6;
 
   TH2F* h_GammaE = new TH2F("hist_d1_11_trunc", "hist_d1_11_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
   TH2F* h_GammaEPart1 = (TH2F*)h_GammaE->Clone("hist_d1_11_truncPart1");
   TH2F* h_GammaEPart2 = (TH2F*)h_GammaE->Clone("hist_d1_11_truncPart2");
 
-  preselTree->Draw("e_1_SVDdEdx:e_1_pSVD>>hist_d1_11_truncPart1", "e_1_SVDdEdx>0", "goff");
-  preselTree->Draw("e_2_SVDdEdx:e_2_pSVD>>hist_d1_11_truncPart2", "e_2_SVDdEdx>0", "goff");
+  preselTree->Draw("e_1_SVDdEdx:e_1_p>>hist_d1_11_truncPart1", "e_1_SVDdEdx>0", "goff");
+  preselTree->Draw("e_2_SVDdEdx:e_2_p>>hist_d1_11_truncPart2", "e_2_SVDdEdx>0", "goff");
   h_GammaE->Add(h_GammaEPart1);
   h_GammaE->Add(h_GammaEPart2);
 

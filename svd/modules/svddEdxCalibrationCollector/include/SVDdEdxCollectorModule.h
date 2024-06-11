@@ -47,25 +47,25 @@ namespace Belle2 {
 
 
     double m_InvMLambda;       /**<  Invariant mass of Lambda candidates */
-    double m_p_pSVD;       /**<   momentum for the proton from the Lambda */
+    double m_p_p;       /**<   momentum for the proton from the Lambda */
     double m_p_SVDdEdx;     /**<  SVD dE/dx response for the proton from the Lambda */
-    double m_pi_pSVD;    /**<   momentum for the pion from the Lambda */
+    double m_pi_p;    /**<   momentum for the pion from the Lambda */
     double m_pi_SVDdEdx;    /**<  SVD dE/dx response for the pion from the Lambda */
 
     double m_InvMDstar;       /**<  Invariant mass of Dstar candidates */
     double m_InvMD0;       /**<  Invariant mass of D0 candidates */
     double m_DeltaM;       /**<  deltaM = m(Dstar)-m(D0) */
-    double m_K_pSVD;       /**<   momentum for the kaon from the D0 */
+    double m_K_p;       /**<   momentum for the kaon from the D0 */
     double m_K_SVDdEdx;     /**<  SVD dE/dx response for the kaon from the D0 */
-    double m_piD_pSVD;    /**<   momentum for the pion from the D0 */
+    double m_piD_p;    /**<   momentum for the pion from the D0 */
     double m_piD_SVDdEdx;    /**<  SVD dE/dx response for the pion from the D0 */
-    double m_piS_pSVD;    /**<   momentum for the pion from the Dstar */
+    double m_piS_p;    /**<   momentum for the pion from the Dstar */
     double m_piS_SVDdEdx;    /**<  SVD dE/dx response for the pion from the Dstar */
 
     double m_InvMGamma;       /**<  Invariant mass of converted photon candidates */
-    double m_e_1_pSVD;       /**<   momentum for the first electron */
+    double m_e_1_p;       /**<   momentum for the first electron */
     double m_e_1_SVDdEdx;     /**<  SVD dE/dx response for the first electron */
-    double m_e_2_pSVD;    /**<   momentum for the second electron */
+    double m_e_2_p;    /**<   momentum for the second electron */
     double m_e_2_SVDdEdx;    /**<  SVD dE/dx response for the second electron */
 
 

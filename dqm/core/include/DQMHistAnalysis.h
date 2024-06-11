@@ -580,7 +580,7 @@ namespace Belle2 {
      * check the return status and check PV in case of error
      * @param state return state of epics function
      * @param message message to print out
-     * @param pv the chid of the affected PV
+     * @param id the chid of the affected PV
      */
     void CheckEpicsError(int state, const std::string& message, chid id);
 

@@ -26,7 +26,7 @@ namespace Belle2 {
   class Kink : public RelationsObject {
   public:
     /** Constructor without arguments; needed for I/O. */
-    Kink();
+    Kink() {}
 
     /**
      * Constructor taking two pairs of tracks and trackFitResults, the fitted vertex coordinates, and filter flag.
@@ -38,8 +38,10 @@ namespace Belle2 {
      * @param vertexY Y coordinate of kink vertex
      * @param vertexZ Z coordinate of kink vertex
      * @param filterFlag a flag containing the following information:
-     * the first digit is a flag of filter used to preselect the kink candidate (from 1 to 6);
-     * the second and third digits form a flag of the two tracks combined fit result (from 0 to 19);
+     * the first digit is a flag of filter used to preselect the kink candidate (from 1 to 5);
+     * the second and third digits form a flag of the two tracks combined fit result (from 0 to 19)
+     * if the first digit is 1 or 2; if the first digit is 3 to 5, then the second digit is equal to 1 when
+     * the distance between daughter and mother track bigger than the cut in kinkFitter;
      * the thousands show the number of reassigned hits between tracks (from 0 to 32);
      * the sign shows from which track the hits were taken (- from daughter, + from mother).
      * The content of the filterFlag may change, please, refer for the details to kinkFitter.cc
@@ -117,31 +119,31 @@ namespace Belle2 {
 
   private:
     /** Indicates which mother track was used for this Kink. */
-    short m_trackIndexMother;
+    short m_trackIndexMother = -1;
 
     /** Indicates which daughter track was used for this Kink. */
-    short m_trackIndexDaughter;
+    short m_trackIndexDaughter = -1;
 
     /** Points to the new TrackFitResult of the mother Track at Start. */
-    short m_trackFitResultIndexMotherStart;
+    short m_trackFitResultIndexMotherStart = -1;
 
     /** Points to the new TrackFitResult of the mother Track at End. */
-    short m_trackFitResultIndexMotherEnd;
+    short m_trackFitResultIndexMotherEnd = -1;
 
     /** Points to the new TrackFitResult of the daughter Track. */
-    short m_trackFitResultIndexDaughter;
+    short m_trackFitResultIndexDaughter = -1;
 
     /** The X coordinate of the fitted vertex. */
-    Double32_t m_fittedVertexX;
+    Double32_t m_fittedVertexX = 0.0;
 
     /** The Y coordinate of the fitted vertex. */
-    Double32_t m_fittedVertexY;
+    Double32_t m_fittedVertexY = 0.0;
 
     /** The Z coordinate of the fitted vertex. */
-    Double32_t m_fittedVertexZ;
+    Double32_t m_fittedVertexZ = 0.0;
 
     /** The filter flag of the kink. */
-    short m_filterFlag;
+    short m_filterFlag = 0;
 
     /** Macro for ROOTification. */
     ClassDef(Kink, 1);

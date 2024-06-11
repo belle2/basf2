@@ -65,12 +65,15 @@ namespace Belle2 {
     double m_vertexChi2Cut;  ///< Cut on Chi2 for the Kink vertex.
     double m_vertexDistanceCut;  ///< Cut on distance between tracks at the Kink vertex.
     unsigned char m_kinkFitterMode;  ///< Fitter mode.
+    bool m_kinkFitterModeSplitTrack; ///< Fitter mode fourth bit to split track.
     double m_precutRho;  ///< Preselection cut on transverse shift from the outer CDC wall for the track ending points.
     double m_precutZ;  ///< Preselection cut on z shift from the outer CDC wall for the track ending points.
     double m_precutDistance;  ///< Preselection cut on distance between ending points of two tracks.
     double m_precutDistance2D;  ///< Preselection cut on 2D distance between ending points of two tracks (for bad z cases).
-    double m_precutDistance_2;  ///< m_precutDistance squared for convenience
-    double m_precutDistance2D_2;  ///< m_precutDistance2D squared for convenience
+    double m_precutDistanceSquared;  ///< m_precutDistance squared for convenience
+    double m_precutDistance2DSquared;  ///< m_precutDistance2D squared for convenience
+    int m_precutSplitNCDCHit; ///< Preselection cut on maximal number of fitted CDC hits for a track candidate to be split.
+    double m_precutSplitPValue; ///< Preselection cut on maximal p-value for a track candidate to be split.
 
     /**
      * Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall,
@@ -96,6 +99,15 @@ namespace Belle2 {
      * false otherwise
      */
     bool preFilterDaughterTracks(RecoTrack const* const recoTrack);
+
+    /**
+    * Check if the track can be a candidate to be split based on some simple selections.
+    * @param recoTrack recoTrack of the candidate
+    * @param track track of the candidate to get the number of fitted CDC hits
+    * @return true if recoTrack pass the criteria;
+    * false otherwise
+    */
+    bool preFilterTracksToSplit(RecoTrack const* const recoTrack, Track const* const track);
 
     /**
      * Track pair preselection based on distance between two tracks with different options.
@@ -132,6 +144,5 @@ namespace Belle2 {
     int m_f3Stored = 0;    ///< counter for filter 3 saved Kinks
     int m_f4Stored = 0;    ///< counter for filter 4 saved Kinks
     int m_f5Stored = 0;    ///< counter for filter 5 saved Kinks
-    int m_f6Stored = 0;    ///< counter for filter 6 saved Kinks
   };
 }

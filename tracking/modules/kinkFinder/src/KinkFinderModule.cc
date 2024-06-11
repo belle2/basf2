@@ -12,6 +12,8 @@
 #include <framework/dataobjects/Helix.h>
 #include <framework/geometry/BFieldManager.h>
 
+#include <mdst/dataobjects/HitPatternCDC.h>
+
 #include <genfit/MeasuredStateOnPlane.h>
 
 using namespace Belle2;
@@ -68,13 +70,18 @@ void KinkFinderModule::initialize()
     B2FATAL("kinkFinder parameters are not available.");
   // mode of the kinkFitter
   m_kinkFitterMode = m_kinkFinderParameters->getKinkFitterMode();
+  m_kinkFitterModeSplitTrack = m_kinkFitterMode & 0b1000;
+
   // preselection cuts
   m_precutRho = m_kinkFinderParameters->getPrecutRho();
   m_precutZ = m_kinkFinderParameters->getPrecutZ();
   m_precutDistance = m_kinkFinderParameters->getPrecutDistance();
   m_precutDistance2D = m_kinkFinderParameters->getPrecutDistance2D();
-  m_precutDistance_2 = m_precutDistance * m_precutDistance;
-  m_precutDistance2D_2 = m_precutDistance2D * m_precutDistance2D;
+  m_precutDistanceSquared = m_precutDistance * m_precutDistance;
+  m_precutDistance2DSquared = m_precutDistance2D * m_precutDistance2D;
+  m_precutSplitNCDCHit = m_kinkFinderParameters->getPrecutSplitNCDCHit();
+  m_precutSplitPValue = m_kinkFinderParameters->getPrecutSplitPValue();
+
   // final cuts used in kinkFitter to decide if the kink candidate should be stored
   m_vertexChi2Cut = m_kinkFinderParameters->getVertexChi2Cut();
   m_vertexDistanceCut = m_kinkFinderParameters->getVertexDistanceCut();
@@ -83,7 +90,7 @@ void KinkFinderModule::initialize()
   m_kinkFitter = std::make_unique<kinkFitter>(m_arrayNameTFResult, m_arrayNameKink,
                                               m_arrayNameRecoTrack,
                                               m_arrayNameCopiedRecoTrack);
-  m_kinkFitter->initializeCuts(m_vertexDistanceCut, m_vertexChi2Cut);
+  m_kinkFitter->initializeCuts(m_vertexDistanceCut, m_vertexChi2Cut, m_precutDistance);
   m_kinkFitter->setFitterMode(m_kinkFitterMode);
 
 }
@@ -104,11 +111,29 @@ void KinkFinderModule::event()
     RecoTrack const* const recoTrack = track.getRelated<RecoTrack>(m_arrayNameRecoTrack);
     B2ASSERT("No RecoTrack available for given Track.", recoTrack);
 
+    bool trackChosen = false;
     if (preFilterMotherTracks(recoTrack)) {
       tracksMother.push_back(&track);
+      trackChosen = true;
+
+      if (m_kinkFitterModeSplitTrack && preFilterTracksToSplit(recoTrack, &track)) {
+        const short filterFlag = 7;
+        fitAndStore(&track, &track, filterFlag);
+      }
     }
     if (preFilterDaughterTracks(recoTrack)) {
       tracksDaughter.push_back(&track);
+      trackChosen = true;
+
+      if (m_kinkFitterModeSplitTrack && preFilterTracksToSplit(recoTrack, &track)) {
+        const short filterFlag = 8;
+        fitAndStore(&track, &track, filterFlag);
+      }
+    }
+
+    if (m_kinkFitterModeSplitTrack && !trackChosen && preFilterTracksToSplit(recoTrack, &track)) {
+      const short filterFlag = 9;
+      fitAndStore(&track, &track, filterFlag);
     }
   }
 
@@ -160,7 +185,7 @@ void KinkFinderModule::terminate()
   B2INFO("===KinkFinder summary===========================================================");
   B2INFO("In total " << m_allStored << " kinks saved.");
   B2INFO("Among them with filter1 " << m_f1Stored << ", f2 " << m_f2Stored << ", f3 " << m_f3Stored << ", f4 "
-         << m_f4Stored << ", f5 " << m_f5Stored << ", f6 " << m_f6Stored);
+         << m_f4Stored << ", f5 " << m_f5Stored);
 }
 
 /// Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall.
@@ -235,7 +260,35 @@ bool KinkFinderModule::preFilterDaughterTracks(RecoTrack const* const recoTrack)
   Helix helixIP(posFirst, momFirst, static_cast<short>(recoTrack->getTrackFitStatus()->getCharge()), Bz);
   if (posFirst.Perp2() < 144 && fabs(helixIP.getD0()) < 1) return false;
   return true;
+}
 
+/// Check if the track is a candidate for splitting based on some simple selections.
+/// They are optimized to reduce the splitting of ordinary (non-decayed) tracks.
+bool KinkFinderModule::preFilterTracksToSplit(RecoTrack const* const recoTrack, Track const* const track)
+{
+  // track is fitted
+  if (!recoTrack->hasTrackFitStatus() || !recoTrack->wasFitSuccessful()) return false;
+  if (recoTrack->getTrackFitStatus()->getPVal() > m_precutSplitPValue) return false;
+  int nCDCHits = track->getTrackFitResultWithClosestMass(Const::pion)->getHitPatternCDC().getNHits();
+  if (nCDCHits > m_precutSplitNCDCHit) return false;
+  // more than 5 CDC hits to have enough hits for possible splitting
+  if (nCDCHits < 5) return false;
+
+  // first point of the track is close to the inner wall of the CDC
+  // we set 18 cm cut to have both tracks with and without VXD hits
+  ROOT::Math::XYZVector posFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
+  if (posFirst.Perp2() > 324) return false;
+
+  // impact parameter in rphi < 2 cm
+  // Loose enough assuming possible bad resolution of track due to daughter hits assignment
+  ROOT::Math::XYZVector momFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
+  const double Bz = BFieldManager::getFieldInTesla({momFirst.X(),
+                                                    momFirst.Y(),
+                                                    momFirst.Z()}).Z();
+  Helix helixIP(posFirst, momFirst, static_cast<short>(recoTrack->getTrackFitStatus()->getCharge()), Bz);
+  if (fabs(helixIP.getD0()) > 2) return false;
+
+  return true;
 }
 
 /// Track pair preselection based on distance between two tracks with six different options.
@@ -252,11 +305,11 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
   // Filter 1 check.
   ROOT::Math::XYZVector motherPosLast(motherRecoTrack->getMeasuredStateOnPlaneFromLastHit().getPos());
   ROOT::Math::XYZVector daughterPosFirst(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
-  if ((daughterPosFirst - motherPosLast).Mag2() < m_precutDistance_2) return 1;
+  if ((daughterPosFirst - motherPosLast).Mag2() < m_precutDistanceSquared) return 1;
 
   // Filter 2 check.
   ROOT::Math::XYZVector daughterPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromLastHit().getPos());
-  if ((daughterPosLast - motherPosLast).Mag2() < m_precutDistance_2) return 2;
+  if ((daughterPosLast - motherPosLast).Mag2() < m_precutDistanceSquared) return 2;
 
   // Filter 3 check. Here the same direction of daughter and mother is checked to exclude intersection of tracks
   // from different hemispheres.
@@ -281,16 +334,16 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
 
     if ((daughterHelixClosestToMotherPosLast.getD0() * daughterHelixClosestToMotherPosLast.getD0() +
          daughterHelixClosestToMotherPosLast.getZ0() * daughterHelixClosestToMotherPosLast.getZ0()) <
-        m_precutDistance_2)
+        m_precutDistanceSquared)
       return 3;
   }
 
   // Filter 4 check.
-  if ((daughterPosFirst - motherPosLast).Perp2() < m_precutDistance2D_2)
+  if ((daughterPosFirst - motherPosLast).Perp2() < m_precutDistance2DSquared)
     return 4;
 
   // Filter 5 check.
-  if ((daughterPosLast - motherPosLast).Perp2() < m_precutDistance2D_2)
+  if ((daughterPosLast - motherPosLast).Perp2() < m_precutDistance2DSquared)
     return 5;
 
   // Filter 6 check. sHere the same direction of daughter and mother is checked to exclude intersection of tracks
@@ -332,20 +385,28 @@ void KinkFinderModule::fitAndStore(const Track* trackMother, const Track* trackD
         ++m_f1Stored;
         break;
       case 2:
-        ++m_f2Stored;
+        ++m_f1Stored;
         break;
       case 3:
-        ++m_f3Stored;
+        ++m_f2Stored;
         break;
       case 4:
-        ++m_f4Stored;
+        ++m_f1Stored;
         break;
       case 5:
-        ++m_f5Stored;
+        ++m_f1Stored;
         break;
       case 6:
-        ++m_f6Stored;
+        ++m_f2Stored;
         break;
+      case 7:
+        ++m_f3Stored;
+        break;
+      case 8:
+        ++m_f4Stored;
+        break;
+      case 9:
+        ++m_f5Stored;
     }
   }
 }

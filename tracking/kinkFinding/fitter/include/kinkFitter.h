@@ -12,6 +12,7 @@
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/Kink.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <genfit/Track.h>
 
 #include <utility>
@@ -39,8 +40,7 @@ namespace Belle2 {
                const std::string& copiedRecoTracksName = "CopiedRecoTracks");
 
     /// Initialize the cuts which will be applied during the fit and store process.
-    void initializeCuts(double vertexDistanceCut,
-                        double vertexChi2Cut);
+    void initializeCuts(double vertexDistanceCut, double vertexChi2Cut, double precutDistance);
 
     /// set kink fitter mode.
     /// switch the mode of fitAndStore function.
@@ -57,6 +57,24 @@ namespace Belle2 {
     bool fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag);
 
   private:
+
+    /**
+     * Create a RecoTrack in a separate StoreArray based on one to be split
+     * @param splitRecoTrack RecoTrack to be split
+     * @param motherFlag true if creating mother, false if creating daughter
+     * @param delta the position of the threshold to split the hits, starting from the end
+     * @return a pointer to created RecoTrack
+     */
+    RecoTrack* copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack, const bool motherFlag, const unsigned int delta);
+
+    /**
+     * Split track into two based on the chi2/ndf ratio. For the best split position search, use binary search.
+     * @param recoTrackSplit RecoTrack to be split
+     * @param recoTrackIndexMother index of the created mother RecoTrack in m_copiedRecoTracks
+     * @param recoTrackIndexDaughter index of the created daughter RecoTrack in m_copiedRecoTracks
+     * @return true if the splitting is successful, false otherwise
+     */
+    bool splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrackIndexMother, short& recoTrackIndexDaughter);
 
     /**
      * Combine daughter and mother tracks in one and fit.
@@ -80,9 +98,9 @@ namespace Belle2 {
      * @return for daughter track, returns negative index of the hit, closest to the vertex
      * for mother track, returns positive index of the hit, closest to the vertex, counting from the end of the track
      */
-    int findHitPositionForReassignment(RecoTrack* recoTrack,
+    int findHitPositionForReassignment(const RecoTrack* recoTrack,
                                        ROOT::Math::XYZVector& vertexPos,
-                                       int direction);
+                                       const int direction);
 
     /**
      * Copy RecoTrack to a separate StoreArray and reassign CDC hits according to delta
@@ -94,7 +112,7 @@ namespace Belle2 {
      * @return a pointer to created RecoTrack
      */
     RecoTrack* copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrack, RecoTrack* daughterRecoTrack,
-                                               bool motherFlag, int delta);
+                                               const bool motherFlag, const int delta);
 
     /**
      * Try to fit new RecoTracks after hit reassignment.
@@ -105,7 +123,7 @@ namespace Belle2 {
      * @return true if the fit was successful and the result for two tracks improved
      */
     bool refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, RecoTrack* recoTrackDaughterRefit,
-                                     RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter);
+                                     const RecoTrack* recoTrackMother, const RecoTrack* recoTrackDaughter);
 
     /**
      * Flip and refit the daughter track.
@@ -115,7 +133,7 @@ namespace Belle2 {
      * @param timeSeed time seed
      * @return pointer to a new copied flipped and refitted daughter RecoTrack
      */
-    RecoTrack* copyRecoTrackForFlipAndRefit(RecoTrack* recoTrack,
+    RecoTrack* copyRecoTrackForFlipAndRefit(const RecoTrack* recoTrack,
                                             ROOT::Math::XYZVector& momentumSeed,
                                             ROOT::Math::XYZVector& positionSeed,
                                             double& timeSeed);
@@ -130,7 +148,7 @@ namespace Belle2 {
      * @param useAnotherFitter use ordinary KalmanFilter
      * @return pointer to a new copied refitted daughter RecoTrack
      */
-    RecoTrack* copyRecoTrackForRefit(RecoTrack* recoTrack,
+    RecoTrack* copyRecoTrackForRefit(const RecoTrack* recoTrack,
                                      ROOT::Math::XYZVector& momentumSeed,
                                      ROOT::Math::XYZVector positionSeed,
                                      double& timeSeed,
@@ -143,7 +161,7 @@ namespace Belle2 {
      * @return true if the refit of filter 6 daughter tracks improves the distance between mother and daughter;
      * false otherwise
      */
-    bool isRefitImproveFilter6(RecoTrack* recoTrackDaughterRefit, const ROOT::Math::XYZVector& motherPosLast);
+    bool isRefitImproveFilter6(const RecoTrack* recoTrackDaughterRefit, const ROOT::Math::XYZVector& motherPosLast);
 
     /**
      * Fit kink vertex using RecoTrack's as inputs.
@@ -151,7 +169,8 @@ namespace Belle2 {
      * If the vertex is inside one of the RecoTracks, bits in reassignHitStatus are set.
      * @param recoTrackMother RecoTrack of mother
      * @param recoTrackDaughter RecoTrack of daughter
-     * @param hasInnerHitStatus store a result of this function. if the plus(minus) track has hits inside the Kink vertex position, 0x1(0x2) bit is set.
+     * @param reassignHitStatus store a result of this function. if the daughter(mother) track has hits inside
+     * the Kink vertex position, 0x1(0x2) bit is set.
      * @param vertexPos store a result of this function. The fitted vertex position is stored.
      * @param distance store a distance between tracks at the decay vertex
      * @param vertexPosSeed a seed of the vertex position
@@ -199,6 +218,11 @@ namespace Belle2 {
 
 
   private:
+
+    // Objects containing the track fitters (DAF and ordinary Kalman Filter).
+    std::unique_ptr<TrackFitter> m_trackFitterDAF;
+    std::unique_ptr<TrackFitter> m_trackFitterKF;
+
     // variables used for input
     std::string m_recoTracksName;   ///< RecoTrackColName (input).
     StoreArray <RecoTrack> m_recoTracks; ///< RecoTrack (input)
@@ -210,13 +234,17 @@ namespace Belle2 {
     // cut variables
     double m_vertexDistanceCut;  ///< cut on the distance at the found vertex.
     double m_vertexChi2Cut;  ///< Chi2 cut.
+    double m_precutDistance;  ///< Preselection cut on distance between ending points of two tracks used in prefilter.
+    ///< here it is needed in isRefitImproveFilter6 function
 
     // fitter working mode variables
     unsigned char m_kinkFitterMode;  ///< fitter mode written in bits
-    ///< first: reassign hits; second: flip and refit filter 2 tracks; third: combine tracks and fit them to find clones
+    ///< first: reassign hits; second: flip and refit filter 2 tracks; third: combine tracks and fit them to find clones;
+    ///< fourth: split the combined track candidates
     bool m_kinkFitterModeHitsReassignment; ///< fitter mode first bit
     bool m_kinkFitterModeFlipAndRefit; ///< fitter mode second bit
     bool m_kinkFitterModeCombineAndFit; ///< fitter mode third bit
+    bool m_kinkFitterModeSplitTrack; ///< fitter mode fourth bit
 
     // helper variables
     StoreArray <RecoTrack> m_copiedRecoTracks; ///< RecoTrack used to refit tracks

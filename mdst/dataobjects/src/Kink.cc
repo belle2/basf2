@@ -9,18 +9,6 @@
 
 using namespace Belle2;
 
-Kink::Kink():
-  m_trackIndexMother(-1),
-  m_trackIndexDaughter(-1),
-  m_trackFitResultIndexMotherStart(-1),
-  m_trackFitResultIndexMotherEnd(-1),
-  m_trackFitResultIndexDaughter(-1),
-  m_fittedVertexX(0.0),
-  m_fittedVertexY(0.0),
-  m_fittedVertexZ(0.0),
-  m_filterFlag(-1)
-{}
-
 Kink::Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >&
            trackPairMother,
            const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairDaughter,

@@ -16,8 +16,8 @@ parameters = Belle2.KinkFinderParameters()
 # double precutRho, double precutZ, double precutDistance, double precutDistance2D
 # kinkFitterMode in binary (1 is ON, 0 is OFF), but written in decimal:
 # 1 bit (from right) reassign hits, 2 bit flip tracks with close end points,
-# and 3 bit fit both tracks as one
-parameters.setParameters(0b111, 10000., 2., 10., 0., 10., 10.)
+# 3 bit fit both tracks as one, and 4 bit split track, candidate to be a combined track
+parameters.setParameters(0b1111, 10000., 2., 10., 0., 10., 10., 49, 0.01)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
 # write db object to 'localdb/'

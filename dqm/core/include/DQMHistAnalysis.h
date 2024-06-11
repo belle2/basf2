@@ -568,6 +568,23 @@ namespace Belle2 {
      */
     void printPVStatus(chid pv, bool onlyError = true);
 
+    /**
+     * check the return status and check PV in case of error
+     * @param state return state of epics function
+     * @param message message to print out
+     * @param name the (key)name of the affected PV
+     */
+    void CheckEpicsError(int state, const std::string& message, const std::string& name);
+
+    /**
+     * check the return status and check PV in case of error
+     * @param state return state of epics function
+     * @param message message to print out
+     * @param pv the chid of the affected PV
+     */
+    void CheckEpicsError(int state, const std::string& message, chid id);
+
+
     // Public functions
   public:
 

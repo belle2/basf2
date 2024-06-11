@@ -557,14 +557,13 @@ class feiSLB0_RDstar(BaseFEISkim):
 
     def build_lists(self, path):
         ma.buildEventShape(inputListNames=['pi+:FEI_cleaned', 'gamma:FEI_cleaned'],
-                           allMoments=True,
                            foxWolfram=True,
-                           harmonicMoments=True,
-                           cleoCones=True,
-                           thrust=True,
-                           collisionAxis=True,
-                           jets=True,
-                           sphericity=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
                            checkForDuplicates=True,
                            path=path)
 

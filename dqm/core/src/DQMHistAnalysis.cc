@@ -122,7 +122,9 @@ TH1* DQMHistAnalysisModule::getDelta(const std::string& fullname, int n, bool on
 
 MonitoringObject* DQMHistAnalysisModule::getMonitoringObject(const std::string& objName)
 {
-  return &s_monObjList[objName];
+  auto obj = &s_monObjList[objName];
+  obj->SetName(objName.c_str());
+  return obj;
 }
 
 TCanvas* DQMHistAnalysisModule::findCanvas(TString canvas_name)

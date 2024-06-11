@@ -102,7 +102,7 @@ namespace Belle2 {
     static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
 
     /** Database identifier or file used to load the weights. */
-    std::string m_identifier = "NNmuidWeightFile";
+    std::string m_identifier = "KLMMuonIDDNNWeightFile";
 
     /** If set true, this model will write the input variables to KLMMuonIDDNNInputVariable dataobject. */
     bool m_retrain = false;

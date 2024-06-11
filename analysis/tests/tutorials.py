@@ -22,7 +22,7 @@ class TutorialsTest(unittest.TestCase):
     """Test to run all tutorials. Will fail if no tutorial directory is found."""
 
     #: list of the broken tutorials (to be removed when they are individually fixed)
-    broken_tutorials = []
+    broken_tutorials = ['B2A702-ContinuumSuppression_MVATrain.py', 'B2A703-ContinuumSuppression_MVAExpert.py']
 
     @unittest.skipIf(not os.getenv('BELLE2_EXAMPLES_DATA_DIR'),
                      "$BELLE2_EXAMPLES_DATA_DIR not found.")

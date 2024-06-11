@@ -27,6 +27,7 @@ PIDLikelihood::PIDLikelihood()
       m_logl[i][k] = 0.0;
     }
   }
+  m_preOfficialLikelihoods["klmMuonIDDNN"] = -1.0;
 }
 
 
@@ -275,6 +276,16 @@ std::string PIDLikelihood::getInfoHTML() const
   stream << "<br>";
 
   return stream.str();
+}
+
+void PIDLikelihood::addPreOfficialLikelihood(const std::string& preOfficialIdentifier, const double preOfficialLikelihood)
+{
+  m_preOfficialLikelihoods[preOfficialIdentifier] = preOfficialLikelihood;
+}
+
+double PIDLikelihood::getPreOfficialLikelihood(const std::string& preOfficialIdentifier)
+{
+  return m_preOfficialLikelihoods[preOfficialIdentifier];
 }
 
 

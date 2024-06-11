@@ -17,7 +17,6 @@
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/KLMMuonIDDNN.h>
 
 #include <reconstruction/dataobjects/KLMMuonIDDNNInputVariable.h>
 
@@ -74,9 +73,6 @@ namespace Belle2 {
 
     // Required array for Tracks.
     StoreArray<Track> m_tracks;
-
-    // Neural Network based KLM muonID dataobjects to be stored in mdst.
-    StoreArray<KLMMuonIDDNN> m_KLMMuonIDDNNs;
 
     // Input variables of DNN. This should only be used for retraining purpose (m_retrain = true).
     StoreArray<KLMMuonIDDNNInputVariable> m_inputVariable;

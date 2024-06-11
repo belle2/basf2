@@ -23,7 +23,7 @@
 #include <tracking/dataobjects/ExtHit.h>
 
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/KLMMuonIDDNN.h>
+#include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <mva/interface/Interface.h>
 
@@ -56,8 +56,6 @@ KLMMuonIDDNNExpertModule::~KLMMuonIDDNNExpertModule()
 void KLMMuonIDDNNExpertModule::initialize()
 {
   m_tracks.isRequired();
-  m_KLMMuonIDDNNs.registerInDataStore();
-  m_tracks.registerRelationTo(m_KLMMuonIDDNNs);
 
   if (m_retrain) {
     m_inputVariable.registerInDataStore();
@@ -199,9 +197,8 @@ void KLMMuonIDDNNExpertModule::event()
     Hit2dMap.clear();
 
     double muprob_nn = getNNmuProbability(&track, klmll);
-    KLMMuonIDDNN* klmMuonIDDNNobject = m_KLMMuonIDDNNs.appendNew();
-    klmMuonIDDNNobject->setKLMMuonIDDNN(muprob_nn);
-    track.addRelationTo(klmMuonIDDNNobject);
+    PIDLikelihood* pid = track.getRelated<PIDLikelihood>();
+    pid->addPreOfficialLikelihood("klmMuonIDDNN", muprob_nn);
   } // loop of tracks
 }
 

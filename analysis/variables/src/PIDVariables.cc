@@ -12,7 +12,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/KLMMuonIDDNN.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
@@ -995,9 +994,12 @@ namespace Belle2 {
     {
       const Track* track = part->getTrack();
       if (!track) return Const::doubleNaN;
-      KLMMuonIDDNN* klmnn = track->getRelatedTo<KLMMuonIDDNN>();
-      if (!klmnn) return Const::doubleNaN;
-      return klmnn->getKLMMuonIDDNN();
+      PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
+      if (!pid) return Const::doubleNaN;
+      double klmMuonIDDNNvalue = pid->getPreOfficialLikelihood("klmMuonIDDNN");
+      // klmMuonIDDNNvalue == -1.0 means there is no valid output from KLMMuonIDDNNExpertModule
+      if (klmMuonIDDNNvalue < 0.0) return Const::doubleNaN;
+      return klmMuonIDDNNvalue;
     }
 
     //*************

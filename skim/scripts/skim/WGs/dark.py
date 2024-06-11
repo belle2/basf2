@@ -115,7 +115,7 @@ class ALP3Gamma(BaseSkim):
         # applying a lab frame energy cut to the daughter photons
         ma.fillParticleList(
             'gamma:cdcAndMinimumEnergy',
-            'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
+            'E >= 0.1 and thetaInCDCAcceptance',
             True, path=path)
 
         # defining the decay string
@@ -318,7 +318,7 @@ class EGammaControlDark(BaseSkim):
 
         # exactly 1 good photon in the event
         photon_energy_cut = '0.45'
-        good_photon = 'theta > 0.296706 and theta < 2.61799' +\
+        good_photon = 'thetaInCDCAcceptance' +\
             f' and useCMSFrame(E) > {photon_energy_cut}'
         ma.cutAndCopyList(f'gamma:{internal_skim_label}', 'gamma:all', good_photon, path=path)
         one_good_photon = f'[eventCached(nParticlesInList(gamma:{internal_skim_label})) == 1]'

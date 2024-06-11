@@ -13,11 +13,13 @@ Script to perform the SVD dE/dx calibration
 import ROOT
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import basf2 as b2
-from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm
+from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm, SVDdEdxValidationAlgorithm
 
 import modularAnalysis as ma
 import vertex as vx
+import reconstruction as re
 
+ROOT.gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
 
 
@@ -34,6 +36,8 @@ settings = CalibrationSettings(
                                          INPUT_DATA_FILTERS["Magnet"]["On"]]},
 
     expert_config={
+        "isMC": False,
+        "rerun_reco": False,
         "MaxFilesPerRun": 5,
         "MinEvtsPerFile": 1,
         "MaxEvtsPerRun": 1.e6,
@@ -43,6 +47,111 @@ settings = CalibrationSettings(
         "dedxCutoff": 5.e6
         },
     depends_on=[])
+
+
+def create_path(rerun_reco, isMC):
+    rec_path = b2.Path()
+
+    if rerun_reco:
+        rec_path.add_module(
+            'RootInput',
+            branchNames=[
+                'RawARICHs',
+                'RawCDCs',
+                'RawECLs',
+                'RawFTSWs',
+                'RawKLMs',
+                'RawPXDs',
+                'RawSVDs',
+                'RawTOPs',
+                'RawTRGs',
+                'RawDataBlock',
+                'RawCOPPER'],
+            logLevel=b2.LogLevel.ERROR)
+        if not isMC:
+            re.add_unpackers(path=rec_path)
+        else:
+            rec_path.add_module("Gearbox")
+            rec_path.add_module("Geometry")
+
+        re.add_reconstruction(path=rec_path, pruneTracks=False)
+        rec_path.add_module('VXDDedxPID')
+    else:
+        rec_path.add_module('RootInput')
+
+    # Fill particle lists
+    ma.fillParticleList("pi+:all", "", path=rec_path)
+    ma.fillParticleList("pi+:lam", "nCDCHits > 0", path=rec_path)  # pi without track quality for reconstructing lambda
+    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1", path=rec_path)
+
+    ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1', path=rec_path)  # kaon
+    ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
+    ma.fillParticleList('p+:lam', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)  # proton
+
+    # ----------------------------------------------------------------------------
+    # Reconstruct D*(D0->K-pi+)pi+ and cc.
+    ma.reconstructDecay(decayString='D0:kpi -> K-:cut pi+:cut', cut='1.7 < M < 2.', path=rec_path)
+    ma.reconstructDecay(
+        decayString='D*+:myDstar -> D0:kpi pi+:all',
+        cut='1.95 < M <2.05 and massDifference(0) < 0.16',
+        path=rec_path)
+
+    # Reconstruct Lambda->p+pi- and cc.
+    ma.reconstructDecay('Lambda0:myLambda -> p+:lam pi-:lam', '1.1 < M < 1.3', path=rec_path)
+
+    # Reconstruct gamma->e+e- (photon conversion)
+    ma.reconstructDecay('gamma:my_gamma -> e+:cut e-:cut', '0.0 < M < 0.5', path=rec_path)
+
+    # ----------------------------------------------------------------------------
+    # vertex fits
+    vx.treeFit(list_name='D*+:myDstar', conf_level=0, ipConstraint=True, updateAllDaughters=True, path=rec_path)
+    vx.treeFit(list_name='Lambda0:myLambda', conf_level=0, ipConstraint=True, updateAllDaughters=True, path=rec_path)
+    vx.treeFit(list_name='gamma:my_gamma', conf_level=0, path=rec_path)
+
+    # ----------------------------------------------------------------------------
+    # Selections on Lambda
+
+    ma.cutAndCopyList(
+        outputListName='Lambda0:cut',
+        inputListName='Lambda0:myLambda',
+        cut=" ".join([
+            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance>1.0 and ",
+            "formula(daughter(0,p)) > formula(daughter(1,p)) and convertedPhotonInvariantMass(0,1) > 0.02 and ",
+            "[[formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
+            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
+            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+",
+            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+",
+            "daughter(1, pz)))**0.5) < 0.488]",
+            "or [formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
+            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
+            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+",
+            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+",
+            "daughter(1, pz)))**0.5) > 0.513]]"
+        ]),
+        path=rec_path)
+
+    # ----------------------------------------------------------------------------
+    # Selections on Dstar
+
+    ma.cutAndCopyList(
+        outputListName='D*+:cut',
+        inputListName='D*+:myDstar',
+        cut='massDifference(0) < 0.151 and 1.85 < daughter(0, InvM) < 1.88 and 1.95 < InvM < 2.05 and chiProb > 0.001',
+        path=rec_path)
+
+    # ----------------------------------------------------------------------------
+    # Selections on gamma
+    # ma.buildEventShape(inputListNames='gamma:my_gamma', path=rec_path)
+    ma.cutAndCopyList(
+        outputListName='gamma:cut',
+        inputListName='gamma:my_gamma',
+        cut=" ".join(['chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01',
+                      'and convertedPhotonInvariantMass(0,1) < 0.005',
+                      'and -0.05 < convertedPhotonDelR(0,1) < 0.15',
+                      'and -0.05 < convertedPhotonDelZ(0,1) < 0.05'
+                      ]),
+        path=rec_path)
+    return rec_path
 
 
 def get_calibrations(input_data, **kwargs):
@@ -75,6 +184,9 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov_hadron_calib = input_data["hadron_calib"]
 
     expert_config = kwargs.get("expert_config")
+
+    isMC = expert_config["isMC"]
+    rerun_reco = expert_config["rerun_reco"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
 
     # If you are using Raw data there's a chance that input files could have zero events.
@@ -106,101 +218,38 @@ def get_calibrations(input_data, **kwargs):
     algo.setDEdxCutoff(expert_config['dedxCutoff'])
     algo.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
 
+    algo_val = SVDdEdxValidationAlgorithm()
+    algo_val.setMonitoringPlots(True)
+    algo_val.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
+
     ###################################################
     # Calibration setup
 
     from caf.framework import Calibration
 
-    rec_path = b2.Path()
-    rec_path.add_module('RootInput')
+    rec_path = create_path(rerun_reco, isMC)
+    rec_path_validation = create_path(1, isMC)
 
-    # Fill particle lists
-    ma.fillParticleList("pi+:all", "", path=rec_path)
-    ma.fillParticleList("pi+:lam", "nCDCHits>0", path=rec_path)  # pi without track quality for reconstructing lambda
-    ma.fillParticleList("pi+:cut", "abs(dr)<0.5 and abs(dz)<2 and pValue > 0.00001 and nSVDHits > 1", path=rec_path)
+    dedx_calibration = Calibration("SVDdEdxCalibration",
+                                   collector="SVDdEdxCollector",
+                                   algorithms=[algo],
+                                   input_files=input_files_hadron_calib,
+                                   pre_collector_path=rec_path)
 
-    ma.fillParticleList('K-:cut', cut='abs(dr)<0.5 and abs(dz)<2 and pValue > 0.00001 and nSVDHits > 1', path=rec_path)  # kaon
-    ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
-    ma.fillParticleList('p+:lam', cut='nCDCHits>0 and nSVDHits > 0', path=rec_path)  # proton
-
-    # ----------------------------------------------------------------------------
-    # Reconstruct D*(D0->K-pi+)pi+ and cc.
-    ma.reconstructDecay(decayString='D0:kpi -> K-:cut pi+:cut', cut='1.7 < M < 2.', path=rec_path)
-    ma.reconstructDecay(
-        decayString='D*+:myDstar -> D0:kpi pi+:all',
-        cut='1.95 < M <2.05 and massDifference(0) < 0.16',
-        path=rec_path)
-
-    # Reconstruct Lambda->p+pi- and cc.
-    ma.reconstructDecay('Lambda0:myLambda -> p+:lam pi-:lam', '1.1 < M < 1.3', path=rec_path)
-
-    # Reconstruct gamma->e+e- (photon conversion)
-    ma.reconstructDecay('gamma:my_gamma -> e+:cut e-:cut', '0.0 < M < 0.5', path=rec_path)
-
-    # ----------------------------------------------------------------------------
-    # vertex fits
-    vx.treeFit(list_name='D*+:myDstar', conf_level=0, ipConstraint=True, updateAllDaughters=True, path=rec_path)
-    vx.treeFit(list_name='Lambda0:myLambda', conf_level=0, ipConstraint=True, updateAllDaughters=True, path=rec_path)
-    vx.treeFit(list_name='gamma:my_gamma', conf_level=0, path=rec_path)
-
-    # ----------------------------------------------------------------------------
-    # Selections on Lambda
-
-    ma.cutAndCopyList(
-        outputListName='Lambda0:cut',
-        inputListName='Lambda0:myLambda',
-        cut=" ".join([
-            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance>1.0 and ",
-            "formula(daughter(0,p))>formula(daughter(1,p)) and convertedPhotonInvariantMass(0,1)>0.02 and ",
-            "[[formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+",
-            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+",
-            "daughter(1, pz)))**0.5)<0.488]",
-            "or [formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+",
-            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+",
-            "daughter(1, pz)))**0.5)>0.513]]"
-        ]),
-        path=rec_path)
-
-    # ----------------------------------------------------------------------------
-    # Selections on Dstar
-
-    ma.cutAndCopyList(
-        outputListName='D*+:cut',
-        inputListName='D*+:myDstar',
-        cut='massDifference(0) < 0.151 and 1.85 < daughter(0, InvM) < 1.88 and 1.95 < InvM < 2.05',
-        path=rec_path)
-
-    # ----------------------------------------------------------------------------
-    # Selections on gamma
-    ma.buildEventShape(inputListNames='gamma:my_gamma', path=rec_path)
-    ma.cutAndCopyList(
-        outputListName='gamma:cut',
-        inputListName='gamma:my_gamma',
-        cut=" ".join(['chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01',
-                      'and convertedPhotonInvariantMass(0,1) < 0.005',
-                      'and -0.05<convertedPhotonDelR(0,1)<0.15',
-                      'and -0.05<convertedPhotonDelZ(0,1)<0.05'
-                      ]),
-        path=rec_path)
-
-    cal_test = Calibration("SVDdEdxCalibration",
-                           collector="SVDdEdxCollector",
-                           algorithms=[algo],
-                           input_files=input_files_hadron_calib,
-                           pre_collector_path=rec_path)
+    dedx_validation = Calibration("SVDdEdxValidation",
+                                  collector="SVDdEdxValidationCollector",
+                                  algorithms=[algo_val],
+                                  input_files=input_files_hadron_calib,
+                                  pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun
-    for algorithm in cal_test.algorithms:
+    for algorithm in dedx_calibration.algorithms:
         algorithm.params = {"apply_iov": output_iov}
 
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.
 
     # You must return all calibrations you want to run in the prompt process, even if it's only one
-    return [cal_test]
+    return [dedx_calibration, dedx_validation]
 
 ##############################

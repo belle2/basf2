@@ -210,6 +210,7 @@ void EventT0ValidationModule::endRun()
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiencies of the various EventT0 algorithms."));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Check", "Efficiency should be close to 1 for all active algorithms."));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
+    algorithmEffi->Write();
 
     m_outputFile->Write();
     m_outputFile->Close();
@@ -225,4 +226,5 @@ void EventT0ValidationModule::setPlotMetaData(TH1* hist, const std::string& desc
   hist->GetListOfFunctions()->Add(new TNamed("Description", description));
   hist->GetListOfFunctions()->Add(new TNamed("Check", check));
   hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", shifter));
+  hist->Write();
 }

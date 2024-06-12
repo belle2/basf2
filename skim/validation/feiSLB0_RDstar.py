@@ -28,6 +28,7 @@ path = b2.Path()
 skim = feiSLB0_RDstar(
     validation=True,
     udstOutput=False,
+    analysisGlobaltag=ma.getAnalysisGlobaltag(),
 )
 
 ma.inputMdstList(

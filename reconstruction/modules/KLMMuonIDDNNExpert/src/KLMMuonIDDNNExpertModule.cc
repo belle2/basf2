@@ -73,23 +73,16 @@ void KLMMuonIDDNNExpertModule::initialize()
   }
 
   // setup KLM geometry
-  std::cout << "maxBKLMlayers = " << m_maxBKLMLayers << ", maxEKLMlayers" << m_maxEKLMLayers << std::endl;
-
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
   const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
 
   m_EndcapScintWidth = eklmGeometry.getStripGeometry()->getWidth() / CLHEP::cm; // in G4e units (cm)
-  std::cout << "Endcap scint width = " << m_EndcapScintWidth << std::endl;
 
   for (int layer = 1; layer <= m_maxBKLMLayers; ++layer) {
     const bklm::Module* module =
       bklmGeometry->findModule(BKLMElementNumbers::c_ForwardSection, 1, layer);
     m_BarrelPhiStripWidth[layer - 1] = module->getPhiStripWidth(); // in G4e units (cm)
-    std::cout << "layer " << layer << "phi width = " << m_BarrelPhiStripWidth[layer - 1] << std::endl;
-
     m_BarrelZStripWidth[layer - 1] = module->getZStripWidth(); // in G4e units (cm)
-    std::cout << "layer " << layer << "Z width = " << m_BarrelZStripWidth[layer - 1] << std::endl;
-
   }
 
   MVA::AbstractInterface::initSupportedInterfaces();

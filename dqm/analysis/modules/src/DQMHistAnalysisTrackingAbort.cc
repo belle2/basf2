@@ -145,9 +145,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
     hAbort->Draw();
 
 
-    if (nEvents < m_statThreshold) colorizeCanvas(m_cAbortRate, EStatus::c_StatusTooFew);
-    else if (hasError) colorizeCanvas(m_cAbortRate, EStatus::c_StatusError);
-    else colorizeCanvas(m_cAbortRate, EStatus::c_StatusGood);
+    auto state = makeStatus(nEvents >= m_statThreshold, false, hasError);
+    colorizeCanvas(m_cAbortRate, state);
 
   } else { // histograms not found
     colorizeCanvas(m_cAbortRate, EStatus::c_StatusTooFew);

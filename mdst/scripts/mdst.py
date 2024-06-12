@@ -20,7 +20,6 @@ MDST_OBJECTS = (
     'KLMClusters',
     'KlIds',
     'PIDLikelihoods',
-    'KLMMuonIDDNNs',
     'SoftwareTriggerResult',
     'TrackFitResults',
     'Tracks',

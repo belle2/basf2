@@ -5,6 +5,7 @@ env['LIBS'] = [
     'tracking_dataobjects',
     'framework',
     '$ROOT_LIBS',
+    'klm',
     'klm_dataobjects', 
     'mva', 
     'mva_dataobjects',

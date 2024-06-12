@@ -12,6 +12,7 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
+#include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/KLMMuidLikelihood.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
@@ -123,6 +124,17 @@ namespace Belle2 {
 
     /** Container of extrapolation situation at each KLM layer of one track. */
     std::array < bool, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_hasext;
+
+    /** BKLM phi-measuring strip width (cm) by layer. */
+    std::array < float, m_maxBKLMLayers > m_BarrelPhiStripWidth;
+
+    /** BKLM Z-measuring strip width (cm) by layer. */
+    std::array < float, m_maxBKLMLayers > m_BarrelZStripWidth;
+
+    /** EKLM scintillator strip width (cm). */
+    float m_EndcapScintWidth;
+
+    float getHitWidth(const KLMHit2d* klmhit);
 
   };
 }

@@ -15,6 +15,11 @@
 #include <klm/dataobjects/KLMHit2d.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/eklm/EKLMElementNumbers.h>
+#include <klm/bklm/geometry/GeometryPar.h>
+#include <klm/bklm/geometry/Module.h>
+#include <klm/eklm/geometry/TransformDataGlobalAligned.h>
+
+#include <CLHEP/Units/SystemOfUnits.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreObjPtr.h>
@@ -66,6 +71,27 @@ void KLMMuonIDDNNExpertModule::initialize()
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                   DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
   }
+
+  // setup KLM geometry
+  std::cout << "maxBKLMlayers = " << m_maxBKLMLayers << ", maxEKLMlayers" << m_maxEKLMLayers << std::endl;
+
+  bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
+  const EKLM::GeometryData& eklmGeometry = EKLM::GeometryData::Instance();
+
+  m_EndcapScintWidth = eklmGeometry.getStripGeometry()->getWidth() / CLHEP::cm; // in G4e units (cm)
+  std::cout << "Endcap scint width = " << m_EndcapScintWidth << std::endl;
+
+  for (int layer = 1; layer <= m_maxBKLMLayers; ++layer) {
+    const bklm::Module* module =
+      bklmGeometry->findModule(BKLMElementNumbers::c_ForwardSection, 1, layer);
+    m_BarrelPhiStripWidth[layer - 1] = module->getPhiStripWidth(); // in G4e units (cm)
+    std::cout << "layer " << layer << "phi width = " << m_BarrelPhiStripWidth[layer - 1] << std::endl;
+
+    m_BarrelZStripWidth[layer - 1] = module->getZStripWidth(); // in G4e units (cm)
+    std::cout << "layer " << layer << "Z width = " << m_BarrelZStripWidth[layer - 1] << std::endl;
+
+  }
+
   MVA::AbstractInterface::initSupportedInterfaces();
 }
 
@@ -158,7 +184,7 @@ void KLMMuonIDDNNExpertModule::event()
     // only apply NN muonID to tracks with at least one KLMHit2d or one ExtHit in KLM.
     if (not(hasExtInKLM || KLMHit2drelation.size())) continue;
 
-    std::map<int, int> Hit2dMap; // arrange KLMHit2d order in layer
+    std::map<int, int> Hit2dMap; // arrange KLMHit2d in the order of layer
     for (long unsigned int ii = 0; ii < KLMHit2drelation.size(); ii++) {
       KLMHit2d* klmhit = KLMHit2drelation[ii];
       bool hit_inBKLM = (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM);
@@ -178,7 +204,7 @@ void KLMMuonIDDNNExpertModule::event()
       KLMHit2d* klmhit = KLMHit2drelation[itermap->second];
 
       float KFchi2 = KLMHit2drelation.weight(itermap->second);
-      float width = klmhit->getWidth();
+      float width = getHitWidth(klmhit);
 
       ROOT::Math::XYZVector hitPosition = klmhit->getPosition();
       float steplength = 0.;
@@ -225,6 +251,28 @@ float KLMMuonIDDNNExpertModule::getNNmuProbability(const Track* track, const KLM
 
   float muprob_nn = m_expert->apply(*m_dataset)[0];
   return muprob_nn;
+}
+
+float KLMMuonIDDNNExpertModule::getHitWidth(const KLMHit2d* klmhit)
+{
+  float stripwidth1 = 0; // strip width of phi or X direction
+  float stripwidth2 = 0; // strip width of Z or Y direction
+  float stripdiff1 = 0; // max minus min strip number in phi or X direction
+  float stripdiff2 = 0; // max minus min strip number in Z or Y direction
+  if (klmhit->getSubdetector() == KLMElementNumbers::c_BKLM) {
+    stripwidth1 = m_BarrelPhiStripWidth[klmhit->getLayer() - 1];
+    stripwidth2 = m_BarrelZStripWidth[klmhit->getLayer() - 1];
+    stripdiff1 = (klmhit->getPhiStripMax() - klmhit->getPhiStripMin() + 1) * 0.5;
+    stripdiff2 = (klmhit->getZStripMax() - klmhit->getZStripMin() + 1) * 0.5;
+  } else {
+    stripwidth1 = m_EndcapScintWidth;
+    stripwidth2 = m_EndcapScintWidth;
+    stripdiff1 = (klmhit->getXStripMax() - klmhit->getXStripMin() + 1) * 0.5;
+    stripdiff2 = (klmhit->getYStripMax() - klmhit->getYStripMin() + 1) * 0.5;
+  }
+  float width1 = stripwidth1 * stripdiff1;
+  float width2 = stripwidth2 * stripdiff2;
+  return std::sqrt(width1 * width1 + width2 * width2);
 }
 
 

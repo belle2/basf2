@@ -95,9 +95,6 @@ namespace Belle2 {
 
     void iterateKeys(TIter& next, std::vector<TH1*>& hs, std::string dirname = "");
 
-    int m_forceRunNr{50};
-    int m_forceExpNr{50};
-    std::string m_forceRunType{"null"};
   };
 } // end namespace Belle2
 

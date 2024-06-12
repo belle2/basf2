@@ -66,7 +66,7 @@ void DQMHistAnalysisInput2Module::iterateKeys(TIter& next, std::vector<TH1*>& hs
   while ((key = (TKey*)next())) {
     auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
     if (obj == nullptr) continue; // would be strange, but better check
-    if (obj->IsA()->InheritsFrom("TDirectory")) {
+    if (!obj->IsA()->InheritsFrom("TDirectory")) {
       auto d = (TDirectory*)obj;
       TIter next2(d->GetListOfKeys());
       iterateKeys(next2, hs, d->GetName() + std::string("/"));
@@ -181,10 +181,6 @@ void DQMHistAnalysisInput2Module::event()
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after input loop");
-
-  if (m_forceRunNr) runno = std::to_string(m_forceRunNr);
-  if (m_forceExpNr) expno = std::to_string(m_forceExpNr);
-  if (m_forceRunType != "") rtype = m_forceRunType;
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
     B2WARNING("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +

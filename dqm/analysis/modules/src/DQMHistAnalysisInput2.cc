@@ -60,49 +60,6 @@ void DQMHistAnalysisInput2Module::beginRun()
   clearCanvases();
 }
 
-void DQMHistAnalysisInput2Module::iterateKeys(TIter& next, std::vector<TH1*>& hs, std::string dirname)
-{
-  TKey* key = nullptr;
-  while ((key = (TKey*)next())) {
-    auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
-    if (obj == nullptr) continue; // would be strange, but better check
-    if (!obj->IsA()->InheritsFrom("TDirectory")) {
-      auto d = (TDirectory*)obj;
-      TIter next2(d->GetListOfKeys());
-      iterateKeys(next2, hs, d->GetName() + std::string("/"));
-    }
-    if (!obj->IsA()->InheritsFrom("TH1")) {
-      delete obj;
-      continue; // other non supported (yet?)
-    }
-    TH1* h = (TH1*)obj; // we are sure its a TH1
-
-    if (m_remove_empty && h->GetEntries() == 0) {
-      delete obj;
-      continue;
-    }
-    // Remove ":" from folder name, workaround!
-    TString a = h->GetName();
-    a.ReplaceAll(":", "");
-    h->SetName(dirname + a);
-    B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
-
-    // the following line prevent any histogram outside a directory to be processed
-    if (dirname == "" && StringSplit(a.Data(), '/').size() <= 1) {
-      delete obj;
-      continue;
-    }
-
-    // only Histograms in the hs list will be taken care off
-    hs.push_back(h);
-
-    // the following workaround need to be improved
-//     if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
-//     if (std::string(h->GetName()) == std::string("DQMInfo/runno")) runno = h->GetTitle();
-//     if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) rtype = h->GetTitle();
-  }
-}
-
 void DQMHistAnalysisInput2Module::event()
 {
   TH1::AddDirectory(false);
@@ -150,6 +107,7 @@ void DQMHistAnalysisInput2Module::event()
 
   pFile->cd();
   TIter next(pFile->GetListOfKeys());
+  TKey* key = nullptr;
 
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
@@ -164,7 +122,39 @@ void DQMHistAnalysisInput2Module::event()
 
   std::vector<TH1*> hs; // temporary histograms storage vector
 
-  iterateKeys(next, hs);
+  while ((key = (TKey*)next())) {
+    auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
+    if (obj == nullptr) continue; // would be strange, but better check
+    if (!obj->IsA()->InheritsFrom("TH1")) {
+      delete obj;
+      continue; // other non supported (yet?)
+    }
+    TH1* h = (TH1*)obj; // we are sure its a TH1
+
+    if (m_remove_empty && h->GetEntries() == 0) {
+      delete obj;
+      continue;
+    }
+    // Remove ":" from folder name, workaround!
+    TString a = h->GetName();
+    a.ReplaceAll(":", "");
+    h->SetName(a);
+    B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
+
+    // the following line prevent any histogram outside a directory to be processed
+    if (StringSplit(a.Data(), '/').size() <= 1) {
+      delete obj;
+      continue;
+    }
+
+    // only Histograms in the hs list will be taken care off
+    hs.push_back(h);
+
+    // the following workaround need to be improved
+    if (std::string(h->GetName()) == std::string("DQMInfo/expno")) expno = h->GetTitle();
+    if (std::string(h->GetName()) == std::string("DQMInfo/runno")) runno = h->GetTitle();
+    if (std::string(h->GetName()) == std::string("DQMInfo/rtype")) rtype = h->GetTitle();
+  }
 
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));

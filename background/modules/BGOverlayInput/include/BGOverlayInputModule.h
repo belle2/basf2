@@ -90,6 +90,7 @@ namespace Belle2 {
     std::string m_extensionName; /**< name added to default branch names */
     std::string m_BackgroundInfoInstanceName = ""; /**< name of BackgroundInfo branch */
     bool m_skipExperimentCheck = false; /**< flag for skipping the check on the experiment number */
+    bool m_ignoreRunNumbers = false; /**< flag for ignoring the run numbers in run-dependent MC */
 
     TChain* m_tree = 0;            /**< tree pointer */
     unsigned m_numEvents = 0;      /**< number of events (tree entries) in the sample */

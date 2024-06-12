@@ -45,7 +45,7 @@ BGOverlayInputModule::BGOverlayInputModule() : Module()
   setDescription("Input for BG overlay, either in form of Digits or raw data. For run-dependent MC (experiments 1 to 999) "
                  "the overlay samples corresponding to the simulated run are automatically selected from the input list "
                  "at each beginRun(), enabling production of multiple runs in a single job. "
-                 "This feature can be turned off by setting skipExperimentCheck to true.");
+                 "This feature can be turned off by setting ignoreRunNumbers to True.");
 
   // Add parameters
   addParam("inputFileNames", m_inputFileNames,
@@ -54,9 +54,12 @@ BGOverlayInputModule::BGOverlayInputModule() : Module()
            "Name added to default branch names", string("_beamBG"));
   addParam("bkgInfoName", m_BackgroundInfoInstanceName, "Name of the BackgroundInfo StoreObjPtr", string(""));
   addParam("skipExperimentCheck", m_skipExperimentCheck,
-           "If true, skip the check on the experiment number consistency between the basf2 process and the beam background files; "
-           "in case of run-dependent MC ignore also run numbers. "
+           "If True, skip the check on the experiment number consistency between the basf2 process and the beam background files; "
+           "for experiments 1 to 999 ignore also run numbers. "
            "By default, it is set to false, since the check should be skipped only by experts.",
+           false);
+  addParam("ignoreRunNumbers", m_ignoreRunNumbers,
+           "If True, ignore run numbers in case of run-dependend MC (experiments 1 to 999).",
            false);
 }
 
@@ -104,7 +107,9 @@ void BGOverlayInputModule::initialize()
                   << LogVar("Experiment number of the basf2 process", experiment)
                   << LogVar("Experiment number of the BG file", fileMetaData.getExperimentLow()));
         }
-        m_runFileNamesMap[fileMetaData.getRunLow()].push_back(fileName);
+        if (not m_ignoreRunNumbers) {
+          m_runFileNamesMap[fileMetaData.getRunLow()].push_back(fileName);
+        }
       }
     } catch (const std::invalid_argument& e) {
       B2FATAL("One of the BG files can not be opened."
@@ -122,7 +127,7 @@ void BGOverlayInputModule::initialize()
     m_tree->AddFile(fileName.c_str());
   }
   m_numEvents = m_tree->GetEntries();
-  if (m_numEvents == 0) B2ERROR(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entires");
+  if (m_numEvents == 0) B2ERROR(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entries");
 
   // register selected branches to DataStore
   bool ok = registerBranches();
@@ -172,7 +177,7 @@ void BGOverlayInputModule::beginRun()
   if (numFiles == 0) B2FATAL("No overlay files for run " << run);
 
   m_numEvents = m_tree->GetEntries();
-  if (m_numEvents == 0) B2FATAL(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entires for run " << run);
+  if (m_numEvents == 0) B2FATAL(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entries for run " << run);
 
   // choose randomly the first event and connect branches
   m_firstEvent = gRandom->Integer(m_numEvents);

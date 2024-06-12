@@ -7,7 +7,7 @@
  **************************************************************************/
 
 #include <svd/calibration/SVDdEdxValidationAlgorithm.h>
-// #include <svd/dbobjects/SVDdEdxPDFs.h>
+
 #include <tuple>
 #include <vector>
 #include <string>
@@ -70,7 +70,6 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
   // call the calibration functions
   TTree* TTreeLambdaSW = LambdaMassFit(TTreeLambda);
   TTree* TTreeDstarSW = DstarMassFit(TTreeDstar);
-  // TH2F h_GammaE = GammaHistogram(TTreeGamma);
   TTree* TTreeGammaWrap = TTreeGamma.get();
 
   std::vector<TString> LAYER;
@@ -78,42 +77,55 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
   LAYER.push_back("SVDonly");
   LAYER.push_back("noSVD");
 
+  std::map<TTree*, TString> SWeightNameMap = {
+    { TTreeGammaWrap, "1" },
+    { TTreeDstarSW, "nSignalDstar_sw" },
+    { TTreeLambdaSW, "nSignalLambda_sw" }
+  };
 
   for (const TString& LayerName : LAYER) {
-    PlotEfficiencyPlots(LayerName, TTreeGammaWrap, "1", "e_1", "electron", TTreeDstarSW, "nSignalDstar_sw", "pi", "pion",
+    PlotEfficiencyPlots(LayerName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "pi", "pion",
                         "electron_pionID",
-                        "0.5", 30, 0.2, 2.5);
-    PlotEfficiencyPlots(LayerName, TTreeGammaWrap, "1", "e_1", "electron", TTreeDstarSW, "nSignalDstar_sw", "K", "kaon",
+                        "0.5", m_NumEffBins, 0.2, m_MomHighEff);
+    PlotEfficiencyPlots(LayerName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "K", "kaon",
                         "electron_kaonID", "0.5",
-                        30, 0.2, 2.5);
-    PlotEfficiencyPlots(LayerName, TTreeLambdaSW, "nSignalLambda_sw", "p", "proton", TTreeDstarSW, "nSignalDstar_sw", "pi", "pion",
+                        m_NumEffBins, 0.2, m_MomHighEff);
+    PlotEfficiencyPlots(LayerName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "pi", "pion",
                         "proton_pionID", "0.5",
-                        30, 0.25, 2.5);
-    PlotEfficiencyPlots(LayerName, TTreeLambdaSW, "nSignalLambda_sw", "p", "proton", TTreeDstarSW, "nSignalDstar_sw", "K", "kaon",
+                        m_NumEffBins, 0.25, m_MomHighEff);
+    PlotEfficiencyPlots(LayerName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "K", "kaon",
                         "proton_kaonID", "0.5",
-                        30, 0.25, 2.5);
-    PlotEfficiencyPlots(LayerName, TTreeDstarSW, "nSignalDstar_sw", "pi", "pion", TTreeDstarSW, "nSignalDstar_sw", "K", "kaon",
-                        "pion_kaonID", "0.5", 30,
-                        0.2, 2.5);
-    PlotEfficiencyPlots(LayerName, TTreeDstarSW, "nSignalDstar_sw", "K", "kaon", TTreeDstarSW, "nSignalDstar_sw", "pi", "pion",
-                        "kaon_pionID", "0.5", 30,
-                        0.2, 2.5);
+                        m_NumEffBins, 0.25, m_MomHighEff);
+    PlotEfficiencyPlots(LayerName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW],
+                        "K", "kaon",
+                        "pion_kaonID", "0.5", m_NumEffBins,
+                        0.2, m_MomHighEff);
+    PlotEfficiencyPlots(LayerName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW],
+                        "pi", "pion",
+                        "kaon_pionID", "0.5", m_NumEffBins,
+                        0.2, m_MomHighEff);
   }
 
-  PlotROCCurve(TTreeGammaWrap, "1", "e_1", "electron", TTreeDstarSW, "nSignalDstar_sw", "pi", "pion", "electron_pionID", 0., 7.);
-  PlotROCCurve(TTreeGammaWrap, "1", "e_1", "electron", TTreeDstarSW, "nSignalDstar_sw", "K", "kaon", "electron_kaonID", 0., 7.);
-  PlotROCCurve(TTreeLambdaSW, "nSignalLambda_sw", "p", "proton", TTreeDstarSW, "nSignalDstar_sw", "pi", "pion", "proton_pionID", 0.,
-               7.);
-  PlotROCCurve(TTreeLambdaSW, "nSignalLambda_sw", "p", "proton", TTreeDstarSW, "nSignalDstar_sw", "K", "kaon", "proton_kaonID", 0.,
-               7.);
-  PlotROCCurve(TTreeDstarSW, "nSignalDstar_sw", "pi", "pion", TTreeDstarSW, "nSignalDstar_sw", "K", "kaon", "pion_kaonID", 0., 7.);
-  PlotROCCurve(TTreeDstarSW, "nSignalDstar_sw", "K", "kaon", TTreeDstarSW, "nSignalDstar_sw", "pi", "pion", "kaon_pionID", 0., 7.);
+  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi",
+               "pion", "electron_pionID");
+  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K",
+               "kaon", "electron_kaonID");
+  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion",
+               "proton_pionID");
+  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon",
+               "proton_kaonID");
+  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon",
+               "pion_kaonID");
+  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion",
+               "kaon_pionID");
 
-  // saveCalibration(payload, "SVDdEdxPDFs"); //"DedxPDFs");
 
   B2INFO("SVD dE/dx validation done!");
 
-  // fout_read->Close();
   return c_OK;
 }
 
@@ -123,14 +135,21 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
                                                      TString FakeVarNameFull, TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh)
 {
 
+  if ((SignalTree == nullptr) || (FakeTree == nullptr)) {
+    B2FATAL("Invalid dataset, stopping here");
+  }
+
+  if ((SignalTree->GetEntries() == 0) || (FakeTree->GetEntries() == 0)) {
+    B2FATAL("The dataset is empty, stopping here");
+  }
+
+  if ((SignalTree->GetBranch(Form("%s_p", SignalVarName.Data())) == nullptr)
+      || (FakeTree->GetBranch(Form("%s_p", FakeVarName.Data())) == nullptr)) {
+    B2FATAL("Check the provided branch name, stopping here");
+  }
+
   TString SignalFiducialCut = "(1>0)"; // placeholder for a possible sanity cut
   TString FakesFiducialCut = "(1>0)";
-
-  // Data
-  // TFile *SignalFile = new TFile(SignalFileName);
-  // TTree *SignalTree = (TTree *)SignalFile->Get(SignalTreeName);
-  // TFile *FakeFile = new TFile(FakeFileName);
-  // TTree *FakeTree = (TTree *)FakeFile->Get(FakeTreeName);
 
   // Produce the plots of the SVD PID distribution
   if (LayerName == "SVDonly") {
@@ -184,7 +203,7 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
 
   // PID plots
   TH1F* h_Base = new TH1F("h_Base", "", 100, 0.0, MomHigh);
-  h_Base->SetTitle(";Momentum [GeV];Efficiency"); //, SignalVarNameFull.Data(), FakeVarNameFull.Data()));
+  h_Base->SetTitle(";Momentum [GeV];Efficiency");
   h_Base->SetMaximum(1.20);
   h_Base->SetMinimum(0.0);
 
@@ -229,45 +248,53 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
   delete ResultCanvas;
   delete h_Base;
 
-  // SignalFile->Close();
-  // FakeFile->Close();
 }
 
 void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
                                               TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull,
-                                              TString PIDVarName, double MomLow, double MomHigh)
+                                              TString PIDVarName)
 {
-  const unsigned int npoints = 250; // the more the nicer curve but slower execution
+
+  if ((SignalTree == nullptr) || (FakeTree == nullptr)) {
+    B2FATAL("Invalid dataset, stopping here");
+  }
+
+  if ((SignalTree->GetEntries() == 0) || (FakeTree->GetEntries() == 0)) {
+    B2FATAL("The dataset is empty, stopping here");
+  }
+
+  if ((SignalTree->GetBranch(Form("%s_p", SignalVarName.Data())) == nullptr)
+      || (FakeTree->GetBranch(Form("%s_p", FakeVarName.Data())) == nullptr)) {
+    B2FATAL("Check the provided branch name, stopping here");
+  }
 
   std::vector<TString> LAYER;
   LAYER.clear();
   LAYER.push_back("_ALL");
   LAYER.push_back("_noSVD");
 
-  // TFile *SignalFile = TFile::Open(SignalFileName, "r");
-  // TTree *SignalTree = (TTree *)SignalFile->Get(SignalTreeName);
-
-  double SignalEfficiency_ALL[npoints], FakeEfficiency_ALL[npoints];
-  double SignalEfficiency_noSVD[npoints], FakeEfficiency_noSVD[npoints];
+  double SignalEfficiency_ALL[m_NumROCpoints], FakeEfficiency_ALL[m_NumROCpoints];
+  double SignalEfficiency_noSVD[m_NumROCpoints], FakeEfficiency_noSVD[m_NumROCpoints];
 
   TString SignalFiducialCut = SignalVarName + "_" + PIDVarName + "_noSVD>=0"; // sanity cuts to reject events with NaN
   TString FakesFiducialCut = FakeVarName + "_" + PIDVarName + "_noSVD>=0";
 
   // calculate efficiencies
   for (unsigned int i = 0; i < LAYER.size(); i++) {
-    for (unsigned int j = 0; j < npoints; ++j) {
+    for (unsigned int j = 0; j < m_NumROCpoints; ++j) {
       delete gROOT->FindObject("PIDCut");
       delete gROOT->FindObject("h_AllSignal");
       delete gROOT->FindObject("h_SelectedSignal");
 
-      double x = 1. / npoints * j;
+      // scan cut values from 0 to 1, with a denser scan closer to 0 or 1, to get a nicer ROC curve
+      double x = 1. / m_NumROCpoints * j;
       TString PIDCut = TString::Format("%f", 1. / (1 + TMath::Power(x / (1 - x), -3)));
 
-      // TString PIDCut = TString::Format("%f", 0. + 1. / npoints * j);
+      // TString PIDCut = TString::Format("%f", 0. + 1. / m_NumROCpoints * j);
 
-      SignalTree->Draw(Form("%s_p>>h_AllSignal(1,%f,%f)", SignalVarName.Data(), MomLow, MomHigh),
+      SignalTree->Draw(Form("%s_p>>h_AllSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
                        SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-      SignalTree->Draw(Form("%s_p>>h_SelectedSignal(1,%f,%f)", SignalVarName.Data(), MomLow, MomHigh),
+      SignalTree->Draw(Form("%s_p>>h_SelectedSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
                        SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + LAYER[i] + ">" + PIDCut + "&&" + SignalFiducialCut + ")", "goff");
 
       TH1F* h_AllSignal = (TH1F*)gDirectory->Get("h_AllSignal");
@@ -283,27 +310,22 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
     }
   }
 
-  // SignalFile->Close();
-
   // calculate fake rates
-  // TFile *FakeFile = TFile::Open(FakeFileName, "r");
-  // TTree *FakeTree = (TTree *)FakeFile->Get(FakeTreeName);
 
   for (unsigned int i = 0; i < LAYER.size(); i++) {
-    for (unsigned int j = 0; j < npoints; ++j) {
+    for (unsigned int j = 0; j < m_NumROCpoints; ++j) {
       delete gROOT->FindObject("PIDCut");
       delete gROOT->FindObject("h_AllFakes");
       delete gROOT->FindObject("h_SelectedFakes");
-      delete gROOT->FindObject("h_AllFakes");
 
-      double x = 1. / npoints * j;
+      // scan cut values from 0 to 1, with a denser scan closer to 0 or 1, to get a nicer ROC curve
+      double x = 1. / m_NumROCpoints * j;
       TString PIDCut = TString::Format("%f", 1. / (1 + TMath::Power(x / (1 - x), -3)));
 
-      // TString PIDCut = TString::Format("%f", 0. + 1. / npoints * j);
 
-      FakeTree->Draw(Form("%s_p>>h_AllFakes(1,%f,%f)", FakeVarName.Data(), MomLow, MomHigh),
+      FakeTree->Draw(Form("%s_p>>h_AllFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
                      FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
-      FakeTree->Draw(Form("%s_p>>h_SelectedFakes(1,%f,%f)", FakeVarName.Data(), MomLow, MomHigh),
+      FakeTree->Draw(Form("%s_p>>h_SelectedFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
                      FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + LAYER[i] + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
 
       TH1F* h_SelectedFakes = (TH1F*)gDirectory->Get("h_SelectedFakes");
@@ -319,13 +341,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
     }
   }
 
-  // FakeFile->Close();
-
   auto ResultCanvas = new TCanvas("ResultCanvas", "", 600, 400);
   TMultiGraph* h_mgraph = new TMultiGraph();
 
   // efficiency and kaon fake rate
-  TGraph* h_graph_ALL = new TGraph(npoints, FakeEfficiency_ALL, SignalEfficiency_ALL);
+  TGraph* h_graph_ALL = new TGraph(m_NumROCpoints, FakeEfficiency_ALL, SignalEfficiency_ALL);
   h_graph_ALL->SetMarkerColor(TColor::GetColor("#2166ac"));
   h_graph_ALL->SetMarkerStyle(20);
   h_graph_ALL->SetLineColor(TColor::GetColor("#2166ac"));
@@ -333,7 +353,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   h_graph_ALL->SetDrawOption("AP*");
   h_graph_ALL->SetTitle("with SVD");
 
-  TGraph* h_graph_noSVD = new TGraph(npoints, FakeEfficiency_noSVD, SignalEfficiency_noSVD);
+  TGraph* h_graph_noSVD = new TGraph(m_NumROCpoints, FakeEfficiency_noSVD, SignalEfficiency_noSVD);
   h_graph_noSVD->SetMarkerColor(TColor::GetColor("#ef8a62"));
   h_graph_noSVD->SetLineColor(TColor::GetColor("#ef8a62"));
   h_graph_noSVD->SetLineWidth(3);
@@ -351,7 +371,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   ResultCanvas->SetGrid();
 
   ResultCanvas->Print("ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_MomRange" + std::to_string(
-                        MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
+                        m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".pdf");
 
   delete ResultCanvas;
 }
@@ -775,78 +795,3 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
 
   return treeDstar_sw;
 }
-
-// TTree SVDdEdxValidationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTree)
-// {
-//   B2INFO("Histogramming the converted photon selection...");
-//   gROOT->SetBatch(true);
-
-//   if (preselTree->GetEntries() == 0)
-//   {
-//     B2FATAL("The Gamma tree is empty, stopping here");
-//   }
-//   std::vector<double> pbins = CreatePBinningScheme();
-//   // const int m_numDEdxBins = 100;
-//   // const int m_numPBins = 69;
-//   // double pbins[m_numPBins + 1];
-//   // pbins[0] = 0.0;
-//   // pbins[1] = 0.05;
-
-//   // for (int bin = 2; bin <= m_numPBins; bin++) {
-//   //   if (bin <= 19)
-//   //     pbins[bin] = 0.025 + 0.025 * bin;
-//   //   else if (bin <= 59)
-//   //     pbins[bin] = pbins[19] + 0.05 * (bin - 19);
-//   //   else
-//   //     pbins[bin] = pbins[59] + 0.3 * (bin - 59);
-//   // }
-
-//   // double m_dedxCutoff = 0;
-//   // m_dedxCutoff = 5e6;
-
-//   TH2F *h_GammaE = new TH2F("hist_d1_11_trunc", "hist_d1_11_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
-
-//   TH2F *h_GammaEPart1 = (TH2F *)h_GammaE->Clone("hist_d1_11_truncPart1");
-//   TH2F *h_GammaEPart2 = (TH2F *)h_GammaE->Clone("hist_d1_11_truncPart2");
-
-//   preselTree->Draw("e_1_SVDdEdx:e_1_p>>hist_d1_11_truncPart1", "e_1_SVDdEdx>0", "goff");
-//   preselTree->Draw("e_2_SVDdEdx:e_2_p>>hist_d1_11_truncPart2", "e_2_SVDdEdx>0", "goff");
-//   h_GammaE->Add(h_GammaEPart1);
-//   h_GammaE->Add(h_GammaEPart2);
-
-//   // for each momentum bin, normalize the pdf
-//   // h_GammaE normalisation
-//   for (int pbin = 1; pbin <= m_numPBins; pbin++)
-//   {
-//     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++)
-//     {
-//       // get rid of the bins with negative weights
-//       if (h_GammaE->GetBinContent(pbin, dedxbin) < 0)
-//       {
-//         h_GammaE->SetBinContent(pbin, dedxbin, 0);
-//       };
-//     }
-
-//     // create a projection (1D histogram) in a given momentum bin
-//     TH1D *slice = (TH1D *)h_GammaE->ProjectionY("slice", pbin, pbin);
-//     // normalise, but ignore the cases with empty histograms
-//     if (slice->Integral() > 0)
-//     {
-//       slice->Scale(1. / slice->Integral());
-//     }
-//     // fill back the 2D histo with the result
-//     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++)
-//     {
-//       h_GammaE->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
-//     }
-//   }
-
-//   if (m_isMakePlots)
-//   {
-//     TCanvas *canvGamma = new TCanvas("canvGamma", "canvGamma");
-//     h_GammaE->Draw("COLZ");
-//     canvGamma->Print("SVDdEdxCalibrationHistoGamma.pdf");
-//   }
-
-//   return *h_GammaE;
-// }

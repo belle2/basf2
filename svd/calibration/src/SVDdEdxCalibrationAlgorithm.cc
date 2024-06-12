@@ -7,8 +7,6 @@
  **************************************************************************/
 
 #include <svd/calibration/SVDdEdxCalibrationAlgorithm.h>
-// #include <framework/database/DBObjPtr.h>
-// #include <reconstruction/dbobjects/DedxPDFs.h>
 #include <svd/dbobjects/SVDdEdxPDFs.h>
 #include <tuple>
 
@@ -50,15 +48,10 @@ SVDdEdxCalibrationAlgorithm::SVDdEdxCalibrationAlgorithm() : CalibrationAlgorith
 CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
 {
   gROOT->SetBatch(true);
-  // get the DB dEdx PDFs
 
   const auto exprun = getRunList()[0];
   B2INFO("ExpRun used for calibration: " << exprun.first << " " << exprun.second);
-  // updateDBObjPtrs(1, exprun.second, exprun.first);
 
-  // DBObjPtr<DedxPDFs> m_DBDedxPDFs;
-  // if (!m_DBDedxPDFs)
-  //   B2FATAL("No VXD dEdx PDFs available");
   auto payload = new Belle2::SVDdEdxPDFs();
 
   // Get data objects
@@ -84,22 +77,16 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   }
 
   B2INFO("Histograms are ready, proceed to creating the payload object...");
-  //    Belle2::DedxPDFs* pdfs = (Belle2::DedxPDFs*)runfile->Get("DedxPDFs");
   std::vector<TH2F*> hDedxPDFs(6);
 
   std::array<std::string, 6> part = {"Electron", "Muon", "Pion", "Kaon", "Proton", "Deuteron"};
-  // std::array<std::string, 3> det = {"PXD", "VXD", "CDC"};
 
   TCanvas* candEdx = new TCanvas("candEdx", "SVD dEdx payloads", 1200, 700);
   candEdx->Divide(3, 2);
   gStyle->SetOptStat(11);
-  // TFile* fout = new TFile("hDedxPDFs_payload.root", "RECREATE");
-  // for (const auto& idet : det) {
+
   for (bool trunmean : {false, true}) {
     for (int iPart = 0; iPart < 6; iPart++) {
-      // if (idet.compare("PXD") == 0)
-      //   hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getPXDPDF(iPart, trunmean);
-      // else if (idet.compare("VXD") == 0) {
 
       if (iPart == 0 && trunmean) {
         hDedxPDFs[iPart] = &h_GammaE;
@@ -117,16 +104,10 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
         hDedxPDFs[iPart] = &h_LambdaP;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       }
-      // else if (iPart == 5 && trunmean)
-      // { // for deuteron, set equal to that of the proton
 
-      //   hDedxPDFs[iPart] = &h_LambdaP;
-      //   hDedxPDFs[iPart]->SetTitle("hist_d1_1000010020_trunc");
-      //   payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
-
-      // }
       else
-        hDedxPDFs[iPart] = &h_Empty;//(TH2F*)m_DBDedxPDFs->getSVDPDF(iPart, trunmean);
+        hDedxPDFs[iPart] = &h_Empty;
+      payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
 
       candEdx->cd(iPart + 1);
       hDedxPDFs[iPart]->SetTitle(Form("%s; p(GeV/c) of %s; dE/dx", hDedxPDFs[iPart]->GetTitle(), part[iPart].data()));
@@ -135,25 +116,14 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       if (m_isMakePlots) {
         candEdx->SaveAs("Plots_SVDDedxPDFs_wTruncMean.pdf");
       }
-      // } else if (idet.compare("CDC") == 0)
-      //   hDedxPDFs[iPart] = (TH2F*)m_DBDedxPDFs->getCDCPDF(iPart, trunmean);
-      // hDedxPDFs[iPart]->Write();
+
     }
     // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
   }
-  // }
 
-  // fout->Close();
-
-  // TFile* fout_read = new TFile("hDedxPDFs_payload.root", "READ"); // not sure if it's the best way to handle this
-  // TClonesArray dedxPDFs("Belle2::DedxPDFs");
-  // auto payload = new Belle2::DedxPDFs(fout_read);
-  // new (dedxPDFs[0]) DedxPDFs(fout_read);
-  saveCalibration(payload, "SVDdEdxPDFs"); //"DedxPDFs");
-
+  saveCalibration(payload, "SVDdEdxPDFs");
   B2INFO("SVD dE/dx calibration done!");
 
-  // fout_read->Close();
   return c_OK;
 }
 

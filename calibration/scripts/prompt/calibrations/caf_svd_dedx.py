@@ -44,7 +44,12 @@ settings = CalibrationSettings(
         "MinEvtsPerTree": 100,
         "NBinsP": 69,
         "NBinsdEdx": 100,
-        "dedxCutoff": 5.e6
+        "dedxCutoff": 5.e6,
+        "NumROCpoints": 250,
+        "MinROCMomentum": 0.,
+        "MaxROCMomentum": 7.,
+        "NumEffBins": 30,
+        "MaxEffMomentum": 2.5
         },
     depends_on=[])
 
@@ -221,6 +226,11 @@ def get_calibrations(input_data, **kwargs):
     algo_val = SVDdEdxValidationAlgorithm()
     algo_val.setMonitoringPlots(True)
     algo_val.setMinEvtsPerTree(expert_config['MinEvtsPerTree'])
+    algo_val.setNumROCpoints(expert_config['NumROCpoints'])
+    algo_val.setMinROCMomentum(expert_config['MinROCMomentum'])
+    algo_val.setMaxROCMomentum(expert_config['MaxROCMomentum'])
+    algo_val.setNumEffBins(expert_config['NumEffBins'])
+    algo_val.setMaxEffMomentum(expert_config['MaxEffMomentum'])
 
     ###################################################
     # Calibration setup

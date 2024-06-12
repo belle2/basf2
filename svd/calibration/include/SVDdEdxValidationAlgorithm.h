@@ -10,6 +10,7 @@
 
 #include <calibration/CalibrationAlgorithm.h>
 #include <TTree.h>
+#include <map>
 
 namespace Belle2 {
   /**
@@ -35,19 +36,29 @@ namespace Belle2 {
     void setMonitoringPlots(bool value = false) { m_isMakePlots = value; }
 
     // /**
-    //  * set the number of dEdx bins for the payloads
+    //  * set the number of points for ROC curve plotting
     //  */
-    // void setNumDEdxBins(const int& value) { m_numDEdxBins = value; }
+    void setNumROCpoints(const unsigned int& value) { m_NumROCpoints = value; }
 
     // /**
-    //  * set the number of momentum bins for the payloads
+    //  * set the lower edge of the momentum range for ROC curve plotting
     //  */
-    // void setNumPBins(const int& value) { m_numPBins = value; }
+    void setMinROCMomentum(const double& value) { m_MomLowROC = value; }
 
     // /**
-    //  * set the upper edge of the dEdx binning for the payloads
+    //  * set the lower edge of the momentum range for ROC curve plotting
     //  */
-    // void setDEdxCutoff(const double& value) { m_dedxCutoff = value; }
+    void setMaxROCMomentum(const double& value) { m_MomHighROC = value; }
+
+    // /**
+    //  * set the number of bins for the efficiency scan
+    //  */
+    void setNumEffBins(const unsigned int& value) { m_NumEffBins = value; }
+
+    // /**
+    //  * set the upper edge of the momentum range for the efficiency scan
+    //  */
+    void setMaxEffMomentum(const double& value) { m_MomHighEff = value; }
 
     /**
      * set the upper edge of the dEdx binning for the payloads
@@ -73,12 +84,17 @@ namespace Belle2 {
      * a generic function to produce ROC curves
      */
     void PlotROCCurve(TTree* SignalTree, TString SignalWeightName, TString SignalVarName, TString SignalVarNameFull, TTree* FakeTree,
-                      TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull, TString PIDVarName, double MomLow, double MomHigh);
+                      TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull, TString PIDVarName);
 
     TTree* LambdaMassFit(std::shared_ptr<TTree> preselTree);  /**< produce histograms for protons */
     TTree* DstarMassFit(std::shared_ptr<TTree> preselTree); /**< produce histograms for K/pi(/mu) */
 
     int m_MinEvtsPerTree = 100;   /**< number of events in TTree below which we don't try to fit */
+    unsigned int m_NumROCpoints = 250;    /**< number of points for the ROC curve plotting */
+    double m_MomLowROC = 0.;    /**< lower edge of the momentum interval considered for the ROC curve */
+    double m_MomHighROC = 7.;    /**< upper edge of the momentum interval considered for the ROC curve */
+    unsigned int m_NumEffBins = 30;    /**< number of bins for the efficiency/fake rate plot */
+    double m_MomHighEff = 2.5;    /**< upper edge of the momentum interval for the efficiency/fake rate plot */
 
   };
 } // namespace Belle2

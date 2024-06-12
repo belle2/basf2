@@ -58,7 +58,7 @@ namespace Belle2 {
      * Reconstructed time of the hit.
      */
     KLMHit2d(const BKLMHit1d* hitPhi, const BKLMHit1d* hitZ,
-             const CLHEP::Hep3Vector& globalPos, double time, double width);
+             const CLHEP::Hep3Vector& globalPos, double time);
 
     /**
      * Destructor.
@@ -278,6 +278,12 @@ namespace Belle2 {
     }
 
     /**
+     * Set hit global position.
+     * @param[in] pos Position.
+     */
+    //void setPosition(const ROOT::Math::XYZVector& pos);
+
+    /**
      * Get hit global position x coordinate.
      * @return Hit x coordinate.
      */
@@ -311,24 +317,6 @@ namespace Belle2 {
     ROOT::Math::XYZVector getPosition() const
     {
       return ROOT::Math::XYZVector(m_GlobalX, m_GlobalY, m_GlobalZ);
-    }
-
-    /**
-     * Get hit width.
-     * @return Hit width.
-     */
-    float getWidth() const
-    {
-      return m_Width;
-    }
-
-    /**
-     * Set hit width.
-     * @param[in] width hit width.
-     */
-    void setWidth(float width)
-    {
-      m_Width = width;
     }
 
     /**
@@ -386,7 +374,7 @@ namespace Belle2 {
     }
 
     /**
-     * Get Chi^2 of the crossing point time.
+     * Get Chi^2 of the crossing point.
      * @return Chi^2.
      */
     float getChiSq() const
@@ -395,7 +383,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set Chi^2 of the crossing point time.
+     * Set Chi^2 of the crossing point.
      * @param[in] chisq Chi^2.
      */
     void setChiSq(float chisq)
@@ -482,9 +470,6 @@ namespace Belle2 {
     /** Global position Z coordinate. */
     float m_GlobalZ = 0.0;
 
-    /** Width of the hit. */
-    float m_Width = 0.0;
-
     /** Time of the hit. */
     float m_Time = 0.0;
 
@@ -496,7 +481,7 @@ namespace Belle2 {
 
     /* From EKLMHit2d. */
 
-    /** Chi^2 of 2 1d hit time. */
+    /** Chi^2 of the hit. */
     float m_ChiSq = 0.0;
 
     /* From BKLMHit2d. */
@@ -511,7 +496,7 @@ namespace Belle2 {
     bool m_IsOnStaTrack = false;
 
     /** Class version. */
-    ClassDef(Belle2::KLMHit2d, 2);
+    ClassDef(Belle2::KLMHit2d, 1);
 
   };
 

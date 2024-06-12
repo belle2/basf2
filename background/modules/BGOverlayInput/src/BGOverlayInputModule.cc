@@ -140,12 +140,6 @@ void BGOverlayInputModule::initialize()
   bkgInfo.registerInDataStore();
   bkgInfo.create();
   bkgInfo->setMethod(BackgroundInfo::c_Overlay);
-  BackgroundInfo::BackgroundDescr descr;
-  descr.tag = BackgroundMetaData::bg_other;
-  descr.type = std::string(BackgroundMetaData::getDefaultBackgroundOverlayType());
-  descr.fileNames = m_inputFileNames;
-  descr.numEvents = m_numEvents;
-  m_index = bkgInfo->appendBackgroundDescr(descr);
   bkgInfo->setExtensionName(m_extensionName);
 
   // set flag for steering between run-independent (false) and run-dependent (true) overlay
@@ -159,6 +153,13 @@ void BGOverlayInputModule::initialize()
   m_start = true;
   connectBranches();
 
+  // add description to BackgroundInfo
+  BackgroundInfo::BackgroundDescr descr;
+  descr.tag = BackgroundMetaData::bg_other;
+  descr.type = std::string(BackgroundMetaData::getDefaultBackgroundOverlayType());
+  descr.fileNames = m_inputFileNames;
+  descr.numEvents = m_numEvents;
+  m_index = bkgInfo->appendBackgroundDescr(descr);
 }
 
 
@@ -170,11 +171,12 @@ void BGOverlayInputModule::beginRun()
   if (m_tree) delete m_tree;
   m_tree = new TChain(RootIOUtilities::c_treeNames[DataStore::c_Event].c_str());
   int run = m_eventMetaData->getRun();
-  int numFiles = 0;
+  std::vector<std::string> inputFileNames;
   for (const string& fileName : m_runFileNamesMap[run]) {
-    numFiles += m_tree->AddFile(fileName.c_str());
+    auto status = m_tree->AddFile(fileName.c_str());
+    if (status > 0) inputFileNames.push_back(fileName);
   }
-  if (numFiles == 0) B2FATAL("No overlay files for run " << run);
+  if (inputFileNames.empty()) B2FATAL("No overlay files for run " << run);
 
   m_numEvents = m_tree->GetEntries();
   if (m_numEvents == 0) B2FATAL(RootIOUtilities::c_treeNames[DataStore::c_Event] << " has no entries for run " << run);
@@ -186,6 +188,14 @@ void BGOverlayInputModule::beginRun()
   m_start = true;
   connectBranches();
 
+  // add description for this run to BackgroundInfo
+  BackgroundInfo::BackgroundDescr descr;
+  descr.tag = BackgroundMetaData::bg_other;
+  descr.type = std::string(BackgroundMetaData::getDefaultBackgroundOverlayType());
+  descr.fileNames = inputFileNames;
+  descr.numEvents = m_numEvents;
+  StoreObjPtr<BackgroundInfo> bkgInfo(m_BackgroundInfoInstanceName, DataStore::c_Persistent);
+  m_index = bkgInfo->appendBackgroundDescr(descr);
 }
 
 

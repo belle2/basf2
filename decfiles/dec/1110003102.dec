@@ -1,0 +1,33 @@
+# EventType: 1110003102
+# Descriptor: [B0 -> [K_S0 -> pi+ pi-] pi0 gamma]cc
+# NickName: Bd_KsPi0Gamma_pipi_PHSP
+# Documentation: Decay mode for sensitivity studies
+# Tested: Yes
+# PhysicsWG: TDPCV
+# Responsible: Risabh Mehta
+# Email: rishabh.mehta@tifr.res.in
+# Cuts: None
+# Date: 20240405
+#
+#
+Alias K_S0sig K_S0
+#
+Decay Upsilon(4S)
+0.5 anti-B0sig B0 VSS;
+0.5 anti-B0 B0sig VSS;
+Enddecay
+#
+Decay B0sig
+1.0 K_S0sig pi0 gamma PHSP;
+Enddecay
+#
+Decay anti-B0sig
+1.0 K_S0sig pi0 gamma PHSP;
+Enddecay
+#
+Decay K_S0sig
+1.000    pi- pi+ PHSP;
+Enddecay
+#
+End
+

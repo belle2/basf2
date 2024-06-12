@@ -27,9 +27,9 @@ TrackingMomentumScaleFactorsModule::TrackingMomentumScaleFactorsModule() : Modul
   setDescription(
     R"DOC(Module to modify momentum of tracks from the lists. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("TrackingMomentumScaleFactors", particleLists=['pi+:cut'], scale=0.999)
+    mypath.add_module("TrackingMomentumScaleFactors", particleLists=['pi+:cut'], scale=0.999)
 
 The module modifies the input particleLists by scaling track momenta as given by the parameter scale
 		     

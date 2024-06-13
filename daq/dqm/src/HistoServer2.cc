@@ -166,3 +166,28 @@ void HistoServer2::write_state(void)
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
     fprintf(fh, "%s %s\n", m_filename.c_str(), mbstr);
 
+    for (auto& it : units_connected) {
+      int nr = it.second.first;
+      int con = it.second.second;
+      auto last_connected = unit_last_conn_time[nr];
+      strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&last_connected));
+      auto last_packet = unit_last_packet_time[nr];
+      strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&last_packet));
+      auto last_content = unit_last_content_time[nr];
+      strftime(mbstr3, sizeof(mbstr3), "%F %T", localtime(&last_content));
+      if (it.first == "127.0.0.1") {
+        fprintf(fh, "RUNCONTROL,");
+      } else {
+        if (nr >= 0 and nr < 20) {
+          fprintf(fh, "HLT%d,", nr);
+        } else if (nr > 100 and nr < 110) {
+          fprintf(fh, "ERECO%d,", nr);
+        } else {
+          fprintf(fh, "UNKNOWN,");
+        }
+      }
+      fprintf(fh, "%s,%d,%s,%s,%s\n", it.first.c_str(), con, mbstr, mbstr2, mbstr3);
+    }
+    fclose(fh);
+  }
+}

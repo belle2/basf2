@@ -283,9 +283,13 @@ void PIDLikelihood::addPreOfficialLikelihood(const std::string& preOfficialIdent
   m_preOfficialLikelihoods[preOfficialIdentifier] = preOfficialLikelihood;
 }
 
-double PIDLikelihood::getPreOfficialLikelihood(const std::string& preOfficialIdentifier)
+double PIDLikelihood::getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const
 {
-  return m_preOfficialLikelihoods[preOfficialIdentifier];
+  if (m_preOfficialLikelihoods.count(preOfficialIdentifier) == 0) {
+    B2ERROR("PIDLikelihood::getPreOfficialLikelihood: preOfficialIdentifier " << preOfficialIdentifier << " does not exist. ");
+    return -1.0;
+  }
+  return m_preOfficialLikelihoods.at(preOfficialIdentifier);
 }
 
 

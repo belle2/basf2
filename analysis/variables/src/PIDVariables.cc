@@ -992,9 +992,7 @@ namespace Belle2 {
 
     double klmMuonIDDNN(const Particle* part)
     {
-      const Track* track = part->getTrack();
-      if (!track) return Const::doubleNaN;
-      PIDLikelihood* pid = track->getRelatedTo<PIDLikelihood>();
+      const PIDLikelihood* pid = part->getPIDLikelihood();
       if (!pid) return Const::doubleNaN;
       double klmMuonIDDNNvalue = pid->getPreOfficialLikelihood("klmMuonIDDNN");
       // klmMuonIDDNNvalue == -1.0 means there is no valid output from KLMMuonIDDNNExpertModule
@@ -1265,7 +1263,7 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);
     REGISTER_VARIABLE("klmMuonIDDNN", klmMuonIDDNN,
-                      "muon likelihood calculated from Neural Network with KLM information (expert use only)");
+                      "Muon probability calculated from Neural Network with KLM information (expert use only)");
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

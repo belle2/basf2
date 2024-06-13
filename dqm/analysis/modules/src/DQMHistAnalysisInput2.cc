@@ -61,11 +61,13 @@ void DQMHistAnalysisInput2Module::beginRun()
   clearCanvases();
 
   m_last_beginrun = time(0);
+  write_state();
 }
 
 void DQMHistAnalysisInput2Module::event()
 {
   m_last_event = time(0);
+  write_state();
 
   TH1::AddDirectory(false);
   initHistListBeforeEvent();

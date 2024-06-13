@@ -13,7 +13,8 @@
 #include <daq/dataflow/EvtSocketManager.h>
 
 #include <daq/dqm/HistoManager2.h>
-
+#include <map>
+#include <vector>
 
 namespace Belle2 {
 
@@ -37,9 +38,17 @@ namespace Belle2 {
     int m_port;
     int m_force_exit;
 
+    /** Write connection state to a file */
+    void write_state(void);
   private:
     std::string m_filename;
     HistoManager2* m_hman;
+
+    /** connection IP, state and last update time */
+    std::map <std::string, std::pair<int, bool>> units_connected;
+    std::map <int, time_t> unit_last_conn_time;
+    std::map <int, time_t> unit_last_packet_time;
+    std::map <int, time_t> unit_last_content_time;
   };
 }
 

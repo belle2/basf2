@@ -9,6 +9,7 @@
 
 #include <framework/pcore/MsgHandler.h>
 #include <ctime>
+#include <arpa/inet.h>
 
 using namespace Belle2;
 using namespace std;
@@ -28,7 +29,7 @@ HistoServer2::~HistoServer2()
 
 // Initialize socket
 
-int HistoServer2:: init()
+int HistoServer2::init()
 {
   m_sock = new EvtSocketRecv(m_port, false);
   m_man = new EvtSocketManager(m_sock);
@@ -48,6 +49,7 @@ int HistoServer2::server()
   //  vector<int> recvsock;
   int loop_counter = 0;
   bool updated = false;
+  write_state();
   while (m_force_exit == 0) {
     fflush(stdout);
     int exam_stat = m_man->examine();
@@ -59,14 +61,28 @@ int HistoServer2::server()
            it != recvsock.end(); ++it) {
         int fd = *it;
         if (m_man->connected(fd)) {
+          struct sockaddr_in isa;
+          socklen_t isize = sizeof(isa);
+          getpeername(fd, (struct sockaddr*)&isa, &isize);
+          char address[INET_ADDRSTRLEN];
+          strcpy(address, inet_ntoa(isa.sin_addr));
+          char* ptr = strrchr(address, '.');
+          int nr = -1;
+          if (ptr) {
+            nr = atoi(ptr + 1);
+          }
+          unit_last_conn_time[nr] = now;
+
           int is = sio.get(fd, buffer, c_maxBufSize);
           if (is <= 0) {
             now = time(0);
             strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-            printf("[%s] HistoServer2: fd %d disconnected\n", mbstr, fd);
+            printf("[%s] HistoServer2: fd %d / %s disconnected\n", mbstr, fd, address);
             m_man->remove(fd);
+            units_connected[address] = std::pair(nr, false);
             break;
           }
+          units_connected[address] = std::pair(nr, true);
           //    printf ( "EvtMessage received : size = %d from fd=%d\n", is, fd );
 
           EvtMessage* hmsg = new EvtMessage(buffer);
@@ -78,7 +94,9 @@ int HistoServer2::server()
           string subdir = "";
           now = time(0);
           strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-          printf("[%s] HistoServer2 : received nobjs = %d\n", mbstr, nobjs);
+          unit_last_packet_time[nr] = now;
+          printf("[%s] HistoServer2 : received nobjs = %d from %s\n", mbstr, nobjs, address);
+          if (nobjs > 0) unit_last_content_time[nr] = now;
           for (int i = 0; i < nobjs; i++) {
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );
@@ -122,15 +140,29 @@ int HistoServer2::server()
     }
     usleep(1000);
     loop_counter++;
-    if (loop_counter % c_mergeIntervall == 0 && updated) {
-      now = time(0);
-      strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-      printf("[%s] HistoServer2: merging histograms\n", mbstr);
-      m_hman->merge();
-      updated = false; // have merged, thus reset updated
+    if (loop_counter % c_mergeIntervall == 0) {
+      write_state();
+      if (updated) {
+        now = time(0);
+        strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+        printf("[%s] HistoServer2: merging histograms\n", mbstr);
+        m_hman->merge();
+        updated = false; // have merged, thus reset updated
+      }
     }
   }
   return 0;
 }
 
+void HistoServer2::write_state(void)
+{
+  char mbstr[100];
+  char mbstr2[100];
+  char mbstr3[100];
+  std::string name = "/tmp/dqm_hserver_state_" + m_filename;
+  FILE* fh = fopen(name.c_str(), "wt+");
+  if (fh) {
+    time_t now = time(0);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+    fprintf(fh, "%s %s\n", m_filename.c_str(), mbstr);
 

@@ -179,7 +179,7 @@ void HistoServer2::write_state(void)
         if (nr >= 0 and nr < 20) {
           fprintf(fh, "HLT%d,", nr);
         } else if (nr > 100 and nr < 110) {
-          fprintf(fh, "ERECO%d,", nr);
+          fprintf(fh, "ERECO%d,", nr - 100);
         } else {
           fprintf(fh, "UNKNOWN,");
         }

@@ -35,7 +35,7 @@ DQMHistAnalysisInput2Module::DQMHistAnalysisInput2Module()
 {
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
-  addParam("AnalysisName", m_name, "Name for status export", std::string(""));
+  addParam("StatFileName", m_statname, "Filename for status export", std::string(""));
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
@@ -239,14 +239,13 @@ void DQMHistAnalysisInput2Module::terminate()
 
 void DQMHistAnalysisInput2Module::write_state(void)
 {
-  if (m_name == "") return;
-  char mbstr[100];
-  std::string name = "/tmp/dqm_analysis_state_" + m_name;
-  FILE* fh = fopen(name.c_str(), "wt+");
+  if (m_statname == "") return;
+  FILE* fh = fopen(m_statname.c_str(), "wt+");
   if (fh) {
+    char mbstr[100];
     time_t now = time(0);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-    fprintf(fh, "%s,%s,", m_name.c_str(), mbstr);
+    fprintf(fh, "%s,%s,%s,", m_statname.c_str(), m_mempath.c_str(), mbstr);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_event));
     fprintf(fh, "%s,", mbstr);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_beginrun));

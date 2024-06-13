@@ -71,7 +71,7 @@ int HistoServer2::server()
           if (ptr) {
             nr = atoi(ptr + 1);
           }
-          unit_last_conn_time[nr] = now;
+          m_unit_last_conn_time[nr] = now;
 
           int is = sio.get(fd, buffer, c_maxBufSize);
           if (is <= 0) {
@@ -79,10 +79,10 @@ int HistoServer2::server()
             strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
             printf("[%s] HistoServer2: fd %d / %s disconnected\n", mbstr, fd, address);
             m_man->remove(fd);
-            units_connected[address] = std::pair(nr, false);
+            m_units_connected[address] = std::pair(nr, false);
             break;
           }
-          units_connected[address] = std::pair(nr, true);
+          m_units_connected[address] = std::pair(nr, true);
           //    printf ( "EvtMessage received : size = %d from fd=%d\n", is, fd );
 
           EvtMessage* hmsg = new EvtMessage(buffer);
@@ -94,9 +94,9 @@ int HistoServer2::server()
           string subdir = "";
           now = time(0);
           strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-          unit_last_packet_time[nr] = now;
+          m_unit_last_packet_time[nr] = now;
           printf("[%s] HistoServer2 : received nobjs = %d from %s\n", mbstr, nobjs, address);
-          if (nobjs > 0) unit_last_content_time[nr] = now;
+          if (nobjs > 0) m_unit_last_content_time[nr] = now;
           for (int i = 0; i < nobjs; i++) {
             //      printf ( "Object : %s received, class = %s\n", (strlist.at(i)).c_str(),
             //                     (objlist.at(i))->ClassName() );
@@ -105,16 +105,16 @@ int HistoServer2::server()
               m_hman->clear();
               m_hman->merge();
               updated = false; // have merged, thus reset updated
-              now = time(0);
-              strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+              m_last_merge_time = time(0);
+              strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_merge_time));
               printf("[%s] HistoServer2: CLEAR\n", mbstr);
               continue;
             }
             if (objname == string("DQMRC:MERGE")) {
               m_hman->merge();
               updated = false; // have merged, thus reset updated
-              now = time(0);
-              strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+              m_last_merge_time = time(0);
+              strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_merge_time));
               printf("[%s] HistoServer2: MERGE\n", mbstr);
               continue;
             }
@@ -141,14 +141,14 @@ int HistoServer2::server()
     usleep(1000);
     loop_counter++;
     if (loop_counter % c_mergeIntervall == 0) {
-      write_state();
       if (updated) {
-        now = time(0);
-        strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+        m_last_merge_time = time(0);
+        strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_merge_time));
         printf("[%s] HistoServer2: merging histograms\n", mbstr);
         m_hman->merge();
         updated = false; // have merged, thus reset updated
       }
+      write_state();
     }
   }
   return 0;
@@ -164,17 +164,15 @@ void HistoServer2::write_state(void)
   if (fh) {
     time_t now = time(0);
     strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-    fprintf(fh, "%s %s\n", m_filename.c_str(), mbstr);
+    strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&m_last_merge_time));
+    fprintf(fh, "%s,%s,%s\n", m_filename.c_str(), mbstr, mbstr2);
 
-    for (auto& it : units_connected) {
+    for (auto& it : m_units_connected) {
       int nr = it.second.first;
       int con = it.second.second;
-      auto last_connected = unit_last_conn_time[nr];
-      strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&last_connected));
-      auto last_packet = unit_last_packet_time[nr];
-      strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&last_packet));
-      auto last_content = unit_last_content_time[nr];
-      strftime(mbstr3, sizeof(mbstr3), "%F %T", localtime(&last_content));
+      strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_unit_last_conn_time[nr]));
+      strftime(mbstr2, sizeof(mbstr2), "%F %T", localtime(&m_unit_last_packet_time[nr]));
+      strftime(mbstr3, sizeof(mbstr3), "%F %T", localtime(&m_unit_last_content_time[nr]));
       if (it.first == "127.0.0.1") {
         fprintf(fh, "RUNCONTROL,");
       } else {

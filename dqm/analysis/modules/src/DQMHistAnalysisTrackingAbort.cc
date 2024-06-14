@@ -73,6 +73,7 @@ void DQMHistAnalysisTrackingAbortModule::initialize()
 
   gROOT->cd();
   m_cAbortRate = new TCanvas("TrackingAnalysis/c_TrackingAbort");
+  m_cAbortRate_BF = new TCanvas("TrackingAnalysis/c_TrackingAbort_BF");
 
   m_cAbortRateIN  = new TCanvas("TrackingAnalysis/c_TrackingAbortIN");
   m_cAbortRateOUT  = new TCanvas("TrackingAnalysis/c_TrackingAbortOUT");
@@ -94,6 +95,31 @@ void DQMHistAnalysisTrackingAbortModule::initialize()
   registerEpicsPV("trackingHLT:abortRateBeforeFilter_inActiveVeto", "abortRateBeforeFilter_inActiveVeto");
   registerEpicsPV("trackingHLT:abortRateBeforeFilter_outActiveVeto", "abortRateBeforeFilter_outActiveVeto");
 
+
+  //abort rate AFTER the Filter:
+  //must have THE SAME binning as mEventsWithAborts from TrackingAbortDQM
+  std::string histoName = "EventsWithAborts";
+  std::string histoTitle = "Fraction of Events With at Least one Abort [After Filter]";
+  m_hAbort = new TH1F(TString::Format("%s", histoName.c_str()),
+                      TString::Format("%s", histoTitle.c_str()),
+                      2, -0.5, 1.5);
+  m_hAbort->GetYaxis()->SetTitle("Number of Events");
+  m_hAbort->GetXaxis()->SetBinLabel(1, "No Abort");
+  m_hAbort->GetXaxis()->SetBinLabel(2, "At Least One Abort");
+  m_hAbort->SetMinimum(0.1);
+
+  //abort rate BEFORE the Filter:
+  //must have THE SAME binning as mEventsWithAborts from TrackingAbortDQM
+  histoName = "EventsWithAborts_beforeFilter";
+  histoTitle = "Fraction of Events With at Least one Abort [Before Filter]";
+  m_hAbort_BF = new TH1F(TString::Format("%s", histoName.c_str()),
+                         TString::Format("%s", histoTitle.c_str()),
+                         2, -0.5, 1.5);
+  m_hAbort_BF->GetYaxis()->SetTitle("Number of Events");
+  m_hAbort_BF->GetXaxis()->SetBinLabel(1, "No Abort");
+  m_hAbort_BF->GetXaxis()->SetBinLabel(2, "At Least One Abort");
+  m_hAbort_BF->SetMinimum(0.1);
+
 }
 
 void DQMHistAnalysisTrackingAbortModule::event()
@@ -114,9 +140,11 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_monObj->setVariable("nEvents_outActiveVeto", nEventsOUT);
     const int nEvents = nEventsIN + nEventsOUT;
 
-    TH1F* hAbort = (TH1F*)hAbortIn->Add((TH1F*)hAbortOut, 1);
-    const double abortRate = hAbort->GetMean();
-    hAbort->SetTitle(Form("Fraction of Events in which Tracking Aborts = %.4f %%", abortRate * 100));
+    m_hAbort->SetBinContent(1, hAbortIn->GetBinContent(1) + hAbortOut->GetBinContent(1));
+    m_hAbort->SetBinContent(2, hAbortIn->GetBinContent(2) + hAbortOut->GetBinContent(2));
+
+    const double abortRate = m_hAbort->GetMean();
+    m_hAbort->SetTitle(Form("Fraction of Events in which Tracking Aborts = %.4f %%", abortRate * 100));
 
     if (nEvents >= m_statThreshold) {
       m_monObj->setVariable("abortRate", abortRate);
@@ -142,7 +170,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
     hAbortOut->Draw();
 
     m_cAbortRate->cd();
-    hAbort->Draw();
+    m_hAbort->Draw();
 
 
     auto state = makeStatus(nEvents >= m_statThreshold, false, hasError);
@@ -171,9 +199,10 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_monObj->setVariable("nEventsBeforeFilter_outActiveVeto", nEventsOUT);
     const int nEvents_BF = nEventsINbf + nEventsOUTbf;
 
-    TH1F* hAbort_BF = (TH1F*)hAbortIn_BF->Add((TH1F*)hAbortOut_BF, 1);
-    const double abortRate_BF = hAbort_BF->GetMean();
-    hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate_BF * 100));
+    m_hAbort_BF->SetBinContent(1, hAbortIn_BF->GetBinContent(1) + hAbortOut_BF->GetBinContent(1));
+    m_hAbort_BF->SetBinContent(2, hAbortIn_BF->GetBinContent(2) + hAbortOut_BF->GetBinContent(2));
+    const double abortRate_BF = m_hAbort_BF->GetMean();
+    m_hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate_BF * 100));
 
     if (nEvents_BF >= m_statThreshold) {
       m_monObj->setVariable("abortRateBeforeFilter", abortRate_BF);
@@ -193,6 +222,9 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_cAbortRateOUT_BF->cd();
     hAbortOut_BF->Draw();
 
+    m_cAbortRate_BF->cd();
+    m_hAbort_BF->Draw();
+
   }
 
   //scale tracking abort reason histograms
@@ -201,9 +233,9 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1F* hAbortReason_out = (TH1F*)findHist("TrackingAbort/TrkAbortReason_OUT");
   if (hAbortReason_out != nullptr) scaleAndSendToMirabelle(hAbortReason_out, nEventsOUT, "_outActiveVeto");
   TH1F* hAbortReason_in_BF = (TH1F*)findHist("TrackingAbort_before_filter/TrkAbortReason_IN");
-  if (hAbortReason_in != nullptr) scaleAndSendToMirabelle(hAbortReason_in_BF, nEventsIN, "BeforeFilter_inActiveVeto");
+  if (hAbortReason_in_BF != nullptr) scaleAndSendToMirabelle(hAbortReason_in_BF, nEventsIN, "BeforeFilter_inActiveVeto");
   TH1F* hAbortReason_out_BF = (TH1F*)findHist("TrackingAbort_before_filter/TrkAbortReason_OUT");
-  if (hAbortReason_out != nullptr) scaleAndSendToMirabelle(hAbortReason_out_BF, nEventsOUT, "BeforeFilter_outActiveVeto");
+  if (hAbortReason_out_BF != nullptr) scaleAndSendToMirabelle(hAbortReason_out_BF, nEventsOUT, "BeforeFilter_outActiveVeto");
 
 
   //scale average histograms
@@ -238,7 +270,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1* hCDCExtraHitsIn_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_IN");
   if (hCDCExtraHitsIn_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_inActiveVeto", hCDCExtraHitsIn_BF->GetMean());
   TH1* hCDCExtraHitsOut_BF = findHist("TrackingAbort_before_filter/nCDCExtraHits_OUT");
-  if (hL3VOccOut_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_outActiveVeto", hCDCExtraHitsOut_BF->GetMean());
+  if (hCDCExtraHitsOut_BF != nullptr) m_monObj->setVariable("nCDCExtraHitsBeforeFilter_outActiveVeto",
+                                                              hCDCExtraHitsOut_BF->GetMean());
 
   if (m_printCanvas) {
     m_cAbortRate->Print("c_TrackingAbort.pdf[");
@@ -250,6 +283,19 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_cAbortRateOUT_BF->Print("c_TrackingAbort.pdf]");
   }
 
+
+}
+
+void DQMHistAnalysisTrackingAbortModule::terminate()
+{
+  delete m_hAbort;
+  delete m_hAbort_BF;
+  delete m_cAbortRate;
+  delete m_cAbortRate_BF;
+  delete m_cAbortRateIN;
+  delete m_cAbortRateIN_BF;
+  delete m_cAbortRateOUT;
+  delete m_cAbortRateOUT_BF;
 
 }
 

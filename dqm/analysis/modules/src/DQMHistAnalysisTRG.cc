@@ -278,11 +278,9 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       }
       average = 1.0 * average / (512 - 80);
       int ECLTRG_deadch = 0;
-      /*
-          for (int i = 2; i <= numberOfBins - 1; i++) {
-            if (hist_ECLTRG_deadch->GetBinContent(i) <= 0.01 * hist_ECLTRG_deadch->GetMaximum()) { ECLTRG_deadch += 1; }
-          }
-      */
+//          for (int i = 2; i <= numberOfBins - 1; i++) {
+//            if (hist_ECLTRG_deadch->GetBinContent(i) <= 0.01 * hist_ECLTRG_deadch->GetMaximum()) { ECLTRG_deadch += 1; }
+//          }
       for (int i = 2; i <= numberOfBins - 1; i++) {
         if (hist_ECLTRG_deadch->GetBinContent(i) <= 0.01 * average) { ECLTRG_deadch += 1; }
       }

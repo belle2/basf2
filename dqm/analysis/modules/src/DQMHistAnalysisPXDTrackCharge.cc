@@ -20,6 +20,7 @@
 #include <RooDataHist.h>
 #include <RooAbsPdf.h>
 #include <RooPlot.h>
+#include <RooFitResult.h>
 
 
 using namespace std;

@@ -37,6 +37,7 @@
 #include <RooCategory.h>
 #include <RooArgSet.h>
 #include <RooConstVar.h>
+#include <RooFitResult.h>
 
 #include <framework/particledb/EvtGenDatabasePDG.h>
 

@@ -7,7 +7,7 @@
  **************************************************************************/
 #pragma once
 //Object with performing the actual algorithm:
-#include <tracking/kinkFinding/fitter/kinkFitter.h>
+#include <tracking/kinkFinding/fitter/KinkFitter.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/Track.h>
@@ -25,8 +25,8 @@ namespace Belle2 {
   /**
    * Kink finder module.
    *
-   * Pairs up tracks,
-   * tries to find vertices between them.
+   * Preselects and pairs up tracks and tries to find a vertex between them.
+   * Preselects and tries to split tracks that might be combined from two kink tracks.
    *
    * The resulting pairs of tracks are stored as Belle2::Kink.
    */
@@ -54,7 +54,7 @@ namespace Belle2 {
     std::string m_arrayNameTrack;  ///< StoreArray name of the Belle2::Track (Input).
     StoreArray <Track> m_tracks;  ///< StoreArray of Belle2::Track.
 
-    std::unique_ptr<kinkFitter> m_kinkFitter;  ///< Object containing the algorithm of Kink creation.
+    std::unique_ptr<KinkFitter> m_kinkFitter;  ///< Object containing the algorithm of Kink creation.
     std::string m_arrayNameRecoTrack;  ///< StoreArray name of the RecoTrack (Input).
     std::string m_arrayNameCopiedRecoTrack;  ///< StoreArray name of the RecoTrack used for creating copies.
     std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResult (In- and Output).
@@ -64,8 +64,9 @@ namespace Belle2 {
 
     double m_vertexChi2Cut;  ///< Cut on Chi2 for the Kink vertex.
     double m_vertexDistanceCut;  ///< Cut on distance between tracks at the Kink vertex.
-    unsigned char m_kinkFitterMode;  ///< Fitter mode.
-    bool m_kinkFitterModeSplitTrack; ///< Fitter mode fourth bit to split track.
+    unsigned char m_kinkFitterMode;  ///< Fitter mode (from 0 to 15). Each bit is responsible for turning On/Off
+    ///< corresponding algorithm. For more details, refer to 'KinkFitter'.
+    bool m_kinkFitterModeSplitTrack; ///< Fitter mode 4th bit responsible for turning On/Off track splitting.
     double m_precutRho;  ///< Preselection cut on transverse shift from the outer CDC wall for the track ending points.
     double m_precutZ;  ///< Preselection cut on z shift from the outer CDC wall for the track ending points.
     double m_precutDistance;  ///< Preselection cut on distance between ending points of two tracks.

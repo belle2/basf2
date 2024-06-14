@@ -105,23 +105,23 @@ namespace Belle2 {
 
   private:
     /** kinkFitter working mode in binary:
-     * first bit: reassign hits (1 is On, 0 is Off)
-     * second bit: flip tracks with close end points (1 is On, 0 is Off)
-     * third bit: fit both tracks as one (1 is On, 0 is Off)
-     * fourth bit: find candidate tracks to be split and do it
+     * 1st bit: reassign hits (1 is On, 0 is Off)
+     * 2nd bit: flip tracks with close end points (1 is On, 0 is Off)
+     * 3rd bit: fit both tracks as one (1 is On, 0 is Off)
+     * 4th bit: find candidate tracks to be split and do it (1 is On, 0 is Off)
      * fitter mode is written in decimal representation */
     unsigned char m_kinkFitterMode = 0b1111;
     /** Cut on Chi2 for the Kink vertex. */
     double m_vertexChi2Cut = 10000.;
-    /** Cut on distance between tracks at the Kink vertex. */
+    /** Cut on distance between tracks at the Kink vertex [cm]. */
     double m_vertexDistanceCut = 2.;
-    /** Preselection cut on transverse shift from the outer CDC wall for the track ending points. */
+    /** Preselection cut on transverse shift from the outer CDC wall for the track ending points [cm]. */
     double m_precutRho = 10.;
-    /** Preselection cut on z shift from the outer CDC wall for the track ending points. */
+    /** Preselection cut on z shift from the outer CDC wall for the track ending points [cm]. */
     double m_precutZ = 0.;
-    /** Preselection cut on distance between ending points of two tracks. */
+    /** Preselection cut on distance between ending points of two tracks [cm]. */
     double m_precutDistance = 10.;
-    /** Preselection cut on 2D distance between ending points of two tracks (for bad z cases). */
+    /** Preselection cut on 2D distance between ending points of two tracks (for bad z cases) [cm]. */
     double m_precutDistance2D = 10.;
     /** Preselection cut on maximal number of fitted CDC hits for a track candidate to be split. */
     int m_precutSplitNCDCHit = 49;

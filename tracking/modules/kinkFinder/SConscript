@@ -8,6 +8,4 @@ env['LIBS'] = [
     'framework'
     ]
 
-env.Append(CXXFLAGS=['-Wshadow'])
-
 Return('env')

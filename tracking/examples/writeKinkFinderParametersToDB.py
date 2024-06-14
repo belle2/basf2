@@ -12,12 +12,33 @@ from ROOT import Belle2
 
 
 parameters = Belle2.KinkFinderParameters()
-# int kinkFitterMode, double vertexChi2Cut, double vertexDistanceCut
-# double precutRho, double precutZ, double precutDistance, double precutDistance2D
-# kinkFitterMode in binary (1 is ON, 0 is OFF), but written in decimal:
-# 1 bit (from right) reassign hits, 2 bit flip tracks with close end points,
-# 3 bit fit both tracks as one, and 4 bit split track, candidate to be a combined track
-parameters.setParameters(0b1111, 10000., 2., 10., 0., 10., 10., 49, 0.01)
+
+# kinkFitter working mode (unsigned char) from 0 to 15  in binary:
+# 1st bit: reassign hits (1 is On, 0 is Off)
+# 2nd bit: flip tracks with close end points (1 is On, 0 is Off)
+# 3rd bit: fit both tracks as one (1 is On, 0 is Off)
+# 4th bit: find candidate tracks to be split and do it (1 is On, 0 is Off)
+kinkFitterMode = 0b1111
+# Cut on Chi2 for the Kink vertex (double)
+vertexChi2Cut = 10000.
+# Cut on distance between tracks at the Kink vertex [cm] (double)
+vertexDistanceCut = 2.
+# Preselection cut on transverse shift from the outer CDC wall for the track ending points [cm] (double)
+precutRho = 10.
+# Preselection cut on z shift from the outer CDC wall for the track ending points [cm] (double)
+precutZ = 0.
+# Preselection cut on distance between ending points of two tracks [cm] (double)
+precutDistance = 10.
+# Preselection cut on 2D distance between ending points of two tracks (for bad z cases) [cm] (double)
+precutDistance2D = 10.
+# Preselection cut on maximal number of fitted CDC hits for a track candidate to be split (int)
+precutSplitNCDCHit = 49
+# Preselection cut on maximal p-value for a track candidate to be split
+precutSplitPValue = 0.01
+
+parameters.setParameters(kinkFitterMode, vertexChi2Cut, vertexDistanceCut,
+                         precutRho, precutZ, precutDistance, precutDistance2D,
+                         precutSplitNCDCHit, precutSplitPValue)
 iov = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
 # write db object to 'localdb/'

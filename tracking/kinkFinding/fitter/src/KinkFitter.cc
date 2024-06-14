@@ -5,7 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <tracking/kinkFinding/fitter/kinkFitter.h>
+#include <tracking/kinkFinding/fitter/KinkFitter.h>
 
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
@@ -18,13 +18,11 @@
 #include <mdst/dataobjects/HitPatternVXD.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/TrackFitResult.h>
 #include <cdc/dataobjects/CDCRecoHit.h>
 #include <pxd/reconstruction/PXDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit.h>
 #include <svd/reconstruction/SVDRecoHit2D.h>
 
-#include <genfit/Track.h>
 #include <genfit/TrackPoint.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/FieldManager.h>
@@ -43,7 +41,7 @@
 
 using namespace Belle2;
 
-kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string& kinksName,
+KinkFitter::KinkFitter(const std::string& trackFitResultsName, const std::string& kinksName,
                        const std::string& recoTracksName, const std::string& copiedRecoTracksName)
   : m_recoTracksName(recoTracksName), m_kinkFitterMode(1)
 {
@@ -76,24 +74,21 @@ kinkFitter::kinkFitter(const std::string& trackFitResultsName, const std::string
            genfit::FieldManager::getInstance()->isInitialized());
 }
 
-void kinkFitter::setFitterMode(unsigned char fitterMode)
+void KinkFitter::setFitterMode(unsigned char fitterMode)
 {
   if (not(fitterMode <= 15)) {
     B2FATAL("Invalid fitter mode!");
   } else {
     m_kinkFitterMode = fitterMode;
     // filling bits of the fitter mode
-    m_kinkFitterModeHitsReassignment = fitterMode & 1;
-    fitterMode >>= 1;
-    m_kinkFitterModeFlipAndRefit = fitterMode & 1;
-    fitterMode >>= 1;
-    m_kinkFitterModeCombineAndFit = fitterMode & 1;
-    fitterMode >>= 1;
-    m_kinkFitterModeSplitTrack = fitterMode & 1;
+    m_kinkFitterModeHitsReassignment = fitterMode & 0b0001;
+    m_kinkFitterModeFlipAndRefit = fitterMode & 0b0010;
+    m_kinkFitterModeCombineAndFit = fitterMode & 0b0100;
+    m_kinkFitterModeSplitTrack = fitterMode & 0b1000;
   }
 }
 
-void kinkFitter::initializeCuts(double vertexDistanceCut,
+void KinkFitter::initializeCuts(double vertexDistanceCut,
                                 double vertexChi2Cut,
                                 double precutDistance)
 {
@@ -104,7 +99,7 @@ void kinkFitter::initializeCuts(double vertexDistanceCut,
 
 /// Used in the vertexFitWithRecoTracks function to extrapolate the states to the fitted vertex.
 /// If the vertex is inside one of the tracks, bits in reassignHitStatus are set.
-bool kinkFitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, genfit::MeasuredStateOnPlane& stDaughter,
+bool KinkFitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, genfit::MeasuredStateOnPlane& stDaughter,
                                      const ROOT::Math::XYZVector& vertexPos, unsigned int& reassignHitStatus)
 {
   reassignHitStatus = 0;
@@ -127,7 +122,7 @@ bool kinkFitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, gen
 }
 
 /// Build TrackFitResult of Kink Track.
-TrackFitResult* kinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
+TrackFitResult* KinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
                                                 const genfit::MeasuredStateOnPlane& msop,
                                                 const double Bz,
                                                 const Const::ParticleType trackHypothesis)
@@ -147,75 +142,64 @@ TrackFitResult* kinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
 }
 
 /// Find hit position closest to the vertex.
-int kinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
+int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
                                                ROOT::Math::XYZVector& vertexPos,
-                                               const int direction)
+                                               int direction)
 {
 
+  if (direction != 1 && direction != -1) {
+    B2WARNING("KinkFitter::findHitPositionForReassignment: the direction is not +-1, although should be. Set to +-1.");
+    if (direction > 0)
+      direction = 1;
+    else
+      direction = -1;
+  }
+
   // Helper variables to store the minimum
-  double minimalDistance2 = 1e10;
+  double minimalDistance2 = std::numeric_limits<double>::max();
   int minimalIndex = 0;
+  int riHit = 0;
 
   // CDC Hits list to loop over
   auto cdcHits = recoTrack->getSortedCDCHitList();
 
-  if (direction > 0) {
-    for (int ri = 0; ri < static_cast<int>(cdcHits.size()); ++ri) {
-      auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[ri]);
-      if (!recoHitInfo->useInFit()) continue;
-      try {
-        const genfit::MeasuredStateOnPlane& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInfo);
-        const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - vertexPos).Mag2();
 
-        if (currentDistance2 < minimalDistance2) {
-          minimalDistance2 = currentDistance2;
-          minimalIndex = ri;
-        }
-        // if cannot find minimum in 3 iterations, stop searching
-        if (ri - minimalIndex > 3) break;
-      } catch (const NoTrackFitResult& exception) {
-        B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
-        continue;
-      } catch (const genfit::Exception& exception) {
-        B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
-        continue;
-      }
-    }
-    if (minimalIndex == 0)
-      return -1;
+  for (int ri = 0; ri < static_cast<int>(cdcHits.size()); ++ri) {
+    if (direction > 0)
+      riHit = ri;
     else
-      return -(minimalIndex);
-  } else {
-    for (int ri = cdcHits.size()  - 1; ri >= 0; --ri) {
-      auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[ri]);
-      if (!recoHitInfo->useInFit()) continue;
-      try {
-        const genfit::MeasuredStateOnPlane& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromRecoHit(recoHitInfo);
-        const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - vertexPos).Mag2();
+      riHit = static_cast<int>(cdcHits.size()) - 1 - ri;
 
-        if (currentDistance2 < minimalDistance2) {
-          minimalDistance2 = currentDistance2;
-          minimalIndex = ri;
-        }
-        // if cannot find minimum in 3 iterations, stop searching
-        if (minimalIndex - ri > 3) break;
-      } catch (const NoTrackFitResult& exception) {
-        B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
-        continue;
-      } catch (const genfit::Exception& exception) {
-        B2DEBUG(50, "Can not get mSoP because of: " << exception.what());
-        continue;
+    auto recoHitInfo = recoTrack->getRecoHitInformation(cdcHits[riHit]);
+    if (!recoHitInfo->useInFit()) continue;
+    try {
+      const genfit::MeasuredStateOnPlane& measuredStateOnPlane = recoTrack->getMeasuredStateOnPlaneFromRecoHit(
+          recoHitInfo);
+      const double currentDistance2 = (ROOT::Math::XYZVector(measuredStateOnPlane.getPos()) - vertexPos).Mag2();
+
+      if (currentDistance2 < minimalDistance2) {
+        minimalDistance2 = currentDistance2;
+        minimalIndex = ri;
       }
+      // if cannot find minimum in 3 iterations, stop searching
+      if (ri - minimalIndex > 3) break;
+    } catch (const NoTrackFitResult& exception) {
+      B2DEBUG(29, "Can not get mSoP because of: " << exception.what());
+      continue;
+    } catch (const genfit::Exception& exception) {
+      B2DEBUG(29, "Can not get mSoP because of: " << exception.what());
+      continue;
     }
-    if ((cdcHits.size() - minimalIndex) == 0)
-      return 1;
-    else
-      return (cdcHits.size() - minimalIndex);
   }
+  if (minimalIndex == 0)
+    return -1 * direction;
+  else
+    return -(minimalIndex * direction);
+
 }
 
 /// Copy RecoTrack to a separate StoreArray and reassign CDC hits according to delta
-RecoTrack* kinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrack, RecoTrack* daughterRecoTrack,
+RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrack, RecoTrack* daughterRecoTrack,
                                                        const bool motherFlag, const int delta)
 {
 
@@ -333,7 +317,7 @@ RecoTrack* kinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
 }
 
 /// Try to fit new RecoTracks after hit reassignment.
-bool kinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, RecoTrack* recoTrackDaughterRefit,
+bool KinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, RecoTrack* recoTrackDaughterRefit,
                                              const RecoTrack* recoTrackMother, const RecoTrack* recoTrackDaughter)
 {
 
@@ -378,7 +362,7 @@ bool kinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, Re
 }
 
 /// Flip and refit the daughter track.
-RecoTrack* kinkFitter::copyRecoTrackForFlipAndRefit(const RecoTrack* recoTrack,
+RecoTrack* KinkFitter::copyRecoTrackForFlipAndRefit(const RecoTrack* recoTrack,
                                                     ROOT::Math::XYZVector& momentumSeed,
                                                     ROOT::Math::XYZVector& positionSeed,
                                                     double& timeSeed)
@@ -399,7 +383,7 @@ RecoTrack* kinkFitter::copyRecoTrackForFlipAndRefit(const RecoTrack* recoTrack,
 }
 
 /// Refit the daughter track blocking hits if required.
-RecoTrack* kinkFitter::copyRecoTrackForRefit(const RecoTrack* recoTrack,
+RecoTrack* KinkFitter::copyRecoTrackForRefit(const RecoTrack* recoTrack,
                                              ROOT::Math::XYZVector& momentumSeed,
                                              ROOT::Math::XYZVector positionSeed,
                                              double& timeSeed,
@@ -443,7 +427,7 @@ RecoTrack* kinkFitter::copyRecoTrackForRefit(const RecoTrack* recoTrack,
 }
 
 /// check if the refit of filter 6 daughter tracks improves the distance between mother and daughter
-bool kinkFitter::isRefitImproveFilter6(const RecoTrack* recoTrackDaughterRefit, const ROOT::Math::XYZVector& motherPosLast)
+bool KinkFitter::isRefitImproveFilter6(const RecoTrack* recoTrackDaughterRefit, const ROOT::Math::XYZVector& motherPosLast)
 {
   // get the values near the mother last point
   ROOT::Math::XYZVector daughterPosClosestToMotherPosLast = ROOT::Math::XYZVector(
@@ -467,7 +451,7 @@ bool kinkFitter::isRefitImproveFilter6(const RecoTrack* recoTrackDaughterRefit, 
 }
 
 /// combine daughter and mother tracks and fit the result to check for clones
-int kinkFitter::combineTracksAndFit(const Track* trackMother, const Track* trackDaughter)
+int KinkFitter::combineTracksAndFit(const Track* trackMother, const Track* trackDaughter)
 {
   RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
@@ -509,7 +493,7 @@ int kinkFitter::combineTracksAndFit(const Track* trackMother, const Track* track
 }
 
 /// Create a RecoTrack in a separate StoreArray based on one to be split
-RecoTrack* kinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
+RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
                                              const bool motherFlag, const unsigned int delta)
 {
 
@@ -601,7 +585,7 @@ RecoTrack* kinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
 }
 
 /// Split track into two based on the chi2/ndf ratio
-bool kinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrackIndexMother, short& recoTrackIndexDaughter)
+bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrackIndexMother, short& recoTrackIndexDaughter)
 {
 
   // initial default value for the chi2/ndf ratio
@@ -759,14 +743,14 @@ bool kinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
 /// Fit and store kink.
 /// If the fitterMode requires, tries to reassign hits between daughter and mother tracks.
 /// If the fitterMode requires, tries to flip and refit the tracks.
-bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag)
+bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag)
 {
 
   // Existence of corresponding RecoTrack already checked at the module level;
   RecoTrack* recoTrackMother = trackMother->getRelated<RecoTrack>(m_recoTracksName);
   RecoTrack* recoTrackDaughter = trackDaughter->getRelated<RecoTrack>(m_recoTracksName);
 
-  if (filterFlag >= 7) {
+  if (filterFlag >= 7 && filterFlag <= 9) {
     short recoTrackIndexMother = -1;
     short recoTrackIndexDaughter = -1;
     if (!splitRecoTrack(recoTrackMother, recoTrackIndexMother, recoTrackIndexDaughter))
@@ -819,7 +803,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   }
 
   // Flip and refit filter 5.
-  if ((m_kinkFitterMode == 2 || m_kinkFitterMode == 3) && (filterFlag == 5)) {
+  if (m_kinkFitterModeFlipAndRefit && (filterFlag == 5)) {
     B2DEBUG(29, "Try to flip and refit filter " << filterFlag);
 
     // initialize seeds for the refit
@@ -910,7 +894,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   m_daughterKinkRecoTrackCache = recoTrackDaughter;
 
   // if the corresponding fitterMode is used, try to reassign hits between mother and daughter tracks
-  if (m_kinkFitterModeHitsReassignment && (filterFlag == 1 || filterFlag == 4  || (filterFlag >= 7
+  if (m_kinkFitterModeHitsReassignment && (filterFlag == 1 || filterFlag == 4  || (filterFlag >= 7 && filterFlag <= 9
                                            && distanceAtVertex > m_vertexDistanceCut))
       && (reassignHitStatus != 0)) {
     B2DEBUG(29, "Start of the hits reassignment for filter " << filterFlag);
@@ -941,7 +925,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       int hitPositionForReassignment = 0;
       if (reassignHitStatus & 0x1) {
 
-        // daughter hits to be reassigned (negative value)
+        // daughter hits to be reassigned (negative value); direction should be 1
         hitPositionForReassignment = findHitPositionForReassignment(recoTrackDaughterBuffer, vertexPosTmp, 1);
 
         // test if the number of hits to be reassigned larger than the number of CDC hits in daughter tracks
@@ -952,7 +936,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 
       } else if (reassignHitStatus & 0x2) {
 
-        // mother hits to be reassigned (positive value)
+        // mother hits to be reassigned (positive value); direction should be -1
         hitPositionForReassignment = findHitPositionForReassignment(recoTrackMotherBuffer, vertexPosTmp, -1);
 
         // test if the number of hits to be reassigned larger than the number of CDC hits in mother tracks
@@ -1204,7 +1188,7 @@ bool kinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
 /// Fit kink vertex using RecoTracks as inputs.
 /// Calculates distance at the fitted vertex.
 /// Checks if the reassignment of the hits is required.
-bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
+bool KinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
                                          unsigned int& reassignHitStatus,
                                          ROOT::Math::XYZVector& vertexPos, double& distance,
                                          ROOT::Math::XYZVector vertexPosSeed = ROOT::Math::XYZVector(0, 0, 0))
@@ -1336,7 +1320,7 @@ bool kinkFitter::vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* 
 }
 
 /// Prepare the error matrix for the kFit
-void kinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
+void KinkFitter::errMatrixForKFit(ROOT::Math::PxPyPzEVector& fourMomentum, TMatrixDSym& covMatrix6,
                                   TMatrixDSym& errMatrix7)
 {
 

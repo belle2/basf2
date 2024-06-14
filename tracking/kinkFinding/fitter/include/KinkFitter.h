@@ -31,29 +31,48 @@ namespace Belle2 {
    *
    * kinkFitter.fitAndStore(B2TrackMother, B2TrackDaughter, filterFlag);
    */
-  class kinkFitter {
+  class KinkFitter {
 
   public:
-    /// Constructor for the kinkFitter.
-    kinkFitter(const std::string& trackFitResultsName = "", const std::string& kinksName = "",
+    /**
+     * Constructor for the KinkFitter.
+     * @param trackFitResultsName Belle2::TrackFitResult StoreArray name.
+     * @param kinksName Kink StoreArray name.
+     * @param recoTracksName RecoTrack StoreArray name.
+     * @param copiedRecoTracksName RecoTrack StoreArray name (used for track refitting).
+     */
+    KinkFitter(const std::string& trackFitResultsName = "", const std::string& kinksName = "",
                const std::string& recoTracksName = "",
-               const std::string& copiedRecoTracksName = "CopiedRecoTracks");
+               const std::string& copiedRecoTracksName = "RecoTracksKinkTmp");
 
-    /// Initialize the cuts which will be applied during the fit and store process.
+    /**
+     * Initialize the cuts which will be applied during the fit and store process.
+     * @param vertexDistanceCut Cut on distance between tracks at the Kink vertex.
+     * @param vertexChi2Cut Cut on Chi2 for the Kink vertex.
+     * @param precutDistance Preselection cut on distance between ending points of two tracks used in KinkFinderModule.
+     */
     void initializeCuts(double vertexDistanceCut, double vertexChi2Cut, double precutDistance);
 
-    /// set kink fitter mode.
-    /// switch the mode of fitAndStore function.
-    ///   0: store kink at the first vertex fit, regardless hit reassignment and flipping
-    ///   1: hit reassignment between mother and daughter tracks
-    ///   2: track flipping
-    ///   3: option 1 and 2
+    /**
+     * set kink fitter mode.
+     * @param fitterMode from 0 to 15 in binary:
+     * 1st bit: reassign hits (1 is On, 0 is Off)
+     * 2nd bit: flip tracks with close end points (1 is On, 0 is Off)
+     * 3rd bit: fit both tracks as one (1 is On, 0 is Off)
+     * 4th bit: track splitting (1 is On, 0 is Off)
+     */
     void setFitterMode(unsigned char fitterMode);
 
-    /// Fit kink with cardinal hypothesis and store it if the fit was successful.
-    /// If the corresponding flag is set, try to reassign hits between mother and daughter tracks.
-    /// If the corresponding flag is set, try to flip and refit daughter track.
-    /// filterFlag is used to distinguish filters with which pair was selected.
+    /**
+     * Fit kink with cardinal hypothesis and store it if the fit was successful.
+     * If the corresponding flag is set, try to reassign hits between mother and daughter tracks.
+     * If the corresponding flag is set, try to flip and refit daughter track.
+     * If the corresponding flag is set, try to combine mother and daughter track and fit the resulting track.
+     * @param trackMother mother Track
+     * @param trackDaughter daughter Track
+     * @param filterFlag filter with which track pair was selected
+     * @return true if the track pair is stored as a Kink, false in other cases
+     */
     bool fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag);
 
   private:
@@ -94,13 +113,13 @@ namespace Belle2 {
      * Find hit position closest to the vertex.
      * @param recoTrack RecoTrack
      * @param vertexPos vertex
-     * @param direction direction (positive for daughter track, negative for mother track)
+     * @param direction direction (+1 for daughter track, -1 for mother track). Should be +-1
      * @return for daughter track, returns negative index of the hit, closest to the vertex
      * for mother track, returns positive index of the hit, closest to the vertex, counting from the end of the track
      */
     int findHitPositionForReassignment(const RecoTrack* recoTrack,
                                        ROOT::Math::XYZVector& vertexPos,
-                                       const int direction);
+                                       int direction);
 
     /**
      * Copy RecoTrack to a separate StoreArray and reassign CDC hits according to delta
@@ -238,13 +257,15 @@ namespace Belle2 {
     ///< here it is needed in isRefitImproveFilter6 function
 
     // fitter working mode variables
-    unsigned char m_kinkFitterMode;  ///< fitter mode written in bits
-    ///< first: reassign hits; second: flip and refit filter 2 tracks; third: combine tracks and fit them to find clones;
-    ///< fourth: split the combined track candidates
-    bool m_kinkFitterModeHitsReassignment; ///< fitter mode first bit
-    bool m_kinkFitterModeFlipAndRefit; ///< fitter mode second bit
-    bool m_kinkFitterModeCombineAndFit; ///< fitter mode third bit
-    bool m_kinkFitterModeSplitTrack; ///< fitter mode fourth bit
+    unsigned char m_kinkFitterMode;  ///< fitter mode from 0 to 15 written in bits:
+    ///< 1st bit: reassign hits (1 is On, 0 is Off)
+    ///< 2nd bit: flip tracks with close end points (1 is On, 0 is Off)
+    ///< 3rd bit: fit both tracks as one (1 is On, 0 is Off)
+    ///< 4th bit: combined track candidate splitting (1 is On, 0 is Off)
+    bool m_kinkFitterModeHitsReassignment; ///< fitter mode 1st bit
+    bool m_kinkFitterModeFlipAndRefit; ///< fitter mode 2nd bit
+    bool m_kinkFitterModeCombineAndFit; ///< fitter mode 3rd bit
+    bool m_kinkFitterModeSplitTrack; ///< fitter mode 4th bit
 
     // helper variables
     StoreArray <RecoTrack> m_copiedRecoTracks; ///< RecoTrack used to refit tracks

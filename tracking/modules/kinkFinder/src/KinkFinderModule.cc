@@ -31,7 +31,9 @@ KinkFinderModule::KinkFinderModule() : Module()
                  "A loose cut on the pair is applied before the fit; "
                  "then, a vertex fit is performed, and only pairs passing a chi^2 (``vertexChi2Cut``) "
                  "and distance (``vertexDistanceCut``) "
-                 "are stored as Belle2::Kink.");
+                 "are stored as Belle2::Kink.\n\n"
+                 "It also can split tracks that might be formed from two kink tracks. "
+                 "The tracks are preselected and split. After that the result is stored in Belle2::Kink.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -64,11 +66,11 @@ void KinkFinderModule::initialize()
   m_tracks.isRequired(m_arrayNameTrack);
   StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
   m_tracks.requireRelationTo(recoTracks);
-  //All the other required StoreArrays are checked in the Construtor of the kinkFitter.
+  //All the other required StoreArrays are checked in the Construtor of the KinkFitter.
 
   if (!m_kinkFinderParameters.isValid())
     B2FATAL("kinkFinder parameters are not available.");
-  // mode of the kinkFitter
+  // mode of the KinkFitter
   m_kinkFitterMode = m_kinkFinderParameters->getKinkFitterMode();
   m_kinkFitterModeSplitTrack = m_kinkFitterMode & 0b1000;
 
@@ -82,12 +84,12 @@ void KinkFinderModule::initialize()
   m_precutSplitNCDCHit = m_kinkFinderParameters->getPrecutSplitNCDCHit();
   m_precutSplitPValue = m_kinkFinderParameters->getPrecutSplitPValue();
 
-  // final cuts used in kinkFitter to decide if the kink candidate should be stored
+  // final cuts used in KinkFitter to decide if the kink candidate should be stored
   m_vertexChi2Cut = m_kinkFinderParameters->getVertexChi2Cut();
   m_vertexDistanceCut = m_kinkFinderParameters->getVertexDistanceCut();
 
 
-  m_kinkFitter = std::make_unique<kinkFitter>(m_arrayNameTFResult, m_arrayNameKink,
+  m_kinkFitter = std::make_unique<KinkFitter>(m_arrayNameTFResult, m_arrayNameKink,
                                               m_arrayNameRecoTrack,
                                               m_arrayNameCopiedRecoTrack);
   m_kinkFitter->initializeCuts(m_vertexDistanceCut, m_vertexChi2Cut, m_precutDistance);
@@ -112,25 +114,30 @@ void KinkFinderModule::event()
     B2ASSERT("No RecoTrack available for given Track.", recoTrack);
 
     bool trackChosen = false;
+    // select mother candidates
     if (preFilterMotherTracks(recoTrack)) {
       tracksMother.push_back(&track);
       trackChosen = true;
 
+      // if mother candidate pass criteria for splitting, split it with filter 7
       if (m_kinkFitterModeSplitTrack && preFilterTracksToSplit(recoTrack, &track)) {
         const short filterFlag = 7;
         fitAndStore(&track, &track, filterFlag);
       }
     }
+    // select daughter candidates
     if (preFilterDaughterTracks(recoTrack)) {
       tracksDaughter.push_back(&track);
       trackChosen = true;
 
+      // if daughter candidate pass criteria for splitting, split it with filter 8
       if (m_kinkFitterModeSplitTrack && preFilterTracksToSplit(recoTrack, &track)) {
         const short filterFlag = 8;
         fitAndStore(&track, &track, filterFlag);
       }
     }
 
+    // if track does not pass mother or daughter selection but passes criteria for splitting, split it with filter 9
     if (m_kinkFitterModeSplitTrack && !trackChosen && preFilterTracksToSplit(recoTrack, &track)) {
       const short filterFlag = 9;
       fitAndStore(&track, &track, filterFlag);

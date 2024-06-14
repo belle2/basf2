@@ -139,6 +139,8 @@ namespace Belle2 {
 
     /**
      * Get the pre-official likelihood
+     * @param preOfficialIdentifier Name of the pre-official likelihood
+     * @return Value of the pre-official likelihood
      */
     double getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const;
 

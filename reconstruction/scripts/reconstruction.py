@@ -78,7 +78,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
                        pxd_filtering_offline=False,
-                       create_intercepts_for_pxd_ckf=True,
+                       create_intercepts_for_pxd_ckf=False,
                        append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
                        skip_full_grid_cdc_eventt0_if_svd_time_present=True):
@@ -187,7 +187,7 @@ def add_prefilter_reconstruction(path,
                                  reconstruct_cdst=None,
                                  event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
-                                 create_intercepts_for_pxd_ckf=True,
+                                 create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """

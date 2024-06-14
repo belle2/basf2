@@ -50,7 +50,7 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=True):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=False):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
 

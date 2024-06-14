@@ -46,7 +46,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
                                 use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                 add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                 pxd_filtering_offline=False,
-                                create_intercepts_for_pxd_ckf=True,
+                                create_intercepts_for_pxd_ckf=False,
                                 append_full_grid_cdc_eventt0=True,
                                 v0_finding=True, flip_recoTrack=True,
                                 skip_full_grid_cdc_eventt0_if_svd_time_present=True):
@@ -172,7 +172,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
                                           use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                                           add_cdcTrack_QI=True, add_vxdTrack_QI=False, add_recoTrack_QI=False,
                                           pxd_filtering_offline=False,
-                                          create_intercepts_for_pxd_ckf=True,
+                                          create_intercepts_for_pxd_ckf=False,
                                           append_full_grid_cdc_eventt0=True,
                                           skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
@@ -421,7 +421,7 @@ def add_track_finding(path, components=None, reco_tracks="RecoTracks",
                       use_svd_to_cdc_ckf=True, use_ecl_to_cdc_ckf=False,
                       add_cdcTrack_QI=True, add_vxdTrack_QI=False,
                       pxd_filtering_offline=False, use_HLT_ROIs=False,
-                      create_intercepts_for_pxd_ckf=True):
+                      create_intercepts_for_pxd_ckf=False):
     """
     Add the CKF to the path with all the track finding related to and needed for it.
     :param path: The path to add the tracking reconstruction modules to

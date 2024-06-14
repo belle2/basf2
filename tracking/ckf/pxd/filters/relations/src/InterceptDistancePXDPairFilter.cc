@@ -86,15 +86,6 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
     }
   }
 
-  // fromState and toState on the same layer, i.e. hits in ladder overlap region
-  if (layerDiff == 0) {
-    if (abs(phiDiff) < static_cast<float>(m_param_PhiOverlapHitHitCut)
-        && abs(etaDiff) < static_cast<float>(m_param_EtaOverlapHitHitCut)) {
-      return 1.0;
-    }
-    return NAN;
-  }
-
   // hit-hit relation from Layer-2 to Layer-1
   if (abs(phiDiff) < static_cast<float>(m_param_PhiHitHitCut) and
       abs(etaDiff) < static_cast<float>(m_param_EtaHitHitCut)) {

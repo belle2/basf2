@@ -31,6 +31,8 @@ namespace Belle2 {
     void event() override final;
     /** Module function doing stuff at beginning of a run */
     void beginRun() override final;
+    /** Module function needed to delete pointer*/
+    void terminate() override final;
 
   private:
 
@@ -46,8 +48,12 @@ namespace Belle2 {
     TCanvas* m_cAbortRate = nullptr;  /**< canvas for the abort rate plot */
     TCanvas* m_cAbortRateIN = nullptr;  /**< canvas for the abort rate inside the active veto region */
     TCanvas* m_cAbortRateOUT = nullptr;  /**< canvas for the abort rate outside the active veto region */
+    TCanvas* m_cAbortRate_BF = nullptr;  /**< canvas for the abort rate plot BEFORE FILTER*/
     TCanvas* m_cAbortRateIN_BF = nullptr;  /**< canvas for the abort rate inside the active veto region BEFORE FILTER*/
     TCanvas* m_cAbortRateOUT_BF = nullptr;  /**< canvas for the abort rate outside the active veto region BEFORE FILTER*/
+
+    TH1F* m_hAbort = nullptr; /**< totla abort (inside + outside) active veto region */
+    TH1F* m_hAbort_BF = nullptr; /**< totla abort (inside + outside) active veto region BEFORE FILTER*/
 
     /** scale hAverage and send bin contents to Mirabelle */
     void scaleAndSendToMirabelle(TH1F* hAverage, const int nEvents, const TString& tag);

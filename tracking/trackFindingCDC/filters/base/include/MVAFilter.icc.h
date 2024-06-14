@@ -127,7 +127,6 @@ namespace Belle2 {
     template <class AFilter>
     std::vector<float> MVA<AFilter>::predict(const std::vector<Object*>& objs)
     {
-      const std::vector<Named<Float_t*>>& namedVariables = Super::getVarSet().getNamedVariables();
       const int nFeature = m_namedVariables.size();
       const int nRows    = objs.size();
       auto allFeatures = std::unique_ptr<float[]>(new float[nRows * nFeature]);

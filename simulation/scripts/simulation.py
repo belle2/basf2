@@ -81,24 +81,31 @@ def add_PXDDataReduction(path, components, pxd_unfiltered_digits='pxd_unfiltered
 
     # empty the StoreArrays which were used for the PXDDatareduction as those are not needed anymore
     if doCleanup:
+        StoreArrays_to_clean = ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
+                                'SPTrackCands__ROI', 'SpacePoints__ROI',
+                                # till here it are StoreArrays, the following are relations and Datastore objects
+                                'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
+                                'RecoHitInformationsTo__ROIsvdClusters',
+                                'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
+                                '__ROIsvdRecoDigitsToMCParticles',
+                                '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
+                                '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
+                                '__ROIsvdRecoTracksToRecoHitInformations',
+                                '__ROIsvdRecoTracksToSPTrackCands__ROI']
+
+        # not only prune the pxd_unfiltered_digits, but also their relations to
+        # MCParticles, PXDDigits (the filtered ones), and PXDTrueHits
+        # Only prune the unfiltered PXD if their name is not 'PXDDigits', otherwise all PXDDigits would be lost
+        if pxd_unfiltered_digits != 'PXDDigits':
+            unfiltered_pxd_digits_arrays = [pxd_unfiltered_digits,
+                                            f'{pxd_unfiltered_digits}ToMCParticles',
+                                            f'{pxd_unfiltered_digits}ToPXDDigits',
+                                            f'{pxd_unfiltered_digits}ToPXDTrueHits']
+            StoreArrays_to_clean += unfiltered_pxd_digits_arrays
+
         datastore_cleaner = b2.register_module('PruneDataStore')
         datastore_cleaner.param('keepMatchedEntries', False)
-        datastore_cleaner.param('matchEntries', ['ROIs', '__ROIsvdRecoDigits', '__ROIsvdClusters', '__ROIsvdRecoTracks',
-                                                 'SPTrackCands__ROI', 'SpacePoints__ROI', pxd_unfiltered_digits,
-                                                 # till here it are StoreArrays, the following are relations and Datastore objects
-                                                 'SegmentNetwork__ROI', 'PXDInterceptsToROIs',
-                                                 'RecoHitInformationsTo__ROIsvdClusters',
-                                                 'SpacePoints__ROITo__ROIsvdClusters', '__ROIsvdClustersToMCParticles',
-                                                 '__ROIsvdRecoDigitsToMCParticles',
-                                                 '__ROIsvdClustersTo__ROIsvdRecoDigits', '__ROIsvdClustersToSVDTrueHits',
-                                                 '__ROIsvdClustersTo__ROIsvdRecoTracks', '__ROIsvdRecoTracksToPXDIntercepts',
-                                                 '__ROIsvdRecoTracksToRecoHitInformations',
-                                                 '__ROIsvdRecoTracksToSPTrackCands__ROI',
-                                                 # not only prune the pxd_unfiltered_digits, but also their relations to
-                                                 # MCParticles, PXDDigits (the filtered ones), and PXDTrueHits
-                                                 f'{pxd_unfiltered_digits}ToMCParticles',
-                                                 f'{pxd_unfiltered_digits}ToPXDDigits',
-                                                 f'{pxd_unfiltered_digits}ToPXDTrueHits'])
+        datastore_cleaner.param('matchEntries', StoreArrays_to_clean)
         path.add_module(datastore_cleaner)
 
 

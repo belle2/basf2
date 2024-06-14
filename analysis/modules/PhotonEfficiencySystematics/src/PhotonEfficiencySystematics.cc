@@ -34,9 +34,9 @@ PhotonEfficiencySystematicsModule::PhotonEfficiencySystematicsModule() : Module(
   setDescription(
     R"DOC(Module to include data/MC weights for photon detection efficiency. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
+    mypath.add_module("PhotonEfficiencySystematics", particleLists=['gamma:cut'], tableName=tableName_Weight)
 
 		     )DOC");
   // Parameter definitions

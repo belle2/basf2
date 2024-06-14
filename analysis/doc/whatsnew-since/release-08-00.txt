@@ -1,3 +1,13 @@
+Changes in the analysis package in light-2406-ragdoll
+-----------------------------------------------------
+
+Variables
++++++++++
+* PIDVariables: in all functions replacing ``logL == 0`` with a call to ``isAvailable`` which tests the detector flags in ``PIDLikelihoods``
+* Added variables: `isPIDAvailable`, `isPIDAvailableFrom(detectorList)`, `pidLogarithmicProbabilityExpert(pdgCodeHyp, detectorList)`
+* in function `addAlias(alias, variable)` adding ``return alias`` for convenience
+
+
 Changes in the analysis package in light-2405-quaxo
 ---------------------------------------------------
 

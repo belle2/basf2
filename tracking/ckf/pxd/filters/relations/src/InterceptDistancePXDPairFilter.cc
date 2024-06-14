@@ -32,15 +32,15 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
 
   B2ASSERT("You have filled the wrong states into this!", toStateCache.isHitState);
 
-  unsigned int layerDiff = abs(fromStateCache.geoLayer - toStateCache.geoLayer);
+  const unsigned int layerDiff = abs(fromStateCache.geoLayer - toStateCache.geoLayer);
 
   float phiDiff = deltaPhi(fromStateCache.phi, toStateCache.phi);
   float etaDiff = deltaEtaFromTheta(fromStateCache.theta, toStateCache.theta);
 
   // fromState and toState on the same layer, i.e. hits in ladder overlap region
   if (layerDiff == 0) {
-    if (abs(phiDiff) < static_cast<float>(m_param_PhiOverlapHitHitCut)
-        && abs(etaDiff) < static_cast<float>(m_param_EtaOverlapHitHitCut)) {
+    if (abs(phiDiff) < static_cast<float>(m_param_PhiOverlapHitHitCut) and
+        abs(etaDiff) < static_cast<float>(m_param_EtaOverlapHitHitCut)) {
       return 1.0;
     }
     return NAN;
@@ -51,8 +51,8 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
     const RecoTrack* seedRecoTrack = fromState.getSeed();
     const auto& relatedIntercepts = seedRecoTrack->getRelationsTo<PXDIntercept>(m_param_PXDInterceptsName);
     // pT dependent factor, pre-set cut value should correspond to pT>=1GeV
-    float scaleInvPt = 1.;
-    if (fromStateCache.ptSeed < m_param_PtThresholdTrackToHitCut) scaleInvPt = m_param_PtThresholdTrackToHitCut / fromStateCache.ptSeed;
+    const float scaleInvPt =
+      (fromStateCache.ptSeed < m_param_PtThresholdTrackToHitCut ? (m_param_PtThresholdTrackToHitCut / fromStateCache.ptSeed) : 1.);
     if (relatedIntercepts.size() > 0) {
       // We have PXDIntercepts for this Seed (RecoTrack), so use the intercept position for filtering
       for (const auto& intercept : relatedIntercepts) {
@@ -74,10 +74,10 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
     } else {
       // We don't have PXDIntercepts for this Seed (RecoTrack), so use simple angular filters.
       // Get eta/theta separation from track angle
-      float dR = fromStateCache.perp - toStateCache.perp;
-      float dZ = fromStateCache.perp / tan(fromStateCache.theta) - toStateCache.perp / tan(toStateCache.theta);
-      float cosTheta_seedhit = dZ / sqrt(dR * dR + dZ * dZ);
-      etaDiff = convertThetaToEta(cosTheta_seedhit) - convertThetaToEta(cos(fromStateCache.thetaSeed));
+      const float dR = fromStateCache.perp - toStateCache.perp;
+      const float dZ = fromStateCache.perp / tan(fromStateCache.theta) - toStateCache.perp / tan(toStateCache.theta);
+      const float cosThetaSeedhit = dZ / sqrt(dR * dR + dZ * dZ);
+      etaDiff = convertThetaToEta(cosThetaSeedhit) - convertThetaToEta(cos(fromStateCache.thetaSeed));
       if (abs(phiDiff) < static_cast<float>(m_param_PhiRecoTrackToHitCut)*float(layerDiff)*scaleInvPt and
           abs(etaDiff) < static_cast<float>(m_param_EtaRecoTrackToHitCut)*float(layerDiff)*scaleInvPt) {
         return 1.0;

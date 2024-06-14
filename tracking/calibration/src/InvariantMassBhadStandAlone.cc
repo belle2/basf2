@@ -145,7 +145,7 @@ namespace Belle2::InvariantMassBhadCalib {
     RooPlot* mbcframe = eNow.frame(40) ;
     dataE0->plotOn(mbcframe) ;
 
-    sumB0.paramOn(mbcframe, dataE0);
+    sumB0.paramOn(mbcframe, Parameters(*dataE0->get()));
 
 
     sumB0.plotOn(mbcframe, Components(argus), LineStyle(kDashed)) ;

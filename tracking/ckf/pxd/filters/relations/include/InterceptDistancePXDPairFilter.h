@@ -20,18 +20,32 @@ namespace Belle2 {
     void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
   private:
+    /// Calculate delta phi
+    float deltaPhi(float phi1, float phi2);
+    /// Calculate delta eta from theta
+    float deltaEtaFromTheta(float theta1, float theta2);
+    /// Convert theta to eta (pseudorapidity)
+    float convertThetaToEta(float cosTheta);
+
+    /// Threshold to apply inverse pT dependent cut [GeV]
+    double m_param_PtThresholdTrackToHitCut = 0.5;
     /// Filter potential relations in phi between seed states (based on PXDIntercepts) and hit states
-    double m_param_PhiInterceptToHitCut = 0.1;
-    /// Filter potential relations in theta between seed states (based on PXDIntercepts) and hit states
-    double m_param_ThetaInterceptToHitCut = 0.1;
+    double m_param_PhiInterceptToHitCut = 0.2;
+    /// Filter potential relations in eta between seed states (based on PXDIntercepts) and hit states
+    double m_param_EtaInterceptToHitCut = 0.2;
     /// Filter potential relations in phi between seed states (based on RecoTracks) and hit states
     double m_param_PhiRecoTrackToHitCut = 0.5;
-    /// Filter potential relations in theta between seed states (based on RecoTracks) and hit states
-    double m_param_ThetaRecoTrackToHitCut = 0.5;
+    /// Filter potential relations in eta between seed states (based on RecoTracks) and hit states
+    double m_param_EtaRecoTrackToHitCut = 0.4;
     /// Filter potential relations in phi between hit states
-    double m_param_PhiHitHitCut = 0.2;
-    /// Filter potential relations in theta between hit states
-    double m_param_ThetaHitHitCut = 0.2;
+    double m_param_PhiHitHitCut = 0.8;
+    /// Filter potential relations in eta between hit states
+    double m_param_EtaHitHitCut = 0.8;
+    /// Filter potential relations in phi between hit states in ladder overlap
+    double m_param_PhiOverlapHitHitCut = 0.15;
+    /// Filter potential relations in eta between hit states in ladder overlap
+    double m_param_EtaOverlapHitHitCut = 0.15;
+
     /// Name of the PXDIntercepts StoreArray
     std::string m_param_PXDInterceptsName = "PXDIntercepts";
   };

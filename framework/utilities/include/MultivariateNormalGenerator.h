@@ -42,7 +42,7 @@ namespace Belle2 {
    *
    * To ease this restriction a little we use the LDLT decomposition given as
    * \f$M = P^T L D L^T P\f$ where \f$P\f$ is a permutation matrix and D a diagonal matrix.
-   * We then can use \f$A = P^T L \sqrt(D)\f$ to caluclate the correlated values also
+   * We then can use \f$A = P^T L \sqrt(D)\f$ to calculate the correlated values also
    * for positive semi-definite covariance matrices if the elements of D are
    * positive.
    */
@@ -69,7 +69,7 @@ namespace Belle2 {
     {
       setMeanCov(mean, cov);
     }
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance
      * @return Vector containing the generated random numbers
      */
@@ -89,7 +89,7 @@ namespace Belle2 {
     void reset();
     /** Return the number of elements to be generated on generate() */
     size_t size() const { return m_mean.rows(); }
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance and store them in buffer output.
      * @param output pointer to array where generated values will be stored.
      */
@@ -99,7 +99,7 @@ namespace Belle2 {
       for (int i = 0; i < x.rows(); ++i) { output[i] = x(i); }
     }
 
-    /** Generate a set of correlated random numbers with the previouly set
+    /** Generate a set of correlated random numbers with the previously set
      * mean and covariance and return a TVector3. Optimally, the set mean and
      * covariance matrix should be of dimension three, otherwise just the first
      * size() elements of the TVector3 are set and the remaining elements are

@@ -92,7 +92,10 @@ void ParticleMassHypothesesUpdaterModule::event()
     int newPdgCode = newMother->getPDGCode();
 
     StoreObjPtr<ParticleList> newList(m_newParticleList);
-    if (!newList.isValid()) { // Check whether it already exists in this path
+    if (newList.isValid()) { // Check whether it already exists in this path
+      B2WARNING("The new particle list already exists, and it should not. Did you call the module twice?");
+      return;
+    } else {
       newList.create();  // Create and initialize the list
       newList->initialize(newPdgCode, m_newParticleList);
       newList->setEditable(true);

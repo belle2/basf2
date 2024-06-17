@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <filesystem>
 
 namespace Belle2 {
   /**
@@ -92,6 +93,11 @@ namespace Belle2 {
     unsigned int m_runno = 0;
     /** Event number */
     unsigned int m_count = 0;
+
+    /** Last time input file changes */
+    std::filesystem::file_time_type m_lasttime;
+    /** enforce a content change on next event */
+    bool m_forceChanged{false};
   };
 } // end namespace Belle2
 

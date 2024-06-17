@@ -15,25 +15,17 @@
 import math
 
 OptL3Mod = True
-Opt2Xi = False
 
 fileName = ""
 fileNameC = ""
 
 if OptL3Mod:
-    if Opt2Xi:
-        fileName = 'VTX-CMOS6-staggered-L3mod-2Xi.xml'
-        fileNameC = 'VTX-Components-CMOS6-staggered-L3mod-2Xi.xml'
-    else:
-        fileName = 'VTX-CMOS6-staggered-L3mod.xml'
-        fileNameC = 'VTX-Components-CMOS6-staggered-L3mod.xml'
+    fileName = 'VTX-CMOS6-staggered-L3mod.xml'
+    fileNameC = 'VTX-Components-CMOS6-staggered-L3mod.xml'
 else:
-    if Opt2Xi:
-        fileName = 'VTX-CMOS6-staggered-2Xi.xml'
-        fileNameC = 'VTX-Components-CMOS6-staggered-2Xi.xml'
-    else:
-        fileName = 'VTX-CMOS6-staggered.xml'
-        fileNameC = 'VTX-Components-CMOS6-staggered.xml'
+    fileName = 'VTX-CMOS6-staggered.xml'
+    fileNameC = 'VTX-Components-CMOS6-staggered.xml'
+
 
 f = open('../data/' + fileNameC, 'w')
 
@@ -201,7 +193,7 @@ for layer in range(1, nlayer+1):
         posZ = str(pos)
 
         cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + \
-            '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:7] + '</z><shift unit=\"mm\">' + shift[0:6]
+            '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:8] + '</z><shift unit=\"mm\">' + shift[0:6]
         cmd1 += '</shift><shiftR unit=\"mm\">' + str(shiftR) + '</shiftR></Sensor>\n'
 
         f.write(cmd1)
@@ -216,7 +208,7 @@ for layer in range(1, nlayer+1):
             posZ = str(pos)
 
             cmd2 = '    <Sensor id=\"' + str(id+nsensor+1) + '\"' + ' type=\"' + type + \
-                '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:7] + '</z><shift unit=\"mm\">' + shift1[0:6]
+                '\" flipV=\"true\"><z unit=\"mm\">' + posZ[0:8] + '</z><shift unit=\"mm\">' + shift1[0:6]
             cmd2 += '</shift><shiftR unit=\"mm\">' + str(shiftR1) + '</shiftR></Sensor>\n'
             f.write(cmd2)
 
@@ -537,6 +529,18 @@ f.write('  </Component>\n')
 
 f.write('\n')
 
+f.write('  <Component name=\"ThinningLayer14i'+'\">\n')
+f.write('    <Material>' + Material + '</Material>\n')
+f.write('    <Color>#5599BB</Color>\n')
+f.write('    <width  unit=\"mm\">'+str(thinW)+'</width>\n')
+f.write('    <length unit=\"mm\">'+str(thinL)+'</length>\n')
+f.write('    <height unit=\"mm\">'+str(thinH)+'</height>\n')
+f.write('    <angle  unit=\"deg\">'+str(thinAngle)+'</angle>\n')
+f.write('  </Component>\n')
+
+f.write('\n')
+
+thinH = 0.360
 thinL = activeL*2
 
 f.write('  <Component name=\"ThinningLayer12'+'\">\n')

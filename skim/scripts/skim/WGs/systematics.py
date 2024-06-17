@@ -44,7 +44,7 @@ class SystematicsDstar(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdK("all", path=path)
@@ -147,7 +147,7 @@ class SystematicsTracking(BaseSkim):
 
     def DstarToD0PiPartList(self, path):
         """Build DstarToD0PiPartList lists for systematics skims."""
-        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and d0 > 0.1", path=path)
+        ma.fillParticleList("pi+:fromks", "chiProb > 0.001 and pionID > 0.1 and dr > 0.1", path=path)
 
         # D-
         DminusCuts = "1.0 < M < 1.75"
@@ -507,7 +507,7 @@ class SystematicsLambda(BaseSkim):
     __contact__ = __liaison__
     __category__ = "systematics"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     def load_standard_lists(self, path):
         stdLambdas(path=path)
@@ -696,8 +696,6 @@ class SystematicsJpsi(BaseSkim):
     __description__ = ""
     __contact__ = __liaison_leptonID__
     __category__ = "systematics, leptonID"
-
-    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)

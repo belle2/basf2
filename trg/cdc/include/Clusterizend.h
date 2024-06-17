@@ -10,7 +10,6 @@
 
 #include <cmath>
 #include <TVector3.h>
-#include <iostream>
 
 namespace Belle2 {
   struct clusterer_params  {

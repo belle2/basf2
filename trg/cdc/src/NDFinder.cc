@@ -16,9 +16,9 @@
 #include "boost/iostreams/filtering_streambuf.hpp"
 #include "boost/iostreams/filtering_stream.hpp"
 #include "trg/cdc/NDFinder.h"
+#include "TMath.h"
 
 using namespace Belle2;
-using namespace std;
 
 
 void NDFinder::init(unsigned short minWeight, unsigned char minPts,
@@ -27,7 +27,7 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
                     unsigned char minCells, bool dbscanning, unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
                     unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
                     bool verbose,
-                    string& axialFile, string& stereoFile)
+                    std::string& axialFile, std::string& stereoFile)
 {
   m_params.minSuperAxial = (unsigned char) minSuperAxial;
   m_params.minSuperStereo = (unsigned char) minSuperStereo;
@@ -146,9 +146,9 @@ void NDFinder::initBins()
   m_planeShape = {m_nOmega, m_nPhiFull, m_nTheta}; //{40, 384, 9};
 
   /** Acceptance Ranges */
-  vector<float> omegaRange = { -5., 5.};
-  vector<float> phiRange = {0., 11.25};
-  vector<float> thetaRange = {19., 140.};
+  std::vector<float> omegaRange = { -5., 5.};
+  std::vector<float> phiRange = {0., 11.25};
+  std::vector<float> thetaRange = {19., 140.};
   float ssOmega = (omegaRange[1] - omegaRange[0]) / m_nOmega; //40;
   float ssPhi = (phiRange[1] - phiRange[0]) / m_nPhiOne; //12;
   float ssTheta = (thetaRange[1] - thetaRange[0]) / m_nTheta; //9;
@@ -164,8 +164,8 @@ void NDFinder::initBins()
 
 void NDFinder::loadArray(const std::string& filename, ndbinning bins, c5array& hitsToTracks)
 {
-  vector<c5elem> flatArray;
-  ifstream arrayFileGZ(filename, ios_base::in | ios_base::binary);
+  std::vector<c5elem> flatArray;
+  std::ifstream arrayFileGZ(filename, std::ios_base::in | std::ios_base::binary);
   boost::iostreams::filtering_istream arrayStream;
   arrayStream.push(boost::iostreams::gzip_decompressor());
   arrayStream.push(arrayFileGZ);
@@ -324,11 +324,11 @@ void NDFinder::printArray3D(c3array& hitsToTracks, ndbinning bins, ushort phi_in
       // reduce printed weight
       ushort valRed = (ushort)((hitsToTracks[iomega][iphi][itheta]) / divide);
       if (valRed <= minWeightShow) // skip small weights
-        cout << " ";
+        std::cout << " ";
       else
-        cout << valRed;
+        std::cout << valRed;
     }
-    cout << "|" << endl;
+    std::cout << "|" << std::endl;
   }
 }
 
@@ -414,7 +414,7 @@ std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClusters(std::vector
 
   for (unsigned long iclus = 0; iclus < clusters.size(); iclus++) {
     SimpleCluster cli = clusters[iclus];
-    vector<cell_index> entries = cli.getEntries();
+    std::vector<cell_index> entries = cli.getEntries();
     cell_index maxid = getMax(entries);
     for (unsigned long ihit = 0; ihit < m_hitIds.size(); ihit++) {
       ushort contrib = hitContrib(maxid, ihit);
@@ -589,9 +589,9 @@ float NDFinder::transformVar(float estVal, int idx)
     if (estVal > 180) {
       phiMod -= 360.;
     }
-    return phiMod * m_pi_deg;
+    return phiMod * TMath::DegToRad();
   } else { // theta
-    float thetRad = estVal * m_pi_deg;
+    float thetRad = estVal * TMath::DegToRad();
     return cos(thetRad) / sin(thetRad);
   }
 }
@@ -607,7 +607,7 @@ std::vector<double> NDFinder::transform(std::vector<double> estimate)
 
 std::vector<double> NDFinder::getBinToVal(std::vector<double> thisAv)
 {
-  vector<double> estimate;
+  std::vector<double> estimate;
   for (ushort idim = 0; idim < 3; idim++) {
     double trafd = m_acceptRanges[idim][0] + (thisAv[idim] + 0.5) * m_slotsizes[idim];
     estimate.push_back(trafd);
@@ -633,7 +633,7 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<cellweight> highWeight
   axomega /= weightSum;
   axphi /= weightSum;
   axtheta /= weightSum;
-  vector<double> result = {axomega, axphi, axtheta};
+  std::vector<double> result = {axomega, axphi, axtheta};
   return result;
 }
 
@@ -654,9 +654,9 @@ cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 }
 
 
-vector<cellweight> NDFinder::getHighWeight(std::vector<cell_index> entries, float cutoff)
+std::vector<cellweight> NDFinder::getHighWeight(std::vector<cell_index> entries, float cutoff)
 {
-  vector<cellweight> cellsAndWeight;
+  std::vector<cellweight> cellsAndWeight;
   const c3array& houghPlane = *m_phoughPlane;
   for (cell_index& entry : entries) {
     ushort cellWeight = houghPlane[entry[0]][entry[1]][entry[2]];

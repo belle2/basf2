@@ -8,7 +8,6 @@
 
 #include "trg/cdc/modules/ndFinder/CDCTriggerNDFinderModule.h"
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(CDCTriggerNDFinder);
@@ -24,10 +23,10 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("TrackSegmentHitsName", m_TrackSegmentHitsName,
            "The name of the StoreArray of the CDCTriggerSegmentHits.",
-           string("CDCTriggerSegmentHits"));
+           std::string("CDCTriggerSegmentHits"));
   addParam("NDFinderTracksName", m_NDFinderTracksName,
            "The name of the StoreArray where the tracks found by this NDFinder Module are stored.",
-           string("CDCTrigger3DFinderTracks"));
+           std::string("CDCTrigger3DFinderTracks"));
   addParam("minSuperAxial", m_minSuperAxial,
            "Cluster pruning: Minimum number of axial super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
@@ -82,13 +81,13 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            false);
   addParam("axialFile", m_axialFile,
            "File name of the axial hit patterns. ",
-           string("data/trg/cdc/ndFinderAxialShallow.txt.gz"));
+           std::string("data/trg/cdc/ndFinderAxialShallow.txt.gz"));
   addParam("stereoFile", m_stereoFile,
            "File name of the stereo hit patterns. ",
-           string("data/trg/cdc/ndFinderStereoShallow.txt.gz"));
+           std::string("data/trg/cdc/ndFinderStereoShallow.txt.gz"));
   addParam("NDFinderInfosName", m_NDFinderInfosName,
            "The name of the StoreArray where the tracks clusters found by this NDFinder Module are stored.",
-           string("CDCTriggerClusterInfos"));
+           std::string("CDCTriggerClusterInfos"));
 }
 
 CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule()
@@ -134,7 +133,7 @@ void CDCTriggerNDFinderModule::event()
   }
   m_NDFinder.findTracks();
 
-  vector<NDFinderTrack>* resultTracks = m_NDFinder.getFinderTracks();
+  std::vector<NDFinderTrack>* resultTracks = m_NDFinder.getFinderTracks();
   for (NDFinderTrack trackND : *resultTracks) {
     const CDCTriggerTrack* NDFinderTrack =
       m_NDFinderTracks.appendNew(trackND.getPhi0(), trackND.getOmega(),
@@ -145,7 +144,7 @@ void CDCTriggerNDFinderModule::event()
     const CDCTrigger3DFinderInfo* NDFinderInfo =
       m_NDFinderInfos.appendNew(houghspace, ndreadout);
     NDFinderTrack->addRelationTo(NDFinderInfo);
-    vector<unsigned short> relHits = trackND.get_relHits();
+    std::vector<unsigned short> relHits = trackND.get_relHits();
     for (ulong i = 0; i < relHits.size(); i++) {
       NDFinderTrack->addRelationTo(m_TrackSegmentHits[relHits[i]]);
     }

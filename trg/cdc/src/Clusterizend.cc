@@ -10,7 +10,6 @@
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
 using namespace Belle2;
-using namespace std;
 
 
 bool Clusterizend::has_before(cell_index entry, ushort dim)
@@ -56,7 +55,7 @@ cell_index Clusterizend::after(cell_index entry, ushort dim)
 }
 
 
-void Clusterizend::blockcheck(vector<cell_index>* neighbors, cell_index elem, ushort dim)
+void Clusterizend::blockcheck(std::vector<cell_index>* neighbors, cell_index elem, ushort dim)
 {
   if (dim > 10) {
     B2ERROR("dim too large, dim=" << dim);
@@ -89,19 +88,19 @@ void Clusterizend::blockcheck(vector<cell_index>* neighbors, cell_index elem, us
   }
 }
 
-vector<cell_index>
+std::vector<cell_index>
 Clusterizend::regionQuery(cell_index entry)
 {
-  vector<cell_index> neighbours;
+  std::vector<cell_index> neighbours;
   blockcheck(&neighbours, entry, m_dimsize - 1);
   return neighbours;
 }
 
-vector<SimpleCluster>
+std::vector<SimpleCluster>
 Clusterizend::dbscan()
 {
-  vector<SimpleCluster> C;
-  vector<cell_index> candidates = getCandidates();
+  std::vector<SimpleCluster> C;
+  std::vector<cell_index> candidates = getCandidates();
   for (unsigned long icand = 0; icand < candidates.size(); icand++) {
     cell_index entry = candidates[icand];
     c3index iom = entry[0];
@@ -111,7 +110,7 @@ Clusterizend::dbscan()
     if (m_houghVisit[iom][iph][ith] == 0) {
       //B2DEBUG(19, "dbscan: unvisited cell");
       m_houghVisit[iom][iph][ith] = 1;
-      vector<cell_index> N = regionQuery(entry);
+      std::vector<cell_index> N = regionQuery(entry);
       if (N.size() >= m_params.minPts) {
         //B2DEBUG(19, "dbscan: starting cluster, neightbors = " << N.size());
         SimpleCluster newcluster(entry);
@@ -124,7 +123,7 @@ Clusterizend::dbscan()
 }
 
 void
-Clusterizend::expandCluster(vector<cell_index>& N, SimpleCluster& C)
+Clusterizend::expandCluster(std::vector<cell_index>& N, SimpleCluster& C)
 {
   while (N.size() > 0) {
     cell_index nextP = N.back();
@@ -137,7 +136,7 @@ Clusterizend::expandCluster(vector<cell_index>& N, SimpleCluster& C)
       if ((*m_houghVals)[iom][iph][ith] < m_params.minWeight) {
         continue;
       }
-      vector<cell_index> nextN = regionQuery(nextP);
+      std::vector<cell_index> nextN = regionQuery(nextP);
       if (nextN.size() >= m_params.minPts) {
         N.insert(N.end(), nextN.begin(), nextN.end());
       }
@@ -146,10 +145,10 @@ Clusterizend::expandCluster(vector<cell_index>& N, SimpleCluster& C)
   }
 }
 
-vector<cell_index>
+std::vector<cell_index>
 Clusterizend::getCandidates()
 {
-  vector<cell_index> candidates;
+  std::vector<cell_index> candidates;
   /** all candidiates TODO: select */
   for (c3index iom = 0; iom < 40; iom++) {
     for (c3index iph = 0; iph < 384; iph++) {

@@ -79,54 +79,53 @@ void ParticleMassHypothesesUpdaterModule::event()
   if (!originalList) {
     B2ERROR("ParticleList " << m_particleList << " not found");
     return;
-  } else {
-    if (originalList->getListSize() == 0)  // Do nothing if empty
-      return;
-
-    DecayDescriptor newDecayDescriptor;
-    const bool valid = newDecayDescriptor.init(m_newParticleList);
-    if (!valid)
-      B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_newParticleList);
-
-    const DecayDescriptorParticle* newMother = newDecayDescriptor.getMother();
-    int newPdgCode = newMother->getPDGCode();
-
-    StoreObjPtr<ParticleList> newList(m_newParticleList);
-    if (newList.isValid()) { // Check whether it already exists in this path
-      B2WARNING("The new particle list already exists, and it should not. Did you call the module twice?");
-      return;
-    } else {
-      newList.create();  // Create and initialize the list
-      newList->initialize(newPdgCode, m_newParticleList);
-      newList->setEditable(true);
-    }
-
-    if (!m_isSelfConjugatedParticle) {
-      StoreObjPtr<ParticleList> newAntiList(m_newAntiParticleList);
-      if (!newAntiList.isValid()) { // Check whether it already exists in this path
-        newAntiList.create();  // Create and initialize the list
-        newAntiList->initialize(-1 * newPdgCode, m_newAntiParticleList);
-        newAntiList->setEditable(true);
-      }
-      newAntiList->bindAntiParticleList(*(newList));
-    }
-
-    for (unsigned int i = 0; i < originalList->getListSize(); ++i) {
-
-      const Particle* originalParticle = originalList->getParticle(i);  // Get particle and check it comes from a track
-      if (originalParticle->getParticleSource() != Particle::c_Track) {
-        B2WARNING("Particle not built from a track. Skipping.");
-        continue;
-      }
-
-      Particle* newPart = ParticleCopy::copyParticle(originalParticle);
-      newPart->setPDGCode(newPdgCode);
-      newPart->updateMass(newPdgCode);
-
-      newList->addParticle(newPart);  // Add particle to list
-    }  // Close loop over tracks
-    newList->setEditable(false);
   }
+  if (originalList->getListSize() == 0)  // Do nothing if empty
+    return;
+
+  DecayDescriptor newDecayDescriptor;
+  const bool valid = newDecayDescriptor.init(m_newParticleList);
+  if (!valid)
+    B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_newParticleList);
+
+  const DecayDescriptorParticle* newMother = newDecayDescriptor.getMother();
+  int newPdgCode = newMother->getPDGCode();
+
+  StoreObjPtr<ParticleList> newList(m_newParticleList);
+  if (newList.isValid()) { // Check whether it already exists in this path
+    B2WARNING("The new particle list already exists, and it should not. Did you call the module twice?");
+    return;
+  }
+
+  newList.create();  // Create and initialize the list
+  newList->initialize(newPdgCode, m_newParticleList);
+  newList->setEditable(true);
+
+  if (!m_isSelfConjugatedParticle) {
+    StoreObjPtr<ParticleList> newAntiList(m_newAntiParticleList);
+    if (!newAntiList.isValid()) { // Check whether it already exists in this path
+      newAntiList.create();  // Create and initialize the list
+      newAntiList->initialize(-1 * newPdgCode, m_newAntiParticleList);
+      newAntiList->setEditable(true);
+    }
+    newAntiList->bindAntiParticleList(*(newList));
+  }
+
+  for (unsigned int i = 0; i < originalList->getListSize(); ++i) {
+
+    const Particle* originalParticle = originalList->getParticle(i);  // Get particle and check it comes from a track
+    if (originalParticle->getParticleSource() != Particle::c_Track) {
+      B2WARNING("Particle not built from a track. Skipping.");
+      continue;
+    }
+
+    Particle* newPart = ParticleCopy::copyParticle(originalParticle);
+    newPart->setPDGCode(newPdgCode);
+    newPart->updateMass(newPdgCode);
+
+    newList->addParticle(newPart);  // Add particle to list
+  }  // Close loop over tracks
+  newList->setEditable(false);
 }
 
 void ParticleMassHypothesesUpdaterModule::terminate() {}

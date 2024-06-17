@@ -122,7 +122,8 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsHadronECLTRG->Modified();
     m_cT0FractionsHadronECLTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for hadrons from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for hadrons from ECLTRG events (" << histname <<
+            ") from EventT0 DQM not processed!");
     m_cT0FractionsHadronECLTRG->SetFillColor(kGray);
   }
 
@@ -133,7 +134,8 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsHadronCDCTRG->Modified();
     m_cT0FractionsHadronCDCTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for hadrons from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for hadrons from CDCTRG events (" << histname <<
+            ") from EventT0 DQM not processed!");
     m_cT0FractionsHadronCDCTRG->SetFillColor(kGray);
   }
 
@@ -144,7 +146,8 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsHadronTOPTRG->Modified();
     m_cT0FractionsHadronTOPTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for hadrons from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for hadrons from TOPTRG events (" << histname <<
+            ") from EventT0 DQM not processed!");
     m_cT0FractionsHadronTOPTRG->SetFillColor(kGray);
   }
 
@@ -156,7 +159,8 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsBhaBhaECLTRG->Modified();
     m_cT0FractionsBhaBhaECLTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for BhaBha from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for BhaBha from ECLTRG events (" << histname <<
+            ") from EventT0 DQM not processed!");
     m_cT0FractionsBhaBhaECLTRG->SetFillColor(kGray);
   }
 
@@ -167,7 +171,8 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsBhaBhaCDCTRG->Modified();
     m_cT0FractionsBhaBhaCDCTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for BhaBha from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for BhaBha from CDCTRG events (" << histname <<
+            ") from EventT0 DQM not processed!");
     m_cT0FractionsBhaBhaCDCTRG->SetFillColor(kGray);
   }
 
@@ -178,7 +183,8 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsBhaBhaTOPTRG->Modified();
     m_cT0FractionsBhaBhaTOPTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for BhaBha from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for BhaBha from TOPTRG events (" << histname <<
+            ") from EventT0 DQM not processed!");
     m_cT0FractionsBhaBhaTOPTRG->SetFillColor(kGray);
   }
 
@@ -190,7 +196,7 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsMuMuECLTRG->Modified();
     m_cT0FractionsMuMuECLTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for MuMu from ECLTRG events (" << histname << ") from EventT0 DQM not processed!");
     m_cT0FractionsMuMuECLTRG->SetFillColor(kGray);
   }
 
@@ -201,7 +207,7 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsMuMuCDCTRG->Modified();
     m_cT0FractionsMuMuCDCTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for MuMu from CDCTRG events (" << histname << ") from EventT0 DQM not processed!");
     m_cT0FractionsMuMuCDCTRG->SetFillColor(kGray);
   }
 
@@ -212,7 +218,7 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
     m_cT0FractionsMuMuTOPTRG->Modified();
     m_cT0FractionsMuMuTOPTRG->Update();
   } else {
-    B2WARNING("Histogram EventT0 source fractions for MuMu from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
+    B2DEBUG(29, "Histogram EventT0 source fractions for MuMu from TOPTRG events (" << histname << ") from EventT0 DQM not processed!");
     m_cT0FractionsMuMuTOPTRG->SetFillColor(kGray);
   }
 

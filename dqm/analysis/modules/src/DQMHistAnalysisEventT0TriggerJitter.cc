@@ -895,42 +895,42 @@ void DQMHistAnalysisEventT0TriggerJitterModule::printCanvases()
 
 void DQMHistAnalysisEventT0TriggerJitterModule::deleteCanvases()
 {
-  delete m_cECLTimeHadronsECLTRG;
-  delete m_cECLTimeBhaBhaECLTRG ;
-  delete m_cECLTimeMuMuECLTRG;
-  delete m_cCDCTimeHadronsECLTRG;
-  delete m_cCDCTimeBhaBhaECLTRG ;
-  delete m_cCDCTimeMuMuECLTRG;
-  delete m_cTOPTimeHadronsECLTRG;
-  delete m_cTOPTimeBhaBhaECLTRG ;
-  delete m_cTOPTimeMuMuECLTRG;
-  delete m_cSVDTimeHadronsECLTRG;
-  delete m_cSVDTimeBhaBhaECLTRG ;
-  delete m_cSVDTimeMuMuECLTRG;
+  if (m_cECLTimeHadronsECLTRG) delete m_cECLTimeHadronsECLTRG;
+  if (m_cECLTimeBhaBhaECLTRG) delete m_cECLTimeBhaBhaECLTRG ;
+  if (m_cECLTimeMuMuECLTRG) delete m_cECLTimeMuMuECLTRG;
+  if (m_cCDCTimeHadronsECLTRG) delete m_cCDCTimeHadronsECLTRG;
+  if (m_cCDCTimeBhaBhaECLTRG) delete m_cCDCTimeBhaBhaECLTRG ;
+  if (m_cCDCTimeMuMuECLTRG) delete m_cCDCTimeMuMuECLTRG;
+  if (m_cTOPTimeHadronsECLTRG) delete m_cTOPTimeHadronsECLTRG;
+  if (m_cTOPTimeBhaBhaECLTRG) delete m_cTOPTimeBhaBhaECLTRG ;
+  if (m_cTOPTimeMuMuECLTRG) delete m_cTOPTimeMuMuECLTRG;
+  if (m_cSVDTimeHadronsECLTRG) delete m_cSVDTimeHadronsECLTRG;
+  if (m_cSVDTimeBhaBhaECLTRG) delete m_cSVDTimeBhaBhaECLTRG ;
+  if (m_cSVDTimeMuMuECLTRG) delete m_cSVDTimeMuMuECLTRG;
 
-  delete m_cECLTimeHadronsCDCTRG;
-  delete m_cECLTimeBhaBhaCDCTRG ;
-  delete m_cECLTimeMuMuCDCTRG;
-  delete m_cCDCTimeHadronsCDCTRG;
-  delete m_cCDCTimeBhaBhaCDCTRG ;
-  delete m_cCDCTimeMuMuCDCTRG;
-  delete m_cTOPTimeHadronsCDCTRG;
-  delete m_cTOPTimeBhaBhaCDCTRG ;
-  delete m_cTOPTimeMuMuCDCTRG;
-  delete m_cSVDTimeHadronsCDCTRG;
-  delete m_cSVDTimeBhaBhaCDCTRG ;
-  delete m_cSVDTimeMuMuCDCTRG;
+  if (m_cECLTimeHadronsCDCTRG) delete m_cECLTimeHadronsCDCTRG;
+  if (m_cECLTimeBhaBhaCDCTRG) delete m_cECLTimeBhaBhaCDCTRG ;
+  if (m_cECLTimeMuMuCDCTRG) delete m_cECLTimeMuMuCDCTRG;
+  if (m_cCDCTimeHadronsCDCTRG) delete m_cCDCTimeHadronsCDCTRG;
+  if (m_cCDCTimeBhaBhaCDCTRG) delete m_cCDCTimeBhaBhaCDCTRG ;
+  if (m_cCDCTimeMuMuCDCTRG) delete m_cCDCTimeMuMuCDCTRG;
+  if (m_cTOPTimeHadronsCDCTRG) delete m_cTOPTimeHadronsCDCTRG;
+  if (m_cTOPTimeBhaBhaCDCTRG) delete m_cTOPTimeBhaBhaCDCTRG ;
+  if (m_cTOPTimeMuMuCDCTRG) delete m_cTOPTimeMuMuCDCTRG;
+  if (m_cSVDTimeHadronsCDCTRG) delete m_cSVDTimeHadronsCDCTRG;
+  if (m_cSVDTimeBhaBhaCDCTRG) delete m_cSVDTimeBhaBhaCDCTRG ;
+  if (m_cSVDTimeMuMuCDCTRG) delete m_cSVDTimeMuMuCDCTRG;
 
-  delete m_cTOPTimeHadronsTOPTRG;
-  delete m_cTOPTimeBhaBhaTOPTRG ;
-  delete m_cTOPTimeMuMuTOPTRG;
-  delete m_cECLTimeHadronsTOPTRG;
-  delete m_cECLTimeBhaBhaTOPTRG ;
-  delete m_cECLTimeMuMuTOPTRG;
-  delete m_cSVDTimeHadronsTOPTRG;
-  delete m_cSVDTimeBhaBhaTOPTRG ;
-  delete m_cSVDTimeMuMuTOPTRG;
-  delete m_cCDCTimeHadronsTOPTRG;
-  delete m_cCDCTimeBhaBhaTOPTRG ;
-  delete m_cCDCTimeMuMuTOPTRG;
+  if (m_cTOPTimeHadronsTOPTRG) delete m_cTOPTimeHadronsTOPTRG;
+  if (m_cTOPTimeBhaBhaTOPTRG) delete m_cTOPTimeBhaBhaTOPTRG ;
+  if (m_cTOPTimeMuMuTOPTRG) delete m_cTOPTimeMuMuTOPTRG;
+  if (m_cECLTimeHadronsTOPTRG) delete m_cECLTimeHadronsTOPTRG;
+  if (m_cECLTimeBhaBhaTOPTRG) delete m_cECLTimeBhaBhaTOPTRG ;
+  if (m_cECLTimeMuMuTOPTRG) delete m_cECLTimeMuMuTOPTRG;
+  if (m_cSVDTimeHadronsTOPTRG) delete m_cSVDTimeHadronsTOPTRG;
+  if (m_cSVDTimeBhaBhaTOPTRG) delete m_cSVDTimeBhaBhaTOPTRG ;
+  if (m_cSVDTimeMuMuTOPTRG) delete m_cSVDTimeMuMuTOPTRG;
+  if (m_cCDCTimeHadronsTOPTRG) delete m_cCDCTimeHadronsTOPTRG;
+  if (m_cCDCTimeBhaBhaTOPTRG) delete m_cCDCTimeBhaBhaTOPTRG ;
+  if (m_cCDCTimeMuMuTOPTRG) delete m_cCDCTimeMuMuTOPTRG;
 }

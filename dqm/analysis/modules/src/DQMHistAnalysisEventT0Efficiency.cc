@@ -235,15 +235,15 @@ void DQMHistAnalysisEventT0EfficiencyModule::event()
 
 void DQMHistAnalysisEventT0EfficiencyModule::terminate()
 {
-  delete m_cT0FractionsHadronECLTRG;
-  delete m_cT0FractionsHadronCDCTRG;
-  delete m_cT0FractionsHadronTOPTRG;
-  delete m_cT0FractionsBhaBhaECLTRG;
-  delete m_cT0FractionsBhaBhaCDCTRG;
-  delete m_cT0FractionsBhaBhaTOPTRG;
-  delete m_cT0FractionsMuMuECLTRG;
-  delete m_cT0FractionsMuMuCDCTRG;
-  delete m_cT0FractionsMuMuTOPTRG;
+  if (m_cT0FractionsHadronECLTRG) delete m_cT0FractionsHadronECLTRG;
+  if (m_cT0FractionsHadronCDCTRG) delete m_cT0FractionsHadronCDCTRG;
+  if (m_cT0FractionsHadronTOPTRG) delete m_cT0FractionsHadronTOPTRG;
+  if (m_cT0FractionsBhaBhaECLTRG) delete m_cT0FractionsBhaBhaECLTRG;
+  if (m_cT0FractionsBhaBhaCDCTRG) delete m_cT0FractionsBhaBhaCDCTRG;
+  if (m_cT0FractionsBhaBhaTOPTRG) delete m_cT0FractionsBhaBhaTOPTRG;
+  if (m_cT0FractionsMuMuECLTRG) delete m_cT0FractionsMuMuECLTRG;
+  if (m_cT0FractionsMuMuCDCTRG) delete m_cT0FractionsMuMuCDCTRG;
+  if (m_cT0FractionsMuMuTOPTRG) delete m_cT0FractionsMuMuTOPTRG;
 }
 
 

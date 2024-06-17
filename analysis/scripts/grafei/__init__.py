@@ -179,7 +179,7 @@ def graFEI(
                 path=path,
             )
         elif len(photon_lists) == 0:
-            b2.B2WARNING("grafei.graFEI You did not define any photon input list. Therefore you don't have one as output.")
+            b2.B2WARNING("grafei.graFEI You did not define a photon input list. Therefore you don't have any as output.")
         if len(photon_lists) > 1:
             b2.B2WARNING("grafei.graFEI You defined more than one photon input list. Using the first one.")
 

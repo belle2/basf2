@@ -7,7 +7,7 @@ Graph-based Full Event Interpretation
 **Author: J. Cerasoli**
 
 The **Graph-based Full Event Interpretation** (graFEI) is a machine learning tool to inclusively reconstruct events in Belle II 
-using information on the final state particles only, without any prior assumption about the structure of the underlying decay chain.
+using information on the final state particles only, without any prior assumptions about the structure of the underlying decay chain.
 This task is achieved with the use of deep Graph Neural Networks (GNNs), a particular class of neural networks acting on *graphs*. 
 Graphs are entities composed of a set of *nodes* :math:`V=\{v_{i}\}_{i=1}^N`` 
 connected by *edges* :math:`E = \{e_{v_{i} v_{j}} \equiv e_{ij}\}_{i \neq j}`.

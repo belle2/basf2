@@ -11,7 +11,7 @@
 #include <cmath>
 #include "trg/cdc/NDFinderDefs.h"
 #include "trg/cdc/Clusterizend.h"
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -24,7 +24,7 @@ namespace Belle2 {
   class NDFinderTrack {
   public:
     NDFinderTrack(std::vector<double> values, const SimpleCluster& cluster,
-                  std::vector<TVector3> houghspace, std::vector<TVector3> ndreadout):
+                  std::vector<ROOT::Math::XYZVector> houghspace, std::vector<ROOT::Math::XYZVector> ndreadout):
       m_cluster(cluster)
     {
       m_omega = values[0];
@@ -70,11 +70,11 @@ namespace Belle2 {
     {
       return m_cluster;
     }
-    std::vector<TVector3> getHoughSpace()
+    std::vector<ROOT::Math::XYZVector> getHoughSpace()
     {
       return m_houghspace;
     }
-    std::vector<TVector3> getNDReadout()
+    std::vector<ROOT::Math::XYZVector> getNDReadout()
     {
       return m_ndreadout;
     }
@@ -92,8 +92,8 @@ namespace Belle2 {
     /** vector of the weights for each related hit. */
     std::vector<double> m_hitWeights;
     SimpleCluster m_cluster;
-    std::vector<TVector3> m_houghspace;
-    std::vector<TVector3> m_ndreadout;
+    std::vector<ROOT::Math::XYZVector> m_houghspace;
+    std::vector<ROOT::Math::XYZVector> m_ndreadout;
   };
 
 

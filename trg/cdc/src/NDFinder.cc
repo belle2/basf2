@@ -495,7 +495,7 @@ void NDFinder::getCM()
 {
   c3array& houghPlane = *m_phoughPlane;
   std::vector<SimpleCluster> allClusters;
-  std::vector<TVector3> houghspace;
+  std::vector<ROOT::Math::XYZVector> houghspace;
   if (m_params.dbscanning) {
     m_clusterer.setNewPlane(houghPlane);
     allClusters = m_clusterer.dbscan();
@@ -531,34 +531,34 @@ void NDFinder::getCM()
     std::vector<double> transformed = transform(estimate);
 
     // READOUTS, uncomment what needed:
-    std::vector<TVector3> ndreadout;
+    std::vector<ROOT::Math::XYZVector> ndreadout;
 
     // Readout of the peak weight
-    /* ndreadout.push_back(TVector3(maxval, 0, 0)); */
+    /* ndreadout.push_back(ROOT::Math::XYZVector(maxval, 0, 0)); */
 
     // Readout of the total weight
     /* unsigned long total_weight = 0; */
     /* for (const cell_index& cellIndex : entries) { */
     /*   total_weight += houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
     /* } */
-    /* ndreadout.push_back(TVector3(total_weight, 0, 0)); */
+    /* ndreadout.push_back(ROOT::Math::XYZVector(total_weight, 0, 0)); */
 
     // Readout of the number of cluster cells
     /* int ncells = entries.size(); */
-    /* ndreadout.push_back(TVector3(ncells, 0, 0)); */
+    /* ndreadout.push_back(ROOT::Math::XYZVector(ncells, 0, 0)); */
 
     // Readout of the cluster center of gravity
-    /* ndreadout.push_back(TVector3(result[0], result[1], result[2])); */
+    /* ndreadout.push_back(ROOT::Math::XYZVector(result[0], result[1], result[2])); */
 
     // Readout of the cluster weights
     /* for (const cell_index& cellIndex : entries) { */
     /*   c3elem element = houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
-    /*   ndreadout.push_back(TVector3(element, 0, 0)); */
+    /*   ndreadout.push_back(ROOT::Math::XYZVector(element, 0, 0)); */
     /* } */
 
     // Readout of the cluster cell indices
     /* for (const cell_index& cellIndex : entries) { */
-    /*   ndreadout.push_back(TVector3(cellIndex[0], cellIndex[1], cellIndex[2])); */
+    /*   ndreadout.push_back(ROOT::Math::XYZVector(cellIndex[0], cellIndex[1], cellIndex[2])); */
     /* } */
 
     // Readout of the complete Hough space:
@@ -566,7 +566,7 @@ void NDFinder::getCM()
     /*   for (c3index j = 0; j < static_cast<c3index>(houghPlane.shape()[1]); ++j) { */
     /*     for (c3index k = 0; k < static_cast<c3index>(houghPlane.shape()[2]); ++k) { */
     /*       c3elem element = houghPlane[i][j][k]; */
-    /*       houghspace.push_back(TVector3(element, 0, 0)); */
+    /*       houghspace.push_back(ROOT::Math::XYZVector(element, 0, 0)); */
     /*     } */
     /*   } */
     /* } */

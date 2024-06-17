@@ -139,8 +139,8 @@ void CDCTriggerNDFinderModule::event()
       m_NDFinderTracks.appendNew(trackND.getPhi0(), trackND.getOmega(),
                                  0., 0., trackND.getCot(), 0.);
     SimpleCluster Cluster = trackND.getCluster();
-    std::vector<TVector3> houghspace = trackND.getHoughSpace();
-    std::vector<TVector3> ndreadout = trackND.getNDReadout();
+    std::vector<ROOT::Math::XYZVector> houghspace = trackND.getHoughSpace();
+    std::vector<ROOT::Math::XYZVector> ndreadout = trackND.getNDReadout();
     const CDCTrigger3DFinderInfo* NDFinderInfo =
       m_NDFinderInfos.appendNew(houghspace, ndreadout);
     NDFinderTrack->addRelationTo(NDFinderInfo);

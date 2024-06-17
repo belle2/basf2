@@ -9,7 +9,7 @@
 #pragma once
 
 #include <cmath>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
   struct clusterer_params  {

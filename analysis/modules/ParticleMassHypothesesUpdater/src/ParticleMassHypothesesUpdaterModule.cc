@@ -9,13 +9,10 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/dataobjects/ParticleList.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <analysis/modules/ParticleMassHypothesesUpdater/ParticleMassHypothesesUpdaterModule.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
-#include <mdst/dataobjects/MCParticle.h>
-#include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/Track.h>
 
 #include <map>
 
@@ -119,46 +116,9 @@ void ParticleMassHypothesesUpdaterModule::event()
         continue;
       }
 
-      StoreArray<Track> trackArray;
-
-      unsigned trackIdx = originalParticle->getMdstArrayIndex();  // Get track
-      const Track* track = trackArray[trackIdx];
-      if (track == nullptr) {
-        B2WARNING("Associated track not valid. Skipping.");
-        continue;
-      }
-
-      Const::ChargedStable type(abs(newPdgCode));
-
-      const PIDLikelihood* pid = track->getRelated<PIDLikelihood>();  // Get related objects
-      const TrackFitResult* trackFit = track->getTrackFitResultWithClosestMass(type);
-      const auto& mcParticleWithWeight = track->getRelatedToWithWeight<MCParticle>();
-
-      if (!trackFit) {  // Should never happen with the "closest mass" getter
-        B2WARNING("Track returned null TrackFitResult pointer. Skipping.");
-        continue;
-      }
-
-      // I think this should not be done since not all tracks are fitted with all mass hypotheses.
-      //if (trackFit->getParticleType().getPDGCode() !=
-      // type.getPDGCode()) { // Skip if fit hypothesis not available
-      //   B2WARNING("Requested track fit hypothesis does not exist.
-      //   Skipping."); continue;
-      // }
-
-      Particle particle(trackIdx, trackFit, type);  // Create new particle with new mass hypothesis
-
-      StoreArray<Particle> particleArray;
-      Particle* newPart = particleArray.appendNew(particle);
-
-      if (pid) newPart->addRelationTo(pid); // Add PID
-      if (mcParticleWithWeight.first) // Add MCParticle
-        newPart->addRelationTo(mcParticleWithWeight.first,
-                               mcParticleWithWeight.second);
-      newPart->addRelationTo(trackFit); // Add fit
-      for (auto info : originalParticle->getExtraInfoNames()) { // Add extraInfos
-        newPart->addExtraInfo(info, originalParticle->getExtraInfo(info));
-      }
+      Particle* newPart = ParticleCopy::copyParticle(originalParticle);
+      newPart->setPDGCode(newPdgCode);
+      newPart->updateMass(newPdgCode);
 
       newList->addParticle(newPart);  // Add particle to list
     }  // Close loop over tracks

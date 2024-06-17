@@ -65,7 +65,7 @@ void Clusterizend::blockcheck(vector<cell_index>* neighbors, cell_index elem, us
     cell_index ind = before(elem, dim);
     ushort leftwe = (*m_houghVals)[ind[0]][ind[1]][ind[2]];
     ushort leftvi = m_houghVisit[ind[0]][ind[1]][ind[2]];
-    if (leftwe > m_params.minweight && leftvi == 0) {
+    if (leftwe > m_params.minWeight && leftvi == 0) {
       neighbors->push_back(ind);
     }
     if (m_params.diagonal && dim > 0) {
@@ -76,7 +76,7 @@ void Clusterizend::blockcheck(vector<cell_index>* neighbors, cell_index elem, us
     cell_index ind = after(elem, dim);
     ushort rightwe = (*m_houghVals)[ind[0]][ind[1]][ind[2]];
     ushort rightvi = m_houghVisit[ind[0]][ind[1]][ind[2]];
-    if (rightwe > m_params.minweight  && rightvi == 0) {
+    if (rightwe > m_params.minWeight  && rightvi == 0) {
       neighbors->push_back(ind);
     }
     if (m_params.diagonal && dim > 0) {
@@ -112,7 +112,7 @@ Clusterizend::dbscan()
       //B2DEBUG(19, "dbscan: unvisited cell");
       m_houghVisit[iom][iph][ith] = 1;
       vector<cell_index> N = regionQuery(entry);
-      if (N.size() >= m_params.minpts) {
+      if (N.size() >= m_params.minPts) {
         //B2DEBUG(19, "dbscan: starting cluster, neightbors = " << N.size());
         SimpleCluster newcluster(entry);
         expandCluster(N, newcluster);
@@ -134,11 +134,11 @@ Clusterizend::expandCluster(vector<cell_index>& N, SimpleCluster& C)
     ushort ith = nextP[2];
     if (m_houghVisit[iom][iph][ith] == 0) {
       m_houghVisit[iom][iph][ith] = 1;
-      if ((*m_houghVals)[iom][iph][ith] < m_params.minweight) {
+      if ((*m_houghVals)[iom][iph][ith] < m_params.minWeight) {
         continue;
       }
       vector<cell_index> nextN = regionQuery(nextP);
-      if (nextN.size() >= m_params.minpts) {
+      if (nextN.size() >= m_params.minPts) {
         N.insert(N.end(), nextN.begin(), nextN.end());
       }
       C.append(nextP);
@@ -154,7 +154,7 @@ Clusterizend::getCandidates()
   for (c3index iom = 0; iom < 40; iom++) {
     for (c3index iph = 0; iph < 384; iph++) {
       for (c3index ith = 0; ith < 9; ith++) {
-        if ((*m_houghVals)[iom][iph][ith] > m_params.minweight) {
+        if ((*m_houghVals)[iom][iph][ith] > m_params.minWeight) {
           cell_index elem = {iom, iph, ith};
           candidates.push_back(elem);
         }
@@ -186,24 +186,24 @@ void Clusterizend::deleteMax(cell_index max_index)
   c3index omIndex = max_index[0];
   c3index phIndex = max_index[1];
   c3index thIndex = max_index[2];
-  for (c3index ith = std::max<int>(0, thIndex - m_params.thetatrim); ith < std::min<int>(9, thIndex + m_params.thetatrim + 1);
+  for (c3index ith = std::max<int>(0, thIndex - m_params.thetaTrim); ith < std::min<int>(9, thIndex + m_params.thetaTrim + 1);
        ith++) {
-    for (c3index iom = std::max<int>(0, omIndex - m_params.omegatrim); iom < std::min<int>(40, omIndex + m_params.omegatrim + 1);
+    for (c3index iom = std::max<int>(0, omIndex - m_params.omegaTrim); iom < std::min<int>(40, omIndex + m_params.omegaTrim + 1);
          iom++) {
       c3index phiIndex = phIndex + omIndex - iom;
       c3index relativePhi = phiIndex - phIndex;
       if (relativePhi > 0) {
-        for (c3index iph = phiIndex - m_params.phitrim; iph < phiIndex + m_params.phitrim + std::floor(2.4 * relativePhi); iph++) {
+        for (c3index iph = phiIndex - m_params.phiTrim; iph < phiIndex + m_params.phiTrim + std::floor(2.4 * relativePhi); iph++) {
           c3index iphMod = (iph + 384) % 384;
           (*m_houghVals)[iom][iphMod][ith] = 0;
         }
       } else if (relativePhi < 0) {
-        for (c3index iph = phiIndex - m_params.phitrim + std::ceil(2.4 * relativePhi); iph < phiIndex + m_params.phitrim + 1; iph++) {
+        for (c3index iph = phiIndex - m_params.phiTrim + std::ceil(2.4 * relativePhi); iph < phiIndex + m_params.phiTrim + 1; iph++) {
           c3index iphMod = (iph + 384) % 384;
           (*m_houghVals)[iom][iphMod][ith] = 0;
         }
       } else {
-        for (c3index iph = phiIndex - m_params.phitrim; iph < phiIndex + m_params.phitrim + 1; iph++) {
+        for (c3index iph = phiIndex - m_params.phiTrim; iph < phiIndex + m_params.phiTrim + 1; iph++) {
           c3index iphMod = (iph + 384) % 384;
           (*m_houghVals)[iom][iphMod][ith] = 0;
         }
@@ -217,11 +217,11 @@ std::vector<SimpleCluster> Clusterizend::makeClusters()
   std::vector<SimpleCluster> candidates;
   for (unsigned long iter = 0; iter < m_params.iterations; iter++) {
     auto [globalmax, peakweight] = getGlobalMax();
-    if (peakweight < m_params.minpeakweight || peakweight == 0) {
+    if (peakweight < m_params.minPeakWeight || peakweight == 0) {
       break;
     }
     auto [new_cluster, totalweight] = createCluster(globalmax);
-    if (totalweight >= m_params.mintotalweight) {
+    if (totalweight >= m_params.minTotalWeight) {
       candidates.push_back(new_cluster);
     }
     deleteMax(globalmax);

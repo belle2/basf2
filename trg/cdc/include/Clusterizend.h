@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef CLUSTERIZEND_H
-#define CLUSTERIZEND_H
+#pragma once
 
 #include <cmath>
 #include <TVector3.h>
@@ -16,23 +15,23 @@
 namespace Belle2 {
   struct clusterer_params  {
     /** minimum weight for a cluster cell */
-    unsigned short minweight      =    24;
+    unsigned short minWeight      =    24;
     /** minimum number of neighbours for a cluster core cell */
-    unsigned short minpts         =    1;
+    unsigned char minPts         =    1;
     /** Consider diagonal adjacent cells as neighbors */
     bool diagonal                 =    true;
     /** Cut on the total weight of all cells in the 3d volume */
-    unsigned long mintotalweight  =    500;
+    unsigned short minTotalWeight  =    450;
     /** Cut on the peak cell weight */
-    unsigned long minpeakweight   =    0;
+    unsigned short minPeakWeight   =    32;
     /** Number of iterations of the cluster searching for each Hough space */
-    unsigned long iterations      =    5;
+    unsigned char iterations      =    5;
     /** Number of deleted cells in omega in each direction of the maximum */
-    long omegatrim                =    5;
+    unsigned char omegaTrim                =    5;
     /** Number of deleted cells in phi in each direction of the maximum */
-    long phitrim                  =    5;
+    unsigned char phiTrim                  =    4;
     /** Number of deleted cells in theta in each direction of the maximum */
-    long thetatrim                =    5;
+    unsigned char thetaTrim                =    4;
     /** Ordering of track parameters and position of cyclic variable (phi) */
     std::vector<bool> var_cyclic = {false, true, false};
     std::vector<std::string> var_labels = {"omega", "phi", "theta"};
@@ -216,5 +215,3 @@ namespace Belle2 {
     c3array m_houghVisit = c3array(m_c3shape);
   };
 }
-
-#endif

@@ -6,8 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#ifndef NDFINDER_H
-#define NDFINDER_H
+#pragma once
 
 #include <cmath>
 #include "trg/cdc/NDFinderDefs.h"
@@ -112,44 +111,38 @@ namespace Belle2 {
       std::string stereoFile = "data/trg/cdc/ndFinderArrayStereoComp.txt.gz";
 
       /** Clustering options */
-      /**  Only accept clusters with minsuper_axial */
-      long unsigned int minsuper_axial  = 4;
+      /**  Only accept clusters with minSuperAxial */
+      unsigned char minSuperAxial  = 4;
 
       /**  Required number of stereo super layers */
-      long unsigned int minsuper_stereo  = 3;
+      unsigned char minSuperStereo  = 3;
 
       /**  houghspace must have thresh x maxweight of cluster */
       float thresh = 0.85;
 
-      /** Required relative weight contribution to assign a hit to a cluster */
-      float minassign = 0.2;
-
-      /** Determines at what point a cluster with to few hits gets removed */
-      long unsigned int clustercut = 2;
-
-      /** Minimum numeber of cells in the track parameter space */
-      long unsigned int mincells  = 5;
+      /** Minimum number of cells in the track parameter space */
+      unsigned char minCells  = 1;
 
       /** Clustering method: When true: dbscan, when false: fixed 3d volume */
       bool dbscanning = false;
 
       /** Clustering: minimum of the total weight in all cells of the 3d volume */
-      long unsigned int mintotalweight = 500;
+      unsigned short minTotalWeight = 450;
 
       /** Clustering: minimum peak cell weight */
-      long unsigned int minpeakweight = 0;
+      unsigned short minPeakWeight = 32;
 
       /** Clustering: number of iterations for the cluster search in each Hough space */
-      long unsigned int iterations = 5;
+      unsigned char iterations = 5;
 
       /** Clustering: number of deleted cells in each omega direction from the maximum */
-      long int omegatrim = 5;
+      unsigned char omegaTrim = 5;
 
       /** Clustering: number of deleted cells in each phi direction from the maximum */
-      long int phitrim = 5;
+      unsigned char phiTrim = 4;
 
       /** Clustering: number of deleted cells in each theta direction from the maximum */
-      long int thetatrim = 5;
+      unsigned char thetaTrim = 4;
 
       /** CDC symmetry: repeat wire pattern 32 times in phi */
       unsigned short phigeo = 32;
@@ -183,29 +176,28 @@ namespace Belle2 {
     /** initialization */
 
     /** Set parameters
-     * @param minweight minimum weight of cluster member cells
-     * @param minpts minimum neighboring cells with minweight for core cells
+     * @param minWeight minimum weight of cluster member cells
+     * @param minPts minimum neighboring cells with minWeight for core cells
      * @param diagonal consider diagonal neighbor cells in the clustering
-     * @param minsuper_axial minimum number of axial super layers per cluster
-     * @param minsuper_stereo minimum number of stereo super layers per cluster
+     * @param minSuperAxial minimum number of axial super layers per cluster
+     * @param minSuperStereo minimum number of stereo super layers per cluster
      * @param thresh selection of cells for weighted mean track estimation
-     * @param minassign hit to cluster assigment critical limit
-     * @param clustercut removing clusters with to few hits in hit to cluster relation
-     * @param mincells minumum number of cells per cluster
+     * @param minCells minumum number of cells per cluster
      * @param dbscanning when true: dbscan, when false: fixed three dim volume
-     * @param mintotalweight minimum total weight of all cells in the 3d volume
-     * @param minpeakweight minimum peak cell weight
+     * @param minTotalWeight minimum total weight of all cells in the 3d volume
+     * @param minPeakWeight minimum peak cell weight
      * @param iterations number of cluster searches in each Hough space
-     * @param omegatrim number deleted cells in each omega direction from the maximum
-     * @param phitrim number deleted cells in each phi direction from the maximum
-     * @param thetatrim number deleted cells in each theta direction from the maximum
+     * @param omegaTrim number deleted cells in each omega direction from the maximum
+     * @param phiTrim number deleted cells in each phi direction from the maximum
+     * @param thetaTrim number deleted cells in each theta direction from the maximum
      * @param verbose print Hough planes and verbose output
      * @param axialFile axial hit data
      * @param stereoFile stereo hit data
      * */
-    void init(int minweight, int minpts, bool diagonal,
-              int minsuper_axial, int minsuper_stereo, double thresh, double minassign, int clustercut,
-              int mincells, bool dbscanning, int mintotalweight, int minpeakweight, int iterations, int omegatrim, int phitrim, int thetatrim,
+    void init(unsigned short minWeight, unsigned char minPts, bool diagonal,
+              unsigned char minSuperAxial, unsigned char minSuperStereo, float thresh,
+              unsigned char minCells, bool dbscanning, unsigned short minTotalWeight, unsigned short minPeakWeight, unsigned char iterations,
+              unsigned char omegaTrim, unsigned char phiTrim, unsigned char thetaTrim,
               bool verbose, std::string& axialFile, std::string& stereoFile);
 
     /** Initialize the binnings and reserve the arrays */
@@ -301,25 +293,14 @@ namespace Belle2 {
      * Used to create the hitsVsClusters confusion matrix. */
     ushort hitContrib(cell_index peak, ushort ihit);
 
-    /** Use confusion matrix to related hits to clusters.
-     * Remove small clusters with less than minhits related hits. */
-    std::vector<SimpleCluster> relateHitsToClusters(
-      std::vector<std::vector<unsigned short>>& hitsVsClusters,
-      std::vector<SimpleCluster>& clusters);
-
     /** Relate all hits in a cluster to the cluster
      * Remove small clusters with less than minsuper related hits. */
     std::vector<SimpleCluster> allHitsToClusters(
       std::vector<std::vector<unsigned short>>& hitsVsClusters,
       std::vector<SimpleCluster>& clusters);
 
-    /** Determine the best cluster for a single hit,
-     * given hitsVsClusters confusion matrix */
-    int hitToCluster(std::vector<std::vector<unsigned short>>& hitsVsClusters,
-                     unsigned short hit);
-
     /** Candidate cells as seed for the clustering.
-     * Selects all cells with weight > minweight */
+     * Selects all cells with weight > minWeight */
     std::vector<cellweight> getHighWeight(std::vector<cell_index> entries, float cutoff);
 
     /** Calculate the weighted center of a cluster */
@@ -436,5 +417,3 @@ namespace Belle2 {
     bool m_verbose{false};
   };
 }
-#endif
-

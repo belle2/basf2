@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(CDCTriggerNDFinder)
+REG_MODULE(CDCTriggerNDFinder);
 
 CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
 {
@@ -28,24 +28,20 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
   addParam("NDFinderTracksName", m_NDFinderTracksName,
            "The name of the StoreArray where the tracks found by this NDFinder Module are stored.",
            string("CDCTrigger3DFinderTracks"));
-  addParam("minsuper_axial", m_minsuper_axial,
+  addParam("minSuperAxial", m_minSuperAxial,
            "Cluster pruning: Minimum number of axial super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
            4);
-  addParam("minsuper_stereo", m_minsuper_stereo,
+  addParam("minSuperStereo", m_minSuperStereo,
            "Cluster pruning: Minimum number of stereo super layer hits related to a cluster "
            "for the cluster to be considered as a track.",
            3);
-  addParam("clustercut", m_clustercut,
-           "Hit to cluster relation small cluster deletion: "
-           "If a cluster has fewer hits than the number of required track segments minus clustercut hits the small cluster is deleted",
-           2);
-  addParam("minweight", m_minweight,
+  addParam("minWeight", m_minWeight,
            "Clustering: Minimum weight of a cell in Hough space "
            "for the cell to be considered as a cluster member.",
            24);
-  addParam("minpts", m_minpts,
-           "Clustering: Minimum number of neighbor cells with minweight "
+  addParam("minPts", m_minPts,
+           "Clustering: Minimum number of neighbor cells with minWeight "
            "for a cell to be considered a core cell.",
            1);
   addParam("thresh", m_thresh,
@@ -54,37 +50,33 @@ CDCTriggerNDFinderModule::CDCTriggerNDFinderModule() : Module()
            "for the cell to enter in the weighted mean "
            "track parameter value estimation.",
            0.85);
-  addParam("minassign", m_minassign,
-           "Hit to cluster assignment limit: "
-           "Minimum relatively larger weight contribution to the largest cluster.",
-           0.2);
   addParam("diagonal", m_diagonal,
            "Clustering: consider diagonal neighbors.",
            true);
-  addParam("mincells", m_mincells,
+  addParam("minCells", m_minCells,
            "Clustering: minimum number of cells for a cluster.",
            1);
   addParam("dbscanning", m_dbscanning,
            ".Clustering method: When true: dbscan, when false: fixed 3d volume.",
            false);
-  addParam("mintotalweight", m_mintotalweight,
+  addParam("minTotalWeight", m_minTotalWeight,
            "Clustering: minimum total weight of all cells in the 3d volume.",
-           500);
-  addParam("minpeakweight", m_minpeakweight,
+           450);
+  addParam("minPeakWeight", m_minPeakWeight,
            "Clustering: minimum peak cell weight of a cluster.",
-           0);
+           32);
   addParam("iterations", m_iterations,
            "Clustering: Number of iterations for the cluster finding in one Hough space.",
            5);
-  addParam("omegatrim", m_omegatrim,
+  addParam("omegaTrim", m_omegaTrim,
            "Clustering: Number of deleted cells in each omega direction of the maximum.",
            5);
-  addParam("phitrim", m_phitrim,
+  addParam("phiTrim", m_phiTrim,
            "Clustering: Number of deleted cells in each phi direction of the maximum.",
-           5);
-  addParam("thetatrim", m_thetatrim,
+           4);
+  addParam("thetaTrim", m_thetaTrim,
            "Clustering: Number of deleted cells in each theta direction of the maximum.",
-           5);
+           4);
   addParam("verbose", m_verbose,
            "Print Hough planes and verbose output. ",
            false);
@@ -105,29 +97,27 @@ CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule()
 
 void CDCTriggerNDFinderModule::initialize()
 {
-  B2DEBUG(11, "CDCTriggerNDFinderModule initialize, m_minweight=" << m_minweight <<
-          ", m_minpts=" << m_minpts << ", m_diagonal=" << m_diagonal <<
-          ", m_minsuper_axial=" << m_minsuper_axial << ", m_minsuper_stereo=" << m_minsuper_stereo <<
+  B2DEBUG(11, "CDCTriggerNDFinderModule initialize, m_minWeight=" << m_minWeight <<
+          ", m_minPts=" << m_minPts << ", m_diagonal=" << m_diagonal <<
+          ", m_minSuperAxial=" << m_minSuperAxial << ", m_minSuperStereo=" << m_minSuperStereo <<
           ", m_thresh= " << m_thresh <<
-          ", m_minassign=" << m_minassign <<
-          ", m_clustercut=" << m_clustercut <<
-          ", m_mincells=" << m_mincells <<
+          ", m_minCells=" << m_minCells <<
           ", m_dbscanning=" << m_dbscanning <<
-          ", m_mintotalweight=" << m_mintotalweight <<
-          ", m_minpeakweight=" << m_minpeakweight <<
+          ", m_minTotalWeight=" << m_minTotalWeight <<
+          ", m_minPeakWeight=" << m_minPeakWeight <<
           ", m_iterations=" << m_iterations <<
-          ", m_omegatrim=" << m_omegatrim <<
-          ", m_phitrim=" << m_phitrim <<
-          ", m_thetatrim=" << m_thetatrim <<
+          ", m_omegaTrim=" << m_omegaTrim <<
+          ", m_phiTrim=" << m_phiTrim <<
+          ", m_thetaTrim=" << m_thetaTrim <<
           ", m_verbose= " << m_verbose);
   m_TrackSegmentHits.isRequired(m_TrackSegmentHitsName);
   m_NDFinderTracks.registerInDataStore(m_NDFinderTracksName);
   m_NDFinderTracks.registerRelationTo(m_TrackSegmentHits);
   m_NDFinderInfos.registerInDataStore(m_NDFinderInfosName);
   m_NDFinderTracks.registerRelationTo(m_NDFinderInfos);
-  m_NDFinder.init(m_minweight, m_minpts, m_diagonal, m_minsuper_axial, m_minsuper_stereo,
-                  m_thresh, m_minassign, m_clustercut, m_mincells, m_dbscanning, m_mintotalweight, m_minpeakweight, m_iterations,
-                  m_omegatrim, m_phitrim, m_thetatrim, m_verbose,
+  m_NDFinder.init(m_minWeight, m_minPts, m_diagonal, m_minSuperAxial, m_minSuperStereo,
+                  m_thresh, m_minCells, m_dbscanning, m_minTotalWeight, m_minPeakWeight, m_iterations,
+                  m_omegaTrim, m_phiTrim, m_thetaTrim, m_verbose,
                   m_axialFile, m_stereoFile);
   m_NDFinder.printParams();
 }

@@ -10,10 +10,8 @@
 
 #include <framework/core/Module.h>
 
-#include <analysis/VariableManager/Utility.h>
-#include <analysis/ParticleCombiner/ParticleCombiner.h>
-
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
+#include <analysis/ParticleCombiner/ParticleCombiner.h>
 
 #include <string>
 
@@ -47,28 +45,15 @@ namespace Belle2 {
 
     StoreObjPtr<ParticleList> m_koutputList; /**< Klong output particle list */
 
-    int m_pdgCode;                /**< PDG code of the combined mother particle */
     std::string m_decayString;   /**< Input DecayString specifying the decay being reconstructed */
-    std::string m_finalDecayString;   /**< Final DecayString specifying the decay being reconstructed with recalculated KL momenta*/
     DecayDescriptor m_decaydescriptor; /**< Decay descriptor of the decay being reconstructed */
     std::unique_ptr<ParticleGenerator> m_generator; /**< Generates the combinations */
 
-    std::string m_listName;   /**< output particle list name */
-    std::string m_antiListName;   /**< output anti-particle list name */
-
     std::string m_klistName;   /**< output K_L0 particle list name */
-
-    int m_decayModeID; /**< user specified decay mode identifier */
-
-    bool m_isSelfConjugatedParticle{true}; /**< flag that indicates whether an anti-particle mother does not exist and should not be reconstructed as well*/
-
-    std::string m_cutParameter;  /**< selection criteria */
-    std::unique_ptr<Variable::Cut> m_cut; /**< cut object which performs the cuts */
 
     bool m_writeOut;  /**< toggle output particle list btw. transient/writeOut */
 
     std::string m_recoList; /**< Suffix attached to the output K_L list, if not defined it is set to '_reco'  */
-
 
     int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
 

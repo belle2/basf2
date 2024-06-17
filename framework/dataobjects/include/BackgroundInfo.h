@@ -44,7 +44,7 @@ namespace Belle2 {
       BackgroundMetaData::BG_TAG tag = BackgroundMetaData::bg_none;  /**< background tag denoting type */
       std::string type; /**< background type */
       BackgroundMetaData::EFileType fileType = BackgroundMetaData::c_Usual; /**< file type */
-      std::vector<std::string> fileNames;     /**< file names */
+      std::vector<std::string> fileNames; /**< file names */
       double realTime = 0;         /**< real time of BG samlpe */
       unsigned numEvents = 0;      /**< number of events (tree entries) in the sample */
       double scaleFactor = 1;      /**< scale factor for the rate */

@@ -192,12 +192,12 @@ _RegisteredSkims = [
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),
     ("19120400", "btocharmless", "BtoRhopRhom"),
     ("19140500", "btocharmless", "BtoEtapKstp"),
-    ("19130600", "btocharmless", "BtoPi0Eta"),
 ]
 """
 A list of all official registered skims and their skim code and parent module. Entries

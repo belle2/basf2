@@ -12,9 +12,9 @@
 using namespace Belle2;
 
 
-bool Clusterizend::has_before(cell_index entry, ushort dim)
+bool Clusterizend::hasBefore(cell_index entry, ushort dim)
 {
-  if (entry[dim] > 0 || m_params.var_cyclic[dim]) {
+  if (entry[dim] > 0 || m_params.varCyclic[dim]) {
     return true;
   }
   return false;
@@ -24,32 +24,32 @@ cell_index Clusterizend::before(cell_index entry, ushort dim)
   if (entry[dim] > 0) {
     entry[dim] -= 1;
     return entry;
-  } else if (m_params.var_cyclic[dim]) {
-    entry[dim] = m_valmax[dim];
+  } else if (m_params.varCyclic[dim]) {
+    entry[dim] = m_valMax[dim];
     return entry;
   } else {
-    B2ERROR("no before(), check with has_before");
+    B2ERROR("no before(), check with hasBefore");
     return entry;
   }
 }
 
-bool Clusterizend::has_after(cell_index entry, ushort dim)
+bool Clusterizend::hasAfter(cell_index entry, ushort dim)
 {
-  if (entry[dim] < m_valmax[dim] || m_params.var_cyclic[dim]) {
+  if (entry[dim] < m_valMax[dim] || m_params.varCyclic[dim]) {
     return true;
   }
   return false;
 }
 cell_index Clusterizend::after(cell_index entry, ushort dim)
 {
-  if (entry[dim] < m_valmax[dim]) {
+  if (entry[dim] < m_valMax[dim]) {
     entry[dim] += 1;
     return entry;
-  } else if (m_params.var_cyclic[dim]) {
+  } else if (m_params.varCyclic[dim]) {
     entry[dim] = 0;
     return entry;
   } else {
-    B2ERROR("no after(), check with has_before()");
+    B2ERROR("no after(), check with hasBefore()");
     return entry;
   }
 }
@@ -60,7 +60,7 @@ void Clusterizend::blockcheck(std::vector<cell_index>* neighbors, cell_index ele
   if (dim > 10) {
     B2ERROR("dim too large, dim=" << dim);
   }
-  if (has_before(elem, dim)) {
+  if (hasBefore(elem, dim)) {
     cell_index ind = before(elem, dim);
     ushort leftwe = (*m_houghVals)[ind[0]][ind[1]][ind[2]];
     ushort leftvi = m_houghVisit[ind[0]][ind[1]][ind[2]];
@@ -71,7 +71,7 @@ void Clusterizend::blockcheck(std::vector<cell_index>* neighbors, cell_index ele
       blockcheck(neighbors, ind, dim - 1);
     }
   }
-  if (has_after(elem, dim)) {
+  if (hasAfter(elem, dim)) {
     cell_index ind = after(elem, dim);
     ushort rightwe = (*m_houghVals)[ind[0]][ind[1]][ind[2]];
     ushort rightvi = m_houghVisit[ind[0]][ind[1]][ind[2]];
@@ -92,7 +92,7 @@ std::vector<cell_index>
 Clusterizend::regionQuery(cell_index entry)
 {
   std::vector<cell_index> neighbours;
-  blockcheck(&neighbours, entry, m_dimsize - 1);
+  blockcheck(&neighbours, entry, m_dimSize - 1);
   return neighbours;
 }
 
@@ -113,9 +113,9 @@ Clusterizend::dbscan()
       std::vector<cell_index> N = regionQuery(entry);
       if (N.size() >= m_params.minPts) {
         //B2DEBUG(25, "dbscan: starting cluster, neightbors = " << N.size());
-        SimpleCluster newcluster(entry);
-        expandCluster(N, newcluster);
-        C.push_back(newcluster);
+        SimpleCluster newCluster(entry);
+        expandCluster(N, newCluster);
+        C.push_back(newCluster);
       }
     }
   }
@@ -166,25 +166,25 @@ Clusterizend::getCandidates()
 std::pair<cell_index, unsigned long> Clusterizend::getGlobalMax()
 {
   unsigned long maxValue = 0;
-  cell_index max_index = {0, 0, 0};
+  cell_index maxIndex = {0, 0, 0};
   for (c3index iom = 0; iom < 40; iom++) {
     for (c3index iph = 0; iph < 384; iph++) {
       for (c3index ith = 0; ith < 9; ith++) {
         if ((*m_houghVals)[iom][iph][ith] > maxValue) {
           maxValue = (*m_houghVals)[iom][iph][ith];
-          max_index = {iom, iph, ith};
+          maxIndex = {iom, iph, ith};
         }
       }
     }
   }
-  return {max_index, maxValue};
+  return {maxIndex, maxValue};
 }
 
-void Clusterizend::deleteMax(cell_index max_index)
+void Clusterizend::deleteMax(cell_index maxIndex)
 {
-  c3index omIndex = max_index[0];
-  c3index phIndex = max_index[1];
-  c3index thIndex = max_index[2];
+  c3index omIndex = maxIndex[0];
+  c3index phIndex = maxIndex[1];
+  c3index thIndex = maxIndex[2];
   for (c3index ith = std::max<int>(0, thIndex - m_params.thetaTrim); ith < std::min<int>(9, thIndex + m_params.thetaTrim + 1);
        ith++) {
     for (c3index iom = std::max<int>(0, omIndex - m_params.omegaTrim); iom < std::min<int>(40, omIndex + m_params.omegaTrim + 1);
@@ -215,25 +215,25 @@ std::vector<SimpleCluster> Clusterizend::makeClusters()
 {
   std::vector<SimpleCluster> candidates;
   for (unsigned long iter = 0; iter < m_params.iterations; iter++) {
-    auto [globalmax, peakweight] = getGlobalMax();
-    if (peakweight < m_params.minPeakWeight || peakweight == 0) {
+    auto [globalMax, peakWeight] = getGlobalMax();
+    if (peakWeight < m_params.minPeakWeight || peakWeight == 0) {
       break;
     }
-    auto [new_cluster, totalweight] = createCluster(globalmax);
-    if (totalweight >= m_params.minTotalWeight) {
-      candidates.push_back(new_cluster);
+    auto [newCluster, totalWeight] = createCluster(globalMax);
+    if (totalWeight >= m_params.minTotalWeight) {
+      candidates.push_back(newCluster);
     }
-    deleteMax(globalmax);
+    deleteMax(globalMax);
   }
   return candidates;
 }
 
-std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(cell_index max_index)
+std::pair<SimpleCluster, unsigned long> Clusterizend::createCluster(cell_index maxIndex)
 {
   SimpleCluster fixedCluster;
-  c3index omIndex = max_index[0];
-  c3index phIndex = max_index[1];
-  c3index thIndex = max_index[2];
+  c3index omIndex = maxIndex[0];
+  c3index phIndex = maxIndex[1];
+  c3index thIndex = maxIndex[2];
   unsigned long totalClusterWeight = 0;
 
   for (c3index ith = std::max<int>(0, thIndex - 1); ith < std::min<int>(9, thIndex + 2); ith++) {

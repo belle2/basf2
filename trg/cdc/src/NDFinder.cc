@@ -36,15 +36,15 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
   m_params.dbscanning = (bool) dbscanning;
   m_params.axialFile = axialFile;
   m_params.stereoFile = stereoFile;
-  m_clusterer_params.minWeight = (unsigned short) minWeight;
-  m_clusterer_params.minPts = (unsigned char) minPts;
-  m_clusterer_params.diagonal = diagonal;
-  m_clusterer_params.minTotalWeight = (unsigned short) minTotalWeight;
-  m_clusterer_params.minPeakWeight = (unsigned short) minPeakWeight;
-  m_clusterer_params.iterations = (unsigned char) iterations;
-  m_clusterer_params.omegaTrim = (unsigned char) omegaTrim;
-  m_clusterer_params.phiTrim = (unsigned char) phiTrim;
-  m_clusterer_params.thetaTrim = (unsigned char) thetaTrim;
+  m_clustererParams.minWeight = (unsigned short) minWeight;
+  m_clustererParams.minPts = (unsigned char) minPts;
+  m_clustererParams.diagonal = diagonal;
+  m_clustererParams.minTotalWeight = (unsigned short) minTotalWeight;
+  m_clustererParams.minPeakWeight = (unsigned short) minPeakWeight;
+  m_clustererParams.iterations = (unsigned char) iterations;
+  m_clustererParams.omegaTrim = (unsigned char) omegaTrim;
+  m_clustererParams.phiTrim = (unsigned char) phiTrim;
+  m_clustererParams.thetaTrim = (unsigned char) thetaTrim;
   m_verbose = verbose;
 
 
@@ -55,23 +55,23 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
   B2DEBUG(25, "initialized HitMod, a map of tsid to (orient, relid, letter).");
 
   /** Load the axial and stereo track to hit relations from file.*/
-  loadArray(m_params.axialFile, m_compaxbins, *m_pcompAxial);
+  loadArray(m_params.axialFile, m_compAxBins, *m_pcompAxial);
   B2DEBUG(25, "loaded zero suppressed axial array ");
-  loadArray(m_params.stereoFile, m_compstbins, *m_pcompStereo);
+  loadArray(m_params.stereoFile, m_compStBins, *m_pcompStereo);
   B2DEBUG(25, "loaded zero suppressed stereo array ");
 
   /** Unpack zero suppresed track to hit relations.*/
-  restoreZeros(m_expaxbins, m_compaxbins, *m_parrayAxialExp, *m_pcompAxial);
+  restoreZeros(m_expAxBins, m_compAxBins, *m_parrayAxialExp, *m_pcompAxial);
   B2DEBUG(25, "restored expanded axial array (11/32 phi) ");
-  restoreZeros(m_expstbins, m_compstbins, *m_parrayStereoExp, *m_pcompStereo);
+  restoreZeros(m_expStBins, m_compStBins, *m_parrayStereoExp, *m_pcompStereo);
   B2DEBUG(25, "restored expanded stereo array (11/32 phi) ");
-  squeezeAll(m_axbins, *m_parrayAxial, *m_parrayAxialExp, m_params.parcels, m_params.parcelsExp);
+  squeezeAll(m_axBins, *m_parrayAxial, *m_parrayAxialExp, m_params.parcels, m_params.parcelsExp);
   B2DEBUG(25, "squeezed axial array (11/32 phi) --> (7/32 phi): ");
-  squeezeAll(m_stbins, *m_parrayStereo, *m_parrayStereoExp, m_params.parcels, m_params.parcelsExp);
+  squeezeAll(m_stBins, *m_parrayStereo, *m_parrayStereoExp, m_params.parcels, m_params.parcelsExp);
   B2DEBUG(25, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
 
   reset();
-  m_clusterer = Clusterizend(m_clusterer_params);
+  m_clusterer = Clusterizend(m_clustererParams);
   m_clusterer.setPlaneShape(m_planeShape);
 }
 
@@ -106,22 +106,22 @@ void NDFinder::initBins()
   /** expanded phi: 132 = 11 * (384/32) */
   m_nPhiExp =  m_params.parcelsExp * m_nPhiOne;
 
-  m_axbins.hitid = m_nAx;
-  m_stbins.hitid = m_nSt;
-  m_axbins.phi = m_nPhiUse; //84
-  m_stbins.phi = m_nPhiUse; //84
-  m_compaxbins.hitid = m_nAx;
-  m_compstbins.hitid = m_nSt;
-  m_compaxbins.phi = m_nPhiComp;
-  m_compstbins.phi = m_nPhiComp;
-  m_compaxbins.theta = 1;
-  m_expaxbins.hitid = m_nAx;
-  m_expstbins.hitid = m_nSt;
-  m_expaxbins.phi = m_nPhiExp; //132
-  m_expstbins.phi = m_nPhiExp; //132
+  m_axBins.hitid = m_nAx;
+  m_stBins.hitid = m_nSt;
+  m_axBins.phi = m_nPhiUse; //84
+  m_stBins.phi = m_nPhiUse; //84
+  m_compAxBins.hitid = m_nAx;
+  m_compStBins.hitid = m_nSt;
+  m_compAxBins.phi = m_nPhiComp;
+  m_compStBins.phi = m_nPhiComp;
+  m_compAxBins.theta = 1;
+  m_expAxBins.hitid = m_nAx;
+  m_expStBins.hitid = m_nSt;
+  m_expAxBins.phi = m_nPhiExp; //132
+  m_expStBins.phi = m_nPhiExp; //132
 
-  m_fullbins.hitid = m_nTS;
-  m_fullbins.phi = m_nPhiFull;
+  m_fullBins.hitid = m_nTS;
+  m_fullBins.phi = m_nPhiFull;
 
   m_pc5shapeax = {{ m_nAx, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
   m_pc5shapest =  {{ m_nSt, m_nPrio, m_nOmega, m_nPhiUse, m_nTheta }};
@@ -155,9 +155,9 @@ void NDFinder::initBins()
   m_acceptRanges.push_back(omegaRange);
   m_acceptRanges.push_back(phiRange);
   m_acceptRanges.push_back(thetaRange);
-  m_slotsizes.push_back(ssOmega);
-  m_slotsizes.push_back(ssPhi);
-  m_slotsizes.push_back(ssTheta);
+  m_slotSizes.push_back(ssOmega);
+  m_slotSizes.push_back(ssPhi);
+  m_slotSizes.push_back(ssTheta);
 }
 
 
@@ -286,7 +286,7 @@ void NDFinder::restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& exp
 }
 
 
-void NDFinder::printArray3D(c3array& hitsToTracks, ndbinning bins, ushort phi_inc = 1, ushort om_inc = 1, ushort divide = 4,
+void NDFinder::printArray3D(c3array& hitsToTracks, ndbinning bins, ushort phiInc = 1, ushort omInc = 1, ushort divide = 4,
                             ushort minWeightShow = 1)
 {
   ushort phistart = 0;
@@ -319,8 +319,8 @@ void NDFinder::printArray3D(c3array& hitsToTracks, ndbinning bins, ushort phi_in
     return;
   }
   c3index itheta = 4; // only print itheta = 4
-  for (c3index iomega = 0; iomega < bins.omega; iomega += om_inc) {
-    for (c3index iphi = phistart; iphi < phiend; iphi += phi_inc) {
+  for (c3index iomega = 0; iomega < bins.omega; iomega += omInc) {
+    for (c3index iphi = phistart; iphi < phiend; iphi += phiInc) {
       // reduce printed weight
       ushort valRed = (ushort)((hitsToTracks[iomega][iphi][itheta]) / divide);
       if (valRed <= minWeightShow) // skip small weights
@@ -358,9 +358,9 @@ void NDFinder::addLookup(unsigned short ihit)
   m_hitOrients.push_back(orient);
 
   if (orient == 1) {
-    addC3Comp(hitr, prio, *m_pcompAxial, DstartComp, m_compaxbins);
+    addC3Comp(hitr, prio, *m_pcompAxial, DstartComp, m_compAxBins);
   } else {
-    addC3Comp(hitr, prio, *m_pcompStereo, DstartComp, m_compstbins);
+    addC3Comp(hitr, prio, *m_pcompStereo, DstartComp, m_compStBins);
   }
 }
 
@@ -399,7 +399,7 @@ void NDFinder::findTracks()
   }
   if (m_verbose) {
     B2DEBUG(25, "m_houghPlane, 2");
-    printArray3D(*m_phoughPlane, m_fullbins);
+    printArray3D(*m_phoughPlane, m_fullBins);
   }
   getCM();
 }
@@ -408,8 +408,8 @@ void NDFinder::findTracks()
 std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClusters(std::vector<SimpleCluster>& clusters)
 {
   unsigned short nClusters = clusters.size();
-  unsigned short default_value = 0;
-  std::vector<unsigned short> hitElem(m_nHits, default_value);
+  unsigned short defaultValue = 0;
+  std::vector<unsigned short> hitElem(m_nHits, defaultValue);
   std::vector<std::vector<unsigned short>> hitsVsClusters(nClusters, hitElem);
 
   for (unsigned long iclus = 0; iclus < clusters.size(); iclus++) {
@@ -428,67 +428,67 @@ std::vector<std::vector<unsigned short>> NDFinder::getHitsVsClusters(std::vector
 std::vector<SimpleCluster>
 NDFinder::allHitsToClusters(std::vector<std::vector<unsigned short>>& hitsVsClusters, std::vector<SimpleCluster>& clusters)
 {
-  std::vector<SimpleCluster> useclusters;
+  std::vector<SimpleCluster> useClusters;
   if (hitsVsClusters.size() > 0) {
     // Iteration over the number of clusters
     for (unsigned long iclus = 0; iclus < hitsVsClusters.size(); iclus++) {
-      std::vector<std::vector<long>> super_layer_numbers;
+      std::vector<std::vector<long>> superLayerNumbers;
       // Iteration over all track segment hits
       for (unsigned long ihit = 0; ihit < m_hitIds.size(); ihit++) {
         unsigned short contribution = hitsVsClusters[iclus][ihit];
         if (contribution > 0) {
-          super_layer_numbers.push_back({static_cast<long>(ihit), contribution, m_hitSLIds[ihit], m_prioTime[ihit]});
+          superLayerNumbers.push_back({static_cast<long>(ihit), contribution, m_hitSLIds[ihit], m_prioTime[ihit]});
         }
       }
       // Iteration over all super layers
       for (unsigned short sl = 0; sl < 9; sl++) {
-        std::vector<std::vector<long>> one_super_layer_contributions;
-        for (unsigned long n_ts = 0; n_ts < super_layer_numbers.size(); n_ts++) {
-          if (super_layer_numbers[n_ts][2] == sl) {
-            one_super_layer_contributions.push_back({super_layer_numbers[n_ts][0], super_layer_numbers[n_ts][1], super_layer_numbers[n_ts][3]});
+        std::vector<std::vector<long>> oneSuperLayerContributions;
+        for (unsigned long nTS = 0; nTS < superLayerNumbers.size(); nTS++) {
+          if (superLayerNumbers[nTS][2] == sl) {
+            oneSuperLayerContributions.push_back({superLayerNumbers[nTS][0], superLayerNumbers[nTS][1], superLayerNumbers[nTS][3]});
           }
         }
         // Continue if there are no hits in the current super layer
-        if (one_super_layer_contributions.size() == 0) {
+        if (oneSuperLayerContributions.size() == 0) {
           continue;
         }
         // Sorting after the drift times
         struct sortingClass {
           bool operator()(std::vector<long> i, std::vector<long> j) {return (i[2] < j[2]);}
         } sortingTimes;
-        sort(one_super_layer_contributions.begin(), one_super_layer_contributions.end(), sortingTimes);
-        long max_hit = one_super_layer_contributions[0][0];
-        long max_contribution = one_super_layer_contributions[0][1];
+        sort(oneSuperLayerContributions.begin(), oneSuperLayerContributions.end(), sortingTimes);
+        long maxHit = oneSuperLayerContributions[0][0];
+        long maxContribution = oneSuperLayerContributions[0][1];
         // Iteration over all track segments in this super layer
-        for (size_t index = 0; index < one_super_layer_contributions.size(); index++) {
+        for (size_t index = 0; index < oneSuperLayerContributions.size(); index++) {
           // The maximum weight contribution gets identified
-          if (one_super_layer_contributions[index][1] > max_contribution) {
-            max_contribution = one_super_layer_contributions[index][1];
-            max_hit = one_super_layer_contributions[index][0];
+          if (oneSuperLayerContributions[index][1] > maxContribution) {
+            maxContribution = oneSuperLayerContributions[index][1];
+            maxHit = oneSuperLayerContributions[index][0];
           }
         }
-        clusters[iclus].add_hit(max_hit, max_contribution, m_hitOrients[max_hit]);
+        clusters[iclus].addHit(maxHit, maxContribution, m_hitOrients[maxHit]);
       }
       SimpleCluster& clu = clusters[iclus];
       // The hits of the current cluster get extracted
-      std::vector<unsigned short> cluster_hits = clu.get_hits();
-      std::vector<unsigned short> cluster_sl_numbers;
-      for (const auto& element : cluster_hits) {
-        cluster_sl_numbers.push_back(m_hitSLIds[element]);
+      std::vector<unsigned short> clusterHits = clu.getHits();
+      std::vector<unsigned short> clusterSLNumbers;
+      for (const auto& element : clusterHits) {
+        clusterSLNumbers.push_back(m_hitSLIds[element]);
       }
       // A cut on the super layer numbers is applied
-      std::set<unsigned short> unique_sl_numbers(cluster_sl_numbers.begin(), cluster_sl_numbers.end());
-      size_t n_sl = unique_sl_numbers.size();
-      unique_sl_numbers.insert({0, 2, 4, 6, 8});
-      size_t with_axial_sls = unique_sl_numbers.size();
-      size_t axial_number = 5 - (with_axial_sls - n_sl);
-      size_t stereo_number = n_sl - axial_number;
-      if (axial_number >= m_params.minSuperAxial && stereo_number >= m_params.minSuperStereo) {
-        useclusters.push_back(clusters[iclus]);
+      std::set<unsigned short> uniqueSLNumbers(clusterSLNumbers.begin(), clusterSLNumbers.end());
+      size_t nSL = uniqueSLNumbers.size();
+      uniqueSLNumbers.insert({0, 2, 4, 6, 8});
+      size_t withAxialSLs = uniqueSLNumbers.size();
+      size_t axialNumber = 5 - (withAxialSLs - nSL);
+      size_t stereoNumber = nSL - axialNumber;
+      if (axialNumber >= m_params.minSuperAxial && stereoNumber >= m_params.minSuperStereo) {
+        useClusters.push_back(clusters[iclus]);
       }
     }
   }
-  return useclusters;
+  return useClusters;
 }
 
 void NDFinder::getCM()
@@ -513,10 +513,10 @@ void NDFinder::getCM()
   }
   std::vector<std::vector<unsigned short>> hitsVsClusters = getHitsVsClusters(clusters);
   // New hit to cluster relation
-  std::vector<SimpleCluster> useclusters = allHitsToClusters(hitsVsClusters, clusters);
+  std::vector<SimpleCluster> useClusters = allHitsToClusters(hitsVsClusters, clusters);
 
-  for (unsigned long iclus = 0; iclus < useclusters.size(); iclus++) {
-    SimpleCluster cli = useclusters[iclus];
+  for (unsigned long iclus = 0; iclus < useClusters.size(); iclus++) {
+    SimpleCluster cli = useClusters[iclus];
     std::vector<cell_index> entries = cli.getEntries();
     cell_index maxid = getMax(entries);
     ushort maxval = houghPlane[maxid[0]][maxid[1]][maxid[2]];
@@ -537,11 +537,11 @@ void NDFinder::getCM()
     /* ndreadout.push_back(ROOT::Math::XYZVector(maxval, 0, 0)); */
 
     // Readout of the total weight
-    /* unsigned long total_weight = 0; */
+    /* unsigned long totalWeight = 0; */
     /* for (const cell_index& cellIndex : entries) { */
-    /*   total_weight += houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
+    /*   totalWeight += houghPlane[cellIndex[0]][cellIndex[1]][cellIndex[2]]; */
     /* } */
-    /* ndreadout.push_back(ROOT::Math::XYZVector(total_weight, 0, 0)); */
+    /* ndreadout.push_back(ROOT::Math::XYZVector(totalWeight, 0, 0)); */
 
     // Readout of the number of cluster cells
     /* int ncells = entries.size(); */
@@ -582,7 +582,7 @@ float NDFinder::transformVar(float estVal, int idx)
     if (estVal == 0.) {
       return estVal;
     } else {
-      return - 1 / cdc_track_radius(1. / estVal);
+      return - 1 / cdcTrackRadius(1. / estVal);
     }
   } else if (idx == 1) { // phi
     float phiMod = estVal;
@@ -609,7 +609,7 @@ std::vector<double> NDFinder::getBinToVal(std::vector<double> thisAv)
 {
   std::vector<double> estimate;
   for (ushort idim = 0; idim < 3; idim++) {
-    double trafd = m_acceptRanges[idim][0] + (thisAv[idim] + 0.5) * m_slotsizes[idim];
+    double trafd = m_acceptRanges[idim][0] + (thisAv[idim] + 0.5) * m_slotSizes[idim];
     estimate.push_back(trafd);
   }
   return estimate;
@@ -640,17 +640,17 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<cellweight> highWeight
 
 cell_index NDFinder::getMax(const std::vector<cell_index>& entries)
 {
-  ushort cur_weight = 0;
-  cell_index cur_max_index = {0, 0, 0};
+  ushort curWeight = 0;
+  cell_index curMaxIndex = {0, 0, 0};
   const c3array& houghPlane = *m_phoughPlane;
 
   for (const cell_index& entry : entries) {
-    if (houghPlane[entry[0]][entry[1]][entry[2]] > cur_weight) {
-      cur_weight = houghPlane[entry[0]][entry[1]][entry[2]];
-      cur_max_index = entry;
+    if (houghPlane[entry[0]][entry[1]][entry[2]] > curWeight) {
+      curWeight = houghPlane[entry[0]][entry[1]][entry[2]];
+      curMaxIndex = entry;
     }
   }
-  return cur_max_index;
+  return curMaxIndex;
 }
 
 
@@ -661,10 +661,10 @@ std::vector<cellweight> NDFinder::getHighWeight(std::vector<cell_index> entries,
   for (cell_index& entry : entries) {
     ushort cellWeight = houghPlane[entry[0]][entry[1]][entry[2]];
     if (cellWeight > cutoff) {
-      cellweight cur_elem;
-      cur_elem.index = entry;
-      cur_elem.weight = cellWeight;
-      cellsAndWeight.push_back(cur_elem);
+      cellweight curElem;
+      curElem.index = entry;
+      curElem.weight = cellWeight;
+      cellsAndWeight.push_back(curElem);
     }
   }
   return cellsAndWeight;
@@ -704,8 +704,8 @@ ushort NDFinder::hitContrib(cell_index peak, ushort ihit)
 void
 NDFinder::printParams()
 {
-  clusterer_params cpa = m_clusterer.getParams();
-  B2DEBUG(25, "clusterer_params minWeight=" << cpa.minWeight << ", minPts=" << cpa.minPts << ", diagonal=" << cpa.diagonal);
+  clustererParams cpa = m_clusterer.getParams();
+  B2DEBUG(25, "clustererParams minWeight=" << cpa.minWeight << ", minPts=" << cpa.minPts << ", diagonal=" << cpa.diagonal);
   B2DEBUG(25, "ndFinderParams minSuperAxial=" << m_params.minSuperAxial <<
           ", minSuperStereo=" << m_params.minSuperStereo << ", thresh=" << m_params.thresh <<
           ", minCells=" << m_params.minCells << ", dbscanning=" << m_params.dbscanning << ", minTotalWeight=" << m_params.minTotalWeight <<

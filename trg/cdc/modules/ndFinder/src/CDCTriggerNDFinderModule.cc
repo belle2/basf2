@@ -144,7 +144,7 @@ void CDCTriggerNDFinderModule::event()
     const CDCTrigger3DFinderInfo* NDFinderInfo =
       m_NDFinderInfos.appendNew(houghspace, ndreadout);
     NDFinderTrack->addRelationTo(NDFinderInfo);
-    std::vector<unsigned short> relHits = trackND.get_relHits();
+    std::vector<unsigned short> relHits = trackND.getRelHits();
     for (ulong i = 0; i < relHits.size(); i++) {
       NDFinderTrack->addRelationTo(m_TrackSegmentHits[relHits[i]]);
     }

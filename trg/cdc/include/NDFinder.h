@@ -48,17 +48,17 @@ namespace Belle2 {
     {
       return m_cotTheta;
     }
-    double get_nRelHits()
+    double getNRelHits()
     {
-      return m_cluster.get_hits().size();
+      return m_cluster.getHits().size();
     }
-    std::vector<unsigned short> get_relHits()
+    std::vector<unsigned short> getRelHits()
     {
-      return m_cluster.get_hits();
+      return m_cluster.getHits();
     }
-    std::vector<unsigned short> get_relHitsWeights()
+    std::vector<unsigned short> getRelHitsWeights()
     {
-      return m_cluster.get_weights();
+      return m_cluster.getWeights();
     }
     void reset()
     {
@@ -153,7 +153,7 @@ namespace Belle2 {
       unsigned short parcelsExp = 11;
     };
     std::vector<std::vector<float>> m_acceptRanges;
-    std::vector<float> m_slotsizes;
+    std::vector<float> m_slotSizes;
 
     /** Default constructor. */
     NDFinder() {}
@@ -309,7 +309,7 @@ namespace Belle2 {
     std::vector<double> getBinToVal(std::vector<double>);
 
     /** Transverse momentum to radius */
-    double cdc_track_radius(double pt)
+    double cdcTrackRadius(double pt)
     {
       return pt * 1e11 / (3e8 * 1.5); // div (c * B)
     }
@@ -379,16 +379,16 @@ namespace Belle2 {
     ndparameters m_params;
 
     /** Binnings in different hit pattern arrays */
-    ndbinning m_axbins;
-    ndbinning m_stbins;
-    ndbinning m_fullbins;
-    ndbinning m_compaxbins;
-    ndbinning m_compstbins;
-    ndbinning m_expaxbins;
-    ndbinning m_expstbins;
+    ndbinning m_axBins;
+    ndbinning m_stBins;
+    ndbinning m_fullBins;
+    ndbinning m_compAxBins;
+    ndbinning m_compStBins;
+    ndbinning m_expAxBins;
+    ndbinning m_expStBins;
 
     /** Configuration of the clustering module */
-    clusterer_params m_clusterer_params;
+    clustererParams m_clustererParams;
     std::vector<ushort> m_planeShape;
 
     /** Default bins */
@@ -408,7 +408,7 @@ namespace Belle2 {
 
     /** Clustering module */
     Belle2::Clusterizend m_clusterer;
-    Belle2::Clusterizend m_clusterer_2;
+    Belle2::Clusterizend m_clusterer2;
 
     /** Print Hough planes and verbose output */
     bool m_verbose{false};

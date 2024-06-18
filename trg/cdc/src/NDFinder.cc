@@ -49,26 +49,26 @@ void NDFinder::init(unsigned short minWeight, unsigned char minPts,
 
 
   initBins();
-  B2DEBUG(55, "initialized binnings");
+  B2DEBUG(25, "initialized binnings");
 
   initHitModAxSt(*m_parrayHitMod);
-  B2DEBUG(55, "initialized HitMod, a map of tsid to (orient, relid, letter).");
+  B2DEBUG(25, "initialized HitMod, a map of tsid to (orient, relid, letter).");
 
   /** Load the axial and stereo track to hit relations from file.*/
   loadArray(m_params.axialFile, m_compaxbins, *m_pcompAxial);
-  B2DEBUG(55, "loaded zero suppressed axial array ");
+  B2DEBUG(25, "loaded zero suppressed axial array ");
   loadArray(m_params.stereoFile, m_compstbins, *m_pcompStereo);
-  B2DEBUG(55, "loaded zero suppressed stereo array ");
+  B2DEBUG(25, "loaded zero suppressed stereo array ");
 
   /** Unpack zero suppresed track to hit relations.*/
   restoreZeros(m_expaxbins, m_compaxbins, *m_parrayAxialExp, *m_pcompAxial);
-  B2DEBUG(55, "restored expanded axial array (11/32 phi) ");
+  B2DEBUG(25, "restored expanded axial array (11/32 phi) ");
   restoreZeros(m_expstbins, m_compstbins, *m_parrayStereoExp, *m_pcompStereo);
-  B2DEBUG(55, "restored expanded stereo array (11/32 phi) ");
+  B2DEBUG(25, "restored expanded stereo array (11/32 phi) ");
   squeezeAll(m_axbins, *m_parrayAxial, *m_parrayAxialExp, m_params.parcels, m_params.parcelsExp);
-  B2DEBUG(55, "squeezed axial array (11/32 phi) --> (7/32 phi): ");
+  B2DEBUG(25, "squeezed axial array (11/32 phi) --> (7/32 phi): ");
   squeezeAll(m_stbins, *m_parrayStereo, *m_parrayStereoExp, m_params.parcels, m_params.parcelsExp);
-  B2DEBUG(55, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
+  B2DEBUG(25, "squeezed stereo array (11/32 phi) --> (7/32 phi)");
 
   reset();
   m_clusterer = Clusterizend(m_clusterer_params);
@@ -178,7 +178,7 @@ void NDFinder::loadArray(const std::string& filename, ndbinning bins, c5array& h
   } else {
     B2ERROR("could not open array file: " << filename);
   }
-  B2DEBUG(55, "loaded array from file " << filename);
+  B2DEBUG(25, "loaded array from file " << filename);
   unsigned long icount = 0;
   for (c5index ihit = 0; ihit < bins.hitid; ihit++) {
     for (c5index iprio = 0; iprio < bins.prio; iprio++) {
@@ -263,7 +263,7 @@ void NDFinder::squeezeAll(ndbinning writebins, c5array& writeArray, c5array& rea
 
 void NDFinder::restoreZeros(ndbinning zerobins, ndbinning compbins, c5array& expArray, const c5array& compArray)
 {
-  B2DEBUG(55, "restoreZeros: zerobins.theta " << zerobins.theta << ", combins.theta " << compbins.theta);
+  B2DEBUG(25, "restoreZeros: zerobins.theta " << zerobins.theta << ", combins.theta " << compbins.theta);
   for (c5index ihit = 0; ihit < compbins.hitid; ihit++) {
     for (c5index iprio = 0; iprio < compbins.prio; iprio++) {
       for (c5index iomega = 0; iomega < compbins.omega; iomega++) {
@@ -311,9 +311,9 @@ void NDFinder::printArray3D(c3array& hitsToTracks, ndbinning bins, ushort phi_in
     }
   }
 
-  B2DEBUG(55, "printArray3D, phistart = " << phistart << ", phiend = " << phiend);
+  B2DEBUG(25, "printArray3D, phistart = " << phistart << ", phiend = " << phiend);
   auto d3shp = hitsToTracks.shape();
-  B2DEBUG(55, "printArray shape: " << d3shp[0] << ", " << d3shp[1] << ", " << d3shp[2]);
+  B2DEBUG(25, "printArray shape: " << d3shp[0] << ", " << d3shp[1] << ", " << d3shp[2]);
 
   if (phiend == phistart) {
     return;
@@ -398,7 +398,7 @@ void NDFinder::findTracks()
     addLookup(ihit);
   }
   if (m_verbose) {
-    B2DEBUG(55, "m_houghPlane, 2");
+    B2DEBUG(25, "m_houghPlane, 2");
     printArray3D(*m_phoughPlane, m_fullbins);
   }
   getCM();
@@ -705,8 +705,8 @@ void
 NDFinder::printParams()
 {
   clusterer_params cpa = m_clusterer.getParams();
-  B2DEBUG(55, "clusterer_params minWeight=" << cpa.minWeight << ", minPts=" << cpa.minPts << ", diagonal=" << cpa.diagonal);
-  B2DEBUG(55, "ndFinderParams minSuperAxial=" << m_params.minSuperAxial <<
+  B2DEBUG(25, "clusterer_params minWeight=" << cpa.minWeight << ", minPts=" << cpa.minPts << ", diagonal=" << cpa.diagonal);
+  B2DEBUG(25, "ndFinderParams minSuperAxial=" << m_params.minSuperAxial <<
           ", minSuperStereo=" << m_params.minSuperStereo << ", thresh=" << m_params.thresh <<
           ", minCells=" << m_params.minCells << ", dbscanning=" << m_params.dbscanning << ", minTotalWeight=" << m_params.minTotalWeight <<
           ", minPeakWeight=" << m_params.minPeakWeight <<

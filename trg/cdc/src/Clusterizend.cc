@@ -108,11 +108,11 @@ Clusterizend::dbscan()
     c3index ith = entry[2];
 
     if (m_houghVisit[iom][iph][ith] == 0) {
-      //B2DEBUG(19, "dbscan: unvisited cell");
+      //B2DEBUG(25, "dbscan: unvisited cell");
       m_houghVisit[iom][iph][ith] = 1;
       std::vector<cell_index> N = regionQuery(entry);
       if (N.size() >= m_params.minPts) {
-        //B2DEBUG(19, "dbscan: starting cluster, neightbors = " << N.size());
+        //B2DEBUG(25, "dbscan: starting cluster, neightbors = " << N.size());
         SimpleCluster newcluster(entry);
         expandCluster(N, newcluster);
         C.push_back(newcluster);

@@ -96,7 +96,7 @@ CDCTriggerNDFinderModule::~CDCTriggerNDFinderModule()
 
 void CDCTriggerNDFinderModule::initialize()
 {
-  B2DEBUG(11, "CDCTriggerNDFinderModule initialize, m_minWeight=" << m_minWeight <<
+  B2DEBUG(25, "CDCTriggerNDFinderModule initialize, m_minWeight=" << m_minWeight <<
           ", m_minPts=" << m_minPts << ", m_diagonal=" << m_diagonal <<
           ", m_minSuperAxial=" << m_minSuperAxial << ", m_minSuperStereo=" << m_minSuperStereo <<
           ", m_thresh= " << m_thresh <<

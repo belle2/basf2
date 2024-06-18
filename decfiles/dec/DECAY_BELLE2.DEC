@@ -4298,6 +4298,8 @@ Decay B+
 
 # B -> D-(*) X Exclusive modes
 
+0.000077000   D-  K+  pi+                                  PHSP; #[New mode added - PDG2024]
+
 0.000300000   D-  pi+  pi+                                 PHSP; #remaining after D**pi BFs   [BF update - NR 06/2023]
 0.000000000   D*-  pi+  pi+                                PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR 06/2023]
 
@@ -5840,6 +5842,8 @@ Decay B-
 0.000000000   D*0  rho0 rho-                               PHSP;
 
 # B -> D-(*) X Exclusive modes
+
+0.000077000   D+  K-  pi-                                  PHSP; #[New mode added - PDG2024]
 
 0.000300000   D+  pi-  pi-                                 PHSP; #remaining after D**pi BFs   [BF update - NR 06/2023]
 0.000000000   D*+  pi-  pi-                                PHSP; #Freeze to 0 to avoid PYTHIA [BF update - NR 06/2023]

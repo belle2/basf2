@@ -238,6 +238,7 @@ void DQMHistAnalysisInput2Module::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisInput2: terminate called");
   if (m_c_info) delete m_c_info;
+  clearlist(); // necessary in the Input Module! Otherwise ROOT may clean before we do
 }
 
 void DQMHistAnalysisInput2Module::write_state(void)

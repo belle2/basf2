@@ -83,6 +83,39 @@ void DQMHistAnalysisPeakModule::initialize()
     if (m_median) registerEpicsPV(m_pvPrefix + "Median", "Median");
     if (m_rms) registerEpicsPV(m_pvPrefix + "RMS", "RMS");
   }
+
+  double xvalues[2] = {-1000, 1000};
+  double yvalues[2] = {0, 0};
+  m_g_alarmlo = new TGraph(2, xvalues, yvalues);
+  m_g_warnlo = new TGraph(2, xvalues, yvalues);
+  m_g_good = new TGraph(2, xvalues, yvalues);
+  m_g_warnhi = new TGraph(2, xvalues, yvalues);
+  m_g_alarmhi = new TGraph(2, xvalues, yvalues);
+
+  m_g_alarmlo->SetLineColor(c_ColorError);
+  m_g_alarmlo->SetLineWidth(-902);
+  m_g_alarmlo->SetFillStyle(3002);
+  m_g_alarmlo->SetFillColor(c_ColorError);
+
+  m_g_warnlo->SetLineColor(c_ColorWarning);
+  m_g_warnlo->SetLineWidth(-602);
+  m_g_warnlo->SetFillStyle(3002);
+  m_g_warnlo->SetFillColor(c_ColorWarning);
+
+  m_g_good->SetLineColor(c_ColorGood);
+  m_g_good->SetLineWidth(-302);
+  m_g_good->SetFillStyle(3002);
+  m_g_good->SetFillColor(c_ColorGood);
+
+  m_g_warnhi->SetLineColor(c_ColorWarning);
+  m_g_warnhi->SetLineWidth(-602);
+  m_g_warnhi->SetFillStyle(3002);
+  m_g_warnhi->SetFillColor(c_ColorWarning);
+
+  m_g_alarmhi->SetLineColor(c_ColorError);
+  m_g_alarmhi->SetLineWidth(-902);
+  m_g_alarmhi->SetFillStyle(3002);
+  m_g_alarmhi->SetFillColor(c_ColorError);
 }
 
 void DQMHistAnalysisPeakModule::terminate()
@@ -106,7 +139,6 @@ void DQMHistAnalysisPeakModule::beginRun()
   m_g_good->SetPoint(0, -9e9, 0);
   m_g_good->SetPoint(1, 9e9, 0);
 
-  getEpicsPV("Median");
   m_lowarnlevel = NAN, m_hiwarnlevel = NAN, m_loerrorlevel = NAN, m_hierrorlevel = NAN;
   if (requestLimitsFromEpicsPVs("Median", m_loerrorlevel, m_lowarnlevel, m_hiwarnlevel, m_hierrorlevel)) {
     m_g_alarmlo->SetPoint(0, -9e9, 0);
@@ -145,7 +177,6 @@ void DQMHistAnalysisPeakModule::beginRun()
     m_valid_warnhi = false;
     m_valid_alarmhi = false;
   }
-
 }
 
 void DQMHistAnalysisPeakModule::event()
@@ -188,7 +219,7 @@ void DQMHistAnalysisPeakModule::event()
         m_lineMedian->SetX2(median);
         m_lineMedian->Draw();
       }
-      m_canvas->Paint();
+      m_canvas->Paint(); // needed, otherwise Graph overlay doesnt work
       if (m_g_good and m_valid_good) m_g_good->Draw("RY");
       if (m_g_warnlo and m_valid_warnlo) m_g_warnlo->Draw("RY");
       if (m_g_warnhi and m_valid_warnhi) m_g_warnhi->Draw("RY");

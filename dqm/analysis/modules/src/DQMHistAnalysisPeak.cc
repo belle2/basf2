@@ -43,6 +43,7 @@ DQMHistAnalysisPeakModule::DQMHistAnalysisPeakModule()
   addParam("mean", m_mean, "extract and plot mean", m_mean);
   addParam("median", m_median, "extract and plot median", m_median);
   addParam("rms", m_rms, "extract rms", m_rms);
+  addParam("PlotLimits", m_plotLimits, "plot limits from PV", m_plotLimits);
   B2DEBUG(20, "DQMHistAnalysisPeak: Constructor done.");
 }
 
@@ -95,6 +96,56 @@ void DQMHistAnalysisPeakModule::beginRun()
 {
   B2DEBUG(20, "DQMHistAnalysisPeak: beginRun called.");
   if (m_canvas) m_canvas->Clear();
+
+  m_valid_alarmlo = m_plotLimits;
+  m_valid_warnlo = m_plotLimits;
+  m_valid_good = m_plotLimits;
+  m_valid_warnhi = m_plotLimits;
+  m_valid_alarmhi = m_plotLimits;
+
+  m_g_good->SetPoint(0, -9e9, 0);
+  m_g_good->SetPoint(1, 9e9, 0);
+
+  getEpicsPV("Median");
+  m_lowarnlevel = NAN, m_hiwarnlevel = NAN, m_loerrorlevel = NAN, m_hierrorlevel = NAN;
+  if (requestLimitsFromEpicsPVs("Median", m_loerrorlevel, m_lowarnlevel, m_hiwarnlevel, m_hierrorlevel)) {
+    m_g_alarmlo->SetPoint(0, -9e9, 0);
+    m_valid_alarmlo &= m_loerrorlevel == m_loerrorlevel;
+    if (m_valid_alarmlo) {
+      m_g_alarmlo->SetPoint(1, m_loerrorlevel, 0);
+      m_g_warnlo->SetPoint(0, m_loerrorlevel, 0);
+      m_g_good->SetPoint(0, m_loerrorlevel, 0);
+    } else {
+      m_g_warnlo->SetPoint(0, -9e9, 0);
+      m_loerrorlevel = -9e9;
+    }
+
+    m_valid_warnlo &= m_lowarnlevel == m_lowarnlevel and m_lowarnlevel >= m_loerrorlevel;
+    m_g_warnlo->SetPoint(1, m_lowarnlevel, 0);
+    if (m_valid_warnlo) m_g_good->SetPoint(0, m_lowarnlevel, 0);
+
+    m_g_alarmhi->SetPoint(1, 9e9, 0);
+    m_valid_alarmhi &= m_hierrorlevel == m_hierrorlevel;
+    if (m_valid_alarmhi) {
+      m_g_warnhi->SetPoint(1, m_hierrorlevel, 0);
+      m_g_alarmhi->SetPoint(0, m_hierrorlevel, 0);
+      m_g_good->SetPoint(1, m_hierrorlevel, 0);
+    } else {
+      m_g_warnhi->SetPoint(1, 9e9, 0);
+      m_hierrorlevel = 9e9;
+    }
+
+    m_valid_warnhi &= m_hiwarnlevel == m_hiwarnlevel and m_hiwarnlevel <= m_hierrorlevel;
+    m_g_warnhi->SetPoint(0, m_hiwarnlevel, 0);
+    if (m_valid_warnhi) m_g_good->SetPoint(1, m_hiwarnlevel, 0);
+  } else {
+    m_valid_alarmlo = false;
+    m_valid_warnlo = false;
+    m_valid_good = false;
+    m_valid_warnhi = false;
+    m_valid_alarmhi = false;
+  }
+
 }
 
 void DQMHistAnalysisPeakModule::event()
@@ -137,6 +188,14 @@ void DQMHistAnalysisPeakModule::event()
         m_lineMedian->SetX2(median);
         m_lineMedian->Draw();
       }
+      m_canvas->Paint();
+      if (m_g_good and m_valid_good) m_g_good->Draw("RY");
+      if (m_g_warnlo and m_valid_warnlo) m_g_warnlo->Draw("RY");
+      if (m_g_warnhi and m_valid_warnhi) m_g_warnhi->Draw("RY");
+      if (m_g_alarmlo and m_valid_alarmlo) m_g_alarmlo->Draw("RY");
+      if (m_g_alarmhi and m_valid_alarmhi) m_g_alarmhi->Draw("RY");
+
+//      m_canvas->Print((m_histoName + ".pdf").c_str());
       m_canvas->Modified();
       m_canvas->Update();
     }

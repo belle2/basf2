@@ -17,7 +17,6 @@
 #include <TKey.h>
 
 #include <ctime>
-#include <filesystem>
 
 using namespace Belle2;
 
@@ -62,6 +61,8 @@ void DQMHistAnalysisInput2Module::beginRun()
 
   m_last_beginrun = time(0);
   write_state();
+  m_lasttime -= std::chrono::seconds(1); // just change
+  m_forceChanged = true;
 }
 
 void DQMHistAnalysisInput2Module::event()
@@ -80,17 +81,16 @@ void DQMHistAnalysisInput2Module::event()
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
 
-  static std::filesystem::file_time_type lasttime;
   const std::filesystem::file_time_type ftime = std::filesystem::last_write_time(m_mempath);
 
-  if (lasttime == ftime) {
+  if (m_lasttime == ftime) {
     B2INFO("File not updated! -> Sleep");
     sleep(m_interval);
     setReturnValue(false);
     return;
   }
-  lasttime = ftime;
   m_last_file_update = time(0);
+  m_lasttime = ftime;
 
   char mbstr[100];
   time_t now = time(0);
@@ -211,7 +211,8 @@ void DQMHistAnalysisInput2Module::event()
   ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
-  bool anyupdate = false; // flag if any histogram updated at all
+  bool anyupdate = m_forceChanged; // flag if any histogram updated at all
+  m_forceChanged = false;
   for (auto& h : hs) {
     anyupdate |= addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());

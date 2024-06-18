@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <filesystem>
 
 namespace Belle2 {
   /**
@@ -105,6 +106,10 @@ namespace Belle2 {
     time_t m_last_file_update{};
     /** last time input file content has changed */
     time_t m_last_content_update{};
+    /** Last time input file changes */
+    std::filesystem::file_time_type m_lasttime;
+    /** enforce a content change on next event */
+    bool m_forceChanged{false};
   };
 } // end namespace Belle2
 

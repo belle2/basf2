@@ -309,14 +309,18 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   }
   //Calculate M(mumu)
   double peak_mumu = hist_inv_p->GetXaxis()->GetBinCenter(hist_inv_p->GetMaximumBin());
-  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.04, peak_mumu + 0.04);
+  TF1* f_mumuInvM = new TF1("f_mumuInvM", "gaus", peak_mumu - 0.05, peak_mumu + 0.05);
   f_mumuInvM->SetParameters(hist_inv_p->GetMaximum(), peak_mumu, 0.045);
-  f_mumuInvM->SetParLimits(1, peak_mumu - 0.04, peak_mumu + 0.04);
-  f_mumuInvM->SetParLimits(2, 0.01, 0.06);
+  f_mumuInvM->SetParLimits(1, peak_mumu - 0.05, peak_mumu + 0.05);
+  f_mumuInvM->SetParLimits(2, 0.01, 0.08);
   hist_inv_p->Fit(f_mumuInvM, "R");
   double fit_mumumass = f_mumuInvM->GetParameter(1);
   if (fit_mumumass < 9.) fit_mumumass = 9.;
   if (fit_mumumass > 12.) fit_mumumass = 12.;
+  double fit_mumumass_error = f_mumuInvM->GetParError(1);
+  double mumumass_reference = 10.573;
+  double pull_mumumass = (fit_mumumass - mumumass_reference) / fit_mumumass_error;
+  double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
   // set values
   mon_mumu->setVariable("mean_npxd", mean_npxd);
@@ -354,6 +358,9 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("notop_frac", notop_frac);
   mon_mumu->setVariable("noarich_frac", noarich_frac);
   mon_mumu->setVariable("fit_mumumass", fit_mumumass);
+  mon_mumu->setVariable("fit_mumumass_error", fit_mumumass_error);
+  mon_mumu->setVariable("pull_mumumass", pull_mumumass);
+  mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
 
   // ========== D*
   // get existing histograms produced by DQM modules

@@ -66,8 +66,8 @@ namespace Belle2 {
     int m_minEntries = 1000;
     /** Flag: plot into canvas */
     bool m_plot = true;
-    /** Flag: zoom on peak */
-    bool m_zoom = true;
+    /** Zoom on peak with range +- zoom*rms ; 0 disable */
+    float m_zoom = 3.0;
     /** Flag: extract mean */
     bool m_mean = true;
     /** Flag: extract median */

@@ -39,7 +39,7 @@ DQMHistAnalysisPeakModule::DQMHistAnalysisPeakModule()
   addParam("MonitorObjectName", m_monObjectName, "Monitor Object Name", std::string(""));
   addParam("minEntries", m_minEntries, "minimum number of new Entries for a fit", m_minEntries);
   addParam("plot", m_plot, "plot histogram in canvas", m_plot);
-  addParam("zoom", m_zoom, "zoom on peak", m_zoom);
+  addParam("zoom", m_zoom, "zoom on peak with +-(zoom*rms); 0 disable", m_zoom);
   addParam("mean", m_mean, "extract and plot mean", m_mean);
   addParam("median", m_median, "extract and plot median", m_median);
   addParam("rms", m_rms, "extract rms", m_rms);
@@ -124,7 +124,7 @@ void DQMHistAnalysisPeakModule::event()
       m_canvas->cd();// necessary!
       delta->Draw("hist");
 
-      if (m_zoom) delta->GetXaxis()->SetRangeUser(mean - 3 * rms, mean + 3 * rms);
+      if (m_zoom > 0) delta->GetXaxis()->SetRangeUser(mean - m_zoom * rms, mean + m_zoom * rms);
       if (m_lineMean) {
         m_lineMean->SetY1(y1 + (y1 - y2) * 0.05);
         m_lineMean->SetX1(mean);

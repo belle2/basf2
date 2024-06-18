@@ -42,26 +42,24 @@ class SinglePhotonDark(BaseSkim):
 
     def build_lists(self, path):
 
-        # start with all photons with E* above 500 MeV in the tracking acceptance
-        in_tracking_acceptance = "0.296706 < theta < 2.61799"  # rad = [17, 150] degrees
+        # start with all photons with E* above 500 MeV and decent time in
+        # the tracking acceptance [17, 150] degrees
         ma.cutAndCopyList(
-            "gamma:singlePhoton", "gamma:all",
-            f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance}", path=path)
+            "gamma:singlePhoton_SinglePhotonDark", "gamma:all",
+            "useCMSFrame(E) > 0.5 and thetaInCDCAcceptance and abs(clusterTiming)<200.", path=path)
 
-        # require a region-dependent minimum energy of the candidate, we have
-        # a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
-        region_dependent = " [clusterTheta < 1.65457213 and clusterTheta > 0.77143553] or "
-        region_dependent += "[clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
-        region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
-        region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
-        region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
-        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0]"      # between bwd and barrel
-        ma.applyCuts("gamma:singlePhoton", region_dependent, path=path)
+        # require a region-dependent minimum energy of the candidate, matching HLT
+        # 0.5 GeV trigger in the inner barrel: [44, 98] degrees, 1 GeV in the barrel
+        # [30, 130] deg, and 2 GeV elsewhere
+        region_dependent = " [44 < formula(57.2957795*theta) < 98] or "
+        region_dependent += "[30 < formula(57.2957795*theta) < 130 and useCMSFrame(E) > 1.0] or "
+        region_dependent += "[useCMSFrame(E) > 2.0] "
+        ma.applyCuts("gamma:singlePhoton_SinglePhotonDark", region_dependent, path=path)
 
         # require only one single photon candidate and no good tracks in the event
         good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
         path = self.skim_event_cuts(
-            f"nParticlesInList(gamma:singlePhoton) == 1 and nCleanedTracks({good_tracks}) == 0",
+            f"nParticlesInList(gamma:singlePhoton_SinglePhotonDark) == 1 and nCleanedTracks({good_tracks}) == 0",
             path=path
         )
 
@@ -69,21 +67,21 @@ class SinglePhotonDark(BaseSkim):
         # be beam-induced background) and veto if it's in time with our signal
         # candidate -- do after the event cuts since it uses a ParticleCombiner
         # and should not be done for all events (save event-processing time)
-        not_in_signal_list = "isInList(gamma:singlePhoton) < 1"
+        not_in_signal_list = "isInList(gamma:singlePhoton_SinglePhotonDark) < 1"
         in_time = "maxWeightedDistanceFromAverageECLTime < 1"
-        ma.cutAndCopyList("gamma:to_veto", "gamma:all",
+        ma.cutAndCopyList("gamma:veto_SinglePhotonDark", "gamma:all",
                           f"E > 0.55 and {not_in_signal_list}", path=path)
-        ma.rankByHighest("gamma:to_veto", "E", numBest=1, path=path)
-        ma.reconstructDecay("vpho:veto -> gamma:singlePhoton gamma:to_veto",
+        ma.rankByHighest("gamma:veto_SinglePhotonDark", "E", numBest=1, path=path)
+        ma.reconstructDecay("vpho:veto_SinglePhotonDark -> gamma:singlePhoton_SinglePhotonDark gamma:veto_SinglePhotonDark",
                             in_time, path=path)
-        veto_additional_in_time_cluster = 'nParticlesInList(vpho:veto) < 1'
+        veto_additional_in_time_cluster = 'nParticlesInList(vpho:veto_SinglePhotonDark) < 1'
 
         # final signal selection must pass the 'in-time' veto on the
         # second-most-energetic cluster -- this is also an event cut, but apply
         # to the list (which is anyway a maximum one candidate per event) since
         # we can only call skim_event_cuts once
-        ma.applyCuts("gamma:singlePhoton", veto_additional_in_time_cluster, path=path)
-        return ["gamma:singlePhoton"]
+        ma.applyCuts("gamma:singlePhoton_SinglePhotonDark", veto_additional_in_time_cluster, path=path)
+        return ["gamma:singlePhoton_SinglePhotonDark"]
 
 
 @fancy_skim_header

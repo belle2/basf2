@@ -60,34 +60,33 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   for (auto& it : m_pnode) {
     // clear ref histos from memory
-    delete it->ref_clone;
-    delete it;
+    if (it.ref_org) delete it.ref_org;
+    if (it.ref_clone) delete it.ref_clone;
   }
   m_pnode.clear();
   B2INFO("DQMHistReference: clear m_pnode. size: " << m_pnode.size());
 
-  //if (m_refFile != NULL) delete m_refFile;
-  TFile* m_refFile = new TFile(m_referenceFile.c_str());
+  TFile* refFile = new TFile(m_referenceFile.c_str(), "READ");
 
-  if (m_refFile->IsZombie()) {
+  if (refFile->IsZombie()) {
     B2INFO("DQMHistReference: reference file " << m_referenceFile << " does not exist. No references will be used!");
-    m_refFile->Close();
-    delete m_refFile;
+    refFile->Close();
+    delete refFile;
     return;
   }
 
   B2INFO("DQMHistReference: use reference file " << m_referenceFile);
 
-  TIter nextkey(m_refFile->GetListOfKeys());
+  TIter nextkey(refFile->GetListOfKeys());
   TKey* key;
   while ((key = (TKey*)nextkey())) {
     if (key->IsFolder() && string(key->GetName()) == string("ref")) {
-      TDirectory* refdir = (TDirectory*)key->ReadObj();
+      TDirectory* refdir = (TDirectory*)key->ReadObj(); // ReadObj -> I own it
       TIter nextDetDir(refdir->GetListOfKeys());
       TKey* detDir;
       // detector folders
       while ((detDir = (TKey*)nextDetDir())) {
-        if (!detDir->IsFolder())  continue;
+        if (!detDir->IsFolder()) continue;
         TIter nextTypeDir(((TDirectory*)detDir->ReadObj())->GetListOfKeys());
         TKey* typeDir;
         TDirectory* foundDir = NULL;
@@ -95,52 +94,58 @@ void DQMHistReferenceModule::loadReferenceHistos()
         while ((typeDir = (TKey*)nextTypeDir())) {
           if (!typeDir->IsFolder()) continue;
           if (string(typeDir->GetName()) == run_type) {
-            foundDir = (TDirectory*)typeDir->ReadObj();
+            foundDir = (TDirectory*)typeDir->ReadObj(); // ReadObj -> I own it
             break;
           }
-          if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj();
+          if (string(typeDir->GetName()) == "default") foundDir = (TDirectory*)typeDir->ReadObj(); // ReadObj -> I own it
         }
         string dirname = detDir->GetName();
-        if (foundDir) B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
-        else {
+        if (!foundDir) {
           B2INFO("No run type specific or default references available for " << dirname);
-          continue;
-        }
+        } else {
+          B2INFO("Reading reference histograms for " << dirname << " from run type folder: " << foundDir->GetName());
 
-        TIter next(foundDir->GetListOfKeys());
-        TKey* hh;
+          TIter next(foundDir->GetListOfKeys());
+          TKey* hh;
 
-        while ((hh = (TKey*)next())) {
-          if (hh->IsFolder()) continue;
-          TObject* obj = hh->ReadObj();
-          if (obj->IsA()->InheritsFrom("TH1")) {
-            TH1* h = (TH1*)obj;
-            string histname = h->GetName();
-            if (h->GetDimension() == 1) {
-              auto n = new REFNODE;
-              n->orghist_name = dirname + "/" + histname;
-              n->refhist_name = "ref/" + dirname + "/" + histname;
-              TH1* histo = (TH1*)h->Clone();
-              histo->SetName((n->refhist_name).c_str());
-              histo->SetDirectory(0);
-              n->ref_clone = histo;
-              n->canvas = nullptr;
-              m_pnode.push_back(n);
+          while ((hh = (TKey*)next())) {
+            if (hh->IsFolder()) continue;
+            TObject* obj = hh->ReadObj(); // ReadObj -> I own it
+            if (obj->IsA()->InheritsFrom("TH1")) {
+              TH1* h = (TH1*)obj;
+              if (h->GetDimension() == 1) {
+                string histname = h->GetName();
+                m_pnode.push_back(REFNODE());
+                auto& n = m_pnode.back();
+                n.orghist_name = dirname + "/" + histname;
+                n.refhist_name = "ref/" + dirname + "/" + histname;
+                h->SetName((n.refhist_name).c_str());
+                h->SetDirectory(0);
+                n.ref_org = h; // transfer ownership!
+                n.ref_clone = nullptr;
+                n.canvas = nullptr;
+              } else {
+                delete h;
+              }
+            } else {
+              delete obj;
             }
           }
+          delete foundDir; // always non-zero
         }
       }
+      delete refdir; // always non-zero
     }
   }
 
   B2INFO("DQMHistReference: insert reference to m_pnode. size: " << m_pnode.size());
-  m_refFile->Close();
-  delete m_refFile;
-
+  refFile->Close();
+  delete refFile;
 }
 
 void DQMHistReferenceModule::event()
 {
+  TH1::AddDirectory(false); // do not store any histograms
 
   if (m_firstInRun) {
     loadReferenceHistos();
@@ -154,34 +159,29 @@ void DQMHistReferenceModule::event()
   B2INFO("[" << mbstr << "] before ref loop");
 
   for (auto& it : m_pnode) {
+    if (!it.ref_org) continue; // No reference, continue
 
-    TH1* hist2 = it->ref_clone;
-    if (!hist2) continue;
+    TH1* hist1 = findHistInCanvas(it.orghist_name, &(it.canvas));
 
-    hist2->SetLineStyle(2);
-    hist2->SetLineColor(3);
-    hist2->SetFillColor(0);
-    hist2->SetStats(kFALSE);
-
-    TH1* hist1 = findHistInCanvas(it->orghist_name, &(it->canvas));
-
-    TCanvas* canvas = it->canvas;
+    TCanvas* canvas = it.canvas;
 
     // if there is no histogram on canvas we plot the reference anyway.
     if (!canvas) {
-      B2DEBUG(1, "No canvas found for refernce histogram " << it->orghist_name);
+      B2DEBUG(1, "No canvas found for reference histogram " << it.orghist_name);
       continue;
     }
     if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it->orghist_name);
-      canvas->cd();
-      hist2->Draw();
-      canvas->Modified();
-      canvas->Update();
+      B2DEBUG(1, "Canvas is without histogram -> no display " << it.orghist_name);
+      // Display something could be confusing for shifters
+//       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.orghist_name);
+//       canvas->cd();
+//       hist2->Draw();
+//       canvas->Modified();
+//       canvas->Update();
       continue;
     }
 
-    if (hist1->Integral() == 0) continue;
+    if (hist1->Integral() == 0) continue; // empty histogram -> continue
 
     /* consider adding coloring option....
       double data = 0;
@@ -190,26 +190,43 @@ void DQMHistReferenceModule::event()
       }
     */
 
-    if (abs(hist2->Integral()) > 0) {
-      hist2->Scale(hist1->Integral() / hist2->Integral());
+    if (abs(it.ref_org->Integral()) > 0) { // onyl if we have entries in reference
+      if (it.ref_clone) {
+        it.ref_clone->Reset();
+        it.ref_clone->Add(it.ref_org);
+      } else {
+        if (hist1->InheritsFrom("TH1C") or hist1->InheritsFrom("TH1S")) {
+          it.ref_clone = new TH1F(); // we want it a float for better scaling
+          it.ref_org->Copy(*it.ref_clone);
+        } else if (hist1->InheritsFrom("TH1I") or hist1->InheritsFrom("TH1L")) {
+          it.ref_clone = new TH1D(); // we want it a float for better scaling
+          it.ref_org->Copy(*it.ref_clone);
+        } else {
+          // keep TProfile, TH1F or TH1D
+          it.ref_clone = (TH1*)it.ref_org->Clone();
+        }
+        it.ref_clone->SetLineStyle(2);
+        it.ref_clone->SetLineColor(3);
+        it.ref_clone->SetFillColor(0);
+        it.ref_clone->SetStats(kFALSE);
+      }
+      it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
+
+      // Adjust the y scale to cover the reference
+      if (it.ref_clone->GetMaximum() > hist1->GetMaximum())
+        hist1->SetMaximum(1.1 * it.ref_clone->GetMaximum());
+
+      canvas->cd();
+      it.ref_clone->Draw("hist,same");
+
+      canvas->Modified();
+      canvas->Update();
     }
-
-    canvas->cd();
-
-    if (hist2->GetMaximum() > hist1->GetMaximum())
-      hist1->SetMaximum(1.1 * hist2->GetMaximum());
-
-    hist2->Draw("hist,same");
-
-    canvas->Modified();
-    canvas->Update();
-
   }
+
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after ref loop");
-
-
 }
 
 void DQMHistReferenceModule::endRun()
@@ -221,6 +238,11 @@ void DQMHistReferenceModule::endRun()
 void DQMHistReferenceModule::terminate()
 {
   B2DEBUG(1, "DQMHistReference: terminate called");
-  //  if (m_refFile) delete m_refFile;
+  for (auto& it : m_pnode) {
+    // clear ref histos from memory
+    if (it.ref_org) delete it.ref_org;
+    if (it.ref_clone) delete it.ref_clone;
+  }
+  m_pnode.clear();
 }
 

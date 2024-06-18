@@ -43,7 +43,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     param = {'bst:max_depth': 2, 'bst:eta': 1, 'silent': 1, 'objective': 'binary:logistic'}
     nTrees = 100
-    if isinstance(parameters, collections.Mapping):
+    if isinstance(parameters, collections.abc.Mapping):
         if 'nTrees' in parameters:
             nTrees = parameters.pop('nTrees')
         param.update(parameters)

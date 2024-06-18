@@ -72,16 +72,16 @@ TrgEclDigitizer::~TrgEclDigitizer()
 //
 
 void
-TrgEclDigitizer::setup(int m_SourceOfTC)
+TrgEclDigitizer::setup(int SourceOfTC)
 {
 
   // prepare Matrix for Noise generation
   _DataBase->  readNoiseLMatrix(MatrixParallel, MatrixSerial);
 
   // Set TC data
-  // m_SourceOfTC => 1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit
+  // SourceOfTC => 1=ECLHit, 2=ECLSimHit, 3=ECLHit+TRGECLBGTCHit
   // ("1:=ECLHit" is used for signal w/o bkg, and real time background monitor)
-  getTCHit(m_SourceOfTC);
+  getTCHit(SourceOfTC);
 
   return;
 }
@@ -89,7 +89,7 @@ TrgEclDigitizer::setup(int m_SourceOfTC)
 //
 //
 void
-TrgEclDigitizer::getTCHit(int m_SourceOfTC)
+TrgEclDigitizer::getTCHit(int SourceOfTC)
 {
 
   std::vector< std::vector<float> > E_cell(8736, std::vector<float>(80, 0.0));
@@ -102,7 +102,7 @@ TrgEclDigitizer::getTCHit(int m_SourceOfTC)
   //-------------------------------------------------------------------
   //                          read Xtal data
   //---------------------------------------------------------------------
-  if (m_SourceOfTC == 1) { // read  ECLHit table
+  if (SourceOfTC == 1) { // read  ECLHit table
 
     StoreArray<ECLHit> eclHitArray("ECLHits");
 
@@ -156,7 +156,7 @@ TrgEclDigitizer::getTCHit(int m_SourceOfTC)
   }
 
 
-  if (m_SourceOfTC == 2) { // read ECLSimHit
+  if (SourceOfTC == 2) { // read ECLSimHit
     ECL::ECLGeometryPar* eclp = ECL::ECLGeometryPar::Instance();
     //=====================
     // Loop over all hits of steps
@@ -250,7 +250,7 @@ TrgEclDigitizer::getTCHit(int m_SourceOfTC)
   //--------------------------------------------------------
   //
   //--------------------------------------------------------
-  if (m_SourceOfTC == 3) {
+  if (SourceOfTC == 3) {
 
     StoreArray<ECLHit> eclHitArray("ECLHits");
 

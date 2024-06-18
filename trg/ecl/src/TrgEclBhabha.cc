@@ -898,21 +898,22 @@ int TrgEclBhabha::GetBhabhaAddition(void)
          thetaSum < m_3DBhabhaAddAngleCut[3])) {
       bit_bhabha_addition |= 0x04;
     }
-    // for hie3
+
+    // for hie3 and hie4
+    // get thetaID of lower energy cluster
     int lowe_MaxThetaId = 0;
-    //    if (energy1 < energy2) {
     if (ClusterEnergy[0] < ClusterEnergy[1]) {
       lowe_MaxThetaId = MaxThetaId[0];
     } else {
       lowe_MaxThetaId = MaxThetaId[1];
     }
+    // select cluster in endcap region
     if (lowe_MaxThetaId <= 3 ||
         lowe_MaxThetaId >= 16) {
+      // for hie3
       bit_bhabha_addition |= 0x08;
-    }
-    // for hie4
-    if (lowe_MaxThetaId <= 3 ||
-        lowe_MaxThetaId >= 16) {
+      // for hie4
+      // require low energy bound for cluster
       if (ClusterEnergy[0] > 0.5 &&
           ClusterEnergy[1] > 0.5) {
         bit_bhabha_addition |= 0x10;

@@ -349,10 +349,8 @@ class B0TwoBody(BaseSkim):
 
     __authors__ = ["Ryan Mueller and Santi Naylor"]
     __contact__ = __liaison__
-    __description__ = (
-        "Skim for 2 body B0 decays"
-        ":math:`B_{\\text{sig}}^0 \\to \\ell \\ell^\\prime`, where :math:`\\ell is e, \\mu, \\pi`")
-    __category__ = "Physics, 2 Body, no pID"
+    __description__ = "Skim for 2 body B0 decays"
+    __category__ = "Physics, 2 Body, no PID"
 
     validation_sample = _VALIDATION_SAMPLE
 
@@ -423,9 +421,7 @@ class FourLepton(BaseSkim):
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
     __contact__ = __liaison__
-    __description__ = (
-        "Skim for 4 body leptonic analyses"
-    )
+    __description__ = "Skim for 4 body leptonic analyses"
     __category__ = "Physics, Leptonic, 4 Body"
 
     validation_sample = _VALIDATION_SAMPLE
@@ -492,10 +488,7 @@ class RadiativeDilepton(BaseSkim):
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
     __contact__ = __liaison__
-    __description__ = (
-        "Skim for 3 body leptonic analyses "
-
-    )
+    __description__ = "Skim for 3 body leptonic analyses "
     __category__ = "Physics, Leptonic, 3 body"
 
     validation_sample = _VALIDATION_SAMPLE

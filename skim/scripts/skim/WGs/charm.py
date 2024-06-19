@@ -1218,7 +1218,7 @@ class LambdacToSHpJm(BaseSkim):
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
         * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
         * loose mass window for :math:`\\pi^{0}` and skim selections from stdPi0s
-        * ``0.44 < M(K_s) < 0.55, significanceOfDistance > 2.0``
+        * ``0.44 < M(K_s) < 0.55, significanceOfFlightDistance > 2.0``
         * :math:`\\pm 3\\sigma` mass windows for :math:`\\Sigma^+`
         * lower bound on significance of distance for :math:`\\Sigma^+` > 2
         * For more details, please check the source code of this skim.
@@ -1344,7 +1344,7 @@ class XictoXimpippim(BaseSkim):
     * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
     * :math:`\\pm 3\\sigma` mass windows for all intermediate hyperons
     * :math:`\\pm 3\\sigma` mass window for pi0 and skim selections from stdPi0s
-    * lower bound on significance of distance for all intermediate hyperons, 40% of expected value to be used in analysis
+    * lower bound on significance of (flight) distance for all intermediate hyperons, 40% of expected value to be used in analysis
     * loose mass window and lower bound to pCMS for Xic+
     """
 

@@ -504,7 +504,7 @@ CDCTriggerTSFModule::event()
                                   -1,
                                   s.hitPattern(),
                                   s.hitPattern_adc());
-
+        float adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
           const TRGCDCWire* wire = (TRGCDCWire*)s[iw];

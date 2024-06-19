@@ -158,7 +158,7 @@ class ClusterEfficiency(b2.Module):
             p = mcp.getMomentum()
             p_gen = None
             for i in momenta:
-                if abs(p.Mag() - i) < 0.05:
+                if abs(p.R() - i) < 0.05:
                     p_gen = i
                     break
 

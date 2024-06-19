@@ -191,11 +191,11 @@ CDCTrigger2DFinderModule::event()
 
     if (m_usehitpattern) {
       unsigned hitpattern;
-      if (m_useadc) m_segmentHits[iHit]->gethitpattern();
-      else         m_segmentHits[iHit]->gethitpattern_adc();
+      if (m_useadc) m_segmentHits[iHit]->gethitpattern_adc();
+      else          m_segmentHits[iHit]->gethitpattern();
       int nhitpattern = 0;
       if (iSL == 0)nhitpattern = 15;
-      else      nhitpattern = 11;
+      else         nhitpattern = 11;
       //std::cout << "fill hough " << hitpattern << std::endl;
       for (int i = 0; i < nhitpattern; i++) {
         if ((hitpattern & (1 << i)) != 0) {

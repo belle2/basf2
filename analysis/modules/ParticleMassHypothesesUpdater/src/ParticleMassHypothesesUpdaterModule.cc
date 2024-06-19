@@ -9,10 +9,11 @@
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
 #include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/utility/ParticleCopy.h>
 #include <analysis/modules/ParticleMassHypothesesUpdater/ParticleMassHypothesesUpdaterModule.h>
+#include <analysis/utility/ParticleCopy.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Const.h>
+#include <TDatabasePDG.h>
 
 #include <map>
 
@@ -29,33 +30,37 @@ ParticleMassHypothesesUpdaterModule::ParticleMassHypothesesUpdaterModule(): Modu
   setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definition
   addParam("particleList", m_particleList, "Input ParticleList", string());
-  addParam("pdgCode", m_pdgCode, "PDG code for mass reference", Const::photon.getPDGCode());
+  addParam("pdgCode", m_newPdgCode, "PDG code for mass reference", Const::photon.getPDGCode());
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 }
 
 void ParticleMassHypothesesUpdaterModule::initialize()
 {
+  m_newPdgCode = abs(m_newPdgCode);
+
   DecayDescriptor decayDescriptor;
   const bool valid = decayDescriptor.init(m_particleList);
   if (!valid)
     B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_particleList);
 
-  map<int, string> allowedPDGs = {{11, "e"}, {13, "mu"}, {211, "pi"}, {321, "K"}, {2212, "p"}};
+  map<int, string> allowedPDGs = {
+    {11, "e"}, {13, "mu"}, {211, "pi"}, {321, "K"}, {2212, "p"}
+  };
 
   const DecayDescriptorParticle* mother = decayDescriptor.getMother();
   int pdgCode = mother->getPDGCode();
   if (allowedPDGs.find(abs(pdgCode)) == allowedPDGs.end())
     B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen particle list contains unsupported particles with PDG code " <<
             pdgCode);
-  if (allowedPDGs.find(abs(m_pdgCode)) == allowedPDGs.end())
-    B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen target PDG code " << m_pdgCode << " not supported.");
+  if (allowedPDGs.find(m_newPdgCode) == allowedPDGs.end())
+    B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Chosen target PDG code " << m_newPdgCode << " not supported.");
 
   string label = mother->getLabel();
   string pName = mother->getName();
   string sign = string(1, pName.back());
   pName.pop_back();
-  m_newParticleList = allowedPDGs[abs(m_pdgCode)] + sign + ":" + label + "_converted_from_" + pName;
+  m_newParticleList = allowedPDGs[m_newPdgCode] + sign + ":" + label + "_converted_from_" + pName;
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
 
@@ -74,7 +79,6 @@ void ParticleMassHypothesesUpdaterModule::initialize()
 
 void ParticleMassHypothesesUpdaterModule::event()
 {
-
   StoreObjPtr<ParticleList> originalList(m_particleList);
   if (!originalList) {
     B2ERROR("ParticleList " << m_particleList << " not found");
@@ -89,7 +93,7 @@ void ParticleMassHypothesesUpdaterModule::event()
     B2FATAL("ParticleMassHypothesesUpdaterModule::initialize Invalid input DecayString: " << m_newParticleList);
 
   const DecayDescriptorParticle* newMother = newDecayDescriptor.getMother();
-  int newPdgCode = newMother->getPDGCode();
+  m_newPdgCode = newMother->getPDGCode();  // Get the right sign
 
   StoreObjPtr<ParticleList> newList(m_newParticleList);
   if (newList.isValid()) { // Check whether it already exists in this path
@@ -98,21 +102,21 @@ void ParticleMassHypothesesUpdaterModule::event()
   }
 
   newList.create();  // Create and initialize the list
-  newList->initialize(newPdgCode, m_newParticleList);
+  newList->initialize(m_newPdgCode, m_newParticleList);
   newList->setEditable(true);
 
   if (!m_isSelfConjugatedParticle) {
     StoreObjPtr<ParticleList> newAntiList(m_newAntiParticleList);
-    if (!newAntiList.isValid()) { // Check whether it already exists in this path
-      newAntiList.create();  // Create and initialize the list
-      newAntiList->initialize(-1 * newPdgCode, m_newAntiParticleList);
-      newAntiList->setEditable(true);
-    }
+    if (newAntiList.isValid()) // Check whether it already exists in this path
+      B2ERROR("The particle list did not exist but the anti-list did. Something fishy is happening.");
+
+    newAntiList.create();  // Create and initialize the list
+    newAntiList->initialize(-1 * m_newPdgCode, m_newAntiParticleList);
+    newAntiList->setEditable(true);
     newAntiList->bindAntiParticleList(*(newList));
   }
 
   for (unsigned int i = 0; i < originalList->getListSize(); ++i) {
-
     const Particle* originalParticle = originalList->getParticle(i);  // Get particle and check it comes from a track
     if (originalParticle->getParticleSource() != Particle::c_Track) {
       B2WARNING("Particle not built from a track. Skipping.");
@@ -120,8 +124,12 @@ void ParticleMassHypothesesUpdaterModule::event()
     }
 
     Particle* newPart = ParticleCopy::copyParticle(originalParticle);
-    newPart->setPDGCode(newPdgCode);
-    newPart->updateMass(newPdgCode);
+    newPart->updateMass(m_newPdgCode);
+    const int charge = newPart->getCharge();
+    if (TDatabasePDG::Instance()->GetParticle(m_newPdgCode)->Charge() / 3.0 == charge)
+      newPart->setPDGCode(m_newPdgCode);
+    else
+      newPart->setPDGCode(-1 * m_newPdgCode);
 
     newList->addParticle(newPart);  // Add particle to list
   }  // Close loop over tracks

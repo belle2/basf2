@@ -16,7 +16,7 @@ namespace Belle2 {
   class ParticleMassHypothesesUpdaterModule : public Module {
   private:
     /** PDG code for mass reference **/
-    int m_pdgCode;
+    int m_newPdgCode;
 
     /** Name of the list */
     std::string m_particleList;

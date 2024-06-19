@@ -218,7 +218,7 @@ void DQMHistAnalysisInput2Module::event()
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
 
-  if (!anyupdate) {
+  if (anyupdate) {
     m_last_content_update = time(0);
   } else {
     // if there is no update, sleep a moment

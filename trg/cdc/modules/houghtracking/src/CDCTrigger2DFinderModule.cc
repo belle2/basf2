@@ -192,15 +192,13 @@ CDCTrigger2DFinderModule::event()
 
     if (m_usehitpattern) {
       unsigned hitpattern;
-      if (m_useadc) m_segmentHits[iHit]->gethitpattern_adc();
-      else          m_segmentHits[iHit]->gethitpattern();
+      if (m_useadc) hitpattern = m_segmentHits[iHit]->gethitpattern_adc();
+      else          hitpattern = m_segmentHits[iHit]->gethitpattern();
       int nhitpattern = 0;
       if (iSL == 0)nhitpattern = 15;
       else         nhitpattern = 11;
-      //std::cout << "fill hough " << hitpattern << std::endl;
       for (int i = 0; i < nhitpattern; i++) {
         if ((hitpattern & (1 << i)) != 0) {
-          //std::cout << "fill hough " << i << std::endl;
           double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
           if (iSL != 0 && i == 0)  phi = phi - 1;
           else if (iSL != 0 && i == 1)  phi = phi;
@@ -257,11 +255,9 @@ CDCTrigger2DFinderModule::event()
           else if (iSL == 0 && i == 13)  iLayer = 4;
           else if (iSL == 0 && i == 14)  iLayer = 4;
 
-          //std::cout << "fill hough " << i << " " << iSL << " " << phi << std::endl;
           double r = radius[iSL][iLayer];
           TVector2 pos(cos(phi) / r, sin(phi) / r);
           hitMap.insert(std::make_pair(iHit * 15 + i, std::make_pair(iSL * 5 + iLayer, pos)));
-          //std::cout << "fill hough " << i << " " << iSL << " " << phi << " " << cos(phi) << std::endl;
         }
       }
     } else {

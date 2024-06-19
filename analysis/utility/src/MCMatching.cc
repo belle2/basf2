@@ -187,7 +187,7 @@ namespace {
         continue;
       }
 
-      if (daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
+      if (mcParticle and daug->hasExtraInfo(MCMatching::c_extraInfoMCErrors)) {
         if (static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) & MCMatching::c_DecayInFlight) {
           //now daug does not have any daughters.
           //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
@@ -412,7 +412,7 @@ int MCMatching::getFlagsOfBremsPhotonDaughter(const Particle* daughter, const MC
   //At first, call getMCErrors as usual
   int daughterStatus = getMCErrors(daughter);
 
-  //Check if the daugther has an MC particle related
+  //Check if the daughter has an MC particle related
   const MCParticle* mcDaughter = daughter->getRelatedTo<MCParticle>();
   //If it hasn't, add the c_BremsPhotonAdded flag to the mother and stop the propagation of c_InternalError
   if (!mcDaughter) {

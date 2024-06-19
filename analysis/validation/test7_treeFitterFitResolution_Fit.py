@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -12,7 +11,7 @@
 """
 <header>
   <output>../TreeFitted_B0ToJPsiKs.root</output>
-  <contact>Yo Sato; yosato@post.kek.jp</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
   <interval>nightly</interval>
 </header>
 """

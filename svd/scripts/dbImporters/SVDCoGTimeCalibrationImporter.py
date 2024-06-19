@@ -1,5 +1,4 @@
 # !/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -45,7 +44,7 @@ inputFileList = []
 if filename.rfind(".root") != -1:
     inputFileList.append(filename)
 else:
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         inputFileList = [line.strip() for line in f]
 
 b2conditions.prepend_globaltag("online")

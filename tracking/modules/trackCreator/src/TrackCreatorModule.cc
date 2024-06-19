@@ -30,8 +30,6 @@ TrackCreatorModule::TrackCreatorModule() :
   // input
   addParam("recoTrackColName", m_recoTrackColName, "Name of collection holding the RecoTracks (input).",
            m_recoTrackColName);
-  addParam("mcParticleColName", m_mcParticleColName, "Name of collection holding the MCParticles (input, optional).",
-           m_mcParticleColName);
   // output
   addParam("trackColName", m_trackColName, "Name of collection holding the Tracks (output).", m_trackColName);
   addParam("trackFitResultColName", m_trackFitResultColName, "Name of collection holding the TrackFitResult (output).",
@@ -59,9 +57,6 @@ void TrackCreatorModule::initialize()
 {
   m_RecoTracks.isRequired(m_recoTrackColName);
 
-  StoreArray<MCParticle> mcParticles(m_mcParticleColName);
-  const bool mcParticlesPresent = mcParticles.isOptional();
-
   StoreArray<Track> tracks(m_trackColName);
   const bool tracksRegistered = tracks.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered);
   StoreArray<TrackFitResult> trackFitResults(m_trackFitResultColName);
@@ -71,9 +66,6 @@ void TrackCreatorModule::initialize()
 
   tracks.registerRelationTo(m_RecoTracks);
 
-  if (mcParticlesPresent) {
-    tracks.registerRelationTo(mcParticles);
-  }
 
   B2ASSERT("BeamSpot should have exactly 3 parameters", m_beamSpot.size() == 3);
   m_beamSpotAsTVector = B2Vector3D(m_beamSpot[0], m_beamSpot[1], m_beamSpot[2]);
@@ -95,8 +87,7 @@ void TrackCreatorModule::event()
   }
 
   TrackFitter trackFitter;
-  TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName,
-                            m_beamSpotAsTVector, m_beamAxisAsTVector);
+  TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_beamSpotAsTVector, m_beamAxisAsTVector);
   for (auto& recoTrack : m_RecoTracks) {
     for (const auto& pdg : m_pdgCodes) {
       // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.

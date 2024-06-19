@@ -62,6 +62,9 @@ ParticleLoaderModule::ParticleLoaderModule() : Module()
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 
+  addParam("skipInitial", m_skipInitial,
+           "If true, initial MCParticles will be skipped (default). If false, initial MCParticles will be included.", true);
+
   addParam("skipNonPrimary", m_skipNonPrimary,
            "If true, the secondary MC particle will be skipped, default is false",
            false);
@@ -180,7 +183,7 @@ void ParticleLoaderModule::initialize()
         }
       } else if (m_useMCParticles) {
         B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
-                  "Please note that the given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary) do not apply to "
+                  "Please note that the given options (addDaughters, skipNonPrimaryDaughters, skipNonPrimary, skipInitial) do not apply to "
                   << listName);
       } else if (m_loadChargedCluster) {
         B2WARNING("ParticleList " << listName << " already exists and will not be created again. " <<
@@ -975,6 +978,9 @@ void ParticleLoaderModule::mcParticlesToParticles()
         continue;
 
       if (m_skipNonPrimary and !mcParticle->hasStatus(MCParticle::c_PrimaryParticle))
+        continue;
+
+      if (m_skipInitial and mcParticle->isInitial())
         continue;
 
       Particle particle(mcParticle);

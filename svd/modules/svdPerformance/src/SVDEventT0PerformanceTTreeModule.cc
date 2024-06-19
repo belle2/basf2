@@ -18,7 +18,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/TrackPoint.h>
-#include <TVector3.h>
 #include <TDirectory.h>
 #include <Math/Boost.h>
 #include <math.h>
@@ -164,31 +163,27 @@ void SVDEventT0PerformanceTTreeModule::event()
       m_eventT0Err = (float)m_EventT0->getEventT0Uncertainty();
 
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::SVD)) {
-        auto evtT0List_SVD = m_EventT0->getTemporaryEventT0s(Const::EDetector::SVD) ;
-        //    There is only one estimate of SVD EVentT0 for the moment
-        m_svdEventT0 = evtT0List_SVD.back().eventT0 ;
-        m_svdEventT0Err = evtT0List_SVD.back().eventT0Uncertainty;
+        const auto bestSVDEvtT0 = m_EventT0->getBestSVDTemporaryEventT0();
+        m_svdEventT0 = bestSVDEvtT0->eventT0 ;
+        m_svdEventT0Err = bestSVDEvtT0->eventT0Uncertainty;
       }
 
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-        auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
-        //    The most accurate CDC event t0 value is the last one in the list.
-        m_cdcEventT0 = evtT0List_CDC.back().eventT0 ;
-        m_cdcEventT0Err = evtT0List_CDC.back().eventT0Uncertainty;
+        const auto bestCDCEvtT0 = m_EventT0->getBestCDCTemporaryEventT0();
+        m_cdcEventT0 = bestCDCEvtT0->eventT0 ;
+        m_cdcEventT0Err = bestCDCEvtT0->eventT0Uncertainty;
       }
 
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::TOP)) {
-        auto evtT0List_TOP = m_EventT0->getTemporaryEventT0s(Const::EDetector::TOP) ;
-        //    There should only be at most one value in the list per event
-        m_topEventT0 = evtT0List_TOP.back().eventT0 ;
-        m_topEventT0Err = evtT0List_TOP.back().eventT0Uncertainty;
+        const auto bestTOPEvtT0 = m_EventT0->getBestTOPTemporaryEventT0();
+        m_topEventT0 = bestTOPEvtT0->eventT0 ;
+        m_topEventT0Err = bestTOPEvtT0->eventT0Uncertainty;
       }
 
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::ECL)) {
-        auto evtT0List_ECL = m_EventT0->getTemporaryEventT0s(Const::EDetector::ECL) ;
-        //    There is only one estimate of ECL EVentT0 for the moment
-        m_eclEventT0 = evtT0List_ECL.back().eventT0 ;
-        m_eclEventT0Err = evtT0List_ECL.back().eventT0Uncertainty;
+        const auto bestECLEvtT0 = m_EventT0->getBestECLTemporaryEventT0();
+        m_eclEventT0 = bestECLEvtT0->eventT0 ;
+        m_eclEventT0Err = bestECLEvtT0->eventT0Uncertainty;
       }
     }
 

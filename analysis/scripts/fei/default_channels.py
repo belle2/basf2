@@ -140,7 +140,8 @@ def get_default_channels(
     if convertedFromBelle:
         gamma_cut = 'goodBelleGamma == 1 and clusterBelleQuality == 0'
     else:
-        gamma_cut = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]'
+        # Same as goodBelleGamma == 1
+        gamma_cut = '[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.15]]'
     if specific:
         gamma_cut += ' and isInRestOfEvent > 0.5'
 

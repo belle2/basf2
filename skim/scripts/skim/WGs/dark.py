@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -19,7 +18,7 @@ from stdCharged import stdE, stdMu, stdPi, stdK
 from stdPhotons import stdPhotons
 import vertex as vertex
 
-__liaison__ = "Sascha Dreyer <sascha.dreyer@desy.de>"
+__liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -42,26 +41,24 @@ class SinglePhotonDark(BaseSkim):
 
     def build_lists(self, path):
 
-        # start with all photons with E* above 500 MeV in the tracking acceptance
-        in_tracking_acceptance = "0.296706 < theta < 2.61799"  # rad = [17, 150] degrees
+        # start with all photons with E* above 500 MeV and decent time in
+        # the tracking acceptance [17, 150] degrees
         ma.cutAndCopyList(
-            "gamma:singlePhoton", "gamma:all",
-            f"useCMSFrame(E) > 0.5 and {in_tracking_acceptance}", path=path)
+            "gamma:singlePhoton_SinglePhotonDark", "gamma:all",
+            "useCMSFrame(E) > 0.5 and thetaInCDCAcceptance and abs(clusterTiming)<200.", path=path)
 
-        # require a region-dependent minimum energy of the candidate, we have
-        # a new 0.5 GeV trigger in the inner barrel: [44.2, 94.8] degrees @ L1
-        region_dependent = " [clusterTheta < 1.65457213 and clusterTheta > 0.77143553] or "
-        region_dependent += "[clusterReg ==  2 and useCMSFrame(E) > 1.0] or "  # barrel
-        region_dependent += "[clusterReg ==  1 and useCMSFrame(E) > 2.0] or "  # fwd
-        region_dependent += "[clusterReg ==  3 and useCMSFrame(E) > 2.0] or "  # bwd
-        region_dependent += "[clusterReg == 11 and useCMSFrame(E) > 2.0] or "  # between fwd and barrel
-        region_dependent += "[clusterReg == 13 and useCMSFrame(E) > 2.0]"      # between bwd and barrel
-        ma.applyCuts("gamma:singlePhoton", region_dependent, path=path)
+        # require a region-dependent minimum energy of the candidate, matching HLT
+        # 0.5 GeV trigger in the inner barrel: [44, 98] degrees, 1 GeV in the barrel
+        # [30, 130] deg, and 2 GeV elsewhere
+        region_dependent = " [44 < formula(57.2957795*theta) < 98] or "
+        region_dependent += "[30 < formula(57.2957795*theta) < 130 and useCMSFrame(E) > 1.0] or "
+        region_dependent += "[useCMSFrame(E) > 2.0] "
+        ma.applyCuts("gamma:singlePhoton_SinglePhotonDark", region_dependent, path=path)
 
         # require only one single photon candidate and no good tracks in the event
         good_tracks = 'abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.15'  # cm, cm, GeV/c
         path = self.skim_event_cuts(
-            f"nParticlesInList(gamma:singlePhoton) == 1 and nCleanedTracks({good_tracks}) == 0",
+            f"nParticlesInList(gamma:singlePhoton_SinglePhotonDark) == 1 and nCleanedTracks({good_tracks}) == 0",
             path=path
         )
 
@@ -69,21 +66,21 @@ class SinglePhotonDark(BaseSkim):
         # be beam-induced background) and veto if it's in time with our signal
         # candidate -- do after the event cuts since it uses a ParticleCombiner
         # and should not be done for all events (save event-processing time)
-        not_in_signal_list = "isInList(gamma:singlePhoton) < 1"
+        not_in_signal_list = "isInList(gamma:singlePhoton_SinglePhotonDark) < 1"
         in_time = "maxWeightedDistanceFromAverageECLTime < 1"
-        ma.cutAndCopyList("gamma:to_veto", "gamma:all",
+        ma.cutAndCopyList("gamma:veto_SinglePhotonDark", "gamma:all",
                           f"E > 0.55 and {not_in_signal_list}", path=path)
-        ma.rankByHighest("gamma:to_veto", "E", numBest=1, path=path)
-        ma.reconstructDecay("vpho:veto -> gamma:singlePhoton gamma:to_veto",
+        ma.rankByHighest("gamma:veto_SinglePhotonDark", "E", numBest=1, path=path)
+        ma.reconstructDecay("vpho:veto_SinglePhotonDark -> gamma:singlePhoton_SinglePhotonDark gamma:veto_SinglePhotonDark",
                             in_time, path=path)
-        veto_additional_in_time_cluster = 'nParticlesInList(vpho:veto) < 1'
+        veto_additional_in_time_cluster = 'nParticlesInList(vpho:veto_SinglePhotonDark) < 1'
 
         # final signal selection must pass the 'in-time' veto on the
         # second-most-energetic cluster -- this is also an event cut, but apply
         # to the list (which is anyway a maximum one candidate per event) since
         # we can only call skim_event_cuts once
-        ma.applyCuts("gamma:singlePhoton", veto_additional_in_time_cluster, path=path)
-        return ["gamma:singlePhoton"]
+        ma.applyCuts("gamma:singlePhoton_SinglePhotonDark", veto_additional_in_time_cluster, path=path)
+        return ["gamma:singlePhoton_SinglePhotonDark"]
 
 
 @fancy_skim_header
@@ -118,7 +115,7 @@ class ALP3Gamma(BaseSkim):
         # applying a lab frame energy cut to the daughter photons
         ma.fillParticleList(
             'gamma:cdcAndMinimumEnergy',
-            'E >= 0.1 and theta >= 0.297 and theta <= 2.618',
+            'E >= 0.1 and thetaInCDCAcceptance',
             True, path=path)
 
         # defining the decay string
@@ -245,7 +242,7 @@ class ElectronMuonPlusMissingEnergy(BaseSkim):
 
 @fancy_skim_header
 class LFVZpVisible(BaseSkim):
-    __authors__ = ["Ilya Komarov"]
+    __authors__ = ["Ilya Komarov and Luigi Corona"]
     __description__ = "Lepton flavour violating Z' skim, Z' to visible FS."
     __contact__ = __liaison__
     __category__ = "physics, dark sector"
@@ -253,7 +250,7 @@ class LFVZpVisible(BaseSkim):
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
-        stdE("loose", path=path)
+        stdMu("all", path=path)
 
     def build_lists(self, path):
         """
@@ -263,31 +260,28 @@ class LFVZpVisible(BaseSkim):
 
         # Here we just want four gpood tracks to be reconstructed
         track_cuts = "abs(dz) < 2.0 and abs(dr) < 0.5"
-        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 4"
+        electron_id_cut = "electronID > 0.2"
+        muon_id_cut = "muonID > 0.2"
 
-        ma.cutAndCopyList("e+:lfvzp", "e+:all", track_cuts, path=path)
+        ma.cutAndCopyList("e+:lfvzp", "e+:all", f"[{track_cuts} and {electron_id_cut}]", path=path)
+        ma.cutAndCopyList("mu+:lfvzp", "mu+:all", f"[{track_cuts} and {muon_id_cut}]", path=path)
+
+        nParticlesInList_selection = "formula(nParticlesInList(mu+:lfvzp) + nParticlesInList(e+:lfvzp)) > 1"
+        Event_cuts_vis = f"[nCleanedTracks({track_cuts}) == 4 and {nParticlesInList_selection}]"
 
         # Z' to lfv: fully reconstructed
-        LFVZpVisChannel = "e+:lfvzp e+:lfvzp e-:lfvzp e-:lfvzp"
+        LFVZpVisChannel = "e+:lfvzp mu+:lfvzp e-:all mu-:all"
 
-        ma.reconstructDecay("vpho:vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path)
+        ma.reconstructDecay(f"vpho:vislfvzp -> {LFVZpVisChannel}", Event_cuts_vis, path=path)
 
         lfvzp_list.append("vpho:vislfvzp")
 
+        LFVZpVisChannel = "e+:lfvzp mu+:lfvzp e+:all mu+:all"
+
         # Z' to lfv: part reco
-        LFVZpVisChannel = "e+:lfvzp e+:lfvzp e-:lfvzp"
-        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 3"
+        ma.reconstructDecay(f"vpho:ecv_vislfvzp -> {LFVZpVisChannel}", Event_cuts_vis, path=path, allowChargeViolation=True)
 
-        ma.reconstructDecay("vpho:3tr_vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path, allowChargeViolation=True)
-
-        lfvzp_list.append("vpho:3tr_vislfvzp")
-
-        # Z' to lfv: two same-sign tracks
-        LFVZpVisChannel = "e+:lfvzp e+:lfvzp"
-        Event_cuts_vis = "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5) == 2"
-        ma.reconstructDecay("vpho:2tr_vislfvzp -> " + LFVZpVisChannel, Event_cuts_vis, path=path, allowChargeViolation=True)
-
-        lfvzp_list.append("vpho:2tr_vislfvzp")
+        lfvzp_list.append("vpho:ecv_vislfvzp")
 
         return lfvzp_list
 
@@ -324,7 +318,7 @@ class EGammaControlDark(BaseSkim):
 
         # exactly 1 good photon in the event
         photon_energy_cut = '0.45'
-        good_photon = 'theta > 0.296706 and theta < 2.61799' +\
+        good_photon = 'thetaInCDCAcceptance' +\
             f' and useCMSFrame(E) > {photon_energy_cut}'
         ma.cutAndCopyList(f'gamma:{internal_skim_label}', 'gamma:all', good_photon, path=path)
         one_good_photon = f'[eventCached(nParticlesInList(gamma:{internal_skim_label})) == 1]'
@@ -334,7 +328,7 @@ class EGammaControlDark(BaseSkim):
         path = self.skim_event_cuts(event_cuts, path=path)
 
         # fill electron lists (tighter than previous selection)
-        good_track_w_hie_cluster_match = '%s and clusterE > 2.0' % phys_perf_good_track
+        good_track_w_hie_cluster_match = f'{phys_perf_good_track} and clusterE > 2.0'
         ma.cutAndCopyList(f'e+:{internal_skim_label}', 'e+:all', good_track_w_hie_cluster_match, path=path)
 
         # reconstruct decay
@@ -661,7 +655,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 
     def build_lists(self, path):
         skim_str = "InelasticDarkMatterWithDarkHiggs"
-        n_track_event_cut = "[nCleanedTracks([nCDCHits > 20] and [thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
+        n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [dr < 0.5] and [abs(dz) < 2]) < 5]"
 
         track_requirements = "[formula(nPXDHits + nSVDHits + nCDCHits) > 20]"
 
@@ -678,7 +672,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 
         ma.reconstructDecay(
             decayString=f"A0:{skim_str} -> mu+:{skim_str} mu-:{skim_str}",
-            cut="pt > 0.1",
+            cut="",
             path=path
         )
         vertex.treeFit(
@@ -689,13 +683,13 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         )
         ma.applyCuts(
             list_name=f"A0:{skim_str}",
-            cut="chiProb > 0",
+            cut="chiProb > 0.001",
             path=path,
         )
 
         ma.reconstructDecay(
             decayString=f"chi2:{skim_str} -> e+:{skim_str} e-:{skim_str}",
-            cut="pt > 0.1",
+            cut="",
             path=path
         )
         vertex.treeFit(
@@ -706,15 +700,14 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         )
         ma.applyCuts(
             list_name=f"chi2:{skim_str}",
-            cut="chiProb > 0",
+            cut="chiProb > 0.001",
             path=path,
         )
 
-        dr_cut = "[daughter(0, dr) > 0.05] or [daughter(1, dr) > 0.05]"
-        vertex_fit_cut = "[daughter(0, chiProb) > 0.1] or [daughter(1, chiProb) > 0.1]"
+        dr_cut = "[daughter(0, distance) > 0.05] or [daughter(1, distance) > 0.05]"
         ma.reconstructDecay(
             decayString=f"beam:{skim_str} -> A0:{skim_str} chi2:{skim_str}",
-            cut=f"[{dr_cut} and {vertex_fit_cut}]",
+            cut=f"[{dr_cut}]",
             path=path,
         )
         ma.buildRestOfEvent(
@@ -726,8 +719,9 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             list_name=f"beam:{skim_str}",
             mask_tuples=[
                 ("std_roe",
-                 "thetaInCDCAcceptance and nCDCHits>20 and dr < 0.5 and abs(dz) < 2",
-                 "thetaInCDCAcceptance and E > 0.05")],
+                 "thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2",
+                 "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and [[clusterReg==1 and E>0.08]" +
+                 "or [clusterReg==2 and E>0.07] or [clusterReg==3 and E>0.1]] and [abs(clusterTiming) < 200]")],
             path=path,
          )
 
@@ -738,3 +732,158 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
         )
 
         return [f"beam:{skim_str}"]
+
+
+@fancy_skim_header
+class AA2uuuu(BaseSkim):
+    """
+    Searching the dark sector through U(1) kinetic mixing.
+
+    Reconstructed 2 muons to a dark photon.
+    """
+    __description__ = ":math:`ee\\to A^{\\prime}A^{\\prime}\\nu_{D}\\nu_{D}\\to \\mu\\mu\\mu\\mu`"
+    __category__ = "physics, dark sector"
+    __authors__ = ["Chanyoung LEE"]
+    __contact__ = __liaison__
+
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdMu("all", path=path)
+
+    def build_lists(self, path):
+        muon_cuts = """[0.8 < muonID_noSVD]
+        and [inKLMAcceptance == 1]
+        and [inCDCAcceptance == 1] and [4 < nCDCHits]"""
+
+        track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
+
+        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts}) <= 6", path=path)
+
+        ma.cutAndCopyList("mu+:accepted", "mu+:all", muon_cuts, path=path)
+        ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted mu-:accepted", cut="", path=path)
+        ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
+
+        return ["Upsilon(4S):rec"]
+
+
+@fancy_skim_header
+class DimuonPlusVisibleDarkHiggs(BaseSkim):
+    """
+    **Physics channel**: e+e- -> A'h', A'-> mu+mu-, hp -> tr+tr-
+
+    Skim list contains candidates for the visible dark Higgs produced in association with a a prompt muon-pair.
+    """
+    __authors__ = ["Luigi Corona"]
+    __contact__ = __liaison__
+    __description__ = "Skim for the visible dark higgs analysis"
+    __category__ = "physics, dark sector"
+
+    ApplyHLTHadronCut = False
+
+    def addParticlesToPDG(self):
+        """Adds the particle codes to the basf2 pdg instance """
+        pdg.add_particle('Ap', 1802060053, 999., 999., 0, 2)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdMu("all", path=path)
+
+    def additional_setup(self, path):
+        self.addParticlesToPDG()
+
+    def build_lists(self, path):
+        skim_str = 'skimDimuonPlusVisibleDarkHiggs'
+        darkPhoton_str = 'darkPhoton'
+
+        track_selection = '[abs(dr) < 0.5] and [abs(dz) < 2]'
+        muon_pid_selection = '[muonID > 0.2]'
+
+        ma.cutAndCopyList(
+            f"mu+:{darkPhoton_str}",
+            "mu+:all",
+            f"[{track_selection} and {muon_pid_selection}]",
+            path=path)
+
+        ma.reconstructDecay(
+             decayString=f'Ap:{skim_str} -> mu+:{darkPhoton_str} mu-:{darkPhoton_str}',
+             cut='',
+             path=path)
+
+        ma.reconstructRecoil(f'Ap:recoil -> Ap:{skim_str}',
+                             cut='',
+                             path=path)
+
+        ma.reconstructDecay(
+             decayString=f'A0:{skim_str} -> pi+:all pi-:all',
+             cut='',
+             path=path)
+
+        mrecoil_cut = "[daughter(0, mRecoil) < 8.5]"
+        ma.reconstructDecay(
+             decayString=f'vpho:{skim_str} -> Ap:{skim_str} A0:{skim_str}',
+             cut=f'{mrecoil_cut}',
+             path=path)
+
+        return [f'vpho:{skim_str}']
+
+
+@fancy_skim_header
+class DielectronPlusVisibleDarkHiggs(BaseSkim):
+    """
+    **Physics channel**: e+e- -> A'h', A'-> e+e-, hp -> tr+tr-
+
+    Skim list contains candidates for the visible dark Higgs produced in association with a prompt electron-pair.
+    """
+    __authors__ = ["Luigi Corona"]
+    __contact__ = __liaison__
+    __description__ = "Skim for the visible dark higgs analysis"
+    __category__ = "physics, dark sector"
+
+    ApplyHLTHadronCut = False
+
+    def addParticlesToPDG(self):
+        """Adds the particle codes to the basf2 pdg instance """
+        pdg.add_particle('ap', 1802070053, 999., 999., 0, 2)
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+        stdE("all", path=path)
+
+    def additional_setup(self, path):
+        self.addParticlesToPDG()
+
+    def build_lists(self, path):
+        skim_str = 'skimDielectronPlusVisibleDarkHiggs'
+        darkPhoton_str = 'darkPhoton'
+
+        track_selection = '[abs(dr) < 0.5] and [abs(dz) < 2]'
+        electron_pid_selection = '[electronID > 0.2]'
+
+        ma.cutAndCopyList(
+            f"e+:{darkPhoton_str}",
+            "e+:all",
+            f"[{track_selection} and {electron_pid_selection}]",
+            path=path)
+
+        ma.reconstructDecay(
+             decayString=f'ap:{skim_str} -> e+:{darkPhoton_str} e-:{darkPhoton_str}',
+             cut='',
+             path=path)
+
+        ma.reconstructRecoil(f'ap:recoil -> ap:{skim_str}',
+                             cut='',
+                             path=path)
+
+        ma.reconstructDecay(
+             decayString=f'A0:{skim_str} -> pi+:all pi-:all',
+             cut='',
+             path=path)
+
+        mrecoil_cut = "[daughter(0, mRecoil) < 8.5]"
+        ma.reconstructDecay(
+             decayString=f'vpho:{skim_str} -> ap:{skim_str} A0:{skim_str}',
+             cut=f'{mrecoil_cut}',
+             path=path)
+
+        return [f'vpho:{skim_str}']

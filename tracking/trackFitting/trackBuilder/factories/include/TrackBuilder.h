@@ -9,6 +9,7 @@
 
 #include <string>
 #include <framework/geometry/B2Vector3.h>
+#include <genfit/AbsTrackRep.h>
 
 namespace Belle2 {
 
@@ -39,21 +40,17 @@ namespace Belle2 {
      *
      * @param trackColName Name of the store array for tracks (output).
      * @param trackFitResultColName Name of the store array for track fit results (output).
-     * @param mcParticleColName Name of the store array for MC particles (input, optional).
-     *                          If given, the tracks are matched to MCParticles.
      * @param beamSpot Origin.
      * @param beamAxis Positive z-direction.
      */
     TrackBuilder(
       const std::string& trackColName,
       const std::string& trackFitResultColName,
-      const std::string& mcParticleColName,
       const B2Vector3D& beamSpot = B2Vector3D(0., 0., 0.),
       const B2Vector3D& beamAxis = B2Vector3D(0., 0., 1.)
     ) :
       m_trackColName(trackColName),
       m_trackFitResultColName(trackFitResultColName),
-      m_mcParticleColName(mcParticleColName),
       m_beamSpot(beamSpot),
       m_beamAxis(beamAxis)
     {};
@@ -77,17 +74,15 @@ namespace Belle2 {
                                  const bool useClosestHitToIP = false, const bool useBFieldAtHit = false);
 
     /// Get the HitPattern in the VXD.
-    static uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack);
+    static uint32_t getHitPatternVXDInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation = nullptr);
     /// Get the HitPattern in the CDC.
-    static uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack);
+    static uint64_t getHitPatternCDCInitializer(const RecoTrack& recoTrack, const genfit::AbsTrackRep* representation = nullptr);
 
   private:
     /// TrackColName (output).
     std::string m_trackColName;
     /// TrackFitResultColName (output).
     std::string m_trackFitResultColName;
-    /// MCParticleColName (input, optional).
-    std::string m_mcParticleColName;
     ///  Extrapolation target, origin.
     B2Vector3D m_beamSpot;
     ///  Extrapolation target, positive z direction.

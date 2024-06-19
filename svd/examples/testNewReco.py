@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -34,7 +33,7 @@ class SVDClustersQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.test = []
         self.testNew = []
         self.size = TH1F("cl_size", "Cluster Size", 20, 0, 20)
@@ -271,7 +270,7 @@ class SVDRecoDigitsQuickCheck(b2.Module):
     def initialize(self):
         '''define histograms'''
 
-        #: \cond
+        #: \cond Doxygen_suppress
         self.test = []
         self.testNew = []
         self.time = TH1F("rd_time", "RecoDigit Time", 300, -100, 200)

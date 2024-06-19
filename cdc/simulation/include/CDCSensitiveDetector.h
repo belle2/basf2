@@ -81,25 +81,18 @@ namespace Belle2 {
       G4double ClosestApproach(G4ThreeVector bwp, G4ThreeVector fwp, G4ThreeVector posIn, G4ThreeVector posOut,
                                G4ThreeVector& hitPosition, G4ThreeVector& wirePosition);//,G4double& transferT);
 
-      //! Calculate intersection of track with cell boundary.
-      /*!
 
-        (Relations)
-
-        (Arguments)
-        input
-        ic1        integer * 4   #cell(sirial) of entrance.
-        ic2        integer * 4   #cell(sirial) of exit.
-        venter(6)  real * 4      (x,y,z,px/p,py/p,pz/p) at entrance.
-        vexit(6)   real * 4      (x,y,z,px/p,py/p,pz/p) at exit.
-        s1         real * 4      track length at entrance.
-        s2         real * 4      track length at exit.
-        output
-        xint(6)    real * 4      (x,y,z,px/p,py/p,pz/p) at intersection of
-        cell boundary.
-        sint       real * 4      track length at intersection of cell
-        boundary.
-        iflag      integer * 4   return code from GIPLAN.
+      /** Calculate intersection of track with cell boundary.
+        @param[in]  layerId      Id of the layer.
+        @param[in]  ic1          serial cell number (start w/ one) of entrance.
+        @param[in]  ic2          serial cell number (start w/ one) of exit.
+        @param[in]  venter       (x,y,z,px/p,py/p,pz/p) at entrance.
+        @param[in]  vexit        (x,y,z,px/p,py/p,pz/p) at exit.
+        @param[in]  s1           track length at entrance.
+        @param[in]  s2           track length at exit.
+        @param[out] xint         (x,y,z,px/p,py/p,pz/p) at intersection of cell boundary.
+        @param[out] sint         track length at intersection of cell boundary.
+        @param[out] iflag        return code from GIPLAN.
       */
       void CellBound(const G4int layerId, const G4int ic1, const G4int ic2,
                      const G4double venter[6], const G4double vexit[6],

@@ -127,12 +127,12 @@ int SocketIO::get_pxd(int sock, char* data, int len)
 {
 #define MAX_PXD_FRAMES  256
   const int headerlen = 8;
-  int* pxdheader = (int*) data;
-  int* pxdheadertable = (int*) &data[headerlen];
+  int* pxdheader = (int*) data;            // TODO should it be unsigned int?
+  int* pxdheadertable = (int*) &data[headerlen];  // TODO should it be unsigned int?
   int framenr = 0, tablelen = 0, datalen = 0;
   int br = read_data(sock, data, headerlen);
   if (br <= 0) return br;
-  if (pxdheader[0] != htonl(0xCAFEBABE)) {
+  if (static_cast<uint>(pxdheader[0]) != htonl(0xCAFEBABE)) {
     printf("pxdheader wrong : Magic %X , Frames %X \n", pxdheader[0], ntohl(pxdheader[1]));
     exit(0);
   }
@@ -155,7 +155,6 @@ int SocketIO::get_pxd(int sock, char* data, int len)
     exit(0);
   }
   int bcount = read_data(sock, data + headerlen + tablelen, datalen);
-  if (br <= 0) return br;
   return (headerlen + tablelen + bcount);
 }
 
@@ -257,52 +256,6 @@ SocketRecv::~SocketRecv()
   shutdown(m_sock, 2);
   ::close(m_sock);
   printf("SocketRecv:: connection socket %d closed\n", m_sock);
-}
-
-int SocketRecv::reconnect(int ntry)
-{
-  // Close existing socket once.
-  shutdown(m_sock, 2);
-  ::close(m_sock);
-
-  // Setup socket parameters again;
-  bzero(&m_sa, sizeof(m_sa));
-  bcopy(m_hp->h_addr, (char*)&m_sa.sin_addr, m_hp->h_length);
-  m_sa.sin_family = m_hp->h_addrtype;
-  m_sa.sin_port = htons((u_short)m_port);
-
-  // Reopen the socket
-  int s;
-  m_sock = -1;
-  if ((s = socket(m_hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
-    m_errno = errno;
-    perror("RSocketRecv:socket");
-    return -3;
-  }
-  int sizeval = D2_SOCKBUF_SIZE;
-  setsockopt(s, SOL_SOCKET, SO_SNDBUF, &sizeval, 4);
-  setsockopt(s, SOL_SOCKET, SO_RCVBUF, &sizeval, 4);
-  int yes = 1;
-  setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &yes, 4);
-
-  m_sock = s;
-
-  // Connect again
-  int maxretry = ntry;
-  //  printf ("RSocketRecv: reconnecting socket %d, try %d times with 5sec. interval.\n", m_sock, ntry );
-
-  for (;;) {
-    printf("RSocketRecv: reconnecting (trial %d) \n", ntry - maxretry + 1);
-    int istat = connect(m_sock, (struct sockaddr*)&m_sa, sizeof(m_sa));
-    if (istat >= 0) {
-      printf("RSocketRecv: reconnected\n");
-      return 0;
-    }
-    maxretry--;
-    if (maxretry == 0) return -1;
-    sleep(5);
-  }
-  printf("RSocketRecv: m_sock = %d reconnected.\n", m_sock);
 }
 
 int SocketRecv::accept()
@@ -438,8 +391,7 @@ SocketSend::SocketSend(const char* node, u_short port)
 {
   m_errno = 0;
   m_sock = -1;
-  struct hostent* hp;
-  if ((hp = gethostbyname(node)) == NULL) {
+  if ((m_hp = gethostbyname(node)) == NULL) {
     m_errno = errno;
     fprintf(stderr,
             "SocketSend::gethostbyname(%s): not found\n", node);
@@ -448,13 +400,13 @@ SocketSend::SocketSend(const char* node, u_short port)
 
   struct sockaddr_in sa;
   bzero(&sa, sizeof(sa));
-  bcopy(hp->h_addr, (char*)&sa.sin_addr, hp->h_length);
-  sa.sin_family = hp->h_addrtype;
+  bcopy(m_hp->h_addr, (char*)&sa.sin_addr, m_hp->h_length);
+  sa.sin_family = m_hp->h_addrtype;
   sa.sin_port = htons((u_short)port);
 
   int s;
   m_sock = -1;
-  if ((s = socket(hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
+  if ((s = socket(m_hp->h_addrtype, SOCK_STREAM, 0)) < 0) {
     m_errno = errno;
     perror("SocketSend:socket");
     return;

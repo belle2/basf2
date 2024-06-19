@@ -18,7 +18,7 @@
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
 #include <ecl/dbobjects/ECLWaveformData.h>
-#include <ecl/digitization/algorithms.h>
+#include <ecl/digitization/BitStream.h>
 #include <ecl/digitization/ECLCompress.h>
 #include <ecl/digitization/shaperdsp.h>
 #include <ecl/geometry/ECLGeometryPar.h>

@@ -149,16 +149,24 @@ namespace Belle2 {
     /**m_2GeV_flag_ECL leaf*/
     int get_2GeV_ECL(int i) const {return m_2GeV_ECL[i];}
 
-    /**#wire hit in SL0*/
-    int get_wire_tsf0() const {return m_wire_tsf0;}
-    /**#wire hit in SL1*/
-    int get_wire_tsf1() const {return m_wire_tsf1;}
-    /**#wire hit in SL2*/
-    int get_wire_tsf2() const {return m_wire_tsf2;}
-    /**#wire hit in SL3*/
-    int get_wire_tsf3() const {return m_wire_tsf3;}
-    /**#wire hit in SL4*/
-    int get_wire_tsf4() const {return m_wire_tsf4;}
+    /** \#wire hit in SL0*/
+    int get_wirecnt_tsf0() const {return m_wirecnt_tsf0;}
+    /** \#wire hit in SL1*/
+    int get_wirecnt_tsf1() const {return m_wirecnt_tsf1;}
+    /** \#wire hit in SL2*/
+    int get_wirecnt_tsf2() const {return m_wirecnt_tsf2;}
+    /** \#wire hit in SL3*/
+    int get_wirecnt_tsf3() const {return m_wirecnt_tsf3;}
+    /** \#wire hit in SL4*/
+    int get_wirecnt_tsf4() const {return m_wirecnt_tsf4;}
+    /** \#wire hit in SL5*/
+    int get_wirecnt_tsf5() const {return m_wirecnt_tsf5;}
+    /** \#wire hit in SL6*/
+    int get_wirecnt_tsf6() const {return m_wirecnt_tsf6;}
+    /** \#wire hit in SL7*/
+    int get_wirecnt_tsf7() const {return m_wirecnt_tsf7;}
+    /** \#wire hit in SL8*/
+    int get_wirecnt_tsf8() const {return m_wirecnt_tsf8;}
 
     /**m_map_TSF0 integer leaf*/
     int get_map_TSF0_int(int i) const {return m_map_TSF0_int[i];}
@@ -405,16 +413,24 @@ namespace Belle2 {
     void set_2GeV_ECL(int i, int c2GeV_ECL)  { m_2GeV_ECL[i] = c2GeV_ECL; }
     void Addto_2GeV_ECL(int c2GeV_ECL)  { m_2GeV_ECL.push_back(c2GeV_ECL) ; }
 
-    /**#wire hit in SL0*/
-    void set_wire_tsf0(int wire_tsf0) { m_wire_tsf0 = wire_tsf0; }
-    /**#wire hit in SL1*/
-    void set_wire_tsf1(int wire_tsf1) { m_wire_tsf1 = wire_tsf1; }
-    /**#wire hit in SL2*/
-    void set_wire_tsf2(int wire_tsf2) { m_wire_tsf2 = wire_tsf2; }
-    /**#wire hit in SL3*/
-    void set_wire_tsf3(int wire_tsf3) { m_wire_tsf3 = wire_tsf3; }
-    /**#wire hit in SL4*/
-    void set_wire_tsf4(int wire_tsf4) { m_wire_tsf4 = wire_tsf4; }
+    /** \#wire hit in SL0*/
+    void set_wirecnt_tsf0(int wirecnt_tsf0) { m_wirecnt_tsf0 = wirecnt_tsf0; }
+    /** \#wire hit in SL1*/
+    void set_wirecnt_tsf1(int wirecnt_tsf1) { m_wirecnt_tsf1 = wirecnt_tsf1; }
+    /** \#wire hit in SL2*/
+    void set_wirecnt_tsf2(int wirecnt_tsf2) { m_wirecnt_tsf2 = wirecnt_tsf2; }
+    /** \#wire hit in SL3*/
+    void set_wirecnt_tsf3(int wirecnt_tsf3) { m_wirecnt_tsf3 = wirecnt_tsf3; }
+    /** \#wire hit in SL4*/
+    void set_wirecnt_tsf4(int wirecnt_tsf4) { m_wirecnt_tsf4 = wirecnt_tsf4; }
+    /** \#wire hit in SL5*/
+    void set_wirecnt_tsf5(int wirecnt_tsf5) { m_wirecnt_tsf5 = wirecnt_tsf5; }
+    /** \#wire hit in SL6*/
+    void set_wirecnt_tsf6(int wirecnt_tsf6) { m_wirecnt_tsf6 = wirecnt_tsf6; }
+    /** \#wire hit in SL7*/
+    void set_wirecnt_tsf7(int wirecnt_tsf7) { m_wirecnt_tsf7 = wirecnt_tsf7; }
+    /** \#wire hit in SL8*/
+    void set_wirecnt_tsf8(int wirecnt_tsf8) { m_wirecnt_tsf8 = wirecnt_tsf8; }
 
     /**m_map_TSF0 integer leaf*/
     void set_map_TSF0_int(int i, int map_TSF0_int)  { m_map_TSF0_int[i] = map_TSF0_int; }
@@ -665,16 +681,24 @@ namespace Belle2 {
     /**m_2GeV_flag_ECL leaf*/
     std::vector<int> m_2GeV_ECL = std::vector<int>(30, 0);
 
-    /**#wire hit in SL0*/
-    int m_wire_tsf0;
-    /**#wire hit in SL2*/
-    int m_wire_tsf2;
-    /**#wire hit in SL4*/
-    int m_wire_tsf4;
-    /**#wire hit in SL1*/
-    int m_wire_tsf1;
-    /**#wire hit in SL3*/
-    int m_wire_tsf3;
+    /** \#wire hit in SL0*/
+    int m_wirecnt_tsf0;
+    /** \#wire hit in SL1*/
+    int m_wirecnt_tsf1;
+    /** \#wire hit in SL2*/
+    int m_wirecnt_tsf2;
+    /** \#wire hit in SL3*/
+    int m_wirecnt_tsf3;
+    /** \#wire hit in SL4*/
+    int m_wirecnt_tsf4;
+    /** \#wire hit in SL5*/
+    int m_wirecnt_tsf5;
+    /** \#wire hit in SL6*/
+    int m_wirecnt_tsf6;
+    /** \#wire hit in SL7*/
+    int m_wirecnt_tsf7;
+    /** \#wire hit in SL8*/
+    int m_wirecnt_tsf8;
 
     /**m_map_TSF0 integer leaf*/
     int m_map_TSF0_int[2];
@@ -780,7 +804,7 @@ namespace Belle2 {
     /**m_maxrvc leafs*/
     int m_maxrvc;
     /** the class title*/
-    ClassDef(TRGGRLUnpackerStore, 2);
+    ClassDef(TRGGRLUnpackerStore, 3);
 
   };
 

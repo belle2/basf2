@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -160,7 +159,7 @@ def mcMatchAndBuildROE(belleOrBelle2Flag='Belle2'):
     @param belleOrBelle2Flag Default is 'Belle2' but 'Belle' is possible.
     """
 
-    # perform MC matching (MC truth asociation). Always before TagV
+    # perform MC matching (MC truth association). Always before TagV
     ma.matchMCTruth(list_name='B0:sig', path=cp_val_path)
 
     # build the rest of the event associated to the B0

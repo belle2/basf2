@@ -290,7 +290,7 @@ namespace Belle2 {
         const CDCTriggerNeuroConfig::B2FormatLine& b2line)
       {
         if (int(b2line.offset + foundtime) >= 0 &&
-            int(b2line.offset + foundtime) <= bitsNN->getEntries()) {
+            int(b2line.offset + foundtime) < bitsNN->getEntries()) {
 
           NNBitStream* bitsn = (*bitsNN)[foundtime + b2line.offset];
 
@@ -349,6 +349,19 @@ namespace Belle2 {
         res = false;
       } else {
         B2WARNING("Invalid input in NNBitstream appending 'false'!");
+        res = false;
+      }
+      return res;
+    }
+    bool decodebool(const std::string& boolstring)
+    {
+      bool res;
+      if (boolstring == "1") {
+        res = true;
+      } else if (boolstring == "0") {
+        res = false;
+      } else {
+        B2WARNING("Invalid input in NNBitstream, appending 'false'!");
         res = false;
       }
       return res;
@@ -1294,6 +1307,18 @@ namespace Belle2 {
                     iclock);
             continue;
           }
+          B2LDataField  p_nntgdl(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("nntgdl"));
+          if ((p_nntgdl.name != "None") && (p_nntgdl.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_nntgdl.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+          B2LDataField  p_sttgdl(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("sttgdl"));
+          if ((p_sttgdl.name != "None") && (p_sttgdl.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_sttgdl.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
 
           // B2LDataField  (bitsNN, iclock, iTracker, neurodb->getB2FormatLine(""));
 
@@ -1510,6 +1535,17 @@ namespace Belle2 {
                   }
                 }
               }
+              if (p_nntgdl.name != "None") {
+                bool dbool = decodebool(p_nntgdl.data);
+                trackNN->setNNTToGDL(dbool);
+                B2DEBUG(20, "NNT to GDL Bit decision for this track is: " << dbool);
+              }
+              if (p_sttgdl.name != "None") {
+                bool dbool = decodebool(p_sttgdl.data);
+                trackNN->setSTTToGDL(dbool);
+                B2DEBUG(20, "STT to GDL Bit decision for this track is: " << dbool);
+              }
+
             }
 
 

@@ -18,7 +18,7 @@ using namespace Belle2;
 
 bool HLTMainLoop::s_interrupted = false;
 
-void HLTMainLoop::signalHandler(int signalValue)
+void HLTMainLoop::signalHandler(int /*signalValue*/)
 {
   B2RESULT("Termination request...");
   HLTMainLoop::s_interrupted = true;

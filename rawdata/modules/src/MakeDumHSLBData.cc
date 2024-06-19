@@ -69,20 +69,23 @@ void MakeDumHSLBDataModule::writeData(RawCOPPER* raw_copper, int i)
     if (nwords > 0) {
       printf("===== Detector Buffer(FINESSE A) 0x%x words \n", raw_copper->GetDetectorNwords(i, 0));
       int header = 0xCAFEBABE;
-      int len = 0;
-      if ((len = write(m_filefd, &header, sizeof(int))) != sizeof(int)) {
+      int len = write(m_filefd, &header, sizeof(int));
+      if (len != sizeof(int)) {
         perror("write error");
         exit(1);
       }
-      if ((len = write(m_filefd, &eve_num, sizeof(int))) != sizeof(int)) {
+      len = write(m_filefd, &eve_num, sizeof(int));
+      if (len != sizeof(int)) {
         perror("write error");
         exit(1);
       }
-      if ((len = write(m_filefd, &cpr_id, sizeof(int))) != sizeof(int)) {
+      len = write(m_filefd, &cpr_id, sizeof(int));
+      if (len != sizeof(int)) {
         perror("write error");
         exit(1);
       }
-      if ((len = write(m_filefd, &nwords, sizeof(int))) != sizeof(int)) {
+      len = write(m_filefd, &nwords, sizeof(int));
+      if (len != sizeof(int)) {
         perror("write error");
         exit(1);
       }

@@ -79,7 +79,7 @@ namespace Belle2 {
        * the same set of fit parameters).
        *
        * For detailed description of the fit algorithm, see ECL-TN-2013-02
-       * (latest version at https://stash.desy.de/users/remnev/repos/ecl-tn-2013-02/browse/digi.pdf)
+       * (latest version at https://gitlab.desy.de/belle2/documents/ecl-tn-2013-02/-/blob/master/digi.pdf)
        */
       struct fitparamspure_t {
         /** Matrix used in shape fit algorithm.
@@ -87,9 +87,9 @@ namespace Belle2 {
          *   0     -> special point that represents average pedestal value
          *   1..15 -> signal samples
          *  2nd index (j): tabulated point ID
-         *   0                            -> point at the ADC sample #i
-         *   1..(m_ndtPure-1)             -> points to the right of ADC sample #i
-         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of ADC sample #i
+         *   0                            -> point at the ADC sample \#i
+         *   1..(m_ndtPure-1)             -> points to the right of ADC sample \#i
+         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of ADC sample \#i
          */
         typedef double double_matrix[16][2 * m_ndtPure];
         /** Array used in shape fit algorithm.

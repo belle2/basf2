@@ -8,10 +8,15 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
-#include <TVector3.h>
-#include <math.h>
+
+/* ROOT headers. */
+#include <Math/Vector3D.h>
 #include <TMatrixDSym.h>
+
+/* C++ headers. */
+#include <cmath>
 
 namespace Belle2 {
 
@@ -298,7 +303,7 @@ namespace Belle2 {
     double getR() const { return m_r; }
 
     /*! Get Error Array for Energy->[0], Phi->[2], Theta->[5]
-     * @return Error Array for Energy->[0], Phi->[2], Theta->[5]
+     * @param covArray array which gets filled with errors for Energy->[0], Phi->[2], Theta->[5]
      */
     void getCovarianceMatrixAsArray(double covArray[6]) const
     {
@@ -439,13 +444,13 @@ namespace Belle2 {
 
 
 
-    //! The method to get return  TVector3 Momentum
-    TVector3 getMomentum() const
+    //! The method to get return  ROOT::Math::XYZVector Momentum
+    ROOT::Math::XYZVector getMomentum() const
     {
-      return TVector3(
-               m_energy * sin(m_theta) * cos(m_phi),
-               m_energy * sin(m_theta) * sin(m_phi),
-               m_energy * cos(m_theta)
+      return ROOT::Math::XYZVector(
+               m_energy * std::sin(m_theta) * std::cos(m_phi),
+               m_energy * std::sin(m_theta) * std::sin(m_phi),
+               m_energy * std::cos(m_theta)
              );
     }
 

@@ -172,10 +172,10 @@ TrgEclDigitizer::getTCHit(int TableFlag)
       float hitTOF      = aECLSimHit->getFlightTime() / Unit::ns;
 
       G4ThreeVector t = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
-      TVector3 HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
-      TVector3 PosCell  = eclp->GetCrystalPos(hitCellId);// [cm], Xtal position (based on from IP)
-      TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
-      float local_pos_r = (15.0 - (HitInPos - PosCell) * VecCell);
+      ROOT::Math::XYZVector HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      ROOT::Math::XYZVector PosCell  = eclp->GetCrystalPos(hitCellId);// [cm], Xtal position (based on from IP)
+      ROOT::Math::XYZVector VecCell  = eclp->GetCrystalVec(hitCellId);
+      float local_pos_r = 15.0 - (HitInPos - PosCell).Dot(VecCell);
       if (hitTOF < - TimeRange || hitTOF >  TimeRange) {continue;}
       int TimeIndex = (int)((hitTOF + TimeRange) / 100);
       E_cell[hitCellId][TimeIndex]  = E_cell[hitCellId][TimeIndex]  + hitE;

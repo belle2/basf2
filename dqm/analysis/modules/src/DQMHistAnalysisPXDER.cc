@@ -32,13 +32,13 @@ REG_MODULE(DQMHistAnalysisPXDER);
 
 DQMHistAnalysisPXDERModule::DQMHistAnalysisPXDERModule() : DQMHistAnalysisModule()
 {
-  //Set module properties
+  // This module CAN NOT be run in parallel!
   setDescription("PXD DQM analysis module for Express Reco ");
+
+  // Set module properties
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms were placed",
            std::string("PXDER"));
   addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
-
-  // NO parallel processing
 }
 
 
@@ -462,3 +462,18 @@ int DQMHistAnalysisPXDERModule::SetFlag(int Type, int bin, const double* pars, d
 //   delete refhistF;
 //   return ret;
 // }
+
+void DQMHistAnalysisPXDERModule::terminate()
+{
+  if (m_refFile) delete m_refFile;
+  if (m_fFiredFlag) delete m_fFiredFlag;
+  if (m_fClustersFlag) delete m_fClustersFlag;
+  if (m_fStartRowFlag) delete m_fStartRowFlag;
+  if (m_fChargStartRowFlag) delete m_fChargStartRowFlag;
+  if (m_fStartRowCountFlag) delete m_fStartRowCountFlag;
+  if (m_fClusterChargeFlag) delete m_fClusterChargeFlag;
+  if (m_fPixelSignalFlag) delete m_fPixelSignalFlag;
+  if (m_fClusterSizeUFlag) delete m_fClusterSizeUFlag;
+  if (m_fClusterSizeVFlag) delete m_fClusterSizeVFlag;
+  if (m_fClusterSizeUVFlag) delete m_fClusterSizeUVFlag;
+}

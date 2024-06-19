@@ -157,14 +157,14 @@ void BKLMTrack::setLocalTrackParamErr(const CLHEP::HepSymMatrix& trkParErr)
 }
 
 //! Get the positon in local coordinate system of track intercept in plane of constant x
-TVector3 BKLMTrack::getLocalIntercept(double x)
+ROOT::Math::XYZVector BKLMTrack::getLocalIntercept(double x)
 {
 
-  TVector3 intercept;
+  ROOT::Math::XYZVector intercept;
 
-  intercept[0] =  x ;
-  intercept[1] =  m_LocalTrackParam[ 0 ] + x * m_LocalTrackParam[ 1 ] ;
-  intercept[2] =  m_LocalTrackParam[ 2 ] + x * m_LocalTrackParam[ 3 ] ;
+  intercept.SetX(x);
+  intercept.SetY(m_LocalTrackParam[ 0 ] + x * m_LocalTrackParam[ 1 ]);
+  intercept.SetZ(m_LocalTrackParam[ 2 ] + x * m_LocalTrackParam[ 3 ]);
 
   return intercept;
 

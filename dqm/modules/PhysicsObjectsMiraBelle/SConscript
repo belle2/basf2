@@ -2,6 +2,7 @@ Import('env')
 
 # env['CONTINUE'] = False
 
-env['LIBS'] = ['framework','analysis','mdst_dataobjects','analysis_dataobjects','top','arich_dataobjects','klm_dataobjects', 'analysis_utility']
+env['LIBS'] = ['framework','analysis','mdst_dataobjects','analysis_dataobjects','top','arich_dataobjects','klm_dataobjects', 'analysis_utility',
+               'analysis_ClusterUtility', 'analysis_ContinuumSuppression']
 
 Return('env')

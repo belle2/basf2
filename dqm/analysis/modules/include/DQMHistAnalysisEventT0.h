@@ -13,6 +13,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <TEfficiency.h>
 
 namespace Belle2 {
 
@@ -33,18 +34,23 @@ namespace Belle2 {
     /** clear TCanvas */
     void beginRun() override final;
 
+    /** Event */
+    void event() override final;
+
     /** fit the histograms */
     void endRun() override final;
 
     /** delete pointers */
     void terminate() override final;
 
-    std::string m_prefixCanvas; /**< prefix to be added to canvas name when saved as pdf*/
-    bool m_printCanvas; /**< if true print the pdf of the canvases */
-
   private:
 
-    int m_nEntriesMin = 100; /**< minimum number of entries to process the histogram*/
+    /** prefix to be added to canvas name when saved as pdf */
+    std::string m_prefixCanvas;
+    /** if true print the pdf of the canvases */
+    bool m_printCanvas;
+    /** minimum number of entries to process the histogram */
+    uint m_nEntriesMin = 100;
     /** process the EventT0 distribution
      * fitting with two gaussians
      * filling the MonitoringObject
@@ -60,17 +66,67 @@ namespace Belle2 {
     */
     static double fDoubleGaus(double* x, double* par);
 
-    TCanvas* m_cECLTRG = nullptr; /**< TOP EventT0 for ECLTRG plots canvas */
-    TCanvas* m_cCDCTRG = nullptr; /**< TOP EventT0 for Hadron CDCTRG plots canvas */
-    TPad* m_pad1ECLTRG = nullptr; /**< pad for ECLTRG hadrons */
-    TPad* m_pad2ECLTRG = nullptr; /**< pad for ECLTRG bhabhas */
-    TPad* m_pad3ECLTRG = nullptr; /**< pad for ECLTRG mumuss */
+    TCanvas* m_cTOPTimeForECLTRG = nullptr; /**< TOP EventT0 for ECLTRG plots canvas */
+    TCanvas* m_cTOPTimeForCDCTRG = nullptr; /**< TOP EventT0 for CDCTRG plots canvas */
+    TCanvas* m_cSVDTimeForECLTRG = nullptr; /**< SVD EventT0 for ECLTRG plots canvas */
+    TCanvas* m_cSVDTimeForCDCTRG = nullptr; /**< SVD EventT0 for CDCTRG plots canvas */
 
-    TPad* m_pad1CDCTRG = nullptr; /**< pad for CDCTRG hadrons */
-    TPad* m_pad2CDCTRG = nullptr; /**< pad for CDCTRG bhabhas */
-    TPad* m_pad3CDCTRG = nullptr; /**< pad for CDCTRG mumus */
+    TPad* m_topPad1ECLTRG = nullptr; /**< pad for TOP time ECLTRG hadrons */
+    TPad* m_topPad2ECLTRG = nullptr; /**< pad for TOP time ECLTRG bhabhas */
+    TPad* m_topPad3ECLTRG = nullptr; /**< pad for TOP time ECLTRG mumu */
+
+    TPad* m_topPad1CDCTRG = nullptr; /**< pad for TOP time CDCTRG hadrons */
+    TPad* m_topPad2CDCTRG = nullptr; /**< pad for TOP time CDCTRG bhabhas */
+    TPad* m_topPad3CDCTRG = nullptr; /**< pad for TOP time CDCTRG mumu */
+
+    TPad* m_svdPad1ECLTRG = nullptr; /**< pad for SVD time ECLTRG hadrons */
+    TPad* m_svdPad2ECLTRG = nullptr; /**< pad for SVD time ECLTRG bhabhas */
+    TPad* m_svdPad3ECLTRG = nullptr; /**< pad for SVD time ECLTRG mumu */
+
+    TPad* m_svdPad1CDCTRG = nullptr; /**< pad for SVD time CDCTRG hadrons */
+    TPad* m_svdPad2CDCTRG = nullptr; /**< pad for SVD time CDCTRG bhabhas */
+    TPad* m_svdPad3CDCTRG = nullptr; /**< pad for SVD time CDCTRG mumu */
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
+
+    TCanvas* m_cT0FractionsForHadrons = nullptr; /**< EventT0 fractions plots canvas for hadron events */
+    TCanvas* m_cT0FractionsForBhaBhas = nullptr; /**< EventT0 fractions plots canvas for BhaBha events */
+    TCanvas* m_cT0FractionsForMuMus   = nullptr; /**< EventT0 fractions plots canvas for MuMu events */
+
+    TPad* m_pHadronECLTRG = nullptr; /**< pad for time fractions for ECLTRG hadrons */
+    TPad* m_pHadronCDCTRG = nullptr; /**< pad for time fractions for CDCTRG hadrons */
+    TPad* m_pHadronTOPTRG = nullptr; /**< pad for time fractions for TOPTRG hadrons */
+
+    TPad* m_pBhaBhaECLTRG = nullptr; /**< pad for time fractions for ECLTRG bhabhas */
+    TPad* m_pBhaBhaCDCTRG = nullptr; /**< pad for time fractions for CDCTRG bhabhas */
+    TPad* m_pBhaBhaTOPTRG = nullptr; /**< pad for time fractions for TOPTRG bhabhas */
+
+    TPad* m_pMuMuECLTRG = nullptr; /**< pad for time fractions for ECLTRG mumu */
+    TPad* m_pMuMuCDCTRG = nullptr; /**< pad for time fractions for CDCTRG mumu */
+    TPad* m_pMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
+
+    /// EventT0 algorithms for which to calculate fractions of abundance
+    const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP", "Any"};
+    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
+    TEfficiency* m_eAlgorithmSourceFractionsHadronL1ECLTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger
+    TEfficiency* m_eAlgorithmSourceFractionsHadronL1CDCTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by TOP trigger
+    TEfficiency* m_eAlgorithmSourceFractionsHadronL1TOPTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by ECL trigger
+    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by CDC trigger
+    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by TOP trigger
+    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by ECL trigger
+    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1ECLTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by CDC trigger
+    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1CDCTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by TOP trigger
+    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1TOPTRG = nullptr;
+    /// Fill the TEfficiency plots
+    bool FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff);
   };
 } // end namespace Belle2
 

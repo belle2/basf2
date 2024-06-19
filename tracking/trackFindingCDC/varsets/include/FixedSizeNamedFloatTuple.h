@@ -87,8 +87,8 @@ namespace Belle2 {
      *  This object template provides the memory and the names of the float values.
      *
      *  @tparam ANames Class with two contained parameters:
-     *  @args@c nVars Number of parts that will be peeled from the complex object.
-     *  @args@c names  Array of names which contain the nVars names of the float values.
+     *  @arg nVars : Number of parts that will be peeled from the complex object.
+     *  @arg names : Array of names which contain the nVars names of the float values.
      */
     template<class ANames>
     class FixedSizeNamedFloatTuple : public NamedFloatTuple {
@@ -153,7 +153,8 @@ namespace Belle2 {
       }
 
       /// Setter for the ith value.
-      void set(int iValue, Float_t value) final {
+      void set(int iValue, Float_t value) final
+      {
         assert(iValue < (int)nVars);
         assert(iValue >= 0);
         m_values[iValue] = value;
@@ -200,7 +201,8 @@ namespace Belle2 {
       }
 
       /// Reference getter for the ith value.
-      Float_t& operator[](int iValue) final {
+      Float_t& operator[](int iValue) final
+      {
         assert(iValue < (int)nVars);
         assert(iValue >= 0);
         return m_values[iValue];

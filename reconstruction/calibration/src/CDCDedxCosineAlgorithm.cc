@@ -12,6 +12,7 @@
 #include <TLine.h>
 #include <TCanvas.h>
 #include <TH1I.h>
+#include <vector>
 
 using namespace Belle2;
 //-----------------------------------------------------------------
@@ -59,7 +60,8 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
 
   // make histograms to store dE/dx values in bins of cos(theta)
   // bin size can be arbitrary, but for now just make uniform bins
-  TH1D* hdEdx_elCosbin[fCosbins], *hdEdx_poCosbin[fCosbins], *hdEdx_epCosbin[fCosbins];
+  std::vector<TH1D*>  hdEdx_elCosbin(fCosbins), hdEdx_poCosbin(fCosbins), hdEdx_epCosbin(fCosbins);
+
   const double binW = (fCosMax - fCosMin) / fCosbins;
 
   for (unsigned int i = 0; i < fCosbins; ++i) {

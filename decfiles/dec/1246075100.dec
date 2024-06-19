@@ -1,0 +1,91 @@
+# EventType: 1246075100 
+# Descriptor: [B+ -> anti-D0 D_s0*+ or D_s1+ anti-D0] cc
+# NickName: Bp2D0*Ds(1)+_sevendecays
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: WU KUAN YING
+# Email: 410280161@m365.fju.edu.tw
+# Cuts: None
+# Date: 20240216 #
+
+Alias          D_s0*+sig         D_s0*+
+Alias          D_s0*-sig         D_s0*-
+ChargeConj     D_s0*+sig         D_s0*-sig 
+
+Alias          D_s*+sig           D_s*+
+Alias          D_s*-sig           D_s*-
+ChargeConj     D_s*+sig           D_s*-sig
+
+Alias          D_s1+sig           D_s1+
+Alias          D_s1-sig           D_s1-
+ChargeConj     D_s1+sig           D_s1-sig
+
+Alias          K*0sig            K*0 
+Alias          anti-K*0sig       anti-K*0
+ChargeConj     K*0sig            anti-K*0sig 
+
+Alias          K_S0sig            K_S0
+Alias          phisig            phi
+Alias          pi0sig            pi0
+
+Decay Upsilon(4S)
+0.500   B+sig     B-   VSS;
+0.500   B+     B-sig   VSS;
+Enddecay
+
+Decay B+sig
+0.7113238790   anti-D0sig        D_s0*+sig     PHSP;
+0.2886761210   D_s1+sig          anti-D0sig    SVS;
+Enddecay
+CDecay B-sig
+
+Decay D_s1+sig
+0.800000      D_s*+sig           pi0sig        PARTWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+0.180000      D_s+sig            gamma      VSP_PWAVE;
+0.020000      D_s0*+sig          gamma      VSP_PWAVE;
+Enddecay
+CDecay D_s1-sig
+
+Decay D_s0*+sig
+1.0     D_s+sig         pi0sig          PHSP;
+Enddecay  
+CDecay D_s0*-sig 
+
+Decay D0sig 
+0.039500000   K-  pi+  PHSP;
+0.008800000   K-  pi+  pi+  pi-   PHSP;
+0.144000000   K-  pi+  pi0sig   D_DALITZ;
+Enddecay  
+CDecay anti-D0sig
+
+Decay D_s*+sig
+1.000000      D_s+sig            gamma  VSP_PWAVE;
+Enddecay
+CDecay D_s*-sig
+
+Decay D_s+sig
+0.007623     phisig          pi+          pi0sig        PHSP;
+0.022037     phisig          pi+          PHSP;
+0.013059     anti-K*0sig          K+           SVS;
+0.015         K_S0sig         K+     PHSP;
+Enddecay
+CDecay D_s-sig
+
+Decay pi0sig
+1.000          gamma         gamma    PHSP;
+Enddecay
+
+Decay phisig
+1.0     K+               K-          VSS;
+Enddecay
+
+Decay K*0sig
+1.0     K+              pi-          VSS;
+Enddecay
+CDecay anti-K*0sig
+
+Decay K_S0sig
+1.000         pi+           pi-  PHSP;
+Enddecay
+
+End

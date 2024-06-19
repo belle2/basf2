@@ -77,7 +77,7 @@ namespace Belle2 {
    *      - Also the relation from PRTrack to MCParticle is added.
    *      - The purity relation is setup from the PRTrack to the MCTrack with the (positive) purity as weight.
    *
-   * - WRONG CHARGE
+   *  - WRONG CHARGE
    *      - The highest efficiency PRTrack of the highest purity MCTrack to this PRTrack is the same as this PRTrack.
    *      - But, the charge of the PRTrack and the one of the MCTrack are NOT the same.
    *      - This means the PRTrack contains a high contribution of only one MCTrack and

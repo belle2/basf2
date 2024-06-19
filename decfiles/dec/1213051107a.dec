@@ -1,0 +1,38 @@
+# EventType: 1213051107a
+# Descriptor: [B+ -> [anti-D*0 (anti-D0 -> (K_S0 -> pi+ pi-) K+ K-) gamma ] K+]cc
+# NickName: Bu_DstK+_DsttoDgamma_DtoKSK+K-_KStopi+pi-
+# Documentation: For phi3 GGSZ studies. SVS decay of B. Dalitz decay of D. 
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: Ansu Johnson
+# Email: ansujohnson@smail.iitm.ac.in
+# Cuts: None
+# Date: 13/06/2023
+#
+
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B+sig
+1.0 anti-D*0sig K+ PHOTOS SVS;
+Enddecay
+CDecay B-sig
+
+Decay anti-D*0sig
+1.000000 anti-D0sig gamma VSP_PWAVE; 
+Enddecay
+CDecay D*0sig
+
+Decay anti-D0sig
+1.0 K_S0  K+  K-   PHOTOS D_DALITZ;
+Enddecay
+CDecay D0sig
+
+Decay K_S0
+1.0 pi+ pi- PHSP;
+Enddecay
+
+End

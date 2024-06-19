@@ -37,29 +37,29 @@ namespace Belle2 {
       // Check if correct arguments
       if (abs(transition[0]) != 1) {
         B2ERROR("The parameter variable hasCharmedDaughter() only accepts 1 or -1 as an argument.");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Check if particle exists
       if (!particle) {
         B2ERROR("This particle does not exist!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Check if MC particle exists
       const MCParticle* mcp = particle->getMCParticle();
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // MCParticle should be related to a B meson
       if (abs(mcp->getPDG()) != 511 and abs(mcp->getPDG()) != 521)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // Check if the particle has daughters
       int nDaughters = int(mcp->getNDaughters());
       if (nDaughters < 1) {
         B2ERROR("This particle does not have any daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Get the PDG sign and load daughters
@@ -91,23 +91,23 @@ namespace Belle2 {
       // Check if particle exists
       if (!particle) {
         B2ERROR("This particle does not exist!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Check if MC particle exists
       const MCParticle* mcp = particle->getMCParticle();
       if (!mcp)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // MCParticle should be related to a B meson
       if (abs(mcp->getPDG()) != 511 and abs(mcp->getPDG()) != 521)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       // Check if the particle has daughters
       int nDaughters = int(mcp->getNDaughters());
       if (nDaughters < 1) {
         B2ERROR("This particle does not have any daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Load daughters
@@ -129,14 +129,14 @@ namespace Belle2 {
       // Check if particle exists
       if (!particle) {
         B2ERROR("This particle does not exist!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Check if the particle has daughters
       int nDaughters = int(particle->getNDaughters());
       if (nDaughters < 1) {
         B2ERROR("This particle does not have any daughters!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       // Load daughters

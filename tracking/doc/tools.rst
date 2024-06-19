@@ -1,4 +1,4 @@
-.. _tracking_tools: 
+.. _tracking_tools:
 
 Tools
 -----

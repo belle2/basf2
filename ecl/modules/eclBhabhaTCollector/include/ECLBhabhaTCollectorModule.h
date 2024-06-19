@@ -9,12 +9,11 @@
 #pragma once
 
 /* ECL headers. */
-#include <ecl/utility/ECLChannelMapper.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 #include <ecl/utility/ECLTimingUtilities.h>
 
 /* Basf2 headers. */
 #include <calibration/CalibrationCollectorModule.h>
-#include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>

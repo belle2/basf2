@@ -52,6 +52,18 @@ KLMDQMModule::KLMDQMModule() :
   addParam("histogramDirectoryName", m_HistogramDirectoryName,
            "Directory for KLM DQM histograms in ROOT file.",
            std::string("KLM"));
+  addParam("RPCTimeMin", m_RPCTimeMin,
+           "Min time for RPC time histogram.", double(-1223.5));
+  addParam("RPCTimeMax", m_RPCTimeMax,
+           "Max time for RPC time histogram.", double(-199.5));
+  addParam("BKLMScintTimeMin", m_BKLMScintTimeMin,
+           "Min time for BKLM scintillator time histogram.", double(-5300));
+  addParam("BKLMScintTimeMax", m_BKLMScintTimeMax,
+           "Max time for BKLM scintillator time histogram.", double(-4300));
+  addParam("EKLMScintTimeMin", m_EKLMScintTimeMin,
+           "Min time for EKLM scintillator time histogram.", double(-5300));
+  addParam("EKLMScintTimeMax", m_EKLMScintTimeMax,
+           "Max time for EKLM scintillator time histogram.", double(-4300));
 }
 
 KLMDQMModule::~KLMDQMModule()
@@ -85,15 +97,15 @@ void KLMDQMModule::defineHisto()
   m_DAQInclusion->GetXaxis()->SetBinLabel(1, "No");
   m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
   /* Time histograms. */
-  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1223.5, -199.5);
+  m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, m_RPCTimeMin, m_RPCTimeMax);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorBKLM =
     new TH1F("time_scintillator_bklm", "Scintillator hit time (BKLM)",
-             100, -5000, -4000);
+             100, m_BKLMScintTimeMin, m_BKLMScintTimeMax);
   m_TimeScintillatorBKLM->GetXaxis()->SetTitle("Time, ns");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
-             100, -5100, -4100);
+             100, m_EKLMScintTimeMin, m_EKLMScintTimeMax);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",

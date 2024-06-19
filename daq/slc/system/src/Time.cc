@@ -122,13 +122,6 @@ void Time::writeObject(Writer& w) const
   w.writeLong(m_us);
 }
 
-Time& Time::operator = (const Time& t)
-{
-  m_s =  t.m_s;
-  m_us =  t.m_us;
-  return *this;
-}
-
 bool Time::operator == (const Time& t) const
 {
   return (m_s == t.m_s) && (m_us == t.m_us);

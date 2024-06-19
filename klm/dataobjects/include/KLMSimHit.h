@@ -17,7 +17,7 @@
 
 /* ROOT headers. */
 #include <Math/Vector4D.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
 
 namespace Belle2 {
 
@@ -347,9 +347,9 @@ namespace Belle2 {
      * Get ihit local position.
      * @return Hit coordinates.
      */
-    TVector3 getLocalPosition() const
+    ROOT::Math::XYZVector getLocalPosition() const
     {
-      return TVector3(m_localX, m_localY, m_localZ);
+      return ROOT::Math::XYZVector(m_localX, m_localY, m_localZ);
     }
 
     /**
@@ -369,7 +369,7 @@ namespace Belle2 {
      * Set hit global position.
      * @param[in] pos Position.
      */
-    void setPosition(const TVector3& pos)
+    void setPosition(const ROOT::Math::XYZVector& pos)
     {
       m_globalX = pos.X();
       m_globalY = pos.Y();
@@ -407,9 +407,9 @@ namespace Belle2 {
      * Get hit global position.
      * @return Hit coordinates.
      */
-    TVector3 getPosition() const
+    ROOT::Math::XYZVector getPosition() const
     {
-      return TVector3(m_globalX, m_globalY, m_globalZ);
+      return ROOT::Math::XYZVector(m_globalX, m_globalY, m_globalZ);
     }
 
     /**

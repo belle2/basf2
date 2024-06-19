@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -50,7 +49,7 @@ class CosmicAnalysis(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(CosmicAnalysis, self).__init__()
+        super().__init__()
 
         #: Input root file
         self.rootfile = ROOT.TFile('cosmicAnalysis.root', 'recreate')

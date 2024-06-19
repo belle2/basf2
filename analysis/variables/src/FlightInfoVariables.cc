@@ -48,25 +48,23 @@ namespace Belle2 {
                                    const bool motherToGranddaughter = false)
     {
       if (!particle || !daughter) {
-        outErr = std::numeric_limits<float>::quiet_NaN();
-        return std::numeric_limits<float>::quiet_NaN();
+        outErr = Const::doubleNaN;
+        return Const::doubleNaN;
       }
-      // check if the particle source is a composite particle
-      if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_Composite) ||
-          !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_Composite)) {
-        // check if the particle source is a V0
-        if (!(particle->getParticleSource() == Particle::EParticleSourceObject::c_V0) ||
-            !(daughter->getParticleSource() == Particle::EParticleSourceObject::c_V0)) {
-          B2WARNING("Attempting to calculate flight " << mode << " for neither composite particle nor V0");
-          outErr = std::numeric_limits<float>::quiet_NaN();
-          return std::numeric_limits<float>::quiet_NaN();
-        }
+      // check if the particle source is a composite particle or a V0
+      if ((particle->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+           particle->getParticleSource() != Particle::EParticleSourceObject::c_V0) or
+          (daughter->getParticleSource() != Particle::EParticleSourceObject::c_Composite and
+           daughter->getParticleSource() != Particle::EParticleSourceObject::c_V0)) {
+        B2WARNING("Attempting to calculate flight " << mode << " for neither composite particle nor V0");
+        outErr = Const::doubleNaN;
+        return Const::doubleNaN;
       }
       if (!(mode == "distance") && !(mode == "time")) {
         B2WARNING("FlightInfo helper function called with mode '" << mode
                   << "'. Only 'distance' and 'time' are available.");
-        outErr = std::numeric_limits<float>::quiet_NaN();
-        return std::numeric_limits<float>::quiet_NaN();
+        outErr = Const::doubleNaN;
+        return Const::doubleNaN;
       }
       // get TreeFitter values if they exist.
       // Bypass this in case the variables are requested for the granddaughter with respect to the mother as
@@ -202,8 +200,8 @@ namespace Belle2 {
         outErr = sqrt(result[0][0]);
         return fT;
       }
-      outErr = std::numeric_limits<float>::quiet_NaN();
-      return std::numeric_limits<float>::quiet_NaN();
+      outErr = Const::doubleNaN;
+      return Const::doubleNaN;
     }
 
     // Helper function for MC flight time and distance
@@ -211,7 +209,7 @@ namespace Belle2 {
     {
 
       if (mcparticle == nullptr)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
 
       if (mode == "distance") {
@@ -226,7 +224,7 @@ namespace Belle2 {
       if (mode == "time") {
         double lifetime = mcparticle->getLifetime();
         double mass = mcparticle->getMass();
-        double time = std::numeric_limits<float>::quiet_NaN();
+        double time = Const::doubleNaN;
         if (mass == 0)
           B2WARNING("you are asking for the proper time of a massless particle which is not allowed, returning -99.");
         else {
@@ -242,32 +240,32 @@ namespace Belle2 {
       }
       B2WARNING("MCFlightInfo helper function called with mode '" << mode
                 << "'. Only 'distance' and 'time' are available.");
-      return std::numeric_limits<float>::quiet_NaN();
+      return Const::doubleNaN;
 
     }
 
     double flightDistance(const Particle* part)
     {
-      double flightDistanceError = std::numeric_limits<float>::quiet_NaN();
+      double flightDistanceError = Const::doubleNaN;
       return getFlightInfoBtw(part, part, flightDistanceError, "distance");
     }
 
     double flightTime(const Particle* part)
     {
-      double flightTimeError = std::numeric_limits<float>::quiet_NaN();
+      double flightTimeError = Const::doubleNaN;
       return getFlightInfoBtw(part, part, flightTimeError, "time");
     }
 
     double flightDistanceErr(const Particle* part)
     {
-      double flightDistanceError = std::numeric_limits<float>::quiet_NaN();
+      double flightDistanceError = Const::doubleNaN;
       getFlightInfoBtw(part, part, flightDistanceError, "distance");
       return flightDistanceError;
     }
 
     double flightTimeErr(const Particle* part)
     {
-      double flightTimeError = std::numeric_limits<float>::quiet_NaN();
+      double flightTimeError = Const::doubleNaN;
       getFlightInfoBtw(part, part, flightTimeError, "time");
       return flightTimeError;
     }
@@ -276,8 +274,8 @@ namespace Belle2 {
                                     bool prodVertIsIP = false)
     {
       if (!particle || !daughter) {
-        vertexDistanceErr = std::numeric_limits<float>::quiet_NaN();
-        return std::numeric_limits<float>::quiet_NaN();
+        vertexDistanceErr = Const::doubleNaN;
+        return Const::doubleNaN;
       }
 
       // production vertex
@@ -352,18 +350,18 @@ namespace Belle2 {
 
     double vertexDistance(const Particle* part)
     {
-      double vertexDistanceError = std::numeric_limits<float>::quiet_NaN();
+      double vertexDistanceError = Const::doubleNaN;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return getVertexDistance(part, part, vertexDistanceError);
     }
 
     double vertexDistanceErr(const Particle* part)
     {
-      double vertexDistanceError = std::numeric_limits<float>::quiet_NaN();
+      double vertexDistanceError = Const::doubleNaN;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       getVertexDistance(part, part, vertexDistanceError);
       return vertexDistanceError;
@@ -371,9 +369,9 @@ namespace Belle2 {
 
     double vertexDistanceSignificance(const Particle* part)
     {
-      double vertexDistanceError = std::numeric_limits<float>::quiet_NaN();
+      double vertexDistanceError = Const::doubleNaN;
       if (!part->hasExtraInfo("prodVertX") || !part->hasExtraInfo("prodVertY") || !part->hasExtraInfo("prodVertZ")) {
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       return getVertexDistance(part, part, vertexDistanceError) / vertexDistanceError;
     }
@@ -381,19 +379,19 @@ namespace Belle2 {
     double flightTimeOfDaughter(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       long daughterNumber = -1;
       if (daughters.size() > 0) {
         daughterNumber = std::lround(daughters[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to flightTimeOfDaughter!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to flightTimeOfDaughter is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       long grandDaughterNumber = -1;
@@ -408,7 +406,7 @@ namespace Belle2 {
           return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeError, "time", true);
         } else {
           B2ERROR("The granddaughter index provided to flightTimeOfDaughter is too large!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       } else {
         return getFlightInfoBtw(particle, daughter, flightTimeError, "time");
@@ -419,19 +417,19 @@ namespace Belle2 {
     double flightTimeOfDaughterErr(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       long daughterNumber = -1;
       if (daughters.size() > 0) {
         daughterNumber = std::lround(daughters[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to flightTimeOfDaughterErr!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to flightTimeOfDaughterErr is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       long grandDaughterNumber = -1;
@@ -440,7 +438,7 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double flightTimeError = std::numeric_limits<float>::quiet_NaN();;
+      double flightTimeError = Const::doubleNaN;;
       if (grandDaughterNumber > -1) {
         if (grandDaughterNumber < (int)daughter->getNDaughters()) {
           getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightTimeError, "time", true);
@@ -456,19 +454,19 @@ namespace Belle2 {
     double flightDistanceOfDaughter(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       long daughterNumber = -1;
       if (daughters.size() > 0) {
         daughterNumber = std::lround(daughters[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to flightDistanceOfDaughter!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to flightDistanceOfDaughter is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       long grandDaughterNumber = -1;
@@ -483,7 +481,7 @@ namespace Belle2 {
           return getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceError, "distance", true);
         } else {
           B2ERROR("The granddaughter index provided to flightDistanceOfDaughter is too large!");
-          return std::numeric_limits<float>::quiet_NaN();
+          return Const::doubleNaN;
         }
       } else {
         return getFlightInfoBtw(particle, daughter, flightDistanceError, "distance");
@@ -494,19 +492,19 @@ namespace Belle2 {
     double flightDistanceOfDaughterErr(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       long daughterNumber = -1;
       if (daughters.size() > 0) {
         daughterNumber = std::lround(daughters[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to flightDistanceOfDaughterErr!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to flightDistanceOfDaughterErr is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       long grandDaughterNumber = -1;
@@ -515,7 +513,7 @@ namespace Belle2 {
       }
 
       const Particle* daughter = particle->getDaughter(daughterNumber);
-      double flightDistanceError = std::numeric_limits<float>::quiet_NaN();
+      double flightDistanceError = Const::doubleNaN;
       if (grandDaughterNumber > -1) {
         if (grandDaughterNumber < (int)daughter->getNDaughters()) {
           getFlightInfoBtw(particle, daughter->getDaughter(grandDaughterNumber), flightDistanceError, "distance", true);
@@ -532,18 +530,18 @@ namespace Belle2 {
     double vertexDistanceOfDaughter(const Particle* particle, const std::vector<double>& arguments)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
       long daughterNumber = -1;
       if (arguments.size() > 0) {
         daughterNumber = std::lround(arguments[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to vertexDistanceOfDaughter!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to vertexDistanceOfDaughter is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       bool prodVertIsIP = true;
@@ -560,18 +558,18 @@ namespace Belle2 {
     double vertexDistanceOfDaughterErr(const Particle* particle, const std::vector<double>& arguments)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
       long daughterNumber = -1;
       if (arguments.size() > 0) {
         daughterNumber = std::lround(arguments[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to vertexDistanceOfDaughterErr!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to vertexDistanceOfDaughterErr is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       bool prodVertIsIP = true;
@@ -589,18 +587,18 @@ namespace Belle2 {
     double vertexDistanceOfDaughterSignificance(const Particle* particle, const std::vector<double>& arguments)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
       long daughterNumber = -1;
       if (arguments.size() > 0) {
         daughterNumber = std::lround(arguments[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to vertexDistanceOfDaughterSignificance!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to vertexDistanceOfDaughterSignificance is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       bool prodVertIsIP = true;
@@ -618,12 +616,12 @@ namespace Belle2 {
     double mcFlightDistance(const Particle* particle)
     {
       if (particle == nullptr)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       const MCParticle* mcparticle = particle->getMCParticle();
 
       if (mcparticle == nullptr)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       return getMCFlightInfoBtw(mcparticle, "distance");
     }
@@ -631,12 +629,12 @@ namespace Belle2 {
     double mcFlightTime(const Particle* particle)
     {
       if (particle == nullptr)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       const MCParticle* mcparticle = particle->getMCParticle();
 
       if (mcparticle == nullptr)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
 
       return getMCFlightInfoBtw(mcparticle, "time");
@@ -645,19 +643,19 @@ namespace Belle2 {
     double mcFlightDistanceOfDaughter(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       long daughterNumber = -1;
       if (daughters.size() > 0) {
         daughterNumber = std::lround(daughters[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to mcFlightDistanceOfDaughter!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to mcFlightDistanceOfDaughter is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       long grandDaughterNumber = -1;
@@ -684,19 +682,19 @@ namespace Belle2 {
     double mcFlightTimeOfDaughter(const Particle* particle, const std::vector<double>& daughters)
     {
       if (!particle)
-        return std::numeric_limits<float>::quiet_NaN(); // Initial particle is NULL
+        return Const::doubleNaN; // Initial particle is NULL
 
       long daughterNumber = -1;
       if (daughters.size() > 0) {
         daughterNumber = std::lround(daughters[0]);
       } else {
         B2ERROR("At least one integer, the index of the daughter, must be provided to mcFlightTimeOfDaughter!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
       int nDaughters = static_cast<int>(particle->getNDaughters());
       if (daughterNumber >= nDaughters) {
         B2ERROR("The daughter index provided to mcFlightTimeOfDaughter is larger than the number of daughters of this particle!");
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
       }
 
       long grandDaughterNumber = -1;

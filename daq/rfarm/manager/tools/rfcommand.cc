@@ -23,19 +23,19 @@ using namespace Belle2;
 
 static int done_flag;
 
-void ok_handler(NSMmsg* msg, NSMcontext*)
+void ok_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   done_flag = 1;
   //  printf ( "OK received\n" );
 }
 
-void error_handler(NSMmsg* msg, NSMcontext*)
+void error_handler(NSMmsg* /*msg*/, NSMcontext*)
 {
   done_flag = -1;
   printf("ERROR received\n");
 }
 
-int main(int argc, char** argv)
+int main(int argc, const char** argv)
 {
   // Usage : getconf conffile node
 
@@ -44,9 +44,9 @@ int main(int argc, char** argv)
     exit(-1);
   }
 
-  char* conffile = argv[1];
-  char* nodename = argv[2];
-  char* command = argv[3];
+  const char* conffile = argv[1];
+  const char* nodename = argv[2];
+  const char* command = argv[3];
 
   char* confdir = getenv("RFARM_CONFDIR");
   string confpath = string(confdir) + "/" + string(conffile) + ".conf";
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 
 
   // Send NSM request
-  int* pars;
+  int* pars = nullptr;
   done_flag = 0;
   b2nsm_sendreq(nodename, command, 0, pars);
   while (done_flag == 0) usleep(1000);

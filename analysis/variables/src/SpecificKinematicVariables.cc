@@ -46,7 +46,7 @@ namespace Belle2 {
       unsigned n = particle->getNDaughters();
 
       if (n < 1)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       for (unsigned i = 0; i < n; i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());
@@ -75,7 +75,7 @@ namespace Belle2 {
       unsigned n = particle->getNDaughters();
 
       if (n < 1)
-        return std::numeric_limits<float>::quiet_NaN();
+        return Const::doubleNaN;
 
       for (unsigned i = 0; i < n; i++) {
         int absPDG = abs(particle->getDaughter(i)->getPDGCode());

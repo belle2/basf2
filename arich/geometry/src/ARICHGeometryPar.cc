@@ -6,11 +6,14 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
-
 #include <arich/geometry/ARICHGeometryPar.h>
+
+#include <framework/logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
+#include <framework/geometry/VectorUtil.h>
+
+#include <Math/VectorUtil.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -303,12 +306,12 @@ namespace Belle2 {
     return m_ChannelQE.at(id) / 100.0;
   }
 
-  int ARICHGeometryPar::getChannelID(TVector2 position)
+  int ARICHGeometryPar::getChannelID(ROOT::Math::XYVector position)
   {
     int ChipID = getChipID(position);
     int Npad = int(m_nPadX / 2);
-    TVector2 chipPos = getChipLocPos(ChipID);
-    TVector2 locloc = position - chipPos;
+    ROOT::Math::XYVector chipPos = getChipLocPos(ChipID);
+    ROOT::Math::XYVector locloc = position - chipPos;
     int ix = int(locloc.X() / m_padSize);
     int iy = int(locloc.Y() / m_padSize);
     if (locloc.X() < 0 || locloc.Y() < 0) return -1;
@@ -356,16 +359,16 @@ namespace Belle2 {
   void ARICHGeometryPar::modulesPositionSimple(const GearDir& content)
   {
     BOOST_FOREACH(const GearDir & module, content.getNodes("Detector/Plane/Modules/Module")) {
-      TVector2 position(module.getLength("xPos"), module.getLength("yPos"));
+      ROOT::Math::XYVector position(module.getLength("xPos"), module.getLength("yPos"));
       double angle = module.getAngle("angle") / Unit::rad;
       m_fFi.push_back(position.Phi());
-      m_fR.push_back(position.Mod());
+      m_fR.push_back(position.R());
       m_fFiMod.push_back(angle);
     }
     B2INFO("Altogether " << m_fR.size() << " ARICH photon detector modules will be placed.");
   }
 
-  int ARICHGeometryPar::getCopyNo(TVector3 hit)
+  int ARICHGeometryPar::getCopyNo(const ROOT::Math::XYZVector& hit)
   {
     double x = hit.X();
     double y = hit.Y();
@@ -382,16 +385,16 @@ namespace Belle2 {
     return -1;
   }
 
-  TVector3 ARICHGeometryPar::getOrigin(int copyNo)
+  ROOT::Math::XYZVector ARICHGeometryPar::getOrigin(int copyNo)
   {
-    TVector2 origin;
-    origin.SetMagPhi(m_fR[copyNo - 1], m_fFi[copyNo - 1]);
-    return TVector3(origin.X(), origin.Y(), m_detZpos + m_modZSize / 2.);
+    const double amag = std::abs(m_fR[copyNo - 1]);
+    const double phi = m_fFi[copyNo - 1];
+    return ROOT::Math::XYZVector(amag * std::cos(phi), amag * std::sin(phi), m_detZpos + m_modZSize / 2.);
   }
 
   G4ThreeVector ARICHGeometryPar::getOriginG4(int copyNo)
   {
-    TVector3 origin = getOrigin(copyNo);
+    ROOT::Math::XYZVector origin = getOrigin(copyNo);
     return G4ThreeVector(origin.X() / Unit::mm, origin.Y() / Unit::mm, origin.Z() / Unit::mm);
   }
 
@@ -403,14 +406,14 @@ namespace Belle2 {
   void ARICHGeometryPar::chipLocPosition()
   {
     double xycenter =  m_padSize * m_nPadX / 4. + m_chipGap / 2.;
-    m_chipLocPos.push_back(TVector2(xycenter - m_padSize * m_nPadX / 4., xycenter - m_padSize * m_nPadX / 4.));
-    m_chipLocPos.push_back(TVector2(xycenter - m_padSize * m_nPadX / 4., -xycenter - m_padSize * m_nPadX / 4.));
-    m_chipLocPos.push_back(TVector2(-xycenter - m_padSize * m_nPadX / 4., xycenter - m_padSize * m_nPadX / 4.));
-    m_chipLocPos.push_back(TVector2(-xycenter - m_padSize * m_nPadX / 4., -xycenter - m_padSize * m_nPadX / 4.));
+    m_chipLocPos.push_back(ROOT::Math::XYVector(xycenter - m_padSize * m_nPadX / 4., xycenter - m_padSize * m_nPadX / 4.));
+    m_chipLocPos.push_back(ROOT::Math::XYVector(xycenter - m_padSize * m_nPadX / 4., -xycenter - m_padSize * m_nPadX / 4.));
+    m_chipLocPos.push_back(ROOT::Math::XYVector(-xycenter - m_padSize * m_nPadX / 4., xycenter - m_padSize * m_nPadX / 4.));
+    m_chipLocPos.push_back(ROOT::Math::XYVector(-xycenter - m_padSize * m_nPadX / 4., -xycenter - m_padSize * m_nPadX / 4.));
   }
 
 
-  int ARICHGeometryPar::getChipID(TVector2 locpos)
+  int ARICHGeometryPar::getChipID(ROOT::Math::XYVector locpos)
   {
     if (locpos.X() > 0) {
       if (locpos.Y() > 0) return 0;
@@ -421,13 +424,13 @@ namespace Belle2 {
   }
 
 
-  TVector3 ARICHGeometryPar::getChannelCenterGlob(int modID, int chanID)
+  ROOT::Math::XYZVector ARICHGeometryPar::getChannelCenterGlob(int modID, int chanID)
   {
     int id = (modID - 1) * m_nPads + chanID;
-    return TVector3(m_padWorldPositions.at(id).X(), m_padWorldPositions.at(id).Y(), m_detZpos + m_winThick);
+    return ROOT::Math::XYZVector(m_padWorldPositions.at(id).X(), m_padWorldPositions.at(id).Y(), m_detZpos + m_winThick);
   }
 
-  TVector2 ARICHGeometryPar::getChannelCenterLoc(int chID)
+  ROOT::Math::XYVector ARICHGeometryPar::getChannelCenterLoc(int chID)
   {
     return m_padLocPositions[chID];
   }
@@ -436,25 +439,32 @@ namespace Belle2 {
   void ARICHGeometryPar::padPositions()
   {
     int Npad = int(m_nPadX / 2.);
-    TVector2 xstart(m_padSize / 2., m_padSize / 2.);
+    ROOT::Math::XYVector xstart(m_padSize / 2., m_padSize / 2.);
     for (int chipID = 0; chipID < 4; chipID++) {
-      TVector2 chipPos = getChipLocPos(chipID);
+      ROOT::Math::XYVector chipPos = getChipLocPos(chipID);
       for (int ix = 0; ix < Npad; ix++) {
         for (int iy = 0; iy < Npad; iy++) {
           int chanID = chipID * Npad * Npad + ix * Npad + iy;
-          TVector2 center(m_padSize / 2. + ix * m_padSize, m_padSize / 2. + iy * m_padSize);
+          ROOT::Math::XYVector center(m_padSize / 2. + ix * m_padSize, m_padSize / 2. + iy * m_padSize);
           center = center + chipPos;
           m_padLocPositions[chanID] = center;
         }
       }
     }
     for (int iMod = 0; iMod < getNMCopies(); iMod++) {
+      const double magnitude = std::abs(m_fR[iMod]);
+      const double phi = m_fFi[iMod];
+      const double phiMod = m_fFiMod[iMod];
+      const double iModCenterX = magnitude * std::cos(phi);
+      const double iModCenterY = magnitude * std::sin(phi);
+
       for (unsigned int iChan = 0; iChan < m_padLocPositions.size(); iChan++) {
-        TVector2 iModCenter;
-        iModCenter.SetMagPhi(m_fR[iMod], m_fFi[iMod]);
-        TVector2 iChanCenter = m_padLocPositions[iChan];
-        iChanCenter = iChanCenter.Rotate(m_fFiMod[iMod]);
-        TVector2 iWorld((iModCenter + iChanCenter).X(), (iModCenter + iChanCenter).Y());
+        const ROOT::Math::XYVector& iChanCenter = m_padLocPositions[iChan];
+        const double cosPhiMod = std::cos(phiMod);
+        const double sinPhiMod = std::sin(phiMod);
+        const double iChanCenterRotatedX = iChanCenter.X() * cosPhiMod - iChanCenter.Y() * sinPhiMod;
+        const double iChanCenterRotatedY = iChanCenter.X() * sinPhiMod + iChanCenter.Y() * cosPhiMod;
+        ROOT::Math::XYVector iWorld(iModCenterX + iChanCenterRotatedX, iModCenterY + iChanCenterRotatedY);
         m_padWorldPositions.push_back(iWorld);
       }
     }
@@ -464,8 +474,8 @@ namespace Belle2 {
   {
     double rmir = m_mirrorOuterRad * cos(M_PI / m_nMirrors) - m_mirrorThickness;
     for (int i = 0; i < m_nMirrors; i++) {
-      TVector3 norm(cos(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng),
-                    sin(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), 0);
+      ROOT::Math::XYZVector norm(cos(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng),
+                                 sin(2.*M_PI / double(m_nMirrors) * (i + 0.5) + m_mirrorStartAng), 0);
       m_mirrornorm.push_back(norm);
       m_mirrorpoint.push_back(rmir * norm);
     }
@@ -477,8 +487,8 @@ namespace Belle2 {
     double thick = content.getLength("Mirrors/thickness");
     BOOST_FOREACH(const GearDir & mirror, content.getNodes("Mirrors/Mirror")) {
       double angle = mirror.getAngle("angle");
-      TVector3 point(mirror.getLength("xPos") - cos(angle)*thick / 2., mirror.getLength("yPos") - sin(angle)*thick / 2., 0);
-      TVector3 norm(cos(angle), sin(angle), 0);
+      ROOT::Math::XYZVector point(mirror.getLength("xPos") - cos(angle)*thick / 2., mirror.getLength("yPos") - sin(angle)*thick / 2., 0);
+      ROOT::Math::XYZVector norm(cos(angle), sin(angle), 0);
       m_mirrorpoint.push_back(point);
       m_mirrornorm.push_back(norm);
       m_mirrorZPos = mirror.getLength("zPos");
@@ -486,12 +496,12 @@ namespace Belle2 {
     }
   }
 
-  TVector3 ARICHGeometryPar::getMirrorNormal(int mirID)
+  ROOT::Math::XYZVector ARICHGeometryPar::getMirrorNormal(int mirID)
   {
     return m_mirrornorm[mirID];
   }
 
-  TVector3 ARICHGeometryPar::getMirrorPoint(int mirID)
+  ROOT::Math::XYZVector ARICHGeometryPar::getMirrorPoint(int mirID)
   {
     return m_mirrorpoint[mirID];
   }
@@ -561,19 +571,19 @@ namespace Belle2 {
       double dr = plate.getLength("dr");
       double dphi = plate.getAngle("dphi");
       double dtheta = plate.getAngle("dtheta");
-      m_mirrorpoint[id - 1].SetMag(m_mirrorpoint[id - 1].Mag() + dr);
-      m_mirrornorm[id - 1].SetTheta(m_mirrornorm[id - 1].Theta() + dtheta);
-      m_mirrornorm[id - 1].SetPhi(m_mirrornorm[id - 1].Phi() + dphi);
+      VectorUtil::setMag(m_mirrorpoint[id - 1], m_mirrorpoint[id - 1].R() + dr);
+      VectorUtil::setTheta(m_mirrornorm[id - 1], m_mirrornorm[id - 1].Theta() + dtheta);
+      VectorUtil::setPhi(m_mirrornorm[id - 1], m_mirrornorm[id - 1].Phi() + dphi);
     }
   }
 
 
-  int ARICHGeometryPar::getAerogelTileID(TVector2 locpos)
+  int ARICHGeometryPar::getAerogelTileID(ROOT::Math::XYVector locpos)
   {
 
     double size = (m_aeroRout - m_aeroRin) / double(m_tileNr);
-    double r = locpos.Mod();
-    double phi = TVector2::Phi_0_2pi(locpos.Phi());
+    double r = locpos.R();
+    double phi = ROOT::Math::VectorUtil::Phi_0_2pi(locpos.Phi());
     int nr = int((r - m_aeroRin) / size);
 
     if (r < m_aeroRin + nr * size + m_tileGap / 2. || r >  m_aeroRin + (nr + 1)*size - m_tileGap / 2.) return 0;

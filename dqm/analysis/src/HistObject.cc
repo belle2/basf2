@@ -9,18 +9,21 @@
 
 using namespace Belle2;
 
-void HistObject::update(TH1* hist)
+bool HistObject::update(TH1* hist)
 {
   if (hist) {
     // usual check for nullptr
     m_updated |= hist->GetEntries() != m_entries;
     m_entries = hist->GetEntries();
   }
+  if (m_hist) delete m_hist;
   m_hist = hist; // even if it is nullptr
+  return m_updated;
 }
 
 void HistObject::resetBeforeEvent(void)
 {
+  if (m_hist) delete m_hist;
   m_hist = nullptr;
   m_updated = false;
 }

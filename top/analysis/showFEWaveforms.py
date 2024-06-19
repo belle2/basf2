@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -11,7 +10,7 @@
 
 # ---------------------------------------------------------------------------------------
 # Display of waveforms with feature extraction points superimposed
-# Usage: basf2 showFEWaveforms.py -i <file_name.sroot>
+# Usage: basf2 showFEWaveforms.py -i <file_name.root>
 # ---------------------------------------------------------------------------------------
 
 # avoid race conditions beetween pyroot and GUI thread
@@ -215,8 +214,8 @@ b2.conditions.append_globaltag('online')
 main = b2.create_path()
 
 # input
-roinput = b2.register_module('SeqRootInput')
-# roinput = register_module('RootInput')
+# roinput = b2.register_module('SeqRootInput')  # sroot files
+roinput = b2.register_module('RootInput')  # root files
 main.add_module(roinput)
 
 # conversion from RawCOPPER or RawDataBlock to RawTOP (needed only in PocketDAQ)

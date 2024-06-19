@@ -627,7 +627,7 @@ TH1* MCTrackCandClassifierModule::duplicateHistogram(const char* newname, const 
   TH2F* h2 =  dynamic_cast<TH2F*>(h);
   TH3F* h3 =  dynamic_cast<TH3F*>(h);
 
-  TH1* newh = 0;
+  TH1* newh = nullptr;
 
   if (h1)
     newh = new TH1F(*h1);
@@ -635,6 +635,12 @@ TH1* MCTrackCandClassifierModule::duplicateHistogram(const char* newname, const 
     newh = new TH2F(*h2);
   if (h3)
     newh = new TH3F(*h3);
+
+  if (newh == nullptr) {
+    B2ERROR("In function duplicateHistogram: newh is a nullptr. This shouldn't happen."\
+            "Don't continue creation of duplicate histogram in this case and return nullptr.");
+    return nullptr;
+  }
 
   newh->SetName(newname);
   newh->SetTitle(newtitle);
@@ -691,8 +697,8 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
   TH3F* h3den =  dynamic_cast<TH3F*>(hDen);
   TH3F* h3num =  dynamic_cast<TH3F*>(hNum);
 
-  TH1* hden = 0;
-  TH1* hnum = 0;
+  TH1* hden = nullptr;
+  TH1* hnum = nullptr;
 
   if (h1den) {
     hden = new TH1F(*h1den);
@@ -705,6 +711,12 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
   if (h3den) {
     hden = new TH3F(*h3den);
     hnum = new TH3F(*h3num);
+  }
+
+  if (hden == nullptr or hnum == nullptr) {
+    B2ERROR("In function createHistogramsRatio: either hden or hnum are a nullptr. This shouldn't happen."\
+            "Don't continue creatio of histogram ratios in this case and return nullptr.");
+    return nullptr;
   }
 
   TAxis* the_axis;

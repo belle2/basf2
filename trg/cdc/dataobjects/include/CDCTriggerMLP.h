@@ -17,6 +17,7 @@ namespace Belle2 {
 
     // weights etc. are set only by the trainer
     friend class CDCTriggerNeuroTrainerModule;
+    friend class NeuroTrigger;
 
   public:
     /** default constructor. */
@@ -26,14 +27,16 @@ namespace Belle2 {
     CDCTriggerMLP(std::vector<unsigned short>& nodes,
                   unsigned short targets,
                   std::vector<float>& outputscale,
-                  std::vector<float>& phirange,
-                  std::vector<float>& invptrange,
-                  std::vector<float>& thetarange,
+                  std::vector<float>& phirangeUse,
+                  std::vector<float>& invptrangeUse,
+                  std::vector<float>& thetarangeUse,
+                  std::vector<float>& phirangeTrain,
+                  std::vector<float>& invptrangeTrain,
+                  std::vector<float>& thetarangeTrain,
                   unsigned short maxHits,
                   unsigned long pattern,
                   unsigned long patternMask,
                   unsigned short tmax,
-                  bool calcT0,
                   const std::string& etoption);
 
     /** destructor, empty because we don't allocate memory anywhere. */
@@ -51,6 +54,8 @@ namespace Belle2 {
     unsigned nWeightsCal() const;
     /** get weights vector */
     std::vector<float> getWeights() const { return weights; }
+    /** set weights vector */
+    void setWeights(std::vector<float> xweights) {weights = xweights; }
     /** get maximum hit number for a single super layer */
     unsigned short getMaxHitsPerSL() const { return maxHitsPerSL; }
     /** get super layer pattern */
@@ -66,23 +71,28 @@ namespace Belle2 {
     {
       return {relevantID[2 * iSL], relevantID[2 * iSL + 1]};
     }
-    /** get flag for event time definition */
-    bool getT0fromHits() const
-    {
-      B2WARNING("Use of this flag is deprecated! Use get_et_option() instead!");
-      return T0fromHits;
-    }
+    /** set and get total relevant ID range */
+    void setRelID(std::vector<float> relid) {relevantID = relid;}
+    std::vector<float> getRelID() const {return relevantID;}
     /** Returns way of obtaining the event time */
     std::string get_et_option() const { return et_option; }
 
     /** check whether given phi value is in sector */
-    bool inPhiRange(float phi) const;
+    bool inPhiRangeUse(float phi) const;
     /** check whether given pt value is in sector */
-    bool inPtRange(float pt) const;
+    bool inPtRangeUse(float pt) const;
     /** check whether given 1/pt value is in sector */
-    bool inInvptRange(float invpt) const;
+    bool inInvptRangeUse(float invpt) const;
     /** check whether given theta value is in sector */
-    bool inThetaRange(float theta) const;
+    bool inThetaRangeUse(float theta) const;
+    /** check whether given phi value is in training sector */
+    bool inPhiRangeTrain(float phi) const;
+    /** check whether given pt value is in training sector */
+    bool inPtRangeTrain(float pt) const;
+    /** check whether given 1/pt value is in training sector */
+    bool inInvptRangeTrain(float invpt) const;
+    /** check whether given theta value is in training sector */
+    bool inThetaRangeTrain(float theta) const;
     /** check whether given relative TS ID is in relevant range */
     bool isRelevant(float relId, unsigned iSL) const;
 
@@ -114,15 +124,24 @@ namespace Belle2 {
      *  to [outputScale[2i], outputScale[2i+1]]. */
     std::vector<float> outputScale;
 
-    /** Phi region in radian for which this expert is trained.
+    /** Phi region in radian for which this expert is used.
       * Valid ranges go from -2pi to 2pi. */
-    std::vector<float> phiRange;
+    std::vector<float> phiRangeUse;
+    /** Charge / Pt region in 1/GeV for which this expert is used.
+      * Taking 1 / Pt instead of Pt means that straight tracks are at 0,
+      * i.e. there is a smooth transition from positive to negative charge. */
+    std::vector<float> invptRangeUse;
+    /** Theta region in radian for which this expert is trained. */
+    std::vector<float> thetaRangeUse;
+    /** Phi region in radian for which this expert is used.
+      * Valid ranges go from -2pi to 2pi. */
+    std::vector<float> phiRangeTrain;
     /** Charge / Pt region in 1/GeV for which this expert is trained.
       * Taking 1 / Pt instead of Pt means that straight tracks are at 0,
       * i.e. there is a smooth transition from positive to negative charge. */
-    std::vector<float> invptRange;
+    std::vector<float> invptRangeTrain;
     /** Theta region in radian for which this expert is trained. */
-    std::vector<float> thetaRange;
+    std::vector<float> thetaRangeTrain;
 
     /** Maximum number of inputs for a single super layer. */
     unsigned short maxHitsPerSL;
@@ -158,15 +177,8 @@ namespace Belle2 {
      */
     std::string et_option;
 
-    /** DEPRECATED!! If true, the event time will be determined
-      * from hits within relevantID region, if it is missing.
-      * Otherwise, no drift times are used if the event time is missing.
-      * Stored here to make sure that the event time definition is the same
-      * during training and during execution. */
-    bool T0fromHits;
-
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerMLP, 7);
+    ClassDef(CDCTriggerMLP, 11);
   };
 }
 #endif

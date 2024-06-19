@@ -113,7 +113,7 @@ Names should be precise, colorful and in self-explanatory English:
 
    * template arguments begin with ``A`` followed by a capital letter
 
-   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, ``h_`` or ``m_h`` 
+   * use the prefix ``m_`` for member variables, ``s_`` for static member variables, ``h_`` or ``m_h``
      for histogram member variables, and ``c_`` for constants
 
    * *Python*: use all upper case with underscores for constants; always use
@@ -376,7 +376,7 @@ All include statements must be at the top of the beginning of the file and shoul
   #include <package/dir/otherclass.h>
 
 Includes should be kept to a minimum: all necessary symbols in the header should be forward declared
-if possible (to reduce depedencies between the header files), or, if that is not possible, the
+if possible (to reduce dependencies between the header files), or, if that is not possible, the
 appropriate header needs to be included.
 
 You must add the following header to all C++ files::
@@ -416,13 +416,13 @@ In general use
 
 Example::
 
-  if (x == y) {  
-    ...   
-  } else if (x > y) {  
-    ...   
-  } else {  
-    ....   
-  }   
+  if (x == y) {
+    ...
+  } else if (x > y) {
+    ...
+  } else {
+    ....
+  }
 
 *Python*: Follow the `Style Guide for Python Code <http://www.python.org/dev/peps/pep-0008/>`_.
 
@@ -434,8 +434,8 @@ Example::
 In the definition of pointers and references the \* and \& symbols have to be attached to
 the variable type, not the variable name, e.g.::
 
-  int* pIndex;   
-  int& index = *pIndex;   
+  int* pIndex;
+  int& index = *pIndex;
 
 Be aware of the (wrong) C++ convention for definitions of multiple variables in one statement.
 E.g. ``int* a, b;`` will define a pointer a and an int variable (not a pointer) b. It is

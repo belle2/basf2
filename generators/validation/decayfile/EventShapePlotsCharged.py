@@ -12,12 +12,31 @@
 <header>
     <input>MCvalidationCharged.root</input>
     <output>EventShapePlotsCharged.root</output>
-    <contact>Frank Meier; frank.meier@belle2.org</contact>
+    <contact>Swagato Banerjee; swagato.banerjee@gmail.com</contact>
     <description>Comparing event shape variables</description>
 </header>
 """
 
 import ROOT
+import argparse
+
+
+def get_argument_parser():
+    """
+    Parses the command line options and returns the corresponding arguments.
+    """
+
+    parser = argparse.ArgumentParser(
+        description=__doc__.split("--examples--")[0],
+        # epilog=__doc__.split("--examples--")[1],
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        # usage="%(prog)s [optional arguments] [--] program [program arguments]"
+    )
+
+    parser.add_argument('--input', type=str, default='MCvalidationCharged.root', help='The name of the input root file')
+    parser.add_argument('--output', type=str, default='EventShapePlotsCharged.root', help='The name of the output root file')
+
+    return parser
 
 
 def PlottingHistos(var):
@@ -27,15 +46,17 @@ def PlottingHistos(var):
     hist.SetTitle(f";{axis_dic[var]}; Events")
     hist.GetListOfFunctions().Add(ROOT.TNamed('Description', axis_dic[var]))
     hist.GetListOfFunctions().Add(ROOT.TNamed('Check', 'Shape should not change drastically.'))
-    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'frank.meier@belle2.org'))
+    hist.GetListOfFunctions().Add(ROOT.TNamed('Contact', 'swagato.banerjee@gmail.com'))
     hist.GetListOfFunctions().Add(ROOT.TNamed('MetaOptions', 'nostats'))
     hist.Write()
 
 
 if __name__ == '__main__':
 
+    parser = get_argument_parser()
+    args = parser.parse_args()
     # load the root file into RDataFrame
-    rdf = ROOT.RDataFrame("EventShape", "MCvalidationCharged.root")
+    rdf = ROOT.RDataFrame("EventShape", args.input)
 
     # define the variables to plot
     colnames = rdf.GetColumnNames()
@@ -90,10 +111,8 @@ if __name__ == '__main__':
                 'harmonicMomentThrust4': "harmonicMomentThrust4"
                 }
 
-    outputFile = ROOT.TFile("EventShapePlotsCharged.root", "RECREATE")
+    outputFile = ROOT.TFile(args.output, "RECREATE")
     ROOT.gROOT.SetBatch(True)
-    ROOT.gROOT.SetStyle("BELLE2")
-    ROOT.gROOT.ForceStyle()
 
     # plot the histograms
     for var in all_list:

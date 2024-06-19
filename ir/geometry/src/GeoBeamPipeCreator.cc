@@ -1025,7 +1025,7 @@ namespace Belle2 {
       //----------
       //-Lv1SUSLERUp
       prep = "Lv1SUSLERUp.";
-      int Lv1SUSLERUp_num = 6;
+      const int Lv1SUSLERUp_num = 6;
       double Lv1SUSLERUp_Z[Lv1SUSLERUp_num];
       double Lv1SUSLERUp_rO[Lv1SUSLERUp_num];
       double Lv1SUSLERUp_rI[Lv1SUSLERUp_num];
@@ -1133,7 +1133,7 @@ namespace Belle2 {
       //----------
       //-Lv1SUSHERDwn
       prep = "Lv1SUSHERDwn.";
-      int Lv1SUSHERDwn_num = 6;
+      const int Lv1SUSHERDwn_num = 6;
       double Lv1SUSHERDwn_Z[Lv1SUSHERDwn_num];
       double Lv1SUSHERDwn_rO[Lv1SUSHERDwn_num];
       double Lv1SUSHERDwn_rI[Lv1SUSHERDwn_num];
@@ -1268,7 +1268,7 @@ namespace Belle2 {
       //----------
       //-Lv1SUSHERUp
       prep = "Lv1SUSHERUp.";
-      int Lv1SUSHERUp_num = 6;
+      const int Lv1SUSHERUp_num = 6;
       double Lv1SUSHERUp_Z[Lv1SUSHERUp_num];
       double Lv1SUSHERUp_rO[Lv1SUSHERUp_num];
       double Lv1SUSHERUp_rI[Lv1SUSHERUp_num];
@@ -1376,7 +1376,7 @@ namespace Belle2 {
       //----------
       //-Lv1SUSLERDwn
       prep = "Lv1SUSLERDwn.";
-      int Lv1SUSLERDwn_num = 6;
+      const int Lv1SUSLERDwn_num = 6;
       double Lv1SUSLERDwn_Z[Lv1SUSLERDwn_num];
       double Lv1SUSLERDwn_rO[Lv1SUSLERDwn_num];
       double Lv1SUSLERDwn_rI[Lv1SUSLERDwn_num];

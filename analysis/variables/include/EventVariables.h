@@ -82,6 +82,21 @@ namespace Belle2 {
     int nVirtualPrimaryMCParticles(const Particle*);
 
     /**
+     * return number of neutral ECL clusters with a given hypothesis
+     */
+    int nNeutralECLClusters(const Particle*, const std::vector<double>& hypothesis);
+
+    /**
+     * return number of V0s in event
+     */
+    int nV0s(const Particle*);
+
+    /**
+     * return number of V0s consisting of pair of tracks with opposite charges
+     */
+    int nValidV0s(const Particle*);
+
+    /**
     * return experiment number
     */
     int expNum(const Particle*);
@@ -125,6 +140,46 @@ namespace Belle2 {
      * return nominal beam energy
      */
     double getBeamE(const Particle*);
+
+
+    /** px component of truth value of HER momentum */
+    double getMcPxHER(const Particle*);
+
+    /** py component of truth value of HER momentum */
+    double getMcPyHER(const Particle*);
+
+    /** pz component of truth value of HER momentum */
+    double getMcPzHER(const Particle*);
+
+    /** px component of truth value of LER momentum */
+    double getMcPxLER(const Particle*);
+
+    /** py component of truth value of LER momentum */
+    double getMcPyLER(const Particle*);
+
+    /** pz component of truth value of LER momentum */
+    double getMcPzLER(const Particle*);
+
+
+    /** px component of HER momentum */
+    double getPxHER(const Particle*);
+
+    /** py component of HER momentum */
+    double getPyHER(const Particle*);
+
+    /** pz component of HER momentum */
+    double getPzHER(const Particle*);
+
+    /** px component of LER momentum */
+    double getPxLER(const Particle*);
+
+    /** py component of LER momentum */
+    double getPyLER(const Particle*);
+
+    /** pz component of LER momentum */
+    double getPzLER(const Particle*);
+
+
 
     /**
      * return true sqrt(s) value

@@ -65,6 +65,7 @@ namespace Belle2 {
     Particle* buildParticleFromDecayTree(const DecayTree<MCParticle>* decay, const DecayDescriptor* dd);
     /** Create a Particle from the given MCParticle appending all daughters of the MCParticle **/
     Particle* createParticleRecursively(const MCParticle* mcp, bool skipNonPrimaryDaughters);
-
+    /** Add a new Particle into the output ParticleList if it does not exist already **/
+    void addUniqueParticleToList(Particle* newParticle);
   };
 }

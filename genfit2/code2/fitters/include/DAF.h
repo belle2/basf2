@@ -25,9 +25,10 @@
 
 #include "AbsKalmanFitter.h"
 
-#include <vector>
 #include <map>
 #include <memory>
+#include <tuple>
+#include <vector>
 
 
 namespace genfit {
@@ -56,6 +57,20 @@ class DAF : public AbsKalmanFitter {
  public:
 
   /**
+   * @brief Create DAF. Per default, use KalmanFitterRefTrack as fitter, 
+   * this constructor should be used for additional configuration of the DAF, allows to provide custom parameters
+   *
+   * @param annealingScheme Start and Final temperatures, and number of steps for the annealing scheme
+   * @param minIter Minimum number of iterations for the annealing scheme
+   * @param maxIter Maximum number of iterations for the annealing scheme
+   * @param minIterForPval Minimum number of iterations before checking the convergence by pvalue
+   * @param useRefKalman If false, use KalmanFitter as fitter.
+   * @param deltaPval Threshold value for pvalue convergence criterion
+   * @param deltaWeight Threshold value for weight convergence criterion
+   * @param probCut Probability cut for weight calculation
+   */
+  DAF(const std::tuple<double, double, int>& annealingScheme, int minIter, int maxIter, int minIterForPval, bool useRefKalman = true, double deltaPval = 1e-3, double deltaWeight = 1e-3, double probCut = 1e-3);
+  /**
    * @brief Create DAF. Per default, use KalmanFitterRefTrack as fitter.
    *
    * @param useRefKalman If false, use KalmanFitter as fitter.
@@ -65,6 +80,9 @@ class DAF : public AbsKalmanFitter {
    * @brief Create DAF. Use the provided AbsKalmanFitter as fitter.
    */
   DAF(AbsKalmanFitter* kalman, double deltaPval = 1e-3, double deltaWeight = 1e-3);
+  /**
+   * @brief Destruct DAF.
+   */
   ~DAF() {};
 
   //! Process a track using the DAF.
@@ -86,17 +104,44 @@ class DAF : public AbsKalmanFitter {
   /** @brief Configure the annealing scheme.
    *
    * Set a start and end temperature and the number of steps. A logarithmic sequence of temperatures will be calculated.
-   * Also sets #minIterations_ and #maxIterations_.
+   * Also sets #minIterations_, #maxIterations_ and #minIterForPval as a function of the number of steps
    */
   void setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps);
 
+  /** @brief Configure the annealing scheme with custom values of min and max iterations.
+   *
+   * Set a start and end temperature and the number of steps. A logarithmic sequence of temperatures will be calculated.
+   * Also sets #minIterations_ and #maxIterations_ to the values provided instead of values depending on nSteps
+   */
+  void setAnnealingScheme(double bStart, double bFinal, unsigned int nSteps, unsigned int minIter, unsigned int  maxIter);
+
+  /**
+   * @brief Set the maximum number of iterations of the DAF.
+   */
   void setMaxIterations(unsigned int n) override {maxIterations_ = n; betas_.resize(maxIterations_,betas_.back());}
 
-  //! If all weights change less than delta between two iterations, the fit is regarded as converged.
+  /**
+   * @brief If all weights change less than delta between two iterations, the fit is regarded as converged.
+   */
   void setConvergenceDeltaWeight(double delta) {deltaWeight_ = delta;}
 
+  /**
+   * @brief Get a pointer to the internal Kalman fitter.
+   */
   AbsKalmanFitter* getKalman() const {return kalman_.get();}
 
+  /**
+   * @brief Set the maximum number of iterations of the internal Kalman fitter.
+   *
+   * Set the maximum number of iterations of the internal Kalman fitter.
+   * Note that the internal Kalman fitter can be called multiple times for each DAF iteration,
+   * up to the (maximum) number of iterations set by this method.
+   */
+  void setMaxIterationsKalman(unsigned int n) {getKalman()->setMaxIterations(n);}
+
+  /**
+   * @brief Set the maximum number of accepted failed hits by the internal Kalman fitter.
+   */
   virtual void setMaxFailedHits(int val) override {getKalman()->setMaxFailedHits(val);}
 
   virtual void setDebugLvl(unsigned int lvl = 1) override {AbsFitter::setDebugLvl(lvl); if (lvl > 1) getKalman()->setDebugLvl(lvl-1);}
@@ -109,7 +154,7 @@ class DAF : public AbsKalmanFitter {
     */
   bool calcWeights(Track* trk, const AbsTrackRep* rep, double beta);
 
-
+  int minIterForPval_; //minimum number of iterations before checking pvalue convergence criterion
   double deltaWeight_; // convergence criterium
   std::vector<double> betas_;   // Temperatures, NOT inverse temperatures.
   double chi2Cuts_[7];  // '7' assumes tracks are helices with one
@@ -117,7 +162,7 @@ class DAF : public AbsKalmanFitter {
 			// where time may be used in the fit.  Zeroth
 			// entry is not used.
 
-  std::unique_ptr<AbsKalmanFitter> kalman_;
+  std::unique_ptr<AbsKalmanFitter> kalman_; // Internal Kalman fitter.
 
  public:
 

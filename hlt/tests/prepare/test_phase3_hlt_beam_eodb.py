@@ -36,7 +36,7 @@ if __name__ == "__main__":
         output_file_name=output_file_name,
         run_type=run_type,
         location=location,
-        exp_number=1003,
+        exp_number=1004,
         passthrough=passthrough,
         simulate_events_of_doom_buster=simulate_events_of_doom_buster)
     )

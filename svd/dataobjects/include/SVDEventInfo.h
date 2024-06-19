@@ -12,6 +12,8 @@
 #include <cmath>
 #include <svd/dataobjects/SVDModeByte.h>
 #include <svd/dataobjects/SVDTriggerType.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
 
 
 namespace Belle2 {
@@ -27,7 +29,10 @@ namespace Belle2 {
 
     /** Constructor. */
     explicit SVDEventInfo(SVDModeByte mode = SVDModeByte(), SVDTriggerType type = SVDTriggerType()):
-      m_modeByte(mode.getID()), m_triggerType(type.getType()) {m_ModeByteMatch = true; m_TriggerTypeMatch = true; m_Xtalk = false; m_relativeTimeShift = 0;}
+      m_modeByte(mode.getID()), m_triggerType(type.getType())
+    {
+      m_ModeByteMatch = true; m_TriggerTypeMatch = true; m_Xtalk = false; m_relativeTimeShift = 0;
+    }
 
     /** Destructor. */
     ~SVDEventInfo() {}
@@ -84,14 +89,11 @@ namespace Belle2 {
     SVDModeByte getModeByte() const
     { return m_modeByte; }
 
-    /** returns the time shift between SVD reference
-     *  and FTSW (Trigger) reference:
-     *  time in FTSW reference = time in SVD reference + time shift
-     *  for clusters, additional information of the first frame is
-     *  used to improve the precision
+    /** returns the time shift between SVD reference (t = 0 at the FF)
+     *  and the FTSW (Trigger) reference
      */
     float getSVD2FTSWTimeShift(int firstFrame) const
-    { return 4000. / 509 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
+    { return m_apvClockPeriod / 4 * (3 - SVDModeByte(m_modeByte).getTriggerBin() + 4 * firstFrame); }
 
     /** returns the number of samples:
      *  6, 3 or 1
@@ -111,7 +113,7 @@ namespace Belle2 {
 
         int nTriggerClocks = SVDModeByte(m_modeByte).getTriggerBin() + m_relativeTimeShift;
 
-        return floor(nTriggerClocks / 4) * 16000. / 509.;
+        return floor(nTriggerClocks / 4) * m_apvClockPeriod;
       }
 
       return 0;
@@ -127,7 +129,7 @@ namespace Belle2 {
     }
 
     /** getTimeInFTSWReference
-     * it takes the cluster time in SVD reference (in either 3- or 6-sample DAQ mode)
+     * it takes the cluster time in SVD reference (t = 0 at FF, in either 3- or 6-sample DAQ mode)
      * and the firstFrame and provides the time in the FTWS reference.
      * DO NOT USE WITH EventT0!
      * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- or 6-sample DAQ mode
@@ -137,10 +139,24 @@ namespace Belle2 {
       return time_in_SVD + getSamplingDelayInNs() + getSVD2FTSWTimeShift(firstFrame);
     }
 
+    /** sets the APV clock period. This operation can be done only in an event().
+    * return false if the HardwareClockSettings DBObject is not valid,
+    * in this case the APV clock period is set to be 16000. / 509.;
+    * returns true when the operation is successfull.
+    */
+    bool setAPVClock(DBObjPtr<HardwareClockSettings> hwClock)
+    {
+      if (hwClock.isValid())
+        m_apvClockPeriod = 1. / hwClock->getClockFrequency(Const::EDetector::SVD, "sampling");
+      else
+        return false;
+
+      return true;
+    }
 
     /** getTimeInSVDReference
      * it takes the cluster time in FTSW reference and provides
-     * the time in the SVD reference for that event.
+     * the time in the SVD reference (t = 0 at FF) for that event.
      * If used with EventT0, it returns EventT0 synchronized to the SVD reference.
      * In the SVD reference t=0 is the time of the first sample, regardless if the event is acquired in 3- or 6-sample DAQ mode
      */
@@ -198,8 +214,11 @@ namespace Belle2 {
     int m_relativeTimeShift = 0; /**< relative shift in units of APV-clock/4 between 3- and 6-sample acquired events */
     int m_nAPVsamples = 0; /**< number of acquired samples */
 
+    /** APV clock period*/
+    double m_apvClockPeriod = 16000. / 509.;
+
     /**class def needed by root*/
-    ClassDef(SVDEventInfo, 2);
+    ClassDef(SVDEventInfo, 3);
 
   }; //class
 } // namespace Belle2

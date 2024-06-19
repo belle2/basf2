@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -30,7 +29,7 @@ import collections
 from basf2 import B2WARNING
 
 
-class State(object):
+class State:
     """
     hep_ml state
     """
@@ -50,7 +49,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         the key 'base_estimator' is passed to DecisionTreeClassifier as keyword arguments
         other keys are passed to uBoostClassifier as keyword arguments
     """
-    if isinstance(parameters, collections.Mapping) and 'base_estimator' in parameters:
+    if isinstance(parameters, collections.abc.Mapping) and 'base_estimator' in parameters:
         base_tree = hep_ml.uboost.DecisionTreeClassifier(**parameters['base_estimator'])
         del parameters['base_estimator']
     else:
@@ -59,7 +58,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     train_features = list(range(number_of_features))
     uniform_features = [number_of_features + i for i in range(number_of_spectators)]
 
-    if isinstance(parameters, collections.Mapping):
+    if isinstance(parameters, collections.abc.Mapping):
         if 'uniform_label' not in parameters:
             parameters['uniform_label'] = [0, 1]
         parameters['train_features'] = train_features

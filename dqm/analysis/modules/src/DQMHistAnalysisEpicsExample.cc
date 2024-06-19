@@ -26,6 +26,7 @@ DQMHistAnalysisEpicsExampleModule::DQMHistAnalysisEpicsExampleModule()
   : DQMHistAnalysisModule()
 {
   // This module CAN NOT be run in parallel!
+  setDescription("Example module for EPICS");
 
   //Parameter definition
   addParam("HistoName", m_histoname, "Name of Histogram (incl dir)", std::string(""));

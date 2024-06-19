@@ -35,7 +35,7 @@ then use it:
 
    skimRNDtrg = skimOutRNDTrgModule()
    main.add_module(skimRNDtrg)
-   emptypath = create_path()  
+   emptypath = create_path()
    skimRNDtrg.if_false(emptypath)
 
 .. autofunction:: svd.skim_utils.skimOutRNDTrgModule
@@ -67,7 +67,7 @@ example:
 calibration validation utils
 ----------------------------
 
-pleas check ``svd/scripts/svd/validation_utils.py``
+please check ``svd/scripts/svd/validation_utils.py``
 
 background overlay utils
 ------------------------

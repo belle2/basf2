@@ -9,9 +9,9 @@
 #pragma once
 
 /* ECL headers. */
-#include <ecl/utility/ECLChannelMapper.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
 #include <framework/core/HistoModule.h>

@@ -1,3 +1,4 @@
+
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
 # Author: The Belle II Collaboration                                     #
@@ -16,8 +17,7 @@ from tracking.adjustments import adjust_module
 
 
 def use_local_sectormap(path, pathToLocalSM):
-    """
-    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
+    """    Helper function that sets up the SectorMapBootstrapModule in that way that a local sectormap will be
     loaded instead the one from the DB. Has to be applied on the path after the SectorMapBootstrap was
     put into the path (usually in add_reconstructin)
 
@@ -50,7 +50,7 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=False):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
 
@@ -58,6 +58,9 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
     :param components: the list of geometry components in use or None for all components.
     :param pxd_filtering_offline: PXD data reduction is performed after CDC and SVD tracking,
             so PXD reconstruction has to wait until the ROIs are calculated.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     """
 
     # Preparation of the SVD clusters
@@ -65,7 +68,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_filtering_offline:
+    if is_pxd_used(components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
         add_pxd_reconstruction(path)
 
 
@@ -250,6 +253,9 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
                         UsePXDHits=is_pxd_used(components),
                         UseSVDHits=is_svd_used(components),
                         UseCDCHits=is_cdc_used(components))
+
+        path.add_module('TrackToMCParticleRelator')
+
     elif (matching_method == "chi2"):
         print("Warning: The Chi2MCTrackMatcherModule is currently not fully developed and tested!")
         path.add_module('Chi2MCTrackMatcherModule',
@@ -450,21 +456,21 @@ def add_svd_track_finding(
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "only_ckf":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
     elif svd_ckf_mode == "SVD_after":
         add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
                     use_mc_truth=use_mc_truth, direction="backward", **kwargs)
         if add_both_directions:
             add_svd_ckf(path, cdc_reco_tracks=input_reco_tracks, svd_reco_tracks=temporary_reco_tracks,
-                        use_mc_truth=use_mc_truth, direction="forward", filter_cut=0.01, **kwargs)
+                        use_mc_truth=use_mc_truth, direction="forward", **kwargs)
 
         add_svd_standalone_tracking(path, components=["SVD"],
                                     svd_standalone_mode=svd_standalone_mode,
@@ -642,7 +648,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     ClusterFilterParameters={})
 
     # Find segments within the clusters
-    path.add_module("TFCDC_SegmentFinderFacetAutomaton")
+    path.add_module("TFCDC_SegmentFinderFacetAutomaton",
+                    SegmentRelationFilterParameters={'DBPayloadName': 'trackfindingcdc_RealisticSegmentRelationFilterParameters'})
 
     # Find axial tracks
     path.add_module("TFCDC_AxialTrackFinderLegendre")
@@ -657,9 +664,9 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     # Combine segments with axial tracks
     path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.74},
+                    segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'},
                     trackFilter="mva",
-                    trackFilterParameters={"cut": 0.1})
+                    trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'})
 
     output_tracks = "CDCTrackVector"
 
@@ -695,7 +702,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
             "TFCDC_TrackQualityEstimator",
             inputTracks=output_tracks,
             filter='mva',
-            filterParameters={"cut": 0.7},
+            filterParameters={'DBPayloadName': 'trackfindingcdc_TrackQualityEstimatorParameters'},
             deleteTracks=True,
             resetTakenFlag=True
         )
@@ -844,7 +851,7 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     # Constructs clusters and reduce background hits
     path.add_module("TFCDC_ClusterPreparer",
                     ClusterFilter="mva_bkg",
-                    ClusterFilterParameters={"cut": 0.2})
+                    ClusterFilterParameters={'DBPayloadName': 'trackfindingcdc_ClusterFilterParameters'})
 
     # Find segments within the clusters
     path.add_module("TFCDC_SegmentFinderFacetAutomaton",
@@ -863,9 +870,9 @@ def add_cdc_cr_track_finding(path, output_reco_tracks="RecoTracks", trigger_poin
     # Combine segments with axial tracks
     path.add_module('TFCDC_SegmentTrackCombiner',
                     segmentTrackFilter="mva",
-                    segmentTrackFilterParameters={"cut": 0.74},
+                    segmentTrackFilterParameters={'DBPayloadName': 'trackfindingcdc_SegmentTrackFilterParameters'},
                     trackFilter="mva",
-                    trackFilterParameters={"cut": 0.1})
+                    trackFilterParameters={'DBPayloadName': 'trackfindingcdc_TrackFilterParameters'})
 
     # Improve the quality of all tracks and output
     path.add_module("TFCDC_TrackQualityAsserter",

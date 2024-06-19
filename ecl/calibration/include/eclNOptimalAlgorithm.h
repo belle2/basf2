@@ -8,9 +8,6 @@
 
 #pragma once
 
-/* ECL headers. */
-#include <ecl/calibration/eclNOptimalAlgorithm.h>
-
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 

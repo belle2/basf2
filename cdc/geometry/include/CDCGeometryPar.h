@@ -676,7 +676,7 @@ namespace Belle2 {
 
       /**
        * Return wire offset in phi direction at endplate.
-       * @parm layerID layerID(0-55).
+       * @param layerID layerID(0-55).
        * @return offset value.
        */
       double offset(int layerID) const;
@@ -1155,7 +1155,7 @@ namespace Belle2 {
       float m_FWirPosAlign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. alignment at the forward endplate for each cell; ibid. */
       float m_BWirPosAlign[c_maxNSenseLayers][c_maxNDriftCells][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[c_maxNSenseLayers][c_maxNDriftCells]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
-      float m_eDepToADCParams[c_maxNSenseLayers][c_maxNDriftCells][7] = {{0}}; /*!< edep-to-ADC conv. params. */
+      float m_eDepToADCParams[c_maxNSenseLayers][c_maxNDriftCells][7] = {}; /*!< edep-to-ADC conv. params. */
 
       float m_alphaPoints[c_maxNAlphaPoints]; /*!< alpha sampling points for xt (rad) */
       float m_thetaPoints[c_maxNThetaPoints]; /*!< theta sampling points for xt (rad) */
@@ -1165,7 +1165,7 @@ namespace Belle2 {
       float m_XT[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       float m_Sigma[c_maxNSenseLayers][2][c_maxNAlphaPoints][c_maxNThetaPoints][c_nSigmaParams];      /*!< position resulution for each layer. */
       float m_propSpeedInv[c_maxNSenseLayers];  /*!< Inverse of propagation speed of the sense wire. */
-      float m_t0[c_maxNSenseLayers][c_maxNDriftCells] = {{0}};  /*!< t0 for each sense-wire (in nsec). */
+      float m_t0[c_maxNSenseLayers][c_maxNDriftCells] = {};  /*!< t0 for each sense-wire (in nsec). */
       float m_timeWalkCoef[c_nBoards][2];  /*!< coefficients for time walk. */
 
       //      float m_meanT0;  /*!< mean t0 over all wires. */

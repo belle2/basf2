@@ -19,15 +19,17 @@
 
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/MetadataService.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
-#include <framework/core/MetadataService.h>
+
 
 #include <boost/program_options.hpp>
-#include <boost/filesystem.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
 
 #include <csignal>
@@ -39,6 +41,7 @@
 #include <fstream>
 #include <locale>
 #include <codecvt>
+#include <filesystem>
 
 #ifdef HAS_CALLGRIND
 #include <valgrind/valgrind.h>
@@ -70,8 +73,8 @@ namespace {
       return;
     }
     // otherwise execute the steering file
-    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
-    if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
+    auto fullPath = std::filesystem::absolute(std::filesystem::path(pythonFile));
+    if ((!(std::filesystem::is_directory(fullPath))) && (std::filesystem::exists(fullPath))) {
 
       std::ifstream file(fullPath.string().c_str());
       std::stringstream buffer;
@@ -101,7 +104,7 @@ int main(int argc, char* argv[])
 
   //Get the lib path (checked for NULL in Environment)
   const char* belle2SubDir = getenv("BELLE2_SUBDIR");
-  boost::filesystem::path libPath = "lib";
+  std::filesystem::path libPath = "lib";
   libPath /= belle2SubDir;
 
   string runModuleIOVisualization(""); //nothing done if empty
@@ -130,6 +133,8 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("package_log_level", prog::value<vector<string> >(),
+     "Set package log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
     ("random-seed", prog::value<string>(),
      "Set the default initial seed for the random number generator. "
      "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
@@ -224,9 +229,19 @@ int main(int argc, char* argv[])
     } else if (varMap.count("steering")) {
       // steering file not misused as module name, so print it's name :D
       pythonFile = varMap["steering"].as<string>();
-      B2INFO("Steering file: " << pythonFile);
     }
 
+    if (!pythonFile.empty()) {
+      //Search in local or central lib/ if this isn't a direct path
+      if (!std::filesystem::exists(pythonFile)) {
+        std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
+        if (!libFile.empty())
+          pythonFile = libFile;
+      }
+      if (varMap.count("steering") and not varMap.count("modules")) {
+        B2INFO("Steering file: " << pythonFile);
+      }
+    }
 
     // -p
     // Do now so that we can override if profiling is requested
@@ -347,8 +362,51 @@ int main(int argc, char* argv[])
 
       //set log level
       LogSystem::Instance().getLogConfig()->setLogLevel((LogConfig::ELogLevel)level);
-      //and make sure it takes precedence overy anything in the steeering file
+      //and make sure it takes precedence over anything in the steering file
       Environment::Instance().setLogLevelOverride(level);
+    }
+
+    // --package_log_level
+    if (varMap.count("package_log_level")) {
+      const auto& packLogList = varMap["package_log_level"].as<vector<string>>();
+      const std::string delimiter = ":";
+      for (const std::string& packLog : packLogList) {
+        if (packLog.find(delimiter) == std::string::npos) {
+          B2FATAL("In --package_log_level input " << packLog << ", no colon detected. ");
+          break;
+        }
+        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:LEVEL*/
+        auto packageName = packLog.substr(0, packLog.find(delimiter));
+        std::string logName = packLog.substr(packLog.find(delimiter) + delimiter.length(), packLog.length());
+        int debugLevel = -1;
+        if ((logName.find("DEBUG") != std::string::npos) && logName.length() > 5) {
+          try {
+            debugLevel = std::stoi(logName.substr(logName.find(delimiter) + delimiter.length(), logName.length()));
+          } catch (std::exception& e) {
+            B2WARNING("In --package_log_level, issue parsing debugLevel. Still setting log level to DEBUG.");
+          }
+          logName = "DEBUG";
+        }
+
+        int level = -1;
+        /* determine log level for package */
+        for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
+          std::string thisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
+          if (boost::iequals(logName, thisLevel)) { //case-insensitive
+            level = i;
+            break;
+          }
+        }
+        if (level < 0) {
+          B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
+        }
+        /* set package log level*/
+        if ((logName == "DEBUG") && (debugLevel >= 0)) {
+          LogSystem::Instance().getPackageLogConfig(packageName).setDebugLevel(debugLevel);
+        }
+        LogSystem::Instance().getPackageLogConfig(packageName).setLogLevel((LogConfig::ELogLevel)level);
+
+      }
     }
 
     // -d
@@ -419,15 +477,6 @@ int main(int argc, char* argv[])
   //---------------------------------------------------
   //  If the python file is set, execute it
   //---------------------------------------------------
-  if (!pythonFile.empty()) {
-    //Search in local or central lib/ if this isn't a direct path
-    if (!boost::filesystem::exists(pythonFile)) {
-      std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
-      if (!libFile.empty())
-        pythonFile = libFile;
-    }
-  }
-
   try {
     //Init Python interpreter
     Py_InitializeEx(0);

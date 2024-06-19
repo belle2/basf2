@@ -46,9 +46,13 @@ template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedPXD
 template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedBKLMHit, Const::BKLM>;
 template class Belle2::BaseMeasurementCreatorFromHit<RecoHitInformation::UsedEKLMHit, Const::EKLM>;
 
+// Silence Doxygen which is complaining that "no matching class member found for"
+// But there should be a better way that I just don't know of / find
+//! @cond Doxygen_Suppress
 template<>
 genfit::AbsMeasurement* CDCBaseMeasurementCreator::createCoordinateMeasurement(RecoHitInformation::UsedCDCHit* cdcHit,
     const RecoHitInformation& recoHitInformation) const
+//! @endcond
 {
 
   // From the genfit code: < 0 means left, > 0 means right, = 0 is undefined

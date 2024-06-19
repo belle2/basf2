@@ -518,7 +518,7 @@ namespace Belle2 {
     short m_VPeak = 0;        /**< ADC value at m_sampleRise + m_dSamplePeak */
     short m_VFall0 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall */
     short m_VFall1 = 0;       /**< ADC value at m_sampleRise + m_dSampleFall + 1 */
-    int m_integral = 0;     /**< integral of a pulse (e.g. \propto charge) */
+    int m_integral = 0;     /**< integral of a pulse (proportional to charge) */
     unsigned short m_revo9Counter = 0; /**< number of clock ticks since last revo9 flag */
     unsigned short m_phase = 0; /**< carrier phase */
     unsigned short m_lookBackWindows = 0; /**< number of look-back windows */

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -68,7 +67,7 @@ def get_dependencies(sconscript_filename):
     ]
     # now just trim only the packagename's from the library names
     # and make a python set of them
-    package_dependencies = set([lb.split("_")[0] for lb in dependencies])
+    package_dependencies = {lb.split("_")[0] for lb in dependencies}
 
     return package_dependencies
 

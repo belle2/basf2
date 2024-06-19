@@ -201,21 +201,21 @@ CDCTrigger2DFinderModule::event()
         if ((hitpattern & (1 << i)) != 0) {
           double phi = m_segmentHits[iHit]->getSegmentID() - TSoffset[iSL];
           if (iSL != 0 && i == 0)  phi = phi - 1;
-          else if (iSL != 0 && i == 1)  phi = phi;
+          else if (iSL != 0 && i == 1)  phi = phi + 0;
           else if (iSL != 0 && i == 2)  phi = phi + 1;
           else if (iSL != 0 && i == 3)  phi = phi - 0.5;
           else if (iSL != 0 && i == 4)  phi = phi + 0.5;
-          else if (iSL != 0 && i == 5)  phi = phi;
+          else if (iSL != 0 && i == 5)  phi = phi + 0;
           else if (iSL != 0 && i == 6)  phi = phi - 0.5;
           else if (iSL != 0 && i == 7)  phi = phi + 0.5;
           else if (iSL != 0 && i == 8)  phi = phi - 1;
-          else if (iSL != 0 && i == 9)  phi = phi;
+          else if (iSL != 0 && i == 9)  phi = phi + 0;
           else if (iSL != 0 && i == 10) phi = phi + 1;
-          else if (iSL == 0 && i == 0)  phi = phi;
+          else if (iSL == 0 && i == 0)  phi = phi + 0;
           else if (iSL == 0 && i == 1)  phi = phi - 0.5;
           else if (iSL == 0 && i == 2)  phi = phi + 0.5;
           else if (iSL == 0 && i == 3)  phi = phi - 1;
-          else if (iSL == 0 && i == 4)  phi = phi;
+          else if (iSL == 0 && i == 4)  phi = phi + 0;
           else if (iSL == 0 && i == 5)  phi = phi + 1;
           else if (iSL == 0 && i == 6)  phi = phi - 1.5;
           else if (iSL == 0 && i == 7)  phi = phi - 0.5;
@@ -223,7 +223,7 @@ CDCTrigger2DFinderModule::event()
           else if (iSL == 0 && i == 9)  phi = phi + 1.5;
           else if (iSL == 0 && i == 10) phi = phi - 2;
           else if (iSL == 0 && i == 11) phi = phi - 1;
-          else if (iSL == 0 && i == 12) phi = phi;
+          else if (iSL == 0 && i == 12) phi = phi + 0;
           else if (iSL == 0 && i == 13) phi = phi + 1;
           else if (iSL == 0 && i == 14) phi = phi + 2;
           phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);

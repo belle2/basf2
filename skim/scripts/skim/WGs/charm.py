@@ -1230,7 +1230,7 @@ class LambdacToSHpJm(BaseSkim):
     def build_lists(self, path):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
-        va.variables.addAlias('significanceOfflightDistance', 'formula(flightDistance/flightDistanceErr)')
+        va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
@@ -1240,7 +1240,7 @@ class LambdacToSHpJm(BaseSkim):
         ma.cutAndCopyList(
             'K_S0:charmSkim',
             'K_S0:merged',
-            'significanceOfflightDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
+            'significanceOfFlightDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
             path=path)
 
         ma.cutAndCopyList('pi0:charmSkim', 'pi0:skim', '0.120<InvM<0.145', True, path=path)
@@ -1359,7 +1359,7 @@ class XictoXimpippim(BaseSkim):
     def build_lists(self, path):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
-        va.variables.addAlias('significanceOfflightDistance', 'formula(flightDistance/flightDistanceErr)')
+        va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
@@ -1372,7 +1372,7 @@ class XictoXimpippim(BaseSkim):
         ma.cutAndCopyList(
             'Lambda0:charmSkim',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfflightDistance > 3 and daughter(0,trinaryID) > 0.2 and daughter(1,pionIDNN) > 0.1',
+            '1.114 < M < 1.118 and significanceOfFlightDistance > 3 and daughter(0,trinaryID) > 0.2 and daughter(1,pionIDNN) > 0.1',
             path=path)
 
         ma.reconstructDecay("Sigma+:charmSkim -> p+:loose pi0:charmSkim",
@@ -1435,12 +1435,12 @@ class Xic0ToLHpJm(BaseSkim):
 
     def build_lists(self, path):
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
-        va.variables.addAlias('significanceOfflightDistance', 'formula(flightDistance/flightDistanceErr)')
+        va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList(
             'Lambda0:charmSkim',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfflightDistance > 3 and daughter(0,trinaryID) > 0.2',
+            '1.114 < M < 1.118 and significanceOfFlightDistance > 3 and daughter(0,trinaryID) > 0.2',
             path=path)
 
         XicCuts = "2.3 < M < 2.65 and useCMSFrame(p) > 2.0"

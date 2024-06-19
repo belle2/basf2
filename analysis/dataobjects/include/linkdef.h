@@ -5,7 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 #pragma link C++ class Belle2::Particle+; // checksum=0x694ee2d8, version=16
-#pragma link C++ class Belle2::ParticleList+; // checksum=0x98887650, version=3
+#pragma link C++ class Belle2::ParticleList+; // checksum=0xa5bad8a, version=4
 #pragma link C++ class Belle2::RestOfEvent+; // checksum=0xe86f1658, version=8
 #pragma link C++ class Belle2::TagVertex+; // checksum=0xf7b6169c, version=6
 #pragma link C++ class Belle2::ContinuumSuppression+; // checksum=0x8f4ac744, version=2
@@ -250,5 +250,19 @@
                                                                    onfile.m_backwardHemisphere4Momentum.Py(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.Pz(),   \
                                                                    onfile.m_backwardHemisphere4Momentum.E());}" \
+// ----------------------------------------------------------------------------
+// ParticleList evolution
+// In version 4, the member m_isReserved has been added
+#pragma read                                     \
+  sourceClass="Belle2::ParticleList"             \
+  source="std::string m_thisListName; int m_pdg" \
+  version="[-3]"                                 \
+  targetClass="Belle2::ParticleList"             \
+  target="m_isReserved"                          \
+  code="{std::string label = onfile.m_thisListName.substr(onfile.m_thisListName.find_first_of(':')+1);                                                 \
+         if ((Belle2::Const::finalStateParticlesSet.contains(Belle2::Const::ParticleType(abs(onfile.m_pdg))) and label == \"all\") or label == \"V0\") \
+           m_isReserved = true;                                                                                                                        \
+         else                                                                                                                                          \
+           m_isReserved = false;}"                                                                                                                     \
 
 #endif

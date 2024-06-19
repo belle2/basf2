@@ -13,7 +13,7 @@
 #include <klm/dbobjects/eklm/EKLMAlignment.h>
 #include <klm/eklm/geometry/Polygon2D.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 

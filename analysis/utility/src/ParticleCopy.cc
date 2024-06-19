@@ -22,6 +22,7 @@ Particle* ParticleCopy::copyParticle(const Particle* original)
   // make a copy of a particle
   Particle* copy = array.appendNew(*original);
   copy->copyRelations(original);
+  copy->writeExtraInfo("original_index", original->getArrayIndex());
 
   // Copy its daughters as well.
   // At this stage the copy of the particle

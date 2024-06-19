@@ -13,7 +13,7 @@
 #include <TMatrixDSym.h>
 #include <TVector3.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {

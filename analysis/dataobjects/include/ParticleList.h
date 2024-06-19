@@ -156,7 +156,8 @@ namespace Belle2 {
       m_particleStore("Particles"),
       m_thisListName(),
       m_antiListName(),
-      m_antiList(nullptr)
+      m_antiList(nullptr),
+      m_isReserved(false)
     {
     }
 
@@ -325,6 +326,22 @@ namespace Belle2 {
      */
     void print() const;
 
+    /**
+     * Sets m_isReserved so that the reserved list can be edited.
+     */
+    void setEditable(bool editable, bool includingAntiList = true)
+    {
+      m_isReserved = !editable;
+      if (includingAntiList and !m_antiListName.empty())
+        getAntiParticleList().setEditable(editable, false);
+    };
+
+    /**
+     * Returns m_isReserved
+     */
+    bool getIsReserved() const { return m_isReserved; };
+
+
     /** Return a short summary of this object's contents in HTML format. */
     std::string getInfoHTML() const;
 
@@ -363,7 +380,9 @@ namespace Belle2 {
     /** keep anti-list around for performance. */
     mutable StoreObjPtr<ParticleList>* m_antiList; //! transient
 
-    ClassDef(ParticleList, 3); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
+    bool m_isReserved = false;  /**< True if the list name is reserved */
+
+    ClassDef(ParticleList, 4); /**< Class to hold a list of particles, anti-particles and self-conjugated particles. */
 
     friend class ParticleSubset;
   };

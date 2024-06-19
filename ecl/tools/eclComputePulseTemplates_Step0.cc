@@ -6,15 +6,22 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include<iostream>
-#include<fstream>
-#include<stdlib.h>
-#include"TTree.h"
-#include"TString.h"
-#include"TFile.h"
-#include <assert.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TString.h>
+#include <TTree.h>
+
+/* C++ headers. */
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+#include <fstream>
 
 using namespace std;
+using namespace Belle2;
 
 /*
 Note photon shape calibrations are needed to compute hadron and diode templates.
@@ -95,11 +102,11 @@ int main(int argc, char* argv[])
   ParameterTree->Branch("mHadronMax", &mHadronMax, "mHadronMax/D");
   ParameterTree->Branch("mDiodeMax", &mDiodeMax, "mDiodeMax/D");
   //
-  std::vector<crystalInfo> cellIDcheck(8736);
+  std::vector<crystalInfo> cellIDcheck(ECLElementNumbers::c_NCrystals);
   ifstream PhotonFile("/home/belle2/longos/WaveformFitting/ecl/tools/params_gamma_shape.dat");
   if (PhotonFile.is_open()) {
     std::vector<double> templine(12);
-    for (int k = 0; k < 8736; k++) {
+    for (int k = 0; k < ECLElementNumbers::c_NCrystals; k++) {
       for (unsigned int j = 0; j < templine.size(); j++)  PhotonFile >> templine[j];
       cellIDcheck[int(templine[0]) - 1].PhotonWaveformPars.resize(11);
       cellIDcheck[int(templine[0]) - 1].PhotonWaveformPars[0] = templine[1];
@@ -139,7 +146,7 @@ int main(int argc, char* argv[])
       //
       for (int j = 0; j < batch; j++) {
         int tCellID = (k * batch) + j;
-        if (tCellID >= 8736)continue;
+        if (tCellID >= ECLElementNumbers::c_NCrystals)continue;
         TempTree->GetEntry(j);
         cellIDcheck[tCellID].HadronWaveformPars.resize(11);
         cellIDcheck[tCellID].DiodeWaveformPars.resize(11);
@@ -163,7 +170,7 @@ int main(int argc, char* argv[])
       TempFile->Close();
     }
     //
-    for (unsigned int f = 0; f < 8736; f++) {
+    for (unsigned int f = 0; f < ECLElementNumbers::c_NCrystals; f++) {
       for (int k = 0; k < 11; k++) {
         PhotonWaveformPar[k] = cellIDcheck[f].PhotonWaveformPars[k];
         HadronWaveformPar[k] = cellIDcheck[f].HadronWaveformPars[k];

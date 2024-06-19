@@ -38,6 +38,7 @@
 #pragma link C++ class Belle2::ECLNoiseData+; // checksum=0xf538d169, implicit, version=1
 #pragma link C++ class Belle2::ECLLookupTable+; // checksum=0xe3749e00, implicit, version=1
 #pragma link C++ class Belle2::ECLLeakageCorrections; // checksum=0x262d45e4, version=2
+#pragma link C++ class Belle2::ECLnOptimal+; // checksum=0xe49fab6f, version=1
 
 // workaround for https://github.com/root-project/root/issues/7960
 #pragma link C++ class std::pair<int,std::unordered_map<int,vector<Belle2::ECLChargedPidPDFs::InputVar>>>+; // checksum=0xacd09862, version=-1

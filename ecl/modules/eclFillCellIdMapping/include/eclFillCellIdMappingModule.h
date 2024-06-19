@@ -8,9 +8,10 @@
 
 #pragma once
 
+/* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 namespace Belle2 {
   class ECLCellIdMapping;
@@ -55,20 +56,22 @@ namespace Belle2 {
     /** Neighbour maps */
     ECL::ECLNeighbours* m_NeighbourMap5{nullptr}; /**< 5x5 */
     ECL::ECLNeighbours* m_NeighbourMap7{nullptr}; /**< 7x7 */
+    ECL::ECLNeighbours* m_NeighbourMap9{nullptr}; /**< 9x9 */
+    ECL::ECLNeighbours* m_NeighbourMap11{nullptr}; /**< 11x11 */
 
     /** Store object pointer: ECLCellIdToECLCalDigitMapping. */
     StoreObjPtr<ECLCellIdMapping> m_eclCellIdMapping;
 
-    /** vector (8736+1 entries) with cell id to phi values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to phi values  */
     std::vector<double> m_CellIdToPhi;
 
-    /** vector (8736+1 entries) with cell id to theta values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to theta values  */
     std::vector<double> m_CellIdToTheta;
 
-    /** vector (8736+1 entries) with cell id to phi id values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to phi id values  */
     std::vector<int> m_CellIdToPhiId;
 
-    /** vector (8736+1 entries) with cell id to theta id values  */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to theta id values  */
     std::vector<int> m_CellIdToThetaId;
 
 

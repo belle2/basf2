@@ -72,9 +72,9 @@ bgType = 'twoPhoton'
 crossect = 7.28e6  # nb
 
 if phase == 3:
-    lumi = 600  # /nb/s
+    lumi = 630  # /nb/s
 elif phase == 31:
-    lumi = 10.6  # /nb/s
+    lumi = 30  # /nb/s
 elif phase == 2:
     lumi = 20   # /nb/s
 else:

@@ -8,15 +8,15 @@
 
 #pragma once
 
-//STL
-#include <vector>
+/* ECL headers. */
+#include <ecl/digitization/EclConfigurationPure.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
-//ECL
-#include <ecl/digitization/EclConfigurationPure.h>
+/* C++ headers. */
+#include <vector>
 
 namespace Belle2 {
 
@@ -111,6 +111,9 @@ namespace Belle2 {
     StoreArray<ECLPureCsIInfo> m_eclpurecsiinfo;
     /** StoreArray ECLHit */
     StoreArray<ECLHit> m_hitLists;
+
+    /** ECL digits (baseline, i.e. the array "ECLDigits").*/
+    StoreArray<ECLDigit> m_BaselineDigits;
 
     /** Fitting parameters. */
     std::vector<fitparams_type> m_fitparams;

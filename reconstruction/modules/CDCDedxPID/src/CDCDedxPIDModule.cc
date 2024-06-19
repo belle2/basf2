@@ -279,12 +279,10 @@ void CDCDedxPIDModule::event()
     // loop over all CDC hits from this track
     // Get the TrackPoints, which contain the hit information we need.
     // Then iterate over each point.
-    int tpcounter = 0;
     const std::vector< genfit::AbsTrackRep* >& gftrackRepresentations = recoTrack->getRepresentations();
     const std::vector< genfit::TrackPoint* >& gftrackPoints = recoTrack->getHitPointsWithMeasurement();
     for (std::vector< genfit::TrackPoint* >::const_iterator tp = gftrackPoints.begin();
          tp != gftrackPoints.end(); ++tp) {
-      tpcounter++;
 
       // should also be possible to use this for svd and pxd hits...
       genfit::AbsMeasurement* aAbsMeasurementPtr = (*tp)->getRawMeasurement(0);

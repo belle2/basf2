@@ -8,16 +8,18 @@
 
 #pragma once
 
-// STL
-#include <vector>
-
-// FRAMEWORK
-#include <framework/core/Module.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/database/DBObjPtr.h>
-
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/utility/ECLTimingUtilities.h>
+
+/* Basf2 headers. */
+#include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+/* C++ headers. */
+#include <vector>
 
 class TH1F;
 class TFile;
@@ -88,7 +90,7 @@ namespace Belle2 {
     double m_backgroundEnergyCut;  /**< Energy cut for background level counting. */
     double m_backgroundTimingCut;  /**< Timing window for background level counting. */
 
-    const int c_nCrystals = 8736;  /**< Number of ECL crystals. */
+    const int c_nCrystals = ECLElementNumbers::c_NCrystals;  /**< Number of ECL crystals. */
 
     std::vector < float > v_calibrationCrystalElectronics;  /**< single crystal electronics calibration as vector*/
     std::vector < float > v_calibrationCrystalElectronicsUnc;  /**< single crystal electronics calibration as vector uncertainty*/

@@ -16,15 +16,19 @@
 
 import basf2 as b2
 
+# Database
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
+
 # Create path
 main = b2.create_path()
 
 # input
 roinput = b2.register_module('SeqRootInput')
-# roinput = register_module('RootInput')
+# roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
-# conversion from RawCOPPER or RawDataBlock to RawDetector objects
+# conversion from RawCOPPER or RawDataBlock to RawDetector objects (needed for PocketDAQ, can be skipped otherwise)
 converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 
@@ -33,20 +37,12 @@ gearbox = b2.register_module('Gearbox')
 gearbox.param('fileName', 'top/TOPSpareModule.xml')
 main.add_module(gearbox)
 
-# Geometry (only TOP needed)
-geometry = b2.register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer', useDB=False)
 
 # Unpacking (format auto detection works now)
 unpack = b2.register_module('TOPUnpacker')
 main.add_module(unpack)
-
-# Add multiple hits by running feature extraction offline
-# remove if production format is used!
-featureExtractor = b2.register_module('TOPWaveformFeatureExtractor')
-main.add_module(featureExtractor)
 
 # Convert to TOPDigits
 converter = b2.register_module('TOPRawDigitConverter')
@@ -64,10 +60,9 @@ main.add_module(converter)
 
 # output
 output = b2.register_module('RootOutput')
-output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPInterimFEInfos',
-                             'TOPRawDigitsToTOPInterimFEInfos',
-                             # 'TOPRawWaveforms', 'TOPRawWaveformsToTOPInterimFEInfos',
-                             # 'TOPRawDigitsToTOPRawWaveforms',
+output.param('branchNames', ['TOPDigits', 'TOPRawDigits', 'TOPProductionEventDebugs',
+                             'TOPProductionHitDebugs', 'TOPRawDigitsToTOPProductionHitDebugs',
+                             # 'TOPRawWaveforms', 'TOPRawDigitsToTOPRawWaveforms',
                              ])
 main.add_module(output)
 

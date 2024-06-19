@@ -149,8 +149,14 @@ namespace Belle2 {
     /** decay string to select one particle that will be treated as invisible */
     std::string  m_treatAsInvisible;
 
+    /** decay string to select one particle that will be ignored to determine the vertex position */
+    std::string  m_ignoreFromVertexFit;
+
     /** Decay descriptor of the invisible particles */
     DecayDescriptor m_pDDescriptorInvisibles;
+
+    /** Decay descriptor of the ignored particles */
+    DecayDescriptor m_pDDescriptorForIgnoring;
 
     /** StoreArray of Particles */
     StoreArray<Particle> m_particles;

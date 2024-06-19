@@ -8,14 +8,14 @@
 
 #pragma once
 
-//STL
-#include <vector>
-
-// FRAMEWORK
+/* Basf2 headers. */
 #include <framework/core/Module.h>
-#include <framework/gearbox/Unit.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/gearbox/Unit.h>
+
+/* C++ headers. */
+#include <vector>
 
 class TGraph2D;
 class TFile;
@@ -111,10 +111,10 @@ namespace Belle2 {
                                                   144, 144, 96, 96, 96, 96, 96, 64, 64, 64
                                                  }; /**< Number of crystals per theta ring. */
 
-    /** vector (8736+1 entries) with cell id to store array positions */
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions */
     std::vector< int > m_StoreArrPosition;
 
-    /** vector (8736+1 entries) with cell id to store array positions for LM*/
+    /** vector (ECLElementNumbers::c_NCrystals + 1 entries) with cell id to store array positions for LM*/
     std::vector< int > m_StoreArrPositionLM;
 
     /** list with all cellid of this connected region */

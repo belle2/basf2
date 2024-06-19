@@ -7,12 +7,12 @@
  **************************************************************************/
 #pragma once
 
-//STL
-#include <string>
-
-//Framework
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+
+/* C++ headers. */
+#include <string>
 
 namespace Belle2 {
   class ECLDebugHit;

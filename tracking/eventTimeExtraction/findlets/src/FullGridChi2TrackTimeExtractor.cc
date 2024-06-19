@@ -11,6 +11,7 @@
 #include <tracking/eventTimeExtraction/findlets/IterativeEventTimeExtractor.icc.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/dataobjects/RecoTrack.h>
+#include <framework/core/ModuleParamList.templateDetails.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

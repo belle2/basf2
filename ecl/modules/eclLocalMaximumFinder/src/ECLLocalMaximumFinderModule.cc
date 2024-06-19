@@ -6,29 +6,27 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// THIS MODULE
+/* Own header. */
 #include <ecl/modules/eclLocalMaximumFinder/ECLLocalMaximumFinderModule.h>
 
-// ROOT
-#include "TFile.h"
-#include "TTree.h"
+/* ECL headers. */
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
+#include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/geometry/ECLNeighbours.h>
 
-// FRAMEWORK
-#include <framework/datastore/StoreArray.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
+
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
-
-// MDST
 #include <mdst/dataobjects/MCParticle.h>
-
-// ECL
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLLocalMaximum.h>
-#include <ecl/dataobjects/ECLConnectedRegion.h>
-#include <ecl/geometry/ECLNeighbours.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
 // NAMESPACE(S)
 using namespace Belle2;
@@ -155,7 +153,7 @@ void ECLLocalMaximumFinderModule::initialize()
   }
 
   // initialize the vector that gives the relation between cellid and store array position
-  m_StoreArrPosition.resize(8736 + 1);
+  m_StoreArrPosition.resize(ECLElementNumbers::c_NCrystals + 1);
 
 }
 

@@ -13,7 +13,11 @@
  **************************************************************************/
 
 #pragma once
+
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
+
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {

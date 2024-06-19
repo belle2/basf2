@@ -29,7 +29,7 @@
 namespace Belle2 {
   /** Class definition for the reference histogram display. */
 
-  class DQMHistComparitorModule : public DQMHistAnalysisModule {
+  class DQMHistComparitorModule final : public DQMHistAnalysisModule {
 
     /**
      * The struct for reference histogram comparison.

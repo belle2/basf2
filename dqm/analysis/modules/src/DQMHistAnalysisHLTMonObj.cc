@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisHLTMonObj.h>
 
-// Belle 2 headers.
+// Basf2 headers.
 #include <hlt/utilities/Units.h>
 
 // C++ headers
@@ -55,15 +55,6 @@ void DQMHistAnalysisHLTMonObjModule::initialize()
 
 }
 
-void DQMHistAnalysisHLTMonObjModule::beginRun()
-{
-}
-
-void DQMHistAnalysisHLTMonObjModule::event()
-{
-  // can put the analysis code here or in endRun() function
-  // for the start tests we will store output only end of run so better to put code there
-}
 
 void DQMHistAnalysisHLTMonObjModule::endRun()
 {

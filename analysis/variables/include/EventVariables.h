@@ -127,6 +127,16 @@ namespace Belle2 {
     double getBeamE(const Particle*);
 
     /**
+     * return true sqrt(s) value
+     */
+    double getCMSEnergyMC(const Particle*);
+
+    /**
+     * return true energy sum of all the generated particles
+     */
+    double getTotalEnergyMC(const Particle*);
+
+    /**
      * return x coordinate of the IP used for MC generation
      */
     double getGenIPX(const Particle*);

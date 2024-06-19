@@ -6,10 +6,10 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-/* Own include. */
+/* Own header. */
 #include <dqm/modules/PhysicsObjectsDQM/IPDQMModule.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <framework/logging/Logger.h>

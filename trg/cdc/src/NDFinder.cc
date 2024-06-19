@@ -558,14 +558,12 @@ std::vector<double> NDFinder::getWeightedMean(std::vector<cellweight> highWeight
   double axomega = 0.;
   double axphi = 0.;
   double axtheta = 0.;
-  int ncells = 0;
   long weightSum = 0;
 
   for (cellweight& elem : highWeight) {
     axomega += elem.index[0] * elem.weight;
     axphi += elem.index[1] * elem.weight;
     axtheta += elem.index[2] * elem.weight;
-    ncells++;
     weightSum += elem.weight;
   }
   axomega /= weightSum;

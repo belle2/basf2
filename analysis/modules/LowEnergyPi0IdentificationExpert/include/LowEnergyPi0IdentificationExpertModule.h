@@ -8,8 +8,10 @@
 
 #pragma once
 
-/* Belle 2 headers. */
+/* Analysis headers. */
 #include <analysis/dataobjects/ParticleList.h>
+
+/* Basf2 headers. */
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>

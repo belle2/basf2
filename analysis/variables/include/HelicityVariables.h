@@ -8,7 +8,10 @@
 
 #pragma once
 
+#include <analysis/VariableManager/Manager.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class Particle;
@@ -82,6 +85,11 @@ namespace Belle2 {
      * must be three. Otherwise, this variable returns NaN.
      */
     double cosHelicityAngleForQuasiTwoBodyDecay(const Particle* mother, const std::vector<double>& indices);
+
+    /**
+     * return a triple-product of three momenta of offspring (i,j,k) in the mother rest frame:  C_T = p_i * (p_j x p_k)
+     */
+    Manager::FunctionPtr momentaTripleProduct(const std::vector<std::string>& arguments);
 
   }
 } // Belle2 namespace

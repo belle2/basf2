@@ -25,13 +25,15 @@ class Generator(basf2.Module):
         self.mcp.registerInDataStore()
 
     def event(self):
-        """And then we generate particles"""
+        """And then we generate particles, ensuring some overlap in the momenta."""
         print("New event:")
-        for i in range(10):
-            p = self.mcp.appendNew()
-            p.setPDG(11)
-            p.setMassFromPDG()
-            p.setMomentum(random.randrange(1, 5), random.randrange(1, 5), random.randrange(1, 5))
+        for _ in range(5):
+            px, py, pz = random.randrange(1, 5), random.randrange(1, 5), random.randrange(1, 5)
+            for _ in range(2):
+                p = self.mcp.appendNew()
+                p.setPDG(11)
+                p.setMassFromPDG()
+                p.setMomentum(px, py, pz)
 
         p = self.mcp.appendNew()
         p.setPDG(11)
@@ -49,18 +51,18 @@ class RankChecker(basf2.Module):
 
     def event(self):
         """And check all the ranks"""
-        # make a list of all the values and a dict of all the exta infos
+        # make a list of all the values and a dict of all the extra infos
         px = []
         py = []
         einfo = defaultdict(list)
-        for p in self.plist:
-            px.append(p.getPx())
-            py.append(p.getPy())
+        for particle in self.plist:
+            px.append(particle.getPx())
+            py.append(particle.getPy())
             # get all names of existing extra infos but convert to a native list of python strings to avoid
             # possible crashes if the std::vector returned by the particle goes out of scope
-            names = [str(n) for n in p.getExtraInfoNames()]
+            names = [str(n) for n in particle.getExtraInfoNames()]
             for n in names:
-                einfo[n].append(p.getExtraInfo(n))
+                einfo[n].append(particle.getExtraInfo(n))
 
         # check the default name is set correctly if we don't specify an output variable
         print(list(einfo.keys()))
@@ -126,24 +128,60 @@ numBest_value = 2
 class NumBestChecker(basf2.Module):
     """Check if 'numBest' works correctly"""
 
+    def __init__(self):
+        """Initializing the parameters."""
+        super().__init__()
+        #: Number of candidates to keep (must be given as parameter, otherwise assert will fail).
+        self.num_best = None
+        #: MultiRank option switch
+        self.allow_multirank = False
+
+    def param(self, kwargs):
+        """Checking for module parameters to distinguish between the different test cases."""
+        self.num_best = kwargs.pop('numBest')
+        self.allow_multirank = kwargs.pop('allowMultiRank', False)
+        super().param(kwargs)
+
     def initialize(self):
-        """Create particle list 'e-:numbest' object"""
-        #: ParticleList object
-        self.plist = Belle2.PyStoreObj('e-:numBest')
+        """Create particle list 'e-:numBest(MultiRank)' object, depending on parameter choice."""
+        if self.allow_multirank:
+            #: particle list object
+            self.plist = Belle2.PyStoreObj('e-:numBestMultiRank')
+        else:
+            #: particle list object
+            self.plist = Belle2.PyStoreObj('e-:numBest')
 
     def event(self):
-        """Check if 'e-:numBest' has the expected size"""
+        """Check if 'e-:numBest' and 'e-:numBestMultiRank' have the expected size"""
+
         size = self.plist.getListSize()
-        # The test fails if size > numBest_value
-        # since we will set numBest = numBest_value
-        assert size <= numBest_value, 'numBest test failed: there are too many Particles in the list!'
+        if self.allow_multirank:
+            px = [particle.getPx() for particle in self.plist]
+            px_value_ranks = {v: i for i, v in enumerate(sorted(set(px), reverse=True,
+                                                                key=lambda v: -math.inf if math.isnan(v) else v),
+                                                         1)}
+            remaining_particles = [v for v in px if px_value_ranks[v] <= self.num_best]
+            assert size <= len(remaining_particles), "numBest test with multirank failed: " \
+                f"there should be {len(remaining_particles)} Particles in the list " \
+                f"instead of {size}!"
+
+        else:
+            # The test fails if size > numBest_value as this is passed as a parameter into the module
+            assert size <= self.num_best, f"numBest test failed: there are too many Particles ({size}) in the list!"
 
 
 # create a new list
-ma.fillParticleListFromMC('e-:numBest', '', path=path)
+ma.fillParticleListFromMC("e-:numBest", "", path=path)
 # sort the list, using numBest
-ma.rankByHighest('e-:numBest', 'p', numBest=numBest_value, path=path)
+ma.rankByHighest("e-:numBest", "p", numBest=numBest_value, path=path)
 # and check that numBest worked as expected
-path.add_module(NumBestChecker())
+path.add_module(NumBestChecker(), numBest=numBest_value)
+
+# create another new list, this time for multi rank test
+ma.fillParticleListFromMC("e-:numBestMultiRank", "", path=path)
+# sort the list, using numBest and allowMultiRank
+ma.rankByHighest("e-:numBestMultiRank", "px", numBest=numBest_value, allowMultiRank=True, path=path)
+# and check that numBest worked as expected
+path.add_module(NumBestChecker(), numBest=numBest_value, allowMultiRank=True)
 
 basf2.process(path)

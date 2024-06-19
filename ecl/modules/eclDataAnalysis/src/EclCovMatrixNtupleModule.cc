@@ -13,20 +13,18 @@
  *                                                                        *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclDataAnalysis/EclCovMatrixNtupleModule.h>
 
-//ROOT
-#include <TTree.h>
-#include <TFile.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-
+/* ROOT headers. */
+#include <TFile.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -97,7 +95,7 @@ void EclCovMatrixNtupleModule::event()
 
   m_nhits  = 0;
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     m_cellID[i]  = 0;
     m_theta[i]  = 0;
     m_phi[i]    = 0;

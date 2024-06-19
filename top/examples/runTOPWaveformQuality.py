@@ -11,7 +11,6 @@
 
 # ---------------------------------------------------------------------------------------
 # Display of waveforms with feature extraction points superimposed
-# Unpacker is set for Interim FE format v2.1
 # ---------------------------------------------------------------------------------------
 
 # avoid race conditions beetween pyroot and GUI thread
@@ -22,19 +21,11 @@ gROOT.SetBatch()  # noqa
 
 import basf2 as b2
 
-import argparse
-parser = argparse.ArgumentParser(description='Go through a data file, apply calibration, and write the waveforms to a root file.',
-                                 usage='%(prog)s [options]')
-
-# parser.add_argument(
-#     '--inputRun',
-#     metavar='InputRun',
-#     required=True,
-#     help='the name for the input data files.')
-#
-args = parser.parse_args()
-
 b2.set_log_level(b2.LogLevel.INFO)
+
+# Database
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
@@ -47,14 +38,8 @@ main.add_module(roinput)
 converter = b2.register_module('Convert2RawDet')
 main.add_module(converter)
 
-# geometry parameters
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
-
-# Geometry (only TOP needed)
-geometry = b2.register_module('Geometry')
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
+main.add_module('TOPGeometryParInitializer')
 
 # Unpacking (format auto detection works now)
 unpack = b2.register_module('TOPUnpacker')

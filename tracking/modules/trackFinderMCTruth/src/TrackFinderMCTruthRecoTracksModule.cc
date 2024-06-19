@@ -121,6 +121,14 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "\"is:X\" where X is a PDG code: particle must have this code. "
            "\"from:X\" any of the particles's ancestors must have this (X) code",
            std::vector<std::string>(1, "primary"));
+  addParam("onlyCheckDirectParentPdgCode",
+           m_onlyCheckDirectParentPdgCode,
+           "To be used together with WhichParticles to select the ancestor and daughters. "
+           "If true, only check the direct parent to be contained in the list of possible ancestors. "
+           "If false, check all ancestors in in the list of possible ancestors. "
+           "This could be used to e.g. only create MCRecoTracks for slow pions from D* decays instead of creating an MCRecoTrack "
+           "for every pion as long as the D* is one of its ancestors.",
+           m_onlyCheckDirectParentPdgCode);
 
   addParam("EnergyCut",
            m_energyCut,
@@ -134,7 +142,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 
   addParam("MergeDecayInFlight",
            m_mergeDecayInFlight,
-           "Merge decay in flights that produce a single charged particle to the mother particle",
+           "Merge decay in flights that produce a single charged particle to the parent particle",
            bool(false));
 
   addParam("SetTimeSeed",
@@ -456,21 +464,31 @@ void TrackFinderMCTruthRecoTracksModule::event()
     //check if particle has an ancestor selected by the user. If user did not set any pdg code every code is fine for track candidate creation
     const int nFromPdgCodes = m_fromPdgCodes.size();
     if (nFromPdgCodes not_eq 0) {
-      MCParticle* currentMother = aMcParticlePtr->getMother();
+      MCParticle* currentParent = aMcParticlePtr->getMother();
       int nFalsePdgCodes = 0;
       int nAncestor = 0;
-      while (currentMother not_eq nullptr) {
-        int currentMotherPdgCode = currentMother->getPDG();
+      bool foundParent = false;
+      while (currentParent not_eq nullptr) {
+        int currentParentPdgCode = currentParent->getPDG();
         for (int i = 0; i not_eq nFromPdgCodes; ++i) {
-          if (m_fromPdgCodes[i] not_eq currentMotherPdgCode) {
+          if (m_fromPdgCodes[i] not_eq currentParentPdgCode) {
             ++nFalsePdgCodes;
+          } else {
+            foundParent = true;
+            // if (m_onlyCheckDirectParentPdgCode) {
+            //   break;
+            // }
           }
         }
 
-        currentMother = currentMother->getMother();
-        ++nAncestor;
+        if (m_onlyCheckDirectParentPdgCode) {
+          currentParent = nullptr;
+        } else {
+          currentParent = currentParent->getMother();
+          ++nAncestor;
+        }
       }
-      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes)) {
+      if (nFalsePdgCodes == (nAncestor * nFromPdgCodes) or not(m_onlyCheckDirectParentPdgCode and foundParent)) {
         B2DEBUG(20, "particle does not have and ancestor with one of the user provided pdg codes and will therefore be skipped");
         continue; //goto next mcParticle, do not make track candidate
       }

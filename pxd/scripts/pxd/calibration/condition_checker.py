@@ -19,7 +19,7 @@ from abc import ABC, abstractmethod
 from ROOT import Belle2
 import ROOT
 import numpy as np
-from root_numpy import array2hist
+from hist_utils import array2hist
 from pxd.utils import get_sensor_graphs, get_sensor_maps, sensorID_list
 from pxd.utils import latex_r, nPixels, nVCells, nUCells
 

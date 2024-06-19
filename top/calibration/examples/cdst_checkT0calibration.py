@@ -16,21 +16,29 @@
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
+from reconstruction import prepare_user_cdst_analysis
 
-# Global tag: use global tag replay
+# global tags
+# ******************************************************************************************************************
+# note: The patching global tags and their order are bucket number and basf2 version dependent.
+#       Given below is what is needed for cdst files of bucket 16 calibration and January-2023 development version.
+# ******************************************************************************************************************
+b2.conditions.override_globaltags()
+b2.conditions.append_globaltag('patch_main_release-07_noTOP')
+b2.conditions.append_globaltag('data_reprocessing_proc13')  # experiments 7 - 18
+# b2.conditions.append_globaltag('data_reprocessing_prompt')  # experiments 20 - 26
+b2.conditions.append_globaltag('online')
 
 # Create path
 main = b2.create_path()
 
 # Input: cDST file(s) of Bhabha skim, use -i option
+# files of bucket 16 can be found on KEKCC in /gpfs/group/belle2/dataprod/Data/PromptReco/bucket16_calib/
 roinput = b2.register_module('RootInput')
 main.add_module(roinput)
 
-# Initialize TOP geometry parameters (creation of Geant geometry is not needed)
-main.add_module('TOPGeometryParInitializer')
-
-# Channel masking
-main.add_module('TOPChannelMasker')
+# run unpackers and post-tracking reconstruction
+prepare_user_cdst_analysis(main)
 
 # Calibration checker: for dimuon sample replace 'bhabha' with 'dimuon'
 calibrator = b2.register_module('TOPChannelT0Calibrator')

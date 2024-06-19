@@ -11,7 +11,7 @@
 
 """
 <header>
-  <contact>ritter</contact>
+  <contact>Benjamin.Schwenker@phys.uni-goettingen.de</contact>
   <description>
     Plot the efficiency to find a cluster for a given truehit for all layers of
     the VXD.
@@ -50,7 +50,7 @@ class ClusterEfficiency(b2.Module):
         self.rfile.cd()
         #: flat list of all profiles for easy access
         self.profiles = []
-        #: layer/momentum hierachy of all profiles
+        #: layer/momentum hierarchy of all profiles
         self.eff = {}
 
         def profile(name, title, text, contact):
@@ -64,7 +64,7 @@ class ClusterEfficiency(b2.Module):
             self.profiles.append(prof)
             return prof
 
-        # name, title and decription templates
+        # name, title and description templates
         prof_name = "ClusterEfficiency_layer{layer}_{p:.1f}GeV"
         prof_title = "Cluster Efficiency in #phi, layer={layer}, "\
             + "p={p:.1f} GeV;#phi in degrees;efficiency"
@@ -151,7 +151,7 @@ class ClusterEfficiency(b2.Module):
 
     def event(self):
         """
-        Update the efficienies by iterating over all primary particles
+        Update the efficiencies by iterating over all primary particles
         """
         mcparticles = Belle2.PyStoreArray("MCParticles")
         for mcp in mcparticles:

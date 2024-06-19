@@ -8,13 +8,15 @@
 
 #pragma once
 
-//STL
-#include <vector>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 
+/* C++ headers. */
+#include <vector>
 
 class TH1F;
 class TH2F;
@@ -142,7 +144,7 @@ namespace Belle2 {
     const double GeVtoJ = 1.6e-10;
 
     /**  Store crystal geometry and mass data*/
-    ECLCrystalData* Crystal[8736] {0};
+    ECLCrystalData* Crystal[ECLElementNumbers::c_NCrystals] {0};
 
     /** Populate ARICH HAPD dose and flux histograms (from the BeamBack hits array)**/
     int FillARICHBeamBack(BeamBackHit* aBBHit);
@@ -162,14 +164,6 @@ namespace Belle2 {
     int ARICHmod2row(int modID);
 
     //ECL channels
-    /** Total number of ECL crystals   */
-    static const int nECLCrystalTot = 8736;
-    /** Number of Barrel ECL crystals  */
-    const int nECLCrystalBAR = 6624;
-    /** Number of FWD ECL end-capcrystals */
-    const int nECLCrystalECF = 1152;
-    /** Number of BWD ECL end-capcrystals */
-    const int nECLCrystalECB =  960;
     /** Number of thetaID values */
     static const int nECLThetaID = 69;
 

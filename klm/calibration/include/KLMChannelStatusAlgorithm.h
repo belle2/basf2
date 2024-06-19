@@ -12,7 +12,7 @@
 #include <klm/dataobjects/KLMChannelMapValue.h>
 #include <klm/dbobjects/KLMChannelStatus.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {

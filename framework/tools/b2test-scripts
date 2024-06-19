@@ -48,8 +48,6 @@ from a different directory.
 import sys
 import os
 import glob
-import pathlib
-import shutil
 import subprocess
 import difflib
 from concurrent.futures import ThreadPoolExecutor
@@ -65,7 +63,6 @@ import timeit
 import xml.etree.cElementTree as ET
 from collections import defaultdict
 from functools import partial
-from basf2 import find_file
 from b2test_utils import is_ci, temporary_set_environment
 
 # allow stopping tests with Ctrl+c
@@ -128,10 +125,11 @@ def format_output(name, out, err):
     return "".join(output)
 
 
-def report_test_result(result, extra, name, message):
+def report_test_result(result, extra, name, message, time):
     """ print out the result of one test"""
     result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
-    print(f"{extra}finished test {name}\n     -> {result_message}: {message}", flush=True)
+    print(f"{extra}finished test {name}\n     -> {result_message}: {message}\n     -> exec. time: {int(time)}s",
+          flush=True)
 
 
 def run_test(prepare_step, argument):
@@ -192,7 +190,7 @@ def run_test_ipynb(argument):
     time = timeit.default_timer() - time_start
 
     with print_lock:
-        report_test_result(result, extra, name, message)
+        report_test_result(result, extra, name, message, time)
 
     return (result, message, time, extra)
 
@@ -256,7 +254,7 @@ def run_test_py(argument, prepare_step=False):
                 # Format diff of output
                 output_diff = "\n".join(e for e in log_tests if e is not None)
 
-        report_test_result(result, extra, name, message)
+        report_test_result(result, extra, name, message, time)
 
     # we didn't want to print the diff in full but we want to return it if it
     # exists so let's replace the extra
@@ -431,7 +429,7 @@ def executor(options, prepare_step):
                     failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
                                             type="FAILED" if passed is False else "SKIPPED")
                     if output is not None:
-                        failure.text = re.sub('\033\[[0-9;]*m', '', output)
+                        failure.text = re.sub('\033\\[[0-9;]*m', '', output)
 
         tree = ET.ElementTree(root_el)
         tree.write(options.xml, encoding="UTF-8", xml_declaration=True)

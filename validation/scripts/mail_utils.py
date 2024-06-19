@@ -133,7 +133,7 @@ def send_mail(
     msg.attach(
         MIMEText(
             "{greeting},\n\n{text}{plain_link}\n\n{closing}"
-            "\n\tThe Belle 2 Software Bot (B2Bot)".format(**data),
+            "\n\tThe Belle II Software Bot (B2Bot)".format(**data),
             "plain",
         )
     )

@@ -91,9 +91,9 @@ author = 'Belle II Software Group'
 # The short X.Y version.
 version = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 # Used for links to the repository
-basf2_repository = "https://stash.desy.de/projects/B2/repos/basf2"
+basf2_repository = "https://gitlab.desy.de/belle2/software/basf2/"
 basf2_commitid = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().strip()
-basf2_jira = "https://agira.desy.de"
+basf2_issues = "https://gitlab.desy.de/belle2/software/basf2/-/issues/"
 
 # The full version, including alpha/beta/rc tags.
 release = os.environ.get('BELLE2_RELEASE', 'development')
@@ -296,7 +296,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'basf2.tex', 'Belle 2 Software Documentation',
+    (master_doc, 'basf2.tex', 'Belle II Software Documentation',
      author, 'manual'),
 ]
 

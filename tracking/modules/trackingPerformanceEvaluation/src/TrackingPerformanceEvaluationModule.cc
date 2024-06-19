@@ -358,7 +358,6 @@ void TrackingPerformanceEvaluationModule::event()
 
     int nFittedTracksMCRT = 0;
     int nFittedTracks = 0;
-    int nFittedTrackswPXDHits = 0;
 
     MCParticleInfo mcParticleInfo(mcParticle, magField);
 
@@ -429,7 +428,6 @@ void TrackingPerformanceEvaluationModule::event()
 
           if (fitResult->getHitPatternVXD().getNPXDHits() > 0) {
             m_h3_TrackswPXDHitsPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
-            nFittedTrackswPXDHits++;
           }
 
           m_h3_TracksPerMCParticle->Fill(mcParticleInfo.getPt(), mcParticleInfo.getPtheta(), mcParticleInfo.getPphi());
@@ -527,7 +525,6 @@ void TrackingPerformanceEvaluationModule::event()
 
   for (const RecoTrack& mcRecoTrack : m_MCRecoTracks) {
 
-    int nRecoTrack = 0;
     bool hasRecoTrack = false;
 
     //3.a retrieve the RecoTrack
@@ -549,7 +546,6 @@ void TrackingPerformanceEvaluationModule::event()
       for (int tc = 0; tc < (int)RecoTracks_fromMCParticle.size(); tc++)
         if (!hasRecoTrack) {
           hasRecoTrack = true;
-          nRecoTrack++;
         }
 
     }

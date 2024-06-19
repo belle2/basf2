@@ -309,13 +309,13 @@ namespace Belle2 {
     double fRange[2][4][15][kRange];      /**< Range pdf */
     double fRchisq[2][4][kRchisq + 1]; /**< Reduced chi-squared pdf */
     double fRchisqN[2][4][15];    /**< Non-overflow normalization */
-    double fRchisqD1[2][4][kRchisq + 1] = {0.0}; /**< First derivatives of Reduced chi-squared pdf */
-    double fRchisqD2[2][4][kRchisq + 1] = {0.0}; /**< Second derivatives of Reduced chi-squared pdf */
-    double fRchisqD3[2][4][kRchisq + 1] = {0.0}; /**< Third derivatives of Reduced chi-squared pdf */
+    double fRchisqD1[2][4][kRchisq + 1] = {{{0.0}}}; /**< First derivatives of Reduced chi-squared pdf */
+    double fRchisqD2[2][4][kRchisq + 1] = {{{0.0}}}; /**< Second derivatives of Reduced chi-squared pdf */
+    double fRchisqD3[2][4][kRchisq + 1] = {{{0.0}}}; /**< Third derivatives of Reduced chi-squared pdf */
     double fEEcl[kPTrk][kEEcl + 1];       /**< ECL energy pdf */
-    double fEEclD1[kPTrk][kEEcl + 1] = {0.0};     /**< First derivatives of ECL energy pdf */
-    double fEEclD2[kPTrk][kEEcl + 1] = {0.0};     /**< Second derivatives of ECL energy pdf */
-    double fEEclD3[kPTrk][kEEcl + 1] = {0.0};     /**< Third derivatives of ECL energy pdf */
+    double fEEclD1[kPTrk][kEEcl + 1] = {{0.0}};     /**< First derivatives of ECL energy pdf */
+    double fEEclD2[kPTrk][kEEcl + 1] = {{0.0}};     /**< Second derivatives of ECL energy pdf */
+    double fEEclD3[kPTrk][kEEcl + 1] = {{0.0}};     /**< Third derivatives of ECL energy pdf */
 
   };
 

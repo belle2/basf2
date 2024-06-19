@@ -6,16 +6,24 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* Basf2 headers. */
+#include <framework/database/Configuration.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Configuration.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <iostream>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TH1F.h>
+
+/* C++ headers. */
+#include <iostream>
 
 using namespace Belle2;
 
@@ -89,9 +97,9 @@ int main(int argc, char** argv)
   TFile hfile(fname, "recreate");
   TString htitle = payloadTitle;
   htitle += " values;cellID";
-  TH1F* existingPayload = new TH1F("existingPayload", htitle, 8736, 1, 8737);
+  TH1F* existingPayload = new TH1F("existingPayload", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     existingPayload->SetBinContent(cellID, currentValues[cellID - 1]);
     existingPayload->SetBinError(cellID, currentUnc[cellID - 1]);
   }

@@ -24,7 +24,7 @@
 namespace Belle2 {
   /*! DQM Delta Histogram Test code and example */
 
-  class DQMHistAnalysisDeltaTestModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisDeltaTestModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:

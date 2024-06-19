@@ -234,6 +234,7 @@ def treeFit(
     customOriginCovariance=[0.0048, 0, 0, 0, 0.003567, 0, 0, 0, 0.0400],
     originDimension=3,
     treatAsInvisible='',
+    ignoreFromVertexFit='',
     path=None,
 ):
     """
@@ -247,6 +248,14 @@ def treeFit(
       reconstructDecay('pi0:A -> gamma:pi0 gamma:pi0', '0.130 < InvM < 0.14', path=mypath)
       reconstructDecay('B0:treefit -> pi+:my pi-:my pi0:A ', '', path=mypath)
       treeFit('B0:treefit', ipConstraint=True, path=mypath)
+
+
+    .. note::
+        The Particle object loaded from the KLMCluster does not have proper covariance matrix yet (by release-06 at least).
+        The performance of TreeFit with these particles is not guaranteed.
+        Alternatively, one can perform the TreeFit ignoring these particles from the vertex fit with
+        the option ``ignoreFromVertexFit``.
+
 
     Parameters:
         list_name (str):     name of the input ParticleList
@@ -270,6 +279,7 @@ def treeFit(
         originDimension (int): If the origin or IP constraint (``customOriginVertex`` or ``ipConstraint``) are used,
             this specifies the dimension of the constraint (3D or 2D).
         treatAsInvisible (str): Decay string to select one particle that will be treated as invisible in the fit.
+        ignoreFromVertexFit (str): Decay string to select particles that will be ignored to determine the vertex position.
         path (basf2.Path): modules are added to this path
     """
     treeFitter = register_module("TreeFitter")
@@ -288,6 +298,7 @@ def treeFit(
     treeFitter.param('customOriginCovariance', customOriginCovariance)
     treeFitter.param('originDimension', originDimension)
     treeFitter.param('treatAsInvisible', treatAsInvisible)
+    treeFitter.param('ignoreFromVertexFit', ignoreFromVertexFit)
     path.add_module(treeFitter)
 
 

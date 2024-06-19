@@ -20,8 +20,15 @@
  **************************************************************************/
 
 #pragma once
-#include <TObject.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
+
+/* ROOT headers. */
+#include <TObject.h>
 
 namespace Belle2 {
 
@@ -42,9 +49,12 @@ namespace Belle2 {
     {
       if (refCrystals.size() != 52) {B2FATAL("ECLReferenceCrystalPerCrateCalib: wrong size vector uploaded, " << refCrystals.size() << " instead of 52 (one crystal per crate)");}
       for (int i = 0; i < 52; i++) {
-        if ((refCrystals[i] < 1) || (refCrystals[i] > 8736)) {
-          B2FATAL("ECLReferenceCrystalPerCrateCalib: cell id outside valid range of 1..8736.  Crate " << i << " has reference cid = " <<
-                  refCrystals[i]);
+        if ((refCrystals[i] < 1) ||
+            (refCrystals[i] > ECLElementNumbers::c_NCrystals)) {
+          B2FATAL(
+            "ECLReferenceCrystalPerCrateCalib: cell id outside valid range from 1 to "
+            << ECLElementNumbers::c_NCrystals << ".  Crate " << i <<
+            " has reference cid = " << refCrystals[i]);
         }
       }
       m_refCrystals = refCrystals;

@@ -208,7 +208,6 @@ void MCTrackCandClassifierModule::event()
   for (const genfit::TrackCand& mcTrackCand : m_GenfitMCTrackCands) {
 
     int nGoodTrueHits = 0;
-    int nBadTrueHits = 0;
     int nGood1Dinfo = 0;
 
     B2DEBUG(21, " a NEW MCTrackCand ");
@@ -389,7 +388,6 @@ void MCTrackCandClassifierModule::event()
           m_h1_hitDistance_accepted->Fill(theDistance(ROOT::Math::XYZVector(0, 0, 0), globalHit));
           m_h1_hitRadius_accepted->Fill(hitRadius);
         } else {
-          nBadTrueHits ++;
           m_h1_hitDistance_rejected->Fill(theDistance(ROOT::Math::XYZVector(0, 0, 0), globalHit));
           m_h1_hitRadius_rejected->Fill(hitRadius);
           if (m_removeBadHits)
@@ -739,7 +737,6 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
   h->GetYaxis()->SetRangeUser(0.00001, 1);
 
   Int_t bin = 0;
-  Int_t nBins = 0;
 
   for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
 
@@ -760,9 +757,6 @@ TH1F* MCTrackCandClassifierModule::createHistogramsRatio(const char* name, const
 
         num += hnum->GetBinContent(bin);
         den += hden->GetBinContent(bin);
-
-        nBins++;
-
       }
     double eff = 0;
     double err = 0;

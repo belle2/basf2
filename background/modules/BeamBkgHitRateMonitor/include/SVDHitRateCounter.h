@@ -38,10 +38,10 @@ namespace Belle2 {
        */
       struct TreeStruct {
         float layerAverageRates[4] = {0}; /**< layer average occupancy */
-        float layerLadderAverageRates[4][16] = {0}; /**< [#layer][#ladder] */
-        float layerSensorAverageRates[4][5] = {0}; /**< [#layer][#sensor] */
+        float layerLadderAverageRates[4][16] = {{0}}; /**< [#layer][#ladder] */
+        float layerSensorAverageRates[4][5] = {{0}}; /**< [#layer][#sensor] */
         float averageRate = 0; /**< total SVD average occupancy */
-        float l3LadderSensorAverageRates[7][2] = {0}; /**< Layer 3 sensors [#ladder][#sensor] */
+        float l3LadderSensorAverageRates[7][2] = {{0}}; /**< Layer 3 sensors [#ladder][#sensor] */
         int numEvents = 0; /**< number of events accumulated */
         bool valid = false;  /**< status: true = rates valid */
 
@@ -206,21 +206,21 @@ namespace Belle2 {
 
       int m_activeStrips = 0; /**< number of active strips */
       int m_layerActiveStrips[4] = {0}; /**< number of active strips in each layer */
-      int m_layerLadderActiveStrips[4][16] = {0}; /**< number of active strips in each layer, ladder */
-      int m_layerSensorActiveStrips[4][5] = {0}; /**< number of active strips in each layer, sensor position */
-      int m_l3LadderSensorActiveStrips[7][2] = {0}; /**< number of active strips in each sensor in Layer 3 */
+      int m_layerLadderActiveStrips[4][16] = {{0}}; /**< number of active strips in each layer, ladder */
+      int m_layerSensorActiveStrips[4][5] = {{0}}; /**< number of active strips in each layer, sensor position */
+      int m_l3LadderSensorActiveStrips[7][2] = {{0}}; /**< number of active strips in each sensor in Layer 3 */
 
       int m_activeStripsU = 0; /**< number of active U-strips */
       int m_layerActiveStripsU[4] = {0}; /**< number of active U-strips in each layer */
-      int m_layerLadderActiveStripsU[4][16] = {0}; /**< number of active U-strips in each layer, ladder */
-      int m_layerSensorActiveStripsU[4][5] = {0}; /**< number of active U-strips in each layer, sensor position */
-      int m_l3LadderSensorActiveStripsU[7][2] = {0}; /**< number of active U-strips in each sensor in Layer 3 */
+      int m_layerLadderActiveStripsU[4][16] = {{0}}; /**< number of active U-strips in each layer, ladder */
+      int m_layerSensorActiveStripsU[4][5] = {{0}}; /**< number of active U-strips in each layer, sensor position */
+      int m_l3LadderSensorActiveStripsU[7][2] = {{0}}; /**< number of active U-strips in each sensor in Layer 3 */
 
       int m_activeStripsV = 0; /**< number of active V-strips */
       int m_layerActiveStripsV[4] = {0}; /**< number of active V-strips in each layer */
-      int m_layerLadderActiveStripsV[4][16] = {0}; /**< number of active V-strips in each layer, ladder */
-      int m_layerSensorActiveStripsV[4][5] = {0}; /**< number of active V-strips in each layer, sensor position */
-      int m_l3LadderSensorActiveStripsV[7][2] = {0}; /**< number of active V-strips in each sensor in Layer 3 */
+      int m_layerLadderActiveStripsV[4][16] = {{0}}; /**< number of active V-strips in each layer, ladder */
+      int m_layerSensorActiveStripsV[4][5] = {{0}}; /**< number of active V-strips in each layer, sensor position */
+      int m_l3LadderSensorActiveStripsV[7][2] = {{0}}; /**< number of active V-strips in each sensor in Layer 3 */
 
       double m_thrCharge = 0; /**< cut on cluster energy in electrons */
       bool m_ignoreHotStripsPayload; /**< count hot strips as active */
@@ -228,8 +228,8 @@ namespace Belle2 {
 
       double m_massKg = 0; /**< Active mass of the whole SVD in Kg. */
       double m_layerMassKg[4] = {0}; /**< Active mass of each layer in Kg. */
-      double m_layerLadderMassKg[4][16] = {0}; /**< Active mass of each ladder of each layer, in Kg. */
-      double m_layerSensorMassKg[4][5] = {0}; /**< Active mass of each ladder/sensor position, in Kg. */
+      double m_layerLadderMassKg[4][16] = {{0}}; /**< Active mass of each ladder of each layer, in Kg. */
+      double m_layerSensorMassKg[4][5] = {{0}}; /**< Active mass of each ladder/sensor position, in Kg. */
       // No need for m_l3LadderSensorMassKg, massOfSensor() can be used.
 
       /** SVD Sampling Clock frequency (approximated) in GHz (standard

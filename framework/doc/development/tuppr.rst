@@ -23,7 +23,7 @@ are a few requirements for this globaltag:
 .. tip::
    If you want to know who is the manager of the main globaltag, please browse
    `the relevant file in the versioning repository
-   <https://stash.desy.de/projects/B2/repos/versioning/browse/versioning.py>`__, go down to the ``jira_global_tag_v2``
+   <https://gitlab.desy.de/belle2/software/versioning/-/tree/main/versioning.py>`__, go down to the ``jira_global_tag_v2``
    function and look for the assignee of the task labelled as ``main``.
 
 

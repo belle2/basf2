@@ -3,8 +3,13 @@
 Tracking for Special Classes of Tracks
 --------------------------------------
 
-.. toctree::
-    :glob:
-    :maxdepth: 3
+.. _tracking_v0Finding:
 
-    v0Finding
+V0 Finding
+""""""""""
+
+.. b2-modules::
+   :package: tracking
+   :modules: V0Finder
+   :io-plots:
+

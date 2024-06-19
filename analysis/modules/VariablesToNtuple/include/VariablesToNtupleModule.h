@@ -8,12 +8,13 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <analysis/VariableManager/Manager.h>
+#include <analysis/dataobjects/RestOfEvent.h>
+
+#include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/pcore/RootMergeable.h>
-#include <analysis/dataobjects/RestOfEvent.h>
 
 #include <TTree.h>
 #include <TFile.h>
@@ -58,6 +59,8 @@ namespace Belle2 {
     std::string m_fileName;
     /** Name of the TTree. */
     std::string m_treeName;
+    /** Suffix to be appended to the output file name. */
+    std::string m_fileNameSuffix;
     /** Size of TBaskets in the output ROOT file in bytes. */
     int m_basketsize;
 

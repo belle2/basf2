@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <analysis/modules/KlongDecayReconstructor/KlongMomentumUpdaterExpertModule.h>
 
 // framework aux
@@ -79,13 +79,14 @@ void KlongMomentumUpdaterExpertModule::event()
     // Set 4-vector to B-meson
     particle->set4Vector(BMomentum);
 
-    // Set 4-vector to Klong
+    // Set 4-vector of Klong
     for (auto daughter : daughters) {
       if (daughter->getPDGCode() == Const::Klong.getPDGCode()) {
         auto copyKlong = ParticleCopy::copyParticle(daughter);
         copyKlong->set4Vector(KMomentum);
         copyKlong->writeExtraInfo("permID", idx);
         particle->replaceDaughter(daughter, copyKlong);
+        break;
       }
     }
 

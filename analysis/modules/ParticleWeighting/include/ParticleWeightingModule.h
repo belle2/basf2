@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   /**
-   * Module to apply weights from the database to particles and store added info in ExtraInfo
+   * Module to append weights from the database into the extraInfo of Particles.
    */
   class ParticleWeightingModule : public Module {
 

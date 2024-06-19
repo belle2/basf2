@@ -271,7 +271,7 @@ class BtoXll_LFV(BaseSkim):
         stdE("all", path=path)
         stdMu("all", path=path)
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         """Build the skim list for :math:`B \\to X\\ell\\ell` LFV decays."""

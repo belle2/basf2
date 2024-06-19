@@ -49,7 +49,7 @@ void RawData::getChannelGroups(std::vector<ChannelGroup>& channelGroups) const
 {
   ChannelGroup group;
   if (multipleStripHit()) {
-    int asic = (m_Channel - 1) / 15;
+    int asic = (m_Channel - 1) / c_NChannelsAsic;
     int channelBase = 15 * asic;
     channelGroups.clear();
     if ((m_TriggerBits & 0x1) != 0) {

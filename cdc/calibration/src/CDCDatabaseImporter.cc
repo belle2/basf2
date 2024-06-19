@@ -480,7 +480,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
-  unsigned nRead = 0;
+  // unsigned nRead = 0;
 
   ifs >> xtParamMode >> np;
   if (xtParamMode < 0 || xtParamMode > 1) B2FATAL("Invalid xt param mode read !");
@@ -502,7 +502,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
       continue;
     }
 
-    ++nRead;
+    // ++nRead;
 
     int ialpha = -99;
     for (unsigned short i = 0; i < nAlphaBins; ++i) {
@@ -595,7 +595,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   const unsigned short npx = c_nSigmaParams;
   double sgm[npx];
   double theta, alpha;
-  unsigned nRead = 0;
+  // unsigned nRead = 0;
 
   ifs >> sgParamMode >> np;
   if (sgParamMode < 0 || sgParamMode > 1) B2FATAL("Invalid sigma param mode read !");
@@ -621,7 +621,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
       continue;
     }
 
-    ++nRead;
+    // ++nRead;
 
     int ialpha = -99;
     for (unsigned short i = 0; i < nAlphaBins; ++i) {

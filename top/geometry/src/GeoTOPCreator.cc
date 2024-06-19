@@ -105,8 +105,8 @@ namespace Belle2 {
       importObj.construct(*geo);
       importObj.import(iov);
 
-      m_topgp->getChannelMapper().import(iov);
-      m_topgp->getFrontEndMapper().import(iov);
+      m_topgp->getChannelMapper().importPayload(iov);
+      m_topgp->getFrontEndMapper().importPayload(iov);
 
       B2RESULT("TOP: geometry and mappers imported to database");
 

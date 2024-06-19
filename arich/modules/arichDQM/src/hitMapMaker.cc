@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// Own include
+// Own header.
 #include <arich/modules/arichDQM/hitMapMaker.h>
 
 // ARICH
@@ -28,8 +28,6 @@
 
 #include <vector>
 #include <fstream>
-
-using namespace std;
 
 namespace Belle2 {
 

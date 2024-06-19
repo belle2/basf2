@@ -1,0 +1,43 @@
+# EventType: 1263741000
+# Descriptor:  [B+ -> D*- pi+ l+ nu, D*- -> anti-D0 pi-] cc
+# NickName: Bp_Dspilnu
+# Tested: Yes
+# PhysicsWG: SL
+# Responsible: Kai-Ning Chu
+# Email: kai-ning.chu@physics.mcgill.ca
+# Cuts: None
+# Date: 20221014
+
+Decay Upsilon(4S)
+1.0000 B-sig   B+                     VSS;
+1.0000 B+sig   B-                     VSS;
+Enddecay
+
+
+Decay B-sig
+
+0.5  D*+sig   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
+0.5  D*+sig   pi-   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
+Enddecay
+CDecay B+sig
+
+Decay D*+sig
+0.6770    D0sig  pi+                        PHOTOS VSS;
+0.3070    D+sig  pi0                        PHOTOS VSS;
+0.0160    D+sig  gamma                      VSP_PWAVE;
+Enddecay
+CDecay D*-sig
+
+Decay D0sig
+1  K- pi+  PHOTOS PHSP;
+Enddecay
+CDecay anti-D0sig
+
+Decay D+sig
+1  K- pi+ pi+  PHOTOS PHSP;
+Enddecay
+CDecay D-sig
+
+
+End
+

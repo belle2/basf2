@@ -6,17 +6,25 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <ecl/dbobjects/ECLCrystalCalib.h>
+
+/* Basf2 headers. */
+#include <framework/database/Configuration.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
-#include <framework/database/Configuration.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <iostream>
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+/* ROOT headers. */
 #include <TFile.h>
 #include <TH1F.h>
+
+/* C++ headers. */
+#include <iostream>
 
 using namespace Belle2;
 
@@ -90,9 +98,9 @@ int main(int argc, char** argv)
   //..For now, use Gamma Gamma if available; otherwise, use existing value
   std::vector<float> NewCalib;
   std::vector<float> NewCalibUnc;
-  NewCalib.resize(8736);
-  NewCalibUnc.resize(8736);
-  for (int ic = 0; ic < 8736; ic++) {
+  NewCalib.resize(ECLElementNumbers::c_NCrystals);
+  NewCalibUnc.resize(ECLElementNumbers::c_NCrystals);
+  for (int ic = 0; ic < ECLElementNumbers::c_NCrystals; ic++) {
     if (GammaGammaCalib[ic] > 0.) {
       NewCalib[ic] = GammaGammaCalib[ic];
       NewCalibUnc[ic] = GammaGammaCalibUnc[ic];
@@ -122,21 +130,21 @@ int main(int argc, char** argv)
 
   TString htitle = payloadTitle;
   htitle += " existing values;cellID";
-  TH1F* existingPayload = new TH1F("existingPayload", htitle, 8736, 1, 8737);
+  TH1F* existingPayload = new TH1F("existingPayload", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " new values;cellID";
-  TH1F* newPayload = new TH1F("newPayload", htitle, 8736, 1, 8737);
+  TH1F* newPayload = new TH1F("newPayload", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " ratio new/old;cellID";
-  TH1F* payloadRatioVsCellID = new TH1F("payloadRatioVsCellID", htitle, 8736, 1, 8737);
+  TH1F* payloadRatioVsCellID = new TH1F("payloadRatioVsCellID", htitle, ECLElementNumbers::c_NCrystals, 1, 8737);
 
   htitle = payloadTitle;
   htitle += " ratio new/old";
   TH1F* payloadRatio = new TH1F("payloadRatio", htitle, 200, 0.95, 1.05);
 
-  for (int cellID = 1; cellID <= 8736; cellID++) {
+  for (int cellID = 1; cellID <= ECLElementNumbers::c_NCrystals; cellID++) {
     existingPayload->SetBinContent(cellID, ExistingCalib[cellID - 1]);
     existingPayload->SetBinError(cellID, ExistingCalibUnc[cellID - 1]);
 

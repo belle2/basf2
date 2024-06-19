@@ -8,23 +8,26 @@
 
 #pragma once
 
-//FRAMEWORK
-#include <framework/core/HistoModule.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/dataobjects/EventMetaData.h>
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLTrig.h>
-#include <ecl/utility/ECLChannelMapper.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-//OTHER
+#include <ecl/utility/ECLChannelMapper.h>
+
+/* Basf2 headers. */
+#include <framework/core/HistoModule.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <mdst/dataobjects/TRGSummary.h>
 #include <rawdata/dataobjects/RawFTSW.h>
 
+/* ROOT headers. */
 #include <TH1.h>
 #include <TH2.h>
+
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {

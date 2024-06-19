@@ -98,9 +98,9 @@ def get_agreament2(histo_eventT0, histo_onTracks, min_entries=100):
 
 
 def make_roc(hist_sgn, hist_bkg, lower_is_better=False, two_sided=True):
-    import root_numpy
-    dist_sgn = root_numpy.hist2array(hist_sgn)
-    dist_bkg = root_numpy.hist2array(hist_bkg)
+    from hist_utils import hist2array
+    dist_sgn = hist2array(hist_sgn)
+    dist_bkg = hist2array(hist_bkg)
     dist_sgn = dist_sgn/dist_sgn.sum()
     dist_bkg = dist_bkg/dist_bkg.sum()
     if two_sided:
@@ -133,10 +133,10 @@ def np2plt_hist(np_hist):
 
 
 def make_combined_plot(pattern, histos, title=None):
-    import root_numpy
-    h_onTracks = root_numpy.hist2array(get_combined(histos['onTracks'], pattern), return_edges=True)
-    h_offTracks = root_numpy.hist2array(get_combined(histos['offTracks'], pattern), return_edges=True)
-    h_eventT0 = root_numpy.hist2array(histos['eventT0'], return_edges=True)
+    from hist_utils import hist2array
+    h_onTracks = hist2array(get_combined(histos['onTracks'], pattern), return_edges=True)
+    h_offTracks = hist2array(get_combined(histos['offTracks'], pattern), return_edges=True)
+    h_eventT0 = hist2array(histos['eventT0'], return_edges=True)
 
     # normalise h_eventT0 to have same number of entries as h_onTracks
     h_eventT0 = (h_eventT0[0]*sum(h_onTracks[0])/sum(h_eventT0[0]), h_eventT0[1])

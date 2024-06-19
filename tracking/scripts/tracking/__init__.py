@@ -51,27 +51,32 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     This function adds the **standard tracking reconstruction** modules
     to a path:
 
-    # . first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
-    # . CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
-    # . remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
-    # . SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
-    # . SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
-    # . merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
+    #. first we find tracks using the CDC hits only, see :ref:`CDC Track Finding<tracking_trackFindingCDC>`
 
-    .. note::
+    #. CDC tracks are extrapolated to SVD and SVD hits are attached, see :ref:`CDC to SVD CKF<tracking_cdc2svd_ckf>`
 
-       PXD hits are not available on HLT. At the end of the tracking chain on HLT we have the\
-       :ref:`PXD Region Of Interest Finding<tracking_pxdDataReduction>`, that consists of extrapolating\
-       the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
-       Only fired pixels inside these regions reach Event Builder 2.
+    #. remaining  SVD hits are used to find SVD tracks, see :ref:`SVD Track Finding<tracking_trackFindingSVD>`
 
-    # . after all the tracks from the IP are found, we look for special classes of tracks,\
+    #. SVD tracks are extrapolated to CDC to attach CDC hits, see :ref:`SVD to CDC CKF<tracking_svd2cdc_ckf>`
+
+    #. SVD and CDC tracks are merged and fitted, see :ref:`Track Fitting<tracking_trackFitting>`
+
+    #. merged SVD+CDC tracks are extrapolated to PXD to attach PXD hits, see :ref:`SVD to PXD CKF<tracking_svd2pxd_ckf>`
+
+        .. note::
+
+           PXD hits are not available on HLT. At the end of the tracking chain on HLT we have the\
+           :ref:`PXD Region Of Interest Finding<tracking_pxdDataReduction>`, that consists of extrapolating\
+           the tracks on the PXD sensors and defining regions in which we expect to find the hit.\
+           Only fired pixels inside these regions reach Event Builder 2.
+
+    #. after all the tracks from the IP are found, we look for special classes of tracks,\
     in particular we search for displaced vertices to reconstruct K-short, Lambda and\
-    photon-conversions, see :ref:`V0 Finding<tracking_v0Finding>`
+    photon-conversions, see :ref:`V0 Finding<tracking_v0Finding>`.
 
-    .. note::
+    #. If the reconstruction uses PXD, we finally look for tracks with a wrong charge,\
+    flip and refit them to fix the charge, see :ref:`Flip&Refit<trk_flipNrefit>`.
 
-       this last step is not run on HLT
 
 
     :param path: the path to add the tracking reconstruction modules to
@@ -106,7 +111,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param v0_finding: if false, the V0Finder module is not executed
-    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
     """
 
     add_prefilter_tracking_reconstruction(
@@ -131,10 +136,11 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     add_postfilter_tracking_reconstruction(path,
                                            components=components,
                                            pruneTracks=pruneTracks,
-                                           v0_finding=v0_finding,
                                            reco_tracks=reco_tracks,
                                            prune_temporary_tracks=prune_temporary_tracks,
-                                           flip_recoTrack=flip_recoTrack)
+                                           v0_finding=v0_finding,
+                                           flip_recoTrack=flip_recoTrack,
+                                           mcTrackFinding=mcTrackFinding)
 
 
 def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdding=False,
@@ -234,7 +240,8 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
-                                           prune_temporary_tracks=True, v0_finding=True, flip_recoTrack=True):
+                                           prune_temporary_tracks=True, v0_finding=True,
+                                           flip_recoTrack=True, mcTrackFinding=False):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -242,11 +249,12 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
-    :param v0_finding: If false, the V0 module will not be executed
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param prune_temporary_tracks: If false, store all information of the single CDC and VXD tracks before merging.
         If true, prune them.
-    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter
+    :param v0_finding: If false, the V0 module will not be executed
+    :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
+    :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     """
 
     # do not add any new modules if no tracking detectors are in the components
@@ -258,7 +266,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
 
     # flip & refit to fix the charge of some tracks
-    if flip_recoTrack:
+    if flip_recoTrack and not mcTrackFinding and is_pxd_used(components):
         add_flipping_of_recoTracks(path, reco_tracks="RecoTracks")
 
     # estimate the track time

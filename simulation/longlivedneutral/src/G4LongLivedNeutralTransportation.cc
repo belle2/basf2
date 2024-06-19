@@ -259,8 +259,8 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 G4VParticleChange* G4LongLivedNeutralTransportation::AlongStepDoIt(const G4Track& track,
     const G4Step&  stepData)
 {
-  static G4ThreadLocal G4long noCallsASDI = 0;
-  noCallsASDI++;
+  // static G4ThreadLocal G4long noCallsASDI = 0;
+  // noCallsASDI++;
 
   fParticleChange.Initialize(track) ;
 
@@ -381,7 +381,7 @@ G4VParticleChange* G4LongLivedNeutralTransportation::PostStepDoIt(const G4Track&
     // Update the Step flag which identifies the Last Step in a volume
     if (!fFieldExertedForce)
       isLastStep =  fLinearNavigator->ExitedMotherVolume()
-                    | fLinearNavigator->EnteredDaughterVolume() ;
+                    or fLinearNavigator->EnteredDaughterVolume() ;
     else
       isLastStep = fFieldPropagator->IsLastStepInVolume();
   } else {             // fGeometryLimitedStep  is false

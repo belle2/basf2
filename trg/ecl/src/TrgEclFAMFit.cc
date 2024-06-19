@@ -102,7 +102,6 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
   int pedFlag = 0;
   double CoeffAAA = 0;
   double CoeffBBB = 0;
-  double CoeffPPP = 0;
   int dTBin = 0;
   int ShiftdTBin = 0;
   int Nsmalldt = 10;
@@ -145,11 +144,9 @@ TrgEclFAMFit::FAMFit01(std::vector<std::vector<double>> digiEnergy, std::vector<
 
       CoeffAAA = 0;
       CoeffBBB = 0;
-      CoeffPPP = 0;
       for (int iFitSample = 0; iFitSample < 12; iFitSample++) {
         CoeffAAA += CoeffNoise31[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
         CoeffBBB += CoeffNoise32[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
-        CoeffPPP += CoeffNoise33[dTBin - 1][iFitSample] * TCFitSample[iFitSample];
       }
       double deltaT = CoeffBBB / CoeffAAA; // deltaT [us]
 

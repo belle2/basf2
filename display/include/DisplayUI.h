@@ -135,7 +135,7 @@ namespace Belle2 {
     void pollNewEvents();
 
     /** Close window and exit immediately. */
-    void exit();
+    void closeAndExit();
 
     /** Add user-defined data (histograms, etc.). */
     void showUserData(const DisplayData& displayData);

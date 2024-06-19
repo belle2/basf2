@@ -6,17 +6,18 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// ECL GEOMETRY
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/geometry/ECLNeighbours.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 
-// FRAMEWORK
-#include <framework/logging/Logger.h>
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
 
-// OTHER
-#include "TMath.h"
-#include "TVector3.h"
+/* ROOT headers. */
+#include <TMath.h>
+#include <TVector3.h>
 
 using namespace Belle2;
 using namespace ECL;
@@ -95,7 +96,7 @@ void ECLNeighbours::initializeR(double radius)
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     // get the central one
     TVector3 direction = geom->GetCrystalVec(i);
     TVector3 position  = geom->GetCrystalPos(i);
@@ -127,7 +128,7 @@ void ECLNeighbours::initializeF(double frac)
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
 
@@ -224,7 +225,7 @@ void ECLNeighbours::initializeF(double frac)
 void ECLNeighbours::initializeN(const int n, const bool sorted)
 {
   // This is the "NxN-edges" case (in the barrel)
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
@@ -313,7 +314,7 @@ void ECLNeighbours::initializeNC(const int n)
   // ECL geometry
   ECLGeometryPar* geom = ECLGeometryPar::Instance();
 
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
     std::vector<short int> neighbours = m_neighbourMap.at(i + 1);
     std::vector<short int> neighbours_temp;
 
@@ -353,7 +354,7 @@ void ECLNeighbours::initializeNLegacy(int n)
 
   // This is the "NxN-edges" case (in the barrel)
   // in the endcaps we project the neighbours to the outer and inner rings.
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;
@@ -399,7 +400,7 @@ void ECLNeighbours::initializeNCLegacy(const int n, const int corners)
 
   // This is the "NxN-edges" minus edges case (in the barrel)
   // in the endcaps we project the neighbours to the outer and inner rings.
-  for (int i = 0; i < 8736; i++) {
+  for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++) {
 
     // this vector will hold all neighbours for the i-th crystal
     std::vector<short int> neighbours;

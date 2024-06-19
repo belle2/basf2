@@ -7,7 +7,7 @@
  **************************************************************************/
 /*
   <header>
-  <input>EvtGenSimRec_dedx.root</input>
+  <input>ParticleGunSimRec_dedx.root</input>
   <contact>renu2@andrew.cmu.edu</contact>
   <description>check PID performance of each particle vs. all others</description>
   </header>
@@ -88,5 +88,5 @@ void plot(const TString &input_filename)
 void dedx2_LR()
 {
   gROOT->SetStyle("Plain");
-  plot("../EvtGenSimRec_dedx.root");
+  plot("../ParticleGunSimRec_dedx.root");
 }

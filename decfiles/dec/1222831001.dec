@@ -1,0 +1,32 @@
+# EventType: 1222831001
+# Descriptor: [B+ -> chi_c2 [ -> Jpsi [ -> l+ l-] gamma ] K+ ]cc
+# NickName: Bu_chi_c2K_Jpsig_l+l-
+# Documentation:
+# Tested: yes
+# Physics WG: Quarkonium
+# Responsible: Sourabh Chutia
+# Email: ph21070@iisermohali.ac.in
+# Cuts: None
+# Date: 20230202
+# Comments:
+
+Decay Upsilon(4S)
+0.5000 B+sig B-    VSS;
+0.5000 B+ B-sig    VSS;
+Enddecay
+
+Decay B+sig
+1.000 chi_c2sig K+   STS;
+Enddecay
+CDecay B-sig
+
+Decay chi_c2sig
+1.000 J/psisig  gamma   PHSP;
+Enddecay
+
+Decay J/psisig 
+0.500 e+ e-           PHOTOS VLL;
+0.500 mu+ mu-         PHOTOS VLL;
+Enddecay
+
+End

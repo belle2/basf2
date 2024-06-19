@@ -8,7 +8,6 @@
 #include <ecl/modules/eclChargedPIDDataAnalysisExpert/ECLChargedPIDDataAnalysisValidationModule.h>
 
 #include <ecl/dataobjects/ECLPidLikelihood.h>
-#include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/Track.h>

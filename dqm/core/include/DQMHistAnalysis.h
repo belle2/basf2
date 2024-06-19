@@ -244,6 +244,14 @@ namespace Belle2 {
     void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a);
 
     /**
+     * Check if Delta histogram parameters exist for histogram.
+     * @param dirname directory
+     * @param histname name of histogram
+     * @return true if parameters have been set already
+     */
+    bool hasDeltaPar(const std::string& dirname, const std::string& histname);
+
+    /**
      * Mark canvas as updated (or not)
      * @param name name of Canvas
      * @param updated was updated

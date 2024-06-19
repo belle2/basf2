@@ -35,9 +35,8 @@ namespace Belle2 {
    *
    * Likelihood values for all particle hypotheses are calculated and saved in a VXDDedxLikelihood object.
    *
-   * The 'EnableDebugOutput' option adds VXDDedxTrack objects (one for each genfit::Track),
-   * which includes individual dE/dx data points and their corresponding layer,
-   * and hit information like reconstructed position, charge, etc.
+   * VXDDedxTrack objects (one for each genfit::Track), include individual dE/dx data points and their
+   * corresponding layer, and hit information like reconstructed position, charge, etc.
    *
    * The reconstruction of flight paths and the used likelihood ratio method are
    * described and evaluated in
@@ -139,7 +138,6 @@ namespace Belle2 {
 
     //parameters: technical stuff
     double m_trackDistanceThreshhold; /**< Use a faster helix parametrisation, with corrections as soon as the approximation is more than ... cm off. */
-    bool m_enableDebugOutput; /**< Whether to save information on tracks and associated hits and dE/dx values in VXDDedxTrack objects */
 
     //parameters: which particles and detectors to use
     bool m_onlyPrimaryParticles; /**< Only save data for primary particles (as determined by MC truth) */

@@ -8,16 +8,14 @@
 
 #pragma once
 
-//Calibration
-#include <calibration/CalibrationCollectorModule.h>
-
-//Framework
-#include <framework/database/DBObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-
-// ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
+
+/* Basf2 headers. */
+#include <calibration/CalibrationCollectorModule.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 

@@ -5,28 +5,23 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclTRGInformation/ECLTRGInformationModule.h>
 
-//Framework
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
-
-//ECL
+/* ECL headers. */
 #include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 
-//MDST
-#include <mdst/dataobjects/ECLCluster.h>
-
-//TRG
-#include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
-#include <trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h>
-
-#include <trg/ecl/TrgEclMapping.h>
-
-//Analysis
+/* Basf2 headers. */
 #include <analysis/dataobjects/ECLTRGInformation.h>
 #include <analysis/dataobjects/ECLTriggerCell.h>
+#include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <trg/ecl/dataobjects/TRGECLUnpackerEvtStore.h>
+#include <trg/ecl/dataobjects/TRGECLUnpackerStore.h>
+#include <trg/ecl/TrgEclMapping.h>
 
 using namespace Belle2;
 using namespace std;
@@ -67,7 +62,7 @@ void ECLTRGInformationModule::initialize()
   m_eclTCs.registerRelationTo(m_eclCalDigits);
 
   /** map to have direct access to storearrays based on id and not store array position */
-  m_calDigitStoreArrPosition.resize(8736 + 1);
+  m_calDigitStoreArrPosition.resize(ECLElementNumbers::c_NCrystals + 1);
   m_TCStoreArrPosition.resize(ECLTRGInformation::c_nTCs + 1);
 
   /** ecl cell ids per TC, cleanup in terminate() */

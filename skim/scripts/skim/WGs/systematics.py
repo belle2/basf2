@@ -611,7 +611,7 @@ class Random(BaseSkim):
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     def build_lists(self, path):
         # Select one photon/track per event with no other cuts, so that all events are
@@ -688,7 +688,7 @@ class SystematicsJpsi(BaseSkim):
     def load_standard_lists(self, path):
         stdMu("all", path=path)
         stdE("all", path=path)
-        stdPhotons("all", path=path, loadPhotonBeamBackgroundMVA=False)
+        stdPhotons("all", path=path)
 
     TestSampleProcess = "ccbar"
     ApplyHLTHadronCut = True

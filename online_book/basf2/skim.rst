@@ -236,7 +236,7 @@ Accessing skims on the grid
 Analysts do not have to run the skims themselves on data or generic MC.
 Each new MC campaign or data collection, a list of skims is requested by the
 analysts in the Belle II physics working groups. This is done via the skim
-liaison or via JIRA tickets. Once requested, the skim is run on the large MC
+liaison or via GitLab issues. Once requested, the skim is run on the large MC
 and/or data samples by the skim production managers. These skims are then
 announced when ready and made available to the analyst.
 
@@ -307,7 +307,7 @@ in the documentation of `skim.registry.SkimRegistryClass`.
      :class: exercise
 
      Run the analysis script in `B2A303-MultipleDecays-Reconstruction.py
-     <https://stash.desy.de/projects/B2/repos/basf2/browse/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
+     <https://gitlab.desy.de/belle2/software/basf2/-/tree/main/analysis/examples/tutorials/B2A303-MultipleDecays-Reconstruction.py>`_
      on one of the LPNs for the mixed samples of the ``B0toDpi_Kspi``
      skim from the MC skim campaign ``SkimM13ax1`` on the grid.
 

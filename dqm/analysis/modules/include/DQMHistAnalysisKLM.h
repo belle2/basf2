@@ -11,7 +11,7 @@
 /* DQM headers. */
 #include <dqm/core/DQMHistAnalysis.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/KLMChannelArrayIndex.h>
@@ -36,7 +36,7 @@ namespace Belle2 {
   /**
    * Analysis of KLM DQM histograms.
    */
-  class DQMHistAnalysisKLMModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisKLMModule final : public DQMHistAnalysisModule {
 
   public:
 

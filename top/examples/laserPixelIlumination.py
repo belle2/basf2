@@ -11,7 +11,7 @@
 
 # ------------------------------------------------------------------------
 # example of making histograms of pixel hits coming from individual fibers
-# needs as input the file produced by top/analysis/simLaserCalibration.py
+# needs as input the file produced by top/examples/simLaserCalibSystem.py
 # ------------------------------------------------------------------------
 
 import basf2 as b2
@@ -20,10 +20,10 @@ import sys
 from ROOT import Belle2
 from ROOT import TH2F, TFile
 
-inputFile = 'laserSimulation.root'
+inputFile = 'opticalGun.root'
 if not os.path.exists(inputFile):
     b2.B2ERROR(inputFile + ': file not found')
-    b2.B2INFO('File can be generated with top/analysis/simLaserCalibration.py')
+    b2.B2INFO('File can be generated with top/examples/simLaserCalibSystem.py')
     sys.exit()
 
 

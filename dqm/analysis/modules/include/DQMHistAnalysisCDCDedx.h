@@ -33,7 +33,7 @@ namespace Belle2 {
    */
 
 
-  class DQMHistAnalysisCDCDedxModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisCDCDedxModule final : public DQMHistAnalysisModule {
 
     // Public functions
   public:
@@ -46,32 +46,32 @@ namespace Belle2 {
     /**
     * destructor
     */
-    virtual ~DQMHistAnalysisCDCDedxModule();
+    ~DQMHistAnalysisCDCDedxModule();
 
     /**
     * init function for default values
     */
-    virtual void initialize() override;
+    void initialize() override final;
 
     /**
     * begin each run
     */
-    virtual void beginRun() override;
+    void beginRun() override final;
 
     /**
     * event by event function
     */
-    virtual void event() override;
+    void event() override final;
 
     /**
     * end of each run
     */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
     * terminating at the end of last run
     */
-    virtual void terminate() override;
+    void terminate() override final;
 
     /**
     * funtion to get metadata from histogram
@@ -111,22 +111,22 @@ namespace Belle2 {
     /**
     * funtion to add plot style
     */
-    void set_Plot_Style();
+    void setPlotStyle();
 
     /**
     * funtion to add text style
     */
-    void set_Text_Style(TPaveText*& obj);
+    void setTextStyle(TPaveText*& obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Hist_Style(TH1* obj);
+    void setHistStyle(TH1* obj);
 
     /**
     * funtion to reset pad margins
     */
-    void set_Pad_Style(double l, double r, double t, double b);
+    void setPadStyle(double l, double r, double t, double b);
 
 
   private:

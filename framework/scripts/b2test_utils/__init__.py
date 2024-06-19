@@ -208,7 +208,7 @@ def local_software_directory():
     try:
         directory = os.environ["BELLE2_LOCAL_DIR"]
     except KeyError:
-        raise RuntimeError("Cannot find local Belle 2 software directory, "
+        raise RuntimeError("Cannot find local Belle II software directory, "
                            "have you setup the software correctly?")
 
     with working_directory(directory):

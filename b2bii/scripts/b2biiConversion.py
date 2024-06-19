@@ -37,15 +37,6 @@ def setupBelleDatabaseServer():
     os.environ['BELLE_POSTGRES_SERVER'] = belleDBServer
 
 
-def setupBelleMagneticField(path):
-    """
-    This function set the Belle Magnetic field (constant).
-    """
-    b2.B2WARNING(
-        'setupBelleMagneticField function is obsolete. Please remove it from your scripts. '
-        'The Belle magnetic field is now being set via the settings in inputMdst(List) fucntion.')
-
-
 def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   useBelleDBServer=None,
                                   convertBeamParameters=True,
@@ -56,7 +47,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
                                   enableNisKsFinder=True,
                                   HadronA=True, HadronB=True,
                                   enableRecTrg=False, enableEvtcls=True,
-                                  SmearTrack=2, enableLocalDB=True):
+                                  SmearTrack=2, enableLocalDB=True,
+                                  convertNbar=False):
     """
     Loads Belle MDST file and converts in each event the Belle MDST dataobjects to Belle II MDST
     data objects and loads them to the StoreArray.
@@ -85,6 +77,7 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
             `here <https://belle.kek.jp/secured/wiki/doku.php?id=physics:charm:tracksmearing>`_.
             Set to 0 to skip smearing (automatically set to 0 internally for real data).
         enableLocalDB (bool): Enables to use local payloads.
+        convertNbar (bool): Enables conversion of anti-n0:mdst.
     """
 
     # If we are on KEKCC make sure we load the correct NeuroBayes library
@@ -169,9 +162,13 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applySkim=True,
     convert.param("nisKsInfo", enableNisKsFinder)
     convert.param("RecTrg", enableRecTrg)
     convert.param("convertEvtcls", enableEvtcls)
+    convert.param("convertNbar", convertNbar)
     # convert.logging.set_log_level(LogLevel.DEBUG)
     # convert.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(convert)
+    if convertNbar:
+        b2.conditions.append_globaltag('BellePID')
+        path.add_module('BelleNbarMVA', particleList='anti-n0:mdst', identifier='nbarMVA')
 
 
 def parse_process_url(url):

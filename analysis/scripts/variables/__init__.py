@@ -63,6 +63,13 @@ class PythonVariableManager(object):
         instance = PythonVariableManager._instance()
         instance.clearAliases()
 
+    def resolveAlias(self, alias):
+        '''
+        Wrapper around Manager::resolveAlias(const std::string& alias).
+        '''
+        instance = PythonVariableManager._instance()
+        return instance.resolveAlias(alias)
+
     def addCollection(self, *args):
         '''
         Wrapper around Manager::addCollection(const std::string& collection, const std::vector<std::string>& variables)

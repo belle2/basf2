@@ -5,34 +5,34 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDigitizer/ECLDigitizerModule.h>
 
-// Root
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
-
-//Framework
-#include <framework/logging/Logger.h>
-#include <framework/utilities/FileSystem.h>
-#include <framework/gearbox/Unit.h>
-
-//ECL
-#include <ecl/digitization/algorithms.h>
-#include <ecl/digitization/shaperdsp.h>
-#include <ecl/digitization/ECLCompress.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dbobjects/ECLWaveformData.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLSimHit.h>
+/* ECL headers. */
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLDsp.h>
 #include <ecl/dataobjects/ECLDspWithExtraMCInfo.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLTrig.h>
 #include <ecl/dataobjects/ECLWaveforms.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
+#include <ecl/digitization/algorithms.h>
+#include <ecl/digitization/ECLCompress.h>
+#include <ecl/digitization/shaperdsp.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/utility/ECLDspUtilities.h>
+
+/* Basf2 headers. */
+#include <framework/gearbox/Unit.h>
+#include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+
+/* ROOT headers. */
+#include <TFile.h>
+#include <TRandom.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -129,14 +129,6 @@ void ECLDigitizerModule::initialize()
 void ECLDigitizerModule::beginRun()
 {
   const EclConfiguration& ec = EclConfiguration::get();
-  DBObjPtr<ECLCrystalCalib>
-  Ael("ECLCrystalElectronics"),
-      Aen("ECLCrystalEnergy"),
-      Tel("ECLCrystalElectronicsTime"),
-      Ten("ECLCrystalTimeOffset"),
-      Tct("ECLCrateTimeOffset"),
-      Tmc("ECLMCTimeOffset"),
-      Awave("ECL_FPGA_StoreWaveform");
   double ns_per_tick = 1.0 / (4.0 * ec.getRF()) * 1e3;// ~0.49126819903043308239 ns/tick
 
   if (m_useWaveformParameters || m_loadOnce) {
@@ -145,25 +137,46 @@ void ECLDigitizerModule::beginRun()
   }
 
   calibration_t def = {1, 0};
-  m_calib.assign(8736, def);
+  m_calib.assign(ECLElementNumbers::c_NCrystals, def);
 
-  if (Ael) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Ael->getCalibVector()[i];
-  if (Aen) for (int i = 0; i < 8736; i++) m_calib[i].ascale /= Aen->getCalibVector()[i] * 20000.0;
-
-  if (Tel) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tel->getCalibVector()[i] * ns_per_tick;
-  if (Ten) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Ten->getCalibVector()[i] * ns_per_tick;
-  if (Tct) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tct->getCalibVector()[i] * ns_per_tick;
-  if (Tmc) for (int i = 0; i < 8736; i++) m_calib[i].tshift += Tmc->getCalibVector()[i] * ns_per_tick;
-
-  m_Awave.assign(8736, -1);
+  if (m_CrystalElectronics.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].ascale /= m_CrystalElectronics->getCalibVector()[i];
+  }
+  if (m_CrystalEnergy.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].ascale /= m_CrystalEnergy->getCalibVector()[i] * 20000.0;
+  }
+  if (m_CrystalElectronicsTime.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_CrystalElectronicsTime->getCalibVector()[i] * ns_per_tick;
+  }
+  if (m_CrystalTimeOffset.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_CrystalTimeOffset->getCalibVector()[i] * ns_per_tick;
+  }
+  if (m_CrateTimeOffset.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_CrateTimeOffset->getCalibVector()[i] * ns_per_tick;
+  }
+  if (m_MCTimeOffset.isValid()) {
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_calib[i].tshift += m_MCTimeOffset->getCalibVector()[i] * ns_per_tick;
+  }
+  m_Awave.assign(ECLElementNumbers::c_NCrystals, -1);
   if (m_WaveformThresholdOverride < 0) {
-    if (Awave) for (int i = 0; i < 8736; i++) m_Awave[i] = Awave->getCalibVector()[i];
+    if (m_FPGAWaveform.isValid()) {
+      for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+        m_Awave[i] = m_FPGAWaveform->getCalibVector()[i];
+    }
   } else {
     //If m_WaveformThresholdOverride > 0 override ECL_FPGA_StoreWaveform;
-    for (int i = 0; i < 8736; i++) m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
+    for (int i = 0; i < ECLElementNumbers::c_NCrystals; i++)
+      m_Awave[i] = m_WaveformThresholdOverride * m_calib[i].ascale; // convert GeV to ADC
   }
 
-  if (m_HadronPulseShape)  callbackHadronSignalShapes();
+  if (m_HadronPulseShape)
+    callbackHadronSignalShapes();
 
   // Initialize channel mapper at run start to account for possible
   // changes in ECL mapping between runs.

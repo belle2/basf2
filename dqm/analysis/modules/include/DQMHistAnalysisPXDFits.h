@@ -20,7 +20,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisPXDFitsModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisPXDFitsModule final : public DQMHistAnalysisModule {
 
     enum { NUM_MODULES = 40}; // we want that from geometry
     // Public functions
@@ -65,38 +65,38 @@ namespace Belle2 {
     /** maps from index to VXDid*/
     std::map <int, int> m_inx_to_id;
 
-    /** Histogram */
+    /** All Signal Histogram */
     TH1F* m_hSignalAll = nullptr;
-    /** Histogram */
+    /** All Common Histogram */
     TH1F* m_hCommonAll = nullptr;
-    /** Histogram */
+    /** All Counts Histogram */
     TH1F* m_hCountsAll = nullptr;
-    /** Histogram */
+    /** All Occupancy Histogram */
     TH1F* m_hOccupancyAll = nullptr;
-    /** Canvas */
+    /** All Signal Canvas */
     TCanvas* m_cSignalAll = nullptr;
-    /** Canvas */
+    /** All Common Canvas */
     TCanvas* m_cCommonAll = nullptr;
-    /** Canvas */
+    /** All Counts Canvas */
     TCanvas* m_cCountsAll = nullptr;
-    /** Canvas */
+    /** All Occupancy Canvas */
     TCanvas* m_cOccupancyAll = nullptr;
 
-    /** Histograms */
+    /** 2D Signal Histograms */
     TH2F* m_hSignal[NUM_MODULES];
-    /** Histograms */
+    /** 2D Common Histograms */
     TH2F* m_hCommon[NUM_MODULES];
-    /** Histograms */
+    /** 2D Counts Histograms */
     TH2F* m_hCounts[NUM_MODULES];
-    /** Canvases */
+    /** 2D Signal Canvases */
     TCanvas* m_cSignal[NUM_MODULES];
-    /** Canvases */
+    /** 2D Common Canvases */
     TCanvas* m_cCommon[NUM_MODULES];
-    /** Canvases */
+    /** 2D Counts Canvases */
     TCanvas* m_cCounts[NUM_MODULES];
-    /** Fit functions */
+    /** Landau Fit functions */
     TF1* m_fLandau = nullptr; // only one fit function
-    /** Fit functions */
+    /** Gauss Fit functions */
     TF1* m_fGaus = nullptr; // only one fit function
 
   };

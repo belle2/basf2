@@ -18,6 +18,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
 
 // framework - root utilities
 #include <framework/utilities/MakeROOTCompatible.h>
@@ -47,7 +48,8 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "List of variables (or collections) to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToNtuple.root"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
+           string("VariablesToNtuple.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("ntuple"));
   addParam("basketSize", m_basketsize, "Size of baskets in Output NTuple in bytes.", 1600);
 
@@ -60,6 +62,9 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
            "Name of signal-side particle list to store the index of the signal-side particle when one calls the module in a for_each loop over the RestOfEvent",
            std::string(""));
 
+  addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
+           string(""));
+
 }
 
 void VariablesToNtupleModule::initialize()
@@ -69,6 +74,15 @@ void VariablesToNtupleModule::initialize()
     StoreObjPtr<ParticleList>().isRequired(m_particleList);
 
   // Initializing the output root file
+
+  // override the output file name with what's been provided with the -o option
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_fileName = outputFileArgument;
+
+  if (!m_fileNameSuffix.empty())
+    m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
+
   if (m_fileName.empty()) {
     B2FATAL("Output root file name is not set. Please set a valid root output file name (\"fileName\" module parameter).");
   }

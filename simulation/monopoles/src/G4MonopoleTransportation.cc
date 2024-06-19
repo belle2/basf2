@@ -345,11 +345,13 @@ AlongStepGetPhysicalInteractionLength(const G4Track&  track,
 G4VParticleChange* G4MonopoleTransportation::AlongStepDoIt(const G4Track& track,
                                                            const G4Step&  stepData)
 {
+#ifdef G4VERBOSE
   static G4int noCalls = 0;
+  noCalls++;
+#endif
+
   static const G4ParticleDefinition* fOpticalPhoton =
     G4ParticleTable::GetParticleTable()->FindParticle("opticalphoton");
-
-  noCalls++;
 
   fParticleChange.Initialize(track) ;
 

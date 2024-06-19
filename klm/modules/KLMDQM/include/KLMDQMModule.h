@@ -18,7 +18,7 @@
 #include <klm/dataobjects/KLMElementNumbers.h>
 #include <klm/dataobjects/KLMSectorArrayIndex.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/core/HistoModule.h>
 #include <framework/datastore/StoreArray.h>
 #include <rawdata/dataobjects/RawFTSW.h>
@@ -128,8 +128,8 @@ namespace Belle2 {
 
     /** Number of hits per channel. */
     TH1F** m_ChannelHits[
-      EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
-      BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
+    EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() +
+    BKLMElementNumbers::getMaximalSectorGlobalNumber()] = {nullptr};
 
     /** Masked channels per sector. */
     TH1F* m_MaskedChannelsPerSector;

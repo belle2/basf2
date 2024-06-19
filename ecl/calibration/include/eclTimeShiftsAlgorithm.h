@@ -12,10 +12,17 @@
  **************************************************************************/
 
 #pragma once
-#include <framework/database/DBObjPtr.h>
-#include <calibration/CalibrationAlgorithm.h>
+
+/* ECL headers. */
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
+
+/* Basf2 headers. */
+#include <calibration/CalibrationAlgorithm.h>
+#include <framework/database/DBObjPtr.h>
+
+/* C++ headers. */
 #include <string>
 
 namespace Belle2 {
@@ -65,7 +72,7 @@ namespace Belle2 {
       DBObjPtr<ECLReferenceCrystalPerCrateCalib> m_refCrysIDzeroingCrate;
 
       /** Number of Crystals expected */
-      const int m_numCrystals = 8736;
+      const int m_numCrystals = ECLElementNumbers::c_NCrystals;
 
       /** Number of Crates expected */
       const int m_numCrates = 52;

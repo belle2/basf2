@@ -376,6 +376,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set various quantities (should be moved to CDC.xml later...)
   m_clockFreq4TDC = geom.getClockFrequency();
+  if (not m_clockSettings.isValid())
+    B2FATAL("HardwareClockSettings payloads are not valid.");
   const double officialClockFreq4TDC = 2 * m_clockSettings->getAcceleratorRF(); // in GHz
   if (abs(m_clockFreq4TDC - officialClockFreq4TDC) / m_clockFreq4TDC > 1.e-4) {
     B2WARNING("ClockFreq4TDC changed from cdclocal " << scientific << setprecision(6) << m_clockFreq4TDC << " to official " <<
@@ -879,7 +881,6 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
   const unsigned short npx = c_nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
-  unsigned nRead = 0;
 
   ifs >> m_xtParamMode >> np;
   if (m_xtParamMode < 0 || m_xtParamMode > 3) B2FATAL("CDCGeometryPar: invalid xt-parameterization mode read !");
@@ -898,7 +899,6 @@ void CDCGeometryPar::newReadXT(const GearDir& gbxParams, const int mode)
     for (int i = 0; i < np; ++i) {
       ifs >> xtc[i];
     }
-    ++nRead;
 
     int itheta = -99;
     for (unsigned short i = 0; i < nThetaBins; ++i) {
@@ -1011,7 +1011,6 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
   unsigned short iCL, iLR;
   double sigma[c_nSigmaParams]; // cppcheck-suppress constVariable
   double theta, alpha;
-  unsigned nRead = 0;
 
   ifs >> m_sigmaParamMode >> np;
   //  std:: cout << m_sigmaParamMode <<" "<< np << std::endl;
@@ -1034,7 +1033,6 @@ void CDCGeometryPar::newReadSigma(const GearDir& gbxParams, const int mode)
     for (int i = 0; i < np; ++i) {
       ifs >> sigma[i];
     }
-    ++nRead;
 
     int itheta = -99;
     for (unsigned short i = 0; i < nThetaBins; ++i) {

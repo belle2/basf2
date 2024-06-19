@@ -9,10 +9,8 @@
 # Email: yinjh2012@korea.ac.kr 
 # Date: 20230102
 
-Alias etasig eta
-
 Decay vpho
-1.0 etasig Upsilon(2S)sig  PARTWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
+1.0 eta Upsilon(2S)sig  PARTWAVE  0.0 0.0 1.0 0.0 0.0 0.0;
 Enddecay
 
 Decay Upsilon(2S)sig

@@ -11,7 +11,7 @@
 /* KLM headers. */
 #include <klm/dbobjects/KLMTimeConversion.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/database/DBObjPtr.h>
 #include <framework/dbobjects/HardwareClockSettings.h>
 

@@ -190,7 +190,7 @@ namespace Belle2 {
     }
 
 
-    void ChannelMapper::import(const IntervalOfValidity& iov) const
+    void ChannelMapper::importPayload(const IntervalOfValidity& iov) const
     {
       DBImportArray<TOPChannelMap> array;
       for (const auto& map : m_mapping) {

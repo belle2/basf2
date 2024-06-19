@@ -13,7 +13,7 @@
 #include <klm/dataobjects/KLMPlaneArrayIndex.h>
 #include <klm/dbobjects/KLMStripEfficiency.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
 namespace Belle2 {

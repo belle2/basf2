@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHPACKERMODULE_H
-#define ARICHPACKERMODULE_H
+#pragma once
 
 // mappers
 #include <arich/dbobjects/ARICHMergerMapping.h>
@@ -45,34 +43,19 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
 
     /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
+     * TODO!
      */
-    virtual void endRun() override;
-
-    /**
-     * Termination action.
-     * Clean-up, close files, summarize statistics, etc.
-     */
-    virtual void terminate() override;
-
     void writeHeader(int* buffer, unsigned& ibyte, const ARICHRawHeader& head);
 
   private:
 
     unsigned m_nonSuppressed;   /**< type of data (1 nonsuppressed, 0 suppressed) */
-    unsigned m_version;
+    unsigned m_version;       /**< dataformat version */
     unsigned m_bitMask;    /**< bitmask for hit detection (4bit/hit) */
     int m_debug; /**< debug */
     std::string m_inputDigitsName;   /**< name of ARICHDigit store array */
@@ -84,5 +67,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

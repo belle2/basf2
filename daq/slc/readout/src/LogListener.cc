@@ -51,7 +51,7 @@ void LogListener::run()
         std::string assembledLogMessage(ss.str());
 
         // basf2 has a flag to escape newlines with "\\n" to write multi-line log messages into a single line
-        // see: https://agira.desy.de/browse/BII-6470
+        // see: https://gitlab.desy.de/belle2/software/basf2/-/issues/6353
         // if m_enableUnescapeNewlines is set, these "\\n" will be replaced with "\n" newlines again before the log message is sent out
 
         if (m_enableUnescapeNewlines) {

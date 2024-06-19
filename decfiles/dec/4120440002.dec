@@ -1,0 +1,23 @@
+# EventType: 4120440002.dec
+# Descriptor: [vpho_[f_2-> pi+pi-][Y1S->mu+mu-]]
+# NickName: vpho_f2Y1S_pipimumu
+# Cuts: None
+# Documentation: Yb10751 decay
+# PhysicsWG: Bottomonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20230102
+
+Decay vpho
+1.0   Upsilon f_2  PHSP;
+Enddecay
+
+Decay f_2
+1.0   pi+ pi- TSS;
+Enddecay
+
+Decay Upsilon
+1.0  mu+ mu-  PHSP;
+Enddecay
+End

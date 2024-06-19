@@ -33,7 +33,7 @@
 
 /*
 <header>
-<input>CDCOutputGen.root</input>
+<input>EvtGenSimNoBkg.root</input>
 <output>CDCValidation.root</output>
 <contact>Hiroki Kanda, kanda@m.tains.tohoku.ac.jp</contact>
 </header>
@@ -59,7 +59,7 @@
 
 
 // Definitions of files
-const string cInRoot = "../CDCOutputGen.root";  // input root file
+const string cInRoot = "../EvtGenSimNoBkg.root";  // input root file
 const string cOutRootSL  = "CDCValidation.root";       // output root file (super layer histograms)
 
 const string cOutDraw = "CDCvalidation.pdf";             // output drawing file

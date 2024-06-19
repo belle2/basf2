@@ -12,7 +12,7 @@
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 #include <klm/dataobjects/KLMElementNumbers.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/datastore/RelationsObject.h>
 
 /* ROOT headers. */

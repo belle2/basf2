@@ -9,9 +9,12 @@
  * ROOT macro for ARICH validation plots
  * Author: Luka Santelj
  * 11.3.2014
+*/
 
+/*
 <header>
-<noexecute>Used as library.</noexecute>
+  <input>../ARICHEvents.root</input>
+  <output>ARICHValidate.root</output>
 </header>
 */
 
@@ -73,7 +76,7 @@ void ARICHValidate(){
 
   TH1F* hnphot = new TH1F("hnphot","Number of detected photons;# of photons;Entries", 35,-0.5,34.5);
 
-  ch->Draw("detPhot.pi>>hnphot","abs(PDG)==211 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
+  ch->Draw("detPhot>>hnphot","abs(PDG)==211 && sqrt((mcHit.x - recHit.x)**2 +(mcHit.y - recHit.y)**2)<1 && mcHit.p>3 && status>1000");
 
   hnphot->GetListOfFunctions()->Add(new TNamed("Description", "Number of detected photons in a 3#sigma band around the expected Cherenkov angle, for #pi with momenta 3.0-3.5 GeV."));
   hnphot->GetListOfFunctions()->Add(new TNamed("Contact","luka.santelj@ijs.si"));

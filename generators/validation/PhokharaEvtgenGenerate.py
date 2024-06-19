@@ -4,7 +4,7 @@
 """
 <header>
     <output>PhokharaEvtgenData.root</output>
-    <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
+    <contact>Kirill Chilikin (K.A.Chilikin@inp.nsk.su)</contact>
     <description>Generation of 25000 e+ e- -> J/psi eta_c events.</description>
 </header>
 """

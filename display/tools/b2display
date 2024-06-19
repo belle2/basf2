@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
+'''
+Starts the Belle II event display and shows MCParticles, Tracks, ECLClusters, KLMClusters, etc.
+using the Display module.
+'''
+
+
+import argparse
+import glob
+
+import basf2 as b2
+import b2test_utils as b2tu
+
+
+def argument_parser():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('input',
+                        type=str,
+                        help='input file to be opened with the display; you can also open multiple files'
+                             ' using wildcards',
+                        metavar='INPUT')
+    parser.add_argument('--play',
+                        action='store_true',
+                        help='start event display advancing through events')
+    return parser
+
+
+def create_geometry_payloads():
+    path = b2.Path()
+    path.add_module('EventInfoSetter')
+    path.add_module('Gearbox')
+    path.add_module('Geometry',
+                    createPayloads=True,
+                    excludedComponents=['ECL', 'MagneticField'],
+                    payloadIov=[0, 0, -1, -1]
+                    )
+    assert(b2tu.safe_process(path) == 0)
+
+
+if __name__ == '__main__':
+
+    args = argument_parser().parse_args()
+    input_files = glob.glob(b2.find_file(args.input))
+    play = args.play
+
+    # Create the geometry as local database and then feed it to this process, to avoid backward incompabilities
+    # Moreover, run the rest of the process under a clean directory
+    with b2tu.clean_working_directory():
+        create_geometry_payloads()
+        b2.conditions.prepend_testing_payloads('localdb/database.txt')
+
+        # Now continue with setting the display and starting it
+        main = b2.Path()
+
+        main.add_module('RootInput',
+                        inputFileNames=input_files)
+
+        main.add_module('Gearbox')
+
+        main.add_module('Geometry')  # .set_log_level(b2.LogLevel.ERROR)
+
+        main.add_module('Display',
+                        showMCInfo=True,
+                        assignHitsToPrimaries=False,
+                        showAllPrimaries=True,
+                        showCharged=True,
+                        showNeutrals=True,
+                        showRecoTracks=False,
+                        showCDCHits=False,
+                        showTriggerObjects=False,
+                        showTrackLevelObjects=True,
+                        options='MH',
+                        automatic=False,
+                        fullGeometry=False,
+                        playOnStartup=play)
+
+        # This ensures that the local database is correctly deleted
+        b2tu.safe_process(main, 0)

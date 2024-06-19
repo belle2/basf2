@@ -34,21 +34,22 @@ CDCDedxElectronCollectorModule::CDCDedxElectronCollectorModule() : CalibrationCo
   addParam("cleanupCuts", m_cuts, "Boolean to apply cleanup cuts", true);
   addParam("maxNumHits", m_maxNumHits,
            "Maximum number of hits per track. If there is more than this the track will not be collected. ", int(100));
-  addParam("fSetEoverP", fSetEoverP, "Set E over p Cut values. ", double(0.25));
-  addParam("IsCosth", IsCosth, "true for adding costh tree branch. ", false);
-  addParam("IsMom", IsMom, "true for adding momentum tree branch. ", false);
-  addParam("IsCharge", IsCharge, "true for charge dedx tree branch. ", false);
-  addParam("IsRun", IsRun, "true for adding run number tree branch. ", false);
-  addParam("IsWire", IsWire, "true for adding wires tree branch. ", false);
-  addParam("IsLayer", IsLayer, "true for adding layers tree branch. ", false);
-  addParam("IsDoca", IsDoca, "true for adding doca tree branch. ", false);
-  addParam("IsEnta", IsEnta, "true for adding enta tree branch. ", false);
-  addParam("IsDocaRS", IsDocaRS, "true for adding doca tree branch. ", false);
-  addParam("IsEntaRS", IsEntaRS, "true for adding enta tree branch. ", false);
-  addParam("Isdedxhit", Isdedxhit, "true for adding dedxhit tree branch. ", false);
-  addParam("IsBhabhaEvt", IsBhabhaEvt, "true for bhabha events", true);
-  addParam("IsRadBhabhaEvt", IsRadBhabhaEvt, "true for radee events", false);
-  addParam("enableTrgSel", enableTrgSel, "true to enable trigger sel inside module", false);
+  addParam("setEoverP", m_setEoverP, "Set E over p Cut values. ", double(0.25));
+  addParam("isCosth", m_isCosth, "true for adding costh tree branch. ", false);
+  addParam("isMom", m_isMom, "true for adding momentum tree branch. ", false);
+  addParam("isCharge", m_isCharge, "true for charge dedx tree branch. ", false);
+  addParam("isRun", m_isRun, "true for adding run number tree branch. ", false);
+  addParam("isWire", m_isWire, "true for adding wires tree branch. ", false);
+  addParam("isLayer", m_isLayer, "true for adding layers tree branch. ", false);
+  addParam("isDoca", m_isDoca, "true for adding doca tree branch. ", false);
+  addParam("isEnta", m_isEnta, "true for adding enta tree branch. ", false);
+  addParam("isDocaRS", m_isDocaRS, "true for adding doca tree branch. ", false);
+  addParam("isEntaRS", m_isEntaRS, "true for adding enta tree branch. ", false);
+  addParam("isDedxhit", m_isDedxhit, "true for adding dedxhit tree branch. ", false);
+  addParam("isADCcorr", m_isADCcorr, "true for adding adc tree branch. ", false);
+  addParam("isBhabhaEvt", m_isBhabhaEvt, "true for bhabha events", true);
+  addParam("isRadBhabhaEvt", m_isRadBhabhaEvt, "true for radee events", false);
+  addParam("enableTrgSel", m_enableTrgSel, "true to enable trigger sel inside module", false);
 }
 
 //-----------------------------------------------------------------
@@ -86,18 +87,19 @@ void CDCDedxElectronCollectorModule::prepare()
   htstats->GetXaxis()->SetBinLabel(7, "selected");
 
   ttree->Branch<double>("dedx", &m_dedx);
-  if (IsCosth)ttree->Branch<double>("costh", &m_costh);
-  if (IsMom)ttree->Branch<double>("p", &m_p);
-  if (IsCharge)ttree->Branch<int>("charge", &m_charge);
-  if (IsRun)ttree->Branch<int>("run", &m_run);
+  if (m_isCosth)ttree->Branch<double>("costh", &m_costh);
+  if (m_isMom)ttree->Branch<double>("p", &m_p);
+  if (m_isCharge)ttree->Branch<int>("charge", &m_charge);
+  if (m_isRun)ttree->Branch<int>("run", &m_run);
 
-  if (IsWire)ttree->Branch("wire", &m_wire);
-  if (IsLayer)ttree->Branch("layer", &m_layer);
-  if (IsDoca)ttree->Branch("doca", &m_doca);
-  if (IsEnta)ttree->Branch("enta", &m_enta);
-  if (IsDocaRS)ttree->Branch("docaRS", &m_docaRS);
-  if (IsEntaRS)ttree->Branch("entaRS", &m_entaRS);
-  if (Isdedxhit)ttree->Branch("dedxhit", &m_dedxhit);
+  if (m_isWire)ttree->Branch("wire", &m_wire);
+  if (m_isLayer)ttree->Branch("layer", &m_layer);
+  if (m_isDoca)ttree->Branch("doca", &m_doca);
+  if (m_isEnta)ttree->Branch("enta", &m_enta);
+  if (m_isDocaRS)ttree->Branch("docaRS", &m_docaRS);
+  if (m_isEntaRS)ttree->Branch("entaRS", &m_entaRS);
+  if (m_isDedxhit)ttree->Branch("dedxhit", &m_dedxhit);
+  if (m_isADCcorr)ttree->Branch("adccorr", &m_adccorr);
 
   // Collector object registration
   registerObject<TH1D>("means", means);
@@ -115,7 +117,7 @@ void CDCDedxElectronCollectorModule::collect()
   auto hestats = getObjectPtr<TH1I>("hestats");
   hestats->Fill(0);
 
-  if (enableTrgSel) {
+  if (m_enableTrgSel) {
     if (!m_TrgResult.isValid()) {
       B2WARNING("SoftwareTriggerResult required to select bhabha/radee event is not found");
       hestats->Fill(1);
@@ -137,15 +139,15 @@ void CDCDedxElectronCollectorModule::collect()
     const bool eRadBhabha = (m_TrgResult->getResult("software_trigger_cut&skim&accept_radee") ==
                              SoftwareTriggerCutResult::c_accept);
 
-    if (!IsBhabhaEvt && !IsRadBhabhaEvt) {
+    if (!m_isBhabhaEvt && !m_isRadBhabhaEvt) {
       B2WARNING("requested not-supported event type: going back");
       hestats->Fill(3);
       return;
-    } else if (IsBhabhaEvt && !IsRadBhabhaEvt && !eBhabha) {
+    } else if (m_isBhabhaEvt && !m_isRadBhabhaEvt && !eBhabha) {
       B2WARNING("requested bhabha only but event not found: going back");
       hestats->Fill(3);
       return;
-    } else  if (IsRadBhabhaEvt && !IsBhabhaEvt && !eRadBhabha) {
+    } else  if (m_isRadBhabhaEvt && !m_isBhabhaEvt && !eRadBhabha) {
       B2WARNING("requested radee only but event not found: going back");
       hestats->Fill(3);
       return;
@@ -158,7 +160,7 @@ void CDCDedxElectronCollectorModule::collect()
 
   StoreObjPtr<EventMetaData> eventMetaDataPtr;
   int run = eventMetaDataPtr->getRun();
-  if (IsRun)m_run = run;
+  if (m_isRun)m_run = run;
 
   int nTracks = m_dedxTracks.getEntries();
   if (nTracks >= 4) {
@@ -227,12 +229,12 @@ void CDCDedxElectronCollectorModule::collect()
       const ECLCluster* eclCluster = track->getRelated<ECLCluster>();
       if (eclCluster and eclCluster->hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons)) {
         double TrkEoverP = (eclCluster->getEnergy(ECLCluster::EHypothesisBit::c_nPhotons)) / (fitResult->getMomentum().R());
-        if (abs(TrkEoverP - 1.0) > fSetEoverP)continue;
+        if (abs(TrkEoverP - 1.0) > m_setEoverP)continue;
       }
       htstats->Fill(4);
 
       //if dealing with radee here (do a safe side cleanup)
-      if (IsRadBhabhaEvt) {
+      if (m_isRadBhabhaEvt) {
         if (nTracks != 2)continue; //exactly 2 tracks
         bool goodradee = false;
         //checking if dedx of other track is restricted
@@ -251,13 +253,14 @@ void CDCDedxElectronCollectorModule::collect()
 
 
     // Make sure to remove all the data in vectors from the previous track
-    if (IsWire)m_wire.clear();
-    if (IsLayer)m_layer.clear();
-    if (IsDoca)m_doca.clear();
-    if (IsEnta)m_enta.clear();
-    if (IsDocaRS)m_docaRS.clear();
-    if (IsEntaRS)m_entaRS.clear();
-    if (Isdedxhit)m_dedxhit.clear();
+    if (m_isWire)m_wire.clear();
+    if (m_isLayer)m_layer.clear();
+    if (m_isDoca)m_doca.clear();
+    if (m_isEnta)m_enta.clear();
+    if (m_isDocaRS)m_docaRS.clear();
+    if (m_isEntaRS)m_entaRS.clear();
+    if (m_isDedxhit)m_dedxhit.clear();
+    if (m_isADCcorr)m_adccorr.clear();
 
     // Simple numbers don't need to be cleared
     // make sure to use the truncated mean without the hadron saturation correction
@@ -266,13 +269,14 @@ void CDCDedxElectronCollectorModule::collect()
 
     for (int i = 0; i < m_nhits; ++i) {
       // if (m_DBWireGains->getWireGain(dedxTrack->getWire(i)) == 0)continue;
-      if (IsWire)m_wire.push_back(dedxTrack->getWire(i));
-      if (IsLayer)m_layer.push_back(dedxTrack->getHitLayer(i));
-      if (IsDoca)m_doca.push_back(dedxTrack->getDoca(i));
-      if (IsEnta)m_enta.push_back(dedxTrack->getEnta(i));
-      if (IsDocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
-      if (IsEntaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
-      if (Isdedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
+      if (m_isWire)m_wire.push_back(dedxTrack->getWire(i));
+      if (m_isLayer)m_layer.push_back(dedxTrack->getHitLayer(i));
+      if (m_isDoca)m_doca.push_back(dedxTrack->getDoca(i));
+      if (m_isEnta)m_enta.push_back(dedxTrack->getEnta(i));
+      if (m_isDocaRS)m_docaRS.push_back(dedxTrack->getDocaRS(i) / dedxTrack->getCellHalfWidth(i));
+      if (m_isEntaRS)m_entaRS.push_back(dedxTrack->getEntaRS(i));
+      if (m_isDedxhit)m_dedxhit.push_back(dedxTrack->getDedx(i));
+      if (m_isADCcorr)m_adccorr.push_back(dedxTrack->getADCCount(i));
     }
 
     // Track and/or hit information filled as per config

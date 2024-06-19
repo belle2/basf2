@@ -82,6 +82,8 @@ namespace Belle2 {
 
     bool m_ignoreMotherFlavor; /**< flag whether flavor of mother particle should be ignored */
 
+    bool m_exceptionForV0B2BII = false; /**< true if the output List is V0 and input is K_S0:mdst, Lambda0:mdst, or gamma:v0mdst */
+
     /**
      * This vector holds unique identifiers (vector of ints) of all particles
      * that are already included in the ParticleList. It is used to prevent

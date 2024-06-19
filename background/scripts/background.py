@@ -87,8 +87,7 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
             'TOPSimHits',
             'ARICHSimHits',
             'ECLHits',
-            'BKLMSimHits',
-            'EKLMSimHits',
+            'KLMSimHits',
         ]
     elif sampleType == 'usual' and phase == 2:
         madeFor = ''
@@ -99,8 +98,7 @@ def add_output(path, bgType, realTime, sampleType, phase=3, fileName='output.roo
             'TOPSimHits',
             'ARICHSimHits',
             'ECLHits',
-            'BKLMSimHits',
-            'EKLMSimHits',
+            'KLMSimHits',
             'CLAWSSimHits',
             'FANGSSimHits',
             'PlumeSimHits',

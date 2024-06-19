@@ -113,7 +113,7 @@ class Basf2VariableIndex(Index):
 class Basf2Domain(Domain):
     """basf2 Software Domain"""
     name = "b2"
-    label = "Belle 2 Software"
+    label = "Belle II Software"
     object_types = {
         "module": ObjType("module", "mod"),
         "variable": ObjType("variable", "var")

@@ -9,7 +9,7 @@
 /* Own header. */
 #include <reconstruction/modules/MdstPID/MdstPIDModule.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 #include <klm/muid/MuidElementNumbers.h>

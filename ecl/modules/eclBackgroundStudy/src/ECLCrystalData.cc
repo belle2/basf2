@@ -6,14 +6,15 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-//This module
+/* Own header. */
 #include <ecl/modules/eclBackgroundStudy/ECLCrystalData.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/logging/Logger.h>
 
-//STL
+/* C++ headers. */
 #include <cmath>
+
 #define PI 3.14159265358979323846
 #define DEGTORAD 1.74532925199432955e-02
 
@@ -255,11 +256,11 @@ int ECLCrystalData::GetCellID(int ThetaId, int PhiId)
 
   } else if (ThetaId > 58) {
     const int backRing[10] = {0, 9, 18, 24, 30, 36, 42, 48, 52, 56} ;
-    return 7776 + backRing[ThetaId - 59] * 16 + PhiId;
+    return ECLElementNumbers::c_NCrystalsForwardBarrel + backRing[ThetaId - 59] * 16 + PhiId;
 
   }
 
-  return 1152 + 144 * (ThetaId - 13)  + PhiId;
+  return ECLElementNumbers::c_NCrystalsForward + 144 * (ThetaId - 13)  + PhiId;
 }
 
 void ECLCrystalData::Mapping(int cid)
@@ -332,59 +333,59 @@ void ECLCrystalData::Mapping(int cid)
     m_phi_ID = cid - 63 * 16 ;
     m_phi_idx = m_phi_ID % 9 + 63;
     m_theta_idx = m_phi_ID / 9;
-  } else if (cid < 7776) {//Barrel start
-    m_phi_ID = (cid - 1152) % 144;
-    m_theta_ID = (cid - 1152) / 144 + 13;
-    m_theta_idx = (cid - 1152) / 144;
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel) {//Barrel start
+    m_phi_ID = (cid - ECLElementNumbers::c_NCrystalsForward) % 144;
+    m_theta_ID = (cid - ECLElementNumbers::c_NCrystalsForward) / 144 + 13;
+    m_theta_idx = (cid - ECLElementNumbers::c_NCrystalsForward) / 144;
     m_phi_idx = m_phi_ID;
-  } else if (cid < 7776 + 9 * 16) { //Backward start
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 9 * 16) { //Backward start
     m_theta_ID = 59;
-    m_phi_ID =  cid - 7776 ;
+    m_phi_ID =  cid - ECLElementNumbers::c_NCrystalsForwardBarrel ;
     m_phi_idx = m_phi_ID % 9 + 72;
     m_theta_idx = m_phi_ID / 9;
-  } else if (cid < 7776 + 18 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 18 * 16) {
     m_theta_ID = 60;
-    m_phi_ID =   cid - 7776 - 9 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 9 * 16 ;
     m_phi_idx = m_phi_ID % 9 + 81;
     m_theta_idx = m_phi_ID / 9;
-  } else if (cid < 7776 + 24 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 24 * 16) {
     m_theta_ID = 61;
-    m_phi_ID =   cid - 7776 - 18 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 18 * 16 ;
     m_phi_idx = m_phi_ID % 6 + 90;
     m_theta_idx = m_phi_ID / 6;
-  } else if (cid < 7776 + 30 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 30 * 16) {
     m_theta_ID = 62;
-    m_phi_ID =   cid - 7776 - 24 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 24 * 16 ;
     m_phi_idx = m_phi_ID % 6 + 96;
     m_theta_idx = m_phi_ID / 6;
-  } else if (cid < 7776 + 36 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 36 * 16) {
     m_theta_ID = 63;
-    m_phi_ID =   cid - 7776 - 30 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 30 * 16 ;
     m_phi_idx = m_phi_ID % 6 + 102;
     m_theta_idx = m_phi_ID / 6;
-  } else if (cid < 7776 + 42 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 42 * 16) {
     m_theta_ID = 64;
-    m_phi_ID =   cid - 7776 - 36 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 36 * 16 ;
     m_phi_idx = m_phi_ID % 6 + 108;
     m_theta_idx = m_phi_ID / 6;
-  } else if (cid < 7776 + 48 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 48 * 16) {
     m_theta_ID = 65;
-    m_phi_ID =   cid - 7776 - 42 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 42 * 16 ;
     m_phi_idx = m_phi_ID % 6 + 114;
     m_theta_idx = m_phi_ID / 6;
-  } else if (cid < 7776 + 52 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 52 * 16) {
     m_theta_ID = 66;
-    m_phi_ID =   cid - 7776 - 48 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 48 * 16 ;
     m_phi_idx = m_phi_ID % 4 + 120;
     m_theta_idx = m_phi_ID / 4;
-  } else if (cid < 7776 + 56 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 56 * 16) {
     m_theta_ID = 67;
-    m_phi_ID =   cid - 7776 - 52 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 52 * 16 ;
     m_phi_idx = m_phi_ID % 4 + 124;
     m_theta_idx = m_phi_ID / 4;
-  } else if (cid < 7776 + 60 * 16) {
+  } else if (cid < ECLElementNumbers::c_NCrystalsForwardBarrel + 60 * 16) {
     m_theta_ID = 68;
-    m_phi_ID =   cid - 7776 - 56 * 16 ;
+    m_phi_ID =   cid - ECLElementNumbers::c_NCrystalsForwardBarrel - 56 * 16 ;
     m_phi_idx = m_phi_ID % 4 + 128;
     m_theta_idx  = m_phi_ID / 4;
   } else {

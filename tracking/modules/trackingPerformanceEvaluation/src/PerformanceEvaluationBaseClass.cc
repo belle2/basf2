@@ -219,7 +219,6 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
   h->GetYaxis()->SetRangeUser(0.00001, 1);
 
   Int_t bin = 0;
-  Int_t nBins = 0;
 
   for (int the_bin = 1; the_bin < the_axis->GetNbins() + 1; the_bin++) {
 
@@ -240,8 +239,6 @@ TH1F*  PerformanceEvaluationBaseClass::createHistogramsRatio(const char* name, c
 
         num += hnum->GetBinContent(bin);
         den += hden->GetBinContent(bin);
-
-        nBins++;
       }
 
     double eff = 0;

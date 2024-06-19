@@ -5,28 +5,29 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//This module
+
+/* Own header. */
 #include <ecl/modules/eclDigitizer/ECLDigitizerPureCsIModule.h>
 
-// ROOT
-#include <TRandom.h>
-#include <TFile.h>
-#include <TTree.h>
-#include <TH1.h>
+/* ECL headers. */
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLPureCsIInfo.h>
+#include <ecl/dbobjects/ECLWaveformData.h>
+#include <ecl/digitization/ECLDspFitterPure.h>
+#include <ecl/geometry/ECLGeometryPar.h>
 
-//Framework
+/* Basf2 headers. */
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-//ECL
-#include <ecl/digitization/ECLDspFitterPure.h>
-#include <ecl/dataobjects/ECLHit.h>
-#include <ecl/dataobjects/ECLDigit.h>
-#include <ecl/dataobjects/ECLDsp.h>
-#include <ecl/dataobjects/ECLPureCsIInfo.h>
-#include <ecl/geometry/ECLGeometryPar.h>
-#include <ecl/dbobjects/ECLWaveformData.h>
+/* ROOT headers. */
+#include <TFile.h>
+#include <TH1.h>
+#include <TRandom.h>
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -211,8 +212,7 @@ void ECLDigitizerPureCsIModule::event()
   // and baseline independently and simultaneously
   // cloning barrel and bwd digits
 
-  StoreArray<ECLDigit> baselineDigits("ECLDigits");
-  for (const auto& eclDigit : baselineDigits) {
+  for (const auto& eclDigit : m_BaselineDigits) {
     int cellid = eclDigit.getCellId();
     if (! isPureCsI(cellid)) {
       auto eclDigitClone = m_ecldigits.appendNew();

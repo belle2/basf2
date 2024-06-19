@@ -12,7 +12,7 @@
 """
 <header>
   <output>../TreeFitted_B0ToJPsiKs.root</output>
-  <contact>Jo-Frederik Krohn; jkrohn@student.unimelb.edu.au</contact>
+  <contact>Yo Sato; yosato@post.kek.jp</contact>
   <interval>nightly</interval>
 </header>
 """

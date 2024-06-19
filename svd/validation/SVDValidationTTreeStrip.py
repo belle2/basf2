@@ -11,12 +11,12 @@
 
 """
 <header>
-  <contact>G. Caria, gcaria@student.unimelb.edu.au</contact>
   <description>
     This module is used for the SVD validation.
     It gets information about digits, saving
     in a ttree in a ROOT file.
   </description>
+  <noexecute>SVD validation helper class</noexecute>
 </header>
 """
 import xml.etree.ElementTree as ET

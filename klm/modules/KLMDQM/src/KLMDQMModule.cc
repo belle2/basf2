@@ -84,35 +84,28 @@ void KLMDQMModule::defineHisto()
   m_DAQInclusion = new TH1F("daq_inclusion", "Is KLM included in DAQ?", 2, 0.0, 2.0);
   m_DAQInclusion->GetXaxis()->SetBinLabel(1, "No");
   m_DAQInclusion->GetXaxis()->SetBinLabel(2, "Yes");
-  m_DAQInclusion->SetOption("LIVE");
   /* Time histograms. */
   m_TimeRPC = new TH1F("time_rpc", "RPC hit time", 128, -1223.5, -199.5);
   m_TimeRPC->GetXaxis()->SetTitle("Time, ns");
-  m_TimeRPC->SetOption("LIVE");
   m_TimeScintillatorBKLM =
     new TH1F("time_scintillator_bklm", "Scintillator hit time (BKLM)",
              100, -5000, -4000);
   m_TimeScintillatorBKLM->GetXaxis()->SetTitle("Time, ns");
-  m_TimeScintillatorBKLM->SetOption("LIVE");
   m_TimeScintillatorEKLM =
     new TH1F("time_scintillator_eklm", "Scintillator hit time (EKLM)",
              100, -5100, -4100);
   m_TimeScintillatorEKLM->GetXaxis()->SetTitle("Time, ns");
-  m_TimeScintillatorEKLM->SetOption("LIVE");
   /* Number of hits per plane. */
   m_PlaneBKLMPhi = new TH1F("plane_bklm_phi",
                             "BKLM plane occupancy (#phi readout)",
                             240, 0.5, 240.5);
   m_PlaneBKLMPhi->GetXaxis()->SetTitle("Layer number");
-  m_PlaneBKLMPhi->SetOption("LIVE");
   m_PlaneBKLMZ = new TH1F("plane_bklm_z",
                           "BKLM plane occupancy (z readout)",
                           240, 0.5, 240.5);
   m_PlaneBKLMZ->GetXaxis()->SetTitle("Layer number");
-  m_PlaneBKLMZ->SetOption("LIVE");
   m_PlaneEKLM = new TH1F("plane_eklm", "EKLM plane occupancy (both readouts)", 208, 0.5, 208.5);
   m_PlaneEKLM->GetXaxis()->SetTitle("Plane number");
-  m_PlaneEKLM->SetOption("LIVE");
   /* Number of hits per channel. */
   int nChannelHistograms =
     BKLMElementNumbers::getMaximalSectorGlobalNumber() *
@@ -170,7 +163,6 @@ void KLMDQMModule::defineHisto()
         name.c_str(), title.c_str(),
         firstChannelNumbers[i + 1] - firstChannelNumbers[i],
         firstChannelNumbers[i] - 0.5, firstChannelNumbers[i + 1] - 0.5);
-      m_ChannelHits[sectorIndex][j]->SetOption("LIVE");
       i++;
     }
   }
@@ -187,32 +179,25 @@ void KLMDQMModule::defineHisto()
     KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(sector);
     m_MaskedChannelsPerSector->GetXaxis()->SetBinLabel(sectorIndex + 1, label.c_str());
   }
-  m_MaskedChannelsPerSector->SetOption("LIVE");
   /* Number of digits. */
   m_DigitsKLM = new TH1F("digits_klm", "Number of KLM digits",
                          250.0, 0.0, 250.0);
   m_DigitsKLM->GetXaxis()->SetTitle("Number of digits");
-  m_DigitsKLM->SetOption("LIVE");
   m_DigitsRPC = new TH1F("digits_rpc", "Number of RPC digits",
                          250.0, 0.0, 250.0);
   m_DigitsRPC->GetXaxis()->SetTitle("Number of digits");
-  m_DigitsRPC->SetOption("LIVE");
   m_DigitsScintillatorBKLM = new TH1F("digits_scintillator_bklm", "Number of scintillator digits (BKLM)",
                                       250.0, 0.0, 250.0);
   m_DigitsScintillatorBKLM->GetXaxis()->SetTitle("Number of digits");
-  m_DigitsScintillatorBKLM->SetOption("LIVE");
   m_DigitsScintillatorEKLM = new TH1F("digits_scintillator_eklm", "Number of scintillator digits (EKLM)",
                                       250.0, 0.0, 250.0);
   m_DigitsScintillatorEKLM->GetXaxis()->SetTitle("Number of digits");
-  m_DigitsScintillatorEKLM->SetOption("LIVE");
   m_DigitsMultiStripBKLM = new TH1F("digits_multi_bklm", "Number of multi-strip digits (BKLM)",
                                     50.0, 0.0, 50.0);
   m_DigitsMultiStripBKLM->GetXaxis()->SetTitle("Number of multi-strip digits");
-  m_DigitsMultiStripBKLM->SetOption("LIVE");
   m_DigitsMultiStripEKLM = new TH1F("digits_multi_eklm", "Number of multi-strip digits (EKLM)",
                                     50.0, 0.0, 50.0);
   m_DigitsMultiStripEKLM->GetXaxis()->SetTitle("Number of multi-strip digits");
-  m_DigitsMultiStripEKLM->SetOption("LIVE");
   /* Trigger bits. */
   m_TriggerBitsBKLM = new TH1F("trigger_bits_bklm", "Trigger bits of multi-strip digits (BKLM)",
                                (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
@@ -220,28 +205,22 @@ void KLMDQMModule::defineHisto()
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
   m_TriggerBitsBKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
-  m_TriggerBitsBKLM->SetOption("LIVE");
   m_TriggerBitsEKLM = new TH1F("trigger_bits_eklm", "Trigger bits of multi-strip digits (EKLM)",
                                (double)c_0x1, (double)c_0x8, (double)c_0x1 + 1.0);
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x8, "0x8");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x4, "0x4");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x2, "0x2");
   m_TriggerBitsEKLM->GetXaxis()->SetBinLabel(c_0x1, "0x1");
-  m_TriggerBitsEKLM->SetOption("LIVE");
   /* Number of digits after injection */
   /* For the histograms below, we use the same style as for other subdetectors. */
   m_DigitsAfterLERInj = new TH1F("KLMOccInjLER", "KLM digits after LER injection / Time;Time [#mus];Number of KLM digits / (5 #mus)",
                                  4000, 0, 20000);
-  m_DigitsAfterLERInj->SetOption("LIVE");
   m_TriggersLERInj = new TH1F("KLMTrigInjLER", "Triggers after KER injection / Time;Time [#mus];Number of triggers / (5 #mus)",
                               4000, 0, 20000);
-  m_TriggersLERInj->SetOption("LIVE");
   m_DigitsAfterHERInj = new TH1F("KLMOccInjHER", "KLM digits after HER injection / Time;Time [#mus];Number of KLM digits / (5 #mus)",
                                  4000, 0, 20000);
-  m_DigitsAfterHERInj->SetOption("LIVE");
   m_TriggersHERInj = new TH1F("KLMTrigInjHER", "Triggers after HER injection / Time;Time [#mus];Number of triggers / (5 #mus)",
                               4000, 0, 20000);
-  m_TriggersHERInj->SetOption("LIVE");
   /* Spatial distribution of EKLM 2d hits per layer. */
   klmIndex.setIndexLevel(KLMChannelIndex::c_IndexLevelSection);
   for (KLMChannelIndex& klmSection : klmIndex) {
@@ -262,7 +241,6 @@ void KLMDQMModule::defineHisto()
                                                            340 * 2 / 10, -340, 340);
         m_Spatial2DHitsEKLM[section - 1][j - 1]->GetXaxis()->SetTitle("X coordinate [cm]");
         m_Spatial2DHitsEKLM[section - 1][j - 1]->GetYaxis()->SetTitle("Y coordinate [cm]");
-        m_Spatial2DHitsEKLM[section - 1][j - 1]->SetOption("LIVE");
       }
     }
   }

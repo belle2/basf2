@@ -209,8 +209,11 @@ namespace {
   /** Recursively gather all daughters of 'gen' we want to reconstruct. */
   void appendParticles(const MCParticle* gen, vector<const MCParticle*>& children)
   {
-    if (MCMatching::isFSP(gen->getPDG()))
+    if (MCMatching::isFSP(gen->getPDG()) and gen->getPDG() != Const::Kshort.getPDGCode())
       return; //stop at the bottom of the MC decay tree (ignore secondaries)
+
+    // Ks that decays interacting with materials can have additional daughters not only 2-pions.
+    // To check the missing daughters, the exception for Ks is introduced.
 
     const vector<MCParticle*>& genDaughters = gen->getDaughters();
     for (auto daug : genDaughters) {
@@ -445,18 +448,18 @@ int MCMatching::getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticl
 bool MCMatching::isFSP(int pdg)
 {
   switch (abs(pdg)) {
-    case 211:
-    case 321:
-    case 11:
-    case 12:
-    case 13:
-    case 14:
-    case 16:
-    case 22:
-    case 2212:
+    case 211: // pi
+    case 321: // K
+    case 11: // e
+    case 12: // nu_e
+    case 13: // mu
+    case 14: // nu_mu
+    case 16: // nu_tau
+    case 22: // gamma
+    case 2212: // proton
     case 310: // K0S
     case 130: // K0L
-    case 2112:
+    case 2112: // neutron
       return true;
     default:
       return false;

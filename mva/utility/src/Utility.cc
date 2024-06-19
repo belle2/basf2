@@ -146,7 +146,6 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
   AbstractInterface::initSupportedInterfaces();
   auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
 
-  unsigned int i = 0;
   for (auto& filename : filenames) {
 
     Belle2::EventMetaData emd(event, run, experiment);
@@ -222,8 +221,6 @@ void Utility::expert(const std::vector<std::string>& filenames, const std::vecto
         target_branch->Fill();
       }
     }
-
-    ++i;
   }
 
   tree.SetEntries();

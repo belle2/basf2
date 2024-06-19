@@ -9,7 +9,7 @@
 /* Own header. */
 #include <tracking/trackExtrapolateG4e/TrackExtrapolateG4e.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

@@ -8,15 +8,19 @@
 
 #include <analysis/modules/VariablesToEventBasedTree/VariablesToEventBasedTreeModule.h>
 
+// analysis
 #include <analysis/dataobjects/ParticleList.h>
 #include <analysis/dataobjects/StringWrapper.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Utility.h>
+
+// framework
 #include <framework/logging/Logger.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
 
 #include <cmath>
 
@@ -46,7 +50,8 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
            "List of variables (or collections) to save for each event. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. Only event-based variables are allowed here.",
            emptylist);
 
-  addParam("fileName", m_fileName, "Name of ROOT file for output.", string("VariablesToEventBasedTree.root"));
+  addParam("fileName", m_fileName, "Name of ROOT file for output. Can be overridden using the -o argument of basf2.",
+           string("VariablesToEventBasedTree.root"));
   addParam("treeName", m_treeName, "Name of the NTuple in the saved file.", string("tree"));
   addParam("maxCandidates", m_maxCandidates, "The maximum number of candidates in the ParticleList per entry of the Tree.", 100u);
 
@@ -54,12 +59,23 @@ VariablesToEventBasedTreeModule::VariablesToEventBasedTreeModule() :
   addParam("sampling", m_sampling,
            "Tuple of variable name and a map of integer values and inverse sampling rate. E.g. (signal, {1: 0, 0:10}) selects all signal events and every 10th background event. Variable must be event-based.",
            default_sampling);
+
+  addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
+           string(""));
 }
 
 void VariablesToEventBasedTreeModule::initialize()
 {
   m_eventMetaData.isRequired();
   StoreObjPtr<ParticleList>().isRequired(m_particleList);
+
+  // override the output file name with what's been provided with the -o option
+  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+  if (!outputFileArgument.empty())
+    m_fileName = outputFileArgument;
+
+  if (!m_fileNameSuffix.empty())
+    m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
 
   // See if there is already a file in which case add a new tree to it ...
   // otherwise create a new file (all handled by framework)
@@ -244,6 +260,7 @@ void VariablesToEventBasedTreeModule::event()
 
       if (iPart >= m_maxCandidates) {
         B2WARNING("Maximum number of candidates exceeded in VariablesToEventBasedTree module. I will skip additional candidates");
+        m_ncandidates = m_maxCandidates;
         break;
       }
 

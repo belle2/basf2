@@ -14,7 +14,7 @@
 #include <klm/dataobjects/KLMChannelIndex.h>
 #include <klm/dbobjects/bklm/BKLMAlignment.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBObjPtr.h>

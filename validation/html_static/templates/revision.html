@@ -33,7 +33,7 @@
   </div>
   <!-- show some extra information, but not for the reference plots -->
   {{#if label != "reference" }}
-  <div class="revision-details">{{creation_date}} {{creation_timezone}} | <a target="_blank" class="revision-details-repo-link" href="https://stash.desy.de/projects/B2/repos/software/commits/{{git_hash}}">{{git_hash}}</a></div>
+  <div class="revision-details">{{creation_date}} {{creation_timezone}} | <a target="_blank" class="revision-details-repo-link" href="https://gitlab.desy.de/belle2/software/basf2/-/tree/{{git_hash}}">{{git_hash}}</a></div>
   {{/if}}
 </div>
 {{/revisions}}

@@ -5,9 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-
-#ifndef ARICHNTUPLEMODULE_H
-#define ARICHNTUPLEMODULE_H
+#pragma once
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/Module.h>
@@ -71,21 +69,9 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Called when entering a new run.
-     * Set run dependent things like run header parameters, alignment, etc.
-     */
-    virtual void beginRun() override;
-
-    /**
      * Event processor.
      */
     virtual void event() override;
-
-    /**
-     * End-of-run action.
-     * Save run-related stuff, such as statistics.
-     */
-    virtual void endRun() override;
 
     /**
      * Termination action.
@@ -114,5 +100,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

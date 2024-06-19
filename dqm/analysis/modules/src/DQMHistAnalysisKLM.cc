@@ -9,7 +9,7 @@
 /* Own header. */
 #include <dqm/analysis/modules/DQMHistAnalysisKLM.h>
 
-/* Belle 2 headers. */
+/* Basf2 headers. */
 #include <klm/dataobjects/KLMChannelIndex.h>
 
 /* ROOT headers. */

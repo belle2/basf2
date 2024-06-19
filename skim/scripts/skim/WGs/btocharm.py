@@ -1048,6 +1048,6 @@ class B0toD0Kpipi0_pi0(BaseSkim):
     def build_lists(self, path):
         Bcuts = "5.2 < Mbc and abs(deltaE) < 0.5"
 
-        ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0 pi0:charmlessFit", Bcuts, path=path)
+        ma.reconstructDecay("B0:D0Kpipi0_pi0 -> anti-D0:Kpipi0_loose pi0:charmlessFit", Bcuts, path=path)
 
         return ["B0:D0Kpipi0_pi0"]

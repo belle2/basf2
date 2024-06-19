@@ -6,12 +6,17 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
 #include <generators/modules/evtgeninput/EvtGenInputModule.h>
-#include <generators/evtgen/EvtGenInterface.h>
-#include <mdst/dataobjects/MCParticleGraph.h>
-#include <framework/utilities/FileSystem.h>
 
+/* Generators headers. */
+#include <generators/evtgen/EvtGenInterface.h>
+#include <generators/evtgen/EvtGenUtilities.h>
+
+/* Basf2 headers. */
+#include <framework/utilities/FileSystem.h>
 #include <framework/datastore/StoreArray.h>
+#include <mdst/dataobjects/MCParticleGraph.h>
 
 using namespace std;
 using namespace Belle2;
@@ -51,23 +56,11 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 
 void EvtGenInputModule::initialize()
 {
-  const std::string defaultDecFile = FileSystem::findFile("decfiles/dec/DECAY_BELLE2.DEC", true);
-  if (m_DECFileName.empty()) {
-    B2ERROR("No global decay file defined, please make sure the parameter 'DECFile' is set correctly");
-    return;
-  }
-  if (defaultDecFile.empty()) {
-    B2WARNING("Cannot find default decay file");
-  } else if (defaultDecFile != m_DECFileName) {
-    B2INFO("Using non-standard DECAY file \"" << m_DECFileName << "\"");
-  }
-  //Initialize MCParticle collection
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
-
-  //initial particle for beam parameters
+  generators::checkEvtGenDecayFile(m_DECFileName);
+  // Initial particle for beam parameters.
   m_initial.initialize();
-
 }
 
 

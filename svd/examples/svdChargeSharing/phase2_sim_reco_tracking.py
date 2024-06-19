@@ -53,7 +53,7 @@ for module in main.modules():
     if module.name() == 'SVDSpacePointCreator':
         module.param("MinClusterTime", -999)
 
-main.add_module('VXDDedxPID', enableDebugOutput=True)
+main.add_module('VXDDedxPID')
 
 main.add_module(
     'RootOutput',

@@ -17,7 +17,7 @@ namespace Belle2 {
   /**
    * Example module of how to use MonitoringObject in DQMHistAnalysis module
    */
-  class DQMHistAnalysisMonObjModule : public DQMHistAnalysisModule {
+  class DQMHistAnalysisMonObjModule final : public DQMHistAnalysisModule {
 
   public:
 
@@ -29,32 +29,22 @@ namespace Belle2 {
     /**
      * Destructor
      */
-    virtual ~DQMHistAnalysisMonObjModule();
+    ~DQMHistAnalysisMonObjModule();
 
     /**
      * Initialize the Module.
      */
-    virtual void initialize() override;
-
-    /**
-     * Begin run function
-     */
-    virtual void beginRun() override;
-
-    /**
-     * Event processor.
-     */
-    virtual void event() override;
+    void initialize() override final;
 
     /**
      * End-of-run action.
      */
-    virtual void endRun() override;
+    void endRun() override final;
 
     /**
      * Termination action.
      */
-    virtual void terminate() override;
+    void terminate() override final;
 
   protected:
 

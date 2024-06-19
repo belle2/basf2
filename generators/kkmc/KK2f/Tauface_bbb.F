@@ -1542,16 +1542,16 @@ C      CALL INIOFC ! dummy for now anyway
       INTEGER JAKT ! temporary place holder for JAK1
       DATA    JAKT /-1/
       SAVE    JAKT
-      INTEGER IFIRST            ! skip action for first event
-      DATA    IFIRST /1/
-      SAVE    IFIRST
-      IF (KTO.EQ.1) THEN
-         IF (CHCONJUGATE.EQ.1.AND.IFIRST.EQ.0) THEN ! swap JAK1/JAK2 for alternate events
-            JAKT = JAK1
-            JAK1 = JAK2
-            JAK2 = JAKT
+      REAL    RRR(1)
+      IF (KTO.EQ.1) THEN  
+         IF (CHCONJUGATE.EQ.1) THEN  
+            CALL KKMC_RANMAR(RRR,1)
+            IF (RRR(1).GT.0.5) THEN ! swap JAK1/JAK2 for alternate events
+               JAKT = JAK1
+               JAK1 = JAK2
+               JAK2 = JAKT
+            ENDIF
          ENDIF
-         IF (IFIRST.EQ.1) IFIRST = 0
       ENDIF
 C this is a prototype, at present rest of this subroutine is inactive, blocked by RETURN
       RETURN

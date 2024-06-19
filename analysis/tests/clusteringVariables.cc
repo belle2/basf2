@@ -570,6 +570,7 @@ namespace {
     // initialise the photon list
     gammalist.create();
     gammalist->initialize(22, gammalist.getName());
+    gammalist->setEditable(true);
 
     // make the photons from clusters
     for (int i = 0; i < eclclusters.getEntries(); ++i) {
@@ -578,6 +579,7 @@ namespace {
         gammalist->addParticle(p);
       }
     }
+    gammalist->setEditable(false);
 
     // initialize the pion lists
     pionlist.create();
@@ -585,12 +587,14 @@ namespace {
     piminuslist.create();
     piminuslist->initialize(-211, piminuslist.getName());
     piminuslist->bindAntiParticleList(*(pionlist));
+    pionlist->setEditable(true);
 
     // fill the pion list with the tracks
     for (int i = 0; i < tracks.getEntries(); ++i) {
       const Particle* p = particles.appendNew(Particle(tracks[i], Const::pion));
       pionlist->addParticle(p);
     }
+    pionlist->setEditable(false);
 
     // check overlap without any arguments
     const Manager::Var* photonHasOverlapNoArgs = Manager::Instance().getVariable("photonHasOverlap()");

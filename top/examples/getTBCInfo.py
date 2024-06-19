@@ -10,9 +10,9 @@
 ##########################################################################
 
 # ---------------------------------------------------------------------------------------
-# Get info about TBC constants in database
+# Prints info about TBC constants in database
 #
-# usage: basf2 getTBCInfo.py expNo runNo [globalTag]
+# usage: basf2 getTBCInfo.py expNo runNo [globalTag or localDB]
 # ---------------------------------------------------------------------------------------
 
 import basf2 as b2
@@ -21,17 +21,34 @@ import sys
 
 argvs = sys.argv
 if len(argvs) < 3:
-    print("usage: basf2", argvs[0], "expNo runNo [globalTag]")
+    print("usage: basf2", argvs[0], "expNo runNo [globalTag or localDB]")
     sys.exit()
 expNo = int(argvs[1])
 runNo = int(argvs[2])
-tag = '(default)'
+
+# Database
+tag = '(main)'
 if len(argvs) == 4:
     tag = argvs[3]
+    if '.txt' in tag:
+        b2.conditions.append_testing_payloads(tag)
+    else:
+        b2.conditions.append_globaltag(tag)
 
-# Central database
-if len(argvs) == 4:
-    b2.use_central_database(tag)
+
+class PrintInfo(b2.Module):
+    ''' Prints timebase calibration info '''
+
+    def initialize(self):
+        ''' Prints calibration status of boardstacks '''
+
+        print()
+        print('Experiment =', expNo, 'Run =', runNo, 'global tag =', tag)
+        print()
+
+        dbImporter = TOPDatabaseImporter()
+        dbImporter.printSampleTimeCalibrationInfo()
+
 
 # create path
 main = b2.create_path()
@@ -41,23 +58,11 @@ eventinfosetter = b2.register_module('EventInfoSetter')
 eventinfosetter.param({'evtNumList': [1], 'runList': [runNo], 'expList': [expNo]})
 main.add_module(eventinfosetter)
 
-# Gearbox - access to xml files
-gearbox = b2.register_module('Gearbox')
-main.add_module(gearbox)
+# Geometry parameters
+main.add_module('TOPGeometryParInitializer')
 
-# Geometry
-geometry = b2.register_module('Geometry')
-geometry.param('useDB', False)
-geometry.param('components', ['TOP'])
-main.add_module(geometry)
+# Print TBC Info
+main.add_module(PrintInfo())
 
 # process single event
 b2.process(main)
-
-print()
-print('Experiment =', expNo, 'Run =', runNo, 'global tag =', tag)
-print()
-
-# and then run the importer
-dbImporter = TOPDatabaseImporter()
-dbImporter.getSampleTimeCalibrationInfo()

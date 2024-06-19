@@ -12,7 +12,7 @@
 /* KLM headers. */
 #include <klm/dataobjects/KLMHit2d.h>
 
-/* Belle2 headers. */
+/* Basf2 headers. */
 #include <framework/gearbox/Const.h>
 
 /* ROOT headers. */

@@ -144,7 +144,8 @@ CDCTrigger2DFinderModule::initialize()
       }
     } else {
       for (int priority = 0; priority < 5; ++ priority) {
-        radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
+        if (iSL == 0) radius[iSL][priority] = cdc.senseWireR(layerId + priority);
+        else       radius[iSL][priority] = cdc.senseWireR(layerId + priority - 2);
       }
     }
     layerId += (iSL > 0 ? 6 : 7);

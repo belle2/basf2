@@ -120,9 +120,9 @@ if __name__ == "__main__":
         def local_print_function(title, categories):
             empty_row = {key: "" for key in df_print.columns}
             tmp = pd.DataFrame(columns=df_print.columns)
-            tmp = tmp.append(pd.Series(empty_row, name=title))
-            tmp = tmp.append(df_print.reindex(categories))
-            tmp = tmp.append(pd.Series(empty_row, name=""))
+            tmp.loc[title] = pd.Series(empty_row)
+            tmp = pd.concat([tmp, df_print.reindex(categories)])
+            tmp.loc[""] = pd.Series(empty_row)
 
             return tmp
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
         remaining_columns = set(df_print.index) - set(df_sorted.index)
         if remaining_columns:
-            df_sorted = df_sorted.append(local_print_function("Uncategorized", remaining_columns))
+            df_sorted = pd.concat([df_sorted, local_print_function("Uncategorized", remaining_columns)])
 
         print(df_sorted)
 

@@ -130,14 +130,15 @@ class BaseFEISkim(BaseSkim):
         We define "cleaned" tracks and clusters as:
 
         * Cleaned tracks (``pi+:FEI_cleaned``): :math:`d_0 < 0.5~{\\rm cm}`,
-          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}` * Cleaned ECL
-          clusters (``gamma:FEI_cleaned``): :math:`0.296706 < \\theta < 2.61799`, and
+          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
+        * Cleaned ECL clusters (``gamma:FEI_cleaned``):
+          :math:`0.296706 < \\theta < 2.61799`, and
           :math:`E>0.1~{\\rm GeV}`
         """
 
         # Pre-selection cuts
-        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+        CleanedTrackCuts = "abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.1"
+        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
 
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)
@@ -565,7 +566,7 @@ class feiSLB0_RDstar(BaseFEISkim):
 
     def build_lists(self, path):
         CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
 
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)

@@ -14,6 +14,7 @@ import math
 
 import pandas
 import numpy
+import itertools
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -191,7 +192,9 @@ class Plotter:
         fill_kwargs = copy.copy(self.fill_kwargs)
 
         if plot_kwargs is None or 'color' not in plot_kwargs:
-            color = next(axis._get_lines.prop_cycler)
+            prop_cycler = plt.rcParams["axes.prop_cycle"]
+            prop_iter = itertools.cycle(prop_cycler)
+            color = next(prop_iter)
             color = color['color']
             plot_kwargs['color'] = color
         else:
@@ -218,7 +221,10 @@ class Plotter:
                 xerr = xerr*numpy.ones(len(x))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
-            e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
+            e = axis.errorbar(
+                x[mask], y[mask], xerr=numpy.where(
+                    xerr[mask] < 0, 0.0, xerr[mask]), yerr=numpy.where(
+                    yerr[mask] < 0, 0.0, yerr[mask]), rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:

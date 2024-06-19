@@ -49,6 +49,11 @@ namespace Belle2 {
      */
     void event(void) override final;
 
+    /**
+     * Terminator.
+     */
+    void terminate(void) override final;
+
   private:
 
     // Data members

@@ -55,7 +55,7 @@ This is the only place where you specify which reconstruction mode you wish to p
 The output files used for training and evaluation must be placed in the folders ``root/train`` and ``root/val`` respectively, where ``root`` is a folder of your choice.
 
 The training is performed with the python script ``grafei/scripts/train_model.py``. It requires a ``.yaml`` config file with the ``-c`` argument.
-You can find a prototype of config file at ``grafei/config.yaml``, where all   options are documented.
+You can find a prototype of config file at ``analysis/data/grafei_config.yaml``, where all options are documented.
 The training will output a copy of the config file used and a weight file in the format ``.pt`` that can be used to apply the model to some other data.
 The output folder is defined in the config file.
 

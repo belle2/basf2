@@ -79,7 +79,6 @@ if __name__ == "__main__":
                                                  iov, "trackfindingcdc_FeasibleSegmentRelationFilter", 0.04)
         write_tracking_mva_filter_payloads_to_db("trackfindingcdc_RealisticSegmentRelationFilterParameters",
                                                  iov, "trackfindingcdc_RealisticSegmentRelationFilter", 0.805)
-
         write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_1_backward_Parameters",
                                                  iov, "ckf_CDCSVDStateFilter_1", 0.1)
         write_tracking_mva_filter_payloads_to_db("ckf_CDCSVDStateFilter_2_backward_Parameters",

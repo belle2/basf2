@@ -18,7 +18,9 @@ TBranch: cosTBz
 TBranch: KSFWVariables__boet__bc
 TBranch: KSFWVariables__bomm2__bc
 TBranch: KSFWVariables__bohso00__bc
+TBranch: KSFWVariables__bohso01__bc
 TBranch: KSFWVariables__bohso02__bc
+TBranch: KSFWVariables__bohso03__bc
 TBranch: KSFWVariables__bohso04__bc
 TBranch: KSFWVariables__bohso10__bc
 TBranch: KSFWVariables__bohso12__bc
@@ -59,7 +61,9 @@ TBranch: cosTBz, 0.4902
 TBranch: KSFWVariables__boet__bc, 10.33
 TBranch: KSFWVariables__bomm2__bc, -2.208
 TBranch: KSFWVariables__bohso00__bc, 0.8699
+TBranch: KSFWVariables__bohso01__bc, 0
 TBranch: KSFWVariables__bohso02__bc, -0.04065
+TBranch: KSFWVariables__bohso03__bc, 0
 TBranch: KSFWVariables__bohso04__bc, -0.1515
 TBranch: KSFWVariables__bohso10__bc, 0.3317
 TBranch: KSFWVariables__bohso12__bc, -0.03392

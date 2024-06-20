@@ -20,10 +20,10 @@ settings = CalibrationSettings(
     expert_username="longos",
     description=__doc__,
     input_data_formats=["raw"],
-    input_data_names=["delayedbhabha"],
+    input_data_names=["delayedbhabha_calib"],
     input_data_filters={
-        "delayedbhabha": [
-            INPUT_DATA_FILTERS["Data Tag"]["delayedbhabha"],
+        "delayedbhabha_calib": [
+            INPUT_DATA_FILTERS["Data Tag"]["delayedbhabha_calib"],
             INPUT_DATA_FILTERS["Data Quality Tag"]["Good Or Recoverable"],
             INPUT_DATA_FILTERS["Run Type"]["physics"],
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
@@ -48,7 +48,7 @@ def get_calibrations(input_data, **kwargs):
     # ..delayed Bhabha
 
     # ..Input data
-    file_to_iov_delayed_Bhabha = input_data["delayedbhabha"]
+    file_to_iov_delayed_Bhabha = input_data["delayedbhabha_calib"]
     input_files = list(file_to_iov_delayed_Bhabha.keys())
 
     # ..Algorithm

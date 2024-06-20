@@ -64,8 +64,10 @@ _RegisteredSkims = [
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
     ("11180300", "fei", "feiSLB0"),
+    ("11180301", "fei", "feiSLB0_RDstar"),
     ("11180400", "fei", "feiSLBplus"),
     ("11180500", "fei", "feiHadronic"),
+    ("11180501", "fei", "feiHadronic_DstEllNu"),
     ("11180600", "fei", "feiSL"),
 
     # --- WG2: Electroweak penguins ---
@@ -193,6 +195,7 @@ _RegisteredSkims = [
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),

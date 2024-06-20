@@ -34,7 +34,8 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons,
                                             loadStdSkimHighEffPhi,
-                                            loadStdSkimHighEffKstar0,)
+                                            loadStdSkimHighEffKstar0,
+                                            loadStdPhotonCutEta)
 from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
 from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
@@ -295,12 +296,11 @@ class BptoD0etapi_Kpi(BaseSkim):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B+:BptoD0etapi_Kpi -> anti-D0:Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B+:BptoD0etapi_Kpi"]
@@ -417,12 +417,11 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
         loadStdDstarPlus_D0pi_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B0:B0toDstaretapi_D0pi_Kpi -> D*-:D0_Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B0:B0toDstaretapi_D0pi_Kpi"]
@@ -1267,15 +1266,15 @@ class B0toDDs0star(BaseSkim):
         loadStdPi0ForBToHadrons(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",
+        ma.reconstructDecay("phi:KK -> K+:GoodTrack K-:GoodTrack",
                             cut="[1.01 < M < 1.03]", path=path)
         ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",
                             cut="[0.793 < M < 1.015]", path=path)
-        ma.reconstructDecay("D_s+:phipipi0 -> phi pi+:GoodTrack pi0:bth_skim",
+        ma.reconstructDecay("D_s+:phipipi0 -> phi:KK pi+:GoodTrack pi0:bth_skim",
                             cut="[1.942 < M < 1.978]", path=path)
         ma.reconstructDecay("D_s+:antiKK -> anti-K*0 K+:GoodTrack",
                             cut="[1.944 < M < 1.992]", path=path)
-        ma.reconstructDecay("D_s+:phipi -> phi pi+:GoodTrack",
+        ma.reconstructDecay("D_s+:phipi -> phi:KK pi+:GoodTrack",
                             cut="[1.935 < M < 1.999]", path=path)
         Dslist = ['D_s+:phipipi0', 'D_s+:antiKK', 'D_s+:phipi']
         ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)
@@ -1375,14 +1374,15 @@ class B0toDs1D(BaseSkim):
         loadStdSkimHighEffKstar0(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay(decayString="D_s+:phipi -> phi:SkimHighEff pi+:SkimHighEff", cut="[1.942 < M < 1.993]", path=path)
-        ma.reconstructDecay(decayString="D_s+:phipipi0 -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
+        ma.reconstructDecay(decayString="D_s+:phipiSkimHighEff -> phi:SkimHighEff pi+:SkimHighEff",
+                            cut="[1.942 < M < 1.993]", path=path)
+        ma.reconstructDecay(decayString="D_s+:phipipi0SkimHighEff -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
                             cut="[1.874 < M < 1.997]", path=path)
         ma.reconstructDecay(decayString="D_s+:Ksk -> K_S0:merged K+:SkimHighEff",
                             cut="[1.914 < M < 2.015]", path=path)
         ma.reconstructDecay(decayString="D_s+:anti-Kstar0K -> anti-K*0:SkimHighEff K+:SkimHighEff",
                             cut="[1.934 < M < 2.002]", path=path)
-        DsList = ['D_s+:phipi', 'D_s+:phipipi0', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
+        DsList = ['D_s+:phipiSkimHighEff', 'D_s+:phipipi0SkimHighEff', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
         ma.copyLists(outputListName="D_s+:all", inputListNames=DsList, path=path)
 
         ma.reconstructDecay(decayString="D_s*+ -> D_s+:all gamma:loose",

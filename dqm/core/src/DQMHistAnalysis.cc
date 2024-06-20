@@ -351,7 +351,7 @@ int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::st
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   // the subscribed name includes the prefix, the map below does *not*
-  SEVCHK(ca_create_channel((prefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
+  CheckEpicsError(ca_create_channel((prefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure", pvname);
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;
@@ -369,7 +369,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
 #endif
 }
 
@@ -381,7 +381,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
 #endif
 }
 
@@ -399,7 +399,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string va
   }
   char text[40];
   strcpy(text, value.c_str());
-  SEVCHK(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure", keyname);
 #endif
 }
 
@@ -411,7 +411,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, double value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -423,7 +423,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -435,9 +435,10 @@ void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  char text[40];
-  strcpy(text, value.c_str());
-  SEVCHK(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure");
+  char text[41];
+  strncpy(text, value.c_str(), 40);
+  text[40] = 0;
+  CheckEpicsError(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -458,9 +459,7 @@ double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
   if (r == ECA_NORMAL) {
     return value;
   } else {
-    B2WARNING("Read PV failed for " << keyname);
-    printPVStatus(m_epicsNameToChID[keyname], false);
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV failed in ca_get or ca_pend_io failure", keyname);
   }
 #endif
   return NAN;
@@ -483,9 +482,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   if (r == ECA_NORMAL) {
     return value;
   } else {
-    B2WARNING("Read PV failed for " << ca_name(m_epicsChID[index]));
-    printPVStatus(m_epicsChID[index], false);
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV failed in ca_get or ca_pend_io failure", m_epicsChID[index]);
   }
 #endif
   return NAN;
@@ -510,9 +507,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& s
     status = true;
     return std::string(value);
   } else {
-    B2WARNING("Read PV failed for " << keyname);
-    printPVStatus(m_epicsNameToChID[keyname], false);
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV (string) failed in ca_get or ca_pend_io failure", keyname);
   }
 #endif
   return std::string(value);
@@ -537,9 +532,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
     status = true;
     return std::string(value);
   } else {
-    B2WARNING("Read PV failed for " << ca_name(m_epicsChID[index]));
-    printPVStatus(m_epicsChID[index], false);
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV (string) failed in ca_get or ca_pend_io failure", m_epicsChID[index]);
   }
 #endif
   return std::string(value);
@@ -591,7 +584,7 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
   // this should be called in terminate function of analysis modules
 #ifdef _BELLE2_EPICS
   if (getUseEpics()) {
-    for (auto& it : m_epicsChID) SEVCHK(ca_clear_channel(it), "ca_clear_channel failure");
+    for (auto& it : m_epicsChID) CheckEpicsError(ca_clear_channel(it), "ca_clear_channel failure", it);
     updateEpicsPVs(5.0);
     // Make sure we clean up both afterwards!
     m_epicsChID.clear();
@@ -641,9 +634,7 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
       }
       return true;
     } else {
-      B2WARNING("Reading PV Limits failed for " << ca_name(pv));
-      printPVStatus(pv, false);
-      SEVCHK(r, "ca_get or ca_pend_io failure");
+      CheckEpicsError(r, "Reading PV Limits failed in ca_get or ca_pend_io failure", pv);
     }
   }
   return false;
@@ -716,9 +707,13 @@ void DQMHistAnalysisModule::checkPVStatus(void)
   }
   B2INFO("Check PVs done");
 }
-void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
 
+void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
 {
+  if (pv == nullptr) {
+    B2WARNING("PV chid was nullptr");
+    return;
+  }
   auto state = ca_state(pv);
   switch (state) {
     case cs_never_conn: /* valid chid, server not found or unavailable */
@@ -736,6 +731,24 @@ void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
     default:
       B2WARNING("Undefined status for channel " << ca_name(pv));
       break;
+  }
+}
+
+void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, const std::string& name)
+{
+  if (state != ECA_NORMAL) {
+    B2WARNING(message << ": " << name);
+    printPVStatus(m_epicsNameToChID[name], false);
+  }
+}
+
+void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, chid id = nullptr)
+{
+  if (state != ECA_NORMAL) {
+    std::string name;
+    if (id) name =  ca_name(id);
+    B2WARNING(message << ": " << name);
+    printPVStatus(id, false);
   }
 }
 

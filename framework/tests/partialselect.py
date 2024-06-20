@@ -19,6 +19,7 @@ class CountEvents(basf2.Module):
         """Start number of events at zero"""
         #: Stores the total number of events passing this module
         self.num_events = 0
+        #: Stores the list of events passing this module
         self.events = []
 
     def event(self):

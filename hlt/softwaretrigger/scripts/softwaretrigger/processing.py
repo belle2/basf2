@@ -162,6 +162,10 @@ def add_hlt_processing(path,
     if run_type == constants.RunTypes.cosmic:
         basf2.declare_cosmics()
 
+    # Check if the run is beam and set the Environment accordingly
+    if run_type == constants.RunTypes.beam:
+        basf2.declare_beam()
+
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
 
@@ -268,6 +272,10 @@ def add_expressreco_processing(path,
     # Check if the run is cosmic and set the Environment accordingly
     if run_type == constants.RunTypes.cosmic:
         basf2.declare_cosmics()
+
+    # Check if the run is beam and set the Environment accordingly
+    if run_type == constants.RunTypes.beam:
+        basf2.declare_beam()
 
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS

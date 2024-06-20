@@ -755,11 +755,11 @@ class AA2uuuu(BaseSkim):
     def build_lists(self, path):
         muon_cuts = """[0.8 < muonID_noSVD]
         and [inKLMAcceptance == 1]
-        and [inCDCAcceptance == 1] and [4 < nCDCHits]"""
+        and [inCDCAcceptance == 1]"""
 
         track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
 
-        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts}) <= 6", path=path)
+        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts})", path=path)
 
         ma.cutAndCopyList("mu+:accepted", "mu+:all", muon_cuts, path=path)
         ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted mu-:accepted", cut="", path=path)

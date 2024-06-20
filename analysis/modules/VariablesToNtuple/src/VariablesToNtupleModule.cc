@@ -21,7 +21,7 @@
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
-#include <framework/dataobjects/NtupleMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 
 // framework - root utilities
 #include <framework/utilities/MakeROOTCompatible.h>
@@ -76,9 +76,6 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 
   addParam("storeEventType", m_storeEventType,
            "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
-
-  addParam("isMC", m_isMC,
-           "Metadata flag to reflect if the processing is performed on Monte Carlo events (true) or not.", true);
 
   addParam("additionalDataDescription", m_additionalDataDescription,
            "Additional dictionary of "
@@ -245,21 +242,21 @@ void VariablesToNtupleModule::initialize()
     m_sampling_variable = nullptr;
   }
 
-  m_ntupleMetaData = new NtupleMetaData;
+  m_outputFileMetaData = new FileMetaData;
   // create persistent tree if it doesn't already exist
   //to-do: c_treeNames[DataStore::c_Persistent].c_str() throws error - RootIOUtilities issue?
   if (!m_file->Get("persistent")) {
-    m_persistent = new TTree("persistent", "persistent");
-    m_persistent->Branch("FileMetaData", &m_ntupleMetaData);
+    m_persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
+    m_persistent->Branch("FileMetaData", &m_outputFileMetaData);
     m_eventTree = new TTree("tree", "tree");
     m_eventTree->Branch("EventMetaData", m_eventMetaData);
   } else {
     m_oldPersistent = dynamic_cast<TTree*>(m_file->Get("persistent"));
-    m_oldNtupleMetaData = dynamic_cast<NtupleMetaData*>(m_file->Get("FileMetaData"));
+    m_oldFileMetaData = dynamic_cast<FileMetaData*>(m_file->Get("FileMetaData"));
     m_persistent = m_oldPersistent->CloneTree(0);
     m_oldPersistent->GetEntry(0);
-    TBranch* ntupleMetaDataBranch = m_persistent->GetBranch("FileMetaData");
-    ntupleMetaDataBranch->SetAddress(&m_ntupleMetaData);
+    TBranch* fileMetaDataBranch = m_persistent->GetBranch("FileMetaData");
+    fileMetaDataBranch->SetAddress(&m_outputFileMetaData);
   }
 
   // create the event tree and fill its branches
@@ -269,7 +266,7 @@ void VariablesToNtupleModule::initialize()
     branchList.insert(pair.first);
 
   //create the tree and branches
-  m_eventTree = new TTree("tree", "tree");
+  m_eventTree = new TTree(c_treeNames[DataStore::c_Event].c_str(), c_treeNames[DataStore::c_Event].c_str());
   for (auto& iter : map) {
     const std::string& branchName = iter.first;
     //skip transient entries (allow overriding via branchNames)
@@ -447,54 +444,49 @@ void VariablesToNtupleModule::event()
   }
 }
 
-void VariablesToNtupleModule::fillNtupleMetaData()
+void VariablesToNtupleModule::fillFileMetaData()
 {
-  bool isMC = (m_isMC) ? m_ntupleMetaData->isMC() : true;
-  new (m_ntupleMetaData) NtupleMetaData;
-  if (!isMC) m_ntupleMetaData->declareRealData();
+  bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
+  new (m_outputFileMetaData) FileMetaData;
+  if (!isMC) m_outputFileMetaData->declareRealData();
 
   unsigned long numEntries = m_tree->get().GetEntries();
-  m_ntupleMetaData->setNFullEvents(m_nFullEvents);
-  m_ntupleMetaData->setNEvents(numEntries);
+  m_outputFileMetaData->setNFullEvents(m_nFullEvents);
+  m_outputFileMetaData->setNEvents(numEntries);
 
   if (m_experimentLow > m_experimentHigh) {
     //starting condition so apparently no events at all
-    m_ntupleMetaData->setLow(-1, -1, 0);
-    m_ntupleMetaData->setHigh(-1, -1, 0);
+    m_outputFileMetaData->setLow(-1, -1, 0);
+    m_outputFileMetaData->setHigh(-1, -1, 0);
   } else {
-    m_ntupleMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
-    m_ntupleMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+    m_outputFileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
+    m_outputFileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
   }
 
-  // //fill more file level metadata
-  // m_ntupleMetaData->setParents(m_parentLfns);
-
-  // to-do: fix RootIOUtilities function calls
-  // RootIOUtilities::setCreationData(*m_ntupleMetaData);
-
-  m_ntupleMetaData->setRandomSeed(RandomNumbers::getSeed());
-  m_ntupleMetaData->setSteering(Environment::Instance().getSteering());
+  //fill more file level metadata
+  RootIOUtilities::setCreationData(*m_outputFileMetaData);
+  m_outputFileMetaData->setRandomSeed(RandomNumbers::getSeed());
+  m_outputFileMetaData->setSteering(Environment::Instance().getSteering());
   auto mcEvents = Environment::Instance().getNumberOfMCEvents();
-  m_ntupleMetaData->setMcEvents(mcEvents);
-  m_ntupleMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  m_outputFileMetaData->setMcEvents(mcEvents);
+  m_outputFileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
-    m_ntupleMetaData->setDataDescription(item.first, item.second);
+    m_outputFileMetaData->setDataDescription(item.first, item.second);
   }
-  if (m_fileMetaData.isValid()) {
-    std::string lfn = m_fileMetaData->getLfn();
-    if (not lfn.empty() and (m_inputLfns.empty() or (m_inputLfns.back() != lfn))) {
-      m_inputLfns.push_back(lfn);
+  if (m_inputFileMetaData.isValid()) {
+    std::string lfn = m_inputFileMetaData->getLfn();
+    if (not lfn.empty() and (m_parentLfns.empty() or (m_parentLfns.back() != lfn))) {
+      m_parentLfns.push_back(lfn);
     }
   }
-  m_ntupleMetaData->setInputs(m_inputLfns);
-  m_ntupleMetaData->setCreationData();
+  m_outputFileMetaData->setParents(m_parentLfns);
 }
 
 void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
-    fillNtupleMetaData();
+    fillFileMetaData();
     TDirectory::TContext directoryGuard(m_file.get());
     m_persistent->Fill();
     m_persistent->Write("persistent", TObject::kWriteDelete);
@@ -524,7 +516,7 @@ void VariablesToNtupleModule::fillTree()
     }
     //FIXME: Do we need this? in theory no but it crashes in parallel processing otherwise ¯\_(ツ)_/¯
     if (entry->name == "FileMetaData") {
-      tree.SetBranchAddress(entry->name.c_str(), &m_ntupleMetaData);
+      tree.SetBranchAddress(entry->name.c_str(), &m_outputFileMetaData);
     } else {
       tree.SetBranchAddress(entry->name.c_str(), &entry->object);
     }

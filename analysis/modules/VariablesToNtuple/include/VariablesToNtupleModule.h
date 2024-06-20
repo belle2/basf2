@@ -15,7 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventExtraInfo.h>
-#include <framework/dataobjects/NtupleMetaData.h>
+#include <framework/dataobjects/FileMetaData.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TTree.h>
@@ -53,8 +53,8 @@ namespace Belle2 {
      */
     float getInverseSamplingRateWeight(const Particle* particle);
 
-    /** Create and fill NtupleMetaData object. */
-    void fillNtupleMetaData();
+    /** Create and fill FileMetaData object. */
+    void fillFileMetaData();
 
     /** Fill TTree.
      *
@@ -82,8 +82,11 @@ namespace Belle2 {
     std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
-
+    /** Event TTree for output. */
+    TTree* m_eventTree;
+    /** Persistent TTree for output. */
     TTree* m_persistent;
+    /** Pre-existing persistent TTree in the output. */
     TTree* m_oldPersistent{nullptr};
     // Counter branch addresses (event number, candidate number etc)
     int m_event{ -1};                /**< event number */
@@ -92,9 +95,6 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-
-    /** Event TTree for output. */
-    TTree* m_eventTree;
 
     /** Vector of DataStore entries that are written to the output. */
     std::vector<DataStore::StoreEntry*> m_entries;
@@ -160,17 +160,15 @@ namespace Belle2 {
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
     std::string m_eventType; /**< EventType to be filled */
 
-    bool m_isMC; /**< Tell ntuplemetadata whether the processed events are MC or not **/
-
     std::map<std::string, std::string> m_additionalDataDescription; /**< Additional metadata description */
 
-    std::vector<std::string> m_inputLfns; /**< Vector of input file LFNs. */
+    std::vector<std::string> m_parentLfns; /**< Vector of parent file LFNs. */
 
-    StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent}; /**< File metadata */
+    StoreObjPtr<FileMetaData> m_inputFileMetaData{"", DataStore::c_Persistent}; /**< Pointer to the input file meta data */
 
-    NtupleMetaData* m_ntupleMetaData; /**< Ntuple meta data stored in the output file */
+    FileMetaData* m_outputFileMetaData; /** File meta data stored in the output ntuple file */
 
-    NtupleMetaData* m_oldNtupleMetaData{nullptr}; /**< Ntuple meta data stored in the output file */
+    FileMetaData* m_oldFileMetaData{nullptr}; /**< Pre-existing FileMetaData in the output. */
 
   };
 } // end namespace Belle2

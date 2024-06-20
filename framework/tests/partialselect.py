@@ -30,12 +30,16 @@ class CountEvents(basf2.Module):
 
 input_events = 1000
 expected_success_events = 200
+# range input for partialselect module
+entry_start = 0.3
+entry_stop = 0.5
+# subsequent event range boundaries for the above inputs
 expected_event_start = 301
 expected_event_stop = 500
 
 main = basf2.Path()
 main.add_module("EventInfoSetter", evtNumList=[input_events], expList=[0], runList=[0])
-partial_select_mod = main.add_module('PartialSelect', entryStart=0.3, entryStop=0.5)
+partial_select_mod = main.add_module('PartialSelect', entryStart=entry_start, entryStop=entry_stop)
 
 success_path = basf2.Path()
 success_count = success_path.add_module(CountEvents())

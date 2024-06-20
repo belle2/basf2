@@ -34,6 +34,10 @@ PartialSelectModule::PartialSelectModule() : Module()
 
     basf2 conditional paths can then be used to select events that pass 
     this module for further processing.
+
+    NOTE: This module has to be added first so as to filter out events 
+    before any other processing. This also only works with one input 
+    file for now.
   )DOC");
 
   // Parameter definitions
@@ -58,10 +62,15 @@ PartialSelectModule::PartialSelectModule() : Module()
 void PartialSelectModule::initialize()
 {
   // Have we received meaningful values?
-  if (m_entryStart < 0 or m_entryStop < 0)
-    B2FATAL("The event start and stop limits passed are beyond the accepted "
-            "range: please reread the 'entryStart' and 'entryStop' descriptions of "
-            "the PartialSelect module.");
+  const bool isOutOfBounds =
+    m_entryStart < 0 || m_entryStop < 0 ||
+    m_entryStart > 1 || m_entryStop > 1 ||
+    m_entryStart > m_entryStop;
+
+  if (isOutOfBounds)
+    B2FATAL("Either the entryStart and entryStop passed are beyond the accepted"
+            " range or they have been swapped: please refer to the 'entryStart'"
+            " and 'entryStop' descriptions of the PartialSelect module.");
   m_nTotal = Environment::Instance().getNumberOfEvents();
   B2INFO("Total number of events :"
          << m_nTotal << ".");
@@ -80,12 +89,12 @@ void PartialSelectModule::event()
   }
   // Mark the boundary events in log.
   if (m_events > m_entryStart * m_nTotal and m_events <= m_entryStart * m_nTotal + 1) {
-    B2INFO("Start processing with event number: "
-           << m_events << ". All previous events have been skipped.");
+    B2INFO("First event passing the PartialSelect range: "
+           << m_events << ".");
   }
   if (m_events <= m_entryStop * m_nTotal and m_events > m_entryStop * m_nTotal - 1) {
-    B2INFO("Stop processing with event number: "
-           << m_events << ". All following events will be skipped.");
+    B2INFO("Last event passing the PartialSelect range: "
+           << m_events << ".");
   }
   setReturnValue(m_returnValue);
 }

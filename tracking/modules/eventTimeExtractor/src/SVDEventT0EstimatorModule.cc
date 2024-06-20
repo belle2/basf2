@@ -9,8 +9,9 @@
 #include <tracking/modules/eventTimeExtractor/SVDEventT0EstimatorModule.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/geometry/B2Vector3.h>
+#include <framework/dataobjects/EventT0.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <mdst/dataobjects/TrackFitResult.h>
+#include <tracking/dbobjects/SVDEventT0Configuration.h>
 
 #include <cmath>
 
@@ -99,9 +100,9 @@ void SVDEventT0EstimatorModule::event()
   // loop on recotracks
   for (auto& recoTrack : m_recoTracks) {
     const B2Vector3D& p = recoTrack.getMomentumSeed();
-    const TrackFitResult seedTrackFitResult = setSeedTrackFitResult(recoTrack);
-    double d0 = seedTrackFitResult.getD0();
-    double z0 = seedTrackFitResult.getZ0();
+    const UncertainHelix uncertainHelix = constructUncertainHelix(recoTrack);
+    double d0 = uncertainHelix.getD0();
+    double z0 = uncertainHelix.getZ0();
 
     // selection on recoTracks
     if (p.Perp() < m_ptSelection || std::fabs(p.Z()) < m_absPzSelection) continue;
@@ -173,24 +174,19 @@ void SVDEventT0EstimatorModule::event()
 
 }
 
-const TrackFitResult SVDEventT0EstimatorModule::setSeedTrackFitResult(const RecoTrack& recoTrack)
+const UncertainHelix SVDEventT0EstimatorModule::constructUncertainHelix(const RecoTrack& recoTrack)
 {
 
   const ROOT::Math::XYZVector& position = recoTrack.getPositionSeed();
   const B2Vector3D& momentum = recoTrack.getMomentumSeed();
-  const TMatrixDSym& cartesianCovariance = recoTrack.getSeedCovariance();
-  short int chargeSign = recoTrack.getChargeSeed();
-  const Const::ParticleType& particleType = Belle2::Const::pion;
-  if (chargeSign < 0) chargeSign = -1;
-  else chargeSign = 1;
+  const TMatrixDSym& covariance = recoTrack.getSeedCovariance();
+  short int charge = recoTrack.getChargeSeed();
+  if (charge < 0) charge = -1;
+  else charge = 1;
   const float pValue = float(std::numeric_limits<double>::quiet_NaN());
   const float bField = Belle2::BFieldManager::getFieldInTesla(ROOT::Math::XYZVector(0, 0, 0)).Z();
-  int cdcHitPattern = 0;
-  int svdHitPattern = 0;
-  uint16_t ndf = 0xFFFF;
 
-  const TrackFitResult trackFitResult = Belle2::TrackFitResult(position, momentum, cartesianCovariance, chargeSign, particleType,
-                                        pValue, bField, cdcHitPattern, svdHitPattern, ndf);
+  const UncertainHelix uncertainHelix(position, momentum, charge, bField, covariance, pValue);
 
-  return trackFitResult;
+  return uncertainHelix;
 }

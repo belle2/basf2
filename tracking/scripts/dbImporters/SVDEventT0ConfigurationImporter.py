@@ -48,7 +48,7 @@ class svdEventT0ConfigurationImporter(basf2.Module):
         payload.setAbsD0Selection(absD0Selection)
         payload.setAbsZ0Selection(absZ0Selection)
 
-        Belle2.Database.Instance().storeData(Belle2.SVDEventT0Configuration.name, payload, iov)
+        Belle2.Database.Instance().storeData(payload.get_name(), payload, iov)
 
 
 main = basf2.create_path()

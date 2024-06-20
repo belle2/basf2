@@ -7,5 +7,5 @@
  **************************************************************************/
 #include <tracking/dbobjects/SVDEventT0Configuration.h>
 
-std::string Belle2::SVDEventT0Configuration::name = std::string("SVDEventT0Configuration");
+std::string Belle2::SVDEventT0Configuration::s_name = std::string("SVDEventT0Configuration");
 

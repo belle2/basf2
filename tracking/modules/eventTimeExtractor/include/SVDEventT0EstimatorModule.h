@@ -12,10 +12,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-#include <framework/dataobjects/EventT0.h>
-#include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/TrackFitResult.h>
-#include <tracking/dbobjects/SVDEventT0Configuration.h>
 
 #include <string>
 
@@ -26,6 +23,9 @@ namespace Belle2 {
    *  RecoTrack pt < m_pt OR RecoTrack pz < m_pz. The EventT0 estimated is added to the temporaryEventT0s to
    *  the StoreObjPtr as EventT0Component that cointains: eventT0, eventT0_error, detector=SVD, algorithm, quality.
    */
+  class RecoTrack;
+  class EventT0;
+  class SVDEventT0Configuration;
 
   class SVDEventT0EstimatorModule : public Module {
   public:
@@ -62,7 +62,7 @@ namespace Belle2 {
     bool m_useDB = true; /**< To compute EvetT0, use configuration of selections stored in the DB */
     std::string m_algorithm = "clsOnTrack_time_average"; /**< name of the algorithm used to evaluate SVD-eventT0 */
 
-    const TrackFitResult setSeedTrackFitResult(const RecoTrack&
-                                               recoTrack); /**< return the TrackFitResult from the seed quantities of the RecoTrack */
+    const UncertainHelix constructUncertainHelix(const RecoTrack&
+                                                 recoTrack); /**< return the UncertainHelix from the seed quantities of the RecoTrack */
   };
 }

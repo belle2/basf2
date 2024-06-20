@@ -7,8 +7,8 @@
  **************************************************************************/
 
 #pragma once
-#include "TObject.h"
-#include "TString.h"
+#include <TObject.h>
+#include <TString.h>
 
 namespace Belle2 {
   /**
@@ -28,6 +28,11 @@ namespace Belle2 {
       , m_absD0Selection(0.5)
       , m_absZ0Selection(2.0)
     {};
+
+    /**
+     * Get payload name
+     */
+    std::string get_name() const {return s_name;}
 
     /**
      * Get the unique ID  of the calibration
@@ -88,10 +93,10 @@ namespace Belle2 {
      */
     void setAbsZ0Selection(double absZ0Selection) { m_absZ0Selection = absZ0Selection; };
 
-    /** name of the payload */
-    static std::string name;
-
   private:
+
+    /** name of the payload */
+    static std::string s_name;
 
     /** unique identifier of the SVD EventT0 configuration payload */
     TString m_uniqueID;

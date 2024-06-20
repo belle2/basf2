@@ -673,13 +673,15 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     def build_lists(self, path):
         D0_cuts = "1.70 < M < 2.10"
         Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionID > 0.1', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'kaonID > 0.1', path=path)
 
         Dst_lists = []
         for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:
             lst = f"{h1}{h2}Pi0"
-            ma.reconstructDecay(f"D0:{lst} -> {h1}+:charmSkim {h2}-:charmSkim pi0:skim", D0_cuts, path=path)
-            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:charmSkim", Dst_cuts, path=path)
-            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:charmSkim", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D0:{lst} -> {h1}+:charmSkim_pid {h2}-:charmSkim_pid pi0:skim", D0_cuts, path=path)
+            ma.reconstructDecay(f"D*+:{lst}_RS -> D0:{lst} pi+:charmSkim_pid", Dst_cuts, path=path)
+            ma.reconstructDecay(f"D*-:{lst}_WS -> D0:{lst} pi-:charmSkim_pid", Dst_cuts, path=path)
             ma.copyLists(f"D*+:{lst}", [f"D*+:{lst}_RS", f"D*+:{lst}_WS"], path=path)
             Dst_lists.append(f"D*+:{lst}")
 

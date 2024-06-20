@@ -429,8 +429,7 @@ def loadStdAllEtaPrime(persistent=True, path=None):
     """
     ma.reconstructDecay('eta\':all1 -> pi+:all pi-:all gamma:all', '0.8 < M < 1.1', 1, persistent, path)
     ma.reconstructDecay('eta\':all2 -> pi+:all pi-:all eta:all', '0.8 < M < 1.1', 2, persistent, path)
-    ma.reconstructDecay('eta\':all3 -> rho0:all gamma:all', '0.8 < M < 1.1', 3, persistent, path)
-    ma.copyLists('eta\':all', ['eta\':all1', 'eta\':all2', 'eta\':all3'], persistent, path)
+    ma.copyLists('eta\':all', ['eta\':all1', 'eta\':all2'], persistent, path)
     return 'eta\':all'
 
 
@@ -463,7 +462,7 @@ def loadStdLooseEtaPrime(persistent=True, path=None):
     @param path         modules are added to this path
     """
     ma.cutAndCopyList('gamma:etaprg', 'gamma:loose', 'E>0.1')
-    ma.reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:etaprg', '0.8 < M < 1.1 and ', 1, persistent, path)
+    ma.reconstructDecay('eta\':loose1 -> pi+:loose pi-:loose gamma:etaprg', '0.8 < M < 1.1', 1, persistent, path)
     ma.reconstructDecay('eta\':loose2 -> pi+:loose pi-:loose eta:loose', '0.8 < M < 1.1', 2, persistent, path)
     ma.copyLists('eta\':loose', ['eta\':loose1', 'eta\':loose2'], persistent, path)
     return 'eta\':loose'

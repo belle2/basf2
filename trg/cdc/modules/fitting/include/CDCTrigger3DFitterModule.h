@@ -103,6 +103,8 @@ namespace Belle2 {
 
 
     // 3D Fitter parameter arguments
+    /** Name of the StoreArray containing the input CDChits. */
+    std::string m_CDCHitCollectionName;
     /** Name of the StoreArray containing the input track segment hits. */
     std::string m_TSHitCollectionName;
     /** name of the event time StoreObjPtr */

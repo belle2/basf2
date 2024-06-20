@@ -26,6 +26,9 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
     "2. Performs a linear fit in the s-z plane (s: 2D arclength).\n"
   );
   setPropertyFlags(c_ParallelProcessingCertified);
+  addParam("CDCHitCollectionName", m_CDCHitCollectionName,
+           "Name of the input StoreArray of CDCHits.",
+           string("CDCHits4Trg"));
   addParam("TSHitCollectionName", m_TSHitCollectionName,
            "Name of the input StoreArray of CDCTriggerSegmentHits.",
            string(""));
@@ -40,7 +43,7 @@ CDCTrigger3DFitterModule::CDCTrigger3DFitterModule() : Module::Module()
            string("TRGCDC3DFitterTracks"));
   addParam("minVoteCounts", m_minVoteCount,
            "Minimal number of votes in Hough voting.",
-           0);
+           8);
 }
 
 void
@@ -164,7 +167,7 @@ vector<vector<CDCHit*>>
     CDCTriggerSegmentHit* TS = m_TSHits[iTS];
     if (TS->getISuperLayer() % 2 == 0)continue; // skip axial TS
 
-    RelationVector<CDCHit> hits = TS->getRelationsTo<CDCHit>("CDCHits");
+    RelationVector<CDCHit> hits = TS->getRelationsTo<CDCHit>(m_CDCHitCollectionName);
 
     vector<int> iHitInEachLayer = select5Cells(TS);
 
@@ -392,7 +395,7 @@ CDCTrigger3DFitterModule::select5Cells(const CDCTriggerSegmentHit* TS)
 {
   int priorityILayer = WireID(TS->getID()).getICLayer();
   int priorityIWire = TS->getIWire();
-  RelationVector<CDCHit> hits = TS->getRelationsTo<CDCHit>("CDCHits");
+  RelationVector<CDCHit> hits = TS->getRelationsTo<CDCHit>(m_CDCHitCollectionName);
 
   // fill iHit of each cell
   vector<int> iHitInEachCell(m_nCellInTS, -1);

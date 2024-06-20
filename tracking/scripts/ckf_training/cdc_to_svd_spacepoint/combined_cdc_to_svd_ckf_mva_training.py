@@ -164,7 +164,7 @@ import background
 import simulation
 
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
-from tracking_mva_filter_payloads import write_tracking_mva_filter_payloads_to_db
+from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
 
 
 basf2.conditions.testing_payloads = ["localdb/database.txt"]

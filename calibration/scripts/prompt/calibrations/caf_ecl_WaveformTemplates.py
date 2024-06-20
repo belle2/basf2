@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -113,7 +113,7 @@ def get_calibrations(input_data, **kwargs):
 
     # ..Algorithm
     algo_C4 = Belle2.ECL.eclWaveformTemplateCalibrationC4Algorithm()
-    algo_C4.setFirstCellID(0)
+    algo_C4.setFirstCellID(1)
     algo_C4.setLastCellID(8736)
 
     # ..The calibration

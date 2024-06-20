@@ -12,9 +12,6 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#if defined(__dummy_close_bracket_to_cheat_emacs_auto_indent)
-}
-#endif
 
 /* NSMparse */
 struct NSMparse_struct {
@@ -45,9 +42,6 @@ NSMparse* nsmlib_parsefile(const char* datname, int revision,
 void nsmlib_parsefree(NSMparse*);
 const char* nsmlib_parseerr(int* code);
 
-#if defined(__dummy_open_bracket_to_cheat_emacs_auto_indent)
-__dummy_open_bracket_to_cheat_emacs_auto_indent {
-#endif
 #if defined(__cplusplus)
 }
 #endif

@@ -518,7 +518,7 @@ namespace Belle2 {
     TParameter<double> m_ang_unit;    /**< The angular unit used for defining the bins grid. */
     std::string
     m_thetaVarName; /**< The name of the polar angle variable used in the MVA categorisation. Must be a string that can be parsed by the VariableManager. */
-    bool m_implicitNaNmasking; /**< Flag to indicate whther the MVA variables have been NaN-masked directly in the weightfiles. */
+    bool m_implicitNaNmasking; /**< Flag to indicate whether the MVA variables have been NaN-masked directly in the weightfiles. */
 
 
     /**

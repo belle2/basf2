@@ -6,12 +6,13 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
+/* Own header. */
+#include <ecl/utility/ECLDspUtilities.h>
+
 /* ECL headers. */
-#include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLDspData.h>
 #include <ecl/mapper/ECLChannelMapper.h>
-#include <ecl/utility/ECLDspUtilities.h>
 
 /* Basf2 headers. */
 #include <framework/database/DBArray.h>

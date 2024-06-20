@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -8,6 +7,10 @@
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
+
+# Limit the number of threads spawned by external libraries (e.g. XGBoost)
+import os
+os.environ['OMP_THREAD_LIMIT'] = "1"  # noqa
 
 import basf2
 
@@ -74,8 +77,11 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False, append_full_grid_cdc_eventt0=False,
-                       legacy_ecl_charged_pid=False, emulate_HLT=False):
+                       pxd_filtering_offline=False,
+                       create_intercepts_for_pxd_ckf=False,
+                       append_full_grid_cdc_eventt0=True,
+                       legacy_ecl_charged_pid=False, emulate_HLT=False,
+                       skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -115,13 +121,23 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
         MVA based charged particle ID (false).
     :param emulate_HLT: if True, it runs the reconstruction as it is run on HLT (e.g. without PXD).
         If you want to use this flag on raw data, you should also exclude the following branches from RootInput: ROIs, ROIpayload
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
+
+    # Set the run for beam data
+    basf2.declare_beam()
 
     # By default, the FullGrid module is not used in the reconstruction chain.
     # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
@@ -142,7 +158,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  reconstruct_cdst=reconstruct_cdst,
                                  event_abort=event_abort,
                                  pxd_filtering_offline=pxd_filtering_offline,
-                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
+                                 create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
+                                 append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
+                                 skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -172,7 +190,9 @@ def add_prefilter_reconstruction(path,
                                  reconstruct_cdst=None,
                                  event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
-                                 append_full_grid_cdc_eventt0=False):
+                                 create_intercepts_for_pxd_ckf=False,
+                                 append_full_grid_cdc_eventt0=True,
+                                 skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds only the reconstruction modules required to calculate HLT filter decision to a path.
     Consists of essential tracking and the functionality provided by :func:`add_prefilter_posttracking_reconstruction()`.
@@ -197,8 +217,15 @@ def add_prefilter_reconstruction(path,
         but just remove all data except for the event information.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
+    :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
+        FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
+        append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
+        SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
     # Always avoid the top-level 'import ROOT'.
@@ -216,14 +243,17 @@ def add_prefilter_reconstruction(path,
     add_prefilter_pretracking_reconstruction(path, components=components)
 
     # Add prefilter tracking reconstruction modules
-    add_prefilter_tracking_reconstruction(path,
-                                          components=components,
-                                          mcTrackFinding=False,
-                                          skipGeometryAdding=skipGeometryAdding,
-                                          trackFitHypotheses=trackFitHypotheses,
-                                          use_second_cdc_hits=use_second_cdc_hits,
-                                          pxd_filtering_offline=pxd_filtering_offline,
-                                          append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0)
+    add_prefilter_tracking_reconstruction(
+        path,
+        components=components,
+        mcTrackFinding=False,
+        skipGeometryAdding=skipGeometryAdding,
+        trackFitHypotheses=trackFitHypotheses,
+        use_second_cdc_hits=use_second_cdc_hits,
+        pxd_filtering_offline=pxd_filtering_offline,
+        create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
+        append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
+        skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
     # Statistics summary
     path.add_module('StatisticsSummary').set_name('Sum_Prefilter_Tracking')
@@ -232,7 +262,6 @@ def add_prefilter_reconstruction(path,
     if reconstruct_cdst:
         add_special_vxd_modules(path, components=components)
     if reconstruct_cdst == 'rawFormat' and not add_modules_for_trigger_calculation:
-        add_dedx_modules(path, components=components)
         return
 
     # Add prefilter posttracking modules
@@ -270,8 +299,9 @@ def add_postfilter_reconstruction(path,
 
     path.add_module('StatisticsSummary').set_name('Sum_Postfilter_Tracking')
 
-    # Skip postfilter posttracking modules for raw format cdst reconstruction
+    # Skip postfilter posttracking modules except dedx for raw format cdst reconstruction
     if reconstruct_cdst == 'rawFormat':
+        add_dedx_modules(path, components=components)
         if pruneTracks:
             add_prune_tracks(path, components)
         return
@@ -333,6 +363,9 @@ def add_cosmics_reconstruction(
       MVA based charged particle ID (false).
     """
 
+    # Set the run for cosmics data
+    basf2.declare_cosmics()
+
     # Check components.
     check_components(components)
 
@@ -382,6 +415,9 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
+
+    # Set the run for beam data
+    basf2.declare_beam()
 
     # Add modules that have to be run before track reconstruction
     add_prefilter_pretracking_reconstruction(path,
@@ -442,10 +478,6 @@ def add_prefilter_posttracking_reconstruction(path,
     :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     """
 
-    # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
-    if not for_cdst_analysis:
-        add_dedx_modules(path, components)
-
     add_ext_module(path, components)
 
     # Add EventT0Combiner, if this function is not called from prepare_cdst_analysis() or if requested also there.
@@ -479,6 +511,10 @@ def add_postfilter_posttracking_reconstruction(path,
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
+
+    # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
+    if not for_cdst_analysis:
+        add_dedx_modules(path, components)
 
     add_top_modules(path, components, cosmics=cosmics)
     add_arich_modules(path, components)
@@ -551,25 +587,6 @@ def add_posttracking_reconstruction(path,
             add_prune_tracks(path, components)
 
     path.add_module('StatisticsSummary').set_name('Sum_Posttracking_Reconstruction')
-
-
-def add_mdst_output(*args, **kwargs):
-    """
-        .. deprecated:: release-08-00-00
-
-    This function simply returns a FATAL message.
-
-    Please use the equivalent function from the mdst package if you want to store
-    the output in a mDST file:
-
-    .. code-block:: python
-
-        import mdst
-        mdst.add_mdst_output(path=mypath)
-    """
-
-    basf2.B2FATAL("This function is deprecated and it will be removed in release-09.\n"
-                  "Please use the equivalent function from the mdst package.")
 
 
 def add_cdst_output(path,

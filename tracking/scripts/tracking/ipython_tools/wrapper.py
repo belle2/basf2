@@ -65,8 +65,8 @@ def show_image(filename, show=True):
     """ Display an image file in ipython """
     from IPython.core.display import Image, display
 
-    os.system("convert " + filename + " " + filename[:-3] + str("png"))
-    image = Image(filename[:-3] + str("png"))
+    os.system("convert " + filename + " " + filename[:-3] + "png")
+    image = Image(filename[:-3] + "png")
     if show:
         display(image)
     return image

@@ -245,9 +245,12 @@ private:
   TH1F* m_neuroHWSimZ = nullptr;
   TH1F* m_neuroHWSimCosTheta = nullptr;
   TH1F* m_neuroErrors = nullptr;
+  TH1F*  m_neuroHWValTSCountAx = nullptr;
+  TH1F*  m_neuroHWValTSCountSt = nullptr;
 
-  unsigned m_errcount = 9;
-  std::vector<std::string> m_errdict{"Not All Axials in HWTrack", "|HW-SW| > 1cm", "Delta Input IDs not all 0", "Delta Input Alphas not all 0", "Drifttime Overflow / Scaling Error", "TS only in HW", "TS only in SW", "Multiple ET per Track", "Eventcounter"};
+  unsigned m_errcount = 0; // set later
+  std::vector<std::string> m_errdict{"Not All HWTrack ATS in 2DInTrack", "|HW-SW| > 1cm", "Delta Input IDs not all 0", "Delta Input Alphas not all 0", "Drifttime Overflow / Scaling Error", "TS only in HW", "TS only in SW", "Multiple ET per Track", "<4 related Axial TS", "<3 related Stereo TS", "Drift Time diff", "Eventcounter"};
+
 
 
 };

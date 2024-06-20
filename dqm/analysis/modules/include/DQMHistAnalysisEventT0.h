@@ -13,6 +13,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <TEfficiency.h>
 
 namespace Belle2 {
 
@@ -32,6 +33,9 @@ namespace Belle2 {
 
     /** clear TCanvas */
     void beginRun() override final;
+
+    /** Event */
+    void event() override final;
 
     /** fit the histograms */
     void endRun() override final;
@@ -84,6 +88,45 @@ namespace Belle2 {
     TPad* m_svdPad3CDCTRG = nullptr; /**< pad for SVD time CDCTRG mumu */
 
     MonitoringObject* m_monObj = nullptr; /**< MonitoringObject to be produced by this module*/
+
+    TCanvas* m_cT0FractionsForHadrons = nullptr; /**< EventT0 fractions plots canvas for hadron events */
+    TCanvas* m_cT0FractionsForBhaBhas = nullptr; /**< EventT0 fractions plots canvas for BhaBha events */
+    TCanvas* m_cT0FractionsForMuMus   = nullptr; /**< EventT0 fractions plots canvas for MuMu events */
+
+    TPad* m_pHadronECLTRG = nullptr; /**< pad for time fractions for ECLTRG hadrons */
+    TPad* m_pHadronCDCTRG = nullptr; /**< pad for time fractions for CDCTRG hadrons */
+    TPad* m_pHadronTOPTRG = nullptr; /**< pad for time fractions for TOPTRG hadrons */
+
+    TPad* m_pBhaBhaECLTRG = nullptr; /**< pad for time fractions for ECLTRG bhabhas */
+    TPad* m_pBhaBhaCDCTRG = nullptr; /**< pad for time fractions for CDCTRG bhabhas */
+    TPad* m_pBhaBhaTOPTRG = nullptr; /**< pad for time fractions for TOPTRG bhabhas */
+
+    TPad* m_pMuMuECLTRG = nullptr; /**< pad for time fractions for ECLTRG mumu */
+    TPad* m_pMuMuCDCTRG = nullptr; /**< pad for time fractions for CDCTRG mumu */
+    TPad* m_pMuMuTOPTRG = nullptr; /**< pad for time fractions for TOPTRG mumu */
+
+    /// EventT0 algorithms for which to calculate fractions of abundance
+    const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC HitBased", "CDC FullGrid #chi^{2}", "TOP", "Any"};
+    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
+    TEfficiency* m_eAlgorithmSourceFractionsHadronL1ECLTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger
+    TEfficiency* m_eAlgorithmSourceFractionsHadronL1CDCTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by TOP trigger
+    TEfficiency* m_eAlgorithmSourceFractionsHadronL1TOPTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by ECL trigger
+    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1ECLTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by CDC trigger
+    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1CDCTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT bhabha events, L1 time by TOP trigger
+    TEfficiency* m_eAlgorithmSourceFractionsBhaBhaL1TOPTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by ECL trigger
+    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1ECLTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by CDC trigger
+    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1CDCTRG = nullptr;
+    /// Fraction of events with EventT0 from a given algorithm, HLT mumu events, L1 time by TOP trigger
+    TEfficiency* m_eAlgorithmSourceFractionsMuMuL1TOPTRG = nullptr;
+    /// Fill the TEfficiency plots
+    bool FillEfficiencyHistogram(const std::string& histname, TEfficiency* eff);
   };
 } // end namespace Belle2
 

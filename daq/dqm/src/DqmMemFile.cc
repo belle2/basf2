@@ -82,7 +82,17 @@ int DqmMemFile::UpdateSharedMem()
   if (!m_writeMode) return -1;
   m_memfile->Write(0, TObject::kOverwrite);
   m_shm->lock();
-  m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  auto ret = m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+
+  FILE* fh = fopen(("/dev/shm/tmp_" + m_name).c_str(), "wb+");
+  if (fh) {
+    fwrite(m_shm->ptr(), 1, ret, fh);
+    fclose(fh);
+    if (rename(("/dev/shm/tmp_" + m_name).c_str(), ("/dev/shm/" + m_name).c_str())) {
+      perror("Rename dhm file failed ");
+    }
+  }
+
   m_shm->unlock();
   return 0;
 }
@@ -178,9 +188,30 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
   return 0;
 }
 
+bool DqmMemFile::SaveToFile(std::string outfile)
+{
+  // we do not work on shared memory, thus can directly write w/o locking
+//   m_memfile->Write(0, TObject::kOverwrite);
+//   m_memfile->WriteToFile(outfile);
 
+  printf("dump to dqm file = %s\n", outfile.c_str());
 
+  TFile* dqmtfile = new TFile(outfile.c_str(), "RECREATE");
 
+  // Copy all histograms in TFile
+  TIter next(m_memfile->GetListOfKeys());
+  TKey* key = NULL;
+  while ((key = (TKey*)next())) {
+    TH1* hist = (TH1*)key->ReadObj();
+    // printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
+    hist->Write();
+  }
 
+  // Close TFile
+  dqmtfile->Write();
+  dqmtfile->Close();
 
+  delete dqmtfile;
 
+  return true;
+}

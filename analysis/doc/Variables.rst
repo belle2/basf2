@@ -498,6 +498,30 @@ Other variable that can be handy in development:
 .. b2-variables::
    :group: Miscellaneous
 
+FEI Variables
+~~~~~~~~~~~~~
+
+As known by many analysts by using the ``isSignal`` flag for truth matching
+for the  tagging B meson from the FEI there is still a peak visible for the
+background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
+determine e.g. a yield there.
+
+New variables seem to be found to address this problem.
+
+.. b2-variables::
+   :group: FEIVariables
+
+Beam Background Overlay
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Here is a list of variables useful for studying the Beam Background Overlay
+events used for producing MC samples (both run-independent and run-dependent).
+
+.. warning:: These variables will always return ``NaN`` when running on data.
+
+.. b2-variables::
+   :group: BeamBackgroundOverlay
+	     
 Calibration
 ~~~~~~~~~~~
 
@@ -513,20 +537,7 @@ They have a **[Calibration]** pretag.
    :group: ECL calibration
 .. b2-variables::
    :group: ECL trigger calibration
-
-FEIVariables
-~~~~~~~~~~~~
-
-As known by many analysts by using the ``isSignal`` flag for truth matching
-for the  tagging B meson from the FEI there is still a peak visible for the
-background in e.g. the :math:`M_{\text{bc}}` distribution making it hard to
-determine e.g. a yield there.
-
-New variables seem to be found to address this problem.
-
-.. b2-variables::
-   :group: FEIVariables
-
+	   
 Collections and Lists
 ---------------------
 

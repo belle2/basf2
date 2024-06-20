@@ -113,7 +113,7 @@ def root_cd(tdirectory):
         if not tdirectory:
             tdirectory = save_tdirectory.mkdir(tdirectory_name, tdirectory_name)
             if not tdirectory:
-                raise RuntimeError("Could not create or find folder %s" % tdirectory_name)
+                raise RuntimeError(f"Could not create or find folder {tdirectory_name}")
 
             # If tdirectory_name is as hierachy like a/b/c make sure we select the most nested folder
             # (and not a as the documentation of TDirectory.mkdir suggests).

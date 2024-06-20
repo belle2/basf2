@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
     # get input file list
     if not all([os.path.exists(f) for f in args.input]):
-        raise FileNotFoundError("Could not find input files: %s" % args.input)
+        raise FileNotFoundError(f"Could not find input files: {args.input}")
 
     # loop over SWTRs
     sum_out = pd.DataFrame()
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                 # use prescale of first file
                 sum_out.at[PRESCALE_ROW, col] = prescales[0, i]
             else:
-                b2.B2WARNING("{}: Different prescale values found for this trigger line! ".format(col) +
+                b2.B2WARNING(f"{col}: Different prescale values found for this trigger line! " +
                              "Final prescale value is set to NaN.")
                 sum_out.at[PRESCALE_ROW, col] = np.nan
             i += 1
@@ -105,4 +105,4 @@ if __name__ == "__main__":
     with uproot.recreate(args.output) as outfile:
         outfile['software_trigger_results'] = sum_out
 
-    print("Created file %s" % args.output)
+    print(f"Created file {args.output}")

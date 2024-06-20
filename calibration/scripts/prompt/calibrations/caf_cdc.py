@@ -342,7 +342,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
             'RootInput',
             branchNames=HLT_INPUT_OBJECTS,
             entrySequences=[
-                '0:{}'.format(max_events)])
+                f'0:{max_events}'])
     reco_path.add_module(root_input)
 
     gearbox = register_module('Gearbox')
@@ -362,7 +362,7 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
                                    merge_tracks=False,
                                    posttracking=False)
     else:
-        from reconstruction import default_event_abort
+        from reconstruction import default_event_abort, add_prefilter_pretracking_reconstruction
         from tracking import add_prefilter_tracking_reconstruction
 
         # Do not even attempt at reconstructing events w/ abnormally large occupancy.
@@ -370,11 +370,17 @@ def pre_collector(max_events=None, is_cosmic=False, use_badWires=False):
         default_event_abort(doom, ">=1", Belle2.EventMetaData.c_ReconstructionAbort)
         reco_path.add_module('StatisticsSummary').set_name('Sum_EventsofDoomBuster')
 
+        # Add modules that have to be run BEFORE track reconstruction
+        add_prefilter_pretracking_reconstruction(reco_path, components=Components)
+
         # Add tracking reconstruction modules
         add_prefilter_tracking_reconstruction(path=reco_path,
                                               components=Components,
                                               trackFitHypotheses=[211],
-                                              prune_temporary_tracks=False, fit_tracks=True)
+                                              prune_temporary_tracks=False,
+                                              fit_tracks=True,
+                                              append_full_grid_cdc_eventt0=True,
+                                              skip_full_grid_cdc_eventt0_if_svd_time_present=False)
         reco_path.add_module('StatisticsSummary').set_name('Sum_Tracking')
 
     reco_path.add_module('Progress')

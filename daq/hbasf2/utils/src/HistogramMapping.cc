@@ -62,7 +62,7 @@ void HistogramMapping::operator+=(const HistogramMapping& rhs)
 
 void HistogramMapping::write() const
 {
-  for (const auto& [key, histogram] : m_histograms) {
+  for (const auto& [_, histogram] : m_histograms) {
     histogram->SetDirectory(gDirectory);
     histogram->Write();
   }

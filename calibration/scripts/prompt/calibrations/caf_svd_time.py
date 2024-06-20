@@ -53,8 +53,8 @@ settings = CalibrationSettings(name="caf_svd_time",
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
                                    "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
-                                   "max_events_per_run":  60000,
-                                   "max_events_per_file": 30000,
+                                   "max_events_per_run":  10000,
+                                   "max_events_per_file": 5000,
                                    "isMC": False,
                                    "linearCutsOnCoG3": False,
                                    "upperLineParameters": [-94.0, 1.264],
@@ -256,7 +256,7 @@ def create_pre_collector_path(
 
     if not isMC:
         # run tracking reconstruction
-        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True)
+        add_tracking_reconstruction(path, append_full_grid_cdc_eventt0=True, skip_full_grid_cdc_eventt0_if_svd_time_present=False)
         path = remove_module(path, "V0Finder")
         if not is_validation:
             # if we would like using the grouping (True by default), we should use the calibrated cluster time
@@ -547,7 +547,7 @@ def get_calibrations(input_data, **kwargs):
     shift_calibration.strategies = strategies.SingleIOV
 
     for algorithm in shift_calibration.algorithms:
-        algorithm.params = {"iov_coverage": output_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     if "timeShiftCalibration" not in listOfMutedCalibrations:
         list_of_calibrations.append(shift_calibration)

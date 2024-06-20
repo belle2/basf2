@@ -4,7 +4,7 @@
 Tracking
 ========
 
-The main goal of the tracking reconstruction is to find and fit tracks using the hit informations provided by the main tracking sub-detectors: PXD, :ref:`SVD<svd>`, CDC.
+The main goal of the tracking reconstruction is to find and fit tracks using the hit information provided by the main tracking sub-detectors: PXD, :ref:`SVD<svd>`, CDC.
 In general, tracking consists in two steps:
 
 #. pattern recognition, or track finding: recognise the hits belonging to a single charged particle

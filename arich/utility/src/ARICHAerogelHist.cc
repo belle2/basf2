@@ -16,7 +16,6 @@
 #include <vector>
 
 //root
-#include <TVector2.h>
 #include <TCanvas.h>
 #include <TMath.h>
 #include <TPad.h>
@@ -98,13 +97,8 @@ Int_t ARICHAerogelHist::GetBinIDFromRingColumn(Int_t ring, Int_t column)
 
 void ARICHAerogelHist::makeRotation(double xold, double yold, double& xnew, double& ynew, double phi)
 {
-
-  TVector2 v(xold, yold);
-  TVector2 vrot;
-  vrot = v.Rotate(phi);
-  xnew = vrot.X();
-  ynew = vrot.Y();
-
+  xnew = xold * std::cos(phi) - yold * std::sin(phi);
+  ynew = xold * std::sin(phi) + yold * std::cos(phi);
 }
 
 void ARICHAerogelHist::DrawHisto(TString opt = "ZCOLOT text same", TString outDirName = "./")
@@ -159,7 +153,7 @@ void ARICHAerogelHist::SetUpVerticesMap()
 {
 
   for (unsigned int i = 0; i < m_nTiles.size(); i++) {
-    std::vector<TVector2> vecTvec;
+    std::vector<ROOT::Math::XYVector> vecTvec;
     int nTiles = m_nTiles[i];
     double rmin = m_tileRmin[i];
     double rmax = m_tileRmax[i];
@@ -169,36 +163,36 @@ void ARICHAerogelHist::SetUpVerticesMap()
     double phimax = lmax / rmax;
     double x1 = rmin * TMath::Cos(phimin / 2.0);
     double y1 = rmin * TMath::Sin(phimin / 2.0);
-    TVector2 v1(x1, y1);
+    ROOT::Math::XYVector v1(x1, y1);
     vecTvec.push_back(v1);
     double x2 = rmax * TMath::Cos(phimax / 2.0);
     double y2 = rmax * TMath::Sin(phimax / 2.0);
-    TVector2 v2(x2, y2);
+    ROOT::Math::XYVector v2(x2, y2);
     vecTvec.push_back(v2);
     //Add circular points from outer radious (clockwise added)
     if (m_nCircularPoints > 0) {
       double dPhi = phimax / (m_nCircularPoints + 1);
       for (int j = 0; j < m_nCircularPoints; j++) {
-        TVector2 v;
-        v.SetMagPhi(rmax, (phimax / 2.0 - dPhi * (j + 1)));
+        const double phi = phimax / 2.0 - dPhi * (j + 1);
+        ROOT::Math::XYVector v(rmax * std::cos(phi), rmax * std::sin(phi));
         vecTvec.push_back(v);
       }
     }
 
     double x3 =  x2;
     double y3 = -y2;
-    TVector2 v3(x3, y3);
+    ROOT::Math::XYVector v3(x3, y3);
     vecTvec.push_back(v3);
     double x4 =  x1;
     double y4 = -y1;
-    TVector2 v4(x4, y4);
+    ROOT::Math::XYVector v4(x4, y4);
     vecTvec.push_back(v4);
     //Add circular points inner radious
     if (m_nCircularPoints > 0) {
       double dPhi = phimin / (m_nCircularPoints + 1);
       for (int j = 0; j < m_nCircularPoints; j++) {
-        TVector2 v;
-        v.SetMagPhi(rmin, (-phimax / 2.0 + dPhi * (j + 1)));
+        const double phi = -phimax / 2.0 + dPhi * (j + 1);
+        ROOT::Math::XYVector v(rmax * std::cos(phi), rmax * std::sin(phi));
         vecTvec.push_back(v);
       }
     }

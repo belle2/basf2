@@ -171,7 +171,7 @@
         <a href="../results/{{compared_revision[j]}}/{{log_url}}" target="_blank">log </a>
         {{#if issues.length==0}}
         <span>
-          <button class="btn-create" onclick="window.open('../issue?file_path=../results/{{compared_revision[j]}}/{{log_url}}&rev_label={{compared_revision[j]}}','_blank');" type="button">
+          <button class="btn-create" onclick="window.open('../issue?file_path=../results/{{compared_revision[j]}}/{{log_url}}&rev_label={{compared_revision[j]}}&contact={{contact}}','_blank');" type="button">
             <img src="images/gitlab-logo-600.png" style="width: 24px;">
               Create issue
           </button>

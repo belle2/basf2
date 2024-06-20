@@ -173,11 +173,21 @@ namespace Belle2 {
     {
       m_rawinput = input;
     }
+    void setNNTToGDL(const bool nntgdl)
+    {
+      m_nntgdl = nntgdl;
+    }
+    void setSTTToGDL(const bool sttgdl)
+    {
+      m_sttgdl = sttgdl;
+    }
     int getRawPhi0() const {return m_rawphi0;}
     int getRawOmega() const {return m_rawomega;}
     int getRawZ() const {return m_rawz;}
     int getRawTheta() const {return m_rawtheta;}
     std::vector<int> getRawInput() const {return m_rawinput;}
+    bool getNNTToGDL() const {return m_nntgdl;}
+    bool getSTTToGDL() const {return m_sttgdl;}
 
   protected:
     float m_chi2D;
@@ -222,8 +232,12 @@ namespace Belle2 {
     int m_rawz{0};
     int m_rawtheta{0};
     std::vector<int> m_rawinput;
+    /** nnt decision that the firmware passed to gdl */
+    bool m_nntgdl{0};
+    /** stt decision that the firmware passed to gdl */
+    bool m_sttgdl{0};
     //! Needed to make the ROOT object storable
-    ClassDef(CDCTriggerTrack, 13);
+    ClassDef(CDCTriggerTrack, 14);
 
   };
 }

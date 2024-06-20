@@ -68,6 +68,46 @@ class BtoPi0Pi0(BaseSkim):
 
 
 @fancy_skim_header
+class BtoPi0Eta(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0}\\to \\pi^0 \\eta`
+    * :math:`B^{0}\\to \\pi^0 \\eta^{'}`
+
+    Cuts applied:
+
+    * ``5.20 < Mbc < 5.29``
+    * ``abs(deltaE) < 0.5``
+
+    """
+    __authors__ = ["Longke Li", "Yinghui Guan"]
+    __description__ = "Skim list definitions for neutral B to pi0 eta and B to pi0 eta'."
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charmless"
+
+    ApplyHLTHadronCut = False
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+
+    def load_standard_lists(self, path):
+        loadStdPi0ForBToCharmless(path=path)
+        stdPhotons('tight', path=path)
+        stdPi0s("eff40_May2020", path=path)
+        loadStdSkimHighEffTracks('pi', path=path)
+        loadStdSkimHighEffEta(path=path)
+        loadStdSkimHighEffEtaPrime(path=path)
+
+    def build_lists(self, path):
+        Bcuts = '5.20 < Mbc < 5.29 and abs(deltaE) < 0.5'
+        BsigList = []
+        ma.reconstructDecay('B0:Pi0Eta -> pi0:charmlessFit eta:SkimHighEff', Bcuts, path=path)
+        ma.reconstructDecay('B0:Pi0Etap -> pi0:charmlessFit eta\':SkimHighEff', Bcuts, path=path)
+        BsigList.append('B0:Pi0Eta')
+        BsigList.append('B0:Pi0Etap')
+        return BsigList
+
+
+@fancy_skim_header
 class BtoHadTracks(BaseSkim):
     """
     Reconstructed decay modes:

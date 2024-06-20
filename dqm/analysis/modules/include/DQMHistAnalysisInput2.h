@@ -94,6 +94,18 @@ namespace Belle2 {
     /** Event number */
     unsigned int m_count = 0;
 
+    /** The file name of the analysis for stats */
+    std::string m_statname;
+    /** Write stats of analysis */
+    void write_state(void);
+    /** last time event loop entered */
+    time_t m_last_event{};
+    /** last time begin run entered */
+    time_t m_last_beginrun{};
+    /** last time input file update detected */
+    time_t m_last_file_update{};
+    /** last time input file content has changed */
+    time_t m_last_content_update{};
     /** Last time input file changes */
     std::filesystem::file_time_type m_lasttime;
     /** enforce a content change on next event */

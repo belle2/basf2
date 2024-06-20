@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -29,6 +28,9 @@ class TestSkimRules(unittest.TestCase):
         SkimsWithApplyEventCuts = set()
 
         for skim in Registry.names:
+            if skim[:2] == "f_":
+                continue  # these are the flagged skims, they are not actual skims
+
             classdef = Registry.get_skim_function(skim)
             source = inspect.getsource(classdef)
             tree = ast.parse(source)

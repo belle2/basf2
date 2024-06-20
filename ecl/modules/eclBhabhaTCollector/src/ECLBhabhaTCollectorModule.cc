@@ -515,9 +515,9 @@ void ECLBhabhaTCollectorModule::collect()
 
     // Get event t0 from CDC.  We don't want event t0 from ECL as we are calibrating the ECL wrt the more accurately measured time measurements of the time.  Start with the CDC since it has an event t0 but in the future we may switch to the TOP detector.
     // Based on the information from Thomas Hauth <Thomas.Hauth@kit.edu> (leaving physics) we should take the last event t0 in the list of event t0's from the CDC as the later event t0 measurements are calculated in slower but more accurate ways.
-    vector<EventT0::EventT0Component> evt_t0_list = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-    evt_t0 = evt_t0_list.back().eventT0;   // time value
-    evt_t0_unc = evt_t0_list.back().eventT0Uncertainty;   // uncertainty on event t0
+    const auto bestCDCEventT0Candidate = m_eventT0->getBestCDCTemporaryEventT0();
+    evt_t0 = bestCDCEventT0Candidate->eventT0;   // time value
+    evt_t0_unc = bestCDCEventT0Candidate->eventT0Uncertainty;   // uncertainty on event t0
 
 
     // Correct the CDC event t0 value for the bhabha bias

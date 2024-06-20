@@ -129,18 +129,14 @@ namespace Belle2 {
 
 
 #ifdef _BELLE2_EPICS
-    //! Vector of EPICS PVs
-    std::vector <chid>  m_epicsChID;
-    //! Map of (key)names to EPICS PVs
+    //! Vector of EPICS PVs, static as it contains all
+    static std::vector <chid>  m_epicsChID;
+    //! Map of (key)names to EPICS PVs, non static, as per module
     std::map <std::string, chid> m_epicsNameToChID;
 #endif
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param prefix prefix to PV name
      * @param pvname full PV name without prefix
      * @param keyname key name for easier access
@@ -233,9 +229,10 @@ namespace Belle2 {
     /**
      * Find histogram in corresponding canvas.
      * @param hname Name of the histogram (dir+name)
+     * @param canvas ptr to specific canvas ptr or nullptr
      * @return The pointer to the histogram, or nullptr if not found.
      */
-    TH1* findHistInCanvas(const std::string& hname);
+    TH1* findHistInCanvas(const std::string& hname, TCanvas** canvas = nullptr);
 
     /**
      * Find MonitoringObject.
@@ -284,6 +281,11 @@ namespace Belle2 {
      * Clears the list of histograms.
      */
     static void clearHistList(void);
+
+    /**
+     * Reset Delta
+     */
+    void resetDeltaList(void);
 
     /**
      * Get Delta histogram.
@@ -350,10 +352,6 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param pvname full PV name
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
@@ -362,10 +360,6 @@ namespace Belle2 {
 
     /**
      * Register a PV with its name and a key name
-     *
-     * If you register large number of PVs at once, consider setting
-     * update_pvs = false and explicitly running updateEpicsPVs()
-     *
      * @param pvname full PV name
      * @param keyname key name for easier access
      * @return an index which can be used to access the PV instead of key name, -1 if failure
@@ -573,6 +567,23 @@ namespace Belle2 {
      * @param onlyError print only if in error condition (default)
      */
     void printPVStatus(chid pv, bool onlyError = true);
+
+    /**
+     * check the return status and check PV in case of error
+     * @param state return state of epics function
+     * @param message message to print out
+     * @param name the (key)name of the affected PV
+     */
+    void CheckEpicsError(int state, const std::string& message, const std::string& name);
+
+    /**
+     * check the return status and check PV in case of error
+     * @param state return state of epics function
+     * @param message message to print out
+     * @param id the chid of the affected PV
+     */
+    void CheckEpicsError(int state, const std::string& message, chid id);
+
 
     // Public functions
   public:

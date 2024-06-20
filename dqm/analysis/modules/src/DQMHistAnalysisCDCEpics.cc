@@ -98,71 +98,72 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
 void DQMHistAnalysisCDCEpicsModule::event()
 {
   //get intra-run histogram from CDC DQM module
-  m_delta_adc = (TH2F*)getDelta(m_histoDir, m_histoADC, 0, true); //true=only if updated
-  m_delta_tdc = (TH2F*)getDelta(m_histoDir, m_histoTDC, 0, true);
-  if (m_delta_adc == nullptr || m_delta_tdc == nullptr) {
-    if (m_delta_adc == nullptr)B2INFO("Histogram of hADCs not found (intra-run). Exiting");
-    if (m_delta_tdc == nullptr)B2INFO("Histogram of hTDCs not found (intra-run). Exiting");
-    return;
-  }
-
-  m_hist_adc->Reset();
-  m_hist_tdc->Reset();
-
-  int cadcgood = 0, ctdcgood = 0;
-  int cadcbad = 0, ctdcbad = 0;
-  double sumadcgood = 0, sumtdcgood = 0;
-
-  for (int ic = 0; ic < 300; ++ic) {
-    if (ic == 0) continue; //299 boards only
-    m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
-    m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
-    float md_adc = getHistMedian(m_hADCs[ic]);
-    m_hist_adc->SetBinContent(ic + 1, md_adc);
-    if (md_adc >= m_minadc && md_adc <= m_maxadc) {
-      sumadcgood = sumadcgood + md_adc;
-      cadcgood++;
-    } else cadcbad++;
-
-    m_hTDCs[ic] = m_delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
-    m_hTDCs[ic]->SetTitle(Form("hTDC%d", ic));
-    float md_tdc = getHistMedian(m_hTDCs[ic]);
-    m_hist_tdc->SetBinContent(ic + 1, md_tdc);
-    if (md_tdc >= m_mintdc && md_tdc <= m_maxtdc) {
-      ctdcgood++;
-      sumtdcgood = sumtdcgood + md_tdc;
-    } else ctdcbad++;
+  auto m_delta_adc = (TH2F*)getDelta(m_histoDir, m_histoADC, 0, true); //true=only if updated
+  if (m_delta_adc) {
+    m_hist_adc->Reset();
+    int cadcgood = 0;
+    int cadcbad = 0;
+    double sumadcgood = 0;
+    for (int ic = 0; ic < 300; ++ic) {
+      if (ic == 0) continue; //299 boards only
+      if (m_hADCs[ic]) delete m_hADCs[ic];
+      m_hADCs[ic] = m_delta_adc->ProjectionY(Form("hADC%d", ic + 1), ic + 1, ic + 1, "");
+      m_hADCs[ic]->SetTitle(Form("hADC%d", ic));
+      float md_adc = getHistMedian(m_hADCs[ic]);
+      m_hist_adc->SetBinContent(ic + 1, md_adc);
+      if (md_adc >= m_minadc && md_adc <= m_maxadc) {
+        sumadcgood = sumadcgood + md_adc;
+        cadcgood++;
+      } else cadcbad++;
+    }
+    double adcfrac = cadcgood / 2.99; // (100.0/299) in %
+    setEpicsPV("adcboards", adcfrac);
+    // Draw canvas
+    c_hist_adc->Clear();
+    c_hist_adc->cd();
+    if (cadcgood > 0)sumadcgood = sumadcgood * 1.0 / cadcgood;
+    getHistStyle(m_hist_adc, "adc", sumadcgood);
+    m_hist_adc->SetTitle(Form("ADC Medians: Bad board count = %d (%0.01f%%)", cadcbad - 1, 100.0 - adcfrac));
+    m_hist_adc->Draw("");
+    m_line_ladc->Draw("same");
+    m_line_hadc->Draw("same");
+    c_hist_adc->Update();
+    UpdateCanvas(c_hist_adc);
 
   }
 
-  double adcfrac = cadcgood / 2.99; // (100.0/299) in %
-  setEpicsPV("adcboards", adcfrac);
+  auto m_delta_tdc = (TH2F*)getDelta(m_histoDir, m_histoTDC, 0, true);
+  if (m_delta_tdc) {
+    m_hist_tdc->Reset();
+    int ctdcgood = 0;
+    int ctdcbad = 0;
+    double sumtdcgood = 0;
+    for (int ic = 0; ic < 300; ++ic) {
+      if (ic == 0) continue; //299 boards only
+      if (m_hTDCs[ic]) delete m_hTDCs[ic];
+      m_hTDCs[ic] = m_delta_tdc->ProjectionY(Form("hTDC%d", ic + 1), ic + 1, ic + 1, "");
+      m_hTDCs[ic]->SetTitle(Form("hTDC%d", ic));
+      float md_tdc = getHistMedian(m_hTDCs[ic]);
+      m_hist_tdc->SetBinContent(ic + 1, md_tdc);
+      if (md_tdc >= m_mintdc && md_tdc <= m_maxtdc) {
+        ctdcgood++;
+        sumtdcgood = sumtdcgood + md_tdc;
+      } else ctdcbad++;
 
-  double tdcfrac = ctdcgood / 2.99;
-  setEpicsPV("tdcboards", tdcfrac);
-
-  updateEpicsPVs(5.0); // 5 is time in seconds
-
-  // Draw canvas
-  c_hist_adc->Clear();
-  c_hist_adc->cd();
-  if (cadcgood > 0)sumadcgood = sumadcgood * 1.0 / cadcgood;
-  getHistStyle(m_hist_adc, "adc", sumadcgood);
-  m_hist_adc->SetTitle(Form("%s: Bad board count = %d (%0.01f%%)", m_hist_adc->GetTitle(), cadcbad, 100.0 - adcfrac));
-  m_hist_adc->Draw("");
-  m_line_ladc->Draw("same");
-  m_line_hadc->Draw("same");
-  c_hist_adc->Update();
-
-  c_hist_tdc->Clear();
-  c_hist_tdc->cd();
-  if (ctdcgood > 0)sumtdcgood = sumtdcgood * 1.0 / ctdcgood;
-  getHistStyle(m_hist_tdc, "tdc", sumtdcgood);
-  m_hist_tdc->SetTitle(Form("%s: Bad board count = %d (%0.01f%%)", m_hist_tdc->GetTitle(), ctdcbad, 100.0 - tdcfrac));
-  m_hist_tdc->Draw("");
-  m_line_ltdc->Draw("same");
-  m_line_htdc->Draw("same");
-  c_hist_tdc->Update();
+    }
+    double tdcfrac = ctdcgood / 2.99;
+    setEpicsPV("tdcboards", tdcfrac);
+    c_hist_tdc->Clear();
+    c_hist_tdc->cd();
+    if (ctdcgood > 0)sumtdcgood = sumtdcgood * 1.0 / ctdcgood;
+    getHistStyle(m_hist_tdc, "tdc", sumtdcgood);
+    m_hist_tdc->SetTitle(Form("TDC Medians: Bad board count = %d (%0.01f%%)", ctdcbad - 1, 100.0 - tdcfrac));
+    m_hist_tdc->Draw("");
+    m_line_ltdc->Draw("same");
+    m_line_htdc->Draw("same");
+    c_hist_tdc->Update();
+    UpdateCanvas(c_hist_tdc);
+  }
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");
 }
@@ -178,11 +179,15 @@ float DQMHistAnalysisCDCEpicsModule::getHistMedian(TH1D* h) const
 {
   TH1D* hist = (TH1D*)h->Clone();
   hist->SetBinContent(1, 0.0); // Exclude 0-th bin
-  if (hist->GetMean() == 0) {return 0.0;} // Avoid an error if only TCD/ADC=0 entries
-  double quantiles[1] = {0.0}; // One element to store median
-  double probSums[1] = {0.5}; // Median definition
-  hist->GetQuantiles(1, quantiles, probSums);
-  float median = quantiles[0];
+  float median = 0.0;
+  if (hist->GetMean() != 0) {
+    // Avoid an error if only TCD/ADC=0 entries
+    double quantiles[1] = {0.0}; // One element to store median
+    double probSums[1] = {0.5}; // Median definition
+    hist->GetQuantiles(1, quantiles, probSums);
+    median = quantiles[0];
+  }
+  delete hist;
   return median;
 }
 

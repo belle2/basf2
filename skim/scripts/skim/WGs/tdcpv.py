@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -91,7 +90,7 @@ class TDCPV_qqs(BaseSkim):
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
     * ``abs(deltaE) < 0.250 for KL``
-    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``E_ECL_TDCPV<9``
     """
 
@@ -130,7 +129,7 @@ class TDCPV_qqs(BaseSkim):
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
-        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'E>0.250', path=path)
+        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'clusterE>0.250', path=path)
         ma.cutAndCopyList('K_L0:klmLayers', 'K_L0:allklm', '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]', path=path)
         ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
 
@@ -188,7 +187,7 @@ class TDCPV_qqs(BaseSkim):
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
-                            cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+                            cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'],
                            allMoments=False,
@@ -205,7 +204,7 @@ class TDCPV_qqs(BaseSkim):
         ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
 
         EventCuts = [
-            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
+            "nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1",
             "E_ECL_TDCPV<9"
         ]
         path = self.skim_event_cuts(" and ".join(EventCuts), path=path)
@@ -282,7 +281,7 @@ class TDCPV_ccs(BaseSkim):
     * ``abs(deltaE) < 0.3 for KL``
     * ``abs(deltaE) < 0.5``
     * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
-    * ``nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1``,
+    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``visibleEnergyOfEventCMS>4"``,
     * ``E_ECL_TDCPV<9``
     """
@@ -323,7 +322,7 @@ class TDCPV_ccs(BaseSkim):
         ma.applyCuts('pi0:eff60_May2020', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
+        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'clusterE>0.15', path=path)
         ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
 
     def build_lists(self, path):
@@ -375,7 +374,7 @@ class TDCPV_ccs(BaseSkim):
         ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
-                            cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+                            cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'],
                            allMoments=False,
@@ -393,7 +392,7 @@ class TDCPV_ccs(BaseSkim):
 
         EventCuts = [
             "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",
-            "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
+            "nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1",
             "visibleEnergyOfEventCMS>4",
             "E_ECL_TDCPV<9"
         ]
@@ -453,14 +452,14 @@ class TDCPV_dilepton(BaseSkim):
         ma.cutAndCopyList(
             "e+:pid",
             "e+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID > 0.5",
+            "abs(dr) < 1 and abs(dz) < 4 and p > 1.2 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
             "mu+:pid",
             "mu+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and muonID > 0.5",
+            "abs(dr) < 1 and abs(dz) < 4 and p > 1.2 and muonID > 0.5",
             True,
             path=path,
         )

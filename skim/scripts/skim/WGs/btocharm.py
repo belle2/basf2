@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -35,7 +34,8 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons,
                                             loadStdSkimHighEffPhi,
-                                            loadStdSkimHighEffKstar0,)
+                                            loadStdSkimHighEffKstar0,
+                                            loadStdPhotonCutEta)
 from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
 from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
@@ -94,21 +94,27 @@ class BtoD0h_Kspi0(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         stdPi0s(listtype='eff50_May2020Fit', path=path)
 
         ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-        ma.variablesToHistogram(
-            filename=f'{self}_Validation.root',
-            decayString='B-:ch3',
-            variables=[
-                ('Mbc', 100, 5.2, 5.3),
-                ('deltaE', 100, -1, 1),
-                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='B-:ch3',
+            variables_1d=[
+                ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
+                ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates'),
+                ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
-                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
+                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+            path=path)
 
 
 @fancy_skim_header
@@ -162,19 +168,25 @@ class BtoD0h_Kspipipi0(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.reconstructDecay('D0 -> K_S0:merged pi-:all pi+:all pi0:eff40_May2020Fit', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-        ma.variablesToHistogram(
-            filename=f'{self}_Validation.root',
-            decayString='B-:ch3',
-            variables=[
-                ('Mbc', 100, 5.2, 5.3),
-                ('deltaE', 100, -1, 1),
-                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='B-:ch3',
+            variables_1d=[
+                ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
+                ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates'),
+                ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
-                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
+                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+            path=path)
 
 
 @fancy_skim_header
@@ -284,12 +296,11 @@ class BptoD0etapi_Kpi(BaseSkim):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B+:BptoD0etapi_Kpi -> anti-D0:Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B+:BptoD0etapi_Kpi"]
@@ -406,12 +417,11 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
         loadStdDstarPlus_D0pi_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B0:B0toDstaretapi_D0pi_Kpi -> D*-:D0_Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B0:B0toDstaretapi_D0pi_Kpi"]
@@ -785,19 +795,25 @@ class BtoD0h_hh(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.reconstructDecay('D0 -> K-:all pi+:all', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-        ma.variablesToHistogram(
-            filename=f'{self}_Validation.root',
-            decayString='B-:ch3',
-            variables=[
-                ('Mbc', 100, 5.2, 5.3),
-                ('deltaE', 100, -1, 1),
-                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='B-:ch3',
+            variables_1d=[
+                ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
+                ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates'),
+                ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
-                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
+                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+            path=path)
 
 
 @fancy_skim_header
@@ -966,20 +982,25 @@ class BtoD0h_Kshh(BaseSkim):
         return BsigList
 
     def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
         ma.reconstructDecay('D0 -> K_S0:merged pi+:all pi-:all', '1.84 < M < 1.89', path=path)
         ma.reconstructDecay('B-:ch3 ->D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
 
         # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-
-        ma.variablesToHistogram(
-            filename=f'{self}_Validation.root',
-            decayString='B-:ch3',
-            variables=[
-                ('Mbc', 100, 5.2, 5.3),
-                ('deltaE', 100, -1, 1),
-                ('daughter(0, InvM)', 100, 1.8, 1.9)],  # D0 invariant mass
+        create_validation_histograms(
+            rootfile=f'{self}_Validation.root',
+            particlelist='B-:ch3',
+            variables_1d=[
+                ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
+                ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates'),
+                ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
             variables_2d=[
-                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7)], path=path)
+                ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
+                 'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+            path=path)
 
 
 @fancy_skim_header
@@ -1245,15 +1266,15 @@ class B0toDDs0star(BaseSkim):
         loadStdPi0ForBToHadrons(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",
+        ma.reconstructDecay("phi:KK -> K+:GoodTrack K-:GoodTrack",
                             cut="[1.01 < M < 1.03]", path=path)
         ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",
                             cut="[0.793 < M < 1.015]", path=path)
-        ma.reconstructDecay("D_s+:phipipi0 -> phi pi+:GoodTrack pi0:bth_skim",
+        ma.reconstructDecay("D_s+:phipipi0 -> phi:KK pi+:GoodTrack pi0:bth_skim",
                             cut="[1.942 < M < 1.978]", path=path)
         ma.reconstructDecay("D_s+:antiKK -> anti-K*0 K+:GoodTrack",
                             cut="[1.944 < M < 1.992]", path=path)
-        ma.reconstructDecay("D_s+:phipi -> phi pi+:GoodTrack",
+        ma.reconstructDecay("D_s+:phipi -> phi:KK pi+:GoodTrack",
                             cut="[1.935 < M < 1.999]", path=path)
         Dslist = ['D_s+:phipipi0', 'D_s+:antiKK', 'D_s+:phipi']
         ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)
@@ -1353,14 +1374,15 @@ class B0toDs1D(BaseSkim):
         loadStdSkimHighEffKstar0(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay(decayString="D_s+:phipi -> phi:SkimHighEff pi+:SkimHighEff", cut="[1.942 < M < 1.993]", path=path)
-        ma.reconstructDecay(decayString="D_s+:phipipi0 -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
+        ma.reconstructDecay(decayString="D_s+:phipiSkimHighEff -> phi:SkimHighEff pi+:SkimHighEff",
+                            cut="[1.942 < M < 1.993]", path=path)
+        ma.reconstructDecay(decayString="D_s+:phipipi0SkimHighEff -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
                             cut="[1.874 < M < 1.997]", path=path)
         ma.reconstructDecay(decayString="D_s+:Ksk -> K_S0:merged K+:SkimHighEff",
                             cut="[1.914 < M < 2.015]", path=path)
         ma.reconstructDecay(decayString="D_s+:anti-Kstar0K -> anti-K*0:SkimHighEff K+:SkimHighEff",
                             cut="[1.934 < M < 2.002]", path=path)
-        DsList = ['D_s+:phipi', 'D_s+:phipipi0', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
+        DsList = ['D_s+:phipiSkimHighEff', 'D_s+:phipipi0SkimHighEff', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
         ma.copyLists(outputListName="D_s+:all", inputListNames=DsList, path=path)
 
         ma.reconstructDecay(decayString="D_s*+ -> D_s+:all gamma:loose",

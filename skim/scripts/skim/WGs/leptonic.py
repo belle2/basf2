@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,7 +16,7 @@ from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
 from variables import variables as vm
 
-__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 

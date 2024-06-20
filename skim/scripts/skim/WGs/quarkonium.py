@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -168,7 +167,7 @@ class CharmoniumPsi(BaseSkim):
 
     Selection criteria:
 
-    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.7 < M < 4.
+    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.85 < M < 3.9.
       Track-quality requirements are not applied.
     """
     __authors__ = ["Kirill Chilikin"]
@@ -235,9 +234,9 @@ class CharmoniumPsi(BaseSkim):
         ma.correctBrems('e+:brems2', 'e+:merged', 'gamma:all', path=path)
 
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay('J/psi:ee -> e+:merged e-:merged',
+        ma.reconstructDecay('J/psi:ee_merged -> e+:merged e-:merged',
                             jpsi_mass_cut, dmID=1, path=path)
-        ma.reconstructDecay('psi(2S):ee -> e+:merged e-:merged',
+        ma.reconstructDecay('psi(2S):ee_merged -> e+:merged e-:merged',
                             psi2s_mass_cut, dmID=1, path=path)
 
         ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
@@ -250,16 +249,16 @@ class CharmoniumPsi(BaseSkim):
         ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
                             psi2s_mass_cut, dmID=1, path=path)
 
-        ma.reconstructDecay('J/psi:mumu -> mu+:merged mu-:merged',
+        ma.reconstructDecay('J/psi:mumu_merged -> mu+:merged mu-:merged',
                             jpsi_mass_cut, dmID=2, path=path)
-        ma.reconstructDecay('psi(2S):mumu -> mu+:merged mu-:merged',
+        ma.reconstructDecay('psi(2S):mumu_merged -> mu+:merged mu-:merged',
                             psi2s_mass_cut, dmID=2, path=path)
 
         # Return the lists.
-        return ['J/psi:ee', 'psi(2S):ee',
+        return ['J/psi:ee_merged', 'psi(2S):ee_merged',
                 'J/psi:eebrems', 'psi(2S):eebrems',
                 'J/psi:eebrems2', 'psi(2S):eebrems2',
-                'J/psi:mumu', 'psi(2S):mumu']
+                'J/psi:mumu_merged', 'psi(2S):mumu_merged']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import

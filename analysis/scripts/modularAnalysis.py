@@ -1663,23 +1663,22 @@ def reconstructMissingKlongDecayExpert(decayString,
                                        path=None,
                                        recoList="_reco"):
     """
-    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
+    Creates a list of K_L0's and of B -> K_L0 + X, with X being a fully-reconstructed state.
+    The K_L0 momentum is determined from kinematic constraints of the two-body B decay into K_L0 and X
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         Particles are added to the K_L0 ParticleList if they
+    @param cut         Particles are added to the K_L0 and B ParticleList if the B candidates
                        pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
-    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    @param recoList    suffix appended to original K_L0 and B ParticleList that identify the newly created K_L0 and B lists
     """
 
     pcalc = register_module('KlongMomentumCalculatorExpert')
     pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
-    pcalc.param('cut', cut)
-    pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
     path.add_module(pcalc)
@@ -2025,7 +2024,7 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix="", useFloat=False):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False, storeEventType=True):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2043,6 +2042,8 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
         useFloat (bool): Use single precision (float) instead of double precision (double)
                          for floating-point numbers.
+        storeEventType (bool) : if true, the branch __eventType__ is added for the MC event type information.
+                                The information is available from MC16 on.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2057,6 +2058,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
     output.param('useFloat', useFloat)
+    output.param('storeEventType', storeEventType)
     path.add_module(output)
 
 

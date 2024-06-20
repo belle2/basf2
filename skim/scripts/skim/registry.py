@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -18,6 +17,24 @@ from tabulate import tabulate
 
 
 _RegisteredSkims = [
+    # --- Flagged skims ---
+    ("21000100", "flagged", "f_SLME_p1"),
+    ("21000200", "flagged", "f_SLME_p2"),
+    ("22000100", "flagged", "f_EWP_p1"),
+    ("22000200", "flagged", "f_EWP_p2"),
+    ("23000100", "flagged", "f_TDCPV_p1"),
+    ("23000200", "flagged", "f_TDCPV_p2"),
+    ("24000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
+    ("24000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
+    ("25000100", "flagged", "f_quarkonium_p1"),
+    ("25000200", "flagged", "f_quarkonium_p2"),
+    ("27000100", "flagged", "f_charm_p1"),
+    ("27000200", "flagged", "f_charm_p2"),
+    ("28000100", "flagged", "f_dark_p1"),
+    ("28000200", "flagged", "f_dark_p2"),
+    ("29000100", "flagged", "f_tau_p1"),
+    ("29000200", "flagged", "f_tau_p2"),
+
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),
     # ("10600100", "systematics", "Systematics"), renamed to SystematicsDstar.
@@ -47,8 +64,10 @@ _RegisteredSkims = [
     ("11180100", "fei", "feiHadronicB0"),
     ("11180200", "fei", "feiHadronicBplus"),
     ("11180300", "fei", "feiSLB0"),
+    ("11180301", "fei", "feiSLB0_RDstar"),
     ("11180400", "fei", "feiSLBplus"),
     ("11180500", "fei", "feiHadronic"),
+    ("11180501", "fei", "feiHadronic_DstEllNu"),
     ("11180600", "fei", "feiSL"),
 
     # --- WG2: Electroweak penguins ---
@@ -173,6 +192,7 @@ _RegisteredSkims = [
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),

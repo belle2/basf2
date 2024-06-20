@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -51,7 +50,7 @@ def main():
     SkimObjects = [
         Registry.get_skim_function(skim)(
             analysisGlobaltag=analysisGlobaltag,
-            pidGlobaltag=pidGlobaltag) for skim in Registry.names]
+            pidGlobaltag=pidGlobaltag) for skim in Registry.names if skim[:2] != "f_"]
     skims = CombinedSkim(*[skim for skim in SkimObjects if not is_combined_or_fei_skim(skim)])
     skims(path)
     feiSkims = CombinedSkim(*[skim for skim in SkimObjects if is_fei_skim(skim)])

@@ -631,8 +631,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     **Selection Criteria**:
         * Tracks: ``charmSkim`` lists from `charm_skim_std_charged`
 
-          * Pions: ``pionIDNN > 0.1``
-          * Kaons: ``kaonIDNN > 0.1``
+          * Pions: ``pionID > 0.1``
+          * Kaons: ``kaonID > 0.1``
 
         * :math:`\\pi^{0}`: from `stdPi0s.loadStdSkimPi0`
         * ``1.70 < M(D0) < 2.10``

@@ -1396,11 +1396,11 @@ class B0toDs1D(BaseSkim):
 
 
 @fancy_skim_header
-class B0toDomegapi_Kpipi(BaseSkim):
+class B0toDomegapi_Kpipi_pipipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0} \\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\omega \\pi^+`,
+    * :math:`B^{0} \\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\omega (\\to \\pi^- \\pi^+ \\pi^0) \\pi^+`,
 
     Cuts applied:
 
@@ -1427,19 +1427,25 @@ class B0toDomegapi_Kpipi(BaseSkim):
         omegacuts = "0.70 < M < 0.90"
         Dcuts = "1.84 < M < 1.90"
 
-        ma.reconstructDecay("omega:pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit", omegacuts, path=path)
-        ma.reconstructDecay("D-:Kpipi -> K+:GoodTrack pi-:GoodTrack pi-:GoodTrack", Dcuts, path=path)
-        ma.reconstructDecay("B0:Domegapi_Kpipi -> D-:Kpipi omega:pipipi0 pi+:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay(
+            "omega:B0toDomegapi_Kpipi_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay("D-:B0toDomegapi_Kpipi_pipipi0 -> K+:GoodTrack pi-:GoodTrack pi-:GoodTrack", Dcuts, path=path)
+        ma.reconstructDecay(
+            "B0:B0toDomegapi_Kpipi_pipipi0 -> D-:B0toDomegapi_Kpipi_pipipi0 omega:B0toDomegapi_Kpipi_pipipi0 pi+:GoodTrack",
+            Bcuts,
+            path=path)
 
-        return ["B0:Domegapi_Kpipi"]
+        return ["B0:B0toDomegapi_Kpipi_pipipi0"]
 
 
 @fancy_skim_header
-class B0toDomegapi_Kspi(BaseSkim):
+class B0toDomegapi_Kspi_pipipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{0} \\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\omega \\pi^+`,
+    * :math:`B^{0} \\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\omega (\\to \\pi^- \\pi^+ \\pi^0) \\pi^+`,
 
     Cuts applied:
 
@@ -1466,19 +1472,25 @@ class B0toDomegapi_Kspi(BaseSkim):
         omegacuts = "0.70 < M < 0.90"
         Dcuts = "1.84 < M < 1.90"
 
-        ma.reconstructDecay("omega:pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit", omegacuts, path=path)
-        ma.reconstructDecay("D-:Kspi -> K_S0:merged pi-:GoodTrack", Dcuts, path=path)
-        ma.reconstructDecay("B0:Domegapi_Kspi -> D-:Kspi omega:pipipi0 pi+:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay(
+            "omega:B0toDomegapi_Kspi_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay("D-:B0toDomegapi_Kspi_pipipi0 -> K_S0:merged pi-:GoodTrack", Dcuts, path=path)
+        ma.reconstructDecay(
+            "B0:B0toDomegapi_Kspi_pipipi0 -> D-:B0toDomegapi_Kspi_pipipi0 omega:B0toDomegapi_Kspi_pipipi0 pi+:GoodTrack",
+            Bcuts,
+            path=path)
 
-        return ["B0:Domegapi_Kspi"]
+        return ["B0:B0toDomegapi_Kspi_pipipi0"]
 
 
 @fancy_skim_header
-class BtoD0pi_Kpiomega(BaseSkim):
+class BtoD0pi_Kpiomega_pipipi0(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{+} \\to \\bar{D}^{0} (\\to K^+ \\pi^- \\omega) \\pi^+`,
+    * :math:`B^{+} \\to \\bar{D}^{0} (\\to K^+ \\pi^- \\omega (\\to \\pi^- \\pi^+ \\pi^0)) \\pi^+`,
 
     Cuts applied:
 
@@ -1505,8 +1517,14 @@ class BtoD0pi_Kpiomega(BaseSkim):
         omegacuts = "0.73 < M < 0.9"
         Dcuts = "1.7 < M < 2.0"
 
-        ma.reconstructDecay("omega:pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit", omegacuts, path=path)
-        ma.reconstructDecay("anti-D0:Kpiomega -> K+:GoodTrack pi-:GoodTrack omega:pipipi0", Dcuts, path=path)
-        ma.reconstructDecay("B+:D0pi_Kpiomega -> anti-D0:Kpiomega pi+:GoodTrack", Bcuts, path=path)
+        ma.reconstructDecay(
+            "omega:BtoD0pi_Kpiomega_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay(
+            "anti-D0:BtoD0pi_Kpiomega_pipipi0 -> K+:GoodTrack pi-:GoodTrack omega:BtoD0pi_Kpiomega_pipipi0",
+            Dcuts,
+            path=path)
+        ma.reconstructDecay("B+:BtoD0pi_Kpiomega_pipipi0 -> anti-D0:BtoD0pi_Kpiomega_pipipi0 pi+:GoodTrack", Bcuts, path=path)
 
-        return ["B+:D0pi_Kpiomega"]
+        return ["B+:BtoD0pi_Kpiomega_pipipi0"]

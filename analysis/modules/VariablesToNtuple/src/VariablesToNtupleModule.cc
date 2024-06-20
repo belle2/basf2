@@ -19,22 +19,28 @@
 #include <framework/pcore/ProcHandler.h>
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/core/Environment.h>
+#include <framework/core/RandomNumbers.h>
+#include <framework/database/Database.h>
+#include <framework/dataobjects/NtupleMetaData.h>
 
 // framework - root utilities
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
+#include <framework/io/RootIOUtilities.h>
 
 #include <cmath>
 
 using namespace std;
 using namespace Belle2;
+using namespace RootIOUtilities;
 
 // Register module in the framework
 REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
-  Module(), m_tree("", DataStore::c_Persistent)
+  Module(), m_tree("", DataStore::c_Persistent), m_experimentLow(1), m_runLow(0), m_eventLow(0), m_experimentHigh(0),
+  m_runHigh(0), m_eventHigh(0)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved into separate rows.");
@@ -70,6 +76,14 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
 
   addParam("storeEventType", m_storeEventType,
            "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
+
+  addParam("isMC", m_isMC,
+           "Metadata flag to reflect if the processing is performed on Monte Carlo events (true) or not.", true);
+
+  addParam("additionalDataDescription", m_additionalDataDescription,
+           "Additional dictionary of "
+           "name->value pairs to be added to the file metadata to describe the data",
+           m_additionalDataDescription);
 
 }
 
@@ -230,6 +244,48 @@ void VariablesToNtupleModule::initialize()
   } else {
     m_sampling_variable = nullptr;
   }
+
+  m_ntupleMetaData = new NtupleMetaData;
+  // create persistent tree if it doesn't already exist
+  //to-do: c_treeNames[DataStore::c_Persistent].c_str() throws error - RootIOUtilities issue?
+  if (!m_file->Get("persistent")) {
+    m_persistent = new TTree("persistent", "persistent");
+    m_persistent->Branch("FileMetaData", &m_ntupleMetaData);
+    m_eventTree = new TTree("tree", "tree");
+    m_eventTree->Branch("EventMetaData", m_eventMetaData);
+  } else {
+    m_oldPersistent = dynamic_cast<TTree*>(m_file->Get("persistent"));
+    m_oldNtupleMetaData = dynamic_cast<NtupleMetaData*>(m_file->Get("FileMetaData"));
+    m_persistent = m_oldPersistent->CloneTree(0);
+    m_oldPersistent->GetEntry(0);
+    TBranch* ntupleMetaDataBranch = m_persistent->GetBranch("FileMetaData");
+    ntupleMetaDataBranch->SetAddress(&m_ntupleMetaData);
+  }
+
+  // create the event tree and fill its branches
+  DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
+  set<string> branchList;
+  for (const auto& pair : map)
+    branchList.insert(pair.first);
+
+  //create the tree and branches
+  m_eventTree = new TTree("tree", "tree");
+  for (auto& iter : map) {
+    const std::string& branchName = iter.first;
+    //skip transient entries (allow overriding via branchNames)
+    if (iter.second.dontWriteOut)
+      continue;
+    //skip branches the user doesn't want
+    if (branchList.count(branchName) == 0) {
+      //make sure EventMetaData is always included in the output
+      if (branchName != "EventMetaData") {
+        continue;
+      }
+    }
+    m_eventTree->Branch(branchName.c_str(), &iter.second.object);
+    m_entries.push_back(&iter.second);
+  }
+
 }
 
 
@@ -260,10 +316,36 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
+  // Fill event tree
+  fillTree();
+
   m_event = m_eventMetaData->getEvent();
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+
+  if (m_experimentLow > m_experimentHigh) { //starting condition
+    m_experimentLow = m_experimentHigh = m_experiment;
+    m_runLow = m_runHigh = m_run;
+    m_eventLow = m_eventHigh = m_event;
+  } else {
+    if ((m_experiment < m_experimentLow) || ((m_experiment == m_experimentLow) && ((m_run < m_runLow) || ((m_run == m_runLow)
+                                             && (m_event < m_eventLow))))) {
+      m_experimentLow = m_experiment;
+      m_runLow = m_run;
+      m_eventLow = m_event;
+    }
+    if ((m_experiment > m_experimentHigh) || ((m_experiment == m_experimentHigh) && ((m_run > m_runHigh) || ((m_run == m_runHigh)
+                                              && (m_event > m_eventHigh))))) {
+      m_experimentHigh = m_experiment;
+      m_runHigh = m_run;
+      m_eventHigh = m_event;
+    }
+  }
+
+  // check if the event is a full event or not: if yes, increase the counter
+  if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
+    m_nFullEvents++;
 
   if (m_stringWrapper.isValid())
     m_MCDecayString = m_stringWrapper->getString();
@@ -365,11 +447,60 @@ void VariablesToNtupleModule::event()
   }
 }
 
+void VariablesToNtupleModule::fillNtupleMetaData()
+{
+  bool isMC = (m_isMC) ? m_ntupleMetaData->isMC() : true;
+  new (m_ntupleMetaData) NtupleMetaData;
+  if (!isMC) m_ntupleMetaData->declareRealData();
+
+  unsigned long numEntries = m_tree->get().GetEntries();
+  m_ntupleMetaData->setNFullEvents(m_nFullEvents);
+  m_ntupleMetaData->setNEvents(numEntries);
+
+  if (m_experimentLow > m_experimentHigh) {
+    //starting condition so apparently no events at all
+    m_ntupleMetaData->setLow(-1, -1, 0);
+    m_ntupleMetaData->setHigh(-1, -1, 0);
+  } else {
+    m_ntupleMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
+    m_ntupleMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+  }
+
+  // //fill more file level metadata
+  // m_ntupleMetaData->setParents(m_parentLfns);
+
+  // to-do: fix RootIOUtilities function calls
+  // RootIOUtilities::setCreationData(*m_ntupleMetaData);
+
+  m_ntupleMetaData->setRandomSeed(RandomNumbers::getSeed());
+  m_ntupleMetaData->setSteering(Environment::Instance().getSteering());
+  auto mcEvents = Environment::Instance().getNumberOfMCEvents();
+  m_ntupleMetaData->setMcEvents(mcEvents);
+  m_ntupleMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  for (const auto& item : m_additionalDataDescription) {
+    m_ntupleMetaData->setDataDescription(item.first, item.second);
+  }
+  if (m_fileMetaData.isValid()) {
+    std::string lfn = m_fileMetaData->getLfn();
+    if (not lfn.empty() and (m_inputLfns.empty() or (m_inputLfns.back() != lfn))) {
+      m_inputLfns.push_back(lfn);
+    }
+  }
+  m_ntupleMetaData->setInputs(m_inputLfns);
+  m_ntupleMetaData->setCreationData();
+}
+
 void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
-    B2INFO("Writing NTuple " << m_treeName);
+
+    fillNtupleMetaData();
     TDirectory::TContext directoryGuard(m_file.get());
+    m_persistent->Fill();
+    m_persistent->Write("persistent", TObject::kWriteDelete);
+    m_eventTree->Write("tree", TObject::kWriteDelete);
+
+    B2INFO("Writing NTuple " << m_treeName);
     m_tree->write(m_file.get());
 
     const bool writeError = m_file->TestBit(TFile::kWriteError);
@@ -377,5 +508,37 @@ void VariablesToNtupleModule::terminate()
     if (writeError) {
       B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
+  }
+}
+
+void VariablesToNtupleModule::fillTree()
+{
+  if (!m_eventTree) return;
+
+  TTree& tree = *m_eventTree;
+  for (auto entry : m_entries) {
+    // Check for entries whose object was not created and mark them as invalid.
+    // We still have to write them in the file due to the structure we have. This could be done better
+    if (!entry->ptr) {
+      entry->object->SetBit(kInvalidObject);
+    }
+    //FIXME: Do we need this? in theory no but it crashes in parallel processing otherwise ¯\_(ツ)_/¯
+    if (entry->name == "FileMetaData") {
+      tree.SetBranchAddress(entry->name.c_str(), &m_ntupleMetaData);
+    } else {
+      tree.SetBranchAddress(entry->name.c_str(), &entry->object);
+    }
+  }
+  tree.Fill();
+  for (auto entry : m_entries) {
+    entry->object->ResetBit(kInvalidObject);
+  }
+
+  const bool writeError = m_file->TestBit(TFile::kWriteError);
+  if (writeError) {
+    //m_file deleted first so we have a chance of closing it (though that will probably fail)
+    const std::string filename = m_file->GetName();
+    // delete m_file;
+    B2FATAL("A write error occured while saving '" << filename << "', please check if enough disk space is available.");
   }
 }

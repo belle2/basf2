@@ -15,6 +15,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/dataobjects/EventExtraInfo.h>
+#include <framework/dataobjects/NtupleMetaData.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TTree.h>
@@ -52,6 +53,16 @@ namespace Belle2 {
      */
     float getInverseSamplingRateWeight(const Particle* particle);
 
+    /** Create and fill NtupleMetaData object. */
+    void fillNtupleMetaData();
+
+    /** Fill TTree.
+     *
+     * Write the objects from the DataStore to the output TTree.
+     *
+     */
+    void fillTree();
+
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
@@ -71,6 +82,9 @@ namespace Belle2 {
     std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
+
+    TTree* m_persistent;
+    TTree* m_oldPersistent{nullptr};
     // Counter branch addresses (event number, candidate number etc)
     int m_event{ -1};                /**< event number */
     int m_run{ -1};                  /**< run number */
@@ -78,6 +92,39 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
+
+    /** Event TTree for output. */
+    TTree* m_eventTree;
+
+    /** Vector of DataStore entries that are written to the output. */
+    std::vector<DataStore::StoreEntry*> m_entries;
+
+    /** Lowest experiment number.
+     */
+    unsigned long m_experimentLow;
+
+    /** Lowest run number.
+     */
+    unsigned long m_runLow;
+
+    /** Lowest event number in lowest run.
+     */
+    unsigned long m_eventLow;
+
+    /** Highest experiment number.
+     */
+    unsigned long m_experimentHigh;
+
+    /** Highest run number.
+     */
+    unsigned long m_runHigh;
+
+    /** Highest event number in highest run.
+     */
+    unsigned long m_eventHigh;
+
+    /** Number of full events (aka number of events without an error flag) */
+    unsigned int m_nFullEvents{0};
 
     /** Branch addresses of variables of type float. */
     std::vector<float> m_branchAddressesFloat;
@@ -112,6 +159,18 @@ namespace Belle2 {
     bool m_storeEventType;  /**< If true, the branch __eventType__ is added */
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
     std::string m_eventType; /**< EventType to be filled */
+
+    bool m_isMC; /**< Tell ntuplemetadata whether the processed events are MC or not **/
+
+    std::map<std::string, std::string> m_additionalDataDescription; /**< Additional metadata description */
+
+    std::vector<std::string> m_inputLfns; /**< Vector of input file LFNs. */
+
+    StoreObjPtr<FileMetaData> m_fileMetaData{"", DataStore::c_Persistent}; /**< File metadata */
+
+    NtupleMetaData* m_ntupleMetaData; /**< Ntuple meta data stored in the output file */
+
+    NtupleMetaData* m_oldNtupleMetaData{nullptr}; /**< Ntuple meta data stored in the output file */
 
   };
 } // end namespace Belle2

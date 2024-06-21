@@ -16,7 +16,6 @@ import sys
 import os
 import re
 import subprocess
-import jupytext
 
 sys.path.insert(0, os.path.abspath("extensions"))
 
@@ -55,13 +54,6 @@ codeautolink_warn_on_missing_inventory = False
 codeautolink_warn_on_failed_resolve = False
 
 nbsphinx_allow_errors = True
-# Anything that ends with .jupy.py will be understood as a jupyter
-# notebook converted to a plain python file with jupytext. During the sphinx
-# build, jupytext will converted it back to a .ipynb file and nbsphinx will
-# build the HTML
-nbsphinx_custom_formats = {
-    '.doc.jupy.py': lambda s: jupytext.reads(s, '.py'),
-}
 
 # autosummary_generate = True
 

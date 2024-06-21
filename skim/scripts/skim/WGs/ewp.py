@@ -82,9 +82,9 @@ class BtoXgamma(BaseSkim):
         path = self.skim_event_cuts(f'{Event_cleanup} and foxWolframR2 < 0.7', path=path)
 
         # Apply gamma cuts clusterE9E21 > 0.9 and 1.4 < E_gamma < 3.4 GeV (in CMS frame)
-        ma.cutAndCopyList('gamma:ewp', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
+        ma.cutAndCopyList('gamma:ewp_BtoXgamma', 'gamma:loose', 'clusterE9E21 > 0.9 and 1.4 < useCMSFrame(E) < 3.4', path=path)
 
-        ma.reconstructDecay('B+:gamma -> gamma:ewp', '', path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:gamma -> gamma:ewp_BtoXgamma', '', path=path, allowChargeViolation=True)
 
         return ['B+:gamma']
 
@@ -97,15 +97,15 @@ class BtoXgamma(BaseSkim):
 
         stdK('all', path=path)
         stdPhotons('cdc', path=path)
-        ma.cutAndCopyList('gamma:sig', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
+        ma.cutAndCopyList('gamma:sig_btxg', 'gamma:cdc', 'clusterNHits > 1.5 and E > 1.5', True, path)
 
-        ma.reconstructDecay('K*0:sig  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
-        ma.reconstructDecay('B0:sig ->  K*0:sig gamma:sig', '5.22 < Mbc < 5.3 and  abs(deltaE)< .5', path=path)
+        ma.reconstructDecay('K*0:sig_btxg  -> K+:all pi-:all', '0.6 < M < 1.6', path=path)
+        ma.reconstructDecay('B0:sig_btxg ->  K*0:sig_btxg gamma:sig_btxg', '5.22 < Mbc < 5.3 and  abs(deltaE)< .5', path=path)
 
         # the variables that are printed out are: Mbc and deltaE
         create_validation_histograms(
             rootfile=histogram_filename,
-            particlelist='B0:sig',
+            particlelist='B0:sig_btxg',
             variables_1d=[
                 ('Mbc', 100, 5.2, 5.3, 'Signal B0 Mbc', __liaison__,
                  'Mbc of the signal B0', '', 'Mbc [GeV/c^2]', 'Candidates'),
@@ -195,19 +195,19 @@ class BtoXll(BaseSkim):
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp_btxll', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp_btxll', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
         E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
         # B+ reconstruction:
         # oppositely charged leptons
-        ma.reconstructDecay('B+:ch1 -> e+:ewp e-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
-        ma.reconstructDecay('B+:ch2 -> mu+:ewp mu-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch1 -> e+:ewp_btxll e-:ewp_btxll', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch2 -> mu+:ewp_btxll mu-:ewp_btxll', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
         # same charge leptons
-        ma.reconstructDecay('B+:ch3 -> e+:ewp e+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
-        ma.reconstructDecay('B+:ch4 -> mu+:ewp mu+:ewp', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch3 -> e+:ewp_btxll e+:ewp_btxll', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:ch4 -> mu+:ewp_btxll mu+:ewp_btxll', E_dilep_cut, dmID=4, path=path, allowChargeViolation=True)
 
         ma.copyLists('B+:xll', ['B+:ch1', 'B+:ch2', 'B+:ch3', 'B+:ch4'], path=path)
 
@@ -222,11 +222,12 @@ class BtoXll(BaseSkim):
 
         stdK(listtype='good', path=path)
         stdMu(listtype='good', path=path)
-        ma.reconstructDecay("B+:signal -> K+:good mu+:good mu-:good", "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
+        ma.reconstructDecay("B+:signal_btxll -> K+:good mu+:good mu-:good",
+                            "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
 
         create_validation_histograms(
             rootfile=histogram_filename,
-            particlelist='B+:signal',
+            particlelist='B+:signal_btxll',
             variables_1d=[
                 ('deltaE', 100, -0.5, 0.5, 'Signal B deltaE', __liaison__,
                  'deltaE of the Signal B', '', 'deltaE [GeV]', 'Candidates'),
@@ -312,18 +313,21 @@ class BtoXll_LFV(BaseSkim):
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp_btxlllfv', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('mu+:ewp_btxlllfv', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
         E_dilep_cut = 'formula(daughter(0, useCMSFrame(E))+daughter(1, useCMSFrame(E))) > 1.5'
 
         # B+ reconstruction:
         # oppositely charged leptons
-        ma.reconstructDecay('B+:lfvch1 -> e+:ewp mu-:ewp', E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
-        ma.reconstructDecay('B+:lfvch2 -> mu+:ewp e-:ewp', E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch1 -> e+:ewp_btxlllfv mu-:ewp_btxlllfv',
+                            E_dilep_cut, dmID=1, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch2 -> mu+:ewp_btxlllfv e-:ewp_btxlllfv',
+                            E_dilep_cut, dmID=2, path=path, allowChargeViolation=True)
         # same charge leptons
-        ma.reconstructDecay('B+:lfvch3 -> e+:ewp mu+:ewp', E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
+        ma.reconstructDecay('B+:lfvch3 -> e+:ewp_btxlllfv mu+:ewp_btxlllfv',
+                            E_dilep_cut, dmID=3, path=path, allowChargeViolation=True)
 
         ma.copyLists('B+:lfv', ['B+:lfvch1', 'B+:lfvch2', 'B+:lfvch3'], path=path)
 
@@ -362,18 +366,18 @@ class B0TwoBody(BaseSkim):
     def build_lists(self, path):
 
         cut_trk = 'dr < 0.5 and abs(dz) < 2'
-        ma.cutAndCopyList('e+:ewp', 'e+:all', cut_trk, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', cut_trk, path=path)
-        ma.cutAndCopyList('pi+:ewp', 'pi+:all', cut_trk, path=path)
+        ma.cutAndCopyList('e+:ewp_2b', 'e+:all', cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp_2b', 'mu+:all', cut_trk, path=path)
+        ma.cutAndCopyList('pi+:ewp_2b', 'pi+:all', cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
         cut_b = "abs(deltaE) < 0.5 and Mbc > 5.2"
         path = self.skim_event_cuts(cut_evt, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_1 -> e+:ewp e-:ewp", cut_b, dmID=1, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_2 -> e+:ewp mu-:ewp", cut_b, dmID=2, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_3 -> e-:ewp mu+:ewp", cut_b, dmID=3, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_4 -> mu-:ewp mu+:ewp", cut_b, dmID=4, path=path)
-        ma.reconstructDecay("B0:B0TwoBody_5 -> pi-:ewp pi+:ewp", cut_b, dmID=5, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_1 -> e+:ewp_2b e-:ewp_2b", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_2 -> e+:ewp_2b mu-:ewp_2b", cut_b, dmID=2, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_3 -> e-:ewp_2b mu+:ewp_2b", cut_b, dmID=3, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_4 -> mu-:ewp_2b mu+:ewp_2b", cut_b, dmID=4, path=path)
+        ma.reconstructDecay("B0:B0TwoBody_5 -> pi-:ewp_2b pi+:ewp_2b", cut_b, dmID=5, path=path)
 
         return ['B0:B0TwoBody_1', 'B0:B0TwoBody_2', 'B0:B0TwoBody_3', 'B0:B0TwoBody_4', 'B0:B0TwoBody_5']
 
@@ -433,15 +437,15 @@ class FourLepton(BaseSkim):
     def build_lists(self, path):
         cut_trk = 'dr < 0.5 and abs(dz) < 2 '
 
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('e+:ewp_4b', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp_4b', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=5"
         cut_b = "deltaE < 0.5 and deltaE > -1.5 and Mbc > 5.2 and Mbc < 5.3"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.reconstructDecay("B0:FourLepton_1 -> e+:ewp e-:ewp e+:ewp e-:ewp", cut_b, dmID=1, path=path)
-        ma.reconstructDecay("B0:FourLepton_2 -> e+:ewp e-:ewp mu+:ewp mu-:ewp", cut_b, dmID=2, path=path)
+        ma.reconstructDecay("B0:FourLepton_1 -> e+:ewp_4b e-:ewp_4b e+:ewp_4b e-:ewp_4b", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:FourLepton_2 -> e+:ewp_4b e-:ewp_4b mu+:ewp_4b mu-:ewp_4b", cut_b, dmID=2, path=path)
         return ["B0:FourLepton_1", "B0:FourLepton_2"]
 
     def validation_histograms(self, path):
@@ -449,7 +453,7 @@ class FourLepton(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        ma.cutAndCopyLists("B0:FourLepton", "B0:FourLepton_2", "", path=path)
+        ma.cutAndCopyLists("B0:FourLepton", "B0:FourLepton_1", "", path=path)
 
         histogramFilename = f"{self}_Validation.root"
 
@@ -501,15 +505,15 @@ class RadiativeDilepton(BaseSkim):
     def build_lists(self, path):
 
         cut_trk = 'dr < 0.5 and abs(dz) < 2'
-        ma.cutAndCopyList('e+:ewp', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
-        ma.cutAndCopyList('mu+:ewp', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('e+:ewp_radll', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('mu+:ewp_radll', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"
         cut_b = "deltaE < 0.5 and deltaE > -1.0 and Mbc > 5.2 and Mbc < 5.3"
         path = self.skim_event_cuts(cut_evt, path=path)
 
-        ma.reconstructDecay("B0:RadiativeDilepton_1 -> e+:ewp e-:ewp gamma:all", cut_b, dmID=1, path=path)
-        ma.reconstructDecay("B0:RadiativeDilepton_2 -> mu+:ewp mu-:ewp gamma:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:RadiativeDilepton_1 -> e+:ewp_radll e-:ewp_radll gamma:all", cut_b, dmID=1, path=path)
+        ma.reconstructDecay("B0:RadiativeDilepton_2 -> mu+:ewp_radll mu-:ewp_radll gamma:all", cut_b, dmID=1, path=path)
         return ["B0:RadiativeDilepton_1", "B0:RadiativeDilepton_2"]
 
     def validation_histograms(self, path):
@@ -517,7 +521,7 @@ class RadiativeDilepton(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import create_validation_histograms
 
-        ma.cutAndCopyLists("B0:RadiativeDilepton", "B0:RadiativeDilepton_2", "", path=path)
+        ma.cutAndCopyLists("B0:RadiativeDilepton", "B0:RadiativeDilepton_1", "", path=path)
 
         histogramFilename = f"{self}_Validation.root"
 

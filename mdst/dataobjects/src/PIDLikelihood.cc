@@ -110,19 +110,14 @@ double PIDLikelihood::getProbability(const Const::ChargedStable& p1,
   return result;
 }
 
+
 double PIDLikelihood::getProbability(const Const::ChargedStable& part,
                                      const double* fractions,
                                      Const::PIDDetectorSet detSet) const
 {
-  double prob[Const::ChargedStable::c_SetSize];
-  probability(prob, fractions, detSet);
-
-  int k = part.getIndex();
-  if (k < 0) return 0;
-
-  return prob[k];
-
+  return 1 / (1 + exp(-getLogarithmicProbability(part, fractions, detSet)));
 }
+
 
 double PIDLikelihood::getLogarithmicProbability(const Const::ChargedStable& part,
                                                 const double* fractions,

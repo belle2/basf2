@@ -2381,7 +2381,7 @@ PIDLikelihood#6:
   getLogarithmicProbability(<type: deuteron>): -82.5631
   getMostLikely(): <type: e->
   getProbability(<type: e->): 1
-  getProbability(<type: mu->): 1.94674e-310
+  getProbability(<type: mu->): 0
   getProbability(<type: pi+>): 1.31505e-08
   getProbability(<type: K+>): 1.45998e-20
   getProbability(<type: p+>): 7.33278e-32
@@ -8856,7 +8856,7 @@ PIDLikelihood#6:
   getLogarithmicProbability(<type: deuteron>): -71.325
   getMostLikely(): <type: e->
   getProbability(<type: e->): 0.999996
-  getProbability(<type: mu->): 1.28457e-321
+  getProbability(<type: mu->): 0
   getProbability(<type: pi+>): 4.09291e-06
   getProbability(<type: K+>): 1.61327e-26
   getProbability(<type: p+>): 1.41774e-21

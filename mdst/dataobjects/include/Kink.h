@@ -17,7 +17,7 @@ namespace Belle2 {
   /**
    *  Object holding information for Kinks.
    *
-   *  This object holds the indices of the Tracks used to create the Kink, the
+   *  This object holds the indices of the Tracks used to create the Kink,
    *  the indices of the TrackFitResults belonging to that Tracks [with material
    *  effects and hits as appropriate for the IP (mother) and the vertex (mother and daughter)],
    *  the fitted vertex position, and flag, indicating the filter used to reconstruct Kink,
@@ -27,8 +27,8 @@ namespace Belle2 {
    */
   class Kink : public RelationsObject {
   public:
-    /** Constructor without arguments; needed for I/O. */
-    Kink() {}
+    /** Constructor without arguments; needed for I/O. Should not be used to create Kinks! */
+    Kink();
 
     /**
      * Constructor taking two pairs of tracks and trackFitResults, the fitted vertex coordinates, and filter flag.
@@ -48,24 +48,24 @@ namespace Belle2 {
      * the sign shows from which track the hits were taken (- from daughter, + from mother).
      * The content of the filterFlag may change, please, refer for the details to `KinkFitter.cc`.
      */
-    Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >&
-         trackPairMother,
+    Kink(const std::pair<const Belle2::Track*,
+         std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >& trackPairMother,
          const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairDaughter,
-         Double32_t vertexX, Double32_t vertexY, Double32_t vertexZ, short filterFlag);
+         const Double32_t vertexX, const Double32_t vertexY, const Double32_t vertexZ, const short filterFlag);
 
     /** Get mother `Track`.*/
     Track* getMotherTrack() const;
 
-    /** Get daughter `Track`.*/
+    /** Get daughter `Track` (it is the same as mother's in case of track splitting).*/
     Track* getDaughterTrack() const;
 
-    /** Get indices of the mother `Track`. */
+    /** Get index of the mother `Track`. */
     short getMotherTrackIndex() const
     {
       return m_trackIndexMother;
     }
 
-    /** Get indices of the mother `Track`. */
+    /** Get index of the daughter `Track` (it is the same as mother's in case of track splitting). */
     short getDaughterTrackIndex() const
     {
       return m_trackIndexDaughter;
@@ -77,7 +77,7 @@ namespace Belle2 {
     /** Get the `TrackFitResult` of mother at the ending point.*/
     TrackFitResult* getMotherTrackFitResultEnd() const;
 
-    /** Get the `TrackFitResult` of daughter.*/
+    /** Get the `TrackFitResult` of daughter at the starting point.*/
     TrackFitResult* getDaughterTrackFitResult() const;
 
     /** Get index of the `TrackFitResult` of mother at the starting point. */
@@ -92,22 +92,22 @@ namespace Belle2 {
       return m_trackFitResultIndexMotherEnd;
     }
 
-    /** Get index of the `TrackFitResult` of daughter. */
+    /** Get index of the `TrackFitResult` of daughter at the starting point. */
     short getTrackFitResultIndexDaughter() const
     {
       return m_trackFitResultIndexDaughter;
     }
 
-    /** Get the X coordinate of the fitted vertex. */
+    /** Get the X coordinate of the fitted kink vertex. */
     Double32_t getFittedVertexX() const { return m_fittedVertexX; }
 
-    /** Get the Y coordinate of the fitted vertex. */
+    /** Get the Y coordinate of the fitted kink vertex. */
     Double32_t getFittedVertexY() const { return m_fittedVertexY; }
 
-    /** Get the Z coordinate of the fitted vertex. */
+    /** Get the Z coordinate of the fitted kink vertex. */
     Double32_t getFittedVertexZ() const { return m_fittedVertexZ; }
 
-    /** Get the fitted vertex position. */
+    /** Get the fitted kink vertex position. */
     ROOT::Math::XYZVector getFittedVertexPosition() const
     {
       return ROOT::Math::XYZVector(m_fittedVertexX, m_fittedVertexY, m_fittedVertexZ);
@@ -117,6 +117,30 @@ namespace Belle2 {
     short getFilterFlag() const
     {
       return m_filterFlag;
+    }
+
+    /** Get the flag of prefilter with which kink track pair (or track in case of splitting) was selected. */
+    short getPrefilterFlag() const
+    {
+      return m_filterFlag % 10;
+    }
+
+    /** Get the flag containing information about combined fit for track pairs. */
+    short getCombinedFitResultFlag() const
+    {
+      return m_filterFlag % 1000 - getPrefilterFlag();
+    }
+
+    /** Get the flag showing if the distance at kink vertex criteria was failed for split track. */
+    short getSplitTrackDistanceAtVertexFlag() const
+    {
+      return getCombinedFitResultFlag();
+    }
+
+    /** Get signed number of reassigned hits (- from daughter to mother, + from mother to daughter). */
+    short getNumberOfReassignedHits() const
+    {
+      return m_filterFlag / 1000;
     }
 
   private:
@@ -166,6 +190,14 @@ namespace Belle2 {
      * The sign shows from which track the hits were taken (- from daughter, + from mother).
      *
      * The content of the m_filterFlag may change, please, refer for the details to `KinkFitter.cc`.
+     *
+     * @example -23181: -2318"1" track pair was preselected with filter 1, 2, 4, or 5
+     * (mother track and daughter track end points are close); -23"18"1 the exit code of combined fit is 18, so
+     * the combined track has less n.d.f. than mother track; "-23"181 -- 23 hits were reassigned from daughter track
+     * to mother track
+     * @example 2015: 201"5" kink was created from split track selected with filter 9 (track did not pass
+     * neither mother nor daughter preselection criteria); 2"01"5 the code 1 means that the distance at the fitted
+     * kink vertex is larger than the set cut; "2"015 -- 2 hits were reassigned from mother track to daughter track
      */
     short m_filterFlag = 0;
 

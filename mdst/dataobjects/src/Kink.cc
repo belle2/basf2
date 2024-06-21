@@ -9,10 +9,22 @@
 
 using namespace Belle2;
 
-Kink::Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >&
-           trackPairMother,
+Kink::Kink():
+  m_trackIndexMother(-1),
+  m_trackIndexDaughter(-1),
+  m_trackFitResultIndexMotherStart(-1),
+  m_trackFitResultIndexMotherEnd(-1),
+  m_trackFitResultIndexDaughter(-1),
+  m_fittedVertexX(0.0),
+  m_fittedVertexY(0.0),
+  m_fittedVertexZ(0.0),
+  m_filterFlag(0)
+{}
+
+Kink::Kink(const std::pair<const Belle2::Track*,
+           std::pair<const Belle2::TrackFitResult*, const Belle2::TrackFitResult*> >& trackPairMother,
            const std::pair<const Belle2::Track*, const Belle2::TrackFitResult*>& trackPairDaughter,
-           Double32_t vertexX, Double32_t vertexY, Double32_t vertexZ, short filterFlag) :
+           const Double32_t vertexX, const Double32_t vertexY, const Double32_t vertexZ, const short filterFlag) :
   m_trackIndexMother(trackPairMother.first->getArrayIndex()),
   m_trackIndexDaughter(trackPairDaughter.first->getArrayIndex()),
   m_trackFitResultIndexMotherStart(trackPairMother.second.first->getArrayIndex()),
@@ -26,30 +38,40 @@ Kink::Kink(const std::pair<const Belle2::Track*, std::pair<const Belle2::TrackFi
 
 Track* Kink::getMotherTrack() const
 {
+  // safety check in case of default constructor was used (should not)
+  if (m_trackIndexMother == -1) return nullptr;
   StoreArray<Track> tracks;
   return tracks[m_trackIndexMother];
 }
 
 Track* Kink::getDaughterTrack() const
 {
+  // safety check in case of default constructor was used (should not)
+  if (m_trackIndexDaughter == -1) return nullptr;
   StoreArray<Track> tracks;
   return tracks[m_trackIndexDaughter];
 }
 
 TrackFitResult* Kink::getMotherTrackFitResultStart() const
 {
+  // safety check in case of default constructor was used (should not)
+  if (m_trackFitResultIndexMotherStart == -1) return nullptr;
   StoreArray <TrackFitResult> trackFitResults;
   return trackFitResults[m_trackFitResultIndexMotherStart];
 }
 
 TrackFitResult* Kink::getMotherTrackFitResultEnd() const
 {
+  // safety check in case of default constructor was used (should not)
+  if (m_trackFitResultIndexMotherEnd == -1) return nullptr;
   StoreArray <TrackFitResult> trackFitResults;
   return trackFitResults[m_trackFitResultIndexMotherEnd];
 }
 
 TrackFitResult* Kink::getDaughterTrackFitResult() const
 {
+  // safety check in case of default constructor was used (should not)
+  if (m_trackFitResultIndexDaughter == -1) return nullptr;
   StoreArray <TrackFitResult> trackFitResults;
   return trackFitResults[m_trackFitResultIndexDaughter];
 }

@@ -34,8 +34,8 @@ namespace Belle2 {
      * @param precutSplitPValue preselection cut on maximal p-value for a track candidate to be split
      */
     void setParameters(const unsigned char kinkFitterMode, const double vertexChi2Cut, const double vertexDistanceCut,
-                       const double precutRho, const double precutZ, const double precutDistance, const double precutDistance2D,
-                       const int precutSplitNCDCHit, const double precutSplitPValue)
+                       const double precutRho, const double precutZ, const double precutDistance,
+                       const double precutDistance2D, const int precutSplitNCDCHit, const double precutSplitPValue)
     {
       m_kinkFitterMode = kinkFitterMode;
       m_vertexChi2Cut = vertexChi2Cut;
@@ -48,6 +48,86 @@ namespace Belle2 {
       m_precutSplitPValue = precutSplitPValue;
     }
 
+    /**
+     * set KinkFitter working mode
+     * @param kinkFitterMode working mode
+     */
+    void setKinkFitterMode(const unsigned char kinkFitterMode)
+    {
+      m_kinkFitterMode = kinkFitterMode;
+    }
+
+    /**
+     * set cut on Chi2 for the Kink vertex
+     * @param vertexChi2Cut cut on Chi2 for the Kink vertex
+     */
+    void setVertexChi2Cut(const double vertexChi2Cut)
+    {
+      m_vertexChi2Cut = vertexChi2Cut;
+    }
+
+    /**
+     * set cut on distance between tracks at the Kink vertex
+     * @param vertexDistanceCut cut on distance between tracks at the Kink vertex
+     */
+    void setVertexDistanceCut(const double vertexDistanceCut)
+    {
+      m_vertexDistanceCut = vertexDistanceCut;
+    }
+
+    /**
+     * set preselection cut on transverse shift from the outer CDC wall for the track ending points
+     * @param precutRho preselection cut on transverse shift from the outer CDC wall for the track ending points
+     */
+    void setPrecutRho(const double precutRho)
+    {
+      m_precutRho = precutRho;
+    }
+
+    /**
+     * set preselection cut on z shift from the outer CDC wall for the track ending points
+     * @param precutZ preselection cut on z shift from the outer CDC wall for the track ending points
+     */
+    void setPrecutZ(const double precutZ)
+    {
+      m_precutZ = precutZ;
+    }
+
+    /**
+     * set preselection cut on distance between ending points of two tracks
+     * @param precutDistance preselection cut on distance between ending points of two tracks
+     */
+    void setPrecutDistance(const double precutDistance)
+    {
+      m_precutDistance = precutDistance;
+    }
+
+    /**
+     * set preselection cut on 2D distance between ending points of two tracks (for bad z cases)
+     * @param precutDistance2D preselection cut on 2D distance between ending points of two tracks (for bad z cases)
+     */
+    void setPrecutDistance2D(const double precutDistance2D)
+    {
+      m_precutDistance2D = precutDistance2D;
+    }
+
+    /**
+     * set preselection cut on maximal number of fitted CDC hits for a track candidate to be split
+     * @param precutSplitNCDCHit preselection cut on maximal number of fitted CDC hits for a track candidate to be split
+     */
+    void setPrecutSplitNCDCHit(const int precutSplitNCDCHit)
+    {
+      m_precutSplitNCDCHit = precutSplitNCDCHit;
+    }
+
+    /**
+     * set preselection cut on maximal p-value for a track candidate to be split
+     * @param precutSplitPValue preselection cut on maximal p-value for a track candidate to be split
+     */
+    void setPrecutSplitPValue(const double precutSplitPValue)
+    {
+      m_precutSplitPValue = precutSplitPValue;
+    }
 
     /** get kinkFitter working mode */
     unsigned char getKinkFitterMode() const

@@ -111,8 +111,8 @@ def add_mdst_dump(path, print_untested=False):
             "getRelationsWith": ["MCParticles"],
         }),
         DataStorePrinter("Kinks", [
-            "getMotherTrack", "getDaughterTrack", "getMotherTrackFitResultStart",
-            "getMotherTrackFitResultEnd", "getDaughterTrackFitResult",
+            "getMotherTrackIndex", "getDaughterTrackIndex", "getTrackFitResultIndexMotherStart",
+            "getTrackFitResultIndexMotherEnd", "getTrackFitResultIndexDaughter",
             "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ", "getFilterFlag"
             ]),
         DataStorePrinter("TrackFitResult", [

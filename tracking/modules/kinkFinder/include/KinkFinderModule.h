@@ -43,6 +43,9 @@ namespace Belle2 {
     /** Registration of StoreArrays, Relations. */
     void initialize() override;
 
+    /** Read parameters from the database and apply to KinkFitter */
+    void beginRun() override;
+
     /** Creates Belle2::Kink from Belle2::Track as described in the class documentation. */
     void event() override;
 
@@ -51,30 +54,19 @@ namespace Belle2 {
 
   private:
 
-    std::string m_arrayNameTrack;  ///< StoreArray name of the Belle2::Track (Input).
-    StoreArray <Track> m_tracks;  ///< StoreArray of Belle2::Track.
+    /**
+     * Kink fitting and storing
+     * @param trackMother mother track
+     * @param trackDaughter daughter track
+     * @param filterFlag flag of the satisfied preselection criteria
+     */
+    void fitAndStore(const Track* trackMother, const Track* trackDaughter, const short filterFlag);
 
-    std::unique_ptr<KinkFitter> m_kinkFitter;  ///< Object containing the algorithm of Kink creation.
-    std::string m_arrayNameRecoTrack;  ///< StoreArray name of the RecoTrack (Input).
-    std::string m_arrayNameCopiedRecoTrack;  ///< StoreArray name of the RecoTrack used for creating copies.
-    std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResult (In- and Output).
-    std::string m_arrayNameKink;  ///< StoreArray name of the Kink (Output).
-
-    DBObjPtr<KinkFinderParameters> m_kinkFinderParameters; ///< kinkFinder parameters Database ObjPtr
-
-    double m_vertexChi2Cut;  ///< Cut on Chi2 for the Kink vertex.
-    double m_vertexDistanceCut;  ///< Cut on distance between tracks at the Kink vertex.
-    unsigned char m_kinkFitterMode;  ///< Fitter mode (from 0 to 15). Each bit is responsible for turning On/Off
-    ///< corresponding algorithm. For more details, refer to 'KinkFitter'.
-    bool m_kinkFitterModeSplitTrack; ///< Fitter mode 4th bit responsible for turning On/Off track splitting.
-    double m_precutRho;  ///< Preselection cut on transverse shift from the outer CDC wall for the track ending points.
-    double m_precutZ;  ///< Preselection cut on z shift from the outer CDC wall for the track ending points.
-    double m_precutDistance;  ///< Preselection cut on distance between ending points of two tracks.
-    double m_precutDistance2D;  ///< Preselection cut on 2D distance between ending points of two tracks (for bad z cases).
-    double m_precutDistanceSquared;  ///< m_precutDistance squared for convenience
-    double m_precutDistance2DSquared;  ///< m_precutDistance2D squared for convenience
-    int m_precutSplitNCDCHit; ///< Preselection cut on maximal number of fitted CDC hits for a track candidate to be split.
-    double m_precutSplitPValue; ///< Preselection cut on maximal p-value for a track candidate to be split.
+    /**
+     * Fitter mode 4th bit responsible for turning On/Off track splitting
+     * @return true if the track splitting is On and false if it is Off
+     */
+    bool kinkFitterModeSplitTrack();
 
     /**
      * Test if the point in space is inside CDC (approximate custom geometry) with respect to shifts from outer wall,
@@ -83,32 +75,31 @@ namespace Belle2 {
      * @return true if the pos is inside the required volume of the CDC;
      * false if outside
      */
-    bool ifInCDC(ROOT::Math::XYZVector& pos);
+    bool ifInCDC(const ROOT::Math::XYZVector& pos);
 
     /**
      * Check if the track can be a mother candidate based on some simple selections.
-     * @param recoTrack track of the candidate
-     * @return true if recoTrack pass the criteria;
+     * @param track track of the candidate
+     * @return true if track pass the criteria;
      * false otherwise
      */
-    bool preFilterMotherTracks(RecoTrack const* const recoTrack);
+    bool preFilterMotherTracks(Track const* const track);
 
     /**
      * Check if the track can be a daughter candidate based on some simple selections.
-     * @param recoTrack track of the candidate
-     * @return true if recoTrack pass the criteria;
+     * @param track track of the candidate
+     * @return true if track pass the criteria;
      * false otherwise
      */
-    bool preFilterDaughterTracks(RecoTrack const* const recoTrack);
+    bool preFilterDaughterTracks(Track const* const track);
 
     /**
     * Check if the track can be a candidate to be split based on some simple selections.
-    * @param recoTrack recoTrack of the candidate
-    * @param track track of the candidate to get the number of fitted CDC hits
-    * @return true if recoTrack pass the criteria;
+    * @param track track of the candidate
+    * @return true if track pass the criteria;
     * false otherwise
     */
-    bool preFilterTracksToSplit(RecoTrack const* const recoTrack, Track const* const track);
+    bool preFilterTracksToSplit(Track const* const track);
 
     /**
      * Track pair preselection based on distance between two tracks with different options.
@@ -126,24 +117,27 @@ namespace Belle2 {
      * (lost layers for daughter combined with bad daughter resolution).
      * @param motherTrack mother track
      * @param daughterTrack daughter track
-     * @return flag of the satisfied preselection criteria, or 0 otherwise.
+     * @return flag of the satisfied preselection criteria (1-6 as it was listed above), or 0 otherwise.
      */
     short isTrackPairSelected(const Track* motherTrack, const Track* daughterTrack);
 
-    /**
-     * Kink fitting and storing
-     * @param trackMother mother track
-     * @param trackDaughter daughter track
-     * @param filterFlag flag of the satisfied preselection criteria
-     */
-    void fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag);
+    std::string m_arrayNameTrack;  ///< StoreArray name of the Belle2::Track (Input).
+    StoreArray<Track> m_tracks;  ///< StoreArray of Belle2::Track.
+
+    std::unique_ptr<KinkFitter> m_kinkFitter;  ///< Object containing the algorithm of Kink creation.
+    std::string m_arrayNameRecoTrack;  ///< StoreArray name of the RecoTrack (Input).
+    std::string m_arrayNameCopiedRecoTrack;  ///< StoreArray name of the RecoTrack used for creating copies.
+    std::string m_arrayNameTFResult;  ///< StoreArray name of the TrackFitResult (In- and Output).
+    std::string m_arrayNameKink;  ///< StoreArray name of the Kink (Output).
+
+    DBObjPtr<KinkFinderParameters> m_kinkFinderParameters; ///< kinkFinder parameters Database ObjPtr
 
     // counter for KinkFinder statistics
-    int m_allStored = 0;    ///< counter for all saved Kinks
-    int m_f1Stored = 0;    ///< counter for filter 1 saved Kinks
-    int m_f2Stored = 0;    ///< counter for filter 2 saved Kinks
-    int m_f3Stored = 0;    ///< counter for filter 3 saved Kinks
-    int m_f4Stored = 0;    ///< counter for filter 4 saved Kinks
-    int m_f5Stored = 0;    ///< counter for filter 5 saved Kinks
+    unsigned int m_allStored = 0;    ///< counter for all saved Kinks
+    unsigned int m_f1Stored = 0;    ///< counter for filter 1 saved Kinks
+    unsigned int m_f2Stored = 0;    ///< counter for filter 2 saved Kinks
+    unsigned int m_f3Stored = 0;    ///< counter for filter 3 saved Kinks
+    unsigned int m_f4Stored = 0;    ///< counter for filter 4 saved Kinks
+    unsigned int m_f5Stored = 0;    ///< counter for filter 5 saved Kinks
   };
 }

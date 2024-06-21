@@ -51,7 +51,7 @@ namespace Belle2 {
      * @param vertexChi2Cut Cut on Chi2 for the Kink vertex.
      * @param precutDistance Preselection cut on distance between ending points of two tracks used in KinkFinderModule.
      */
-    void initializeCuts(double vertexDistanceCut, double vertexChi2Cut, double precutDistance);
+    void initializeCuts(const double vertexDistanceCut, const double vertexChi2Cut, const double precutDistance);
 
     /**
      * set kink fitter mode.
@@ -61,16 +61,32 @@ namespace Belle2 {
      * 3rd bit: fit both tracks as one (1 is On, 0 is Off)
      * 4th bit: track splitting (1 is On, 0 is Off)
      */
-    void setFitterMode(unsigned char fitterMode);
+    void setFitterMode(const unsigned char fitterMode);
 
     /**
      * Fit kink with cardinal hypothesis and store it if the fit was successful.
      * If the corresponding flag is set, try to reassign hits between mother and daughter tracks.
      * If the corresponding flag is set, try to flip and refit daughter track.
      * If the corresponding flag is set, try to combine mother and daughter track and fit the resulting track.
+     * If the corresponding flag is set, try to split the track candidate selected by KinkFinderModule.
      * @param trackMother mother Track
-     * @param trackDaughter daughter Track
+     * @param trackDaughter daughter Track (in case of splitting the same as trackMother)
      * @param filterFlag filter with which track pair was selected
+     * Filter 1: Distance between first point of the daughter and last point of the mother < m_precutDistance (majority).
+     * Filter 2: Distance between last point of the daughter and last point of the mother < m_precutDistance
+     * (wrong daughter sign).
+     * Filter 3: Distance between the daughter Helix extrapolation to last point of the mother
+     * and last point of the mother < m_precutDistance (lost layers for daughter, second largest contribution).
+     * Filter 4: 2D distance between first point of the daughter and last point of the mother < m_precutDistance2D
+     * (bad daughter resolution recovered by hit reassignment).
+     * Filter 5: 2D distance between last point of the daughter and last point of the mother < m_precutDistance2D
+     * (bad daughter resolution and wrong daughter sign, almost no events).
+     * Filter 6: Distance between the daughter Helix extrapolation to last point of the mother
+     * and last point of the mother < m_precutDistance2D
+     * (lost layers for daughter combined with bad daughter resolution, can be recovered by refit).
+     * Filter 7: Track to split selected among mother candidates.
+     * Filter 8: Track to split selected among daughter candidates.
+     * Filter 9: Track to split selected among tracks not passing mother/daughter criteria.
      * @return true if the track pair is stored as a Kink, false in other cases
      */
     bool fitAndStore(const Track* trackMother, const Track* trackDaughter, short filterFlag);
@@ -87,7 +103,7 @@ namespace Belle2 {
     RecoTrack* copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack, const bool motherFlag, const unsigned int delta);
 
     /**
-     * Split track into two based on the chi2/ndf ratio. For the best split position search, use binary search.
+     * Split track into two based on |chi2/ndf - 1|. For the best split position search, use binary search.
      * @param recoTrackSplit RecoTrack to be split
      * @param recoTrackIndexMother index of the created mother RecoTrack in m_copiedRecoTracks
      * @param recoTrackIndexDaughter index of the created daughter RecoTrack in m_copiedRecoTracks
@@ -104,10 +120,11 @@ namespace Belle2 {
      * second bit: combined pValue > daughter pValue
      * third bit: combined NDF > daughter NDF;
      * fourth bit: combined pValue > 10^-7;
+     * If the value > 15, the combination is assumed as failed with the following codes:
      * 18: combined NDF < mother NDF;
      * 19: fit failed;
      */
-    int combineTracksAndFit(const Track* trackMother, const Track* trackDaughter);
+    unsigned int combineTracksAndFit(const Track* trackMother, const Track* trackDaughter);
 
     /**
      * Find hit position closest to the vertex.
@@ -153,9 +170,9 @@ namespace Belle2 {
      * @return pointer to a new copied flipped and refitted daughter RecoTrack
      */
     RecoTrack* copyRecoTrackForFlipAndRefit(const RecoTrack* recoTrack,
-                                            ROOT::Math::XYZVector& momentumSeed,
-                                            ROOT::Math::XYZVector& positionSeed,
-                                            double& timeSeed);
+                                            const ROOT::Math::XYZVector& momentumSeed,
+                                            const ROOT::Math::XYZVector& positionSeed,
+                                            const double& timeSeed);
 
     /**
      * Refit the daughter track blocking hits if required.
@@ -163,15 +180,15 @@ namespace Belle2 {
      * @param momentumSeed momentum seed
      * @param positionSeed position seed
      * @param timeSeed time seed
-     * @param block block the hits in the first stereo layer and all before
+     * @param blockInnerStereoHits block the hits in the first stereo layer and all before
      * @param useAnotherFitter use ordinary KalmanFilter
      * @return pointer to a new copied refitted daughter RecoTrack
      */
     RecoTrack* copyRecoTrackForRefit(const RecoTrack* recoTrack,
-                                     ROOT::Math::XYZVector& momentumSeed,
-                                     ROOT::Math::XYZVector positionSeed,
-                                     double& timeSeed,
-                                     bool block, bool useAnotherFitter);
+                                     const ROOT::Math::XYZVector& momentumSeed,
+                                     const ROOT::Math::XYZVector& positionSeed,
+                                     const double& timeSeed,
+                                     const bool blockInnerStereoHits = false, const bool useAnotherFitter = false);
 
     /**
      * check if the refit of filter 6 daughter tracks improves the distance between mother and daughter
@@ -200,7 +217,7 @@ namespace Belle2 {
     bool vertexFitWithRecoTracks(RecoTrack* recoTrackMother, RecoTrack* recoTrackDaughter,
                                  unsigned int& reassignHitStatus,
                                  ROOT::Math::XYZVector& vertexPos, double& distance,
-                                 ROOT::Math::XYZVector vertexPosSeed);
+                                 ROOT::Math::XYZVector vertexPosSeed = ROOT::Math::XYZVector(0, 0, 0));
 
     /**
      * Extrapolate the fit results to the perigee to the vertex.
@@ -239,8 +256,8 @@ namespace Belle2 {
   private:
 
     // Objects containing the track fitters (DAF and ordinary Kalman Filter).
-    std::unique_ptr<TrackFitter> m_trackFitterDAF;
-    std::unique_ptr<TrackFitter> m_trackFitterKF;
+    std::unique_ptr<TrackFitter> m_trackFitterDAF; ///< Object containing the DAF track fitter.
+    std::unique_ptr<TrackFitter> m_trackFitterKF; ///< Object containing the KalmanFitter.
 
     // variables used for input
     std::string m_recoTracksName;   ///< RecoTrackColName (input).
@@ -276,4 +293,3 @@ namespace Belle2 {
   };
 
 }
-

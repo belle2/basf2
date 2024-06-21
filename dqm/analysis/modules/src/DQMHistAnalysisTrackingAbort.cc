@@ -144,7 +144,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_hAbort->SetBinContent(2, hAbortIn->GetBinContent(2) + hAbortOut->GetBinContent(2));
 
     const double abortRate = (double)m_hAbort->GetBinContent(2) / (m_hAbort->GetBinContent(1) + m_hAbort->GetBinContent(2));
-    m_hAbort->SetTitle(Form("[After Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate * 100));
+    m_hAbort->SetTitle(Form("[After Filter] Fraction of Events in which Tracking Aborts = %.2f %%", abortRate * 100));
 
     if (nEvents >= m_statThreshold) {
       m_monObj->setVariable("abortRate", abortRate);
@@ -196,14 +196,14 @@ void DQMHistAnalysisTrackingAbortModule::event()
     nEventsINbf = hAbortIn_BF->GetEntries();
     m_monObj->setVariable("nEventsBeforeFilter_inActiveVeto", nEventsINbf);
     nEventsOUTbf = hAbortOut_BF->GetEntries();
-    m_monObj->setVariable("nEventsBeforeFilter_outActiveVeto", nEventsOUT);
+    m_monObj->setVariable("nEventsBeforeFilter_outActiveVeto", nEventsOUTbf);
     const int nEvents_BF = nEventsINbf + nEventsOUTbf;
 
     m_hAbort_BF->SetBinContent(1, hAbortIn_BF->GetBinContent(1) + hAbortOut_BF->GetBinContent(1));
     m_hAbort_BF->SetBinContent(2, hAbortIn_BF->GetBinContent(2) + hAbortOut_BF->GetBinContent(2));
 
     const double abortRate_BF = (double)m_hAbort_BF->GetBinContent(2) / (m_hAbort_BF->GetBinContent(1) + m_hAbort_BF->GetBinContent(2));
-    m_hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate_BF * 100));
+    m_hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.2f %%", abortRate_BF * 100));
 
     if (nEvents_BF >= m_statThreshold) {
       m_monObj->setVariable("abortRateBeforeFilter", abortRate_BF);

@@ -58,9 +58,8 @@ void ParticleMassHypothesesUpdaterModule::initialize()
 
   string label = mother->getLabel();
   string pName = mother->getName();
-  string sign = string(1, pName.back());
   pName.pop_back();
-  m_newParticleList = allowedPDGs[m_newPdgCode] + sign + ":" + label + "_converted_from_" + pName;
+  m_newParticleList = allowedPDGs[m_newPdgCode] + "+:" + label + "_converted_from_" + pName;
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
 
@@ -68,11 +67,8 @@ void ParticleMassHypothesesUpdaterModule::initialize()
   newList.registerInDataStore(flags);
 
   m_newAntiParticleList = ParticleListName::antiParticleListName(m_newParticleList);
-  m_isSelfConjugatedParticle = (m_newParticleList == m_newAntiParticleList);
-  if (!m_isSelfConjugatedParticle) {
-    StoreObjPtr<ParticleList> antiParticleList(m_newAntiParticleList);
-    antiParticleList.registerInDataStore(flags);
-  }
+  StoreObjPtr<ParticleList> antiParticleList(m_newAntiParticleList);
+  antiParticleList.registerInDataStore(flags);
 
   return;
 }
@@ -103,18 +99,14 @@ void ParticleMassHypothesesUpdaterModule::event()
 
   newList.create();  // Create and initialize the list
   newList->initialize(m_newPdgCode, m_newParticleList);
-  newList->setEditable(true);
 
-  if (!m_isSelfConjugatedParticle) {
-    StoreObjPtr<ParticleList> newAntiList(m_newAntiParticleList);
-    if (newAntiList.isValid()) // Check whether it already exists in this path
-      B2ERROR("The particle list did not exist but the anti-list did. Something fishy is happening.");
+  StoreObjPtr<ParticleList> newAntiList(m_newAntiParticleList);
+  if (newAntiList.isValid()) // Check whether it already exists in this path
+    B2ERROR("The particle list did not exist but the anti-list did. Something fishy is happening.");
 
-    newAntiList.create();  // Create and initialize the list
-    newAntiList->initialize(-1 * m_newPdgCode, m_newAntiParticleList);
-    newAntiList->setEditable(true);
-    newAntiList->bindAntiParticleList(*(newList));
-  }
+  newAntiList.create();  // Create and initialize the list
+  newAntiList->initialize(-1 * m_newPdgCode, m_newAntiParticleList);
+  newAntiList->bindAntiParticleList(*(newList));
 
   for (unsigned int i = 0; i < originalList->getListSize(); ++i) {
     const Particle* originalParticle = originalList->getParticle(i);  // Get particle and check it comes from a track
@@ -133,7 +125,6 @@ void ParticleMassHypothesesUpdaterModule::event()
 
     newList->addParticle(newPart);  // Add particle to list
   }  // Close loop over tracks
-  newList->setEditable(false);
 }
 
 void ParticleMassHypothesesUpdaterModule::terminate() {}

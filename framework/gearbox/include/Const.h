@@ -54,6 +54,15 @@ namespace Belle2 {
     };
 
     /**
+     * Enum for identifying run type
+     * (beam or cosmic)
+     */
+    enum ERunType {
+      c_Beam,
+      c_Cosmic
+    };
+
+    /**
     * Converts Const::EDetector object to string.
     * @param det Const::EDetector object to be converted to string
     * @return converted string

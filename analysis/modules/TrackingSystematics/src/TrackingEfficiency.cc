@@ -27,9 +27,9 @@ TrackingEfficiencyModule::TrackingEfficiencyModule() : Module()
   setDescription(
     R"DOC(Module to remove tracks from the lists at random. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("TrackingEfficiency", particleLists=['pi+:cut'], frac=0.01)
+    mypath.add_module("TrackingEfficiency", particleLists=['pi+:cut'], frac=0.01)
 
 The module modifies the input particleLists by randomly removing tracks with the probability frac.
 		     

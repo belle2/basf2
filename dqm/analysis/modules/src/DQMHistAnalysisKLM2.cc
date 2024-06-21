@@ -34,12 +34,13 @@ DQMHistAnalysisKLM2Module::DQMHistAnalysisKLM2Module()
   addParam("RefHistogramDirectoryName", m_refHistogramDirectoryName, "Name of ref histogram directory",
            std::string("ref/KLMEfficiencyDQM"));
   addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
-  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.9));
+  addParam("RunStopThreshold", m_stopThr, "Set stop threshold", float(0.20));
+  addParam("AlarmThreshold", m_alarmThr, "Set alarm threshold", float(0.5));
   addParam("WarnThreshold", m_warnThr, "Set warn threshold", float(0.92));
   addParam("Min2DEff", m_min, "2D efficiency min", float(0.5));
   addParam("Max2DEff", m_max, "2D efficiency max", float(2));
   addParam("RatioPlot", m_ratio, "2D efficiency ratio or difference plot ", bool(true));
-  addParam("MinEntries", m_minEntries, "Minimum entries for delta histogram update", 10000.);
+  addParam("MinEntries", m_minEntries, "Minimum entries for delta histogram update", 30000.);
 
   m_PlaneLine.SetLineColor(kMagenta);
   m_PlaneLine.SetLineWidth(1);
@@ -111,7 +112,8 @@ void DQMHistAnalysisKLM2Module::initialize()
     B2WARNING("DQMHistAnalysisKLM2: reference root file (" << m_refFileName << ") not found, or closed");
 
     // Switch to absolute 2D efficiencies if reference histogram is not found
-    m_alarmThr = 0.0;
+    m_stopThr = 0.0;
+    m_alarmThr = 0.35;
     m_warnThr = 0.5; //contigency value to still spot some problems
     m_ref_efficiencies_bklm = new TH1F("eff_bklm_plane", "Plane Efficiency in BKLM", BKLMElementNumbers::getMaximalLayerGlobalNumber(),
                                        0.5, 0.5 + BKLMElementNumbers::getMaximalLayerGlobalNumber());
@@ -271,16 +273,27 @@ void DQMHistAnalysisKLM2Module::beginRun()
   double unused = NAN;
   //ratio/diff mode should only be possible if references exist
   if (m_refFile && m_refFile->IsOpen()) {
-    // values for LOLO and LOW error are used for alarmThr and warnThr settings
+    // values for LOLO, LOW & High error are used for (run-)stopThr, alarmThr and warnThr settings
     // default values should be initially defined in input parameters?
+    double tempStop = (double) m_stopThr;
     double tempAlarm = (double) m_alarmThr;
     double tempWarn = (double) m_warnThr;
-    requestLimitsFromEpicsPVs("2DEffSettings", tempAlarm, tempWarn, unused, unused);
-    m_alarmThr = (float) std::min(tempAlarm, tempWarn); //lolo
-    m_warnThr = (float) std::max(tempAlarm, tempWarn); //low
+    requestLimitsFromEpicsPVs("2DEffSettings", tempStop, tempAlarm, tempWarn, unused);
+
+    // Create an array of the Thresholds
+    double valuesThr[] = { tempStop, tempAlarm, tempWarn };
+
+    // Sort the array from lowest to highest
+    std::sort(std::begin(valuesThr), std::end(valuesThr));
+
+    // Assign the sorted threshold values
+    m_stopThr = (float)(valuesThr[0]);   // lowest value i.e, //lolo
+    m_alarmThr = (float)(valuesThr[1]);  // middle value i.e, //low
+    m_warnThr = (float)(valuesThr[2]);   // highest value i.e, //high
+
     // EPICS should catch if this happens but just in case
-    if (m_alarmThr > m_warnThr) {
-      B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr is greater than warnThr...");
+    if (m_alarmThr > m_warnThr || m_stopThr > m_warnThr || m_stopThr > m_alarmThr) {
+      B2WARNING("DQMHistAnalysisKLM2Module: Found that alarmThr or alarmStop is greater than warnThr...");
     }
   }
   m_BKLMLayerWarn = 5;
@@ -341,7 +354,8 @@ void DQMHistAnalysisKLM2Module::endRun()
 void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* denominator, TH1* numerator, TCanvas* canvas)
 {
   effHist->Reset();
-  TH1* effClone = (TH1*)effHist->Clone(); //will be useful for delta plots
+  std::unique_ptr<TH1> effClone(static_cast<TH1*>
+                                (effHist->Clone()));   // Clone effHist, will be useful for delta plots & Smart pointer will mange memory leak
   canvas->cd();
   if (denominator != nullptr && numerator != nullptr) {
     effHist->Divide(numerator, denominator, 1, 1, "B");
@@ -360,13 +374,12 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
     if ((deltaNumer != nullptr) && (deltaDenom != nullptr)) {
       B2INFO("DQMHistAnalysisKLM2: Eff Delta Num/Denom Entries is " << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
-      effClone->SetLineColor(kBlackBody);
-      effClone->Draw("SAME");
+      effClone->SetLineColor(kOrange);
+      effClone->DrawCopy("SAME"); // managed by ROOT, so it helpes in plotting even if obj deleted by smart pointer
       canvas->Modified();
       canvas->Update();
     }
   }
-
 }
 
 void DQMHistAnalysisKLM2Module::processPlaneHistogram(
@@ -443,11 +456,14 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   float minVal = m_min;
   float alarmThr = m_alarmThr;
   float warnThr = m_warnThr;
+  float stopThr = m_stopThr;
   float eff2dVal;
   bool setAlarm = false;
   bool setWarn = false;
   bool setFew = false;
   int mainEntries;
+
+  errHist->Reset(); // Reset histogram
 
   *pvcount = 0; //initialize to zero
   mainEntries = mainHist->GetEntries();
@@ -498,34 +514,27 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
         }
 
         // set alarm
-        if (eff2dVal < warnThr) {
-          *pvcount += 1;
-        }
-        if (eff2dVal < alarmThr) {
-          if (mainEntries < (int)m_minEntries) {
-            setFew = true;
-            B2DEBUG(1, "Alarm Set to be grey for 2D Canvas: Low Statistics");
-          } else {
-            setAlarm = true;
-            B2DEBUG(1, "Alarm Set to be red for threshold warning.");
+        if (mainEntries < (int)m_minEntries) {
+          setFew = true;
+        } else {
+          if (eff2dVal < warnThr) {
+            *pvcount += 1;
+            if ((eff2dVal <= alarmThr) && (eff2dVal >= stopThr)) {
+              setWarn = true;
+            } else if (eff2dVal < stopThr) {
+              setAlarm = true;
+            }
           }
         }
 
       }
-
       i++;
     }//end of bin y
 
   }//end of bin x
 
   if (*pvcount > (int) layerLimit) {
-    if (mainEntries < (int)m_minEntries) {
-      setFew = true;
-      B2DEBUG(1, "Alarm Set to be grey for ineff Layer Count: Low statistics");
-    } else {
-      setWarn = true;
-      B2DEBUG(1, "Alarm Set to be yellow for ineff Layer Count warning.");
-    }
+    setAlarm = true;
   }
 
   eff2dHist->SetMinimum(minVal);

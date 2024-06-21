@@ -252,15 +252,15 @@ void DQMHistAnalysisTrackingAbortModule::event()
   TH1F* hAverage_out_BF = (TH1F*)findHist("TrackingAbort_before_filter/averages_OUT");
   if (hAverage_out_BF != nullptr) scaleAndSendToMirabelle(hAverage_out_BF, nEventsOUTbf, "BeforeFilter_outActiveVeto");
 
-  // average SVD L3V Occupancy to Mirabelle
-  TH1* hL3VOccIn = findHist("TrackingAbort/SVDL3UOcc_IN");
-  if (hL3VOccIn != nullptr) m_monObj->setVariable("svdL3VOcc_inActiveVeto", hL3VOccIn->GetMean());
-  TH1* hL3VOccOut = findHist("TrackingAbort/SVDL3UOcc_OUT");
-  if (hL3VOccOut != nullptr) m_monObj->setVariable("svdL3VOcc_outActiveVeto", hL3VOccOut->GetMean());
-  TH1* hL3VOccIn_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_IN");
-  if (hL3VOccIn_BF != nullptr) m_monObj->setVariable("svdL3VOccBeforeFilter_inActiveVeto", hL3VOccIn_BF->GetMean());
-  TH1* hL3VOccOut_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_OUT");
-  if (hL3VOccOut_BF != nullptr) m_monObj->setVariable("svdL3VOccBeforeFilter_outActiveVeto", hL3VOccOut_BF->GetMean());
+  // average SVD L3U Occupancy to Mirabelle
+  TH1* hL3UOccIn = findHist("TrackingAbort/SVDL3UOcc_IN");
+  if (hL3UOccIn != nullptr) m_monObj->setVariable("svdL3UOcc_inActiveVeto", hL3UOccIn->GetMean());
+  TH1* hL3UOccOut = findHist("TrackingAbort/SVDL3UOcc_OUT");
+  if (hL3UOccOut != nullptr) m_monObj->setVariable("svdL3UOcc_outActiveVeto", hL3UOccOut->GetMean());
+  TH1* hL3UOccIn_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_IN");
+  if (hL3UOccIn_BF != nullptr) m_monObj->setVariable("svdL3UOccBeforeFilter_inActiveVeto", hL3UOccIn_BF->GetMean());
+  TH1* hL3UOccOut_BF = findHist("TrackingAbort_before_filter/SVDL3UOcc_OUT");
+  if (hL3UOccOut_BF != nullptr) m_monObj->setVariable("svdL3UOccBeforeFilter_outActiveVeto", hL3UOccOut_BF->GetMean());
 
 
   // average n CDC extra hits to Mirabelle

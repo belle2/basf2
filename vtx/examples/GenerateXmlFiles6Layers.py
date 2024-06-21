@@ -322,9 +322,6 @@ for i in range(0, 3):
     f.write('  </Sensor>\n')
     f.write('\n')
 
-
-f.write('\n')
-
 Material = 'ColdAir'
 thinW = activeW
 thinL = activeL*4

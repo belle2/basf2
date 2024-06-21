@@ -29,9 +29,6 @@ namespace Belle2 {
     /** Name of the new created anti-list */
     std::string m_newAntiParticleList;
 
-    /** Anti-list flag */
-    bool m_isSelfConjugatedParticle;
-
   public:
     /** Constructor. */
     ParticleMassHypothesesUpdaterModule();

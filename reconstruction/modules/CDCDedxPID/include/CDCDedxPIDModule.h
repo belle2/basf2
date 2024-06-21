@@ -35,7 +35,7 @@
 #include <reconstruction/dbobjects/CDCDedxSigmaPars.h>
 #include <reconstruction/dbobjects/CDCDedxHadronCor.h>
 #include <reconstruction/dbobjects/CDCDedxInjectionTime.h>
-#include <reconstruction/dbobjects/DedxPDFs.h>
+#include <cdc/dbobjects/CDCdEdxPDFs.h>
 
 #include <vector>
 
@@ -151,7 +151,7 @@ namespace Belle2 {
     std::vector<double> m_sigmapars; /**< dE/dx resolution parameters */
 
     // pdfs for PID
-    DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
+    DBObjPtr<CDCdEdxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
 
     bool m_trackLevel; /**< Whether to use track-level or hit-level MC */
     bool m_usePrediction; /**< Whether to use parameterized means and resolutions or lookup tables */

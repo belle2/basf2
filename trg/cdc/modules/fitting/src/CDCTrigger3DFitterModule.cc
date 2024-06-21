@@ -378,8 +378,9 @@ CDCTrigger3DFitterModule::getIWireBegin(double phi0, double omega)
     if (iLayerInSL % 2 == 1) iWireCross -= 0.5; // odd layer is shifted by the half cell
 
     // iWireBegin <= iWireCross < iWireEnd
-    int iWireBegin, iWireEnd;
+    int iWireBegin;
     if (iStereoSuperLayer == 0 || iStereoSuperLayer == 2) { // phiFW > phiBW
+      int iWireEnd;
       iWireEnd = (int)(ceil(iWireCross)) % m_nWire[iLayer];
       iWireBegin = (iWireEnd - 10 + m_nWire[iLayer]) % m_nWire[iLayer];
     } else { // phiBW > phiFW

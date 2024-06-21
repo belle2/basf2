@@ -86,4 +86,4 @@ b2.conditions.prepend_globaltag('tracking_data_Moriond23_v1')
 ma.scaleTrackMomenta('B0:sig', payloadName='tracking_momentumScaleFactor_global', scalingFactorName='sf_global_central', path=path)
 [INFO] Convert the localfile to a payload
 [INFO] Conditions Database: found working metadata provider
-[INFO] Conditions data: configured globaltag is main_2023-09-18
+[INFO] Conditions data: configured globaltag is ${default_globaltag}

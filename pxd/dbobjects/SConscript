@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['$ROOT_LIBS', 'vxd_dbobjects']
+env['LIBS'] = ['$ROOT_LIBS', 'vxd_dbobjects', 'framework']
 env['SUBLIB'] = True
 
 Return('env')

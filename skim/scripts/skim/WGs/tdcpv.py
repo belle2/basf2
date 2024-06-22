@@ -134,8 +134,8 @@ class TDCPV_qqs(BaseSkim):
         ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
 
     def build_lists(self, path):
-        vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
-        vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_eventshape)')
+        vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
+        vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_qqs_eventshape)')
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
         btotcpvcuts = '5.18 < Mbc and abs(deltaE) < 0.52'
@@ -186,12 +186,12 @@ class TDCPV_qqs(BaseSkim):
             ma.reconstructDecay('B+:TDCPV_qqs' + str(chID) + ' -> ' + channel, btotcpvcuts, chID, path=path)
             bu_qqs_List.append('B+:TDCPV_qqs' + str(chID))
 
-        ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
+        ma.fillParticleList(decayString='pi+:TDCPV_qqs_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
-        ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
+        ma.fillParticleList(decayString='gamma:TDCPV_qqs_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
-        ma.buildEventShape(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'],
+        ma.buildEventShape(inputListNames=['pi+:TDCPV_qqs_eventshape', 'gamma:TDCPV_qqs_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,
@@ -203,7 +203,7 @@ class TDCPV_qqs(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
+        ma.buildEventKinematics(inputListNames=['pi+:TDCPV_qqs_eventshape', 'gamma:TDCPV_qqs_eventshape'], path=path)
 
         EventCuts = [
             "nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>1",
@@ -328,8 +328,8 @@ class TDCPV_ccs(BaseSkim):
         ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
 
     def build_lists(self, path):
-        vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_eventshape)')
-        vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_eventshape)')
+        vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_ccs_eventshape)')
+        vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_ccs_eventshape)')
         vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
 
         btotcpvcuts = 'Mbc > 5.18 and abs(deltaE) < 0.52'
@@ -373,12 +373,12 @@ class TDCPV_ccs(BaseSkim):
                                                   recoList=f'_reco{chID}')
             b0toJPsiKL_List.append('B0:TDCPV_JPsiKL' + str(chID))
 
-        ma.fillParticleList(decayString='pi+:TDCPV_eventshape',
+        ma.fillParticleList(decayString='pi+:TDCPV_ccs_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
-        ma.fillParticleList(decayString='gamma:TDCPV_eventshape',
+        ma.fillParticleList(decayString='gamma:TDCPV_ccs_eventshape',
                             cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
 
-        ma.buildEventShape(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'],
+        ma.buildEventShape(inputListNames=['pi+:TDCPV_ccs_eventshape', 'gamma:TDCPV_ccs_eventshape'],
                            allMoments=False,
                            foxWolfram=True,
                            harmonicMoments=False,
@@ -390,7 +390,7 @@ class TDCPV_ccs(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.buildEventKinematics(inputListNames=['pi+:TDCPV_eventshape', 'gamma:TDCPV_eventshape'], path=path)
+        ma.buildEventKinematics(inputListNames=['pi+:TDCPV_ccs_eventshape', 'gamma:TDCPV_ccs_eventshape'], path=path)
 
         EventCuts = [
             "nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3",

@@ -877,7 +877,7 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
             path=path)
 
         ma.reconstructDecay(
-             decayString=f'ap:{skim_str} -> e+:{darkPhoton_str}__DielectronPlusVisibleDarkHiggs '
+             decayString=f'ap:{skim_str} -> e+:{darkPhoton_str}_DielectronPlusVisibleDarkHiggs '
                          f'e-:{darkPhoton_str}_DielectronPlusVisibleDarkHiggs',
              cut='',
              path=path)

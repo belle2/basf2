@@ -27,7 +27,6 @@ PIDLikelihood::PIDLikelihood()
       m_logl[i][k] = 0.0;
     }
   }
-  m_preOfficialLikelihoods["klmMuonIDDNN"] = -1.0;
 }
 
 
@@ -286,7 +285,7 @@ void PIDLikelihood::addPreOfficialLikelihood(const std::string& preOfficialIdent
 double PIDLikelihood::getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const
 {
   if (m_preOfficialLikelihoods.count(preOfficialIdentifier) == 0) {
-    B2ERROR("PIDLikelihood::getPreOfficialLikelihood: preOfficialIdentifier " << preOfficialIdentifier << " does not exist. ");
+    B2WARNING("PIDLikelihood::getPreOfficialLikelihood: preOfficialIdentifier " << preOfficialIdentifier << " does not exist. ");
     return -1.0;
   }
   return m_preOfficialLikelihoods.at(preOfficialIdentifier);

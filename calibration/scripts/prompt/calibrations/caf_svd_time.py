@@ -547,7 +547,7 @@ def get_calibrations(input_data, **kwargs):
     shift_calibration.strategies = strategies.SingleIOV
 
     for algorithm in shift_calibration.algorithms:
-        algorithm.params = {"iov_coverage": output_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     if "timeShiftCalibration" not in listOfMutedCalibrations:
         list_of_calibrations.append(shift_calibration)

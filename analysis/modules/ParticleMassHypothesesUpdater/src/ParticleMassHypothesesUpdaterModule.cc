@@ -26,11 +26,15 @@ REG_MODULE(ParticleMassHypothesesUpdater);
 ParticleMassHypothesesUpdaterModule::ParticleMassHypothesesUpdaterModule(): Module()
 {
   // Set module properties
-  setDescription("This module creates a new particle list with the desired pdg code using tracks from an input particle list (basically updates the mass hypotheses of the input list).");
+  setDescription("This module updates the mass hypothesis of particleList to pdgCode. "
+                 "The module creates a new particle list containing copies of the original particles, with updated mass hypotheses. "
+                 "The newly created particle list is named after the input one plus the suffix ``_converted_from_`` and the old mass hypothesis, "
+                 "e.g. ``e+:mylist`` to pdgCode = 13 becomes ``mu+:mylist_converted_from_e``. "
+                 "The only supported mass hypotheses are electrons, muons, kaons, pions and protons (for both input and output lists).");
   setPropertyFlags(c_ParallelProcessingCertified);
   // Parameter definition
   addParam("particleList", m_particleList, "Input ParticleList", string());
-  addParam("pdgCode", m_newPdgCode, "PDG code for mass reference", Const::photon.getPDGCode());
+  addParam("pdgCode", m_newPdgCode, "Target PDG code for mass reference.", Const::electron.getPDGCode());
   addParam("writeOut", m_writeOut,
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
 }
@@ -69,8 +73,6 @@ void ParticleMassHypothesesUpdaterModule::initialize()
   m_newAntiParticleList = ParticleListName::antiParticleListName(m_newParticleList);
   StoreObjPtr<ParticleList> antiParticleList(m_newAntiParticleList);
   antiParticleList.registerInDataStore(flags);
-
-  return;
 }
 
 void ParticleMassHypothesesUpdaterModule::event()

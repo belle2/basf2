@@ -49,7 +49,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Returns default torch model
     """
 
-    state = State(myModel(number_of_features).to("cuda" if torch.cuda.is_available() else "cpu"))
+    state = State(myModel(number_of_features).to("cpu"))
     print(state.model)
 
     state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-2))

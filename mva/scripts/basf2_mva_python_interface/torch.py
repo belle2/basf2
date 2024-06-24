@@ -77,8 +77,11 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     Returns default torch model
     """
 
-    state = State(myModel().to("cuda" if torch.cuda.is_available() else "cpu"))
+    state = State(myModel(number_of_features).to("cpu"))
     print(state.model)
+
+    if parameters is None:
+        parameters = {}
 
     state.optimizer = torch.optim.SGD(state.model.parameters(), parameters.get('learning_rate', 1e-3))
 
@@ -94,7 +97,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
     Passes in a fraction of events if specific_options.m_training_fraction is set.
     """
     # transform to torch tensor and store the validation sample for later use
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
     state.Xtest = torch.from_numpy(Xtest).to(device)
     state.ytest = torch.from_numpy(ytest).to(device)
     state.wtest = torch.from_numpy(wtest).to(device)
@@ -113,7 +116,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     This can then be loaded into torch in any way you want.
     """
     # transform to torch tensor
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+    device = "cpu"
     tensor_x = torch.from_numpy(X).to(device)
     tensor_y = torch.from_numpy(y).to(device).type(torch.float)
     tensor_w = torch.from_numpy(w).to(device)
@@ -189,7 +192,7 @@ def load(obj):
         # model.load_state_dict(torch.load(temp_path.joinpath(file_names[0])))
         model = torch.load(temp_path.joinpath(file_names[0]))
         model.eval()  # sets dropout and batch norm layers to eval mode
-        device = "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cpu"
         model.to(device)
         state = State(model)
 

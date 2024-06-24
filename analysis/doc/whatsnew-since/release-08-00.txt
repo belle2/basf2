@@ -1,3 +1,6 @@
+Changes in the analysis package in light-xxxx-xxxx
+---------------------------------------------------
+
 Variables
 +++++++++
 * Added a new Neural-Network based KLM muon probability variable `klmMuonIDDNN` (for expert use only). 

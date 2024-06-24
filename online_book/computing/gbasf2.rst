@@ -420,7 +420,7 @@ Everything clear? Ok, let's submit your first jobs.
 
 
 Let's use the steering file located at
-``~jbennett/public/gbasf2Tutorial/Reconstruct_Bd2JpsiKS_template.py`` on KEKCC (take a look at what contains).
+``~jbennett/public/gbasf2Tutorial/Reconstruct_Bd2JpsiKS_template.py`` on KEKCC (take a look at what it contains).
 If we are interested in running over a generic uubar sample, then the LFN of one datablock is
 ``/belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst/sub00``.
 

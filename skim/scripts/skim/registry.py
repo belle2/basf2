@@ -159,8 +159,8 @@ _RegisteredSkims = [
     ("17222100", "charm", "DpToKsHp"),  # D+ -> Ks pi+
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
-    ("17220100", "charm", "DpToPipepem"),  # D+ -> pi+ e+ e-
-    ("17220200", "charm", "DpToPipmupmum"),  # D+ -> pi+ mu+ mu-
+    ("17220100", "charm", "DpToPipEpEm"),  # D+ -> pi+ e+ e-
+    ("17220200", "charm", "DpToPipMupMum"),  # D+ -> pi+ mu+ mu-
     ("17220300", "charm", "DpToPipKpKm"),  # D+ -> pi+ K+ K-
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0

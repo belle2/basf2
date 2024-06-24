@@ -105,7 +105,7 @@ namespace Belle2 {
     TH2F* m_hHit  = nullptr;         /**< Histogram of Hits for all layers (0-55) */
     TH2F* m_hBit = nullptr;          /**< Histogram of online databit removed */
     TH1F* m_hPhi = nullptr;          /**< Histogram of cdc phi of IP tracks*/
-    TH2F* m_hPhiIndex = nullptr;     /**< Histogram of cdc phi of offIP tracks */
+    TH2F* m_hPhiIndex = nullptr;     /**< Histogram of cdc phi of different IP + skims tracks */
     TH2F* m_hPhiEff = nullptr;       /**< Histogram of cdc phi of tracking eff */
     TH2F* m_hPhiHit  = nullptr;      /**< Histogram of track associated hits in phi vs layer  */
 

@@ -195,7 +195,7 @@ void CDCDQMModule::event()
 
     double phiDegree = fitresult->getPhi() / Unit::deg;
 
-    if (fitresult->getD0() > 1.0 || fitresult->getZ0() > 1.0) {
+    if (fabs(fitresult->getD0()) > 1.0 || fabs(fitresult->getZ0()) > 1.0) {
       //Off IP tracks
       m_hPhiIndex->Fill(phiDegree, 0.5); //all skims
       if (IsBhabha) iselect = 1.5;

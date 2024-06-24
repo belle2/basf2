@@ -113,5 +113,6 @@ namespace Belle2 {
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
     std::string m_eventType; /**< EventType to be filled */
 
+    bool m_ignoreCommandLineOverride;
   };
 } // end namespace Belle2

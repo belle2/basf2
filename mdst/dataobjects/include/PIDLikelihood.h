@@ -11,6 +11,9 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 
+#include <map>
+#include <string>
+
 namespace Belle2 {
 
   /**
@@ -148,7 +151,9 @@ namespace Belle2 {
 
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
     float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
-    std::map<std::string, double> m_preOfficialLikelihoods; /**< pre-official likelihood */
+
+    /// Internal storage of pre-official likelihood.
+    std::map<std::string, double> m_preOfficialLikelihoods;
 
     /**
      * Calculate likelihood probabilities

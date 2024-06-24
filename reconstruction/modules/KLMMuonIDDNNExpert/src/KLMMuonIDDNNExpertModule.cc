@@ -42,6 +42,7 @@ KLMMuonIDDNNExpertModule::KLMMuonIDDNNExpertModule() : Module()
 {
   // Set module properties
   setDescription(R"DOC(Get information from KLMMuIDLikelihood)DOC");
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Parameter definitions
   addParam("identifier", m_identifier,

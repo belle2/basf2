@@ -1,9 +1,15 @@
+Variables
++++++++++
+* Added a new Neural-Network based KLM muon probability variable `klmMuonIDDNN` (for expert use only). 
+
+
 Changes in the analysis package in light-2405-quaxo
 ---------------------------------------------------
 
 Modules
 +++++++
 * Removed the cut functionality from the `KlongMomentumCalculatorExpert` module.
+* Added the :ref:`analysis_reweighting` python script that can add correction table weights to analysis ntuples.
 
 Variables
 +++++++++

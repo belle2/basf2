@@ -47,11 +47,6 @@ KLMMuonIDDNNExpertModule::KLMMuonIDDNNExpertModule() : Module()
   addParam("identifier", m_identifier,
            "Database identifier or file used to load the weights.",
            m_identifier);
-
-  addParam("retrain", m_retrain,
-           "Bool denoting whether to retrain KLMMuonIDDNNExpert. If set true, this module will write input variables to KLMMuonIDDNNInputVariable dataobject and register it to DataStore.",
-           m_retrain);
-
 }
 
 KLMMuonIDDNNExpertModule::~KLMMuonIDDNNExpertModule()
@@ -62,10 +57,8 @@ void KLMMuonIDDNNExpertModule::initialize()
 {
   m_tracks.isRequired();
 
-  if (m_retrain) {
-    m_inputVariable.registerInDataStore();
-    m_tracks.registerRelationTo(m_inputVariable);
-  }
+  m_inputVariable.registerInDataStore();
+  m_tracks.registerRelationTo(m_inputVariable);
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
@@ -236,11 +229,9 @@ float KLMMuonIDDNNExpertModule::getNNmuProbability(const Track* track, const KLM
     m_dataset->m_input[5 + 4 * layer + 3] = m_hitpattern_hasext.at(layer); // hasext
   }
 
-  if (m_retrain) {
-    KLMMuonIDDNNInputVariable* inputVariable = m_inputVariable.appendNew();
-    inputVariable->setKLMMuonIDDNNInputVariable(m_dataset->m_input);
-    track->addRelationTo(inputVariable);
-  }
+  KLMMuonIDDNNInputVariable* inputVariable = m_inputVariable.appendNew();
+  inputVariable->setKLMMuonIDDNNInputVariable(m_dataset->m_input);
+  track->addRelationTo(inputVariable);
 
   float muprob_nn = m_expert->apply(*m_dataset)[0];
   return muprob_nn;

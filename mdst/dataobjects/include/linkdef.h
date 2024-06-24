@@ -12,7 +12,7 @@
 #pragma link C++ class Belle2::PIDLikelihood+; // checksum=0xf007f770, version=4
 #pragma link C++ class Belle2::ECLCluster+; // checksum=0x31d0dad4, version=15
 
-#pragma link C++ class Belle2::KLMCluster+; // checksum=0x9be09a36, version=2
+#pragma link C++ class Belle2::KLMCluster+; // checksum=0x5496e711, version=3
 #pragma link C++ class Belle2::KlId+; // checksum=0xdc073aa, version=2
 
 #pragma link C++ class Belle2::EventLevelClusteringInfo+; // checksum=0x71a4f53c, version=4

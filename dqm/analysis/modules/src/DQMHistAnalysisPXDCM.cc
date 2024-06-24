@@ -283,6 +283,7 @@ void DQMHistAnalysisPXDCMModule::event()
         tt->SetTextSize(0.035);
         tt->SetTextAngle(90);// Rotated
         tt->SetTextAlign(12);// Centered
+        ltmap[it] = tt;
       }
       tt->Draw();
     }
@@ -296,5 +297,10 @@ void DQMHistAnalysisPXDCMModule::event()
 void DQMHistAnalysisPXDCMModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDCM: terminate called");
+
+  if (m_cCommonModeDelta) delete m_cCommonModeDelta;
+  if (m_hCommonModeDelta) delete m_hCommonModeDelta;
+  if (m_line10) delete m_line10;
+  if (m_lineOutside) delete m_lineOutside;
 }
 

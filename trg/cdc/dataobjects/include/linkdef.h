@@ -10,9 +10,9 @@
 // ROOT dictionaries will be build for all classes mentioned this way
 #pragma link C++ class bitset <639>+; // checksum=0x88f24d, version=2
 #pragma link C++ class bitset <256>+; // checksum=0x88f1ea, version=2
-#pragma link C++ class Belle2::CDCTriggerSegmentHit+; // checksum=0x89ed4679, version=4
+#pragma link C++ class Belle2::CDCTriggerSegmentHit+; // checksum=0x6ce27e6c, version=5
 #pragma link C++ class Belle2::CDCTriggerTrack+; // checksum=0xa6eb4663, version=14
-#pragma link C++ class Belle2::CDCTriggerMLP+; // checksum=0x2a3c1c8d, version=10
+#pragma link C++ class Belle2::CDCTriggerMLP+; // checksum=0x67ae26ef, version=11
 #pragma link C++ class Belle2::CDCTriggerMLPData+; // checksum=0x62b29f0b, version=3
 #pragma link C++ class Belle2::CDCTriggerMLPInput+; // checksum=0x6fd59940, version=1
 #pragma link C++ class Belle2::CDCTriggerHoughCluster+; // checksum=0x219165f4, version=2

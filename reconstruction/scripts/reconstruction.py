@@ -77,9 +77,11 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                        trackFitHypotheses=None, addClusterExpertModules=True,
                        use_second_cdc_hits=False, add_muid_hits=False, reconstruct_cdst=None,
                        event_abort=default_event_abort, use_random_numbers_for_hlt_prescale=True,
-                       pxd_filtering_offline=False, append_full_grid_cdc_eventt0=True,
+                       pxd_filtering_offline=False,
+                       create_intercepts_for_pxd_ckf=False,
+                       append_full_grid_cdc_eventt0=True,
                        legacy_ecl_charged_pid=False, emulate_HLT=False,
-                       skip_full_grid_cdc_eventt0_if_svd_time_present=True, retrain_KLMMuonIDDNNExpert=False):
+                       skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of clustering, tracking and the PID modules essentially in this structure:
@@ -119,6 +121,9 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         generated numbers, otherwise are applied using an internal counter.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
@@ -129,9 +134,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         FullGridChi2TrackTimeExtractor is only executed in the events where no SVD-based EventT0 is found. If false, but
         append_full_grid_cdc_eventt0 is true, FullGridChi2TrackTimeExtractor will be executed in each event regardless of
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
-    :param retrain_KLMMuonIDDNNExpert: Bool denoting whether to retrain KLMMuonIDDNNExpert.
-           If set True, KLMMuonIDDNNInputVariable dataobject will be registered in DataStore.
     """
+
+    # Set the run for beam data
+    basf2.declare_beam()
 
     # By default, the FullGrid module is not used in the reconstruction chain.
     # It is needed for detectors that perform post-tracking calibration with respect to CDC EventT0 using cDST
@@ -152,6 +158,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                  reconstruct_cdst=reconstruct_cdst,
                                  event_abort=event_abort,
                                  pxd_filtering_offline=pxd_filtering_offline,
+                                 create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
                                  append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
@@ -166,8 +173,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
                                   pruneTracks=pruneTracks,
                                   addClusterExpertModules=addClusterExpertModules,
                                   reconstruct_cdst=reconstruct_cdst,
-                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                  retrain_KLMMuonIDDNNExpert=retrain_KLMMuonIDDNNExpert)
+                                  legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
     # Add the modules calculating the software trigger skims
     if add_trigger_calculation and (not components or ("CDC" in components and "ECL" in components and "KLM" in components)):
@@ -184,6 +190,7 @@ def add_prefilter_reconstruction(path,
                                  reconstruct_cdst=None,
                                  event_abort=default_event_abort,
                                  pxd_filtering_offline=False,
+                                 create_intercepts_for_pxd_ckf=False,
                                  append_full_grid_cdc_eventt0=True,
                                  skip_full_grid_cdc_eventt0_if_svd_time_present=True):
     """
@@ -210,6 +217,9 @@ def add_prefilter_reconstruction(path,
         but just remove all data except for the event information.
     :param pxd_filtering_offline: If True, PXD data reduction (ROI filtering) is applied during the track reconstruction.
         The reconstructed SVD/CDC tracks are used to define the ROIs and reject all PXD clusters outside of these.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     :param append_full_grid_cdc_eventt0: If True, the module FullGridChi2TrackTimeExtractor is added to the path
                                       and provides the CDC temporary EventT0.
     :param skip_full_grid_cdc_eventt0_if_svd_time_present: if true, and if also append_full_grid_cdc_eventt0 is true, the
@@ -241,6 +251,7 @@ def add_prefilter_reconstruction(path,
         trackFitHypotheses=trackFitHypotheses,
         use_second_cdc_hits=use_second_cdc_hits,
         pxd_filtering_offline=pxd_filtering_offline,
+        create_intercepts_for_pxd_ckf=create_intercepts_for_pxd_ckf,
         append_full_grid_cdc_eventt0=append_full_grid_cdc_eventt0,
         skip_full_grid_cdc_eventt0_if_svd_time_present=skip_full_grid_cdc_eventt0_if_svd_time_present)
 
@@ -267,8 +278,7 @@ def add_postfilter_reconstruction(path,
                                   pruneTracks=False,
                                   addClusterExpertModules=True,
                                   reconstruct_cdst=None,
-                                  legacy_ecl_charged_pid=False,
-                                  retrain_KLMMuonIDDNNExpert=False):
+                                  legacy_ecl_charged_pid=False):
     """
     This function adds the reconstruction modules not required to calculate HLT filter decision to a path.
 
@@ -282,8 +292,6 @@ def add_postfilter_reconstruction(path,
         required PXD objects won't be added.
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
-    :param retrain_KLMMuonIDDNNExpert: Bool denoting whether to retrain KLMMuonIDDNNExpert.
-           If set True, KLMMuonIDDNNInputVariable dataobject will be registered in DataStore.
     """
 
     # Add postfilter tracking reconstruction modules
@@ -302,8 +310,7 @@ def add_postfilter_reconstruction(path,
     add_postfilter_posttracking_reconstruction(path,
                                                components=components,
                                                addClusterExpertModules=addClusterExpertModules,
-                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                               retrain_KLMMuonIDDNNExpert=retrain_KLMMuonIDDNNExpert)
+                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid)
     # Prune tracks
     if pruneTracks:
         add_prune_tracks(path, components)
@@ -356,6 +363,9 @@ def add_cosmics_reconstruction(
       MVA based charged particle ID (false).
     """
 
+    # Set the run for cosmics data
+    basf2.declare_cosmics()
+
     # Check components.
     check_components(components)
 
@@ -405,6 +415,9 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True, addClusterExp
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
     """
+
+    # Set the run for beam data
+    basf2.declare_beam()
 
     # Add modules that have to be run before track reconstruction
     add_prefilter_pretracking_reconstruction(path,
@@ -484,8 +497,7 @@ def add_postfilter_posttracking_reconstruction(path,
                                                addClusterExpertModules=True,
                                                cosmics=False,
                                                for_cdst_analysis=False,
-                                               legacy_ecl_charged_pid=False,
-                                               retrain_KLMMuonIDDNNExpert=False):
+                                               legacy_ecl_charged_pid=False):
     """
     This function adds to the path the standard reconstruction modules whoose outputs are not needed in the filter.
 
@@ -498,8 +510,6 @@ def add_postfilter_posttracking_reconstruction(path,
            This is only needed by prepare_cdst_analysis().
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
-    :param retrain_KLMMuonIDDNNExpert: Bool denoting whether to retrain KLMMuonIDDNNExpert.
-           If set True, KLMMuonIDDNNInputVariable dataobject will be registered in DataStore.
     """
 
     # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
@@ -514,7 +524,7 @@ def add_postfilter_posttracking_reconstruction(path,
         path.add_module("OnlineEventT0Creator")
 
     add_ecl_chargedpid_module(path, components, legacy_ecl_charged_pid)
-    add_pid_module(path, components, retrain_KLMMuonIDDNNExpert)
+    add_pid_module(path, components)
 
     if addClusterExpertModules:
         # FIXME: Disabled for HLT until execution time bug is fixed
@@ -532,8 +542,7 @@ def add_posttracking_reconstruction(path,
                                     for_cdst_analysis=False,
                                     add_eventt0_combiner_for_cdst=False,
                                     eventt0_combiner_mode="prefer_svd",
-                                    legacy_ecl_charged_pid=False,
-                                    retrain_KLMMuonIDDNNExpert=False):
+                                    legacy_ecl_charged_pid=False):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -555,8 +564,6 @@ def add_posttracking_reconstruction(path,
     :param eventt0_combiner_mode: Mode to combine the t0 values of the sub-detectors
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
       MVA based charged particle ID (false).
-    :param retrain_KLMMuonIDDNNExpert: Bool denoting whether to retrain KLMMuonIDDNNExpert.
-           If set True, KLMMuonIDDNNInputVariable dataobject will be registered in DataStore.
     """
 
     add_prefilter_posttracking_reconstruction(path,
@@ -571,8 +578,7 @@ def add_posttracking_reconstruction(path,
                                                addClusterExpertModules=addClusterExpertModules,
                                                cosmics=cosmics,
                                                for_cdst_analysis=for_cdst_analysis,
-                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid,
-                                               retrain_KLMMuonIDDNNExpert=retrain_KLMMuonIDDNNExpert)
+                                               legacy_ecl_charged_pid=legacy_ecl_charged_pid)
 
     # Prune tracks as soon as the post-tracking steps are complete
     # Not add prune tracks modules in prepare_cdst_analysis()
@@ -675,19 +681,17 @@ def add_cluster_expert_modules(path, components=None):
         path.add_module('ClusterMatcher')
 
 
-def add_pid_module(path, components=None, retrain_KLMMuonIDDNNExpert=False):
+def add_pid_module(path, components=None):
     """
     Add the PID modules to the path.
 
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
-    :param retrain_KLMMuonIDDNNExpert: Bool denoting whether to retrain KLMMuonIDDNNExpert.
-           If set True, KLMMuonIDDNNInputVariable dataobject will be registered in DataStore.
     """
     if components is None or 'SVD' in components or 'CDC' in components:
         path.add_module('MdstPID')
-    if components is None or 'KLM' in components:
-        path.add_module('KLMMuonIDDNNExpert', retrain=retrain_KLMMuonIDDNNExpert)
+    if components is None:
+        path.add_module('KLMMuonIDDNNExpert')
 
 
 def add_klm_modules(path, components=None):

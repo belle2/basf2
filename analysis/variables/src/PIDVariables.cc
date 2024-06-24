@@ -12,7 +12,6 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/utility/ReferenceFrame.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 
 // framework aux

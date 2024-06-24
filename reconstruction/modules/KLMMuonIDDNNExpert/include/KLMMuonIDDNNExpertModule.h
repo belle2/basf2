@@ -72,10 +72,10 @@ namespace Belle2 {
 
   private:
 
-    // Required array for Tracks.
+    /** Required array for Tracks. */
     StoreArray<Track> m_tracks;
 
-    // Input variables of DNN. This should only be used for retraining purpose (m_retrain = true).
+    /** Input variables of DNN. */
     StoreArray<KLMMuonIDDNNInputVariable> m_inputVariable;
 
     /**
@@ -100,9 +100,6 @@ namespace Belle2 {
 
     /** Database identifier or file used to load the weights. */
     std::string m_identifier = "KLMMuonIDDNNWeightFile";
-
-    /** If set true, this model will write the input variables to KLMMuonIDDNNInputVariable dataobject. */
-    bool m_retrain = false;
 
     /** Database pointer to the database representation of the weightfile. */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;
@@ -134,6 +131,11 @@ namespace Belle2 {
     /** EKLM scintillator strip width (cm). */
     float m_EndcapScintWidth;
 
+    /**
+     * Get Hit width (cluster size) of a KLMHit2d.
+     * @param[in] klmhit target KLMHit2d object.
+     * @return hit width of the KLMHit2d object.
+     */
     float getHitWidth(const KLMHit2d* klmhit);
 
   };

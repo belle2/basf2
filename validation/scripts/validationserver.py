@@ -277,7 +277,9 @@ def get_project_object(
 
 
 def search_project_issues(
-    gitlab_object: gitlab.Gitlab, search_term: str
+    gitlab_object: gitlab.Gitlab,
+    search_term: str,
+    state: str = 'opened',
 ) -> 'list[gitlab.issues]':
     """
     Search in the Gitlab for open issues that contain the
@@ -289,7 +291,7 @@ def search_project_issues(
 
     issues = gitlab_object.issues.list(
         search=search_term,
-        state='opened',
+        state=state,
         lazy=True,
         scope='all',
         get_all=True,
@@ -311,16 +313,21 @@ def update_linked_issues(
     # collect list of issues validation server has worked with
     search_key = "Automated code, please do not delete"
     issues = search_project_issues(gitlab_object, search_key)
+    past_issues = search_project_issues(gitlab_object, search_key, 'closed')
 
     # find out the plots/scripts linked to the issues
+    # store closed issue ids as -ve numbers to distinguish them from open ones
     plot_issues = collections.defaultdict(list)
     script_issues = collections.defaultdict(list)
     pattern = r"Relevant ([a-z]+): (\w+.*\w*)"
-    for issue in issues:
+    for i, issue in enumerate(issues+past_issues):
         match = re.search(pattern, issue.description)
         if match:
             if match.groups()[0] == 'plot':
-                plot_issues[match.groups()[1]].append(issue.iid)
+                if i >= len(issues):
+                    plot_issues[match.groups()[1]].append(-issue.iid)
+                else:
+                    plot_issues[match.groups()[1]].append(issue.iid)
             else:
                 script_issues[match.groups()[1]].append(issue.iid)
 

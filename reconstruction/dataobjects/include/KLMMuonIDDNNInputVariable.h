@@ -46,6 +46,7 @@ namespace Belle2 {
 
   private:
 
+    /** vector to store the input array of KLMMuonIDDNNExpertModule. */
     std::vector<float> m_dataset;
 
     /** ClassDef. */

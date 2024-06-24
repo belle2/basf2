@@ -206,10 +206,15 @@ void DQMHistAnalysisPXDReductionModule::event()
     if (!std::isnan(m_meanUpperWarn)) m_meanUpperWarnLine->Draw();
     if (!std::isnan(m_meanUpperAlarm)) m_meanUpperAlarmLine->Draw();
     for (auto& it : m_excluded) {
-      auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-      tt->SetTextSize(0.035);
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
+      static std::map <int, TLatex*> ltmap;
+      auto tt = ltmap[it];
+      if (!tt) {
+        tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextSize(0.035);
+        tt->SetTextAngle(90);// Rotated
+        tt->SetTextAlign(12);// Centered
+        ltmap[it] = tt;
+      }
       tt->Draw();
     }
   }
@@ -229,5 +234,14 @@ void DQMHistAnalysisPXDReductionModule::event()
 void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
+
+  if (m_cReduction) delete m_cReduction;
+  if (m_hReduction) delete m_hReduction;
+
+  if (m_meanLine) delete m_meanLine;
+  if (m_meanUpperWarnLine) delete m_meanUpperWarnLine;
+  if (m_meanLowerWarnLine) delete m_meanLowerWarnLine;
+  if (m_meanUpperAlarmLine) delete m_meanUpperAlarmLine;
+  if (m_meanLowerAlarmLine) delete m_meanLowerAlarmLine;
 }
 

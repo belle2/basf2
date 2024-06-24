@@ -132,7 +132,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
   int nEventsIN = 0;
   int nEventsOUT = 0;
 
-  if (hAbortIn != nullptr && hAbortOut) {
+  if (hAbortIn != nullptr && hAbortOut != nullptr) {
 
     nEventsIN = hAbortIn->GetEntries();
     m_monObj->setVariable("nEvents_inActiveVeto", nEventsIN);
@@ -143,8 +143,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
     m_hAbort->SetBinContent(1, hAbortIn->GetBinContent(1) + hAbortOut->GetBinContent(1));
     m_hAbort->SetBinContent(2, hAbortIn->GetBinContent(2) + hAbortOut->GetBinContent(2));
 
-    const double abortRate = m_hAbort->GetMean();
-    m_hAbort->SetTitle(Form("Fraction of Events in which Tracking Aborts = %.4f %%", abortRate * 100));
+    const double abortRate = (double)m_hAbort->GetBinContent(2) / (m_hAbort->GetBinContent(1) + m_hAbort->GetBinContent(2));
+    m_hAbort->SetTitle(Form("[After Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate * 100));
 
     if (nEvents >= m_statThreshold) {
       m_monObj->setVariable("abortRate", abortRate);
@@ -191,7 +191,7 @@ void DQMHistAnalysisTrackingAbortModule::event()
   int nEventsINbf = 0;
   int nEventsOUTbf = 0;
 
-  if (hAbortIn_BF != nullptr && hAbortOut_BF) {
+  if (hAbortIn_BF != nullptr && hAbortOut_BF != nullptr) {
 
     nEventsINbf = hAbortIn_BF->GetEntries();
     m_monObj->setVariable("nEventsBeforeFilter_inActiveVeto", nEventsINbf);
@@ -201,7 +201,8 @@ void DQMHistAnalysisTrackingAbortModule::event()
 
     m_hAbort_BF->SetBinContent(1, hAbortIn_BF->GetBinContent(1) + hAbortOut_BF->GetBinContent(1));
     m_hAbort_BF->SetBinContent(2, hAbortIn_BF->GetBinContent(2) + hAbortOut_BF->GetBinContent(2));
-    const double abortRate_BF = m_hAbort_BF->GetMean();
+
+    const double abortRate_BF = (double)m_hAbort_BF->GetBinContent(2) / (m_hAbort_BF->GetBinContent(1) + m_hAbort_BF->GetBinContent(2));
     m_hAbort_BF->SetTitle(Form("[Before Filter] Fraction of Events in which Tracking Aborts = %.4f %%", abortRate_BF * 100));
 
     if (nEvents_BF >= m_statThreshold) {

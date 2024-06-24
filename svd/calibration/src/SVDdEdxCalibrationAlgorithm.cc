@@ -8,7 +8,6 @@
 
 #include <svd/calibration/SVDdEdxCalibrationAlgorithm.h>
 #include <svd/dbobjects/SVDdEdxPDFs.h>
-#include <tuple>
 
 #include <TROOT.h>
 #include <TStyle.h>
@@ -19,7 +18,6 @@
 #include <TLegend.h>
 #include <TCanvas.h>
 #include <TH1D.h>
-#include <TH2F.h>
 #include <TAxis.h>
 
 #include <RooDataSet.h>
@@ -65,14 +63,14 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   }
 
   // call the calibration functions
-  TH2F h_LambdaP = LambdaMassFit(ttreeLambda);
-  auto [h_DstarK, h_DstarPi, h_DstarMu] = DstarMassFit(ttreeDstar);
-  TH2F h_GammaE = GammaHistogram(ttreeGamma);
+  TH2F hLambdaP = LambdaMassFit(ttreeLambda);
+  auto [hDstarK, hDstarPi, hDstarMu] = DstarMassFit(ttreeDstar);
+  TH2F hGammaE = GammaHistogram(ttreeGamma);
   std::vector<double> pbins = CreatePBinningScheme();
-  TH2F h_Empty("h_Empty", "A histogram returned if we cannot calibrate", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
+  TH2F hEmpty("hEmpty", "A histogram returned if we cannot calibrate", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
-      h_Empty.SetBinContent(pbin, dedxbin, 0.01);
+      hEmpty.SetBinContent(pbin, dedxbin, 0.01);
     };
   }
 
@@ -89,24 +87,24 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
     for (int iPart = 0; iPart < 6; iPart++) {
 
       if (iPart == 0 && trunmean) {
-        hDedxPDFs[iPart] = &h_GammaE;
+        hDedxPDFs[iPart] = &hGammaE;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 1 && trunmean) {
-        hDedxPDFs[iPart] = &h_DstarMu;
+        hDedxPDFs[iPart] = &hDstarMu;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 2 && trunmean) {
-        hDedxPDFs[iPart] = &h_DstarPi;
+        hDedxPDFs[iPart] = &hDstarPi;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 3 && trunmean) {
-        hDedxPDFs[iPart] = &h_DstarK;
+        hDedxPDFs[iPart] = &hDstarK;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       } else if (iPart == 4 && trunmean) {
-        hDedxPDFs[iPart] = &h_LambdaP;
+        hDedxPDFs[iPart] = &hLambdaP;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       }
 
       else
-        hDedxPDFs[iPart] = &h_Empty;
+        hDedxPDFs[iPart] = &hEmpty;
       payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
 
       candEdx->cd(iPart + 1);
@@ -246,49 +244,49 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
       B2FATAL("Lambda: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* LambdaDatasetw_sig = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
-                                                  *LambdaDataset->get());
+  RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
+                                                      *LambdaDataset->get());
 
   RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(LambdaDatasetw_sig->store())->tree())->SetName("treeLambda_sw");
-  TTree* treeLambda_sw = LambdaDatasetw_sig->GetClonedTree();
+  ((RooTreeDataStore*)(LambdaDatasetSWeighted->store())->tree())->SetName("treeLambda_sw");
+  TTree* treeLambda_sw = LambdaDatasetSWeighted->GetClonedTree();
 
   B2INFO("Lambda: sPlot done. Proceed to histogramming");
 
   std::vector<double> pbins = CreatePBinningScheme();
 
-  TH2F* h_LambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
+  TH2F* hLambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
   treeLambda_sw->Draw("p_SVDdEdx:p_p>>hist_d1_2212_trunc", "nSignalLambda_sw * (p_p>0.15) * (p_SVDdEdx>0)", "goff");
 
   // for each momentum bin, normalize the pdf
 
-  // h_LambdaP normalisation
+  // hLambdaP normalisation
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
-      if (h_LambdaP->GetBinContent(pbin, dedxbin) < 0) {
-        h_LambdaP->SetBinContent(pbin, dedxbin, 0);
+      if (hLambdaP->GetBinContent(pbin, dedxbin) < 0) {
+        hLambdaP->SetBinContent(pbin, dedxbin, 0);
       };
     }
     // create a projection (1D histogram) in a given momentum bin
-    TH1D* slice = (TH1D*)h_LambdaP->ProjectionY("slice", pbin, pbin);
+    TH1D* slice = (TH1D*)hLambdaP->ProjectionY("slice", pbin, pbin);
     // normalise, but ignore the cases with empty histograms
     if (slice->Integral() > 0) {
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
-      h_LambdaP->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
+      hLambdaP->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   if (m_isMakePlots) {
-    h_LambdaP->Draw("COLZ");
+    hLambdaP->Draw("COLZ");
     canvLambda->Print("SVDdEdxCalibrationHistoLambda.pdf");
   }
 
-  return *h_LambdaP;
+  return *hLambdaP;
 }
 
 std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTree)
@@ -403,108 +401,108 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       B2FATAL("Dstar: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* DstarDatasetw_sig = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
-                                                 *DstarDataset->get());
+  RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
+                                                     *DstarDataset->get());
 
   RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(DstarDatasetw_sig->store())->tree())->SetName("treeDstar_sw");
-  TTree* treeDstar_sw = DstarDatasetw_sig->GetClonedTree();
+  ((RooTreeDataStore*)(DstarDatasetSWeighted->store())->tree())->SetName("treeDstar_sw");
+  TTree* treeDstar_sw = DstarDatasetSWeighted->GetClonedTree();
 
   B2INFO("Dstar: sPlot done. Proceed to histogramming");
 
   std::vector<double> pbins = CreatePBinningScheme();
 
   // the kaon payload
-  TH2F* h_DstarK = new TH2F("hist_d1_321_trunc", "hist_d1_321_trunc", m_numPBins, pbins.data(),
-                            m_numDEdxBins, 0, m_dedxCutoff);
+  TH2F* hDstarK = new TH2F("hist_d1_321_trunc", "hist_d1_321_trunc", m_numPBins, pbins.data(),
+                           m_numDEdxBins, 0, m_dedxCutoff);
   // the pion payload
-  TH2F* h_DstarPi = new TH2F("hist_d1_211_trunc", "hist_d1_211_trunc", m_numPBins, pbins.data(),
-                             m_numDEdxBins, 0, m_dedxCutoff);
+  TH2F* hDstarPi = new TH2F("hist_d1_211_trunc", "hist_d1_211_trunc", m_numPBins, pbins.data(),
+                            m_numDEdxBins, 0, m_dedxCutoff);
 
   treeDstar_sw->Draw("K_SVDdEdx:K_p>>hist_d1_321_trunc", "nSignalDstar_sw * (K_SVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
-  TH2F* h_DstarPiPart1 = (TH2F*)h_DstarPi->Clone("hist_d1_211_truncPart1");
-  TH2F* h_DstarPiPart2 = (TH2F*)h_DstarPi->Clone("hist_d1_211_truncPart2");
+  TH2F* hDstarPiPart1 = (TH2F*)hDstarPi->Clone("hist_d1_211_truncPart1");
+  TH2F* hDstarPiPart2 = (TH2F*)hDstarPi->Clone("hist_d1_211_truncPart2");
 
   treeDstar_sw->Draw("pi_SVDdEdx:pi_p>>hist_d1_211_truncPart1", "nSignalDstar_sw * (pi_SVDdEdx>0)", "goff");
   treeDstar_sw->Draw("piS_SVDdEdx:piS_p>>hist_d1_211_truncPart2", "nSignalDstar_sw * (piS_SVDdEdx>0)", "goff");
-  h_DstarPi->Add(h_DstarPiPart1);
-  h_DstarPi->Add(h_DstarPiPart2);
+  hDstarPi->Add(hDstarPiPart1);
+  hDstarPi->Add(hDstarPiPart2);
 
   // the current strategy assumes that the muon and pion payloads are indistinguishable: clone the pion one
-  TH2F* h_DstarMu = (TH2F*)h_DstarPi->Clone("hist_d1_13_trunc");
-  h_DstarMu->SetTitle("hist_d1_13_trunc");
-  // h_DstarK normalisation
+  TH2F* hDstarMu = (TH2F*)hDstarPi->Clone("hist_d1_13_trunc");
+  hDstarMu->SetTitle("hist_d1_13_trunc");
+  // hDstarK normalisation
   // for each momentum bin, normalize the pdf
 
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
-      if (h_DstarK->GetBinContent(pbin, dedxbin) < 0) {
-        h_DstarK->SetBinContent(pbin, dedxbin, 0);
+      if (hDstarK->GetBinContent(pbin, dedxbin) < 0) {
+        hDstarK->SetBinContent(pbin, dedxbin, 0);
       };
     }
     // create a projection (1D histogram) in a given momentum bin
-    TH1D* slice = (TH1D*)h_DstarK->ProjectionY("slice", pbin, pbin);
+    TH1D* slice = (TH1D*)hDstarK->ProjectionY("slice", pbin, pbin);
     // normalise, but ignore the cases with empty histograms
     if (slice->Integral() > 0) {
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
-      h_DstarK->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
+      hDstarK->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
-  // h_DstarPi normalisation
+  // hDstarPi normalisation
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
-      if (h_DstarPi->GetBinContent(pbin, dedxbin) < 0) {
-        h_DstarPi->SetBinContent(pbin, dedxbin, 0);
+      if (hDstarPi->GetBinContent(pbin, dedxbin) < 0) {
+        hDstarPi->SetBinContent(pbin, dedxbin, 0);
       };
     }
     // create a projection (1D histogram) in a given momentum bin
-    TH1D* slice = (TH1D*)h_DstarPi->ProjectionY("slice", pbin, pbin);
+    TH1D* slice = (TH1D*)hDstarPi->ProjectionY("slice", pbin, pbin);
     // normalise, but ignore the cases with empty histograms
     if (slice->Integral() > 0) {
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
-      h_DstarPi->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
+      hDstarPi->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
-  // h_DstarMu normalisation
+  // hDstarMu normalisation
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
-      if (h_DstarMu->GetBinContent(pbin, dedxbin) < 0) {
-        h_DstarMu->SetBinContent(pbin, dedxbin, 0);
+      if (hDstarMu->GetBinContent(pbin, dedxbin) < 0) {
+        hDstarMu->SetBinContent(pbin, dedxbin, 0);
       };
     }
     // create a projection (1D histogram) in a given momentum bin
-    TH1D* slice = (TH1D*)h_DstarMu->ProjectionY("slice", pbin, pbin);
+    TH1D* slice = (TH1D*)hDstarMu->ProjectionY("slice", pbin, pbin);
     // normalise, but ignore the cases with empty histograms
     if (slice->Integral() > 0) {
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
-      h_DstarMu->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
+      hDstarMu->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
   if (m_isMakePlots) {
-    h_DstarK->Draw("COLZ");
+    hDstarK->Draw("COLZ");
     canvDstar->Print("SVDdEdxCalibrationHistoDstarK.pdf");
-    h_DstarPi->Draw("COLZ");
+    hDstarPi->Draw("COLZ");
     canvDstar->Print("SVDdEdxCalibrationHistoDstarPi.pdf");
-    h_DstarMu->Draw("COLZ");
+    hDstarMu->Draw("COLZ");
     canvDstar->Print("SVDdEdxCalibrationHistoDstarMu.pdf");
   }
 
-  return std::make_tuple(*h_DstarK, *h_DstarPi, *h_DstarMu);
+  return std::make_tuple(*hDstarK, *hDstarPi, *hDstarMu);
 }
 
 TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTree)
@@ -517,43 +515,43 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   }
   std::vector<double> pbins = CreatePBinningScheme();
 
-  TH2F* h_GammaE = new TH2F("hist_d1_11_trunc", "hist_d1_11_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
+  TH2F* hGammaE = new TH2F("hist_d1_11_trunc", "hist_d1_11_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
-  TH2F* h_GammaEPart1 = (TH2F*)h_GammaE->Clone("hist_d1_11_truncPart1");
-  TH2F* h_GammaEPart2 = (TH2F*)h_GammaE->Clone("hist_d1_11_truncPart2");
+  TH2F* hGammaEPart1 = (TH2F*)hGammaE->Clone("hist_d1_11_truncPart1");
+  TH2F* hGammaEPart2 = (TH2F*)hGammaE->Clone("hist_d1_11_truncPart2");
 
   preselTree->Draw("e_1_SVDdEdx:e_1_p>>hist_d1_11_truncPart1", "e_1_SVDdEdx>0", "goff");
   preselTree->Draw("e_2_SVDdEdx:e_2_p>>hist_d1_11_truncPart2", "e_2_SVDdEdx>0", "goff");
-  h_GammaE->Add(h_GammaEPart1);
-  h_GammaE->Add(h_GammaEPart2);
+  hGammaE->Add(hGammaEPart1);
+  hGammaE->Add(hGammaEPart2);
 
   // for each momentum bin, normalize the pdf
-  // h_GammaE normalisation
+  // hGammaE normalisation
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
       // get rid of the bins with negative weights
-      if (h_GammaE->GetBinContent(pbin, dedxbin) < 0) {
-        h_GammaE->SetBinContent(pbin, dedxbin, 0);
+      if (hGammaE->GetBinContent(pbin, dedxbin) < 0) {
+        hGammaE->SetBinContent(pbin, dedxbin, 0);
       };
     }
 
     // create a projection (1D histogram) in a given momentum bin
-    TH1D* slice = (TH1D*)h_GammaE->ProjectionY("slice", pbin, pbin);
+    TH1D* slice = (TH1D*)hGammaE->ProjectionY("slice", pbin, pbin);
     // normalise, but ignore the cases with empty histograms
     if (slice->Integral() > 0) {
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
     for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
-      h_GammaE->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
+      hGammaE->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   if (m_isMakePlots) {
     TCanvas* canvGamma = new TCanvas("canvGamma", "canvGamma");
-    h_GammaE->Draw("COLZ");
+    hGammaE->Draw("COLZ");
     canvGamma->Print("SVDdEdxCalibrationHistoGamma.pdf");
   }
 
-  return *h_GammaE;
+  return *hGammaE;
 }

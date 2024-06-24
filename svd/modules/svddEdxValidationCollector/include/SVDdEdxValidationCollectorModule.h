@@ -17,7 +17,7 @@
 namespace Belle2 {
   /**
    * Collector module used to create the histograms needed for the
-   * SVD CoG-Time calibration
+   * SVD dE/dx calibration
    */
   class SVDdEdxValidationCollectorModule : public CalibrationCollectorModule {
 

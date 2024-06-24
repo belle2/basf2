@@ -15,7 +15,7 @@
 #include <reconstruction/dataobjects/VXDDedxTrack.h>
 #include <mdst/dataobjects/Track.h>
 
-#include "TTree.h"
+#include <TTree.h>
 
 using namespace std;
 using namespace Belle2;
@@ -87,9 +87,6 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("piS_SVDdEdx", &m_piS_SVDdEdx);
 
   GammaTree->Branch<double>("InvM", &m_InvMGamma);
-  // GammaTree->Branch<double>("cpM", &m_cpMGamma);
-  // GammaTree->Branch<double>("cpdr", &m_cpdr);
-  // GammaTree->Branch<double>("cpdz", &m_cpdz);
   GammaTree->Branch<double>("e_1_p", &m_e_1_p);
   GammaTree->Branch<double>("e_1_SVDdEdx", &m_e_1_SVDdEdx);
   GammaTree->Branch<double>("e_2_p", &m_e_2_p);
@@ -262,18 +259,10 @@ void SVDdEdxValidationCollectorModule::collect()
   StoreObjPtr<ParticleList> DstarParticles(m_DstarListName);
   StoreObjPtr<ParticleList> GammaParticles(m_GammaListName);
 
-  // if (!LambdaParticles.isValid() || abs(LambdaParticles->getPDGCode()) != 3122)
-  //     return;
-  // if (!DstarParticles.isValid() || abs(DstarParticles->getPDGCode()) != 413)
-  //     return;
-  // if (!GammaParticles.isValid() || abs(GammaParticles->getPDGCode()) != 22)
-  //     return;
 
   if (!LambdaParticles.isValid() && !DstarParticles.isValid() && !GammaParticles.isValid())
     return;
 
-  // if (LambdaParticles->getListSize() <  1 && DstarParticles->getListSize() <  1 && GammaParticles->getListSize() <  1)
-  //     return;
   if (LambdaParticles->getListSize() > 0) {
     for (unsigned int iParticle = 0; iParticle < LambdaParticles->getListSize(); ++iParticle) {
 

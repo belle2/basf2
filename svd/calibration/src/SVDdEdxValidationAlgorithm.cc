@@ -16,7 +16,6 @@
 #include <TStyle.h>
 #include <TMath.h>
 #include <TFile.h>
-#include <TTree.h>
 #include <TColor.h>
 #include <TLegend.h>
 #include <TCanvas.h>
@@ -72,10 +71,10 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
   TTree* TTreeDstarSW = DstarMassFit(TTreeDstar);
   TTree* TTreeGammaWrap = TTreeGamma.get();
 
-  std::vector<TString> LAYER;
-  LAYER.push_back("ALL");
-  LAYER.push_back("SVDonly");
-  LAYER.push_back("noSVD");
+  std::vector<TString> PIDDetectors;
+  PIDDetectors.push_back("ALL");
+  PIDDetectors.push_back("SVDonly");
+  PIDDetectors.push_back("noSVD");
 
   std::map<TTree*, TString> SWeightNameMap = {
     { TTreeGammaWrap, "1" },
@@ -83,31 +82,33 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
     { TTreeLambdaSW, "nSignalLambda_sw" }
   };
 
-  for (const TString& LayerName : LAYER) {
-    PlotEfficiencyPlots(LayerName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
+  for (const TString& PIDDetectorsName : PIDDetectors) {
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
                         SWeightNameMap[TTreeDstarSW], "pi", "pion",
                         "electron_pionID",
-                        "0.5", m_NumEffBins, 0.2, m_MomHighEff);
-    PlotEfficiencyPlots(LayerName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
+                        "0.5", m_NumEffBins, 0., m_MomHighEff);
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
                         SWeightNameMap[TTreeDstarSW], "K", "kaon",
                         "electron_kaonID", "0.5",
-                        m_NumEffBins, 0.2, m_MomHighEff);
-    PlotEfficiencyPlots(LayerName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
+                        m_NumEffBins, 0., m_MomHighEff);
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
                         SWeightNameMap[TTreeDstarSW], "pi", "pion",
                         "proton_pionID", "0.5",
                         m_NumEffBins, 0.25, m_MomHighEff);
-    PlotEfficiencyPlots(LayerName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
                         SWeightNameMap[TTreeDstarSW], "K", "kaon",
                         "proton_kaonID", "0.5",
                         m_NumEffBins, 0.25, m_MomHighEff);
-    PlotEfficiencyPlots(LayerName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW],
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW],
                         "K", "kaon",
                         "pion_kaonID", "0.5", m_NumEffBins,
-                        0.2, m_MomHighEff);
-    PlotEfficiencyPlots(LayerName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW],
+                        0., m_MomHighEff);
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW],
                         "pi", "pion",
                         "kaon_pionID", "0.5", m_NumEffBins,
-                        0.2, m_MomHighEff);
+                        0., m_MomHighEff);
   }
 
   PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi",
@@ -130,7 +131,7 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
 }
 
 // generic efficiency and fake rate
-void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, TTree* SignalTree, TString SignalWeightName,
+void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectorsName, TTree* SignalTree, TString SignalWeightName,
                                                      TString SignalVarName, TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName,
                                                      TString FakeVarNameFull, TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh)
 {
@@ -152,14 +153,15 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
   TString FakesFiducialCut = "(1>0)";
 
   // Produce the plots of the SVD PID distribution
-  if (LayerName == "SVDonly") {
-    SignalTree->Draw(Form("%s_%s_%s>>h_SignalPIDDistribution(100,0.,1.)", SignalVarName.Data(), PIDVarName.Data(), LayerName.Data()),
+  if (PIDDetectorsName == "SVDonly") {
+    SignalTree->Draw(Form("%s_%s_%s>>hSignalPIDDistribution(100,0.,1.)", SignalVarName.Data(), PIDVarName.Data(),
+                          PIDDetectorsName.Data()),
                      SignalWeightName + Form("* (%s_p>%f && %s_p<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
-    TH1F* h_SignalPIDDistribution = (TH1F*)gDirectory->Get("h_SignalPIDDistribution");
-    h_SignalPIDDistribution->Scale(1. / h_SignalPIDDistribution->Integral());
-    h_SignalPIDDistribution->GetXaxis()->SetTitle(PIDVarName + "_" + LayerName + " for " + SignalVarNameFull);
-    h_SignalPIDDistribution->GetYaxis()->SetTitle("Candidates, normalised");
-    h_SignalPIDDistribution->SetMaximum(1.35 * h_SignalPIDDistribution->GetMaximum());
+    TH1F* hSignalPIDDistribution = (TH1F*)gDirectory->Get("hSignalPIDDistribution");
+    hSignalPIDDistribution->Scale(1. / hSignalPIDDistribution->Integral());
+    hSignalPIDDistribution->GetXaxis()->SetTitle(PIDVarName + "_" + PIDDetectorsName + " for " + SignalVarNameFull);
+    hSignalPIDDistribution->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalPIDDistribution->SetMaximum(1.35 * hSignalPIDDistribution->GetMaximum());
 
     TCanvas* DistribCanvas = new TCanvas("DistribCanvas", "", 600, 600);
     gPad->SetTopMargin(0.05);
@@ -167,11 +169,12 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
     gPad->SetLeftMargin(0.13);
     gPad->SetBottomMargin(0.12);
 
-    h_SignalPIDDistribution->SetLineWidth(2);
-    h_SignalPIDDistribution->SetLineColor(TColor::GetColor("#2166ac"));
-    h_SignalPIDDistribution->Draw("hist ");
+    hSignalPIDDistribution->SetLineWidth(2);
+    hSignalPIDDistribution->SetLineColor(TColor::GetColor("#2166ac"));
+    hSignalPIDDistribution->Draw("hist ");
 
-    DistribCanvas->Print("Distribution_" + SignalVarNameFull + "_" + PIDVarName + "_" + LayerName + "_MomRange_" + std::to_string(
+    DistribCanvas->Print("Distribution_" + SignalVarNameFull + "_" + PIDVarName + "_" + PIDDetectorsName + "_MomRange_" +
+                         std::to_string(
                            MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
 
     delete DistribCanvas;
@@ -179,33 +182,35 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
 
   // ---------- Momentum distributions (for efficiency determination) ----------
 
-  SignalTree->Draw(Form("%s_p>>h_AllSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
+  SignalTree->Draw(Form("%s_p>>hAllSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
                    SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-  SignalTree->Draw(Form("%s_p>>h_SelectedSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
-                   SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + "_" + LayerName + ">" + PIDCut + "&&" + SignalFiducialCut + ")",
+  SignalTree->Draw(Form("%s_p>>hSelectedSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
+                   SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + "_" + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut +
+                   ")",
                    "goff");
 
-  FakeTree->Draw(Form("%s_p>>h_AllFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
+  FakeTree->Draw(Form("%s_p>>hAllFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
                  FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
-  FakeTree->Draw(Form("%s_p>>h_SelectedFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
-                 FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + "_" + LayerName + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
+  FakeTree->Draw(Form("%s_p>>hSelectedFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
+                 FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + "_" + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")",
+                 "goff");
 
-  TH1F* h_AllSignal = (TH1F*)gDirectory->Get("h_AllSignal");
-  TH1F* h_SelectedSignal = (TH1F*)gDirectory->Get("h_SelectedSignal");
-  TH1F* h_AllFakes = (TH1F*)gDirectory->Get("h_AllFakes");
-  TH1F* h_SelectedFakes = (TH1F*)gDirectory->Get("h_SelectedFakes");
+  TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
+  TH1F* hSelectedSignal = (TH1F*)gDirectory->Get("hSelectedSignal");
+  TH1F* hAllFakes = (TH1F*)gDirectory->Get("hAllFakes");
+  TH1F* hSelectedFakes = (TH1F*)gDirectory->Get("hSelectedFakes");
 
-  TH1F* EffHistoSig = (TH1F*)h_AllSignal->Clone("EffHistoSig");   // signal efficiency
-  TH1F* EffHistoFake = (TH1F*)h_AllFakes->Clone("EffHistoFake");  // fakes efficiency
+  TH1F* EffHistoSig = (TH1F*)hAllSignal->Clone("EffHistoSig");   // signal efficiency
+  TH1F* EffHistoFake = (TH1F*)hAllFakes->Clone("EffHistoFake");  // fakes efficiency
 
-  EffHistoSig->Divide(h_SelectedSignal, h_AllSignal, 1, 1, "B");
-  EffHistoFake->Divide(h_SelectedFakes, h_AllFakes, 1, 1, "B");
+  EffHistoSig->Divide(hSelectedSignal, hAllSignal, 1, 1, "B");
+  EffHistoFake->Divide(hSelectedFakes, hAllFakes, 1, 1, "B");
 
   // PID plots
-  TH1F* h_Base = new TH1F("h_Base", "", 100, 0.0, MomHigh);
-  h_Base->SetTitle(";Momentum [GeV];Efficiency");
-  h_Base->SetMaximum(1.20);
-  h_Base->SetMinimum(0.0);
+  TH1F* hBase = new TH1F("hBase", "", 100, 0.0, MomHigh);
+  hBase->SetTitle(";Momentum [GeV];Efficiency");
+  hBase->SetMaximum(1.20);
+  hBase->SetMinimum(0.0);
 
   TLegend* tleg1 = new TLegend(0.63, 0.82, 0.93, 0.94);
   tleg1->AddEntry(EffHistoSig, SignalVarNameFull + " efficiency", "pl");
@@ -218,7 +223,7 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
   gPad->SetBottomMargin(0.12);
 
   ResultCanvas->SetGrid();
-  h_Base->Draw();
+  hBase->Draw();
   EffHistoSig->SetMarkerSize(1.5);
   EffHistoSig->SetMarkerStyle(22);
   EffHistoSig->SetMarkerColor(TColor::GetColor("#2166ac"));
@@ -233,20 +238,21 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& LayerName, T
 
   tleg1->Draw("same");
 
-  h_Base->SetStats(0);
-  h_Base->GetXaxis()->SetTitleSize(0.04);
-  h_Base->GetYaxis()->SetTitleSize(0.04);
-  h_Base->GetXaxis()->SetTitleOffset(1.0);
-  h_Base->GetYaxis()->SetTitleOffset(1.3);
-  h_Base->GetYaxis()->SetLabelSize(0.04);
-  h_Base->GetXaxis()->SetLabelSize(0.04);
+  hBase->SetStats(0);
+  hBase->GetXaxis()->SetTitleSize(0.04);
+  hBase->GetYaxis()->SetTitleSize(0.04);
+  hBase->GetXaxis()->SetTitleOffset(1.0);
+  hBase->GetYaxis()->SetTitleOffset(1.3);
+  hBase->GetYaxis()->SetLabelSize(0.04);
+  hBase->GetXaxis()->SetLabelSize(0.04);
 
   // std::setprecision(2);
-  ResultCanvas->Print("Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_" + LayerName + "_Cut" +
+  ResultCanvas->Print("Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_" + PIDDetectorsName +
+                      "_Cut" +
                       PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
 
   delete ResultCanvas;
-  delete h_Base;
+  delete hBase;
 
 }
 
@@ -268,10 +274,10 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
     B2FATAL("Check the provided branch name, stopping here");
   }
 
-  std::vector<TString> LAYER;
-  LAYER.clear();
-  LAYER.push_back("_ALL");
-  LAYER.push_back("_noSVD");
+  std::vector<TString> PIDDetectors;
+  PIDDetectors.clear();
+  PIDDetectors.push_back("_ALL");
+  PIDDetectors.push_back("_noSVD");
 
   double SignalEfficiency_ALL[m_NumROCpoints], FakeEfficiency_ALL[m_NumROCpoints];
   double SignalEfficiency_noSVD[m_NumROCpoints], FakeEfficiency_noSVD[m_NumROCpoints];
@@ -280,11 +286,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   TString FakesFiducialCut = FakeVarName + "_" + PIDVarName + "_noSVD>=0";
 
   // calculate efficiencies
-  for (unsigned int i = 0; i < LAYER.size(); i++) {
+  for (unsigned int i = 0; i < PIDDetectors.size(); i++) {
     for (unsigned int j = 0; j < m_NumROCpoints; ++j) {
       delete gROOT->FindObject("PIDCut");
-      delete gROOT->FindObject("h_AllSignal");
-      delete gROOT->FindObject("h_SelectedSignal");
+      delete gROOT->FindObject("hAllSignal");
+      delete gROOT->FindObject("hSelectedSignal");
 
       // scan cut values from 0 to 1, with a denser scan closer to 0 or 1, to get a nicer ROC curve
       double x = 1. / m_NumROCpoints * j;
@@ -292,80 +298,81 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
 
       // TString PIDCut = TString::Format("%f", 0. + 1. / m_NumROCpoints * j);
 
-      SignalTree->Draw(Form("%s_p>>h_AllSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
+      SignalTree->Draw(Form("%s_p>>hAllSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
                        SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-      SignalTree->Draw(Form("%s_p>>h_SelectedSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
-                       SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + LAYER[i] + ">" + PIDCut + "&&" + SignalFiducialCut + ")", "goff");
+      SignalTree->Draw(Form("%s_p>>hSelectedSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
+                       SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + ")",
+                       "goff");
 
-      TH1F* h_AllSignal = (TH1F*)gDirectory->Get("h_AllSignal");
-      TH1F* h_SelectedSignal = (TH1F*)gDirectory->Get("h_SelectedSignal");
+      TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
+      TH1F* hSelectedSignal = (TH1F*)gDirectory->Get("hSelectedSignal");
 
-      if (LAYER[i] == "_ALL") {
-        SignalEfficiency_ALL[j] = h_SelectedSignal->Integral() / h_AllSignal->Integral();
+      if (PIDDetectors[i] == "_ALL") {
+        SignalEfficiency_ALL[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
       }
 
-      if (LAYER[i] == "_noSVD") {
-        SignalEfficiency_noSVD[j] = h_SelectedSignal->Integral() / h_AllSignal->Integral();
+      if (PIDDetectors[i] == "_noSVD") {
+        SignalEfficiency_noSVD[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
       }
     }
   }
 
   // calculate fake rates
 
-  for (unsigned int i = 0; i < LAYER.size(); i++) {
+  for (unsigned int i = 0; i < PIDDetectors.size(); i++) {
     for (unsigned int j = 0; j < m_NumROCpoints; ++j) {
       delete gROOT->FindObject("PIDCut");
-      delete gROOT->FindObject("h_AllFakes");
-      delete gROOT->FindObject("h_SelectedFakes");
+      delete gROOT->FindObject("hAllFakes");
+      delete gROOT->FindObject("hSelectedFakes");
 
       // scan cut values from 0 to 1, with a denser scan closer to 0 or 1, to get a nicer ROC curve
       double x = 1. / m_NumROCpoints * j;
       TString PIDCut = TString::Format("%f", 1. / (1 + TMath::Power(x / (1 - x), -3)));
 
 
-      FakeTree->Draw(Form("%s_p>>h_AllFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
+      FakeTree->Draw(Form("%s_p>>hAllFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
                      FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
-      FakeTree->Draw(Form("%s_p>>h_SelectedFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
-                     FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + LAYER[i] + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
+      FakeTree->Draw(Form("%s_p>>hSelectedFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
+                     FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
 
-      TH1F* h_SelectedFakes = (TH1F*)gDirectory->Get("h_SelectedFakes");
-      TH1F* h_AllFakes = (TH1F*)gDirectory->Get("h_AllFakes");
+      TH1F* hSelectedFakes = (TH1F*)gDirectory->Get("hSelectedFakes");
+      TH1F* hAllFakes = (TH1F*)gDirectory->Get("hAllFakes");
 
-      if (LAYER[i] == "_ALL") {
-        FakeEfficiency_ALL[j] = h_SelectedFakes->Integral() / h_AllFakes->Integral();
+      if (PIDDetectors[i] == "_ALL") {
+        FakeEfficiency_ALL[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
       }
 
-      if (LAYER[i] == "_noSVD") {
-        FakeEfficiency_noSVD[j] = h_SelectedFakes->Integral() / h_AllFakes->Integral();
+      if (PIDDetectors[i] == "_noSVD") {
+        FakeEfficiency_noSVD[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
       }
     }
   }
 
   auto ResultCanvas = new TCanvas("ResultCanvas", "", 600, 400);
-  TMultiGraph* h_mgraph = new TMultiGraph();
+  TMultiGraph* hmgraph = new TMultiGraph();
 
   // efficiency and kaon fake rate
-  TGraph* h_graph_ALL = new TGraph(m_NumROCpoints, FakeEfficiency_ALL, SignalEfficiency_ALL);
-  h_graph_ALL->SetMarkerColor(TColor::GetColor("#2166ac"));
-  h_graph_ALL->SetMarkerStyle(20);
-  h_graph_ALL->SetLineColor(TColor::GetColor("#2166ac"));
-  h_graph_ALL->SetLineWidth(3);
-  h_graph_ALL->SetDrawOption("AP*");
-  h_graph_ALL->SetTitle("with SVD");
+  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiency_ALL, SignalEfficiency_ALL);
+  hgraphALL->SetMarkerColor(TColor::GetColor("#2166ac"));
+  hgraphALL->SetMarkerStyle(20);
+  hgraphALL->SetLineColor(TColor::GetColor("#2166ac"));
+  hgraphALL->SetLineWidth(3);
+  hgraphALL->SetDrawOption("AP*");
+  hgraphALL->SetTitle("with SVD");
 
-  TGraph* h_graph_noSVD = new TGraph(m_NumROCpoints, FakeEfficiency_noSVD, SignalEfficiency_noSVD);
-  h_graph_noSVD->SetMarkerColor(TColor::GetColor("#ef8a62"));
-  h_graph_noSVD->SetLineColor(TColor::GetColor("#ef8a62"));
-  h_graph_noSVD->SetLineWidth(3);
-  h_graph_noSVD->SetMarkerStyle(22);
-  h_graph_noSVD->SetDrawOption("P*");
-  h_graph_noSVD->SetTitle("without SVD");
+  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiency_noSVD, SignalEfficiency_noSVD);
+  hgraphnoSVD->SetMarkerColor(TColor::GetColor("#ef8a62"));
+  hgraphnoSVD->SetLineColor(TColor::GetColor("#ef8a62"));
+  hgraphnoSVD->SetLineWidth(3);
+  hgraphnoSVD->SetMarkerStyle(22);
+  hgraphnoSVD->SetDrawOption("P*");
+  hgraphnoSVD->SetTitle("without SVD");
 
-  h_mgraph->Add(h_graph_ALL);
-  h_mgraph->Add(h_graph_noSVD);
-  h_mgraph->Draw("A");
-  h_mgraph->GetHistogram()->GetXaxis()->SetTitle(FakeVarNameFull + " fake rate");
-  h_mgraph->GetHistogram()->GetYaxis()->SetTitle(SignalVarNameFull + " signal efficiency");
+  hmgraph->Add(hgraphALL);
+  hmgraph->Add(hgraphnoSVD);
+  hmgraph->Draw("A");
+  hmgraph->GetHistogram()->GetXaxis()->SetTitle(FakeVarNameFull + " fake rate");
+  hmgraph->GetHistogram()->GetYaxis()->SetTitle(SignalVarNameFull + " signal efficiency");
 
   ResultCanvas->BuildLegend(0.6, 0.25, 0.9, 0.5);
   ResultCanvas->SetGrid();
@@ -546,12 +553,12 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
       B2FATAL("Lambda: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* LambdaDatasetw_sig = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
-                                                  *LambdaDataset->get());
+  RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
+                                                      *LambdaDataset->get());
 
   RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(LambdaDatasetw_sig->store())->tree())->SetName("treeLambda_sw");
-  TTree* treeLambda_sw = LambdaDatasetw_sig->GetClonedTree();
+  ((RooTreeDataStore*)(LambdaDatasetSWeighted->store())->tree())->SetName("treeLambda_sw");
+  TTree* treeLambda_sw = LambdaDatasetSWeighted->GetClonedTree();
 
   B2INFO("Lambda: sPlot done. ");
 
@@ -784,12 +791,12 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
       B2FATAL("Dstar: sPlot error: sum of weights not equal to 1");
   }
 
-  RooDataSet* DstarDatasetw_sig = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
-                                                 *DstarDataset->get());
+  RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
+                                                     *DstarDataset->get());
 
   RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(DstarDatasetw_sig->store())->tree())->SetName("treeDstar_sw");
-  TTree* treeDstar_sw = DstarDatasetw_sig->GetClonedTree();
+  ((RooTreeDataStore*)(DstarDatasetSWeighted->store())->tree())->SetName("treeDstar_sw");
+  TTree* treeDstar_sw = DstarDatasetSWeighted->GetClonedTree();
 
   B2INFO("Dstar: sPlot done. ");
 

@@ -19,7 +19,6 @@ import modularAnalysis as ma
 import vertex as vx
 import reconstruction as re
 
-ROOT.gSystem.Load('libreconstruction.so')
 ROOT.gROOT.SetBatch(True)
 
 
@@ -86,12 +85,12 @@ def create_path(rerun_reco, isMC):
 
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)
-    ma.fillParticleList("pi+:lam", "nCDCHits > 0", path=rec_path)  # pi without track quality for reconstructing lambda
+    ma.fillParticleList("pi+:lambda", "nCDCHits > 0", path=rec_path)  # pi without track quality for reconstructing lambda
     ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1", path=rec_path)
 
     ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1', path=rec_path)  # kaon
     ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
-    ma.fillParticleList('p+:lam', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)  # proton
+    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)  # proton
 
     # ----------------------------------------------------------------------------
     # Reconstruct D*(D0->K-pi+)pi+ and cc.
@@ -102,16 +101,16 @@ def create_path(rerun_reco, isMC):
         path=rec_path)
 
     # Reconstruct Lambda->p+pi- and cc.
-    ma.reconstructDecay('Lambda0:myLambda -> p+:lam pi-:lam', '1.1 < M < 1.3', path=rec_path)
+    ma.reconstructDecay('Lambda0:myLambda -> p+:lambda pi-:lambda', '1.1 < M < 1.3', path=rec_path)
 
     # Reconstruct gamma->e+e- (photon conversion)
-    ma.reconstructDecay('gamma:my_gamma -> e+:cut e-:cut', '0.0 < M < 0.5', path=rec_path)
+    ma.reconstructDecay('gamma:myGamma -> e+:cut e-:cut', '0.0 < M < 0.5', path=rec_path)
 
     # ----------------------------------------------------------------------------
     # vertex fits
     vx.treeFit(list_name='D*+:myDstar', conf_level=0, ipConstraint=True, updateAllDaughters=True, path=rec_path)
     vx.treeFit(list_name='Lambda0:myLambda', conf_level=0, ipConstraint=True, updateAllDaughters=True, path=rec_path)
-    vx.treeFit(list_name='gamma:my_gamma', conf_level=0, path=rec_path)
+    vx.treeFit(list_name='gamma:myGamma', conf_level=0, path=rec_path)
 
     # ----------------------------------------------------------------------------
     # Selections on Lambda
@@ -146,10 +145,10 @@ def create_path(rerun_reco, isMC):
 
     # ----------------------------------------------------------------------------
     # Selections on gamma
-    # ma.buildEventShape(inputListNames='gamma:my_gamma', path=rec_path)
+    # ma.buildEventShape(inputListNames='gamma:myGamma', path=rec_path)
     ma.cutAndCopyList(
         outputListName='gamma:cut',
-        inputListName='gamma:my_gamma',
+        inputListName='gamma:myGamma',
         cut=" ".join(['chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01',
                       'and convertedPhotonInvariantMass(0,1) < 0.005',
                       'and -0.05 < convertedPhotonDelR(0,1) < 0.15',
@@ -249,6 +248,8 @@ def get_calibrations(input_data, **kwargs):
     dedx_validation = Calibration("SVDdEdxValidation",
                                   collector="SVDdEdxValidationCollector",
                                   algorithms=[algo_val],
+                                  backend_args={"queue": "l"},
+                                  depends_on=[dedx_calibration],
                                   input_files=input_files_hadron_calib,
                                   pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV

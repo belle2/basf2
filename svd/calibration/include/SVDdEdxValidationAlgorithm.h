@@ -35,29 +35,29 @@ namespace Belle2 {
      */
     void setMonitoringPlots(bool value = false) { m_isMakePlots = value; }
 
-    // /**
-    //  * set the number of points for ROC curve plotting
-    //  */
+    /**
+     * set the number of points for ROC curve plotting
+     */
     void setNumROCpoints(const unsigned int& value) { m_NumROCpoints = value; }
 
-    // /**
-    //  * set the lower edge of the momentum range for ROC curve plotting
-    //  */
+    /**
+     * set the lower edge of the momentum range for ROC curve plotting
+     */
     void setMinROCMomentum(const double& value) { m_MomLowROC = value; }
 
-    // /**
-    //  * set the lower edge of the momentum range for ROC curve plotting
-    //  */
+    /**
+     * set the lower edge of the momentum range for ROC curve plotting
+     */
     void setMaxROCMomentum(const double& value) { m_MomHighROC = value; }
 
-    // /**
-    //  * set the number of bins for the efficiency scan
-    //  */
+    /**
+     * set the number of bins for the efficiency scan
+     */
     void setNumEffBins(const unsigned int& value) { m_NumEffBins = value; }
 
-    // /**
-    //  * set the upper edge of the momentum range for the efficiency scan
-    //  */
+    /**
+     * set the upper edge of the momentum range for the efficiency scan
+     */
     void setMaxEffMomentum(const double& value) { m_MomHighEff = value; }
 
     /**
@@ -76,7 +76,7 @@ namespace Belle2 {
     /**
      * a generic function to produce efficiency plots
      */
-    void PlotEfficiencyPlots(const TString& LayerName, TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
+    void PlotEfficiencyPlots(const TString& PIDDetectorsName, TTree* SignalTree, TString SignalWeightName, TString SignalVarName,
                              TString SignalVarNameFull, TTree* FakeTree, TString FakeWeightName, TString FakeVarName, TString FakeVarNameFull,
                              TString PIDVarName, TString PIDCut, unsigned int nbins, double MomLow, double MomHigh);
 

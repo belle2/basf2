@@ -367,6 +367,9 @@ def add_cr_tracking_reconstruction(path, components=None, prune_tracks=False,
 
     """
 
+    # Set the run for cosmics data
+    b2.declare_cosmics()
+
     # make sure CDC is used
     if not is_cdc_used(components):
         return

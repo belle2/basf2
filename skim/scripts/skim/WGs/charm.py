@@ -258,9 +258,9 @@ class DstToD0Pi_D0ToRare(BaseSkim):
 
         for chID, channel in enumerate(D0_Channels):
             ma.reconstructDecay("D0:Rare" + str(chID) + " -> " + channel, charmcuts, chID, path=path)
-            ma.reconstructDecay("D*+:" + str(chID) + " -> pi+:all D0:Rare" + str(chID),
+            ma.reconstructDecay("D*+:Rare" + str(chID) + " -> pi+:all D0:Rare" + str(chID),
                                 Dstcuts, chID, path=path)
-            DstList.append("D*+:" + str(chID))
+            DstList.append("D*+:Rare" + str(chID))
 
         return DstList
 
@@ -787,14 +787,14 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
     def build_lists(self, path):
         mySel = "abs(dr) < 1 and abs(dz) < 3"
         mySel += " and thetaInCDCAcceptance"
-        ma.fillParticleList("pi+:hphmhpjm", mySel, path=path)
-        ma.fillParticleList("K+:hphmhpjm", mySel, path=path)
+        ma.fillParticleList("pi+:HpHmHpJm", mySel, path=path)
+        ma.fillParticleList("K+:HpHmHpJm", mySel, path=path)
 
         D0_Channels = [
-            "pi+:hphmhpjm pi-:hphmhpjm pi+:hphmhpjm pi-:hphmhpjm",
-            "pi+:hphmhpjm pi-:hphmhpjm pi+:hphmhpjm K-:hphmhpjm",
-            "pi+:hphmhpjm pi-:hphmhpjm K+:hphmhpjm K-:hphmhpjm",
-            "pi+:hphmhpjm K-:hphmhpjm K+:hphmhpjm K-:hphmhpjm",
+            "pi+:HpHmHpJm pi-:HpHmHpJm pi+:HpHmHpJm pi-:HpHmHpJm",
+            "pi+:HpHmHpJm pi-:HpHmHpJm pi+:HpHmHpJm K-:HpHmHpJm",
+            "pi+:HpHmHpJm pi-:HpHmHpJm K+:HpHmHpJm K-:HpHmHpJm",
+            "pi+:HpHmHpJm K-:HpHmHpJm K+:HpHmHpJm K-:HpHmHpJm",
         ]
 
         D0cuts = "1.66 < M < 2.06"

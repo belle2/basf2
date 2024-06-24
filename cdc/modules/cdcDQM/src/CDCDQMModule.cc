@@ -121,7 +121,7 @@ void CDCDQMModule::event()
 
   const std::map<std::string, int>& fresults = m_TrgResult->getResults();
   if ((fresults.find("software_trigger_cut&skim&accept_bhabha") == fresults.end())   ||
-      (fresults.find("software_trigger_cut&skim&accept_mumu_2trk") == fresults.end())   ||
+      (fresults.find("software_trigger_cut&skim&accept_mumu_tight_or_highm") == fresults.end())   ||
       (fresults.find("software_trigger_cut&skim&accept_hadron") == fresults.end())) {
     B2WARNING("CDCDQMModule: Can't find required bhabha or mumu or hadron trigger identifier");
     return;
@@ -131,7 +131,7 @@ void CDCDQMModule::event()
                          SoftwareTriggerCutResult::c_accept);
   const bool IsHadron = (m_TrgResult->getResult("software_trigger_cut&skim&accept_hadron") ==
                          SoftwareTriggerCutResult::c_accept);
-  const bool IsMumu = (m_TrgResult->getResult("software_trigger_cut&skim&accept_mumu_2trk") ==
+  const bool IsMumu = (m_TrgResult->getResult("software_trigger_cut&skim&accept_mumu_tight_or_highm") ==
                        SoftwareTriggerCutResult::c_accept);
 
   if (m_cdcHits.getEntries() < m_minHits) {

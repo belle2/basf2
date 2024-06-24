@@ -249,7 +249,6 @@ def get_calibrations(input_data, **kwargs):
                                   collector="SVDdEdxValidationCollector",
                                   algorithms=[algo_val],
                                   backend_args={"queue": "l"},
-                                  depends_on=[dedx_calibration],
                                   input_files=input_files_hadron_calib,
                                   pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV
@@ -260,6 +259,7 @@ def get_calibrations(input_data, **kwargs):
     # Most other options like database chain and backend args will be overwritten by b2caf-prompt-run.
     # So we don't bother setting them.
 
+    dedx_validation.depends_on(dedx_calibration)
     # You must return all calibrations you want to run in the prompt process, even if it's only one
     return [dedx_calibration, dedx_validation]
 

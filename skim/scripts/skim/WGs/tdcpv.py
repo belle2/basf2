@@ -134,9 +134,9 @@ class TDCPV_qqs(BaseSkim):
         ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
 
     def build_lists(self, path):
-        vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
-        vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_qqs_eventshape)')
-        vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
+        vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
+        vm.addAlias('E_ECL_gamma_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_qqs_eventshape)')
+        vm.addAlias('E_ECL_TDCPV_qqs', 'formula(E_ECL_pi_TDCPV_qqs+E_ECL_gamma_TDCPV_qqs)')
 
         btotcpvcuts = '5.18 < Mbc and abs(deltaE) < 0.52'
         btotcpvcuts_KL = 'abs(deltaE) < 0.250'
@@ -328,9 +328,9 @@ class TDCPV_ccs(BaseSkim):
         ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
 
     def build_lists(self, path):
-        vm.addAlias('E_ECL_pi_TDCPV', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_ccs_eventshape)')
-        vm.addAlias('E_ECL_gamma_TDCPV', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_ccs_eventshape)')
-        vm.addAlias('E_ECL_TDCPV', 'formula(E_ECL_pi_TDCPV+E_ECL_gamma_TDCPV)')
+        vm.addAlias('E_ECL_pi_TDCPV_ccs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_ccs_eventshape)')
+        vm.addAlias('E_ECL_gamma_TDCPV_ccs', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_ccs_eventshape)')
+        vm.addAlias('E_ECL_TDCPV_ccs', 'formula(E_ECL_pi_TDCPV_ccs+E_ECL_gamma_TDCPV_ccs)')
 
         btotcpvcuts = 'Mbc > 5.18 and abs(deltaE) < 0.52'
         btotcpvcuts_KL = 'abs(deltaE) < 0.3'

@@ -82,12 +82,8 @@ namespace Belle2 {
     std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
-    /** Event TTree for output. */
-    TTree* m_eventTree;
     /** Persistent TTree for output. */
     TTree* m_persistent;
-    /** Pre-existing persistent TTree in the output. */
-    TTree* m_oldPersistent{nullptr};
     // Counter branch addresses (event number, candidate number etc)
     int m_event{ -1};                /**< event number */
     int m_run{ -1};                  /**< run number */
@@ -95,9 +91,6 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-
-    /** Vector of DataStore entries that are written to the output. */
-    std::vector<DataStore::StoreEntry*> m_entries;
 
     /** Lowest experiment number.
      */

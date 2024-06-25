@@ -27,6 +27,8 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/utilities/RootFileCreationManager.h>
 #include <framework/io/RootIOUtilities.h>
+#include <framework/io/RootFileInfo.h>
+
 
 #include <cmath>
 
@@ -244,43 +246,16 @@ void VariablesToNtupleModule::initialize()
 
   m_outputFileMetaData = new FileMetaData;
   // create persistent tree if it doesn't already exist
-  //to-do: c_treeNames[DataStore::c_Persistent].c_str() throws error - RootIOUtilities issue?
   if (!m_file->Get("persistent")) {
     m_persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
     m_persistent->Branch("FileMetaData", &m_outputFileMetaData);
-    m_eventTree = new TTree("tree", "tree");
-    m_eventTree->Branch("EventMetaData", m_eventMetaData);
   } else {
-    m_oldPersistent = dynamic_cast<TTree*>(m_file->Get("persistent"));
+    TTree* m_oldPersistent = dynamic_cast<TTree*>(m_file->Get("persistent"));
     m_oldFileMetaData = dynamic_cast<FileMetaData*>(m_file->Get("FileMetaData"));
     m_persistent = m_oldPersistent->CloneTree(0);
     m_oldPersistent->GetEntry(0);
     TBranch* fileMetaDataBranch = m_persistent->GetBranch("FileMetaData");
     fileMetaDataBranch->SetAddress(&m_outputFileMetaData);
-  }
-
-  // create the event tree and fill its branches
-  DataStore::StoreEntryMap& map = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
-  set<string> branchList;
-  for (const auto& pair : map)
-    branchList.insert(pair.first);
-
-  //create the tree and branches
-  m_eventTree = new TTree(c_treeNames[DataStore::c_Event].c_str(), c_treeNames[DataStore::c_Event].c_str());
-  for (auto& iter : map) {
-    const std::string& branchName = iter.first;
-    //skip transient entries (allow overriding via branchNames)
-    if (iter.second.dontWriteOut)
-      continue;
-    //skip branches the user doesn't want
-    if (branchList.count(branchName) == 0) {
-      //make sure EventMetaData is always included in the output
-      if (branchName != "EventMetaData") {
-        continue;
-      }
-    }
-    m_eventTree->Branch(branchName.c_str(), &iter.second.object);
-    m_entries.push_back(&iter.second);
   }
 
 }
@@ -313,8 +288,6 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
-  // Fill event tree
-  fillTree();
 
   m_event = m_eventMetaData->getEvent();
   m_run = m_eventMetaData->getRun();
@@ -337,6 +310,13 @@ void VariablesToNtupleModule::event()
       m_experimentHigh = m_experiment;
       m_runHigh = m_run;
       m_eventHigh = m_event;
+    }
+  }
+
+  if (m_inputFileMetaData.isValid()) {
+    std::string lfn = m_inputFileMetaData->getLfn();
+    if (not lfn.empty() and (m_parentLfns.empty() or (m_parentLfns.back() != lfn))) {
+      m_parentLfns.push_back(lfn);
     }
   }
 
@@ -473,12 +453,6 @@ void VariablesToNtupleModule::fillFileMetaData()
   for (const auto& item : m_additionalDataDescription) {
     m_outputFileMetaData->setDataDescription(item.first, item.second);
   }
-  if (m_inputFileMetaData.isValid()) {
-    std::string lfn = m_inputFileMetaData->getLfn();
-    if (not lfn.empty() and (m_parentLfns.empty() or (m_parentLfns.back() != lfn))) {
-      m_parentLfns.push_back(lfn);
-    }
-  }
   m_outputFileMetaData->setParents(m_parentLfns);
 }
 
@@ -490,7 +464,6 @@ void VariablesToNtupleModule::terminate()
     TDirectory::TContext directoryGuard(m_file.get());
     m_persistent->Fill();
     m_persistent->Write("persistent", TObject::kWriteDelete);
-    m_eventTree->Write("tree", TObject::kWriteDelete);
 
     B2INFO("Writing NTuple " << m_treeName);
     m_tree->write(m_file.get());
@@ -500,37 +473,5 @@ void VariablesToNtupleModule::terminate()
     if (writeError) {
       B2FATAL("A write error occurred while saving '" << m_fileName  << "', please check if enough disk space is available.");
     }
-  }
-}
-
-void VariablesToNtupleModule::fillTree()
-{
-  if (!m_eventTree) return;
-
-  TTree& tree = *m_eventTree;
-  for (auto entry : m_entries) {
-    // Check for entries whose object was not created and mark them as invalid.
-    // We still have to write them in the file due to the structure we have. This could be done better
-    if (!entry->ptr) {
-      entry->object->SetBit(kInvalidObject);
-    }
-    //FIXME: Do we need this? in theory no but it crashes in parallel processing otherwise ¯\_(ツ)_/¯
-    if (entry->name == "FileMetaData") {
-      tree.SetBranchAddress(entry->name.c_str(), &m_outputFileMetaData);
-    } else {
-      tree.SetBranchAddress(entry->name.c_str(), &entry->object);
-    }
-  }
-  tree.Fill();
-  for (auto entry : m_entries) {
-    entry->object->ResetBit(kInvalidObject);
-  }
-
-  const bool writeError = m_file->TestBit(TFile::kWriteError);
-  if (writeError) {
-    //m_file deleted first so we have a chance of closing it (though that will probably fail)
-    const std::string filename = m_file->GetName();
-    // delete m_file;
-    B2FATAL("A write error occured while saving '" << filename << "', please check if enough disk space is available.");
   }
 }

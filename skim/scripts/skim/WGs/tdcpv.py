@@ -453,14 +453,14 @@ class TDCPV_dilepton(BaseSkim):
         ma.cutAndCopyList(
             "e+:pid",
             "e+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and electronID > 0.5",
+            "abs(dr) < 1 and abs(dz) < 4 and p > 1.2 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
             "mu+:pid",
             "mu+:all",
-            "abs(d0) < 1 and abs(z0) < 4 and p > 1.2 and muonID > 0.5",
+            "abs(dr) < 1 and abs(dz) < 4 and p > 1.2 and muonID > 0.5",
             True,
             path=path,
         )

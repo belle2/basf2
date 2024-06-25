@@ -151,10 +151,8 @@ import simulation
 
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
 from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
-# basf2.conditions.prepend_testing_payloads("localdb/database.txt")
-basf2.conditions.testing_payloads = ["localdb/database.txt"]
+
 basf2.conditions.prepend_testing_payloads("localdb/database.txt")
-# basf2.conditions.prepend_globatags = ["user_ftesta_testing_CKFMVAFilter"]
 
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
@@ -486,7 +484,6 @@ class CKFResultFilterTeacherTask(Basf2Task):
     def get_weightfile_identifier(self, fast_bdt_option=None):
         """
         Name of weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -498,8 +495,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
     def get_weightfile_root_identifier(self, fast_bdt_option=None):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of the root weightfile used as a local weightfile in the following validation tasks.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -537,7 +533,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name="records",
-            weightfile_identifier=self.get_weightfile_identifier(),
+            weightfile_identifier=weightfile_identifier,
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option,
@@ -546,8 +542,6 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
 
 class ValidationAndOptimisationTask(Basf2PathTask):
-
-    # basf2.conditions.prepend_globaltag("user_ftesta_testing_CKFMVAFilter")
 
     """
     Validate the performance of the trained filters by trying various combinations of FastBDT options, as well as cut values for
@@ -568,8 +562,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     #: Value of the cut on the MVA classifier output for a result candidate.
     result_filter_cut = b2luigi.FloatParameter()
 
-    #: location of the testing payloads
-    basf2.conditions.testing_payloads = ["localdb/database.txt"]
+    # prepend the testing payloads
     basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
@@ -633,14 +626,14 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         direction = "backward"
         fbdt_string = create_fbdt_option_string(self.fast_bdt_option)
 
-        # write the tracking MVA filter paramaters and the cut on MVA classifier to be applied on a local db
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
         iov = [0, 0, 0, -1]
         write_tracking_mva_filter_payloads_to_db(
             f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}",
             iov,
             f"trk_CDCToSVDSeedResultFilter{fbdt_string}",
             self.result_filter_cut)
-        # basf2.conditions.testing_payloads = ["localdb/database.txt"]
+
         basf2.conditions.prepend_testing_payloads("localdb/database.txt")
         result_filter_parameters = {"DBPayloadName": f"trk_CDCToSVDSeedResultFilterParameter{fbdt_string}"}
 
@@ -768,7 +761,9 @@ class MainTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
+
+    # I'm not sure how to treat this line. I commented it out to make the script run
     # b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    # b2luigi.set_setting("batch_system", "htcondor")
+    b2luigi.set_setting("batch_system", "lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

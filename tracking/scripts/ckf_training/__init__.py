@@ -33,9 +33,7 @@ def my_basf2_mva_teacher(
     :param tree_name: Name of the TTree in the ROOT file from the ``data_collection_task``
            that contains the training data for the MVA teacher.
     :param weightfile_identifier: Name of the weightfile that is created.
-           Should either end in ".xml" for local weightfiles or in ".root", when
-           the weightfile needs later to be uploaded as a payload to the conditions
-           database.
+           Must not end in .xml nor in .root since the payload will be later downloaded to a local database.
     :param target_variable: Feature/variable to use as truth label in the quality estimator MVA classifier.
     :param exclude_variables: List of collected variables to not use in the training of the QE MVA classifier.
            In addition to variables containing the "truth" substring, which are excluded by default.
@@ -43,12 +41,6 @@ def my_basf2_mva_teacher(
     """
     if exclude_variables is None:
         exclude_variables = []
-
-    '''
-    weightfile_extension = Path(weightfile_identifier).suffix
-    if weightfile_extension not in {".xml", ".root"}:
-        raise ValueError(f"Weightfile Identifier should end in .xml or .root, but ends in {weightfile_extension}")
-    '''
 
     # extract names of all variables from one record file
     with root_utils.root_open(records_files[0]) as records_tfile:
@@ -88,9 +80,8 @@ def my_basf2_mva_teacher(
     fastbdt_options.m_nCuts = fast_bdt_option[1]
     fastbdt_options.m_nLevels = fast_bdt_option[2]
     fastbdt_options.m_shrinkage = fast_bdt_option[3]
-    # Train a MVA method and store the weightfile (MVAFastBDT.root) locally.
+    # Train a MVA method.
     basf2_mva.teacher(general_options, fastbdt_options)
-    # basf2_mva.download(weightfile_identifier, weightfile_identifier + '.root')
 
 
 def create_fbdt_option_string(fast_bdt_option):

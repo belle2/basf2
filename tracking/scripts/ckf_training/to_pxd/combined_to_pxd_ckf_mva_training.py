@@ -516,7 +516,6 @@ class CKFStateFilterTeacherTask(Basf2Task):
     def get_weightfile_identifier(self, fast_bdt_option=None, filter_number=1):
         """
         Name of weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -528,8 +527,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
 
     def get_weightfile_root_identifier(self):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of the root weightfile used as a local weightfile in the following validation tasks.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -603,8 +601,7 @@ class ResultRecordingTask(Basf2PathTask):
     #: Name of the records file for training the final result filter
     result_filter_records_name = b2luigi.Parameter()
 
-    #: location of the testing payloads
-    basf2.conditions.testing_payloads = ["localdb/database.txt"]
+    # prepend  testing payloads
     basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
@@ -672,7 +669,7 @@ class ResultRecordingTask(Basf2PathTask):
 
         fast_bdt_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
 
-        # write the tracking MVA filter paramaters and the cut on MVA classifier to be applied on a local db
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
         iov = [0, 0, 0, -1]
         write_tracking_mva_filter_payloads_to_db(
             f"trk_ToPXDStateFilter_1_Parameter{fast_bdt_string}",
@@ -692,7 +689,6 @@ class ResultRecordingTask(Basf2PathTask):
             f"trk_ToPXDStateFilter_3{fast_bdt_string}",
             0.01)
 
-        # basf2.conditions.testing_payloads = ["localdb/database.txt"]
         basf2.conditions.prepend_testing_payloads("localdb/database.txt")
         first_high_filter_parameters = {"DBPayloadName": f"trk_ToPXDStateFilter_1_Parameter{fast_bdt_string}",
                                         "direction": "backward"}
@@ -781,23 +777,9 @@ class CKFResultFilterTeacherTask(Basf2Task):
         #: \endcond
     )
 
-    def get_weightfile_xml_identifier(self, fast_bdt_option=None):
-        """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
-
-        :param fast_bdt_option: FastBDT option that is used to train this MVA
-        """
-        if fast_bdt_option is None:
-            fast_bdt_option = self.fast_bdt_option_result_filter
-        fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
-        weightfile_name = "trk_ToPXDResultFilter" + fast_bdt_string
-        return weightfile_name + ".xml"
-
     def get_weightfile_identifier(self, fast_bdt_option=None):
         """
         Name of weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -809,8 +791,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
 
     def get_weightfile_root_identifier(self):
         """
-        Name of the xml weightfile that is created by the teacher task.
-        It is subsequently used as a local weightfile in the following validation tasks.
+        Name of the root weightfile used as a local weightfile in the following validation tasks.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
         """
@@ -891,8 +872,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
     #: How many results should be kept at maximum to search for overlaps.
     use_n_best_results = b2luigi.IntParameter()
 
-    #: location of the testing payloads
-    basf2.conditions.testing_payloads = ["localdb/database.txt"]
+    # prepend the testing payloads
     basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 
     def output(self):
@@ -960,7 +940,7 @@ class ValidationAndOptimisationTask(Basf2PathTask):
         fbdt_state_filter_string = create_fbdt_option_string(self.fast_bdt_option_state_filter)
         fbdt_result_filter_string = create_fbdt_option_string(self.fast_bdt_option_result_filter)
 
-        # write the tracking MVA filter paramaters and the cut on MVA classifier to be applied on a local db
+        # write the tracking MVA filter parameters and the cut on MVA classifier to be applied on a local db
         iov = [0, 0, 0, -1]
         write_tracking_mva_filter_payloads_to_db(
             f"trk_ToPXDStateFilter_1_Parameter{fbdt_state_filter_string}",
@@ -986,12 +966,10 @@ class ValidationAndOptimisationTask(Basf2PathTask):
             f"trk_ToPXDResultFilter{fbdt_result_filter_string}",
             self.result_filter_cut)
 
-        # basf2.conditions.testing_payloads = ["localdb/database.txt"]
         basf2.conditions.prepend_testing_payloads("localdb/database.txt")
         first_high_filter_parameters = {"DBPayloadName": f"trk_ToPXDStateFilter_1_Parameter{fbdt_state_filter_string}",
                                         "direction": "backward"}
-        second_high_filter_parameters = {
-            "DBPayloadName": f"trk_ToPXDStateFilter_2_Parameter{fbdt_state_filter_string}"}
+        second_high_filter_parameters = {"DBPayloadName": f"trk_ToPXDStateFilter_2_Parameter{fbdt_state_filter_string}"}
         third_high_filter_parameters = {"DBPayloadName": f"trk_ToPXDStateFilter_3_Parameter{fbdt_state_filter_string}"}
         filter_parameters = {"DBPayloadName":  f"trk_ToPXDResultFilter_Parameter{fbdt_result_filter_string}"}
 
@@ -1141,7 +1119,9 @@ class MainTask(b2luigi.WrapperTask):
 
 
 if __name__ == "__main__":
+
+    # I'm not sure how to treat this line. I commented it out to make the script run
     # b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    # b2luigi.set_setting("batch_system", "htcondor")
+    b2luigi.set_setting("batch_system", "lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

@@ -12,9 +12,6 @@
 
 #include <reconstruction/modules/KLMMuonIDDNNExpert/KLMMuonIDDNNExpertModule.h>
 
-#include <klm/dataobjects/KLMHit2d.h>
-#include <klm/dataobjects/bklm/BKLMElementNumbers.h>
-#include <klm/dataobjects/eklm/EKLMElementNumbers.h>
 #include <klm/bklm/geometry/GeometryPar.h>
 #include <klm/bklm/geometry/Module.h>
 #include <klm/eklm/geometry/TransformDataGlobalAligned.h>
@@ -27,7 +24,6 @@
 
 #include <tracking/dataobjects/ExtHit.h>
 
-#include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 
 #include <mva/interface/Interface.h>

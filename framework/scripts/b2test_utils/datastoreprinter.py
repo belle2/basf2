@@ -146,7 +146,7 @@ class DataStorePrinter:
                     self._printObj(obj, i)
         else:
             obj = Belle2.PyStoreObj(self.name)
-            if not data.isValid():
+            if not obj.isValid():
                 print(f"No data for {self.name}")
             else:
                 if obj:

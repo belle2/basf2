@@ -356,7 +356,7 @@ def loadStdWideOmega(persistent=True, path=None):
     ma.fillParticleList('pi+:wideOmega', 'dr < 1 and abs(dz) < 3 and thetaInCDCAcceptance and pionID > 0.1', path=path)
     ma.cutAndCopyList('pi0:wideOmega', 'pi0:skim', 'p > 0.25 and 0.11 < InvM < 0.15', path=path)
     ma.reconstructDecay('omega:wide -> pi+:wideOmega pi-:wideOmega pi0:wideOmega', '0.71 < M < 0.85',
-                        writeOut=persistent, standardParticleList=True, path=path)
+                        writeOut=persistent, path=path)
     return 'omega:wide'
 
 
@@ -382,7 +382,7 @@ def loadStdPhotonCutEta(persistent=True, path=None):
     @param path         modules are added to this path
     """
     etacuts = "0.35 < M < 0.7 and daughterLowest(E) > 0.05"
-    ma.reconstructDecay('eta:gm -> gamma:all gamma:all', etacuts, 1, persistent, path, standardParticleList=True)
+    ma.reconstructDecay('eta:gm -> gamma:all gamma:all', etacuts, 1, persistent, path)
     return 'eta:gm'
 
 

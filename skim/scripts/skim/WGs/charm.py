@@ -74,8 +74,7 @@ def charm_skim_sigma(path):
     ma.fillParticleList('p+:loose_charmSkim', 'trinaryID > 0.2', path=path)
     ma.cutAndCopyList('pi0:charmSkim', 'pi0:skim', '0.120 < InvM < 0.145', True, path=path)
     ma.reconstructDecay('Sigma+:charmSkim -> p+:loose_charmSkim pi0:charmSkim',
-                        cut='1.166 < M < 1.211 and significanceOfDistance > 2',
-                        standardParticleList=True, path=path)
+                        cut='1.166 < M < 1.211 and significanceOfDistance > 2', path=path)
 
 
 @fancy_skim_header

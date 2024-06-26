@@ -42,7 +42,7 @@ New skims
   * `17220300 <skim.WGs.charm.DpToPipKpKm>`:  :math:`D^+ \to \pi^+ K^- K^+`
   * `17230900 <skim.WGs.charm.LambdacToSHpJm>`:  :math:`\Lambda_c^+ \to \Sigma^+ h^+ j^-`
   * `17231000 <skim.WGs.charm.XicpTopHpJm>`:  :math:`\Xi_c^+ \to p \pi^+ K^-`
-  * `17231100 <skim.WGs.charm.XictoXimpippim>`:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
+  * `17231100 <skim.WGs.charm.XictoXimPipPim>`:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
   * `17231200 <skim.WGs.charm.Xic0ToLHpJm>`:  :math:`\Xi_c^0 \to \Lambda^0 h^+ j^-`
   * `17232000 <skim.WGs.charm.DpToHpPi0>`:  :math:`D^{+} \to \pi^+ \pi^0`
   * `17222100 <skim.WGs.charm.DpToKsHp>`:  :math:`D^+ \to K_S \pi^+`

@@ -1139,7 +1139,7 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
         ma.reconstructDecay(decayString="D*+:D0ToKstGam -> D0:D0ToKstGam pi+:charmSkim", cut=Dstcuts, dmID=4, path=path)
 
         ma.copyLists(
-            outputListName="D*+:all",
+            outputListName="D*+:D0ToVGam",
             inputListNames=[
                 "D*+:D0ToOmgGam",
                 "D*+:D0ToPhiGam",
@@ -1147,10 +1147,10 @@ class DstToD0Pi_D0ToVGamma(BaseSkim):
                 "D*+:D0ToKstGam"],
             path=path)
 
-        eventCuts = "nParticlesInList(D*+:all) > 0"
+        eventCuts = "nParticlesInList(D*+:D0ToVGam) > 0"
         path = self.skim_event_cuts(eventCuts, path=path)
 
-        DstList.append("D*+:all")
+        DstList.append("D*+:D0ToVGam")
 
         return DstList
 

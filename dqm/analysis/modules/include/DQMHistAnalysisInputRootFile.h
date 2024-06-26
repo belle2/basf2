@@ -100,6 +100,11 @@ namespace Belle2 {
 
     /** Test mode for null histograms */
     bool m_nullHistoMode = false;
+
+    TCanvas* m_c_info{nullptr};
+    TH1F* m_h_expno{nullptr};
+    TH1F* m_h_runno{nullptr};
+    TH1F* m_h_rtype{nullptr};
   };
 } // end namespace Belle2
 

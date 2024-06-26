@@ -60,6 +60,15 @@ void DQMHistAnalysisInputRootFileModule::initialize()
   m_run_idx = 0;
   m_file = new TFile(m_fileList[m_run_idx].c_str());
   m_eventMetaDataPtr.registerInDataStore();
+
+  if (true /*m_enable_run_info*/) {
+    m_c_info = new TCanvas("DQMInfo/c_info", "");
+    m_c_info->SetTitle("");
+  }
+  m_h_expno = new TH1F("DQMInfo/expno", "", 1, 0, 1);
+  m_h_runno = new TH1F("DQMInfo/runno", "", 1, 0, 1);
+  m_h_rtype = new TH1F("DQMInfo/rtype", "", 1, 0, 1);
+
   B2INFO("DQMHistAnalysisInputRootFile: initialized.");
 }
 
@@ -218,6 +227,13 @@ void DQMHistAnalysisInputRootFileModule::event()
   m_eventMetaDataPtr->setRun(m_runList[m_run_idx]);
   m_eventMetaDataPtr->setEvent(m_count);
   m_eventMetaDataPtr->setTime(ts * 1e9);
+
+  m_h_expno->SetTitle(std::to_string(m_expno).c_str());
+  hs.push_back(m_h_expno);
+  m_h_runno->SetTitle(std::to_string(m_runList[m_run_idx]).c_str());
+  hs.push_back(m_h_runno);
+  m_h_rtype->SetTitle(m_runType.c_str());
+  hs.push_back(m_h_rtype);
 
   //setExpNr(m_expno); // redundant access from MetaData
   //setRunNr(m_runno); // redundant access from MetaData

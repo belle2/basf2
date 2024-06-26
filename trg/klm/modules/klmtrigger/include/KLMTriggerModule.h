@@ -16,7 +16,8 @@
 
 
 namespace Belle2 {
-
+  class klm_trig_linear_fit_t;
+  class klmtrg_layer_counter_t;
 
   class KLMTriggerModule : public Module {
   public:
@@ -42,6 +43,14 @@ namespace Belle2 {
 
     struct geometry_data;
     std::shared_ptr<geometry_data>  m_geometry;
+
+
+    std::shared_ptr<klmtrg_layer_counter_t>  m_klmtrg_layer_counter;
+
+
+
+    std::shared_ptr<klm_trig_linear_fit_t>  m_klm_trig_linear_fit;
+
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;
     std::string m_geometry_fileName;

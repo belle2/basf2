@@ -1854,17 +1854,17 @@ class DpToEtaHp(BaseSkim):
     def build_lists(self, path):
         eta_gamma_cut = "[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]]"
         eta_gamma_cut += " and [[clusterReg==1 and E>0.05] or [clusterReg==2 and E>0.05] or [clusterReg==3 and E>0.075]]"
-        ma.fillParticleList("gamma:my", eta_gamma_cut, path=path)
+        ma.fillParticleList("gamma:DpToEtaHp", eta_gamma_cut, path=path)
 
-        ma.reconstructDecay('eta:gg -> gamma:my gamma:my', '[0.4 < M < 0.6] and [p>0.4]', path=path)
-        ma.reconstructDecay('eta:pipipi -> pi+:charmSkim pi-:charmSkim pi0:skim', '[0.48 < M < 0.6] and [p>0.4]', path=path)
+        ma.reconstructDecay('eta:DpToEtaHp_2Gam -> gamma:DpToEtaHp gamma:DpToEtaHp', '[0.4 < M < 0.6] and [p>0.4]', path=path)
+        ma.reconstructDecay('eta:DpToEtaHp_3Pi -> pi+:charmSkim pi-:charmSkim pi0:skim', '[0.48 < M < 0.6] and [p>0.4]', path=path)
 
         charmcuts = "1.6 < M < 2.1 and useCMSFrame(p)>2.2"
-        ma.reconstructDecay('D+:gg_pip -> eta:gg pi+:charmSkim', charmcuts, path=path)
-        ma.reconstructDecay('D+:3pi_pip -> eta:pipipi pi+:charmSkim', charmcuts, path=path)
+        ma.reconstructDecay('D+:DpToEtaHp_2Gam -> eta:DpToEtaHp_2Gam pi+:charmSkim', charmcuts, path=path)
+        ma.reconstructDecay('D+:DpToEtaHp_3Pi -> eta:DpToEtaHp_3Pi pi+:charmSkim', charmcuts, path=path)
 
         DpList = []
-        DpList.append("D+:gg_pip")
-        DpList.append("D+:3pi_pip")
+        DpList.append("D+:DpToEtaHp_2Gam")
+        DpList.append("D+:DpToEtaHp_3Pi")
 
         return DpList

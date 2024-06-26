@@ -7777,6 +7777,7 @@ MCParticle#90:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
   getErrorFlag(): 0
@@ -16130,6 +16131,7 @@ MCParticle#71:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
   getErrorFlag(): 0
@@ -23393,6 +23395,7 @@ MCParticle#75:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

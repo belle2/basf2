@@ -145,7 +145,7 @@ KLMTriggerModule::KLMTriggerModule() : Module()
   addParam("nLayerTrigger", m_nLayerTrigger, "", 8);
   int do_dump = 0;
   addParam("do_dump", do_dump, "", 0);
-  get_IO_csv_handle().do_dump = 1;
+  get_IO_csv_handle().do_dump = do_dump > 0;
 
 
 }

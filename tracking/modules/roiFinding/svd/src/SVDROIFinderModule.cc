@@ -52,7 +52,7 @@ SVDROIFinderModule::SVDROIFinderModule() : Module()
   addParam("SVDInterceptListName", m_SVDInterceptListName, "name of the list of interceptions", std::string(""));
   addParam("ROIListName", m_ROIListName, "name of the list of ROIs", std::string(""));
   addParam("ROIFindingForDQM", m_ROIFindingForDQM,
-           "Is this ROI finding for DQM? If false, create PXDIntercepts by extrapolating tracks in both directions. If true, only extrapolate backwards.",
+           "Is this ROI finding for DQM? If false, create SVDIntercepts by extrapolating tracks in both directions. If true, only extrapolate backwards.",
            m_ROIFindingForDQM);
 }
 

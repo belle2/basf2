@@ -32,7 +32,8 @@ settings = CalibrationSettings(
 
     expert_config={
         "isMC": False,
-        "rerun_reco": False,
+        "rerun_reco": False,  # need to rerun reconstruction for calibration?
+        "rerun_reco_val": True,  # need to rerun reconstruction for validation?
         "MaxFilesPerRun": 15,
         "MaxFilesPerRunValidation": 5,
         "MinEvtsPerFile": 1,
@@ -205,6 +206,7 @@ def get_calibrations(input_data, **kwargs):
 
     isMC = expert_config["isMC"]
     rerun_reco = expert_config["rerun_reco"]
+    rerun_reco_val = expert_config["rerun_reco_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
 
@@ -256,7 +258,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Calibration
 
     rec_path = create_path(rerun_reco, isMC, expert_config)
-    rec_path_validation = create_path(1, isMC, expert_config)
+    rec_path_validation = create_path(rerun_reco_val, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",

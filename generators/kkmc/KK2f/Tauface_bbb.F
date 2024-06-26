@@ -1589,7 +1589,7 @@ C      CALL INIOFC ! dummy for now anyway
             IF (RRR1(1).GT.0.5) THEN ! flip between 1 and 2
                IF (JAK1.EQ.1.OR.JAK1.EQ.2) THEN
                   JAK1=MOD(JAK1,2)+1
-               ELSE
+               ELSEIF (JAK2.EQ.1.OR.JAK2.EQ.2) THEN
                   JAK2=MOD(JAK2,2)+1
                ENDIF
             ENDIF

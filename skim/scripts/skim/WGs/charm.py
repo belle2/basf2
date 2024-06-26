@@ -98,12 +98,12 @@ class XToD0_D0ToHpJm(BaseSkim):
         **Selection Criteria**:
             * Use tracks from the charm_skim_std_charged
             * ``1.70 < M(D0) < 2.00, pcms(D0) > 2.0``
-            * `` K/pi binary ID > 0.2, pi_pionIDNN > 0.1``
+            * `` K/pi binary ID > 0.2``
             * For more details, please check the source code of this skim.
 
         """
 
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
+        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
         D0Cuts = "1.70 < M < 2.00 and useCMSFrame(p) > 2.0"
@@ -1140,7 +1140,7 @@ class LambdacTopHpJm(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
         * For more details, please check the source code of this skim.
 
     """
@@ -1164,8 +1164,8 @@ class LambdacTopHpJm(BaseSkim):
         charm_skim_std_charged('p', path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
         ma.cutAndCopyList('p+:charmSkim_pid', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
@@ -1198,7 +1198,7 @@ class LambdacToSHpJm(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
         * loose mass window for :math:`\\pi^{0}` and skim selections from stdPi0s
         * ``0.44 < M(K_s) < 0.55, significanceOfDistance > 2.0``
         * :math:`\\pm 3\\sigma` mass windows for :math:`\\Sigma^+`
@@ -1227,8 +1227,8 @@ class LambdacToSHpJm(BaseSkim):
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
@@ -1270,7 +1270,7 @@ class XicpTopHpJm(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.3 < M(Xi_c) < 2.65, pcms(Xi_c) > 2.0``
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
         * For more details, please check the source code of this skim.
 
     """
@@ -1294,8 +1294,8 @@ class XicpTopHpJm(BaseSkim):
         charm_skim_std_charged('p', path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
         ma.cutAndCopyList('p+:charmSkim_pid', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
@@ -1326,7 +1326,7 @@ class XictoXimpippim(BaseSkim):
     **Selection Criteria**
 
     * standard track quality constraints on final state particles from charm_skim_std_charged
-    * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+    * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
     * :math:`\\pm 3\\sigma` mass windows for all intermediate hyperons
     * :math:`\\pm 3\\sigma` mass window for pi0 and skim selections from stdPi0s
     * lower bound on significance of distance for all intermediate hyperons, 40% of expected value to be used in analysis
@@ -1353,8 +1353,8 @@ class XictoXimpippim(BaseSkim):
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
         ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.2', path=path)
 
@@ -1427,7 +1427,7 @@ class Xic0ToLHpJm(BaseSkim):
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
         ma.cutAndCopyList(
             'Lambda0:charmSkim',

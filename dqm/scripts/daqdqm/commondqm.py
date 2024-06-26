@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -111,6 +110,11 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             pathLocation="before filter",
         ).set_name("SoftwareTriggerHLTDQM_before_filter")
 
+        path.add_module(
+            "TrackingAbortDQM",
+            histogramDirectoryName="TrackingAbort_before_filter",
+        ).set_name("TrackingAbortDQM_before_filter")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -190,6 +194,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
             pathLocation="after filter",
         )
+
+        path.add_module("TrackingAbortDQM")
+
         # Skim plots where bhabha contamination is removed
         path.add_module(
             "SoftwareTriggerHLTDQM",
@@ -252,6 +259,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # TRGECL
         trgecldqm = b2.register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+        trgecltimingdqm = b2.register_module('TRGECLEventTimingDQM')
+        path.add_module(trgecltimingdqm)
         # TRGGDL
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
@@ -338,6 +347,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_analysis_dqm(path)
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
+
+    # KLM2 (requires mu+ particle list from add_analysis_dqm)
+    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
+                        MinimalMatchingDigits=12,
+                        MinimalMatchingDigitsOuterLayers=0,
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

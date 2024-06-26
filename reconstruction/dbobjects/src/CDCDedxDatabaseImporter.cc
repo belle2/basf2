@@ -91,6 +91,7 @@ void CDCDedxDatabaseImporter::importHadronCorrection()
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
 
   // loop over the histogram to fill the TClonesArray
+  if (!parhist) B2FATAL("None of the input files contains the histogram called 'CDCDedxHadronCor'!");
   short version = parhist->GetBinContent(1);
   std::vector<double> hadroncor;
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
@@ -137,6 +138,7 @@ void CDCDedxDatabaseImporter::importMeanParameters()
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
 
   // loop over the histogram to fill the TClonesArray
+  if (!parhist) B2FATAL("None of the input files contains the histogram called 'CDCDedxMeanPars'!");
   short version = parhist->GetBinContent(1);
   std::vector<double> meanpars;
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {
@@ -183,6 +185,7 @@ void CDCDedxDatabaseImporter::importSigmaParameters()
   if (nFiles != 1) { B2FATAL("Sorry, you must only import one file at a time for now!"); }
 
   // loop over the histogram to fill the TClonesArray
+  if (!parhist) B2FATAL("None of the input files contains the histogram called 'CDCDedxSigmaPars'!");
   short version = parhist->GetBinContent(1);
   std::vector<double> sigmapars;
   for (int bin = 2; bin <= parhist->GetNbinsX(); ++bin) {

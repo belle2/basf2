@@ -7,13 +7,14 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-# #########################################################################
+##########################################################################
 
 import copy
 import math
 
 import pandas
 import numpy
+import itertools
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -82,19 +83,25 @@ class Plotter:
         """
         b2.B2INFO("Create new figure for class " + str(type(self)))
         if figure is None:
+            #: create figure
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(False)
         else:
             self.figure = figure
 
         if axis is None:
+            #: divide figure into subplots
             self.axis = self.figure.add_subplot(1, 1, 1)
         else:
             self.axis = axis
 
+        #: create empty list for plots
         self.plots = []
+        #: create empty list for labels
         self.labels = []
+        #: set x limits
         self.xmin, self.xmax = float(0), float(1)
+        #: set y limits
         self.ymin, self.ymax = float(0), float(1)
         #: y limit scale
         self.yscale = 0.1
@@ -185,7 +192,9 @@ class Plotter:
         fill_kwargs = copy.copy(self.fill_kwargs)
 
         if plot_kwargs is None or 'color' not in plot_kwargs:
-            color = next(axis._get_lines.prop_cycler)
+            prop_cycler = plt.rcParams["axes.prop_cycle"]
+            prop_iter = itertools.cycle(prop_cycler)
+            color = next(prop_iter)
             color = color['color']
             plot_kwargs['color'] = color
         else:
@@ -212,7 +221,10 @@ class Plotter:
                 xerr = xerr*numpy.ones(len(x))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
-            e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
+            e = axis.errorbar(
+                x[mask], y[mask], xerr=numpy.where(
+                    xerr[mask] < 0, 0.0, xerr[mask]), yerr=numpy.where(
+                    yerr[mask] < 0, 0.0, yerr[mask]), rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:
@@ -487,6 +499,7 @@ class Multiplot(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
+            #: create figure
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(True)
         else:
@@ -503,6 +516,7 @@ class Multiplot(Plotter):
 
         #: the subplots which are displayed in the grid
         self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
+        #: the axis of the first subplot
         self.axis = self.sub_plots[0].axis
         super().__init__(self.figure, self.axis)
 
@@ -860,14 +874,18 @@ class Overtraining(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
+            #: create figure
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         gs = matplotlib.gridspec.GridSpec(5, 1)
+        #: define first subplot
         self.axis = self.figure.add_subplot(gs[:3, :])
+        #: define second subplot
         self.axis_d1 = self.figure.add_subplot(gs[3, :], sharex=self.axis)
+        #: define third subplot
         self.axis_d2 = self.figure.add_subplot(gs[4, :], sharex=self.axis)
 
         super().__init__(self.figure, self.axis)
@@ -987,6 +1005,7 @@ class VerboseDistribution(Plotter):
         self.normed = normed
         #: Show only a certain range in terms of standard deviations of the data
         self.range_in_std = range_in_std
+        #: create empty list for box axes
         self.box_axes = []
         #: The distribution plot
         self.distribution = Distribution(self.figure, self.axis, normed_to_all_entries=self.normed, range_in_std=self.range_in_std)
@@ -1060,14 +1079,18 @@ class Correlation(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
+            #: create figure
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         gs = matplotlib.gridspec.GridSpec(3, 2)
+        #: define first subplot
         self.axis = self.figure.add_subplot(gs[0, :])
+        #: define second subplot
         self.axis_d1 = self.figure.add_subplot(gs[1, :], sharex=self.axis)
+        #: define third subplot
         self.axis_d2 = self.figure.add_subplot(gs[2, :], sharex=self.axis)
 
         super().__init__(self.figure, self.axis)
@@ -1232,13 +1255,16 @@ class CorrelationMatrix(Plotter):
         @param figure default draw figure which is used
         """
         if figure is None:
+            #: create figure
             self.figure = matplotlib.figure.Figure(figsize=(32, 18))
             self.figure.set_tight_layout(True)
         else:
             self.figure = figure
 
         gs = matplotlib.gridspec.GridSpec(8, 2)
+        #: add signal subplot
         self.signal_axis = self.figure.add_subplot(gs[:6, 0])
+        #: add background subplot
         self.bckgrd_axis = self.figure.add_subplot(gs[:6, 1], sharey=self.signal_axis)
         #: Colorbar axis contains the colorbar
         self.colorbar_axis = self.figure.add_subplot(gs[7, :])

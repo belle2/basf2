@@ -23,7 +23,7 @@ def default_extractor():
     def computeMean(profile_obj):
         """
         compute the mean values of the y dimension, also with
-        zero supression
+        zero suppression
         """
         nbinsx = profile_obj.GetNbinsX()
         sum = 0.0
@@ -83,7 +83,7 @@ def default_extractor():
 
 class RootQuantityExtract:
     """
-    Class to automatically quntaties from ROOT Objects
+    Class to automatically extract quantities from ROOT Objects
     """
 
     def __init__(self, extractor=None):

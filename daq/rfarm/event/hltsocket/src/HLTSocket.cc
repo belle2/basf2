@@ -79,9 +79,9 @@ int HLTSocket::write_data(char* data, int len)
   errno = 0;
   char* ptr = data;
   int bcount = 0;
-  int br = 0;
 
   while (bcount < len) {
+    int br = 0;
     if ((br = ::write(m_socket, ptr, len - bcount)) > 0) {
       bcount += br;
       ptr += br;
@@ -163,9 +163,9 @@ int HLTSocket::read_data(char* data, int len)
 {
   char* buf = data;
   int bcount = 0;
-  int br = 0;
 
   while (bcount < len) {
+    int br = 0;
     if ((br = ::read(m_socket, buf, len - bcount)) > 0) {
       bcount += br;
       buf += br;

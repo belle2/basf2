@@ -31,6 +31,9 @@ DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
+#ifdef _BELLE2_EPICS
+std::vector <chid>  DQMHistAnalysisModule::m_epicsChID;
+#endif
 
 bool DQMHistAnalysisModule::m_useEpics = false; // default to false, to enable EPICS, add special EPICS Module class into chain
 bool DQMHistAnalysisModule::m_epicsReadOnly =
@@ -161,27 +164,37 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name)
+TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-  // parse the dir+histo name and create the corresponding canvas name
-  auto s = StringSplit(histo_name, '/');
-  if (s.size() != 2) {
-    B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
-    return nullptr;
+
+  TCanvas* cnv = nullptr;
+  // try to get canvas from outside
+  if (cobj) cnv = *cobj;
+  // if no canvas search for it
+  if (cnv == nullptr) {
+    // parse the dir+histo name and create the corresponding canvas name
+    auto s = StringSplit(histo_name, '/');
+    if (s.size() != 2) {
+      B2ERROR("findHistInCanvas: histoname not valid (missing dir?), should be 'dirname/histname': " << histo_name);
+      return nullptr;
+    }
+    auto dirname = s.at(0);
+    auto hname = s.at(1);
+    std::string canvas_name = dirname + "/c_" + hname;
+    cnv = findCanvas(canvas_name);
+    // set canvas pointer for outside
+    if (cnv && cobj) *cobj = cnv;
   }
-  auto dirname = s.at(0);
-  auto hname = s.at(1);
-  std::string canvas_name = dirname + "/c_" + hname;
 
-  auto cobj = findCanvas(canvas_name);
-  if (cobj == nullptr) return nullptr;
-
-  TIter nextkey(((TCanvas*)cobj)->GetListOfPrimitives());
-  TObject* obj{};
-  while ((obj = dynamic_cast<TObject*>(nextkey()))) {
-    if (obj->IsA()->InheritsFrom("TH1")) {
-      if (obj->GetName() == histo_name)
-        return  dynamic_cast<TH1*>(obj);
+  // get histogram pointer
+  if (cnv != nullptr) {
+    TIter nextkey(cnv->GetListOfPrimitives());
+    TObject* obj{};
+    while ((obj = dynamic_cast<TObject*>(nextkey()))) {
+      if (obj->IsA()->InheritsFrom("TH1")) {
+        if (obj->GetName() == histo_name)
+          return  dynamic_cast<TH1*>(obj);
+      }
     }
   }
   return nullptr;
@@ -238,6 +251,20 @@ std::vector <std::string> DQMHistAnalysisModule::StringSplit(const std::string& 
   return out;
 }
 
+void DQMHistAnalysisModule::clearCanvases(void)
+{
+  TIter nextckey(gROOT->GetListOfCanvases());
+  TObject* cobj = nullptr;
+
+  while ((cobj = dynamic_cast<TObject*>(nextckey()))) {
+    if (cobj->IsA()->InheritsFrom("TCanvas")) {
+      TCanvas* cnv = dynamic_cast<TCanvas*>(cobj);
+      cnv->Clear();
+      colorizeCanvas(cnv, c_StatusDefault);
+    }
+  }
+}
+
 void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 {
   for (auto& h : s_histList) {
@@ -254,6 +281,13 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 void DQMHistAnalysisModule::clearHistList(void)
 {
   s_histList.clear();
+}
+
+void DQMHistAnalysisModule::resetDeltaList(void)
+{
+  for (auto d : s_deltaList) {
+    d.second->reset();
+  }
 }
 
 void DQMHistAnalysisModule::UpdateCanvas(std::string name, bool updated)
@@ -290,8 +324,17 @@ void DQMHistAnalysisModule::ExtractEvent(std::vector <TH1*>& hs)
   B2ERROR("ExtractEvent: Histogram \"DAQ/Nevent\" missing");
 }
 
+int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname)
+{
+  return registerEpicsPVwithPrefix(m_PVPrefix, pvname, keyname);
+}
 
-int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyname, bool update_pvs)
+int DQMHistAnalysisModule::registerExternalEpicsPV(std::string pvname, std::string keyname)
+{
+  return registerEpicsPVwithPrefix(std::string(""), pvname, keyname);
+}
+
+int DQMHistAnalysisModule::registerEpicsPVwithPrefix(std::string prefix, std::string pvname, std::string keyname)
 {
   if (!m_useEpics) return -1;
 #ifdef _BELLE2_EPICS
@@ -308,9 +351,7 @@ int DQMHistAnalysisModule::registerEpicsPV(std::string pvname, std::string keyna
   auto ptr = &m_epicsChID.back();
   if (!ca_current_context()) SEVCHK(ca_context_create(ca_disable_preemptive_callback), "ca_context_create");
   // the subscribed name includes the prefix, the map below does *not*
-  SEVCHK(ca_create_channel((m_PVPrefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure");
-
-  if (update_pvs) SEVCHK(ca_pend_io(5.0), "ca_pend_io failure");
+  CheckEpicsError(ca_create_channel((prefix + pvname).data(), NULL, NULL, 10, ptr), "ca_create_channel failure", pvname);
 
   m_epicsNameToChID[pvname] =  *ptr;
   if (keyname != "") m_epicsNameToChID[keyname] =  *ptr;
@@ -328,7 +369,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, double value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
 #endif
 }
 
@@ -340,7 +381,7 @@ void DQMHistAnalysisModule::setEpicsPV(std::string keyname, int value)
     B2ERROR("Epics PV " << keyname << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsNameToChID[keyname], (void*)&value), "ca_set failure", keyname);
 #endif
 }
 
@@ -358,7 +399,7 @@ void DQMHistAnalysisModule::setEpicsStringPV(std::string keyname, std::string va
   }
   char text[40];
   strcpy(text, value.c_str());
-  SEVCHK(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_STRING, m_epicsNameToChID[keyname], text), "ca_set failure", keyname);
 #endif
 }
 
@@ -370,7 +411,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, double value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_DOUBLE, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -382,7 +423,7 @@ void DQMHistAnalysisModule::setEpicsPV(int index, int value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  SEVCHK(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure");
+  CheckEpicsError(ca_put(DBR_SHORT, m_epicsChID[index], (void*)&value), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -394,9 +435,10 @@ void DQMHistAnalysisModule::setEpicsStringPV(int index, std::string value)
     B2ERROR("Epics PV with " << index << " not registered!");
     return;
   }
-  char text[40];
-  strcpy(text, value.c_str());
-  SEVCHK(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure");
+  char text[41];
+  strncpy(text, value.c_str(), 40);
+  text[40] = 0;
+  CheckEpicsError(ca_put(DBR_STRING, m_epicsChID[index], text), "ca_set failure", m_epicsChID[index]);
 #endif
 }
 
@@ -417,7 +459,7 @@ double DQMHistAnalysisModule::getEpicsPV(std::string keyname)
   if (r == ECA_NORMAL) {
     return value;
   } else {
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV failed in ca_get or ca_pend_io failure", keyname);
   }
 #endif
   return NAN;
@@ -440,7 +482,7 @@ double DQMHistAnalysisModule::getEpicsPV(int index)
   if (r == ECA_NORMAL) {
     return value;
   } else {
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV failed in ca_get or ca_pend_io failure", m_epicsChID[index]);
   }
 #endif
   return NAN;
@@ -465,7 +507,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(std::string keyname, bool& s
     status = true;
     return std::string(value);
   } else {
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV (string) failed in ca_get or ca_pend_io failure", keyname);
   }
 #endif
   return std::string(value);
@@ -490,7 +532,7 @@ std::string DQMHistAnalysisModule::getEpicsStringPV(int index, bool& status)
     status = true;
     return std::string(value);
   } else {
-    SEVCHK(r, "ca_get or ca_pend_io failure");
+    CheckEpicsError(r, "Read PV (string) failed in ca_get or ca_pend_io failure", m_epicsChID[index]);
   }
 #endif
   return std::string(value);
@@ -524,12 +566,17 @@ chid DQMHistAnalysisModule::getEpicsPVChID(int index)
   return nullptr;
 }
 
-void DQMHistAnalysisModule::updateEpicsPVs(float wait)
+int DQMHistAnalysisModule::updateEpicsPVs(float wait)
 {
-  if (!m_useEpics) return;
+  int state = ECA_NORMAL;
+  if (!m_useEpics) return state;
 #ifdef _BELLE2_EPICS
-  if (wait > 0.) SEVCHK(ca_pend_io(wait), "ca_pend_io failure");
+  if (wait > 0.) {
+    state = ca_pend_io(wait);
+    SEVCHK(state, "ca_pend_io failure");
+  }
 #endif
+  return state;
 }
 
 void DQMHistAnalysisModule::cleanupEpicsPVs(void)
@@ -537,7 +584,7 @@ void DQMHistAnalysisModule::cleanupEpicsPVs(void)
   // this should be called in terminate function of analysis modules
 #ifdef _BELLE2_EPICS
   if (getUseEpics()) {
-    for (auto& it : m_epicsChID) SEVCHK(ca_clear_channel(it), "ca_clear_channel failure");
+    for (auto& it : m_epicsChID) CheckEpicsError(ca_clear_channel(it), "ca_clear_channel failure", it);
     updateEpicsPVs(5.0);
     // Make sure we clean up both afterwards!
     m_epicsChID.clear();
@@ -587,8 +634,121 @@ bool DQMHistAnalysisModule::requestLimitsFromEpicsPVs(chid pv, double& lowerAlar
       }
       return true;
     } else {
-      SEVCHK(r, "ca_get or ca_pend_io failure");
+      CheckEpicsError(r, "Reading PV Limits failed in ca_get or ca_pend_io failure", pv);
     }
   }
   return false;
 }
+
+DQMHistAnalysisModule::EStatus DQMHistAnalysisModule::makeStatus(bool enough, bool warn_flag, bool error_flag)
+{
+  // white color is the default, if no colorize
+  if (!enough) {
+    return (c_StatusTooFew);
+  } else {
+    if (error_flag) {
+      return (c_StatusError);
+    } else if (warn_flag) {
+      return (c_StatusWarning);
+    } else {
+      return (c_StatusGood);
+    }
+  }
+
+  return (c_StatusDefault); // default, but should not be reached
+}
+
+DQMHistAnalysisModule::EStatusColor DQMHistAnalysisModule::getStatusColor(EStatus stat)
+{
+  // white color is the default, if no colorize
+  EStatusColor color = c_ColorDefault;
+  switch (stat) {
+    case c_StatusTooFew:
+      color = c_ColorTooFew; // Magenta or Gray
+      break;
+    case c_StatusDefault:
+      color = c_ColorDefault; // default no colors
+      break;
+    case c_StatusGood:
+      color = c_ColorGood; // Good
+      break;
+    case c_StatusWarning:
+      color = c_ColorWarning; // Warning
+      break;
+    case c_StatusError:
+      color = c_ColorError; // Severe
+      break;
+    default:
+      color = c_ColorDefault; // default no colors
+      break;
+  }
+  return color;
+}
+
+void DQMHistAnalysisModule::colorizeCanvas(TCanvas* canvas, EStatus stat)
+{
+  if (!canvas) return;
+  auto color = getStatusColor(stat);
+
+  canvas->Pad()->SetFillColor(color);
+
+  canvas->Pad()->SetFrameFillColor(10); // White (kWhite is not used since it results in transparent!)
+  canvas->Pad()->SetFrameFillStyle(1001);// White
+  canvas->Pad()->Modified();
+  canvas->Pad()->Update();
+}
+
+void DQMHistAnalysisModule::checkPVStatus(void)
+{
+  B2INFO("Check PV Connections");
+
+  for (auto& it : m_epicsChID) {
+    printPVStatus(it);
+  }
+  B2INFO("Check PVs done");
+}
+
+void DQMHistAnalysisModule::printPVStatus(chid pv, bool onlyError)
+{
+  if (pv == nullptr) {
+    B2WARNING("PV chid was nullptr");
+    return;
+  }
+  auto state = ca_state(pv);
+  switch (state) {
+    case cs_never_conn: /* valid chid, server not found or unavailable */
+      B2WARNING("Channel never connected " << ca_name(pv));
+      break;
+    case cs_prev_conn:  /* valid chid, previously connected to server */
+      B2WARNING("Channel was connected, but now is not " << ca_name(pv));
+      break;
+    case cs_closed:   /* channel deleted by user */
+      B2WARNING("Channel deleted already " << ca_name(pv));
+      break;
+    case cs_conn:       /* valid chid, connected to server */
+      if (!onlyError) B2INFO("Channel connected and OK " << ca_name(pv));
+      break;
+    default:
+      B2WARNING("Undefined status for channel " << ca_name(pv));
+      break;
+  }
+}
+
+void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, const std::string& name)
+{
+  if (state != ECA_NORMAL) {
+    B2WARNING(message << ": " << name);
+    printPVStatus(m_epicsNameToChID[name], false);
+  }
+}
+
+void DQMHistAnalysisModule::CheckEpicsError(int state, const std::string& message, chid id = nullptr)
+{
+  if (state != ECA_NORMAL) {
+    std::string name;
+    if (id) name =  ca_name(id);
+    B2WARNING(message << ": " << name);
+    printPVStatus(id, false);
+  }
+}
+

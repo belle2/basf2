@@ -97,6 +97,9 @@ namespace Belle2 {
     /// returns trigger output. Null will returned if no signal.
     virtual const TRGSignal& signal(void) const = 0;
 
+    /// returns trigger output. Null will returned if no signal.
+    virtual const TRGSignal& signal_adc(void) const = 0;
+
   public:// Geometry
 
     /// returns position in forward endplate.

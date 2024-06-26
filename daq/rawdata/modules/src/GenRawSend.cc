@@ -20,7 +20,7 @@ using namespace Belle2;
 //RawSend* RAWCDC = NULL;
 
 // Framework interface
-REG_MODULE(GenRawSend)
+REG_MODULE(GenRawSend);
 
 // Constructor and destructor
 

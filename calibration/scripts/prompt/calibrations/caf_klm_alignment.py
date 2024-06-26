@@ -283,6 +283,16 @@ def get_calibrations(input_data, **kwargs):
     if input_files_physics:
         coll_physics = get_collector("raw_physics")
         rec_path_physics = get_alignment_pre_collector_path_physics(entry_sequence=entries)
+        # remove cdcdedxpid module
+        tmp = basf2.create_path()
+        for m in rec_path_physics.modules():
+            if m.name() not in ["CDCDedxPID", "TOPBunchFinder", "VXDDedxPID"]:
+                tmp.add_module(m)
+            elif m.name() == "CDCDedxPID":
+                basf2.B2INFO('removed CDCDedxPID')
+            elif m.name() == "TOPBunchFinder":
+                basf2.B2INFO('removed TOPBunchFinder')
+        rec_path_physics = tmp
 
         collection_physics = Collection(collector=coll_physics,
                                         input_files=input_files_physics,
@@ -293,6 +303,16 @@ def get_calibrations(input_data, **kwargs):
     if input_files_cosmic:
         coll_cosmic = get_collector("raw_cosmic")
         rec_path_cosmic = get_alignment_pre_collector_path_cosmic(entry_sequence=entries)
+        # remove cdcdedxpid module
+        tmp = basf2.create_path()
+        for m in rec_path_cosmic.modules():
+            if m.name() not in ["CDCDedxPID", "TOPBunchFinder", "VXDDedxPID"]:
+                tmp.add_module(m)
+            elif m.name() == "CDCDedxPID":
+                basf2.B2INFO('removed CDCDedxPID')
+            elif m.name() == "TOPBunchFinder":
+                basf2.B2INFO('removed TOPBunchFinder')
+        rec_path_cosmic = tmp
 
         collection_cosmic = Collection(collector=coll_cosmic,
                                        input_files=input_files_cosmic,

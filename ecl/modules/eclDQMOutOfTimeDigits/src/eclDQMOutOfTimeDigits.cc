@@ -12,7 +12,6 @@
 /* Basf2 headers. */
 #include <analysis/VariableManager/Manager.h>
 #include <framework/core/HistoModule.h>
-#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
 /* ROOT headers. */

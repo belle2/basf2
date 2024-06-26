@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -55,13 +54,6 @@ def add_collision_dqm(path, components=None, dqm_environment="expressreco", dqm_
         # IP DQM (when run on HLT, less plots are produced)
         if components is None or ('CDC' in components and 'SVD' in components):
             add_IP_dqm(path, dqm_environment=dqm_environment)
-
-        # KLM2 (requires mu+ particle list from add_analysis_dqm)
-        if (components is None or 'KLM' in components):
-            path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
-                            MinimalMatchingDigits=12,
-                            MinimalMatchingDigitsOuterLayers=0,
-                            MinimalMomentumNoOuterLayers=4.0)
 
     # the following makes only sense in collisions
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):

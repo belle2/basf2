@@ -96,6 +96,7 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
 void DQMHistAnalysisInputRootFileModule::event()
 {
   B2INFO("DQMHistAnalysisInputRootFile: event called.");
+  TH1::AddDirectory(false);
 
   sleep(m_interval);
 

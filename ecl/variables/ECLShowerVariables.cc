@@ -6,19 +6,16 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-// analysis
-#include <analysis/VariableManager/Manager.h>
+/* Own header. */
+#include <ecl/dataobjects/ECLShower.h>
 
-// framework
+/* Basf2 headers. */
+#include <analysis/dataobjects/Particle.h>
+#include <analysis/VariableManager/Manager.h>
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-
-// dataobjects
 #include <mdst/dataobjects/ECLCluster.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <ecl/dataobjects/ECLShower.h>
 
 using namespace std;
 

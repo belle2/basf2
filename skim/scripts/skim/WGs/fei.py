@@ -529,6 +529,138 @@ class feiSLB0(BaseFEISkim):
             path=path)
 
 
+@_FEI_skim_header("B0")
+class feiSLB0_RDstar(BaseFEISkim):
+    """
+    Tag side :math:`B` cuts:
+
+    * :math:`\\text{FoxWolframR2} < 0.4`
+    * :math:`-1.75 < \\cos\\theta_{BY} < 1.1`
+    * :math:`\\log_{10}(\\text{signal probability}) > -2.0`
+    * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
+    * :math:`\\text{BCS:signal probability}`
+
+    SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with SL :math:`D` are not
+    reconstructed, as these are rare and time-intensive.
+
+    <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
+    """
+    __description__ = ("FEI-tagged neutral :math:`B`'s decaying semileptonically",
+                       "Analysis cuts included, best sigProb candidate kept"
+                       )
+    validation_sample = _VALIDATION_SAMPLE
+
+    FEIChannelArgs = {
+        "neutralB": True,
+        "chargedB": False,
+        "hadronic": False,
+        "semileptonic": True,
+        "KLong": False,
+        "baryonic": True,
+        "removeSLD": True
+    }
+
+    def build_lists(self, path):
+        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
+        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+
+        ma.fillParticleList(decayString="pi+:FEI_cleaned",
+                            cut=CleanedTrackCuts, path=path)
+        ma.fillParticleList(decayString="gamma:FEI_cleaned",
+                            cut=CleanedClusterCuts, path=path)
+
+        ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
+                                                "gamma:FEI_cleaned"],
+                                path=path)
+
+        ma.buildEventShape(inputListNames=['pi+:FEI_cleaned', 'gamma:FEI_cleaned'],
+                           allMoments=True,
+                           foxWolfram=True,
+                           harmonicMoments=True,
+                           cleoCones=True,
+                           thrust=True,
+                           collisionAxis=True,
+                           jets=True,
+                           sphericity=True,
+                           checkForDuplicates=True,
+                           path=path)
+
+        # additional cut on Fox WR R2
+        vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+
+        EventCuts = " and ".join(
+            [
+                f"nCleanedTracks({CleanedTrackCuts})>=3",
+                f"nCleanedECLClusters({CleanedClusterCuts})>=3",
+                "visibleEnergyOfEventCMS>4",
+                "foxWolframR2_maskedNaN<0.40",
+            ]
+        )
+        eselect = b2.register_module('VariableToReturnValue')
+        eselect.param('variable', 'passesEventCut(' + EventCuts + ')')
+        path.add_module(eselect)
+        empty_path = b2.create_path()
+        eselect.if_value('<1', empty_path)
+
+        ma.copyList("B0:SLRDstar", "B0:semileptonic", path=path)
+
+        ma.applyCuts("B0:SLRDstar", "dmID<8", path=path)
+        # tightened cut on sigprob
+        ma.applyCuts("B0:SLRDstar", "log10(sigProb)>-2.0", path=path)
+        # tightened cut on cosThetaBY
+        ma.applyCuts("B0:SLRDstar", "-1.75<cosThetaBY<1.1", path=path)
+        ma.applyCuts("B0:SLRDstar", "p_lepton_CMSframe>1.0", path=path)
+
+        # best candidate selection on signal probability
+        ma.rankByHighest("B0:SLRDstar", "sigProb", numBest=1,
+                         allowMultiRank=True, outputVariable='sigProb_rank_tag',
+                         path=path)
+
+        return ["B0:SLRDstar"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+        vm.addAlias('d0_M', 'daughter(0,M)')
+        vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+        vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist='B0:SLRDstar',
+            variables_1d=[
+                ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
+                 'Signal probability of the reconstructed tag B candidates', 'Most around zero, with a tail at non-zero values.',
+                 'Signal probability', 'Candidates', 'logy'),
+                ('nDaug', 6, 0.0, 6, 'Number of daughters of tag B', __liaison__,
+                 'Number of daughters of tag B', 'Some distribution of number of daughters', 'n_{daughters}', 'Candidates'),
+                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, '#cos#theta_{BY}', __liaison__,
+                 'Cosine of angle between the reconstructed B and the nominal B', 'Distribution peaking between -1 and 1',
+                 '#cos#theta_{BY}', 'Candidates'),
+                ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', __liaison__,
+                 'Mass difference of $D^{*}$ and D', 'Peak at 0.14 GeV', 'm(D^{*})-m(D) [GeV]', 'Candidates', 'shifter'),
+                ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
+                 'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
+                 'm(D^{(*)}) [GeV]', 'Candidates', 'shifter')],
+            variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
+                           'Signal probability for each decay mode ID', __liaison__,
+                           'Signal probability for each decay mode ID',
+                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Decay mode ID', '#log_10(signal probability)', 'colz')],
+            path=path)
+
+
 @_FEI_skim_header("B+")
 class feiSLBplus(BaseFEISkim):
     """

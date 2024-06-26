@@ -15,7 +15,7 @@ import basf2
 import modularAnalysis as ma
 from ROOT import Belle2
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdMu
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
@@ -181,17 +181,14 @@ class CharmoniumPsi(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        stdE('loosepid', path=path)
         stdMu('loosepid', path=path)
         stdPhotons('all', path=path)
 
     def build_lists(self, path):
 
-        # Electron list (TOP is excluded).
-        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1',
-                            path=path)
-
         # Apply charged PID MVA.
-        charged_pid_mva_enabled = True
+        charged_pid_mva_enabled = False
         if charged_pid_mva_enabled:
             if self.pidGlobaltag is None:
                 basf2.B2FATAL('The PID globaltag is not set in the CharmoniumPsi skim.')
@@ -214,7 +211,7 @@ class CharmoniumPsi(BaseSkim):
                                 'pidChargedBDTScore(13, ALL) > 0.1', path=path)
 
         # Lists with both standard and MVA-based PID.
-        ma.copyList('e+:merged', 'e+:loosepid_noTOP', path=path)
+        ma.copyList('e+:merged', 'e+:loosepid', path=path)
         ma.copyList('mu+:merged', 'mu+:loosepid', path=path)
         if charged_pid_mva_enabled:
             ma.copyList('e+:merged', 'e+:charged_pid', path=path)

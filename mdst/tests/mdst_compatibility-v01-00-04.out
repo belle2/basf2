@@ -1213,6 +1213,7 @@ TrackFitResult#15:
     0.0153364
   getTransverseMomentum(): 0.438381
   getZ0(): 0.0295699
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -493.81
   getLogL(<type: mu->): -471.66
@@ -3205,6 +3206,7 @@ ECLCluster#36:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -5682,6 +5684,7 @@ MCParticle#55:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
   getErrorFlag(): 0
@@ -7101,6 +7104,7 @@ TrackFitResult#21:
     2.67078
   getTransverseMomentum(): 0.258881
   getZ0(): 0.0186024
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -466.037
   getLogL(<type: mu->): -425.313
@@ -9259,6 +9263,7 @@ ECLCluster#38:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -11780,6 +11785,7 @@ MCParticle#56:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
   getErrorFlag(): 0
@@ -12746,6 +12752,7 @@ TrackFitResult#14:
     -1.84311
   getTransverseMomentum(): 0.158492
   getZ0(): 153.114
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -380.124
   getLogL(<type: mu->): -803.553
@@ -14038,6 +14045,7 @@ ECLCluster#22:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -16318,6 +16326,7 @@ MCParticle#47:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        4
 EventMetaData:
   getErrorFlag(): 0
@@ -19867,6 +19876,7 @@ TrackFitResult#55:
     2.01908
   getTransverseMomentum(): 0.242914
   getZ0(): 0.0108449
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -441.393
   getLogL(<type: mu->): -449.203
@@ -22483,6 +22493,7 @@ ECLCluster#44:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -25445,6 +25456,7 @@ MCParticle#66:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

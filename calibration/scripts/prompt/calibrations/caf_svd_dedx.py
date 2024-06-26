@@ -87,11 +87,13 @@ def create_path(rerun_reco, isMC, expert_config):
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)
     ma.fillParticleList("pi+:lambda", "nCDCHits > 0", path=rec_path)  # pi without track quality for reconstructing lambda
-    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1", path=rec_path)
+    ma.fillParticleList("pi+:cut", "abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1",
+                        path=rec_path)  # pions for reconstructing D and Dstar
 
     ma.fillParticleList('K-:cut', cut='abs(dr) < 0.5 and abs(dz) < 2 and pValue > 0.00001 and nSVDHits > 1', path=rec_path)  # kaon
     ma.fillParticleList('e+:cut', cut='nSVDHits > 0', path=rec_path)  # electron
-    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)  # proton
+    # proton. In data, we only see background at p<0.25 GeV which motivates adding this cut.
+    ma.fillParticleList('p+:lambda', cut='nCDCHits > 0 and nSVDHits > 0 and p > 0.25', path=rec_path)
 
     # ----------------------------------------------------------------------------
     # Reconstruct D*(D0->K-pi+)pi+ and cc.
@@ -114,7 +116,12 @@ def create_path(rerun_reco, isMC, expert_config):
     vx.treeFit(list_name='gamma:myGamma', conf_level=0, path=rec_path)
 
     # ----------------------------------------------------------------------------
-    # Selections on Lambda
+    # Final selections on Lambda:
+    # - a tighter InvM range
+    # - a good vertex quality and a displacement requirement
+    # - a kinematic requirement p(p)>p(pi) which should always be satisfied in a true Lambda decay
+    # - a veto on the misidentified converted photons using the convertedPhotonInvariantMass tool, m(ee)>0.02 GeV
+    # - a veto on the misidentified K0S->pipi decays, vetoeing the region 0.488<m(pipi)<0.513 GeV
 
     ma.cutAndCopyList(
         outputListName='Lambda0:cut',
@@ -137,6 +144,8 @@ def create_path(rerun_reco, isMC, expert_config):
 
     # ----------------------------------------------------------------------------
     # Selections on Dstar
+    # - a tighter InvM and deltaM range
+    # - a good vertex quality
 
     ma.cutAndCopyList(
         outputListName='D*+:cut',
@@ -146,6 +155,10 @@ def create_path(rerun_reco, isMC, expert_config):
 
     # ----------------------------------------------------------------------------
     # Selections on gamma
+    # - a good vertex quality
+    # - the dr cut on the origin vertex coordinate of the photon conversion, that excludes the beam background
+    # - a tighter range on both the invariant mass and the convertedPhotonInvariantMass
+    # - geometric cuts on proximity of e+ and e- with convertedPhotonDelR and convertedPhotonDelZ
 
     ma.cutAndCopyList(
         outputListName='gamma:cut',

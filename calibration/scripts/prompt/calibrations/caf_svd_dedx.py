@@ -10,7 +10,6 @@
 '''
 Script to perform the SVD dE/dx calibration
 '''
-import ROOT
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import basf2 as b2
 from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm, SVDdEdxValidationAlgorithm
@@ -18,9 +17,6 @@ from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm, SVDdEdxValidationAlgorithm
 import modularAnalysis as ma
 import vertex as vx
 import reconstruction as re
-
-ROOT.gROOT.SetBatch(True)
-
 
 settings = CalibrationSettings(
     name="caf_svd_dedx",
@@ -37,24 +33,28 @@ settings = CalibrationSettings(
     expert_config={
         "isMC": False,
         "rerun_reco": False,
-        "MaxFilesPerRun": 5,
+        "MaxFilesPerRun": 15,
+        "MaxFilesPerRunValidation": 5,
         "MinEvtsPerFile": 1,
-        "MaxEvtsPerRun": 1.e6,
+        "MaxEvtsPerFile": 20000,  # only if rerun the reco, to prevent jobs >10h
         "MinEvtsPerTree": 100,
         "NBinsP": 69,
         "NBinsdEdx": 100,
         "dedxCutoff": 5.e6,
-        "NumROCpoints": 250,
+        "NumROCpoints": 175,
         "MinROCMomentum": 0.,
-        "MaxROCMomentum": 7.,
+        "MaxROCMomentum": 2.5,
         "NumEffBins": 30,
         "MaxEffMomentum": 2.5
         },
     depends_on=[])
 
 
-def create_path(rerun_reco, isMC):
+def create_path(rerun_reco, isMC, expert_config):
     rec_path = b2.Path()
+
+    # expert_config = kwargs.get("expert_config")
+    max_events_per_file = expert_config["MaxEvtsPerFile"]
 
     if rerun_reco:
         rec_path.add_module(
@@ -71,6 +71,7 @@ def create_path(rerun_reco, isMC):
                 'RawTRGs',
                 'RawDataBlock',
                 'RawCOPPER'],
+            entrySequences=[f'0:{max_events_per_file - 1}'],
             logLevel=b2.LogLevel.ERROR)
         if not isMC:
             re.add_unpackers(path=rec_path)
@@ -145,7 +146,7 @@ def create_path(rerun_reco, isMC):
 
     # ----------------------------------------------------------------------------
     # Selections on gamma
-    # ma.buildEventShape(inputListNames='gamma:myGamma', path=rec_path)
+
     ma.cutAndCopyList(
         outputListName='gamma:cut',
         inputListName='gamma:myGamma',
@@ -192,6 +193,7 @@ def get_calibrations(input_data, **kwargs):
     isMC = expert_config["isMC"]
     rerun_reco = expert_config["rerun_reco"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
+    max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.
@@ -202,8 +204,12 @@ def get_calibrations(input_data, **kwargs):
 
     reduced_file_to_iov_hadron_calib = filter_by_max_files_per_run(file_to_iov_hadron_calib, max_files_per_run, min_events_per_file)
     input_files_hadron_calib = list(reduced_file_to_iov_hadron_calib.keys())
-    basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_hadron_calib)}")
+    basf2.B2INFO(f"Total number of files actually used as input for calibration = {len(input_files_hadron_calib)}")
 
+    reduced_file_to_iov_hadron_validation = filter_by_max_files_per_run(
+        file_to_iov_hadron_calib, max_files_per_run_validation, min_events_per_file)
+    input_files_hadron_validation = list(reduced_file_to_iov_hadron_validation.keys())
+    basf2.B2INFO(f"Total number of files actually used as input for validation = {len(input_files_hadron_validation)}")
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
@@ -236,8 +242,8 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
 
-    rec_path = create_path(rerun_reco, isMC)
-    rec_path_validation = create_path(1, isMC)
+    rec_path = create_path(rerun_reco, isMC, expert_config)
+    rec_path_validation = create_path(1, isMC, expert_config)
 
     dedx_calibration = Calibration("SVDdEdxCalibration",
                                    collector="SVDdEdxCollector",
@@ -249,7 +255,7 @@ def get_calibrations(input_data, **kwargs):
                                   collector="SVDdEdxValidationCollector",
                                   algorithms=[algo_val],
                                   backend_args={"queue": "l"},
-                                  input_files=input_files_hadron_calib,
+                                  input_files=input_files_hadron_validation,
                                   pre_collector_path=rec_path_validation)
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

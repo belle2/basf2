@@ -66,26 +66,26 @@ void SVDdEdxCollectorModule::prepare()
 
   // Specific decay info for all trees
   LambdaTree->Branch<double>("InvM", &m_InvMLambda);
-  LambdaTree->Branch<double>("p_p", &m_p_p);
-  LambdaTree->Branch<double>("p_SVDdEdx", &m_p_SVDdEdx);
-  LambdaTree->Branch<double>("pi_p", &m_pi_p);
-  LambdaTree->Branch<double>("pi_SVDdEdx", &m_pi_SVDdEdx);
+  LambdaTree->Branch<double>("p_p", &m_protonMomentum);
+  LambdaTree->Branch<double>("p_SVDdEdx", &m_protonSVDdEdx);
+  LambdaTree->Branch<double>("pi_p", &m_pionLambdap);
+  LambdaTree->Branch<double>("pi_SVDdEdx", &m_pionLambdaSVDdEdx);
 
   DstarTree->Branch<double>("InvM", &m_InvMDstar);
   DstarTree->Branch<double>("D0_InvM", &m_InvMD0);
   DstarTree->Branch<double>("deltaM", &m_DeltaM);
-  DstarTree->Branch<double>("K_p", &m_K_p);
-  DstarTree->Branch<double>("K_SVDdEdx", &m_K_SVDdEdx);
-  DstarTree->Branch<double>("pi_p", &m_piD_p);
-  DstarTree->Branch<double>("pi_SVDdEdx", &m_piD_SVDdEdx);
-  DstarTree->Branch<double>("piS_p", &m_piS_p);
-  DstarTree->Branch<double>("piS_SVDdEdx", &m_piS_SVDdEdx);
+  DstarTree->Branch<double>("K_p", &m_kaonMomentum);
+  DstarTree->Branch<double>("K_SVDdEdx", &m_kaonSVDdEdx);
+  DstarTree->Branch<double>("pi_p", &m_pionDp);
+  DstarTree->Branch<double>("pi_SVDdEdx", &m_pionDSVDdEdx);
+  DstarTree->Branch<double>("piS_p", &m_slowPionMomentum);
+  DstarTree->Branch<double>("piS_SVDdEdx", &m_slowPionSVDdEdx);
 
   GammaTree->Branch<double>("InvM", &m_InvMGamma);
-  GammaTree->Branch<double>("e_1_p", &m_e_1_p);
-  GammaTree->Branch<double>("e_1_SVDdEdx", &m_e_1_SVDdEdx);
-  GammaTree->Branch<double>("e_2_p", &m_e_2_p);
-  GammaTree->Branch<double>("e_2_SVDdEdx", &m_e_2_SVDdEdx);
+  GammaTree->Branch<double>("e_1_p", &m_firstElectronMomentum);
+  GammaTree->Branch<double>("e_1_SVDdEdx", &m_firstElectronSVDdEdx);
+  GammaTree->Branch<double>("e_2_p", &m_secondElectronMomentum);
+  GammaTree->Branch<double>("e_2_SVDdEdx", &m_secondElectronSVDdEdx);
 
   // We register the objects so that our framework knows about them.
   // Don't try and hold onto the pointers or fill these objects directly
@@ -140,18 +140,18 @@ void SVDdEdxCollectorModule::collect()
 
       m_InvMLambda = partLambda->getMass();
 
-      m_p_p = partPFromLambda->getMomentumMagnitude();
+      m_protonMomentum = partPFromLambda->getMomentumMagnitude();
       if (!dedxTrackPFromLambda) {
-        m_p_SVDdEdx = -999.0;
+        m_protonSVDdEdx = -999.0;
       } else {
-        m_p_SVDdEdx = dedxTrackPFromLambda->getDedx(Const::EDetector::SVD);
+        m_protonSVDdEdx = dedxTrackPFromLambda->getDedx(Const::EDetector::SVD);
       }
 
-      m_pi_p = partPiFromLambda->getMomentumMagnitude();
+      m_pionLambdap = partPiFromLambda->getMomentumMagnitude();
       if (!dedxTrackPiFromLambda) {
-        m_pi_SVDdEdx = -999.0;
+        m_pionLambdaSVDdEdx = -999.0;
       } else {
-        m_pi_SVDdEdx = dedxTrackPiFromLambda->getDedx(Const::EDetector::SVD);
+        m_pionLambdaSVDdEdx = dedxTrackPiFromLambda->getDedx(Const::EDetector::SVD);
       }
       getObjectPtr<TTree>("Lambda")->Fill();
     }
@@ -179,25 +179,25 @@ void SVDdEdxCollectorModule::collect()
       m_InvMD0 = partD0->getMass();
       m_DeltaM = m_InvMDstar - m_InvMD0;
 
-      m_K_p = partKFromD->getMomentumMagnitude();
+      m_kaonMomentum = partKFromD->getMomentumMagnitude();
       if (!dedxTrackKFromD) {
-        m_K_SVDdEdx = -999.0;
+        m_kaonSVDdEdx = -999.0;
       } else {
-        m_K_SVDdEdx = dedxTrackKFromD->getDedx(Const::EDetector::SVD);
+        m_kaonSVDdEdx = dedxTrackKFromD->getDedx(Const::EDetector::SVD);
       }
 
-      m_piD_p = partPiFromD->getMomentumMagnitude();
+      m_pionDp = partPiFromD->getMomentumMagnitude();
       if (!dedxTrackPiFromD) {
-        m_piD_SVDdEdx = -999.0;
+        m_pionDSVDdEdx = -999.0;
       } else {
-        m_piD_SVDdEdx = dedxTrackPiFromD->getDedx(Const::EDetector::SVD);
+        m_pionDSVDdEdx = dedxTrackPiFromD->getDedx(Const::EDetector::SVD);
       }
 
-      m_piS_p = partPiS->getMomentumMagnitude();
+      m_slowPionMomentum = partPiS->getMomentumMagnitude();
       if (!dedxTrackPiS) {
-        m_piS_SVDdEdx = -999.0;
+        m_slowPionSVDdEdx = -999.0;
       } else {
-        m_piS_SVDdEdx = dedxTrackPiS->getDedx(Const::EDetector::SVD);
+        m_slowPionSVDdEdx = dedxTrackPiS->getDedx(Const::EDetector::SVD);
       }
       getObjectPtr<TTree>("Dstar")->Fill();
     }
@@ -218,18 +218,18 @@ void SVDdEdxCollectorModule::collect()
 
       m_InvMGamma = partGamma->getMass();
 
-      m_e_1_p = partE1FromGamma->getMomentumMagnitude();
+      m_firstElectronMomentum = partE1FromGamma->getMomentumMagnitude();
       if (!dedxTrackE1FromGamma) {
-        m_e_1_SVDdEdx = -999.0;
+        m_firstElectronSVDdEdx = -999.0;
       } else {
-        m_e_1_SVDdEdx = dedxTrackE1FromGamma->getDedx(Const::EDetector::SVD);
+        m_firstElectronSVDdEdx = dedxTrackE1FromGamma->getDedx(Const::EDetector::SVD);
       }
 
-      m_e_2_p = partE2FromGamma->getMomentumMagnitude();
+      m_secondElectronMomentum = partE2FromGamma->getMomentumMagnitude();
       if (!dedxTrackE2FromGamma) {
-        m_e_2_SVDdEdx = -999.0;
+        m_secondElectronSVDdEdx = -999.0;
       } else {
-        m_e_2_SVDdEdx = dedxTrackE2FromGamma->getDedx(Const::EDetector::SVD);
+        m_secondElectronSVDdEdx = dedxTrackE2FromGamma->getDedx(Const::EDetector::SVD);
       }
 
       getObjectPtr<TTree>("Gamma")->Fill();

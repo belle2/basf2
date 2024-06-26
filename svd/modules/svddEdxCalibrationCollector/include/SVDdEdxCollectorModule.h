@@ -47,26 +47,26 @@ namespace Belle2 {
 
 
     double m_InvMLambda;       /**<  Invariant mass of Lambda candidates */
-    double m_p_p;       /**<   momentum for the proton from the Lambda */
-    double m_p_SVDdEdx;     /**<  SVD dE/dx response for the proton from the Lambda */
-    double m_pi_p;    /**<   momentum for the pion from the Lambda */
-    double m_pi_SVDdEdx;    /**<  SVD dE/dx response for the pion from the Lambda */
+    double m_protonMomentum;       /**<   momentum for the proton from the Lambda */
+    double m_protonSVDdEdx;     /**<  SVD dE/dx response for the proton from the Lambda */
+    double m_pionLambdap;    /**<   momentum for the pion from the Lambda */
+    double m_pionLambdaSVDdEdx;    /**<  SVD dE/dx response for the pion from the Lambda */
 
     double m_InvMDstar;       /**<  Invariant mass of Dstar candidates */
     double m_InvMD0;       /**<  Invariant mass of D0 candidates */
     double m_DeltaM;       /**<  deltaM = m(Dstar)-m(D0) */
-    double m_K_p;       /**<   momentum for the kaon from the D0 */
-    double m_K_SVDdEdx;     /**<  SVD dE/dx response for the kaon from the D0 */
-    double m_piD_p;    /**<   momentum for the pion from the D0 */
-    double m_piD_SVDdEdx;    /**<  SVD dE/dx response for the pion from the D0 */
-    double m_piS_p;    /**<   momentum for the pion from the Dstar */
-    double m_piS_SVDdEdx;    /**<  SVD dE/dx response for the pion from the Dstar */
+    double m_kaonMomentum;       /**<   momentum for the kaon from the D0 */
+    double m_kaonSVDdEdx;     /**<  SVD dE/dx response for the kaon from the D0 */
+    double m_pionDp;    /**<   momentum for the pion from the D0 */
+    double m_pionDSVDdEdx;    /**<  SVD dE/dx response for the pion from the D0 */
+    double m_slowPionMomentum;    /**<   momentum for the pion from the Dstar */
+    double m_slowPionSVDdEdx;    /**<  SVD dE/dx response for the pion from the Dstar */
 
     double m_InvMGamma;       /**<  Invariant mass of converted photon candidates */
-    double m_e_1_p;       /**<   momentum for the first electron */
-    double m_e_1_SVDdEdx;     /**<  SVD dE/dx response for the first electron */
-    double m_e_2_p;    /**<   momentum for the second electron */
-    double m_e_2_SVDdEdx;    /**<  SVD dE/dx response for the second electron */
+    double m_firstElectronMomentum;       /**<   momentum for the first electron */
+    double m_firstElectronSVDdEdx;     /**<  SVD dE/dx response for the first electron */
+    double m_secondElectronMomentum;    /**<   momentum for the second electron */
+    double m_secondElectronSVDdEdx;    /**<  SVD dE/dx response for the second electron */
 
 
     std::string m_LambdaListName = "";    /**< Name of the Lambda particle list */

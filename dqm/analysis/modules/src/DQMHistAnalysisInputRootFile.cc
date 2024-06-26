@@ -221,6 +221,10 @@ void DQMHistAnalysisInputRootFileModule::event()
     }
   }
 
+  auto runno = m_runList[m_run_idx];
+  if (m_c_info != NULL) m_c_info->SetTitle(("OFFLINE: Exp " + std::to_string(m_expno) + ", Run " + std::to_string(
+                                                runno) + ", RunType " + m_runType + ", Last Changed NEVER, Last Updated NEVER, Last DQM event NEVER").c_str());
+
   m_count++;
   m_eventMetaDataPtr.create();
   m_eventMetaDataPtr->setExperiment(m_expno);
@@ -230,7 +234,7 @@ void DQMHistAnalysisInputRootFileModule::event()
 
   m_h_expno->SetTitle(std::to_string(m_expno).c_str());
   hs.push_back(m_h_expno);
-  m_h_runno->SetTitle(std::to_string(m_runList[m_run_idx]).c_str());
+  m_h_runno->SetTitle(std::to_string(runno).c_str());
   hs.push_back(m_h_runno);
   m_h_rtype->SetTitle(m_runType.c_str());
   hs.push_back(m_h_rtype);

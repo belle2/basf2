@@ -137,7 +137,7 @@ _RegisteredSkims = [
     # Charmed baryons
     ("17230900", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
-    ("17231100", "charm", "XictoXimPipPim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
+    ("17231100", "charm", "XicToXimPipPim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
     ("17231200", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
     ("17231300", "charm", "XicpToLKsHp"),  # Xi_c+ -> Lambda Ks h+, Xi- pi+ h+
     # D* -> D0

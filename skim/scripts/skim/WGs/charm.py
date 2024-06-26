@@ -1402,7 +1402,7 @@ class XicpToLKsHp(BaseSkim):
 
 
 @fancy_skim_header
-class XictoXimPipPim(BaseSkim):
+class XicToXimPipPim(BaseSkim):
     """
     **Decay Modes**
 

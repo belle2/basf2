@@ -903,13 +903,13 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_Khh_Khpi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_Khh_Khpi0" + str(chID))
 
-        ma.copyLists(outputListName="B+:BtoD0h_merged", inputListNames=BsigList, path=path)
+        ma.copyLists(outputListName="B+:BtoD0h_Kpipipi_Kpipi0", inputListNames=BsigList, path=path)
 
         # Select only three random candidates
-        ma.rankByHighest(particleList="B+:BtoD0h_merged", variable="cos(mdstIndex)", numBest=3,
+        ma.rankByHighest(particleList="B+:BtoD0h_Kpipipi_Kpipi0", variable="cos(mdstIndex)", numBest=3,
                          outputVariable="cosMdstIndex_rank", path=path)
 
-        return ["B+:BtoD0h_merged"]
+        return ["B+:BtoD0h_Kpipipi_Kpipi0"]
 
 
 @fancy_skim_header
@@ -1094,13 +1094,13 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
             ma.reconstructDecay("B+:BtoD0rho_merged" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0rho_merged" + str(chID))
 
-        ma.copyLists(outputListName="B+:BtoD0rho_merged", inputListNames=BsigList, path=path)
+        ma.copyLists(outputListName="B+:BtoD0rho_Kpipipi_Kpipi0", inputListNames=BsigList, path=path)
 
         # Select only three random candidates to save them as these channels have high multiplicity.
-        ma.rankByHighest(particleList="B+:BtoD0rho_merged", variable="cos(mdstIndex)", numBest=3,
+        ma.rankByHighest(particleList="B+:BtoD0rho_Kpipipi_Kpipi0", variable="cos(mdstIndex)", numBest=3,
                          outputVariable="cosMdstIndex_rank", path=path)
 
-        return ["B+:BtoD0rho_merged"]
+        return ["B+:BtoD0rho_Kpipipi_Kpipi0"]
 
 
 @fancy_skim_header
@@ -1255,13 +1255,13 @@ class B0toDDs0star(BaseSkim):
         ma.reconstructDecay("D_s+:phipi -> phi:KK pi+:GoodTrack",
                             cut="[1.935 < M < 1.999]", path=path)
         Dslist = ['D_s+:phipipi0', 'D_s+:antiKK', 'D_s+:phipi']
-        ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)
+        ma.copyLists(outputListName='D_s+:all_DDs0star', inputListNames=Dslist, path=path)
 
-        ma.reconstructDecay("D_s0*+ -> D_s+:all pi0:bth_skim",
+        ma.reconstructDecay("D_s0*+:all_DDs0star -> D_s+:all_DDs0star pi0:bth_skim",
                             cut="[2.249 < M < 2.298] and [0.31 < massDifference(0) < 0.347] and \
                             [1.017 < p < 2.552]", path=path)
 
-        ma.reconstructDecay("B0:B0toDDs0star -> D_s0*+ D-:Kpipi",
+        ma.reconstructDecay("B0:B0toDDs0star -> D_s0*+:all_DDs0star D-:Kpipi",
                             cut="[5.2 < Mbc < 5.3] and \
                             [-0.2 < deltaE < 0.2]", path=path)
 
@@ -1361,13 +1361,13 @@ class B0toDs1D(BaseSkim):
         ma.reconstructDecay(decayString="D_s+:anti-Kstar0K -> anti-K*0:SkimHighEff K+:SkimHighEff",
                             cut="[1.934 < M < 2.002]", path=path)
         DsList = ['D_s+:phipiSkimHighEff', 'D_s+:phipipi0SkimHighEff', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
-        ma.copyLists(outputListName="D_s+:all", inputListNames=DsList, path=path)
+        ma.copyLists(outputListName="D_s+:all_Ds1D", inputListNames=DsList, path=path)
 
-        ma.reconstructDecay(decayString="D_s*+ -> D_s+:all gamma:loose",
+        ma.reconstructDecay(decayString="D_s*+:Ds1D -> D_s+:all_Ds1D gamma:loose",
                             cut="[2.062 < M < 2.131] and [0.072 < massDifference(0) < 0.179]", path=path)
-        ma.reconstructDecay(decayString="D_s1+ -> D_s*+ pi0:bth_skim",
+        ma.reconstructDecay(decayString="D_s1+:Ds1D -> D_s*+:Ds1D pi0:bth_skim",
                             cut="[2.288 < M < 2.507] and [0.247 < massDifference(0) < 0.378]", path=path)
-        ma.reconstructDecay(decayString="B0:merged -> D_s1+ D-:Kpipi",
+        ma.reconstructDecay(decayString="B0:merged -> D_s1+:Ds1D D-:Kpipi",
                             cut="[5.2 < Mbc < 5.3] and [-0.5 < deltaE < 0.5]", path=path)
 
         return ["B0:merged"]

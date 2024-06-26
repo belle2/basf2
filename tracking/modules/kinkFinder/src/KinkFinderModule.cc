@@ -78,11 +78,11 @@ void KinkFinderModule::initialize()
                                               m_arrayNameCopiedRecoTrack);
 
   // Set geometry of CDC forward and backward walls.
-  // Here the tangent is forward CDC acceptance.
+  // Here the tangent is forward CDC acceptance (17 degrees).
   m_cdcForwardBottomWall.setLine(tan(17. / 180 * M_PI), 0);
   // Here numbers are calculated from the CDC technical geometry.
   m_cdcForwardTopWall.setLine(4.97, -670);
-  // Here the tangent is backward CDC acceptance.
+  // Here the tangent is backward CDC acceptance (30 degrees).
   m_cdcBackwardBottomWall.setLine(-tan(30. / 180 * M_PI), 0);
   // Here numbers are calculated from the CDC technical geometry.
   m_cdcBackwardTopWall.setLine(-4.2, -192.5);
@@ -313,7 +313,7 @@ bool KinkFinderModule::preFilterTracksToSplit(Track const* const track)
 short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Track* daughterTrack)
 {
   constexpr double M_PI_over_6 = M_PI / 6.;
-  constexpr double cos_M_PI_over_6 = cos(M_PI_over_6);
+  const double cos_M_PI_over_6 = cos(M_PI_over_6);
 
   // cut variables squared for convenience
   const double precutDistanceSquared = m_kinkFinderParameters->getPrecutDistance() * m_kinkFinderParameters->getPrecutDistance();

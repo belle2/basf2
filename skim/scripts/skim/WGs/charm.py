@@ -672,9 +672,10 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 
     def build_lists(self, path):
         D0_cuts = "1.70 < M < 2.10"
+        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
-        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'pionID > 0.1', path=path)
-        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'kaonID > 0.1', path=path)
+        ma.cutAndCopyList('pi+:charmSkim_pid', 'pi+:charmSkim', 'binaryID < 0.9', path=path)
+        ma.cutAndCopyList('K+:charmSkim_pid', 'K+:charmSkim', 'binaryID > 0.1', path=path)
 
         Dst_lists = []
         for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:

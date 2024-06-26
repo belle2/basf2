@@ -97,8 +97,7 @@ void KinkFitter::initializeCuts(const double vertexDistanceCut,
   m_precutDistance = precutDistance;
 }
 
-/// Used in the vertexFitWithRecoTracks function to extrapolate the states to the fitted vertex.
-/// If the vertex is inside one of the tracks, bits in reassignHitStatus are set.
+/// Extrapolate the states to the fitted vertex. If the vertex is inside one of the tracks, bits are set.
 bool KinkFitter::extrapolateToVertex(genfit::MeasuredStateOnPlane& stMother, genfit::MeasuredStateOnPlane& stDaughter,
                                      const ROOT::Math::XYZVector& vertexPos, unsigned int& reassignHitStatus)
 {
@@ -159,7 +158,7 @@ int KinkFitter::findHitPositionForReassignment(const RecoTrack* recoTrack,
   // Helper variables to store the minimum
   double minimalDistance2 = std::numeric_limits<double>::max();
   int minimalIndex = 0;
-  int riHit = 0;
+  int riHit;
 
   // CDC Hits list to loop over
   auto cdcHits = recoTrack->getSortedCDCHitList();
@@ -601,7 +600,8 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
   const double ndfSplit = splitTrackFitStatus->getNdf();
   const double chi2Split = splitTrackFitStatus->getChi2();
   const double chi2NdfRatioSplit = fabs(chi2Split / ndfSplit - 1);
-  B2DEBUG(29, "Initial fit result, p-value: " <<  splitTrackFitStatus->getPVal() << " " << chi2Split << " " << ndfSplit);
+  B2DEBUG(29, "Initial fit result, p-value: " <<  splitTrackFitStatus->getPVal() << ", chi2: " <<
+          chi2Split << ", ndf: " << ndfSplit);
 
   // number of SVD+CDC hits of the initial track to be split
   const unsigned int numberSVDCDCHitsSplit = recoTrackSplit->getNumberOfCDCHits() + recoTrackSplit->getNumberOfSVDHits();
@@ -636,7 +636,8 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
     if (splitHitNumber[splitHitNumberIndex] > recoTrackSplit->getNumberOfCDCHits())
       splitHitNumber[splitHitNumberIndex] = recoTrackSplit->getNumberOfCDCHits();
 
-    B2DEBUG(29, "Splitting number initial, i" << splitHitNumberIndex << ": " << splitHitNumber[splitHitNumberIndex]);
+    B2DEBUG(29, "Initial splitting hit number for point " << splitHitNumberIndex << ": " <<
+            splitHitNumber[splitHitNumberIndex]);
 
     // creation of split RecoTracks
     recoTrackMother[splitHitNumberIndex] = copyRecoTrackAndSplit(recoTrackSplit, true, splitHitNumber[splitHitNumberIndex]);
@@ -658,11 +659,11 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
     const double chi2MotherTmp = motherNewTrackFitStatus->getChi2();
     const double chi2DaughterTmp = daughterNewTrackFitStatus->getChi2();
     const double chi2NdfRatioTmp = fabs((chi2MotherTmp + chi2DaughterTmp) / (ndfMotherTmp + ndfDaughterTmp) - 1);
-    B2DEBUG(29, "Mother fit result for initial index " << splitHitNumberIndex << ", p-value: " <<
+    B2DEBUG(29, "Mother fit result for initial point " << splitHitNumberIndex << ", p-value: " <<
             motherNewTrackFitStatus->getPVal() << ", chi2: " << chi2MotherTmp << ", ndf: " << ndfMotherTmp);
-    B2DEBUG(29, "Daughter fit result for initial index " << splitHitNumberIndex << ", p-value: " <<
+    B2DEBUG(29, "Daughter fit result for initial point " << splitHitNumberIndex << ", p-value: " <<
             daughterNewTrackFitStatus->getPVal() << ", chi2: " << chi2DaughterTmp << ", ndf: " << ndfDaughterTmp);
-    B2DEBUG(29, "|Chi2/NDF - 1| for initial index " << splitHitNumberIndex << ": " <<
+    B2DEBUG(29, "|Chi2/NDF - 1| for initial point " << splitHitNumberIndex << ": " <<
             chi2NdfRatioTmp << ", and for initial track: " << chi2NdfRatioSplit);
 
     // if the resulting |chi2/ndf - 1| is bigger than one for initial track, skip this track pair
@@ -696,7 +697,7 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
       recoTrackMother[c_middlePoint] = nullptr;
       recoTrackDaughter[c_middlePoint] = nullptr;
 
-      B2DEBUG(29, "Outer interval; hit numbers: " << splitHitNumber[c_outerEdge] << ", " <<
+      B2DEBUG(29, "Outer interval is chosen; hit numbers: " << splitHitNumber[c_outerEdge] << ", " <<
               splitHitNumber[c_middlePoint] << ", " << splitHitNumber[c_innerEdge]);
 
     } else if (chi2NdfRatio[c_outerEdge] > chi2NdfRatio[c_innerEdge]) { // choose inner interval
@@ -712,7 +713,7 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
       recoTrackMother[c_middlePoint] = nullptr;
       recoTrackDaughter[c_middlePoint] = nullptr;
 
-      B2DEBUG(29, "Inner interval; hit numbers: " << splitHitNumber[c_outerEdge] << ", " <<
+      B2DEBUG(29, "Inner interval is chosen; hit numbers: " << splitHitNumber[c_outerEdge] << ", " <<
               splitHitNumber[c_middlePoint] << ", " << splitHitNumber[c_innerEdge]);
 
     } else if (chi2NdfRatio[c_middlePoint] == defaultChi2NdfRatio) { // if none of the point was fitted successfully, return false
@@ -722,7 +723,7 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
 
     } else { // if both edges fits have the same results (their fit failed), return the middle one
 
-      B2DEBUG(29, "Middle point; hit numbers: " << splitHitNumber[c_outerEdge] << ", " <<
+      B2DEBUG(29, "Middle point is chosen; hit numbers: " << splitHitNumber[c_outerEdge] << ", " <<
               splitHitNumber[c_middlePoint] << ", " << splitHitNumber[c_innerEdge]);
       // return through references indexes of the mother and daughter tracks
       recoTrackIndexMother = recoTrackMother[c_middlePoint]->getArrayIndex();
@@ -779,9 +780,9 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
 
 
   B2DEBUG(29, "End of splitting with |chi2/ndf - 1| for point 1:" << chi2NdfRatio[c_outerEdge] <<
-          "; 2:" << chi2NdfRatio[c_middlePoint] << "; 2:" << chi2NdfRatio[c_innerEdge]);
+          "; 2:" << chi2NdfRatio[c_middlePoint] << "; 3:" << chi2NdfRatio[c_innerEdge]);
   B2DEBUG(29, "Hit numbers for point 1:" << splitHitNumber[c_outerEdge] <<
-          "; 2:" << splitHitNumber[c_middlePoint] << "; 2:" << splitHitNumber[c_innerEdge]);
+          "; 2:" << splitHitNumber[c_middlePoint] << "; 3:" << splitHitNumber[c_innerEdge]);
   B2DEBUG(29, "Min index: " << minIndex);
 
   // return through references indexes of the mother and daughter tracks for the best splitting point
@@ -1236,9 +1237,9 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   }
 
   // save the kink to the StoreArray
-  auto kink = m_kinks.appendNew(std::make_pair(trackMother, std::make_pair(tfrMotherIP, tfrMotherVtx)),
-                                std::make_pair(trackDaughter, tfrDaughterVtx),
-                                vertexPos.X(), vertexPos.Y(), vertexPos.Z(), filterFlagToStore);
+  m_kinks.appendNew(std::make_pair(trackMother, std::make_pair(tfrMotherIP, tfrMotherVtx)),
+                    std::make_pair(trackDaughter, tfrDaughterVtx),
+                    vertexPos.X(), vertexPos.Y(), vertexPos.Z(), filterFlagToStore);
 
 
   return true;

@@ -79,7 +79,7 @@ namespace Belle2 {
 
     /**
      * Check if the track can be a mother candidate based on some simple selections.
-     * @param track track of the candidate
+     * @param track of the candidate
      * @return true if track pass the criteria;
      * false otherwise
      */
@@ -87,7 +87,7 @@ namespace Belle2 {
 
     /**
      * Check if the track can be a daughter candidate based on some simple selections.
-     * @param track track of the candidate
+     * @param track of the candidate
      * @return true if track pass the criteria;
      * false otherwise
      */
@@ -95,7 +95,7 @@ namespace Belle2 {
 
     /**
     * Check if the track can be a candidate to be split based on some simple selections.
-    * @param track track of the candidate
+    * @param track of the candidate
     * @return true if track pass the criteria;
     * false otherwise
     */
@@ -121,6 +121,40 @@ namespace Belle2 {
      */
     short isTrackPairSelected(const Track* motherTrack, const Track* daughterTrack);
 
+    /**
+     * Structure to store the information about forward and backward walls of CDC.
+     * CDC has a shape of two trapezoids, so the geometry of forward and backward walls is two sloping lines.
+     * This structure handles one sloping line.
+     */
+    struct CDCForwardBackwardWallLine {
+
+      /**
+       * Set parameters of slopping line
+       * @param tangent tangent of the sloping line
+       * @param offset offset of the sloping line [cm]
+       */
+      void setLine(const double tangent, const double offset)
+      {
+        m_tangent = tangent;
+        m_offset = offset;
+      }
+
+      /**
+       * Return the y value of the sloping line based on the x value.
+       * It is used in `ifInCDC` function to check if the track point is inside CDC.
+       * @param x coordinate [cm]
+       * @return y value of the sloping line
+       */
+      double getLine(const double x) const
+      {
+        return m_tangent * x + m_offset;
+      }
+
+    private:
+      double m_tangent; ///< tangent of the sloping line
+      double m_offset; ///< offset of the sloping line [cm]
+    };
+
     std::string m_arrayNameTrack;  ///< StoreArray name of the Belle2::Track (Input).
     StoreArray<Track> m_tracks;  ///< StoreArray of Belle2::Track.
 
@@ -131,6 +165,20 @@ namespace Belle2 {
     std::string m_arrayNameKink;  ///< StoreArray name of the Kink (Output).
 
     DBObjPtr<KinkFinderParameters> m_kinkFinderParameters; ///< kinkFinder parameters Database ObjPtr
+
+    // CDC and SVD geometry variables
+    CDCForwardBackwardWallLine m_cdcForwardBottomWall; ///< Bottom part of forward CDC wall.
+    CDCForwardBackwardWallLine m_cdcForwardTopWall; ///< Top part of forward CDC wall.
+    CDCForwardBackwardWallLine m_cdcBackwardBottomWall; ///< Bottom part of backward CDC wall.
+    CDCForwardBackwardWallLine m_cdcBackwardTopWall; ///< Top part of backward CDC wall.
+    static constexpr double m_cdcInnerWithFirstLayerWall = 15; ///< Smaller radius of inner CDC wall [cm].
+    ///< It is taken a bit smaller not to loose some events with the first layer of CDC.
+    static constexpr double m_cdcInnerWallWithoutFirstLayer = 17; ///< Bigger radius of inner CDC wall [cm].
+    ///< It is taken a bit bigger to exclude the first layer of CDC (required in some preselection).
+    static constexpr double m_cdcInnerWallWithoutFirstTwoLayers = 18; ///< Second bigger radius of inner CDC wall [cm].
+    ///< It is taken a bit bigger to exclude first two layers of CDC (required in some preselection).
+    static constexpr double m_cdcOuterWall = 112; ///< Radius of outer CDC wall [cm].
+    static constexpr double m_svdBeforeOuterLayer = 12; ///< Radius between two outer SVD layers (10.4 and 13.5 cm) [cm].
 
     // counter for KinkFinder statistics
     unsigned int m_allStored = 0;    ///< counter for all saved Kinks

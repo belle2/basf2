@@ -156,16 +156,16 @@ namespace Belle2 {
     /** Points to the new `TrackFitResult` of the mother `Track` at End. */
     short m_trackFitResultIndexMotherEnd = -1;
 
-    /** Points to the new `TrackFitResult` of the daughter `Track`. */
+    /** Points to the new `TrackFitResult` of the daughter `Track` at Start. */
     short m_trackFitResultIndexDaughter = -1;
 
-    /** The X coordinate of the fitted vertex. */
+    /** The X coordinate of the fitted kink vertex. */
     Double32_t m_fittedVertexX = 0.0;
 
-    /** The Y coordinate of the fitted vertex. */
+    /** The Y coordinate of the fitted kink vertex. */
     Double32_t m_fittedVertexY = 0.0;
 
-    /** The Z coordinate of the fitted vertex. */
+    /** The Z coordinate of the fitted kink vertex. */
     Double32_t m_fittedVertexZ = 0.0;
 
     /** The filter flag of the kink.
@@ -191,11 +191,11 @@ namespace Belle2 {
      *
      * The content of the m_filterFlag may change, please, refer for the details to `KinkFitter.cc`.
      *
-     * @example -23181: -2318"1" track pair was preselected with filter 1, 2, 4, or 5
+     * Example 1: -23181: -2318"1" track pair was preselected with filter 1, 2, 4, or 5
      * (mother track and daughter track end points are close); -23"18"1 the exit code of combined fit is 18, so
      * the combined track has less n.d.f. than mother track; "-23"181 -- 23 hits were reassigned from daughter track
      * to mother track
-     * @example 2015: 201"5" kink was created from split track selected with filter 9 (track did not pass
+     * Example 2: 2015: 201"5" kink was created from split track selected with filter 9 (track did not pass
      * neither mother nor daughter preselection criteria); 2"01"5 the code 1 means that the distance at the fitted
      * kink vertex is larger than the set cut; "2"015 -- 2 hits were reassigned from mother track to daughter track
      */

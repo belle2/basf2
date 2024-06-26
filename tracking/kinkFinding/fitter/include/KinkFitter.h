@@ -17,12 +17,6 @@
 
 #include <utility>
 
-namespace genfit {
-  class MeasuredStateOnPlane;
-  class GFRaveVertex;
-  class Track;
-}
-
 namespace Belle2 {
 
   /**

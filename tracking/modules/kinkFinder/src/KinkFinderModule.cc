@@ -24,17 +24,19 @@ REG_MODULE(KinkFinder);
 KinkFinderModule::KinkFinderModule() : Module()
 {
 
-  setDescription("This is a simple Kink finder"
-                 "which matches all mother candidate tracks with all daughter candidate tracks, "
-                 "fitting a vertex for each pair. "
-                 "Depending on the outcome of each fit, a corresponding "
-                 "Belle2::Kink is stored or not.\n\n"
-                 "A loose cut on the pair is applied before the fit; "
-                 "then, a vertex fit is performed, and only pairs passing a chi^2 (``vertexChi2Cut``) "
-                 "and distance (``vertexDistanceCut``) "
-                 "are stored as Belle2::Kink.\n\n"
-                 "It also can split tracks that might be formed from two kink tracks. "
-                 "The tracks are preselected and split. After that the result is stored in Belle2::Kink.");
+  setDescription("This is a Kink finder module which preselects mother and daughter candidate tracks and matches them "
+                 "and fits a vertex for each pair. Depending on the outcome of each fit, a corresponding "
+                 "``Belle2::Kink`` is stored or not.\n\n"
+                 "The parameters of the ``KinkFinder`` are stored as payloads in ``KinkFinderParameters``.\n\n"
+                 "A loose cut on the pair is applied before the fit; then, a vertex fit is performed, and only pairs "
+                 "passing a chi^2 (``KinkFinderParameters::m_vertexChi2Cut``) and distance "
+                 "(``KinkFinderParameters::m_vertexDistanceCut``) are stored as ``Belle2::Kink``.\n\n"
+                 "If a corresponding ``KinkFitter`` mode is ON, hits are reassigned between mother and daughter tracks "
+                 "to improve the resolutions and efficiency. If a corresponding ``KinkFitter`` mode is ON, the track "
+                 "pair is also fitted as one track and a special flag is filled based on the result to supress the clones.\n\n"
+                 "If a corresponding ``KinkFitter`` mode is ON, ``KinkFinder`` preselects track candidates "
+                 "that might be formed from two kink tracks, and ``KinkFitter`` splits such tracks. "
+                 "After that the result is stored in ``Belle2::Kink``.");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -74,6 +76,16 @@ void KinkFinderModule::initialize()
   m_kinkFitter = std::make_unique<KinkFitter>(m_arrayNameTFResult, m_arrayNameKink,
                                               m_arrayNameRecoTrack,
                                               m_arrayNameCopiedRecoTrack);
+
+  // Set geometry of CDC forward and backward walls.
+  // Here the tangent is forward CDC acceptance.
+  m_cdcForwardBottomWall.setLine(tan(17. / 180 * M_PI), 0);
+  // Here numbers are calculated from the CDC technical geometry.
+  m_cdcForwardTopWall.setLine(4.97, -670);
+  // Here the tangent is backward CDC acceptance.
+  m_cdcBackwardBottomWall.setLine(-tan(30. / 180 * M_PI), 0);
+  // Here numbers are calculated from the CDC technical geometry.
+  m_cdcBackwardTopWall.setLine(-4.2, -192.5);
 
 }
 
@@ -187,7 +199,8 @@ bool KinkFinderModule::kinkFitterModeSplitTrack()
 bool KinkFinderModule::ifInCDC(const ROOT::Math::XYZVector& pos)
 {
   // check for the first layer of CDC (needed separately because of calculation of trapezoid shapes later)
-  if (pos.Perp2() < 289 && pos.Perp2() > 225)
+  if (pos.Perp2() < m_cdcInnerWallWithoutFirstLayer * m_cdcInnerWallWithoutFirstLayer
+      && pos.Perp2() > m_cdcInnerWithFirstLayerWall * m_cdcInnerWithFirstLayerWall)
     return true;
 
   // position inside CDC with respect to required shifts
@@ -196,19 +209,18 @@ bool KinkFinderModule::ifInCDC(const ROOT::Math::XYZVector& pos)
   const double r = sqrt(pos.Perp2()) + m_kinkFinderParameters->getPrecutRho();
 
   // the point should be inside CDC with respect to shift, precutRho, from outer wall
-  // Numbers for restricting lines of inner and outer walls are calculated from the CDC technical geometry.
-  if (!((r < 112) && (r > 17 + m_kinkFinderParameters->getPrecutRho())))
+  if (!((r < m_cdcOuterWall) && (r > m_cdcInnerWallWithoutFirstLayer + m_kinkFinderParameters->getPrecutRho())))
     return false;
 
   // the z coordinate point restriction
-  // CDC has a shape of two trapezoids. Numbers for restricting lines are calculated from the CDC technical geometry.
+  // CDC has a shape of two trapezoids; thus, the forward and backward walls are described with two lines: bottom and top
   bool z_part;
   if (z > 0) {
     // forward walls of CDC
-    z_part = (r > (tan(17. / 180 * M_PI) * z)) && (r > (4.97 * z - 670));
+    z_part = (r > m_cdcForwardBottomWall.getLine(z)) && (r > m_cdcForwardTopWall.getLine(z));
   } else {
     // backward walls of CDC
-    z_part = (r > (-tan(30. / 180 * M_PI) * z)) && (r > (-4.2 * z - 192.5));
+    z_part = (r > m_cdcBackwardBottomWall.getLine(z)) && (r > m_cdcBackwardTopWall.getLine(z));
   }
   return z_part;
 }
@@ -230,15 +242,16 @@ bool KinkFinderModule::preFilterMotherTracks(Track const* const track)
   if (nCDCHits && !ifInCDC(posLast)) return false;
 
   // track is not curled back to IP
-  // The first layer of CDC has 16.8 cm radius; thus, the track which ends inside 17 cm cylinder is either short or curler.
+  // The first layer of CDC has 16.8 cm radius; thus, the track which ends inside m_cdcInnerWallWithoutFirstLayer=17 cm
+  // cylinder is either short or curler.
   // The requirement of >= 10 hits ensures that it is a curler (obtained empirically)
-  if (nCDCHits >= 10 && posLast.Perp2() < 289) return false;
+  if (nCDCHits >= 10 && posLast.Perp2() < m_cdcInnerWallWithoutFirstLayer * m_cdcInnerWallWithoutFirstLayer) return false;
 
   // first point of the track is inside inner layers of VXD
   // The mother candidate should start inside VXD. The radius of outer two SVD layers are 10.4 and 13.5 cm,
-  // so we set 12 cm cut (between these layers).
+  // so we set m_svdBeforeOuterLayer=12 cm cut (between these layers).
   const ROOT::Math::XYZVector posFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
-  if (posFirst.Perp2() > 144) return false;
+  if (posFirst.Perp2() > m_svdBeforeOuterLayer * m_svdBeforeOuterLayer) return false;
 
   // impact parameter in rphi < 1 cm
   // conservative enough assuming possible bad resolution of mother track due to daughter hits assignment
@@ -262,7 +275,7 @@ bool KinkFinderModule::preFilterDaughterTracks(Track const* const track)
 
   // first point of the track is outside inner layers of VXD, or impact parameter in rphi > 1 cm
   // inverse criteria for mother
-  if (posFirst.Perp2() < 144 && fabs(trackFitResult->getD0()) < 1) return false;
+  if (posFirst.Perp2() < m_svdBeforeOuterLayer * m_svdBeforeOuterLayer && fabs(trackFitResult->getD0()) < 1) return false;
   return true;
 }
 
@@ -285,9 +298,9 @@ bool KinkFinderModule::preFilterTracksToSplit(Track const* const track)
   if (nFittedCDCHits < 5) return false;
 
   // first point of the track is close to the inner wall of the CDC
-  // we set 18 cm cut to have both tracks with and without VXD hits
+  // we set m_cdcInnerWallWithoutFirstTwoLayers=18 cm cut to have both tracks with and without VXD hits
   const ROOT::Math::XYZVector posFirst(recoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
-  if (posFirst.Perp2() > 324) return false;
+  if (posFirst.Perp2() > m_cdcInnerWallWithoutFirstTwoLayers * m_cdcInnerWallWithoutFirstTwoLayers) return false;
 
   // impact parameter in rphi < 2 cm
   // Loose enough assuming possible bad resolution of track due to daughter hits assignment
@@ -332,9 +345,7 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
 
     const ROOT::Math::XYZVector daughterPosClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
     const ROOT::Math::XYZVector daughterMomClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
-    const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
-                                                      daughterPosClosestToMotherPosLast.Y(),
-                                                      daughterPosClosestToMotherPosLast.Z()}).Z();
+    const double Bz = BFieldManager::getFieldInTesla(daughterPosClosestToMotherPosLast).Z();
     // daughter Helix with move to mother last point
     Helix daughterHelixClosestToMotherPosLast(daughterPosClosestToMotherPosLast,
                                               daughterMomClosestToMotherPosLast,
@@ -365,9 +376,7 @@ short KinkFinderModule::isTrackPairSelected(const Track* motherTrack, const Trac
 
     const ROOT::Math::XYZVector daughterPosClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getPos());
     const ROOT::Math::XYZVector daughterMomClosestToMotherPosLast(daughterRecoTrack->getMeasuredStateOnPlaneFromFirstHit().getMom());
-    const double Bz = BFieldManager::getFieldInTesla({daughterPosClosestToMotherPosLast.X(),
-                                                      daughterPosClosestToMotherPosLast.Y(),
-                                                      daughterPosClosestToMotherPosLast.Z()}).Z();
+    const double Bz = BFieldManager::getFieldInTesla(daughterPosClosestToMotherPosLast).Z();
     // daughter Helix with move to mother last point
     Helix daughterHelixClosestToMotherPosLast(daughterPosClosestToMotherPosLast,
                                               daughterMomClosestToMotherPosLast,

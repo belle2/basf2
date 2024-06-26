@@ -114,7 +114,6 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       if (m_isMakePlots) {
         candEdx->SaveAs("Plots_SVDDedxPDFs_wTruncMean.pdf");
       }
-
     }
     // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
   }
@@ -258,6 +257,18 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   TH2F* hLambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
   treeLambda_sw->Draw("p_SVDdEdx:p_p>>hist_d1_2212_trunc", "nSignalLambda_sw * (p_p>0.15) * (p_SVDdEdx>0)", "goff");
+
+  // produce the 1D profile (for data-MC comparisons)
+  if (m_isMakePlots) {
+    TH1F* ProtonProfile = (TH1F*)hLambdaP->ProfileX("ProtonProfile");
+    canvLambda->SetTicky(1);
+    ProtonProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
+    ProtonProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
+    ProtonProfile->GetYaxis()->SetTitle("dE/dx");
+    ProtonProfile->Draw();
+    canvLambda->Print("SVDdEdxCalibrationProfileProton.pdf");
+    canvLambda->SetTicky(0);
+  }
 
   // for each momentum bin, normalize the pdf
 
@@ -432,6 +443,26 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   // the current strategy assumes that the muon and pion payloads are indistinguishable: clone the pion one
   TH2F* hDstarMu = (TH2F*)hDstarPi->Clone("hist_d1_13_trunc");
   hDstarMu->SetTitle("hist_d1_13_trunc");
+
+  // produce the 1D profile (for data-MC comparisons)
+  if (m_isMakePlots) {
+    TH1F* PionProfile = (TH1F*)hDstarPi->ProfileX("PionProfile");
+    canvDstar->SetTicky(1);
+    PionProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
+    PionProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
+    PionProfile->GetYaxis()->SetTitle("dE/dx");
+    PionProfile->Draw();
+    canvDstar->Print("SVDdEdxCalibrationProfilePion.pdf");
+
+    TH1F* KaonProfile = (TH1F*)hDstarK->ProfileX("KaonProfile");
+    KaonProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
+    KaonProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
+    KaonProfile->GetYaxis()->SetTitle("dE/dx");
+    KaonProfile->Draw();
+    canvDstar->Print("SVDdEdxCalibrationProfileKaon.pdf");
+    canvDstar->SetTicky(0);
+  }
+
   // hDstarK normalisation
   // for each momentum bin, normalize the pdf
 
@@ -525,6 +556,19 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   hGammaE->Add(hGammaEPart1);
   hGammaE->Add(hGammaEPart2);
 
+  // produce the 1D profile (for data-MC comparisons)
+  TCanvas* canvGamma = new TCanvas("canvGamma", "canvGamma");
+  if (m_isMakePlots) {
+    TH1F* ElectronProfile = (TH1F*)hGammaE->ProfileX("ElectronProfile");
+    canvGamma->SetTicky(1);
+    ElectronProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
+    ElectronProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
+    ElectronProfile->GetYaxis()->SetTitle("dE/dx");
+    ElectronProfile->Draw();
+    canvGamma->Print("SVDdEdxCalibrationProfileElectron.pdf");
+    canvGamma->SetTicky(0);
+  }
+
   // for each momentum bin, normalize the pdf
   // hGammaE normalisation
   for (int pbin = 1; pbin <= m_numPBins; pbin++) {
@@ -548,7 +592,6 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   }
 
   if (m_isMakePlots) {
-    TCanvas* canvGamma = new TCanvas("canvGamma", "canvGamma");
     hGammaE->Draw("COLZ");
     canvGamma->Print("SVDdEdxCalibrationHistoGamma.pdf");
   }

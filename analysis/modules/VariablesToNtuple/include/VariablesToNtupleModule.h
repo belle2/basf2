@@ -91,33 +91,7 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-
-    /** Lowest experiment number.
-     */
-    unsigned long m_experimentLow;
-
-    /** Lowest run number.
-     */
-    unsigned long m_runLow;
-
-    /** Lowest event number in lowest run.
-     */
-    unsigned long m_eventLow;
-
-    /** Highest experiment number.
-     */
-    unsigned long m_experimentHigh;
-
-    /** Highest run number.
-     */
-    unsigned long m_runHigh;
-
-    /** Highest event number in highest run.
-     */
-    unsigned long m_eventHigh;
-
-    /** Number of full events (aka number of events without an error flag) */
-    unsigned int m_nFullEvents{0};
+    unsigned int m_nFullEvents{0};   /**< number of full events (aka number of events without an error flag) */
 
     /** Branch addresses of variables of type float. */
     std::vector<float> m_branchAddressesFloat;
@@ -160,8 +134,6 @@ namespace Belle2 {
     StoreObjPtr<FileMetaData> m_inputFileMetaData{"", DataStore::c_Persistent}; /**< Pointer to the input file meta data */
 
     FileMetaData* m_outputFileMetaData; /** File meta data stored in the output ntuple file */
-
-    FileMetaData* m_oldFileMetaData{nullptr}; /**< Pre-existing FileMetaData in the output. */
 
   };
 } // end namespace Belle2

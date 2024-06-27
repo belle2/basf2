@@ -41,8 +41,7 @@ REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
-  Module(), m_tree("", DataStore::c_Persistent), m_experimentLow(1), m_runLow(0), m_eventLow(0), m_experimentHigh(0),
-  m_runHigh(0), m_eventHigh(0)
+  Module(), m_tree("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved into separate rows.");
@@ -249,14 +248,11 @@ void VariablesToNtupleModule::initialize()
   if (!m_file->Get("persistent")) {
     m_persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
     m_persistent->Branch("FileMetaData", &m_outputFileMetaData);
-  } else {
-    TTree* m_oldPersistent = dynamic_cast<TTree*>(m_file->Get("persistent"));
-    m_oldFileMetaData = dynamic_cast<FileMetaData*>(m_file->Get("FileMetaData"));
-    m_persistent = m_oldPersistent->CloneTree(0);
-    m_oldPersistent->GetEntry(0);
-    TBranch* fileMetaDataBranch = m_persistent->GetBranch("FileMetaData");
-    fileMetaDataBranch->SetAddress(&m_outputFileMetaData);
   }
+
+  //set starting conditions
+  m_outputFileMetaData->setLow(-1, -1, 0);
+  m_outputFileMetaData->setHigh(-1, -1, 0);
 
 }
 
@@ -293,8 +289,14 @@ void VariablesToNtupleModule::event()
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
+  int m_experimentLow = m_outputFileMetaData->getExperimentLow();
+  int m_experimentHigh = m_outputFileMetaData->getExperimentHigh();
+  int m_runLow = m_outputFileMetaData->getRunLow();
+  int m_runHigh = m_outputFileMetaData->getRunHigh();
+  int m_eventLow = m_outputFileMetaData->getEventLow();
+  int m_eventHigh = m_outputFileMetaData->getEventHigh();
 
-  if (m_experimentLow > m_experimentHigh) { //starting condition
+  if (m_experimentLow == -1) { //starting condition
     m_experimentLow = m_experimentHigh = m_experiment;
     m_runLow = m_runHigh = m_run;
     m_eventLow = m_eventHigh = m_event;
@@ -312,6 +314,9 @@ void VariablesToNtupleModule::event()
       m_eventHigh = m_event;
     }
   }
+
+  m_outputFileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
+  m_outputFileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
 
   if (m_inputFileMetaData.isValid()) {
     std::string lfn = m_inputFileMetaData->getLfn();
@@ -427,21 +432,11 @@ void VariablesToNtupleModule::event()
 void VariablesToNtupleModule::fillFileMetaData()
 {
   bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
-  new (m_outputFileMetaData) FileMetaData;
   if (!isMC) m_outputFileMetaData->declareRealData();
 
-  unsigned long numEntries = m_tree->get().GetEntries();
   m_outputFileMetaData->setNFullEvents(m_nFullEvents);
-  m_outputFileMetaData->setNEvents(numEntries);
-
-  if (m_experimentLow > m_experimentHigh) {
-    //starting condition so apparently no events at all
-    m_outputFileMetaData->setLow(-1, -1, 0);
-    m_outputFileMetaData->setHigh(-1, -1, 0);
-  } else {
-    m_outputFileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
-    m_outputFileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
-  }
+  // this is ambiguous for files with multiple ntuple trees so setting it to -1
+  m_outputFileMetaData->setNEvents(-1);
 
   //fill more file level metadata
   RootIOUtilities::setCreationData(*m_outputFileMetaData);
@@ -453,6 +448,7 @@ void VariablesToNtupleModule::fillFileMetaData()
   for (const auto& item : m_additionalDataDescription) {
     m_outputFileMetaData->setDataDescription(item.first, item.second);
   }
+  m_outputFileMetaData->setDataDescription("isNtupleMetaData", "True");
   m_outputFileMetaData->setParents(m_parentLfns);
 }
 
@@ -460,10 +456,12 @@ void VariablesToNtupleModule::terminate()
 {
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
-    fillFileMetaData();
     TDirectory::TContext directoryGuard(m_file.get());
-    m_persistent->Fill();
-    m_persistent->Write("persistent", TObject::kWriteDelete);
+    if (!m_file->GetListOfKeys()->Contains("persistent")) {
+      fillFileMetaData();
+      m_persistent->Fill();
+      m_persistent->Write("persistent", TObject::kWriteDelete);
+    }
 
     B2INFO("Writing NTuple " << m_treeName);
     m_tree->write(m_file.get());

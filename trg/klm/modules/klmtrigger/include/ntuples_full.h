@@ -1,9 +1,17 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
+#pragma once
 #include <type_traits>
 #include <iostream>
 #include <vector>
 #include <iomanip>
 #include <algorithm>
-#pragma once
 
 namespace nt {
 
@@ -621,10 +629,27 @@ namespace nt {
     }
     return ret;
   }
+
+  template <typename NT_T, typename FUNT>
+  void ntuple_for_each(const NT_T& ntuple, FUNT&& fun)
+  {
+    nt::constexpr_for <
+    0,
+    nt::_Remove_cvref_t<decltype(ntuple)>::__size__,
+    1 > (
+    [&](auto j) {
+      fun(
+        nt::get_nth<j>(ntuple)
+      );
+    }
+    );
+  }
 }
 
 
 namespace nt::algorithms {
+
+
 
   struct identity_t {
     template <typename T>
@@ -744,7 +769,7 @@ namespace nt::algorithms {
     {
       auto fun_c = [&](const auto & rng) {
         auto tail = rng.begin();
-        return nt::ntuple(T::get(*tail)...) | fun(rng);
+        return nt::ntuple<T...>(T::get(*tail)...) | fun(rng);
       };
       return __apply__internal__(vec, fun_c);
     }
@@ -903,7 +928,7 @@ namespace nt::algorithms {
       {                                                                             \
         struct name_getter_t                                                        \
         {                                                                           \
-          static auto get_name()                                          \
+          static std::string get_name()                                          \
           {                                                                         \
             return #name_;                                                          \
           }                                                                         \

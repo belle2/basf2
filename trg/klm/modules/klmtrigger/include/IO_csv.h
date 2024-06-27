@@ -1,3 +1,10 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
 #pragma once
 
 #include <iostream>
@@ -28,7 +35,6 @@ auto & get_IO_csv_handle()
 
 
 
-
 template <typename T>
 void save(std::string filename, T&& content)
 {
@@ -50,10 +56,13 @@ void save(std::string filename, T&& content)
 
     *o_file << "gevent_number";
     const auto& row = content[0];
-    nt::constexpr_for<0, row.__size__, 1>([&](auto j) {
-      auto& ele = nt::get_nth<j>(row);
+
+    nt::ntuple_for_each(row,
+    [&](auto & ele) {
       *o_file   << "," << ele.get_name();
-    });
+    }
+                       );
+
     *o_file << '\n';
 
   }
@@ -62,10 +71,12 @@ void save(std::string filename, T&& content)
 
   for (const auto& row : content) {
     *o_file <<  get_IO_csv_handle().event_nr;
-    nt::constexpr_for<0, row.__size__, 1>([&](auto j) {
-      auto& ele = nt::get_nth<j>(row);
+    nt::ntuple_for_each(row,
+    [&](auto & ele) {
       *o_file << ',' << ele.v;
-    });
+    }
+                       );
+
     *o_file << '\n';
   }
 

@@ -459,7 +459,7 @@ class FourLepton(BaseSkim):
 
         create_validation_histograms(
             rootfile=histogramFilename,
-            particlelist=["B0:FourLepton"],
+            particlelist="B0:FourLepton",
             variables_1d=[
                 ("Mbc", 100, 5.19, 5.3, "Signal B Mbc", __liaison__,
                  "Mbc of the Signal B", "", 'Mbc [GeV/c^2]', 'Candidates'),

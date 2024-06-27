@@ -1,0 +1,28 @@
+# EventType: 1210030006
+# Descriptor: [b_to_kppbar]
+# NickName: b_to_kppbar
+# Cuts: None
+# Documentation: B+ -> K+ p anti-p- decay
+# PhysicsWG: BtoCharmless
+# Tested: Yes
+# Responsible: Kristina Gudkova
+# Email: k.s.gudkova@inp.nsk.su
+# Date: 20240627
+
+Alias MyB+ B+
+Alias MyB- B-
+ChargeConj MyB+ MyB-
+
+Decay Upsilon(4S)
+0.5	  MyB-          B+           VSS;
+0.5       MyB+          B-           VSS;
+Enddecay
+
+Decay MyB-
+1.        K- p+ anti-p-          PHOTOS PHSP;
+Enddecay
+
+CDecay MyB+
+
+End
+

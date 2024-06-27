@@ -1266,7 +1266,7 @@ class LambdacToSHpJm(BaseSkim):
             path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["Sigma+:charmSkim pi+:charmSkim pi-:LcToSHpJm",
+        LambdacChannels = ["Sigma+:charmSkim pi+:charmSkim pi-:charmSkim",
                            "Sigma+:charmSkim pi+:charmSkim K-:LcToSHpJm",
                            "Sigma+:charmSkim K+:LcToSHpJm pi-:charmSkim",
                            "Sigma+:charmSkim K+:LcToSHpJm K-:LcToSHpJm",

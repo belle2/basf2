@@ -393,6 +393,7 @@ namespace nt {
   struct ntuple : ntuple_base_t<T>... {
     constexpr ntuple(const ntuple& rhs) = default;
     constexpr ntuple& operator=(const ntuple& rhs) = default;
+    constexpr ntuple& operator=(ntuple&& rhs) = default;
     constexpr ntuple(const T& ...t1) : ntuple_base_t<T>(t1)... {}
 
 
@@ -891,7 +892,7 @@ namespace nt::algorithms {
       {                                                                             \
         struct getter_t                                                             \
         {                                                                           \
-          static constexpr auto &get(decltype(e.val) x)                             \
+          static auto &get(decltype(e.val) x)                             \
           {                                                                         \
             return x.name_;                                                         \
           }                                                                         \
@@ -902,7 +903,7 @@ namespace nt::algorithms {
       {                                                                             \
         struct name_getter_t                                                        \
         {                                                                           \
-          static constexpr auto get_name()                                          \
+          static auto get_name()                                          \
           {                                                                         \
             return #name_;                                                          \
           }                                                                         \

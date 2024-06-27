@@ -213,6 +213,21 @@ void Framework::setRealm(const std::string& realm)
   }
 }
 
+void Framework::setRunType(const Const::ERunType runType)
+{
+  Environment::Instance().setRunType(runType);
+}
+
+void Framework::setCosmicRun()
+{
+  Environment::Instance().setRunType(Const::c_Cosmic);
+}
+
+void Framework::setBeamRun()
+{
+  Environment::Instance().setRunType(Const::c_Beam);
+}
+
 void Framework::writeSimulationSteps()
 {
   B2WARNING("basf2 will write the simulation steps of each event into output csv files. "
@@ -409,6 +424,12 @@ The severity of log messages sometimes depends on where basf2 runs. This is cont
 
 Usually the realm does not have to be set explicitly. On the HLT or express reco it should be set to 'online' and for official productions to 'production'.
 )DOCSTRING", args("realm"));
+  def("declare_cosmics", &Framework::setCosmicRun, R"DOCSTRING(
+Set that the run is for cosmics data
+)DOCSTRING");
+  def("declare_beam", &Framework::setBeamRun, R"DOCSTRING(
+Set that the run is for beam data
+)DOCSTRING");
   def("write_simulation_steps", &Framework::writeSimulationSteps, R"DOCSTRING(
 Allow basf2 to write the simulation steps of each event into csv files.
 

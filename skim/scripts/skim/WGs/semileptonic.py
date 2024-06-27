@@ -211,6 +211,7 @@ class SLUntagged(BaseSkim):
         loadStdDstarPlus(path=path)
 
     def build_lists(self, path):
+        path = self.skim_event_cuts("nTracks > 4", path=path)
         ma.cutAndCopyList("e+:SLUntagged", "e+:all", "p>0.35", True, path=path)
         ma.cutAndCopyList("mu+:SLUntagged", "mu+:all", "p>0.35", True, path=path)
         Bcuts = "5.24 < Mbc < 5.29 and abs(deltaE) < 0.5"
@@ -230,13 +231,11 @@ class SLUntagged(BaseSkim):
         bplusList = []
         for chID, channel in enumerate(BplusChannels):
             ma.reconstructDecay(f"B+:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
-            ma.applyCuts(f"B+:SLUntagged_{chID}", "nTracks>4", path=path)
             bplusList.append(f"B+:SLUntagged_{chID}")
 
         b0List = []
         for chID, channel in enumerate(B0Channels):
             ma.reconstructDecay(f"B0:SLUntagged_{chID} -> {channel}", Bcuts, chID, path=path)
-            ma.applyCuts(f"B0:SLUntagged_{chID}", "nTracks>4", path=path)
             b0List.append(f"B0:SLUntagged_{chID}")
 
         return b0List + bplusList
@@ -280,7 +279,7 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
     * ``SkimHighEff tracks thetaInCDCAcceptance AND dr < 2 AND abs(dz) < 5 AND PID>=0.01``
     * ``slowPi tracks thetaInCDCAcceptance AND dr < 2 AND abs(dz) < 5 AND useCMSFrame(p) < 0.4``
     * :math:`2.5 > p_{\\ell} > 1.1\\,\\text{GeV}`
-    * ``lepton with abs(d0) < 0.5 AND abs(z0) < 2 AND thetaInCDCAcceptance AND ID >= 0.95 AND 1.1 < useCMSFrame(p) < 2.5``
+    * ``lepton with abs(dr) < 0.5 AND abs(dz) < 2 AND thetaInCDCAcceptance AND ID >= 0.95 AND 1.1 < useCMSFrame(p) < 2.5``
     * ``1.8 < M_D0 < 2.0``
     * ``DM_Dstar_D < 0.16``
 
@@ -337,12 +336,12 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
         ma.cutAndCopyList(
             'e+:sig',
             'e+:all',
-            'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and electronID_noTOP >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
+            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and electronID_noTOP >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
             path=path)
         ma.cutAndCopyList(
             'mu+:sig',
             'mu+:all',
-            'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and muonID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5',
+            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and muonID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5',
             path=path)
 
         B0_channels = ["D*-:D0_Kpi_skimhigheff e+:sig",
@@ -411,15 +410,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     TestSampleProcess = "charged"
 
     validation_sample = _VALIDATION_SAMPLE
 
-    def load_particle_lists(self, path):
-
-        return
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
 
     def build_lists(self, path):
 
@@ -458,13 +456,12 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.fillParticleList("mu-:sig", f"{muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}", path=path)
         total_leptons = "formula( nParticlesInList(e-:sig) + nParticlesInList(mu-:sig) )"
         # don't waste time if there are no leptons
-        if (f"{total_leptons}" == "0"):
-            return []
+        path = self.skim_event_cuts(f"{total_leptons} > 0", path=path)
 
         # charged K and pi candidates
-        ma.fillParticleList("K-:loose", f"binaryPID(321,211) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1", path=path)
+        ma.fillParticleList("K-:BtoDl", f"binaryPID(321,211) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1", path=path)
         ma.fillParticleList(
-            "pi+:loose",
+            "pi+:BtoDl",
             f"binaryPID(211,321) > 0.1 and {hadTrkCuts} and thetaInCDCAcceptance and pt>0.1",
             path=path)
         ma.fillParticleList("pi+:slow", f"{hadTrkCuts} and thetaInCDCAcceptance and p>0.05", path=path)
@@ -473,40 +470,38 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.reconstructDecay("pi0:eff50 -> gamma:eff50 gamma:eff50", '0.114<InvM<0.150', path=path)
         ma.cutAndCopyList("gamma:e90", "gamma:eff50", "E>0.090", path=path)
         ma.reconstructDecay("pi0:e90 -> gamma:e90 gamma:e90", '0.118<InvM<0.148', path=path)
-        # K0s -> pi+pi- candidates
-        stdKshorts(path=path)
         ma.cutAndCopyList('K_S0:good', 'K_S0:merged', cut='significanceOfDistance>2.5', path=path)
 
         # D reconstruction - only clean modes
-        ma.reconstructDecay("D0:Kpi       -> K-:loose pi+:loose", cut="abs(dM) < 0.025", dmID=1, path=path)
-        ma.rankByLowest("D0:Kpi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:KK        -> K-:loose K+:loose", cut="abs(dM) < 0.020", dmID=2, path=path)
+        ma.reconstructDecay("D0:Kpi_BtoDl -> K-:BtoDl pi+:BtoDl", cut="abs(dM) < 0.025", dmID=1, path=path)
+        ma.rankByLowest("D0:Kpi_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D0:KK        -> K-:BtoDl K+:BtoDl", cut="abs(dM) < 0.020", dmID=2, path=path)
         ma.rankByLowest("D0:KK", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:K3pi      -> K-:loose pi+:loose pi-:loose pi+:loose", cut="abs(dM) < 0.020", dmID=3, path=path)
+        ma.reconstructDecay("D0:K3pi      -> K-:BtoDl pi+:BtoDl pi-:BtoDl pi+:BtoDl", cut="abs(dM) < 0.020", dmID=3, path=path)
         ma.rankByLowest("D0:K3pi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:Kpi0pi    -> K-:loose pi0:e90 pi+:loose", cut="abs(dM)-0.005 < 0.050", dmID=4, path=path)
+        ma.reconstructDecay("D0:Kpi0pi    -> K-:BtoDl pi0:e90 pi+:BtoDl", cut="abs(dM)-0.005 < 0.050", dmID=4, path=path)
         ma.rankByLowest("D0:Kpi0pi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:piKspi      -> pi+:loose K_S0:good pi-:loose", cut="abs(dM) < 0.020", dmID=5, path=path)
+        ma.reconstructDecay("D0:piKspi      -> pi+:BtoDl K_S0:good pi-:BtoDl", cut="abs(dM) < 0.020", dmID=5, path=path)
         ma.rankByLowest("D0:piKspi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D0:Kspi0       -> K_S0:good pi0:e90", cut="abs(dM)-0.005 < 0.050", dmID=6, path=path)
-        ma.rankByLowest("D0:Kspi0", variable="abs(dM)", numBest=15, path=path)
-        ma.copyLists("D0:sig", ['D0:Kpi', 'D0:KK', 'D0:K3pi', 'D0:Kpi0pi', 'D0:piKspi', 'D0:Kspi0'], path=path)
+        ma.reconstructDecay("D0:Kspi0_BtoDl -> K_S0:good pi0:e90", cut="abs(dM)-0.005 < 0.050", dmID=6, path=path)
+        ma.rankByLowest("D0:Kspi0_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.copyLists("D0:sig", ['D0:Kpi_BtoDl', 'D0:KK', 'D0:K3pi', 'D0:Kpi0pi', 'D0:piKspi', 'D0:Kspi0_BtoDl'], path=path)
 
-        ma.reconstructDecay("D+:Kpipi     -> K-:loose pi+:loose pi+:loose", cut="abs(dM) < 0.020", dmID=1, path=path)
-        ma.rankByLowest("D+:Kpipi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D+:Kspi     -> K_S0:good pi+:loose", cut="abs(dM) < 0.020", dmID=2, path=path)
-        ma.rankByLowest("D+:Kspi", variable="abs(dM)", numBest=15, path=path)
-        ma.reconstructDecay("D+:KKpi     -> K-:loose K+:loose pi+:loose", cut="abs(dM) < 0.015", dmID=3, path=path)
+        ma.reconstructDecay("D+:Kpipi_BtoDl -> K-:BtoDl pi+:BtoDl pi+:BtoDl", cut="abs(dM) < 0.020", dmID=1, path=path)
+        ma.rankByLowest("D+:Kpipi_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D+:Kspi_BtoDl -> K_S0:good pi+:BtoDl", cut="abs(dM) < 0.020", dmID=2, path=path)
+        ma.rankByLowest("D+:Kspi_BtoDl", variable="abs(dM)", numBest=15, path=path)
+        ma.reconstructDecay("D+:KKpi     -> K-:BtoDl K+:BtoDl pi+:BtoDl", cut="abs(dM) < 0.015", dmID=3, path=path)
         ma.rankByLowest("D+:KKpi", variable="abs(dM)", numBest=15, path=path)
-        ma.copyLists("D+:sig", ['D+:Kpipi', 'D+:Kspi', 'D+:KKpi'], path=path)
+        ma.copyLists("D+:sig", ['D+:Kpipi_BtoDl', 'D+:Kspi_BtoDl', 'D+:KKpi'], path=path)
 
-# No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
+        # No explicit reconstruction of D*0 to D0 pi0/gamma or D*+ to D0 pi+ (included in feeddown)
 
         ma.reconstructDecay("D*+:D0        -> pi+:slow D0:sig", cut="abs(dQ) < 0.0035", dmID=11, path=path)
         ma.rankByLowest("D*+:D0", variable="abs(dQ)", numBest=15, path=path)
         ma.copyLists("D*+:sig", ['D*+:D0'], path=path)
 
-# B reconstruction.  Use wide cut on cosThetaBY.
+        # B reconstruction.  Use wide cut on cosThetaBY.
 
         ma.reconstructDecay('anti-B0:Dpe  ->  e-:sig D+:sig ?nu ', BSLRecoCut, dmID=200, path=path)
         ma.reconstructDecay('anti-B0:Dpmu -> mu-:sig D+:sig ?nu ', BSLRecoCut, dmID=201, path=path)
@@ -523,17 +518,17 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         ma.copyLists('B-:D0l', ['B-:D0e', 'B-:D0mu'], path=path)
         ma.rankByHighest('B-:D0l', variable='InvM', numBest=9, path=path)
 
-# master SL B lists
+        # main SL B lists
         ma.copyLists('B-:SL', ['B-:D0l'], path=path)
         ma.copyLists('anti-B0:SL', ['anti-B0:Dspl', 'anti-B0:Dpl'], path=path)
 
-# Build ROE and look for e-, mu-, charged multiplicity and E_ECL
+        # Build ROE and look for e-, mu-, charged multiplicity and E_ECL
 
         for Btype in ['B-:SL', 'anti-B0:SL']:
 
             roe_path = b2.create_path()
             deadEndPath = b2.create_path()
-# Execute the filter module:
+            # Execute the filter module:
             ma.buildRestOfEvent(Btype, fillWithMostLikely=True, path=path)
             ma.appendROEMasks(Btype, [cleanMask], path=path)
             ma.signalSideParticleFilter(Btype, '', roe_path, deadEndPath)
@@ -562,7 +557,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('nROE_Ch', 'nROE_Charged(cleanMask)')
         vm.addAlias('E_extra_ROE', 'useCMSFrame(roeEextra(cleanMask))')
 
-#  Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
+        # Only keep events whose ROE has an extra e or mu, or Ntrk<3, or E_ECL<2.0 GeV
 
         ma.applyCuts('B-:SL', f'passesCut({BSLSkimCut})', path=path)
         ma.applyCuts('anti-B0:SL', f'passesCut({BSLSkimCut})', path=path)

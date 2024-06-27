@@ -14,6 +14,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
+from glob import glob
 from SCons.Builder import Builder
 
 # module in b2modmap file
@@ -98,6 +99,7 @@ def doxyfile(target, source, env):
     content = source[0].get_text_contents().replace('BELLE2_RELEASE', env.GetOption('doxygen'))
     if env.get('HAS_DOT', False):
         content = content.replace('HAVE_DOT               = NO', 'HAVE_DOT               = YES')
+    content = content.replace('IMPORTED', ' '.join([path.rsplit(os.sep, 1)[0] for path in glob('**/.imported', recursive=True)]))
     target_file = open(str(target[0]), 'w')
     target_file.write(content)
     target_file.close()

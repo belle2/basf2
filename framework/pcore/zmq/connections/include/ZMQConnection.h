@@ -13,6 +13,7 @@
 #include <zmq.hpp>
 
 #include <memory>
+#include <functional>
 
 namespace Belle2 {
   /**

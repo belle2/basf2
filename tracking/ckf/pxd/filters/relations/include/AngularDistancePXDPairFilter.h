@@ -12,9 +12,17 @@
 
 namespace Belle2 {
   /// Base filter for CKF PXD states
-  class DistancePXDPairFilter : public BasePXDPairFilter {
+  class AngularDistancePXDPairFilter : public BasePXDPairFilter {
   public:
     /// Return the weight based on azimuthal-angle separation
     TrackFindingCDC::Weight operator()(const std::pair<const CKFToPXDState*, const CKFToPXDState*>& relation) override;
+    /// Expose the parameters.
+    void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
+  private:
+    /// Filter potential relations in phi between seed states and hit states
+    double m_param_PhiRecoTrackToHitCut = 0.8;
+    /// Filter potential relations in phi between hit states
+    double m_param_PhiHitHitCut = 1.0;
   };
 }

@@ -138,7 +138,7 @@ class TDCPV_qqs(BaseSkim):
         vm.addAlias('E_ECL_gamma_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_qqs_eventshape)')
         vm.addAlias('E_ECL_TDCPV_qqs', 'formula(E_ECL_pi_TDCPV_qqs+E_ECL_gamma_TDCPV_qqs)')
 
-        btotcpvcuts = '5.18 < Mbc and abs(deltaE) < 0.52'
+        btotcpvcuts = '5.2 < Mbc and abs(deltaE) < 0.5'
         btotcpvcuts_KL = 'abs(deltaE) < 0.250'
 
         bd_qqs_Channels = [
@@ -189,7 +189,7 @@ class TDCPV_qqs(BaseSkim):
         ma.fillParticleList(decayString='pi+:TDCPV_qqs_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_qqs_eventshape',
-                            cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+                            cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:TDCPV_qqs_eventshape', 'gamma:TDCPV_qqs_eventshape'],
                            allMoments=False,
@@ -332,7 +332,7 @@ class TDCPV_ccs(BaseSkim):
         vm.addAlias('E_ECL_gamma_TDCPV_ccs', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_ccs_eventshape)')
         vm.addAlias('E_ECL_TDCPV_ccs', 'formula(E_ECL_pi_TDCPV_ccs+E_ECL_gamma_TDCPV_ccs)')
 
-        btotcpvcuts = 'Mbc > 5.18 and abs(deltaE) < 0.52'
+        btotcpvcuts = 'Mbc > 5.2 and abs(deltaE) < 0.5'
         btotcpvcuts_KL = 'abs(deltaE) < 0.3'
 
         bd_ccs_Channels = ['J/psi:ee K_S0:merged',
@@ -376,7 +376,7 @@ class TDCPV_ccs(BaseSkim):
         ma.fillParticleList(decayString='pi+:TDCPV_ccs_eventshape',
                             cut='pt > 0.1 and abs(dr)<0.5 and abs(dz)<2 and nCDCHits>20', path=path)
         ma.fillParticleList(decayString='gamma:TDCPV_ccs_eventshape',
-                            cut='E > 0.1 and 0.296706 < theta < 2.61799', path=path)
+                            cut='E > 0.1 and thetaInCDCAcceptance', path=path)
 
         ma.buildEventShape(inputListNames=['pi+:TDCPV_ccs_eventshape', 'gamma:TDCPV_ccs_eventshape'],
                            allMoments=False,

@@ -35,9 +35,14 @@ PartialSelectModule::PartialSelectModule() : Module()
     basf2 conditional paths can then be used to select events that pass 
     this module for further processing.
 
-    NOTE: This module has to be added first so as to filter out events 
-    before any other processing. This also only works with one input 
-    file for now.
+    This module can be used with GRID jobs when dataset collections are 
+    passed as input. It helps you control the range of events per file so
+    that you can avoid processing all of the events but still cover all
+    the files in the collection. 
+
+    NOTE: This module has to be added directly after the input module so 
+    as to filter out events before any other processing. It also only 
+    works with one input file for now.
   )DOC");
 
   // Parameter definitions

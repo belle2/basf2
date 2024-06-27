@@ -106,10 +106,6 @@ Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBWD
 Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripBarrel
 Untested method EventLevelClusteringInfo::setNKLMDigitsMultiStripFWD
 Untested method KLMCluster::setClusterPosition
-Untested method KLMCluster::setErrorP
-Untested method KLMCluster::setErrorX
-Untested method KLMCluster::setErrorY
-Untested method KLMCluster::setErrorZ
 Untested method KLMCluster::setInnermostLayer
 Untested method KLMCluster::setLayers
 Untested method KLMCluster::setMomentumMag
@@ -1436,6 +1432,7 @@ TrackFitResult#16:
     1.29303
   getTransverseMomentum(): 0.238484
   getZ0(): 0.0187068
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -237.148
   getLogL(<type: mu->): -235.226
@@ -3283,6 +3280,7 @@ ECLCluster#31:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -3337,8 +3335,8 @@ KLMCluster#1:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 1)
   getTime(): 2.62976
- ... message repeated 14 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
+No data for KlId
+No data for TRGSummary
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -3644,6 +3642,7 @@ MCParticle#4:
   getNDaughters(): 0
   getName(): e+
   getPDG(): -11
+ ... message repeated 14 times
 [WARNING] Daughter index out of range
 	daughter index = 0
 [WARNING] Trying to access non-existing particle.
@@ -5337,6 +5336,7 @@ MCParticle#54:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        2
 EventMetaData:
   getErrorFlag(): 0
@@ -7564,6 +7564,7 @@ TrackFitResult#31:
     3.11522
   getTransverseMomentum(): 0.824068
   getZ0(): -0.010414
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -141.776
   getLogL(<type: mu->): -122.109
@@ -10140,8 +10141,9 @@ ECLCluster#44:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
- ... message repeated 20 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
+No data for EventLevelClusteringInfo
+No data for KlId
+No data for TRGSummary
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -10643,6 +10645,7 @@ MCParticle#10:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
+ ... message repeated 20 times
 [WARNING] Daughter index out of range
 	daughter index = 0
 [WARNING] Trying to access non-existing particle.
@@ -13890,6 +13893,7 @@ MCParticle#106:
   isInitial(): False
   isPrimaryParticle(): False
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] EXP:        0        RUN:        0        EVT:        3
 EventMetaData:
   getErrorFlag(): 0
@@ -15063,6 +15067,7 @@ TrackFitResult#14:
     1.94164
   getTransverseMomentum(): 0.395543
   getZ0(): -0.050998
+No data for EventLevelTrackingInfo
 PIDLikelihood#0:
   getLogL(<type: e->): -259.555
   getLogL(<type: mu->): -239.917
@@ -17962,6 +17967,7 @@ ECLCluster#51:
   isNeutral(): True
   isTrack(): False
   isTriggerCluster(): False
+No data for EventLevelClusteringInfo
 KLMCluster#0:
   getAssociatedEclClusterFlag(): False
   getAssociatedTrackFlag(): False
@@ -17989,8 +17995,8 @@ KLMCluster#0:
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#70 (weight: 1)
   getTime(): 2.63636
- ... message repeated 24 times
-[ERROR] PyStoreArray array 'KlIds' (durability: event) has not been registered!
+No data for KlId
+No data for TRGSummary
 SoftwareTriggerResult:
   getNonPrescaledResults(): size(25)
     pair
@@ -18422,6 +18428,7 @@ MCParticle#8:
   getNDaughters(): 2
   getName(): pi-
   getPDG(): -211
+ ... message repeated 24 times
 [WARNING] Daughter index out of range
 	daughter index = 0
 [WARNING] Trying to access non-existing particle.
@@ -21152,6 +21159,7 @@ MCParticle#89:
   isInitial(): False
   isPrimaryParticle(): True
   isVirtual(): False
+No data for EventLevelTriggerTimeInfo
 [INFO] ------------------------------------------------------------------------
 [INFO] <<< End run: 0
 [INFO] ========================================================================

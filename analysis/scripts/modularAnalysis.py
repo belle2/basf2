@@ -1663,23 +1663,22 @@ def reconstructMissingKlongDecayExpert(decayString,
                                        path=None,
                                        recoList="_reco"):
     """
-    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
+    Creates a list of K_L0's and of B -> K_L0 + X, with X being a fully-reconstructed state.
+    The K_L0 momentum is determined from kinematic constraints of the two-body B decay into K_L0 and X
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         Particles are added to the K_L0 ParticleList if they
+    @param cut         Particles are added to the K_L0 and B ParticleList if the B candidates
                        pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
-    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    @param recoList    suffix appended to original K_L0 and B ParticleList that identify the newly created K_L0 and B lists
     """
 
     pcalc = register_module('KlongMomentumCalculatorExpert')
     pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
-    pcalc.param('cut', cut)
-    pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
     path.add_module(pcalc)
@@ -4419,6 +4418,29 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
     module.param('allowGamma', allowGamma)
     module.param('allowAnyParticleSource', allowAnyParticleSource)
     path.add_module(module)
+
+
+def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
+    """
+    Module to update the mass hypothesis of a given input particle list with the chosen PDG.
+    A new particle list is created with updated mass hypothesis.
+    The allowed mass hypotheses for both input and output are electrons, muons, pions, kaons and protons.
+
+    .. note:
+        The new particle list is named after the input one, with the additional suffix ``_converted_from_OLDHYPOTHESIS``,
+        e.g. ``e+:all`` converted to muons becomes ``mu+:all_converted_from_e``.
+
+    @param particleList The input particle list name
+    @param pdg          The PDG code for the new mass hypothesis, in [11, 13, 211, 321, 2212]
+    @param writeOut     Whether `RootOutput` module should save the new particle list
+    @param path         Modules are added to this path
+    """
+    mass_updater = register_module("ParticleMassHypothesesUpdater")
+    mass_updater.set_name("ParticleMassHypothesesUpdater_" + particleList + "_to_" + str(pdg))
+    mass_updater.param("particleList", particleList)
+    mass_updater.param("writeOut", writeOut)
+    mass_updater.param("pdgCode", pdg)
+    path.add_module(mass_updater)
 
 
 func_requiring_analysisGT = [

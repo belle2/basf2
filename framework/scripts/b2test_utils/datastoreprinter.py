@@ -19,6 +19,8 @@ def get_public_members(classname):
     Return a list of public, non-static member functions for a given classname.
     The class must exist in the Belle2 namespace and have a ROOT dictionary
     """
+    if not hasattr(Belle2, classname):
+        return []
     tclass = getattr(Belle2, classname).Class()
     members = {e.GetName() for e in tclass.GetListOfMethods()
                if (e.Property() & kIsPublic) and not (e.Property() & kIsStatic)}
@@ -137,12 +139,18 @@ class DataStorePrinter:
         """Print all the objects currently existing"""
         if self.array:
             data = Belle2.PyStoreArray(self.name + "s")
-            for i, obj in enumerate(data):
-                self._printObj(obj, i)
+            if not data.isValid():
+                print(f"No data for {self.name}")
+            else:
+                for i, obj in enumerate(data):
+                    self._printObj(obj, i)
         else:
             obj = Belle2.PyStoreObj(self.name)
-            if obj:
-                self._printObj(obj.obj())
+            if not obj.isValid():
+                print(f"No data for {self.name}")
+            else:
+                if obj:
+                    self._printObj(obj.obj())
 
     def print_untested(self):
         """Print all the public member functions we will not test"""

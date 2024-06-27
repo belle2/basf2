@@ -172,120 +172,120 @@ namespace Belle2 {
 
   void klm_trig_linear_fit_t::run(const KLM_Digit_compact_ts& hits)
   {
-
-    __CSV__WRITE__(hits);
-    m_linear_fits.clear();
-
-
-    auto hits_w_geo_fit = nt::algorithms::add_column(
-                            hits,
-    [&](const auto & e1) {
-      auto ret = nt::ntuple(
-                   Belle2::KLM_TRG_definitions::x_pos(0),
-                   Belle2::KLM_TRG_definitions::y_pos(0)
-                 );
+    /*
+        __CSV__WRITE__(hits);
+        m_linear_fits.clear();
 
 
-
-      if (e1.subdetector == m_bklm_constant) {
-        auto&& e2 = m_BKLMgeomap[get_index(e1)];
-        ret.x_pos.v = e1.layer * m_bklm_slopeX + m_bklm_offsetX;
-        ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
-      } else {
-        auto&& e2 = m_EKLMgeomap[e1.section];
-        ret.x_pos.v = e1.layer * e2.slopeX + e2.offsetX;
-        ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
-      }
-
-
-      return ret;
-
-
-    }
-                          );
-
-
-    __CSV__WRITE__(hits_w_geo_fit);
-    nt::algorithms::sort(hits_w_geo_fit);
-
-
-    auto track_maker_ = track_maker_t{};
-    track_maker_.y_cutoff = y_cutoff;
-
-
-    auto hits_w_geo_fit_w_tracks = nt::algorithms::add_column(
-                                     hits_w_geo_fit,
-    [&](const auto & e) {
-      return nt::ntuple{
-        track_id(track_maker_(e))
-      };
-
-
-    }
-
-                                   );
-
-
-    __CSV__WRITE__(hits_w_geo_fit_w_tracks);
+        auto hits_w_geo_fit = nt::algorithms::add_column(
+                                hits,
+        [&](const auto & e1) {
+          auto ret = nt::ntuple(
+                       Belle2::KLM_TRG_definitions::x_pos(0),
+                       Belle2::KLM_TRG_definitions::y_pos(0)
+                     );
 
 
 
-    m_linear_fits = nt_group(
-                      hits_w_geo_fit_w_tracks[0].subdetector,
-                      hits_w_geo_fit_w_tracks[0].section,
-                      hits_w_geo_fit_w_tracks[0].sector,
-                      hits_w_geo_fit_w_tracks[0].plane,
-                      hits_w_geo_fit_w_tracks[0].track_id
-                    ).apply_append(
-                      hits_w_geo_fit_w_tracks,
-                      Linear_fit_of_Hits
-                    );
-    __CSV__WRITE__(m_linear_fits);
+          if (e1.subdetector == m_bklm_constant) {
+            auto&& e2 = m_BKLMgeomap[get_index(e1)];
+            ret.x_pos.v = e1.layer * m_bklm_slopeX + m_bklm_offsetX;
+            ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
+          } else {
+            auto&& e2 = m_EKLMgeomap[e1.section];
+            ret.x_pos.v = e1.layer * e2.slopeX + e2.offsetX;
+            ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
+          }
 
 
-    nt::algorithms::filter(m_linear_fits, [&](const auto & e) { return std::abs(e.interceptXY) <= m_intercept_cutoff; });
+          return ret;
 
 
-    auto m_linear_fits1 = nt_group(
-                            m_linear_fits[0].subdetector,
-                            m_linear_fits[0].section,
-                            m_linear_fits[0].sector
+        }
+                              );
+
+
+        __CSV__WRITE__(hits_w_geo_fit);
+        nt::algorithms::sort(hits_w_geo_fit);
+
+
+        auto track_maker_ = track_maker_t{};
+        track_maker_.y_cutoff = y_cutoff;
+
+
+        auto hits_w_geo_fit_w_tracks = nt::algorithms::add_column(
+                                         hits_w_geo_fit,
+        [&](const auto & e) {
+          return nt::ntuple{
+            track_id(track_maker_(e))
+          };
+
+
+        }
+
+                                       );
+
+
+        __CSV__WRITE__(hits_w_geo_fit_w_tracks);
+
+
+
+        m_linear_fits = nt_group(
+                          hits_w_geo_fit_w_tracks[0].subdetector,
+                          hits_w_geo_fit_w_tracks[0].section,
+                          hits_w_geo_fit_w_tracks[0].sector,
+                          hits_w_geo_fit_w_tracks[0].plane,
+                          hits_w_geo_fit_w_tracks[0].track_id
+                        ).apply_append(
+                          hits_w_geo_fit_w_tracks,
+                          Linear_fit_of_Hits
+                        );
+        __CSV__WRITE__(m_linear_fits);
+
+
+        nt::algorithms::filter(m_linear_fits, [&](const auto & e) { return std::abs(e.interceptXY) <= m_intercept_cutoff; });
+
+
+        auto m_linear_fits1 = nt_group(
+                                m_linear_fits[0].subdetector,
+                                m_linear_fits[0].section,
+                                m_linear_fits[0].sector
+                              ).apply_append(
+                                m_linear_fits,
+        [](const auto & es) {
+          bool plane0 = false;
+          bool plane1 = false;
+          for (const auto& e : es) {
+            if (e.plane == 0) { plane0 = true; }
+            if (e.plane == 1) { plane1 = true; }
+          }
+          return nt::ntuple{
+            ax_maker(trigger_or) = (int)(plane0 || plane1),
+            ax_maker(trigger_and) = (int)(plane0 && plane1)
+          };
+        }
+                              );
+        __CSV__WRITE__(m_linear_fits1);
+
+        m_sections_trig = nt_group(
+                            m_linear_fits1[0].subdetector,
+                            m_linear_fits1[0].section
                           ).apply_append(
-                            m_linear_fits,
-    [](const auto & es) {
-      bool plane0 = false;
-      bool plane1 = false;
-      for (const auto& e : es) {
-        if (e.plane == 0) { plane0 = true; }
-        if (e.plane == 1) { plane1 = true; }
-      }
-      return nt::ntuple{
-        ax_maker(trigger_or) = (int)(plane0 || plane1),
-        ax_maker(trigger_and) = (int)(plane0 && plane1)
-      };
-    }
+                            m_linear_fits1,
+        [](const auto & e) {
+          auto ret = nt::ntuple{
+            KLM_TRG_definitions::sector_mask {},
+            KLM_TRG_definitions::sector_mask_or{}
+          };
+          auto trig_and = nt::algorithms::filter_copy(e, [](const auto & x) { return x.trigger_and > 0; });
+          ret.sector_mask.v = Belle2::to_bit_mask< sector >(trig_and);
+          ret.sector_mask_or.v = Belle2::to_bit_mask< sector >(e);
+          return ret;
+
+        }
                           );
-    __CSV__WRITE__(m_linear_fits1);
-
-    m_sections_trig = nt_group(
-                        m_linear_fits1[0].subdetector,
-                        m_linear_fits1[0].section
-                      ).apply_append(
-                        m_linear_fits1,
-    [](const auto & e) {
-      auto ret = nt::ntuple{
-        KLM_TRG_definitions::sector_mask {},
-        KLM_TRG_definitions::sector_mask_or{}
-      };
-      auto trig_and = nt::algorithms::filter_copy(e, [](const auto & x) { return x.trigger_and > 0; });
-      ret.sector_mask.v = Belle2::to_bit_mask< sector >(trig_and);
-      ret.sector_mask_or.v = Belle2::to_bit_mask< sector >(e);
-      return ret;
-
-    }
-                      );
-    __CSV__WRITE__(m_sections_trig);
-
+        __CSV__WRITE__(m_sections_trig);
+    */
 
   }
 

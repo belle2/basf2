@@ -248,6 +248,8 @@ void VariablesToNtupleModule::initialize()
   if (!m_file->Get("persistent")) {
     m_persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
     m_persistent->Branch("FileMetaData", &m_outputFileMetaData);
+  } else {
+    m_isMetadataFilled = true;
   }
 
   //set starting conditions
@@ -457,7 +459,7 @@ void VariablesToNtupleModule::terminate()
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
     TDirectory::TContext directoryGuard(m_file.get());
-    if (!m_file->GetListOfKeys()->Contains("persistent")) {
+    if (!m_isMetadataFilled) {
       fillFileMetaData();
       m_persistent->Fill();
       m_persistent->Write("persistent", TObject::kWriteDelete);

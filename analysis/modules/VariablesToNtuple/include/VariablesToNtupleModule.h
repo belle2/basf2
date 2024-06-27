@@ -93,6 +93,8 @@ namespace Belle2 {
     unsigned int m_ncandidates{0};   /**< total n candidates */
     unsigned int m_nFullEvents{0};   /**< number of full events (aka number of events without an error flag) */
 
+    bool m_isMetadataFilled{false};    /**< flag to check if FileMetaData has already been filled */
+
     /** Branch addresses of variables of type float. */
     std::vector<float> m_branchAddressesFloat;
 

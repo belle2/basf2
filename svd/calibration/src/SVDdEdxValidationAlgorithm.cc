@@ -178,7 +178,15 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                            MomLow)
                          .substr(0, 3) +
                          "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
-
+    TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull + "_" + PIDVarName + "_" + PIDDetectorsName +
+                      "_MomRange_" +
+                      std::to_string(
+                        MomLow)
+                      .substr(0, 3) +
+                      "_" + std::to_string(MomHigh).substr(0, 3) + ".root", "RECREATE");
+    hSignalPIDDistribution->SetLineColor(kBlack);
+    hSignalPIDDistribution->Write();
+    DistribFile.Close();
     delete DistribCanvas;
   }
 
@@ -276,7 +284,17 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                       PIDDetectorsName +
                       "_Cut" +
                       PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
-
+  TFile ResultFile("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_" +
+                   PIDDetectorsName +
+                   "_Cut" +
+                   PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".root", "RECREATE");
+  EffHistoSig->SetLineColor(kBlack);
+  EffHistoSig->SetMarkerColor(kBlack);
+  EffHistoFake->SetLineColor(kBlack);
+  EffHistoFake->SetMarkerColor(kBlack);
+  EffHistoSig->Write();
+  EffHistoFake->Write();
+  ResultFile.Close();
   delete ResultCanvas;
   delete hBase;
 }
@@ -427,6 +445,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
 
   ResultCanvas->Print("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_MomRange" +
                       std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".pdf");
+
+  TFile ResultFile("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_MomRange" +
+                   std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".root", "RECREATE");
+  hmgraph->Write();
+  ResultFile.Close();
 
   delete ResultCanvas;
 }

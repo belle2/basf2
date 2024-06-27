@@ -32,6 +32,7 @@ settings = CalibrationSettings(
 
     expert_config={
         "isMC": False,
+        "listOfMutedCalibrations": [],  # dEdxCalibration, dEdxValidation
         "rerun_reco": False,  # need to rerun reconstruction for calibration?
         "rerun_reco_val": True,  # need to rerun reconstruction for validation?
         "MaxFilesPerRun": 15,
@@ -127,20 +128,20 @@ def create_path(rerun_reco, isMC, expert_config):
     ma.cutAndCopyList(
         outputListName='Lambda0:cut',
         inputListName='Lambda0:myLambda',
-        cut=" ".join([
-            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance>1.0 and ",
-            "formula(daughter(0,p)) > formula(daughter(1,p)) and convertedPhotonInvariantMass(0,1) > 0.02 and ",
-            "[[formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+",
-            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+",
-            "daughter(1, pz)))**0.5) < 0.488]",
-            "or [formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+",
-            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+",
-            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+",
+        cut=(
+            "1.10 < InvM < 1.13 and chiProb > 0.001 and distance>1.0 and "
+            "formula(daughter(0,p)) > formula(daughter(1,p)) and convertedPhotonInvariantMass(0,1) > 0.02 and "
+            "[[formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
+            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
+            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+"
+            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+"
+            "daughter(1, pz)))**0.5) < 0.488]"
+            "or [formula((((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
+            "daughter(1, E))*((daughter(0, px)**2+daughter(0, py)**2+daughter(0, pz)**2 + 0.13957**2)**0.5+"
+            "daughter(1, E))-(daughter(0, px)+daughter(1, px))*(daughter(0, px)+daughter(1, px))-(daughter(0, py)+"
+            "daughter(1, py))*(daughter(0, py)+daughter(1, py))-(daughter(0, pz)+daughter(1, pz))*(daughter(0, pz)+"
             "daughter(1, pz)))**0.5) > 0.513]]"
-        ]),
+        ),
         path=rec_path)
 
     # ----------------------------------------------------------------------------
@@ -164,11 +165,11 @@ def create_path(rerun_reco, isMC, expert_config):
     ma.cutAndCopyList(
         outputListName='gamma:cut',
         inputListName='gamma:myGamma',
-        cut=" ".join(['chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01',
-                      'and convertedPhotonInvariantMass(0,1) < 0.005',
-                      'and -0.05 < convertedPhotonDelR(0,1) < 0.15',
+        cut=('chiProb > 0.001 and 1 < dr < 12 and InvM < 0.01'
+                      'and convertedPhotonInvariantMass(0,1) < 0.005'
+                      'and -0.05 < convertedPhotonDelR(0,1) < 0.15'
                       'and -0.05 < convertedPhotonDelZ(0,1) < 0.05'
-                      ]),
+             ),
         path=rec_path)
     return rec_path
 
@@ -205,6 +206,7 @@ def get_calibrations(input_data, **kwargs):
     expert_config = kwargs.get("expert_config")
 
     isMC = expert_config["isMC"]
+    listOfMutedCalibrations = expert_config["listOfMutedCalibrations"]
     rerun_reco = expert_config["rerun_reco"]
     rerun_reco_val = expert_config["rerun_reco_val"]
     max_files_per_run = expert_config["MaxFilesPerRun"]
@@ -282,6 +284,12 @@ def get_calibrations(input_data, **kwargs):
 
     dedx_validation.depends_on(dedx_calibration)
     # You must return all calibrations you want to run in the prompt process, even if it's only one
-    return [dedx_calibration, dedx_validation]
+    list_of_calibrations = []
+    if "dEdxCalibration" not in listOfMutedCalibrations:
+        list_of_calibrations.append(dedx_calibration)
+    if "dEdxValidation" not in listOfMutedCalibrations:
+        list_of_calibrations.append(dedx_validation)
+
+    return list_of_calibrations
 
 ##############################

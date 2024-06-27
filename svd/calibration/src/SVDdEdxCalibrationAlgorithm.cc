@@ -261,12 +261,16 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   // produce the 1D profile (for data-MC comparisons)
   if (m_isMakePlots) {
     TH1F* ProtonProfile = (TH1F*)hLambdaP->ProfileX("ProtonProfile");
+    ProtonProfile->SetTitle("ProtonProfile");
     canvLambda->SetTicky(1);
     ProtonProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
     ProtonProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
     ProtonProfile->GetYaxis()->SetTitle("dE/dx");
     ProtonProfile->Draw();
     canvLambda->Print("SVDdEdxCalibrationProfileProton.pdf");
+    TFile ProtonProfileFile("SVDdEdxCalibrationProfileProton.root", "RECREATE");
+    ProtonProfile->Write();
+    ProtonProfileFile.Close();
     canvLambda->SetTicky(0);
   }
 
@@ -447,19 +451,27 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   // produce the 1D profile (for data-MC comparisons)
   if (m_isMakePlots) {
     TH1F* PionProfile = (TH1F*)hDstarPi->ProfileX("PionProfile");
+    PionProfile->SetTitle("PionProfile");
     canvDstar->SetTicky(1);
     PionProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
     PionProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
     PionProfile->GetYaxis()->SetTitle("dE/dx");
     PionProfile->Draw();
     canvDstar->Print("SVDdEdxCalibrationProfilePion.pdf");
+    TFile PionProfileFile("SVDdEdxCalibrationProfilePion.root", "RECREATE");
+    PionProfile->Write();
+    PionProfileFile.Close();
 
     TH1F* KaonProfile = (TH1F*)hDstarK->ProfileX("KaonProfile");
+    KaonProfile->SetTitle("KaonProfile");
     KaonProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
     KaonProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
     KaonProfile->GetYaxis()->SetTitle("dE/dx");
     KaonProfile->Draw();
     canvDstar->Print("SVDdEdxCalibrationProfileKaon.pdf");
+    TFile KaonProfileFile("SVDdEdxCalibrationProfileKaon.root", "RECREATE");
+    KaonProfile->Write();
+    KaonProfileFile.Close();
     canvDstar->SetTicky(0);
   }
 
@@ -560,12 +572,16 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   TCanvas* canvGamma = new TCanvas("canvGamma", "canvGamma");
   if (m_isMakePlots) {
     TH1F* ElectronProfile = (TH1F*)hGammaE->ProfileX("ElectronProfile");
+    ElectronProfile->SetTitle("ElectronProfile");
     canvGamma->SetTicky(1);
     ElectronProfile->GetYaxis()->SetRangeUser(0, m_dedxCutoff);
     ElectronProfile->GetXaxis()->SetTitle("Momentum, GeV/c");
     ElectronProfile->GetYaxis()->SetTitle("dE/dx");
     ElectronProfile->Draw();
     canvGamma->Print("SVDdEdxCalibrationProfileElectron.pdf");
+    TFile ElectronProfileFile("SVDdEdxCalibrationProfileElectron.root", "RECREATE");
+    ElectronProfile->Write();
+    ElectronProfileFile.Close();
     canvGamma->SetTicky(0);
   }
 

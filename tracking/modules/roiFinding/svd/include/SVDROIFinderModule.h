@@ -89,6 +89,8 @@ namespace Belle2 {
 
     ROIinfo m_ROIinfo = {0, 0, 0, 0, 0, 0, "", "", "", ""}; /**< contains the parameters that can be changed by the user*/
 
+    bool m_ROIFindingForDQM = true; /**< ROI finding for DQM or for data reduction */
+
   private:
 
   };

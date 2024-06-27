@@ -41,6 +41,7 @@ settings = CalibrationSettings(
         "maxevt_rg": 75000,
         "maxevt_cc": 18e6,
         "maxevt_wg": 18e6,
+        "adjustment": 1.00798,
         "calib_mode": "full",  # manual or predefined: quick or full
         "calibration_procedure": {"rgtrail0": 0, "rgpre0": 0, "rg0": 0}
          },
@@ -67,8 +68,10 @@ def get_calibrations(input_data, **kwargs):
 
     expert_config = kwargs.get("expert_config")
     calib_mode = expert_config["calib_mode"]
+
     # extracting parameters
     fulldataMode = expert_config["calib_datamode"]
+    adjustment = expert_config["adjustment"]
 
     if fulldataMode:
         input_files_rungain = list(file_to_iov_physics.keys())
@@ -157,7 +160,7 @@ def get_calibrations(input_data, **kwargs):
         data_files = [input_files_rungain, input_files_coscorr, input_files_wiregain]
         cal_name = ''.join([i for i in calib_keys[i] if not i.isdigit()])
         if cal_name == "rg" or cal_name == "rgtrail" or cal_name == "rgpre":
-            alg = [rg_algo()]
+            alg = [rg_algo(cal_name, adjustment)]
         elif cal_name == "cc":
             alg = [cos_algo()]
         elif cal_name == "ce":
@@ -280,7 +283,7 @@ def collector(granularity='all', name=''):
 # Rungain Algorithm setup
 
 
-def rg_algo():
+def rg_algo(name, adjustment):
     """
     Create a rungain calibration algorithm.
     Returns:
@@ -288,6 +291,8 @@ def rg_algo():
     """
     algo = CDCDedxRunGainAlgorithm()
     algo.setMonitoringPlots(True)
+    if name == "rg":
+        algo.setAdjustment(adjustment)
     return algo
 
 # Injection Algorithm setup

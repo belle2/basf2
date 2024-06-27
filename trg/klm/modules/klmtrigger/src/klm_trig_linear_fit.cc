@@ -153,13 +153,13 @@ namespace Belle2 {
     if (geometry.subdetector == m_bklm_constant) {
       m_bklm_offsetX = geometry.offsetX;
       m_bklm_slopeX = geometry.slopeX;
-      m_BKLMgeomap[get_index(geometry)] = nt::ntuple{
+      m_BKLMgeomap[get_index(geometry)] = geo_t{
         geometry.geo_id,
         geometry.slopeY,
         geometry.offsetY
       };
     } else {
-      m_EKLMgeomap[geometry.section] = nt::ntuple{
+      m_EKLMgeomap[geometry.section] = geo_EKLM_t{
         geometry.slopeX,
         geometry.offsetX,
         geometry.slopeY,

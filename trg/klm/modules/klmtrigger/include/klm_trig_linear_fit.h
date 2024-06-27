@@ -34,9 +34,12 @@ namespace Belle2 {
     KLM_TRG_definitions::KLM_trig_linear_fits m_linear_fits;
     int y_cutoff = 100;
     int m_intercept_cutoff = 500;
-    std::map<int64_t, nt::ntuple<KLM_TRG_definitions::geo_id, KLM_TRG_definitions::slopeY, KLM_TRG_definitions::offsetY>> m_BKLMgeomap;
-    std::map<int64_t, nt::ntuple<KLM_TRG_definitions::slopeX, KLM_TRG_definitions::offsetX, KLM_TRG_definitions::slopeY, KLM_TRG_definitions::offsetY>>
-        m_EKLMgeomap;
+    using geo_t = nt::ntuple<KLM_TRG_definitions::geo_id, KLM_TRG_definitions::slopeY, KLM_TRG_definitions::offsetY>;
+    using geo_EKLM_t =
+      nt::ntuple<KLM_TRG_definitions::slopeX, KLM_TRG_definitions::offsetX, KLM_TRG_definitions::slopeY, KLM_TRG_definitions::offsetY>;
+    std::map<int64_t, geo_t> m_BKLMgeomap;
+    std::map<int64_t, geo_EKLM_t>
+    m_EKLMgeomap;
     KLM_TRG_definitions::subdetector m_bklm_constant;
 
     double m_bklm_slopeX;

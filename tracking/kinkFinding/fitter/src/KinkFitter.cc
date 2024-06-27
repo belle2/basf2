@@ -8,10 +8,10 @@
 #include <tracking/kinkFinding/fitter/KinkFitter.h>
 
 #include <framework/logging/Logger.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/geometry/VectorUtil.h>
 #include <framework/geometry/BFieldManager.h>
 #include <framework/utilities/IOIntercept.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <tracking/trackFitting/trackBuilder/factories/TrackBuilder.h>
 
@@ -493,9 +493,6 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
   // sorted list of CDC hits of track to be split
   const auto splitCDCHit = splitRecoTrack->getSortedCDCHitList();
 
-  // initialization of helper variables
-  int sortingParameterOffset = 0;
-
   // seeds used for a copy RecoTrack
   ROOT::Math::XYZVector positionSeed(0, 0, 0);
   ROOT::Math::XYZVector momentumSeed(0, 0, 0);
@@ -540,7 +537,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
     for (size_t splitCDCHitIndex = 0; splitCDCHitIndex < splitCDCHit.size() - delta; ++splitCDCHitIndex) {
       auto recoHitInfo = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHitIndex]);
       recoTrack->addCDCHit(splitCDCHit[splitCDCHitIndex],
-                           recoHitInfo->getSortingParameter() - sortingParameterOffset,
+                           recoHitInfo->getSortingParameter(),
                            recoHitInfo->getRightLeftInformation(),
                            recoHitInfo->getFoundByTrackFinder());
 
@@ -551,8 +548,8 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
   } else {
 
     // copy CDC hits with respect to reassignment
-    sortingParameterOffset = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHit.size()
-                             - delta])->getSortingParameter();
+    int sortingParameterOffset = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHit.size()
+                                 - delta])->getSortingParameter();
     for (size_t splitCDCHitIndex = splitCDCHit.size() - delta; splitCDCHitIndex < splitCDCHit.size(); ++splitCDCHitIndex) {
       auto recoHitInfo = splitRecoTrack->getRecoHitInformation(splitCDCHit[splitCDCHitIndex]);
       recoTrack->addCDCHit(splitCDCHit[splitCDCHitIndex],
@@ -1197,10 +1194,10 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
   if (vertexPos.Rho() < 14)
     return false;
 
-  // extrapolate the mother state to IP
+  // extrapolate the mother state to IP (B2Vector3D(0., 0., 0.) beam spot, and B2Vector3D(0., 0., 1.) beam axis)
   genfit::MeasuredStateOnPlane stMotherIP = recoTrackMother->getMeasuredStateOnPlaneFromFirstHit();
   try {
-    stMotherIP.extrapolateToPoint(TVector3(0, 0, 0));
+    stMotherIP.extrapolateToLine(B2Vector3D(0., 0., 0.), B2Vector3D(0., 0., 1.));
   } catch (...) {
     B2DEBUG(29, "Could not extrapolate mother track to IP.");
   }

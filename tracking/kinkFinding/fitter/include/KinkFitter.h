@@ -20,8 +20,9 @@
 namespace Belle2 {
 
   /**
-   * kinkFitter class to create Kink mdst's from reconstructed tracks.
+   * KinkFitter class to create Kink mdst's objects from reconstructed tracks.
    * To use this class, give the kinkFitter a mother and a daughter charged track and call the fitAndStore function.
+   * In case of track splitting, the mother and daughter should be the same particle.
    *
    * kinkFitter.fitAndStore(B2TrackMother, B2TrackDaughter, filterFlag);
    */
@@ -214,7 +215,7 @@ namespace Belle2 {
                                  ROOT::Math::XYZVector vertexPosSeed = ROOT::Math::XYZVector(0, 0, 0));
 
     /**
-     * Extrapolate the fit results to the perigee to the vertex.
+     * Extrapolate the fit results to the perigee to the kink vertex.
      * If the vertex is inside one of the tracks, bits in reassignHitStatus are set.
      * @param stMother mother MeasuredStateOnPlane
      * @param stDaughter daughter MeasuredStateOnPlane
@@ -282,8 +283,8 @@ namespace Belle2 {
     StoreArray <RecoTrack> m_copiedRecoTracks; ///< RecoTrack used to refit tracks
     genfit::MeasuredStateOnPlane m_stMotherBuffer; ///< buffer for the MeasuredStateOnPlane of mother obtained in the vertex fit
     genfit::MeasuredStateOnPlane m_stDaughterBuffer; ///< buffer for the MeasuredStateOnPlane of daughter obtained in the vertex fit
-    RecoTrack* m_motherKinkRecoTrackCache; ///< cash for the RecoTrack of mother used to find the best vertex
-    RecoTrack* m_daughterKinkRecoTrackCache; ///< cash for the RecoTrack of daughter used to find the best vertex
+    RecoTrack* m_motherKinkRecoTrackCache; ///< cache for the RecoTrack of mother used to find the best vertex
+    RecoTrack* m_daughterKinkRecoTrackCache; ///< cache for the RecoTrack of daughter used to find the best vertex
   };
 
 }

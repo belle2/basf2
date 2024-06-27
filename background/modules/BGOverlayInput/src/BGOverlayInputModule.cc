@@ -194,6 +194,7 @@ void BGOverlayInputModule::beginRun()
   descr.type = std::string(BackgroundMetaData::getDefaultBackgroundOverlayType());
   descr.fileNames = inputFileNames;
   descr.numEvents = m_numEvents;
+  descr.runNumber = run;
   StoreObjPtr<BackgroundInfo> bkgInfo(m_BackgroundInfoInstanceName, DataStore::c_Persistent);
   m_index = bkgInfo->appendBackgroundDescr(descr);
 }

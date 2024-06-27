@@ -12,6 +12,7 @@ GraFEI
 ++++++
 * The tool now assigns an updated mass hypothesis to each final state particle corresponding to the model prediction. This is done by filling
   new particles lists named ``:graFEI``.
+
 Variables
 +++++++++
 * PIDVariables: in all functions replacing ``logL == 0`` with a call to ``isAvailable`` which tests the detector flags in ``PIDLikelihoods``

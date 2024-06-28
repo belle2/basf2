@@ -215,7 +215,7 @@ class GraFEIIgniteTrainer:
 
     def _score_fn(self, engine):
         """Metric to use for early stoppging"""
-        return engine.state.metrics["loss"]
+        return -engine.state.metrics["loss"]
 
     def _perfect_score_fn(self, engine):
         """Metric to use for checkpoints"""

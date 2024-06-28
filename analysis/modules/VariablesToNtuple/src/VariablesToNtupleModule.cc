@@ -243,19 +243,6 @@ void VariablesToNtupleModule::initialize()
     m_sampling_variable = nullptr;
   }
 
-  m_outputFileMetaData = new FileMetaData;
-  // create persistent tree if it doesn't already exist
-  if (!m_file->Get("persistent")) {
-    m_persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
-    m_persistent->Branch("FileMetaData", &m_outputFileMetaData);
-  } else {
-    m_isMetadataFilled = true;
-  }
-
-  //set starting conditions
-  m_outputFileMetaData->setLow(-1, -1, 0);
-  m_outputFileMetaData->setHigh(-1, -1, 0);
-
 }
 
 
@@ -286,39 +273,27 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
-
+  bool start = m_event < 0;
   m_event = m_eventMetaData->getEvent();
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
-  int m_experimentLow = m_outputFileMetaData->getExperimentLow();
-  int m_experimentHigh = m_outputFileMetaData->getExperimentHigh();
-  int m_runLow = m_outputFileMetaData->getRunLow();
-  int m_runHigh = m_outputFileMetaData->getRunHigh();
-  int m_eventLow = m_outputFileMetaData->getEventLow();
-  int m_eventHigh = m_outputFileMetaData->getEventHigh();
 
-  if (m_experimentLow == -1) { //starting condition
-    m_experimentLow = m_experimentHigh = m_experiment;
-    m_runLow = m_runHigh = m_run;
-    m_eventLow = m_eventHigh = m_event;
+  if (start) {
+    m_outputFileMetaData.setLow(m_experiment, m_run, m_event);
+    m_outputFileMetaData.setHigh(m_experiment, m_run, m_event);
   } else {
-    if ((m_experiment < m_experimentLow) || ((m_experiment == m_experimentLow) && ((m_run < m_runLow) || ((m_run == m_runLow)
-                                             && (m_event < m_eventLow))))) {
-      m_experimentLow = m_experiment;
-      m_runLow = m_run;
-      m_eventLow = m_event;
+    if ((m_experiment < m_outputFileMetaData.getExperimentLow()) || ((m_experiment == m_outputFileMetaData.getExperimentLow())
+        && ((m_run < m_outputFileMetaData.getRunLow())
+            || ((m_run == m_outputFileMetaData.getRunLow()) && (m_event < int(m_outputFileMetaData.getEventLow())))))) {
+      m_outputFileMetaData.setLow(m_experiment, m_run, m_event);
     }
-    if ((m_experiment > m_experimentHigh) || ((m_experiment == m_experimentHigh) && ((m_run > m_runHigh) || ((m_run == m_runHigh)
-                                              && (m_event > m_eventHigh))))) {
-      m_experimentHigh = m_experiment;
-      m_runHigh = m_run;
-      m_eventHigh = m_event;
+    if ((m_experiment > m_outputFileMetaData.getExperimentHigh()) || ((m_experiment == m_outputFileMetaData.getExperimentHigh())
+        && ((m_run > m_outputFileMetaData.getRunHigh())
+            || ((m_run == m_outputFileMetaData.getRunHigh()) && (m_event > int(m_outputFileMetaData.getEventHigh())))))) {
+      m_outputFileMetaData.setHigh(m_experiment, m_run, m_event);
     }
   }
-
-  m_outputFileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
-  m_outputFileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
 
   if (m_inputFileMetaData.isValid()) {
     std::string lfn = m_inputFileMetaData->getLfn();
@@ -329,7 +304,7 @@ void VariablesToNtupleModule::event()
 
   // check if the event is a full event or not: if yes, increase the counter
   if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
-    m_nFullEvents++;
+    m_outputFileMetaData.setNFullEvents(m_outputFileMetaData.getNFullEvents() + 1);
 
   if (m_stringWrapper.isValid())
     m_MCDecayString = m_stringWrapper->getString();
@@ -433,27 +408,34 @@ void VariablesToNtupleModule::event()
 
 void VariablesToNtupleModule::fillFileMetaData()
 {
-  bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
-  if (!isMC) m_outputFileMetaData->declareRealData();
+  if (m_file->Get("persistent")) return;
 
-  m_outputFileMetaData->setNFullEvents(m_nFullEvents);
+  bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
+  if (!isMC) m_outputFileMetaData.declareRealData();
+
+  // this is ambiguous for files with multiple ntuple trees so setting it to -1
+  m_outputFileMetaData.setNEvents(-1);
 
   //fill more file level metadata
-  RootIOUtilities::setCreationData(*m_outputFileMetaData);
-  m_outputFileMetaData->setRandomSeed(RandomNumbers::getSeed());
-  m_outputFileMetaData->setSteering(Environment::Instance().getSteering());
+  RootIOUtilities::setCreationData(m_outputFileMetaData);
+  m_outputFileMetaData.setRandomSeed(RandomNumbers::getSeed());
+  m_outputFileMetaData.setSteering(Environment::Instance().getSteering());
   auto mcEvents = Environment::Instance().getNumberOfMCEvents();
-  m_outputFileMetaData->setMcEvents(mcEvents);
-  m_outputFileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  m_outputFileMetaData.setMcEvents(mcEvents);
+  m_outputFileMetaData.setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
-    m_outputFileMetaData->setDataDescription(item.first, item.second);
+    m_outputFileMetaData.setDataDescription(item.first, item.second);
+    B2INFO("additionalDataDescription: " << item.first);
   }
-  m_outputFileMetaData->setDataDescription("isNtupleMetaData", "True");
-  m_outputFileMetaData->setParents(m_parentLfns);
-  // Set the LFN to the filename, make sure it's absolute
-  std::string lfn = m_file->GetName();
-  lfn = std::filesystem::absolute(lfn).string();
-  m_outputFileMetaData->setLfn(lfn);
+  m_outputFileMetaData.setDataDescription("isNtupleMetaData", "True");
+  m_outputFileMetaData.setParents(m_parentLfns);
+  m_outputFileMetaData.setLfn(m_file->GetName());
+
+  FileMetaData* outputFileMetaData = &m_outputFileMetaData;
+  TTree* persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
+  persistent->Branch("FileMetaData", &outputFileMetaData);
+  persistent->Fill();
+  persistent->Write("persistent", TObject::kWriteDelete);
 }
 
 void VariablesToNtupleModule::terminate()
@@ -461,10 +443,8 @@ void VariablesToNtupleModule::terminate()
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
     TDirectory::TContext directoryGuard(m_file.get());
-    if (!m_isMetadataFilled) {
+    if (m_outputFileMetaData.getNFullEvents() > 0) {
       fillFileMetaData();
-      m_persistent->Fill();
-      m_persistent->Write("persistent", TObject::kWriteDelete);
     }
 
     B2INFO("Writing NTuple " << m_treeName);

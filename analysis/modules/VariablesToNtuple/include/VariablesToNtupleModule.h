@@ -56,13 +56,6 @@ namespace Belle2 {
     /** Create and fill FileMetaData object. */
     void fillFileMetaData();
 
-    /** Fill TTree.
-     *
-     * Write the objects from the DataStore to the output TTree.
-     *
-     */
-    void fillTree();
-
     /** Name of particle list with reconstructed particles. */
     std::string m_particleList;
     /** List of variables to save. Variables are taken from Variable::Manager, and are identical to those available to e.g. ParticleSelector. */
@@ -82,8 +75,6 @@ namespace Belle2 {
     std::shared_ptr<TFile> m_file{nullptr};
     /** The ROOT TNtuple for output. */
     StoreObjPtr<RootMergeable<TTree>> m_tree;
-    /** Persistent TTree for output. */
-    TTree* m_persistent;
     // Counter branch addresses (event number, candidate number etc)
     int m_event{ -1};                /**< event number */
     int m_run{ -1};                  /**< run number */
@@ -91,9 +82,6 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-    unsigned int m_nFullEvents{0};   /**< number of full events (aka number of events without an error flag) */
-
-    bool m_isMetadataFilled{false};    /**< flag to check if FileMetaData has already been filled */
 
     /** Branch addresses of variables of type float. */
     std::vector<float> m_branchAddressesFloat;
@@ -135,7 +123,7 @@ namespace Belle2 {
 
     StoreObjPtr<FileMetaData> m_inputFileMetaData{"", DataStore::c_Persistent}; /**< Pointer to the input file meta data */
 
-    FileMetaData* m_outputFileMetaData; /** File meta data stored in the output ntuple file */
+    FileMetaData m_outputFileMetaData; /** File meta data to be stored in the output ntuple file */
 
   };
 } // end namespace Belle2

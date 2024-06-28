@@ -101,9 +101,13 @@ namespace Belle2 {
     /** Test mode for null histograms */
     bool m_nullHistoMode = false;
 
+    /** Status canvas */
     TCanvas* m_c_info{nullptr};
+    /** emulated histogram from runcontrol, expno */
     TH1F* m_h_expno{nullptr};
+    /** emulated histogram from runcontrol, runno */
     TH1F* m_h_runno{nullptr};
+    /** emulated histogram from runcontrol, runtype */
     TH1F* m_h_rtype{nullptr};
   };
 } // end namespace Belle2

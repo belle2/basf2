@@ -29,7 +29,7 @@ EXPECTED_CHECKSUMS = {
     'Belle2::EventLevelTrackingInfo': (2, 1667284927),
     'Belle2::EventMetaData': (4, 2999207747),
     'Belle2::FileMetaData': (11, 3436141238),
-    'Belle2::KLMCluster': (2, 2615188022),
+    'Belle2::KLMCluster': (3, 1419175697),
     'Belle2::KlId': (2, 230716330),
     'Belle2::PIDLikelihood': (3, 36434623),
     'Belle2::RelationContainer': (1, 1725678837),

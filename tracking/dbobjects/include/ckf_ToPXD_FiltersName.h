@@ -42,14 +42,14 @@ namespace Belle2 {
 
     /** Get the hitFilterName
      */
-    float getHitFilterName() const
+    std::string getHitFilterName() const
     {
       return m_hitFilterName;
     }
 
     /** Get the seedFilterName
      */
-    float getSeedFilterName() const
+    std::string getSeedFilterName() const
     {
       return m_seedFilterName;
     }
@@ -57,10 +57,10 @@ namespace Belle2 {
   private:
 
     /** The hitFilterName */
-    float m_hitFilterName = "";
+    std::string m_hitFilterName = "not set";
 
     /** The seedFilterName */
-    float m_seedFilterName = "";
+    std::string m_seedFilterName = "not set";
 
     ClassDef(ckf_ToPXD_FiltersName, 1);  /**< ClassDef, necessary for ROOT */
   };

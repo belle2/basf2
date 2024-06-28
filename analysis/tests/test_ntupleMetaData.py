@@ -63,12 +63,12 @@ with clean_working_directory():
     main.add_module('RootInput', inputFileNames=[inputFile1, inputFile2])
     main.add_module('VariablesToNtuple',
                     fileName=testFile,
-                    treeName='tree',
-                    additionalDataDescription=additionalDataDescription
+                    treeName='tree'
                     )
     main.add_module('VariablesToNtuple',
                     fileName=testFile,
-                    treeName='anotherTree')
+                    treeName='anotherTree',
+                    additionalDataDescription=additionalDataDescription)
     safe_process(main)
 
     metadata = get_metadata(testFile)

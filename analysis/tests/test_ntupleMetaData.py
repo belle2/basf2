@@ -8,6 +8,7 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+import socket
 from ROOT import Belle2, TFile
 import basf2 as b2
 from basf2.version import get_version
@@ -73,8 +74,8 @@ with clean_working_directory():
 
     metadata = get_metadata(testFile)
 
-    # print (metadata.getLfn()) #?
-    # assert 10 == metadata.getNEvents()
+    assert os.path.abspath(testFile) == metadata.getLfn()
+    assert 0 == metadata.getNEvents()
     assert 40 == metadata.getNFullEvents()
 
     assert 7 == metadata.getExperimentLow()
@@ -99,8 +100,8 @@ with clean_working_directory():
     assert os.path.abspath(inputFile2) == metadata.getParent(1)
 
     assert datetime.today().strftime('%Y-%m-%d') == metadata.getDate()[:10]
-    # assert socket.gethostname() == metadata.getSite()
-    # print (metadata.getUser()) #different env variables, not checked
+    assert socket.gethostname() == metadata.getSite()
+
     assert "something random" == metadata.getRandomSeed()
 
     assert get_version() == metadata.getRelease()
@@ -126,8 +127,8 @@ with clean_working_directory():
     assert 30 == m['runHigh']
     assert 11 == m['eventHigh']
     assert 'something random' == m['randomSeed']
-    # assert 10 == m['nEvents']
-    # assert isinstance(m['nEvents'], int)
+    assert 0 == m['nEvents']
+    assert isinstance(m['nEvents'], int)
     assert 40 == m['nFullEvents']
     assert isinstance(m['nFullEvents'], int)
     assert '/logical/file/name' == m['LFN']

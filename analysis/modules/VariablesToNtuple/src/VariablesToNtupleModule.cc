@@ -21,7 +21,6 @@
 #include <framework/core/Environment.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/database/Database.h>
-#include <framework/dataobjects/FileMetaData.h>
 
 // framework - root utilities
 #include <framework/utilities/MakeROOTCompatible.h>
@@ -31,6 +30,7 @@
 
 
 #include <cmath>
+#include <filesystem>
 
 using namespace std;
 using namespace Belle2;
@@ -437,8 +437,6 @@ void VariablesToNtupleModule::fillFileMetaData()
   if (!isMC) m_outputFileMetaData->declareRealData();
 
   m_outputFileMetaData->setNFullEvents(m_nFullEvents);
-  // this is ambiguous for files with multiple ntuple trees so setting it to -1
-  m_outputFileMetaData->setNEvents(-1);
 
   //fill more file level metadata
   RootIOUtilities::setCreationData(*m_outputFileMetaData);
@@ -452,6 +450,10 @@ void VariablesToNtupleModule::fillFileMetaData()
   }
   m_outputFileMetaData->setDataDescription("isNtupleMetaData", "True");
   m_outputFileMetaData->setParents(m_parentLfns);
+  // Set the LFN to the filename, make sure it's absolute
+  std::string lfn = m_file->GetName();
+  lfn = std::filesystem::absolute(lfn).string();
+  m_outputFileMetaData->setLfn(lfn);
 }
 
 void VariablesToNtupleModule::terminate()

@@ -413,9 +413,6 @@ void VariablesToNtupleModule::fillFileMetaData()
   bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
   if (!isMC) m_outputFileMetaData.declareRealData();
 
-  // this is ambiguous for files with multiple ntuple trees so setting it to -1
-  m_outputFileMetaData.setNEvents(-1);
-
   //fill more file level metadata
   RootIOUtilities::setCreationData(m_outputFileMetaData);
   m_outputFileMetaData.setRandomSeed(RandomNumbers::getSeed());

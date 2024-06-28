@@ -11,7 +11,7 @@
 #pragma link C++ class Belle2::DAFparameters+; // checksum=0x8be1953d, version=1
 #pragma link C++ class Belle2::ROICalculationParameters+; // checksum=0x8691bfeb, version=1
 #pragma link C++ class Belle2::SVDEventT0Configuration+; // checksum=0x3782a1d9, version=1
-#pragma link C++ class Belle2::ckf_ToPXD_FiltersName+;
+#pragma link C++ class Belle2::ckf_ToPXD_FiltersName+; // checksum=0x20afb3a3, version=1
 // Tracking MVAFilter payloads
 #pragma link C++ class Belle2::TrackingMVAFilterParameters+; // checksum=0xd0221a33, version=1
 

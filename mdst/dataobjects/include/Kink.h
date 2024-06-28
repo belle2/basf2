@@ -113,31 +113,47 @@ namespace Belle2 {
       return ROOT::Math::XYZVector(m_fittedVertexX, m_fittedVertexY, m_fittedVertexZ);
     }
 
-    /** Get the filter flag. */
+    /**
+     * Get the filter flag.
+     * For the content of the flag, refer to the documentation of Kink::m_filterFlag.
+     * Use this function only in case one of the content getters for some reason returns wrong values.
+     */
     short getFilterFlag() const
     {
       return m_filterFlag;
     }
 
-    /** Get the flag of prefilter with which kink track pair (or track in case of splitting) was selected. */
+    /**
+     * Get the flag of prefilter with which kink track pair (or track in case of splitting) was selected.
+     * For details, refer to the documentation of Kink::m_filterFlag.
+     */
     short getPrefilterFlag() const
     {
-      return m_filterFlag % 10;
+      return abs(m_filterFlag) % 10;
     }
 
-    /** Get the flag containing information about combined fit for track pairs. */
+    /**
+     * Get the flag containing information about combined fit for track pairs.
+     * For details, refer to the documentation of Kink::m_filterFlag.
+     */
     short getCombinedFitResultFlag() const
     {
-      return m_filterFlag % 1000 - getPrefilterFlag();
+      return (abs(m_filterFlag) % 1000 - getPrefilterFlag()) / 10;
     }
 
-    /** Get the flag showing if the distance at kink vertex criteria was failed for split track. */
+    /**
+     * Get the flag showing if the distance at kink vertex criteria was failed for split track.
+     * For details, refer to the documentation of Kink::m_filterFlag.
+     */
     short getSplitTrackDistanceAtVertexFlag() const
     {
       return getCombinedFitResultFlag();
     }
 
-    /** Get signed number of reassigned hits (- from daughter to mother, + from mother to daughter). */
+    /**
+     * Get signed number of reassigned hits (- from daughter to mother, + from mother to daughter).
+     * For details, refer to the documentation of Kink::m_filterFlag.
+     */
     short getNumberOfReassignedHits() const
     {
       return m_filterFlag / 1000;
@@ -147,7 +163,7 @@ namespace Belle2 {
     /** Indicates which mother `Track` was used for this `Kink`. */
     short m_trackIndexMother = -1;
 
-    /** Indicates which daughter `Track` was used for this `Kink`. */
+    /** Indicates which daughter `Track` was used for this `Kink` (it is the same as mother's in case of track splitting). */
     short m_trackIndexDaughter = -1;
 
     /** Points to the new `TrackFitResult` of the mother `Track` at Start. */
@@ -171,9 +187,13 @@ namespace Belle2 {
     /** The filter flag of the kink.
      *
      * 1st digit represents the filter in `KinkFinderModule` used to preselect the kink candidate (from 1 to 5):
-     * Filter 1, 2, 4, and 5 of `KinkFinderModule` are saved as 1;
-     * Filter 3 and 6 of `KinkFinderModule` are saved as 2;
-     * Filter 7, 8, and 9 of `KinkFinderModule` are saved as 3, 4, and 5, respectively.
+     * Filter 1, 2, 4, and 5 of `KinkFinderModule` are saved as 1 (track pair that has close endpoints);
+     * Filter 3 and 6 of `KinkFinderModule` are saved as 2 (track pair selected with daughter Helix extrapolation);
+     * Filter 7, 8, and 9 of `KinkFinderModule` are saved as 3, 4, and 5, respectively (split tracks).
+     * Split-track kinks (3-5) have worse resolutions compared to track-pair kinks (1-2).
+     * The filter number (3-5) for split-track kinks might be helpful to supress false track splitting with ML.
+     * The kinks created from track pair that has close endpoints (1) might have better resolutions than ones selected
+     * with daughter Helix extrapolation (2).
      *
      * 2nd and 3rd digits for filter 1-6 of `KinkFinderModule` represent the result of combined fit (from 0 to 15, 18 and 19);
      * 19 means fit of combined track is failed; 18 means combined track has less n.d.f. than mother track;

@@ -36,7 +36,7 @@ settings = CalibrationSettings(
         "rerun_reco": False,  # need to rerun reconstruction for calibration?
         "rerun_reco_val": True,  # need to rerun reconstruction for validation?
         "MaxFilesPerRun": 15,
-        "MaxFilesPerRunValidation": 5,
+        "MaxFilesPerRunValidation": 6,  # be careful in MC to not exclude certain event types
         "MinEvtsPerFile": 1,
         "MaxEvtsPerFile": 20000,  # only if rerun the reco, to prevent jobs >10h
         "MinEvtsPerTree": 100,

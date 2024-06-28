@@ -66,26 +66,26 @@ void SVDdEdxCollectorModule::prepare()
 
   // Specific decay info for all trees
   LambdaTree->Branch<double>("InvM", &m_InvMLambda);
-  LambdaTree->Branch<double>("p_p", &m_protonMomentum);
-  LambdaTree->Branch<double>("p_SVDdEdx", &m_protonSVDdEdx);
-  LambdaTree->Branch<double>("pi_p", &m_pionLambdap);
-  LambdaTree->Branch<double>("pi_SVDdEdx", &m_pionLambdaSVDdEdx);
+  LambdaTree->Branch<double>("ProtonMomentum", &m_protonMomentum);
+  LambdaTree->Branch<double>("ProtonSVDdEdx", &m_protonSVDdEdx);
+  LambdaTree->Branch<double>("PionLambdaMomentum", &m_pionLambdap);
+  LambdaTree->Branch<double>("PionLambdaSVDdEdx", &m_pionLambdaSVDdEdx);
 
   DstarTree->Branch<double>("InvM", &m_InvMDstar);
-  DstarTree->Branch<double>("D0_InvM", &m_InvMD0);
+  DstarTree->Branch<double>("D0InvM", &m_InvMD0);
   DstarTree->Branch<double>("deltaM", &m_DeltaM);
-  DstarTree->Branch<double>("K_p", &m_kaonMomentum);
-  DstarTree->Branch<double>("K_SVDdEdx", &m_kaonSVDdEdx);
-  DstarTree->Branch<double>("pi_p", &m_pionDp);
-  DstarTree->Branch<double>("pi_SVDdEdx", &m_pionDSVDdEdx);
-  DstarTree->Branch<double>("piS_p", &m_slowPionMomentum);
-  DstarTree->Branch<double>("piS_SVDdEdx", &m_slowPionSVDdEdx);
+  DstarTree->Branch<double>("KaonMomentum", &m_kaonMomentum);
+  DstarTree->Branch<double>("KaonSVDdEdx", &m_kaonSVDdEdx);
+  DstarTree->Branch<double>("PionDMomentum", &m_pionDp);
+  DstarTree->Branch<double>("PionDSVDdEdx", &m_pionDSVDdEdx);
+  DstarTree->Branch<double>("SlowPionMomentum", &m_slowPionMomentum);
+  DstarTree->Branch<double>("SlowPionSVDdEdx", &m_slowPionSVDdEdx);
 
   GammaTree->Branch<double>("InvM", &m_InvMGamma);
-  GammaTree->Branch<double>("e_1_p", &m_firstElectronMomentum);
-  GammaTree->Branch<double>("e_1_SVDdEdx", &m_firstElectronSVDdEdx);
-  GammaTree->Branch<double>("e_2_p", &m_secondElectronMomentum);
-  GammaTree->Branch<double>("e_2_SVDdEdx", &m_secondElectronSVDdEdx);
+  GammaTree->Branch<double>("FirstElectronMomentum", &m_firstElectronMomentum);
+  GammaTree->Branch<double>("FirstElectronSVDdEdx", &m_firstElectronSVDdEdx);
+  GammaTree->Branch<double>("SecondElectronMomentum", &m_secondElectronMomentum);
+  GammaTree->Branch<double>("SecondElectronSVDdEdx", &m_secondElectronSVDdEdx);
 
   // We register the objects so that our framework knows about them.
   // Don't try and hold onto the pointers or fill these objects directly

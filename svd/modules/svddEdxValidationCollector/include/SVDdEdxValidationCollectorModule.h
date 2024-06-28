@@ -59,8 +59,8 @@ namespace Belle2 {
     double m_kaonSVDdEdx;     /**<  SVD dE/dx response for the kaon from the D0 */
     double m_pionDp;    /**<   momentum for the pion from the D0 */
     double m_pionDSVDdEdx;    /**<  SVD dE/dx response for the pion from the D0 */
-    double m_softPionp;    /**<   momentum for the pion from the Dstar */
-    double m_softPionSVDdEdx;    /**<  SVD dE/dx response for the pion from the Dstar */
+    double m_slowPionp;    /**<   momentum for the pion from the Dstar */
+    double m_slowPionSVDdEdx;    /**<  SVD dE/dx response for the pion from the Dstar */
 
     double m_InvMGamma;       /**<  Invariant mass of converted photon candidates */
     double m_firstElectronp;       /**<   momentum for the first electron */
@@ -68,245 +68,245 @@ namespace Belle2 {
     double m_secondElectronp;    /**<   momentum for the second electron */
     double m_secondElectronSVDdEdx;    /**<  SVD dE/dx response for the second electron */
 
-    double m_protonElectronID_ALL;  /**<  electron ID value (all subdetectors) for the proton from Lambda */
-    double m_protonPionID_ALL;  /**<  pion ID value (all subdetectors) for the proton from Lambda */
-    double m_protonKaonID_ALL;  /**<  kaon ID value (all subdetectors) for the proton from Lambda */
-    double m_protonProtonID_ALL;  /**<  proton ID value (all subdetectors) for the proton from Lambda */
+    double m_protonElectronIDALL;  /**<  electron ID value (all subdetectors) for the proton from Lambda */
+    double m_protonPionIDALL;  /**<  pion ID value (all subdetectors) for the proton from Lambda */
+    double m_protonKaonIDALL;  /**<  kaon ID value (all subdetectors) for the proton from Lambda */
+    double m_protonProtonIDALL;  /**<  proton ID value (all subdetectors) for the proton from Lambda */
 
-    double m_kaonElectronID_ALL;   /**<  electron ID value (all subdetectors) for the kaon from D */
-    double m_kaonPionID_ALL;   /**<  pion ID value (all subdetectors) for the kaon from D */
-    double m_kaonKaonID_ALL;   /**<  kaon ID value (all subdetectors) for the kaon from D */
-    double m_kaonProtonID_ALL;   /**<  proton ID value (all subdetectors) for the kaon from D */
+    double m_kaonElectronIDALL;   /**<  electron ID value (all subdetectors) for the kaon from D */
+    double m_kaonPionIDALL;   /**<  pion ID value (all subdetectors) for the kaon from D */
+    double m_kaonKaonIDALL;   /**<  kaon ID value (all subdetectors) for the kaon from D */
+    double m_kaonProtonIDALL;   /**<  proton ID value (all subdetectors) for the kaon from D */
 
-    double m_pionDElectronID_ALL;   /**<  electron ID value (all subdetectors) for the pion from D */
-    double m_pionDPionID_ALL;   /**<  pion ID value (all subdetectors) for the pion from D */
-    double m_pionDKaonID_ALL;   /**<  kaon ID value (all subdetectors) for the pion from D */
-    double m_pionDProtonID_ALL;   /**<  proton ID value (all subdetectors) for the pion from D */
+    double m_pionDElectronIDALL;   /**<  electron ID value (all subdetectors) for the pion from D */
+    double m_pionDPionIDALL;   /**<  pion ID value (all subdetectors) for the pion from D */
+    double m_pionDKaonIDALL;   /**<  kaon ID value (all subdetectors) for the pion from D */
+    double m_pionDProtonIDALL;   /**<  proton ID value (all subdetectors) for the pion from D */
 
-    double m_softPionElectronID_ALL;   /**<  electron ID value (all subdetectors) for the pion from Dstar */
-    double m_softPionPionID_ALL;   /**<  pion ID value (all subdetectors) for the pion from Dstar */
-    double m_softPionKaonID_ALL;   /**<  kaon ID value (all subdetectors) for the pion from Dstar */
-    double m_softPionProtonID_ALL;   /**<  proton ID value (all subdetectors) for the pion from Dstar */
+    double m_slowPionElectronIDALL;   /**<  electron ID value (all subdetectors) for the pion from Dstar */
+    double m_slowPionPionIDALL;   /**<  pion ID value (all subdetectors) for the pion from Dstar */
+    double m_slowPionKaonIDALL;   /**<  kaon ID value (all subdetectors) for the pion from Dstar */
+    double m_slowPionProtonIDALL;   /**<  proton ID value (all subdetectors) for the pion from Dstar */
 
-    double m_firstElectronElectronID_ALL;   /**<  electron ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronPionID_ALL;   /**<  pion ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronKaonID_ALL;   /**<  kaon ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronProtonID_ALL;   /**<  proton ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronElectronIDALL;   /**<  electron ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronPionIDALL;   /**<  pion ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronKaonIDALL;   /**<  kaon ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronProtonIDALL;   /**<  proton ID value (all subdetectors) for the e+ from gamma */
 
-    double m_secondElectronElectronID_ALL;   /**<  electron ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronPionID_ALL;   /**<  pion ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronKaonID_ALL;   /**<  kaon ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronProtonID_ALL;   /**<  proton ID value (all subdetectors) for the e- from gamma */
-
-
-    double m_protonElectronID_SVDonly;  /**<  electron ID value (only SVD) for the proton from Lambda */
-    double m_protonPionID_SVDonly;  /**<  pion ID value (only SVD) for the proton from Lambda */
-    double m_protonKaonID_SVDonly;  /**<  kaon ID value (only SVD) for the proton from Lambda */
-    double m_protonProtonID_SVDonly;  /**<  proton ID value (only SVD) for the proton from Lambda */
-
-    double m_kaonElectronID_SVDonly;  /**<  electron ID value (only SVD) for the K from D */
-    double m_kaonPionID_SVDonly;  /**<  pion ID value (only SVD) for the K from D */
-    double m_kaonKaonID_SVDonly;  /**<  kaon ID value (only SVD) for the K from D */
-    double m_kaonProtonID_SVDonly;  /**<  proton ID value (only SVD) for the K from D */
-
-    double m_pionDElectronID_SVDonly;  /**<  electron ID value (only SVD) for the pi from D */
-    double m_pionDPionID_SVDonly;  /**<  pion ID value (only SVD) for the pi from D */
-    double m_pionDKaonID_SVDonly;  /**<  kaon ID value (only SVD) for the pi from D */
-    double m_pionDProtonID_SVDonly;  /**<  proton ID value (only SVD) for the pi from D */
-
-    double m_softPionElectronID_SVDonly;  /**<  electron ID value (only SVD) for the pi from Dstar */
-    double m_softPionPionID_SVDonly;  /**<  pion ID value (only SVD) for the pi from Dstar */
-    double m_softPionKaonID_SVDonly;  /**<  kaon ID value (only SVD) for the pi from Dstar */
-    double m_softPionProtonID_SVDonly;  /**<  proton ID value (only SVD) for the pi from Dstar */
-
-    double m_firstElectronElectronID_SVDonly;  /**<  electron ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronPionID_SVDonly;  /**<  pion ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronKaonID_SVDonly;  /**<  kaon ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronProtonID_SVDonly;  /**<  proton ID value (only SVD) for the e+ from gamma */
-
-    double m_secondElectronElectronID_SVDonly;  /**<  electron ID value (only SVD) for the e- from gamma */
-    double m_secondElectronPionID_SVDonly;  /**<  pion ID value (only SVD) for the e- from gamma */
-    double m_secondElectronKaonID_SVDonly;  /**<  kaon ID value (only SVD) for the e- from gamma */
-    double m_secondElectronProtonID_SVDonly;  /**<  proton ID value (only SVD) for the e- from gamma */
+    double m_secondElectronElectronIDALL;   /**<  electron ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronPionIDALL;   /**<  pion ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronKaonIDALL;   /**<  kaon ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronProtonIDALL;   /**<  proton ID value (all subdetectors) for the e- from gamma */
 
 
-    double m_protonElectronID_noSVD;  /**<  electron ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonPionID_noSVD;  /**<  pion ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonKaonID_noSVD;  /**<  kaon ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonProtonID_noSVD;  /**<  proton ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonElectronIDSVDonly;  /**<  electron ID value (only SVD) for the proton from Lambda */
+    double m_protonPionIDSVDonly;  /**<  pion ID value (only SVD) for the proton from Lambda */
+    double m_protonKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the proton from Lambda */
+    double m_protonProtonIDSVDonly;  /**<  proton ID value (only SVD) for the proton from Lambda */
 
-    double m_kaonElectronID_noSVD;  /**<  electron ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonPionID_noSVD;  /**<  pion ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonKaonID_noSVD;  /**<  kaon ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonProtonID_noSVD;  /**<  proton ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonElectronIDSVDonly;  /**<  electron ID value (only SVD) for the K from D */
+    double m_kaonPionIDSVDonly;  /**<  pion ID value (only SVD) for the K from D */
+    double m_kaonKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the K from D */
+    double m_kaonProtonIDSVDonly;  /**<  proton ID value (only SVD) for the K from D */
 
-    double m_pionDElectronID_noSVD;  /**<  electron ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDPionID_noSVD;  /**<  pion ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDKaonID_noSVD;  /**<  kaon ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDProtonID_noSVD;  /**<  proton ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDElectronIDSVDonly;  /**<  electron ID value (only SVD) for the pi from D */
+    double m_pionDPionIDSVDonly;  /**<  pion ID value (only SVD) for the pi from D */
+    double m_pionDKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the pi from D */
+    double m_pionDProtonIDSVDonly;  /**<  proton ID value (only SVD) for the pi from D */
 
-    double m_softPionElectronID_noSVD;  /**<  electron ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionPionID_noSVD;  /**<  pion ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionKaonID_noSVD;  /**<  kaon ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionProtonID_noSVD;  /**<  proton ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionElectronIDSVDonly;  /**<  electron ID value (only SVD) for the pi from Dstar */
+    double m_slowPionPionIDSVDonly;  /**<  pion ID value (only SVD) for the pi from Dstar */
+    double m_slowPionKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the pi from Dstar */
+    double m_slowPionProtonIDSVDonly;  /**<  proton ID value (only SVD) for the pi from Dstar */
 
-    double m_firstElectronElectronID_noSVD;  /**<  electron ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronPionID_noSVD;  /**<  pion ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronKaonID_noSVD;  /**<  kaon ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronProtonID_noSVD;  /**<  proton ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronElectronIDSVDonly;  /**<  electron ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronPionIDSVDonly;  /**<  pion ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronProtonIDSVDonly;  /**<  proton ID value (only SVD) for the e+ from gamma */
 
-    double m_secondElectronElectronID_noSVD;  /**<  electron ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronPionID_noSVD;  /**<  pion ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronKaonID_noSVD;  /**<  kaon ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronProtonID_noSVD;  /**<  proton ID value (all subdetectors except SVD) for the e- from gamma */
-
-
-    double m_protonBinaryProtonElectronID_ALL;  /**<  binary p/e ID value (all subdetectors) for the p from Lambda */
-    double m_protonBinaryProtonPionID_ALL;  /**<  binary p/pi ID value (all subdetectors) for the p from Lambda */
-    double m_protonBinaryProtonKaonID_ALL;  /**<  binary p/K ID value (all subdetectors) for the p from Lambda */
-
-    double m_protonBinaryKaonProtonID_ALL;  /**<  binary K/p ID value (all subdetectors) for the p from Lambda */
-    double m_protonBinaryPionProtonID_ALL;  /**<  binary pi/p ID value (all subdetectors) for the p from Lambda */
-    double m_protonBinaryElectronProtonID_ALL;  /**<  binary e/p ID value (all subdetectors) for the p from Lambda */
-
-    double m_kaonBinaryKaonElectronID_ALL;  /**<  binary K/e ID value (all subdetectors) for the K from D */
-    double m_kaonBinaryKaonPionID_ALL;  /**<  binary K/pi ID value (all subdetectors) for the K from D */
-    double m_kaonBinaryKaonProtonID_ALL;  /**<  binary K/p ID value (all subdetectors) for the K from D */
-
-    double m_kaonBinaryPionKaonID_ALL;  /**<  binary pi/K ID value (all subdetectors) for the K from D */
-    double m_kaonBinaryProtonKaonID_ALL;  /**<  binary p/K ID value (all subdetectors) for the K from D */
-    double m_kaonBinaryElectronKaonID_ALL;  /**<  binary e/K ID value (all subdetectors) for the K from D */
-
-    double m_pionDBinaryPionElectronID_ALL;  /**<  binary pi/e ID value (all subdetectors) for the pi from D */
-    double m_pionDBinaryPionKaonID_ALL;  /**<  binary pi/K ID value (all subdetectors) for the pi from D */
-    double m_pionDBinaryPionProtonID_ALL;  /**<  binary pi/p ID value (all subdetectors) for the pi from D */
-
-    double m_pionDBinaryElectronPionID_ALL;  /**<  binary e/pi ID value (all subdetectors) for the pi from D */
-    double m_pionDBinaryKaonPionID_ALL;  /**<  binary K/pi ID value (all subdetectors) for the pi from D */
-    double m_pionDBinaryProtonPionID_ALL;  /**<  binary p/pi ID value (all subdetectors) for the pi from D */
-
-    double m_softPionBinaryPionElectronID_ALL;  /**<  binary pi/e ID value (all subdetectors) for the pi from Dstar */
-    double m_softPionBinaryPionKaonID_ALL;  /**<  binary pi/K ID value (all subdetectors) for the pi from Dstar */
-    double m_softPionBinaryPionProtonID_ALL;  /**<  binary pi/p ID value (all subdetectors) for the pi from Dstar */
-
-    double m_softPionBinaryElectronPionID_ALL;  /**<  binary e/pi ID value (all subdetectors) for the pi from Dstar */
-    double m_softPionBinaryKaonPionID_ALL;  /**<  binary K/pi ID value (all subdetectors) for the pi from Dstar */
-    double m_softPionBinaryProtonPionID_ALL;  /**<  binary p/pi ID value (all subdetectors) for the pi from Dstar */
-
-    double m_firstElectronBinaryElectronPionID_ALL;  /**<  binary e/pi ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronBinaryElectronKaonID_ALL;  /**<  binary K/pi ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronBinaryElectronProtonID_ALL;  /**<  binary p/pi ID value (all subdetectors) for the e+ from gamma */
-
-    double m_firstElectronBinaryPionElectronID_ALL;  /**<  binary pi/e ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronBinaryKaonElectronID_ALL;  /**<  binary K/e ID value (all subdetectors) for the e+ from gamma */
-    double m_firstElectronBinaryProtonElectronID_ALL;  /**<  binary p/e ID value (all subdetectors) for the e+ from gamma */
-
-    double m_secondElectronBinaryElectronPionID_ALL;  /**<  binary e/pi ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryElectronKaonID_ALL;  /**<  binary e/K ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryElectronProtonID_ALL;  /**<  binary e/p ID value (all subdetectors) for the e- from gamma */
-
-    double m_secondElectronBinaryPionElectronID_ALL;  /**<  binary pi/e ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryKaonElectronID_ALL;  /**<  binary K/e ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryProtonElectronID_ALL;  /**<  binary p/e ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronElectronIDSVDonly;  /**<  electron ID value (only SVD) for the e- from gamma */
+    double m_secondElectronPionIDSVDonly;  /**<  pion ID value (only SVD) for the e- from gamma */
+    double m_secondElectronKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the e- from gamma */
+    double m_secondElectronProtonIDSVDonly;  /**<  proton ID value (only SVD) for the e- from gamma */
 
 
+    double m_protonElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the p from Lambda */
 
-    double m_protonBinaryProtonElectronID_noSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonBinaryProtonPionID_noSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonBinaryProtonKaonID_noSVD;  /**<  binary p/K ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_kaonElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the K from D */
 
-    double m_protonBinaryKaonProtonID_noSVD;  /**<  binary K/p ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonBinaryPionProtonID_noSVD;  /**<  binary pi/p ID value (all subdetectors except SVD) for the p from Lambda */
-    double m_protonBinaryElectronProtonID_noSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_pionDElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the pi from D */
 
-    double m_kaonBinaryKaonElectronID_noSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonBinaryKaonPionID_noSVD;  /**<  binary K/pi ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonBinaryKaonProtonID_noSVD;  /**<  binary K/p ID value (all subdetectors except SVD) for the K from D */
+    double m_slowPionElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the pi from Dstar */
 
-    double m_kaonBinaryPionKaonID_noSVD;  /**<  binary pi/K ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonBinaryProtonKaonID_noSVD;  /**<  binary p/K ID value (all subdetectors except SVD) for the K from D */
-    double m_kaonBinaryElectronKaonID_noSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the K from D */
+    double m_firstElectronElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the e+ from gamma */
 
-    double m_pionDBinaryPionElectronID_noSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDBinaryPionKaonID_noSVD;  /**<  binary pi/K ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDBinaryPionProtonID_noSVD;  /**<  binary pi/p ID value (all subdetectors except SVD) for the pi from D */
-
-    double m_pionDBinaryElectronPionID_noSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDBinaryKaonPionID_noSVD;  /**<  binary K/pi ID value (all subdetectors except SVD) for the pi from D */
-    double m_pionDBinaryProtonPionID_noSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the pi from D */
-
-    double m_softPionBinaryPionElectronID_noSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionBinaryPionKaonID_noSVD;  /**<  binary pi/K ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionBinaryPionProtonID_noSVD;  /**<  binary pi/p ID value (all subdetectors except SVD) for the pi from Dstar */
-
-    double m_softPionBinaryElectronPionID_noSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionBinaryKaonPionID_noSVD;  /**<  binary K/pi ID value (all subdetectors except SVD) for the pi from Dstar */
-    double m_softPionBinaryProtonPionID_noSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the pi from Dstar */
-
-    double m_firstElectronBinaryElectronPionID_noSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronBinaryElectronKaonID_noSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronBinaryElectronProtonID_noSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the e+ from gamma */
-
-    double m_firstElectronBinaryPionElectronID_noSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronBinaryKaonElectronID_noSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the e+ from gamma */
-    double m_firstElectronBinaryProtonElectronID_noSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the e+ from gamma */
-
-    double m_secondElectronBinaryElectronPionID_noSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronKaonID_noSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronProtonID_noSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the e- from gamma */
-
-    double m_secondElectronBinaryPionElectronID_noSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryKaonElectronID_noSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryProtonElectronID_noSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the e- from gamma */
 
 
-    double m_protonBinaryProtonElectronID_SVDonly;  /**<  binary p/e ID value (only SVD) for the p from Lambda */
-    double m_protonBinaryProtonPionID_SVDonly;  /**<  binary p/pi ID value (only SVD) for the p from Lambda */
-    double m_protonBinaryProtonKaonID_SVDonly;  /**<  binary p/K ID value (only SVD) for the p from Lambda */
+    double m_protonBinaryProtonElectronIDALL;  /**<  binary p/e ID value (all subdetectors) for the p from Lambda */
+    double m_protonBinaryProtonPionIDALL;  /**<  binary p/pi ID value (all subdetectors) for the p from Lambda */
+    double m_protonBinaryProtonKaonIDALL;  /**<  binary p/K ID value (all subdetectors) for the p from Lambda */
 
-    double m_protonBinaryKaonProtonID_SVDonly;  /**<  binary K/p ID value (only SVD) for the p from Lambda */
-    double m_protonBinaryPionProtonID_SVDonly;  /**<  binary pi/p ID value (only SVD) for the p from Lambda */
-    double m_protonBinaryElectronProtonID_SVDonly;  /**<  binary e/p ID value (only SVD) for the p from Lambda */
+    double m_protonBinaryKaonProtonIDALL;  /**<  binary K/p ID value (all subdetectors) for the p from Lambda */
+    double m_protonBinaryPionProtonIDALL;  /**<  binary pi/p ID value (all subdetectors) for the p from Lambda */
+    double m_protonBinaryElectronProtonIDALL;  /**<  binary e/p ID value (all subdetectors) for the p from Lambda */
 
-    double m_kaonBinaryKaonElectronID_SVDonly;  /**<  binary K/e ID value (only SVD) for the K from D */
-    double m_kaonBinaryKaonPionID_SVDonly;  /**<  binary K/pi ID value (only SVD) for the K from D */
-    double m_kaonBinaryKaonProtonID_SVDonly;  /**<  binary K/ ID value (only SVD) for the K from D */
+    double m_kaonBinaryKaonElectronIDALL;  /**<  binary K/e ID value (all subdetectors) for the K from D */
+    double m_kaonBinaryKaonPionIDALL;  /**<  binary K/pi ID value (all subdetectors) for the K from D */
+    double m_kaonBinaryKaonProtonIDALL;  /**<  binary K/p ID value (all subdetectors) for the K from D */
 
-    double m_kaonBinaryPionKaonID_SVDonly;  /**<  binary pi/K ID value (only SVD) for the K from D */
-    double m_kaonBinaryProtonKaonID_SVDonly;  /**<  binary p/K ID value (only SVD) for the K from D */
-    double m_kaonBinaryElectronKaonID_SVDonly;  /**<  binary e/K ID value (only SVD) for the K from D */
+    double m_kaonBinaryPionKaonIDALL;  /**<  binary pi/K ID value (all subdetectors) for the K from D */
+    double m_kaonBinaryProtonKaonIDALL;  /**<  binary p/K ID value (all subdetectors) for the K from D */
+    double m_kaonBinaryElectronKaonIDALL;  /**<  binary e/K ID value (all subdetectors) for the K from D */
 
-    double m_pionDBinaryPionElectronID_SVDonly;  /**<  binary pi/e ID value (only SVD) for the pi from D */
-    double m_pionDBinaryPionKaonID_SVDonly;  /**<  binary pi/K ID value (only SVD) for the pi from D */
-    double m_pionDBinaryPionProtonID_SVDonly;  /**<  binary pi/p ID value (only SVD) for the pi from D */
+    double m_pionDBinaryPionElectronIDALL;  /**<  binary pi/e ID value (all subdetectors) for the pi from D */
+    double m_pionDBinaryPionKaonIDALL;  /**<  binary pi/K ID value (all subdetectors) for the pi from D */
+    double m_pionDBinaryPionProtonIDALL;  /**<  binary pi/p ID value (all subdetectors) for the pi from D */
 
-    double m_pionDBinaryElectronPionID_SVDonly;  /**<  binary e/pi ID value (only SVD) for the pi from D */
-    double m_pionDBinaryKaonPionID_SVDonly;  /**<  binary K/pi ID value (only SVD) for the pi from D */
-    double m_pionDBinaryProtonPionID_SVDonly;  /**<  binary p/pi ID value (only SVD) for the pi from D */
+    double m_pionDBinaryElectronPionIDALL;  /**<  binary e/pi ID value (all subdetectors) for the pi from D */
+    double m_pionDBinaryKaonPionIDALL;  /**<  binary K/pi ID value (all subdetectors) for the pi from D */
+    double m_pionDBinaryProtonPionIDALL;  /**<  binary p/pi ID value (all subdetectors) for the pi from D */
 
-    double m_softPionBinaryPionElectronID_SVDonly;  /**<  binary pi/e ID value (only SVD) for the pi from Dstar */
-    double m_softPionBinaryPionKaonID_SVDonly;  /**<  binary pi/K ID value (only SVD) for the pi from Dstar */
-    double m_softPionBinaryPionProtonID_SVDonly;  /**<  binary pi/p ID value (only SVD) for the pi from Dstar */
+    double m_slowPionBinaryPionElectronIDALL;  /**<  binary pi/e ID value (all subdetectors) for the pi from Dstar */
+    double m_slowPionBinaryPionKaonIDALL;  /**<  binary pi/K ID value (all subdetectors) for the pi from Dstar */
+    double m_slowPionBinaryPionProtonIDALL;  /**<  binary pi/p ID value (all subdetectors) for the pi from Dstar */
 
-    double m_softPionBinaryElectronPionID_SVDonly;  /**<  binary e/pi ID value (only SVD) for the pi from Dstar */
-    double m_softPionBinaryKaonPionID_SVDonly;  /**<  binary K/pi ID value (only SVD) for the pi from Dstar */
-    double m_softPionBinaryProtonPionID_SVDonly;  /**<  binary p/pi ID value (only SVD) for the pi from Dstar */
+    double m_slowPionBinaryElectronPionIDALL;  /**<  binary e/pi ID value (all subdetectors) for the pi from Dstar */
+    double m_slowPionBinaryKaonPionIDALL;  /**<  binary K/pi ID value (all subdetectors) for the pi from Dstar */
+    double m_slowPionBinaryProtonPionIDALL;  /**<  binary p/pi ID value (all subdetectors) for the pi from Dstar */
 
-    double m_firstElectronBinaryElectronPionID_SVDonly;  /**<  binary e/pi ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronBinaryElectronKaonID_SVDonly;  /**<  binary e/K ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronBinaryElectronProtonID_SVDonly;  /**<  binary e/p ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronBinaryElectronPionIDALL;  /**<  binary e/pi ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronBinaryElectronKaonIDALL;  /**<  binary K/pi ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronBinaryElectronProtonIDALL;  /**<  binary p/pi ID value (all subdetectors) for the e+ from gamma */
 
-    double m_firstElectronBinaryPionElectronID_SVDonly;  /**<  binary pi/e ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronBinaryKaonElectronID_SVDonly;  /**<  binary K/e ID value (only SVD) for the e+ from gamma */
-    double m_firstElectronBinaryProtonElectronID_SVDonly;  /**<  binary p/e ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronBinaryPionElectronIDALL;  /**<  binary pi/e ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronBinaryKaonElectronIDALL;  /**<  binary K/e ID value (all subdetectors) for the e+ from gamma */
+    double m_firstElectronBinaryProtonElectronIDALL;  /**<  binary p/e ID value (all subdetectors) for the e+ from gamma */
 
-    double m_secondElectronBinaryElectronPionID_SVDonly;  /**<  binary e/pi ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronKaonID_SVDonly;  /**<  binary e/K ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronProtonID_SVDonly;  /**<  binary e/p ID value (only SVD) for the e- from gamma */
+    double m_secondElectronBinaryElectronPionIDALL;  /**<  binary e/pi ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronBinaryElectronKaonIDALL;  /**<  binary e/K ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronBinaryElectronProtonIDALL;  /**<  binary e/p ID value (all subdetectors) for the e- from gamma */
 
-    double m_secondElectronBinaryPionElectronID_SVDonly;  /**<  binary pi/e ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryKaonElectronID_SVDonly;  /**<  binary K/e ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryProtonElectronID_SVDonly;  /**<  binary p/e ID value (only SVD) for the e- from gamma */
+    double m_secondElectronBinaryPionElectronIDALL;  /**<  binary pi/e ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronBinaryKaonElectronIDALL;  /**<  binary K/e ID value (all subdetectors) for the e- from gamma */
+    double m_secondElectronBinaryProtonElectronIDALL;  /**<  binary p/e ID value (all subdetectors) for the e- from gamma */
+
+
+
+    double m_protonBinaryProtonElectronIDnoSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonBinaryProtonPionIDnoSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonBinaryProtonKaonIDnoSVD;  /**<  binary p/K ID value (all subdetectors except SVD) for the p from Lambda */
+
+    double m_protonBinaryKaonProtonIDnoSVD;  /**<  binary K/p ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonBinaryPionProtonIDnoSVD;  /**<  binary pi/p ID value (all subdetectors except SVD) for the p from Lambda */
+    double m_protonBinaryElectronProtonIDnoSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the p from Lambda */
+
+    double m_kaonBinaryKaonElectronIDnoSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonBinaryKaonPionIDnoSVD;  /**<  binary K/pi ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonBinaryKaonProtonIDnoSVD;  /**<  binary K/p ID value (all subdetectors except SVD) for the K from D */
+
+    double m_kaonBinaryPionKaonIDnoSVD;  /**<  binary pi/K ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonBinaryProtonKaonIDnoSVD;  /**<  binary p/K ID value (all subdetectors except SVD) for the K from D */
+    double m_kaonBinaryElectronKaonIDnoSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the K from D */
+
+    double m_pionDBinaryPionElectronIDnoSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDBinaryPionKaonIDnoSVD;  /**<  binary pi/K ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDBinaryPionProtonIDnoSVD;  /**<  binary pi/p ID value (all subdetectors except SVD) for the pi from D */
+
+    double m_pionDBinaryElectronPionIDnoSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDBinaryKaonPionIDnoSVD;  /**<  binary K/pi ID value (all subdetectors except SVD) for the pi from D */
+    double m_pionDBinaryProtonPionIDnoSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the pi from D */
+
+    double m_slowPionBinaryPionElectronIDnoSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionBinaryPionKaonIDnoSVD;  /**<  binary pi/K ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionBinaryPionProtonIDnoSVD;  /**<  binary pi/p ID value (all subdetectors except SVD) for the pi from Dstar */
+
+    double m_slowPionBinaryElectronPionIDnoSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionBinaryKaonPionIDnoSVD;  /**<  binary K/pi ID value (all subdetectors except SVD) for the pi from Dstar */
+    double m_slowPionBinaryProtonPionIDnoSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the pi from Dstar */
+
+    double m_firstElectronBinaryElectronPionIDnoSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronBinaryElectronKaonIDnoSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronBinaryElectronProtonIDnoSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the e+ from gamma */
+
+    double m_firstElectronBinaryPionElectronIDnoSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronBinaryKaonElectronIDnoSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the e+ from gamma */
+    double m_firstElectronBinaryProtonElectronIDnoSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the e+ from gamma */
+
+    double m_secondElectronBinaryElectronPionIDnoSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronBinaryElectronKaonIDnoSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronBinaryElectronProtonIDnoSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the e- from gamma */
+
+    double m_secondElectronBinaryPionElectronIDnoSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronBinaryKaonElectronIDnoSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the e- from gamma */
+    double m_secondElectronBinaryProtonElectronIDnoSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the e- from gamma */
+
+
+    double m_protonBinaryProtonElectronIDSVDonly;  /**<  binary p/e ID value (only SVD) for the p from Lambda */
+    double m_protonBinaryProtonPionIDSVDonly;  /**<  binary p/pi ID value (only SVD) for the p from Lambda */
+    double m_protonBinaryProtonKaonIDSVDonly;  /**<  binary p/K ID value (only SVD) for the p from Lambda */
+
+    double m_protonBinaryKaonProtonIDSVDonly;  /**<  binary K/p ID value (only SVD) for the p from Lambda */
+    double m_protonBinaryPionProtonIDSVDonly;  /**<  binary pi/p ID value (only SVD) for the p from Lambda */
+    double m_protonBinaryElectronProtonIDSVDonly;  /**<  binary e/p ID value (only SVD) for the p from Lambda */
+
+    double m_kaonBinaryKaonElectronIDSVDonly;  /**<  binary K/e ID value (only SVD) for the K from D */
+    double m_kaonBinaryKaonPionIDSVDonly;  /**<  binary K/pi ID value (only SVD) for the K from D */
+    double m_kaonBinaryKaonProtonIDSVDonly;  /**<  binary K/ ID value (only SVD) for the K from D */
+
+    double m_kaonBinaryPionKaonIDSVDonly;  /**<  binary pi/K ID value (only SVD) for the K from D */
+    double m_kaonBinaryProtonKaonIDSVDonly;  /**<  binary p/K ID value (only SVD) for the K from D */
+    double m_kaonBinaryElectronKaonIDSVDonly;  /**<  binary e/K ID value (only SVD) for the K from D */
+
+    double m_pionDBinaryPionElectronIDSVDonly;  /**<  binary pi/e ID value (only SVD) for the pi from D */
+    double m_pionDBinaryPionKaonIDSVDonly;  /**<  binary pi/K ID value (only SVD) for the pi from D */
+    double m_pionDBinaryPionProtonIDSVDonly;  /**<  binary pi/p ID value (only SVD) for the pi from D */
+
+    double m_pionDBinaryElectronPionIDSVDonly;  /**<  binary e/pi ID value (only SVD) for the pi from D */
+    double m_pionDBinaryKaonPionIDSVDonly;  /**<  binary K/pi ID value (only SVD) for the pi from D */
+    double m_pionDBinaryProtonPionIDSVDonly;  /**<  binary p/pi ID value (only SVD) for the pi from D */
+
+    double m_slowPionBinaryPionElectronIDSVDonly;  /**<  binary pi/e ID value (only SVD) for the pi from Dstar */
+    double m_slowPionBinaryPionKaonIDSVDonly;  /**<  binary pi/K ID value (only SVD) for the pi from Dstar */
+    double m_slowPionBinaryPionProtonIDSVDonly;  /**<  binary pi/p ID value (only SVD) for the pi from Dstar */
+
+    double m_slowPionBinaryElectronPionIDSVDonly;  /**<  binary e/pi ID value (only SVD) for the pi from Dstar */
+    double m_slowPionBinaryKaonPionIDSVDonly;  /**<  binary K/pi ID value (only SVD) for the pi from Dstar */
+    double m_slowPionBinaryProtonPionIDSVDonly;  /**<  binary p/pi ID value (only SVD) for the pi from Dstar */
+
+    double m_firstElectronBinaryElectronPionIDSVDonly;  /**<  binary e/pi ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronBinaryElectronKaonIDSVDonly;  /**<  binary e/K ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronBinaryElectronProtonIDSVDonly;  /**<  binary e/p ID value (only SVD) for the e+ from gamma */
+
+    double m_firstElectronBinaryPionElectronIDSVDonly;  /**<  binary pi/e ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronBinaryKaonElectronIDSVDonly;  /**<  binary K/e ID value (only SVD) for the e+ from gamma */
+    double m_firstElectronBinaryProtonElectronIDSVDonly;  /**<  binary p/e ID value (only SVD) for the e+ from gamma */
+
+    double m_secondElectronBinaryElectronPionIDSVDonly;  /**<  binary e/pi ID value (only SVD) for the e- from gamma */
+    double m_secondElectronBinaryElectronKaonIDSVDonly;  /**<  binary e/K ID value (only SVD) for the e- from gamma */
+    double m_secondElectronBinaryElectronProtonIDSVDonly;  /**<  binary e/p ID value (only SVD) for the e- from gamma */
+
+    double m_secondElectronBinaryPionElectronIDSVDonly;  /**<  binary pi/e ID value (only SVD) for the e- from gamma */
+    double m_secondElectronBinaryKaonElectronIDSVDonly;  /**<  binary K/e ID value (only SVD) for the e- from gamma */
+    double m_secondElectronBinaryProtonElectronIDSVDonly;  /**<  binary p/e ID value (only SVD) for the e- from gamma */
 
     std::string m_LambdaListName = "";    /**< Name of the Lambda particle list */
     std::string m_DstarListName = "";    /**< Name of the Dstar particle list */

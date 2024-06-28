@@ -83,46 +83,52 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
   };
 
   for (const TString& PIDDetectorsName : PIDDetectors) {
-    PlotEfficiencyPlots(PIDDetectorsName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
-                        SWeightNameMap[TTreeDstarSW], "pi", "pion",
-                        "electron_pionID",
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "PionD", "pion",
+                        "BinaryElectronPionID",
                         "0.5", m_NumEffBins, 0., m_MomHighEff);
-    PlotEfficiencyPlots(PIDDetectorsName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW,
-                        SWeightNameMap[TTreeDstarSW], "K", "kaon",
-                        "electron_kaonID", "0.5",
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "Kaon", "kaon",
+                        "BinaryElectronKaonID", "0.5",
                         m_NumEffBins, 0., m_MomHighEff);
-    PlotEfficiencyPlots(PIDDetectorsName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
-                        SWeightNameMap[TTreeDstarSW], "pi", "pion",
-                        "proton_pionID", "0.5",
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "PionD", "pion",
+                        "BinaryProtonPionID", "0.5",
                         m_NumEffBins, 0.25, m_MomHighEff);
-    PlotEfficiencyPlots(PIDDetectorsName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW,
-                        SWeightNameMap[TTreeDstarSW], "K", "kaon",
-                        "proton_kaonID", "0.5",
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW,
+                        SWeightNameMap[TTreeDstarSW], "Kaon", "kaon",
+                        "BinaryProtonKaonID", "0.5",
                         m_NumEffBins, 0.25, m_MomHighEff);
-    PlotEfficiencyPlots(PIDDetectorsName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion", TTreeDstarSW,
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD", "pion", TTreeDstarSW,
                         SWeightNameMap[TTreeDstarSW],
-                        "K", "kaon",
-                        "pion_kaonID", "0.5", m_NumEffBins,
+                        "Kaon", "kaon",
+                        "BinaryPionKaonID", "0.5", m_NumEffBins,
                         0., m_MomHighEff);
-    PlotEfficiencyPlots(PIDDetectorsName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon", TTreeDstarSW,
+    PlotEfficiencyPlots(PIDDetectorsName, TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon", "kaon", TTreeDstarSW,
                         SWeightNameMap[TTreeDstarSW],
-                        "pi", "pion",
-                        "kaon_pionID", "0.5", m_NumEffBins,
+                        "PionD", "pion",
+                        "BinaryKaonPionID", "0.5", m_NumEffBins,
                         0., m_MomHighEff);
   }
 
-  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi",
-               "pion", "electron_pionID");
-  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "e_1", "electron", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K",
-               "kaon", "electron_kaonID");
-  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion",
-               "proton_pionID");
-  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "p", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon",
-               "proton_kaonID");
-  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon",
-               "pion_kaonID");
-  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "K", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "pi", "pion",
-               "kaon_pionID");
+  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
+               SWeightNameMap[TTreeDstarSW], "PionD",
+               "pion", "BinaryElectronPionID");
+  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
+               SWeightNameMap[TTreeDstarSW], "Kaon",
+               "kaon", "BinaryElectronKaonID");
+  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD",
+               "pion",
+               "BinaryProtonPionID");
+  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon",
+               "kaon",
+               "BinaryProtonKaonID");
+  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon",
+               "kaon",
+               "BinaryPionKaonID");
+  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD",
+               "pion",
+               "BinaryKaonPionID");
 
   B2INFO("SVD dE/dx validation done!");
 
@@ -143,8 +149,8 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     B2FATAL("The dataset is empty, stopping here");
   }
 
-  if ((SignalTree->GetBranch(Form("%s_p", SignalVarName.Data())) == nullptr)
-      || (FakeTree->GetBranch(Form("%s_p", FakeVarName.Data())) == nullptr)) {
+  if ((SignalTree->GetBranch(Form("%sMomentum", SignalVarName.Data())) == nullptr)
+      || (FakeTree->GetBranch(Form("%sMomentum", FakeVarName.Data())) == nullptr)) {
     B2FATAL("Check the provided branch name, stopping here");
   }
 
@@ -153,12 +159,12 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
 
   // Produce the plots of the SVD PID distribution
   if (PIDDetectorsName == "SVDonly") {
-    SignalTree->Draw(Form("%s_%s_%s>>hSignalPIDDistribution(100,0.,1.)", SignalVarName.Data(), PIDVarName.Data(),
+    SignalTree->Draw(Form("%s%s%s>>hSignalPIDDistribution(100,0.,1.)", SignalVarName.Data(), PIDVarName.Data(),
                           PIDDetectorsName.Data()),
-                     SignalWeightName + Form("* (%s_p>%f && %s_p<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
+                     SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
     TH1F* hSignalPIDDistribution = (TH1F*)gDirectory->Get("hSignalPIDDistribution");
     hSignalPIDDistribution->Scale(1. / hSignalPIDDistribution->Integral());
-    hSignalPIDDistribution->GetXaxis()->SetTitle(PIDVarName + "_" + PIDDetectorsName + " for " + SignalVarNameFull);
+    hSignalPIDDistribution->GetXaxis()->SetTitle(PIDVarName + PIDDetectorsName + " for " + SignalVarNameFull);
     hSignalPIDDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalPIDDistribution->SetMaximum(1.35 * hSignalPIDDistribution->GetMaximum());
 
@@ -172,13 +178,13 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalPIDDistribution->SetLineColor(TColor::GetColor("#2166ac"));
     hSignalPIDDistribution->Draw("hist ");
 
-    DistribCanvas->Print("SVDdEdxValidation_Distribution_" + SignalVarNameFull + "_" + PIDVarName + "_" + PIDDetectorsName +
+    DistribCanvas->Print("SVDdEdxValidation_Distribution_" + SignalVarNameFull +  PIDVarName + PIDDetectorsName +
                          "_MomRange_" +
                          std::to_string(
                            MomLow)
                          .substr(0, 3) +
                          "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
-    TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull + "_" + PIDVarName + "_" + PIDDetectorsName +
+    TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull +  PIDVarName + PIDDetectorsName +
                       "_MomRange_" +
                       std::to_string(
                         MomLow)
@@ -192,17 +198,17 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
 
   // ---------- Momentum distributions (for efficiency determination) ----------
 
-  SignalTree->Draw(Form("%s_p>>hAllSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
+  SignalTree->Draw(Form("%sMomentum>>hAllSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
                    SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-  SignalTree->Draw(Form("%s_p>>hSelectedSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
-                   SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + "_" + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut +
+  SignalTree->Draw(Form("%sMomentum>>hSelectedSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
+                   SignalWeightName + " * (" + SignalVarName +  PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut +
                    ")",
                    "goff");
 
-  FakeTree->Draw(Form("%s_p>>hAllFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
+  FakeTree->Draw(Form("%sMomentum>>hAllFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
                  FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
-  FakeTree->Draw(Form("%s_p>>hSelectedFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
-                 FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + "_" + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")",
+  FakeTree->Draw(Form("%sMomentum>>hSelectedFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
+                 FakeWeightName + " * (" + FakeVarName +  PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")",
                  "goff");
 
   TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
@@ -210,27 +216,28 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
   TH1F* hAllFakes = (TH1F*)gDirectory->Get("hAllFakes");
   TH1F* hSelectedFakes = (TH1F*)gDirectory->Get("hSelectedFakes");
 
-  // ---------- Add soft pions to the pion dataset ----------
-  if (strncmp(SignalVarName.Data(), "pi", 2) == 0) {
-    SignalTree->Draw(Form("piS_p>>hAllSignalSoft(%i,%f,%f)", nbins, MomLow, MomHigh),
+  // ---------- Add slow pions to the pion dataset ----------
+  if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
+    SignalTree->Draw(Form("SlowPionMomentum>>hAllSignalSlow(%i,%f,%f)", nbins, MomLow, MomHigh),
                      SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-    SignalTree->Draw(Form("piS_p>>hSelectedSignalSoft(%i,%f,%f)", nbins, MomLow, MomHigh),
-                     SignalWeightName + " * (piS_" + PIDVarName + "_" + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut + ")", "goff");
-    TH1F* hAllSignalSoft = (TH1F*)gDirectory->Get("hAllSignalSoft");
-    TH1F* hSelectedSignalSoft = (TH1F*)gDirectory->Get("hSelectedSignalSoft");
-    hAllSignal->Add(hAllSignalSoft);
-    hSelectedSignal->Add(hSelectedSignalSoft);
+    SignalTree->Draw(Form("SlowPionMomentum>>hSelectedSignalSlow(%i,%f,%f)", nbins, MomLow, MomHigh),
+                     SignalWeightName + " * (SlowPion" + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut + ")", "goff");
+    TH1F* hAllSignalSlow = (TH1F*)gDirectory->Get("hAllSignalSlow");
+    TH1F* hSelectedSignalSlow = (TH1F*)gDirectory->Get("hSelectedSignalSlow");
+    hAllSignal->Add(hAllSignalSlow);
+    hSelectedSignal->Add(hSelectedSignalSlow);
   }
 
-  if (strncmp(FakeVarName.Data(), "pi", 2) == 0) {
-    FakeTree->Draw(Form("piS_p>>hAllFakesSoft(%i,%f,%f)", nbins, MomLow, MomHigh), FakeWeightName + " * (" + FakesFiducialCut + ")",
+  if (strncmp(FakeVarName.Data(), "PionD", 5) == 0) {
+    FakeTree->Draw(Form("SlowPionMomentum>>hAllFakesSlow(%i,%f,%f)", nbins, MomLow, MomHigh),
+                   FakeWeightName + " * (" + FakesFiducialCut + ")",
                    "goff");
-    FakeTree->Draw(Form("piS_p>>hSelectedFakesSoft(%i,%f,%f)", nbins, MomLow, MomHigh),
-                   FakeWeightName + " * (piS_" + PIDVarName + "_" + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
-    TH1F* hAllFakesSoft = (TH1F*)gDirectory->Get("hAllFakesSoft");
-    TH1F* hSelectedFakesSoft = (TH1F*)gDirectory->Get("hSelectedFakesSoft");
-    hAllFakes->Add(hAllFakesSoft);
-    hSelectedFakes->Add(hSelectedFakesSoft);
+    FakeTree->Draw(Form("SlowPionMomentum>>hSelectedFakesSlow(%i,%f,%f)", nbins, MomLow, MomHigh),
+                   FakeWeightName + " * (SlowPion" + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
+    TH1F* hAllFakesSlow = (TH1F*)gDirectory->Get("hAllFakesSlow");
+    TH1F* hSelectedFakesSlow = (TH1F*)gDirectory->Get("hSelectedFakesSlow");
+    hAllFakes->Add(hAllFakesSlow);
+    hSelectedFakes->Add(hSelectedFakesSlow);
   }
 
   TH1F* EffHistoSig = (TH1F*)hAllSignal->Clone("EffHistoSig");   // signal efficiency
@@ -280,11 +287,11 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
   hBase->GetXaxis()->SetLabelSize(0.04);
 
   // std::setprecision(2);
-  ResultCanvas->Print("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_" +
+  ResultCanvas->Print("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_" +
                       PIDDetectorsName +
                       "_Cut" +
                       PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
-  TFile ResultFile("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_" +
+  TFile ResultFile("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_" +
                    PIDDetectorsName +
                    "_Cut" +
                    PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".root", "RECREATE");
@@ -312,21 +319,21 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
     B2FATAL("The dataset is empty, stopping here");
   }
 
-  if ((SignalTree->GetBranch(Form("%s_p", SignalVarName.Data())) == nullptr)
-      || (FakeTree->GetBranch(Form("%s_p", FakeVarName.Data())) == nullptr)) {
+  if ((SignalTree->GetBranch(Form("%sMomentum", SignalVarName.Data())) == nullptr)
+      || (FakeTree->GetBranch(Form("%sMomentum", FakeVarName.Data())) == nullptr)) {
     B2FATAL("Check the provided branch name, stopping here");
   }
 
   std::vector<TString> PIDDetectors;
   PIDDetectors.clear();
-  PIDDetectors.push_back("_ALL");
-  PIDDetectors.push_back("_noSVD");
+  PIDDetectors.push_back("ALL");
+  PIDDetectors.push_back("noSVD");
 
-  double SignalEfficiency_ALL[m_NumROCpoints], FakeEfficiency_ALL[m_NumROCpoints];
-  double SignalEfficiency_noSVD[m_NumROCpoints], FakeEfficiency_noSVD[m_NumROCpoints];
+  double SignalEfficiencyALL[m_NumROCpoints], FakeEfficiencyALL[m_NumROCpoints];
+  double SignalEfficiencynoSVD[m_NumROCpoints], FakeEfficiencynoSVD[m_NumROCpoints];
 
-  TString SignalFiducialCut = SignalVarName + "_" + PIDVarName + "_noSVD>=0"; // sanity cuts to reject events with NaN
-  TString FakesFiducialCut = FakeVarName + "_" + PIDVarName + "_noSVD>=0";
+  TString SignalFiducialCut = SignalVarName +  PIDVarName + "noSVD>=0"; // sanity cuts to reject events with NaN
+  TString FakesFiducialCut = FakeVarName +  PIDVarName + "noSVD>=0";
 
   // calculate efficiencies
   for (unsigned int i = 0; i < PIDDetectors.size(); i++) {
@@ -341,33 +348,34 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
 
       // TString PIDCut = TString::Format("%f", 0. + 1. / m_NumROCpoints * j);
 
-      SignalTree->Draw(Form("%s_p>>hAllSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
+      SignalTree->Draw(Form("%sMomentum>>hAllSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
                        SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-      SignalTree->Draw(Form("%s_p>>hSelectedSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
-                       SignalWeightName + " * (" + SignalVarName + "_" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + ")",
+      SignalTree->Draw(Form("%sMomentum>>hSelectedSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
+                       SignalWeightName + " * (" + SignalVarName +  PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + ")",
                        "goff");
 
       TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
       TH1F* hSelectedSignal = (TH1F*)gDirectory->Get("hSelectedSignal");
 
-      if (strncmp(SignalVarName.Data(), "pi", 2) == 0) {
-        SignalTree->Draw(Form("piS_p>>hAllSignalSoft(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                         SignalWeightName + " * (" + SignalFiducialCut + "&& piS_" + PIDVarName + "_noSVD>=0" + ")", "goff");
-        SignalTree->Draw(Form("piS_p>>hSelectedSignalSoft(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                         SignalWeightName + " * (piS_" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + "&& piS_" + PIDVarName +
-                         "_noSVD>=0" + ")", "goff");
-        TH1F* hAllSignalSoft = (TH1F*)gDirectory->Get("hAllSignalSoft");
-        TH1F* hSelectedSignalSoft = (TH1F*)gDirectory->Get("hSelectedSignalSoft");
-        hAllSignal->Add(hAllSignalSoft);
-        hSelectedSignal->Add(hSelectedSignalSoft);
+      if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
+        SignalTree->Draw(Form("SlowPionMomentum>>hAllSignalSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
+                         SignalWeightName + " * (" + SignalFiducialCut + "&& SlowPion" + PIDVarName + "noSVD>=0" + ")", "goff");
+        SignalTree->Draw(Form("SlowPionMomentum>>hSelectedSignalSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
+                         SignalWeightName + " * (SlowPion" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + "&& SlowPion" +
+                         PIDVarName +
+                         "noSVD>=0" + ")", "goff");
+        TH1F* hAllSignalSlow = (TH1F*)gDirectory->Get("hAllSignalSlow");
+        TH1F* hSelectedSignalSlow = (TH1F*)gDirectory->Get("hSelectedSignalSlow");
+        hAllSignal->Add(hAllSignalSlow);
+        hSelectedSignal->Add(hSelectedSignalSlow);
       }
 
-      if (PIDDetectors[i] == "_ALL") {
-        SignalEfficiency_ALL[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
+      if (PIDDetectors[i] == "ALL") {
+        SignalEfficiencyALL[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
       }
 
-      if (PIDDetectors[i] == "_noSVD") {
-        SignalEfficiency_noSVD[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
+      if (PIDDetectors[i] == "noSVD") {
+        SignalEfficiencynoSVD[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
       }
     }
   }
@@ -384,32 +392,33 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
       double x = 1. / m_NumROCpoints * j;
       TString PIDCut = TString::Format("%f", 1. / (1 + TMath::Power(x / (1 - x), -3)));
 
-      FakeTree->Draw(Form("%s_p>>hAllFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
+      FakeTree->Draw(Form("%sMomentum>>hAllFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
                      FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
-      FakeTree->Draw(Form("%s_p>>hSelectedFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
-                     FakeWeightName + " * (" + FakeVarName + "_" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
+      FakeTree->Draw(Form("%sMomentum>>hSelectedFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
+                     FakeWeightName + " * (" + FakeVarName +  PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
 
       TH1F* hSelectedFakes = (TH1F*)gDirectory->Get("hSelectedFakes");
       TH1F* hAllFakes = (TH1F*)gDirectory->Get("hAllFakes");
 
-      if (strncmp(FakeVarName.Data(), "pi", 2) == 0) {
-        FakeTree->Draw(Form("piS_p>>hAllFakesSoft(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                       FakeWeightName + " * (" + FakesFiducialCut + "&& piS_" + PIDVarName + "_noSVD>=0" + ")", "goff");
-        FakeTree->Draw(Form("piS_p>>hSelectedFakesSoft(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                       FakeWeightName + " * (piS_" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + "&& piS_" + PIDVarName +
-                       "_noSVD>=0" + ")", "goff");
-        TH1F* hAllFakesSoft = (TH1F*)gDirectory->Get("hAllFakesSoft");
-        TH1F* hSelectedFakesSoft = (TH1F*)gDirectory->Get("hSelectedFakesSoft");
-        hAllFakes->Add(hAllFakesSoft);
-        hSelectedFakes->Add(hSelectedFakesSoft);
+      if (strncmp(FakeVarName.Data(), "PionD", 5) == 0) {
+        FakeTree->Draw(Form("SlowPionMomentum>>hAllFakesSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
+                       FakeWeightName + " * (" + FakesFiducialCut + "&& SlowPion" + PIDVarName + "noSVD>=0" + ")", "goff");
+        FakeTree->Draw(Form("SlowPionMomentum>>hSelectedFakesSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
+                       FakeWeightName + " * (SlowPion" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + "&& SlowPion" + PIDVarName
+                       +
+                       "noSVD>=0" + ")", "goff");
+        TH1F* hAllFakesSlow = (TH1F*)gDirectory->Get("hAllFakesSlow");
+        TH1F* hSelectedFakesSlow = (TH1F*)gDirectory->Get("hSelectedFakesSlow");
+        hAllFakes->Add(hAllFakesSlow);
+        hSelectedFakes->Add(hSelectedFakesSlow);
       }
 
-      if (PIDDetectors[i] == "_ALL") {
-        FakeEfficiency_ALL[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
+      if (PIDDetectors[i] == "ALL") {
+        FakeEfficiencyALL[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
       }
 
-      if (PIDDetectors[i] == "_noSVD") {
-        FakeEfficiency_noSVD[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
+      if (PIDDetectors[i] == "noSVD") {
+        FakeEfficiencynoSVD[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
       }
     }
   }
@@ -418,7 +427,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   TMultiGraph* hmgraph = new TMultiGraph();
 
   // efficiency and kaon fake rate
-  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiency_ALL, SignalEfficiency_ALL);
+  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiencyALL, SignalEfficiencyALL);
   hgraphALL->SetMarkerColor(TColor::GetColor("#2166ac"));
   hgraphALL->SetMarkerStyle(20);
   hgraphALL->SetLineColor(TColor::GetColor("#2166ac"));
@@ -426,7 +435,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   hgraphALL->SetDrawOption("AP*");
   hgraphALL->SetTitle("with SVD");
 
-  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiency_noSVD, SignalEfficiency_noSVD);
+  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiencynoSVD, SignalEfficiencynoSVD);
   hgraphnoSVD->SetMarkerColor(TColor::GetColor("#ef8a62"));
   hgraphnoSVD->SetLineColor(TColor::GetColor("#ef8a62"));
   hgraphnoSVD->SetLineWidth(3);
@@ -443,10 +452,10 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   ResultCanvas->BuildLegend(0.6, 0.25, 0.9, 0.5);
   ResultCanvas->SetGrid();
 
-  ResultCanvas->Print("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_MomRange" +
+  ResultCanvas->Print("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_MomRange" +
                       std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".pdf");
 
-  TFile ResultFile("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + "_" + PIDVarName + "_MomRange" +
+  TFile ResultFile("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_MomRange" +
                    std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".root", "RECREATE");
   hmgraph->Write();
   ResultFile.Close();
@@ -462,70 +471,70 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
 
   RooRealVar InvM("InvM", "m(p^{+}#pi^{-})", 1.1, 1.13, "GeV/c^{2}");
 
-  RooRealVar p_p("p_p", "momentum for p", -1.e8, 1.e8);
-  RooRealVar p_SVDdEdx("p_SVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar ProtonMomentum("ProtonMomentum", "momentum for p", -1.e8, 1.e8);
+  RooRealVar ProtonSVDdEdx("ProtonSVDdEdx", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
   RooRealVar run("run", "run number", 0, 1.e7);
 
-  RooRealVar p_protonID_ALL("p_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_protonID_SVDonly("p_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_protonID_noSVD("p_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonProtonIDALL("ProtonProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonProtonIDSVDonly("ProtonProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonProtonIDnoSVD("ProtonProtonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar p_proton_pionID_ALL("p_proton_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_proton_pionID_SVDonly("p_proton_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_proton_pionID_noSVD("p_proton_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonPionIDALL("ProtonBinaryProtonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonPionIDSVDonly("ProtonBinaryProtonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonPionIDnoSVD("ProtonBinaryProtonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar p_proton_kaonID_ALL("p_proton_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_proton_kaonID_SVDonly("p_proton_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_proton_kaonID_noSVD("p_proton_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonKaonIDALL("ProtonBinaryProtonKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonKaonIDSVDonly("ProtonBinaryProtonKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonKaonIDnoSVD("ProtonBinaryProtonKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar p_proton_electronID_ALL("p_proton_electronID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_proton_electronID_SVDonly("p_proton_electronID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_proton_electronID_noSVD("p_proton_electronID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonElectronIDALL("ProtonBinaryProtonElectronIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonElectronIDSVDonly("ProtonBinaryProtonElectronIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryProtonElectronIDnoSVD("ProtonBinaryProtonElectronIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar p_pion_protonID_ALL("p_pion_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_pion_protonID_SVDonly("p_pion_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_pion_protonID_noSVD("p_pion_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryPionProtonIDALL("ProtonBinaryPionProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryPionProtonIDSVDonly("ProtonBinaryPionProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryPionProtonIDnoSVD("ProtonBinaryPionProtonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar p_kaon_protonID_ALL("p_kaon_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_kaon_protonID_SVDonly("p_kaon_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_kaon_protonID_noSVD("p_kaon_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryKaonProtonIDALL("ProtonBinaryKaonProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryKaonProtonIDSVDonly("ProtonBinaryKaonProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryKaonProtonIDnoSVD("ProtonBinaryKaonProtonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar p_electron_protonID_ALL("p_electron_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar p_electron_protonID_SVDonly("p_electron_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar p_electron_protonID_noSVD("p_electron_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryElectronProtonIDALL("ProtonBinaryElectronProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryElectronProtonIDSVDonly("ProtonBinaryElectronProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonBinaryElectronProtonIDnoSVD("ProtonBinaryElectronProtonIDnoSVD", "", -1.e8, 1.e8);
 
   auto variables = new RooArgSet();
 
   variables->add(InvM);
 
-  variables->add(p_p);
-  variables->add(p_SVDdEdx);
+  variables->add(ProtonMomentum);
+  variables->add(ProtonSVDdEdx);
   variables->add(exp);
   variables->add(run);
 
-  variables->add(p_protonID_ALL);
-  variables->add(p_protonID_SVDonly);
-  variables->add(p_protonID_noSVD);
-  variables->add(p_proton_pionID_ALL);
-  variables->add(p_proton_pionID_SVDonly);
-  variables->add(p_proton_pionID_noSVD);
-  variables->add(p_proton_kaonID_ALL);
-  variables->add(p_proton_kaonID_SVDonly);
-  variables->add(p_proton_kaonID_noSVD);
-  variables->add(p_proton_electronID_ALL);
-  variables->add(p_proton_electronID_SVDonly);
-  variables->add(p_proton_electronID_noSVD);
-  variables->add(p_pion_protonID_ALL);
-  variables->add(p_pion_protonID_SVDonly);
-  variables->add(p_pion_protonID_noSVD);
-  variables->add(p_kaon_protonID_ALL);
-  variables->add(p_kaon_protonID_SVDonly);
-  variables->add(p_kaon_protonID_noSVD);
-  variables->add(p_electron_protonID_ALL);
-  variables->add(p_electron_protonID_SVDonly);
-  variables->add(p_electron_protonID_noSVD);
+  variables->add(ProtonProtonIDALL);
+  variables->add(ProtonProtonIDSVDonly);
+  variables->add(ProtonProtonIDnoSVD);
+  variables->add(ProtonBinaryProtonPionIDALL);
+  variables->add(ProtonBinaryProtonPionIDSVDonly);
+  variables->add(ProtonBinaryProtonPionIDnoSVD);
+  variables->add(ProtonBinaryProtonKaonIDALL);
+  variables->add(ProtonBinaryProtonKaonIDSVDonly);
+  variables->add(ProtonBinaryProtonKaonIDnoSVD);
+  variables->add(ProtonBinaryProtonElectronIDALL);
+  variables->add(ProtonBinaryProtonElectronIDSVDonly);
+  variables->add(ProtonBinaryProtonElectronIDnoSVD);
+  variables->add(ProtonBinaryPionProtonIDALL);
+  variables->add(ProtonBinaryPionProtonIDSVDonly);
+  variables->add(ProtonBinaryPionProtonIDnoSVD);
+  variables->add(ProtonBinaryKaonProtonIDALL);
+  variables->add(ProtonBinaryKaonProtonIDSVDonly);
+  variables->add(ProtonBinaryKaonProtonIDnoSVD);
+  variables->add(ProtonBinaryElectronProtonIDALL);
+  variables->add(ProtonBinaryElectronProtonIDSVDonly);
+  variables->add(ProtonBinaryElectronProtonIDnoSVD);
 
   RooDataSet* LambdaDataset = new RooDataSet("LambdaDataset", "LambdaDataset", preselTree.get(), *variables);
 
@@ -602,6 +611,7 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   double chisquare = LambdaFitFrame->chiSquare();
   B2INFO("Lambda: Fit chi2 = " << chisquare);
   totalPDFLambda.paramOn(LambdaFitFrame, Layout(0.6, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+  LambdaFitFrame->getAttText()->SetTextSize(0.03);
 
   totalPDFLambda.plotOn(LambdaFitFrame, Components("LambdaSignalPDF"), LineColor(TColor::GetColor("#d73027")));
   totalPDFLambda.plotOn(LambdaFitFrame, Components("BkgPolyPDF"), LineColor(TColor::GetColor("#fc8d59")));
@@ -613,6 +623,9 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
 
   if (m_isMakePlots) {
     canvLambda->Print("SVDdEdxValidationFitLambda.pdf");
+    TFile LambdaFitPlotFile("SVDdEdxValidationLambdaFitPlotFile.root", "RECREATE");
+    canvLambda->Write();
+    LambdaFitPlotFile.Close();
   }
   RooStats::SPlot* sPlotDatasetLambda = new RooStats::SPlot("sData", "An SPlot", *LambdaDataset, &totalPDFLambda,
                                                             RooArgList(nSignalLambda, nBkgLambda));
@@ -643,197 +656,197 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
 
   RooRealVar deltaM("deltaM", "m(D*)-m(D^{0})", 0.139545, 0.151, "GeV/c^{2}");
 
-  RooRealVar K_p("K_p", "momentum for Kaon(GeV)", -1.e8, 1.e8);
-  RooRealVar K_SVDdEdx("K_SVDdEdx", "", -1.e8, 1.e8);
-  RooRealVar pi_p("pi_p", "momentum for pion(GeV)", -1.e8, 1.e8);
-  RooRealVar pi_SVDdEdx("pi_SVDdEdx", "", -1.e8, 1.e8);
-  RooRealVar piS_p("piS_p", "momentum for slow pion(GeV)", -1.e8, 1.e8);
-  RooRealVar piS_SVDdEdx("piS_SVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar KaonMomentum("KaonMomentum", "momentum for Kaon(GeV)", -1.e8, 1.e8);
+  RooRealVar KaonSVDdEdx("KaonSVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar PionDMomentum("PionDMomentum", "momentum for pion(GeV)", -1.e8, 1.e8);
+  RooRealVar PionDSVDdEdx("PionDSVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar SlowPionMomentum("SlowPionMomentum", "momentum for slow pion(GeV)", -1.e8, 1.e8);
+  RooRealVar SlowPionSVDdEdx("SlowPionSVDdEdx", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
   RooRealVar run("run", "run number", 0, 1.e8);
 
-  RooRealVar K_kaonID_ALL("K_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_kaonID_SVDonly("K_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_kaonID_noSVD("K_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonKaonIDALL("KaonKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonKaonIDSVDonly("KaonKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonKaonIDnoSVD("KaonKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_pionID_ALL("K_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_pionID_SVDonly("K_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_pionID_noSVD("K_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonPionIDALL("KaonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonPionIDSVDonly("KaonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonPionIDnoSVD("KaonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_protonID_ALL("K_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_protonID_SVDonly("K_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_protonID_noSVD("K_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonProtonIDALL("KaonProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonProtonIDSVDonly("KaonProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonProtonIDnoSVD("KaonProtonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_electronID_ALL("K_electronID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_electronID_SVDonly("K_electronID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_electronID_noSVD("K_electronID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonElectronIDALL("KaonElectronIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonElectronIDSVDonly("KaonElectronIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonElectronIDnoSVD("KaonElectronIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_kaon_pionID_ALL("K_kaon_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_kaon_pionID_SVDonly("K_kaon_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_kaon_pionID_noSVD("K_kaon_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryKaonPionIDALL("KaonBinaryKaonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryKaonPionIDSVDonly("KaonBinaryKaonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryKaonPionIDnoSVD("KaonBinaryKaonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_pion_kaonID_ALL("K_pion_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_pion_kaonID_SVDonly("K_pion_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_pion_kaonID_noSVD("K_pion_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryPionKaonIDALL("KaonBinaryPionKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryPionKaonIDSVDonly("KaonBinaryPionKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryPionKaonIDnoSVD("KaonBinaryPionKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_proton_kaonID_ALL("K_proton_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_proton_kaonID_SVDonly("K_proton_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_proton_kaonID_noSVD("K_proton_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryProtonKaonIDALL("KaonBinaryProtonKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryProtonKaonIDSVDonly("KaonBinaryProtonKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryProtonKaonIDnoSVD("KaonBinaryProtonKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar K_electron_kaonID_ALL("K_electron_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar K_electron_kaonID_SVDonly("K_electron_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar K_electron_kaonID_noSVD("K_electron_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryElectronKaonIDALL("KaonBinaryElectronKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryElectronKaonIDSVDonly("KaonBinaryElectronKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonBinaryElectronKaonIDnoSVD("KaonBinaryElectronKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_kaonID_ALL("pi_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_kaonID_SVDonly("pi_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_kaonID_noSVD("pi_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDKaonIDALL("PionDKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDKaonIDSVDonly("PionDKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDKaonIDnoSVD("PionDKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_pionID_ALL("pi_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_pionID_SVDonly("pi_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_pionID_noSVD("pi_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDPionIDALL("PionDPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDPionIDSVDonly("PionDPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDPionIDnoSVD("PionDPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_electronID_ALL("pi_electronID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_electronID_SVDonly("pi_electronID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_electronID_noSVD("pi_electronID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDElectronIDALL("PionDElectronIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDElectronIDSVDonly("PionDElectronIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDElectronIDnoSVD("PionDElectronIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_protonID_ALL("pi_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_protonID_SVDonly("pi_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_protonID_noSVD("pi_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDProtonIDALL("PionDProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDProtonIDSVDonly("PionDProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDProtonIDnoSVD("PionDProtonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_pion_kaonID_ALL("pi_pion_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_pion_kaonID_SVDonly("pi_pion_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_pion_kaonID_noSVD("pi_pion_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryPionKaonIDALL("PionDBinaryPionKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryPionKaonIDSVDonly("PionDBinaryPionKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryPionKaonIDnoSVD("PionDBinaryPionKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_kaon_pionID_ALL("pi_kaon_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_kaon_pionID_SVDonly("pi_kaon_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_kaon_pionID_noSVD("pi_kaon_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryKaonPionIDALL("PionDBinaryKaonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryKaonPionIDSVDonly("PionDBinaryKaonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryKaonPionIDnoSVD("PionDBinaryKaonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_proton_pionID_ALL("pi_proton_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_proton_pionID_SVDonly("pi_proton_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_proton_pionID_noSVD("pi_proton_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryProtonPionIDALL("PionDBinaryProtonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryProtonPionIDSVDonly("PionDBinaryProtonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryProtonPionIDnoSVD("PionDBinaryProtonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar pi_electron_pionID_ALL("pi_electron_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar pi_electron_pionID_SVDonly("pi_electron_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar pi_electron_pionID_noSVD("pi_electron_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryElectronPionIDALL("PionDBinaryElectronPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryElectronPionIDSVDonly("PionDBinaryElectronPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDBinaryElectronPionIDnoSVD("PionDBinaryElectronPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_kaonID_ALL("piS_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_kaonID_SVDonly("piS_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_kaonID_noSVD("piS_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionKaonIDALL("SlowPionKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionKaonIDSVDonly("SlowPionKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionKaonIDnoSVD("SlowPionKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_pionID_ALL("piS_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_pionID_SVDonly("piS_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_pionID_noSVD("piS_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionPionIDALL("SlowPionPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionPionIDSVDonly("SlowPionPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionPionIDnoSVD("SlowPionPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_electronID_ALL("piS_electronID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_electronID_SVDonly("piS_electronID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_electronID_noSVD("piS_electronID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionElectronIDALL("SlowPionElectronIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionElectronIDSVDonly("SlowPionElectronIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionElectronIDnoSVD("SlowPionElectronIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_protonID_ALL("piS_protonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_protonID_SVDonly("piS_protonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_protonID_noSVD("piS_protonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionProtonIDALL("SlowPionProtonIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionProtonIDSVDonly("SlowPionProtonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionProtonIDnoSVD("SlowPionProtonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_pion_kaonID_ALL("piS_pion_kaonID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_pion_kaonID_SVDonly("piS_pion_kaonID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_pion_kaonID_noSVD("piS_pion_kaonID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryPionKaonIDALL("SlowPionBinaryPionKaonIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryPionKaonIDSVDonly("SlowPionBinaryPionKaonIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryPionKaonIDnoSVD("SlowPionBinaryPionKaonIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_kaon_pionID_ALL("piS_kaon_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_kaon_pionID_SVDonly("piS_kaon_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_kaon_pionID_noSVD("piS_kaon_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryKaonPionIDALL("SlowPionBinaryKaonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryKaonPionIDSVDonly("SlowPionBinaryKaonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryKaonPionIDnoSVD("SlowPionBinaryKaonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_proton_pionID_ALL("piS_proton_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_proton_pionID_SVDonly("piS_proton_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_proton_pionID_noSVD("piS_proton_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryProtonPionIDALL("SlowPionBinaryProtonPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryProtonPionIDSVDonly("SlowPionBinaryProtonPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryProtonPionIDnoSVD("SlowPionBinaryProtonPionIDnoSVD", "", -1.e8, 1.e8);
 
-  RooRealVar piS_electron_pionID_ALL("piS_electron_pionID_ALL", "", -1.e8, 1.e8);
-  RooRealVar piS_electron_pionID_SVDonly("piS_electron_pionID_SVDonly", "", -1.e8, 1.e8);
-  RooRealVar piS_electron_pionID_noSVD("piS_electron_pionID_noSVD", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryElectronPionIDALL("SlowPionBinaryElectronPionIDALL", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryElectronPionIDSVDonly("SlowPionBinaryElectronPionIDSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionBinaryElectronPionIDnoSVD("SlowPionBinaryElectronPionIDnoSVD", "", -1.e8, 1.e8);
 
   auto variables = new RooArgSet();
   variables->add(deltaM);
-  variables->add(K_p);
-  variables->add(K_SVDdEdx);
-  variables->add(pi_p);
-  variables->add(pi_SVDdEdx);
-  variables->add(piS_p);
-  variables->add(piS_SVDdEdx);
+  variables->add(KaonMomentum);
+  variables->add(KaonSVDdEdx);
+  variables->add(PionDMomentum);
+  variables->add(PionDSVDdEdx);
+  variables->add(SlowPionMomentum);
+  variables->add(SlowPionSVDdEdx);
   variables->add(exp);
   variables->add(run);
 
-  variables->add(K_kaonID_ALL);
-  variables->add(K_kaonID_SVDonly);
-  variables->add(K_kaonID_noSVD);
-  variables->add(K_pionID_ALL);
-  variables->add(K_pionID_SVDonly);
-  variables->add(K_pionID_noSVD);
-  variables->add(K_protonID_ALL);
-  variables->add(K_protonID_SVDonly);
-  variables->add(K_protonID_noSVD);
-  variables->add(K_electronID_ALL);
-  variables->add(K_electronID_SVDonly);
-  variables->add(K_electronID_noSVD);
-  variables->add(K_kaon_pionID_ALL);
-  variables->add(K_kaon_pionID_SVDonly);
-  variables->add(K_kaon_pionID_noSVD);
-  variables->add(K_pion_kaonID_ALL);
-  variables->add(K_pion_kaonID_SVDonly);
-  variables->add(K_pion_kaonID_noSVD);
-  variables->add(K_proton_kaonID_ALL);
-  variables->add(K_proton_kaonID_SVDonly);
-  variables->add(K_proton_kaonID_noSVD);
-  variables->add(K_electron_kaonID_ALL);
-  variables->add(K_electron_kaonID_SVDonly);
-  variables->add(K_electron_kaonID_noSVD);
+  variables->add(KaonKaonIDALL);
+  variables->add(KaonKaonIDSVDonly);
+  variables->add(KaonKaonIDnoSVD);
+  variables->add(KaonPionIDALL);
+  variables->add(KaonPionIDSVDonly);
+  variables->add(KaonPionIDnoSVD);
+  variables->add(KaonProtonIDALL);
+  variables->add(KaonProtonIDSVDonly);
+  variables->add(KaonProtonIDnoSVD);
+  variables->add(KaonElectronIDALL);
+  variables->add(KaonElectronIDSVDonly);
+  variables->add(KaonElectronIDnoSVD);
+  variables->add(KaonBinaryKaonPionIDALL);
+  variables->add(KaonBinaryKaonPionIDSVDonly);
+  variables->add(KaonBinaryKaonPionIDnoSVD);
+  variables->add(KaonBinaryPionKaonIDALL);
+  variables->add(KaonBinaryPionKaonIDSVDonly);
+  variables->add(KaonBinaryPionKaonIDnoSVD);
+  variables->add(KaonBinaryProtonKaonIDALL);
+  variables->add(KaonBinaryProtonKaonIDSVDonly);
+  variables->add(KaonBinaryProtonKaonIDnoSVD);
+  variables->add(KaonBinaryElectronKaonIDALL);
+  variables->add(KaonBinaryElectronKaonIDSVDonly);
+  variables->add(KaonBinaryElectronKaonIDnoSVD);
 
-  variables->add(pi_pionID_ALL);
-  variables->add(pi_pionID_SVDonly);
-  variables->add(pi_pionID_noSVD);
-  variables->add(pi_kaonID_ALL);
-  variables->add(pi_kaonID_SVDonly);
-  variables->add(pi_kaonID_noSVD);
-  variables->add(pi_electronID_ALL);
-  variables->add(pi_electronID_SVDonly);
-  variables->add(pi_electronID_noSVD);
-  variables->add(pi_protonID_ALL);
-  variables->add(pi_protonID_SVDonly);
-  variables->add(pi_protonID_noSVD);
-  variables->add(pi_pion_kaonID_ALL);
-  variables->add(pi_pion_kaonID_SVDonly);
-  variables->add(pi_pion_kaonID_noSVD);
-  variables->add(pi_kaon_pionID_ALL);
-  variables->add(pi_kaon_pionID_SVDonly);
-  variables->add(pi_kaon_pionID_noSVD);
-  variables->add(pi_proton_pionID_ALL);
-  variables->add(pi_proton_pionID_SVDonly);
-  variables->add(pi_proton_pionID_noSVD);
-  variables->add(pi_electron_pionID_ALL);
-  variables->add(pi_electron_pionID_SVDonly);
-  variables->add(pi_electron_pionID_noSVD);
+  variables->add(PionDPionIDALL);
+  variables->add(PionDPionIDSVDonly);
+  variables->add(PionDPionIDnoSVD);
+  variables->add(PionDKaonIDALL);
+  variables->add(PionDKaonIDSVDonly);
+  variables->add(PionDKaonIDnoSVD);
+  variables->add(PionDElectronIDALL);
+  variables->add(PionDElectronIDSVDonly);
+  variables->add(PionDElectronIDnoSVD);
+  variables->add(PionDProtonIDALL);
+  variables->add(PionDProtonIDSVDonly);
+  variables->add(PionDProtonIDnoSVD);
+  variables->add(PionDBinaryPionKaonIDALL);
+  variables->add(PionDBinaryPionKaonIDSVDonly);
+  variables->add(PionDBinaryPionKaonIDnoSVD);
+  variables->add(PionDBinaryKaonPionIDALL);
+  variables->add(PionDBinaryKaonPionIDSVDonly);
+  variables->add(PionDBinaryKaonPionIDnoSVD);
+  variables->add(PionDBinaryProtonPionIDALL);
+  variables->add(PionDBinaryProtonPionIDSVDonly);
+  variables->add(PionDBinaryProtonPionIDnoSVD);
+  variables->add(PionDBinaryElectronPionIDALL);
+  variables->add(PionDBinaryElectronPionIDSVDonly);
+  variables->add(PionDBinaryElectronPionIDnoSVD);
 
-  variables->add(piS_pionID_ALL);
-  variables->add(piS_pionID_SVDonly);
-  variables->add(piS_pionID_noSVD);
-  variables->add(piS_kaonID_ALL);
-  variables->add(piS_kaonID_SVDonly);
-  variables->add(piS_kaonID_noSVD);
-  variables->add(piS_electronID_ALL);
-  variables->add(piS_electronID_SVDonly);
-  variables->add(piS_electronID_noSVD);
-  variables->add(piS_protonID_ALL);
-  variables->add(piS_protonID_SVDonly);
-  variables->add(piS_protonID_noSVD);
-  variables->add(piS_pion_kaonID_ALL);
-  variables->add(piS_pion_kaonID_SVDonly);
-  variables->add(piS_pion_kaonID_noSVD);
-  variables->add(piS_kaon_pionID_ALL);
-  variables->add(piS_kaon_pionID_SVDonly);
-  variables->add(piS_kaon_pionID_noSVD);
-  variables->add(piS_proton_pionID_ALL);
-  variables->add(piS_proton_pionID_SVDonly);
-  variables->add(piS_proton_pionID_noSVD);
-  variables->add(piS_electron_pionID_ALL);
-  variables->add(piS_electron_pionID_SVDonly);
-  variables->add(piS_electron_pionID_noSVD);
+  variables->add(SlowPionPionIDALL);
+  variables->add(SlowPionPionIDSVDonly);
+  variables->add(SlowPionPionIDnoSVD);
+  variables->add(SlowPionKaonIDALL);
+  variables->add(SlowPionKaonIDSVDonly);
+  variables->add(SlowPionKaonIDnoSVD);
+  variables->add(SlowPionElectronIDALL);
+  variables->add(SlowPionElectronIDSVDonly);
+  variables->add(SlowPionElectronIDnoSVD);
+  variables->add(SlowPionProtonIDALL);
+  variables->add(SlowPionProtonIDSVDonly);
+  variables->add(SlowPionProtonIDnoSVD);
+  variables->add(SlowPionBinaryPionKaonIDALL);
+  variables->add(SlowPionBinaryPionKaonIDSVDonly);
+  variables->add(SlowPionBinaryPionKaonIDnoSVD);
+  variables->add(SlowPionBinaryKaonPionIDALL);
+  variables->add(SlowPionBinaryKaonPionIDSVDonly);
+  variables->add(SlowPionBinaryKaonPionIDnoSVD);
+  variables->add(SlowPionBinaryProtonPionIDALL);
+  variables->add(SlowPionBinaryProtonPionIDSVDonly);
+  variables->add(SlowPionBinaryProtonPionIDnoSVD);
+  variables->add(SlowPionBinaryElectronPionIDALL);
+  variables->add(SlowPionBinaryElectronPionIDSVDonly);
+  variables->add(SlowPionBinaryElectronPionIDnoSVD);
 
   RooDataSet* DstarDataset = new RooDataSet("DstarDataset", "DstarDataset", preselTree.get(), *variables);
 
@@ -841,7 +854,7 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
     B2FATAL("The Dstar dataset is empty, stopping here");
   }
 
-  RooPlot* myframe = DstarDataset->plotOn(deltaM.frame());
+  RooPlot* DstarFitFrame = DstarDataset->plotOn(deltaM.frame());
 
   RooRealVar GaussMean("GaussMean", "GaussMean", 0.145, 0.140, 0.150);
   RooRealVar GaussSigma1("GaussSigma1", "GaussSigma1", 0.01, 1.e-4, 1.0);
@@ -888,24 +901,28 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
     B2INFO("Dstar: Fit warning: covariance quality " << covqual);
   }
 
-  totalPDFDstar.plotOn(myframe, LineColor(TColor::GetColor("#4575b4")));
+  totalPDFDstar.plotOn(DstarFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
-  double chisquare = myframe->chiSquare();
+  double chisquare = DstarFitFrame->chiSquare();
   B2INFO("Dstar: Fit chi2 = " << chisquare);
-  totalPDFDstar.paramOn(myframe, Layout(0.66, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+  totalPDFDstar.paramOn(DstarFitFrame, Layout(0.63, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+  DstarFitFrame->getAttText()->SetTextSize(0.03);
 
-  totalPDFDstar.plotOn(myframe, Components("DstarSignalPDF"), LineColor(TColor::GetColor("#d73027")));
-  totalPDFDstar.plotOn(myframe, Components("DstarBkgPDF"), LineColor(TColor::GetColor("#fc8d59")));
-  totalPDFDstar.plotOn(myframe, LineColor(TColor::GetColor("#4575b4")));
+  totalPDFDstar.plotOn(DstarFitFrame, Components("DstarSignalPDF"), LineColor(TColor::GetColor("#d73027")));
+  totalPDFDstar.plotOn(DstarFitFrame, Components("DstarBkgPDF"), LineColor(TColor::GetColor("#fc8d59")));
+  totalPDFDstar.plotOn(DstarFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
-  myframe->GetXaxis()->SetTitle("#Deltam [GeV/c^{2}]");
+  DstarFitFrame->GetXaxis()->SetTitle("#Deltam [GeV/c^{2}]");
   TCanvas* canvDstar = new TCanvas("canvDstar", "canvDstar");
   canvDstar->cd();
 
-  myframe->Draw();
+  DstarFitFrame->Draw();
 
   if (m_isMakePlots) {
     canvDstar->Print("SVDdEdxValidationFitDstar.pdf");
+    TFile DstarFitPlotFile("SVDdEdxValidationDstarFitPlotFile.root", "RECREATE");
+    canvDstar->Write();
+    DstarFitPlotFile.Close();
   }
 
   /////////////////// SPlot ///////////////////////////////////////////////////////////

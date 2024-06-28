@@ -101,6 +101,34 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       } else if (iPart == 4 && trunmean) {
         hDedxPDFs[iPart] = &hLambdaP;
         payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 5 && trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_1000010020_trunc");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 0 && !trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_11");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 1 && !trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_13");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 2 && !trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_211");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 3 && !trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_321");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 4 && !trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_2212");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
+      } else if (iPart == 5 && !trunmean) {
+        hDedxPDFs[iPart] = &hEmpty;
+        hDedxPDFs[iPart]->SetName("hist_d1_1000010020");
+        payload->setPDF(*hDedxPDFs[iPart], iPart, trunmean);
       }
 
       else
@@ -112,7 +140,7 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
       hDedxPDFs[iPart]->DrawCopy("colz");
 
       if (m_isMakePlots) {
-        candEdx->SaveAs("Plots_SVDDedxPDFs_wTruncMean.pdf");
+        candEdx->SaveAs("PlotsSVDdEdxPDFs_wTruncMean.pdf");
       }
     }
     // candEdx->SetTitle(Form("Likehood dist. of charged particles from %s, trunmean = %s", idet.data(), check.str().data()));
@@ -132,8 +160,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   RooRealVar InvM("InvM", "m(p^{+}#pi^{-})", 1.1, 1.13, "GeV/c^{2}");
 
-  RooRealVar p_p("p_p", "momentum for p", -1.e8, 1.e8);
-  RooRealVar p_SVDdEdx("p_SVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar ProtonMomentum("ProtonMomentum", "momentum for p", -1.e8, 1.e8);
+  RooRealVar ProtonSVDdEdx("ProtonSVDdEdx", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
   RooRealVar run("run", "run number", 0, 1.e7);
@@ -142,8 +170,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   variables->add(InvM);
 
-  variables->add(p_p);
-  variables->add(p_SVDdEdx);
+  variables->add(ProtonMomentum);
+  variables->add(ProtonSVDdEdx);
   variables->add(exp);
   variables->add(run);
 
@@ -222,6 +250,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   double chisquare = LambdaFitFrame->chiSquare();
   B2INFO("Lambda: Fit chi2 = " << chisquare);
   totalPDFLambda.paramOn(LambdaFitFrame, Layout(0.6, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+  LambdaFitFrame->getAttText()->SetTextSize(0.03);
 
   totalPDFLambda.plotOn(LambdaFitFrame, Components("LambdaSignalPDF"), LineColor(TColor::GetColor("#d73027")));
   totalPDFLambda.plotOn(LambdaFitFrame, Components("BkgPolyPDF"), LineColor(TColor::GetColor("#fc8d59")));
@@ -233,6 +262,9 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   if (m_isMakePlots) {
     canvLambda->Print("SVDdEdxCalibrationFitLambda.pdf");
+    TFile LambdaFitPlotFile("SVDdEdxCalibrationLambdaFitPlotFile.root", "RECREATE");
+    canvLambda->Write();
+    LambdaFitPlotFile.Close();
   }
   RooStats::SPlot* sPlotDatasetLambda = new RooStats::SPlot("sData", "An SPlot", *LambdaDataset, &totalPDFLambda,
                                                             RooArgList(nSignalLambda, nBkgLambda));
@@ -256,7 +288,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
 
   TH2F* hLambdaP = new TH2F("hist_d1_2212_trunc", "hist_d1_2212_trunc", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
 
-  treeLambda_sw->Draw("p_SVDdEdx:p_p>>hist_d1_2212_trunc", "nSignalLambda_sw * (p_p>0.15) * (p_SVDdEdx>0)", "goff");
+  treeLambda_sw->Draw("ProtonSVDdEdx:ProtonMomentum>>hist_d1_2212_trunc",
+                      "nSignalLambda_sw * (ProtonMomentum>0.15) * (ProtonSVDdEdx>0)", "goff");
 
   // produce the 1D profile (for data-MC comparisons)
   if (m_isMakePlots) {
@@ -312,24 +345,24 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
 
   RooRealVar deltaM("deltaM", "m(D*)-m(D^{0})", 0.139545, 0.151, "GeV/c^{2}");
 
-  RooRealVar K_p("K_p", "momentum for Kaon(GeV)", -1.e8, 1.e8);
-  RooRealVar K_SVDdEdx("K_SVDdEdx", "", -1.e8, 1.e8);
-  RooRealVar pi_p("pi_p", "momentum for pion(GeV)", -1.e8, 1.e8);
-  RooRealVar pi_SVDdEdx("pi_SVDdEdx", "", -1.e8, 1.e8);
-  RooRealVar piS_p("piS_p", "momentum for slow pion(GeV)", -1.e8, 1.e8);
-  RooRealVar piS_SVDdEdx("piS_SVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar KaonMomentum("KaonMomentum", "momentum for Kaon(GeV)", -1.e8, 1.e8);
+  RooRealVar KaonSVDdEdx("KaonSVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar PionDMomentum("PionDMomentum", "momentum for pion(GeV)", -1.e8, 1.e8);
+  RooRealVar PionDSVDdEdx("PionDSVDdEdx", "", -1.e8, 1.e8);
+  RooRealVar SlowPionMomentum("SlowPionMomentum", "momentum for slow pion(GeV)", -1.e8, 1.e8);
+  RooRealVar SlowPionSVDdEdx("SlowPionSVDdEdx", "", -1.e8, 1.e8);
 
   RooRealVar exp("exp", "experiment number", 0, 1.e5);
   RooRealVar run("run", "run number", 0, 1.e8);
 
   auto variables = new RooArgSet();
   variables->add(deltaM);
-  variables->add(K_p);
-  variables->add(K_SVDdEdx);
-  variables->add(pi_p);
-  variables->add(pi_SVDdEdx);
-  variables->add(piS_p);
-  variables->add(piS_SVDdEdx);
+  variables->add(KaonMomentum);
+  variables->add(KaonSVDdEdx);
+  variables->add(PionDMomentum);
+  variables->add(PionDSVDdEdx);
+  variables->add(SlowPionMomentum);
+  variables->add(SlowPionSVDdEdx);
   variables->add(exp);
   variables->add(run);
 
@@ -339,7 +372,7 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
     B2FATAL("The Dstar dataset is empty, stopping here");
   }
 
-  RooPlot* myframe = DstarDataset->plotOn(deltaM.frame());
+  RooPlot* DstarFitFrame = DstarDataset->plotOn(deltaM.frame());
 
   RooRealVar GaussMean("GaussMean", "GaussMean", 0.145, 0.140, 0.150);
   RooRealVar GaussSigma1("GaussSigma1", "GaussSigma1", 0.01, 1.e-4, 1.0);
@@ -386,24 +419,28 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
     B2INFO("Dstar: Fit warning: covariance quality " << covqual);
   }
 
-  totalPDFDstar.plotOn(myframe, LineColor(TColor::GetColor("#4575b4")));
+  totalPDFDstar.plotOn(DstarFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
-  double chisquare = myframe->chiSquare();
+  double chisquare = DstarFitFrame->chiSquare();
   B2INFO("Dstar: Fit chi2 = " << chisquare);
-  totalPDFDstar.paramOn(myframe, Layout(0.66, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+  totalPDFDstar.paramOn(DstarFitFrame, Layout(0.63, 0.96, 0.93), Format("NEU", AutoPrecision(2)));
+  DstarFitFrame->getAttText()->SetTextSize(0.03);
 
-  totalPDFDstar.plotOn(myframe, Components("DstarSignalPDF"), LineColor(TColor::GetColor("#d73027")));
-  totalPDFDstar.plotOn(myframe, Components("DstarBkgPDF"), LineColor(TColor::GetColor("#fc8d59")));
-  totalPDFDstar.plotOn(myframe, LineColor(TColor::GetColor("#4575b4")));
+  totalPDFDstar.plotOn(DstarFitFrame, Components("DstarSignalPDF"), LineColor(TColor::GetColor("#d73027")));
+  totalPDFDstar.plotOn(DstarFitFrame, Components("DstarBkgPDF"), LineColor(TColor::GetColor("#fc8d59")));
+  totalPDFDstar.plotOn(DstarFitFrame, LineColor(TColor::GetColor("#4575b4")));
 
-  myframe->GetXaxis()->SetTitle("#Deltam [GeV/c^{2}]");
+  DstarFitFrame->GetXaxis()->SetTitle("#Deltam [GeV/c^{2}]");
   TCanvas* canvDstar = new TCanvas("canvDstar", "canvDstar");
   canvDstar->cd();
 
-  myframe->Draw();
+  DstarFitFrame->Draw();
 
   if (m_isMakePlots) {
     canvDstar->Print("SVDdEdxCalibrationFitDstar.pdf");
+    TFile DstarFitPlotFile("SVDdEdxCalibrationDstarFitPlotFile.root", "RECREATE");
+    canvDstar->Write();
+    DstarFitPlotFile.Close();
   }
 
   /////////////////// SPlot ///////////////////////////////////////////////////////////
@@ -434,13 +471,13 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   TH2F* hDstarPi = new TH2F("hist_d1_211_trunc", "hist_d1_211_trunc", m_numPBins, pbins.data(),
                             m_numDEdxBins, 0, m_dedxCutoff);
 
-  treeDstar_sw->Draw("K_SVDdEdx:K_p>>hist_d1_321_trunc", "nSignalDstar_sw * (K_SVDdEdx>0)", "goff");
+  treeDstar_sw->Draw("KaonSVDdEdx:KaonMomentum>>hist_d1_321_trunc", "nSignalDstar_sw * (KaonSVDdEdx>0)", "goff");
   // the pion one will be built from both pions in the Dstar decay tree
   TH2F* hDstarPiPart1 = (TH2F*)hDstarPi->Clone("hist_d1_211_truncPart1");
   TH2F* hDstarPiPart2 = (TH2F*)hDstarPi->Clone("hist_d1_211_truncPart2");
 
-  treeDstar_sw->Draw("pi_SVDdEdx:pi_p>>hist_d1_211_truncPart1", "nSignalDstar_sw * (pi_SVDdEdx>0)", "goff");
-  treeDstar_sw->Draw("piS_SVDdEdx:piS_p>>hist_d1_211_truncPart2", "nSignalDstar_sw * (piS_SVDdEdx>0)", "goff");
+  treeDstar_sw->Draw("PionDSVDdEdx:PionDMomentum>>hist_d1_211_truncPart1", "nSignalDstar_sw * (PionDSVDdEdx>0)", "goff");
+  treeDstar_sw->Draw("SlowPionSVDdEdx:SlowPionMomentum>>hist_d1_211_truncPart2", "nSignalDstar_sw * (SlowPionSVDdEdx>0)", "goff");
   hDstarPi->Add(hDstarPiPart1);
   hDstarPi->Add(hDstarPiPart2);
 
@@ -563,8 +600,8 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
   TH2F* hGammaEPart1 = (TH2F*)hGammaE->Clone("hist_d1_11_truncPart1");
   TH2F* hGammaEPart2 = (TH2F*)hGammaE->Clone("hist_d1_11_truncPart2");
 
-  preselTree->Draw("e_1_SVDdEdx:e_1_p>>hist_d1_11_truncPart1", "e_1_SVDdEdx>0", "goff");
-  preselTree->Draw("e_2_SVDdEdx:e_2_p>>hist_d1_11_truncPart2", "e_2_SVDdEdx>0", "goff");
+  preselTree->Draw("FirstElectronSVDdEdx:FirstElectronMomentum>>hist_d1_11_truncPart1", "FirstElectronSVDdEdx>0", "goff");
+  preselTree->Draw("SecondElectronSVDdEdx:SecondElectronMomentum>>hist_d1_11_truncPart2", "SecondElectronSVDdEdx>0", "goff");
   hGammaE->Add(hGammaEPart1);
   hGammaE->Add(hGammaEPart2);
 

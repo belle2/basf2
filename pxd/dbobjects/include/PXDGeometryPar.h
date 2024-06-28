@@ -33,6 +33,7 @@ namespace Belle2 {
       m_cutOutWidth = geo.getCutOutWidth();
       m_cutOutHeight = geo.getCutOutHeight();
       m_cutOutRphi = geo.getCutOutRPhi();
+      m_cutOutShift = geo.getCutOutShift();
       m_cutOutStartPhi = geo.getCutOutStartPhi();
       m_cutOutDeltaPhi = geo.getCutOutDeltaPhi();
       m_nTubes = geo.getNTubes();
@@ -44,7 +45,6 @@ namespace Belle2 {
       m_tubesStartPhi = geo.getTubesStartPhi();
       m_tubesDeltaPhi = geo.getTubesDeltaPhi();
       m_tubesMaterial = geo.getTubesMaterial();
-      m_cutOutShift = geo.getCutOutShift();
     }
     //! Assignemnt operator
     PXDGeometryPar& operator=(PXDGeometryPar& geo)
@@ -58,6 +58,7 @@ namespace Belle2 {
       m_cutOutWidth = geo.getCutOutWidth();
       m_cutOutHeight = geo.getCutOutHeight();
       m_cutOutRphi = geo.getCutOutRPhi();
+      m_cutOutShift = geo.getCutOutShift();
       m_cutOutStartPhi = geo.getCutOutStartPhi();
       m_cutOutDeltaPhi = geo.getCutOutDeltaPhi();
       m_nTubes = geo.getNTubes();
@@ -69,7 +70,6 @@ namespace Belle2 {
       m_tubesStartPhi = geo.getTubesStartPhi();
       m_tubesDeltaPhi = geo.getTubesDeltaPhi();
       m_tubesMaterial = geo.getTubesMaterial();
-      m_cutOutShift = geo.getCutOutShift();
       return *this;
     }
     //! Destructor

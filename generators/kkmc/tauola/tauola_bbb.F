@@ -107,6 +107,8 @@ C JAK=0 INCLUSIVE:  JAK=1,2,3,4,5,6,7,8,...
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
       INTEGER IFEQUALBR
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER TauToElOrMu
+      COMMON /TauToElOrMu/ TauToElOrMu
 
       COMMON / IDFC  / IDF
 
@@ -155,6 +157,7 @@ C USER SELECTED LIST OF DECAYS
         IF (IFEQUALBR.LT.0) THEN
            CALL JAKEREQ(-1,JAK1)
            JAK2=0
+           IF (TauToElOrMu.EQ.1) JAK2=1
         ENDIF
 
 C AJWMOD to change BRs depending on sign:

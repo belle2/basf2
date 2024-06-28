@@ -48,6 +48,7 @@ class PythonVariableManager:
         '''
         instance = PythonVariableManager._instance()
         assert(instance.addAlias(alias, variable))
+        return alias
 
     def printAliases(self):
         '''

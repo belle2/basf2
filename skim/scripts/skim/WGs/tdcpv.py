@@ -129,7 +129,7 @@ class TDCPV_qqs(BaseSkim):
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
-        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'E>0.250', path=path)
+        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'clusterE>0.250', path=path)
         ma.cutAndCopyList('K_L0:klmLayers', 'K_L0:allklm', '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]', path=path)
         ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
 
@@ -216,14 +216,11 @@ class TDCPV_qqs(BaseSkim):
         # must be made here rather than at the top of the file.
         from validation_tools.metadata import ValidationMetadataSetter
 
-        ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.20 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
+        ma.reconstructDecay("B0:etap -> eta':SkimHighEff K_S0:merged", '5.2 < Mbc < 5.3 and abs(deltaE) < 0.3', path=path)
 
-        Kres = 'K_10'
-        ma.applyCuts('gamma:E15', '1.4 < E < 4', path=path)
-
-        ma.reconstructDecay(Kres + ":all -> K_S0:merged pi+:all pi-:all ", "", path=path)
-        ma.reconstructDecay("B0:Kspipig -> " + Kres + ":all gamma:E15",
-                            "Mbc > 5.2 and deltaE < 0.5 and deltaE > -0.5", path=path)
+        ma.reconstructDecay("K_10:all -> K_S0:merged pi+:all pi-:all ", "", path=path)
+        ma.reconstructDecay("B0:Kspipig -> K_10:all gamma:E15",
+                            "Mbc > 5.2 and abs(deltaE) < 0.5", path=path)
 
         variableshisto = [('deltaE', 100, -0.5, 0.5), ('Mbc', 100, 5.2, 5.3)]
         filename = f'{self}_Validation.root'
@@ -322,7 +319,7 @@ class TDCPV_ccs(BaseSkim):
         ma.applyCuts('pi0:eff60_May2020', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'E>0.15', path=path)
+        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'clusterE>0.15', path=path)
         ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
 
     def build_lists(self, path):

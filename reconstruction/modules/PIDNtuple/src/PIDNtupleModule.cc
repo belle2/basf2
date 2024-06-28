@@ -44,7 +44,6 @@ PIDNtupleModule::PIDNtupleModule() : Module(),
 {
   // set module description (e.g. insert text)
   setDescription("Writes a flat ntuple of PIDLikelihoods with track info into a root file");
-  setPropertyFlags(c_ParallelProcessingCertified);
 
   // Add parameters
   addParam("outputFileName", m_outputFileName, "Output file name",
@@ -55,7 +54,6 @@ PIDNtupleModule::PIDNtupleModule() : Module(),
   addParam("pMax", m_pMax, "make distribution flat up to this momentum", 3.0);
 }
 
-PIDNtupleModule::~PIDNtupleModule() { }
 
 void PIDNtupleModule::initialize()
 {
@@ -94,12 +92,12 @@ void PIDNtupleModule::initialize()
   m_tree->Branch("rhoDec", &m_pid.rhoDec, "rhoDec/F");
   m_tree->Branch("zDec",   &m_pid.zDec,   "zDec/F");
   m_tree->Branch("phiDec", &m_pid.phiDec, "phiDec/F");
-  m_tree->Branch("cdcdedx",  &m_pid.cdcdedx,  "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
-  m_tree->Branch("svddedx",  &m_pid.svddedx,  "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
-  m_tree->Branch("top",   &m_pid.top,   "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
-  m_tree->Branch("arich", &m_pid.arich, "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
-  m_tree->Branch("ecl",   &m_pid.ecl,   "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
-  m_tree->Branch("klm",   &m_pid.klm,   "le/F:lmu:lpi:lk:lp:flag/S:seen/S");
+  m_tree->Branch("svd",  &m_pid.svddedx,  "le/F:lmu:lpi:lk:lp:ld:flag/S:seen/S");
+  m_tree->Branch("cdc",  &m_pid.cdcdedx,  "le/F:lmu:lpi:lk:lp:ld:flag/S:seen/S");
+  m_tree->Branch("top",   &m_pid.top,   "le/F:lmu:lpi:lk:lp:ld:flag/S:seen/S");
+  m_tree->Branch("arich", &m_pid.arich, "le/F:lmu:lpi:lk:lp:ld:flag/S:seen/S");
+  m_tree->Branch("ecl",   &m_pid.ecl,   "le/F:lmu:lpi:lk:lp:ld:flag/S:seen/S");
+  m_tree->Branch("klm",   &m_pid.klm,   "le/F:lmu:lpi:lk:lp:ld:flag/S:seen/S");
 
   m_norm = 1;
   double p0 = m_p1 * log1p(4.0 * m_p2 / m_p1); // distribution peak
@@ -107,9 +105,6 @@ void PIDNtupleModule::initialize()
   m_value = momDistribution(m_pMax);
 }
 
-void PIDNtupleModule::beginRun()
-{
-}
 
 void PIDNtupleModule::event()
 {
@@ -166,6 +161,7 @@ void PIDNtupleModule::event()
     m_pid.cdcdedx.lpi = pid->getLogL(Const::pion, Const::CDC);
     m_pid.cdcdedx.lk = pid->getLogL(Const::kaon, Const::CDC);
     m_pid.cdcdedx.lp = pid->getLogL(Const::proton, Const::CDC);
+    m_pid.cdcdedx.ld = pid->getLogL(Const::deuteron, Const::CDC);
     m_pid.cdcdedx.flag = pid->isAvailable(Const::CDC);
     if (mcParticle)
       m_pid.cdcdedx.seen = mcParticle->hasSeenInDetector(Const::CDC);
@@ -175,6 +171,7 @@ void PIDNtupleModule::event()
     m_pid.svddedx.lpi = pid->getLogL(Const::pion, Const::SVD);
     m_pid.svddedx.lk = pid->getLogL(Const::kaon, Const::SVD);
     m_pid.svddedx.lp = pid->getLogL(Const::proton, Const::SVD);
+    m_pid.svddedx.ld = pid->getLogL(Const::deuteron, Const::SVD);
     m_pid.svddedx.flag = pid->isAvailable(Const::SVD);
     if (mcParticle)
       m_pid.svddedx.seen = mcParticle->hasSeenInDetector(Const::SVD);
@@ -184,6 +181,7 @@ void PIDNtupleModule::event()
     m_pid.top.lpi = pid->getLogL(Const::pion, Const::TOP);
     m_pid.top.lk = pid->getLogL(Const::kaon, Const::TOP);
     m_pid.top.lp = pid->getLogL(Const::proton, Const::TOP);
+    m_pid.top.ld = pid->getLogL(Const::deuteron, Const::TOP);
     m_pid.top.flag = pid->isAvailable(Const::TOP);
     if (mcParticle)
       m_pid.top.seen = mcParticle->hasSeenInDetector(Const::TOP);
@@ -193,6 +191,7 @@ void PIDNtupleModule::event()
     m_pid.arich.lpi = pid->getLogL(Const::pion, Const::ARICH);
     m_pid.arich.lk = pid->getLogL(Const::kaon, Const::ARICH);
     m_pid.arich.lp = pid->getLogL(Const::proton, Const::ARICH);
+    m_pid.arich.ld = pid->getLogL(Const::deuteron, Const::ARICH);
     m_pid.arich.flag = pid->isAvailable(Const::ARICH);
     if (mcParticle)
       m_pid.arich.seen = mcParticle->hasSeenInDetector(Const::ARICH);
@@ -202,6 +201,7 @@ void PIDNtupleModule::event()
     m_pid.ecl.lpi = pid->getLogL(Const::pion, Const::ECL);
     m_pid.ecl.lk = pid->getLogL(Const::kaon, Const::ECL);
     m_pid.ecl.lp = pid->getLogL(Const::proton, Const::ECL);
+    m_pid.ecl.ld = pid->getLogL(Const::deuteron, Const::ECL);
     m_pid.ecl.flag = pid->isAvailable(Const::ECL);
     if (mcParticle)
       m_pid.ecl.seen = mcParticle->hasSeenInDetector(Const::ECL);
@@ -211,6 +211,7 @@ void PIDNtupleModule::event()
     m_pid.klm.lpi = pid->getLogL(Const::pion, Const::KLM);
     m_pid.klm.lk = pid->getLogL(Const::kaon, Const::KLM);
     m_pid.klm.lp = pid->getLogL(Const::proton, Const::KLM);
+    m_pid.klm.ld = pid->getLogL(Const::deuteron, Const::KLM);
     m_pid.klm.flag = pid->isAvailable(Const::KLM);
     if (mcParticle)
       m_pid.klm.seen = mcParticle->hasSeenInDetector(Const::KLM);
@@ -221,8 +222,6 @@ void PIDNtupleModule::event()
 }
 
 
-void PIDNtupleModule::endRun() { }
-
 void PIDNtupleModule::terminate()
 {
   TDirectory::TContext context;
@@ -231,4 +230,3 @@ void PIDNtupleModule::terminate()
   m_file->Close();
 }
 
-void PIDNtupleModule::printModuleParams() const { }

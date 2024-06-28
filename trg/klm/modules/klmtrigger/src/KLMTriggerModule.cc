@@ -142,11 +142,18 @@ KLMTriggerModule::KLMTriggerModule() : Module()
   setDescription("KLM trigger simulation");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("nLayerTrigger", m_nLayerTrigger, "", 8);
-  int do_dump = 0;
-  addParam("do_dump", do_dump, "", 0);
-  get_IO_csv_handle().do_dump = do_dump > 0;
 
+
+  addParam("y_cutoff", y_cutoff, "", 500);
+  addParam("intercept_cutoff", m_intercept_cutoff, "", 500);
+
+  std::string dump_Path;
+  addParam("CSV_Dump_Path", dump_Path, "", dump_Path);
+
+  if (!dump_Path.empty()) {
+    get_IO_csv_handle().dump_path  = dump_Path;
+    get_IO_csv_handle().do_dump    = true;
+  }
 
 }
 
@@ -193,7 +200,7 @@ void KLMTriggerModule::initialize()
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
 // end unused
 
-  get_IO_csv_handle().dump_path  = "../development4/dump/";
+
 
 
 }
@@ -205,7 +212,7 @@ void KLMTriggerModule::beginRun()
   B2DEBUG(100, "KLMTrigger: Experiment " << evtMetaData->getExperiment() << ", run " << evtMetaData->getRun());
   if (not KLMTriggerParameters.isValid())
     B2FATAL("KLM trigger parameters are not available.");
-  m_nLayerTrigger = KLMTriggerParameters->getNLayers();
+
   try {
     m_layerUsed = layer_string_list_to_integer(KLMTriggerParameters->getWhichLayers());
     B2DEBUG(20, "KLMTrigger: m_layerUsed " << KLMTriggerParameters->getWhichLayers());
@@ -220,8 +227,11 @@ void KLMTriggerModule::beginRun()
   try {
     m_klmtrg_layer_counter = std::make_shared< Belle2::klmtrg_layer_counter_t>();
     m_klm_trig_linear_fit = std::make_shared< Belle2::klm_trig_linear_fit_t>();
+    m_klm_trig_linear_fit->set_y_cutoff(y_cutoff);
+    m_klm_trig_linear_fit->set_intercept_cutoff(m_intercept_cutoff);
 
-    m_klmtrg_layer_counter->set_NLayerTrigger(m_nLayerTrigger);
+
+    m_klmtrg_layer_counter->set_NLayerTrigger(KLMTriggerParameters->getNLayers());
 
     for (auto e : m_layerUsed) {
       m_klmtrg_layer_counter->add_layersUsed(e);
@@ -229,8 +239,7 @@ void KLMTriggerModule::beginRun()
 
 
     Belle2::KLM_TRG_definitions::KLM_geo_fit_t e{};
-    e.offsetX = 1627.0;
-    e.slopeX = 72.0;
+
 
     for (size_t i = 0 ; i < KLMTriggerParameters->getGeometryDataSize() ; ++i) {
       e.subdetector  = KLMTriggerParameters->getSubdetector(i);

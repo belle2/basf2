@@ -35,7 +35,7 @@ namespace Belle2 {
     virtual void terminate() override { };
 
   private: // Parameters
-    int m_nLayerTrigger = 0;
+
 
 
 
@@ -54,6 +54,10 @@ namespace Belle2 {
     std::vector<int> m_layerUsed;
     std::string m_dummy_used_layers;
     std::string m_geometry_fileName;
+
+    int y_cutoff = 100;
+    int m_intercept_cutoff = 500;
+
 
   };
 } // namespace Belle2

@@ -27,7 +27,7 @@ namespace Belle2 {
     void add_geometry(const KLM_TRG_definitions::KLM_geo_fit_t&  geometry);
     void set_y_cutoff(int cutoff);
     void set_intercept_cutoff(int cutoff);
-    void set_bklm_constant(KLM_TRG_definitions::subdetector sub);
+
 
     void run(const KLM_TRG_definitions::KLM_Digit_compact_ts&  hits);
 
@@ -41,16 +41,15 @@ namespace Belle2 {
     KLM_TRG_definitions::KLM_trig_linear_fits m_linear_fits;
     int y_cutoff = 100;
     int m_intercept_cutoff = 500;
-    using geo_t = nt::ntuple<KLM_TRG_definitions::geo_id, KLM_TRG_definitions::slopeY, KLM_TRG_definitions::offsetY>;
-    using geo_EKLM_t =
+
+    using geo_KLM_t =
       nt::ntuple<KLM_TRG_definitions::slopeX, KLM_TRG_definitions::offsetX, KLM_TRG_definitions::slopeY, KLM_TRG_definitions::offsetY>;
-    std::map<int64_t, geo_t> m_BKLMgeomap;
-    std::map<int64_t, geo_EKLM_t>
-    m_EKLMgeomap;
+
+    std::map<int64_t, geo_KLM_t> m_KLMgeomap;
+
     KLM_TRG_definitions::subdetector m_bklm_constant;
 
-    double m_bklm_slopeX;
-    double m_bklm_offsetX;
+
 
 
     using sections_trig_t =

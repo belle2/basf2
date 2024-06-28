@@ -143,29 +143,19 @@ namespace Belle2 {
 
   void klm_trig_linear_fit_t::clear_geometry()
   {
-    m_BKLMgeomap.clear();
-    m_EKLMgeomap.clear();
+    m_KLMgeomap.clear();
+
   }
 
   void klm_trig_linear_fit_t::add_geometry(const KLM_geo_fit_t& geometry)
   {
 
-    if (geometry.subdetector == m_bklm_constant) {
-      m_bklm_offsetX = geometry.offsetX;
-      m_bklm_slopeX = geometry.slopeX;
-      m_BKLMgeomap[get_index(geometry)] = geo_t{
-        geometry.geo_id,
-        geometry.slopeY,
-        geometry.offsetY
-      };
-    } else {
-      m_EKLMgeomap[geometry.section] = geo_EKLM_t{
-        geometry.slopeX,
-        geometry.offsetX,
-        geometry.slopeY,
-        geometry.offsetY
-      };
-    }
+    m_KLMgeomap[get_index(geometry)] = geo_KLM_t{
+      geometry.slopeX,
+      geometry.offsetX,
+      geometry.slopeY,
+      geometry.offsetY
+    };
 
 
   }
@@ -185,21 +175,10 @@ namespace Belle2 {
                    Belle2::KLM_TRG_definitions::y_pos(0)
                  );
 
-
-
-      if (e1.subdetector == m_bklm_constant) {
-        auto&& e2 = m_BKLMgeomap[get_index(e1)];
-        ret.x_pos.v = e1.layer * m_bklm_slopeX + m_bklm_offsetX;
-        ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
-      } else {
-        auto&& e2 = m_EKLMgeomap[e1.section];
-        ret.x_pos.v = e1.layer * e2.slopeX + e2.offsetX;
-        ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
-      }
-
-
+      auto&& e2 = m_KLMgeomap[get_index(e1)];
+      ret.x_pos.v = e1.layer * e2.slopeX + e2.offsetX;
+      ret.y_pos.v = e1.strip * e2.slopeY + e2.offsetY;
       return ret;
-
 
     }
                           );
@@ -324,11 +303,6 @@ namespace Belle2 {
   void klm_trig_linear_fit_t::set_intercept_cutoff(int cutoff)
   {
     m_intercept_cutoff = cutoff;
-  }
-
-  void klm_trig_linear_fit_t::set_bklm_constant(subdetector sub)
-  {
-    m_bklm_constant = sub;
   }
 
 }

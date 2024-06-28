@@ -1393,3 +1393,138 @@ class B0toDs1D(BaseSkim):
                             cut="[5.2 < Mbc < 5.3] and [-0.5 < deltaE < 0.5]", path=path)
 
         return ["B0:merged"]
+
+
+@fancy_skim_header
+class B0toDomegapi_Kpipi_pipipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0} \\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\omega (\\to \\pi^- \\pi^+ \\pi^0) \\pi^+`,
+
+    Cuts applied:
+
+    * ``1.84 < M_D < 1.90``
+    * ``0.70 < M_omega < 0.90``
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.25``
+    """
+
+    __authors__ = ["Dmitry Matvienko"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi0s("eff40_May2020Fit", path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.25"
+        omegacuts = "0.70 < M < 0.90"
+        Dcuts = "1.84 < M < 1.90"
+
+        ma.reconstructDecay(
+            "omega:B0toDomegapi_Kpipi_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay("D-:B0toDomegapi_Kpipi_pipipi0 -> K+:GoodTrack pi-:GoodTrack pi-:GoodTrack", Dcuts, path=path)
+        ma.reconstructDecay(
+            "B0:B0toDomegapi_Kpipi_pipipi0 -> D-:B0toDomegapi_Kpipi_pipipi0 omega:B0toDomegapi_Kpipi_pipipi0 pi+:GoodTrack",
+            Bcuts,
+            path=path)
+
+        return ["B0:B0toDomegapi_Kpipi_pipipi0"]
+
+
+@fancy_skim_header
+class B0toDomegapi_Kspi_pipipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0} \\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\omega (\\to \\pi^- \\pi^+ \\pi^0) \\pi^+`,
+
+    Cuts applied:
+
+    * ``1.84 < M_D < 1.90``
+    * ``0.70 < M_omega < 0.90``
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.25``
+    """
+
+    __authors__ = ["Dmitry Matvienko"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        stdPi0s("eff40_May2020Fit", path=path)
+        loadPiForBtoHadrons(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.25"
+        omegacuts = "0.70 < M < 0.90"
+        Dcuts = "1.84 < M < 1.90"
+
+        ma.reconstructDecay(
+            "omega:B0toDomegapi_Kspi_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay("D-:B0toDomegapi_Kspi_pipipi0 -> K_S0:merged pi-:GoodTrack", Dcuts, path=path)
+        ma.reconstructDecay(
+            "B0:B0toDomegapi_Kspi_pipipi0 -> D-:B0toDomegapi_Kspi_pipipi0 omega:B0toDomegapi_Kspi_pipipi0 pi+:GoodTrack",
+            Bcuts,
+            path=path)
+
+        return ["B0:B0toDomegapi_Kspi_pipipi0"]
+
+
+@fancy_skim_header
+class BtoD0pi_Kpiomega_pipipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{+} \\to \\bar{D}^{0} (\\to K^+ \\pi^- \\omega (\\to \\pi^- \\pi^+ \\pi^0)) \\pi^+`,
+
+    Cuts applied:
+
+    * ``1.7 < M_D < 2.0``
+    * ``0.73 < M_omega < 0.9``
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.25``
+    """
+
+    __authors__ = ["Dmitry Matvienko"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi0s("eff40_May2020Fit", path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.25"
+        omegacuts = "0.73 < M < 0.9"
+        Dcuts = "1.7 < M < 2.0"
+
+        ma.reconstructDecay(
+            "omega:BtoD0pi_Kpiomega_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay(
+            "anti-D0:BtoD0pi_Kpiomega_pipipi0 -> K+:GoodTrack pi-:GoodTrack omega:BtoD0pi_Kpiomega_pipipi0",
+            Dcuts,
+            path=path)
+        ma.reconstructDecay("B+:BtoD0pi_Kpiomega_pipipi0 -> anti-D0:BtoD0pi_Kpiomega_pipipi0 pi+:GoodTrack", Bcuts, path=path)
+
+        return ["B+:BtoD0pi_Kpiomega_pipipi0"]

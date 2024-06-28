@@ -47,10 +47,17 @@ C switch to initialize that all modes are represented equally.
       INTEGER IFEQUALBR
       DATA    IFEQUALBR /0/ 
       COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER IUSER
+      INTEGER USERACTIVE
+      COMMON /USERACTIVE/ USERACTIVE(100)
 C switch to generate charge conjugate taupair decays for alternate events
       INTEGER CHCONJUGATE
       DATA    CHCONJUGATE /0/
       COMMON /CHCONJUGATE/ CHCONJUGATE
+C switch to generate tau decays to electron or muon for alternate events [randomized]
+      INTEGER TauToElOrMu
+      DATA    TauToElOrMu /0/
+      COMMON /TauToElOrMu/ TauToElOrMu
       
 C     FF2PIRHO ! switch for the two pion form factor
 C     = 0 CLEO parametrization
@@ -153,10 +160,21 @@ C  KeyA1 is used for formfactors actually not in use
       IFCURR4PI = XPAR(ITAUXPAR+905)
       LAMDEC    = XPAR(ITAUXPAR+906)
       CHCONJUGATE= XPAR(ITAUXPAR+909)
+      TauToElOrMu= XPAR(ITAUXPAR+910)
+      IF (TauToElOrMu.EQ.1) JAK2=1
+C
+      DO IUSER = 1,100
+         USERACTIVE(IUSER) = 0
+      ENDDO
+      IF (IFEQUALBR.LT.0) THEN
+         DO IUSER = 1, -IFEQUALBR
+            USERACTIVE(IUSER) = XPAR(ITAUXPAR+1000+IUSER)
+         ENDDO
+      ENDIF
       
 C     Print functional flags
-      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE = ',
-     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE
+      WRITE(iout,*) 'FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE, TauToElOrMu = ',
+     $               FF2PIRHO, IRCHL3PI, IFKPIPI, IFCURR4PI, CHCONJUGATE, TauToElOrMu
 
       AMINVI    = XPAR(ITAUXPAR+911)
       ISPNVI    = INT(XPAR(ITAUXPAR+912))

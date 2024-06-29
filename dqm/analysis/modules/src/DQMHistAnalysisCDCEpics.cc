@@ -26,7 +26,7 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   addParam("HistPhiEff", m_histoPhiEff, "Phi Eff Histogram Name", std::string("hPhiEff"));
   addParam("PvPrefix", m_pvPrefix, "PV Prefix and Name", std::string("CDC:"));
   addParam("RefFilePhi", m_refNamePhi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
-  addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("Ref_CDCDQM"));
+  addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("ref/CDC/default"));
   addParam("MinEvt", m_minevt, "Min events for intra-run point", 20000);
   for (int i = 0; i < 300; i++) {
     m_hADCs[i] = nullptr;
@@ -61,8 +61,8 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
     m_fileRefPhi = TFile::Open(m_refNamePhi.data(), "READ");
     if (m_fileRefPhi && m_fileRefPhi->IsOpen()) {
       B2INFO("DQMHistAnalysisCDCEpics: reference (" << m_refNamePhi << ") found OK");
-      m_hist_refphi = (TH1D*)m_fileRefPhi->Get((m_refDir + "/cdcdqm_phiref").data());
-      if (!m_hist_refphi)B2INFO("\t .. but (histogram) not found");
+      m_histref_phiindex = (TH2F*)m_fileRefPhi->Get((m_refDir + "/hPhiIndex").data());
+      if (!m_histref_phiindex)B2INFO("\t .. but (histogram) not found");
       else B2INFO("\t ..and (cdcdqm_phiref) also exist");
     }
   }
@@ -98,7 +98,7 @@ void DQMHistAnalysisCDCEpicsModule::beginRun()
   double unused = 0;
   requestLimitsFromEpicsPVs("adcmedianwindow", unused, m_minadc, m_maxadc, unused);
   requestLimitsFromEpicsPVs("tdcmedianwindow", unused, m_mintdc, m_maxtdc, unused);
-  requestLimitsFromEpicsPVs("phicomparewindow", unused, m_phiwarn, m_phialarm, unused);
+  requestLimitsFromEpicsPVs("phicomparewindow", m_phialarm, m_phiwarn, unused, unused);
 
   //in case if something is wrong in config file
   if (std::isnan(m_minadc)) m_minadc = 60.0;
@@ -232,9 +232,10 @@ void DQMHistAnalysisCDCEpicsModule::event()
       m_hist_crphi->Scale(1.0 / maxnow);
       if (maxnow < 1000) isFew = true;
       else {
-        if (m_hist_refphi) {
-          double nbinnow = m_hist_crphi->GetNbinsX();
+        if (m_histref_phiindex) {
+          m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
           double nbinref = m_hist_refphi->GetNbinsX();
+          double nbinnow = m_hist_crphi->GetNbinsX();
           if (nbinref == nbinnow) { //same bins
             double maxref = m_hist_refphi->Integral();
             m_hist_refphi->Scale(1.0 / maxref);
@@ -253,7 +254,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     c_hist_crphi->cd();
     gPad->SetGridx(1);
     gPad->SetGridy(1);
-    if (!m_hist_refphi)m_hist_crphi->SetTitle(Form("%s (no ref file)", m_hist_crphi->GetTitle()));
+    if (!m_histref_phiindex)m_hist_crphi->SetTitle(Form("%s (no ref file)", m_hist_crphi->GetTitle()));
     m_hist_crphi->Draw("hist");
     if (isFew) colorizeCanvas(c_hist_crphi, c_StatusTooFew);
     else if (isAlarm)colorizeCanvas(c_hist_crphi, c_StatusError);

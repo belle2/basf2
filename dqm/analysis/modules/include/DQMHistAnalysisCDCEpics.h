@@ -115,6 +115,7 @@ namespace Belle2 {
     std::string m_refNamePhi = ""; /**< reference histogram of phi */
 
     TFile* m_fileRefPhi = nullptr; /**< reference histogram file point */
+    TH2F* m_histref_phiindex = nullptr; /**< for above*/
     TH1D* m_hist_refphi = nullptr; /**< for above*/
 
     int m_minevt;/**< min events for single intra-run point */

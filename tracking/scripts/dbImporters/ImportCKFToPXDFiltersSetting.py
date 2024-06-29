@@ -8,15 +8,15 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-# Import ckf_ToPXD_FiltersSetting payloads
+# Import CkfToPXDFiltersSetting payloads
 
-from ROOT.Belle2 import ckf_ToPXD_FiltersSetting, Database, IntervalOfValidity
+from ROOT.Belle2 import CkfToPXDFiltersSetting, Database, IntervalOfValidity
 
-ckfToPXDFiltersSetting_sensor = ckf_ToPXD_FiltersSetting()
+ckfToPXDFiltersSetting_sensor = CkfToPXDFiltersSetting()
 ckfToPXDFiltersSetting_sensor.setHitFilterName("sensor")
 ckfToPXDFiltersSetting_sensor.setSeedFilterName("sensor")
 
-ckfToPXDFiltersSetting_intercept = ckf_ToPXD_FiltersSetting()
+ckfToPXDFiltersSetting_intercept = CkfToPXDFiltersSetting()
 ckfToPXDFiltersSetting_intercept.setHitFilterName("intercept")
 ckfToPXDFiltersSetting_intercept.setSeedFilterName("intercept")
 ckfToPXDFiltersSetting_intercept.setPtThresholdTrackToHitCut(0.5)
@@ -32,10 +32,13 @@ ckfToPXDFiltersSetting_intercept.setPXDInterceptsName("PXDIntercepts")
 
 database = Database.Instance()
 
+payloadname = "ckf_" + ckfToPXDFiltersSetting_intercept.ClassName().replace("Belle2::", "", 1)
+print("Storing payload under name: " + payloadname)
+
 iov = IntervalOfValidity(0, 0, 0, -1)
-database.storeData('ckf_toPXD_FiltersSetting', ckfToPXDFiltersSetting_sensor, iov)
+database.storeData(payloadname, ckfToPXDFiltersSetting_sensor, iov)
 iov = IntervalOfValidity(1003, 0, 1003, -1)
-database.storeData('ckf_toPXD_FiltersSetting', ckfToPXDFiltersSetting_sensor, iov)
+database.storeData(payloadname, ckfToPXDFiltersSetting_sensor, iov)
 
 iov = IntervalOfValidity(1004, 0, 1004, -1)
-database.storeData('ckf_toPXD_FiltersSetting', ckfToPXDFiltersSetting_intercept, iov)
+database.storeData(payloadname, ckfToPXDFiltersSetting_intercept, iov)

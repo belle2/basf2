@@ -15,15 +15,15 @@ namespace Belle2 {
    * - the toPXD CKF hitFilter and seedFilter names
    * - the parameters values for the `intercept` filters only
    */
-  class ckf_ToPXD_FiltersSetting: public TObject {
+  class CkfToPXDFiltersSetting: public TObject {
 
   public:
 
     /** Default constructor, parameters set to NaN */
-    ckf_ToPXD_FiltersSetting();
+    CkfToPXDFiltersSetting();
 
     /** Destructor */
-    ~ckf_ToPXD_FiltersSetting() {}
+    ~CkfToPXDFiltersSetting() {}
 
     /** Set the hitFilterName
      * @param hitFilterName name of the hitFilter
@@ -45,7 +45,7 @@ namespace Belle2 {
      */
     void setPtThresholdTrackToHitCut(const double PtThresholdTrackToHitCut)
     {
-      m_param_PtThresholdTrackToHitCut = PtThresholdTrackToHitCut;
+      m_paramPtThresholdTrackToHitCut = PtThresholdTrackToHitCut;
     }
 
     /** Set the PhiInterceptToHitCut
@@ -53,7 +53,7 @@ namespace Belle2 {
      */
     void setPhiInterceptToHitCut(const double PhiInterceptToHitCut)
     {
-      m_param_PhiInterceptToHitCut = PhiInterceptToHitCut;
+      m_paramPhiInterceptToHitCut = PhiInterceptToHitCut;
     }
 
     /** Set the EtaInterceptToHitCut
@@ -61,7 +61,7 @@ namespace Belle2 {
      */
     void setEtaInterceptToHitCut(const double EtaInterceptToHitCut)
     {
-      m_param_EtaInterceptToHitCut = EtaInterceptToHitCut;
+      m_paramEtaInterceptToHitCut = EtaInterceptToHitCut;
     }
 
     /** Set the PhiRecoTrackToHitCut
@@ -69,7 +69,7 @@ namespace Belle2 {
      */
     void setPhiRecoTrackToHitCut(const double PhiRecoTrackToHitCut)
     {
-      m_param_PhiRecoTrackToHitCut = PhiRecoTrackToHitCut;
+      m_paramPhiRecoTrackToHitCut = PhiRecoTrackToHitCut;
     }
 
     /** Set the EtaRecoTrackToHitCut
@@ -77,7 +77,7 @@ namespace Belle2 {
      */
     void setEtaRecoTrackToHitCut(const double EtaRecoTrackToHitCut)
     {
-      m_param_EtaRecoTrackToHitCut = EtaRecoTrackToHitCut;
+      m_paramEtaRecoTrackToHitCut = EtaRecoTrackToHitCut;
     }
 
     /** Set the PhiHitHitCut
@@ -85,7 +85,7 @@ namespace Belle2 {
      */
     void setPhiHitHitCut(const double PhiHitHitCut)
     {
-      m_param_PhiHitHitCut = PhiHitHitCut;
+      m_paramPhiHitHitCut = PhiHitHitCut;
     }
 
     /** Set the EtaHitHitCut
@@ -93,7 +93,7 @@ namespace Belle2 {
      */
     void setEtaHitHitCut(const double EtaHitHitCut)
     {
-      m_param_EtaHitHitCut = EtaHitHitCut;
+      m_paramEtaHitHitCut = EtaHitHitCut;
     }
 
     /** Set the PhiOverlapHitHitCut
@@ -101,7 +101,7 @@ namespace Belle2 {
      */
     void setPhiOverlapHitHitCut(const double PhiOverlapHitHitCut)
     {
-      m_param_PhiOverlapHitHitCut = PhiOverlapHitHitCut;
+      m_paramPhiOverlapHitHitCut = PhiOverlapHitHitCut;
     }
 
     /** Set the EtaOverlapHitHitCut
@@ -109,7 +109,7 @@ namespace Belle2 {
      */
     void setEtaOverlapHitHitCut(const double EtaOverlapHitHitCut)
     {
-      m_param_EtaOverlapHitHitCut = EtaOverlapHitHitCut;
+      m_paramEtaOverlapHitHitCut = EtaOverlapHitHitCut;
     }
 
     /** Set the PXDInterceptsName
@@ -117,7 +117,7 @@ namespace Belle2 {
      */
     void setPXDInterceptsName(const std::string PXDInterceptsName)
     {
-      m_param_PXDInterceptsName = PXDInterceptsName;
+      m_paramPXDInterceptsName = PXDInterceptsName;
     }
 
     /** Get the hitFilterName
@@ -130,43 +130,43 @@ namespace Belle2 {
 
     /** Get the PtThresholdTrackToHitCut
      */
-    const double& getPtThresholdTrackToHitCut() const { return this->m_param_PtThresholdTrackToHitCut; }
+    const double& getPtThresholdTrackToHitCut() const { return this->m_paramPtThresholdTrackToHitCut; }
 
     /** Get the PhiInterceptToHitCut
      */
-    const double& getPhiInterceptToHitCut() const { return this->m_param_PhiInterceptToHitCut; }
+    const double& getPhiInterceptToHitCut() const { return this->m_paramPhiInterceptToHitCut; }
 
     /** Get the EtaInterceptToHitCut
      */
-    const double& getEtaInterceptToHitCut() const { return this->m_param_EtaInterceptToHitCut; }
+    const double& getEtaInterceptToHitCut() const { return this->m_paramEtaInterceptToHitCut; }
 
     /** Get the PhiRecoTrackToHitCut
      */
-    const double& getPhiRecoTrackToHitCut() const { return this->m_param_PhiRecoTrackToHitCut; }
+    const double& getPhiRecoTrackToHitCut() const { return this->m_paramPhiRecoTrackToHitCut; }
 
     /** Get the EtaRecoTrackToHitCut
      */
-    const double& getEtaRecoTrackToHitCut() const { return this->m_param_EtaRecoTrackToHitCut; }
+    const double& getEtaRecoTrackToHitCut() const { return this->m_paramEtaRecoTrackToHitCut; }
 
     /** Get the PhiHitHitCut
      */
-    const double& getPhiHitHitCut() const { return this->m_param_PhiHitHitCut; }
+    const double& getPhiHitHitCut() const { return this->m_paramPhiHitHitCut; }
 
     /** Get the EtaHitHitCut
      */
-    const double& getEtaHitHitCut() const { return this->m_param_EtaHitHitCut; }
+    const double& getEtaHitHitCut() const { return this->m_paramEtaHitHitCut; }
 
     /** Get the PhiOverlapHitHitCut
      */
-    const double& getPhiOverlapHitHitCut() const { return this->m_param_PhiOverlapHitHitCut; }
+    const double& getPhiOverlapHitHitCut() const { return this->m_paramPhiOverlapHitHitCut; }
 
     /** Get the EtaOverlapHitHitCut
      */
-    const double& getEtaOverlapHitHitCut() const { return this->m_param_EtaOverlapHitHitCut; }
+    const double& getEtaOverlapHitHitCut() const { return this->m_paramEtaOverlapHitHitCut; }
 
     /** Get the PXDInterceptsName
      */
-    const std::string& getPXDInterceptsName() const { return this->m_param_PXDInterceptsName; }
+    const std::string& getPXDInterceptsName() const { return this->m_paramPXDInterceptsName; }
 
 
   private:
@@ -181,26 +181,26 @@ namespace Belle2 {
     // the seed filter parameter values are not stored in this payload
 
     /** Treshold on pT to apply inverse pT scale on cut value */
-    double m_param_PtThresholdTrackToHitCut;
+    double m_paramPtThresholdTrackToHitCut;
     /** Cut in phi for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state */
-    double m_param_PhiInterceptToHitCut;
+    double m_paramPhiInterceptToHitCut;
     /** Cut in eta for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state*/
-    double m_param_EtaInterceptToHitCut;
+    double m_paramEtaInterceptToHitCut;
     /** Cut in phi for the difference between RecoTrack information and current hit-based state */
-    double m_param_PhiRecoTrackToHitCut;
+    double m_paramPhiRecoTrackToHitCut;
     /** Cut in eta for the difference between RecoTrack information and current hit-based state */
-    double m_param_EtaRecoTrackToHitCut;
+    double m_paramEtaRecoTrackToHitCut;
     /** Cut in phi between two hit-based states*/
-    double m_param_PhiHitHitCut;
+    double m_paramPhiHitHitCut;
     /** Cut in eta between two hit-based states*/
-    double m_param_EtaHitHitCut;
+    double m_paramEtaHitHitCut;
     /** Cut in phi between two hit-based states in ladder overlap*/
-    double m_param_PhiOverlapHitHitCut;
+    double m_paramPhiOverlapHitHitCut;
     /** Cut in eta between two hit-based states in ladder overlap */
-    double m_param_EtaOverlapHitHitCut;
+    double m_paramEtaOverlapHitHitCut;
     /** Name of the PXDIntercepts StoreArray */
-    std::string m_param_PXDInterceptsName = "not set";
+    std::string m_paramPXDInterceptsName = "not set";
 
-    ClassDef(ckf_ToPXD_FiltersSetting, 1);  /**< ClassDef, necessary for ROOT */
+    ClassDef(CkfToPXDFiltersSetting, 1);  /**< ClassDef, necessary for ROOT */
   };
 }

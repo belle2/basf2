@@ -32,7 +32,7 @@ ckfToPXDFiltersSetting_intercept.setPXDInterceptsName("PXDIntercepts")
 
 database = Database.Instance()
 
-payloadname = "ckf_" + ckfToPXDFiltersSetting_intercept.ClassName().replace("Belle2::", "", 1)
+payloadname = "ckf_ToPXD_FiltersSetting"
 print("Storing payload under name: " + payloadname)
 
 iov = IntervalOfValidity(0, 0, 0, -1)

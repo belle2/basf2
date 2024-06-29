@@ -11,6 +11,9 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 
+#include <map>
+#include <string>
+
 namespace Belle2 {
 
   /**
@@ -160,6 +163,21 @@ namespace Belle2 {
      */
     std::string getInfoHTML() const override;
 
+    /**
+     * Add the pre-official likelihood
+     * @param preOfficialIdentifier Name of the pre-official likelihood
+     * @param preOfficialLikelihood Value of the pre-official likelihood
+     */
+    void addPreOfficialLikelihood(const std::string& preOfficialIdentifier,
+                                  const double preOfficialLikelihood);
+
+    /**
+     * Get the pre-official likelihood
+     * @param preOfficialIdentifier Name of the pre-official likelihood
+     * @return Value of the pre-official likelihood
+     */
+    double getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const;
+
   private:
 
     /**
@@ -175,7 +193,10 @@ namespace Belle2 {
     Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
     float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
 
-    ClassDefOverride(PIDLikelihood, 3); /**< ClassDef */
+    /// Internal storage of pre-official likelihood.
+    std::map<std::string, double> m_preOfficialLikelihoods;
+
+    ClassDefOverride(PIDLikelihood, 4); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
 
   };
 

@@ -80,10 +80,10 @@ void KLMMuonIDDNNExpertModule::beginRun()
     if (m_weightfile_representation.hasChanged()) {
       std::stringstream ss(m_weightfile_representation->m_data);
       auto weightfile = MVA::Weightfile::loadFromStream(ss);
-      init_mva(weightfile);
+      initializeMVA(weightfile);
     }
   } else {
-    B2FATAL("Payload " << m_identifier << " is not found in the loaded globaltags!");
+    B2FATAL("Payload " << m_identifier << " is not valid!");
   }
 }
 
@@ -91,7 +91,7 @@ void KLMMuonIDDNNExpertModule::endRun()
 {
 }
 
-void KLMMuonIDDNNExpertModule::init_mva(MVA::Weightfile& weightfile)
+void KLMMuonIDDNNExpertModule::initializeMVA(MVA::Weightfile& weightfile)
 {
   auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
   MVA::GeneralOptions general_options;

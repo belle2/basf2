@@ -72,17 +72,12 @@ namespace Belle2 {
 
   private:
 
-    /** Required array for Tracks. */
-    StoreArray<Track> m_tracks;
-
-    /** Input variables of DNN. */
-    StoreArray<KLMMuonIDDNNInputVariable> m_inputVariable;
-
     /**
      * Initialize mva expert, dataset and features.
      * Called every time the weightfile in the database changes in begin run.
+     * @param[in] weightfile weightfile of the MVA model.
     */
-    void init_mva(MVA::Weightfile& weightfile);
+    void initializeMVA(MVA::Weightfile& weightfile);
 
     /**
      * Get the NN-based muon probability.
@@ -92,11 +87,18 @@ namespace Belle2 {
      */
     float getNNmuProbability(const Track* track, const KLMMuidLikelihood* klmll);
 
-    /** Total BKLM layers. */
-    static constexpr int m_maxBKLMLayers = BKLMElementNumbers::getMaximalLayerNumber();
+    /**
+     * Get Hit width (cluster size) of a KLMHit2d.
+     * @param[in] klmhit target KLMHit2d object.
+     * @return hit width of the KLMHit2d object.
+     */
+    float getHitWidth(const KLMHit2d* klmhit);
 
-    /** Total EKLM layers. */
-    static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
+    /** Required array for Tracks. */
+    StoreArray<Track> m_tracks;
+
+    /** Input variables of DNN. */
+    StoreArray<KLMMuonIDDNNInputVariable> m_inputVariable;
 
     /** Database identifier or file used to load the weights. */
     const std::string m_identifier = "KLMMuonIDDNNWeightFile";
@@ -110,17 +112,11 @@ namespace Belle2 {
     /** Pointer to the current dataset. */
     std::unique_ptr<MVA::SingleDataset> m_dataset;
 
-    /** Container of hit widths of one track. */
-    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_width;
+    /** Total BKLM layers. */
+    static constexpr int m_maxBKLMLayers = BKLMElementNumbers::getMaximalLayerNumber();
 
-    /** Container of hit steplength of one track. */
-    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_steplength;
-
-    /** Container of hit chi2 of one track. */
-    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_chi2;
-
-    /** Container of extrapolation situation at each KLM layer of one track. */
-    std::array < bool, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_hasext;
+    /** Total EKLM layers. */
+    static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
 
     /** BKLM phi-measuring strip width (cm) by layer. */
     std::array < float, m_maxBKLMLayers > m_BarrelPhiStripWidth;
@@ -131,12 +127,17 @@ namespace Belle2 {
     /** EKLM scintillator strip width (cm). */
     float m_EndcapScintWidth;
 
-    /**
-     * Get Hit width (cluster size) of a KLMHit2d.
-     * @param[in] klmhit target KLMHit2d object.
-     * @return hit width of the KLMHit2d object.
-     */
-    float getHitWidth(const KLMHit2d* klmhit);
+    /** Container of hit widths of one track. Hit pattern variable. */
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_width;
+
+    /** Container of hit steplength of one track. Hit pattern variable. */
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_steplength;
+
+    /** Container of hit chi2 of one track. Hit pattern variable. */
+    std::array < float, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_chi2;
+
+    /** Container of extrapolation situation at each KLM layer of one track. Hit pattern variable. */
+    std::array < bool, m_maxBKLMLayers + m_maxEKLMLayers > m_hitpattern_hasext;
 
   };
 }

@@ -666,6 +666,7 @@ V0#2:
     -> Tracks#9
     -> Tracks#14
   getV0Hypothesis(): <type: Lambda0>
+No data for Kinks
 TrackFitResult#0:
 [INFO] Conditions Database: found working metadata provider
 	provider = ${BELLE2_CONDB_METADATA}
@@ -12045,6 +12046,7 @@ V0#15:
     -> Tracks#16
     -> Tracks#12
   getV0Hypothesis(): <type: anti-Lambda0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (-0.153828,0.173653,0.00878871,0.270879)
   getChargeSign(): 1
@@ -21833,6 +21835,7 @@ V0#3:
     -> Tracks#7
     -> Tracks#4
   getV0Hypothesis(): <type: anti-Lambda0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (0.160134,0.129692,-0.0190537,0.249612)
   getChargeSign(): -1

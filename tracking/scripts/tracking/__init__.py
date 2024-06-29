@@ -279,7 +279,7 @@ def add_prefilter_tracking_reconstruction(path, components=None, skipGeometryAdd
 
 def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=False, reco_tracks="RecoTracks",
                                            use_second_cdc_hits=False, prune_temporary_tracks=True, v0_finding=True,
-                                           flip_recoTrack=True, mcTrackFinding=False):
+                                           flip_recoTrack=True, mcTrackFinding=False, kink_finding=True):
     """
     This function adds the tracking reconstruction modules not required to calculate HLT filter
     decision to a path.
@@ -307,6 +307,10 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     # V0 finding
     if v0_finding:
         path.add_module('V0Finder', RecoTracks=reco_tracks, v0FitterMode=1)
+
+    # Kink finding
+    if kink_finding:
+        path.add_module('KinkFinder', RecoTracks=reco_tracks)
 
     # estimate the track time
     path.add_module('TrackTimeEstimator')

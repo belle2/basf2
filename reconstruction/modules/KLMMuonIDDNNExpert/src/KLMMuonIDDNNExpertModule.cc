@@ -39,11 +39,6 @@ KLMMuonIDDNNExpertModule::KLMMuonIDDNNExpertModule() : Module()
   // Set module properties
   setDescription(R"DOC(Get information from KLMMuIDLikelihood)DOC");
   setPropertyFlags(c_ParallelProcessingCertified);
-
-  // Parameter definitions
-  addParam("identifier", m_identifier,
-           "Database identifier or file used to load the weights.",
-           m_identifier);
 }
 
 KLMMuonIDDNNExpertModule::~KLMMuonIDDNNExpertModule()
@@ -56,11 +51,6 @@ void KLMMuonIDDNNExpertModule::initialize()
 
   m_inputVariable.registerInDataStore();
   m_tracks.registerRelationTo(m_inputVariable);
-
-  if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
-    m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
-                                  DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
-  }
 
   // setup KLM geometry
   bklm::GeometryPar* bklmGeometry = bklm::GeometryPar::instance();
@@ -86,15 +76,14 @@ void KLMMuonIDDNNExpertModule::terminate()
 
 void KLMMuonIDDNNExpertModule::beginRun()
 {
-  if (m_weightfile_representation) {
-    if (m_weightfile_representation->hasChanged()) {
-      std::stringstream ss((*m_weightfile_representation)->m_data);
+  if (m_weightfile_representation.isValid()) {
+    if (m_weightfile_representation.hasChanged()) {
+      std::stringstream ss(m_weightfile_representation->m_data);
       auto weightfile = MVA::Weightfile::loadFromStream(ss);
       init_mva(weightfile);
     }
   } else {
-    auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
-    init_mva(weightfile);
+    B2FATAL("Payload " << m_identifier << " is not found in the loaded globaltags!");
   }
 }
 

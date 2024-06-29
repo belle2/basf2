@@ -99,10 +99,10 @@ namespace Belle2 {
     static constexpr int m_maxEKLMLayers = EKLMElementNumbers::getMaximalLayerNumber();
 
     /** Database identifier or file used to load the weights. */
-    std::string m_identifier = "KLMMuonIDDNNWeightFile";
+    const std::string m_identifier = "KLMMuonIDDNNWeightFile";
 
     /** Database pointer to the database representation of the weightfile. */
-    std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>> m_weightfile_representation;
+    DBObjPtr<DatabaseRepresentationOfWeightfile> m_weightfile_representation{m_identifier};
 
     /** Pointer to the current MVA expert. */
     std::unique_ptr<MVA::Expert> m_expert;

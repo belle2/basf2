@@ -124,16 +124,14 @@ void KLMMuonIDDNNExpertModule::event()
     m_hitpattern_hasext.fill(0);
 
     bool hasExtInKLM = false;
-    RelationVector<ExtHit> ExtHitrelation = track.getRelationsTo<ExtHit>();
-    for (unsigned long int ii = 0; ii < ExtHitrelation.size(); ii++) {
-      ExtHit* exthit = ExtHitrelation[ii];
+    for (const ExtHit& exthit : track.getRelationsTo<ExtHit>()) {
 
-      if (exthit->getDetectorID() != Const::EDetector::BKLM
-          and exthit->getDetectorID() != Const::EDetector::EKLM) continue;
+      if (exthit.getDetectorID() != Const::EDetector::BKLM
+          and exthit.getDetectorID() != Const::EDetector::EKLM) continue;
 
       int layer;
-      bool inBKLM = (exthit->getDetectorID() == Const::EDetector::BKLM);
-      int copyid = exthit->getCopyID();
+      bool inBKLM = (exthit.getDetectorID() == Const::EDetector::BKLM);
+      int copyid = exthit.getCopyID();
 
       int section, sector, plane, strip;
 

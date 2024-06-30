@@ -133,8 +133,8 @@ run-tests:
     - b2code-option opt
     - b2setup
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
-    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 720
-    - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 720
+    - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 780
+    - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 780
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 build-clang:

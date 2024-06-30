@@ -241,11 +241,10 @@ void DQMHistAnalysisCDCEpicsModule::event()
             m_hist_refphi->Scale(1.0 / maxref);
             double maxphidiff = 0;
             double maxphidiff_angle = 0;
-            double phidiff = 0;
             for (int iphi = 0; iphi < nbinnow; iphi++) {
               double icnow = m_hist_crphi->GetBinContent(iphi + 1);
               double icref = m_hist_refphi->GetBinContent(iphi + 1);
-              phidiff = fabs(icnow - icref);
+              double phidiff = fabs(icnow - icref);
               if (phidiff > m_phiwarn)isWarn = true;
               if (phidiff > m_phialarm)isAlarm = true;
               if (phidiff > maxphidiff) {

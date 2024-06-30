@@ -204,6 +204,9 @@ namespace Belle2 {
     return m_sectorDeadMap;
   }
 
+  /**
+   * Set palette for sector dead-chip map.
+   */
   void deadPalette()
   {
     static Int_t colors[50];

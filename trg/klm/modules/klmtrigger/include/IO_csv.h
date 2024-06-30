@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "ntuples_full.h"
+#include "trg/klm/modules/klmtrigger/ntuples_full.h"
 
 
 template <int N = 0>

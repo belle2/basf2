@@ -9,7 +9,7 @@
 
 #pragma once
 #include <vector>
-#include "KLMAxis.h"
+#include "trg/klm/modules/klmtrigger/KLMAxis.h"
 
 
 namespace Belle2 {

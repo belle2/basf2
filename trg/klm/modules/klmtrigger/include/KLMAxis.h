@@ -10,7 +10,7 @@
 #pragma once
 
 
-#include "ntuples_full.h"
+#include "trg/klm/modules/klmtrigger/ntuples_full.h"
 #include <cstdint>
 
 

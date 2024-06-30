@@ -117,8 +117,8 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   // write them to the output file
   for (const auto& obj : objts) {
     // of object already exists rewrite it
-    if (exist) f->Delete((obj.second)->GetName() + TString(";*"));
-    (obj.second)->Write();
+    if (exist) f->Delete(obj.second.GetName() + TString(";*"));
+    obj.second.Write();
   }
   f->Close();
 
@@ -186,14 +186,13 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   else b_procID->SetAddress(procID);
 
 
-  const MonObjList& objts =  getMonObjList();
+  auto& objts =  getMonObjList();
   // write them to the output file
-  for (const auto& obj : objts) {
-    std::map<std::string, float>& vars = const_cast<std::map<std::string, float>&>((obj.second)->getVariables());
-    std::map<std::string, float>& upErr = const_cast<std::map<std::string, float>&>((obj.second)->getUpError());
-    std::map<std::string, float>& lowErr = const_cast<std::map<std::string, float>&>((obj.second)->getLowError());
-
-    const std::vector<std::pair<std::string, std::string>>& strVars = (obj.second)->getStringVariables();
+  for (auto& obj : objts) {
+    auto& vars = const_cast<std::map<std::string, float>&>(obj.second.getVariables());
+    auto& upErr = const_cast<std::map<std::string, float>&>(obj.second.getUpError());
+    auto& lowErr = const_cast<std::map<std::string, float>&>(obj.second.getLowError());
+    auto& strVars = obj.second.getStringVariables();
 
     for (auto& var : vars) {
       std::string brname = obj.first + "_" + var.first;

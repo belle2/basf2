@@ -143,6 +143,9 @@ namespace Belle2 {
     /** efficiency ratio alarm threshold **/
     float m_alarmThr = 0;
 
+    /** efficiency ratio (run-)stop threshold **/
+    float m_stopThr = 0;
+
     /** efficiency ratio min z scale **/
     float m_min = 0;
 

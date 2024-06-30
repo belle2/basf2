@@ -74,6 +74,9 @@ _RegisteredSkims = [
     ("12160100", "ewp", "BtoXgamma"),
     ("12160200", "ewp", "BtoXll"),
     ("12160300", "ewp", "BtoXll_LFV"),
+    ("12120400", "ewp", "B0TwoBody"),
+    ("12120500", "ewp", "FourLepton"),
+    ("12120600", "ewp", "RadiativeDilepton"),
     # ("12160400", "ewp", "inclusiveBplusToKplusNuNu"), # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---
@@ -115,6 +118,9 @@ _RegisteredSkims = [
     ("14121300", "btocharm", "B0toD0Kpipi0_pi0"),
     ("14160200", "btocharm", "B0toDs1D"),
     ("14160201", "btocharm", "B0toDDs0star"),
+    ("14141701", "btocharm", "B0toDomegapi_Kpipi_pipipi0"),
+    ("14141702", "btocharm", "B0toDomegapi_Kspi_pipipi0"),
+    ("14141703", "btocharm", "BtoD0pi_Kpiomega_pipipi0"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -137,8 +143,9 @@ _RegisteredSkims = [
     # Charmed baryons
     ("17230900", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
-    ("17231100", "charm", "XictoXimpippim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
+    ("17231100", "charm", "XicToXimPipPim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
     ("17231200", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
+    ("17231300", "charm", "XicpToLKsHp"),  # Xi_c+ -> Lambda Ks h+, Xi- pi+ h+
     # D* -> D0
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)
@@ -158,8 +165,8 @@ _RegisteredSkims = [
     ("17222100", "charm", "DpToKsHp"),  # D+ -> Ks pi+
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
-    ("17220100", "charm", "DpToPipepem"),  # D+ -> pi+ e+ e-
-    ("17220200", "charm", "DpToPipmupmum"),  # D+ -> pi+ mu+ mu-
+    ("17220100", "charm", "DpToPipEpEm"),  # D+ -> pi+ e+ e-
+    ("17220200", "charm", "DpToPipMupMum"),  # D+ -> pi+ mu+ mu-
     ("17220300", "charm", "DpToPipKpKm"),  # D+ -> pi+ K+ K-
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
@@ -192,6 +199,7 @@ _RegisteredSkims = [
 
     # --- WG9: Charmless B decays ---
     ("19120100", "btocharmless", "BtoPi0Pi0"),
+    ("19130600", "btocharmless", "BtoPi0Eta"),
     ("19130201", "btocharmless", "BtoHadTracks"),
     ("19130300", "btocharmless", "BtoHad1Pi0"),
     ("19130310", "btocharmless", "BtoHad3Tracks1Pi0"),

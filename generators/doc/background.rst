@@ -61,4 +61,3 @@ Modules in this project:
 .. autoclass:: smartBKG.b2modules.NN_trainer_module.SaveFlag
 .. autoclass:: smartBKG.b2modules.NN_trainer_module.TrainDataSaver
 .. autoclass:: smartBKG.b2modules.NN_trainer_module.data_production
-.. autoclass:: smartBKG.b2modules.NN_filter_module.NNFilterModule  

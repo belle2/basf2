@@ -20,7 +20,7 @@ Changes since release-08
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-00
+   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-01
       :widths: 50 25 25
       :header-rows: 1
 
@@ -75,9 +75,6 @@ Changes since release-08
       * - python
         - 3.8.8
         - 3.11.9
-      * - PyTorch
-        -
-        - 2.2.2
       * - ROOT
         - 6.24/06
         - 6.26/14
@@ -237,15 +234,12 @@ Changes since release-08
       * - docutils
         - 0.17.1
         - 0.21.2
-      * - dynesty
-        -
-        - 2.1.3
       * - entrypoints
         - 0.3
         - removed
       * - eoshep
         - 1.0.1
-        - 1.0.11
+        - removed
       * - executing
         -
         - 2.0.1
@@ -647,7 +641,7 @@ Changes since release-08
         - 3.1.2
       * - pypmc
         - 1.2
-        - 1.2.3
+        - removed
       * - pyroofit
         - 0.9.6
         - removed

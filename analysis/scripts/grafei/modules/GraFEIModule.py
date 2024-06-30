@@ -312,6 +312,10 @@ class GraFEIModule(b2.Module):
             graFEI_nLeptons_postFit = graFEI_nElectrons_postFit + graFEI_nMuons_postFit
             graFEI_nOthers_postFit = (predicted_masses == 0).sum()
 
+            # Assign new mass hypotheses as extraInfo
+            for i, p in enumerate(p_list):
+                p.addExtraInfo("graFEI_massHypothesis", predicted_masses[i])
+
             # Get square matrices
             edge_probability_square = torch.sparse_coo_tensor(
                 edge_index, edge_probability

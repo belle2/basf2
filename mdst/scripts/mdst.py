@@ -18,6 +18,7 @@ MDST_OBJECTS = (
     'EventLevelTrackingInfo',
     'EventLevelTriggerTimeInfo',
     'KLMClusters',
+    'Kinks',
     'KlIds',
     'PIDLikelihoods',
     'SoftwareTriggerResult',
@@ -109,6 +110,11 @@ def add_mdst_dump(path, print_untested=False):
             ], {
             "getRelationsWith": ["MCParticles"],
         }),
+        DataStorePrinter("Kinks", [
+            "getMotherTrackIndex", "getDaughterTrackIndex", "getTrackFitResultIndexMotherStart",
+            "getTrackFitResultIndexMotherEnd", "getTrackFitResultIndexDaughter",
+            "getFittedVertexX", "getFittedVertexY", "getFittedVertexZ", "getFilterFlag"
+            ]),
         DataStorePrinter("TrackFitResult", [
             "getPosition", "getMomentum", "get4Momentum", "getEnergy", "getTransverseMomentum",
             "getCovariance6", "getParticleType", "getChargeSign", "getPValue", "getD0", "getPhi0",
@@ -122,10 +128,12 @@ def add_mdst_dump(path, print_untested=False):
             "hasSVDCKFAbortionFlag", "hasPXDCKFAbortionFlag", "hasSVDSpacePointCreatorAbortionFlag"], {
             "hasCDCLayer": range(56)
         }, array=False),
-        DataStorePrinter("PIDLikelihood", ["getMostLikely"], {
+        DataStorePrinter("PIDLikelihood", ["getMostLikely", "isAvailable", "areAllAvailable"], {
             "isAvailable": pid_detectors,
+            "areAllAvailable": pid_detectors,
             "getLogL": charged_stables,
             "getProbability": charged_stables,
+            "getLogarithmicProbability": charged_stables,
         }),
         DataStorePrinter("ECLCluster", [
             "isTrack", "isNeutral", "getStatus", "getConnectedRegionId",

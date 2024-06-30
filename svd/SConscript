@@ -7,6 +7,8 @@ env['LIBS'] = [
     'svd_dataobjects', 'mdst_dataobjects',
     'simulation_dataobjects',
     'calibration','calibration_dataobjects', 
+    'RooFit', 'RooFitCore', 'RooStats',
+    'reconstruction_dataobjects', 'reconstruction_dbobjects'
 ]
 
 # env.Append(CPPDEFINES=["DISABLE_CONST_DBOBJECTS"])

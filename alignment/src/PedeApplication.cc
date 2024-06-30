@@ -55,7 +55,7 @@ namespace Belle2 {
     }
     bool PedeApplication::run(PedeSteering& steering)
     {
-      string cmd("pede " + steering.make());
+      string cmd("export OMP_THREAD_LIMIT=1000 && pede " + steering.make());
       int retval = system(cmd.c_str());
       if (retval != 0)
         return false;

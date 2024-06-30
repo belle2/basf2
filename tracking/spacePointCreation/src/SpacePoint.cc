@@ -201,8 +201,8 @@ std::pair<double, double> SpacePoint::convertNormalizedToLocalCoordinates(
 }
 
 
-B2Vector3<double> SpacePoint::getGlobalCoordinates(std::pair<double, double> const& hitLocal, VxdID vxdID,
-                                                   VXD::SensorInfoBase const* aSensorInfo)
+B2Vector3D SpacePoint::getGlobalCoordinates(std::pair<double, double> const& hitLocal, VxdID vxdID,
+                                            VXD::SensorInfoBase const* aSensorInfo)
 {
   //We need some handle to translate IDs to local and global coordinates.
   if (aSensorInfo == nullptr) {

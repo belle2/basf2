@@ -230,7 +230,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     if (m_hist_crphi) {
       double maxnow = m_hist_crphi->Integral();
       m_hist_crphi->Scale(1.0 / maxnow);
-      if (maxnow < 1000) isFew = true;
+      if (maxnow < 10000) isFew = true;
       else {
         if (m_histref_phiindex) {
           m_hist_refphi = m_histref_phiindex->ProjectionX("histphi_ip_hadronsref", 7, 7, "");
@@ -239,14 +239,24 @@ void DQMHistAnalysisCDCEpicsModule::event()
           if (nbinref == nbinnow) { //same bins
             double maxref = m_hist_refphi->Integral();
             m_hist_refphi->Scale(1.0 / maxref);
+            double x_min = m_hist_crphi->GetXaxis()->GetXmin();
+            double x_max = m_hist_crphi->GetXaxis()->GetXmax();
+            double bin_width = (x_max - x_min) / nbinnow;
+            double maxphidiff = 0;
+            double maxphidiff_angle = 0;
             double phidiff = 0;
             for (int iphi = 0; iphi < nbinnow; iphi++) {
               double icnow = m_hist_crphi->GetBinContent(iphi + 1);
               double icref = m_hist_refphi->GetBinContent(iphi + 1);
               phidiff += fabs(icnow - icref);
+              if (phidiff > m_phiwarn)isWarn = true;
+              if (phidiff > m_phialarm)isAlarm = true;
+              if (phidiff > maxphidiff) {
+                maxphidiff = phidiff;
+                maxphidiff_angle = x_min + iphi * bin_width;
+              }
             }
-            if (phidiff > m_phiwarn)isWarn = true;
-            if (phidiff > m_phialarm)isAlarm = true;
+            m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));
           }
         }
       }

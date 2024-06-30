@@ -190,7 +190,7 @@ void DQMHistReferenceModule::event()
       }
     */
 
-    if (abs(it.ref_org->Integral()) > 0) { // onyl if we have entries in reference
+    if (abs(it.ref_org->Integral()) > 0) { // only if we have entries in reference
       if (it.ref_clone) {
         it.ref_clone->Reset();
         it.ref_clone->Add(it.ref_org);

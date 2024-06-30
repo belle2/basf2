@@ -560,7 +560,7 @@ class Calibration(CalibrationBase):
         self.max_iterations = None
         #: List of ExpRun that will be ignored by this Calibration. This runs will not have Collector jobs run on
         #: them (if possible). And the algorithm execution will exclude them from a ExpRun list. However, the
-        #: algorithm execution may merge IoVs of final payloads to cover the 'gaps' caused by these runs.
+        #: algorithm execution may merge IoVs of final payoads to cover the 'gaps' caused by these runs.
         #: You should pay attention to what the AlgorithmStrategy you choose will do in these cases.
         self.ignored_runs = None
         if self.algorithms:
@@ -1096,8 +1096,8 @@ class Algorithm():
     Parameters:
         algorithm: The CalibrationAlgorithm instance that we want to execute.
     Keyword Arguments:
-        data_input (types.FunctionType): An optional function that sets the input files of the algorithm.
-        pre_algorithm (types.FunctionType): An optional function that runs just prior to execution of the algorithm.
+        data_input : An optional function that sets the input files of the algorithm.
+        pre_algorithm : An optional function that runs just prior to execution of the algorithm.
             Useful for set up e.g. module initialisation
 
     This is a simple wrapper class around the C++ CalibrationAlgorithm class.

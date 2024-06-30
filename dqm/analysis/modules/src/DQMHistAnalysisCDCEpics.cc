@@ -239,9 +239,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
           if (nbinref == nbinnow) { //same bins
             double maxref = m_hist_refphi->Integral();
             m_hist_refphi->Scale(1.0 / maxref);
-            double x_min = m_hist_crphi->GetXaxis()->GetXmin();
-            double x_max = m_hist_crphi->GetXaxis()->GetXmax();
-            double bin_width = (x_max - x_min) / nbinnow;
             double maxphidiff = 0;
             double maxphidiff_angle = 0;
             double phidiff = 0;
@@ -253,7 +250,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
               if (phidiff > m_phialarm)isAlarm = true;
               if (phidiff > maxphidiff) {
                 maxphidiff = phidiff;
-                maxphidiff_angle = x_min + iphi * bin_width;
+                maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1)
               }
             }
             m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));

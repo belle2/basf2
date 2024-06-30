@@ -250,7 +250,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
               if (phidiff > m_phialarm)isAlarm = true;
               if (phidiff > maxphidiff) {
                 maxphidiff = phidiff;
-                maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1)
+                maxphidiff_angle = m_hist_crphi->GetBinLowEdge(iphi + 1) + m_hist_crphi->GetBinWidth(iphi + 1);
               }
             }
             m_hist_crphi->SetTitle(Form("%s (diff = %0.03f at %0.1f)", m_hist_crphi->GetTitle(), maxphidiff, maxphidiff_angle));

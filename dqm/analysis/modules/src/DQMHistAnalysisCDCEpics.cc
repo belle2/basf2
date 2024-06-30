@@ -248,7 +248,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
             for (int iphi = 0; iphi < nbinnow; iphi++) {
               double icnow = m_hist_crphi->GetBinContent(iphi + 1);
               double icref = m_hist_refphi->GetBinContent(iphi + 1);
-              phidiff += fabs(icnow - icref);
+              phidiff = fabs(icnow - icref);
               if (phidiff > m_phiwarn)isWarn = true;
               if (phidiff > m_phialarm)isAlarm = true;
               if (phidiff > maxphidiff) {

@@ -9,20 +9,16 @@
 # Email: k.s.gudkova@inp.nsk.su
 # Date: 20240627
 
-Alias MyB+ B+
-Alias MyB- B-
-ChargeConj MyB+ MyB-
-
 Decay Upsilon(4S)
-0.5	  MyB-          B+           VSS;
-0.5       MyB+          B-           VSS;
+0.5	  B-sig          B+           VSS;
+0.5       B+sig          B-           VSS;
 Enddecay
 
-Decay MyB-
+Decay B-sig
 1.        K- p+ anti-p-          PHOTOS PHSP;
 Enddecay
 
-CDecay MyB+
+CDecay B+sig
 
 End
 

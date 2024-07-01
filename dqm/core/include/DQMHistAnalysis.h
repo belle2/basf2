@@ -76,6 +76,29 @@ namespace Belle2 {
      */
     typedef std::map<std::string, bool> CanvasUpdatedList;
 
+    /**
+     * The type for reference histograms and
+     * they're mapping to online histograms
+     */
+    typedef struct {
+      /** online histogram name */
+      std::string orghist_name;
+      /** reference histogram name */
+      std::string refhist_name;
+      /** related canvas name name */
+      TCanvas* canvas{nullptr};
+      /** pointer to the org reference histogram */
+      TH1* ref_org{nullptr};
+      /** pointer to the cloned/scaled reference histogram */
+      TH1* ref_clone{nullptr};
+    } REFNODE;
+
+    /**
+     * The type of list of references.
+     */
+    typedef std::map<std::string, REFNODE> RefList;
+
+
   private:
     /**
      * The list of Histograms.
@@ -95,6 +118,11 @@ namespace Belle2 {
      * The list of canvas updated status.
      */
     static CanvasUpdatedList s_canvasUpdatedList;
+
+    /**
+     * The list of Histograms.
+     */
+    static RefList s_refList;
 
     /**
      * Number of Events processed to fill histograms.
@@ -170,6 +198,12 @@ namespace Belle2 {
     static const CanvasUpdatedList& getCanvasUpdatedList() { return s_canvasUpdatedList;};
 
     /**
+     * Get the list of the histograms.
+     * @return The list of the histograms.
+     */
+    static /*const*/ RefList& getRefList() { return s_refList;};
+
+    /**
      * Get the Run Type.
      * @return Run type string.
      */
@@ -219,6 +253,24 @@ namespace Belle2 {
                          const std::string& histname, bool onlyIfUpdated = false);
 
     /**
+    * Get referencehistogram from list (no other search).
+    * @param histname The name of the histogram (incl dir).
+    * @param onlyIfUpdated req only updated hists, return nullptr otherwise
+    * @return The found histogram, or nullptr if not found.
+    */
+    static TH1* findRefHist(const std::string& histname, bool onlyIfUpdated = false);
+
+    /**
+     * Find reference histogram.
+     * @param dirname  The name of the directory.
+     * @param histname The name of the histogram.
+     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
+     * @return The found histogram, or nullptr if not found.
+     */
+    static TH1* findRefHist(const std::string& dirname,
+                            const std::string& histname, bool onlyIfUpdated = false);
+
+    /**
      * Find histogram in specific TFile (e.g. ref file).
      * @param file  The TFile to search.
      * @param histname The name of the histogram, can incl directory
@@ -259,6 +311,7 @@ namespace Belle2 {
      */
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
+
 
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)

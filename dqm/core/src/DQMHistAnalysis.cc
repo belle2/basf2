@@ -164,6 +164,28 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, bool was_updated)
+{
+  if (s_refList.find(histname) != s_refList.end()) {
+    if (was_updated && !s_refList[histname].isUpdated()) return nullptr;
+    if (s_refList[histname].getHist()) {
+      return s_refList[histname].getHist();
+    } else {
+      B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
+    }
+  }
+  B2INFO("Histogram " << histname << " not in list.");
+  return nullptr;
+}
+
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, bool updated)
+{
+  if (dirname.size() > 0) {
+    return findRefHist(dirname + "/" + histname, updated);
+  }
+  return findRefHist(histname, updated);
+}
+
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
 

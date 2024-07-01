@@ -1,3 +1,26 @@
+Changes in the analysis package in light-2406-ragdoll
+-----------------------------------------------------
+
+Modules
++++++++
+* Added the `ParticleMassHypothesesUpdater` module, which updates the mass hypothesis of a given input particle list. 
+  The module takes as input a particle list and a PDG code and creates a new particle list containing copies of the original particles, 
+  with updated mass hypotheses. The only supported mass hypotheses are :math:`e, \mu, K, \pi, p` (for both input and output lists).
+  This module differs from the `ParticleMassUpdater` module, since the latter changes the value of the mass of the particles without changing their PDG code.
+
+GraFEI
+++++++
+* The tool now assigns an updated mass hypothesis to each final state particle corresponding to the model prediction. This is done by filling
+  new particles lists named ``:graFEI``.
+
+Variables
++++++++++
+* PIDVariables: in all functions replacing ``logL == 0`` with a call to ``isAvailable`` which tests the detector flags in ``PIDLikelihoods``
+* Added variables: `isPIDAvailable`, `isPIDAvailableFrom`, `pidLogarithmicProbabilityExpert`
+* in function ``addAlias(alias, variable)`` adding ``return alias`` for convenience
+* Added a new Neural-Network based KLM muon probability variable `klmMuonIDDNN` (for expert use only). 
+
+
 Changes in the analysis package in light-2405-quaxo
 ---------------------------------------------------
 

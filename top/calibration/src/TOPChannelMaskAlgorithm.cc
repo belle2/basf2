@@ -13,6 +13,8 @@
 #include <TH2F.h>
 #include <string>
 #include <vector>
+#include <algorithm>
+#include <cmath>
 
 using namespace std;
 
@@ -56,24 +58,35 @@ namespace Belle2 {
       // dead and hot channels
 
       auto meanHits = new TH1F("meanHits", "Average number of hits per channel; slot number; average", 16, 0.5, 16.5);
+      auto rmsHits = new TH1F("rmsHits", "r.m.s of number of hits per channel; slot number; r.m.s", 16, 0.5, 16.5);
       for (int slot = 1; slot <= 16; slot++) {
         string name = "hits_" + to_string(slot);
         auto h = getObjectPtr<TH1F>(name);
         if (not h) continue;
         h->Write();
+
         double mean = 0;
-        int n = 0;
-        for (int chan = 0; chan < h->GetNbinsX(); chan++) {
-          double y = h->GetBinContent(chan + 1);
-          if (y > 0) {
-            mean += y;
+        double rms = h->GetMaximum();
+        for (int iter = 0; iter < 5; iter++) {
+          double sumy = 0;
+          double sumyy = 0;
+          int n = 0;
+          for (int chan = 0; chan < h->GetNbinsX(); chan++) {
+            double y = h->GetBinContent(chan + 1);
+            if (y == 0 or fabs(y - mean) > 3 * rms) continue;
+            sumy += y;
+            sumyy += y * y;
             n++;
           }
+          if (n == 0) break;
+          mean = sumy / n;
+          rms = sqrt(sumyy / n - mean * mean);
         }
-        if (n > 0) mean /= n;
         meanHits->SetBinContent(slot, mean);
-        double deadCut = mean / 10;
-        double hotCut = mean * 10;
+        rmsHits->SetBinContent(slot, rms);
+        double deadCut = mean / 5;
+        double hotCut = std::max(mean * 2, mean + 6 * rms);
+
         for (int chan = 0; chan < h->GetNbinsX(); chan++) {
           double y = h->GetBinContent(chan + 1);
           if (y <= deadCut) {

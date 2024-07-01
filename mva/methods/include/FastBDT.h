@@ -15,24 +15,8 @@
 #include <mva/interface/Expert.h>
 
 #include <FastBDT.h>
-
-#if FastBDT_VERSION_MAJOR >= 3
 #include <FastBDT_IO.h>
-#else
-#include <IO.h>
-#endif
-
-#if FastBDT_VERSION_MAJOR >= 5
 #include <Classifier.h>
-#endif
-
-// Template specialization to fix NAN sort bug of FastBDT in up to Version 3.2
-#if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
-namespace FastBDT {
-  template<>
-  bool compareIncludingNaN(float i, float j);
-}
-#endif
 
 namespace Belle2 {
   namespace MVA {
@@ -76,7 +60,6 @@ namespace Belle2 {
       unsigned int m_nLevels = 3; /**< Depth of tree */
       double m_shrinkage = 0.1; /**< Shrinkage during the boosting step */
       double m_randRatio = 0.5; /**< Fraction of data to use in the stochastic training */
-#if FastBDT_VERSION_MAJOR >= 5
       std::vector<unsigned int>
       m_individual_nCuts; /**< Number of cut Levels = log_2(Number of Cuts) for each provided feature. If empty m_nCuts is used for all features*/
       double m_flatnessLoss = -1.0; /**< Flatness Loss constant */
@@ -84,7 +67,6 @@ namespace Belle2 {
       bool m_purityTransformation = false; /**< Activates purity transformation globally for all features */
       std::vector<bool>
       m_individualPurityTransformation; /**< Vector which decided for each feature individually if the purity transformation should be used. */
-#endif
     };
 
 
@@ -132,16 +114,9 @@ namespace Belle2 {
 
     private:
       FastBDTOptions m_specific_options; /**< Method specific options */
-#if FastBDT_VERSION_MAJOR >= 3
-#if FastBDT_VERSION_MAJOR >= 5
       bool m_use_simplified_interface = false; /**< Use the simplified FastBDT interface of version 4 */
       FastBDT::Classifier m_classifier; /**< Simplified FastBDT interface: classifier combines preprocessing and forest */
-#endif
       FastBDT::Forest<float> m_expert_forest; /**< Forest Expert -> used in case of no purity transformation. */
-#else
-      FastBDT::Forest m_expert_forest; /**< Forest Expert */
-      std::vector<FastBDT::FeatureBinning<float>> m_expert_feature_binning; /**< Forest feature binning */
-#endif
     };
 
   }

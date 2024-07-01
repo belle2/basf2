@@ -122,6 +122,7 @@ namespace Belle2 {
 
     // other
     int m_numModules = 0; /**< number of TOP modules */
+    double m_bunchTimeSep = 0; /**< bunch separation time */
 
     // dataobjects
     StoreArray<RawFTSW> m_rawFTSW; /**< Input array for DAQ Status. */

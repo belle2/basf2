@@ -31,34 +31,34 @@ namespace Belle2 {
      * Struct to hold tube parameters
      */
     struct tube {
-      double innerR;
-      double outerR;
-      double length;
-      double zPosition;
-      std::string material;
-      std::string name;
+      double innerR; /**< inner radius */
+      double outerR; /**< outer radius */
+      double length; /**< length */
+      double zPosition; /**< z position */
+      std::string material; /**< material */
+      std::string name; /**< name */
     };
 
     /**
      * Struct to hold wedge parameters
      */
     struct wedge {
-      int type;
-      double r;
-      double phi;
-      double z;
-      std::string material;
+      int type; /**< type */
+      double r; /**< radius */
+      double phi; /**< polar angle */
+      double z; /**< length */
+      std::string material; /**< material */
     };
 
     /**
      * Struct to hold parameters of box volumes (examples, scintilators for cosmic test)
      */
     struct box {
-      double size[3];
-      double position[3];
-      double rotation[3];
-      std::string name;
-      std::string material;
+      double size[3]; /**< size coordinates */
+      double position[3]; /**< position coordinates */
+      double rotation[3]; /**< rotation coordinates */
+      std::string name; /**< name */
+      std::string material; /**< material */
     };
 
 
@@ -106,6 +106,8 @@ namespace Belle2 {
      * @param outR outer radius
      * @param length length
      * @param zPosition Z position of start of tube (in ARICH frame)
+     * @param material material
+     * @param name name
      */
     void addTube(double inR, double outR, double length, double zPosition, const std::string& material, const std::string& name)
     {

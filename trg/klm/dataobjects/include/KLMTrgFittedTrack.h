@@ -85,7 +85,7 @@ namespace Belle2 {
     }
     int getTrack_id() const
     {
-      return Nhits ;
+      return track_id ;
     }
 
 

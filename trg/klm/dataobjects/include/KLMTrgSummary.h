@@ -287,7 +287,7 @@ namespace Belle2 {
 
 
 
-    ClassDef(KLMTrgSummary, 5);
+    ClassDef(KLMTrgSummary, 6);
   };
 } // end of namespace Belle2
 

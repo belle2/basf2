@@ -112,8 +112,7 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
   double theta      = p.Theta();
 
   if (m_applyInCMS) {
-    PCmsLabTransform boostrotate;
-    const ROOT::Math::PxPyPzEVector p_cms = boostrotate.rotateLabToCms() * mc.get4Vector();
+    const ROOT::Math::PxPyPzEVector p_cms = PCmsLabTransform::labToCms(mc.get4Vector());
     energy = p_cms.E();
     mom = p_cms.P();
     theta = p_cms.Theta();

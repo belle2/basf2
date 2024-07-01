@@ -358,7 +358,7 @@ class Luminosity:
                    "date_stop": int(dateutil.parser.parse(run['time_stop']).timestamp()),
                    "lumi": run['statistics']['lumi_recorded'],
                    }
-            if(run['statistics']['lumi_exp_delivered']):
+            if (run['statistics']['lumi_exp_delivered']):
                 row['intLumiDel'] = run['statistics']['lumi_exp_delivered']
             else:
                 row['intLumiDel'] = None
@@ -487,13 +487,13 @@ class Luminosity:
                     if not self.conn:
                         b2.B2FATAL("Could not establish connection to db")
                 if 7 in expTBU:
-                    df = df.append(self.getDataFrameFromDBOnline([7]), sort=False, ignore_index=True)
+                    df = pd.concat([df, self.getDataFrameFromDBOnline([7])], sort=False, ignore_index=True)
                 if 8 in expTBU:
-                    df = df.append(self.getDataFrameFromDBOnline([8]), sort=False, ignore_index=True)
+                    df = pd.concat([df, self.getDataFrameFromDBOnline([8])], sort=False, ignore_index=True)
                 # experiment >10
                 exp_rr = [e for e in expTBU if e > 9]
                 for exp in exp_rr:
-                    df = df.append(self.getDataFrameFromRunRegistry(exp, new_runs[exp]), sort=False, ignore_index=True)
+                    df = pd.concat([df, self.getDataFrameFromRunRegistry(exp, new_runs[exp])], sort=False, ignore_index=True)
 
                 # in case of multiple experiment, need to fix the delivered lumi as it is reste to 0 at the exp change.
                 if len(exp_rr) > 1:
@@ -508,7 +508,7 @@ class Luminosity:
             else:
                 self.conn = self.create_connection(self.what)
                 df = pd.DataFrame(columns=["exp", "run", "date", "date_stop", "lumi", "intLumi", "intLumiDel"])
-                df = df.append(self.getDataFrameFromDBOffLine(), sort=False)
+                df = pd.concat([df, self.getDataFrameFromDBOffLine()], sort=False)
                 df['intLumi'] = df['lumi'].cumsum()
                 df['intLumiErr'] = np.sqrt(df['lumiErr2'].cumsum())
                 df['lumiDel'] = np.nan

@@ -288,23 +288,34 @@
   <a href="../results/{{newest_revision}}/{{log_url}}" target="_blank">Logfile</a><br>
   {{/if}}
   {{/scriptfiles}}
-  {{#if issue.length==0 }}
-  <button class="btn-create" onclick="window.open('../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}&contact={{contact}}','_blank');" type="button">
-    <img src="images/gitlab-logo-600.png" style="width: 24px;">
-      Create issue
-  </button>
-  {{else}}
+  {{#if issue[issue.length-1] < 0}}
+    <span>
+      <strong>Past issues: </strong>
+      <a target="_blank" href="../issue_redirect?iid={{ -1*issue[issue.length-1] }}">{{-1*issue[issue.length-1]}}</a>{{#if issue[issue.length-2] < 0}}, 
+      <a target="_blank" href="../issue_redirect?iid={{ -1*issue[issue.length-2] }}">{{-1*issue[issue.length-2]}}</a>{{/if}}{{#if issue[issue.length-3] < 0}}, 
+      <a target="_blank" href="../issue_redirect?iid={{ -1*issue[issue.length-3] }}">{{-1*issue[issue.length-3]}}</a>{{/if}}
+    </span><br>
+  {{/if}}
+  {{#if issue[0] > 0}}
   <span>
     <strong>Linked issues &darr</strong>
     <ul style="margin:auto">
       {{#issue:i}}
+      {{#if issue[i] > 0}}
       <li>
         <a target="_blank" href="../issue_redirect?iid={{ issue[i] }}">{{issue[i]}}</a> || 
         <a target="_blank" href="../update_issue?file_path={{ plot_path }}{{ png_filename }}&id={{issue[i]}}&rev_label={{ newest_revision}}" target="_blank">Update with this plot</a>
       </li>
+      {{/if}}
       {{/issue}}
     </ul>
   </span>
+  {{/if}}
+  {{#if issue.length==0  || issue[0] < 0}}
+  <button class="btn-create" onclick="window.open('../issue?file_path={{ plot_path }}{{ png_filename }}&rev_label={{ newest_revision}}&contact={{contact}}','_blank');" type="button">
+    <img src="images/gitlab-logo-600.png" style="width: 24px;">
+      Create issue
+  </button>
   {{/if}}
   <br>
   <!-- todo: share this plot -->

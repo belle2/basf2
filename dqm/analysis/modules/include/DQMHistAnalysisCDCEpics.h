@@ -86,27 +86,46 @@ namespace Belle2 {
 
     //Canvas for DQM analysis IR plots
     TCanvas* c_hist_adc = nullptr; /**< canvas for adc board median */
+    TH1F* m_hist_adc = nullptr; /**< for above*/
+
     TCanvas* c_hist_tdc = nullptr; /**< canvas for tdc board median */
+    TH1F* m_hist_tdc = nullptr; /**< for above */
+
+    TCanvas* c_hist_crphi = nullptr; /**< canvas for control shifter phi */
+    TH1D* m_hist_crphi = nullptr; /**< for above*/
+
+    TCanvas* c_hist_effphi = nullptr; /**< canvas for tracking efficiency */
+    TH1D* m_hist_effphi = nullptr; /**< for above*/
+
+    TCanvas* c_hist_skimphi = nullptr; /**< canvas for various phi distribution */
+    TH1D* m_hist_skimphi[8] = {nullptr}; /**< for above*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
-
     TLine* m_line_ltdc  = nullptr; /**< line for lower TDC window */
     TLine* m_line_htdc  = nullptr; /**< line for higher TDC window */
 
     std::string m_histoDir = ""; /**< histogram dir of CDC DQMs */
     std::string m_histoADC = ""; /**< ADC histogram names of CDC DQMs */
     std::string m_histoTDC = ""; /**< TDC histogram names of CDC DQMs */
+    std::string m_histoPhiIndex = ""; /**< Phi Inedx histogram names of CDC DQMs */
+    std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
+    std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
+    std::string m_refNamePhi = ""; /**< reference histogram of phi */
+
+    TFile* m_fileRefPhi = nullptr; /**< reference histogram file point */
+    TH2F* m_histref_phiindex = nullptr; /**< for above*/
+    TH1D* m_hist_refphi = nullptr; /**< for above*/
 
     int m_minevt;/**< min events for single intra-run point */
     double m_minadc;/**< min adc median thershold accepted */
     double m_maxadc;/**< max adc median thershold accepted */
     double m_mintdc;/**< min tdc median thershold accepted */
     double m_maxtdc;/**< max tdc median thershold accepted */
-
-    TH1F* m_hist_adc = nullptr; /**< same as above but for Integrated run*/
-    TH1F* m_hist_tdc = nullptr; /**< same as above but for Integrated run*/
+    double m_phistop;/**< stop thershold for phi differences */
+    double m_phialarm;/**< alram thershold for phi differences */
+    double m_phiwarn;/**< warn thershold for phi differences */
 
     TH1D* m_hADCs[300]; /**< ADC histograms with track associated hits for each board (0-299) */
     TH1D* m_hTDCs[300]; /**< TDC histograms with track associated hits for each board (0-299) */

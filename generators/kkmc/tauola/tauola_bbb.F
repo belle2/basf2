@@ -77,7 +77,7 @@ C
       ELSE
          ICOUNT=ICOUNT+1
          JAK=ACTIVE(MOD(ICOUNT-1,KSUM)+1)
-C        PRINT *, 'ICOUNT, JAK, KSUM = ',ICOUNT, JAK, KSUM
+         WRITE(6,'(''ICOUNT, JAK, KSUM = '',3I6)') ICOUNT, JAK, KSUM
          ANSWER=JAK
       ENDIF
       RETURN
@@ -105,6 +105,12 @@ C JAK=0 INCLUSIVE:  JAK=1,2,3,4,5,6,7,8,...
       REAL  H(4)
       REAL*8 HX(4)
       COMMON / JAKI   /  JAK1,JAK2,JAKP,JAKM,KTOM
+      INTEGER IFEQUALBR
+      COMMON /IFEQUALBR/ IFEQUALBR
+      INTEGER TauToElOrMu
+      COMMON /TauToElOrMu/ TauToElOrMu
+      INTEGER JAK1SV,JAK2SV
+      COMMON /JAKSV/ JAK1SV, JAK2SV
 
       COMMON / IDFC  / IDF
 
@@ -148,6 +154,13 @@ C DECAY OF TAU+ IN THE TAU REST FRAME
         NEVTOT=NEVTOT+1
         IF(IWARM.EQ.0) GOTO 902
         ISGN= IDF/IABS(IDF)
+
+C USER SELECTED LIST OF DECAYS
+        IF (IFEQUALBR.LT.0) THEN
+           CALL JAKEREQ(-1,JAK1)
+           JAK2=JAK2SV
+           IF (TauToElOrMu.EQ.1) JAK2=1
+        ENDIF
 
 C AJWMOD to change BRs depending on sign:
         CALL TAURDF(KTO)
@@ -278,6 +291,7 @@ C     =================
       JAK=JAK1
       IF(JAK1.EQ.0) CALL JAKER(JAK)
       IF (IFEQUALBR.GT.0) CALL JAKEREQ(1,JAK)
+
       IF(JAK.EQ.1) THEN
          IF (NEV.LT.NPRIN.OR.NPRIN.EQ.-1)
      C   PRINT *, 'DEKAY1(0): tau- JAK = ', JAK,

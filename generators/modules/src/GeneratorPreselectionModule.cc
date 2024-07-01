@@ -38,7 +38,7 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   addParam("MinChargedTheta", m_MinChargedTheta, "minimum polar angle of charged particle [deg]", 17.);
   addParam("MaxChargedTheta", m_MaxChargedTheta, "maximum polar angle of charged particle [deg]", 150.);
   addParam("applyInCMS", m_applyInCMS, "if true apply the P,Pt,theta, and energy cuts in the center of mass frame", false);
-  addParam("applyInMother", m_applyInMother, "if true apply the P,Pt,theta, and energy cuts in the rest frame of mother", false);
+  addParam("applyToPhotonInMother", m_applyToPhotonInMother, "if true apply energy cut to photon in the rest frame of mother", false);
   addParam("stableParticles", m_stableParticles, "if true apply the selection criteria for stable particles in the generator", false);
 
   addParam("nPhotonMin", m_nPhotonMin, "minimum number of photons", 0);
@@ -119,7 +119,7 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
     theta = p_cms.Theta();
   }
 
-  if (m_applyInMother && mc.getPDG() == 22) {
+  if (m_applyToPhotonInMother && mc.getPDG() == 22) {
     energy = 0;
     if (mc.getMother() && !(mc.getMother()->isInitial()) && !(mc.getMother()->getPDG() == 111)
         && !(mc.getMother()->getPDG() == 221)) { // mother is not the incoming beams, pi0 or eta

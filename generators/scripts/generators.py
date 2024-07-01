@@ -38,7 +38,7 @@ def add_generator_preselection(
         MinPhotonTheta=0.0,
         MaxPhotonTheta=180.0,
         applyInCMS=False,
-        applyInMother=False,
+        applyToPhotonInMother=False,
         stableParticles=False):
     """
         Adds generator preselection.
@@ -64,7 +64,7 @@ def add_generator_preselection(
             MinPhotonTheta (float): minimum polar angle of photon [deg]
             MaxPhotonTheta (float): maximum polar angle of photon [deg]
             applyInCMS (bool): if true apply the P,Pt,theta, and energy cuts in the center of mass frame
-            applyInMother (bool): if true apply the P,Pt,theta, and energy cuts in the rest frame of mother
+            applyToPhotonInMother (bool): if true apply energy cut to photon in the rest frame of mother
             stableParticles (bool): if true apply the selection criteria for stable particles in the generator
     """
 
@@ -81,7 +81,7 @@ def add_generator_preselection(
                                             MinPhotonTheta=MinPhotonTheta,
                                             MaxPhotonTheta=MaxPhotonTheta,
                                             applyInCMS=applyInCMS,
-                                            applyInMother=applyInMother,
+                                            applyToPhotonInMother=applyToPhotonInMother,
                                             stableParticles=stableParticles
                                             )
 

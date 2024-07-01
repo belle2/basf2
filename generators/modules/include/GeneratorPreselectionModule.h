@@ -60,8 +60,8 @@ namespace Belle2 {
     double m_MaxChargedTheta; /**< maximum theta for each charged particle. */
     bool m_applyInCMS{false}; /**< if true apply the selection criteria for
                                    charged in the center of mass system */
-    bool m_applyInMother{false}; /**< if true apply the selection criteria for
-                                   photons in the rest frame of its mother */
+    bool m_applyToPhotonInMother{false}; /**< if true apply the selection criteria
+                                   to photon in the rest frame of its mother */
     bool m_stableParticles{false}; /**< if true apply the selection criteria for
                                    only stable particles in the generator */
 

@@ -1515,7 +1515,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         * 0.130 < massDifference(0) < 0.160 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
         * 0.120 < massDifference(0) < 0.165 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
         * 1.81 < M < 2.21 on signal side :math:`D^{*+}`
-        * 0.115 < :math:`M_{D^{*}}` - :math:`M_{D}` < 0.220 and p* > 2.0 on signal side :math:`D^{0}`
+        * 0.08 < :math:`M_{D^{*}}` - :math:`M_{D}` and p* > 2.0 on signal side :math:`D^{0}`
     """
     vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
     vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')
@@ -1541,8 +1541,8 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
+        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionID > 0.01', path=path)
+        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonID > 0.1', path=path)
         ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
         ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
         ma.reconstructDecay("pi0:hadtag -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
@@ -1739,7 +1739,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
         ma.copyLists("D*+:skimSig", sigDstList, path=path)
 
-        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.115 < DelM < 0.220", path=path)
+        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and DelM > 0.08", path=path)
 
         sigDzList = ["D0:skimSig"]
         return sigDzList

@@ -652,7 +652,7 @@ To actually download the files, use ``gb2_ds_get``:
 
 .. tip::
 
-    You can enable download in multiple streams using the ``--new`` option of ``gb2_ds_get``, which speed up the transfer. At some point it will become the default behavior of ``gb2_ds_get``. 
+    You can enable download in multiple streams using the ``--new`` option of ``gb2_ds_get``, which will speed up the transfer. At some point it will become the default behavior of ``gb2_ds_get``. 
 
 .. tip::
 

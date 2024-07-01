@@ -8,9 +8,11 @@
 
 // own include
 #include <generators/modules/GeneratorPreselectionModule.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/gearbox/Unit.h>
 #include <numeric>
-
+#include <Math/LorentzRotation.h>
+#include <Math/Boost.h>
 using namespace std;
 using namespace Belle2;
 
@@ -36,6 +38,7 @@ GeneratorPreselectionModule::GeneratorPreselectionModule() : Module()
   addParam("MinChargedTheta", m_MinChargedTheta, "minimum polar angle of charged particle [deg]", 17.);
   addParam("MaxChargedTheta", m_MaxChargedTheta, "maximum polar angle of charged particle [deg]", 150.);
   addParam("applyInCMS", m_applyInCMS, "if true apply the P,Pt,theta, and energy cuts in the center of mass frame", false);
+  addParam("applyInMother", m_applyInMother, "if true apply the P,Pt,theta, and energy cuts in the rest frame of mother", false);
   addParam("stableParticles", m_stableParticles, "if true apply the selection criteria for stable particles in the generator", false);
 
   addParam("nPhotonMin", m_nPhotonMin, "minimum number of photons", 0);
@@ -109,10 +112,35 @@ void GeneratorPreselectionModule::checkParticle(const MCParticle& mc)
   double theta      = p.Theta();
 
   if (m_applyInCMS) {
-    const ROOT::Math::PxPyPzEVector p_cms = m_initial->getLabToCMS() * mc.get4Vector();
+    PCmsLabTransform boostrotate;
+    const ROOT::Math::PxPyPzEVector p_cms = boostrotate.rotateLabToCms() * mc.get4Vector();
     energy = p_cms.E();
     mom = p_cms.P();
     theta = p_cms.Theta();
+  }
+
+  if (m_applyInMother && mc.getPDG() == 22) {
+    energy = 0;
+    if (mc.getMother() && !(mc.getMother()->isInitial()) && !(mc.getMother()->getPDG() == 111)
+        && !(mc.getMother()->getPDG() == 221)) { // mother is not the incoming beams, pi0 or eta
+      //
+      ROOT::Math::PxPyPzEVector p_this = mc.get4Vector();
+      ROOT::Math::PxPyPzEVector p_moth = mc.getMother()->get4Vector();
+      // Create a Lorentz boost to the rest frame of the mother particle
+      ROOT::Math::Boost boost_to_mother_rest_frame(p_moth.BoostToCM());
+      ROOT::Math::PxPyPzEVector p_moth_rest = boost_to_mother_rest_frame * p_moth;
+      ROOT::Math::PxPyPzEVector p_this_rest = boost_to_mother_rest_frame * p_this;
+      double check_this_e =  p_this_rest.E();
+      double check_this_p =  p_this_rest.P();
+      //
+      energy = check_this_e;
+      mom =  check_this_p;
+      theta = (m_MinPhotonTheta + m_MaxPhotonTheta) / 2; // always pass
+      //
+      B2DEBUG(250, "GeneratorPresel: energy, mom = " << p_this.E() << " " << p_this.P() << " mother id, energy, mom = " <<
+              mc.getMother()->getPDG() << " " << p_moth.E() << " " << p_moth.P() << "energy/mom in mother's rest frame " <<  check_this_e << " "
+              << check_this_p << " energy/mom of mother in rest frame " << p_moth_rest.E() << " " << p_moth_rest.P());
+    }
   }
 
   if (mc.getPDG() == 22) {

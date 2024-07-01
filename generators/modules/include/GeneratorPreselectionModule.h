@@ -61,7 +61,7 @@ namespace Belle2 {
     bool m_applyInCMS{false}; /**< if true apply the selection criteria for
                                    charged in the center of mass system */
     bool m_applyInMother{false}; /**< if true apply the selection criteria for
-                                   charged in the center of mass system */
+                                   photons in the rest frame of its mother */
     bool m_stableParticles{false}; /**< if true apply the selection criteria for
                                    only stable particles in the generator */
 

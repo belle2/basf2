@@ -29,7 +29,6 @@ Skim list building functions for charm analyses.
 
 from functools import lru_cache
 
-import basf2 as b2
 import modularAnalysis as ma
 import variables as va
 from skim import BaseSkim, fancy_skim_header
@@ -89,11 +88,6 @@ class XToD0_D0ToHpJm(BaseSkim):
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
-
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm D0 -> HpJm skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
@@ -677,11 +671,6 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -1180,11 +1169,6 @@ class LambdacTopHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Lambda_c+ -> proton skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -1242,11 +1226,6 @@ class LambdacToSHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Lambdac+ -> Sigma+ skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -1303,11 +1282,6 @@ class XicpTopHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xi_c+ -> proton skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -1355,11 +1329,6 @@ class XicpToLKsHp(BaseSkim):
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
-
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> Lambda Ks h+, Xi- pi+ h+, Omega- pi+ K+.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
     def load_standard_lists(self, path):
         stdPi("all", path=path)
@@ -1427,11 +1396,6 @@ class XicToXimPipPim(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> hyperon skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         loadStdSkimPi0(path=path)
         charm_skim_std_charged('pi', path=path)
@@ -1496,11 +1460,6 @@ class Xic0ToLHpJm(BaseSkim):
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
-
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic0 -> Lambda0 skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
@@ -1574,11 +1533,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
-
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)

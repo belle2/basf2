@@ -90,6 +90,7 @@ namespace Belle2 {
       TObjArray* MLPs = (TObjArray*)datafile.Get(arrayname.c_str());
       if (!MLPs) {
         datafile.Close();
+        return;
       }
       m_MLPs.clear();
       for (int isector = 0; isector < MLPs->GetEntriesFast(); ++isector) {

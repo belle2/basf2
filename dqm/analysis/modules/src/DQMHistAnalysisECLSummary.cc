@@ -67,18 +67,17 @@ void DQMHistAnalysisECLSummaryModule::initialize()
     // By crate
     for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
       std::string pv_name = (boost::format("crate%02d:%s") % crate_id % alarm.name).str();
-      registerEpicsPV(m_pvPrefix + pv_name, pv_name, false);
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
     // Totals
     for (auto& ecl_part : {"All", "FWDEndcap", "Barrel", "BWDEndcap"}) {
       std::string pv_name = (boost::format("%s:%s") % ecl_part % alarm.name).str();
-      registerEpicsPV(m_pvPrefix + pv_name, pv_name, false);
+      registerEpicsPV(m_pvPrefix + pv_name, pv_name);
     }
     // Masked Cell IDs
     std::string mask_pv_name = (boost::format("mask:%s") % alarm.name).str();
-    registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name, false);
+    registerEpicsPV(m_pvPrefix + mask_pv_name, mask_pv_name);
   }
-  updateEpicsPVs(5.0);
 
   m_monObj = getMonitoringObject("ecl");
 
@@ -253,9 +252,9 @@ void DQMHistAnalysisECLSummaryModule::event()
   //=== Draw histogram, labels and grid
 
   // Customize title
-  int gstyle_title_h = gStyle->GetTitleH();
-  int gstyle_title_x = gStyle->GetTitleX();
-  int gstyle_title_y = gStyle->GetTitleY();
+  auto gstyle_title_h = gStyle->GetTitleH();
+  auto gstyle_title_x = gStyle->GetTitleX();
+  auto gstyle_title_y = gStyle->GetTitleY();
   gStyle->SetTitleH(0.04);
   gStyle->SetTitleX(0.60);
   gStyle->SetTitleY(1.00);
@@ -403,7 +402,7 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
 
   //=== Get number of fit inconsistencies
 
-  TH1* h_fail_crateid = findHist("ECL/fail_crateid", m_onlyIfUpdated);
+  TH1* h_fail_crateid = findHist("ECL/fail_crateid", false);
 
   const int fit_alarm_index = getAlarmByName("bad_fit").first;
   for (int crate_id = 1; crate_id <= ECL::ECL_CRATES; crate_id++) {
@@ -549,8 +548,6 @@ std::vector< std::vector<int> > DQMHistAnalysisECLSummaryModule::updateAlarmCoun
       }
     }
   }
-
-  if (!update_mirabelle) updateEpicsPVs(5.0);
 
   return alarm_counts;
 }
@@ -736,19 +733,26 @@ std::map<int, int> DQMHistAnalysisECLSummaryModule::getSuspiciousChannels(
 
 void DQMHistAnalysisECLSummaryModule::drawGrid(TH2* hist)
 {
-  int x_min = hist->GetXaxis()->GetXmin();
-  int x_max = hist->GetXaxis()->GetXmax();
-  int y_min = hist->GetYaxis()->GetXmin();
-  int y_max = hist->GetYaxis()->GetXmax();
-  for (int x = x_min + 1; x < x_max; x++) {
-    auto l = new TLine(x, 0, x, 5);
-    l->SetLineStyle(kDashed);
-    l->Draw();
+  static std::map<std::string, std::vector<TLine*> > lines;
+  std::string name = hist->GetName();
+  if (lines[name].empty()) {
+    int x_min = hist->GetXaxis()->GetXmin();
+    int x_max = hist->GetXaxis()->GetXmax();
+    int y_min = hist->GetYaxis()->GetXmin();
+    int y_max = hist->GetYaxis()->GetXmax();
+    for (int x = x_min + 1; x < x_max; x++) {
+      auto l = new TLine(x, 0, x, 5);
+      l->SetLineStyle(kDashed);
+      lines[name].push_back(l);
+    }
+    for (int y = y_min + 1; y < y_max; y++) {
+      auto l = new TLine(1, y, ECL::ECL_CRATES + 1, y);
+      l->SetLineStyle(kDashed);
+      lines[name].push_back(l);
+    }
   }
-  for (int y = y_min + 1; y < y_max; y++) {
-    auto l = new TLine(1, y, ECL::ECL_CRATES + 1, y);
-    l->SetLineStyle(kDashed);
-    l->Draw();
+  for (auto line : lines[name]) {
+    line->Draw();
   }
 }
 

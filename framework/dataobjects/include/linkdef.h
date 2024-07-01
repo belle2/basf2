@@ -13,7 +13,7 @@
 #pragma link C++ class Belle2::MCInitialParticles+; // checksum=0x77c00ada, version=5
 #pragma link C++ class Belle2::DigitBase+; // checksum=0xd2fac950, version=2
 #pragma link C++ class Belle2::MergedEventConsistency+; // checksum=0x39886d50, version=1
-#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x965ad50b, version=2
+#pragma link C++ class Belle2::EventExtraInfo+; // checksum=0x6e52097a, version=3
 
 #pragma link C++ class Belle2::Helix+; // checksum=0xc11c13b7, version=2
 #pragma link C++ class Belle2::UncertainHelix+; // checksum=0xe2ab4508, version=2
@@ -23,7 +23,7 @@
 #pragma link C++ class Belle2::TestChunkData+; // checksum=0x25c3db4e, version=1
 
 #pragma link C++ class Belle2::BackgroundMetaData+; // checksum=0x60d78a20, version=4
-#pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=4
+#pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=5
 
 #pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
   source="unsigned int m_randomSeed" \

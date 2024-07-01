@@ -14,69 +14,76 @@
 namespace Belle2 {
 
   /**
-   *   List of Cables
+   * List of cables.
    */
-
   class ARICHCableInfo: public TObject {
   public:
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHCableInfo(): m_id(0), m_type(0), m_length(0), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHCableInfo(int id, int type, float length): m_id(id), m_type(type), m_length(length), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHCableInfo(int id, int type, float length, const std::string& comment): m_id(id), m_type(type), m_length(length),
       m_comment(comment) {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHCableInfo() {};
 
-    /** Return Cable Identifier
-     * @return Cable Identifier
+    /**
+     * Get cable identifier.
+     * @return Cable identifier.
      */
     int getCableID() const {return m_id; }
 
-    /** Set Cable Identifier
-     * @param Cable Identifier
+    /**
+     * Set cable identifier.
+     * @param[in] id Cable identifier.
      */
     void setCableID(int id) {m_id = id; }
 
-    /** Return Cable Type
-     * @return Cable Type
+    /**
+     * Get cable type.
+     * @return Cable yype.
      */
     int getCableType() const {return m_type; }
 
-    /** Set Cable Type
-     * @param Cable Type
+    /**
+     * Set cable type.
+     * @param[in] type Cable type.
      */
     void setCableType(int type) {m_type = type; }
 
-    /** Return Cable Type
-     * @return Cable Type
+    /**
+     * Get cable length.
+     * @return Cable length.
      */
     float getCableLength() const {return m_length; }
 
-    /** Set Cable Length
-     * @param Cable Length
+    /**
+     * Set cable length.
+     * @param[in] length Cable length.
      */
     void setCableLength(float length) {m_length = length; }
 
-    /** Return comment
-     * @return comment
+    /**
+     * Get comment.
+     * @return Comment.
      */
     std::string getCableComment() const {return m_comment; }
 
-    /** Set comment
-     * @param comment
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
      */
     void setCableComment(const std::string& comment) {m_comment = comment; }
 

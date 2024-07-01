@@ -161,6 +161,101 @@ namespace Belle2 {
     }
 
 
+    void setSector_mask_SLF_Backward_Barrel(int mask)
+    {
+      Sector_mask_SLF_Backward_Barrel = mask;
+    }
+
+    void setSector_mask_SLF_Forward_Barrel(int mask)
+    {
+      Sector_mask_SLF_Forward_Barrel = mask;
+    }
+
+    void setSector_mask_SLF_Backward_Endcap(int mask)
+    {
+      Sector_mask_SLF_Backward_Endcap = mask;
+    }
+
+
+    void setSector_mask_SLF_Forward_Endcap(int mask)
+    {
+      Sector_mask_SLF_Forward_Endcap = mask;
+    }
+
+    int  getSector_mask_SLF_Backward_Barrel() const
+    {
+      return Sector_mask_SLF_Backward_Barrel ;
+    }
+
+    int getSector_mask_SLF_Forward_Barrel() const
+    {
+      return Sector_mask_SLF_Forward_Barrel ;
+    }
+
+    int getSector_mask_SLF_Backward_Endcap() const
+    {
+      return Sector_mask_SLF_Backward_Endcap;
+    }
+    int getSector_mask_SLF_Forward_Endcap() const
+    {
+      return Sector_mask_SLF_Forward_Endcap ;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void setSector_mask_SLF_OR_Backward_Barrel(int mask)
+    {
+      Sector_mask_SLF_OR_Backward_Barrel = mask;
+    }
+
+    void setSector_mask_SLF_OR_Forward_Barrel(int mask)
+    {
+      Sector_mask_SLF_OR_Forward_Barrel = mask;
+    }
+
+    void setSector_mask_SLF_OR_Backward_Endcap(int mask)
+    {
+      Sector_mask_SLF_OR_Backward_Endcap = mask;
+    }
+
+
+    void setSector_mask_SLF_OR_Forward_Endcap(int mask)
+    {
+      Sector_mask_SLF_OR_Forward_Endcap = mask;
+    }
+
+    int  getSector_mask_SLF_OR_Backward_Barrel() const
+    {
+      return Sector_mask_SLF_OR_Backward_Barrel ;
+    }
+
+    int getSector_mask_SLF_OR_Forward_Barrel() const
+    {
+      return Sector_mask_SLF_OR_Forward_Barrel ;
+    }
+
+    int getSector_mask_SLF_OR_Backward_Endcap() const
+    {
+      return Sector_mask_SLF_OR_Backward_Endcap;
+    }
+    int getSector_mask_SLF_OR_Forward_Endcap() const
+    {
+      return Sector_mask_SLF_OR_Forward_Endcap ;
+    }
+
 
   private:
 
@@ -174,7 +269,16 @@ namespace Belle2 {
     int  Sector_mask_OR_Backward_Endcap = 0;
     int  Sector_mask_OR_Forward_Endcap = 0;
 
+    int  Sector_mask_SLF_Backward_Barrel = 0;
+    int  Sector_mask_SLF_Forward_Barrel = 0;
+    int  Sector_mask_SLF_Backward_Endcap = 0;
+    int  Sector_mask_SLF_Forward_Endcap = 0;
 
+
+    int  Sector_mask_SLF_OR_Backward_Barrel = 0;
+    int  Sector_mask_SLF_OR_Forward_Barrel = 0;
+    int  Sector_mask_SLF_OR_Backward_Endcap = 0;
+    int  Sector_mask_SLF_OR_Forward_Endcap = 0;
 
     int  m_bklm_n_trg_sectors = 0;
     int  m_eklm_n_trg_sectors = 0 ;
@@ -183,7 +287,7 @@ namespace Belle2 {
 
 
 
-    ClassDef(KLMTrgSummary, 5);
+    ClassDef(KLMTrgSummary, 6);
   };
 } // end of namespace Belle2
 

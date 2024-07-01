@@ -64,11 +64,12 @@ class Script:
     @var path: The path to the steering file
     @var name: The name of the file, but without special chars or spaces
     @var package: The package to which the steering file belongs to
-    @var header: The contents of the XML file header
+    @var _header: The contents of the XML file header
     @var dependencies: On which scripts does the steering file depend
     @var status: The current status, e.g. 'running' or 'finished'
     @var control: Execute locally or on the cluster?
     @var returncode: The returncode of the steering file
+    @type returncode: Optional[int]
     @var _object: Pointer to the object itself. Is this even necessary?
     """
 
@@ -127,7 +128,7 @@ class Script:
         self.control = None
 
         # The returncode of the script. Should be 0 if all went well.
-        self.returncode: Optional[int] = None
+        self.returncode = None
 
         #: Id of job for job submission. This is set by some of the
         #: cluster controls in order to terminate the job if it exceeds the

@@ -1,0 +1,31 @@
+# EventType: 1110008000
+# Descriptor: [B0 -> [pi0 -> gamma gamma] [eta -> gamma gamma]]
+# NickName: B0_pi0eta_gammagamma
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: Longke Li
+# Email: lilk@ucmail.uc.edu 
+# Cuts: None
+# Date: 20240226
+##
+Alias pi0sig pi0
+Alias etasig eta
+##
+Decay Upsilon(4S)
+1.0   B0sig anti-B0sig B0 anti-B0   VSS_BMIX dm;
+Enddecay
+##
+Decay B0sig
+1.0   pi0sig etasig  PHSP;
+Enddecay
+CDecay anti-B0sig
+##
+Decay etasig
+1.0   gamma gamma PHSP;
+Enddecay
+##
+Decay pi0sig
+1.0   gamma gamma PHSP;
+Enddecay    
+##
+End

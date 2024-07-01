@@ -48,7 +48,7 @@ limZTag = 0.03
 
 treeName = str(sys.argv[2])
 
-# No PXD hit equired: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
+# No PXD hit required: PXD0. At least one PXD (SVD) hit for one of the muon tracks: PXD1 (SVD1).
 # Hit required for both muon tracks: PXD2 (SVD2)"
 VXDReqs = []
 if str(sys.argv[3]) == "PXD":

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -116,13 +115,13 @@ class LowMassTwoTrack(BaseSkim):
 
     **Decay Modes**
 
-        1. :math:`e^{+}e^{-} \\to \\gamma \\pi^{+} \\pi^{-} X`,
-        2. :math:`e^{+}e^{-} \\to \\gamma K^{+} K^{-} X`,
-        3. :math:`e^{+}e^{-} \\to \\gamma K^{+} \\pi^{-} X`,
-        4. :math:`e^{+}e^{-} \\to \\gamma p \\overline{p} X`,
-        5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
-        6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
-        7. :math:`e^{+}e^{-} \\to \\gamma \\mu^{+} \\mu^{-} X`,
+    1. :math:`e^{+}e^{-} \\to \\gamma \\pi^{+} \\pi^{-} X`,
+    2. :math:`e^{+}e^{-} \\to \\gamma K^{+} K^{-} X`,
+    3. :math:`e^{+}e^{-} \\to \\gamma K^{+} \\pi^{-} X`,
+    4. :math:`e^{+}e^{-} \\to \\gamma p \\overline{p} X`,
+    5. :math:`e^{+}e^{-} \\to \\gamma p \\pi^{-} X`,
+    6. :math:`e^{+}e^{-} \\to \\gamma p K^{-} X`,
+    7. :math:`e^{+}e^{-} \\to \\gamma \\mu^{+} \\mu^{-} X`,
     """
     __authors__ = ["Xing-Yu Zhou", "Guanda Gong"]
     __description__ = "Skim list for low mass events with at least two tracks and one hard photon" \
@@ -219,12 +218,12 @@ class SingleTagPseudoScalar(BaseSkim):
 
     **Decay Modes**
 
-        1. :math:`\\pi^{0}\\to \\gamma \\gamma`,
-        2. :math:`\\eta \\to \\gamma\\gamma`,
-        3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
-        4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
-        5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \\gamma\\gamma)`,
-        6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
+    1. :math:`\\pi^{0}\\to \\gamma \\gamma`,
+    2. :math:`\\eta \\to \\gamma\\gamma`,
+    3. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\pi^{0}`,
+    4. :math:`\\eta \\to \\pi^{+}\\pi^{-}\\gamma`,
+    5. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\eta(\\to \\gamma\\gamma)`,
+    6. :math:`\\eta^{\\prime} \\to \\pi^{+}\\pi^{-}\\gamma`
     """
 
     __authors__ = ["Hisaki Hayashii"]
@@ -261,10 +260,10 @@ class SingleTagPseudoScalar(BaseSkim):
         for dmID, (mode, cut) in enumerate(ModesAndCuts):
             ma.reconstructDecay(mode, cut, dmID=dmID, path=path)
 
-        ma.cutAndCopyList(f"pi0:{label}_highE", f"pi0:{label}_loose", "E > 0.5", path=path)
+        ma.cutAndCopyList(f"pi0:{label}_highE_SingleTagPseudoScalar", f"pi0:{label}_loose", "E > 0.5", path=path)
 
         particles = [
-            f"pi0:{label}_highE",
+            f"pi0:{label}_highE_SingleTagPseudoScalar",
             "eta:gg",
             "eta:pipipi0",
             "eta:pipig",

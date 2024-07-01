@@ -137,7 +137,7 @@ void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
   // Split the path into input, main and output. A nullptr means, the path should not be used
   PathPtr inputPath, mainPath, outputPath;
   std::tie(inputPath, mainPath, outputPath) = PathUtils::splitPath(path);
-  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath, mainPath, outputPath);
+  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath);
 
   // Check for existence of HLTZMQ2Ds module in input path to set DAQ environment
   for (const ModulePtr& module : inputPath->getModules()) {

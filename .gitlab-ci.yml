@@ -88,6 +88,7 @@ default:
     - source ${GITLAB_BELLE2_TOOLS_B2SETUP}
     # Use the externals installed in the docker image
     - export BELLE2_EXTERNALS_TOPDIR=${GITLAB_BELLE2_EXTERNALS_TOPDIR}
+  interruptible: true  # All the jobs can be interrupted by newer pipelines
 
 prepare-pipeline:
   stage: prepare-pipeline

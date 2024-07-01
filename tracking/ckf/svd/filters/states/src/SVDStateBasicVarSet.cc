@@ -67,25 +67,33 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
   var<named("arcLengthOfHitPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(hitPosition));
   var<named("arcLengthOfCenterPosition")>() = static_cast<Float_t>(trajectory.calcArcLength2D(Vector3D(0, 0, 0)));
 
-  var<named("layer")>() = spacePoint->getVxdID().getLayerNumber();
-  var<named("number")>() = previousStates.size();
-
   var<named("pt")>() = static_cast<Float_t>(momentum.xy().norm());
   var<named("tan_lambda")>() = static_cast<Float_t>(trajectory.getTanLambda());
   var<named("phi")>() = static_cast<Float_t>(momentum.phi());
 
   const VxdID& sensorInfo = spacePoint->getVxdID();
-
+  var<named("layer")>() = sensorInfo.getLayerNumber();
+  var<named("number")>() = previousStates.size();
   var<named("ladder")>() = sensorInfo.getLadderNumber();
   var<named("sensor")>() = sensorInfo.getSensorNumber();
   var<named("segment")>() = sensorInfo.getSegmentNumber();
   var<named("id")>() = sensorInfo.getID();
+
+
+  const auto& clusters = spacePoint->getRelationsTo<SVDCluster>();
+  B2ASSERT("Must be related to exactly 2 clusters", clusters.size() == 2);
+  const SVDCluster* firstCluster = clusters[0];
+  const SVDCluster* secondCluster = clusters[1];
+  var<named("cluster_1_time")>() = firstCluster->getClsTime();
+  var<named("cluster_2_time")>() = secondCluster->getClsTime();
 
   var<named("last_layer")>() = 0;
   var<named("last_ladder")>() = 0;
   var<named("last_sensor")>() = 0;
   var<named("last_segment")>() = 0;
   var<named("last_id")>() = 0;
+  var<named("last_cluster_1_time")>() = -999.9;
+  var<named("last_cluster_2_time")>() = -999.9;
 
   const CKFToSVDState* parent = previousStates.back();
   const SpacePoint* parentSpacePoint = parent->getHit();
@@ -97,6 +105,13 @@ bool SVDStateBasicVarSet::extract(const BaseSVDStateFilter::Object* pair)
     var<named("last_sensor")>() = parentSensorInfo.getSensorNumber();
     var<named("last_segment")>() = parentSensorInfo.getSegmentNumber();
     var<named("last_id")>() = parentSensorInfo.getID();
+
+    const auto& parentclusters = parentSpacePoint->getRelationsTo<SVDCluster>();
+    B2ASSERT("Must be related to exactly 2 clusters", parentclusters.size() == 2);
+    const SVDCluster* parentfirstCluster = parentclusters[0];
+    const SVDCluster* parentsecondCluster = parentclusters[1];
+    var<named("last_cluster_1_time")>() = parentfirstCluster->getClsTime();
+    var<named("last_cluster_2_time")>() = parentsecondCluster->getClsTime();
   }
 
   const double residual = m_kalmanStepper.calculateResidual(firstMeasurement, *state);

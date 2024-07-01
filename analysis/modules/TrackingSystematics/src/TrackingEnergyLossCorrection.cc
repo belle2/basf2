@@ -11,6 +11,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -27,16 +28,16 @@ TrackingEnergyLossCorrectionModule::TrackingEnergyLossCorrectionModule() : Modul
   setDescription(
     R"DOC(Module to modify Energy of tracks from the lists. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("TrackingEnergyLossCorrection", particleLists=['pi+:cut'], correction=0.001)
+    mypath.add_module("TrackingEnergyLossCorrection", particleLists=['pi+:cut'], correction=0.001)
 
-    The module modifies the input particleLists by substracting the correction value to the track energy and rescaling the momentums 
+The module modifies the input particleLists by subtracting the correction value to the track energy and rescaling the momenta
 		     
 		     )DOC");
   // Parameter definitions
   addParam("particleLists", m_ParticleLists, "input particle lists");
-  addParam("correction", m_correction, "correction value to be substracted from the particle energy",
+  addParam("correction", m_correction, "correction value to be subtracted from the particle energy",
            nan(""));                                        // Nan
   addParam("payloadName", m_payloadName, "ID of table used for reweighing", std::string(""));
   addParam("correctionName", m_correctionName, "Label for the correction in the look up table", std::string(""));
@@ -49,6 +50,11 @@ void TrackingEnergyLossCorrectionModule::initialize()
   } else if (isnan(m_correction) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
+    if (Environment::Instance().isMC()) {
+      m_payloadName += "_MC";
+    } else {
+      m_payloadName += "_Data";
+    }
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
 
     std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((

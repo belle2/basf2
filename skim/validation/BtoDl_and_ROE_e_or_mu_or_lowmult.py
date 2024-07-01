@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -29,6 +28,7 @@ path = b2.Path()
 skim = BtoDl_and_ROE_e_or_mu_or_lowmult(
     validation=True,
     udstOutput=False,
+    analysisGlobaltag=ma.getAnalysisGlobaltag(),
 )
 
 ma.inputMdstList(
@@ -37,4 +37,5 @@ ma.inputMdstList(
 )
 skim(path)
 
+path.add_module('Progress')
 b2.process(path)

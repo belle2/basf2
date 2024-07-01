@@ -11,6 +11,9 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/gearbox/Const.h>
 
+#include <map>
+#include <string>
+
 namespace Belle2 {
 
   /**
@@ -39,11 +42,29 @@ namespace Belle2 {
                           float logl);
 
     /**
-     * Check whether PID information from a given set of detectors is available
-     * @param set a set of PID detectors
-     * @return true if the given set of detectors contributed to the PID information
+     * Subtract the maximum of log likelihoods of each detector component
+     * in order to reduce the range of values.
      */
-    bool isAvailable(Const::PIDDetectorSet set) const {return  m_detectors.contains(set);}
+    void subtractMaximum();
+
+    /**
+     * Check whether PID information is available for at least one of the detectors in a given set.
+     * Redefined after release-8.
+     * @param set a set of PID detectors
+     * @return true if at least one of the detectors in the set provides likelihoods
+     */
+    bool isAvailable(Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+
+    /**
+     * Check whether PID information is available for all detectors in a given set.
+     * Was named isAvailable in release-8 or older.
+     * @param set a set of PID detectors
+     * @return true if all detectors in the set provide likelihoods
+     */
+    bool areAllAvailable(Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const
+    {
+      return  m_detectors.contains(set);
+    }
 
     /**
      * Return log likelihood for a given detector set and particle
@@ -55,11 +76,11 @@ namespace Belle2 {
                   Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
-     * Return log likelihood difference for a given detector set and particles
+     * Return log likelihood difference between two particles for a given detector set
      * @param p1 charged stable particle
      * @param p2 charged stable particle
      * @param set  a set of PID detectors to use
-     * @return log likelihood difference logL_p1 - logL_p2
+     * @return log likelihood difference between p1 and p2: logL(p1) - logL(p2)
      */
     float getDeltaLogL(const Const::ChargedStable& p1,
                        const Const::ChargedStable& p2,
@@ -74,7 +95,7 @@ namespace Belle2 {
      * @param p1 charged stable particle
      * @param p2 charged stable particle
      * @param set  a set of PID detectors to use
-     * @return likelihood probability
+     * @return binary likelihood probability
      */
     double getProbability(const Const::ChargedStable& p1,
                           const Const::ChargedStable& p2,
@@ -89,7 +110,7 @@ namespace Belle2 {
      * @param p2 charged stable particle
      * @param ratio ratio of prior probabilities (p1/p2)
      * @param set  a set of PID detectors to use
-     * @return likelihood probability
+     * @return binary likelihood probability
      */
     double getProbability(const Const::ChargedStable& p1,
                           const Const::ChargedStable& p2,
@@ -103,22 +124,35 @@ namespace Belle2 {
      * @param part charged stable particle
      * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
      * @param set  a set of PID detectors to use
-     * @return likelihood probability (a value btw. 0 and 1)
+     * @return global likelihood probability
      */
     double getProbability(const Const::ChargedStable& part,
-                          const double* fractions = 0,
+                          const double* fractions = nullptr,
                           Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
+
+    /**
+     * Return logarithmic equivalent of likelihood probability defined as log(p/(1-p)),
+     * where p is the combined likelihood probability of a particle according to chargedStableSet.
+     * This one gives a smooth peak-like distribution (opposite to probability distribution which has spikes at 0 and 1).
+     * If prior fractions are not given, equal prior probabilities are assumed.
+     * @param part charged stable particle
+     * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
+     * @param set  a set of PID detectors to use
+     * @return logarithmic equivalent of global likelihood probability
+     */
+    double getLogarithmicProbability(const Const::ChargedStable& part,
+                                     const double* fractions = nullptr,
+                                     Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
 
     /**
      * Return most likely particle among chargedStableSet;
      * if prior fractions not given equal prior probabilities assumed.
      * @param fractions array of prior probabilities in the order defined in Const::ChargedStable
      * @param set  a set of PID detectors to use
-     * @return particle type
+     * @return most likely particle
      */
-    Const::ChargedStable getMostLikely(const double* fractions = 0,
-                                       Const::PIDDetectorSet set =
-                                         Const::PIDDetectorSet::set()) const;
+    Const::ChargedStable getMostLikely(const double* fractions = nullptr,
+                                       Const::PIDDetectorSet set = Const::PIDDetectorSet::set()) const;
     /**
      * Prints the content of a private array of log likelihoods
      */
@@ -129,10 +163,22 @@ namespace Belle2 {
      */
     std::string getInfoHTML() const override;
 
-  private:
+    /**
+     * Add the pre-official likelihood
+     * @param preOfficialIdentifier Name of the pre-official likelihood
+     * @param preOfficialLikelihood Value of the pre-official likelihood
+     */
+    void addPreOfficialLikelihood(const std::string& preOfficialIdentifier,
+                                  const double preOfficialLikelihood);
 
-    Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
-    float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
+    /**
+     * Get the pre-official likelihood
+     * @param preOfficialIdentifier Name of the pre-official likelihood
+     * @return Value of the pre-official likelihood
+     */
+    double getPreOfficialLikelihood(const std::string& preOfficialIdentifier) const;
+
+  private:
 
     /**
      * Calculate likelihood probabilities
@@ -144,8 +190,13 @@ namespace Belle2 {
                      const double* fractions,
                      Const::PIDDetectorSet detSet) const;
 
+    Const::DetectorSet m_detectors;   /**< set of detectors with PID information */
+    float m_logl[Const::PIDDetectors::c_size][Const::ChargedStable::c_SetSize]; /**< log likelihoods */
 
-    ClassDefOverride(PIDLikelihood, 3); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
+    /// Internal storage of pre-official likelihood.
+    std::map<std::string, double> m_preOfficialLikelihoods;
+
+    ClassDefOverride(PIDLikelihood, 4); /**< Collect log likelihoods from TOP, ARICH, dEdx, ECL and KLM. */
 
   };
 

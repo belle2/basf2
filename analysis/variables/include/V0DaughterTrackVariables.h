@@ -72,7 +72,7 @@ namespace Belle2 {
     double v0DaughterTrackD0(const Particle* part, const std::vector<double>& daughterID);
 
     /**
-     * returns the tranverse momentum angle of the V0 daughter track
+     * returns the transverse momentum angle of the V0 daughter track
      */
     double v0DaughterTrackPhi0(const Particle* part, const std::vector<double>& daughterID);
 

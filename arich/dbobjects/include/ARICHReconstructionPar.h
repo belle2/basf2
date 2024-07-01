@@ -150,7 +150,7 @@ namespace Belle2 {
     /**
     * Get expected number of background hits for pad at given theta at given phi_Cer_trk
     * (flat background in Cherenkov s)pace
-    * @param th_cer pad theta angle
+    * @param fi_cer_trk pad phi angle
     * @param th_cer pad theta angle
     * @param pars vector of parameters for PDF (beta, track hits HAPD window (1 or 0))
     * @return expected number of backgrond hits on pad

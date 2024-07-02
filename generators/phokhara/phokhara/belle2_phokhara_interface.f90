@@ -98,4 +98,12 @@ CONTAINS
     CALL CONVERT_STRING(INPUT_FILE, BELLE2_PHOKHARA_PARAMETERS%INPUT_FILE)
   END SUBROUTINE
 
+  SUBROUTINE ERROR_ROUTINE(message, error_flag)
+    CHARACTER(LEN=*), INTENT(IN) :: message
+    INTEGER, INTENT(INOUT) :: error_flag
+
+    WRITE(*, *) "Error: ", TRIM(message)
+    error_flag = error_flag + 1
+  END SUBROUTINE
+
 END MODULE

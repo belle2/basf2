@@ -243,6 +243,9 @@ c ======================================================================== c
 
       common / intsigma / int2ph,int2ph_err,int1ph,
      & int1ph_err,int0ph,int0ph_err !T
+      
+      character*20 qqmax_str, qqmin_str  ! AH
+      character*200 error_string  ! AH
 
       integer acc !TF
       
@@ -252,6 +255,7 @@ c
       common/muonfsr/inte
       common/virtsoft/inte_s
       common/zeroph/intezero
+
       
       
 c
@@ -297,6 +301,8 @@ c --- input parameters ----------------------------
         pi2cut     = XPAR(23) ! maximal hadrons(muons) angle
         pi2cut     = XPAR(23) ! maximal hadrons(muons) angle
         beamres    = XPAR(30) ! beam resolution for pion==11 and pion==12 only
+        
+        error_flag = 0        ! AH error_flag initialization
         
         call input(nges,nm,outfile)
 
@@ -354,8 +360,8 @@ c --- print run data ------------------------------
          elseif(pion.eq.15) then   
       write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> etaP  gamma gamma'
       else 
-         write(*,*) '     PHOKHARA 10.0: not yet implemented'
-         stop        
+         call ERROR_ROUTINE(' PHOKHARA 10.0: ' // 
+     &               'not yet implemented', error_flag)       
       endif
       endif
       if((ph0.eq.1).or.(ph0.eq.-1))then
@@ -396,9 +402,9 @@ c --- print run data ------------------------------
       write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> eta gamma'
       elseif(pion.eq.15) then   
       write(*,*) 'PHOKHARA 10.0 : e^+ e^- -> etaP gamma' 
-      else 
-         write(*,*) '     PHOKHARA 10.0: not yet implemented'
-         stop        
+      else     
+         call ERROR_ROUTINE(' PHOKHARA 10.0: ' // 
+     &               'not yet implemented', error_flag) 
       endif
       endif
 c --------------------------------
@@ -407,8 +413,8 @@ c --------------------------------
      &                 dSqrt(Sp),' GeV  '
         if(ph0.eq.0)then
         if(((gmin/2.d0/ebeam).lt.0.0098d0))then
-             write(*,*)' minimal missing energy set to small'
-             stop
+             call ERROR_ROUTINE(' minimal missing ' // 
+     &               'energy set to small', error_flag)
         endif
         write(*,100) 'minimal tagged photon energy           = ',
      &                 gmin,' GeV  '
@@ -546,10 +552,11 @@ c -------------------
             
 c -------------------
       if(qqmax.le.qqmin)then
-         write(*,*)' Q^2_max to small '
-         write(*,*)' Q^2_max = ',qqmax
-         write(*,*)' Q^2_min = ',qqmin
-         stop
+         write(qqmax_str, '(F12.6)') qqmax
+         write(qqmin_str, '(F12.6)') qqmin
+         call ERROR_ROUTINE('Q^2_max to small ' // 
+     &               ' Q^2_max = ' // trim(qqmax_str) //
+     &               ' Q^2_min = ' // trim(qqmin_str) , error_flag)
       endif
 c -------------------
       if(ph0.eq.0)then
@@ -685,12 +692,11 @@ c -------------------
             write(*,*) 'Beam resolution is included'
             continue
           else
-      write(*,*) 'Beam resolution allowed only for pion=11 or pion=12'
-      stop 
+      call ERROR_ROUTINE('Beam resolution allowed only ' // 
+     &               'for pion=11 or pion=12', error_flag) 
       endif
       else
-      write(*,*) 'Wrong be_r switch'
-      stop
+      call ERROR_ROUTINE('Wrong be_r switch', error_flag)
       endif
  
       if(ph0.eq.-1)then
@@ -699,9 +705,8 @@ c -------------------
        if (nlo.eq.0) then 
          write(*,*) 'Born'
          if(fsrnlo.ne.0)then
-           write(*,*)
-     1  'WRONG FSRNLO flag - only fsrnlo=0 allowed for Born'
-           stop
+           call ERROR_ROUTINE('WRONG FSRNLO flag - ' // 
+     &               'only fsrnlo=0 allowed for Born', error_flag)
          endif
        endif
       else !ph0.eq.1
@@ -710,33 +715,34 @@ c -------------------
         elseif(nlo.eq.1)then
          write(*,*) 'ISR NNLO'
         else
-         write(*,*) 'wrong nlo switch'
-         stop
+         call ERROR_ROUTINE('wrong nlo switch', error_flag)
         endif
       endif
 c -------------------
       if((pion.eq.9).and.(nlo.ne.0)) then
-        write(*,*)'WRONG NLO flag'
-       if(ph0.eq.0) write(*,*)' - only Born allowed for Lambdas'
-       if(ph0.eq.1) write(*,*)' - only NLO allowed for Lambdas'
-        write(*,*)'If you feel that you need better precision'
-        write(*,*)'please contact the authors'
-        stop
+        error_string = 'WRONG NLO flag'
+       if(ph0.eq.0) error_string = error_string // 
+     &                            ' - only Born allowed for Lambdas'
+       if(ph0.eq.0) error_string = error_string // 
+     &                            ' - only NLO allowed for Lambdas'
+        error_string = error_string // 
+     &                'If you feel that you need better precision'
+        error_string = error_string // 'please contact the authors'
+        call ERROR_ROUTINE(error_string, error_flag)
       endif
 
         if(((pion.eq.11).or.(pion.eq.12)).and.(nlo.ne.0))then
-        write(*,*) 'WRONG NLO flag'
-        write(*,*)'only nlo=0 allowed for chi production'
-        write(*,*)'If you feel that you need better precision'
-        write(*,*)'please contact the authors'
-       stop
+       call ERROR_ROUTINE('WRONG NLO flag ' // 
+     &               'only nlo=0 allowed for chi production ' //
+     &               'If you feel that you need better precision' //
+     &               'please contact the authors', error_flag)
        endif
      
         if(((pion.eq.11).or.(pion.eq.12)).and.(ph0.ne.0))then
-         write(*,*) 'WRONG NLO flag'
-        write(*,*)'only ph0=0 allowed for chi production'
-        write(*,*)'please contact the authors'
-       stop
+       call ERROR_ROUTINE('WRONG NLO flag ' // 
+     &               'Combinations for mu+mu- NLO  mode: ' //
+     &               'only ph0=0 allowed for chi production ' //
+     &               'please contact the authors', error_flag)
        endif
 
        
@@ -757,8 +763,8 @@ c-----------------------
       if((ph0.eq.0).and.(pion.eq.0))then
        if(nlo.eq.0)then
         if(fsrnlo.ne.0)then
-         write(*,*)'WRONG combination of FSR, FSRNLO flags'
-         stop
+         call ERROR_ROUTINE('WRONG combination of FSR, ' // 
+     &               'FSRNLO flags', error_flag)
         else
           if (fsr.eq.0) then
           continue
@@ -767,9 +773,8 @@ c-----------------------
           elseif (fsr.eq.2) then
            write(*,*) 'ISR+INT+FSR'
           else
-           write(*,*)
-     1   'WRONG FSR flag: interference is included only for nlo=0'
-           stop
+           call ERROR_ROUTINE('WRONG FSR flag: interference is ' // 
+     &               'included only for nlo=0', error_flag)
           endif
          endif
         elseif(nlo.eq.1)then
@@ -777,19 +782,17 @@ c-----------------------
            if(fsr.eq.2)then
             write(*,*)'ISR+FSR+INT'
            elseif(fsr.eq.0)then
-            write(*,*)'Wrong switch'
-            write(*,*)'Combinations for mu+mu- NLO  mode:'
-            write(*,*)'nlo = 1 then'
-            write(*,*)'fsr = 0, ifsnlo = 0'
-            write(*,*)'fsr = 2, ifsnlo = 1'
-            stop
+            call ERROR_ROUTINE('Wrong switch' // 
+     &               'Combinations for mu+mu- NLO  mode: ' //
+     &               'nlo = 1 then ' //
+     &               'fsr = 0, ifsnlo = 0 ' //
+     &               'fsr = 2, ifsnlo = 1', error_flag)
            elseif(fsr.eq.1)then
-            write(*,*)'Wrong switch'
-            write(*,*)'Combinations for mu+mu- NLO  mode:'
-            write(*,*)'nlo = 1 then'
-            write(*,*)'fsr = 0, ifsnlo = 0'
-            write(*,*)'fsr = 2, ifsnlo = 1'
-            stop
+            call ERROR_ROUTINE('Wrong switch' // 
+     &               'Combinations for mu+mu- NLO  mode: ' //
+     &               'nlo = 1 then ' //
+     &               'fsr = 0, ifsnlo = 0 ' //
+     &               'fsr = 2, ifsnlo = 1', error_flag)
            endif
          endif
         endif
@@ -803,9 +806,8 @@ c pi+pi-
      1 (nlo.eq.1).and.(ph0.eq.0))then
              continue
           else
-        write(*,*)'only ph0=0, nlo=1,frs=2 and fsrnlo=1
-     1  is allowed for nlo2=1'
-            stop
+            call ERROR_ROUTINE('only ph0=0, nlo=1,frs=2 ' // 
+     &               'and fsrnlo=1 is allowed for nlo2=1', error_flag)
           endif
         endif
       endif
@@ -825,8 +827,8 @@ c          if(fsrnlo.eq.1) write(10,*) 'IFSNLO included'
         write(*,*)'full NLO'
            continue
         else
-        write(*,*)'WRONG combination of FSR, FSRNLO flags'
-        stop
+        call ERROR_ROUTINE('WRONG combination of FSR, ' // 
+     &               'FSRNLO flags', error_flag)
         endif
        endif
 
@@ -841,14 +843,12 @@ c          if(fsrnlo.eq.1) write(10,*) 'IFSNLO included'
              if(nlo2.eq.1)then
                  continue
              else
-         write(*,*)
-     1   'WRONG FSR flag: interference is included only for nlo=0'
-         stop
+         call ERROR_ROUTINE('WRONG FSR flag: interference is ' // 
+     &               'included only for nlo=0', error_flag)
              endif
          endif
        else
-          write(*,*)'WRONG FSR flag', fsr
-         stop
+         call ERROR_ROUTINE('WRONG FSR flag', error_flag)
        endif
          if(fsrnlo.eq.1) then
             write(*,*)'IFSNLO included'
@@ -872,8 +872,8 @@ c
        elseif((fsr.eq.0).and.(fsrnlo.eq.0))then
         continue
        else
-        write(*,*)'WRONG combination of FSR, FSRNLO flags'
-        stop
+        call ERROR_ROUTINE('WRONG combination of FSR, ' // 
+     &               'FSRNLO flags', error_flag)
        endif
 
 
@@ -885,13 +885,11 @@ c
          if (nlo.eq.0) then
             write(*,*) 'ISR+INT+FSR'
          else
-         write(*,*)
-     1   'WRONG FSR flag: interference is included only for nlo=0'
-         stop
+         call ERROR_ROUTINE('WRONG FSR flag: interference is ' // 
+     &               'included only for nlo=0', error_flag)
          endif
        else
-          write(*,*)'WRONG FSR flag', fsr
-         stop
+         call ERROR_ROUTINE('WRONG FSR flag', error_flag)
        endif
          if(fsrnlo.eq.1) then
             write(*,*)'IFSNLO included'
@@ -903,9 +901,8 @@ c
           if((pion.eq.0).or.(pion.eq.1) )then 
           continue
           else
-        write(*,*)'FSR is implemented only for pi+pi-, mu+mu-,K+K- and
-     1 ppbar modes'
-       stop
+       call ERROR_ROUTINE('FSR is implemented only for pi+pi-, ' // 
+     &               'mu+mu-,K+K- and ppbar modes', error_flag)
            endif
        endif
       endif
@@ -925,9 +922,9 @@ c ------------------
       elseif(ivac.eq.2)then
         write(*,*)'Vacuum polarization (VP_HLMNT_v1_3nonr) by' 
         write(*,*)'Daisuke Nomura and Thomas Teubner' 
-      else
-        write(*,*)'WRONG vacuum polarization switch'
-        stop      
+      else 
+        call ERROR_ROUTINE('WRONG vacuum polarization ' // 
+     &               'switch', error_flag)
       endif
        
 c -----------------
@@ -938,9 +935,8 @@ c -----------------
           write(*,*)'Gounaris-Sakurai PionFormFactor old'
         elseif(FF_pion.eq.2)then
           write(*,*)'Gounaris-Sakurai PionFormFactor new'
-        else
-        write(*,*)'WRONG PionFormFactor switch'
-        stop      
+        else    
+        call ERROR_ROUTINE('WRONG PionFormFactor switch', error_flag)
         endif
 c ------
         if(fsr.ne.0)then
@@ -952,9 +948,8 @@ c ------
            write(*,*)'NO f0+f0(600)'
          elseif(f0_model.eq.3)then
            write(*,*)'only f0, KLOE: Cesare Bini-private communication'
-         else
-         write(*,*)'WRONG f0+f0(600) switch'
-         stop      
+         else    
+         call ERROR_ROUTINE('WRONG f0+f0(600) switch', error_flag)
          endif
         endif
       endif
@@ -966,9 +961,8 @@ c --------------------
           write(*,*)'unconstrained KaonFormFactor'
         elseif(FF_kaon.eq.2)then
           write(*,*)'Kuhn-Khodjamirian-Bruch KaonFormFactor'
-        else
-          write(*,*)'WRONG KaonFormFactor switch'
-          stop      
+        else    
+          call ERROR_ROUTINE('WRONG KaonFormFactor switch', error_flag)
         endif
       endif
 c --------------------
@@ -980,8 +974,8 @@ c --------------------
         elseif(narr_res.eq.2) then
           write(*,*)'THE NARROW RESONANCE PSI(2S) INLUDED'
         else
-          write(*,*)'wrong flag narr_res: only 0, 1 or 2 allowed'
-          stop
+          call ERROR_ROUTINE('wrong flag narr_res: ' // 
+     &               'only 0, 1 or 2 allowed', error_flag)
         endif
       endif
 
@@ -2017,7 +2011,6 @@ c J/Psi and Psi(2S) generation common
       common/ssmm/sm
       
         
-       
       real*8 ecm !TF
       common / beam / ecm !TF
 c
@@ -2124,9 +2117,8 @@ c
       enddo
       
       if((pion.ne.1).and.(nlo2.eq.1))then
-         write(*,*)'nlo2=1 allowed only for 2pi mode (pion=1)'
-         write(10,*)'nlo2=1 allowed only for 2pi mode (pion=1)'
-         stop
+         call ERROR_ROUTINE('nlo2=1 allowed only for ' // 
+     &               '2pi mode (pion=1)', error_flag)
       endif
 
       call init_ha
@@ -2144,17 +2136,16 @@ c J/Psi resonance parameters and EM and strong couplings
       if((narr_res.eq.0).or.(narr_res.eq.1).or.(narr_res.eq.2)) then
          continue
       else
-         write(*,*)'if you do not use flag narr_res put: 0'
-         stop
+         call ERROR_ROUTINE('if you do not use flag narr_res' // 
+     &               ' put: 0', error_flag)
       endif
 
       if((pion.eq.11).or.(pion.eq.12))then
         if(narr_res.eq.1)then
        continue
        else
-       write(*,*)
-     1 'for chi_c1 and chi_c2 production you have to use narr_res=1 !!!' 
-       stop
+       call ERROR_ROUTINE('for chi_c1 and chi_c2 production you ' // 
+     &               'have to use narr_res=1 !!!', error_flag)
        endif
        endif
 
@@ -2226,23 +2217,22 @@ c
       if(ph0.eq.-1)then
 c
        if(fsr.ne.0)then
-        write(6,*)'fsr.ne.0; only ISR is implemented in 0-ph mode'
-        stop
+        call ERROR_ROUTINE('fsr.ne.0; only ISR is implemented ' // 
+     &               'in 0-ph mode', error_flag)
        endif
        if(fsrnlo.ne.0)then
-        write(6,*)'fsrnlo.ne.0; only ISR is implemented in 0-ph mode'
-        stop
+        call ERROR_ROUTINE('fsrnlo.ne.0; only ISR is implemented ' // 
+     &               'in 0-ph mode', error_flag)
        endif
        if(narr_res.ne.0)then
-        write(6,*)'narr_res.ne.0;'
-        write(6,*)' narrow resonances are not implemented in 0-ph mode'
-        stop
+        call ERROR_ROUTINE('narr_res.ne.0; narrow resonances' // 
+     &               ' are not implemented in 0-ph mode', error_flag)
        endif
        if((phot1cut.ne.0.d0).or.(phot2cut.ne.180.d0))then
-        write(6,*)'in 0-ph mode the photons have to be generated with'
-        write(6,*)'no angular cuts. Please put your experimental event'
-        write(6,*)'selection directly in the subroutine  testcuts '
-        stop
+         call ERROR_ROUTINE('in 0-ph mode the photons have to be ' // 
+     &               'generated with no angular cuts. Please put ' //
+     &               'your experimental eventselection directly ' //
+     &               'in the subroutine  testcuts ', error_flag)
        endif
      
                   gmin = w*dSqrt(Sp)
@@ -2275,32 +2265,31 @@ c************************************************************
 c
        if(pion.ne.4)then
        if(fsr.ne.0)then
-        write(6,*)'fsr.ne.0; only ISR is implemented in 0-ph mode'
-        stop
+         call ERROR_ROUTINE('fsr.ne.0; only ISR is implemented ' // 
+     &               'in 0-ph mode', error_flag)
        endif
        if(fsrnlo.ne.0)then
-        write(6,*)'fsrnlo.ne.0; only ISR is implemented in 0-ph mode'
-        stop
+        call ERROR_ROUTINE('fsrnlo.ne.0; only ISR is implemented ' // 
+     &               'in 0-ph mode', error_flag)
        endif
        if(narr_res.ne.0)then
-        write(6,*)'narr_res.ne.0;'
-        write(6,*)' narrow resonances are not implemented in 0-ph mode'
-        stop
+        call ERROR_ROUTINE('narr_res.ne.0; narrow resonances' // 
+     &               ' are not implemented in 0-ph mode', error_flag)
        endif
        if((phot1cut.ne.0.d0).or.(phot2cut.ne.180.d0))then
-        write(6,*)'in 0-ph mode the photons have to be generated with'
-        write(6,*)'no angular cuts. Please put your experimental event'
-        write(6,*)'selection directly in the subroutine  testcuts '
-        stop
+         call ERROR_ROUTINE('in 0-ph mode the photons have to be ' // 
+     &               'generated with no angular cuts. Please put ' //
+     &               'your experimental eventselection directly ' //
+     &               'in the subroutine  testcuts ', error_flag)
          endif
          else
 c 
 
        if((phot1cut.ne.0.d0).or.(phot2cut.ne.180.d0))then
-        write(6,*)'in 0-ph mode the photons have to be generated with'
-        write(6,*)'no angular cuts. Please put your experimental event'
-        write(6,*)'selection directly in the subroutine  testcuts '
-        stop
+         call ERROR_ROUTINE('in 0-ph mode the photons have to be ' // 
+     &               'generated with no angular cuts. Please put ' //
+     &               'your experimental eventselection directly ' //
+     &               'in the subroutine  testcuts ', error_flag)
        endif
 c         
         endif
@@ -2308,18 +2297,17 @@ c
           if((fsr.eq.0).or.(fsr.eq.1))then
             continue
           elseif(fsr.eq.2)then
-           write(6,*)'only Coulomb factor is implemented in 0-ph mode'
-           stop
+           call ERROR_ROUTINE('only Coulomb factor is ' // 
+     &               'implemented in 0-ph mode', error_flag)
           else
-            write(6,*)'wrong fsr switch'
-            stop
+            call ERROR_ROUTINE('wrong fsr switch', error_flag)
           endif
           if(fsrnlo.eq.0)then
            continue
           else
-           write(6,*)'only Coulomb factor is implemented in 0-ph mode'
-           write(6,*)'fsrnlo should be set to 0'
-           stop
+           call ERROR_ROUTINE('only Coulomb factor is ' // 
+     &               'implemented in 0-ph mode. ' //
+     &               'fsrnlo should be set to 0', error_flag)
           endif
        endif
 c
@@ -2349,8 +2337,8 @@ c leptonic tensor for e+e- initial state
       elseif(ph0.eq.0)then
         continue
       else
-       write(6,*)'wrong ph0 switch; please check the input file'
-       stop
+       call ERROR_ROUTINE('wrong ph0 switch; ' // 
+     &               'please check the input file', error_flag)
       endif
 c
       if(pion.eq.1)then
@@ -8110,6 +8098,7 @@ c **********************************************************************
       end
 c **********************************************************************
       subroutine sum_FF_Kp()
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'       
       integer jj,ii
       real*8 GAMMA,qq_min_Kp,qq_max_Kp
@@ -8130,8 +8119,8 @@ c **********************************************************************
       if(pion.eq.7) qq_min_Kp = 4.d0 * mKn**2
 
       if(sqrt(Sp).gt.11.d0) then
-        write(6,*)' this function is to be used  below sqrt(s) = 11 GeV'
-        stop
+        call ERROR_ROUTINE(' this function is to be used ' // 
+     &               'below sqrt(s) = 11 GeV', error_flag)
       endif
 
         beta_p_rho_Kp = beta_rho_Kp - 1.d0
@@ -8440,6 +8429,7 @@ c **********************************************************************
 c **********************************************************************
 
       complex*16 function appr_sum(qq)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'       
       real*8 qq,appr_r,appr_i,q_ss
       real*8 aa,bb,cc,tt,dd,ee,ff,gg,hh,jj,kk,ll,mm,nn,oo,pp,rr,ss,uu     
@@ -8490,8 +8480,8 @@ c
         ee = 7.73108923d0
         appr_i = aa*(1.d0/q_ss-bb)**cc*(1.d0 + dd/q_ss**ee)
        else
-        write(6,*)' this function is to be used  below sqrt(s) = 11 GeV'
-        stop
+        call ERROR_ROUTINE(' this function is to be used ' // 
+     &               'below sqrt(s) = 11 GeV', error_flag)
        endif
 c ---------------------------------------
 c  real part
@@ -8903,6 +8893,7 @@ c*************************************************************************
 c i=1: a1, i=2: f0, i=3: omega
 c 
       complex*16 function bwgrho_o(ij,qq2)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'
 c
       complex*16 cbw,cbw1,cbw2,cbw3
@@ -8942,8 +8933,8 @@ c
         beta2 = b2_om_4pi
         beta3 = b3_om_4pi
       else
-        write(6,*)'wrong function bwgrho_o call'
-        stop
+        call ERROR_ROUTINE('wrong function ' // 
+     &               'bwgrho_o call', error_flag)
       endif
 c
       bwgrho_o = (cbw + beta1*cbw1+beta2*cbw2+beta3*cbw3)
@@ -10750,6 +10741,7 @@ c
       end
 c**************************************************************************
       subroutine ddvec(rk1,eck1,uupp1,uupp2,vv1,vv2,ddpl,ddmi,qq)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'     
       complex*16 gam(4),eck1(4),eck2(4),dd(4),dee(4),dmm(4),
      1               protF1,protF2
@@ -10880,7 +10872,11 @@ c-------------------------------------------------------------------------------
       enddo 
 
       else 
-       stop
+c       stop
+c AH: Here, no stop reason is given. Out of the context I'm assuming
+c that this function is not relevant for finalstates other than
+c pion=1,6,0
+        call ERROR_ROUTINE('wrong "pions" switch', error_flag)
       endif      
 c
       call cplus(dd,ddpl)
@@ -11362,6 +11358,7 @@ c*****************************************************************************
 c the 2pi(pion=1) and mu+, mu-(pion=0) currents + 4pi currents
 c
       subroutine gam1(gam,gammu,gammu_ma,v1,v2,up1,up2,qq)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'       
       integer mu,ic1,ic2,ic3,i
       real*8 qq,th1,th2,sphi1,cphi1,sphi2,cphi2,cth1d2,sth1d2,
@@ -11498,8 +11495,7 @@ c
         call had_3pi(qq,q1,q2,q3,gam,10)
        endif
       else
-       write(6,*)'wrong "pions" switch'
-       stop
+       call ERROR_ROUTINE('wrong "pions" switch', error_flag)
       endif
       return
       end
@@ -11703,6 +11699,7 @@ c this function includes vacuum polarisation and J/psi or psi(2S)
 c as set by the input parameters     
 c---------------------------------------------------------------------
       complex*16 function vacpol_and_nr(qq)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'
       real*8 qq,aa_phi,mm_ph,gg_ph
       real*8 vprehadsp,vprehadtm,vpimhad,vprelepsp,vpreleptm,vpimlep,
@@ -11735,8 +11732,7 @@ c     1   - 3.d0*Br_phi_ee*gg_ph/alpha/mm_ph*BW_om(mm_ph,gg_ph,qq,1)
 c        endif
 c
       else
-       write(6,*)' wrong ivac parameter '
-       stop
+       call ERROR_ROUTINE(' wrong ivac parameter ', error_flag)
       endif
 c
       if(narr_res.eq.1)then
@@ -13424,6 +13420,7 @@ c muon mode, hard part with 2 real hard photon
 c sum over all polarisations for e+,e-,mu+,mu-,gamma,gamma 
 c-----------------------------------------------------------------------
       real*8 function ampsqr_mu(q,qq,gammu,rk1,rk2)
+      use belle2_phokhara_interface
       include 'phokhara_10.0.inc'
       real*8 rk1(4),rk2(4),ampsgr,qq,q(4),con4,dps,B6,B5,error,B5ISR
       complex*16 fsr_mu_amp,isr_mu_amp,isr_fsr_mu_amp,isr_fsr_mu_amp2
@@ -13500,12 +13497,11 @@ c
      &  (rk1,rk2,ii1,ii2,eck1,eck2,
      &   gam,q,qq,uupp1,uupp2,vv1,vv2))**2/4.d0
       else
-      write(*,*)'Wrong switch'
-      write(*,*)'Combinations for mu+mu- NLO  mode:'
-      write(*,*)'nlo = 1 then'
-      write(*,*)'fsr = 0, ifsnlo = 0'
-      write(*,*)'fsr = 2, ifsnlo = 1'
-      stop
+      call ERROR_ROUTINE('WRONG NLO flag ' // 
+     &               'Combinations for mu+mu- NLO  mode: ' //
+     &               'nlo = 1 then' //
+     &               'fsr = 0, ifsnlo = 0' //
+     &               'fsr = 2, ifsnlo = 1', error_flag)
       endif
 c
       elseif(fsrnlo.eq.1)then

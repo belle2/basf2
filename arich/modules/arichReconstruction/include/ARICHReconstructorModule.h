@@ -38,52 +38,87 @@ namespace Belle2 {
 
   public:
 
-    /*! Constructor.*/
+    /**
+     * Constructor.
+     */
     ARICHReconstructorModule();
 
-    /*! Destructor.*/
+    /**
+     * Destructor.
+     */
     virtual ~ARICHReconstructorModule();
 
     /**
      * Initialize the Module.
-     *
      */
     virtual void initialize() override;
 
     /**
      * Called when entering a new run.
-     *
      */
     virtual void beginRun() override;
 
     /**
      * Event processor.
-     *
      */
     virtual void event() override;
 
   protected:
 
-    /*! Print module parameters.*/
+    /**
+     * Print module parameters.
+     */
     void printModuleParams();
 
   private:
 
+    /** ARICH hits. */
     StoreArray<ARICHHit> m_ARICHHits;
+
+    /** Tracks. */
     StoreArray<Track> m_Tracks;
+
+    /** Extrapolation hits. */
     StoreArray<ExtHit> m_ExtHits;
+
+    /** Aerogel hits. */
     StoreArray<ARICHAeroHit> m_aeroHits;
+
+    /** Likelihoods. */
     StoreArray<ARICHLikelihood> m_ARICHLikelihoods;
+
+    /** ARICH tracks. */
     StoreArray<ARICHTrack> m_ARICHTracks;
 
-    // Other members.
-    ARICHReconstruction* m_ana;      /**< Class with reconstruction tools */
-    double m_trackPositionResolution;/**< Track position resolution; simulation smearing. */
-    double m_trackAngleResolution;   /**< Track direction resolution; simulation smearing. */
-    int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-    int m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
-    bool m_align;                    /** If==1 alignment constants are used for global->local track transformation */
-    bool m_alignMirrors;             /** If==1 alignment constants for mirrors are used */
+    /* Other members. */
+
+    /** Class with reconstruction tools. */
+    ARICHReconstruction* m_ana;
+
+    /** Track position resolution; simulation smearing. */
+    double m_trackPositionResolution;
+
+    /** Track direction resolution; simulation smearing. */
+    double m_trackAngleResolution;
+
+    /** Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
+    int m_inputTrackType;
+
+    /**
+     * If == 1, individual reconstruced photon information
+     * (Cherenkov angle,...) is stored in ARICHTrack.
+     */
+    int m_storePhot;
+
+    /**
+     * Whether alignment constants are used for global->local
+     * track transformation.
+     */
+    bool m_align;
+
+    /** Whether alignment constants for mirrors are used. */
+    bool m_alignMirrors;
+
   };
 
 } // Belle2 namespace

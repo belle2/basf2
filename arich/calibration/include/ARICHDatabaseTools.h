@@ -39,7 +39,7 @@ namespace Belle2 {
 
       /**
        * @brief isValidChannel defines the range of valid channels.
-       * @param channel
+       * @param channel channel
        * @return true if channel id/number is in the valid range otherwise false.
        */
       static constexpr auto isValidChannel(const int channel) noexcept -> bool
@@ -47,6 +47,11 @@ namespace Belle2 {
         return (channel >= 0) && (channel <= m_gMaxChannel);
       }
 
+      /**
+       * @brief isValidSector checks whether a given sector is valid.
+       * @param sector sector to be checked
+       * @return true if sector id/number is in the valid range otherwise false.
+       */
       static auto isValidSector(const uint8_t sector) noexcept -> bool
       {
         return std::find(m_gValidSectors.begin(), m_gValidSectors.end(), sector) !=

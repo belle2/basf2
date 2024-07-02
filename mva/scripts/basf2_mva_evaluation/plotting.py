@@ -122,6 +122,8 @@ class Plotter:
         self.set_errorband_options()
         self.set_fill_options()
 
+        self.prop_cycler = itertools.cycle(plt.rcParams["axes.prop_cycle"])
+
     def add_subplot(self, gridspecs):
         """
         Adds a new subplot to the figure, updates all other axes
@@ -192,9 +194,7 @@ class Plotter:
         fill_kwargs = copy.copy(self.fill_kwargs)
 
         if plot_kwargs is None or 'color' not in plot_kwargs:
-            prop_cycler = plt.rcParams["axes.prop_cycle"]
-            prop_iter = itertools.cycle(prop_cycler)
-            color = next(prop_iter)
+            color = next(self.prop_cycler)
             color = color['color']
             plot_kwargs['color'] = color
         else:

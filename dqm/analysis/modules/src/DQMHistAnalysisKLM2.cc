@@ -312,7 +312,7 @@ void DQMHistAnalysisKLM2Module::endRun()
 
   int eklmGlobalMaxSector = EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();//8
   int eklmLocalMaxSector = EKLMElementNumbers::getMaximalSectorNumber();//4
-  int eklmBLayerCount = m_EklmElementNumbers->getMaximalDetectorLayerNumber(0);//12
+  int eklmBLayerCount = m_EklmElementNumbers->getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection);//12
 
   // Looping over the sectors
   for (int bin = 0; bin < m_eff_bklm_sector->GetXaxis()->GetNbins(); bin++) {

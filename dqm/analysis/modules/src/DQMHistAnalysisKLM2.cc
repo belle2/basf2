@@ -349,13 +349,11 @@ void DQMHistAnalysisKLM2Module::endRun()
   }
   for (int layer = 0; layer < m_eff_eklm->GetXaxis()->GetNbins(); layer++) {
     name = "eff_E";
-    if (layer / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() <
-        EKLMElementNumbers::getMaximalDetectorLayerNumber[0]) //(layer/8 < 12)
-      name += "B" + std::to_string(layer / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() + 1);
+    if (layer / eklmGlobalMaxSector < eklmBLayerCount) //(layer/8 < 12)
+      name += "B" + std::to_string(layer / eklmGlobalMaxSector + 1);
     else
-      name += "F" + std::to_string(layer / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder() -
-                                   EKLMElementNumbers::getMaximalDetectorLayerNumber[0] + 1);
-    name +=  + "_num" + std::to_string(((layer) % EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder()) + 1);
+      name += "F" + std::to_string(layer / eklmGlobalMaxSector - eklmBLayerCount + 1);
+    name +=  + "_num" + std::to_string(((layer) % eklmGlobalMaxSector) + 1);
     m_monObj->setVariable(name, m_eff_eklm->GetBinContent(layer + 1));
 
   }

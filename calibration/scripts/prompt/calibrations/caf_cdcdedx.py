@@ -41,6 +41,7 @@ settings = CalibrationSettings(
         "maxevt_rg": 75000,
         "maxevt_cc": 18e6,
         "maxevt_wg": 18e6,
+        "adjustment": 1.00798,
         "calib_mode": "full",  # manual or predefined: quick or full
         "calibration_procedure": {"rgtrail0": 0, "rgpre0": 0, "rg0": 0}
          },
@@ -67,8 +68,10 @@ def get_calibrations(input_data, **kwargs):
 
     expert_config = kwargs.get("expert_config")
     calib_mode = expert_config["calib_mode"]
+
     # extracting parameters
     fulldataMode = expert_config["calib_datamode"]
+    adjustment = expert_config["adjustment"]
 
     if fulldataMode:
         input_files_rungain = list(file_to_iov_physics.keys())
@@ -122,15 +125,15 @@ def get_calibrations(input_data, **kwargs):
 
     if calib_mode == "full":
         calibration_procedure = {
-            "rgtrail0": 0,
-            "tgpre0": 0,
-            "tg0": 0,
-            "rgpre0": 0,
-            "cc0": 0,
-            "ce0": 0,
-            "bd0": 0,
-            "wg0": 0,
-            "rg0": 0
+            "rgtrail0": 0,  # Run Gain trail (No Payload saving and take of effect of previous rungains)
+            "tgpre0": 0,  # Injection time gain Pre (No payload saving)
+            "tg0": 0,  # Injection time gain
+            "rgpre0": 0,  # Run Gain Pre (No Payload saving)
+            "cc0": 0,  # Cosine Corr Gain
+            "ce0": 0,  # Cosine edge Corr Gain
+            "bd0": 0,  # Bad wire
+            "wg0": 0,  # WireGain Gain
+            "rg0": 0  # Final Run Gain to take Wire and Cosine correction in effect
         }
     elif calib_mode == "quick":
         calibration_procedure = {
@@ -157,17 +160,17 @@ def get_calibrations(input_data, **kwargs):
         data_files = [input_files_rungain, input_files_coscorr, input_files_wiregain]
         cal_name = ''.join([i for i in calib_keys[i] if not i.isdigit()])
         if cal_name == "rg" or cal_name == "rgtrail" or cal_name == "rgpre":
-            alg = [rg_algo()]
+            alg = [rungain_algo(cal_name, adjustment)]
         elif cal_name == "cc":
             alg = [cos_algo()]
         elif cal_name == "ce":
             alg = [cosedge_algo()]
         elif cal_name == "tg" or cal_name == "tgpre":
-            alg = [time_algo()]
+            alg = [injection_time_algo()]
         elif cal_name == "bd":
             alg = [badwire_algo()]
         elif cal_name == "wg":
-            alg = [wg_algo()]
+            alg = [wiregain_algo()]
         else:
             basf2.B2FATAL(f"The calibration is not defined, check spelling: calib {i}: {calib_keys[i]}")
 
@@ -280,7 +283,7 @@ def collector(granularity='all', name=''):
 # Rungain Algorithm setup
 
 
-def rg_algo():
+def rungain_algo(name, adjustment):
     """
     Create a rungain calibration algorithm.
     Returns:
@@ -288,12 +291,14 @@ def rg_algo():
     """
     algo = CDCDedxRunGainAlgorithm()
     algo.setMonitoringPlots(True)
+    if name == "rg":
+        algo.setAdjustment(adjustment)
     return algo
 
 # Injection Algorithm setup
 
 
-def time_algo():
+def injection_time_algo():
     """
     Create a injection time calibration algorithm.
     Returns:
@@ -350,7 +355,7 @@ def badwire_algo():
 # WireGain Algorithm setup
 
 
-def wg_algo():
+def wiregain_algo():
     """
     Create a wire gain calibration algorithm.
     Returns:

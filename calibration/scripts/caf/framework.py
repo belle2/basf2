@@ -1096,8 +1096,8 @@ class Algorithm():
     Parameters:
         algorithm: The CalibrationAlgorithm instance that we want to execute.
     Keyword Arguments:
-        data_input (types.FunctionType): An optional function that sets the input files of the algorithm.
-        pre_algorithm (types.FunctionType): An optional function that runs just prior to execution of the algorithm.
+        data_input : An optional function that sets the input files of the algorithm.
+        pre_algorithm : An optional function that runs just prior to execution of the algorithm.
             Useful for set up e.g. module initialisation
 
     This is a simple wrapper class around the C++ CalibrationAlgorithm class.

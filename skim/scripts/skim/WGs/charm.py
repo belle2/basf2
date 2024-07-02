@@ -1515,7 +1515,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         * 0.130 < massDifference(0) < 0.160 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
         * 0.120 < massDifference(0) < 0.165 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
         * 1.81 < M < 2.21 on signal side :math:`D^{*+}`
-        * 0.08 < :math:`M_{D^{*}}` - :math:`M_{D}` and p* > 2.0 on signal side :math:`D^{0}`
+        * 0.08 < :math:`M_{D^{*}}` - :math:`M_{D}` < 0.27 and p* > 2.0 on signal side :math:`D^{0}`
     """
     vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
     vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')
@@ -1739,7 +1739,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
         ma.copyLists("D*+:skimSig", sigDstList, path=path)
 
-        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and DelM > 0.08", path=path)
+        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.08 < DelM < 0.27", path=path)
 
         sigDzList = ["D0:skimSig"]
         return sigDzList

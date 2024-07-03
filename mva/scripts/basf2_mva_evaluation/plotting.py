@@ -122,6 +122,7 @@ class Plotter:
         self.set_errorband_options()
         self.set_fill_options()
 
+        #: Property cycler used to give plots unique colors
         self.prop_cycler = itertools.cycle(plt.rcParams["axes.prop_cycle"])
 
     def add_subplot(self, gridspecs):

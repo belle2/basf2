@@ -123,7 +123,7 @@ namespace Belle2 {
 
     StoreObjPtr<FileMetaData> m_inputFileMetaData{"", DataStore::c_Persistent}; /**< Pointer to the input file meta data */
 
-    FileMetaData m_outputFileMetaData; /** File meta data to be stored in the output ntuple file */
+    FileMetaData m_outputFileMetaData; /**< File meta data to be stored in the output ntuple file */
 
     bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
 

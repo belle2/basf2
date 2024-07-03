@@ -11,7 +11,6 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
-#include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -52,11 +51,6 @@ void TrackingMomentumScaleFactorsModule::initialize()
   } else if (!m_scalingFactorName.empty() && !m_smearingFactorName.empty()) {
     B2FATAL("It's not allowed to provide both a valid value for the scalingFactorName and smearingFactorName. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
-    if (Environment::Instance().isMC()) {
-      m_payloadName += "_MC";
-    } else {
-      m_payloadName += "_Data";
-    }
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
 
     std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((

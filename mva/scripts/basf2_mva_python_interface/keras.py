@@ -19,7 +19,7 @@ from basf2 import B2WARNING
 
 class State:
     """
-    Tensorflow.keras state
+    keras state
     """
 
     def __init__(self, model=None, **kwargs):
@@ -45,7 +45,7 @@ def feature_importance(state):
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
-    Return default tensorflow.keras model
+    Return dummy default keras model
     """
 
     input = Input(shape=(number_of_features,))
@@ -62,7 +62,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
 def load(obj):
     """
-    Load Tensorflow.keras model into state
+    Load keras model into state
     """
     with tempfile.TemporaryDirectory() as temp_path:
 
@@ -103,7 +103,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
 
 def partial_fit(state, X, S, y, w, epoch, batch):
     """
-    Pass received data to tensorflow.keras session
+    Pass received data to keras model and fit it
     """
     if epoch > 0:
         B2WARNING("The keras training interface has been called with specific_options.m_nIterations > 1."
@@ -119,7 +119,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 def end_fit(state):
     """
-    Store tensorflow.keras session in a graph
+    Store trained keras model
     """
 
     with tempfile.TemporaryDirectory() as temp_path:

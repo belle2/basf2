@@ -114,8 +114,7 @@ class XToD0_D0ToHpJm(BaseSkim):
 
         """
 
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
-        ma.cutAndCopyList('K+:D0ToHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:D0ToHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         D0Cuts = "1.70 < M < 2.00 and useCMSFrame(p) > 2.0"
         D0Channels = ["pi+:charmSkim pi-:charmSkim",
@@ -678,10 +677,9 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 
     def build_lists(self, path):
         D0_cuts = "1.70 < M < 2.10"
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
-        ma.cutAndCopyList('pi+:HpJmPi0', 'pi+:charmSkim', 'binaryID < 0.9', path=path)
-        ma.cutAndCopyList('K+:HpJmPi0', 'K+:charmSkim', 'binaryID > 0.1', path=path)
+        ma.cutAndCopyList('pi+:HpJmPi0', 'pi+:charmSkim', 'binaryPID(321, 211) < 0.9', path=path)
+        ma.cutAndCopyList('K+:HpJmPi0', 'K+:charmSkim', 'binaryPID(321, 211) > 0.1', path=path)
 
         Dst_lists = []
         for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:
@@ -837,9 +835,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
-        ma.cutAndCopyList('pi+:D0ToHpJmEta', 'pi+:charmSkim', 'binaryID < 0.9', path=path)
-        ma.cutAndCopyList('K+:D0ToHpJmEta', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('pi+:D0ToHpJmEta', 'pi+:charmSkim', 'binaryPID(321, 211) < 0.9', path=path)
+        ma.cutAndCopyList('K+:D0ToHpJmEta', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
         charmcuts = "1.66 < M < 2.06"
@@ -1175,10 +1172,9 @@ class LambdacTopHpJm(BaseSkim):
         charm_skim_std_charged('p', path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
-        ma.cutAndCopyList('K+:LcTopHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:LcTopHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
         ma.cutAndCopyList('p+:LcTopHpJm', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
@@ -1234,10 +1230,9 @@ class LambdacToSHpJm(BaseSkim):
         charm_skim_sigma(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
-        ma.cutAndCopyList('K+:LcToSHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:LcToSHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         ma.cutAndCopyList(
             'K_S0:LcToSHpJm',
@@ -1289,10 +1284,9 @@ class XicpTopHpJm(BaseSkim):
         charm_skim_std_charged('p', path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
-        ma.cutAndCopyList('K+:XicTopHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:XicTopHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
         ma.cutAndCopyList('p+:XicTopHpJm', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
 
         XicCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
@@ -1340,11 +1334,10 @@ class XicpToLKsHp(BaseSkim):
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
-        ma.cutAndCopyList('pi+:Xic2LKsHp', 'pi+:charmSkim', 'binaryID < 0.9', path=path)
-        ma.cutAndCopyList('K+:Xic2LKsHp', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('pi+:Xic2LKsHp', 'pi+:charmSkim', 'binaryPID(321, 211) < 0.9', path=path)
+        ma.cutAndCopyList('K+:Xic2LKsHp', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
         ma.cutAndCopyList('Lambda0:Xic2LKsHp', 'Lambda0:merged', '1.10 < M < 1.13 and daughter(0,trinaryID) > 0.2', path=path)
         ma.cutAndCopyList('K_S0:Xic2LKsHp', 'K_S0:merged', '0.46 < M < 0.54', path=path)
         ma.reconstructDecay("Xi-:Xic2LKsHp -> Lambda0:Xic2LKsHp pi-:all", cut="1.295 < M < 1.35", path=path)
@@ -1406,11 +1399,10 @@ class XicToXimPipPim(BaseSkim):
         charm_skim_sigma(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
         va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
-        ma.cutAndCopyList('K+:XicToSHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:XicToSHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         ma.cutAndCopyList(
             'Lambda0:XicToSHpJm',

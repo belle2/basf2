@@ -46,7 +46,7 @@ def generate_test_data(filename, evtNumList, runList, expList):
     return os.path.abspath(filename)
 
 
-with clean_working_directory():
+with clean_working_directory() as tmpdir:
 
     # generate input files
     evtNumList = [9, 1]
@@ -74,7 +74,7 @@ with clean_working_directory():
 
     metadata = get_metadata(testFile)
 
-    assert os.path.abspath(testFile) == metadata.getLfn()
+    assert os.path.abspath(testFile) == tmpdir + '/' + metadata.getLfn()
     assert 0 == metadata.getNEvents()
     assert 40 == metadata.getNFullEvents()
 

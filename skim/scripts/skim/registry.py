@@ -122,8 +122,9 @@ _RegisteredSkims = [
     # Charmed baryons
     ("17230900", "charm", "LambdacToSHpJm"),  # Lambda_c+ -> Sigma+ h+ j-
     ("17231000", "charm", "XicpTopHpJm"),  # Xi_c+ -> proton h+ j-
-    ("17231100", "charm", "XictoXimpippim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
+    ("17231100", "charm", "XicToXimPipPim"),  # Xi_c+ -> Sigma+/Xi h+ j- (k+)
     ("17231200", "charm", "Xic0ToLHpJm"),  # Xi_c0 -> Lambda0 h+ j-
+    ("17231300", "charm", "XicpToLKsHp"),  # Xi_c+ -> Lambda Ks h+, Xi- pi+ h+
     # D* -> D0
     ("17240100", "charm", "DstToD0Pi_D0ToHpJm"),  # D* -> D0 -> K pi/pi pi/K K
     # D* -> D0 -> K/pi- pi/pi+ pi0 (RS+WS)
@@ -143,8 +144,8 @@ _RegisteredSkims = [
     ("17222100", "charm", "DpToKsHp"),  # D+ -> Ks pi+
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
-    ("17220100", "charm", "DpToPipepem"),  # D+ -> pi+ e+ e-
-    ("17220200", "charm", "DpToPipmupmum"),  # D+ -> pi+ mu+ mu-
+    ("17220100", "charm", "DpToPipEpEm"),  # D+ -> pi+ e+ e-
+    ("17220200", "charm", "DpToPipMupMum"),  # D+ -> pi+ mu+ mu-
     ("17220300", "charm", "DpToPipKpKm"),  # D+ -> pi+ K+ K-
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0

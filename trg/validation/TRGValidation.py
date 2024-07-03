@@ -738,7 +738,7 @@ class MakePlots(basf2.Module):
             h_eff_theta.Write()
             h_eff_phi.Write()
 
-        bits = ['ty_0', 'klm_0']
+        bits = ['ty_0', 'klm_0', "klm_hit"]
         part = "mu"
         h_gen_p = self.tfile.Get(f"{part}_all/p")
         h_gen_E = self.tfile.Get(f"{part}_all/clusterE")
@@ -818,7 +818,7 @@ ma.cutAndCopyList('e+:true', 'e+:all', cut='isSignal>0 and mcPrimary>0', path=my
 pvars = ["p", "theta", "phi"]
 dvars = vu.create_aliases(pvars, 'daughter(0,{variable})', "emu")
 
-bits = ['ty_0', 'ehigh', 'clst_0', 'klm_0']
+bits = ['ty_0', 'ehigh', 'clst_0', 'klm_0', "klm_hit"]
 varlists = []
 for bit in bits:
     inb_cut = f"L1Input({bit})>0"

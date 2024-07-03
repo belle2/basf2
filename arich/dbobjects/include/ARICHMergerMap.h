@@ -48,7 +48,7 @@ namespace Belle2 {
     int getMergerPosition() const {return m_position; }
 
     /** Set Merger Position
-     * @param Merger Position
+     * @param position Merger Position
      */
     void setMergerPosition(int position) {m_position = position; }
 
@@ -58,7 +58,7 @@ namespace Belle2 {
     int getMergerSextant() const {return m_sextant; }
 
     /** Set Merger sextant
-     * @param Merger sextant
+     * @param sextant Merger sextant
      */
     void setMergerSextant(int sextant) {m_sextant = sextant; }
 
@@ -69,7 +69,7 @@ namespace Belle2 {
     ARICHMergerInfo getMergerID() const {return m_merger; }
 
     /** Set Merger board Identifier
-     * @param Merger board Identifier
+     * @param merger Merger board Identifier
      */
     void setMergerID(ARICHMergerInfo merger) {m_merger = merger; }
 
@@ -81,7 +81,7 @@ namespace Belle2 {
     ARICHB2LinkInfo getB2LinkID() const {return m_b2Link; }
 
     /** Set B2Link Identifier
-     * @param B2Link Identifier
+     * @param b2Link B2Link Identifier
      */
     void setB2LinkID(ARICHB2LinkInfo b2Link) {m_b2Link = b2Link; }
 

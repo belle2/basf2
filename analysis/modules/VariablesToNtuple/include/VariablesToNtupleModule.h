@@ -125,5 +125,7 @@ namespace Belle2 {
 
     FileMetaData m_outputFileMetaData; /** File meta data to be stored in the output ntuple file */
 
+    bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
+
   };
 } // end namespace Belle2

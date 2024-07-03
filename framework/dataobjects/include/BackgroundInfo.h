@@ -50,6 +50,7 @@ namespace Belle2 {
       double scaleFactor = 1;      /**< scale factor for the rate */
       double rate = 0;             /**< background rate of the sample */
       unsigned reused = 0;         /**< number of times the sample is reused */
+      int runNumber = 0;           /**< run number of run-dependent overlay, otherwise 0 */
     };
 
     /**
@@ -273,7 +274,7 @@ namespace Belle2 {
     double m_maxEdepECL = 0;  /**< maximal allowed deposited energy in ECL */
     std::string m_extensionName; /**< name added to default branch names of background */
 
-    ClassDefOverride(BackgroundInfo, 4); /**< Class definition */
+    ClassDefOverride(BackgroundInfo, 5); /**< Class definition */
   };
 }
 

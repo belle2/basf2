@@ -11,6 +11,7 @@
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/core/ModuleParam.templateDetails.h>
+#include <framework/core/Environment.h>
 #include <analysis/VariableManager/Manager.h>
 #include <analysis/dataobjects/ParticleList.h>
 
@@ -49,6 +50,11 @@ void TrackingEnergyLossCorrectionModule::initialize()
   } else if (isnan(m_correction) && m_payloadName.empty()) {
     B2FATAL("Neither a valid value for the scale parameter nor a non-empty table name was provided. Please set (exactly) one of the two options!");
   } else if (!m_payloadName.empty()) {
+    if (Environment::Instance().isMC()) {
+      m_payloadName += "_MC";
+    } else {
+      m_payloadName += "_Data";
+    }
     m_ParticleWeightingLookUpTable = std::make_unique<DBObjPtr<ParticleWeightingLookUpTable>>(m_payloadName);
 
     std::vector<std::string> variables =  Variable::Manager::Instance().resolveCollections((

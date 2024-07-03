@@ -1911,7 +1911,7 @@ class DpToEtaHp(BaseSkim):
     __category__ = "physics, charm"
 
     NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = True
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)

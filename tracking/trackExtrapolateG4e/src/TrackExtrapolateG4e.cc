@@ -1561,7 +1561,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       intersection.hit = bestHit;
       hit->isOnTrack(true);
       if (track != nullptr) {
-        track->addRelationTo(hit);
+        track->addRelationTo(hit, intersection.chi2);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
           recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
@@ -1622,7 +1622,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
       if (track != nullptr) {
-        track->addRelationTo(hit);
+        track->addRelationTo(hit, intersection.chi2);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
           for (const EKLMAlignmentHit& alignmentHit : hit->getRelationsFrom<EKLMAlignmentHit>()) {

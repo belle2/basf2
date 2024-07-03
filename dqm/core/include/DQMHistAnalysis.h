@@ -65,12 +65,12 @@ namespace Belle2 {
     /**
      * The type of list of MonitoringObjects.
      */
-    typedef std::map<std::string, MonitoringObject*> MonObjList;
+    typedef std::map<std::string, MonitoringObject> MonObjList;
 
     /**
      * The type of list of delta settings and histograms.
      */
-    typedef std::map<std::string, HistDelta*> DeltaList;
+    typedef std::map<std::string, HistDelta> DeltaList;
 
     /**
      * The type of list of canvas updated status.
@@ -81,6 +81,11 @@ namespace Belle2 {
      * The type of list of references.
      */
     typedef std::map<std::string, RefHistObject> RefList;
+
+    /**
+    * Clear all static global lists
+    */
+    void clearlist(void);
 
 
   private:
@@ -93,10 +98,12 @@ namespace Belle2 {
      */
     static MonObjList s_monObjList;
 
+  public:
     /**
      * The list of Delta Histograms and settings.
      */
     static DeltaList s_deltaList;
+  private:
 
     /**
      * The list of canvas updated status.
@@ -167,7 +174,7 @@ namespace Belle2 {
      * Get the list of MonitoringObjects.
      * @return The list of the MonitoringObjects.
      */
-    static const MonObjList& getMonObjList() { return s_monObjList;};
+    static /*const*/ MonObjList& getMonObjList() { return s_monObjList;};
 
     /**
      * Get the list of the delta histograms.
@@ -299,10 +306,10 @@ namespace Belle2 {
 
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)
-     * @param histname name of MonitoringObject to get
+     * @param name name of MonitoringObject to get
      * @return The MonitoringObject
      */
-    static MonitoringObject* getMonitoringObject(const std::string& histname);
+    static MonitoringObject* getMonitoringObject(const std::string& name);
 
     /**
      * Clear content of all Canvases

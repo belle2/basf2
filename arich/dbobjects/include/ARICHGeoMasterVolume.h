@@ -139,9 +139,32 @@ namespace Belle2 {
      */
     const std::string& getMaterial() const {return m_material;}
 
+    /**
+     * Transform local point into global Belle II coordinate system via rotation and translation
+     * @param point point to be transformed
+     * @return transformed point
+     */
     ROOT::Math::XYZVector pointToGlobal(const ROOT::Math::XYZVector& point) const;
+
+    /**
+     * Rotate local momentum into global Belle II coordinate system
+     * @param momentum momentum vector to be rotated
+     * @return rotated momentum vector
+     */
     ROOT::Math::XYZVector momentumToGlobal(const ROOT::Math::XYZVector& momentum) const;
+
+    /**
+     * Transform global point into ARICH reference system via inverse rotation and translation
+     * @param point point to be transformed
+     * @return transformed point
+     */
     ROOT::Math::XYZVector pointToLocal(const ROOT::Math::XYZVector& point) const;
+
+    /**
+     * Rotate global point into ARICH reference system via inverse rotation
+     * @param momentum momentum vector to be rotated
+     * @return rotated momentum vector
+     */
     ROOT::Math::XYZVector momentumToLocal(const ROOT::Math::XYZVector& momentum) const;
 
 
@@ -160,11 +183,11 @@ namespace Belle2 {
     double m_outerR = 0; /**< tube outer radius */
     double m_length = 0; /**< tube length */
 
-    std::string m_material;
+    std::string m_material; /**< material of ARICH master volume */
 
-    mutable ROOT::Math::Rotation3D* m_rotation = nullptr ;
-    mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr;
-    mutable ROOT::Math::XYZVector*  m_translation = nullptr;
+    mutable ROOT::Math::Rotation3D* m_rotation = nullptr ; /**< rotation matrix of ARICH master volume */
+    mutable ROOT::Math::Rotation3D* m_rotationInverse = nullptr; /**< inverse rotation matrix of ARICH master volume */
+    mutable ROOT::Math::XYZVector*  m_translation = nullptr; /**< position of ARICH master volume center point */
 
     ClassDefOverride(ARICHGeoMasterVolume, 2); /**< ClassDef */
 

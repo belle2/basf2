@@ -31,6 +31,7 @@ DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
+DQMHistAnalysisModule::RefList DQMHistAnalysisModule::s_refList;
 #ifdef _BELLE2_EPICS
 std::vector <chid>  DQMHistAnalysisModule::m_epicsChID;
 #endif
@@ -167,9 +168,9 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
 TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, bool was_updated)
 {
   if (s_refList.find(histname) != s_refList.end()) {
-    if (was_updated && !s_refList[histname].isUpdated()) return nullptr;
-    if (s_refList[histname].getHist()) {
-      return s_refList[histname].getHist();
+    if (was_updated) return nullptr;
+    if (s_refList[histname].getRefHist()) {
+      return s_refList[histname].getRefHist();
     } else {
       B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
     }

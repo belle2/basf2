@@ -115,7 +115,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
               TH1* h = (TH1*)obj;
               if (h->GetDimension() == 1) {
                 string histname = h->GetName();
-                m_pnode.push_back(REFNODE());
+                m_pnode.push_back(RefHistObject::REFNODE());
                 auto& n = m_pnode.back();
                 n.orghist_name = dirname + "/" + histname;
                 n.refhist_name = "ref/" + dirname + "/" + histname;

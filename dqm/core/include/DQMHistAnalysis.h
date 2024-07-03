@@ -15,6 +15,7 @@
 #include <framework/core/Module.h>
 #include <dqm/core/MonitoringObject.h>
 #include <dqm/analysis/HistObject.h>
+#include <dqm/analysis/RefHistObject.h>
 #include <dqm/analysis/HistDelta.h>
 #include <TFile.h>
 #include <TH1.h>
@@ -77,26 +78,9 @@ namespace Belle2 {
     typedef std::map<std::string, bool> CanvasUpdatedList;
 
     /**
-     * The type for reference histograms and
-     * they're mapping to online histograms
-     */
-    typedef struct {
-      /** online histogram name */
-      std::string orghist_name;
-      /** reference histogram name */
-      std::string refhist_name;
-      /** related canvas name name */
-      TCanvas* canvas{nullptr};
-      /** pointer to the org reference histogram */
-      TH1* ref_org{nullptr};
-      /** pointer to the cloned/scaled reference histogram */
-      TH1* ref_clone{nullptr};
-    } REFNODE;
-
-    /**
      * The type of list of references.
      */
-    typedef std::map<std::string, REFNODE> RefList;
+    typedef std::map<std::string, RefHistObject> RefList;
 
 
   private:

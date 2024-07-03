@@ -261,6 +261,13 @@ namespace Belle2 {
     static TH1* findRefHist(const std::string& dirname,
                             const std::string& histname, bool onlyIfUpdated = false);
 
+    /** Using the original and reference, create scaled version
+     * @param hist pointer to histogram
+     * @param ref pointer to reference
+     * @return scaled reference
+     */
+    static TH1* scaleReference(TH1* hist, TH1* ref);
+
     /**
      * Find histogram in specific TFile (e.g. ref file).
      * @param file  The TFile to search.

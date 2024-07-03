@@ -186,6 +186,47 @@ TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::s
   return findRefHist(histname, updated);
 }
 
+TH1* DQMHistAnalysisModule::scaleReference(TH1* hist, TH1* ref)
+{
+  TH1* output{nullptr};
+
+  // if hist/ref is nullptr, nothing to do
+  if (!hist || !ref)
+    return output;
+
+  if (hist->Integral() == 0)
+    return output;
+
+  B2DEBUG(1, "Beginning scaleReference Procedure")
+
+  // only if we have entries in reference
+  if (abs(ref->Integral()) > 0) {
+    if (hist->InheritsFrom("TH1C") or hist->InheritsFrom("TH1S")) {
+      output = new TH1F(); // we want it a float for better scaling
+      ref->Copy(*output);
+    } else if (hist->InheritsFrom("TH1I") or hist->InheritsFrom("TH1L")) {
+      output = new TH1D(); // we want it a float for better scaling
+      ref->Copy(*output);
+    } else {
+      // keep TProfile, TH1F or TH1D
+      output = (TH1*)ref->Clone();
+    }
+    output->SetLineStyle(2);
+    output->SetLineColor(3);
+    output->SetFillColor(0);
+    output->SetStats(kFALSE);
+
+    output->Scale(hist->Integral() / output->Integral());
+
+    //Not sure if we want this block at this stage. Maybe move it when drawing. -2024/July/3
+    //Adjust the y scale to cover the reference
+    //if (output->GetMaximum() > hist->GetMaximum())
+    //  hist->SetMaximum(1.1 * output->GetMaximum());
+  }
+
+  return output;
+}
+
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
 

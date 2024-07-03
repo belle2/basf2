@@ -18,11 +18,12 @@ namespace Belle2 {
 
 
   public:
-    std::string orghist_name; /** online histogram name */
-    std::string refhist_name; /** online histogram name */
-    TH1* m_hist{};/**< Pointer to original histogram */
+    std::string m_orghist_name; /** online histogram name */
+    std::string m_refhist_name; /** reference histogram name */
+    TCanvas* m_canvas{};
     TH1* m_refHist{};/**< Pointer to reference histogram */
     TH1* m_refCopy{};/**< Pointer to scaled reference histogram */
+    bool m_updated = false; /**< flag if update since last event */
 
     typedef struct {
       /** online histogram name */
@@ -37,18 +38,30 @@ namespace Belle2 {
       TH1* ref_clone{nullptr};
     } REFNODE;
 
-    REFNODE m_refNode{};
+    REFNODE m_refNode{m_orghist_name, m_refhist_name, m_canvas, m_refHist, m_refCopy  };
 
   public:
 
     /** Constructor
      */
-    RefHistObject(void) : orghist_name(""), refhist_name(""), m_hist(nullptr), m_refHist(nullptr), m_refCopy(nullptr) {};
+    RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_canvas(nullptr), m_refHist(nullptr), m_refCopy(nullptr),
+      m_updated(false) {};
+
+    /** Updating original reference, and scaled reference
+     * @param ref pointer to reference
+     * @param norm normalization from original histogram
+     * @return histogram was updated flag (return m_updated)
+     */
+    bool update(TH1* ref, double norm);
+
+    /** Reset histogram and update flag, not the entries
+     */
+    void resetBeforeEvent(void);
 
     /** Get hist pointer
     * @return hist ptr
     */
-    TH1* getHist(void) { return m_hist;};
+    TCanvas* getCanvas(void) { return m_canvas;};
 
     /** Get ref hist pointer
     * @return ref hist ptr

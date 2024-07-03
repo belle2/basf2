@@ -158,6 +158,7 @@ void DQMHistReferenceModule::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before ref loop");
 
+
   for (auto& it : m_pnode) {
     if (!it.ref_org) continue; // No reference, continue
 
@@ -211,6 +212,8 @@ void DQMHistReferenceModule::event()
         it.ref_clone->SetStats(kFALSE);
       }
       it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
+      auto* testIntegral = scaleReference(hist1, it.ref_clone);
+      B2WARNING("base class vs. existing: " << testIntegral << "vs. " << it.ref_clone->Integral());
 
       // Adjust the y scale to cover the reference
       if (it.ref_clone->GetMaximum() > hist1->GetMaximum())

@@ -57,6 +57,8 @@ def scanTTree(filename):
     ttrees = [key.GetName() for key in tfile.GetListOfKeys() if key.GetClassName() == "TTree"]
 
     for ttree_name in ttrees:
+        if ttree_name == "persistent":
+            continue
         print(f"TTree: {ttree_name}")
 
         # get TTree object

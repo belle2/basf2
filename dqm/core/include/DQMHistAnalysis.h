@@ -189,8 +189,8 @@ namespace Belle2 {
     static const CanvasUpdatedList& getCanvasUpdatedList() { return s_canvasUpdatedList;};
 
     /**
-     * Get the list of the histograms.
-     * @return The list of the histograms.
+     * Get the list of the reference histograms.
+     * @return The list of the reference  histograms.
      */
     static /*const*/ RefList& getRefList() { return s_refList;};
 

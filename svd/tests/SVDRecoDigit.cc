@@ -90,7 +90,7 @@ namespace Belle2 {
                          init_timeErr, init_probs, init_chi2);
       // Test getters
       std::string
-      digitString("VXDID : 12548 = 3.4.1 strip: V-132 Amplitude: 23456 +/- 1234 Time: -16 +/- 3.21\n probabilities: 0 655 6553 51772 3932 2621 Chi2/ndf: 2.34\n");
+      digitString("VXDID : 25092 = 3.4.1 strip: V-132 Amplitude: 23456 +/- 1234 Time: -16 +/- 3.21\n probabilities: 0 655 6553 51772 3932 2621 Chi2/ndf: 2.34\n");
       EXPECT_EQ(digitString, digit.toString());
     }
 

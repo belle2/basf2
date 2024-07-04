@@ -1,0 +1,24 @@
+# EventType: 4110441003
+# Descriptor: [Y4S->gamma[Y2S->pi+pi-[Y1S->mu+mu-]]]
+# NickName: Y4S_pipiY1S_mumu
+# Cuts: None
+# Documentation: Upsilon(4S) decay process
+# PhysicsWG: Quarkonium
+# Tested: Yes
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Date: 20240704
+
+Decay  Upsilon(4S)
+1.0    Upsilon(2S)sig  gamma  VECTORISR 1.0 1.0; 
+Enddecay
+
+Decay  Upsilon(2S)sig
+1.0    Upsilonsig pi+ pi- YMSTOYNSPIPICLEOBOOST -0.753 0.000;
+Enddecay
+
+Decay  Upsilonsig
+1.0    mu+  mu-  PHOTOS VLL;
+Enddecay
+
+End 

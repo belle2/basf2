@@ -159,12 +159,12 @@ namespace Belle2 {
     // Test time indep. detector constructors
     GlobalLabel vxdlabel = GlobalLabel::construct<VXDAlignment>(vxdSensor, paramid);
     GlobalLabel cdclabel = GlobalLabel::construct<CDCAlignment>(cdcWire, paramid);
-    EXPECT_EQ(100422809, vxdlabel.label());
+    EXPECT_EQ(100845209, vxdlabel.label());
     EXPECT_EQ(270620409, cdclabel.label());
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());
     // Test time indep. label constructor
-    vxdlabel = GlobalLabel(100422809);
+    vxdlabel = GlobalLabel(100845209);
     cdclabel = GlobalLabel(270620409);
     EXPECT_EQ(paramid, vxdlabel.getParameterId());
     EXPECT_EQ(paramid, cdclabel.getParameterId());

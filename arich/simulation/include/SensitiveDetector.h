@@ -25,7 +25,6 @@ namespace Belle2 {
 
       /**
        * Constructor.
-       * @param name Name of the sensitive detector. Do we still need that?
        */
       SensitiveDetector();
 

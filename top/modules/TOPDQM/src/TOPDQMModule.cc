@@ -15,6 +15,7 @@
 #include "TDirectory.h"
 #include <boost/format.hpp>
 #include <algorithm>
+#include <cmath>
 
 using namespace std;
 using boost::format;
@@ -62,7 +63,7 @@ namespace Belle2 {
 
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_numModules = geo->getNumModules();
-    double bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
+    m_bunchTimeSep = geo->getNominalTDC().getSyncTimeBase() / 24;
 
     // Histograms
 
@@ -82,10 +83,10 @@ namespace Belle2 {
     m_window_vs_slot->GetXaxis()->SetNdivisions(16);
 
     int nbinsT0 = 75;
-    double rangeT0 = nbinsT0 * bunchTimeSep;
+    double rangeT0 = nbinsT0 * m_bunchTimeSep;
     m_eventT0 = new TH1F("eventT0", "Event T0; event T0 [ns]; events per bin", nbinsT0, -rangeT0 / 2, rangeT0 / 2);
 
-    m_bunchOffset = new TH1F("bunchOffset", "Bunch offset", 100, -bunchTimeSep / 2, bunchTimeSep / 2);
+    m_bunchOffset = new TH1F("bunchOffset", "Bunch offset", 100, -m_bunchTimeSep / 2, m_bunchTimeSep / 2);
     m_bunchOffset->SetXTitle("offset [ns]");
     m_bunchOffset->SetYTitle("events per bin");
     m_bunchOffset->SetMinimum(0);
@@ -320,7 +321,9 @@ namespace Belle2 {
 
     if (recBunchValid) {
       double t0 = m_commonT0->isRoughlyCalibrated() ? m_commonT0->getT0() : 0;
-      m_bunchOffset->Fill(m_recBunch->getCurrentOffset() - t0);
+      double offset = m_recBunch->getCurrentOffset() - t0;
+      offset -= m_bunchTimeSep * lround(offset / m_bunchTimeSep); // wrap around
+      m_bunchOffset->Fill(offset);
       m_eventT0->Fill(m_recBunch->getTime());
     }
 

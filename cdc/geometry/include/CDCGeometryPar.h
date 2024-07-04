@@ -551,7 +551,11 @@ namespace Belle2 {
       float getT0(const WireID& wireID) const
       {
         //  std::cout << wireID.getICLayer() <<" "<< wireID.getIWire() << std::endl;
-        return m_t0[wireID.getICLayer()][wireID.getIWire()];
+        unsigned int iclayer = wireID.getICLayer();
+        unsigned int iwire = wireID.getIWire();
+        if (iclayer >= c_maxNSenseLayers) iclayer = c_maxNSenseLayers - 1;
+        if (iwire >= c_maxNDriftCells) iwire = c_maxNDriftCells - 1;
+        return m_t0[iclayer][iwire];
       }
 
       //! Returns frontend board id. corresponding to the wire id.

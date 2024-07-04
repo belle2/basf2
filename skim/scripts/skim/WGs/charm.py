@@ -1228,7 +1228,7 @@ class LambdacToSHpJm(BaseSkim):
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
         * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
         * loose mass window for :math:`\\pi^{0}` and skim selections from stdPi0s
-        * ``0.44 < M(K_s) < 0.55, significanceOfDistance > 2.0``
+        * ``0.44 < M(K_s) < 0.55, significanceOfFlightDistance > 2.0``
         * :math:`\\pm 3\\sigma` mass windows for :math:`\\Sigma^+`
         * lower bound on significance of distance for :math:`\\Sigma^+` > 2
         * For more details, please check the source code of this skim.
@@ -1257,6 +1257,8 @@ class LambdacToSHpJm(BaseSkim):
 
     def build_lists(self, path):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList('pi+:LcToSHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:LcToSHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
@@ -1264,7 +1266,7 @@ class LambdacToSHpJm(BaseSkim):
         ma.cutAndCopyList(
             'K_S0:LcToSHpJm',
             'K_S0:merged',
-            'significanceOfDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
+            'significanceOfFlightDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
             path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
@@ -1418,7 +1420,7 @@ class XicToXimPipPim(BaseSkim):
     * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
     * :math:`\\pm 3\\sigma` mass windows for all intermediate hyperons
     * :math:`\\pm 3\\sigma` mass window for pi0 and skim selections from stdPi0s
-    * lower bound on significance of distance for all intermediate hyperons, 40% of expected value to be used in analysis
+    * lower bound on significance of (flight) distance for all intermediate hyperons, 40% of expected value to be used in analysis
     * loose mass window and lower bound to pCMS for Xic+
     """
 
@@ -1445,6 +1447,8 @@ class XicToXimPipPim(BaseSkim):
 
     def build_lists(self, path):
         va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList('pi+:XicToSHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
         ma.cutAndCopyList('K+:XicToSHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
@@ -1452,7 +1456,7 @@ class XicToXimPipPim(BaseSkim):
         ma.cutAndCopyList(
             'Lambda0:XicToSHpJm',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfDistance > 3 and daughter(0,trinaryID) > 0.2 and daughter(1,pionIDNN) > 0.1',
+            '1.114 < M < 1.118 and significanceOfFlightDistance > 3 and daughter(0,trinaryID) > 0.2 and daughter(1,pionIDNN) > 0.1',
             path=path)
 
         ma.reconstructDecay(
@@ -1513,11 +1517,12 @@ class Xic0ToLHpJm(BaseSkim):
 
     def build_lists(self, path):
         va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList(
             'Lambda0:XicToLHpJm',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfDistance > 3 and daughter(0,trinaryID) > 0.2',
+            '1.114 < M < 1.118 and significanceOfFlightDistance > 3 and daughter(0,trinaryID) > 0.2',
             path=path)
 
         XicCuts = "2.3 < M < 2.65 and useCMSFrame(p) > 2.0"

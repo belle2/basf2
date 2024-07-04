@@ -169,7 +169,7 @@ namespace Belle2 {
     double m_rectangleW = 0.0;           /**< Width of the rectangle in mm */
     double m_rectangleThickness = 0.0;   /**< Thickness of the rectangle in mm */
     double m_rectangleDistanceFromCenter = 0.0;   /**< Distance from center of the rectangle */
-    /**< Feb cooling configuration/geometry ID. 0 -> Not installed, 1 -> Default position, 2 -> Rotated by 90 degree. */
+    /** Feb cooling configuration/geometry ID. 0 -> Not installed, 1 -> Default position, 2 -> Rotated by 90 degree. */
     std::vector<double> m_febcoolingv2GeometryID;
 
     ClassDef(ARICHGeoFEBCooling, 1); /**< ClassDef */

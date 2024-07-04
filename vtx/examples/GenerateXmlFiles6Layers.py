@@ -26,7 +26,6 @@ else:
     fileName = 'VTX-CMOS6-staggered.xml'
     fileNameC = 'VTX-Components-CMOS6-staggered.xml'
 
-
 f = open('../data/' + fileNameC, 'w')
 
 Material = "Si"
@@ -87,6 +86,7 @@ shift = ""
 shift1 = ""
 shiftR = 0.
 shiftR1 = 6.5
+shiftZ = 11.75
 gap = 0
 shiftL = 0
 radius = 0
@@ -102,61 +102,61 @@ f.write('      -->\n')
 for layer in range(1, nlayer+1):
 
     if layer == 1:
-        type = 'layer14i'
-        nsensor = 1
-        start = 0
+        type = 'layer1i'
+        nsensor = 4
+        start = -28.218  # + sensorL/2.
         shift = str(2.9)
         gap = 0.1
         shiftL = 2.9
-        radius = 14.0
+        radius = 14.0 + sensorHi/2.
 
     if layer == 2:
-        type = 'layer14i'
-        nsensor = 1
-        start = 0
+        type = 'layer1i'
+        nsensor = 4
+        start = -28.218  # + sensorL/2.
         shift = str(6.0)
         gap = 0.1
         shiftL = 6
-        radius = 22.0
+        radius = 22.0 + sensorHi/2.
 
     if layer == 3:
-        type = 'layer14'
-        nsensor = 3
-        start = -111.474 + 2*sensorL
+        type = 'layer1o'
+        nsensor = 12
+        start = -111.474  # + sensorL/2.
         shift = str(11.0)
         gap = 0.1
         shiftL = 11
-        radius = 69.0
+        radius = 69.0 + sensorH/2.
 
     if layer == 4:
-        type = 'layer14'
-        nsensor = 4
-        start = -157.144 + 2*sensorL
+        type = 'layer1o'
+        nsensor = 16
+        start = -157.144  # + sensorL/2.
         gap = 0.1
         shiftL = 0
-        radius = 82.5
+        radius = 82.5 + sensorH/2.
         radius1 = radius + shiftR1
         phi = 5.
         phi1 = 15.
 
     if layer == 5:
-        type = 'layer12'
-        nsensor = 10
-        start = -207.546 + sensorL
+        type = 'layer1o'
+        nsensor = 20
+        start = -207.546  # + sensorL/2.
         gap = 0.1
         shiftL = 0
-        radius = 106.0
+        radius = 108.0 + sensorH/2.
         radius1 = radius + shiftR1
         phi = 3.75
         phi1 = 11.25
 
     if layer == 6:
-        type = 'layer14'
-        nsensor = 6
-        start = -249.082 + 2*sensorL
+        type = 'layer1o'
+        nsensor = 24
+        start = -249.082  # + sensorL/2.
         gap = 0.1
         shiftL = 0
-        radius = 133.5
+        radius = 133.5 + sensorH/2.
         radius1 = radius + shiftR1
         phi = 3.
         phi1 = 9.
@@ -184,12 +184,7 @@ for layer in range(1, nlayer+1):
         f.write('    <!-- The value of Sensors is the global z position -->\n')
 
     for id in range(0, nsensor):
-
-        pos = 0
-        if (layer == 5):
-            pos = start + (2*sensorL+gap)*id
-        else:
-            pos = start + (4*sensorL+gap)*id
+        pos = start + (sensorL+gap)*id
         posZ = str(pos)
 
         cmd1 = '    <Sensor id=\"' + str(id+1) + '\"' + ' type=\"' + type + \
@@ -200,11 +195,9 @@ for layer in range(1, nlayer+1):
 
     if (layer >= 4):
         for id in range(0, nsensor):
-            pos = 0
-            if (layer == 5):
-                pos = start + (2*sensorL+gap)*id
-            else:
-                pos = start + (4*sensorL+gap)*id
+            pos = start + (sensorL+gap)*id
+            if (layer == 6):
+                pos -= shiftZ
             posZ = str(pos)
 
             cmd2 = '    <Sensor id=\"' + str(id+nsensor+1) + '\"' + ' type=\"' + type + \
@@ -217,13 +210,13 @@ for layer in range(1, nlayer+1):
     f.write('\n')
 
 
-type = ("layer14", "layer14i", "layer12")
-length = (sensorL*4, sensorL*4, sensorL*2)
-height = (sensorH, sensorHi, sensorH)
-lengthA = (activeL*4, activeL*4, activeL*2)
-pixels = (pixelsV*4, pixelsV*4, pixelsV*2)
+type = ("layer1o", "layer1i")
+length = (sensorL, sensorL)
+height = (sensorH, sensorHi)
+lengthA = (activeL, activeL, activeL)
+pixels = (pixelsV, pixelsV, pixelsV)
 
-for i in range(0, 3):
+for i in range(0, 2):
 
     f.write('<Sensor type=\"' + type[i] + '\">\n')
     f.write('  <Material>' + Material + '</Material>\n')
@@ -428,6 +421,8 @@ nlayers = 6
 nLaddersYing = 0
 nLaddersYang = 0
 nLadders = 0
+shiftPhi1 = 0
+shiftPhi2 = 0
 
 # Ying
 for layer in range(1, nlayers+1):
@@ -435,33 +430,39 @@ for layer in range(1, nlayers+1):
     if layer == 1:
         nLaddersYing = 3
         nLadders = 6
+        shiftPhi1 = 0
 
     if layer == 2:
         nLaddersYing = 5
         nLadders = 10
+        shiftPhi1 = 0
 
     if layer == 3:
         nLaddersYing = 15
         nLadders = 30
+        shiftPhi1 = 11
 
     if layer == 4:
         nLaddersYing = 9
         nLadders = 18
+        shiftPhi1 = 10
 
     if layer == 5:
         nLaddersYing = 12
         nLadders = 24
+        shiftPhi1 = 7.5
 
     if layer == 6:
         nLaddersYing = 15
         nLadders = 30
+        shiftPhi1 = 6.
 
     f.write('      <Layer id=\"' + str(layer) + '\">\n')
     dPhi = 360/nLadders
 
     for id in range(1, nLaddersYing+1):
 
-        ang = str(dPhi*(id-1))
+        ang = str(dPhi*(id-1) + shiftPhi1)
 
         angt = ang[0:6]
 
@@ -481,44 +482,51 @@ f.write('      <!-- Define the ladders in each layer with increasing phi angle. 
 f.write('           ladder ids are unique per layer and thus are continued from the\n')
 f.write('           first half shell -->\n')
 
+
 for layer in range(1, nlayers+1):
 
     if layer == 1:
         nLaddersYing = 3
         nLaddersYang = 6
         nLadders = 6
+        shiftPhi2 = 0
 
     if layer == 2:
         nLaddersYing = 5
         nLaddersYang = 10
         nLadders = 10
+        shiftPhi2 = 0
 
     if layer == 3:
         nLaddersYing = 15
         nLaddersYang = 30
         nLadders = 30
+        shiftPhi2 = 11
 
     if layer == 4:
         nLaddersYing = 9
         nLaddersYang = 18
         nLadders = 18
+        shiftPhi2 = 10
 
     if layer == 5:
         nLaddersYing = 12
         nLaddersYang = 24
         nLadders = 24
+        shiftPhi2 = 7.5
 
     if layer == 6:
         nLaddersYing = 15
         nLaddersYang = 30
         nLadders = 30
+        shiftPhi2 = 6
 
     f.write('      <Layer id=\"' + str(layer) + '\">\n')
     dPhi = 360/nLadders
 
     for id in range(nLaddersYing+1, nLaddersYang+1):
 
-        ang = str(dPhi*(id-1))
+        ang = str(dPhi*(id-1) + shiftPhi2)
 
         angt = ang[0:6]
 

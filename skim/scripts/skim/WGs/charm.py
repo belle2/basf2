@@ -1380,6 +1380,7 @@ class XicToXimPipPim(BaseSkim):
     * :math:`\\pm 3\\sigma` mass window for pi0 and skim selections from stdPi0s
     * lower bound on significance of (flight) distance for all intermediate hyperons, 40% of expected value to be used in analysis
     * loose mass window and lower bound to pCMS for Xic+
+    * lower bound to p for pi0s originating from a Sigma+
     """
 
     __authors__ = ["Paul Gebeline"]
@@ -1403,6 +1404,7 @@ class XicToXimPipPim(BaseSkim):
         va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList('K+:XicToSHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
+        ma.cutAndCopyList('Sigma+:XicToSHpJm', 'Sigma+:charmSkim', 'daughter(1, p) > 0.1', path=path)
 
         ma.cutAndCopyList(
             'Lambda0:XicToSHpJm',
@@ -1418,9 +1420,9 @@ class XicToXimPipPim(BaseSkim):
                             cut="1.294 < M < 1.335 and significanceOfDistance > 2", path=path)
 
         XicCuts = "2.3 < M < 2.65 and useCMSFrame(p) > 2.0"
-        XicChannels = ["Sigma+:charmSkim pi+:charmSkim K-:XicToSHpJm",
-                       "Sigma+:charmSkim pi+:charmSkim pi-:charmSkim",
-                       "Sigma+:charmSkim K+:XicToSHpJm K-:XicToSHpJm",
+        XicChannels = ["Sigma+:XicToSHpJm pi+:charmSkim K-:XicToSHpJm",
+                       "Sigma+:XicToSHpJm pi+:charmSkim pi-:charmSkim",
+                       "Sigma+:XicToSHpJm K+:XicToSHpJm K-:XicToSHpJm",
                        "Xi-:XicToSHpJm pi+:charmSkim pi+:charmSkim",
                        "Xi0:XicToSHpJm pi+:charmSkim pi+:charmSkim pi-:charmSkim"
                        ]

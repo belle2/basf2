@@ -17,7 +17,7 @@ bool RefHistObject::update(TH1* ref, double norm)
 {
   // usual check for nullptr
   m_updated |= norm != m_refCopy->Integral();
-  m_refHist = std::unique_ptr<TH1>(ref);
+  m_refHist = ref;
   if (!ref) {
     if (ref->InheritsFrom("TH1C") or ref->InheritsFrom("TH1S")) {
       m_refCopy = new TH1F(); // we want it a float for better scaling
@@ -29,10 +29,10 @@ bool RefHistObject::update(TH1* ref, double norm)
       // keep TProfile, TH1F or TH1D
       m_refCopy = (TH1*)m_refHist->Clone();
     }
-  }
-  if (!m_refCopy)
-    m_refCopy = std::unique_ptr<TH1>(m_refCopy->Scale(norm / m_refCopy->Integral()););
 
+    if (!m_refCopy)
+      m_refCopy->Scale(norm / m_refCopy->Integral());
+  }
   return m_updated; //incase an update procedure is needed
 }
 

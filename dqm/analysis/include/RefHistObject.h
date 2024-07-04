@@ -8,6 +8,7 @@
 #pragma once
 
 #include <TH1.h>
+#include <TCanvas.h>
 
 namespace Belle2 {
 
@@ -18,13 +19,14 @@ namespace Belle2 {
 
 
   public:
-    std::string m_orghist_name; /** online histogram name */
-    std::string m_refhist_name; /** reference histogram name */
-    TCanvas* m_canvas{};
+    std::string m_orghist_name; /**< online histogram name */
+    std::string m_refhist_name; /**< reference histogram name */
+    TCanvas* m_canvas{}; /**< canvas where we draw the histogram*/
     TH1* m_refHist{};/**< Pointer to reference histogram */
     TH1* m_refCopy{};/**< Pointer to scaled reference histogram */
     bool m_updated = false; /**< flag if update since last event */
 
+    /** Reference Node structure used in DQMHistReferenceModule*/
     typedef struct {
       /** online histogram name */
       std::string orghist_name;
@@ -38,7 +40,8 @@ namespace Belle2 {
       TH1* ref_clone{nullptr};
     } REFNODE;
 
-    REFNODE m_refNode{m_orghist_name, m_refhist_name, m_canvas, m_refHist, m_refCopy  };
+    /** Unique object that could be used by ReferenceModule to access objects directly */
+    REFNODE m_refNode{m_orghist_name, m_refhist_name, m_canvas, m_refHist, m_refCopy };
 
   public:
 
@@ -46,6 +49,10 @@ namespace Belle2 {
      */
     RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_canvas(nullptr), m_refHist(nullptr), m_refCopy(nullptr),
       m_updated(false) {};
+
+    /** Destructor
+     */
+    ~RefHistObject(void);
 
     /** Updating original reference, and scaled reference
      * @param ref pointer to reference

@@ -197,7 +197,7 @@ TH1* DQMHistAnalysisModule::scaleReference(TH1* hist, TH1* ref)
   if (hist->Integral() == 0)
     return output;
 
-  B2DEBUG(1, "Beginning scaleReference Procedure")
+  B2DEBUG(1, "Beginning scaleReference Procedure");
 
   // only if we have entries in reference
   if (abs(ref->Integral()) > 0) {

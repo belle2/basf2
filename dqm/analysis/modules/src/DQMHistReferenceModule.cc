@@ -192,28 +192,8 @@ void DQMHistReferenceModule::event()
     */
 
     if (abs(it.ref_org->Integral()) > 0) { // only if we have entries in reference
-      if (it.ref_clone) {
-        it.ref_clone->Reset();
-        it.ref_clone->Add(it.ref_org);
-      } else {
-        if (hist1->InheritsFrom("TH1C") or hist1->InheritsFrom("TH1S")) {
-          it.ref_clone = new TH1F(); // we want it a float for better scaling
-          it.ref_org->Copy(*it.ref_clone);
-        } else if (hist1->InheritsFrom("TH1I") or hist1->InheritsFrom("TH1L")) {
-          it.ref_clone = new TH1D(); // we want it a float for better scaling
-          it.ref_org->Copy(*it.ref_clone);
-        } else {
-          // keep TProfile, TH1F or TH1D
-          it.ref_clone = (TH1*)it.ref_org->Clone();
-        }
-        it.ref_clone->SetLineStyle(2);
-        it.ref_clone->SetLineColor(3);
-        it.ref_clone->SetFillColor(0);
-        it.ref_clone->SetStats(kFALSE);
-      }
-      it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
-      auto* testIntegral = scaleReference(hist1, it.ref_clone);
-      B2WARNING("base class vs. existing: " << testIntegral << "vs. " << it.ref_clone->Integral());
+      it.ref_clone = scaleReference(hist1, it.ref_clone);
+
 
       // Adjust the y scale to cover the reference
       if (it.ref_clone->GetMaximum() > hist1->GetMaximum())

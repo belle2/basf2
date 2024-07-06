@@ -28,13 +28,13 @@ BeginX
  2002            0e0      Jak2   =xpar(72)  Second Tau decay mask (tau+)
 ********************************************************************************
  2900            1e0      BBB    0: ORIG  1: BBB
- 2901           -6e0      EQUALBR
+ 2901           -6e0      EQUALBR        : generate N modes listed at 3001-3xxN
  2902            2e0      FF2PIRHO
  2903            1e0      IRCHL3PI
  2904            0e0      IFKPIPI
  2905            0e0      IFCURR4PI
  2909            1e0      CHCONJUGATE = 1: swap JAK1/JAK2 for alternate events
- 2910            0e0      TauToElOrMu = 1: swap e/mu decay for alternate events
+ 2910            1e0      TauToElOrMu = 1: swap e/mu decay for alternate events
 ********************************************************************************
  3001              1
  3002              2

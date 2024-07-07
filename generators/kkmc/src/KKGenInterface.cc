@@ -244,10 +244,13 @@ void KKGenInterface::updateGraphParticle(int index, MCParticleGraph::GraphPartic
   }
 
   // set photon flags (for now: set ISR and FSR (CEEX is undefined by definition, unsure about IFI))
-  // PHOTOS could be called by TAUOLA, not sure what to do about that
+  // PHOTOS could be called by TAUOLA, not sure what to do about that // Fixed [SwB, 7/7/2024]
   if (hepevt_.idhep[index - 1] == 22) {
     if (hepevt_.jmohep[index - 1][0] == 1) {
       gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsISRPhoton);
+    } else if (hepevt_.jdahep[index - 1][0] == 0 && hepevt_.jdahep[index - 1][1] == -1) {
+      gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsPHOTOSPhoton);
+    } else if (abs(hepevt_.idhep[hepevt_.jmohep[index - 1][0]]) == 15 || abs(hepevt_.idhep[hepevt_.jmohep[index - 1][0]]) == 24) {
       gParticle->addStatus(MCParticleGraph::GraphParticle::c_IsFSRPhoton);
     }
   }

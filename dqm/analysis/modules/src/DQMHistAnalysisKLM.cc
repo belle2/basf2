@@ -374,8 +374,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       divisions = 7;
       shift = 1;
     } else {
-      divisions = 8;
-      shift = 8;
+      divisions = BKLMElementNumbers::getMaximalSectorNumber();
+      shift = BKLMElementNumbers::getMaximalSectorNumber();
     }
     for (int k = 0; k < divisions; k++) {
       xLine = (histogram->GetXaxis()->GetBinLowEdge(bin) - canvas->GetX1()) / (canvas->GetX2() - canvas->GetX1());
@@ -520,11 +520,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         if (sector > 0)
           m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
         name = "B";
-        if (sector < 8)
+        if (sector < BKLMElementNumbers::getMaximalSectorNumber())
           name += "B";
         else
           name += "F";
-        name += std::to_string(sector % 8);
+        name += std::to_string(sector % BKLMElementNumbers::getMaximalSectorNumber());
         m_PlaneText.DrawText(xText, yText, name.c_str());
       }
       /* Then, color the canvas with red if there is a dead module

@@ -322,7 +322,8 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     // Special treatment for photons
     bool accept_photon = false;
-    if (pdgid == Const::photon.getPDGCode())  {
+    // Photons from PHOTOS do not define tau decay mode
+    if (pdgid == Const::photon.getPDGCode() && !p.hasStatus(MCParticle::c_IsPHOTOSPhoton))  {
       const MCParticle* mother = p.getMother();
       if (not mother) continue; // In some low multiplicity generators there may be no mother
       int mothid = abs(mother->getPDG());
@@ -375,7 +376,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       // e.g. includes omega in the form factor but not as an explicit final state particle
       bool isPiPizGam = false;
       if (isRadiationfromIntermediateWBoson) {
-        if (p.get4Vector().E() > 0.050) { // 50 MeV threshold
+        if (p.get4Vector().E() > -999) { // no hack needed to check for energy threshold
           const vector<MCParticle*> daughters = mother->getDaughters();
           int nPiSisters = 0;
           int nPizSisters = 0;

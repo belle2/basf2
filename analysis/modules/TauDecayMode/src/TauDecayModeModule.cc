@@ -278,6 +278,9 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     if (pdgid == -Const::Klong.getPDGCode()) pdgid = -pdgid; // Strange feature in TauolaBelle2
 
+    // Special treatment for photons
+    bool accept_photon = false;
+
     if (!p.hasStatus(MCParticle::c_PrimaryParticle))
       continue; // only consider particles coming from generator, e.g. discard particles added by Geant4
     if (p.isInitial()) continue; // pick e-  e+, but not from the incoming beams
@@ -320,8 +323,6 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       }
     }
 
-    // Special treatment for photons
-    bool accept_photon = false;
     // Photons from PHOTOS do not define tau decay mode
     else if (pdgid == Const::photon.getPDGCode() && !p.hasStatus(MCParticle::c_IsPHOTOSPhoton))  {
       const MCParticle* mother = p.getMother();
@@ -573,12 +574,6 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
         }
       }
     }
-    B2DEBUG(1,
-            "isEtaPizPizPizFromTauMinusFirst = " << isEtaPizPizPizFromTauMinusFirst << " "
-            "m_isEtaPizPizPizFromTauMinus = "    << m_isEtaPizPizPizFromTauMinus    << " "
-            "isEtaPizPizPizFromTauPlusFirst = "  << isEtaPizPizPizFromTauPlusFirst  << " "
-            "m_isEtaPizPizPizFromTauPlus = "     << m_isEtaPizPizPizFromTauPlus
-           );
 
     // Without further analysis, it is NOT possible to separate
     // tau- ->  pi-     2pi0 omega (-> pi- pi+)     nu decays [Mode 49] from
@@ -627,7 +622,13 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
         }
       }
     }
-    B2DEBUG(1,
+    B2DEBUG(19,
+            "isEtaPizPizPizFromTauMinusFirst = " << isEtaPizPizPizFromTauMinusFirst << " "
+            "m_isEtaPizPizPizFromTauMinus = "    << m_isEtaPizPizPizFromTauMinus    << " "
+            "isEtaPizPizPizFromTauPlusFirst = "  << isEtaPizPizPizFromTauPlusFirst  << " "
+            "m_isEtaPizPizPizFromTauPlus = "     << m_isEtaPizPizPizFromTauPlus
+           );
+    B2DEBUG(19,
             "isOmegaPimPipFromTauMinusFirst = " << isOmegaPimPipFromTauMinusFirst << " "
             "m_isOmegaPimPipFromTauMinus = "    << m_isOmegaPimPipFromTauMinus    << " "
             "isOmegaPimPipFromTauPlusFirst = "  << isOmegaPimPipFromTauPlusFirst  << " "

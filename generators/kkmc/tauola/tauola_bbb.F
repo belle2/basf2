@@ -77,7 +77,7 @@ C
       ELSE
          ICOUNT=ICOUNT+1
          JAK=ACTIVE(MOD(ICOUNT-1,KSUM)+1)
-         WRITE(6,'(''ICOUNT, JAK, KSUM = '',3I6)') ICOUNT, JAK, KSUM
+C        WRITE(6,'(''ICOUNT, JAK, KSUM = '',3I6)') ICOUNT, JAK, KSUM
          ANSWER=JAK
       ENDIF
       RETURN

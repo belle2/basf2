@@ -355,7 +355,7 @@ class ValidationPlot:
                 self.ylabel = 'probability'
 
             min_y = 0
-            if(is_asymmetry):
+            if (is_asymmetry):
                 min_y = -1.05
             for histogram in self.histograms:
                 histogram.SetMinimum(min_y)
@@ -1264,7 +1264,7 @@ class ValidationPlot:
     def fill_into_tgrapherror(self, graph, xs, ys, filter=None):
         """fill point values and error of the x and y axis into the graph"""
 
-        assert(len(xs[0]) == len(ys[0]))
+        assert (len(xs[0]) == len(ys[0]))
         # set the overall amount of points
         graph.Set(len(xs[0]))
 
@@ -1719,7 +1719,7 @@ class ValidationPlot:
             # Special value for the flat distribution binning
             n_bins = None
 
-        elif isinstance(bins, collections.Iterable):
+        elif isinstance(bins, collections.abc.Iterable):
             # Bins is considered as an array
             # Construct a float array forwardable to root.
             bin_edges = bins

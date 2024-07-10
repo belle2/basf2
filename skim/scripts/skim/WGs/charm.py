@@ -370,7 +370,7 @@ class DpToPipMupMum(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("mu", path=path)
 
-        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID_noSVD > 0.01", path=path)
+        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"

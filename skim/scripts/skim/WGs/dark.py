@@ -762,7 +762,7 @@ class AA2uuuu(BaseSkim):
         stdMu("all", path=path)
 
     def build_lists(self, path):
-        muon_cuts = """[0.8 < muonID_noSVD]
+        muon_cuts = """[0.8 < muonID]
         and [inKLMAcceptance == 1]
         and [inCDCAcceptance == 1]"""
 

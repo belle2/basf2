@@ -10,7 +10,7 @@
 ##########################################################################
 
 import modularAnalysis as ma
-from skim.standardlists.dileptons import (loadStdJpsiToee_noTOP, loadStdJpsiTomumu,
+from skim.standardlists.dileptons import (loadStdJpsiToee, loadStdJpsiTomumu,
                                           loadStdPsi2s2lepton)
 from skim.standardlists.lightmesons import (loadStdSkimHighEffTracks,
                                             loadStdSkimHighEffPhi, loadStdSkimHighEffEtaPrime,
@@ -310,7 +310,7 @@ class TDCPV_ccs(BaseSkim):
         loadStdSkimHighEffKstar0(path=path)
         loadStdSkimHighEffEta(path=path)
 
-        loadStdJpsiToee_noTOP(path=path)
+        loadStdJpsiToee(path=path)
         loadStdJpsiTomumu(path=path)
         loadStdPsi2s2lepton(path=path)
         stdKlongs(listtype='allklm', path=path)

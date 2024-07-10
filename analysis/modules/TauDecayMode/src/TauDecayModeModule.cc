@@ -301,7 +301,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       }
     }
 
-    if (pdgid == Const::muon.getPDGCode() && muonFirst)  {
+    else if (pdgid == Const::muon.getPDGCode() && muonFirst)  {
       muonFirst = false;
       const MCParticle* mother = p.getMother();
       if (not mother) continue; // In some low multiplicity generators there may be no mother
@@ -323,7 +323,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     // Special treatment for photons
     bool accept_photon = false;
     // Photons from PHOTOS do not define tau decay mode
-    if (pdgid == Const::photon.getPDGCode() && !p.hasStatus(MCParticle::c_IsPHOTOSPhoton))  {
+    else if (pdgid == Const::photon.getPDGCode() && !p.hasStatus(MCParticle::c_IsPHOTOSPhoton))  {
       const MCParticle* mother = p.getMother();
       if (not mother) continue; // In some low multiplicity generators there may be no mother
       int mothid = abs(mother->getPDG());
@@ -549,7 +549,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     // tau- -> pi- 2pi0 eta (-> pi- pi+ pi0) nu decays [Mode 39] from
     // tau- -> 2pi- pi+ eta (-> pi0 pi0 pi0) nu decays [Mode 42]
 
-    if (pdgid == Const::pi0.getPDGCode() && (isEtaPizPizPizFromTauMinusFirst || isEtaPizPizPizFromTauPlusFirst)) {
+    else if (pdgid == Const::pi0.getPDGCode() && (isEtaPizPizPizFromTauMinusFirst || isEtaPizPizPizFromTauPlusFirst)) {
       const MCParticle* mother = p.getMother();
       // In some low multiplicity generators there may be no mother
       if (mother and (mother->getPDG() == 221)) { // eta -> pi0 pi0 pi0
@@ -593,7 +593,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     // tau- -> pi- pi0 omega (-> pi- pi+)     nu decays [Mode 131]
     // tau- -> pi-     omega (-> pi- pi+ pi0) nu decays [Mode 236]
 
-    if (pdgid == -Const::pion.getPDGCode() && (isOmegaPimPipFromTauMinusFirst || isOmegaPimPipFromTauPlusFirst)) {
+    else if (pdgid == -Const::pion.getPDGCode() && (isOmegaPimPipFromTauMinusFirst || isOmegaPimPipFromTauPlusFirst)) {
       const MCParticle* mother = p.getMother();
       // In some low multiplicity generators there may be no mother
       if (mother and (mother->getPDG() == 223)) { // omega -> pi- pi+

@@ -300,7 +300,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
         if (d->getPDG() == -Const::electron.getPDGCode()) nElPlus++;
       }
       if (nElMinus == 1 && nElPlus == 1) { // use this information in getRecursiveMotherCharge
-        B2DEBUG(1, "Mother of elec pair is = " << mother->getPDG() << " which has daughters : " << elec_ss.str());
+        B2DEBUG(19, "Mother of elec pair is = " << mother->getPDG() << " which has daughters : " << elec_ss.str());
       }
     }
 
@@ -319,7 +319,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
         if (d->getPDG() == -Const::muon.getPDGCode()) nMuPlus++;
       }
       if (nMuMinus == 1 && nMuPlus == 1) { // use this information in getRecursiveMotherCharge
-        B2DEBUG(1, "Mother of muon pair is = " << mother->getPDG() << " which has daughters : " << muon_ss.str());
+        B2DEBUG(19, "Mother of muon pair is = " << mother->getPDG() << " which has daughters : " << muon_ss.str());
       }
     }
 
@@ -446,7 +446,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
             }
           }
         }
-        B2DEBUG(1, "hasNeutrinoAsSister = " << hasNeutrinoAsSister
+        B2DEBUG(19, "hasNeutrinoAsSister = " << hasNeutrinoAsSister
                 << " numChargedSister = " << numChargedSister
                 << " numNeutralNonNeutrinoNonPhotonSister = " << numNeutralNonNeutrinoNonPhotonSister
                 << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
@@ -510,13 +510,13 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
         }
       }
 
-      B2DEBUG(1, "isRadiationfromFinalStateChargedParticle = " << isRadiationfromFinalStateChargedParticle);
-      B2DEBUG(1, "isRadiationFromChargedRho = " << isRadiationFromChargedRho);
-      B2DEBUG(1, "isRadiationFromChargedA1 = " << isRadiationFromChargedA1);
-      B2DEBUG(1, "isRadiationfromIntermediateWBoson = " << isRadiationfromIntermediateWBoson << " isPiPizGam = " << isPiPizGam);
-      B2DEBUG(1, "isRadiationfromTau = " << isRadiationfromTau << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
-      B2DEBUG(1, "isPi0GG = " << isPi0GG << " isEtaGG = " << isEtaGG << " isEtpGG = " << isEtpGG << " isPi0GEE = " << isPi0GEE);
-      B2DEBUG(1, "isEtaPPG = " << isEtaPPG << " isOmPizG = " << isOmPizG);
+      B2DEBUG(19, "isRadiationfromFinalStateChargedParticle = " << isRadiationfromFinalStateChargedParticle);
+      B2DEBUG(19, "isRadiationFromChargedRho = " << isRadiationFromChargedRho);
+      B2DEBUG(19, "isRadiationFromChargedA1 = " << isRadiationFromChargedA1);
+      B2DEBUG(19, "isRadiationfromIntermediateWBoson = " << isRadiationfromIntermediateWBoson << " isPiPizGam = " << isPiPizGam);
+      B2DEBUG(19, "isRadiationfromTau = " << isRadiationfromTau << " isLFVTau2BodyDecay = " << isLFVTau2BodyDecay);
+      B2DEBUG(19, "isPi0GG = " << isPi0GG << " isEtaGG = " << isEtaGG << " isEtpGG = " << isEtpGG << " isPi0GEE = " << isPi0GEE);
+      B2DEBUG(19, "isEtaPPG = " << isEtaPPG << " isOmPizG = " << isOmPizG);
 
       // accept photons if (isRadiationfromFinalStateChargedParticle is false) or
       // if (isRadiationfromIntermediateWBoson is false) or
@@ -560,7 +560,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
           if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
           if (d->getPDG() == Const::pi0.getPDGCode()) nPizSisters++;
         }
-        B2DEBUG(1, "nPizSisters = " << nPizSisters);
+        B2DEBUG(19, "nPizSisters = " << nPizSisters);
         if (nPizSisters == 3) {
           int chg = getRecursiveMotherCharge(mother);
           if (chg < 0 && isEtaPizPizPizFromTauMinusFirst) {
@@ -604,7 +604,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
           if (d->getPDG() ==  Const::pion.getPDGCode()) nPipSisters++;
           if (d->getPDG() ==  Const::pi0.getPDGCode()) nPizSisters++;
         }
-        B2DEBUG(1,
+        B2DEBUG(19,
                 "nOmegaDaughters = " << nOmegaDaughters << " "
                 "nPimSisters = " << nPimSisters << " "
                 "nPipSisters = " << nPipSisters << " "
@@ -641,7 +641,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       if (pdgid == ite->first) {
         if (pdgid == Const::photon.getPDGCode()) {
           if (accept_photon) {
-            B2DEBUG(1, "Photon accepted");
+            B2DEBUG(19, "Photon accepted");
             ite-> second.push_back(i);
           }
         } else {

@@ -1866,7 +1866,7 @@ class DpToEtaHp(BaseSkim):
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        eta_gamma_cut = "[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]]"
+        eta_gamma_cut = "[[clusterNHits>1.5] and thetaInCDCAcceptance]"
         eta_gamma_cut += " and [[clusterReg==1 and E>0.05] or [clusterReg==2 and E>0.05] or [clusterReg==3 and E>0.075]]"
         ma.fillParticleList("gamma:DpToEtaHp", eta_gamma_cut, path=path)
 

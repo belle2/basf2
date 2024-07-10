@@ -401,7 +401,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     ECL cluster mask for ROE:
 
-    * :math:`\\text{clusterNHits}>1.5`,  :math:`0.2967<\\theta<2.6180`
+    * :math:`\\text{clusterNHits}>1.5`,  :math:`\\theta` in CDC acceptance
     * :math:`E>0.080,\\text{GeV}`
     """
 
@@ -433,7 +433,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         muPtCut = "pt > 0.4"
         lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
         hadTrkCuts = "dr < 2.0 and abs(dz) < 4"
-        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
+        gammaCuts = "[clusterNHits>1.5] and thetaInCDCAcceptance"
         gammaECuts = "[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]"
         cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
                      f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')

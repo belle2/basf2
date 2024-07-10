@@ -332,7 +332,7 @@ class DpToPipEpEm(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("e", path=path)
 
-        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID_noSVD_noTOP > 0.01", path=path)
+        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"

@@ -75,7 +75,7 @@ Setting up gbasf2 via cvmfs
 ---------------------------
 
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
-gbasf2 can function. At this moment, only CentOS 7 is supported.
+gbasf2 can function. At this moment, only CentOS 7 is supported (it works on other EL9-based operating systems like AlmaLinux 9 but please be aware it is not fully validated).
 
 Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).

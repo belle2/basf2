@@ -1891,3 +1891,51 @@ class DspToHpOmega(BaseSkim):
         DsList.append("D_s+:DspToPipOmg")
 
         return DsList
+
+
+@fancy_skim_header
+class DpToEtaHp(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{+}\\to \\eta \\pi^+` (and CC)
+        * :math:`D^{+}\\to \\eta \\K^+` (and CC)
+
+    **Selection Criteria**:
+        * Track cuts are `charm_skim_std_charged` pion and Kaon
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * :math:`0.4 < M(\\eta_{\\gamma\\gamma} < 0.6`
+        * :math:`0.48 < M(\\eta_{\\pi^{+}\\pi^{-}\\pi^{0}} < 0.6`
+        * :math:`p(\\eta) > 0.4`
+        * :math:`1.6 < M(D^{+}) < 2.1`
+        * :math:`p*(D^{+})>2.2`
+    """
+
+    __authors__ = ["Jaeyoung Kim"]
+    __description__ = "Skim list for D+ to eta h+"
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+        eta_gamma_cut = "[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]]"
+        eta_gamma_cut += " and [[clusterReg==1 and E>0.05] or [clusterReg==2 and E>0.05] or [clusterReg==3 and E>0.075]]"
+        ma.fillParticleList("gamma:DpToEtaHp", eta_gamma_cut, path=path)
+
+        ma.reconstructDecay('eta:DpToEtaHp_2Gam -> gamma:DpToEtaHp gamma:DpToEtaHp', '[0.4 < M < 0.6] and [p>0.4]', path=path)
+        ma.reconstructDecay('eta:DpToEtaHp_3Pi -> pi+:charmSkim pi-:charmSkim pi0:skim', '[0.48 < M < 0.6] and [p>0.4]', path=path)
+
+        charmcuts = "1.6 < M < 2.1 and useCMSFrame(p)>2.2"
+        ma.reconstructDecay('D+:DpToEtaHp_2Gam -> eta:DpToEtaHp_2Gam pi+:charmSkim', charmcuts, path=path)
+        ma.reconstructDecay('D+:DpToEtaHp_3Pi -> eta:DpToEtaHp_3Pi pi+:charmSkim', charmcuts, path=path)
+
+        DpList = []
+        DpList.append("D+:DpToEtaHp_2Gam")
+        DpList.append("D+:DpToEtaHp_3Pi")
+
+        return DpList

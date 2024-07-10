@@ -377,34 +377,32 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       // e.g. includes omega in the form factor but not as an explicit final state particle
       bool isPiPizGam = false;
       if (isRadiationfromIntermediateWBoson) {
-        if (p.get4Vector().E() > -999) { // no hack needed to check for energy threshold
-          const vector<MCParticle*> daughters = mother->getDaughters();
-          int nPiSisters = 0;
-          int nPizSisters = 0;
-          int nTotSisters = 0;
-          int nOtherSisters = 0;
-          for (MCParticle* d : daughters) {
-            if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
-            nTotSisters++;
-            if (abs(d->getPDG()) == Const::pion.getPDGCode()) {
-              nPiSisters++;
-            } else if (abs(d->getPDG()) == Const::pi0.getPDGCode()) {
-              nPizSisters++;
-            } else if (abs(d->getPDG()) != Const::photon.getPDGCode()) {
-              nOtherSisters++;
-            }
+        const vector<MCParticle*> daughters = mother->getDaughters();
+        int nPiSisters = 0;
+        int nPizSisters = 0;
+        int nTotSisters = 0;
+        int nOtherSisters = 0;
+        for (MCParticle* d : daughters) {
+          if (!d->hasStatus(MCParticle::c_PrimaryParticle)) continue;
+          nTotSisters++;
+          if (abs(d->getPDG()) == Const::pion.getPDGCode()) {
+            nPiSisters++;
+          } else if (abs(d->getPDG()) == Const::pi0.getPDGCode()) {
+            nPizSisters++;
+          } else if (abs(d->getPDG()) != Const::photon.getPDGCode()) {
+            nOtherSisters++;
           }
-          // allow final state radiation from the tau lepton, but ignore information on number of photons for decay mode classifiction
-          if (nTotSisters >= 3 && nPiSisters == 1 && nPizSisters == 1 && nOtherSisters == 0) {
-            int chg = getRecursiveMotherCharge(mother);
-            if (chg < 0 && isPiPizGamTauMinusFirst) {
-              isPiPizGamTauMinusFirst = false;
-              isPiPizGam = true;
-            }
-            if (chg > 0 && isPiPizGamTauPlusFirst) {
-              isPiPizGamTauPlusFirst = false;
-              isPiPizGam = true;
-            }
+        }
+        // allow final state radiation from the tau lepton, but ignore information on number of photons for decay mode classifiction
+        if (nTotSisters >= 3 && nPiSisters == 1 && nPizSisters == 1 && nOtherSisters == 0) {
+          int chg = getRecursiveMotherCharge(mother);
+          if (chg < 0 && isPiPizGamTauMinusFirst) {
+            isPiPizGamTauMinusFirst = false;
+            isPiPizGam = true;
+          }
+          if (chg > 0 && isPiPizGamTauPlusFirst) {
+            isPiPizGamTauPlusFirst = false;
+            isPiPizGam = true;
           }
         }
       }

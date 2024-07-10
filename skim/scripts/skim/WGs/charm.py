@@ -649,14 +649,6 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         * ``M(D*)-M(D0) < 0.16``
         * ``pCM(D*) > 2.0``
 
-    .. Note::
-        The neural-network based PID variables ``pionIDNN`` and ``kaonIDNN``
-        require the analysis globaltag to be set (e.g. via
-        ``b2skim-run --analysis-globaltag ANALYSIS_GT_NAME ...``). In case
-        calibrated weights are not ready for the skimming campaign, this skim
-        must be modified to use :b2:var:`binaryPID_noSVD` or
-        :b2:var:`binaryPID` instead (this will have some impact on skim
-        performance, although small, and needs to be tested).
     """
 
     __authors__ = ["Ludovico Massaccesi", "Emma Oxford"]

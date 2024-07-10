@@ -276,7 +276,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
 
     int pdgid = p.getPDG();
 
-    if (pdgid == -Const::Klong.getPDGCode()) pdgid = Const::Klong.getPDGCode(); // Strange feature in TauolaBelle2
+    if (pdgid == -Const::Klong.getPDGCode()) pdgid = -pdgid; // Strange feature in TauolaBelle2
 
     if (!p.hasStatus(MCParticle::c_PrimaryParticle))
       continue; // only consider particles coming from generator, e.g. discard particles added by Geant4
@@ -676,7 +676,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     for (unsigned int i = 0; i < vec_dau_tauminus.size(); i++) {
       MCParticle* p = MCParticles[vec_dau_tauminus[i]];
       int pdg = p->getPDG();
-      if (pdg == -130) pdg = 130; // Strange Feature in TauolaBelle2
+      if (pdg == -Const::Klong.getPDGCode()) pdg = -pdg; // Strange Feature in TauolaBelle2
       if (pdg != ii) continue;
       m_tauminusdecaymode.append(".");
       if (pdg == 94144) {
@@ -698,7 +698,7 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
     for (unsigned int i = 0; i < vec_dau_tauplus.size(); i++) {
       MCParticle* p = MCParticles[vec_dau_tauplus[i]];
       int pdg = p->getPDG();
-      if (pdg == -130) pdg = 130; // Strange Feature in TauolaBelle2
+      if (pdg == -Const::Klong.getPDGCode()) pdg = -pdg; // Strange Feature in TauolaBelle2
       if (pdg != ii) continue;
       m_tauplusdecaymode.append(".");
       if (pdg == 94144) {

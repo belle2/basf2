@@ -358,6 +358,8 @@ class B0TwoBody(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
@@ -430,6 +432,8 @@ class FourLepton(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
@@ -496,6 +500,8 @@ class RadiativeDilepton(BaseSkim):
     __category__ = "Physics, Leptonic, 3 body"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)

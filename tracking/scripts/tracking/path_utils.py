@@ -640,7 +640,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
-                    filter="cuts_from_DB")
+                    filter="mva",
+                    filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",

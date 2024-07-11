@@ -15,13 +15,12 @@
 import basf2_mva
 from basf2_mva_python_interface.keras import State
 
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras.models import Model
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.losses import binary_crossentropy, sparse_categorical_crossentropy
-from tensorflow.keras.activations import sigmoid, tanh, softmax
-from tensorflow.keras.callbacks import EarlyStopping, Callback
-from tensorflow.keras.utils import plot_model
+from keras.layers import Dense, Input
+from keras.models import Model
+from keras.optimizers import Adam
+from keras.losses import binary_crossentropy, sparse_categorical_crossentropy
+from keras.activations import sigmoid, tanh, softmax
+from keras.callbacks import EarlyStopping, Callback
 
 import numpy as np
 from basf2_mva_extensions.preprocessing import fast_equal_frequency_binning
@@ -76,8 +75,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     Building 3 keras models:
     1. Network without adversary, used for apply data.
-    2. Freezed MLP with unfreezed Adverserial Network to train adverserial part of network.
-    3. Unfreezed MLP with freezed adverserial to train MLP part of the network,
+    2. Frozen MLP with unfrozen Adverserial Network to train adverserial part of network.
+    3. Unfrozen MLP with frozen adverserial to train MLP part of the network,
        combined with losses of the adverserial networks.
     """
 
@@ -104,7 +103,7 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
     # Model for applying Data. Loss function will not be used for training, if adversary is used.
     apply_model = Model(input, output)
-    apply_model.compile(optimizer=Adam(lr=parameters['learning_rate']), loss=binary_crossentropy, metrics=['accuracy'])
+    apply_model.compile(optimizer=Adam(learning_rate=parameters['learning_rate']), loss=binary_crossentropy, metrics=['accuracy'])
 
     state = State(apply_model, use_adv=parameters['lambda'] > 0 and number_of_spectators > 0)
     state.number_bins = parameters['number_bins']
@@ -122,8 +121,8 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
         # Model which trains first part of the net
         model1 = Model(input, [output] + adversaries)
-        model1.compile(optimizer=Adam(lr=parameters['learning_rate']),
-                       loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'],
+        model1.compile(optimizer=Adam(learning_rate=parameters['learning_rate']),
+                       loss=[binary_crossentropy] + adversary_losses_model, metrics=['accuracy'] * (len(adversaries) + 1),
                        loss_weights=[1] + [-parameters['lambda']] * len(adversary_losses_model))
         model1.summary()
 
@@ -133,15 +132,12 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
         for layer in model2.layers:
             layer.trainable = not layer.trainable
 
-        model2.compile(optimizer=Adam(lr=parameters['learning_rate']), loss=adversary_losses_model,
-                       metrics=['accuracy'])
+        model2.compile(optimizer=Adam(learning_rate=parameters['learning_rate']), loss=adversary_losses_model,
+                       metrics=['accuracy'] * len(adversaries))
         model2.summary()
 
         state.forward_model, state.adv_model = model1, model2
         state.K = parameters['adversary_steps']
-
-        # draw model as a picture
-        plot_model(model1, to_file='model.png', show_shapes=True)
 
     return state
 

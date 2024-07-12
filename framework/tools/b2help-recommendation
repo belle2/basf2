@@ -85,7 +85,7 @@ class RSTFormatterStrategy(FormatterStrategy):
         """
         Format a dictionary with a name and key-value pairs.
         """
-        result = f"\n{name}\n{'~' * len(name)}\n"
+        result = f"\n{name}\n{'-' * len(name)}\n"
         for key in content:
             result += f'* **{key}** - {content[key]}\n'
         return result
@@ -94,15 +94,32 @@ class RSTFormatterStrategy(FormatterStrategy):
         """
         Format a table or list with a name and items.
         """
-        title = f'\n{name}:'
+        title = f' {name}: '
         line = '+'
         body = '|'
-        for i, tag in enumerate(content):
+        for tag in [title] + content:
             line += '-' * len(tag) + '+'
             body += tag + '|'
         
-        return f'{title}\n\n{line}\n{body}\n{line}\n'
-            
+        return f'\n{line}\n{body}\n{line}\n'
+
+    def format_code(self, code: str, language: str) -> str:
+        """
+        Format code with syntax highlighting.
+        """
+        if not code:
+            return ''
+        highlighed_code = [' ' * 4 + line for line in code.splitlines()]
+        result = f'.. code-block:: {language}\n\n'
+        result += '\n'.join(highlighed_code)
+        return result
+
+
+class ColorRSTFormatterStrategy(RSTFormatterStrategy):
+    """
+    Format recommendations in reStructuredText format.
+    """
+
     def format_code(self, code: str, language: str) -> str:
         """
         Format code with syntax highlighting.
@@ -274,6 +291,8 @@ def get_argument_parser():
                         nargs='+', default=None)
     parser.add_argument("-gt", "--globaltag", help="Global tag name, if one wants to check another recommendation",
                         default=None)
+    parser.add_argument("-f", "--format", help="Output format", choices=['rst', 'color_rst'],
+                        default='color_rst')
     parser.add_argument("-p", "--payload", help="Payload name, if one wants to check another recommendation",
                         default=None)
     parser.add_argument("-m", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
@@ -283,9 +302,13 @@ def get_argument_parser():
     return parser
 
 def main():
- 
+    """
+    Main method
+    """
     args = get_argument_parser().parse_args()
-    formatter = RSTFormatterStrategy()
+    formatter = ColorRSTFormatterStrategy()
+    if args.format == 'rst':
+        formatter = RSTFormatterStrategy()
     if args.convert:
         b2.B2INFO("Convert the localfile to a payload")
 

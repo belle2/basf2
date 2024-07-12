@@ -410,7 +410,7 @@ If the particle is created from a KLM cluster, the distance is calculated betwee
     REGISTER_VARIABLE("z_uncertainty", particleDZUncertainty, "uncertainty on z (measured with respect to the origin)\n\n", "cm");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track.\n\n",
                       "cm");
-    REGISTER_VARIABLE("dr_Signed", particleSignedDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track; signed depending on the postion of IP; Returns NaN if not a track.\n\n",
+    REGISTER_VARIABLE("dr_signed", particleSignedDRho, "transverse distance in respect to IP for a vertex; track d0 relative to IP for a track; signed depending on the postion of IP; Returns NaN if not a track.\n\n",
                       "cm");
     REGISTER_VARIABLE("dphi", particleDPhi, "vertex azimuthal angle of the vertex or POCA in degrees in respect to IP\n\n", "rad");
     REGISTER_VARIABLE("dcosTheta", particleDCosTheta, "vertex or POCA polar angle in respect to IP");

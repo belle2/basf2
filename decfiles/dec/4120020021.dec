@@ -1,0 +1,17 @@
+##############################################################
+# EventType: 4120020021
+# Descriptor: [e+ e- -> phi eta_b is generated
+# NickName: vpho_phieta_b
+# Test : Yes
+# Documentation: MC15rd signal request
+# PhysicsWG: Quarkonium
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Cuts: None
+# Date: 2024/05/29
+###############################################################
+Decay vpho
+1.00  phi eta_b PHOTOS PHSP;
+Enddecay
+
+End

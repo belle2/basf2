@@ -240,7 +240,7 @@ namespace Belle2 {
       if (!trackFit) return Const::doubleNaN;
       UncertainHelix helix = trackFit->getUncertainHelix();
       helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
-      return helix.getZ0;
+      return helix.getZ0();
     }
 
     double particleDPhi(const Particle* part)

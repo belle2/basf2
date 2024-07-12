@@ -383,14 +383,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     Cuts on electrons:
 
-    * :math:`\\text{pidChargedBDTScore(11,all)} > 0.9`
+    * :math:`\\text{electronID} > 0.3`
     * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame,  :math:`p > 0.5\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
     * :math:`\\text{thetaInCDCAcceptance}`
 
     Cuts on muons:
 
-    * :math:`\\text{muonID_noSVD} > 0.9`
+    * :math:`\\text{muonID} > 0.9`
     * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame,  :math:`p > 0.7\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
 
@@ -425,8 +425,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
         b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
-        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
-        muIDCut = "muonID_noSVD > 0.9"
+        eIDCut = "electronID > 0.3"
+        muIDCut = "muonID > 0.9"
         ePCut = "p > 0.5"
         ePtCut = "pt > 0.3"
         muPCut = "p > 0.7"

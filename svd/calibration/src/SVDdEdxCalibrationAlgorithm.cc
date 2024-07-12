@@ -68,8 +68,8 @@ CalibrationAlgorithm::EResult SVDdEdxCalibrationAlgorithm::calibrate()
   TH2F hGammaE = GammaHistogram(ttreeGamma);
   std::vector<double> pbins = CreatePBinningScheme();
   TH2F hEmpty("hEmpty", "A histogram returned if we cannot calibrate", m_numPBins, pbins.data(), m_numDEdxBins, 0, m_dedxCutoff);
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hEmpty.SetBinContent(pbin, dedxbin, 0.01);
     };
   }
@@ -310,8 +310,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   // for each momentum bin, normalize the pdf
 
   // hLambdaP normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hLambdaP->GetBinContent(pbin, dedxbin) <= 1) {
         hLambdaP->SetBinContent(pbin, dedxbin, 0);
@@ -324,7 +324,7 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hLambdaP->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
@@ -515,8 +515,8 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   // hDstarK normalisation
   // for each momentum bin, normalize the pdf
 
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hDstarK->GetBinContent(pbin, dedxbin) <= 1) {
         hDstarK->SetBinContent(pbin, dedxbin, 0);
@@ -529,14 +529,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hDstarK->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   // hDstarPi normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hDstarPi->GetBinContent(pbin, dedxbin) <= 1) {
         hDstarPi->SetBinContent(pbin, dedxbin, 0);
@@ -549,14 +549,14 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hDstarPi->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
 
   // hDstarMu normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hDstarMu->GetBinContent(pbin, dedxbin) <= 1) {
         hDstarMu->SetBinContent(pbin, dedxbin, 0);
@@ -569,7 +569,7 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hDstarMu->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }
@@ -624,8 +624,8 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
 
   // for each momentum bin, normalize the pdf
   // hGammaE normalisation
-  for (int pbin = 1; pbin <= m_numPBins; pbin++) {
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+  for (int pbin = 0; pbin <= m_numPBins + 1; pbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       // get rid of the bins with negative weights
       if (hGammaE->GetBinContent(pbin, dedxbin) <= 1) {
         hGammaE->SetBinContent(pbin, dedxbin, 0);
@@ -639,7 +639,7 @@ TH2F SVDdEdxCalibrationAlgorithm::GammaHistogram(std::shared_ptr<TTree> preselTr
       slice->Scale(1. / slice->Integral());
     }
     // fill back the 2D histo with the result
-    for (int dedxbin = 1; dedxbin <= m_numDEdxBins; dedxbin++) {
+    for (int dedxbin = 0; dedxbin <= m_numDEdxBins + 1; dedxbin++) {
       hGammaE->SetBinContent(pbin, dedxbin, slice->GetBinContent(dedxbin));
     }
   }

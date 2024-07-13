@@ -238,9 +238,9 @@ namespace Belle2 {
       static DBObjPtr<BeamSpot> beamSpotDB;
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      UncertainHelix helix = trackFit->getUncertainHelix();
+      auto helix = trackFit->getHelix();
       helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
-      return helix.getZ0();
+      return helix.getD0();
     }
 
     double particleDPhi(const Particle* part)

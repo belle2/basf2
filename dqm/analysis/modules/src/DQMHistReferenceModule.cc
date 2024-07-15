@@ -192,10 +192,16 @@ void DQMHistReferenceModule::event()
     */
 
     if (abs(it.ref_org->Integral()) > 0) { // only if we have entries in reference
-      it.ref_clone = scaleReference(hist1, it.ref_clone);
+      if (it.ref_clone) {
+        it.ref_clone->Reset();
+        it.ref_clone->Add(it.ref_org);
+        it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
+      } else {
+        it.ref_clone = scaleReference(hist1, it.ref_org);
+      }
 
 
-      // Adjust the y scale to cover the reference
+      //Adjust the y scale to cover the reference
       if (it.ref_clone->GetMaximum() > hist1->GetMaximum())
         hist1->SetMaximum(1.1 * it.ref_clone->GetMaximum());
 

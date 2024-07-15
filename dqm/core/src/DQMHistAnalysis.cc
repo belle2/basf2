@@ -215,15 +215,8 @@ TH1* DQMHistAnalysisModule::scaleReference(TH1* hist, TH1* ref)
     output->SetLineColor(3);
     output->SetFillColor(0);
     output->SetStats(kFALSE);
-
-    output->Scale(hist->Integral() / output->Integral());
-
-    //Not sure if we want this block at this stage. Maybe move it when drawing. -2024/July/3
-    //Adjust the y scale to cover the reference
-    //if (output->GetMaximum() > hist->GetMaximum())
-    //  hist->SetMaximum(1.1 * output->GetMaximum());
   }
-
+  output->Scale(hist->Integral() / output->Integral());
   return output;
 }
 

@@ -369,12 +369,10 @@ class TDCPV_ccs(BaseSkim):
                            'J/psi:mumu K+:SkimHighEff pi-:SkimHighEff']
 
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:SkimHighEff',
-                                'J/psi:ee K+:SkimHighEff',
-                                ]
+                                'J/psi:ee K+:SkimHighEff']
 
         bd_ccs_KL_Channels = ['J/psi:mumu K_L0:all_klmecl_ccs_0',
-                              'J/psi:ee K_L0:all_klmecl_ccs_1'
-                              ]
+                              'J/psi:ee K_L0:all_klmecl_ccs_1']
 
         bd_ccs_List = []
         for chID, channel in enumerate(bd_ccs_Channels):

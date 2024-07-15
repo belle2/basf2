@@ -124,7 +124,8 @@ track_hits = ['nCDCHits', 'nPXDHits', 'nSVDHits', 'nVXDHits']
 
 #: Track fit parameters
 trackfit_parameters = ['omega', 'omegaErr', 'tanLambda', 'tanLambdaErr',
-                       'd0', 'd0Err', 'z0', 'z0Err', 'phi0', 'phi0Err', 'pValue', 'ndf']
+                       'd0', 'd0Err', 'z0', 'z0Err', 'phi0', 'phi0Err', 'pValue', 'ndf',
+                       'd0FromIP', 'z0FromIP', 'phi0FromIP']
 
 #: Replacement for MCTruth tool
 mc_truth = ['isSignal', 'mcErrors', 'mcPDG']

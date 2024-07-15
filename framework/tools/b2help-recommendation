@@ -214,16 +214,23 @@ class Tool:
     """
     def __init__(self, data: Dict[str, str], formatter: FormatterStrategy):
         self.fields = []
-        value = data.pop('name')
-        self.fields.append(Field('Name', value, SectionDecorator(formatter)))
+        title = '(no title)'
+        if 'title' in data:
+            title = data.pop('title')
+        self.fields.append(Field('Title', title, SectionDecorator(formatter)))
+        tool = '(no tool)'
+        if 'tool' in data:
+            tool = data.pop('tool')
+        if tool and tool != "(no tool)":
+            self.fields.append(Field('Tool', [tool], TableListDecorator(formatter)))
         tags = data.pop('tags')
         for name, value in data.items():
             decorator = DefaultDecorator(formatter)
             if name == "snippet":
-                decorator = CodeDecorator(formatter, language=data.get("Tool", "python").lower())
+                decorator = CodeDecorator(formatter, language="python")
             elif name == 'recommendation':
                 decorator = DictDecorator(formatter)
-            elif name in [ "tool", "description"]:
+            elif name in ["description"]:
                 decorator = SubsectionDecorator(formatter)
             self.fields.append(Field(name.capitalize(), value, decorator))
         self.fields.append(Field('Tags', tags, TableListDecorator(formatter)))
@@ -359,7 +366,8 @@ def main():
         for tag in available_tags:
             print(f"  - {tag}")
 
-        print("\nYou can check all information with the 'all' tag.")
+        print("\nTags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. ")
+        print("You can check all information with the 'all' tag.")
 
     elif "all" in args.tags:
         for tool in tools:

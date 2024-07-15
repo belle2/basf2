@@ -30,8 +30,7 @@ __authors__ = [
     "Stefano Lacaprara  <stefano.lacaprara@pd.infn.it>"
 ]
 
-# __liaison__ = "Chiara La Licata <chiara.lalicata@ts.infn.it>"
-__liaison__ = "Yoshiyuki ONUKI <onuki@hep.phys.s.u-tokyo.ac.jp>"
+__liaison__ = "Noah BRENNY <nbrenny@iastate.edu>"
 _VALIDATION_SAMPLE = "mdst14.root"
 
 
@@ -43,9 +42,9 @@ class TDCPV_qqs(BaseSkim):
     **Decay Channels**:
 
     * ``B0 -> phi K_S0``
+    * ``B0 -> phi K_L0``
     * ``B0 -> eta K_S0``
     * ``B0 -> eta' K_S0``
-    * ``B0 -> eta' K_L0``
     * ``B0 -> eta K*``
     * ``B0 -> eta' K*``
     * ``B0 -> K_S0 K_S0 K_S0``
@@ -129,9 +128,14 @@ class TDCPV_qqs(BaseSkim):
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
-        ma.cutAndCopyList('K_L0:eclEcut', 'K_L0:allecl', 'clusterE>0.250', path=path)
-        ma.cutAndCopyList('K_L0:klmLayers', 'K_L0:allklm', '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]', path=path)
-        ma.copyLists('K_L0:klmecl', ['K_L0:klmLayers', 'K_L0:eclEcut'], path=path)
+        ma.cutAndCopyList('K_L0:eclEcut_qqs', 'K_L0:allecl', 'clusterE>0.250', path=path)
+        ma.cutAndCopyList(
+            'K_L0:klmLayers_qqs',
+            'K_L0:allklm',
+            '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
+            path=path)
+        ma.copyLists('K_L0:klmecl_qqs_0', ['K_L0:klmLayers_qqs', 'K_L0:eclEcut_qqs'], path=path)
+        ma.copyLists('K_L0:klmecl_qqs_1', ['K_L0:klmLayers_qqs', 'K_L0:eclEcut_qqs'], path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
@@ -144,7 +148,7 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K_S0:merged',
-            'eta\':SkimHighEff K_L0:eclEcut',
+            'eta\':SkimHighEff K_L0:eclEcut_qqs',
             'eta:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K*0:SkimHighEff',
             'eta:SkimHighEff K*0:SkimHighEff',
@@ -162,8 +166,8 @@ class TDCPV_qqs(BaseSkim):
         ]
 
         bd_qqs_KL_Channels = [
-            'eta\':SkimHighEff  K_L0:klmecl',
-            'phi:SkimHighEff K_L0:klmecl']
+            'eta\':SkimHighEff  K_L0:klmecl_qqs_0',
+            'phi:SkimHighEff K_L0:klmecl_qqs_1']
 
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
@@ -178,7 +182,15 @@ class TDCPV_qqs(BaseSkim):
 
         bd_qqs_KL_List = []
         for chID, channel in enumerate(bd_qqs_KL_Channels):
-            ma.reconstructMissingKlongDecayExpert('B0:TDCPV_qqs_KL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
+            ma.reconstructMissingKlongDecayExpert(
+                'B0:TDCPV_qqs_KL' +
+                str(chID) +
+                ' -> ' +
+                channel,
+                btotcpvcuts_KL,
+                chID,
+                recoList=f"_reco{chID}",
+                path=path)
             bd_qqs_KL_List.append('B0:TDCPV_qqs_KL' + str(chID))
 
         bu_qqs_List = []
@@ -256,10 +268,11 @@ class TDCPV_ccs(BaseSkim):
     * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``
     * ``B0 -> J/psi (ee/mm) pi0``
     * ``B0 -> J/psi (ee/mm) K+ pi-``
+    * ``B+ -> J/psi (ee/mm) K*+ (pi+ K_S0 / K+ pi0)
 
     **Particle lists used**:
 
-    * ``k_S0:merged``
+    * ``K_S0:merged``
     * ``pi+:all``
     * ``J/psi:ee``
     * ``J/psi:mumu``
@@ -277,7 +290,7 @@ class TDCPV_ccs(BaseSkim):
 
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29 for Ks/K*``
-    * ``abs(deltaE) < 0.3 for KL``
+    * ``abs(deltaE) < 0.3 and 5.05 < Mbc < 5.29 for KL``
     * ``abs(deltaE) < 0.5``
     * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
@@ -318,11 +331,20 @@ class TDCPV_ccs(BaseSkim):
         stdKlongs(listtype='allecl', path=path)
 
         ma.reconstructDecay('K*0:neutral -> K_S0:merged pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*+:kshort_pip -> K_S0:merged pi+:SkimHighEff', '0.74 < M < 1.04', path=path)
+        ma.reconstructDecay('K*+:kp_piz -> K+:SkimHighEff pi0:eff40_May2020', '0.74 < M < 1.04', path=path)
+
         ma.applyCuts('pi0:eff60_May2020', 'InvM < 0.2', path=path)
 
     def additional_setup(self, path):
-        ma.cutAndCopyList('K_L0:alleclEcut', 'K_L0:allecl', 'clusterE>0.15', path=path)
-        ma.copyLists('K_L0:all_klmecl', ['K_L0:allklm', 'K_L0:alleclEcut'], writeOut=True, path=path)
+        ma.cutAndCopyList('K_L0:alleclEcut_ccs', 'K_L0:allecl', 'clusterE>0.15 and clusterE1E9<0.85', path=path)
+        ma.cutAndCopyList(
+            'K_L0:klmLayers_ccs',
+            'K_L0:allklm',
+            '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=7] and [klmClusterKlId>0.001]',
+            path=path)
+        ma.copyLists('K_L0:all_klmecl_ccs_0', ['K_L0:klmLayers_ccs', 'K_L0:alleclEcut_ccs'], writeOut=True, path=path)
+        ma.copyLists('K_L0:all_klmecl_ccs_1', ['K_L0:klmLayers_ccs', 'K_L0:alleclEcut_ccs'], writeOut=True, path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_ccs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_ccs_eventshape)')
@@ -330,7 +352,7 @@ class TDCPV_ccs(BaseSkim):
         vm.addAlias('E_ECL_TDCPV_ccs', 'formula(E_ECL_pi_TDCPV_ccs+E_ECL_gamma_TDCPV_ccs)')
 
         btotcpvcuts = 'Mbc > 5.2 and abs(deltaE) < 0.5'
-        btotcpvcuts_KL = 'abs(deltaE) < 0.3'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.25 and 5.05 < Mbc < 5.29'
 
         bd_ccs_Channels = ['J/psi:ee K_S0:merged',
                            'J/psi:mumu K_S0:merged',
@@ -347,10 +369,12 @@ class TDCPV_ccs(BaseSkim):
                            'J/psi:mumu K+:SkimHighEff pi-:SkimHighEff']
 
         bPlustoJPsiK_Channel = ['J/psi:mumu K+:SkimHighEff',
-                                'J/psi:ee K+:SkimHighEff']
+                                'J/psi:ee K+:SkimHighEff',
+                                ]
 
-        bd_ccs_KL_Channels = ['J/psi:mumu K_L0:all_klmecl',
-                              'J/psi:ee K_L0:all_klmecl']
+        bd_ccs_KL_Channels = ['J/psi:mumu K_L0:all_klmecl_ccs_0',
+                              'J/psi:ee K_L0:all_klmecl_ccs_1'
+                              ]
 
         bd_ccs_List = []
         for chID, channel in enumerate(bd_ccs_Channels):

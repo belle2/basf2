@@ -43,7 +43,7 @@ void CDCDedxValidationModule::initialize()
   m_cdcDedxTracks.isRequired();
 
   if (fCollType != "radbhabha" and fCollType != "bhabha" and fCollType != "hadron") {
-    printf("Wrong input file tpye (%s): choose bhabha or radbhabha or hadron \n", fCollType.data());
+    printf("Wrong input file type (%s): choose bhabha or radbhabha or hadron \n", fCollType.data());
     return;
   } else {
     fBasic = new TList(); fBasic->SetOwner(); fBasic->SetName("AllRunBasics");
@@ -251,11 +251,11 @@ void CDCDedxValidationModule::DefineHistograms(TString level = "XR", Int_t iR = 
       fBasic->Add(hP_Positron_AR);
 
       TH1D* hdEdx_Electron_AR = new TH1D("hdEdx_Electron_AR", "bla-bla", fnBinsdedx, fnBinsdedxLE, fnBinsdedxUE);
-      hdEdx_Electron_AR->SetTitle("dE/dx (nohad sat) of e- ;dE/dx distrbution (e-);Entries");
+      hdEdx_Electron_AR->SetTitle("dE/dx (nohad sat) of e- ;dE/dx distribution (e-);Entries");
       fBasic->Add(hdEdx_Electron_AR);
 
       TH1D* hdEdx_Positron_AR = new TH1D("hdEdx_Positron_AR", "bla-bla", fnBinsdedx, fnBinsdedxLE, fnBinsdedxUE);
-      hdEdx_Positron_AR->SetTitle("dE/dx (nohad sat) of e+;dE/dx distrbution (e+);Entries");
+      hdEdx_Positron_AR->SetTitle("dE/dx (nohad sat) of e+;dE/dx distribution (e+);Entries");
       fBasic->Add(hdEdx_Positron_AR);
 
       TH2D* hPvsdEdx_AR = new TH2D("hPvsdEdx_AR", "bla-bla", 320, -8.0, 8.0, 100, 0.0, 2.0);
@@ -277,14 +277,14 @@ void CDCDedxValidationModule::DefineHistograms(TString level = "XR", Int_t iR = 
 
         hdEdx_Posi_Pbin_AR[ip] = new TH1D(Form("hdEdx_Posi_Pbin_AR%d", ip), Form("hdEdx_Posi_Pbin_AR%d", ip), fnBinsdedx, fnBinsdedxLE,
                                           fnBinsdedxUE);
-        hdEdx_Posi_Pbin_AR[ip]->GetXaxis()->SetTitle("dE/dx distrbution (e+)");
+        hdEdx_Posi_Pbin_AR[ip]->GetXaxis()->SetTitle("dE/dx distribution (e+)");
         hdEdx_Posi_Pbin_AR[ip]->GetYaxis()->SetTitle("Entries");
         hdEdx_Posi_Pbin_AR[ip]->SetTitle(Form("Momentum range %0.03f to %0.03f", ip * 0.250, (ip + 1) * 0.250));
         fPRdEdxinP->Add(hdEdx_Posi_Pbin_AR[ip]);
 
         hdEdx_Elec_Pbin_AR[ip] = new TH1D(Form("hdEdx_Elec_Pbin_AR%d", ip), Form("hdEdx_Elec_Pbin_AR%d", ip), fnBinsdedx, fnBinsdedxLE,
                                           fnBinsdedxUE);
-        hdEdx_Elec_Pbin_AR[ip]->GetXaxis()->SetTitle("dE/dx distrbution (e-)");
+        hdEdx_Elec_Pbin_AR[ip]->GetXaxis()->SetTitle("dE/dx distribution (e-)");
         hdEdx_Elec_Pbin_AR[ip]->GetYaxis()->SetTitle("Entries");
         hdEdx_Elec_Pbin_AR[ip]->SetTitle(Form("Momentum range %0.03f to %0.03f", ip * 0.250, (ip + 1) * 0.250));
 

@@ -127,7 +127,7 @@ namespace Belle2 {
     }
 
     /**
-     * Check for validity of log likelihood values (NaN and +Inf are not alowed).
+     * Check for validity of log likelihood values (NaN and +Inf are not allowed).
      * @param logl detector log likelihoods
      * @return true if all likelihoods are valid and not being the same
      */

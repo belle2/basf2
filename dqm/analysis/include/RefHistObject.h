@@ -26,23 +26,6 @@ namespace Belle2 {
     TH1* m_refCopy{};/**< Pointer to scaled reference histogram */
     bool m_updated = false; /**< flag if update since last event */
 
-    /** Reference Node structure used in DQMHistReferenceModule*/
-    typedef struct {
-      /** online histogram name */
-      std::string orghist_name;
-      /** reference histogram name */
-      std::string refhist_name;
-      /** related canvas name name */
-      TCanvas* canvas{nullptr};
-      /** pointer to the org reference histogram */
-      TH1* ref_org{nullptr};
-      /** pointer to the cloned/scaled reference histogram */
-      TH1* ref_clone{nullptr};
-    } REFNODE;
-
-    /** Unique object that could be used by ReferenceModule to access objects directly */
-    REFNODE m_refNode{m_orghist_name, m_refhist_name, m_canvas, m_refHist, m_refCopy };
-
   public:
 
     /** Constructor
@@ -79,11 +62,6 @@ namespace Belle2 {
     * @return scaled ref hist ptr
     */
     TH1* getRefCopy(void) { return m_refCopy;};
-
-    /** Get custom node structure output (for reference module)
-    * @return refnode
-    */
-    REFNODE getRefNode(void) { return m_refNode;};
 
   };
 }

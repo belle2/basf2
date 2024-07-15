@@ -60,8 +60,8 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   for (auto& it : m_pnode) {
     // clear ref histos from memory
-    if (it.ref_org) delete it.ref_org;
-    if (it.ref_clone) delete it.ref_clone;
+    if (it.m_refHist) delete it.m_refHist;
+    if (it.m_refCopy) delete it.m_refCopy;
   }
   m_pnode.clear();
   B2INFO("DQMHistReference: clear m_pnode. size: " << m_pnode.size());
@@ -115,15 +115,15 @@ void DQMHistReferenceModule::loadReferenceHistos()
               TH1* h = (TH1*)obj;
               if (h->GetDimension() == 1) {
                 string histname = h->GetName();
-                m_pnode.push_back(RefHistObject::REFNODE());
+                m_pnode.push_back(RefHistObject());
                 auto& n = m_pnode.back();
-                n.orghist_name = dirname + "/" + histname;
-                n.refhist_name = "ref/" + dirname + "/" + histname;
-                h->SetName((n.refhist_name).c_str());
+                n.m_orghist_name = dirname + "/" + histname;
+                n.m_refhist_name = "ref/" + dirname + "/" + histname;
+                h->SetName((n.m_refhist_name).c_str());
                 h->SetDirectory(0);
-                n.ref_org = h; // transfer ownership!
-                n.ref_clone = nullptr;
-                n.canvas = nullptr;
+                n.m_refHist = h; // transfer ownership!
+                n.m_refCopy = nullptr;
+                n.m_canvas = nullptr;
               } else {
                 delete h;
               }
@@ -160,19 +160,19 @@ void DQMHistReferenceModule::event()
 
 
   for (auto& it : m_pnode) {
-    if (!it.ref_org) continue; // No reference, continue
+    if (!it.m_refHist) continue; // No reference, continue
 
-    TH1* hist1 = findHistInCanvas(it.orghist_name, &(it.canvas));
+    TH1* hist1 = findHistInCanvas(it.m_orghist_name, &(it.m_canvas));
 
-    TCanvas* canvas = it.canvas;
+    TCanvas* canvas = it.m_canvas;
 
     // if there is no histogram on canvas we plot the reference anyway.
     if (!canvas) {
-      B2DEBUG(1, "No canvas found for reference histogram " << it.orghist_name);
+      B2DEBUG(1, "No canvas found for reference histogram " << it.m_orghist_name);
       continue;
     }
     if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> no display " << it.orghist_name);
+      B2DEBUG(1, "Canvas is without histogram -> no display " << it.m_orghist_name);
       // Display something could be confusing for shifters
 //       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.orghist_name);
 //       canvas->cd();
@@ -191,22 +191,22 @@ void DQMHistReferenceModule::event()
       }
     */
 
-    if (abs(it.ref_org->Integral()) > 0) { // only if we have entries in reference
-      if (it.ref_clone) {
-        it.ref_clone->Reset();
-        it.ref_clone->Add(it.ref_org);
-        it.ref_clone->Scale(hist1->Integral() / it.ref_clone->Integral());
+    if (abs(it.m_refHist->Integral()) > 0) { // only if we have entries in reference
+      if (it.m_refCopy) {
+        it.m_refCopy->Reset();
+        it.m_refCopy->Add(it.m_refHist);
+        it.m_refCopy->Scale(hist1->Integral() / it.m_refCopy->Integral());
       } else {
-        it.ref_clone = scaleReference(hist1, it.ref_org);
+        it.m_refCopy = scaleReference(hist1, it.m_refHist);
       }
 
 
       //Adjust the y scale to cover the reference
-      if (it.ref_clone->GetMaximum() > hist1->GetMaximum())
-        hist1->SetMaximum(1.1 * it.ref_clone->GetMaximum());
+      if (it.m_refCopy->GetMaximum() > hist1->GetMaximum())
+        hist1->SetMaximum(1.1 * it.m_refCopy->GetMaximum());
 
       canvas->cd();
-      it.ref_clone->Draw("hist,same");
+      it.m_refCopy->Draw("hist,same");
 
       canvas->Modified();
       canvas->Update();
@@ -229,8 +229,8 @@ void DQMHistReferenceModule::terminate()
   B2DEBUG(1, "DQMHistReference: terminate called");
   for (auto& it : m_pnode) {
     // clear ref histos from memory
-    if (it.ref_org) delete it.ref_org;
-    if (it.ref_clone) delete it.ref_clone;
+    if (it.m_refHist) delete it.m_refHist;
+    if (it.m_refCopy) delete it.m_refCopy;
   }
   m_pnode.clear();
 }

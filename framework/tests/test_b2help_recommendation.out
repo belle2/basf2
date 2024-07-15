@@ -6,9 +6,14 @@ Available Tags:
   - Tracking
   - gamma
 
+Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.
-scaleTrackMomenta
-=================
+Track energy correction on Data
+===============================
+
++-------+-----------------+
+| Tool: |scaleTrackMomenta|
++-------+-----------------+
 
 Description
 -----------
@@ -35,8 +40,12 @@ Recommendation
 +-------+----+-----------+--------+
 
 
-correctEnergyBias
-=================
+Photon energy correction on Data
+================================
+
++-------+-----------------+
+| Tool: |correctEnergyBias|
++-------+-----------------+
 
 Description
 -----------
@@ -70,8 +79,12 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
-correctEnergyBias
-=================
+Photon energy correction on Data
+================================
+
++-------+-----------------+
+| Tool: |correctEnergyBias|
++-------+-----------------+
 
 Description
 -----------
@@ -105,8 +118,12 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
-scaleTrackMomenta
-=================
+Track energy correction on Data
+===============================
+
++-------+-----------------+
+| Tool: |scaleTrackMomenta|
++-------+-----------------+
 
 Description
 -----------

@@ -20,6 +20,7 @@
 #include <framework/dataobjects/Helix.h>
 
 // dataobjects from the MDST
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -173,6 +174,36 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       return trackFit->getTanLambda();
+    }
+
+    double trackD0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getD0();
+    }
+
+    double trackZ0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getZ0();
+    }
+
+    double trackPhi0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getPhi0();
     }
 
     double trackD0Error(const Particle* part)
@@ -777,6 +808,39 @@ Returns :math:`\tan\lambda`, the slope of the track in the :math:`r-z` plane.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("d0FromIP", trackD0FromIP, R"DOC(
+Returns the tracking parameter :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
+
+.. note::
+
+        Tracking parameters are with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("z0FromIP", trackZ0FromIP, R"DOC(
+Returns the tracking parameter :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA).
+
+.. note::
+
+        Tracking parameters are with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("phi0FromIP", trackPhi0FromIP, R"DOC(
+Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
+momentum in the :math:`r-\phi` plane.
+
+.. note::
+
+        Tracking parameters are with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "rad");
     REGISTER_VARIABLE("d0Err", trackD0Error, R"DOC(
 Returns the uncertainty on :math:`d_0`, the signed distance to the
 point-of-closest-approach (POCA) in the :math:`r-\phi` plane.

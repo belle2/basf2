@@ -144,12 +144,6 @@ namespace Belle2 {
     double particleDRho(const Particle* part);
 
     /**
-     * return transverse distance relative to interaction point
-     * (signed depending on the postion of IP)
-     */
-    double particleSignedDRho(const Particle* part);
-
-    /**
      * return vertex azimuthal angle
      */
     double particleDPhi(const Particle* part);

@@ -85,7 +85,7 @@ namespace Belle2 {
     bool isMergePayload; /**< merge payload at the of calibration */
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
 
-    TString fsrun; /**< flag to indentify low stats runs */
+    TString fsrun; /**< flag to identify low stats runs */
     double fSigLim; /**< fit range limit based on sigma */
     int fdEdxBins; /**< number of bins for dedx histogram */
     double fdEdxMin; /**< min dedx range for gain cal */

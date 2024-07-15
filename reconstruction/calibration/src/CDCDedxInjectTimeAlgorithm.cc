@@ -69,7 +69,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
 
   TH1D* htimes = new TH1D(Form("htimes_%s", m_suffix.data()), "", m_tbins, m_tedges);
 
-  //time bins are changable from out so vector is used
+  //time bins are changeable from out so vector is used
   std::array<std::vector<TH1D*>, numdedx::nrings> hdedx, htime, hchi, hdedx_corr;
   defineHisto(hdedx, "dedx");
   defineHisto(hdedx_corr, "dedx_corr");
@@ -107,7 +107,7 @@ CalibrationAlgorithm::EResult CDCDedxInjectTimeAlgorithm::calibrate()
     htime[wr][tb]->Fill(injtime);
   }
 
-  //keep merging runs to achive enough stats
+  //keep merging runs to achieve enough stats
   m_isminStat = false;
   checkStatistics(hdedx);
   if (m_isminStat) {
@@ -314,7 +314,7 @@ void CDCDedxInjectTimeAlgorithm::fitGaussianWRange(TH1D*& temphist, fstatus& sta
       return;
     } else {
       temphist->GetXaxis()->SetRangeUser(mean - 5.0 * width, mean + 5.0 * width);
-      B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
+      B2INFO(Form("\tFit for hist (%s) successful (status = %d)", temphist->GetName(), fs));
       status = fitOK;
     }
   }
@@ -702,7 +702,7 @@ void CDCDedxInjectTimeAlgorithm::plotTimeStat(std::array<std::vector<TH1D*>, num
 
   for (unsigned int ir = 0; ir < c_rings; ir++) {
 
-    std::string title = Form("injection time, her-ler comparision, (%s)", m_suffix.data());
+    std::string title = Form("injection time, her-ler comparison, (%s)", m_suffix.data());
     htimestat[ir] = new TH1D(Form("htimestat_%s_%s", m_suffix.data(), m_sring[ir].data()), "", m_tbins, 0, m_tbins);
     htimestat[ir]->SetTitle(Form("%s;injection time(#mu-second);norm. entries", title.data()));
 

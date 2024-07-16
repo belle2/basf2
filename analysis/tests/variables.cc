@@ -391,6 +391,8 @@ namespace {
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(position.Rho(), trackD0(part));
+    EXPECT_FLOAT_EQ(particleDRho(part), std::fabs(trackD0FromIP(part)));
+    EXPECT_FLOAT_EQ(particleDZ(part), trackZ0FromIP(part));
     EXPECT_FLOAT_EQ(3, trackNCDCHits(part));
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));

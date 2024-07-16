@@ -4,3 +4,7 @@ Changes in the analysis package in light-2408-savannah
 Modules
 +++++++
 * Fixed a bug in `MCDecayFinder`, which previously didn't find all true candidates when using the default arrow.
+
+Command line tools
+++++++++++++++++++
+* Improved output and content of the :ref:`b2help-recommendation` tool.

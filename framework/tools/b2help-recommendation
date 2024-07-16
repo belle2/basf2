@@ -215,8 +215,8 @@ class Tool:
     def __init__(self, data: Dict[str, str], formatter: FormatterStrategy):
         self.fields = []
         title = '(no title)'
-        if 'title' in data:
-            title = data.pop('title')
+        if 'name' in data:
+            title = data.pop('name')
         self.fields.append(Field('Title', title, SectionDecorator(formatter)))
         tool = '(no tool)'
         if 'tool' in data:

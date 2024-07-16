@@ -1,7 +1,6 @@
 [
   {
-    "title": "Track energy correction on Data",
-    "tool": "scaleTrackMomenta",
+    "name": "Track energy correction on Data",
     "description": "Track momentum scale (global phase space)",
     "tags": [
       "Data",
@@ -17,8 +16,7 @@
     }
   },
   {
-    "title": "Photon energy correction on Data",
-    "tool": "correctEnergyBias",
+    "name": "Photon energy correction on Data",
     "description": "Correction of photon energy bias in data wrt MC15rd",
     "tags": [
       "Data",

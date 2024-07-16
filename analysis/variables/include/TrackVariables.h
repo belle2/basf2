@@ -100,17 +100,17 @@ namespace Belle2 {
     double trackTanLambda(const Particle* part);
 
     /**
-     * returns the track's D0 impact parameter with resepect to IP
+     * returns the track's D0 impact parameter with respect to IP
      */
     double trackD0FromIP(const Particle* part);
 
     /**
-     * returns the track's Z0 impact parameter with resepect to IP
+     * returns the track's Z0 impact parameter with respect to IP
      */
     double trackZ0FromIP(const Particle* part);
 
     /**
-     * returns the track's transverse momentum angle with resepect to IP
+     * returns the track's transverse momentum angle with respect to IP
      */
     double trackPhi0FromIP(const Particle* part);
 

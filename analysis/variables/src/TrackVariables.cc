@@ -768,10 +768,10 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
 
 .. note::
 
-        Tracking parameters are with respect to the origin (0,0,0).  For the
+        Tracking parameters are with respect to the origin (0,0,0). For the
         POCA with respect to the measured beam interaction point, see
         :b2:var:`dr` (you probably want this unless you're doing a tracking
-        study or some debugging).
+        study or some debugging) and :b2:var:`d0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -779,6 +779,12 @@ Returns NaN if called for something other than a track-based particle.
     REGISTER_VARIABLE("phi0", trackPhi0, R"DOC(
 Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
 momentum in the :math:`r-\phi` plane.
+
+.. note::
+
+        Tracking parameters are with respect to the origin (0,0,0). For the
+        POCA with respect to the measured beam interaction point, see
+        :b2:var:`phi0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -795,10 +801,10 @@ point-of-closest-approach (POCA).
 
 .. note::
 
-        Tracking parameters are with respect to the origin (0,0,0).  For the
+        Tracking parameters are with respect to the origin (0,0,0). For the
         POCA with respect to the measured beam interaction point, see
         :b2:var:`dz` (you probably want this unless you're doing a tracking
-        study or some debugging).
+        study or some debugging) and :b2:var:`z0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -810,33 +816,21 @@ Returns NaN if called for something other than a track-based particle.
     )DOC");
     REGISTER_VARIABLE("d0FromIP", trackD0FromIP, R"DOC(
 Returns the tracking parameter :math:`d_0`, the signed distance to the
-point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
-
-.. note::
-
-        Tracking parameters are with respect to the measured beam interaction point.
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane, with respect to the measured beam interaction point.
 
 Returns NaN if called for something other than a track-based particle.
 
 )DOC", "cm");
     REGISTER_VARIABLE("z0FromIP", trackZ0FromIP, R"DOC(
 Returns the tracking parameter :math:`z_0`, the z-coordinate of the
-point-of-closest-approach (POCA).
-
-.. note::
-
-        Tracking parameters are with respect to the measured beam interaction point.
+point-of-closest-approach (POCA), with respect to the measured beam interaction point.
 
 Returns NaN if called for something other than a track-based particle.
 
 )DOC", "cm");
     REGISTER_VARIABLE("phi0FromIP", trackPhi0FromIP, R"DOC(
 Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
-momentum in the :math:`r-\phi` plane.
-
-.. note::
-
-        Tracking parameters are with respect to the measured beam interaction point.
+momentum in the :math:`r-\phi` plane, with respect to the measured beam interaction point.
 
 Returns NaN if called for something other than a track-based particle.
 

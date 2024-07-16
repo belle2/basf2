@@ -94,7 +94,7 @@ namespace Belle2 {
     }
 
     /**
-    * function to perform gaus fit for input histogram
+    * function to perform gauss fit for input histogram
     */
     void fitGaussianWRange(TH1D*& temphist, fstatus& status);
 

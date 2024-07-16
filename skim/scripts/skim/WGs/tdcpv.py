@@ -268,7 +268,7 @@ class TDCPV_ccs(BaseSkim):
     * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``
     * ``B0 -> J/psi (ee/mm) pi0``
     * ``B0 -> J/psi (ee/mm) K+ pi-``
-    * ``B+ -> J/psi (ee/mm) K*+ (pi+ K_S0 / K+ pi0)
+    * ``B+ -> J/psi (ee/mm) K*+ (pi+ K_S0 / K+ pi0)``
 
     **Particle lists used**:
 

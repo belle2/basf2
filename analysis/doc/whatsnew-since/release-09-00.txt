@@ -7,4 +7,5 @@ Modules
 
 Command line tools
 ++++++++++++++++++
-* Improved output and content of the :ref:`b2help-recommendation` tool.
+* Improved output and content of the :ref:`b2help-recommendation`.
+

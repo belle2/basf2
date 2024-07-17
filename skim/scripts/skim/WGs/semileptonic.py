@@ -28,7 +28,7 @@ from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from variables import variables as vm
-from ROOT import Belle2
+# from ROOT import Belle2
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -422,10 +422,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     def build_lists(self, path):
 
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
         eIDCut = "electronID > 0.3"
         muIDCut = "muonID > 0.9"
         ePCut = "p > 0.5"
@@ -448,10 +444,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('cosBY', 'cosThetaBetweenParticleAndNominalB')
         # electrons and muons
         ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and {ePtCut} and {ePCut}", path=path)
-        ma.applyChargedPidMVA(
-            particleLists=['e-:sig'],
-            path=path,
-            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
         ma.applyCuts('e-:sig', eIDCut, path=path)
 
         ma.fillParticleList("mu-:sig", f"{muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}", path=path)

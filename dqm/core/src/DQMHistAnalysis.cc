@@ -77,6 +77,18 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   return false; // histogram didnt change
 }
 
+void DQMHistAnalysisModule::addRefHist(const std::string& dirname, const std::string& histname, TH1* h, TH1* r, TCanvas* c)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+
+  s_refList[fullname].update(r, scaleReference(h, r), c);
+}
+
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
 {

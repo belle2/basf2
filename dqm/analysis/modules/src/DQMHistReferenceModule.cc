@@ -60,8 +60,8 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   for (auto& it : m_pnode) {
     // clear ref histos from memory
-    if (it.m_refHist) delete it.m_refHist;
-    if (it.m_refCopy) delete it.m_refCopy;
+    if (it.m_refHist) it.setRefHist(nullptr);
+    if (it.m_refCopy) it.setRefCopy(nullptr);
   }
   m_pnode.clear();
   B2INFO("DQMHistReference: clear m_pnode. size: " << m_pnode.size());
@@ -121,9 +121,8 @@ void DQMHistReferenceModule::loadReferenceHistos()
                 n.m_refhist_name = "ref/" + dirname + "/" + histname;
                 h->SetName((n.m_refhist_name).c_str());
                 h->SetDirectory(0);
-                n.m_refHist = h; // transfer ownership!
-                n.m_refCopy = nullptr;
-                n.m_canvas = nullptr;
+                n.setRefHist(h); // transfer ownership!
+
               } else {
                 delete h;
               }
@@ -160,11 +159,12 @@ void DQMHistReferenceModule::event()
 
 
   for (auto& it : m_pnode) {
-    if (!it.m_refHist) continue; // No reference, continue
+    TH1* ref = it.getRefHist();
+    if (!ref) continue; // No reference, continue
 
-    TH1* hist1 = findHistInCanvas(it.m_orghist_name, &(it.m_canvas));
+    TCanvas* canvas = it.getCanvas();
 
-    TCanvas* canvas = it.m_canvas;
+    TH1* hist1 = findHistInCanvas(it.m_orghist_name, &(canvas));
 
     // if there is no histogram on canvas we plot the reference anyway.
     if (!canvas) {
@@ -191,25 +191,28 @@ void DQMHistReferenceModule::event()
       }
     */
 
-    if (abs(it.m_refHist->Integral()) > 0) { // only if we have entries in reference
-      if (it.m_refCopy) {
-        it.m_refCopy->Reset();
-        it.m_refCopy->Add(it.m_refHist);
-        it.m_refCopy->Scale(hist1->Integral() / it.m_refCopy->Integral());
+    if (abs(ref->Integral()) > 0) { // only if we have entries in reference
+      TH1* refCopy = it.getRefCopy();
+      if (refCopy) {
+        refCopy->Reset();
+        refCopy->Add(ref);
+        refCopy->Scale(hist1->Integral() / refCopy->Integral());
       } else {
-        it.m_refCopy = scaleReference(hist1, it.m_refHist);
+        refCopy = scaleReference(hist1, ref);
       }
 
 
       //Adjust the y scale to cover the reference
-      if (it.m_refCopy->GetMaximum() > hist1->GetMaximum())
-        hist1->SetMaximum(1.1 * it.m_refCopy->GetMaximum());
+      if (refCopy->GetMaximum() > hist1->GetMaximum())
+        hist1->SetMaximum(1.1 * refCopy->GetMaximum());
 
       canvas->cd();
-      it.m_refCopy->Draw("hist,same");
+      refCopy->Draw("hist,same");
 
       canvas->Modified();
       canvas->Update();
+
+      addRefHist("", hist1->GetName(), hist1, ref, canvas);
     }
   }
 
@@ -228,9 +231,11 @@ void DQMHistReferenceModule::terminate()
 {
   B2DEBUG(1, "DQMHistReference: terminate called");
   for (auto& it : m_pnode) {
-    // clear ref histos from memory
-    if (it.m_refHist) delete it.m_refHist;
-    if (it.m_refCopy) delete it.m_refCopy;
+    // clear ref histos from memory (but converting to smart pointers)
+    //if (it.m_refHist) delete it.m_refHist;
+    //if (it.m_refCopy) delete it.m_refCopy;
+    if (it.m_refHist) it.setRefHist(nullptr);
+    if (it.m_refCopy) it.setRefCopy(nullptr);
   }
   m_pnode.clear();
 }

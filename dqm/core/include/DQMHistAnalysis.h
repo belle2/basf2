@@ -310,6 +310,18 @@ namespace Belle2 {
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
+    /**
+     * Add reference histogram.
+     * @param dirname The name of the directory.
+     * @param histname The name of the histogram.
+     * @param h The TH1 pointer for the histogram.
+     * @param r The TH1 pointer for the (original) reference.
+     * @param c The TCanvas pointer
+     * @return histogram was updated flag
+     */
+    static void addRefHist(const std::string& dirname,
+                           const std::string& histname, TH1* h, TH1* r, TCanvas* c);
+
 
     /**
      * Get MonitoringObject with given name (new object is created if non-existing)

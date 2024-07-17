@@ -77,6 +77,20 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   return false; // histogram didnt change
 }
 
+void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
+{
+  std::string fullname;
+  if (dirname.size() > 0) {
+    fullname = dirname + "/" + histname;
+  } else {
+    fullname = histname;
+  }
+  auto it = s_refList.find(fullname);
+  if (it == s_refList.end()) {
+    B2INFO("Did not find histogram " << fullname << "in s_refList, so inserting now.");
+    s_refList.insert({fullname, ref});
+  }
+}
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
@@ -169,10 +183,10 @@ TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, bool was_up
 {
   if (s_refList.find(histname) != s_refList.end()) {
     if (was_updated) return nullptr;
-    if (s_refList[histname].getRefHist()) {
-      return s_refList[histname].getRefHist();
+    if (s_refList[histname]) {
+      return s_refList[histname];
     } else {
-      B2ERROR("Histogram " << histname << " in histogram list but nullptr.");
+      B2WARNING("Histogram " << histname << " in histogram list but nullptr.");
     }
   }
   B2INFO("Histogram " << histname << " not in list.");

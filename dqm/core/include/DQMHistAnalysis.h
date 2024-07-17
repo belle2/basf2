@@ -80,7 +80,7 @@ namespace Belle2 {
     /**
      * The type of list of references.
      */
-    typedef std::map<std::string, RefHistObject> RefList;
+    typedef std::map<std::string, TH1*> RefList;
 
     /**
     * Clear all static global lists
@@ -309,6 +309,15 @@ namespace Belle2 {
      */
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
+
+    /**
+     * Add reference.
+     * @param dirname The name of the directory.
+     * @param histname The name of the histogram.
+     * @param ref The TH1 pointer for the reference.
+     */
+    void addRef(const std::string& dirname,
+                const std::string& histname, TH1* ref);
 
 
     /**

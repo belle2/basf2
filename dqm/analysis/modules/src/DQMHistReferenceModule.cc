@@ -209,6 +209,8 @@ void DQMHistReferenceModule::event()
 
       canvas->Modified();
       canvas->Update();
+      B2DEBUG(2, "Adding ref: " << it.m_orghist_name << " " << ref->GetName() << " " << ref);
+      addRef("", it.m_orghist_name, ref);
     }
   }
 

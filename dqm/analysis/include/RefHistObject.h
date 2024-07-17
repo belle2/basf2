@@ -29,7 +29,8 @@ namespace Belle2 {
      */
     RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_canvas(nullptr), m_refHist(nullptr), m_refCopy(nullptr) {};
 
-    // Move constructor
+    /** Move constructor
+    */
     RefHistObject(RefHistObject&& other) noexcept
       : m_orghist_name(std::move(other.m_orghist_name)),
         m_refhist_name(std::move(other.m_refhist_name)),
@@ -43,7 +44,8 @@ namespace Belle2 {
       other.m_refCopy = nullptr;
     }
 
-    // Move assignment operator
+    /** Move assignment operator
+    */
     RefHistObject& operator=(RefHistObject&& other) noexcept
     {
       if (this != &other) {

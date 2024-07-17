@@ -443,7 +443,10 @@ def pretty_print_module(module, module_name, replacements=None):
         signature = str(_inspect.signature(function))
         for key, value in replacements.items():
             signature = signature.replace(key, value)
-        desc_list.append((function.__name__, signature + '\n' + function.__doc__))
+        function_doc = function.__doc__
+        if not function_doc:
+            function_doc = '(no documentation)'
+        desc_list.append((function.__name__, signature + '\n' + function_doc))
 
     with Pager('List of available functions in ' + module_name, True):
         pretty_print_description_list(desc_list)

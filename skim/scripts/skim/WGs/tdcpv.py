@@ -45,6 +45,7 @@ class TDCPV_qqs(BaseSkim):
     * ``B0 -> phi K_L0``
     * ``B0 -> eta K_S0``
     * ``B0 -> eta' K_S0``
+    * ``B0 -> eta' K_L0``
     * ``B0 -> eta K*``
     * ``B0 -> eta' K*``
     * ``B0 -> K_S0 K_S0 K_S0``
@@ -90,7 +91,7 @@ class TDCPV_qqs(BaseSkim):
     * ``abs(deltaE) < 0.5``
     * ``abs(deltaE) < 0.250 for KL``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
-    * ``E_ECL_TDCPV_qqs<9``
+    * ``E_ECL_TDCPV < 9``
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -148,7 +149,6 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K_S0:merged',
-            'eta\':SkimHighEff K_L0:eclEcut_qqs',
             'eta:SkimHighEff K_S0:merged',
             'eta\':SkimHighEff K*0:SkimHighEff',
             'eta:SkimHighEff K*0:SkimHighEff',
@@ -184,13 +184,7 @@ class TDCPV_qqs(BaseSkim):
         for chID, channel in enumerate(bd_qqs_KL_Channels):
             ma.reconstructMissingKlongDecayExpert(
                 'B0:TDCPV_qqs_KL' +
-                str(chID) +
-                ' -> ' +
-                channel,
-                btotcpvcuts_KL,
-                chID,
-                recoList=f"_reco{chID}",
-                path=path)
+                str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, recoList=f"_reco{chID}", path=path)
             bd_qqs_KL_List.append('B0:TDCPV_qqs_KL' + str(chID))
 
         bu_qqs_List = []
@@ -295,7 +289,7 @@ class TDCPV_ccs(BaseSkim):
     * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``visibleEnergyOfEventCMS>4"``,
-    * ``E_ECL_TDCPV_ccs<9``
+    * ``E_ECL_TDCPV < 9``
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]

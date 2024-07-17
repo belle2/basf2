@@ -8,6 +8,8 @@ Available Tags:
 
 Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.
+Recommendations for MC15 and all tags:
+
 Track energy correction on Data
 ===============================
 
@@ -71,6 +73,8 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
+Recommendations for MC15 and gamma tags:
+
 Photon energy correction on Data
 ================================
 
@@ -106,6 +110,8 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
+Recommendations for MC15 and Tracking tags:
+
 Track energy correction on Data
 ===============================
 

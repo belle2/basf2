@@ -205,12 +205,11 @@ void EventT0ValidationModule::endRun()
 
     TEfficiency* algorithmEffi = new TEfficiency(*m_histAlgorithmSourceCounts, *m_histAlgorithmSourceCountsActive);
     algorithmEffi->SetTitle("Efficiency of finding an EventT0 per Algorithm");
-    algorithmEffi->Write("EventT0AlgorithmEfficiency");
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Contact", m_contact));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiencies of the various EventT0 algorithms."));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Check", "Efficiency should be close to 1 for all active algorithms."));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
-    algorithmEffi->Write();
+    algorithmEffi->Write("EventT0AlgorithmEfficiency");
 
     m_outputFile->Write();
     m_outputFile->Close();

@@ -28,10 +28,10 @@ Snippet
 
 Recommendation
 --------------
-* **GlobalTag** - tracking_data_Moriond23_v1
-* **payloadName** - tracking_momentumScaleFactor_global
-* **scalingFactorName** - sf_global_central
-* **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
++ **GlobalTag** - tracking_data_Moriond23_v1
++ **payloadName** - tracking_momentumScaleFactor_global
++ **scalingFactorName** - sf_global_central
++ **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
 
 +-------+----+-----------+--------+
 | Tags: |Data|Systematics|Tracking|
@@ -130,10 +130,10 @@ Snippet
 
 Recommendation
 --------------
-* **GlobalTag** - tracking_data_Moriond23_v1
-* **payloadName** - tracking_momentumScaleFactor_global
-* **scalingFactorName** - sf_global_central
-* **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
++ **GlobalTag** - tracking_data_Moriond23_v1
++ **payloadName** - tracking_momentumScaleFactor_global
++ **scalingFactorName** - sf_global_central
++ **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
 
 +-------+----+-----------+--------+
 | Tags: |Data|Systematics|Tracking|

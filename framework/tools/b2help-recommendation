@@ -88,7 +88,7 @@ class RSTFormatterStrategy(FormatterStrategy):
         """
         result = f"\n{name}\n{'-' * len(name)}\n"
         for key in content:
-            result += f'* **{key}** - {content[key]}\n'
+            result += f'+ **{key}** - {content[key]}\n'
         return result
 
     def format_table_list(self, name: str, content: str) -> str:

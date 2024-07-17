@@ -205,7 +205,7 @@ void EventT0ValidationModule::endRun()
 
     TEfficiency* algorithmEffi = new TEfficiency(*m_histAlgorithmSourceCounts, *m_histAlgorithmSourceCountsActive);
     algorithmEffi->SetTitle("Efficiency of finding an EventT0 per Algorithm");
-    algorithmEffi->GetListOfFunctions()->Add(new TNamed("Contact", m_contact));
+    algorithmEffi->GetListOfFunctions()->Add(new TNamed("Contact", m_contact.c_str()));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Description", "Efficiencies of the various EventT0 algorithms."));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("Check", "Efficiency should be close to 1 for all active algorithms."));
     algorithmEffi->GetListOfFunctions()->Add(new TNamed("MetaOptions", "shifter"));
@@ -221,9 +221,9 @@ void EventT0ValidationModule::endRun()
 void EventT0ValidationModule::setPlotMetaData(TH1* hist, const std::string& description, const std::string& check,
                                               const std::string& contact, const std::string& shifter)
 {
-  hist->GetListOfFunctions()->Add(new TNamed("Contact", contact));
-  hist->GetListOfFunctions()->Add(new TNamed("Description", description));
-  hist->GetListOfFunctions()->Add(new TNamed("Check", check));
-  hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", shifter));
+  hist->GetListOfFunctions()->Add(new TNamed("Contact", contact.c_str()));
+  hist->GetListOfFunctions()->Add(new TNamed("Description", description.c_str()));
+  hist->GetListOfFunctions()->Add(new TNamed("Check", check.c_str()));
+  hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", shifter.c_str()));
   hist->Write();
 }

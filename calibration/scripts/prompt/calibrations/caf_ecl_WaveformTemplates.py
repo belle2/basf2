@@ -28,7 +28,8 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     depends_on=[],
     expert_config={
-        "C2_MinEnergyThreshold": 2.0
+        "C2_MinEnergyThreshold": 2.0,
+        "nFilesCollector": 50
     })
 
 
@@ -53,6 +54,7 @@ def get_calibrations(input_data, **kwargs):
 
     expert_config = kwargs.get("expert_config")
     C2_MinEnergyThreshold = expert_config["C2_MinEnergyThreshold"]
+    nFilesCollector = expert_config["nFilesCollector"]
 
     # ..The calibration
     collector_C1 = basf2.register_module("eclWaveformTemplateCalibrationC1Collector")
@@ -63,7 +65,7 @@ def get_calibrations(input_data, **kwargs):
         collector=collector_C1,
         algorithms=[algo_C1],
         input_files=input_files,
-        max_files_per_collector_job=50)
+        max_files_per_collector_job=nFilesCollector)
 
     # ..Add prepare_cdst_analysis to pre_collector_path
     gamma_gamma_pre_path = basf2.create_path()
@@ -114,7 +116,7 @@ def get_calibrations(input_data, **kwargs):
                                            algorithms=[algos_C2[-1],
                                                        algos_C3[-1]],
                                            input_files=input_files,
-                                           max_files_per_collector_job=50))
+                                           max_files_per_collector_job=nFilesCollector))
         calibrations_C2[-1].pre_collector_path = gamma_gamma_pre_path
         calibrations_C2[-1].depends_on(cal_ecl_Wave_C1)
 

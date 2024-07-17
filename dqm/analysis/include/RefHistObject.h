@@ -19,17 +19,15 @@ namespace Belle2 {
   public:
     std::string m_orghist_name; /**< online histogram name */
     std::string m_refhist_name; /**< reference histogram name */
-    std::shared_ptr <TCanvas> m_canvas; /**< canvas where we draw the histogram*/
+    std::unique_ptr <TCanvas> m_canvas; /**< canvas where we draw the histogram*/
     std::unique_ptr <TH1> m_refHist;/**< Pointer to reference histogram */
     std::unique_ptr <TH1> m_refCopy;/**< Pointer to scaled reference histogram */
-    bool m_updated = false; /**< flag if update since last event */
 
   public:
 
     /** Constructor
      */
-    RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_canvas(nullptr), m_refHist(nullptr), m_refCopy(nullptr),
-      m_updated(false) {};
+    RefHistObject(void) : m_orghist_name(""), m_refhist_name(""), m_canvas(nullptr), m_refHist(nullptr), m_refCopy(nullptr) {};
 
     // Move constructor
     RefHistObject(RefHistObject&& other) noexcept
@@ -37,14 +35,12 @@ namespace Belle2 {
         m_refhist_name(std::move(other.m_refhist_name)),
         m_canvas(std::move(other.m_canvas)),
         m_refHist(std::move(other.m_refHist)),
-        m_refCopy(std::move(other.m_refCopy)),
-        m_updated(other.m_updated)
+        m_refCopy(std::move(other.m_refCopy))
     {
       // Reset the moved-from object
       other.m_canvas = nullptr;
       other.m_refHist = nullptr;
       other.m_refCopy = nullptr;
-      other.m_updated = false;
     }
 
     // Move assignment operator
@@ -56,13 +52,11 @@ namespace Belle2 {
         m_canvas = std::move(other.m_canvas);
         m_refHist = std::move(other.m_refHist);
         m_refCopy = std::move(other.m_refCopy);
-        m_updated = other.m_updated;
 
         // Reset the moved-from object
         other.m_canvas = nullptr;
         other.m_refHist = nullptr;
         other.m_refCopy = nullptr;
-        other.m_updated = false;
       }
       return *this;
     }
@@ -71,20 +65,12 @@ namespace Belle2 {
      */
     ~RefHistObject(void);
 
-    /** Updating original reference, and scaled reference
-     * @param ref pointer to reference
-     * @param refCopy pointer to pre-scaled reference
-     * @param canvas pointer to canvas
-     * @return histogram was updated flag (return m_updated)
-     */
-    void update(TH1* ref, TH1* refCopy, TCanvas* canvas);
-
     /** Reset histogram and update flag, not the entries
      */
     void resetBeforeEvent(void);
 
-    /** Get hist pointer
-    * @return hist ptr
+    /** Get canvas pointer
+    * @return canvas ptr
     */
     TCanvas* getCanvas(void) { return m_canvas.get();};
 
@@ -98,19 +84,25 @@ namespace Belle2 {
     */
     TH1* getRefCopy(void) { return m_refCopy.get();};
 
-    // Setter for m_canvas
+    /** Set canvas pointer
+    * @param canvas input TCanvas pointer
+    */
     void setCanvas(TCanvas* canvas)
     {
       m_canvas.reset(canvas);  // Assumes ownership of canvas
     }
 
-    // Setter for m_refHist
+    /** set ref hist pointer
+    * @param refHist reference TH1 pointer
+    */
     void setRefHist(TH1* refHist)
     {
       m_refHist.reset(refHist);  // Assumes ownership of refHist
     }
 
-    // Setter for m_refCopy
+    /** set scaled ref hist pointer
+    * @param refCopy scaled reference TH1 pointer
+    */
     void setRefCopy(TH1* refCopy)
     {
       m_refCopy.reset(refCopy);  // Assumes ownership of refCopy

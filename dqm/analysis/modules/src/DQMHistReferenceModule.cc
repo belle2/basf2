@@ -122,6 +122,8 @@ void DQMHistReferenceModule::loadReferenceHistos()
                 h->SetName((n.m_refhist_name).c_str());
                 h->SetDirectory(0);
                 n.setRefHist(h); // transfer ownership!
+                n.setRefCopy(nullptr);
+                n.setCanvas(nullptr);
 
               } else {
                 delete h;
@@ -161,16 +163,10 @@ void DQMHistReferenceModule::event()
   for (auto& it : m_pnode) {
     TH1* ref = it.getRefHist();
     if (!ref) continue; // No reference, continue
-
     TCanvas* canvas = it.getCanvas();
-
     TH1* hist1 = findHistInCanvas(it.m_orghist_name, &(canvas));
 
     // if there is no histogram on canvas we plot the reference anyway.
-    if (!canvas) {
-      B2DEBUG(1, "No canvas found for reference histogram " << it.m_orghist_name);
-      continue;
-    }
     if (!hist1) {
       B2DEBUG(1, "Canvas is without histogram -> no display " << it.m_orghist_name);
       // Display something could be confusing for shifters
@@ -181,7 +177,10 @@ void DQMHistReferenceModule::event()
 //       canvas->Update();
       continue;
     }
-
+    if (!canvas) {
+      B2DEBUG(1, "No canvas found for reference histogram " << it.m_orghist_name);
+      continue;
+    }
     if (hist1->Integral() == 0) continue; // empty histogram -> continue
 
     /* consider adding coloring option....
@@ -201,7 +200,6 @@ void DQMHistReferenceModule::event()
         refCopy = scaleReference(hist1, ref);
       }
 
-
       //Adjust the y scale to cover the reference
       if (refCopy->GetMaximum() > hist1->GetMaximum())
         hist1->SetMaximum(1.1 * refCopy->GetMaximum());
@@ -211,8 +209,6 @@ void DQMHistReferenceModule::event()
 
       canvas->Modified();
       canvas->Update();
-
-      addRefHist("", hist1->GetName(), hist1, ref, canvas);
     }
   }
 

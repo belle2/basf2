@@ -440,7 +440,7 @@ def pretty_print_module(module, module_name, replacements=None):
 
     for function_name in sorted(list_functions(module), key=lambda x: x.lower()):
         function = getattr(module, function_name)
-        signature = _inspect.formatargspec(*_inspect.getfullargspec(function))
+        signature = str(_inspect.signature(function))
         for key, value in replacements.items():
             signature = signature.replace(key, value)
         desc_list.append((function.__name__, signature + '\n' + function.__doc__))

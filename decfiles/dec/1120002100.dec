@@ -9,9 +9,6 @@
 # Cuts: None
 # Date: 20240718
 
-# Aliases
-Alias K_S0sig K_S0
-
 
 Decay Upsilon(4S)
 1.000 B0 anti-B0 B0sig anti-B0sig VSS_BMIX dm;

@@ -87,7 +87,7 @@ void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string
   }
   auto it = s_refList.find(fullname);
   if (it == s_refList.end()) {
-    B2INFO("Did not find histogram " << fullname << "in s_refList, so inserting now.");
+    B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
     s_refList.insert({fullname, ref});
   }
 }

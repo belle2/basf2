@@ -10,37 +10,31 @@
 # Date: 20240719
 #
 
-Alias MyK_S0 K_S0
-
-Alias Mypi0 pi0
-
-Alias MyXsd Xsd
-Alias Myanti_Xsd anti-Xsd
-ChargeConj MyXsd Myanti_Xsd 
-
-Alias MyB0 B0
-Alias Myanti-B0 anti-B0
-ChargeConj MyB0 Myanti-B0
+Alias K_S0sig K_S0
+Alias pi0sig pi0
+Alias Xsdsig Xsd
+Alias anti_Xsdsig anti-Xsd
+ChargeConj Xsdsig anti_Xsdsig
 
 Decay Upsilon(4S)
-1.000    MyB0 Myanti-B0 B0  anti-B0  VSS_BMIX dm;
+1.000    B0sig anti-B0sig B0  anti-B0  VSS_BMIX dm;
 Enddecay
 
-Decay MyB0
-1.000    MyXsd  gamma  BTOXSGAMMA 2;
+Decay B0sig
+1.000    Xsdsig  gamma  BTOXSGAMMA 2;
 Enddecay
-CDecay Myanti-B0
+CDecay anti-B0sig
 
-Decay MyXsd
-1.00    Mypi0 MyK_S0  VSS;
+Decay Xsdsig
+1.00    pi0sig K_S0sig  VSS;
 Enddecay
-CDecay Myanti_Xsd
+CDecay anti_Xsdsig
 
-Decay MyK_S0
+Decay K_S0sig
 1.000    pi- pi+ PHSP;
 Enddecay
 
-Decay Mypi0
+Decay pi0sig
 1.000 gamma gamma PHSP;
 Enddecay
 

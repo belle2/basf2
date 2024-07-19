@@ -384,7 +384,6 @@ class Reweighter:
         weight_cols = _weight_cols
         if particle.column_names:
             weight_cols = particle.column_names
-        print(ntuple_df.index, binning_df.index)
         binning_df = binning_df.merge(particle.merged_table[weight_cols + binning_df.columns.tolist()],
                                       on=binning_df.columns.tolist(), how='left')
         binning_df.index = ntuple_df.index

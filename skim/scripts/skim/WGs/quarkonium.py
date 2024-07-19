@@ -65,14 +65,14 @@ class BottomoniumEtabExclusive(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.cutAndCopyList("gamma:hard", "gamma:loose", "E>3.5", path=path)
-        ma.applyCuts("gamma:hard", "foxWolframR2 < 0.995", path=path)
+        ma.cutAndCopyList("gamma:hard_BottomoniumEtabExclusive", "gamma:loose", "E>3.5", path=path)
+        ma.applyCuts("gamma:hard_BottomoniumEtabExclusive", "foxWolframR2 < 0.995", path=path)
 
         # the requirement of 7 < M(eta_b) < 10 GeV/c2
         Etabcuts = "M > 7 and M < 10"
 
         # eta_b candidates are reconstructed
-        Etab_Channels = ["gamma:hard gamma:hard"]
+        Etab_Channels = ["gamma:hard_BottomoniumEtabExclusive gamma:hard_BottomoniumEtabExclusive"]
 
         # define the eta_b decay list
         EtabList = []
@@ -115,7 +115,7 @@ class BottomoniumUpsilon(BaseSkim):
         ma.fillParticleList("mu+:BottomoniumUpsilon", "p<15 and p>3.5", path=path)
         ma.fillParticleList("e+:BottomoniumUpsilon", "p<15 and p>3.5", path=path)
         ma.fillParticleList("pi+:BottomoniumUpsilon", "p<1.5 and pt>0.05", path=path)
-        ma.cutAndCopyList("gamma:soft", "gamma:loose", "E>0.15", path=path)
+        ma.cutAndCopyList("gamma:soft_BottomoniumUpsilon", "gamma:loose", "E>0.15", path=path)
 
         # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
         ma.reconstructDecay("Upsilon:ee -> e+:BottomoniumUpsilon e-:BottomoniumUpsilon", "M > 8", path=path)
@@ -142,7 +142,7 @@ class BottomoniumUpsilon(BaseSkim):
 
         # Y(1S,2S) with pi+ or photon are reconstructed
         Upsilon_Channels = ["Upsilon:all pi+:BottomoniumUpsilon",
-                            "Upsilon:all gamma:soft"]
+                            "Upsilon:all gamma:soft_BottomoniumUpsilon"]
 
         # define the Y(1S,2S) decay channel list
         UpsilonList = []
@@ -362,7 +362,7 @@ class InclusiveUpsilon(BaseSkim):
         ma.fillParticleList('e+:all', "", path=path)
         ma.fillParticleList("mu+:all", "", path=path)
         ma.fillParticleList("pi+:all", "", path=path)
-        ma.cutAndCopyList("gamma:skimsoft", "gamma:loose", "E>0.15", path=path)
+        ma.cutAndCopyList("gamma:skimsoft_InclusiveUpsilon", "gamma:loose", "E>0.15", path=path)
 
         # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
         ma.reconstructDecay("Upsilon:llee -> e+:all e-:all", "M > 8 and M < 10.6", path=path)
@@ -371,7 +371,7 @@ class InclusiveUpsilon(BaseSkim):
 
         # Y(1S,2S) with pi+ or photon are reconstructed
         InclusiveUpsilon_Channels = ["Upsilon:ll pi+:all",
-                                     "Upsilon:ll gamma:skimsoft"]
+                                     "Upsilon:ll gamma:skimsoft_InclusiveUpsilon"]
 
         # define the Y(1S,2S) decay channel list
         InclusiveUpsilon = []

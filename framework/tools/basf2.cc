@@ -497,7 +497,7 @@ int main(int argc, char* argv[])
       pyArgvArray[i] = pyArgvString[i].c_str();
     }
     //Pass python filename and additional arguments to python
-    PySys_SetArgvEx(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()), 0);
+    PySys_SetArgvEx(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()), 1);
 
     //Execute Python file
     executePythonFile(pythonFile);

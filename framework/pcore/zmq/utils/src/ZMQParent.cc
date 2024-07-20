@@ -57,7 +57,7 @@ unsigned int ZMQParent::poll(const std::vector<zmq::socket_t*>& socketList, int 
 {
   B2ASSERT("Only allow to poll on maximal 8 sockets at the same time!", socketList.size() <= 8);
   std::bitset<8> return_bitmask;
-  zmq::pollitem_t items[socketList.size()];
+  std::vector<zmq::pollitem_t> items(socketList.size());
 
   for (unsigned int i = 0; i < socketList.size(); i++) {
     items[i].socket = static_cast<void*>(*socketList[i]);
@@ -66,7 +66,7 @@ unsigned int ZMQParent::poll(const std::vector<zmq::socket_t*>& socketList, int 
   }
 
   try {
-    zmq::poll(items, socketList.size(), timeout);
+    zmq::poll(items.data(), socketList.size(), timeout);
 
     for (unsigned int i = 0; i < socketList.size(); i++) {
       return_bitmask[i] = static_cast<bool>(items[i].revents & ZMQ_POLLIN);

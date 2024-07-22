@@ -380,7 +380,7 @@ class BtoEtapKstp(BaseSkim):
 
     def load_standard_lists(self, path):
         stdKshorts(path=path)
-        stdPhotons('all', path=path)
+        stdPhotons('tight', path=path)
         stdPi0s("eff40_May2020", path=path)
         loadStdVeryLooseTracks('pi', path=path)
         loadStdSkimHighEffTracks('pi', path=path)

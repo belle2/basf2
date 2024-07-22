@@ -411,7 +411,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
     __contact__ = __liaison__
     __category__ = "physics, semileptonic"
 
-    ApplyHLTHadronCut = False
+    ApplyHLTHadronCut = True
 
     TestSampleProcess = "charged"
 

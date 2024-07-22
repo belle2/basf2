@@ -557,55 +557,29 @@ class feiSLB0_RDstar(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
-
-        ma.fillParticleList(decayString="pi+:FEI_cleaned",
-                            cut=CleanedTrackCuts, path=path)
-        ma.fillParticleList(decayString="gamma:FEI_cleaned",
-                            cut=CleanedClusterCuts, path=path)
-
-        ma.buildEventKinematics(inputListNames=["pi+:FEI_cleaned",
-                                                "gamma:FEI_cleaned"],
-                                path=path)
-
         ma.buildEventShape(inputListNames=['pi+:FEI_cleaned', 'gamma:FEI_cleaned'],
-                           allMoments=True,
                            foxWolfram=True,
-                           harmonicMoments=True,
-                           cleoCones=True,
-                           thrust=True,
-                           collisionAxis=True,
-                           jets=True,
-                           sphericity=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
                            checkForDuplicates=True,
                            path=path)
 
-        # additional cut on Fox WR R2
+        # tightened cuts on sigprob and cosThetaBY as well as additional cut on Fox WR R2
         vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
-
-        EventCuts = " and ".join(
+        TighterCuts = " and ".join(
             [
-                f"nCleanedTracks({CleanedTrackCuts})>=3",
-                f"nCleanedECLClusters({CleanedClusterCuts})>=3",
-                "visibleEnergyOfEventCMS>4",
-                "foxWolframR2_maskedNaN<0.40",
+                "foxWolframR2_maskedNaN<0.4",
+                "dmID < 8",
+                "log10(sigProb) > -2.0",
+                "-1.75 < cosThetaBY < 1.1",
+                "p_lepton_CMSframe > 1.0"
             ]
         )
-        eselect = b2.register_module('VariableToReturnValue')
-        eselect.param('variable', 'passesEventCut(' + EventCuts + ')')
-        path.add_module(eselect)
-        empty_path = b2.create_path()
-        eselect.if_value('<1', empty_path)
-
-        ma.copyList("B0:SLRDstar", "B0:semileptonic", path=path)
-
-        ma.applyCuts("B0:SLRDstar", "dmID<8", path=path)
-        # tightened cut on sigprob
-        ma.applyCuts("B0:SLRDstar", "log10(sigProb)>-2.0", path=path)
-        # tightened cut on cosThetaBY
-        ma.applyCuts("B0:SLRDstar", "-1.75<cosThetaBY<1.1", path=path)
-        ma.applyCuts("B0:SLRDstar", "p_lepton_CMSframe>1.0", path=path)
+        ma.cutAndCopyList("B0:SLRDstar", "B0:semileptonic", TighterCuts, path=path)
 
         # best candidate selection on signal probability
         ma.rankByHighest("B0:SLRDstar", "sigProb", numBest=1,
@@ -648,7 +622,7 @@ class feiSLB0_RDstar(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 

@@ -56,6 +56,9 @@ _RegisteredSkims = [
     ("12160100", "ewp", "BtoXgamma"),
     ("12160200", "ewp", "BtoXll"),
     ("12160300", "ewp", "BtoXll_LFV"),
+    ("12120400", "ewp", "B0TwoBody"),
+    ("12120500", "ewp", "FourLepton"),
+    ("12120600", "ewp", "RadiativeDilepton"),
     # ("12160400", "ewp", "inclusiveBplusToKplusNuNu"), # deprecated skim
 
     # --- WG3: Time-dependent CP violation ---

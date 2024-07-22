@@ -6,9 +6,12 @@ Available Tags:
   - Tracking
   - gamma
 
+Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.
-scaleTrackMomenta
-=================
+Recommendations for MC15 and all tags:
+
+Track energy correction on Data
+===============================
 
 Description
 -----------
@@ -25,18 +28,18 @@ Snippet
 
 Recommendation
 --------------
-* **GlobalTag** - tracking_data_Moriond23_v1
-* **payloadName** - tracking_momentumScaleFactor_global
-* **scalingFactorName** - sf_global_central
-* **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
++ **GlobalTag** - tracking_data_Moriond23_v1
++ **payloadName** - tracking_momentumScaleFactor_global
++ **scalingFactorName** - sf_global_central
++ **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
 
 +-------+----+-----------+--------+
 | Tags: |Data|Systematics|Tracking|
 +-------+----+-----------+--------+
 
 
-correctEnergyBias
-=================
+Photon energy correction on Data
+================================
 
 Description
 -----------
@@ -70,8 +73,10 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
-correctEnergyBias
-=================
+Recommendations for MC15 and gamma tags:
+
+Photon energy correction on Data
+================================
 
 Description
 -----------
@@ -105,8 +110,10 @@ Recommendation
 +-------+----+-----------+-------+-----+
 | Tags: |Data|Systematics|Neutral|gamma|
 +-------+----+-----------+-------+-----+
-scaleTrackMomenta
-=================
+Recommendations for MC15 and Tracking tags:
+
+Track energy correction on Data
+===============================
 
 Description
 -----------
@@ -123,10 +130,10 @@ Snippet
 
 Recommendation
 --------------
-* **GlobalTag** - tracking_data_Moriond23_v1
-* **payloadName** - tracking_momentumScaleFactor_global
-* **scalingFactorName** - sf_global_central
-* **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
++ **GlobalTag** - tracking_data_Moriond23_v1
++ **payloadName** - tracking_momentumScaleFactor_global
++ **scalingFactorName** - sf_global_central
++ **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
 
 +-------+----+-----------+--------+
 | Tags: |Data|Systematics|Tracking|

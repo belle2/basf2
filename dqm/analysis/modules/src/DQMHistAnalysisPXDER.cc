@@ -85,7 +85,7 @@ void DQMHistAnalysisPXDERModule::initialize()
     int iSensor = 0;
     getIDsFromIndex(i, iLayer, iLadder, iSensor);
     VxdID sensorID(iLayer, iLadder, iSensor);
-    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+    PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
     //----------------------------------------------------------------
     // Number of fired pixels per frame

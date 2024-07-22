@@ -383,7 +383,7 @@ void SVDDigitizerModule::event()
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
       m_currentSensorInfo =
-        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
+        dynamic_cast<const SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       if (!m_currentSensorInfo)
         B2FATAL(
           "Sensor Information for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
@@ -871,7 +871,7 @@ void SVDDigitizerModule::saveWaveforms()
   for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
     tree_vxdID = sensorWaveforms.first;
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorWaveforms.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorWaveforms.first));
     // u-side digits:
     tree_uv = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();
@@ -914,7 +914,7 @@ void SVDDigitizerModule::saveSignals()
   for (Waveforms::value_type& sensorWaveforms : m_waveforms) {
     VxdID sensorID(sensorWaveforms.first);
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorWaveforms.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorWaveforms.first));
     // u-side digits:
     size_t isU = 1;
     double thresholdU = 3.0 * info.getElectronicNoiseU();

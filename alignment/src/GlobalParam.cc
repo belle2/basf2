@@ -181,7 +181,7 @@ namespace Belle2 {
               continue;
 
             rigidBodyHierarchy.insertTGeoTransform<VXDAlignment, VXDAlignment>(sensor, VxdID(0, 0, 0, 1),
-                geo.get(sensor).getTransformation(true));
+                geo.getSensorInfo(sensor).getTransformation(true));
           }
         } else if (s_hierarchyType == c_HalfShells) {
           /**

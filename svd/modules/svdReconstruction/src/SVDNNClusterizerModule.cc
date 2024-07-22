@@ -234,7 +234,7 @@ void SVDNNClusterizerModule::event()
     bool isU = sampleRecoDigit.isUStrip();
 
     // Retrieve sensor parameters from GeoCache
-    const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+    const SensorInfo& sensorInfo = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
     // 4. Cycle through digits and form clusters on the way.
 

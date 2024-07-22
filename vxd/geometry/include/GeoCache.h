@@ -129,11 +129,6 @@ namespace Belle2 {
 
       // --------------------------------------------------------------------------------------------------
 
-      /** Return a reference to the SensorInfo of a given SensorID.
-       * This function is a shorthand for GeoCache::getInstance().getSensorInfo
-       */
-      static const SensorInfoBase& get(Belle2::VxdID id) { return getInstance().getSensorInfo(id); }
-
       /** Return a reference to the singleton instance */
       static GeoCache& getInstance();
 

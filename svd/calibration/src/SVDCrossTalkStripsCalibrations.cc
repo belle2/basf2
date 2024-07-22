@@ -15,7 +15,7 @@ std::string Belle2::SVDCrossTalkStripsCalibrations::name = std::string("SVDCross
 
 bool Belle2::SVDCrossTalkStripsCalibrations::isInCrossTalkRegion(const VxdID& sensorID, const bool& isU, const float& clsPosition)
 {
-  const VXD::SensorInfoBase* currentSensorInfo = dynamic_cast<const VXD::SensorInfoBase*>(&VXD::GeoCache::get(
+  const VXD::SensorInfoBase* currentSensorInfo = dynamic_cast<const VXD::SensorInfoBase*>(&VXD::GeoCache::getInstance().getSensorInfo(
                                                    sensorID)); /** SensorInfo class providing information about the current sensor*/
 
   float m_uPitch = currentSensorInfo->getUPitch(0); /** getting the pitch dimension for u-side*/

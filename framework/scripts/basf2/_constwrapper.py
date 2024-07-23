@@ -99,6 +99,127 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
+def wrap_fill_array(func):
+    type_table = {"short": "short",
+                  "unsigned short": "ushort",
+                  "int": "intc",
+                  "unsigned int": "uintc",
+                  "long": "long",
+                  "unsigned long": "ulong",
+                  "float": "single",
+                  "double": "double",
+                  "long double": "longdouble",
+                  "Belle2::VxdID": "ushort"}
+
+    conv_type_table = {"int16": "short *",
+                       "uint16": "unsigned short *",
+                       "int32": "int *",
+                       "uint32": "unsigned int *",
+                       "int64": "long *",
+                       "uint64": "unsigned long *",
+                       "float32": "float *",
+                       "float64": "double *",
+                       "float96": "long double *"}
+
+    def fill_array(pyStoreArray, **kwargs):
+        import numpy as np
+
+        class ConstructorNotFoundError(Exception):
+            def __init__(self, members, list_constructors, obj_name):
+                self.message = "No corresponding constructor found. Looking for signature: \n"
+                self.d = members
+                self.list_constructors = list_constructors
+                self.name = obj_name
+                self.message = self.message + self.name + "("
+                self.message = (self.message +
+                                ", ".join([" ".join(i) for i in list(zip(self.d.values(), self.d.keys()))]) +
+                                ")\n Available constructors:\n")
+                for lis in list_constructors:
+                    self.message = (self.message +
+                                    self.name + "(" + ", ".join([" ".join(i) for i in list(zip(lis.values(), lis.keys()))]) + ")\n")
+                super().__init__(self.message)
+
+        d = {}
+        list_constructors = []
+
+        obj_class = pyStoreArray.getClass()
+        obj_classname = obj_class.GetName()
+
+        for meth in obj_class.GetListOfMethods():
+            if meth.GetName() == obj_classname.split(":")[-1]:  # found one constructor
+                d.clear()
+
+                for ar in meth.GetListOfMethodArgs():
+                    d.setdefault(ar.GetName(), ar.GetTypeName())
+                list_constructors.append(d.copy())
+
+                # Check if this is the right constructor
+                if d.keys() == kwargs.keys():
+                    break
+
+        else:
+            m_d = {list(kwargs.keys())[i]: conv_type_table[type(list(kwargs.values())[i]
+                                                                [0]).__name__].split("*")[0] for i in range(len(kwargs.keys()))}
+            raise ConstructorNotFoundError(m_d, list_constructors, obj_classname)
+
+        arr_types = []
+        for k in kwargs.keys():
+            if kwargs[k][0].dtype != np.dtype(type_table[d[k]]):
+                try:
+                    kwargs[k] = kwargs[k].astype(type_table[d[k]])
+                except ValueError:
+                    raise ValueError((f"Impossible to convert type of input arrays ({type(kwargs[k][0]).__name__})" +
+                                      f" into the type of the corresponding class member '{k}' ({np.dtype(type_table[d[k]])})"))
+            arr_types.append(conv_type_table[type(kwargs[k][0]).__name__])
+
+        length = len(list(kwargs.values())[0])
+
+        func[(obj_classname, *arr_types)](pyStoreArray, length, *[kwargs[k] for k in d.keys()])
+
+    return fill_array
+
+
+def wrap_read_array(func):
+    type_table = {"short": "short",
+                  "unsigned short": "ushort",
+                  "int": "intc",
+                  "unsigned int": "uintc",
+                  "long": "long",
+                  "unsigned long": "ulong",
+                  "float": "single",
+                  "double": "double",
+                  "long double": "longdouble",
+                  "Belle2::VxdID": "ushort"}
+
+    conv_type_table = {"int16": "short *",
+                       "uint16": "unsigned short *",
+                       "int32": "int *",
+                       "uint32": "unsigned int *",
+                       "int64": "long *",
+                       "uint64": "unsigned long *",
+                       "float32": "float *",
+                       "float64": "double *",
+                       "float96": "long double *"}
+
+    def read_array(pyStoreArray):
+        import numpy as np
+        kwargs = {}
+
+        obj_class = pyStoreArray.getClass()
+        obj_classname = obj_class.GetName()
+
+        for ar in obj_class.GetMethodAny("fillValues").GetListOfMethodArgs():
+            kwargs.setdefault(ar.GetName(), np.zeros(len(pyStoreArray), dtype=type_table[ar.GetFullTypeName().split("*")[0]]))
+
+        l_types = [conv_type_table[type(kwargs[v][0]).__name__] for v in kwargs.keys()]
+
+        func[(obj_classname, *l_types)](pyStoreArray, *kwargs.values())
+
+        return kwargs
+
+    return read_array
+
+
 @pythonization(namespace="Belle2")
 def _pythonize(klass, name):
     """Adjust the python interface of some Py* classes"""
@@ -124,3 +245,6 @@ def _pythonize(klass, name):
         # make sure that we can iterate over the items in the class
         # pointed to if it allows iteration
         klass.__iter__ = lambda self: iter(self.obj())
+    elif name == "PyStoreArray":
+        klass.fillArray = wrap_fill_array(klass.fillArray)
+        klass.readArray = wrap_read_array(klass.readArray)

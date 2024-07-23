@@ -10,10 +10,13 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
+#include <framework/logging/Logger.h>
 
 #include <TCollection.h> //for TIter
 
-class TClonesArray;
+#include "TClonesArray.h"
+
+//class TClonesArray;
 class TClass;
 class TObject;
 
@@ -197,6 +200,7 @@ namespace Belle2 {
 
     /** Return name under which the object is saved in the DataStore. */
     std::string getName() const { return m_storeAccessor.getName(); }
+    TClass* getClass() const {return m_storeAccessor.getClass(); }
 
     /** Check whether a TClass of the objects in this PyStoreArray could be determined. */
     bool hasValidClass() const;
@@ -235,6 +239,24 @@ namespace Belle2 {
      *           getEntries() or appendNew() instead.
      */
     TClonesArray* getPtr();
+
+    template <class T, typename... Args> void fillArray(size_t len, Args... args)
+    {
+      TClonesArray* digits = getPtr();
+      for (size_t i = 0; i < len; i++) {
+        new ((*digits)[i]) T(args[i]...);
+      }
+    }
+
+    template <class T, typename... Args> void readArray(Args... args)
+    {
+      TClonesArray* t = getPtr();
+      for (size_t i = 0; i < t->GetEntriesFast(); i++) {
+        ((T*)(*t)[i])->fillArrays(&args[i]...);
+      }
+    }
+
+
 
   private:
     /** Ensure that contained TClonesArray has been created on the DataStore. */

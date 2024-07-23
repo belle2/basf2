@@ -10,7 +10,6 @@
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreAccessorBase.h>
-#include <framework/logging/Logger.h>
 
 #include <TCollection.h> //for TIter
 

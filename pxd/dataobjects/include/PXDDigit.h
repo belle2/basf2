@@ -12,6 +12,8 @@
 
 #include <framework/dataobjects/DigitBase.h>
 
+#include <typeinfo>
+
 namespace Belle2 {
 
   /**
@@ -52,6 +54,14 @@ namespace Belle2 {
       VxdID id(m_sensorID);
       id.setSegmentNumber(frame);
       m_sensorID = id;
+    }
+
+    void fillValues(unsigned short* charge, unsigned short* uCellID, unsigned short* vCellID, unsigned short* sensorID)
+    {
+      *charge = m_charge;
+      *uCellID = m_uCellID;
+      *vCellID = m_vCellID;
+      *sensorID = m_sensorID;
     }
 
     /** Get the sensor ID.

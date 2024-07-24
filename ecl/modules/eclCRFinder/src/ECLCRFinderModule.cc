@@ -77,7 +77,7 @@ void ECLCRFinderModule::initialize()
   B2DEBUG(200, "ECLCRFinderModule::initialize()");
 
   // Register dataobjects.
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
   m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
 

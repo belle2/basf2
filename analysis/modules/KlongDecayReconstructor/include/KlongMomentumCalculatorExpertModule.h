@@ -57,6 +57,7 @@ namespace Belle2 {
 
     int m_maximumNumberOfCandidates; /**< drop all candidates if more candidates than this parameter are produced */
 
+    double m_acollinearity_cut; /**< maximum acollinearity in the transverse plane of the two (KL and X) decay final states */
   };
 
 } // Belle2 namespace

@@ -139,7 +139,7 @@ class BaseFEISkim(BaseSkim):
 
         # Pre-selection cuts
         CleanedTrackCuts = "abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
 
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)

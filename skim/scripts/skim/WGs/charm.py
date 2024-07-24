@@ -267,7 +267,7 @@ class XToDp_DpToKsHp(BaseSkim):
 
     **Selection Criteria**:
         * Tracks not from :math:`K_{S}`: ``abs(dr) < 1, abs(dz) < 3,
-          0.296706 < theta < 2.61799``
+          thetaInCDCAcceptance``
         * Use :math:`K_{S}` from `stdV0s.stdKshorts` and require
           ``flightDistance/flightDistanceErr > 2``
         * ``1.67 < M(D+) < 2.17, pcms(D+) > 2.0``
@@ -476,7 +476,7 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
         * :math:`D^{*+}\\to \\pi^{0} D^{+}, D^+ \\to \\pi^+ \\pi^0`
 
     **Selection Criteria**:
-        * Tracks: ``dr < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``
+        * Tracks: ``dr < 1, abs(dz) < 3, thetaInCDCAcceptance``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
         * ``1.67 < M(D+) < 2.07, pcms(D+) > 2.0``
         * ``0 < Q < 0.018``
@@ -498,7 +498,7 @@ class DstToDpPi0_DpToHpPi0(BaseSkim):
 
     def build_lists(self, path):
         mySel = "dr < 1 and abs(dz) < 3"
-        mySel += " and 0.296706 < theta < 2.61799"
+        mySel += " and thetaInCDCAcceptance"
         ma.fillParticleList("pi+:hppi0", mySel, path=path)
 
         Dpcuts = "1.67 < M < 2.07 and useCMSFrame(p) > 2.0"
@@ -521,7 +521,7 @@ class DpToHpPi0(BaseSkim):
         * :math:`D^+ \\to \\pi^+ \\pi^0`
 
     **Selection Criteria**:
-        * Tracks: ``dr < 1, abs(dz) < 3, 0.296706 < theta < 2.61799, pcms(\\pi^{+}) > 0.5``
+        * Tracks: ``dr < 1, abs(dz) < 3, thetaInCDCAcceptance, pcms(\\pi^{+}) > 0.5``
         * Use :math:`\\pi^{0}` from `stdPi0s` require ``pcms(\\pi^{0}) > 0.5``
         * ``1.57 < M(D+) < 2.17, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
@@ -561,7 +561,7 @@ class DpToKsHp(BaseSkim):
         * :math:`D^+ \\to K_S \\pi^+`
 
     **Selection Criteria**:
-        * Tracks: ``dr < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``
+        * Tracks: ``dr < 1, abs(dz) < 3, thetaInCDCAcceptance``
         * Use Ks from `stdKshorts`
         * ``1.77 < M(D+) < 1.97, pcms(D+) > 2.0``
         * For more details, please check the source code of this skim.
@@ -702,7 +702,7 @@ class DstToD0Pi_D0ToKsOmega(BaseSkim):
 
     **Selection Criteria**:
         * Tracks from :math:`D^{0}`:
-          ``abs(dr) < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``
+          ``abs(dr) < 1, abs(dz) < 3, thetaInCDCAcceptance``
         * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`, then require ``0.11 < M(pi0) < 0.15, p(pi0) > 0.25``
         * ``1.66 < M(D0) < 2.06, pcms(D0) > 2.0``
         * ``Q < 0.018``
@@ -752,7 +752,7 @@ class DstToD0Pi_D0ToHpHmHpJm(BaseSkim):
 
     **Selection Criteria**:
         * Tracks from :math:`D^{0}`:
-          ``abs(dr) < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``
+          ``abs(dr) < 1, abs(dz) < 3, thetaInCDCAcceptance``
         * ``1.66 < M(D0) < 2.06``
         * No cut on the slow pion
         * ``Q < 0.022, pcms(D*+) > 2.0``
@@ -914,7 +914,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
 
     **Selection Criteria**:
         * Tracks from :math:`D^{0}`:
-          ``abs(dr) < 1, abs(dz) < 3, 0.296706 < theta < 2.61799``
+          ``abs(dr) < 1, abs(dz) < 3, thetaInCDCAcceptance``
         * Use :math:`K_{S}` from `stdV0s.stdKshorts`
         * ``1.66 < M(D0) < 2.06``
         * No cut on the slow pion
@@ -937,7 +937,7 @@ class DstToD0Pi_D0ToHpJmKs(BaseSkim):
 
     def build_lists(self, path):
         mySel = "abs(dr) < 1 and abs(dz) < 3"
-        mySel += " and 0.296706 < theta < 2.61799"
+        mySel += " and thetaInCDCAcceptance"
         ma.fillParticleList("pi+:hpjmks", mySel, path=path)
         ma.fillParticleList("K+:hpjmks", mySel, path=path)
 
@@ -981,7 +981,7 @@ class EarlyData_DstToD0Pi_D0ToHpJmPi0(BaseSkim):
 
     def build_lists(self, path):
         mySel = "abs(dr) < 0.5 and abs(dz) < 1.0"  # IP cut, tighter than previous skims
-        mySel += " and 0.296706 < theta < 2.61799"  # CDC acceptance cut
+        mySel += " and thetaInCDCAcceptance"  # CDC acceptance cut
         ma.fillParticleList("pi+:myhjp0", mySel, path=path)
         ma.fillParticleList("K+:myhjp0", mySel, path=path)
 
@@ -1023,7 +1023,7 @@ class EarlyData_DstToD0Pi_D0ToHpHmPi0(BaseSkim):
 
     def build_lists(self, path):
         mySel = "abs(dr) < 0.5 and abs(dz) < 1.0"  # IP cut, tighter than previous skims
-        mySel += " and 0.296706 < theta < 2.61799"  # CDC acceptance cut
+        mySel += " and thetaInCDCAcceptance"  # CDC acceptance cut
         ma.fillParticleList("pi+:myhhp0", mySel, path=path)
         ma.fillParticleList("K+:myhhp0", mySel, path=path)
 

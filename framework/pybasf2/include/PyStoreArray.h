@@ -15,7 +15,6 @@
 
 #include "TClonesArray.h"
 
-//class TClonesArray;
 class TClass;
 class TObject;
 
@@ -199,6 +198,8 @@ namespace Belle2 {
 
     /** Return name under which the object is saved in the DataStore. */
     std::string getName() const { return m_storeAccessor.getName(); }
+
+    /** Return class of the object that is saved in the DataStore. */
     TClass* getClass() const {return m_storeAccessor.getClass(); }
 
     /** Check whether a TClass of the objects in this PyStoreArray could be determined. */
@@ -239,6 +240,14 @@ namespace Belle2 {
      */
     TClonesArray* getPtr();
 
+    /** Templated function to fill the PyStoreArray with objects of a certain class (PXDDigits, CDCHits, ...)
+     * @param len Length of the PyStoreArray.
+     * @param args Arrays of length len, one for each of the memebers of the class under consideration.
+     *
+     * \warning Do not use this function in C++ directly, but only through the python wrapper
+     *          by calling PyStoreArray.fillArray(**kwargs) and passing the numpy arrays
+     *          for each of the class members.
+    */
     template <class T, typename... Args> void fillArray(size_t len, Args... args)
     {
       TClonesArray* digits = getPtr();
@@ -247,11 +256,17 @@ namespace Belle2 {
       }
     }
 
+    /** Templated function to read from the PyStoreArray objects of a certain class (PXDDigits, CDCHits, ...)
+     * @param args Empty arrays which will be filled with the values of the class members.
+     *
+     * \warning Do not use this function in C++ directly, but only through the python wrapper
+     *          by calling PyStoreArray.readArray().
+    */
     template <class T, typename... Args> void readArray(Args... args)
     {
       TClonesArray* t = getPtr();
       for (size_t i = 0; i < t->GetEntriesFast(); i++) {
-        ((T*)(*t)[i])->fillArrays(&args[i]...);
+        ((T*)(*t)[i])->fillValues(&args[i]...);
       }
     }
 

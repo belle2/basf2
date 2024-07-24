@@ -298,6 +298,8 @@ class Pager:
         os.dup2(self._original_stderr_fd, sys.stderr.fileno())
         # and the original __stdout__/__stderr__ object just in case. Will also
         # close the copied file descriptors
+        sys.__stdout__.close()
+        sys.__stderr__.close()
         sys.__stderr__ = self._original_stderr
         sys.__stdout__ = self._original_stdout
         # and clean up our monkey patch of isatty

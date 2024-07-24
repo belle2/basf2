@@ -1,5 +1,0 @@
-Changes in the mva package since release-09-00
-----------------------------------------------
-
- * Added an interface for pyTorch. Please see ``mva/examples/torch/simple.py`` for a basic example for binary classification. As with all other supported python interfaces the interface is designed for users to override the ``get_model(...)``, ``begin_fit(...)``, ``partial_fit(...)``, and ``apply(...)`` methods in their training script to define their models and training loop as needed.
-

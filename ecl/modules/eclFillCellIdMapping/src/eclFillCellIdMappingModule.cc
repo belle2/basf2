@@ -35,6 +35,7 @@ ECLFillCellIdMappingModule::ECLFillCellIdMappingModule() : Module()
 {
   // Set module properties
   setDescription("Fills a dataobject that provides maping between cell id and store arrays and neighbour maps");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 void ECLFillCellIdMappingModule::initialize()

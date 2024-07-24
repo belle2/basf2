@@ -99,7 +99,7 @@ CalibrationAlgorithm::EResult CDCDedxCosineAlgorithm::calibrate()
     //if track is a junk
     if (dedx <= 0 || charge == 0) continue;
 
-    //if track is in CDC accpetance (though it is inbuilt in collector module)
+    //if track is in CDC acceptance (though it is inbuilt in collector module)
     if (costh < TMath::Cos(150 * TMath::DegToRad()) || costh > TMath::Cos(17 * TMath::DegToRad())) continue;
 
     int bin = int((costh - fCosMin) / binW);
@@ -468,7 +468,7 @@ void CDCDedxCosineAlgorithm::generateNewPayloads(std::vector<double> cosine)
 
 void CDCDedxCosineAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
 {
-  if (temphist->Integral() < 2000) { //atleast 1k bhabha events
+  if (temphist->Integral() < 2000) { //at least 1k bhabha events
     B2INFO(Form("\tThis hist (%s) have insufficient entries to perform fit (%0.03f)", temphist->GetName(), temphist->Integral()));
     status = "LowStats";
     return;
@@ -490,7 +490,7 @@ void CDCDedxCosineAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status)
         return;
       } else {
         temphist->GetXaxis()->SetRangeUser(fdEdxMean - 5.0 * width, fdEdxMean + 5.0 * width);
-        B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
+        B2INFO(Form("\tFit for hist (%s) successful (status = %d)", temphist->GetName(), fs));
         status = "FitOK";
       }
     }

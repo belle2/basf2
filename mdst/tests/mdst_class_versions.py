@@ -31,7 +31,7 @@ EXPECTED_CHECKSUMS = {
     'Belle2::FileMetaData': (11, 3436141238),
     'Belle2::KLMCluster': (3, 1419175697),
     'Belle2::KlId': (2, 230716330),
-    'Belle2::PIDLikelihood': (3, 36434623),
+    'Belle2::PIDLikelihood': (4, 4027053936),
     'Belle2::RelationContainer': (1, 1725678837),
     'Belle2::RelationElement': (1, 1883389510),
     'Belle2::RelationsInterface<TObject>': (0, 3862127315),

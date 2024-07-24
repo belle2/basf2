@@ -49,7 +49,7 @@ class PRsemileptonicUntagged(BaseSkim):
 
     Cuts on electrons:
 
-    * :math:`\\text{electronID_noTOP} > 0.5`
+    * :math:`\\text{electronID} > 0.5`
     * :math:`p > 1.5\\,\\text{GeV}` in CMS frame
 
     Cuts on muons:
@@ -103,14 +103,14 @@ class PRsemileptonicUntagged(BaseSkim):
         path = self.skim_event_cuts("foxWolframR2<0.5 and nTracks>4", path=path)
 
         ma.cutAndCopyList("e+:PRSemileptonic_1", "e+:all",
-                          "useCMSFrame(p) > 1.50 and electronID_noTOP > 0.5", path=path)
+                          "useCMSFrame(p) > 1.50 and electronID > 0.5", path=path)
         ma.cutAndCopyList("mu+:PRSemileptonic_1", "mu+:all",
                           "useCMSFrame(p) > 1.50 and muonID > 0.5", path=path)
         ma.cutAndCopyList("pi-:PRSemileptonic_1", "pi-:all",
                           "pionID>0.5 and muonID<0.2 and 0.060<useCMSFrame(p)<0.220", path=path)
 
         ma.cutAndCopyList("e+:PRSemileptonic_2", "e+:all",
-                          "0.600 < useCMSFrame(p) <= 1.50 and electronID_noTOP > 0.5", path=path)
+                          "0.600 < useCMSFrame(p) <= 1.50 and electronID > 0.5", path=path)
         ma.cutAndCopyList("mu+:PRSemileptonic_2", "mu+:all",
                           "0.350 < useCMSFrame(p) <= 1.50 and muonID > 0.5", path=path)
         ma.cutAndCopyList("pi-:PRSemileptonic_2", "pi-:all",
@@ -336,7 +336,7 @@ class B0toDstarl_Kpi_Kpipi0_Kpipipi(BaseSkim):
         ma.cutAndCopyList(
             'e+:sig',
             'e+:all',
-            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and electronID_noTOP >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
+            'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance and electronID >= 0.95 and 1.1 < useCMSFrame(p) < 2.5 ',
             path=path)
         ma.cutAndCopyList(
             'mu+:sig',
@@ -383,14 +383,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     Cuts on electrons:
 
-    * :math:`\\text{pidChargedBDTScore(11,all)} > 0.9`
+    * :math:`\\text{electronID} > 0.3`
     * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame,  :math:`p > 0.5\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
     * :math:`\\text{thetaInCDCAcceptance}`
 
     Cuts on muons:
 
-    * :math:`\\text{muonID_noSVD} > 0.9`
+    * :math:`\\text{muonID} > 0.9`
     * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame,  :math:`p > 0.7\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
 
@@ -425,8 +425,8 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
             b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
         b2.conditions.prepend_globaltag(self.analysisGlobaltag)
 
-        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
-        muIDCut = "muonID_noSVD > 0.9"
+        eIDCut = "electronID > 0.3"
+        muIDCut = "muonID > 0.9"
         ePCut = "p > 0.5"
         ePtCut = "pt > 0.3"
         muPCut = "p > 0.7"

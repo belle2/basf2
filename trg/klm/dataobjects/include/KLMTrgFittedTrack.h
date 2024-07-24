@@ -83,6 +83,11 @@ namespace Belle2 {
     {
       return Nhits ;
     }
+    int getTrack_id() const
+    {
+      return track_id ;
+    }
+
 
     void setSubdetector(int Subdetector_)
     {
@@ -105,11 +110,16 @@ namespace Belle2 {
     {
       Nhits = Nhits_;
     }
+
+    void setTrack_id(int track_id_)
+    {
+      track_id = track_id_;
+    }
   private:
     double slopeXY = 0, interceptXY = 0, ipXY = 0, chisqXY = 0;
-    int Subdetector = 0, Section = 0, Sector = 0, Plane = 0, Nhits = 0;
+    int Subdetector = 0, Section = 0, Sector = 0, Plane = 0, Nhits = 0, track_id = 0;
 
-    ClassDef(KLMTrgFittedTrack, 2);
+    ClassDef(KLMTrgFittedTrack, 3);
   };
 } // end of namespace Belle2
 

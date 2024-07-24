@@ -23,7 +23,11 @@ import simulation as sim
 import svd as svd
 import glob
 
-useSimulation = True
+'''
+Usage: basf2 svdPerformanceTree.py -i <input_file>
+'''
+
+useSimulation = False
 
 # set this string to identify the output rootfiles
 tag = "_test"
@@ -86,6 +90,9 @@ svd.add_svd_create_recodigits(main)
 
 # look at raw time - uncomment if needed
 b2.set_module_parameters(main, "SVDClusterizer", returnClusterRawTime=True)
+
+# Histos
+main.add_module('HistoManager', histoFileName="histos.root")
 
 # fill TTrees
 main.add_module('SVDPerformanceTTree', outputFileName="SVDPerformanceTree"+str(tag)+".root")

@@ -23,7 +23,7 @@
 #pragma link C++ class Belle2::TestChunkData+; // checksum=0x25c3db4e, version=1
 
 #pragma link C++ class Belle2::BackgroundMetaData+; // checksum=0x60d78a20, version=4
-#pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=4
+#pragma link C++ class Belle2::BackgroundInfo+; // checksum=0x6eb1ad8, version=5
 
 #pragma read sourceClass="Belle2::FileMetaData" version="[-3]" \
   source="unsigned int m_randomSeed" \

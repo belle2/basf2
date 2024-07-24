@@ -437,7 +437,7 @@ Now that you've checked to make sure it works, let's submit a gbasf2 project:
            -i /belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst \
            ~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
 
-A project summary and a confirmation prompt will be displayed after excecuting gbasf2
+A project summary and a confirmation prompt will be displayed after executing gbasf2
 
 .. code-block:: bash
 

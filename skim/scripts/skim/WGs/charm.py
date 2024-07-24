@@ -333,7 +333,7 @@ class DpToPipEpEm(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("e", path=path)
 
-        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID_noSVD_noTOP > 0.01", path=path)
+        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
@@ -370,7 +370,7 @@ class DpToPipMupMum(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("mu", path=path)
 
-        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID_noSVD > 0.01", path=path)
+        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
@@ -650,14 +650,6 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         * ``M(D*)-M(D0) < 0.16``
         * ``pCM(D*) > 2.0``
 
-    .. Note::
-        The neural-network based PID variables ``pionIDNN`` and ``kaonIDNN``
-        require the analysis globaltag to be set (e.g. via
-        ``b2skim-run --analysis-globaltag ANALYSIS_GT_NAME ...``). In case
-        calibrated weights are not ready for the skimming campaign, this skim
-        must be modified to use :b2:var:`binaryPID_noSVD` or
-        :b2:var:`binaryPID` instead (this will have some impact on skim
-        performance, although small, and needs to be tested).
     """
 
     __authors__ = ["Ludovico Massaccesi", "Emma Oxford"]

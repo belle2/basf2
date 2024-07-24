@@ -54,16 +54,16 @@ void SegmentNetworkAnalyzerModule::event()
 
   for (const auto& outerHit : hitNetwork.getNodes()) {
     for (const auto& centerHit : outerHit->getInnerNodes()) {
-      for (const auto& innerHit : centerHit->getInnerNodes()) {
+      Segment<TrackNode> outerSegment(outerHit->getEntry().m_sector->getFullSecID(),
+                                      centerHit->getEntry().m_sector->getFullSecID(),
+                                      &outerHit->getEntry(),
+                                      &centerHit->getEntry());
 
+      for (const auto& innerHit : centerHit->getInnerNodes()) {
         Segment<TrackNode> innerSegment(centerHit->getEntry().m_sector->getFullSecID(),
                                         innerHit->getEntry().m_sector->getFullSecID(),
                                         &centerHit->getEntry(),
                                         &innerHit->getEntry());
-        Segment<TrackNode> outerSegment(outerHit->getEntry().m_sector->getFullSecID(),
-                                        centerHit->getEntry().m_sector->getFullSecID(),
-                                        &outerHit->getEntry(),
-                                        &centerHit->getEntry());
 
         bool passed = false;
         // check if the outerSegment is in the network and then look if the inner is connected to it

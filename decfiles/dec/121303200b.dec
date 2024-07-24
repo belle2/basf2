@@ -10,9 +10,6 @@
 # Date: 24/07/2024
 #
 #
-Alias omegasig omega
-Alias D0sig D0
-Alias anti-D0sig anti-D0
 Alias pi0sig pi0
 
 Decay Upsilon(4S)

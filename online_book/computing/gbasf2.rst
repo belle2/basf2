@@ -13,7 +13,7 @@ Gbasf2
     **Prerequisites**:
 
     * See `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
-    * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
+    * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
     * A valid `grid certificate <https://confluence.desy.de/display/BI/Computing+Belle-II-Grid-Certificate>`_ installed in ``~/.globus`` and in a web browser.
     * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 

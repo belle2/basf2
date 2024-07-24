@@ -73,7 +73,7 @@ void ECLClusterPSDModule::initialize()
   // ECL dataobjects
   m_eclShowers.isRequired(eclShowerArrayName());
   m_eclCalDigits.isRequired(eclCalDigitArrayName());
-  m_eclShower.requireRelationTo(m_eclCalDigits);
+  m_eclShowers.requireRelationTo(m_eclCalDigits);
   initializeMVAweightFile(m_MVAidentifier, m_weightfile_representation);
 }
 

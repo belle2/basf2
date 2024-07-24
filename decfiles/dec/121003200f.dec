@@ -11,6 +11,7 @@
 #
 #
 Alias omegasig omega
+Alias pi0sig pi0
 
 Decay Upsilon(4S)
 0.5   B+sig   B-      VSS;
@@ -23,7 +24,10 @@ Enddecay
 CDecay B-sig
 
 Decay omegasig
-1.0   pi-  pi+  pi0          OMEGA_DALITZ;
+1.0   pi-  pi+  pi0sig          OMEGA_DALITZ;
 Enddecay
 
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
 End

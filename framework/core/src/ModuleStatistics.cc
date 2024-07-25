@@ -13,7 +13,7 @@ using namespace Belle2;
 void ModuleStatistics::csv_header(std::ostream& output) const
 {
   output << "name";
-  for (auto resource : {"memory", "time"}) {
+  for (auto resource : {"time", "memory"}) {
     for (auto type : {"init", "begin_run", "event", "end_run", "term", "total"}) {
       output << "," << resource << " " << type;
     }

@@ -32,6 +32,7 @@
 #include <root/TRandom.h>
 
 using namespace std;
+using namespace std::placeholders;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
@@ -747,7 +748,7 @@ void SVDDigitizerModule::saveDigits()
       auto rawThreshold = m_SNAdjacent * elNoise * gain;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                                  std::bind2nd(std::greater<double>(), rawThreshold)
+                                  std::bind(std::greater<double>(), _1, rawThreshold)
                                  );
       if (n_over < m_nSamplesOverZS) continue;
 
@@ -767,7 +768,7 @@ void SVDDigitizerModule::saveDigits()
         rawSamples[5] = 0.;
         //2.d.2 check if still over threshold
         n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                               std::bind2nd(std::greater<double>(), rawThreshold)
+                               std::bind(std::greater<double>(), _1, rawThreshold)
                               );
         if (n_over < m_nSamplesOverZS) continue;
 
@@ -825,7 +826,7 @@ void SVDDigitizerModule::saveDigits()
       auto rawThreshold = m_SNAdjacent * elNoise * gain;
       if (m_roundZS) rawThreshold = round(rawThreshold);
       auto n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                                  std::bind2nd(std::greater<double>(), rawThreshold)
+                                  std::bind(std::greater<double>(), _1, rawThreshold)
                                  );
       if (n_over < m_nSamplesOverZS) continue;
 
@@ -845,7 +846,7 @@ void SVDDigitizerModule::saveDigits()
         rawSamples[5] = 0.;
         //2.d.2 check if still over threshold
         n_over = std::count_if(rawSamples.begin(), rawSamples.end(),
-                               std::bind2nd(std::greater<double>(), rawThreshold)
+                               std::bind(std::greater<double>(), _1, rawThreshold)
                               );
         if (n_over < m_nSamplesOverZS) continue;
       }

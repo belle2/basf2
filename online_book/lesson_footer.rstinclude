@@ -18,8 +18,7 @@
     with `GitLab <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_.
     Make sure to use the ``documentation-training`` label of the ``basf2`` project.
 
-    If you just want to give very quick feedback, use the last box
-    "Quick feedback".
+    If you just want to give us feedback, please open a `GitLab issue <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_ and add the label ``online_book`` to it.
 
     Please make sure to be as precise as possible to make it easier for us
     to fix things! So for example:
@@ -37,6 +36,4 @@
 .. admonition:: Quick feedback!
     :class: hint toggle
 
-    .. raw:: html
-
-        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScr_ZdmXRGKKm5PGxw9ygdv4kx93T2E_avsISj09_s2eNk0HQ/viewform?embedded=true" width="640" height="700" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    Do you want to leave us some feedback? Open a `GitLab issue <https://gitlab.desy.de/belle2/software/basf2/-/issues>`_ and add the label ``online_book`` to it.

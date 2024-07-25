@@ -1,0 +1,28 @@
+# EventType: 1210310001
+# Descriptor: [B+ -> tau+ nu_tau]cc
+# NickName: Bu_taunu, tau_pinu
+# Documentation: SM B-> tau nu signal MC  
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Ihor Prudiiev
+# Email: ihor.prudiiev@ijs.si
+# Cuts: None
+# Date: 20240707
+#
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+
+Decay B+sig
+1.000 tau+sig  nu_tau  PHOTOS  SLN;
+Enddecay
+CDecay B-sig
+
+Decay tau+sig
+1.000 pi+  anti-nu_tau  TAUSCALARNU;
+Enddecay
+CDecay tau-sig
+
+End

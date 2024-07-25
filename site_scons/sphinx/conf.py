@@ -113,7 +113,7 @@ for entry in ['int', 'bool', 'list', 'str', 'object', 'None', 'LogConfig', 'Modu
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -357,7 +357,7 @@ texinfo_documents = [
 # texinfo_no_detailmenu = False
 
 # allow to have links to python documentation
-intersphinx_mapping = {'python': ('https://docs.python.org/3.8/', None),
+intersphinx_mapping = {'python': ('https://docs.python.org/3.11/', None),
                        'numpy': ('https://numpy.org/doc/stable/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),

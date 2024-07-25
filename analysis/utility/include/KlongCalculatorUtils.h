@@ -32,13 +32,15 @@ namespace Belle2 {
      * @param daughters Original daughters of the B-meson
      * @param m_b PDG-mass of the B-meson
      * @param idx Array index of the other daughter. This will be assigned to the extraInfo, permID, of Klong.
+     * @param maximum acollinearity (in radians) of the Klong and the other daughter(s) in the transverse plane. // radians
      * @return true if the kinematics is physical
      */
     static bool calculateBtoKlongX(ROOT::Math::PxPyPzEVector& BMomentum,
                                    ROOT::Math::PxPyPzEVector& KMomentum,
                                    const std::vector<Particle*> daughters,
                                    const double m_b,
-                                   int& idx)
+                                   int& idx,
+                                   const double& acollinearity_cut = 1.)
     {
 
       bool k_check = false;
@@ -79,6 +81,11 @@ namespace Belle2 {
       if (daughters.size() == 3) {
         m_j = pDaughters.M();
       }
+
+      // skip the candidate if not enough back-to-back with the "pDaughters" vector in the transverse plane
+      double deltaPhi = abs(klDaughters.Phi() - pDaughters.Phi());
+      if (abs(deltaPhi - TMath::Pi()) > acollinearity_cut) // in radians
+        return false;
 
       const double m_k2 = Const::Klong.getMass() * Const::Klong.getMass();
 

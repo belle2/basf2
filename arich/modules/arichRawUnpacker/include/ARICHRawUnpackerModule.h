@@ -13,23 +13,27 @@
 namespace Belle2 {
 
   /**
-   * Fill ARICHHit collection from ARICHDigits
+   * Fill ARICHHit collection from ARICHDigits.
    */
   class ARICHRawUnpackerModule : public HistoModule {
 
   public:
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHRawUnpackerModule();
 
     /**
-     * Destructor
+     * Destructor.
      */
     virtual ~ARICHRawUnpackerModule();
 
+    /**
+     * Definition of the histograms.
+     */
     virtual void defineHisto() override;
+
     /**
      * Initialize the Module.
      * This method is called at the beginning of data processing.
@@ -42,16 +46,40 @@ namespace Belle2 {
     virtual void event() override;
 
   protected:
+
+    /**
+     * Read byte with number m_ibyte from the buffer and increase
+     * the number by 1.
+     * @param[in] buf Buffer.
+     */
     unsigned int calbyte(const int* buf);
+
+    /**
+     * Read word (4 bytes) from the buffer and increase the byte number
+     * m_ibyte by 4.
+     * @param[in] buf Buffer.
+     */
     unsigned int calword(const int* buf);
 
   protected:
+
+    /** Debug mode. */
     bool m_debug;
+
+    /** Current byte number. */
     unsigned int m_ibyte = 0;
-    TH1* h_rate_a_all = NULL;//yone
-    TH1* h_rate_b_all  = NULL;//yone
-    TH1* h_rate_c_all  = NULL;//yone
-    TH1* h_rate_d_all  = NULL;//yone
+
+    /** Rate histogram (unused). */
+    TH1* h_rate_a_all = NULL;
+
+    /** Rate histogram (unused). */
+    TH1* h_rate_b_all  = NULL;
+
+    /** Rate histogram (unused). */
+    TH1* h_rate_c_all  = NULL;
+
+    /** Rate histogram (unused). */
+    TH1* h_rate_d_all  = NULL;
 
   };
 

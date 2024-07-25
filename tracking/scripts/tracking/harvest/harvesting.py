@@ -300,7 +300,7 @@ class HarvestingModule(basf2.Module):
             except GeneratorExit:
                 crops = np.array(raw_crops)
 
-        elif isinstance(crop, collections.MutableMapping):
+        elif isinstance(crop, collections.abc.MutableMapping):
             for part_name in crop:
                 raw_crops[part_name] = self.create_crop_part_collection()
 

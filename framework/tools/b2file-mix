@@ -152,7 +152,8 @@ if __name__ == "__main__":
 
     basf2.B2INFO(f"Found a total of {len(indexlist)} events in {len(inputevents)} files, shuffling ...")
     # make sure events are randomized.
-    random.shuffle(indexlist, ROOT.gRandom.Rndm)
+    random.seed(str(basf2.get_random_seed()))
+    random.shuffle(indexlist)
 
     if args.output_events is not None and args.output_events < len(indexlist):
         indexlist = indexlist[:args.output_events]

@@ -638,7 +638,7 @@ def get_individual_skims(SkimName, CombinedSkimDefinitions):
     want. Otherwise, retrieve the list of individual skims from
     ``CombinedSkimDefinitions``.
     """
-    if SkimName in Registry.names:
+    if SkimName in Registry.names and not 'f_' in SkimName:
         SingleSkims = [SkimName]
     else:
         SingleSkims = CombinedSkimDefinitions[SkimName]
@@ -665,21 +665,30 @@ def produce_on_tau_samples(skims):
     return SkimObject.produce_on_tau_samples
 
 
-def make_data_description_block(skims, sampleInfo):
+def make_data_description_block(skims, sampleInfo,skimName, flagged=False):
     DataDescription = []
     GeneralSkim = sampleInfo.get("generalSkimName", None)
-
-    for skim in skims:
+    
+    if flagged :
         DescriptionDict = {
-            "": skim,
-            "SkimDecayMode": Registry.encode_skim_name(skim),
-            "DataLevel": get_skim_output_datalevel(skim),
-        }
-
-        if GeneralSkim is not None:
-            DescriptionDict["GeneralSkimName"] = GeneralSkim
+                "": skimName,
+                "SkimDecayMode": Registry.encode_skim_name(skimName),
+                "DataLevel": 'mdst',
+                "GeneralSkimName" : GeneralSkim
+            }
         DataDescription.append(DescriptionDict)
+    else :
+        for skim in skims:
+            DescriptionDict = {
+                "": skim,
+                "SkimDecayMode": Registry.encode_skim_name(skim),
+                "DataLevel": get_skim_output_datalevel(skim),
+            }
 
+            if GeneralSkim is not None:
+                DescriptionDict["GeneralSkimName"] = GeneralSkim
+            DataDescription.append(DescriptionDict)
+        
     return DataDescription
 
 
@@ -721,6 +730,7 @@ def make_combined_steering_file(
     LocalModule=None,
     analysis_globaltag="",
     pid_globaltag="",
+    flagged=False,
 ):
     """Construct a steering file for the requested combined skim."""
     SteeringFileDirectory = Path(SteeringFileDirectory)
@@ -750,7 +760,10 @@ def make_combined_steering_file(
         data=(not mc),
         stats=False,
         hints=False,
-        mdstOutput=False,
+        mdstOutput=flagged,
+        udstOutput=not flagged,
+        CombinedSkimName=flagged,
+        CombinedSkimNameString=SkimName,
         analysis_globaltag=analysis_globaltag,
         pid_globaltag=pid_globaltag,
         backward_compatibility=True,
@@ -841,7 +854,7 @@ def make_request_dict(
         "LPNPrefix": LPNPrefix,
         "DataStructureByRun": "False",
 	    "VolumeDependentMerge": "True", 
-        "DataDescription": make_data_description_block(individualSkims, sampleInfo)
+        "DataDescription": make_data_description_block(individualSkims, sampleInfo,skimName,args.flagged)
     }
 
     # We only want the MCEventType to include the beam background level if the sample is BGx0
@@ -901,6 +914,7 @@ def write_json_files(sampleRegistry, args, outputDirectory):
             LocalModule=args.local_skim_script,
             analysis_globaltag=args.analysis_globaltag,
             pid_globaltag=args.pid_globaltag,
+            flagged=args.flagged
         )
         dry_run_steering_file(SteeringFile)
 
@@ -1112,6 +1126,15 @@ def get_argument_parser():
         dest="StartingBatchNumber",
         help="Starting number to count from for batch label appended to prod names.",
     )
+    
+    parser.add_argument(
+        "-flagged",
+        "--flagged",
+        action="store_true",
+        help="if added use flagged skim",
+    )
+    
+    
 
     mcDataGroup = parser.add_mutually_exclusive_group(required=True)
     mcDataGroup.add_argument(

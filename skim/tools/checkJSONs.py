@@ -1,13 +1,5 @@
 #!/usr/bin/env python3
 
-##########################################################################
-# basf2 (Belle II Analysis Software Framework)                           #
-# Author: The Belle II Collaboration                                     #
-#                                                                        #
-# See git log for contributors and copyright holders.                    #
-# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-##########################################################################
-
 import os
 import argparse
 import glob
@@ -55,7 +47,7 @@ if args.MAXEventCPUTime:
     valueLIM = args.MAXEventCPUTime
 print('Looking for JSONs with ExpectedEventCPUTime > {valueLIM}')
 
-json_path = f'{base_path}*/*/*/*/*.json'
+json_path = f'{base_path}*/*/*/*.json'
 if args.skim:
     skims = args.skim
     print('Checking JSONs files for the following skims:', skims)

@@ -16,10 +16,9 @@ import validation_gt as vgt
 if not b2test_utils.is_ci():
     b2test_utils.skip_test("Will not run the test because $BELLE2_IS_CI is not set.")
 
+calibration_path = b2test_utils.require_file('calibration', 'validation')
 
 with b2test_utils.clean_working_directory():
-
-    calibration_path = b2test_utils.require_file('calibration', 'validation')
 
     # Prepare the configuration dictionary for CAF and dump it into a JSON file.
     config = {

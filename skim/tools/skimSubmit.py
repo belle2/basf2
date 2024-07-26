@@ -522,7 +522,7 @@ def getMCtype(mctype):
     MCtypes = {
         'Main': ["mixed", "charged", "uubar", "ddbar", "ssbar", "ccbar", "taupair"],
         'LowMult': ["ee", "mumu", "gg", "eeee", "eemumu", "llXX", "hhISR"],
-        'Excited': ["BstarBstar"],
+        'Excited': ["BstarBstar", "BstarB"],
     }
 
     # check if the required MCtype is allowed

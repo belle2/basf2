@@ -250,9 +250,9 @@ namespace Belle2 {
     */
     template <class T, typename... Args> void fillArray(size_t len, Args... args)
     {
-      TClonesArray* digits = getPtr();
+      TClonesArray* array = getPtr();
       for (size_t i = 0; i < len; i++) {
-        new ((*digits)[i]) T(args[i]...);
+        new ((*array)[i]) T(args[i]...);
       }
     }
 
@@ -264,9 +264,9 @@ namespace Belle2 {
     */
     template <class T, typename... Args> void readArray(Args... args)
     {
-      TClonesArray* t = getPtr();
-      for (size_t i = 0; i < t->GetEntriesFast(); i++) {
-        ((T*)(*t)[i])->fillValues(&args[i]...);
+      TClonesArray* array = getPtr();
+      for (size_t i = 0; i < array->GetEntriesFast(); i++) {
+        ((T*)(*array)[i])->fillValues(&args[i]...);
       }
     }
 

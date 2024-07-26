@@ -12,8 +12,6 @@
 
 #include <framework/dataobjects/DigitBase.h>
 
-#include <typeinfo>
-
 namespace Belle2 {
 
   /**

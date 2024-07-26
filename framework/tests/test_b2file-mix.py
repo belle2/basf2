@@ -18,12 +18,17 @@ import b2test_utils as b2tu
 
 
 class PopulateEvents(b2.Module):
+    '''Class for populating the events with some random numbers.'''
+
     def initialize(self):
+        '''Initialize.'''
         import ROOT
+        #: EventMetaData
         self.evt = ROOT.Belle2.PyStoreObj('EventMetaData')
         self.evt.isRequired()
 
     def event(self):
+        '''Event.'''
         import ROOT
         # Let's store a random number in the slot for the generator weight
         self.evt.setGeneratedWeight(ROOT.gRandom.Rndm())

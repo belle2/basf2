@@ -11,6 +11,8 @@
 """
 Modify the PyDBObj and PyDBArray classes to return read only objects to prevent
 accidental changes to the conditions data.
+Also modify the functions fillArray and readArray of the PyStoreArray class to
+ensure a safe and simple usage of those function.
 
 This module does not contain any public functions or variables, it just
 modifies the ROOT interfaces for PyDBObj and PyDBArray to only return read only
@@ -99,7 +101,7 @@ def _PyDBArray__iter__(self):
         yield self[i]
 
 
-def wrap_fill_array(func):
+def _wrap_fill_array(func):
     type_table = {"short": "short",
                   "unsigned short": "ushort",
                   "int": "intc",
@@ -139,7 +141,6 @@ def wrap_fill_array(func):
                                     self.name + "(" + ", ".join([" ".join(i) for i in list(zip(lis.values(), lis.keys()))]) + ")\n")
                 super().__init__(self.message)
 
-        d = {}
         list_constructors = []
 
         obj_class = pyStoreArray.getClass()
@@ -147,11 +148,11 @@ def wrap_fill_array(func):
 
         for meth in obj_class.GetListOfMethods():
             if meth.GetName() == obj_classname.split(":")[-1]:  # found one constructor
-                d.clear()
+                d = {}
 
                 for ar in meth.GetListOfMethodArgs():
-                    d.setdefault(ar.GetName(), ar.GetTypeName())
-                list_constructors.append(d.copy())
+                    d[ar.GetName()] = ar.GetTypeName()
+                list_constructors.append(d)
 
                 # Check if this is the right constructor
                 if d.keys() == kwargs.keys():
@@ -172,14 +173,18 @@ def wrap_fill_array(func):
                                       f" into the type of the corresponding class member '{k}' ({np.dtype(type_table[d[k]])})"))
             arr_types.append(conv_type_table[type(kwargs[k][0]).__name__])
 
-        length = len(list(kwargs.values())[0])
+        l_arr = list(kwargs.values())
+        if not all(len(l_arr[0]) == len(arr) for arr in l_arr[1:]):
+            raise ValueError("The lengths of the passed arrays are not the same")
+
+        length = len(l_arr[0])
 
         func[(obj_classname, *arr_types)](pyStoreArray, length, *[kwargs[k] for k in d.keys()])
 
     return fill_array
 
 
-def wrap_read_array(func):
+def _wrap_read_array(func):
     type_table = {"short": "short",
                   "unsigned short": "ushort",
                   "int": "intc",
@@ -246,5 +251,5 @@ def _pythonize(klass, name):
         # pointed to if it allows iteration
         klass.__iter__ = lambda self: iter(self.obj())
     elif name == "PyStoreArray":
-        klass.fillArray = wrap_fill_array(klass.fillArray)
-        klass.readArray = wrap_read_array(klass.readArray)
+        klass.fillArray = _wrap_fill_array(klass.fillArray)
+        klass.readArray = _wrap_read_array(klass.readArray)

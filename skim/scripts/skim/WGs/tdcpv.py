@@ -24,6 +24,7 @@ from stdPi0s import loadStdSkimPi0, stdPi0s, loadStdSkimHighEffPi0
 from stdV0s import stdKshorts
 from variables import variables as vm
 from stdKlongs import stdKlongs
+from basf2 import register_module
 
 __authors__ = [
     "Chiara La Licata <chiara.lalicata@ts.infn.it>",
@@ -144,7 +145,7 @@ class TDCPV_qqs(BaseSkim):
         vm.addAlias('E_ECL_TDCPV_qqs', 'formula(E_ECL_pi_TDCPV_qqs+E_ECL_gamma_TDCPV_qqs)')
 
         btotcpvcuts = '5.2 < Mbc and abs(deltaE) < 0.5'
-        btotcpvcuts_KL = 'abs(deltaE) < 0.250'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.150'
 
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',
@@ -181,10 +182,23 @@ class TDCPV_qqs(BaseSkim):
             bd_qqs_List.append('B0:TDCPV_qqs' + str(chID))
 
         bd_qqs_KL_List = []
+
         for chID, channel in enumerate(bd_qqs_KL_Channels):
-            ma.reconstructMissingKlongDecayExpert(
-                'B0:TDCPV_qqs_KL' +
-                str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, recoList=f"_reco{chID}", path=path)
+            decayString = 'B0:TDCPV_qqs_KL' + str(chID) + ' -> ' + channel
+            pcalc = register_module('KlongMomentumCalculatorExpert',
+                                    decayString=decayString,
+                                    recoList=f"_reco{chID}",
+                                    maximumAcollinearityCut=1)
+            pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
+            path.add_module(pcalc)
+            ma.applyCuts(f'{channel.split()[1]}_reco{chID}', 'useCMSFrame(p)<4', path=path)
+            rmake = register_module('KlongDecayReconstructorExpert',
+                                    decayString=decayString,
+                                    recoList=f"_reco{chID}",
+                                    cut=btotcpvcuts_KL,
+                                    decayMode=chID)
+            rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
+            path.add_module(rmake)
             bd_qqs_KL_List.append('B0:TDCPV_qqs_KL' + str(chID))
 
         bu_qqs_List = []

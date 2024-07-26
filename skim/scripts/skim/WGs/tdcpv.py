@@ -142,7 +142,7 @@ class TDCPV_qqs(BaseSkim):
         vm.addAlias('E_ECL_TDCPV_qqs', 'formula(E_ECL_pi_TDCPV_qqs+E_ECL_gamma_TDCPV_qqs)')
 
         btotcpvcuts = '5.2 < Mbc and abs(deltaE) < 0.5'
-        btotcpvcuts_KL = 'abs(deltaE) < 0.150'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.250'
 
         bd_qqs_Channels = [
             'phi:SkimHighEff K_S0:merged',

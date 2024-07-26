@@ -62,9 +62,6 @@ kinematic constraints of the initial state.
            "If true, the output ParticleList will be saved by RootOutput. If false, it will be ignored when writing the file.", false);
   addParam("recoList", m_recoList,
            "Suffix attached to the output K_L list, if not defined it is set to '_reco' \n", std::string("_reco"));
-  addParam("maximumAcollinearityCut", m_acollinearity_cut,
-           "Maximum allowed acollinearity (in radians) in the transverse plane between the KL candidate and the other final state particle in the decay to add the KL candidate to the output ParticleList.", 1.);
-
 }
 
 void KlongMomentumCalculatorExpertModule::initialize()
@@ -123,7 +120,7 @@ void KlongMomentumCalculatorExpertModule::event()
     ROOT::Math::PxPyPzEVector MotherMomentum;
     ROOT::Math::PxPyPzEVector KMomentum;
     int idx = 0;
-    bool is_physical = KlongCalculatorUtils::calculateBtoKlongX(MotherMomentum, KMomentum, daughters, motherMass, idx, m_acollinearity_cut);
+    bool is_physical = KlongCalculatorUtils::calculateBtoKlongX(MotherMomentum, KMomentum, daughters, motherMass, idx);
 
     if (!is_physical)
       continue;

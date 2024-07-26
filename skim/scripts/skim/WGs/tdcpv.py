@@ -24,7 +24,6 @@ from stdPi0s import loadStdSkimPi0, stdPi0s, loadStdSkimHighEffPi0
 from stdV0s import stdKshorts
 from variables import variables as vm
 from stdKlongs import stdKlongs
-from basf2 import register_module
 
 __authors__ = [
     "Chiara La Licata <chiara.lalicata@ts.infn.it>",
@@ -46,7 +45,6 @@ class TDCPV_qqs(BaseSkim):
     * ``B0 -> phi K_L0``
     * ``B0 -> eta K_S0``
     * ``B0 -> eta' K_S0``
-    * ``B0 -> eta' K_L0``
     * ``B0 -> eta K*``
     * ``B0 -> eta' K*``
     * ``B0 -> K_S0 K_S0 K_S0``
@@ -137,7 +135,6 @@ class TDCPV_qqs(BaseSkim):
             '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
             path=path)
         ma.copyLists('K_L0:klmecl_qqs_0', ['K_L0:klmLayers_qqs', 'K_L0:eclEcut_qqs'], path=path)
-        ma.copyLists('K_L0:klmecl_qqs_1', ['K_L0:klmLayers_qqs', 'K_L0:eclEcut_qqs'], path=path)
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')
@@ -167,8 +164,7 @@ class TDCPV_qqs(BaseSkim):
         ]
 
         bd_qqs_KL_Channels = [
-            'eta\':SkimHighEff  K_L0:klmecl_qqs_0',
-            'phi:SkimHighEff K_L0:klmecl_qqs_1']
+            'phi:SkimHighEff K_L0:klmecl_qqs_0']
 
         bu_qqs_Channels = [
             'eta\':SkimHighEff K+:SkimHighEff',
@@ -184,21 +180,7 @@ class TDCPV_qqs(BaseSkim):
         bd_qqs_KL_List = []
 
         for chID, channel in enumerate(bd_qqs_KL_Channels):
-            decayString = 'B0:TDCPV_qqs_KL' + str(chID) + ' -> ' + channel
-            pcalc = register_module('KlongMomentumCalculatorExpert',
-                                    decayString=decayString,
-                                    recoList=f"_reco{chID}",
-                                    maximumAcollinearityCut=1)
-            pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
-            path.add_module(pcalc)
-            ma.applyCuts(f'{channel.split()[1]}_reco{chID}', 'useCMSFrame(p)<4', path=path)
-            rmake = register_module('KlongDecayReconstructorExpert',
-                                    decayString=decayString,
-                                    recoList=f"_reco{chID}",
-                                    cut=btotcpvcuts_KL,
-                                    decayMode=chID)
-            rmake.set_name('KlongDecayReconstructorExpert_' + decayString)
-            path.add_module(rmake)
+            ma.reconstructMissingKlongDecayExpert('B0:TDCPV_qqs_KL' + str(chID) + ' -> ' + channel, btotcpvcuts_KL, chID, path=path)
             bd_qqs_KL_List.append('B0:TDCPV_qqs_KL' + str(chID))
 
         bu_qqs_List = []

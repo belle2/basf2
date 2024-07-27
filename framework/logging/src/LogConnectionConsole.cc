@@ -41,7 +41,8 @@ bool LogConnectionConsole::terminalSupportsColors(int fileDescriptor)
 {
   //enable color for TTYs with color support (list taken from gtest)
   const bool isTTY = isatty(fileDescriptor);
-  const std::string termName = getenv("TERM") ? getenv("TERM") : "";
+  const char* term = getenv("TERM");
+  const std::string termName = term ? term : "";
   const bool useColor = isTTY and
                         (termName == "xterm" or termName == "xterm-color" or termName == "xterm-256color" or
                          termName == "sceen" or termName == "screen-256color" or termName == "tmux" or

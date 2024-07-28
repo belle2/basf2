@@ -38,6 +38,6 @@ if __name__ == '__main__':
     call_command(f'b2help-recommendation -l {filename}')
     # Call the script for tags
     for tag in check_tags:
-        call_command(f'b2help-recommendation -t {tag} -l {filename}')
+        call_command(f'b2help-recommendation -t {tag} -l {filename} -f rst')
     # Call convert to payload
     call_command(f'b2help-recommendation -l {filename} -t {check_tags[1]} -c -p test')

@@ -1,0 +1,33 @@
+# EventType: 121003200f
+# Descriptor: [B+ -> omega(pipipi0) pi+ ]cc
+# NickName: B+_omegapi+
+# Documentation: BR and Acp in B+ -> omega(pipipi0) pi+
+# Responsible: ZhouHan Xu
+# Email: r10222086@ntu.edu.tw
+# Tested: yes
+# PhysicsWG: Bhadronic
+# Cuts: None
+# Date: 24/07/2024
+#
+#
+Alias omegasig omega
+Alias pi0sig pi0
+
+Decay Upsilon(4S)
+0.5   B+sig   B-      VSS;
+0.5   B+      B-sig   VSS;
+Enddecay
+
+Decay B+sig
+1.0   omegasig pi+ SVS;
+Enddecay
+CDecay B-sig
+
+Decay omegasig
+1.0   pi-  pi+  pi0sig          OMEGA_DALITZ;
+Enddecay
+
+Decay pi0sig
+1.0 gamma gamma PHSP;
+Enddecay
+End

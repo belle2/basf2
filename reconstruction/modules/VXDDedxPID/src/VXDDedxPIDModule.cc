@@ -38,7 +38,7 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
            "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", false);
-  // no need to define highest and lowest truncated value as we always remove higest two dE/dx value from the 8 dE/dx value
+  // no need to define highest and lowest truncated value as we always remove highest two dE/dx value from the 8 dE/dx value
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);

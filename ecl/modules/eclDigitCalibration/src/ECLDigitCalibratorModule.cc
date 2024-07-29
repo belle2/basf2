@@ -56,9 +56,7 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElect
   m_calibrationCrateTimeOffset("ECLCrateTimeOffset"),
   m_calibrationCrystalFlightTime("ECLCrystalFlightTime"),
   m_eclDigits(eclDigitArrayName()),
-  m_eclCalDigits(eclCalDigitArrayName()),
-  m_eclDsps(eclDspArrayName()),
-  m_eclPureCsIInfo(eclPureCsIInfoArrayName())
+  m_eclCalDigits(eclCalDigitArrayName())
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
@@ -126,20 +124,16 @@ void ECLDigitCalibratorModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& ca
 void ECLDigitCalibratorModule::initialize()
 {
   // mdst dataobjects
-  //  This object is registered by both ECL and KLM packages. Let's be agnostic about the
-  //  execution order of ecl and klm modules: the first package run registers the module
+  // This object is registered by few packages. Let's be agnostic about the
+  // execution order of the modules: the first package run registers the module
   m_eventLevelClusteringInfo.isOptional(eventLevelClusteringInfoName()) ? m_eventLevelClusteringInfo.isRequired(
     eventLevelClusteringInfoName())
   : m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register Digits, CalDigits and their relation in datastore
-  m_eclDigits.registerInDataStore(eclDigitArrayName());
-  m_eclDsps.registerInDataStore(eclDspArrayName());
+  m_eclDigits.isRequired(eclDigitArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclCalDigits.registerRelationTo(m_eclDigits);
-
-  // Special information for pure CsI simulation
-  m_eclPureCsIInfo.registerInDataStore(eclPureCsIInfoArrayName());
 
   // initialize calibration
   initializeCalibration();

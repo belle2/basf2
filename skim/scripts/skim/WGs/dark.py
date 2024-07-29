@@ -730,7 +730,7 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
             mask_tuples=[
                 ("std_roe",
                  "thetaInCDCAcceptance and dr < 0.5 and abs(dz) < 2",
-                 "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and [[clusterReg==1 and E>0.08]" +
+                 "[clusterNHits>1.5] and thetaInCDCAcceptance and [[clusterReg==1 and E>0.08]" +
                  "or [clusterReg==2 and E>0.07] or [clusterReg==3 and E>0.1]] and [abs(clusterTiming) < 200]")],
             path=path,
          )

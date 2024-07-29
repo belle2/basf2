@@ -28,7 +28,7 @@ from stdPhotons import stdPhotons
 from stdPi0s import stdPi0s
 from stdV0s import stdKshorts
 from variables import variables as vm
-from ROOT import Belle2
+# from ROOT import Belle2
 
 __liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -384,14 +384,14 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     Cuts on electrons:
 
-    * :math:`\\text{pidChargedBDTScore(11,all)} > 0.9`
+    * :math:`\\text{electronID} > 0.3`
     * :math:`p_t > 0.3\\,\\text{GeV}` in lab frame,  :math:`p > 0.5\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
     * :math:`\\text{thetaInCDCAcceptance}`
 
     Cuts on muons:
 
-    * :math:`\\text{muonID_noSVD} > 0.9`
+    * :math:`\\text{muonID} > 0.9`
     * :math:`p_t > 0.4\\,\\text{GeV}` in lab frame,  :math:`p > 0.7\\,\\text{GeV}` in lab frame
     * :math:`dr < 0.5`,  :math:`|dz| < 2`
 
@@ -402,7 +402,7 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     ECL cluster mask for ROE:
 
-    * :math:`\\text{clusterNHits}>1.5`,  :math:`0.2967<\\theta<2.6180`
+    * :math:`\\text{clusterNHits}>1.5`,  :math:`\\theta` in CDC acceptance
     * :math:`E>0.080,\\text{GeV}`
     """
 
@@ -422,19 +422,15 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
 
     def build_lists(self, path):
 
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
-        eIDCut = "pidChargedBDTScore(11,all) > 0.9"
-        muIDCut = "muonID_noSVD > 0.9"
+        eIDCut = "electronID > 0.3"
+        muIDCut = "muonID > 0.9"
         ePCut = "p > 0.5"
         ePtCut = "pt > 0.3"
         muPCut = "p > 0.7"
         muPtCut = "pt > 0.4"
         lepTrkCuts = "dr < 0.5 and abs(dz) < 2"
         hadTrkCuts = "dr < 2.0 and abs(dz) < 4"
-        gammaCuts = "[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]"
+        gammaCuts = "[clusterNHits>1.5] and thetaInCDCAcceptance"
         gammaECuts = "[[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]"
         cleanMask = ('cleanMask', 'pt>0.05 and dr < 5 and abs(dz) < 10',
                      f'{gammaCuts} and E>0.080 and minC2TDist>20.0 and abs(clusterTiming)<200')
@@ -448,10 +444,6 @@ class BtoDl_and_ROE_e_or_mu_or_lowmult(BaseSkim):
         vm.addAlias('cosBY', 'cosThetaBetweenParticleAndNominalB')
         # electrons and muons
         ma.fillParticleList("e-:sig", f"{lepTrkCuts} and thetaInCDCAcceptance and {ePtCut} and {ePCut}", path=path)
-        ma.applyChargedPidMVA(
-            particleLists=['e-:sig'],
-            path=path,
-            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
         ma.applyCuts('e-:sig', eIDCut, path=path)
 
         ma.fillParticleList("mu-:sig", f"{muIDCut} and {lepTrkCuts} and {muPtCut} and {muPCut}", path=path)

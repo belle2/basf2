@@ -80,7 +80,7 @@ namespace Belle2 {
     /**
      * The type of list of references.
      */
-    typedef std::map<std::string, TH1*> RefList;
+    typedef std::map<std::string, RefHistObject> RefList;
 
     /**
     * Clear all static global lists
@@ -244,29 +244,32 @@ namespace Belle2 {
                          const std::string& histname, bool onlyIfUpdated = false);
 
     /**
-    * Get referencehistogram from list (no other search).
-    * @param histname The name of the histogram (incl dir).
-    * @param onlyIfUpdated req only updated hists, return nullptr otherwise
-    * @return The found histogram, or nullptr if not found.
-    */
-    static TH1* findRefHist(const std::string& histname, bool onlyIfUpdated = false);
+     * Get referencehistogram from list (no other search).
+     * @param histname The name of the histogram (incl dir).
+     * @param scaling enum what scaling to use
+     * @param hist histogram to scale to
+     * @return The found histogram, or nullptr if not found.
+     */
+    static TH1* findRefHist(const std::string& histname, int scaling = 0, const TH1* hist = nullptr);
 
     /**
      * Find reference histogram.
      * @param dirname  The name of the directory.
      * @param histname The name of the histogram.
-     * @param onlyIfUpdated req only updated hists, return nullptr otherwise
+     * @param scaling enum what scaling to use
+     * @param hist histogram to scale to
      * @return The found histogram, or nullptr if not found.
      */
     static TH1* findRefHist(const std::string& dirname,
-                            const std::string& histname, bool onlyIfUpdated = false);
+                            const std::string& histname, int scaling = 0, const TH1* hist = nullptr);
 
     /** Using the original and reference, create scaled version
+     * @param scaling scaling algorithm
      * @param hist pointer to histogram
      * @param ref pointer to reference
      * @return scaled reference
      */
-    static TH1* scaleReference(TH1* hist, TH1* ref);
+    static TH1* scaleReference(int scaling, const TH1* hist, TH1* ref);
 
     /**
      * Find histogram in specific TFile (e.g. ref file).
@@ -310,14 +313,14 @@ namespace Belle2 {
     static bool addHist(const std::string& dirname,
                         const std::string& histname, TH1* h);
 
-    /**
-     * Add reference.
-     * @param dirname The name of the directory.
-     * @param histname The name of the histogram.
-     * @param ref The TH1 pointer for the reference.
-     */
-    void addRef(const std::string& dirname,
-                const std::string& histname, TH1* ref);
+    // /**
+    //  * Add reference.
+    //  * @param dirname The name of the directory.
+    //  * @param histname The name of the histogram.
+    //  * @param ref The TH1 pointer for the reference.
+    //  */
+    // void addRef(const std::string& dirname,
+    //             const std::string& histname, TH1* ref);
 
 
     /**
@@ -341,6 +344,11 @@ namespace Belle2 {
      * Clears the list of histograms.
      */
     static void clearHistList(void);
+
+    /**
+     * Clears the list of ref histograms.
+     */
+    static void clearRefList(void);
 
     /**
      * Reset Delta

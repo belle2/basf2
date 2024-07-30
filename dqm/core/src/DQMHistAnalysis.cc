@@ -50,6 +50,7 @@ DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 void DQMHistAnalysisModule::clearlist()
 {
   s_histList.clear();
+  s_refList.clear();
 // s_monObjList;
   s_deltaList.clear();
   s_canvasUpdatedList.clear();
@@ -77,20 +78,20 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
   return false; // histogram didnt change
 }
 
-void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
-{
-  std::string fullname;
-  if (dirname.size() > 0) {
-    fullname = dirname + "/" + histname;
-  } else {
-    fullname = histname;
-  }
-  auto it = s_refList.find(fullname);
-  if (it == s_refList.end()) {
-    B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
-    s_refList.insert({fullname, ref});
-  }
-}
+// void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
+// {
+//   std::string fullname;
+//   if (dirname.size() > 0) {
+//     fullname = dirname + "/" + histname;
+//   } else {
+//     fullname = histname;
+//   }
+//   auto it = s_refList.find(fullname);
+//   if (it == s_refList.end()) {
+//     B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
+//     s_refList.insert({fullname, ref});
+//   }
+// }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
@@ -179,65 +180,53 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, bool was_updated)
+TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* ref)
+{
+  // if hist/ref is nullptr, nothing to do
+  if (!hist || !ref)
+    return ref;
+
+  switch (scaling) {
+    // default: do nothing
+    // case 0: do nothing
+    case 1: // Integral
+      // only if we have entries in reference
+      if (hist->Integral() != 0 and ref->Integral() != 0) {
+        ref->Scale(hist->Integral() / ref->Integral());
+      }
+      break;
+    case 2: // Maximum
+      // only if we have entries in reference
+      if (hist->GetMaximum() != 0 and ref->GetMaximum() != 0) {
+        ref->Scale(hist->GetMaximum() / ref->GetMaximum());
+      }
+      break;
+  }
+  return ref;
+}
+
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, int scaling, const TH1* hist)
 {
   if (s_refList.find(histname) != s_refList.end()) {
-    if (was_updated) return nullptr;
-    if (s_refList[histname]) {
-      return s_refList[histname];
-    } else {
-      B2WARNING("Histogram " << histname << " in histogram list but nullptr.");
-    }
+    // get a copy of the reference which we can modify
+    // (it is still owned and managed by the framework)
+    // then do the scaling
+    return scaleReference(scaling, hist, s_refList[histname].getReference());
   }
-  B2INFO("Histogram " << histname << " not in list.");
+  B2INFO("Ref Histogram " << histname << " not in list.");
   return nullptr;
 }
 
-TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, bool updated)
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, int scaling, const TH1* hist)
 {
   if (dirname.size() > 0) {
-    return findRefHist(dirname + "/" + histname, updated);
+    return findRefHist(dirname + "/" + histname, scaling, hist);
   }
-  return findRefHist(histname, updated);
-}
-
-TH1* DQMHistAnalysisModule::scaleReference(TH1* hist, TH1* ref)
-{
-  TH1* output{nullptr};
-
-  // if hist/ref is nullptr, nothing to do
-  if (!hist || !ref)
-    return output;
-
-  if (hist->Integral() == 0)
-    return output;
-
-  B2DEBUG(1, "Beginning scaleReference Procedure");
-
-  // only if we have entries in reference
-  if (abs(ref->Integral()) > 0) {
-    if (hist->InheritsFrom("TH1C") or hist->InheritsFrom("TH1S")) {
-      output = new TH1F(); // we want it a float for better scaling
-      ref->Copy(*output);
-    } else if (hist->InheritsFrom("TH1I") or hist->InheritsFrom("TH1L")) {
-      output = new TH1D(); // we want it a float for better scaling
-      ref->Copy(*output);
-    } else {
-      // keep TProfile, TH1F or TH1D
-      output = (TH1*)ref->Clone();
-    }
-    output->SetLineStyle(2);
-    output->SetLineColor(3);
-    output->SetFillColor(0);
-    output->SetStats(kFALSE);
-  }
-  output->Scale(hist->Integral() / output->Integral());
-  return output;
+  return findRefHist(histname, scaling, hist);
 }
 
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-
   TCanvas* cnv = nullptr;
   // try to get canvas from outside
   if (cobj) cnv = *cobj;
@@ -348,6 +337,11 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 void DQMHistAnalysisModule::clearHistList(void)
 {
   s_histList.clear();
+}
+
+void DQMHistAnalysisModule::clearRefList(void)
+{
+  s_refList.clear();
 }
 
 void DQMHistAnalysisModule::resetDeltaList(void)

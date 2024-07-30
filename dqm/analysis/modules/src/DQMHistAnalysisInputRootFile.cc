@@ -104,6 +104,7 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_runList[m_run_idx]);
   clearHistList();
+  clearRefList();
 }
 
 void DQMHistAnalysisInputRootFileModule::event()

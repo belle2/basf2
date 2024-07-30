@@ -65,7 +65,7 @@ namespace Belle2 {
 
     /** Destructor
      */
-    ~RefHistObject(void);
+    ~RefHistObject(void) {};
 
     /** Reset histogram and update flag, not the entries
      */
@@ -110,5 +110,14 @@ namespace Belle2 {
       m_refCopy.reset(refCopy);  // Assumes ownership of refCopy
     }
 
+    /** Get reference pointer for copy
+    * @return reference histogram pointer
+    */
+    TH1* getReference(void);
+
+  private:
+    /** Make a reference copy
+    */
+    void makeReferenceCopy(void);
   };
 }

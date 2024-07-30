@@ -1544,6 +1544,14 @@ C      CALL INIOFC ! dummy for now anyway
       SAVE    JAKT
       REAL    RRR(1)
       IF (KTO.EQ.1) THEN  
+         IF (TauToElOrMu.EQ.1) THEN
+            CALL KKMC_RANMAR(RRR1,1)
+            IF (RRR1(1).GT.0.5) THEN
+               JAK2 = 1
+            ELSE
+               JAK2 = 2
+            ENDIF
+         ENDIF
          IF (CHCONJUGATE.EQ.1) THEN  
             CALL KKMC_RANMAR(RRR,1)
             IF (RRR(1).GT.0.5) THEN ! swap JAK1/JAK2 for alternate events

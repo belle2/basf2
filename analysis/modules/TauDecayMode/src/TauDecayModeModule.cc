@@ -869,8 +869,6 @@ double TauDecayModeModule::getEgstar(std::vector<int> vec_radgam, const MCPartic
   ROOT::Math::PxPyPzEVector p4_tau = p.get4Vector();
   B2DEBUG(19, "p4_tau: " << p4_tau << " " << p4_tau.P());
   ROOT::Math::Boost boost_to_mother_rest_frame(p4_tau.BoostToCM());
-  ROOT::Math::PxPyPzEVector p4_tau_rest = boost_to_mother_rest_frame * p4_tau;
-  B2DEBUG(19, "p4_tau_rest: " << p4_tau_rest << " " << p4_tau_rest.P());
   for (unsigned int i = 0; i < vec_radgam.size(); i++) {
     ROOT::Math::PxPyPzEVector p4_gamma = MCParticles[vec_radgam[i]]->get4Vector();
     B2DEBUG(19, "p4_gamma: " << p4_gamma << " " << p4_gamma.P());

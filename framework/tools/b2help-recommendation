@@ -24,6 +24,8 @@ from pygments.lexers import get_lexer_by_name
 import pygments.formatters
 import terminal_utils
 
+MC_CAMPAIGN = ['MC15', 'MC16']
+
 class FormatterStrategy(ABC):
     """
     Abstract base class for formatting recommendations.
@@ -306,6 +308,8 @@ def get_argument_parser():
     Get the argument parser.
     """
     parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate.")
+    parser.add_argument("-mc", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
+                        choices=MC_CAMPAIGN)
     parser.add_argument("-t", "--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
                         nargs='+', default=None)
     parser.add_argument("-gt", "--globaltag", help="Global tag name, if one wants to check another recommendation",
@@ -314,8 +318,6 @@ def get_argument_parser():
                         default='color_rst')
     parser.add_argument("-p", "--payload", help="Payload name, if one wants to check another recommendation",
                         default=None)
-    parser.add_argument("-m", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
-                        default='MC15')
     parser.add_argument("--no-pager", help="Disable output scrolling, which is done by Pager", action='store_true')
     parser.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
@@ -345,6 +347,9 @@ def main():
 
     if args.localfile is None:
         gt_name = args.globaltag
+        if args.mccampaign is None:
+            b2.B2ERROR(f"The MC campaign is not provided! Available choices for -mc argument: {MC_CAMPAIGN}")
+            sys.exit(1)
         if gt_name is None:
             gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']
         payload_name = args.payload
@@ -375,9 +380,10 @@ def main():
 
     else:
         tools = load_data(args.localfile, formatter)
+        args.mccampaign = "local"
 
     if args.tags is None:
-        print("Available Tags:")
+        print(f"Available tags for {args.mccampaign}:")
         available_tags = get_available_tags(tools)
         for tag in available_tags:
             print(f"  - {tag}")

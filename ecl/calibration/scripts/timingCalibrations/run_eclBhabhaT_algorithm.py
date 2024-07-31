@@ -133,7 +133,7 @@ else:
 
 
 print("Summary of possible calibration completion status values:")
-print("      c_OK             = Finished successfully             = 0 in Python")
+print("      c_OK             = Finished successfully            = 0 in Python")
 print("      c_Iterate,       = Needs iteration                  = 1 in Python")
 print("      c_NotEnoughData, = Needs more data                  = 2 in Python")
 print("      c_Failure,       = Failed                           = 3 in Python")

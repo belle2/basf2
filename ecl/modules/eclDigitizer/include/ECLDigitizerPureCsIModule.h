@@ -76,8 +76,8 @@ namespace Belle2 {
     bool isPureCsI(int cellId)
     {
       if (cellId > ECL::EclConfigurationPure::m_nch) return false;
-      int this = m_thetaID[cellId - 1];
-      if (this >= m_thetaIdMin && this <= m_thetaIdMax) return true;
+      int thId = m_thetaID[cellId - 1];
+      if (thId >= m_thetaIdMin && thId <= m_thetaIdMax) return true;
       return false;
     }
 

@@ -10,7 +10,6 @@
 #include <framework/core/Module.h>
 
 #include <analysis/dataobjects/ParticleList.h>
-#include <analysis/VariableManager/Manager.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <string>
 
@@ -48,9 +47,6 @@ namespace Belle2 {
     std::string m_particleList;              /**< input ParticleList name */
     std::string m_extraInfoName;             /**< output extra-info name */
     bool m_prioritiseV0;                    /**< if one of the decay is a V0, prioritise that before checking vertex quality */
-
-    const Variable::Manager::Var* m_targetVar; /**< Pointer to target variable stored in the variable manager */
-
   };
 
 } // Belle2 namespace

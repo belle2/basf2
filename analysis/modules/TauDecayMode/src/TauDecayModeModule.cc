@@ -863,14 +863,14 @@ int TauDecayModeModule::getProngOfDecay(const MCParticle& p)
 }
 
 // Energy of the radiative photon in tau rest frame
-double TauDecayModeModule::getEgstar(std::vector<int> vec_radgam, const MCParticle& p)
+double TauDecayModeModule::getEgstar(const std::vector<int>& vec_radgam, const MCParticle& p)
 {
   double egstar = -1.;
   ROOT::Math::PxPyPzEVector p4_tau = p.get4Vector();
   B2DEBUG(19, "p4_tau: " << p4_tau << " " << p4_tau.P());
   ROOT::Math::Boost boost_to_mother_rest_frame(p4_tau.BoostToCM());
-  for (unsigned int i = 0; i < vec_radgam.size(); i++) {
-    ROOT::Math::PxPyPzEVector p4_gamma = MCParticles[vec_radgam[i]]->get4Vector();
+  for (auto i : vec_radgam) {
+    ROOT::Math::PxPyPzEVector p4_gamma = MCParticles[i]->get4Vector();
     B2DEBUG(19, "p4_gamma: " << p4_gamma << " " << p4_gamma.P());
     ROOT::Math::PxPyPzEVector p4_gamma_rest = boost_to_mother_rest_frame * p4_gamma;
     B2DEBUG(19, "p4_gamma_rest: " << p4_gamma_rest << " " << p4_gamma_rest.P());

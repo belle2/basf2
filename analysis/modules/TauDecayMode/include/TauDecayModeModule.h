@@ -186,7 +186,7 @@ namespace Belle2 {
     /** Identifies the number of charged final state particles in the decay*/
     int getProngOfDecay(const MCParticle& mc);
     /** Energy of the radiative photon in tau rest frame */
-    double getEgstar(std::vector<int> vec_radgam, const MCParticle& mc);
+    double getEgstar(const std::vector<int>& vec_radgam, const MCParticle& mc);
   };
 
 }

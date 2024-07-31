@@ -27,7 +27,7 @@ REG_MODULE(DQMHistReference);
 DQMHistReferenceModule::DQMHistReferenceModule() : DQMHistAnalysisModule()
 {
   //Parameter definition
-  addParam("ReferenceFile", m_referenceFile, "Name of the reference histrogram files", string(""));
+  addParam("ReferenceFile", m_referenceFileName, "Name of the reference histrogram files", string(""));
   B2DEBUG(1, "DQMHistReference: Constructor done.");
 }
 
@@ -36,21 +36,20 @@ DQMHistReferenceModule::~DQMHistReferenceModule() { }
 
 void DQMHistReferenceModule::initialize()
 {
-  gStyle->SetOptStat(0);
-  gStyle->SetStatStyle(1);
-  gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
-
   B2DEBUG(1, "DQMHistReference: initialized.");
 }
 
 void DQMHistReferenceModule::beginRun()
 {
   B2DEBUG(1, "DQMHistReference: beginRun called.");
-  m_firstInRun = true;
+
+  loadReferenceHistos();
 }
 
 void DQMHistReferenceModule::loadReferenceHistos()
 {
+  TH1::AddDirectory(false); // do not store any histograms
+
   B2DEBUG(1, "DQMHistReference: reading references from input root file");
 
   string run_type = getRunType();
@@ -58,24 +57,16 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
   B2INFO("DQMHistReference: run_type " << run_type);
 
-  for (auto& it : m_pnode) {
-    // clear ref histos from memory
-    if (it.m_refHist) it.setRefHist(nullptr);
-    if (it.m_refCopy) it.setRefCopy(nullptr);
-  }
-  m_pnode.clear();
-  B2INFO("DQMHistReference: clear m_pnode. size: " << m_pnode.size());
-
-  TFile* refFile = new TFile(m_referenceFile.c_str(), "READ");
+  TFile* refFile = new TFile(m_referenceFileName.c_str(), "READ");
 
   if (refFile->IsZombie()) {
-    B2INFO("DQMHistReference: reference file " << m_referenceFile << " does not exist. No references will be used!");
+    B2INFO("DQMHistReference: reference file " << m_referenceFileName << " does not exist. No references will be used!");
     refFile->Close();
     delete refFile;
     return;
   }
 
-  B2INFO("DQMHistReference: use reference file " << m_referenceFile);
+  B2INFO("DQMHistReference: use reference file " << m_referenceFileName);
 
   TIter nextkey(refFile->GetListOfKeys());
   TKey* key;
@@ -113,21 +104,16 @@ void DQMHistReferenceModule::loadReferenceHistos()
             TObject* obj = hh->ReadObj(); // ReadObj -> I own it
             if (obj->IsA()->InheritsFrom("TH1")) {
               TH1* h = (TH1*)obj;
-              if (h->GetDimension() == 1) {
-                string histname = h->GetName();
-                m_pnode.push_back(RefHistObject());
-                auto& n = m_pnode.back();
-                n.m_orghist_name = dirname + "/" + histname;
-                n.m_refhist_name = "ref/" + dirname + "/" + histname;
-                h->SetName((n.m_refhist_name).c_str());
-                h->SetDirectory(0);
-                n.setRefHist(h); // transfer ownership!
-                n.setRefCopy(nullptr);
-                n.setCanvas(nullptr);
-
-              } else {
-                delete h;
-              }
+              string histname = h->GetName();
+              std::string name = dirname + "/" + histname;
+              auto& n = getRefList()[name];
+              n.m_orghist_name = name;
+              n.m_refhist_name = "ref/" + name;
+              h->SetName((n.m_refhist_name).c_str());
+              h->SetDirectory(0);
+              n.setRefHist(h); // transfer ownership!
+              n.setRefCopy(nullptr);
+              n.setCanvas(nullptr);
             } else {
               delete obj;
             }
@@ -139,7 +125,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
     }
   }
 
-  B2INFO("DQMHistReference: insert reference to m_pnode. size: " << m_pnode.size());
+  B2INFO("DQMHistReference: read references done");
   refFile->Close();
   delete refFile;
 }
@@ -147,11 +133,9 @@ void DQMHistReferenceModule::loadReferenceHistos()
 void DQMHistReferenceModule::event()
 {
   TH1::AddDirectory(false); // do not store any histograms
-
-  if (m_firstInRun) {
-    loadReferenceHistos();
-    m_firstInRun = false;
-  }
+  gStyle->SetOptStat(0);
+  gStyle->SetStatStyle(1);
+  gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
 
   char mbstr[100];
 
@@ -159,18 +143,17 @@ void DQMHistReferenceModule::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before ref loop");
 
-
-  for (auto& it : m_pnode) {
-    TH1* ref = it.getRefHist();
+  for (auto& it : getRefList()) {
+    TH1* ref = it.second.getRefHist();
     if (!ref) continue; // No reference, continue
-    TCanvas* canvas = it.getCanvas();
-    TH1* hist1 = findHistInCanvas(it.m_orghist_name, &(canvas));
+    TCanvas* canvas = it.second.getCanvas();
+    TH1* hist1 = findHistInCanvas(it.second.m_orghist_name, &(canvas));
 
     // if there is no histogram on canvas we plot the reference anyway.
     if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> no display " << it.m_orghist_name);
+      B2DEBUG(1, "Canvas is without histogram -> no display " << it.second.m_orghist_name);
       // Display something could be confusing for shifters
-//       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.orghist_name);
+//       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.second.orghist_name);
 //       canvas->cd();
 //       hist2->Draw();
 //       canvas->Modified();
@@ -178,7 +161,7 @@ void DQMHistReferenceModule::event()
       continue;
     }
     if (!canvas) {
-      B2DEBUG(1, "No canvas found for reference histogram " << it.m_orghist_name);
+      B2DEBUG(1, "No canvas found for reference histogram " << it.second.m_orghist_name);
       continue;
     }
     if (hist1->Integral() == 0) continue; // empty histogram -> continue
@@ -191,14 +174,7 @@ void DQMHistReferenceModule::event()
     */
 
     if (abs(ref->Integral()) > 0) { // only if we have entries in reference
-      TH1* refCopy = it.getRefCopy();
-      if (refCopy) {
-        refCopy->Reset();
-        refCopy->Add(ref);
-        refCopy->Scale(hist1->Integral() / refCopy->Integral());
-      } else {
-        refCopy = scaleReference(hist1, ref);
-      }
+      auto refCopy = scaleReference(1, hist1, it.second.getReference());
 
       //Adjust the y scale to cover the reference
       if (refCopy->GetMaximum() > hist1->GetMaximum())
@@ -209,8 +185,8 @@ void DQMHistReferenceModule::event()
 
       canvas->Modified();
       canvas->Update();
-      B2DEBUG(2, "Adding ref: " << it.m_orghist_name << " " << ref->GetName() << " " << ref);
-      addRef("", it.m_orghist_name, ref);
+      B2DEBUG(2, "Adding ref: " << it.second.m_orghist_name << " " << ref->GetName() << " " << ref);
+      //addRef("", it.second.m_orghist_name, ref);
     }
   }
 
@@ -224,17 +200,8 @@ void DQMHistReferenceModule::endRun()
   B2DEBUG(1, "DQMHistReference: endRun called");
 }
 
-
 void DQMHistReferenceModule::terminate()
 {
   B2DEBUG(1, "DQMHistReference: terminate called");
-  for (auto& it : m_pnode) {
-    // clear ref histos from memory (but converting to smart pointers)
-    //if (it.m_refHist) delete it.m_refHist;
-    //if (it.m_refCopy) delete it.m_refCopy;
-    if (it.m_refHist) it.setRefHist(nullptr);
-    if (it.m_refCopy) it.setRefCopy(nullptr);
-  }
-  m_pnode.clear();
 }
 

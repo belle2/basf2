@@ -63,14 +63,8 @@ namespace Belle2 {
 
   private:
 
-    /** Struct for reference histogram  */
-    std::vector<RefHistObject> m_pnode;
-
     /** Reference Histogram Root file name */
-    std::string m_referenceFile;
-
-    /** Is first event in run */
-    bool m_firstInRun = true;
+    std::string m_referenceFileName;
 
     /** Reads reference histograms from input root file */
     void loadReferenceHistos();

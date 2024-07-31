@@ -42,7 +42,7 @@ namespace Belle2 {
 
   private:
     /** Parameters to control the job */
-    double m_thetaLabMinDeg; /**< miniumum ecl cluster theta in lab (17 degrees) */
+    double m_thetaLabMinDeg; /**< minimum ecl cluster theta in lab (17 degrees) */
     double m_thetaLabMaxDeg; /**< maximum ecl cluster theta in lab (150 degrees) */
     double m_minE0; /**< minimum energy of cluster 0: E*0/sqrts (0.45) */
     double m_minE1; /**< minimum energy of cluster 1: E*1/sqrts (0.40) */

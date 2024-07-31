@@ -71,7 +71,7 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC4Algorithm::calibra
     updateDBObjPtrs(1, chosenRun.second, chosenRun.first);
 
     for (int j = first; j <= last; j++) {
-      B2INFO("Check Norm Parms CellID " << j);
+      B2INFO("Check Norm Params CellID " << j);
       B2INFO("P " << j << " " << tempexistingPhotonWaveformParameters->getPhotonParameters(j)[0]);
       B2INFO("H " << j << " " << tempexistingHadronDiodeWaveformParameters->getHadronParameters(j)[0]);
       B2INFO("D " << j << " " << tempexistingHadronDiodeWaveformParameters->getDiodeParameters(j)[0]);

@@ -490,7 +490,7 @@ CalibrationAlgorithm::EResult eclMuMuEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Set the return code appropriately */
   if (storeConst == -1) {
-    B2RESULT("eclMuMuEAlgorithm performed fits but was not asked to store contants");
+    B2RESULT("eclMuMuEAlgorithm performed fits but was not asked to store constants");
     return c_Failure;
   } else if (!DBsuccess) {
     if (findExpValues) { B2RESULT("eclMuMuEAlgorithm: failed to store expected values"); }

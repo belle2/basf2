@@ -124,7 +124,7 @@ void ECLPackerModule::event()
 
   B2DEBUG(100, "EclPacker:: Hits ======>> ");
   int tot_dsp_hits = 0;
-  // fill number of hits, masks and fill correspondance between cellID and index in container
+  // fill number of hits, masks and fill correspondence between cellID and index in container
   for (int i_digit = 0; i_digit < nEclDigits; i_digit++) {
     int cid = m_eclDigits[i_digit]->getCellId();
     int amp = m_eclDigits[i_digit]->getAmp();

@@ -2022,7 +2022,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz->GetYaxis()->SetTitle("y (m)");
   BDyz->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz->GetListOfFunctions()->Add(new TNamed("Description","Bkg cluster position in the ecl (upper part is $\\phi$<0, lower part $\\phi$>0)")); 
-  BDyz->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
+  BDyz->GetListOfFunctions()->Add(new TNamed("Check","Distribution should not vary much"));
   BDyz->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   BDyz->Write();
 
@@ -2036,7 +2036,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz7->GetYaxis()->SetTitle("y (m)");
   BDyz7->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz7->GetListOfFunctions()->Add(new TNamed("Description","Bkg cluster position in the FWD ecl")); 
-  BDyz7->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
+  BDyz7->GetListOfFunctions()->Add(new TNamed("Check","Distribution should not vary much"));
   BDyz7->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   BDyz7->Write();
 
@@ -2047,7 +2047,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz8->GetYaxis()->SetTitle("y (m)");
   BDyz8->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz8->GetListOfFunctions()->Add(new TNamed("Description","Bkg cluster position in the BWD ecl")); 
-  BDyz8->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
+  BDyz8->GetListOfFunctions()->Add(new TNamed("Check","Distribution should not vary much"));
   BDyz8->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   BDyz8->Write();
 
@@ -2058,7 +2058,7 @@ void ECL2D(TTree* bkg_tree)
   BDyz9->GetYaxis()->SetTitle("y (m)");
   BDyz9->GetListOfFunctions()->Add(new TNamed("MetaOptions","colz")); 
   BDyz9->GetListOfFunctions()->Add(new TNamed("Description","Bkg cluster position in barrel ecl")); 
-  BDyz9->GetListOfFunctions()->Add(new TNamed("Check","Distibution should not vary much"));
+  BDyz9->GetListOfFunctions()->Add(new TNamed("Check","Distribution should not vary much"));
   BDyz9->GetListOfFunctions()->Add(new TNamed("Contact","pche3675@uni.sydney.edu.au")); 
   BDyz9->Write();
   

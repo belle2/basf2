@@ -64,7 +64,7 @@ namespace Belle2 {
     void setLikelihoodMergedPi0(float likelihood) { m_LikelihoodMergedPi0 = likelihood; }
 
     // getters
-    /*! Get CR identifieer
+    /*! Get CR identifier
      * @return CRId
      */
     int getCRId() const { return m_CRId; }

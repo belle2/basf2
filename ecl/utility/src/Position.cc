@@ -81,7 +81,7 @@ namespace Belle2 {
             firstTheta = theta;
             firstPhi = phi;
           } else {
-            if (!foundSecondPhi and fabs(phi - firstPhi) > 1e-4) { // we cant use phi id in the endcaps
+            if (!foundSecondPhi and fabs(phi - firstPhi) > 1e-4) { // we can't use phi id in the endcaps
               foundSecondPhi = true;
             }
             if (!foundSecondTheta

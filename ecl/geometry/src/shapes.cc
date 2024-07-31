@@ -113,7 +113,7 @@ namespace Belle2 {
       /** create map of vertices */
       virtual map<int, G4ThreeVector> make_verticies(double wrapthick) const = 0;
 
-      /** get tesselated solid */
+      /** get tessellated solid */
       G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         map<int, G4ThreeVector> v = make_verticies(wrapthick);
@@ -472,7 +472,7 @@ namespace Belle2 {
         return v;
       }
 
-      /**get tesselated solid */
+      /**get tessellated solid */
       G4VSolid* get_tesselatedsolid(const string& prefix, double wrapthick, G4Translate3D& shift UNUSED) const override
       {
         if (nshape != 36) return nullptr; // only one crystal has pentagon shape

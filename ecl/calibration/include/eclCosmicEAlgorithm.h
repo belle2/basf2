@@ -47,10 +47,10 @@ namespace Belle2 {
 
     private:
       int fitOK = 16; /**< fit is OK */
-      int iterations = 8; /**< fit reached max number of iterations, but is useable */
-      int atLimit = 4; /**< a parameter is at the limit; fit not useable */
-      int poorFit = 3; /**< low chi square; fit not useable */
-      int noPeak = 2; /**< Novosibirsk component of fit is negligible; fit not useable */
+      int iterations = 8; /**< fit reached max number of iterations, but is usable */
+      int atLimit = 4; /**< a parameter is at the limit; fit not usable */
+      int poorFit = 3; /**< low chi square; fit not usable */
+      int noPeak = 2; /**< Novosibirsk component of fit is negligible; fit not usable */
       int notFit = -1; /**< no fit performed */
 
     };

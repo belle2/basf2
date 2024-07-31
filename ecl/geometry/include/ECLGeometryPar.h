@@ -34,7 +34,7 @@ namespace Belle2 {
 
 
     //! The Class for ECL Geometry Parameters
-    /*! This class provides ECL gemetry parameters for simulation, reconstruction and so on.
+    /*! This class provides ECL geometry parameters for simulation, reconstruction and so on.
         These parameters are got from geometry description
     */
     class ECLGeometryPar {
@@ -144,7 +144,7 @@ namespace Belle2 {
 
     /** EclNbr class  */
     class EclNbr {
-      // friend classses and functions
+      // friend classes and functions
 
     public:
       /** constants, enums and typedefs */

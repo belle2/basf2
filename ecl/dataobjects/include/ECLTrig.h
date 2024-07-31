@@ -35,7 +35,7 @@ namespace Belle2 {
     /*! Set Trig Time (crate Id)
      */
     void setTrigTag(int TrigTag) { m_TrigTag = TrigTag; }
-    /*! Set Triger Tag (crate Id)
+    /*! Set Trigger Tag (crate Id)
      */
     void setTimeTrig(double TimeTrig) { m_TimeTrig = TimeTrig; }
     /*! Get Trig ID

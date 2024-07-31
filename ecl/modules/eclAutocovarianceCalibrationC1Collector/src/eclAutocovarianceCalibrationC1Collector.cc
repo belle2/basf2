@@ -40,7 +40,7 @@ void eclAutocovarianceCalibrationC1CollectorModule::prepare()
 
   /**----------------------------------------------------------------------------------------*/
   /** Create the histograms and register them in the data store */
-  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitud (ADC)",
+  PPVsCrysID = new TH2F("PPVsCrysID", "Peak to peak amplitude for each crystal;crystal ID;Peak to peak Amplitude (ADC)",
                         ECLElementNumbers::c_NCrystals, 0,
                         ECLElementNumbers::c_NCrystals, MaxPeaktoPeakValue, 0, MaxPeaktoPeakValue);
   registerObject<TH2F>("PPVsCrysID", PPVsCrysID);

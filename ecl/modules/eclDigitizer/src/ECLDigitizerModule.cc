@@ -312,7 +312,7 @@ void ECLDigitizerModule::shapeSignals()
   if (m_inter) {
     // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
     // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
-    // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
+    // conversion factor to get equivalent energy deposition in the crystal to sum up it with deposition in crystal
     const double diodeEdep2crystalEdep = E2GeV * (1 / (5000 * 3.6e-6));
     for (const auto& hit : m_eclDiodeHits) {
       int cellId = hit.getCellId(); // 1 .. 8736
@@ -411,7 +411,7 @@ void ECLDigitizerModule::event()
     comp = selectAlgo(compAlgo & 0x7f);
     if (comp == nullptr)
       B2FATAL("Unknown compression algorithm: " << compAlgo);
-    isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrived
+    isTrigTime = compAlgo >> 7; // crate trigger times are stored and retrieved
     if (isTrigTime) {
       for (int i = 0; i < ECL::ECL_CRATES; i++) {
         unsigned char t = out.getNBits(7); // [0..72)
@@ -611,7 +611,7 @@ void ECLDigitizerModule::readDSPDB()
     for (int i = 0; i < ncellId; ++i)
       eclWaveformDataTable[cellId[i] - 1] = j;
   }
-  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matricies will be used.");
+  B2DEBUG(150, "ECLDigitizer: " << tree->GetEntries() << " sets of wave form covariance matrices will be used.");
 
   ECLWFAlgoParams* algo = new ECLWFAlgoParams;
   tree2->SetBranchAddress("Algopars", &algo);
@@ -651,7 +651,7 @@ void ECLDigitizerModule::readDSPDB()
     }
   }
   if (noise) delete noise;
-  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matricies were loaded.");
+  B2DEBUG(150, "ECLDigitizer: " << eclWFAlgoParams.size() << " noise matrices were loaded.");
 
   // repack fitting algorithm parameters
   m_idn.resize(eclWFAlgoParams.size());

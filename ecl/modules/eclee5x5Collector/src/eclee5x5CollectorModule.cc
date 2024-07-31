@@ -50,7 +50,7 @@ eclee5x5CollectorModule::eclee5x5CollectorModule() : CalibrationCollectorModule(
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using Bhabha events");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum ecl cluster theta in lab (degrees)", 17.);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "minimum ecl cluster theta in lab (degrees)", 17.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum ecl cluster theta in lab (degrees)", 150.);
   addParam("minE0", m_minE0, "minimum energy of cluster 0: E*0/sqrts", 0.45);
   addParam("minE1", m_minE1, "minimum energy of cluster 1: E*1/sqrts", 0.40);

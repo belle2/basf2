@@ -204,7 +204,7 @@ namespace Belle2 {
     std::vector<int>   m_numOfReg1ThetaBins; /**< Number of theta bins in region 1 */
     std::vector<int>   m_numOfReg2ThetaBins; /**< Number of theta bins in region 2 */
     std::vector<int>   m_numOfReg3ThetaBins; /**< Number of theta bins in region 3 */
-    std::vector<int>   m_phiPeriodicity; /**< Periodicity in phi - repeating patter in phi direction */
+    std::vector<int>   m_phiPeriodicity; /**< Periodicity in phi - repeating pattern in phi direction */
 
     // 1: Initial version
     ClassDef(ECLShowerCorrectorLeakageCorrection, 1); /**< ClassDef */

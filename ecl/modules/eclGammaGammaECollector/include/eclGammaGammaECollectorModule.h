@@ -37,7 +37,7 @@ namespace Belle2 {
 
   private:
     /** Parameters to control the job */
-    double m_thetaLabMinDeg{0.}; /**< miniumum photon theta in lab (0 degrees) */
+    double m_thetaLabMinDeg{0.}; /**< minimum photon theta in lab (0 degrees) */
     double m_thetaLabMaxDeg{180.}; /**< maximum photon theta in lab (180 degrees) */
     double m_minPairMass; /**< minimum invariant mass of the pair of photons (9 GeV/c^2) */
     double m_mindPhi; /**< minimum delta phi between clusters (179 deg) */

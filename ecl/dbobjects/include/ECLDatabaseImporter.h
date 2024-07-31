@@ -55,10 +55,10 @@ namespace Belle2 {
 
     /**
     * Import ECL corrections to showers energies.
-    * Temperary - there will be additional improvements done to these corrections in the future.
+    * Temporary - there will be additional improvements done to these corrections in the future.
     * Input file should be .txt file and have the format:
     * generated-energy bkg-scale-factor theta-min theta-max corr-factor.
-    * The numbers should be seperated by spaces.
+    * The numbers should be separated by spaces.
     * For each line, the theta value used is the average of theta-min and theta-max
     */
     void importShowerEnergyCorrectionTemporary();

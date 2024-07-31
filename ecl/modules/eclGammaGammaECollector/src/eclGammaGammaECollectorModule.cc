@@ -53,7 +53,7 @@ eclGammaGammaECollectorModule::eclGammaGammaECollectorModule() : CalibrationColl
   // Set module properties
   setDescription("Calibration Collector Module for ECL single crystal energy calibration using gamma gamma events");
   setPropertyFlags(c_ParallelProcessingCertified);
-  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "miniumum photon theta in lab (degrees)", 0.);
+  addParam("thetaLabMinDeg", m_thetaLabMinDeg, "minimum photon theta in lab (degrees)", 0.);
   addParam("thetaLabMaxDeg", m_thetaLabMaxDeg, "maximum photon theta in lab (degrees)", 180.);
   addParam("minPairMass", m_minPairMass, "minimum invariant mass of the pair of photons (GeV/c^2)", 9.);
   addParam("mindPhi", m_mindPhi, "minimum delta phi between clusters (deg)", 179.);

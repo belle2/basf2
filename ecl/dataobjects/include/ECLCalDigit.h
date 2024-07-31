@@ -133,8 +133,8 @@ namespace Belle2 {
      */
     double getTwoComponentDiodeEnergy() const { return m_TwoComponentDiodeEnergy; }
 
-    /*! Get two componnent chi2
-     * @return two componnent chi2
+    /*! Get two component chi2
+     * @return two component chi2
      */
     double getTwoComponentChi2() const { return m_TwoComponentChi2; }
 
@@ -148,8 +148,8 @@ namespace Belle2 {
       return m_TwoComponentSavedChi2[index];
     }
 
-    /*! Get two componnent fit type
-     * @return two componnent fit type
+    /*! Get two component fit type
+     * @return two component fit type
      */
     ECLDsp::TwoComponentFitType getTwoComponentFitType() const { return m_TwoComponentFitType; }
 

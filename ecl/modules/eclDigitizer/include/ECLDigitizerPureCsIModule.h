@@ -29,7 +29,7 @@ namespace Belle2 {
   /** The ECLDigitizerPureCsI module.
    *
    * This module is responsible to digitize all hits found in the ECL from ECLHit
-   * First, we simualte the sampling array by waveform and amplitude of hit, and
+   * First, we simulate the sampling array by waveform and amplitude of hit, and
    * smear this sampling array by corresponding error matrix.
    * We then fit the array as hardware of shaper DSP board to obtain the fit result
    * of amplitude, time and quality.
@@ -76,8 +76,8 @@ namespace Belle2 {
     bool isPureCsI(int cellId)
     {
       if (cellId > ECL::EclConfigurationPure::m_nch) return false;
-      int thId = m_thetaID[cellId - 1];
-      if (thId >= m_thetaIdMin && thId <= m_thetaIdMax) return true;
+      int this = m_thetaID[cellId - 1];
+      if (this >= m_thetaIdMin && this <= m_thetaIdMax) return true;
       return false;
     }
 

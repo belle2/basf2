@@ -64,7 +64,7 @@ void ECLClusterPropertiesModule::event()
     if (cluster != nullptr) {
       cluster->setMinTrkDistance(float(dist));
       cluster->setMinTrkDistanceID(trackID);
-      // compute path lenghts on the energy weighted average crystals
+      // compute path lengths on the energy weighted average crystals
       // direction and on the extrapolated track direction corresponding to
       // the minimum distance among the two lines. if more than one track is
       // related to a cluster the one with the highest momentum is used

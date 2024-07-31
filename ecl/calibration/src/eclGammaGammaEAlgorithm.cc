@@ -576,7 +576,7 @@ CalibrationAlgorithm::EResult eclGammaGammaEAlgorithm::calibrate()
   /**-----------------------------------------------------------------------------------------------*/
   /** Set the return code appropriately */
   if (m_storeConst == -1) {
-    B2INFO("eclGammaGammaEAlgorithm performed fits but was not asked to store contants");
+    B2INFO("eclGammaGammaEAlgorithm performed fits but was not asked to store constants");
     return c_Failure;
   } else if (!DBsuccess) {
     if (m_findExpValues) { B2INFO("eclGammaGammaEAlgorithm: failed to store expected values"); }

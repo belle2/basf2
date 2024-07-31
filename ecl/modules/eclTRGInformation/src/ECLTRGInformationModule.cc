@@ -78,7 +78,7 @@ void ECLTRGInformationModule::event()
   }
 
   int EventTiming = 0;
-  int RevoGDL = 0; // L1 Revo clk  (Same value in an evnet)
+  int RevoGDL = 0; // L1 Revo clk  (Same value in an event)
   int RevoFAM = 0; // FAM Revo clk (Same value in an event)
   for (const auto& trgEvt : m_trgUnpackerEvtStore) {
     EventTiming = trgEvt.getEvtTime();

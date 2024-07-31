@@ -45,7 +45,7 @@ RBB can be replaced with Coulomb and Touschek, and HER with LER.
 inputs = '~nakayama/basf2_opt/release_201506_12th/Work_MCgen/output/output_RBB_HER_study_1??.root'
 # inputs = '~nakayama/basf2_opt/release_201506_12th/Work_MCgen/output/output_RBB_HER_study_*.root'
 
-# Length of time in us (micro second) each sample file corrosponds to
+# Length of time in us (micro second) each sample file corresponds to
 timePerFile = 1
 
 # Set the sample time based on the number of files that will be opened

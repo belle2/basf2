@@ -29,3 +29,13 @@ void TauPairDecay::addTauMinusMcProng(int mprong)
 {
   m_mprong = mprong;
 }
+
+void TauPairDecay::addTauMinusEgstar(double megstar)
+{
+  m_megstar = megstar;
+}
+
+void TauPairDecay::addTauPlusEgstar(double pegstar)
+{
+  m_pegstar = pegstar;
+}

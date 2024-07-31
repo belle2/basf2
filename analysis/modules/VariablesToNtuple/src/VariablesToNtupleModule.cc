@@ -41,7 +41,7 @@ REG_MODULE(VariablesToNtuple);
 
 
 VariablesToNtupleModule::VariablesToNtupleModule() :
-  Module(), m_tree("", DataStore::c_Persistent)
+  Module(), m_tree("", DataStore::c_Persistent), m_outputFileMetaData("", DataStore::c_Persistent)
 {
   //Set module properties
   setDescription("Calculate variables specified by the user for a given ParticleList and save them into a TNtuple. The TNtuple is candidate-based, meaning that the variables of each candidate are saved into separate rows.");
@@ -78,10 +78,10 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("storeEventType", m_storeEventType,
            "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
 
-  addParam("additionalDataDescription", m_additionalDataDescription,
+  addParam("dataDescription", m_dataDescription,
            "Additional dictionary of "
            "name->value pairs to be added to the file metadata to describe the data",
-           m_additionalDataDescription);
+           m_dataDescription);
 
   addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
@@ -140,6 +140,12 @@ void VariablesToNtupleModule::initialize()
   m_tree.registerInDataStore(m_fileName + m_treeName, DataStore::c_DontWriteOut);
   m_tree.construct(m_treeName.c_str(), "");
   m_tree->get().SetCacheSize(100000);
+
+  if (!StoreObjPtr<FileMetaData>(m_fileName + c_treeNames[DataStore::c_Persistent].c_str(), DataStore::c_Persistent).isValid()) {
+    m_outputFileMetaData.registerInDataStore(m_fileName + c_treeNames[DataStore::c_Persistent].c_str(), DataStore::c_DontWriteOut);
+    m_outputFileMetaData.create();
+  }
+  m_outputFileMetaData.isRequired(m_fileName + c_treeNames[DataStore::c_Persistent].c_str());
 
   // declare counter branches - pass through variable list, remove counters added by user
   m_tree->get().Branch("__experiment__", &m_experiment, "__experiment__/I");
@@ -285,18 +291,18 @@ void VariablesToNtupleModule::event()
   m_production = m_eventMetaData->getProduction();
 
   if (start) {
-    m_outputFileMetaData.setLow(m_experiment, m_run, m_event);
-    m_outputFileMetaData.setHigh(m_experiment, m_run, m_event);
+    m_outputFileMetaData->setLow(m_experiment, m_run, m_event);
+    m_outputFileMetaData->setHigh(m_experiment, m_run, m_event);
   } else {
-    if ((m_experiment < m_outputFileMetaData.getExperimentLow()) || ((m_experiment == m_outputFileMetaData.getExperimentLow())
-        && ((m_run < m_outputFileMetaData.getRunLow())
-            || ((m_run == m_outputFileMetaData.getRunLow()) && (m_event < int(m_outputFileMetaData.getEventLow())))))) {
-      m_outputFileMetaData.setLow(m_experiment, m_run, m_event);
+    if ((m_experiment < m_outputFileMetaData->getExperimentLow()) || ((m_experiment == m_outputFileMetaData->getExperimentLow())
+        && ((m_run < m_outputFileMetaData->getRunLow())
+            || ((m_run == m_outputFileMetaData->getRunLow()) && (m_event < int(m_outputFileMetaData->getEventLow())))))) {
+      m_outputFileMetaData->setLow(m_experiment, m_run, m_event);
     }
-    if ((m_experiment > m_outputFileMetaData.getExperimentHigh()) || ((m_experiment == m_outputFileMetaData.getExperimentHigh())
-        && ((m_run > m_outputFileMetaData.getRunHigh())
-            || ((m_run == m_outputFileMetaData.getRunHigh()) && (m_event > int(m_outputFileMetaData.getEventHigh())))))) {
-      m_outputFileMetaData.setHigh(m_experiment, m_run, m_event);
+    if ((m_experiment > m_outputFileMetaData->getExperimentHigh()) || ((m_experiment == m_outputFileMetaData->getExperimentHigh())
+        && ((m_run > m_outputFileMetaData->getRunHigh())
+            || ((m_run == m_outputFileMetaData->getRunHigh()) && (m_event > int(m_outputFileMetaData->getEventHigh())))))) {
+      m_outputFileMetaData->setHigh(m_experiment, m_run, m_event);
     }
   }
 
@@ -306,10 +312,11 @@ void VariablesToNtupleModule::event()
       m_parentLfns.push_back(lfn);
     }
   }
+  m_outputFileMetaData->setParents(m_parentLfns);
 
   // check if the event is a full event or not: if yes, increase the counter
   if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
-    m_outputFileMetaData.setNFullEvents(m_outputFileMetaData.getNFullEvents() + 1);
+    m_eventCount++;
 
   if (m_stringWrapper.isValid())
     m_MCDecayString = m_stringWrapper->getString();
@@ -413,27 +420,40 @@ void VariablesToNtupleModule::event()
 
 void VariablesToNtupleModule::fillFileMetaData()
 {
-  if (m_file->Get("persistent")) return;
 
+  FileMetaData outputFileMetaData;
   bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
-  if (!isMC) m_outputFileMetaData.declareRealData();
+  if (!isMC) outputFileMetaData.declareRealData();
+
+  outputFileMetaData.setLow(m_outputFileMetaData->getExperimentLow(), m_outputFileMetaData->getRunLow(),
+                            m_outputFileMetaData->getEventLow());
+  outputFileMetaData.setHigh(m_outputFileMetaData->getExperimentHigh(), m_outputFileMetaData->getRunHigh(),
+                             m_outputFileMetaData->getEventHigh());
+  outputFileMetaData.setNFullEvents(m_eventCount);
 
   //fill more file level metadata
-  RootIOUtilities::setCreationData(m_outputFileMetaData);
-  m_outputFileMetaData.setRandomSeed(RandomNumbers::getSeed());
-  m_outputFileMetaData.setSteering(Environment::Instance().getSteering());
+  RootIOUtilities::setCreationData(outputFileMetaData);
+  outputFileMetaData.setRandomSeed(RandomNumbers::getSeed());
+  outputFileMetaData.setSteering(Environment::Instance().getSteering());
   auto mcEvents = Environment::Instance().getNumberOfMCEvents();
-  m_outputFileMetaData.setMcEvents(mcEvents);
-  m_outputFileMetaData.setDatabaseGlobalTag(Database::Instance().getGlobalTags());
-  for (const auto& item : m_additionalDataDescription) {
-    m_outputFileMetaData.setDataDescription(item.first, item.second);
-    B2INFO("additionalDataDescription: " << item.first);
+  outputFileMetaData.setMcEvents(mcEvents);
+  outputFileMetaData.setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  for (const auto& item : m_dataDescription) {
+    m_outputFileMetaData->setDataDescription(item.first, item.second);
   }
-  m_outputFileMetaData.setDataDescription("isNtupleMetaData", "True");
-  m_outputFileMetaData.setParents(m_parentLfns);
-  m_outputFileMetaData.setLfn(m_file->GetName());
+  for (const auto& item : m_outputFileMetaData->getDataDescription()) {
+    outputFileMetaData.setDataDescription(item.first, item.second);
+  }
+  outputFileMetaData.setDataDescription("isNtupleMetaData", "True");
+  for (int iParent = 0; iParent < m_outputFileMetaData->getNParents(); iParent++) {
+    std::string lfn = m_outputFileMetaData->getParent(iParent);
+    if ((std::find(m_parentLfns.begin(), m_parentLfns.end(), lfn) == m_parentLfns.end())) {
+      m_parentLfns.push_back(lfn);
+    }
+  }
+  outputFileMetaData.setParents(m_parentLfns);
+  outputFileMetaData.setLfn(m_file->GetName());
 
-  FileMetaData* outputFileMetaData = &m_outputFileMetaData;
   TTree* persistent = new TTree(c_treeNames[DataStore::c_Persistent].c_str(), c_treeNames[DataStore::c_Persistent].c_str());
   persistent->Branch("FileMetaData", &outputFileMetaData);
   persistent->Fill();
@@ -445,9 +465,7 @@ void VariablesToNtupleModule::terminate()
   if (!ProcHandler::parallelProcessingUsed() or ProcHandler::isOutputProcess()) {
 
     TDirectory::TContext directoryGuard(m_file.get());
-    if (m_outputFileMetaData.getNFullEvents() > 0) {
-      fillFileMetaData();
-    }
+    fillFileMetaData();
 
     B2INFO("Writing NTuple " << m_treeName);
     m_tree->write(m_file.get());

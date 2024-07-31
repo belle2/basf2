@@ -82,6 +82,7 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
+    unsigned int m_eventCount{0};    /**< event counter */
 
     /** Branch addresses of variables of type float. */
     std::vector<float> m_branchAddressesFloat;
@@ -117,13 +118,13 @@ namespace Belle2 {
     StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
     std::string m_eventType; /**< EventType to be filled */
 
-    std::map<std::string, std::string> m_additionalDataDescription; /**< Additional metadata description */
+    std::map<std::string, std::string> m_dataDescription; /**< Additional metadata description */
 
     std::vector<std::string> m_parentLfns; /**< Vector of parent file LFNs. */
 
     StoreObjPtr<FileMetaData> m_inputFileMetaData{"", DataStore::c_Persistent}; /**< Pointer to the input file meta data */
 
-    FileMetaData m_outputFileMetaData; /**< File meta data to be stored in the output ntuple file */
+    StoreObjPtr<FileMetaData> m_outputFileMetaData; /**< File meta data to be stored in the output ntuple file */
 
     bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
 

@@ -73,6 +73,20 @@ You can write several trees to the same file by calling the module several times
                           path=mypath)
 
 
+Metadata
+~~~~~~~~
+The module will also collect all the relevant ``FileMetaData`` attributes and write them out to the output file(s) in ``persistent`` tree. 
+Additional information can be added to the metadata by setting the ``dataDescription`` parameter:
+
+.. code-block:: python
+
+        from modularAnalysis import variablesToNtuple
+        variablesToNtuple('pi+:all', list_of_interesting_variables,
+                          treename='pions', filename='myoutput.root',
+                          dataDescription={'mcEventType':'mixed'}, # <-- multiple key:value pairs can be passed here
+                          path=mypath)
+
+
 As with many modules, there is a `modularAnalysis` convenience function:
 
 .. autofunction:: modularAnalysis.variablesToNtuple

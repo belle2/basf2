@@ -24,7 +24,8 @@ b2.set_random_seed("something random")
 testFile = 'ntuplemetadata.root'
 inputFile1 = 'test1.root'
 inputFile2 = 'test2.root'
-additionalDataDescription = {"adding_custom_key": "works"}
+dataDescription1 = {"adding_custom_key": "works"}
+dataDescription2 = {"with_multiple": "trees"}
 
 
 def get_metadata(name="output.root"):
@@ -64,12 +65,14 @@ with clean_working_directory() as tmpdir:
     main.add_module('RootInput', inputFileNames=[inputFile1, inputFile2])
     main.add_module('VariablesToNtuple',
                     fileName=testFile,
-                    treeName='tree'
+                    treeName='tree',
+                    dataDescription=dataDescription1
                     )
     main.add_module('VariablesToNtuple',
                     fileName=testFile,
                     treeName='anotherTree',
-                    additionalDataDescription=additionalDataDescription)
+                    dataDescription=dataDescription2
+                    )
     safe_process(main)
 
     metadata = get_metadata(testFile)
@@ -111,6 +114,7 @@ with clean_working_directory() as tmpdir:
 
     assert metadata.getDataDescription()["isNtupleMetaData"]
     assert "works" == metadata.getDataDescription()["adding_custom_key"]
+    assert "trees" == metadata.getDataDescription()["with_multiple"]
 
     os.system('touch Belle2FileCatalog.xml')
     assert 0 == os.system('b2file-metadata-add --lfn /logical/file/name ' + testFile)

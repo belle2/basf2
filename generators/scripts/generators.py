@@ -566,6 +566,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
         path (basf2.Path): path where the generator should be added
         finalstate (str): One of the following final states: "mu+mu-", "pi+pi-", "pi+pi-pi0", "pi+pi-pi+pi-" (or "2(pi+pi-)"),
           "pi+pi-pi0pi0" or ("pi+pi-2pi0"), "pi+pi-eta", "K+K-", "K0K0bar", "ppbar", "n0n0bar" or "Lambda0Lambda0bar"
+        eventType (str) : event type information
     """
 
     if finalstate == 'mu+mu-':
@@ -574,6 +575,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=0,        # mu+mu-
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_mumuISR')
 
     elif finalstate == 'pi+pi-':
@@ -582,6 +584,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=1,        # pi+pi-
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_pipiISR')
 
     elif finalstate == 'pi+pi-pi0':
@@ -590,6 +593,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=8,        # pi+pi-pi0
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_pipipi0ISR')
 
     elif finalstate == 'pi+pi-pi+pi-' or finalstate == '2(pi+pi-)':
@@ -598,6 +602,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=3,        # 2(pi+pi-)
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_pipipipiISR')
 
     elif finalstate == 'pi+pi-pi0pi0' or finalstate == 'pi+pi-2pi0':
@@ -606,6 +611,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=2,        # pi+pi-2pi0
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_pipipi0pi0ISR')
 
     elif finalstate == 'pi+pi-eta':
@@ -614,6 +620,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=10,       # pi+pi-eta
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_pipietaISR')
 
     elif finalstate == 'K+K-':
@@ -622,6 +629,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=6,        # K+K-
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_KKISR')
 
     elif finalstate == 'K0K0bar':
@@ -630,6 +638,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=7,        # K0K0bar
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_K0K0barISR')
 
     elif finalstate == 'ppbar':
@@ -638,6 +647,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=4,        # ppbar
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_ppbarISR')
 
     elif finalstate == 'n0n0bar':
@@ -646,6 +656,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=5,        # n0n0bar
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_n0n0barISR')
 
     elif finalstate == 'Lambda0Lambda0bar':
@@ -654,6 +665,7 @@ def add_phokhara_generator(path, finalstate='', eventType=''):
             FinalState=9,        # Lambda0Lambda0bar
             LO=0, NLO=1, QED=0,  # use full two loop corrections
             MinInvMassHadrons=0.,
+            eventType=eventType,
         ).set_name('PHOKHARA_Lambda0Lambda0barISR')
 
     else:

@@ -1,10 +1,8 @@
 [INFO] Steering file: framework/tests/test_b2help_recommendation.py
 Available tags for local:
-  - Data
-  - Neutral
-  - Systematics
-  - Tracking
-  - gamma
+ - Data                       - Neutral                  
+ - Systematics                - Tracking                 
+ - gamma                    
 
 Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.

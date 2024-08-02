@@ -149,7 +149,6 @@ C DECAY OF TAU+ IN THE TAU REST FRAME
         IF(IWARM.EQ.0) GOTO 902
         ISGN= IDF/IABS(IDF)
 
-<<<<<<< HEAD
 =======
 C RESTORE SAVED MASKS        
         JAK1=JAK1SV
@@ -160,7 +159,6 @@ C USER SELECTED LIST OF DECAYS
            CALL JAKEREQ(-1,JAK1)
         ENDIF
 
->>>>>>> 7ac84063e (Merge branch 'bugfix/CHCONJUGATE_TauToElOrMu_EqualBr_rel-09-00' into 'release/09-00')
 C AJWMOD to change BRs depending on sign:
         CALL TAURDF(KTO)
 

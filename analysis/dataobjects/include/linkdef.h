@@ -14,7 +14,7 @@
 #pragma link C++ class Belle2::StringWrapper+; // checksum=0xf15ef1c4, version=1
 #pragma link C++ class Belle2::EventShapeContainer+; // checksum=0xe048bccd, version=2
 #pragma link C++ class Belle2::EventKinematics+; // checksum=0xabfc6580, version=3
-#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x15ea58a, version=1
+#pragma link C++ class Belle2::TauPairDecay+; // checksum=0x3ecb631d, version=2
 #pragma link C++ class Belle2::ECLEnergyCloseToTrack+; // checksum=0xeadb37d4, version=1
 #pragma link C++ class Belle2::ECLTRGInformation+; // checksum=0x744abff9, version=3
 #pragma link C++ class Belle2::ECLTriggerCell+; // checksum=0xfcbe0110, version=2

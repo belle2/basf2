@@ -70,6 +70,12 @@ namespace Belle2 {
     /** Prong of the decay channel of tau+ */
     Int_t m_pprong;
 
+    /** Energy of radiative photon from tau- */
+    double m_megstar;
+
+    /** Energy of radiative photon from tau+ */
+    double m_pegstar;
+
     /** Boolean variable used to identify tau event */
     bool tauPair;
     /** Number of tau- in the event */
@@ -164,6 +170,8 @@ namespace Belle2 {
     std::vector<int> vec_lmb_br;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_alpha;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_gam;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_radgam_taum;/**< Variable name of the vector where particles identified in the event are stored */
+    std::vector<int> vec_radgam_taup;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauminus;/**< Variable name of the vector where particles identified in the event are stored */
     std::vector<int> vec_dau_tauplus;/**< Variable name of the vector where particles identified in the event are stored */
 
@@ -177,7 +185,8 @@ namespace Belle2 {
     void IdentifyTauPair();
     /** Identifies the number of charged final state particles in the decay*/
     int getProngOfDecay(const MCParticle& mc);
-
+    /** Energy of the radiative photon in tau rest frame */
+    double getEgstar(const std::vector<int>& vec_radgam, const MCParticle& mc);
   };
 
 }

@@ -512,14 +512,15 @@ void SVDUnpackerModule::event()
             //check CRC16
             crc16vec.pop_back();
             unsigned short iCRC = crc16vec.size();
-            uint32_t crc16input[iCRC];
+            std::vector<uint32_t> crc16input;
+            crc16input.reserve(iCRC);
 
             for (unsigned short icrc = 0; icrc < iCRC; icrc++)
-              crc16input[icrc] = htonl(crc16vec.at(icrc));
+              crc16input.push_back(htonl(crc16vec.at(icrc)));
 
             //verify CRC16
             boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-            bcrc.process_block(crc16input, crc16input + iCRC);
+            bcrc.process_bytes(crc16input.data(), crc16input.size() * sizeof(uint32_t));
             unsigned int checkCRC = bcrc.checksum();
 
             if (checkCRC != m_FTBTrailer.crc16) {

@@ -736,8 +736,9 @@ class Box(Plotter):
             b2.B2WARNING("Ignore empty boxplot.")
             return self
 
+        # we don't plot outliers as they cause the file size to explode if large datasets are used
         p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
-                              boxprops=dict(facecolor='blue', alpha=0.5),
+                              boxprops=dict(facecolor='blue', alpha=0.5), showfliers=False,
                               # medianprobs=dict(color='blue'),
                               # meanprobs=dict(color='red'),
                               )

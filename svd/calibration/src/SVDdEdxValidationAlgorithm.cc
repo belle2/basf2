@@ -328,8 +328,12 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   PIDDetectors.push_back("ALL");
   PIDDetectors.push_back("noSVD");
 
-  double SignalEfficiencyALL[m_NumROCpoints], FakeEfficiencyALL[m_NumROCpoints];
-  double SignalEfficiencynoSVD[m_NumROCpoints], FakeEfficiencynoSVD[m_NumROCpoints];
+  std::vector<double> SignalEfficiencyALL, FakeEfficiencyALL;
+  SignalEfficiencyALL.reserve(m_NumROCpoints);
+  FakeEfficiencyALL.reserve(m_NumROCpoints);
+  std::vector<double> SignalEfficiencynoSVD, FakeEfficiencynoSVD;
+  SignalEfficiencynoSVD.reserve(m_NumROCpoints);
+  FakeEfficiencynoSVD.reserve(m_NumROCpoints);
 
   TString SignalFiducialCut = SignalVarName +  PIDVarName + "noSVD>=0"; // sanity cuts to reject events with NaN
   TString FakesFiducialCut = FakeVarName +  PIDVarName + "noSVD>=0";
@@ -370,11 +374,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
       }
 
       if (PIDDetectors[i] == "ALL") {
-        SignalEfficiencyALL[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
+        SignalEfficiencyALL.push_back(hSelectedSignal->Integral() / hAllSignal->Integral());
       }
 
       if (PIDDetectors[i] == "noSVD") {
-        SignalEfficiencynoSVD[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
+        SignalEfficiencynoSVD.push_back(hSelectedSignal->Integral() / hAllSignal->Integral());
       }
     }
   }
@@ -413,11 +417,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
       }
 
       if (PIDDetectors[i] == "ALL") {
-        FakeEfficiencyALL[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
+        FakeEfficiencyALL.push_back(hSelectedFakes->Integral() / hAllFakes->Integral());
       }
 
       if (PIDDetectors[i] == "noSVD") {
-        FakeEfficiencynoSVD[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
+        FakeEfficiencynoSVD.push_back(hSelectedFakes->Integral() / hAllFakes->Integral());
       }
     }
   }
@@ -426,7 +430,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   TMultiGraph* hmgraph = new TMultiGraph();
 
   // efficiency and kaon fake rate
-  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiencyALL, SignalEfficiencyALL);
+  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiencyALL.data(), SignalEfficiencyALL.data());
   hgraphALL->SetMarkerColor(TColor::GetColor("#2166ac"));
   hgraphALL->SetMarkerStyle(20);
   hgraphALL->SetLineColor(TColor::GetColor("#2166ac"));
@@ -434,7 +438,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   hgraphALL->SetDrawOption("AP*");
   hgraphALL->SetTitle("with SVD");
 
-  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiencynoSVD, SignalEfficiencynoSVD);
+  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiencynoSVD.data(), SignalEfficiencynoSVD.data());
   hgraphnoSVD->SetMarkerColor(TColor::GetColor("#ef8a62"));
   hgraphnoSVD->SetLineColor(TColor::GetColor("#ef8a62"));
   hgraphnoSVD->SetLineWidth(3);

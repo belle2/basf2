@@ -295,8 +295,11 @@ void ECLWaveformFitModule::beginRun()
 void ECLWaveformFitModule::initialize()
 {
   // ECL dataobjects
-  m_eclDSPs.registerInDataStore();
-  m_eclDigits.registerInDataStore();
+  m_eclDSPs.isRequired();
+  m_eclDigits.isRequired();
+  // While we set a relation from ECLDsps to ECLDigits here, the relation
+  // is already register in previous modules: let's require it here
+  m_eclDSPs.registerRelationTo(m_eclDigits);
 
   //initializing fit minimizer
   m_MinuitPhotonHadron = new TMinuit(4);

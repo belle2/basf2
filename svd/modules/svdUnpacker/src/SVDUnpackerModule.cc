@@ -187,10 +187,11 @@ void SVDUnpackerModule::event()
 
       const unsigned short maxNumOfCh = m_rawSVD[i]->GetMaxNumOfCh(j);
 
-      unsigned short nWords   [maxNumOfCh];
+      std::vector<unsigned short> nWords;
+      nWords.reserve(maxNumOfCh);
       uint32_t*      data32tab[maxNumOfCh]; //vector of pointers
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
-        nWords[k]    = m_rawSVD[i]->GetDetectorNwords(j, k);
+        nWords.push_back(m_rawSVD[i]->GetDetectorNwords(j, k));
         data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the begining of the 1st buffer
       }
 
@@ -211,18 +212,18 @@ void SVDUnpackerModule::event()
 
       for (unsigned int buf = 0; buf < maxNumOfCh; buf++) { // loop over 4(COPPER) or 48(PCIe40) buffers
 
-        if (data32tab[buf] == nullptr || nWords[buf] == 0) {
-          if (data32tab[buf] != nullptr || nWords[buf] != 0) {
+        if (data32tab[buf] == nullptr || nWords.at(buf) == 0) {
+          if (data32tab[buf] != nullptr || nWords.at(buf) != 0) {
             B2WARNING("Invalid combination of buffer pointer and nWords:" <<
                       LogVar("COPPER/PCIe40 ID", i) <<
                       LogVar("COPPER/PCIe40 Entry", j) <<
                       LogVar("COPPER/PCIe40 Channel", buf) <<
                       LogVar("data32tab[buf]", data32tab[buf]) <<
-                      LogVar("nWords[buf]", nWords[buf]));
+                      LogVar("nWords[buf]", nWords.at(buf)));
           }
           continue;
         }
-        if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords[buf] - 1], nWords[buf]);
+        if (m_printRaw) printB2Debug(data32tab[buf], data32tab[buf], &data32tab[buf][nWords.at(buf) - 1], nWords.at(buf));
 
         cntFADCboards++;
 
@@ -236,7 +237,7 @@ void SVDUnpackerModule::event()
         //reset value for headers and trailers check
         seenHeadersAndTrailers = 0;
 
-        for (; data32_it != &data32tab[buf][nWords[buf]]; data32_it++) {
+        for (; data32_it != &data32tab[buf][nWords.at(buf)]; data32_it++) {
           m_data32 = *data32_it; //put current 32-bit frame to union
 
           if (m_data32 == 0xffaa0000) {   // first part of FTB header

@@ -13,7 +13,7 @@ import b2test_utils
 import validation_gt as vgt
 
 
-if not b2test_utils.is_ci():
+if b2test_utils.is_ci():
     b2test_utils.skip_test("Will not run the test because $BELLE2_IS_CI is not set.")
 
 calibration_path = b2test_utils.require_file('calibration', 'validation')

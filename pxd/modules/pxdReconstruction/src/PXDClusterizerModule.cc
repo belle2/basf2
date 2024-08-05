@@ -317,7 +317,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
                                   m_relClusterTrueHitName);
 
   //Get Geometry information
-  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
+  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
                                                              sensorID));
 
   map<unsigned int, float> mc_relations;

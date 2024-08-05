@@ -243,7 +243,7 @@ void SVDClusterizerDirectModule::event()
     bool isU = sampleDigit.isUStrip();
 
     // Retrieve sensor parameters from GeoCache
-    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+    const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     double pitch = isU ? info.getUPitch() : info.getVPitch();
 
     // 4. Cycle through digits and form clusters on the way.

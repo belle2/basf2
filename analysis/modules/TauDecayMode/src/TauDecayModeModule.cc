@@ -18,6 +18,8 @@
 #include <map>
 #include <fstream>
 #include <set>
+#include <Math/LorentzRotation.h>
+#include <Math/Boost.h>
 using namespace std;
 using namespace Belle2;
 
@@ -59,7 +61,8 @@ REG_MODULE(TauDecayMode);
 //-----------------------------------------------------------------
 
 TauDecayModeModule::TauDecayModeModule() : Module(), m_taum_no(0), m_taup_no(0), m_mmode(-2), m_pmode(-2),
-  m_mprong(0), m_pprong(0), tauPair(false), numOfTauMinus(0), numOfTauPlus(0), idOfTauMinus(-1), idOfTauPlus(-1),
+  m_mprong(0), m_pprong(0), m_megstar(0), m_pegstar(0),
+  tauPair(false), numOfTauMinus(0), numOfTauPlus(0), idOfTauMinus(-1), idOfTauPlus(-1),
   m_isEtaPizPizPizFromTauMinus(false), m_isEtaPizPizPizFromTauPlus(false),
   m_isOmegaPimPipFromTauMinus(false), m_isOmegaPimPipFromTauPlus(false)
 {
@@ -121,11 +124,16 @@ void TauDecayModeModule::event()
     m_pprong = getProngOfDecay(*MCParticles[idOfTauPlus - 1]);
     m_mprong = getProngOfDecay(*MCParticles[idOfTauMinus - 1]);
 
+    m_megstar = getEgstar(vec_radgam_taum, *MCParticles[idOfTauMinus - 1]);
+    m_pegstar = getEgstar(vec_radgam_taup, *MCParticles[idOfTauPlus - 1]);
+
   } else {
     m_pmode = -1;
     m_mmode = -1;
     m_pprong = -1;
     m_mprong = -1;
+    m_megstar = -1;
+    m_pegstar = -1;
   }
 
   if (!m_tauDecay) m_tauDecay.create();
@@ -135,6 +143,8 @@ void TauDecayModeModule::event()
   m_tauDecay->addTauPlusMcProng(m_pprong);
   m_tauDecay->addTauMinusMcProng(m_mprong);
 
+  m_tauDecay->addTauMinusEgstar(m_megstar);
+  m_tauDecay->addTauPlusEgstar(m_pegstar);
 }
 
 void TauDecayModeModule::AnalyzeTauPairEvent()
@@ -186,6 +196,8 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
   vec_lmb_br.clear();
   vec_alpha.clear();
   vec_gam.clear();
+  vec_radgam_taum.clear();
+  vec_radgam_taup.clear();
   //
   map<int, std::vector<int>> map_vec;
   //
@@ -236,6 +248,9 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
   map_vec[94144] = vec_alpha;
   map_vec[22] = vec_gam;
 
+  bool TauMinusIsLeptonicDecay = false;
+  bool TauPlusIsLeptonicDecay = false;
+
   bool elecFirst = true;
   bool muonFirst = true;
 
@@ -285,7 +300,24 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       continue; // only consider particles coming from generator, e.g. discard particles added by Geant4
     if (p.isInitial()) continue; // pick e-  e+, but not from the incoming beams
 
-    if (pdgid == Const::electron.getPDGCode() && elecFirst)  {
+    // Check IsLeptonicDecay first
+    if (abs(pdgid) == 12 || abs(pdgid) == 14) { // (anti-)nu_e or (anti-)nu_mu
+      int leptonicdecay = 0;
+      const MCParticle* mother = p.getMother(); // tau- or tau+
+      const vector<MCParticle*> daughters = mother->getDaughters();
+      for (MCParticle* d : daughters) {
+        int dauid = abs(d->getPDG());
+        if (dauid == 11 || dauid == 12 || dauid == 13 || dauid == 14 || dauid == 16) {
+          leptonicdecay++;
+        }
+      }
+      if (leptonicdecay == 3) {
+        if (mother->getPDG() == 15) TauMinusIsLeptonicDecay = true;
+        if (mother->getPDG() == -15) TauPlusIsLeptonicDecay = true;
+      }
+    }
+
+    else if (pdgid == Const::electron.getPDGCode() && elecFirst)  {
       elecFirst = false;
       const MCParticle* mother = p.getMother();
       if (not mother) continue; // In some low multiplicity generators there may be no mother
@@ -321,6 +353,13 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       if (nMuMinus == 1 && nMuPlus == 1) { // use this information in getRecursiveMotherCharge
         B2DEBUG(19, "Mother of muon pair is = " << mother->getPDG() << " which has daughters : " << muon_ss.str());
       }
+    }
+
+    // Photons from PHOTOS are radiative photons
+    else if (pdgid == Const::photon.getPDGCode() && p.hasStatus(MCParticle::c_IsPHOTOSPhoton))  {
+      int chg = getRecursiveMotherCharge(MCParticles[i]);
+      if (chg < 0) vec_radgam_taum.push_back(i);
+      if (chg > 0) vec_radgam_taup.push_back(i);
     }
 
     // Photons from PHOTOS do not define tau decay mode
@@ -410,6 +449,13 @@ void TauDecayModeModule::AnalyzeTauPairEvent()
       // check if the gamma comes from tau
       bool isRadiationfromTau = false;
       if (mothid == 15) isRadiationfromTau = true;
+
+      // Photons from LeptonicTauDecays are radiative photons not added by PHOTOS
+      if (isRadiationfromTau) {
+        int chg = getRecursiveMotherCharge(MCParticles[i]);
+        if (chg < 0 && TauMinusIsLeptonicDecay) vec_radgam_taum.push_back(i);
+        if (chg > 0 && TauPlusIsLeptonicDecay)  vec_radgam_taup.push_back(i);
+      }
 
       // check if the gamma comes from 2 body LFV decays of tau, e.g. tau- -> e-/mu- gamma with arbitrary number of extra photon radiations from PHOTOS/FSR
       bool isLFVTau2BodyDecay = false;
@@ -814,4 +860,23 @@ int TauDecayModeModule::getProngOfDecay(const MCParticle& p)
     else ret += getProngOfDecay(*d);
   }
   return ret;
+}
+
+// Energy of the radiative photon in tau rest frame
+double TauDecayModeModule::getEgstar(const std::vector<int>& vec_radgam, const MCParticle& p)
+{
+  double egstar = -1.;
+  ROOT::Math::PxPyPzEVector p4_tau = p.get4Vector();
+  B2DEBUG(19, "p4_tau: " << p4_tau << " " << p4_tau.P());
+  ROOT::Math::Boost boost_to_mother_rest_frame(p4_tau.BoostToCM());
+  for (auto i : vec_radgam) {
+    ROOT::Math::PxPyPzEVector p4_gamma = MCParticles[i]->get4Vector();
+    B2DEBUG(19, "p4_gamma: " << p4_gamma << " " << p4_gamma.P());
+    ROOT::Math::PxPyPzEVector p4_gamma_rest = boost_to_mother_rest_frame * p4_gamma;
+    B2DEBUG(19, "p4_gamma_rest: " << p4_gamma_rest << " " << p4_gamma_rest.P());
+    double energy_rest = p4_gamma_rest.E();
+    if (energy_rest > egstar) egstar = energy_rest;
+  }
+  B2DEBUG(19, "egstar: " << egstar);
+  return egstar;
 }

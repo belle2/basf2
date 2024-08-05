@@ -78,6 +78,7 @@ def add_generator_preselection(
                                             MinPhotonEnergy=MinPhotonEnergy,
                                             MinPhotonTheta=MinPhotonTheta,
                                             MaxPhotonTheta=MaxPhotonTheta,
+                                            applyInCMS=applyInCMS,
                                             stableParticles=stableParticles
                                             )
 

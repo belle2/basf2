@@ -63,10 +63,6 @@ namespace Belle2 {
       return *this;
     }
 
-    /** Destructor
-     */
-    ~RefHistObject(void) {};
-
     /** Reset histogram and update flag, not the entries
      */
     void resetBeforeEvent(void);

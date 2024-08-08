@@ -293,14 +293,15 @@ void SVDPackerModule::event()
     // crc16 calculation
     //first swap all 32-bits word -> big endian
     unsigned short nCRC = data_words.size();
-    uint32_t tmpBuffer[nCRC];
+    std::vector<uint32_t> tmpBuffer;
+    tmpBuffer.reserve(nCRC);
 
     for (unsigned short i = 0; i < nCRC; i++)
-      tmpBuffer[i] = htonl(data_words[i]);
+      tmpBuffer.push_back(htonl(data_words[i]));
 
     //compute crc16
     boost::crc_basic<16> bcrc(0x8005, 0xffff, 0, false, false);
-    bcrc.process_block(tmpBuffer, tmpBuffer + nCRC);
+    bcrc.process_bytes(tmpBuffer.data(), tmpBuffer.size() * sizeof(uint32_t));
     unsigned int crc = bcrc.checksum();
 
 

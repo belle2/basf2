@@ -77,21 +77,21 @@ namespace Belle2 {
      */
     std::vector<double> CreatePBinningScheme()
     {
-      double pbins[m_numPBins + 1];
-      pbins[0] = 0.0;
-      pbins[1] = 0.05;
+      std::vector<double> pbins;
+      pbins.reserve(m_numPBins + 1);
+      pbins.push_back(0.0);
+      pbins.push_back(0.05);
 
       for (int iBin = 2; iBin <= m_numPBins; iBin++) {
         if (iBin <= 19)
-          pbins[iBin] = 0.025 + 0.025 * iBin;
+          pbins.push_back(0.025 + 0.025 * iBin);
         else if (iBin <= 59)
-          pbins[iBin] = pbins[19] + 0.05 * (iBin - 19);
+          pbins.push_back(pbins.at(19) + 0.05 * (iBin - 19));
         else
-          pbins[iBin] = pbins[59] + 0.3 * (iBin - 59);
+          pbins.push_back(pbins.at(59) + 0.3 * (iBin - 59));
       }
 
-      std::vector<double> pbinsvec(pbins, pbins + sizeof pbins);
-      return pbinsvec;
+      return pbins;
     }
   };
 } // namespace Belle2

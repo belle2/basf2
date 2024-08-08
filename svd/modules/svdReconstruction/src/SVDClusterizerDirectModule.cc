@@ -29,6 +29,7 @@
 #include <cassert>
 
 using namespace std;
+using namespace std::placeholders;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
@@ -277,7 +278,7 @@ void SVDClusterizerDirectModule::event()
 
       auto samples = digit.getSamples();
       transform(samples.begin(), samples.end(), normedSamples.begin(),
-                bind2nd(divides<float>(), stripNoiseADU));
+                bind(divides<float>(), _1, stripNoiseADU));
       bool validDigit = pass3Samples(normedSamples, m_cutAdjacent);
 
       // If this is a valid digit, store normed samples.

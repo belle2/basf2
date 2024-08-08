@@ -29,6 +29,7 @@
 #include <cassert>
 
 using namespace std;
+using namespace std::placeholders;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
@@ -356,7 +357,7 @@ void SVDNNClusterizerModule::event()
           B2FATAL("Missing SVDRecoDigits->SVDShaperDigits relation. This should not happen.");
         auto samples = shaperDigit->getSamples();
         transform(samples.begin(), samples.end(), normedSamples.begin(),
-                  bind2nd(divides<float>(), stripNoiseADU));
+                  bind(divides<float>(), _1, stripNoiseADU));
 
         // These are from ShaperDigit, we need to zeroSuppress again,
         // just in case.

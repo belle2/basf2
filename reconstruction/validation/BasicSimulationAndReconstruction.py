@@ -116,7 +116,7 @@ def run():
         def event(self):
             ''' Event processor: fill histograms '''
 
-            for h in self.hist:
+            for h in self.hists:
                 digits = Belle2.PyStoreArray(h.GetName())
                 if h.GetName() == 'ECLDigits':
                     n = 0

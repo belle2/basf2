@@ -111,7 +111,6 @@ class LeptonicUntagged(BaseSkim):
                  contact, "", ""),
                 ("d0_muonID_noSVD", 100, 0, 1, "muonID_noSVD of signal-side lepton", contact,
                  "", ""),
-                ("R2", 100, 0, 1, "R2", contact, "", ""),
                 ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
                  "", ""),
             ],

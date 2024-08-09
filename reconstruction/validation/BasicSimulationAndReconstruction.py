@@ -48,7 +48,6 @@ def run():
         * SVDShaperDigits
         * SVDClusters
         * SVDSpacePoints
-        * zero-suppressed SVDShaperDigits for L3 (SVDShaperDigitsZS5)
         * CDCHits
         * CDCHits above threshold
         * TOPDigits
@@ -78,25 +77,24 @@ def run():
 
             self.hists = []
             self.hists.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
-                                   200, 0, 1000))
+                                   100, 0, 100))
             self.hists.append(TH1F('PXDClusters', 'PXDClusters (no data reduction)',
-                                   200, 0, 1000))
+                                   50, 0, 50))
             self.hists.append(TH1F('PXDSpacePoints', 'PXDSpacePoints (no data reduction)',
-                                   200, 0, 1000))
-            self.hists.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 200, 0, 200))
-            self.hists.append(TH1F('SVDClusters', 'SVDClusters', 200, 0, 200))
-            self.hists.append(TH1F('SVDSpacePoints', 'SVDSpacePoints', 200, 0, 200))
-            self.hists.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 200, 0, 200))
+                                   50, 0, 50))
+            self.hists.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 200, 0, 800))
+            self.hists.append(TH1F('SVDClusters', 'SVDClusters', 200, 0, 400))
+            self.hists.append(TH1F('SVDSpacePoints', 'SVDSpacePoints', 200, 0, 600))
             self.hists.append(TH1F('CDCHits', 'CDCHits (all)', 200, 0, 2000))
             self.hists.append(TH1F('CDCHitsAboveThreshold', 'CDCHits (above threshold)', 200, 0, 2000))
-            self.hists.append(TH1F('TOPDigits', 'TOPDigits', 200, 0, 200))
+            self.hists.append(TH1F('TOPDigits', 'TOPDigits', 200, 0, 800))
             self.hists.append(TH1F('ARICHDigits', 'ARICHDigits', 200, 0, 200))
             self.hists.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
-                                   200, 0, 400))
+                                   100, 0, 100))
             self.hists.append(TH1F('KLMDigits', 'KLMDigits', 200, 0, 200))
 
             for h in self.hists:
-                h.SetXTitle('number of digits in event')
+                h.SetXTitle(f'Number of {h.GetName()} in event')
                 option = 'shifter'
                 descr = TNamed('Description', 'Number of ' + h.GetName() +
                                ' per event (no BG overlay, just result of add_simulation and basic reconstruction)')
@@ -124,16 +122,10 @@ def run():
                         if digit.getAmp() > 500:  # roughly 25 MeV
                             n += 1
                     h.Fill(n)
+                elif h.GetName() == 'CDCHitsAboveThreshold':
+                    pass
                 else:
                     h.Fill(digits.getEntries())
-
-            # SVD
-            svdDigits = Belle2.PyStoreArray('SVDShaperDigitsZS5')
-            nL3 = 0
-            for svdDigit in svdDigits:
-                if svdDigit.getSensorID().getLayerNumber() == 3:  # only check SVD L3
-                    nL3 += 1
-            self.hists[6].Fill(nL3/self.nSVDL3 * 100)
 
             # CDC
             cdcHits = Belle2.PyStoreArray('CDCHits')
@@ -143,7 +135,9 @@ def run():
                     nCDC_above_threshold += 1
                 if cdcHit.getISuperLayer() != 0 and cdcHit.getADCCount() > 18:
                     nCDC_above_threshold += 1
-            self.hists[8].Fill(nCDC_above_threshold)
+            for h in self.hists:
+                if h.GetName() == 'CDCHitsAboveThreshold':
+                    h.Fill(nCDC_above_threshold)
 
         def terminate(self):
             """ Write histograms to file."""

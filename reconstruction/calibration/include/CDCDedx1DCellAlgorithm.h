@@ -19,6 +19,8 @@
 #include <TTree.h>
 #include <TStyle.h>
 #include <TLegend.h>
+#include <TRandom.h>
+
 
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <calibration/CalibrationAlgorithm.h>
@@ -109,10 +111,8 @@ namespace Belle2 {
       if (charge < 0)m_chargeType = -1.0;
       else if (charge > 0)m_chargeType = 1.0;
       else if (charge == 0)m_chargeType = 0.0;
-      else {
-        std::cout << "choose charge value either +/-1 or 0" << std::endl;
-        exit(1);
-      }
+      else
+        B2FATAL("Choose charge value either +/-1 or 0");
     }
 
     /**

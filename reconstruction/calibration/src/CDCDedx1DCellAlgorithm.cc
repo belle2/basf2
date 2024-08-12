@@ -31,7 +31,7 @@ CDCDedx1DCellAlgorithm::CDCDedx1DCellAlgorithm() :
   isVarBins(true),
   isRotSymm(false),
   isMakePlots(true),
-  isPrintLog(true),
+  isPrintLog(false),
   isMerge(true),
   m_suffix("")
 {
@@ -72,8 +72,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   CreateBinMapping();
 
   if (isPrintLog) {
-    std::cout << "inner layers bins: " << m_eaBinLocal[0] << std::endl;
-    std::cout << "outer layers bins: " << m_eaBinLocal[1] << std::endl;
+    B2INFO("inner layers bins: " << m_eaBinLocal[0]);
+    B2INFO("outer layers bins: " << m_eaBinLocal[1]);
   }
 
   // dedxhit vector to store dE/dx values for each enta bin
@@ -84,6 +84,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
   TH2D* hptcosth = new TH2D("hptcosth", "pt vs costh dist;pt;costh", 1000, -8.0, 8.0, 1000, -1.0, 1.0);
 
   defineHisto(hdedxhit, hdedxlay, hentalay);
+
+  TRandom*  random = new TRandom();
 
   //Star filling histogram defined above
   for (int i = 0; i < ttree->GetEntries(); ++i) {
@@ -99,8 +101,8 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     if (abs(pt) > m_ptMax) continue;
 
     //change to random 10%
-    int random = rand() % 100;
-    if (random < 10) hptcosth->Fill(pt, costh);
+    int rand = random->Integer(100);
+    if (rand < 10) hptcosth->Fill(pt, costh);
 
     for (unsigned int j = 0; j < dedxhit->size(); ++j) {
 
@@ -116,7 +118,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
       else mL = 1;
 
       hdedxlay[mL]->Fill(dedxhit->at(j));
-      if (random < 10) hentalay[mL]->Fill(entaval);
+      if (rand < 10) hentalay[mL]->Fill(entaval);
 
       int jbinea = ibin;
       if (isVarBins) jbinea = m_binIndex[mL].at(ibin);
@@ -200,6 +202,14 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     plotEventStats();
   }
 
+  for (int il = 0; il < 2; il++) {
+    delete hentalay[il];
+    delete hdedxlay[il];
+    for (int iea = 0; iea < m_eaBinLocal[il]; iea++)
+      delete hdedxhit[il][iea];
+  }
+
+  delete hptcosth;
   return c_OK;
 }
 
@@ -299,7 +309,7 @@ void CDCDedx1DCellAlgorithm::defineHisto(std::vector<TH1D*> hdedxhit[2],  TH1D* 
       double max = m_binValue[il].at(iea + 1);
       double width =  max - min;
 
-      if (isPrintLog) printf("bin: %d ], min: %0.03f, max: %0.03f, width: %0.03f\n", iea, min, max, width);
+      if (isPrintLog) B2INFO("bin: " << iea << " ], min:" << min << " , max: " << max << " , width: " << width);
 
       title = Form("%s: entaRS = (%0.03f to %0.03f)", m_label[il].data(), min, max);
       hdedxhit[il].push_back(new TH1D(Form("hdedxhit_%s_bin%d", m_label[il].data(), iea), "", m_dedxBin, m_dedxMin, m_dedxMax));
@@ -400,7 +410,7 @@ void CDCDedx1DCellAlgorithm::plotMergeFactor(std::map<int, std::vector<double>> 
     Double_t* nvarBins;
     nvarBins = &bounds[il][0];
 
-    TH1I* hist = new TH1I(Form("hist_%s", m_label[il].data()), "", nDev[il], nvarBins);
+    TH1I* hist  = new TH1I(Form("hist_%s", m_label[il].data()), "", nDev[il], nvarBins);
     hist->SetTitle(Form("Merging factor for %s bins;binindex;merge-factors", m_label[il].data()));
 
     for (int ibin = 0; ibin < nDev[il]; ibin++) hist->SetBinContent(ibin + 1, steps[il][ibin]);
@@ -408,6 +418,7 @@ void CDCDedx1DCellAlgorithm::plotMergeFactor(std::map<int, std::vector<double>> 
     cmfactor.cd(il + 1);
     hist->SetFillColor(kYellow);
     hist->Draw("hist");
+    delete hist;
   }
 
   cmfactor.SaveAs(Form("cdcdedx_1dcell_mergefactor%s.pdf", m_suffix.data()));
@@ -449,6 +460,7 @@ void CDCDedx1DCellAlgorithm::plotdedxHist(std::vector<TH1D*> hdedxhit[2])
         gPad->Clear("D");
         ctmp.Clear("D");
       }
+      delete htempC;
     }
   }
   psname.str("");
@@ -554,6 +566,9 @@ void CDCDedx1DCellAlgorithm::plotRelConst(std::vector<double>tempconst, std::vec
   }
   cconst.SaveAs(Form("cdcdedx_1dcell_relconst%s_%s.pdf", m_label[il].data(), m_suffix.data()));
   cconst.SaveAs(Form("cdcdedx_1dcell_relconst%s_%s.root", m_label[il].data(), m_suffix.data()));
+
+  delete hconst;
+  delete hconstvar;
 }
 
 //--------------------------------------------------
@@ -608,6 +623,11 @@ void CDCDedx1DCellAlgorithm::plotConstants()
 
   cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts%s.pdf", m_suffix.data()));
   cfconst.SaveAs(Form("cdcdedx_1dcell_fconsts%s.root", m_suffix.data()));
+
+  for (int il = 0; il < 2; il++) {
+    delete hnewconst[il];
+    delete holdconst[il];
+  }
 }
 
 //------------------------------------

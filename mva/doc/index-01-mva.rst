@@ -102,18 +102,15 @@ It is used in the Flavor Tagger and by the HLT people.
 NeuroBayes
 ^^^^^^^^^^
 
-was the default method in Belle I and widely used for a lot of analyses.
+was the default method in Belle and widely used for a lot of analyses.
 It provides a smart feature preprocessing, converges a lot faster and more robust than other neural network implementations.
 In addition, it provides an analysis-pdf output which describes the importance of each feature.
-However, NeuroBayes is a commercial product and is no longer supported by the company, only some minimal legacy support is available, no bug fixes, new features, ... Use it for comparison with Belle I results.
+However, NeuroBayes is a commercial product and is no longer supported by the company, only some minimal legacy support is available, no bug fixes, new features, ... Use it for comparison with Belle results.
 
 Python-based
 ^^^^^^^^^^^^
 
-All frameworks which provide a python interface are supported e.g. XGBoost, SKLearn, Tensorflow, Theano.
-However, only TensorFlow and Theano are installed by default, the others you can only use in your local installation by installing them using pip3.
-It is possible to include these other methods in the externals as well i.e. to ship them with basf2, but you will have to give a good justification for this.
-In general, these options mainly provide a playground to test new technologies e.g. deep-learning frameworks like Tensorflow and Theano.
+All frameworks which provide a python interface are supported. XGBoost, LightGBM, SKLearn, Tensorflow, Keras and PyTorch are included in the externals and mva methods using these frameworks can be trained and applied without additional setup. For details on which version of these packages and which related packages (e.g. PyTorch Geometric) are available please refer to the documentation of the externals. It is possible to use alternate python-based frameworks locally by installing them using pip3. Mva methods which use a framework that is not included in the externals cannot be used on the grid. It is possible to include these other frameworks in the externals as well i.e. to ship them with basf2, but you will have to give a good justification for this.
 
 Using the mva package
 ---------------------

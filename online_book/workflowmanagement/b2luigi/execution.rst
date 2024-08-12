@@ -3,7 +3,7 @@
 Full Workflow Execution
 =======================
 
-We execute the dependency tree for a target task by calling :code:`b2luigi.process(Task(parameters=...),workers=<nworkers>)`. b2luigi will run a maximum number of :code:`<nworkers>` tasks in parallel, whenever possible.
+We execute the dependency tree for a target task by calling `b2luigi.process(Task(parameters=...),workers=nworkers) <b2luigi.process>`. :doc:`b2luigi:index` will run a maximum number of :code:`<nworkers>` tasks in parallel, whenever possible.
 
 It is best practice  to include a :code:`__main__` method in the scripts:
 

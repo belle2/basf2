@@ -20,7 +20,6 @@
 #include <TString.h>
 #include <TFitResult.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVD3SampleELSTimeCalibrationAlgorithm::SVD3SampleELSTimeCalibrationAlgorithm(const std::string& str) :
@@ -129,7 +128,7 @@ CalibrationAlgorithm::EResult SVD3SampleELSTimeCalibrationAlgorithm::calibrate()
           }
           for (int i = 1; i <= hEventT0vsELS->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsELS->GetNbinsY(); j++) {
-              if (hEventT0vsELS->GetBinContent(i, j) < max(2, int(hEventT0vsELS->GetEntries() * 0.001))) {
+              if (hEventT0vsELS->GetBinContent(i, j) < std::max(2, int(hEventT0vsELS->GetEntries() * 0.001))) {
                 hEventT0vsELS->SetBinContent(i, j, 0);
               }
             }

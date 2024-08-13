@@ -34,7 +34,6 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 

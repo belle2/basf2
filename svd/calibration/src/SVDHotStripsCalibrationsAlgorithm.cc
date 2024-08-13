@@ -15,7 +15,6 @@
 #include <iostream>
 #include <TString.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVDHotStripsCalibrationsAlgorithm::SVDHotStripsCalibrationsAlgorithm(const std::string& str) :

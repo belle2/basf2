@@ -78,7 +78,7 @@ with clean_working_directory() as tmpdir:
     metadata = get_metadata(testFile)
 
     assert os.path.abspath(testFile) == tmpdir + '/' + metadata.getLfn()
-    assert 0 == metadata.getNEvents()
+    assert 40 == metadata.getNEvents()
     assert 40 == metadata.getNFullEvents()
 
     assert 7 == metadata.getExperimentLow()
@@ -131,7 +131,7 @@ with clean_working_directory() as tmpdir:
     assert 30 == m['runHigh']
     assert 11 == m['eventHigh']
     assert 'something random' == m['randomSeed']
-    assert 0 == m['nEvents']
+    assert 40 == m['nEvents']
     assert isinstance(m['nEvents'], int)
     assert 40 == m['nFullEvents']
     assert isinstance(m['nFullEvents'], int)

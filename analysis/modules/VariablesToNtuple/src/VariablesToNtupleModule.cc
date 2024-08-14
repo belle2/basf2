@@ -284,27 +284,10 @@ float VariablesToNtupleModule::getInverseSamplingRateWeight(const Particle* part
 
 void VariablesToNtupleModule::event()
 {
-  bool start = m_event < 0;
   m_event = m_eventMetaData->getEvent();
   m_run = m_eventMetaData->getRun();
   m_experiment = m_eventMetaData->getExperiment();
   m_production = m_eventMetaData->getProduction();
-
-  if (start) {
-    m_outputFileMetaData->setLow(m_experiment, m_run, m_event);
-    m_outputFileMetaData->setHigh(m_experiment, m_run, m_event);
-  } else {
-    if ((m_experiment < m_outputFileMetaData->getExperimentLow()) || ((m_experiment == m_outputFileMetaData->getExperimentLow())
-        && ((m_run < m_outputFileMetaData->getRunLow())
-            || ((m_run == m_outputFileMetaData->getRunLow()) && (m_event < int(m_outputFileMetaData->getEventLow())))))) {
-      m_outputFileMetaData->setLow(m_experiment, m_run, m_event);
-    }
-    if ((m_experiment > m_outputFileMetaData->getExperimentHigh()) || ((m_experiment == m_outputFileMetaData->getExperimentHigh())
-        && ((m_run > m_outputFileMetaData->getRunHigh())
-            || ((m_run == m_outputFileMetaData->getRunHigh()) && (m_event > int(m_outputFileMetaData->getEventHigh())))))) {
-      m_outputFileMetaData->setHigh(m_experiment, m_run, m_event);
-    }
-  }
 
   if (m_inputFileMetaData.isValid()) {
     std::string lfn = m_inputFileMetaData->getLfn();
@@ -312,7 +295,6 @@ void VariablesToNtupleModule::event()
       m_parentLfns.push_back(lfn);
     }
   }
-  m_outputFileMetaData->setParents(m_parentLfns);
 
   // check if the event is a full event or not: if yes, increase the counter
   if (m_eventMetaData->getErrorFlag() == 0) // no error flag -> this is a full event
@@ -425,10 +407,20 @@ void VariablesToNtupleModule::fillFileMetaData()
   bool isMC = (m_inputFileMetaData) ? m_inputFileMetaData->isMC() : true;
   if (!isMC) outputFileMetaData.declareRealData();
 
-  outputFileMetaData.setLow(m_outputFileMetaData->getExperimentLow(), m_outputFileMetaData->getRunLow(),
-                            m_outputFileMetaData->getEventLow());
-  outputFileMetaData.setHigh(m_outputFileMetaData->getExperimentHigh(), m_outputFileMetaData->getRunHigh(),
-                             m_outputFileMetaData->getEventHigh());
+  auto runHigh = m_tree->get().GetMaximum("__run__");
+  double eventHigh{-1};
+  gROOT->SetBatch();
+  std::string cut = "__run__ == " + std::to_string(runHigh);
+  const unsigned runHighEvents = m_tree->get().Draw("__event__", cut.c_str());
+  if (runHighEvents) {
+    double* event = m_tree->get().GetV1();
+    eventHigh = *(std::max_element(event, event + runHighEvents));
+  }
+
+  outputFileMetaData.setLow(int(m_tree->get().GetMinimum("__experiment__")), int(m_tree->get().GetMinimum("__run__")),
+                            int(m_tree->get().GetMinimum("__event__")));
+  outputFileMetaData.setHigh(int(m_tree->get().GetMaximum("__experiment__")), int(runHigh), int(eventHigh));
+  outputFileMetaData.setNEvents(m_tree->get().GetEntries());
   outputFileMetaData.setNFullEvents(m_eventCount);
 
   //fill more file level metadata
@@ -445,12 +437,6 @@ void VariablesToNtupleModule::fillFileMetaData()
     outputFileMetaData.setDataDescription(item.first, item.second);
   }
   outputFileMetaData.setDataDescription("isNtupleMetaData", "True");
-  for (int iParent = 0; iParent < m_outputFileMetaData->getNParents(); iParent++) {
-    std::string lfn = m_outputFileMetaData->getParent(iParent);
-    if ((std::find(m_parentLfns.begin(), m_parentLfns.end(), lfn) == m_parentLfns.end())) {
-      m_parentLfns.push_back(lfn);
-    }
-  }
   outputFileMetaData.setParents(m_parentLfns);
   outputFileMetaData.setLfn(m_file->GetName());
 

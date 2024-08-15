@@ -180,7 +180,7 @@ def getArgumentParser():
     sampleGroup.add_argument(
         "--custom-only", action="store_true", help="Test on only custom samples."
     )
-    
+
     parser.add_argument(
         "--flagged",
         action="store_true",
@@ -248,7 +248,7 @@ def write_stats_metadata(logDirectory, samples, CombinedSkimDefinitions={}):
         json.dump(metadata, f, indent=2)
 
 
-def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun, filename,flagged):
+def verify_combined_skims(CombinedSkimDefinitions, SkimsToRun, filename, flagged):
     """Perform basic checks on combined skim definitions to catch issues early."""
     # Check all the requested combined skims are defined in the YAML file
     unrecognised = set(SkimsToRun).difference(CombinedSkimDefinitions)
@@ -343,7 +343,7 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
                         *CombinedSkimDefinitions[skim]
                     ]
                     basf2_arguments += ["--flaggedSkim", skim]
-                else :
+                else:
                     basf2_arguments = [
                         "basf2", runner, "--job-information", jsonFile, "-n",
                         str(nTestEvents), "-i", str(sampleFile), "--", "combined",
@@ -376,17 +376,17 @@ def submit_jobs(skims, samples, nEventsPerSample, DryRun, *, CombinedSkimDefinit
 
                 skim_checked = True
 
-            #arguments = [*bsub_arguments, *basf2_arguments]
+            # arguments = [*bsub_arguments, *basf2_arguments]
             command = " ".join([quote(str(arg)) for arg in bsub_arguments])
             command += " \" " + " ulimit -v 10000000 && ulimit -a && " + " ".join([quote(str(arg)) for arg in basf2_arguments]) + " \" "
             if DryRun:
-                #print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
+                # print(" ".join([quote(str(arg)) for arg in arguments]) + "\n")
                 print(command + "\n")
                 continue
 
             # Submit jobs
             process = subprocess.run(
-                #arguments,
+                # arguments,
                 args=command,
                 shell=True,
                 stdout=subprocess.PIPE,
@@ -453,7 +453,7 @@ if __name__ == "__main__":
         elif "all" in skims:
             raise ValueError("Cannot pass both 'all' and a list of skim names.")
 
-        verify_combined_skims(CombinedSkimDefinitions, skims, filename=args.combined[0],flagged=args.flagged)
+        verify_combined_skims(CombinedSkimDefinitions, skims, filename=args.combined[0], flagged=args.flagged)
         submit_jobs(skims, samples, args.nEventsPerSample, args.dry_run,
                     CombinedSkimDefinitions=CombinedSkimDefinitions,
                     analysisGlobaltag=args.analysis_globaltag,

@@ -45,7 +45,7 @@ from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 
 __liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

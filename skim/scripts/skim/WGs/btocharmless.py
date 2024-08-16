@@ -31,7 +31,7 @@ from stdPi0s import stdPi0s
 from stdPhotons import stdPhotons
 
 __liaison__ = "Benedikt Wach <benedikt.wach@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

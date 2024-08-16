@@ -22,7 +22,7 @@ import variables.collections as vc
 import variables.utils as vu
 
 __liaison__ = "Kenji Inami <kenji.inami@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 def tauskim_particle_selection(label, path):

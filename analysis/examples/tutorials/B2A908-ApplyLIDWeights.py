@@ -74,8 +74,8 @@ def main():
     # ----------
 
     ma.inputMdst(environmentType="default",
-                 filename=b2.find_file("mdst14.root", "validation"),
-                 entrySequence="0:10000",
+                 filename=b2.find_file("mdst16.root", "validation"),
+                 entrySequence="6500:16500",
                  path=path)
 
     # ----------------------------------------------

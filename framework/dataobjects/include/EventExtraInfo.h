@@ -89,7 +89,7 @@ namespace Belle2 {
        * Event type may already be set if there are multiple generator calls
        * with subsequent selection of generated events by another module.
        */
-      if (!hasExtraInfo("eventType"))
+      if (!hasExtraStringInfo("eventType"))
         addExtraStringInfo(std::string("eventType"), eventType);
     };
 

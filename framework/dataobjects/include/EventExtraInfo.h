@@ -85,7 +85,12 @@ namespace Belle2 {
      * Helper function for the GeneratorBaseModule. */
     void addEventType(const std::string& eventType)
     {
-      addExtraStringInfo(std::string("eventType"), eventType);
+      /**
+       * Event type may already be set if there are multiple generator calls
+       * with subsequent selection of generated events by another module.
+       */
+      if (!hasExtraInfo("eventType"))
+        addExtraStringInfo(std::string("eventType"), eventType);
     };
 
     /** Get the event type information.

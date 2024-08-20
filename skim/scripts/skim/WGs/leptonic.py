@@ -15,8 +15,6 @@ import modularAnalysis as ma
 from skim import BaseSkim, fancy_skim_header
 from stdCharged import stdE, stdMu
 from variables import variables as vm
-import basf2 as b2
-from ROOT import Belle2
 
 __liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
 _VALIDATION_SAMPLE = "mdst14.root"
@@ -31,8 +29,8 @@ class LeptonicUntagged(BaseSkim):
 
     Cuts applied
         * :math:`p_{\\ell}^{*} > 1.8\\,\\text{GeV}` in CMS Frame
-        * :math:`\\text{pidChargedBDTScore_e} > 0.9`
-        * :math:`\\text{muonID_noSVD} > 0.9`
+        * :math:`\\text{electronID} > 0.5`
+        * :math:`\\text{muonID} > 0.5`
         * :math:`n_{\\text{tracks}} \\geq 3`
     """
 
@@ -45,33 +43,27 @@ class LeptonicUntagged(BaseSkim):
     __category__ = "physics, leptonic"
 
     validation_sample = _VALIDATION_SAMPLE
-    ApplyHLTHadronCut = True
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
 
     def build_lists(self, path):
-        b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
-        ma.applyChargedPidMVA(
-            particleLists=['e-:all'],
-            path=path,
-            trainingMode=Belle2.ChargedPidMVAWeights.ChargedPidMVATrainingMode.c_Multiclass)
         ma.cutAndCopyList(
             "e-:LeptonicUntagged",
             "e-:all",
-            "useCMSFrame(p) > 1.8 and pidChargedBDTScore(11, ALL) > 0.9",
+            "useCMSFrame(p) > 1.8 and electronID > 0.5",
             True,
             path=path,
         )
         ma.cutAndCopyList(
             "mu-:LeptonicUntagged",
             "mu-:all",
-            "useCMSFrame(p) > 1.8 and muonID_noSVD > 0.9",
+            "useCMSFrame(p) > 1.8 and muonID > 0.5",
             True,
             path=path,
         )
-
         ma.reconstructDecay("B-:LeptonicUntagged_0 -> e-:LeptonicUntagged", "", 1, path=path)
         ma.reconstructDecay("B-:LeptonicUntagged_1 -> mu-:LeptonicUntagged", "", 2, path=path)
         ma.applyCuts("B-:LeptonicUntagged_0", "nTracks>=3", path=path)
@@ -94,8 +86,8 @@ class LeptonicUntagged(BaseSkim):
             path=path,
         )
         vm.addAlias("d0_p", "daughter(0,p)")
-        vm.addAlias("d0_pidChargedBDTScore_e", "daughter(0,pidChargedBDTScore(11, ALL))")
-        vm.addAlias("d0_muonID_noSVD", "daughter(0,muonID_noSVD)")
+        vm.addAlias("d0_electronID", "daughter(0,electronID)")
+        vm.addAlias("d0_muonID", "daughter(0,muonID)")
         vm.addAlias("MissP", "weMissP(basic,0)")
 
         histogramFilename = f"{self}_Validation.root"
@@ -107,9 +99,9 @@ class LeptonicUntagged(BaseSkim):
             variables_1d=[
                 ("Mbc", 100, 4.0, 5.3, "Mbc", contact, "", ""),
                 ("d0_p", 100, 0, 5.2, "Signal-side lepton momentum", contact, "", ""),
-                ("d0_pidChargedBDTScore_e", 100, 0, 1, "pidChargedBDTScore_e of signal-side lepton",
+                ("d0_electronID", 100, 0, 1, "electronID of signal-side lepton",
                  contact, "", ""),
-                ("d0_muonID_noSVD", 100, 0, 1, "muonID_noSVD of signal-side lepton", contact,
+                ("d0_muonID", 100, 0, 1, "muonID of signal-side lepton", contact,
                  "", ""),
                 ("MissP", 100, 0, 5.3, "Missing momentum of event (CMS frame)", contact,
                  "", ""),

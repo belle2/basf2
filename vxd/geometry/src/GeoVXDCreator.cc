@@ -276,11 +276,13 @@ namespace Belle2 {
 
     G4Transform3D GeoVXDCreator::placeLadder(int ladderID, double phi, G4LogicalVolume* volume,
                                              const G4Transform3D& placement,
-                                             const VXDGeometryPar& parameters)
+                                             const VXDGeometryPar& parameters,
+                                             double shiftR,
+                                             double shiftZ)
     {
       VxdID ladder(m_ladder.getLayerID(), ladderID, 0);
 
-      G4Translate3D ladderPos(m_ladder.getRadius(), m_ladder.getShift(), 0);
+      G4Translate3D ladderPos(m_ladder.getRadius() + shiftR, m_ladder.getShift(), shiftZ);
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(parameters.getAlignment(ladder));
       // The actuall coordinate system of ladder (w still points to Z, there is only phi rotation + move to correct radius + shift)
       VXD::GeoCache::getInstance().addLadderPlacement(m_halfShellVxdIDs[m_currentHalfShell], ladder, ladderPlacement);

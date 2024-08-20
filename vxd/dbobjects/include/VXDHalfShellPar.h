@@ -31,8 +31,12 @@ namespace Belle2 {
     double getShellAngle() const { return m_shellAngle; }
     /** add ladder */
     void addLadder(int layerID, int ladderID, double phi) { m_layers[layerID].push_back(std::pair<int, double>(ladderID, phi)); }
+    /** add staggered ladder */
+    void addLadderStaggered(int layerID, int ladderID, double phi, double shiftR, double shiftZ) { m_layersStaggered[layerID].push_back(std::tuple<int, double, double, double>(ladderID, phi, shiftR, shiftZ)); }
     /** get layers */
     const std::map< int, std::vector<std::pair<int, double>> >& getLayers() const { return m_layers; }
+    /** get staggered layers */
+    const std::map< int, std::vector<std::tuple<int, double, double, double>> >& getLayersStaggered() const { return m_layersStaggered; }
 
   private:
     /** Name of half shell */
@@ -41,8 +45,10 @@ namespace Belle2 {
     double m_shellAngle;
     /** Map for keeping ladderID and its phi rotation angle for all layers */
     std::map< int, std::vector<std::pair<int, double>> > m_layers;
+    /** Map for keeping ladderID, its phi rotation angle, its radius shift and its shiftZ for all staggered layers */
+    std::map< int, std::vector<std::tuple<int, double, double, double>> > m_layersStaggered;
 
-    ClassDef(VXDHalfShellPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(VXDHalfShellPar, 6);  /**< ClassDef, must be the last term before the closing {}*/
   };
 } // end of namespace Belle2
 

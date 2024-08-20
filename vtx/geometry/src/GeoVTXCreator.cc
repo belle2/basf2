@@ -272,8 +272,10 @@ namespace Belle2 {
           for (const GearDir& ladder : layer.getNodes("Ladder")) {
             int ladderID = ladder.getInt("@id");
             double phi = ladder.getAngle("phi", 0);
+            double shiftR = ladder.getLength("shiftR", 0);
+            double shiftZ = ladder.getLength("shiftZ", 0);
             readLadderComponents(layerID, ladderID, content, vtxGeometryPar);
-            halfShell.addLadder(layerID, ladderID,  phi);
+            halfShell.addLadderStaggered(layerID, ladderID,  phi, shiftR, shiftZ);
           }
         }
         vtxGeometryPar.getHalfShells().push_back(halfShell);
@@ -533,9 +535,9 @@ namespace Belle2 {
         if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
 
         //const std::map< int, std::vector<std::pair<int, double>> >& Layers = shell.getLayers();
-        for (const std::pair<const int, std::vector<std::pair<int, double>> >& layer : shell.getLayers()) {
+        for (const std::pair<const int, std::vector<std::tuple<int, double, double, double>> >& layer : shell.getLayersStaggered()) {
           int layerID = layer.first;
-          const std::vector<std::pair<int, double>>& Ladders = layer.second;
+          const std::vector<std::tuple<int, double, double, double>>& Ladders = layer.second;
 
 
           setCurrentLayer(layerID, parameters);
@@ -546,11 +548,13 @@ namespace Belle2 {
           VXD::GeoVXDAssembly ladderSupport = createLadderSupport();
 
           //Loop over defined ladders
-          for (const std::pair<int, double>& ladder : Ladders) {
-            int ladderID = ladder.first;
-            double phi = ladder.second;
+          for (const std::tuple<int, double, double, double>& ladder : Ladders) {
+            int ladderID = std::get<0>(ladder);
+            double phi = std::get<1>(ladder);
+            double shiftR = std::get<2>(ladder);
+            double shiftZ = std::get<3>(ladder);
 
-            G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters);
+            G4Transform3D ladderPlacement = placeLadder(ladderID, phi, envelope, shellAlignment, parameters, shiftR, shiftZ);
             if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
           }
 

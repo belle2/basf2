@@ -75,7 +75,7 @@ namespace Belle2 {
        * setLayer has to be called first to set the correct layer id
        */
       G4Transform3D placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
-                                const VXDGeometryPar& parameters);
+                                const VXDGeometryPar& parameters, double shiftR = 0, double shiftZ = 0);
 
       /**
        * Return the position where a daughter component is to be placed

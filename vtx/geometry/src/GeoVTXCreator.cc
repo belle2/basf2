@@ -272,8 +272,8 @@ namespace Belle2 {
           for (const GearDir& ladder : layer.getNodes("Ladder")) {
             int ladderID = ladder.getInt("@id");
             double phi = ladder.getAngle("phi", 0);
-            double shiftR = ladder.getLength("shiftR", 0);
-            double shiftZ = ladder.getLength("shiftZ", 0);
+            double shiftR = ladder.getLength("shiftR", 0) / Unit::mm;
+            double shiftZ = ladder.getLength("shiftZ", 0) / Unit::mm;
             readLadderComponents(layerID, ladderID, content, vtxGeometryPar);
             halfShell.addLadderStaggered(layerID, ladderID,  phi, shiftR, shiftZ);
           }

@@ -191,7 +191,7 @@ class HitInfoHarvester(harvesting.HarvestingModule):
 
         # Getting residuals for each hit of the RecoTrack
         for hit_info in reco_track.getRelationsWith("RecoHitInformations"):
-            layer = np.float("nan")
+            layer = float("nan")
             if hit_info.getTrackingDetector() == Belle2.RecoHitInformation.c_SVD:
                 hit = hit_info.getRelated("SVDClusters")
                 layer = hit.getSensorID().getLayerNumber()

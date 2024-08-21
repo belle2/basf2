@@ -332,7 +332,7 @@ class DpToPipEpEm(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("e", path=path)
 
-        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID_noSVD_noTOP > 0.01", path=path)
+        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
@@ -369,7 +369,7 @@ class DpToPipMupMum(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("mu", path=path)
 
-        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID_noSVD > 0.01", path=path)
+        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
@@ -554,44 +554,6 @@ class DpToHpPi0(BaseSkim):
 
 
 @fancy_skim_header
-class DpToKsHp(BaseSkim):
-    """
-    **Decay Modes**:
-        * :math:`D^+ \\to K_S \\pi^+`
-
-    **Selection Criteria**:
-        * Tracks: ``dr < 1, abs(dz) < 3, thetaInCDCAcceptance``
-        * Use Ks from `stdKshorts`
-        * ``1.77 < M(D+) < 1.97, pcms(D+) > 2.0``
-        * For more details, please check the source code of this skim.
-
-    """
-
-    __authors__ = ["Yifan Jin"]
-    __description__ = "Skim list for D+ to Ks pi+."
-    __contact__ = __liaison__
-    __category__ = "physics, charm"
-
-    NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = False
-
-    def load_standard_lists(self, path):
-        charm_skim_std_charged('pi', path=path)
-        stdKshorts(path=path)
-
-    def build_lists(self, path):
-        ma.cutAndCopyList('pi+:DpToKsPip', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
-
-        Dpcuts = "1.77 < M < 1.97 and useCMSFrame(p) > 2.0"
-
-        DList = []
-        ma.reconstructDecay("D+:KsPip -> K_S0:merged pi+:DpToKsPip", Dpcuts, path=path)
-        DList.append("D+:KsPip")
-
-        return DList
-
-
-@fancy_skim_header
 class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:
@@ -649,14 +611,6 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
         * ``M(D*)-M(D0) < 0.16``
         * ``pCM(D*) > 2.0``
 
-    .. Note::
-        The neural-network based PID variables ``pionIDNN`` and ``kaonIDNN``
-        require the analysis globaltag to be set (e.g. via
-        ``b2skim-run --analysis-globaltag ANALYSIS_GT_NAME ...``). In case
-        calibrated weights are not ready for the skimming campaign, this skim
-        must be modified to use :b2:var:`binaryPID_noSVD` or
-        :b2:var:`binaryPID` instead (this will have some impact on skim
-        performance, although small, and needs to be tested).
     """
 
     __authors__ = ["Ludovico Massaccesi", "Emma Oxford"]
@@ -1866,7 +1820,7 @@ class DpToEtaHp(BaseSkim):
         loadStdSkimPi0(path=path)
 
     def build_lists(self, path):
-        eta_gamma_cut = "[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]]"
+        eta_gamma_cut = "[[clusterNHits>1.5] and thetaInCDCAcceptance]"
         eta_gamma_cut += " and [[clusterReg==1 and E>0.05] or [clusterReg==2 and E>0.05] or [clusterReg==3 and E>0.075]]"
         ma.fillParticleList("gamma:DpToEtaHp", eta_gamma_cut, path=path)
 

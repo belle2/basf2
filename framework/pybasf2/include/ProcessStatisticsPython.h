@@ -70,6 +70,9 @@ namespace Belle2 {
     /** Clear collected statistics but keep names of modules */
     void clear();
 
+    /** Write statistics to a csv file */
+    void csv(const char* filename);
+
     /** Define python wrappers to make functionality avaiable in python */
     static void exposePythonAPI();
   private:

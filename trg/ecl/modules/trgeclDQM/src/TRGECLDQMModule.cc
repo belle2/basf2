@@ -50,10 +50,7 @@ TRGECLDQMModule::~TRGECLDQMModule()
 void TRGECLDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  TDirectory* dirDQM = (TDirectory*)gDirectory->Get("TRG");
-  if (!dirDQM) {
-    dirDQM = oldDir->mkdir("TRG");
-  }
+  TDirectory* dirDQM = gDirectory->mkdir("TRG", "", true);
   dirDQM->cd();
 
   h_TCId           = new TH1D("h_TCId",          "[TRGECL] Hit TC ID",                   578, 0, 578);

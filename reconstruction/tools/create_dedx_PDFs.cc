@@ -155,7 +155,7 @@ int main(int argc, char* argv[])
                       TString::Format("%s:CDCDedxTracks.m_pCDC", varname),
                       TString::Format("CDCDedxTracks.m_lNHitsUsed > 15 && %s < %g && abs(CDCDedxTracks.m_pdg) == %i", varname, dedx_cutoff, pdg_code));
 
-      //{{{ for each momentum bin, normalize pdf (disable if you want to keep the orginals, e.g. for fitting)
+      //{{{ for each momentum bin, normalize pdf (disable if you want to keep the originals, e.g. for fitting)
       if (true) {
         for (int d = 0; d < Dedx::c_num_detectors; d++) {
           for (int pbin = 0; pbin <= num_p_bins + 1; pbin++) {

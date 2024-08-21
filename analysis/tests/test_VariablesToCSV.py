@@ -21,7 +21,7 @@ path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2hdf5_e = VariablesToNotRoot(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5", "hdf5")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.csv", "csv")
 path.add_module(v2hdf5_e)
 
 # event-wise mode is not supported at the moment. when it is add something like
@@ -36,8 +36,8 @@ with b2test_utils.clean_working_directory():
     basf2.process(path, 10)  # v2hdf5 is a python module, so don't run over everything... remove this if it gets implemented in C++
 
     # Testing
-    assert os.path.isfile('particleDF.hdf5'), "particleDF.hdf5 wasn't created"
-    df1 = pandas.read_hdf('particleDF.hdf5', 'e+:all')
+    assert os.path.isfile('particleDF.csv'), "particleDF.csv wasn't created"
+    df1 = pandas.read_csv('particleDF.csv')
     assert len(df1) > 0, "electron dataframe contains zero entries"
     assert 'electronID' in df1.columns, "electronID column is missing from electron dataframe"
     assert 'p' in df1.columns, "p column is missing from electron dataframe"

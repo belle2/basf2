@@ -99,14 +99,24 @@ class VariablesToNotRoot(basf2.Module):
             raise ValueError(f"Unknown format {self._format}")
 
     def initialize_parquet_writer(self):
+        """
+        Initialize the parquet writer using pyarrow
+        """
         self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
         self._parquet_writer = parquet.ParquetWriter(self._filename, schema=pa.schema(self._schema))
 
     def initialize_csv_writer(self):
+        """
+        Initialize the csv writer using pyarrow
+        """
         self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
         self._csv_writer = csv.CSVWriter(self._filename, schema=pa.schema(self._schema))
 
     def initialize_hdf5_writer(self):
+        """
+        Initialize the hdf5 writer using pytables
+        """
+
         self._hdf5_writer = tables.open_file(self._filename, mode="w", title="Belle2 Variables to HDF5")
         filters = tables.Filters(complevel=1, complib='blosc:lz4', fletcher32=False)
 
@@ -118,6 +128,10 @@ class VariablesToNotRoot(basf2.Module):
             self._table = self._hdf5_writer.create_table("/", self._listname, obj=np.zeros(0, self._dtypes), filters=filters)
 
     def fill_buffer(self):
+        """
+        collect all variables for the particle in a numpy array
+        """
+
         # create a numpy array with the data
         buf = np.empty(self._plist.getListSize(), dtype=self._dtypes)
         # add some extra columns for bookkeeping
@@ -137,6 +151,10 @@ class VariablesToNotRoot(basf2.Module):
         return buf
 
     def event(self):
+        """
+        Event processing function
+        executes the fill_buffer function and writes the data to the output file
+        """
         buf = self.fill_buffer()
 
         if self._format == "hdf5":

@@ -755,7 +755,7 @@ class AA2uuuu(BaseSkim):
     __authors__ = ["Chanyoung LEE"]
     __contact__ = __liaison__
 
-    ApplyHLTHadronCut = True
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdMu("all", path=path)
@@ -769,8 +769,8 @@ class AA2uuuu(BaseSkim):
 
         path = self.skim_event_cuts(f"nCleanedTracks({llcut_acceptance}) >= 4", path=path)
 
-        ma.cutAndCopyList("mu+:fixed08", "mu+:all", llcut_PID, path=path)
-        ma.reconstructDecay(decayString="vpho:rec -> mu+:fixed08 mu-:fixed08", cut="", path=path)
+        ma.cutAndCopyList("mu+:over08", "mu+:all", llcut_PID, path=path)
+        ma.reconstructDecay(decayString="vpho:rec -> mu+:over08 mu-:over08", cut="", path=path)
         vertex.kFit("vpho:rec", 0.0, path=path)
         ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
 

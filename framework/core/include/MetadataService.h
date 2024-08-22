@@ -54,6 +54,19 @@ namespace Belle2 {
     void addHDF5File(const std::string& fileName);
 
     /**
+     * Add the metadata of a Parquet file
+     */
+
+    void addParquetFile(const std::string& fileName);
+
+    /**
+     * Add the metadata of a CSV file
+     */
+
+    void addCSVFile(const std::string& fileName);
+
+
+    /**
      * Add metadata of basf2 status
      */
     void addBasf2Status(const std::string& message = "");

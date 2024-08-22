@@ -102,21 +102,25 @@ class VariablesToNotRoot(basf2.Module):
         """
         Initialize the parquet writer using pyarrow
         """
+        #: A list of tuples and py.DataTypes to define the pyarrow schema
         self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
+        #: a writer object to write data into a parquet file
         self._parquet_writer = ParquetWriter(self._filename, schema=pa.schema(self._schema))
 
     def initialize_csv_writer(self):
         """
         Initialize the csv writer using pyarrow
         """
+        #: A list of tuples and py.DataTypes to define the pyarrow schema
         self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
+        #: a writer object to write data into a csv file
         self._csv_writer = CSVWriter(self._filename, schema=pa.schema(self._schema))
 
     def initialize_hdf5_writer(self):
         """
         Initialize the hdf5 writer using pytables
         """
-
+        #: The pytable file
         self._hdf5_writer = tables.open_file(self._filename, mode="w", title="Belle2 Variables to HDF5")
         filters = tables.Filters(complevel=1, complib='blosc:lz4', fletcher32=False)
 

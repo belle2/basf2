@@ -12,9 +12,9 @@ import variables
 import tables
 import numpy as np
 import warnings
-import pyarrow.parquet as parquet
+from pyarrow.parquet import ParquetWriter
+from pyarrow.csv import CSVWriter
 import pyarrow as pa
-from pyarrow import csv
 
 
 """
@@ -45,7 +45,7 @@ class VariablesToNotRoot(basf2.Module):
         Arguments:
             listname(str): name of the particle list
             variables(list(str)): list of variables to save for each particle
-            filename(str): name of the hdf5 file to be created
+            filename(str): name of the output file to be created
             format(str): format of the output file, one of 'hdf5', 'parquet', 'csv'
         """
         super().__init__()
@@ -103,14 +103,14 @@ class VariablesToNotRoot(basf2.Module):
         Initialize the parquet writer using pyarrow
         """
         self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
-        self._parquet_writer = parquet.ParquetWriter(self._filename, schema=pa.schema(self._schema))
+        self._parquet_writer = ParquetWriter(self._filename, schema=pa.schema(self._schema))
 
     def initialize_csv_writer(self):
         """
         Initialize the csv writer using pyarrow
         """
         self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
-        self._csv_writer = csv.CSVWriter(self._filename, schema=pa.schema(self._schema))
+        self._csv_writer = CSVWriter(self._filename, schema=pa.schema(self._schema))
 
     def initialize_hdf5_writer(self):
         """
@@ -178,8 +178,10 @@ class VariablesToNotRoot(basf2.Module):
             ROOT.Belle2.MetadataService.Instance().addHDF5File(self._filename)
         elif self._format == "parquet":
             self._parquet_writer.close()
+            ROOT.Belle2.MetadataService.Instance().addParquetFile(self._filename)
         elif self._format == "csv":
             self._csv_writer.close()
+            ROOT.Belle2.MetadataService.Instance().addCSVFile(self._filename)
 
 
 class VariablesToHDF5(VariablesToNotRoot):
@@ -193,10 +195,10 @@ class VariablesToHDF5(VariablesToNotRoot):
 
 def make_mcerrors_readable(dataframe, column="mcErrors"):
     """
-    Take a dataframe containing an column with the output of the :b2:var:`mcErrors`
+    Take a dataframe containing a column with the output of the :b2:var:`mcErrors`
     variable from :b2:mod:`VariablesToNTuple` and convert it to a readable set
     of columns of the form ``{column}_{name}`` where column is the value of the
-    ``column`` argument and ``name`` is one of one of the :ref:`mcmatching`
+    ``column`` argument and ``name`` is one of the :ref:`mcmatching`
     error flags (without the leading 'c_').
 
     Arguments:
@@ -227,20 +229,3 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
             dataframe[name] = mcErrors == 0
         else:
             dataframe[name] = (mcErrors & value) == value
-
-
-# This is just for testing, no need for doxygen to weirdly document it
-# @cond
-if __name__ == "__main__":
-    import modularAnalysis
-
-    p = basf2.create_path()
-    p.add_module("EventInfoSetter", evtNumList=1000)
-    p.add_module("EvtGenInput")
-    modularAnalysis.fillParticleListsFromMC([("pi-:gen", "")], path=p)
-    a = VariablesToNotRoot("pi-:gen", ["M", "E", "px", "py", "pz"], "test.parquet", "parquet")
-    p.add_module(a)
-    # Process the events
-    basf2.process(p)
-    print(basf2.statistics)
-# @endcond

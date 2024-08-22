@@ -19,7 +19,7 @@ from stdPhotons import stdPhotons
 import vertex as vertex
 
 __liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

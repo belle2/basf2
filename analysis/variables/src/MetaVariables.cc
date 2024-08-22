@@ -212,6 +212,31 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          const MCParticle* mcpart = particle->getMCParticle();
+          while (mcpart)
+          {
+            int pdg = std::abs(mcpart->getPDG());
+            if ((pdg == 521) || (pdg == 511)) {
+              Particle temp(mcpart);
+              UseReferenceFrame<RestFrame> frame(&temp);
+              double result = std::get<double>(var->function(particle));
+              return result;
+            }
+            mcpart = mcpart->getMother();
+          }
+          return Const::doubleNaN;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function useMCancestorBRestFrame.");
+      }
+    }
+
     Manager::FunctionPtr extraInfo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -3419,6 +3444,9 @@ Specifying the lab frame is useful in some corner-cases. For example:
 		      "of the first daughter (0). If the daughter index is invalid, it returns NaN.\n"
 		      "If two or more indices are given, the rest frame of the sum of the daughters is used.",
 		      Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("useMCancestorBRestFrame(variable)", useMCancestorBRestFrame,
+                      "Returns the value of the variable in the rest frame of the ancestor B MC particle.\n"
+                      "If no B or no MC-matching is found, it returns NaN.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("passesCut(cut)", passesCut,
                       "Returns 1 if particle passes the cut otherwise 0.\n"
                       "Useful if you want to write out if a particle would have passed a cut or not.", Manager::VariableDataType::c_bool);

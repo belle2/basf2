@@ -175,10 +175,10 @@ class VariablesToNotRoot(basf2.Module):
 
     def terminate(self):
         """save and close the output"""
+        import ROOT  # noqa
         if self._format == "hdf5":
             self._table.flush()
             self._hdf5_writer.close()
-            import ROOT
             ROOT.Belle2.MetadataService.Instance().addHDF5File(self._filename)
         elif self._format == "parquet":
             self._parquet_writer.close()

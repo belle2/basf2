@@ -179,13 +179,11 @@ class VariablesToNotRoot(basf2.Module):
         if self._format == "hdf5":
             self._table.flush()
             self._hdf5_writer.close()
-            ROOT.Belle2.MetadataService.Instance().addHDF5File(self._filename)
         elif self._format == "parquet":
             self._parquet_writer.close()
-            ROOT.Belle2.MetadataService.Instance().addParquetFile(self._filename)
         elif self._format == "csv":
             self._csv_writer.close()
-            ROOT.Belle2.MetadataService.Instance().addCSVFile(self._filename)
+        ROOT.Belle2.MetadataService.Instance().addNotRootNtuple(self._filename, self._format)
 
 
 class VariablesToHDF5(VariablesToNotRoot):

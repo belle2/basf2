@@ -57,14 +57,7 @@ namespace Belle2 {
      * Add the metadata of a Parquet file
      */
 
-    void addParquetFile(const std::string& fileName);
-
-    /**
-     * Add the metadata of a CSV file
-     */
-
-    void addCSVFile(const std::string& fileName);
-
+    void addNotRootNtuple(const std::string& fileName, const std::string& fileType);
 
     /**
      * Add metadata of basf2 status

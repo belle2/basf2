@@ -14,22 +14,22 @@ import pandas
 import b2test_utils
 from b2pandas_utils import VariablesToNotRoot
 
-inputFile = b2test_utils.require_file('mdst14.root', 'validation')
+inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
-v2hdf5_e = VariablesToNotRoot(
+v2parquet_e = VariablesToNotRoot(
     "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.pq", "parquet")
-path.add_module(v2hdf5_e)
+path.add_module(v2parquet_e)
 
 # event-wise mode is not supported at the moment. when it is add something like
 # the following comment and test file creation
 # Write out number of tracks and ecl-clusters in every event
-# v2hdf5_evt = VariablesToHDF5(
-# "", ['nTracks', 'nKLMClusters'], "eventDF.hdf5")
-# path.add_module(v2hdf5_evt)
+# v2parquet_e = VariablesToNotRoot(
+# "", ['nTracks', 'nKLMClusters'], "eventDF.pq", "parquet")
+# path.add_module(v2parquet_e)
 
 
 with b2test_utils.clean_working_directory():

@@ -12,7 +12,7 @@ import os
 import basf2
 import pandas
 import b2test_utils
-from b2pandas_utils import VariablesToNotRoot
+from b2pandas_utils import VariablesToHDF5
 
 inputFile = b2test_utils.require_file('mdst14.root', 'validation')
 path = basf2.create_path()
@@ -20,7 +20,7 @@ path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
-v2hdf5_e = VariablesToNotRoot(
+v2hdf5_e = VariablesToHDF5(
     "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5", "hdf5")
 path.add_module(v2hdf5_e)
 

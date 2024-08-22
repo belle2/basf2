@@ -21,7 +21,7 @@ path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
 v2hdf5_e = VariablesToHDF5(
-    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5", "hdf5")
+    "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.hdf5")
 path.add_module(v2hdf5_e)
 
 # event-wise mode is not supported at the moment. when it is add something like

@@ -80,7 +80,7 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   if (m_additionalPlots)
     m_sensors = m_SVDModules.size();
   else
-    m_sensors = 4;
+    m_sensors = 2;
 
   m_cStripOccupancyU = new TCanvas*[m_sensors];
   m_cStripOccupancyV = new TCanvas*[m_sensors];
@@ -155,7 +155,6 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
     m_cStripOccupancyV[i]->Clear();
   }
 
-
   if (m_3Samples) {
     m_cOccupancyU3Samples->Clear();
     m_cOccupancyV3Samples->Clear();
@@ -227,8 +226,8 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legOnEmpty = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legOnEmpty->AddText("NO DATA RECEIVED");
   m_legOnEmpty->AddText("from at least one sensor");
-  m_legOnEmpty->SetFillColor(kBlack);
-  m_legOnEmpty->SetTextColor(c_ColorDefault);
+  m_legOnEmpty->SetFillColor(c_ColorDefault);
+  m_legOnEmpty->SetTextColor(kBlack);
 }
 
 void DQMHistAnalysisSVDOccupancyModule::event()
@@ -359,7 +358,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         m_hStripOccupancyU[i].SetTitle(Form("SVD Sensor %d_%d_%d U-Strip OFFLINE Occupancy vs Strip Number %s", tmp_layer, tmp_ladder,
                                             tmp_sensor, runID.Data()));
       } else {
-        if (i < (unsigned int)m_sensors) {
+        if (i == 0 || i == 1) {
           m_hStripOccupancyU[i].Clear();
           htmp->Copy(m_hStripOccupancyU[i]);
           m_hStripOccupancyU[i].Scale(1 / nEvents);
@@ -611,7 +610,6 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       }
     }
 
-
     //look for U histogram - ONLINE ZS
     tmpname = Form("SVDExpReco/SVDDQM_%d_%d_%d_OnlineZSStripCountU", tmp_layer, tmp_ladder, tmp_sensor);
 
@@ -687,7 +685,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cStripOccupancyV[i]->cd();
       m_hStripOccupancyV[i].Draw("histo");
     } else {
-      if (i < (unsigned int)m_sensors) {
+      if (i == 0 || i == 1) {
         m_cStripOccupancyU[i]->cd();
         m_hStripOccupancyU[i].Draw("histo");
         m_cStripOccupancyV[i]->cd();

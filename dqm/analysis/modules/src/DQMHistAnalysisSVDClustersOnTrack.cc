@@ -79,10 +79,10 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
     m_cClusterOnTrackTimeL456V3Samples->Clear();
 
   //Retrieve limits from EPICS
-
   double timeWarnUp = 0.;
   double timeErrorLo = 0.;
-  requestLimitsFromEpicsPVs("clusTimeOnTrkLimits", timeErrorLo, m_statThreshold, timeWarnUp,  m_timeThreshold);
+  double timeWarnLo = 0.;
+  requestLimitsFromEpicsPVs("clusTimeOnTrkLimits", timeErrorLo, timeWarnLo, timeWarnUp,  m_timeThreshold);
   B2DEBUG(10, " SVD cluster time on track threshold taken from EPICS configuration file:");
   B2DEBUG(10, "  CLUSTER TIME ON TRACK: error > " << m_timeThreshold << " ns with minimum statistics of " << m_statThreshold);
 
@@ -147,8 +147,6 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
   TString runID = tmp(pos, tmp.Length() - pos);
   B2INFO("DQMHistAnalysisSVDClustersOnTrackModule::runID = " << runID);
   Float_t nEvents = hnEvnts->GetEntries();
-
-
 
   // cluster time for clusters of track
   double ratio3_6 = 0.;

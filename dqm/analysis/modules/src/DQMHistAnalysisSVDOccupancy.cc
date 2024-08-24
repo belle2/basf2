@@ -184,12 +184,14 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legProblem->AddText("at least one sensor with:");
   m_legProblem->AddText(Form("occupancy > %1.1f%%", m_occError));
   m_legProblem->SetFillColor(c_ColorDefault);
+  m_legProblem->SetLineColor(kBlack);
 
   m_legWarning = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
   m_legWarning->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occWarning, m_occError));
   m_legWarning->SetFillColor(c_ColorDefault);
+  m_legWarning->SetLineColor(kBlack);
 
   m_legNormal = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legNormal->AddText("OCCUPANCY WITHIN LIMITS");
@@ -200,7 +202,6 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legEmpty = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legEmpty->AddText("NO DATA RECEIVED");
   m_legEmpty->AddText("from at least one sensor");
-  m_legEmpty->SetFillColor(kBlack);
   m_legEmpty->SetTextColor(c_ColorDefault);
   m_legEmpty->SetLineColor(kBlack);
 
@@ -210,12 +211,14 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legOnProblem->AddText("at least one sensor with:");
   m_legOnProblem->AddText(Form("online occupancy > %1.1f%%", m_onlineOccError));
   m_legOnProblem->SetFillColor(c_ColorDefault);
+  m_legOnProblem->SetLineColor(kBlack);
 
   m_legOnWarning = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legOnWarning->AddText("WARNING!");
   m_legOnWarning->AddText("at least one sensor with:");
   m_legOnWarning->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccWarning, m_onlineOccError));
   m_legOnWarning->SetFillColor(c_ColorDefault);
+  m_legOnWarning->SetLineColor(kBlack);
 
   m_legOnNormal = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legOnNormal->AddText("OCCUPANCY WITHIN LIMITS");

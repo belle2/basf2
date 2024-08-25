@@ -233,7 +233,7 @@ class MetavariableDataTypeTest(unittest.TestCase):
 
         # We should get at least 237 registering statements
         print(f"Number of meta-variables is {num_metavariables}")
-        self.assertGreaterEqual(num_metavariables, 237)
+        self.assertGreaterEqual(num_metavariables, 238)
 
 
 if __name__ == "__main__":

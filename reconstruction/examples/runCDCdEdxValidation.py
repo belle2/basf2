@@ -7,7 +7,7 @@
 ##########################################################################
 
 # Example script to run dEdx validation module for bhabha or radbhabha or hadron skims
-# configure distination of file and set variable --> var
+# configure destination of file and set variable --> var
 
 
 import basf2

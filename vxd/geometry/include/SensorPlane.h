@@ -61,7 +61,7 @@ namespace Belle2 {
         //If running in ROOT CINT we do not know about GeoCache so we cannot get
         //the SensorInfo
         if (!m_sensorInfo) {
-          m_sensorInfo = &VXD::GeoCache::get(m_sensorID);
+          m_sensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_sensorID);
         }
 #endif
         //No sensorInfo set so we have to bail

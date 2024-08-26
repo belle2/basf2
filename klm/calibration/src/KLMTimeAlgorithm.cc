@@ -1377,14 +1377,14 @@ void KLMTimeAlgorithm::saveHist()
 {
   m_outFile->cd();
   B2INFO("Save Histograms into Files.");
-  TDirectory* dir_monitor = m_outFile->mkdir("monitor_Hists");
+  TDirectory* dir_monitor = m_outFile->mkdir("monitor_Hists", "", true);
   dir_monitor->cd();
   h_calibrated->SetDirectory(dir_monitor);
   hc_calibrated->SetDirectory(dir_monitor);
   h_diff->SetDirectory(dir_monitor);
 
   m_outFile->cd();
-  TDirectory* dir_effC = m_outFile->mkdir("effC_Hists");
+  TDirectory* dir_effC = m_outFile->mkdir("effC_Hists", "", true);
   dir_effC->cd();
   m_ProfileRpcPhi->SetDirectory(dir_effC);
   m_ProfileRpcZ->SetDirectory(dir_effC);
@@ -1400,7 +1400,7 @@ void KLMTimeAlgorithm::saveHist()
   m_Profile2EKLMScintillatorPlane2->SetDirectory(dir_effC);
 
   m_outFile->cd();
-  TDirectory* dir_time = m_outFile->mkdir("time");
+  TDirectory* dir_time = m_outFile->mkdir("time", "", true);
   dir_time->cd();
 
   h_time_scint->SetDirectory(dir_time);
@@ -1457,7 +1457,7 @@ void KLMTimeAlgorithm::saveHist()
     h2c_timeF_scint_end[iF]->SetDirectory(dir_time);
 
     sprintf(dirname, "isForward_%d", iF);
-    dir_time_F[iF] = dir_time->mkdir(dirname);
+    dir_time_F[iF] = dir_time->mkdir(dirname, "", true);
     dir_time_F[iF]->cd();
 
     for (int iS = 0; iS < 8; ++iS) {
@@ -1471,7 +1471,7 @@ void KLMTimeAlgorithm::saveHist()
       h2c_timeFS[iF][iS]->SetDirectory(dir_time_F[iF]);
 
       sprintf(dirname, "Sector_%d", iS + 1);
-      dir_time_FS[iF][iS] = dir_time_F[iF]->mkdir(dirname);
+      dir_time_FS[iF][iS] = dir_time_F[iF]->mkdir(dirname, "", true);
       dir_time_FS[iF][iS]->cd();
 
       for (int iL = 0; iL < 15; ++iL) {
@@ -1479,7 +1479,7 @@ void KLMTimeAlgorithm::saveHist()
         hc_timeFSL[iF][iS][iL]->SetDirectory(dir_time_FS[iF][iS]);
 
         sprintf(dirname, "Layer_%d", iL + 1);
-        dir_time_FSL[iF][iS][iL] = dir_time_FS[iF][iS]->mkdir(dirname);
+        dir_time_FSL[iF][iS][iL] = dir_time_FS[iF][iS]->mkdir(dirname, "", true);
         dir_time_FSL[iF][iS][iL]->cd();
         for (int iP = 0; iP < 2; ++iP) {
           h_timeFSLP[iF][iS][iL][iP]->SetDirectory(dir_time_FSL[iF][iS][iL]);
@@ -1488,7 +1488,7 @@ void KLMTimeAlgorithm::saveHist()
           h2c_timeFSLP[iF][iS][iL][iP]->SetDirectory(dir_time_FSL[iF][iS][iL]);
 
           sprintf(dirname, "Plane_%d", iP);
-          dir_time_FSLP[iF][iS][iL][iP] = dir_time_FSL[iF][iS][iL]->mkdir(dirname);
+          dir_time_FSLP[iF][iS][iL][iP] = dir_time_FSL[iF][iS][iL]->mkdir(dirname, "", true);
           dir_time_FSLP[iF][iS][iL][iP]->cd();
 
           int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
@@ -1504,7 +1504,7 @@ void KLMTimeAlgorithm::saveHist()
     }
 
     sprintf(dirname, "isForward_%d_end", iF + 1);
-    dir_time_F_end[iF] = dir_time->mkdir(dirname);
+    dir_time_F_end[iF] = dir_time->mkdir(dirname, "", true);
     dir_time_F_end[iF]->cd();
     int maxLayer = 12 + 2 * iF;
     for (int iS = 0; iS < 4; ++iS) {
@@ -1515,14 +1515,14 @@ void KLMTimeAlgorithm::saveHist()
       h2c_timeFS_end[iF][iS]->SetDirectory(dir_time_F_end[iF]);
 
       sprintf(dirname, "Sector_%d_end", iS + 1);
-      dir_time_FS_end[iF][iS] = dir_time_F_end[iF]->mkdir(dirname);
+      dir_time_FS_end[iF][iS] = dir_time_F_end[iF]->mkdir(dirname, "", true);
       dir_time_FS_end[iF][iS]->cd();
       for (int iL = 0; iL < maxLayer; ++iL) {
         h_timeFSL_end[iF][iS][iL]->SetDirectory(dir_time_FS_end[iF][iS]);
         hc_timeFSL_end[iF][iS][iL]->SetDirectory(dir_time_FS_end[iF][iS]);
 
         sprintf(dirname, "Layer_%d_end", iL + 1);
-        dir_time_FSL_end[iF][iS][iL] = dir_time_FS_end[iF][iS]->mkdir(dirname);
+        dir_time_FSL_end[iF][iS][iL] = dir_time_FS_end[iF][iS]->mkdir(dirname, "", true);
         dir_time_FSL_end[iF][iS][iL]->cd();
         for (int iP = 0; iP < 2; ++iP) {
           h_timeFSLP_end[iF][iS][iL][iP]->SetDirectory(dir_time_FSL_end[iF][iS][iL]);
@@ -1531,7 +1531,7 @@ void KLMTimeAlgorithm::saveHist()
           h2c_timeFSLP_end[iF][iS][iL][iP]->SetDirectory(dir_time_FSL_end[iF][iS][iL]);
 
           sprintf(dirname, "plane_%d_end", iP);
-          dir_time_FSLP_end[iF][iS][iL][iP] = dir_time_FSL_end[iF][iS][iL]->mkdir(dirname);
+          dir_time_FSLP_end[iF][iS][iL][iP] = dir_time_FSL_end[iF][iS][iL]->mkdir(dirname, "", true);
           dir_time_FSLP_end[iF][iS][iL][iP]->cd();
 
           for (int iC = 0; iC < 75; ++iC) {

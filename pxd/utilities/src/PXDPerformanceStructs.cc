@@ -41,7 +41,7 @@ namespace Belle2 {
       // Propogate a track state back to the module of interest
       // as PXDIntercept doesn't contain global track point,
       // cos(incident angle), and the expected charge from the hit.
-      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().get(sensorID);
+      const VXD::SensorInfoBase& sensorInfo = VXD::GeoCache::getInstance().getSensorInfo(sensorID);
       auto statePtr = getTrackStateOnModule(sensorInfo, *recoTracks[0]);
       if (statePtr == nullptr) return nullptr; // shouldn't happen.
       auto intersec = statePtr -> getPos();

@@ -15,7 +15,8 @@ env['LIBS'] = [
     'genfit2',
     'EG',
     '$ROOT_LIBS',
-    'FastBDT_shared'
+    'FastBDT_shared',
+    'analysis', 'analysis_dataobjects', 'analysis_VertexFitting'
     ]
 
 Return('env')

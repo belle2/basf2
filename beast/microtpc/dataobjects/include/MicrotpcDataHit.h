@@ -49,8 +49,6 @@ namespace Belle2 {
      * TODO: Normally this would be done with an lvalue reference but we need a
      * dictionary so we have to compile it with cint, might change for ROOT6.
      *
-     * @param electronProfile list of energy depositions along the simhit,
-     * encoded using ElectronDeposit class. Will be empty after call
      */
     /*
     void setcolumn(std::vector<int>& column) {

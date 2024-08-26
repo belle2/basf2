@@ -28,16 +28,16 @@ logo = """\
             eeee       eeeeeeeeeeeeeeeee
                        eeeeeeeeeeeee
 
-                      əəəəəəəəəəəəəə
-                      əəəəəəəəəəəəəəəəəəə
-       əəəə          əəəə            əəəəəə
-     əəəə            əəəə             əəəəəə
-   əəəə             əəəə                əəəəə
-  əəəə              əəəə                əəəəə
-    əəəə           əəəə             əəəəəəə
-      əəəəəə       əəəəəəəəəəəəəəəəəəəəə
-         əəəəəəəəəəəəəəəəəəəəəəəəəə
-             əəəəəəəəəəəəəəəəə
+                      eeeeeeeeeeeeee
+                      eeeeeeeeeeeeeeeeeee
+       eeee          eeee            eeeeee
+     eeee            eeee             eeeeee
+   eeee             eeee                eeeee
+  eeee              eeee                eeeee
+    eeee           eeee             eeeeeee
+      eeeeee       eeeeeeeeeeeeeeeeeeeee
+         eeeeeeeeeeeeeeeeeeeeeeeeee
+             eeeeeeeeeeeeeeeee
 
    BBBBBBB             ll ll          2222222
    BB    BB    eeee    ll ll   eeee    22 22

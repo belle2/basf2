@@ -231,7 +231,8 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const Belle2::PXDCl
   bool vEdge = false;
 
   Belle2::VxdID sensorID = cluster.getSensorID();
-  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
+  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>
+                                        (Belle2::VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
   for (const Belle2::PXDDigit& digit : cluster.getRelationsTo<Belle2::PXDDigit>("PXDDigits")) {
     int pixelkind = Info.getPixelKindNew(sensorID, digit.getVCellID());
@@ -263,7 +264,8 @@ int Belle2::PXD::PXDClusterPositionEstimator::getClusterkind(const std::vector<B
   bool uEdge = false;
   bool vEdge = false;
 
-  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>(Belle2::VXD::GeoCache::get(sensorID));
+  const Belle2::PXD::SensorInfo& Info = dynamic_cast<const Belle2::PXD::SensorInfo&>
+                                        (Belle2::VXD::GeoCache::getInstance().getSensorInfo(sensorID));
 
   for (const Belle2::PXD::Pixel& pix : pixels) {
     int pixelkind = Info.getPixelKindNew(sensorID, pix.getV());

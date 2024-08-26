@@ -179,11 +179,11 @@ namespace Belle2 {
                 AttributeMap attributeMap = AttributeMap());
 
       /// Draws the CDCSimHit as a momentum arrow starting at the track position with a length proportional to its momentum.
-      void draw(const Belle2::CDCSimHit& simHit,
+      void draw(const CDCSimHit& simHit,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCHit as the wire position and its drift circle at the wire reference position.
-      void draw(const Belle2::CDCHit& hit,
+      void draw(const CDCHit& hit,
                 const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws the CDCWireHit as the wire position and its drift circle at the wire reference position.

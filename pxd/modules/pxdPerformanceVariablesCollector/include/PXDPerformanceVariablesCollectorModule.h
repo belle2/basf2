@@ -82,7 +82,7 @@ namespace Belle2 {
       auto const& tPoint = trackCluster.intersection;
       // Get uBin and vBin from a global point.
       VxdID sensorID = PXD::getVxdIDFromPXDModuleID(trackCluster.cluster.pxdID);
-      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       float posU(0.), posV(0.);
       if (useCluster) {
         posU = trackCluster.cluster.posU;

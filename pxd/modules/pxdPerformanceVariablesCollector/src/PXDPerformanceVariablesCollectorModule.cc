@@ -360,7 +360,7 @@ void PXDPerformanceVariablesCollectorModule::collectEfficiencyVariables(const Tr
   auto z = tPoint.z;
 
   VxdID sensorID = PXD::getVxdIDFromPXDModuleID(cluster.pxdID);
-  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+  const PXD::SensorInfo& Info = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
   auto localPoint = Info.pointToLocal(ROOT::Math::XYZVector(tPoint.x, tPoint.y, tPoint.z), true);
   auto uID = Info.getUCellID(localPoint.X());
   auto vID = Info.getVCellID(localPoint.Y());

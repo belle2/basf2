@@ -219,7 +219,7 @@ def transform_to_probability_sf(value, sig_back_tuple, signal_fraction):
 
     :return: float, probability for a given signal fraction
     """
-    assert(signal_fraction > 0)
+    assert (signal_fraction > 0)
 
     p_signal = transform_to_probability(value, sig_back_tuple[0])
     p_background = transform_to_probability(value, sig_back_tuple[1])
@@ -237,7 +237,7 @@ def transform_array_to_probability_sf(arr, sig_back_tuple, signal_fraction):
     :param signal_fraction: signal fraction of classifier events
     :return:
     """
-    assert(signal_fraction > 0)
+    assert (signal_fraction > 0)
 
     p_signal = transform_array_to_probability(arr, sig_back_tuple[0])
     p_back = transform_array_to_probability(arr, sig_back_tuple[1])
@@ -287,7 +287,7 @@ def transform_ndarray(ndarr, binning_parameters):
     :return: None, inplace operation
     """
 
-    assert(ndarr.dtype not in [np.int, np.int16, np.int32, np.int64])
+    assert (ndarr.dtype not in [np.int16, np.int32, np.int64])
     for i, param_tuple in enumerate(binning_parameters):
         ndarr[:, i] = transform_array(ndarr[:, i], *param_tuple)
 
@@ -301,7 +301,7 @@ def transform_variable_vector(arr, binning_parameters):
     :return: None, inplace operation
     """
 
-    assert(arr.dtype not in [np.int, np.int16, np.int32, np.int64])
+    assert (arr.dtype not in [np.int16, np.int32, np.int64])
     for i, param_tuple in enumerate(binning_parameters):
         arr[i] = transform_value(arr[i], *param_tuple)
 

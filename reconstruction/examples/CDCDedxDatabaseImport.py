@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 # This steering file shows how to use the CDCDedxDatabaseImporter
 # to import dummy data (from TH1) into a payload ROOT file
 #
-# The user should provide input and output root filname
+# The user should provide input and output root filename
 # as first and second argument respectively.
 ########################################################
 

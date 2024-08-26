@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -53,7 +52,7 @@ if outPath[-5:] != '.root':
 # dec_path_string = base_path + '/dec_files/generic_Btag.dec'
 mypath = b2.Path()
 
-# my_path.add_module('RootInput', inputFileNames=b2.find_file('mdst14.root', 'validation'))
+# my_path.add_module('RootInput', inputFileNames=b2.find_file('mdst16.root', 'validation'))
 
 dec_file = None
 final_state = 'mixed'
@@ -70,10 +69,10 @@ add_reconstruction(mypath)
 #    m.logging.log_level = LogLevel.ERROR
 #    #m.logging.debug_level = 200
 #    if KLMexpertPath:
-#      m.logging.info("Setting KLMclassifier to {}".format(KLMexpertPath))
+#      m.logging.info(f"Setting KLMclassifier to {KLMexpertPath}")
 #      m.param("classifierPath", KLMexpertPath)
 
-if((not useKLM) and (not useECL)):
+if ((not useKLM) and (not useECL)):
     sys.exit("neither KLM nor ECL data will be written. Aborting...")
 
 data_writer = b2.register_module('DataWriter')

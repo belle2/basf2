@@ -15,81 +15,88 @@
 #define N_BIASCHANNELS 48
 
 namespace Belle2 {
-  //! The Class for ARICH mapping of bias power supply channels to modules
-  /*!     This class provides ARICH mapping of HAPD modules to bias power supply channels.
-   */
 
+  /**
+   * This class provides ARICH mapping of HAPD modules to bias
+   * power supply channels.
+   */
   class ARICHBiasChannelsMapping : public TObject {
 
   public:
 
-    //! Default constructor
+    /**
+     * Default constructor.
+     */
     ARICHBiasChannelsMapping();
 
     /**
-     * Get bias power supply channel ID from inner cable type and ID
-     * @param crate crate ID number
-     * @param slot slot ID number
-     * @param channelID power supply channel ID number
-     * @param innerID ID of inner cable
-     * @param type type of inner cable
-     * @return channelID power supply channel ID number
+     * Get bias power supply channel ID from inner cable type and ID.
+     * @param[in] crate        Crate ID number.
+     * @param[in] slot         Slot ID number.
+     * @param[in] connectionID Connection number.
+     * @param[in] innerID      ID of inner cable.
+     * @param[in] type         Type of inner cable.
+     * @return Power supply channel ID number.
      */
     int getChannelID(int crate, int slot, int connectionID, int innerID, const std::string& type) const;
 
     /**
-     * Get bias power supply cratem slot and channel ID from inner cable type and ID
-     * @param innerID ID of inner cable
-     * @param type type of inner cable
-     * @param connectionID connection number
-     * @return channel power supply channel numbers; crate, slot, channelID
+     * Get bias power supply cratem slot and channel ID from inner cable
+     * type and ID.
+     * @param[in] innerID      ID of inner cable.
+     * @param[in] type         Type of inner cable.
+     * @param[in] connectionID Connection number.
+     * @return Power supply channel numbers; crate, slot, channelID.
      */
     std::vector<int> getChannelValues(int connectionID, int innerID, const std::string& type) const;
 
     /**
-    * Get inner cable pin ID from bias power supply channel ID
-    * @param channelID power supply channel ID number
-    * @return pinID pin ID of inner cable
-    */
+     * Get inner cable pin ID from bias power supply channel ID.
+     * @param[in] channelID Power supply channel ID number.
+     * @return Pin ID of inner cable.
+     */
     int getPinID(std::vector<int> channelID) const;
 
     /**
-    * Get bias/guard type from channel
-    * @param channel power supply channel numbers; crate, slot, channelID
-    * @param type type of inner cable
-    */
+     * Get bias/guard type from channel.
+     * @param[in] channel Power supply channel numbers; crate, slot, channelID.
+     * @return Inner cable type.
+     */
     std::string getType(std::vector<int> channel) const;
 
     /**
-    * Get inner cable pin ID from bias power supply channel ID
-    * @param channel power supply channel numbers; crate, slot, channelID
-    * @return innerID ID of inner cable
-    */
+     * Get inner cable pin ID from bias power supply channel ID.
+     * @param[in] channel Power supply channel numbers; crate, slot, channelID.
+     * @return ID of inner cable.
+     */
     int getInnerID(std::vector<int> channel) const;
 
     /**
-    * Get inner cable pin ID from bias power supply channel ID
-    * @param channel power supply channel numbers; crate, slot, channelID
-    * @return connectionID connection number
-    */
+     * Get inner cable pin ID from bias power supply channel ID.
+     * @param[in] channel Power supply channel numbers; crate, slot, channelID.
+     * @return Connection number.
+     */
     int getConnectionID(std::vector<int> channel) const;
 
     /**
-    * Get inner cable ID and type, connected to bias channel
-    * @param channel vector of crate, slot and power supply channel ID number
-    * @return innerID inner cable ID and type
-    */
+     * Get inner cable ID and type, connected to bias channel.
+     *
+     * @param[in] channel
+     * Vector of crate, slot and power supply channel ID number.
+     *
+     * @return Inner cable ID and type.
+     */
     std::tuple<int, int, std::string> getInnerConnection(std::vector<int> channel) const;
 
     /**
-     * Add new entry to the mapping table
-     * @param crate crate ID number
-     * @param slot slot ID number
-     * @param channelID power supply channel ID number
-     * @param pinID pin ID of inner cable
-     * @param connectionID connection number
-     * @param innerID ID of inner cable
-     * @param type type of inner cable
+     * Add new entry to the mapping table.
+     * @param[in] crate        Crate ID number.
+     * @param[in] slot         Slot ID number.
+     * @param[in] channelID    Power supply channel ID number.
+     * @param[in] pinID        Pin ID of inner cable.
+     * @param[in] connectionID Connection number.
+     * @param[in] innerID      ID of inner cable.
+     * @param[in] type         Type of inner cable.
      */
     void addMapping(int crate, int slot, int channelID, int pinID, int connectionID, int innerID, const std::string& type);
 

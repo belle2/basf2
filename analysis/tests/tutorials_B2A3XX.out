@@ -7,6 +7,7 @@ TBranch: __event__, 99
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 2.169
 TBranch: ErrM, 0
@@ -96,6 +97,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 2
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
@@ -200,6 +202,7 @@ TBranch: __event__, 5
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: M, 5.236
 TBranch: ErrM, 0
@@ -302,6 +305,7 @@ TBranch: __event__, 1
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: Mbc, 5.281
 TBranch: deltaE, -0.001868
@@ -333,6 +337,7 @@ TBranch: __event__, 1180040
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 0.4336
 TBranch: py, 0.3623
@@ -485,6 +490,7 @@ TBranch: __event__, 4
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 0
 TBranch: mcErrors, 8
@@ -535,6 +541,7 @@ TBranch: __event__, 4
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
@@ -562,6 +569,7 @@ TBranch: __event__, 4
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, nan
 TBranch: mcErrors, 512
@@ -584,6 +592,7 @@ TBranch: __event__, 1180040
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: px, 0.4336
 TBranch: py, 0.3623
@@ -722,6 +731,7 @@ TBranch: __event__, 7
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 0
 TBranch: mcErrors, 8
@@ -775,6 +785,7 @@ TBranch: __event__, 7
 TBranch: __production__, 0
 TBranch: __candidate__, 0
 TBranch: __ncandidates__, 1
+TBranch: __eventType__, 
 TBranch: __weight__, 1
 TBranch: isSignal, 1
 TBranch: mcErrors, 0

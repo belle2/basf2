@@ -12,6 +12,9 @@
 #include <tracking/dataobjects/ExtHit.h>
 #include <arich/dataobjects/ARICHPhoton.h>
 #include <arich/dataobjects/ARICHAeroHit.h>
+
+#include <Math/Vector2D.h>
+
 #include <vector>
 
 namespace Belle2 {
@@ -39,14 +42,14 @@ namespace Belle2 {
      * @param position   position vector of track on aerogel plane
      * @param momentum   momentum vector of track on aerogel plane
      */
-    ARICHTrack(TVector3 position,
-               TVector3 momentum)
+    ARICHTrack(ROOT::Math::XYZVector position,
+               ROOT::Math::XYZVector momentum)
     {
 
       m_x = (float) position.X();
       m_y = (float) position.Y();
       m_z = (float) position.Z();
-      m_momentum = (float) momentum.Mag();
+      m_momentum = (float) momentum.R();
       momentum = momentum.Unit();
       m_dx = (float) momentum.X();
       m_dy = (float) momentum.Y();
@@ -57,18 +60,18 @@ namespace Belle2 {
 
     /**
      * Constructor from ARICHAeroHit
-     * @param ARICHAeroHit   ARICHAeroHit
+     * @param aeroHit ARICHAeroHit
      */
     explicit ARICHTrack(const ARICHAeroHit* aeroHit)
     {
 
-      TVector3 pos = aeroHit->getPosition();
+      ROOT::Math::XYZVector pos = aeroHit->getPosition();
       m_x = (float) pos.X();
       m_y = (float) pos.Y();
       m_z = (float) pos.Z();
 
-      TVector3 mom = aeroHit->getMomentum();
-      m_momentum = (float) mom.Mag();
+      ROOT::Math::XYZVector mom = aeroHit->getMomentum();
+      m_momentum = (float) mom.R();
       mom = mom.Unit();
       m_dx = (float) mom.X();
       m_dy = (float) mom.Y();
@@ -78,7 +81,7 @@ namespace Belle2 {
 
     /**
      * Constructor from ExtHit
-     * @param ExtHit  ExtHit
+     * @param extHit ExtHit
      */
     explicit ARICHTrack(const ExtHit* extHit)
     {
@@ -126,13 +129,13 @@ namespace Belle2 {
      * returns track position vector
      * @return track position vector
      */
-    TVector3 getPosition() const { return TVector3(m_x, m_y, m_z);}
+    ROOT::Math::XYZVector getPosition() const { return ROOT::Math::XYZVector(m_x, m_y, m_z);}
 
     /**
      * returns track direction vector
      * @return track direction vector
      */
-    TVector3 getDirection() const { return TVector3(m_dx, m_dy, m_dz);}
+    ROOT::Math::XYZVector getDirection() const { return ROOT::Math::XYZVector(m_dx, m_dy, m_dz);}
 
     /**
      * returns track momentum
@@ -150,7 +153,7 @@ namespace Belle2 {
      * Get HAPD window hit position
      * @return HAPD window hit position
      */
-    TVector2 windowHitPosition() const {return TVector2(m_winX, m_winY);}
+    ROOT::Math::XYVector windowHitPosition() const {return ROOT::Math::XYVector(m_winX, m_winY);}
 
 
     /**
@@ -159,7 +162,7 @@ namespace Belle2 {
      * @param dir   direction vector of track (unit vector)
      * @param p     track momentum
      */
-    void  setReconstructedValues(TVector3 r, TVector3 dir, double p)
+    void  setReconstructedValues(ROOT::Math::XYZVector r, ROOT::Math::XYZVector dir, double p)
     {
       m_x = (float) r.X();
       m_y = (float) r.Y();

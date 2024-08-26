@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -15,13 +14,13 @@ import basf2
 import modularAnalysis as ma
 from ROOT import Belle2
 from skim import BaseSkim, fancy_skim_header
-from stdCharged import stdMu
+from stdCharged import stdE, stdMu
 from stdPhotons import stdPhotons
 from stdV0s import stdLambdas
 from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@seu.edu.cn>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -65,14 +64,14 @@ class BottomoniumEtabExclusive(BaseSkim):
                            checkForDuplicates=False,
                            path=path)
 
-        ma.cutAndCopyList("gamma:hard", "gamma:loose", "E>3.5", path=path)
-        ma.applyCuts("gamma:hard", "foxWolframR2 < 0.995", path=path)
+        ma.cutAndCopyList("gamma:hard_BottomoniumEtabExclusive", "gamma:loose", "E>3.5", path=path)
+        ma.applyCuts("gamma:hard_BottomoniumEtabExclusive", "foxWolframR2 < 0.995", path=path)
 
         # the requirement of 7 < M(eta_b) < 10 GeV/c2
         Etabcuts = "M > 7 and M < 10"
 
         # eta_b candidates are reconstructed
-        Etab_Channels = ["gamma:hard gamma:hard"]
+        Etab_Channels = ["gamma:hard_BottomoniumEtabExclusive gamma:hard_BottomoniumEtabExclusive"]
 
         # define the eta_b decay list
         EtabList = []
@@ -115,7 +114,7 @@ class BottomoniumUpsilon(BaseSkim):
         ma.fillParticleList("mu+:BottomoniumUpsilon", "p<15 and p>3.5", path=path)
         ma.fillParticleList("e+:BottomoniumUpsilon", "p<15 and p>3.5", path=path)
         ma.fillParticleList("pi+:BottomoniumUpsilon", "p<1.5 and pt>0.05", path=path)
-        ma.cutAndCopyList("gamma:soft", "gamma:loose", "E>0.15", path=path)
+        ma.cutAndCopyList("gamma:soft_BottomoniumUpsilon", "gamma:loose", "E>0.15", path=path)
 
         # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
         ma.reconstructDecay("Upsilon:ee -> e+:BottomoniumUpsilon e-:BottomoniumUpsilon", "M > 8", path=path)
@@ -142,7 +141,7 @@ class BottomoniumUpsilon(BaseSkim):
 
         # Y(1S,2S) with pi+ or photon are reconstructed
         Upsilon_Channels = ["Upsilon:all pi+:BottomoniumUpsilon",
-                            "Upsilon:all gamma:soft"]
+                            "Upsilon:all gamma:soft_BottomoniumUpsilon"]
 
         # define the Y(1S,2S) decay channel list
         UpsilonList = []
@@ -168,7 +167,7 @@ class CharmoniumPsi(BaseSkim):
 
     Selection criteria:
 
-    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.7 < M < 4.
+    * 2 tracks with electronID > 0.1 or muonID > 0.1 and 2.85 < M < 3.9.
       Track-quality requirements are not applied.
     """
     __authors__ = ["Kirill Chilikin"]
@@ -181,17 +180,14 @@ class CharmoniumPsi(BaseSkim):
     validation_sample = _VALIDATION_SAMPLE
 
     def load_standard_lists(self, path):
+        stdE('loosepid', path=path)
         stdMu('loosepid', path=path)
         stdPhotons('all', path=path)
 
     def build_lists(self, path):
 
-        # Electron list (TOP is excluded).
-        ma.fillParticleList('e+:loosepid_noTOP', 'electronID_noTOP > 0.1',
-                            path=path)
-
         # Apply charged PID MVA.
-        charged_pid_mva_enabled = True
+        charged_pid_mva_enabled = False
         if charged_pid_mva_enabled:
             if self.pidGlobaltag is None:
                 basf2.B2FATAL('The PID globaltag is not set in the CharmoniumPsi skim.')
@@ -214,7 +210,7 @@ class CharmoniumPsi(BaseSkim):
                                 'pidChargedBDTScore(13, ALL) > 0.1', path=path)
 
         # Lists with both standard and MVA-based PID.
-        ma.copyList('e+:merged', 'e+:loosepid_noTOP', path=path)
+        ma.copyList('e+:merged', 'e+:loosepid', path=path)
         ma.copyList('mu+:merged', 'mu+:loosepid', path=path)
         if charged_pid_mva_enabled:
             ma.copyList('e+:merged', 'e+:charged_pid', path=path)
@@ -235,9 +231,9 @@ class CharmoniumPsi(BaseSkim):
         ma.correctBrems('e+:brems2', 'e+:merged', 'gamma:all', path=path)
 
         # Reconstruct J/psi or psi(2S).
-        ma.reconstructDecay('J/psi:ee -> e+:merged e-:merged',
+        ma.reconstructDecay('J/psi:ee_merged -> e+:merged e-:merged',
                             jpsi_mass_cut, dmID=1, path=path)
-        ma.reconstructDecay('psi(2S):ee -> e+:merged e-:merged',
+        ma.reconstructDecay('psi(2S):ee_merged -> e+:merged e-:merged',
                             psi2s_mass_cut, dmID=1, path=path)
 
         ma.reconstructDecay('J/psi:eebrems -> e+:brems e-:brems',
@@ -250,16 +246,16 @@ class CharmoniumPsi(BaseSkim):
         ma.reconstructDecay('psi(2S):eebrems2 -> e+:brems2 e-:brems2',
                             psi2s_mass_cut, dmID=1, path=path)
 
-        ma.reconstructDecay('J/psi:mumu -> mu+:merged mu-:merged',
+        ma.reconstructDecay('J/psi:mumu_merged -> mu+:merged mu-:merged',
                             jpsi_mass_cut, dmID=2, path=path)
-        ma.reconstructDecay('psi(2S):mumu -> mu+:merged mu-:merged',
+        ma.reconstructDecay('psi(2S):mumu_merged -> mu+:merged mu-:merged',
                             psi2s_mass_cut, dmID=2, path=path)
 
         # Return the lists.
-        return ['J/psi:ee', 'psi(2S):ee',
+        return ['J/psi:ee_merged', 'psi(2S):ee_merged',
                 'J/psi:eebrems', 'psi(2S):eebrems',
                 'J/psi:eebrems2', 'psi(2S):eebrems2',
-                'J/psi:mumu', 'psi(2S):mumu']
+                'J/psi:mumu_merged', 'psi(2S):mumu_merged']
 
     def validation_histograms(self, path):
         # NOTE: the validation package is not part of the light releases, so this import
@@ -365,7 +361,7 @@ class InclusiveUpsilon(BaseSkim):
         ma.fillParticleList('e+:all', "", path=path)
         ma.fillParticleList("mu+:all", "", path=path)
         ma.fillParticleList("pi+:all", "", path=path)
-        ma.cutAndCopyList("gamma:skimsoft", "gamma:loose", "E>0.15", path=path)
+        ma.cutAndCopyList("gamma:skimsoft_InclusiveUpsilon", "gamma:loose", "E>0.15", path=path)
 
         # Y(1S,2S) are reconstructed with e^+ e^- or mu^+ mu^-
         ma.reconstructDecay("Upsilon:llee -> e+:all e-:all", "M > 8 and M < 10.6", path=path)
@@ -374,7 +370,7 @@ class InclusiveUpsilon(BaseSkim):
 
         # Y(1S,2S) with pi+ or photon are reconstructed
         InclusiveUpsilon_Channels = ["Upsilon:ll pi+:all",
-                                     "Upsilon:ll gamma:skimsoft"]
+                                     "Upsilon:ll gamma:skimsoft_InclusiveUpsilon"]
 
         # define the Y(1S,2S) decay channel list
         InclusiveUpsilon = []

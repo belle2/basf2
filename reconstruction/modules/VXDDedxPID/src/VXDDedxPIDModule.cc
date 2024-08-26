@@ -38,7 +38,7 @@ VXDDedxPIDModule::VXDDedxPIDModule() : Module()
   //Parameter definitions
   addParam("useIndividualHits", m_useIndividualHits,
            "Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used.", false);
-  // no need to define highest and lowest truncated value as we always remove higest two dE/dx value from the 8 dE/dx value
+  // no need to define highest and lowest truncated value as we always remove highest two dE/dx value from the 8 dE/dx value
   addParam("onlyPrimaryParticles", m_onlyPrimaryParticles, "Only save data for primary particles (as determined by MC truth)", false);
   addParam("usePXD", m_usePXD, "Use PXDClusters for dE/dx calculation", false);
   addParam("useSVD", m_useSVD, "Use SVDClusters for dE/dx calculation", true);
@@ -55,7 +55,8 @@ VXDDedxPIDModule::~VXDDedxPIDModule() { }
 void VXDDedxPIDModule::checkPDFs()
 {
   //load dedx:momentum PDFs
-  if (!m_DBDedxPDFs) B2FATAL("No VXD Dedx PDFS available");
+  if (!m_SVDDedxPDFs) B2FATAL("No SVD Dedx PDFS available");
+  if (!m_PXDDedxPDFs) B2FATAL("No PXD Dedx PDFS available");
   int nBinsXPXD, nBinsYPXD;
   double xMinPXD, xMaxPXD, yMinPXD, yMaxPXD;
   nBinsXPXD = nBinsYPXD = -1;
@@ -68,8 +69,8 @@ void VXDDedxPIDModule::checkPDFs()
 
   for (unsigned int iPart = 0; iPart < 6; iPart++) {
     const int pdgCode = Const::chargedStableSet.at(iPart).getPDGCode();
-    const TH2F* svd_pdf = m_DBDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
-    const TH2F* pxd_pdf = m_DBDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
+    const TH2F* svd_pdf = m_SVDDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
+    const TH2F* pxd_pdf = m_PXDDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
 
     if (pxd_pdf->GetEntries() == 0 || svd_pdf->GetEntries() == 0) {
       if (m_ignoreMissingParticles)
@@ -142,7 +143,8 @@ void VXDDedxPIDModule::initialize()
   m_dedxLikelihoods.registerInDataStore();
   m_tracks.registerRelationTo(m_dedxLikelihoods);
 
-  m_DBDedxPDFs.addCallback([this]() {checkPDFs();});
+  m_SVDDedxPDFs.addCallback([this]() {checkPDFs();});
+  m_PXDDedxPDFs.addCallback([this]() {checkPDFs();});
   checkPDFs();
 
 
@@ -323,7 +325,7 @@ void VXDDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
 double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHelper* helix)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
 
   const ROOT::Math::XYZVector localPos(hit->getU(), hit->getV(), 0.0); //z-component is height over the center of the detector plane
   const ROOT::Math::XYZVector& globalPos = sensor.pointToGlobal(localPos);
@@ -340,7 +342,7 @@ double VXDDedxPIDModule::getTraversedLength(const PXDCluster* hit, const HelixHe
 double VXDDedxPIDModule::getTraversedLength(const SVDCluster* hit, const HelixHelper* helix)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
 
   ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {
@@ -372,7 +374,7 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
   //figure out which detector to assign hits to
-  const int currentDetector = geo.get(hits.front()->getSensorID()).getType();
+  const int currentDetector = geo.getSensorInfo(hits.front()->getSensorID()).getType();
   assert(currentDetector == VXD::SensorInfoBase::PXD or currentDetector == VXD::SensorInfoBase::SVD);
   assert(currentDetector <= 1); //used as array index
 
@@ -422,12 +424,12 @@ template <class HitClass> void VXDDedxPIDModule::saveSiHits(VXDDedxTrack* track,
 void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
-  const TH2F* pdf = m_DBDedxPDFs->getPXDPDF(0, !m_useIndividualHits);
+  const TH2F* pdf = m_PXDDedxPDFs->getPXDPDF(0, !m_useIndividualHits);
   const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
   const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    pdf = m_DBDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
+    pdf = m_PXDDedxPDFs->getPXDPDF(iPart, !m_useIndividualHits);
     if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;
@@ -457,12 +459,12 @@ void VXDDedxPIDModule::savePXDLogLikelihood(double(&logl)[Const::ChargedStable::
 void VXDDedxPIDModule::saveSVDLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, float dedx) const
 {
   //all pdfs have the same dimensions
-  const TH2F* pdf = m_DBDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
+  const TH2F* pdf = m_SVDDedxPDFs->getSVDPDF(0, !m_useIndividualHits);
   const Int_t binX = pdf->GetXaxis()->FindFixBin(p);
   const Int_t binY = pdf->GetYaxis()->FindFixBin(dedx);
 
   for (unsigned int iPart = 0; iPart < Const::ChargedStable::c_SetSize; iPart++) {
-    pdf = m_DBDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
+    pdf = m_SVDDedxPDFs->getSVDPDF(iPart, !m_useIndividualHits);
     if (pdf->GetEntries() == 0) //might be NULL if m_ignoreMissingParticles is set
       continue;
     double probability = 0.0;

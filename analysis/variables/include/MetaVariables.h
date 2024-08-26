@@ -115,6 +115,12 @@ namespace Belle2 {
     Manager::FunctionPtr angleToMostB2BInList(const std::vector<std::string>& arguments);
 
     /**
+     * Returns a function which returns the abs(phi difference) to the most back-to-back
+     * in phi (closest to 180 degrees) particle in the provided particle list.
+     */
+    Manager::FunctionPtr deltaPhiToMostB2BPhiInList(const std::vector<std::string>& arguments);
+
+    /**
      * Returns function which returns the product of a variable over all daughters of the given particle
      * First argument in the argument vector must be the name of variable
      */
@@ -498,6 +504,16 @@ namespace Belle2 {
     * Returns function which returns the median value of the given variable of the particles in the given particle list.
     */
     Manager::FunctionPtr medianValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the sum of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr sumValueInList(const std::vector<std::string>& arguments);
+
+    /**
+    * Returns function which returns the product of the given variable of the particles in the given particle list.
+    */
+    Manager::FunctionPtr productValueInList(const std::vector<std::string>& arguments);
 
     /**
     * Returns a function which returns the value of a variable obtained combining an arbitrary subset of particles in the decay tree, passed as

@@ -181,10 +181,9 @@ void SVDPerformanceTTreeModule::event()
   if (m_EventT0.isValid())
     if (m_EventT0->hasEventT0()) {
       if (m_EventT0->hasTemporaryEventT0(Const::EDetector::CDC)) {
-        auto evtT0List_CDC = m_EventT0->getTemporaryEventT0s(Const::EDetector::CDC) ;
-        //    The most accurate CDC event t0 value is the last one in the list.
-        m_cdcEventT0 = evtT0List_CDC.back().eventT0 ;
-        m_cdcEventT0Err = evtT0List_CDC.back().eventT0Uncertainty;
+        const auto bestCDCEvtT0 = m_EventT0->getBestCDCTemporaryEventT0();
+        m_cdcEventT0 = bestCDCEvtT0->eventT0 ;
+        m_cdcEventT0Err = bestCDCEvtT0->eventT0Uncertainty;
       }
     }
 
@@ -270,9 +269,9 @@ void SVDPerformanceTTreeModule::event()
 
           const double res_U_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const ROOT::Math::XYZVector svdLocal_1(svd_1->getPosition(), svd_predIntersect_1[4], 0.);
-          const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+          const VXD::SensorInfoBase& svdSensor_1 = geo.getSensorInfo(svd_id_1);
           const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X()); // maybe use svdGlobal_1.Phi()
+          double svdPhi_1 = svdGlobal_1.Phi();
           double svdZ_1 = svdGlobal_1.Z();
 
           m_svdFF = svd_1->getFirstFrame();
@@ -348,9 +347,9 @@ void SVDPerformanceTTreeModule::event()
           const int strips_1 = svd_1->getSize();
           const double res_V_1 = resUnBias_1.GetMatrixArray()[0] * Unit::convertValueToUnit(1.0, "um");
           const ROOT::Math::XYZVector svdLocal_1(svd_predIntersect_1[3], svd_1->getPosition(), 0.);
-          const VXD::SensorInfoBase& svdSensor_1 = geo.get(svd_id_1);
+          const VXD::SensorInfoBase& svdSensor_1 = geo.getSensorInfo(svd_id_1);
           const ROOT::Math::XYZVector& svdGlobal_1 = svdSensor_1.pointToGlobal(svdLocal_1);
-          double svdPhi_1 = atan2(svdGlobal_1.Y(), svdGlobal_1.X());  // maybe use svdGlobal_1.Phi()
+          double svdPhi_1 = svdGlobal_1.Phi();
           double svdZ_1 = svdGlobal_1.Z();
 
           m_svdFF = svd_1->getFirstFrame();

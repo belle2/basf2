@@ -208,7 +208,7 @@ CalibrationAlgorithm::EResult CDCDedx2DCellAlgorithm::calibrate()
   }
 
 
-  //Calculationg 5-75% global truncation mean
+  //Calculating 5-75% global truncation mean
   double InsumPer5 = 0.0, InsumPer75 = 0.0;
   double OutsumPer5 = 0.0, OutsumPer75 = 0.0;
   double InLayInt = hILdEdx_all->Integral();

@@ -9,6 +9,10 @@
 
 using namespace Belle2;
 
+HistObject::~HistObject()
+{
+}
+
 bool HistObject::update(TH1* hist)
 {
   if (hist) {
@@ -16,7 +20,7 @@ bool HistObject::update(TH1* hist)
     m_updated |= hist->GetEntries() != m_entries;
     m_entries = hist->GetEntries();
   }
-  m_hist = hist; // even if it is nullptr
+  m_hist = std::unique_ptr<TH1>(hist); // even if it is nullptr
   return m_updated;
 }
 

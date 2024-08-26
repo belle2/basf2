@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -26,7 +25,7 @@ from concurrent.futures import ProcessPoolExecutor
 # Skip this test for light releases.
 b2u.skip_test_if_light()
 # And skip also if the validation folder is not available
-b2u.require_file('mdst14.root', 'validation')
+b2u.require_file('mdst16.root', 'validation')
 
 
 def arg_parser():

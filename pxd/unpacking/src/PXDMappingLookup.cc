@@ -20,7 +20,7 @@ using namespace Belle2::PXD;
 int PXDMappingLookup::getDCDID(const int u, const int v, const VxdID sensorID)
 {
 
-  //const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
+  //const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
   //                                                              sensorID));
   int ret = 0;
   int iLayer = sensorID.getLayerNumber();

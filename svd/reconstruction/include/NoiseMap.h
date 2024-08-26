@@ -43,7 +43,7 @@ namespace Belle2 {
       /** Set the sensorID currently used */
       virtual void setSensorID(VxdID sensorID, bool side)
       {
-        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+        const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
         m_sensorID = sensorID;
         if (side)
           m_noiseLevel = info.getElectronicNoiseU() / m_eInADU;

@@ -217,19 +217,13 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          const MCParticle* mcpart = particle->getMCParticle();
-          while (mcpart)
-          {
-            int pdg = std::abs(mcpart->getPDG());
-            if ((pdg == 521) || (pdg == 511)) {
-              Particle temp(mcpart);
-              UseReferenceFrame<RestFrame> frame(&temp);
-              double result = std::get<double>(var->function(particle));
-              return result;
-            }
-            mcpart = mcpart->getMother();
-          }
-          return Const::doubleNaN;
+          int index = ancestorBIndex(particle);
+          if (index < 0) return Const::doubleNaN;
+          StoreArray<MCParticle> mcparticles;
+          Particle temp(mcparticles[index]);
+          UseReferenceFrame<RestFrame> frame(&temp);
+          double result = std::get<double>(var->function(particle));
+          return result;
         };
         return func;
       } else {

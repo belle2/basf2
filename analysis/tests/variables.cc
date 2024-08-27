@@ -1018,11 +1018,6 @@ namespace {
     mcparticles[0]->setMassFromPDG();
     DataStore::Instance().setInitializeActive(false);
 
-    std::cout << "MC: " << p->getMCParticle() << std::endl;
-    std::cout << "MC Mother: " << p->getMCParticle()->getMother() << std::endl;
-    std::cout << "MC Mother PDG: " << p->getMCParticle()->getMother()->getPDG() << std::endl;
-    std::cout << "MC Mother Momentum: " << p->getMCParticle()->getMother()->getMomentum() << std::endl;
-
     const Manager::Var* var = Manager::Instance().getVariable("useMCancestorBRestFrame(p)");
     ASSERT_NE(var, nullptr);
     EXPECT_FLOAT_EQ(std::get<double>(var->function(p)), 0.88333338);

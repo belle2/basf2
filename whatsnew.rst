@@ -20,7 +20,7 @@ Changes since release-07
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-01
+   .. list-table:: New and updated packages in externals from v01-12-01 to v02-00-05
       :widths: 50 25 25
       :header-rows: 1
 
@@ -30,6 +30,9 @@ Changes since release-07
       * - clhep
         - 2.4.1.3
         - 2.4.6.2
+      * - EvtGen
+        - R02-00-00
+        - R02-00-01
       * - Geant4
         - 10.06.p03
         - 11.1.1
@@ -45,12 +48,24 @@ Changes since release-07
       * - VGM
         - 4.6
         - 5.0
+      * - Whizard
+        -
+        - 3.1.2
       * - beautifulsoup4
         -
         - 4.11.1
+      * - click
+        -
+        - 8.1.6
       * - pydata-sphinx-theme
         -
         - 0.8.1
+      * - PyJWT
+        -
+        - 2.8.0
+      * - pytorch-ignite
+        -
+        - 0.4.12
       * - soupsieve
         -
         - 2.3.2.post1

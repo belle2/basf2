@@ -189,7 +189,7 @@ void SVDUnpackerModule::event()
 
       std::vector<unsigned short> nWords;
       nWords.reserve(maxNumOfCh);
-      uint32_t*      data32tab[maxNumOfCh]; //vector of pointers
+      std::vector<uint32_t*>      data32tab(maxNumOfCh); //vector of pointers
       for (unsigned int k = 0; k < maxNumOfCh; k++) {
         nWords.push_back(m_rawSVD[i]->GetDetectorNwords(j, k));
         data32tab[k] = (uint32_t*)m_rawSVD[i]->GetDetectorBuffer(j, k); // points at the begining of the 1st buffer

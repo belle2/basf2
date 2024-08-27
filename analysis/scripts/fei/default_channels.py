@@ -1506,8 +1506,9 @@ def get_mode_names(particle_name: str,
                            })
     channels = get_default_channels(**channel_kwargs)
     modes = []
+    conjugate_name = particle_name.replace('-', '+')
     for channel in channels:
-        if channel.name == particle_name:
+        if channel.name == particle_name or channel.name == conjugate_name:
             modes += [d_channel.label.split(' ==> ')[1] for d_channel in channel.channels]
     if remove_list_labels:
         modes = [mode.replace(':generic', '').replace(':semileptonic', '') for mode in modes]

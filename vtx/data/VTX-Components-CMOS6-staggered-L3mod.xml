@@ -14,7 +14,7 @@
     <!-- The nominal radius of the inner layer is 14 mm, but this is the inner
          surface of the sensor and here we give the center of the sensor, so
          let's add half of the thickness of supporting balcony (0.2mm) -->
-    <radius unit="mm">14.095</radius>
+    <radius unit="mm">14.0475</radius>
     <!-- The value of Sensors is the global z position -->
     <Sensor id="1" type="layer1i" unit="mm" flipV="true">-28.218</Sensor>
     <Sensor id="2" type="layer1i" unit="mm" flipV="true">2.050000</Sensor>
@@ -24,7 +24,7 @@
 
   <Ladder layer="2">
     <shift  unit="mm">6</shift>
-    <radius unit="mm">22.095</radius>
+    <radius unit="mm">22.0475</radius>
     <Sensor id="1" type="layer1i" unit="mm" flipV="true">-28.218</Sensor>
     <Sensor id="2" type="layer1i" unit="mm" flipV="true">2.050000</Sensor>
     <Sensor id="3" type="layer1i" unit="mm" flipV="true">32.318</Sensor>
@@ -223,7 +223,7 @@
   <Material>Si</Material>
   <width unit="mm">18.812</width>
   <length unit="mm">30.168</length>
-  <height unit="mm">0.19</height>
+  <height unit="mm">0.095</height>
   <!-- definition of the active area of the module which is a part of the
        whole thing. The position is given relative to the lower left edge of
        the module (the point with the most negative local coordinates). -->

@@ -193,7 +193,7 @@ or by using the ``-h`` flag.
      :class: exercise stacked
 
      Use ``b2skim-run`` to apply the skim ``XToD0_D0ToHpJm`` to the file
-     ``$BELLE2_VALIDATION_DATA_DIR/mdst14.root``.
+     ``$BELLE2_VALIDATION_DATA_DIR/mdst16.root``.
 
 .. admonition:: Solution
      :class: toggle solution
@@ -202,7 +202,7 @@ or by using the ``-h`` flag.
 
      .. code-block:: bash
 
-         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst14.root
+         b2skim-run single XToD0_D0ToHpJm -i $BELLE2_VALIDATION_DATA_DIR/mdst16.root
 
      By default, this will output a uDST file in the current directory titled
      ``17230100.udst.root``.
@@ -224,11 +224,11 @@ or by using the ``-h`` flag.
 
      .. code-block:: bash
 
-         b2file-metadata-show $BELLE2_VALIDATION_DATA_DIR/mdst14.root
+         b2file-metadata-show $BELLE2_VALIDATION_DATA_DIR/mdst16.root
          b2file-metadata-show 17230100.udst.root
 
-     We find the unskimmed file has 90000 events, and the skimmed file has 8347
-     events, so the retention rate on this sample is 9.3%.
+     We find the unskimmed file has 90000 events, and the skimmed file has 3519
+     events, so the retention rate on this sample is 3.9%.
 
 
 Accessing skims on the grid

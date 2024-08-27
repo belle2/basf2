@@ -13,7 +13,7 @@ import basf2
 import ROOT
 import b2test_utils
 
-inputFile = b2test_utils.require_file('mdst14.root', 'validation')
+inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 path = basf2.create_path()
 path.add_module('RootInput', inputFileName=inputFile)
 

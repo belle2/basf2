@@ -13,6 +13,7 @@
 #include <analysis/modules/DuplicateVertexMarker/DuplicateVertexMarkerModule.h>
 
 #include <analysis/dataobjects/Particle.h>
+#include <analysis/variables/BasicParticleInformation.h>
 
 #include <framework/logging/Logger.h>
 
@@ -26,7 +27,7 @@ using namespace Belle2;
 
 REG_MODULE(DuplicateVertexMarker);
 
-DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetVar(nullptr)
+DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module()
 {
   setDescription("Identify duplicate vertices (distinct particles, but built from the same daughters) and mark the one with best chi2. Only works if the particle has exactly two daughters. Mainly used to deal when merging V0 vertices with hand-built ones.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -44,12 +45,6 @@ DuplicateVertexMarkerModule::DuplicateVertexMarkerModule() : Module(), m_targetV
 void DuplicateVertexMarkerModule::initialize()
 {
   m_inPList.isRequired(m_particleList);
-
-  Variable::Manager& manager = Variable::Manager::Instance();
-  m_targetVar = manager.getVariable("chiProb");
-  if (m_targetVar == nullptr) {
-    B2ERROR("DuplicateVertexMarker: Variable::Manager doesn't have variable chiProb");
-  }
 }
 
 void DuplicateVertexMarkerModule::event()
@@ -96,8 +91,7 @@ void DuplicateVertexMarkerModule::event()
         }
         if (!(part->hasExtraInfo(m_extraInfoName) || cloneCand->hasExtraInfo(m_extraInfoName))) {
           //if V0s aren't being checked, or have been checked but inconclusive (should not happen) check best fit
-          B2DEBUG(10, std::get<double>(m_targetVar->function(part)) << " vs " << std::get<double>(m_targetVar->function(cloneCand)));
-          if (std::get<double>(m_targetVar->function(part)) > std::get<double>(m_targetVar->function(cloneCand))) {
+          if (Variable::particlePvalue(part) > Variable::particlePvalue(cloneCand)) {
             cloneCand->addExtraInfo(m_extraInfoName, 0.0);
           } else {
             part->addExtraInfo(m_extraInfoName, 0.0);

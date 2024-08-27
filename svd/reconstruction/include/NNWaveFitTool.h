@@ -181,7 +181,7 @@ namespace Belle2 {
         } else {
           // Normalize if the norm makes sense.
           std::transform(p.begin(), p.end(), p.begin(),
-                         std::bind2nd(std::divides<double>(), pnorm));
+                         std::bind(std::divides<double>(), std::placeholders::_1, pnorm));
         }
       }
 

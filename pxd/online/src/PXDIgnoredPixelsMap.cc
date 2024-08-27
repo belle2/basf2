@@ -69,7 +69,7 @@ PXDIgnoredPixelsMap::PXDIgnoredPixelsMap(const string& xmlFilename):
                 sensorID.setSensorNumber(static_cast<unsigned short>(sensor.second.get<int>("<xmlattr>.n")));
                 PXDIgnoredPixelsMap::IgnoredPixelsRangeSet ranges;
                 PXDIgnoredPixelsMap::IgnoredSinglePixelsSet singles;
-                const VXD::SensorInfoBase& info = VXD::GeoCache::getInstance().get(sensorID);
+                const VXD::SensorInfoBase& info = VXD::GeoCache::getInstance().getSensorInfo(sensorID);
                 for (ptree::value_type const& tag : sensor.second) {
                   if (tag.first == "pixels") {
                     auto limits = tag.second;
@@ -153,7 +153,7 @@ const std::set<PXDIgnoredPixelsMap::map_pixel> PXDIgnoredPixelsMap::getIgnoredPi
   // This function is quite ineffective, but it is not supposed to be run often
   // Also, it currently returns copy of the (possibly very big) set of masked pixels
   std::set<PXDIgnoredPixelsMap::map_pixel> pixels;
-  const VXD::SensorInfoBase& info = VXD::GeoCache::getInstance().get(id);
+  const VXD::SensorInfoBase& info = VXD::GeoCache::getInstance().getSensorInfo(id);
 
   // This is quite slow solution but it merges duplicate maskings in the set
   for (int pixelU = 0; pixelU < info.getUCells(); pixelU++) {
@@ -172,7 +172,7 @@ bool PXDIgnoredPixelsMap::pixelOK(VxdID id, PXDIgnoredPixelsMap::map_pixel pixel
   // of the new sensor. Otherwise clear temp maps, as there is nothing to mask
   if (id != m_lastSensorID) {
     m_lastSensorID = id;
-    m_lastSensorVCells =  VXD::GeoCache::getInstance().get(m_lastSensorID).getVCells();
+    m_lastSensorVCells = VXD::GeoCache::getInstance().getSensorInfo(m_lastSensorID).getVCells();
     auto mapIter = m_Map.find(id);
     auto mapIterSingles = m_MapSingles.find(id);
 

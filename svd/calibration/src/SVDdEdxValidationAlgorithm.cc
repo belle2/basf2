@@ -28,7 +28,6 @@
 
 #include <RooDataSet.h>
 #include <RooRealVar.h>
-#include <RooFormulaVar.h>
 #include <RooAddPdf.h>
 #include <RooGaussian.h>
 #include <RooChebychev.h>
@@ -329,8 +328,12 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   PIDDetectors.push_back("ALL");
   PIDDetectors.push_back("noSVD");
 
-  double SignalEfficiencyALL[m_NumROCpoints], FakeEfficiencyALL[m_NumROCpoints];
-  double SignalEfficiencynoSVD[m_NumROCpoints], FakeEfficiencynoSVD[m_NumROCpoints];
+  std::vector<double> SignalEfficiencyALL, FakeEfficiencyALL;
+  SignalEfficiencyALL.reserve(m_NumROCpoints);
+  FakeEfficiencyALL.reserve(m_NumROCpoints);
+  std::vector<double> SignalEfficiencynoSVD, FakeEfficiencynoSVD;
+  SignalEfficiencynoSVD.reserve(m_NumROCpoints);
+  FakeEfficiencynoSVD.reserve(m_NumROCpoints);
 
   TString SignalFiducialCut = SignalVarName +  PIDVarName + "noSVD>=0"; // sanity cuts to reject events with NaN
   TString FakesFiducialCut = FakeVarName +  PIDVarName + "noSVD>=0";
@@ -371,11 +374,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
       }
 
       if (PIDDetectors[i] == "ALL") {
-        SignalEfficiencyALL[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
+        SignalEfficiencyALL.push_back(hSelectedSignal->Integral() / hAllSignal->Integral());
       }
 
       if (PIDDetectors[i] == "noSVD") {
-        SignalEfficiencynoSVD[j] = hSelectedSignal->Integral() / hAllSignal->Integral();
+        SignalEfficiencynoSVD.push_back(hSelectedSignal->Integral() / hAllSignal->Integral());
       }
     }
   }
@@ -414,11 +417,11 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
       }
 
       if (PIDDetectors[i] == "ALL") {
-        FakeEfficiencyALL[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
+        FakeEfficiencyALL.push_back(hSelectedFakes->Integral() / hAllFakes->Integral());
       }
 
       if (PIDDetectors[i] == "noSVD") {
-        FakeEfficiencynoSVD[j] = hSelectedFakes->Integral() / hAllFakes->Integral();
+        FakeEfficiencynoSVD.push_back(hSelectedFakes->Integral() / hAllFakes->Integral());
       }
     }
   }
@@ -427,7 +430,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   TMultiGraph* hmgraph = new TMultiGraph();
 
   // efficiency and kaon fake rate
-  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiencyALL, SignalEfficiencyALL);
+  TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiencyALL.data(), SignalEfficiencyALL.data());
   hgraphALL->SetMarkerColor(TColor::GetColor("#2166ac"));
   hgraphALL->SetMarkerStyle(20);
   hgraphALL->SetLineColor(TColor::GetColor("#2166ac"));
@@ -435,7 +438,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   hgraphALL->SetDrawOption("AP*");
   hgraphALL->SetTitle("with SVD");
 
-  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiencynoSVD, SignalEfficiencynoSVD);
+  TGraph* hgraphnoSVD = new TGraph(m_NumROCpoints, FakeEfficiencynoSVD.data(), SignalEfficiencynoSVD.data());
   hgraphnoSVD->SetMarkerColor(TColor::GetColor("#ef8a62"));
   hgraphnoSVD->SetLineColor(TColor::GetColor("#ef8a62"));
   hgraphnoSVD->SetLineWidth(3);
@@ -548,14 +551,21 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   RooRealVar GaussSigma("GaussSigma", "#sigma_{1}", 3.e-3, 3.e-5, 10.e-3);
   RooGaussian LambdaGauss("LambdaGauss", "LambdaGauss", InvM, GaussMean, GaussSigma);
 
-  RooRealVar resolutionParamL("resolutionParamL", "resolutionParamL", 0.4, 5.e-4, 1.0);
-  RooRealVar resolutionParamR("resolutionParamR", "resolutionParamR", 0.4, 5.e-4, 1.0);
-  RooFormulaVar sigmaBifurGaussL1("sigmaBifurGaussL1", "resolutionParamL*GaussSigma", RooArgSet(resolutionParamL, GaussSigma));
-  RooFormulaVar sigmaBifurGaussR1("sigmaBifurGaussR1", "resolutionParamR*GaussSigma", RooArgSet(resolutionParamR, GaussSigma));
+  /* temporary RooRealVar sigmaBifurGaussL1 and sigmaBifurGaussR1 to replace
+   * RooRealVar resolutionParamL("resolutionParamL", "resolutionParamL", 0.4, 5.e-4, 1.0);
+   * RooRealVar resolutionParamR("resolutionParamR", "resolutionParamR", 0.4, 5.e-4, 1.0);
+   * RooFormulaVar sigmaBifurGaussL1("sigmaBifurGaussL1", "resolutionParamL*GaussSigma", RooArgSet(resolutionParamL, GaussSigma));
+   * RooFormulaVar sigmaBifurGaussR1("sigmaBifurGaussR1", "resolutionParamR*GaussSigma", RooArgSet(resolutionParamR, GaussSigma));
+   */
+  RooRealVar sigmaBifurGaussL1("sigmaBifurGaussL1", "sigma left", 0.4 * 3.e-3, 3.e-5, 10.e-3);
+  RooRealVar sigmaBifurGaussR1("sigmaBifurGaussR1", "sigma right", 0.4 * 3.e-3, 3.e-5, 10.e-3);
   RooBifurGauss LambdaBifurGauss("LambdaBifurGauss", "LambdaBifurGauss", InvM, GaussMean, sigmaBifurGaussL1, sigmaBifurGaussR1);
 
-  RooRealVar resolutionParam2("resolutionParam2", "resolutionParam2", 0.2, 5.e-4, 1.0);
-  RooFormulaVar sigmaBifurGaussL2("sigmaBifurGaussL2", "resolutionParam2*GaussSigma", RooArgSet(resolutionParam2, GaussSigma));
+  /* temporary RooRealVar sigmaBifurGaussL2 to replace
+   * RooRealVar resolutionParam2("resolutionParam2", "resolutionParam2", 0.2, 5.e-4, 1.0);
+   * sigmaBifurGaussL2("sigmaBifurGaussL2", "resolutionParam2*GaussSigma", RooArgSet(resolutionParam2, GaussSigma));
+   */
+  RooRealVar sigmaBifurGaussL2("sigmaBifurGaussL2", "sigmaBifurGaussL2", 0.2 * 3.e-3, 3.e-5, 10.e-3);
   RooGaussian LambdaBifurGauss2("LambdaBifurGauss2", "LambdaBifurGauss2", InvM, GaussMean, sigmaBifurGaussL2);
 
   RooRealVar fracBifurGaussYield("fracBifurGaussYield", "fracBifurGaussYield", 0.3, 5.e-4, 1.0);

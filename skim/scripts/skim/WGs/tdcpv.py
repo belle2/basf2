@@ -31,7 +31,7 @@ __authors__ = [
 ]
 
 __liaison__ = "Noah BRENNY <nbrenny@iastate.edu>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

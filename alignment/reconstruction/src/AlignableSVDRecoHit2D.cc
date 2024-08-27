@@ -35,7 +35,7 @@ std::pair<std::vector<int>, TMatrixD> AlignableSVDRecoHit2D::globalDerivatives(c
     globals.add(lorentz);
   }
 
-  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(getSensorID()));
+  const SVD::SensorInfo& geometry = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(getSensorID()));
 
   // Legendre parametrization of deformation
   auto L1 = [](double x) {return x;};

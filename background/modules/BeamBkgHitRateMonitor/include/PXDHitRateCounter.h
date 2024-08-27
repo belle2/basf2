@@ -116,7 +116,7 @@ namespace Belle2 {
 
     inline const PXD::SensorInfo& PXDHitRateCounter::getInfo(VxdID sensorID) const
     {
-      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      return dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     }
 
   } // Background namespace

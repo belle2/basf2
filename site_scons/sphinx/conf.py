@@ -362,6 +362,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.11/', None),
                        'scipy': ('https://docs.scipy.org/doc/scipy/', None),
                        'pandas': ('https://pandas.pydata.org/docs/', None),
                        'matplotlib': ('https://matplotlib.org/stable/', None),
+                       'b2luigi': ('https://b2luigi.belle2.org/', None),
                        'uproot': ('https://uproot.readthedocs.io/en/stable/', None)}
 
 
@@ -474,24 +475,3 @@ def setup(app):
     app.connect('autodoc-process-docstring', process_docstring)
     app.connect('autodoc-skip-member', skipmember)
     app.add_css_file('css/custom.css')
-
-
-# Work around https://github.com/sphinx-doc/sphinx/issues/9189 by monkey patching the member function in question
-# FIXME: Not needed with sphinx>=4.0.1
-
-from sphinx.ext import autodoc  # noqa
-# remember the old function
-old_directive_header = autodoc.PropertyDocumenter.add_directive_header
-
-
-# make a new one that ignores the value error
-def _fixed_directive_header(*args, **argk):
-    """Catch the ValueError and ignore it as done in https://github.com/sphinx-doc/sphinx/pull/9190"""
-    try:
-        old_directive_header(*args, **argk)
-    except ValueError:
-        return None
-
-
-# and override the existing function with our new and improved version.
-autodoc.PropertyDocumenter.add_directive_header = _fixed_directive_header

@@ -292,7 +292,7 @@ void PXDDigitizerModule::event()
 
     VxdID sensorID = m_currentHit->getSensorID();
     if (!m_currentSensorInfo || sensorID != m_currentSensorInfo->getID()) {
-      m_currentSensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::get(sensorID));
+      m_currentSensorInfo = dynamic_cast<const SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       if (!m_currentSensorInfo)
         B2FATAL(
           "SensorInformation for Sensor " << sensorID << " not found, make sure that the geometry is set up correctly");
@@ -501,7 +501,7 @@ void PXDDigitizerModule::addNoiseDigits()
 
     //Calculate the number of pixels on an empty sensor which will exceed the noise cut
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensor.first));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensor.first));
     int nU = info.getUCells();
     int nV = info.getVCells();
     int nPixels = gRandom->Poisson(info.getNoiseFraction() * nU * nV);
@@ -537,7 +537,7 @@ void PXDDigitizerModule::saveDigits()
   for (Sensors::value_type& sensor : m_sensors) {
     auto sensorID = sensor.first;
     const SensorInfo& info =
-      dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(sensorID));
+      dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
     m_chargeThreshold = info.getChargeThreshold();
     m_chargeThresholdElectrons = m_chargeThreshold * m_eToADU;
     for (Sensor::value_type& digitAndValue : sensor.second) {

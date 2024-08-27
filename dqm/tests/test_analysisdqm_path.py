@@ -25,7 +25,7 @@ with b2test_utils.clean_working_directory():
     b2.set_random_seed("")
 
     # require_file skips the test if can't be found
-    inputfile = b2test_utils.require_file("mdst14.root", "validation")
+    inputfile = b2test_utils.require_file("mdst16.root", "validation")
 
     # just run over an mdst to check the modules execute
     testpath = b2.Path()

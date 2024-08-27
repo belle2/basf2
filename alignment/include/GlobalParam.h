@@ -217,7 +217,7 @@ namespace Belle2 {
       }
 
       /// Copy constructor
-      GlobalParamSet<DBObjType>(const GlobalParamSet<DBObjType>& other)
+      GlobalParamSet(const GlobalParamSet<DBObjType>& other)
       {
         m_hasBeenChangedInDB = other.m_hasBeenChangedInDB;
         // Make new unique ptr to a copy of the other internal object

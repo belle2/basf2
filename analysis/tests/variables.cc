@@ -391,6 +391,8 @@ namespace {
     EXPECT_FLOAT_EQ(0.5, trackPValue(part));
     EXPECT_FLOAT_EQ(position.Z(), trackZ0(part));
     EXPECT_FLOAT_EQ(position.Rho(), trackD0(part));
+    EXPECT_FLOAT_EQ(particleDRho(part), std::fabs(trackD0FromIP(part)));
+    EXPECT_FLOAT_EQ(particleDZ(part), trackZ0FromIP(part));
     EXPECT_FLOAT_EQ(3, trackNCDCHits(part));
     EXPECT_FLOAT_EQ(24, trackNSVDHits(part));
     EXPECT_FLOAT_EQ(12, trackNPXDHits(part));
@@ -3142,6 +3144,124 @@ namespace {
     // non-existing list
     const Manager::Var* vnolist = Manager::Instance().getVariable(
                                     "medianValueInList(NONEXISTANTLIST, px)");
+
+    EXPECT_B2FATAL(std::get<double>(vnolist->function(nullptr)));
+  }
+
+  TEST_F(MetaVariableTest, productValueInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5, 0.4, 0.4, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto& g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get the product of the px, py, pz, E of the gammas in the list
+    const Manager::Var* vproductpx = Manager::Instance().getVariable(
+                                       "productValueInList(testGammaList, px)");
+    const Manager::Var* vproductpy = Manager::Instance().getVariable(
+                                       "productValueInList(testGammaList, py)");
+    const Manager::Var* vproductpz = Manager::Instance().getVariable(
+                                       "productValueInList(testGammaList, pz)");
+    const Manager::Var* vproductE = Manager::Instance().getVariable(
+                                      "productValueInList(testGammaList, E)");
+
+    EXPECT_FLOAT_EQ(std::get<double>(vproductpx->function(nullptr)), 0.015);
+    EXPECT_FLOAT_EQ(std::get<double>(vproductpy->function(nullptr)), 0.00192);
+    EXPECT_FLOAT_EQ(std::get<double>(vproductpz->function(nullptr)), 0.06272);
+    EXPECT_FLOAT_EQ(std::get<double>(vproductE->function(nullptr)), 0.42768);
+
+    // wrong number of arguments (no variable provided)
+    EXPECT_B2FATAL(Manager::Instance().getVariable("productValueInList(testGammaList)"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("productValueInList(testGammaList, NONEXISTANTVARIABLE)"));
+
+    // non-existing list
+    const Manager::Var* vnolist = Manager::Instance().getVariable(
+                                    "productValueInList(NONEXISTANTLIST, px)");
+
+    EXPECT_B2FATAL(std::get<double>(vnolist->function(nullptr)));
+  }
+
+  TEST_F(MetaVariableTest, sumValueInList)
+  {
+    // we need the particles StoreArray
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    // create a photon list for testing
+    StoreObjPtr<ParticleList> gammalist("testGammaList");
+    DataStore::Instance().setInitializeActive(true);
+    gammalist.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    gammalist.create();
+    gammalist->initialize(22, "testGammaList");
+
+    // create some photons in an stdvector
+    std::vector<Particle> gammavector = {
+      Particle({0.5, 0.4, 0.4, 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 0),
+      Particle({0.5, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 1),
+      Particle({0.4, 0.2, 0.7, 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2),
+      Particle({0.5, 0.4, 0.8, 1.1}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3),
+      Particle({0.3, 0.3, 0.4, 0.6}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4)
+    };
+
+    // put the photons in the StoreArray
+    for (const auto& g : gammavector)
+      particles.appendNew(g);
+
+    // put the photons in the test list
+    for (size_t i = 0; i < gammavector.size(); i++)
+      gammalist->addParticle(i, 22, Particle::c_Unflavored);
+
+    // get the summed px, py, pz, E of the gammas in the list
+    const Manager::Var* vsumpx = Manager::Instance().getVariable(
+                                   "sumValueInList(testGammaList, px)");
+    const Manager::Var* vsumpy = Manager::Instance().getVariable(
+                                   "sumValueInList(testGammaList, py)");
+    const Manager::Var* vsumpz = Manager::Instance().getVariable(
+                                   "sumValueInList(testGammaList, pz)");
+    const Manager::Var* vsumE = Manager::Instance().getVariable(
+                                  "sumValueInList(testGammaList, E)");
+
+    EXPECT_FLOAT_EQ(std::get<double>(vsumpx->function(nullptr)), 2.2);
+    EXPECT_FLOAT_EQ(std::get<double>(vsumpy->function(nullptr)), 1.5);
+    EXPECT_FLOAT_EQ(std::get<double>(vsumpz->function(nullptr)), 3.0);
+    EXPECT_FLOAT_EQ(std::get<double>(vsumE->function(nullptr)), 4.3);
+
+    // wrong number of arguments (no variable provided)
+    EXPECT_B2FATAL(Manager::Instance().getVariable("sumValueInList(testGammaList)"));
+
+    // non-existing variable
+    EXPECT_B2FATAL(Manager::Instance().getVariable("sumValueInList(testGammaList, NONEXISTANTVARIABLE)"));
+
+    // non-existing list
+    const Manager::Var* vnolist = Manager::Instance().getVariable(
+                                    "sumValueInList(NONEXISTANTLIST, px)");
 
     EXPECT_B2FATAL(std::get<double>(vnolist->function(nullptr)));
   }

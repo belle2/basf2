@@ -50,9 +50,9 @@ void AlignDQMModule::defineHisto()
     B2WARNING("Missing geometry for VXD.");
 
   TDirectory* originalDirectory = gDirectory;
-  TDirectory* alignmentDirectory = originalDirectory->mkdir("AlignmentDQM");
-  TDirectory* sensorsDirectory = originalDirectory->mkdir("AlignmentDQMSensors");
-  TDirectory* layersDirectory = originalDirectory->mkdir("AlignmentDQMLayers");
+  TDirectory* alignmentDirectory = originalDirectory->mkdir("AlignmentDQM", "", true);
+  TDirectory* sensorsDirectory = originalDirectory->mkdir("AlignmentDQMSensors", "", true);
+  TDirectory* layersDirectory = originalDirectory->mkdir("AlignmentDQMLayers", "", true);
 
   alignmentDirectory->cd();
   DefineTracks();
@@ -121,8 +121,8 @@ void AlignDQMModule::DefineHelixParametersAndCorrelations()
 {
   TDirectory* originalDirectory = gDirectory;
 
-  TDirectory* helixParameters = originalDirectory->mkdir("HelixPars");
-  TDirectory* helixCorrelations = originalDirectory->mkdir("HelixCorrelations");
+  TDirectory* helixParameters = originalDirectory->mkdir("HelixPars", "", true);
+  TDirectory* helixCorrelations = originalDirectory->mkdir("HelixCorrelations", "", true);
 
   int iZ0Range = 100;
   double fZ0Range = 10.0;     // Half range in cm
@@ -203,19 +203,19 @@ void AlignDQMModule::DefineSensors()
 {
   TDirectory* originalDirectory = gDirectory;
 
-  TDirectory* resMeanUPosUV = originalDirectory->mkdir("ResidMeanUPositUV");
-  TDirectory* resMeanVPosUV = originalDirectory->mkdir("ResidMeanVPositUV");
-  TDirectory* resMeanPosUVCounts = originalDirectory->mkdir("ResidMeanPositUVCounts");
-  TDirectory* resMeanUPosU = originalDirectory->mkdir("ResidMeanUPositU");
-  TDirectory* resMeanVPosU = originalDirectory->mkdir("ResidMeanVPositU");
-  TDirectory* resMeanUPosV = originalDirectory->mkdir("ResidMeanUPositV");
-  TDirectory* resMeanVPosV = originalDirectory->mkdir("ResidMeanVPositV");
-  TDirectory* resUPosU = originalDirectory->mkdir("ResidUPositU");
-  TDirectory* resVPosU = originalDirectory->mkdir("ResidVPositU");
-  TDirectory* resUPosV = originalDirectory->mkdir("ResidUPositV");
-  TDirectory* resVPosV = originalDirectory->mkdir("ResidVPositV");
-  TDirectory* resids2D = originalDirectory->mkdir("Residuals2D");
-  TDirectory* resids1D = originalDirectory->mkdir("Residuals1D");
+  TDirectory* resMeanUPosUV = originalDirectory->mkdir("ResidMeanUPositUV", "", true);
+  TDirectory* resMeanVPosUV = originalDirectory->mkdir("ResidMeanVPositUV", "", true);
+  TDirectory* resMeanPosUVCounts = originalDirectory->mkdir("ResidMeanPositUVCounts", "", true);
+  TDirectory* resMeanUPosU = originalDirectory->mkdir("ResidMeanUPositU", "", true);
+  TDirectory* resMeanVPosU = originalDirectory->mkdir("ResidMeanVPositU", "", true);
+  TDirectory* resMeanUPosV = originalDirectory->mkdir("ResidMeanUPositV", "", true);
+  TDirectory* resMeanVPosV = originalDirectory->mkdir("ResidMeanVPositV", "", true);
+  TDirectory* resUPosU = originalDirectory->mkdir("ResidUPositU", "", true);
+  TDirectory* resVPosU = originalDirectory->mkdir("ResidVPositU", "", true);
+  TDirectory* resUPosV = originalDirectory->mkdir("ResidUPositV", "", true);
+  TDirectory* resVPosV = originalDirectory->mkdir("ResidVPositV", "", true);
+  TDirectory* resids2D = originalDirectory->mkdir("Residuals2D", "", true);
+  TDirectory* resids1D = originalDirectory->mkdir("Residuals1D", "", true);
 
   int iSizeBins = 20;
   double fSizeMin = -50;  // in mm
@@ -293,17 +293,17 @@ void AlignDQMModule::DefineLayers()
 {
   TDirectory* originalDirectory = gDirectory;
 
-  TDirectory* resMeanUPosUV = originalDirectory->mkdir("ResidLayerMeanUPositPhiTheta");
-  TDirectory* resMeanVPosUV = originalDirectory->mkdir("ResidLayerMeanVPositPhiTheta");
-  TDirectory* resMeanPosUVCounts = originalDirectory->mkdir("ResidLayerMeanPositPhiThetaCounts");
-  TDirectory* resMeanUPosU = originalDirectory->mkdir("ResidLayerMeanUPositPhi");
-  TDirectory* resMeanVPosU = originalDirectory->mkdir("ResidLayerMeanVPositPhi");
-  TDirectory* resMeanUPosV = originalDirectory->mkdir("ResidLayerMeanUPositTheta");
-  TDirectory* resMeanVPosV = originalDirectory->mkdir("ResidLayerMeanVPositTheta");
-  TDirectory* resUPosU = originalDirectory->mkdir("ResidLayerUPositPhi");
-  TDirectory* resVPosU = originalDirectory->mkdir("ResidLayerVPositPhi");
-  TDirectory* resUPosV = originalDirectory->mkdir("ResidLayerUPositTheta");
-  TDirectory* resVPosV = originalDirectory->mkdir("ResidLayerVPositTheta");
+  TDirectory* resMeanUPosUV = originalDirectory->mkdir("ResidLayerMeanUPositPhiTheta", "", true);
+  TDirectory* resMeanVPosUV = originalDirectory->mkdir("ResidLayerMeanVPositPhiTheta", "", true);
+  TDirectory* resMeanPosUVCounts = originalDirectory->mkdir("ResidLayerMeanPositPhiThetaCounts", "", true);
+  TDirectory* resMeanUPosU = originalDirectory->mkdir("ResidLayerMeanUPositPhi", "", true);
+  TDirectory* resMeanVPosU = originalDirectory->mkdir("ResidLayerMeanVPositPhi", "", true);
+  TDirectory* resMeanUPosV = originalDirectory->mkdir("ResidLayerMeanUPositTheta", "", true);
+  TDirectory* resMeanVPosV = originalDirectory->mkdir("ResidLayerMeanVPositTheta", "", true);
+  TDirectory* resUPosU = originalDirectory->mkdir("ResidLayerUPositPhi", "", true);
+  TDirectory* resVPosU = originalDirectory->mkdir("ResidLayerVPositPhi", "", true);
+  TDirectory* resUPosV = originalDirectory->mkdir("ResidLayerUPositTheta", "", true);
+  TDirectory* resVPosV = originalDirectory->mkdir("ResidLayerVPositTheta", "", true);
 
   int iPhiGran = 90;
   int iThetGran = iPhiGran / 2;

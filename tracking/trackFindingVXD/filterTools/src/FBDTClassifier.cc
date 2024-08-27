@@ -9,11 +9,7 @@
 #include <tracking/trackFindingVXD/filterTools/FBDTClassifier.h>
 #include <framework/logging/Logger.h>
 
-#if FastBDT_VERSION_MAJOR >= 3
 #include <FastBDT_IO.h>
-#else
-#include <IO.h>
-#endif
 
 using namespace Belle2;
 
@@ -24,11 +20,7 @@ void FBDTClassifier<Ndims>::readFromStream(std::istream& is)
   B2DEBUG(20, "Reading the FeatureBinnings");
   is >> m_featBins;
   B2DEBUG(20, "Reading the Forest");
-#if FastBDT_VERSION_MAJOR >= 3
   m_forest = FastBDT::readForestFromStream<unsigned int>(is);
-#else
-  m_forest = FastBDT::readForestFromStream(is);
-#endif
   B2DEBUG(20, "Reading the DecorrelationMatrix");
   if (!m_decorrMat.readFromStream(is)) { // for some reason this does not stop if there is no decor matrix
     B2ERROR("Reading in the decorrelation matrix did not work! The decorrelation matrix of this classifier will be set to identity!");
@@ -77,21 +69,13 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
   std::vector<unsigned int> nBinningLevels;
   m_featBins.clear(); // clear the feature binnings (if present)
   for (auto featureVec : data) {
-#if FastBDT_VERSION_MAJOR >= 3
     m_featBins.push_back(FastBDT::FeatureBinning<double>(nBinCuts, featureVec));
-#else
-    m_featBins.push_back(FastBDT::FeatureBinning<double>(nBinCuts, featureVec.begin(), featureVec.end()));
-#endif
     nBinningLevels.push_back(nBinCuts);
   }
 
   // have to use the decorrelated data for training!!!
   B2DEBUG(20, "FBDTClassifier::train(): Creating the EventSamples");
-#if FastBDT_VERSION_MAJOR >= 5
   FastBDT::EventSample eventSample(nSamples, Ndims, 0, nBinningLevels);
-#else
-  FastBDT::EventSample eventSample(nSamples, Ndims, nBinningLevels);
-#endif
   for (size_t iS = 0; iS < nSamples; ++iS) {
     std::vector<unsigned> bins(Ndims);
     for (size_t iF = 0; iF < Ndims; ++iF) {
@@ -104,11 +88,7 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
   FastBDT::ForestBuilder fbdt(eventSample, nTrees, shrinkage, ratio, depth); // train FastBDT
 
   B2DEBUG(20, "FBDTClassifier::train(): getting FastBDT to internal member");
-#if FastBDT_VERSION_MAJOR >= 3
   FBDTForest forest(fbdt.GetF0(), fbdt.GetShrinkage(), true);
-#else
-  FBDTForest forest(fbdt.GetF0(), fbdt.GetShrinkage());
-#endif
   for (const auto& tree : fbdt.GetForest()) {
     forest.AddTree(tree);
   }

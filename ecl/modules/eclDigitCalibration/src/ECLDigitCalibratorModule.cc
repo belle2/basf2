@@ -49,17 +49,14 @@ REG_MODULE(ECLDigitCalibratorPureCsI);
 //-----------------------------------------------------------------
 
 // constructor
-ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
-  m_calibrationCrystalElectronics("ECLCrystalElectronics"),
+ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationCrystalElectronics("ECLCrystalElectronics"),
   m_calibrationCrystalEnergy("ECLCrystalEnergy"),
   m_calibrationCrystalElectronicsTime("ECLCrystalElectronicsTime"),
   m_calibrationCrystalTimeOffset("ECLCrystalTimeOffset"),
   m_calibrationCrateTimeOffset("ECLCrateTimeOffset"),
   m_calibrationCrystalFlightTime("ECLCrystalFlightTime"),
   m_eclDigits(eclDigitArrayName()),
-  m_eclCalDigits(eclCalDigitArrayName()),
-  m_eclDsps(eclDspArrayName()),
-  m_eclPureCsIInfo(eclPureCsIInfoArrayName())
+  m_eclCalDigits(eclCalDigitArrayName())
 {
   // Set module properties
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
@@ -83,14 +80,12 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() :
   addParam("energyDependenceTimeOffsetFitParam_p6", m_energyDependenceTimeOffsetFitParam_p6,
            "Fit parameter (p6) for applying correction to the time offset as a function of the energy (amplitude)", -999.0);
 
-
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
 
   m_averageBG = 0;
   m_pol2Max = 0.0;
   m_timeInverseSlope = 0.0;
-
 }
 
 // destructor
@@ -104,9 +99,9 @@ void ECLDigitCalibratorModule::initializeCalibration()
 
   // 1/(4fRF) = 0.4913 ns/clock tick, where fRF is the accelerator RF frequency. Same for all crystals:
   m_timeInverseSlope = 1.0 / (4.0 * EclConfiguration::getRF()) * 1e3;
-  m_pureCsIEnergyCalib = 0.00005; //conversion factor from ADC counts to GeV
-  m_pureCsITimeCalib = 0.1; //conversion factor from eclPureCsIDigitizer to ns
-  m_pureCsITimeOffset = 0.31; //ad-hoc offset correction for pureCsI timing
+  m_pureCsIEnergyCalib = 0.00005; // conversion factor from ADC counts to GeV
+  m_pureCsITimeCalib = 0.1;       // conversion factor from eclPureCsIDigitizer to ns
+  m_pureCsITimeOffset = 0.31;     // ad-hoc offset correction for pureCsI timing
 
   callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
   callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);
@@ -125,24 +120,20 @@ void ECLDigitCalibratorModule::callbackCalibration(DBObjPtr<ECLCrystalCalib>& ca
   constantsUnc = cal->getCalibUncVector();
 }
 
-
 // initialize
 void ECLDigitCalibratorModule::initialize()
 {
-  //mdst dataobjects
-  // This object is registered by both ECL and KLM packages. Let's be agnostic about the
-  // execution order of ecl and klm modules: the first package run registers the module
+  // mdst dataobjects
+  // This object is registered by few packages. Let's be agnostic about the
+  // execution order of the modules: the first package run registers the module
   m_eventLevelClusteringInfo.isOptional(eventLevelClusteringInfoName()) ? m_eventLevelClusteringInfo.isRequired(
-    eventLevelClusteringInfoName()) : m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
+    eventLevelClusteringInfoName())
+  : m_eventLevelClusteringInfo.registerInDataStore(eventLevelClusteringInfoName());
 
   // Register Digits, CalDigits and their relation in datastore
-  m_eclDigits.registerInDataStore(eclDigitArrayName());
-  m_eclDsps.registerInDataStore(eclDspArrayName());
+  m_eclDigits.isRequired(eclDigitArrayName());
   m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
   m_eclCalDigits.registerRelationTo(m_eclDigits);
-
-  //Special information for pure CsI simulation
-  m_eclPureCsIInfo.registerInDataStore(eclPureCsIInfoArrayName());
 
   // initialize calibration
   initializeCalibration();
@@ -150,9 +141,11 @@ void ECLDigitCalibratorModule::initialize()
   // initialize time resolution (not yet from the database)
   // read the Background correction factors (for full background)
   m_fileBackground = new TFile(m_fileBackgroundName.c_str(), "READ");
-  if (!m_fileBackground) B2FATAL("Could not find file: " << m_fileBackgroundName);
+  if (!m_fileBackground)
+    B2FATAL("Could not find file: " << m_fileBackgroundName);
   m_th1fBackground = dynamic_cast<TH1F*>(m_fileBackground->Get("background"));
-  if (!m_th1fBackground) B2FATAL("Could not find m_th1fBackground");
+  if (!m_th1fBackground)
+    B2FATAL("Could not find m_th1fBackground");
 
   // average BG value from m_th1fBackground
   m_averageBG = m_th1fBackground->Integral() / m_th1fBackground->GetEntries();
@@ -182,7 +175,7 @@ void ECLDigitCalibratorModule::initialize()
                                        m_energyDependenceTimeOffsetFitParam_p3,
                                        m_energyDependenceTimeOffsetFitParam_p4,
                                        m_energyDependenceTimeOffsetFitParam_p5,
-                                       m_energyDependenceTimeOffsetFitParam_p6) ;
+                                       m_energyDependenceTimeOffsetFitParam_p6);
   }
 }
 
@@ -193,40 +186,45 @@ void ECLDigitCalibratorModule::beginRun()
   if (m_calibrationCrystalElectronics.hasChanged()) {
     if (m_calibrationCrystalElectronics) {
       callbackCalibration(m_calibrationCrystalElectronics, v_calibrationCrystalElectronics, v_calibrationCrystalElectronicsUnc);
-    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalElectronics for current run!");
+    } else
+      B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalElectronics for current run!");
   }
 
   if (m_calibrationCrystalEnergy.hasChanged()) {
     if (m_calibrationCrystalEnergy) {
       callbackCalibration(m_calibrationCrystalEnergy, v_calibrationCrystalEnergy, v_calibrationCrystalEnergyUnc);
-    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalEnergy for current run!");
+    } else
+      B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalEnergy for current run!");
   }
 
   if (m_calibrationCrystalElectronicsTime.hasChanged()) {
     if (m_calibrationCrystalElectronicsTime) {
       callbackCalibration(m_calibrationCrystalElectronicsTime, v_calibrationCrystalElectronicsTime,
                           v_calibrationCrystalElectronicsTimeUnc);
-    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalElectronicsTime for current run!");
+    } else
+      B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalElectronicsTime for current run!");
   }
 
   if (m_calibrationCrystalTimeOffset.hasChanged()) {
     if (m_calibrationCrystalTimeOffset) {
       callbackCalibration(m_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffset, v_calibrationCrystalTimeOffsetUnc);
-    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalTimeOffset for current run!");
+    } else
+      B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalTimeOffset for current run!");
   }
 
   if (m_calibrationCrateTimeOffset.hasChanged()) {
     if (m_calibrationCrateTimeOffset) {
       callbackCalibration(m_calibrationCrateTimeOffset, v_calibrationCrateTimeOffset, v_calibrationCrateTimeOffsetUnc);
-    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrateTimeOffset for current run!");
+    } else
+      B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrateTimeOffset for current run!");
   }
 
   if (m_calibrationCrystalFlightTime.hasChanged()) {
     if (m_calibrationCrystalFlightTime) {
       callbackCalibration(m_calibrationCrystalFlightTime, v_calibrationCrystalFlightTime, v_calibrationCrystalFlightTimeUnc);
-    } else B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalFlightTime for current run!");
+    } else
+      B2ERROR("ECLDigitCalibratorModule::beginRun - Couldn't find m_calibrationCrystalFlightTime for current run!");
   }
-
 }
 
 // event
@@ -265,46 +263,47 @@ void ECLDigitCalibratorModule::event()
     } else {
       calibratedEnergy = amplitude * v_calibrationCrystalElectronics[cellid - 1] * v_calibrationCrystalEnergy[cellid - 1];
     }
-    if (calibratedEnergy < 0.0) calibratedEnergy = 0.0;
+    if (calibratedEnergy < 0.0)
+      calibratedEnergy = 0.0;
 
     // perform the digit timing calibration: t = c * (tfit - Te - Ts)
     const int time = aECLDigit.getTimeFit();
     const int quality = aECLDigit.getQuality();
     double calibratedTime = c_timeForFitFailed;
     if (quality == 1) {
-      aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); //this is used to flag failed fits
-    } else { //only calibrate digit time if we have a good waveform fit
+      aECLCalDigit->addStatus(ECLCalDigit::c_IsFailedFit); // this is used to flag failed fits
+    } else {
+      // only calibrate digit time if we have a good waveform fit
       if (is_pure_csi) {
         calibratedTime = m_pureCsITimeCalib * m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
-                                                                    v_calibrationCrystalTimeOffset[cellid - 1] -
-                                                                    v_calibrationCrateTimeOffset[cellid - 1])
-                         - v_calibrationCrystalFlightTime[cellid - 1] + m_pureCsITimeOffset ;
+                                                                    v_calibrationCrystalTimeOffset[cellid - 1] - v_calibrationCrateTimeOffset[cellid - 1]) - v_calibrationCrystalFlightTime[cellid - 1]
+                         + m_pureCsITimeOffset;
       } else {
         calibratedTime = m_timeInverseSlope * (time - v_calibrationCrystalElectronicsTime[cellid - 1] -
                                                v_calibrationCrystalTimeOffset[cellid - 1] -
-                                               v_calibrationCrateTimeOffset[cellid - 1])
-                         - v_calibrationCrystalFlightTime[cellid - 1] ;
+                                               v_calibrationCrateTimeOffset[cellid - 1]) -
+                         v_calibrationCrystalFlightTime[cellid - 1];
       }
 
       // For data, apply a correction to the time as a function of the signal amplitude.  Correction determined from a fit.
       // No correction for MC
       bool m_IsMCFlag = Environment::Instance().isMC();
-      B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag) ;
+      B2DEBUG(35, "cellid = " << cellid << ", m_IsMCFlag = " << m_IsMCFlag);
 
       if (!m_IsMCFlag) {
         double energyTimeShift = ECLTimeUtil->energyDependentTimeOffsetElectronic(amplitude * v_calibrationCrystalElectronics[cellid - 1]) *
-                                 m_timeInverseSlope ;
+                                 m_timeInverseSlope;
         B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", corrected amplitude = " << amplitude*
                 v_calibrationCrystalElectronics[cellid - 1] << ", time before t(E) shift = " << calibratedTime << ", t(E) shift = " <<
-                energyTimeShift << " ns") ;
-        calibratedTime -= energyTimeShift ;
+                energyTimeShift << " ns");
+        calibratedTime -= energyTimeShift;
       }
     }
 
     B2DEBUG(35, "cellid = " << cellid << ", amplitude = " << amplitude << ", calibrated energy = " << calibratedEnergy);
     B2DEBUG(35, "cellid = " << cellid << ", time = " << time << ", calibratedTime = " << calibratedTime);
 
-    //Calibrating offline fit results
+    // Calibrating offline fit results
     ECLDsp* aECLDsp = ECLDsp::getByCellID(cellid);
     aECLCalDigit->setTwoComponentChi2(-1);
     aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonHadron, -1);
@@ -313,10 +312,22 @@ void ECLDigitCalibratorModule::event()
     aECLCalDigit->setTwoComponentTotalEnergy(-1);
     aECLCalDigit->setTwoComponentHadronEnergy(-1);
     aECLCalDigit->setTwoComponentDiodeEnergy(-1);
+    // copy online fit quality from ECLDigit
+    const int online_quality = aECLDigit.getQuality();
+    if (online_quality == 1) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality1);
+    } else if (online_quality == 2) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality2);
+    } else if (online_quality == 3) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality3);
+    } else if (online_quality == 0) {
+      aECLCalDigit->addStatus(ECLCalDigit::c_OnlineFitQuality0);
+    }
+
     if (aECLDsp) {
-      //require ECLDigit to have offline waveform
+      // require ECLDigit to have offline waveform
       if (aECLDsp->getTwoComponentChi2() > 0) {
-        //require offline waveform to have offline fit result
+        // require offline waveform to have offline fit result
 
         const double calibratedTwoComponentTotalEnergy = aECLDsp->getTwoComponentTotalAmp() * v_calibrationCrystalElectronics[cellid - 1] *
                                                          v_calibrationCrystalEnergy[cellid - 1];
@@ -337,7 +348,6 @@ void ECLDigitCalibratorModule::event()
                                                aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonHadronBackgroundPhoton));
         aECLCalDigit->setTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing, aECLDsp->getTwoComponentSavedChi2(ECLDsp::photonDiodeCrossing));
         aECLCalDigit->setTwoComponentFitType(twoComponentFitType);
-
       }
     }
 
@@ -378,13 +388,11 @@ void ECLDigitCalibratorModule::event()
 // end run
 void ECLDigitCalibratorModule::endRun()
 {
-
 }
 
 // terminate
 void ECLDigitCalibratorModule::terminate()
 {
-
 }
 
 // Time resolution calibration
@@ -392,10 +400,11 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
 {
 
   // if this digit is calibrated to the trigger time, we set the resolution to 'very bad' (to be discussed)
-  if (fitfailed) return c_timeResolutionForFitFailed;
+  if (fitfailed)
+    return c_timeResolutionForFitFailed;
 
   // Get the background level [MeV / mus]
-  const double bglevel = TMath::Min((double) bgcount / (double) c_nominalBG * m_th1fBackground->GetBinContent(cellid) / m_averageBG,
+  const double bglevel = TMath::Min((double)bgcount / (double)c_nominalBG * m_th1fBackground->GetBinContent(cellid) / m_averageBG,
                                     m_pol2Max); // c_nominalBG = 183 for actual version of digitizer, m_averageBG is about 2 MeV/ mus
 
   // Get p1 as function of background level
@@ -403,17 +412,19 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
 
   // inverse energy in 1/MeV
   double einv = 0.;
-  if (energy > 1e-12) einv = 1. / (energy / Belle2::Unit::MeV);
+  if (energy > 1e-12)
+    einv = 1. / (energy / Belle2::Unit::MeV);
 
   // calculate t99 using the inverse energy and p1 (p0 is zero)
   double t99 = p1 * einv;
 
   // for high energies we fix t99 to 3.5ns
-  if (t99 < c_minT99) t99 = c_minT99;
+  if (t99 < c_minT99)
+    t99 = c_minT99;
 
   B2DEBUG(35, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1fBackground->GetBinContent(
-            cellid) << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy /
-          Belle2::Unit::MeV);
+            cellid)
+          << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy / Belle2::Unit::MeV);
 
   return t99;
 }
@@ -421,10 +432,10 @@ double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, c
 // Determine background level by event by counting out-of-time digits above threshold.
 int ECLDigitCalibratorModule::determineBackgroundECL()
 {
-  //EventLevelClustering counters
+  // EventLevelClustering counters
   using regionCounter = std::unordered_map<ECL::DetectorRegion, uint>;
 
-  regionCounter outOfTimeCount {{ECL::DetectorRegion::FWD, 0},
+  regionCounter outOfTimeCount{{ECL::DetectorRegion::FWD, 0},
     {ECL::DetectorRegion::BRL, 0},
     {ECL::DetectorRegion::BWD, 0}};
 
@@ -434,20 +445,20 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
   for (auto& aECLCalDigit : m_eclCalDigits) {
     if (abs(aECLCalDigit.getTime()) >= m_backgroundTimingCut) {
       if (aECLCalDigit.getEnergy() >= m_backgroundEnergyCut) {
-        //Get digit theta
-        const B2Vector3D position  = geom->GetCrystalPos(aECLCalDigit.getCellId() - 1);
-        const double theta         = position.Theta();
+        // Get digit theta
+        const B2Vector3D position = geom->GetCrystalPos(aECLCalDigit.getCellId() - 1);
+        const double theta = position.Theta();
 
-        //Get detector region
+        // Get detector region
         const auto detectorRegion = ECL::getDetectorRegion(theta);
 
-        //Count out of time digits per region
+        // Count out of time digits per region
         ++outOfTimeCount.at(detectorRegion);
       }
     }
   }
 
-  //Save EventLevelClusteringInfo
+  // Save EventLevelClusteringInfo
   if (!m_eventLevelClusteringInfo) {
     m_eventLevelClusteringInfo.create();
   }
@@ -457,8 +468,8 @@ int ECLDigitCalibratorModule::determineBackgroundECL()
   m_eventLevelClusteringInfo->setNECLCalDigitsOutOfTimeBWD(outOfTimeCount.at(ECL::DetectorRegion::BWD));
 
   B2DEBUG(35, "ECLDigitCalibratorModule::determineBackgroundECL found " << outOfTimeCount.at(ECL::DetectorRegion::FWD) << ", " <<
-          outOfTimeCount.at(ECL::DetectorRegion::BRL) << ", " <<
-          outOfTimeCount.at(ECL::DetectorRegion::BWD) << " out of time digits in FWD, BRL, BWD");
+          outOfTimeCount.at(ECL::DetectorRegion::BRL) << ", " << outOfTimeCount.at(ECL::DetectorRegion::BWD) <<
+          " out of time digits in FWD, BRL, BWD");
 
   return m_eventLevelClusteringInfo->getNECLCalDigitsOutOfTime();
 }

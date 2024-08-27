@@ -81,7 +81,7 @@ CalibrationAlgorithm::EResult CDCDedxWireGainAlgorithm::calibrate()
 
   if (minstat > 0.10 * c_nwireCDC) return c_NotEnoughData;
 
-  //25-75 is average bin # for trunction
+  //25-75 is average bin # for truncation
   array<unsigned int, 2> minbinL, maxbinL;
   for (int il = 0; il < 2; il++) {
     getTruncatedBins(hdedxL[il], minbinL[il], maxbinL[il]);

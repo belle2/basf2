@@ -16,7 +16,7 @@
 // -------------------------------------- ------------------------------------------
 //                   |      1 |         0     | TRG(Hit or not)
 //                   |      7 |   7 downto 1  | Timing (LSB = 1 ns )
-//    m_Triggerbit[0] |      7 |  14 downto 8  | Revoclk from FAM (LSB  = 125 ns)
+//   m_Triggerbit[0] |      7 |  14 downto 8  | Revoclk from FAM (LSB  = 125 ns)
 //    (upto 12th     |      3 |  17 downto 15 | ECL-TRG Timing Source
 //    bhabha bit)    |      1 |            18 | Physics TRG
 //      (32bit)      |      1 |            19 | Belle type Bhabha
@@ -24,28 +24,29 @@
 //                   |     13 |  46 downto 34 | Total Energy
 //                   |      1 |            47 | E low (Etot >0.5 GeV)
 //                   |      1 |            48 | E High (Etot > 1.0 GeV)
-//    m_Triggerbit[1] |      1 |            49 | E lom (Etot > 3.0 GeV)
+//   m_Triggerbit[1] |      1 |            49 | E lom (Etot > 3.0 GeV)
 //                   |      7 |  56 dwonto 50 | ICN
 //                   |      3 |  59 downto 57 | BG veto
 //                   |      1 |            60 | Cluster Overflow
 //                   |      1 |            61 | 3D Bhabha Trigger for Veto
-//                   |      1 |         62    | N Cluster  >= 3, at least one Cluster >300 MeV (LAB), not 3D ECL Bhabha
-// _________________ |      1 |         63    | one Cluster >= 2GeV(CM) with Theta Id = 4~14
-//                   |      1 |         64    | one Cluster >= 2GeV(CM) with Theta Id = 2,3,15 or 16 and not a 3D ECL Bhabha
-//                   |      1 |         65    | one Cluster >= 2GeV(CM) with Theta Id = 2, 3, 15 or 16 and not a 3D ECL Bhabha
-//                   |      1 |         66    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and not a 3D ECL Bhabha
-//                   |      1 |         67    | one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and a 3D ECL Bhabha
-//    m_Triggerbit[2] |      1 |         68    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300  MeV (LAB ), in Theta Id 4~15(Barrel)
-//                   |      1 |         69    | exactly one Cluster >= 1GeV(CM) and one Cluster > 300 MeV (LAB), in Theta Id 2, 3 or 16
-//                   |      1 |         70    | 170 < delta phi(CM) < 190 degree, both Clusters > 250 MeV (LAB), and no 2GeV (CM) Cluster
-//                   |      1 |         71    | 170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
-//                   |      1 |         72    | 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
+//                   |      1 |         62    | (lml0)  N Cluster  >= 3, at least one Cluster >300 MeV (LAB), not 3D ECL Bhabha
+// _________________ |      1 |         63    | (lml1)  one Cluster >= 2GeV(CM) with Theta Id = 4~14
+//                   |      1 |         64    | (lml2)  one Cluster >= 2GeV(CM) with Theta Id = 2,3,15 or 16 and not a 3D ECL Bhabha
+//                   |      1 |         65    | (lml3)  one Cluster >= 2GeV(CM) with Theta Id = 2, 3, 15 or 16 and not a 3D ECL Bhabha
+//                   |      1 |         66    | (lml4)  one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and not a 3D ECL Bhabha
+//                   |      1 |         67    | (lml5)  one Cluster >= 2GeV(CM) with Theta Id = 1 or 17 and a 3D ECL Bhabha
+//   m_Triggerbit[2] |      1 |         68    | (lml6)  exactly one Cluster >= 1GeV(CM) and one Cluster > 300  MeV (LAB ), in Theta Id 4~15(Barrel)
+//                   |      1 |         69    | (lml7)  exactly one Cluster >= 1GeV(CM) and one Cluster > 300 MeV (LAB), in Theta Id 2, 3 or 16
+//                   |      1 |         70    | (lml8)  170 < delta phi(CM) < 190 degree, both Clusters > 250 MeV (LAB), and no 2GeV (CM) Cluster
+//                   |      1 |         71    | (lml9)  170 < delta phi(CM) < 190 degree, one Cluster < 250 MeV (LAB), the other Cluster > 250 MeV(LAB), and no 2GeV (CM) Cluster
+//                   |      1 |         72    | (lml10) 160 < delta phi(CM) < 200 degree, 160 < Sum Theta (CM)< 200 degree, no 2 GeV(CM) cluster
+//                   |      1 |         73    | (lml11) No 2GeV(CM) CL in an event
 //                   |      1 |         74    | 3D Bhabha Trigger for selection
 //                   |      1 |         75    | mumu bit
 //                   |      1 |         76    | Bhabha prescale bit
 //                   |      1 |         77    | E_tot > 20 GeV
-//                   |      1 |         78    | N Cluster  >= 3, at least one Cluster >500 MeV (LAB) with Theta Id 2~16, not 3D ECL Bhabha
-//                   |      1 |         79    | Only one Cluster >500 MeV (CM) with Theta Id 6~11 and no other CL >= 300 MeV(LAB) anywhere
+//                   |      1 |         78    | (lml12) N Cluster  >= 3, at least one Cluster >500 MeV (LAB) with Theta Id 2~16, not 3D ECL Bhabha
+//                   |      1 |         79    | (lml13) Only one Cluster >500 MeV (CM) with Theta Id 6~11 and no other CL >= 300 MeV(LAB) anywhere
 //                   |      1 |  83 downto 80 | clock counter(set to be "0000" in tsim)
 //                   |      1 |  85 downto 84 | event timing quality flag
 //                   |      1 |         86    | 3D Bhabha Veto Intrk
@@ -56,6 +57,7 @@
 //                   |      1 |         92    | [hie3] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-3(not (N(CL)=2 && CL_lowe in FW or BW)
 //                   |      1 |         93    | [ecltaub2b v2] for 1x1 tau process : (120<delta phi(CM)<240, 140<Thata Sum(CM)<220, Etot1to17(Lab)<7GeV, N(CL) in endcap with E(CL)(3GeV) , E(CL)>0.165 for N(CL)==2, 1CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)==3,  2CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)==4,  1CL E(CL)>0.12 and 2CL E(CL)>0.14 and 2CL E(CL)>0.165 for N(CL)>4
 //                   |      1 |         94    | [ecltaub2b v3] for 1x1 tau process : (120<delta phi(CM)<240, 140<Thata Sum(CM)<220, Etot1to17(Lab)<7GeV, E(CL)>0.140 in lab for one of 2CL in b2b CLs, CL ThetaID= 2-16 for b2b CLs, CL(E)>0.12GeV in lab for all CLs, CL(E)<4.5GeV in lab for all CLs)
+//                   |      1 |         95    | [hie4] hie && 1CL veto(not (N(CL)=1 && CL in FW)) && 2CL veto-4(not (N(CL)=2 && CL_lowe in FW or BW) && E(CL_lowe)>0.5GeV)
 // ---------------------------------------------------------------------------------
 
 #define TRG_SHORT_NAMES
@@ -178,7 +180,7 @@ TrgEclMaster::initialize(int)
   m_taub2b2CLEEndcapCut = 3.0; // GeV
   m_taub2b2CLECut = 0.162; // GeV
 
-  //taub2b3 cut by S.Ito
+  //taub2b3 cut
   m_taub2b3AngleCut   = {120, 240, 140, 220}; // degree
   m_taub2b3EtotCut    = 7.0; // GeV
   m_taub2b3CLEb2bCut  = 0.14; // GeV
@@ -381,7 +383,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
                                 m_taub2b2EtotCut,
                                 m_taub2b2CLEEndcapCut,
                                 m_taub2b2CLECut);
-    //Added by S.Ito
+    // for taub2b3
     m_obj_bhabha->setTaub2b3Cut(m_taub2b3AngleCut,
                                 m_taub2b3EtotCut,
                                 m_taub2b3CLEb2bCut,
@@ -398,7 +400,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
     int bhabha3DSelectionThetaFlag = 0;
     int taub2bFlag = 0;
     int taub2b2Flag = 0;
-    int taub2b3Flag = 0;//By S.Ito
+    int taub2b3Flag = 0;
 
     bool b_2Dbhabha = m_obj_bhabha->GetBhabha00(phiringsum);
     vct_bhabha = m_obj_bhabha->GetBhabhaComb();
@@ -546,6 +548,7 @@ TrgEclMaster::simulate01(int m_nEvent) // Firmware simulator(time window 250 ns 
 void
 TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger logic
 {
+
   //  TrgEclFAM* obj_trgeclfam = new TrgEclFAM();
   //   obj_trgeclfam->setup(m_nEvent, 1);
   // setPRS(obj_trgeclfam);
@@ -603,6 +606,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
 
   for (int iBin = startBin ; iBin <= endBin; iBin ++) {
     WindowStart = iBin * (m_TimeWindow - m_OverlapWindow) + fluctuation - 4000;
+
     if (iBin == 0) {WindowStart = - 4000 + fluctuation;}
     WindowEnd = WindowStart + m_TimeWindow;
 
@@ -765,7 +769,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
                               m_taub2b2EtotCut,
                               m_taub2b2CLEEndcapCut,
                               m_taub2b2CLECut);
-  //Added by S.Ito
+  //
   m_obj_bhabha->setTaub2b3Cut(m_taub2b3AngleCut,
                               m_taub2b3EtotCut,
                               m_taub2b3CLEb2bCut,
@@ -783,7 +787,7 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
   int bhabha3DSelectionThetaFlag = -1;
   int taub2bFlag = 0;
   int taub2b2Flag = 0;
-  int taub2b3Flag = 0;//By S.Ito
+  int taub2b3Flag = 0;
 
   bool b_2Dbhabha = m_obj_bhabha->GetBhabha00(phiringsum);
   vct_bhabha = m_obj_bhabha->GetBhabhaComb();
@@ -819,11 +823,13 @@ TrgEclMaster::simulate02(int m_nEvent) // select one window for analyze trigger 
 
   int bit_hie_bhav = 0;
   if (E_phys > 1.0) {
-    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 3 & 0x01);
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 4 & 0x01); // hie4
     bit_hie_bhav <<= 1;
-    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 2 & 0x01);
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 3 & 0x01); // hie3
     bit_hie_bhav <<= 1;
-    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 1 & 0x01);
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 2 & 0x01); // hie2
+    bit_hie_bhav <<= 1;
+    bit_hie_bhav |= (~bhabha_addition & 0x01) & (~bhabha_addition >> 1 & 0x01); // hie1
   }
   //-------------
   // Make ECL  Trigger Bit
@@ -1192,12 +1198,16 @@ TrgEclMaster::makeTriggerBit(int hit, int Timing, int RevoFAM, int TimingSource,
   int bit_taub2b2flag = taub2b2Flag & 0x01;
   int bit_taub2b3flag = taub2b3Flag & 0x01;
 
+  int bit_hie_bhav_hie123 = bit_hie_bhav & 0x7;      // for hie1, hie2, hie3
+  int bit_hie_bhav_hie4   = (bit_hie_bhav >> 3) & 0x1; // for hie4
 
-  m_Triggerbit[2] |= bit_taub2b3flag;//taub2b3 added by S.Ito, bit:94
-  m_Triggerbit[2] <<= 1;//taub2b3 added by S.Ito, bit:94
+  m_Triggerbit[2] |= bit_hie_bhav_hie4;
+  m_Triggerbit[2] <<= 1;
+  m_Triggerbit[2] |= bit_taub2b3flag;
+  m_Triggerbit[2] <<= 1;
   m_Triggerbit[2] |= bit_taub2b2flag;
   m_Triggerbit[2] <<= 3;
-  m_Triggerbit[2] |= bit_hie_bhav;
+  m_Triggerbit[2] |= bit_hie_bhav_hie123;
   m_Triggerbit[2] <<= 1;
   m_Triggerbit[2] |= bit_taub2bflag;
   m_Triggerbit[2] <<= 2;

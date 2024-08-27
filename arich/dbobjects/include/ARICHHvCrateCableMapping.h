@@ -47,7 +47,7 @@ namespace Belle2 {
 
     /**
      * Add new entry to the mapping table
-     * @param crateSlot numbers of crate and slot
+     * @param connectionID connection ID
      * @param sectorCable sector and cable number
      */
     void addMapping(int connectionID, std::vector<int> sectorCable);

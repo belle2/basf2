@@ -1,0 +1,35 @@
+# EventType: 1211450003
+# Descriptor: [B+ -> Jpsi [-> mu+ mu-] phi[-> K+ K-] K+]cc
+# NickName: Bu_JpsiphiK_mumuKK
+# Documentation:
+# Tested: Yes
+# Physics WG: Quarkonium WG
+# Responsible: Yang Li
+# Email: y_li21@m.fudan.edu.cn
+# Cuts: None
+# Date: 20240627
+# Comments:
+#
+# Y(4S) -> B+ B-
+#
+Alias phisig  phi
+
+Decay Upsilon(4S)
+0.50  B+sig   B-  VSS;
+0.50  B-sig   B+  VSS;
+Enddecay
+
+Decay B+sig
+1.00  J/psisig  phisig  K+  PHSP;
+Enddecay
+CDecay B-sig
+
+Decay J/psisig
+1.00  mu+ mu-  PHOTOS  VLL;
+Enddecay
+
+Decay phisig
+1.00  K+  K-  VSS;
+Enddecay
+
+End

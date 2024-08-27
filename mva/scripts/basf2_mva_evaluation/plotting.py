@@ -7,13 +7,14 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-# #########################################################################
+##########################################################################
 
 import copy
 import math
 
 import pandas
 import numpy
+import itertools
 import matplotlib.pyplot as plt
 import matplotlib.artist
 import matplotlib.figure
@@ -121,6 +122,9 @@ class Plotter:
         self.set_errorband_options()
         self.set_fill_options()
 
+        #: Property cycler used to give plots unique colors
+        self.prop_cycler = itertools.cycle(plt.rcParams["axes.prop_cycle"])
+
     def add_subplot(self, gridspecs):
         """
         Adds a new subplot to the figure, updates all other axes
@@ -191,7 +195,7 @@ class Plotter:
         fill_kwargs = copy.copy(self.fill_kwargs)
 
         if plot_kwargs is None or 'color' not in plot_kwargs:
-            color = next(axis._get_lines.prop_cycler)
+            color = next(self.prop_cycler)
             color = color['color']
             plot_kwargs['color'] = color
         else:
@@ -218,7 +222,10 @@ class Plotter:
                 xerr = xerr*numpy.ones(len(x))
             mask = numpy.logical_and.reduce([numpy.isfinite(v) for v in [x, y, xerr, yerr]])
 
-            e = axis.errorbar(x[mask], y[mask], xerr=xerr[mask], yerr=yerr[mask], rasterized=True, **errorbar_kwargs)
+            e = axis.errorbar(
+                x[mask], y[mask], xerr=numpy.where(
+                    xerr[mask] < 0, 0.0, xerr[mask]), yerr=numpy.where(
+                    yerr[mask] < 0, 0.0, yerr[mask]), rasterized=True, **errorbar_kwargs)
             patches.append(e)
 
         if errorband_kwargs is not None and yerr is not None:
@@ -729,8 +736,9 @@ class Box(Plotter):
             b2.B2WARNING("Ignore empty boxplot.")
             return self
 
+        # we don't plot outliers as they cause the file size to explode if large datasets are used
         p = self.axis.boxplot(x, sym='k.', whis=1.5, vert=False, patch_artist=True, showmeans=True, widths=1,
-                              boxprops=dict(facecolor='blue', alpha=0.5),
+                              boxprops=dict(facecolor='blue', alpha=0.5), showfliers=False,
                               # medianprobs=dict(color='blue'),
                               # meanprobs=dict(color='red'),
                               )

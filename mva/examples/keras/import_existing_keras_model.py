@@ -12,7 +12,7 @@
 
 from basf2_mva_python_interface.keras import State
 
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -40,11 +40,11 @@ if __name__ == "__main__":
     import basf2_mva
     import basf2_mva_util
 
-    from tensorflow.keras.layers import Input, Dense
-    from tensorflow.keras.models import Model
-    from tensorflow.keras.optimizers import Adam
-    from tensorflow.keras.losses import binary_crossentropy
-    from tensorflow.keras.activations import sigmoid, tanh
+    from keras.layers import Input, Dense
+    from keras.models import Model
+    from keras.optimizers import Adam
+    from keras.losses import binary_crossentropy
+    from keras.activations import sigmoid, tanh
     from basf2 import conditions
     # NOTE: do not use testing payloads in production! Any results obtained like this WILL NOT BE PUBLISHED
     conditions.testing_payloads = [
@@ -60,14 +60,14 @@ if __name__ == "__main__":
     data = np.random.normal(size=[1000, 11])
     data[:, -1] = np.int32(data[:, -1] > 0.5)
 
-    # Build some simple model as an example to convert into weightfile
+    # Build a simple model as an example to convert into weightfile
     input = Input(shape=(10,))
 
     net = Dense(units=100, activation=tanh)(input)
     output = Dense(units=1, activation=sigmoid)(net)
 
     model = Model(input, output)
-    model.compile(optimizer=Adam(lr=0.01), loss=binary_crossentropy, metrics=['accuracy'])
+    model.compile(optimizer=Adam(learning_rate=0.01), loss=binary_crossentropy, metrics=['accuracy'])
 
     model.fit(data[:, :-1], data[:, -1], batch_size=10, epochs=10)
 
@@ -84,7 +84,7 @@ if __name__ == "__main__":
             outfile['tree'] = df
 
         # Saving keras training model
-        model.save(os.path.join(path, 'example_existing_model'))
+        model.save(os.path.join(path, 'example_existing_model.keras'))
 
         # ##########################Do Conversion#################################
 
@@ -99,10 +99,10 @@ if __name__ == "__main__":
         specific_options.m_steering_file = 'mva/examples/keras/import_existing_keras_model.py'
 
         general_options.m_identifier = 'converted_keras'
-        specific_options.m_config = json.dumps({'file_path': os.path.join(path, 'example_existing_model')})
+        specific_options.m_config = json.dumps({'file_path': os.path.join(path, 'example_existing_model.keras')})
         basf2_mva.teacher(general_options, specific_options)
 
         # ########################Apply weightfile####################################
         method = basf2_mva_util.Method(general_options.m_identifier)
         p, t = method.apply_expert(general_options.m_datafiles, general_options.m_treename)
-        print('Overtraining AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t))
+        print('AUC: ', basf2_mva_util.calculate_auc_efficiency_vs_background_retention(p, t))

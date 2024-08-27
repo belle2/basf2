@@ -81,11 +81,16 @@ namespace Belle2 {
     /** Grab the names in this event extra string info (for printing etc) */
     std::vector<std::string> getStringInfoNames() const;
 
-    /** Add the event type information.
+    /** Add the event type information if it is not already set.
      * Helper function for the GeneratorBaseModule. */
-    void addEventType(const std::string& eventType)
+    void addEventTypeIfNotSet(const std::string& eventType)
     {
-      addExtraStringInfo(std::string("eventType"), eventType);
+      /**
+       * Event type may already be set if there are multiple generator calls
+       * with subsequent selection of generated events by another module.
+       */
+      if (!hasExtraStringInfo("eventType"))
+        addExtraStringInfo(std::string("eventType"), eventType);
     };
 
     /** Get the event type information.

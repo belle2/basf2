@@ -185,32 +185,38 @@ namespace Belle2 {
 
     double CDCdEdx_chiE(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 11)")->function(part));
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "11"});
+      return std::get<double>(pidFunction(part));
     }
 
     double CDCdEdx_chiMu(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 13)")->function(part));
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "13"});
+      return std::get<double>(pidFunction(part));
     }
 
     double CDCdEdx_chiPi(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 211)")->function(part));
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "211"});
+      return std::get<double>(pidFunction(part));
     }
 
     double CDCdEdx_chiK(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 321)")->function(part));
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "321"});
+      return std::get<double>(pidFunction(part));
     }
 
     double CDCdEdx_chiP(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 2212)")->function(part));
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "2212"});
+      return std::get<double>(pidFunction(part));
     }
 
     double CDCdEdx_chiD(const Particle* part)
     {
-      return std::get<double>(Manager::Instance().getVariable("CDCdEdx_PIDvars(chi, 1000010020)")->function(part));
+      static Manager::FunctionPtr pidFunction = CDCdEdx_PIDvars({"chi", "1000010020"});
+      return std::get<double>(pidFunction(part));
     }
 
 //Variables for SVD dedx

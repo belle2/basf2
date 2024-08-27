@@ -34,7 +34,8 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons,
                                             loadStdSkimHighEffPhi,
-                                            loadStdSkimHighEffKstar0,)
+                                            loadStdSkimHighEffKstar0,
+                                            loadStdPhotonCutEta)
 from skim.standardlists.charmless import (loadStdPi0ForBToCharmless)
 from skim.standardlists.charmless import (loadStdVeryLooseTracks)
 from skim import BaseSkim, fancy_skim_header
@@ -44,7 +45,7 @@ from stdV0s import stdKshorts
 from stdPhotons import stdPhotons
 
 __liaison__ = "Yi Zhang <yi.zhang2@desy.de>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -295,12 +296,11 @@ class BptoD0etapi_Kpi(BaseSkim):
         loadPiForBtoHadrons(path=path)
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B+:BptoD0etapi_Kpi -> anti-D0:Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B+:BptoD0etapi_Kpi"]
@@ -417,12 +417,11 @@ class B0toDstaretapi_D0pi_Kpi(BaseSkim):
         loadKForBtoHadrons(path=path)
         loadStdD0_Kpi(path=path)
         loadStdDstarPlus_D0pi_Kpi(path=path)
+        loadStdPhotonCutEta(path=path)
 
     def build_lists(self, path):
         Bcuts = "5.25 < Mbc and abs(deltaE) < 0.32 and 0.35 < daughter(1,M) < 0.7"
-        etacuts = "0.35 < M < 0.7 and daughter(0,E) > 0.05 and daughter(1,E) > 0.05"
 
-        ma.reconstructDecay("eta:gm -> gamma:all gamma:all", etacuts, path=path)
         ma.reconstructDecay("B0:B0toDstaretapi_D0pi_Kpi -> D*-:D0_Kpi eta:gm pi+:GoodTrack", Bcuts, path=path)
 
         return ["B0:B0toDstaretapi_D0pi_Kpi"]
@@ -921,13 +920,13 @@ class BtoD0h_Kpipipi_Kpipi0(BaseSkim):
             ma.reconstructDecay("B+:BtoD0h_Khh_Khpi0" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0h_Khh_Khpi0" + str(chID))
 
-        ma.copyLists(outputListName="B+:BtoD0h_merged", inputListNames=BsigList, path=path)
+        ma.copyLists(outputListName="B+:BtoD0h_Kpipipi_Kpipi0", inputListNames=BsigList, path=path)
 
         # Select only three random candidates
-        ma.rankByHighest(particleList="B+:BtoD0h_merged", variable="cos(mdstIndex)", numBest=3,
+        ma.rankByHighest(particleList="B+:BtoD0h_Kpipipi_Kpipi0", variable="cos(mdstIndex)", numBest=3,
                          outputVariable="cosMdstIndex_rank", path=path)
 
-        return ["B+:BtoD0h_merged"]
+        return ["B+:BtoD0h_Kpipipi_Kpipi0"]
 
 
 @fancy_skim_header
@@ -1117,13 +1116,13 @@ class BtoD0rho_Kpipipi_Kpipi0(BaseSkim):
             ma.reconstructDecay("B+:BtoD0rho_merged" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
             BsigList.append("B+:BtoD0rho_merged" + str(chID))
 
-        ma.copyLists(outputListName="B+:BtoD0rho_merged", inputListNames=BsigList, path=path)
+        ma.copyLists(outputListName="B+:BtoD0rho_Kpipipi_Kpipi0", inputListNames=BsigList, path=path)
 
         # Select only three random candidates to save them as these channels have high multiplicity.
-        ma.rankByHighest(particleList="B+:BtoD0rho_merged", variable="cos(mdstIndex)", numBest=3,
+        ma.rankByHighest(particleList="B+:BtoD0rho_Kpipipi_Kpipi0", variable="cos(mdstIndex)", numBest=3,
                          outputVariable="cosMdstIndex_rank", path=path)
 
-        return ["B+:BtoD0rho_merged"]
+        return ["B+:BtoD0rho_Kpipipi_Kpipi0"]
 
 
 @fancy_skim_header
@@ -1267,24 +1266,24 @@ class B0toDDs0star(BaseSkim):
         loadStdPi0ForBToHadrons(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay("phi -> K+:GoodTrack K-:GoodTrack",
+        ma.reconstructDecay("phi:KK -> K+:GoodTrack K-:GoodTrack",
                             cut="[1.01 < M < 1.03]", path=path)
         ma.reconstructDecay("anti-K*0 -> K-:GoodTrack pi+:GoodTrack",
                             cut="[0.793 < M < 1.015]", path=path)
-        ma.reconstructDecay("D_s+:phipipi0 -> phi pi+:GoodTrack pi0:bth_skim",
+        ma.reconstructDecay("D_s+:phipipi0 -> phi:KK pi+:GoodTrack pi0:bth_skim",
                             cut="[1.942 < M < 1.978]", path=path)
         ma.reconstructDecay("D_s+:antiKK -> anti-K*0 K+:GoodTrack",
                             cut="[1.944 < M < 1.992]", path=path)
-        ma.reconstructDecay("D_s+:phipi -> phi pi+:GoodTrack",
+        ma.reconstructDecay("D_s+:phipi -> phi:KK pi+:GoodTrack",
                             cut="[1.935 < M < 1.999]", path=path)
         Dslist = ['D_s+:phipipi0', 'D_s+:antiKK', 'D_s+:phipi']
-        ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)
+        ma.copyLists(outputListName='D_s+:all_DDs0star', inputListNames=Dslist, path=path)
 
-        ma.reconstructDecay("D_s0*+ -> D_s+:all pi0:bth_skim",
+        ma.reconstructDecay("D_s0*+:all_DDs0star -> D_s+:all_DDs0star pi0:bth_skim",
                             cut="[2.249 < M < 2.298] and [0.31 < massDifference(0) < 0.347] and \
                             [1.017 < p < 2.552]", path=path)
 
-        ma.reconstructDecay("B0:B0toDDs0star -> D_s0*+ D-:Kpipi",
+        ma.reconstructDecay("B0:B0toDDs0star -> D_s0*+:all_DDs0star D-:Kpipi",
                             cut="[5.2 < Mbc < 5.3] and \
                             [-0.2 < deltaE < 0.2]", path=path)
 
@@ -1375,21 +1374,157 @@ class B0toDs1D(BaseSkim):
         loadStdSkimHighEffKstar0(path=path)
 
     def build_lists(self, path):
-        ma.reconstructDecay(decayString="D_s+:phipi -> phi:SkimHighEff pi+:SkimHighEff", cut="[1.942 < M < 1.993]", path=path)
-        ma.reconstructDecay(decayString="D_s+:phipipi0 -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
+        ma.reconstructDecay(decayString="D_s+:phipiSkimHighEff -> phi:SkimHighEff pi+:SkimHighEff",
+                            cut="[1.942 < M < 1.993]", path=path)
+        ma.reconstructDecay(decayString="D_s+:phipipi0SkimHighEff -> phi:SkimHighEff pi+:SkimHighEff pi0:bth_skim",
                             cut="[1.874 < M < 1.997]", path=path)
         ma.reconstructDecay(decayString="D_s+:Ksk -> K_S0:merged K+:SkimHighEff",
                             cut="[1.914 < M < 2.015]", path=path)
         ma.reconstructDecay(decayString="D_s+:anti-Kstar0K -> anti-K*0:SkimHighEff K+:SkimHighEff",
                             cut="[1.934 < M < 2.002]", path=path)
-        DsList = ['D_s+:phipi', 'D_s+:phipipi0', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
-        ma.copyLists(outputListName="D_s+:all", inputListNames=DsList, path=path)
+        DsList = ['D_s+:phipiSkimHighEff', 'D_s+:phipipi0SkimHighEff', 'D_s+:Ksk', 'D_s+:anti-Kstar0K']
+        ma.copyLists(outputListName="D_s+:all_Ds1D", inputListNames=DsList, path=path)
 
-        ma.reconstructDecay(decayString="D_s*+ -> D_s+:all gamma:loose",
+        ma.reconstructDecay(decayString="D_s*+:Ds1D -> D_s+:all_Ds1D gamma:loose",
                             cut="[2.062 < M < 2.131] and [0.072 < massDifference(0) < 0.179]", path=path)
-        ma.reconstructDecay(decayString="D_s1+ -> D_s*+ pi0:bth_skim",
+        ma.reconstructDecay(decayString="D_s1+:Ds1D -> D_s*+:Ds1D pi0:bth_skim",
                             cut="[2.288 < M < 2.507] and [0.247 < massDifference(0) < 0.378]", path=path)
-        ma.reconstructDecay(decayString="B0:merged -> D_s1+ D-:Kpipi",
+        ma.reconstructDecay(decayString="B0:merged -> D_s1+:Ds1D D-:Kpipi",
                             cut="[5.2 < Mbc < 5.3] and [-0.5 < deltaE < 0.5]", path=path)
 
         return ["B0:merged"]
+
+
+@fancy_skim_header
+class B0toDomegapi_Kpipi_pipipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0} \\to D^{-} (\\to K^+ \\pi^- \\pi^-) \\omega (\\to \\pi^- \\pi^+ \\pi^0) \\pi^+`,
+
+    Cuts applied:
+
+    * ``1.84 < M_D < 1.90``
+    * ``0.70 < M_omega < 0.90``
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.25``
+    """
+
+    __authors__ = ["Dmitry Matvienko"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi0s("eff40_May2020Fit", path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.25"
+        omegacuts = "0.70 < M < 0.90"
+        Dcuts = "1.84 < M < 1.90"
+
+        ma.reconstructDecay(
+            "omega:B0toDomegapi_Kpipi_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay("D-:B0toDomegapi_Kpipi_pipipi0 -> K+:GoodTrack pi-:GoodTrack pi-:GoodTrack", Dcuts, path=path)
+        ma.reconstructDecay(
+            "B0:B0toDomegapi_Kpipi_pipipi0 -> D-:B0toDomegapi_Kpipi_pipipi0 omega:B0toDomegapi_Kpipi_pipipi0 pi+:GoodTrack",
+            Bcuts,
+            path=path)
+
+        return ["B0:B0toDomegapi_Kpipi_pipipi0"]
+
+
+@fancy_skim_header
+class B0toDomegapi_Kspi_pipipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{0} \\to D^{-} (\\to K_{\\rm S}^0 \\pi^-) \\omega (\\to \\pi^- \\pi^+ \\pi^0) \\pi^+`,
+
+    Cuts applied:
+
+    * ``1.84 < M_D < 1.90``
+    * ``0.70 < M_omega < 0.90``
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.25``
+    """
+
+    __authors__ = ["Dmitry Matvienko"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdKshorts(path=path)
+        stdPi0s("eff40_May2020Fit", path=path)
+        loadPiForBtoHadrons(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.25"
+        omegacuts = "0.70 < M < 0.90"
+        Dcuts = "1.84 < M < 1.90"
+
+        ma.reconstructDecay(
+            "omega:B0toDomegapi_Kspi_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay("D-:B0toDomegapi_Kspi_pipipi0 -> K_S0:merged pi-:GoodTrack", Dcuts, path=path)
+        ma.reconstructDecay(
+            "B0:B0toDomegapi_Kspi_pipipi0 -> D-:B0toDomegapi_Kspi_pipipi0 omega:B0toDomegapi_Kspi_pipipi0 pi+:GoodTrack",
+            Bcuts,
+            path=path)
+
+        return ["B0:B0toDomegapi_Kspi_pipipi0"]
+
+
+@fancy_skim_header
+class BtoD0pi_Kpiomega_pipipi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{+} \\to \\bar{D}^{0} (\\to K^+ \\pi^- \\omega (\\to \\pi^- \\pi^+ \\pi^0)) \\pi^+`,
+
+    Cuts applied:
+
+    * ``1.7 < M_D < 2.0``
+    * ``0.73 < M_omega < 0.9``
+    * ``Mbc > 5.25``
+    * ``abs(deltaE) < 0.25``
+    """
+
+    __authors__ = ["Dmitry Matvienko"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        stdPi0s("eff40_May2020Fit", path=path)
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.25 and abs(deltaE) < 0.25"
+        omegacuts = "0.73 < M < 0.9"
+        Dcuts = "1.7 < M < 2.0"
+
+        ma.reconstructDecay(
+            "omega:BtoD0pi_Kpiomega_pipipi0 -> pi-:GoodTrack pi+:GoodTrack pi0:eff40_May2020Fit",
+            omegacuts,
+            path=path)
+        ma.reconstructDecay(
+            "anti-D0:BtoD0pi_Kpiomega_pipipi0 -> K+:GoodTrack pi-:GoodTrack omega:BtoD0pi_Kpiomega_pipipi0",
+            Dcuts,
+            path=path)
+        ma.reconstructDecay("B+:BtoD0pi_Kpiomega_pipipi0 -> anti-D0:BtoD0pi_Kpiomega_pipipi0 pi+:GoodTrack", Bcuts, path=path)
+
+        return ["B+:BtoD0pi_Kpiomega_pipipi0"]

@@ -1,3 +1,11 @@
+/**************************************************************************
+ * basf2 (Belle II Analysis Software Framework)                           *
+ * Author: The Belle II Collaboration                                     *
+ *                                                                        *
+ * See git log for contributors and copyright holders.                    *
+ * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
+ **************************************************************************/
+
 //For GFTrack visualisation:
 /* Copyright 2011, Technische Universitaet Muenchen,
    Author: Karl Bicker
@@ -679,7 +687,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
                 continue;
               }
 
-              const VXD::SensorInfoBase& sensor = geo.get(recoHit->getSensorID());
+              const VXD::SensorInfoBase& sensor = geo.getSensorInfo(recoHit->getSensorID());
               double du, dv;
               ROOT::Math::XYZVector a = o; //defines position of sensor plane
               double hit_res_u = hit_cov(0, 0);
@@ -1070,13 +1078,13 @@ void EVEVisualization::addSimHit(const CDCSimHit* hit, const MCParticle* particl
 void EVEVisualization::addSimHit(const PXDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const SVDSimHit* hit, const MCParticle* particle)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const ROOT::Math::XYZVector& global_pos = geo.get(hit->getSensorID()).pointToGlobal(hit->getPosIn());
+  const ROOT::Math::XYZVector& global_pos = geo.getSensorInfo(hit->getSensorID()).pointToGlobal(hit->getPosIn());
   addSimHit(global_pos, particle);
 }
 void EVEVisualization::addSimHit(const KLMSimHit* hit, const MCParticle* particle)
@@ -1575,7 +1583,7 @@ void EVEVisualization::addROI(const ROIid* roi)
 void EVEVisualization::addRecoHit(const SVDCluster* hit, TEveStraightLineSet* lines)
 {
   static VXD::GeoCache& geo = VXD::GeoCache::getInstance();
-  const VXD::SensorInfoBase& sensor = geo.get(hit->getSensorID());
+  const VXD::SensorInfoBase& sensor = geo.getSensorInfo(hit->getSensorID());
 
   ROOT::Math::XYZVector a, b;
   if (hit->isUCluster()) {

@@ -66,7 +66,7 @@ void KlongValidationModule::initialize()
                                5);
   m_effMom    = new TH1F("Momentum Efficiency obtained from cluster", "Efficiency Momentum;Momentum [GeV];Efficiency", 25, 0, 5);
 
-  m_fakePhi_Pass     = new TH1F("Phi Fake Passsed", "Fake Passed #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
+  m_fakePhi_Pass     = new TH1F("Phi Fake Passed", "Fake Passed #Phi;#Phi [rad];Count", 32, -3.2, 3.2);
   m_fakePhi     = new TH1F("Phi Fake Rate", "Fake Rate #Phi;#Phi [rad];Fake Rate", 32, -3.2, 3.2);
 
   m_fakeTheta_Pass = new TH1F("Theta Fake Passed", "Fake Passed #Theta;#Theta [rad];Count", 32, 0, 3.2);
@@ -204,7 +204,7 @@ void KlongValidationModule::event()
     m_trackFlag->SetMinimum(0.);
     m_ECLFlag->SetMinimum(0.);
 
-    //fil all to normalise later
+    //fill all to normalise later
     m_Phi_all -> Fill(m_phi);
     m_Theta_all -> Fill(m_theta);
     m_Mom_all -> Fill(m_momentum);

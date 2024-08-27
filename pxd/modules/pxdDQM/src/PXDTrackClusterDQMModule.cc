@@ -143,7 +143,7 @@ void PXDTrackClusterDQMModule::event()
       if (m_ASICHistos && tfr) {
         // for now, we only want to have this module in
         if (cluster.getSensorID() == VxdID("1.5.1")) {
-          auto SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(cluster.getSensorID()));
+          auto SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(cluster.getSensorID()));
           auto d = PXDMappingLookup::getDCDID(SensorInfo.getUCellID(cluster.getU()), SensorInfo.getVCellID(cluster.getV()),
                                               cluster.getSensorID());
           auto s = PXDMappingLookup::getSWBID(SensorInfo.getVCellID(cluster.getV()));

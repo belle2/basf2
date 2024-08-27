@@ -222,11 +222,13 @@ CalibrationAlgorithm::EResult eclWaveformTemplateCalibrationC2Algorithm::calibra
       B2INFO("CellID " << CellID_i << " counterWaveforms = " << counterWaveforms);
 
       if (counterWaveforms < m_TotalCountsThreshold) {
+        /** in this case crystal does not have enough stat.  Allow to proceed by clearing skip array and doubling resLimit */
         B2INFO("eclWaveformTemplateCalibrationC2Algorithm: warning total entries for cell ID " <<  CellID_i << " is only: " <<
-               counterWaveforms <<
-               " Requirement is : " << m_TotalCountsThreshold);
-        /** We require all crystals to have a minimum number of waveforms available.  If c_NotEnoughData is returned then the next run will be appended.  */
-        return c_NotEnoughData;
+               counterWaveforms << " Requirement is : " << m_TotalCountsThreshold);
+        EntriesToSkip.clear();
+        resLimit *= 2;
+        B2INFO("eclWaveformTemplateCalibrationC2Algorithm: warning " <<  CellID_i << " resLimit is doubled to" << resLimit << " start was "
+               << resLimitOriginal);
       }
 
 

@@ -154,7 +154,7 @@ void DQMHistAutoCanvasModule::event()
           // assume users are expecting non-0-suppressed axis
           if (hist->GetMinimum() > 0) hist->SetMinimum(0);
           hist->Draw("hist");
-
+          /* TODO: Uncomment below after debugging
           // reference only for 1dim
           if (hist->Integral() != 0) { // ignore empty histogram
             auto refCopy = findRefHist(it.first, 1, hist);
@@ -166,6 +166,7 @@ void DQMHistAutoCanvasModule::event()
               refCopy->Draw("hist,same");
             }
           }
+          */
         } else if (hist->GetDimension() == 2) {
           // ... but not in 2d
           hist->Draw("colz");

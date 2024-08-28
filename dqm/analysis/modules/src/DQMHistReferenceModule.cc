@@ -173,6 +173,24 @@ void DQMHistReferenceModule::event()
       }
     */
 
+    //TODO: Remove me when and move me to AutoCanvas (after debugging)
+    if (abs(ref->Integral()) > 0) { // only if we have entries in reference
+      auto refCopy = scaleReference(1, hist1, it.second.getReference());
+
+      //Adjust the y scale to cover the reference
+      if (refCopy->GetMaximum() > hist1->GetMaximum())
+        hist1->SetMaximum(1.1 * refCopy->GetMaximum());
+
+      canvas->cd();
+      refCopy->Draw("hist,same");
+
+      canvas->Modified();
+      canvas->Update();
+      B2DEBUG(2, "Adding ref: " << it.second.m_orghist_name << " " << ref->GetName() << " " << ref);
+      //addRef("", it.second.m_orghist_name, ref);
+    }
+
+
   }
 
   now = time(0);

@@ -152,7 +152,8 @@ void PXDInjectionDQMModule::defineHisto()
 void PXDInjectionDQMModule::initialize()
 {
   REG_HISTOGRAM
-  m_rawTTD.isOptional(); /// TODO better use isRequired(), but RawFTSW is not in sim, thus tests are failing
+  m_EventLevelTriggerTimeInfo.isRequired();
+
   if (m_useClusters) {
     m_storeClusters.isRequired(m_PXDClustersName);
   } else {
@@ -185,19 +186,15 @@ void PXDInjectionDQMModule::beginRun()
 
 void PXDInjectionDQMModule::event()
 {
-
-  for (auto& it : m_rawTTD) {
-    B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-            (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-            it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
-
+  // And check if the stored data is valid
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
     // get last injection time
-    hTriggersAfterTrigger->Fill(it.GetTimeSincePrevTrigger(0) / 127.);
-    hTriggersPerBunch->Fill(it.GetBunchNumber(0));
+    hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 127.);
+    // hTriggersAfterTrigger->Fill(m_EventLevelTriggerTimeInfo->getTimeSincePrevTrigger() / 64.);
+    hTriggersPerBunch->Fill(m_EventLevelTriggerTimeInfo->getBunchNumber());
 
-    auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
+    if (m_EventLevelTriggerTimeInfo->hasInjection()) {
       // count raw pixel hits or clusters per module, only if necessary
       unsigned int all = 0;
       std::map <VxdID, int> freq;// count the number of RawHits per sensor
@@ -212,23 +209,23 @@ void PXDInjectionDQMModule::event()
           all++;
         }
       }
-      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
-      if (it.GetIsHER(0)) {
-        hOccAfterInjHER->Fill(diff2, all);
-        hEOccAfterInjHER->Fill(diff2);
-//         hTrigAfterInjHER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
+      float difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection() / 127.; //  127MHz clock ticks to us, inexact rounding
+      if (m_EventLevelTriggerTimeInfo->isHER()) {
+        hOccAfterInjHER->Fill(difference, all);
+        hEOccAfterInjHER->Fill(difference);
+        //         hTrigAfterInjHER->Fill(difference, difference - int(difference / (5120 / 508.)) * (5120 / 508.));
         if (m_createMaxHist) {
-          auto bin = hMaxOccAfterInjHER->FindBin(diff2);
+          auto bin = hMaxOccAfterInjHER->FindBin(difference);
           auto value = hMaxOccAfterInjHER->GetBinContent(bin);
           if (all > value) hMaxOccAfterInjHER->SetBinContent(bin, all);
         }
         for (auto& a : hOccModAfterInjHER) {
-          if (a.second) a.second->Fill(diff2, freq[a.first]);
+          if (a.second) a.second->Fill(difference, freq[a.first]);
         }
         if (m_createMaxHist) {
           for (auto& a : hMaxOccModAfterInjHER) {
             if (a.second) {
-              auto bin = a.second->FindBin(diff2);
+              auto bin = a.second->FindBin(difference);
               auto value = a.second->GetBinContent(bin);
               if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
             }
@@ -238,32 +235,32 @@ void PXDInjectionDQMModule::event()
           if (m_useClusters) {
             // Cluster does not contain VCellID, need to change histogramm completely
             // -> doesnt work with clusters!
-//             for (auto& p : m_storeClusters) {
-//               hOccAfterInjHERGate->Fill(diff2, p.getVCellID() / 4);
-//             }
+            //             for (auto& p : m_storeClusters) {
+            //               hOccAfterInjHERGate->Fill(difference, p.getVCellID() / 4);
+            //             }
           } else {
             for (auto& p : m_storeRawHits) {
-              hOccAfterInjHERGate->Fill(diff2, p.getRow() / 4);
-              hOccModAfterInjHERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
+              hOccAfterInjHERGate->Fill(difference, p.getRow() / 4);
+              hOccModAfterInjHERGate[p.getSensorID()]->Fill(difference, p.getRow() / 4);
             }
           }
         }
       } else {
-        hOccAfterInjLER->Fill(diff2, all);
-        hEOccAfterInjLER->Fill(diff2);
-//         hTrigAfterInjLER->Fill(diff2, diff2 - int(diff2 / (5120 / 508.)) * (5120 / 508.));
+        hOccAfterInjLER->Fill(difference, all);
+        hEOccAfterInjLER->Fill(difference);
+        //         hTrigAfterInjLER->Fill(difference, difference - int(difference / (5120 / 508.)) * (5120 / 508.));
         if (m_createMaxHist) {
-          auto bin = hMaxOccAfterInjLER->FindBin(diff2);
+          auto bin = hMaxOccAfterInjLER->FindBin(difference);
           auto value = hMaxOccAfterInjLER->GetBinContent(bin);
           if (all > value) hMaxOccAfterInjLER->SetBinContent(bin, all);
         }
         for (auto& a : hOccModAfterInjLER) {
-          if (a.second) a.second->Fill(diff2, freq[a.first]);
+          if (a.second) a.second->Fill(difference, freq[a.first]);
         }
         if (m_createMaxHist) {
           for (auto& a : hMaxOccModAfterInjLER) {
             if (a.second) {
-              auto bin = a.second->FindBin(diff2);
+              auto bin = a.second->FindBin(difference);
               auto value = a.second->GetBinContent(bin);
               if (freq[a.first] > value) a.second->SetBinContent(bin, freq[a.first]);
             }
@@ -274,19 +271,17 @@ void PXDInjectionDQMModule::event()
           if (m_useClusters) {
             // Cluster does not contain VCellID, need to change histogramm completely
             // -> doesnt work with clusters!
-//             for (auto& p : m_storeClusters) {
-//               hOccAfterInjLERGate->Fill(diff2, p.getVCellID() / 4);
-//             }
+            //             for (auto& p : m_storeClusters) {
+            //               hOccAfterInjLERGate->Fill(difference, p.getVCellID() / 4);
+            //             }
           } else {
             for (auto& p : m_storeRawHits) {
-              hOccAfterInjLERGate->Fill(diff2, p.getRow() / 4);
-              hOccModAfterInjLERGate[p.getSensorID()]->Fill(diff2, p.getRow() / 4);
+              hOccAfterInjLERGate->Fill(difference, p.getRow() / 4);
+              hOccModAfterInjLERGate[p.getSensorID()]->Fill(difference, p.getRow() / 4);
             }
           }
         }
       }
     }
-
-    break;
   }
 }

@@ -47,7 +47,7 @@ void PXDGatedDHCDQMModule::initialize()
 {
   REG_HISTOGRAM
   m_storeDAQEvtStats.isRequired();
-  m_rawTTD.isRequired();
+  m_EventLevelTriggerTimeInfo.isRequired();
 }
 
 void PXDGatedDHCDQMModule::beginRun()
@@ -60,29 +60,24 @@ void PXDGatedDHCDQMModule::beginRun()
 void PXDGatedDHCDQMModule::event()
 {
 
-  for (auto& it : m_rawTTD) {
-    B2DEBUG(29, "TTD FTSW : " << hex << it.GetTTUtime(0) << " " << it.GetTTCtime(0) << " EvtNr " << it.GetEveNo(0)  << " Type " <<
-            (it.GetTTCtimeTRGType(0) & 0xF) << " TimeSincePrev " << it.GetTimeSincePrevTrigger(0) << " TimeSinceInj " <<
-            it.GetTimeSinceLastInjection(0) << " IsHER " << it.GetIsHER(0) << " Bunch " << it.GetBunchNumber(0));
+  // And check if the stored data is valid
+  if (m_EventLevelTriggerTimeInfo.isValid() and m_EventLevelTriggerTimeInfo->isValid()) {
 
-    // get last injection time
-    auto difference = it.GetTimeSinceLastInjection(0);
     // check time overflow, too long ago
-    if (difference != 0x7FFFFFFF) {
-      float diff2 = difference / 127.; //  127MHz clock ticks to us, inexact rounding
-      bool isher = it.GetIsHER(0);
+    if (m_EventLevelTriggerTimeInfo->hasInjection()) {
+      // get last injection time
+      float difference = m_EventLevelTriggerTimeInfo->getTimeSinceLastInjection() / 127.; //  127MHz clock ticks to us, inexact rounding
+      bool isher = m_EventLevelTriggerTimeInfo->isHER();
       for (auto& pkt : *m_storeDAQEvtStats) {
         for (auto& dhc : pkt) {
           int value = dhc.getDHCID() * 4 + dhc.getGatedFlag() * 2 + dhc.getGatedHER();
           if (isher) {
-            hGateAfterInjHER->Fill(diff2, value);
+            hGateAfterInjHER->Fill(difference, value);
           } else {
-            hGateAfterInjLER->Fill(diff2, value);
+            hGateAfterInjLER->Fill(difference, value);
           }
         }
       }
     }
-
-    break;
   }
 }

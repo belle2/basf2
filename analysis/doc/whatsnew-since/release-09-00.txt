@@ -18,4 +18,5 @@ Variables
 Command line tools
 ++++++++++++++++++
 * Improved output and content of the :ref:`b2help-recommendation`.
+* Added new tool to list available FEI modes :ref:`b2help-print-fei-mode-names` and corresponding function `get_mode_names`.
 

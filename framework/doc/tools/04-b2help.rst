@@ -52,6 +52,19 @@ Tools which will provide you help
     :nogroupsections:
 
 
+.. _b2help-print-fei-mode-names:
+
+``b2help-print-fei-mode-names``: List available FEI modes for a given particle
+------------------------------------------------------------------------------
+
+.. argparse::
+    :filename: analysis/tools/b2help-print-fei-mode-names
+    :func: get_argument_parser
+    :prog: b2help-print-fei-mode-names
+    :nodefault:
+    :nogroupsections:
+
+
 .. include:: ../../../decfiles/doc/decfiles-tools.rstinclude
 
 

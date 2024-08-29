@@ -422,8 +422,8 @@ class StateRecordingTask(Basf2PathTask):
                         inputRecoTrackStoreArrayName="CDCSVDRecoTracks",
                         outputRecoTrackStoreArrayName="RecoTracks",
                         outputRelationRecoTrackStoreArrayName="CDCSVDRecoTracks",
-                        hitFilter="distance",
-                        seedFilter="distance",
+                        hitFilter="angulardistance",
+                        seedFilter="angulardistance",
                         preSeedFilter='all',
                         preHitFilter='all',
 
@@ -513,26 +513,21 @@ class CKFStateFilterTeacherTask(Basf2Task):
         #: \endcond
     )
 
-    def get_weightfile_identifier(self, fast_bdt_option=None, filter_number=1):
+    def get_weightfile_identifier(self, fast_bdt_option=None, filter_number=None):
         """
         Name of weightfile that is created by the teacher task.
 
         :param fast_bdt_option: FastBDT option that is used to train this MVA
+        :param filter_number: Filter number (first=1, second=2, third=3) to be trained
         """
         if fast_bdt_option is None:
             fast_bdt_option = self.fast_bdt_option_state_filter
         fast_bdt_string = create_fbdt_option_string(fast_bdt_option)
+
+        if filter_number is None:
+            filter_number = self.filter_number
         weightfile_name = f"trk_ToPXDStateFilter_{filter_number}" + fast_bdt_string
         return weightfile_name
-
-    def get_weightfile_root_identifier(self):
-        """
-        Name of the root weightfile used as a local weightfile in the following validation tasks.
-
-        :param fast_bdt_option: FastBDT option that is used to train this MVA
-        """
-
-        return self.get_weightfile_identifier() + ".root"
 
     def requires(self):
         """
@@ -552,7 +547,7 @@ class CKFStateFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_root_identifier())
+        yield self.add_to_output(self.get_weightfile_identifier() + ".root")
 
     def process(self):
         """
@@ -570,12 +565,12 @@ class CKFStateFilterTeacherTask(Basf2Task):
         my_basf2_mva_teacher(
             records_files=records_files,
             tree_name=tree_name,
-            weightfile_identifier=self.get_weightfile_identifier(filter_number=self.filter_number),
+            weightfile_identifier=weightfile_identifier,
             target_variable=self.training_target,
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option_state_filter,
         )
-        basf2_mva.download(weightfile_identifier, self.get_output_file_name(self.get_weightfile_root_identifier()))
+        basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + '.root'))
 
 
 class ResultRecordingTask(Basf2PathTask):
@@ -789,15 +784,6 @@ class CKFResultFilterTeacherTask(Basf2Task):
         weightfile_name = "trk_ToPXDResultFilter" + fast_bdt_string
         return weightfile_name
 
-    def get_weightfile_root_identifier(self):
-        """
-        Name of the root weightfile used as a local weightfile in the following validation tasks.
-
-        :param fast_bdt_option: FastBDT option that is used to train this MVA
-        """
-
-        return self.get_weightfile_identifier() + ".root"
-
     def requires(self):
         """
         Generate list of luigi Tasks that this Task depends on.
@@ -815,7 +801,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
         Generate list of output files that the task should produce.
         The task is considered finished if and only if the outputs all exist.
         """
-        yield self.add_to_output(self.get_weightfile_root_identifier())
+        yield self.add_to_output(self.get_weightfile_identifier() + ".root")
 
     def process(self):
         """
@@ -837,7 +823,7 @@ class CKFResultFilterTeacherTask(Basf2Task):
             exclude_variables=self.exclude_variables,
             fast_bdt_option=self.fast_bdt_option_result_filter,
         )
-        basf2_mva.download(weightfile_identifier, self.get_output_file_name(self.get_weightfile_root_identifier()))
+        basf2_mva.download(weightfile_identifier, self.get_output_file_name(weightfile_identifier + ".root"))
 
 
 class ValidationAndOptimisationTask(Basf2PathTask):
@@ -1098,7 +1084,7 @@ class MainTask(b2luigi.WrapperTask):
                 experiment_numbers, fast_bdt_options, fast_bdt_options
         ):
 
-            state_filter_cuts = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2]
+            state_filter_cuts = [0.0, 0.02, 0.03, 0.05, 0.1, 0.2]
             n_best_states_list = [3, 5, 10]
             result_filter_cuts = [0.05, 0.1, 0.2]
             n_best_results_list = [2, 3, 5]
@@ -1122,6 +1108,6 @@ if __name__ == "__main__":
 
     # I'm not sure how to treat this line. I commented it out to make the script run
     # b2luigi.set_setting("env_script", "./setup_basf2.sh")
-    b2luigi.set_setting("batch_system", "lsf")
+    b2luigi.get_setting("batch_system", "lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

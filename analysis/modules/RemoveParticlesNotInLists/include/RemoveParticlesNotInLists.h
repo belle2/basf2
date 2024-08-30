@@ -52,6 +52,7 @@ namespace Belle2 {
   private:
     StoreArray<Particle> m_particles; /**< StoreArray of Particles */
     std::vector<std::string>  m_particleLists; /**< keep Particles and daughters in these lists. */
+    bool m_includeAntiPlists; /**< keep Particles from the anti-ParticleLists of the given ParticleLists. */
     ParticleSubset m_subset; /**< reduces the Particles array. */
     unsigned long m_nRemoved; /**< number of particles removed. */
     unsigned long m_nTotal; /**< number of particles before removal. */

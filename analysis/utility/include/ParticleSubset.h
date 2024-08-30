@@ -21,7 +21,7 @@ namespace Belle2 {
      *
      * Removal is done immediately, there is no need to call select() afterwards.
      */
-    void removeParticlesNotInLists(const std::vector<std::string>& listNames);
+    void removeParticlesNotInLists(const std::vector<std::string>& listNames, const bool includeAntiPlists = false);
 
     /** select Particles for which f returns true, discard others */
     void select(std::function<bool (const Particle*)> f)

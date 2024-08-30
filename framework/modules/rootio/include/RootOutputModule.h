@@ -111,6 +111,12 @@ namespace Belle2 {
      */
     std::vector<std::string> m_branchNames[DataStore::c_NDurabilityTypes];
 
+    /** Flag to include anti-particles in the output.
+     *
+     *  This flag is steerable.
+     */
+    bool m_includeAntiPlists;
+
     /** Array of names of branches that should be written out although they are not flagged for writeout.
      *  And usually ignored, use to writeout RestOfEvent.
      */

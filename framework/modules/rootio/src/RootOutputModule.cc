@@ -8,6 +8,8 @@
 
 #include <boost/python.hpp>
 
+#include <analysis/DecayDescriptor/ParticleListName.h>
+
 #include <framework/modules/rootio/RootOutputModule.h>
 
 #include <framework/io/RootIOUtilities.h>
@@ -123,6 +125,7 @@ Warning:
 
 .. versionadded:: release-03-00-00
 )DOC", m_outputSplitSize);
+  addParam("includeAntiPlists", m_includeAntiPlists, "Include anti particle lists in the output", false);
 
   m_outputFileMetaData = new FileMetaData;
 }
@@ -164,6 +167,30 @@ void RootOutputModule::initialize()
       m_regularFile = false;
     }
   }
+
+  // add anti particle lists to the list of branches to be saved
+  if (m_includeAntiPlists) {
+    std::vector<std::string> antiParticleLists;
+    for (auto branchName : m_branchNames[0]) {
+      if (branchName.find(":") == std::string::npos) continue;
+      string antiListName = ParticleListName::antiParticleListName(branchName);
+      if (!antiListName.empty()) {
+        antiParticleLists.push_back(antiListName);  
+      }
+    }
+    m_branchNames[0].insert(m_branchNames[0].end(), antiParticleLists.begin(), antiParticleLists.end());
+    
+    std::vector<std::string> exAntiParticleLists;
+    for (auto exBranchName : m_excludeBranchNames[0]) {
+      if (exBranchName.find(":") == std::string::npos) continue;
+      string exAntiListName = ParticleListName::antiParticleListName(exBranchName);
+      if (!exAntiListName.empty()) {
+        exAntiParticleLists.push_back(exAntiListName);  
+      }
+    }
+    m_excludeBranchNames[0].insert(m_excludeBranchNames[0].end(), exAntiParticleLists.begin(), exAntiParticleLists.end());
+  }
+
   openFile();
 }
 

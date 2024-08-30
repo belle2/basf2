@@ -1,0 +1,49 @@
+# EventType: 1243034000
+# Descriptor: [B- -> D*0 rho-]cc
+# NickName: Bu_D*0rho-
+# Documentation: Branching Ratio Measurement
+# Tested: Yes
+# PhysicsWG: BHadronic
+# Responsible: Xiang Zhao
+# Email: xiangzhao@mail.nankai.edu.cn
+# Cuts: None
+# Date: 20240814
+
+Alias pi0sig pi0
+Alias rho-sig rho-
+Alias rho+sig rho+
+ChargeConj rho+sig rho-sig
+
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B+ B-sig VSS;
+Enddecay
+
+Decay B-sig
+1.00  D*0sig  rho-sig               SVV_HELAMP 0.228 0.95 0.932 0 0.283 1.13;
+Enddecay
+CDecay B+sig
+
+Decay D*0sig
+1.00  D0sig  pi0sig                        VSS;
+Enddecay
+CDecay anti-D*0sig
+
+Decay rho-sig
+1.00  pi- pi0sig                       VSS;
+Enddecay
+CDecay rho+sig
+
+Decay D0sig
+0.03947   K-  pi+                        PHSP;
+0.144   K-  pi+  pi0sig                     D_DALITZ;
+0.0822   K-  pi+  pi+   pi-              PHSP;
+Enddecay
+CDecay anti-D0sig
+
+
+Decay pi0sig
+1.000   gamma   gamma   PHSP;
+Enddecay
+
+End

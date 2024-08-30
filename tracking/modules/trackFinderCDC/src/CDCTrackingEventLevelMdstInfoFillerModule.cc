@@ -5,29 +5,30 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 #include <tracking/modules/trackFinderCDC/CDCTrackingEventLevelMdstInfoFillerModule.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-// Register the CDCTrackingEventLevelMdstInfoFillerModule to the framework
-REG_MODULE(CDCTrackingEventLevelMdstInfoFiller);
+
+// Register the modules to the framework
+REG_MODULE(CDCTrackingEventLevelMdstInfoFillerFromHits);
+REG_MODULE(CDCTrackingEventLevelMdstInfoFillerFromSegments);
 
 
-std::string CDCTrackingEventLevelMdstInfoFillerFindlet::getDescription()
+std::string CDCTrackingEventLevelMdstInfoFillerFromHitsFindlet::getDescription()
 {
-  return "This module adds additional global event level information about CDC track finding results to the MDST object CDCTrackingEventLevelTrackingInfo";
+  return "This module adds additional global event level information based on hits about CDC track finding results to the MDST object EventLevelTrackingInfo";
 }
 
-void CDCTrackingEventLevelMdstInfoFillerFindlet::initialize()
+void CDCTrackingEventLevelMdstInfoFillerFromHitsFindlet::initialize()
 {
   Super::initialize();
   m_eventLevelTrackingInfo.isRequired();
 }
 
-// Actual work
-void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWireHit>& inputWireHits,
-                                                       const std::vector<CDCSegment2D>& inputWireHitSegments)
+void CDCTrackingEventLevelMdstInfoFillerFromHitsFindlet::apply(const std::vector<CDCWireHit>& inputWireHits)
 {
   int nhitTotal = inputWireHits.size(); //total number of hits
   int nTaken = 0;  // bg+assigned to tracks
@@ -55,10 +56,25 @@ void CDCTrackingEventLevelMdstInfoFillerFindlet::apply(const std::vector<CDCWire
 
   B2DEBUG(10, "Total " << nhitTotal << " taken " << nTaken << " background " << nBg  << " signal " << nTaken - nBg  <<
           " Not assigned " << nRestCleaned);
+}
 
-  // Count 2D segments too:
-  nTaken = 0;
-  nBg = 0;
+
+std::string CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet::getDescription()
+{
+  return "This module adds additional global event level information based on 2D segements about CDC track finding results to the MDST object EventLevelTrackingInfo";
+}
+
+void CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet::initialize()
+{
+  Super::initialize();
+  m_eventLevelTrackingInfo.isRequired();
+}
+
+void CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet::apply(const std::vector<CDCSegment2D>& inputWireHitSegments)
+{
+  // Count 2D segments
+  int nTaken = 0;
+  int nBg = 0;
   for (CDCSegment2D const& seg : inputWireHitSegments) {
     AutomatonCell const& a_cell = seg.getAutomatonCell();
     if (a_cell.hasTakenFlag()) nTaken += 1;

@@ -20,7 +20,6 @@
 #include <TString.h>
 #include <TFitResult.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVD3SampleCoGTimeCalibrationAlgorithm::SVD3SampleCoGTimeCalibrationAlgorithm(const std::string& str) :
@@ -149,7 +148,7 @@ CalibrationAlgorithm::EResult SVD3SampleCoGTimeCalibrationAlgorithm::calibrate()
               if (m_applyLinearCutsToRemoveBkg && (hEventT0vsCoG->GetBinContent(i, j) > 0 && (bcy > f1->Eval(bcx) || bcy < f2->Eval(bcx)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               } else if (hEventT0vsCoG->GetBinContent(i, j) > 0
-                         && (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(nEntriesForFilter * 0.001)))) {
+                         && (hEventT0vsCoG->GetBinContent(i, j) < std::max(2, int(nEntriesForFilter * 0.001)))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
             }

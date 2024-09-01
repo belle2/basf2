@@ -166,7 +166,6 @@ import simulation
 from ckf_training import my_basf2_mva_teacher, create_fbdt_option_string
 from tracking_mva_filter_payloads.write_tracking_mva_filter_payloads_to_db import write_tracking_mva_filter_payloads_to_db
 
-# basf2.conditions.prepend_testing_payloads("localdb/database.txt")
 # wrap python modules that are used here but not in the externals into a try except block
 install_helpstring_formatter = ("\nCould not find {module} python module.Try installing it via\n"
                                 "  python3 -m pip install [--user] {module}\n")
@@ -1152,7 +1151,7 @@ class MainTask(b2luigi.WrapperTask):
 if __name__ == "__main__":
 
     # I'm not sure how to treat this line. I commented it out to make the script run
-    # b2luigi.set_setting("env_script", "./setup_basf2.sh")
+    b2luigi.set_setting("env_script", "./setup_basf2.sh")
     b2luigi.get_setting("batch_system", "lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

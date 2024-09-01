@@ -751,8 +751,7 @@ class MainTask(b2luigi.WrapperTask):
 
 if __name__ == "__main__":
 
-    # I'm not sure how to treat this line. I commented it out to make the script run
-    # b2luigi.set_setting("env_script", "./setup_basf2.sh")
+    b2luigi.set_setting("env_script", "./setup_basf2.sh")
     b2luigi.get_setting("batch_system", default="lsf")
     workers = b2luigi.get_setting("workers", default=1)
     b2luigi.process(MainTask(), workers=workers, batch=True)

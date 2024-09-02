@@ -1084,7 +1084,7 @@ class MainTask(b2luigi.WrapperTask):
                 experiment_numbers, fast_bdt_options, fast_bdt_options
         ):
 
-            state_filter_cuts = [0.0, 0.02, 0.03, 0.05, 0.1, 0.2]
+            state_filter_cuts = [0.01, 0.02, 0.03, 0.05, 0.1, 0.2]
             n_best_states_list = [3, 5, 10]
             result_filter_cuts = [0.05, 0.1, 0.2]
             n_best_results_list = [2, 3, 5]

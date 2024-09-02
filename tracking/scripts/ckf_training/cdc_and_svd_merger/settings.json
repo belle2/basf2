@@ -10,5 +10,7 @@
     "experiment_numbers": [0],
     "bkgfiles_by_exp": {
         "0": "/use/the/default/path/for/experiment/0/"
-    }
+    },
+    "batch_system": "lsf"
+
 }

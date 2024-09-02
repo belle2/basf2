@@ -368,6 +368,11 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
   if (denominator != nullptr && numerator != nullptr) {
     effHist->Divide(numerator, denominator, 1, 1, "B");
     effHist->Draw();
+
+    //reference check
+    TH1* ref = findRefHist(effHist->GetName(), false);
+    if (ref) {ref->Draw("hist,same");}
+
     canvas->Modified();
     canvas->Update();
 

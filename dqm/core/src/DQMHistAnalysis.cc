@@ -31,6 +31,7 @@ DQMHistAnalysisModule::HistList DQMHistAnalysisModule::s_histList;
 DQMHistAnalysisModule::MonObjList DQMHistAnalysisModule::s_monObjList;
 DQMHistAnalysisModule::DeltaList DQMHistAnalysisModule::s_deltaList;
 DQMHistAnalysisModule::CanvasUpdatedList DQMHistAnalysisModule::s_canvasUpdatedList;
+DQMHistAnalysisModule::RefList DQMHistAnalysisModule::s_refList;
 #ifdef _BELLE2_EPICS
 std::vector <chid>  DQMHistAnalysisModule::m_epicsChID;
 #endif
@@ -49,6 +50,7 @@ DQMHistAnalysisModule::DQMHistAnalysisModule() : Module()
 void DQMHistAnalysisModule::clearlist()
 {
   s_histList.clear();
+  s_refList.clear();
 // s_monObjList;
   s_deltaList.clear();
   s_canvasUpdatedList.clear();
@@ -75,6 +77,21 @@ bool DQMHistAnalysisModule::addHist(const std::string& dirname, const std::strin
 
   return false; // histogram didnt change
 }
+
+// void DQMHistAnalysisModule::addRef(const std::string& dirname, const std::string& histname, TH1* ref)
+// {
+//   std::string fullname;
+//   if (dirname.size() > 0) {
+//     fullname = dirname + "/" + histname;
+//   } else {
+//     fullname = histname;
+//   }
+//   auto it = s_refList.find(fullname);
+//   if (it == s_refList.end()) {
+//     B2DEBUG(1, "Did not find histogram " << fullname << "in s_refList, so inserting now.");
+//     s_refList.insert({fullname, ref});
+//   }
+// }
 
 void DQMHistAnalysisModule::addDeltaPar(const std::string& dirname, const std::string& histname, HistDelta::EDeltaType t, int p,
                                         unsigned int a)
@@ -163,9 +180,53 @@ TH1* DQMHistAnalysisModule::findHist(const std::string& dirname, const std::stri
   return findHist(histname, updated);
 }
 
+TH1* DQMHistAnalysisModule::scaleReference(int scaling, const TH1* hist, TH1* ref)
+{
+  // if hist/ref is nullptr, nothing to do
+  if (!hist || !ref)
+    return ref;
+
+  switch (scaling) {
+    // default: do nothing
+    // case 0: do nothing
+    case 1: // Integral
+      // only if we have entries in reference
+      if (hist->Integral() != 0 and ref->Integral() != 0) {
+        ref->Scale(hist->Integral() / ref->Integral());
+      }
+      break;
+    case 2: // Maximum
+      // only if we have entries in reference
+      if (hist->GetMaximum() != 0 and ref->GetMaximum() != 0) {
+        ref->Scale(hist->GetMaximum() / ref->GetMaximum());
+      }
+      break;
+  }
+  return ref;
+}
+
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, int scaling, const TH1* hist)
+{
+  if (s_refList.find(histname) != s_refList.end()) {
+    // get a copy of the reference which we can modify
+    // (it is still owned and managed by the framework)
+    // then do the scaling
+    return scaleReference(scaling, hist, s_refList[histname].getReference());
+  }
+  B2INFO("Ref Histogram " << histname << " not in list.");
+  return nullptr;
+}
+
+TH1* DQMHistAnalysisModule::findRefHist(const std::string& dirname, const std::string& histname, int scaling, const TH1* hist)
+{
+  if (dirname.size() > 0) {
+    return findRefHist(dirname + "/" + histname, scaling, hist);
+  }
+  return findRefHist(histname, scaling, hist);
+}
+
 TH1* DQMHistAnalysisModule::findHistInCanvas(const std::string& histo_name, TCanvas** cobj)
 {
-
   TCanvas* cnv = nullptr;
   // try to get canvas from outside
   if (cobj) cnv = *cobj;
@@ -276,6 +337,11 @@ void DQMHistAnalysisModule::initHistListBeforeEvent(void)
 void DQMHistAnalysisModule::clearHistList(void)
 {
   s_histList.clear();
+}
+
+void DQMHistAnalysisModule::clearRefList(void)
+{
+  s_refList.clear();
 }
 
 void DQMHistAnalysisModule::resetDeltaList(void)

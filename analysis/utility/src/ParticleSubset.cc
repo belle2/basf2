@@ -25,7 +25,7 @@ namespace {
   }
 }
 
-void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& listNames, const bool includeAntiPlists)
+void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& listNames)
 {
   std::unordered_set<int> indicesToKeep;
   for (const auto& l : listNames) {
@@ -42,27 +42,6 @@ void ParticleSubset::removeParticlesNotInLists(const std::vector<std::string>& l
     } else {
       B2ERROR("ParticleList " << l << " uses Particle array '" << list->getParticleCollectionName() <<
               "', but ParticleSubset uses different array '" << m_set->getName() << "'!");
-    }
-
-    if (includeAntiPlists) {
-      const auto& antiListName = list->getAntiParticleListName();
-      if (antiListName.empty())
-        continue;
-      StoreObjPtr<ParticleList> antiList(antiListName);
-
-      if (!antiList)
-        continue;
-
-      if (antiList->getParticleCollectionName() == m_set->getName()) {
-        const int n = antiList->getListSize();
-        for (int i = 0; i < n; i++) {
-          const Particle* p = antiList->getParticle(i);
-          keepParticle(p, &indicesToKeep);
-        }
-      } else {
-        B2ERROR("AntiParticleList " << antiListName << " uses Particle array '" << antiList->getParticleCollectionName() <<
-                "', but ParticleSubset uses different array '" << m_set->getName() << "'!");
-      }
     }
   }
 

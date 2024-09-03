@@ -24,8 +24,6 @@ RemoveParticlesNotInListsModule::RemoveParticlesNotInListsModule(): m_nRemoved(0
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("particleLists", m_particleLists, "Keep the Particles and their daughters in these ParticleLists.");
-  addParam("includeAntiPlists", m_includeAntiPlists, "Also keep Particles from the anti-ParticleLists of the given ParticleLists.",
-           false);
 }
 
 void RemoveParticlesNotInListsModule::initialize()
@@ -42,7 +40,7 @@ void RemoveParticlesNotInListsModule::event()
 {
   const int nBefore = m_particles.getEntries();
 
-  m_subset.removeParticlesNotInLists(m_particleLists, m_includeAntiPlists);
+  m_subset.removeParticlesNotInLists(m_particleLists);
 
   const int nAfter = m_particles.getEntries();
 

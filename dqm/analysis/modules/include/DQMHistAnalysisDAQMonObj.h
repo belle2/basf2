@@ -48,6 +48,11 @@ namespace Belle2 {
     void beginRun() override final;
 
     /**
+     * This method is called for each event.
+     */
+    void event() override final;
+
+    /**
      * End-of-run action.
      * Save run-related stuff, such as statistics.
      */

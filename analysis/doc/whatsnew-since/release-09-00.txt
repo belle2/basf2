@@ -20,3 +20,8 @@ Command line tools
 * Improved output and content of the :ref:`b2help-recommendation`.
 * Added new tool to list available FEI modes :ref:`b2help-print-fei-mode-names` and corresponding function `get_mode_names`.
 
+Charm Flavor Tagger
++++++++++++++++++++
+* Updated the default identifier name for the payload of the Charm Flavor Tagger (argument ``uniqueIdentifier`` of the
+  function ``charmFlavorTagger``) to ``CFT_ragdoll``. This value must be used for all releases as recent as
+  light-2406-ragdoll and release-09.

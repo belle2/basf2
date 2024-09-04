@@ -284,8 +284,8 @@ TBranch: E, 3.23
 TBranch: isSignal, 1
 TBranch: mcErrors, 0
 TBranch: mcPDG, 421
-TBranch: CFT_qr, -0.558
-TBranch: CFT_prob, 0.221
+TBranch: CFT_qr, 0.5695
+TBranch: CFT_prob, 0.7848
 TBranch: K_px, -0.9924
 TBranch: K_py, 2.049
 TBranch: K_pz, 0.8923
@@ -304,4 +304,3 @@ TBranch: pi_E, 0.7346
 TBranch: pi_isSignal, 1
 TBranch: pi_mcErrors, 0
 TBranch: pi_mcPDG, 211
->>>>>>> 047853068 (Revert "Adjust output of tutorial test B2A9XX")

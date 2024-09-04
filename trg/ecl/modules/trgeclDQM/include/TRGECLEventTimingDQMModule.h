@@ -51,7 +51,7 @@ namespace Belle2 {
     //! Trg ECL UnpakcerEvtStore
     StoreArray<TRGECLUnpackerEvtStore> m_trgeclUnpackerEvtStores;
     //! ecl trigger map
-    TrgEclMapping* trgecl_map;
+    TrgEclMapping* m_trgecl_map;
     //! Max TC E
     TH1F* m_histMaxTCE{nullptr};
     //! Max TC ID
@@ -62,12 +62,26 @@ namespace Belle2 {
     TH1F* m_histEventTimingQuality{nullptr};
     //! EventT0 with coarse event timing
     TH1F* m_histEventT0Coarse{nullptr};
+    //! x-axis minimum for EventT0 with coarse event timing
+    double m_histEventT0CoarseXMin;
+    //! x-axis maximum for EventT0 with coarse event timing
+    double m_histEventT0CoarseXMax;
     //! EventT0 with fine event timing
     TH1F* m_histEventT0Fine{nullptr};
+    //! x-axis minimum for EventT0 with fine event timing
+    double m_histEventT0FineXMin;
+    //! x-axis maximum for EventT0 with fine event timing
+    double m_histEventT0FineXMax;
     //! The number of EventT0 histogram for different max TC E region
-    static const int NBinEventT0 = 15;
+    static const int c_NBinEventT0 = 15;
     //! EventT0 for different max TC E region
-    TH1F* m_histEventT0[NBinEventT0] {nullptr};
+    TH1F* m_histEventT0[c_NBinEventT0] {nullptr};
+    //! the number of bin for EventT0 histogram
+    std::vector<int>    m_histEventT0NBin;
+    //! x axis minimum for EventT0 histogram
+    std::vector<double> m_histEventT0XMin;
+    //! x axis maximum for EventT0 histogram
+    std::vector<double> m_histEventT0XMax;
 
   };
 } // Belle2 namespace

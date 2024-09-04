@@ -85,7 +85,7 @@ namespace Belle2 {
     //! bklm GeometryPar
     //bklm::GeometryPar* m_GeoPar;
 
-    //! distribution of distance between mathced extHit and bklmHit2d
+    //! distribution of distance between matched extHit and bklmHit2d
     TH1F* m_hdistance;
 
     //! histogram of total entries of extHit vs. track momentum

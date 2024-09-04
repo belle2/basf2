@@ -79,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    /** Bins for the trigger bits historgrams. */
+    /** Bins for the trigger bits histograms. */
     enum TriggerBitsBin {
 
       /** 0x8. */

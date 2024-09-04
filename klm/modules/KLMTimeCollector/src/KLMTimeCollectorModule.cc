@@ -167,7 +167,7 @@ void KLMTimeCollectorModule::collect()
     return;
   }
 
-  B2DEBUG(20, "debug infor for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
+  B2DEBUG(20, "debug info for" << LogVar("run", runId) << LogVar("event", evtId) << LogVar("number of rec tracks", n_track));
 
   getObjectPtr<TH1D>("m_HevtT0_1")->Fill(m_Event.t0);
   getObjectPtr<TH1I>("m_HnTrack")->Fill(n_track);

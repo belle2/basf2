@@ -652,7 +652,7 @@ namespace Belle2 {
       //! Nominal height of a layer's structural iron
       double m_IronNominalHeight;
 
-      //! Actual height of a layer's stuctural iron
+      //! Actual height of a layer's structural iron
       double m_IronActualHeight;
 
       //! Radius of the inner tangent circle of the innermost gap

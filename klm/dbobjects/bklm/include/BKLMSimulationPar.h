@@ -65,13 +65,13 @@ namespace Belle2 {
       return c_MAX_NHIT;
     }
 
-    //! Get number of kind of mutiplicity for phistrips
+    //! Get number of kind of multiplicity for phistrips
     int getNPhiMultiplicity(int division) const
     {
       return m_NPhiMultiplicity[division];
     }
 
-    //! Get number of kind of mutiplicity for zstrips
+    //! Get number of kind of multiplicity for zstrips
     int getNZMultiplicity(int division) const
     {
       return m_NZMultiplicity[division];
@@ -112,10 +112,10 @@ namespace Belle2 {
     //! Number of division for zstrips
     int m_NZDiv;
 
-    //! Number of kind of mutiplicity of phistrips in each divison
+    //! Number of kind of multiplicity of phistrips in each division
     int m_NPhiMultiplicity[c_NDIV + 1];
 
-    //! Number of weigths of zstrips in each divison
+    //! Number of weights of zstrips in each division
     int m_NZMultiplicity[c_NDIV + 1];
 
     //! RPC phiStrip weight table

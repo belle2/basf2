@@ -150,7 +150,7 @@ namespace Belle2 {
     }
 
     /**
-     * Set the lower number of hits collected on one sigle strip. If the hit
+     * Set the lower number of hits collected on one single strip. If the hit
      * number is lower than the limit, the strip will not be calibrated and
      * set the average value of the calibration constant.
      */
@@ -171,13 +171,13 @@ namespace Belle2 {
     double esti_timeShift(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with increasing strip number.
+     * Tracing available channels with increasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tS_upperStrip(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with decreasing strip number.
+     * Tracing available channels with decreasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tS_lowerStrip(const KLMChannelIndex& klmChannel);
@@ -189,13 +189,13 @@ namespace Belle2 {
     double esti_timeRes(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with increasing strip number.
+     * Tracing available channels with increasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tR_upperStrip(const KLMChannelIndex& klmChannel);
 
     /**
-     * Tracing avaiable channels with decreasing strip number.
+     * Tracing available channels with decreasing strip number.
      * @param[in] klmChannel KLM channel index.
      */
     std::pair<int, double> tR_lowerStrip(const KLMChannelIndex& klmChannel);
@@ -739,10 +739,10 @@ namespace Belle2 {
     /** Const function. Global time distribution fitting. */
     TF1* fcn_const = nullptr;
 
-    /** Gaussian function. Scitillator time ditribution fitting. */
+    /** Gaussian function. Scitillator time distribution fitting. */
     TF1* fcn_gaus = nullptr;
 
-    /** Landau function. RPC time ditribution fitting. */
+    /** Landau function. RPC time distribution fitting. */
     TF1* fcn_land = nullptr;
 
     /** Output file. */

@@ -156,7 +156,7 @@ void BKLMTrack::setLocalTrackParamErr(const CLHEP::HepSymMatrix& trkParErr)
   }
 }
 
-//! Get the positon in local coordinate system of track intercept in plane of constant x
+//! Get the position in local coordinate system of track intercept in plane of constant x
 ROOT::Math::XYZVector BKLMTrack::getLocalIntercept(double x)
 {
 

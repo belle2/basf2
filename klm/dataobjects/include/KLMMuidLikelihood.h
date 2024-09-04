@@ -19,7 +19,7 @@
 namespace Belle2 {
 
   /**
-   * Class to store the likelihoods from KLM with additional informations related to the extrapolation.
+   * Class to store the likelihoods from KLM with additional information related to the extrapolation.
    */
   class KLMMuidLikelihood : public RelationsObject {
 

@@ -205,7 +205,7 @@ void TrackingAbortDQMModule::beginRun()
 void TrackingAbortDQMModule::event()
 {
 
-  //skip events in which we do not have EvenTMetaData or TRGSummary
+  //skip events in which we do not have EventMetaData or TRGSummary
   if (!m_eventMetaData.isValid()) return;
   if (!m_trgSummary.isValid()) return;
 

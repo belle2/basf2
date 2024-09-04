@@ -261,83 +261,83 @@ void KLMTimeAlgorithm::createHistograms()
                                                   "Time over propagation length for scintillators (plane2, Endcap); propagation distance[cm]; T_rec-T_0-T_fly-'T_calibration'[ns]",
                                                   200, 0.0, maximalStripLengthEKLM);
 
-  h_time_rpc_tc = new TH1F("h_time_rpc_tc", "time distributions for RPC", nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
-  h_time_scint_tc = new TH1F("h_time_scint_tc", "time distributions for Scintillator", nBin_scint,
+  h_time_rpc_tc = new TH1F("h_time_rpc_tc", "time distribution for RPC", nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
+  h_time_scint_tc = new TH1F("h_time_scint_tc", "time distribution for Scintillator", nBin_scint,
                              m_LowerTimeBoundaryScintilltorsBKLM, m_UpperTimeBoundaryScintilltorsBKLM);
-  h_time_scint_tc_end = new TH1F("h_time_scint_tc_end", "time distributions for Scintillator (Endcap)", nBin_scint,
+  h_time_scint_tc_end = new TH1F("h_time_scint_tc_end", "time distribution for Scintillator (Endcap)", nBin_scint,
                                  m_LowerTimeBoundaryScintilltorsEKLM,
                                  m_UpperTimeBoundaryScintilltorsEKLM);
 
   /** Hist declaration Global time distribution **/
-  h_time_rpc = new TH1F("h_time_rpc", "time distributions for RPC; T_rec-T_0-T_fly-T_propagation[ns]", nBin, m_LowerTimeBoundaryRPC,
+  h_time_rpc = new TH1F("h_time_rpc", "time distribution for RPC; T_rec-T_0-T_fly-T_propagation[ns]", nBin, m_LowerTimeBoundaryRPC,
                         m_UpperTimeBoundaryRPC);
-  h_time_scint = new TH1F("h_time_scint", "time distributions for Scintillator; T_rec-T_0-T_fly-T_propagation[ns]", nBin_scint,
+  h_time_scint = new TH1F("h_time_scint", "time distribution for Scintillator; T_rec-T_0-T_fly-T_propagation[ns]", nBin_scint,
                           m_LowerTimeBoundaryScintilltorsBKLM, m_UpperTimeBoundaryScintilltorsBKLM);
-  h_time_scint_end = new TH1F("h_time_scint_end", "time distributions for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+  h_time_scint_end = new TH1F("h_time_scint_end", "time distribution for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                               nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM, m_UpperTimeBoundaryScintilltorsEKLM);
 
-  hc_time_rpc = new TH1F("hc_time_rpc", "Calibrated time distributions for RPC; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+  hc_time_rpc = new TH1F("hc_time_rpc", "Calibrated time distribution for RPC; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                          nBin, m_LowerTimeBoundaryCalibratedRPC, m_UpperTimeBoundaryCalibratedRPC);
   hc_time_scint = new TH1F("hc_time_scint",
-                           "Calibrated time distributions for Scintillator; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", nBin_scint,
+                           "Calibrated time distribution for Scintillator; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", nBin_scint,
                            m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                            m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
   hc_time_scint_end = new TH1F("hc_time_scint_end",
-                               "Calibrated time distributions for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", nBin_scint,
+                               "Calibrated time distribution for Scintillator (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", nBin_scint,
                                m_LowerTimeBoundaryCalibratedScintilltorsEKLM, m_UpperTimeBoundaryCalibratedScintilltorsEKLM);
 
   for (int iF = 0; iF < 2; ++iF) {
     hn = Form("h_timeF%d_rpc", iF);
-    ht = Form("Time distributions for RPC of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribution for RPC of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h_timeF_rpc[iF] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
     hn = Form("h_timeF%d_scint", iF);
-    ht = Form("Time distributions for Scintillator of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribution for Scintillator of %s; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h_timeF_scint[iF] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                  m_UpperTimeBoundaryScintilltorsBKLM);
     hn = Form("h_timeF%d_scint_end", iF);
-    ht = Form("Time distributions for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribution for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h_timeF_scint_end[iF] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                      m_UpperTimeBoundaryScintilltorsEKLM);
 
     hn = Form("h2_timeF%d_rpc", iF);
-    ht = Form("Time distributions for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribution for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h2_timeF_rpc[iF] = new TH2F(hn.Data(), ht.Data(), 8, 0, 8, nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
     hn = Form("h2_timeF%d_scint", iF);
-    ht = Form("Time distributions for Scintillator of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
+    ht = Form("Time distribution for Scintillator of %s; Sector Index; T_rec-T_0-T_fly-T_propagation[ns]", iFstring[iF].Data());
     h2_timeF_scint[iF] = new TH2F(hn.Data(), ht.Data(), 8, 0, 8, nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                   m_UpperTimeBoundaryScintilltorsBKLM);
     hn = Form("h2_timeF%d_scint_end", iF);
-    ht = Form("Time distributions for Scintillator of %s (Endcap); Sector Index; T_rec-T_0-T_fly-T_propagation[ns]",
+    ht = Form("Time distribution for Scintillator of %s (Endcap); Sector Index; T_rec-T_0-T_fly-T_propagation[ns]",
               iFstring[iF].Data());
     h2_timeF_scint_end[iF] = new TH2F(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                       m_UpperTimeBoundaryScintilltorsEKLM);
 
     hn = Form("hc_timeF%d_rpc", iF);
-    ht = Form("Calibrated time distributions for RPC of %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iFstring[iF].Data());
+    ht = Form("Calibrated time distribution for RPC of %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iFstring[iF].Data());
     hc_timeF_rpc[iF] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryCalibratedRPC, m_UpperTimeBoundaryCalibratedRPC);
     hn = Form("hc_timeF%d_scint", iF);
-    ht = Form("Calibrated time distributions for Scintillator of %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+    ht = Form("Calibrated time distribution for Scintillator of %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
     hc_timeF_scint[iF] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                   m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
     hn = Form("hc_timeF%d_scint_end", iF);
-    ht = Form("Calibrated time distributions for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+    ht = Form("Calibrated time distribution for Scintillator of %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
     hc_timeF_scint_end[iF] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
                                       m_UpperTimeBoundaryCalibratedScintilltorsEKLM);
 
     hn = Form("h2c_timeF%d_rpc", iF);
-    ht = Form("Calibrated time distributions for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+    ht = Form("Calibrated time distribution for RPC of %s; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
     h2c_timeF_rpc[iF] = new TH2F(hn.Data(), ht.Data(), 8, 0, 8, nBin, m_LowerTimeBoundaryCalibratedRPC,
                                  m_UpperTimeBoundaryCalibratedRPC);
     hn = Form("h2c_timeF%d_scint", iF);
-    ht = Form("Calibrated time distributions for Scintillator of %s; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+    ht = Form("Calibrated time distribution for Scintillator of %s; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
     h2c_timeF_scint[iF] = new TH2F(hn.Data(), ht.Data(), 8, 0, 8, nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                    m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
     hn = Form("h2c_timeF%d_scint_end", iF);
-    ht = Form("Calibrated time distributions for Scintillator of %s (Endcap) ; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+    ht = Form("Calibrated time distribution for Scintillator of %s (Endcap) ; Sector Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
               iFstring[iF].Data());
     h2c_timeF_scint_end[iF] = new TH2F(hn.Data(), ht.Data(), 4, 0, 4, nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
                                        m_UpperTimeBoundaryCalibratedScintilltorsEKLM);
@@ -345,29 +345,29 @@ void KLMTimeAlgorithm::createHistograms()
     for (int iS = 0; iS < 8; ++iS) {
       // Barrel parts
       hn = Form("h_timeF%d_S%d_scint", iF, iS);
-      ht = Form("Time distributions for Scintillator of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribution for Scintillator of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h_timeFS_scint[iF][iS] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                         m_UpperTimeBoundaryScintilltorsBKLM);
       hn = Form("h_timeF%d_S%d_rpc", iF, iS);
-      ht = Form("Time distributions for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribution for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h_timeFS_rpc[iF][iS] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
       hn = Form("h2_timeF%d_S%d", iF, iS);
-      ht = Form("Time distributions of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribution of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h2_timeFS[iF][iS] = new TH2F(hn.Data(), ht.Data(), 15, 0, 15, nBin_scint, m_LowerTimeBoundaryRPC,
                                    m_UpperTimeBoundaryScintilltorsBKLM);
 
       hn = Form("hc_timeF%d_S%d_scint", iF, iS);
-      ht = Form("Calibrated time distributions for Scintillator of Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
+      ht = Form("Calibrated time distribution for Scintillator of Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
                 iFstring[iF].Data());
       hc_timeFS_scint[iF][iS] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                          m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
       hn = Form("hc_timeF%d_S%d_rpc", iF, iS);
-      ht = Form("Calibrated time distributions for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
+      ht = Form("Calibrated time distribution for RPC of Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
                 iFstring[iF].Data());
       hc_timeFS_rpc[iF][iS] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedRPC,
                                        m_UpperTimeBoundaryCalibratedRPC);
       hn = Form("h2c_timeF%d_S%d", iF, iS);
-      ht = Form("Calibrated time distributions of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
+      ht = Form("Calibrated time distribution of Sector%d, %s; Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iS,
                 iFstring[iF].Data());
       h2c_timeFS[iF][iS] = new TH2F(hn.Data(), ht.Data(), 15, 0, 15, nBin_scint, m_LowerTimeBoundaryCalibratedRPC,
                                     m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
@@ -375,35 +375,35 @@ void KLMTimeAlgorithm::createHistograms()
       // Inner 2 layers --> Scintillators
       for (int iL = 0; iL < 2; ++iL) {
         hn = Form("h_timeF%d_S%d_L%d", iF, iS, iL);
-        ht = Form("Time distributions for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
+        ht = Form("Time distribution for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
                   iFstring[iF].Data());
         h_timeFSL[iF][iS][iL] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                          m_UpperTimeBoundaryScintilltorsBKLM);
         hn = Form("hc_timeF%d_S%d_L%d", iF, iS, iL);
-        ht = Form("Calibrated time distributions for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+        ht = Form("Calibrated time distribution for Scintillator of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                   iL, iS, iFstring[iF].Data());
         hc_timeFSL[iF][iS][iL] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                           m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
 
         for (int iP = 0; iP < 2; ++iP) {
           hn = Form("h_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("Time distributions for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribution for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h_timeFSLP[iF][iS][iL][iP] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                                 m_UpperTimeBoundaryScintilltorsBKLM);
           hn = Form("h2_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("Time distributions for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribution for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2_timeFSLP[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 54, 0, 54, nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                                  m_UpperTimeBoundaryScintilltorsBKLM);
 
           hn = Form("hc_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("Calibrated time distributions for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+          ht = Form("Calibrated time distribution for Scintillator of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           hc_timeFSLP[iF][iS][iL][iP] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                                  m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
           hn = Form("h2c_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("Calibrated time distributions for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+          ht = Form("Calibrated time distribution for Scintillator of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2c_timeFSLP[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 54, 0, 54, nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                                   m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
@@ -411,19 +411,19 @@ void KLMTimeAlgorithm::createHistograms()
           int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
           for (int iC = 0; iC < nchannel_max; ++iC) {
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc", iF, iS, iL, iP, iC);
-            ht = Form("time distributions for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
+            ht = Form("time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
                       iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_tc[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                                           m_UpperTimeBoundaryScintilltorsBKLM);
 
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            ht = Form("time distributions for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
+            ht = Form("time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
                       iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsBKLM,
                                                        m_UpperTimeBoundaryScintilltorsBKLM);
 
             hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            ht = Form("Calibrated time distributions for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+            ht = Form("Calibrated time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             hc_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsBKLM,
                                                         m_UpperTimeBoundaryCalibratedScintilltorsBKLM);
@@ -443,33 +443,33 @@ void KLMTimeAlgorithm::createHistograms()
 
       for (int iL = 2; iL < 15; ++iL) {
         hn = Form("h_timeF%d_S%d_L%d", iF, iS, iL);
-        ht = Form("time distributions for RPC of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iL, iS, iFstring[iF].Data());
+        ht = Form("time distribution for RPC of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iL, iS, iFstring[iF].Data());
         h_timeFSL[iF][iS][iL] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
 
         hn = Form("hc_timeF%d_S%d_L%d", iF, iS, iL);
-        ht = Form("Calibrated time distributions for RPC of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iL, iS,
+        ht = Form("Calibrated time distribution for RPC of Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]", iL, iS,
                   iFstring[iF].Data());
         hc_timeFSL[iF][iS][iL] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryCalibratedRPC, m_UpperTimeBoundaryCalibratedRPC);
 
         for (int iP = 0; iP < 2; ++iP) {
           hn = Form("h_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("time distributions for RPC of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iPstring[iP].Data(), iL, iS,
+          ht = Form("time distribution for RPC of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iPstring[iP].Data(), iL, iS,
                     iFstring[iF].Data());
           h_timeFSLP[iF][iS][iL][iP] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
 
           hn = Form("h2_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("time distributions for RPC of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("time distribution for RPC of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2_timeFSLP[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 48, 0, 48, nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
 
           hn = Form("hc_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("Calibrated time distributions for RPC of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+          ht = Form("Calibrated time distribution for RPC of %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           hc_timeFSLP[iF][iS][iL][iP] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryCalibratedRPC,
                                                  m_UpperTimeBoundaryCalibratedRPC);
 
           hn = Form("h2c_timeF%d_S%d_L%d_P%d", iF, iS, iL, iP);
-          ht = Form("Calibrated time distributions for RPC of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+          ht = Form("Calibrated time distribution for RPC of %s, Layer%d, Sector%d, %s; Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2c_timeFSLP[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 48, 0, 48, nBin, m_LowerTimeBoundaryCalibratedRPC,
                                                   m_UpperTimeBoundaryCalibratedRPC);
@@ -477,17 +477,17 @@ void KLMTimeAlgorithm::createHistograms()
           int nchannel_max = BKLMElementNumbers::getNStrips(iF, iS + 1, iL + 1, iP);
           for (int iC = 0; iC < nchannel_max; ++iC) {
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc", iF, iS, iL, iP, iC);
-            ht = Form("Time distributions for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
+            ht = Form("Time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
                       iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_tc[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
 
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            ht = Form("Time distributions for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
+            ht = Form("Time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation[ns]", iC,
                       iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryRPC, m_UpperTimeBoundaryRPC);
 
             hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d", iF, iS, iL, iP, iC);
-            ht = Form("Calibrated time distributions for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+            ht = Form("Calibrated time distribution for RPC of Channel%d, %s, Layer%d, Sector%d, %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             hc_timeFSLPC[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin, m_LowerTimeBoundaryCalibratedRPC,
                                                         m_UpperTimeBoundaryCalibratedRPC);
@@ -499,21 +499,21 @@ void KLMTimeAlgorithm::createHistograms()
     int maxLay = 12 + 2 * iF;
     for (int iS = 0; iS < 4; ++iS) {
       hn = Form("h_timeF%d_S%d_scint_end", iF, iS);
-      ht = Form("Time distributions for Scintillator of Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iS,
+      ht = Form("Time distribution for Scintillator of Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iS,
                 iFstring[iF].Data());
       h_timeFS_scint_end[iF][iS] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                             m_UpperTimeBoundaryScintilltorsEKLM);
       hn = Form("h2_timeF%d_S%d_end", iF, iS);
-      ht = Form("Time distributions of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
+      ht = Form("Time distribution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation[ns]", iS, iFstring[iF].Data());
       h2_timeFS_end[iF][iS] = new TH2F(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                        m_UpperTimeBoundaryScintilltorsEKLM);
       hn = Form("hc_timeF%d_S%d_scint_end", iF, iS);
-      ht = Form("Calibrated time distributions for Scintillator of Sector%d (Endcap), %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+      ht = Form("Calibrated time distribution for Scintillator of Sector%d (Endcap), %s; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                 iS, iFstring[iF].Data());
       hc_timeFS_scint_end[iF][iS] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
                                              m_UpperTimeBoundaryCalibratedScintilltorsEKLM);
       hn = Form("h2c_timeF%d_S%d_end", iF, iS);
-      ht = Form("Calibrated time distributions of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+      ht = Form("Calibrated time distribution of Sector%d, %s (Endcap); Layer Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                 iS, iFstring[iF].Data());
       h2c_timeFS_end[iF][iS] = new TH2F(hn.Data(), ht.Data(), maxLay, 0, maxLay, nBin_scint,
                                         m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
@@ -521,37 +521,37 @@ void KLMTimeAlgorithm::createHistograms()
 
       for (int iL = 0; iL < maxLay; ++iL) {
         hn = Form("h_timeF%d_S%d_L%d_end", iF, iS, iL);
-        ht = Form("Time distributions for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
+        ht = Form("Time distribution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]", iL, iS,
                   iFstring[iF].Data());
         h_timeFSL_end[iF][iS][iL] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                              m_UpperTimeBoundaryScintilltorsEKLM);
         hn = Form("hc_timeF%d_S%d_L%d_end", iF, iS, iL);
-        ht = Form("Calibrated time distributions for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+        ht = Form("Calibrated time distribution for Scintillator of Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                   iL, iS, iFstring[iF].Data());
         hc_timeFSL_end[iF][iS][iL] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
                                               m_UpperTimeBoundaryCalibratedScintilltorsEKLM);
 
         for (int iP = 0; iP < 2; ++iP) {
           hn = Form("h_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
-          ht = Form("Time distributions for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h_timeFSLP_end[iF][iS][iL][iP] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                                     m_UpperTimeBoundaryScintilltorsEKLM);
 
           hn = Form("h2_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
-          ht = Form("Time distributions for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
+          ht = Form("Time distribution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2_timeFSLP_end[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                                      m_UpperTimeBoundaryScintilltorsEKLM);
 
           hn = Form("hc_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
-          ht = Form("Calibrated time distributions for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+          ht = Form("Calibrated time distribution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           hc_timeFSLP_end[iF][iS][iL][iP] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
                                                      m_UpperTimeBoundaryCalibratedScintilltorsEKLM);
 
           hn = Form("h2c_timeF%d_S%d_L%d_P%d_end", iF, iS, iL, iP);
-          ht = Form("Calibrated time distributions for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+          ht = Form("Calibrated time distribution for Scintillator of %s, Layer%d, Sector%d, %s (Endcap); Channel Index; T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                     iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
           h2c_timeFSLP_end[iF][iS][iL][iP] = new TH2F(hn.Data(), ht.Data(), 75, 0, 75, nBin_scint,
                                                       m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
@@ -559,18 +559,18 @@ void KLMTimeAlgorithm::createHistograms()
 
           for (int iC = 0; iC < 75; ++iC) {
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_tc_end", iF, iS, iL, iP, iC);
-            ht = Form("Time distributions for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+            ht = Form("Time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_tc_end[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                                               m_UpperTimeBoundaryScintilltorsEKLM);
 
             hn = Form("h_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
-            ht = Form("Time distributions for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
+            ht = Form("Time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             h_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryScintilltorsEKLM,
                                                            m_UpperTimeBoundaryScintilltorsEKLM);
             hn = Form("hc_timeF%d_S%d_L%d_P%d_C%d_end", iF, iS, iL, iP, iC);
-            ht = Form("Calibrated time distributions for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
+            ht = Form("Calibrated time distribution for Scintillator of Channel%d, %s, Layer%d, Sector%d, %s (Endcap); T_rec-T_0-T_fly-T_propagation-T_calibration[ns]",
                       iC, iPstring[iP].Data(), iL, iS, iFstring[iF].Data());
             hc_timeFSLPC_end[iF][iS][iL][iP][iC] = new TH1F(hn.Data(), ht.Data(), nBin_scint, m_LowerTimeBoundaryCalibratedScintilltorsEKLM,
                                                             m_UpperTimeBoundaryCalibratedScintilltorsEKLM);

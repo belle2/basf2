@@ -52,7 +52,7 @@ namespace Belle2 {
       if (not m_eventExtraInfo.isValid())
         m_eventExtraInfo.create();
 
-      m_eventExtraInfo->addEventType(getEventType());
+      m_eventExtraInfo->addEventTypeIfNotSet(getEventType());
 
       for (auto [name, val] : m_generatorInfoMap)
         m_eventExtraInfo->addExtraInfo(name, val);

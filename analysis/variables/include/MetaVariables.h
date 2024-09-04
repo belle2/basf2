@@ -560,5 +560,10 @@ namespace Belle2 {
      */
     Manager::FunctionPtr nTrackFitResults(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns the value of the variable in the rest frame of the ancestor B MC particle.
+     */
+    Manager::FunctionPtr useMCancestorBRestFrame(const std::vector<std::string>& arguments);
+
   }
 }

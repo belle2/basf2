@@ -16,7 +16,6 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace Belle2;
 
 SVDOccupancyCalibrationsAlgorithm::SVDOccupancyCalibrationsAlgorithm(const std::string& str) :

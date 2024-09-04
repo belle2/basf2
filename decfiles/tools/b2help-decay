@@ -107,7 +107,7 @@ def find_signal_decay_belle2(mother: str, daughters: list):
     start_line = -1
     end_line = -1
     for i, content_line in enumerate(lines):
-        if content_line.startswith('Decay') and mother in content_line:
+        if content_line.startswith('Decay') and content_line.strip().endswith(mother):
             start_line = i
         if start_line >= 0 and 'Enddecay' in content_line:
             end_line = i

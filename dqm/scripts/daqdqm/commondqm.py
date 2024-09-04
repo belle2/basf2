@@ -115,6 +115,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             histogramDirectoryName="TrackingAbort_before_filter",
         ).set_name("TrackingAbortDQM_before_filter")
 
+        path.add_module("BeforeHLTDQM")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )

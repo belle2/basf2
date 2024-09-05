@@ -120,8 +120,8 @@ void BeforeHLTFilterDQMModule::defineHisto()
   histoTitle = "ARICH Ocupancy";
   m_ARICHOccupancy[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
                                  TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
-                                 200, 0.5, 200);
-  m_ARICHOccupancy[0]->GetXaxis()->SetTitle("Number of Digits");
+                                 201, -0.5, 200.5);
+  m_ARICHOccupancy[0]->GetXaxis()->SetTitle("Number of hits");
 
   //inside active_veto window:
   m_ARICHOccupancy[1] = new TH1F(*m_ARICHOccupancy[0]);
@@ -140,7 +140,7 @@ void BeforeHLTFilterDQMModule::initialize()
   m_trgSummary.isOptional();
   m_KLMDigits.isOptional();
   m_BklmHit1ds.isOptional();
-
+  m_ARICHHits.isOptional();
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 }
@@ -216,7 +216,8 @@ void BeforeHLTFilterDQMModule::event()
     }
   }
 
-  m_ARICHOccupancy[index] -> Fill(m_ARICHDigits.getEntries());
+  int arichNentr = m_ARICHHits.isValid() ?  m_ARICHHits.getEntries() : 0;
+  m_ARICHOccupancy[index] -> Fill(arichNentr > 200 ? 200 : arichNentr);
 
 }
 

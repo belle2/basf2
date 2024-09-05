@@ -14,7 +14,7 @@
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
 
-#include <arich/dataobjects/ARICHDigit.h>
+#include <arich/dataobjects/ARICHHit.h>
 
 #include <framework/core/HistoModule.h>
 #include <string>
@@ -65,7 +65,7 @@ namespace Belle2 {
     const EKLMElementNumbers* m_eklmElementNumbers; /**< EKLM Element numbers. */
 
     //ARICH stuff
-    StoreArray<ARICHDigit>m_ARICHDigits; /**< ARICH Digits*/
+    StoreArray<ARICHHit>m_ARICHHits; /**< ARICH hits*/
 
     //index: 0 = passive veto; 1 = active veto
     TH1F* m_PlaneBKLMPhi[2]; /**< BKLM phi plane integrated occupancy */;

@@ -18,7 +18,7 @@
 
 #include <framework/core/HistoModule.h>
 #include <string>
-#include <TH2S.h>
+#include <TH1F.h>
 
 namespace Belle2 {
 

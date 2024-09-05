@@ -74,52 +74,53 @@ void BeforeHLTFilterDQMModule::defineHisto()
   //outside active_veto window:
   std::string histoName = "plane_bklm_phi";
   std::string histoTitle = "BKLM plane occupancy (#phi readout)";
-  m_PlaneBKLMPhi[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
-                               TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+  m_PlaneBKLMPhi[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                               (histoTitle + " " + title[0]).c_str(),
                                240, 0.5, 240.5);
   m_PlaneBKLMPhi[0]->GetXaxis()->SetTitle("Layer number");
 
   //inside active_veto window:
   m_PlaneBKLMPhi[1] = new TH1F(*m_PlaneBKLMPhi[0]);
-  m_PlaneBKLMPhi[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_PlaneBKLMPhi[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+  m_PlaneBKLMPhi[1]->SetName((histoName + "_" + tag[1]).c_str());
+
+  m_PlaneBKLMPhi[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
 
   //BKLM plane occupancy (z)
   //outside active_veto window:
   histoName = "plane_bklm_z";
   histoTitle = "BKLM plane occupancy (z readout)";
-  m_PlaneBKLMZ[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
-                             TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+  m_PlaneBKLMZ[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                             (histoTitle + " " + title[0]).c_str(),
                              240, 0.5, 240.5);
   m_PlaneBKLMZ[0]->GetXaxis()->SetTitle("Layer number");
 
   //inside active_veto window:
   m_PlaneBKLMZ[1] = new TH1F(*m_PlaneBKLMZ[0]);
-  m_PlaneBKLMZ[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_PlaneBKLMZ[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+  m_PlaneBKLMZ[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_PlaneBKLMZ[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
 
   //EKLM plane occupancy
   //outside active_veto window:
   histoName = "plane_eklm";
   histoTitle = "EKLM plane occupancy (both readouts)";
-  m_PlaneEKLM[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
-                            TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+  m_PlaneEKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                            (histoTitle + " " + title[0]).c_str(),
                             208, 0.5, 208.5);
   m_PlaneEKLM[0]->GetXaxis()->SetTitle("Plane number");
 
   //inside active_veto window:
   m_PlaneEKLM[1] = new TH1F(*m_PlaneEKLM[0]);
-  m_PlaneEKLM[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_PlaneEKLM[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+  m_PlaneEKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_PlaneEKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //ARICH plane occupancy
   //outside active_veto window:
   histoName = "arich_occ";
-  histoTitle = "ARICH Ocupancy";
-  m_ARICHOccupancy[0] = new TH1F(TString::Format("%s_%s", histoName.c_str(), tag[0].c_str()),
-                                 TString::Format("%s %s", histoTitle.c_str(), title[0].c_str()),
+  histoTitle = "ARICH Occupancy";
+  m_ARICHOccupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                 (histoTitle + " " + title[0]).c_str(),
                                  201, -0.5, 200.5);
   m_ARICHOccupancy[0]->GetXaxis()->SetTitle("Number of hits");
 

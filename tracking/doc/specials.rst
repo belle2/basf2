@@ -67,11 +67,11 @@ During analysis, V0 lists are loaded using functions such as `stdKshorts` and `s
 Kink Finding
 """"""""""""
 
-Kink is a special case of tracking when two tracks can be related as mother and daughter. The shape of this object is similar
+Kink is a special case of tracking where two tracks can be related as mother and daughter. The shape of this object is similar
 to a kink of the track where the name of the object originates from. Kinks appear due to physical processes occurring inside the
 tracking detector, such as decays-in-flight of pions, kaons, and muons and particle scattering on the material. Although some of
 these processes produce more than one charged particle, usually, it is possible to relate only one daughter particle with its mother, e.g.,
-it is quite rare when more than one daughter pion is reconstructed from the :math:`K^-\to\pi^-\pi^+\pi^-` decay.
+it is quite rare that more than one daughter pion is reconstructed from the :math:`K^-\to\pi^-\pi^+\pi^-` decay.
 
 The most interesting cases of kinks are when the primary particle from IP decays in flight inside the CDC. Muon decay-in-flight
 can be used to measure its polarization, which allows for studying weak processes with them, e.g., Michel parameters measurement
@@ -89,29 +89,30 @@ In general, there are five possibilities for kink events:
 The latter case is the most crucial for the PID fake rate. In principle, there are around 10% of events where a particle from IP
 decays inside CDC, and the daughter track cannot be reconstructed due to leaving not enough hits.
 
-The kink events can be imitated by clones of the tracks from IP and random combinations of normal tracks with a fake track.
-While for kink studies, it is a background, reconstruction of such secondary ''particles'' allows for excluding them from
-other analyses suppressing possible backgrounds.
+In addition to real kink events, there are events that can imitate kink, although not being one.
+They consist of combinations of tracks from IP with their clones or fake tracks.
+While being a background for physical studies of kinks, identification of such events allows for suppression of these
+secondary bad tracks and therefore reducing background for other analyses.
 
 **Kink Finder**
 
 `KinkFinder` handles two general cases of kinks at Belle II:
 
-* The first one is when both mother and daughter tracks were found by the track finding, and ``Track`` was created for each of them. In this case, `KinkFinder` tries to find two track combinations forming a kink.
+* The first one is when both mother and daughter tracks were found by the track finding, and a ``Track`` was created for each of them individually. In this case, `KinkFinder` tries to find two track combinations forming a kink.
 * The second one is when hits from mother and daughter tracks are found by track finding as one track. In this case, `KinkFinder` tries to select such tracks and split them into two.
 
 The parameters of the `KinkFinder` are stored as a payload in the ``KinkFinderParameters`` object.
 
 *KinkFinder for kinks as a combination of two separate tracks*
 
-Before two tracks are combined as a pair, one of them should pass the mother track preselection, and the second should pass
+Before two tracks are combined as a pair, one of them should pass the mother track preselection, and the other should pass
 the daughter track preselection. In addition, both tracks are required to have no VXD hits at their end
 (the efficiency loss due to this requirement is negligible).
 
 Mother track preselection is based on the following requirements:
 
 * If the track has CDC hits, it should end inside CDC with its last hit state position having offset from the outer walls of CDC. The offset from the outer cylinder is set by the ``KinkFinderParameters::m_precutRho`` parameter, and the offset in the :math:`z`-axis is set by the ``KinkFinderParameters::m_precutZ`` parameter. This requirement suppresses the ordinary track selection.
-* If the track has more than 10 CDC hits, its last position has to have a radius > 17 cm, thus not ending in the first layer of CDC or inside SVD (although the latter should be excluded when the absence of VXD hits at the end of the track is required). This is to exclude curlers from the consideration.
+* If the track has more than 10 CDC hits, the last hit position has to have a radius > 17 cm, thus not ending in the first layer of CDC or inside SVD (although the latter should be excluded when the absence of VXD hits at the end of the track is required). This is to exclude curlers from the consideration.
 * Finally, the radius of the first hit state position should be less than 12 cm (before the outermost SVD layer) **AND** have impact parameter ``D0`` less than 1 cm; thus, the track is from IP.
 
 Daughter track preselection is based on the following requirements:
@@ -121,20 +122,20 @@ Daughter track preselection is based on the following requirements:
 
 One track that passes mother preselection is combined with one track that passes daughter preselection, and preselection cuts are applied to the pair.
 There are 6 different filters for the pair, and further processing depends on which one is used to select the pair.
-The list of the filters is the following (the filter with a lower index is processed earlier; once one filter is passed, others are not considered):
+The list of the filters is the following (the filter with a lower index is processed earlier; once one filter is passed, the others are not considered):
 
-* Filter 1. The distance between the mother's LAST hit state position and the daughter's FIRST hit state position is less than ``KinkFinderParameters::m_precutDistance``. This is a normal ordering when the mother track is followed by the daughter track. The majority of events are like this.
-* Filter 2. The distance between the mother's LAST hit state position and the daughter's LAST hit state position is less than ``KinkFinderParameters::m_precutDistance``. This case is similar to the normal ordering, but the daughter track is reconstructed with the wrong charge as it goes back to IP, and the track finding assumes it as a track coming from IP.
-* Filter 3. The 3rd filter is aimed at the cases when the daughter track is reconstructed missing some inner superlayers; thus, ``Helix`` extrapolation has to be applied to check the distance to the mother's LAST hit. Here, the wrong charge cases are not distinguished, and the daughter track state closest to the mother's LAST hit state is chosen for the ``Helix`` extrapolation. The distance at the closest approach is less than ``KinkFinderParameters::m_precutDistance``. To exclude a random combination of the tracks from the whole detector, one of the angles between directions from IP to the mother LAST hit state position and daughter FIRST/LAST state positions should be less than :math:`\pi/6` (either in 3D or in 2D). The fraction of these cases is the second largest.
+* **Filter 1**. The distance between the mother's LAST hit state position and the daughter's FIRST hit state position is less than ``KinkFinderParameters::m_precutDistance``. This is a normal ordering when the mother track is followed by the daughter track. The majority of events are like this.
+* **Filter 2**. The distance between the mother's LAST hit state position and the daughter's LAST hit state position is less than ``KinkFinderParameters::m_precutDistance``. This case is similar to the normal ordering, but the daughter track is reconstructed with the wrong charge as it goes back to IP, and the track finding assumes it as a track coming from IP.
+* **Filter 3**. The 3rd filter is aimed at the cases when the daughter track is reconstructed missing some inner superlayers; thus, ``Helix`` extrapolation has to be applied to check the distance to the mother's LAST hit. Here, the wrong charge cases are not distinguished, and the daughter track state closest to the mother's LAST hit state is chosen for the ``Helix`` extrapolation. The distance at the closest approach is less than ``KinkFinderParameters::m_precutDistance``. To exclude a random combination of the tracks from the whole detector, one of the angles between the directions from IP to the mother LAST hit state position and the daughter FIRST/LAST state positions should be less than :math:`\pi/6` (either in 3D or in 2D). The fraction of these cases is the second largest.
 
 The following three filters are similar to those already listed, but they are aimed at recovering events where the daughter
 track :math:`z`-component of the reconstructed momentum is wrong; thus, the requirements are checked in 2D:
 
-* Filter 4. The :math:`r\phi` distance between the mother's LAST hit state position and the daughter's FIRST hit state position is less than ``KinkFinderParameters::m_precutDistance2D``.
-* Filter 5. The :math:`r\phi` distance between the mother's LAST hit state position and the daughter's LAST hit state position is less than ``KinkFinderParameters::m_precutDistance2D``.
-* Filter 6. The same as the 3rd filter, but the comparison is done between distance in :math:`r\phi` and ``KinkFinderParameters::m_precutDistance2D``.
+* **Filter 4**. The :math:`r\phi` distance between the mother's LAST hit state position and the daughter's FIRST hit state position is less than ``KinkFinderParameters::m_precutDistance2D``.
+* **Filter 5**. The :math:`r\phi` distance between the mother's LAST hit state position and the daughter's LAST hit state position is less than ``KinkFinderParameters::m_precutDistance2D``.
+* **Filter 6**. The same as the 3rd filter, but the comparison is done between the distance in :math:`r\phi` and ``KinkFinderParameters::m_precutDistance2D``.
 
-The track pairs passed one of the listed filters are then processed by ``KinkFitter``.
+The track pairs that passed one of the listed filters are then processed by ``KinkFitter``.
 
 *KinkFinder for kinks combined in one track*
 
@@ -144,7 +145,7 @@ at the analysis level to further suppress the false split track cases:
 
 1) The first group consists of tracks passing mother track preselection, and the assigned filter is 7;
 2) The second group consists of tracks passing daughter track preselection, and the assigned filter is 8;
-3) The third group includes all tracks that have not passed previous criteria, and the filter assigned to them is 9.
+3) The third group includes all tracks that have not passed the previous criteria, and the filter assigned to them is 9.
 
 The same as in the case of a track pair, the track to be split is required to have no VXD hits at its end
 (the efficiency loss due to this requirement is negligible).
@@ -153,7 +154,7 @@ Track-to-split preselection is based on the following requirements:
 
 1) The p-value of the track fit should be lower than ``KinkFinderParameters::m_precutSplitPValue``.
 2) The number of fitted CDC hits in the track should be more than 5 (to be able to split in general) and less than ``KinkFinderParameters::m_precutSplitNCDCHit``.
-3) The radius of the first hit state position should be less than 18 cm (to have both tracks with and without VXD hits).
+3) The radius of the first hit state position should be less than 18 cm; thus, tracks that do not have VXD hits but start in the first two layers of CDC are also accepted.
 4) Track impact parameter ``D0`` should be less than 2 cm.
 
 The track passing the listed criteria is then processed by ``KinkFitter`` with a call of the ``fitAndStore`` function.
@@ -165,7 +166,7 @@ A simplified scheme of the `KinkFinder` module with the processing sequence is s
 .. _kink_finder_scheme:
 
 .. figure:: figures/KinkFinderScheme.png
-  :width: 30em
+  :width: 60em
   :align: center
 
   Simplified scheme of the `KinkFinder` module with the processing sequence.
@@ -174,7 +175,7 @@ A simplified scheme of the `KinkFinder` module with the processing sequence is s
 
 The ``KinkFitter`` class is responsible for processing the kink track pair candidates: fitting the kink vertex, hits reassignment
 between tracks, daughter track refitting to improve the resolutions, fitting the combination of the track pair as one track to
-suppress the clones, and finally filtering and store the result. It is also responsible for processing the tracks selected to be split
+suppress the clones, and finally filtering and storing the result. It is also responsible for processing the tracks selected to be split
 to create a kink track pair. The ``KinkFinderParameters::m_kinkFitterMode`` is responsible for switching ON and OFF
 different algorithms inside ``KinkFitter``, as it is described below.
 
@@ -183,32 +184,37 @@ description will be split by the filter. Major algorithms used in the processing
 
 *General Scheme*
 
+* **Filter 1** (schematic view is shown in :numref:`kink_fitter_filter1_scheme`).
+
+    1) The vertex fit (described below) is done for a track pair.
+    2) If the vertex fit fails, the daughter track is refitted with inner hits blocked (they might be restored at the further steps) until the first stereo superlayer is passed. For time and position seeds, the mother's LAST hit state values are used. If the daughter track fit fails or the vertex fit fails, exit.
+    3) If the hit reassignment mode is ON, do hit reassignment based on the information in the ``reassignHitStatus`` variable (described below).
+
 .. _kink_fitter_filter1_scheme:
 
 .. figure:: figures/KinkFitterFilter1Scheme.png
-  :width: 30em
+  :width: 60em
   :align: center
 
   Simplified scheme of the KinkFitter processing sequence for filter 1.
 
-* Filter 1 (schematic view is shown in :numref:`kink_fitter_filter1_scheme`).
+* **Filter 2** (schematic view is shown in :numref:`kink_fitter_filter2_scheme`).
 
-    1) The vertex fit (described below) is done for a track pair.
-    2) If the vertex fit fails, the daughter track is refitted with blocking inner hits until the first stereo superlayer is passed. For time and position seeds, the mother's LAST hit state values are used. If the daughter track fit fails or the vertex fit fails, exit.
-    3) If the hit reassignment mode is ON, do hit reassignment based on the information in the ``reassignHitStatus`` variable (described below).
+    1) The vertex fit is done for a track pair. If it fails, exit.
+    2) If the flip and refit mode is ON, flip and refit the daughter track. As a time seed, use the mother’s LAST hit state value. As a position seed, use the fitted kink vertex. As a momentum seed, use the daughter’s LAST hit state extrapolated to the kink vertex with the opposite sign. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, vertex fit fails, or the distance at the fitted kink vertex is bigger than the initial one, proceed with the initial result.
 
 .. _kink_fitter_filter2_scheme:
 
 .. figure:: figures/KinkFitterFilter2Scheme.png
-  :width: 30em
+  :width: 20em
   :align: center
 
   Simplified scheme of the KinkFitter processing sequence for filter 2.
 
-* Filter 2 (schematic view is shown in :numref:`kink_fitter_filter2_scheme`).
+* **Filter 3** (schematic view is shown in :numref:`kink_fitter_filter3_scheme`).
 
-    1) The vertex fit is done for a track pair. If it fails, exit.
-    2) If the flip and refit mode is ON, flip and refit the daughter track. As a time seed, use the mother’s LAST hit state value. As a position seed, use the fitted kink vertex. As a momentum seed, use the daughter’s LAST hit state extrapolated to the kink vertex with the opposite sign. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, vertex fit fails, or the distance at the fitted kink vertex is bigger than the initial one, proceed with the initial result.
+    1) The vertex fit is done for a track pair.
+    2) Refit the daughter track. As time and position seeds, use the mother’s LAST hit state values. As a momentum seed, use the daughter’s FIRST hit state. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, vertex fit fails, or the distance at the fitted kink vertex is bigger than the initial one (the latter condition if the original vertex fit has not failed), proceed with the initial result.
 
 .. _kink_fitter_filter3_scheme:
 
@@ -218,36 +224,36 @@ description will be split by the filter. Major algorithms used in the processing
 
   Simplified scheme of the KinkFitter processing sequence for filter 3.
 
-* Filter 3 (schematic view is shown in :numref:`kink_fitter_filter3_scheme`).
+* **Filter 4** (schematic view is shown in :numref:`kink_fitter_filter4_scheme`).
 
-    1) The vertex fit is done for a track pair.
-    2) Refit the daughter track. As time and position seeds, use the mother’s LAST hit state values. As a momentum seed, use the daughter’s FIRST hit state. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, vertex fit fails, or the distance at the fitted kink vertex is bigger than the initial one (the latter condition if the original vertex fit has not failed), proceed with the initial result.
+    1) The daughter track is refitted with inner hits blocked (they might be restored at the further steps) until the first stereo superlayer is passed. For time and position seeds, the mother's LAST hit state values are used. If the track fit fails, proceed with the original track.
+    2) The vertex fit is done for a track pair. If it fails, exit.
+    3) If the hit reassignment mode is ON, do hit reassignment based on the information in the ``reassignHitStatus`` variable (described below).
 
 .. _kink_fitter_filter4_scheme:
 
 .. figure:: figures/KinkFitterFilter4Scheme.png
-  :width: 30em
+  :width: 60em
   :align: center
 
   Simplified scheme of the KinkFitter processing sequence for filter 4.
 
-* Filter 4 (schematic view is shown in :numref:`kink_fitter_filter4_scheme`).
+* **Filter 5** (schematic view is shown in :numref:`kink_fitter_filter5_scheme`).
 
-    1) The daughter track is refitted with blocking inner hits until the first stereo superlayer is passed. For time and position seeds, the mother's LAST hit state values are used. If the track fit fails, proceed with the original track.
+    1) If the flip and refit mode is ON, flip and refit the daughter track. As time and position seeds, use the mother's LAST hit state values. As a momentum seed, use the daughter's LAST hit state with the opposite sign. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, proceed with the original track.
     2) The vertex fit is done for a track pair. If it fails, exit.
-    3) If the hit reassignment mode is ON, do hit reassignment based on the information in the ``reassignHitStatus`` variable (described below).
 
 .. _kink_fitter_filter5_scheme:
 
 .. figure:: figures/KinkFitterFilter5Scheme.png
-  :width: 30em
+  :width: 20em
   :align: center
 
   Simplified scheme of the KinkFitter processing sequence for filter 5.
 
-* Filter 5 (schematic view is shown in :numref:`kink_fitter_filter5_scheme`).
+* **Filter 6** (schematic view is shown in :numref:`kink_fitter_filter6_scheme`).
 
-    1) If the flip and refit mode is ON, flip and refit the daughter track. As time and position seeds, use the mother's LAST hit state values. As a momentum seed, use the daughter's LAST hit state with the opposite sign. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, proceed with the original track.
+    1) Refit the daughter track. As time and position seeds, use the mother's LAST hit state values. As a momentum seed, use the daughter's FIRST hit state. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, vertex fit fails, or the distance preselection from `KinkFinder` for filter 3 is not passed (``KinkFinderParameters::m_precutDistance``), proceed with the original track.
     2) The vertex fit is done for a track pair. If it fails, exit.
 
 .. _kink_fitter_filter6_scheme:
@@ -258,26 +264,13 @@ description will be split by the filter. Major algorithms used in the processing
 
   Simplified scheme of the KinkFitter processing sequence for filter 6.
 
-* Filter 6 (schematic view is shown in :numref:`kink_fitter_filter6_scheme`).
-
-    1) Refit the daughter track. As time and position seeds, use the mother's LAST hit state values. As a momentum seed, use the daughter's FIRST hit state. ``KalmanFilter`` from the ``genfit2`` package is used as a fitter (better performance than ``DAF`` from the same package in this case). If the daughter track fit fails, vertex fit fails, or the distance preselection from `KinkFinder` for filter 3 is not passed (``KinkFinderParameters::m_precutDistance``), proceed with the original track.
-    2) The vertex fit is done for a track pair. If it fails, exit.
-
 * The last steps are similar for all filters from 1st to 6th:
 
     1) Filter the result. If the distance between the track pair at the fitted kink vertex is larger than ``KinkFinderParameters::m_vertexDistanceCut`` or the radius of the fitted kink vertex is less than 14 cm (inside VXD), do not save the result.
     2) If the combined fit of the track pair mode is ON, combine two tracks in one and fit it. The result of the fit is stored as a flag (described below).
     3) Fill in the information about the filter, combined fit, and number of reassigned hits into the special flag. Prepare the ``TrackFitResult``\s of the mother and daughter tracks. Store the ``Kink`` object.
 
-.. _kink_fitter_filter79_scheme:
-
-.. figure:: figures/KinkFitterFilter79Scheme.png
-  :width: 30em
-  :align: center
-
-  Simplified scheme of the KinkFitter processing sequence for filter 7-9.
-
-* Filter 7-9 (schematic view is shown in :numref:`kink_fitter_filter79_scheme`). They are not distinguished at the ``KinkFitter`` processing level.
+* **Filter 7-9** (schematic view is shown in :numref:`kink_fitter_filter79_scheme`). They are not distinguished at the ``KinkFitter`` processing level.
 
     1) Tracks are split (described below), and two `RecoTrack`\s are created.
     2) The vertex fit is done for a new track pair. If it fails, exit.
@@ -285,6 +278,13 @@ description will be split by the filter. Major algorithms used in the processing
     4) Filter the result. If the radius of the fitted kink vertex is less than 14 cm (inside VXD), do not save the result. If the distance between the created track pair at the fitted kink vertex is larger than ``KinkFinderParameters::m_vertexDistanceCut``, then set the second digit of the flag to store to 1 and do not throw away the result (unlike with filter 1-6 track pairs).
     5) Fill in the information about the filter, passing distance cut, and the number of reassigned hits into the special flag. Prepare the ``TrackFitResult``\s of the mother and daughter tracks. Store the ``Kink`` object.
 
+.. _kink_fitter_filter79_scheme:
+
+.. figure:: figures/KinkFitterFilter79Scheme.png
+  :width: 60em
+  :align: center
+
+  Simplified scheme of the KinkFitter processing sequence for filter 7-9.
 
 *Vertex Fit*
 

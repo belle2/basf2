@@ -254,7 +254,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   }
 
 
-  // efficiency of cluster recontruction for U and V side
+  // efficiency of cluster reconstruction for U and V side
   TH2F* h_found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
   TH2F* h_matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
   TH2F* h_found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");

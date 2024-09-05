@@ -379,7 +379,7 @@ namespace Belle2 {
      * @param dirname directory
      * @param histname name of histogram
      * @param t type of delta histogramming
-     * @param p numerical parameter depnding on type, e.g. number of entries
+     * @param p numerical parameter depending on type, e.g. number of entries
      * @param a amount of histograms in the past
      */
     void addDeltaPar(const std::string& dirname, const std::string& histname,  HistDelta::EDeltaType t, int p, unsigned int a = 1);

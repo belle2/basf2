@@ -13,11 +13,11 @@ Some of the factors users should consider about when using this module are the f
    - Mixing: A different method to introduce beam background events that doesn't require ReadoutFrame (ROF) information. Instead, it includes the background events at the Simulation Hit level and shifts the event type within the given time window. 
 
 
-For details on background overlays for each release, see here: `Data Production Gitlab for BGOverlays <https://gitlab.desy.de/belle2/data-production/data/-/tree/master/BGOverlay?ref_type=heads>`
-For details for run dependent generation, see here: `Data Production Gitlab For MCRD Production <https://gitlab.desy.de/belle2/data-production/data/-/tree/master/mcrd_processing?ref_type=heads>`
+For details on background overlays for each release, see here: `Data Production Gitlab for BGOverlays <https://gitlab.desy.de/belle2/data-production/data/-/tree/master/BGOverlay?ref_type=heads>`_
+For details for run dependent generation, see here: `Data Production Gitlab For MCRD Production <https://gitlab.desy.de/belle2/data-production/data/-/tree/master/mcrd_processing?ref_type=heads>`_
 
 Useful Python Tools: 
---------
+---------------------
 .. automodule:: background
    :members:
 

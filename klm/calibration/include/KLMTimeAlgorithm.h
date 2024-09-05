@@ -305,16 +305,16 @@ namespace Belle2 {
     double m_UpperTimeBoundaryRPC = 10.0;
 
     /** Lower time boundary for BKLM scintillators. */
-    double m_LowerTimeBoundaryScintilltorsBKLM = 20.0;
+    double m_LowerTimeBoundaryScintillatorsBKLM = 20.0;
 
     /** Upper time boundary for BKLM scintillators. */
-    double m_UpperTimeBoundaryScintilltorsBKLM = 70.0;
+    double m_UpperTimeBoundaryScintillatorsBKLM = 70.0;
 
     /** Lower time boundary for EKLM scintillators. */
-    double m_LowerTimeBoundaryScintilltorsEKLM = 20.0;
+    double m_LowerTimeBoundaryScintillatorsEKLM = 20.0;
 
     /** Upper time boundary for BKLM scintillators. */
-    double m_UpperTimeBoundaryScintilltorsEKLM = 70.0;
+    double m_UpperTimeBoundaryScintillatorsEKLM = 70.0;
 
     /** Lower time boundary for RPC (calibrated data). */
     double m_LowerTimeBoundaryCalibratedRPC = -40.0;
@@ -323,16 +323,16 @@ namespace Belle2 {
     double m_UpperTimeBoundaryCalibratedRPC = 40.0;
 
     /** Lower time boundary for BKLM scintillators (calibrated data). */
-    double m_LowerTimeBoundaryCalibratedScintilltorsBKLM = -40.0;
+    double m_LowerTimeBoundaryCalibratedScintillatorsBKLM = -40.0;
 
     /** Upper time boundary for BKLM scintillators (calibrated data). */
-    double m_UpperTimeBoundaryCalibratedScintilltorsBKLM = 40.0;
+    double m_UpperTimeBoundaryCalibratedScintillatorsBKLM = 40.0;
 
     /** Lower time boundary for EKLM scintillators (calibrated data). */
-    double m_LowerTimeBoundaryCalibratedScintilltorsEKLM = -40.0;
+    double m_LowerTimeBoundaryCalibratedScintillatorsEKLM = -40.0;
 
     /** Upper time boundary for BKLM scintillators (calibrated data). */
-    double m_UpperTimeBoundaryCalibratedScintilltorsEKLM = 40.0;
+    double m_UpperTimeBoundaryCalibratedScintillatorsEKLM = 40.0;
 
     /** Central value of the global time distribution (BKLM RPC part). */
     double m_time_channelAvg_rpc = 0.0;

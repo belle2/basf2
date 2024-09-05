@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "reconstruction/modules/beforeHLTFilterDQM/DetectorOccupanciesDQMModule.h"
+#include "reconstruction/modules/detectorOccupanciesDQM/DetectorOccupanciesDQMModule.h"
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -37,7 +37,7 @@ REG_MODULE(DetectorOccupanciesDQM);
 DetectorOccupanciesDQMModule::DetectorOccupanciesDQMModule() : HistoModule()
   , m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
-  setDescription("DQM Module to monitor basic detector quantities before the HLT filter");
+  setDescription("DQM Module to monitor basic detector quantities");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("DetectorOccupancies"));

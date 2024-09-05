@@ -27,15 +27,15 @@ namespace Belle2 {
   class KLMDigit;
 
   /** DQM Module for basic detector quantities before the HLT filter*/
-  class BeforeHLTFilterDQMModule : public HistoModule {
+  class DetectorOccupanciesDQMModule : public HistoModule {
 
   public:
 
     /** Constructor */
-    BeforeHLTFilterDQMModule();
+    DetectorOccupanciesDQMModule();
 
     /* Destructor */
-    virtual ~BeforeHLTFilterDQMModule();
+    virtual ~DetectorOccupanciesDQMModule();
 
     /** Module function initialize */
     void initialize() override final;

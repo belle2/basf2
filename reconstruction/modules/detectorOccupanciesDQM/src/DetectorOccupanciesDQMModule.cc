@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include "reconstruction/modules/beforeHLTFilterDQM/BeforeHLTFilterDQMModule.h"
+#include "reconstruction/modules/beforeHLTFilterDQM/DetectorOccupanciesDQMModule.h"
 
 #include <framework/dataobjects/EventMetaData.h>
 #include <svd/dataobjects/SVDShaperDigit.h>
@@ -27,26 +27,26 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(BeforeHLTFilterDQM);
+REG_MODULE(DetectorOccupanciesDQM);
 
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-BeforeHLTFilterDQMModule::BeforeHLTFilterDQMModule() : HistoModule()
+DetectorOccupanciesDQMModule::DetectorOccupanciesDQMModule() : HistoModule()
   , m_eklmElementNumbers{&(EKLMElementNumbers::Instance())}
 {
   setDescription("DQM Module to monitor basic detector quantities before the HLT filter");
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
-           std::string("BeforeHLTFilter"));
+           std::string("DetectorOccupancies"));
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 
-BeforeHLTFilterDQMModule::~BeforeHLTFilterDQMModule()
+DetectorOccupanciesDQMModule::~DetectorOccupanciesDQMModule()
 {
 }
 
@@ -54,7 +54,7 @@ BeforeHLTFilterDQMModule::~BeforeHLTFilterDQMModule()
 // Function to define histograms
 //-----------------------------------------------------------------
 
-void BeforeHLTFilterDQMModule::defineHisto()
+void DetectorOccupanciesDQMModule::defineHisto()
 {
 
   // Create a separate histogram directories and cd into it.
@@ -185,7 +185,7 @@ void BeforeHLTFilterDQMModule::defineHisto()
   oldDir->cd();
 }
 
-void BeforeHLTFilterDQMModule::initialize()
+void DetectorOccupanciesDQMModule::initialize()
 {
   m_eventMetaData.isOptional();
   m_trgSummary.isOptional();
@@ -199,7 +199,7 @@ void BeforeHLTFilterDQMModule::initialize()
 }
 
 
-void BeforeHLTFilterDQMModule::beginRun()
+void DetectorOccupanciesDQMModule::beginRun()
 {
 
   for (int i = 0; i < 2; i++) {
@@ -213,7 +213,7 @@ void BeforeHLTFilterDQMModule::beginRun()
 }
 
 
-void BeforeHLTFilterDQMModule::event()
+void DetectorOccupanciesDQMModule::event()
 {
 
   //skip events in which we do not have EventMetaData or TRGSummary

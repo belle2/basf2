@@ -115,6 +115,45 @@ void BeforeHLTFilterDQMModule::defineHisto()
   m_PlaneEKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
   m_PlaneEKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
+  //RPC Time
+  histoName = "time_rpc";
+  histoTitle = "RPC Hit Time";
+  m_TimeRPC[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                          (histoTitle + " " + title[0]).c_str(),
+                          128, double(-1223.5), double(-199.5));
+  m_TimeRPC[0]->GetXaxis()->SetTitle("Time [ns]");
+
+  //inside active_veto window:
+  m_TimeRPC[1] = new TH1F(*m_TimeRPC[0]);
+  m_TimeRPC[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_TimeRPC[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+
+  //BKLM SCintillator Time
+  histoName = "time_scintillator_bklm";
+  histoTitle = "Scintillator Hit Time (BKLM)";
+  m_TimeScintillatorBKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                       (histoTitle + " " + title[0]).c_str(),
+                                       100, double(-5300), double(-4300));
+  m_TimeScintillatorBKLM[0]->GetXaxis()->SetTitle("Time [ns]");
+
+  //inside active_veto window:
+  m_TimeScintillatorBKLM[1] = new TH1F(*m_TimeScintillatorBKLM[0]);
+  m_TimeScintillatorBKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_TimeScintillatorBKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+
+  //EKLM SCintillator Time
+  histoName = "time_scintillator_eklm";
+  histoTitle = "Scintillator Hit Time (EKLM)";
+  m_TimeScintillatorEKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                       (histoTitle + " " + title[0]).c_str(),
+                                       100, double(-5300), double(-4300));
+  m_TimeScintillatorEKLM[0]->GetXaxis()->SetTitle("Time [ns]");
+
+  //inside active_veto window:
+  m_TimeScintillatorEKLM[1] = new TH1F(*m_TimeScintillatorEKLM[0]);
+  m_TimeScintillatorEKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_TimeScintillatorEKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+
   //ARICH plane occupancy
   //outside active_veto window:
   histoName = "arich_occ";
@@ -131,7 +170,7 @@ void BeforeHLTFilterDQMModule::defineHisto()
 
   //TOP occupancy
   histoName = "top_occ";
-  histoTitle = "TOP occupancy";
+  histoTitle = "TOP occupancy for good hits";
   for (int i = 0; i < 2; i++) {
     m_topOccupancy[i] = new TH1F((histoName + "_" + tag[i]).c_str(),
                                  (histoTitle + " " +  title[i]).c_str(),
@@ -220,6 +259,7 @@ void BeforeHLTFilterDQMModule::event()
      */
     if (!digit.isGood())
       continue;
+
     if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
       int section = digit.getSection();
       int layer = digit.getLayer();
@@ -227,6 +267,11 @@ void BeforeHLTFilterDQMModule::event()
       int plane = digit.getPlane();
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
       m_PlaneEKLM[index]->Fill(planeGlobal);
+      m_TimeScintillatorEKLM[index]->Fill(digit.getTime());
+    } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
+
+      if (digit.inRPC()) m_TimeRPC[index]->Fill(digit.getTime());
+      else m_TimeScintillatorBKLM[index]->Fill(digit.getTime());
     }
   }
 

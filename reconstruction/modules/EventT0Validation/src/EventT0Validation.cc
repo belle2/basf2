@@ -94,18 +94,6 @@ void EventT0ValidationModule::beginRun()
     B2WARNING("Missing EventT0, EventT0Validation is skipped.");
     return;
   }
-
-  m_histECLEventT0->Reset();
-  m_histSVDEventT0->Reset();
-  m_histTOPEventT0->Reset();
-  m_histCDCEventT0->Reset();
-  m_histCDCHitBasedEventT0->Reset();
-  m_histCDCChi2EventT0->Reset();
-  m_histCDCGridEventT0->Reset();
-
-  m_histAlgorithmSourceCounts->Reset();
-  m_histAlgorithmSourceCountsActive->Reset();
-
 }
 
 
@@ -117,7 +105,6 @@ void EventT0ValidationModule::event()
     B2WARNING("Missing EventT0, EventT0Validation is skipped.");
     return ;
   }
-
 
   // Set the different EventT0 values, default is -1000 in case there are no information based on a given detector
   const double eventT0ECL =
@@ -214,7 +201,6 @@ void EventT0ValidationModule::endRun()
     m_outputFile->Write();
     m_outputFile->Close();
   }
-
 }
 
 

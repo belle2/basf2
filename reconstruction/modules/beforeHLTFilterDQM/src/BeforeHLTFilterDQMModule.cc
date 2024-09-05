@@ -70,7 +70,7 @@ void BeforeHLTFilterDQMModule::defineHisto()
   std::string title[2] = {"[Outside Active Veto Window]", "[Inside Active Veto Window]"};
 
 
-  //BKLM plane occupany (phi)
+  //BKLM plane occupancy (phi)
   //outside active_veto window:
   std::string histoName = "plane_bklm_phi";
   std::string histoTitle = "BKLM plane occupancy (#phi readout)";
@@ -85,7 +85,7 @@ void BeforeHLTFilterDQMModule::defineHisto()
   m_PlaneBKLMPhi[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
 
-  //BKLM plane occupany (z)
+  //BKLM plane occupancy (z)
   //outside active_veto window:
   histoName = "plane_bklm_z";
   histoTitle = "BKLM plane occupancy (z readout)";
@@ -100,7 +100,7 @@ void BeforeHLTFilterDQMModule::defineHisto()
   m_PlaneBKLMZ[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
 
-  //EKLM plane occupany
+  //EKLM plane occupancy
   //outside active_veto window:
   histoName = "plane_eklm";
   histoTitle = "EKLM plane occupancy (both readouts)";
@@ -114,7 +114,7 @@ void BeforeHLTFilterDQMModule::defineHisto()
   m_PlaneEKLM[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
   m_PlaneEKLM[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
 
-  //EKLM plane occupany
+  //ARICH plane occupancy
   //outside active_veto window:
   histoName = "arich_occ";
   histoTitle = "ARICH Ocupancy";
@@ -125,8 +125,19 @@ void BeforeHLTFilterDQMModule::defineHisto()
 
   //inside active_veto window:
   m_ARICHOccupancy[1] = new TH1F(*m_ARICHOccupancy[0]);
-  m_ARICHOccupancy[1]->SetName(TString::Format("%s_%s", histoName.c_str(), tag[1].c_str()));
-  m_ARICHOccupancy[1]->SetTitle(TString::Format("%s %s", histoTitle.c_str(), title[1].c_str()));
+  m_ARICHOccupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_ARICHOccupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+
+  //TOP occupancy
+  histoName = "top_occ";
+  histoTitle = "TOP occupancy";
+  for (int i = 0; i < 2; i++) {
+    m_topOccupancy[i] = new TH1F((histoName + "_" + tag[i]).c_str(),
+                                 (histoTitle + " " +  title[i]).c_str(),
+                                 1000, 0, 10000);
+    m_topOccupancy[i]->SetXTitle("hits per event");
+    m_topOccupancy[i]->SetYTitle("entries per bin");
+  }
 
 
 
@@ -141,6 +152,8 @@ void BeforeHLTFilterDQMModule::initialize()
   m_KLMDigits.isOptional();
   m_BklmHit1ds.isOptional();
   m_ARICHHits.isOptional();
+  m_topDigits.isOptional();
+
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
 }
@@ -149,14 +162,14 @@ void BeforeHLTFilterDQMModule::initialize()
 void BeforeHLTFilterDQMModule::beginRun()
 {
 
-  if (m_PlaneBKLMPhi[0] != nullptr)  m_PlaneBKLMPhi[0]->Reset();
-  if (m_PlaneBKLMPhi[1] != nullptr)  m_PlaneBKLMPhi[1]->Reset();
-  if (m_PlaneBKLMZ[0] != nullptr)  m_PlaneBKLMZ[0]->Reset();
-  if (m_PlaneBKLMZ[1] != nullptr)  m_PlaneBKLMZ[1]->Reset();
-  if (m_PlaneEKLM[0] != nullptr)  m_PlaneEKLM[0]->Reset();
-  if (m_PlaneEKLM[1] != nullptr)  m_PlaneEKLM[1]->Reset();
-  if (m_ARICHOccupancy[0] != nullptr)  m_ARICHOccupancy[0]->Reset();
-  if (m_ARICHOccupancy[1] != nullptr)  m_ARICHOccupancy[1]->Reset();
+  for (int i = 0; i < 2; i++) {
+    if (m_PlaneBKLMPhi[i] != nullptr)  m_PlaneBKLMPhi[i]->Reset();
+    if (m_PlaneBKLMZ[i] != nullptr)  m_PlaneBKLMZ[i]->Reset();
+    if (m_PlaneEKLM[i] != nullptr)  m_PlaneEKLM[i]->Reset();
+    if (m_ARICHOccupancy[i] != nullptr)  m_ARICHOccupancy[i]->Reset();
+    if (m_topOccupancy[i] != nullptr)  m_topOccupancy[i]->Reset();
+
+  }
 }
 
 
@@ -219,5 +232,11 @@ void BeforeHLTFilterDQMModule::event()
   int arichNentr = m_ARICHHits.isValid() ?  m_ARICHHits.getEntries() : 0;
   m_ARICHOccupancy[index] -> Fill(arichNentr > 200 ? 200 : arichNentr);
 
-}
 
+  int topGoodHits = 0;
+  for (const auto& digit : m_topDigits) {
+    if (digit.getHitQuality() != TOPDigit::c_Junk) topGoodHits++;
+  }
+  m_topOccupancy[index]->Fill(topGoodHits);
+
+}

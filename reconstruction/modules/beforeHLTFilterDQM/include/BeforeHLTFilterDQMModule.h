@@ -13,8 +13,8 @@
 
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
-
 #include <arich/dataobjects/ARICHHit.h>
+#include <top/dataobjects/TOPDigit.h>
 
 #include <framework/core/HistoModule.h>
 #include <string>
@@ -24,9 +24,7 @@ namespace Belle2 {
 
   class EventMetaData;
   class TRGSummary;
-  class BKLMHit1d;
   class KLMDigit;
-  class ARICHDigit;
 
   /** DQM Module for basic detector quantities before the HLT filter*/
   class BeforeHLTFilterDQMModule : public HistoModule {
@@ -67,12 +65,16 @@ namespace Belle2 {
     //ARICH stuff
     StoreArray<ARICHHit>m_ARICHHits; /**< ARICH hits*/
 
+    //TOP stuff
+    StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
+
+    //histograms (all)
     //index: 0 = passive veto; 1 = active veto
     TH1F* m_PlaneBKLMPhi[2]; /**< BKLM phi plane integrated occupancy */;
     TH1F* m_PlaneBKLMZ[2]; /**< BKLM z plane integrated occupancy */;
     TH1F* m_PlaneEKLM[2]; /**< EKLM plane integrated occupancy */;
     TH1F* m_ARICHOccupancy[2]; /**< ARICH Digit Occupancy*/
-
+    TH1F* m_topOccupancy[2]; /**< TOP occupancy (good hits only) */
   };
 
 }

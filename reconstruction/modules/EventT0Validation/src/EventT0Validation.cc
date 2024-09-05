@@ -211,5 +211,4 @@ void EventT0ValidationModule::setPlotMetaData(TH1* hist, const std::string& desc
   hist->GetListOfFunctions()->Add(new TNamed("Description", description.c_str()));
   hist->GetListOfFunctions()->Add(new TNamed("Check", check.c_str()));
   hist->GetListOfFunctions()->Add(new TNamed("MetaOptions", shifter.c_str()));
-  hist->Write();
 }

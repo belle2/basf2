@@ -37,26 +37,26 @@ void EventT0ValidationModule::initialize()
     double minT0 = -100 ;
     double maxT0 =  100 ;
 
-    m_histECLEventT0 = new TH1F("m_histECLEventT0", "ECL EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histECLEventT0 = new TH1F("histECLEventT0", "ECL EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
     setPlotMetaData(m_histECLEventT0, "Distribution of ECL EventT0s.", "Should be centered around 0.", m_contact);
-    m_histSVDEventT0 = new TH1F("m_histSVDEventT0", "SVD EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histSVDEventT0 = new TH1F("histSVDEventT0", "SVD EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
     setPlotMetaData(m_histSVDEventT0, "Distribution of SVD EventT0s.", "Should be centered around 0.", m_contact);
-    m_histTOPEventT0 = new TH1F("m_histTOPEventT0", "TOP EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histTOPEventT0 = new TH1F("histTOPEventT0", "TOP EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
     setPlotMetaData(m_histTOPEventT0, "Distribution of TOP EventT0s.", "Should be centered around 0.", m_contact);
-    m_histCDCEventT0 = new TH1F("m_histCDCEventT0", "CDC EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
+    m_histCDCEventT0 = new TH1F("histCDCEventT0", "CDC EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0, maxT0);
     setPlotMetaData(m_histCDCEventT0, "Distribution of CDC EventT0s.", "Should be centered around 0.", m_contact);
-    m_histCDCHitBasedEventT0 = new TH1F("m_histCDCHitBasedEventT0", "CDC hit based EventT0;EventT0 [ns];events / 0.5 ns",
+    m_histCDCHitBasedEventT0 = new TH1F("histCDCHitBasedEventT0", "CDC hit based EventT0;EventT0 [ns];events / 0.5 ns",
                                         nBins, minT0, maxT0);
     setPlotMetaData(m_histCDCHitBasedEventT0, "Distribution of CDC hit based EventT0s.", "Should be centered around 0.", m_contact);
-    m_histCDCChi2EventT0 = new TH1F("m_histCDCChi2EventT0", "CDC FullGrid #chi^{2} EventT0;EventT0 [ns];events / 0.5 ns",
+    m_histCDCChi2EventT0 = new TH1F("histCDCChi2EventT0", "CDC FullGrid #chi^{2} EventT0;EventT0 [ns];events / 0.5 ns",
                                     nBins, minT0, maxT0);
     setPlotMetaData(m_histCDCChi2EventT0, "Distribution of CDC FullGrid #chi^{2} EventT0s.", "Should be centered around 0.", m_contact);
-    m_histCDCGridEventT0 = new TH1F("m_histCDCGridEventT0", "CDC Grid search EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
+    m_histCDCGridEventT0 = new TH1F("histCDCGridEventT0", "CDC Grid search EventT0;EventT0 [ns];events / 0.5 ns", nBins, minT0,
                                     maxT0);
     setPlotMetaData(m_histCDCGridEventT0, "Distribution of CDC Grid search EventT0s.", "Should be centered around 0.", m_contact);
 
     m_histAlgorithmSourceCounts =
-      new TH1D("m_histAlgorithmSourceCounts",
+      new TH1D("histAlgorithmSourceCounts",
                "Number of events with EventT0 from each algorithm;Algorithm;Count",
                11, 0, 11);
     setPlotMetaData(m_histAlgorithmSourceCounts,
@@ -64,7 +64,7 @@ void EventT0ValidationModule::initialize()
                     "Some of the CDC algorithms are only executed if no SVD EventT0 is found.",
                     "Values should be around 1000 (1000 events in validation).", m_contact);
     m_histAlgorithmSourceCountsActive =
-      new TH1D("m_histAlgorithmSourceCountsActive",
+      new TH1D("histAlgorithmSourceCountsActive",
                "Number of events with EventT0 from each algorithm where it was active;Algorithm;Count",
                11, 0, 11);
     setPlotMetaData(m_histAlgorithmSourceCountsActive,

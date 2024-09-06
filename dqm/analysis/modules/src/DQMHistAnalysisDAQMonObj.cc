@@ -8,15 +8,7 @@
 
 // Own header.
 #include <dqm/analysis/modules/DQMHistAnalysisDAQMonObj.h>
-
-// DAQ geometry
-#include <TROOT.h>
-#include <TEllipse.h>
-#include <TF1.h>
-#include <TLine.h>
-#include <TStyle.h>
-
-#include <numeric>
+#include <TH1F.h>
 
 using namespace std;
 using namespace Belle2;

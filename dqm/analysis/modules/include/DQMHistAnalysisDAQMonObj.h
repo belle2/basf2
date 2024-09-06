@@ -11,11 +11,6 @@
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
-#include <framework/database/DBArray.h>
-#include <framework/database/DBObjPtr.h>
-
-#include <TH1F.h>
-
 namespace Belle2 {
 
   /**

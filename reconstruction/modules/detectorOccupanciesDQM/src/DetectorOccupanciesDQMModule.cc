@@ -57,7 +57,7 @@ DetectorOccupanciesDQMModule::~DetectorOccupanciesDQMModule()
 void DetectorOccupanciesDQMModule::defineHisto()
 {
 
-  // Create a separate histogram directories and cd into it.
+  // Create a separate histogram directory and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {
     oldDir->mkdir(m_histogramDirectoryName.c_str());

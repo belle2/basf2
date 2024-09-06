@@ -58,37 +58,37 @@ void DQMHistAnalysisDAQMonObjModule::endRun()
 {
   B2DEBUG(20, "DQMHistAnalysisDAQMonObj: endRun called.");
 
-  m_PXDDataSize = (TH1F*)findHist("DAQ/PXDDataSize");
-  m_SVDDataSize = (TH1F*)findHist("DAQ/SVDDataSize");
-  m_CDCDataSize = (TH1F*)findHist("DAQ/CDCDataSize");
-  m_TOPDataSize = (TH1F*)findHist("DAQ/TOPDataSize");
-  m_ARICHDataSize = (TH1F*)findHist("DAQ/ARICHDataSize");
-  m_ECLDataSize = (TH1F*)findHist("DAQ/ECLDataSize");
-  m_KLMDataSize = (TH1F*)findHist("DAQ/KLMDataSize");
-  m_TRGDataSize = (TH1F*)findHist("DAQ/TRGDataSize");
-  m_HLTDataSize = (TH1F*)findHist("DAQ/HLTDataSize");
-  m_TotalDataSize = (TH1F*)findHist("DAQ/TotalDataSize");
+  auto* PXDDataSize = (TH1F*)findHist("DAQ/PXDDataSize");
+  auto* SVDDataSize = (TH1F*)findHist("DAQ/SVDDataSize");
+  auto* CDCDataSize = (TH1F*)findHist("DAQ/CDCDataSize");
+  auto* TOPDataSize = (TH1F*)findHist("DAQ/TOPDataSize");
+  auto* ARICHDataSize = (TH1F*)findHist("DAQ/ARICHDataSize");
+  auto* ECLDataSize = (TH1F*)findHist("DAQ/ECLDataSize");
+  auto* KLMDataSize = (TH1F*)findHist("DAQ/KLMDataSize");
+  auto* TRGDataSize = (TH1F*)findHist("DAQ/TRGDataSize");
+  auto* HLTDataSize = (TH1F*)findHist("DAQ/HLTDataSize");
+  auto* TotalDataSize = (TH1F*)findHist("DAQ/TotalDataSize");
 
-  m_monObj->setVariable("PXDEventSize", m_PXDDataSize ? m_PXDDataSize->GetMean() : 0,
-                        m_PXDDataSize ? m_PXDDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("SVDEventSize", m_SVDDataSize ? m_SVDDataSize->GetMean() : 0,
-                        m_SVDDataSize ? m_SVDDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("CDCEventSize", m_CDCDataSize ? m_CDCDataSize->GetMean() : 0,
-                        m_CDCDataSize ? m_CDCDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("TOPEventSize", m_TOPDataSize ? m_TOPDataSize->GetMean() : 0,
-                        m_TOPDataSize ? m_TOPDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("ARICHEventSize", m_ARICHDataSize ? m_ARICHDataSize->GetMean() : 0,
-                        m_ARICHDataSize ? m_ARICHDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("ECLEventSize", m_ECLDataSize ? m_ECLDataSize->GetMean() : 0,
-                        m_ECLDataSize ? m_ECLDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("KLMEventSize", m_KLMDataSize ? m_KLMDataSize->GetMean() : 0,
-                        m_KLMDataSize ? m_KLMDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("TRGEventSize", m_TRGDataSize ? m_TRGDataSize->GetMean() : 0,
-                        m_TRGDataSize ? m_TRGDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("HLTEventSize", m_HLTDataSize ? m_HLTDataSize->GetMean() : 0,
-                        m_HLTDataSize ? m_HLTDataSize->GetMeanError() : -1);
-  m_monObj->setVariable("TotalEventSize", m_TotalDataSize ? m_TotalDataSize->GetMean() : 0,
-                        m_TotalDataSize ? m_TotalDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("PXDEventSize", PXDDataSize ? PXDDataSize->GetMean() : 0,
+                        PXDDataSize ? PXDDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("SVDEventSize", SVDDataSize ? SVDDataSize->GetMean() : 0,
+                        SVDDataSize ? SVDDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("CDCEventSize", CDCDataSize ? CDCDataSize->GetMean() : 0,
+                        CDCDataSize ? CDCDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("TOPEventSize", TOPDataSize ? TOPDataSize->GetMean() : 0,
+                        TOPDataSize ? TOPDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("ARICHEventSize", ARICHDataSize ? ARICHDataSize->GetMean() : 0,
+                        ARICHDataSize ? ARICHDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("ECLEventSize", ECLDataSize ? ECLDataSize->GetMean() : 0,
+                        ECLDataSize ? ECLDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("KLMEventSize", KLMDataSize ? KLMDataSize->GetMean() : 0,
+                        KLMDataSize ? KLMDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("TRGEventSize", TRGDataSize ? TRGDataSize->GetMean() : 0,
+                        TRGDataSize ? TRGDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("HLTEventSize", HLTDataSize ? HLTDataSize->GetMean() : 0,
+                        HLTDataSize ? HLTDataSize->GetMeanError() : -1);
+  m_monObj->setVariable("TotalEventSize", TotalDataSize ? TotalDataSize->GetMean() : 0,
+                        TotalDataSize ? TotalDataSize->GetMeanError() : -1);
 }
 
 void DQMHistAnalysisDAQMonObjModule::terminate()

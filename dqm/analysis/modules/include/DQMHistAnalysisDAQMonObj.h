@@ -67,16 +67,6 @@ namespace Belle2 {
   protected:
     MonitoringObject* m_monObj = nullptr; /**< monitoring object */
 
-    TH1F* m_PXDDataSize = nullptr; /**< Histogram of PXD event size  */
-    TH1F* m_SVDDataSize = nullptr; /**< Histogram of SVD event size  */
-    TH1F* m_CDCDataSize = nullptr; /**< Histogram of CDC event size  */
-    TH1F* m_TOPDataSize = nullptr; /**< Histogram of TOP event size  */
-    TH1F* m_ARICHDataSize = nullptr; /**< Histogram of ARICH event size  */
-    TH1F* m_ECLDataSize = nullptr; /**< Histogram of ECL event size  */
-    TH1F* m_KLMDataSize = nullptr; /**< Histogram of KLM event size  */
-    TH1F* m_TRGDataSize = nullptr; /**< Histogram of TRG event size  */
-    TH1F* m_HLTDataSize = nullptr; /**< Histogram of HLT event size  */
-    TH1F* m_TotalDataSize = nullptr; /**< Histogram of Total event size  */
   };
 
 } // Belle2 namespace

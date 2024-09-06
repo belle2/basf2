@@ -66,8 +66,8 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //histogram index:
   // 0 if the event is triggered OUTSIDE the active_veto window
-  std::string tag[2] = {"OUT", "IN"};
-  std::string title[2] = {"[Outside Active Veto Window]", "[Inside Active Veto Window]"};
+  const std::string tag[2] = {"OUT", "IN"};
+  const std::string title[2] = {"[Outside Active Veto Window]", "[Inside Active Veto Window]"};
 
 
   //BKLM plane occupancy (phi)

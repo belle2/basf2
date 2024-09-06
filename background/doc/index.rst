@@ -4,6 +4,7 @@ In the following we describe the ``background`` package (documentation still und
 
 The background package is how we introduce beam background hit rates in MC samples. 
 Things users should consider when using this module are the following: 
+
 * Run conditions (i.e. indepedent vs dependent MC samples): 
 
   * Run Indepedent or Simulated Beam Backgrounds: The experiment number used for "Exp: 100X" (ex. 1002 for phase 2 and 1003 for phase 3). The files produced from these 'experiments' are in coordination with the background group and are used in run-independent MC proudction.

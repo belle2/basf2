@@ -45,7 +45,7 @@ namespace Belle2 {
     /** The metadata for each event. */
     StoreObjPtr<EventMetaData> m_evtMetaDataPtr;
 
-    /** Save untagged canvase by default */
+    /** Save untagged canvas by default */
     bool m_canvasSaveDefault{true};
 
     /** Output path for saving images in sub-folders */

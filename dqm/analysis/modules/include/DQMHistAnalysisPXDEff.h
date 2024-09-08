@@ -100,7 +100,7 @@ namespace Belle2 {
     double m_warnlevel;
     //! error level for alarm
     double m_errorlevel;
-    /** Update entry intervall */
+    /** Update entry interval */
     int m_minEntries = 1000;
     /** use alarm level per module */
     bool m_perModuleAlarm;

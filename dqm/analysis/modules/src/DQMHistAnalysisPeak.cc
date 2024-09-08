@@ -182,7 +182,7 @@ void DQMHistAnalysisPeakModule::beginRun()
 void DQMHistAnalysisPeakModule::event()
 {
   auto delta = getDelta(m_histoDirectory, m_histoName);
-  // do not care about initial filling handling. we wont show or update unless we reach the min req entries
+  // do not care about initial filling handling. we won't show or update unless we reach the min req entries
   UpdateCanvas(m_canvas, delta != nullptr);
   if (delta != nullptr) {
 
@@ -219,7 +219,7 @@ void DQMHistAnalysisPeakModule::event()
         m_lineMedian->SetX2(median);
         m_lineMedian->Draw();
       }
-      m_canvas->Paint(); // needed, otherwise Graph overlay doesnt work
+      m_canvas->Paint(); // needed, otherwise Graph overlay doesn't work
       if (m_g_good and m_valid_good) m_g_good->Draw("RY");
       if (m_g_warnlo and m_valid_warnlo) m_g_warnlo->Draw("RY");
       if (m_g_warnhi and m_valid_warnhi) m_g_warnhi->Draw("RY");

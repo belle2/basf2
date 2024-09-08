@@ -114,7 +114,7 @@ void DQMHistAnalysisInputTestModule::initialize()
       if (dir == "" or name == "") {
         std::cout << "Both Dir and Name must be given. -> parse error"  << std::endl;
       } else {
-        // as we are already on analyis side, we dont
+        // as we are already on analysis side, we dont
         // need to put it in the directory
         // (even so it may be a cleaner solution)
         m_testHisto.push_back((TH1*) new TH1F(name.data(), "test Histo", histparm.at(0), histparm.at(1), histparm.at(2)));

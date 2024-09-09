@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <tracking/modules/trackFinderCDC/CDCTrackingEventLevelMdstInfoFillerModule.h>
+#include <tracking/modules/trackFinderCDC/CDCTrackingEventLevelMdstInfoFiller.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -54,7 +54,7 @@ void CDCTrackingEventLevelMdstInfoFillerFromHitsFindlet::apply(const std::vector
   m_eventLevelTrackingInfo->setNCDCHitsNotAssigned(nRest);
   m_eventLevelTrackingInfo->setNCDCHitsNotAssignedPostCleaning(nRestCleaned);
 
-  B2DEBUG(10, "Total " << nhitTotal << " taken " << nTaken << " background " << nBg  << " signal " << nTaken - nBg  <<
+  B2DEBUG(20, "Total " << nhitTotal << " taken " << nTaken << " background " << nBg  << " signal " << nTaken - nBg  <<
           " Not assigned " << nRestCleaned);
 }
 
@@ -82,5 +82,5 @@ void CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet::apply(const std::ve
   }
 
   m_eventLevelTrackingInfo->setNCDCSegments(inputWireHitSegments.size() - nTaken);
-  B2DEBUG(10, "Total number of segments =" << inputWireHitSegments.size() << " Taken " << nTaken << " BG " << nBg);
+  B2DEBUG(20, "Total number of segments =" << inputWireHitSegments.size() << " Taken " << nTaken << " BG " << nBg);
 }

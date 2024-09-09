@@ -57,7 +57,7 @@ DetectorOccupanciesDQMModule::~DetectorOccupanciesDQMModule()
 void DetectorOccupanciesDQMModule::defineHisto()
 {
 
-  // Create a separate histogram directory and cd into it.
+  // Create a separate histogram directories and cd into it.
   TDirectory* oldDir = gDirectory;
   if (m_histogramDirectoryName != "") {
     oldDir->mkdir(m_histogramDirectoryName.c_str());
@@ -74,46 +74,46 @@ void DetectorOccupanciesDQMModule::defineHisto()
   //outside active_veto window:
   std::string histoName = "plane_bklm_phi";
   std::string histoTitle = "BKLM plane occupancy (#phi readout)";
-  m_PlaneBKLMPhi[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                               (histoTitle + " " + title[0]).c_str(),
-                               240, 0.5, 240.5);
-  m_PlaneBKLMPhi[0]->GetXaxis()->SetTitle("Layer number");
+  m_BKLM_PlanePhi_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                          (histoTitle + " " + title[0]).c_str(),
+                                          240, 0.5, 240.5);
+  m_BKLM_PlanePhi_Occupancy[0]->GetXaxis()->SetTitle("Layer number");
 
   //inside active_veto window:
-  m_PlaneBKLMPhi[1] = new TH1F(*m_PlaneBKLMPhi[0]);
-  m_PlaneBKLMPhi[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_BKLM_PlanePhi_Occupancy[1] = new TH1F(*m_BKLM_PlanePhi_Occupancy[0]);
+  m_BKLM_PlanePhi_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
 
-  m_PlaneBKLMPhi[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_BKLM_PlanePhi_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
 
   //BKLM plane occupancy (z)
   //outside active_veto window:
   histoName = "plane_bklm_z";
   histoTitle = "BKLM plane occupancy (z readout)";
-  m_PlaneBKLMZ[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                             (histoTitle + " " + title[0]).c_str(),
-                             240, 0.5, 240.5);
-  m_PlaneBKLMZ[0]->GetXaxis()->SetTitle("Layer number");
+  m_BKLM_PlaneZ_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                        (histoTitle + " " + title[0]).c_str(),
+                                        240, 0.5, 240.5);
+  m_BKLM_PlaneZ_Occupancy[0]->GetXaxis()->SetTitle("Layer number");
 
   //inside active_veto window:
-  m_PlaneBKLMZ[1] = new TH1F(*m_PlaneBKLMZ[0]);
-  m_PlaneBKLMZ[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_PlaneBKLMZ[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_BKLM_PlaneZ_Occupancy[1] = new TH1F(*m_BKLM_PlaneZ_Occupancy[0]);
+  m_BKLM_PlaneZ_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_BKLM_PlaneZ_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
 
   //EKLM plane occupancy
   //outside active_veto window:
   histoName = "plane_eklm";
   histoTitle = "EKLM plane occupancy (both readouts)";
-  m_PlaneEKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                            (histoTitle + " " + title[0]).c_str(),
-                            208, 0.5, 208.5);
-  m_PlaneEKLM[0]->GetXaxis()->SetTitle("Plane number");
+  m_EKLM_Plane_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                       (histoTitle + " " + title[0]).c_str(),
+                                       208, 0.5, 208.5);
+  m_EKLM_Plane_Occupancy[0]->GetXaxis()->SetTitle("Plane number");
 
   //inside active_veto window:
-  m_PlaneEKLM[1] = new TH1F(*m_PlaneEKLM[0]);
-  m_PlaneEKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_PlaneEKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_EKLM_Plane_Occupancy[1] = new TH1F(*m_EKLM_Plane_Occupancy[0]);
+  m_EKLM_Plane_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_EKLM_Plane_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //RPC Time
   histoName = "time_rpc";
@@ -158,25 +158,25 @@ void DetectorOccupanciesDQMModule::defineHisto()
   //outside active_veto window:
   histoName = "arich_occ";
   histoTitle = "ARICH Occupancy";
-  m_ARICHOccupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                                 (histoTitle + " " + title[0]).c_str(),
-                                 201, -0.5, 200.5);
-  m_ARICHOccupancy[0]->GetXaxis()->SetTitle("Number of hits");
+  m_ARICH_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                  (histoTitle + " " + title[0]).c_str(),
+                                  201, -0.5, 200.5);
+  m_ARICH_Occupancy[0]->GetXaxis()->SetTitle("Number of hits");
 
   //inside active_veto window:
-  m_ARICHOccupancy[1] = new TH1F(*m_ARICHOccupancy[0]);
-  m_ARICHOccupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_ARICHOccupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_ARICH_Occupancy[1] = new TH1F(*m_ARICH_Occupancy[0]);
+  m_ARICH_Occupancy[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_ARICH_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //TOP occupancy
   histoName = "top_occ";
   histoTitle = "TOP occupancy for good hits";
   for (int i = 0; i < 2; i++) {
-    m_topOccupancy[i] = new TH1F((histoName + "_" + tag[i]).c_str(),
-                                 (histoTitle + " " +  title[i]).c_str(),
-                                 1000, 0, 10000);
-    m_topOccupancy[i]->SetXTitle("hits per event");
-    m_topOccupancy[i]->SetYTitle("entries per bin");
+    m_TOP_Occupancy[i] = new TH1F((histoName + "_" + tag[i]).c_str(),
+                                  (histoTitle + " " +  title[i]).c_str(),
+                                  1000, 0, 10000);
+    m_TOP_Occupancy[i]->SetXTitle("hits per event");
+    m_TOP_Occupancy[i]->SetYTitle("entries per bin");
   }
 
 
@@ -203,11 +203,11 @@ void DetectorOccupanciesDQMModule::beginRun()
 {
 
   for (int i = 0; i < 2; i++) {
-    if (m_PlaneBKLMPhi[i] != nullptr)  m_PlaneBKLMPhi[i]->Reset();
-    if (m_PlaneBKLMZ[i] != nullptr)  m_PlaneBKLMZ[i]->Reset();
-    if (m_PlaneEKLM[i] != nullptr)  m_PlaneEKLM[i]->Reset();
-    if (m_ARICHOccupancy[i] != nullptr)  m_ARICHOccupancy[i]->Reset();
-    if (m_topOccupancy[i] != nullptr)  m_topOccupancy[i]->Reset();
+    if (m_BKLM_PlanePhi_Occupancy[i] != nullptr)  m_BKLM_PlanePhi_Occupancy[i]->Reset();
+    if (m_BKLM_PlaneZ_Occupancy[i] != nullptr)  m_BKLM_PlaneZ_Occupancy[i]->Reset();
+    if (m_EKLM_Plane_Occupancy[i] != nullptr)  m_EKLM_Plane_Occupancy[i]->Reset();
+    if (m_ARICH_Occupancy[i] != nullptr)  m_ARICH_Occupancy[i]->Reset();
+    if (m_TOP_Occupancy[i] != nullptr)  m_TOP_Occupancy[i]->Reset();
 
   }
 }
@@ -246,9 +246,9 @@ void DetectorOccupanciesDQMModule::event()
     int layerGlobal = BKLMElementNumbers::layerGlobalNumber(
                         section, sector, layer);
     if (hit1d.isPhiReadout())
-      m_PlaneBKLMPhi[index]->Fill(layerGlobal);
+      m_BKLM_PlanePhi_Occupancy[index]->Fill(layerGlobal);
     else
-      m_PlaneBKLMZ[index]->Fill(layerGlobal);
+      m_BKLM_PlaneZ_Occupancy[index]->Fill(layerGlobal);
 
   }
 
@@ -266,7 +266,7 @@ void DetectorOccupanciesDQMModule::event()
       int sector = digit.getSector();
       int plane = digit.getPlane();
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
-      m_PlaneEKLM[index]->Fill(planeGlobal);
+      m_EKLM_Plane_Occupancy[index]->Fill(planeGlobal);
       m_TimeScintillatorEKLM[index]->Fill(digit.getTime());
     } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
 
@@ -275,14 +275,15 @@ void DetectorOccupanciesDQMModule::event()
     }
   }
 
+  float xMax =   m_ARICH_Occupancy[0]->GetXaxis()->GetXmax();
   int arichNentr = m_ARICHHits.isValid() ?  m_ARICHHits.getEntries() : 0;
-  m_ARICHOccupancy[index] -> Fill(arichNentr > 200 ? 200 : arichNentr);
+  m_ARICH_Occupancy[index] -> Fill(arichNentr > xMax ? xMax : arichNentr);
 
 
   int topGoodHits = 0;
   for (const auto& digit : m_topDigits) {
     if (digit.getHitQuality() != TOPDigit::c_Junk) topGoodHits++;
   }
-  m_topOccupancy[index]->Fill(topGoodHits);
+  m_TOP_Occupancy[index]->Fill(topGoodHits);
 
 }

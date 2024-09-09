@@ -70,14 +70,14 @@ namespace Belle2 {
 
     //histograms (all)
     //index: 0 = passive veto; 1 = active veto
-    TH1F* m_PlaneBKLMPhi[2]; /**< BKLM phi plane integrated occupancy */;
-    TH1F* m_PlaneBKLMZ[2]; /**< BKLM z plane integrated occupancy */;
-    TH1F* m_PlaneEKLM[2]; /**< EKLM plane integrated occupancy */;
+    TH1F* m_BKLM_PlanePhi_Occupancy[2]; /**< BKLM phi plane integrated occupancy */;
+    TH1F* m_BKLM_PlaneZ_Occupancy[2]; /**< BKLM z plane integrated occupancy */;
+    TH1F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
     TH1F* m_TimeRPC[2]; /**< RPC Hit Time */;
     TH1F* m_TimeScintillatorBKLM[2]; /**< BKLM Scintillator Hit Time */;
     TH1F* m_TimeScintillatorEKLM[2]; /**< EKLM  Scintillator Hit Time */;
-    TH1F* m_ARICHOccupancy[2]; /**< ARICH Digit Occupancy*/
-    TH1F* m_topOccupancy[2]; /**< TOP occupancy (good hits only) */
+    TH1F* m_ARICH_Occupancy[2]; /**< ARICH Digit Occupancy*/
+    TH1F* m_TOP_Occupancy[2]; /**< TOP occupancy (good hits only) */
   };
 
 }

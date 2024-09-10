@@ -12,6 +12,8 @@
 #include <svd/dataobjects/SVDShaperDigit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
 #include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
@@ -41,6 +43,8 @@ DetectorOccupanciesDQMModule::DetectorOccupanciesDQMModule() : HistoModule()
 
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed.",
            std::string("DetectorOccupancies"));
+
+  addParam("eclEnergyThr", m_eclEnergyThr, "Energy threshold (in MeV) for ECL occupancy histogram", 5.0);
 
   setPropertyFlags(c_ParallelProcessingCertified);
 }
@@ -179,7 +183,17 @@ void DetectorOccupanciesDQMModule::defineHisto()
     m_TOP_Occupancy[i]->SetYTitle("entries per bin");
   }
 
-
+  //ECL occupancy
+  histoName = "ecl_occ";
+  histoTitle = "ECL occupancy (for hits with E > " + std::to_string((int)m_eclEnergyThr) + " MeV)";
+  for (int i = 0; i < 2; i++) {
+    m_ECL_Occupancy[i] = new TProfile((histoName + "_" + tag[i]).c_str(),
+                                      (histoTitle + " " +  title[i]).c_str(),
+                                      ECLElementNumbers::c_NCrystals,
+                                      1, ECLElementNumbers::c_NCrystals + 1);
+    m_ECL_Occupancy[i]->SetXTitle("cell id");
+    m_ECL_Occupancy[i]->SetYTitle("Occupancy (hits / evt_count)");
+  }
 
 
   oldDir->cd();
@@ -193,6 +207,7 @@ void DetectorOccupanciesDQMModule::initialize()
   m_BklmHit1ds.isOptional();
   m_ARICHHits.isOptional();
   m_topDigits.isOptional();
+  m_eclCalDigits.isOptional();
 
   // Register histograms (calls back defineHisto)
   REG_HISTOGRAM
@@ -208,6 +223,7 @@ void DetectorOccupanciesDQMModule::beginRun()
     if (m_EKLM_Plane_Occupancy[i] != nullptr)  m_EKLM_Plane_Occupancy[i]->Reset();
     if (m_ARICH_Occupancy[i] != nullptr)  m_ARICH_Occupancy[i]->Reset();
     if (m_TOP_Occupancy[i] != nullptr)  m_TOP_Occupancy[i]->Reset();
+    if (m_ECL_Occupancy[i] != nullptr)  m_ECL_Occupancy[i]->Reset();
 
   }
 }
@@ -285,5 +301,15 @@ void DetectorOccupanciesDQMModule::event()
     if (digit.getHitQuality() != TOPDigit::c_Junk) topGoodHits++;
   }
   m_TOP_Occupancy[index]->Fill(topGoodHits);
+
+  bool crystal_hit[ECLElementNumbers::c_NCrystals] = {};
+  for (const auto& digit : m_eclCalDigits) {
+    const double thresholdGeV = m_eclEnergyThr * 1e-3;
+    if (digit.getEnergy() > thresholdGeV)
+      crystal_hit[digit.getCellId() - 1] = true;
+  }
+  for (int cid0 = 0; cid0 < ECLElementNumbers::c_NCrystals; cid0++) {
+    m_ECL_Occupancy[index]->Fill(cid0 + 1, crystal_hit[cid0]);
+  }
 
 }

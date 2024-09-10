@@ -19,12 +19,14 @@
 #include <framework/core/HistoModule.h>
 #include <string>
 #include <TH1F.h>
+#include <TProfile.h>
 
 namespace Belle2 {
 
   class EventMetaData;
   class TRGSummary;
   class KLMDigit;
+  class ECLCalDigit;
 
   /** DQM Module for basic detector quantities before the HLT filter*/
   class DetectorOccupanciesDQMModule : public HistoModule {
@@ -68,6 +70,10 @@ namespace Belle2 {
     //TOP stuff
     StoreArray<TOPDigit> m_topDigits; /**< collection of TOP digits */
 
+    //ECL stuff
+    double m_eclEnergyThr; /**< Energy threshold (in MeV) for ECL occupancy histogram */
+    StoreArray<ECLCalDigit> m_eclCalDigits; /**< collection of ECL digits */
+
     //histograms (all)
     //index: 0 = passive veto; 1 = active veto
     TH1F* m_BKLM_PlanePhi_Occupancy[2]; /**< BKLM phi plane integrated occupancy */;
@@ -78,6 +84,7 @@ namespace Belle2 {
     TH1F* m_TimeScintillatorEKLM[2]; /**< EKLM  Scintillator Hit Time */;
     TH1F* m_ARICH_Occupancy[2]; /**< ARICH Digit Occupancy*/
     TH1F* m_TOP_Occupancy[2]; /**< TOP occupancy (good hits only) */
+    TProfile* m_ECL_Occupancy[2]; /**< ECL occupancy (hits above 5 MeV) */
   };
 
 }

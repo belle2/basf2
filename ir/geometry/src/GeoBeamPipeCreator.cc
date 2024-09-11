@@ -25,6 +25,7 @@
 #include <G4Box.hh>
 #include <G4Tubs.hh>
 #include <G4Polycone.hh>
+#include "G4EllipticalTube.hh"
 #include <G4UnionSolid.hh>
 #include <G4IntersectionSolid.hh>
 #include <G4SubtractionSolid.hh>
@@ -113,7 +114,7 @@ namespace Belle2 {
       //get parameters from .xml file
       std::string prep = "Lv1SUS.";
       //
-      const int Lv1SUS_num = 21;
+      const int Lv1SUS_num = 20;
       //
       double Lv1SUS_Z[Lv1SUS_num];
       Lv1SUS_Z[0] = 0.0;
@@ -134,12 +135,11 @@ namespace Belle2 {
       Lv1SUS_Z[12] = Lv1SUS_Z[11] + m_config.getParameter(prep + "L10") * Unit::cm / Unit::mm;
       Lv1SUS_Z[13] = Lv1SUS_Z[12] + m_config.getParameter(prep + "L11") * Unit::cm / Unit::mm;
       Lv1SUS_Z[14] = Lv1SUS_Z[13] + m_config.getParameter(prep + "L12") * Unit::cm / Unit::mm;
-      Lv1SUS_Z[15] = Lv1SUS_Z[14] + m_config.getParameter(prep + "L13") * Unit::cm / Unit::mm;
-      Lv1SUS_Z[16] = Lv1SUS_Z[15];
+      Lv1SUS_Z[15] = Lv1SUS_Z[14];
+      Lv1SUS_Z[16] = Lv1SUS_Z[15] + m_config.getParameter(prep + "L13") * Unit::cm / Unit::mm;
       Lv1SUS_Z[17] = Lv1SUS_Z[16] + m_config.getParameter(prep + "L14") * Unit::cm / Unit::mm;
-      Lv1SUS_Z[18] = Lv1SUS_Z[17] + m_config.getParameter(prep + "L15") * Unit::cm / Unit::mm;
-      Lv1SUS_Z[19] = Lv1SUS_Z[18];
-      Lv1SUS_Z[20] = Lv1SUS_Z[19] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm;
+      Lv1SUS_Z[18] = Lv1SUS_Z[17];
+      Lv1SUS_Z[19] = Lv1SUS_Z[18] + m_config.getParameter(prep + "L15") * Unit::cm / Unit::mm;
       //
       double Lv1SUS_rI[Lv1SUS_num];
       for (int tmpn = 0; tmpn < Lv1SUS_num; tmpn++)
@@ -161,12 +161,11 @@ namespace Belle2 {
       Lv1SUS_rO[12] = m_config.getParameter(prep + "R7") * Unit::cm / Unit::mm;
       Lv1SUS_rO[13] = Lv1SUS_rO[12];
       Lv1SUS_rO[14] = m_config.getParameter(prep + "R8") * Unit::cm / Unit::mm;
-      Lv1SUS_rO[15] = Lv1SUS_rO[14];
-      Lv1SUS_rO[16] = m_config.getParameter(prep + "R9") * Unit::cm / Unit::mm;
-      Lv1SUS_rO[17] = m_config.getParameter(prep + "R10") * Unit::cm / Unit::mm;
-      Lv1SUS_rO[18] = Lv1SUS_rO[17];
-      Lv1SUS_rO[19] = m_config.getParameter(prep + "R11") * Unit::cm / Unit::mm;
-      Lv1SUS_rO[20] = Lv1SUS_rO[19];
+      Lv1SUS_rO[15] = m_config.getParameter(prep + "R9") * Unit::cm / Unit::mm;
+      Lv1SUS_rO[16] = m_config.getParameter(prep + "R10") * Unit::cm / Unit::mm;
+      Lv1SUS_rO[17] = Lv1SUS_rO[16];
+      Lv1SUS_rO[18] = m_config.getParameter(prep + "R11") * Unit::cm / Unit::mm;
+      Lv1SUS_rO[19] = Lv1SUS_rO[18];
       //
       string strMat_Lv1SUS = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv1SUS = Materials::get(strMat_Lv1SUS);
@@ -293,12 +292,22 @@ namespace Belle2 {
       double Lv2Vacuum_L1 = m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
       double Lv2Vacuum_L2 = m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
       double Lv2Vacuum_L3 = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
-      double Lv2Vacuum_L4 = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
+      // double Lv2Vacuum_L4 = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_D1 = m_config.getParameter(prep + "D1") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_D2 = m_config.getParameter(prep + "D2") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_D3 = m_config.getParameter(prep + "D3") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_D4 = m_config.getParameter(prep + "D4") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_D5 = m_config.getParameter(prep + "D5") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_D6 = m_config.getParameter(prep + "D6") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_S1 = m_config.getParameter(prep + "S1") * Unit::cm / Unit::mm;
       double Lv2Vacuum_R1 = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
       double Lv2Vacuum_R2 = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
       double Lv2Vacuum_R3 = m_config.getParameter(prep + "R3") * Unit::cm / Unit::mm;
+      double Lv2Vacuum_P1 = m_config.getParameter(prep + "P1") * Unit::cm / Unit::mm;
       //double Lv2Vacuum_A1 = cLv2Vacuum.getAngle("A1");
+      double Lv2Vacuum_A1 = m_config.getParameter(prep + "A1");
       double Lv2Vacuum_A2 = m_config.getParameter(prep + "A2");
+      double Lv2Vacuum_A3 = m_config.getParameter(prep + "A3");
       //
       string strMat_Lv2Vacuum = m_config.getParameterStr(prep + "Material");
       G4Material* mat_Lv2Vacuum = Materials::get(strMat_Lv2Vacuum);
@@ -324,17 +333,28 @@ namespace Belle2 {
       double Lv2Vacuum2_rI2 = 0.0;
       double Lv2Vacuum2_rO2 = 2 * Lv2Vacuum_R2;
       // Part 3
-      const int Lv2Vacuum3_num = 2;
+      // const int Lv2Vacuum3_num = 2;
+
       //
-      double Lv2Vacuum3_Z[Lv2Vacuum3_num];
-      Lv2Vacuum3_Z[0] = 0.0;
-      Lv2Vacuum3_Z[1] = Lv2Vacuum_L4;
-      double Lv2Vacuum3_rI[Lv2Vacuum3_num];
-      for (int tmpn = 0; tmpn < Lv2Vacuum3_num; tmpn++)
-      { Lv2Vacuum3_rI[tmpn] = 0.0; }
-      double Lv2Vacuum3_rO[Lv2Vacuum3_num];
-      Lv2Vacuum3_rO[0] = Lv2Vacuum_R3;
-      Lv2Vacuum3_rO[1] = Lv2Vacuum_R3;
+      // double Lv2Vacuum3_Z[Lv2Vacuum3_num];
+      // Lv2Vacuum3_Z[0] = 0.0;
+      // Lv2Vacuum3_Z[1] = Lv2Vacuum_L4;
+      // double Lv2Vacuum3_rI[Lv2Vacuum3_num];
+      // for (int tmpn = 0; tmpn < Lv2Vacuum3_num; tmpn++)
+      // { Lv2Vacuum3_rI[tmpn] = 0.0; }
+      // double Lv2Vacuum3_rO[Lv2Vacuum3_num];
+      // Lv2Vacuum3_rO[0] = Lv2Vacuum_R3;
+      // Lv2Vacuum3_rO[1] = Lv2Vacuum_R3;
+
+      double Lv2Vacuum3_dx1 = Lv2Vacuum_D1;
+      double Lv2Vacuum3_dx2 = Lv2Vacuum_D2;
+      double Lv2Vacuum3_dy1 = Lv2Vacuum_D3;
+      double Lv2Vacuum3_dy2 = Lv2Vacuum_D4;
+      double Lv2Vacuum3_dz = Lv2Vacuum_D5;
+      double Lv2Vacuum3_Dz = Lv2Vacuum_D6;
+      double Lv2Vacuum3_L_a = Lv2Vacuum_S1;
+      double Lv2Vacuum3_L_b = Lv2Vacuum3_L_a * sin(Lv2Vacuum_A3);
+      double Lv2Vacuum3_pXYZ = Lv2Vacuum_P1;
 
       //define geometry
       // Part 1
@@ -348,8 +368,27 @@ namespace Belle2 {
       G4IntersectionSolid* geo_Lv2VacuumPart2 = new G4IntersectionSolid("geo_Lv2VacuumPart2_name", geo_Lv2VacuumPart2_1,
           geo_Lv2VacuumPart2_2, transform_Lv2VacuumPart2_2);
       // Part 3
-      G4Polycone* geo_Lv2VacuumPart3 = new G4Polycone("geo_Lv2VacuumPart3_name", 0, 2 * M_PI, Lv2Vacuum3_num, Lv2Vacuum3_Z, Lv2Vacuum3_rI,
-                                                      Lv2Vacuum3_rO);
+      // G4Polycone* geo_Lv2VacuumPart3 = new G4Polycone("geo_Lv2VacuumPart3_name", 0, 2 * M_PI, Lv2Vacuum3_num, Lv2Vacuum3_Z, Lv2Vacuum3_rI,
+      // Lv2Vacuum3_rO);
+      G4Trd* geo_Lv2VacuumPart3_1 = new G4Trd("geo_Lv2VacuumPart3_1_name", Lv2Vacuum3_dx1, Lv2Vacuum3_dx2, Lv2Vacuum3_dy1, Lv2Vacuum3_dy2,
+                                              Lv2Vacuum3_dz);
+      G4EllipticalTube* geo_Lv2VacuumPart3_2 = new G4EllipticalTube("geo_Lv2VacuumPart3_2_name", Lv2Vacuum3_L_b, Lv2Vacuum3_L_a,
+          Lv2Vacuum3_Dz);
+      G4Box* geo_Lv2VacuumPart3_3 = new G4Box("geo_Lv2VacuumPart3_3_name", Lv2Vacuum3_pXYZ, Lv2Vacuum3_pXYZ, Lv2Vacuum3_pXYZ);
+
+      G4Transform3D transform_Lv2VacuumPart3_1 = G4Translate3D(0.5, 0., 0.);
+      transform_Lv2VacuumPart3_1 = transform_Lv2VacuumPart3_1 * G4RotateY3D(M_PI / 2 - Lv2Vacuum_A3);
+      G4UnionSolid* geo_Lv2VacuumPart3xx = new G4UnionSolid("geo_Lv2VacuumPart3xx_name", geo_Lv2VacuumPart3_1, geo_Lv2VacuumPart3_2,
+                                                            transform_Lv2VacuumPart3_1);
+
+      G4Transform3D transform_Lv2VacuumPart3_2 = G4Translate3D(-0.5, 0., 0.);
+      transform_Lv2VacuumPart3_2 = transform_Lv2VacuumPart3_2 * G4RotateY3D(Lv2Vacuum_A3 - M_PI / 2);
+      G4UnionSolid* geo_Lv2VacuumPart3x = new G4UnionSolid("geo_Lv2VacuumPart3x_name", geo_Lv2VacuumPart3xx, geo_Lv2VacuumPart3_2,
+                                                           transform_Lv2VacuumPart3_2);
+
+      G4Transform3D transform_Lv2VacuumPart2_3 = G4Translate3D(0., 0., 0.);
+      G4IntersectionSolid* geo_Lv2VacuumPart3 = new G4IntersectionSolid("geo_Lv2VacuumPart3_name", geo_Lv2VacuumPart3x,
+          geo_Lv2VacuumPart3_3);
       // Part1+2+3
 //      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(0., 0., 0.);
       G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(-0.5, 0., 0.);
@@ -380,7 +419,7 @@ namespace Belle2 {
       //get parameters from .xml file
       prep = "Lv2Paraf.";
       //
-      const int Lv2Paraf1_num = 20;
+      const int Lv2Paraf1_num = 18;
       const int Lv2Paraf2_num = 3;
       //
       double Lv2Paraf1_Z[Lv2Paraf1_num];
@@ -404,12 +443,9 @@ namespace Belle2 {
       Lv2Paraf1_Z[13] = Lv2Paraf1_Z[12] + m_config.getParameter(prep + "L13") * Unit::cm / Unit::mm;
       Lv2Paraf1_Z[14] = Lv2Paraf1_Z[13] + m_config.getParameter(prep + "L14") * Unit::cm / Unit::mm;
       Lv2Paraf1_Z[15] = Lv2Paraf1_Z[14] + m_config.getParameter(prep + "L15") * Unit::cm / Unit::mm + m_config.getParameter(
-                          prep + "L16") * Unit::cm / Unit::mm;
-      Lv2Paraf1_Z[16] = Lv2Paraf1_Z[15] + m_config.getParameter(prep + "L17") * Unit::cm / Unit::mm + m_config.getParameter(
-                          prep + "L18") * Unit::cm / Unit::mm;
-      Lv2Paraf1_Z[17] = Lv2Paraf1_Z[16] + m_config.getParameter(prep + "L19") * Unit::cm / Unit::mm;
-      Lv2Paraf1_Z[18] = Lv2Paraf1_Z[17];
-      Lv2Paraf1_Z[19] = Lv2Paraf1_Z[18] + m_config.getParameter(prep + "L20") * Unit::cm / Unit::mm;
+                          prep + "L16") * Unit::cm / Unit::mm + m_config.getParameter(prep + "L17") * Unit::cm / Unit::mm;
+      Lv2Paraf1_Z[16] = Lv2Paraf1_Z[15];
+      Lv2Paraf1_Z[17] = Lv2Paraf1_Z[16] + m_config.getParameter(prep + "L18") * Unit::cm / Unit::mm;
       //
       double Lv2Paraf1_rI[Lv2Paraf1_num];
       Lv2Paraf1_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
@@ -430,8 +466,6 @@ namespace Belle2 {
       Lv2Paraf1_rI[15] = Lv2Paraf1_rI[14];
       Lv2Paraf1_rI[16] = Lv2Paraf1_rI[15];
       Lv2Paraf1_rI[17] = Lv2Paraf1_rI[16];
-      Lv2Paraf1_rI[18] = Lv2Paraf1_rI[17];
-      Lv2Paraf1_rI[19] = Lv2Paraf1_rI[18];
       //
       double Lv2Paraf1_rO[Lv2Paraf1_num];
       Lv2Paraf1_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
@@ -449,11 +483,9 @@ namespace Belle2 {
       Lv2Paraf1_rO[12] = Lv2Paraf1_rO[11];
       Lv2Paraf1_rO[13] = Lv2Paraf1_rO[12];
       Lv2Paraf1_rO[14] = Lv2Paraf1_rO[13];
-      Lv2Paraf1_rO[15] = m_config.getParameter(prep + "R10") * Unit::cm / Unit::mm;
-      Lv2Paraf1_rO[16] = Lv2Paraf1_rO[15];
-      Lv2Paraf1_rO[17] = m_config.getParameter(prep + "R12") * Unit::cm / Unit::mm;
-      Lv2Paraf1_rO[18] = m_config.getParameter(prep + "R13") * Unit::cm / Unit::mm;
-      Lv2Paraf1_rO[19] = Lv2Paraf1_rO[18];
+      Lv2Paraf1_rO[15] = m_config.getParameter(prep + "R11") * Unit::cm / Unit::mm;
+      Lv2Paraf1_rO[16] = m_config.getParameter(prep + "R12") * Unit::cm / Unit::mm;
+      Lv2Paraf1_rO[17] = Lv2Paraf1_rO[16];
       //
       //
       double Lv2Paraf2_Z[Lv2Paraf2_num];
@@ -461,11 +493,9 @@ namespace Belle2 {
       for (int tmpn = 10; tmpn <= 15; tmpn++) {
         Lv2Paraf2_Z[0] += m_config.getParameter(prep + (boost::format("L%1%") % tmpn).str().c_str()) * Unit::cm / Unit::mm;
       }
-      Lv2Paraf2_Z[1] = Lv2Paraf2_Z[0] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm + m_config.getParameter(
-                         prep + "L17") * Unit::cm / Unit::mm;
-      Lv2Paraf2_Z[2] = Lv2Paraf2_Z[1] + m_config.getParameter(prep + "L18") * Unit::cm / Unit::mm + m_config.getParameter(
-                         prep + "L19") * Unit::cm / Unit::mm +
-                       m_config.getParameter(prep + "L20") * Unit::cm / Unit::mm + 1.0;
+      Lv2Paraf2_Z[1] = Lv2Paraf2_Z[0] + m_config.getParameter(prep + "L16") * Unit::cm / Unit::mm;
+      Lv2Paraf2_Z[2] = Lv2Paraf2_Z[1] + m_config.getParameter(prep + "L17") * Unit::cm / Unit::mm + m_config.getParameter(
+                         prep + "L18") * Unit::cm / Unit::mm;
       //
       double Lv2Paraf2_rI[Lv2Paraf2_num];
       for (int tmpn = 0; tmpn < Lv2Paraf2_num; tmpn++)
@@ -473,7 +503,7 @@ namespace Belle2 {
       //
       double Lv2Paraf2_rO[Lv2Paraf2_num];
       Lv2Paraf2_rO[0] = m_config.getParameter(prep + "R9") * Unit::cm / Unit::mm;
-      Lv2Paraf2_rO[1] = m_config.getParameter(prep + "R11") * Unit::cm / Unit::mm;
+      Lv2Paraf2_rO[1] = m_config.getParameter(prep + "R10") * Unit::cm / Unit::mm;
       Lv2Paraf2_rO[2] = Lv2Paraf2_rO[1];
       //
       string strMat_Lv2Paraf = m_config.getParameterStr(prep + "Material");
@@ -490,6 +520,54 @@ namespace Belle2 {
       //-   put volume
       setColor(*logi_Lv2Paraf, "#00CCCC");
       new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2Paraf, "phys_Lv2Paraf_name", logi_Lv1SUS, false, 0);
+
+      //-
+      //----------
+
+      //----------
+      //- Lv3AuCoat
+      prep = "Lv2AuCoat.";
+      //
+      const int Lv2AuCoat_num = 2;
+      //
+      // Part1
+      //
+      double Lv2AuCoat1_Z[Lv2AuCoat_num];
+      Lv2AuCoat1_Z[0] = -m_config.getParameter(prep + "L1") * Unit::cm / Unit::mm;
+      Lv2AuCoat1_Z[1] = -m_config.getParameter(prep + "L2") * Unit::cm / Unit::mm;
+      double Lv2AuCoat1_rI[Lv2AuCoat_num];
+      Lv2AuCoat1_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      Lv2AuCoat1_rI[1] = Lv2AuCoat1_rI[0];
+      double Lv2AuCoat1_rO[Lv2AuCoat_num];
+      Lv2AuCoat1_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      Lv2AuCoat1_rO[1] = Lv2AuCoat1_rO[0];
+      //
+      // Part2
+      //
+      double Lv2AuCoat2_Z[Lv2AuCoat_num];
+      Lv2AuCoat2_Z[0] = m_config.getParameter(prep + "L3") * Unit::cm / Unit::mm;
+      Lv2AuCoat2_Z[1] = m_config.getParameter(prep + "L4") * Unit::cm / Unit::mm;
+      double Lv2AuCoat2_rI[Lv2AuCoat_num];
+      Lv2AuCoat2_rI[0] = m_config.getParameter(prep + "R1") * Unit::cm / Unit::mm;
+      Lv2AuCoat2_rI[1] = Lv2AuCoat2_rI[0];
+      double Lv2AuCoat2_rO[Lv2AuCoat_num];
+      Lv2AuCoat2_rO[0] = m_config.getParameter(prep + "R2") * Unit::cm / Unit::mm;
+      Lv2AuCoat2_rO[1] = Lv2AuCoat2_rO[0];
+      //
+      string strMat_Lv2AuCoat = m_config.getParameterStr(prep + "Material");
+      G4Material* mat_Lv2AuCoat = Materials::get(strMat_Lv2AuCoat);
+
+      //define geometry
+      G4Polycone* geo_Lv2AuCoat1 = new G4Polycone("geo_Lv2AuCoat1_name", 0, 2 * M_PI, Lv2AuCoat_num, Lv2AuCoat1_Z, Lv2AuCoat1_rI,
+                                                  Lv2AuCoat1_rO);
+      G4Polycone* geo_Lv2AuCoat2 = new G4Polycone("geo_Lv2AuCoat2_name", 0, 2 * M_PI, Lv2AuCoat_num, Lv2AuCoat2_Z, Lv2AuCoat2_rI,
+                                                  Lv2AuCoat2_rO);
+      G4UnionSolid* geo_Lv2AuCoat = new G4UnionSolid("geo_Lv2AuCoat_name", geo_Lv2AuCoat1, geo_Lv2AuCoat2);
+      G4LogicalVolume* logi_Lv2AuCoat = new G4LogicalVolume(geo_Lv2AuCoat, mat_Lv2AuCoat, "logi_Lv2AuCoat_name");
+
+      //-   put volume
+      setColor(*logi_Lv2AuCoat, "#CCCC00");
+      new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logi_Lv2AuCoat, "phys_Lv2AuCoat_name", logi_Lv2Paraf, false, 0);
 
       //-
       //----------

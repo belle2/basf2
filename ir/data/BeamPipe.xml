@@ -140,7 +140,7 @@
     </Lv3AuCoat>
     
     <Lv1TaFwd>
-      <sec name="D1" unit="cm">13.65</sec>
+      <sec name="D1" unit="cm">13.55</sec>
       <sec name="L1" unit="cm">34.55</sec>
       <!--L2 unit="cm">1.96</L2-->
       <sec name="L2" unit="cm">1.555</sec>
@@ -173,7 +173,7 @@
     </Lv2VacFwd>
     
     <Lv1TaBwd>
-      <sec name="D1" unit="cm">9.15</sec>
+      <sec name="D1" unit="cm">9.05</sec>
       <sec name="L1" unit="cm">39.05</sec>
       <sec name="L2" unit="cm">4.0</sec>
       <!--L3 unit="cm">1.69</L3-->

@@ -161,7 +161,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_ARICH_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                   (histoTitle + " " + title[0]).c_str(),
                                   201, -0.5, 200.5);
-  m_ARICH_Occupancy[0]->GetXaxis()->SetTitle("Number of hits");
+  m_ARICH_Occupancy[0]->GetXaxis()->SetTitle("hits per event");
 
   //inside active_veto window:
   m_ARICH_Occupancy[1] = new TH1F(*m_ARICH_Occupancy[0]);

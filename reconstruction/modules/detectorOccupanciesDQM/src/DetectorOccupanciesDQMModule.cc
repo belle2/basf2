@@ -275,7 +275,7 @@ void DetectorOccupanciesDQMModule::event()
     }
   }
 
-  float xMax =   m_ARICH_Occupancy[0]->GetXaxis()->GetXmax();
+  float xMax =   m_ARICH_Occupancy[0]->GetXaxis()->GetBinCenter(h1->GetNbinsX());
   int arichNentr = m_ARICHHits.isValid() ?  m_ARICHHits.getEntries() : 0;
   m_ARICH_Occupancy[index] -> Fill(arichNentr > xMax ? xMax : arichNentr);
 

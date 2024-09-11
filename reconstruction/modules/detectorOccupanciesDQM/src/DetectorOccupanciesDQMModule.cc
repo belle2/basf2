@@ -290,11 +290,12 @@ void DetectorOccupanciesDQMModule::event()
   }
   m_TOP_Occupancy[index]->Fill(topGoodHits);
 
-  bool crystal_hit[ECLElementNumbers::c_NCrystals] = {};
+  std::array<bool, ECLElementNumbers::c_NCrystals>crystal_hit;
+
   for (const auto& digit : m_eclCalDigits) {
     const double thresholdGeV = m_eclEnergyThr * 1e-3;
     if (digit.getEnergy() > thresholdGeV)
-      crystal_hit[digit.getCellId() - 1] = true;
+      crystal_hit.at(digit.getCellId() - 1) = true;
   }
   for (int cid0 = 0; cid0 < ECLElementNumbers::c_NCrystals; cid0++) {
     m_ECL_Occupancy[index]->Fill(cid0 + 1, crystal_hit[cid0]);

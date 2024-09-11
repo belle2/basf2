@@ -28,6 +28,7 @@
 /* Boost headers. */
 #include <boost/format.hpp>
 #include <boost/range/combine.hpp>
+#include <boost/range/adaptor/indexed.hpp>
 
 /* ROOT headers. */
 #include <TDirectory.h>
@@ -44,6 +45,8 @@
 //NAMESPACE(S)
 using namespace Belle2;
 using namespace ECL;
+
+using namespace boost::adaptors;
 
 REG_MODULE(ECLDQM);
 
@@ -351,43 +354,37 @@ void ECLDQMModule::event()
     double energy  = aECLCalDigit.getEnergy(); //get calibrated energy.
     double timing  = aECLCalDigit.getTime();   //get calibrated time.
 
-    for (const auto& id : m_HitThresholds) {
-      auto scale = id / 1000.;
-      auto index = std::distance(m_HitThresholds.begin(), std::find(m_HitThresholds.begin(), m_HitThresholds.end(), id));
-      if (energy > scale)  {
-        h_cids[index]->Fill(cid);
-        nhits[index] += 1;
+    for (size_t i = 0; i < m_HitThresholds.size(); i++) {
+      auto thrGeV = m_HitThresholds[i] / 1000.;
+      if (energy > thrGeV)  {
+        h_cids[i]->Fill(cid);
+        nhits[i] += 1;
       }
     }
 
-    for (const auto& id : m_TotalEnergyThresholds) {
-      auto scale = id / 1000.;
-      auto index = std::distance(m_TotalEnergyThresholds.begin(), std::find(m_TotalEnergyThresholds.begin(),
-                                 m_TotalEnergyThresholds.end(), id));
-      if (energy > scale) ecltot[index] += energy;
+    for (const auto& thr : m_TotalEnergyThresholds | indexed(0)) {
+      auto thrGeV = thr.value() / 1000.;
+      if (energy > thrGeV) ecltot[thr.index()] += energy;
     }
 
-    for (const auto& id : m_TimingThresholds) {
-      auto scale = id / 1000.;
-      auto index = std::distance(m_TimingThresholds.begin(), std::find(m_TimingThresholds.begin(), m_TimingThresholds.end(), id));
-      if (energy > scale) {
-        if (cid > ECL_FWD_CHANNELS && cid <= ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrels[index]->Fill(timing);
-        else h_time_endcaps[index]->Fill(timing);
+    for (const auto& thr : m_TimingThresholds | indexed(0)) {
+      auto thrGeV = thr.value() / 1000.;
+      if (energy > thrGeV) {
+        if (cid > ECL_FWD_CHANNELS && cid <= ECL_FWD_CHANNELS + ECL_BARREL_CHANNELS) h_time_barrels[thr.index()]->Fill(timing);
+        else h_time_endcaps[thr.index()]->Fill(timing);
       }
     }
 
-    if (energy > 1.000 && std::abs(timing) < 100.)  h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
+    if (energy > 1.000 && std::abs(timing) < 100.) h_time_crate_Thr1GeV[mapper.getCrateID(cid) - 1]->Fill(timing);
     if (energy > 1.000 && std::abs(timing) > 100.) h_time_crate_Thr1GeV_large->Fill(mapper.getCrateID(cid));
   }
 
-  for (auto& h : h_edeps) {
-    auto index = std::distance(h_edeps.begin(), std::find(h_edeps.begin(), h_edeps.end(), h));
-    h->Fill(ecltot[index]);
+  for (const auto& h : h_edeps | indexed(0)) {
+    h.value()->Fill(ecltot[h.index()]);
   }
 
-  for (auto& h : h_ncevs) {
-    auto index = std::distance(h_ncevs.begin(), std::find(h_ncevs.begin(), h_ncevs.end(), h));
-    h->Fill(nhits[index]);
+  for (const auto& h : h_ncevs | indexed(0)) {
+    h.value()->Fill(nhits[h.index()]);
   }
 
   for (auto& aECLDsp : m_ECLDsps)  {
@@ -408,18 +405,19 @@ void ECLDQMModule::event()
 
     ECLDigit* aECLDigit = ECLDigit::getByCellID(aECLDsp.getCellId());
 
-    for (const auto& id : m_WaveformOption) {
-      auto index = std::distance(m_WaveformOption.begin(), std::find(m_WaveformOption.begin(), m_WaveformOption.end(), id));
-      if (id != "all" && id != "psd" && id != "logic" && id != "rand" && id != "dphy" && id != "other") continue;
-      else if (id == "psd" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
-                               !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
-      else if (id == "logic" && m_iEvent % 1000 != 999) continue;
-      else if (id == "rand" && (m_iEvent % 1000 == 999 || !isRandomTrigger())) continue;
-      else if (id == "dphy" && (m_iEvent % 1000 == 999 || !bhatrig)) continue;
-      else if (id == "other" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
-                                 (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
+    for (const auto& iter : m_WaveformOption | indexed(0)) {
+      const auto& index  = iter.index();
+      const auto& wf_opt = iter.value();
+      if (wf_opt != "all" && wf_opt != "psd" && wf_opt != "logic" && wf_opt != "rand" && wf_opt != "dphy" && wf_opt != "other") continue;
+      else if (wf_opt == "psd" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
+                                   !aECLDigit || aECLDigit->getAmp() < (v_totalthrApsd[i] / 4 * 4))) continue;
+      else if (wf_opt == "logic" && m_iEvent % 1000 != 999) continue;
+      else if (wf_opt == "rand" && (m_iEvent % 1000 == 999 || !isRandomTrigger())) continue;
+      else if (wf_opt == "dphy" && (m_iEvent % 1000 == 999 || !bhatrig)) continue;
+      else if (wf_opt == "other" && (m_iEvent % 1000 == 999 || isRandomTrigger() || bhatrig ||
+                                     (aECLDigit && aECLDigit->getAmp() >= (v_totalthrApsd[i] / 4 * 4)))) continue;
       h_cells[index]->Fill(aECLDsp.getCellId());
-      if (id == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());
+      if (wf_opt == "other" && aECLDigit) h_quality_other->Fill(aECLDigit->getQuality());
     }
   }
   if (m_ECLDigits.getEntries() > 0)

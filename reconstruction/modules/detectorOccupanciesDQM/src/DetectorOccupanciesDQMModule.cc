@@ -8,20 +8,8 @@
 
 #include "reconstruction/modules/detectorOccupanciesDQM/DetectorOccupanciesDQMModule.h"
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <svd/dataobjects/SVDShaperDigit.h>
-#include <svd/dataobjects/SVDCluster.h>
-#include <cdc/dataobjects/CDCHit.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
-#include <ecl/dataobjects/ECLElementNumbers.h>
-#include <mdst/dataobjects/EventLevelTrackingInfo.h>
-#include <mdst/dataobjects/TRGSummary.h>
-
 #include <TDirectory.h>
-#include <TLine.h>
-#include <TStyle.h>
 
-#include <algorithm>
 
 
 using namespace Belle2;
@@ -76,7 +64,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //BKLM plane occupancy (phi)
   //outside active_veto window:
-  std::string histoName = "plane_bklm_phi";
+  std::string histoName = "bklm_plane_phi_occupancy";
   std::string histoTitle = "BKLM plane occupancy (#phi readout)";
   m_BKLM_PlanePhi_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                           (histoTitle + " " + title[0]).c_str(),
@@ -92,7 +80,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //BKLM plane occupancy (z)
   //outside active_veto window:
-  histoName = "plane_bklm_z";
+  histoName = "bklm_plane_z_occupancy";
   histoTitle = "BKLM plane occupancy (z readout)";
   m_BKLM_PlaneZ_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                         (histoTitle + " " + title[0]).c_str(),
@@ -107,7 +95,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //EKLM plane occupancy
   //outside active_veto window:
-  histoName = "plane_eklm";
+  histoName = "eklm_plane_occupancy";
   histoTitle = "EKLM plane occupancy (both readouts)";
   m_EKLM_Plane_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
@@ -120,7 +108,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_EKLM_Plane_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //RPC Time
-  histoName = "time_rpc";
+  histoName = "rpc_time";
   histoTitle = "BKLM RPC Hit Time";
   m_TimeRPC[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                           (histoTitle + " " + title[0]).c_str(),
@@ -133,7 +121,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_TimeRPC[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //BKLM Scintillator Time
-  histoName = "time_scintillator_bklm";
+  histoName = "bklm_scintillator_time";
   histoTitle = "BKLM Scintillator Hit Time";
   m_TimeScintillatorBKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
@@ -146,7 +134,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_TimeScintillatorBKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //EKLM SCintillator Time
-  histoName = "time_scintillator_eklm";
+  histoName = "eklm_scintillator_time";
   histoTitle = "EKLM Scintillator Hit Time";
   m_TimeScintillatorEKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
@@ -160,7 +148,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //ARICH plane occupancy
   //outside active_veto window:
-  histoName = "arich_occ";
+  histoName = "arich_occupancy";
   histoTitle = "ARICH Occupancy";
   m_ARICH_Occupancy[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                   (histoTitle + " " + title[0]).c_str(),
@@ -173,8 +161,8 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_ARICH_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //TOP occupancy
-  histoName = "top_occ";
-  histoTitle = "TOP occupancy for good hits";
+  histoName = "top_occupancy";
+  histoTitle = "TOP Occupancy for good hits";
   for (int i = 0; i < 2; i++) {
     m_TOP_Occupancy[i] = new TH1F((histoName + "_" + tag[i]).c_str(),
                                   (histoTitle + " " +  title[i]).c_str(),
@@ -184,7 +172,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
   }
 
   //ECL occupancy
-  histoName = "ecl_occ";
+  histoName = "ecl_occupancy";
   histoTitle = "ECL occupancy (for hits with E > " + std::to_string((int)m_eclEnergyThr) + " MeV)";
   for (int i = 0; i < 2; i++) {
     m_ECL_Occupancy[i] = new TProfile((histoName + "_" + tag[i]).c_str(),

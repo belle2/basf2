@@ -10,23 +10,25 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/core/HistoModule.h>
 
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLElementNumbers.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
+#include <mdst/dataobjects/TRGSummary.h>
 #include <klm/dataobjects/bklm/BKLMElementNumbers.h>
 #include <klm/dataobjects/bklm/BKLMHit1d.h>
+#include <klm/dataobjects/KLMDigit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <top/dataobjects/TOPDigit.h>
 
-#include <framework/core/HistoModule.h>
 #include <string>
 #include <TH1F.h>
 #include <TProfile.h>
 
 namespace Belle2 {
 
-  class EventMetaData;
-  class TRGSummary;
-  class KLMDigit;
-  class ECLCalDigit;
 
   /** DQM Module for basic detector quantities before the HLT filter*/
   class DetectorOccupanciesDQMModule : public HistoModule {

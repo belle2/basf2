@@ -121,7 +121,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //RPC Time
   histoName = "time_rpc";
-  histoTitle = "RPC Hit Time";
+  histoTitle = "BKLM RPC Hit Time";
   m_TimeRPC[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                           (histoTitle + " " + title[0]).c_str(),
                           128, double(-1223.5), double(-199.5));
@@ -132,9 +132,9 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_TimeRPC[1]->SetName((histoName + "_" + tag[1]).c_str());
   m_TimeRPC[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
-  //BKLM SCintillator Time
+  //BKLM Scintillator Time
   histoName = "time_scintillator_bklm";
-  histoTitle = "Scintillator Hit Time (BKLM)";
+  histoTitle = "BKLM Scintillator Hit Time";
   m_TimeScintillatorBKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
                                        100, double(-5300), double(-4300));
@@ -147,7 +147,7 @@ void DetectorOccupanciesDQMModule::defineHisto()
 
   //EKLM SCintillator Time
   histoName = "time_scintillator_eklm";
-  histoTitle = "Scintillator Hit Time (EKLM)";
+  histoTitle = "EKLM Scintillator Hit Time";
   m_TimeScintillatorEKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
                                        (histoTitle + " " + title[0]).c_str(),
                                        100, double(-5300), double(-4300));
@@ -254,7 +254,7 @@ void DetectorOccupanciesDQMModule::event()
   if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
 
 
-  //fill the BKLM plane occupancy pliots
+  //fill the BKLM plane occupancy plots
   for (const BKLMHit1d& hit1d : m_BklmHit1ds) {
     int section = hit1d.getSection();
     int sector = hit1d.getSector();

@@ -187,7 +187,7 @@ description will be split by the filter. Major algorithms used in the processing
 * **Filter 1** (schematic view is shown in :numref:`kink_fitter_filter1_scheme`).
 
     1) The vertex fit (described below) is done for a track pair.
-    2) If the vertex fit fails, the daughter track is refitted with inner hits blocked (they might be restored at the further steps) until the first stereo superlayer is passed. For time and position seeds, the mother's LAST hit state values are used. If the daughter track fit fails or the vertex fit fails, exit.
+    2) If the vertex fit fails, the daughter track is refitted without using the inner hits up to the first stereo superlayer in the fit (they might be returned to the fit at the further steps). For time and position seeds, the mother's LAST hit state values are used. If the daughter track fit fails or the vertex fit fails, exit.
     3) If the hit reassignment mode is ON, do hit reassignment based on the information in the ``reassignHitStatus`` variable (described below).
 
 .. _kink_fitter_filter1_scheme:
@@ -226,7 +226,7 @@ description will be split by the filter. Major algorithms used in the processing
 
 * **Filter 4** (schematic view is shown in :numref:`kink_fitter_filter4_scheme`).
 
-    1) The daughter track is refitted with inner hits blocked (they might be restored at the further steps) until the first stereo superlayer is passed. For time and position seeds, the mother's LAST hit state values are used. If the track fit fails, proceed with the original track.
+    1) The daughter track is refitted without using the inner hits up to the first stereo superlayer in the fit (they might be returned to the fit at the further steps). For time and position seeds, the mother's LAST hit state values are used. If the track fit fails, proceed with the original track.
     2) The vertex fit is done for a track pair. If it fails, exit.
     3) If the hit reassignment mode is ON, do hit reassignment based on the information in the ``reassignHitStatus`` variable (described below).
 

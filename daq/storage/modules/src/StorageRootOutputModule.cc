@@ -198,11 +198,6 @@ void StorageRootOutputModule::initialize()
 }
 
 // For online storage
-void StorageRootOutputModule::beginRun() {
-  m_run++;
-}
-
-// For online storage
 void StorageRootOutputModule::endRun() {
   if (m_file) {
     closeFile();

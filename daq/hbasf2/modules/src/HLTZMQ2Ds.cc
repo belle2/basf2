@@ -101,6 +101,7 @@ void HLTZMQ2DsModule::event()
           m_eventMetaData->setRun(m_lastRun);
         } else {
           m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+          m_firstEventIsSpecialMessage = true;
         }
         return;
       } else if (eventMessage->isMessage(EMessageTypes::c_terminateMessage)) {

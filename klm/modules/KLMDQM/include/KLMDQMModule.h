@@ -197,10 +197,10 @@ namespace Belle2 {
     /** Feature extraction status histogram for EKLM */
     TH1F* m_FeatureExtractionStatusEKLM;
 
-    /** Feature extraction status 2D histogram for BKLM, status 0 */
+    /** Feature extraction status 2D histogram for BKLM, status 0 or 1 */
     TH2F* m_FeatureExtractionStatusBKLM2D;
 
-    /** Feature extraction status 2D histogram for EKLM, status 0 */
+    /** Feature extraction status 2D histogram for EKLM, status 1*/
     TH2F* m_FeatureExtractionStatusEKLM2D;
 
     /** KLM channel array index. */
@@ -229,9 +229,6 @@ namespace Belle2 {
 
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
-
-    /** Analyze feature extraction status at the end of the run */
-    void analyzeFeatureExtractionStatus();
 
   };
 

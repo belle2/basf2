@@ -42,6 +42,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TriggersLERInj{nullptr},
   m_DigitsAfterHERInj{nullptr},
   m_TriggersHERInj{nullptr},
+  m_FeatureExtractionStatusBKLM(nullptr),
+  m_FeatureExtractionStatusEKLM(nullptr),
+  m_FeatureExtractionStatusBKLM2D(nullptr),
+  m_FeatureExtractionStatusEKLM2D(nullptr),
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
   m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -256,6 +260,32 @@ void KLMDQMModule::defineHisto()
       }
     }
   }
+  // Feature extraction status histogram for BKLM
+  m_FeatureExtractionStatusBKLM = new TH1F("feature_extraction_status_bklm",
+                                           "BKLM Scintillator Feature Extraction Status", 2, 0, 2);
+  m_FeatureExtractionStatusBKLM->GetXaxis()->SetBinLabel(1, "Standard Readout");
+  m_FeatureExtractionStatusBKLM->GetXaxis()->SetBinLabel(2, "Feature Extraction");
+
+  // Feature extraction status histogram for EKLM
+  m_FeatureExtractionStatusEKLM = new TH1F("feature_extraction_status_eklm",
+                                           "EKLM Scintillator Feature Extraction Status", 2, 0, 2);
+  m_FeatureExtractionStatusEKLM->GetXaxis()->SetBinLabel(1, "Standard Readout");
+  m_FeatureExtractionStatusEKLM->GetXaxis()->SetBinLabel(2, "Feature Extraction");
+
+  // Feature extraction status 2D histogram for BKLM
+  int bklmSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber();
+  int bklmLayers = BKLMElementNumbers::getMaximalLayerNumber();
+  int eklmSectors = EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();
+  int eklmLayers = EKLMElementNumbers::getMaximalLayerGlobalNumber();
+
+  m_FeatureExtractionStatusBKLM2D = new TH2F("feature_extraction_status_bklm2D",
+                                             "BKLM Readout;Sectors;Layers",
+                                             bklmSectors, 0, bklmSectors, bklmLayers, 0, bklmLayers);
+
+  m_FeatureExtractionStatusEKLM2D = new TH2F("feature_extraction_status_eklm2D",
+                                             "EKLM Readout;Layers;Sectors",
+                                             eklmLayers, 0, eklmLayers, eklmSectors, 0, eklmSectors);
+
   oldDirectory->cd();
 }
 
@@ -325,6 +355,11 @@ void KLMDQMModule::beginRun()
         m_Spatial2DHitsEKLM[section - 1][j - 1]->Reset();
     }
   }
+  /* Feature extraction. */
+  m_FeatureExtractionStatusBKLM->Reset();
+  m_FeatureExtractionStatusEKLM->Reset();
+  m_FeatureExtractionStatusBKLM2D->Reset();
+  m_FeatureExtractionStatusEKLM2D->Reset();
 }
 
 void KLMDQMModule::event()
@@ -469,6 +504,37 @@ void KLMDQMModule::event()
     int layer = hit2d.getLayer();
     m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());
   }
+  /* Feature extraction status */
+  for (const KLMDigit& digit : m_Digits) {
+    if (!digit.isGood())
+      continue;
+    if (digit.getSubdetector() == KLMElementNumbers::c_BKLM ||
+        digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
+
+      KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+      if (digitRaw) {
+        // Extract m_FE from m_word4
+        uint16_t word4 = digitRaw->getWord4();
+        uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+
+        int section = digit.getSection();
+        int sector = digit.getSector();
+        int layer = digit.getLayer();
+        int plane = digit.getPlane();
+
+        if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
+          m_FeatureExtractionStatusBKLM->Fill(feStatus);
+          KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
+          KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+          m_FeatureExtractionStatusBKLM2D->Fill(sectorIndex, layer - 1);
+        } else {
+          m_FeatureExtractionStatusEKLM->Fill(feStatus);
+          m_FeatureExtractionStatusEKLM2D->Fill((section - 1) * 12 + layer - 1, (sector - 1) * 2 + plane - 1);
+        }
+      }
+    }
+  }
+
 }
 
 void KLMDQMModule::endRun()

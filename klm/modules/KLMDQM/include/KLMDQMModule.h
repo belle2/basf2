@@ -79,7 +79,7 @@ namespace Belle2 {
 
   private:
 
-    /** Bins for the trigger bits historgrams. */
+    /** Bins for the trigger bits histograms. */
     enum TriggerBitsBin {
 
       /** 0x8. */
@@ -191,6 +191,18 @@ namespace Belle2 {
     /** Spatial distribution of EKLM 2d hits per layer. */
     TH2F** m_Spatial2DHitsEKLM[EKLMElementNumbers::getMaximalSectionNumber()] = {nullptr};
 
+    /** Feature extraction status histogram for BKLM */
+    TH1F* m_FeatureExtractionStatusBKLM;
+
+    /** Feature extraction status histogram for EKLM */
+    TH1F* m_FeatureExtractionStatusEKLM;
+
+    /** Feature extraction status 2D histogram for BKLM, status 0 */
+    TH2F* m_FeatureExtractionStatusBKLM2D;
+
+    /** Feature extraction status 2D histogram for EKLM, status 0 */
+    TH2F* m_FeatureExtractionStatusEKLM2D;
+
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
 
@@ -217,6 +229,9 @@ namespace Belle2 {
 
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
+
+    /** Analyze feature extraction status at the end of the run */
+    void analyzeFeatureExtractionStatus();
 
   };
 

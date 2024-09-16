@@ -1491,17 +1491,36 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         charm_skim_std_charged('K', path=path)
         stdKshorts(path=path)
         stdLambdas(path=path)
+        Ks_sel = '[0.468 < M < 0.506] and goodBelleKshort == 1'
+        L0_sel = '[1.111 < M < 1.121] and [dr > 0.1] and [extraInfo(chiSquared) < 100]' + \
+                 ' and [cosAngleBetweenMomentumAndVertexVectorInXYPlane > 0.99]'
+        ma.applyCuts('K_S0:merged', Ks_sel, path=path)
+        ma.applyCuts('Lambda0:merged', L0_sel, path=path)
 
     def build_lists(self, path):
         ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionID > 0.01', path=path)
         ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonID > 0.1', path=path)
         ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
+        ma.rankByHighest(particleList='pi+:hadtag',
+                         variable='pionID',
+                         numBest=15,
+                         path=path)
+        ma.rankByHighest(particleList='K+:hadtag',
+                         variable='kaonID',
+                         numBest=10,
+                         path=path)
+        ma.rankByHighest(particleList='p+:hadtag',
+                         variable='protonID',
+                         numBest=10,
+                         path=path)
+
+        ClusterCut = 'abs(clusterTiming) < 200 and abs(formula(clusterTiming/clusterErrorTiming)) < 2.0 and E > 0.1'
         ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
         ma.reconstructDecay("pi0:hadtag -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
+        ma.cutAndCopyList("gamma:hadtag", "gamma:tag", ClusterCut, path=path)
+
         d0cuts = "1.72 < M < 2.02 and useCMSFrame(p) > 2.0"
-
         # tag charm hadrons reconstruction (D0/D+/Lambda_c+/D_s+/D*0/D*+/D_s*+)
-
         D0_channels = [
             "K-:hadtag pi+:hadtag",
             "K-:hadtag pi+:hadtag pi0:hadtag",
@@ -1558,9 +1577,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
                 "Lambda0:merged pi+:hadtag",
                 "Lambda0:merged pi+:hadtag pi0:hadtag",
                 "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag",
-                "Lambda0:merged pi+:hadtag gamma:tag",
-                "Lambda0:merged pi+:hadtag pi0:hadtag gamma:tag",
-                "Lambda0:merged pi+:hadtag pi-:hadtag pi+:hadtag gamma:tag",
                 "Sigma+:hadtag pi+:hadtag pi-:hadtag",
                 "Sigma+:hadtag pi+:hadtag pi-:hadtag pi0:hadtag",
                 "Sigma+:hadtag pi0:hadtag"]
@@ -1601,14 +1617,15 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         ma.copyLists("D*+:skim", ["D*+:skim1", "D*+:skim2"], path=path)
 
         ma.reconstructDecay("D*0:skim1 -> D0:skim pi0:hadtag", "0.130 < massDifference(0) < 0.160", 1, path=path)
-        ma.reconstructDecay("D*0:skim2 -> D0:skim gamma:tag", "0.120 < massDifference(0) < 0.165", 2, path=path)
+        ma.reconstructDecay("D*0:skim2 -> D0:skim gamma:hadtag", "0.120 < massDifference(0) < 0.165", 2, path=path)
         ma.copyLists("D*0:skim", ["D*0:skim1", "D*0:skim2"], path=path)
 
-        ma.reconstructDecay("D_s*+:skim -> D_s+:skim gamma:tag", "0.120 < massDifference(0) < 0.165", path=path)
+        ma.reconstructDecay("D_s*+:skim -> D_s+:skim gamma:hadtag", "0.120 < massDifference(0) < 0.165", path=path)
 
         # ==============================================================================================
         # ============================ fragmentation part ==============================================
         # ==============================================================================================
+
         DstP_Xfrag = [
             "", "pi0:hadtag", "pi+:hadtag pi-:hadtag", "pi+:hadtag pi-:hadtag pi0:hadtag"]
 

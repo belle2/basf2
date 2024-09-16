@@ -14,10 +14,14 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
+#include <svd/dataobjects/SVDSummaryPlotsPhiDependence.h>
 
 #include <TFile.h>
 #include <TPaveText.h>
 #include <TCanvas.h>
+#include <TText.h>
+#include <TLine.h>
+#include <TArrow.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
@@ -91,7 +95,30 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
     SVDSummaryPlots* m_hEfficiencyErr3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
+    TCanvas* m_cEfficiencyPhiDependenceU = nullptr; /**< efficiency U plot canvas */
+    TCanvas* m_cEfficiencyPhiDependenceV = nullptr; /**< efficiency V plot canvas */
+    SVDSummaryPlotsPhiDependence* m_hEfficiencyPhiDependence = nullptr; /**< efficiency histo */
+    TCanvas* m_cEfficiencyErrPhiDependenceU = nullptr; /**<efficiency U error plot canvas */
+    TCanvas* m_cEfficiencyErrPhiDependenceV = nullptr; /**<efficiency V error plot canvas */
+    SVDSummaryPlotsPhiDependence* m_hEfficiencyErrPhiDependence = nullptr; /**< efficiency error histo */
+
+    TCanvas* m_cEfficiencyPhiDependenceU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
+    TCanvas* m_cEfficiencyPhiDependenceV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
+    SVDSummaryPlotsPhiDependence* m_hEfficiencyPhiDependence3Samples = nullptr; /**< efficiency histo for 3 samples */
+    TCanvas* m_cEfficiencyErrPhiDependenceU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
+    TCanvas* m_cEfficiencyErrPhiDependenceV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
+    SVDSummaryPlotsPhiDependence* m_hEfficiencyErrPhiDependence3Samples = nullptr; /**< efficiency error histo for 3 samples*/
+
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
+    std::tuple<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
+
+    std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
+    std::vector<TText*> m_sensorsText; /**< list of sensors to write on the cancas */
+
+    TLine* m_lx = nullptr; /**< y-axis */
+    TLine* m_ly = nullptr; /**< x-axis */
+    TArrow* m_arrowx = nullptr; /**< x-axis direction */
+    TArrow* m_arrowy = nullptr; /**< y-axis direction */
 
     TPaveText* m_legProblem = nullptr; /**< efficiency plot legend, problem */
     TPaveText* m_legWarning = nullptr; /**< efficiency plot legend, warning */

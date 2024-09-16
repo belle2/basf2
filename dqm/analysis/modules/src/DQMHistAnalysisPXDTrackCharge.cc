@@ -215,14 +215,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_hTrackedClusters->SetLineColor(kBlue);
       m_hTrackedClusters->Draw("hist");
 
-      // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-//       auto href2 = findHistInFile(m_refFile, name);
-//
-//       if (href2) {
-//         href2->SetLineStyle(3);// 2 or 3
-//         href2->SetLineColor(kBlack);
-//         href2->Draw("same,hist");
-//       }
+      // get ref histogram
+      auto href2 = findRefHist(name); // no scaling!
+      if (href2) {
+        href2->SetLineStyle(3);// 2 or 3
+        href2->SetLineColor(kBlack);
+        href2->Draw("same,hist");
+      }
 
       // keep this commented code as we may have excluded modules in phase4
 //       auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
@@ -277,23 +276,23 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         hh1->Draw("hist"); // avoid to confuse people by showing nothing for low stat
       }
 
-      // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-//       auto hist2 = findHistInFile(m_refFile, name);
-//       if (hist2) {
-//         B2DEBUG(20, "Draw Normalized " << hist2->GetName());
-//         hist2->SetLineStyle(3);// 2 or 3
-//         hist2->SetLineColor(kBlack);
-//
-//         canvas->cd();
-//
-//         // if draw normalized
-//         TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
-//         // would it work to scale it each time again?
-//         if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
-//
-//         h->SetStats(kFALSE);
-//         h->Draw("same,hist");
-//       }
+      // get ref histogram
+      auto hist2 = findRefHist(name);// no scaling
+      if (hist2) {
+        B2DEBUG(20, "Draw Normalized " << hist2->GetName());
+        hist2->SetLineStyle(3);// 2 or 3
+        hist2->SetLineColor(kBlack);
+
+        canvas->cd();
+
+        // if draw normalized
+        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+        // would it work to scale it each time again?
+        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
+
+        h->SetStats(kFALSE);
+        h->Draw("same,hist");
+      }
 
       // add coloring, cuts? based on fit, compare with ref?
       canvas->Pad()->SetFrameFillColor(10);

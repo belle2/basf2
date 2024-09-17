@@ -16,18 +16,18 @@
 namespace Belle2 {
 
   /** class to summarize SVD quantities per sensor and side*/
-  class SVDSummaryPlotsPhiDependence: public TObject {
+  class SVDSummaryPlotsRPhiView: public TObject {
 
   public:
     /** Default constructor*/
-    SVDSummaryPlotsPhiDependence():
-      SVDSummaryPlotsPhiDependence("", "") {}; /**< this is the default constructor */
+    SVDSummaryPlotsRPhiView():
+      SVDSummaryPlotsRPhiView("", "") {}; /**< this is the default constructor */
 
     /**
      * @param name histogram name
      * @param title histogram title
      */
-    SVDSummaryPlotsPhiDependence(TString name, TString title)
+    SVDSummaryPlotsRPhiView(TString name, TString title)
     {
       double xLow = -210.;
       double xHigh = 210.;
@@ -50,15 +50,15 @@ namespace Belle2 {
 
 
     /** clean everything in the destructor */
-    ~SVDSummaryPlotsPhiDependence() { clean(); };
+    ~SVDSummaryPlotsRPhiView() { clean(); };
 
     /** This enumeration assure the same semantic of the
     isU methods defined by Peter Kv.*/
     enum E_side { VIndex = 0, UIndex = 1 };
 
     /** get a reference to the histogram for @param view
-     * please, use the enumeration SVDSummaryPlotsPhiDependence::Vindex and
-     * SVDSummaryPlotsPhiDependence::UIndex */
+     * please, use the enumeration SVDSummaryPlotsRPhiView::Vindex and
+     * SVDSummaryPlotsRPhiView::UIndex */
     TH2Poly* getHistogram(int view)
     {
       TH2Poly* returnValue = m_defaultHistogram;
@@ -179,7 +179,7 @@ namespace Belle2 {
     /** set histogram maximum
      * @param value
      */
-    void setMaximum(Int_t value = 0)
+    void setMaximum(Int_t value = 100)
     {
       for (int view = VIndex ; view < UIndex + 1; view++)
         getHistogram(view)->SetMaximum(value);
@@ -284,10 +284,10 @@ namespace Belle2 {
       histogram.GetXaxis()->SetTickLength(0);
       histogram.GetXaxis()->SetTitleOffset(0.5);
 
-      histogram.GetXaxis()->SetTitle("y");
-      histogram.GetXaxis()->SetLabelSize(0);
-      histogram.GetXaxis()->SetTickLength(0);
-      histogram.GetXaxis()->SetTitleOffset(0.5);
+      histogram.GetYaxis()->SetTitle("y");
+      histogram.GetYaxis()->SetLabelSize(0);
+      histogram.GetYaxis()->SetTickLength(0);
+      histogram.GetYaxis()->SetTitleOffset(0.5);
 
       bool isU = view == UIndex;
       std::string title = histogram.GetTitle();
@@ -296,6 +296,6 @@ namespace Belle2 {
     }
 
 
-    ClassDef(SVDSummaryPlotsPhiDependence, 1);  /**< needed by root */
+    ClassDef(SVDSummaryPlotsRPhiView, 1);  /**< needed by root */
   };
 }

@@ -81,9 +81,9 @@ namespace Belle2 {
     TH1F* m_BKLM_PlanePhi_Occupancy[2]; /**< BKLM phi plane integrated occupancy */;
     TH1F* m_BKLM_PlaneZ_Occupancy[2]; /**< BKLM z plane integrated occupancy */;
     TH1F* m_EKLM_Plane_Occupancy[2]; /**< EKLM plane integrated occupancy */;
-    TH1F* m_TimeRPC[2]; /**< RPC Hit Time */;
-    TH1F* m_TimeScintillatorBKLM[2]; /**< BKLM Scintillator Hit Time */;
-    TH1F* m_TimeScintillatorEKLM[2]; /**< EKLM  Scintillator Hit Time */;
+    TH1F* m_BKLM_TimeRPC[2]; /**< RPC Hit Time */;
+    TH1F* m_BKLM_TimeScintillator[2]; /**< BKLM Scintillator Hit Time */;
+    TH1F* m_EKLM_TimeScintillator[2]; /**< EKLM  Scintillator Hit Time */;
     TH1F* m_ARICH_Occupancy[2]; /**< ARICH Digit Occupancy*/
     TH1F* m_TOP_Occupancy[2]; /**< TOP occupancy (good hits only) */
     TProfile* m_ECL_Occupancy[2]; /**< ECL occupancy (hits above 5 MeV) */

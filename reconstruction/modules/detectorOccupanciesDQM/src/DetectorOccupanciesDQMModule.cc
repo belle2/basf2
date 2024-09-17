@@ -108,43 +108,43 @@ void DetectorOccupanciesDQMModule::defineHisto()
   m_EKLM_Plane_Occupancy[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //RPC Time
-  histoName = "rpc_time";
+  histoName = "bklm_rpc_time";
   histoTitle = "BKLM RPC Hit Time";
-  m_TimeRPC[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                          (histoTitle + " " + title[0]).c_str(),
-                          128, double(-1223.5), double(-199.5));
-  m_TimeRPC[0]->GetXaxis()->SetTitle("Time [ns]");
+  m_BKLM_TimeRPC[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                               (histoTitle + " " + title[0]).c_str(),
+                               128, double(-1223.5), double(-199.5));
+  m_BKLM_TimeRPC[0]->GetXaxis()->SetTitle("Time [ns]");
 
   //inside active_veto window:
-  m_TimeRPC[1] = new TH1F(*m_TimeRPC[0]);
-  m_TimeRPC[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_TimeRPC[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_BKLM_TimeRPC[1] = new TH1F(*m_BKLM_TimeRPC[0]);
+  m_BKLM_TimeRPC[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_BKLM_TimeRPC[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //BKLM Scintillator Time
   histoName = "bklm_scintillator_time";
   histoTitle = "BKLM Scintillator Hit Time";
-  m_TimeScintillatorBKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                                       (histoTitle + " " + title[0]).c_str(),
-                                       100, double(-5300), double(-4300));
-  m_TimeScintillatorBKLM[0]->GetXaxis()->SetTitle("Time [ns]");
+  m_BKLM_TimeScintillator[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                        (histoTitle + " " + title[0]).c_str(),
+                                        100, double(-5300), double(-4300));
+  m_BKLM_TimeScintillator[0]->GetXaxis()->SetTitle("Time [ns]");
 
   //inside active_veto window:
-  m_TimeScintillatorBKLM[1] = new TH1F(*m_TimeScintillatorBKLM[0]);
-  m_TimeScintillatorBKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_TimeScintillatorBKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_BKLM_TimeScintillator[1] = new TH1F(*m_BKLM_TimeScintillator[0]);
+  m_BKLM_TimeScintillator[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_BKLM_TimeScintillator[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //EKLM SCintillator Time
   histoName = "eklm_scintillator_time";
   histoTitle = "EKLM Scintillator Hit Time";
-  m_TimeScintillatorEKLM[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
-                                       (histoTitle + " " + title[0]).c_str(),
-                                       100, double(-5300), double(-4300));
-  m_TimeScintillatorEKLM[0]->GetXaxis()->SetTitle("Time [ns]");
+  m_EKLM_TimeScintillator[0] = new TH1F((histoName + "_" + tag[0]).c_str(),
+                                        (histoTitle + " " + title[0]).c_str(),
+                                        100, double(-5300), double(-4300));
+  m_EKLM_TimeScintillator[0]->GetXaxis()->SetTitle("Time [ns]");
 
   //inside active_veto window:
-  m_TimeScintillatorEKLM[1] = new TH1F(*m_TimeScintillatorEKLM[0]);
-  m_TimeScintillatorEKLM[1]->SetName((histoName + "_" + tag[1]).c_str());
-  m_TimeScintillatorEKLM[1]->SetTitle((histoTitle + " " + title[1]).c_str());
+  m_EKLM_TimeScintillator[1] = new TH1F(*m_EKLM_TimeScintillator[0]);
+  m_EKLM_TimeScintillator[1]->SetName((histoName + "_" + tag[1]).c_str());
+  m_EKLM_TimeScintillator[1]->SetTitle((histoTitle + " " + title[1]).c_str());
 
   //ARICH plane occupancy
   //outside active_veto window:
@@ -209,6 +209,9 @@ void DetectorOccupanciesDQMModule::beginRun()
     if (m_BKLM_PlanePhi_Occupancy[i] != nullptr)  m_BKLM_PlanePhi_Occupancy[i]->Reset();
     if (m_BKLM_PlaneZ_Occupancy[i] != nullptr)  m_BKLM_PlaneZ_Occupancy[i]->Reset();
     if (m_EKLM_Plane_Occupancy[i] != nullptr)  m_EKLM_Plane_Occupancy[i]->Reset();
+    if (m_BKLM_TimeRPC[i] != nullptr) m_BKLM_TimeRPC[i]->Reset();
+    if (m_BKLM_TimeScintillator[i] != nullptr) m_BKLM_TimeScintillator[i]->Reset();
+    if (m_EKLM_TimeScintillator[i] != nullptr) m_EKLM_TimeScintillator[i]->Reset();
     if (m_ARICH_Occupancy[i] != nullptr)  m_ARICH_Occupancy[i]->Reset();
     if (m_TOP_Occupancy[i] != nullptr)  m_TOP_Occupancy[i]->Reset();
     if (m_ECL_Occupancy[i] != nullptr)  m_ECL_Occupancy[i]->Reset();
@@ -271,11 +274,11 @@ void DetectorOccupanciesDQMModule::event()
       int plane = digit.getPlane();
       int planeGlobal = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
       m_EKLM_Plane_Occupancy[index]->Fill(planeGlobal);
-      m_TimeScintillatorEKLM[index]->Fill(digit.getTime());
+      m_EKLM_TimeScintillator[index]->Fill(digit.getTime());
     } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
 
-      if (digit.inRPC()) m_TimeRPC[index]->Fill(digit.getTime());
-      else m_TimeScintillatorBKLM[index]->Fill(digit.getTime());
+      if (digit.inRPC()) m_BKLM_TimeRPC[index]->Fill(digit.getTime());
+      else m_BKLM_TimeScintillator[index]->Fill(digit.getTime());
     }
   }
 
@@ -290,7 +293,7 @@ void DetectorOccupanciesDQMModule::event()
   }
   m_TOP_Occupancy[index]->Fill(topGoodHits);
 
-  std::array<bool, ECLElementNumbers::c_NCrystals>crystal_hit;
+  std::array<bool, ECLElementNumbers::c_NCrystals> crystal_hit;
 
   for (const auto& digit : m_eclCalDigits) {
     const double thresholdGeV = m_eclEnergyThr * 1e-3;

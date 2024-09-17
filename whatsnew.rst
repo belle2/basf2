@@ -25,7 +25,7 @@ Changes since release-08
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-02
+   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-03
       :widths: 50 25 25
       :header-rows: 1
 

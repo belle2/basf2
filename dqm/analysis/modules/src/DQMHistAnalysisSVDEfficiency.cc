@@ -304,6 +304,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
   }
 
+
   Float_t effU = -1;
   Float_t effV = -1;
   Float_t erreffU = -1;
@@ -329,14 +330,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denU = found_tracksU->GetBinContent(bin);
       if (denU > 0)
         effU = numU / denU;
-      else
-        effU = -1;
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       m_hEfficiencyRPhiView->fill(m_SVDModules[i], 1, effU * 100);
-      if (effU == -1)
-        erreffU = -1;
-      else
+      if (denU > 0)
         erreffU = std::sqrt(effU * (1 - effU) / denU);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
       m_hEfficiencyErrRPhiView->fill(m_SVDModules[i], 1, erreffU * 100);
@@ -345,14 +342,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denV = found_tracksV->GetBinContent(bin);
       if (denV > 0)
         effV = numV / denV;
-      else
-        effV = -1;
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       m_hEfficiencyRPhiView->fill(m_SVDModules[i], 0, effV * 100);
-      if (effV == -1)
-        erreffV = -1;
-      else
+      if (denV > 0)
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
       m_hEfficiencyErrRPhiView->fill(m_SVDModules[i], 0, erreffV * 100);
@@ -376,9 +369,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       } else if ((effV <= m_effError)) {
         m_effVstatus = std::max(error, m_effVstatus);
       }
-
       B2DEBUG(10, "Status U-side is " << m_effUstatus);
-      B2DEBUG(10, "Status V-side is " << m_effUstatus);
+      B2DEBUG(10, "Status V-side is " << m_effVstatus);
     }
   } else {
     if (matched_clusU == NULL || found_tracksU == NULL) {
@@ -527,14 +519,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denU = found3_tracksU->GetBinContent(bin);
         if (denU > 0)
           effU = numU / denU;
-        else
-          effU = -1;
         B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         m_hEfficiencyRPhiView3Samples->fill(m_SVDModules[i], 1, effU * 100);
-        if (effU == -1)
-          erreffU = -1;
-        else
+        if (denU > 0)
           erreffU = std::sqrt(effU * (1 - effU) / denU);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
         m_hEfficiencyErrRPhiView3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
@@ -543,14 +531,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denV = found3_tracksV->GetBinContent(bin);
         if (denV > 0)
           effV = numV / denV;
-        else
-          effV = -1;
         B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         m_hEfficiencyRPhiView3Samples->fill(m_SVDModules[i], 0, effV * 100);
-        if (effV == -1)
-          erreffV = -1;
-        else
+        if (denV > 0)
           erreffV = std::sqrt(effV * (1 - effV) / denV);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
         m_hEfficiencyErrRPhiView3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
@@ -576,7 +560,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         }
 
         B2DEBUG(10, "Status U-side is " << m_effUstatus);
-        B2DEBUG(10, "Status V-side is " << m_effUstatus);
+        B2DEBUG(10, "Status V-side is " << m_effVstatus);
       }
     } else {
       if (matched3_clusU == NULL || found3_tracksU == NULL) {

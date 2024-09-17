@@ -98,8 +98,8 @@ void HLTZMQ2DsModule::event()
         m_eventMetaData.create();
         if (!m_lastEventIsSpecialMessage) {
           m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+          m_lastEventIsSpecialMessage = true;
         }
-        m_lastEventIsSpecialMessage = true;
         return;
       } else if (eventMessage->isMessage(EMessageTypes::c_terminateMessage)) {
         B2DEBUG(10, "Received termination request");

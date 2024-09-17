@@ -80,8 +80,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      int bin = findBin(layer, ladder, sensor);
-      return getHistogram(view)->GetBinContent(bin);
+      return getValue(layer, ladder, sensor, view);
     }
 
     /** get the value contained in the corresponding bin, given
@@ -118,8 +117,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      int bin = findBin(layer, ladder, sensor);
-      getHistogram(view)->SetBinContent(bin, value);
+      fill(layer, ladder, sensor, view, value);
     }
 
     /** fill the histogram for @param vxdID side @param isU with @param value*/
@@ -131,8 +129,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      int bin = findBin(layer, ladder, sensor);
-      getHistogram(view)->SetBinContent(bin, value);
+      fill(layer, ladder, sensor, view, value);
     }
 
 

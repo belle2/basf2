@@ -77,8 +77,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      int bin = m_histos[view]->FindBin(ladder, findBinY(layer, sensor));
-      return getHistogram(view)->GetBinContent(bin);
+      return getValue(layer, ladder, sensor, view);
     }
 
     /** get the value contained in the corresponding bin, given
@@ -114,7 +113,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
+      fill(layer, ladder, sensor, view, value);
     }
 
     /** set run ids in title
@@ -157,7 +156,7 @@ namespace Belle2 {
       int ladder = vxdID.getLadderNumber();
       int sensor = vxdID.getSensorNumber();
 
-      getHistogram(view)->Fill(ladder, findBinY(layer, sensor), value);
+      fill(layer, ladder, sensor, view, value);
     }
 
     /** replaces layer ladder sensor view and apv with the current numbers*/

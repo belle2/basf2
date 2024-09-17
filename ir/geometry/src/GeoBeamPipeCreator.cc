@@ -525,7 +525,7 @@ namespace Belle2 {
       //----------
 
       //----------
-      //- Lv3AuCoat
+      //- Lv2AuCoat
       prep = "Lv2AuCoat.";
       //
       const int Lv2AuCoat_num = 2;

@@ -85,7 +85,7 @@
       <sec name="L17" unit="cm">0.73</sec>
       <sec name="L18" unit="cm">0.35</sec>
       <sec name="R1" unit="cm">1.12</sec>
-      <sec name="R2" unit="cm">2.23</sec>
+      <sec name="R2" unit="cm">2.05</sec>
       <sec name="R3" unit="cm">1.6</sec>
       <sec name="R4" unit="cm">1.5</sec>
       <sec name="R5" unit="cm">1.18</sec>
@@ -104,7 +104,7 @@
       <sec name="L2" unit="cm">10.0</sec>
       <sec name="L3" unit="cm">5.0</sec>
       <sec name="L4" unit="cm">15.0</sec>
-      <sec name="D1" unit="cm">0</sec>
+      <sec name="D1" unit="cm">0.0</sec>
       <sec name="D2" unit="cm">0.1</sec>
       <sec name="D3" unit="cm">0.5</sec>
       <sec name="D4" unit="cm">0.5</sec>

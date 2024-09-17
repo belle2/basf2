@@ -79,8 +79,8 @@ class VariablesToTable(basf2.Module):
         self._plist.isRequired()
 
         dtypes = [
-            ("exp", np.int32), ("run", np.int32), ("evt", np.uint32),
-            ("prod", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)
+            ("__experiment__", np.int32), ("__run__", np.int32), ("__evt__", np.uint32),
+            ("__prod__", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)
         ]
         for name in self._varnames:
             # only float variables for now
@@ -96,7 +96,7 @@ class VariablesToTable(basf2.Module):
         elif self._format == "csv":
             self.initialize_csv_writer()
         else:
-            raise ValueError(f"Unknown format {self._format}")
+            raise ValueError(f"Unknown format {self._format}, supported formats are 'hdf5', 'parquet', 'csv'.")
 
     def initialize_parquet_writer(self):
         """

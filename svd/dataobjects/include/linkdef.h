@@ -32,6 +32,6 @@
 #pragma link C++ class Belle2::SVDAPVHistograms< TProfile > +; // checksum=0x9fc3f6cf, version=1
 
 #pragma link C++ class Belle2::SVDSummaryPlots +; // checksum=0xc68b9fbd, version=2
-#pragma link C++ class Belle2::SVDSummaryPlotsPhiDependence +; // checksum=0x54a73851, version=1
+#pragma link C++ class Belle2::SVDSummaryPlotsRPhiView +;
 
 #endif

@@ -6,7 +6,8 @@ Modules
 * Fixed a bug in `MCDecayFinder`, which previously didn't find all true candidates when using the default arrow.
 * Fixed a bug in :ref:`analysis_reweighting` where the weights were not correctly assigned 
   if a selection cut was applied on the input DataFrame. 
-* Added a module `VariabesToNotRoot` that writes Ntuples to hdf5, csv or parquet.
+* Added a module `VariabesToTable` that writes Ntuples to hdf5, csv or parquet.
+* renamed `addRootNtuple` to `addNtuple` to be more inclusive of other file formats.
 
 Variables
 +++++++++

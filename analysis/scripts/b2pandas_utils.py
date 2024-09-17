@@ -34,7 +34,7 @@ numpy_to_pyarrow_type_map = {
 }
 
 
-class VariablesToNotRoot(basf2.Module):
+class VariablesToTable(basf2.Module):
     """
     Base class to dump ntuples into a non root format of your choosing
     """
@@ -183,10 +183,10 @@ class VariablesToNotRoot(basf2.Module):
             self._parquet_writer.close()
         elif self._format == "csv":
             self._csv_writer.close()
-        ROOT.Belle2.MetadataService.Instance().addNotRootNtuple(self._filename, self._format)
+        ROOT.Belle2.MetadataService.Instance().addNtuple(self._filename, self._format)
 
 
-class VariablesToHDF5(VariablesToNotRoot):
+class VariablesToHDF5(VariablesToTable):
     """
     Legacy class to not break existing code
     """

@@ -54,12 +54,12 @@ void MetadataService::addRootOutputFile(const std::string& fileName, const FileM
   writeJson();
 }
 
-void MetadataService::addRootNtupleFile(const std::string& fileName)
+void MetadataService::addNtuple(const std::string& fileName)
 {
   if (m_fileName.empty()) return;
   if (!FileSystem::isFile(fileName)) return;
 
-  nlohmann::json file_json = {{"type", "RootNtuple"}, {"filename", fileName}};
+  nlohmann::json file_json = {{"type", "Ntuple"}, {"filename", fileName}};
 
   // no metadata and no check
 
@@ -71,36 +71,6 @@ void MetadataService::addRootNtupleFile(const std::string& fileName)
 
   writeJson();
 }
-
-void MetadataService::addHDF5File(const std::string& fileName)
-{
-  if (m_fileName.empty()) return;
-  if (!FileSystem::isFile(fileName)) return;
-
-  nlohmann::json file_json = {{"type", "HDF5"}, {"filename", fileName}};
-
-  file_json["checksums"]["adler32"] = FileSystem::calculateAdler32(fileName);
-
-  m_json["output_files"].push_back(file_json);
-
-  writeJson();
-}
-
-
-void MetadataService::addNotRootNtuple(const std::string& fileName, const std::string& fileType)
-{
-  if (m_fileName.empty()) return;
-  if (!FileSystem::isFile(fileName)) return;
-
-  nlohmann::json file_json = {{"type", fileType}, {"filename", fileName}};
-
-  file_json["checksums"]["adler32"] = FileSystem::calculateAdler32(fileName);
-
-  m_json["output_files"].push_back(file_json);
-
-  writeJson();
-}
-
 
 void MetadataService::addBasf2Status(const std::string& message)
 {

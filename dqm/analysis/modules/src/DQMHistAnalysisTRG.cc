@@ -181,7 +181,10 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //ECLTRG N(TC) clean from the forward endcap
   addDeltaPar("TRG", "h_n_TChit_FWD_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
-  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_FWD_clean", "ECLTRG_meanTC_FWD_clean");
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_FWD_clean",
+                  "ECLTRG_meanTC_FWD_clean"); // Mean value for the distribution of N(TC) from the forward
+  registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_FWD_clean",
+                  "ECLTRG_tailTC_FWD_clean"); // Tail position for the distribution of N(TC) from the forward
 
   //ECLTRG N(TC) HER Injection region from the forward endcap
   addDeltaPar("TRG", "h_n_TChit_FWD_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
@@ -197,7 +200,10 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //ECLTRG N(TC) clean from the barrel
   addDeltaPar("TRG", "h_n_TChit_BRL_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
-  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BRL_clean", "ECLTRG_meanTC_BRL_clean");
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BRL_clean",
+                  "ECLTRG_meanTC_BRL_clean"); // Mean value for the distribution of N(TC) from the barrel
+  registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_BRL_clean",
+                  "ECLTRG_tailTC_BRL_clean"); // Tail position for the distribution of N(TC) from the barrel
 
   //ECLTRG N(TC) HER Injection region from the barrel
   addDeltaPar("TRG", "h_n_TChit_BRL_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
@@ -213,7 +219,10 @@ void DQMHistAnalysisTRGModule::initialize()
 
   //ECLTRG N(TC) clean from the backward endcap
   addDeltaPar("TRG", "h_n_TChit_BWD_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
-  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BWD_clean", "ECLTRG_meanTC_BWD_clean");
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BWD_clean",
+                  "ECLTRG_meanTC_BWD_clean"); // Mean value for the distribution of N(TC) from the backward
+  registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_BWD_clean",
+                  "ECLTRG_tailTC_BWD_clean"); // Tail position for the distribution of N(TC) from the backward
 
   //ECLTRG N(TC) HER Injection region from the backward endcap
   addDeltaPar("TRG", "h_n_TChit_BWD_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
@@ -711,6 +720,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       double mean = hist_nTC_FWD_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_FWD_clean:" << mean);
       setEpicsPV("ECLTRG_meanTC_FWD_clean", mean);
+
+      double tail = getThreshold(hist_nTC_FWD_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_FWD_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_FWD_clean", tail);
     }
 
     auto hist_nTC_FWD_injHER = getDelta("TRG", "h_n_TChit_FWD_injHER_clkgrp", 0, true);
@@ -739,6 +752,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       double mean = hist_nTC_BRL_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BRL_clean:" << mean);
       setEpicsPV("ECLTRG_meanTC_BRL_clean", mean);
+
+      double tail = getThreshold(hist_nTC_BRL_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_BRL_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_BRL_clean", tail);
     }
 
     auto hist_nTC_BRL_injHER = getDelta("TRG", "h_n_TChit_BRL_injHER_clkgrp", 0, true);
@@ -767,6 +784,10 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       double mean = hist_nTC_BWD_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_BWD_clean:" << mean);
       setEpicsPV("ECLTRG_meanTC_BWD_clean", mean);
+
+      double tail = getThreshold(hist_nTC_BWD_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_BWD_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_BWD_clean", tail);
     }
 
     auto hist_nTC_BWD_injHER = getDelta("TRG", "h_n_TChit_BWD_injHER_clkgrp", 0, true);

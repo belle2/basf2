@@ -146,7 +146,7 @@ std::unique_ptr<ZMQIdMessage> ZMQConfirmedInput::handleIncomingData()
   }
 
   if (m_allStopMessages) {
-    B2ERROR("Received an event after having received stop messages from every worker. This is not a good sign! I will dismiss this event!");
+    B2FATAL("Received an event after having received stop messages from every worker. This is not a good sign! I will dismiss this event!");
     increment("received_messages_after_stop");
     return {};
   }

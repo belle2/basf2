@@ -580,8 +580,13 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
                  " isEndOfRun = " << m_previousEventMetaData.isEndOfRun());
           B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
           B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
-          processBeginRun();
-          m_previousEventMetaData = *m_eventMetaDataPtr;
+          // The run number should not be 0
+          if (m_eventMetaDataPtr->getRun() != 0) {
+            processBeginRun();
+            m_previousEventMetaData = *m_eventMetaDataPtr;
+          } else {
+            return false;
+          }
         }
 
         //Check for a change of the run (should not come here)

@@ -184,13 +184,17 @@ Generally it is best not to set anything in the prompt script itself. Just use t
         B2INFO("Overwriting values in 'expert_config' by using the values from the config JSON file.")
         expert_config = {**expert_config, **caf_config["expert_config"]}
 
-    # check if the input_data_files IOVs are consistent with the requested_iov IOVs
+    # Check if the input_data_files IOVs are consistent with the requested_iov IOV
+    # If they are not in the requested_iov IOV, remove them from the input_data_files list
     requested_iov = IoV(*caf_config["requested_iov"])
-    for key in input_data_files:
-        for filename in input_data_files[key]:
-            if not requested_iov.contains(input_data_files[key][filename]):
-                B2ERROR(f"Provided input file {filename} from input data name {key} with {input_data_files[key][filename]} is not contained in the requested IOV ({requested_iov})")
-                return 1
+    to_exclude = []
+    for input_name in input_data_files:
+        for filename in input_data_files[input_name]:
+            if not requested_iov.contains(input_data_files[input_name][filename]):
+                B2WARNING(f"Provided input file {filename} from input data name {input_name} with {input_data_files[input_name][filename]} is not contained in the requested IOV ({requested_iov}). Excluding this file.")
+                to_exclude.append({"input_name":input_name,"filename":filename})
+    for exclusion in to_exclude:
+        del input_data_files[exclusion["input_name"]][exclusion["filename"]]
 
     calibrations = cal_module.get_calibrations(input_data_files,
                                                requested_iov=IoV(*caf_config["requested_iov"]),

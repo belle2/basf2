@@ -79,8 +79,8 @@ class VariablesToTable(basf2.Module):
         self._plist.isRequired()
 
         dtypes = [
-            ("__experiment__", np.int32), ("__run__", np.int32), ("__evt__", np.uint32),
-            ("__prod__", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)
+            ("__experiment__", np.int32), ("__run__", np.int32), ("__event__", np.uint32),
+            ("__prod__", np.uint32), ("__candidate_-", np.uint32), ("__ncandidates__", np.uint32)
         ]
         for name in self._varnames:
             # only float variables for now

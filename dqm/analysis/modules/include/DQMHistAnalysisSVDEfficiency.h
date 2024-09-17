@@ -14,7 +14,7 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
-#include <svd/dataobjects/SVDSummaryPlotsPhiDependence.h>
+#include <svd/dataobjects/SVDSummaryPlotsRPhiView.h>
 
 #include <TFile.h>
 #include <TPaveText.h>
@@ -95,22 +95,24 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
     SVDSummaryPlots* m_hEfficiencyErr3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
-    TCanvas* m_cEfficiencyPhiDependenceU = nullptr; /**< efficiency U plot canvas */
-    TCanvas* m_cEfficiencyPhiDependenceV = nullptr; /**< efficiency V plot canvas */
-    SVDSummaryPlotsPhiDependence* m_hEfficiencyPhiDependence = nullptr; /**< efficiency histo */
-    TCanvas* m_cEfficiencyErrPhiDependenceU = nullptr; /**<efficiency U error plot canvas */
-    TCanvas* m_cEfficiencyErrPhiDependenceV = nullptr; /**<efficiency V error plot canvas */
-    SVDSummaryPlotsPhiDependence* m_hEfficiencyErrPhiDependence = nullptr; /**< efficiency error histo */
+    TCanvas* m_cEfficiencyRPhiViewU = nullptr; /**< efficiency U plot canvas */
+    TCanvas* m_cEfficiencyRPhiViewV = nullptr; /**< efficiency V plot canvas */
+    SVDSummaryPlotsRPhiView* m_hEfficiencyRPhiView = nullptr; /**< efficiency histo */
+    TCanvas* m_cEfficiencyErrRPhiViewU = nullptr; /**<efficiency U error plot canvas */
+    TCanvas* m_cEfficiencyErrRPhiViewV = nullptr; /**<efficiency V error plot canvas */
+    SVDSummaryPlotsRPhiView* m_hEfficiencyErrRPhiView = nullptr; /**< efficiency error histo */
 
-    TCanvas* m_cEfficiencyPhiDependenceU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
-    TCanvas* m_cEfficiencyPhiDependenceV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
-    SVDSummaryPlotsPhiDependence* m_hEfficiencyPhiDependence3Samples = nullptr; /**< efficiency histo for 3 samples */
-    TCanvas* m_cEfficiencyErrPhiDependenceU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
-    TCanvas* m_cEfficiencyErrPhiDependenceV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
-    SVDSummaryPlotsPhiDependence* m_hEfficiencyErrPhiDependence3Samples = nullptr; /**< efficiency error histo for 3 samples*/
+    TCanvas* m_cEfficiencyRPhiViewU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
+    TCanvas* m_cEfficiencyRPhiViewV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
+    SVDSummaryPlotsRPhiView* m_hEfficiencyRPhiView3Samples = nullptr; /**< efficiency histo for 3 samples */
+    TCanvas* m_cEfficiencyErrRPhiViewU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
+    TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
+    SVDSummaryPlotsRPhiView* m_hEfficiencyErrRPhiView3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
     std::tuple<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
+    void drawText(); /**< draw text on the RPhi view */
+    void setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg); /**< set status of Canvas */
 
     std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
     std::vector<TText*> m_sensorsText; /**< list of sensors to write on the cancas */

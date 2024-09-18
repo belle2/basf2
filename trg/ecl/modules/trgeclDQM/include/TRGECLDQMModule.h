@@ -46,6 +46,9 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
+    //! The number of clocks to group the number of TCs of ECLTRG
+    int m_grpclknum;
+
     //! TCId histogram
     TH1* h_TCId = nullptr;
     //! TCthetaId histogram
@@ -74,16 +77,6 @@ namespace Belle2 {
     TH1* h_n_TChit_injLER = nullptr;
     //! N of TC Hit / events in the LER injection BG region vs. time since injection
     TH2* h_nTChit_injtime = nullptr;
-    //! N of TC Hit / event per two ETM clocks
-    TH1* h_n_TChit_event_2clk = nullptr;
-    //! N of TC Hit / event vs. time since injection per two ETM clocks
-    TH1* h_n_TChit_clean_2clk = nullptr;
-    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks
-    TH1* h_n_TChit_injHER_2clk = nullptr;
-    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks
-    TH1* h_n_TChit_injLER_2clk = nullptr;
-    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks
-    TH2* h_nTChit_injtime_2clk = nullptr;
     //! N of Cluster / event
     TH1* h_Cluster = nullptr;
     //! TC Timing / event
@@ -98,6 +91,28 @@ namespace Belle2 {
     TH1* h_ECL_TriggerBit = nullptr;
     //! Energy sum of 2 Top energetic clusters when 3D bhabnha bit on
     TH1* h_Cluster_Energy_Sum = nullptr;
+
+    //! N of TC Hit / event per two ETM clocks
+    TH1* h_n_TChit_event_clkgrp = nullptr;
+    //! N of TC Hit / event vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_clean_clkgrp = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injHER_clkgrp = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injLER_clkgrp = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks
+    TH2* h_nTChit_injtime_clkgrp = nullptr;
+
+    //! N of TC Hit / event per two ETM clocks
+    TH1* h_n_TChit_part_event_clkgrp[3] = {nullptr};
+    //! N of TC Hit / event vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH1* h_n_TChit_part_clean_clkgrp[3] = {nullptr};
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH1* h_n_TChit_part_injHER_clkgrp[3] = {nullptr};
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH1* h_n_TChit_part_injLER_clkgrp[3] = {nullptr};
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH2* h_nTChit_part_injtime_clkgrp[3] = {nullptr};
 
     //! Hit TCId
     std::vector<int> TCId;

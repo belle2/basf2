@@ -406,7 +406,7 @@ for layer in range(1, nlayers+1):
     if layer == 3:
         nLaddersYing = 15
         nLadders = 30
-        shiftPhi = 11
+        shiftPhi = 0
 
     if layer == 4:
         nLaddersYing = 18
@@ -488,7 +488,7 @@ for layer in range(1, nlayers+1):
     if layer == 3:
         nLaddersYing = 15
         nLadders = 30
-        shiftPhi = 11
+        shiftPhi = 0
 
     if layer == 4:
         nLaddersYing = 18

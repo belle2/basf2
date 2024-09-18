@@ -126,6 +126,7 @@ void HLTZMQ2DsModule::event()
       // didn't get any events, probably interrupted by a signal.
       // We're the input module so let's better have some event meta data
       // even if it's not useful
+      // If the m_lastRun is 0, it is probably the lastEventMessage. Do not issue the endOfData.
       m_eventMetaData.create();
       m_eventMetaData->setEndOfData();
     }

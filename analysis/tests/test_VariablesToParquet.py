@@ -12,7 +12,7 @@ import os
 import basf2
 import pandas
 import b2test_utils
-from b2pandas_utils import VariablesToNotRoot
+from b2pandas_utils import VariablesToTable
 
 inputFile = b2test_utils.require_file('mdst16.root', 'validation')
 path = basf2.create_path()
@@ -20,7 +20,7 @@ path.add_module('RootInput', inputFileName=inputFile)
 path.add_module('ParticleLoader', decayStrings=['e+'])
 
 # Write out electron id and momentum of all true electron candidates
-v2parquet_e = VariablesToNotRoot(
+v2parquet_e = VariablesToTable(
     "e+:all", ['electronID', 'p', 'isSignal'], "particleDF.pq", "parquet")
 path.add_module(v2parquet_e)
 

@@ -122,7 +122,7 @@ void HLTZMQ2DsModule::event()
     };
 
     bool result = ZMQConnection::poll({{m_input.get(), reactToInput}}, -1);
-    if (!result) {
+    if (!result and m_lastRun != 0) {
       // didn't get any events, probably interrupted by a signal.
       // We're the input module so let's better have some event meta data
       // even if it's not useful

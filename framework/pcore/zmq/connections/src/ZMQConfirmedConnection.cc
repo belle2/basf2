@@ -146,8 +146,17 @@ std::unique_ptr<ZMQIdMessage> ZMQConfirmedInput::handleIncomingData()
   }
 
   if (m_allStopMessages) {
-    B2FATAL("Received an event after having received stop messages from every worker. This is not a good sign! I will dismiss this event!");
+    if (not m_eventAfterAllStopMessages) {
+      m_eventAfterAllStopMessages = true;
+      m_whenEventAfterAllStopMessages = std::chrono::system_clock::now();
+    }
+    B2ERROR("Received an event after having received stop messages from every worker. This is not a good sign! I will dismiss this event!");
     increment("received_messages_after_stop");
+    auto t1 = std::chrono::system_clock::now();
+    const auto intervalAfterAllStopMessages = std::chrono::duration_cast<std::chrono::seconds> (t1 - m_whenEventAfterAllStopMessages);
+    if (intervalAfterAllStopMessages > std::chrono::seconds{150}) {
+      B2FATAL("Too many events after having received stop messages! This is abnormal. I will kill the process!");
+    }
     return {};
   }
 
@@ -175,6 +184,7 @@ void ZMQConfirmedInput::clear()
   m_allStopMessages = false;
   m_receivedTerminateMessages.clear();
   m_allTerminateMessages = false;
+  m_eventAfterAllStopMessages = false;
 
   log("received_stop_messages", static_cast<long>(m_receivedStopMessages.size()));
   log("all_stop_messages", static_cast<long>(m_allStopMessages));

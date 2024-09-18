@@ -80,7 +80,7 @@ class VariablesToTable(basf2.Module):
 
         dtypes = [
             ("__experiment__", np.int32), ("__run__", np.int32), ("__event__", np.uint32),
-            ("__prod__", np.uint32), ("__candidate_-", np.uint32), ("__ncandidates__", np.uint32)
+            ("__production__", np.uint32), ("__candidate__", np.uint32), ("__ncandidates__", np.uint32)
         ]
         for name in self._varnames:
             # only float variables for now
@@ -139,12 +139,12 @@ class VariablesToTable(basf2.Module):
         # create a numpy array with the data
         buf = np.empty(self._plist.getListSize(), dtype=self._dtypes)
         # add some extra columns for bookkeeping
-        buf["exp"] = self._evtmeta.getExperiment()
-        buf["run"] = self._evtmeta.getRun()
-        buf["evt"] = self._evtmeta.getEvent()
-        buf["prod"] = self._evtmeta.getProduction()
-        buf["ncand"] = len(buf)
-        buf["icand"] = np.arange(len(buf))
+        buf["__experiment__"] = self._evtmeta.getExperiment()
+        buf["__run__"] = self._evtmeta.getRun()
+        buf["__event__"] = self._evtmeta.getEvent()
+        buf["__production__"] = self._evtmeta.getProduction()
+        buf["__ncandidates__"] = len(buf)
+        buf["__candidate__"] = np.arange(len(buf))
 
         for row, p in zip(buf, self._plist):
             for name, v in zip(self._varnames, self._var_objects):

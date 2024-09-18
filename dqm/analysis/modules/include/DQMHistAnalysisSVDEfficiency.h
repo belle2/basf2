@@ -14,7 +14,6 @@
 
 #include <dqm/core/DQMHistAnalysis.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
-#include <svd/dataobjects/SVDSummaryPlotsRPhiView.h>
 
 #include <TFile.h>
 #include <TPaveText.h>
@@ -97,17 +96,13 @@ namespace Belle2 {
 
     TCanvas* m_cEfficiencyRPhiViewU = nullptr; /**< efficiency U plot canvas */
     TCanvas* m_cEfficiencyRPhiViewV = nullptr; /**< efficiency V plot canvas */
-    SVDSummaryPlotsRPhiView* m_hEfficiencyRPhiView = nullptr; /**< efficiency histo */
     TCanvas* m_cEfficiencyErrRPhiViewU = nullptr; /**<efficiency U error plot canvas */
     TCanvas* m_cEfficiencyErrRPhiViewV = nullptr; /**<efficiency V error plot canvas */
-    SVDSummaryPlotsRPhiView* m_hEfficiencyErrRPhiView = nullptr; /**< efficiency error histo */
 
     TCanvas* m_cEfficiencyRPhiViewU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
     TCanvas* m_cEfficiencyRPhiViewV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
-    SVDSummaryPlotsRPhiView* m_hEfficiencyRPhiView3Samples = nullptr; /**< efficiency histo for 3 samples */
     TCanvas* m_cEfficiencyErrRPhiViewU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
     TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
-    SVDSummaryPlotsRPhiView* m_hEfficiencyErrRPhiView3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
     std::tuple<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */

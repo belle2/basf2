@@ -113,14 +113,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
   m_hEfficiencyErr->setStats(0);
 
-  m_hEfficiencyRPhiView = new SVDSummaryPlotsRPhiView("SVDEfficiencyRPhiView@view",
-                                                      "Summary of SVD efficiencies (%), @view/@side Side");
-  m_hEfficiencyRPhiView->setStats(0);
-  m_hEfficiencyRPhiView->setMinimum(80);
-  m_hEfficiencyErrRPhiView = new SVDSummaryPlotsRPhiView("SVDEfficiencyErrRPhiView@view",
-                                                         "Summary of SVD efficiencies errors (%), @view/@side Side");
-  m_hEfficiencyErrRPhiView->setStats(0);
-
   if (m_3Samples) {
     m_cEfficiencyU3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyU3Samples");
     m_cEfficiencyV3Samples = new TCanvas("SVDAnalysis/c_SVDEfficiencyV3Samples");
@@ -138,15 +130,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
                                                    "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");
     m_hEfficiencyErr3Samples->setStats(0);
-
-    m_hEfficiencyRPhiView3Samples = new SVDSummaryPlotsRPhiView("SVDEfficiencyRPhiView@view",
-                                                                "Summary of SVD efficiencies (%), @view/@side Side for 3 samples");
-    m_hEfficiencyRPhiView3Samples->setStats(0);
-    m_hEfficiencyRPhiView3Samples->setMinimum(80);
-    m_hEfficiencyErrRPhiView3Samples = new SVDSummaryPlotsRPhiView("SVDEfficiencyErrRPhiView@view",
-        "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");
-    m_hEfficiencyErrRPhiView3Samples->setStats(0);
-
   }
 
   //register limits for EPICS
@@ -272,16 +255,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_hEfficiencyErr->setRunID(runID);
   }
 
-  if (m_hEfficiencyRPhiView) {
-    m_hEfficiencyRPhiView->reset();
-    m_hEfficiencyRPhiView->setRunID(runID);
-  }
-
-  if (m_hEfficiencyErrRPhiView) {
-    m_hEfficiencyErrRPhiView->reset();
-    m_hEfficiencyErrRPhiView->setRunID(runID);
-  }
-
   if (m_3Samples) {
     if (m_hEfficiency3Samples) {
       m_hEfficiency3Samples->reset();
@@ -291,16 +264,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     if (m_hEfficiencyErr3Samples) {
       m_hEfficiencyErr3Samples->reset();
       m_hEfficiencyErr3Samples->setRunID(runID);
-    }
-
-    if (m_hEfficiencyRPhiView3Samples) {
-      m_hEfficiencyRPhiView3Samples->reset();
-      m_hEfficiencyRPhiView3Samples->setRunID(runID);
-    }
-
-    if (m_hEfficiencyErrRPhiView3Samples) {
-      m_hEfficiencyErrRPhiView3Samples->reset();
-      m_hEfficiencyErrRPhiView3Samples->setRunID(runID);
     }
   }
 
@@ -332,11 +295,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effU = numU / denU;
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
-      m_hEfficiencyRPhiView->fill(m_SVDModules[i], 1, effU * 100);
       if (denU > 0)
         erreffU = std::sqrt(effU * (1 - effU) / denU);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
-      m_hEfficiencyErrRPhiView->fill(m_SVDModules[i], 1, erreffU * 100);
       // V-side
       float numV = matched_clusV->GetBinContent(bin);
       float denV = found_tracksV->GetBinContent(bin);
@@ -344,11 +305,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effV = numV / denV;
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
-      m_hEfficiencyRPhiView->fill(m_SVDModules[i], 0, effV * 100);
       if (denV > 0)
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
-      m_hEfficiencyErrRPhiView->fill(m_SVDModules[i], 0, erreffV * 100);
 
       if (denU < m_statThreshold) {
         m_effUstatus = std::max(lowStat, m_effUstatus);
@@ -383,8 +342,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       m_cEfficiencyRPhiViewU->Draw();
       m_cEfficiencyRPhiViewU->cd();
-      if (m_hEfficiencyRPhiView)
-        m_hEfficiencyRPhiView->getHistogram(1)->Draw("colz l");
+      if (m_hEfficiency)
+        m_hEfficiency->getPoly(1)->Draw("colz l");
       colorizeCanvas(m_cEfficiencyRPhiViewU, c_StatusDefault);
     }
     if (matched_clusV == NULL || found_tracksV == NULL) {
@@ -397,8 +356,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
       m_cEfficiencyRPhiViewV->cd();
       m_cEfficiencyRPhiViewV->Draw();
-      if (m_hEfficiencyRPhiView)
-        m_hEfficiencyRPhiView->getHistogram(0)->Draw("colz l");
+      if (m_hEfficiency)
+        m_hEfficiency->getPoly(0)->Draw("colz l");
       colorizeCanvas(m_cEfficiencyRPhiViewV, c_StatusDefault);
     }
   }
@@ -418,8 +377,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   m_cEfficiencyRPhiViewU->Draw();
   m_cEfficiencyRPhiViewU->cd();
-  if (m_hEfficiencyRPhiView) {
-    m_hEfficiencyRPhiView->getHistogram(1)->Draw("colz l");
+  if (m_hEfficiency) {
+    m_hEfficiency->getPoly(1)->Draw("colz l");
     drawText();
   }
   setStatusOfCanvas(m_effUstatus, m_cEfficiencyRPhiViewU, false);
@@ -441,8 +400,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   m_cEfficiencyRPhiViewV->cd();
   m_cEfficiencyRPhiViewV->Draw();
-  if (m_hEfficiencyRPhiView) {
-    m_hEfficiencyRPhiView->getHistogram(0)->Draw("colz l");
+  if (m_hEfficiency) {
+    m_hEfficiency->getPoly(0)->Draw("colz l");
     drawText();
   }
   setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV, false);
@@ -460,8 +419,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrU->Update();
 
   m_cEfficiencyErrRPhiViewU->cd();
-  if (m_hEfficiencyErrRPhiView) {
-    m_hEfficiencyErrRPhiView->getHistogram(1)->Draw("colz l");
+  if (m_hEfficiencyErr) {
+    m_hEfficiencyErr->getPoly(1, 0)->Draw("colz l");
     drawText();
   }
   m_cEfficiencyErrRPhiViewU->Draw();
@@ -478,8 +437,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyErrV->Update();
 
   m_cEfficiencyErrRPhiViewV->cd();
-  if (m_hEfficiencyErrRPhiView) {
-    m_hEfficiencyErrRPhiView->getHistogram(0)->Draw("colz l");
+  if (m_hEfficiencyErr) {
+    m_hEfficiencyErr->getPoly(0, 0)->Draw("colz l");
     drawText();
   }
   m_cEfficiencyErrRPhiViewV->Draw();
@@ -493,11 +452,6 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_hEfficiency3Samples->getHistogram(1)->Reset();
     m_hEfficiencyErr3Samples->getHistogram(0)->Reset();
     m_hEfficiencyErr3Samples->getHistogram(1)->Reset();
-
-    m_hEfficiencyRPhiView3Samples->getHistogram(0)->Reset("");
-    m_hEfficiencyRPhiView3Samples->getHistogram(1)->Reset("");
-    m_hEfficiencyErrRPhiView3Samples->getHistogram(0)->Reset("");
-    m_hEfficiencyErrRPhiView3Samples->getHistogram(1)->Reset("");
 
     // Efficiency for the U and V-side - 3 samples
     TH2F* found3_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHits3U");
@@ -521,11 +475,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
           effU = numU / denU;
         B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
-        m_hEfficiencyRPhiView3Samples->fill(m_SVDModules[i], 1, effU * 100);
         if (denU > 0)
           erreffU = std::sqrt(effU * (1 - effU) / denU);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
-        m_hEfficiencyErrRPhiView3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
         // V-side
         float numV = matched3_clusV->GetBinContent(bin);
         float denV = found3_tracksV->GetBinContent(bin);
@@ -533,11 +485,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
           effV = numV / denV;
         B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
-        m_hEfficiencyRPhiView3Samples->fill(m_SVDModules[i], 0, effV * 100);
         if (denV > 0)
           erreffV = std::sqrt(effV * (1 - effV) / denV);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
-        m_hEfficiencyErrRPhiView3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
 
         if (denU < m_statThreshold) {
           m_effUstatus = std::max(lowStat, m_effUstatus);
@@ -572,19 +522,19 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
         m_cEfficiencyRPhiViewU3Samples->Draw();
         m_cEfficiencyRPhiViewU3Samples->cd();
-        m_hEfficiencyRPhiView3Samples->getHistogram(1)->Draw("colz l");
+        m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
         colorizeCanvas(m_cEfficiencyRPhiViewU3Samples, c_StatusDefault);
       }
       if (matched3_clusV == NULL || found3_tracksV == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
         m_cEfficiencyV3Samples->Draw();
         m_cEfficiencyV3Samples->cd();
-        m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+        m_hEfficiency3Samples->getHistogram(0)->Draw("text");
         colorizeCanvas(m_cEfficiencyV3Samples, c_StatusDefault);
 
         m_cEfficiencyRPhiViewV3Samples->Draw();
         m_cEfficiencyRPhiViewV3Samples->cd();
-        m_hEfficiencyRPhiView3Samples->getHistogram(1)->Draw("colz l");
+        m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
         colorizeCanvas(m_cEfficiencyRPhiViewV3Samples, c_StatusDefault);
       }
     }
@@ -602,8 +552,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
     m_cEfficiencyRPhiViewU3Samples->Draw();
     m_cEfficiencyRPhiViewU3Samples->cd();
-    if (m_hEfficiencyRPhiView3Samples) {
-      m_hEfficiencyRPhiView3Samples->getHistogram(1)->Draw("colz l");
+    if (m_hEfficiency3Samples) {
+      m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
       drawText();
     }
     setStatusOfCanvas(m_effUstatus, m_cEfficiencyRPhiViewU3Samples, false);
@@ -625,8 +575,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
     m_cEfficiencyRPhiViewV3Samples->Draw();
     m_cEfficiencyRPhiViewV3Samples->cd();
-    if (m_hEfficiencyRPhiView3Samples) {
-      m_hEfficiencyRPhiView3Samples->getHistogram(0)->Draw("colz l");
+    if (m_hEfficiency3Samples) {
+      m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
       drawText();
     }
     setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV3Samples, false);
@@ -644,8 +594,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyErrU3Samples->Update();
 
     m_cEfficiencyErrRPhiViewU3Samples->cd();
-    if (m_hEfficiencyErrRPhiView3Samples) {
-      m_hEfficiencyErrRPhiView3Samples->getHistogram(1)->Draw("colz l");
+    if (m_hEfficiencyErr3Samples) {
+      m_hEfficiencyErr3Samples->getPoly(1, 0)->Draw("colz l");
       drawText();
     }
     m_cEfficiencyErrRPhiViewU3Samples->Draw();
@@ -662,8 +612,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyErrV3Samples->Update();
 
     m_cEfficiencyErrRPhiViewV3Samples->cd();
-    if (m_hEfficiencyErrRPhiView3Samples) {
-      m_hEfficiencyErrRPhiView3Samples->getHistogram(0)->Draw("colz l");
+    if (m_hEfficiencyErr3Samples) {
+      m_hEfficiencyErr3Samples->getPoly(0, 0)->Draw("colz l");
       drawText();
     }
     m_cEfficiencyErrRPhiViewV3Samples->Draw();
@@ -695,10 +645,8 @@ void DQMHistAnalysisSVDEfficiencyModule::terminate()
   delete m_cEfficiencyErrU;
   delete m_cEfficiencyErrV;
 
-  delete m_hEfficiencyRPhiView;
   delete m_cEfficiencyRPhiViewU;
   delete m_cEfficiencyRPhiViewV;
-  delete m_hEfficiencyErrRPhiView;
   delete m_cEfficiencyErrRPhiViewU;
   delete m_cEfficiencyErrRPhiViewV;
 
@@ -718,10 +666,8 @@ void DQMHistAnalysisSVDEfficiencyModule::terminate()
     delete m_cEfficiencyErrU3Samples;
     delete m_cEfficiencyErrV3Samples;
 
-    delete m_hEfficiencyRPhiView3Samples;
     delete m_cEfficiencyRPhiViewU3Samples;
     delete m_cEfficiencyRPhiViewV3Samples;
-    delete m_hEfficiencyErrRPhiView3Samples;
     delete m_cEfficiencyErrRPhiViewU3Samples;
     delete m_cEfficiencyErrRPhiViewV3Samples;
   }

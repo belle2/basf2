@@ -20,13 +20,34 @@ TRGECLEventTimingDQMModule::TRGECLEventTimingDQMModule(): HistoModule()
 {
   setPropertyFlags(c_ParallelProcessingCertified);
   setDescription("ECL trigger event timing histograms");
-  trgecl_map = new TrgEclMapping();
+  m_trgecl_map = new TrgEclMapping();
+
+  m_histEventT0CoarseXMin = -150;
+  m_histEventT0CoarseXMax = 150;
+  m_histEventT0FineXMin = -150;
+  m_histEventT0FineXMax = 150;
+
+  for (int iii = 0; iii < c_NBinEventT0; iii++) {
+    if (iii <= 1) {
+      m_histEventT0NBin.push_back(100);
+      m_histEventT0XMin.push_back(-200);
+      m_histEventT0XMax.push_back(200);
+    } else if (iii <= 5) {
+      m_histEventT0NBin.push_back(100);
+      m_histEventT0XMin.push_back(-100);
+      m_histEventT0XMax.push_back(100);
+    } else {
+      m_histEventT0NBin.push_back(50);
+      m_histEventT0XMin.push_back(-50);
+      m_histEventT0XMax.push_back(50);
+    }
+  }
 }
 
 
 TRGECLEventTimingDQMModule::~TRGECLEventTimingDQMModule()
 {
-  delete trgecl_map;
+  delete m_trgecl_map;
 }
 
 void TRGECLEventTimingDQMModule::defineHisto()
@@ -51,14 +72,15 @@ void TRGECLEventTimingDQMModule::defineHisto()
     new TH1F("h_EventTimingQuality",
              "[TRGECL] Event timing quality ; Event timing quality ; Entries",
              4, 0, 4);
+
   m_histEventT0Coarse =
     new TH1F("h_EventT0Coarse",
              "[TRGECL] EventT0 with coarse event timing ; EventT0 (ns) ; Entries / 2 ns",
-             150, -150, 150);
+             150, m_histEventT0CoarseXMin, m_histEventT0CoarseXMax);
   m_histEventT0Fine =
     new TH1F("h_EventT0Fine",
              "[TRGECL] EventT0 with fine event timing ; EventT0 (ns) ; Entries / 2 ns",
-             150, -150, 150);
+             150, m_histEventT0FineXMin, m_histEventT0FineXMax);
 
   // set label for h_EventTimingQuality
   m_histEventTimingQuality->GetXaxis()->SetBinLabel(1, "None");
@@ -67,24 +89,7 @@ void TRGECLEventTimingDQMModule::defineHisto()
   m_histEventTimingQuality->GetXaxis()->SetBinLabel(4, "Super fine");
 
   // EventT0 histograms for different TC energy region
-  int nBins;
-  double minT0;
-  double maxT0;
-  for (int energyBin = 0; energyBin < NBinEventT0; energyBin++) {
-
-    if (energyBin <= 1) {
-      nBins =  200;
-      minT0 = -200;
-      maxT0 =  200;
-    } else if (energyBin <= 5) {
-      nBins =  100;
-      minT0 = -100;
-      maxT0 =  100;
-    } else {
-      nBins =  50;
-      minT0 = -50;
-      maxT0 =  50;
-    }
+  for (int energyBin = 0; energyBin < c_NBinEventT0; energyBin++) {
 
     // set TC energy(ADC) ranges for each histogram
     std::stringstream ss1, ss2;
@@ -97,8 +102,11 @@ void TRGECLEventTimingDQMModule::defineHisto()
     m_histEventT0[energyBin] =
       new TH1F("h_EventT0_MaxTCE_" + ECUT1 + "",
                "[TRGECL] EventT0 MaxTCE (" + ECUT2 + " ADC) ; EventT0 (ns); Entries / 2 ns",
-               nBins, minT0, maxT0);
+               m_histEventT0NBin[energyBin],
+               m_histEventT0XMin[energyBin],
+               m_histEventT0XMax[energyBin]);
   }
+
   oldDir->cd();
 }
 
@@ -128,7 +136,7 @@ void TRGECLEventTimingDQMModule::beginRun()
   m_histEventT0Coarse->Reset();
   m_histEventT0Fine->Reset();
 
-  for (int energyBin = 0; energyBin < NBinEventT0; energyBin++) {
+  for (int energyBin = 0; energyBin < c_NBinEventT0; energyBin++) {
     m_histEventT0[energyBin]->Reset();
   }
 
@@ -210,7 +218,7 @@ void TRGECLEventTimingDQMModule::event()
     if (TCEnergy > MaxTCEnergy) {
       MaxTCEnergy  = TCEnergy;
       MaxTCId      = TCId;
-      MaxTCThetaId = trgecl_map->getTCThetaIdFromTCId(TCId);
+      MaxTCThetaId = m_trgecl_map->getTCThetaIdFromTCId(TCId);
     }
   }
   if (MaxTCId == -1000) {
@@ -234,16 +242,22 @@ void TRGECLEventTimingDQMModule::event()
   // EventT0 with coarse or fine event timing
   if (gdlTimQuality == 1) {
     // coarse
-    m_histEventT0Coarse->Fill(eventT0);
+    if (eventT0 > m_histEventT0CoarseXMin &&
+        eventT0 < m_histEventT0CoarseXMax) {
+      m_histEventT0Coarse->Fill(eventT0);
+    }
   } else if (gdlTimQuality >= 2) {
     // fine or super fine
-    m_histEventT0Fine->Fill(eventT0);
+    if (eventT0 > m_histEventT0FineXMin &&
+        eventT0 < m_histEventT0FineXMax) {
+      m_histEventT0Fine->Fill(eventT0);
+    }
   }
 
   // set TC energy region for EventT0
-  bool IsMaxTCEnergy[NBinEventT0] = {false};
+  bool IsMaxTCEnergy[c_NBinEventT0] = {false};
   int EnergyBinWidth = 20;
-  for (int idx = 0; idx < NBinEventT0;  idx++) {
+  for (int idx = 0; idx < c_NBinEventT0;  idx++) {
     if (MaxTCEnergy >= 10 + EnergyBinWidth * idx &&
         MaxTCEnergy <= 10 + EnergyBinWidth * (idx + 1)) {
       IsMaxTCEnergy[idx] = true;
@@ -251,9 +265,12 @@ void TRGECLEventTimingDQMModule::event()
   }
 
   // fill EventT0 for different TC energy region
-  for (int binADC = 0 ; binADC < NBinEventT0; binADC++) {
+  for (int binADC = 0 ; binADC < c_NBinEventT0; binADC++) {
     if (IsMaxTCEnergy[binADC] == true) {
-      m_histEventT0[binADC]->Fill(eventT0);
+      if (eventT0 > m_histEventT0XMin[binADC] &&
+          eventT0 < m_histEventT0XMax[binADC]) {
+        m_histEventT0[binADC]->Fill(eventT0);
+      }
     }
   }
 

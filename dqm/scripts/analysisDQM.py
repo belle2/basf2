@@ -16,6 +16,7 @@ This module defines functions to add analysis DQM modules.
 import basf2 as b2
 from stdPi0s import stdPi0s
 import modularAnalysis as ma
+import vertex as vx
 
 
 def add_analysis_dqm(path):
@@ -34,6 +35,8 @@ def add_analysis_dqm(path):
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
     ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
+    # remove all K_S0 that fail the fit
+    vx.treeFit('K_S0:physDQM', conf_level=0.0, path=path, updateAllDaughters=True)
     ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
     # bhabha,hadrons
     ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)

@@ -122,13 +122,17 @@ void HLTZMQ2DsModule::event()
     };
 
     bool result = ZMQConnection::poll({{m_input.get(), reactToInput}}, -1);
-    if (!result && m_lastRun != 0) {
+    if (!result) {
       // didn't get any events, probably interrupted by a signal.
       // We're the input module so let's better have some event meta data
       // even if it's not useful
       // If the m_lastRun is 0, it is probably the lastEventMessage. Do not issue the endOfData.
-      m_eventMetaData.create();
-      m_eventMetaData->setEndOfData();
+      if (m_lastRun != 0) {
+        m_eventMetaData.create();
+        m_eventMetaData->setEndOfData();
+      } else {
+        m_eventMetaData->setEndOfRun(m_lastExperiment, m_lastRun);
+      }
     }
   } catch (zmq::error_t& error) {
     // This is an unexpected error: better report it.

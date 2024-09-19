@@ -449,10 +449,10 @@ class Reweighter:
         Checks if the tables are provided in a legacy format and converts them to the standard format.
         """
         result = None
+        str_to_pdg = {'B+': 521, 'B-': 521, 'B0': 511}
         if 'cal' in table.columns:
             result = pd.DataFrame(index=table.index)
             result['data_MC_ratio'] = table['cal']
-            str_to_pdg = {'B+': 521, 'B-': 521, 'B0': 511}
             result['PDG'] = table['Btag'].apply(lambda x: str_to_pdg.get(x))
             # Assume these are only efficiency tables
             result['mcPDG'] = result['PDG']
@@ -462,6 +462,18 @@ class Reweighter:
             result['data_MC_uncertainty_stat_up'] = table['cal_stat_error']
             result['data_MC_uncertainty_sys_dn'] = table['cal_sys_error']
             result['data_MC_uncertainty_sys_up'] = table['cal_sys_error']
+        elif 'cal factor' in table.columns:
+            result = pd.DataFrame(index=table.index)
+            result['data_MC_ratio'] = table['cal factor']
+            result['PDG'] = table['Btype'].apply(lambda x: str_to_pdg.get(x))
+            result['mcPDG'] = result['PDG']
+            result['threshold'] = table['sig prob cut']
+            # Assign the total error to the stat uncertainty and set syst. one to 0
+            result['data_MC_uncertainty_stat_dn'] = table['error']
+            result['data_MC_uncertainty_stat_up'] = table['error']
+            result['data_MC_uncertainty_sys_dn'] = 0
+            result['data_MC_uncertainty_sys_up'] = 0
+            result[_fei_mode_col] = table['mode']
         else:
             result = table
         result = result.query(f'threshold == {threshold}')
@@ -512,7 +524,8 @@ class Reweighter:
         """
         Adds weight columns according to the FEI calibration tables
         """
-        rest_str = 'Rest'
+        rest_str = 'rest'
+        particle.merged_table[_fei_mode_col]
         # Apply a weight value from the weight table to the ntuple, based on the binning
         binning_df = pd.DataFrame(index=ntuple_df.index)
         # Take absolute value of mcPDG for binning because we have charge already
@@ -525,7 +538,7 @@ class Reweighter:
         for reco_pdg, mc_pdg in particle.pdg_binning:
             plot_values[(reco_pdg, mc_pdg)] = {}
             binning_df.loc[binning_df['PDG'] == reco_pdg, _fei_mode_col] = particle.merged_table.query(
-                f'PDG == {reco_pdg} and {_fei_mode_col} == "{rest_str}"')[_fei_mode_col].values[0]
+                f'PDG == {reco_pdg} and {_fei_mode_col}.str.lower() == "{rest_str}"')[_fei_mode_col].values[0]
             for mode in particle.pdg_binning[(reco_pdg, mc_pdg)][_fei_mode_col]:
                 binning_df.loc[(binning_df['PDG'] == reco_pdg) & (binning_df['num_mode'] == int(mode[4:])), _fei_mode_col] = mode
             if self.evaluate_plots:

@@ -16,6 +16,7 @@ TRGGDLInjectionVetoFromOverlayModule::TRGGDLInjectionVetoFromOverlayModule() : M
 {
   setDescription("Module for adding to MC samples the information about the TRG active veto from "
                  "beam background overlay files.");
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("extensionName", m_extensionName,
            "Name added to default branch names", std::string("_beamBG"));
 }

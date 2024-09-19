@@ -234,6 +234,7 @@ def add_simulation(
 
     if components is None or 'TRG' in components:
         add_trigger_simulation(path, simulateT0jitter=simulateT0jitter, FilterEvents=FilterEvents)
+        path.add_module('TRGGDLInjectionVetoFromOverlay')
 
     # SVD digitization, BG Overlay, sorting and zero suppression
     if components is None or 'SVD' in components:

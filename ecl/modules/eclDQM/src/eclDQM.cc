@@ -19,6 +19,9 @@
 #include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
+#include <analysis/dataobjects/ParticleList.h>
+#include <analysis/VariableManager/Manager.h>
+#include <analysis/variables/ECLVariables.h>
 #include <framework/core/HistoModule.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Unit.h>
@@ -74,6 +77,7 @@ ECLDQMModule::ECLDQMModule()
            m_WaveformOption);
   addParam("DPHYTTYP", m_DPHYTTYP,
            "Flag to control trigger of delayed bhabha events; 0 - select events by 'bha_delay' trigger bit, 1 - select by TTYP_DPHY", false);
+  addParam("PI0PListName", m_pi0PListName, "Name of the pi0 particle list", std::string("pi0:eclDQM"));
 }
 
 ECLDQMModule::~ECLDQMModule()
@@ -237,6 +241,8 @@ void ECLDQMModule::defineHisto()
   h_trigtime_trigid->GetXaxis()->SetTitle("Crate ID (same as ECLCollector ID)");
   h_trigtime_trigid->GetYaxis()->SetTitle("Trigger time (only even, 0-142)");
 
+  h_pi0_mass = new TH1F("ecl_pi0_mass", "ecl_pi0_mass", 120, 0.08, 0.20);
+
   //cd into parent directory.
 
   oldDir->cd();
@@ -287,6 +293,7 @@ void ECLDQMModule::beginRun()
   h_pedrms_cellid->Reset();
   h_pedrms_thetaid->Reset();
   h_trigtime_trigid->Reset();
+  h_pi0_mass->Reset();
 }
 
 void ECLDQMModule::event()
@@ -422,6 +429,8 @@ void ECLDQMModule::event()
   }
   if (m_ECLDigits.getEntries() > 0)
     h_adc_hits->Fill((double)NDigits / (double)m_ECLDigits.getEntries()); //Fraction of high-energy hits
+
+  fillInvMassHistogram();
 }
 
 void ECLDQMModule::endRun()
@@ -438,5 +447,28 @@ bool ECLDQMModule::isRandomTrigger()
   if (!m_l1Trigger.isValid()) return false;
   return m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_RAND ||
          m_l1Trigger->getTimType() == TRGSummary::ETimingType::TTYP_POIS;
+}
+
+bool ECLDQMModule::fillInvMassHistogram()
+{
+  const std::string trg_identifier = "software_trigger_cut&skim&accept_hadron";
+  StoreObjPtr<SoftwareTriggerResult> result;
+
+  // check if trigger identifier is available
+  const std::map<std::string, int>& results = result->getResults();
+  if (results.find(trg_identifier) == results.end()) return false;
+  // apply software trigger
+  const bool accepted = (result->getResult(trg_identifier) == SoftwareTriggerCutResult::c_accept);
+  if (!accepted) return false;
+
+  StoreObjPtr<ParticleList> particles(m_pi0PListName);
+
+  for (unsigned int i = 0; i < particles->getListSize(); i++) {
+    const Particle* part = particles->getParticle(i);
+    auto inv_mass = Variable::eclClusterOnlyInvariantMass(part);
+    h_pi0_mass->Fill(inv_mass);
+  }
+
+  return true;
 }
 

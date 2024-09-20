@@ -13,6 +13,8 @@ import numpy as np
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 import pdg
+import warnings
+from pandas.errors import PerformanceWarning
 
 """
 A module that adds corrections to analysis dataframe.
@@ -627,35 +629,38 @@ def add_weights_to_dataframe(prefix: str,
     n_variations = kw_args.get('n_variations', 100)
     weight_name = kw_args.get('weight_name', "Weight")
     fillna = kw_args.get('fillna', 1.0)
-    reweighter = Reweighter(n_variations=n_variations,
-                            weight_name=weight_name,
-                            fillna=fillna)
-    variable_aliases = kw_args.get('variable_aliases')
-    if systematic.lower() == 'custom_fei':
-        cov_matrix = kw_args.get('cov_matrix')
-        reweighter.add_fei_particle(prefix=prefix,
-                                    table=custom_tables,
-                                    threshold=custom_thresholds,
-                                    variable_aliases=variable_aliases,
-                                    cov=cov_matrix
-                                    )
-    elif systematic.lower() == 'custom_pid':
-        sys_seed = kw_args.get('sys_seed')
-        syscorr = kw_args.get('syscorr')
-        if syscorr is None:
-            syscorr = True
-        reweighter.add_pid_particle(prefix=prefix,
-                                    weights_dict=custom_tables,
-                                    pdg_pid_variable_dict=custom_thresholds,
-                                    variable_aliases=variable_aliases,
-                                    sys_seed=sys_seed,
-                                    syscorr=syscorr
-                                    )
-    else:
-        raise ValueError(f'Systematic {systematic} is not supported!')
+    # Catch performance warnings from pandas
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", category=PerformanceWarning)
+        reweighter = Reweighter(n_variations=n_variations,
+                                weight_name=weight_name,
+                                fillna=fillna)
+        variable_aliases = kw_args.get('variable_aliases')
+        if systematic.lower() == 'custom_fei':
+            cov_matrix = kw_args.get('cov_matrix')
+            reweighter.add_fei_particle(prefix=prefix,
+                                        table=custom_tables,
+                                        threshold=custom_thresholds,
+                                        variable_aliases=variable_aliases,
+                                        cov=cov_matrix
+                                        )
+        elif systematic.lower() == 'custom_pid':
+            sys_seed = kw_args.get('sys_seed')
+            syscorr = kw_args.get('syscorr')
+            if syscorr is None:
+                syscorr = True
+            reweighter.add_pid_particle(prefix=prefix,
+                                        weights_dict=custom_tables,
+                                        pdg_pid_variable_dict=custom_thresholds,
+                                        variable_aliases=variable_aliases,
+                                        sys_seed=sys_seed,
+                                        syscorr=syscorr
+                                        )
+        else:
+            raise ValueError(f'Systematic {systematic} is not supported!')
 
-    result = reweighter.reweight(df, generate_variations=generate_variations)
-    if kw_args.get('show_plots'):
-        reweighter.print_coverage()
-        reweighter.plot_coverage()
-    return result
+        result = reweighter.reweight(df, generate_variations=generate_variations)
+        if kw_args.get('show_plots'):
+            reweighter.print_coverage()
+            reweighter.plot_coverage()
+        return result

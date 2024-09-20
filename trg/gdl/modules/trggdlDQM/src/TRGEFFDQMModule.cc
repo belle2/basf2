@@ -104,41 +104,25 @@ void TRGEFFDQMModule::defineHisto()
   m_nobha_stt_theta_psnecl       = new TH1F("nobha_stt_theta_psnecl", "", 18, 0, 180);
   m_nobha_stt_theta_psnecl_ftdf  = new TH1F("nobha_stt_theta_psnecl_ftdf", "", 18, 0, 180);
 
-  m_hie_E                        = new TH1F("hie_E", "", 24, 0, 12);
-  m_hie_E_psnecl                 = new TH1F("hie_E_psnecl", "", 24, 0, 12);
-  m_hie_E_psnecl_ftdf            = new TH1F("hie_E_psnecl_ftdf", "", 24, 0, 12);
+  m_hie_E                        = new TH1F("hie_E", "", 60, 0, 12);
+  m_hie_E_psnecl                 = new TH1F("hie_E_psnecl", "", 60, 0, 12);
+  m_hie_E_psnecl_ftdf            = new TH1F("hie_E_psnecl_ftdf", "", 60, 0, 12);
 
-  m_hie_theta                    = new TH1F("hie_theta", "", 18, 0, 180);
-  m_hie_theta_psnecl             = new TH1F("hie_theta_psnecl", "", 18, 0, 180);
-  m_hie_theta_psnecl_ftdf        = new TH1F("hie_theta_psnecl_ftdf", "", 18, 0, 180);
+  m_nobha_hie_E                  = new TH1F("nobha_hie_E", "", 60, 0, 12);
+  m_nobha_hie_E_psnecl           = new TH1F("nobha_hie_E_psnecl", "", 60, 0, 12);
+  m_nobha_hie_E_psnecl_ftdf      = new TH1F("nobha_hie_E_psnecl_ftdf", "", 60, 0, 12);
 
-  m_hie_phi                      = new TH1F("hie_phi", "", 36, -180., 180.);
-  m_hie_phi_psnecl               = new TH1F("hie_phi_psnecl", "", 36, -180., 180.);
-  m_hie_phi_psnecl_ftdf          = new TH1F("hie_phi_psnecl_ftdf", "", 36, -180., 180.);
+  m_ecltiming_E                  = new TH1F("ecltiming_E", "", 60, 0, 12);
+  m_ecltiming_E_psnecl           = new TH1F("ecltiming_E_psnecl", "", 60, 0, 12);
+  m_ecltiming_E_psnecl_ftdf      = new TH1F("ecltiming_E_psnecl_ftdf", "", 60, 0, 12);
 
-  m_nobha_hie_E                  = new TH1F("nobha_hie_E", "", 24, 0, 12);
-  m_nobha_hie_E_psnecl           = new TH1F("nobha_hie_E_psnecl", "", 24, 0, 12);
-  m_nobha_hie_E_psnecl_ftdf      = new TH1F("nobha_hie_E_psnecl_ftdf", "", 24, 0, 12);
+  m_ecltiming_theta              = new TH1F("ecltiming_theta", "", 18, 0, 180);
+  m_ecltiming_theta_psnecl       = new TH1F("ecltiming_theta_psnecl", "", 18, 0, 180);
+  m_ecltiming_theta_psnecl_ftdf  = new TH1F("ecltiming_theta_psnecl_ftdf", "", 18, 0, 180);
 
-  m_nobha_hie_theta              = new TH1F("nobha_hie_theta", "", 18, 0, 180);
-  m_nobha_hie_theta_psnecl       = new TH1F("nobha_hie_theta_psnecl", "", 18, 0, 180);
-  m_nobha_hie_theta_psnecl_ftdf  = new TH1F("nobha_hie_theta_psnecl_ftdf", "", 18, 0, 180);
-
-  m_nobha_hie_phi                = new TH1F("nobha_hie_phi", "", 36, -180., 180.);
-  m_nobha_hie_phi_psnecl         = new TH1F("nobha_hie_phi_psnecl", "", 36, -180., 180.);
-  m_nobha_hie_phi_psnecl_ftdf    = new TH1F("nobha_hie_phi_psnecl_ftdf", "", 36, -180., 180.);
-
-  m_c1hie_E                      = new TH1F("c1hie_E", "", 24, 0, 12);
-  m_c1hie_E_psnecl               = new TH1F("c1hie_E_psnecl", "", 24, 0, 12);
-  m_c1hie_E_psnecl_ftdf          = new TH1F("c1hie_E_psnecl_ftdf", "", 24, 0, 12);
-
-  m_c1hie_theta                  = new TH1F("c1hie_theta", "", 18, 0, 180);
-  m_c1hie_theta_psnecl           = new TH1F("c1hie_theta_psnecl", "", 18, 0, 180);
-  m_c1hie_theta_psnecl_ftdf      = new TH1F("c1hie_theta_psnecl_ftdf", "", 18, 0, 180);
-
-  m_c1hie_phi                    = new TH1F("c1hie_phi", "", 36, -180., 180.);
-  m_c1hie_phi_psnecl             = new TH1F("c1hie_phi_psnecl", "", 36, -180., 180.);
-  m_c1hie_phi_psnecl_ftdf        = new TH1F("c1hie_phi_psnecl_ftdf", "", 36, -180., 180.);
+  m_ecltiming_phi                = new TH1F("ecltiming_phi", "", 36, -180., 180.);
+  m_ecltiming_phi_psnecl         = new TH1F("ecltiming_phi_psnecl", "", 36, -180., 180.);
+  m_ecltiming_phi_psnecl_ftdf    = new TH1F("ecltiming_phi_psnecl_ftdf", "", 36, -180., 180.);
 
   m_klmhit_phi                   = new TH1F("klmhit_phi", "", 18, -180., 180.);
   m_klmhit_phi_psnecl            = new TH1F("klmhit_phi_psnecl", "", 18, -180., 180.);
@@ -201,6 +185,11 @@ void TRGEFFDQMModule::event()
 {
   // bool debug = 1;   // if(debug)cout<<"line "<<__LINE__<<endl;
 
+  if (!m_trgSummary.isValid()) {
+    B2WARNING("TRGSummary object not available but require to estimate trg efficiency");
+    return;
+  }
+
   if (!m_TrgResult.isValid()) {
     B2WARNING("SoftwareTriggerResult object not available but require to select bhabha/mumu/hadron events skim");
     return;
@@ -226,6 +215,7 @@ void TRGEFFDQMModule::event()
   double E_ecl_hie =
     0;       // the ECL total energy in the thetaID range 2<=ThetaID<=15 (corresponds to 22.49<=theta<=126.80) for ehigh bit
   for (const auto& test_b2eclcluster : m_ECLClusters) {
+    if (!(test_b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
     double energy = test_b2eclcluster.getEnergyRaw();
     double theta  = test_b2eclcluster.getTheta() / Unit::deg;
 
@@ -235,63 +225,44 @@ void TRGEFFDQMModule::event()
     }
   }
 
-  bool trg_hie_psncdc     = 0;  // for ECL energy trigger, for hie
-  bool trg_hie_Eecl       = 0;  // for ECL energy trigger, for hie
-  bool trg_c1hie_psncdc   = 0;  // for ECL energy trigger, for c1hie
-  bool trg_c1hie_Eecl     = 0;  // for ECL energy trigger. for c1hie
-  bool trg_nobha_hie_Eecl = 0;
+  bool trg_hie_psncdc       = 0;  // for ECL energy trigger, for hie
+  bool trg_hie_Eecl         = 0;  // for ECL energy trigger, for hie
+  bool trg_ecltiming_psncdc = 0;  // for ECL energy trigger, for ecltiming
+  bool trg_ecltiming_Eecl   = 0;  // for ECL energy trigger. for ecltiming
+  bool trg_nobha_hie_Eecl   = 0;
 
   for (const auto& b2eclcluster : m_ECLClusters) {
     //members in mdst/dataobjects/include/ECLCluster.h
-    // double energy = b2eclcluster.getEnergyRaw();
     double phi    = b2eclcluster.getPhi() / Unit::deg;
     double theta  = b2eclcluster.getTheta() / Unit::deg;
 
-    // bool trg_psncdc =  m_trgSummary->testPsnm("fff") || m_trgSummary->testPsnm("ffo")
-    bool trg_psncdc    = m_trgSummary->testPsnm("ffy") || m_trgSummary->testPsnm("ffo");
+    bool trg_psncdc    = m_trgSummary->testPsnm("ffy") || m_trgSummary->testPsnm("fyo") || m_trgSummary->testPsnm("stt");
     bool trg_hie       = m_trgSummary->testFtdl("hie");
     bool trg_hie_nobha = m_trgSummary->testInput("ehigh");   // remove the bha_veto for hie bit
-    bool trg_c1hie     = m_trgSummary->testFtdl("c1hie");
+    bool trg_ecltiming = m_trgSummary->testFtdl("ecltiming");
 
-    m_hie_theta->Fill(theta);
-    m_hie_phi->Fill(phi);
-    m_nobha_hie_theta->Fill(theta);
-    m_nobha_hie_phi->Fill(phi);
-
-    m_c1hie_theta->Fill(theta);
-    m_c1hie_phi->Fill(phi);
+    m_ecltiming_theta->Fill(theta);
+    m_ecltiming_phi->Fill(phi);
 
     if (trg_psncdc) {
       trg_hie_psncdc   = 1;
-      trg_c1hie_psncdc = 1;
+      trg_ecltiming_psncdc = 1;
 
-      m_hie_theta_psnecl->Fill(theta);
-      m_hie_phi_psnecl->Fill(phi);
-
-      m_c1hie_theta_psnecl->Fill(theta);
-      m_c1hie_phi_psnecl->Fill(phi);
-
-      m_nobha_hie_theta_psnecl->Fill(theta);
-      m_nobha_hie_phi_psnecl->Fill(phi);
+      m_ecltiming_theta_psnecl->Fill(theta);
+      m_ecltiming_phi_psnecl->Fill(phi);
     }
 
     if (trg_psncdc && trg_hie) {
       trg_hie_Eecl = 1;
-
-      m_hie_theta_psnecl_ftdf->Fill(theta);
-      m_hie_phi_psnecl_ftdf->Fill(phi);
     }
     if (trg_psncdc && trg_hie_nobha) {
       trg_nobha_hie_Eecl = 1;
-
-      m_nobha_hie_theta_psnecl_ftdf->Fill(theta);
-      m_nobha_hie_phi_psnecl_ftdf->Fill(phi);
     }
-    if (trg_psncdc && trg_c1hie) {
-      trg_c1hie_Eecl = 1;
+    if (trg_psncdc && trg_ecltiming) {
+      trg_ecltiming_Eecl = 1;
 
-      m_c1hie_theta_psnecl_ftdf->Fill(theta);
-      m_c1hie_phi_psnecl_ftdf->Fill(phi);
+      m_ecltiming_theta_psnecl_ftdf->Fill(theta);
+      m_ecltiming_phi_psnecl_ftdf->Fill(phi);
     }
   }
 
@@ -309,12 +280,12 @@ void TRGEFFDQMModule::event()
     m_nobha_hie_E_psnecl_ftdf->Fill(E_ecl_hie);
   }
 
-  m_c1hie_E->Fill(E_ecl_hie);
-  if (trg_c1hie_psncdc) {
-    m_c1hie_E_psnecl->Fill(E_ecl_hie);
+  m_ecltiming_E->Fill(E_ecl_all);
+  if (trg_ecltiming_psncdc) {
+    m_ecltiming_E_psnecl->Fill(E_ecl_all);
   }
-  if (trg_c1hie_Eecl) {
-    m_c1hie_E_psnecl_ftdf->Fill(E_ecl_hie);
+  if (trg_ecltiming_Eecl) {
+    m_ecltiming_E_psnecl_ftdf->Fill(E_ecl_all);
   }
 
 

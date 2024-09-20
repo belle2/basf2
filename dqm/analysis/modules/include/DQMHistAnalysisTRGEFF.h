@@ -12,19 +12,13 @@
 #pragma once
 
 #ifdef _BELLE2_EPICS
-// EPICS
-// #include "cadef.h"
 #endif
 
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>
 
 
-//ARICH
-// #include <arich/utility/ARICHChannelHist.h>
-
 #include <vector>
-
 #include <TCanvas.h>
 #include <TLine.h>
 #include <TH2Poly.h>
@@ -83,9 +77,6 @@ namespace Belle2 {
     /** Run type flag for debug runs. */
     bool m_IsDebugRun;
 
-    // TCanvas* m_cPhi_eff_psnecl_ftdf = nullptr;       /**<Canvas for TRGEFF efficiency, simplified one for CR shifter*/
-    // TH1F* m_hPhi_eff_psnecl_ftdf    = nullptr;       /**<Histogram for TRGEFF efficiency, phi of f bit with ecl mask */
-
     /***********************************************************************
      * More details meaning of the following histograms could be found in  *
      * 'basf2/trg/gdl/modules/trggdlDQM/include/TRGEFFDQMModule.h'  and    *
@@ -111,17 +102,16 @@ namespace Belle2 {
     //  CDC TRG, remove the bhabha veto for f bit
     TH1F* m_nobha_hPt_psnecl        = nullptr;   /**< Pt of ecl mask bit */
     TH1F* m_nobha_hPt_psnecl_ftdf   = nullptr;   /**< remove the bha_veto, Pt of f bit with ecl mask */
-    TCanvas* m_nobha_cPt_eff        = nullptr;   /**< remove the bha_veto,Canvas for TRGEFF efficiency, Pt */
-    TEfficiency* m_nobha_hPt_eff    = nullptr;   /**< remove the bha_veto,the efficiency of Pt for f bit */
+    TCanvas* m_nobha_cPt_eff        = nullptr;   /**< remove the bha_veto, Canvas for TRGEFF efficiency, Pt */
+    TEfficiency* m_nobha_hPt_eff    = nullptr;   /**< remove the bha_veto, the efficiency of Pt for f bit */
 
     // (t3>0 and !bhaveto and !veto),  for z bit
     /** for CDC TRG, the histograms for 3-momentum p with ecl mask bits,
      * p of z bit with ecl mask bits. And the canvas of p and the efficiency of p */
     TH1F* m_hP3_z_psnecl            = nullptr;  /**< p of ecl mask bit */
     TH1F* m_hP3_z_psnecl_ftdf       = nullptr;  /**< p of z bit with ecl mask */
-    TCanvas* m_cP3_z_eff            = nullptr;  /**< Canvas for TRGEFF efficiency,  z bit */
+    TCanvas* m_cP3_z_eff            = nullptr;  /**< Canvas for TRGEFF efficiency, z bit */
     TEfficiency* m_hP3_z_eff        = nullptr;  /**< the efficiency of p for z bit */
-
 
     //  (t3>0 and !bhaveto and !veto), for y bit
     /** for CDC TRG, the histograms for 3-momentum p with ecl mask bits,
@@ -198,7 +188,7 @@ namespace Belle2 {
     TEfficiency* m_nobha_stt_theta_eff  = nullptr;  /**< remove the bha_veto, the efficiency of theta for stt bit */
 
 
-    //-"hie" with ECL cluster energy sum distribution, as well as θ, phi.
+    //-"hie" with ECL cluster energy sum distribution
     /** for ECL TRG, the histograms for the sum energy E distribution in an event within the thetaID range of the cdc mask bits,
      * and the sum E of the hie bit with cdc mask bits. And the canvas and the efficiency for the hie bit. */
     TH1F* m_hie_E_psnecl                = nullptr;   /**< E of cdc mask bit */
@@ -206,50 +196,31 @@ namespace Belle2 {
     TCanvas* m_c_hie_E_eff              = nullptr;   /**< canvas for TRGEFF efficiency,  hie bit */
     TEfficiency* m_hie_E_eff            = nullptr;   /**< the efficiency of phi for hie bit */
 
-    TH1F* m_hie_theta_psnecl            = nullptr;   /**< theta of cdc mask bit */
-    TH1F* m_hie_theta_psnecl_ftdf       = nullptr;   /**< theta of hie bit with cdc mask */
-    TCanvas* m_c_hie_theta_eff          = nullptr;   /**< canvas for TRGEFF efficiency,  hie bit */
-    TEfficiency* m_hie_theta_eff        = nullptr;   /**< the efficiency of theta for hie bit */
-
-    TH1F* m_hie_phi_psnecl              = nullptr;   /**< phi of cdc mask bit */
-    TH1F* m_hie_phi_psnecl_ftdf         = nullptr;   /**< phi of hie bit with cdc mask */
-    TCanvas* m_c_hie_phi_eff            = nullptr;   /**< canvas for TRGEFF efficiency,  hie bit */
-    TEfficiency* m_hie_phi_eff          = nullptr;   /**< the efficiency of phi for hie bit */
-
-    // remove the bha_veto for hie bit (the distribution of sum E, theta and phi)
+    // remove the bha_veto for hie bit (the distribution of sum E)
     TH1F* m_nobha_hie_E_psnecl          = nullptr;  /**< E of cdc mask bit */
     TH1F* m_nobha_hie_E_psnecl_ftdf     = nullptr;  /**< remove the bha_veto, E of hie bit with cdc mask */
     TCanvas* m_c_nobha_hie_E_eff        = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  hie bit */
     TEfficiency* m_nobha_hie_E_eff      = nullptr;  /**< remove the bha_veto, the efficiency of phi for hie bit */
 
-    TH1F* m_nobha_hie_theta_psnecl      = nullptr;  /**< theta of cdc mask bit */
-    TH1F* m_nobha_hie_theta_psnecl_ftdf = nullptr;  /**< remove the bha_veto, theta of hie bit with cdc mask */
-    TCanvas* m_c_nobha_hie_theta_eff    = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  hie bit */
-    TEfficiency* m_nobha_hie_theta_eff  = nullptr;  /**< remove the bha_veto, the efficiency of theta for hie bit */
-
-    TH1F* m_nobha_hie_phi_psnecl        = nullptr;  /**< phi of cdc mask bit */
-    TH1F* m_nobha_hie_phi_psnecl_ftdf   = nullptr;  /**< remove the bha_veto, phi of hie bit with cdc mask */
-    TCanvas* m_c_nobha_hie_phi_eff      = nullptr;  /**< remove the bha_veto, canvas for TRGEFF efficiency,  hie bit */
-    TEfficiency* m_nobha_hie_phi_eff    = nullptr;  /**< remove the bha_veto, the efficiency of phi for hie bit */
 
     /** for ECL TRG, the histograms for the sum energy E distribution in an event with cdc mask bits,
-     * the c1hie bit with cdc mask bits. And the canvas and the efficiency of c1hie bit. */
-    TH1F* m_c1hie_E_psnecl              = nullptr;    /**< E of cdc mask bit */
-    TH1F* m_c1hie_E_psnecl_ftdf         = nullptr;    /**< E of c1hie bit with cdc mask */
-    TCanvas* m_c_c1hie_E_eff            = nullptr;    /**< canvas for TRGEFF efficiency,  c1hie bit */
-    TEfficiency* m_c1hie_E_eff          = nullptr;    /**< the efficiency of phi for c1hie bit */
+     * the ecltiming bit with cdc mask bits. And the canvas and the efficiency of ecltiming bit. */
+    TH1F* m_ecltiming_E_psnecl          = nullptr;    /**< E of cdc mask bit */
+    TH1F* m_ecltiming_E_psnecl_ftdf     = nullptr;    /**< E of ecltiming bit with cdc mask */
+    TCanvas* m_c_ecltiming_E_eff        = nullptr;    /**< canvas for TRGEFF efficiency,  ecltiming bit */
+    TEfficiency* m_ecltiming_E_eff      = nullptr;    /**< the efficiency of phi for ecltiming bit */
 
-    // the theta distribution for the c1hie bit.
-    TH1F* m_c1hie_theta_psnecl          = nullptr;    /**< theta of cdc mask bit */
-    TH1F* m_c1hie_theta_psnecl_ftdf     = nullptr;    /**< theta of c1hie bit with cdc mask */
-    TCanvas* m_c_c1hie_theta_eff        = nullptr;    /**< canvas for TRGEFF efficiency,  c1hie bit */
-    TEfficiency* m_c1hie_theta_eff      = nullptr;    /**< the efficiency of theta for c1hie bit */
+    // the theta distribution for the ecltiming bit.
+    TH1F* m_ecltiming_theta_psnecl      = nullptr;    /**< theta of cdc mask bit */
+    TH1F* m_ecltiming_theta_psnecl_ftdf = nullptr;    /**< theta of ecltiming bit with cdc mask */
+    TCanvas* m_c_ecltiming_theta_eff    = nullptr;    /**< canvas for TRGEFF efficiency,  ecltiming bit */
+    TEfficiency* m_ecltiming_theta_eff  = nullptr;    /**< the efficiency of theta for ecltiming bit */
 
-    // the phi distribution for the c1hie bit. the histograms of the cdc mask bits, the c1hie with cdc mask bits.
-    TH1F* m_c1hie_phi_psnecl            = nullptr;    /**< phi of cdc mask bit */
-    TH1F* m_c1hie_phi_psnecl_ftdf       = nullptr;    /**< phi of c1hie bit with cdc mask */
-    TCanvas* m_c_c1hie_phi_eff          = nullptr;    /**< canvas for TRGEFF efficiency,  c1hie bit */
-    TEfficiency* m_c1hie_phi_eff        = nullptr;    /**< the efficiency of phi for c1hie bit */
+    // the phi distribution for the ecltiming bit. the histograms of the cdc mask bits, the ecltiming with cdc mask bits.
+    TH1F* m_ecltiming_phi_psnecl        = nullptr;    /**< phi of cdc mask bit */
+    TH1F* m_ecltiming_phi_psnecl_ftdf   = nullptr;    /**< phi of ecltiming bit with cdc mask */
+    TCanvas* m_c_ecltiming_phi_eff      = nullptr;    /**< canvas for TRGEFF efficiency,  ecltiming bit */
+    TEfficiency* m_ecltiming_phi_eff    = nullptr;    /**< the efficiency of phi for ecltiming bit */
 
 
     /** for KLM TRG, the histograms for the phi of the ecl mask bits, and the phi of klmhit bit with ecl mask bits.
@@ -278,12 +249,12 @@ namespace Belle2 {
     TCanvas* m_c_eklmhit_theta_eff      = nullptr;    /**< canvas for TRGEFF efficiency,  eklmhit bit */
     TEfficiency* m_eklmhit_theta_eff    = nullptr;    /**< the efficiency of theta for eklmhit bit */
 
-    std::vector<std::pair<std::string, TH1F**>> histList; /**< the histogram list */
-    std::vector<std::tuple<TH1F*, TH1F*, TEfficiency**>> efficiencyPairs; /**< the efficiency pair list */
-    std::vector<std::tuple<TCanvas*, TEfficiency*>> canvasEfficiencyPairs; /**< the Canvas pair list */
+    std::vector<std::pair<std::string, TH1F**>> m_histList; /**< the histogram list */
+    std::vector<std::tuple<TH1F*, TH1F*, TEfficiency**>> m_efficiencyPairs; /**< the efficiency pair list */
+    std::vector<std::tuple<TCanvas*, TEfficiency*>> m_canvasEfficiencyPairs; /**< the Canvas pair list */
 
     //mirabelle
-    Belle2::MonitoringObject* mon_trgeff = nullptr; /**< MonitoringObject for trg */
+    Belle2::MonitoringObject* m_mon_trgeff = nullptr; /**< MonitoringObject for trg */
 
   };
 

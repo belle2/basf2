@@ -157,43 +157,27 @@ namespace Belle2 {
     TH1F* m_nobha_stt_theta_psnecl      = nullptr;
     TH1F* m_nobha_stt_theta_psnecl_ftdf = nullptr;
 
-    //-"hie" with ECL cluster energy sum distribution, as well as gamma θ, phi.
+    //-"hie" with ECL cluster energy sum distribution.
     TH1F* m_hie_E                       = nullptr;
     TH1F* m_hie_E_psnecl                = nullptr;
     TH1F* m_hie_E_psnecl_ftdf           = nullptr;
-
-    TH1F* m_hie_theta                   = nullptr;
-    TH1F* m_hie_theta_psnecl            = nullptr;
-    TH1F* m_hie_theta_psnecl_ftdf       = nullptr;
-
-    TH1F* m_hie_phi                     = nullptr;
-    TH1F* m_hie_phi_psnecl              = nullptr;
-    TH1F* m_hie_phi_psnecl_ftdf         = nullptr;
 
     TH1F* m_nobha_hie_E                 = nullptr;    // remove the bha_veto
     TH1F* m_nobha_hie_E_psnecl          = nullptr;
     TH1F* m_nobha_hie_E_psnecl_ftdf     = nullptr;
 
-    TH1F* m_nobha_hie_theta             = nullptr;
-    TH1F* m_nobha_hie_theta_psnecl      = nullptr;
-    TH1F* m_nobha_hie_theta_psnecl_ftdf = nullptr;
+    // ecltiming
+    TH1F* m_ecltiming_E                 = nullptr;
+    TH1F* m_ecltiming_E_psnecl          = nullptr;
+    TH1F* m_ecltiming_E_psnecl_ftdf     = nullptr;
 
-    TH1F* m_nobha_hie_phi               = nullptr;
-    TH1F* m_nobha_hie_phi_psnecl        = nullptr;
-    TH1F* m_nobha_hie_phi_psnecl_ftdf   = nullptr;
+    TH1F* m_ecltiming_theta             = nullptr;
+    TH1F* m_ecltiming_theta_psnecl      = nullptr;
+    TH1F* m_ecltiming_theta_psnecl_ftdf = nullptr;
 
-    // c1hie
-    TH1F* m_c1hie_E                   = nullptr;
-    TH1F* m_c1hie_E_psnecl            = nullptr;
-    TH1F* m_c1hie_E_psnecl_ftdf       = nullptr;
-
-    TH1F* m_c1hie_theta               = nullptr;
-    TH1F* m_c1hie_theta_psnecl        = nullptr;
-    TH1F* m_c1hie_theta_psnecl_ftdf   = nullptr;
-
-    TH1F* m_c1hie_phi                 = nullptr;
-    TH1F* m_c1hie_phi_psnecl          = nullptr;
-    TH1F* m_c1hie_phi_psnecl_ftdf     = nullptr;
+    TH1F* m_ecltiming_phi               = nullptr;
+    TH1F* m_ecltiming_phi_psnecl        = nullptr;
+    TH1F* m_ecltiming_phi_psnecl_ftdf   = nullptr;
 
     // -KLM TRG - - - for track φ,θ distribution
     TH1F* m_klmhit_phi                = nullptr;

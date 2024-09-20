@@ -173,7 +173,7 @@ void StatisticsTimingHLTDQMModule::defineHisto()
 void StatisticsTimingHLTDQMModule::initialize()
 {
   m_trgSummary.isOptional();
-  m_svdShaperDigits.isOptional();
+  // m_svdShaperDigits.isOptional();
   m_cdcHits.isOptional();
   m_eclDigits.isOptional();
 
@@ -274,7 +274,7 @@ void StatisticsTimingHLTDQMModule::event()
   }
 
   const uint32_t nCDCHits = m_cdcHits.isOptional() ? m_cdcHits.getEntries() : 0;
-  const uint32_t nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
+  // const uint32_t nSVDShaperDigits = m_svdShaperDigits.isOptional() ? m_svdShaperDigits.getEntries() : 0;
   const uint32_t nECLDigits = m_eclDigits.isOptional() ? m_eclDigits.getEntries() : 0;
   if (!m_trgSummary.isValid()) {
     return;
@@ -283,13 +283,13 @@ void StatisticsTimingHLTDQMModule::event()
     if (m_trgSummary->testInput("passive_veto") == 0) { // These events would stay even with just passive veto
       m_processingTimePassiveVeto->Fill(processingTimeSum - m_lastProcessingTimeSum);
 
-      m_procTimeVsnSVDShaperDigitsPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
+      // m_procTimeVsnSVDShaperDigitsPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
       m_procTimeVsnCDCHitsPassiveVeto->Fill(nCDCHits, processingTimeSum - m_lastProcessingTimeSum);
       m_procTimeVsnECLDigitsPassiveVeto->Fill(nECLDigits, processingTimeSum - m_lastProcessingTimeSum);
     } else {
       m_processingTimeNotPassiveVeto->Fill(processingTimeSum - m_lastProcessingTimeSum);
 
-      m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
+      // m_procTimeVsnSVDShaperDigitsNotPassiveVeto->Fill(nSVDShaperDigits, processingTimeSum - m_lastProcessingTimeSum);
       m_procTimeVsnCDCHitsNotPassiveVeto->Fill(nCDCHits, processingTimeSum - m_lastProcessingTimeSum);
       m_procTimeVsnECLDigitsNotPassiveVeto->Fill(nECLDigits, processingTimeSum - m_lastProcessingTimeSum);
     }

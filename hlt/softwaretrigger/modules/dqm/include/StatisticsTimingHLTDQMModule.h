@@ -174,7 +174,7 @@ namespace Belle2 {
       StoreObjPtr<TRGSummary> m_trgSummary;
 
       /// SVD strips
-      StoreArray<SVDShaperDigit> m_svdShaperDigits;
+      // StoreArray<SVDShaperDigit> m_svdShaperDigits;
 
       /// CDC Hits
       StoreArray<CDCHit> m_cdcHits;

@@ -136,7 +136,11 @@ void StatisticsTimingHLTDQMModule::initialize()
 
       pclose(pipe);
 
-      m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      if (host.length() == 5) {
+        m_hlt_unit = atoi(host.substr(3, 2).c_str());
+      } else {
+        B2WARNING("HLT unit number not found");
+      }
     } else {
       B2WARNING("HLT unit number not found");
     }

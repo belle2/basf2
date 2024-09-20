@@ -218,6 +218,7 @@ void TRGEFFDQMModule::event()
     if (!(test_b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
     double energy = test_b2eclcluster.getEnergyRaw();
     double theta  = test_b2eclcluster.getTheta() / Unit::deg;
+    if (energy < 0.1) continue;
 
     E_ecl_all = E_ecl_all + energy;
     if (theta >= 22.49 && theta <= 126.8) {
@@ -371,21 +372,8 @@ void TRGEFFDQMModule::event()
       continue;
     }
 
-    Belle2::RecoTrack* track = b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
-    if (!track) {
-      B2WARNING("Can not access RecoTrack of this Belle2::Track");
-      nitrack++;
-      continue;
-    }
-
-    const genfit::FitStatus* fs = track->getTrackFitStatus();
-    if (!fs) {
-      B2WARNING("Can not access FitStatus of this Track");
-      nitrack++;
-      continue;
-    }
     // require high NDF track
-    int ndf = fs->getNdf();
+    int ndf = fitresult->getNDF();
     if (ndf < 20) {
       nitrack++;
       continue;
@@ -526,22 +514,8 @@ void TRGEFFDQMModule::event()
           continue;
         }
 
-        Belle2::RecoTrack* jtrack = j_b2track.getRelatedTo<Belle2::RecoTrack>(m_recoTrackArrayName);
-        if (!jtrack) {
-          B2WARNING("Can not access RecoTrack of this Belle2::Track");
-          njtrack++;
-          continue;
-        }
-
-        const genfit::FitStatus* jfs = jtrack->getTrackFitStatus();
-        if (!jfs) {
-          B2WARNING("Can not access FitStatus of this Track");
-          njtrack++;
-          continue;
-        }
-
         // require high NDF track
-        int jndf = jfs->getNdf();
+        int jndf = jfitresult->getNDF();
         if (jndf < 20) {
           njtrack++;
           continue;

@@ -101,6 +101,14 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_triggerVariablesHistograms[variable]->SetXTitle(("SoftwareTriggerVariable " + variable).c_str());
   }
 
+  for (const std::string& trigger : m_param_l1Identifiers) {
+    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
+    m_l1Histograms[trigger]->SetXTitle("");
+    m_l1Histograms[trigger]->SetOption("hist");
+    m_l1Histograms[trigger]->SetStats(false);
+    m_l1Histograms[trigger]->SetMinimum(0);
+  }
+
   for (const auto& cutIdentifier : m_param_cutResultIdentifiers) {
 
     const std::string& title = cutIdentifier.first;
@@ -143,6 +151,10 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     for (const std::string& cutTitle : cuts) {
       index++;
       m_cutResultHistograms[title]->GetXaxis()->SetBinLabel(index, cutTitle.c_str());
+
+      for (const std::string& trigger : m_param_l1Identifiers) {
+        m_l1Histograms[trigger]->GetXaxis()->SetBinLabel(index, cutTitle.c_str());
+      }
     }
   }
 
@@ -154,14 +166,6 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_cutResultHistograms["total_result"]->SetOption("hist");
     m_cutResultHistograms["total_result"]->SetStats(false);
     m_cutResultHistograms["total_result"]->SetMinimum(0);
-  }
-
-  for (const std::string& trigger : m_param_l1Identifiers) {
-    m_l1Histograms.emplace(trigger, new TH1F(trigger.c_str(), ("Events triggered in L1 " + trigger).c_str(), 1, 0, 0));
-    m_l1Histograms[trigger]->SetXTitle("");
-    m_l1Histograms[trigger]->SetOption("hist");
-    m_l1Histograms[trigger]->SetStats(false);
-    m_l1Histograms[trigger]->SetMinimum(0);
   }
 
   // And also one for the total numbers
@@ -367,7 +371,9 @@ void SoftwareTriggerHLTDQMModule::event()
           continue;
         }
 
+        float index = 0;
         for (auto const& cutIdentifier : m_param_cutResultIdentifiers) {
+          index++;
           const std::string& title = cutIdentifier.first;
           const auto& mapVal = *(m_param_cutResultIdentifiers[title].begin());
           const std::string& baseIdentifier = mapVal.first;
@@ -383,7 +389,9 @@ void SoftwareTriggerHLTDQMModule::event()
 
               if (cutEntry != results.end()) {
                 const int cutResult = cutEntry->second;
-                m_l1Histograms[l1Trigger]->Fill(cutTitle.c_str(), cutResult > 0);
+                if (cutResult > 0) {
+                  m_l1Histograms[l1Trigger]->Fill(index - 0.5);
+                }
               }
             }
           }
@@ -391,7 +399,6 @@ void SoftwareTriggerHLTDQMModule::event()
 
         const bool totalResult = FinalTriggerDecisionCalculator::getFinalTriggerDecision(*m_triggerResult);
         m_l1Histograms[l1Trigger]->Fill("hlt_result", totalResult > 0);
-        m_l1Histograms[l1Trigger]->LabelsDeflate("X");
       }
       if (m_param_create_total_result_histograms) {
         for (const std::string& l1Trigger : m_param_additionalL1Identifiers) {

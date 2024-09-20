@@ -11,6 +11,7 @@
 import sys
 
 import basf2
+import ROOT  # noqa
 from ROOT.Belle2 import KLMTimeAlgorithm
 from klm_calibration_utils import get_time_pre_collector_path
 from prompt.calibrations.caf_klm_time import get_collector

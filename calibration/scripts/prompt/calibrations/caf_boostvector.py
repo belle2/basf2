@@ -82,6 +82,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
+    import ROOT  # noqa
     from ROOT.Belle2 import BoostVectorAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana

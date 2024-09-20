@@ -10,6 +10,7 @@
 
 # Import CkfToPXDFiltersSetting payloads
 
+import ROOT  # noqa
 from ROOT.Belle2 import CkfToPXDFiltersSetting, Database, IntervalOfValidity
 
 ckfToPXDFiltersSetting_sensor = CkfToPXDFiltersSetting()

@@ -12,7 +12,6 @@ Script to perform the SVD dE/dx calibration
 '''
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 import basf2 as b2
-from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm, SVDdEdxValidationAlgorithm
 
 import modularAnalysis as ma
 import vertex as vx
@@ -237,6 +236,8 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
+    import ROOT  # noqa
+    from ROOT.Belle2 import SVDdEdxCalibrationAlgorithm, SVDdEdxValidationAlgorithm
 
     algo = SVDdEdxCalibrationAlgorithm()
     algo.setMonitoringPlots(True)

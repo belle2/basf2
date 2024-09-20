@@ -17,7 +17,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 
@@ -48,6 +47,8 @@ def main(argv):
         col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
         col_test.param('granularity', 'run')  # Allows us to execute algorithm over all data, in one big IoV
 
+        import ROOT  # noqa
+        from ROOT.Belle2 import TestCalibrationAlgorithm
         alg_test = TestCalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have
         # different names. TestCalibrationAlgorithm outputs to the database using the prefix name so we change it

@@ -105,7 +105,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-
+    import ROOT  # noqa
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     alg_test = TestCalibrationAlgorithm()

@@ -14,7 +14,6 @@ import basf2 as b2
 import sys
 from pathlib import Path
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV
 from caf.strategies import SequentialBoundaries
@@ -39,6 +38,8 @@ def main(argv):
 
     ###################################################
     # Test Calibration Setup
+    import ROOT  # noqa
+    from ROOT.Belle2 import TestCalibrationAlgorithm
     alg_test = TestCalibrationAlgorithm()  # Getting a calibration algorithm instance
     alg_test.setMinEntries(15000)  # This algorithm provides a setting to change when c_NotEnoughData is returned
     alg_test.setAllowedMeanShift(0.1)  # This alters how often boundaries will be requested (smaller = more often)

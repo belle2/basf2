@@ -293,6 +293,7 @@ def get_calibrations(input_data, **kwargs):
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
 
+    import ROOT  # noqa
     from ROOT.Belle2 import InvariantMassAlgorithm
     from caf.framework import Collection
 

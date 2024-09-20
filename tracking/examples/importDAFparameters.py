@@ -9,6 +9,7 @@
 ##########################################################################
 
 # Import DAFparameters payloads
+import ROOT  # noqa
 from ROOT.Belle2 import Database, IntervalOfValidity, DAFparameters
 
 # Optimisation 2023 #

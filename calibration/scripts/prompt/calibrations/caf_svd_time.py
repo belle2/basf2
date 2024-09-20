@@ -15,6 +15,7 @@ import sys
 import datetime
 import random
 
+import ROOT  # noqa
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm

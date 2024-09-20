@@ -15,7 +15,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 
 b2.set_log_level(b2.LogLevel.INFO)
@@ -41,6 +40,9 @@ def main(argv):
 
     ###################################################
     # Test Calibration Setup
+    import ROOT  # noqa
+    from ROOT.Belle2 import TestCalibrationAlgorithm
+
     alg_test = TestCalibrationAlgorithm()  # Getting a calibration algorithm instance
     alg_test.setMinEntries(15000)  # This algorithm provides a setting to change when c_NotEnoughData is returned
 

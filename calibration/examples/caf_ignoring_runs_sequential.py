@@ -13,8 +13,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
-
 from caf.framework import Calibration, CAF
 from caf.utils import ExpRun, IoV
 from caf.strategies import SequentialRunByRun
@@ -43,6 +41,8 @@ def main(argv):
     # Specific parameter to our test collector, proportional to the probability of algorithm requesting iteration.
     col_test.param('spread', 15)
 
+    import ROOT  # noqa
+    from ROOT.Belle2 import TestCalibrationAlgorithm
     alg_test = TestCalibrationAlgorithm()
     # We want to see what happens when c_NotEnoughData is returned
     alg_test.setMinEntries(10000)

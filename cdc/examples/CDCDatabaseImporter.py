@@ -14,6 +14,7 @@ Simple example.
 """
 
 import basf2 as b2
+import ROOT  # noqa
 from ROOT.Belle2 import CDCDatabaseImporter
 from ROOT.Belle2 import FileSystem
 

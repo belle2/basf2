@@ -20,7 +20,7 @@
 # output file RootOutput.root contains many additional diagnostic histograms.
 
 import basf2 as b2
-
+import ROOT  # noqa
 from ROOT.Belle2 import eclMuMuEAlgorithm
 from caf.framework import Calibration, CAF
 

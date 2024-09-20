@@ -331,6 +331,7 @@ class LCASaverModule(b2.Module):
         """
         Called for each event.
         """
+        from ROOT import Belle2  # noqa: make Belle2 namespace available
         from ROOT.Belle2 import PyStoreObj
 
         # Get the particle list (note this is a regular Particle list, not MCParticle)

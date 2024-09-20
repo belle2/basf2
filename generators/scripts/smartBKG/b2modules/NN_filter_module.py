@@ -10,6 +10,7 @@ import torch
 
 import basf2 as b2
 from ROOT import Belle2
+import ROOT  # noqa
 from ROOT.Belle2 import DBAccessorBase, DBStoreEntry
 
 from smartBKG import PREPROC_CONFIG, MODEL_CONFIG

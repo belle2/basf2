@@ -14,8 +14,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
-
 from caf.framework import Calibration, CAF, Collection
 from caf import backends
 
@@ -78,6 +76,8 @@ def main(argv):
     ###################################################
     # Algorithm setup
     # We only want one algorithm, but we're collecting two sets of data and merging when the algorithm uses them.
+    import ROOT  # noqa
+    from ROOT.Belle2 import TestCalibrationAlgorithm
     alg_test = TestCalibrationAlgorithm()
     # Must have the same prefix as colllector prefixes. By default this algorithm and collectors
     # have the correct prefixes if we hadn't changed anything. So this is unnecessary, but we're just showing you how it's done.

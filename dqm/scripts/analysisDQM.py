@@ -16,6 +16,7 @@ This module defines functions to add analysis DQM modules.
 import basf2 as b2
 from stdPi0s import stdPi0s
 import modularAnalysis as ma
+import stdV0s
 
 
 def add_analysis_dqm(path):
@@ -30,10 +31,10 @@ def add_analysis_dqm(path):
     # muons, Kshorts and pi0s
     ma.fillParticleList('mu+:KLMDQM', 'p>1.5', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
-    ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
-    ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
+    # std Kshorts-TreeFit
+    stdV0s.stdKshorts(path=path, updateAllDaughters=True, writeOut=True)
     ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
     # bhabha,hadrons
     ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
@@ -58,7 +59,7 @@ def add_analysis_dqm(path):
 
     dqm = b2.register_module('PhysicsObjectsDQM')
     dqm.param('PI0PListName', 'pi0:physDQM')
-    dqm.param('KS0PListName', 'K_S0:physDQM')
+    dqm.param('KS0PListName', 'K_S0:merged')
     dqm.param('UpsPListName', 'Upsilon:physDQM')
     # bhabha,hadrons
     dqm.param('UpsBhabhaPListName', 'Upsilon:ephysDQM')

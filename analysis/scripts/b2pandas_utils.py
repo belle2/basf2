@@ -183,7 +183,7 @@ class VariablesToTable(basf2.Module):
             self._parquet_writer.close()
         elif self._format == "csv":
             self._csv_writer.close()
-        ROOT.Belle2.MetadataService.Instance().addNtuple(self._filename, self._format)
+        ROOT.Belle2.MetadataService.Instance().addNtuple(self._filename)
 
 
 class VariablesToHDF5(VariablesToTable):

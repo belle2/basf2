@@ -784,7 +784,7 @@ void DQMHistAnalysisSVDEfficiencyModule::setStatusOfCanvas(int status, TCanvas* 
       break;
     }
     default: {
-      B2INFO("effVstatus not set properly: " << status);
+      B2INFO("efficiency status not set properly: " << status);
       break;
     }
   }

@@ -173,7 +173,7 @@ namespace Belle2 {
 
     /** Create the TH2Poly version of the plot
      */
-    TH2Poly* getPoly(int view, int min = -1111) //-1111 set the minimum dependig on the content
+    TH2Poly* getPoly(int view, int min = -1111) //-1111 set the minimum depending on the content
     {
       TH2F* histogram = getHistogram(view);
       TString name = histogram->GetName();

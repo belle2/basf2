@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['klm_dataobjects','arich_dataobjects','top_dataobjects', 'mdst_dataobjects', 'ecl_dataobjects']
+env['LIBS'] = ['klm_dataobjects','arich_dataobjects','top_dataobjects', 'mdst_dataobjects', 'ecl_dataobjects', 'framework']
 
 Return('env')

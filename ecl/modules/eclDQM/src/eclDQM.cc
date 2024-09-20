@@ -453,6 +453,7 @@ bool ECLDQMModule::fillInvMassHistogram()
 {
   const std::string trg_identifier = "software_trigger_cut&skim&accept_hadron";
   StoreObjPtr<SoftwareTriggerResult> result;
+  if (!result.isValid()) return false;
 
   // check if trigger identifier is available
   const std::map<std::string, int>& results = result->getResults();
@@ -462,6 +463,7 @@ bool ECLDQMModule::fillInvMassHistogram()
   if (!accepted) return false;
 
   StoreObjPtr<ParticleList> particles(m_pi0PListName);
+  if (!particles.isValid()) return false;
 
   for (unsigned int i = 0; i < particles->getListSize(); i++) {
     const Particle* part = particles->getParticle(i);

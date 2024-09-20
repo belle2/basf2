@@ -11,8 +11,6 @@
 
 #pragma once
 
-#ifdef _BELLE2_EPICS
-#endif
 
 //DQM
 #include <dqm/core/DQMHistAnalysis.h>

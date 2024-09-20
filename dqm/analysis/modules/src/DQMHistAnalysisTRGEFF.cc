@@ -76,6 +76,40 @@ void DQMHistAnalysisTRGEFFModule::initialize()
   m_c_eklmhit_theta_eff   = new TCanvas("TRGEFF/c_eklmhit_theta_eff");
 
 
+
+  //get histo from TRGEFFDQMModule
+  m_histList.clear();
+  m_histList = {
+    // Add more histogram names as needed
+    {"TRGEFF/hPhi_psnecl", &m_hPhi_psnecl},                          {"TRGEFF/hPhi_psnecl_ftdf", &m_hPhi_psnecl_ftdf},
+    {"TRGEFF/hPt_psnecl", &m_hPt_psnecl},                            {"TRGEFF/hPt_psnecl_ftdf", &m_hPt_psnecl_ftdf},
+    {"TRGEFF/nobha_hPt_psnecl", &m_nobha_hPt_psnecl},                {"TRGEFF/nobha_hPt_psnecl_ftdf", &m_nobha_hPt_psnecl_ftdf},
+    {"TRGEFF/hP3_z_psnecl", &m_hP3_z_psnecl},                        {"TRGEFF/hP3_z_psnecl_ftdf", &m_hP3_z_psnecl_ftdf},
+    {"TRGEFF/hP3_y_psnecl", &m_hP3_y_psnecl},                        {"TRGEFF/hP3_y_psnecl_ftdf", &m_hP3_y_psnecl_ftdf},
+    {"TRGEFF/nobha_hP3_z_psnecl", &m_nobha_hP3_z_psnecl},            {"TRGEFF/nobha_hP3_z_psnecl_ftdf", &m_nobha_hP3_z_psnecl_ftdf},
+    {"TRGEFF/nobha_hP3_y_psnecl", &m_nobha_hP3_y_psnecl},            {"TRGEFF/nobha_hP3_y_psnecl_ftdf", &m_nobha_hP3_y_psnecl_ftdf},
+    {"TRGEFF/fyo_dphi_psnecl", &m_fyo_dphi_psnecl},                  {"TRGEFF/fyo_dphi_psnecl_ftdf", &m_fyo_dphi_psnecl_ftdf},
+    {"TRGEFF/nobha_fyo_dphi_psnecl", &m_nobha_fyo_dphi_psnecl},      {"TRGEFF/nobha_fyo_dphi_psnecl_ftdf", &m_nobha_fyo_dphi_psnecl_ftdf},
+    {"TRGEFF/stt_phi_psnecl", &m_stt_phi_psnecl},                    {"TRGEFF/stt_phi_psnecl_ftdf", &m_stt_phi_psnecl_ftdf},
+    {"TRGEFF/stt_P3_psnecl", &m_stt_P3_psnecl},                      {"TRGEFF/stt_P3_psnecl_ftdf", &m_stt_P3_psnecl_ftdf},
+    {"TRGEFF/stt_theta_psnecl", &m_stt_theta_psnecl},                {"TRGEFF/stt_theta_psnecl_ftdf", &m_stt_theta_psnecl_ftdf},
+    {"TRGEFF/nobha_stt_phi_psnecl", &m_nobha_stt_phi_psnecl},        {"TRGEFF/nobha_stt_phi_psnecl_ftdf", &m_nobha_stt_phi_psnecl_ftdf},
+    {"TRGEFF/nobha_stt_P3_psnecl", &m_nobha_stt_P3_psnecl},          {"TRGEFF/nobha_stt_P3_psnecl_ftdf", &m_nobha_stt_P3_psnecl_ftdf},
+    {"TRGEFF/nobha_stt_theta_psnecl", &m_nobha_stt_theta_psnecl},    {"TRGEFF/nobha_stt_theta_psnecl_ftdf", &m_nobha_stt_theta_psnecl_ftdf},
+    {"TRGEFF/hie_E_psnecl", &m_hie_E_psnecl},                        {"TRGEFF/hie_E_psnecl_ftdf", &m_hie_E_psnecl_ftdf},
+    {"TRGEFF/nobha_hie_E_psnecl", &m_nobha_hie_E_psnecl},            {"TRGEFF/nobha_hie_E_psnecl_ftdf", &m_nobha_hie_E_psnecl_ftdf},
+    {"TRGEFF/ecltiming_E_psnecl", &m_ecltiming_E_psnecl},            {"TRGEFF/ecltiming_E_psnecl_ftdf", &m_ecltiming_E_psnecl_ftdf},
+    {"TRGEFF/ecltiming_theta_psnecl", &m_ecltiming_theta_psnecl},    {"TRGEFF/ecltiming_theta_psnecl_ftdf", &m_ecltiming_theta_psnecl_ftdf},
+    {"TRGEFF/ecltiming_phi_psnecl", &m_ecltiming_phi_psnecl},        {"TRGEFF/ecltiming_phi_psnecl_ftdf", &m_ecltiming_phi_psnecl_ftdf},
+    {"TRGEFF/klmhit_phi_psnecl", &m_klmhit_phi_psnecl},              {"TRGEFF/klmhit_phi_psnecl_ftdf", &m_klmhit_phi_psnecl_ftdf},
+    {"TRGEFF/klmhit_theta_psnecl", &m_klmhit_theta_psnecl},          {"TRGEFF/klmhit_theta_psnecl_ftdf", &m_klmhit_theta_psnecl_ftdf},
+    {"TRGEFF/eklmhit_phi_psnecl", &m_eklmhit_phi_psnecl},            {"TRGEFF/eklmhit_phi_psnecl_ftdf", &m_eklmhit_phi_psnecl_ftdf},
+    {"TRGEFF/eklmhit_theta_psnecl", &m_eklmhit_theta_psnecl},        {"TRGEFF/eklmhit_theta_psnecl_ftdf", &m_eklmhit_theta_psnecl_ftdf}
+
+
+  };
+
+
   /////////////////
   // the MonitoringObject
   m_mon_trgeff = getMonitoringObject("trg");
@@ -120,39 +154,7 @@ void DQMHistAnalysisTRGEFFModule::event()
 
   B2DEBUG(1, "DQMHistAnalysisTRGEFF: fill histogram");
 
-  /////////////////////////////////////////////////////////
-  //get histo from TRGEFFDQMModule
-  m_histList.clear();
-  m_histList = {
-    // Add more histogram names as needed
-    {"TRGEFF/hPhi_psnecl", &m_hPhi_psnecl},                          {"TRGEFF/hPhi_psnecl_ftdf", &m_hPhi_psnecl_ftdf},
-    {"TRGEFF/hPt_psnecl", &m_hPt_psnecl},                            {"TRGEFF/hPt_psnecl_ftdf", &m_hPt_psnecl_ftdf},
-    {"TRGEFF/nobha_hPt_psnecl", &m_nobha_hPt_psnecl},                {"TRGEFF/nobha_hPt_psnecl_ftdf", &m_nobha_hPt_psnecl_ftdf},
-    {"TRGEFF/hP3_z_psnecl", &m_hP3_z_psnecl},                        {"TRGEFF/hP3_z_psnecl_ftdf", &m_hP3_z_psnecl_ftdf},
-    {"TRGEFF/hP3_y_psnecl", &m_hP3_y_psnecl},                        {"TRGEFF/hP3_y_psnecl_ftdf", &m_hP3_y_psnecl_ftdf},
-    {"TRGEFF/nobha_hP3_z_psnecl", &m_nobha_hP3_z_psnecl},            {"TRGEFF/nobha_hP3_z_psnecl_ftdf", &m_nobha_hP3_z_psnecl_ftdf},
-    {"TRGEFF/nobha_hP3_y_psnecl", &m_nobha_hP3_y_psnecl},            {"TRGEFF/nobha_hP3_y_psnecl_ftdf", &m_nobha_hP3_y_psnecl_ftdf},
-    {"TRGEFF/fyo_dphi_psnecl", &m_fyo_dphi_psnecl},                  {"TRGEFF/fyo_dphi_psnecl_ftdf", &m_fyo_dphi_psnecl_ftdf},
-    {"TRGEFF/nobha_fyo_dphi_psnecl", &m_nobha_fyo_dphi_psnecl},      {"TRGEFF/nobha_fyo_dphi_psnecl_ftdf", &m_nobha_fyo_dphi_psnecl_ftdf},
-    {"TRGEFF/stt_phi_psnecl", &m_stt_phi_psnecl},                    {"TRGEFF/stt_phi_psnecl_ftdf", &m_stt_phi_psnecl_ftdf},
-    {"TRGEFF/stt_P3_psnecl", &m_stt_P3_psnecl},                      {"TRGEFF/stt_P3_psnecl_ftdf", &m_stt_P3_psnecl_ftdf},
-    {"TRGEFF/stt_theta_psnecl", &m_stt_theta_psnecl},                {"TRGEFF/stt_theta_psnecl_ftdf", &m_stt_theta_psnecl_ftdf},
-    {"TRGEFF/nobha_stt_phi_psnecl", &m_nobha_stt_phi_psnecl},        {"TRGEFF/nobha_stt_phi_psnecl_ftdf", &m_nobha_stt_phi_psnecl_ftdf},
-    {"TRGEFF/nobha_stt_P3_psnecl", &m_nobha_stt_P3_psnecl},          {"TRGEFF/nobha_stt_P3_psnecl_ftdf", &m_nobha_stt_P3_psnecl_ftdf},
-    {"TRGEFF/nobha_stt_theta_psnecl", &m_nobha_stt_theta_psnecl},    {"TRGEFF/nobha_stt_theta_psnecl_ftdf", &m_nobha_stt_theta_psnecl_ftdf},
-    {"TRGEFF/hie_E_psnecl", &m_hie_E_psnecl},                        {"TRGEFF/hie_E_psnecl_ftdf", &m_hie_E_psnecl_ftdf},
-    {"TRGEFF/nobha_hie_E_psnecl", &m_nobha_hie_E_psnecl},            {"TRGEFF/nobha_hie_E_psnecl_ftdf", &m_nobha_hie_E_psnecl_ftdf},
-    {"TRGEFF/ecltiming_E_psnecl", &m_ecltiming_E_psnecl},            {"TRGEFF/ecltiming_E_psnecl_ftdf", &m_ecltiming_E_psnecl_ftdf},
-    {"TRGEFF/ecltiming_theta_psnecl", &m_ecltiming_theta_psnecl},    {"TRGEFF/ecltiming_theta_psnecl_ftdf", &m_ecltiming_theta_psnecl_ftdf},
-    {"TRGEFF/ecltiming_phi_psnecl", &m_ecltiming_phi_psnecl},        {"TRGEFF/ecltiming_phi_psnecl_ftdf", &m_ecltiming_phi_psnecl_ftdf},
-    {"TRGEFF/klmhit_phi_psnecl", &m_klmhit_phi_psnecl},              {"TRGEFF/klmhit_phi_psnecl_ftdf", &m_klmhit_phi_psnecl_ftdf},
-    {"TRGEFF/klmhit_theta_psnecl", &m_klmhit_theta_psnecl},          {"TRGEFF/klmhit_theta_psnecl_ftdf", &m_klmhit_theta_psnecl_ftdf},
-    {"TRGEFF/eklmhit_phi_psnecl", &m_eklmhit_phi_psnecl},            {"TRGEFF/eklmhit_phi_psnecl_ftdf", &m_eklmhit_phi_psnecl_ftdf},
-    {"TRGEFF/eklmhit_theta_psnecl", &m_eklmhit_theta_psnecl},        {"TRGEFF/eklmhit_theta_psnecl_ftdf", &m_eklmhit_theta_psnecl_ftdf}
-
-
-  };
-
+  //get histo from TRGEFFDQMModule, find the histogram
   for (auto& [name, histPtr] : m_histList) {
     // B2INFO("The name for the histogram is   " << name);
     B2DEBUG(1, "The current histogram name is   " << name);  // Debug print

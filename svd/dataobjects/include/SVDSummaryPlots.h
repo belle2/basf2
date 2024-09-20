@@ -171,9 +171,27 @@ namespace Belle2 {
       base = std::regex_replace(base, std::regex("[@]side"), side);
     }
 
+    /** set histogram minimum
+     * @param value
+     */
+    void setMinimum(Int_t value = 0)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->SetMinimum(value);
+    }
+
+    /** set histogram maximum
+     * @param value
+     */
+    void setMaximum(Int_t value = 0)
+    {
+      for (int view = VIndex ; view < UIndex + 1; view++)
+        getHistogram(view)->SetMaximum(value);
+    }
+
     /** Create the TH2Poly version of the plot
      */
-    TH2Poly* getPoly(int view, int min = -1111) //-1111 set the minimum depending on the content
+    TH2Poly* getPoly(int view, int min = -1111, int max = -1111) //-1111 set the minimum depending on the content
     {
       TH2F* histogram = getHistogram(view);
       TString name = histogram->GetName();
@@ -202,6 +220,7 @@ namespace Belle2 {
       m_polyHistos[view]->SetTitle(title);
 
       m_polyHistos[view]->SetMinimum(min);
+      m_polyHistos[view]->SetMaximum(max);
 
       const double nLadders[4] = {7, 10, 12, 16}; // per layer
       const double nSensors[4] = {2, 3, 4, 5}; // per ladder

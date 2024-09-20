@@ -122,6 +122,10 @@ namespace Belle2 {
     TPaveText* m_legNormal = nullptr; /**< efficiency plot legend, normal */
     TPaveText* m_legEmpty = nullptr; /**< efficiency plot legend, empty */
 
+    int m_setEfficiencyMin = 0; /**< Set minimum of the efficiency histogram */
+    int m_setEfficiencyMax = -1111; /**< Set maximum of the efficiency histogram. -1111 adjust the maximum depennding on the content */
+    bool m_setEfficiencyRange = false; /**< set the range of the efficiency histogram */
+
     /** efficiency status flags */
     enum effStatus {
       good = 0,    /**< green frame */

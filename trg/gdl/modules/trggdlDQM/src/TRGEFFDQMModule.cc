@@ -218,7 +218,6 @@ void TRGEFFDQMModule::event()
     if (!(test_b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
     double energy = test_b2eclcluster.getEnergyRaw();
     double theta  = test_b2eclcluster.getTheta() / Unit::deg;
-    if (energy < 0.1) continue;
 
     E_ecl_all = E_ecl_all + energy;
     if (theta >= 22.49 && theta <= 126.8) {

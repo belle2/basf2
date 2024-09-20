@@ -48,10 +48,10 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
   addParam("setEfficiencyRange", m_setEfficiencyRange,
-           "If true you can set the range of the efficiency histogram with 'setEfficiencyMaximum' and 'setEfficiencyMinimum' parameters. Default: false",
+           "If true you can set the range of the efficiency histogram with 'efficiencyMax' and 'efficiencyMin' parameters.",
            bool(false));
-  addParam("setEfficiencyMin", m_setEfficiencyMin, "Set minimum of efficiency histogram", int(0));
-  addParam("setEfficiencyMax", m_setEfficiencyMax, "Set maximum of efficiency histogram",
+  addParam("efficiencyMin", m_efficiencyMin, "Minimum of efficiency histogram", int(0));
+  addParam("efficiencyMax", m_efficiencyMax, "Maximum of efficiency histogram",
            int(-1111)); //-1111 set the maximum depending on the content
 }
 
@@ -117,8 +117,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiency->setStats(0);
   if (m_setEfficiencyRange) {
-    m_hEfficiency->setMaximum(m_setEfficiencyMax);
-    m_hEfficiency->setMinimum(m_setEfficiencyMin);
+    m_hEfficiency->setMaximum(m_efficiencyMax);
+    m_hEfficiency->setMinimum(m_efficiencyMin);
   }
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
   m_hEfficiencyErr->setStats(0);
@@ -138,8 +138,8 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
                                                 "Summary of SVD efficiencies (%), @view/@side Side for 3 samples");
     m_hEfficiency3Samples->setStats(0);
     if (m_setEfficiencyRange) {
-      m_hEfficiency3Samples->setMaximum(m_setEfficiencyMax);
-      m_hEfficiency3Samples->setMinimum(m_setEfficiencyMin);
+      m_hEfficiency3Samples->setMaximum(m_efficiencyMax);
+      m_hEfficiency3Samples->setMinimum(m_efficiencyMin);
     }
     m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
                                                    "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");
@@ -357,7 +357,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_cEfficiencyRPhiViewU->Draw();
       m_cEfficiencyRPhiViewU->cd();
       if (m_hEfficiency) {
-        if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+        if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
         else m_hEfficiency->getPoly(1)->Draw("colz l");
         drawText();
       }
@@ -374,7 +374,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_cEfficiencyRPhiViewV->cd();
       m_cEfficiencyRPhiViewV->Draw();
       if (m_hEfficiency) {
-        if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+        if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
         else m_hEfficiency->getPoly(0)->Draw("colz l");
         drawText();
       }
@@ -398,7 +398,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyRPhiViewU->Draw();
   m_cEfficiencyRPhiViewU->cd();
   if (m_hEfficiency) {
-    if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+    if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
     else m_hEfficiency->getPoly(1)->Draw("colz l");
     drawText();
   }
@@ -422,7 +422,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyRPhiViewV->cd();
   m_cEfficiencyRPhiViewV->Draw();
   if (m_hEfficiency) {
-    if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+    if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
     else m_hEfficiency->getPoly(0)->Draw("colz l");
     drawText();
   }
@@ -546,7 +546,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         m_cEfficiencyRPhiViewU3Samples->Draw();
         m_cEfficiencyRPhiViewU3Samples->cd();
         if (m_hEfficiency3Samples) {
-          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
           else m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
           drawText();
         }
@@ -563,7 +563,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         m_cEfficiencyRPhiViewV3Samples->Draw();
         m_cEfficiencyRPhiViewV3Samples->cd();
         if (m_hEfficiency3Samples) {
-          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
           else m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
           drawText();
         }
@@ -585,7 +585,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyRPhiViewU3Samples->Draw();
     m_cEfficiencyRPhiViewU3Samples->cd();
     if (m_hEfficiency3Samples) {
-      if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+      if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
       else m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
       drawText();
     }
@@ -609,7 +609,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyRPhiViewV3Samples->Draw();
     m_cEfficiencyRPhiViewV3Samples->cd();
     if (m_hEfficiency3Samples) {
-      if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_setEfficiencyMin, m_setEfficiencyMax)->Draw("colz l");
+      if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
       else m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
       drawText();
     }

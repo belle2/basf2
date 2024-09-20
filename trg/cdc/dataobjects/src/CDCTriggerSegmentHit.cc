@@ -16,10 +16,10 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short segmentID,
                                            short fastestTime,
                                            short foundTime,
                                            short quadrant,
-                                           unsigned int hitpattern,
                                            std::vector<float> hittime,
-                                           unsigned int adcpattern,
-                                           std::vector<float> adcinfo):
+                                           unsigned int hitpattern,
+                                           std::vector<float> adcinfo,
+                                           unsigned int adcpattern):
   m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime), m_quadrant(quadrant), m_hitpattern(hitpattern),
   m_hittime(hittime), m_adcpattern(adcpattern), m_adcinfo(adcinfo)
@@ -55,10 +55,11 @@ CDCTriggerSegmentHit::CDCTriggerSegmentHit(unsigned short iSL,
                                            short fastestTime,
                                            short foundTime,
                                            short quadrant,
-                                           unsigned int hitpattern,
                                            std::vector<float> hittime,
-                                           unsigned int adcpattern,
-                                           std::vector<float> adcinfo):
+                                           unsigned int hitpattern,
+                                           std::vector<float> adcinfo,
+                                           unsigned int adcpattern):
+
   m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime), m_quadrant(quadrant), m_hitpattern(hitpattern),
   m_hittime(hittime), m_adcpattern(adcpattern), m_adcinfo(adcinfo)
@@ -92,10 +93,10 @@ CDCTriggerSegmentHit:: CDCTriggerSegmentHit(const CDCHit& priorityHit,
                                             short fastestTime,
                                             short foundTime,
                                             short quadrant,
-                                            unsigned int hitpattern,
                                             std::vector<float> hittime,
-                                            unsigned int adcpattern,
-                                            std::vector<float> adcinfo):
+                                            unsigned int hitpattern,
+                                            std::vector<float> adcinfo,
+                                            unsigned int adcpattern):
   m_segmentID(segmentID), m_priorityPosition(priorityPosition), m_leftRight(leftRight),
   m_priorityTime(priorityTime), m_fastestTime(fastestTime), m_foundTime(foundTime),
   m_eWire(priorityHit.getID()), m_quadrant(quadrant), m_hitpattern(hitpattern), m_hittime(hittime), m_adcpattern(adcpattern),

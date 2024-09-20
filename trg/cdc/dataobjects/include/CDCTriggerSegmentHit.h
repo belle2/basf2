@@ -33,10 +33,10 @@ namespace Belle2 {
                          short fastestTime,
                          short foundTime,
                          short quadrant = -1,
-                         unsigned int hitpattern = 0,
                          std::vector<float> hittime = std::vector<float>(),
-                         unsigned int adcpattern = -1,
-                         std::vector<float> adcinfo  = std::vector<float>());
+                         unsigned int hitpattern = 0,
+                         std::vector<float> adcinfo  = std::vector<float>(),
+                         unsigned int adcpattern = -1);
 
     /** constructor using super layer ID and TS ID in layer (== central wire ID). */
     CDCTriggerSegmentHit(unsigned short iSL,
@@ -47,10 +47,10 @@ namespace Belle2 {
                          short fastestTime,
                          short foundTime,
                          short quadrant = -1,
+                         std::vector<float> hittime = std::vector<float>(),
                          unsigned int hitpattern = 0,
-                         std::vector<float> hittim = std::vector<float>(),
-                         unsigned int adcpattern = -1,
-                         std::vector<float> adcinfo  = std::vector<float>());
+                         std::vector<float> adcinfo  = std::vector<float>(),
+                         unsigned int adcpattern = -1);
 
 
     /** constructor using continuous TS ID and a reference to the priority hit
@@ -65,10 +65,11 @@ namespace Belle2 {
                          short fastestTime,
                          short foundTime,
                          short quadrant = -1,
-                         unsigned int hitpattern = -1,
                          std::vector<float> hittime = std::vector<float>(),
-                         unsigned int adcpattern = -1,
-                         std::vector<float> adcinfo  = std::vector<float>());
+                         unsigned int hitpattern = 0,
+                         std::vector<float> adcinfo  = std::vector<float>(),
+                         unsigned int adcpattern = -1);
+
 
     /** destructor, empty because we don't allocate memory anywhere. */
     ~CDCTriggerSegmentHit() { }

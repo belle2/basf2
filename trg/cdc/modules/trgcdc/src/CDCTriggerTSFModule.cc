@@ -513,10 +513,10 @@ CDCTriggerTSFModule::event()
                                   s.fastestTime(),
                                   s.foundTime(),
                                   -1,
-                                  s.hitPattern(),
                                   s.hitPatternTime(),
-                                  adcpattern,
-                                  fullADC);
+                                  s.hitPattern(),
+                                  fullADC,
+                                  adcpattern);
         unsigned short adcSum = 0;
         // relation to all CDCHits in segment
         for (unsigned iw = 0; iw < s.wires().size(); ++iw) {

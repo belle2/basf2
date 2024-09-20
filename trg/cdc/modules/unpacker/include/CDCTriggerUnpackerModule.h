@@ -353,6 +353,8 @@ namespace Belle2 {
     /** run number */
     unsigned m_run = 0;
 
+    std::string m_neurotrack_name;
+
     /** vector holding the pointers to all the dynamically allocated SubTriggers */
     std::vector<SubTrigger*> m_subTrigger;
 

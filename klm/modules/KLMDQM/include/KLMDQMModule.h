@@ -191,17 +191,13 @@ namespace Belle2 {
     /** Spatial distribution of EKLM 2d hits per layer. */
     TH2F** m_Spatial2DHitsEKLM[EKLMElementNumbers::getMaximalSectionNumber()] = {nullptr};
 
-    /** Feature extraction status histogram for BKLM */
-    TH1F* m_FeatureExtractionStatusBKLM;
+    /** feature extraction status for BKLM 240 Layers*/
+    TH1F* m_FE_BKLM_Layer_0; // Standard Readout
+    TH1F* m_FE_BKLM_Layer_1; // Feature Extraction
 
-    /** Feature extraction status histogram for EKLM */
-    TH1F* m_FeatureExtractionStatusEKLM;
-
-    /** Feature extraction status 2D histogram for BKLM, status 0 or 1 */
-    TH2F* m_FeatureExtractionStatusBKLM2D;
-
-    /** Feature extraction status 2D histogram for EKLM, status 1*/
-    TH2F* m_FeatureExtractionStatusEKLM2D;
+    /** feature extraction status for EKLM 208 Layers*/
+    TH1F* m_FE_EKLM_Plane_0; // Standard Readout
+    TH1F* m_FE_EKLM_Plane_1; // Feature Extraction
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;
@@ -229,6 +225,12 @@ namespace Belle2 {
 
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
+
+    /** Number of layers/planes for BKLM. */
+    const int m_LayerNumBKLM = BKLMElementNumbers::getMaximalLayerGlobalNumber(); // 15 layers per octant, forward and backward
+
+    /** Number of layers/planes for EKLM. */
+    const int m_PlaneNumEKLM = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 12 or 14 layers per quadrant, forward and backward
 
   };
 

@@ -42,10 +42,10 @@ KLMDQMModule::KLMDQMModule() :
   m_TriggersLERInj{nullptr},
   m_DigitsAfterHERInj{nullptr},
   m_TriggersHERInj{nullptr},
-  m_FeatureExtractionStatusBKLM(nullptr),
-  m_FeatureExtractionStatusEKLM(nullptr),
-  m_FeatureExtractionStatusBKLM2D(nullptr),
-  m_FeatureExtractionStatusEKLM2D(nullptr),
+  m_FE_BKLM_Layer_0(nullptr),
+  m_FE_BKLM_Layer_1(nullptr),
+  m_FE_EKLM_Plane_0(nullptr),
+  m_FE_EKLM_Plane_1(nullptr),
   m_ChannelArrayIndex{&(KLMChannelArrayIndex::Instance())},
   m_SectorArrayIndex{&(KLMSectorArrayIndex::Instance())},
   m_ElementNumbers{&(KLMElementNumbers::Instance())},
@@ -261,31 +261,17 @@ void KLMDQMModule::defineHisto()
     }
   }
   // Feature extraction status histogram for BKLM
-  m_FeatureExtractionStatusBKLM = new TH1F("feature_extraction_status_bklm",
-                                           "BKLM Scintillator Feature Extraction Status", 2, 0, 2);
-  m_FeatureExtractionStatusBKLM->GetXaxis()->SetBinLabel(1, "Standard Readout");
-  m_FeatureExtractionStatusBKLM->GetXaxis()->SetBinLabel(2, "Feature Extraction");
+  int bklmLayers = BKLMElementNumbers::getMaximalLayerGlobalNumber(); // 240
+  int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
 
-  // Feature extraction status histogram for EKLM
-  m_FeatureExtractionStatusEKLM = new TH1F("feature_extraction_status_eklm",
-                                           "EKLM Scintillator Feature Extraction Status", 2, 0, 2);
-  m_FeatureExtractionStatusEKLM->GetXaxis()->SetBinLabel(1, "Standard Readout");
-  m_FeatureExtractionStatusEKLM->GetXaxis()->SetBinLabel(2, "Feature Extraction");
-
-  // Feature extraction status 2D histogram for BKLM
-  int bklmSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber();
-  int bklmLayers = BKLMElementNumbers::getMaximalLayerNumber();
-  int eklmSectors = EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();
-  int eklmLayers = EKLMElementNumbers::getMaximalLayerGlobalNumber();
-
-  m_FeatureExtractionStatusBKLM2D = new TH2F("feature_extraction_status_bklm2D",
-                                             "BKLM Readout;Sectors;Layers",
-                                             bklmSectors, 0, bklmSectors, bklmLayers, 0, bklmLayers);
-
-  m_FeatureExtractionStatusEKLM2D = new TH2F("feature_extraction_status_eklm2D",
-                                             "EKLM Readout;Layers;Sectors",
-                                             eklmLayers, 0, eklmLayers, eklmSectors, 0, eklmSectors);
-
+  m_FE_BKLM_Layer_0 = new TH1F("feature_extraction_status_bklm_layers_0",
+                               "BKLM Standard Readout;Layers", bklmLayers, 0.5, 0.5 + bklmLayers);
+  m_FE_BKLM_Layer_1 = new TH1F("feature_extraction_status_bklm_layers_1",
+                               "BKLM Feature Extraction;Layers", bklmLayers, 0.5, 0.5 + bklmLayers);
+  m_FE_EKLM_Plane_0 = new TH1F("feature_extraction_status_eklm_planes_0",
+                               "EKLM Standard Readout;Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+  m_FE_EKLM_Plane_1 = new TH1F("feature_extraction_status_eklm_planes_1",
+                               "EKLM Feature Extraction;Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   oldDirectory->cd();
 }
 
@@ -356,10 +342,10 @@ void KLMDQMModule::beginRun()
     }
   }
   /* Feature extraction. */
-  m_FeatureExtractionStatusBKLM->Reset();
-  m_FeatureExtractionStatusEKLM->Reset();
-  m_FeatureExtractionStatusBKLM2D->Reset();
-  m_FeatureExtractionStatusEKLM2D->Reset();
+  m_FE_BKLM_Layer_0->Reset();
+  m_FE_BKLM_Layer_1->Reset();
+  m_FE_EKLM_Plane_0->Reset();
+  m_FE_EKLM_Plane_1->Reset();
 }
 
 void KLMDQMModule::event()
@@ -523,13 +509,19 @@ void KLMDQMModule::event()
         int plane = digit.getPlane();
 
         if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
-          m_FeatureExtractionStatusBKLM->Fill(feStatus);
-          KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-          KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(klmSector);
-          m_FeatureExtractionStatusBKLM2D->Fill(sectorIndex, layer - 1);
+          int layerGlobal = BKLMElementNumbers::layerGlobalNumber(section, sector, layer);
+          if (feStatus != 0) {
+            m_FE_BKLM_Layer_1->Fill(layerGlobal);
+          } else {
+            m_FE_BKLM_Layer_0->Fill(layerGlobal);
+          }
         } else {
-          m_FeatureExtractionStatusEKLM->Fill(feStatus);
-          m_FeatureExtractionStatusEKLM2D->Fill((section - 1) * 12 + layer - 1, (sector - 1) * 2 + plane - 1);
+          int planeNum = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
+          if (feStatus != 0) {
+            m_FE_EKLM_Plane_1->Fill(planeNum);
+          } else {
+            m_FE_EKLM_Plane_0->Fill(planeNum);
+          }
         }
       }
     }

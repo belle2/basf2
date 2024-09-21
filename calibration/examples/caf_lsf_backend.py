@@ -47,7 +47,7 @@ def main(argv):
         col_test.param('spread', 15)  # Proportional to the probability of algorithm requesting iteration
         col_test.param('granularity', 'run')  # Allows us to execute algorithm over all data, in one big IoV
 
-        import ROOT  # noqa
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import TestCalibrationAlgorithm
         alg_test = TestCalibrationAlgorithm()
         # Since we're using several instances of the same test algorithm here, we still want the database entries to have

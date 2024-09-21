@@ -15,7 +15,7 @@ import sys
 import datetime
 import random
 
-import ROOT  # noqa
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm

@@ -11,7 +11,7 @@
 # Import BKLM simulation parameters payloads.
 
 import basf2
-import from ROOT import Belle2  # noqa: make the Belle2 namespace available
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import BKLMDatabaseImporter
 
 basf2.set_log_level(basf2.LogLevel.INFO)

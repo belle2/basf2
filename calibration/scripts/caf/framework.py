@@ -886,7 +886,7 @@ class Calibration(CalibrationBase):
     def algorithms(self, value):
         """
         """
-        import ROOT  # noqa
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import CalibrationAlgorithm
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
@@ -900,7 +900,7 @@ class Calibration(CalibrationBase):
         """
         Alternate algorithms setter for lists and tuples of CalibrationAlgorithms.
         """
-        import ROOT  # noqa
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import CalibrationAlgorithm
         if value:
             self._algorithms = []

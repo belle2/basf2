@@ -41,7 +41,7 @@ def main(argv):
     # Specific parameter to our test collector, proportional to the probability of algorithm requesting iteration.
     col_test.param('spread', 15)
 
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
     alg_test = TestCalibrationAlgorithm()
     # We want to see what happens when c_NotEnoughData is returned

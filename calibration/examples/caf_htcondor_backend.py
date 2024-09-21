@@ -39,7 +39,7 @@ def main(argv):
     from caf.strategies import SequentialRunByRun
     ###################################################
     # Test Calibration Setup
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
     # Make a bunch of test calibrations
     calibrations = []

@@ -14,7 +14,7 @@ Simple example to import CDCWireHitRequirements to the database.
 """
 
 import basf2
-import ROOT  # noqa
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import FileSystem
 from ROOT.Belle2 import CDCDatabaseImporter
 

@@ -127,7 +127,7 @@ def get_calibrations(input_data, **kwargs):
 
     ###################################################
     # Algorithm setup
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import KLMChannelStatusAlgorithm
 
     alg = KLMChannelStatusAlgorithm()

@@ -37,7 +37,7 @@ def main(argv):
     input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
     from caf.strategies import SequentialRunByRun
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
     ###################################################
     # Test Calibration Setup

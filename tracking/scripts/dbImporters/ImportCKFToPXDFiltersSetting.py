@@ -10,7 +10,7 @@
 
 # Import CkfToPXDFiltersSetting payloads
 
-import ROOT  # noqa
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import CkfToPXDFiltersSetting, Database, IntervalOfValidity
 
 ckfToPXDFiltersSetting_sensor = CkfToPXDFiltersSetting()

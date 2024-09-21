@@ -25,7 +25,7 @@ settings = ValidationSettings(name='KLM alignment',
 
 
 def get_result(job_path, tmp_dir):
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import KLMCalibrationChecker
 
     database_file = f'{job_path}/outputdb/database.txt'

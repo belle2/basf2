@@ -40,7 +40,7 @@ def main(argv):
 
     ###################################################
     # Test Calibration Setup
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     alg_test = TestCalibrationAlgorithm()  # Getting a calibration algorithm instance

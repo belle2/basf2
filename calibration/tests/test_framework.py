@@ -32,7 +32,7 @@ class TestCalibrationClass_Configure(TestCase):
         """
         Create useful objects for each test
         """
-        import ROOT  # noqa
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
         #: Calibration algorithm for use in unittests
         self.alg1 = TestAlgo()
@@ -112,7 +112,7 @@ class TestCalibrationClass_Args(TestCase):
         """
         Create useful objects for each test
         """
-        import ROOT  # noqa
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
 
         #: Calibration algorithm for use in unittests
@@ -173,7 +173,7 @@ class TestCAF(TestCase):
         """
         Create useful objects for each test and the teardown
         """
-        import ROOT  # noqa
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
 
         #: Calibration name for use in unittests

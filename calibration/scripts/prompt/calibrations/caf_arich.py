@@ -77,7 +77,7 @@ def get_calibrations(input_data, **kwargs):
     # Algorithm setup
 
     from basf2 import create_path
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import ARICHChannelMaskMaker
 
     alg_arich = ARICHChannelMaskMaker()

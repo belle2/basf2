@@ -46,7 +46,7 @@ def main(argv):
         b2.B2INFO(f"Running Test Algorithm Setup For Iteration {iteration}")
         b2.B2INFO(f"Can access the {algorithm.__cppname__} class from Calibration().pre_algorithms.")
 
-    import ROOT  # noqa
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import TestCalibrationAlgorithm
 
     # Make a bunch of test calibrations

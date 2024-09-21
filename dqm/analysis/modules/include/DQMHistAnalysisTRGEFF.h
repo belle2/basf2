@@ -247,9 +247,9 @@ namespace Belle2 {
     TCanvas* m_c_eklmhit_theta_eff      = nullptr;    /**< canvas for TRGEFF efficiency,  eklmhit bit */
     TEfficiency* m_eklmhit_theta_eff    = nullptr;    /**< the efficiency of theta for eklmhit bit */
 
-    std::vector<std::pair<std::string, TH1F**>> m_histList; /**< the histogram list */
-    std::vector<std::tuple<TH1F*, TH1F*, TEfficiency**>> m_efficiencyPairs; /**< the efficiency pair list */
-    std::vector<std::tuple<TCanvas*, TEfficiency*>> m_canvasEfficiencyPairs; /**< the Canvas pair list */
+    std::vector<std::tuple<std::string, TEfficiency**, TCanvas*>>
+                                                               m_efficiencyList; /**< Combined efficiency list,the histogram, efficiency and Canvas  */
+
 
     //mirabelle
     Belle2::MonitoringObject* m_mon_trgeff = nullptr; /**< MonitoringObject for trg */

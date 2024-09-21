@@ -78,30 +78,30 @@ void DQMHistAnalysisTRGEFFModule::initialize()
   m_efficiencyList.clear();
   m_efficiencyList = {
     // Histogram names, efficiency pointers, and corresponding canvases
-    {"TRGEFF/hPt_psnecl",     &m_hPt_eff,    m_cPt_eff},
-    {"TRGEFF/hPhi_psnecl",     &m_hPhi_eff,    m_cPhi_eff},
-    {"TRGEFF/nobha_hPt_psnecl",     &m_nobha_hPt_eff,    m_nobha_cPt_eff},
-    {"TRGEFF/hP3_z_psnecl",     &m_hP3_z_eff,    m_cP3_z_eff},
-    {"TRGEFF/hP3_y_psnecl",     &m_hP3_y_eff,    m_cP3_y_eff},
-    {"TRGEFF/nobha_hP3_z_psnecl",     &m_nobha_hP3_z_eff,    m_nobha_cP3_z_eff},
-    {"TRGEFF/nobha_hP3_y_psnecl",     &m_nobha_hP3_y_eff,    m_nobha_cP3_y_eff},
-    {"TRGEFF/fyo_dphi_psnecl",     &m_fyo_dphi_eff,    m_c_fyo_dphi_eff},
-    {"TRGEFF/nobha_fyo_dphi_psnecl",     &m_nobha_fyo_dphi_eff,    m_c_nobha_fyo_dphi_eff},
-    {"TRGEFF/stt_phi_psnecl",     &m_stt_phi_eff,    m_c_stt_phi_eff},
-    {"TRGEFF/stt_P3_psnecl",     &m_stt_P3_eff,    m_c_stt_P3_eff},
-    {"TRGEFF/stt_theta_psnecl",     &m_stt_theta_eff,    m_c_stt_theta_eff},
-    {"TRGEFF/nobha_stt_phi_psnecl",     &m_nobha_stt_phi_eff,    m_c_nobha_stt_phi_eff},
-    {"TRGEFF/nobha_stt_P3_psnecl",     &m_nobha_stt_P3_eff,    m_c_nobha_stt_P3_eff},
-    {"TRGEFF/nobha_stt_theta_psnecl",     &m_nobha_stt_theta_eff,    m_c_nobha_stt_theta_eff},
-    {"TRGEFF/hie_E_psnecl",     &m_hie_E_eff,    m_c_hie_E_eff},
-    {"TRGEFF/nobha_hie_E_psnecl",     &m_nobha_hie_E_eff,    m_c_nobha_hie_E_eff},
-    {"TRGEFF/ecltiming_E_psnecl",     &m_ecltiming_E_eff,    m_c_ecltiming_E_eff},
-    {"TRGEFF/ecltiming_theta_psnecl",     &m_ecltiming_theta_eff,    m_c_ecltiming_theta_eff},
-    {"TRGEFF/ecltiming_phi_psnecl",     &m_ecltiming_phi_eff,    m_c_ecltiming_phi_eff},
-    {"TRGEFF/klmhit_phi_psnecl",     &m_klmhit_phi_eff,    m_c_klmhit_phi_eff},
-    {"TRGEFF/klmhit_theta_psnecl",     &m_klmhit_theta_eff,    m_c_klmhit_theta_eff},
-    {"TRGEFF/eklmhit_phi_psnecl",     &m_eklmhit_phi_eff,    m_c_eklmhit_phi_eff},
-    {"TRGEFF/eklmhit_theta_psnecl",     &m_eklmhit_theta_eff,    m_c_eklmhit_theta_eff}
+    {"TRGEFF/hPt_psnecl",             &m_hPt_eff,               m_cPt_eff},
+    {"TRGEFF/hPhi_psnecl",            &m_hPhi_eff,              m_cPhi_eff},
+    {"TRGEFF/nobha_hPt_psnecl",       &m_nobha_hPt_eff,         m_nobha_cPt_eff},
+    {"TRGEFF/hP3_z_psnecl",           &m_hP3_z_eff,             m_cP3_z_eff},
+    {"TRGEFF/hP3_y_psnecl",           &m_hP3_y_eff,             m_cP3_y_eff},
+    {"TRGEFF/nobha_hP3_z_psnecl",     &m_nobha_hP3_z_eff,       m_nobha_cP3_z_eff},
+    {"TRGEFF/nobha_hP3_y_psnecl",     &m_nobha_hP3_y_eff,       m_nobha_cP3_y_eff},
+    {"TRGEFF/fyo_dphi_psnecl",        &m_fyo_dphi_eff,          m_c_fyo_dphi_eff},
+    {"TRGEFF/nobha_fyo_dphi_psnecl",  &m_nobha_fyo_dphi_eff,    m_c_nobha_fyo_dphi_eff},
+    {"TRGEFF/stt_phi_psnecl",         &m_stt_phi_eff,           m_c_stt_phi_eff},
+    {"TRGEFF/stt_P3_psnecl",          &m_stt_P3_eff,            m_c_stt_P3_eff},
+    {"TRGEFF/stt_theta_psnecl",       &m_stt_theta_eff,         m_c_stt_theta_eff},
+    {"TRGEFF/nobha_stt_phi_psnecl",   &m_nobha_stt_phi_eff,     m_c_nobha_stt_phi_eff},
+    {"TRGEFF/nobha_stt_P3_psnecl",    &m_nobha_stt_P3_eff,      m_c_nobha_stt_P3_eff},
+    {"TRGEFF/nobha_stt_theta_psnecl", &m_nobha_stt_theta_eff,   m_c_nobha_stt_theta_eff},
+    {"TRGEFF/hie_E_psnecl",           &m_hie_E_eff,             m_c_hie_E_eff},
+    {"TRGEFF/nobha_hie_E_psnecl",     &m_nobha_hie_E_eff,       m_c_nobha_hie_E_eff},
+    {"TRGEFF/ecltiming_E_psnecl",     &m_ecltiming_E_eff,       m_c_ecltiming_E_eff},
+    {"TRGEFF/ecltiming_theta_psnecl", &m_ecltiming_theta_eff,   m_c_ecltiming_theta_eff},
+    {"TRGEFF/ecltiming_phi_psnecl",   &m_ecltiming_phi_eff,     m_c_ecltiming_phi_eff},
+    {"TRGEFF/klmhit_phi_psnecl",      &m_klmhit_phi_eff,        m_c_klmhit_phi_eff},
+    {"TRGEFF/klmhit_theta_psnecl",    &m_klmhit_theta_eff,      m_c_klmhit_theta_eff},
+    {"TRGEFF/eklmhit_phi_psnecl",     &m_eklmhit_phi_eff,       m_c_eklmhit_phi_eff},
+    {"TRGEFF/eklmhit_theta_psnecl",   &m_eklmhit_theta_eff,     m_c_eklmhit_theta_eff}
 
     // Add more entries as needed
   };
@@ -151,12 +151,14 @@ void DQMHistAnalysisTRGEFFModule::event()
 
   B2DEBUG(1, "DQMHistAnalysisTRGEFF: fill histogram");
 
-  for (auto& [name, efficiencyPtr, canvas] : m_efficiencyList) {
-    TH1F* hist = (TH1F*)findHist(name);
-    TH1F* histFtdf = (TH1F*)findHist(name + "_ftdf");
+  for (auto& entry : m_efficiencyList) {
+    const std::string& name     = std::get<0>(entry);       // Get the histogram name
+    TEfficiency** efficiencyPtr = std::get<1>(entry);   // Get the efficiency pointer
+    TCanvas* canvas = std::get<2>(entry);               // Get the canvas pointer
 
     B2DEBUG(1, "The current histogram name is   " << name);  // Debug print
-
+    TH1F* hist = (TH1F*)findHist(name);
+    TH1F* histFtdf = (TH1F*)findHist(name + "_ftdf");
     if (hist == nullptr || histFtdf == nullptr) {
       B2WARNING("Histogram for " + name + " or its Ftdf counterpart is not found.");
       return;

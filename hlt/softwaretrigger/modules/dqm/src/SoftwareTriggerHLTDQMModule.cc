@@ -166,10 +166,7 @@ void SoftwareTriggerHLTDQMModule::defineHisto()
     m_cutResultHistograms["total_result"]->SetOption("hist");
     m_cutResultHistograms["total_result"]->SetStats(false);
     m_cutResultHistograms["total_result"]->SetMinimum(0);
-  }
 
-  // And also one for the total numbers
-  if (m_param_create_total_result_histograms) {
     m_l1Histograms.emplace("l1_total_result",
                            new TH1F("l1_total_result", "Events triggered in L1 (total results)", 1, 0, 0));
     m_l1Histograms["l1_total_result"]->SetXTitle("Total L1 Cut Result");

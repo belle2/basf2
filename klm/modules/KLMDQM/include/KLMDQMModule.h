@@ -230,12 +230,6 @@ namespace Belle2 {
     /** KLM 2d hits. */
     StoreArray<KLMHit2d> m_Hit2ds;
 
-    /** Number of layers/planes for BKLM. */
-    const int m_LayerNumBKLM = BKLMElementNumbers::getMaximalLayerGlobalNumber(); // 15 layers per octant, forward and backward
-
-    /** Number of layers/planes for EKLM. */
-    const int m_PlaneNumEKLM = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 12 or 14 layers per quadrant, forward and backward
-
   };
 
 }

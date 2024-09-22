@@ -267,7 +267,7 @@ void KLMDQMModule::defineHisto()
   m_FE_BKLM_Layer_0 = new TH1F("feStatus_bklm_scintillator_layers_0",
                                "BKLM Scintillator Standard Readout;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_FE_BKLM_Layer_1 = new TH1F("feStatus_bklm_scintillator_layers_1",
-                               "BKLM Feature Extraction;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+                               "BKLM Scintillator Feature Extraction;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_FE_EKLM_Plane_0 = new TH1F("feStatus_eklm_plane_0",
                                "EKLM Standard Readout;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   m_FE_EKLM_Plane_1 = new TH1F("feStatus_eklm_plane_1",

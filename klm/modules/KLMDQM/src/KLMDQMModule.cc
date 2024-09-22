@@ -359,9 +359,11 @@ void KLMDQMModule::event()
      * for simulated events).
      */
     KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
-    // Extract m_FE from m_word4
-    uint16_t word4 = digitRaw->getWord4();
-    uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+    if (digitRaw) {
+      // Extract m_FE from m_word4
+      uint16_t word4 = digitRaw->getWord4();
+      uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+    }
     if (!digit.isGood())
       continue;
     if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {

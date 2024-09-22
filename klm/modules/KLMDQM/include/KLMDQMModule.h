@@ -191,13 +191,17 @@ namespace Belle2 {
     /** Spatial distribution of EKLM 2d hits per layer. */
     TH2F** m_Spatial2DHitsEKLM[EKLMElementNumbers::getMaximalSectionNumber()] = {nullptr};
 
-    /** feature extraction status for BKLM 240 Layers*/
-    TH1F* m_FE_BKLM_Layer_0; // Standard Readout
-    TH1F* m_FE_BKLM_Layer_1; // Feature Extraction
+    /** Standard Readout status for BKLM Scintillator*/
+    TH1F* m_FE_BKLM_Layer_0;
 
-    /** feature extraction status for EKLM 208 Layers*/
-    TH1F* m_FE_EKLM_Plane_0; // Standard Readout
-    TH1F* m_FE_EKLM_Plane_1; // Feature Extraction
+    /** feature extraction status for BKLM Scintillator*/
+    TH1F* m_FE_BKLM_Layer_1;
+
+    /** Standard Readout status for EKLM*/
+    TH1F* m_FE_EKLM_Plane_0;
+
+    /** feature extraction status for EKLM*/
+    TH1F* m_FE_EKLM_Plane_1;
 
     /** KLM channel array index. */
     const KLMChannelArrayIndex* m_ChannelArrayIndex;

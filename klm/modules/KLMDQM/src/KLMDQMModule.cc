@@ -261,17 +261,17 @@ void KLMDQMModule::defineHisto()
     }
   }
   // Feature extraction status histogram for BKLM
-  int bklmLayers = BKLMElementNumbers::getMaximalLayerGlobalNumber(); // 240
+  int bklmSectors = BKLMElementNumbers::getMaximalSectorGlobalNumber(); // 16
   int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
 
-  m_FE_BKLM_Layer_0 = new TH1F("feature_extraction_status_bklm_layers_0",
-                               "BKLM Standard Readout;Layers", bklmLayers, 0.5, 0.5 + bklmLayers);
-  m_FE_BKLM_Layer_1 = new TH1F("feature_extraction_status_bklm_layers_1",
-                               "BKLM Feature Extraction;Layers", bklmLayers, 0.5, 0.5 + bklmLayers);
-  m_FE_EKLM_Plane_0 = new TH1F("feature_extraction_status_eklm_planes_0",
-                               "EKLM Standard Readout;Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
-  m_FE_EKLM_Plane_1 = new TH1F("feature_extraction_status_eklm_planes_1",
-                               "EKLM Feature Extraction;Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+  m_FE_BKLM_Layer_0 = new TH1F("feStatus_bklm_scintillator_layers_0",
+                               "BKLM Scintillator Standard Readout;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+  m_FE_BKLM_Layer_1 = new TH1F("feStatus_bklm_scintillator_layers_1",
+                               "BKLM Feature Extraction;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+  m_FE_EKLM_Plane_0 = new TH1F("feStatus_eklm_plane_0",
+                               "EKLM Standard Readout;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+  m_FE_EKLM_Plane_1 = new TH1F("feStatus_eklm_plane_1",
+                               "EKLM Feature Extraction;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   oldDirectory->cd();
 }
 
@@ -509,11 +509,12 @@ void KLMDQMModule::event()
         int plane = digit.getPlane();
 
         if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
-          int layerGlobal = BKLMElementNumbers::layerGlobalNumber(section, sector, layer);
+          KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
+          KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(klmSector);
           if (feStatus != 0) {
-            m_FE_BKLM_Layer_1->Fill(layerGlobal);
+            m_FE_BKLM_Layer_1->Fill((sectorIndex) * 2 + layer);
           } else {
-            m_FE_BKLM_Layer_0->Fill(layerGlobal);
+            m_FE_BKLM_Layer_0->Fill((sectorIndex) * 2 + layer);
           }
         } else {
           int planeNum = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);

@@ -358,6 +358,10 @@ void KLMDQMModule::event()
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
      */
+    KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+    // Extract m_FE from m_word4
+    uint16_t word4 = digitRaw->getWord4();
+    uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
     if (!digit.isGood())
       continue;
     if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
@@ -385,7 +389,6 @@ void KLMDQMModule::event()
       m_PlaneEKLM->Fill(planeGlobal);
       m_TimeScintillatorEKLM->Fill(digit.getTime());
       if (digit.isMultiStrip()) {
-        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
         if (digitRaw) {
           uint16_t triggerBits = digitRaw->getTriggerBits();
           if ((triggerBits & 0x1) != 0)
@@ -398,15 +401,22 @@ void KLMDQMModule::event()
             m_TriggerBitsEKLM->Fill(c_0x8);
         }
       }
+      if (feStatus != 0) {
+        m_FE_EKLM_Plane_1->Fill(planeGlobal);
+      } else {
+        m_FE_EKLM_Plane_0->Fill(planeGlobal);
+      }
     } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
       int section = digit.getSection();
       int sector = digit.getSector();
       int layer = digit.getLayer();
       int plane = digit.getPlane();
       int strip = digit.getStrip();
+
+      KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
+      KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
+
       if (not digit.isMultiStrip()) {
-        KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-        KLMSectorNumber klmSectorIndex = m_SectorArrayIndex->getIndex(klmSector);
         KLMChannelNumber channel = m_ElementNumbers->channelNumberBKLM(section, sector, layer, plane, strip);
         KLMChannelNumber channelIndex = m_ChannelArrayIndex->getIndex(channel);
         for (int j = 0; j < m_ChannelHitHistogramsBKLM; j++) {
@@ -424,9 +434,13 @@ void KLMDQMModule::event()
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
+        if (feStatus != 0) {
+          m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
+        } else {
+          m_FE_BKLM_Layer_0->Fill((klmSectorIndex) * 2 + layer);
+        }
       }
       if (digit.isMultiStrip()) {
-        KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
         if (digitRaw) {
           uint16_t triggerBits = digitRaw->getTriggerBits();
           if ((triggerBits & 0x1) != 0)
@@ -490,44 +504,6 @@ void KLMDQMModule::event()
     int layer = hit2d.getLayer();
     m_Spatial2DHitsEKLM[section - 1][layer - 1]->Fill(hit2d.getPositionX(), hit2d.getPositionY());
   }
-  /* Feature extraction status */
-  for (const KLMDigit& digit : m_Digits) {
-    if (!digit.isGood())
-      continue;
-    if (digit.getSubdetector() == KLMElementNumbers::c_BKLM ||
-        digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
-
-      KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
-      if (digitRaw) {
-        // Extract m_FE from m_word4
-        uint16_t word4 = digitRaw->getWord4();
-        uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
-
-        int section = digit.getSection();
-        int sector = digit.getSector();
-        int layer = digit.getLayer();
-        int plane = digit.getPlane();
-
-        if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
-          KLMSectorNumber klmSector = m_ElementNumbers->sectorNumberBKLM(section, sector);
-          KLMSectorNumber sectorIndex = m_SectorArrayIndex->getIndex(klmSector);
-          if (feStatus != 0) {
-            m_FE_BKLM_Layer_1->Fill((sectorIndex) * 2 + layer);
-          } else {
-            m_FE_BKLM_Layer_0->Fill((sectorIndex) * 2 + layer);
-          }
-        } else {
-          int planeNum = m_eklmElementNumbers->planeNumber(section, layer, sector, plane);
-          if (feStatus != 0) {
-            m_FE_EKLM_Plane_1->Fill(planeNum);
-          } else {
-            m_FE_EKLM_Plane_0->Fill(planeNum);
-          }
-        }
-      }
-    }
-  }
-
 }
 
 void KLMDQMModule::endRun()

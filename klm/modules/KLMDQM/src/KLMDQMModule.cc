@@ -359,11 +359,6 @@ void KLMDQMModule::event()
      * for simulated events).
      */
     KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
-    if (digitRaw) {
-      // Extract m_FE from m_word4
-      uint16_t word4 = digitRaw->getWord4();
-      uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
-    }
     if (!digit.isGood())
       continue;
     if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
@@ -403,10 +398,15 @@ void KLMDQMModule::event()
             m_TriggerBitsEKLM->Fill(c_0x8);
         }
       }
-      if (feStatus != 0) {
-        m_FE_EKLM_Plane_1->Fill(planeGlobal);
-      } else {
-        m_FE_EKLM_Plane_0->Fill(planeGlobal);
+      if (digitRaw) {
+        // Extract m_FE from m_word4
+        uint16_t word4 = digitRaw->getWord4();
+        uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+        if (feStatus != 0) {
+          m_FE_EKLM_Plane_1->Fill(planeGlobal);
+        } else {
+          m_FE_EKLM_Plane_0->Fill(planeGlobal);
+        }
       }
     } else if (digit.getSubdetector() == KLMElementNumbers::c_BKLM) {
       int section = digit.getSection();
@@ -436,10 +436,14 @@ void KLMDQMModule::event()
       } else {
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
-        if (feStatus != 0) {
-          m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
-        } else {
-          m_FE_BKLM_Layer_0->Fill((klmSectorIndex) * 2 + layer);
+        if (digitRaw) {
+          uint16_t word4 = digitRaw->getWord4();
+          uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+          if (feStatus != 0) {
+            m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
+          } else {
+            m_FE_BKLM_Layer_0->Fill((klmSectorIndex) * 2 + layer);
+          }
         }
       }
       if (digit.isMultiStrip()) {

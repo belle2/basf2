@@ -190,55 +190,45 @@ void DQMHistAnalysisTRGEFFModule::endRun()
 {
   B2DEBUG(1, "DQMHistAnalysisTRGEFF : endRun called");
 
-  // Vector to hold histogram names and their corresponding efficiency histograms
-  std::vector<std::tuple<const char*, TEfficiency*>> efficiencyHistograms = {
-    // Add more pairs as needed
-    {"m_hPhi_eff", m_hPhi_eff},
-    {"m_hPt_eff", m_hPt_eff},
-    {"m_nobha_hPt_eff", m_nobha_hPt_eff},
-    {"m_hP3_z_eff", m_hP3_z_eff},
-    {"m_hP3_y_eff", m_hP3_y_eff},
-    {"m_nobha_hP3_z_eff", m_nobha_hP3_z_eff},
-    {"m_nobha_hP3_y_eff", m_nobha_hP3_y_eff},
-    {"m_fyo_dphi_eff", m_fyo_dphi_eff},
-    {"m_nobha_fyo_dphi_eff", m_nobha_fyo_dphi_eff},
-    {"m_stt_phi_eff", m_stt_phi_eff},
-    {"m_stt_P3_eff", m_stt_P3_eff},
-    {"m_stt_theta_eff", m_stt_theta_eff},
-    {"m_nobha_stt_phi_eff", m_nobha_stt_phi_eff},
-    {"m_nobha_stt_P3_eff", m_nobha_stt_P3_eff},
-    {"m_nobha_stt_theta_eff", m_nobha_stt_theta_eff},
-    {"m_hie_E_eff", m_hie_E_eff},
-    {"m_nobha_hie_E_eff", m_nobha_hie_E_eff},
-    {"m_ecltiming_E_eff", m_ecltiming_E_eff},
-    {"m_ecltiming_theta_eff", m_ecltiming_theta_eff},
-    {"m_ecltiming_phi_eff", m_ecltiming_phi_eff},
-    {"m_klmhit_phi_eff", m_klmhit_phi_eff},
-    {"m_klmhit_theta_eff", m_klmhit_theta_eff},
-    {"m_eklmhit_phi_eff", m_eklmhit_phi_eff},
-    {"m_eklmhit_theta_eff", m_eklmhit_theta_eff}
+  // Loop through m_efficiencyList and process the efficiency histogram
+  for (auto& entry : m_efficiencyList) {
+    const std::string& name = std::get<0>(entry);       // Get the histogram name
+    TEfficiency** efficiencyPtr = std::get<1>(entry);   // Get the efficiency pointer
 
+    TEfficiency* effHist = *efficiencyPtr;
 
-  };
-
-  // Loop through each histogram and process the efficiency data
-  for (const auto& [name, effHist] : efficiencyHistograms) {
     if (effHist) {
+      // Clean the name: remove "TRGEFF/" prefix and "_psnecl" suffix for the name in m_efficiencyList
+      std::string cleanName = name;
+
+      // Find and erase "TRGEFF/" if it exists
+      size_t prefixPos = cleanName.find("TRGEFF/");
+      if (prefixPos != std::string::npos) {
+        cleanName.erase(prefixPos, std::string("TRGEFF/").length());  // Remove "TRGEFF/"
+      }
+
+      // Find and erase "_psnecl" if it exists
+      size_t suffixPos = cleanName.find("_psnecl");
+      if (suffixPos != std::string::npos) {
+        cleanName.erase(suffixPos, std::string("_psnecl").length());  // Remove "_psnecl"
+      }
+
       int nbins = effHist->GetTotalHistogram()->GetNbinsX();
       for (int i = 0; i < nbins; i++) {
         char varName[100];
-        sprintf(varName, "%s_%i", name, i);
+        sprintf(varName, "%s_%i", cleanName.c_str(), i);
+        // B2DEBUG(1, "The name for MonitoringObject histogram is " << varName);
         m_mon_trgeff->setVariable(varName,
-                                  effHist ? effHist->GetEfficiency(i) : 0,
-                                  effHist ? effHist->GetEfficiencyErrorUp(i) : -1,
-                                  effHist ? effHist->GetEfficiencyErrorLow(i) : -1);
+                                  effHist->GetEfficiency(i),
+                                  effHist->GetEfficiencyErrorUp(i),
+                                  effHist->GetEfficiencyErrorLow(i));
       }
     } else {
-      char warningMessage[200];
-      sprintf(warningMessage, "Efficiency histogram is null for %s", name);
-      B2WARNING(warningMessage);
+      B2WARNING(std::string("Efficiency histogram is null for ") + name);
     }
   }
+
+
 }
 
 void DQMHistAnalysisTRGEFFModule::terminate()

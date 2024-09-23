@@ -358,9 +358,10 @@ void KLMDQMModule::event()
      * Reject digits that are below the threshold (such digits may appear
      * for simulated events).
      */
-    KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
+
     if (!digit.isGood())
       continue;
+    KLMDigitRaw* digitRaw = digit.getRelated<KLMDigitRaw>();
     if (digit.getSubdetector() == KLMElementNumbers::c_EKLM) {
       nDigitsScintillatorEKLM++;
       int section = digit.getSection();

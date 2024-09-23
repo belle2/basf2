@@ -219,6 +219,8 @@ void TRGEFFDQMModule::event()
     double energy = test_b2eclcluster.getEnergyRaw();
     double theta  = test_b2eclcluster.getTheta() / Unit::deg;
 
+    if (energy < 0.1) continue;
+
     E_ecl_all = E_ecl_all + energy;
     if (theta >= 22.49 && theta <= 126.8) {
       E_ecl_hie = E_ecl_hie + energy;
@@ -232,9 +234,12 @@ void TRGEFFDQMModule::event()
   bool trg_nobha_hie_Eecl   = 0;
 
   for (const auto& b2eclcluster : m_ECLClusters) {
-    //members in mdst/dataobjects/include/ECLCluster.h
+    if (!(b2eclcluster.hasHypothesis(ECLCluster::EHypothesisBit::c_nPhotons))) continue;
     double phi    = b2eclcluster.getPhi() / Unit::deg;
     double theta  = b2eclcluster.getTheta() / Unit::deg;
+    double energy = b2eclcluster.getEnergyRaw();
+
+    if (energy < 0.1) continue;
 
     bool trg_psncdc    = m_trgSummary->testPsnm("ffy") || m_trgSummary->testPsnm("fyo") || m_trgSummary->testPsnm("stt");
     bool trg_hie       = m_trgSummary->testFtdl("hie");

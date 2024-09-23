@@ -54,31 +54,24 @@ using namespace boost::python;
 namespace prog = boost::program_options;
 
 namespace {
-  void executePythonFile(const string& pythonFile)
+  void executeInteractivePython()
   {
     object main_module = import("__main__");
     object main_namespace = main_module.attr("__dict__");
-    if (pythonFile.empty()) {
-      // No steering file given, start an interactive ipython session
-      object interactive = import("interactive");
-      main_namespace["__b2shell_config"] = interactive.attr("basf2_shell_config")();
-      exec("import IPython; "
-           " from basf2 import *; "
-           "IPython.embed(config=__b2shell_config, header=f\"Welcome to {basf2label}\"); ",
-           main_namespace, main_namespace);
-      return;
-    }
-    // otherwise execute the steering file
-    auto fullPath = std::filesystem::absolute(std::filesystem::path(pythonFile));
-    if ((!(std::filesystem::is_directory(fullPath))) && (std::filesystem::exists(fullPath))) {
+    object interactive = import("interactive");
+    main_namespace["__b2shell_config"] = interactive.attr("basf2_shell_config")();
+    exec("import IPython; "
+         " from basf2 import *; "
+         "IPython.embed(config=__b2shell_config, header=f\"Welcome to {basf2label}\"); ",
+         main_namespace, main_namespace);
+    return;
+  }
 
-      std::ifstream file(fullPath.string().c_str());
-      std::stringstream buffer;
-      buffer << file.rdbuf();
-      Environment::Instance().setSteering(buffer.str());
-      exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
-    } else {
-      B2FATAL("The given filename and/or path is not valid: " + pythonFile);
+  void checkPythonStatus(PyConfig& config, PyStatus& status)
+  {
+    if (PyStatus_Exception(status)) {
+      PyConfig_Clear(&config);
+      Py_ExitStatusException(status);
     }
   }
 }
@@ -474,29 +467,62 @@ int main(int argc, char* argv[])
   //  If the python file is set, execute it
   //---------------------------------------------------
   try {
-    //Init Python interpreter
-    Py_InitializeEx(0);
+    PyStatus status;
+    PyConfig config;
+    PyConfig_InitPythonConfig(&config);
+    config.install_signal_handlers = 0;
+    config.safe_path = 0;
 
     std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    std::vector<wstring> pyArgvString(arguments.size() + 1);
-    // Set argument 0 to either script name or the basf2 exectuable
+
+    std::vector<wstring> pyArgvString(arguments.size() + 2);
+
+
     if (!pythonFile.empty()) {
-      pyArgvString[0] = converter.from_bytes(pythonFile);
+      pyArgvString[0] = L"python3"; //set the executable
+      pyArgvString[1] = converter.from_bytes(pythonFile);
     } else {
+      // Set argument 0 to the basf2 executable
       pyArgvString[0] = converter.from_bytes(argv[0]);
+      // for some inexplicable reason the first argument is swallowed. Adyd a dummy string.
+      pyArgvString[1] = L"";
     }
+
     for (size_t i = 0; i < arguments.size(); i++) {
-      pyArgvString[i + 1] = converter.from_bytes(arguments[i]);
+      pyArgvString[i + 2] = converter.from_bytes(arguments[i]);
     }
     std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
     for (size_t i = 0; i < pyArgvString.size(); ++i) {
       pyArgvArray[i] = pyArgvString[i].c_str();
     }
-    //Pass python filename and additional arguments to python
-    PySys_SetArgvEx(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()), 1);
 
-    //Execute Python file
-    executePythonFile(pythonFile);
+
+    //Pass python filename and additional arguments to python
+    status = PyConfig_SetArgv(&config, pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
+    checkPythonStatus(config, status);
+
+    status = Py_InitializeFromConfig(&config);
+    checkPythonStatus(config, status);
+    // PyConfig_Clear(&config);
+
+    int returnValue = 0;
+
+    if (pythonFile.empty()) {
+      // No steering file given, start an interactive ipython session
+      executeInteractivePython();
+    } else {
+      auto fullPath = std::filesystem::absolute(std::filesystem::path(pythonFile));
+      if ((!(std::filesystem::is_directory(fullPath))) && (std::filesystem::exists(fullPath))) {
+
+        std::ifstream file(fullPath.string().c_str());
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        Environment::Instance().setSteering(buffer.str());
+        returnValue = Py_RunMain();
+      } else {
+        B2FATAL("The given filename and/or path is not valid: " + pythonFile);
+      }
+    }
 
     //Finish Python interpreter
     Py_Finalize();
@@ -514,6 +540,9 @@ int main(int argc, char* argv[])
     //Report completion in json metadata
     MetadataService::Instance().addBasf2Status("finished successfully");
     MetadataService::Instance().finishBasf2();
+
+    return returnValue;
+
   } catch (error_already_set&) {
     //Apparently an exception occured which wasn't handled. So print the traceback
     PyErr_Print();
@@ -522,6 +551,4 @@ int main(int argc, char* argv[])
     Py_Finalize();
     return 1;
   }
-
-  return 0;
 }

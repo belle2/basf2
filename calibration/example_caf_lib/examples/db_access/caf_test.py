@@ -17,6 +17,7 @@ import basf2 as b2
 
 import os
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import TestDBAccessAlgorithm
 from caf.framework import Calibration, CAF
 from caf.utils import IoV

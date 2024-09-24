@@ -14,6 +14,7 @@ Author: qingyuan.liu@desy.de
 """
 
 from basf2 import register_module, create_path
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import PXDHotPixelMaskCalibrationAlgorithm, PXDAnalyticGainCalibrationAlgorithm
 from ROOT.Belle2 import PXDValidationAlgorithm
 from caf.framework import Calibration

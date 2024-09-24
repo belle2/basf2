@@ -174,7 +174,7 @@ release-validation:
       - automated_validation_*
     expire_in: 60 days
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == 'release/08-01' && $CI_COMMIT_TITLE =~ /Merge branch.*/
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_BRANCH == $GITLAB_BRANCH_FOR_RELEASE_VALIDATION && $CI_COMMIT_TITLE =~ /Merge branch.*/
     - if: $GITLAB_FORCE_RUNNING_PIPELINE == 'yes'
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"

@@ -356,21 +356,19 @@ void SoftwareTriggerHLTDQMModule::event()
       }
     }
 
-    if (m_l1TriggerResult.isValid() and m_l1NameLookup.isValid()) {
+    if (m_l1TriggerResult.isValid()) {
       float l1Index = 0;
       for (const std::string& l1Trigger : m_param_l1Identifiers) {
         l1Index++;
-        const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
-        if (triggerBit < 0) {
-          B2WARNING("Could not find"
-                    << LogVar("L1 trigger line", l1Trigger));
-          continue;
-        }
         bool triggerResult;
         try {
-          triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+          triggerResult = m_l1TriggerResult->testPsnm(l1Trigger.c_str());
         } catch (const std::exception&) {
-          triggerResult = false;
+          try {
+            triggerResult = m_l1TriggerResult->testInput(l1Trigger.c_str());
+          } catch (const std::exception&) {
+            triggerResult = false;
+          }
         }
         if (m_param_create_total_result_histograms) {
           if (triggerResult) {
@@ -417,17 +415,15 @@ void SoftwareTriggerHLTDQMModule::event()
       if (m_param_create_total_result_histograms) {
         for (const std::string& l1Trigger : m_param_additionalL1Identifiers) {
           l1Index++;
-          const int triggerBit = m_l1NameLookup->getoutbitnum(l1Trigger.c_str());
-          if (triggerBit < 0) {
-            B2WARNING("Could not find"
-                      << LogVar("L1 trigger line", l1Trigger));
-            continue;
-          }
           bool triggerResult;
           try {
-            triggerResult = m_l1TriggerResult->testPsnm(triggerBit);
+            triggerResult = m_l1TriggerResult->testPsnm(l1Trigger.c_str());
           } catch (const std::exception&) {
-            triggerResult = false;
+            try {
+              triggerResult = m_l1TriggerResult->testInput(l1Trigger.c_str());
+            } catch (const std::exception&) {
+              triggerResult = false;
+            }
           }
           if (triggerResult) {
             m_l1Histograms["l1_total_result"]->Fill(l1Index - 0.5);

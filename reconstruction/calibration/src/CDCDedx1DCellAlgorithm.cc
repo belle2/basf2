@@ -85,8 +85,6 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
 
   defineHisto(hdedxhit, hdedxlay, hentalay);
 
-  TRandom*  random = new TRandom();
-
   //Star filling histogram defined above
   for (int i = 0; i < ttree->GetEntries(); ++i) {
 
@@ -101,7 +99,7 @@ CalibrationAlgorithm::EResult CDCDedx1DCellAlgorithm::calibrate()
     if (abs(pt) > m_ptMax) continue;
 
     //change to random 10%
-    int rand = random->Integer(100);
+    int rand = gRandom->Integer(100);
     if (rand < 10) hptcosth->Fill(pt, costh);
 
     for (unsigned int j = 0; j < dedxhit->size(); ++j) {

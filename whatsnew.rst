@@ -20,7 +20,7 @@ Changes since release-08
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-01
+   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-04
       :widths: 50 25 25
       :header-rows: 1
 
@@ -48,6 +48,9 @@ Changes since release-08
       * - doxygen
         - 1.9.1
         - 1.9.6
+      * - EvtGen
+        - R02-00-00
+        - R02-00-01
       * - gcc
         - 11.2.0
         - 14.1.0
@@ -800,7 +803,7 @@ Changes since release-08
         - 5.6.0
       * - tensorboard
         - 2.10.1
-        - 2.16.2
+        - 2.17.1
       * - tensorboard-data-server
         - 0.6.1
         - 0.7.2
@@ -809,7 +812,7 @@ Changes since release-08
         - removed
       * - tensorflow
         - 2.10.0
-        - 2.16.1
+        - 2.17.0
       * - tensorflow-estimator
         - 2.10.0
         - removed

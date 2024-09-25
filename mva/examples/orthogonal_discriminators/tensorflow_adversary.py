@@ -267,7 +267,7 @@ if __name__ == "__main__":
     test_tree = uproot.open(test_file)['tree']
     invMassDaughter01 = test_tree.array('daughterInvM__bo0__cm__sp1__bc')
     invMassDaughter02 = test_tree.array('daughterInvM__bo0__cm__sp2__bc')
-    isSignal = test_tree.array('isSignal').astype(np.int)
+    isSignal = test_tree.array('isSignal').astype(np.int32)
 
     def print_summary(name, data):
 

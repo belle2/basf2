@@ -98,8 +98,8 @@ After the FEI path the following lists are available
 
 Each candidate has two extra infos which are interesting:
 
-*    SignalProbability is the signal probability calculated using FastBDT
-*    decayModeID is the tag :math:`B` decay channel
+*    SignalProbability is the signal probability calculated using FastBDT;
+*    decayModeID is the tag :math:`B` decay channel, labels of which can be listed with `get_mode_names` function.
 
 
 You can use a different decay channel configuration during the application. In particular you can omit decay channels (e.g. the semileptonic ones if you are only interested in the hadronic tag).

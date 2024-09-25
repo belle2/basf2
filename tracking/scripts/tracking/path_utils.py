@@ -640,7 +640,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
-                    filter="cuts_from_DB")
+                    filter="mva",
+                    filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
@@ -732,7 +733,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     path.add_module("CDCHitBasedT0Extraction")
 
     # prepare mdst event level info
-    path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromHits")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromSegments")
 
 
 def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", prune_temporary_tracks=True):

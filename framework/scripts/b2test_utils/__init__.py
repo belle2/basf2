@@ -365,6 +365,19 @@ def skip_test_if_light(py_case=None):
         skip_test(reason="We're in a light build.", py_case=py_case)
 
 
+def skip_test_if_central(py_case=None):
+    """
+    Skips the test if we are using a central release (and have no local
+    git repository)
+
+    Parameters:
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
+    """
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        skip_test(reason="We're in a central release.", py_case=py_case)
+
+
 def print_belle2_environment():
     """
     Prints all the BELLE2 environment variables on the screen.

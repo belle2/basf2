@@ -85,8 +85,8 @@ from caf.utils import LocalDatabase
 from caf.utils import ExpRun, IoV
 from caf.backends import LSF
 from caf.framework import Calibration, CAF
+import ROOT  # noqa (must be before 'from ROOT.Belle2' to load ROOT.Belle2 namespace)
 from ROOT.Belle2 import PXDDataMCGainCalibrationAlgorithm
-import ROOT
 import pickle
 import basf2 as b2
 b2.set_log_level(b2.LogLevel.INFO)

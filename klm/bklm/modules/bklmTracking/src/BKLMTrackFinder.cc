@@ -63,7 +63,7 @@ bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
       continue;
 
     // Prevent duplicate hits or hits on same layer
-    // no duplicate hit is alreday guaranteed and now we allow hits on same layer so the following is commented out
+    // no duplicate hit is already guaranteed and now we allow hits on same layer so the following is commented out
     // bool skip = false;
     // for (j = track.begin(); j != track.end(); ++j) {
     //  if ((*j)->getLayer() == (*i)->getLayer())

@@ -132,7 +132,7 @@ class SVDValidationTTreeCluster(b2.Module):
             cluster_truehits = cluster.getRelationsTo('SVDTrueHits')
 
             # Sensor identification
-            sensorInfo = Belle2.VXD.GeoCache.get(cluster.getSensorID())
+            sensorInfo = Belle2.VXD.GeoCache.getInstance().getSensorInfo(cluster.getSensorID())
             sensorID = cluster.getSensorID()
             self.data.sensor_id = int(sensorID)
             sensorNum = sensorID.getSensorNumber()

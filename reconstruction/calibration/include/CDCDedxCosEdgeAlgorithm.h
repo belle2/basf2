@@ -80,12 +80,12 @@ namespace Belle2 {
     }
 
     /**
-    * funtion to get info about current exp and run
+    * function to get info about current exp and run
     */
     void getExpRunInfo();
 
     /**
-    * function to perform gaus fit for given histogram
+    * function to perform gauss fit for given histogram
     */
     void fitGaussianWRange(TH1D*& temphist, fitstatus& status);
 
@@ -95,7 +95,7 @@ namespace Belle2 {
     void createPayload(std::vector<std::vector<double>>& vfinalconst);
 
     /**
-    * funtion to draw dedx histograms for each bin
+    * function to draw dedx histograms for each bin
     */
     void plotHist(std::vector<TH1D*>& hdedx, std::map<int, std::vector<double>>& fPars, std::string type);
 

@@ -226,7 +226,7 @@ void B2BIIMdstInputModule::event()
   StoreObjPtr<EventMetaData> evtmetadata;
 
   // Read next event: We try to read the next event from the current file
-  // if thist fails, open the next file and try again
+  // if this fails, open the next file and try again
   // if we cannot open the next file then stop processing
   while (!readNextEvent()) {
     if (!openNextFile()) {

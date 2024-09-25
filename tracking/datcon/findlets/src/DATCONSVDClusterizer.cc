@@ -196,7 +196,8 @@ void DATCONSVDClusterizer::fillDATCONSVDNoiseMap()
         int ladder =  itSvdSensors->getLadderNumber();
         int sensor = itSvdSensors->getSensorNumber();
         Belle2::VxdID theVxdID(layer, ladder, sensor);
-        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::get(theVxdID));
+        const SVD::SensorInfo* currentSensorInfo = dynamic_cast<const SVD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                                     theVxdID));
 
         int simpleVXDID = 131072 * (layer - 3) + 8192 * (ladder - 1) + 1024 * (sensor - 1);
 

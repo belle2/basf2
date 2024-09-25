@@ -148,15 +148,29 @@ class TestSysVar(unittest.TestCase):
         self.assertCountEqual(cols, [col for col in local_data.columns if col.startswith('Weight_')])
         self.assertTrue((local_data.query('abs(mcPDG) == 11')[['Weight']+cols] < 1.5).all().all())
         self.assertTrue((local_data.query('abs(mcPDG) != 11')[['Weight']+cols] > 1.5).all().all())
-        print(local_data.query('abs(mcPDG) != 11')[['Weight']+cols].std(axis=1))
+        # print(local_data.query('abs(mcPDG) != 11')[['Weight']+cols].std(axis=1))
         self.assertTrue((local_data.query('abs(mcPDG) == 11')[['Weight']+cols].std(axis=1) < 0.015).all())
         self.assertTrue((local_data.query('abs(mcPDG) != 11')[['Weight']+cols].std(axis=1) > 0.015).all())
 
         cols = [f'B0_Weight_{i}' for i in range(0, n_variations)]
         self.assertCountEqual(cols, [col for col in local_data.columns if col.startswith('B0_Weight_')])
-        print(local_data[['B0_Weight']+cols])
+        # print(local_data[['B0_Weight']+cols])
         self.assertFalse((local_data[['B0_Weight']+cols].isna()).any().any())
         self.assertTrue((local_data[['B0_Weight']+cols] > 0).all().all())
+
+        print('==================================================')
+        print('==================================================')
+        print('Shift index test:')
+        local_data_shift = self.user_data.copy(deep=True)
+        local_data_shift.index += 100
+        reweighter.reweight(local_data_shift)
+        self.assertIn('Weight', local_data_shift.columns)
+        cols = [f'Weight_{i}' for i in range(0, n_variations)]
+        print(local_data[['Weight']+cols])
+        print(local_data_shift[['Weight']+cols])
+        self.assertFalse((local_data_shift[['Weight']+cols].isna()).any().any())
+        cols = [f'B0_Weight_{i}' for i in range(0, n_variations)]
+        self.assertFalse((local_data_shift[['B0_Weight']+cols].isna()).any().any())
 
 
 if __name__ == '__main__':

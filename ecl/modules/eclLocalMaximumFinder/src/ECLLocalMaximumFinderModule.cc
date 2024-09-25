@@ -77,12 +77,12 @@ void ECLLocalMaximumFinderModule::initialize()
 {
   B2DEBUG(200, "ECLLocalMaximumFinderModule::initialize()");
 
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclConnectedRegions.isRequired(eclConnectedRegionArrayName());
+  m_eclConnectedRegions.requireRelationTo(m_eclCalDigits);
   m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
   m_eclConnectedRegions.registerRelationTo(m_eclLocalMaximums);
-  m_eclCalDigits.registerRelationTo(m_eclLocalMaximums);
-  m_eventLevelClusteringInfo.registerInDataStore();
+  m_eventLevelClusteringInfo.isRequired();
 
   // Check user input.
   if (m_energyCut < c_minEnergyCut) {
@@ -184,7 +184,6 @@ void ECLLocalMaximumFinderModule::event()
 
     // Loop over all entries in this CR.
     for (const ECLCalDigit& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
-
       // Check seed energy cut.
       if (aECLCalDigit.getEnergy() >= m_energyCut) {
 

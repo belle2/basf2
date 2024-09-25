@@ -29,6 +29,7 @@ from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
 from basf2 import conditions as b2conditions
 from basf2.pickle_path import serialize_path
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import CalibrationAlgorithm
 
 from caf.utils import create_directories

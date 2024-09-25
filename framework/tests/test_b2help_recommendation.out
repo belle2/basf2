@@ -1,89 +1,141 @@
 [INFO] Steering file: framework/tests/test_b2help_recommendation.py
-Available Tags:
-  - Data
-  - Neutral
-  - Systematics
-  - Tracking
-  - gamma
+Available tags for local:
+ - Data                       - Neutral                  
+ - Systematics                - Tracking                 
+ - gamma                    
 
+Tags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. 
 You can check all information with the 'all' tag.
-Tool: scaleTrackMomenta
-  Tags: Data, Systematics, Tracking
-  Description: Track momentum scale (global phase space)
-  Recommendation:
-    GlobalTag: tracking_data_Moriond23_v1
-    payloadName: tracking_momentumScaleFactor_global
-    scalingFactorName: sf_global_central
-    scalingFactorName to evaluate the systematic uncertainty: sf_global_up, sf_global_down
-  Snippet:
+Recommendations for local and all tags:
 
-import basf2 as b2
-import modularAnalysis as ma
-b2.conditions.prepend_globaltag('tracking_data_Moriond23_v1')
-ma.scaleTrackMomenta('B0:sig', payloadName='tracking_momentumScaleFactor_global', scalingFactorName='sf_global_central', path=path)
+Track energy correction on Data
+===============================
 
-Tool: correctEnergyBias
-  Tags: Data, Systematics, Neutral, gamma
-  Description: Correction of photon energy bias in data wrt MC15rd
-  Recommendation:
+Description
+-----------
+Track momentum scale (global phase space)
 
-  Snippet:
+Snippet
+-------
+.. code-block:: python
 
-import modularAnalysis as ma 
-#Global tag should be analysis_tools_light-2305-korat or later
- b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag()) 
-# example photon list
-fillParticleList('gamma:sel','p>0.1',path=my_path)
- 
-# energy bias correction applied to photon list.
-#Set TableName to corresponding dataset combination used.
- 
-#For For MC15rd/preLS1:  TableName = "PhotonEnergyBiasCorrection_MC15rd_June2023"
-ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=TableName , path=my_path)
- 
-#Optional: To save correction information for each photon:
-#vm.addAlias('Weight', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_Weight)')
-#vm.addAlias('StatErr', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_StatErr)')
-#vm.addAlias('binID', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_binID)')
-#photon_extravars = ['Weight','StatErr','binID']
-Tool: correctEnergyBias
-  Tags: Data, Systematics, Neutral, gamma
-  Description: Correction of photon energy bias in data wrt MC15rd
-  Recommendation:
+    import basf2 as b2
+    import modularAnalysis as ma
+    b2.conditions.prepend_globaltag('tracking_data_Moriond23_v1')
+    ma.scaleTrackMomenta('B0:sig', payloadName='tracking_momentumScaleFactor_global', scalingFactorName='sf_global_central', path=path)
 
-  Snippet:
+Recommendation
+--------------
++ **GlobalTag** - tracking_data_Moriond23_v1
++ **payloadName** - tracking_momentumScaleFactor_global
++ **scalingFactorName** - sf_global_central
++ **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
 
-import modularAnalysis as ma 
-#Global tag should be analysis_tools_light-2305-korat or later
- b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag()) 
-# example photon list
-fillParticleList('gamma:sel','p>0.1',path=my_path)
- 
-# energy bias correction applied to photon list.
-#Set TableName to corresponding dataset combination used.
- 
-#For For MC15rd/preLS1:  TableName = "PhotonEnergyBiasCorrection_MC15rd_June2023"
-ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=TableName , path=my_path)
- 
-#Optional: To save correction information for each photon:
-#vm.addAlias('Weight', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_Weight)')
-#vm.addAlias('StatErr', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_StatErr)')
-#vm.addAlias('binID', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_binID)')
-#photon_extravars = ['Weight','StatErr','binID']
-Tool: scaleTrackMomenta
-  Tags: Data, Systematics, Tracking
-  Description: Track momentum scale (global phase space)
-  Recommendation:
-    GlobalTag: tracking_data_Moriond23_v1
-    payloadName: tracking_momentumScaleFactor_global
-    scalingFactorName: sf_global_central
-    scalingFactorName to evaluate the systematic uncertainty: sf_global_up, sf_global_down
-  Snippet:
++-------+----+-----------+--------+
+| Tags: |Data|Systematics|Tracking|
++-------+----+-----------+--------+
 
-import basf2 as b2
-import modularAnalysis as ma
-b2.conditions.prepend_globaltag('tracking_data_Moriond23_v1')
-ma.scaleTrackMomenta('B0:sig', payloadName='tracking_momentumScaleFactor_global', scalingFactorName='sf_global_central', path=path)
+
+Photon energy correction on Data
+================================
+
+Description
+-----------
+Correction of photon energy bias in data wrt MC15rd
+
+Snippet
+-------
+.. code-block:: python
+
+    import modularAnalysis as ma 
+    #Global tag should be analysis_tools_light-2305-korat or later
+     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag()) 
+    # example photon list
+    fillParticleList('gamma:sel','p>0.1',path=my_path)
+     
+    # energy bias correction applied to photon list.
+    #Set TableName to corresponding dataset combination used.
+     
+    #For For MC15rd/preLS1:  TableName = "PhotonEnergyBiasCorrection_MC15rd_June2023"
+    ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=TableName , path=my_path)
+     
+    #Optional: To save correction information for each photon:
+    #vm.addAlias('Weight', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_Weight)')
+    #vm.addAlias('StatErr', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_StatErr)')
+    #vm.addAlias('binID', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_binID)')
+    #photon_extravars = ['Weight','StatErr','binID']
+
+Recommendation
+--------------
+
++-------+----+-----------+-------+-----+
+| Tags: |Data|Systematics|Neutral|gamma|
++-------+----+-----------+-------+-----+
+Recommendations for local and gamma tags:
+
+Photon energy correction on Data
+================================
+
+Description
+-----------
+Correction of photon energy bias in data wrt MC15rd
+
+Snippet
+-------
+.. code-block:: python
+
+    import modularAnalysis as ma 
+    #Global tag should be analysis_tools_light-2305-korat or later
+     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag()) 
+    # example photon list
+    fillParticleList('gamma:sel','p>0.1',path=my_path)
+     
+    # energy bias correction applied to photon list.
+    #Set TableName to corresponding dataset combination used.
+     
+    #For For MC15rd/preLS1:  TableName = "PhotonEnergyBiasCorrection_MC15rd_June2023"
+    ma.correctEnergyBias(inputListNames=['gamma:sel'], tableName=TableName , path=my_path)
+     
+    #Optional: To save correction information for each photon:
+    #vm.addAlias('Weight', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_Weight)')
+    #vm.addAlias('StatErr', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_StatErr)')
+    #vm.addAlias('binID', 'extraInfo(PhotonEnergyBiasCorrection_MC15rd_June2023_binID)')
+    #photon_extravars = ['Weight','StatErr','binID']
+
+Recommendation
+--------------
+
++-------+----+-----------+-------+-----+
+| Tags: |Data|Systematics|Neutral|gamma|
++-------+----+-----------+-------+-----+
+Recommendations for local and Tracking tags:
+
+Track energy correction on Data
+===============================
+
+Description
+-----------
+Track momentum scale (global phase space)
+
+Snippet
+-------
+.. code-block:: python
+
+    import basf2 as b2
+    import modularAnalysis as ma
+    b2.conditions.prepend_globaltag('tracking_data_Moriond23_v1')
+    ma.scaleTrackMomenta('B0:sig', payloadName='tracking_momentumScaleFactor_global', scalingFactorName='sf_global_central', path=path)
+
+Recommendation
+--------------
++ **GlobalTag** - tracking_data_Moriond23_v1
++ **payloadName** - tracking_momentumScaleFactor_global
++ **scalingFactorName** - sf_global_central
++ **scalingFactorName to evaluate the systematic uncertainty** - sf_global_up, sf_global_down
+
++-------+----+-----------+--------+
+| Tags: |Data|Systematics|Tracking|
++-------+----+-----------+--------+
 [INFO] Convert the localfile to a payload
 [INFO] Conditions Database: found working metadata provider
 [INFO] Conditions data: configured globaltag is ${default_globaltag}

@@ -201,12 +201,38 @@ namespace Belle2 {
     TCanvas* m_c_eklmhit_theta_eff      = nullptr;    /**< canvas for TRGEFF efficiency,  eklmhit bit */
     TEfficiency* m_eklmhit_theta_eff    = nullptr;    /**< the efficiency of theta for eklmhit bit */
 
-    std::vector<std::tuple<std::string, TEfficiency**, TCanvas*>>
-                                                               m_efficiencyList; /**< Combined efficiency list,the histogram, efficiency and Canvas  */
-
-
     //mirabelle
     Belle2::MonitoringObject* m_mon_trgeff = nullptr; /**< MonitoringObject for trg */
+
+
+    // rebin the histogram and then calculate the efficiency
+    TEfficiency* m_rebin_hPhi_eff             = nullptr;  /**< the efficiency of Phi */
+    TEfficiency* m_rebin_hPt_eff              = nullptr;  /**< the efficiency of Pt for f bit */
+    TEfficiency* m_rebin_nobha_hPt_eff        = nullptr;  /**< remove the bha_veto, the efficiency of Pt for f bit */
+    TEfficiency* m_rebin_hP3_z_eff            = nullptr;  /**< the efficiency of p for z bit */
+    TEfficiency* m_rebin_hP3_y_eff            = nullptr;  /**< the efficiency of p for y bit */
+    TEfficiency* m_rebin_nobha_hP3_z_eff      = nullptr;  /**< remove the bha_veto, the efficiency of p for z bit */
+    TEfficiency* m_rebin_nobha_hP3_y_eff      = nullptr;  /**< remove the bha_veto, the efficiency of p for y bit */
+    TEfficiency* m_rebin_fyo_dphi_eff         = nullptr;  /**< the efficiency of dphi for fyo bit */
+    TEfficiency* m_rebin_nobha_fyo_dphi_eff   = nullptr;  /**< remove the bha_veto, the efficiency of dphi for fyo bit */
+    TEfficiency* m_rebin_stt_phi_eff          = nullptr;  /**< the efficiency of phi for stt bit */
+    TEfficiency* m_rebin_stt_P3_eff           = nullptr;  /**< the efficiency of p for stt bit */
+    TEfficiency* m_rebin_stt_theta_eff        = nullptr;  /**< the efficiency of theta for stt bit */
+    TEfficiency* m_rebin_nobha_stt_phi_eff    = nullptr;  /**< remove the bha_veto, the efficiency of phi for stt bit */
+    TEfficiency* m_rebin_nobha_stt_P3_eff     = nullptr;  /**< remove the bha_veto, the efficiency of p for stt bit */
+    TEfficiency* m_rebin_nobha_stt_theta_eff  = nullptr;  /**< remove the bha_veto, the efficiency of theta for stt bit */
+    TEfficiency* m_rebin_hie_E_eff            = nullptr;  /**< the efficiency of phi for hie bit */
+    TEfficiency* m_rebin_nobha_hie_E_eff      = nullptr;  /**< remove the bha_veto, the efficiency of phi for hie bit */
+    TEfficiency* m_rebin_ecltiming_E_eff      = nullptr;  /**< the efficiency of phi for ecltiming bit */
+    TEfficiency* m_rebin_ecltiming_theta_eff  = nullptr;  /**< the efficiency of theta for ecltiming bit */
+    TEfficiency* m_rebin_ecltiming_phi_eff    = nullptr;  /**< the efficiency of phi for ecltiming bit */
+    TEfficiency* m_rebin_klmhit_phi_eff       = nullptr;  /**< the efficiency of phi for klmhit bit */
+    TEfficiency* m_rebin_klmhit_theta_eff     = nullptr;  /**< the efficiency of theta for klmhit bit */
+    TEfficiency* m_rebin_eklmhit_phi_eff      = nullptr;  /**< the efficiency of phi for eklmhit bit */
+    TEfficiency* m_rebin_eklmhit_theta_eff    = nullptr;  /**< the efficiency of theta for eklmhit bit */
+
+    std::vector<std::tuple<std::string, TEfficiency**, TCanvas*, TEfficiency**>>
+        m_efficiencyList; /**< Combined efficiency list,the histogram, efficiency Canvas, and rebinned efficiency */
 
   };
 

@@ -343,7 +343,8 @@ void ROIFinder::apply(const std::vector<SpacePointTrackCand>& finalTracks)
       double uCoordinate = intercept.getCoorU();
       double vCoordinate = intercept.getCoorV();
 
-      const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(interceptSensorID));
+      const PXD::SensorInfo* currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(
+                                               interceptSensorID));
 
       int interceptUCell = currentSensor->getUCellID(uCoordinate, vCoordinate, false);
       int interceptVCell = currentSensor->getVCellID(vCoordinate, false);

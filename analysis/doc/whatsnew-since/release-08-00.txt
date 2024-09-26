@@ -12,11 +12,13 @@ GraFEI
 ++++++
 * The tool now assigns an updated mass hypothesis to each final state particle corresponding to the model prediction. This is done by filling
   new particles lists named ``:graFEI``.
+
 Variables
 +++++++++
 * PIDVariables: in all functions replacing ``logL == 0`` with a call to ``isAvailable`` which tests the detector flags in ``PIDLikelihoods``
 * Added variables: `isPIDAvailable`, `isPIDAvailableFrom`, `pidLogarithmicProbabilityExpert`
 * in function ``addAlias(alias, variable)`` adding ``return alias`` for convenience
+* Added a new Neural-Network based KLM muon probability variable `klmMuonIDDNN` (for expert use only). 
 
 
 Changes in the analysis package in light-2405-quaxo

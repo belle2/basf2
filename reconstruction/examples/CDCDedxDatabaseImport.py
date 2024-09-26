@@ -12,10 +12,11 @@
 # This steering file shows how to use the CDCDedxDatabaseImporter
 # to import dummy data (from TH1) into a payload ROOT file
 #
-# The user should provide input and output root filname
+# The user should provide input and output root filename
 # as first and second argument respectively.
 ########################################################
 
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import CDCDedxDatabaseImporter
 
 dedxScaleImporter = CDCDedxDatabaseImporter("DedxPDFs.root", "DedxPDFs")

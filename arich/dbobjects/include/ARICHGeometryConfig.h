@@ -216,21 +216,35 @@ namespace Belle2 {
       m_mirrorDispl = displ;
     }
 
+    /**
+     * Set whether global displacement should be used
+     * @param use switch on/off global displacement
+     */
     void setUseGlobalDisplacement(bool use)
     {
       m_displaceGlobal = use;
     }
 
+    /**
+     * Set whether mirror displacement should be used
+     * @param use switch on/off mirror displacement
+     */
     void setUseMirrorDisplacement(bool use)
     {
       m_displaceMirrors = use;
     }
 
+    /**
+     * Get whether global displacement is used
+     */
     bool useGlobalDisplacement() const
     {
       return m_displaceGlobal;
     }
 
+    /**
+     * Get whether mirror displacement is used
+     */
     bool useMirrorDisplacement() const
     {
       return m_displaceMirrors;

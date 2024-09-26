@@ -9,6 +9,7 @@
 ##########################################################################
 
 # Import DAFparameters payloads
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import Database, IntervalOfValidity, DAFparameters
 
 # Optimisation 2023 #

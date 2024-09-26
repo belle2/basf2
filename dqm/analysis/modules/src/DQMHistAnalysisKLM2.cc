@@ -307,45 +307,53 @@ void DQMHistAnalysisKLM2Module::endRun()
 {
   std::string name;
 
+  int bklmMaxLayer = BKLMElementNumbers::getMaximalLayerNumber();//15
+  int bklmMaxSector = BKLMElementNumbers::getMaximalSectorNumber();//8
+
+  int eklmGlobalMaxSector = EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder();//8
+  int eklmLocalMaxSector = EKLMElementNumbers::getMaximalSectorNumber();//4
+  int eklmBLayerCount = m_EklmElementNumbers->getMaximalDetectorLayerNumber(EKLMElementNumbers::c_BackwardSection);//12
+
   // Looping over the sectors
   for (int bin = 0; bin < m_eff_bklm_sector->GetXaxis()->GetNbins(); bin++) {
     name = "eff_B";
-    if (bin < 8)
+    if (bin < bklmMaxSector)
       name += "B";
     else
       name += "F";
-    name += std::to_string(bin % 8);
+    name += std::to_string(bin % bklmMaxSector);
     m_monObj->setVariable(name, m_eff_bklm_sector->GetBinContent(bin + 1));
   }
 
   for (int bin = 0; bin < m_eff_eklm_sector->GetXaxis()->GetNbins(); bin++) {
     name = "eff_E";
-    if (bin < 4)
+    if (bin < eklmLocalMaxSector) //(bin < 4)
       name += "B";
     else
       name += "F";
-    name += std::to_string(bin % 4);
+    name += std::to_string(bin % eklmLocalMaxSector);
     m_monObj->setVariable(name, m_eff_eklm_sector->GetBinContent(bin + 1));
   }
 
   // Looping over the planes
   for (int layer = 0; layer < m_eff_bklm->GetXaxis()->GetNbins(); layer++) {
     name = "eff_B";
-    if (layer / 15 < 8) {
+    //layer/15 < 8
+    if (layer / bklmMaxLayer < bklmMaxSector) {
       name += "B";
     } else {
       name += "F";
     }
-    name += std::to_string(int(layer / 15) % 8) + "_layer" + std::to_string(1 + (layer % 15));
+    name += std::to_string(int(layer / bklmMaxLayer) % bklmMaxSector) + "_layer" + std::to_string(1 + (layer % bklmMaxLayer));
     m_monObj->setVariable(name, m_eff_bklm->GetBinContent(layer + 1));
   }
   for (int layer = 0; layer < m_eff_eklm->GetXaxis()->GetNbins(); layer++) {
     name = "eff_E";
-    if (layer / 8 < 12)
-      name += "B" + std::to_string(layer / 8 + 1);
+    if (layer / eklmGlobalMaxSector < eklmBLayerCount) //(layer/8 < 12)
+      name += "B" + std::to_string(layer / eklmGlobalMaxSector + 1);
     else
-      name += "F" + std::to_string(layer / 8 - 11);
-    name +=  + "_num" + std::to_string(((layer) % 8) + 1);
+      name += "F" + std::to_string(layer / eklmGlobalMaxSector - eklmBLayerCount + 1);
+    name +=  + "_num" + std::to_string(((layer) % eklmGlobalMaxSector) + 1);
     m_monObj->setVariable(name, m_eff_eklm->GetBinContent(layer + 1));
 
   }
@@ -355,11 +363,16 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
 {
   effHist->Reset();
   std::unique_ptr<TH1> effClone(static_cast<TH1*>
-                                (effHist->Clone()));   // Clone effHist, will be useful for delta plots & Smart pointer will mange memory leak
+                                (effHist->Clone()));   // Clone effHist, will be useful for delta plots & Smart pointer will manage memory leak
   canvas->cd();
   if (denominator != nullptr && numerator != nullptr) {
     effHist->Divide(numerator, denominator, 1, 1, "B");
     effHist->Draw();
+
+    //reference check
+    TH1* ref = findRefHist(effHist->GetName(), false);
+    if (ref) {ref->Draw("hist,same");}
+
     canvas->Modified();
     canvas->Update();
 
@@ -375,7 +388,7 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
       B2INFO("DQMHistAnalysisKLM2: Eff Delta Num/Denom Entries is " << deltaNumer->GetEntries() << "/" << deltaDenom->GetEntries());
       effClone->Divide(deltaNumer, deltaDenom, 1, 1, "B");
       effClone->SetLineColor(kOrange);
-      effClone->DrawCopy("SAME"); // managed by ROOT, so it helpes in plotting even if obj deleted by smart pointer
+      effClone->DrawCopy("SAME"); // managed by ROOT, so it helps in plotting even if obj deleted by smart pointer
       canvas->Modified();
       canvas->Update();
     }
@@ -407,11 +420,11 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
         if (sector > 0)
           m_PlaneLine.DrawLine(xLine, histMin, xLine, histMin + histRange);
         name = "B";
-        if (sector < 8)
+        if (sector < BKLMElementNumbers::getMaximalSectorNumber())
           name += "B";
         else
           name += "F";
-        name += std::to_string(sector % 8);
+        name += std::to_string(sector % BKLMElementNumbers::getMaximalSectorNumber());
         m_PlaneText.DrawText(xText, yText, name.c_str());
       }
 

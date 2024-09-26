@@ -16,7 +16,7 @@ from tracking.root_utils import root_cd, root_save_name
 from tracking.validation.matplotting import get_logger
 
 
-class ValidationFiguresOfMerit(collections.MutableMapping):
+class ValidationFiguresOfMerit(collections.abc.MutableMapping):
     """Create and write an TNtuple of the validation figures of merit"""
 
     def __init__(

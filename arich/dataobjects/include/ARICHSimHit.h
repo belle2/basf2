@@ -42,7 +42,6 @@ namespace Belle2 {
       \param position vector of hit local position (in module coor. sys.)
       \param globalTime global time of photon hit
       \param energy energy of photon
-      \param parentID geant4 id of photon parent particle
     */
 
     ARICHSimHit(

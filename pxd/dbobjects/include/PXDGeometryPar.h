@@ -23,7 +23,7 @@ namespace Belle2 {
     //! Default constructor
     PXDGeometryPar() {}
     //! Copy constructor
-    PXDGeometryPar(PXDGeometryPar& geo)
+    PXDGeometryPar(PXDGeometryPar& geo) : VXDGeometryPar(geo)
     {
       for (PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
         m_SensorInfo.push_back(new PXDSensorInfoPar(*pxdSensor));
@@ -33,6 +33,7 @@ namespace Belle2 {
       m_cutOutWidth = geo.getCutOutWidth();
       m_cutOutHeight = geo.getCutOutHeight();
       m_cutOutRphi = geo.getCutOutRPhi();
+      m_cutOutShift = geo.getCutOutShift();
       m_cutOutStartPhi = geo.getCutOutStartPhi();
       m_cutOutDeltaPhi = geo.getCutOutDeltaPhi();
       m_nTubes = geo.getNTubes();
@@ -48,6 +49,7 @@ namespace Belle2 {
     //! Assignemnt operator
     PXDGeometryPar& operator=(PXDGeometryPar& geo)
     {
+      VXDGeometryPar::operator=(geo);
       for (PXDSensorInfoPar* pxdSensor : geo.getSensorInfos()) {
         m_SensorInfo.push_back(new PXDSensorInfoPar(*pxdSensor));
       }
@@ -56,6 +58,7 @@ namespace Belle2 {
       m_cutOutWidth = geo.getCutOutWidth();
       m_cutOutHeight = geo.getCutOutHeight();
       m_cutOutRphi = geo.getCutOutRPhi();
+      m_cutOutShift = geo.getCutOutShift();
       m_cutOutStartPhi = geo.getCutOutStartPhi();
       m_cutOutDeltaPhi = geo.getCutOutDeltaPhi();
       m_nTubes = geo.getNTubes();

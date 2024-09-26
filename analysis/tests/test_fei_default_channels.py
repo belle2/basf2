@@ -191,6 +191,16 @@ class TestGetFRChannels(unittest.TestCase):
         self.assertEqual(len(particles[14].channels), 15)
         self.assertEqual(len(particles[15].channels), 17)
 
+    def test_get_mode_names(self):
+        had_modes = fei.default_channels.get_mode_names('B0', hadronic=True, semileptonic=False)
+        self.assertEqual(len(had_modes), 32)
+        sl_modes = fei.default_channels.get_mode_names('B0', hadronic=False, semileptonic=True)
+        self.assertEqual(len(sl_modes), 8)
+        had_modes = fei.default_channels.get_mode_names('B+', hadronic=True, semileptonic=False)
+        self.assertEqual(len(had_modes), 36)
+        sl_modes = fei.default_channels.get_mode_names('B+', hadronic=False, semileptonic=True)
+        self.assertEqual(len(sl_modes), 8)
+
 
 if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()

@@ -86,7 +86,7 @@ namespace Belle2 {
     }
 
     /**
-    * funtion to set flag active for plotting
+    * function to set flag active for plotting
     */
     void enableExtraPlots(bool value = false) {isMakePlots = value;}
 
@@ -241,6 +241,7 @@ namespace Belle2 {
     std::vector<std::vector<double>> m_onedcors; /**< final vectors of calibration  */
 
     DBObjPtr<CDCDedx1DCell> m_DBOneDCell; /**< One cell correction DB object */
+
 
   };
 } // namespace Belle2

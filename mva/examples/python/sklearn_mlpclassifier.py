@@ -21,9 +21,9 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
     """
     from sklearn.neural_network import MLPClassifier
     from basf2_mva_python_interface.sklearn import State
-    if isinstance(parameters, collections.Mapping):
+    if isinstance(parameters, collections.abc.Mapping):
         clf = MLPClassifier(**parameters)
-    elif isinstance(parameters, collections.Sequence):
+    elif isinstance(parameters, collections.abc.Sequence):
         clf = MLPClassifier(*parameters)
     else:
         clf = MLPClassifier()

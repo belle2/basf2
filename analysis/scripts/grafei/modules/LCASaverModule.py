@@ -294,7 +294,7 @@ class LCASaverModule(b2.Module):
         self.tree.Branch("n_particles", self.n_particles, "n_particles/I")
 
         #: Particle-is-primary flag
-        self.primary = np.zeros(self.max_particles, dtype=np.bool)
+        self.primary = np.zeros(self.max_particles, dtype=bool)
         self.tree.Branch("primary", self.primary, "primary[n_particles]/O")
 
         #: Leaves in event
@@ -331,6 +331,7 @@ class LCASaverModule(b2.Module):
         """
         Called for each event.
         """
+        from ROOT import Belle2  # noqa: make Belle2 namespace available
         from ROOT.Belle2 import PyStoreObj
 
         # Get the particle list (note this is a regular Particle list, not MCParticle)

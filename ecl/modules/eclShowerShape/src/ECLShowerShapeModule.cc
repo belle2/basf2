@@ -96,6 +96,13 @@ void ECLShowerShapeModule::initializeMVAweightFiles(const std::string& identifie
 
 void ECLShowerShapeModule::initialize()
 {
+  m_eclConnectedRegions.isRequired(eclConnectedRegionArrayName());
+  StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
+  eclCalDigits.isRequired();
+  StoreArray<ECLShower> eclShowers(eclShowerArrayName());
+  eclShowers.isRequired();
+  m_eclConnectedRegions.requireRelationTo(eclCalDigits);
+  eclShowers.requireRelationTo(eclCalDigits);
 
   // Initialize neighbour maps.
   m_neighbourMap9 = std::unique_ptr<ECL::ECLNeighbours>(new ECL::ECLNeighbours("N", 1));

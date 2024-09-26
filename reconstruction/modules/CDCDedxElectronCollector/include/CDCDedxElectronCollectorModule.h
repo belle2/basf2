@@ -109,7 +109,7 @@ namespace Belle2 {
     bool m_isADCcorr;       /**< flag to write adc corrected in tree */
     bool m_isBhabha;     /**< flag to select bhabha event */
     bool m_isRadee;  /**< flag to select radee event */
-    bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */
-    bool m_isInjTime; /**< flag to enable trigger skim (off deafult) */
+    bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off default) */
+    bool m_isInjTime; /**< flag to enable trigger skim (off default) */
   };
 }

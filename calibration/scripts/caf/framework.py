@@ -886,6 +886,7 @@ class Calibration(CalibrationBase):
     def algorithms(self, value):
         """
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import CalibrationAlgorithm
         if isinstance(value, CalibrationAlgorithm):
             self._algorithms = [Algorithm(value)]
@@ -899,6 +900,7 @@ class Calibration(CalibrationBase):
         """
         Alternate algorithms setter for lists and tuples of CalibrationAlgorithms.
         """
+        from ROOT import Belle2  # noqa: make the Belle2 namespace available
         from ROOT.Belle2 import CalibrationAlgorithm
         if value:
             self._algorithms = []
@@ -1096,8 +1098,8 @@ class Algorithm():
     Parameters:
         algorithm: The CalibrationAlgorithm instance that we want to execute.
     Keyword Arguments:
-        data_input (types.FunctionType): An optional function that sets the input files of the algorithm.
-        pre_algorithm (types.FunctionType): An optional function that runs just prior to execution of the algorithm.
+        data_input : An optional function that sets the input files of the algorithm.
+        pre_algorithm : An optional function that runs just prior to execution of the algorithm.
             Useful for set up e.g. module initialisation
 
     This is a simple wrapper class around the C++ CalibrationAlgorithm class.

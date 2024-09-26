@@ -58,7 +58,9 @@ C switch to generate tau decays to electron or muon for alternate events [random
       INTEGER TauToElOrMu
       DATA    TauToElOrMu /0/
       COMMON /TauToElOrMu/ TauToElOrMu
-      
+      INTEGER JAK1SV,JAK2SV
+      COMMON /JAKSV/ JAK1SV, JAK2SV
+
 C     FF2PIRHO ! switch for the two pion form factor
 C     = 0 CLEO parametrization
 C     = 1 RChL parametrization (is same as = 0 in this implementation)
@@ -138,6 +140,8 @@ C radiative correction switch in tau --> e (mu) decays !
 C switches of tau+ tau- decay modes !!
       Jak1            = xpar(ITAUXPAR+1) ! Decay Mask for first tau
       Jak2            = xpar(ITAUXPAR+2) ! Decay Mask for second tau
+      JAK1SV          = Jak1
+      JAK2SV          = Jak2
 C output file number for TAUOLA
       IOUT    = xpar(4)
 C  KeyA1 is used for formfactors actually not in use
@@ -161,7 +165,6 @@ C  KeyA1 is used for formfactors actually not in use
       LAMDEC    = XPAR(ITAUXPAR+906)
       CHCONJUGATE= XPAR(ITAUXPAR+909)
       TauToElOrMu= XPAR(ITAUXPAR+910)
-      IF (TauToElOrMu.EQ.1) JAK2=1
 C
       DO IUSER = 1,100
          USERACTIVE(IUSER) = 0

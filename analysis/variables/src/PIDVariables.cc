@@ -1025,6 +1025,15 @@ namespace Belle2 {
       return std::get<double>(func(particle));
     }
 
+    double klmMuonIDDNN(const Particle* part)
+    {
+      const PIDLikelihood* pid = part->getPIDLikelihood();
+      if (!pid) return Const::doubleNaN;
+      double klmMuonIDDNNvalue = pid->getPreOfficialLikelihood("klmMuonIDDNN");
+      // klmMuonIDDNNvalue == -1.0 means there is no valid output from KLMMuonIDDNNExpertModule
+      if (klmMuonIDDNNvalue < 0.0) return Const::doubleNaN;
+      return klmMuonIDDNNvalue;
+    }
 
     //*************
     // B2BII
@@ -1297,6 +1306,8 @@ following the order shown in the metavariable's declaration. Flat priors are ass
                           "such as the likelihood from the 6 subdetectors for PID for all 6 hypotheses, "
                           ":math:`\\mathcal{\\tilde{L}}_{hyp}^{det}`, or the track momentum and charge",
                           Manager::VariableDataType::c_double);
+    REGISTER_VARIABLE("klmMuonIDDNN", klmMuonIDDNN,
+                      "Muon probability calculated from Neural Network with KLM information (expert use only)");
 
     // B2BII PID
     VARIABLE_GROUP("Belle PID variables");

@@ -23,7 +23,8 @@
 #include <pxd/dataobjects/PXDCluster.h>
 
 #include <framework/database/DBObjPtr.h>
-#include <reconstruction/dbobjects/DedxPDFs.h>
+#include <svd/dbobjects/SVDdEdxPDFs.h>
+#include <pxd/dbobjects/PXDdEdxPDFs.h>
 
 #include <vector>
 
@@ -124,11 +125,12 @@ namespace Belle2 {
       return (d == Dedx::c_PXD and m_usePXD) or (d == Dedx::c_SVD and m_useSVD);
     }
 
-    /** Check the pdfs for consistency everytime they change in the database */
+    /** Check the pdfs for consistency every time they change in the database */
     void checkPDFs();
 
     // pdfs for PID
-    DBObjPtr<DedxPDFs> m_DBDedxPDFs; /**< DB object for dedx:momentum PDFs */
+    DBObjPtr<SVDdEdxPDFs> m_SVDDedxPDFs; /**< SVD DB object for dedx:momentum PDFs */
+    DBObjPtr<PXDdEdxPDFs> m_PXDDedxPDFs; /**< PXD DB object for dedx:momentum PDFs */
 
     // parameters: full likelihood vs. truncated mean
     bool m_useIndividualHits; /**< Include PDF value for each hit in likelihood. If false, the truncated mean of dedx values for the detectors will be used. */

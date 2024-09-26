@@ -47,8 +47,10 @@ Untested method EventLevelTrackingInfo::setSVDFirstSampleTime
 Untested method EventLevelTrackingInfo::setSVDSpacePointCreatorAbortionFlag
 Untested method EventLevelTrackingInfo::setUnspecifiedTrackFindingFailure
 Untested method EventLevelTrackingInfo::setVXDTF2AbortionFlag
+Untested method PIDLikelihood::addPreOfficialLikelihood
 Untested method PIDLikelihood::getDeltaLogL
 Untested method PIDLikelihood::getInfoHTML
+Untested method PIDLikelihood::getPreOfficialLikelihood
 Untested method PIDLikelihood::printArray
 Untested method PIDLikelihood::setLogLikelihood
 Untested method PIDLikelihood::subtractMaximum
@@ -495,6 +497,7 @@ V0#2:
     -> Tracks#8
     -> Tracks#6
   getV0Hypothesis(): <type: K_S0>
+No data for Kinks
 TrackFitResult#0:
 [INFO] Conditions Database: found working metadata provider
 	provider = ${BELLE2_CONDB_METADATA}
@@ -5959,6 +5962,7 @@ V0#8:
     -> Tracks#7
     -> Tracks#9
   getV0Hypothesis(): <type: K_S0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (0.186523,0.190646,0.0252355,0.302082)
   getChargeSign(): -1
@@ -14593,6 +14597,7 @@ V0#0:
     -> Tracks#10
     -> Tracks#7
   getV0Hypothesis(): <type: K_S0>
+No data for Kinks
 TrackFitResult#0:
   get4Momentum(): (-0.0999914,0.219547,0.150702,0.316844)
   getChargeSign(): -1

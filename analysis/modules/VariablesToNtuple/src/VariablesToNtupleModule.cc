@@ -71,6 +71,8 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("storeEventType", m_storeEventType,
            "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
 
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
 }
 
 void VariablesToNtupleModule::initialize()
@@ -82,9 +84,11 @@ void VariablesToNtupleModule::initialize()
   // Initializing the output root file
 
   // override the output file name with what's been provided with the -o option
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_fileName = outputFileArgument;
+  if (!m_ignoreCommandLineOverride) {
+    const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+    if (!outputFileArgument.empty())
+      m_fileName = outputFileArgument;
+  }
 
   if (!m_fileNameSuffix.empty())
     m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);

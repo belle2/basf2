@@ -108,7 +108,7 @@ class PXDHitErrorsTTree(b2.Module):
                 self.data.cluster_index = cluster.getArrayIndex()
 
                 # Get sensor geometry information
-                sensor_info = Belle2.VXD.GeoCache.get(vxd_id)
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(vxd_id)
                 thickness = sensor_info.getThickness()
 
                 # TrueHit information

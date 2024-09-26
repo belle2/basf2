@@ -10,6 +10,7 @@
 
 /* Geant4 headers. */
 #include <G4ThreeVector.hh>
+#include <G4VTouchable.hh>
 
 /* ROOT headers. */
 #include <Math/Vector3D.h>
@@ -23,7 +24,6 @@ typedef double EclGeV;
 typedef double EclCM;
 typedef double EclRad;
 
-class G4VTouchable;
 namespace HepGeom {
   class Transform3D;
 }

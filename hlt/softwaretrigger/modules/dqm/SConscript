@@ -10,7 +10,8 @@ env['LIBS'] = [
     'hlt_softwaretrigger_dataobjects',
     'hlt',
     'klm_dataobjects',
-    'ecl_dataobjects'
+    'ecl_dataobjects',
+    'svd_dataobjects'
     ]
 
 Return('env')

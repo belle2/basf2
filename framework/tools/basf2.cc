@@ -56,10 +56,6 @@ namespace prog = boost::program_options;
 namespace {
   void executePythonFile(const string& pythonFile)
   {
-    // temporarily disable users' rootlogon
-    // FIXME: remove this line when ROOT-10468 is resolved
-    import("ROOT").attr("PyConfig").attr("DisableRootLogon") =  true;
-
     object main_module = import("__main__");
     object main_namespace = main_module.attr("__dict__");
     if (pythonFile.empty()) {

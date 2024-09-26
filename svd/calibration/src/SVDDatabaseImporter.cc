@@ -25,22 +25,21 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 
 
-void SVDDatabaseImporter::importSVDHitTimeNeuralNetwork(string fileName, bool threeSamples)
+void SVDDatabaseImporter::importSVDHitTimeNeuralNetwork(std::string fileName, bool threeSamples)
 {
-  ifstream xml(fileName);
+  std::ifstream xml(fileName);
   if (!xml.good()) {
     B2RESULT("ERROR: File not found.\nNeural network from " << fileName << " could not be imported.");
     return;
   }
-  string label("SVDTimeNet_6samples");
+  std::string label("SVDTimeNet_6samples");
   if (threeSamples)
     label = "SVDTimeNet_3samples";
-  stringstream buffer;
+  std::stringstream buffer;
   buffer << xml.rdbuf();
   DBImportObjPtr<DatabaseRepresentationOfWeightfile> importObj(label);
   importObj.construct();

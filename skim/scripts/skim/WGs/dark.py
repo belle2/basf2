@@ -19,7 +19,7 @@ from stdPhotons import stdPhotons
 import vertex as vertex
 
 __liaison__ = "Gaurav Sharma <gaurav@physics.iitm.ac.in>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -746,9 +746,9 @@ class InelasticDarkMatterWithDarkHiggs(BaseSkim):
 @fancy_skim_header
 class AA2uuuu(BaseSkim):
     """
-    Searching the dark sector through U(1) kinetic mixing.
+    Searching dark photons in 4-muon final state.
 
-    Reconstructed 2 muons to a dark photon.
+    Reconstructed a muon pair to a dark photon.
     """
     __description__ = ":math:`ee\\to A^{\\prime}A^{\\prime}\\nu_{D}\\nu_{D}\\to \\mu\\mu\\mu\\mu`"
     __category__ = "physics, dark sector"
@@ -761,16 +761,17 @@ class AA2uuuu(BaseSkim):
         stdMu("all", path=path)
 
     def build_lists(self, path):
-        muon_cuts = """[0.8 < muonID]
-        and [inKLMAcceptance == 1]
-        and [inCDCAcceptance == 1]"""
+        llcut_PID = "[muonID > 0.8]"
 
-        track_cuts = "[dr < 0.5] and [abs(dz) < 2]"
+        llcut_acceptance = "[dr < 0.5] and [abs(dz) < 2]"
+        llcut_acceptance += " and [inKLMAcceptance == 1]"
+        llcut_acceptance += " and [inCDCAcceptance == 1]"
 
-        path = self.skim_event_cuts(f"4 <= nCleanedTracks({track_cuts})", path=path)
+        path = self.skim_event_cuts(f"nCleanedTracks({llcut_acceptance}) >= 4", path=path)
 
-        ma.cutAndCopyList("mu+:accepted_AA2uuuu", "mu+:all", muon_cuts, path=path)
-        ma.reconstructDecay(decayString="vpho:rec -> mu+:accepted_AA2uuuu mu-:accepted_AA2uuuu", cut="", path=path)
+        ma.cutAndCopyList("mu+:over08", "mu+:all", llcut_PID, path=path)
+        ma.reconstructDecay(decayString="vpho:rec -> mu+:over08 mu-:over08", cut="", path=path)
+        vertex.kFit("vpho:rec", 0.0, path=path)
         ma.reconstructDecay(decayString="Upsilon(4S):rec -> vpho:rec vpho:rec", cut="", path=path)
 
         return ["Upsilon(4S):rec"]

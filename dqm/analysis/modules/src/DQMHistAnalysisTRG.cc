@@ -159,21 +159,78 @@ void DQMHistAnalysisTRGModule::initialize()
   registerEpicsPV(m_pvPrefix + "ECLTRG_deadch", "ECLTRG_deadch");
 
   //ECLTRG N(TC) total
-  addDeltaPar("TRG", "h_n_TChit_event", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("TRG", "h_n_TChit_event_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_total", "ECLTRG_meanTC_total");
 
   //ECLTRG N(TC) clean
-  addDeltaPar("TRG", "h_n_TChit_clean", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("TRG", "h_n_TChit_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_clean", "ECLTRG_meanTC_clean"); // Mean value for the distribution of N(TC)
   registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_clean", "ECLTRG_tailTC_clean"); // Tail position for the distribution of N(TC)
 
   //ECLTRG N(TC) HER Injection region
-  addDeltaPar("TRG", "h_n_TChit_injHER", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("TRG", "h_n_TChit_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_injHER", "ECLTRG_meanTC_injHER");
 
   //ECLTRG N(TC) LER Injection region
-  addDeltaPar("TRG", "h_n_TChit_injLER", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  addDeltaPar("TRG", "h_n_TChit_injLER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
   registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_injLER", "ECLTRG_meanTC_injLER");
+
+  //ECLTRG N(TC) total from the forward endcap
+  addDeltaPar("TRG", "h_n_TChit_FWD_event_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_FWD_total", "ECLTRG_meanTC_FWD_total");
+
+  //ECLTRG N(TC) clean from the forward endcap
+  addDeltaPar("TRG", "h_n_TChit_FWD_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_FWD_clean",
+                  "ECLTRG_meanTC_FWD_clean"); // Mean value for the distribution of N(TC) from the forward
+  registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_FWD_clean",
+                  "ECLTRG_tailTC_FWD_clean"); // Tail position for the distribution of N(TC) from the forward
+
+  //ECLTRG N(TC) HER Injection region from the forward endcap
+  addDeltaPar("TRG", "h_n_TChit_FWD_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_FWD_injHER", "ECLTRG_meanTC_FWD_injHER");
+
+  //ECLTRG N(TC) LER Injection region from the forward endcap
+  addDeltaPar("TRG", "h_n_TChit_FWD_injLER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_FWD_injLER", "ECLTRG_meanTC_FWD_injLER");
+
+  //ECLTRG N(TC) total from the barrel
+  addDeltaPar("TRG", "h_n_TChit_BRL_event_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BRL_total", "ECLTRG_meanTC_BRL_total");
+
+  //ECLTRG N(TC) clean from the barrel
+  addDeltaPar("TRG", "h_n_TChit_BRL_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BRL_clean",
+                  "ECLTRG_meanTC_BRL_clean"); // Mean value for the distribution of N(TC) from the barrel
+  registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_BRL_clean",
+                  "ECLTRG_tailTC_BRL_clean"); // Tail position for the distribution of N(TC) from the barrel
+
+  //ECLTRG N(TC) HER Injection region from the barrel
+  addDeltaPar("TRG", "h_n_TChit_BRL_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BRL_injHER", "ECLTRG_meanTC_BRL_injHER");
+
+  //ECLTRG N(TC) LER Injection region from the barrel
+  addDeltaPar("TRG", "h_n_TChit_BRL_injLER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BRL_injLER", "ECLTRG_meanTC_BRL_injLER");
+
+  //ECLTRG N(TC) total from the backward endcap
+  addDeltaPar("TRG", "h_n_TChit_BWD_event_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BWD_total", "ECLTRG_meanTC_BWD_total");
+
+  //ECLTRG N(TC) clean from the backward endcap
+  addDeltaPar("TRG", "h_n_TChit_BWD_clean_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BWD_clean",
+                  "ECLTRG_meanTC_BWD_clean"); // Mean value for the distribution of N(TC) from the backward
+  registerEpicsPV(m_pvPrefix + "ECLTRG_tailTC_BWD_clean",
+                  "ECLTRG_tailTC_BWD_clean"); // Tail position for the distribution of N(TC) from the backward
+
+  //ECLTRG N(TC) HER Injection region from the backward endcap
+  addDeltaPar("TRG", "h_n_TChit_BWD_injHER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BWD_injHER", "ECLTRG_meanTC_BWD_injHER");
+
+  //ECLTRG N(TC) LER Injection region from the backward endcap
+  addDeltaPar("TRG", "h_n_TChit_BWD_injLER_clkgrp", HistDelta::c_Entries, 10000, 1); // update each 10000 entries
+  registerEpicsPV(m_pvPrefix + "ECLTRG_meanTC_BWD_injLER", "ECLTRG_meanTC_BWD_injLER");
 
   //CDCTRG_deadch
 //  m_canvas_CDCTRG_deadch = new TCanvas("CDCTRG_deadch");
@@ -619,14 +676,14 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("CDCTRG_meanTSFHits_injLER", mean);
     }
 
-    auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event", 0, true);
+    auto hist_nTC_total = getDelta("TRG", "h_n_TChit_event_clkgrp", 0, true);
     if (hist_nTC_total) {
       double mean = hist_nTC_total->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_total:" << mean);
       setEpicsPV("ECLTRG_meanTC_total", mean);
     }
 
-    auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean", 0, true);
+    auto hist_nTC_clean = getDelta("TRG", "h_n_TChit_clean_clkgrp", 0, true);
     if (hist_nTC_clean) {
       double mean = hist_nTC_clean->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_clean:" << mean);
@@ -637,18 +694,114 @@ void DQMHistAnalysisTRGModule::doHistAnalysis()
       setEpicsPV("ECLTRG_tailTC_clean", tail);
     }
 
-    auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER", 0, true);
+    auto hist_nTC_injHER = getDelta("TRG", "h_n_TChit_injHER_clkgrp", 0, true);
     if (hist_nTC_injHER) {
       double mean = hist_nTC_injHER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_injHER:" << mean);
       setEpicsPV("ECLTRG_meanTC_injHER", mean);
     }
 
-    auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER", 0, true);
+    auto hist_nTC_injLER = getDelta("TRG", "h_n_TChit_injLER_clkgrp", 0, true);
     if (hist_nTC_injLER) {
       double mean = hist_nTC_injLER->GetMean();
       B2DEBUG(1, "ECLTRG_meanTC_injLER:" << mean);
       setEpicsPV("ECLTRG_meanTC_injLER", mean);
+    }
+
+    auto hist_nTC_FWD_total = getDelta("TRG", "h_n_TChit_FWD_event_clkgrp", 0, true);
+    if (hist_nTC_FWD_total) {
+      double mean = hist_nTC_FWD_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_total", mean);
+    }
+
+    auto hist_nTC_FWD_clean = getDelta("TRG", "h_n_TChit_FWD_clean_clkgrp", 0, true);
+    if (hist_nTC_FWD_clean) {
+      double mean = hist_nTC_FWD_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_clean", mean);
+
+      double tail = getThreshold(hist_nTC_FWD_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_FWD_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_FWD_clean", tail);
+    }
+
+    auto hist_nTC_FWD_injHER = getDelta("TRG", "h_n_TChit_FWD_injHER_clkgrp", 0, true);
+    if (hist_nTC_FWD_injHER) {
+      double mean = hist_nTC_FWD_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_injHER", mean);
+    }
+
+    auto hist_nTC_FWD_injLER = getDelta("TRG", "h_n_TChit_FWD_injLER_clkgrp", 0, true);
+    if (hist_nTC_FWD_injLER) {
+      double mean = hist_nTC_FWD_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_FWD_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_FWD_injLER", mean);
+    }
+
+    auto hist_nTC_BRL_total = getDelta("TRG", "h_n_TChit_BRL_event_clkgrp", 0, true);
+    if (hist_nTC_BRL_total) {
+      double mean = hist_nTC_BRL_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_total", mean);
+    }
+
+    auto hist_nTC_BRL_clean = getDelta("TRG", "h_n_TChit_BRL_clean_clkgrp", 0, true);
+    if (hist_nTC_BRL_clean) {
+      double mean = hist_nTC_BRL_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_clean", mean);
+
+      double tail = getThreshold(hist_nTC_BRL_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_BRL_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_BRL_clean", tail);
+    }
+
+    auto hist_nTC_BRL_injHER = getDelta("TRG", "h_n_TChit_BRL_injHER_clkgrp", 0, true);
+    if (hist_nTC_BRL_injHER) {
+      double mean = hist_nTC_BRL_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_injHER", mean);
+    }
+
+    auto hist_nTC_BRL_injLER = getDelta("TRG", "h_n_TChit_BRL_injLER_clkgrp", 0, true);
+    if (hist_nTC_BRL_injLER) {
+      double mean = hist_nTC_BRL_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BRL_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BRL_injLER", mean);
+    }
+
+    auto hist_nTC_BWD_total = getDelta("TRG", "h_n_TChit_BWD_event_clkgrp", 0, true);
+    if (hist_nTC_BWD_total) {
+      double mean = hist_nTC_BWD_total->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_total:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_total", mean);
+    }
+
+    auto hist_nTC_BWD_clean = getDelta("TRG", "h_n_TChit_BWD_clean_clkgrp", 0, true);
+    if (hist_nTC_BWD_clean) {
+      double mean = hist_nTC_BWD_clean->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_clean:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_clean", mean);
+
+      double tail = getThreshold(hist_nTC_BWD_clean, 0.5);
+      B2DEBUG(1, "ECLTRG_tailTC_BWD_clean:" << tail);
+      setEpicsPV("ECLTRG_tailTC_BWD_clean", tail);
+    }
+
+    auto hist_nTC_BWD_injHER = getDelta("TRG", "h_n_TChit_BWD_injHER_clkgrp", 0, true);
+    if (hist_nTC_BWD_injHER) {
+      double mean = hist_nTC_BWD_injHER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_injHER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_injHER", mean);
+    }
+
+    auto hist_nTC_BWD_injLER = getDelta("TRG", "h_n_TChit_BWD_injLER_clkgrp", 0, true);
+    if (hist_nTC_BWD_injLER) {
+      double mean = hist_nTC_BWD_injLER->GetMean();
+      B2DEBUG(1, "ECLTRG_meanTC_BWD_injLER:" << mean);
+      setEpicsPV("ECLTRG_meanTC_BWD_injLER", mean);
     }
 
 

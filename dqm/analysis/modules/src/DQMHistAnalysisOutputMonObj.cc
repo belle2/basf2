@@ -96,7 +96,7 @@ void DQMHistAnalysisOutputMonObjModule::endRun()
   int exist = 0;
   if (f->IsZombie()) {
     B2WARNING("File " << LogVar("MonitoringObject file",
-                                fname) << " already exists additional data will be appended! previous metadata is keept.");
+                                fname) << " already exists additional data will be appended! previous metadata is kept.");
     f = new TFile(fname, "UPDATE");
     exist = 1;
   }
@@ -141,7 +141,7 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   //int expee = 0;
   char* rel = const_cast<char*>(m_metaData->getRelease().c_str());
   char* db = const_cast<char*>(m_metaData->getDatabaseGlobalTag().c_str());
-  char* datee = const_cast<char*>(m_metaData->getRunDate().c_str());
+  char* date = const_cast<char*>(m_metaData->getRunDate().c_str());
   char* rtype = const_cast<char*>(m_metaData->getRunType().c_str());
   char* procID = const_cast<char*>(m_metaData->getProcessingID().c_str());
 
@@ -178,8 +178,8 @@ void DQMHistAnalysisOutputMonObjModule::addTreeEntry()
   else b_release->SetAddress(rel);
   if (!b_gt) tree->Branch("gt", db, "gt/C");
   else b_gt->SetAddress(db);
-  if (!b_datetime) tree->Branch("datetime", datee, "datetime/C");
-  else b_datetime->SetAddress(datee);
+  if (!b_datetime) tree->Branch("datetime", date, "datetime/C");
+  else b_datetime->SetAddress(date);
   if (!b_rtype) tree->Branch("rtype", rtype, "rtype/C");
   else b_rtype->SetAddress(rtype);
   if (!b_procID) tree->Branch("procID", procID, "procID/C");

@@ -22,7 +22,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 
 __liaison__ = "Ihor Prudiiev <Ihor.Prudiiev@ijs.si>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

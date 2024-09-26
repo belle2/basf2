@@ -58,6 +58,8 @@ namespace Belle2 {
     int y_cutoff = 100;
     int m_intercept_cutoff = 500;
 
+    /** Name of the file for debugging output. */
+    std::string m_dump_Path;
 
   };
 } // namespace Belle2

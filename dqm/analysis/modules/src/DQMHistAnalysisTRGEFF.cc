@@ -280,6 +280,9 @@ void DQMHistAnalysisTRGEFFModule::endRun()
         delete efficiencyRebinnedPtr;
       }
 
+      // Delete the rebinned histograms
+      delete histRebinned;
+      delete histFtdfRebinned;
 
     } else {
       B2WARNING(std::string("Efficiency histogram is null for ") + name);

@@ -571,7 +571,7 @@ namespace Belle2 {
 
       int phi = std::stoi(p_phi, 0, 2);
       trackout.hwPhi0 = phi;
-      // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
+      // c.f. https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/Trigger%20WebHome/Sub-Trigger%20Systems/CDC%20Trigger/WebHome/output-def.pdf?rev=1.1
       double globalPhi0 = pi() / 4 + pi() / 2 / 80 * (phi + 1) + pi() / 2 * iTracker; // see document above
 
 
@@ -611,7 +611,7 @@ namespace Belle2 {
       const double BField = 1.5e-4;
       // omega in 1/cm
       // omega = 1/R = c * B / pt
-      // c.f. https://confluence.desy.de/download/attachments/34033650/output-def.pdf
+      // c.f. https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/Trigger%20WebHome/Sub-Trigger%20Systems/CDC%20Trigger/WebHome/output-def.pdf?rev=1.1
       trackOut.omega = Const::speedOfLight * BField / 0.3 / 34 * omegaFirm;
       int phi0 = std::bitset<trackLens[2]>(trackIn.substr(trackPos[2], trackLens[2])).to_ulong();
       trackOut.hwPhi0 = phi0;

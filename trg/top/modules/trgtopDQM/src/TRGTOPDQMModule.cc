@@ -1341,7 +1341,7 @@ void TRGTOPDQMModule::event()
       sort(tcEclList.begin(), tcEclList.end(), largestEnergy());
 
       // Barrel TCID map:
-      // https://confluence.desy.de/display/BI/TRGECL+Meeting?preview=%2F43899281%2F58924075%2F170630yjkim.pdf
+      // https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/Trigger%20WebHome/Sub-Trigger%20Systems/ECL%20Trigger/ECL%20Trigger%20Meeting/TRGECL%20Meeting/WebHome/170630yjkim.pdf?rev=1.1
       if (tcEclList.size() >= 2) {
         vector<tcEcl>::const_iterator it = tcEclList.begin();
         const tcEcl& tc1 = *it;

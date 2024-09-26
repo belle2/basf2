@@ -47,6 +47,6 @@ with b2test_utils.clean_working_directory():
     assert '__candidate__' in df1.columns, "candidate number is missing from electron dataframe"
     assert '__ncandidates__' in df1.columns, "candidate count is missing from electron dataframe"
 
-    assert df1.run[0] == 0, "run number not as expected"
-    assert df1.exp[0] == 1003, "experiment number not as expected"
-    assert df1.evt[0] == 1, "event number not as expected"
+    assert df1.__run__[0] == 0, "run number not as expected"
+    assert df1.__experiment__[0] == 1003, "experiment number not as expected"
+    assert df1.__event__[0] == 1, "event number not as expected"

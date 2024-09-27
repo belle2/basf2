@@ -324,6 +324,9 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim = b2.register_module('TRGGDLDQM')
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
+        trgeffdqm = b2.register_module("TRGEFFDQM")
+        path.add_module(trgeffdqm)
+
         # TRGTOP
         trgtopdqm_skim = b2.register_module('TRGTOPDQM')
         trgtopdqm_skim.param('skim', 1)

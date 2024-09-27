@@ -6,34 +6,47 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
+from typing import List
 import basf2
 import variables
 import tables
 import numpy as np
 import warnings
+from pyarrow.parquet import ParquetWriter
+from pyarrow.csv import CSVWriter
+import pyarrow as pa
 
 
 """
 Python utilities to help create or manage ntuples and work with them in pandas
 """
 
+numpy_to_pyarrow_type_map = {
+    np.int32: pa.int32(),
+    np.int64: pa.int64(),
+    np.uint32: pa.uint32(),
+    np.uint64: pa.uint64(),
+    np.float32: pa.float32(),
+    np.float64: pa.float64(),
+    np.bool_: pa.bool_(),
+    np.object_: pa.string(),
+    np.str_: pa.string(),
+}
 
-class VariablesToHDF5(basf2.Module):
+
+class VariablesToTable(basf2.Module):
     """
-    Dump variables directly to HDF5
-
-    This Module is the equivalent of VariablesToNtuple but creates an hdf5 file
-    instead of a root file. It is slower as it is implemented in pure python and
-    should currently be considered a proof of concept.
+    Base class to dump ntuples into a non root format of your choosing
     """
 
-    def __init__(self, listname, variables, filename):
+    def __init__(self, listname: str, variables: List[str], filename: str, format: str):
         """Constructor to initialize the internal state
 
         Arguments:
             listname(str): name of the particle list
             variables(list(str)): list of variables to save for each particle
-            filename(str): name of the hdf5 file to be created
+            filename(str): name of the output file to be created
+            format(str): format of the output file, one of 'hdf5', 'parquet', 'csv'
         """
         super().__init__()
         #: Output filename
@@ -42,6 +55,8 @@ class VariablesToHDF5(basf2.Module):
         self._listname = listname
         #: List of variables
         self._variables = variables
+        #: Output format
+        self._format = format
 
     def initialize(self):
         """Create the hdf5 file and list of variable objects to be used during
@@ -63,38 +78,73 @@ class VariablesToHDF5(basf2.Module):
         self._plist = ROOT.Belle2.PyStoreObj(self._listname)
         self._plist.isRequired()
 
-        #: The hdf5 file
-        self._hdf5file = tables.open_file(self._filename, mode="w", title="Belle2 Variables to HDF5")
-        if not self._hdf5file:
-            basf2.B2ERROR("Cannot create output file")
-            return
-
-        dtype = [("exp", np.int32), ("run", np.int32), ("evt", np.uint32),
-                 ("prod", np.uint32), ("icand", np.uint32), ("ncand", np.uint32)]
+        dtypes = [
+            ("__experiment__", np.int32), ("__run__", np.int32), ("__event__", np.uint32),
+            ("__production__", np.uint32), ("__candidate__", np.uint32), ("__ncandidates__", np.uint32)
+        ]
         for name in self._varnames:
             # only float variables for now
-            dtype.append((name, np.float64))
+            dtypes.append((name, np.float64))
 
         #: The data type
-        self._dtype = dtype
+        self._dtypes = dtypes
+
+        if self._format == "hdf5":
+            self.initialize_hdf5_writer()
+        elif self._format == "parquet":
+            self.initialize_parquet_writer()
+        elif self._format == "csv":
+            self.initialize_csv_writer()
+        else:
+            raise ValueError(f"Unknown format {self._format}, supported formats are 'hdf5', 'parquet', 'csv'.")
+
+    def initialize_parquet_writer(self):
+        """
+        Initialize the parquet writer using pyarrow
+        """
+        #: A list of tuples and py.DataTypes to define the pyarrow schema
+        self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
+        #: a writer object to write data into a parquet file
+        self._parquet_writer = ParquetWriter(self._filename, schema=pa.schema(self._schema))
+
+    def initialize_csv_writer(self):
+        """
+        Initialize the csv writer using pyarrow
+        """
+        #: A list of tuples and py.DataTypes to define the pyarrow schema
+        self._schema = [(name, numpy_to_pyarrow_type_map[dt]) for name, dt in self._dtypes]
+        #: a writer object to write data into a csv file
+        self._csv_writer = CSVWriter(self._filename, schema=pa.schema(self._schema))
+
+    def initialize_hdf5_writer(self):
+        """
+        Initialize the hdf5 writer using pytables
+        """
+        #: The pytable file
+        self._hdf5_writer = tables.open_file(self._filename, mode="w", title="Belle2 Variables to HDF5")
         filters = tables.Filters(complevel=1, complib='blosc:lz4', fletcher32=False)
+
         # some variable names are not just A-Za-z0-9 so pytables complains but
         # seems to work. Ignore warning
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             #: The pytable
-            self._table = self._hdf5file.create_table("/", self._listname, obj=np.zeros(0, dtype), filters=filters)
+            self._table = self._hdf5_writer.create_table("/", self._listname, obj=np.zeros(0, self._dtypes), filters=filters)
 
-    def event(self):
-        """Create a new row in the hdf5 file with for each particle in the list"""
-        buf = np.empty(self._plist.getListSize(), dtype=self._dtype)
+    def fill_buffer(self):
+        """
+        collect all variables for the particle in a numpy array
+        """
+
+        # create a numpy array with the data
+        buf = np.empty(self._plist.getListSize(), dtype=self._dtypes)
         # add some extra columns for bookkeeping
-        buf["exp"] = self._evtmeta.getExperiment()
-        buf["run"] = self._evtmeta.getRun()
-        buf["evt"] = self._evtmeta.getEvent()
-        buf["prod"] = self._evtmeta.getProduction()
-        buf["ncand"] = len(buf)
-        buf["icand"] = np.arange(len(buf))
+        buf["__experiment__"] = self._evtmeta.getExperiment()
+        buf["__run__"] = self._evtmeta.getRun()
+        buf["__event__"] = self._evtmeta.getEvent()
+        buf["__production__"] = self._evtmeta.getProduction()
+        buf["__ncandidates__"] = len(buf)
+        buf["__candidate__"] = np.arange(len(buf))
 
         for row, p in zip(buf, self._plist):
             for name, v in zip(self._varnames, self._var_objects):
@@ -102,23 +152,55 @@ class VariablesToHDF5(basf2.Module):
                 # For now we need to go back by name and call it.
                 # should be `row[v.name] = v.func(p)`
                 row[name] = variables.variables.evaluate(v.name, p)
+        return buf
 
-        self._table.append(buf)
+    def event(self):
+        """
+        Event processing function
+        executes the fill_buffer function and writes the data to the output file
+        """
+        buf = self.fill_buffer()
+
+        if self._format == "hdf5":
+            """Create a new row in the hdf5 file with for each particle in the list"""
+            self._table.append(buf)
+        elif self._format == "parquet":
+            table = {name: buf[name] for name, _ in self._dtypes}
+            pa_table = pa.table(table, schema=pa.schema(self._schema))
+            self._parquet_writer.write_table(pa_table)
+        elif self._format == "csv":
+            table = {name: buf[name] for name, _ in self._dtypes}
+            pa_table = pa.table(table, schema=pa.schema(self._schema))
+            self._csv_writer.write(pa_table)
 
     def terminate(self):
         """save and close the output"""
-        self._table.flush()
-        self._hdf5file.close()
-        import ROOT
-        ROOT.Belle2.MetadataService.Instance().addHDF5File(self._filename)
+        import ROOT  # noqa
+        if self._format == "hdf5":
+            self._table.flush()
+            self._hdf5_writer.close()
+        elif self._format == "parquet":
+            self._parquet_writer.close()
+        elif self._format == "csv":
+            self._csv_writer.close()
+        ROOT.Belle2.MetadataService.Instance().addNtuple(self._filename)
+
+
+class VariablesToHDF5(VariablesToTable):
+    """
+    Legacy class to not break existing code
+    """
+
+    def __init__(self, listname, variables, filename):
+        super().__init__(listname, variables, filename, "hdf5")
 
 
 def make_mcerrors_readable(dataframe, column="mcErrors"):
     """
-    Take a dataframe containing an column with the output of the :b2:var:`mcErrors`
+    Take a dataframe containing a column with the output of the :b2:var:`mcErrors`
     variable from :b2:mod:`VariablesToNTuple` and convert it to a readable set
     of columns of the form ``{column}_{name}`` where column is the value of the
-    ``column`` argument and ``name`` is one of one of the :ref:`mcmatching`
+    ``column`` argument and ``name`` is one of the :ref:`mcmatching`
     error flags (without the leading 'c_').
 
     Arguments:
@@ -149,20 +231,3 @@ def make_mcerrors_readable(dataframe, column="mcErrors"):
             dataframe[name] = mcErrors == 0
         else:
             dataframe[name] = (mcErrors & value) == value
-
-
-# This is just for testing, no need for doxygen to weirdly document it
-# @cond
-if __name__ == "__main__":
-    import modularAnalysis
-
-    p = basf2.create_path()
-    p.add_module("EventInfoSetter", evtNumList=100)
-    p.add_module("EvtGenInput")
-    modularAnalysis.fillParticleListsFromMC([("pi-:gen", "")], path=p)
-    a = VariablesToHDF5("pi-:gen", ["M", "E", "px", "py", "pz"], "test.hdf5")
-    p.add_module(a)
-    # Process the events
-    basf2.process(p)
-    print(basf2.statistics)
-# @endcond

@@ -142,18 +142,9 @@ KLMTriggerModule::KLMTriggerModule() : Module()
   setDescription("KLM trigger simulation");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-
-
   addParam("y_cutoff", y_cutoff, "", 500);
   addParam("intercept_cutoff", m_intercept_cutoff, "", 500);
-
-  std::string dump_Path;
-  addParam("CSV_Dump_Path", dump_Path, "", dump_Path);
-
-  if (!dump_Path.empty()) {
-    get_IO_csv_handle().dump_path  = dump_Path;
-    get_IO_csv_handle().do_dump    = true;
-  }
+  addParam("CSV_Dump_Path", m_dump_Path, "", m_dump_Path);
 
 }
 
@@ -200,8 +191,10 @@ void KLMTriggerModule::initialize()
   klmTriggerTracks.registerRelationTo(klmTriggerHits);
 // end unused
 
-
-
+  if (!m_dump_Path.empty()) {
+    get_IO_csv_handle().dump_path  = m_dump_Path;
+    get_IO_csv_handle().do_dump    = true;
+  }
 
 }
 

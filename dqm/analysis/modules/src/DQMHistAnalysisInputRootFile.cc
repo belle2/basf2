@@ -104,6 +104,7 @@ void DQMHistAnalysisInputRootFileModule::beginRun()
 {
   B2INFO("DQMHistAnalysisInputRootFile: beginRun called. Run: " << m_runList[m_run_idx]);
   clearHistList();
+  clearRefList();
 }
 
 void DQMHistAnalysisInputRootFileModule::event()
@@ -128,7 +129,7 @@ void DQMHistAnalysisInputRootFileModule::event()
     m_file = new TFile(m_fileList[m_run_idx].c_str());
   }
 
-  // Clear only after EndOfRun check, otherwise we wont have any histograms for MiraBelle
+  // Clear only after EndOfRun check, otherwise we won't have any histograms for MiraBelle
   // which expects analysis run in endRun function
   initHistListBeforeEvent();
 

@@ -29,7 +29,7 @@
 namespace Belle2 {
 
   /**
-   * First version commited on Feb 21 2019
+   * First version committed on Feb 21 2019
    * Extracts dE/dx information for validation and writes a ROOT file.
    * Input to this module is bhabha or radbhabha or hadron skimmed files only.
    * See reconstruction/examples/ExtractCDCdEdxValidation.C to extract output file and make nice plots.
@@ -57,19 +57,19 @@ namespace Belle2 {
     virtual void initialize() override;
 
     /**
-     * Fuction to execute each run
+     * Function to execute each run
      * This is inherited from base class
      */
     virtual void beginRun() override;
 
     /**
-     * fuction to execute event (event by event)
+     * function to execute event (event by event)
      * This is inherited from base class
      */
     virtual void event() override;
 
     /**
-     * fuction is called after each event
+     * function is called after each event
      * This is inherited from base class
      */
     virtual void endRun() override;
@@ -82,7 +82,7 @@ namespace Belle2 {
 
 
     /**
-     * Defination of histograms
+     * Definition of histograms
      * This contain a list of histogram for validation
      */
     void DefineHistograms(TString level, Int_t iR);
@@ -94,14 +94,14 @@ namespace Belle2 {
     void FillHistograms(CDCDedxTrack* dedxTrack, const TrackFitResult* mTrack);
 
     /**
-     * Extrating histogram and some calucation
+     * Extracting histogram and some calculation
      * Higher level histograms are filled after each run or full processing
      */
     void ExtractHistograms(TString level);
 
     /**
      * Track selection
-     * A clean way to impliment selections on tracks (so far few only)
+     * A clean way to implement selections on tracks (so far few only)
      */
     Bool_t IsSelectedTrack(const TrackFitResult* mTrack);
 

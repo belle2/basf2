@@ -211,7 +211,7 @@ void CDCDedxRunGainAlgorithm::FitGaussianWRange(TH1D*& temphist, TString& status
       return;
     } else {
       temphist->GetXaxis()->SetRangeUser(mean - 5.0 * width, mean + 5.0 * width);
-      B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
+      B2INFO(Form("\tFit for hist (%s) successful (status = %d)", temphist->GetName(), fs));
       status = "FitOK";
     }
   }

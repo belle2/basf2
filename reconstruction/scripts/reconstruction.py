@@ -748,7 +748,6 @@ def add_ecl_modules(path, components=None):
         path.add_module('ECLSplitterN1')
         path.add_module('ECLSplitterN2')
         path.add_module('ECLShowerCorrector')
-        path.add_module('ECLShowerCalibrator')
         path.add_module('ECLShowerShape')
         path.add_module('ECLClusterPSD')
         path.add_module('ECLCovarianceMatrix')

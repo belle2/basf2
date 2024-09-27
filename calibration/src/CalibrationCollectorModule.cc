@@ -127,7 +127,7 @@ void CalibrationCollectorModule::beginRun()
 void CalibrationCollectorModule::defineHisto()
 {
   if (!ProcHandler::parallelProcessingUsed() || ProcHandler::isWorkerProcess()) {
-    m_dir = gDirectory->mkdir(getName().c_str());
+    m_dir = gDirectory->mkdir(getName().c_str(), "", true);
     m_manager.setDirectory(m_dir);
     B2INFO("Saving output to TDirectory " << m_dir->GetPath());
     B2DEBUG(100, "Creating directories for individual collector objects.");

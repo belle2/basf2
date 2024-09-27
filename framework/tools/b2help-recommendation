@@ -17,56 +17,271 @@ import argparse
 import sys
 import versioning
 import basf2 as b2
+from abc import ABC, abstractmethod
+from typing import List, Dict
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+import pygments.formatters
+import terminal_utils
+import itertools
+
+MC_CAMPAIGN = ['MC15', 'MC16']
+
+class FormatterStrategy(ABC):
+    """
+    Abstract base class for formatting recommendations.
+    """
+
+    @abstractmethod
+    def format_section(self, title: str, content: str) -> str:
+        pass
+
+    @abstractmethod
+    def format_subsection(self, title: str, content: str) -> str:
+        pass
+
+    @abstractmethod
+    def format_field(self, name: str, value: str) -> str:
+        pass
+
+    @abstractmethod
+    def format_code(self, code: str, language: str) -> str:
+        pass
+    
+    @abstractmethod
+    def format_dict(self, name: str, content: str) -> str:
+        pass
+    
+    @abstractmethod
+    def format_table_list(self, name: str, content: str) -> str:
+        pass
+
+
+class RSTFormatterStrategy(FormatterStrategy):
+    """
+    Format recommendations in reStructuredText format.
+    """
+
+    def format_section(self, title: str, content: str) -> str:
+        """
+        Format a section with a title and optional content.
+        """
+        result = f"\n{title}\n{'=' * len(title)}\n"
+        if content:
+            result += "{content}\n"
+        return result
+
+    def format_subsection(self, title: str, content: str) -> str:
+        """
+        Format a subsection with a title and optional content.
+        """
+        if not content:
+            return ''
+        return f"\n{title}\n{'-' * len(title)}\n{content}\n"
+
+    def format_field(self, name: str, value: str) -> str:
+        """
+        Format a field with a name and value.
+        """
+        return f":{name}: {value}\n"
+    
+    def format_dict(self, name: str, content: str) -> str:
+        """
+        Format a dictionary with a name and key-value pairs.
+        """
+        result = f"\n{name}\n{'-' * len(name)}\n"
+        for key in content:
+            result += f'+ **{key}** - {content[key]}\n'
+        return result
+
+    def format_table_list(self, name: str, content: str) -> str:
+        """
+        Format a table or list with a name and items.
+        """
+        title = f' {name}: '
+        line = '+'
+        body = '|'
+        for tag in [title] + content:
+            line += '-' * len(tag) + '+'
+            body += tag + '|'
+        
+        return f'\n{line}\n{body}\n{line}\n'
+
+    def format_code(self, code: str, language: str) -> str:
+        """
+        Format code.
+        """
+        if not code:
+            return ''
+        highlighed_code = [' ' * 4 + line for line in code.splitlines()]
+        result = f'.. code-block:: {language}\n\n'
+        result += '\n'.join(highlighed_code)
+        return result
+
+
+class ColorRSTFormatterStrategy(RSTFormatterStrategy):
+    """
+    Format recommendations in reStructuredText format with colored text in terminal.
+    """
+
+    def format_code(self, code: str, language: str) -> str:
+        """
+        Format code with syntax highlighting.
+        """
+        if not code:
+            return ''
+        lexer = get_lexer_by_name(language)
+        formatter = pygments.formatters.TerminalFormatter()
+        highlighed_code = highlight(code, lexer, formatter).split('\n')
+        highlighed_code = [' ' * 4 + line for line in highlighed_code]
+        result = f'.. code-block:: {language}\n\n'
+        result += '\n'.join(highlighed_code)
+        return result
+        
+
+class FieldDecorator(ABC):
+    """
+    Abstract base class for decorating fields.
+    """
+    def __init__(self, formatter: FormatterStrategy):
+        self.formatter = formatter
+
+    @abstractmethod
+    def decorate(self, name: str, value: str) -> str:
+        pass
+
+class DefaultDecorator(FieldDecorator):
+    """
+    Default decorator for fields.
+    """
+    def decorate(self, name: str, value: str) -> str:
+        return self.formatter.format_field(name, value)
+
+class DictDecorator(FieldDecorator):
+    """
+    Decorator for dictionary fields.
+    """
+    def decorate(self, name: str, value: str) -> str:
+        return self.formatter.format_dict(name, value)
+
+class TableListDecorator(FieldDecorator):
+    """
+    Decorator for lists as table fields.
+    """
+    def decorate(self, name: str, value: str) -> str:
+        return self.formatter.format_table_list(name, value)
+
+class SectionDecorator(FieldDecorator):
+    """
+    Decorator for the section field.
+    """
+    def decorate(self, name: str, value: str) -> str:
+        return self.formatter.format_section(value, "")
+
+class SubsectionDecorator(FieldDecorator):
+    """
+    Decorator for subsections.
+    """
+    def decorate(self, name: str, value: str) -> str:
+        return self.formatter.format_subsection(name, value)
+
+
+class CodeDecorator(FieldDecorator):
+    """
+    Decorator for code fields.
+    """
+    def __init__(self, formatter: FormatterStrategy, language: str = 'python'):
+        super().__init__(formatter)
+        self.language = language
+
+    def decorate(self, name: str, value: str) -> str:
+        highlighted_code = self.formatter.format_code(value, self.language)
+        return self.formatter.format_subsection(name, highlighted_code)
+
+
+class Field:
+    """
+    Represents a field in a recommendation.
+    """
+    def __init__(self, name: str, value: str, decorator: FieldDecorator):
+        self.name = name
+        self.value = value
+        self.decorator = decorator
+
+    def format(self) -> str:
+        return self.decorator.decorate(self.name, self.value)
 
 
 class Tool:
     """
-    Analysis tool information.
+    Represents a tool recommendation.
     """
+    def __init__(self, data: Dict[str, str], formatter: FormatterStrategy):
+        self.fields = []
+        title = '(no title)'
+        if 'name' in data:
+            title = data.pop('name')
+        self.fields.append(Field('Title', title, SectionDecorator(formatter)))
+        tool = '(no tool)'
+        if 'tool' in data:
+            tool = data.pop('tool')
+        if tool and tool != "(no tool)":
+            self.fields.append(Field('Tool', [tool], TableListDecorator(formatter)))
+        tags = data.pop('tags')
+        for name, value in data.items():
+            decorator = DefaultDecorator(formatter)
+            if name == "snippet":
+                decorator = CodeDecorator(formatter, language="python")
+            elif name == 'recommendation':
+                decorator = DictDecorator(formatter)
+            elif name in ["description"]:
+                decorator = SubsectionDecorator(formatter)
+            self.fields.append(Field(name.capitalize(), value, decorator))
+        self.fields.append(Field('Tags', tags, TableListDecorator(formatter)))
 
-    def __init__(self, name, tags=None, description=None, recommendation=None, snippet=None):
-        self.name = name
-        self.tags = tags if tags else []
-        self.description = description
-        self.recommendation = recommendation if recommendation else {}
-        self.snippet = snippet
+    def get_field(self, name:str):
+        """
+        Get the value of a field by name.
+        """
+        result = None
+        for field in self.fields:
+            if field.name.lower() == name.lower():
+                result = field.value
+        return result
 
-    def to_json(self):
-        return {
-            "name": self.name,
-            "tags": self.tags,
-            "description": self.description,
-            "recommendation": self.recommendation,
-            "snippet": self.snippet,
-        }
+    def format(self) -> str:
+        """
+        Format the tool recommendation.
+        """
+        return "".join(field.format() for field in self.fields)
 
 
-def load_data(filename: str):
+def load_data(filename: str, formatter: FormatterStrategy):
     """
     load a local json file.
     """
     with open(filename, 'r') as file:
         data = json.load(file)
-        return [Tool(**tool_data) for tool_data in data]
+    return [Tool(entry, formatter) for entry in data]
 
 
 def display_tool_info(tool: Tool):
     """
     display a tool's information.
     """
-    print(f"Tool: {tool.name}")
-    print(f"  Tags: {', '.join(tool.tags)}")
-    print(f"  Description: {tool.description}")
+    print(tool.format())
 
-    recommendation = "\n".join([f"    {key}: {value}" for key, value in tool.recommendation.items()])
-    print(f"  Recommendation:\n{recommendation}")
-
-    if tool.snippet:
-        # print only if it is written.
-        print(f"  Snippet:\n\n{tool.snippet}")
-
-    print()
-
+def display_tags(tools: list, tags: list):
+    """
+    Display tools with specific tags.
+    """
+    if "all" in tags:
+        for tool in tools:
+            display_tool_info(tool)
+    else:
+        for tool in tools:
+            if all(tag in tool.get_field('tags') for tag in tags):
+                display_tool_info(tool)
 
 def get_available_tags(tools: list):
     """
@@ -74,7 +289,7 @@ def get_available_tags(tools: list):
     """
     tags = set()
     for tool in tools:
-        tags.update(tool.tags)
+        tags.update(tool.get_field('tags'))
     # Sort the tags for the tests
     return sorted(tags)
 
@@ -89,27 +304,55 @@ def convert_json_to_payload(localfile: str, payload: str):
     db = Belle2.Database.Instance()
     db.addPayload(payload, localfile, iov)
 
+def print_tags(tools: list, mccampaign:str, n_tag_columns: int = 2):
+    """
+    Print all available tags.
+    """
+    print(f"Available tags for {mccampaign}:")
+    available_tags = get_available_tags(tools)
+    if n_tag_columns < 2 or n_tag_columns >= len(available_tags):
+        for tag in available_tags:
+            print(f"  - {tag}")
+    else:
+        groups = [available_tags[i::n_tag_columns] for i in range(n_tag_columns)]
+        for group in itertools.zip_longest(*groups):
+            print(" ".join(f" - {tag:<25}" for tag in group if tag))
+    print("\nTags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. ")
+    print("You can check all information with the 'all' tag.")
+
+
 def get_argument_parser():
     """
     Get the argument parser.
     """
     parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate.")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-mc", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
+                        choices=MC_CAMPAIGN)
+    group.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("-t", "--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
                         nargs='+', default=None)
     parser.add_argument("-gt", "--globaltag", help="Global tag name, if one wants to check another recommendation",
                         default=None)
+    parser.add_argument("-f", "--format", help="Output format", choices=['rst', 'color_rst'],
+                        default='color_rst')
     parser.add_argument("-p", "--payload", help="Payload name, if one wants to check another recommendation",
                         default=None)
-    parser.add_argument("-m", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
-                        default='MC15')
-    parser.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
+    parser.add_argument("--n_tag_columns", help="Number of columns for tag printing", type=int,
+                        default=2)
+    parser.add_argument("--no-pager", help="Disable output scrolling, which is done by Pager", action='store_true')
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
     return parser
 
-def main():
- 
-    args = get_argument_parser().parse_args()
 
+def main():
+    """
+    Main method
+    """
+    args = get_argument_parser().parse_args()
+    formatter = ColorRSTFormatterStrategy()
+    if args.format == 'rst':
+        formatter = RSTFormatterStrategy()
     if args.convert:
         b2.B2INFO("Convert the localfile to a payload")
 
@@ -124,6 +367,9 @@ def main():
             sys.exit(0)
 
     if args.localfile is None:
+        if args.mccampaign is None:
+            b2.B2ERROR(f"The MC campaign is not provided! Available choices for -mc argument: {MC_CAMPAIGN}")
+            sys.exit(1)
         gt_name = args.globaltag
         if gt_name is None:
             gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']
@@ -140,7 +386,10 @@ def main():
         event_meta_data.registerInDataStore()
         event_meta_data.assign(Belle2.EventMetaData(0, 0, 0), True)
         Belle2.DataStore.Instance().setInitializeActive(False)
-
+        # Avoid printing INFO messages if no pager is set
+        # This is useful for potential conversions to other formats
+        if args.no_pager:
+            b2.set_log_level(b2.LogLevel.ERROR)
         # if it is not found, B2ERROR is given
         payload = Belle2.DBAccessorBase(Belle2.DBStoreEntry.c_RawFile, payload_name, True).getFilename()
 
@@ -148,29 +397,22 @@ def main():
             print("\nRecommendation information is not found!")
             sys.exit(1)
         else:
-            tools = load_data(payload)
+            tools = load_data(payload, formatter)
 
     else:
-        tools = load_data(args.localfile)
+        tools = load_data(args.localfile, formatter)
+        args.mccampaign = "local"
 
     if args.tags is None:
-        print("Available Tags:")
-
-        available_tags = get_available_tags(tools)
-        for tag in available_tags:
-            print(f"  - {tag}")
-
-        print("\nYou can check all information with the 'all' tag.")
-
-    elif "all" in args.tags:
-        for tool in tools:
-            display_tool_info(tool)
-
+        print_tags(tools, args.mccampaign, n_tag_columns=args.n_tag_columns)
+        sys.exit(0)
+    tags_line = ' '.join(args.tags)
+    print(f'Recommendations for {args.mccampaign} and {tags_line} tags:')
+    if args.no_pager:
+        display_tags(tools, args.tags)
     else:
-        for tool in tools:
-            if all(tag in tool.tags for tag in args.tags):
-                display_tool_info(tool)
-
+        with terminal_utils.Pager(f'Recommendations for {args.mccampaign} and {tags_line} tags', True):
+            display_tags(tools, args.tags)
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,7 @@
 """\
 This module contains classes for plotting validation results.
 """
-from pxd.utils.plots import plot_in_module_efficiency, plot_efficiency_vs_run,\
+from pxd.utils.plots import plot_in_module_efficiency, plot_efficiency_vs_run, \
                             plot_module_efficiencies_in_DHHs, plot_efficiency_map, plot_ip_resolutions
 import uproot
 import ROOT
@@ -60,7 +60,7 @@ def analyse_root_file(file_name, tree_name="tree"):
     # Calculate efficiences of modules
     df_module_sum = df.groupby(['exp', 'run', 'pxdid'])[["nTrackPoints", "nSelTrackPoints",
                                                          "nTrackClusters", "nSelTrackClusters"]].sum().reset_index()
-    df_module_sum["pxdid"] = df_module_sum["pxdid"].astype(np.int)
+    df_module_sum["pxdid"] = df_module_sum["pxdid"].astype(np.int32)
     df_module_sum.calculate_eff(num="nTrackClusters", den="nTrackPoints", output_var="eff")
     df_module_sum.calculate_eff(num="nSelTrackClusters", den="nSelTrackPoints", output_var="eff_sel")
 

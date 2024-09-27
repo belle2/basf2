@@ -14,13 +14,18 @@ be adapted when changing to the new release.
 
 .. important changes should go here. Especially things that break backwards compatibility
 
+Changes since release-09
+========================
+
+.. include:: analysis/doc/whatsnew-since/release-09-00.txt
+
 Changes since release-08
 ========================
 
 .. admonition:: New and updated packages in externals
    :class: toggle
 
-   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-01
+   .. list-table:: New and updated packages in externals from v02-00-02 to v02-02-03
       :widths: 50 25 25
       :header-rows: 1
 
@@ -942,6 +947,7 @@ Changes since release-08
 
 .. include:: analysis/doc/whatsnew-since/release-08-00.txt
 .. include:: skim/doc/whatsnew-since/release-08-00.txt
+.. include:: mva/doc/whatsnew-since/release-08-00.txt
 
 Changes since release-07
 ========================

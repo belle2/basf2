@@ -1094,7 +1094,7 @@ namespace Photospp {
     pho.jmohep[pho.nhep - i][1 - i] = IP;
     pho.jmohep[pho.nhep - i][2 - i] = 0;
     pho.jdahep[pho.nhep - i][1 - i] = 0;
-    pho.jdahep[pho.nhep - i][2 - i] = 0;
+    pho.jdahep[pho.nhep - i][2 - i] = -1;
     pho.phep[pho.nhep - i][4 - i] = EPHOTO * pho.phep[IP - i][5 - i] / PMAVIR;
     //--
     //--   ...and photon momenta

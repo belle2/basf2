@@ -20,7 +20,6 @@
 #include <TString.h>
 #include <TFitResult.h>
 
-using namespace std;
 using namespace Belle2;
 
 SVDCoGTimeCalibrationAlgorithm::SVDCoGTimeCalibrationAlgorithm(const std::string& str) :
@@ -132,7 +131,7 @@ CalibrationAlgorithm::EResult SVDCoGTimeCalibrationAlgorithm::calibrate()
           }
           for (int i = 1; i <= hEventT0vsCoG->GetNbinsX(); i++) {
             for (int j = 1; j <= hEventT0vsCoG->GetNbinsY(); j++) {
-              if (hEventT0vsCoG->GetBinContent(i, j) < max(2, int(hEventT0vsCoG->GetEntries() * 0.001))) {
+              if (hEventT0vsCoG->GetBinContent(i, j) < std::max(2, int(hEventT0vsCoG->GetEntries() * 0.001))) {
                 hEventT0vsCoG->SetBinContent(i, j, 0);
               }
             }

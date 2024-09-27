@@ -58,7 +58,7 @@ TH1* DQMHistComparitorModule::GetHisto(TString histoname)
   if (hh1 == NULL) {
     B2DEBUG(20, "findHist failed " << histoname << " not in memfile");
 
-    // first search reference root file ... if ther is one
+    // first search reference root file ... if there is one
     if (m_refFile && m_refFile->IsOpen()) {
       TDirectory* d = m_refFile;
       TString myl = histoname;
@@ -168,7 +168,7 @@ void DQMHistComparitorModule::initialize()
       continue;
     }
 
-    // Do not check for histogram existance here, as it might not be
+    // Do not check for histogram existence here, as it might not be
     // in memfile when analysis task is started
     TString a = it.at(2).c_str();
 
@@ -247,7 +247,7 @@ void DQMHistComparitorModule::event()
     // if draw normalized
     TH1* h;
     if (1) {
-      h = (TH1*)hist2->Clone(); // Anoying ... Maybe an memory leak? TODO
+      h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
       if (abs(hist2->Integral()) > 0)
         h->Scale(hist1->Integral() / hist2->Integral());
     } else {

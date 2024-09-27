@@ -47,7 +47,7 @@ namespace Belle2 {
    * If a PDF file is specified using the 'PDFFile' parameter, likelihood values
    * for all particle hypotheses are calculated and saved in a CDCDedxLikelihood object.
    *
-   * Performs a simple path length correction to the dE/dx measuremnt
+   * Performs a simple path length correction to the dE/dx measurement
    * based on individual hits in the CDC and determines the mean and
    * truncated mean dE/dx value for each track.
    *
@@ -123,7 +123,7 @@ namespace Belle2 {
     /** for all particles, save chi values into 'chi'.
      *
      * @param chi       array of chi values to be modified
-     * @param predmean  prediceted mean for each hypothesis
+     * @param predmean  predicted mean for each hypothesis
      * @param predres   predicted resolution for each hypothesis
      * @param p         track momentum valid in the cdc
      * @param dedx      dE/dx value
@@ -143,7 +143,7 @@ namespace Belle2 {
      * */
     void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx);
 
-    /** Check the pdfs for consistency everytime they change in the database */
+    /** Check the pdfs for consistency every time they change in the database */
     void checkPDFs();
 
     // parameters to determine the predicted means and resolutions
@@ -170,11 +170,11 @@ namespace Belle2 {
     DBObjPtr<CDCDedxRunGain> m_DBRunGain; /**< Run gain DB object */
     DBObjPtr<CDCDedxInjectionTime> m_DBInjectTime; /**< time gain/reso DB object */
     DBObjPtr<CDCDedxCosineCor> m_DBCosineCor; /**< Electron saturation correction DB object */
-    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxCosineEdge> m_DBCosEdgeCor; /**< non-linearly ACD correction DB object */
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedx2DCell> m_DB2DCell; /**< 2D correction DB object */
     DBObjPtr<CDCDedx1DCell> m_DB1DCell; /**< 1D correction DB object */
-    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< non-lineary ACD correction DB object */
+    DBObjPtr<CDCDedxADCNonLinearity> m_DBNonlADC; /**< non-linearly ACD correction DB object */
     DBObjPtr<CDCDedxHadronCor> m_DBHadronCor; /**< hadron saturation parameters */
 
     std::vector<double> m_hadronpars; /**< hadron saturation parameters */

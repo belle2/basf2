@@ -46,8 +46,7 @@ namespace Belle2 {
     /** Set cluster shape ID  */
     pxdClusterShapeType PXDClusterShape::setClsShape(const ClusterCandidate& cls, VxdID sensorID)
     {
-      const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
-                                                                 sensorID));
+      const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       pxdClusterShapeType clsShape;
       clsShape = pxdClusterShapeType::no_shape_set;
       ClusterProjection projU, projV;

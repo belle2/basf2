@@ -29,7 +29,6 @@ Skim list building functions for charm analyses.
 
 from functools import lru_cache
 
-import basf2 as b2
 import modularAnalysis as ma
 import variables as va
 from skim import BaseSkim, fancy_skim_header
@@ -42,7 +41,7 @@ from variables import variables as vm
 
 
 __liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @lru_cache  # Avoid loading the list multiple time on the same path
@@ -90,11 +89,6 @@ class XToD0_D0ToHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm D0 -> HpJm skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -115,19 +109,17 @@ class XToD0_D0ToHpJm(BaseSkim):
         **Selection Criteria**:
             * Use tracks from the charm_skim_std_charged
             * ``1.70 < M(D0) < 2.00, pcms(D0) > 2.0``
-            * `` K/pi binary ID > 0.2, pi_pionIDNN > 0.1``
+            * `` K/pi binary ID > 0.2``
             * For more details, please check the source code of this skim.
 
         """
 
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        ma.cutAndCopyList('K+:D0ToHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
-        ma.cutAndCopyList('pi+:D0ToHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
+        ma.cutAndCopyList('K+:D0ToHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         D0Cuts = "1.70 < M < 2.00 and useCMSFrame(p) > 2.0"
-        D0Channels = ["pi+:D0ToHpJm pi-:D0ToHpJm",
-                      "pi+:D0ToHpJm K-:D0ToHpJm",
-                      "K+:D0ToHpJm pi-:D0ToHpJm",
+        D0Channels = ["pi+:charmSkim pi-:charmSkim",
+                      "pi+:charmSkim K-:D0ToHpJm",
+                      "K+:D0ToHpJm pi-:charmSkim",
                       "K+:D0ToHpJm K-:D0ToHpJm",
                       ]
 
@@ -340,7 +332,7 @@ class DpToPipEpEm(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("e", path=path)
 
-        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID_noSVD_noTOP > 0.01", path=path)
+        ma.cutAndCopyList("e+:DpToPipEE", "e+:charmSkim", "electronID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
@@ -377,7 +369,7 @@ class DpToPipMupMum(BaseSkim):
         charm_skim_std_charged("pi", path=path)
         charm_skim_std_charged("mu", path=path)
 
-        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID_noSVD > 0.01", path=path)
+        ma.cutAndCopyList("mu+:DpToPipMuMu", "mu+:charmSkim", "muonID > 0.01", path=path)
 
     def build_lists(self, path):
         Dpcuts = "1.67 < M < 2.17 and useCMSFrame(p) > 2.0"
@@ -562,44 +554,6 @@ class DpToHpPi0(BaseSkim):
 
 
 @fancy_skim_header
-class DpToKsHp(BaseSkim):
-    """
-    **Decay Modes**:
-        * :math:`D^+ \\to K_S \\pi^+`
-
-    **Selection Criteria**:
-        * Tracks: ``dr < 1, abs(dz) < 3, thetaInCDCAcceptance``
-        * Use Ks from `stdKshorts`
-        * ``1.77 < M(D+) < 1.97, pcms(D+) > 2.0``
-        * For more details, please check the source code of this skim.
-
-    """
-
-    __authors__ = ["Yifan Jin"]
-    __description__ = "Skim list for D+ to Ks pi+."
-    __contact__ = __liaison__
-    __category__ = "physics, charm"
-
-    NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = False
-
-    def load_standard_lists(self, path):
-        charm_skim_std_charged('pi', path=path)
-        stdKshorts(path=path)
-
-    def build_lists(self, path):
-        ma.cutAndCopyList('pi+:DpToKsPip', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
-
-        Dpcuts = "1.77 < M < 1.97 and useCMSFrame(p) > 2.0"
-
-        DList = []
-        ma.reconstructDecay("D+:KsPip -> K_S0:merged pi+:DpToKsPip", Dpcuts, path=path)
-        DList.append("D+:KsPip")
-
-        return DList
-
-
-@fancy_skim_header
 class DstToD0Pi_D0ToHpJm(XToD0_D0ToHpJm):
     """
     **Decay Modes**:
@@ -649,22 +603,14 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     **Selection Criteria**:
         * Tracks: ``charmSkim`` lists from `charm_skim_std_charged`
 
-          * Pions: ``pionIDNN > 0.1``
-          * Kaons: ``kaonIDNN > 0.1``
+          * Pions: ``pionID > 0.1``
+          * Kaons: ``kaonID > 0.1``
 
         * :math:`\\pi^{0}`: from `stdPi0s.loadStdSkimPi0`
         * ``1.70 < M(D0) < 2.10``
         * ``M(D*)-M(D0) < 0.16``
         * ``pCM(D*) > 2.0``
 
-    .. Note::
-        The neural-network based PID variables ``pionIDNN`` and ``kaonIDNN``
-        require the analysis globaltag to be set (e.g. via
-        ``b2skim-run --analysis-globaltag ANALYSIS_GT_NAME ...``). In case
-        calibrated weights are not ready for the skimming campaign, this skim
-        must be modified to use :b2:var:`binaryPID_noSVD` or
-        :b2:var:`binaryPID` instead (this will have some impact on skim
-        performance, although small, and needs to be tested).
     """
 
     __authors__ = ["Ludovico Massaccesi", "Emma Oxford"]
@@ -678,11 +624,6 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -691,8 +632,8 @@ class DstToD0Pi_D0ToHpJmPi0(BaseSkim):
     def build_lists(self, path):
         D0_cuts = "1.70 < M < 2.10"
         Dst_cuts = "massDifference(0) < 0.16 and useCMSFrame(p) > 2"
-        ma.cutAndCopyList('pi+:HpJmPi0', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:HpJmPi0', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
+        ma.cutAndCopyList('pi+:HpJmPi0', 'pi+:charmSkim', 'binaryPID(321, 211) < 0.9', path=path)
+        ma.cutAndCopyList('K+:HpJmPi0', 'K+:charmSkim', 'binaryPID(321, 211) > 0.1', path=path)
 
         Dst_lists = []
         for h1, h2 in [('pi', 'pi'), ('pi', 'K'), ('K', 'K')]:
@@ -848,9 +789,8 @@ class DstToD0Pi_D0ToHpJmEta(BaseSkim):
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
-        ma.cutAndCopyList('pi+:D0ToHpJmEta', 'pi+:charmSkim', 'binaryID < 0.9', path=path)
-        ma.cutAndCopyList('K+:D0ToHpJmEta', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('pi+:D0ToHpJmEta', 'pi+:charmSkim', 'binaryPID(321, 211) < 0.9', path=path)
+        ma.cutAndCopyList('K+:D0ToHpJmEta', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         Dstcuts = "massDifference(0) < 0.160 and useCMSFrame(p) > 2.0"
         charmcuts = "1.66 < M < 2.06"
@@ -1167,7 +1107,7 @@ class LambdacTopHpJm(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
         * For more details, please check the source code of this skim.
 
     """
@@ -1180,28 +1120,21 @@ class LambdacTopHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Lambda_c+ -> proton skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         charm_skim_std_charged('p', path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
-        ma.cutAndCopyList('pi+:LcTopHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:LcTopHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:LcTopHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
         ma.cutAndCopyList('p+:LcTopHpJm', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["p+:LcTopHpJm pi+:LcTopHpJm pi-:LcTopHpJm",
-                           "p+:LcTopHpJm pi+:LcTopHpJm K-:LcTopHpJm",
-                           "p+:LcTopHpJm K+:LcTopHpJm pi-:LcTopHpJm",
+        LambdacChannels = ["p+:LcTopHpJm pi+:charmSkim pi-:charmSkim",
+                           "p+:LcTopHpJm pi+:charmSkim K-:LcTopHpJm",
+                           "p+:LcTopHpJm K+:LcTopHpJm pi-:charmSkim",
                            "p+:LcTopHpJm K+:LcTopHpJm K-:LcTopHpJm",
                            ]
 
@@ -1226,7 +1159,7 @@ class LambdacToSHpJm(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.2 < M(Lambda_c) < 2.4, pcms(Lambda_c) > 2.0``
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
         * loose mass window for :math:`\\pi^{0}` and skim selections from stdPi0s
         * ``0.44 < M(K_s) < 0.55, significanceOfFlightDistance > 2.0``
         * :math:`\\pm 3\\sigma` mass windows for :math:`\\Sigma^+`
@@ -1243,11 +1176,6 @@ class LambdacToSHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Lambdac+ -> Sigma+ skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -1256,23 +1184,20 @@ class LambdacToSHpJm(BaseSkim):
         charm_skim_sigma(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
         va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
-        ma.cutAndCopyList('pi+:LcToSHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:LcToSHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:LcToSHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
 
         ma.cutAndCopyList(
             'K_S0:LcToSHpJm',
             'K_S0:merged',
-            'significanceOfFlightDistance > 2.0 and daughter(0,pionIDNN) > 0.1 and daughter(1,pionIDNN) > 0.1',
+            'significanceOfFlightDistance > 2.0',
             path=path)
 
         LambdacCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        LambdacChannels = ["Sigma+:charmSkim pi+:LcToSHpJm pi-:LcToSHpJm",
-                           "Sigma+:charmSkim pi+:LcToSHpJm K-:LcToSHpJm",
-                           "Sigma+:charmSkim K+:LcToSHpJm pi-:LcToSHpJm",
+        LambdacChannels = ["Sigma+:charmSkim pi+:charmSkim pi-:charmSkim",
+                           "Sigma+:charmSkim pi+:charmSkim K-:LcToSHpJm",
+                           "Sigma+:charmSkim K+:LcToSHpJm pi-:charmSkim",
                            "Sigma+:charmSkim K+:LcToSHpJm K-:LcToSHpJm",
                            "Sigma+:charmSkim K_S0:LcToSHpJm",
                            ]
@@ -1294,7 +1219,7 @@ class XicpTopHpJm(BaseSkim):
     **Selection Criteria**:
         * Use tracks from the charm_skim_std_charged
         * ``2.3 < M(Xi_c) < 2.65, pcms(Xi_c) > 2.0``
-        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+        * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
         * For more details, please check the source code of this skim.
 
     """
@@ -1307,26 +1232,19 @@ class XicpTopHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xi_c+ -> proton skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         charm_skim_std_charged('p', path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
-        ma.cutAndCopyList('pi+:XicTopHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:XicTopHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:XicTopHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
         ma.cutAndCopyList('p+:XicTopHpJm', 'p+:charmSkim', 'trinaryID > 0.2', path=path)
 
         XicCuts = "2.2 < M < 2.4 and useCMSFrame(p) > 2.0"
-        XicChannels = ["p+:XicTopHpJm pi+:XicTopHpJm K-:XicTopHpJm",
+        XicChannels = ["p+:XicTopHpJm pi+:charmSkim K-:XicTopHpJm",
                        ]
 
         XicList = []
@@ -1361,11 +1279,6 @@ class XicpToLKsHp(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> Lambda Ks h+, Xi- pi+ h+, Omega- pi+ K+.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         stdPi("all", path=path)
         stdK("all", path=path)
@@ -1375,11 +1288,10 @@ class XicpToLKsHp(BaseSkim):
         stdKshorts(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID/(pionID+kaonID))')
         va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
 
-        ma.cutAndCopyList('pi+:Xic2LKsHp', 'pi+:charmSkim', 'binaryID < 0.9', path=path)
-        ma.cutAndCopyList('K+:Xic2LKsHp', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('pi+:Xic2LKsHp', 'pi+:charmSkim', 'binaryPID(321, 211) < 0.9', path=path)
+        ma.cutAndCopyList('K+:Xic2LKsHp', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
         ma.cutAndCopyList('Lambda0:Xic2LKsHp', 'Lambda0:merged', '1.10 < M < 1.13 and daughter(0,trinaryID) > 0.2', path=path)
         ma.cutAndCopyList('K_S0:Xic2LKsHp', 'K_S0:merged', '0.46 < M < 0.54', path=path)
         ma.reconstructDecay("Xi-:Xic2LKsHp -> Lambda0:Xic2LKsHp pi-:all", cut="1.295 < M < 1.35", path=path)
@@ -1417,11 +1329,12 @@ class XicToXimPipPim(BaseSkim):
     **Selection Criteria**
 
     * standard track quality constraints on final state particles from charm_skim_std_charged
-    * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2, pi_pionIDNN > 0.1
+    * K/pi binary ID > 0.2, p/K/pi trinary ID > 0.2
     * :math:`\\pm 3\\sigma` mass windows for all intermediate hyperons
     * :math:`\\pm 3\\sigma` mass window for pi0 and skim selections from stdPi0s
     * lower bound on significance of (flight) distance for all intermediate hyperons, 40% of expected value to be used in analysis
     * loose mass window and lower bound to pCMS for Xic+
+    * lower bound to p for pi0s originating from a Sigma+
     """
 
     __authors__ = ["Paul Gebeline"]
@@ -1432,11 +1345,6 @@ class XicToXimPipPim(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic+ -> hyperon skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         loadStdSkimPi0(path=path)
         charm_skim_std_charged('pi', path=path)
@@ -1446,17 +1354,16 @@ class XicToXimPipPim(BaseSkim):
         charm_skim_sigma(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('binaryID', 'formula(kaonID_noSVD/(pionID_noSVD+kaonID_noSVD))')
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
         va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
-        ma.cutAndCopyList('pi+:XicToSHpJm', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:XicToSHpJm', 'K+:charmSkim', 'binaryID > 0.2', path=path)
+        ma.cutAndCopyList('K+:XicToSHpJm', 'K+:charmSkim', 'binaryPID(321, 211) > 0.2', path=path)
+        ma.cutAndCopyList('Sigma+:XicToSHpJm', 'Sigma+:charmSkim', 'daughter(1, p) > 0.1', path=path)
 
         ma.cutAndCopyList(
             'Lambda0:XicToSHpJm',
             'Lambda0:merged',
-            '1.114 < M < 1.118 and significanceOfFlightDistance > 3 and daughter(0,trinaryID) > 0.2 and daughter(1,pionIDNN) > 0.1',
+            '1.114 < M < 1.118 and significanceOfFlightDistance > 3 and daughter(0,trinaryID) > 0.2',
             path=path)
 
         ma.reconstructDecay(
@@ -1467,11 +1374,11 @@ class XicToXimPipPim(BaseSkim):
                             cut="1.294 < M < 1.335 and significanceOfDistance > 2", path=path)
 
         XicCuts = "2.3 < M < 2.65 and useCMSFrame(p) > 2.0"
-        XicChannels = ["Sigma+:charmSkim pi+:XicToSHpJm K-:XicToSHpJm",
-                       "Sigma+:charmSkim pi+:XicToSHpJm pi-:XicToSHpJm",
-                       "Sigma+:charmSkim K+:XicToSHpJm K-:XicToSHpJm",
-                       "Xi-:XicToSHpJm pi+:XicToSHpJm pi+:XicToSHpJm",
-                       "Xi0:XicToSHpJm pi+:XicToSHpJm pi+:XicToSHpJm pi-:XicToSHpJm"
+        XicChannels = ["Sigma+:XicToSHpJm pi+:charmSkim K-:XicToSHpJm",
+                       "Sigma+:XicToSHpJm pi+:charmSkim pi-:charmSkim",
+                       "Sigma+:XicToSHpJm K+:XicToSHpJm K-:XicToSHpJm",
+                       "Xi-:XicToSHpJm pi+:charmSkim pi+:charmSkim",
+                       "Xi0:XicToSHpJm pi+:charmSkim pi+:charmSkim pi-:charmSkim"
                        ]
 
         XicList = []
@@ -1505,18 +1412,13 @@ class Xic0ToLHpJm(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL("The analysis globaltag is not set in the charm Xic0 -> Lambda0 skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        va.variables.addAlias('trinaryID', 'formula(protonID_noSVD/(pionID_noSVD+kaonID_noSVD+protonID_noSVD))')
+        va.variables.addAlias('trinaryID', 'formula(protonID/(pionID+kaonID+protonID))')
         va.variables.addAlias('significanceOfFlightDistance', 'formula(flightDistance/flightDistanceErr)')
 
         ma.cutAndCopyList(
@@ -1565,7 +1467,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         * 0.130 < massDifference(0) < 0.160 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
         * 0.120 < massDifference(0) < 0.165 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
         * 1.81 < M < 2.21 on signal side :math:`D^{*+}`
-        * 0.115 < :math:`M_{D^{*}}` - :math:`M_{D}` < 0.220 and p* > 2.0 on signal side :math:`D^{0}`
+        * 0.08 < :math:`M_{D^{*}}` - :math:`M_{D}` < 0.27 and p* > 2.0 on signal side :math:`D^{0}`
     """
     vm.addAlias('reco_px', 'formula(daughter(0,pxRecoil)-daughter(1,px))')
     vm.addAlias('reco_py', 'formula(daughter(0,pyRecoil)-daughter(1,py))')
@@ -1584,11 +1486,6 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
     NoisyModules = ["ParticleLoader", "RootOutput"]
     ApplyHLTHadronCut = True
 
-    def additional_setup(self, path):
-        if self.analysisGlobaltag is None:
-            b2.B2FATAL(f"The analysis globaltag is not set in the {self.name} skim.")
-        b2.conditions.prepend_globaltag(self.analysisGlobaltag)
-
     def load_standard_lists(self, path):
         charm_skim_std_charged('pi', path=path)
         charm_skim_std_charged('K', path=path)
@@ -1596,8 +1493,8 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
         stdLambdas(path=path)
 
     def build_lists(self, path):
-        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionIDNN > 0.1', path=path)
-        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonIDNN > 0.1', path=path)
+        ma.cutAndCopyList('pi+:hadtag', 'pi+:charmSkim', 'pionID > 0.01', path=path)
+        ma.cutAndCopyList('K+:hadtag', 'K+:charmSkim', 'kaonID > 0.1', path=path)
         ma.fillParticleList("p+:hadtag", "protonID > 0.1  and abs(dr) < 1.0 and abs(dz) < 3.0", path=path)
         ma.fillParticleList("gamma:tag", "E > 0.05", path=path)
         ma.reconstructDecay("pi0:hadtag -> gamma:tag gamma:tag", "0.115 < M < 0.160", path=path)
@@ -1794,7 +1691,7 @@ class DstToD0Pi_D0ToGeneric(BaseSkim):
 
         ma.copyLists("D*+:skimSig", sigDstList, path=path)
 
-        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.115 < DelM < 0.220", path=path)
+        ma.reconstructDecay("D0:skimSig -> D*+:skimSig pi-:hadtag", "cms_p > 2.0 and 0.08 < DelM < 0.27", path=path)
 
         sigDzList = ["D0:skimSig"]
         return sigDzList
@@ -1891,3 +1788,51 @@ class DspToHpOmega(BaseSkim):
         DsList.append("D_s+:DspToPipOmg")
 
         return DsList
+
+
+@fancy_skim_header
+class DpToEtaHp(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{+}\\to \\eta \\pi^+` (and CC)
+        * :math:`D^{+}\\to \\eta \\K^+` (and CC)
+
+    **Selection Criteria**:
+        * Track cuts are `charm_skim_std_charged` pion and Kaon
+        * Use :math:`\\pi^{0}` from `stdPi0s.loadStdSkimPi0`
+        * :math:`0.4 < M(\\eta_{\\gamma\\gamma} < 0.6`
+        * :math:`0.48 < M(\\eta_{\\pi^{+}\\pi^{-}\\pi^{0}} < 0.6`
+        * :math:`p(\\eta) > 0.4`
+        * :math:`1.6 < M(D^{+}) < 2.1`
+        * :math:`p*(D^{+})>2.2`
+    """
+
+    __authors__ = ["Jaeyoung Kim"]
+    __description__ = "Skim list for D+ to eta h+"
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        charm_skim_std_charged('pi', path=path)
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+        eta_gamma_cut = "[[clusterNHits>1.5] and thetaInCDCAcceptance]"
+        eta_gamma_cut += " and [[clusterReg==1 and E>0.05] or [clusterReg==2 and E>0.05] or [clusterReg==3 and E>0.075]]"
+        ma.fillParticleList("gamma:DpToEtaHp", eta_gamma_cut, path=path)
+
+        ma.reconstructDecay('eta:DpToEtaHp_2Gam -> gamma:DpToEtaHp gamma:DpToEtaHp', '[0.4 < M < 0.6] and [p>0.4]', path=path)
+        ma.reconstructDecay('eta:DpToEtaHp_3Pi -> pi+:charmSkim pi-:charmSkim pi0:skim', '[0.48 < M < 0.6] and [p>0.4]', path=path)
+
+        charmcuts = "1.6 < M < 2.1 and useCMSFrame(p)>2.2"
+        ma.reconstructDecay('D+:DpToEtaHp_2Gam -> eta:DpToEtaHp_2Gam pi+:charmSkim', charmcuts, path=path)
+        ma.reconstructDecay('D+:DpToEtaHp_3Pi -> eta:DpToEtaHp_3Pi pi+:charmSkim', charmcuts, path=path)
+
+        DpList = []
+        DpList.append("D+:DpToEtaHp_2Gam")
+        DpList.append("D+:DpToEtaHp_3Pi")
+
+        return DpList

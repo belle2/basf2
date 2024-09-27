@@ -6,8 +6,9 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-"""Full CDC tracking calibration."""
+"""CDC fudge factor calibration."""
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
+from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from prompt.utils import ExpRun
 import basf2
 from ROOT import Belle2
@@ -26,7 +27,7 @@ settings = CalibrationSettings(name="CDC Sigma fudge factor",
                                                    [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[],
+                               depends_on=[cdc_tracking_calibration],
                                expert_config={
                                    "fileFormat": "RAW",
                                    "min_events_per_file": 500,
@@ -129,7 +130,7 @@ def pre_collector(max_events=None, components=["CDC", "ECL", "KLM"], fileFormat=
             root_input = register_module('RootInput', branchNames=HLT_INPUT_OBJECTS)
         else:
             root_input = register_module('RootInput', branchNames=HLT_INPUT_OBJECTS,
-                                         entrySequences=['0:{}'.format(max_events)])
+                                         entrySequences='0:{}'.format(max_events))
         reco_path.add_module(root_input)
         # unpack
         from rawdata import add_unpackers

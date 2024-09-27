@@ -81,6 +81,19 @@ namespace Belle2 {
       Float_t Pval_neg;              /**< P-value of the negative track. */
       Float_t nCDC_pos;              /**< Number of CDC hit of the positive track. */
       Float_t nCDC_neg;              /**< Number of CDC hit of the negative track. */
+      Float_t nPXD_pos;              /**< Number of PXD hit of the positive track. */
+      Float_t nPXD_neg;              /**< Number of PXD hit of the negative track. */
+      Float_t nSVD_pos;              /**< Number of SVD hit of the positive track. */
+      Float_t nSVD_neg;              /**< Number of SVD hit of the negative track. */
+      Float_t Muid_pos;              /**< Muon ID for positive charged track */
+      Float_t Muid_neg;              /**< Muon ID for negative charged track */
+      Float_t Eid_pos;               /**< Electron ID for positive charged track */
+      Float_t Eid_neg;               /**< Electron ID for negative charged track */
+
+
+      Float_t nExtraCDCHits;         /**< Number of CDC hits not assigned to any tracks */
+      Float_t Eecl_track;            /**< sum of ECL associated to track */
+      Float_t Eecl_neutral;          /**< Sum of neutral ECL clusgter */
 
       Float_t D0_pos;                /**< d0 of the positive track  */
       Float_t D0_neg;                /**< d0 of the negative track  */
@@ -92,9 +105,15 @@ namespace Belle2 {
       Float_t Z0ip_neg;              /**< z0 w.r.t IP of the negative track  */
       Float_t Pt_pos;                /**< Transeverse momentum of the positive track  */
       Float_t Pt_neg;                /**< Transeverse momentum of the negative track  */
+      Float_t Pz_pos;                /**< Longitudinal momentum of the positive track  */
+      Float_t Pz_neg;                /**< Longitudinal momentum of the negative track  */
+
 
       Float_t Pt_pos_cm;             /**< Transeverse momentum of the positive track  in c.m frame*/
       Float_t Pt_neg_cm;             /**< Transeverse momentum of the negative track in c.m frame */
+      Float_t Pz_pos_cm;             /**< Longitudinal momentum of the positive track  in c.m frame*/
+      Float_t Pz_neg_cm;             /**< Longitudinal momentum of the negative track in c.m frame */
+
       Float_t Theta_pos_cm;          /**< theta of the positive track in c.m frame. */
       Float_t Theta_neg_cm;          /**< theta of the negative track in c.m frame. */
       Float_t Phi0_pos_cm;           /**< phi0 of the positive track in c.m frame. */

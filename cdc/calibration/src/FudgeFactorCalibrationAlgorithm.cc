@@ -27,9 +27,8 @@ using namespace CDC;
 
 FudgeFactorCalibrationAlgorithm::FudgeFactorCalibrationAlgorithm(): CalibrationAlgorithm("CDCFudgeFactorCalibrationCollector")
 {
-
   setDescription(
-    " -------------------------- T0 Calibration Algorithm -------------------------\n"
+    " -------------------------- CDC fudge factor Calibration Algorithm -------------------------\n"
   );
 }
 
@@ -99,10 +98,12 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   if (hdPtPt_cm) hdPtPt_cm->Write();
   if (hdPhi0_cm) hdPhi0_cm->Write();
   if (hdTheta_cm) hdTheta_cm->Write();
-  TTree* newtree = tree->CloneTree();
-  newtree->SetName("tree_dimuon");
-  newtree->Write();
+  TTree* newtree = (TTree*)tree->CloneTree();
+  newtree->SetName("dimuon");
+  newtree->Print();
+  //  tree->Write(0,TObject::kOverwrite);
+  //  tree->Write();
   fout->Write();
-  fout->Close();
+  delete fout;
   return c_OK;
 }

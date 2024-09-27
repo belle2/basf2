@@ -4,6 +4,11 @@ Changes in the analysis package in light-2409-toyger
 Modules
 +++++++
 * Added a module ``VariabesToTable`` that writes Ntuples to hdf5, csv or parquet.
+* Added support for the FEI table format of the corrections repository to the analysis reweighting script
+
+Graph Neural Network based Flavor Tagger
+++++++++++++++++++++++++++++++++++++++++
+* Fixed a memory leak that affected light-2406-ragdoll and light-2408-savannah by upgrading the tensorflow version
 
 Changes in the analysis package in light-2408-savannah
 ------------------------------------------------------

@@ -55,6 +55,7 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   //reading data from rootfile
   auto tree = getObjectPtr<TTree>("tree");
   auto hEvtT0 =   getObjectPtr<TH1F>("hEventT0");
+  auto hExtraCDCHit =   getObjectPtr<TH1F>("hExtraCDCHit");
   auto hNDF_pos =   getObjectPtr<TH1F>("hNDF_pos");
   auto hNDF_neg =   getObjectPtr<TH1F>("hNDF_neg");
   auto hPval_pos =   getObjectPtr<TH1F>("hPval_pos");
@@ -80,6 +81,7 @@ CalibrationAlgorithm::EResult FudgeFactorCalibrationAlgorithm::calibrate()
   //  TDirectory* top = gDirectory;
   //  if(tree) tree->Write();
   if (hEvtT0) hEvtT0->Write();
+  if (hExtraCDCHit) hExtraCDCHit->Write();
 
   if (hPval_pos) hPval_pos->Write();
   if (hPval_neg) hPval_neg->Write();

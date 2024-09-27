@@ -51,56 +51,57 @@ void CDCFudgeFactorCalibrationCollectorModule::prepare()
 
   if (m_StoreNtuple) {
     auto m_tree  = new TTree(m_treeName.c_str(), "tree for cdc calibration");
-    m_tree->Branch<Int_t>("exp_run", &exp_run);
-    m_tree->Branch<Float_t>("pt_pos", &Pt_pos);
-    m_tree->Branch<Float_t>("pt_neg", &Pt_neg);
-    m_tree->Branch<Float_t>("pz_pos", &Pz_pos);
-    m_tree->Branch<Float_t>("pz_neg", &Pz_neg);
+    m_tree->Branch<Int_t>("exp_run", &expRun);
+    m_tree->Branch<Float_t>("pt_pos", &ptPos);
+    m_tree->Branch<Float_t>("pt_neg", &ptNeg);
+    m_tree->Branch<Float_t>("pz_pos", &pzPos);
+    m_tree->Branch<Float_t>("pz_neg", &pzNeg);
 
-    m_tree->Branch<Float_t>("pt_pos_cm", &Pt_pos_cm);
-    m_tree->Branch<Float_t>("pt_neg_cm", &Pt_neg_cm);
-    m_tree->Branch<Float_t>("pz_pos_cm", &Pz_pos_cm);
-    m_tree->Branch<Float_t>("pz_neg_cm", &Pz_neg_cm);
+    m_tree->Branch<Float_t>("pt_pos_cm", &ptPosCm);
+    m_tree->Branch<Float_t>("pt_neg_cm", &ptNegCm);
+    m_tree->Branch<Float_t>("pz_pos_cm", &pzPosCm);
+    m_tree->Branch<Float_t>("pz_neg_cm", &pzNegCm);
 
-    m_tree->Branch<Float_t>("theta_pos_cm", &Theta_pos_cm);
-    m_tree->Branch<Float_t>("theta_neg_cm", &Theta_neg_cm);
+    m_tree->Branch<Float_t>("theta_pos_cm", &thetaPosCm);
+    m_tree->Branch<Float_t>("theta_neg_cm", &thetaNegCm);
 
-    m_tree->Branch<Float_t>("phi0_pos_cm",  &Phi0_pos_cm);
-    m_tree->Branch<Float_t>("theta_neg_cm", &Phi0_neg_cm);
+    m_tree->Branch<Float_t>("phi0_pos_cm",  &phi0PosCm);
+    m_tree->Branch<Float_t>("theta_neg_cm", &phi0NegCm);
 
-    m_tree->Branch<Float_t>("Pval_pos", &Pval_pos);
-    m_tree->Branch<Float_t>("Pval_neg", &Pval_neg);
+    m_tree->Branch<Float_t>("Pval_pos", &pvalPos);
+    m_tree->Branch<Float_t>("Pval_neg", &pvalNeg);
 
-    m_tree->Branch<Float_t>("ndf_pos", &ndf_pos);
-    m_tree->Branch<Float_t>("ndf_neg", &ndf_neg);
+    m_tree->Branch<Float_t>("ndf_pos", &ndfPos);
+    m_tree->Branch<Float_t>("ndf_neg", &ndfNeg);
 
-    m_tree->Branch<Float_t>("ncdc_pos", &nCDC_pos);
-    m_tree->Branch<Float_t>("ncdc_neg", &nCDC_neg);
-    m_tree->Branch<Float_t>("npxd_pos", &nPXD_pos);
-    m_tree->Branch<Float_t>("npxd_neg", &nPXD_neg);
-    m_tree->Branch<Float_t>("nsvd_pos", &nSVD_pos);
-    m_tree->Branch<Float_t>("nsvd_neg", &nSVD_neg);
+    m_tree->Branch<Float_t>("ncdc_pos", &ncdcPos);
+    m_tree->Branch<Float_t>("ncdc_neg", &ncdcNeg);
+    m_tree->Branch<Float_t>("npxd_pos", &npxdPos);
+    m_tree->Branch<Float_t>("npxd_neg", &npxdNeg);
+    m_tree->Branch<Float_t>("nsvd_pos", &nsvdPos);
+    m_tree->Branch<Float_t>("nsvd_neg", &nsvdNeg);
 
     m_tree->Branch<Float_t>("nextra_cdchit", &nExtraCDCHits);
-    m_tree->Branch<Float_t>("ecl_track", &Eecl_track);
-    m_tree->Branch<Float_t>("ecl_neutral", &Eecl_neutral);
+    m_tree->Branch<Float_t>("ecl_track", &eclTrack);
+    m_tree->Branch<Float_t>("ecl_neutral", &eclNeutral);
 
-    m_tree->Branch<Float_t>("d0_pos", &D0_pos);
-    m_tree->Branch<Float_t>("d0_neg", &D0_neg);
-    m_tree->Branch<Float_t>("z0_pos", &Z0_pos);
-    m_tree->Branch<Float_t>("z0_neg", &Z0_neg);
-    m_tree->Branch<Float_t>("d0ip_pos", &D0ip_pos);
-    m_tree->Branch<Float_t>("d0ip_neg", &D0ip_neg);
-    m_tree->Branch<Float_t>("z0ip_pos", &Z0ip_pos);
-    m_tree->Branch<Float_t>("z0ip_neg", &Z0ip_neg);
-    m_tree->Branch<Float_t>("muid_pos", &Muid_pos);
-    m_tree->Branch<Float_t>("muid_neg", &Muid_neg);
-    m_tree->Branch<Float_t>("eid_pos", &Eid_pos);
-    m_tree->Branch<Float_t>("eid_neg", &Eid_neg);
+    m_tree->Branch<Float_t>("d0_pos", &d0Pos);
+    m_tree->Branch<Float_t>("d0_neg", &d0Neg);
+    m_tree->Branch<Float_t>("z0_pos", &z0Pos);
+    m_tree->Branch<Float_t>("z0_neg", &z0Neg);
+    m_tree->Branch<Float_t>("d0ip_pos", &d0ipPos);
+    m_tree->Branch<Float_t>("d0ip_neg", &d0ipNeg);
+    m_tree->Branch<Float_t>("z0ip_pos", &z0ipPos);
+    m_tree->Branch<Float_t>("z0ip_neg", &z0ipNeg);
+    m_tree->Branch<Float_t>("muid_pos", &muidPos);
+    m_tree->Branch<Float_t>("muid_neg", &muidNeg);
+    m_tree->Branch<Float_t>("eid_pos", &eidPos);
+    m_tree->Branch<Float_t>("eid_neg", &eidNeg);
 
     registerObject<TTree>(m_treeName.c_str(), m_tree);
   }
-  auto m_hEventT0 = new TH1F("hEventT0", "Event T0", 1000, -100, 100);
+  auto m_hEventT0 = new TH1F("hEventT0", "Event T0", 200, -100, 100);
+  auto m_hExtraCDCHit = new TH1F("hExtraCDCHit", "Extra cdc hits", 500, 0, 5000);
   auto m_hNDF_pos = new TH1F("hNDF_pos", "NDF of positive track;NDF;Tracks", 71, -1, 70);
   auto m_hNDF_neg = new TH1F("hNDF_neg", "NDF of negative track;NDF;Tracks", 71, -1, 70);
   auto m_hPval_pos = new TH1F("hPval_pos", "p-values of pos tracks;pVal;Tracks", 1000, 0, 1);
@@ -120,6 +121,7 @@ void CDCFudgeFactorCalibrationCollectorModule::prepare()
   auto m_hdTheta_cm = new TH1F("hdTheta_cm", "#Delta#theta in c.m frame ; #Delta#theta in c.m ; Events ", 200, -3.0, 3.0);
 
   registerObject<TH1F>("hEventT0", m_hEventT0);
+  registerObject<TH1F>("hExtraCDCHit", m_hExtraCDCHit);
   registerObject<TH1F>("hNDF_pos", m_hNDF_pos);
   registerObject<TH1F>("hNDF_neg", m_hNDF_neg);
   registerObject<TH1F>("hnCDC_pos", m_hnCDC_pos);
@@ -142,7 +144,7 @@ void CDCFudgeFactorCalibrationCollectorModule::prepare()
 void CDCFudgeFactorCalibrationCollectorModule::collect()
 {
   int nCandidates = m_DiMuonList->getListSize();
-  B2DEBUG(199, "Number of muon canndiate:" << nCandidates);
+  B2DEBUG(29, "Number of muon canndiate:" << nCandidates);
   if (nCandidates < 1) return;
 
   // event with is fail to extract t0 will be exclude from analysis
@@ -155,24 +157,22 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
   StoreObjPtr<EventMetaData> m_EventMetaData;   /**< Event metadata. */
   int run = m_EventMetaData->getRun();
   int exp = m_EventMetaData->getExperiment();
-  exp_run = exp * 1000000 + run;
+  expRun = exp * 1000000 + run;
 
   /************************************/
   /// Calculate total energy of Ecl for neutral
   StoreObjPtr<ParticleList> gamma_list(m_GammaListName);
   int nG = gamma_list->getListSize();
-  B2DEBUG(199, "Number of gamma: " << nG);
+  B2DEBUG(29, "Number of gamma: " << nG);
   for (int i = 0; i < nG; ++i) {
     Particle* gamma = gamma_list->getParticle(i);
-    Eecl_neutral += gamma->getEnergy();
+    eclNeutral += gamma->getEnergy();
   }
-  B2DEBUG(199, "Sum of neutral ECL " << Eecl_neutral);
+  B2DEBUG(29, "Sum of neutral ECL " << eclNeutral);
   /************************************/
-
-  //  const int nTr = m_Tracks.getEntries();
   PCmsLabTransform T;
   //now start to collect dimuon parameters
-  double   theta_pos(0), theta_neg(0);
+  double   thetaPos(0), thetaNeg(0);
   int charge_sum = 0;
 
   for (int i = 0; i < nCandidates; ++i) {
@@ -192,51 +192,52 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
         break;
       }
       //get Cluter Energy
-      Eecl_track +=  d0->getECLClusterEnergy();
+      eclTrack +=  d0->getECLClusterEnergy();
       double muid = Variable::muonID(d0);
       double eid = Variable::muonID(d0);
 
       if (chg > 0) {
-        ndf_pos = fitresult->getNDF();
-        Pval_pos = fitresult->getPValue();
-        Pt_pos = fitresult->getTransverseMomentum();
-        Pz_pos = fitresult->getMomentum().Z();
-        D0_pos  = fitresult->getD0();
-        Z0_pos  = fitresult->getZ0();
-        theta_pos = fitresult->getMomentum().Theta() * 180 / M_PI;
-        nCDC_pos = fitresult->getHitPatternCDC().getNHits();
-        nSVD_pos = fitresult->getHitPatternVXD().getNSVDHits();
-        nPXD_pos = fitresult->getHitPatternVXD().getNPXDHits();
+        ndfPos = fitresult->getNDF();
+        pvalPos = fitresult->getPValue();
+        ptPos = fitresult->getTransverseMomentum();
+        pzPos = fitresult->getMomentum().Z();
+        d0Pos  = fitresult->getD0();
+        z0Pos  = fitresult->getZ0();
+        thetaPos = fitresult->getMomentum().Theta() * 180 / M_PI;
+        ncdcPos = fitresult->getHitPatternCDC().getNHits();
+        nsvdPos = fitresult->getHitPatternVXD().getNSVDHits();
+        npxdPos = fitresult->getHitPatternVXD().getNPXDHits();
         ROOT::Math::PxPyPzEVector P4_pos = T.rotateLabToCms() * fitresult->get4Momentum();
-        Pt_pos_cm = P4_pos.Pt();
-        Theta_pos_cm = P4_pos.Theta() * 180 / M_PI;
-        Phi0_pos_cm = P4_pos.Phi() * 180 / M_PI;
+        ptPosCm = P4_pos.Pt();
+        thetaPosCm = P4_pos.Theta() * 180 / M_PI;
+        phi0PosCm = P4_pos.Phi() * 180 / M_PI;
         UncertainHelix helix_pos = fitresult->getUncertainHelix();
         helix_pos.passiveMoveBy(v0Vertex);
-        D0ip_pos = helix_pos.getD0();
-        Z0ip_pos = helix_pos.getZ0();
-        Muid_pos = muid;  Eid_pos = eid;
+        d0ipPos = helix_pos.getD0();
+        z0ipPos = helix_pos.getZ0();
+        muidPos = muid;  eidPos = eid;
       } else if (chg < 0) {
-        ndf_neg = fitresult->getNDF();
-        Pval_neg = fitresult->getPValue();
-        Pt_neg = fitresult->getTransverseMomentum();
-        Pz_neg = fitresult->getMomentum().Z();
-        D0_neg  = fitresult->getD0();
-        Z0_neg  = fitresult->getZ0();
-        theta_neg = fitresult->getMomentum().Theta() * 180 / M_PI;
-        nCDC_neg = fitresult->getHitPatternCDC().getNHits();
-        nSVD_neg = fitresult->getHitPatternVXD().getNSVDHits();
-        nPXD_neg = fitresult->getHitPatternVXD().getNPXDHits();
+        ndfNeg = fitresult->getNDF();
+        pvalNeg = fitresult->getPValue();
+        ptNeg = fitresult->getTransverseMomentum();
+        pzNeg = fitresult->getMomentum().Z();
+        d0Neg  = fitresult->getD0();
+        z0Neg  = fitresult->getZ0();
+        thetaNeg = fitresult->getMomentum().Theta() * 180 / M_PI;
+        ncdcNeg = fitresult->getHitPatternCDC().getNHits();
+        nsvdNeg = fitresult->getHitPatternVXD().getNSVDHits();
+        npxdNeg = fitresult->getHitPatternVXD().getNPXDHits();
 
         ROOT::Math::PxPyPzEVector P4_neg = T.rotateLabToCms() * fitresult->get4Momentum();
-        Pt_neg_cm = P4_neg.Pt();
-        Theta_neg_cm = P4_neg.Theta() * 180 / M_PI;
-        Phi0_neg_cm = P4_neg.Phi() * 180 / M_PI;
+        ptNegCm = P4_neg.Pt();
+        thetaNegCm = P4_neg.Theta() * 180 / M_PI;
+        phi0NegCm = P4_neg.Phi() * 180 / M_PI;
         UncertainHelix helix_neg = fitresult->getUncertainHelix();
         helix_neg.passiveMoveBy(v0Vertex);
-        D0ip_neg = helix_neg.getD0();
-        Z0ip_neg = helix_neg.getZ0();
-        Muid_neg = muid;  Eid_neg = eid;
+        d0ipNeg = helix_neg.getD0();
+        z0ipNeg = helix_neg.getZ0();
+        muidNeg = muid;
+        eidNeg = eid;
       } else {
         continue;
       }
@@ -247,43 +248,38 @@ void CDCFudgeFactorCalibrationCollectorModule::collect()
     StoreObjPtr<EventLevelTrackingInfo> elti;
     if (!elti) nExtraCDCHits = -1;
     else nExtraCDCHits = elti->getNCDCHitsNotAssigned();
-
+    getObjectPtr<TH1F>("hExtraCDCHit")->Fill(nExtraCDCHits);
     // cut good charged track
     if (charge_sum != 0) {continue;}
     //cut according to the Line400 in the plotMumu_4ff.C
-    if (Pt_pos < 2.5  || Pt_neg < 2.5
-        || theta_pos < 45 || theta_pos > 125
-        || theta_neg < 45 || theta_neg > 125) {return;}
+    if (ptPos < 2.5  || ptNeg < 2.5
+        || thetaPos < 45 || thetaPos > 125
+        || thetaNeg < 45 || thetaNeg > 125) {return;}
 
     // cut on Energy deposite in ECL
     // Keep the same as in the dimuon study script,
     // Although it is not neccessary to keep this as cut on Etot is enough
-    double Eecl_tot = Eecl_neutral + Eecl_track;
-    if (Eecl_tot > 2 || Eecl_track > 2) return;
+    double eclTot = eclNeutral + eclTrack;
+    if (eclTot > 2 || eclTrack > 2) return;
 
     //  B2INFO("Total Eecl_track = "<< Eecl_trk);
-    double dPt = (Pt_pos - Pt_neg) / sqrt(2);
-    double dD0 = (D0_pos + D0_neg) / sqrt(2);
-    double dZ0 = (Z0_pos - Z0_neg) / sqrt(2);
-    double Pt_cm = (Pt_pos_cm + Pt_neg_cm) / 2;
-    double dPt_cm = (Pt_pos_cm - Pt_neg_cm) / sqrt(2);
-    double dPhi0_cm = (180 - fabs(Phi0_pos_cm - Phi0_neg_cm)) / sqrt(2);
-    double dTheta_cm = (180 - fabs(Theta_pos_cm + Theta_neg_cm)) / sqrt(2);
-
-    B2DEBUG(199, "ECL neutral - trk:" << Eecl_neutral << "  -  " << Eecl_track);
-    B2DEBUG(199, "Pos: theta phi0  :" << Theta_pos_cm << "  - " << Phi0_pos_cm);
-    B2DEBUG(199, "Neg: theta phi0  :" << Theta_neg_cm << "  - " << Phi0_neg_cm);
-    B2DEBUG(199, "DeltaPhi  Theta  :" << dPhi0_cm << "  " << dTheta_cm);
+    double dPt = (ptPos - ptNeg) / sqrt(2);
+    double dD0 = (d0Pos + d0Neg) / sqrt(2);
+    double dZ0 = (z0Pos - z0Neg) / sqrt(2);
+    double Pt_cm = (ptPosCm + ptNegCm) / 2;
+    double dPt_cm = (ptPosCm - ptNegCm) / sqrt(2);
+    double dPhi0_cm = (180 - fabs(phi0PosCm - phi0NegCm)) / sqrt(2);
+    double dTheta_cm = (180 - fabs(thetaPosCm + thetaNegCm)) / sqrt(2);
 
     //require back to back
     if (fabs(dPhi0_cm) > m_minCollinearityPhi0 || fabs(dTheta_cm) > m_minCollinearityTheta) return;
 
-    getObjectPtr<TH1F>("hPval_pos")->Fill(Pval_pos);
-    getObjectPtr<TH1F>("hPval_neg")->Fill(Pval_neg);
-    getObjectPtr<TH1F>("hNDF_pos")->Fill(ndf_pos);
-    getObjectPtr<TH1F>("hNDF_neg")->Fill(ndf_neg);
-    getObjectPtr<TH1F>("hnCDC_pos")->Fill(nCDC_pos);
-    getObjectPtr<TH1F>("hnCDC_neg")->Fill(nCDC_neg);
+    getObjectPtr<TH1F>("hPval_pos")->Fill(pvalPos);
+    getObjectPtr<TH1F>("hPval_neg")->Fill(pvalNeg);
+    getObjectPtr<TH1F>("hNDF_pos")->Fill(ndfPos);
+    getObjectPtr<TH1F>("hNDF_neg")->Fill(ndfNeg);
+    getObjectPtr<TH1F>("hnCDC_pos")->Fill(ncdcPos);
+    getObjectPtr<TH1F>("hnCDC_neg")->Fill(ncdcNeg);
 
     getObjectPtr<TH1F>("hdPt")->Fill(dPt);
     getObjectPtr<TH1F>("hdD0")->Fill(dD0);

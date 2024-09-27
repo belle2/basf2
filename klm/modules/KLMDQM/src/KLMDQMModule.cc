@@ -265,13 +265,13 @@ void KLMDQMModule::defineHisto()
   int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
 
   m_FE_BKLM_Layer_0 = new TH1F("feStatus_bklm_scintillator_layers_0",
-                               "BKLM Scintillator Standard Readout;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+                               "BKLM Scintillator Standard Readout;Scintillator Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_FE_BKLM_Layer_1 = new TH1F("feStatus_bklm_scintillator_layers_1",
-                               "BKLM Scintillator Feature Extraction;Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+                               "BKLM Scintillator Feature Extraction;Scintillator Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_FE_EKLM_Plane_0 = new TH1F("feStatus_eklm_plane_0",
-                               "EKLM Standard Readout;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+                               "EKLM Standard Readout;Scintillator Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   m_FE_EKLM_Plane_1 = new TH1F("feStatus_eklm_plane_1",
-                               "EKLM Feature Extraction;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+                               "EKLM Feature Extraction;Scintillator Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   oldDirectory->cd();
 }
 
@@ -401,8 +401,7 @@ void KLMDQMModule::event()
       }
       if (digitRaw) {
         // Extract m_FE from m_word4
-        uint16_t word4 = digitRaw->getWord4();
-        uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+        uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
         if (feStatus != 0) {
           m_FE_EKLM_Plane_1->Fill(planeGlobal);
         } else {
@@ -438,8 +437,7 @@ void KLMDQMModule::event()
         nDigitsScintillatorBKLM++;
         m_TimeScintillatorBKLM->Fill(digit.getTime());
         if (digitRaw) {
-          uint16_t word4 = digitRaw->getWord4();
-          uint16_t feStatus = (word4 >> 15) & 0x1;  // Extract the most significant bit
+          uint16_t feStatus = digitRaw->getFEStatus(); // Extract the most significant bit
           if (feStatus != 0) {
             m_FE_BKLM_Layer_1->Fill((klmSectorIndex) * 2 + layer);
           } else {

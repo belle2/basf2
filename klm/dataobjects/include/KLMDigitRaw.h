@@ -166,6 +166,14 @@ namespace Belle2 {
     }
 
     /**
+     * Get FE
+     */
+    uint16_t getFEStatus()
+    {
+      return KLM::RawData::unpackFE(m_word4);
+    }
+
+    /**
      * Get unused bits from the fourth word.
      */
     uint16_t getUnusedBits()

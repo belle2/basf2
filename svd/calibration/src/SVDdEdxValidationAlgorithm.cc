@@ -340,13 +340,6 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   SignalEfficiencynoSVD.reserve(m_NumROCpoints);
   FakeEfficiencynoSVD.reserve(m_NumROCpoints);
 
-  std::vector<double> SignalEfficiencyALL2, FakeEfficiencyALL2;
-  SignalEfficiencyALL2.reserve(m_NumROCpoints);
-  FakeEfficiencyALL2.reserve(m_NumROCpoints);
-  std::vector<double> SignalEfficiencynoSVD2, FakeEfficiencynoSVD2;
-  SignalEfficiencynoSVD2.reserve(m_NumROCpoints);
-  FakeEfficiencynoSVD2.reserve(m_NumROCpoints);
-
   TString SignalFiducialCut = SignalVarName + PIDVarName + "noSVD>=0"; // sanity cuts to reject events with NaN
   TString FakesFiducialCut = FakeVarName + PIDVarName + "noSVD>=0";
   TString SignalFiducialCutSlow = "SlowPion" + PIDVarName + "noSVD>=0";

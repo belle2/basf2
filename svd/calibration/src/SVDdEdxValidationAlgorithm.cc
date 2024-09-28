@@ -25,6 +25,7 @@
 #include <TAxis.h>
 #include <TGraph.h>
 #include <TMultiGraph.h>
+#include <TCut.h>
 
 #include <RooDataSet.h>
 #include <RooRealVar.h>
@@ -37,7 +38,9 @@
 #include <RooTreeDataStore.h>
 #include <RooMsgService.h>
 #include <RooStats/SPlot.h>
+#include <ROOT/RDataFrame.hxx>
 
+using namespace ROOT;
 using namespace RooFit;
 using namespace Belle2;
 
@@ -177,18 +180,19 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalPIDDistribution->SetLineColor(TColor::GetColor("#2166ac"));
     hSignalPIDDistribution->Draw("hist ");
 
-    DistribCanvas->Print("SVDdEdxValidation_Distribution_" + SignalVarNameFull +  PIDVarName + PIDDetectorsName +
+    DistribCanvas->Print("SVDdEdxValidation_Distribution_" + SignalVarNameFull + PIDVarName + PIDDetectorsName +
                          "_MomRange_" +
                          std::to_string(
                            MomLow)
                          .substr(0, 3) +
                          "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
-    TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull +  PIDVarName + PIDDetectorsName +
+    TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull + PIDVarName + PIDDetectorsName +
                       "_MomRange_" +
                       std::to_string(
                         MomLow)
                       .substr(0, 3) +
-                      "_" + std::to_string(MomHigh).substr(0, 3) + ".root", "RECREATE");
+                      "_" + std::to_string(MomHigh).substr(0, 3) + ".root",
+                      "RECREATE");
     hSignalPIDDistribution->SetLineColor(kBlack);
     hSignalPIDDistribution->Write();
     DistribFile.Close();
@@ -200,14 +204,14 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
   SignalTree->Draw(Form("%sMomentum>>hAllSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
                    SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
   SignalTree->Draw(Form("%sMomentum>>hSelectedSignal(%i,%f,%f)", SignalVarName.Data(), nbins, MomLow, MomHigh),
-                   SignalWeightName + " * (" + SignalVarName +  PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut +
+                   SignalWeightName + " * (" + SignalVarName + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + SignalFiducialCut +
                    ")",
                    "goff");
 
   FakeTree->Draw(Form("%sMomentum>>hAllFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
                  FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
   FakeTree->Draw(Form("%sMomentum>>hSelectedFakes(%i,%f,%f)", FakeVarName.Data(), nbins, MomLow, MomHigh),
-                 FakeWeightName + " * (" + FakeVarName +  PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")",
+                 FakeWeightName + " * (" + FakeVarName + PIDVarName + PIDDetectorsName + ">" + PIDCut + "&&" + FakesFiducialCut + ")",
                  "goff");
 
   TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
@@ -286,14 +290,15 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
   hBase->GetXaxis()->SetLabelSize(0.04);
 
   // std::setprecision(2);
-  ResultCanvas->Print("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_" +
+  ResultCanvas->Print("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + PIDVarName + "_" +
                       PIDDetectorsName +
                       "_Cut" +
                       PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
-  TFile ResultFile("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_" +
+  TFile ResultFile("SVDdEdxValidation_Efficiency_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + PIDVarName + "_" +
                    PIDDetectorsName +
                    "_Cut" +
-                   PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".root", "RECREATE");
+                   PIDCut + "_MomRange_" + std::to_string(MomLow).substr(0, 3) + "_" + std::to_string(MomHigh).substr(0, 3) + ".root",
+                   "RECREATE");
   EffHistoSig->SetLineColor(kBlack);
   EffHistoSig->SetMarkerColor(kBlack);
   EffHistoFake->SetLineColor(kBlack);
@@ -335,55 +340,117 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   SignalEfficiencynoSVD.reserve(m_NumROCpoints);
   FakeEfficiencynoSVD.reserve(m_NumROCpoints);
 
-  TString SignalFiducialCut = SignalVarName +  PIDVarName + "noSVD>=0"; // sanity cuts to reject events with NaN
-  TString FakesFiducialCut = FakeVarName +  PIDVarName + "noSVD>=0";
+  std::vector<double> SignalEfficiencyALL2, FakeEfficiencyALL2;
+  SignalEfficiencyALL2.reserve(m_NumROCpoints);
+  FakeEfficiencyALL2.reserve(m_NumROCpoints);
+  std::vector<double> SignalEfficiencynoSVD2, FakeEfficiencynoSVD2;
+  SignalEfficiencynoSVD2.reserve(m_NumROCpoints);
+  FakeEfficiencynoSVD2.reserve(m_NumROCpoints);
+
+  TString SignalFiducialCut = SignalVarName + PIDVarName + "noSVD>=0"; // sanity cuts to reject events with NaN
+  TString FakesFiducialCut = FakeVarName + PIDVarName + "noSVD>=0";
+  TString SignalFiducialCutSlow = "SlowPion" + PIDVarName + "noSVD>=0";
+  TString FakesFiducialCutSlow = "SlowPion" + PIDVarName + "noSVD>=0";
 
   // calculate efficiencies
+
+  TCut AllSignalCut = SignalFiducialCut * Form("%sMomentum>%f && %sMomentum<%f", SignalVarName.Data(), m_MomLowROC,
+                                               SignalVarName.Data(), m_MomHighROC);
+
+  double AllSignalIntegral, SelectedSignalIntegral;
+
+  auto DataFrameSignalAll = RDataFrame(*SignalTree).Filter(AllSignalCut.GetTitle());
+
+  if (SignalWeightName == "1") {
+    AllSignalIntegral = DataFrameSignalAll.Count().GetValue();
+  } else {
+    AllSignalIntegral = DataFrameSignalAll.Sum(SignalWeightName).GetValue();
+  }
+
+  std::unique_ptr<ROOT::RDF::RNode> DataFrameSlowSignalAll;
+
+  if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
+    TString SignalVarNameSlow = "SlowPion";
+    TCut AllSignalCutSlow = TCut(SignalFiducialCut) * TCut(SignalFiducialCutSlow) * Form("(%sMomentum>%f && %sMomentum<%f)",
+                            SignalVarNameSlow.Data(), m_MomLowROC, SignalVarNameSlow.Data(), m_MomHighROC);
+    DataFrameSlowSignalAll = std::make_unique<ROOT::RDF::RNode>(RDataFrame(*SignalTree).Filter(AllSignalCutSlow.GetTitle()));
+
+    if (SignalWeightName == "1") {
+      AllSignalIntegral += DataFrameSlowSignalAll->Count().GetValue();
+    } else {
+      AllSignalIntegral += DataFrameSlowSignalAll->Sum(SignalWeightName).GetValue();
+    }
+  }
+
   for (unsigned int i = 0; i < PIDDetectors.size(); i++) {
     for (unsigned int j = 0; j < m_NumROCpoints; ++j) {
       delete gROOT->FindObject("PIDCut");
-      delete gROOT->FindObject("hAllSignal");
-      delete gROOT->FindObject("hSelectedSignal");
 
       // scan cut values from 0 to 1, with a denser scan closer to 0 or 1, to get a nicer ROC curve
       double x = 1. / m_NumROCpoints * j;
       TString PIDCut = TString::Format("%f", 1. / (1 + TMath::Power(x / (1 - x), -3)));
 
-      // TString PIDCut = TString::Format("%f", 0. + 1. / m_NumROCpoints * j);
+      TCut SelectedSignalCut = Form("(%s%s%s > %s)", SignalVarName.Data(), PIDVarName.Data(), PIDDetectors[i].Data(), PIDCut.Data());
 
-      SignalTree->Draw(Form("%sMomentum>>hAllSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
-                       SignalWeightName + " * (" + SignalFiducialCut + ")", "goff");
-      SignalTree->Draw(Form("%sMomentum>>hSelectedSignal(1,%f,%f)", SignalVarName.Data(), m_MomLowROC, m_MomHighROC),
-                       SignalWeightName + " * (" + SignalVarName +  PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + ")",
-                       "goff");
+      if (SignalWeightName == "1") {
+        SelectedSignalIntegral = DataFrameSignalAll.Filter(SelectedSignalCut.GetTitle()).Count().GetValue();
+      } else {
+        SelectedSignalIntegral = DataFrameSignalAll.Filter(SelectedSignalCut.GetTitle()).Sum(SignalWeightName).GetValue();
+      }
 
-      TH1F* hAllSignal = (TH1F*)gDirectory->Get("hAllSignal");
-      TH1F* hSelectedSignal = (TH1F*)gDirectory->Get("hSelectedSignal");
-
+      // special treatement for pions: add also the slow pions from Dstar to gain low-momentum coverage
       if (strncmp(SignalVarName.Data(), "PionD", 5) == 0) {
-        SignalTree->Draw(Form("SlowPionMomentum>>hAllSignalSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                         SignalWeightName + " * (" + SignalFiducialCut + "&& SlowPion" + PIDVarName + "noSVD>=0" + ")", "goff");
-        SignalTree->Draw(Form("SlowPionMomentum>>hSelectedSignalSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                         SignalWeightName + " * (SlowPion" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + SignalFiducialCut + "&& SlowPion" +
-                         PIDVarName +
-                         "noSVD>=0" + ")", "goff");
-        TH1F* hAllSignalSlow = (TH1F*)gDirectory->Get("hAllSignalSlow");
-        TH1F* hSelectedSignalSlow = (TH1F*)gDirectory->Get("hSelectedSignalSlow");
-        hAllSignal->Add(hAllSignalSlow);
-        hSelectedSignal->Add(hSelectedSignalSlow);
+        TString SignalVarNameSlow = "SlowPion";
+        TCut SelectedSignalCutSlow = Form("(%s%s%s > %s)", SignalVarNameSlow.Data(), PIDVarName.Data(), PIDDetectors[i].Data(),
+                                          PIDCut.Data());
+
+        if (SignalWeightName == "1") {
+          SelectedSignalIntegral += DataFrameSlowSignalAll->Filter(SelectedSignalCutSlow.GetTitle()).Count().GetValue();
+        } else {
+          SelectedSignalIntegral += DataFrameSlowSignalAll->Filter(SelectedSignalCutSlow.GetTitle()).Sum(SignalWeightName).GetValue();
+        }
       }
 
       if (PIDDetectors[i] == "ALL") {
-        SignalEfficiencyALL.push_back(hSelectedSignal->Integral() / hAllSignal->Integral());
+        SignalEfficiencyALL.push_back(SelectedSignalIntegral / AllSignalIntegral);
       }
 
       if (PIDDetectors[i] == "noSVD") {
-        SignalEfficiencynoSVD.push_back(hSelectedSignal->Integral() / hAllSignal->Integral());
+        SignalEfficiencynoSVD.push_back(SelectedSignalIntegral / AllSignalIntegral);
       }
     }
   }
 
   // calculate fake rates
+
+  TCut AllFakeCut = FakesFiducialCut * Form("%sMomentum>%f && %sMomentum<%f", FakeVarName.Data(), m_MomLowROC, FakeVarName.Data(),
+                                            m_MomHighROC);
+
+  double AllFakeIntegral, SelectedFakeIntegral;
+  auto DataFrameFakeAll = RDataFrame(*FakeTree).Filter(AllFakeCut.GetTitle());
+
+  if (FakeWeightName == "1") {
+    AllFakeIntegral = DataFrameFakeAll.Count().GetValue();
+  } else {
+    AllFakeIntegral = DataFrameFakeAll.Sum(FakeWeightName).GetValue();
+  }
+
+  std::unique_ptr<ROOT::RDF::RNode> DataFrameSlowFakeAll;
+
+  // special treatement for pions: add also the slow pions from Dstar to gain low-momentum coverage
+  if (strncmp(FakeVarName.Data(), "PionD", 5) == 0) {
+
+    TString FakeVarNameSlow = "SlowPion";
+    TCut AllFakeCutSlow = TCut(FakesFiducialCut) * TCut(FakesFiducialCutSlow) * Form("(%sMomentum>%f && %sMomentum<%f)",
+                          FakeVarNameSlow.Data(), m_MomLowROC, FakeVarNameSlow.Data(), m_MomHighROC);
+    DataFrameSlowFakeAll = std::make_unique<ROOT::RDF::RNode>(RDataFrame(*FakeTree).Filter(AllFakeCutSlow.GetTitle()));
+
+    if (FakeWeightName == "1") {
+      AllFakeIntegral += DataFrameSlowFakeAll->Count().GetValue();
+    } else {
+      AllFakeIntegral += DataFrameSlowFakeAll->Sum(FakeWeightName).GetValue();
+    }
+  }
 
   for (unsigned int i = 0; i < PIDDetectors.size(); i++) {
     for (unsigned int j = 0; j < m_NumROCpoints; ++j) {
@@ -395,33 +462,32 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
       double x = 1. / m_NumROCpoints * j;
       TString PIDCut = TString::Format("%f", 1. / (1 + TMath::Power(x / (1 - x), -3)));
 
-      FakeTree->Draw(Form("%sMomentum>>hAllFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
-                     FakeWeightName + " * (" + FakesFiducialCut + ")", "goff");
-      FakeTree->Draw(Form("%sMomentum>>hSelectedFakes(1,%f,%f)", FakeVarName.Data(), m_MomLowROC, m_MomHighROC),
-                     FakeWeightName + " * (" + FakeVarName +  PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + ")", "goff");
+      TCut SelectedFakeCut = Form("(%s%s%s > %s)", FakeVarName.Data(), PIDVarName.Data(), PIDDetectors[i].Data(), PIDCut.Data());
 
-      TH1F* hSelectedFakes = (TH1F*)gDirectory->Get("hSelectedFakes");
-      TH1F* hAllFakes = (TH1F*)gDirectory->Get("hAllFakes");
+      if (FakeWeightName == "1") {
+        SelectedFakeIntegral = DataFrameFakeAll.Filter(SelectedFakeCut.GetTitle()).Count().GetValue();
+      } else {
+        SelectedFakeIntegral = DataFrameFakeAll.Filter(SelectedFakeCut.GetTitle()).Sum(FakeWeightName).GetValue();
+      }
 
       if (strncmp(FakeVarName.Data(), "PionD", 5) == 0) {
-        FakeTree->Draw(Form("SlowPionMomentum>>hAllFakesSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                       FakeWeightName + " * (" + FakesFiducialCut + "&& SlowPion" + PIDVarName + "noSVD>=0" + ")", "goff");
-        FakeTree->Draw(Form("SlowPionMomentum>>hSelectedFakesSlow(1,%f,%f)", m_MomLowROC, m_MomHighROC),
-                       FakeWeightName + " * (SlowPion" + PIDVarName + PIDDetectors[i] + ">" + PIDCut + "&&" + FakesFiducialCut + "&& SlowPion" + PIDVarName
-                       +
-                       "noSVD>=0" + ")", "goff");
-        TH1F* hAllFakesSlow = (TH1F*)gDirectory->Get("hAllFakesSlow");
-        TH1F* hSelectedFakesSlow = (TH1F*)gDirectory->Get("hSelectedFakesSlow");
-        hAllFakes->Add(hAllFakesSlow);
-        hSelectedFakes->Add(hSelectedFakesSlow);
+        TString FakeVarNameSlow = "SlowPion";
+
+        TCut SelectedFakeCutSlow = Form("(%s%s%s > %s)", FakeVarNameSlow.Data(), PIDVarName.Data(), PIDDetectors[i].Data(), PIDCut.Data());
+
+        if (FakeWeightName == "1") {
+          SelectedFakeIntegral += DataFrameSlowFakeAll->Filter(SelectedFakeCutSlow.GetTitle()).Count().GetValue();
+        } else {
+          SelectedFakeIntegral += DataFrameSlowFakeAll->Filter(SelectedFakeCutSlow.GetTitle()).Sum(FakeWeightName).GetValue();
+        }
       }
 
       if (PIDDetectors[i] == "ALL") {
-        FakeEfficiencyALL.push_back(hSelectedFakes->Integral() / hAllFakes->Integral());
+        FakeEfficiencyALL.push_back(SelectedFakeIntegral / AllFakeIntegral);
       }
 
       if (PIDDetectors[i] == "noSVD") {
-        FakeEfficiencynoSVD.push_back(hSelectedFakes->Integral() / hAllFakes->Integral());
+        FakeEfficiencynoSVD.push_back(SelectedFakeIntegral / AllFakeIntegral);
       }
     }
   }
@@ -429,7 +495,7 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   auto ResultCanvas = new TCanvas("ResultCanvas", "", 600, 400);
   TMultiGraph* hmgraph = new TMultiGraph();
 
-  // efficiency and kaon fake rate
+  // efficiency vs fake rate graph
   TGraph* hgraphALL = new TGraph(m_NumROCpoints, FakeEfficiencyALL.data(), SignalEfficiencyALL.data());
   hgraphALL->SetMarkerColor(TColor::GetColor("#2166ac"));
   hgraphALL->SetMarkerStyle(20);
@@ -455,11 +521,12 @@ void SVDdEdxValidationAlgorithm::PlotROCCurve(TTree* SignalTree, TString SignalW
   ResultCanvas->BuildLegend(0.6, 0.25, 0.9, 0.5);
   ResultCanvas->SetGrid();
 
-  ResultCanvas->Print("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_MomRange" +
+  ResultCanvas->Print("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + PIDVarName + "_MomRange" +
                       std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".pdf");
 
-  TFile ResultFile("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull +  PIDVarName + "_MomRange" +
-                   std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".root", "RECREATE");
+  TFile ResultFile("SVDdEdxValidation_ROC_curve_" + SignalVarNameFull + "_vs_" + FakeVarNameFull + PIDVarName + "_MomRange" +
+                   std::to_string(m_MomLowROC).substr(0, 3) + "_" + std::to_string(m_MomHighROC).substr(0, 3) + ".root",
+                   "RECREATE");
   hmgraph->Write();
   ResultFile.Close();
 
@@ -649,9 +716,8 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
                                                       *LambdaDataset->get());
 
-  RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(LambdaDatasetSWeighted->store())->tree())->SetName("treeLambda_sw");
   TTree* treeLambda_sw = LambdaDatasetSWeighted->GetClonedTree();
+  treeLambda_sw->SetName("treeLambda_sw");
 
   B2INFO("Lambda: sPlot done. ");
 
@@ -948,9 +1014,8 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
                                                      *DstarDataset->get());
 
-  RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(DstarDatasetSWeighted->store())->tree())->SetName("treeDstar_sw");
   TTree* treeDstar_sw = DstarDatasetSWeighted->GetClonedTree();
+  treeDstar_sw->SetName("treeDstar_sw");
 
   B2INFO("Dstar: sPlot done. ");
 

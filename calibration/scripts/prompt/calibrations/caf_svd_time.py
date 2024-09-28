@@ -15,6 +15,7 @@ import sys
 import datetime
 import random
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import SVDCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleCoGTimeCalibrationAlgorithm
 from ROOT.Belle2 import SVD3SampleELSTimeCalibrationAlgorithm
@@ -33,6 +34,8 @@ from caf.utils import IoV
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.utils import filter_by_max_events_per_run
 
+from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
+
 b2.set_log_level(b2.LogLevel.INFO)
 
 random.seed(42)
@@ -49,7 +52,7 @@ settings = CalibrationSettings(name="caf_svd_time",
                                                                     INPUT_DATA_FILTERS["Beam Energy"]["Continuum"],
                                                                     INPUT_DATA_FILTERS["Run Type"]["physics"],
                                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[],
+                               depends_on=[cdc_tracking_calibration],  # SVD time depends on CDC tracking calibration
                                expert_config={
                                    "timeAlgorithms": ["CoG3", "ELS3", "CoG6"],
                                    "listOfMutedCalibrations": [],  # "rawTimeCalibration", "timeShiftCalibration", "timeValidation"
@@ -547,7 +550,7 @@ def get_calibrations(input_data, **kwargs):
     shift_calibration.strategies = strategies.SingleIOV
 
     for algorithm in shift_calibration.algorithms:
-        algorithm.params = {"iov_coverage": output_iov}
+        algorithm.params = {"apply_iov": output_iov}
 
     if "timeShiftCalibration" not in listOfMutedCalibrations:
         list_of_calibrations.append(shift_calibration)

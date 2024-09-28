@@ -99,7 +99,7 @@ class CDCSVGPlotter:
         """Mapping function to unpack the attributes from the attribute maps. Mechanism and interface inspired by d3.js"""
         result = {}
         for (key, value) in list(styling.items()):
-            if isinstance(value, collections.Callable):
+            if isinstance(value, collections.abc.Callable):
                 result[key] = value(i_obj, obj)
             elif isinstance(value, str):
                 result[key] = value

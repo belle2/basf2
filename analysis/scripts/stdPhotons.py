@@ -100,7 +100,7 @@ def stdPhotons(
     elif listtype == 'pi0eff10_May2020':
         ma.fillParticleList(
             'gamma:pi0eff10_May2020',
-            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+            '[clusterNHits>1.5] and thetaInCDCAcceptance and \
              [[clusterReg==1 and E>0.200] or [clusterReg==2 and E>0.100] or [clusterReg==3 and E>0.180]] and [clusterE1E9>0.5]',
             writeOut=True,
             path=path
@@ -108,7 +108,7 @@ def stdPhotons(
     elif listtype == 'pi0eff20_May2020':
         ma.fillParticleList(
             'gamma:pi0eff20_May2020',
-            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+            '[clusterNHits>1.5] and thetaInCDCAcceptance and \
              [[clusterReg==1 and E>0.120] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.080]] and [clusterE1E9>0.4]',
             writeOut=True,
             path=path
@@ -116,7 +116,7 @@ def stdPhotons(
     elif listtype == 'pi0eff30_May2020' or listtype == 'pi0eff40_May2020':
         ma.fillParticleList(
             f'gamma:{listtype}',
-            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+            '[clusterNHits>1.5] and thetaInCDCAcceptance and \
              [[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060 ]]',
             writeOut=True,
             path=path
@@ -124,7 +124,7 @@ def stdPhotons(
     elif listtype == 'pi0eff50_May2020':
         ma.fillParticleList(
             'gamma:pi0eff50_May2020',
-            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+            '[clusterNHits>1.5] and thetaInCDCAcceptance and \
             [[clusterReg==1 and E>0.025] or [clusterReg==2 and E>0.025] or [clusterReg==3 and E>0.040]]',
             writeOut=True,
             path=path
@@ -132,7 +132,7 @@ def stdPhotons(
     elif listtype == 'pi0eff60_May2020':
         ma.fillParticleList(
             'gamma:pi0eff60_May2020',
-            '[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180] and \
+            '[clusterNHits>1.5] and thetaInCDCAcceptance and \
              [[clusterReg==1 and E>0.0225] or [clusterReg==2 and E>0.020] or [clusterReg==3 and E>0.020]]',
             writeOut=True,
             path=path

@@ -12,39 +12,38 @@ Gbasf2
 
     **Prerequisites**:
 
-    * `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
-    * A system with SL6 or CentOS 7.
-    * Grid certificate installed in ``~/.globus`` and on the web browser.
-    * :ref:`onlinebook_first_steering_file` lesson.
+    * See `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
+    * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
+    * A valid `grid certificate <https://confluence.desy.de/display/BI/Computing+Belle-II-Grid-Certificate>`_ installed in ``~/.globus`` and in a web browser.
+    * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
     **Questions**:
 
     * What is gbasf2?
-    * Where to search files on the grid?
-    * How I monitor my jobs?
-    * What to do if I need help?
+    * How do I find input files on the grid?
+    * How do I monitor my jobs?
+    * What do I do if I need help?
 
     **Objectives**:
 
-    * Install gbasf2 and set the environment for using grid tools.
-    * Search datasets stored on the grid.
+    * Set up the gbasf2 environment.
+    * Search for datasets stored on the grid.
     * Submit jobs using gbasf2.
-    * Monitor your jobs and take action if there are issues.
+    * Monitor jobs and take action if there are issues.
     * Check the documentation and ask for help if necessary.
     * Download the output for offline analysis.
 
-
 Gbasf2 is the command-line client for submitting grid-based basf2 jobs.
-Data and MC samples are distributed in many storage sites around the world, and the gbasf2 tools allow you to access and
+Belle II data and MC samples are distributed in many storage sites around the world. Gbasf2 and a set of grid-based user tools (gb2 tools) allow you to access and
 analyze them.
 
-The same steering files used with basf2 work with gbasf2, and the usual workflow is:
+The same basf2 steering files are used when running on the grid. The usual workflow is:
 
-* First developing a basf2 steering file.
-* Testing it locally.
-* Locate your input files.
-* Submit jobs to the grid with the same steering file.
-* Download the output to perform the offline analysis (plots, fits, etc.)
+* Develop a basf2 steering file.
+* Test it locally (don't skip this step!).
+* Locate your input files on the grid.
+* Submit jobs to the grid with the same basf2 steering file.
+* Download the output to perform offline analysis (plots, fits, etc.).
 
 .. warning::
 
@@ -52,29 +51,31 @@ The same steering files used with basf2 work with gbasf2, and the usual workflow
 
     * The GRID is NOT a local computing system like KEKCC.
     * Once you submit jobs, they will be assigned to computing systems around the world.
-    * If your job is problematic, it will be distributed to the world and all sites will be affected.
+    * If your job is problematic, it will be distributed to the world and many sites will be affected.
+    * Remember, always test your jobs locally before submitting to the grid!
 
 
 Go to `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_
 and verify that you have the prerequisites. You need:
 
-* A system with SL6 or CentOS 7.
-* A valid grid certificate issued within a year and installed in ``~/.globus`` in ``.pem`` format.
-* Belle Virtual Organization (VO) membership registered or renewed within a year at the
+* Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
+* A valid grid certificate issued within a year and `installed <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
+* Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
   `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
-* Registration in `DIRAC <https://dirac.cc.kek.jp:8443/DIRAC/>`_.
+* Registration in `DIRAC <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-7.RegisterwithDIRAC>`_.
 
 .. note::
 
-    It is required to join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
-    where you can ask for help and receive announcements on releases and system issues.
+    It is required that you join the `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_,
+    where you can ask for help and receive announcements on releases and system issues. You can also find more
+    details on the official `gbasf2 documentation page <https://gbasf2.belle2.org/>`_
 
 
-Installing gbasf2
------------------
+Setting up gbasf2 via cvmfs
+---------------------------
 
 Since the DIRAC user interface relies on some middleware components, this limits the operating environments in which
-gbasf2 can function. At this moment, only SL6 and CentOS 7 are supported.
+gbasf2 can function. At this moment, only CentOS 7 is supported (it works on other EL9-based operating systems like AlmaLinux 9 but please be aware it is not fully validated).
 
 Also, unfortunately at this moment the basf2 and gbasf2 environments are not compatible. This means gbasf2 requires
 a fresh ssh session (without sourcing ``b2setup``).
@@ -88,50 +89,48 @@ a fresh ssh session (without sourcing ``b2setup``).
 
         chmod 600 ~/.globus/userkey.pem
 
-
-Open a terminal and create a directory to store your gbasf2 installation. Inside, let's download the
-installation script:
+If your computing system has access to cvmfs (e.g. at KEKCC), the simplest way to use gbasf2 is via a central installation. The following command sets all the necessary environment variables and initializes a grid proxy for you (you will be asked to enter your credentials for this).
 
 .. code-block:: bash
 
-        mkdir gbasf2 && cd gbasf2
-        wget -N http://dirac.cc.kek.jp/dirac/dirac-install.py
-        python dirac-install.py -V Belle-KEK
+    source /cvmfs/belle.kek.jp/grid/gbasf2/pro/bashrc
 
-Execute the installation script specifying the installation type with ``-V Belle-KEK``:
+It will request your certificate passphrase. If the command finishes without errors and you see information related to your certificate, similar to that below, your proxy has been successfully set:
 
 .. code-block:: bash
 
-        python dirac-install.py -V Belle-KEK
+    Proxy generated:
+    subject      : /C=JP/O=KEK/OU=CRC/CN=USERNAME
+    issuer       : /C=JP/O=KEK/OU=CRC/CN=USERNAME
+    identity     : /C=JP/O=KEK/OU=CRC/CN=USERNAME
+    timeleft     : 23:53:58
+    DIRAC group  : belle
+    rfc          : True
+    path         : /tmp/x100up_u0001
+    username     : youruser
+    properties   : NormalUser
+    VOMS         : True
+    VOMS fqan    : ['/belle']
 
-Check that the execution finished without errors.
+    Succeed with return value:
+    0
 
-.. tip::
+That's it! You are ready to run grid jobs!
 
-    If you see error messages,
-    a `gbasf2 troubleshooting <https://confluence.desy.de/display/BI/GBasf2+Troubleshooting>`_ is available.
+A proxy is a short-term credential that verifies your identity, allowing you to perform operations on the grid. By default your proxy is valid for 24h. If it expires, you need to execute ``gb2_proxy_init -g belle`` again if you have already setup gbasf2 in the same shell (terminal).
 
-Proceed to the post-installation configuration:
+.. note::
 
-.. code-block:: bash
+    You can also pass arguments when setting up gbasf2, e.g. if you need to setup a grid proxy with permissions beyond the default user (with option -g).
 
-        source bashrc && dirac-proxy-init -x
-        dirac-configure --cfg defaults-Belle-KEK.cfg
 
-Setting your gbasf2 environment
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Once the above installation is done, you only need to execute two commands every time that you open a new terminal:
+Installing gbasf2
+-----------------
 
-.. code-block:: bash
+The pre-installed gbasf2 on CVMFS is the recommended version (see Setup Gbasf2). However, gbasf2 local installation is available. Please be aware this is not fully tested and not fully supported. If you wish to install gbasf2 locally, follow the instructions on the `gbasf2 documentation <https://gbasf2.belle2.org/gbasf2install.html>`_.
 
-        source ~/gbasf2/BelleDIRAC/gbasf2/tools/setup
-        gb2_proxy_init -g belle
-
-It will ask for your certificate password before generating your credentials. Once created, your proxy will be valid
-for 24 hours. You just need to execute ``gb2_proxy_init -g belle`` again if your credentials expire.
-
-.. seealso:: https://confluence.desy.de/display/BI/Computing+GBasf2
+.. seealso:: https://gbasf2.belle2.org/
 
 
 Locating datasets on the grid
@@ -146,7 +145,7 @@ The most common task as user of the grid is the submission of jobs with input fi
 Files are stored around the world in the different storage elements.
 Fortunately, as users, you don't have to worry about the physical location.
 A file catalog keeps the record of where the files are located, and you just need to provide a logical identifier
-of the interesting samples for your analysis.
+of the samples of interest for your analysis.
 
 Datasets and Datablocks
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -167,14 +166,14 @@ Examples of LFNs for datasets are:
 
 .. code-block:: bash
 
-        # A mdst dataset of data from exp 10
-        /belle/Data/proc/release-04-02-02/DB00000938/proc11/prod00013368/e0010/4S/r03774/mdst
+        # An mDST dataset of data from exp 18
+        /belle/Data/release-06-00-08/DB00002392/proc13/prod00029531/e0018/4S/r00000/mdst
 
-        # A udst dataset of data from exp 10
-        /belle/Data/release-05-01-03/DB00001363/SkimP11x1/prod00016031/e0010/4S/r04275/18530200/udst
+        # A uDST dataset of data from exp 18
+        /belle/Data/release-06-01-11/DB00002058/proc13/prod00029781/e0018/4S/r01394/hadron/14120601/udst
 
-        # A MC sample of charged B mesons
-        /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009435/s00/e1003/4S/r00000/charged/mdst
+        # An MC sample of charged B mesons
+        /belle/MC/release-06-01-08/DB00002649/MC15rd_b/prod00027830/s00/e0026/4S/r01950/charged/mdst
 
 By design, a directory on the grid can only contain 1000 files at most. For this reason, the concept of datablock
 is introduced. Each dataset is subdivided by directories with name ``subXX``, where the last two digits are sequential
@@ -200,7 +199,7 @@ in each dataset.
 
      Use ``gb2_ds_list`` to see how many datablock(s) is/are contained in the skimmed dataset
 
-     ``/belle/Data/release-05-01-03/DB00001363/SkimP11x1/prod00016031/e0010/4S/r04275/18530200/udst``
+     ``/belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
 
 .. admonition:: Hint
      :class: toggle xhint stacked
@@ -210,9 +209,8 @@ in each dataset.
 .. admonition:: Solution
      :class: toggle solution
 
-     Executing ``gb2_ds_list /belle/Data/release-05-01-03/DB00001363/SkimP11x1/prod00016031/e0010/4S/r04275/18530200/udst``
+     Executing ``gb2_ds_list /belle/Data/release-06-01-11/DB00002058/proc13/prod00029825/e0018/4S_offres/r02559/hadron/14120601/udst``
      will show you that the dataset contains 1 datablock, ``sub00``.
-
 
 .. note::
 
@@ -224,7 +222,7 @@ The Dataset Searcher
 
 The Dataset Searcher is a web application to find datasets on the grid.
 Go to the `DIRAC webportal <https://dirac.cc.kek.jp:8443/DIRAC/>`_ and then open
-Menu (the icon at the left-bottom) -> BelleDIRACApps -> Dataset Searcher.
+Menu (the icon at the left-bottom) -> BelleDIRAC Apps -> Dataset Searcher.
 
 You have the option of searching between data or MC, samples
 with beam background (BGx1) or without (BGx0), and several other fields to refine your search. Play with all the
@@ -299,7 +297,7 @@ Another way to interact with the dataset searcher is using the command line tool
      :class: exercise stacked
 
      Set your gbasf2 environment and try to get the LFNs of MC uubar samples using the same skim code from the
-     decay mode above (``14120601``), and using campaign ``SkimM13ax1`` along with beam energy of 4S and background
+     decay mode above (``14120601``), and using campaign ``MC15rd_b`` along with beam energy of 4S and background
      level BGx1 using ``gb2_ds_search``.
 
 .. admonition:: Hint
@@ -314,19 +312,67 @@ Another way to interact with the dataset searcher is using the command line tool
 
      .. code-block:: bash
 
-         gb2_ds_search dataset --data_type mc --skim_decay 14120601 --campaign SkimM13ax1 --beam_energy 4S --mc_event uubar --bkg_level BGx1
+         gb2_ds_search dataset --data_type mc --skim_decay 14120601 --campaign MC15rd_b --beam_energy 4S --mc_event uubar --bkg_level BGx1
 
          Matching datasets found:
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013046/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013047/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013048/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013049/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013050/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013051/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013052/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013053/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013054/e1003/4S/r00000/uubar/14120601/udst
-         /belle/MC/release-04-02-00/DB00000898/SkimM13ax1/prod00013055/e1003/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00030843/s00/e0007/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00030871/s00/e0008/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00030899/s00/e0010/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00030927/s00/e0012/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00031011/s00/e0017/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00031095/s00/e0022/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00030955/s00/e0014/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00031151/s00/e0024/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00031123/s00/e0022/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032932/s00/e0020/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032922/s00/e0018/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032908/s00/e0016/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032954/s00/e0026/4S/r00000/uubar/14120601/udst
+	 /belle/MC/release-06-01-11/DB00002058/MC15rd_b/prod00032969/s00/e0026/4S/r00000/uubar/14120601/udst
+
+
+Collections
+----------------------------------
+
+Rather than expect every analyst to use the dataset searcher to discover the data and MC samples useful for analysis,
+the data production team prepares ``collections`` of LFNs. This provides a common, immutable, intuitive resource,
+which can help to avoid errors related to missing or using incorrect samples for an analysis. You can discover 
+collections in the same way as for LFNs.
+
+To discover the collection you need, you should first check `Data main page <https://confluence.desy.de/display/BI/Data+main+page>`_ 
+and `MC main page <https://confluence.desy.de/display/BI/MC+main+page>`_, which provide details for the official collections.
+
+If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
+used the ``gb2_ds_search`` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
+
+.. admonition:: Exercise
+     :class: exercise stacked
+
+     Set your gbasf2 environment and find the available data collections for Moriond2023 using ``gb2_ds_search``.
+
+.. admonition:: Hint
+     :class: toggle xhint stacked
+
+     Use ``--help`` and ``--usage`` to get all the available options
+
+.. admonition:: Solution
+     :class: toggle solution
+
+     The execution and result from the command line are as follows:
+
+     .. code-block:: bash
+
+         gb2_ds_search collection --list_all_collections /belle/collection/Data/Moriond2023*
+
+You can also do things like list the datasets within a collection with ``gb2_ds_search collection --list_datasets <COLLECTION>`` 
+and get the metadata for the collection with ``gb2_ds_search collection --get_metadata <COLLECTION>``.
+
+.. admonition:: Key points
+    :class: key-points
+
+    * Collections contain a complete sample of a particular type, e.g. the Moriond 2023 data sample
+
+    * You should always refer to the data production pages to find the recommended collections.
 
 
 
@@ -344,7 +390,7 @@ version to use.
 
 .. note::
 
-    The maximum length for a project name is 32 characters.
+    The maximum length for a project name is 32 characters and the project name must be unique and cannot ever be reused, even if the project is deleted. One way to avoid problems with these restrictions is to use a short label and the date (eg. YYMMDD), for example ``B2JpsiKs_4Sdata_240119``.
 
 
 .. warning::
@@ -365,52 +411,49 @@ with the flag ``-i``.
     You can, if you wish to use only one datablock, append to the end of the dataset LPN the datablock of your
     choosing, but this is no longer strictly required.
 
-.. note::
-
-    You may hit the 1000 job limit with certain datasets. In those cases, your project should be divided by
-    specifying the datablock(s) during the submission.
-
 Everything clear? Ok, let's submit your first jobs.
 
 .. warning::
 
-    Remember: you must carefully check your jobs with a local computing system,
+    Remember: you **must** carefully check your jobs with a local computing system,
     e.g. KEKCC, before you submit jobs to GRID.
 
 
 Let's use the steering file located at
-``~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py`` on KEKCC (take a look at what contains).
+``~jbennett/public/gbasf2Tutorial/Reconstruct_Bd2JpsiKS_template.py`` on KEKCC (take a look at what it contains).
 If we are interested in running over a generic uubar sample, then the LFN of one datablock is
-``/belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00`` (you obtained it in a
-previous exercise, remember?).
+``/belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst/sub00``.
 
 With all this information,
-let's submit the gbasf2 jobs:
+we are ready to submit the gbasf2 jobs, right?
+
+STOP! Did you test the script locally first? Make sure it works before submitting to the grid!
+
+Now that you've checked to make sure it works, let's submit a gbasf2 project:
 
 .. code-block:: bash
 
-    gbasf2 -p gb2Tutorial_Bd2JpsiKs -s light-2106-rhea \
-           -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00 \
+    gbasf2 -p gb2Tutorial_Bd2JpsiKs_240101 -s light-2311-nebelung \
+           -i /belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst \
            ~michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
 
-A project summary and a confirmation prompt will be displayed after excecuting gbasf2
+A project summary and a confirmation prompt will be displayed after executing gbasf2
 
 .. code-block:: bash
 
     ************************************************
     *************** Project summary ****************
-    ** Project name: gb2Tutorial_Bd2JpsiKs
-    ** Dataset path: /belle/user/michmx/gb2Tutorial_Bd2JpsiKs
-    ** Steering file: /home/michmx/public/tutorial2020/Reconstruct_Bd2JpsiKS_template.py
-    ** Job owner: michmx @ belle (105:58:39)
+    ** Project name: gb2Tutorial_Bd2JpsiKs_240119
+    ** Dataset path: /belle/user/jbennett/gb2Tutorial_Bd2JpsiKs_240119
+    ** Steering file: /home/belle2/jbennett/public/gbasf2Tutorial/Reconstruct_Bd2JpsiKS_template.py
+    ** Job owner: jbennett @ belle (16:29:58)
     ** Preferred site / SE: None / None
-    ** Input files for first job: LFN:/belle/MC/release-04-00-03/DB00000757/MC13a/prod00009436/s00/e1003/4S/r00000/uubar/mdst/sub00/mdst_000001_prod00009436_task10020000001.root
-    ** Number of data sets: 1
-    ** Number of input files: 803
-    ** Number of jobs: 803
-    ** Processed data (MB): 968305
-    ** Processed events: 158623897 events
-    ** Estimated CPU time per job: 3293 min
+    ** Input files for first job: LFN:/belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029583/s00/e0018/4S/r00870/uubar/mdst/sub00/mdst_000001_prod00029583_task17869000001.root
+    ** Number of input files: 1
+    ** Number of jobs: 1
+    ** Processed data (MB): 840
+    ** Processed events: 127516 events
+    ** Estimated CPU time per job: 2126 min
     ************************************************
     Are you sure to submit the project?
     Please enter Y or N:
@@ -425,7 +468,7 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Solution
      :class: toggle solution
 
-     The basf2 light release is ``light-2106-rhea``.
+     The basf2 light release is ``light-2311-nebelung``.
 
 
 .. tip::
@@ -439,18 +482,19 @@ After verifying that everything is correct, you can confirm the submission.
 
       * If submitted **per dataset**, all datablocks within the specified dataset will be resolved.
 
-    * Inside the project, gbasf2 will produce file-by-file jobs.
+      * The most useful way to submit an analysis project is using collections! Just use the collection path as the input argument. We won't do that here, since the collections are quite large and you shouldn't use them until you are ready to run a real analysis.
 
-    * The number of output files in the project will be the number of files in the input datablock.
+    * Inside the project, gbasf2 will produce jobs file-by-file according to the input.
 
+    * The number of output files in the project will be equal to the number of files in the input.
 
 
 .. admonition:: Exercise
      :class: exercise stacked
 
      Submit a gbasf2 job with an steering file built by you in previous chapters of the book, for analyzing
-     a datablock of MC13a, MC Event Types ``charged`` with energy ``4S`` and without beam background.
-     Use ``light-2106-rhea`` of basf2.
+     a datablock of MC15rd_b, MC Event Types ``charged`` at center-of-mass energy ``4S``.
+     Use ``light-2311-nebelung`` of basf2.
 
      Remember:
 
@@ -461,7 +505,7 @@ After verifying that everything is correct, you can confirm the submission.
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-     Use the Dataset Searcher to locate MC13a datasets of MC Event Types ``charged`` and ``BGx0``.
+     Use the Dataset Searcher to locate MC15rd_b datasets of MC Event Types ``charged``.
 
 .. admonition:: Additional hint
      :class: toggle xhint stacked
@@ -470,51 +514,28 @@ After verifying that everything is correct, you can confirm the submission.
 
      .. code-block:: bash
 
-        gb2_ds_search dataset --data_type mc --campaign MC13a --beam_energy 4S --mc_event charged --bkg_level BGx0
+        gb2_ds_search dataset --data_type mc --campaign MC15rd_b --beam_energy 4S --mc_event charged
 
      Next, choose one of the datasets listed after executing the command above and use that dataset with the command
      ``gb2_ds_list <dataset_LPN>`` to see what datablock(s) are available in your chose dataset.
      Recall that, if you wish to run over one specific datablock from a dataset, you can add ``sub00, sub01, ...``
-     at the end of the dataset LPN. For the datasets listed from search done above, there is only one datablock
-     (``sub00``) available for each dataset. So, for this exercise, we will submit our gbasf2 job using the dataset LPN
-     as our input.
+     at the end of the dataset LPN.
 
 .. admonition:: Solution
      :class: toggle solution
 
      .. code-block:: bash
 
-        gbasf2 -i /belle/MC/release-04-00-03/DB00000757/MC13a/prod00009551/s00/e1003/4S/r00000/charged/mdst
-        -s light-2106-rhea -p myFirstProject <your steering file>
+        gbasf2 -i /belle/MC/release-06-01-10/DB00002752/MC15rd_b/prod00029588/s00/e0018/4S/r00092/charged/mdst
+        -s light-2311-nebelung -p myFirstProject_240101 <your steering file>
 
 
 Submit jobs with multiple LFNs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 As we have already stated, with the newest releases of BelleDIRAC, there is no longer a need to append the datablock
-``(sub00, sub01, ...)`` to the end of the dataset LPN. But, with certain datasets, you may hit the 1000 job limit.
-In those instances, you should specify a datablock (or, datablocks). If you want (or need) to submit a project
-with several datablocks, you can prepare a list of LFNs on a file and provide it to gbasf2 using ``--input_dslist``.
-
-.. tip::
-
-    If necessary for the dataset you are using, a quick way of appending ``/sub00`` to a list of LFNs obtained from the
-    Dataset Searcher is using ``sed``:
-
-    .. code-block:: bash
-
-        sed -i 's/mdst/mdst\/sub00/g' listOfLFNs.list
-
-    .. note::
-
-        In the example above, we are using the ``s/search/replace/g`` syntax of ``sed``. Note that, when applicable,
-        we must escape additional slashes. That is, like in the example above, we want to replace ``mdst`` with
-        ``mdst/sub00``, so to do this we must use ``\`` before ``/sub00``. In addition, we use the flag ``-i`` which
-        allows us to edit files in-place.
-
-.. note::
-
-    For more information on using ``sed``, see the GNU `sed manual <https://www.gnu.org/software/sed/manual/sed.html>`_.
+``(sub00, sub01, ...)`` to the end of the dataset LPN. If you want (or need) to submit a project with several datablocks, 
+you can prepare a list of LFNs on a file and provide it to gbasf2 using ``--input_dslist``.
 
 Monitoring jobs
 ---------------
@@ -529,11 +550,11 @@ to have an overview of your project (The flag ``-p`` will specify the project na
 
 .. code-block:: bash
 
-    gb2_project_summary -p gb2Tutorial_Bd2JpsiKs
+    gb2_project_summary -p gb2Tutorial_Bd2JpsiKs_240119
 
-           Project          Owner    Status    Done   Fail   Run   Wait   Submission Time(UTC)   Duration
-    =====================================================================================================
-    gb2Tutorial_Bd2JpsiKs   michmx   Running   0      0      5     0      2020-07-07 08:41:40    00:01:15
+           Project               Owner     Status    Done   Fail   Run   Wait   Submission Time(UTC)   Duration
+    ==============================================================================================================
+    gb2Tutorial_Bd2JpsiKs_240119   jbennett   Running   0      0      1     0      2024-01-20 02:14:57    00:01:30
 
 
 .. tip::
@@ -545,20 +566,16 @@ The gb2 tool ``gb2_job_status`` lists all the jobs running in a project, includi
 
 .. code-block:: bash
 
-    gb2_job_status -p gb2Tutorial_Bd2JpsiKs
+    gb2_job_status -p gb2Tutorial_Bd2JpsiKs_240119
 
     5 jobs are selected.
 
      Job id     Status         MinorStatus        ApplicationStatus      Site
     =============================================================================
-    161844659   Running   Application             Running             LCG.KEK2.jp
-    161844660   Running   Application             Running             LCG.KEK2.jp
-    161844661   Running   Input Data Resolution   Unknown             LCG.Pisa.it
-    161844662   Running   Application             Running             LCG.KEK2.jp
-    161844663   Running   Application             Running             LCG.KEK2.jp
+    387165066   Running   Application             Running             OSG.BNL.us
 
     --- Summary of Selected Jobs ---
-    Completed:0  Deleted:0  Done:0  Failed:0  Killed:0  Running:5  Stalled:0  Waiting:0
+    Completed:0  Deleted:0  Done:0  Failed:0  Killed:0  Running:1  Stalled:0  Waiting:0
 
 
 Monitoring using the web portal
@@ -592,7 +609,7 @@ You should see something like this:
 .. admonition:: Hint
      :class: toggle xhint stacked
 
-      Do you see failed jobs? Go to the last section "Dealing with issues".
+     Do you see failed jobs? Go to the last section "Dealing with issues".
 
 .. admonition:: Solution
      :class: toggle solution
@@ -610,13 +627,9 @@ You can check the output using ``gb2_ds_list <project_name>``:
 
 .. code-block:: bash
 
-    gb2_ds_list gb2Tutorial_Bd2JpsiKs
+    gb2_ds_list gb2Tutorial_Bd2JpsiKs_240119
 
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_0.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_2.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_3.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root
+    /belle/user/jbennett/gb2Tutorial_Bd2JpsiKs_240119/sub00
 
 .. tip::
 
@@ -626,21 +639,20 @@ To actually download the files, use ``gb2_ds_get``:
 
 .. code-block:: bash
 
-    gb2_ds_get gb2Tutorial_Bd2JpsiKs
+    gb2_ds_get gb2Tutorial_Bd2JpsiKs_240119
 
-    Download 5 files from SE
-    Trying to download srm://kek2-se03.cc.kek.jp:8444/srm/managerv2?SFN=/disk/belle/TMP/belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root to /home/michmx/gbasf2Tutorial/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root
-    Trying to download srm://kek2-se03.cc.kek.jp:8444/srm/managerv2?SFN=/disk/belle/TMP/belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root to /home/michmx/gbasf2Tutorial/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root
-    ...
+    Download 1 files from SE
+    Trying to download davs://dcbldoor.sdcc.bnl.gov:443/pnfs/sdcc.bnl.gov/data/bellediskdata/TMP/belle/user/jbennett/gb2Tutorial_Bd2JpsiKs240119/sub00/Bd2KpsiKs_00000_job387165066_00.root to /localhome/jvbennet/gb2Tutorial_Bd2JpsiKs240119/sub00/Bd2KpsiKs_00000_job387165066_00.root
 
     Successfully downloaded files:
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_4.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_1.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_3.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_0.root
-    /belle/user/michmx/gb2Tutorial_Bd2JpsiKs/Bd2KpsiKs_2.root in /home/michmx/gbasf2Tutorial/gb2Tutorial_Bd2JpsiKs
+    /belle/user/jbennett/gb2Tutorial_Bd2JpsiKs240119/sub00/Bd2KpsiKs_00000_job387165066_00.root in /localhome/jvbennet/gb2Tutorial_Bd2JpsiKs240119/sub00
+
 
     Failed files:
+
+.. tip::
+
+    You can enable download in multiple streams using the ``--new`` option of ``gb2_ds_get``, which will speed up the transfer. At some point it will become the default behavior of ``gb2_ds_get``. 
 
 .. tip::
 
@@ -721,14 +733,14 @@ It is also possible to retrieve the log files directly from the command line usi
 
 .. code-block:: bash
 
-    gb2_job_output -j 161846653
+    gb2_job_output -j 387165066
 
     download output sandbox below ./log/JOBID
     1 jobs are selected.
     Please wait...
-                               Result for jobs: ['161846653']
+                               Result for jobs: ['387165066']
     =====================================================================================
-    Downloaded: "Job output sandbox retrieved in /home/michmx/gb2_tutorial/log/161846653"
+    Downloaded: "Job output sandbox retrieved in /home/jbennett/log/387165066"
 
 .. admonition:: Exercise
      :class: exercise stacked
@@ -752,6 +764,8 @@ Where to go for help?
 The `comp users forum <https://lists.belle2.org/sympa/info/comp-users-forum>`_ is the main channel of communication
 related to issues with the grid. Feel free to ask every time that you need help.
 
+The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <https://gbasf2.belle2.org>`_.
+
 Additionally, some pages at Confluence are prepared with additional information:
 
 * `Gbasf2 mainpage <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
@@ -766,4 +780,4 @@ You can also ask in `questions.belle2.org <https://questions.belle2.org/question
 
 .. rubric:: Author of this lesson
 
-Michel Villanueva, Justin Guilliams
+Michel Villanueva, Justin Guilliams, Jake Bennett

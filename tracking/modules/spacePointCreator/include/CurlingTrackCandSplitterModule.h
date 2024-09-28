@@ -155,7 +155,7 @@ namespace Belle2 {
 
     bool m_saveCompleteCurler; /**< set to true if all parts of a curling TrackCand should be stored in a separate StoreArray (no parameter!) */
 
-    B2Vector3<double> m_origin; /**< origin used internally (set from user set value) */
+    B2Vector3D m_origin; /**< origin used internally (set from user set value) */
 
     int m_spacePointTCCtr; /**< Counter for presented SpacePointTrackCands */
 
@@ -184,7 +184,7 @@ namespace Belle2 {
      * @return pair of global position and momentum for a given TrueHit. .first is position, .second is momentum
      */
     template<class TrueHit>
-    std::pair<const B2Vector3<double>, const B2Vector3<double> >
+    std::pair<const B2Vector3D, const B2Vector3D >
     getGlobalPositionAndMomentum(TrueHit* aTrueHit);
 
     /**
@@ -194,8 +194,8 @@ namespace Belle2 {
     splitCurlingTrackCand(const Belle2::SpacePointTrackCand& SPTrackCand, int NTracklets, const std::vector<int>& splitIndices);
 
     /** determine the direction of flight of a particle for a given hit and the origin (assumed interaction point). True is outwards, false is inwards */
-    bool getDirectionOfFlight(std::pair<const B2Vector3<double>, const B2Vector3<double> > const& hitPosAndMom,
-                              const B2Vector3<double>& origin);
+    bool getDirectionOfFlight(std::pair<const B2Vector3D, const B2Vector3D > const& hitPosAndMom,
+                              const B2Vector3D& origin);
 
     /**
      * Exception for case when no TrueHit can be found for a Cluster

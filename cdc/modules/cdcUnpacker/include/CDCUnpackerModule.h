@@ -356,6 +356,11 @@ namespace Belle2 {
        */
       bool m_relationRawHits;
 
+      /**
+       * Recover boardID error if true, skip information otherwise
+       */
+      bool m_recoverBoardIdError;
+
     };//end class declaration
 
 

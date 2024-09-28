@@ -277,9 +277,11 @@ void DQMHistAnalysisSVDDoseModule::endRun()
             << LogVar("group", group.nameSuffix.Data())
             << LogVar("nEvts", nEvts) << LogVar("nHits", nHits));
 
-    double occ = nEvts ? (nHits / nEvts * 100.0 / group.nStrips) : -1.0;
-    TString vName = group.nameSuffix + "OccPoisAvg"; // e.g. L3XXUOccPoisAvg
-    m_monObj->setVariable(vName.Data(), occ);
+    if (nEvts > 0) {
+      const double occ = nHits / nEvts * 100.0 / group.nStrips;
+      TString vName = group.nameSuffix + "OccPoisAvg"; // e.g. L3XXUOccPoisAvg
+      m_monObj->setVariable(vName.Data(), occ);
+    }
   }
 
   updateCanvases();

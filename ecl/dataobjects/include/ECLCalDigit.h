@@ -18,7 +18,6 @@ namespace Belle2 {
 
   class ECLCalDigit : public RelationsObject {
   public:
-
     /** status enumerator */
     enum StatusBit {
       c_IsEnergyCalibrated = 1 << 0,
@@ -27,23 +26,28 @@ namespace Belle2 {
       c_IsFailedFit = 1 << 3,
       c_IsFailedTimeResolution = 1 << 4,
       c_IsCalibrated = c_IsEnergyCalibrated | c_IsTimeCalibrated | c_IsTimeResolutionCalibrated,
+      // constants for the online Fit Quality Flags. For description of these Flags, see https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=ECL+Quality+flag
+      c_OnlineFitQuality1 = 1 << 5,
+      c_OnlineFitQuality2 = 1 << 6,
+      c_OnlineFitQuality3 = 1 << 7,
+      c_OnlineFitQuality0 = 1 << 8,
     };
 
     /** default constructor for ROOT */
     ECLCalDigit()
     {
-      m_CellId         = 0; /**< Cell ID */
-      m_Time           = 0; /**< Calibrated Time */
-      m_TimeResolution = 0; /**< Calibrated Time Resolution */
-      m_Energy         = 0; /**< Calibrated Energy */
-      m_Status         = 0; /**< Calibration Status */
-      m_TwoComponentTotalEnergy = 0; /**< Offline Two Component Total Energy*/
-      m_TwoComponentHadronEnergy = 0; /**< Offline Two Component Hadron Energy*/
-      m_TwoComponentDiodeEnergy = 0; /**< Offline Two Component Diode Energy*/
-      m_TwoComponentChi2 = -1; /**< Offline Two Component chi2*/
-      m_TwoComponentSavedChi2[0] = -1;  /**< Offline two component chi2 FT=0*/
-      m_TwoComponentSavedChi2[1] = -1;  /**< Offline two component chi2 FT=1*/
-      m_TwoComponentSavedChi2[2] = -1;  /**< Offline two component chi2 FT=2*/
+      m_CellId = 0;                             /**< Cell ID */
+      m_Time = 0;                               /**< Calibrated Time */
+      m_TimeResolution = 0;                     /**< Calibrated Time Resolution */
+      m_Energy = 0;                             /**< Calibrated Energy */
+      m_Status = 0;                             /**< Calibration Status */
+      m_TwoComponentTotalEnergy = 0;            /**< Offline Two Component Total Energy*/
+      m_TwoComponentHadronEnergy = 0;           /**< Offline Two Component Hadron Energy*/
+      m_TwoComponentDiodeEnergy = 0;            /**< Offline Two Component Diode Energy*/
+      m_TwoComponentChi2 = -1;                  /**< Offline Two Component chi2*/
+      m_TwoComponentSavedChi2[0] = -1;          /**< Offline two component chi2 FT=0*/
+      m_TwoComponentSavedChi2[1] = -1;          /**< Offline two component chi2 FT=1*/
+      m_TwoComponentSavedChi2[2] = -1;          /**< Offline two component chi2 FT=2*/
       m_TwoComponentFitType = ECLDsp::poorChi2; /**< Offline Two Component fit type*/
     }
 
@@ -76,7 +80,7 @@ namespace Belle2 {
      */
     void setTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn, double input)
     {
-      unsigned int index = FitTypeIn ;
+      unsigned int index = FitTypeIn;
       m_TwoComponentSavedChi2[index] = input;
     }
 
@@ -140,7 +144,7 @@ namespace Belle2 {
      */
     double getTwoComponentSavedChi2(ECLDsp::TwoComponentFitType FitTypeIn) const
     {
-      unsigned int index = FitTypeIn ;
+      unsigned int index = FitTypeIn;
       return m_TwoComponentSavedChi2[index];
     }
 
@@ -165,13 +169,13 @@ namespace Belle2 {
     bool hasStatus(unsigned short int bitmask) const { return (m_Status & bitmask) == bitmask; }
 
     /*! Get Boolean Calibration Status
-    * @return Calibration Status
-    */
+     * @return Calibration Status
+     */
     bool isCalibrated() const;
 
     /*! Get Boolean Energy Calibration Status
-    * @return Energy Calibration Status
-    */
+     * @return Energy Calibration Status
+     */
     bool isEnergyCalibrated() const;
 
     /*! Get Boolean Time Calibration Status
@@ -194,19 +198,38 @@ namespace Belle2 {
      */
     bool isTimeResolutionFailed() const;
 
-  private:
+    /*! Get Boolean online fit quality 1
+     * @return online fit quality 1
+     */
+    bool isOnlineFitQuality1() const;
 
-    int m_CellId;   /**< Cell ID */
-    double m_Time;   /**< Calibrated Time */
-    double m_TimeResolution;   /**< Calibrated Time resolution*/
-    double m_Energy; /**< Calibrated Energy */
-    unsigned short int m_Status;   /**< Calibration and Fit Status */
-    double m_TwoComponentTotalEnergy;  /**< Calibrated Two Component Total Energy */
-    double m_TwoComponentHadronEnergy; /**< Calibrated Hadron Component Energy */
-    double m_TwoComponentDiodeEnergy; /**< Calibrated Diode Component Energy */
-    double m_TwoComponentChi2; /**< Two Component chi2*/
-    double m_TwoComponentSavedChi2[3]; /**< Two comp chi2 for each fit tried in reconstruction */
-    ECLDsp::TwoComponentFitType m_TwoComponentFitType;  /**< offline fit hypothesis.*/
+    /*! Get Boolean online fit quality 2
+     * @return online fit quality 2
+     */
+    bool isOnlineFitQuality2() const;
+
+    /*! Get Boolean online fit quality 3
+     * @return online fit quality 3
+     */
+    bool isOnlineFitQuality3() const;
+
+    /*! Get Boolean online fit quality 0
+     * @return online fit quality 0
+     */
+    bool isOnlineFitQuality0() const;
+
+  private:
+    int m_CellId;                                      /**< Cell ID */
+    double m_Time;                                     /**< Calibrated Time */
+    double m_TimeResolution;                           /**< Calibrated Time resolution*/
+    double m_Energy;                                   /**< Calibrated Energy */
+    unsigned short int m_Status;                       /**< Calibration and Fit Status */
+    double m_TwoComponentTotalEnergy;                  /**< Calibrated Two Component Total Energy */
+    double m_TwoComponentHadronEnergy;                 /**< Calibrated Hadron Component Energy */
+    double m_TwoComponentDiodeEnergy;                  /**< Calibrated Diode Component Energy */
+    double m_TwoComponentChi2;                         /**< Two Component chi2*/
+    double m_TwoComponentSavedChi2[3];                 /**< Two comp chi2 for each fit tried in reconstruction */
+    ECLDsp::TwoComponentFitType m_TwoComponentFitType; /**< offline fit hypothesis.*/
 
     // 1: first version (TF)
     // 2: added m_TimeResolution (TF)
@@ -214,8 +237,8 @@ namespace Belle2 {
     // 4: added offline fit variables (SL)
     // 5: added diode and pile-up photon offline fit hypothesis (SL)
     // 6: added m_TwoComponentSavedChi2[3] to save chi2 for each fit tried (SL)
-    ClassDef(ECLCalDigit, 6); /**< ClassDef */
-
+    // 7: propagated status flags for the online fit from the ECLDigit object (JE)
+    ClassDef(ECLCalDigit, 7); /**< ClassDef */
   };
 
   // inline isCalibrated
@@ -254,5 +277,28 @@ namespace Belle2 {
     return hasStatus(c_IsFailedTimeResolution);
   }
 
+  // inline isOnlineFitQuality1
+  inline bool ECLCalDigit::isOnlineFitQuality1() const
+  {
+    return hasStatus(c_OnlineFitQuality1);
+  }
+
+  // inline isOnlineFitQuality2
+  inline bool ECLCalDigit::isOnlineFitQuality2() const
+  {
+    return hasStatus(c_OnlineFitQuality2);
+  }
+
+  // inline isOnlineFitQuality3
+  inline bool ECLCalDigit::isOnlineFitQuality3() const
+  {
+    return hasStatus(c_OnlineFitQuality3);
+  }
+
+  // inline isOnlineFitQuality0
+  inline bool ECLCalDigit::isOnlineFitQuality0() const
+  {
+    return hasStatus(c_OnlineFitQuality0);
+  }
 
 } // end namespace Belle2

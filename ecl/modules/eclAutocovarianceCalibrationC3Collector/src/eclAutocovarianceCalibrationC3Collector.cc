@@ -30,8 +30,7 @@ REG_MODULE(eclAutocovarianceCalibrationC3Collector);
 
 // constructor
 eclAutocovarianceCalibrationC3CollectorModule::eclAutocovarianceCalibrationC3CollectorModule() : CalibrationCollectorModule(),
-  m_ECLAutocovarianceCalibrationC1Threshold("ECLAutocovarianceCalibrationC1Threshold"),
-  m_ECLAutocovarianceCalibrationC2Baseline("ECLAutocovarianceCalibrationC2Baseline")
+  m_ECLAutocovarianceCalibrationC1Threshold("ECLAutocovarianceCalibrationC1Threshold")
 {
   // Set module properties
   setDescription("Module to compute covarience matrix using waveforms from delayed Bhabha events");
@@ -60,8 +59,6 @@ void eclAutocovarianceCalibrationC3CollectorModule::startRun()
 
   m_PeakToPeakThresholds = m_ECLAutocovarianceCalibrationC1Threshold->getCalibVector();
 
-  m_Baselines = m_ECLAutocovarianceCalibrationC2Baseline->getCalibVector();
-
 }
 
 
@@ -84,7 +81,9 @@ void eclAutocovarianceCalibrationC3CollectorModule::collect()
 
       if (PeakToPeak < m_PeakToPeakThresholds[id]) {
 
-        float baseline = m_Baselines[id];
+        float baseline = 0;
+        for (int i = 0; i < m_BaselineLimit; i++) baseline += aECLDsp.getDspA()[i];
+        baseline = baseline * (1. / ((float) m_BaselineLimit));
 
         // Computing baseline subtracted waveform
         m_tempArray.clear();

@@ -14,7 +14,9 @@
 #include "trg/ecl/dataobjects/TRGECLUnpackerSumStore.h"
 #include "trg/ecl/dataobjects/TRGECLCluster.h"
 #include <framework/datastore/StoreArray.h>
-#include "rawdata/dataobjects/RawFTSW.h"
+#include <framework/database/DBObjPtr.h>
+#include <framework/dbobjects/HardwareClockSettings.h>
+#include <mdst/dataobjects/EventLevelTriggerTimeInfo.h>
 
 class TH1;
 class TH2;
@@ -44,6 +46,9 @@ namespace Belle2 {
     virtual void defineHisto() override;
 
   private:
+    //! The number of clocks to group the number of TCs of ECLTRG
+    int m_grpclknum;
+
     //! TCId histogram
     TH1* h_TCId = nullptr;
     //! TCthetaId histogram
@@ -65,6 +70,12 @@ namespace Belle2 {
     //! N of TC Hit / event
     TH1* h_n_TChit_event = nullptr;
     //! N of TC Hit / event vs. time since injection
+    TH1* h_n_TChit_clean = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection
+    TH1* h_n_TChit_injHER = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection
+    TH1* h_n_TChit_injLER = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection
     TH2* h_nTChit_injtime = nullptr;
     //! N of Cluster / event
     TH1* h_Cluster = nullptr;
@@ -81,8 +92,32 @@ namespace Belle2 {
     //! Energy sum of 2 Top energetic clusters when 3D bhabnha bit on
     TH1* h_Cluster_Energy_Sum = nullptr;
 
+    //! N of TC Hit / event per two ETM clocks
+    TH1* h_n_TChit_event_clkgrp = nullptr;
+    //! N of TC Hit / event vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_clean_clkgrp = nullptr;
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injHER_clkgrp = nullptr;
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks
+    TH1* h_n_TChit_injLER_clkgrp = nullptr;
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks
+    TH2* h_nTChit_injtime_clkgrp = nullptr;
+
+    //! N of TC Hit / event per two ETM clocks
+    TH1* h_n_TChit_part_event_clkgrp[3] = {nullptr};
+    //! N of TC Hit / event vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH1* h_n_TChit_part_clean_clkgrp[3] = {nullptr};
+    //! N of TC Hit / events in the injection BG clean region vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH1* h_n_TChit_part_injHER_clkgrp[3] = {nullptr};
+    //! N of TC Hit / events in the HER injection BG region vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH1* h_n_TChit_part_injLER_clkgrp[3] = {nullptr};
+    //! N of TC Hit / events in the LER injection BG region vs. time since injection per two ETM clocks for each part (FWD, BRL, and BWD)
+    TH2* h_nTChit_part_injtime_clkgrp[3] = {nullptr};
+
     //! Hit TCId
     std::vector<int> TCId;
+    //! Hit TCHitWin
+    std::vector<int> TCHitWin;
     //! Hit TC Energy
     std::vector<double> TCEnergy;
     //! Hit TC Timing
@@ -104,8 +139,10 @@ namespace Belle2 {
     //! Trg ECL Cluster output
     StoreArray<TRGECLCluster> trgeclCluster;
     //! Array to access the FTSW information
-    StoreArray<RawFTSW> m_rawTTD;
+    StoreObjPtr<EventLevelTriggerTimeInfo> m_trgTime;
 
+    //! DB pointerto access the hardware clock information
+    DBObjPtr<HardwareClockSettings> m_hwclkdb;
   };
 
 }

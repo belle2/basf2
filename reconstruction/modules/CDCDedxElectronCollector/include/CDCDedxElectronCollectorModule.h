@@ -76,6 +76,7 @@ namespace Belle2 {
     double m_injTime{ -1}; /**< time since last injection */
 
     /// track level information
+    double m_pt = -1; /**< track transverse momentum */
     double m_dedx{ -1}; /**< dE/dx truncated mean */
     double m_costh{ -1}; /**< track cos(theta) */
     double m_p{ -1}; /**< track momentum */
@@ -95,6 +96,7 @@ namespace Belle2 {
 
     bool m_isCosth;         /**< flag to write costh in tree  */
     bool m_isMom;           /**< flag to write momentum in treet */
+    bool m_isPt;/**< flag to write trans momentum in treet */
     bool m_isCharge;        /**< flag to write charge in treet */
     bool m_isRun;           /**< flag to write run number in tree */
     bool m_isWire;          /**< flag to write wire number in tree */
@@ -107,7 +109,7 @@ namespace Belle2 {
     bool m_isADCcorr;       /**< flag to write adc corrected in tree */
     bool m_isBhabha;     /**< flag to select bhabha event */
     bool m_isRadee;  /**< flag to select radee event */
-    bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off deafult) */
-    bool m_isInjTime; /**< flag to enable trigger skim (off deafult) */
+    bool m_isTrgSel;    /**< flag to enable trigger skim selected in the module (off default) */
+    bool m_isInjTime; /**< flag to enable trigger skim (off default) */
   };
 }

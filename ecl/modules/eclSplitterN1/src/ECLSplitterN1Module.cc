@@ -103,10 +103,10 @@ void ECLSplitterN1Module::initialize()
   m_liloParameters.at(2) = m_liloParameterC;
 
   // ECL dataobjects.
-  m_eclCalDigits.registerInDataStore(eclCalDigitArrayName());
-  m_eclConnectedRegions.registerInDataStore(eclConnectedRegionArrayName());
+  m_eclCalDigits.isRequired(eclCalDigitArrayName());
+  m_eclConnectedRegions.isRequired(eclConnectedRegionArrayName());
+  m_eclLocalMaximums.isRequired(eclLocalMaximumArrayName());
   m_eclShowers.registerInDataStore(eclShowerArrayName());
-  m_eclLocalMaximums.registerInDataStore(eclLocalMaximumArrayName());
 
   // mDST dataobjects.
   m_eventLevelClusteringInfo.isRequired(eventLevelClusteringInfoName());
@@ -116,6 +116,8 @@ void ECLSplitterN1Module::initialize()
   m_eclShowers.registerRelationTo(m_eclCalDigits);
   m_eclShowers.registerRelationTo(m_eclLocalMaximums);
   m_eclLocalMaximums.registerRelationTo(m_eclCalDigits);
+  m_eclConnectedRegions.requireRelationTo(m_eclLocalMaximums);
+  m_eclConnectedRegions.requireRelationTo(m_eclCalDigits);
 
   // Initialize neighbour maps (we will optimize the endcaps later, there is more than just a certain energy containment to be considered)
   m_NeighbourMap9 = new ECLNeighbours("N", 1); // N: 3x3 = 9

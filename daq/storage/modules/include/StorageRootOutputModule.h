@@ -229,7 +229,8 @@ namespace Belle2 {
     FileMetaData* m_outputFileMetaData;
 
     /** Variables for online storage */
-    int m_expno, m_runno;
+    int m_expno{0};
+    int m_runno{0};
     DBInterface* m_db;
     std::string m_runType;
     std::string m_HLTName;

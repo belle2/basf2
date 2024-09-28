@@ -55,31 +55,31 @@ void OnlineEventT0CreatorModule::event()
     return;
   }
   // check if ECL hypothesis exists
-  auto eclHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::ECL);
-  if (eclHypos.size() == 0) {
+  const auto bestECLHypo = m_eventT0->getBestECLTemporaryEventT0();
+  if (not bestECLHypo) {
     B2DEBUG(20, "No ECL EventT0 available");
   } else {
-    // get the most accurate ECL evenT0 (smallest chi2/quality)
-    auto eclBestT0 = std::min_element(eclHypos.begin(), eclHypos.end(), [](EventT0::EventT0Component c1,
-    EventT0::EventT0Component c2) {return c1.quality < c2.quality;});
-    m_onlineEventT0.appendNew(eclBestT0->eventT0, eclBestT0->eventT0Uncertainty, Const::EDetector::ECL);
+    m_onlineEventT0.appendNew(bestECLHypo->eventT0, bestECLHypo->eventT0Uncertainty, Const::EDetector::ECL);
   }
   // check if a CDC hypothesis exists
-  auto cdcHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-  if (cdcHypos.size() == 0) {
+  const auto bestCDCHypo = m_eventT0->getBestCDCTemporaryEventT0();
+  if (not bestCDCHypo) {
     B2DEBUG(20, "No CDC EventT0 available");
   } else {
-    // get the most accurate CDC evenT0 (latest)
-    const auto& cdcBestT0 = cdcHypos.back();
-    m_onlineEventT0.appendNew(cdcBestT0.eventT0, cdcBestT0.eventT0Uncertainty, Const::EDetector::CDC);
+    m_onlineEventT0.appendNew(bestCDCHypo->eventT0, bestCDCHypo->eventT0Uncertainty, Const::EDetector::CDC);
   }
   // check if a TOP hypothesis exists
-  auto topHypos = m_eventT0->getTemporaryEventT0s(Const::EDetector::TOP);
-  if (topHypos.size() == 0) {
+  const auto bestTOPHypo = m_eventT0->getBestTOPTemporaryEventT0();
+  if (not bestTOPHypo) {
     B2DEBUG(20, "No TOP EventT0 available");
   } else {
-    // get the most accurate TOP eventT0 (there is only one)
-    const auto& topBestT0 = topHypos.back();
-    m_onlineEventT0.appendNew(topBestT0.eventT0, topBestT0.eventT0Uncertainty, Const::EDetector::TOP);
+    m_onlineEventT0.appendNew(bestTOPHypo->eventT0, bestTOPHypo->eventT0Uncertainty, Const::EDetector::TOP);
+  }
+  // check if a SVD hypothesis exists
+  const auto bestSVDHypo = m_eventT0->getBestSVDTemporaryEventT0();
+  if (not bestSVDHypo) {
+    B2DEBUG(20, "No SVD EventT0 available");
+  } else {
+    m_onlineEventT0.appendNew(bestSVDHypo->eventT0, bestSVDHypo->eventT0Uncertainty, Const::EDetector::SVD);
   }
 }

@@ -131,7 +131,7 @@ def extend_path(path,
         # try it as a convenience function that add modules to the path
         module(path)
 
-    elif isinstance(module, collections.Iterable):
+    elif isinstance(module, collections.abc.Iterable):
         # A list of modules or basf2.Path
         modules = module
         for module in modules:

@@ -303,7 +303,7 @@ namespace Belle2 {
     double getR() const { return m_r; }
 
     /*! Get Error Array for Energy->[0], Phi->[2], Theta->[5]
-     * @return Error Array for Energy->[0], Phi->[2], Theta->[5]
+     * @param covArray array which gets filled with errors for Energy->[0], Phi->[2], Theta->[5]
      */
     void getCovarianceMatrixAsArray(double covArray[6]) const
     {

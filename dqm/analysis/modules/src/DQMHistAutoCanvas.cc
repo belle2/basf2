@@ -60,6 +60,11 @@ void DQMHistAutoCanvasModule::beginRun()
   }
 }
 
+void DQMHistAutoCanvasModule::terminate()
+{
+  m_cs.clear();
+}
+
 void DQMHistAutoCanvasModule::event()
 {
   gStyle->SetOptStat(0);
@@ -132,11 +137,11 @@ void DQMHistAutoCanvasModule::event()
       if (m_cs.find(name) == m_cs.end()) {
         // no canvas exists yet, create one
         TCanvas* c = new TCanvas(cname.c_str(), ("c_" + hname).c_str());
-        m_cs.insert(std::pair<std::string, TCanvas*>(name, c));
+        m_cs.insert(std::pair<std::string, std::unique_ptr<TCanvas>>(name, c));
         B2DEBUG(1, "DQMHistAutoCanvasModule: new canvas " << c->GetName());
       }
 
-      TCanvas* c = m_cs[name]; // access already created canvas
+      TCanvas* c = m_cs[name].get(); // access already created canvas
       c->cd();
       // Maybe we want to have it Cleared? Otherwise colored border could stay?
       // but if, then only if histogram has changed!
@@ -149,6 +154,19 @@ void DQMHistAutoCanvasModule::event()
           // assume users are expecting non-0-suppressed axis
           if (hist->GetMinimum() > 0) hist->SetMinimum(0);
           hist->Draw("hist");
+          /* TODO: Uncomment below after debugging
+          // reference only for 1dim
+          if (hist->Integral() != 0) { // ignore empty histogram
+            auto refCopy = findRefHist(it.first, 1, hist);
+            if (refCopy) {
+              // Adjust the y scale to cover the reference
+              if (refCopy->GetMaximum() > hist->GetMaximum())
+                hist->SetMaximum(1.1 * refCopy->GetMaximum());
+
+              refCopy->Draw("hist,same");
+            }
+          }
+          */
         } else if (hist->GetDimension() == 2) {
           // ... but not in 2d
           hist->Draw("colz");

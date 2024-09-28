@@ -38,7 +38,7 @@ namespace Belle2 {
     void apply(std::vector<CDCCKFPath>& newPaths) override
     {
       const auto pathComparison = [&](const CDCCKFPath & lhs, const CDCCKFPath & rhs) {
-        return m_filter({&lhs, &rhs}) > 0;
+        return m_filter(std::pair(&lhs, &rhs)) > 0;
       };
       std::sort(newPaths.begin(), newPaths.end(), pathComparison);
 

@@ -254,7 +254,7 @@ void DQMHistAnalysisSVDOnMiraBelleModule::endRun()
   }
 
 
-  // efficiency of cluster recontruction for U and V side
+  // efficiency of cluster reconstruction for U and V side
   TH2F* h_found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
   TH2F* h_matched_clusU = (TH2F*)findHist("SVDEfficiency/MatchedHitsU");
   TH2F* h_found_tracksV = (TH2F*)findHist("SVDEfficiency/TrackHitsV");
@@ -851,6 +851,8 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgOccupancyGrpId0UV(int
 std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hMCU, TH2F* hMCV, TH2F* hFTU, TH2F* hFTV, int minX,
     int maxX, int minY, int maxY) const
 {
+  float nan = numeric_limits<float>::quiet_NaN();
+
   std::vector<float> avgEffUV(2, 0.0);
   std::vector<float> sumMatchedClustersUV(2, 0.0);
   std::vector<float> sumFoundTracksUV(2, 0.0);
@@ -866,12 +868,12 @@ std::vector<float> DQMHistAnalysisSVDOnMiraBelleModule::avgEfficiencyUV(TH2F* hM
   if (sumFoundTracksUV[0] > 0) {
     avgEffUV[0] = sumMatchedClustersUV[0] / sumFoundTracksUV[0] * 100;
   } else {
-    avgEffUV[0] = -1;
+    avgEffUV[0] = nan;
   }
   if (sumFoundTracksUV[1] > 0) {
     avgEffUV[1] = sumMatchedClustersUV[1] / sumFoundTracksUV[1] * 100;
   } else {
-    avgEffUV[1] = -1;
+    avgEffUV[1] = nan;
   }
   return avgEffUV;
 }

@@ -56,6 +56,8 @@ def setup_basf2_and_db(zmq=False):
     parser.add_argument('--local-db-path', type=str,
                         help="set path to the local payload locations to use for the ConditionDB",
                         default=constants.DEFAULT_DB_FILE_LOCATION)
+    parser.add_argument('--local-db-tag', type=str, nargs="*",
+                        help="Use the local db with a specific tag (can be applied multiple times, order is relevant)")
     parser.add_argument('--central-db-tag', type=str, nargs="*",
                         help="Use the central db with a specific tag (can be applied multiple times, order is relevant)")
     parser.add_argument('--udp-hostname', type=str,
@@ -71,7 +73,11 @@ def setup_basf2_and_db(zmq=False):
         for central_tag in args.central_db_tag:
             basf2.conditions.prepend_globaltag(central_tag)
     else:
-        basf2.conditions.globaltags = ["online"]
+        if args.local_db_tag:
+            for local_tag in args.local_db_tag:
+                basf2.conditions.prepend_globaltag(local_tag)
+        else:
+            basf2.conditions.globaltags = ["online"]
         basf2.conditions.metadata_providers = ["file://" + basf2.find_file(args.local_db_path + "/metadata.sqlite")]
         basf2.conditions.payload_locations = [basf2.find_file(args.local_db_path)]
 
@@ -157,6 +163,14 @@ def add_hlt_processing(path,
     """
     Add all modules for processing on HLT filter machines
     """
+
+    # Check if the run is cosmic and set the Environment accordingly
+    if run_type == constants.RunTypes.cosmic:
+        basf2.declare_cosmics()
+
+    # Check if the run is beam and set the Environment accordingly
+    if run_type == constants.RunTypes.beam:
+        basf2.declare_beam()
 
     # Always avoid the top-level 'import ROOT'.
     import ROOT  # noqa
@@ -260,6 +274,15 @@ def add_expressreco_processing(path,
     """
     Add all modules for processing on the ExpressReco machines
     """
+
+    # Check if the run is cosmic and set the Environment accordingly
+    if run_type == constants.RunTypes.cosmic:
+        basf2.declare_cosmics()
+
+    # Check if the run is beam and set the Environment accordingly
+    if run_type == constants.RunTypes.beam:
+        basf2.declare_beam()
+
     if unpacker_components is None:
         unpacker_components = constants.DEFAULT_EXPRESSRECO_COMPONENTS
     if reco_components is None:

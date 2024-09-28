@@ -1663,23 +1663,22 @@ def reconstructMissingKlongDecayExpert(decayString,
                                        path=None,
                                        recoList="_reco"):
     """
-    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
+    Creates a list of K_L0's and of B -> K_L0 + X, with X being a fully-reconstructed state.
+    The K_L0 momentum is determined from kinematic constraints of the two-body B decay into K_L0 and X
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         Particles are added to the K_L0 ParticleList if they
+    @param cut         Particles are added to the K_L0 and B ParticleList if the B candidates
                        pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
-    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    @param recoList    suffix appended to original K_L0 and B ParticleList that identify the newly created K_L0 and B lists
     """
 
     pcalc = register_module('KlongMomentumCalculatorExpert')
     pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
-    pcalc.param('cut', cut)
-    pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
     path.add_module(pcalc)
@@ -2025,7 +2024,8 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix="", useFloat=False, storeEventType=True):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False, storeEventType=True,
+                      ignoreCommandLineOverride=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2045,6 +2045,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
                          for floating-point numbers.
         storeEventType (bool) : if true, the branch __eventType__ is added for the MC event type information.
                                 The information is available from MC16 on.
+        ignoreCommandLineOverride (bool) : if true, ignore override of file name via command line argument ``-o``.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2060,6 +2061,7 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('fileNameSuffix', filenameSuffix)
     output.param('useFloat', useFloat)
     output.param('storeEventType', storeEventType)
+    output.param('ignoreCommandLineOverride', ignoreCommandLineOverride)
     path.add_module(output)
 
 
@@ -2070,7 +2072,8 @@ def variablesToHistogram(decayString,
                          path=None, *,
                          directory=None,
                          prefixDecayString=False,
-                         filenameSuffix=""):
+                         filenameSuffix="",
+                         ignoreCommandLineOverride=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
 
@@ -2085,6 +2088,7 @@ def variablesToHistogram(decayString,
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+        ignoreCommandLineOverride (bool) : if true, ignore override of file name via command line argument ``-o``.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2098,6 +2102,7 @@ def variablesToHistogram(decayString,
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
     output.param('fileNameSuffix', filenameSuffix)
+    output.param('ignoreCommandLineOverride', ignoreCommandLineOverride)
     if directory is not None or prefixDecayString:
         if directory is None:
             directory = ""
@@ -4419,6 +4424,29 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
     module.param('allowGamma', allowGamma)
     module.param('allowAnyParticleSource', allowAnyParticleSource)
     path.add_module(module)
+
+
+def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
+    """
+    Module to update the mass hypothesis of a given input particle list with the chosen PDG.
+    A new particle list is created with updated mass hypothesis.
+    The allowed mass hypotheses for both input and output are electrons, muons, pions, kaons and protons.
+
+    .. note:
+        The new particle list is named after the input one, with the additional suffix ``_converted_from_OLDHYPOTHESIS``,
+        e.g. ``e+:all`` converted to muons becomes ``mu+:all_converted_from_e``.
+
+    @param particleList The input particle list name
+    @param pdg          The PDG code for the new mass hypothesis, in [11, 13, 211, 321, 2212]
+    @param writeOut     Whether `RootOutput` module should save the new particle list
+    @param path         Modules are added to this path
+    """
+    mass_updater = register_module("ParticleMassHypothesesUpdater")
+    mass_updater.set_name("ParticleMassHypothesesUpdater_" + particleList + "_to_" + str(pdg))
+    mass_updater.param("particleList", particleList)
+    mass_updater.param("writeOut", writeOut)
+    mass_updater.param("pdgCode", pdg)
+    path.add_module(mass_updater)
 
 
 func_requiring_analysisGT = [

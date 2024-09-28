@@ -50,7 +50,7 @@ def add_geometry_modules(path, components=None):
                         energyLossBrems=False, noiseBrems=False)
 
 
-def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False):
+def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=False):
     """
     Helper fucntion to prepare the hit information to be used by tracking.
 
@@ -58,6 +58,9 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
     :param components: the list of geometry components in use or None for all components.
     :param pxd_filtering_offline: PXD data reduction is performed after CDC and SVD tracking,
             so PXD reconstruction has to wait until the ROIs are calculated.
+    :param create_intercepts_for_pxd_ckf: If True, the PXDROIFinder is added to the path to create PXDIntercepts to be used
+        for hit filtering when creating the CKF relations. This independent of the offline PXD digit filtering which is
+        steered by 'pxd_filtering_offline'. This can be applied for both data and MC.
     """
 
     # Preparation of the SVD clusters
@@ -65,7 +68,7 @@ def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=Fal
         add_svd_reconstruction(path)
 
     # Preparation of the PXD clusters
-    if is_pxd_used(components) and not pxd_filtering_offline:
+    if is_pxd_used(components) and not pxd_filtering_offline and not create_intercepts_for_pxd_ckf:
         add_pxd_reconstruction(path)
 
 
@@ -637,7 +640,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
                     wirePosition="aligned",
                     useSecondHits=use_second_hits,
                     flightTimeEstimation="outwards",
-                    filter="cuts_from_DB")
+                    filter="mva",
+                    filterParameters={'DBPayloadName': 'trackfindingcdc_WireHitBackgroundDetectorParameters'})
 
     # Constructs clusters
     path.add_module("TFCDC_ClusterPreparer",
@@ -729,7 +733,8 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
     path.add_module("CDCHitBasedT0Extraction")
 
     # prepare mdst event level info
-    path.add_module("CDCTrackingEventLevelMdstInfoFiller")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromHits")
+    path.add_module("CDCTrackingEventLevelMdstInfoFillerFromSegments")
 
 
 def add_eclcdc_track_finding(path, components, output_reco_tracks="RecoTracks", prune_temporary_tracks=True):

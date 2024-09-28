@@ -56,13 +56,13 @@ namespace Belle2 {
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
     bool m_ignorereadEventNr;               /**< Count event numbers 'manually' */
-    int m_runNum;                    /**< The run number that should be used if the reader acts as master */
-    int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
-    int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+    int m_runNum;                    /**< The run number that should be used if the reader handles EventMetaData */
+    int m_expNum;                    /**< The experiment number that should be used if the reader handles EventMetaData */
+    int m_evtNum;                    /**< The event number is needed if the reader handles EventMetaData */
     int m_minEvent;                    /**< Start at event number x. */
     int m_maxEvent;                    /**< Stop after processing n events. */
     int m_totalEvents;                    /**< totla number of events to read */
-    bool m_makeMaster;                /**< Parameter to signal if the modul should act as master */
+    bool m_createEventMetaData;                /**< Parameter to allow the module to create EventMetaData and set event info */
 
   private:
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< event meta data pointer to control event nubmer etc */

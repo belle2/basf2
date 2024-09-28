@@ -41,8 +41,6 @@ ma.reconstructDecay('J/psi:mumu -> mu-:loose mu+:loose', cut='3.08 < M < 3.12  a
 pcalc = basf2.register_module('KlongMomentumCalculatorExpert')
 pcalc.set_name('KlongMomentumCalculatorExpert_' + 'B0 -> J/psi:mumu K_L0:allklm')
 pcalc.param('decayString', 'B0 -> J/psi:mumu K_L0:allklm')
-pcalc.param('cut', '')
-pcalc.param('decayMode', 0)
 pcalc.param('writeOut', False)
 pcalc.param('recoList', "_reco")
 main.add_module(pcalc)

@@ -161,6 +161,9 @@ namespace Belle2 {
       return m_stats[getIndex(module)];
     }
 
+    /** Write process statistics to a csv file. */
+    void write_csv(const char* filename = "ProcessStatistics.csv") const;
+
     /** get m_stats index for given module, inserting it if not found. */
     int getIndex(const Module* module);
 

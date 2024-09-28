@@ -234,7 +234,6 @@ namespace Belle2 {
       /**
        * Propagate photon to the exit of bar segment.
        * @param bar bar segment data
-       * @return true on success
        */
       void propagate(const RaytracerBase::BarSegment& bar);
 
@@ -246,7 +245,6 @@ namespace Belle2 {
        * which are anyway smeared-out by the dispersion and other processes.
        * @param bar mirror segment data
        * @param mirror spherical mirror data
-       * @return true on success
        */
       void propagateSemiLinear(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror);
 
@@ -254,14 +252,12 @@ namespace Belle2 {
        * Propagate photon to the mirror and reflect it using exact mirror optics.
        * @param bar mirror segment data
        * @param mirror spherical mirror data
-       * @return true on success
        */
       void propagateExact(const RaytracerBase::BarSegment& bar, const RaytracerBase::Mirror& mirror);
 
       /**
        * Propagate photon in the prism to the detector plane.
        * @param prism prism data
-       * @return true on success
        */
       void propagate(const RaytracerBase::Prism& prism);
 

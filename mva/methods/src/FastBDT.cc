@@ -12,28 +12,6 @@
 #include <sstream>
 #include <vector>
 
-// Template specialization to fix NAN sort bug of FastBDT in up to Version 3.2
-#if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
-namespace FastBDT {
-  template<>
-  bool compareIncludingNaN(float i, float j)
-  {
-    if (std::isnan(i)) {
-      if (std::isnan(j)) {
-        // If both are NAN i is NOT smaller
-        return false;
-      } else {
-        // In all other cases i is smaller
-        return true;
-      }
-    }
-    // If j is NaN the following line will return false,
-    // which is fine in our case.
-    return i < j;
-  }
-}
-#endif
-
 namespace Belle2 {
   namespace MVA {
     bool isValidSignal(const std::vector<bool>& Signals)
@@ -49,24 +27,16 @@ namespace Belle2 {
     void FastBDTOptions::load(const boost::property_tree::ptree& pt)
     {
       int version = pt.get<int>("FastBDT_version");
-#if FastBDT_VERSION_MAJOR >= 5
       if (version != 1 and version != 2) {
         B2ERROR("Unknown weightfile version " << std::to_string(version));
         throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
       }
-#else
-      if (version != 1) {
-        B2ERROR("Unknown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unknown weightfile version " + std::to_string(version));
-      }
-#endif
       m_nTrees = pt.get<int>("FastBDT_nTrees");
       m_nCuts = pt.get<int>("FastBDT_nCuts");
       m_nLevels = pt.get<int>("FastBDT_nLevels");
       m_shrinkage = pt.get<double>("FastBDT_shrinkage");
       m_randRatio = pt.get<double>("FastBDT_randRatio");
 
-#if FastBDT_VERSION_MAJOR >= 5
       if (version > 1) {
 
         m_flatnessLoss = pt.get<double>("FastBDT_flatnessLoss");
@@ -89,22 +59,16 @@ namespace Belle2 {
         m_flatnessLoss = -1.0;
         m_sPlot = false;
       }
-#endif
     }
 
     void FastBDTOptions::save(boost::property_tree::ptree& pt) const
     {
-#if FastBDT_VERSION_MAJOR >= 5
       pt.put("FastBDT_version", 2);
-#else
-      pt.put("FastBDT_version", 1);
-#endif
       pt.put("FastBDT_nTrees", m_nTrees);
       pt.put("FastBDT_nCuts", m_nCuts);
       pt.put("FastBDT_nLevels", m_nLevels);
       pt.put("FastBDT_shrinkage", m_shrinkage);
       pt.put("FastBDT_randRatio", m_randRatio);
-#if FastBDT_VERSION_MAJOR >= 5
       pt.put("FastBDT_flatnessLoss", m_flatnessLoss);
       pt.put("FastBDT_sPlot", m_sPlot);
       pt.put("FastBDT_number_individual_nCuts", m_individual_nCuts.size());
@@ -116,7 +80,6 @@ namespace Belle2 {
       for (unsigned int i = 0; i < m_individualPurityTransformation.size(); ++i) {
         pt.put(std::string("FastBDT_individualPurityTransformation") + std::to_string(i), m_individualPurityTransformation[i]);
       }
-#endif
     }
 
     po::options_description FastBDTOptions::getDescription()
@@ -130,7 +93,6 @@ namespace Belle2 {
        "Shrinkage of the boosting algorithm. Reasonable values are between 0.01 and 1.0.")
       ("nCutLevels", po::value<unsigned int>(&m_nCuts)->notifier(check_bounds<unsigned int>(0, 20, "nCutLevels")),
        "Number of cut levels N per feature. 2^N Bins will be used per feature. Reasonable values are between 6 and 12.")
-#if FastBDT_VERSION_MAJOR >= 5
       ("individualNCutLevels", po::value<std::vector<unsigned int>>(&m_individual_nCuts)->multitoken()->notifier(
          check_bounds_vector<unsigned int>(0, 20, "individualNCutLevels")),
        "Number of cut levels N per feature. 2^N Bins will be used per feature. Reasonable values are between 6 and 12. One value per feature (including spectators) should be provided, if parameter is not set the global value specified by nCutLevels is used for all features.")
@@ -142,7 +104,6 @@ namespace Belle2 {
        "Activates purity transformation on all features: Add the purity transformed of all features in addition to the training. This will double the number of features and slow down the inference considerably")
       ("individualPurityTransformation", po::value<std::vector<bool>>(&m_individualPurityTransformation)->multitoken(),
        "Activates purity transformation for each feature: Vector of boolean values which decide if the purity transformed of the feature should be added in addition to this training.")
-#endif
       ("randRatio", po::value<double>(&m_randRatio)->notifier(check_bounds<double>(0.0, 1.0001, "randRatio")),
        "Fraction of the data sampled each training iteration. Reasonable values are between 0.1 and 1.0.");
       return description;
@@ -155,17 +116,13 @@ namespace Belle2 {
 
     Weightfile FastBDTTeacher::train(Dataset& training_data) const
     {
+      if (training_data.getNumberOfEvents() > 5e+6) {
+        B2WARNING("Number of events for training exceeds 5 million. FastBDT performance starts getting worse when the number reaches O(10^7).");
+      }
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
-#if FastBDT_VERSION_MAJOR >= 4
       unsigned int numberOfSpectators = training_data.getNumberOfSpectators();
-#else
-      // Deactivate support for spectators below version 4!
-      unsigned int numberOfSpectators = 0;
-#endif
 
-      // FastBDT Version 4 has a simplified interface with a sklearn style Classifier
-#if FastBDT_VERSION_MAJOR >= 5
       if (m_specific_options.m_individual_nCuts.size() != 0
           and m_specific_options.m_individual_nCuts.size() != numberOfFeatures + numberOfSpectators) {
         B2ERROR("You provided individual nCut values for each feature and spectator, but the total number of provided cuts is not same as as the total number of features and spectators.");
@@ -205,93 +162,12 @@ namespace Belle2 {
         X[i + numberOfFeatures] = training_data.getSpectator(i);
       }
       classifier.fit(X, y, w);
-#else
-      const auto& y = training_data.getSignals();
-      if (not isValidSignal(y)) {
-        B2FATAL("The training data is not valid. It only contains one class instead of two.");
-      }
-      std::vector<FastBDT::FeatureBinning<float>> featureBinnings;
-      std::vector<unsigned int> nBinningLevels;
-      for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
-        auto feature = training_data.getFeature(iFeature);
-
-        unsigned int nCuts = m_specific_options.m_nCuts;
-#if FastBDT_VERSION_MAJOR >= 3
-        featureBinnings.push_back(FastBDT::FeatureBinning<float>(nCuts, feature));
-#else
-        featureBinnings.push_back(FastBDT::FeatureBinning<float>(nCuts, feature.begin(), feature.end()));
-#endif
-        nBinningLevels.push_back(nCuts);
-      }
-
-      for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
-        auto feature = training_data.getSpectator(iSpectator);
-
-        unsigned int nCuts = m_specific_options.m_nCuts;
-#if FastBDT_VERSION_MAJOR >= 3
-        featureBinnings.push_back(FastBDT::FeatureBinning<float>(nCuts, feature));
-#else
-        featureBinnings.push_back(FastBDT::FeatureBinning<float>(nCuts, feature.begin(), feature.end()));
-#endif
-        nBinningLevels.push_back(nCuts);
-      }
-
-      unsigned int numberOfEvents = training_data.getNumberOfEvents();
-      if (numberOfEvents > 5e+6) {
-        B2WARNING("Number of events for training exceeds 5 million. FastBDT performance starts getting worse when the number reaches O(10^7).");
-      }
-
-#if FastBDT_VERSION_MAJOR >= 4
-      FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, numberOfSpectators, nBinningLevels);
-#else
-      FastBDT::EventSample eventSample(numberOfEvents, numberOfFeatures, nBinningLevels);
-#endif
-      std::vector<unsigned int> bins(numberOfFeatures + numberOfSpectators);
-      for (unsigned int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
-        training_data.loadEvent(iEvent);
-        for (unsigned int iFeature = 0; iFeature < numberOfFeatures + numberOfSpectators; ++iFeature) {
-          bins[iFeature] = featureBinnings[iFeature].ValueToBin(training_data.m_input[iFeature]);
-        }
-        for (unsigned int iSpectator = 0; iSpectator < numberOfSpectators; ++iSpectator) {
-          bins[iSpectator + numberOfFeatures] = featureBinnings[iSpectator + numberOfFeatures].ValueToBin(
-                                                  training_data.m_spectators[iSpectator]);
-        }
-        eventSample.AddEvent(bins, training_data.m_weight, training_data.m_isSignal);
-      }
-
-      FastBDT::ForestBuilder dt(eventSample, m_specific_options.m_nTrees, m_specific_options.m_shrinkage, m_specific_options.m_randRatio,
-                                m_specific_options.m_nLevels);
-#if FastBDT_VERSION_MAJOR >= 3
-      FastBDT::Forest<float> forest(dt.GetShrinkage(), dt.GetF0(), true);
-#else
-      FastBDT::Forest forest(dt.GetShrinkage(), dt.GetF0());
-#endif
-      for (auto t : dt.GetForest()) {
-#if FastBDT_VERSION_MAJOR >= 3
-        auto tree = FastBDT::removeFeatureBinningTransformationFromTree(t, featureBinnings);
-        forest.AddTree(tree);
-#else
-        forest.AddTree(t);
-#endif
-      }
-
-#endif
-
 
       Weightfile weightfile;
       std::string custom_weightfile = weightfile.generateFileName();
       std::fstream file(custom_weightfile, std::ios_base::out | std::ios_base::trunc);
 
-#if FastBDT_VERSION_MAJOR >= 5
       file << classifier << std::endl;
-#else
-#if FastBDT_VERSION_MAJOR >= 3
-      file << forest << std::endl;
-#else
-      file << featureBinnings << std::endl;
-      file << forest << std::endl;
-#endif
-#endif
       file.close();
 
       weightfile.addOptions(m_general_options);
@@ -300,15 +176,9 @@ namespace Belle2 {
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
       std::map<std::string, float> importance;
-#if FastBDT_VERSION_MAJOR >= 5
       for (auto& pair : classifier.GetVariableRanking()) {
         importance[m_general_options.m_variables[pair.first]] = pair.second;
       }
-#else
-      for (auto& pair : forest.GetVariableRanking()) {
-        importance[m_general_options.m_variables[pair.first]] = pair.second;
-      }
-#endif
       weightfile.addFeatureImportance(importance);
 
       return weightfile;
@@ -325,7 +195,6 @@ namespace Belle2 {
       int version = weightfile.getElement<int>("FastBDT_version", 0);
       B2DEBUG(100, "FastBDT Weightfile Version " << version);
       if (version < 2) {
-#if FastBDT_VERSION_MAJOR >= 3
         std::stringstream s;
         {
           std::string t;
@@ -366,43 +235,10 @@ namespace Belle2 {
           }
           m_expert_forest = cleaned_forest;
         }
-#else
-        B2INFO("FastBDT: I read an old weightfile of FastBDT using the old FastBDT version."
-               "I try to fix the weightfile first to avoid problems due to NaN and inf values."
-               "Consider to switch to the newer version of FastBDT (newer externals)");
-        // Check for nan or inf in file and replace with 0
-        std::stringstream s;
-        std::string t;
-        while (getline(file, t)) {
-          size_t f = 0;
-
-          while ((f = t.find("inf", f)) != std::string::npos) {
-            t.replace(f, std::string("inf").length(), std::string("0.0"));
-            f += std::string("0.0").length();
-            B2WARNING("Found infinity in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version");
-          }
-          f = 0;
-          while ((f = t.find("nan", f)) != std::string::npos) {
-            t.replace(f, std::string("nan").length(), std::string("0.0"));
-            f += std::string("0.0").length();
-            B2WARNING("Found nan in FastBDT weightfile, I replace it with 0 to prevent horrible crashes, this is fixed in the newer version");
-          }
-          s << t + '\n';
-        }
-        s >> m_expert_feature_binning;
-        m_expert_forest = FastBDT::readForestFromStream(s);
-#endif
-      }
-#if FastBDT_VERSION_MAJOR >= 5
-      else {
+      } else {
         m_use_simplified_interface = true;
         m_classifier = FastBDT::Classifier(file);
       }
-#else
-      else {
-        B2ERROR("Unknown Version 2 of Weightfile, please use a more recent FastBDT version");
-      }
-#endif
       file.close();
 
       weightfile.getOptions(m_specific_options);
@@ -414,22 +250,10 @@ namespace Belle2 {
       std::vector<float> probabilities(test_data.getNumberOfEvents());
       for (unsigned int iEvent = 0; iEvent < test_data.getNumberOfEvents(); ++iEvent) {
         test_data.loadEvent(iEvent);
-#if FastBDT_VERSION_MAJOR >= 3
-#if FastBDT_VERSION_MAJOR >= 5
         if (m_use_simplified_interface)
           probabilities[iEvent] = m_classifier.predict(test_data.m_input);
         else
           probabilities[iEvent] = m_expert_forest.Analyse(test_data.m_input);
-#else
-        probabilities[iEvent] = m_expert_forest.Analyse(test_data.m_input);
-#endif
-#else
-        std::vector<unsigned int> bins(m_expert_feature_binning.size());
-        for (unsigned int iFeature = 0; iFeature < m_expert_feature_binning.size(); ++iFeature) {
-          bins[iFeature] = m_expert_feature_binning[iFeature].ValueToBin(test_data.m_input[iFeature]);
-        }
-        probabilities[iEvent] = m_expert_forest.Analyse(bins);
-#endif
       }
 
       return probabilities;

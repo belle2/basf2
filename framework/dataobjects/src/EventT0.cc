@@ -113,3 +113,49 @@ void EventT0::clearEventT0()
 {
   m_hasEventT0 = false;
 }
+
+std::optional<EventT0::EventT0Component> EventT0::getBestSVDTemporaryEventT0() const
+{
+  if (hasTemporaryEventT0(Const::EDetector::SVD)) {
+    std::vector<EventT0::EventT0Component> svdT0s = getTemporaryEventT0s(Const::EDetector::SVD);
+    // The most accurate SVD EventT0 candidate is the last one in the list
+    return std::make_optional(svdT0s.back());
+  }
+
+  return {};
+}
+
+std::optional<EventT0::EventT0Component> EventT0::getBestCDCTemporaryEventT0() const
+{
+  if (hasTemporaryEventT0(Const::EDetector::CDC)) {
+    std::vector<EventT0::EventT0Component> cdcT0s = getTemporaryEventT0s(Const::EDetector::CDC);
+    // The most accurate CDC EventT0 candidate is the last one in the list
+    return std::make_optional(cdcT0s.back());
+  }
+
+  return {};
+}
+
+std::optional<EventT0::EventT0Component> EventT0::getBestTOPTemporaryEventT0() const
+{
+  if (hasTemporaryEventT0(Const::EDetector::TOP)) {
+    std::vector<EventT0::EventT0Component> topT0s = getTemporaryEventT0s(Const::EDetector::TOP);
+    // The most accurate TOP EventT0 candidate is the last one in the list, though there should only be one at max anyway
+    return std::make_optional(topT0s.back());
+  }
+
+  return {};
+}
+
+std::optional<EventT0::EventT0Component> EventT0::getBestECLTemporaryEventT0() const
+{
+  if (hasTemporaryEventT0(Const::EDetector::ECL)) {
+    std::vector<EventT0::EventT0Component> eclT0s = getTemporaryEventT0s(Const::EDetector::ECL);
+    // The most accurate ECL EevenT0 is assumed to be the one with smallest chi2/quality
+    auto eclBestT0 = std::min_element(eclT0s.begin(), eclT0s.end(), [](EventT0::EventT0Component c1,
+    EventT0::EventT0Component c2) {return c1.quality < c2.quality;});
+    return std::make_optional(*eclBestT0);
+  }
+
+  return {};
+}

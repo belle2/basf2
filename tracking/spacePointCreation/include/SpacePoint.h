@@ -73,7 +73,7 @@ namespace Belle2 {
      *  @param UClusterTime       Time in ns of the cluster on the U side
      *  @param VClusterTime       Time in ns of the cluster on the V side
      */
-    SpacePoint(const B2Vector3<double>& pos, const B2Vector3<double>& posError, std::pair<double, double> normalizedLocal,
+    SpacePoint(const B2Vector3D& pos, const B2Vector3D& posError, std::pair<double, double> normalizedLocal,
                std::pair<bool, bool> clustersAssigned, VxdID sensorID, Belle2::VXD::SensorInfoBase::SensorType detID,
                double UClusterTime = 0., double VClusterTime = 0.) :
       m_position(pos), m_positionError(posError),
@@ -131,10 +131,10 @@ namespace Belle2 {
     double TimeV() const { return m_VClusterTime; }
 
     /** return the position vector in global coordinates */
-    const B2Vector3<double>& getPosition() const { return m_position; }
+    const B2Vector3D& getPosition() const { return m_position; }
 
     /** return the hitErrors in sigma of the global position */
-    const B2Vector3<double>& getPositionError() const { return m_positionError; }
+    const B2Vector3D& getPositionError() const { return m_positionError; }
 
     //---- Sensor Level Information Getters ---------------------------------------------------------------------------
     /** Return SensorType (PXD, SVD, ...) on which the SpacePoint lives.*/
@@ -219,8 +219,8 @@ namespace Belle2 {
     *
     * ATTENTION: this function assumes, that for wedged sensors, the uCoordinate is already adapted to the vCoordinate!
      */
-    static B2Vector3<double> getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID vxdID,
-                                                  const VXD::SensorInfoBase* aSensorInfo = nullptr);
+    static B2Vector3D getGlobalCoordinates(const std::pair<double, double>& hitLocal, VxdID vxdID,
+                                           const VXD::SensorInfoBase* aSensorInfo = nullptr);
 
 
     /** converts a local hit into sensor-independent relative coordinates.
@@ -329,13 +329,13 @@ namespace Belle2 {
      *
      *  [0]: x, [1] : y, [2] : z
      */
-    B2Vector3<double> m_position;
+    B2Vector3D m_position;
 
     /** Global position error vector in sigma.
      *
      *  [0]: x-uncertainty, [1] : y-uncertainty, [2] : z-uncertainty
      */
-    B2Vector3<double> m_positionError;
+    B2Vector3D m_positionError;
 
 
     /** Local position vector normalized to sensor size (0 <= x <= 1).

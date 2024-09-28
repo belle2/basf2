@@ -37,15 +37,14 @@ New skims
   * `17230700 <skim.WGs.charm.DstToD0Pi_D0ToGeneric>`:  :math:`D^{*} \to D^{0} \pi`
   * `17260100 <skim.WGs.charm.DpToHpOmega>`:  :math:`D^{+} \to K^{+} \omega (\to \pi^+ \pi^- \pi^0)`,  :math:`D^{+} \to \pi^{+} \omega (\to \pi^+ \pi^- \pi^0)`  (and CC)
   * `17260200 <skim.WGs.charm.DspToHpOmega>`:  :math:`D_{s}^{+} \to K^{+} \omega (\to \pi^+ \pi^- \pi^0)`,  :math:`D_{s}^{+} \to \pi^{+} \omega (\to \pi^+ \pi^- \pi^0)`  (and CC)
-  * `17220100 <skim.WGs.charm.DpToPipepem>`:  :math:`D^+ \to \pi^+ e^- e^+`
-  * `17220200 <skim.WGs.charm.DpToPipmupmum>`:  :math:`D^+ \to \pi^+ \mu^- \mu^+`
+  * `17220100 <skim.WGs.charm.DpToPipEpEm>`:  :math:`D^+ \to \pi^+ e^- e^+`
+  * `17220200 <skim.WGs.charm.DpToPipMupMum>`:  :math:`D^+ \to \pi^+ \mu^- \mu^+`
   * `17220300 <skim.WGs.charm.DpToPipKpKm>`:  :math:`D^+ \to \pi^+ K^- K^+`
   * `17230900 <skim.WGs.charm.LambdacToSHpJm>`:  :math:`\Lambda_c^+ \to \Sigma^+ h^+ j^-`
   * `17231000 <skim.WGs.charm.XicpTopHpJm>`:  :math:`\Xi_c^+ \to p \pi^+ K^-`
-  * `17231100 <skim.WGs.charm.XictoXimpippim>`:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
+  * `17231100 <skim.WGs.charm.XicToXimPipPim>`:  :math:`\Xi_c^+ \to \Sigma^+ h^+ j^-`,  :math:`\Xi_c^+ \to \Xi^- h^+ j^-`
   * `17231200 <skim.WGs.charm.Xic0ToLHpJm>`:  :math:`\Xi_c^0 \to \Lambda^0 h^+ j^-`
   * `17232000 <skim.WGs.charm.DpToHpPi0>`:  :math:`D^{+} \to \pi^+ \pi^0`
-  * `17222100 <skim.WGs.charm.DpToKsHp>`:  :math:`D^+ \to K_S \pi^+`
 
 * Quarkonium: 
 

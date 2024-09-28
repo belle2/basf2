@@ -15,7 +15,7 @@
 #include <root/TMatrix.h>
 
 /* defines */
-#define CDC_SUPER_LAYERS 9
+#define CDC_SUPER_LAYERS 45
 
 using namespace std;
 using namespace Belle2;
@@ -112,6 +112,7 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
 
       idx_list.clear();
       bool layerHit[CDC_SUPER_LAYERS] = {false}; /* For layer filter */
+      //bool layerHit[CDC_SUPER_LAYERS*5] = {false}; /* For layer filter */
       for (auto it = hits.begin(); it != hits.end(); ++it) {
         iHit = it->first;
         hp = it->second;
@@ -135,6 +136,10 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
               << " layerHit " << int(layerHit[0]) << int(layerHit[2])
               << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
               << " nSL " << nSL);
+      //std::cout << indent << "i " << i << " j " << j
+      //        << " layerHit " << int(layerHit[0]) << int(layerHit[2])
+      //        << int(layerHit[4]) << int(layerHit[6]) << int(layerHit[8])
+      //        << " nSL " << nSL << std::endl;
       if (nSL >= m_minHits || shortTrack(layerHit)) {
         if (iterations != maxIterations) {
           fastInterceptFinder(hits, x1_d, x2_d, y1_d, y2_d, iterations + 1, ix, iy);

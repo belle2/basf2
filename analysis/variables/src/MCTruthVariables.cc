@@ -559,6 +559,26 @@ namespace Belle2 {
       return tauDecay->getTauMinusMcProng();
     }
 
+    double tauPlusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauPlusEgstar();
+    }
+
+    double tauMinusEgstar(const Particle*)
+    {
+      StoreObjPtr<TauPairDecay> tauDecay;
+      if (!tauDecay) {
+        B2WARNING("Cannot find tau prong, did you forget to run TauDecayMarkerModule?");
+        return 0;
+      }
+      return tauDecay->getTauMinusEgstar();
+    }
+
     double isReconstructible(const Particle* p)
     {
       if (p->getParticleSource() == Particle::EParticleSourceObject::c_Composite)
@@ -944,6 +964,22 @@ namespace Belle2 {
         return 1;
     }
 
+    int ancestorBIndex(const Particle* particle)
+    {
+      const MCParticle* mcpart = particle->getMCParticle();
+
+      while (mcpart) {
+        int pdg = std::abs(mcpart->getPDG());
+
+        if ((pdg == 521) || (pdg == 511))
+          return mcpart->getArrayIndex();
+
+        mcpart = mcpart->getMother();
+      }
+
+      return -1;
+    }
+
     VARIABLE_GROUP("MC matching and MC truth");
     REGISTER_VARIABLE("isSignal", isSignal,
                       "1.0 if Particle is correctly reconstructed (SIGNAL), 0.0 if not, and NaN if no related MCParticle could be found. \n"
@@ -982,6 +1018,8 @@ namespace Belle2 {
     // variable in sphinx
     REGISTER_VARIABLE("isBBCrossfeed", isBBCrossfeed,
                       "Returns 1 for crossfeed in reconstruction of given B meson, 0 for no crossfeed and NaN for no true B meson or failed truthmatching.");
+    REGISTER_VARIABLE("ancestorBIndex", ancestorBIndex,
+                      "Returns array index of B ancestor, or -1 if no B or no MC-matching is found.");
     REGISTER_VARIABLE("genMotherP", genMotherP,
                       "Generated momentum of a particles MC mother particle\n\n", "GeV/c");
     REGISTER_VARIABLE("genParticleID", genParticleIndex,
@@ -1174,6 +1212,10 @@ List of possible values (taken from the Geant4 source of
                       "[Eventbased] Prong for the positive tau lepton in a tau pair generated event.");
     REGISTER_VARIABLE("tauMinusMCProng", tauMinusMcProng,
                       "[Eventbased] Prong for the negative tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauPlusEgstar", tauPlusEgstar,
+                      "[Eventbased] Energy of radiated gamma from positive tau lepton in a tau pair generated event.");
+    REGISTER_VARIABLE("tauMinusEgstar", tauMinusEgstar,
+                      "[Eventbased] Energy of radiated gamma from negative tau lepton in a tau pair generated event.");
 
     VARIABLE_GROUP("MC particle seen in subdetectors");
     REGISTER_VARIABLE("isReconstructible", isReconstructible,

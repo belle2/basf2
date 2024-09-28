@@ -30,7 +30,8 @@ LHEInputModule::LHEInputModule() : Module(),
 
   //Parameter definition
   addParam("inputFileList", m_inputFileNames, "List of names of LHE files");
-  addParam("makeMaster", m_makeMaster, "Boolean to indicate whether the event numbers from input file should be used.", false);
+  addParam("createEventMetaData", m_createEventMetaData,
+           "Boolean to indicate whether the event numbers from input file should be used.", false);
   addParam("runNum", m_runNum, "Run number", -1);
   addParam("expNum", m_expNum, "Experiment number", -1);
   addParam("skipEvents", m_skipEventNumber, "Skip this number of events before starting.", 0);
@@ -49,7 +50,7 @@ LHEInputModule::LHEInputModule() : Module(),
 
 void LHEInputModule::initialize()
 {
-  if (m_makeMaster) {
+  if (m_createEventMetaData) {
     if (m_expNum < 0 or m_runNum < 0)
       B2FATAL("The exp. and run numbers are not properly initialized: please set the 'expNum' and 'runNum' parameters of the LHEInput module.");
 
@@ -103,7 +104,7 @@ void LHEInputModule::event()
     m_pg.clear();
     double weight = 1;
     int id = m_lhe.getEvent(m_pg, weight);
-    if (m_makeMaster) {
+    if (m_createEventMetaData) {
       if (id > -1) {
         m_evtNum = id;
       } else {

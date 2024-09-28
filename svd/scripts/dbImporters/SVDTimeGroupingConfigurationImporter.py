@@ -6,8 +6,6 @@
 #                                                                        #
 # See git log for contributors and copyright holders.                    #
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
-#                                                                        #
-# Usage: basf2 <script> -- -j ../../data/SVDTimeGrouping.json            #
 ##########################################################################
 
 

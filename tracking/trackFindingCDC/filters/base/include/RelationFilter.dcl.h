@@ -15,6 +15,8 @@
 
 #include <vector>
 
+#include <cmath>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -38,6 +40,22 @@ namespace Belle2 {
        *  Return always returns NAN to reject all segment neighbors.
        */
       virtual Weight operator()(const AObject& from, const AObject& to);
+
+      /**
+       * Filter over a vector of relations. We need to override it since derrived relation classes do not implement a call with a pointer to a relation.
+       */
+      virtual std::vector<float> operator()(const std::vector <Relation<AObject>*>& objs) override
+      {
+        std::vector<float> out(objs.size());
+        for (size_t iObj = 0; iObj < objs.size(); iObj += 1) {
+          if (objs[iObj]) {
+            out[iObj] = operator()(*objs[iObj]);
+          } else {
+            out[iObj] = NAN;
+          }
+        }
+        return out;
+      }
 
       /**
        *  Main filter method overriding the filter interface method.

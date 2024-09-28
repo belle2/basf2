@@ -222,7 +222,7 @@ void CDCDedxCosEdgeAlgorithm::createPayload(vector<vector<double>>& vfinalconst)
 //------------------------------------
 void CDCDedxCosEdgeAlgorithm::fitGaussianWRange(TH1D*& temphist, fitstatus& status)
 {
-  if (temphist->Integral() < 500) { //atleast 1k bhabha events
+  if (temphist->Integral() < 500) { //at least 1k bhabha events
     B2INFO(Form("\t insufficient fit stats (%0.00f) for (%s)", temphist->Integral(), temphist->GetName()));
     status = LowStats;
     return;
@@ -244,7 +244,7 @@ void CDCDedxCosEdgeAlgorithm::fitGaussianWRange(TH1D*& temphist, fitstatus& stat
         return;
       } else {
         temphist->GetXaxis()->SetRangeUser(fdEdxMean - 5.0 * width, fdEdxMean + 5.0 * width);
-        B2INFO(Form("\tFit for hist (%s) sucessfull (status = %d)", temphist->GetName(), fs));
+        B2INFO(Form("\tFit for hist (%s) successful (status = %d)", temphist->GetName(), fs));
         status = FitOK;
       }
     }
@@ -357,7 +357,7 @@ void CDCDedxCosEdgeAlgorithm::plotConstants(vector<vector<double>>& vfinalconst)
     }
 
     TH1D holdconst(Form("holdconst%d_%s", i, m_suffix.data()), "", m_npBins, min, max);
-    holdconst.SetTitle(Form("constant comparision, cos#theta:(%0.02f, %0.02f);cos(#theta);const", min, max));
+    holdconst.SetTitle(Form("constant comparison, cos#theta:(%0.02f, %0.02f);cos(#theta);const", min, max));
 
     TH1D hnewconst(Form("hnewconst%d_%s", i, m_suffix.data()), "", m_npBins, min, max);
 

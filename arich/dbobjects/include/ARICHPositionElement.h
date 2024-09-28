@@ -10,8 +10,11 @@
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <framework/gearbox/Unit.h>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
+#include <Math/RotationX.h>
+#include <Math/RotationY.h>
+#include <Math/RotationZ.h>
 #include <iostream>
 
 namespace Belle2 {
@@ -86,14 +89,14 @@ namespace Belle2 {
 
     /**
      * Sets rotation around y
-     * @param alpha rotation angle around y
+     * @param beta rotation angle around y
      */
     void setBeta(double beta) {m_beta = beta;}
 
 
     /**
      * Sets rotation around z
-     * @param alpha rotation angle around z
+     * @param gamma rotation angle around z
      */
     void setGamma(double gamma) {m_gamma = gamma;}
 
@@ -156,10 +159,13 @@ namespace Belle2 {
      * Returns rotation matrix
      * @return rotation matrix
      */
-    TRotation getRotation() const
+    ROOT::Math::Rotation3D getRotation() const
     {
-      TRotation rot;
-      rot.RotateX(m_alpha).RotateY(m_beta).RotateZ(m_gamma);
+      ROOT::Math::Rotation3D rot;
+      ROOT::Math::RotationX rotX(m_alpha);
+      ROOT::Math::RotationY rotY(m_beta);
+      ROOT::Math::RotationZ rotZ(m_gamma);
+      rot *= rotZ * rotY * rotX;
       return rot;
     }
 
@@ -167,7 +173,7 @@ namespace Belle2 {
      * Returns translation vector (always in basf2 units!)
      * @return translation vector
      */
-    TVector3 getTranslation() const {return TVector3(m_x, m_y, m_z);}
+    ROOT::Math::XYZVector getTranslation() const {return ROOT::Math::XYZVector(m_x, m_y, m_z);}
 
     /**
      * Check for consistency of data members

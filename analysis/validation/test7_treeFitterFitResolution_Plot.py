@@ -11,7 +11,7 @@
 """
 <header>
   <input>../TreeFitted_B0ToJPsiKs.root</input>
-  <contact>Yo Sato; yosato@post.kek.jp</contact>
+  <contact>Frank Meier; frank.meier@duke.edu</contact>
   <interval>nightly</interval>
 </header>
 """
@@ -92,7 +92,7 @@ checkForGausian = "This should be a Gaussian on flat bkg and not changing."
 metaOptions = "pvalue-warn=0.1"
 for hist, xlabel in histsAndLabels.items():
     hist.GetXaxis().SetTitle(xlabel)
-    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "yosato@post.kek.jp"))
+    hist.GetListOfFunctions().Add(ROOT.TNamed("Contact", "frank.meier@duke.edu"))
     hist.GetListOfFunctions().Add(ROOT.TNamed("Description", xlabel))
     hist.GetListOfFunctions().Add(ROOT.TNamed("MetaOptions", metaOptions))
     if any(string in xlabel for string in ["pull", "meas-mc"]):

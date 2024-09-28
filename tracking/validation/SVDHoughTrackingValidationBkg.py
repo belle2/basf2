@@ -32,7 +32,7 @@ ACTIVE = True
 
 class SVDHoughTrackingValidationBkg(TrackingValidationRun):
     """
-    Validation class for the DATCON tracking
+    Validation class for the SVDHoughTracking
     """
     #: the number of events to process
     n_events = N_EVENTS

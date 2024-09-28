@@ -83,6 +83,9 @@ class TestSkimRegistry(unittest.TestCase):
     def test_modules_exist(self):
         """Check that all modules listed in registry exist in skim/scripts/skim/."""
         for module in Registry.modules:
+            if module == 'flagged':
+                continue
+
             self.assertIn(
                 module,
                 self.ExistentModules,
@@ -108,6 +111,9 @@ class TestSkimRegistry(unittest.TestCase):
         in the modules.
         """
         for ModuleName in Registry.modules:
+            if ModuleName == 'flagged':
+                continue  # flagged category are not actual skims
+
             SkimModule = import_module(f"skim.WGs.{ModuleName}")
             for SkimName in Registry.get_skims_in_module(ModuleName):
                 # Check the skim is defined in the module
@@ -135,6 +141,9 @@ class TestSkimRegistry(unittest.TestCase):
         incorrect skim information in the registry.
         """
         for ModuleName in self.ExistentModules:
+            if ModuleName == 'flagged':
+                continue  # flagged category are not actual skims
+
             SkimModule = import_module(f"skim.WGs.{ModuleName}")
 
             # Inspect the module, and find all BaseSkim subclasses
@@ -185,7 +194,7 @@ class TestSkimValidation(unittest.TestCase):
         SkimsWithValidationMethod = [
             skim
             for skim in Registry.names
-            if not Registry.get_skim_function(skim)()._method_unchanged(
+            if skim[:2] != "f_" and not Registry.get_skim_function(skim)()._method_unchanged(
                 "validation_histograms"
             )
         ]
@@ -221,6 +230,9 @@ class TestSkimValidation(unittest.TestCase):
         Check that all ``validation_sample`` attributes of skims point to existing files.
         """
         for skim in Registry.names:
+            if skim[:2] == "f_":
+                continue
+
             SkimObject = Registry.get_skim_function(skim)()
             # Don't bother checking sample if no `validation_histograms` method is defined
             if SkimObject._method_unchanged("validation_histograms"):

@@ -265,13 +265,13 @@ void KLMDQMModule::defineHisto()
   int eklmPlanes = EKLMElementNumbers::getMaximalPlaneGlobalNumber(); // 208
 
   m_FE_BKLM_Layer_0 = new TH1F("feStatus_bklm_scintillator_layers_0",
-                               "BKLM Scintillator Standard Readout;Scintillator Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+                               "BKLM Scintillator Standard Readout;FEE Card", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_FE_BKLM_Layer_1 = new TH1F("feStatus_bklm_scintillator_layers_1",
-                               "BKLM Scintillator Feature Extraction;Scintillator Layers", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
+                               "BKLM Scintillator Feature Extraction;FEE Card", bklmSectors * 2, 0.5, 0.5 + bklmSectors * 2);
   m_FE_EKLM_Plane_0 = new TH1F("feStatus_eklm_plane_0",
-                               "EKLM Standard Readout;Scintillator Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+                               "EKLM Standard Readout;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   m_FE_EKLM_Plane_1 = new TH1F("feStatus_eklm_plane_1",
-                               "EKLM Feature Extraction;Scintillator Planes", eklmPlanes, 0.5, 0.5 + eklmPlanes);
+                               "EKLM Feature Extraction;Plane", eklmPlanes, 0.5, 0.5 + eklmPlanes);
   oldDirectory->cd();
 }
 

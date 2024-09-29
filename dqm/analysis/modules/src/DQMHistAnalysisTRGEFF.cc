@@ -173,15 +173,16 @@ void DQMHistAnalysisTRGEFFModule::event()
     // Check consistency and create a new TEfficiency
     if (TEfficiency::CheckConsistency(*histFtdf, *hist)) {
       *efficiencyPtr = new TEfficiency(*histFtdf, *hist);
+
+      // Draw efficiency on canvas and update it
+      canvas->Clear();
+      canvas->cd();
+      (*efficiencyPtr)->Draw();
+      canvas->Modified();
+
     } else {
       B2WARNING("Histograms " << histFtdf->GetName() << " and " << hist->GetName() << " are not consistent for efficiency calculation.");
     }
-
-    // Draw efficiency on canvas and update it
-    canvas->Clear();
-    canvas->cd();
-    (*efficiencyPtr)->Draw();
-    canvas->Modified();
   }
 
 }
@@ -244,46 +245,46 @@ void DQMHistAnalysisTRGEFFModule::endRun()
       // Check consistency and create a new TEfficiency for rebinned histograms
       if (TEfficiency::CheckConsistency(*histFtdfRebinned, *histRebinned)) {
         efficiencyRebinnedPtr = new TEfficiency(*histFtdfRebinned, *histRebinned);
+
+        // Clean the name: remove "TRGEFF/" prefix and "_psnecl" suffix for the name in m_efficiencyList
+        std::string cleanName = name;
+
+        // Find and erase "TRGEFF/" if it exists
+        size_t prefixPos = cleanName.find("TRGEFF/");
+        if (prefixPos != std::string::npos) {
+          cleanName.erase(prefixPos, std::string("TRGEFF/").length());  // Remove "TRGEFF/"
+        }
+
+        // Find and erase "_psnecl" if it exists
+        size_t suffixPos = cleanName.find("_psnecl");
+        if (suffixPos != std::string::npos) {
+          cleanName.erase(suffixPos, std::string("_psnecl").length());  // Remove "_psnecl"
+        }
+
+        int nbins = efficiencyRebinnedPtr->GetTotalHistogram()->GetNbinsX();
+        for (int i = 1; i <= nbins; i++) {
+          char varName[100];
+          sprintf(varName, "%s_%i", cleanName.c_str(), i);
+          B2DEBUG(1, "The name for MonitoringObject histogram is " << varName << "  " << efficiencyRebinnedPtr->GetEfficiency(
+                    i) << "   " << efficiencyRebinnedPtr->GetEfficiencyErrorUp(i) << "   " << efficiencyRebinnedPtr->GetEfficiencyErrorLow(i));
+          m_mon_trgeff->setVariable(varName,
+                                    efficiencyRebinnedPtr->GetEfficiency(i),
+                                    efficiencyRebinnedPtr->GetEfficiencyErrorUp(i),
+                                    efficiencyRebinnedPtr->GetEfficiencyErrorLow(i));
+        }
+
+        if (efficiencyRebinnedPtr != nullptr) {
+          delete efficiencyRebinnedPtr;
+        }
+
+        // Delete the rebinned histograms
+        delete histRebinned;
+        delete histFtdfRebinned;
+
       } else {
         B2WARNING("Rebinned histograms " << histFtdfRebinned->GetName() << " and " << histRebinned->GetName() <<
                   " are not consistent for efficiency calculation.");
       }
-
-      // Clean the name: remove "TRGEFF/" prefix and "_psnecl" suffix for the name in m_efficiencyList
-      std::string cleanName = name;
-
-      // Find and erase "TRGEFF/" if it exists
-      size_t prefixPos = cleanName.find("TRGEFF/");
-      if (prefixPos != std::string::npos) {
-        cleanName.erase(prefixPos, std::string("TRGEFF/").length());  // Remove "TRGEFF/"
-      }
-
-      // Find and erase "_psnecl" if it exists
-      size_t suffixPos = cleanName.find("_psnecl");
-      if (suffixPos != std::string::npos) {
-        cleanName.erase(suffixPos, std::string("_psnecl").length());  // Remove "_psnecl"
-      }
-
-      int nbins = efficiencyRebinnedPtr->GetTotalHistogram()->GetNbinsX();
-      for (int i = 1; i <= nbins; i++) {
-        char varName[100];
-        sprintf(varName, "%s_%i", cleanName.c_str(), i);
-        B2DEBUG(1, "The name for MonitoringObject histogram is " << varName << "  " << efficiencyRebinnedPtr->GetEfficiency(
-                  i) << "   " << efficiencyRebinnedPtr->GetEfficiencyErrorUp(i) << "   " << efficiencyRebinnedPtr->GetEfficiencyErrorLow(i));
-        m_mon_trgeff->setVariable(varName,
-                                  efficiencyRebinnedPtr->GetEfficiency(i),
-                                  efficiencyRebinnedPtr->GetEfficiencyErrorUp(i),
-                                  efficiencyRebinnedPtr->GetEfficiencyErrorLow(i));
-      }
-
-      if (efficiencyRebinnedPtr != nullptr) {
-        delete efficiencyRebinnedPtr;
-      }
-
-      // Delete the rebinned histograms
-      delete histRebinned;
-      delete histFtdfRebinned;
-
     } else {
       B2WARNING(std::string("Efficiency histogram is null for ") + name);
     }

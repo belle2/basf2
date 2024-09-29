@@ -1009,7 +1009,6 @@ void DQMHistAnalysisSVDOccupancyModule::terminate()
 
   delete m_hOnlineOccupancyU;
   delete m_cOnlineOccupancyU;
-  delete m_hOnlineOccupancyV;
   delete m_cOnlineOccupancyV;
 
   delete m_cOccupancyChartChip;

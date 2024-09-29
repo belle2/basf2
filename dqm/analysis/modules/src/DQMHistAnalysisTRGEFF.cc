@@ -182,6 +182,7 @@ void DQMHistAnalysisTRGEFFModule::event()
 
     } else {
       B2WARNING("Histograms " << histFtdf->GetName() << " and " << hist->GetName() << " are not consistent for efficiency calculation.");
+      canvas->Clear();
     }
   }
 
@@ -277,14 +278,14 @@ void DQMHistAnalysisTRGEFFModule::endRun()
           delete efficiencyRebinnedPtr;
         }
 
-        // Delete the rebinned histograms
-        delete histRebinned;
-        delete histFtdfRebinned;
-
       } else {
         B2WARNING("Rebinned histograms " << histFtdfRebinned->GetName() << " and " << histRebinned->GetName() <<
                   " are not consistent for efficiency calculation.");
       }
+      // Delete the rebinned histograms
+      delete histRebinned;
+      delete histFtdfRebinned;
+
     } else {
       B2WARNING(std::string("Efficiency histogram is null for ") + name);
     }

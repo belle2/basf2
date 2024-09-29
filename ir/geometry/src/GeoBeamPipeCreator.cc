@@ -391,9 +391,9 @@ namespace Belle2 {
           geo_Lv2VacuumPart3_3);
       // Part1+2+3
 //      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(0., 0., 0.);
-      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(-0.5, 0., 0.);
+      G4Transform3D transform_Lv2VacuumPart3 = G4Translate3D(-(67.5 + 85) * sin(Lv2Vacuum_A1), 0., (67.5 + 85) * cos(Lv2Vacuum_A1));
       // A11 instead of A1
-      transform_Lv2VacuumPart3 = transform_Lv2VacuumPart3 * G4RotateY3D(-A11);
+      transform_Lv2VacuumPart3 = transform_Lv2VacuumPart3 * G4RotateY3D(M_PI - Lv2Vacuum_A1);
       G4UnionSolid* geo_Lv2Vacuumxx = new G4UnionSolid("geo_Lv2Vacuumxx_name", geo_Lv2VacuumPart1, geo_Lv2VacuumPart3,
                                                        transform_Lv2VacuumPart3);
       G4Transform3D transform_Lv2VacuumPart2 = G4Translate3D(Lv2Vacuum_L3 * sin(Lv2Vacuum_A2), 0.,

@@ -23,7 +23,7 @@ void BeamPipeGeo::initialize(const GearDir& content)
 
   addParameter("LimitStepLength", content.getInt("LimitStepLength"));
 
-  std::vector<std::string> names = {"Lv1SUS", "Lv2OutTi", "Lv2OutBe", "Lv2InBe", "Lv2Paraf", "Lv2Vacuum", "Lv3AuCoat", "Lv1TaFwd", "Lv2VacFwd", "Lv1TaBwd", "Lv2VacBwd", "Flange", "AreaTubeFwd", "Lv1TaLERUp", "Lv1SUSLERUp", "Lv2VacLERUp", "Lv1TaHERDwn", "Lv1SUSHERDwn", "Lv2VacHERDwn", "AreaTubeBwd", "Lv1TaHERUp", "Lv1SUSHERUp", "Lv2VacHERUp", "Lv1TaLERDwn", "Lv1SUSLERDwn", "Lv2VacLERDwn", "PXDMountFwd", "PXDMountBwd", "PXDMountFixtureFwd", "PXDMountFixtureBwd", "GoldLayer1", "GoldLayer2"};
+  std::vector<std::string> names = {"Lv1SUS", "Lv2OutTi", "Lv2OutBe", "Lv2InBe", "Lv2Paraf", "Lv2Vacuum", "Lv3AuCoat", "Lv1TaFwd", "Lv2VacFwd", "Lv1TaBwd", "Lv2VacBwd", "Flange", "AreaTubeFwd", "Lv1TaLERUp", "Lv1SUSLERUp", "Lv2VacLERUp", "Lv1TaHERDwn", "Lv1SUSHERDwn", "Lv2VacHERDwn", "AreaTubeBwd", "Lv1TaHERUp", "Lv1SUSHERUp", "Lv2VacHERUp", "Lv1TaLERDwn", "Lv1SUSLERDwn", "Lv2VacLERDwn", "PXDMountFwd", "PXDMountBwd", "PXDMountFixtureFwd", "PXDMountFixtureBwd", "Lv2AuCoat", "GoldLayer1", "GoldLayer2"};
 
   for (auto name : names) {
     GearDir sect(content, name + "/");

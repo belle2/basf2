@@ -199,6 +199,10 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             pathLocation="after filter",
         )
 
+        path.add_module("StatisticsTimingHLTDQM",
+                        histogramDirectoryName="timing_statistics_after_filter"
+                        )
+
         path.add_module("TrackingAbortDQM")
 
         path.add_module("DetectorOccupanciesDQM")

@@ -192,12 +192,16 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(
             "SoftwareTriggerHLTDQM",
             cutResultIdentifiers=cutResultIdentifiers,
-            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp", "passive_veto"],
             additionalL1Identifiers=additionalL1Identifiers,
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
             pathLocation="after filter",
         )
+
+        path.add_module("StatisticsTimingHLTDQM",
+                        histogramDirectoryName="timing_statistics_after_filter"
+                        ).set_name("StatisticsTimingHLTDQM_after_filter")
 
         path.add_module("TrackingAbortDQM")
 

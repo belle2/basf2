@@ -100,16 +100,11 @@ namespace Belle2 {
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 
-    TH2F* m_hOnlineOccupancyU = nullptr; /**< online occupancy U histo */
-    TH2F* m_hOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyU = nullptr; /**< online occupancy U histo canvas */
     TCanvas* m_cOnlineOccupancyU3Samples = nullptr; /**< online occupancy U histo canvas for 3 samples*/
-    TH2F* m_hOnlineOccupancyV = nullptr; /**< online Occupancy V histo */
-    TH2F* m_hOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo  for 3 sample*/
     TCanvas* m_cOnlineOccupancyV = nullptr; /**< online Occupancy V histo canvas */
     TCanvas* m_cOnlineOccupancyV3Samples = nullptr; /**< online Occupancy V histo canvas  for 3 samples*/
 
-    const int nSensors = 172; /**< total number of sensors */
     int m_sensors = 0; /**< number of sensors to considired*/
     TH1F m_hStripOccupancyU[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyU = nullptr; /**< u-side strip chart occupancy canvas*/

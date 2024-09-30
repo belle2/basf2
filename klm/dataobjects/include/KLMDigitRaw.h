@@ -130,7 +130,7 @@ namespace Belle2 {
      */
     uint16_t getFlag() const
     {
-      return m_word1 >> 13;
+      return KLM::RawData::unpackType(m_word1);
     }
 
     /**

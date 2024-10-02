@@ -104,6 +104,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   LambdaTree->Branch<double>("ProtonKaonIDSVDonly", &m_protonKaonIDSVDonly);
   LambdaTree->Branch<double>("ProtonProtonIDSVDonly", &m_protonProtonIDSVDonly);
 
+  LambdaTree->Branch<double>("ProtonElectronLLSVDonly", &m_protonElectronLLSVDonly);
+  LambdaTree->Branch<double>("ProtonPionLLSVDonly", &m_protonPionLLSVDonly);
+  LambdaTree->Branch<double>("ProtonKaonLLSVDonly", &m_protonKaonLLSVDonly);
+  LambdaTree->Branch<double>("ProtonProtonLLSVDonly", &m_protonProtonLLSVDonly);
+
   LambdaTree->Branch<double>("ProtonBinaryProtonKaonIDALL", &m_protonBinaryProtonKaonIDALL);
   LambdaTree->Branch<double>("ProtonBinaryProtonPionIDALL", &m_protonBinaryProtonPionIDALL);
   LambdaTree->Branch<double>("ProtonBinaryProtonElectronIDALL", &m_protonBinaryProtonElectronIDALL);
@@ -136,6 +141,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("KaonPionIDSVDonly", &m_kaonPionIDSVDonly);
   DstarTree->Branch<double>("KaonKaonIDSVDonly", &m_kaonKaonIDSVDonly);
   DstarTree->Branch<double>("KaonProtonIDSVDonly", &m_kaonProtonIDSVDonly);
+
+  DstarTree->Branch<double>("KaonElectronLLSVDonly", &m_kaonElectronLLSVDonly);
+  DstarTree->Branch<double>("KaonPionLLSVDonly", &m_kaonPionLLSVDonly);
+  DstarTree->Branch<double>("KaonKaonLLSVDonly", &m_kaonKaonLLSVDonly);
+  DstarTree->Branch<double>("KaonProtonLLSVDonly", &m_kaonProtonLLSVDonly);
 
   DstarTree->Branch<double>("KaonBinaryKaonProtonIDALL", &m_kaonBinaryKaonProtonIDALL);
   DstarTree->Branch<double>("KaonBinaryKaonPionIDALL", &m_kaonBinaryKaonPionIDALL);
@@ -170,6 +180,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("PionDKaonIDSVDonly", &m_pionDKaonIDSVDonly);
   DstarTree->Branch<double>("PionDProtonIDSVDonly", &m_pionDProtonIDSVDonly);
 
+  DstarTree->Branch<double>("PionDElectronLLSVDonly", &m_pionDElectronLLSVDonly);
+  DstarTree->Branch<double>("PionDPionLLSVDonly", &m_pionDPionLLSVDonly);
+  DstarTree->Branch<double>("PionDKaonLLSVDonly", &m_pionDKaonLLSVDonly);
+  DstarTree->Branch<double>("PionDProtonLLSVDonly", &m_pionDProtonLLSVDonly);
+
   DstarTree->Branch<double>("PionDBinaryPionProtonIDALL", &m_pionDBinaryPionProtonIDALL);
   DstarTree->Branch<double>("PionDBinaryPionKaonIDALL", &m_pionDBinaryPionKaonIDALL);
   DstarTree->Branch<double>("PionDBinaryPionElectronIDALL", &m_pionDBinaryPionElectronIDALL);
@@ -203,6 +218,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("SlowPionKaonIDSVDonly", &m_slowPionKaonIDSVDonly);
   DstarTree->Branch<double>("SlowPionProtonIDSVDonly", &m_slowPionProtonIDSVDonly);
 
+  DstarTree->Branch<double>("SlowPionElectronLLSVDonly", &m_slowPionElectronLLSVDonly);
+  DstarTree->Branch<double>("SlowPionPionLLSVDonly", &m_slowPionPionLLSVDonly);
+  DstarTree->Branch<double>("SlowPionKaonLLSVDonly", &m_slowPionKaonLLSVDonly);
+  DstarTree->Branch<double>("SlowPionProtonLLSVDonly", &m_slowPionProtonLLSVDonly);
+
   DstarTree->Branch<double>("SlowPionBinaryPionProtonIDALL", &m_slowPionBinaryPionProtonIDALL);
   DstarTree->Branch<double>("SlowPionBinaryPionKaonIDALL", &m_slowPionBinaryPionKaonIDALL);
   DstarTree->Branch<double>("SlowPionBinaryPionElectronIDALL", &m_slowPionBinaryPionElectronIDALL);
@@ -235,6 +255,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   GammaTree->Branch<double>("FirstElectronPionIDSVDonly", &m_firstElectronPionIDSVDonly);
   GammaTree->Branch<double>("FirstElectronKaonIDSVDonly", &m_firstElectronKaonIDSVDonly);
   GammaTree->Branch<double>("FirstElectronProtonIDSVDonly", &m_firstElectronProtonIDSVDonly);
+
+  GammaTree->Branch<double>("FirstElectronElectronLLSVDonly", &m_firstElectronElectronLLSVDonly);
+  GammaTree->Branch<double>("FirstElectronPionLLSVDonly", &m_firstElectronPionLLSVDonly);
+  GammaTree->Branch<double>("FirstElectronKaonLLSVDonly", &m_firstElectronKaonLLSVDonly);
+  GammaTree->Branch<double>("FirstElectronProtonLLSVDonly", &m_firstElectronProtonLLSVDonly);
 
   GammaTree->Branch<double>("FirstElectronBinaryElectronProtonIDALL", &m_firstElectronBinaryElectronProtonIDALL);
   GammaTree->Branch<double>("FirstElectronBinaryElectronKaonIDALL", &m_firstElectronBinaryElectronKaonIDALL);
@@ -309,6 +334,11 @@ void SVDdEdxValidationCollectorModule::collect()
   static Manager::FunctionPtr binaryPionElectronPIDSVDOnlyFunction = pidPairProbabilityExpert({"211", "11", "SVD"});
   static Manager::FunctionPtr binaryElectronPionPIDSVDOnlyFunction = pidPairProbabilityExpert({"11", "211", "SVD"});
 
+  static Manager::FunctionPtr electronLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"11", "SVD"});
+  static Manager::FunctionPtr pionLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"211", "SVD"});
+  static Manager::FunctionPtr kaonLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"321", "SVD"});
+  static Manager::FunctionPtr protonLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"2212", "SVD"});
+
   if (LambdaParticles->getListSize() > 0) {
     for (unsigned int iParticle = 0; iParticle < LambdaParticles->getListSize(); ++iParticle) {
 
@@ -345,6 +375,10 @@ void SVDdEdxValidationCollectorModule::collect()
       m_protonPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partPFromLambda));
       m_protonKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partPFromLambda));
       m_protonProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partPFromLambda));
+      m_protonElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partPFromLambda));
+      m_protonPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partPFromLambda));
+      m_protonKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partPFromLambda));
+      m_protonProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partPFromLambda));
 
       m_protonBinaryProtonKaonIDALL = Variable::binaryPID(partPFromLambda, {2212., 321.});
       m_protonBinaryProtonPionIDALL = Variable::binaryPID(partPFromLambda, {2212., 211.});
@@ -427,6 +461,11 @@ void SVDdEdxValidationCollectorModule::collect()
       m_kaonPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partKFromD));
       m_kaonKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partKFromD));
       m_kaonProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partKFromD));
+      m_kaonElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partKFromD));
+      m_kaonPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partKFromD));
+      m_kaonKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partKFromD));
+      m_kaonProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partKFromD));
+
 
       m_kaonBinaryKaonProtonIDALL = Variable::binaryPID(partKFromD, {321., 2212.});
       m_kaonBinaryKaonPionIDALL = Variable::binaryPID(partKFromD, {321., 211.});
@@ -462,6 +501,10 @@ void SVDdEdxValidationCollectorModule::collect()
       m_pionDPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partPiFromD));
       m_pionDKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partPiFromD));
       m_pionDProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partPiFromD));
+      m_pionDElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partPiFromD));
+      m_pionDPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partPiFromD));
+      m_pionDKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partPiFromD));
+      m_pionDProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partPiFromD));
 
       m_pionDBinaryPionProtonIDALL = Variable::binaryPID(partPiFromD, {211., 2212.});
       m_pionDBinaryPionKaonIDALL = Variable::binaryPID(partPiFromD, {211., 321.});
@@ -496,6 +539,11 @@ void SVDdEdxValidationCollectorModule::collect()
       m_slowPionPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partPiS));
       m_slowPionKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partPiS));
       m_slowPionProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partPiS));
+      m_slowPionElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partPiS));
+      m_slowPionPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partPiS));
+      m_slowPionKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partPiS));
+      m_slowPionProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partPiS));
+
 
       m_slowPionBinaryPionProtonIDALL = Variable::binaryPID(partPiS, {211., 2212.});
       m_slowPionBinaryPionKaonIDALL = Variable::binaryPID(partPiS, {211., 321.});
@@ -562,6 +610,10 @@ void SVDdEdxValidationCollectorModule::collect()
       m_firstElectronPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partE1FromGamma));
       m_firstElectronKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partE1FromGamma));
       m_firstElectronProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partE1FromGamma));
 
       m_firstElectronBinaryElectronProtonIDALL = Variable::binaryPID(partE1FromGamma, {11., 2212.});
       m_firstElectronBinaryElectronKaonIDALL = Variable::binaryPID(partE1FromGamma, {11., 321.});

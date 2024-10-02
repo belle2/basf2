@@ -129,6 +129,35 @@ namespace Belle2 {
     double m_secondElectronKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the e- from gamma */
     double m_secondElectronProtonIDSVDonly;  /**<  proton ID value (only SVD) for the e- from gamma */
 
+    double m_protonElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the proton from Lambda */
+    double m_protonPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the proton from Lambda */
+    double m_protonKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the proton from Lambda */
+    double m_protonProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the proton from Lambda */
+
+    double m_kaonElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the K from D */
+    double m_kaonPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the K from D */
+    double m_kaonKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the K from D */
+    double m_kaonProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the K from D */
+
+    double m_pionDElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the pi from D */
+    double m_pionDPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the pi from D */
+    double m_pionDKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the pi from D */
+    double m_pionDProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the pi from D */
+
+    double m_slowPionElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the pi from Dstar */
+    double m_slowPionPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the pi from Dstar */
+    double m_slowPionKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the pi from Dstar */
+    double m_slowPionProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the pi from Dstar */
+
+    double m_firstElectronElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the e+ from gamma */
+    double m_firstElectronPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the e+ from gamma */
+    double m_firstElectronKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the e+ from gamma */
+    double m_firstElectronProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the e+ from gamma */
+
+    double m_secondElectronElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the e- from gamma */
+    double m_secondElectronPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the e- from gamma */
+    double m_secondElectronKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the e- from gamma */
+    double m_secondElectronProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the e- from gamma */
 
     double m_protonElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the p from Lambda */
     double m_protonPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the p from Lambda */

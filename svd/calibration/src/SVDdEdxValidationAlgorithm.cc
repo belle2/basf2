@@ -170,6 +170,40 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalPIDDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalPIDDistribution->SetMaximum(1.35 * hSignalPIDDistribution->GetMaximum());
 
+    SignalTree->Draw(Form("%sElectronLLSVDonly>>hSignalElectronLLDistribution(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalElectronLLDistribution = (TH1F*)gDirectory->Get("hSignalElectronLLDistribution");
+    SignalTree->Draw(Form("%sPionLLSVDonly>>hSignalPionLLDistribution(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalPionLLDistribution = (TH1F*)gDirectory->Get("hSignalPionLLDistribution");
+    SignalTree->Draw(Form("%sKaonLLSVDonly>>hSignalKaonLLDistribution(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalKaonLLDistribution = (TH1F*)gDirectory->Get("hSignalKaonLLDistribution");
+    SignalTree->Draw(Form("%sProtonLLSVDonly>>hSignalProtonLLDistribution(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalProtonLLDistribution = (TH1F*)gDirectory->Get("hSignalProtonLLDistribution");
+
+    hSignalElectronLLDistribution->Scale(1. / hSignalElectronLLDistribution->Integral());
+    hSignalPionLLDistribution->Scale(1. / hSignalPionLLDistribution->Integral());
+    hSignalKaonLLDistribution->Scale(1. / hSignalKaonLLDistribution->Integral());
+    hSignalProtonLLDistribution->Scale(1. / hSignalProtonLLDistribution->Integral());
+
+    hSignalElectronLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
+    hSignalElectronLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalElectronLLDistribution->SetMaximum(1.35 * hSignalElectronLLDistribution->GetMaximum());
+
+    hSignalPionLLDistribution->GetXaxis()->SetTitle(PIDVarName + "PionLLSVDonly");
+    hSignalPionLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalPionLLDistribution->SetMaximum(1.35 * hSignalPionLLDistribution->GetMaximum());
+
+    hSignalKaonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "KaonLLSVDonly");
+    hSignalKaonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalKaonLLDistribution->SetMaximum(1.35 * hSignalKaonLLDistribution->GetMaximum());
+
+    hSignalProtonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
+    hSignalProtonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalProtonLLDistribution->SetMaximum(1.35 * hSignalProtonLLDistribution->GetMaximum());
+
     TCanvas* DistribCanvas = new TCanvas("DistribCanvas", "", 600, 600);
     gPad->SetTopMargin(0.05);
     gPad->SetRightMargin(0.05);
@@ -178,7 +212,7 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
 
     hSignalPIDDistribution->SetLineWidth(2);
     hSignalPIDDistribution->SetLineColor(TColor::GetColor("#2166ac"));
-    hSignalPIDDistribution->Draw("hist ");
+    hSignalPIDDistribution->Draw("hist");
 
     DistribCanvas->Print("SVDdEdxValidation_Distribution_" + SignalVarNameFull + PIDVarName + PIDDetectorsName +
                          "_MomRange_" +
@@ -186,6 +220,26 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                            MomLow)
                          .substr(0, 3) +
                          "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
+
+
+    TCanvas* LLCanvas = new TCanvas("LLCanvas", "", 900, 700);
+    LLCanvas->Divide(2, 2, 0, 0);
+    LLCanvas->cd(1);
+    hSignalElectronLLDistribution->Draw("hist");
+    LLCanvas->cd(2);
+    hSignalPionLLDistribution->Draw("hist");
+    LLCanvas->cd(3);
+    hSignalKaonLLDistribution->Draw("hist");
+    LLCanvas->cd(4);
+    hSignalProtonLLDistribution->Draw("hist");
+
+    LLCanvas->Print("SVDdEdxValidation_LLDistributions_" + SignalVarNameFull +
+                    "_SVDonly_MomRange_" +
+                    std::to_string(
+                      MomLow)
+                    .substr(0, 3) +
+                    "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
+
     TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull + PIDVarName + PIDDetectorsName +
                       "_MomRange_" +
                       std::to_string(
@@ -197,6 +251,18 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalPIDDistribution->Write();
     DistribFile.Close();
     delete DistribCanvas;
+
+    TFile LLDistribFile(TString("SVDdEdxValidation_LLDistributions_" + SignalVarNameFull + "_SVDonly_MomRange_" +
+                                std::to_string(
+                                  MomLow)
+                                .substr(0, 3) +
+                                "_" + std::to_string(MomHigh).substr(0, 3) + ".root"),
+                        "RECREATE");
+    hSignalElectronLLDistribution->Write();
+    hSignalPionLLDistribution->Write();
+    hSignalKaonLLDistribution->Write();
+    hSignalProtonLLDistribution->Write();
+    LLDistribFile.Close();
   }
 
   // ---------- Momentum distributions (for efficiency determination) ----------
@@ -544,6 +610,11 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   RooRealVar ProtonProtonIDSVDonly("ProtonProtonIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar ProtonProtonIDnoSVD("ProtonProtonIDnoSVD", "", -1.e8, 1.e8);
 
+  RooRealVar ProtonElectronLLSVDonly("ProtonElectronLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonPionLLSVDonly("ProtonPionLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonKaonLLSVDonly("ProtonKaonLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar ProtonProtonLLSVDonly("ProtonProtonLLSVDonly", "", -1.e8, 1.e8);
+
   RooRealVar ProtonBinaryProtonPionIDALL("ProtonBinaryProtonPionIDALL", "", -1.e8, 1.e8);
   RooRealVar ProtonBinaryProtonPionIDSVDonly("ProtonBinaryProtonPionIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar ProtonBinaryProtonPionIDnoSVD("ProtonBinaryProtonPionIDnoSVD", "", -1.e8, 1.e8);
@@ -580,6 +651,10 @@ TTree* SVDdEdxValidationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTr
   variables->add(ProtonProtonIDALL);
   variables->add(ProtonProtonIDSVDonly);
   variables->add(ProtonProtonIDnoSVD);
+  variables->add(ProtonElectronLLSVDonly);
+  variables->add(ProtonPionLLSVDonly);
+  variables->add(ProtonKaonLLSVDonly);
+  variables->add(ProtonProtonLLSVDonly);
   variables->add(ProtonBinaryProtonPionIDALL);
   variables->add(ProtonBinaryProtonPionIDSVDonly);
   variables->add(ProtonBinaryProtonPionIDnoSVD);
@@ -751,6 +826,11 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   RooRealVar KaonElectronIDSVDonly("KaonElectronIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar KaonElectronIDnoSVD("KaonElectronIDnoSVD", "", -1.e8, 1.e8);
 
+  RooRealVar KaonElectronLLSVDonly("KaonElectronLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonPionLLSVDonly("KaonPionLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonKaonLLSVDonly("KaonKaonLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar KaonProtonLLSVDonly("KaonProtonLLSVDonly", "", -1.e8, 1.e8);
+
   RooRealVar KaonBinaryKaonPionIDALL("KaonBinaryKaonPionIDALL", "", -1.e8, 1.e8);
   RooRealVar KaonBinaryKaonPionIDSVDonly("KaonBinaryKaonPionIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar KaonBinaryKaonPionIDnoSVD("KaonBinaryKaonPionIDnoSVD", "", -1.e8, 1.e8);
@@ -783,6 +863,11 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   RooRealVar PionDProtonIDSVDonly("PionDProtonIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar PionDProtonIDnoSVD("PionDProtonIDnoSVD", "", -1.e8, 1.e8);
 
+  RooRealVar PionDElectronLLSVDonly("PionDElectronLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDPionLLSVDonly("PionDPionLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDKaonLLSVDonly("PionDKaonLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar PionDProtonLLSVDonly("PionDProtonLLSVDonly", "", -1.e8, 1.e8);
+
   RooRealVar PionDBinaryPionKaonIDALL("PionDBinaryPionKaonIDALL", "", -1.e8, 1.e8);
   RooRealVar PionDBinaryPionKaonIDSVDonly("PionDBinaryPionKaonIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar PionDBinaryPionKaonIDnoSVD("PionDBinaryPionKaonIDnoSVD", "", -1.e8, 1.e8);
@@ -814,6 +899,11 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   RooRealVar SlowPionProtonIDALL("SlowPionProtonIDALL", "", -1.e8, 1.e8);
   RooRealVar SlowPionProtonIDSVDonly("SlowPionProtonIDSVDonly", "", -1.e8, 1.e8);
   RooRealVar SlowPionProtonIDnoSVD("SlowPionProtonIDnoSVD", "", -1.e8, 1.e8);
+
+  RooRealVar SlowPionElectronLLSVDonly("SlowPionElectronLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionPionLLSVDonly("SlowPionPionLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionKaonLLSVDonly("SlowPionKaonLLSVDonly", "", -1.e8, 1.e8);
+  RooRealVar SlowPionProtonLLSVDonly("SlowPionProtonLLSVDonly", "", -1.e8, 1.e8);
 
   RooRealVar SlowPionBinaryPionKaonIDALL("SlowPionBinaryPionKaonIDALL", "", -1.e8, 1.e8);
   RooRealVar SlowPionBinaryPionKaonIDSVDonly("SlowPionBinaryPionKaonIDSVDonly", "", -1.e8, 1.e8);
@@ -854,6 +944,12 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(KaonElectronIDALL);
   variables->add(KaonElectronIDSVDonly);
   variables->add(KaonElectronIDnoSVD);
+
+  variables->add(KaonElectronLLSVDonly);
+  variables->add(KaonPionLLSVDonly);
+  variables->add(KaonKaonLLSVDonly);
+  variables->add(KaonProtonLLSVDonly);
+
   variables->add(KaonBinaryKaonPionIDALL);
   variables->add(KaonBinaryKaonPionIDSVDonly);
   variables->add(KaonBinaryKaonPionIDnoSVD);
@@ -879,6 +975,12 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(PionDProtonIDALL);
   variables->add(PionDProtonIDSVDonly);
   variables->add(PionDProtonIDnoSVD);
+
+  variables->add(PionDElectronLLSVDonly);
+  variables->add(PionDPionLLSVDonly);
+  variables->add(PionDKaonLLSVDonly);
+  variables->add(PionDProtonLLSVDonly);
+
   variables->add(PionDBinaryPionKaonIDALL);
   variables->add(PionDBinaryPionKaonIDSVDonly);
   variables->add(PionDBinaryPionKaonIDnoSVD);
@@ -904,6 +1006,12 @@ TTree* SVDdEdxValidationAlgorithm::DstarMassFit(std::shared_ptr<TTree> preselTre
   variables->add(SlowPionProtonIDALL);
   variables->add(SlowPionProtonIDSVDonly);
   variables->add(SlowPionProtonIDnoSVD);
+
+  variables->add(SlowPionElectronLLSVDonly);
+  variables->add(SlowPionPionLLSVDonly);
+  variables->add(SlowPionKaonLLSVDonly);
+  variables->add(SlowPionProtonLLSVDonly);
+
   variables->add(SlowPionBinaryPionKaonIDALL);
   variables->add(SlowPionBinaryPionKaonIDSVDonly);
   variables->add(SlowPionBinaryPionKaonIDnoSVD);

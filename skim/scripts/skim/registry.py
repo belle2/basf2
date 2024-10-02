@@ -170,6 +170,8 @@ _RegisteredSkims = [
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
+    ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
+
 
 
     # --- WG8: Dark matter searches and tau physics ---

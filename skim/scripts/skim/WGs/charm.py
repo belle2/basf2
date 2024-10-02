@@ -1836,3 +1836,355 @@ class DpToEtaHp(BaseSkim):
         DpList.append("D+:DpToEtaHp_3Pi")
 
         return DpList
+
+
+@fancy_skim_header
+class LambdacToGeneric(BaseSkim):
+    """
+    **Decay Modes**:
+        * :math:`D^{*+}\\to D^0 \\pi^{+}` and :math:`D^{*+}\\to D^{+} \\pi^{0}` (tag side)
+        * :math:`D^{*0}\\to D^0 \\pi^{0}` and :math:`D^{*0}\\to D^{0} \\gamma` (tag side)
+        * :math:`D_s^{*+}\\to D_s^{+} \\gamma` (tag side)
+        * 6 hadronic channels for tag :math:`D^{0}` reconstruction
+        * 6 hadronic channels for tag :math:`D^{+}` reconstruction
+        * 5 hadronic channels for tag :math:`D_{s}^{+}` reconstruction
+
+    **Selection Criteria**:
+        * Cut on :math:`\\pi^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0
+        * Cut on :math:`\\K^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and kaonID > 0.2
+        * Cut on :math:`p^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and protonID > 0.2
+        * Cut on :math:`\\gamma` : E > 0.10
+        * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma`: pi0:skim
+        * Cut on tag side :math:`D^{0}` : channel dependent mass window and p* > 1.8
+        * Cut on tag side :math:`D^{+}` : channel dependent mass window and p* > 1.8
+        * Cut on tag side :math:`D_{s}^{+}` : channel dependent mass window and p* > 1.8
+        * 0.120 < massDifference(0) < 0.176 on decay with :math:`\\pi_{s}^{+}` on :math:`D_{tag}^{*}`
+        * 0.114 < massDifference(0) < 0.176 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
+        * 0.104 < massDifference(0) < 0.190 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
+        * 1.4 < M < 3.4 and p* > 1.8 on signal side :math:`\\Lambda_{c}^{+}`
+    """
+
+    __authors__ = ["Lukas Bierwirth"]
+    __description__ = "Skim list for inclusive Lambda_c+ decays."
+    __contact__ = __liaison__
+    __category__ = "physics, charm"
+
+    NoisyModules = ["ParticleLoader", "RootOutput"]
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        loadStdSkimPi0(path=path)
+
+    def build_lists(self, path):
+
+        def batchReconstructDecays(
+                channels, outputList=None, allowChargeViolation=False, path=None
+                ):
+            for key in channels:
+                ma.reconstructDecay(
+                    decayString=channels[key].decay_string,
+                    cut=channels[key].cut,
+                    allowChargeViolation=allowChargeViolation,
+                    path=path,
+                )
+            if outputList:
+                ma.copyLists(outputList, list(channels.keys()), path=path)
+            return 0
+
+        class Channel:
+            def __init__(self, decay_string, cut):
+                self.decay_string = decay_string
+                self.cut = cut
+
+        suffix = "_Lambdac_inc_skim"
+
+        dummy = f"B+:dummy{suffix}"
+        antiDummy = f"B-:dummy{suffix}"
+
+        M_factor = 1.2
+        p_cms = 1.8
+
+        ma.fillParticleListFromDummy(
+            dummy, mdstIndex=0, covMatrix=-1, treatAsInvisible=False, path=path
+        )
+
+        ma.fillParticleList(
+             f"gamma:tag{suffix}",
+             """[[clusterNHits>1.5] and [0.2967< clusterTheta<2.6180]] and
+             [[clusterReg==1 and E>0.080] or [clusterReg==2 and E>0.030] or [clusterReg==3 and E>0.060]]""",
+             path=path,
+         )
+
+        ipCut = "[dr < 0.5] and [abs(dz) < 2]"
+
+        gammaCut = "[E > 0.10]"
+
+        ma.fillParticleList(f"pi+:noPID{suffix}", "", path=path)
+        ma.fillParticleList(f"K+:pidOnly{suffix}", "[kaonID > 0.1]", path=path)
+        ma.fillParticleList(f"p+:pidOnly{suffix}", "[protonID > 0.1]", path=path)
+
+        ma.cutAndCopyList(f"pi+:ip{suffix}", f"pi+:noPID{suffix}", ipCut, path=path)
+        ma.cutAndCopyList(f"K+:ip{suffix}", f"K+:pidOnly{suffix}", ipCut, path=path)
+        ma.cutAndCopyList(f"p+:ip{suffix}", f"p+:pidOnly{suffix}", ipCut, path=path)
+
+        ma.cutAndCopyList(f"pi+:base{suffix}", f"pi+:ip{suffix}", "", path=path)
+        ma.cutAndCopyList(f"K+:base{suffix}", f"K+:ip{suffix}", "kaonID > 0.2", path=path)
+        ma.cutAndCopyList(f"p+:base{suffix}", f"p+:ip{suffix}", "protonID > 0.2", path=path)
+
+        ma.cutAndCopyList(f"pi0:tag{suffix}", "pi0:skim", "", path=path)
+
+        ma.fillParticleList(
+            f"K_S0:pi+pi-{suffix} -> pi+ pi-", "0.25 < M < 0.84", path=path
+            )
+
+        massCut = {
+            "D_s*+:D_s+gamma": f"[{2.078/M_factor} < M < {2.138*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D_s+:K_S0K-pi+pi+": f"[{1.938/M_factor} < M < {1.988*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D_s+:K+K-pi+pi0": f"[{1.936/M_factor} < M < {1.991*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D_s+:K_S0K_S0pi+": f"[{1.921/M_factor} < M < {2.001*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D_s+:K_S0K+": f"[{1.934/M_factor} < M < {1.994*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D_s+:K+K-pi+": f"[{1.954/M_factor} < M < {1.979*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D*+:D+pi0": f"[{1.976/M_factor} < M < {2.031*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D*+:D0pi+": f"[{1.970/M_factor} < M < {2.035*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:K+K-pi+": f"[{1.857/M_factor} < M < {1.882*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:K_S0pi+pi+pi-": f"[{1.836/M_factor} < M < {1.896*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:K_S0pi+pi0": f"[{1.810/M_factor} < M < {1.905*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:K_S0pi+": f"[{1.830/M_factor} < M < {1.900*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:K-pi+pi+pi0": f"[{1.830/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:K-pi+pi+": f"[{1.850/M_factor} < M < {1.885*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D*0:D0gamma": f"[{1.962/M_factor} < M < {2.032*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D*0:D0pi0": f"[{1.972/M_factor} < M < {2.032*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:K_S0pi+pi-pi0": f"[{1.820/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:K_S0pi+pi-": f"[{1.825/M_factor} < M < {1.890*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:K-pi+pi+pi-pi0": f"[{1.836/M_factor} < M < {1.886*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:K-pi+pi+pi-": f"[{1.845/M_factor} < M < {1.880*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:K-pi+pi0": f"[{1.815/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:K-pi+": f"[{1.845/M_factor} < M < {1.885*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D_s+:allChannels": f"[{1.944/M_factor} < M < {1.989*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D*+:allChannels": f"[{1.970/M_factor} < M < {2.035*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D+:allChannels": f"[{1.835/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D*0:allChannels": f"[{1.967/M_factor} < M < {2.032*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+            "D0:allChannels": f"[{1.825/M_factor} < M < {1.890*M_factor}] and [useCMSFrame(p) > {p_cms}]",
+        }
+
+        massDifferenceCut = {
+            "D*+:D0pi+": "[0.120 < massDifference(0) < 0.176]",
+            "D*0:D0pi0": "[0.114 < massDifference(0) < 0.176]",
+            "D*0:D0gamma": "[0.104 < massDifference(0) < 0.204]",
+            "D*+:D+pi0": "[0.114 < massDifference(0) < 0.176]",
+            "D_s*+:D_s+gamma": "[0.104 < massDifference(0) < 0.204]",
+        }
+
+        channelsDzero = {
+            f"D0:K-pi+{suffix}": Channel(
+                f"D0:K-pi+{suffix} -> K-:base{suffix} pi+:base{suffix}", massCut["D0:K-pi+"]
+            ),
+            f"D0:K-pi+pi0{suffix}": Channel(
+                f"D0:K-pi+pi0{suffix} -> K-:base{suffix} pi+:base{suffix} pi0:tag{suffix}", massCut["D0:K-pi+pi0"]
+            ),
+            f"D0:K-pi+pi+pi-{suffix}": Channel(
+                f"D0:K-pi+pi+pi-{suffix} -> K-:base{suffix} pi+:base{suffix} pi+:base{suffix} pi-:base{suffix}",
+                massCut["D0:K-pi+pi+pi-"],
+            ),
+            f"D0:K-pi+pi+pi-pi0{suffix}": Channel(
+                f"D0:K-pi+pi+pi-pi0{suffix} -> K-:base{suffix} pi+:base{suffix} pi+:base{suffix} pi-:base{suffix} pi0:tag{suffix}",
+                massCut["D0:K-pi+pi+pi-pi0"],
+            ),
+            f"D0:K_S0pi+pi-{suffix}": Channel(
+                f"D0:K_S0pi+pi-{suffix} -> K_S0:pi+pi-{suffix} pi+:base{suffix} pi-:base{suffix}",
+                massCut["D0:K_S0pi+pi-"],
+            ),
+            f"D0:K_S0pi+pi-pi0{suffix}": Channel(
+                f"D0:K_S0pi+pi-pi0{suffix} -> K_S0:pi+pi-{suffix} pi+:base{suffix} pi-:base{suffix} pi0:tag{suffix}",
+                massCut["D0:K_S0pi+pi-pi0"],
+            ),
+        }
+
+        channelsDplus = {
+            f"D+:K-pi+pi+{suffix}": Channel(
+                f"D+:K-pi+pi+{suffix} -> K-:base{suffix} pi+:base{suffix} pi+:base{suffix}", massCut["D+:K-pi+pi+"]
+            ),
+            f"D+:K-pi+pi+pi0{suffix}": Channel(
+                f"D+:K-pi+pi+pi0{suffix} -> K-:base{suffix} pi+:base{suffix} pi+:base{suffix} pi0:tag{suffix}",
+                massCut["D+:K-pi+pi+pi0"],
+            ),
+            f"D+:K_S0pi+{suffix}": Channel(
+                f"D+:K_S0pi+{suffix} -> K_S0:pi+pi-{suffix} pi+:base{suffix}", massCut["D+:K_S0pi+"]
+            ),
+            f"D+:K_S0pi+pi0{suffix}": Channel(
+                f"D+:K_S0pi+pi0{suffix} -> K_S0:pi+pi-{suffix} pi+:base{suffix} pi0:tag{suffix}",
+                massCut["D+:K_S0pi+pi0"],
+            ),
+            f"D+:K_S0pi+pi+pi-{suffix}": Channel(
+                f"D+:K_S0pi+pi+pi-{suffix} -> K_S0:pi+pi-{suffix} pi+:base{suffix} pi+:base{suffix} pi-:base{suffix}",
+                massCut["D+:K_S0pi+pi+pi-"],
+            ),
+            f"D+:K+K-pi+{suffix}": Channel(
+                f"D+:K+K-pi+{suffix} -> K+:base{suffix} K-:base{suffix} pi+:base{suffix}", massCut["D+:K+K-pi+"]
+            ),
+        }
+
+        channelsDstrangeplus = {
+            f"D_s+:K+K-pi+{suffix}": Channel(
+                f"D_s+:K+K-pi+{suffix} -> K+:base{suffix} K-:base{suffix} pi+:base{suffix}", massCut["D_s+:K+K-pi+"]
+            ),
+            f"D_s+:K_S0K+{suffix}": Channel(
+                f"D_s+:K_S0K+{suffix} -> K_S0:pi+pi-{suffix} K+:base{suffix}", massCut["D_s+:K_S0K+"]
+            ),
+            f"D_s+:K_S0K_S0pi+{suffix}": Channel(
+                f"D_s+:K_S0K_S0pi+{suffix} -> K_S0:pi+pi-{suffix} K_S0:pi+pi-{suffix} pi+:base{suffix}",
+                massCut["D_s+:K_S0K_S0pi+"],
+            ),
+            f"D_s+:K+K-pi+pi0{suffix}": Channel(
+                f"D_s+:K+K-pi+pi0{suffix} -> K+:base{suffix} K-:base{suffix} pi+:base{suffix} pi0:tag{suffix}",
+                massCut["D_s+:K+K-pi+pi0"],
+            ),
+            f"D_s+:K_S0K-pi+pi+{suffix}": Channel(
+                f"D_s+:K_S0K-pi+pi+{suffix} -> K_S0:pi+pi-{suffix} K-:base{suffix} pi+:base{suffix} pi+:base{suffix}",
+                massCut["D_s+:K_S0K-pi+pi+"],
+            ),
+        }
+
+        channelsDstarzero = {
+            f"D*0:D0pi0{suffix}": Channel(
+                f"D*0:D0pi0{suffix} -> D0:allChannels{suffix} pi0:tag{suffix}",
+                massCut["D*0:D0pi0"] + "and" + massDifferenceCut["D*0:D0pi0"],
+            ),
+            f"D*0:D0gamma{suffix}": Channel(
+                f"D*0:D0gamma{suffix} -> D0:allChannels{suffix} gamma:ECut{suffix}",
+                massCut["D*0:D0gamma"] + "and" + massDifferenceCut["D*0:D0gamma"],
+            ),
+        }
+
+        channelsDstarplus = {
+            f"D*+:D0pi+{suffix}": Channel(
+                f"D*+:D0pi+{suffix} -> D0:allChannels{suffix} pi+:base{suffix}",
+                massCut["D*+:D0pi+"] + "and" + massDifferenceCut["D*+:D0pi+"],
+            ),
+            f"D*+:D+pi0{suffix}": Channel(
+                f"D*+:D+pi0{suffix} -> D+:allChannels{suffix} pi0:tag{suffix}",
+                massCut["D*+:D+pi0"] + "and" + massDifferenceCut["D*+:D+pi0"],
+            ),
+        }
+
+        channelsDstrangestarplus = {
+            f"D_s*+:D_s+gamma{suffix}": Channel(
+                f"D_s*+:D_s+gamma{suffix} -> D_s+:allChannels{suffix} gamma:ECut{suffix}",
+                massCut["D_s*+:D_s+gamma"] + "and" + massDifferenceCut["D_s*+:D_s+gamma"],
+            ),
+        }
+
+        channelsDzeroFragmentation = {
+            f"Xsd:p+{suffix}": Channel(f"@Xsd:p+{suffix} -> p+:base{suffix}", ""),
+        }
+
+        channelsDplusFragmentation = {
+            f"Xsd:p+pi-{suffix}": Channel(f"@Xsd:p+pi-{suffix} -> p+:base{suffix} pi-:base{suffix}", ""),
+        }
+
+        channelsDstrangeplusFragmentation = {
+            f"Xsd:p+K-{suffix}": Channel(f"@Xsd:p+K-{suffix} -> p+:base{suffix} K-:base{suffix}", ""),
+        }
+        channelsZzero = {
+            f"Xsd:D0p+{suffix}": Channel(f"@Xsd:D0p+{suffix} -> D0:allChannels{suffix} Xsd:p+like{suffix}", ""),
+            f"Xsd:D+p+pi-{suffix}": Channel(
+                f"@Xsd:D+p+pi-{suffix} -> D+:allChannels{suffix} Xsd:p+pi-like{suffix}", ""
+            ),
+            f"Xsd:D_s+p+K-{suffix}": Channel(
+                f"@Xsd:D_s+p+K-{suffix} -> D_s+:allChannels{suffix} Xsd:p+K-like{suffix}", ""
+            ),
+            f"Xsd:D*0p+{suffix}": Channel(f"@Xsd:D*0p+{suffix} -> D*0:allChannels{suffix} Xsd:p+like{suffix}", ""),
+            f"Xsd:D*+p+pi-{suffix}": Channel(
+                f"@Xsd:D*+p+pi-{suffix} -> D*+:allChannels{suffix} Xsd:p+pi-like{suffix}", ""
+            ),
+            f"Xsd:D_s*+p+K-{suffix}": Channel(
+                f"@Xsd:D_s*+p+K-{suffix} -> D_s*+:allChannels{suffix} Xsd:p+K-like{suffix}", ""
+            ),
+        }
+
+        batchReconstructDecays(channelsDzero, outputList=f"D0:allChannels{suffix}", path=path)
+        batchReconstructDecays(channelsDplus, outputList=f"D+:allChannels{suffix}", path=path)
+        batchReconstructDecays(
+            channelsDstrangeplus, outputList=f"D_s+:allChannels{suffix}", path=path
+        )
+
+        ma.cutAndCopyLists(f"gamma:ECut{suffix}", f"gamma:tag{suffix}", gammaCut, path=path)
+
+        batchReconstructDecays(
+            channelsDstarzero,
+            outputList=f"D*0:allChannels{suffix}",
+            path=path,
+        )
+        batchReconstructDecays(
+            channelsDstarplus,
+            outputList=f"D*+:allChannels{suffix}",
+            path=path,
+        )
+        batchReconstructDecays(
+            channelsDstrangestarplus,
+            outputList=f"D_s*+:allChannels{suffix}",
+            path=path,
+        )
+
+        batchReconstructDecays(
+            channelsDzeroFragmentation,
+            outputList=f"Xsd:p+like{suffix}",
+            allowChargeViolation=True,
+            path=path,
+        )
+        batchReconstructDecays(
+            channelsDplusFragmentation,
+            outputList=f"Xsd:p+pi-like{suffix}",
+            allowChargeViolation=True,
+            path=path,
+        )
+        batchReconstructDecays(
+            channelsDstrangeplusFragmentation,
+            outputList=f"Xsd:p+K-like{suffix}",
+            allowChargeViolation=True,
+            path=path,
+        )
+
+        batchReconstructDecays(
+            channelsZzero,
+            outputList=f"Xsd:tagSide{suffix}",
+            allowChargeViolation=True,
+            path=path,
+        )
+
+        ma.applyCuts(f"Xsd:tagSide{suffix}", f"daughter(0,useCMSFrame(p))>{p_cms}", path=path)
+
+        ma.reconstructDecay(
+            f"Z0:inc1{suffix} -> {antiDummy} Xsd:tagSide{suffix}",
+            cut="",
+            allowChargeViolation=True,
+            path=path,
+        )
+
+        ma.setBeamConstrainedMomentum(
+            f"Z0:inc1{suffix}",
+            f"^Z0:inc1{suffix} -> {antiDummy} Xsd:tagSide{suffix}",
+            f" Z0:inc1{suffix} -> {antiDummy} Xsd:tagSide{suffix}",
+            path=path,
+        )
+
+        ma.setBeamConstrainedMomentum(
+            f"Z0:inc1{suffix}",
+            f"Z0:inc1 -> ^{antiDummy}  Xsd:tagSide{suffix}",
+            f"Z0:inc1 ->  {antiDummy} ^Xsd:tagSide{suffix}",
+            path=path,
+        )
+
+        ma.applyCuts(
+            f"Z0:inc1{suffix}",
+            cut="1.4 < daughter(0,M) < 3.4",
+            path=path,
+            )
+
+        ma.applyCuts(
+            f"Z0:inc1{suffix}", cut=f"daughter(0,useCMSFrame(p)) > {p_cms}", path=path
+        )
+
+        DList = [f"Z0:inc1{suffix}",]
+
+        return DList

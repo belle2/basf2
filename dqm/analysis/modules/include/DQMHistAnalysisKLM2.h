@@ -85,7 +85,7 @@ namespace Belle2 {
      * Process 2D efficiency histograms.
      */
     void process2DEffHistogram(TH1* mainHist, TH1* refHist, TH2* planeHist, TH2* errHist, int layers, int sectors,
-                               bool ratioPlot, int* pvcount, double layerLimit, TCanvas* eff2dCanv);
+                               bool ratioPlot, int* pvcount, double layerLimitWarn, double layerLimitAlarm, TCanvas* eff2dCanv);
 
     /** TLine for boundary in plane histograms. */
     TLine m_PlaneLine;
@@ -194,11 +194,17 @@ namespace Belle2 {
     /** Number of inefficient EKLM Layers*/
     int m_nEffEKLMLayers;
 
-    /** alarm limits from inefficient BKLM layers PV */
+    /** warn limits from inefficient BKLM layers PV */
     double m_BKLMLayerWarn;
 
-    /** alarm limits from inefficient EKLM layers PV*/
+    /** warn limits from inefficient EKLM layers PV*/
     double m_EKLMLayerWarn;
+
+    /** alarm limits from inefficient BKLM layers PV*/
+    double m_BKLMLayerAlarm;
+
+    /** alarm limits from inefficient EKLM layers PV*/
+    double m_EKLMLayerAlarm;
 
   };
 

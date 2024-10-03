@@ -1,6 +1,6 @@
-# EventType: 1213038000
-# Descriptor: [B+ -> anti-D0(-> K+ pi-) a_0+(-> eta pi+)]
-# NickName: Bu_D0a0
+# EventType: 1213038002
+# Descriptor: [B+ -> anti-D2*0(-> anti-D0 eta) pi+]
+# NickName: Bu_D2st0pi
 # Documentation: B to charm
 # Tested: yes
 # Physics WG: B2Hadronic WG
@@ -10,29 +10,33 @@
 # Date: 20241001
 
 Alias etasig eta
-Alias a0+sig a_0+
-Alias a0-sig a_0-
-ChargeConj a0+sig a0-sig
+Alias D2*0sig D_2*0
+Alias anti-D2*0sig anti-D_2*0
+ChargeConj D2*0sig anti-D2*0sig
+
 
 Decay Upsilon(4S)
 0.5 B-sig   B+ VSS;
 0.5 B+sig   B- VSS;
 Enddecay
 
+
 Decay B+sig
-1.0000 anti-D0sig a0+sig PHOTOS PHSP;
+1.0000 anti-D2*0sig pi+ PHOTOS PHSP;
 Enddecay
 CDecay B-sig
+
+
+Decay anti-D2*0sig
+1.0000 anti-D0sig etasig TSS;
+Enddecay
+CDecay D2*0sig
+
 
 Decay anti-D0sig
 1.0000 K+ pi- PHOTOS PHSP;
 Enddecay
 CDecay D0sig
-
-Decay a0+sig
-1.0000 etasig pi+ PHOTOS PHSP;
-Enddecay
-CDecay a0-sig
 
 Decay etasig
 1.0000 gamma gamma PHSP;

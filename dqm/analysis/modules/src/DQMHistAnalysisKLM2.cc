@@ -298,8 +298,10 @@ void DQMHistAnalysisKLM2Module::beginRun()
   }
   m_BKLMLayerWarn = 5;
   m_EKLMLayerWarn = 5;
-  requestLimitsFromEpicsPVs("nEffBKLMLayers", unused, unused, unused, m_BKLMLayerWarn);
-  requestLimitsFromEpicsPVs("nEffEKLMLayers", unused, unused, unused, m_EKLMLayerWarn);
+  m_BKLMLayerAlarm = 14;
+  m_EKLMLayerAlarm = 14;
+  requestLimitsFromEpicsPVs("nEffBKLMLayers", unused, unused, m_BKLMLayerWarn, m_BKLMLayerAlarm);
+  requestLimitsFromEpicsPVs("nEffEKLMLayers", unused, unused, m_EKLMLayerWarn, m_EKLMLayerAlarm);
 
 }
 
@@ -457,7 +459,7 @@ void DQMHistAnalysisKLM2Module::processPlaneHistogram(
 
 void DQMHistAnalysisKLM2Module::process2DEffHistogram(
   TH1* mainHist, TH1* refHist, TH2* eff2dHist, TH2* errHist, int layers, int sectors, bool ratioPlot,
-  int* pvcount, double layerLimit, TCanvas* eff2dCanv)
+  int* pvcount, double layerLimitWarn, double layerLimitAlarm, TCanvas* eff2dCanv)
 {
 
   int i = 0;
@@ -509,7 +511,7 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
         if (ratioPlot) {
           eff2dVal = mainEff / refEff;
-          if (eff2dVal < alarmThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
+          if (eff2dVal < warnThr) {errHist->SetBinContent(binx + 1, biny + 1, eff2dVal);}
         } else {
           eff2dVal = (mainEff - refEff) / pow(pow(mainErr, 2) + pow(refErr, 2), 0.5);
         }
@@ -546,8 +548,11 @@ void DQMHistAnalysisKLM2Module::process2DEffHistogram(
 
   }//end of bin x
 
-  if (*pvcount > (int) layerLimit) {
-    setAlarm = true;
+  if (*pvcount > (int) layerLimitWarn) {
+    setWarn = true;
+    if (*pvcount > (int) layerLimitAlarm) {
+      setAlarm = true;
+    }
   }
 
   eff2dHist->SetMinimum(minVal);
@@ -623,12 +628,12 @@ void DQMHistAnalysisKLM2Module::event()
   /* Make Diff 2D plots */
   process2DEffHistogram(m_eff_bklm, m_ref_efficiencies_bklm, m_eff2d_bklm, m_err_bklm,
                         BKLMElementNumbers::getMaximalLayerNumber(), BKLMElementNumbers::getMaximalSectorGlobalNumber(),
-                        m_ratio, &m_nEffBKLMLayers, m_BKLMLayerWarn, m_c_eff2d_bklm);
+                        m_ratio, &m_nEffBKLMLayers, m_BKLMLayerWarn, m_BKLMLayerAlarm, m_c_eff2d_bklm);
 
   process2DEffHistogram(m_eff_eklm, m_ref_efficiencies_eklm, m_eff2d_eklm, m_err_eklm,
                         EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
                         EKLMElementNumbers::getMaximalPlaneGlobalNumber() / EKLMElementNumbers::getMaximalSectorGlobalNumberKLMOrder(),
-                        m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_c_eff2d_eklm);
+                        m_ratio, &m_nEffEKLMLayers, m_EKLMLayerWarn, m_EKLMLayerAlarm, m_c_eff2d_eklm);
   /* Set EPICS PV Values*/
   B2DEBUG(20, "DQMHistAnalysisKLM2: Updating EPICS PVs");
   // only update PVs if there's enough statistics and datasize != 0

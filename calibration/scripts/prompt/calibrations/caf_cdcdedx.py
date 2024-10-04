@@ -228,7 +228,7 @@ def pre_collector(name='rg'):
     if (name == "timegain" or name == "onedcell"):
         trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
-        ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.60)
+        ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
         ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     elif (name == "cosedge"):

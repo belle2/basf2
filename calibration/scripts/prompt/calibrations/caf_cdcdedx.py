@@ -19,6 +19,8 @@ import ROOT
 from ROOT import gSystem
 from ROOT.Belle2 import CDCDedxRunGainAlgorithm, CDCDedxCosineAlgorithm, CDCDedxWireGainAlgorithm
 from ROOT.Belle2 import CDCDedxCosEdgeAlgorithm, CDCDedxBadWireAlgorithm, CDCDedxInjectTimeAlgorithm
+from ROOT.Belle2 import CDCDedx1DCellAlgorithm
+
 from caf.framework import Calibration
 from caf.strategies import SequentialRunByRun, SequentialBoundaries
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
@@ -130,10 +132,11 @@ def get_calibrations(input_data, **kwargs):
             "timegain1": 0,  # Injection time gain
             "rungain1": 0,  # Run Gain Pre (No Payload saving)
             "coscorr0": 0,  # Cosine Corr Gain Pre (No Payload saving)
-            "coscorr1": 0,  # Cosine Corr Gain
             "cosedge0": 0,  # Cosine edge Corr Gain
             "badwire0": 0,  # Bad wire
             "wiregain0": 0,  # WireGain Gain
+            "onedcell0": 0,  # OneD cell correction
+            "coscorr1": 0,  # Cosine Corr Gain
             "rungain2": 0  # Final Run Gain to take Wire and Cosine correction in effect
         }
     elif calib_mode == "quick":
@@ -173,6 +176,8 @@ def get_calibrations(input_data, **kwargs):
             alg = [badwire_algo()]
         elif cal_name == "wiregain":
             alg = [wiregain_algo()]
+        elif cal_name == "onedcell":
+            alg = [onedcell_algo()]
         else:
             basf2.B2FATAL(f"The calibration is not defined, check spelling: calib {i}: {calib_keys[i]}")
 
@@ -220,11 +225,11 @@ def pre_collector(name='rg'):
 
     reco_path = basf2.create_path()
     recon.prepare_cdst_analysis(path=reco_path)
-    if (name == "timegain"):
+    if (name == "timegain" or name == "onedcell"):
         trg_bhabhaskim = reco_path.add_module("TriggerSkim", triggerLines=["software_trigger_cut&skim&accept_radee"])
         trg_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
-        # ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.80)
-        # ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
+        ps_bhabhaskim = reco_path.add_module("Prescale", prescale=0.60)
+        ps_bhabhaskim.if_value("==0", basf2.Path(), basf2.AfterConditionPath.END)
 
     elif (name == "cosedge"):
         trg_bhabhaskim = reco_path.add_module(
@@ -277,6 +282,15 @@ def collector(granularity='all', name=''):
 
     elif name == "wiregain":
         CollParam = {'isWire': True, 'isDedxhit': True, 'granularity': granularity}
+
+    elif name == "onedcell":
+        CollParam = {
+            'isPt': True,
+            'isCosth': True,
+            'isLayer': True,
+            'isDedxhit': True,
+            'isEntaRS': True,
+            'granularity': granularity}
 
     else:
         CollParam = {'isRun': True, 'granularity': 'run'}
@@ -370,6 +384,18 @@ def wiregain_algo():
     return algo
 
 
+def onedcell_algo():
+    """
+    Create oned cell calibration algorithim.
+    Returns:
+        algo : oned cell correction algorithm
+    """
+    algo = CDCDedx1DCellAlgorithm()
+    algo.enableExtraPlots(True)
+    algo.setMergePayload(True)
+    return algo
+
+
 class CDCDedxCalibration(Calibration):
     '''
     CDCDedxCalibration is a specialized calibration for cdcdedx.
@@ -402,7 +428,7 @@ class CDCDedxCalibration(Calibration):
                                     input_files=input_file_dict[2],
                                     pre_collector_path=pre_collector(cal_name)
                                     )
-        elif cal_name == "coscorr" or cal_name == "cosedge":
+        elif cal_name == "coscorr" or cal_name == "cosedge" or cal_name == "onedcell":
             collection = Collection(collector=collector(granularity=collector_granularity, name=cal_name),
                                     input_files=input_file_dict[1],
                                     pre_collector_path=pre_collector(cal_name)

@@ -45,6 +45,7 @@ std::vector<int> hlts; // initialized on run START
 std::set<int> triggers;
 unsigned int event_number_max = 0;
 unsigned int missing_walk_index = 0;
+bool enable_check = true;
 
 bool got_sigusr1 = false;
 bool got_sigusr2 = false;
@@ -153,13 +154,17 @@ void check_event_nr(unsigned int event_number)
   } else if (missing_walk_index > 0 && event_number_max - *std::next(triggers.begin(), missing_walk_index) < 100000) {
     missing_walk_index--;
   }
+  if (triggers.size() > 50000) {
+    // diable to avoid slow-down by too many in-flight triggers
+    enable_check = false;
+    ERR_FPRINTF(stderr, "[ERROR] Too many in-flight triggers -> disable checking until next run\n");
+  }
 }
 
 int
 b2_timed_blocking_io(const int sd, const int timeout /* secs */)
 {
   int ret;
-
 
   if (timeout > 0) {
     struct timeval tv;
@@ -199,7 +204,6 @@ b2_timed_blocking_io(const int sd, const int timeout /* secs */)
     }
   }
 
-
   return 0;
 }
 
@@ -221,7 +225,6 @@ b2_build_sockaddr_in(const char* hostname, const unsigned short port, struct soc
   }
   in->sin_port = htons(port);
 
-
   return 0;
 }
 
@@ -230,7 +233,6 @@ static int
 b2_create_tcp_socket(void)
 {
   int sd, ret, one = 1;
-
 
   sd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (sd == -1) {
@@ -252,7 +254,6 @@ b2_create_tcp_socket(void)
     return -1;
   }
 
-
   return sd;
 }
 
@@ -262,7 +263,6 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
 {
   int sd, ret;
   struct sockaddr_in in;
-
 
   sd = b2_create_tcp_socket();
   if (sd < 0) {
@@ -288,7 +288,6 @@ b2_create_accept_socket(const unsigned short port) /* in reality DOES NOT accept
     return -1;
   }
 
-
   return sd;
 }
 
@@ -298,7 +297,6 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
 {
   int sd, ret;
   struct sockaddr_in in;
-
 
   sd = b2_create_tcp_socket();
   if (sd < 0) {
@@ -318,7 +316,6 @@ b2_create_connect_socket(const char* hostname, const unsigned short port)
     return -1;
   }
 
-
   return sd;
 }
 
@@ -328,7 +325,6 @@ b2_send(const int sd, const void* buf, const size_t size)
 {
   unsigned char* ptr = (unsigned char*)buf;
   size_t n_bytes_remained = size;
-
 
   for (;;) {
     int ret, n_bytes_send;
@@ -365,7 +361,6 @@ b2_send(const int sd, const void* buf, const size_t size)
     }
   }
 
-
   return size;
 }
 
@@ -375,7 +370,6 @@ b2_recv(const int sd,       void* buf, const size_t size)
 {
   unsigned char* ptr = (unsigned char*)buf;
   size_t n_bytes_remained = size;
-
 
   for (;;) {
     int ret, n_bytes_recv;
@@ -411,7 +405,6 @@ b2_recv(const int sd,       void* buf, const size_t size)
     }
   }
 
-
   return size;
 }
 
@@ -422,7 +415,6 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
 {
   int sd, ret;
   struct pollfd fds;
-
 
   sd = b2_create_connect_socket(host, port);
   if (sd == -1) {
@@ -472,7 +464,6 @@ MM_init_connect_to_onsen(const char* host, const unsigned int port)
     return -1;
   }
 
-
   return sd;
 }
 
@@ -483,7 +474,6 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
   int sd;
   int one = 1, ret;
   // struct pollfd fds;
-
 
   LOG_FPRINTF(stderr, "[INFO] merger_merge: Waiting for connection from hltout2merger on port %d\n", port);
 
@@ -559,7 +549,6 @@ MM_init_accept_from_hltout2merger(const unsigned int port)
     return -1;
   }
   */
-
 
   return sd;
   //  return nd;
@@ -737,6 +726,8 @@ main(int argc, char* argv[])
   int minfd = sd_acc;
   fd_set rset;//, wset;
 
+  // enable the checking of missing triggers
+  enable_check = true;
   // Handle Obtain ROI and send it to ONSEN
   while (!stop_running) {
     memcpy(&rset, &allset, sizeof(rset));
@@ -878,6 +869,7 @@ main(int argc, char* argv[])
             print_stat();
             clear_triggers();
             current_runnr = runnr;
+            enable_check = true;
           } else if (runnr < current_runnr) {
             // got some event from old run
             ERR_FPRINTF(stderr, "[WARNING] merger_merge: got trigger from older run: got %d current %d trig %d\n", runnr, current_runnr,
@@ -886,7 +878,7 @@ main(int argc, char* argv[])
 
           if (runnr == current_runnr) {
             // seperate if, as we might set it in the if above
-            check_event_nr(eventnr);
+            if (enable_check) check_event_nr(eventnr);
           } // if we end the if here, we will send out old events to ONSEN!
 
           n_bytes_to_onsen = n_bytes_from_hltout;
@@ -930,13 +922,13 @@ main(int argc, char* argv[])
       event_count++;
       if (event_count % 10000 == 0) {
         int hltcount = hltused.size();
-        int mod = *triggers.begin() % hltcount;
         if (triggers.empty()) {
           // workaround for empty vector, but keep same structure for monitor parsing (kibana)
           ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
                       event_number_max, event_number_max, missing_walk_index, triggers.size(),
-                      0, event_number_max, mod, hlts[mod]);
+                      0, event_number_max, -1, -1);
         } else {
+          int mod = *triggers.begin() % hltcount;
           ERR_FPRINTF(stderr, "[INFO] merger_merge: trigger low %u high %u missing %u inflight %lu delta %u max %u low mod %d low HLT %d\n",
                       *triggers.begin(), *(--triggers.end()), missing_walk_index, triggers.size(),
                       *(--triggers.end()) - *triggers.begin(), event_number_max, mod, hlts[mod]);

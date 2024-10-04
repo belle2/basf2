@@ -11,7 +11,6 @@
 
 #include <framework/gearbox/Gearbox.h>
 
-#include <TVector3.h>
 #include <filesystem>
 
 #include <boost/math/special_functions/sign.hpp>

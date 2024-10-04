@@ -104,11 +104,11 @@ bool Belle2::TestHelpers::allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVe
   return xNear and yNear and zNear;
 }
 
-void Belle2::TestHelpers::PrintTo(const TVector3& tVector3, ::std::ostream& output)
+void Belle2::TestHelpers::PrintTo(const ROOT::Math::XYZVector& vector3, ::std::ostream& output)
 {
   output
-      << "TVector3("
-      << tVector3.X() << ", "
-      << tVector3.Y() << ", "
-      << tVector3.Z() << ")";
+      << "ROOT::Math::XYZVector("
+      << vector3.X() << ", "
+      << vector3.Y() << ", "
+      << vector3.Z() << ")";
 }

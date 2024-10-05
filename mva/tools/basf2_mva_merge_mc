@@ -136,7 +136,7 @@ if __name__ == '__main__':
             df_bkg = df_bkg.sample(int(fb*n_bkg))
 
     # Merge signal and background DataFrame
-    df = df_bkg.append(df_sig, ignore_index=True)
+    df = pd.concat([df_bkg, df_sig], ignore_index=True)
 
     # Replace NaN
     if args.fillnan:

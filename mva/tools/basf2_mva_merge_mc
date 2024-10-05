@@ -46,6 +46,7 @@ PyConfig.IgnoreCommandLineOptions = True  # noqa
 
 import argparse
 import numpy as np
+import pandas as pd
 import uproot
 from sklearn.model_selection import train_test_split
 

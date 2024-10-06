@@ -115,7 +115,7 @@ FEI and the conditions database
 ###############################
 
 The FEI is frequently retrained and updated to give the best performance with the latest reconstruction, etc. You will need to use the relevant database in which the FEI training weights are located.
-FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <https://confluence.desy.de/x/MhqdAw>`_.
+FEI training weights are distributed by the `basf2.conditions` database under an `analysis global tag <https://xwiki.desy.de/xwiki/rest/p/88ebe>`_.
 In order to find the latest, recommended FEI training, you can use the `b2conditionsdb-recommend` tool.
 
 ``b2conditionsdb-recommend input_file.mdst.root``
@@ -340,7 +340,7 @@ In this section, we will consider, how to run the FEI training workflow on the g
 
 .. seealso::
 
-    * `gbasf2 documentation <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
+    * `gbasf2 documentation <https://gbasf2.belle2.org/>`_
     * `b2luigi documentation <https://b2luigi.readthedocs.io/en/latest/>`_
 
 The example adapted for this section is ``analysis/examples/FEI/B_generic_train.py``, but feel free to adapt
@@ -380,7 +380,7 @@ that they do not work properly because of missing ``python`` packages. In that c
 
 
 The last step is to install `gbasf2`_. For that purpose, please switch to a new terminal window with fresh environment
-on your machine, and follow the steps for `gbasf2 installation <https://confluence.desy.de/display/BI/Computing+GBasf2#ComputingGBasf2-gBasf2installationprocedure>`_.
+on your machine, and follow the steps for `gbasf2 installation <https://xwiki.desy.de/xwiki/rest/p/78b3b/#HgBasf2installationprocedure>`_.
 
 In the following, an adaption for the `gbasf2`_ package is discussed, which is required until the GitLab issue
 `BIIDCD-1256 <https://gitlab.desy.de/belle2/computing/distributed-computing/belledirac/-/issues/1256>`_ is resolved. It enables to upload non-basf2 data to remote SE's on the grid.
@@ -831,7 +831,7 @@ Resources, Publications etc.
 
 .. _luigi: https://luigi.readthedocs.io/en/latest/
 .. _b2luigi: https://b2luigi.readthedocs.io/en/latest/
-.. _gbasf2: https://confluence.desy.de/display/BI/Computing+GBasf2
+.. _gbasf2: https://xwiki.desy.de/xwiki/rest/p/78b3b
 .. _settings.json: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/settings.json
 .. _fei_grid_workflow.py: https://gitlab.desy.de/belle2/performance/fei/grid-workflow/-/blob/main/fei_grid_workflow.py
 .. _Belle II DIRAC: https://dirac.cc.kek.jp:8443/DIRAC/

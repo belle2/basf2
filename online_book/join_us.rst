@@ -36,7 +36,7 @@ If you're interested in getting to know us better,
 
 * join our `chat.belle2 channel <https://chat.belle2.org/channel/training-documentation>`_
 * `subscribe to our mailing list <https://lists.belle2.org/sympa/info/software-doc>`_ ``software-doc@belle2.org``
-* visit our `confluence page <https://confluence.desy.de/x/IzpnAw>`_ which also
+* visit our `XWiki page <https://xwiki.desy.de/xwiki/rest/p/1958b>`_ which also
   shows our next meetings and has a display of open issues on GitLab
 
 Some possible ideas for contributions:
@@ -44,7 +44,7 @@ Some possible ideas for contributions:
 * Fixing wrong/misleading/insufficient documentation
 * Creating new training lessons in the online book
 * Recording video walk throughts for the lessons
-* Hunting for outdated information on confluence and removing it/bringing it to sphinx
+* Hunting for outdated information on XWiki and removing it/bringing it to sphinx
 
 and probably much more issues that you have already noticed yourself.
 

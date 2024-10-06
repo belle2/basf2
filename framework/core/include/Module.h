@@ -63,7 +63,7 @@ namespace Belle2 {
    *
    * The 'Module Development' section in the manual provides detailed information
    * on how to create modules, setting parameters, or using return values/conditions:
-   * https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development
+   * https://xwiki.desy.de/xwiki/rest/p/f4fa4/#HModuleDevelopment
    */
   class Module : public PathElement {
 
@@ -254,7 +254,7 @@ namespace Belle2 {
      * one condition to the module.
      * If more than one condition results in true, only the *last* of them will be used.
      *
-     * See https://confluence.desy.de/display/BI/Software+ModCondTut or ModuleCondition for a description of the syntax.
+     * See https://xwiki.desy.de/xwiki/rest/p/a94f2 or ModuleCondition for a description of the syntax.
      *
      * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
      * to a path which is processed before the path where this module is

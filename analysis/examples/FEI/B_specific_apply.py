@@ -9,7 +9,7 @@
 ##########################################################################
 
 # Steering file to apply the specific FEI on Belle II MC, but it can be also easily adapted for converted Belle MC.
-# For reference see Confluence and Thomas Keck's PhD thesis.
+# For reference see XWiki and Thomas Keck's PhD thesis.
 #
 # Please adapt for your signal channel.
 # This example is for hadronic tagging.

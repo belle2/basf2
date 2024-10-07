@@ -42,7 +42,7 @@ class TestSkimRegistry(unittest.TestCase):
 
     def test_code_format(self):
         """Check the codes are the correct format (8 digits)."""
-        # https://confluence.desy.de/x/URdYBQ
+        # https://xwiki.desy.de/xwiki/rest/p/9199f/#HSkimcodeconventionandskimregistry
         for code in Registry.codes:
             self.assertEqual(len(code), 8, "Incorrect length skim code")
             self.assertTrue(code.isdigit(), "Must consist of digits")

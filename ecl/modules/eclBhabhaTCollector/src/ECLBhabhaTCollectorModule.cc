@@ -104,7 +104,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_electrons->Branch("E_DIV_p", &m_E_DIV_p)->SetTitle("E DIV p");
     m_dbgTree_electrons->Branch("timeF", &m_tree_timeF)->SetTitle("Time F, ns");
     m_dbgTree_electrons->Branch("time_t_psi", &m_tree_time)->SetTitle("Time t_psi for Ts, ns");
-    m_dbgTree_electrons->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see Confluence article");
+    m_dbgTree_electrons->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see XWiki article");
     m_dbgTree_electrons->Branch("t0", &m_tree_t0)->SetTitle("T0, ns");
     m_dbgTree_electrons->Branch("t0_unc", &m_tree_t0_unc)->SetTitle("T0 uncertainty, ns");
     m_dbgTree_electrons->Branch("CrateID", &m_crystalCrate)->SetTitle("Crate id for crystal");
@@ -131,7 +131,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_crystals->Branch("Crystal_E", &m_tree_clustCrysE) ->SetTitle("E of crystal i from cluster");
     m_dbgTree_crystals->Branch("time_t_psi", &m_tree_time)->SetTitle("Time for Ts, ns");
     m_dbgTree_crystals->Branch("Crystal_cell_ID", &m_tree_cid)->SetTitle("Cell ID, 1..8736");
-    m_dbgTree_crystals->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see Confluence article");
+    m_dbgTree_crystals->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see XWiki article");
 
     m_dbgTree_crystals->SetAutoSave(10);
 

@@ -1,48 +1,73 @@
 # EventType: 1113048003
-# Descriptor: [B0 -> Dst-(-> anti-D0 a_0+(-> eta pi+) pi+]
-# NickName: Bu_Dst0a0
-# Documentation: B to charm
-# Tested: yes
-# Physics WG: B2Hadronic WG
-# Responsible: Vismaya Vs
+# Descriptor: Y(4S) -> B0 anti-B0
+#                     [B0 -> [D1st- -> [D*- -> [anti-D0 -> K+ pi-] pi-] [eta -> gamma gamma]] pi+]
+#                      anti-B0 -> anything
+# NickName: Bd_D1stpi
+
+# Tested: Yes
+# PhysicsWG: BHADRONIC
+# Responsible: Vismaya
 # Email: ph20resch11010@iith.ac.in
 # Cuts: None
-# Date: 20241001
+# Date: 13/09/23
+
+#
+# Aliases
+#
+
+Alias D1st+sig D'_1+
+Alias D1st-sig D'_1-
+ChargeConj D1st+sig D1st-sig
 
 Alias etasig eta
-Alias a0+sig a_0+
-Alias a0-sig a_0-
-ChargeConj a0+sig a0-sig
 
+#
+# Y(4S) -> B0 anti-B0 
+#
 
 Decay Upsilon(4S)
 1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
 Enddecay
 
+#
+# B0 -> D1st- pi+
+#
 
 Decay B0sig
-1.0000 D*-sig a0+sig PHOTOS PHSP;
+1.0000 D1st-sig pi+ PHOTOS PHSP;
 Enddecay
 CDecay anti-B0sig
 
+#
+# D1st- -> D*- eta
+#
+
+Decay D1st-sig
+1.0000 D*-sig etasig PHOTOS VVS_PWAVE 1.0 0.0 0.0 0.0 0.0 0.0;
+Enddecay
+CDecay D1st+sig
+
+#
+# D*- -> anti-D0 pi-
+#
 
 Decay D*-sig
 1.0000 anti-D0sig pi- PHOTOS VSS;
 Enddecay
 CDecay D*+sig
 
+#
+# anti-D0 -> K+ pi-
+#
 
 Decay anti-D0sig
 1.0000 K+ pi- PHOTOS PHSP;
 Enddecay
 CDecay D0sig
 
-
-Decay a0+sig
-1.0000 etasig pi+ PHOTOS PHSP;
-Enddecay
-CDecay a0-sig
-
+#
+# eta -> gamma gamma
+#
 
 Decay etasig
 1.0000 gamma gamma PHSP;

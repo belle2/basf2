@@ -1,0 +1,51 @@
+# EventType: 1113048003
+# Descriptor: [B0 -> Dst-(-> anti-D0 a_0+(-> eta pi+) pi+]
+# NickName: Bu_Dst0a0
+# Documentation: B to charm
+# Tested: yes
+# Physics WG: B2Hadronic WG
+# Responsible: Vismaya Vs
+# Email: ph20resch11010@iith.ac.in
+# Cuts: None
+# Date: 20241001
+
+Alias etasig eta
+Alias a0+sig a_0+
+Alias a0-sig a_0-
+ChargeConj a0+sig a0-sig
+
+
+Decay Upsilon(4S)
+1.0 B0sig anti-B0sig B0 anti-B0    VSS_BMIX dm;
+Enddecay
+
+
+Decay B0sig
+1.0000 D*-sig a0+sig PHOTOS PHSP;
+Enddecay
+CDecay anti-B0sig
+
+
+Decay D*-sig
+1.0000 anti-D0sig pi- PHOTOS VSS;
+Enddecay
+CDecay D*+sig
+
+
+Decay anti-D0sig
+1.0000 K+ pi- PHOTOS PHSP;
+Enddecay
+CDecay D0sig
+
+
+Decay a0+sig
+1.0000 etasig pi+ PHOTOS PHSP;
+Enddecay
+CDecay a0-sig
+
+
+Decay etasig
+1.0000 gamma gamma PHSP;
+Enddecay
+
+End

@@ -1,38 +1,46 @@
 # EventType: 1213038000
-# Descriptor: [B+ -> anti-D0(-> K+ pi-) a_0+(-> eta pi+)]
-# NickName: Bu_D0a0
-# Documentation: B to charm
-# Tested: yes
-# Physics WG: B2Hadronic WG
-# Responsible: Vismaya Vs
-# Email: ph20resch11010@iith.ac.in
+# Description: [B+ -> (anti-D0 -> K+ pi-) (eta -> gamma gamma) pi+]
+# NickName: Bu_D0etapi_Kpi
+# Documentation: MC15rd signal request 
+# Tested: Yes
+# Physics WG: BHadronic 
+# Responsible: Vismaya
 # Cuts: None
-# Date: 20241001
-
+# Date: 20240207
+#
+#
 Alias etasig eta
-Alias a0+sig a_0+
-Alias a0-sig a_0-
-ChargeConj a0+sig a0-sig
+
+#
+# Y(4S) -> B+ B- 
+#
 
 Decay Upsilon(4S)
 0.5 B-sig   B+ VSS;
 0.5 B+sig   B- VSS;
 Enddecay
 
+#
+# B+ -> anti-D0 eta pi+
+#
+
 Decay B+sig
-1.0000 anti-D0sig a0+sig PHOTOS PHSP;
+1.0000 anti-D0sig etasig pi+ PHOTOS PHSP;
 Enddecay
 CDecay B-sig
+
+#
+# anti-D0 -> K+ pi-
+#
 
 Decay anti-D0sig
 1.0000 K+ pi- PHOTOS PHSP;
 Enddecay
 CDecay D0sig
 
-Decay a0+sig
-1.0000 etasig pi+ PHOTOS PHSP;
-Enddecay
-CDecay a0-sig
+#
+# eta -> gamma gamma
+#
 
 Decay etasig
 1.0000 gamma gamma PHSP;

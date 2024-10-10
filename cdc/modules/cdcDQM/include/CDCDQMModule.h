@@ -29,6 +29,7 @@
 
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH2Poly.h>
 
 namespace Belle2 {
 
@@ -84,6 +85,10 @@ namespace Belle2 {
      */
     void terminate() override;
 
+    /**
+     * Convenient function to create a TH2Poly based on CDC geometry
+     */
+    TH2Poly* createTH2Poly(const TString& name, const TString& title) ;
 
   protected:
 
@@ -108,6 +113,8 @@ namespace Belle2 {
     TH2F* m_hPhiIndex = nullptr;     /**< Histogram of cdc phi of different IP + skims tracks */
     TH2F* m_hPhiEff = nullptr;       /**< Histogram of cdc phi of tracking eff */
     TH2F* m_hPhiHit  = nullptr;      /**< Histogram of track associated hits in phi vs layer  */
+    TH2Poly* m_hObservedExtPos = nullptr; /**< Histogram of observed CDC hits in layer */
+    TH2Poly* m_hExpectedExtPos = nullptr; /**< Histogram of expected CDC hits in layer */
 
   };
 

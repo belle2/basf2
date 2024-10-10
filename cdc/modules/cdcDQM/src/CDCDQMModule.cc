@@ -13,10 +13,12 @@
 #include <framework/database/DBObjPtr.h>
 
 #include <TF1.h>
+#include <TMath.h>
 #include <TDirectory.h>
 
 #include <fstream>
 #include <math.h>
+#include <set>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -68,6 +70,8 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
+  m_hObservedExtPos = createTH2Poly("hObservedExtPos", "Observed CDC hit at extrapolated position;x [cm];y [cm]");
+  m_hExpectedExtPos = createTH2Poly("hExpectedExtPos", "Expected CDC hit at extrapolated position;x [cm];y [cm]");
   oldDir->cd();
 }
 
@@ -101,6 +105,8 @@ void CDCDQMModule::beginRun()
   m_hPhiIndex->Reset();
   m_hPhiEff->Reset();
   m_hPhiHit->Reset();
+  m_hObservedExtPos->Reset("ICES");
+  m_hExpectedExtPos->Reset("ICES");
 }
 
 void CDCDQMModule::event()
@@ -188,6 +194,27 @@ void CDCDQMModule::event()
       B2WARNING("Can not access FitStatus of this Track");
       continue;
     }
+
+    std::set<int> hitInSLayer;  // list of contributing layers for this track
+    for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
+      const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
+      if (!tp) continue;
+      hitInSLayer.insert(hit->getICLayer());
+    }
+    auto helix = fitresult->getHelix();
+    int nSLayers = cdcgeo.getNumberOfSenseLayers();
+    for (int lay = 0; lay < nSLayers; lay++) {
+      double layerR = cdcgeo.senseWireR(lay);
+      double arcLength = helix.getArcLength2DAtCylindricalR(layerR);
+      if (std::isnan(arcLength)) continue;
+      const auto& result = helix.getPositionAtArcLength2D(arcLength);
+      if (result.Z() > cdcgeo.senseWireFZ(lay) || result.Z() < cdcgeo.senseWireBZ(lay)) continue;
+      double phi = TMath::ATan2(result.Y(), result.X());
+      m_hExpectedExtPos->Fill(layerR * TMath::Cos(phi), layerR * TMath::Sin(phi));
+      if (hitInSLayer.count(lay)) // if hit is attached in this layer
+        m_hObservedExtPos->Fill(layerR * TMath::Cos(phi), layerR * TMath::Sin(phi));
+    }
+
     // require high NDF track
     int ndf = fs->getNdf();
     if (ndf < 20) continue;
@@ -237,8 +264,7 @@ void CDCDQMModule::event()
 
       m_hADC->Fill(bid, adc);
       m_hTDC->Fill(bid, tdc);
-      m_hPhiHit->Fill(fitresult->getPhi() / Unit::deg, lay);
-
+      m_hPhiHit->Fill(phiDegree, lay);
     }
   }
 }
@@ -250,4 +276,52 @@ void CDCDQMModule::endRun()
 
 void CDCDQMModule::terminate()
 {
+  // Writing TH2Poly
+  TDirectory* oldDir = gDirectory;
+  oldDir->cd("CDC");
+  m_hObservedExtPos->Write(0, TObject::kOverwrite);
+  m_hExpectedExtPos->Write(0, TObject::kOverwrite);
+  oldDir->cd();
+}
+
+TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title)
+{
+  TH2Poly* hist = new TH2Poly();
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  int nSLayers = cdcgeo.getNumberOfSenseLayers();
+  for (int nlayer = 0; nlayer < nSLayers; nlayer++) {
+    int nWires = cdcgeo.nWiresInLayer(nlayer);
+    double offset = cdcgeo.offset(nlayer);
+    double layerR = cdcgeo.senseWireR(nlayer);
+    double r_inner = 0;
+    double r_outer = 0;
+    if (nlayer == 0) {
+      r_inner = layerR - (cdcgeo.senseWireR(1) - cdcgeo.senseWireR(0)) / 2;
+      r_outer = layerR + (cdcgeo.senseWireR(1) - cdcgeo.senseWireR(0)) / 2;
+    } else if (nlayer == nSLayers - 1) {
+      r_inner = layerR - (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
+      r_outer = layerR + (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
+    } else {
+      r_inner = layerR - (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
+      r_outer = layerR + (cdcgeo.senseWireR(nlayer + 1) - cdcgeo.senseWireR(nlayer)) / 2;
+    }
+    for (int wire = 0; wire < nWires; wire++) {
+      double phi_inner = (wire - 0.5 + offset) * 2 * TMath::Pi() / nWires;
+      double phi_outer = (wire + 0.5 + offset) * 2 * TMath::Pi() / nWires;
+      // Each bin is a rectangle defined by four corners
+      double x1 = r_inner * TMath::Cos(phi_inner);
+      double y1 = r_inner * TMath::Sin(phi_inner);
+      double x2 = r_outer * TMath::Cos(phi_inner);
+      double y2 = r_outer * TMath::Sin(phi_inner);
+      double x3 = r_outer * TMath::Cos(phi_outer);
+      double y3 = r_outer * TMath::Sin(phi_outer);
+      double x4 = r_inner * TMath::Cos(phi_outer);
+      double y4 = r_inner * TMath::Sin(phi_outer);
+      double xx[] = {x1, x2, x3, x4};
+      double yy[] = {y1, y2, y3, y4};
+      hist->AddBin(4, xx, yy);
+    }
+  }
+  hist->SetNameTitle(name, title);
+  return hist;
 }

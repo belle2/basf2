@@ -49,7 +49,6 @@ void TRGECLUnpackerModule::initialize()
   // execution order of the modules: the first package run registers the module
   m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
   m_eventLevelClusteringInfo.registerInDataStore();
-
 }
 
 void TRGECLUnpackerModule::beginRun() {}

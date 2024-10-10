@@ -45,6 +45,9 @@ void TRGECLUnpackerModule::initialize()
   m_TRGECLTCArray.registerInDataStore();
   m_TRGECLEvtArray.registerInDataStore();
   m_TRGECLClusterArray.registerInDataStore();
+  // This object is registered by few packages. Let's be agnostic about the
+  // execution order of the modules: the first package run registers the module
+  m_eventLevelClusteringInfo.isOptional() ? m_eventLevelClusteringInfo.isRequired() :
   m_eventLevelClusteringInfo.registerInDataStore();
 
 }

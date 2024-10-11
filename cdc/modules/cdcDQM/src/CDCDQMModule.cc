@@ -209,10 +209,9 @@ void CDCDQMModule::event()
       if (std::isnan(arcLength)) continue;
       const auto& result = helix.getPositionAtArcLength2D(arcLength);
       if (result.Z() > cdcgeo.senseWireFZ(lay) || result.Z() < cdcgeo.senseWireBZ(lay)) continue;
-      double phi = TMath::ATan2(result.Y(), result.X());
-      m_hExpectedExtPos->Fill(layerR * TMath::Cos(phi), layerR * TMath::Sin(phi));
+      m_hExpectedExtPos->Fill(result.X(), result.Y());
       if (hitInSLayer.count(lay)) // if hit is attached in this layer
-        m_hObservedExtPos->Fill(layerR * TMath::Cos(phi), layerR * TMath::Sin(phi));
+        m_hObservedExtPos->Fill(result.X(), result.Y());
     }
 
     // require high NDF track

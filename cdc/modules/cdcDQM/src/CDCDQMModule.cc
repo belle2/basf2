@@ -15,6 +15,9 @@
 #include <TF1.h>
 #include <TMath.h>
 #include <TDirectory.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TH2Poly.h>
 
 #include <fstream>
 #include <math.h>
@@ -49,7 +52,7 @@ void CDCDQMModule::defineHisto()
 {
 
   TDirectory* oldDir = gDirectory;
-  oldDir->mkdir("CDC");
+  TDirectory* cdcDir = oldDir->mkdir("CDC");
   oldDir->cd("CDC");
   m_hNEvents = new TH1F("hNEvents", "hNEvents", 10, 0, 10);
   m_hNEvents->GetXaxis()->SetBinLabel(1, "number of events");
@@ -70,9 +73,9 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
-  m_hObservedExtPos = createTH2Poly("hObservedExtPos", "Observed CDC hit at extrapolated position;x [cm];y [cm]");
-  m_hExpectedExtPos = createTH2Poly("hExpectedExtPos", "Expected CDC hit at extrapolated position;x [cm];y [cm]");
   oldDir->cd();
+  m_hObservedExtPos = createTH2Poly("hObservedExtPos", "Observed CDC hit at extrapolated position;x [cm];y [cm];Track / bin", cdcDir);
+  m_hExpectedExtPos = createTH2Poly("hExpectedExtPos", "Expected CDC hit at extrapolated position;x [cm];y [cm];Track / bin", cdcDir);
 }
 
 void CDCDQMModule::initialize()
@@ -275,15 +278,9 @@ void CDCDQMModule::endRun()
 
 void CDCDQMModule::terminate()
 {
-  // Writing TH2Poly
-  TDirectory* oldDir = gDirectory;
-  oldDir->cd("CDC");
-  m_hObservedExtPos->Write(0, TObject::kOverwrite);
-  m_hExpectedExtPos->Write(0, TObject::kOverwrite);
-  oldDir->cd();
 }
 
-TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title)
+TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, TDirectory* dir)
 {
   TH2Poly* hist = new TH2Poly();
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
@@ -322,5 +319,6 @@ TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title)
     }
   }
   hist->SetNameTitle(name, title);
+  hist->SetDirectory(dir);
   return hist;
 }

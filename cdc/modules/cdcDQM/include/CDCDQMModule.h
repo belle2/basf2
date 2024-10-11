@@ -27,9 +27,10 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <rawdata/dataobjects/RawCDC.h>
 
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH2Poly.h>
+class TDirectory;
+class TH1F;
+class TH2F;
+class TH2Poly;
 
 namespace Belle2 {
 
@@ -88,7 +89,7 @@ namespace Belle2 {
     /**
      * Convenient function to create a TH2Poly based on CDC geometry
      */
-    TH2Poly* createTH2Poly(const TString& name, const TString& title) ;
+    TH2Poly* createTH2Poly(const TString& name, const TString& title, TDirectory* dir) ;
 
   protected:
 

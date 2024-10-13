@@ -42,10 +42,8 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
-  addParam("BoardwiseEfficiency", m_boardwiseEfficiency,
-           "If true, bins are joined together for each board on each year", m_boardwiseEfficiency);
-  addParam("MaxBinGroup", m_MaxBinGroup,
-           "If BoardwiseEfficiency is true, merge bins upto this", m_MaxBinGroup);
+  addParam("MergePolyBins", m_mergePolyBins,
+           "Merge adjucent bins on same layer connected to same board", m_mergePolyBins);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -115,6 +113,8 @@ void CDCDQMModule::beginRun()
   m_hPhiHit->Reset();
   m_hObservedExtPos->Reset("ICES");
   m_hExpectedExtPos->Reset("ICES");
+
+  if (m_mergePolyBins <= 0) m_mergePolyBins = 1;
 }
 
 void CDCDQMModule::event()
@@ -315,9 +315,7 @@ TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, 
       int bid = cdcgeo.getBoardID(wireid);
 
       if (int(binXvals.size()) &&
-          (!m_boardwiseEfficiency ||
-           (m_boardwiseEfficiency && (prevBid != bid ||
-                                      m_MaxBinGroup == binGroup)))) {
+          (prevBid != bid || m_mergePolyBins == binGroup)) {
         hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
         binXvals.clear(); binYvals.clear();
         binGroup = 0;
@@ -337,7 +335,7 @@ TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, 
         double y1 = r_outer * TMath::Sin(phi_inner);
         binXvals = {x0, x1, x2, x3};
         binYvals = {y0, y1, y2, y3};
-      } else if (m_boardwiseEfficiency && prevBid == bid) {
+      } else if (m_mergePolyBins > 1 && prevBid == bid) {
         int insertPos = int(binXvals.size()) / 2;
         binXvals.insert(binXvals.begin() + insertPos + 1, x2);
         binYvals.insert(binYvals.begin() + insertPos + 1, y2);

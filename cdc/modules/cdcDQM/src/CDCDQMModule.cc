@@ -113,8 +113,6 @@ void CDCDQMModule::beginRun()
   m_hPhiHit->Reset();
   m_hObservedExtPos->Reset("ICES");
   m_hExpectedExtPos->Reset("ICES");
-
-  if (m_mergePolyBins <= 0) m_mergePolyBins = 1;
 }
 
 void CDCDQMModule::event()

@@ -360,7 +360,7 @@ class LCASaverModule(b2.Module):
                 # In this way the LCA variables in the ntuples will be labelled _1 and _2
                 # If we train on B decays these will correspond to the two B's
                 # while if we train on the Upsilon, _1 will correspond to it and _2 will remain empty
-                # becaus getArrayIndex() gives 0 for the Upsilon and 1, 2 for the B's
+                # because getArrayIndex() gives 0 for the Upsilon and 1, 2 for the B's
                 array_index = 1 if self.isB[0] == 0 else mcp.getArrayIndex()
 
                 # Call function to write history of leaves in the tree.

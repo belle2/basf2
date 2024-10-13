@@ -369,11 +369,10 @@ void SVDDQMExpressRecoModule::defineHisto()
     m_cluster3TimeV456->GetXaxis()->SetTitle("cluster time (ns)");
     m_cluster3TimeV456->GetYaxis()->SetTitle("count");
     m_histoList->Add(m_cluster3TimeV456);
-  }
-  //----------------------------------------------------------------
-  // Time of clusters for L3/L456 sensors for 6 samples
-  //----------------------------------------------------------------
-  if (m_3Samples) {
+
+    //----------------------------------------------------------------
+    // Time of clusters for L3/L456 sensors for 6 samples
+    //----------------------------------------------------------------
     Name = "SVDDQM_Cluster6TimeU3";
     Title = Form("SVD U-Cluster Time %s for layer 3 sensors for 6 samples", refFrame.Data());
     m_cluster6TimeU3 = new TH1F(Name.Data(), Title.Data(), TimeBins, TimeMin, TimeMax);
@@ -623,11 +622,10 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_strip3CountV[i]->GetXaxis()->SetTitle("cellID");
       m_strip3CountV[i]->GetYaxis()->SetTitle("count");
       m_histoList->Add(m_strip3CountV[i]);
-    }
-    //----------------------------------------------------------------
-    // Strips Counts with online ZS for 3 samples
-    //----------------------------------------------------------------
-    if (m_3Samples) {
+
+      //----------------------------------------------------------------
+      // Strips Counts with online ZS for 3 samples
+      //----------------------------------------------------------------
       name = str(format("SVDDQM_%1%_OnlineZSStrip3CountU") % sensorDescr);
       title = str(format("SVD Sensor %1% Integrated Number of online-ZS Fired U-Strip vs Strip Number for 3 samples") % sensorDescr);
       m_onlineZSstrip3CountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);
@@ -640,12 +638,10 @@ void SVDDQMExpressRecoModule::defineHisto()
       m_onlineZSstrip3CountV[i]->GetXaxis()->SetTitle("cellID");
       m_onlineZSstrip3CountV[i]->GetYaxis()->SetTitle("count");
       m_histoList->Add(m_onlineZSstrip3CountV[i]);
-    }
 
-    //----------------------------------------------------------------
-    // Strips Counts for 6 samples
-    //----------------------------------------------------------------
-    if (m_3Samples) {
+      //----------------------------------------------------------------
+      // Strips Counts for 6 samples
+      //----------------------------------------------------------------
       name = str(format("SVDDQM_%1%_Strip6CountU") % sensorDescr);
       title = str(format("SVD Sensor %1% Integrated Number of ZS5 Fired U-Strip vs Strip Number for 6 samples") % sensorDescr);
       m_strip6CountU[i] = new TH1F(name.c_str(), title.c_str(), 768, -0.5, 767.5);

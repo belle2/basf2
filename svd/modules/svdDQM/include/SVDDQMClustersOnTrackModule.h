@@ -53,6 +53,9 @@ namespace Belle2 {
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
+    /**< if true enable 3 samples histograms analysis */
+    bool m_3Samples = false;
+
     std::string m_svdShaperDigitsName;   /**< SVDShaperDigits data object  name*/
     std::string m_svdRecoDigitsName;   /**< SVDRecoDigits data object  name*/
     std::string m_svdClustersName;   /**< SVDClusters data object  name*/

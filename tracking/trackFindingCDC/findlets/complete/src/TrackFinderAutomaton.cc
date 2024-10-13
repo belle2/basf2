@@ -75,7 +75,7 @@ void TrackFinderAutomaton::beginEvent()
 
 void TrackFinderAutomaton::apply()
 {
-  // Aquire the wire hits, segments and tracks from the DataStore in case they have already been created
+  // Acquire the wire hits, segments and tracks from the DataStore in case they have already been created
   m_wireHitsSwapper.apply(m_wireHits);
   m_segmentsSwapper.apply(m_segments);
   m_tracksSwapper.apply(m_tracks);

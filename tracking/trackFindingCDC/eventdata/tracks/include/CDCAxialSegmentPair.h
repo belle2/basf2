@@ -23,23 +23,23 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
 
-    /// Class representing a pair of reconstructed axial segements in adjacent superlayer
+    /// Class representing a pair of reconstructed axial segments in adjacent superlayer
     class CDCAxialSegmentPair  {
 
     public:
-      /// Default constructor setting the contained segmetns to nullptr.
+      /// Default constructor setting the contained segments to nullptr.
       CDCAxialSegmentPair();
 
       /// Constructor from two segments
       CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
                           const CDCAxialSegment2D* endSegment);
 
-      /// Constructor from two segments and an assoziated trajectory
+      /// Constructor from two segments and an associated trajectory
       CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
                           const CDCAxialSegment2D* endSegment,
                           const CDCTrajectory2D& trajectory2D);
 
-      /// Equality comparision based on the pointers to the stored segments.
+      /// Equality comparison based on the pointers to the stored segments.
       bool operator==(CDCAxialSegmentPair const& rhs) const
       {
         return
@@ -47,7 +47,7 @@ namespace Belle2 {
           std::tie(rhs.m_startSegment, rhs.m_endSegment);
       }
 
-      /// Total ordering sheme comparing the segment pointers.
+      /// Total ordering scheme comparing the segment pointers.
       bool operator<(CDCAxialSegmentPair const& rhs) const
       {
         return

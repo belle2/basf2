@@ -50,7 +50,7 @@ def setup_VXDTF2(path=None,
                  debug_level=1):
     """
     Convenience Method to setup the redesigned vxd track finding module chain.
-    Reuslt is a store array containing reco tracks called 'RecoTracks'.
+    Results is a store array containing reco tracks called 'RecoTracks'.
     :param path: basf2.Path
     :param sec_map_file: training data for segment network.
     :param setup_name: name of the setup within all the sectormaps in the sec_map_file which should be used,

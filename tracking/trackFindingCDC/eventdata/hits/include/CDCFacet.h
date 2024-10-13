@@ -95,13 +95,13 @@ namespace Belle2 {
       /// Getter for the reconstructed position at the third hit on the fit line
       Vector2D getEndRecoPos2D() const;
 
-      /// Getter for the first reconstucted hit
+      /// Getter for the first reconstructed hit
       CDCRecoHit2D getStartRecoHit2D() const;
 
-      /// Getter for the second reconstucted hit
+      /// Getter for the second reconstructed hit
       CDCRecoHit2D getMiddleRecoHit2D() const;
 
-      /// Getter for the third reconstucted hit
+      /// Getter for the third reconstructed hit
       CDCRecoHit2D getEndRecoHit2D() const;
 
       /// Getter for the tangential line including the hits from the first to the second hit.
@@ -132,7 +132,7 @@ namespace Belle2 {
       /// Memory for a line fit to the three contained hits
       mutable UncertainParameterLine2D m_fitLine;
 
-      /// Memory for the cellular automaton cell assoziated with the facet.
+      /// Memory for the cellular automaton cell associated with the facet.
       mutable AutomatonCell m_automatonCell;
     };
   }

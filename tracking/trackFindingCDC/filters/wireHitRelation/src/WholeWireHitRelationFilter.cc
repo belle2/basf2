@@ -76,7 +76,7 @@ std::vector<CDCWireHit*> WholeWireHitRelationFilter::getPossibleTos(
 
   // Insert the neighbors such that they are most likely sorted.
 
-  // Degree 1 neighnborhood - only add the six oclock and the twelve oclock neighbot once
+  // Degree 1 neighborhood - only add the six oclock and the twelve oclock neighbot once
   if (m_param_degree > 1 and ccwSixthSecondWireNeighbor)
     m_wireNeighbors.push_back(ccwSixthSecondWireNeighbor);
 

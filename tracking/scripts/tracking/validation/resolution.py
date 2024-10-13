@@ -53,9 +53,9 @@ class ResolutionAnalysis:
         plot_name=None,
         plot_title=None,
         min_required_entries=None,  # minimum number of entries in a bin for the resolution fit
-        plot_name_prefix='',  # depricated use plot_name instead
-        plot_name_postfix='',  # depricated use plot_name instead
-        plot_title_postfix='',  # depricated use plot_title instead
+        plot_name_prefix='',  # deprecated use plot_name instead
+        plot_name_postfix='',  # deprecated use plot_name instead
+        plot_title_postfix='',  # deprecated use plot_title instead
         referenceFileName=None,  # if set binnings of histograms will be read from corresponding histogram in this file
     ):
         """Performs a comparison of an estimated quantity to their truths by generating standardized validation plots."""

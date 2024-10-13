@@ -18,7 +18,7 @@ path.add_module("EventInfoSetter", expList=0, runList=1, evtNumList=10)
 # generate BBbar events
 path.add_module('EvtGenInput')
 
-# detector simulation, don't perfrom PXD data reduction
+# detector simulation, don't perform PXD data reduction
 add_simulation(path, bkgOverlay=False, forceSetPXDDataReduction=True, usePXDDataReduction=False, cleanupPXDDataReduction=False)
 
 # add tracking and track fitting, without MC matching

@@ -71,7 +71,7 @@ namespace Belle2 {
       /// Checks if the circle is already set to a valid value.
       bool isFitted() const;
 
-      /// Clears all information from this trajectoy
+      /// Clears all information from this trajectory
       void clear();
 
     public:
@@ -83,7 +83,7 @@ namespace Belle2 {
 
     public:
       /**
-       *  Gives the two z postions where the given drift circle on the wire line touches the trajectory
+       *  Gives the two z positions where the given drift circle on the wire line touches the trajectory
        *
        *  Only works for the skew stereo wires
        *
@@ -94,7 +94,7 @@ namespace Belle2 {
       std::array<double, 2> reconstructBothZ(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /**
-       *  Gives the one z postions within the CDC closest to the given z
+       *  Gives the one z positions within the CDC closest to the given z
        *  where the given drift circle on the wire line touches the trajectory.
        *
        *  Only works for the skew stereo wires.
@@ -117,7 +117,7 @@ namespace Belle2 {
       std::array<Vector3D, 2> reconstructBoth3D(const WireLine& wireLine, double distance = 0.0, double z = 0) const;
 
       /**
-       *  Gives the one three dimensional postions within the CDC  closest to the given z
+       *  Gives the one three dimensional positions within the CDC  closest to the given z
        *  where the given drift circle on the wire line touches the trajectory.
        *
        *  This method makes the reconstruction of the z coordinate possible by using the skewness \n

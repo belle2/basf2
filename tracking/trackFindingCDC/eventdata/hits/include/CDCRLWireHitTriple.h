@@ -86,7 +86,7 @@ namespace Belle2 {
       /// Returns the aliased version of this oriented wire hit triple
       CDCRLWireHitTriple getAlias() const;
 
-      /// Equality comparision considering all three oriented wire hits.
+      /// Equality comparison considering all three oriented wire hits.
       bool operator==(const CDCRLWireHitTriple& other) const
       {
         return getStartRLWireHit() == other.getStartRLWireHit() and

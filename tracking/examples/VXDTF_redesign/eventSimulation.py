@@ -46,15 +46,15 @@ from svd import add_svd_reconstruction
 
 # ---------------------------------------------------------------------------------------
 
-# Set Random Seed for reproducable simulation. 0 means really random.
+# Set Random Seed for reproducible simulation. 0 means really random.
 rndseed = 12345
 # assume the first argument is the random seed
-if(len(sys.argv) > 1):
+if (len(sys.argv) > 1):
     rndseed = sys.argv[1]
 
 outputDir = './'
 # assume second argument is the output directory
-if(len(sys.argv) > 2):
+if (len(sys.argv) > 2):
     outputDir = sys.argv[2]
 
 b2.set_random_seed(rndseed)
@@ -188,7 +188,7 @@ else:
     outputFileName += "SimEvts_Belle2"
 outputFileName += '_' + str(rndseed) + '.root'
 
-# Root output. Default filename can be overriden with '-o' basf2 option.
+# Root output. Default filename can be overridden with '-o' basf2 option.
 rootOutput = b2.register_module('RootOutput')
 rootOutput.param('outputFileName', outputFileName)
 # to save some space exclude everything except stuff needed for tracking

@@ -30,7 +30,7 @@ namespace Belle2 {
     short vxdSensor;
     /// Testing cdc id
     short cdcWire;
-    /// Testng parameter id
+    /// Testing parameter id
     int paramid;
 
     /** init */

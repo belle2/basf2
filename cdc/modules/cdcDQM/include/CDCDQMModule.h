@@ -103,6 +103,8 @@ namespace Belle2 {
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
 
     int m_minHits;                   /**< Minimum hits for processing. */
+    bool m_boardwiseEfficiency = true; /**< If true, bins are joined together for each board on each year */
+    int m_MaxBinGroup = 4;         /**<  */
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */

@@ -22,6 +22,7 @@
 #include <fstream>
 #include <math.h>
 #include <set>
+#include <vector>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -41,6 +42,10 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
+  addParam("BoardwiseEfficiency", m_boardwiseEfficiency,
+           "If true, bins are joined together for each board on each year", m_boardwiseEfficiency);
+  addParam("MaxBinGroup", m_MaxBinGroup,
+           "If BoardwiseEfficiency is true, merge bins upto this", m_MaxBinGroup);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -301,22 +306,49 @@ TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, 
       r_inner = layerR - (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
       r_outer = layerR + (cdcgeo.senseWireR(nlayer + 1) - cdcgeo.senseWireR(nlayer)) / 2;
     }
+
+    std::vector<double> binXvals, binYvals;
+    int prevBid = -1;
+    int binGroup = 0;
     for (int wire = 0; wire < nWires; wire++) {
+      WireID wireid(nlayer, wire);
+      int bid = cdcgeo.getBoardID(wireid);
+
+      if (int(binXvals.size()) &&
+          (!m_boardwiseEfficiency ||
+           (m_boardwiseEfficiency && (prevBid != bid ||
+                                      m_MaxBinGroup == binGroup)))) {
+        hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
+        binXvals.clear(); binYvals.clear();
+        binGroup = 0;
+      }
+
       double phi_inner = (wire - 0.5 + offset) * 2 * TMath::Pi() / nWires;
       double phi_outer = (wire + 0.5 + offset) * 2 * TMath::Pi() / nWires;
       // Each bin is a rectangle defined by four corners
-      double x1 = r_inner * TMath::Cos(phi_inner);
-      double y1 = r_inner * TMath::Sin(phi_inner);
-      double x2 = r_outer * TMath::Cos(phi_inner);
-      double y2 = r_outer * TMath::Sin(phi_inner);
-      double x3 = r_outer * TMath::Cos(phi_outer);
-      double y3 = r_outer * TMath::Sin(phi_outer);
-      double x4 = r_inner * TMath::Cos(phi_outer);
-      double y4 = r_inner * TMath::Sin(phi_outer);
-      double xx[] = {x1, x2, x3, x4};
-      double yy[] = {y1, y2, y3, y4};
-      hist->AddBin(4, xx, yy);
+      double x2 = r_outer * TMath::Cos(phi_outer);
+      double y2 = r_outer * TMath::Sin(phi_outer);
+      double x3 = r_inner * TMath::Cos(phi_outer);
+      double y3 = r_inner * TMath::Sin(phi_outer);
+      if (!int(binXvals.size())) {
+        double x0 = r_inner * TMath::Cos(phi_inner);
+        double y0 = r_inner * TMath::Sin(phi_inner);
+        double x1 = r_outer * TMath::Cos(phi_inner);
+        double y1 = r_outer * TMath::Sin(phi_inner);
+        binXvals = {x0, x1, x2, x3};
+        binYvals = {y0, y1, y2, y3};
+      } else if (m_boardwiseEfficiency && prevBid == bid) {
+        int insertPos = int(binXvals.size()) / 2;
+        binXvals.insert(binXvals.begin() + insertPos + 1, x2);
+        binYvals.insert(binYvals.begin() + insertPos + 1, y2);
+        binXvals.insert(binXvals.begin() + insertPos + 2, x3);
+        binYvals.insert(binYvals.begin() + insertPos + 2, y3);
+      }
+      prevBid = bid;
+      binGroup++;
     }
+    if (int(binXvals.size())) // last bin
+      hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
   }
   hist->SetNameTitle(name, title);
   hist->SetDirectory(dir);

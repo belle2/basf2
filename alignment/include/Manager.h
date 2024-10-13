@@ -93,7 +93,7 @@ namespace Belle2 {
       /// Initialize the manager with given configuration (from MillepedeCollector)
       void initialize(const std::vector<std::string>& components = {}, const std::vector<EventMetaData>& timeSlices = {});
 
-      /// Notice manager of a comming event (from MillepedeCollector)
+      /// Notice manager of a coming event (from MillepedeCollector)
       void preCollect(const EventMetaData& emd);
 
       /// -------------------------------------------------------------------------

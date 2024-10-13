@@ -224,7 +224,7 @@ def create_pre_collector_path(
         is_validation=False):
     """
     Create a basf2 path that runs a common reconstruction path and also runs several SVDSimpleClusterizer
-    modules with different configurations. This way they re-use the same reconstructed objects.
+    modules with different configurations. This way they reuse the same reconstructed objects.
 
     Parameters:
         clusterizers (list[pybasf2.Module]): All the differently configured

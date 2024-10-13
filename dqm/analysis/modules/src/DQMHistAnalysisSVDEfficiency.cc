@@ -67,28 +67,26 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_legProblem->AddText("at least one sensor with:");
   m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
   m_legProblem->SetFillColor(c_ColorDefault);
-  m_legProblem->SetLineColor(kBlack);
+  m_legProblem->SetTextColor(kBlack);
 
   m_legWarning = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legWarning->AddText("WARNING!");
   m_legWarning->AddText("at least one sensor with:");
   m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
   m_legWarning->SetFillColor(c_ColorDefault);
-  m_legWarning->SetLineColor(kBlack);
+  m_legWarning->SetTextColor(kBlack);
 
   m_legNormal = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
   m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
   m_legNormal->SetFillColor(c_ColorDefault);
-  m_legNormal->SetLineColor(kBlack);
+  m_legNormal->SetTextColor(kBlack);
 
   m_legEmpty = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
   m_legEmpty->AddText("Not enough statistics,");
   m_legEmpty->AddText("check again in a few minutes");
   m_legEmpty->SetFillColor(c_ColorDefault);
-  m_legEmpty->SetTextColor(kWhite);
-  m_legEmpty->SetLineColor(kBlack);
-
+  m_legEmpty->SetTextColor(kBlack);
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 

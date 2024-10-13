@@ -314,28 +314,31 @@ TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, 
       WireID wireid(nlayer, wire);
       int bid = cdcgeo.getBoardID(wireid);
 
-      if (int(binXvals.size()) &&
+      // Add bin if board changes or we reached the desired number of merged bins
+      if (!binXvals.empty() &&
           (prevBid != bid || m_mergePolyBins == binGroup)) {
         hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
         binXvals.clear(); binYvals.clear();
-        binGroup = 0;
+        binGroup = 0;   // Reset bin group for the new board
       }
 
       double phi_inner = (wire - 0.5 + offset) * 2 * TMath::Pi() / nWires;
       double phi_outer = (wire + 0.5 + offset) * 2 * TMath::Pi() / nWires;
-      // Each bin is a rectangle defined by four corners
+      // Calculate the four corners of the bin
       double x2 = r_outer * TMath::Cos(phi_outer);
       double y2 = r_outer * TMath::Sin(phi_outer);
       double x3 = r_inner * TMath::Cos(phi_outer);
       double y3 = r_inner * TMath::Sin(phi_outer);
-      if (!int(binXvals.size())) {
+      if (binXvals.empty()) {
+        // Initialize with the first rectangle's corners
         double x0 = r_inner * TMath::Cos(phi_inner);
         double y0 = r_inner * TMath::Sin(phi_inner);
         double x1 = r_outer * TMath::Cos(phi_inner);
         double y1 = r_outer * TMath::Sin(phi_inner);
         binXvals = {x0, x1, x2, x3};
         binYvals = {y0, y1, y2, y3};
-      } else if (m_mergePolyBins > 1 && prevBid == bid) {
+      } else {
+        // Insert new corners at the correct position for merged bins
         int insertPos = int(binXvals.size()) / 2;
         binXvals.insert(binXvals.begin() + insertPos + 1, x2);
         binYvals.insert(binYvals.begin() + insertPos + 1, y2);
@@ -345,7 +348,7 @@ TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, 
       prevBid = bid;
       binGroup++;
     }
-    if (int(binXvals.size())) // last bin
+    if (!binXvals.empty()) // last bin
       hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
   }
   hist->SetNameTitle(name, title);

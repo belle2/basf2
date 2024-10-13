@@ -69,7 +69,7 @@ namespace Belle2 {
     /** additional plots flag*/
     bool m_additionalPlots = false;
 
-    /**< if true enable 3 samples histograms analysis */
+    /** if true enable 3 samples histograms analysis */
     bool m_3Samples = false;
 
     /** list of cumulative histograms */

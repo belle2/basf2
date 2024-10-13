@@ -75,7 +75,6 @@ namespace Belle2 {
 
     TCanvas* m_cUnpacker = nullptr; /**<unpacker plot canvas */
     TPaveText* m_legError = nullptr; /**<  plot legend, error*/
-    TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 

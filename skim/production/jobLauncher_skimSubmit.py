@@ -33,15 +33,21 @@ import time
 parser = argparse.ArgumentParser("")
 
 # input arguments. All but release are mandatory.
-parser.add_argument('-dir',   '--base_dir',          type=str, default='./SkimProd/',        help="main output directory")
+parser.add_argument('-dir',
+                    '--base_dir',
+                    type=str,
+                    default='./SkimProd/',
+                    help="main output directory")
 parser.add_argument(
     '-skim',
     '--skim',
     type=str,
     default='flaggedSkims.yaml',
     help="yaml file containing skims definitions")
-parser.add_argument('-info',   '--info',
-                    type=str, default='infoSkim.yaml',
+parser.add_argument('-info',
+                    '--info',
+                    type=str,
+                    default='infoSkim.yaml',
                     help="python file containing HLTskim, MCtype, GT of the skims")
 parser.add_argument(
     '-coll',
@@ -49,8 +55,10 @@ parser.add_argument(
     type=str,
     default='collections.yaml',
     help="input collection to be used")
-parser.add_argument('-rel',   '--release',
-                    type=str, default='',
+parser.add_argument('-rel',
+                    '--release',
+                    type=str,
+                    default='',
                     help=" basf2 release to be used. If not provide the one in infoSkim.yaml will be used")
 
 # configuration argument, used for debugging only
@@ -92,9 +100,9 @@ if not args.lpns and not args.register and not args.upload and not args.approve 
     from termcolor import colored
 
 try:
-    print(colored("WARNING: check that you have all your skims not commentedin the YAML!!!", 'red'))
+    print(colored("WARNING: check that you have all your skims not commented in the YAML", 'red'))
 except BaseException:
-    print("WARNING: check that you have all your skims not commented in the YAML!!!")
+    print("WARNING: check that you have all your skims not commented in the YAML")
 
 
 if args.lpns:  # step1 - gbasf2, once per campaign, one command for data and one for MC

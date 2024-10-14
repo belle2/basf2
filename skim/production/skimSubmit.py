@@ -18,6 +18,7 @@ import glob
 import subprocess
 from subprocess import Popen, PIPE
 import yaml
+import shutil
 
 
 def get_argument_parser():
@@ -606,12 +607,12 @@ def printStats(skims, stats_dir, flagged=False):
             os.system(f'b2skim-stats-print {flaggedString} -c {skim} -J')
         print(f'Moving to {stats_dir}')
         # move to MC folder
-        os.system(f'mv SkimStats.json {stats_dir}SkimStats_{skim}.json')
+        shutil.move('SkimStats.json', f'{stats_dir}SkimStats_{skim}.json')
         stats_dir_data = stats_dir.split('/MC/skim/stats/')[0]
         stats_dir_data = stats_dir_data+'/Data/skim/stats/'
         print(f'Copying to {stats_dir_data}')
         # make sure stats are in both MC and Data folders
-        os.system(f'cp {stats_dir}SkimStats_{skim}.json {stats_dir_data}')
+        shutil.copy2(f'{stats_dir}SkimStats_{skim}.json', stats_dir_data)
 
 
 def main():

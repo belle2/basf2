@@ -164,7 +164,7 @@ namespace Belle2 {
 
       /// Gives the azimuth angle difference from backward to forward position
       /* backwardToForwardAngle means how far the backward position has to be rotated in the xy projection
-         in the mathematical positiv sense that it seems to be coaligned with the forward position. */
+         in the mathematical positive sense that it seems to be coaligned with the forward position. */
       double backwardToForwardAngle() const
       { return backward2D().angleWith(forward2D()) ; }
 

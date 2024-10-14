@@ -64,7 +64,7 @@ void DQMEventProcessorBase::ProcessTrack(const Track& track)
   RelationVector<CDCHit> cdcHits = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
   int nCDCHits = (int)cdcHits.size();
 
-  // This method allways returns TrackFitResult so there's no need to check if it's not nullptr
+  // This method always returns TrackFitResult so there's no need to check if it's not nullptr
   auto trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
 
   TString message = ConstructMessage(trackFitResult, nPXDClusters, nSVDClusters, nCDCHits);

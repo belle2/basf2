@@ -273,7 +273,7 @@ bool V0FinderModule::isTrackPairSelected(const Track* track1, const Track* track
   double b1 = dr.Dot(k1);
   double b2 = dr.Dot(k2);
   double lam1 = (-b1 + b2 * cosAlpha) / D; // solution for the first straight line
-  double lam2 = (b2 - b1 * cosAlpha) / D;  // solution for the second staright line
+  double lam2 = (b2 - b1 * cosAlpha) / D;  // solution for the second straight line
   auto p1 = r1 + k1 * lam1;  // point on the first line closest to the second line
   auto p2 = r2 + k2 * lam2;  // point on the second line closest to the first line
   auto poca = (p1 + p2) / 2; // POCA of two straight lines, an approximation for the vertex

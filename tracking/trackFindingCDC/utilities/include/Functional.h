@@ -243,7 +243,7 @@ namespace Belle2 {
     template <class AFunctor = Id>
     using VoidOf = Composition<Void, AFunctor>;
 
-    /// Meta-functor that calles the given functor in case the call works - otherwise do nothing
+    /// Meta-functor that calls the given functor in case the call works - otherwise do nothing
     template <class AFunctor>
     using IfApplicable = Alternation<AFunctor, Void>;
 
@@ -453,12 +453,12 @@ namespace Belle2 {
 
     // ******************** ? < ? aka less ********************
 
-    /// Binary functor for less comparision of abitrary objects - equivalent to std::less<> (c++14)
+    /// Binary functor for less comparison of arbitrary objects - equivalent to std::less<> (c++14)
     struct Less {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator for less comparision of an abitrary object
+      /// Operator for less comparison of an arbitrary object
       template<class T1, class T2>
       auto operator()(const T1& t1, const T2& t2) const -> decltype(t1 < t2)
       {

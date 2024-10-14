@@ -409,7 +409,7 @@ class ValidationPlot:
 
         # Trying to make the graph lines invisible
         color_index = 0  # white
-        # Transperent white
+        # Transparent white
         graph.SetLineColorAlpha(color_index, 0)
         graph.SetLineStyle(self.very_sparse_dots_line_style_index)
 
@@ -687,7 +687,7 @@ class ValidationPlot:
         Parameters
         ----------
         formula : str or TF1
-            Formula string or TH1 to be fitted. See TF1 constructurs for that is a valid formula
+            Formula string or TH1 to be fitted. See TF1 constructors for that is a valid formula
         options : str
            Options string to be used in the fit. See TH1::Fit()
         lower_bound : float
@@ -1689,7 +1689,7 @@ class ValidationPlot:
             Preset bin edges or preset number of desired bins.
             The default, None, means the bound should be extracted from data.
             The rice rule is used the determine the number of bins.
-            If a list of floats is given return them immediatly.
+            If a list of floats is given return them immediately.
         lower_bound : float or None, optional
             Preset lower bound of the binning range.
             The default, None, means the bound should be extracted from data.
@@ -1979,7 +1979,7 @@ class ValidationPlot:
         # Prepare for the estimation of outliers
         if exclude_outliers:
             if not np.all(exceptional_indices):
-                # Exclude excecptional values from the estimation to be unbiased
+                # Exclude exceptional values from the estimation to be unbiased
                 # even in case exceptional values fall into the central region near the mean
                 x_mean, x_std = self.get_robust_mean_and_std(finite_xs[~exceptional_indices])
             else:
@@ -2143,7 +2143,7 @@ class ValidationPlot:
         for (i, (label, value)) in enumerate(additional_stats.items()):
             # root 6 does not like labels with spaces ..
             # bug report:  https://sft.its.cern.ch/jira/browse/ROOT-7460
-            # therefor this workaround:
+            # therefore this workaround:
             label = label.replace(" ", "-")
             additional_stats_tf1.SetParName(i, label)
             additional_stats_tf1.FixParameter(i, value)

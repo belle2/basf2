@@ -858,7 +858,7 @@ def plot_tf1_data_into(ax,
     ax : matplotlib.axes.Axes
         An axes space in which to plot
     tf1 : ROOT.TF1
-        Function to be ploted.
+        Function to be plotted.
     label : str, optional
         Label for the legend entry.
     """

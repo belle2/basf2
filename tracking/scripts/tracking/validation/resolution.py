@@ -115,7 +115,7 @@ class ResolutionAnalysis:
         Parameters
         ----------
         bin_values : array_like(float
-            The parametr used for binning
+            The parameter used for binning
         truths : array_like(float)
             Sample of the true values
         estimates : array_like(float)
@@ -211,7 +211,7 @@ class ResolutionAnalysis:
             resolution_graph_name = formatter.format(plot_name, subplot_name="resolution")
             resolution_graph = ValidationPlot(resolution_graph_name, self.referenceFileName)
 
-            # compile all requried data going into the final TGraphErrors
+            # compile all required data going into the final TGraphErrors
             xs = []
             xs_err = []
             ys = []

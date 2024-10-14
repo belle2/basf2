@@ -90,7 +90,7 @@ namespace Belle2 {
       void adjustRLInfo();
 
       /** Reverses the tangent inplace.
-       *  Swaps the to wire hits, reverses the left right informations and
+       *  Swaps the to wire hits, reverses the left right information and
        *  exchanges the two touch points of the line
        */
       void reverse();

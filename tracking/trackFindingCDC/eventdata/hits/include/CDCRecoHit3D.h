@@ -123,8 +123,8 @@ namespace Belle2 {
        *  that both circle trajectory and sz trajectory share a common reference point.
        *
        *  For two dimensional reconstructed hits on stereo wires the transverse travel distance is obtained
-       *  as in the reconstuct() method before. However the z coordinate is set to the value of the sz trajectory
-       *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
+       *  as in the reconstruct() method before. However the z coordinate is set to the value of the sz trajectory
+       *  at just calculated the transverse travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.
        */
       static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,

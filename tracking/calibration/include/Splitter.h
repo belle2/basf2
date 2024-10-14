@@ -151,7 +151,7 @@ namespace Belle2 {
       * @param evts: A vector with all events
       * @param lossFunctionOuter: A formula of the outer loss function (for calib. intervals)
       * @param lossFunctionInner: A formula of the inner loss function (for calib. subintervals)
-      * @param atomSize: lenght of the small calibration interval - atom (in hours)
+      * @param atomSize: length of the small calibration interval - atom (in hours)
       * @return: Vector of the calib. intervals always containing vector of calib. subintervals.
       *          Each subinterval is defined as a map spanning in general over several runs
       **/
@@ -208,7 +208,7 @@ namespace Belle2 {
 
   private:
 
-    /** Get optimal break points using algorithm based on dynamic programing
+    /** Get optimal break points using algorithm based on dynamic programming
       * @param runs: Vector of atoms, where each atom is an intervals in time
       * @return: Optimal indexes of the break points
      **/

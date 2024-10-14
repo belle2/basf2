@@ -83,7 +83,7 @@ namespace Belle2 {
        */
       const std::string save(const std::string& fileName);
 
-      /// Clears all drawed elements from the plotter.
+      /// Clears all drawn elements from the plotter.
       void clear();
 
     public:

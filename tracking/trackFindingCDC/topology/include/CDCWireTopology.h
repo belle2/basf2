@@ -29,9 +29,9 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Class representating the sense wire arrangement in the whole of the central drift chamber.
+     *  Class representing the sense wire arrangement in the whole of the central drift chamber.
      *  This class represents the the whole CDC layer geometry and the neighborhood relations in it. \n
-     *  Since their is only one CDC at a time it is implemented as a singletone object, with getInstance(). \n
+     *  Since their is only one CDC at a time it is implemented as a singleton object, with getInstance(). \n
      *  Their should rarely be the need to construct additional instances. \n
      *  It provides getters for all wires, layers and superlayers and can check the validity of wire id combinations. \n
      *  Also there are methods for getting to the closest and secondary of each wire. \n

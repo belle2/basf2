@@ -388,7 +388,7 @@ class CDCSVGDisplayModule(basf2.Module):
 
         # ######### CDCWires ##########
         # Draw wires from cdcwire objects
-        # Now prefered way of ploting the wires
+        # Now preferred way of plotting the wires
         if self.draw_wires:
             theCDCWireTopology = \
                 Belle2.TrackFindingCDC.CDCWireTopology.getInstance()
@@ -1048,14 +1048,14 @@ class CDCSVGDisplayModule(basf2.Module):
 
     def endRun(self):
         """
-        endRun methode of the module. Empty here.
+        endRun method of the module. Empty here.
         """
 
         pass
 
     def terminate(self):
         """
-        teminate methode of the module. Empty here.
+        terminate method of the module. Empty here.
         """
 
         pass

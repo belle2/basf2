@@ -63,7 +63,7 @@ def TH2Hex(name,
                                  y_upper_bound)
 
     # Construct points of a hexagon with unit radius
-    # Go clockwise such that root understands what the interal of the polygon is
+    # Go clockwise such that root understands what the internal part of the polygon is
     pi = math.pi
 
     unit_radius_hex_xs = np.array([math.sin(2.0 * pi * i / 6.0) for i in range(-2, 4)])

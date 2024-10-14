@@ -267,7 +267,7 @@ void VXDSimpleClusterizerModule::event()
     }
 
     if (m_setMeasSigma == 0) {
-      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbritary values here, better solution recommended!
+      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbitrary values here, better solution recommended!
       sigmaU = 0.000001;
       sigmaV = 0.000001;
     }

@@ -60,7 +60,7 @@ with open("first_var_regressor.pickle", "wb") as first_var_regressor_file:
   TEST(TrackFindingCDCTest, PyEstimator_predict_classifier)
   {
     Py_Initialize();
-    // Create dummy regession object
+    // Create dummy regression object
     std::string first_var_classifier_code = R"code(
 import numpy
 class FirstVarClassifier(object):
@@ -110,7 +110,7 @@ with open("first_var_classifier.pickle", "wb") as first_var_classifier_file:
       return;
     }
 
-    // Create dummy regession object
+    // Create dummy regression object
     std::string bdt_regressor_code = R"code(
 
 from sklearn import ensemble

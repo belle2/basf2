@@ -53,7 +53,7 @@ namespace Belle2 {
     //   m_Id(Id), m_wU(wU), m_wV(wV), m_U(U), m_V(V) { }
 
     // /** ctor for single Cluster SpacePoints (SVD) or PXD SpacePoints. The information which Cluster is set can be
-    //  * retrieved from the SpacePoint directlly for SVD in this case!
+    //  * retrieved from the SpacePoint directly for SVD in this case!
     //  */
     // TrueHitInfo(int Id, double weight) : m_Id(Id), m_wU(weight), m_wV(0.), m_U(true), m_V(false) { }
 

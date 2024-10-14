@@ -20,15 +20,15 @@ namespace Belle2 {
   /**  This module evaluate the cuts used to select the training sample
   *  of the SectorMap. From simulated data files, during the events create
   *  for each track a vector of hitXP (see hitXP class) with the
-  *  first hit on each layer of VXD (see NoKickRTSel class for detalis). Than
+  *  first hit on each layer of VXD (see NoKickRTSel class for details). Than
   *  fills some histogram with the distribution of difference of parameters
-  *  betweeen following layers.
-  *  During endrun evaluate the cuts on tails of these distibution using a
-  *  funcion that define the percentage that has to be selected. Than these
-  *  cuts are fitted in momentum and angular theta distiribution. In the end
+  *  between following layers.
+  *  During endrun evaluate the cuts on tails of these distribution using a
+  *  function that define the percentage that has to be selected. Than these
+  *  cuts are fitted in momentum and angular theta distribution. In the end
   *  the parameters of the fits are put in a matrix (TH3F) on a TFile and
   *  they contains all the informations of the cuts. The output file
-  * NoKickCuts.root has to be used duing training of SectorMap.
+  * NoKickCuts.root has to be used during training of SectorMap.
   */
   class NoKickCutsEvalModule : public Module {
   public:
@@ -66,9 +66,9 @@ namespace Belle2 {
     double deltaParEval(hitXP hit1, hitXP hit2, NoKickCuts::EParameters par, bool is0 = false);
 
 
-    /** This is the funcion that select the percentage that has to be cut away from
+    /** This is the function that select the percentage that has to be cut away from
     *  deltaPar distributions (function of momentum)
-    *  input: (momentum, widht of momentum bin)
+    *  input: (momentum, width of momentum bin)
     *  output: (value of the function)
     */
     double cutFunction(int p, double pwidth);
@@ -97,9 +97,9 @@ namespace Belle2 {
     double c_twidth = (c_tmax - c_tmin) / (double)c_nbint; /**< width of theta bin */
     const double c_multLimit = 1; /**< multiplier of the range limit of the histograms of DeltaX */
     const double c_over = NAN; /**< escape flag of some methods */
-    int m_pCounter = 0; /**< conter of hit out of range in momentum */
+    int m_pCounter = 0; /**< counter of hit out of range in momentum */
     int m_tCounter = 0; /**< counter of hit out of range in theta */
-    int m_globCounter = 0; /**< counter of tracks cutted from global cuts */
+    int m_globCounter = 0; /**< counter of tracks cut from global cuts */
     bool c_validationON; /**< flag to activate some validation plots */
     bool c_fitMethod; /**< flag to activate the fit method to evaluate the cuts */
 

@@ -148,7 +148,7 @@ namespace Belle2 {
       /// Function call to map the CDCHit id and object to a color.
       std::string map(int index, const CDCHit& hit) override;
 
-      /// Informal string summarizing the translation from seconday process codes to colors.
+      /// Informal string summarizing the translation from secondary process codes to colors.
       std::string info() override;
     };
 

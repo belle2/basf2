@@ -18,7 +18,7 @@
 # The training sample must be provided via the extra commandline
 # argument '-- --train_sample <f1> <f2> ...' or '-- -i <f1> <f2> ...'
 # where f1, f2 and so on are different prepared training samples.
-# The -- is requiered to escape from basf2 options and add additional
+# The -- is required to escape from basf2 options and add additional
 # commandline arguments specifically for this script.
 # The file name under which the trained SecMap will be stored can be
 # specified via the argument --secmap
@@ -35,7 +35,7 @@ import os
 
 
 # ---------------------------------------------------------------------------------------
-# Argument parser for input of training sample file via comandline option.
+# Argument parser for input of training sample file via commandline option.
 arg_parser = argparse.ArgumentParser(description='Sector Map Training:\
                                      Trains and stores SecMap from provided data sample.\n\
                                      Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root')
@@ -66,7 +66,7 @@ b2.log_to_file('logVXDTF2Training.log', append=False)
 # ---------------------------------------------------------------------------------------
 path = b2.create_path()
 
-# Event Info Setter which is requiered as the SecMap Training is performed in the Initilize
+# Event Info Setter which is required as the SecMap Training is performed in the Initialize
 # Phase. Thus, this script does not run over any events at all, but over the data available
 # in the prepared training sample root file.
 eventinfosetter = b2.register_module('EventInfoSetter')
@@ -82,12 +82,12 @@ path.add_module(eventinfosetter)
 gearbox = b2.register_module('Gearbox')
 path.add_module(gearbox)
 # the geometry is loaded from the DB by default now! The correct geometry
-# should be pickked according to exp number
+# should be picked according to exp number
 geometry = b2.register_module('Geometry')
 path.add_module(geometry)
 
 
-# SecMapBootStrap Module is requiered, as it holds all  the sector maps and
+# SecMapBootStrap Module is required, as it holds all  the sector maps and
 # for storing the trained SecMap.
 secMapBootStrap = b2.register_module('SectorMapBootstrap')
 secMapBootStrap.param('ReadSectorMap', False)

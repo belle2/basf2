@@ -52,7 +52,7 @@ def add_geometry_modules(path, components=None):
 
 def add_hit_preparation_modules(path, components=None, pxd_filtering_offline=False, create_intercepts_for_pxd_ckf=False):
     """
-    Helper fucntion to prepare the hit information to be used by tracking.
+    Helper function to prepare the hit information to be used by tracking.
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
@@ -216,7 +216,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     """
     Match the tracks to the MC truth. The matching works based on
     the output of the TrackFinderMCTruthRecoTracks.
-    Alternativly one can use the Chi2MCTrackMatcher based on chi2 values
+    Alternatively one can use the Chi2MCTrackMatcher based on chi2 values
     calculated from the helixparameters of Tracks and MCParticles.
 
     :param path: The path to add the tracking reconstruction modules to
@@ -225,7 +225,7 @@ def add_mc_matcher(path, components=None, mc_reco_tracks="MCRecoTracks",
     :param reco_tracks: Name of the StoreArray where the reco tracks should be stored
     :param use_second_cdc_hits: If true, the second hit information will be used in the CDC track finding.
     :param split_after_delta_t: If positive, split MCRecoTrack into multiple MCRecoTracks if the time
-                                distance between two adjecent SimHits is more than the given value
+                                distance between two adjacent SimHits is more than the given value
     :param matching_method:     hit: uses the hit-matching
                                 chi2: uses the chi2-matching
     :param chi2_cutoffs:        If chi2 matching method is used, this list defines the individual cut-off values
@@ -629,7 +629,7 @@ def add_cdc_track_finding(path, output_reco_tracks="RecoTracks", with_ca=False,
            indicator property of the CDC ``output_reco_tracks``
     :param cdc_quality_estimator_weightfile: Weightfile identifier for the TFCDC_TrackQualityEstimator
     :param reattach_hits: if true, use the ReattachCDCWireHitsToRecoTracks module at the end of the CDC track finding
-                          to readd hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
+                          to read hits with bad ADC or TOT rejected by the TFCDC_WireHitPreparer module.
     """
     # add EventLevelTrackinginfo for logging errors
     if 'RegisterEventLevelTrackingInfo' not in path:

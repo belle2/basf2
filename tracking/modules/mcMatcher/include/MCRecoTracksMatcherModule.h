@@ -43,7 +43,7 @@ namespace Belle2 {
    *   .
    *
    *  The RelationArray for purity and efficiency generally store only the single highest purity and
-   *  the single highest efficiency for a given PRTrack, MCTrack respectivelly. However these values are stored with
+   *  the single highest efficiency for a given PRTrack, MCTrack respectively. However these values are stored with
    *  a minus sign if the PRTrack is a clone, or the MCTrack is merged into another PRTrack. The McTrackId is either set to the
    *  index of the MCParticle or to some negative value indicating the severity of the mismatch. (Classification details below).
    *
@@ -124,7 +124,7 @@ namespace Belle2 {
    *  - GHOST
    *      - The highest purity MCTrack to this PRTrack has a purity lower than the minimal purity given in the parameter minimalPurity or
    *      - has an efficiency lower than the efficiency given in the parameter minimalEfficiency.
-   *      - This means that the PRTrack does not contain a significat number of a specific MCTrack nor can it considered only made of background.
+   *      - This means that the PRTrack does not contain a significant number of a specific MCTrack nor can it considered only made of background.
    *      - For ghost tracks the McTrackId of the RecoTracks is set to -999.
    *      - No relation from the PRTrack to the MCParticle is inserted.
    *      - PRTracks classified as ghost are not entered in the purity RelationArray.
@@ -163,7 +163,7 @@ namespace Belle2 {
    *        to be able to distinguish them from the matched tracks.
    *
    *  - MISSING
-   *      - There is no highest efficiency PRTrack to this MCTrack, which also fullfills the minimal purity requirement.
+   *      - There is no highest efficiency PRTrack to this MCTrack, which also fulfills the minimal purity requirement.
    *      - For this category no efficiency relation is inserted.
    *  .
    *
@@ -231,7 +231,7 @@ namespace Belle2 {
     //! Flag to indicated whether the Monte Carlo track are on the DataStore
     bool m_mcParticlesPresent = false;
 
-    //! Descriptive type defintion for a number of degrees of freedom.
+    //! Descriptive type definition for a number of degrees of freedom.
     using NDF = int;
 
     //! Map storing the standard number degrees of freedom for a single hit by detector */

@@ -27,7 +27,7 @@ import argparse
 import os
 
 # ---------------------------------------------------------------------------------------
-# Argument parser to enable training sample selection via comandline option.
+# Argument parser to enable training sample selection via commandline option.
 parser = argparse.ArgumentParser(description='Training sample preparation:\
                                      Prepare a data sample to train the sector map.\n\
                                      Usage: basf2 traininPreparation.py -i dataSample.root -- --enable_selection boolean')

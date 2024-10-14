@@ -89,7 +89,7 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
            "alter the 3-hit filters. The inner vector should contain exactly two strings. The first entry is interpreted as index (integer). "
            "The second entry is interpreted as function used to create a TF1. The variable to be altered will be assumed to be called \"x\" "
            "and in addition \"[0]\" can be used which will be interpreted as FullSecID of the static sector the filter is attached to. No other "
-           "parameter is allowd. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
+           "parameter is allowed. The structure of the 2-hit filter is as follows:     " + structure3HitFilter +
            "    Example: [(1, \"12\"), (3, \"sin(x)\"), (4, \"x + [0]\")]    PS: use this feature only if you know what you are doing!",
            m_threeHitFilterAdjustFunctions);
 }
@@ -141,7 +141,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 {
 
 
-  // TODO: Most of these informations are not used at all.
+  // TODO: Most of the information is not used at all.
   //        It seems to me (EP) that only the SectorDividers are used.
 
   // TODO: find a better way to put the configs into the framework

@@ -264,7 +264,7 @@ void MCRecoTracksMatcherModule::event()
   std::multimap<DetHitIdPair, WeightedRecoTrackId > mcId_by_hitId;
   fillIDsFromStoreArray(mcId_by_hitId, m_MCRecoTracks);
 
-  //  Use set instead of multimap to handel to following situation
+  //  Use set instead of multimap to handle to following situation
   //  * One hit may be assigned to multiple tracks should contribute to the efficiency of both tracks
   //  * One hit assigned twice or more to the same track should not contribute to the purity multiple times
   //  The first part is handled well by the multimap. But to enforce that one hit is also only assigned

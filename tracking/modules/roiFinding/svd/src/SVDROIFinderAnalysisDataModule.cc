@@ -58,7 +58,7 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   , m_h1GoodROItrack_lambda(nullptr)
   , m_h1GoodROItrack_cosTheta(nullptr)
   , m_h1GoodROItrack_pVal(nullptr)
-  //tracks with an attached Good ROI contaning at least one SVDShaperDigit
+  //tracks with an attached Good ROI containing at least one SVDShaperDigit
   , m_h1FullROItrack(nullptr)
   , m_h1FullROItrack_pt(nullptr)
   , m_h1FullROItrack_phi(nullptr)

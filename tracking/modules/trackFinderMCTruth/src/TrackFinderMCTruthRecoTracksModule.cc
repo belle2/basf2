@@ -65,8 +65,8 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            false);
   addParam("UseNLoops",
            m_useNLoops,
-           "Set the number of loops whose hits will be marked as priortiy hits. All other hits "
-           "will be marked as auxiliary and therfore not considered for efficiency computations "
+           "Set the number of loops whose hits will be marked as priority hits. All other hits "
+           "will be marked as auxiliary and therefore not considered for efficiency computations "
            "By default, all hits will be priority hits.",
            INFINITY);
   addParam("UseOnlyBeforeTOP",
@@ -75,7 +75,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            false);
   addParam("UseReassignedHits",
            m_useReassignedHits,
-           "Include hits reassigned from discarded seconardy daughters in the tracks.",
+           "Include hits reassigned from discarded secondary daughters in the tracks.",
            false);
   addParam("UseSecondCDCHits",
            m_useSecondCDCHits,
@@ -264,7 +264,7 @@ void TrackFinderMCTruthRecoTracksModule::initialize()
 
 
 
-    //transfom the smearingCov vector into a TMatrixD
+    //transform the smearingCov vector into a TMatrixD
     //first check if it can be transformed into a 6x6 matrix
     if (m_smearingCov.size() != 36) {
       B2FATAL("SmearingCov does not have exactly 36 elements. So 6x6 covariance matrix can be formed from it");
@@ -770,7 +770,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     } // end if m_useCDCHits
 
-    if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of inital state adds information
+    if (m_initialCov(0, 0) > 0.0) { //using a user set initial cov and corresponding smearing of initial state adds information
       ndf += 5;
     }
     if (ndf < m_minimalNdf) {

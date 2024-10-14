@@ -179,7 +179,7 @@ namespace Belle2 {
       /// Threshold for the purity that must be exceeded to be considered as a match.
       float m_minimalMatchPurity = 0.5;
 
-      /// Threshold for the correct fraction of right left passage informations to be considered a match
+      /// Threshold for the correct fraction of right left passage information to be considered a match
       float m_minimalRLPurity = 0.5;
     };
   }

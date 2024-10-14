@@ -33,7 +33,7 @@ KinkFinderModule::KinkFinderModule() : Module()
                  "(``KinkFinderParameters::m_vertexDistanceCut``) are stored as ``Belle2::Kink``.\n\n"
                  "If a corresponding ``KinkFitter`` mode is ON, hits are reassigned between mother and daughter tracks "
                  "to improve the resolutions and efficiency. If a corresponding ``KinkFitter`` mode is ON, the track "
-                 "pair is also fitted as one track and a special flag is filled based on the result to supress the clones.\n\n"
+                 "pair is also fitted as one track and a special flag is filled based on the result to suppress the clones.\n\n"
                  "If a corresponding ``KinkFitter`` mode is ON, ``KinkFinder`` preselects track candidates "
                  "that might be formed from two kink tracks, and ``KinkFitter`` splits such tracks. "
                  "After that the result is stored in ``Belle2::Kink``.");

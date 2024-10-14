@@ -85,7 +85,7 @@ namespace Belle2 {
 
     /**
      * Track pair preselection based on a point-of-closest-approach of two tracks.
-     * Tracks are approximated with staright lines using their perigee parameters.
+     * Tracks are approximated with straight lines using their perigee parameters.
      * @param track1 first track
      * @param track2 second track
      * @return true, if preselection criteria are satisfied.

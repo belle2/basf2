@@ -20,7 +20,7 @@
 #include <utility> // std::pair
 
 namespace Belle2 {
-  /** simple class storing infos relevant for a TC for analizing it. */
+  /** simple class storing infos relevant for a TC for analyzing it. */
   class AnalizerTCInfo {
   public:
 

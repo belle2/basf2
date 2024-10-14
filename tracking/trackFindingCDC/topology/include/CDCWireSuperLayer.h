@@ -60,7 +60,7 @@ namespace Belle2 {
       void operator=(const CDCWireSuperLayer& wireSuperLayer) = delete;
 
     public:
-      /// Intializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
+      /// Initializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
       void initialize();
 
       /**
@@ -232,7 +232,7 @@ namespace Belle2 {
        *
        *  Due to the hexogonal arrangement of the wires, the secondary neighbors are positioned
        *  just like the numbers on the clock if you took the center of the clock to the wire position
-       *  and the twelve o'clock poing in the outwards direction.
+       *  and the twelve o'clock points in the outwards direction.
        *
        *  Note : Not all neighbors might be present at the boundaries of the superlayer.
        *  In case the neighbor asked for does not exist, the functions return nullptr instead.

@@ -293,7 +293,7 @@ namespace Belle2 {
                                 VxdID vxdID = VxdID())
     {
       // Times to times there are normalized coordinates that are out of the boundaries.
-      // We do apply a smal sloppyness here
+      // We do apply a small sloppiness here
 
       double sloppyTerm = 1e-3;
       if (value < lower - sloppyTerm) {

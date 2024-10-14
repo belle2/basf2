@@ -573,7 +573,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
 
     def __str__(self):
         """
-        Informal string summarizing the translation from seconday process codes to colors.
+        Informal string summarizing the translation from secondary process codes to colors.
         """
 
         return """

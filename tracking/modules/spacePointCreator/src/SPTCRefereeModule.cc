@@ -77,7 +77,7 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
 
   // other
   addParam("minDistance", m_PARAMminDistance,
-           "Minimal Distance [cm] that two subsequent SpacePoints have to be seperated if 'checkMinDistance' is enabled",
+           "Minimal Distance [cm] that two subsequent SpacePoints have to be separated if 'checkMinDistance' is enabled",
            m_PARAMminDistance);
   addParam("setOrigin", m_PARAMsetOrigin, "WARNING: still need to find out the units that are used internally! "
            "Reset origin to given point. Used for determining the direction of flight of a particle for a "
@@ -534,7 +534,7 @@ SPTCRefereeModule::splitTrackCand(const Belle2::SpacePointTrackCand* trackCand, 
       trackStub.setFlightDirection(dirOfFlight);
       dirOfFlight = !dirOfFlight;
 
-      // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to chagnes with the new bitfield in SpacePointTrackCand
+      // trackStub index starts at 1 for curling SPTCs. NOTE: this might be subject to changes with the new bitfield in SpacePointTrackCand
       trackStub.setTrackStubIndex(iTs + 1);
 
       // determine and set the referee status of this trackStub based upon the information from the previous tests

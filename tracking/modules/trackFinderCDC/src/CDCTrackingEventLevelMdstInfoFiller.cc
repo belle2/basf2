@@ -61,7 +61,7 @@ void CDCTrackingEventLevelMdstInfoFillerFromHitsFindlet::apply(const std::vector
 
 std::string CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet::getDescription()
 {
-  return "This module adds additional global event level information based on 2D segements about CDC track finding results to the MDST object EventLevelTrackingInfo";
+  return "This module adds additional global event level information based on 2D segments about CDC track finding results to the MDST object EventLevelTrackingInfo";
 }
 
 void CDCTrackingEventLevelMdstInfoFillerFromSegmentsFindlet::initialize()

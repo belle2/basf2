@@ -23,7 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A three dimensional vector
-    /** A three dimensional vector which is equiped with the expected vector methods. \n
+    /** A three dimensional vector which is equipped with the expected vector methods. \n
      *  Also this vector can be passed to functions where a TVector3 is expected syntactically.
      */
     class Vector3D {

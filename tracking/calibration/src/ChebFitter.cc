@@ -57,7 +57,7 @@ namespace Belle2 {
     // loading the Cheb nodes
     m_nodes = (xMax - xMin) * getNodes(Size).array() + xMin;
 
-    // loding the weights for integration
+    // loading the weights for integration
     m_weights = (xMax - xMin) * getWeights(Size);
 
 

@@ -144,7 +144,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
 void PrintDataTemplateModule::checkFTSWver2(RawFTSW* rawftsw, int i)
 {
   //
-  // Double check by comparing extracted values with ones at https://confluence.desy.de/display/BI/DAQ+TimingDistribution (ver.26)
+  // Double check by comparing extracted values with ones at https://xwiki.desy.de/xwiki/rest/p/a2bb3
   //
 
   int* buf = rawftsw->GetBuffer(i);

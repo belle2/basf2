@@ -24,7 +24,7 @@ import basf2 as b2
 
 # Some ROOT tools
 import ROOT
-from ROOT import Belle2  # make Belle2 namespace available
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT import gROOT, addressof
 
 # Define a ROOT struct to hold output data in the TTree
@@ -114,7 +114,7 @@ class SVDValidationTTreeStrip(b2.Module):
 
                     # print("this digit's charge: " + str(digit.getCharge()))
 
-                    if(digit.getCharge() > strip_charge):
+                    if (digit.getCharge() > strip_charge):
                         strip_charge = digit.getCharge()
 
                 # Sensor identification

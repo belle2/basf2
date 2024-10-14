@@ -187,7 +187,7 @@ void ECLLocalMaximumFinderModule::event()
       // Check seed energy cut.
       if (aECLCalDigit.getEnergy() >= m_energyCut) {
 
-        // Clean up for this candiate (MVA is trained per LM, regardless of CR)
+        // Clean up for this candidate (MVA is trained per LM, regardless of CR)
         std::fill_n(vNeighourEnergies.begin(), vNeighourEnergies.size(),
                     -999);   // -999 means later: this digit is just not available in this neighbour definition.
         resetTrainingVariables();

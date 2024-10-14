@@ -487,7 +487,7 @@ class GraFEIModule(b2.Module):
                     # Here we look if the candidate has a perfectly reconstructed LCA
                     for genP in gen_list.obj():
                         mcp = genP.getMCParticle()
-                        # If storing true info on B decays and we have matched paricles coming
+                        # If storing true info on B decays and we have matched particles coming
                         # from different Bs the decay will not have a perfectLCA
                         if self.mc_particle != "Upsilon(4S):MC" and len(B_indices) != 1:
                             break

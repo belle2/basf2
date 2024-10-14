@@ -56,6 +56,7 @@ void DQMHistAnalysisInput2Module::beginRun()
 {
   B2DEBUG(1, "DQMHistAnalysisInput2: beginRun called.");
   clearHistList();
+  clearRefList();
   resetDeltaList();
   clearCanvases();
 

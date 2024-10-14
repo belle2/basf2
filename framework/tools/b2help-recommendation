@@ -23,6 +23,9 @@ from pygments import highlight
 from pygments.lexers import get_lexer_by_name
 import pygments.formatters
 import terminal_utils
+import itertools
+
+MC_CAMPAIGN = ['MC15', 'MC16']
 
 class FormatterStrategy(ABC):
     """
@@ -301,11 +304,32 @@ def convert_json_to_payload(localfile: str, payload: str):
     db = Belle2.Database.Instance()
     db.addPayload(payload, localfile, iov)
 
+def print_tags(tools: list, mccampaign:str, n_tag_columns: int = 2):
+    """
+    Print all available tags.
+    """
+    print(f"Available tags for {mccampaign}:")
+    available_tags = get_available_tags(tools)
+    if n_tag_columns < 2 or n_tag_columns >= len(available_tags):
+        for tag in available_tags:
+            print(f"  - {tag}")
+    else:
+        groups = [available_tags[i::n_tag_columns] for i in range(n_tag_columns)]
+        for group in itertools.zip_longest(*groups):
+            print(" ".join(f" - {tag:<25}" for tag in group if tag))
+    print("\nTags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. ")
+    print("You can check all information with the 'all' tag.")
+
+
 def get_argument_parser():
     """
     Get the argument parser.
     """
     parser = argparse.ArgumentParser(description="Outputs recommendation for data/MC corrections and systematics, use tags to navigate.")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-mc", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
+                        choices=MC_CAMPAIGN)
+    group.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("-t", "--tags", help="Filter tools by specific tags. The 'all' tag allows to show all information.",
                         nargs='+', default=None)
     parser.add_argument("-gt", "--globaltag", help="Global tag name, if one wants to check another recommendation",
@@ -314,10 +338,9 @@ def get_argument_parser():
                         default='color_rst')
     parser.add_argument("-p", "--payload", help="Payload name, if one wants to check another recommendation",
                         default=None)
-    parser.add_argument("-m", "--mccampaign", help="Show recommendations for this MC campaign and the corresponding data processing",
-                        default='MC15')
+    parser.add_argument("--n_tag_columns", help="Number of columns for tag printing", type=int,
+                        default=2)
     parser.add_argument("--no-pager", help="Disable output scrolling, which is done by Pager", action='store_true')
-    parser.add_argument("-l", "--localfile", help="If one wants to check a json file locally.", default=None)
     parser.add_argument("-c", "--convert", help="For developers. Convert the localfile to a payload.", action='store_true')
     return parser
 
@@ -344,6 +367,9 @@ def main():
             sys.exit(0)
 
     if args.localfile is None:
+        if args.mccampaign is None:
+            b2.B2ERROR(f"The MC campaign is not provided! Available choices for -mc argument: {MC_CAMPAIGN}")
+            sys.exit(1)
         gt_name = args.globaltag
         if gt_name is None:
             gt_name = versioning.performance_recommendation_global_tag(args.mccampaign)['global_tag']
@@ -375,14 +401,10 @@ def main():
 
     else:
         tools = load_data(args.localfile, formatter)
+        args.mccampaign = "local"
 
     if args.tags is None:
-        print("Available Tags:")
-        available_tags = get_available_tags(tools)
-        for tag in available_tags:
-            print(f"  - {tag}")
-        print("\nTags can be combined to narrow down the search, e.g. use '-t pion PID' to get information only about pion PID, etc. ")
-        print("You can check all information with the 'all' tag.")
+        print_tags(tools, args.mccampaign, n_tag_columns=args.n_tag_columns)
         sys.exit(0)
     tags_line = ' '.join(args.tags)
     print(f'Recommendations for {args.mccampaign} and {tags_line} tags:')

@@ -35,7 +35,7 @@ Untested method Particle::setVertex
 Untested method Particle::updateJacobiMatrix
 Untested method Particle::updateMomentum
 Untested method Particle::writeExtraInfo
-Untested method EventExtraInfo::addEventType
+Untested method EventExtraInfo::addEventTypeIfNotSet
 Untested method EventExtraInfo::addExtraStringInfo
 Untested method EventExtraInfo::getEventType
 Untested method EventExtraInfo::getExtraStringInfo

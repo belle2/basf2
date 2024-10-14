@@ -267,9 +267,9 @@ Skim registry
 
 All skims must be registered and encoded by the relevant skim liaison. Registering a skim is as simple as adding it to the list in ``skim/scripts/skim/registry.py`` as an entry of the form ``(SkimCode, ParentModule, SkimName)``.
 
-The skim numbering convention is defined on the `Confluence skim page`_.
+The skim numbering convention is defined on the `XWiki skim page`_.
 
-.. _Confluence skim page: https://confluence.desy.de/display/BI/Skimming+Homepage#SkimmingHomepage-Skimcodeconventionandskimregistry
+.. _XWiki skim page: https://xwiki.desy.de/xwiki/rest/p/9199f/#HSkimcodeconventionandskimregistry
 
 .. automodule:: skim.registry
     :members:
@@ -301,7 +301,7 @@ This will read the output files of the test jobs, and produce tables of statisti
 
 * If the ``-M`` flag is provided, a Markdown table will be written to ``SkimStats.md``. This table is in a format that can be copied into the comment fields of merge requests (where GitLab will format the table nicely for you). Use this flag when asked to produce a table of stats in a merge request.
 
-* If the ``-C`` flag is provided, a text file ``SkimStats.txt`` is written, in which the statistics are formatted as Confluence wiki markup tables. These tables can be copied directly onto a Confluence page by editing the page, selecting ``Insert more content`` from the toolbar, selecting ``Markup`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. Confluence will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
+* If the ``-C`` flag is provided, a text file ``SkimStats.txt`` is written, in which the statistics are formatted as XWiki markup tables. These tables can be copied directly onto a XWiki page by editing the page, selecting ``Insert`` from the toolbar, selecting ``Code Snippet`` from the drop-down menu, and then pasting the content of the text file into the markup editor which appears. XWiki will then format the tables and headings. The markup editor can also be accessed via ``ctrl-shift-D`` (``cmd-shift-D``).
 
 * If the ``-J`` flag is provided, then all statistics produced are printed to a JSON file ``SkimStats.json``, indexed by skim, statistic, and sample label. This file contains extra metadata about when and how the tests were run. This file is to be used by grid production tools.
 

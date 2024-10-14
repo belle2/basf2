@@ -211,7 +211,7 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 
 void DQMEventProcessorBase::ComputeCommonVariables()
 {
-  auto sensorInfo = &VXD::GeoCache::get(m_sensorID);
+  auto sensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_sensorID);
   m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
   ROOT::Math::XYZVector globalPosition = sensorInfo->pointToGlobal(m_position, true);
 

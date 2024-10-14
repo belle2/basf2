@@ -100,7 +100,6 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
   }
 
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
-  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
   for (CDCSegment2D& segment : outputSegments) {
     for (CDCRecoHit2D& recoHit2D : segment) {
       Vector2D flightDirection = recoHit2D.getFlightDirection2D();
@@ -117,7 +116,7 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
         // that would be present in two dimensional reconstruction is used
         const double beta = 1;
         double flightTimeEstimate = 0;
-        flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+        FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
         driftLength =
           tdcCountTranslator.getDriftLength(hit->getTDCCount(),

@@ -16,10 +16,10 @@ Detailed usage examples can be found in analysis/examples/FEI/
 
 # @cond internal
 # only public interfaces, to make package doc nicer. Also the only things imported by 'from fei import *'
-__all__ = ['FeiState', 'get_path', 'get_default_channels', 'get_unittest_channels', 'do_trainings',
+__all__ = ['FeiState', 'get_path', 'get_default_channels', 'get_unittest_channels', 'do_trainings', 'get_mode_names',
            'Particle', 'MVAConfiguration', 'PreCutConfiguration', 'PostCutConfiguration', 'FeiConfiguration', 'DecayChannel']
 # @endcond
 
 from fei.config import Particle, MVAConfiguration, PreCutConfiguration, PostCutConfiguration, FeiConfiguration, DecayChannel
-from fei.default_channels import get_default_channels, get_unittest_channels
+from fei.default_channels import get_default_channels, get_unittest_channels, get_mode_names
 from fei.core import get_path, FeiState, do_trainings

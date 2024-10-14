@@ -87,7 +87,7 @@ namespace Belle2 {
        *  in member map object for fast look up for repeated calls.*/
       ITrackType getMCTrackId(const ACDCHitCollection* ptrHits) const;
 
-      /// Getter for the difference of correct versus incorrect right left passage informations
+      /// Getter for the difference of correct versus incorrect right left passage information
       int getCorrectRLVote(const ACDCHitCollection* ptrHits) const;
 
       /// Getter for the right left passge purity which respects the forward backward reconstruction
@@ -167,7 +167,7 @@ namespace Belle2 {
       /**
        *  Returns if the second collection of hits follows the first collection of hits in their common Monte Carlo track.
        *
-       *  Also checks that the majority of the right left passage informations agrees with the forward backward information
+       *  Also checks that the majority of the right left passage information agrees with the forward backward information
        */
       EForwardBackward areAlignedInMCTrackWithRLCheck(const ACDCHitCollection* ptrFromHits,
                                                       const ACDCHitCollection* ptrToHits) const;

@@ -132,8 +132,8 @@ namespace Belle2 {
 
       /// Total ordering based on cylindrical radius first the z component second and azimuth angle
       /// third.
-      /** Total order achiving a lower bound Vector3D(0.0, 0.0, 0.0). By first taking the norm \n
-       *  for comparision the null vector is smaller than all other possible \n
+      /** Total order achieving a lower bound Vector3D(0.0, 0.0, 0.0). By first taking the norm \n
+       *  for comparison the null vector is smaller than all other possible \n
        *  vectors. Secondly the polar angle theta ( equivalently z ) and finally the azimuth \n
        *  angle phi is considered to have a total ordering for all vectors. \n
        *  Note does not commute with the projection to xy space.
@@ -145,7 +145,7 @@ namespace Belle2 {
       }
 
       /// Getter for the lowest possible vector
-      /** The lowest possilbe vector according to the comparision is the null vector */
+      /** The lowest possible vector according to the comparison is the null vector */
       static Vector3D getLowest()
       {
         return Vector3D(0.0, 0.0, 0.0);
@@ -214,7 +214,7 @@ namespace Belle2 {
        *  These functions measure the angle between two vectors from *this* to rhs. \n
        *  Because the three dimensional space does not have a unique orientation available, \n
        *  the sign of the angle is not well defined. Therefore angles between three dimensional \n
-       *  vectors are always positiv and so is the sine of the angle. The angle is bound by M_PI.
+       *  vectors are always positive and so is the sine of the angle. The angle is bound by M_PI.
        */
       ///@{
       /// Cosine of the angle between this and rhs
@@ -402,7 +402,7 @@ namespace Belle2 {
         return Vector3D(xy() + rhs.xy(), z() + rhs.z());
       }
 
-      /// Returns a new vector as differenc of this and rhs
+      /// Returns a new vector as difference of this and rhs
       Vector3D operator-(const Vector3D& rhs) const
       {
         return Vector3D(xy() - rhs.xy(), z() - rhs.z());
@@ -430,9 +430,9 @@ namespace Belle2 {
 
       /// Calculates the component orthogonal to the given vector
       /** The orthogonal component is the rest of the vector not parallel to \n
-       *  relative to. Since the three dimensional space does not have a unque \n
+       *  relative to. Since the three dimensional space does not have a unique \n
        *  orientation given by the vector relative to, the sign of the orthogonal \n
-       *  component is meaningless and is always set to positiv */
+       *  component is meaningless and is always set to positive */
       double orthogonalComp(const Vector3D& relativTo) const
       {
         return relativTo.cross(*this).norm() / relativTo.norm();
@@ -452,13 +452,13 @@ namespace Belle2 {
         return relativTo.cross(*this).norm();
       }
 
-      /// Passivelly moves the vector inplace by the given vector
+      /// Passively moves the vector inplace by the given vector
       void passiveMoveBy(const Vector3D& by)
       {
         subtract(by);
       }
 
-      /// Passivelly moves the vector inplace by the given vector
+      /// Passively moves the vector inplace by the given vector
       Vector3D passiveMovedBy(const Vector3D& by)
       {
         return *this - by;

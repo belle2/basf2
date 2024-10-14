@@ -46,7 +46,7 @@ TrackFinderAutomaton::TrackFinderAutomaton()
 
 std::string TrackFinderAutomaton::getDescription()
 {
-  return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
+  return "Performs pattern recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
 }
 
 void TrackFinderAutomaton::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)

@@ -82,7 +82,7 @@ namespace Belle2 {
        */
       ///@{
 
-      /// Checks the validity of a wireID convinience object.
+      /// Checks the validity of a wireID convenience object.
       bool isValidWireID(const WireID& wireID) const
       { return isValidIWire(wireID.getISuperLayer(), wireID.getILayer(), wireID.getIWire()); }
 
@@ -103,7 +103,7 @@ namespace Belle2 {
       { return getWireLayer(iCLayer).getWire(iWire) ; }
 
       /// Getter for wire getter by superlayer id, layer id and wire id.
-      const CDCWire& getWire(ISuperLayer iSuperLayer, ILayer iLayer , IWire iWire) const
+      const CDCWire& getWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire) const
       { return getWireSuperLayer(iSuperLayer).getWireLayer(iLayer).getWire(iWire) ; }
 
       /// Getter for the underlying storing wire vector.

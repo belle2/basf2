@@ -14,7 +14,7 @@
 namespace Belle2 {
   /**  This class collects some information of a TrueHit, using
   *  SVDCLuster and MCParticle information too.
-  *  These informations are: position in local and global coordinates
+  *  This information is: position in local and global coordinates
   *  at entry/middle/exit position of the sensor, momentum, analytical
   *  track parameters (evaluated from position and momentum), geometrical
   *  information (layed,ladder,sensor) and time.

@@ -19,12 +19,12 @@ namespace Belle2 {
     class CDCRecoHit2D;
     class CDCRLWireHit;
 
-    /// Class representating a linear track piece between two oriented wire hits.
+    /// Class representing a linear track piece between two oriented wire hits.
     /** A tangent is an approximation of the possible trajectory between two oriented wire hits.
      *  The approximation is obtained by constructing a tangent between two drift circles of the wire hits
      *  (in the reference xy projection).\n
      *  Generally maximal four tangents are possible. So to uniquely define a tangent we have
-     *  to give additional information how it passes relativ to the drift circles. This right left
+     *  to give additional information how it passes relative to the drift circles. This right left
      *  passage information indicates if the related wire hit should lie to the right of to the left
      *  of the tangent. The four possible combinations are then\n
      *  (ERightLeft::c_Right, ERightLeft::c_Right), (ERightLeft::c_Right, ERightLeft::c_Left),\n
@@ -99,7 +99,7 @@ namespace Belle2 {
       CDCTangent reversed() const;
 
       /** Getter for the line representation of the line.
-       *  The line stretchs between the two the touch point.
+       *  The line stretches between the two the touch point.
        *  The first touch point is at(0) the second at(1).
        */
       const ParameterLine2D& getLine() const
@@ -110,7 +110,7 @@ namespace Belle2 {
       ParameterLine2D m_line;
     };
 
-    /// Print tangent for debuggin.
+    /// Print tangent for debugging.
     std::ostream& operator<<(std::ostream& output, const CDCTangent& tangent);
   }
 }

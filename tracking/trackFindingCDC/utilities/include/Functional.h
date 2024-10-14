@@ -227,7 +227,7 @@ namespace Belle2 {
 
     // ******************** (void)(?) ********************
 
-    /// Functor returning void from an abitrary objects.
+    /// Functor returning void from an arbitrary objects.
     struct Void {
       /// Marker function for the isFunctor test
       operator FunctorTag();
@@ -266,13 +266,13 @@ namespace Belle2 {
 
     // ******************** get<I>(?) ********************
 
-    /// Functor to get the I part (as of std::get<I>) from an abitrary objects.
+    /// Functor to get the I part (as of std::get<I>) from an arbitrary objects.
     template<int I>
     struct Get {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the I part (as of std::get<I>) of an abitrary object
+      /// Operator getting the I part (as of std::get<I>) of an arbitrary object
       template <class T>
       auto operator()(const T& t) const -> decltype(std::get<I>(t))
       {
@@ -288,8 +288,8 @@ namespace Belle2 {
 
     // ******************** ?.first ********************
 
-    /// Functor to get the .first from an abitrary objects.
-    /// Implementated with get<0>, could be improved, but this is shorter for now
+    /// Functor to get the .first from an arbitrary objects.
+    /// Implemented with get<0>, could be improved, but this is shorter for now
     using First = Get<0>;
 
     /// Meta-functor to get the .first of an object returned from another functor.
@@ -299,8 +299,8 @@ namespace Belle2 {
 
     // ******************** ?.second ********************
 
-    /// Functor to get the .second from an abitrary objects.
-    /// Implementated with get<1>, could be improved, but this is shorter for now
+    /// Functor to get the .second from an arbitrary objects.
+    /// Implemented with get<1>, could be improved, but this is shorter for now
     using Second = Get<1>;
 
     /// Meta-functor to get the .second of an object returned from another functor.
@@ -310,12 +310,12 @@ namespace Belle2 {
 
     // ******************** ?.size() ********************
 
-    /// Functor to get the .size() from an abitrary objects.
+    /// Functor to get the .size() from an arbitrary objects.
     struct Size {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the .size() of an abitrary object
+      /// Operator getting the .size() of an arbitrary object
       template <class T>
       auto operator()(const T& t) const -> decltype(t.size())
       {
@@ -323,19 +323,19 @@ namespace Belle2 {
       }
     };
 
-    /// Meta-functor to get the .size() of an abitrary object returned from another functor
+    /// Meta-functor to get the .size() of an arbitrary object returned from another functor
     template <class AFunctor = Id>
     using SizeOf = Composition<Size, AFunctor>;
 
 
     // ******************** ?.clear() ********************
 
-    /// Functor to get the .clear() from an abitrary objects.
+    /// Functor to get the .clear() from an arbitrary objects.
     struct Clear {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the .clear() of an abitrary object
+      /// Operator getting the .clear() of an arbitrary object
       template <class T>
       auto operator()(T& t) const -> decltype(t.clear())
       {
@@ -343,7 +343,7 @@ namespace Belle2 {
       }
     };
 
-    /// Meta-functor to get the .clear() of an abitrary object returned from another functor
+    /// Meta-functor to get the .clear() of an arbitrary object returned from another functor
     template <class AFunctor = Id>
     using ClearOf = Composition<Clear, AFunctor>;
 
@@ -355,12 +355,12 @@ namespace Belle2 {
 
     // ******************** not(?) ********************
 
-    /// Functor to get the logical negation from an abitrary objects.
+    /// Functor to get the logical negation from an arbitrary objects.
     struct Not {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the logical negation of an abitrary object
+      /// Operator getting the logical negation of an arbitrary object
       template <class T>
       auto operator()(const T& t) const -> decltype(not t)
       {
@@ -382,19 +382,19 @@ namespace Belle2 {
 
     // ******************** *? ********************
 
-    /// Functor to get the referenced object from an abitrary objects.
+    /// Functor to get the referenced object from an arbitrary objects.
     struct Deref {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the referenced object of an abitrary object
+      /// Operator getting the referenced object of an arbitrary object
       template <class T>
       auto operator()(const T& t) const -> decltype(*t)
       {
         return *t;
       }
 
-      /// Specialisation for pointers to make an assertion that no nullptr is derefernced
+      /// Specialisation for pointers to make an assertion that no nullptr is dereferenced
       template <class T>
       auto operator()(const T* t) const -> decltype(*t)
       {
@@ -413,12 +413,12 @@ namespace Belle2 {
 
     // ******************** *(?->) ********************
 
-    /// Functor to get the indirection from an abitrary objects.
+    /// Functor to get the indirection from an arbitrary objects.
     struct Indirect {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator getting the indirection of an abitrary object
+      /// Operator getting the indirection of an arbitrary object
       template <class T>
       auto operator()(const T& t) const -> decltype(*(t.operator->()))
       {
@@ -466,11 +466,11 @@ namespace Belle2 {
       }
     };
 
-    /// Meta-functor for comparision of two objects or two values returned from another functors.
+    /// Meta-functor for comparison of two objects or two values returned from another functors.
     template <class AFunctor1 = Id, class AFunctor2 = AFunctor1>
     using LessOf = BinaryJoin<Less, AFunctor1, AFunctor2>;
 
-    /// Operator to construct a less comparision functor from two functors or on functor and a constant value.
+    /// Operator to construct a less comparison functor from two functors or on functor and a constant value.
     template <class ALHS, class ARHS, class SFINAE = std::enable_if_t<isFunctor<ALHS>() or isFunctor<ARHS>()>>
     LessOf<ToFunctor<ALHS>, ToFunctor<ARHS> > operator<(const ALHS& lhs, const ARHS& rhs)
     {
@@ -481,12 +481,12 @@ namespace Belle2 {
 
     // ******************** ? > ? aka greater ********************
 
-    /// Binary functor for greater comparision of abitrary objects - equivalent to std::greater<> (c++14)
+    /// Binary functor for greater comparison of arbitrary objects - equivalent to std::greater<> (c++14)
     struct Greater {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator for greater comparision of an abitrary object
+      /// Operator for greater comparison of an arbitrary object
       template<class T1, class T2>
       auto operator()(const T1& t1, const T2& t2) const -> decltype(t1 > t2)
       {
@@ -494,11 +494,11 @@ namespace Belle2 {
       }
     };
 
-    /// Meta-functor for comparision of two objects or two values returned from another functors.
+    /// Meta-functor for comparison of two objects or two values returned from another functors.
     template <class AFunctor1 = Id, class AFunctor2 = AFunctor1>
     using GreaterOf = BinaryJoin<Greater, AFunctor1, AFunctor2>;
 
-    /// Operator to construct a greater comparision functor from two functors or on functor and a constant value.
+    /// Operator to construct a greater comparison functor from two functors or on functor and a constant value.
     template <class ALHS, class ARHS, class SFINAE = std::enable_if_t<isFunctor<ALHS>() or isFunctor<ARHS>()>>
     GreaterOf<ToFunctor<ALHS>, ToFunctor<ARHS> > operator>(const ALHS& lhs, const ARHS& rhs)
     {
@@ -507,12 +507,12 @@ namespace Belle2 {
 
     // ******************** ? == ? aka equal_to ********************
 
-    /// Binary functor for equality comparision of abitrary objects - equivalent to std::equal_to<> (c++14)
+    /// Binary functor for equality comparison of arbitrary objects - equivalent to std::equal_to<> (c++14)
     struct Equal {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator for equality comparision of an abitrary object
+      /// Operator for equality comparison of an arbitrary object
       template<class T1, class T2>
       auto operator()(const T1& t1, const T2& t2) const -> decltype(t1 == t2)
       {
@@ -520,11 +520,11 @@ namespace Belle2 {
       }
     };
 
-    /// Meta-functor for comparision of two objects or two values returned from another functors.
+    /// Meta-functor for comparison of two objects or two values returned from another functors.
     template <class AFunctor1 = Id, class AFunctor2 = AFunctor1>
     using EqualOf = BinaryJoin<Equal, AFunctor1, AFunctor2>;
 
-    /// Operator to construct a equality comparision functor from two functors or on functor and a constant value.
+    /// Operator to construct a equality comparison functor from two functors or on functor and a constant value.
     template <class ALHS, class ARHS, class SFINAE = std::enable_if_t<isFunctor<ALHS>() or isFunctor<ARHS>()>>
     EqualOf<ToFunctor<ALHS>, ToFunctor<ARHS> > operator==(const ALHS& lhs, const ARHS& rhs)
     {
@@ -536,7 +536,7 @@ namespace Belle2 {
       /// Marker function for the isFunctor test
       operator FunctorTag();
 
-      /// Operator for equality comparision to NaN
+      /// Operator for equality comparison to NaN
       template<class T>
       bool operator()(const T& t) const
       {

@@ -164,7 +164,7 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
 
     Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic > projectedPoints(nObservations, 2);
 
-    //all coordiates
+    //all coordinates
     //projectedPoints.col(0) = Eigen::Matrix<double,Eigen::Dynamic,1>::Constant(nObservations,1.0);
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);
@@ -180,7 +180,7 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
 
     Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic > projectedPoints(nObservations, 3);
 
-    //all coordiates
+    //all coordinates
     //projectedPoints.col(0) = Eigen::Matrix<double,Eigen::Dynamic,1>::Constant(1.0);
     projectedPoints.col(0) = eigenObservation.col(0);
     projectedPoints.col(1) = eigenObservation.col(1);

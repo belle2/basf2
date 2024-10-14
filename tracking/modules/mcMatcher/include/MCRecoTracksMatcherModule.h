@@ -24,9 +24,9 @@ namespace Belle2 {
    *
    *  In order to match the tracks the module takes two StoreArrays of RecoTracks, which should be compared.
    *
-   *  One of them contains RecoTracks composed by the patter recognition algorithm to be assessed. They are refered to as PRTracks.
+   *  One of them contains RecoTracks composed by the pattern recognition algorithm to be assessed. They are referred to as PRTracks.
    *
-   *  The second StoreArray holds the reference tracks, which should ideally be reconstructed. These are refered to as MCTracks and
+   *  The second StoreArray holds the reference tracks, which should ideally be reconstructed. These are referred to as MCTracks and
    *  should generally be composed by the MCTrackingModule.
    *  (Design note : We use the tracks composed by the MCTrackFinder as reference, because the mere definition of
    *   what a trackable particle and what the best achievable track is, lies within the implementation of the MCTrackFinder.
@@ -49,8 +49,8 @@ namespace Belle2 {
    *
    *  Moreover, only PRTracks that exceed the minimal purity requirement and a minimal efficiency requirement
    *  will have their purity/efficiency stored and will take part in the matching.
-   *  The minimal purity can be choosen by the minimalPurity parameter (default 2.0/3.0).
-   *  The minimal efficiency can be choosen by the minimalEfficiency parameter (default 0.05).
+   *  The minimal purity can be chosen by the minimalPurity parameter (default 2.0/3.0).
+   *  The minimal efficiency can be chosen by the minimalEfficiency parameter (default 0.05).
    *
    *  Last but not least a RelationArray from matched PRTracks to MCParticles is build and
    *  the McTrackId property of the PRTrack is set to the StoreArray index of the MCParticle
@@ -58,7 +58,7 @@ namespace Belle2 {
    *  By default clone tracks are also assigned to their MCParticle.
    *  This behaviour can be switched off by the relateClonesToMCParticles.
    *
-   *  In the following a more detailed explaination is given for the matching and
+   *  In the following a more detailed explanation is given for the matching and
    *  the classification of PRTracks and MCTracks.
    *
    *  The PRTracks can be classified into six categories:

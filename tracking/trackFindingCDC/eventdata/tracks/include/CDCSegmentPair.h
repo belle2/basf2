@@ -67,7 +67,7 @@ namespace Belle2 {
         return segment < segmentPair.getFromSegment();
       }
 
-      /// Checks if both stored segments are not nullptr. Returns true if check is succeded.
+      /// Checks if both stored segments are not nullptr. Returns true if check is succeeded.
       bool checkSegmentsNonNullptr() const
       {
         return getFromSegment() != nullptr and getToSegment() != nullptr;
@@ -138,7 +138,7 @@ namespace Belle2 {
         return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment();
       }
 
-      /// Setter for both segments simultaniously
+      /// Setter for both segments simultaneously
       void setSegments(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment)
       {
         m_fromSegment = fromSegment;

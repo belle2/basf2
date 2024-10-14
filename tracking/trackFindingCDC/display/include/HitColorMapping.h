@@ -42,7 +42,7 @@ namespace Belle2 {
     /// CDCHit to color map highlighting the CDCHits that posses the do not use flag.
     class TakenFlagColorMap : public HitColorMapping {
     public:
-      /// Constructor checking if the CDCWireHits caring the taken flag are accessable.
+      /// Constructor checking if the CDCWireHits caring the taken flag are accessible.
       TakenFlagColorMap();
 
       /// Function call to map the CDCHit id and object to a color.
@@ -63,7 +63,7 @@ namespace Belle2 {
       std::string info() override;
     };
 
-    /// CDCHit to color map by their assoziated CDCSimHit::getPosFlag property.
+    /// CDCHit to color map by their associated CDCSimHit::getPosFlag property.
     class PosFlagColorMap : public HitColorMapping {
     public:
       /// Function call to map the CDCHit id and object to a color.
@@ -73,7 +73,7 @@ namespace Belle2 {
       std::string info() override;
     };
 
-    /// CDCHit to color map by their assoziated CDCSimHit::getBackgroundTag property.
+    /// CDCHit to color map by their associated CDCSimHit::getBackgroundTag property.
     class BackgroundTagColorMap : public HitColorMapping {
     public:
       /// Function call to map the CDCHit id and object to a color.
@@ -90,7 +90,7 @@ namespace Belle2 {
       std::string map(int index, const CDCHit& hit) override;
     };
 
-    /// CDCHit to color map by their assoziated CDCSimHit::getFlightTime.
+    /// CDCHit to color map by their associated CDCSimHit::getFlightTime.
     class TOFColorMap : public HitColorMapping {
     public:
       /// Function call to map the CDCHit id and object to a color.
@@ -107,10 +107,10 @@ namespace Belle2 {
       std::string map(int index, const CDCHit& hit) override;
     };
 
-    /// CDCHit to color map by their assoziated MCParticle::getArrayId() property.
+    /// CDCHit to color map by their associated MCParticle::getArrayId() property.
     class MCParticleColorMap : public HitColorMapping {
     public:
-      /// Constructor setting up a Monte Carlo id to color map which is continously filled as new during the event.
+      /// Constructor setting up a Monte Carlo id to color map which is continuously filled as new during the event.
       MCParticleColorMap();
 
       /// Function call to map the CDCHit id and object to a color.

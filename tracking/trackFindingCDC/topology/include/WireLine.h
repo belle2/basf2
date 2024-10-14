@@ -19,8 +19,8 @@ namespace Belle2 {
      *  The representation is only suitable for lines out of the xy plane.
      *  The endpoints are stored encoded by their z position.
      *  The end point with the higher z value is called forward, the one with the smaller is called backward.
-     *  This class is mainly used to descripe the cdc wires with as few parameters as possible and
-     *  simplifies the retrival of the two dimensional track reference position, which is taken at
+     *  This class is mainly used to describe the cdc wires with as few parameters as possible and
+     *  simplifies the retrieval of the two dimensional track reference position, which is taken at
      *  the closest approach to the beam z-axes.
      *  @brief A three dimensional limited line
      */
@@ -31,7 +31,7 @@ namespace Belle2 {
       WireLine()
       {}
 
-      /// Constuctor for a wire line between forward and backward point
+      /// Constructor for a wire line between forward and backward point
       WireLine(const Vector3D& forward, const Vector3D& backward, double sagCoeff);
 
       /// Returns a copy of the wire line moved by a three dimensional offset
@@ -122,11 +122,11 @@ namespace Belle2 {
       Vector3D wireVector() const
       { return Vector3D(nominalMovePerZ() * deltaZ(), deltaZ()); }
 
-      /// Gives the forward z coodinate
+      /// Gives the forward z coordinate
       double forwardZ() const
       { return m_forwardZ; }
 
-      /// Gives the backward z coodinate
+      /// Gives the backward z coordinate
       double backwardZ() const
       { return m_backwardZ; }
 
@@ -228,7 +228,7 @@ namespace Belle2 {
       { return m_sagCoeff; }
 
     private:
-      /// Memory for the reference postion
+      /// Memory for the reference position
       Vector3D m_refPos3D;
 
       /// Memory for the nominal movement of the xy position per z unit off the reference.
@@ -240,7 +240,7 @@ namespace Belle2 {
       /// Memory for the backward end z coordinate.
       double m_backwardZ = 0.0;
 
-      /// Memory for the wire sag coeffiecent.
+      /// Memory for the wire sag coefficient.
       double m_sagCoeff = 0.0;
 
     };

@@ -51,13 +51,13 @@ SPTCRefereeModule::SPTCRefereeModule() : Module()
            "Check if two subsequent SpacePoints are on the same sensor",
            m_PARAMcheckSameSensor);
   addParam("checkMinDistance", m_PARAMcheckMinDistance,
-           "Check if two subsequent SpacePoints are seperated by more than 'minDistance'",
+           "Check if two subsequent SpacePoints are separated by more than 'minDistance'",
            m_PARAMcheckMinDistance);
   addParam("checkCurling", m_PARAMcheckCurling,
            "Check the SpacePointTrackCand for curling behaviour and mark it as curling if it does",
            m_PARAMcheckCurling);
   addParam("splitCurlers", m_PARAMsplitCurlers,
-           "Split curling SpacePointTrackCands and save the TrackStubs in seperate StoreArrays",
+           "Split curling SpacePointTrackCands and save the TrackStubs in separate StoreArrays",
            m_PARAMsplitCurlers);
   addParam("keepOnlyFirstPart", m_PARAMkeepOnlyFirstPart,
            "Keep only the first part of a curling SpacePointTrackCand (e.g. when only this is needed)",
@@ -638,7 +638,7 @@ SPTCRefereeModule::getDirsOfFlightSpacePoints(const std::vector<const Belle2::Sp
 // =============================================== GET DIRECTION OF FLIGHT FROM POSITION AND MOMENTUM =============================
 bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F momentum, B2Vector3F origin)
 {
-  // calculate the positon relative to the set origin, and add the momentum to the position to get the direction of flight
+  // calculate the position relative to the set origin, and add the momentum to the position to get the direction of flight
   B2Vector3F originToHit = position - origin;
 
   B2DEBUG(20, "Position relative to origin: (" << originToHit.x() << "," << originToHit.y() << "," << originToHit.z() <<
@@ -648,7 +648,7 @@ bool SPTCRefereeModule::getDirOfFlightPosMom(B2Vector3F position, B2Vector3F mom
   // get dot product of momentum and hit position for the perpendicular component only!
   float dot_xy = originToHit.x() * momentum.x() + originToHit.y() * momentum.y();
 
-  B2DEBUG(20, "result dot product xy component between postion and momentum: " << dot_xy);
+  B2DEBUG(20, "result dot product xy component between position and momentum: " << dot_xy);
 
   if (dot_xy < 0) {
     B2DEBUG(20, "Direction of flight is inwards for this hit");

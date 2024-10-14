@@ -448,7 +448,7 @@ namespace Belle2 {
         m_localPerigeeCircle.passiveMoveBy(getLocalOrigin());
       }
 
-      /// Getter for the cirlce in local coordinates
+      /// Getter for the circle in local coordinates
       const UncertainPerigeeCircle& getLocalCircle() const
       {
         return m_localPerigeeCircle;

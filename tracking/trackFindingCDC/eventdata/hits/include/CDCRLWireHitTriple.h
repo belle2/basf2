@@ -77,7 +77,7 @@ namespace Belle2 {
                          const CDCRLWireHit& endRLWireHit,
                          int iCluster = 0);
 
-      /// Constructs the reverse tiple from this one.
+      /// Constructs the reverse triple from this one.
       CDCRLWireHitTriple reversed() const;
 
       /// Reverses the triple inplace.
@@ -130,7 +130,7 @@ namespace Belle2 {
                   rlWireHitPair.getToRLWireHit() < rlWireHitTriple.getMiddleRLWireHit())));
       }
 
-      /// Getter for the shape of this tiple if all three oriented wire hits are neighbors. Else ILLSHAPE
+      /// Getter for the shape of this triple if all three oriented wire hits are neighbors. Else ILLSHAPE
       Shape getShape() const;
 
       /// Getter for the common superlayer id of the pair

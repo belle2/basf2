@@ -41,10 +41,10 @@ namespace Belle2 {
                const CDCRLWireHit& endRLWireHit,
                const UncertainParameterLine2D& fitLine);
 
-      /// Reverses the facet inplace including the fit line.
+      /// Reverses the facet in place including the fit line.
       void reverse();
 
-      /// Constructs the reverse tiple from this one.
+      /// Constructs the reverse triple from this one.
       CDCFacet reversed() const;
 
       /// Adjusts the contained fit line to touch such that it touches the first and third hit.

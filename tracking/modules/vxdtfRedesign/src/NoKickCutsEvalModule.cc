@@ -241,7 +241,7 @@ void NoKickCutsEvalModule::endRun()
 
   //------------------------------------------FIT THE CUTS --------------------------------//
 
-  /** buld 2D histogram with cuts */
+  /** build 2D histogram with cuts */
   std::vector<std::vector<std::vector<TH2F*>>> cut_M_histo;
   std::vector<std::vector<std::vector<TH2F*>>> cut_m_histo;
 

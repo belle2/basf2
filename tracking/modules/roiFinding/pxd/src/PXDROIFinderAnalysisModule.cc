@@ -445,7 +445,7 @@ void PXDROIFinderAnalysisModule::event()
     B2DEBUG(1, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and PXDDigits = " << pxdDigits_MCParticle.size() <<
             " related to this MCParticle");
 
-    //retrieve general informations of MCParticle
+    //retrieve general information about MCParticle
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();

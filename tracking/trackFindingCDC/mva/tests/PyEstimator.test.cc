@@ -24,7 +24,7 @@ namespace {
   TEST(TrackFindingCDCTest, PyEstimator_predict_regression)
   {
     Py_Initialize();
-    // Create dummy regession object
+    // Create dummy regression object
     std::string first_var_regressor_code = R"code(
 class FirstVarRegressor(object):
     def predict(self, ys):
@@ -184,7 +184,7 @@ with open("bdt_regressor.pickle", "wb") as bdt_regressor_file:
       timeItResult.printSummary();
       B2INFO("This might be to slow for serious stuff");
 
-      // Compare prediciton
+      // Compare predictions
       boost::python::object testY = global["testY"];
       double squareSum = 0;
       for (size_t iRowTestX = 0; iRowTestX < nRowsTestX; ++iRowTestX) {

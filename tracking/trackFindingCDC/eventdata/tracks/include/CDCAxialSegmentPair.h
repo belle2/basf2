@@ -105,7 +105,7 @@ namespace Belle2 {
         m_endSegment = endSegment;
       }
 
-      /// Setter for both segments simultaniously
+      /// Setter for both segments simultaneously
       void setSegments(const CDCSegment2D* startSegment, const CDCSegment2D* endSegment)
       {
         m_startSegment = startSegment;
@@ -123,7 +123,7 @@ namespace Belle2 {
       void setTrajectory2D(const CDCTrajectory2D& trajectory2D) const
       { m_trajectory2D =  trajectory2D; }
 
-      /// Invalides the currently stored trajectory information
+      /// Invalidates the currently stored trajectory information
       void clearTrajectory2D() const
       { getTrajectory2D().clear(); }
 
@@ -160,7 +160,7 @@ namespace Belle2 {
       /// Reference to the common trajectory
       mutable CDCTrajectory2D m_trajectory2D;
 
-      /// Automaton cell assoziated with the pair of segments
+      /// Automaton cell associated with the pair of segments
       mutable AutomatonCell m_automatonCell;
     };
   }

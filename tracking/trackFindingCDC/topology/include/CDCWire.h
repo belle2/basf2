@@ -55,7 +55,7 @@ namespace Belle2 {
        */
       /**@{*/
 
-      /// Getter from the wireID convinience object. Does not construct a new object.
+      /// Getter from the wireID convenience object. Does not construct a new object.
       static const CDCWire* getInstance(const WireID& wireID);
 
       /// Getter from the superlayer id, the layer id and the wire id. Does not construct a new object.
@@ -392,7 +392,7 @@ namespace Belle2 {
       /// Getter for the secondary neighbors of this wire id following the direction on the clock
       MayBePtr<const CDCWire> getSecondaryNeighbor(short oClockDirection) const;
 
-      /// Sting output operator for wire objects to help debugging
+      /// String output operator for wire objects to help debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCWire& wire)
       { return (output << "CDCWire(" << wire.getISuperLayer() << "," << wire.getILayer() << "," << wire.getIWire() << ")") ; }
 

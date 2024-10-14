@@ -195,10 +195,10 @@ namespace Belle2 {
                               const AttributeMap& styleAttributeMap = AttributeMap());
 
       /**
-       *  Writes part that belongs between the <, > brakets. Used by writeOpeningTag and writeClosing.
+       *  Writes part that belongs between the <, > brackets. Used by writeOpeningTag and writeClosing.
        *
        *  Used by writeOpeningTag and writeClosing.
-       *  Factored to avoid code dublication.
+       *  Factored to avoid code duplication.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
        *  @param[in]  tagName                Name of the xml tag to be written
@@ -231,13 +231,13 @@ namespace Belle2 {
                            const std::string& tagName);
 
     private:
-      /// Memory for the plotted elements. This contains only the fragment that is inbetween the svg tags and comes after the global svg definitions.
+      /// Memory for the plotted elements. This contains only the fragment that is in-between the svg tags and comes after the global svg definitions.
       std::ostringstream m_svgContentStream;
 
       /// Memory for the number of spaces that shall be prepended to each line.
       int m_nIndentationSpaces;
 
-      /// Memory for additional attributes to the toplevel svg element.
+      /// Memory for additional attributes to the top-level svg element.
       AttributeMap m_svgAttributes;
 
     };

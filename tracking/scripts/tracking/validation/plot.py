@@ -37,7 +37,7 @@ def get_logger():
     return logging.getLogger(__name__)
 
 
-#: A map from quanity name symbols to their usual units in Belle II standard units.
+#: A map from quantity name symbols to their usual units in Belle II standard units.
 units_by_quantity_name = {
     'x': 'cm',
     'y': 'cm',

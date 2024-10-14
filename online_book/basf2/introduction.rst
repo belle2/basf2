@@ -119,7 +119,7 @@ A good place to look for Belle II-specific jargon is the **Belle II Glossary**.
 .. admonition:: Solution
      :class: toggle solution
 
-     `Belle II Glossary <https://confluence.desy.de/display/BI/Main+Glossary>`_
+     `Belle II Glossary <https://xwiki.desy.de/xwiki/rest/p/1e1f2>`_
 
 basf2 modules
 ~~~~~~~~~~~~~
@@ -811,8 +811,8 @@ backward-compatibility that is guaranteed in the software.
 
 .. seealso::
 
-    The confluence page `Software Backward Compatibility
-    <https://confluence.desy.de/display/BI/Backward+Compatibility>`_
+    The XWiki page `Software Backward Compatibility
+    <https://xwiki.desy.de/xwiki/rest/p/0a372>`_
 
 .. admonition:: Question
      :class: exercise stacked

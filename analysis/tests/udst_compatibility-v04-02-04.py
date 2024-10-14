@@ -15,7 +15,7 @@ This is not always guaranteed. Analysis objects may break backwards
 compatibility for older files. Some niche corner cases might be problematic for
 file produced with release older than release-05-00-00.
 
-See https://confluence.desy.de/display/BI/Backward+Compatibility for more
+See https://xwiki.desy.de/xwiki/rest/p/0a372 for more
 """
 
 import basf2

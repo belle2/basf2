@@ -119,15 +119,6 @@ void ECLDQMOutOfTimeDigitsModule::event()
   }
 }
 
-void ECLDQMOutOfTimeDigitsModule::endRun()
-{
-}
-
-
-void ECLDQMOutOfTimeDigitsModule::terminate()
-{
-}
-
 bool ECLDQMOutOfTimeDigitsModule::isRandomTrigger()
 {
   if (!m_l1Trigger.isValid()) return false;

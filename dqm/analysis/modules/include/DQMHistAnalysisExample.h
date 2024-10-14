@@ -62,7 +62,7 @@ namespace Belle2 {
      */
     void terminate() override final;
 
-    //! Parameters accesible from basf2 scripts
+    //! Parameters accessible from basf2 scripts
   private:
     //! name of histogram directory
     std::string m_histogramDirectoryName;

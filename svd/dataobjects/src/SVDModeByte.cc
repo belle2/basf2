@@ -9,15 +9,13 @@
 #include <svd/dataobjects/SVDModeByte.h>
 #include <sstream>
 
-using namespace std;
-
 namespace Belle2 {
 
   const SVDModeByte::baseType SVDModeByte::c_DefaultID = 151;
 
-  SVDModeByte::operator string() const
+  SVDModeByte::operator std::string() const
   {
-    stringstream os;
+    std::stringstream os;
     switch (m_id.parts.runType) {
       case SVDRunType::raw:
         os << "raw";
@@ -66,7 +64,7 @@ namespace Belle2 {
 
   std::ostream& operator<<(std::ostream& out, const SVDModeByte& id)
   {
-    out << ((string)id);
+    out << ((std::string)id);
     return out;
   }
 

@@ -132,7 +132,7 @@ def argparser():
                         dest="token",
                         type=str,
                         required=False,
-                        help="Use the read-only token to automatize the script")
+                        help="Use the read-only token to automate the script")
     parser.add_argument("--username",
                         dest="username",
                         type=str,
@@ -227,7 +227,7 @@ class Luminosity:
         try:
             connection = sqlite3.connect(DB, uri=True)
         except sqlite3.Error as e:
-            b2.B2FATAL(f"Cannot conntect to sql DB {DB}: {e}")
+            b2.B2FATAL(f"Cannot connect to sql DB {DB}: {e}")
 
         return connection
 
@@ -495,7 +495,7 @@ class Luminosity:
                 for exp in exp_rr:
                     df = pd.concat([df, self.getDataFrameFromRunRegistry(exp, new_runs[exp])], sort=False, ignore_index=True)
 
-                # in case of multiple experiment, need to fix the delivered lumi as it is reste to 0 at the exp change.
+                # in case of multiple experiment, need to fix the delivered lumi as it is reset to 0 at the exp change.
                 if len(exp_rr) > 1:
                     df = self.fixDeliveredLumi(df, exp_rr)
 

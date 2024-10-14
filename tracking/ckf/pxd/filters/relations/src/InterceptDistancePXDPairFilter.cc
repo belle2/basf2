@@ -60,7 +60,8 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
         if (fromStateSensorID.getLayerNumber() != toStateCache.geoLayer) {
           continue;
         }
-        const PXD::SensorInfo& sensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(fromStateSensorID));
+        const PXD::SensorInfo& sensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
+                                              fromStateSensorID));
         const auto& interceptGlobalPoint = sensorInfo.pointToGlobal({intercept.getCoorU(), intercept.getCoorV(), 0});
         phiDiff = deltaPhi(interceptGlobalPoint.Phi(), toStateCache.phi);
         etaDiff = deltaEtaFromTheta(interceptGlobalPoint.Theta(), toStateCache.theta);

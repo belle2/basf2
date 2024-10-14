@@ -237,7 +237,7 @@ void ECLDQMInjectionModule::event()
     // Time within beam revolution (in microseconds)
     double time_in_cycle_us = time_within_cycle / 127.;
     // Time within beam revolution (in ADC ticks)
-    // https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=ECL+Technical+Notes
+    // https://xwiki.desy.de/xwiki/rest/p/4630a
     int time_within_cycle_adc_ticks = (1280 - time_within_cycle) / 72;
 
     int is_her = it.GetIsHER(0);

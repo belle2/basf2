@@ -23,9 +23,8 @@ namespace Belle2 {
    *    ShaperDSP boards that started sending corrupted data.
    *    (ECL expert then resets these modules)
    *
-   * For detailed overview of ECLDSP file structure see Confluence,
-   * https://confluence.desy.de/display/BI/ECL+Technical+Notes
-   * Attached file ECL-TN-2013-02 (digi.pdf)
+   * For detailed overview of ECLDSP file structure see
+   * `ECL-TN-2013-02 <https://xwiki.desy.de/xwiki/bin/download/BI/Belle%20II%20Internal/Detector%20WebHome/ECL%20WebHome/ECL%20Technical%20Notes/WebHome/digi.pdf?rev=4.1>`__
    */
   class ECLDspData: public TObject {
   private:
@@ -53,13 +52,13 @@ namespace Belle2 {
     unsigned char m_k1Chi;
     /** multipliers power of 2 for chi2 calculation */
     unsigned char m_k2Chi;
-    /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
+    /** See https://xwiki.desy.de/xwiki/rest/p/545bc */
     short int m_hitThresh;
-    /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
+    /** See https://xwiki.desy.de/xwiki/rest/p/545bc */
     short int m_lowAmpThresh;
-    /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
+    /** See https://xwiki.desy.de/xwiki/rest/p/545bc */
     short int m_skipThresh;
-    /** See https://confluence.desy.de/display/BI/Electronics+Thresholds */
+    /** See https://xwiki.desy.de/xwiki/rest/p/545bc */
     short int m_adcAlwThresh;
     /** See documentation for method 'getF31' */
     std::vector<short int> m_fg31 = {};
@@ -169,19 +168,19 @@ namespace Belle2 {
     /** @return Minor version of DSP coefficients */
     unsigned char getverMin() const { return m_verMin; }
     /**
-     * @return ADC always threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * @return ADC always threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     short int getaAT() const { return m_adcAlwThresh; }
     /**
-     * @return Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * @return Low amp threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     short int getlAT() const { return m_lowAmpThresh; }
     /**
-     * @return Skip threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * @return Skip threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     short int getsT() const { return m_skipThresh; }
     /**
-     * @return Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * @return Hit threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     short int gethT() const { return m_hitThresh; }
     /** chi2 threshold for fit quality flag */
@@ -252,19 +251,19 @@ namespace Belle2 {
     /** Sets minor version of DSP coefficients */
     void setverMin(unsigned char val) { m_verMin = val; }
     /**
-     * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * Set Low amp threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     void setaAT(short int val) { m_adcAlwThresh = val; }
     /**
-     * Set Low amp threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * Set Low amp threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     void setlAT(short int val) { m_lowAmpThresh = val; }
     /**
-     * Set Skip threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * Set Skip threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     void setsT(short int val) { m_skipThresh = val; }
     /**
-     * Set Hit threshold (https://confluence.desy.de/display/BI/Electronics+Thresholds)
+     * Set Hit threshold (https://xwiki.desy.de/xwiki/rest/p/545bc)
      */
     void sethT(short int val) { m_hitThresh = val; }
     /** Set chi2 threshold for fit quality flag */

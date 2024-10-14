@@ -17,6 +17,7 @@ import uproot
 
 def _make_const_lists():
     """Moving this code into a function to avoid a top-level ROOT import."""
+    from ROOT import Belle2  # noqa: make Belle2 namespace available
     import ROOT.Belle2
 
     PARTICLES, PDG_CODES = [], []

@@ -26,7 +26,7 @@ namespace Belle2 {
       c_IsFailedFit = 1 << 3,
       c_IsFailedTimeResolution = 1 << 4,
       c_IsCalibrated = c_IsEnergyCalibrated | c_IsTimeCalibrated | c_IsTimeResolutionCalibrated,
-      // constants for the online Fit Quality Flags. For description of these Flags, see https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=ECL+Quality+flag
+      // constants for the online Fit Quality Flags. For description of these Flags, see https://xwiki.desy.de/xwiki/rest/p/ca7f6
       c_OnlineFitQuality1 = 1 << 5,
       c_OnlineFitQuality2 = 1 << 6,
       c_OnlineFitQuality3 = 1 << 7,

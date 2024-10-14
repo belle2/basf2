@@ -12,9 +12,9 @@ Gbasf2
 
     **Prerequisites**:
 
-    * See `Computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_.
+    * See `Computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_.
     * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 or EL9 and CVMFS mounted.
-    * A valid `grid certificate <https://confluence.desy.de/display/BI/Computing+Belle-II-Grid-Certificate>`_ installed in ``~/.globus`` and in a web browser.
+    * A valid `grid certificate <https://xwiki.desy.de/xwiki/rest/p/d9328>`_ installed in ``~/.globus`` and in a web browser.
     * A working basf2 steering script (see the :ref:`onlinebook_first_steering_file` lesson)
 
     **Questions**:
@@ -55,14 +55,14 @@ The same basf2 steering files are used when running on the grid. The usual workf
     * Remember, always test your jobs locally before submitting to the grid!
 
 
-Go to `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_
+Go to `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_
 and verify that you have the prerequisites. You need:
 
 * Access to KEKCC or NAF (recommended), or to a system with CentOS 7 and CVMFS mounted.
-* A valid grid certificate issued within a year and `installed <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
+* A valid grid certificate issued within a year and `installed <https://xwiki.desy.de/xwiki/rest/p/c804c/#H2.Installyourcertificate>`_ in ``~/.globus`` in ``.pem`` format.
 * Belle Virtual Organization (VO) membership registered or renewed within a year. You can check your status at
   `VOMS server <https://voms.cc.kek.jp:8443/voms/belle/>`_.
-* Registration in `DIRAC <https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=Computing+GettingStarted#ComputingGettingStarted-7.RegisterwithDIRAC>`_.
+* Registration in `DIRAC <https://xwiki.desy.de/xwiki/rest/p/c804c/#H7.RegisterwithDIRAC>`_.
 
 .. note::
 
@@ -214,7 +214,7 @@ in each dataset.
 
 .. note::
 
-    Sometimes, in the documentation (such as in the Confluence pages) we refer to the **logical path name** (LPN)
+    Sometimes, in the documentation (such as in the XWiki pages) we refer to the **logical path name** (LPN)
     of datasets and datablocks, while for files we use LFN. In practice, LFN and LPN are the same thing.
 
 The Dataset Searcher
@@ -238,12 +238,12 @@ available options and get familiar with them.
 .. note::
 
     Accessing the DIRAC web portal requires that your user certificate is installed in your web browser. See
-    `computing getting started <https://confluence.desy.de/display/BI/Computing+GettingStarted>`_ for details.
+    `computing getting started <https://xwiki.desy.de/xwiki/rest/p/c804c>`_ for details.
 
 
 The ``MC Event types`` box show, by default, the generic samples available (charged, mixed, uubar, etc.).
 If you want to search
-signal samples, you need to specify the `signal event type <https://confluence.desy.de/display/BI/Signal+EventType>`_.
+signal samples, you need to specify the `signal event type <https://xwiki.desy.de/xwiki/rest/p/3a506>`_.
 Also, if you want to search uDST skim samples - which are what we will be using in the examples - you can find them at
 :ref:`skim/doc/04-experts:Skim Registry` section in the basf2 software documentation.
 
@@ -339,8 +339,8 @@ the data production team prepares ``collections`` of LFNs. This provides a commo
 which can help to avoid errors related to missing or using incorrect samples for an analysis. You can discover 
 collections in the same way as for LFNs.
 
-To discover the collection you need, you should first check `Data main page <https://confluence.desy.de/display/BI/Data+main+page>`_ 
-and `MC main page <https://confluence.desy.de/display/BI/MC+main+page>`_, which provide details for the official collections.
+To discover the collection you need, you should first check `Data main page <https://xwiki.desy.de/xwiki/rest/p/ed439>`_ 
+and `MC main page <https://xwiki.desy.de/xwiki/rest/p/70b0a>`_, which provide details for the official collections.
 
 If you want to explore the available collections, you can also use the dataset searcher tool. You've already 
 used the ``gb2_ds_search`` tool to search for datasets. Now use the ``collection`` key word to list the available data collections.
@@ -766,13 +766,13 @@ related to issues with the grid. Feel free to ask every time that you need help.
 
 The most useful place to find additional instructions and information about using gbasf2 is `gbasf2.belle2.org <https://gbasf2.belle2.org>`_.
 
-Additionally, some pages at Confluence are prepared with additional information:
+Additionally, some pages at XWiki are prepared with additional information:
 
-* `Gbasf2 mainpage <https://confluence.desy.de/display/BI/Computing+GBasf2>`_
-* `Gbasf2 FAQ <https://confluence.desy.de/display/BI/GBasf2+FAQ>`_ and `troubleshooting <https://confluence.desy.de/display/BI/gbasf2+trouble+shooting>`_
-* `Computing glossary <https://confluence.desy.de/display/BI/Computing+Glossary>`_
+* `Gbasf2 mainpage <https://xwiki.desy.de/xwiki/rest/p/78b3b>`_
+* `Gbasf2 FAQ <https://xwiki.desy.de/xwiki/rest/p/f1a37>`_ and `troubleshooting <https://xwiki.desy.de/xwiki/rest/p/35008>`_
+* `Computing glossary <https://xwiki.desy.de/xwiki/rest/p/d6530>`_
 
-Take a look to the `gbasf2 tutorials <https://confluence.desy.de/display/BI/GBasf2+Tutorials>`_ (they contain some advanced topics not covered here).
+Take a look at the `gbasf2 tutorials <https://xwiki.desy.de/xwiki/rest/p/a21dd>`_ (they contain some advanced topics not covered here).
 
 You can also ask in `questions.belle2.org <https://questions.belle2.org/questions>`_.
 

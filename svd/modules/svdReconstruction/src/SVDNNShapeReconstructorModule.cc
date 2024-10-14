@@ -24,6 +24,7 @@
 #include <functional>
 
 using namespace std;
+using namespace std::placeholders;
 using namespace Belle2;
 using namespace Belle2::SVD;
 
@@ -264,7 +265,7 @@ void SVDNNShapeReconstructorModule::event()
       apvSamples normedSamples;
       auto samples = shaperDigit.getSamples();
       transform(samples.begin(), samples.end(), normedSamples.begin(),
-                bind2nd(divides<float>(), stripNoiseADU));
+                bind(divides<float>(), _1, stripNoiseADU));
       // FIXME: This won't work in 3 sample mode, we have no control over the number of non-zero samples.
       validDigit = validDigit && pass3Samples(normedSamples, m_cutAdjacent);
 

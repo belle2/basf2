@@ -349,7 +349,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_cEfficiencyU->Draw();
       m_cEfficiencyU->cd();
       if (m_hEfficiency)
-        m_hEfficiency->getHistogram(1)->Draw("text");
+        m_hEfficiency->getHistogram(1)->Draw("text colz");
       colorizeCanvas(m_cEfficiencyU, c_StatusDefault);
 
       m_cEfficiencyRPhiViewU->Draw();
@@ -366,7 +366,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       m_cEfficiencyV->cd();
       m_cEfficiencyV->Draw();
       if (m_hEfficiency)
-        m_hEfficiency->getHistogram(0)->Draw("text");
+        m_hEfficiency->getHistogram(0)->Draw("text colz");
       colorizeCanvas(m_cEfficiencyV, c_StatusDefault);
 
       m_cEfficiencyRPhiViewV->cd();
@@ -384,7 +384,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyU->Draw();
   m_cEfficiencyU->cd();
   if (m_hEfficiency)
-    m_hEfficiency->getHistogram(1)->Draw("text");
+    m_hEfficiency->getHistogram(1)->Draw("text colz");
   setStatusOfCanvas(m_effUstatus, m_cEfficiencyU, true);
 
 //   setEpicsPV("EfficiencyUAlarm", alarm);
@@ -410,7 +410,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   m_cEfficiencyV->cd();
   m_cEfficiencyV->Draw();
   if (m_hEfficiency)
-    m_hEfficiency->getHistogram(0)->Draw("text");
+    m_hEfficiency->getHistogram(0)->Draw("text colz");
   setStatusOfCanvas(m_effVstatus, m_cEfficiencyV, true);
 
   m_cEfficiencyV->Update();

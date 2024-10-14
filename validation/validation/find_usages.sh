@@ -21,7 +21,7 @@ cd "${thisdir}"
 
 # Find all root files that are produced by the validation scripts
 # of the validation package by using grep.
-# Warning: Only scripts declared in the header using <output>...</outpout>
+# Warning: Only scripts declared in the header using <output>...</output>
 # will be found.
 
 extensions="*.C *.py"

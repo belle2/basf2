@@ -102,7 +102,7 @@ PXDROIFinderAnalysisModule::PXDROIFinderAnalysisModule() : Module()
   setDescription("This module performs the analysis of the PXDROIFinder module output");
 
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",

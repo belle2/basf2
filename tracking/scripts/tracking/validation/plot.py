@@ -615,7 +615,7 @@ class ValidationPlot:
         return self
 
     def fit_gaus(self, z_score=None):
-        """Fit a gaus belle curve to the central portion of a one dimensional histogram
+        """Fit a Gaus bell curve to the central portion of a one dimensional histogram
 
         The fit is applied to the central mean +- z_score * std interval of the histogram,
         such that it is less influence by non gaussian tails further away than the given z score.
@@ -1805,8 +1805,8 @@ class ValidationPlot:
         if lower_bound != upper_bound:
             if bins == "flat":
                 debug("Creating flat distribution binning")
-                precentiles = np.linspace(0.0, 100.0, n_bin_edges)
-                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], precentiles))
+                percentiles = np.linspace(0.0, 100.0, n_bin_edges)
+                bin_edges = np.unique(np.nanpercentile(xs[(lower_bound <= xs) & (xs <= upper_bound)], percentiles))
             else:
                 # Correct the upper bound such that all values are strictly smaller than the upper bound
                 # Make one step in single precision in the positive direction
@@ -1848,7 +1848,7 @@ class ValidationPlot:
         and always include them in the range if it finds any.
         Exceptional values means exact values that appear often in the series for whatever reason.
         Possible reasons include
-        * Interal / default values
+        * Integral / default values
         * Failed evaluation conditions
         * etc.
         which should be not cropped away automatically if you are locking on the quality of your data.
@@ -1971,7 +1971,7 @@ class ValidationPlot:
         make_symmetric = False
         exclude_outliers = outlier_z_score is not None and (lower_bound is None or upper_bound is None)
 
-        # Look for exceptionally frequent values in the series, e.g. interal delta values like -999
+        # Look for exceptionally frequent values in the series, e.g. integral delta values like -999
         if include_exceptionals or exclude_outliers:
             exceptional_xs = self.get_exceptional_values(finite_xs)
             exceptional_indices = np.in1d(finite_xs, exceptional_xs)
@@ -2137,7 +2137,7 @@ class ValidationPlot:
         # Formula string looks like 0*[0]+0*[1]+0*[2]+...
         formula_string = '+'.join('0*[' + str(i) + ']' for i in range(len(additional_stats)))
 
-        # Compose a function that carries the addtional information
+        # Compose a function that carries the additional information
         additional_stats_tf1 = ROOT.TF1("Stats", formula_string, lower_bound, upper_bound)
 
         for (i, (label, value)) in enumerate(additional_stats.items()):

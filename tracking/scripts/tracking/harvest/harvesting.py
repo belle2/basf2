@@ -113,7 +113,7 @@ class HarvestingModule(basf2.Module):
         Method called with each object in the StoreArray.
         Extractes the parts relevant for analysis and
         returns them as MutableMapping (e.g. a dict) of part_name and values.
-        Currently only float values or values convertable to floats are supported.
+        Currently only float values or values convertible to floats are supported.
         If requested that can change in the future.
 
     On termination all the collected values are recasted to numpy arrays and
@@ -443,7 +443,7 @@ class HarvestingModule(basf2.Module):
     def iter_store_obj(store_obj):
         """Obtain a iterator from a StoreObj
 
-        Repeatly calls iter(store_obj) or store_obj.__iter__()
+        Repeatedly calls iter(store_obj) or store_obj.__iter__()
         until the final iterator returns itself
 
         Returns

@@ -20,7 +20,7 @@
 namespace Belle2 {
 
   /**  This module from a data root file builds a tree of hitXP
-  **  (see the class to know all the informations contained). The tree
+  **  (see the class to know all the information contained). The tree
   **  filled with tracks (so each "event" is a track), as vector of
   **  hitXP.
   **

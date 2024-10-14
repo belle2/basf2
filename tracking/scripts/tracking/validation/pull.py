@@ -240,7 +240,7 @@ class PullAnalysis:
                                                 gaus_z_score=4,
                                                 is_expert=is_expert)
 
-            # Correct with TF1 - only works because the gaus fit is active.
+            # Correct with TF1 - only works because the Gaussian fit is active.
             hist = estimates_by_truths_profile.histograms[0]
             GetBinContent = hist.GetBinContent
             GetBinCenter = hist.GetBinCenter

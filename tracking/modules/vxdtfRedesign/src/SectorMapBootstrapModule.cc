@@ -216,7 +216,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
   segmentFilters->setConfig(config);
 
-  // TO DO: All these informations must be retrieved from the geometry
+  // TO DO: The whole information must be retrieved from the geometry
   CompactSecIDs compactSecIds;
 
   std::vector< double > uDividersMinusLastOne = config.uSectorDivider;

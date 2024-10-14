@@ -31,7 +31,7 @@ namespace Belle2 {
      *  (ERightLeft::c_Left, ERightLeft::c_Right), (ERightLeft::c_Left,ERightLeft::c_Left).\n
      *  To represent the tangent this class uses a ParameterLine2D. The touch points to the two drift circles
      *  are located at(0) for the first and at(1) for the second.
-     *  The tangent has therefor a sense of what is forward and can be reversed if necessary.
+     *  The tangent has therefore a sense of what is forward and can be reversed if necessary.
      *  Generally tangents are only a good approximation between neighboring wire hits.*/
     class CDCTangent : public CDCRLWireHitPair {
     public:

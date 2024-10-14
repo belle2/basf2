@@ -27,7 +27,7 @@ namespace Belle2 {
   *  function that define the percentage that has to be selected. Than these
   *  cuts are fitted in momentum and angular theta distribution. In the end
   *  the parameters of the fits are put in a matrix (TH3F) on a TFile and
-  *  they contains all the informations of the cuts. The output file
+  *  they contains all the information of the cuts. The output file
   * NoKickCuts.root has to be used during training of SectorMap.
   */
   class NoKickCutsEvalModule : public Module {

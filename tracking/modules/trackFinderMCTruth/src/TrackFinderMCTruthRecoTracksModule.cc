@@ -167,7 +167,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
   addParam("SplitAfterDeltaT",
            m_splitAfterDeltaT,
            "Minimal time delay between two sim hits (in ns) after which MC reco track will be "
-           "split into seperate tracks. If < 0, don't do splitting."
+           "split into separate tracks. If < 0, don't do splitting."
            "This feature was designed to be used in MC cosmics reconstruction to get two MCRecoTracks"
            "when track pass through empty SVD region, so that number of MCRecoTracks can be compared with"
            "number of non merged reco tracks. ",

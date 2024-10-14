@@ -1336,7 +1336,7 @@ class VXDQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "tree"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_vxd"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = VXDQEDataCollectionTask
 
@@ -1352,7 +1352,7 @@ class CDCQETeacherTask(TrackQETeacherBaseTask):
     tree_name = "records"
     #: Random basf2 seed used to create the training data set.
     random_seed = "train_cdc"
-    #: Defines DataCollectionTask to require by tha base class to collect
+    #: Defines DataCollectionTask to require by the base class to collect
     # features for the MVA training.
     data_collection_task = CDCQEDataCollectionTask
 

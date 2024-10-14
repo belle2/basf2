@@ -196,7 +196,7 @@ SVDROIFinderAnalysisModule::SVDROIFinderAnalysisModule() : Module()
   addParam("isSimulation", m_isSimulation,
            "set true if you want to evaluate efficiency on simulation", bool(true));
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",
@@ -471,7 +471,7 @@ void SVDROIFinderAnalysisModule::event()
     B2DEBUG(21, "Number of RecoTracks = " << recoTracks_MCParticle.size() << " and SVDShaperDigits = " << svdDigits_MCParticle.size() <<
             " related to this MCParticle");
 
-    //retrieve general informations of MCParticle
+    //retrieve general information of MCParticle
     m_momXmc = (aMcParticle->getMomentum()).X();
     m_momYmc = (aMcParticle->getMomentum()).Y();
     m_momZmc = (aMcParticle->getMomentum()).Z();

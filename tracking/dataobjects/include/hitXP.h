@@ -17,7 +17,7 @@ namespace Belle2 {
   *  This information is: position in local and global coordinates
   *  at entry/middle/exit position of the sensor, momentum, analytical
   *  track parameters (evaluated from position and momentum), geometrical
-  *  information (layed,ladder,sensor) and time.
+  *  information (layer,ladder,sensor) and time.
   *
   *  The purpose of this class is to obtain a single "hit-like object"
   *  with all the useful information for a track-parameters study.

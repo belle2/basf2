@@ -65,7 +65,7 @@ namespace Belle2 {
       void apply(const std::vector<CDCSegment2D>& inputSegment2Ds) final;
 
     private:
-      /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+      /** Access to the EventLevelTrackingInfo object in the datastore. */
       StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
     };
 

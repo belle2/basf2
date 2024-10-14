@@ -193,7 +193,7 @@ def plot_tmultigraph(tmultigraph,
                      legend=None,
                      style=None,
                      **kwd):
-    """Plots multiple overlayed graphs"""
+    """Plots multiple overlaid graphs"""
 
     title = create_title(tmultigraph)
     fig, ax = create_figure(title=title)
@@ -903,7 +903,7 @@ def reformat_root_latex_to_matplotlib_latex(text):
     translate it in to proper latex that can be understood by matplotlib"""
 
     # Dumb implementation, can be improved a lot
-    # Splits by white space and try to treat every part separatly.
+    # Splits by white space and try to treat every part separately.
     # Additionally a dump regular expression replacement for ROOT latex directives
     # is applied.
     # It may loose some context,

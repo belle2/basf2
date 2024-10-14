@@ -158,7 +158,7 @@ void VXDSimpleClusterizerModule::event()
     double energy = aPxdTrueHit->getEnergyDep();
 
 
-    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+    if (m_onlyPrimaries == true) { // ignore hits not coming from primary particles (e.g material effects particles)
       if (aMcParticle == nullptr or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         m_fakePXDHitCtr++;
         discardedPXDFake++;
@@ -197,7 +197,7 @@ void VXDSimpleClusterizerModule::event()
     }
 
     if (m_setMeasSigma == 0 and m_uniSigma == 0) {
-      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbritary values here, better solution recommended!
+      // in this case, the hits will not be smeared, but still we need some measurement error-values to be able to do some fitting... WARNING currently arbitrary values here, better solution recommended!
       sigmaU = 0.000001;
       sigmaV = 0.000001;
     }
@@ -224,7 +224,7 @@ void VXDSimpleClusterizerModule::event()
     const MCParticle* aMcParticle = aSvdTrueHit->getRelatedFrom<MCParticle>();
     unsigned int particleID = std::numeric_limits<unsigned int>::max();
 
-    if (m_onlyPrimaries == true) { // ingore hits not comming from primary particles (e.g material effects particles)
+    if (m_onlyPrimaries == true) { // ignore hits not coming from primary particles (e.g material effects particles)
       if (aMcParticle == nullptr or aMcParticle->hasStatus(MCParticle::c_PrimaryParticle) == false) {
         m_fakeSVDHitCtr++;
         discardedSVDFake++;

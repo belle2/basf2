@@ -58,7 +58,7 @@ namespace Belle2 {
       c_ColorError = kRed /**< Analysis result: Severe issue found */
     };
 
-    /*
+    /**
      * Reference plot scaling type
     */
     enum ERefScaling {

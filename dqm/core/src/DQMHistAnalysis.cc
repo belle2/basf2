@@ -188,7 +188,8 @@ TH1* DQMHistAnalysisModule::scaleReference(ERefScaling scaling, const TH1* hist,
 
   switch (scaling) {
     // default: do nothing
-    // case ERefScaling::c_RefScaleNone: //do nothing
+    case ERefScaling::c_RefScaleNone: //do nothing
+      break;
     case ERefScaling::c_RefScaleEntries: // Integral
       // only if we have entries in reference
       if (hist->Integral() != 0 and ref->Integral() != 0) {

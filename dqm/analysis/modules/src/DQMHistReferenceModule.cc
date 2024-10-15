@@ -132,70 +132,7 @@ void DQMHistReferenceModule::loadReferenceHistos()
 
 void DQMHistReferenceModule::event()
 {
-  TH1::AddDirectory(false); // do not store any histograms
-  gStyle->SetOptStat(0);
-  gStyle->SetStatStyle(1);
-  gStyle->SetOptDate(22);// Date and Time in Bottom Right, does no work
-
-  char mbstr[100];
-
-  time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-  B2INFO("[" << mbstr << "] before ref loop");
-
-  for (auto& it : getRefList()) {
-    TH1* ref = it.second.getRefHist();
-    if (!ref) continue; // No reference, continue
-    TCanvas* canvas = it.second.getCanvas();
-    TH1* hist1 = findHistInCanvas(it.second.m_orghist_name, &(canvas));
-
-    // if there is no histogram on canvas we plot the reference anyway.
-    if (!hist1) {
-      B2DEBUG(1, "Canvas is without histogram -> no display " << it.second.m_orghist_name);
-      // Display something could be confusing for shifters
-//       B2DEBUG(1, "Canvas is without histogram -> displaying only reference " << it.second.orghist_name);
-//       canvas->cd();
-//       hist2->Draw();
-//       canvas->Modified();
-//       canvas->Update();
-      continue;
-    }
-    if (!canvas) {
-      B2DEBUG(1, "No canvas found for reference histogram " << it.second.m_orghist_name);
-      continue;
-    }
-    if (hist1->Integral() == 0) continue; // empty histogram -> continue
-
-    /* consider adding coloring option....
-      double data = 0;
-      if (m_color) {
-      data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
-      }
-    */
-
-    //TODO: Remove me when and move me to AutoCanvas (after debugging)
-    if (abs(ref->Integral()) > 0) { // only if we have entries in reference
-      auto refCopy = scaleReference(1, hist1, it.second.getReference());
-
-      //Adjust the y scale to cover the reference
-      if (refCopy->GetMaximum() > hist1->GetMaximum())
-        hist1->SetMaximum(1.1 * refCopy->GetMaximum());
-
-      canvas->cd();
-      refCopy->Draw("hist,same");
-
-      canvas->Modified();
-      canvas->Update();
-      B2DEBUG(2, "Adding ref: " << it.second.m_orghist_name << " " << ref->GetName() << " " << ref);
-      //addRef("", it.second.m_orghist_name, ref);
-    }
-
-
-  }
-
-  now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-  B2INFO("[" << mbstr << "] after ref loop");
+  B2DEBUG(1, "DQMHistReference: event called");
 }
 
 void DQMHistReferenceModule::endRun()

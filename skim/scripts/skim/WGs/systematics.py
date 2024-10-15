@@ -30,7 +30,7 @@ from variables import variables as vm
 # TODO: Add liaison name and email address
 __liaison__ = ""
 __liaison_leptonID__ = "Marcel Hohmann"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

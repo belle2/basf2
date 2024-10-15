@@ -133,7 +133,6 @@ namespace Belle2 {
     static const int m_nStereoLayer = 20;
     const int m_nCellInTS = 11;
     const int m_nLayerInSuperLayer = 5; // 5 layers out of 6 are used in trigger
-    //const int m_nStereoSuperLayer = 4;
     const double m_maxZSelection = 25; // cm
 
     /** CDC geometry constants **/

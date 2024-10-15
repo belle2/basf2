@@ -140,7 +140,7 @@ void DQMHistAnalysisPXDCMModule::beginRun()
   m_cCommonModeDelta->Clear();
   m_cCommonModeDelta->SetLogz();
 
-  // this is needed at least for the "Old" and "Delta" one or update doesnt work
+  // this is needed at least for the "Old" and "Delta" one or update doesn't work
   m_hCommonModeDelta->Reset();
 }
 
@@ -190,7 +190,7 @@ void DQMHistAnalysisPXDCMModule::event()
                  hh1->GetBinContent(hh1->GetBin(gate + 1 + 192 * 3, bin));
           }
         }
-        // integration intervalls depend on CM default value, this seems to be agreed =10
+        // integration intervals depend on CM default value, this seems to be agreed =10
         // FIXME currently we have to much noise below the line ... thus excluding this to avoid false alarms
         // outside_full += hh1->Integral(1 /*0*/, 5); /// FIXME we exclude bin 0 as we use it for debugging/timing pixels
         // attention, n bins!

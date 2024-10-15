@@ -40,7 +40,7 @@ def check_path_exists(paths, terminate_on_error=True):
     """
 
     for p in paths:
-        print(f"Checking for existance of file {p}")
+        print(f"Checking for existence of file {p}")
         if not os.path.exists(p):
             print(f"Path {p} does not exist")
             if terminate_on_error:

@@ -17,7 +17,6 @@ import basf2 as b2
 import os
 import sys
 
-from ROOT.Belle2 import TestCalibrationAlgorithm
 from caf.framework import Calibration, CAF
 from caf import backends
 
@@ -38,6 +37,8 @@ def main(argv):
     input_files_test = [os.path.join(os.path.abspath(data_dir), '*.root')]
 
     from caf.strategies import SequentialRunByRun
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
+    from ROOT.Belle2 import TestCalibrationAlgorithm
     ###################################################
     # Test Calibration Setup
     # Make a bunch of test calibrations

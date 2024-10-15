@@ -152,7 +152,7 @@ bool KLMDigitizerModule::efficiencyCorrection(float efficiency)
 {
   if (std::isnan(efficiency))
     B2FATAL("Incomplete KLM efficiency data.");
-  double selection = gRandom->Rndm();
+  double selection = gRandom->Uniform();
   return (selection < efficiency);
 }
 

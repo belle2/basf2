@@ -114,7 +114,7 @@ void ECLShowerShapeModule::initialize()
 
 
   //Add callback to fill m_secondMomentCorrections when m_secondMomentCorrectionArray changes
-  //21-Oct-2016 - The callback doesn't seem to be called at the begining of the run so I commented it out and added a call to prepareSecondMomentCorrectionsCallback in the beginRun
+  //21-Oct-2016 - The callback doesn't seem to be called at the beginning of the run so I commented it out and added a call to prepareSecondMomentCorrectionsCallback in the beginRun
 //   m_secondMomentCorrectionArray.addCallback(this, &ECLShowerShapeModule::prepareSecondMomentCorrectionsCallback);
 //   prepareSecondMomentCorrectionsCallback();
 
@@ -148,7 +148,7 @@ void ECLShowerShapeModule::initializeMVA(const std::string& identifier,
 
   //Check number of variables in weight file
   if (m_numZernikeMVAvariables != general_options.m_variables.size())
-    B2FATAL("Expecting " << m_numZernikeMVAvariables << " varibales, found " << general_options.m_variables.size());
+    B2FATAL("Expecting " << m_numZernikeMVAvariables << " variables, found " << general_options.m_variables.size());
 
   expert = supported_interfaces[general_options.m_method]->getExpert();
   expert->load(weightfile);
@@ -166,7 +166,7 @@ void ECLShowerShapeModule::beginRun()
   initializeMVA(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL, m_expert_BRL);
   initializeMVA(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD, m_expert_BWD);
 
-  //This is a hack because the callback doesn't seem to be called at the begining of the run
+  //This is a hack because the callback doesn't seem to be called at the beginning of the run
   if (m_secondMomentCorrectionArray.hasChanged()) {
     if (m_secondMomentCorrectionArray) prepareSecondMomentCorrectionsCallback();
     else B2ERROR("ECLShowerShapeModule::beginRun - Couldn't find second moment correction for current run");
@@ -334,7 +334,7 @@ std::vector<ECLShowerShapeModule::ProjectedECLDigit> ECLShowerShapeModule::proje
     B2Vector3D calDigitPosition = geometry->GetCrystalPos(cellId - 1);
 
     // Angle between vector pointing to shower and vector pointing to CalDigit,
-    //where the orgin is the detector origin (implicitly assuming IP = detector origin)
+    //where the origin is the detector origin (implicitly assuming IP = detector origin)
     const double angleDigitShower = calDigitPosition.Angle(showerPosition);
     tmpProjectedDigit.rho = showerR * TMath::Tan(angleDigitShower);
 
@@ -420,7 +420,7 @@ double ECLShowerShapeModule::Rnm(const int n, const int m, const double rho) con
   if (n == 5 && m == 3) return 5.0 * rho * rho * rho * rho * rho - 4.0 * rho * rho * rho;
   if (n == 5 && m == 5) return rho * rho * rho * rho * rho;
 
-  // Otherwise compute explicitely.
+  // Otherwise compute explicitly.
   double returnVal = 0;
   for (int idx = 0; idx <= (n - std::abs(m)) / 2; ++idx)
     returnVal += std::pow(-1, idx) * TMath::Factorial(n - idx) / TMath::Factorial(idx)

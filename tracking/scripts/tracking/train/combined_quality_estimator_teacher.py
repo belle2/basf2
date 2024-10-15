@@ -13,8 +13,8 @@ combined_module_quality_estimator_teacher
 -----------------------------------------
 
 Information on the MVA Track Quality Indicator / Estimator can be found
-on `Confluence
-<https://confluence.desy.de/display/BI/MVA+Track+Quality+Indicator>`_.
+on `XWiki
+<https://xwiki.desy.de/xwiki/rest/p/0d3f4>`_.
 
 Purpose of this script
 ~~~~~~~~~~~~~~~~~~~~~~

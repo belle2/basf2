@@ -13,7 +13,7 @@ import variables as va
 import modularAnalysis as ma
 
 
-def charmFlavorTagger(particle_list, uniqueIdentifier='CFT',
+def charmFlavorTagger(particle_list, uniqueIdentifier='CFT_ragdoll',
                       path=None):
     """
     Interfacing for the Charm Flavor Tagger.

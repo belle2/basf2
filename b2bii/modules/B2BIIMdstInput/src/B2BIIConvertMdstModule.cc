@@ -622,7 +622,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
         for (unsigned i = 0; i < 7; i++)
@@ -678,7 +678,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
           for (unsigned j = 0; j < 7; j++)
@@ -2017,7 +2017,7 @@ void B2BIIConvertMdstModule::setTracksToECLClustersRelations()
 
       // the numbering in mdst_charged
       // not necessarily the same as in mdst_trk
-      // therfore have to find corresponding mdst_charged
+      // therefore have to find corresponding mdst_charged
       for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
         Belle::Mdst_charged mChar = *chgIterator;
         Belle::Mdst_trk mTRK_in_charged = mChar.trk();

@@ -1219,7 +1219,7 @@ bool ParticleVertexFitterModule::makeKRecoilMassMother(analysis::RecoilMassKFit&
 void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::vector<std::vector<unsigned>>& pars,
     std::vector<unsigned>& parm, std::vector<Particle*>&  allparticles, const Particle* daughter)
 {
-  std::vector <Belle2::Particle*> childs = daughter->getDaughters();
+  std::vector <Belle2::Particle*> daughters = daughter->getDaughters();
   for (unsigned ichild = 0; ichild < daughter->getNDaughters(); ichild++) {
     const Particle* child = daughter->getDaughter(ichild);
     std::vector<unsigned> pard;
@@ -1227,12 +1227,12 @@ void ParticleVertexFitterModule::updateMapOfTrackAndDaughter(unsigned& l,  std::
       updateMapOfTrackAndDaughter(l, pars, pard, allparticles, child);
       parm.insert(parm.end(), pard.begin(), pard.end());
       pars.push_back(pard);
-      allparticles.push_back(childs[ichild]);
+      allparticles.push_back(daughters[ichild]);
     } else  {
       pard.push_back(l);
       parm.push_back(l);
       pars.push_back(pard);
-      allparticles.push_back(childs[ichild]);
+      allparticles.push_back(daughters[ichild]);
       l++;
     }
   }

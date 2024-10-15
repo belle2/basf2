@@ -52,7 +52,7 @@ if __name__ == "__main__":
     store_mc_truth = True
 
     path = b2.create_path()
-    ma.inputMdst(filename=b2.find_file('mdst14.root', 'validation', False), path=path)
+    ma.inputMdst(filename=b2.find_file('mdst16.root', 'validation', False), path=path)
 
     b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag())
     if args.globaltag:
@@ -209,7 +209,7 @@ if __name__ == "__main__":
         path=path,
     )
 
-    # Reconstructin Upsilon(4S)
+    # Reconstructing Upsilon(4S)
     ma.reconstructDecay("Upsilon(4S):graFEI -> B0:tag B0:sig", "", path=path)
 
     # ---------------- Write information to file ---------------------------

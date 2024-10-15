@@ -41,7 +41,7 @@ from variables import variables as vm
 
 
 __liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @lru_cache  # Avoid loading the list multiple time on the same path

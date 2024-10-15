@@ -88,7 +88,7 @@ namespace Belle2 {
     TH2Poly* createEffiTH2Poly(const TString& name, const TString& title) ;
 
     /**
-     * Convenient function to create a TH2Poly based on CDC geometry
+     * Populate the efficiency histograms
      */
     void fillEffiTH2Poly(TH2F* hist, TH2Poly* observed, TH2Poly* expected, TH2Poly* efficiency) ;
 

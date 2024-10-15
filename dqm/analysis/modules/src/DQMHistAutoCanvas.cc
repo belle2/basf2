@@ -154,23 +154,29 @@ void DQMHistAutoCanvasModule::event()
           // assume users are expecting non-0-suppressed axis
           if (hist->GetMinimum() > 0) hist->SetMinimum(0);
           hist->Draw("hist");
-          /* TODO: Uncomment below after debugging
-          // reference only for 1dim
+          // reference only for 1dim and only if *both* not empty
           if (hist->Integral() != 0) { // ignore empty histogram
-            auto refCopy = findRefHist(it.first, 1, hist);
-            if (refCopy) {
+            // default scaling to number of entries
+            auto refCopy = findRefHist(it.first, ERefScaling::c_RefScaleEntries, hist);
+            if (refCopy and abs(ref->Integral()) > 0) { // only if we have entries in reference
               // Adjust the y scale to cover the reference
               if (refCopy->GetMaximum() > hist->GetMaximum())
                 hist->SetMaximum(1.1 * refCopy->GetMaximum());
 
               refCopy->Draw("hist,same");
+
+              /* We could consider to add some auto-comparison here later, thus adding coloring option....
+                double data = 0;
+                if (m_color) {
+                data = hist1->KolmogorovTest(hist2, ""); // returns p value (0 bad, 1 good), N - do not compare normalized
+                }
+              */
             }
           }
-          */
         } else if (hist->GetDimension() == 2) {
           // ... but not in 2d
           hist->Draw("colz");
-        }
+        } // else 3D or others?
       }
 
       // set Canvas "name" update flag if histo was updated

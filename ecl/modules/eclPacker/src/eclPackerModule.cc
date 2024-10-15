@@ -245,7 +245,6 @@ void ECLPackerModule::event()
       nShapers = m_eclMapper.getNShapersInCrate(iCrate);
       if (!nShapers) B2ERROR("Ecl packer:: Wrong shapers number " << nShapers);
 
-      if (!shaperMaskArray[iCrate - 1]) continue; // FIXME Since shaperMaskArray is 2D static array, this will never happen
       B2DEBUG(200, "Pack data for iCrate = " << iCrate << " nShapers = " << nShapers);
 
       // write EclCollector header to the buffer

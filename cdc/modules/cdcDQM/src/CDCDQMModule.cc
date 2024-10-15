@@ -15,14 +15,10 @@
 #include <TF1.h>
 #include <TMath.h>
 #include <TDirectory.h>
-#include <TH1F.h>
-#include <TH2F.h>
-#include <TH2Poly.h>
 
 #include <fstream>
 #include <math.h>
 #include <set>
-#include <vector>
 
 #include <cdc/dataobjects/WireID.h>
 #include <cdc/geometry/CDCGeometryPar.h>
@@ -42,8 +38,6 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
-  addParam("MergePolyBins", m_mergePolyBins,
-           "Merge adjucent bins on same layer connected to same board", m_mergePolyBins);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -53,9 +47,8 @@ CDCDQMModule::~CDCDQMModule()
 
 void CDCDQMModule::defineHisto()
 {
-
   TDirectory* oldDir = gDirectory;
-  TDirectory* cdcDir = oldDir->mkdir("CDC");
+  oldDir->mkdir("CDC");
   oldDir->cd("CDC");
   m_hNEvents = new TH1F("hNEvents", "hNEvents", 10, 0, 10);
   m_hNEvents->GetXaxis()->SetBinLabel(1, "number of events");
@@ -76,9 +69,9 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
+  m_h2EffiHisto = new TH2F("h2EffiHisto", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
+  m_h2EffiHisto->SetTitle("Observed vs Expected hits for all layers;#phi bin;layer;Track / bin");
   oldDir->cd();
-  m_hObservedExtPos = createTH2Poly("hObservedExtPos", "Observed CDC hit at extrapolated position;x [cm];y [cm];Track / bin", cdcDir);
-  m_hExpectedExtPos = createTH2Poly("hExpectedExtPos", "Expected CDC hit at extrapolated position;x [cm];y [cm];Track / bin", cdcDir);
 }
 
 void CDCDQMModule::initialize()
@@ -111,8 +104,6 @@ void CDCDQMModule::beginRun()
   m_hPhiIndex->Reset();
   m_hPhiEff->Reset();
   m_hPhiHit->Reset();
-  m_hObservedExtPos->Reset("ICES");
-  m_hExpectedExtPos->Reset("ICES");
 }
 
 void CDCDQMModule::event()
@@ -201,23 +192,30 @@ void CDCDQMModule::event()
       continue;
     }
 
-    std::set<int> hitInSLayer;  // list of contributing layers for this track
-    for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
-      const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
-      if (!tp) continue;
-      hitInSLayer.insert(hit->getICLayer());
-    }
-    auto helix = fitresult->getHelix();
-    int nSLayers = cdcgeo.getNumberOfSenseLayers();
-    for (int lay = 0; lay < nSLayers; lay++) {
-      double layerR = cdcgeo.senseWireR(lay);
-      double arcLength = helix.getArcLength2DAtCylindricalR(layerR);
-      if (std::isnan(arcLength)) continue;
-      const auto& result = helix.getPositionAtArcLength2D(arcLength);
-      if (result.Z() > cdcgeo.senseWireFZ(lay) || result.Z() < cdcgeo.senseWireBZ(lay)) continue;
-      m_hExpectedExtPos->Fill(result.X(), result.Y());
-      if (hitInSLayer.count(lay)) // if hit is attached in this layer
-        m_hObservedExtPos->Fill(result.X(), result.Y());
+    // use tracks from IP for layer effi calculation
+    if (std::fabs(fitresult->getD0()) < 1.0 && std::fabs(fitresult->getZ0()) < 1.0) {
+      std::set<int> hitInSLayer;  // list of contributing layers for this track
+      for (const RecoHitInformation::UsedCDCHit* hit : track->getCDCHitList()) {
+        const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(hit));
+        if (!tp) continue;
+        hitInSLayer.insert(hit->getICLayer());
+      }
+      auto helix = fitresult->getHelix();
+      int nSLayers = cdcgeo.getNumberOfSenseLayers();
+      for (int lay = 0; lay < nSLayers; lay++) {
+        double layerR = cdcgeo.senseWireR(lay);
+        // extrapolate to layer
+        double arcLength = helix.getArcLength2DAtCylindricalR(layerR);
+        if (std::isnan(arcLength)) continue;
+        const auto& result = helix.getPositionAtArcLength2D(arcLength);
+        if (result.Z() > cdcgeo.senseWireFZ(lay) || result.Z() < cdcgeo.senseWireBZ(lay)) continue;
+        // get phi of extrapolation and fill
+        double phi = TMath::ATan2(result.Y(), result.X());
+        int fillXbin = findThetaBin(phi, cdcgeo.nWiresInLayer(lay), cdcgeo.offset(lay));
+        m_h2EffiHisto->Fill(fillXbin, lay);
+        if (hitInSLayer.count(lay)) // if hit is attached in this layer
+          m_h2EffiHisto->Fill(fillXbin, lay + nSLayers);
+      }
     }
 
     // require high NDF track
@@ -283,73 +281,18 @@ void CDCDQMModule::terminate()
 {
 }
 
-TH2Poly* CDCDQMModule::createTH2Poly(const TString& name, const TString& title, TDirectory* dir)
+int CDCDQMModule::findThetaBin(double& phi, const int& nWires, const double& offset)
 {
-  TH2Poly* hist = new TH2Poly();
-  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-  int nSLayers = cdcgeo.getNumberOfSenseLayers();
-  for (int nlayer = 0; nlayer < nSLayers; nlayer++) {
-    int nWires = cdcgeo.nWiresInLayer(nlayer);
-    double offset = cdcgeo.offset(nlayer);
-    double layerR = cdcgeo.senseWireR(nlayer);
-    double r_inner = 0;
-    double r_outer = 0;
-    if (nlayer == 0) {
-      r_inner = layerR - (cdcgeo.senseWireR(1) - cdcgeo.senseWireR(0)) / 2;
-      r_outer = layerR + (cdcgeo.senseWireR(1) - cdcgeo.senseWireR(0)) / 2;
-    } else if (nlayer == nSLayers - 1) {
-      r_inner = layerR - (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
-      r_outer = layerR + (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
-    } else {
-      r_inner = layerR - (cdcgeo.senseWireR(nlayer) - cdcgeo.senseWireR(nlayer - 1)) / 2;
-      r_outer = layerR + (cdcgeo.senseWireR(nlayer + 1) - cdcgeo.senseWireR(nlayer)) / 2;
-    }
-
-    std::vector<double> binXvals, binYvals;
-    int prevBid = -1;
-    int binGroup = 0;
-    for (int wire = 0; wire < nWires; wire++) {
-      WireID wireid(nlayer, wire);
-      int bid = cdcgeo.getBoardID(wireid);
-
-      // Add bin if board changes or we reached the desired number of merged bins
-      if (!binXvals.empty() &&
-          (prevBid != bid || m_mergePolyBins == binGroup)) {
-        hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
-        binXvals.clear(); binYvals.clear();
-        binGroup = 0;   // Reset bin group for the new board
-      }
-
-      double phi_inner = (wire - 0.5 + offset) * 2 * TMath::Pi() / nWires;
-      double phi_outer = (wire + 0.5 + offset) * 2 * TMath::Pi() / nWires;
-      // Calculate the four corners of the bin
-      double x2 = r_outer * TMath::Cos(phi_outer);
-      double y2 = r_outer * TMath::Sin(phi_outer);
-      double x3 = r_inner * TMath::Cos(phi_outer);
-      double y3 = r_inner * TMath::Sin(phi_outer);
-      if (binXvals.empty()) {
-        // Initialize with the first rectangle's corners
-        double x0 = r_inner * TMath::Cos(phi_inner);
-        double y0 = r_inner * TMath::Sin(phi_inner);
-        double x1 = r_outer * TMath::Cos(phi_inner);
-        double y1 = r_outer * TMath::Sin(phi_inner);
-        binXvals = {x0, x1, x2, x3};
-        binYvals = {y0, y1, y2, y3};
-      } else {
-        // Insert new corners at the correct position for merged bins
-        int insertPos = int(binXvals.size()) / 2;
-        binXvals.insert(binXvals.begin() + insertPos + 1, x2);
-        binYvals.insert(binYvals.begin() + insertPos + 1, y2);
-        binXvals.insert(binXvals.begin() + insertPos + 2, x3);
-        binYvals.insert(binYvals.begin() + insertPos + 2, y3);
-      }
-      prevBid = bid;
-      binGroup++;
-    }
-    if (!binXvals.empty()) // last bin
-      hist->AddBin(binXvals.size(), &binXvals[0], &binYvals[0]);
-  }
-  hist->SetNameTitle(name, title);
-  hist->SetDirectory(dir);
-  return hist;
+  double shift = (offset - 0.5) * 2 * TMath::Pi() / nWires;
+  double binLow = shift;
+  double binHigh = 2 * TMath::Pi() + shift;
+  // convert [-pi,pi] range to [0,2pi]
+  if (phi < 0) phi += 2 * TMath::Pi();
+  // wrap around
+  if (phi < binLow) phi += 2 * TMath::Pi(); // Wrap around for values less than binLow
+  else if (phi >= binHigh) phi -= 2 * TMath::Pi(); // Wrap around for values >= binHigh
+  double binWidth = (binHigh - binLow) / nWires;
+  int binIndex = (phi - binLow) / binWidth;
+  // Return the bin index (1-based for ROOT histograms)
+  return binIndex + 1;
 }

@@ -14,6 +14,7 @@
 
 #include <TROOT.h>
 #include <TLine.h>
+#include <TH2Poly.h>
 #include <TH2F.h>
 #include <TH1F.h>
 #include <TStyle.h>
@@ -81,6 +82,16 @@ namespace Belle2 {
      */
     float getHistMedian(TH1D* h) const;
 
+    /**
+     * Convenient function to create a TH2Poly based on CDC geometry
+     */
+    TH2Poly* createEffiTH2Poly(const TString& name, const TString& title) ;
+
+    /**
+     * Convenient function to create a TH2Poly based on CDC geometry
+     */
+    void fillEffiTH2Poly(TH2F* hist, TH2Poly* observed, TH2Poly* expected, TH2Poly* efficiency) ;
+
 
   protected:
 
@@ -100,6 +111,10 @@ namespace Belle2 {
     TCanvas* c_hist_skimphi = nullptr; /**< canvas for various phi distribution */
     TH1D* m_hist_skimphi[8] = {nullptr}; /**< for above*/
 
+    TCanvas* c_hist_efficiency = nullptr; /**< canvas for layer efficiency */
+    TH2Poly* m_hist_efficiency[3] = {nullptr}; /**< for above*/
+    TH1F* m_hist_cellEffi = nullptr; /**< for above*/
+
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
     TLine* m_line_ltdc  = nullptr; /**< line for lower TDC window */
@@ -110,6 +125,7 @@ namespace Belle2 {
     std::string m_histoTDC = ""; /**< TDC histogram names of CDC DQMs */
     std::string m_histoPhiIndex = ""; /**< Phi Inedx histogram names of CDC DQMs */
     std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
+    std::string m_histoLayEff = ""; /**< Layer Eff histogram names of CDC DQMs */
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
     std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
     std::string m_refNamePhi = ""; /**< reference histogram of phi */

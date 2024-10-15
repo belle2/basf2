@@ -294,6 +294,7 @@ def add_postfilter_tracking_reconstruction(path, components=None, pruneTracks=Fa
     :param v0_finding: If false, the V0 module will not be executed
     :param flip_recoTrack: if true, add the recoTracks flipping function in the postfilter (only if PXD is present)
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
+    :param kink_finding: if true, add the ``KinkFinder`` module to the path.
     """
 
     # do not add any new modules if no tracking detectors are in the components

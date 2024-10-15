@@ -1561,7 +1561,7 @@ bool TrackExtrapolateG4e::findMatchingBarrelHit(Intersection& intersection, cons
       intersection.hit = bestHit;
       hit->isOnTrack(true);
       if (track != nullptr) {
-        track->addRelationTo(hit);
+        track->addRelationTo(hit, intersection.chi2);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
           recoTrack->addBKLMHit(hit, recoTrack->getNumberOfTotalHits() + 1);
@@ -1622,7 +1622,7 @@ bool TrackExtrapolateG4e::findMatchingEndcapHit(Intersection& intersection, cons
       // DIVOT no such function for EKLM!
       // hit->isOnTrack(true);
       if (track != nullptr) {
-        track->addRelationTo(hit);
+        track->addRelationTo(hit, intersection.chi2);
         RecoTrack* recoTrack = track->getRelatedTo<RecoTrack>();
         if (m_addHitsToRecoTrack) {
           for (const EKLMAlignmentHit& alignmentHit : hit->getRelationsFrom<EKLMAlignmentHit>()) {
@@ -1728,7 +1728,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   correction.invert(fail);
   if (fail != 0)
     return;
-  // Matrix inversion succeeeded and is reasonable.
+  // Matrix inversion succeeded and is reasonable.
   // Evaluate chi-squared increment assuming that the Kalman filter
   // won't be able to adjust the extrapolated track's position (fall-back).
   intersection.chi2 = (correction.similarityT(residual))[0][0];

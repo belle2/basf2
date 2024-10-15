@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TTree.h>
@@ -107,5 +108,12 @@ namespace Belle2 {
     int m_signalSideCandidate{-1};             /**< signal-side candidate counter */
     unsigned int m_nSignalSideCandidates{0};   /**< total n signal-side candidates */
     StoreObjPtr<RestOfEvent> m_roe;            /**< ROE object */
+
+    bool m_storeEventType;  /**< If true, the branch __eventType__ is added */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
+    std::string m_eventType; /**< EventType to be filled */
+
+    bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
+
   };
 } // end namespace Belle2

@@ -137,7 +137,7 @@ void ZMQEventProcessor::process(const PathPtr& path, long maxEvent)
   // Split the path into input, main and output. A nullptr means, the path should not be used
   PathPtr inputPath, mainPath, outputPath;
   std::tie(inputPath, mainPath, outputPath) = PathUtils::splitPath(path);
-  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath, mainPath, outputPath);
+  const ModulePtr& histogramManager = PathUtils::getHistogramManager(inputPath);
 
   // Check for existence of HLTZMQ2Ds module in input path to set DAQ environment
   for (const ModulePtr& module : inputPath->getModules()) {
@@ -386,7 +386,10 @@ void ZMQEventProcessor::runMonitoring(const PathPtr& inputPath, const PathPtr& m
     // Test if we need more workers
     const unsigned int neededWorkers = m_processMonitor.needMoreWorkers();
     if (neededWorkers > 0) {
+      B2DEBUG(30, "restartFailedWorkers = " << restartFailedWorkers);
       if (restartFailedWorkers) {
+        B2DEBUG(30, ".... Restarting a new worker");
+        B2ERROR(".... Restarting a new worker process");
         runWorker(neededWorkers, inputPath, mainPath, terminateGlobally, maxEvent);
       } else if (failOnFailedWorkers) {
         B2ERROR("A worker failed. Will try to end the process smoothly now.");
@@ -577,32 +580,34 @@ bool ZMQEventProcessor::processEvent(PathIterator moduleIter, bool skipMasterMod
                  " isEndOfRun = " << m_previousEventMetaData.isEndOfRun());
           B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
           B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
-          processBeginRun();
-          m_previousEventMetaData = *m_eventMetaDataPtr;
+          // The run number should not be 0
+          if (m_eventMetaDataPtr->getRun() != 0) {
+            processBeginRun();
+            m_previousEventMetaData = *m_eventMetaDataPtr;
+          } else {
+            return false;
+          }
         }
 
-        //Check for a change of the run (should not come here)
-        else {
-          const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or
-                                   (m_eventMetaDataPtr->getRun() != m_previousEventMetaData.getRun()));
-          const bool runChangedWithoutNotice = runChanged and not m_previousEventMetaData.isEndOfData()
-                                               and not m_previousEventMetaData.isEndOfRun();
-          //  if (runChangedWithoutNotice && !g_first_round) {
-          if (runChangedWithoutNotice) {
-            if (collectStats)
-              m_processStatisticsPtr->suspendGlobal();
+        const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or
+                                 (m_eventMetaDataPtr->getRun() != m_previousEventMetaData.getRun()));
+        const bool runChangedWithoutNotice = runChanged and not m_previousEventMetaData.isEndOfData()
+                                             and not m_previousEventMetaData.isEndOfRun();
+        //  if (runChangedWithoutNotice && !g_first_round) {
+        if (runChangedWithoutNotice) {
+          if (collectStats)
+            m_processStatisticsPtr->suspendGlobal();
 
-            B2INFO("===> Run Change (possibly offline) : calling processEndRun() and processBeginRun()");
-            B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
-            B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
-            B2INFO("--> runChanged = " << runChanged << " runChangedWithoutNotice = " << runChangedWithoutNotice);
+          B2INFO("===> Run Change (possibly offline) : calling processEndRun() and processBeginRun()");
+          B2INFO("--> cur run = " << m_eventMetaDataPtr->getRun() << " <- prev run = " << m_previousEventMetaData.getRun());
+          B2INFO("--> cur evt = " << m_eventMetaDataPtr->getEvent() << " <- prev evt = " << m_previousEventMetaData.getEvent());
+          B2INFO("--> runChanged = " << runChanged << " runChangedWithoutNotice = " << runChangedWithoutNotice);
 
-            processEndRun();
-            processBeginRun();
+          processEndRun();
+          processBeginRun();
 
-            if (collectStats)
-              m_processStatisticsPtr->resumeGlobal();
-          }
+          if (collectStats)
+            m_processStatisticsPtr->resumeGlobal();
         }
         m_previousEventMetaData = *m_eventMetaDataPtr;
       } else

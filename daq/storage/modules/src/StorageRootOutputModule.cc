@@ -135,6 +135,8 @@ Warning:
 .. versionadded:: release-03-00-00
 )DOC", m_outputSplitSize);
 
+  m_outputFileMetaData = new FileMetaData;
+
   // Parameters for online storage
   addParam("runType", m_runType, "Run type", string("null"));
   addParam("HLTName", m_HLTName, "HLT name", string("HLT00"));
@@ -146,7 +148,10 @@ Warning:
 }
 
 
-StorageRootOutputModule::~StorageRootOutputModule() = default;
+StorageRootOutputModule::~StorageRootOutputModule()
+{
+  delete m_outputFileMetaData;
+}
 
 void StorageRootOutputModule::initialize()
 {
@@ -154,9 +159,7 @@ void StorageRootOutputModule::initialize()
   //Let's set this to 100PB, that should last a bit longer.
   TTree::SetMaxTreeSize(1000 * 1000 * 100000000000LL);
 
-  //create a file level metadata object in the data store
-  m_fileMetaData.registerInDataStore();
-  //and make sure we have event meta data
+  //make sure we have event meta data
   m_eventMetaData.isRequired();
 
   //check outputSplitSize
@@ -192,6 +195,16 @@ void StorageRootOutputModule::initialize()
                                                     config.get("database.password"),
                                                     config.getInt("database.port"));
   m_db = db;
+}
+
+// For online storage
+void StorageRootOutputModule::endRun() {
+  if (m_file) {
+    closeFile();
+    while (m_file) closeFile(); // I hope that this will not be failed
+    m_fileIndex = 0;
+  }
+  m_runno++;
 }
 
 void StorageRootOutputModule::openFile()
@@ -323,6 +336,14 @@ void StorageRootOutputModule::openFile()
     }
   }
 
+  // set the address of the FileMetaData branch for the output to a separate one from the input
+  TBranch* fileMetaDataBranch = m_tree[DataStore::c_Persistent]->GetBranch("FileMetaData");
+  if (fileMetaDataBranch) {
+    fileMetaDataBranch->SetAddress(&m_outputFileMetaData);
+  } else {
+    m_tree[DataStore::c_Persistent]->Branch("FileMetaData", &m_outputFileMetaData, m_basketsize, m_splitLevel);
+  }
+
   dir->cd();
   if (m_outputSplitSize) {
     B2INFO(getName() << ": Opened " << (m_fileIndex > 0 ? "new " : "") << "file for writing" << LogVar("filename", out));
@@ -332,10 +353,10 @@ void StorageRootOutputModule::openFile()
   try {
     m_db->connect();
     m_db->execute("INSERT INTO datafiles_root "
-                  "(name, path, host, runtype, expno, runno, compression_level, compression_algorithm, time_open, "
+                  "(name, path, host, disk, runtype, expno, runno, compression_level, compression_algorithm, time_open, "
                   "size, nevents, nfullevents, correct_close, renamed, used_for_merge, removed) "
-                  "VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d, '%s', 0, 0, 0, FALSE, FALSE, FALSE, FALSE);",
-                  out_notmp.filename().c_str(), out_notmp.c_str(), m_HLTName.c_str(),
+                  "VALUES ('%s', '%s', '%s', '%s','%s', %d, %d, %d, %d, '%s', 0, 0, 0, FALSE, FALSE, FALSE, FALSE);",
+                  out_notmp.filename().c_str(), out_notmp.c_str(), m_HLTName.c_str(), m_disk.c_str(),
                   m_runType.c_str(), m_expno, m_runno,
                   m_compressionLevel, m_compressionAlgorithm,
                   (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())+std::string("+09")).c_str());
@@ -374,8 +395,9 @@ void StorageRootOutputModule::event()
     m_expno = m_eventMetaData->getExperiment();
     m_runno = m_eventMetaData->getRun();
     m_processNumber = atoi(getName().substr(0, getName().find(std::string("_"))).c_str());
-    m_outputFileName = StringUtil::form("/rawdata/disk%02d/belle/Raw/%4.4d/%5.5d/%s.%4.4d.%5.5d.%s.p%02d.root", 
-                                        (m_processNumber%m_nDisk)+1, m_expno, m_runno, m_runType.c_str(), 
+    m_disk = StringUtil::form("disk%02d", (m_processNumber%m_nDisk)+1);
+    m_outputFileName = StringUtil::form("/rawdata/%s/belle/Raw/%4.4d/%5.5d/%s.%4.4d.%5.5d.%s.p%02d.root", 
+                                        m_disk.c_str(), m_expno, m_runno, m_runType.c_str(), 
                                         m_expno, m_runno, m_HLTName.c_str(), m_processNumber);
   }
 
@@ -452,14 +474,14 @@ void StorageRootOutputModule::fillFileMetaData()
   // I wonder why the no file meta data is associated with isMC == true
   isMC = false;
 
-  m_fileMetaData.create(true);
-  if (!isMC) m_fileMetaData->declareRealData();
+  new(m_outputFileMetaData) FileMetaData;
+  if (!isMC) m_outputFileMetaData->declareRealData();
 
   if (m_tree[DataStore::c_Event]) {
     //create an index for the event tree
     TTree* tree = m_tree[DataStore::c_Event];
     unsigned long numEntries = tree->GetEntries();
-    m_fileMetaData->setNFullEvents(m_nFullEvents);
+    m_outputFileMetaData->setNFullEvents(m_nFullEvents);
     if (m_buildIndex && numEntries > 0) {
       if (numEntries > 10000000) {
         //10M events correspond to about 240MB for the TTreeIndex object. for more than ~45M entries this causes crashes, broken files :(
@@ -470,31 +492,31 @@ void StorageRootOutputModule::fillFileMetaData()
       }
     }
 
-    m_fileMetaData->setNEvents(numEntries);
+    m_outputFileMetaData->setNEvents(numEntries);
     if (m_experimentLow > m_experimentHigh) {
       //starting condition so apparently no events at all
-      m_fileMetaData->setLow(-1, -1, 0);
-      m_fileMetaData->setHigh(-1, -1, 0);
+      m_outputFileMetaData->setLow(-1, -1, 0);
+      m_outputFileMetaData->setHigh(-1, -1, 0);
     } else {
-      m_fileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
-      m_fileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
+      m_outputFileMetaData->setLow(m_experimentLow, m_runLow, m_eventLow);
+      m_outputFileMetaData->setHigh(m_experimentHigh, m_runHigh, m_eventHigh);
     }
   }
 
   //fill more file level metadata
-  m_fileMetaData->setParents(m_parentLfns);
-  RootIOUtilities::setCreationData(*m_fileMetaData);
-  m_fileMetaData->setRandomSeed(RandomNumbers::getSeed());
-  m_fileMetaData->setSteering(Environment::Instance().getSteering());
+  m_outputFileMetaData->setParents(m_parentLfns);
+  RootIOUtilities::setCreationData(*m_outputFileMetaData);
+  m_outputFileMetaData->setRandomSeed(RandomNumbers::getSeed());
+  m_outputFileMetaData->setSteering(Environment::Instance().getSteering());
   auto mcEvents = Environment::Instance().getNumberOfMCEvents();
   if(m_outputSplitSize and mcEvents > 0) {
     if(m_fileIndex == 0) B2WARNING("Number of MC Events cannot be saved when splitting output files by size, setting to 0");
     mcEvents = 0;
   }
-  m_fileMetaData->setMcEvents(mcEvents);
-  m_fileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
+  m_outputFileMetaData->setMcEvents(mcEvents);
+  m_outputFileMetaData->setDatabaseGlobalTag(Database::Instance().getGlobalTags());
   for (const auto& item : m_additionalDataDescription) {
-    m_fileMetaData->setDataDescription(item.first, item.second);
+    m_outputFileMetaData->setDataDescription(item.first, item.second);
   }
   // Set the LFN to the filename: if it's a URL to directly, otherwise make sure it's absolute
   std::string lfn = m_file->GetName();
@@ -505,14 +527,13 @@ void StorageRootOutputModule::fillFileMetaData()
   std::string format = EnvironmentVariables::get("BELLE2_LFN_FORMATSTRING", "");
   if (!format.empty()) {
     auto format_filename = boost::python::import("B2Tools.format").attr("format_filename");
-    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_fileMetaData->getJsonStr()));
+    lfn = boost::python::extract<std::string>(format_filename(format, m_outputFileName, m_outputFileMetaData->getJsonStr()));
   }
-  m_fileMetaData->setLfn(lfn);
+  m_outputFileMetaData->setLfn(lfn);
   //register the file in the catalog
   if (m_updateFileCatalog) {
-    FileCatalog::Instance().registerFile(m_file->GetName(), *m_fileMetaData);
+    FileCatalog::Instance().registerFile(m_file->GetName(), *m_outputFileMetaData);
   }
-  m_outputFileMetaData = *m_fileMetaData;
 }
 
 
@@ -526,18 +547,11 @@ void StorageRootOutputModule::terminate()
 void StorageRootOutputModule::closeFile()
 {
   if(!m_file) return;
-  //get pointer to file level metadata
-  std::unique_ptr<FileMetaData> old;
-  if (m_fileMetaData) old = std::make_unique<FileMetaData>(*m_fileMetaData);
 
   fillFileMetaData();
 
   //fill Persistent data
   fillTree(DataStore::c_Persistent);
-
-  // restore old file meta data if it existed
-  if (old) *m_fileMetaData = *old;
-  old.reset();
 
   //write the trees
   TDirectory* dir = gDirectory;
@@ -573,7 +587,7 @@ void StorageRootOutputModule::closeFile()
                   "time_close = '%s' "
                   "WHERE name = '%s' AND host = '%s';",
                   ((boost::optional<uint64_t>)(m_file->GetSize()*2) < m_outputSplitSize || m_ramdiskBuffer) ? "true" : "false",
-                  m_outputFileMetaData.getNEvents(), m_outputFileMetaData.getNFullEvents(), m_file->GetSize(),
+                  m_outputFileMetaData->getNEvents(), m_outputFileMetaData->getNFullEvents(), m_file->GetSize(),
                   (boost::posix_time::to_iso_extended_string(boost::posix_time::microsec_clock::local_time())+std::string("+09")).c_str(),
                   filename_path.filename().c_str(), m_HLTName.c_str());
   } catch (const DBHandlerException &e) {
@@ -585,7 +599,7 @@ void StorageRootOutputModule::closeFile()
   m_file = nullptr;
 
   // and now add it to the metadata service as it's fully written
-  MetadataService::Instance().addRootOutputFile(filename, &m_outputFileMetaData);
+  MetadataService::Instance().addRootOutputFile(filename, m_outputFileMetaData);
 
   // reset some variables
   for (auto & entry : m_entries) {
@@ -622,7 +636,11 @@ void StorageRootOutputModule::fillTree(DataStore::EDurability durability)
       entry->object->SetBit(kInvalidObject);
     }
     //FIXME: Do we need this? in theory no but it crashes in parallel processing otherwise ¯\_(ツ)_/¯
-    tree.SetBranchAddress(entry->name.c_str(), &entry->object);
+    if (entry->name == "FileMetaData") {
+      tree.SetBranchAddress(entry->name.c_str(), &m_outputFileMetaData);
+    } else {
+      tree.SetBranchAddress(entry->name.c_str(), &entry->object);
+    }
   }
   tree.Fill();
   for (auto* entry: m_entries[durability]) {

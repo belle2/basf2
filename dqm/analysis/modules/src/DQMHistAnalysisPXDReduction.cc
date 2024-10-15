@@ -36,10 +36,10 @@ DQMHistAnalysisPXDReductionModule::DQMHistAnalysisPXDReductionModule()
 
   // Parameter definition
   addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of Histogram dir", std::string("PXDDAQ"));
-  addParam("lowarnlimit", m_lowarnlimit, "Mean Reduction Low Warn limit for alarms", 0.99);
-  addParam("LowErrorlimit", m_loerrorlimit, "Mean Reduction Low limit for alarms", 0.90);
-  addParam("HighWarnlimit", m_hiwarnlimit, "Mean Reduction High Warn limit for alarms", 1.01);
-  addParam("HighErrorlimit", m_hierrorlimit, "Mean Reduction High limit for alarms", 1.10);
+  addParam("LowerWarnLimit", m_meanLowerWarn, "Mean Reduction Low limit for warning", double(NAN)); // default is NAN =disable
+  addParam("LowerErrorLimit", m_meanLowerAlarm, "Mean Reduction Low limit for alarms", double(NAN)); // default is NAN =disable
+  addParam("UpperWarnLimit", m_meanUpperWarn, "Mean Reduction High limit for warning", double(NAN)); // default is NAN =disable
+  addParam("UpperErrorLimit", m_meanUpperAlarm, "Mean Reduction High limit for alarms", double(NAN)); // default is NAN =disable
   addParam("minEntries", m_minEntries, "minimum number of new entries for last time slot", 1000);
   addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: Constructor done.");
@@ -96,19 +96,26 @@ void DQMHistAnalysisPXDReductionModule::initialize()
   m_hReduction->Draw("");
   m_monObj->addCanvas(m_cReduction);
 
-  /// FIXME were to put the lines depends ...
-  m_line1 = new TLine(0, 10, m_PXDModules.size(), 10);
-//   m_line2 = new TLine(0, 16, m_PXDModules.size(), 16);
-//   m_line3 = new TLine(0, 3, m_PXDModules.size(), 3);
-  m_line1->SetHorizontal(true);
-  m_line1->SetLineColor(3);// Green
-  m_line1->SetLineWidth(3);
-//   m_line2->SetHorizontal(true);
-//   m_line2->SetLineColor(1);// Black
-//   m_line2->SetLineWidth(3);
-//   m_line3->SetHorizontal(true);
-//   m_line3->SetLineColor(1);
-//   m_line3->SetLineWidth(3);
+  m_meanLine = new TLine(0, 10, m_PXDModules.size(), 10);
+  m_meanUpperWarnLine = new TLine(0, 16, m_PXDModules.size(), 16);
+  m_meanLowerWarnLine = new TLine(0, 0.9, m_PXDModules.size(), 0.9);
+  m_meanUpperAlarmLine = new TLine(0, 20, m_PXDModules.size(), 20);
+  m_meanLowerAlarmLine = new TLine(0, 0.5, m_PXDModules.size(), 0.5);
+  m_meanLine->SetHorizontal(true);
+  m_meanLine->SetLineColor(kBlue);
+  m_meanLine->SetLineWidth(3);
+  m_meanUpperWarnLine->SetHorizontal(true);
+  m_meanUpperWarnLine->SetLineColor(c_ColorWarning + 2);
+  m_meanUpperWarnLine->SetLineWidth(3);
+  m_meanLowerWarnLine->SetHorizontal(true);
+  m_meanLowerWarnLine->SetLineColor(c_ColorWarning + 2);
+  m_meanLowerWarnLine->SetLineWidth(3);
+  m_meanUpperAlarmLine->SetHorizontal(true);
+  m_meanUpperAlarmLine->SetLineColor(c_ColorError + 2);
+  m_meanUpperAlarmLine->SetLineWidth(3);
+  m_meanLowerAlarmLine->SetHorizontal(true);
+  m_meanLowerAlarmLine->SetLineColor(c_ColorError + 2);
+  m_meanLowerAlarmLine->SetLineWidth(3);
 
   registerEpicsPV("PXD:Red:Status", "Status");
   registerEpicsPV("PXD:Red:Value", "Value");
@@ -121,8 +128,27 @@ void DQMHistAnalysisPXDReductionModule::beginRun()
 
   m_cReduction->Clear();
   m_hReduction->Reset(); // dont sum up!!!
+  colorizeCanvas(m_cReduction, c_StatusTooFew);
 
-  requestLimitsFromEpicsPVs("Value", m_loerrorlimit, m_lowarnlimit, m_hiwarnlimit, m_hierrorlimit);
+  // override with limits from EPICS. if they are set
+  requestLimitsFromEpicsPVs("Value", m_meanLowerAlarm, m_meanLowerWarn, m_meanUpperWarn, m_meanUpperAlarm);
+
+  if (!std::isnan(m_meanLowerAlarm)) {
+    m_meanLowerAlarmLine->SetY1(m_meanLowerAlarm);
+    m_meanLowerAlarmLine->SetY2(m_meanLowerAlarm);
+  }
+  if (!std::isnan(m_meanLowerWarn)) {
+    m_meanLowerWarnLine->SetY1(m_meanLowerWarn);
+    m_meanLowerWarnLine->SetY2(m_meanLowerWarn);
+  }
+  if (!std::isnan(m_meanUpperWarn)) {
+    m_meanUpperWarnLine->SetY1(m_meanUpperWarn);
+    m_meanUpperWarnLine->SetY2(m_meanUpperWarn);
+  }
+  if (!std::isnan(m_meanUpperAlarm)) {
+    m_meanUpperAlarmLine->SetY1(m_meanUpperAlarm);
+    m_meanUpperAlarmLine->SetY2(m_meanUpperAlarm);
+  }
 }
 
 void DQMHistAnalysisPXDReductionModule::event()
@@ -138,7 +164,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     // std::replace( name.begin(), name.end(), '.', '_');
 
     TH1* hh1 = getDelta(m_histogramDirectoryName, name);
-    // no inital sampling, we should get lenty of statistics
+    // no initial sampling, we should get plenty of statistics
     if (hh1) {
       auto mean = hh1->GetMean();
       m_hReduction->SetBinContent(i + 1, mean);
@@ -153,7 +179,7 @@ void DQMHistAnalysisPXDReductionModule::event()
     // ignore modules in exclude list
     if (std::find(m_excluded.begin(), m_excluded.end(), i) != m_excluded.end()) continue;
     auto mean = m_hReduction->GetBinContent(i + 1);
-    if (mean > 0) { // onyl for valid values
+    if (mean > 0) { // only for valid values
       ireduction += mean; // well fit would be better
       ireductioncnt++;
     }
@@ -163,59 +189,59 @@ void DQMHistAnalysisPXDReductionModule::event()
 
   double value = ireductioncnt > 0 ? ireduction / ireductioncnt : 0;
 
-  int status = 0;
-// not enough Entries
-  if (ireductioncnt < 15) { // still have to see how to handle masked modules
-    status = 0; // Grey
-    m_cReduction->Pad()->SetFillColor(kGray);// Magenta or Gray
-  } else {
-    if (value > m_hierrorlimit || value < m_loerrorlimit) {
-      m_cReduction->Pad()->SetFillColor(kRed);// Red
-      status = 4;
-    } else if (value >  m_hiwarnlimit ||  value < m_lowarnlimit) {
-      m_cReduction->Pad()->SetFillColor(kYellow);// Yellow
-      status = 3;
-    } else {
-      m_cReduction->Pad()->SetFillColor(kGreen);// Green
-      status = 2;
-//   } else {
-// we wont use white anymore here
-//    m_cReduction->Pad()->SetFillColor(kWhite);// White
-//    status = 1; // White
-    }
-  }
+  // if any if NaN, the comparison is false
+  auto stat_data = makeStatus(ireductioncnt >= 15,
+                              value > m_meanUpperWarn || value < m_meanLowerWarn,
+                              value > m_meanUpperAlarm || value < m_meanLowerAlarm);
 
   if (m_hReduction) {
     m_hReduction->Draw("");
-    if (status != 0) {
-      m_line1->SetY1(value);
-      m_line1->SetY2(value); // aka SetHorizontal
-      m_line1->Draw();
+    if (stat_data != c_StatusTooFew) {
+      m_meanLine->SetY1(value);
+      m_meanLine->SetY2(value); // aka SetHorizontal
+      m_meanLine->Draw();
     }
-//     m_line2->Draw();
-//     m_line3->Draw();
+    if (!std::isnan(m_meanLowerAlarm)) m_meanLowerAlarmLine->Draw();
+    if (!std::isnan(m_meanLowerWarn)) m_meanLowerWarnLine->Draw();
+    if (!std::isnan(m_meanUpperWarn)) m_meanUpperWarnLine->Draw();
+    if (!std::isnan(m_meanUpperAlarm)) m_meanUpperAlarmLine->Draw();
     for (auto& it : m_excluded) {
-      auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-      tt->SetTextSize(0.035);
-      tt->SetTextAngle(90);// Rotated
-      tt->SetTextAlign(12);// Centered
+      static std::map <int, TLatex*> ltmap;
+      auto tt = ltmap[it];
+      if (!tt) {
+        tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+        tt->SetTextSize(0.035);
+        tt->SetTextAngle(90);// Rotated
+        tt->SetTextAlign(12);// Centered
+        ltmap[it] = tt;
+      }
       tt->Draw();
     }
   }
 
   m_monObj->setVariable("reduction", value);
 
+  colorizeCanvas(m_cReduction, stat_data);
   UpdateCanvas(m_cReduction);
   m_cReduction->Modified();
   m_cReduction->Update();
 
   // better only update if statistics is reasonable, we dont want "0" drops between runs!
-  setEpicsPV("Status", status);
+  setEpicsPV("Status", stat_data);
   setEpicsPV("Value", value);
 }
 
 void DQMHistAnalysisPXDReductionModule::terminate()
 {
   B2DEBUG(1, "DQMHistAnalysisPXDReduction: terminate called");
+
+  if (m_cReduction) delete m_cReduction;
+  if (m_hReduction) delete m_hReduction;
+
+  if (m_meanLine) delete m_meanLine;
+  if (m_meanUpperWarnLine) delete m_meanUpperWarnLine;
+  if (m_meanLowerWarnLine) delete m_meanLowerWarnLine;
+  if (m_meanUpperAlarmLine) delete m_meanUpperAlarmLine;
+  if (m_meanLowerAlarmLine) delete m_meanLowerAlarmLine;
 }
 

@@ -8,9 +8,6 @@
 
 #pragma once
 
-/* ECL headers. */
-#include <ecl/calibration/eclMuMuEAlgorithm.h>
-
 /* Basf2 headers. */
 #include <calibration/CalibrationAlgorithm.h>
 
@@ -49,10 +46,10 @@ namespace Belle2 {
 
     private:
       int fitOK = 16; /**< fit is OK */
-      int iterations = 8; /**< fit reached max number of iterations, but is useable */
+      int iterations = 8; /**< fit reached max number of iterations, but is usable */
       int noLowerEdge = 5; /**< could not determine lower edge of fit */
-      int atLimit = 4; /**< a parameter is at the limit; fit not useable */
-      int poorFit = 3; /**< low chi square; fit not useable */
+      int atLimit = 4; /**< a parameter is at the limit; fit not usable */
+      int poorFit = 3; /**< low chi square; fit not usable */
       int notFit = -1; /**< no fit performed */
 
     };

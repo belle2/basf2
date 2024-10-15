@@ -12,92 +12,100 @@
 #include <TTimeStamp.h>
 
 namespace Belle2 {
-  /**
-  *   Test of the ARICH component
-  */
 
+  /**
+   * Test of the ARICH component.
+   */
   class ARICHComponentTest: public TObject {
+
   public:
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     ARICHComponentTest(): m_id(0), m_componentID(""), m_timeStamp(), m_type(0), m_data(NULL), m_comment("") {};
 
     /**
-     * Constructor
+     * Constructor.
      */
     ARICHComponentTest(int id, TTimeStamp timeStamp, int type, TObject* data): m_id(id), m_componentID(""), m_timeStamp(timeStamp),
       m_type(type), m_data(data), m_comment("") {};
 
     /**
-     * Destructor
+     * Destructor.
      */
     ~ARICHComponentTest() {};
 
 
-    /** Return Test Identifier
-     * @return Test Identifier
+    /**
+     * Get test identifier.
+     * @return Test identifier.
      */
     int getTestID() const {return m_id; }
 
     /**
-     * Set Test Identifier
-     * @param Test Identifier
+     * Set test identifier.
+     * @param[in] id Test identifier.
      */
     void setTestID(int id) { m_id = id;}
 
-    /** Return Component Identifier
-     * @return Component Identifier
+    /**
+     * Get component identifier.
+     * @return Component identifier.
      */
     std::string getComponentID();
 
-    /** Set Component Identifier
-     * @param Component Identifier
+    /**
+     * Set component identifier.
+     * @param[in] componentID Component identifier.
      */
     void setComponentID(const std::string& componentID) {m_componentID = componentID; }
 
-    /** Return Date of test measurement
-     * @return Date of test measurement
+    /**
+     * Get date of test measurement.
+     * @return Date of test measurement.
      */
     TTimeStamp getTestTimeStamp() const {return m_timeStamp; }
 
-    /** Set Date of test measurement
-     * @param Date of test measurement
+    /**
+     * Set date of test measurement.
+     * @param[in] timeStamp Date of test measurement.
      */
     void setTestTimeStamp(TTimeStamp timeStamp) {m_timeStamp = timeStamp; }
 
-    /** Return measurement type
-     * @return measurement type
+    /**
+     * Get measurement type.
+     * @return Measurement type.
      */
     int getMeasurementType() const {return m_type; }
 
     /**
-     * Set measurement type
-     * @param mwasurement type
+     * Set measurement type.
+     * @param[in] type Measurement type.
      */
     void setMeasurementType(int type) { m_type = type;}
 
     /**
-     * Return Measurement data
-     * @return Measurement data
+     * Get measurement data.
+     * @return Measurement data.
      */
     TObject* getMeasurementData() const {return m_data;}
 
     /**
-     * Set Measurement data
-     * @param Measurement data
+     * Set measurement data.
+     * @param[in] data Measurement data.
      */
     void setMeasurementData(TObject* data) {m_data = data;}
 
-
-    /** Return comment
-     * @return comment
+    /**
+     * Get comment.
+     * @return Comment.
      */
     std::string getComponentTestComment();
 
-    /** Set comment
-     * @param comment
+    /**
+     * Set comment.
+     * @param[in] comment Comment.
      */
     void setComponentTestComment(const std::string& comment) {m_comment = comment; }
 

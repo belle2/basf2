@@ -60,8 +60,8 @@ namespace Belle2 {
 
       G4String symbol;
       G4double a, z;
-      G4double density, fractionmass;
-      G4int ncomponents, natoms;
+      G4double density;
+      G4int ncomponents;
 
       G4Element* H  = new G4Element("Hydrogen",  symbol = "H", z =  1., a =  1.00794 * CLHEP::g / CLHEP::mole);
       G4Element* He = new G4Element("Helium",    symbol = "He", z =  2., a =  4.002602 * CLHEP::g / CLHEP::mole);
@@ -75,31 +75,31 @@ namespace Belle2 {
       //Helium 4
       G4Material* gas_4He = new G4Material("gas_4He", density = 0.0001664 * CLHEP::g / CLHEP::cm3, ncomponents = 1, kStateGas,
                                            293.15 * CLHEP::kelvin,  1.*CLHEP::atmosphere);
-      gas_4He->AddElement(He, natoms = 1);
+      gas_4He->AddElementByNumberOfAtoms(He, 1);
       //C02
       G4Material* gas_CO2 = new G4Material("gas_CO2", density = 0.001842 * CLHEP::g / CLHEP::cm3, ncomponents = 2, kStateGas,
                                            293.15 * CLHEP::kelvin, 1.*CLHEP::atmosphere);
-      gas_CO2->AddElement(C, natoms = 1);
-      gas_CO2->AddElement(O, natoms = 2);
+      gas_CO2->AddElementByNumberOfAtoms(C, 1);
+      gas_CO2->AddElementByNumberOfAtoms(O, 2);
 
       //70/30 - 4He/ CO2
       G4Material* gasmix_4HeCO2 = new G4Material("gasmix_4HeCO2", density = 0.00066908 * CLHEP::g / CLHEP::cm3, ncomponents = 2,
                                                  kStateGas,  293.15 * CLHEP::kelvin, 1.*CLHEP::atmosphere);
-      gasmix_4HeCO2->AddMaterial(gas_4He, fractionmass = 17.409 * CLHEP::perCent);
-      gasmix_4HeCO2->AddMaterial(gas_CO2, fractionmass = 82.591 * CLHEP::perCent);
+      gasmix_4HeCO2->AddMaterial(gas_4He, 17.409 * CLHEP::perCent);
+      gasmix_4HeCO2->AddMaterial(gas_CO2, 82.591 * CLHEP::perCent);
 
       //c8h7cl
       G4Material* TPC_ParylenC = new G4Material("TPC_ParylenC", density = 1.298 * CLHEP::g / CLHEP::cm3, ncomponents = 3);
-      TPC_ParylenC->AddElement(H, fractionmass = 0.050908 * CLHEP::perCent);
-      TPC_ParylenC->AddElement(C, fractionmass = 0.693276 * CLHEP::perCent);
-      TPC_ParylenC->AddElement(Cl, fractionmass = 0.255816 * CLHEP::perCent);
+      TPC_ParylenC->AddElementByMassFraction(H, 0.050908 * CLHEP::perCent);
+      TPC_ParylenC->AddElementByMassFraction(C, 0.693276 * CLHEP::perCent);
+      TPC_ParylenC->AddElementByMassFraction(Cl, 0.255816 * CLHEP::perCent);
 
       //G10
       G4Material* TPC_G10 = new G4Material("TPC_G10", density = 1.700 * CLHEP::g / CLHEP::cm3, ncomponents = 4);
-      TPC_G10->AddElement(Si, natoms = 1);
-      TPC_G10->AddElement(O, natoms = 2);
-      TPC_G10->AddElement(C, natoms = 3);
-      TPC_G10->AddElement(H, natoms = 3);
+      TPC_G10->AddElementByNumberOfAtoms(Si, 1);
+      TPC_G10->AddElementByNumberOfAtoms(O, 2);
+      TPC_G10->AddElementByNumberOfAtoms(C, 3);
+      TPC_G10->AddElementByNumberOfAtoms(H, 3);
 
       //Cu - copper
       G4Material* metalCu = new G4Material("MetalCopper", density = 8.960 * CLHEP::g / CLHEP::cm3, ncomponents = 1);
@@ -107,8 +107,8 @@ namespace Belle2 {
 
       //Copper screen
       G4Material* TPC_metaCuScreen = new G4Material("TPC_metaCuScreen", density = 8.95 * CLHEP::g / CLHEP::cm3, ncomponents = 2);
-      TPC_metaCuScreen->AddElement(Cu, fractionmass = 90.*CLHEP::perCent);
-      TPC_metaCuScreen->AddElement(Zn, fractionmass = 10.*CLHEP::perCent);
+      TPC_metaCuScreen->AddElementByMassFraction(Cu, 90.*CLHEP::perCent);
+      TPC_metaCuScreen->AddElementByMassFraction(Zn, 10.*CLHEP::perCent);
 
 
       //lets get the stepsize parameter with a default value of 5 µm

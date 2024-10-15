@@ -65,10 +65,12 @@ class RenderDocstring(Directive):
     want to write the example in Google Docstring and keep that synchronous
     with a reStructuredText version
     """
+    #: \cond Doxygen_suppress
     has_content = True
     option_spec = {
         "lines": directives.unchanged
     }
+    #: \endcond
 
     def run(self):
         """Just pass on the content to the autodoc-process-docstring event and
@@ -76,7 +78,7 @@ class RenderDocstring(Directive):
         env = self.state.document.settings.env
         content = list(self.content)
         try:
-            start_index, end_index = [int(e) for e in self.options.get("lines", None).split(",")]
+            start_index, end_index = (int(e) for e in self.options.get("lines", None).split(","))
             content = content[start_index:end_index]
         except Exception:
             pass
@@ -88,6 +90,7 @@ class RenderDocstring(Directive):
         return parse_with_titles(self.state, content)
 
 
+#: \cond Doxygen_suppress
 class ModuleListDirective(Directive):
     has_content = False
     option_spec = {
@@ -99,6 +102,7 @@ class ModuleListDirective(Directive):
         "regex-filter": directives.unchanged,
         "io-plots": directives.flag,
     }
+#: \endcond
 
     def show_module(self, module, library):
         description = module.description().splitlines()
@@ -108,8 +112,8 @@ class ModuleListDirective(Directive):
         env = self.state.document.settings.env
         env.app.emit('autodoc-process-docstring', "b2:module", module.name(), module, None, description)
         description += ["", "",
-                        ":Package: %s" % module.package(),
-                        ":Library: %s" % os.path.basename(library),
+                        f":Package: {module.package()}",
+                        f":Library: {os.path.basename(library)}",
                         ]
 
         if "no-parameters" not in self.options:
@@ -117,13 +121,13 @@ class ModuleListDirective(Directive):
             required_params = []
             for p in module.available_params():
                 dest = required_params if p.forceInSteering else optional_params
-                default = "" if p.forceInSteering else ", default={default!r}".format(default=p.default)
+                default = "" if p.forceInSteering else f", default={p.default!r}"
                 param_desc = p.description.splitlines()
                 # run the description through autodoc event to get
                 # Google/Numpy/doxygen style as well
                 env.app.emit('autodoc-process-docstring', 'b2:module:param', module.name() + '.' + p.name, p, None, param_desc)
                 param_desc = textwrap.indent("\n".join(param_desc), 8 * " ").splitlines()
-                dest += ["    * **{name}** *({type}{default})*".format(name=p.name, type=p.type, default=default)]
+                dest += [f"    * **{p.name}** *({p.type}{default})*"]
                 dest += param_desc
 
             if(required_params):
@@ -132,11 +136,11 @@ class ModuleListDirective(Directive):
                 description += [":Parameters:", "    "] + optional_params
 
         if "io-plots" in self.options:
-            image = "build/ioplots/%s.png" % module.name()
+            image = f"build/ioplots/{module.name()}.png"
             if os.path.exists(image):
-                description += [":IO diagram:", "    ", "    .. image:: /%s" % image]
+                description += [":IO diagram:", "    ", f"    .. image:: /{image}"]
 
-        content = [".. b2:module:: {module}".format(module=module.name())] + self.noindex + ["    "]
+        content = [f".. b2:module:: {module.name()}"] + self.noindex + ["    "]
         content += ["    " + e for e in description]
         return parse_with_titles(self.state, content)
 
@@ -178,6 +182,7 @@ class ModuleListDirective(Directive):
         return all_nodes
 
 
+#: \cond Doxygen_suppress
 class VariableListDirective(Directive):
     has_content = False
     option_spec = {
@@ -187,6 +192,7 @@ class VariableListDirective(Directive):
         "description-regex-filter": directives.unchanged,
         "noindex": directives.flag,
     }
+#: \endcond
 
     def run(self):
         from ROOT import Belle2

@@ -68,6 +68,11 @@ if __name__ == "__main__":
         assert safe_process(path) == 0, "RootOutput failed"
         check_jobfile("job-info1.json", {f"test_split.f0000{i}.root" for i in range(2)})
 
+        # check metadata
+        meta = [get_metadata(e) for e in ["test_split.f00000.root", "test_split.f00001.root"]]
+        assert meta[0]["parents"] == [], "There should be no parents"
+        assert meta[1]["parents"] == [], "There should be no parents"
+
         # check files and set a well known lfn
         for i in range(2):
             subprocess.check_call(["b2file-metadata-add", "-l", f"parent{i}", f"test_split.f0000{i}.root"])

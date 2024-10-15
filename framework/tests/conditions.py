@@ -122,8 +122,7 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
             gtname = url.path.split("/")[-1]
             if gtname in self.globaltags:
                 return self.reply(
-                    '{{ "name": "{}", "globalTagStatus": {{ "name": "{}" }} }}'.format(
-                        gtname, self.globaltags[gtname]))
+                    f'{{ "name": "{gtname}", "globalTagStatus": {{ "name": "{self.globaltags[gtname]}" }} }}')
             else:
                 return self.send_error(404)
 

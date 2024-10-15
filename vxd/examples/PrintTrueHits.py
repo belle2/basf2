@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -24,7 +23,7 @@ class CheckTrueHits(b2.Module):
     def __init__(self):
         """Initialize the module"""
 
-        super(CheckTrueHits, self).__init__()
+        super().__init__()
         #: TrueHit statistics for the PXD
         self.truehit_stats_pxd = {
             'through': {'total': 0, 'secondary': 0, 'remapped': 0},
@@ -65,9 +64,7 @@ class CheckTrueHits(b2.Module):
             sensor_info = geocache.get(id)
             thickness = sensor_info.getThickness()
             base_info = \
-                '\nPXDTrueHit {index}: layer:{ly} ladder:{ld} sensor:{sr}'\
-                .format(index=truehit.getArrayIndex(),
-                        ly=layer, ld=ladder, sr=sensor)
+                f'\nPXDTrueHit {truehit.getArrayIndex()}: layer:{layer} ladder:{ladder} sensor:{sensor}'
             # Classify the TrueHit
             into_type = \
                 abs(abs(truehit.getEntryW()) - thickness / 2.0) < 1.0e-6
@@ -92,9 +89,7 @@ class CheckTrueHits(b2.Module):
             particle_type_text = 'secondary'
             if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                 particle_type_text = 'primary'
-            mcparticle_message = 'MCParticle {index}: {text}'.format(
-                index=particle.getArrayIndex(),
-                text=particle_type_text + ' ')
+            mcparticle_message = f"MCParticle {particle.getArrayIndex()}: {particle_type_text + ' '}"
             self.truehit_stats_pxd[truehit_type_text]['total'] += 1
             if particle_type_text == 'secondary':
                 self.truehit_stats_pxd[truehit_type_text]['secondary'] += 1
@@ -122,56 +117,32 @@ class CheckTrueHits(b2.Module):
                     if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                         particle_type_text = 'primary'
                 simhit_text = \
-                    '{index} {ptext} {pindex} {wt:9.6f}'.format(
-                        index=simhit.getArrayIndex(),
-                        ptext=particle_type_text,
-                        pindex=particle_index,
-                        wt=simhit_weight)
+                    f'{simhit.getArrayIndex()} {particle_type_text} {particle_index} {simhit_weight:9.6f}'
                 simhit_text += \
-                    ' {u_in:8.4f} {v_in:8.4f} {w_in:8.4f}'.format(
-                        u_in=simhit.getPosIn().X(),
-                        v_in=simhit.getPosIn().Y(),
-                        w_in=simhit.getPosIn().Z())
+                    f' {simhit.getPosIn().X():8.4f} {simhit.getPosIn().Y():8.4f} {simhit.getPosIn().Z():8.4f}'
                 simhit_text += \
-                    '{time:8.5f}'.format(time=simhit.getGlobalTime())
+                    f'{simhit.getGlobalTime():8.5f}'
                 b2.B2INFO(simhit_text)
             # Print the truhit position
             midpoint_text = 'TrueHit position:\n'
             midpoint_text += \
-                'IN: ({u_in:8.4f},{v_in:8.4f},{w_in:8.4f})\n'.format(
-                    u_in=truehit.getEntryU(),
-                    v_in=truehit.getEntryV(),
-                    w_in=truehit.getEntryW())
+                f'IN: ({truehit.getEntryU():8.4f},{truehit.getEntryV():8.4f},{truehit.getEntryW():8.4f})\n'
             midpoint_text += \
-                'MID: ({u_mid:8.4f},{v_mid:8.4f},{w_mid:8.4f})\n'.format(
-                    u_mid=truehit.getU(),
-                    v_mid=truehit.getV(),
-                    w_mid=truehit.getW())
+                f'MID: ({truehit.getU():8.4f},{truehit.getV():8.4f},{truehit.getW():8.4f})\n'
             midpoint_text += \
-                'OUT: ({u_out:8.4f},{v_out:8.4f},{w_out:8.4f})\n'.format(
-                    u_out=truehit.getExitU(),
-                    v_out=truehit.getExitV(),
-                    w_out=truehit.getExitW())
+                f'OUT: ({truehit.getExitU():8.4f},{truehit.getExitV():8.4f},{truehit.getExitW():8.4f})\n'
             # Print the truhit momenta
             midpoint_text += '\nTrueHit momentum:\n'
             midpoint_text += \
-                'IN: ({pu_in:8.4f},{pv_in:8.4f},{pw_in:8.4f})\n'.format(
-                    pu_in=truehit.getEntryMomentum().X(),
-                    pv_in=truehit.getEntryMomentum().Y(),
-                    pw_in=truehit.getEntryMomentum().Z())
+                f'IN: ({truehit.getEntryMomentum().X():8.4f},{truehit.getEntryMomentum().Y():8.4f},' + \
+                f'{truehit.getEntryMomentum().Z():8.4f})\n'
             midpoint_text += \
-                'MID: ({pu_mid:8.4f},{pv_mid:8.4f},{pw_mid:8.4f})\n'.format(
-                    pu_mid=truehit.getMomentum().X(),
-                    pv_mid=truehit.getMomentum().Y(),
-                    pw_mid=truehit.getMomentum().Z())
+                f'MID: ({truehit.getMomentum().X():8.4f},{truehit.getMomentum().Y():8.4f},{truehit.getMomentum().Z():8.4f})\n'
             midpoint_text += \
-                'OUT: ({pu_out:8.4f},{pv_out:8.4f},{pw_out:8.4f})\n'.format(
-                    pu_out=truehit.getExitMomentum().X(),
-                    pv_out=truehit.getExitMomentum().Y(),
-                    pw_out=truehit.getExitMomentum().Z())
+                f'OUT: ({truehit.getExitMomentum().X():8.4f},{truehit.getExitMomentum().Y():8.4f},' + \
+                f'{truehit.getExitMomentum().Z():8.4f})\n'
             # Print the truhit time
-            midpoint_text += 'Time: {t:8.5f}\n'.format(
-                t=truehit.getGlobalTime())
+            midpoint_text += f'Time: {truehit.getGlobalTime():8.5f}\n'
             b2.B2INFO(midpoint_text)
 
         for truehit in svd_truehits:
@@ -183,9 +154,7 @@ class CheckTrueHits(b2.Module):
             sensor_info = geocache.get(id)
             thickness = sensor_info.getThickness()
             base_info = \
-                '\nSVDTrueHit {index}: layer:{ly} ladder:{ld} sensor:{sr}'\
-                .format(index=truehit.getArrayIndex(),
-                        ly=layer, ld=ladder, sr=sensor)
+                f'\nSVDTrueHit {truehit.getArrayIndex()}: layer:{layer} ladder:{ladder} sensor:{sensor}'
             # Classify the TrueHit
             into_type = \
                 abs(abs(truehit.getEntryW()) - thickness / 2.0) < 1.0e-6
@@ -210,9 +179,7 @@ class CheckTrueHits(b2.Module):
             particle_type_text = 'secondary'
             if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                 particle_type_text = 'primary'
-            mcparticle_message = 'MCParticle {index}: {text}'.format(
-                index=particle.getArrayIndex(),
-                text=particle_type_text + ' ')
+            mcparticle_message = f"MCParticle {particle.getArrayIndex()}: {particle_type_text + ' '}"
             self.truehit_stats_svd[truehit_type_text]['total'] += 1
             if particle_type_text == 'secondary':
                 self.truehit_stats_svd[truehit_type_text]['secondary'] += 1
@@ -240,66 +207,38 @@ class CheckTrueHits(b2.Module):
                     if particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle):
                         particle_type_text = 'primary'
                 simhit_text = \
-                    '{index} {ptext} {pindex} {wt:9.6f}'.format(
-                        index=simhit.getArrayIndex(),
-                        ptext=particle_type_text,
-                        pindex=particle_index,
-                        wt=simhit_weight)
+                    f'{simhit.getArrayIndex()} {particle_type_text} {particle_index} {simhit_weight:9.6f}'
                 simhit_text += \
-                    ' {u_in:8.4f} {v_in:8.4f} {w_in:8.4f}'.format(
-                        u_in=simhit.getPosIn().X(),
-                        v_in=simhit.getPosIn().Y(),
-                        w_in=simhit.getPosIn().Z())
+                    f' {simhit.getPosIn().X():8.4f} {simhit.getPosIn().Y():8.4f} {simhit.getPosIn().Z():8.4f}'
                 simhit_text += \
-                    '{time:8.5f} '.format(time=simhit.getGlobalTime())
+                    f'{simhit.getGlobalTime():8.5f} '
                 b2.B2INFO(simhit_text)
             # Print the truhit position
             midpoint_text = 'TrueHit position:\n'
             midpoint_text += \
-                'IN: ({u_in:8.4f},{v_in:8.4f},{w_in:8.4f})\n'.format(
-                    u_in=truehit.getEntryU(),
-                    v_in=truehit.getEntryV(),
-                    w_in=truehit.getEntryW())
+                f'IN: ({truehit.getEntryU():8.4f},{truehit.getEntryV():8.4f},{truehit.getEntryW():8.4f})\n'
             midpoint_text += \
-                'MID: ({u_mid:8.4f},{v_mid:8.4f},{w_mid:8.4f})\n'.format(
-                    u_mid=truehit.getU(),
-                    v_mid=truehit.getV(),
-                    w_mid=truehit.getW())
+                f'MID: ({truehit.getU():8.4f},{truehit.getV():8.4f},{truehit.getW():8.4f})\n'
             midpoint_text += \
-                'OUT: ({u_out:8.4f},{v_out:8.4f},{w_out:8.4f})\n'.format(
-                    u_out=truehit.getExitU(),
-                    v_out=truehit.getExitV(),
-                    w_out=truehit.getExitW())
+                f'OUT: ({truehit.getExitU():8.4f},{truehit.getExitV():8.4f},{truehit.getExitW():8.4f})\n'
             # Print the truhit momenta
             midpoint_text += '\nTrueHit momentum:\n'
             midpoint_text += \
-                'IN: ({pu_in:8.4f},{pv_in:8.4f},{pw_in:8.4f})\n'.format(
-                    pu_in=truehit.getEntryMomentum().X(),
-                    pv_in=truehit.getEntryMomentum().Y(),
-                    pw_in=truehit.getEntryMomentum().Z())
+                f'IN: ({truehit.getEntryMomentum().X():8.4f},{truehit.getEntryMomentum().Y():8.4f},' + \
+                f'{truehit.getEntryMomentum().Z():8.4f})\n'
             midpoint_text += \
-                'MID: ({pu_mid:8.4f},{pv_mid:8.4f},{pw_mid:8.4f})\n'.format(
-                    pu_mid=truehit.getMomentum().X(),
-                    pv_mid=truehit.getMomentum().Y(),
-                    pw_mid=truehit.getMomentum().Z())
+                f'MID: ({truehit.getMomentum().X():8.4f},{truehit.getMomentum().Y():8.4f},{truehit.getMomentum().Z():8.4f})\n'
             midpoint_text += \
-                'OUT: ({pu_out:8.4f},{pv_out:8.4f},{pw_out:8.4f})\n'.format(
-                    pu_out=truehit.getExitMomentum().X(),
-                    pv_out=truehit.getExitMomentum().Y(),
-                    pw_out=truehit.getExitMomentum().Z())
+                f'OUT: ({truehit.getExitMomentum().X():8.4f},{truehit.getExitMomentum().Y():8.4f},' + \
+                f'{truehit.getExitMomentum().Z():8.4f})\n'
             # Print the truhit time
-            midpoint_text += 'Time: {t:8.5f}\n'.format(
-                t=truehit.getGlobalTime())
+            midpoint_text += f'Time: {truehit.getGlobalTime():8.5f}\n'
             b2.B2INFO(midpoint_text)
 
     def terminate(self):
         """ Write results """
         b2.B2INFO(
-            '\nStatistics for PXD: {pxd};\nStatistics for SVD: {svd}\n'.format(
-                pxd=str(self.truehit_stats_pxd),
-                svd=str(self.truehit_stats_svd)
-            )
-        )
+            f'\nStatistics for PXD: {str(self.truehit_stats_pxd)};\nStatistics for SVD: {str(self.truehit_stats_svd)}\n')
 
 
 # Particle gun module

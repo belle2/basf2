@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -37,9 +36,9 @@ import os
 ROOT.gSystem.Load("libtracking")
 
 
-class FilterProperties(object):
+class FilterProperties:
     """
-    contains all informations necessary for track filters to decide whether
+    contains all information necessary for track filters to decide whether
     track will be included into the processed list of tracks
     This class is used for both providing information on pattern reco and
     MC tracks
@@ -88,7 +87,7 @@ class FilterProperties(object):
 #    mcParticle is guaranteed to be != None
 #
 
-class AlwaysPassFilter(object):
+class AlwaysPassFilter:
     """Filter that always passes"""
 
     def doesPrPass(self, filterProperties):
@@ -125,7 +124,7 @@ class TrackingValidationModule(basf2.Module):
     ):
         """Constructor"""
 
-        super(TrackingValidationModule, self).__init__()
+        super().__init__()
 
         #: cached value of the tracking-validation name
         self.validation_name = name
@@ -181,7 +180,7 @@ class TrackingValidationModule(basf2.Module):
         #: Track-match object that examines relation information from MCMatcherTracksModule
         self.trackMatchLookUp = Belle2.TrackMatchLookUp(self.mcTrackCandidatesColumnName, self.trackCandidatesColumnName)
 
-        #: Use deques in favour of lists to prevent repeated memory allocation of cost O(n)
+        #: Use dequeues in favour of lists to prevent repeated memory allocation of cost O(n)
 
         #: list of PR-track clones and matches
         self.pr_clones_and_matches = collections.deque()
@@ -484,8 +483,7 @@ class TrackingValidationModule(basf2.Module):
         else:
             clone_rate = float('nan')
 
-        figures_of_merit = ValidationFiguresOfMerit('%s_figures_of_merit'
-                                                    % name)
+        figures_of_merit = ValidationFiguresOfMerit(f'{name}_figures_of_merit')
         figures_of_merit['finding_charge_efficiency'] = finding_charge_efficiency
         figures_of_merit['finding_efficiency'] = finding_efficiency
         figures_of_merit['charge_efficiency'] = charge_efficiency
@@ -815,7 +813,7 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             if parameter_name in parameter_names \
                     or root_save_name(parameter_name) in parameter_names:
 
-                is_expert = not(parameter_name in self.non_expert_parameters)
+                is_expert = not (parameter_name in self.non_expert_parameters)
 
                 parameter_root_name = root_save_name(parameter_name)
 

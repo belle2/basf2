@@ -47,7 +47,7 @@ def skip_test(reason, py_case=None):
     if py_case:
         py_case.skipTest(reason)
     else:
-        print("TEST SKIPPED: %s" % reason, file=sys.stderr, flush=True)
+        print(f"TEST SKIPPED: {reason}", file=sys.stderr, flush=True)
     sys.exit(1)
 
 
@@ -69,7 +69,7 @@ def require_file(filename, data_type="", py_case=None):
     try:
         fullpath = basf2.find_file(filename, data_type, silent=False)
     except FileNotFoundError as fnf:
-        skip_test('Cannot find: %s' % fnf.filename, py_case)
+        skip_test(f'Cannot find: {fnf.filename}', py_case)
     return fullpath
 
 
@@ -363,6 +363,19 @@ def skip_test_if_light(py_case=None):
         import generators  # noqa
     except ModuleNotFoundError:
         skip_test(reason="We're in a light build.", py_case=py_case)
+
+
+def skip_test_if_central(py_case=None):
+    """
+    Skips the test if we are using a central release (and have no local
+    git repository)
+
+    Parameters:
+        py_case (unittest.TestCase): if this is to be skipped within python's
+            native unittest then pass the TestCase instance
+    """
+    if "BELLE2_RELEASE_DIR" in os.environ:
+        skip_test(reason="We're in a central release.", py_case=py_case)
 
 
 def print_belle2_environment():

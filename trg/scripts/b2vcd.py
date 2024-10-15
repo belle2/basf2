@@ -10,7 +10,6 @@
 # Convert Belle2Link data into human-readable Value Change Dump file
 # =====================================================================
 
-from __future__ import print_function
 import pickle
 import re
 from writer import VCDWriter
@@ -68,9 +67,9 @@ ddd(15 downto 0) & cntr125M2D(15 downto 0) &
 "000" & TSF8_input(218 downto 210) &
 "0000" &
 """ + \
-    ''.join(["""TSF{sl:d}_input({high:d} downto {low:d}) &
-TSF{sl:d}_input({high2:d} downto {low2:d}) &
-""".format(sl=sl, high=h, low=h - 7, high2=h - 8, low2=h - 20) for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
+    ''.join([f"""TSF{sl:d}_input({h:d} downto {h - 7:d}) &
+TSF{sl:d}_input({h - 8:d} downto {h - 20:d}) &
+""" for sl in range(0, 9, 2) for h in range(209, 0, -21)]) + \
     """unamed(901 downto 0)
 """
 
@@ -130,7 +129,7 @@ def makeAtlas(signals, evtsize):
             pos += size
     if pos != sum(evtsize):
         raise ValueError(
-            'Size of atlas:{} does not match event size:{}'.format(pos, evtsize))
+            f'Size of atlas:{pos} does not match event size:{evtsize}')
     return atlas
 
 
@@ -142,9 +141,9 @@ def unpack(triggers, atlas, writer):
     """
     transform into VCD signals from clock-seperated data and hitmap
     """
-    unpackwith = ', '.join(['bin:{}'.format(sig[4]) for sig in atlas])
+    unpackwith = ', '.join([f'bin:{sig[4]}' for sig in atlas])
     vcdVars = [writer.register_var(
-        sig[5], sig[0] + '[{}:{}]'.format(sig[1], sig[2]), 'wire', size=sig[4]) if
+        sig[5], sig[0] + f'[{sig[1]}:{sig[2]}]', 'wire', size=sig[4]) if
         not isUnamed(sig) else None for sig in atlas]
     event = writer.register_var('m', 'event', 'event')
     lastvalues = [None] * len(atlas)
@@ -157,7 +156,7 @@ def unpack(triggers, atlas, writer):
         writer.change(event, timestamp, '1')
         for clock in trg.cut(sum(evtsize)):
             if timestamp & 1023 == 0:
-                print('\r{} us converted'.format(str(timestamp)[:-3]), end="")
+                print(f'\r{str(timestamp)[:-3]} us converted', end="")
                 sys.stdout.flush()
             timestamp = iteration << power
             iteration += 1
@@ -165,8 +164,7 @@ def unpack(triggers, atlas, writer):
             for i, sig in enumerate(atlas):
                 if isUnamed(sig):
                     if dummycheck and '1' in values[i] and '0' in values[i]:
-                        print('[Warning] non-uniform dummy value detected at {}ns: {}'.format(
-                            timestamp, sig[3] % sum(evtsize)))
+                        print(f'[Warning] non-uniform dummy value detected at {timestamp}ns: {sig[3] % sum(evtsize)}')
                         print(values[i])
                     continue
                 if values[i] != lastvalues[i]:
@@ -181,7 +179,7 @@ def literalVCD(triggers, atlas, writer):
     write a VCD file from clock-seperated data and hitmap
     """
     vcdVars = [writer.register_var(
-        'm', sig[0] + '[{}:{}]'.format(sig[1], sig[2]), 'wire', size=sig[4]) if
+        'm', sig[0] + f'[{sig[1]}:{sig[2]}]', 'wire', size=sig[4]) if
         sig[0] != 'unamed' else 0 for sig in atlas]
     event = writer.register_var('m', 'event', 'event')
     lastvalue = None
@@ -193,7 +191,7 @@ def literalVCD(triggers, atlas, writer):
         writer.change(event, timestamp, '1')
         for value in trg.cut(sum(evtsize)):
             if timestamp & 1023 == 0:
-                print('\r{} us completed'.format(str(timestamp)[:-3]),)
+                print(f'\r{str(timestamp)[:-3]} us completed',)
                 sys.stdout.flush()
             timestamp = iteration << power
             iteration += 1
@@ -204,8 +202,7 @@ def literalVCD(triggers, atlas, writer):
                     if dummycheck and sigvalue.any(1) and sigvalue.any(0):
                         with sys.stderr as fout:
                             fout.write(
-                                '[Warning] non-uniform dummy value detected at {}ns: {}'.format(
-                                    timestamp, sig[3] % sum(evtsize)))
+                                f'[Warning] non-uniform dummy value detected at {timestamp}ns: {sig[3] % sum(evtsize)}')
                             fout.write(value[i])
                     continue
                 if not lastvalue or sigvalue != lastsigvalue:
@@ -230,7 +227,7 @@ def combVCD(clocks, atlas, writer):
             signal[0].extend(k)
         comAtlas.append(signal[0])
     vars = [writer.register_var(
-        'm', sig[0] + '[{}:{}]'.format(sig[1], sig[-3]), 'wire',
+        'm', sig[0] + f'[{sig[1]}:{sig[-3]}]', 'wire',
         size=sum(sig[4::5])) for sig in comAtlas]
     for timestamp, value in enumerate(clocks):
         for i, sig in enumerate(comAtlas):

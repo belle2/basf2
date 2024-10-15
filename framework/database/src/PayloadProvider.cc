@@ -20,7 +20,7 @@ namespace fs = std::filesystem;
 namespace Belle2::Conditions {
   PayloadProvider::PayloadProvider(const std::vector<std::string>& locations, const std::string& cacheDir, int timeout): m_timeout{timeout}
   {
-    // check whether we have a chache directory ... otherwise use default
+    // check whether we have a cache directory ... otherwise use default
     if (!cacheDir.empty()) {
       m_cacheDir = {fs::absolute(cacheDir).string(), false};
     } else {

@@ -9,8 +9,8 @@
 
 /** Impl Declaration **/
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
-#include <mva/interface/Weightfile.h>
 #include <mva/interface/Expert.h>
+#include <mva/interface/Weightfile.h>
 #include <framework/database/DBObjPtr.h>
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -32,7 +32,8 @@ namespace Belle2 {
       void beginRun(); /**< Called once before a new run begins */
       std::unique_ptr<MVA::Weightfile> getWeightFile(); /**< Get the weight file */
       double predict(); /**< Get the MVA prediction */
-
+      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int /* nRows */); /** Get predictions for several inputs */
+      std::vector<std::string> getVariableNames();
     private:
       /// References to the all named values from the source variable set.
       std::vector<Named<Float_t*> > m_allNamedVariables;
@@ -48,6 +49,9 @@ namespace Belle2 {
 
       /// Pointer to the current dataset
       std::unique_ptr<MVA::Dataset> m_dataset;
+
+      /// General options
+      MVA::GeneralOptions m_generalOptions;
 
       /// DB identifier of the expert or file name
       std::string m_identifier;
@@ -88,9 +92,10 @@ void MVAExpert::Impl::beginRun()
 {
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
-    if (weightfile->getElement<std::string>("method") == "FastBDT" and
-        (weightfile->getElement<int>("FastBDT_version") == 1 or
-         weightfile->getElement<int>("FastBDT_version") == 2)) {
+    if ((weightfile->getElement<std::string>("method") == "FastBDT" and
+         (weightfile->getElement<int>("FastBDT_version") == 1 or
+          weightfile->getElement<int>("FastBDT_version") == 2)) or
+        (weightfile->getElement<std::string>("method") == "Python")) {
 
       int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
 
@@ -119,14 +124,13 @@ void MVAExpert::Impl::beginRun()
 
     std::map<std::string, MVA::AbstractInterface*> supportedInterfaces =
       MVA::AbstractInterface::getSupportedInterfaces();
-    MVA::GeneralOptions generalOptions;
-    weightfile->getOptions(generalOptions);
-    m_expert = supportedInterfaces[generalOptions.m_method]->getExpert();
+    weightfile->getOptions(m_generalOptions);
+    m_expert = supportedInterfaces[m_generalOptions.m_method]->getExpert();
     m_expert->load(*weightfile);
 
     std::vector<float> dummy;
     dummy.resize(m_selectedNamedVariables.size(), 0);
-    m_dataset = std::make_unique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
+    m_dataset = std::make_unique<MVA::SingleDataset>(m_generalOptions, std::move(dummy), 0);
   } else {
     B2ERROR("Could not find weight file for identifier " << m_identifier);
   }
@@ -157,6 +161,32 @@ double MVAExpert::Impl::predict()
   return m_expert->apply(*m_dataset)[0];
 }
 
+std::vector<float> MVAExpert::Impl::predict(float* test_data, int nFeature, int nRows)   /** Get predictions for several inputs */
+{
+  std::vector<std::vector<float>> spectators;
+  std::vector<std::vector <float> > data;
+  data.resize(nRows);
+  for (int iRow = 0; iRow < nRows; iRow += 1) {
+    data[iRow].resize(nFeature);
+    for (int iFeature = 0; iFeature < nFeature; iFeature += 1) {
+      data[iRow][iFeature] = test_data[nFeature * iRow + iFeature];
+    }
+  }
+
+  MVA::MultiDataset dataSet(m_generalOptions, data, spectators);
+  return m_expert->apply(dataSet);
+}
+
+std::vector<std::string> MVAExpert::Impl::getVariableNames()
+{
+  std::vector<std::string> out(m_selectedNamedVariables.size());
+  for (size_t iName = 0; iName < m_selectedNamedVariables.size(); iName += 1) {
+    out[iName] = m_selectedNamedVariables[iName].getName();
+  }
+  return out;
+}
+
+
 /** PImpl Interface **/
 // Silence Doxygen which is complaining that "no matching class member found for"
 // But there should be a better way that I just don't know of / find
@@ -184,3 +214,14 @@ double MVAExpert::predict()
 {
   return m_impl->predict();
 }
+
+std::vector<float> MVAExpert::predict(float* test_data, int nFeature, int nRows)
+{
+  return m_impl->predict(test_data, nFeature, nRows);
+}
+
+std::vector<std::string> MVAExpert::getVariableNames()
+{
+  return m_impl->getVariableNames();
+}
+

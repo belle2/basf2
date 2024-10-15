@@ -45,7 +45,7 @@ namespace Belle2 {
     /**
      * Exception thrown, when trying to access SpacePoints by their index inside of SpacePointTrackCand, but index is out of bounds
      */
-    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to acces a SpacePoint from a SpacePointTrackCand via an"\
+    BELLE2_DEFINE_EXCEPTION(SPTCIndexOutOfBounds, "Trying to access a SpacePoint from a SpacePointTrackCand via an"\
                             " index that is out of bounds!");
 
     /**
@@ -85,7 +85,7 @@ namespace Belle2 {
 
     /** Empty constructor with default values, including it to be active.
      *
-     *  Sets pdg code to zero to make it  possible to determine, whether a particle hyptohesis has been asigned
+     *  Sets pdg code to zero to make it  possible to determine, whether a particle hyptohesis has been assigned
      *  to the track candidate or not.MCTrackID is initialized to -1. <br>
      *  Each SPTC is created in c_isActive-state and has to be deactivated manually, if need be.
      */
@@ -128,7 +128,7 @@ namespace Belle2 {
 
     /**
      * get hits (SpacePoints) in range (indices of SpacePoint inside SpacePointTrackCand)
-     * including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex wil be returned!).
+     * including first index and excluding last index (the SpacePoint on firstInd but not the one on lastIndex will be returned!).
      * NOTE: For all hits range is from 0 to getNHits(). throws an exception when trying to access hits outside the allowed range!
      */
     const std::vector<const Belle2::SpacePoint*> getHitsInRange(int firstInd, int lastInd) const;
@@ -191,7 +191,7 @@ namespace Belle2 {
     int getMcTrackId() const { return m_MCTrackID; }
 
     /**
-     * Return the refere status code of the SpacePointTrackCand.
+     * Return the referee status code of the SpacePointTrackCand.
      * @param bitmask is an optional bitmask that is compared to the referee status of the SpacePointTrackCand
      */
     unsigned short int getRefereeStatus(unsigned short int bitmask = USHRT_MAX) const { return m_refereeStatus & bitmask; }
@@ -259,7 +259,7 @@ namespace Belle2 {
 
     /**
      * get the refereeStatus as a string (easier to read than an unsigned short int)
-     * @param delimiter delimiter to be put inbetween the individual strings, defaults to whitespace (1 character)
+     * @param delimiter delimiter to be put in between the individual strings, defaults to white space (1 character)
      * NOTE: mainly for easier readability of debug output!
      */
     std::string getRefereeStatusString(std::string delimiter = " ") const;
@@ -408,7 +408,7 @@ namespace Belle2 {
     /**
      * An estimation for the quality of the track.
      *
-     * Normally defined between 0-1 to describe the propability that this track is real(istic).
+     * Normally defined between 0-1 to describe the probability that this track is real(istic).
      * The quality of the track has to be determined by another function or module.
      * */
     double m_qualityIndicator = 0.5;

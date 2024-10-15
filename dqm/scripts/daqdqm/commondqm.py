@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -27,7 +26,7 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             "expressreco" (default) if running on the ExpressReco system
                             "hlt" if running on the HLT online reconstructon nodes
                             If running on the hlt, you may want to output less or other DQM plots
-                            due to the limited bandwith of the HLT nodes.
+                            due to the limited bandwidth of the HLT nodes.
     @param dqm_mode: How to split up the path for online/HLT.
                      For dqm_mode == "dont_care" all the DQM modules should be added.
                      For dqm_mode == "all_events" only the DQM modules which should run on all events
@@ -111,6 +110,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
             pathLocation="before filter",
         ).set_name("SoftwareTriggerHLTDQM_before_filter")
 
+        path.add_module(
+            "TrackingAbortDQM",
+            histogramDirectoryName="TrackingAbort_before_filter",
+        ).set_name("TrackingAbortDQM_before_filter")
+
+        path.add_module("DetectorOccupanciesDQM", histogramDirectoryName="DetectorOccupancies_before_filter").set_name(
+            "DetectorOccupanciesDQM_before_filter")
+
         path.add_module("StatisticsTimingHLTDQM",
                         createHLTUnitHistograms=create_hlt_unit_histograms,
                         )
@@ -184,12 +191,21 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         path.add_module(
             "SoftwareTriggerHLTDQM",
             cutResultIdentifiers=cutResultIdentifiers,
-            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp"],
+            l1Identifiers=["fff", "ffo", "lml0", "ffb", "fp", "passive_veto"],
             additionalL1Identifiers=additionalL1Identifiers,
             createHLTUnitHistograms=create_hlt_unit_histograms,
             cutResultIdentifiersPerUnit=hlt_trigger_lines_per_unit_in_plot,
             pathLocation="after filter",
         )
+
+        path.add_module("StatisticsTimingHLTDQM",
+                        histogramDirectoryName="timing_statistics_after_filter"
+                        ).set_name("StatisticsTimingHLTDQM_after_filter")
+
+        path.add_module("TrackingAbortDQM")
+
+        path.add_module("DetectorOccupanciesDQM")
+
         # Skim plots where bhabha contamination is removed
         path.add_module(
             "SoftwareTriggerHLTDQM",
@@ -252,14 +268,12 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         # TRGECL
         trgecldqm = b2.register_module('TRGECLDQM')
         path.add_module(trgecldqm)
+        trgecltimingdqm = b2.register_module('TRGECLEventTimingDQM')
+        path.add_module(trgecltimingdqm)
         # TRGGDL
         trggdldqm = b2.register_module('TRGGDLDQM')
         trggdldqm.param('skim', 0)
         path.add_module(trggdldqm)
-        # TRGTOP
-        trgtopdqm = b2.register_module('TRGTOPDQM')
-        trgtopdqm.param('skim', 0)
-        path.add_module(trgtopdqm)
         # TRGGRL
         trggrldqm = b2.register_module('TRGGRLDQM')
         path.add_module(trggrldqm)
@@ -310,10 +324,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         trggdldqm_skim = b2.register_module('TRGGDLDQM')
         trggdldqm_skim.param('skim', 1)
         path.add_module(trggdldqm_skim)
-        # TRGTOP
-        trgtopdqm_skim = b2.register_module('TRGTOPDQM')
-        trgtopdqm_skim.param('skim', 1)
-        path.add_module(trgtopdqm_skim)
+        trgeffdqm = b2.register_module("TRGEFFDQM")
+        path.add_module(trgeffdqm)
 
     # TrackDQM, needs at least one VXD components to be present or will crash otherwise
     if (components is None or 'SVD' in components or 'PXD' in components) and (dqm_mode in ["dont_care", "filtered"]):
@@ -338,6 +350,14 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
         add_analysis_dqm(path)
     if dqm_environment == "expressreco" and (dqm_mode in ["dont_care"]):
         add_mirabelle_dqm(path)
+
+    # KLM2 (requires mu+ particle list from add_analysis_dqm)
+    if (components is None or ('KLM' in components and 'CDC' in components)) and (dqm_mode in ["dont_care", "filtered"]):
+        path.add_module("KLMDQM2", MuonListName='mu+:KLMDQM',
+                        MinimalMatchingDigits=12,
+                        MinimalMatchingDigitsOuterLayers=0,
+                        MinimalMomentumNoOuterLayers=4.0,
+                        SoftwareTriggerName="")
 
     # We want to see the datasize of all events after removing the raw data
     if dqm_mode in ["dont_care", "all_events"]:

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -13,7 +12,7 @@
 <header>
   <output>PartGunChargedStableGenSim.root</output>
   <cacheable/>
-  <contact>Marco Milesi, marco.milesi@unimelb.edu.au</contact>
+  <contact>arul.prakash@physik.uni-muenchen.de</contact>
   <description> This steering script generates 1000 particle gun events for a set of charged stable particles,
 runs the fullsim w/ mixed in background, and dumps full output (*Digits containers) in a file.</description>
 </header>

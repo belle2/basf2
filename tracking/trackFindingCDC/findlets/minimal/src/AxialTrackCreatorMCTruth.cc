@@ -49,7 +49,7 @@ void AxialTrackCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList
   moduleParamList->addParameter(prefixed(prefix, "reconstructedPositions"),
                                 m_param_reconstructedPositions,
                                 "Switch to reconstruct the positions in the tracks "
-                                "immitating the legendre finder.",
+                                "imitating the Legendre finder.",
                                 m_param_reconstructedPositions);
 
   moduleParamList->addParameter(prefixed(prefix, "fit"),
@@ -66,7 +66,7 @@ void AxialTrackCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList
 
 std::string AxialTrackCreatorMCTruth::getDescription()
 {
-  return "Constructs tracks from wire hits using the mc truth information.";
+  return "Constructs tracks from wire hits using the MC truth information.";
 }
 
 
@@ -133,7 +133,6 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
   }
 
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
-  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
   for (CDCTrack& track : outputAxialTracks) {
     for (CDCRecoHit3D& recoHit3D : track) {
       Vector2D recoPos2D = recoHit3D.getRecoPos2D();
@@ -148,7 +147,7 @@ void AxialTrackCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHit
         // Setup the drift length such that only information
         // that would be present in two dimensional reconstruction is used
         const double beta = 1;
-        flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+        FlightTimeEstimator::instance().getFlightTime2D(recoPos2D, alpha, beta);
 
         //TODO: for now this seems to be unused, (see following comment)
         /*

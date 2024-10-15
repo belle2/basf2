@@ -5,6 +5,7 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+
 /*
   nsmsys2.h
 
@@ -290,8 +291,11 @@ typedef struct NSMsys_struct {
   int32_t pid;
   int64_t timstart; /* creation time of NSMsys (may not by me) */
   int64_t timevent; /* last update of NSMsys */
+
   uint32_t netmask;
   int16_t sock_updated;  /* socket updated, but fdset not updated yet */
+
+  /* network-shared variables in network byte order from here */
   int16_t afirst; /* set and distributed by master */
   int16_t nnod; /* set and distributed by master */
   int16_t nref; /* set and distributed by master */
@@ -308,6 +312,7 @@ typedef struct NSMsys_struct {
   int32_t dathash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
   int32_t reqhash[NSMSYS_MAX_HASH + 1]; /* set and distributed by master */
 
+  /* host local variables in host byte order from here */
   NSMcon con[NSMSYS_MAX_CON];
   NSMsch sch[NSMSYS_MAX_SCH];
   int32_t ncon;
@@ -315,7 +320,8 @@ typedef struct NSMsys_struct {
   int16_t conid[NSMSYS_MAX_NOD];  /* nod => con mapping */
   int16_t ireg_free; /* cache to make it easier to find new reg slot */
   int16_t nsnd;
-  int16_t rsv16[2];
+  int16_t ndaemon; /* to judge when two masters are running */
+  int16_t rsv16;
   NSMdat_snd snd[NSMSYS_MAX_DAT];
   NSMdat_rcv rcv[NSMSYS_MAX_DAT];
 

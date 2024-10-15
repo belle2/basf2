@@ -20,7 +20,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Class representating a sense wire layer in the central drift chamber.
+     *  Class representing a sense wire layer in the central drift chamber.
      *  This class represents a CDC layer as a range of wires. \n
      *  The range is sorted with increasing wire ids for maximal fast look up. \n
      *  It offers methods for checking the validity of wire ids, a getter for the wires in this layer \n
@@ -72,7 +72,7 @@ namespace Belle2 {
       void operator=(const CDCWireLayer& wireLayer) = delete;
 
     public:
-      /// Intializes the wire layer variables to the average of according variables in the wire range
+      /// Initializes the wire layer variables to the average of according variables in the wire range
       void initialize();
 
       /**
@@ -151,7 +151,7 @@ namespace Belle2 {
        *  Returns the wire by its id in the layer.
        *  Gives the wire by its id, but transforms it to valid range first, \n
        *  so even if the id is out of range you will get a valid wire object. \n
-       *  This makes the retrival of neighbors much easier if the neighborhood \n
+       *  This makes the retrieval of neighbors much easier if the neighborhood \n
        *  is around the discontinuity near the zero wires.
        */
       const CDCWire& getWireWrappedAround(IWire iWire) const

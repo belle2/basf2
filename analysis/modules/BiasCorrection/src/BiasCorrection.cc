@@ -36,9 +36,9 @@ EnergyBiasCorrectionModule::EnergyBiasCorrectionModule() : Module()
   setDescription(
     R"DOC(Module to modify energy from the lists. Include in your code as
 
-    .. code:: python
+.. code:: python
 
-        mypath.add_module("EnergyBiasCorrection", particleLists=['gamma:cut'], scale=tableName_Weight)
+    mypath.add_module("EnergyBiasCorrection", particleLists=['gamma:cut'], scale=tableName_Weight)
 
 The module modifies the input particleLists by scaling energy as given by the scale in the LookUpTable
 		     
@@ -58,8 +58,9 @@ WeightInfo EnergyBiasCorrectionModule::getInfo(const Particle* particle)
     const Variable::Manager::Var* var = Variable::Manager::Instance().getVariable(i_variable);
     if (!var) {
       B2ERROR("Variable '" << i_variable << "' is not available in Variable::Manager!");
+    } else {
+      values.insert(std::make_pair(i_variable, std::get<double>(var->function(particle))));
     }
-    values.insert(std::make_pair(i_variable, std::get<double>(var->function(particle))));
   }
 
   return (*m_ParticleWeightingLookUpTable.get())->getInfo(values);

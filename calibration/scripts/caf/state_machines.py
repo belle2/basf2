@@ -29,6 +29,7 @@ from basf2 import B2DEBUG, B2ERROR, B2INFO, B2WARNING
 from basf2 import conditions as b2conditions
 from basf2.pickle_path import serialize_path
 
+from ROOT import Belle2  # noqa: make the Belle2 namespace available
 from ROOT.Belle2 import CalibrationAlgorithm
 
 from caf.utils import create_directories
@@ -997,7 +998,7 @@ class AlgorithmMachine(Machine):
         Returns:
             bool: Whether or not this machine has been set up correctly with all its necessary attributes.
         """
-        B2INFO("Checking validity of current setup of AlgorithmMachine for {}.".format(self.algorithm.name))
+        B2INFO(f"Checking validity of current setup of AlgorithmMachine for {self.algorithm.name}.")
         # Check if we're somehow missing a required attribute (should be impossible since they get initialised in init)
         for attribute_name in self.required_attrs:
             if not hasattr(self, attribute_name):

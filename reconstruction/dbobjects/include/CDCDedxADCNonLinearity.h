@@ -16,9 +16,9 @@
 namespace Belle2 {
 
   /**
-  *   dE/dx eletronic ADC non-linearity correction for
+  *   dE/dx electronic ADC non-linearity correction for
   *   highly ionising particles (used in offline hadron saturation calibration)
-  *   paramters are for X vs Y relation and sep for inner and outer layer
+  *   parameters are for X vs Y relation and sep for inner and outer layer
   *   vector array 0,1 for inner and 2,3 for outer layers
   */
 

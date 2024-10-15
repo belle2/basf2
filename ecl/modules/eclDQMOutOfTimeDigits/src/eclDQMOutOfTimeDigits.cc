@@ -12,7 +12,6 @@
 /* Basf2 headers. */
 #include <analysis/VariableManager/Manager.h>
 #include <framework/core/HistoModule.h>
-#include <framework/logging/Logger.h>
 #include <mdst/dataobjects/TRGSummary.h>
 
 /* ROOT headers. */
@@ -118,15 +117,6 @@ void ECLDQMOutOfTimeDigitsModule::event()
     double value =  std::get<double>(var->function(nullptr));
     h_out_of_time[key_name]->Fill(value);
   }
-}
-
-void ECLDQMOutOfTimeDigitsModule::endRun()
-{
-}
-
-
-void ECLDQMOutOfTimeDigitsModule::terminate()
-{
 }
 
 bool ECLDQMOutOfTimeDigitsModule::isRandomTrigger()

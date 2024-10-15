@@ -42,7 +42,7 @@ namespace Belle2 {
     /** Defines the histograms for the tracking abort flags. */
     virtual void DefineAbortFlagsHistograms();
 
-    /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+    /** Access to the EventLevelTrackingInfo object in the datastore. */
     StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
 
     /** Monitors the Error flags set by the tracking code.

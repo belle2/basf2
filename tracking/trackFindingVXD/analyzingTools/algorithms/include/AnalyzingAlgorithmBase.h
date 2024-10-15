@@ -68,13 +68,13 @@ namespace Belle2 {
 
     /** copy constructor should not be used so delete it*/
     AnalyzingAlgorithmBase(const AnalyzingAlgorithmBase& algo) = delete;
-    /** also assignement constructor should not be used */
+    /** also assignment constructor should not be used */
     AnalyzingAlgorithmBase& operator = (const AnalyzingAlgorithmBase& algo) = delete;
 
 
     /** virtual class to determine the correct TC to be used for algorithm calculation.
     *
-    * - throws exeption if there are problems.
+    * - throws exception if there are problems.
     * More explanations @ m_storeRefTCDataForTestTC.
     */
     virtual const TCInfoType& chooseCorrectTC(const TCInfoType& aTC) const
@@ -92,7 +92,7 @@ namespace Belle2 {
     }
 
 
-    /** makes sure that TcPair.refTC and .testTC are correctly set - throws exeption if there are problems */
+    /** makes sure that TcPair.refTC and .testTC are correctly set - throws exception if there are problems */
     virtual const TcPair chooseCorrectPairOfTCs(const TCInfoType& aTC) const
     {
       // capture bad case, where second TC is missing:

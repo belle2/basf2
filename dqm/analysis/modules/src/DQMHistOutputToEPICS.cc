@@ -106,7 +106,7 @@ void DQMHistOutputToEPICSModule::event()
     int length = it->data.size();
     TH1* hh1 = findHist(it->histoname);
     if (hh1 && hh1->GetNcells() > 2 && length > 0  && length == int(ca_element_count(it->mychid))) {
-      // If bin count doesnt match, we loose bins but otherwise ca_array_put will complain
+      // If bin count doesn't match, we loose bins but otherwise ca_array_put will complain
       // We fill up the array with ZEROs otherwise
       if (hh1->GetDimension() == 1) {
         int i = 0;

@@ -19,7 +19,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(RawInput)
+REG_MODULE(RawInput);
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -35,7 +35,7 @@ RawInputModule::RawInputModule() : Module()
   m_nevt = -1;
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName, "Raw file name.", string("RawInput.root"));
+  addParam("inputFileName", m_inputFileName, "Raw file name.", string("RawInput.root"));
 
   B2DEBUG(1, "RawInput: Constructor done.");
 }

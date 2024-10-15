@@ -20,7 +20,7 @@ namespace Belle2 {
    * WARNING this method throws an exception!
    * */
   template <typename PointType >
-  class CIRCLECENTERXY_NAME : public SelectionVariable< PointType, 3, B2Vector3<double> > {
+  class CIRCLECENTERXY_NAME : public SelectionVariable< PointType, 3, B2Vector3D > {
   public:
     /** this exception is thrown by the CircleFit and occurs when the track is too straight. */
     BELLE2_DEFINE_EXCEPTION(Straight_Line, "The hits are on a straight Line (or indistinguishably near to being on it).");
@@ -29,7 +29,7 @@ namespace Belle2 {
     PUT_NAME_FUNCTION(CIRCLECENTERXY_NAME);
 
     /** calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3. */
-    static B2Vector3<double> value(const PointType& a, const PointType& b, const PointType& c)
+    static B2Vector3D value(const PointType& a, const PointType& b, const PointType& c)
     {
       // calculates the intersection point using Cramer's rule.
       // x_1+s*n_1==x_2+t*n_2 --> n_1 *s - n_2 *t == x_2 - x_1 --> http://en.wikipedia.org/wiki/Cramer%27s_rule
@@ -50,7 +50,7 @@ namespace Belle2 {
 
       double s = (b1 * a22 - b2 * a21) / (a11 * a22 - a12 * a21); //the determinant is zero if the three hits are on a line in (x,y).
 
-      return B2Vector3<double>(c.X() + inX * 0.5 + s * inY, c.Y() + inY * 0.5 - s * inX, 0.);
+      return B2Vector3D(c.X() + inX * 0.5 + s * inY, c.Y() + inY * 0.5 - s * inX, 0.);
     }
 
 

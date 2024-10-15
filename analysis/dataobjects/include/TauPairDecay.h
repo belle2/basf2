@@ -26,7 +26,7 @@ namespace Belle2 {
      * Default constructor.
      * All private members are set to 0.
      */
-    TauPairDecay() : m_pmode(0.0), m_mmode(0.0), m_pprong(0.0), m_mprong(0.0) {};
+    TauPairDecay() : m_pmode(0.0), m_mmode(0.0), m_pprong(0.0), m_mprong(0.0), m_megstar(0), m_pegstar(0) {};
 
     // setters
     /**
@@ -56,6 +56,20 @@ namespace Belle2 {
      * @param mprong prong of generated tau decay.
      */
     void addTauMinusMcProng(int mprong);
+
+    /**
+     * Add energy of radiated photon from negative tau decay [in tau- rest frame]
+     *
+     * @param megstar egstar of generated tau- decay.
+     */
+    void addTauMinusEgstar(double megstar);
+
+    /**
+     * Add energy of radiated photon from positive tau decay [in tau+ rest frame]
+     *
+     * @param pegstar egstar of generated tau+ decay.
+     */
+    void addTauPlusEgstar(double pegstar);
 
     /**
      * Get ID of positive tau decay
@@ -97,6 +111,26 @@ namespace Belle2 {
       return m_mprong;
     }
 
+    /**
+     * Get energy of radiated photon from negative tau decay [in tau- rest frame]
+     *
+     * @return Energy of radiated photon from generated tau- decay
+     */
+    double getTauMinusEgstar(void) const
+    {
+      return m_megstar;
+    }
+
+    /**
+     * Get energy of radiated photon from positive tau decay [in tau+ rest frame]
+     *
+     * @return Energy of radiated photon from generated tau+ decay
+     */
+    double getTauPlusEgstar(void) const
+    {
+      return m_pegstar;
+    }
+
   private:
 
     // persistent data members
@@ -104,9 +138,10 @@ namespace Belle2 {
     int m_mmode; /**< Decay ID of negative tau lepton decay */
     int m_pprong; /**< Prong of positive tau lepton decay */
     int m_mprong; /**< Prong of negative tau lepton decay */
+    double m_megstar; /**< Energy of photon from negative tau decay*/
+    double m_pegstar; /**< Energy of photon from positive tau decay*/
 
-
-    ClassDef(TauPairDecay, 1) /**< class definition */
+    ClassDef(TauPairDecay, 2) /**< class definition */
 
   };
 

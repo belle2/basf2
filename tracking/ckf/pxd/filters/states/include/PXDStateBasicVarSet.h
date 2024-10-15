@@ -44,6 +44,12 @@ namespace Belle2 {
 
     "chi2",
 
+    "cluster_charge",
+    "cluster_seed_charge",
+    "cluster_size",
+    "cluster_size_u",
+    "cluster_size_v",
+
     "ladder",
     "sensor",
     "segment",
@@ -54,6 +60,12 @@ namespace Belle2 {
     "last_sensor",
     "last_segment",
     "last_id",
+
+    "last_cluster_charge",
+    "last_cluster_seed_charge",
+    "last_cluster_size",
+    "last_cluster_size_u",
+    "last_cluster_size_v",
   };
 
   /// Vehicle class to transport the variable names

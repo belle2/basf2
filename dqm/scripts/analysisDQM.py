@@ -1,5 +1,4 @@
 # !/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -16,6 +15,7 @@ This module defines functions to add analysis DQM modules.
 import basf2 as b2
 from stdPi0s import stdPi0s
 import modularAnalysis as ma
+import stdV0s
 
 
 def add_analysis_dqm(path):
@@ -28,13 +28,17 @@ def add_analysis_dqm(path):
     """
 
     # muons, Kshorts and pi0s
-    ma.fillParticleList('mu+:KLMDQM', 'p>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
+    ma.fillParticleList('mu+:KLMDQM', 'p>1.5', path=path)
     ma.fillParticleList('gamma:physDQM', 'E > 0.15', path=path)
-    ma.fillParticleList('pi+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.fillParticleList('mu+:physDQM', 'pt>2. and abs(d0) < 2 and abs(z0) < 4', path=path)
     ma.reconstructDecay('pi0:physDQM -> gamma:physDQM gamma:physDQM', '0.10 < M < 0.15', 1, True, path)
-    ma.reconstructDecay('K_S0:physDQM -> pi-:physDQM pi+:physDQM', '0.48 < M < 0.52', 1, True, path)
+    # std Kshorts-TreeFit
+    stdV0s.stdKshorts(path=path, updateAllDaughters=True, writeOut=True)
     ma.reconstructDecay('Upsilon:physDQM -> mu-:physDQM mu+:physDQM', '9 < M < 12', 1, True, path)
+    # bhabha,hadrons
+    ma.fillParticleList('e+:physDQM', 'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
+    ma.reconstructDecay('Upsilon:ephysDQM -> e-:physDQM e+:physDQM', '4 < M < 12', 1, True, path)
+    ma.fillParticleList('pi+:hadbphysDQM', 'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance', path=path)
 
     # have to manually create "all" lists of pi+ and photons to use inside buildEventShape
     # to avoid loading the photons' beamBackgroundMVA variable on the DQM
@@ -54,8 +58,12 @@ def add_analysis_dqm(path):
 
     dqm = b2.register_module('PhysicsObjectsDQM')
     dqm.param('PI0PListName', 'pi0:physDQM')
-    dqm.param('KS0PListName', 'K_S0:physDQM')
+    dqm.param('KS0PListName', 'K_S0:merged')
     dqm.param('UpsPListName', 'Upsilon:physDQM')
+    # bhabha,hadrons
+    dqm.param('UpsBhabhaPListName', 'Upsilon:ephysDQM')
+    dqm.param('UpsHadPListName', 'pi+:hadbphysDQM')
+
     path.add_module(dqm)
 
 
@@ -72,6 +80,9 @@ def add_mirabelle_dqm(path):
     MiraBelleDst1_path = b2.create_path()
     MiraBelleNotDst1_path = b2.create_path()
     MiraBelleDst2_path = b2.create_path()
+    # bhabha,hadrons
+    MiraBelleBhabha_path = b2.create_path()
+    MiraBellehadronb2_path = b2.create_path()
 
     trigger_skim_mumutight = path.add_module(
         "TriggerSkim",
@@ -100,6 +111,19 @@ def add_mirabelle_dqm(path):
         resultOnMissing=0,
     )
     trigger_skim_dstar_2.if_value("==1", MiraBelleDst2_path, b2.AfterConditionPath.CONTINUE)
+    # bhabha,hadrons
+    trigger_skim_bhabhaall = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&skim&accept_bhabha_all"],
+        resultOnMissing=0,
+    )
+    trigger_skim_bhabhaall.if_value("==1", MiraBelleBhabha_path, b2.AfterConditionPath.CONTINUE)
+    trigger_skim_hadronb2 = path.add_module(
+        "TriggerSkim",
+        triggerLines=["software_trigger_cut&skim&accept_hadronb2"],
+        resultOnMissing=0,
+    )
+    trigger_skim_hadronb2.if_value("==1", MiraBellehadronb2_path, b2.AfterConditionPath.CONTINUE)
 
     # MiraBelle di-muon path
     ma.fillParticleList('mu+:physMiraBelle', '', path=MiraBelleMumu_path)
@@ -132,3 +156,20 @@ def add_mirabelle_dqm(path):
     MiraBelleDst2 = b2.register_module('PhysicsObjectsMiraBelleDst2')
     MiraBelleDst2.param('DstListName', 'D*+:MiraBelleDst2_kpipi0')
     MiraBelleDst2_path.add_module(MiraBelleDst2)
+    # bhabha,hadrons
+    ma.fillParticleList(
+        'e+:physMiraBelle',
+        'pt>0.2 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance',
+        path=MiraBelleBhabha_path)
+    ma.reconstructDecay('Upsilon:ephysMiraBelle -> e+:physMiraBelle e-:physMiraBelle', '4 < M < 12', path=MiraBelleBhabha_path)
+    MiraBelleBhabha = b2.register_module('PhysicsObjectsMiraBelleBhabha')
+    MiraBelleBhabha.param('ePListName', 'e+:physMiraBelle')
+    MiraBelleBhabha.param('bhabhaPListName', 'Upsilon:ephysMiraBelle')
+    MiraBelleBhabha_path.add_module(MiraBelleBhabha)
+    ma.fillParticleList(
+        'pi+:hadb2physMiraBelle',
+        'p>0.1 and abs(d0) < 2 and abs(z0) < 4 and thetaInCDCAcceptance',
+        path=MiraBellehadronb2_path)
+    MiraBellehadronb = b2.register_module('PhysicsObjectsMiraBelleHadron')
+    MiraBellehadronb.param('hadronb2piPListName', 'pi+:hadb2physMiraBelle')
+    MiraBellehadronb2_path.add_module(MiraBellehadronb)

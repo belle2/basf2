@@ -319,13 +319,13 @@ template <class FilterType> unsigned RawSecMapMergerModule::updateFilterSubLayer
   std::vector<VxdID> vxdIDs = VXD::GeoCache::getInstance().getListOfSensors();
 
 
-  // collect all secIDs occured in training and use them to update the sectors in the SectorID in the VXDTFFilter
+  // collect all secIDs occurred in training and use them to update the sectors in the SectorID in the VXDTFFilter
   // in particular the sublayerID which is determined from the graph
   for (VxdID sensor : vxdIDs) {
 
     std::vector< FullSecID> allTrainedSecIDsOfSensor = mainGraph.getAllFullSecIDsOfSensor(sensor);
 
-    // this removes all FullSecIDs which occured more than once
+    // this removes all FullSecIDs which occurred more than once
     std::sort(allTrainedSecIDsOfSensor.begin(), allTrainedSecIDsOfSensor.end());
     allTrainedSecIDsOfSensor.erase(
       std::unique(

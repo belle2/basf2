@@ -12,13 +12,11 @@
 /* ECL headers. */
 #include <ecl/dataobjects/ECLElementNumbers.h>
 #include <ecl/dbobjects/ECLCrystalCalib.h>
-#include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
 #include <ecl/geometry/ECLGeometryPar.h>
 #include <ecl/mapper/ECLChannelMapper.h>
 
 /* Basf2 headers. */
-#include <framework/database/DBImportObjPtr.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBStore.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -28,12 +26,8 @@
 /* ROOT headers. */
 #include <TF1.h>
 #include <TFile.h>
-#include <TGaxis.h>
 #include <TGraphAsymmErrors.h>
-#include <TGraphErrors.h>
 #include <TH2F.h>
-#include <TLegend.h>
-#include <TMultiGraph.h>
 #include <TROOT.h>
 #include <TString.h>
 

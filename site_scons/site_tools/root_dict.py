@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -81,7 +80,7 @@ def linkdef_emitter(target, source, env):
         namespace = match.group(1)  # or possibly a class, but it might match the header file
         classname = match.group(2)
         if not classname:
-            raise RuntimeError("%s contains '%s' without class name?" % (str(linkdef), str(line)))
+            raise RuntimeError(f"{str(linkdef)} contains '{str(line)}' without class name?")
 
         is_implicit = not linkdef_implicit.search(line) is None
         if is_implicit:
@@ -93,11 +92,11 @@ def linkdef_emitter(target, source, env):
         if not os.path.isfile(header_file):
             if not namespace:
                 # no //implicit for suppression found...
-                print("%s contains '%s' where we couldn't find a header file. "
+                print(f"{str(linkdef)} contains '{str(line)}' where we couldn't find a header file. "
                       "If dictionary compilation fails, this might be the reason. "
                       "For classes residing in other directories and already "
                       "included via other link requests, add '// implicit' at "
-                      "the end to suppress this message." % (str(linkdef), str(line)))
+                      "the end to suppress this message.")
                 continue
 
             # remove trailing '::', add '.h'

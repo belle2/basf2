@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     /**
-     * Empty Constructor for ROOT IO (needed to make the class storeable).
+     * Empty Constructor for ROOT IO (needed to make the class storable).
      */
     KLMClusterShape();
 

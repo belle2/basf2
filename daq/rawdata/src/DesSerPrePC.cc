@@ -274,7 +274,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
     try {
       total_recvd_byte += recvFD(m_socket_recv[ i ], (char*)temp_buf + total_recvd_byte,
                                  each_buf_nwords[ i ] * sizeof(int), flag);
-    } catch (string err_str) {
+    } catch (const string& err_str) {
       if (*delete_flag) {
         //        B2WARNING("Delete buffer before going to Run-pause state");
         printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
@@ -319,7 +319,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
   for (int i = 0; i < (int)(m_socket_recv.size()); i++) {
     try {
       recvFD(m_socket_recv[ i ], (char*)send_trl_buf, SendTrailer::SENDTRL_NWORDS * sizeof(int), flag);
-    } catch (string err_str) {
+    } catch (const string& err_str) {
       if (*delete_flag) {
         //        B2WARNING("Delete buffer before going to Run-pause state");
         printf("[WARNING] Delete buffer before going to Run-pause state\n"); fflush(stdout);
@@ -430,7 +430,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
         try {
           temp_rawftsw->CheckData(0, m_prev_evenum, &cur_evenum, m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           char err_buf[500];
           strcpy(err_buf, err_str.c_str());
           print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -459,7 +459,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
         try {
           temp_rawtlu->CheckData(0, m_prev_evenum, &cur_evenum);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           char err_buf[500];
           strcpy(err_buf, err_str.c_str());
           print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -489,7 +489,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
                                     m_prev_copper_ctr, &cur_copper_ctr,
                                     m_prev_exprunsubrun_no, &m_exprunsubrun_no);
           eve_array[ entry_id ] = cur_evenum;
-        } catch (string err_str) {
+        } catch (const string& err_str) {
           exit(1); // Error in the contents of an event was detected
         }
 #endif
@@ -603,7 +603,7 @@ void DesSerPrePC::DataAcquisition()
       try {
         setRecvdBuffer(&temp_rawdatablk, &delete_flag_from);
         checkData(&temp_rawdatablk, &eve_copper_0);
-      } catch (string err_str) {
+      } catch (const string& err_str) {
         printf("Error was detected\n"); fflush(stdout);
         break;
       }
@@ -705,7 +705,7 @@ void DesSerPrePC::DataAcquisition()
 
       try {
         m_sent_totbytes += sendByWriteV(&(raw_datablk[ j ]));
-      } catch (string err_str) {
+      } catch (const string& err_str) {
 #ifdef NONSTOP
         break;
 #endif

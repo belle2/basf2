@@ -11,7 +11,7 @@
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(HLTDs2ZMQ)
+REG_MODULE(HLTDs2ZMQ);
 
 HLTDs2ZMQModule::HLTDs2ZMQModule() : Module()
 {
@@ -37,6 +37,8 @@ HLTDs2ZMQModule::HLTDs2ZMQModule() : Module()
   addParam("raw", m_param_raw, "Send out raw data with send header and trailer around the evtmessage instead of just the evtmessage. "
            "The former is the typical use case when talking with e.g. storage, "
            "the latter can be used for local tests or when sending full events e.g. to the event display.");
+  addParam("outputConfirmation", m_param_outputConfirmation, "Waiting for output confirmation message or not. "
+           "ExpressReco output is event displays and usually don't need the confirmation message.", m_param_outputConfirmation);
 }
 
 void HLTDs2ZMQModule::event()
@@ -53,10 +55,10 @@ void HLTDs2ZMQModule::event()
 
     if (m_param_raw) {
       auto zmqMessage = m_streamHelper.streamRaw();
-      m_output->handleEvent(std::move(zmqMessage));
+      m_output->handleEvent(std::move(zmqMessage), m_param_outputConfirmation);
     } else {
       auto zmqMessage = m_streamHelper.stream(false, false);
-      m_output->handleEvent(std::move(zmqMessage));
+      m_output->handleEvent(std::move(zmqMessage), m_param_outputConfirmation);
     }
   } catch (zmq::error_t& error) {
     if (error.num() == EINTR) {

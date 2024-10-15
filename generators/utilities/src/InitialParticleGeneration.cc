@@ -25,7 +25,7 @@ namespace Belle2 {
   {
     if (m_event->hasGenerationFlags(BeamParameters::c_smearVertex)) {
       if (!gen.size()) gen.setMeanCov(initial, cov);
-      return ROOT::Math::XYZVector(gen.generateVec3());
+      return gen.generateVec3();
     }
     return initial;
   }

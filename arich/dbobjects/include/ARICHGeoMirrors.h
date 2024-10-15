@@ -12,8 +12,8 @@
 
 #include <arich/dbobjects/ARICHGeoBase.h>
 #include <string>
-#include <TVector3.h>
-#include <TRotation.h>
+#include <Math/Vector3D.h>
+#include <Math/Rotation3D.h>
 #include <geometry/dbobjects/GeoOpticalSurface.h>
 
 namespace Belle2 {
@@ -137,7 +137,7 @@ namespace Belle2 {
     void setMirrorNormVector(unsigned mirID, double x, double y, double z)
     {
       if (mirID < 1 || mirID > m_normVector.size()) B2ERROR("ARICHGeoMirrors: invalid mirror plate ID number");
-      m_normVector[mirID - 1] = TVector3(x, y, z).Unit();
+      m_normVector[mirID - 1] = ROOT::Math::XYZVector(x, y, z).Unit();
     }
 
     /**
@@ -150,7 +150,7 @@ namespace Belle2 {
     void setMirrorPoint(unsigned mirID, double x, double y, double z)
     {
       if (mirID < 1 || mirID > m_nMirrors) B2ERROR("ARICHGeoMirrors: invalid mirror plate ID number");
-      m_point[mirID - 1] = TVector3(x, y, z);
+      m_point[mirID - 1] = ROOT::Math::XYZVector(x, y, z);
     }
 
     /**
@@ -170,7 +170,7 @@ namespace Belle2 {
      * @param mirID mirror ID
      * @return nomrmal vector of the mirID mirror plate
      */
-    const TVector3& getNormVector(const unsigned mirID) const
+    const ROOT::Math::XYZVector& getNormVector(const unsigned mirID) const
     {
       if (mirID < 1 || mirID > m_nMirrors) B2ERROR("ARICHGeoMirrors: invalid mirror plate ID number");
       return m_normVector[mirID - 1];
@@ -181,7 +181,7 @@ namespace Belle2 {
      * @param mirID mirror ID
      * @return vector to the center point of mirID mirror plate
      */
-    const TVector3& getPoint(const unsigned mirID) const
+    const ROOT::Math::XYZVector& getPoint(const unsigned mirID) const
     {
       if (mirID < 1 || mirID > m_nMirrors) B2ERROR("ARICHGeoMirrors: invalid mirror plate ID number");
       return m_point[mirID - 1];
@@ -218,8 +218,8 @@ namespace Belle2 {
 
   private:
 
-    std::vector<TVector3> m_normVector;    /**< vector of normal vectors of all mirror plates */
-    std::vector<TVector3> m_point;         /**< vector of points on the reflective surface of all mirror plates */
+    std::vector<ROOT::Math::XYZVector> m_normVector;    /**< vector of normal vectors of all mirror plates */
+    std::vector<ROOT::Math::XYZVector> m_point;         /**< vector of points on the reflective surface of all mirror plates */
     std::vector<bool> m_installed;         /**< vector of installed/not installed flags of all mirror plates */
 
     std::string m_material;                /**< material of mirror plates */
@@ -233,7 +233,7 @@ namespace Belle2 {
 
     GeoOpticalSurface m_surface;           /**< optical surface of mirror plates */
 
-    ClassDefOverride(ARICHGeoMirrors, 1); /**< ClassDef */
+    ClassDefOverride(ARICHGeoMirrors, 2); /**< ClassDef */
 
   };
 

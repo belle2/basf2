@@ -65,7 +65,7 @@ namespace Belle2::InvariantMassMuMuCalib {
 
     double m_x    = 10400; ///< the resulting PDF is function of this variable the actual rec-level mass
 
-    double m_C = 16;       ///< the coeficient between part bellow eps and above eps cut-off
+    double m_C = 16;       ///< the coefficient between part below eps and above eps cut-off
 
   };
 

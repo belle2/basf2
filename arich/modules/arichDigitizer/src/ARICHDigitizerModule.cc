@@ -25,8 +25,8 @@
 
 
 // ROOT
-#include <TVector2.h>
-#include <TVector3.h>
+#include <Math/Vector2D.h>
+#include <Math/Vector3D.h>
 #include <TRandom3.h>
 
 using namespace boost;
@@ -108,7 +108,7 @@ namespace Belle2 {
 
       if (time < 0 || time > m_timeWindow) continue;
 
-      TVector2 locpos(aSimHit.getLocalPosition().X(), aSimHit.getLocalPosition().Y());
+      ROOT::Math::XYVector locpos = aSimHit.getLocalPosition();
 
       // Get id of module
       int moduleID = aSimHit.getModuleID();
@@ -183,22 +183,23 @@ namespace Belle2 {
 
   }
 
-  void ARICHDigitizerModule::magFieldDistorsion(TVector2& hit, int copyno)
+  void ARICHDigitizerModule::magFieldDistorsion(ROOT::Math::XYVector& hit, int copyno)
   {
 
-    TVector2 hitGlob;
+    ROOT::Math::XYVector hitGlob;
     double phi = m_geoPar->getDetectorPlane().getSlotPhi(copyno);
     double r = m_geoPar->getDetectorPlane().getSlotR(copyno);
     double z = m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness();
-    hitGlob.SetMagPhi(r, phi);
-    TVector2 shift = hit;
-    hitGlob += shift.Rotate(phi);
-    ROOT::Math::XYZVector Bfield = BFieldManager::getField(ROOT::Math::XYZVector(m_geoPar->getMasterVolume().pointToGlobal(TVector3(
-                                                             hitGlob.X(), hitGlob.Y(), z))));
+    hitGlob.SetXY(r * std::cos(phi), r * std::sin(phi));
+    ROOT::Math::XYVector shift = hit;
+    shift.Rotate(phi);
+    hitGlob += shift;
+    ROOT::Math::XYZVector Bfield = BFieldManager::getField(m_geoPar->getMasterVolume().pointToGlobal(ROOT::Math::XYZVector(hitGlob.X(),
+                                                           hitGlob.Y(), z)));
     double cc = m_geoPar->getHAPDGeometry().getPhotocathodeApdDistance() / abs(Bfield.Z());
     shift.SetX(cc * Bfield.X());
     shift.SetY(cc * Bfield.Y());
-    shift = shift.Rotate(-phi);
+    shift.Rotate(phi);
     hit.SetX(hit.X() + shift.X());
     hit.SetY(hit.Y() + shift.Y());
   }

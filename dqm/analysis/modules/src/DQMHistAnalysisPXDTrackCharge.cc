@@ -10,7 +10,6 @@
 // Description : Analysis of PXD Cluster Charge
 //-
 
-
 #include <dqm/analysis/modules/DQMHistAnalysisPXDTrackCharge.h>
 #include <TROOT.h>
 #include <TStyle.h>
@@ -46,7 +45,6 @@ DQMHistAnalysisPXDTrackChargeModule::DQMHistAnalysisPXDTrackChargeModule()
   addParam("RangeHigh", m_rangeHigh, "High border for fit", 80.);
 //   addParam("PeakBefore", m_peakBefore, "Range for fit before peak (positive)", 5.);
 //   addParam("PeakAfter", m_peakAfter, "Range for after peak", 40.);
-  addParam("RefHistoFile", m_refFileName, "Reference histrogram file name", std::string("refHisto.root"));
   addParam("ColorAlert", m_color, "Whether to show the color alert", true);
   addParam("excluded", m_excluded, "excluded module (indizes starting from 0 to 39)");
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: Constructor done.");
@@ -59,11 +57,6 @@ DQMHistAnalysisPXDTrackChargeModule::~DQMHistAnalysisPXDTrackChargeModule()
 void DQMHistAnalysisPXDTrackChargeModule::initialize()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: initialized.");
-
-  m_refFile = NULL;
-  if (m_refFileName != "") {
-    m_refFile = new TFile(m_refFileName.data());// default is read only
-  }
 
   m_monObj = getMonitoringObject("pxd");
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
@@ -97,6 +90,18 @@ void DQMHistAnalysisPXDTrackChargeModule::initialize()
                                             6, 0.5, 6.5, 4, 0.5, 4.5);
       m_cChargeModASIC2d[aVxdID] = new TCanvas((m_histogramDirectoryName + "/c_TCCharge_MPV_" + name).data());
     }
+  }
+  if (m_PXDModules.size() == 0) {
+    // Backup if no geometry is present (testing...)
+    B2WARNING("No PXDModules in Geometry found! Use hard-coded setup.");
+    std::vector <string> mod = {
+      "1.1.1", "1.1.2", "1.2.1", "1.2.2", "1.3.1", "1.3.2", "1.4.1", "1.4.2",
+      "1.5.1", "1.5.2", "1.6.1", "1.6.2", "1.7.1", "1.7.2", "1.8.1", "1.8.2",
+      "2.1.1", "2.1.2", "2.2.1", "2.2.2", "2.3.1", "2.3.2", "2.4.1", "2.4.2",
+      "2.5.1", "2.5.2", "2.6.1", "2.6.2", "2.7.1", "2.7.2", "2.8.1", "2.8.2",
+      "2.9.1", "2.9.2", "2.10.1", "2.10.2", "2.11.1", "2.11.2", "2.12.1", "2.12.2"
+    };
+    for (auto& it : mod) m_PXDModules.push_back(VxdID(it));
   }
   std::sort(m_PXDModules.begin(), m_PXDModules.end());  // back to natural order
 
@@ -179,13 +184,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
 //   auto sg = m_rfws->var("sg");
 
   {
-    m_cTrackedClusters->Clear();
-    m_cTrackedClusters->cd();
-    m_hTrackedClusters->Reset();
-
     std::string name = "Tracked_Clusters"; // new name
     TH1* hh2 = findHist(m_histogramDirectoryName, "PXD_Tracked_Clusters", true);
     if (hh2) {// update only if histogram is updated
+      m_cTrackedClusters->Clear();
+      m_cTrackedClusters->cd();
+      m_hTrackedClusters->Reset();
+
       auto scale = hh2->GetBinContent(0);// overflow misused as event counter!
       if (scale > 0) {
         int j = 1;
@@ -211,13 +216,13 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
       m_hTrackedClusters->Draw("hist");
 
       // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-      auto href2 = findHistInFile(m_refFile, name);
-
-      if (href2) {
-        href2->SetLineStyle(3);// 2 or 3
-        href2->SetLineColor(kBlack);
-        href2->Draw("same,hist");
-      }
+//       auto href2 = findHistInFile(m_refFile, name);
+//
+//       if (href2) {
+//         href2->SetLineStyle(3);// 2 or 3
+//         href2->SetLineColor(kBlack);
+//         href2->Draw("same,hist");
+//       }
 
       // keep this commented code as we may have excluded modules in phase4
 //       auto tt = new TLatex(5.5, 0, " 1.3.2 Module is excluded, please ignore");
@@ -238,11 +243,11 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     std::string name = "PXD_Track_Cluster_Charge_" + (std::string)m_PXDModules[i];
     std::replace(name.begin(), name.end(), '.', '_');
 
-    canvas->cd();
-    canvas->Clear();
-
     TH1* hh1 = findHist(m_histogramDirectoryName, name, true);
     if (hh1) {// update only if histo was updated
+      canvas->cd();
+      canvas->Clear();
+      UpdateCanvas(canvas);
 
       if (hh1->GetEntries() > 50) {
 
@@ -268,26 +273,27 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
         m_gCharge->SetPoint(p, i + 0.49, ml->getValV());
         m_gCharge->SetPointError(p, 0.1, ml->getError()); // error in x is useless
         m_monObj->setVariable(("trackcharge_" + (std::string)m_PXDModules[i]).c_str(), ml->getValV(), ml->getError());
+      } else {
+        hh1->Draw("hist"); // avoid to confuse people by showing nothing for low stat
       }
 
       // get ref histogram, assumes no m_histogramDirectoryName directory in ref file
-      auto hist2 = findHistInFile(m_refFile, name);
-
-      if (hist2) {
-        B2DEBUG(20, "Draw Normalized " << hist2->GetName());
-        hist2->SetLineStyle(3);// 2 or 3
-        hist2->SetLineColor(kBlack);
-
-        canvas->cd();
-
-        // if draw normalized
-        TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
-        // would it work to scale it each time again?
-        if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
-
-        h->SetStats(kFALSE);
-        h->Draw("same,hist");
-      }
+//       auto hist2 = findHistInFile(m_refFile, name);
+//       if (hist2) {
+//         B2DEBUG(20, "Draw Normalized " << hist2->GetName());
+//         hist2->SetLineStyle(3);// 2 or 3
+//         hist2->SetLineColor(kBlack);
+//
+//         canvas->cd();
+//
+//         // if draw normalized
+//         TH1* h = (TH1*)hist2->Clone(); // Annoying ... Maybe an memory leak? TODO
+//         // would it work to scale it each time again?
+//         if (abs(hist2->GetEntries()) > 0) h->Scale(hh1->GetEntries() / hist2->GetEntries());
+//
+//         h->SetStats(kFALSE);
+//         h->Draw("same,hist");
+//       }
 
       // add coloring, cuts? based on fit, compare with ref?
       canvas->Pad()->SetFrameFillColor(10);
@@ -381,10 +387,15 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
   m_gCharge->Draw("AP");
 
   for (auto& it : m_excluded) {
-    auto tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
-    tt->SetTextSize(0.035);
-    tt->SetTextAngle(90);// Rotated
-    tt->SetTextAlign(12);// Centered
+    static std::map <int, TLatex*> ltmap;
+    auto tt = ltmap[it];
+    if (!tt) {
+      tt = new TLatex(it + 0.5, 0, (" " + std::string(m_PXDModules[it]) + " Module is excluded, please ignore").c_str());
+      tt->SetTextSize(0.035);
+      tt->SetTextAngle(90);// Rotated
+      tt->SetTextAlign(12);// Centered
+      ltmap[it] = tt;
+    }
     tt->Draw();
   }
   m_cCharge->cd(0);
@@ -406,7 +417,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_line_mean->SetY2(mean);
     m_line_low->SetY1(mini);
     m_line_low->SetY2(mini);
-    data = mean; // m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    data = mean; // m_fMean->GetParameter(0); // we are more interested in the maximum deviation from mean
     // m_gCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = m_gCharge->GetRMS(2);// RMS of Y
     // better, max deviation as fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
@@ -427,7 +438,7 @@ void DQMHistAnalysisPXDTrackChargeModule::event()
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
     status = 0; // default
   } else {
-    /// FIXME: what is the accpetable limit?
+    /// FIXME: what is the acceptable limit?
     if (fabs(data - 30.) > 20. || diff > 12) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;
@@ -456,5 +467,15 @@ void DQMHistAnalysisPXDTrackChargeModule::endRun()
 void DQMHistAnalysisPXDTrackChargeModule::terminate()
 {
   B2DEBUG(99, "DQMHistAnalysisPXDTrackCharge: terminate called");
-  if (m_refFile) delete m_refFile;
+
+  if (m_rfws) delete m_rfws;
+
+  if (m_cTrackedClusters) delete m_cTrackedClusters;
+  if (m_hTrackedClusters) delete m_hTrackedClusters;
+  if (m_cCharge) delete m_cCharge;
+  if (m_gCharge) delete m_gCharge;
+  if (m_line_up) delete m_line_up;
+  if (m_line_mean) delete m_line_mean;
+  if (m_line_low) delete m_line_low;
+  if (m_fMean) delete m_fMean;
 }

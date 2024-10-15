@@ -33,6 +33,7 @@ namespace Belle2 {
     int m_runno;
     std::string m_runtype;
     std::string m_histodir;
+    std::string m_tmpdir;
     std::string m_instance;
     EvtSocketSend* m_sock;
   };

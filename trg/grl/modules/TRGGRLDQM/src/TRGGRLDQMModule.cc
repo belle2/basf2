@@ -12,6 +12,9 @@
 
 #include "trg/grl/dataobjects/TRGGRLUnpackerStore.h"
 
+#include <TH1F.h>
+#include <TH1I.h>
+#include <TH2F.h>
 #include <TDirectory.h>
 #include <iostream>
 
@@ -95,6 +98,54 @@ void TRGGRLDQMModule::defineHisto()
   h_map_TSF3 = new TH1F("h_map_TSF3",  "CDCTRG TSF3 map [5.625 degrees]", 64, 0, 360);
   h_map_TSF3->GetXaxis()->SetTitle("CDCTRG TSF3 map [5.625 degrees]");
 
+  h_wc_TSF0 = new TH1F("h_wirecnt_TSF0", "The wire counter from TSF 0", 2001, 0, 2000);
+  h_wc_TSF0->GetXaxis()->SetTitle("Number of wires for TSF 0 input");
+  h_wc_TSF1 = new TH1F("h_wirecnt_TSF1", "The wire counter from TSF 1", 2001, 0, 2000);
+  h_wc_TSF1->GetXaxis()->SetTitle("Number of wires for TSF 1 input");
+  h_wc_TSF2 = new TH1F("h_wirecnt_TSF2", "The wire counter from TSF 2", 2001, 0, 2000);
+  h_wc_TSF2->GetXaxis()->SetTitle("Number of wires for TSF 2 input");
+  h_wc_TSF3 = new TH1F("h_wirecnt_TSF3", "The wire counter from TSF 3", 2001, 0, 2000);
+  h_wc_TSF3->GetXaxis()->SetTitle("Number of wires for TSF 3 input");
+  h_wc_TSF4 = new TH1F("h_wirecnt_TSF4", "The wire counter from TSF 4", 2001, 0, 2000);
+  h_wc_TSF4->GetXaxis()->SetTitle("Number of wires for TSF 4 input");
+  h_wc_TSF5 = new TH1F("h_wirecnt_TSF5", "The wire counter from TSF 5", 2001, 0, 2000);
+  h_wc_TSF5->GetXaxis()->SetTitle("Number of wires for TSF 5 input");
+  h_wc_TSF6 = new TH1F("h_wirecnt_TSF6", "The wire counter from TSF 6", 2001, 0, 2000);
+  h_wc_TSF6->GetXaxis()->SetTitle("Number of wires for TSF 6 input");
+  h_wc_sum = new TH1F("h_wirecnt_sum", "The wire counter from TSF0-6", 20001, 0, 20000);
+  h_wc_sum->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
+  h_wcsum_clean = new TH1F("h_wirecnt_sum_clean", "The wire counter from TSF0-6 (Injection BG Clean)", 20001, 0, 20000);
+  h_wcsum_clean->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
+  h_wcsum_injHER = new TH1F("h_wirecnt_sum_injHER", "The wire counter from TSF0-6 (HER Injection BG)", 20001, 0, 20000);
+  h_wcsum_injHER->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
+  h_wcsum_injLER = new TH1F("h_wirecnt_sum_injLER", "The wire counter from TSF0-6 (LER Injection BG)", 20001, 0, 20000);
+  h_wcsum_injLER->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
+
+  h_wc0_injtime = new TH2F("h_wirecnt0_injtime", "The wire counter from TSF 0", 201, 0, 1000, 100, 0, 50);
+  h_wc0_injtime->GetXaxis()->SetTitle("Number of wires for TSF 0 input");
+  h_wc0_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wc1_injtime = new TH2F("h_wirecnt1_injtime", "The wire counter from TSF 1", 201, 0, 1000, 100, 0, 50);
+  h_wc1_injtime->GetXaxis()->SetTitle("Number of wires for TSF 1 input");
+  h_wc1_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wc2_injtime = new TH2F("h_wirecnt2_injtime", "The wire counter from TSF 2", 201, 0, 1000, 100, 0, 50);
+  h_wc2_injtime->GetXaxis()->SetTitle("Number of wires for TSF 2 input");
+  h_wc2_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wc3_injtime = new TH2F("h_wirecnt3_injtime", "The wire counter from TSF 3", 201, 0, 1000, 100, 0, 50);
+  h_wc3_injtime->GetXaxis()->SetTitle("Number of wires for TSF 3 input");
+  h_wc3_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wc4_injtime = new TH2F("h_wirecnt4_injtime", "The wire counter from TSF 4", 201, 0, 1000, 100, 0, 50);
+  h_wc4_injtime->GetXaxis()->SetTitle("Number of wires for TSF 4 input");
+  h_wc4_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wc5_injtime = new TH2F("h_wirecnt5_injtime", "The wire counter from TSF 5", 201, 0, 1000, 100, 0, 50);
+  h_wc5_injtime->GetXaxis()->SetTitle("Number of wires for TSF 5 input");
+  h_wc5_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wc6_injtime = new TH2F("h_wirecnt6_injtime", "The wire counter from TSF 6", 201, 0, 1000, 100, 0, 50);
+  h_wc6_injtime->GetXaxis()->SetTitle("Number of wires for TSF 6 input");
+  h_wc6_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+  h_wcsum_injtime = new TH2F("h_wirecntsum_injtime", "The wire counter from TSF0-6", 601, 0, 6000, 100, 0, 50);
+  h_wcsum_injtime->GetXaxis()->SetTitle("Summation of the number of wires for TSF0-6 inputs");
+  h_wcsum_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
+
   oldDir->cd();
 }
 
@@ -129,6 +180,26 @@ void TRGGRLDQMModule::beginRun()
   h_map_TSF4->Reset();
   h_map_TSF1->Reset();
   h_map_TSF3->Reset();
+
+  h_wc_TSF0->Reset();
+  h_wc_TSF1->Reset();
+  h_wc_TSF2->Reset();
+  h_wc_TSF3->Reset();
+  h_wc_TSF4->Reset();
+  h_wc_TSF5->Reset();
+  h_wc_TSF6->Reset();
+  h_wc_sum->Reset();
+  h_wcsum_clean->Reset();
+  h_wcsum_injHER->Reset();
+  h_wcsum_injLER->Reset();
+  h_wc0_injtime->Reset();
+  h_wc1_injtime->Reset();
+  h_wc2_injtime->Reset();
+  h_wc3_injtime->Reset();
+  h_wc4_injtime->Reset();
+  h_wc5_injtime->Reset();
+  h_wc6_injtime->Reset();
+  h_wcsum_injtime->Reset();
 
   oldDir->cd();
 }
@@ -239,6 +310,72 @@ void TRGGRLDQMModule::event()
     if (evtinfo->get_map_TSF3(i)) {
       h_map_TSF3->Fill(2.8 + i * 360.0 / 64.0);
     }
+  }
+
+  int wcsum = 0, nowcnt;
+
+  const double revotime_in_us = 5.120 / m_hwclkdb->getAcceleratorRF();
+
+  double diff_in_ms, diff_in_us;
+  diff_in_us = m_trgTime->getTimeSinceLastInjectionInMicroSeconds();
+  diff_in_ms = diff_in_us / 1000.;
+
+  nowcnt = evtinfo->get_wirecnt_tsf0();
+  h_wc_TSF0->Fill(nowcnt);
+  h_wc0_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  nowcnt = evtinfo->get_wirecnt_tsf1();
+  h_wc_TSF1->Fill(nowcnt);
+  h_wc1_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  nowcnt = evtinfo->get_wirecnt_tsf2();
+  h_wc_TSF2->Fill(nowcnt);
+  h_wc2_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  nowcnt = evtinfo->get_wirecnt_tsf3();
+  h_wc_TSF3->Fill(nowcnt);
+  h_wc3_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  nowcnt = evtinfo->get_wirecnt_tsf4();
+  h_wc_TSF4->Fill(nowcnt);
+  h_wc4_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  nowcnt = evtinfo->get_wirecnt_tsf5();
+  h_wc_TSF5->Fill(nowcnt);
+  h_wc5_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  nowcnt = evtinfo->get_wirecnt_tsf6();
+  h_wc_TSF6->Fill(nowcnt);
+  h_wc6_injtime->Fill(nowcnt, diff_in_ms);
+  wcsum += nowcnt;
+
+  h_wc_sum->Fill(wcsum);
+  h_wcsum_injtime->Fill(wcsum, diff_in_ms);
+
+  int quotient;
+  double running_in_us;
+  quotient = diff_in_us / revotime_in_us;
+  running_in_us = diff_in_us - quotient * revotime_in_us;
+
+  bool cond_clean, cond_injHER, cond_injLER;
+
+  cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff_in_ms && diff_in_ms < 70);
+
+  cond_injHER =  m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (2 < running_in_us && running_in_us < 3)));
+  cond_injLER = !m_trgTime->isHER() && ((diff_in_ms < 0.5) || ((diff_in_ms < 20) && (1 < running_in_us && running_in_us < 2)));
+
+  if (cond_clean) {
+    h_wcsum_clean->Fill(wcsum);
+  } else if (cond_injHER) {
+    h_wcsum_injHER->Fill(wcsum);
+  } else if (cond_injLER) {
+    h_wcsum_injLER->Fill(wcsum);
   }
 }
 

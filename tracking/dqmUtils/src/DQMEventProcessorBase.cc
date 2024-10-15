@@ -64,7 +64,7 @@ void DQMEventProcessorBase::ProcessTrack(const Track& track)
   RelationVector<CDCHit> cdcHits = DataStore::getRelationsWithObj<CDCHit>(m_recoTrack);
   int nCDCHits = (int)cdcHits.size();
 
-  // This method allways returns TrackFitResult so there's no need to check if it's not nullptr
+  // This method always returns TrackFitResult so there's no need to check if it's not nullptr
   auto trackFitResult = track.getTrackFitResultWithClosestMass(Const::pion);
 
   TString message = ConstructMessage(trackFitResult, nPXDClusters, nSVDClusters, nCDCHits);
@@ -136,7 +136,10 @@ void DQMEventProcessorBase::ProcessRecoHit(RecoHitInformation* recoHitInfo)
   if (!isPXD && !isSVD)
     return;
 
-  auto fitterInfo = m_recoTrack->getCreatedTrackPoint(recoHitInfo)->getFitterInfo();
+  auto trackpoint = m_recoTrack->getCreatedTrackPoint(recoHitInfo);
+  if (!trackpoint)
+    return;
+  auto fitterInfo = trackpoint->getFitterInfo();
   if (!fitterInfo)
     return;
 
@@ -208,7 +211,7 @@ void DQMEventProcessorBase::ProcessSVDRecoHit(RecoHitInformation* recoHitInfo)
 
 void DQMEventProcessorBase::ComputeCommonVariables()
 {
-  auto sensorInfo = &VXD::GeoCache::get(m_sensorID);
+  auto sensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(m_sensorID);
   m_globalResidual_um = sensorInfo->vectorToGlobal(m_residual_um, true);
   ROOT::Math::XYZVector globalPosition = sensorInfo->pointToGlobal(m_position, true);
 

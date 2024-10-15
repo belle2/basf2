@@ -30,7 +30,7 @@ REG_MODULE(EvtGenInput);
 //                 Implementation
 //-----------------------------------------------------------------
 
-EvtGenInputModule::EvtGenInputModule() : Module(),
+EvtGenInputModule::EvtGenInputModule() : GeneratorBaseModule(),
   m_initial(BeamParameters::c_smearALL)
 {
   //Set module properties
@@ -51,7 +51,7 @@ EvtGenInputModule::EvtGenInputModule() : Module(),
 }
 
 
-void EvtGenInputModule::initialize()
+void EvtGenInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
@@ -70,12 +70,11 @@ MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double
 {
   // try to generate the 4 momentum a m_maxTries amount of times before we give up
   for (int i = 0; i < m_maxTries; ++i) {
-    const MCInitialParticles& initial = m_initial.generate();
+    const MCInitialParticles initial = m_initial.generate();
 
     // check if we fullfill the mass window
-    if (initial.getMass() >= minMass && initial.getMass() < maxMass) {
+    if (minMass <= initial.getMass() && initial.getMass() < maxMass)
       return initial;
-    }
   }
 
   //Apparently the beam energies don't match the particle mass we want to generate
@@ -83,32 +82,15 @@ MCInitialParticles  EvtGenInputModule::createBeamParticle(double minMass, double
           << "minMass=" << minMass << " GeV, "
           << "maxMass=" << maxMass << " GeV");
 
-  //This will never be reached, only used to avoid warning
-  return m_initial.generate();
-}
-
-
-// Add colliding electron/positron to the event graph
-static void addInitialParticle(MCParticleGraph& mpg, int pdg, ROOT::Math::PxPyPzEVector p4)
-{
-  MCParticleGraph::GraphParticle& part = mpg.addParticle();
-
-  part.setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_StableInGenerator | MCParticle::c_Initial);
-  part.setMass(Const::electronMass);
-  part.setPDG(pdg);
-
-  part.set4Vector(p4);
-
-  part.setProductionVertex(0, 0, 0);
-  part.setProductionTime(0);
-  part.setValidVertex(false);
+  //This will never be reached so return empty to avoid warning
+  return MCInitialParticles();
 }
 
 
 
 
 
-void EvtGenInputModule::event()
+void EvtGenInputModule::generatorEvent()
 {
   B2DEBUG(10, "Starting event generation");
 
@@ -133,21 +115,11 @@ void EvtGenInputModule::event()
                                  EvtPDL::getMaxMass(m_parentId));
   }
 
-  ROOT::Math::PxPyPzEVector pParentParticle = initial.getLER() + initial.getHER();
-  ROOT::Math::XYZVector primaryVertex = initial.getVertex();
-
   //end initialization
 
-  //clear existing MCParticles
-  mpg.clear();
-
-  // add colliding electron & positron to the event list
-  addInitialParticle(mpg, 11, initial.getHER());
-  addInitialParticle(mpg, -11, initial.getLER());
 
   //generate event.
-  int nPart =  m_Ievtgen.simulateEvent(mpg, pParentParticle, primaryVertex,
-                                       m_inclusiveType, m_inclusiveParticle);
+  int nPart =  m_Ievtgen.simulateEvent(initial, m_inclusiveType, m_inclusiveParticle);
 
   B2DEBUG(10, "EvtGen: generated event with " << nPart << " particles.");
 }

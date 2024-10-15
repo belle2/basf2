@@ -340,6 +340,10 @@ void HitLevelInfoWriterModule::fillDedx(CDCDedxTrack* dedxTrack)
     m_chip = cdcChi[4];
     m_chid = cdcChi[5];
   } else {
+    m_mean = dedxTrack->getDedxMean();
+    m_trunc = dedxTrack->getDedx();
+    m_truncNoSat = dedxTrack->getDedxNoSat();
+    m_error = dedxTrack->getDedxError();
     m_chie = dedxTrack->getChi(0);
     m_chimu = dedxTrack->getChi(1);
     m_chipi = dedxTrack->getChi(2);

@@ -787,7 +787,7 @@ Making your plots pretty
 
 Let's face it, physicists aren't well known for their amazing graphical
 representations, but here's our chance to shine! We can implement matplotlib
-functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://confluence.desy.de/display/BI/Colo%28u%29r+Blind+Friendly+Plots+and+Displays>`_!
+functions to make our plots GREAT. You can even choose a `colourblind friendly colour scheme <https://xwiki.desy.de/xwiki/rest/p/a2fdc>`_!
 
 It is possible to display multiple plots at once using ``plt.subplots``. As you can see
 below, rather than simply having our histograms show up using ``plt``, we define a
@@ -1050,7 +1050,7 @@ However, your python journey has just begun and there's a lot to learn.
 
 .. seealso::
 
-  We have started to compile a reading list for python `on confluence <https://confluence.desy.de/x/ARC3Cg>`_.
+  We have started to compile a reading list for python `on XWiki <https://xwiki.desy.de/xwiki/rest/p/9bd7e>`_.
   Please help us extend it!
 
 .. include:: ../lesson_footer.rstinclude

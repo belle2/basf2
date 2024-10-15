@@ -1,0 +1,22 @@
+# EventType: 1220910001
+# Descriptor: [B0 -> K*+ tau+ e-]cc
+# NickName: Bd_Kstptaue
+# Documentation: LFV b->sll' process
+# Tested: Yes
+# PhysicsWG: EWP
+# Responsible: Pablo Goldenzweig
+# Email: pablo.goldenzweig@kit.edu
+# Cuts: None
+# Date: 20240916 
+#
+Decay Upsilon(4S)
+0.5 B+sig B- VSS;
+0.5 B-sig B+ VSS;
+Enddecay
+#
+Decay B+sig
+1.000        K*+    tau+    e-           PHSP;
+Enddecay
+CDecay B-sig
+#
+End

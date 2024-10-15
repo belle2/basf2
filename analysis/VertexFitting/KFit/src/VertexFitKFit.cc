@@ -511,7 +511,7 @@ VertexFitKFit::doFit4() {
   m_V_al_1 = m_V_al_0 - m_V_al_0 * (m_D.T()) * m_V_Dt * m_D * m_V_al_0;
   m_Cov_v_al_1 = -m_BeamError * (m_E.T()) * m_V_Dt * m_D * m_V_al_0;
   // m_V_v is m_V_E
-  // --> need to replace m_V_E for my implimentaion.
+  // --> need to replace m_V_E for my implementation.
   m_V_E = m_BeamError - m_BeamError * (m_E.T()) * m_V_Dt * m_E * m_BeamError;
 
   if (prepareOutputMatrix() != KFitError::kNoError) return m_ErrorCode;

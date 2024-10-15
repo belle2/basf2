@@ -17,25 +17,34 @@ HistDelta::HistDelta(EDeltaType t, int p, unsigned int a)
   m_type = t;
   m_parameter = p;
   m_amountDeltas = a;
+  m_lastHist = nullptr; // implied
+  m_lastValue = 0; // implied
+}
+
+HistDelta::~HistDelta()
+{
   m_lastHist = nullptr;
-  m_lastValue = 0;
-};
+  m_deltaHists.clear();
+}
 
 void HistDelta::set(EDeltaType t, int p, unsigned int a)
 {
   m_type = t;
   m_parameter = p;
   m_amountDeltas = a;
-};
+  m_lastHist = nullptr;
+  m_lastValue = 0;
+  m_deltaHists.clear();
+}
 
-void HistDelta::update(TH1* currentHist)
+void HistDelta::update(const TH1* currentHist)
 {
   m_updated = false;
-  if (currentHist == nullptr) return; // this wont make sense
+  if (currentHist == nullptr) return; // this won't make sense
   gROOT->cd(); // make sure we dont accidentally write the histograms to a open file
   // cover first update after start
   if (m_lastHist == nullptr) {
-    m_lastHist = (TH1*)currentHist->Clone();
+    m_lastHist = std::unique_ptr<TH1> ((TH1*)(currentHist->Clone()));
     m_lastHist->SetName(TString(currentHist->GetName()) + "_last");
     m_lastHist->Reset();
     m_updated = true;
@@ -65,17 +74,16 @@ void HistDelta::update(TH1* currentHist)
 
   if (need_update) {
     m_updated = true;
-    TH1* delta = (TH1*)currentHist->Clone();
-    delta->Add(m_lastHist, -1.);
+    auto delta = (TH1*)currentHist->Clone();
+    delta->SetName(TString(delta->GetName()) + "_delta");
+    delta->Add(m_lastHist.get(), -1.);
 
     // we use this as a fifo, but cannot use queue as we need the random access
     // maybe use deque?
     m_deltaHists.emplace(m_deltaHists.begin(), delta);
     if (m_deltaHists.size() > m_amountDeltas) {
       // remove (and delete) last element
-      auto h = m_deltaHists.back();
       m_deltaHists.erase(m_deltaHists.begin() + m_deltaHists.size() - 1);
-      if (h) delete h;
     }
     m_lastHist->Reset();
     m_lastHist->Add(currentHist);
@@ -91,15 +99,14 @@ void HistDelta::update(TH1* currentHist)
 
 void HistDelta::reset(void)
 {
-  // m_deltaHists.clear(); // loop and delete? to be checked what is left in memory
-  // by intention, we may not want to delete old m_deltaHists, thus having them from m_lastHist run? tbd
+  m_deltaHists.clear();
   if (m_lastHist) m_lastHist->Reset();
-  m_updated = true;
+  m_lastValue = 0;
 }
 
-TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated)
+TH1* HistDelta::getDelta(unsigned int n, bool onlyIfUpdated) const
 {
   if (onlyIfUpdated && !m_updated) return nullptr;// not updated, but requested
   if (n >= m_deltaHists.size()) return nullptr;
-  return m_deltaHists.at(n);
+  return m_deltaHists.at(n).get();
 }

@@ -129,6 +129,8 @@ namespace Belle2 {
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
     std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
     std::string m_refNamePhi = ""; /**< reference histogram of phi */
+    double m_firstEffBoundary = 0.08; /** <The first boundary of the efficiency range */
+    double m_secondEffBoundary = 0.72; /** <The second boundary of the efficiency range */
 
     TFile* m_fileRefPhi = nullptr; /**< reference histogram file point */
     TH2F* m_histref_phiindex = nullptr; /**< for above*/

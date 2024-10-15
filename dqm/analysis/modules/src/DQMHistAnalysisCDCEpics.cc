@@ -32,6 +32,8 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   addParam("RefFilePhi", m_refNamePhi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
   addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("ref/CDC/default"));
   addParam("MinEvt", m_minevt, "Min events for intra-run point", 20000);
+  addParam("FirstEffBoundary", m_firstEffBoundary, "The first boundary of the efficiency range", m_firstEffBoundary);
+  addParam("SecondEffBoundary", m_secondEffBoundary, "The second boundary of the efficiency range", m_secondEffBoundary);
   for (int i = 0; i < 300; i++) {
     m_hADCs[i] = nullptr;
     m_hTDCs[i] = nullptr;
@@ -84,7 +86,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   m_hist_efficiency[2] = (TH2Poly*)m_hist_efficiency[0]->Clone();
   m_hist_efficiency[2]->SetNameTitle("CDC/hist_layerEfficiency", "hist_layerEfficiency;X [cm];Y [cm]; Efficiency");
   m_hist_efficiency[2]->SetDirectory(gDirectory);
-  m_hist_cellEffi = new TH1F("CDC/hist_cellEffi", "hist_cellEffi;Cell Efficiency;Cell / bin", 104, -0.02, 1.02);
+  m_hist_cellEffi = new TH1F("CDC/hist_cellEffi", "hist_cellEffi;Cell Efficiency;Cell / bin", 208, -0.02, 1.02);
   m_hist_cellEffi->GetYaxis()->SetTitleOffset(1.4);
 
   if (!hasDeltaPar(m_histoDir, m_histoADC))
@@ -334,15 +336,15 @@ void DQMHistAnalysisCDCEpicsModule::event()
     c_hist_efficiency->cd(3);
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
     double meanEffiValue = 0;
-    int effiValues = 0;
+    int nEffiValues = 0;
     for (int ij = 0; ij < m_hist_efficiency[2]->GetNumberOfBins(); ij++) {
       if (m_hist_efficiency[1]->GetBinContent(ij + 1) == 0) continue;
       double binEffi = m_hist_efficiency[2]->GetBinContent(ij + 1);
       m_hist_cellEffi->Fill(binEffi);
       meanEffiValue += binEffi;
-      effiValues++;
+      nEffiValues++;
     }
-    if (effiValues) meanEffiValue /= effiValues;
+    if (nEffiValues) meanEffiValue /= nEffiValues;
     m_hist_efficiency[2]->SetMinimum(0.0);
     m_hist_efficiency[2]->SetMaximum(1.0);
     m_hist_efficiency[2]->SetStats(0);
@@ -351,14 +353,20 @@ void DQMHistAnalysisCDCEpicsModule::event()
     latex.SetTextSize(0.025);
     latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanEffiValue * 100.0));
     c_hist_efficiency->cd(4);
-    int bin24 = m_hist_cellEffi->GetXaxis()->FindBin(0.25) - 1;
-    double below25 = m_hist_cellEffi->Integral(1, bin24) / m_hist_cellEffi->GetEntries();
-    int bin64 = m_hist_cellEffi->GetXaxis()->FindBin(0.65) - 1;
-    double below65 = m_hist_cellEffi->Integral(1, bin64) / m_hist_cellEffi->GetEntries() - below25;
-    m_hist_cellEffi->SetStats(0);
-    m_hist_cellEffi->Draw();
-    latex.DrawLatexNDC(0.15, 0.84, TString::Format("%.3f%% : 25%% < cell < 65%%", below65 * 100));
-    latex.DrawLatexNDC(0.15, 0.87, TString::Format("%.3f%% : cell < 25%%", below25 * 100));
+    if (nEffiValues) {
+      int firstBoundaryBin = m_hist_cellEffi->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
+      double belowFirstBoundary = m_hist_cellEffi->Integral(1, firstBoundaryBin) / nEffiValues;
+      int secondBoundaryBin = m_hist_cellEffi->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
+      double belowSecondBoundary = m_hist_cellEffi->Integral(firstBoundaryBin + 1, secondBoundaryBin) / nEffiValues;
+      m_hist_cellEffi->SetStats(0);
+      m_hist_cellEffi->Draw();
+      latex.DrawLatexNDC(0.15, 0.87, TString::Format("%06.3f%% cell : eff < %.2f",
+                                                     belowFirstBoundary * 100,
+                                                     m_firstEffBoundary));
+      latex.DrawLatexNDC(0.15, 0.84, TString::Format("%06.3f%% cell : %.2f < eff < %.2f",
+                                                     belowSecondBoundary * 100,
+                                                     m_firstEffBoundary, m_secondEffBoundary));
+    }
     c_hist_efficiency->Update();
     UpdateCanvas(c_hist_efficiency);
   }

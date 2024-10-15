@@ -41,7 +41,7 @@ void SegmentCreatorMCTruth::exposeParameters(ModuleParamList* moduleParamList, c
   moduleParamList->addParameter(prefixed(prefix, "reconstructedPositions"),
                                 m_param_reconstructedPositions,
                                 "Switch to reconstruct the positions in the segments "
-                                "immitating the facet ca picking up all correct hits.",
+                                "imitating the facet ca picking up all correct hits.",
                                 m_param_reconstructedPositions);
 }
 

@@ -76,7 +76,7 @@ geometry.param('components', ['BeamPipe',
 path.add_module(geometry)
 
 
-# VXDTF2: Including actual VXDTF2 Modul Chain
+# VXDTF2: Including actual VXDTF2 Module Chain
 setup_VXDTF2(path=path,
              use_pxd=usePXD,
              sec_map_file=secmap_name,

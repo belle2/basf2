@@ -52,7 +52,7 @@ namespace Belle2 {
       Weight operator()(const Object& obj) override;
 
     public:
-      /// Steal the set of variables form this filter - filter becomes disfunctional afterwards.
+      /// Steal the set of variables form this filter - filter becomes dysfunctional afterwards.
       std::unique_ptr<AVarSet> releaseVarSet()&& ;
 
     protected:
@@ -74,7 +74,7 @@ namespace Belle2 {
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Convience template to create a filter operating on a specific set of variables.
+    /// Convenience template to create a filter operating on a specific set of variables.
     template<class AVarSet>
     class FilterOnVarSet: public OnVarSet<Filter<typename AVarSet::Object> > {
 

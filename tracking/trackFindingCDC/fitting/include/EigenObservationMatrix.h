@@ -38,7 +38,7 @@ namespace Belle2 {
     EigenObservationMatrix getEigenObservationMatrix(CDCSZObservations* szObservations);
 
     /**
-     *  Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for
+     *  Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengths as relevant for
      circle fits.
      *
      *  Cumulates weights, x positions, y positions, quadratic cylindrical radii and signed drift
@@ -68,10 +68,10 @@ namespace Belle2 {
     Eigen::Matrix<double, 5, 5> getWXYRLSumMatrix(CDCObservations2D& observations2D);
 
     /**
-     *  Constructs a symmetric matrix of weighted sums of x, y and drift lengts as relevant for line
+     *  Constructs a symmetric matrix of weighted sums of x, y and drift lengths as relevant for line
      * fits.
      *
-     *  Cumulates weights, x positions, y positions and signed drift legnths and products thereof
+     *  Cumulates weights, x positions, y positions and signed drift lengths and products thereof
      *  @returns symmetric matrix s with the following:
      *  * \f$ s_{00} = \sum w \f$
      *  * \f$ s_{01} = \sum x * w \f$

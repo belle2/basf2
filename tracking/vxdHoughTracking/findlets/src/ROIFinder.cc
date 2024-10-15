@@ -35,7 +35,7 @@ void ROIFinder::exposeParameters(ModuleParamList* moduleParamList, const std::st
   Super::exposeParameters(moduleParamList, prefix);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "calculateROI"), m_calculateROI,
-                                "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straigh line extrapolation (z, theta)?",
+                                "Calculate PXDIntercepts and ROIs in this findlet based on a simple circle extrapolation (r-phi) and straight line extrapolation (z, theta)?",
                                 m_calculateROI);
 
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "storePXDInterceptsName"), m_storePXDInterceptsName,

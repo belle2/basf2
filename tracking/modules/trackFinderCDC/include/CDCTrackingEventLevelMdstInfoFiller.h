@@ -33,7 +33,7 @@ namespace Belle2 {
       /// Getter for the module description
       std::string getDescription() final;
 
-      /// Signal the begining of the event processing
+      /// Called at the beginning of the event processing
       void initialize() final;
 
     public:
@@ -41,7 +41,7 @@ namespace Belle2 {
       void apply(const std::vector<CDCWireHit>& inputWireHits) final;
 
     private:
-      /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+      /** Access to the EventLevelTrackingInfo object in the datastore. */
       StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
     };
 
@@ -57,7 +57,7 @@ namespace Belle2 {
       /// Getter for the module description
       std::string getDescription() final;
 
-      /// Signal the begining of the event processing
+      /// Called at the beginning of the event processing
       void initialize() final;
 
     public:
@@ -65,7 +65,7 @@ namespace Belle2 {
       void apply(const std::vector<CDCSegment2D>& inputSegment2Ds) final;
 
     private:
-      /** Acccess to the EventLevelTrackingInfo object in the datastore. */
+      /** Access to the EventLevelTrackingInfo object in the datastore. */
       StoreObjPtr<EventLevelTrackingInfo> m_eventLevelTrackingInfo;
     };
 

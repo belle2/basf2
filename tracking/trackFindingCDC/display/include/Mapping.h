@@ -75,7 +75,7 @@ namespace Belle2 {
       {
       }
 
-      /// Return the a value from the cycle value according to the given inded
+      /// Return a value from the cycle value according to the given index
       std::string map(int index, T& t __attribute__((unused))) override
       {
         assert(index >= 0);

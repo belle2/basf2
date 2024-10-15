@@ -44,7 +44,7 @@ namespace Belle2 {
         : m_szLine(tanLambda, z0, getBasicSZCovariance())
       {}
 
-      /// Constucts a basic assumption, what the z0 start position and the sz slope are, including some broad values for the covariance matrix.
+      /// Constructs a basic assumption, what the z0 start position and the sz slope are, including some broad values for the covariance matrix.
       static CDCTrajectorySZ basicAssumption();
 
       /// Translates the travel distance to the z coordinate
@@ -52,37 +52,37 @@ namespace Belle2 {
       { return getSZLine()->map(s); }
 
       /**
-       *  Translates the absolute value of the transvers momentum to the momentum in z direction.
-       *  Scales the absolute value of  the transvers momentum to the z component of the momentum
+       *  Translates the absolute value of the transverse momentum to the momentum in z direction.
+       *  Scales the absolute value of  the transverse momentum to the z component of the momentum
        *  vector. The z component comes with the correct sign as reflected by increasing or
-       *  decreasing z component. Note : This assumes s to be the transvers travel distance.
+       *  decreasing z component. Note : This assumes s to be the transverse travel distance.
        */
       double mapPtToPz(const double pt) const
       { return getSZLine()->slope() * pt; }
 
-      /// Calculates the distance along between the given point an the sz trajectory.
+      /// Calculates the distance along between the given point at the sz trajectory.
       double getZDist(const double s, const double z) const
       { return mapSToZ(s) - z; }
 
       /**
        *  Gets the signed distance of the sz point to the line in the sz plane
        *  This gives the signed distance of a given point in the sy plane \n
-       *  Errors in s and z are equaly weighted in this distance \n
+       *  Errors in s and z are equally weighted in this distance \n
        *  ( which might be an incorrect choice to fit to ).
        *  The plus sign mean the point is below the line. For minus it is above.
-       *  The later is naturally choosen as the direction of positiv advance is \n
-       *  coaligned with the s axes
+       *  The later is naturally chosen as the direction of positive advance is \n
+       *  coalined with the s axes
        */
       double getSZDist(const double s, const double z) const
       { return getSZLine()->distance(Vector2D(s, z)) ; }
 
       /**
        *  Passively Shift the s coordinate by the amount given.
-       *  Adjust all transvers travel distance measurements by deltaS. \n
+       *  Adjust all transverse travel distance measurements by deltaS. \n
        *  The old values of s before the shift corresponds the new scale \n
        *  like old_s - deltaS = new_s. This corresponds to an passive transformation \n
        *  of s by deltaS. This can be used in conjunction with the return value of \n
-       *  CDCTrajectory2D::setStartPos2D() in order to move the transvers travel distance \n
+       *  CDCTrajectory2D::setStartPos2D() in order to move the transverse travel distance \n
        *  by the same amount in both trajectories.
        */
       void passiveMoveS(const double deltaS)

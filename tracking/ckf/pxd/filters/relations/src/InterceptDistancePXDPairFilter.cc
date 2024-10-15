@@ -100,7 +100,7 @@ InterceptDistancePXDPairFilter::operator()(const std::pair<const CKFToPXDState*,
 void InterceptDistancePXDPairFilter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "ptThresholdTrackToHitCut"), m_param_PtThresholdTrackToHitCut,
-                                "Treshold on pT to apply inverse pT scale on cut value.",
+                                "Threshold on pT to apply inverse pT scale on cut value.",
                                 m_param_PtThresholdTrackToHitCut);
   moduleParamList->addParameter(TrackFindingCDC::prefixed(prefix, "phiInterceptToHitCut"), m_param_PhiInterceptToHitCut,
                                 "Cut in phi for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state.",

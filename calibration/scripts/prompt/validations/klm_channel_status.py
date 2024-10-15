@@ -26,13 +26,48 @@ settings = ValidationSettings(name='KLM channel status',
                                   "chunk_size": 100
                               })
 
-if __name__ == '__main__':
+
+def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('job_path')
     parser.add_argument('input_data_path')
     parser.add_argument('requested_iov')
     parser.add_argument('expert_config')
-    args = parser.parse_args()
+    return parser.parse_args()
+
+
+def plot(run_num_arry, eklm_dead_arry, eklm_hot_arry, bklm_dead_arry, bklm_hot_arry,
+         fname='plots.pdf', drawLims=False):
+    fig, axs = plt.subplots(2, 2, sharex=True)
+    axs = axs.ravel()
+
+    axs[0].plot(run_num_arry, eklm_dead_arry, '.', color='C0')
+    axs[0].set_ylabel("EKLM dead channels")
+    axs[0].set_xlabel("Run numbers")
+
+    axs[1].plot(run_num_arry, eklm_hot_arry, '.', color='C1')
+    axs[1].set_ylabel("EKLM hot channels")
+    axs[1].set_xlabel("Run numbers")
+
+    axs[2].plot(run_num_arry, bklm_dead_arry, '.', color='C0')
+    axs[2].set_ylabel("BKLM dead channels")
+    axs[2].set_xlabel("Run numbers")
+
+    axs[3].plot(run_num_arry, bklm_hot_arry, '.', color='C1')
+    axs[3].set_ylabel("BKLM hot channels")
+    axs[3].set_xlabel("Run numbers")
+
+    if drawLims:
+        axs[0].axhline(300, ls='--', color='r')
+        axs[1].axhline(8, ls='--', color='r')
+        axs[2].axhline(300, ls='--', color='r')
+        axs[3].axhline(8, ls='--', color='r')
+
+    fig.savefig(fname)
+
+
+if __name__ == '__main__':
+    args = parse_args()
     job_path = args.job_path
     input_data_path = args.input_data_path
     requested_iov = args.requested_iov
@@ -140,30 +175,4 @@ if __name__ == '__main__':
     tree.Write()
     outfile.Close()
 
-    fig, axs = plt.subplots(2, 2, sharex=True)
-    axs = axs.ravel()
-
-    axs[0].plot(run_num_arry, eklm_dead_arry, '.', color='C0')
-    axs[0].set_ylabel("EKLM dead channels")
-    axs[0].set_xlabel("Run numbers")
-
-    axs[1].plot(run_num_arry, eklm_hot_arry, '.', color='C1')
-    axs[1].set_ylabel("EKLM hot channels")
-    axs[1].set_xlabel("Run numbers")
-
-    axs[2].plot(run_num_arry, bklm_dead_arry, '.', color='C0')
-    axs[2].set_ylabel("BKLM dead channels")
-    axs[2].set_xlabel("Run numbers")
-
-    axs[3].plot(run_num_arry, bklm_hot_arry, '.', color='C1')
-    axs[3].set_ylabel("BKLM hot channels")
-    axs[3].set_xlabel("Run numbers")
-
-    drawLims = False
-    if drawLims:
-        axs[0].axhline(300, ls='--', color='r')
-        axs[1].axhline(8, ls='--', color='r')
-        axs[2].axhline(300, ls='--', color='r')
-        axs[3].axhline(8, ls='--', color='r')
-
-    fig.savefig('plots.pdf')
+    plot(run_num_arry, eklm_dead_arry, eklm_hot_arry, bklm_dead_arry, bklm_hot_arry)

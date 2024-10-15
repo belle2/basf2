@@ -38,11 +38,11 @@ REG_MODULE(TRGGDLSummary);
 TRGGDLSummaryModule::TRGGDLSummaryModule()
   : Module::Module()
 {
-
   setDescription("Fill experiment data to TRGSummary");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("debugLevel", _debugLevel, "Debug Level", 0);
-
+  addParam("inputBitsWithPSNMTiming", e_inBitsWithPSNMTiming, "List of input bits to judge triggering with the PSNM timings.", {"passive_veto", "cdc_veto", "ecl_veto", "cdcecl_veto", "injv", "veto"});
+  addParam("outputBitsWithPSNMTiming", e_outBitsWithPSNMTiming, "List of output bits to judge triggering with the PSNM timings.", {});
 }
 
 void TRGGDLSummaryModule::initialize()
@@ -100,6 +100,38 @@ void TRGGDLSummaryModule::initialize()
     if (strcmp(LeafNames[i], "itd9") == 0)   ee_itd[9] = LeafBitMap[i];
   }
 
+  for (unsigned int i = 0; i < TRGSummary::c_ntrgWords; i++) {
+    e_inBitWPTMasks[i] = 0;
+    e_outBitWPTMasks[i] = 0;
+  }
+
+  for (const auto& nowbn : e_inBitsWithPSNMTiming) {
+    unsigned int nowbit;
+    try {
+      nowbit = GDLResult->getInputBitNumber(nowbn);
+    } catch (std::invalid_argument& e) {
+      B2WARNING("The input bitname '" << nowbn << "' is not in the input bitname list! This bitname will be skipped!");
+      continue;
+    };
+    int iWord = nowbit / TRGSummary::c_trgWordSize;
+    int iBit = nowbit % TRGSummary::c_trgWordSize;
+
+    e_inBitWPTMasks[iWord] |= (1u << iBit);
+  }
+
+  for (const auto& nowbn : e_outBitsWithPSNMTiming) {
+    unsigned int nowbit;
+    try {
+      nowbit = GDLResult->getOutputBitNumber(nowbn);
+    } catch (std::invalid_argument& e) {
+      B2WARNING("The output bitname '" << nowbn << "' is not in the FTDL bitname list! This bitname will be skipped!");
+      continue;
+    };
+    int iWord = nowbit / TRGSummary::c_trgWordSize;
+    int iBit = nowbit % TRGSummary::c_trgWordSize;
+
+    e_outBitWPTMasks[iWord] |= (1u << iBit);
+  }
 
   if (_debugLevel > 9) printf("TRGGDLSummaryModule::initialize() end\n");
 }
@@ -167,7 +199,27 @@ void TRGGDLSummaryModule::event()
 
   GDLResult.create(true);
 
-  unsigned ored = 0;
+  // reg_tmdl_timtype in header. 3bit, no quality info.
+  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];
+  unsigned int ored = 0;
+
+  int psnmClk = n_clocks;
+  int l1timstart, l1timend;
+  bool l1timfound;
+  switch (gtt) {
+    case GDL::e_tt_top:
+    case GDL::e_tt_ecl:
+    case GDL::e_tt_cdc:
+      l1timfound = true;
+      l1timstart = 8;
+      l1timend = 25;
+      break;
+    default:
+      l1timfound = false;
+      l1timstart = n_clocks;
+      l1timend = n_clocks;
+      break;
+  }
 
   for (int j = 0; j < (int)nword_input; j++) {
     if (_debugLevel > 89) printf("b:j(%d),", j);
@@ -200,10 +252,22 @@ void TRGGDLSummaryModule::event()
     GDLResult->setPsnmBits(0, ored);
 
     ored = 0;
+    for (int clk = l1timstart; ored == 0 && clk < l1timend; clk++) {
+      ored |= _data[ee_psn[0]][clk];
+      if (ored != 0) psnmClk = std::min(clk, psnmClk);
+    }
+
+    ored = 0;
     for (int clk = 0; clk < n_clocks; clk++) {
       ored |= (_data[ee_psn[2]][clk] << 16) + _data[ee_psn[1]][clk];
     }
     GDLResult->setPsnmBits(1, ored);
+
+    ored = 0;
+    for (int clk = l1timstart; ored == 0 && clk < l1timend; clk++) {
+      ored |= (_data[ee_psn[2]][clk] << 16) + _data[ee_psn[1]][clk];
+      if (ored != 0) psnmClk = std::min(clk, psnmClk);
+    }
   } else {
     for (int j = 0; j < (int)nword_output; j++) {
       ored = 0;
@@ -219,11 +283,46 @@ void TRGGDLSummaryModule::event()
         ored |= _data[ee_psn[j]][clk];
       }
       GDLResult->setPsnmBits(j, ored);
+
+      ored = 0;
+      for (int clk = l1timstart; ored == 0 && clk < l1timend; clk++) {
+        ored |= _data[ee_psn[j]][clk];
+        if (ored != 0) psnmClk = std::min(clk, psnmClk);
+      }
     }
   }
 
-  // reg_tmdl_timtype in header. 3bit, no quality info.
-  GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];
+  if (l1timfound) {
+    for (int i = 0; i < nword_input; i++) {
+      unsigned int nowmask = e_inBitWPTMasks[i];
+      if (nowmask == 0) continue;
+      else ored = nowmask;
+
+      for (int clk = psnmClk - 1; ored != 0 && clk <= psnmClk; clk++)
+        ored &= (_data[ee_itd[i]][clk] & nowmask);
+
+      if (ored != nowmask) {
+        unsigned int ibits = GDLResult->getInputBits(i);
+        unsigned int result_mask = ~nowmask | ored;
+        GDLResult->setInputBits(i, ibits & result_mask);
+      }
+    }
+
+    for (int i = 0; i < nword_output; i++) {
+      unsigned int nowmask = e_outBitWPTMasks[i];
+      if (nowmask == 0) continue;
+      else ored = nowmask;
+
+      for (int clk = psnmClk - 1; ored != 0 && clk <= psnmClk; clk++)
+        ored &= (_data[ee_ftd[i]][clk] & nowmask);
+
+      if (ored != nowmask) {
+        unsigned int fbits = GDLResult->getFtdlBits(i);
+        unsigned int result_mask = ~nowmask | ored;
+        GDLResult->setFtdlBits(i, fbits & result_mask);
+      }
+    }
+  }
 
   //get prescales
   for (int i = 0; i < 320; i++) {
@@ -295,5 +394,4 @@ void TRGGDLSummaryModule::event()
     }
   }
   GDLResult->setTimType(tt);
-
 }

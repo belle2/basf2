@@ -292,7 +292,9 @@ void TRGGDLSummaryModule::event()
     }
   }
 
-  if (l1timfound) {
+  if (psnmClk <= 0) psnmClk = 1;
+
+  if (l1timfound && psnmClk < 32) {
     for (int i = 0; i < nword_input; i++) {
       unsigned int nowmask = e_inBitWPTMasks[i];
       if (nowmask == 0) continue;

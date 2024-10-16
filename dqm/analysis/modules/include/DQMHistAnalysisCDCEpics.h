@@ -113,7 +113,7 @@ namespace Belle2 {
 
     TCanvas* c_hist_efficiency = nullptr; /**< canvas for layer efficiency */
     TH2Poly* m_hist_efficiency[3] = {nullptr}; /**< for above*/
-    TH1F* m_hist_cellEffi = nullptr; /**< for above*/
+    TH1F* m_hist_cellEff1D = nullptr; /**< for above*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
@@ -125,7 +125,7 @@ namespace Belle2 {
     std::string m_histoTDC = ""; /**< TDC histogram names of CDC DQMs */
     std::string m_histoPhiIndex = ""; /**< Phi Inedx histogram names of CDC DQMs */
     std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
-    std::string m_histoLayEff = ""; /**< Layer Eff histogram names of CDC DQMs */
+    std::string m_histoCellEff = ""; /**< Cell Eff histogram names of CDC DQMs */
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
     std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
     std::string m_refNamePhi = ""; /**< reference histogram of phi */

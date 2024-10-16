@@ -27,7 +27,7 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   addParam("HistTDC", m_histoTDC, "TDC Histogram Name", std::string("hTDC"));
   addParam("HistPhiIndex", m_histoPhiIndex, "Phi Index Histogram Name", std::string("hPhiIndex"));
   addParam("HistPhiEff", m_histoPhiEff, "Phi Eff Histogram Name", std::string("hPhiEff"));
-  addParam("HistLayEff", m_histoLayEff, "Layer Eff Histogram Name", std::string("h2EffiHisto"));
+  addParam("HistCellEff", m_histoCellEff, "Cell Eff Histogram Name", std::string("hCellEff"));
   addParam("PvPrefix", m_pvPrefix, "PV Prefix and Name", std::string("CDC:"));
   addParam("RefFilePhi", m_refNamePhi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
   addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("ref/CDC/default"));
@@ -77,17 +77,17 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 360, -180.0, 180.0);
 
   c_hist_efficiency = new TCanvas("CDC/c_hist_efficiency", "c_hist_efficiency", 840, 800);
-  m_hist_efficiency[0] = createEffiTH2Poly("CDC/hist_observedHits", "hist_observedHits;X [cm];Y [cm]; Track / bin");
+  m_hist_efficiency[0] = createEffiTH2Poly("CDC/hist_observedCellHits", "hist_observedCellHits;X [cm];Y [cm]; Track / bin");
   m_hist_efficiency[0]->GetYaxis()->SetTitleOffset(1.4);
   m_hist_efficiency[0]->SetDirectory(gDirectory);
   m_hist_efficiency[1] = (TH2Poly*)m_hist_efficiency[0]->Clone();
-  m_hist_efficiency[1]->SetNameTitle("CDC/hist_expectedHits", "hist_expectedHits;X [cm];Y [cm]; Track / bin");
+  m_hist_efficiency[1]->SetNameTitle("CDC/hist_expectedCellHits", "hist_expectedCellHits;X [cm];Y [cm]; Track / bin");
   m_hist_efficiency[1]->SetDirectory(gDirectory);
   m_hist_efficiency[2] = (TH2Poly*)m_hist_efficiency[0]->Clone();
-  m_hist_efficiency[2]->SetNameTitle("CDC/hist_layerEfficiency", "hist_layerEfficiency;X [cm];Y [cm]; Efficiency");
+  m_hist_efficiency[2]->SetNameTitle("CDC/hist_cellEfficiency", "hist_cellEfficiency;X [cm];Y [cm]; Efficiency");
   m_hist_efficiency[2]->SetDirectory(gDirectory);
-  m_hist_cellEffi = new TH1F("CDC/hist_cellEffi", "hist_cellEffi;Cell Efficiency;Cell / bin", 208, -0.02, 1.02);
-  m_hist_cellEffi->GetYaxis()->SetTitleOffset(1.4);
+  m_hist_cellEff1D = new TH1F("CDC/hist_cellEfficiency1D", "hist_cellEfficiency1D;Cell Efficiency;Cell / bin", 208, -0.02, 1.02);
+  m_hist_cellEff1D->GetYaxis()->SetTitleOffset(1.4);
 
   if (!hasDeltaPar(m_histoDir, m_histoADC))
     addDeltaPar(m_histoDir, m_histoADC, HistDelta::c_Entries, m_minevt, 1);
@@ -101,8 +101,8 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   if (!hasDeltaPar(m_histoDir, m_histoPhiEff))
     addDeltaPar(m_histoDir, m_histoPhiEff, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoLayEff))
-    addDeltaPar(m_histoDir, m_histoLayEff, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_histoDir, m_histoCellEff))
+    addDeltaPar(m_histoDir, m_histoCellEff, HistDelta::c_Entries, m_minevt, 1);
 
   registerEpicsPV(m_pvPrefix + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_pvPrefix + "cdcboards_wtdc", "tdcboards");
@@ -321,12 +321,12 @@ void DQMHistAnalysisCDCEpicsModule::event()
     UpdateCanvas(c_hist_effphi);
   }
 
-  // get layer efficiency
+  // get cell efficiency
   double meanCellEff = 0;
   double cellsWithLowEff = 0;
   double cellsWithMidEff = 0;
   double cellsWithHighEff = 0;
-  auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoLayEff, 0, true); //true=only if updated
+  auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoCellEff, 0, true); //true=only if updated
   c_hist_efficiency->Clear();
   if (m_delta_efflay) {
     fillEffiTH2Poly(m_delta_efflay, m_hist_efficiency[0], m_hist_efficiency[1], m_hist_efficiency[2]);
@@ -345,7 +345,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     for (int ij = 0; ij < m_hist_efficiency[2]->GetNumberOfBins(); ij++) {
       if (m_hist_efficiency[1]->GetBinContent(ij + 1) == 0) continue;
       double binEffi = m_hist_efficiency[2]->GetBinContent(ij + 1);
-      m_hist_cellEffi->Fill(binEffi);
+      m_hist_cellEff1D->Fill(binEffi);
       meanCellEff += binEffi;
       nEffiValues++;
     }
@@ -359,13 +359,13 @@ void DQMHistAnalysisCDCEpicsModule::event()
     latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanCellEff * 100.0));
     c_hist_efficiency->cd(4);
     if (nEffiValues) {
-      int firstBoundaryBin = m_hist_cellEffi->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
-      cellsWithLowEff = m_hist_cellEffi->Integral(1, firstBoundaryBin) / nEffiValues;
-      int secondBoundaryBin = m_hist_cellEffi->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
-      cellsWithMidEff = m_hist_cellEffi->Integral(firstBoundaryBin + 1, secondBoundaryBin) / nEffiValues;
-      cellsWithHighEff =  m_hist_cellEffi->Integral(secondBoundaryBin + 1, m_hist_cellEffi->GetNbinsX()) / nEffiValues;
-      m_hist_cellEffi->SetStats(0);
-      m_hist_cellEffi->Draw();
+      int firstBoundaryBin = m_hist_cellEff1D->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
+      cellsWithLowEff = m_hist_cellEff1D->Integral(1, firstBoundaryBin) / nEffiValues;
+      int secondBoundaryBin = m_hist_cellEff1D->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
+      cellsWithMidEff = m_hist_cellEff1D->Integral(firstBoundaryBin + 1, secondBoundaryBin) / nEffiValues;
+      cellsWithHighEff =  m_hist_cellEff1D->Integral(secondBoundaryBin + 1, m_hist_cellEff1D->GetNbinsX()) / nEffiValues;
+      m_hist_cellEff1D->SetStats(0);
+      m_hist_cellEff1D->Draw();
       latex.DrawLatexNDC(0.15, 0.87, TString::Format("%06.3f%% cell : eff < %.2f",
                                                      cellsWithLowEff * 100,
                                                      m_firstEffBoundary));

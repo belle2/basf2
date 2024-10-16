@@ -85,9 +85,16 @@ namespace Belle2 {
     void terminate() override;
 
     /**
-     * Find bin corresponds to a specific phi in a layer
+     * Compute and shift phi if it is stereo layer
+     * return [0,2pi]
      */
-    int findThetaBin(double& phi, const int& nWires, const double& offset);
+    double getShiftedPhi(const ROOT::Math::XYZVector& position, const int& lay);
+
+    /**
+     * Find bin corresponds to a specific phi in a layer
+     * phi must be in [0,2pi]
+     */
+    int findThetaBin(double phi, const int& lay);
 
   protected:
 
@@ -101,6 +108,7 @@ namespace Belle2 {
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
 
     int m_minHits;                   /**< Minimum hits for processing. */
+    bool m_adjustStereoShift = true; /**< Adjust the shift in stereo layers for Eff histo */
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */
     TH1F* m_hOcc = nullptr;          /**< Histogram of occupancy */
@@ -112,7 +120,7 @@ namespace Belle2 {
     TH2F* m_hPhiIndex = nullptr;     /**< Histogram of cdc phi of different IP + skims tracks */
     TH2F* m_hPhiEff = nullptr;       /**< Histogram of cdc phi of tracking eff */
     TH2F* m_hPhiHit  = nullptr;      /**< Histogram of track associated hits in phi vs layer  */
-    TH2F* m_h2EffiHisto = nullptr;   /**< Histogram of observed and expected CDC hits in layer */
+    TH2F* m_hCellEff = nullptr;      /**< Histogram of observed and expected CDC hits in layer */
 
   };
 

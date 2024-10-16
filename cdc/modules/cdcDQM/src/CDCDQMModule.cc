@@ -38,6 +38,7 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
+  addParam("AdjustStereoShift", m_adjustStereoShift, "Adjust the shift in stereo layers for Eff histo", m_adjustStereoShift);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -69,8 +70,8 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
-  m_h2EffiHisto = new TH2F("h2EffiHisto", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
-  m_h2EffiHisto->SetTitle("Observed vs Expected hits for all layers;#phi bin;layer;Track / bin");
+  m_hCellEff = new TH2F("hCellEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
+  m_hCellEff->SetTitle("Observed vs Expected hits for all layers;cell;layer;Track / bin");
   oldDir->cd();
 }
 
@@ -200,6 +201,7 @@ void CDCDQMModule::event()
         if (!tp) continue;
         hitInSLayer.insert(hit->getICLayer());
       }
+      if (hitInSLayer.empty()) continue;
       auto helix = fitresult->getHelix();
       int nSLayers = cdcgeo.getNumberOfSenseLayers();
       for (int lay = 0; lay < nSLayers; lay++) {
@@ -210,11 +212,11 @@ void CDCDQMModule::event()
         const auto& result = helix.getPositionAtArcLength2D(arcLength);
         if (result.Z() > cdcgeo.senseWireFZ(lay) || result.Z() < cdcgeo.senseWireBZ(lay)) continue;
         // get phi of extrapolation and fill
-        double phi = TMath::ATan2(result.Y(), result.X());
-        int fillXbin = findThetaBin(phi, cdcgeo.nWiresInLayer(lay), cdcgeo.offset(lay));
-        m_h2EffiHisto->Fill(fillXbin, lay);
+        double phi = getShiftedPhi(result, lay);
+        int fillXbin = findThetaBin(phi, lay);
+        m_hCellEff->Fill(fillXbin, lay);
         if (hitInSLayer.count(lay)) // if hit is attached in this layer
-          m_h2EffiHisto->Fill(fillXbin, lay + nSLayers);
+          m_hCellEff->Fill(fillXbin, lay + nSLayers);
       }
     }
 
@@ -281,13 +283,14 @@ void CDCDQMModule::terminate()
 {
 }
 
-int CDCDQMModule::findThetaBin(double& phi, const int& nWires, const double& offset)
+int CDCDQMModule::findThetaBin(double phi, const int& lay)
 {
+  static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+  int nWires = cdcgeo.nWiresInLayer(lay);
+  double offset = cdcgeo.offset(lay);
   double shift = (offset - 0.5) * 2 * TMath::Pi() / nWires;
   double binLow = shift;
   double binHigh = 2 * TMath::Pi() + shift;
-  // convert [-pi,pi] range to [0,2pi]
-  if (phi < 0) phi += 2 * TMath::Pi();
   // wrap around
   if (phi < binLow) phi += 2 * TMath::Pi(); // Wrap around for values less than binLow
   else if (phi >= binHigh) phi -= 2 * TMath::Pi(); // Wrap around for values >= binHigh
@@ -295,4 +298,30 @@ int CDCDQMModule::findThetaBin(double& phi, const int& nWires, const double& off
   int binIndex = (phi - binLow) / binWidth;
   // Return the bin index (1-based for ROOT histograms)
   return binIndex + 1;
+}
+
+double CDCDQMModule::getShiftedPhi(const ROOT::Math::XYZVector& position, const int& lay)
+{
+  double phi = TMath::ATan2(position.Y(), position.X());
+  if (m_adjustStereoShift) {
+    static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
+    int nWires = cdcgeo.nWiresInLayer(lay);
+    int nShifts = cdcgeo.nShifts(lay);
+    double fZ = cdcgeo.senseWireFZ(lay);
+    double bZ = cdcgeo.senseWireBZ(lay);
+    double R = cdcgeo.senseWireR(lay);
+    double phiSize = 2 * TMath::Pi() / nWires;
+    double phiF = phiSize * 0.5 * nShifts;
+    double phiB = 0;
+    B2Vector3D f(R * TMath::Cos(phiF), R * TMath::Sin(phiF), fZ);
+    B2Vector3D b(R * TMath::Cos(phiB), R * TMath::Sin(phiB), bZ);
+    B2Vector3D v = f - b;
+    B2Vector3D u = v.Unit();
+    double beta = (position.Z() - b.Z()) / u.Z();
+    B2Vector3D p = b + beta * u;
+    phi -= TMath::ATan2(p.Y(), p.X());
+  }
+  while (phi < 0) phi += (2 * TMath::Pi());
+  while (phi >= 2 * TMath::Pi()) phi -= (2 * TMath::Pi());
+  return phi;
 }

@@ -1,0 +1,56 @@
+# EventType: 1240018001 
+# Descriptor: [B+ -> eta'(-> pi+ pi- eta / rho0 gamma) rho+]
+# NickName: Bu_etaprho
+# Documentation: B+ -> eta' rho+ 
+# Tested: Yes
+# PhysicsWG: Bhadronic
+# Responsible: Ming-Chuan Chang
+# Email: jeri.mcchang@gmail.com
+# Cuts: None
+# Date: 20241011
+
+Alias      eta'sig    eta'
+Alias      etasig     eta
+Alias      pi0sig     pi0
+
+Alias      rho0sig     rho0
+Alias      rho+sig     rho+
+Alias      rho-sig     rho-
+ChargeConj rho+sig     rho-sig
+
+
+Decay Upsilon(4S)
+0.5  B+sig   B-      VSS;
+0.5  B+      B-sig   VSS;
+Enddecay
+
+Decay B+sig
+1.000   rho+sig   eta'sig   SVS;  
+Enddecay
+CDecay B-sig
+
+Decay rho+sig
+1.000   pi+  pi0sig  VSS;
+Enddecay
+CDecay rho-sig
+
+Decay eta'sig 
+0.6   pi+  pi-  etasig    ETAPRIME_DALITZ  -0.047  -0.069  0.0  0.073; # New dalitz mode
+0.4   rho0sig   gamma     SVP_HELAMP  1.0 0.0 1.0 0.0; 
+Enddecay
+
+Decay etasig
+1.0  gamma  gamma      PHSP;
+Enddecay 
+
+Decay  pi0sig
+1.0  gamma  gamma  PHSP;
+Enddecay
+
+Decay rho0sig 
+1.000   pi+  pi-                                       VSS;
+Enddecay
+
+End
+
+

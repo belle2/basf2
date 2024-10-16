@@ -132,6 +132,8 @@ namespace Belle2 {
     double m_firstEffBoundary = 0.08; /**< The first boundary of the efficiency range */
     double m_secondEffBoundary = 0.72; /**< The second boundary of the efficiency range */
 
+    MonitoringObject* m_monObj = nullptr; /**< monitoring object */
+
     TFile* m_fileRefPhi = nullptr; /**< reference histogram file point */
     TH2F* m_histref_phiindex = nullptr; /**< for above*/
     TH1D* m_hist_refphi = nullptr; /**< for above*/

@@ -112,6 +112,8 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
 
   registerEpicsPV(m_pvPrefix + "phi_compare_window", "phicomparewindow");
 
+  m_monObj = getMonitoringObject("cdc");
+
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: initialized.");
 }
 
@@ -320,6 +322,10 @@ void DQMHistAnalysisCDCEpicsModule::event()
   }
 
   // get layer efficiency
+  double meanCellEff = 0;
+  double cellsWithLowEff = 0;
+  double cellsWithMidEff = 0;
+  double cellsWithHighEff = 0;
   auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoLayEff, 0, true); //true=only if updated
   c_hist_efficiency->Clear();
   if (m_delta_efflay) {
@@ -335,41 +341,49 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_efficiency[1]->Draw("COLZ");
     c_hist_efficiency->cd(3);
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
-    double meanEffiValue = 0;
     int nEffiValues = 0;
     for (int ij = 0; ij < m_hist_efficiency[2]->GetNumberOfBins(); ij++) {
       if (m_hist_efficiency[1]->GetBinContent(ij + 1) == 0) continue;
       double binEffi = m_hist_efficiency[2]->GetBinContent(ij + 1);
       m_hist_cellEffi->Fill(binEffi);
-      meanEffiValue += binEffi;
+      meanCellEff += binEffi;
       nEffiValues++;
     }
-    if (nEffiValues) meanEffiValue /= nEffiValues;
+    if (nEffiValues) meanCellEff /= nEffiValues;
     m_hist_efficiency[2]->SetMinimum(0.0);
     m_hist_efficiency[2]->SetMaximum(1.0);
     m_hist_efficiency[2]->SetStats(0);
     m_hist_efficiency[2]->Draw("COLZ");
     TLatex latex;
     latex.SetTextSize(0.025);
-    latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanEffiValue * 100.0));
+    latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanCellEff * 100.0));
     c_hist_efficiency->cd(4);
     if (nEffiValues) {
       int firstBoundaryBin = m_hist_cellEffi->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
-      double belowFirstBoundary = m_hist_cellEffi->Integral(1, firstBoundaryBin) / nEffiValues;
+      cellsWithLowEff = m_hist_cellEffi->Integral(1, firstBoundaryBin) / nEffiValues;
       int secondBoundaryBin = m_hist_cellEffi->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
-      double belowSecondBoundary = m_hist_cellEffi->Integral(firstBoundaryBin + 1, secondBoundaryBin) / nEffiValues;
+      cellsWithMidEff = m_hist_cellEffi->Integral(firstBoundaryBin + 1, secondBoundaryBin) / nEffiValues;
+      cellsWithHighEff =  m_hist_cellEffi->Integral(secondBoundaryBin + 1, m_hist_cellEffi->GetNbinsX()) / nEffiValues;
       m_hist_cellEffi->SetStats(0);
       m_hist_cellEffi->Draw();
       latex.DrawLatexNDC(0.15, 0.87, TString::Format("%06.3f%% cell : eff < %.2f",
-                                                     belowFirstBoundary * 100,
+                                                     cellsWithLowEff * 100,
                                                      m_firstEffBoundary));
       latex.DrawLatexNDC(0.15, 0.84, TString::Format("%06.3f%% cell : %.2f < eff < %.2f",
-                                                     belowSecondBoundary * 100,
+                                                     cellsWithMidEff * 100,
                                                      m_firstEffBoundary, m_secondEffBoundary));
+      latex.DrawLatexNDC(0.15, 0.81, TString::Format("%06.3f%% cell : %.2f < eff",
+                                                     cellsWithHighEff * 100,
+                                                     m_secondEffBoundary));
     }
     c_hist_efficiency->Update();
     UpdateCanvas(c_hist_efficiency);
   }
+
+  m_monObj->setVariable("meanCellEff", meanCellEff);
+  m_monObj->setVariable("cellsWithLowEff", cellsWithLowEff);
+  m_monObj->setVariable("cellsWithMidEff", cellsWithMidEff);
+  m_monObj->setVariable("cellsWithHighEff", cellsWithHighEff);
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");
 }

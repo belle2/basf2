@@ -326,6 +326,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
   double cellsWithLowEff = 0;
   double cellsWithMidEff = 0;
   double cellsWithHighEff = 0;
+  gStyle->SetNumberContours(100);
   auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoCellEff, 0, true); //true=only if updated
   c_hist_efficiency->Clear();
   if (m_delta_efflay) {

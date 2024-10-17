@@ -3112,7 +3112,8 @@ def writePi0EtaVeto(
     pi0PayloadNameOverride=None,
     pi0SoftPhotonCutOverride=None,
     etaPayloadNameOverride=None,
-    etaSoftPhotonCutOverride=None
+    etaSoftPhotonCutOverride=None,
+    requireSoftPhotonIsInROE=True,
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -3166,6 +3167,8 @@ def writePi0EtaVeto(
     @param etaPayloadNameOverride  specify the payload name of eta veto only if one wants to use non-default one. (default is None)
     @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
                                     (default is None)
+    @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
+                                    or not. Default is True, i.e. only soft photons in the ROE are used.
     """
 
     import b2bii
@@ -3253,6 +3256,9 @@ def writePi0EtaVeto(
     else:
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
 
+    if requireSoftPhotonIsInROE:
+        Pi0SoftPhotonCut += 'and isInRestOfEvent==1'
+
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     # fill the particleList for soft photon with energy, timing and clusterNHits cuts
@@ -3280,6 +3286,9 @@ def writePi0EtaVeto(
             EtaSoftPhotonCut += ' and ' + TimingCut
     else:
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
+
+    if requireSoftPhotonIsInROE:
+        EtaSoftPhotonCut += 'and isInRestOfEvent==1'
 
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)

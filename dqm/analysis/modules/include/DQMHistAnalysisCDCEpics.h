@@ -90,7 +90,7 @@ namespace Belle2 {
     /**
      * Populate the efficiency histograms
      */
-    void fillEffiTH2Poly(TH2F* hist, TH2Poly* observed, TH2Poly* expected, TH2Poly* efficiency) ;
+    void fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency) ;
 
 
   protected:
@@ -111,9 +111,9 @@ namespace Belle2 {
     TCanvas* c_hist_skimphi = nullptr; /**< canvas for various phi distribution */
     TH1D* m_hist_skimphi[8] = {nullptr}; /**< for above*/
 
-    TCanvas* c_hist_efficiency = nullptr; /**< canvas for layer efficiency */
-    TH2Poly* m_hist_efficiency[3] = {nullptr}; /**< for above*/
-    TH1F* m_hist_cellEff1D = nullptr; /**< for above*/
+    TCanvas* c_hist_attach_eff = nullptr; /**< canvas for layer efficiency */
+    TH2Poly* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
+    TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
     TLine* m_line_hadc  = nullptr; /**< line for higher ADC window */
@@ -125,7 +125,7 @@ namespace Belle2 {
     std::string m_histoTDC = ""; /**< TDC histogram names of CDC DQMs */
     std::string m_histoPhiIndex = ""; /**< Phi Inedx histogram names of CDC DQMs */
     std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
-    std::string m_histoCellEff = ""; /**< Cell Eff histogram names of CDC DQMs */
+    std::string m_histoTrackingWireEff = ""; /**< Wire Eff histogram names of CDC DQMs */
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
     std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
     std::string m_refNamePhi = ""; /**< reference histogram of phi */

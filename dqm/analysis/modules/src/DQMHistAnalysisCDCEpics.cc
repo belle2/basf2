@@ -27,7 +27,7 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   addParam("HistTDC", m_histoTDC, "TDC Histogram Name", std::string("hTDC"));
   addParam("HistPhiIndex", m_histoPhiIndex, "Phi Index Histogram Name", std::string("hPhiIndex"));
   addParam("HistPhiEff", m_histoPhiEff, "Phi Eff Histogram Name", std::string("hPhiEff"));
-  addParam("HistCellEff", m_histoCellEff, "Cell Eff Histogram Name", std::string("hCellEff"));
+  addParam("HistTrackingWireEff", m_histoTrackingWireEff, "Wire Eff Histogram Name", std::string("hTrackingWireEff"));
   addParam("PvPrefix", m_pvPrefix, "PV Prefix and Name", std::string("CDC:"));
   addParam("RefFilePhi", m_refNamePhi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
   addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("ref/CDC/default"));
@@ -43,7 +43,6 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
 
 DQMHistAnalysisCDCEpicsModule::~DQMHistAnalysisCDCEpicsModule()
 {
-
 }
 
 void DQMHistAnalysisCDCEpicsModule::initialize()
@@ -76,18 +75,19 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
   m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 360, -180.0, 180.0);
 
-  c_hist_efficiency = new TCanvas("CDC/c_hist_efficiency", "c_hist_efficiency", 840, 800);
-  m_hist_efficiency[0] = createEffiTH2Poly("CDC/hist_observedCellHits", "hist_observedCellHits;X [cm];Y [cm]; Track / bin");
-  m_hist_efficiency[0]->GetYaxis()->SetTitleOffset(1.4);
-  m_hist_efficiency[0]->SetDirectory(gDirectory);
-  m_hist_efficiency[1] = (TH2Poly*)m_hist_efficiency[0]->Clone();
-  m_hist_efficiency[1]->SetNameTitle("CDC/hist_expectedCellHits", "hist_expectedCellHits;X [cm];Y [cm]; Track / bin");
-  m_hist_efficiency[1]->SetDirectory(gDirectory);
-  m_hist_efficiency[2] = (TH2Poly*)m_hist_efficiency[0]->Clone();
-  m_hist_efficiency[2]->SetNameTitle("CDC/hist_cellEfficiency", "hist_cellEfficiency;X [cm];Y [cm]; Efficiency");
-  m_hist_efficiency[2]->SetDirectory(gDirectory);
-  m_hist_cellEff1D = new TH1F("CDC/hist_cellEfficiency1D", "hist_cellEfficiency1D;Cell Efficiency;Cell / bin", 208, -0.02, 1.02);
-  m_hist_cellEff1D->GetYaxis()->SetTitleOffset(1.4);
+  c_hist_attach_eff = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 840, 800);
+  m_hist_attach_eff[0] = createEffiTH2Poly("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin");
+  m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);
+  m_hist_attach_eff[0]->SetDirectory(gDirectory);
+  m_hist_attach_eff[1] = (TH2Poly*)m_hist_attach_eff[0]->Clone();
+  m_hist_attach_eff[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires;X [cm];Y [cm]; Track / bin");
+  m_hist_attach_eff[1]->SetDirectory(gDirectory);
+  m_hist_attach_eff[2] = (TH2Poly*)m_hist_attach_eff[0]->Clone();
+  m_hist_attach_eff[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff;X [cm];Y [cm]; Efficiency");
+  m_hist_attach_eff[2]->SetDirectory(gDirectory);
+  m_hist_wire_attach_eff_1d = new TH1F("CDC/hist_wire_attach_eff_1d", "hist_wire_attach_eff_1d;Wire Efficiency;Wire / bin", 208,
+                                       -0.02, 1.02);
+  m_hist_wire_attach_eff_1d->GetYaxis()->SetTitleOffset(1.4);
 
   if (!hasDeltaPar(m_histoDir, m_histoADC))
     addDeltaPar(m_histoDir, m_histoADC, HistDelta::c_Entries, m_minevt, 1);
@@ -101,8 +101,8 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   if (!hasDeltaPar(m_histoDir, m_histoPhiEff))
     addDeltaPar(m_histoDir, m_histoPhiEff, HistDelta::c_Entries, m_minevt, 1);
 
-  if (!hasDeltaPar(m_histoDir, m_histoCellEff))
-    addDeltaPar(m_histoDir, m_histoCellEff, HistDelta::c_Entries, m_minevt, 1);
+  if (!hasDeltaPar(m_histoDir, m_histoTrackingWireEff))
+    addDeltaPar(m_histoDir, m_histoTrackingWireEff, HistDelta::c_Entries, m_minevt, 1);
 
   registerEpicsPV(m_pvPrefix + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_pvPrefix + "cdcboards_wtdc", "tdcboards");
@@ -321,70 +321,68 @@ void DQMHistAnalysisCDCEpicsModule::event()
     UpdateCanvas(c_hist_effphi);
   }
 
-  // get cell efficiency
-  double meanCellEff = 0;
-  double cellsWithLowEff = 0;
-  double cellsWithMidEff = 0;
-  double cellsWithHighEff = 0;
+  // get wire efficiency
+  double meanWireAttachProb = 0;
+  double fracWiresWIthLowAttachProb = 0;
+  double fracWiresWithHighAttachProb = 0;
   gStyle->SetNumberContours(100);
-  auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoCellEff, 0, true); //true=only if updated
-  c_hist_efficiency->Clear();
+  auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoTrackingWireEff, 0, true); //true=only if updated
+  c_hist_attach_eff->Clear();
   if (m_delta_efflay) {
-    fillEffiTH2Poly(m_delta_efflay, m_hist_efficiency[0], m_hist_efficiency[1], m_hist_efficiency[2]);
-    c_hist_efficiency->Divide(2, 2);
-    c_hist_efficiency->cd(1);
+    fillEffiTH2Poly(m_delta_efflay, m_hist_attach_eff[0], m_hist_attach_eff[1], m_hist_attach_eff[2]);
+    c_hist_attach_eff->Divide(2, 2);
+    c_hist_attach_eff->cd(1);
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
-    m_hist_efficiency[0]->SetStats(0);
-    m_hist_efficiency[0]->Draw("COLZ");
-    c_hist_efficiency->cd(2);
+    m_hist_attach_eff[0]->SetStats(0);
+    m_hist_attach_eff[0]->Draw("COLZ");
+    c_hist_attach_eff->cd(2);
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
-    m_hist_efficiency[1]->SetStats(0);
-    m_hist_efficiency[1]->Draw("COLZ");
-    c_hist_efficiency->cd(3);
+    m_hist_attach_eff[1]->SetStats(0);
+    m_hist_attach_eff[1]->Draw("COLZ");
+    c_hist_attach_eff->cd(3);
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
     int nEffiValues = 0;
-    for (int ij = 0; ij < m_hist_efficiency[2]->GetNumberOfBins(); ij++) {
-      if (m_hist_efficiency[1]->GetBinContent(ij + 1) == 0) continue;
-      double binEffi = m_hist_efficiency[2]->GetBinContent(ij + 1);
-      m_hist_cellEff1D->Fill(binEffi);
-      meanCellEff += binEffi;
+    for (int ij = 0; ij < m_hist_attach_eff[2]->GetNumberOfBins(); ij++) {
+      if (m_hist_attach_eff[1]->GetBinContent(ij + 1) == 0) continue;
+      double binEffi = m_hist_attach_eff[2]->GetBinContent(ij + 1);
+      m_hist_wire_attach_eff_1d->Fill(binEffi);
+      meanWireAttachProb += binEffi;
       nEffiValues++;
     }
-    if (nEffiValues) meanCellEff /= nEffiValues;
-    m_hist_efficiency[2]->SetMinimum(0.0);
-    m_hist_efficiency[2]->SetMaximum(1.0);
-    m_hist_efficiency[2]->SetStats(0);
-    m_hist_efficiency[2]->Draw("COLZ");
+    if (nEffiValues) meanWireAttachProb /= nEffiValues;
+    m_hist_attach_eff[2]->SetMinimum(0.0);
+    m_hist_attach_eff[2]->SetMaximum(1.0);
+    m_hist_attach_eff[2]->SetStats(0);
+    m_hist_attach_eff[2]->Draw("COLZ");
     TLatex latex;
     latex.SetTextSize(0.025);
-    latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanCellEff * 100.0));
-    c_hist_efficiency->cd(4);
+    latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanWireAttachProb * 100.0));
+    c_hist_attach_eff->cd(4);
     if (nEffiValues) {
-      int firstBoundaryBin = m_hist_cellEff1D->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
-      cellsWithLowEff = m_hist_cellEff1D->Integral(1, firstBoundaryBin) / nEffiValues;
-      int secondBoundaryBin = m_hist_cellEff1D->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
-      cellsWithMidEff = m_hist_cellEff1D->Integral(firstBoundaryBin + 1, secondBoundaryBin) / nEffiValues;
-      cellsWithHighEff =  m_hist_cellEff1D->Integral(secondBoundaryBin + 1, m_hist_cellEff1D->GetNbinsX()) / nEffiValues;
-      m_hist_cellEff1D->SetStats(0);
-      m_hist_cellEff1D->Draw();
-      latex.DrawLatexNDC(0.15, 0.87, TString::Format("%06.3f%% cell : eff < %.2f",
-                                                     cellsWithLowEff * 100,
+      int firstBoundaryBin = m_hist_wire_attach_eff_1d->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
+      fracWiresWIthLowAttachProb = m_hist_wire_attach_eff_1d->Integral(1, firstBoundaryBin) / nEffiValues;
+      int secondBoundaryBin = m_hist_wire_attach_eff_1d->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
+      fracWiresWithHighAttachProb =  m_hist_wire_attach_eff_1d->Integral(secondBoundaryBin + 1,
+                                     m_hist_wire_attach_eff_1d->GetNbinsX()) / nEffiValues;
+      m_hist_wire_attach_eff_1d->SetStats(0);
+      m_hist_wire_attach_eff_1d->Draw();
+      latex.DrawLatexNDC(0.15, 0.87, TString::Format("%06.3f%% wire : eff < %.2f",
+                                                     fracWiresWIthLowAttachProb * 100,
                                                      m_firstEffBoundary));
-      latex.DrawLatexNDC(0.15, 0.84, TString::Format("%06.3f%% cell : %.2f < eff < %.2f",
-                                                     cellsWithMidEff * 100,
+      latex.DrawLatexNDC(0.15, 0.84, TString::Format("%06.3f%% wire : %.2f < eff < %.2f",
+                                                     (1. - fracWiresWithHighAttachProb - fracWiresWIthLowAttachProb) * 100,
                                                      m_firstEffBoundary, m_secondEffBoundary));
-      latex.DrawLatexNDC(0.15, 0.81, TString::Format("%06.3f%% cell : %.2f < eff",
-                                                     cellsWithHighEff * 100,
+      latex.DrawLatexNDC(0.15, 0.81, TString::Format("%06.3f%% wire : %.2f < eff",
+                                                     fracWiresWithHighAttachProb * 100,
                                                      m_secondEffBoundary));
     }
-    c_hist_efficiency->Update();
-    UpdateCanvas(c_hist_efficiency);
+    c_hist_attach_eff->Update();
+    UpdateCanvas(c_hist_attach_eff);
   }
 
-  m_monObj->setVariable("meanCellEff", meanCellEff);
-  m_monObj->setVariable("cellsWithLowEff", cellsWithLowEff);
-  m_monObj->setVariable("cellsWithMidEff", cellsWithMidEff);
-  m_monObj->setVariable("cellsWithHighEff", cellsWithHighEff);
+  m_monObj->setVariable("meanWireAttachProb", meanWireAttachProb);
+  m_monObj->setVariable("fracWiresWIthLowAttachProb", fracWiresWIthLowAttachProb);
+  m_monObj->setVariable("fracWiresWithHighAttachProb", fracWiresWithHighAttachProb);
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");
 }
@@ -417,7 +415,6 @@ void DQMHistAnalysisCDCEpicsModule::terminate()
 {
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
 }
-
 
 TH2Poly* DQMHistAnalysisCDCEpicsModule::createEffiTH2Poly(const TString& name, const TString& title)
 {
@@ -461,7 +458,7 @@ TH2Poly* DQMHistAnalysisCDCEpicsModule::createEffiTH2Poly(const TString& name, c
   return hist;
 }
 
-void DQMHistAnalysisCDCEpicsModule::fillEffiTH2Poly(TH2F* hist, TH2Poly* observed, TH2Poly* expected, TH2Poly* efficiency)
+void DQMHistAnalysisCDCEpicsModule::fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency)
 {
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   int nSLayers = cdcgeo.getNumberOfSenseLayers();
@@ -476,9 +473,9 @@ void DQMHistAnalysisCDCEpicsModule::fillEffiTH2Poly(TH2F* hist, TH2Poly* observe
       double phi = (wire + offset) * 2 * TMath::Pi() / nWires;
       double fillX = layerR * TMath::Cos(phi);
       double fillY = layerR * TMath::Sin(phi);
-      observed->Fill(fillX, fillY, hist->GetBinContent(wire + 1, obsBin));
+      attached->Fill(fillX, fillY, hist->GetBinContent(wire + 1, obsBin));
       expected->Fill(fillX, fillY, hist->GetBinContent(wire + 1, expBin));
     }
   }
-  efficiency->Divide(observed, expected);
+  efficiency->Divide(attached, expected);
 }

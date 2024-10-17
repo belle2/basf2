@@ -38,7 +38,7 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
-  addParam("AdjustStereoShift", m_adjustStereoShift, "Adjust the shift in stereo layers for Eff histo", m_adjustStereoShift);
+  addParam("AdjustWireShift", m_adjustWireShift, "If true, gets the correct phi view of the boards", m_adjustWireShift);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -70,8 +70,8 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
-  m_hCellEff = new TH2F("hCellEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
-  m_hCellEff->SetTitle("Observed vs Expected hits for all layers;cell;layer;Track / bin");
+  m_hTrackingWireEff = new TH2F("hTrackingWireEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
+  m_hTrackingWireEff->SetTitle("Attached vs Expected hits for all layers;wire;layer;Track / bin");
   oldDir->cd();
 }
 
@@ -214,9 +214,9 @@ void CDCDQMModule::event()
         // get phi of extrapolation and fill
         double phi = getShiftedPhi(result, lay);
         int fillXbin = findThetaBin(phi, lay);
-        m_hCellEff->Fill(fillXbin, lay);
+        m_hTrackingWireEff->Fill(fillXbin, lay);
         if (hitInSLayer.count(lay)) // if hit is attached in this layer
-          m_hCellEff->Fill(fillXbin, lay + nSLayers);
+          m_hTrackingWireEff->Fill(fillXbin, lay + nSLayers);
       }
     }
 
@@ -303,7 +303,7 @@ int CDCDQMModule::findThetaBin(double phi, const int& lay)
 double CDCDQMModule::getShiftedPhi(const ROOT::Math::XYZVector& position, const int& lay)
 {
   double phi = TMath::ATan2(position.Y(), position.X());
-  if (m_adjustStereoShift) {
+  if (m_adjustWireShift) {
     static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
     int nWires = cdcgeo.nWiresInLayer(lay);
     int nShifts = cdcgeo.nShifts(lay);

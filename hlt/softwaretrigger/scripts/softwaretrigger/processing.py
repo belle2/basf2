@@ -159,7 +159,7 @@ def add_hlt_processing(path,
                        unpacker_components=None,
                        reco_components=None,
                        create_hlt_unit_histograms=True,
-                       switch_off_slow_modules_for_online=False,
+                       switch_off_slow_modules_for_online=True,
                        **kwargs):
     """
     Add all modules for processing on HLT filter machines

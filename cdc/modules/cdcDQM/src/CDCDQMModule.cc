@@ -38,7 +38,8 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
-  addParam("AdjustWireShift", m_adjustWireShift, "If true, gets the correct phi view of the boards", m_adjustWireShift);
+  addParam("AdjustWireShift", m_adjustWireShift,
+           "If true, gets the corrected phi view of the wires in stereo layers", m_adjustWireShift);
   setPropertyFlags(c_ParallelProcessingCertified);
 }
 
@@ -70,7 +71,7 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
-  m_hPhiNCDC = new TH2F("hPhiNCDC", "hPhiNCDC", 90, -180.0, 180.0, 100, -0.5, 99.5);
+  m_hPhiNCDC = new TH2F("hPhiNCDC", "hPhiNCDC", 45, -180.0, 180.0, 61, -0.5, 60.5);
   m_hPhiNCDC->SetTitle("nCDCHits vs #phi;Track-#phi;nCDCHits;Track / bin");
   m_hTrackingWireEff = new TH2F("hTrackingWireEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
   m_hTrackingWireEff->SetTitle("Attached vs Expected hits for all layers;wire;layer;Track / bin");
@@ -226,7 +227,7 @@ void CDCDQMModule::event()
 
     double phiDegree = fitresult->getPhi() / Unit::deg;
 
-    m_hPhiNCDC->Fill(phiDegree, track->getNumberOfCDCHits());
+    m_hPhiNCDC->Fill(phiDegree, TMath::Min(int(track->getNumberOfCDCHits()), 60));
 
     // require high NDF track
     int ndf = fs->getNdf();
@@ -311,21 +312,23 @@ double CDCDQMModule::getShiftedPhi(const ROOT::Math::XYZVector& position, const 
   double phi = TMath::ATan2(position.Y(), position.X());
   if (m_adjustWireShift) {
     static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
-    int nWires = cdcgeo.nWiresInLayer(lay);
     int nShifts = cdcgeo.nShifts(lay);
-    double fZ = cdcgeo.senseWireFZ(lay);
-    double bZ = cdcgeo.senseWireBZ(lay);
-    double R = cdcgeo.senseWireR(lay);
-    double phiSize = 2 * TMath::Pi() / nWires;
-    double phiF = phiSize * 0.5 * nShifts;
-    double phiB = 0;
-    B2Vector3D f(R * TMath::Cos(phiF), R * TMath::Sin(phiF), fZ);
-    B2Vector3D b(R * TMath::Cos(phiB), R * TMath::Sin(phiB), bZ);
-    B2Vector3D v = f - b;
-    B2Vector3D u = v.Unit();
-    double beta = (position.Z() - b.Z()) / u.Z();
-    B2Vector3D p = b + beta * u;
-    phi -= TMath::ATan2(p.Y(), p.X());
+    if (nShifts) {
+      int nWires = cdcgeo.nWiresInLayer(lay);
+      double fZ = cdcgeo.senseWireFZ(lay);
+      double bZ = cdcgeo.senseWireBZ(lay);
+      double R = cdcgeo.senseWireR(lay);
+      double phiSize = 2 * TMath::Pi() / nWires;
+      double phiF = phiSize * 0.5 * nShifts;
+      double phiB = 0;
+      B2Vector3D f(R * TMath::Cos(phiF), R * TMath::Sin(phiF), fZ);
+      B2Vector3D b(R * TMath::Cos(phiB), R * TMath::Sin(phiB), bZ);
+      B2Vector3D v = f - b;
+      B2Vector3D u = v.Unit();
+      double beta = (position.Z() - b.Z()) / u.Z();
+      B2Vector3D p = b + beta * u;
+      phi -= TMath::ATan2(p.Y(), p.X());
+    }
   }
   while (phi < 0) phi += (2 * TMath::Pi());
   while (phi >= 2 * TMath::Pi()) phi -= (2 * TMath::Pi());

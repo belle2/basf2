@@ -70,6 +70,8 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
+  m_hPhiNCDC = new TH2F("hPhiNCDC", "hPhiNCDC", 90, -180.0, 180.0, 70, -0.5, 69.5);
+  m_hPhiNCDC->SetTitle("nCDCHits vs #phi;Track-#phi;nCDCHits;Track / bin");
   m_hTrackingWireEff = new TH2F("hTrackingWireEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
   m_hTrackingWireEff->SetTitle("Attached vs Expected hits for all layers;wire;layer;Track / bin");
   oldDir->cd();
@@ -220,11 +222,13 @@ void CDCDQMModule::event()
       }
     }
 
+    double phiDegree = fitresult->getPhi() / Unit::deg;
+
+    m_hPhiNCDC->Fill(phiDegree, track->getNumberOfCDCHits());
+
     // require high NDF track
     int ndf = fs->getNdf();
     if (ndf < 20) continue;
-
-    double phiDegree = fitresult->getPhi() / Unit::deg;
 
     if (fabs(fitresult->getD0()) > 1.0 || fabs(fitresult->getZ0()) > 1.0) {
       //Off IP tracks

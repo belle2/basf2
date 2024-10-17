@@ -120,6 +120,7 @@ namespace Belle2 {
     TH2F* m_hPhiIndex = nullptr;     /**< Histogram of cdc phi of different IP + skims tracks */
     TH2F* m_hPhiEff = nullptr;       /**< Histogram of cdc phi of tracking eff */
     TH2F* m_hPhiHit  = nullptr;      /**< Histogram of track associated hits in phi vs layer  */
+    TH2F* m_hPhiNCDC  = nullptr;     /**< Histogram of track associated nCDCHits vs phi */
     TH2F* m_hTrackingWireEff = nullptr; /**< Histogram of attached and expected CDC wires in layer */
 
   };

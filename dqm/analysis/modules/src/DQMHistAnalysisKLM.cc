@@ -196,7 +196,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   n = histogram->GetXaxis()->GetNbins();
 
   /* call reference histograms from base class*/
-  TH1* ref_histogram = findRefHist(histogram->GetName(), false);
+  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleNone);
   float ref_average = 0;
 
   if (ref_histogram != nullptr) {

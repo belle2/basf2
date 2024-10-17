@@ -370,7 +370,7 @@ void DQMHistAnalysisKLM2Module::processEfficiencyHistogram(TH1* effHist, TH1* de
     effHist->Draw();
 
     //reference check
-    TH1* ref = findRefHist(effHist->GetName(), false);
+    TH1* ref = findRefHist(effHist->GetName(), ERefScaling::c_RefScaleNone);
     if (ref) {ref->Draw("hist,same");}
 
     canvas->Modified();

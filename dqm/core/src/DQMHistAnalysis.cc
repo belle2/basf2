@@ -214,7 +214,6 @@ TH1* DQMHistAnalysisModule::findRefHist(const std::string& histname, ERefScaling
     // then do the scaling
     return scaleReference(scaling, hist, s_refList[histname].getReference());
   }
-  B2INFO("Ref Histogram " << histname << " not in list.");
   return nullptr;
 }
 
@@ -289,7 +288,7 @@ MonitoringObject* DQMHistAnalysisModule::findMonitoringObject(const std::string&
     return &s_monObjList[objName];
   }
   B2INFO("MonitoringObject " << objName << " not in memfile.");
-  return NULL;
+  return nullptr;
 }
 
 double DQMHistAnalysisModule::getSigma68(TH1* h) const

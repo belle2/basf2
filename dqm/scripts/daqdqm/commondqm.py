@@ -338,7 +338,8 @@ def add_common_dqm(path, components=None, dqm_environment="expressreco", dqm_mod
                             tracksStoreArrayName="TracksFromIP", histogramTitleSuffix=" - Tracks from IP") \
                 .set_name("TrackingExpressRecoDQM_FromIP")
             path.add_module('TrackingExpressRecoDQM', histogramDirectoryName="TrackingERDQM_NotFromIP",
-                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP") \
+                            tracksStoreArrayName="TracksNotFromIP", histogramTitleSuffix=" - Tracks not from IP",
+                            produce1Dresiduals=False, m_produce2Dres=False, m_produceTRClusterPlots=False) \
                 .set_name("TrackingExpressRecoDQM_NotFromIP")
 
     # ARICH

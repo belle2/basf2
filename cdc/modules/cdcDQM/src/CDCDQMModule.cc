@@ -70,7 +70,7 @@ void CDCDQMModule::defineHisto()
   m_hPhiEff->SetTitle("CDC-track-#phi;cdctrack #phi vs cdchits;ncdchits");
   m_hPhiHit = new TH2F("h2HitPhi", "h2HitPhi", 90, -180.0, 180.0, 56, 0, 56);
   m_hPhiHit->SetTitle("CDC-hits-map (#phi vs layer);Track-#phi;Layer index");
-  m_hPhiNCDC = new TH2F("hPhiNCDC", "hPhiNCDC", 90, -180.0, 180.0, 70, -0.5, 69.5);
+  m_hPhiNCDC = new TH2F("hPhiNCDC", "hPhiNCDC", 90, -180.0, 180.0, 100, -0.5, 99.5);
   m_hPhiNCDC->SetTitle("nCDCHits vs #phi;Track-#phi;nCDCHits;Track / bin");
   m_hTrackingWireEff = new TH2F("hTrackingWireEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
   m_hTrackingWireEff->SetTitle("Attached vs Expected hits for all layers;wire;layer;Track / bin");

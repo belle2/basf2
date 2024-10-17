@@ -137,7 +137,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, add_trigger_calc
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
-        to true in ordet to speed up the reconstruction.
+        to true in order to speed up the reconstruction.
     """
 
     # Set the run for beam data
@@ -240,7 +240,7 @@ def add_prefilter_reconstruction(path,
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
-        to true in ordet to speed up the reconstruction.
+        to true in order to speed up the reconstruction.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -314,7 +314,7 @@ def add_postfilter_reconstruction(path,
       MVA based charged particle ID (false).
     :param switch_off_slow_modules_for_online: if true, it switches off some modules in the reconstruction chain by overriding
         other flags (e.g.: this flag overrides ``append_full_grid_cdc_eventt0``. On HLT and ExpressReco, this flag is set
-        to true in ordet to speed up the reconstruction.
+        to true in order to speed up the reconstruction.
     """
 
     # If switch_off_slow_modules_for_online is True, we override some flags to make sure some slow modules are not executed
@@ -555,9 +555,11 @@ def add_postfilter_posttracking_reconstruction(path,
         execution time.
     :param cosmics: if True, steer TOP for cosmic reconstruction.
     :param for_cdst_analysis: if True, the OnlineEventT0Creator module is not added to the path.
-           This is only needed by prepare_cdst_analysis().
+        This is only needed by prepare_cdst_analysis().
     :param legacy_ecl_charged_pid: Bool denoting whether to use the legacy EoP based charged particleID in the ECL (true) or
-      MVA based charged particle ID (false).
+        MVA based charged particle ID (false). This flag is automatically set to true on HLT and ExpressReco.
+    :param run_klm_dnn: If True, add the ``KLMMuonIDDNNExpert`` module to the path. This flag is automatically set to
+        false on HLT and ExpressReco.
     """
 
     # Add dEdx modules, if this function is not called from prepare_cdst_analysis()
@@ -733,6 +735,7 @@ def add_pid_module(path, components=None, run_klm_dnn=True):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     :param run_klm_dnn: If True, add the ``KLMMuonIDDNNExpert`` module to the path.
+        This flag is automatically set to false on HLT and ExpressReco.
     """
     if components is None or 'SVD' in components or 'CDC' in components:
         path.add_module('MdstPID')
@@ -860,6 +863,7 @@ def add_ecl_chargedpid_module(path, components=None, legacyMode=False):
     :param path: The path to add the modules to.
     :param components: The components to use or None to use all standard components.
     :param legacyMode: Uses the simple E/p based charged PID instead of the MVA based charged PID.
+        This flag is automatically set to true on HLT and ExpressReco.
     """
     if components is None or 'ECL' in components:
         # charged PID

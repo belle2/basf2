@@ -1,6 +1,8 @@
+.. _tracking_secMapTraining:
 
 SectorMap training
 ==================
+
 
 The SectorMap needs to be trained on MC events. During this training the friendship relations between sectors and the allowed ranges for the applied filter variables are learned. The training procedure can be very roughly separated into four steps:
 
@@ -16,7 +18,7 @@ The scripts used for the SectorMap training are collected in *tracking/scripts/t
 Collection of trainings data
 ----------------------------
 
-For the SectorMap training a large amount trainings data needs to be generated. By default we generate 10 Mio BB events and an additional 2 Mio Bhabha events for the training. Both event types have additional muon tracks mixed in using the `ParticleGun` event generator. To make the SectorMap more robust against displaced IP - positions the IP position is randomly varied for each generated sub-sample. The concrete setup of the event generators is done by the function :code:`tracking.secMapTraining.SectorMapTrainingUtils.add_event_generation`. We train on MC - track candidates only, so adding beam bkg or a change in the beam background simulation should have no effect on the training. Thus all samples generated do not include beam background. 
+For the SectorMap training a large amount trainings data needs to be generated. By default we generate 10 Mio BB events and an additional 2 Mio Bhabha events for the training. Both event types have additional muon tracks mixed in using the `ParticleGun` event generator. To make the SectorMap more robust against displaced IP - positions the IP position is randomly varied for each generated sub-sample. The concrete setup of the event generators is done by the function :code:`tracking.secMapTraining.SectorMapTrainingUtils.add_event_generation`. We train on MC - track candidates only, so adding beam background or a change in the beam background simulation should have no effect on the training. Thus all samples generated do not include beam background. 
 
 Please note that there is a special reconstruction chain applied for this MC generation. When using the commands described below this chain is set up automatically. If you need to know or adjust this chain you can look up the setting in the following function :code:`tracking.secMapTraining.SectorMapTrainingUtils.add_simulation_and_reconstruction_modules`. 
 
@@ -134,7 +136,7 @@ Both of these tasks are performed by executing the following command:
 
 The only parameter is the name of the input SectorMap (including directory). The generated output will be a new SectorMap with timing information removed. The new SectorMap (without timing) is named after the input SectorMap by adding the postfix *_timingRemoved*. This SectorMap uses usually a bit less disk space (around 16 vs. 17MB). 
 
-The local database with both SectorMap payloads will be created in your current folder in a directory named *localSectorMapDB*. Note that the IOVs  specified in the file :code:`database.txt` contained in that folder use dummy values. These NEED to be adjusted before you upload this to the database. After adjusting the IOVs you can upload the SectorMaps to the database using the `b2conditionsdb` command. 
+The local database with both SectorMap payloads will be created in your current folder in a directory named *localSectorMapDB*. Note that the IOVs  specified in the file :code:`database.txt` contained in that folder use dummy values. These **MUST** be adjusted before you upload this to the database. After adjusting the IOVs you can upload the SectorMaps to the database using the `b2conditionsdb` command. 
 
 
 Validation of the SectorMap

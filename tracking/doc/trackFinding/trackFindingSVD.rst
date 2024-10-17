@@ -44,7 +44,7 @@ different ranges for the filters defined.
       Two-hit filter example
 
 Variables used in the filters are geometric (distances, slopes) or properties of the SVD clusters, like the cluster time. There are two types of filters defined within 
-the framework. There are 2-hit filters, defined for the selection of 2-hit combination, and 3-hit filters, defined for the selection of 3-hit combinations, defined. 
+the framework. There are 2-hit filters, for the selection of 2-hit combination, and 3-hit filters, for the selection of 3-hit combinations, defined. 
 Variables used in the current implementation of filters are listed in the following tables. For 2-hit filters are following variables used:
 
 
@@ -53,7 +53,7 @@ Variables used in the current implementation of filters are listed in the follow
 +============================+===========================================================================================+
 |Distance3DSquared           | squared distance of the two SpacePoints                                                   |
 +----------------------------+-------------------------------------------------------------------------------------------+
-|Distance3DNormed            | squared distance in the x-y plane divied by the 3D distance sqared of the two SpacePoints |
+|Distance3DNormed            | squared distance in the x-y plane divided by the 3D distance sqared of the two SpacePoints|
 +----------------------------+-------------------------------------------------------------------------------------------+
 |Distance2DXYSquared         | xy squared distance of the two SpacePoints in the x-y plane                               |
 +----------------------------+-------------------------------------------------------------------------------------------+
@@ -67,7 +67,7 @@ Variables used in the current implementation of filters are listed in the follow
 +----------------------------+-------------------------------------------------------------------------------------------+
 
 
-For 3-hit filters a larger variaty and more complex quanities can be calculated due to the information the third hit is adding. The 3-hit filters currently used in the SectorMap are the following:  
+For 3-hit filters a larger variety and more complex quanities can be calculated due to the information the third hit is adding. The 3-hit filters currently used in the SectorMap are the following:  
 
 
 +-----------------------------+-------------------------------------------------------------------------------------------------------------+
@@ -99,7 +99,7 @@ For 3-hit filters a larger variaty and more complex quanities can be calculated 
 Note the names for the variables in the tables are the same as the class names used in the implementation. 
 
 
-The allowed range for each filter is learned from simulation, filling the distribution of the variable during the training and defining threshold as max and min of the distribution (or 0.1% and 99.9% quantile?).
+The allowed range for each filter is learned from simulation, filling the distribution of the variable during the training and defining thresholds for min and max at the 0.1% and 99.9% quantiles, respectively.
 Using the friendship relations and the filters, segments connecting two, three or four SpacePoints are built. At this stage a single SpacePoint can be shared by more than one segment and we are ready to build track candidates that are identified and collected by a Cellular Automaton.
 
 SectorMap Training

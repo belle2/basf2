@@ -9,7 +9,7 @@ Tools
 
 Tools for SectorMap training
 """"""""""""""""""""""""""""
-The tracking tools contain four scripts related to the SectorMap training. A detailed description on how a full SectorMap training is performed can be found _ref_
+The tracking tools contain four scripts related to the SectorMap training. A detailed description on how a full SectorMap training is performed can be found in :ref:`tracking_secMapTraining`
 
 * :command:`tracking-vxdtf2-collect-train-data` : collects data needed for training a SectorMap by simulating MC events
 * :command:`tracking-vxdtf2-prepare-SectorMap` : Once a SectorMap is built it has to be prepared. This preparation includes generating a version of the 

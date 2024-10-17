@@ -3257,7 +3257,7 @@ def writePi0EtaVeto(
         Pi0SoftPhotonCut = pi0SoftPhotonCutOverride
 
     if requireSoftPhotonIsInROE:
-        Pi0SoftPhotonCut += 'and isInRestOfEvent==1'
+        Pi0SoftPhotonCut += ' and isInRestOfEvent==1'
 
     # define the particleList name for soft photon
     pi0soft = f'gamma:Pi0Soft{suffix}' + ListName + '_' + particleList.replace(':', '_')
@@ -3288,7 +3288,7 @@ def writePi0EtaVeto(
         EtaSoftPhotonCut = etaSoftPhotonCutOverride
 
     if requireSoftPhotonIsInROE:
-        EtaSoftPhotonCut += 'and isInRestOfEvent==1'
+        EtaSoftPhotonCut += ' and isInRestOfEvent==1'
 
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)

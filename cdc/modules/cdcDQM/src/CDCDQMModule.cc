@@ -107,6 +107,8 @@ void CDCDQMModule::beginRun()
   m_hPhiIndex->Reset();
   m_hPhiEff->Reset();
   m_hPhiHit->Reset();
+  m_hPhiNCDC->Reset();
+  m_hTrackingWireEff->Reset();
 }
 
 void CDCDQMModule::event()

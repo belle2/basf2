@@ -75,7 +75,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
   m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 360, -180.0, 180.0);
 
-  c_hist_attach_eff = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 840, 800);
+  c_hist_attach_eff = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 840, 400);
   m_hist_attach_eff[0] = createEffiTH2Poly("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin");
   m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);
   m_hist_attach_eff[0]->SetDirectory(gDirectory);
@@ -329,17 +329,10 @@ void DQMHistAnalysisCDCEpicsModule::event()
   auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoTrackingWireEff, 0, true); //true=only if updated
   c_hist_attach_eff->Clear();
   if (m_delta_efflay) {
+    m_hist_wire_attach_eff_1d->Reset();
     fillEffiTH2Poly(m_delta_efflay, m_hist_attach_eff[0], m_hist_attach_eff[1], m_hist_attach_eff[2]);
-    c_hist_attach_eff->Divide(2, 2);
+    c_hist_attach_eff->Divide(2, 1);
     c_hist_attach_eff->cd(1);
-    gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
-    m_hist_attach_eff[0]->SetStats(0);
-    m_hist_attach_eff[0]->Draw("COLZ");
-    c_hist_attach_eff->cd(2);
-    gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
-    m_hist_attach_eff[1]->SetStats(0);
-    m_hist_attach_eff[1]->Draw("COLZ");
-    c_hist_attach_eff->cd(3);
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
     int nEffiValues = 0;
     for (int ij = 0; ij < m_hist_attach_eff[2]->GetNumberOfBins(); ij++) {
@@ -357,7 +350,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
     TLatex latex;
     latex.SetTextSize(0.025);
     latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanWireAttachProb * 100.0));
-    c_hist_attach_eff->cd(4);
+    c_hist_attach_eff->cd(2);
     if (nEffiValues) {
       int firstBoundaryBin = m_hist_wire_attach_eff_1d->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
       fracWiresWIthLowAttachProb = m_hist_wire_attach_eff_1d->Integral(1, firstBoundaryBin) / nEffiValues;
@@ -460,6 +453,8 @@ TH2Poly* DQMHistAnalysisCDCEpicsModule::createEffiTH2Poly(const TString& name, c
 
 void DQMHistAnalysisCDCEpicsModule::fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency)
 {
+  attached->Reset("ICES");
+  expected->Reset("ICES");
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   int nSLayers = cdcgeo.getNumberOfSenseLayers();
   for (int lay = 0; lay < nSLayers; lay++) {

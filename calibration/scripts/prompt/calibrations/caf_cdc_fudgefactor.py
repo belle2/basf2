@@ -10,6 +10,7 @@
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_cdc import settings as cdc_tracking_calibration
 from prompt.calibrations.vxdcdc_alignment import settings as alignment
+from prompt.calibrations.caf_vxdcdc_alignment import settings as full_alignment
 from prompt.utils import ExpRun
 import basf2
 from ROOT import Belle2
@@ -28,7 +29,7 @@ settings = CalibrationSettings(name="CDC Sigma fudge factor",
                                                    [INPUT_DATA_FILTERS["Data Tag"]["mumu_tight_or_highm_calib"],
                                                     INPUT_DATA_FILTERS["Data Quality Tag"]["Good"],
                                                     INPUT_DATA_FILTERS["Magnet"]["On"]]},
-                               depends_on=[cdc_tracking_calibration, alignment],
+                               depends_on=[cdc_tracking_calibration, alignment, full_alignment],
                                expert_config={
                                    "fileFormat": "RAW",
                                    "min_events_per_file": 500,

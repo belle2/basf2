@@ -30,7 +30,8 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadStdDstarPlus_Dpi0_Kpipi,
                                       loadCharmlessD0_Kpipi0,
                                       loadPiSkimHighEff,
-                                      loadKSkimHighEff)
+                                      loadKSkimHighEff,
+                                      loadSlowPi)
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons,
                                             loadStdSkimHighEffPhi,
@@ -1528,3 +1529,116 @@ class BtoD0pi_Kpiomega_pipipi0(BaseSkim):
         ma.reconstructDecay("B+:BtoD0pi_Kpiomega_pipipi0 -> anti-D0:BtoD0pi_Kpiomega_pipipi0 pi+:GoodTrack", Bcuts, path=path)
 
         return ["B+:BtoD0pi_Kpiomega_pipipi0"]
+
+
+@fancy_skim_header
+class BtoDsthpipi_D0pi_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{-}\\to \\D^{*+} (\\to D^0 (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^-`,
+
+    Cuts applied:
+
+    * ``1.84 < M_D < 1.89``
+    * ``5.22 < Mbc``
+    * ``-0.3 < deltaE < 0.2``
+
+    """
+    __authors__ = ["Agrim Aggarwal"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadKForBtoHadrons(path=path),
+        loadPiForBtoHadrons(path=path),
+        loadStdD0_Kpi(path=path),
+        loadStdDstarPlus_D0pi_Kpi(path=path),
+        loadSlowPi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+
+        ma.reconstructDecay("B-:Dsthpipi_D0pi_Kpi -> D*+:D0_Kpi pi-:GoodTrack pi-:GoodTrack", Bcuts, path=path)
+
+        return ["B-:Dsthpipi_D0pi_Kpi"]
+
+    # def validation_histograms(self, path):
+    #     # NOTE: the validation package is not part of the light releases, so this import
+    #     # must be made here rather than at the top of the file.
+    #     from validation_tools.metadata import create_validation_histograms
+
+    #     stdPi0s(listtype='eff50_May2020Fit', path=path)
+
+    #     ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_May2020Fit', '1.84 < M < 1.89', path=path)
+    #     ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
+
+    #     # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
+    #     create_validation_histograms(
+    #         rootfile=f'{self}_Validation.root',
+    #         particlelist='B-:ch3',
+    #         variables_1d=[
+    #             ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
+    #             ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates'),
+    #             ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
+    #         variables_2d=[
+    #             ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
+    #              'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+    #         path=path)
+
+
+@fancy_skim_header
+class BtoDpipi_Kpipi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{-}\\to D^{+} (\\to K^- \\pi^+ \\pi^-) \\pi^- \\pi^-`,
+
+
+    Cuts applied:
+
+    * ``1.84 < M_D < 1.89``
+    * ``5.22 < Mbc``
+    * ``-0.3 < deltaE < 0.2``
+    """
+    __authors__ = ["Melisa-Melek Akdag"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+        ma.reconstructDecay("B-:BtoDpipi_Kpipi -> D+:Kpipi pi-:GoodTrack pi-:GoodTrack",
+                            Bcuts,
+                            path=path)
+        return ["B-:BtoDpipi_Kpipi"]
+
+    # def validation_histograms(self, path):
+    #     # NOTE: the validation package is not part of the light releases, so this import
+    #     # must be made here rather than at the top of the file.
+    #     from validation_tools.metadata import create_validation_histograms
+
+    #     # the variables that are printed out are:
+    #     # Mbc, deltaE and the daughter particle invariant masses.
+    #     create_validation_histograms(
+    #         rootfile=f'{self}_Validation.root',
+    #         particlelist='B-:',
+    #         variables_1d=[
+    #             ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
+    #             ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates')],
+    #         variables_2d=[
+    #             ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
+    #              'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
+    #         path=path)

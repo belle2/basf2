@@ -13,6 +13,7 @@ import basf2_mva
 import modularAnalysis as ma
 import variables
 from variables import utils
+from basf2 import conditions as b2_conditions
 
 
 def add_default_ks_Selector_aliases():
@@ -61,6 +62,9 @@ def add_variable_collection():
         'M_lambda_p', 'M_lambda_antip',
         'pip_p', 'pin_p',
         'pip_cosTheta', 'pin_cosTheta',
+        'ArmenterosLongitudinalMomentumAsymmetry',
+        'ArmenterosDaughter1Qt',
+        'ArmenterosDaughter2Qt'
     ]
     utils.add_collection(inputVariablesList, 'ks_selector_info')
 
@@ -69,7 +73,8 @@ def V0Selector_Training(
     train_data,
     tree_name="tree",
     mva_identifier="MVAFastBDT_V0Selector.root",
-    target_variable="isSignal"
+    target_variable="isSignal",
+    parameters={}
 ):
     """
     Defines the configuration of V0Selector Training.
@@ -79,6 +84,8 @@ def V0Selector_Training(
     @param tree_name                    Tree name for variables.
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
+    @param parameters                   hyperparameter for LGBM
+
     """
     trainVars = [
         'cosVertexMomentum',
@@ -104,12 +111,56 @@ def V0Selector_Training(
     fastbdt_options = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general_options, fastbdt_options)
 
+    general_options = basf2_mva.GeneralOptions()
+    general_options.m_datafiles = basf2_mva.vector(train_data)
+    general_options.m_treename = tree_name
+    general_options.m_identifier = mva_identifier+'.root'
+    general_options.m_variables = basf2_mva.vector(*trainVars)
+    general_options.m_target_variable = target_variable
+
+    python_options = basf2_mva.PythonOptions()
+
+    python_options.m_framework = "custom"
+    python_options.m_steering_file = "MVALightGBM.py"
+
+    import json
+    param = {'num_leaves': 256,
+             'learning_rate': 0.1,
+             'device_type': "cpu",
+             'deterministic': True,
+             'metric': 'auc',
+             'num_round': 100,
+             # 'stop_round' : 30,
+             'path': mva_identifier+'.txt',
+             'max_bin': 250,
+             'boosting': ' gbdt',
+             'trainFraction': 0.8,
+             'min_data_in_leaf': 4000,
+             'max_depth': 8,
+             'objective': 'cross_entropy'
+             }
+
+    if isinstance(parameters, dict):
+        param.update(parameters)
+    config_string = json.dumps(param)
+    print("The json config string", config_string)
+    python_options.m_config = config_string
+
+    python_options.m_training_fraction = 1
+
+    python_options.m_normalize = False  # we do it inside MVA torch
+
+    python_options.m_nIterations = 1
+    python_options.m_mini_batch_size = 0
+    basf2_mva.teacher(general_options, python_options)
+
 
 def LambdaVeto_Training(
     train_data,
     tree_name="tree",
     mva_identifier="MVAFastBDT_LambdaVeto.root",
-    target_variable="isSignal"
+    target_variable="isSignal",
+    parameters={}
 ):
     """
     Defines the configuration of LambdaVeto Training.
@@ -119,16 +170,18 @@ def LambdaVeto_Training(
     @param tree_name                    Tree name for variables.
     @param mva_identifier               Name for output MVA weight file.
     @param target_variable              Target variable for MVA training.
+    @param parameters                   hyperparameter for LGBM
     """
     trainVars = [
         'pip_protonID',
         'pin_protonID',
         'M_lambda_p',
         'M_lambda_antip',
-        'pip_p',
-        'pin_p',
         'pip_cosTheta',
         'pin_cosTheta',
+        'ArmenterosLongitudinalMomentumAsymmetry',
+        'ArmenterosDaughter1Qt',
+        'ArmenterosDaughter2Qt'
     ]
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector(train_data)
@@ -139,6 +192,48 @@ def LambdaVeto_Training(
     fastbdt_options = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general_options, fastbdt_options)
 
+    general_options = basf2_mva.GeneralOptions()
+    general_options.m_datafiles = basf2_mva.vector(train_data)
+    general_options.m_treename = tree_name
+    general_options.m_identifier = mva_identifier+'.root'
+    general_options.m_variables = basf2_mva.vector(*trainVars)
+    general_options.m_target_variable = target_variable
+
+    python_options = basf2_mva.PythonOptions()
+
+    python_options.m_framework = "custom"
+    python_options.m_steering_file = "MVALightGBM.py"
+
+    import json
+    param = {'num_leaves': 256,
+             'learning_rate': 0.2,
+             'device_type': "cpu",
+             'deterministic': True,
+             'metric': 'auc',
+             'num_round': 100,
+             # 'stop_round' : 30,
+             'path': mva_identifier+'.txt',
+             'max_bin': 250,
+             'boosting': ' dart',
+             'trainFraction': 0.8,
+             'min_data_in_leaf': 300,
+             'max_depth': 8,
+             'objective': 'cross_entropy'
+             }
+
+    if isinstance(parameters, dict):
+        param.update(parameters)
+    config_string = json.dumps(param)
+    print("The json config string", config_string)
+    python_options.m_config = config_string
+
+    python_options.m_training_fraction = 1
+
+    python_options.m_normalize = False  # we do it inside MVA torch
+
+    python_options.m_nIterations = 1
+    python_options.m_mini_batch_size = 0
+    basf2_mva.teacher(general_options, python_options)
 # ****************************************
 # KS Selector MAIN FUNCTION
 # ****************************************
@@ -146,8 +241,8 @@ def LambdaVeto_Training(
 
 def ksSelector(
     particleListName,
-    identifier_Ks,
-    identifier_vLambda,
+    identifier_Ks="Ks_LGBM_V0_Selector",
+    identifier_vLambda="Ks_LGBM_LambdaVeto",
     output_label_name='',
     extraInfoName_V0Selector='KsSelector_V0Selector',
     extraInfoName_LambdaVeto='KsSelector_LambdaVeto',
@@ -182,6 +277,12 @@ def ksSelector(
 
     add_default_ks_Selector_aliases()
 
+    # if using weights files, prepend related conditiondb
+    centralDB = 'user_liuyux_KsFinder_dev'
+    if not(centralDB in b2_conditions.globaltags) and (identifier_Ks ==
+                                                       "Ks_LGBM_V0_Selector" or identifier_vLambda == "Ks_LGBM_LambdaVeto"):
+        b2_conditions.prepend_globaltag(centralDB)
+
     path.add_module('MVAMultipleExperts',
                     listNames=[particleListName],
                     extraInfoNames=[extraInfoName_V0Selector, extraInfoName_LambdaVeto],
@@ -212,15 +313,15 @@ def ksSelector(
             Lambda_thr = 0
             if output_label_name == 'standard':
                 B2INFO('KsSelector: Standard Cut is applied on '+outputListName+'.')
-                V0_thr = 0.90
-                Lambda_thr = 0.11
+                V0_thr = 0.91
+                Lambda_thr = 0.19
             elif output_label_name == 'tight':
                 B2INFO('KsSelector: Tight Cut is applied on '+outputListName+'.')
-                V0_thr = 0.96
-                Lambda_thr = 0.27
+                V0_thr = 0.97
+                Lambda_thr = 0.45
             elif output_label_name == 'loose':
                 B2INFO('KsSelector: Loose Cut is applied on '+outputListName+'.')
-                V0_thr = 0.49
+                V0_thr = 0.51
                 Lambda_thr = 0.02
             B2INFO('KsSelector: Threshold is (' + str(V0_thr) + ', ' + str(Lambda_thr) + ')')
             cut_string = 'extraInfo('+extraInfoName_V0Selector+')>'+str(V0_thr) + \

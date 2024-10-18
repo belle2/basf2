@@ -33,22 +33,11 @@ ma.inputMdst(filename=b2.find_file('B02JpsiKs_Jpsi2mumu_Ks2pipi.root', 'examples
 # load V0s and copy it
 stdV0s.stdKshorts(path=my_path)
 
-# load globaltag
-useCentralDB = True
-centralDB = 'KsFinder_dev'
-localDB = ''
-if useCentralDB:
-    b2.conditions.prepend_globaltag(centralDB)
-else:
-    b2.conditions.append_testing_payloads(localDB)
-
 # apply ksSelector to the K_S0 particle list
 # list type can be 'all', 'standard', 'tight', or 'loose'
 # If 'all', no cut is applied by KsSelector, and mva output become available via extraInfo.
 # if other list type, cut is applied on the original particle list.
 ksSelector.ksSelector(particleListName='K_S0:merged',
-                      identifier_Ks="sugiura_KsFinder_V0Selector",
-                      identifier_vLambda="sugiura_KsFinder_LambdaVeto",
                       output_label_name='standard',
                       extraInfoName_V0Selector='V0_mva',
                       extraInfoName_LambdaVeto='Lam_mva',

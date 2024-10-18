@@ -111,7 +111,7 @@ namespace Belle2 {
     TCanvas* c_hist_skimphi = nullptr; /**< canvas for various phi distribution */
     TH1D* m_hist_skimphi[8] = {nullptr}; /**< for above*/
 
-    TCanvas* c_hist_attach_eff = nullptr; /**< canvas for layer efficiency */
+    TCanvas* c_hist_attach_eff[4] = {nullptr}; /**< canvas for layer efficiency */
     TH2Poly* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
 

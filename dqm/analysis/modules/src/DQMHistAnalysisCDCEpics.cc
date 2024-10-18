@@ -75,7 +75,10 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_effphi = new TCanvas("CDC/c_hist_effphi", "c_hist_effphi", 500, 400);
   m_hist_effphi = new TH1D("CDC/hist_effphi", "m_hist_effphi", 360, -180.0, 180.0);
 
-  c_hist_attach_eff = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 840, 400);
+  c_hist_attach_eff[0] = new TCanvas("CDC/c_hist_attached_wires", "c_hist_attached_wires", 403, 400);
+  c_hist_attach_eff[1] = new TCanvas("CDC/c_hist_expected_wires", "c_hist_expected_wires", 403, 400);
+  c_hist_attach_eff[2] = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 403, 400);
+  c_hist_attach_eff[3] = new TCanvas("CDC/c_hist_attach_eff_1d", "c_hist_attach_eff_1d", 403, 400);
   m_hist_attach_eff[0] = createEffiTH2Poly("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin");
   m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);
   m_hist_attach_eff[0]->SetDirectory(gDirectory);
@@ -323,16 +326,23 @@ void DQMHistAnalysisCDCEpicsModule::event()
 
   // get wire efficiency
   double meanWireAttachProb = 0;
-  double fracWiresWIthLowAttachProb = 0;
+  double fracWiresWithLowAttachProb = 0;
   double fracWiresWithHighAttachProb = 0;
   gStyle->SetNumberContours(100);
   auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoTrackingWireEff, 0, true); //true=only if updated
-  c_hist_attach_eff->Clear();
+  for (int ij = 0; ij < 4; ij++) c_hist_attach_eff[ij]->Clear();
   if (m_delta_efflay) {
     m_hist_wire_attach_eff_1d->Reset();
     fillEffiTH2Poly(m_delta_efflay, m_hist_attach_eff[0], m_hist_attach_eff[1], m_hist_attach_eff[2]);
-    c_hist_attach_eff->Divide(2, 1);
-    c_hist_attach_eff->cd(1);
+    c_hist_attach_eff[0]->cd();
+    gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
+    m_hist_attach_eff[0]->SetStats(0);
+    m_hist_attach_eff[0]->Draw("COLZ");
+    c_hist_attach_eff[1]->cd();
+    gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
+    m_hist_attach_eff[1]->SetStats(0);
+    m_hist_attach_eff[1]->Draw("COLZ");
+    c_hist_attach_eff[2]->cd();
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
     int nEffiValues = 0;
     for (int ij = 0; ij < m_hist_attach_eff[2]->GetNumberOfBins(); ij++) {
@@ -350,31 +360,33 @@ void DQMHistAnalysisCDCEpicsModule::event()
     TLatex latex;
     latex.SetTextSize(0.025);
     latex.DrawLatexNDC(0.12, 0.87, TString::Format("mean = %.3f%%", meanWireAttachProb * 100.0));
-    c_hist_attach_eff->cd(2);
+    c_hist_attach_eff[3]->cd();
     if (nEffiValues) {
       int firstBoundaryBin = m_hist_wire_attach_eff_1d->GetXaxis()->FindBin(m_firstEffBoundary) - 1;
-      fracWiresWIthLowAttachProb = m_hist_wire_attach_eff_1d->Integral(1, firstBoundaryBin) / nEffiValues;
+      fracWiresWithLowAttachProb = m_hist_wire_attach_eff_1d->Integral(1, firstBoundaryBin) / nEffiValues;
       int secondBoundaryBin = m_hist_wire_attach_eff_1d->GetXaxis()->FindBin(m_secondEffBoundary) - 1;
       fracWiresWithHighAttachProb =  m_hist_wire_attach_eff_1d->Integral(secondBoundaryBin + 1,
                                      m_hist_wire_attach_eff_1d->GetNbinsX()) / nEffiValues;
       m_hist_wire_attach_eff_1d->SetStats(0);
       m_hist_wire_attach_eff_1d->Draw();
       latex.DrawLatexNDC(0.15, 0.87, TString::Format("%06.3f%% wire : eff < %.2f",
-                                                     fracWiresWIthLowAttachProb * 100,
+                                                     fracWiresWithLowAttachProb * 100,
                                                      m_firstEffBoundary));
       latex.DrawLatexNDC(0.15, 0.84, TString::Format("%06.3f%% wire : %.2f < eff < %.2f",
-                                                     (1. - fracWiresWithHighAttachProb - fracWiresWIthLowAttachProb) * 100,
+                                                     (1. - fracWiresWithHighAttachProb - fracWiresWithLowAttachProb) * 100,
                                                      m_firstEffBoundary, m_secondEffBoundary));
       latex.DrawLatexNDC(0.15, 0.81, TString::Format("%06.3f%% wire : %.2f < eff",
                                                      fracWiresWithHighAttachProb * 100,
                                                      m_secondEffBoundary));
     }
-    c_hist_attach_eff->Update();
-    UpdateCanvas(c_hist_attach_eff);
+    for (int ij = 0; ij < 4; ij++) {
+      c_hist_attach_eff[ij]->Update();
+      UpdateCanvas(c_hist_attach_eff[ij]);
+    }
   }
 
   m_monObj->setVariable("meanWireAttachProb", meanWireAttachProb);
-  m_monObj->setVariable("fracWiresWIthLowAttachProb", fracWiresWIthLowAttachProb);
+  m_monObj->setVariable("fracWiresWithLowAttachProb", fracWiresWithLowAttachProb);
   m_monObj->setVariable("fracWiresWithHighAttachProb", fracWiresWithHighAttachProb);
 
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: end event");

@@ -230,31 +230,31 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_histoList->Add(m_clsTrkTimeV3);
 
   if (m_3Samples) {
-    name = "SVDTRK_Cluster3TimeU3";
+    name = "SVDTRK_Cluster3SampleTimeU3";
     title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors for 3 samples", refFrame.Data());
-    m_cls3TrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls3TrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls3TrkTimeU3->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls3TrkTimeU3);
-    name = "SVDTRK_Cluster3TimeV3";
+    m_cls3SampleTrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeU3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeU3);
+    name = "SVDTRK_Cluster3SampleTimeV3";
     title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors for 3 samples", refFrame.Data());
-    m_cls3TrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls3TrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls3TrkTimeV3->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls3TrkTimeV3);
+    m_cls3SampleTrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeV3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeV3);
 
-    name = "SVDTRK_Cluster6TimeU3";
+    name = "SVDTRK_Cluster6SampleTimeU3";
     title = Form("SVD U-Cluster-on-Track Time %s for layer 3 sensors for 6 samples", refFrame.Data());
-    m_cls6TrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls6TrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls6TrkTimeU3->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls6TrkTimeU3);
-    name = "SVDTRK_Cluster6TimeV3";
+    m_cls6SampleTrkTimeU3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeU3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeU3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeU3);
+    name = "SVDTRK_Cluster6SampleTimeV3";
     title = Form("SVD V-Cluster-on-Track Time %s for layer 3 sensors for 6 samples", refFrame.Data());
-    m_cls6TrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls6TrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls6TrkTimeV3->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls6TrkTimeV3);
+    m_cls6SampleTrkTimeV3 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeV3->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeV3->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeV3);
   }
 
   name = "SVDTRK_ClusterTimeU456";
@@ -271,31 +271,31 @@ void SVDDQMClustersOnTrackModule::defineHisto()
   m_histoList->Add(m_clsTrkTimeV456);
 
   if (m_3Samples) {
-    name = "SVDTRK_Cluster3TimeU456";
+    name = "SVDTRK_Cluster3SampleTimeU456";
     title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
-    m_cls3TrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls3TrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls3TrkTimeU456->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls3TrkTimeU456);
-    name = "SVDTRK_Cluster3TimeV456";
+    m_cls3SampleTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeU456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeU456);
+    name = "SVDTRK_Cluster3SampleTimeV456";
     title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors for 3 samples", refFrame.Data());
-    m_cls3TrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls3TrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls3TrkTimeV456->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls3TrkTimeV456);
+    m_cls3SampleTrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls3SampleTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls3SampleTrkTimeV456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls3SampleTrkTimeV456);
 
-    name = "SVDTRK_Cluster6TimeU456";
+    name = "SVDTRK_Cluster6SampleTimeU456";
     title = Form("SVD U-Cluster-on-Track Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
-    m_cls6TrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls6TrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls6TrkTimeU456->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls6TrkTimeU456);
-    name = "SVDTRK_Cluster6TimeV456";
+    m_cls6SampleTrkTimeU456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeU456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeU456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeU456);
+    name = "SVDTRK_Cluster6SampleTimeV456";
     title = Form("SVD V-Cluster-on-Track Time %s for layers 4,5,6 sensors for 6 samples", refFrame.Data());
-    m_cls6TrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
-    m_cls6TrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
-    m_cls6TrkTimeV456->GetYaxis()->SetTitle("count");
-    m_histoList->Add(m_cls6TrkTimeV456);
+    m_cls6SampleTrkTimeV456 = new TH1F(name.Data(), title.Data(), TimeBins, TimeMin, TimeMax);
+    m_cls6SampleTrkTimeV456->GetXaxis()->SetTitle("cluster time (ns)");
+    m_cls6SampleTrkTimeV456->GetYaxis()->SetTitle("count");
+    m_histoList->Add(m_cls6SampleTrkTimeV456);
   }
 
   //----------------------------------------------------------------
@@ -476,9 +476,9 @@ void SVDDQMClustersOnTrackModule::event()
 
           if (m_3Samples) {
             if (nSamples == 3) {
-              if (m_cls3TrkTimeU3 != nullptr) m_cls3TrkTimeU3->Fill(time);
+              if (m_cls3SampleTrkTimeU3 != nullptr) m_cls3SampleTrkTimeU3->Fill(time);
             } else {
-              if (m_cls6TrkTimeU3 != nullptr) m_cls6TrkTimeU3->Fill(time);
+              if (m_cls6SampleTrkTimeU3 != nullptr) m_cls6SampleTrkTimeU3->Fill(time);
             }
           }
         } else {
@@ -488,9 +488,9 @@ void SVDDQMClustersOnTrackModule::event()
 
           if (m_3Samples) {
             if (nSamples == 3) {
-              if (m_cls3TrkTimeU456 != nullptr) m_cls3TrkTimeU456->Fill(time);
+              if (m_cls3SampleTrkTimeU456 != nullptr) m_cls3SampleTrkTimeU456->Fill(time);
             } else {
-              if (m_cls6TrkTimeU456 != nullptr) m_cls6TrkTimeU456->Fill(time);
+              if (m_cls6SampleTrkTimeU456 != nullptr) m_cls6SampleTrkTimeU456->Fill(time);
             }
           }
         }
@@ -512,9 +512,9 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkTimeV3 != nullptr) m_clsTrkTimeV3->Fill(time);
           if (m_3Samples) {
             if (nSamples == 3) {
-              if (m_cls3TrkTimeV3 != nullptr) m_cls3TrkTimeV3->Fill(time);
+              if (m_cls3SampleTrkTimeV3 != nullptr) m_cls3SampleTrkTimeV3->Fill(time);
             } else {
-              if (m_cls6TrkTimeV3 != nullptr) m_cls6TrkTimeV3->Fill(time);
+              if (m_cls6SampleTrkTimeV3 != nullptr) m_cls6SampleTrkTimeV3->Fill(time);
             }
           }
         } else {
@@ -523,9 +523,9 @@ void SVDDQMClustersOnTrackModule::event()
           if (m_clsTrkTimeV456 != nullptr) m_clsTrkTimeV456->Fill(time);
           if (m_3Samples) {
             if (nSamples == 3) {
-              if (m_cls3TrkTimeV456 != nullptr) m_cls3TrkTimeV456->Fill(time);
+              if (m_cls3SampleTrkTimeV456 != nullptr) m_cls3SampleTrkTimeV456->Fill(time);
             } else {
-              if (m_cls6TrkTimeV456 != nullptr) m_cls6TrkTimeV456->Fill(time);
+              if (m_cls6SampleTrkTimeV456 != nullptr) m_cls6SampleTrkTimeV456->Fill(time);
             }
           }
         }

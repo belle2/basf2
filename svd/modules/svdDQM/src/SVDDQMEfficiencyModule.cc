@@ -127,11 +127,11 @@ void SVDDQMEfficiencyModule::event()
 
       if (m_3Samples) {
         if (nSamples == 3) {
-          m_TrackHits3->fill(theVxdID, 0, 1);
-          m_TrackHits3->fill(theVxdID, 1, 1);
+          m_TrackHits3Sample->fill(theVxdID, 0, 1);
+          m_TrackHits3Sample->fill(theVxdID, 1, 1);
         } else {
-          m_TrackHits6->fill(theVxdID, 0, 1);
-          m_TrackHits6->fill(theVxdID, 1, 1);
+          m_TrackHits6Sample->fill(theVxdID, 0, 1);
+          m_TrackHits6Sample->fill(theVxdID, 1, 1);
         }
       }
 
@@ -170,9 +170,9 @@ void SVDDQMEfficiencyModule::event()
         m_MatchedHits->fill(theVxdID, 1, 1);
         if (m_3Samples) {
           if (nSamples == 3)
-            m_MatchedHits3->fill(theVxdID, 1, 1);
+            m_MatchedHits3Sample->fill(theVxdID, 1, 1);
           else
-            m_MatchedHits6->fill(theVxdID, 1, 1);
+            m_MatchedHits6Sample->fill(theVxdID, 1, 1);
         }
 
         if (m_saveExpertHistos) {
@@ -190,9 +190,9 @@ void SVDDQMEfficiencyModule::event()
         m_MatchedHits->fill(theVxdID, 0, 1);
         if (m_3Samples) {
           if (nSamples == 3)
-            m_MatchedHits3->fill(theVxdID, 0, 1);
+            m_MatchedHits3Sample->fill(theVxdID, 0, 1);
           else
-            m_MatchedHits6->fill(theVxdID, 0, 1);
+            m_MatchedHits6Sample->fill(theVxdID, 0, 1);
         }
 
         if (m_saveExpertHistos) {
@@ -222,10 +222,10 @@ void SVDDQMEfficiencyModule::defineHisto()
   m_MatchedHits = new SVDSummaryPlots("MatchedHits@view", "Number of Matched Clusters on the @view/@side Side");
 
   if (m_3Samples) {
-    m_TrackHits3 = new SVDSummaryPlots("TrackHits3@view", "Number of Tracks intercepting the @view/@side Side for 3 samples");
-    m_TrackHits6 = new SVDSummaryPlots("TrackHits6@view", "Number of Tracks intercepting the @view/@side Side for 6 samples");
-    m_MatchedHits3 = new SVDSummaryPlots("MatchedHits3@view", "Number of Matched Clusters on the @view/@side Side for 3 samples");
-    m_MatchedHits6 = new SVDSummaryPlots("MatchedHits6@view", "Number of Matched Clusters on the @view/@side Side for 6 samples");
+    m_TrackHits3Sample = new SVDSummaryPlots("TrackHits3@view", "Number of Tracks intercepting the @view/@side Side for 3 samples");
+    m_TrackHits6Sample = new SVDSummaryPlots("TrackHits6@view", "Number of Tracks intercepting the @view/@side Side for 6 samples");
+    m_MatchedHits3Sample = new SVDSummaryPlots("MatchedHits3@view", "Number of Matched Clusters on the @view/@side Side for 3 samples");
+    m_MatchedHits6Sample = new SVDSummaryPlots("MatchedHits6@view", "Number of Matched Clusters on the @view/@side Side for 6 samples");
   }
 
   if (!m_saveExpertHistos) {

@@ -101,11 +101,11 @@ namespace Belle2 {
 
 
     SVDSummaryPlots* m_TrackHits = nullptr; /**< track hits summary plot*/
-    SVDSummaryPlots* m_TrackHits3 = nullptr; /**< track hits summary plot for 3 samples*/
-    SVDSummaryPlots* m_TrackHits6 = nullptr; /**< track hits summary plot for 6 samples*/
+    SVDSummaryPlots* m_TrackHits3Sample = nullptr; /**< track hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_TrackHits6Sample = nullptr; /**< track hits summary plot for 6 samples*/
     SVDSummaryPlots* m_MatchedHits = nullptr; /**< matched hits summary plot*/
-    SVDSummaryPlots* m_MatchedHits3 = nullptr; /**< matched hits summary plot for 3 samples*/
-    SVDSummaryPlots* m_MatchedHits6 = nullptr; /**< matched hits summary plot for 6 samples*/
+    SVDSummaryPlots* m_MatchedHits3Sample = nullptr; /**< matched hits summary plot for 3 samples*/
+    SVDSummaryPlots* m_MatchedHits6Sample = nullptr; /**< matched hits summary plot for 6 samples*/
 
   };
 }

@@ -97,7 +97,7 @@ def get_argument_parser():
         metavar="Skim",
         help="List of skims to run as a combined skim.",
     )
-     
+
     flagged = subparsers.add_parser(
         "flagged", help="Run several skims as a flagged steering file.",
     )
@@ -109,7 +109,7 @@ def get_argument_parser():
         metavar="Skim",
         help="List of skims to run as a flagged skim.",
     )
-    
+
     flagged.add_argument(
         "--flaggedSkim",
         default=None,

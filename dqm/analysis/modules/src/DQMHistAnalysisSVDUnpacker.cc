@@ -97,12 +97,6 @@ void DQMHistAnalysisSVDUnpackerModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
-  TH1* rtype = findHist("DQMInfo/rtype");
-  if (rtype)
-    B2DEBUG(10, "DQMInfo/rtype found");
-
-  m_runtype = rtype ? rtype->GetTitle() : "physics"; // per default
-
   TString tmp = hnEvnts->GetTitle();
   Int_t pos = tmp.Last('~');
   if (pos == -1) pos = 0;

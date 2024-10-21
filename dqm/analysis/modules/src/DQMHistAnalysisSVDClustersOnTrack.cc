@@ -91,34 +91,37 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   m_legTiProblem->AddText("ERROR!");
   m_legTiProblem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
   m_legTiProblem->SetFillColor(c_ColorDefault);
-  m_legTiProblem->SetLineColor(kBlack);
+  m_legTiProblem->SetTextColor(kBlack);
 
   m_legTiNormal = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
   m_legTiNormal->AddText("TIME SHIFT UNDER LIMIT");
   m_legTiNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
   m_legTiNormal->SetFillColor(c_ColorDefault);
-  m_legTiNormal->SetLineColor(kBlack);
+  m_legTiNormal->SetTextColor(kBlack);
 
   m_legTiEmpty = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
   m_legTiEmpty->AddText("Not enough statistics");
-  m_legTiEmpty->SetTextColor(c_ColorDefault);
-  m_legTiEmpty->SetFillColor(kBlack);
+  m_legTiEmpty->SetFillColor(c_ColorDefault);
+  m_legTiEmpty->SetTextColor(kBlack);
 
   m_legTi3Problem = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
   m_legTi3Problem->AddText("ERROR!");
   m_legTi3Problem->AddText(Form("abs(Mean) > %3.1f ns", m_timeThreshold));
   m_legTi3Problem->SetFillColor(c_ColorDefault);
+  m_legTi3Problem->SetTextColor(kBlack);
 
-  m_legTi3Normal = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTi3Normal->AddText("TIME SHIFT UNDER LIMIT");
-  m_legTi3Normal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
-  m_legTi3Normal->SetFillColor(c_ColorDefault);
-  m_legTi3Normal->SetLineColor(kBlack);
+  if (m_3Samples) {
+    m_legTi3Normal = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
+    m_legTi3Normal->AddText("TIME SHIFT UNDER LIMIT");
+    m_legTi3Normal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
+    m_legTi3Normal->SetFillColor(c_ColorDefault);
+    m_legTi3Normal->SetTextColor(kBlack);
 
-  m_legTi3Empty = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
-  m_legTi3Empty->AddText("Not enough statistics");
-  m_legTi3Empty->SetTextColor(c_ColorDefault);
-  m_legTi3Empty->SetFillColor(kBlack);
+    m_legTi3Empty = new TPaveText(0.15, 0.65, 0.35, 0.80, "brNDC");
+    m_legTi3Empty->AddText("Not enough statistics");
+    m_legTi3Empty->SetFillColor(c_ColorDefault);
+    m_legTi3Empty->SetTextColor(kBlack);
+  }
 }
 
 void DQMHistAnalysisSVDClustersOnTrackModule::event()
@@ -134,11 +137,11 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
-  TH1* rtype = findHist("DQMInfo/rtype");
-  if (rtype)
-    B2DEBUG(10, "DQMInfo/rtype found");
+  string rtype = getRunType();
+  m_runtype = !rtype.empty() ? rtype.c_str() : "physics"; // per default
 
-  m_runtype = rtype ? rtype->GetTitle() : "physics"; // per default
+  if (rtype.empty())
+    B2INFO("no run type found, put defaultwise physics");
 
   TString tmp = hnEvnts->GetTitle();
   Int_t pos = tmp.Last('~');
@@ -301,6 +304,12 @@ void DQMHistAnalysisSVDClustersOnTrackModule::terminate()
   delete m_legTiProblem;
   delete m_legTiNormal;
   delete m_legTiEmpty;
+
+  if (m_3Samples) {
+    delete m_legTi3Problem;
+    delete m_legTi3Normal;
+    delete m_legTi3Empty;
+  }
 
   delete m_cClusterOnTrackTime_L456V;
   delete m_cClusterOnTrackTimeL456V3Samples;

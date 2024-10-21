@@ -54,7 +54,7 @@ namespace Belle2::InvariantMassBhadCalib {
     std::vector<Candidate>  cand = {}; ///< vector of B meson candidates
 
 
-    int nBootStrap = 1;  ///< bootstap weight, 1 -> data without bootstrapping
+    int nBootStrap = 1;  ///< bootstrap weight, 1 -> data without bootstrapping
   };
 
 

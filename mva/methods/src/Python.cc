@@ -96,9 +96,6 @@ namespace Belle2 {
       {
         if (not Py_IsInitialized()) {
           Py_Initialize();
-          // wchar_t* bla[] = {L""};
-          wchar_t** bla = nullptr;
-          PySys_SetArgvEx(0, bla, 0);
           m_initialized_python = true;
         }
 

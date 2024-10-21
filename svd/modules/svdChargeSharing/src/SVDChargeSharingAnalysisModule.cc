@@ -208,7 +208,7 @@ void SVDChargeSharingAnalysisModule::event()
       unsigned short clSize = svdClustersTrack[cl]->getSize();
       unsigned short clSizeIndex;
       unsigned short sensTypeIndex;
-      VXD::SensorInfoBase info = VXD::GeoCache::get(cl_VxdID);
+      VXD::SensorInfoBase info = VXD::GeoCache::getInstance().getSensorInfo(cl_VxdID);
       // double sensThickness = info.getThickness();
       // double pathLength = VXDdedxTr[0]->getDx(cl); // path length in the silicon, for a given sensor
       // double incAngle = 180. / M_PI * acos(sensThickness / pathLength);

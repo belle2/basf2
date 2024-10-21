@@ -10,7 +10,7 @@ Checkpointing for machine learning
 
     **Prerequisites**:
 
-    * a python enviroment
+    * a python environment
 
     **Questions**:
 
@@ -26,10 +26,10 @@ Checkpointing describes the process of storing the current state of the program 
 Having checkpoints of workflows is helpful in case of failures or crashes and can save time and resource when not everything has to be re-run.
 
 Checkpointing an arbitrary workflow however can be almost endlessly complex.
-However, very repetetive workflows can be checkpointed with little effort.
+However, very repetitive workflows can be checkpointed with little effort.
 Common examples in the context of high energy physics are event loops and machine learning workflows.
 For event loops, Checkpointing is not so interesting, since this work is trivially parallelizable:
-the workload can be split in independent batches to minimize the risk of loosing work.
+the workload can be split in independent batches to minimize the risk of losing work.
 
 Training machine learning models however can not be parallelized, since one epoch depends on the epoch before.
 Additionally, the training time can be very long, which makes crashes more severe and time constraints on host sites a big issue.

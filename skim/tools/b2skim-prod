@@ -12,7 +12,7 @@
    This tool is intended for use by skim production managers, not by skim liaisons.
 
 ``%(prog)s`` is a tool for producing grid production requests in the format required by the
-`production system <https://confluence.desy.de/display/BI/Production+Definition>`_, and
+`production system <https://xwiki.desy.de/xwiki/rest/p/81bb3>`_, and
 also generating combined steering files.
 
 YAML files are used by this tool to define the LPNs of datasets. Below are examples of

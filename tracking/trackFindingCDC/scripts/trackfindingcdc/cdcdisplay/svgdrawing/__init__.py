@@ -27,7 +27,7 @@ class CDCSVGPlotter:
 
     def __init__(self, animate=False):
         """
-        Constructor methode.
+        Constructor method.
         @param animate switch indicating if an animated SVG should be generated
         """
         top = -112

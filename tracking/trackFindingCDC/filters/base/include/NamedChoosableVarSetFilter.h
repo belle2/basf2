@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Convience template to create a filter returning on variable from a set of variables.
+    /// Convenience template to create a filter returning on variable from a set of variables.
     template <class ATruthVarSet>
     using NamedChoosableVarSetFilter = ChoosableFromVarSetFilter<ATruthVarSet>;
   }

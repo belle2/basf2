@@ -40,6 +40,9 @@
 
 #include <cmath>
 
+// for std::ignore
+#include <utility>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -70,7 +73,7 @@ namespace {
   /// used by drawCDCSimHitsConnectByToF as comparison tool
   class FlightTimeOrder {
   public:
-    /// Comparision function that sorts CDCSimHits for their flight time.
+    /// Comparison function that sorts CDCSimHits for their flight time.
     bool operator()(const CDCSimHit* x, const CDCSimHit* y) const
     {
       return (x->getFlightTime() < y->getFlightTime());
@@ -393,10 +396,9 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& hitStoreArrayName
       return false;
     };
 
-    // cppcheck-suppress ignoredReturnValue
-    std::adjacent_find(simHitsForMcParticle.begin(),
-                       simHitsForMcParticle.end(),
-                       drawConnectSimHits);
+    std::ignore = std::adjacent_find(simHitsForMcParticle.begin(),
+                                     simHitsForMcParticle.end(),
+                                     drawConnectSimHits);
   }
 }
 

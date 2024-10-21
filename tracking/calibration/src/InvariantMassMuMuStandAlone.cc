@@ -852,7 +852,7 @@ namespace Belle2::InvariantMassMuMuCalib {
         double err  = sqrt(resM(ind, ind));
 
 
-        // if there are problems with fit, try again with diffrent bootstrap replica
+        // if there are problems with fit, try again with different bootstrap replica
         if (!(errEst < err && err < 4 * errEst))
           continue;
 
@@ -883,7 +883,7 @@ namespace Belle2::InvariantMassMuMuCalib {
         }
 
 
-        // if the fit was sucesfull several times only on replicas, plot & break
+        // if the fit was successful several times only on replicas, plot & break
         if (vals.size() >= nRep) {
           plotMuMuFit(readEvents(evtsNow, 0.9/*PIDcut*/, mMin, mMax), resP, resM, mMin, mMax, int(round(evtsNow[0].t)));
           break;

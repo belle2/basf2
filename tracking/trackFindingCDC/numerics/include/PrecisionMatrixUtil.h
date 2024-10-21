@@ -94,7 +94,7 @@ namespace Belle2 {
        *  @param      precision2  Precision matrix to the second parameters
        *  @param[out] parameter   Averaged parameters
        *  @param[out] precision   Averaged precision matrix
-       *  @return                 Chi square deviation of orignal parameters to the average
+       *  @return                 Chi square deviation of original parameters to the average
        */
       template <int N>
       static double average(const ParameterVector<N>& parameter1,

@@ -21,7 +21,7 @@ REG_MODULE(V0Finder);
 
 V0FinderModule::V0FinderModule() : Module()
 {
-  setDescription("This is a simple V0 finder for X = Ks, Lambda and converted fotons "
+  setDescription("This is a simple V0 finder for X = Ks, Lambda and converted photons "
                  "which matches all positive tracks with all negative tracks, "
                  "fitting a vertex for each pair. "
                  "Depending on the outcome of each fit, a corresponding "
@@ -88,7 +88,7 @@ V0FinderModule::V0FinderModule() : Module()
            "Set value to 0 to accept all.", 0.5);
   addParam("precutCosAlpha", m_precutCosAlpha, "preselection cut on the cosine of opening angle between two tracks. "
            "Those above this cut are always accepted.", 0.9);
-  addParam("useNewV0Fitter", m_useNewV0Fitter, "on true use new V0 fitter, othewise use the old one", false);
+  addParam("useNewV0Fitter", m_useNewV0Fitter, "on true use new V0 fitter, otherwise use the old one", false);
 }
 
 
@@ -97,7 +97,7 @@ void V0FinderModule::initialize()
   m_tracks.isRequired(m_arrayNameTrack);
   StoreArray<RecoTrack> recoTracks(m_arrayNameRecoTrack);
   m_tracks.requireRelationTo(recoTracks);
-  //All the other required StoreArrays are checked in the Construtor of the V0Fitter.
+  //All the other required StoreArrays are checked in the Constructor of the V0Fitter.
 
   if (m_useNewV0Fitter) {
     m_newV0Fitter = std::make_unique<NewV0Fitter>(m_arrayNameTFResult, m_arrayNameV0,
@@ -125,7 +125,7 @@ void V0FinderModule::initialize()
             (m_preFilterMassRangeLambda) << " max = " << std::get<1>(m_preFilterMassRangeLambda));
   }
 
-  // precalculate the mass range squared
+  // Precalculate the mass range squared
   m_mKshortMin2 = std::get<0>(m_preFilterMassRangeKshort) < 0 ? -std::get<0>(m_preFilterMassRangeKshort) * std::get<0>
                   (m_preFilterMassRangeKshort) : std::get<0>
                   (m_preFilterMassRangeKshort) * std::get<0>(m_preFilterMassRangeKshort);
@@ -215,7 +215,7 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
   const auto trackHypotheses = m_newV0Fitter ? m_newV0Fitter->getTrackHypotheses(v0Hypothesis) : m_v0Fitter->getTrackHypotheses(
                                  v0Hypothesis);
 
-  // first track should always be the positve one
+  // first track should always be the positive one
   double m_plus = trackHypotheses.first.getMass();
   double p_plus = trackPlus->getTrackFitResultWithClosestMass(trackHypotheses.first)->getMomentum().R();
   double E_plus = sqrt(m_plus * m_plus + p_plus * p_plus);
@@ -232,7 +232,7 @@ V0FinderModule::preFilterTracks(const Track* trackPlus, const Track* trackMinus,
   double candmass_min2 = sum_E2 - (p_plus + p_minus) * (p_plus + p_minus);
   double candmass_max2 = sum_E2 - (p_plus - p_minus) * (p_plus - p_minus);
 
-  // if true possible candiate mass overlaps with the user specified range
+  // if true possible candidate mass overlaps with the user specified range
   bool in_range = candmass_max2 > *range_m2_min and candmass_min2 < *range_m2_max;
 
   return in_range;
@@ -261,7 +261,7 @@ bool V0FinderModule::isTrackPairSelected(const Track* track1, const Track* track
   // where p1 = r1 + k1 * lam1 and p2 = r2 + k2 * lam2,
   // and lam1 and lam2 are running parameters - the unknowns of the equations.
   //
-  // After rearangement the system of equations reads:
+  // After rearrangement the system of equations reads:
   //
   //   lam1 - cosAlpha * lam2 = b1, b1 = (r2 - r1).Dot(k1),
   //   cosAlpha * lam1 - lam2 = b2, b2 = (r2 - r1).Dot(k2)
@@ -273,7 +273,7 @@ bool V0FinderModule::isTrackPairSelected(const Track* track1, const Track* track
   double b1 = dr.Dot(k1);
   double b2 = dr.Dot(k2);
   double lam1 = (-b1 + b2 * cosAlpha) / D; // solution for the first straight line
-  double lam2 = (b2 - b1 * cosAlpha) / D;  // solution for the second staright line
+  double lam2 = (b2 - b1 * cosAlpha) / D;  // solution for the second straight line
   auto p1 = r1 + k1 * lam1;  // point on the first line closest to the second line
   auto p2 = r2 + k2 * lam2;  // point on the second line closest to the first line
   auto poca = (p1 + p2) / 2; // POCA of two straight lines, an approximation for the vertex

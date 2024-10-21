@@ -214,7 +214,7 @@ class WrongRLColorMap():
 
     def __call__(self, iCDCRecoHit, cdcRecoHit3D):
         """
-        This function maps the cdcRecoHit3D to the color which inidcated the correctness of the rl passage
+        This function maps the cdcRecoHit3D to the color which indicates the correctness of the rl passage
         """
 
         cdcHit = cdcRecoHit3D.getWireHit().getHit()
@@ -239,7 +239,7 @@ class WrongRLColorMap():
 class PosFlagColorMap(CDCHitColorMap):
 
     """
-    CDCHit to color map by their assoziated CDCSimHit::getPosFlag property.
+    CDCHit to color map by their associated CDCSimHit::getPosFlag property.
     """
 
     def __call__(self, iCDCHit, cdcHit):
@@ -269,7 +269,7 @@ class PosFlagColorMap(CDCHitColorMap):
 class BackgroundTagColorMap(CDCHitColorMap):
 
     """
-    CDCHit to color map by their assoziated CDCSimHit::getBackgroundTag property.
+    CDCHit to color map by their associated CDCSimHit::getBackgroundTag property.
     """
 
     #: access the SimHitBase enum of background tags
@@ -381,7 +381,7 @@ class MCSegmentIdColorMap(CDCHitColorMap):
 class TOFColorMap(CDCHitColorMap):
 
     """
-    CDCHit to color map by their assoziated CDCSimHit::getFlightTime.
+    CDCHit to color map by their associated CDCSimHit::getFlightTime.
     """
 
     def __call__(self, iCDCHit, cdcHit):
@@ -420,16 +420,16 @@ class ReassignedSecondaryMap(CDCHitColorMap):
 class MCParticleColorMap(CDCHitColorMap):
 
     """
-    CDCHit to color map coloring by the assoziated MCParticle::getArrayIndex()
+    CDCHit to color map coloring by the associated MCParticle::getArrayIndex()
     """
 
     def __init__(self):
         """
-        Construction method setting up a Monte Carlo id to color dictionary which is continously filled
+        Construction method setting up a Monte Carlo id to color dictionary which is continuously filled
         as new during the event.
         """
 
-        #: Dictionary mapping the MCParticle ids to colors for consistent and contious use of the available colors
+        #: Dictionary mapping the MCParticle ids to colors for consistent and continuous use of the available colors
         self.color_by_mcparticleId = {-1: self.bkgHitColor}
 
     def __call__(self, iCDCHit, cdcHit):
@@ -463,7 +463,7 @@ class MCParticleColorMap(CDCHitColorMap):
 class MCPDGCodeColorMap(CDCHitColorMap):
 
     """
-    CDCHit to color map by the assoziated MCParticle::getPDG()
+    CDCHit to color map by the associated MCParticle::getPDG()
     """
 
     #: Dictionary to define the color for the most relevant
@@ -534,7 +534,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
 
     def __init__(self):
         """
-        Constuction method setting up a dictionary to count the hits for each secondary type.
+        Construction method setting up a dictionary to count the hits for each secondary type.
         """
 
         #: Dictionary keeping track of the number of hits with a specific secondary process type.
@@ -573,7 +573,7 @@ class MCPrimaryColorMap(CDCHitColorMap):
 
     def __str__(self):
         """
-        Informal string summarizing the translation from seconday process codes to colors.
+        Informal string summarizing the translation from secondary process codes to colors.
         """
 
         return """

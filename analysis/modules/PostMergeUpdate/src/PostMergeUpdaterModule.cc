@@ -82,11 +82,11 @@ TRotation PostMergeUpdaterModule::tag_vertex_rotation()
     }
 
 
-    B2Vector3D cros = tag3v.Unit().Cross(sec3v.Unit());
+    B2Vector3D cross = tag3v.Unit().Cross(sec3v.Unit());
     double  dot = tag3v.Unit().Dot(sec3v.Unit());
 
     // Rotation to make secondary B point as tag B
-    rot.Rotate(-acos(dot), cros);
+    rot.Rotate(-acos(dot), cross);
 
     // Closure test that rotation does what expected:
     B2Vector3D test = rot * sec3v;

@@ -175,7 +175,7 @@ void DQMHistAnalysisPXDChargeModule::event()
 //     m_line2->Draw();
 //     m_line3->Draw();
     m_hCharge->Fit(m_fMean, "R");
-    data = m_fMean->GetParameter(0); // we are more interessted in the maximum deviation from mean
+    data = m_fMean->GetParameter(0); // we are more interested in the maximum deviation from mean
     m_hCharge->GetMinimumAndMaximum(currentMin, currentMax);
     diff = fabs(data - currentMin) > fabs(currentMax - data) ? fabs(data - currentMin) : fabs(currentMax - data);
     if (0) B2INFO("Mean: " << data << " Max Diff: " << diff);
@@ -191,7 +191,7 @@ void DQMHistAnalysisPXDChargeModule::event()
     m_cCharge->Pad()->SetFillColor(kGray);// Magenta or Gray
     status = 0; // default
   } else {
-    /// FIXME: what is the accpetable limit?
+    /// FIXME: what is the acceptable limit?
     if (fabs(data - 50.) > 20. || diff > 30) {
       m_cCharge->Pad()->SetFillColor(kRed);// Red
       status = 4;

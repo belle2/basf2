@@ -341,7 +341,7 @@ def add_time_extraction(path, append_full_grid_cdc_eventt0=False, components=Non
         SVD EventT0 being present. Has no effect if append_full_grid_cdc_eventt0 is false. Default: true
     """
 
-    # Always run SVD EventT0 estimation first so that the CDC based medhod can check whether an SVD based EventT0 exists
+    # Always run SVD EventT0 estimation first so that the CDC based method can check whether an SVD based EventT0 exists
     if is_svd_used(components):
         path.add_module("SVDEventT0Estimator")
 
@@ -725,7 +725,7 @@ def add_vxd_standalone_cosmics_finder(
     if "PXDSpacePointCreator" not in [m.name() for m in path.modules()]:
         path.add_module('PXDSpacePointCreator', SpacePoints=pxd_spacepoints_name)
 
-    # SVDSpacePointCreator is applied in funtion add_svd_reconstruction
+    # SVDSpacePointCreator is applied in function add_svd_reconstruction
 
     track_finder = b2.register_module('TrackFinderVXDCosmicsStandalone')
     track_finder.param('SpacePointTrackCandArrayName', "")

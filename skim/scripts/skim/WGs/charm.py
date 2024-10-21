@@ -41,7 +41,7 @@ from variables import variables as vm
 
 
 __liaison__ = "Jaeyoung Kim <jaeyoung_kim@yonsei.ac.kr>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @lru_cache  # Avoid loading the list multiple time on the same path
@@ -549,44 +549,6 @@ class DpToHpPi0(BaseSkim):
         DList = []
         ma.reconstructDecay("D+:HpPi0 -> pi+:HpPi0 pi0:HpPi0", Dpcuts, path=path)
         DList.append("D+:HpPi0")
-
-        return DList
-
-
-@fancy_skim_header
-class DpToKsHp(BaseSkim):
-    """
-    **Decay Modes**:
-        * :math:`D^+ \\to K_S \\pi^+`
-
-    **Selection Criteria**:
-        * Tracks: ``dr < 1, abs(dz) < 3, thetaInCDCAcceptance``
-        * Use Ks from `stdKshorts`
-        * ``1.77 < M(D+) < 1.97, pcms(D+) > 2.0``
-        * For more details, please check the source code of this skim.
-
-    """
-
-    __authors__ = ["Yifan Jin"]
-    __description__ = "Skim list for D+ to Ks pi+."
-    __contact__ = __liaison__
-    __category__ = "physics, charm"
-
-    NoisyModules = ["ParticleLoader", "RootOutput"]
-    ApplyHLTHadronCut = False
-
-    def load_standard_lists(self, path):
-        charm_skim_std_charged('pi', path=path)
-        stdKshorts(path=path)
-
-    def build_lists(self, path):
-        ma.cutAndCopyList('pi+:DpToKsPip', 'pi+:charmSkim', 'pt > 0.1 and useCMSFrame(p) > 0.5', path=path)
-
-        Dpcuts = "1.77 < M < 1.97 and useCMSFrame(p) > 2.0"
-
-        DList = []
-        ma.reconstructDecay("D+:KsPip -> K_S0:merged pi+:DpToKsPip", Dpcuts, path=path)
-        DList.append("D+:KsPip")
 
         return DList
 

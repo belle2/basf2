@@ -17,7 +17,7 @@ namespace Belle2 {
     class SVGPrimitivePlotter : public PrimitivePlotter {
 
     private:
-      /// Constant for the number of indention space to be used within the svg block
+      /// Constant for the number of indentation space to be used within the svg block
       static const int s_defaultNIndentationSpaces;
 
       /// Constant for the additional number of space to be prepended with each open tag group.
@@ -51,7 +51,7 @@ namespace Belle2 {
        *  @param startY        y coordinate where the line starts.
        *  @param endX          x coordinate where the line ends.
        *  @param endY          y coordinate where the line ends.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties of the line.
        */
       void drawLine(float startX,
                     float startY,
@@ -66,7 +66,7 @@ namespace Belle2 {
        *  @param startY        y coordinate where the arrow starts.
        *  @param endX          x coordinate where the arrow ends.
        *  @param endY          y coordinate where the arrow ends.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties of the line.
        */
       void drawArrow(float startX,
                      float startY,
@@ -80,7 +80,7 @@ namespace Belle2 {
        *  @param centerX        x coordinate of the circle center.
        *  @param centerY        y coordinate of the circle center.
        *  @param radius         radius of the circle
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties of the line.
        */
       void drawCircle(float centerX,
                       float centerY,
@@ -97,7 +97,7 @@ namespace Belle2 {
        *  @param radius        Radius of the circle
        *  @param longArc       Boolean indicator if the long arc or the short arc is traversed from one point to the other.
        *  @param sweepFlag     Boolean indicator related to the curvature perceived one the circle arc. False means negative curvature. True mean positive curvature.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties of the line.
        */
       void drawCircleArc(float startX,
                          float startY,
@@ -110,11 +110,11 @@ namespace Belle2 {
 
       /** Adds a smooth curve to the plot
        *
-       *  Current implementation approxiamtes circle arcs between the points with cubic splines.
+       *  Current implementation approximates circle arcs between the points with cubic splines.
        *
        *  @param points        X,Y points on the curve
        *  @param tangents      Tangent vector at each point. Length of tangents does not matter.
-       *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
+       *  @param attributeMap  A map of string keys and values that describe the drawing properties of the line.
        */
       void drawCurve(const std::vector<std::array<float, 2>>& points,
                      const std::vector<std::array<float, 2>>& tangents,
@@ -133,25 +133,25 @@ namespace Belle2 {
       /**
        *  Saves the current plot state to a file.
        *
-       *  Deriving instances may should implement the approriate thing here and
+       *  Deriving instances should implement the appropriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
-       *  It is allowed to append or change the file extension if the concret implementation decides to do so.
+       *  It is allowed to append or change the file extension if the concrete implementation decides to do so.
        *
        *  @param fileName       fileName where the plot shall be saved
-       *  @return               Potentially modifed file name where the file has actually been written to.
+       *  @return               Potentially modified file name where the file has actually been written to.
        */
       const std::string save(const std::string& fileName) override;
 
       /**
-       *  Clears all drawed elements from the plotter.
+       *  Clears all drawn elements from the plotter.
        */
       void clear() override;
 
     private:
-      /// Increases the current indention by one.
+      /// Increases the current indentation by one.
       void indent();
 
-      /// Decreases the current indention by one.
+      /// Decreases the current indentation by one.
       void dedent();
 
       /**
@@ -195,10 +195,10 @@ namespace Belle2 {
                               const AttributeMap& styleAttributeMap = AttributeMap());
 
       /**
-       *  Writes part that belongs between the <, > brakets. Used by writeOpeningTag and writeClosing.
+       *  Writes part that belongs between the <, > brackets. Used by writeOpeningTag and writeClosing.
        *
        *  Used by writeOpeningTag and writeClosing.
-       *  Factored to avoid code dublication.
+       *  Factored to avoid code duplication.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
        *  @param[in]  tagName                Name of the xml tag to be written
@@ -213,7 +213,7 @@ namespace Belle2 {
                           const AttributeMap& styleAttributeMap = AttributeMap());
 
       /**
-       *  Writes attribute specification that belongs between the <, > brakets after the tag name.
+       *  Writes attribute specification that belongs between the <, > brackets after the tag name.
        *
        *  @param[out] outputStream           The output stream to which the result is written.
        *  @param[in]  attributeMap           A map of attribute keys to attribute values that shall be attached to the tag.
@@ -231,13 +231,13 @@ namespace Belle2 {
                            const std::string& tagName);
 
     private:
-      /// Memory for the plotted elements. This contains only the fragment that is inbetween the svg tags and comes after the global svg definitions.
+      /// Memory for the plotted elements. This contains only the fragment that is in-between the svg tags and comes after the global svg definitions.
       std::ostringstream m_svgContentStream;
 
       /// Memory for the number of spaces that shall be prepended to each line.
       int m_nIndentationSpaces;
 
-      /// Memory for additional attributes to the toplevel svg element.
+      /// Memory for additional attributes to the top-level svg element.
       AttributeMap m_svgAttributes;
 
     };

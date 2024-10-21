@@ -82,6 +82,7 @@ def get_calibrations(input_data, **kwargs):
     ###################################################
     # Algorithm setup
 
+    from ROOT import Belle2  # noqa: make the Belle2 namespace available
     from ROOT.Belle2 import BoostVectorAlgorithm
     from basf2 import create_path, register_module
     import modularAnalysis as ana

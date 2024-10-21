@@ -357,10 +357,8 @@ void SVDUnpackerDQMModule::event()
   if (m_DQMEventFractionHisto != nullptr) {
     TString histoFractionTitle = TString::Format("SVD bad events,  Exp %d Run %d", m_expNumber, m_runNumber);
     m_DQMEventFractionHisto->SetTitle(histoFractionTitle.Data());
+    m_DQMEventFractionHisto->Fill(m_badEvent);
   }
-
-
-  m_DQMEventFractionHisto->Fill(m_badEvent);
 
 } // end event function
 

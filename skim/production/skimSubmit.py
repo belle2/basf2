@@ -16,7 +16,6 @@ import argparse
 import sys
 import glob
 import subprocess
-from subprocess import Popen, PIPE
 import yaml
 import shutil
 
@@ -208,16 +207,21 @@ def getLPNs(collection, dataset_type, lpn_dir, mctype=None):  # Only works for p
         col_dir = '/belle/collection/MC/'
     elif 'data' in dataset_type:
         col_dir = '/belle/collection/Data/'
-    else:  # for the Fskim_test, for debugging purposes
-        # col_dir = '/belle/collection/Data/' #used for data in the Fskim_test
+    else:  # for the test and for debugging purposes
         col_dir = '/belle/collection/test/'
     for key in collectionDict.keys():
+        if 'data' in dataset_type and 'MC' in key:
+            continue
+        if 'MC' in dataset_type and 'MC' not in key:
+            continue
         for col in collectionDict[key]:
-            # if 'offres' in col and 'MC' in dataset_type and ('mixed' in mctype or 'charged' in mctype) :
-            # continue
-            command = f'gb2_ds_search collection --list_datasets {col_dir}{col} > {lpn_dir}{col}_LPNs.txt'
+            command = f'gb2_ds_search collection --list_datasets {col_dir}{col}'
             print(f'executed: {command}')
-            os.system(command)
+            result = subprocess.run(command.split(), capture_output=True, text=True, )
+            with open(f'{lpn_dir}{col}_LPNs.txt', 'w') as file:
+                file.write(result.stdout)
+            if result.returncode != 0:
+                print(f"Error executing command: {result.stderr}")
 
     # Split up the collection .txt files based on experiment and prod number:
 
@@ -274,7 +278,9 @@ def getYAMLs(dataset_type, lpn_dir, yaml_dir, bg=None):  # , mcCamp=None):
             if bg:
                 command += f' --bg {bg}'
             print(f'executed: {command}')
-            os.system(command)
+            result = subprocess.run(command.split(), capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error executing command: {result.stderr}")
 
 
 def lines_that_contain(string, fp):
@@ -334,7 +340,11 @@ def getJSONs(
                         command += ' --flagged'
                     print(command)
                     counter_JSONs += 1
-                    my_proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+                    my_proc = subprocess.Popen(
+                        command.split(),
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE)
                     my_proc.stdin.write(b'1\n')
                     stdout, stderr = my_proc.communicate()
                     print(f'stderr = {stderr}')
@@ -375,7 +385,7 @@ def getJSONs(
                     command += ' --flagged'
                 print(command)
                 counter_JSONs += 1
-                my_proc = Popen(command, stdin=PIPE, stdout=PIPE, stderr=PIPE, shell=True)
+                my_proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 my_proc.stdin.write(b'1\n')
                 stdout, stderr = my_proc.communicate()
                 print(f'stdout = {stdout}')
@@ -408,9 +418,11 @@ def register(dataset_type, skim=None, json_dir=None, release=None, camp=None):
         for path in glob.glob(jsonPath):
             if os.path.exists(path):
                 counter = counter+1
-                command = f'cd {skimPath} && gb2_prod_register {path}'
-                print(command)
-                os.system(command)
+                command = ['gb2_prod_register', path]
+                print(f"Executing command in {skimPath}: {' '.join(command)}")
+                result = subprocess.run(command, cwd=skimPath, capture_output=True, text=True)
+                if result.returncode != 0:
+                    print(f"Error executing command: {result.stderr}")
             else:
                 print(f'PATH DOESNT EXIST: {path}')
 
@@ -427,7 +439,7 @@ def upload_files(json_dir, release):
 
     # Run the command and capture the output
     try:
-        output = subprocess.check_output(prod_cmd, shell=True, text=True)
+        output = subprocess.check_output(prod_cmd.split(), text=True)
         print(output)
 
         # Split the output into lines
@@ -448,7 +460,10 @@ def upload_files(json_dir, release):
             elif 'MC15rd_b' in camp:
                 camp = 'MC15rd_b'
             script_dir = f'{json_dir}skim/{camp}/{release}/SkimScripts'
-            os.system(f'cd {script_dir} && gb2_prod_uploadFile -p {prod}')
+            command = ['gb2_prod_uploadFile', '-p', prod]
+            result = subprocess.run(command, cwd=script_dir, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error uploading files for prod {prod}: {result.stderr}")
 
     except subprocess.CalledProcessError as e:
         print("Error while running the command:", e)
@@ -462,7 +477,7 @@ def approve_prods():
 
     # Run the command and capture the output
     try:
-        output = subprocess.check_output(prod_cmd, shell=True, text=True)
+        output = subprocess.check_output(prod_cmd.split(), text=True)
         print(output)
         # Split the output into lines
         prodlines = output.strip().split('\n')
@@ -471,7 +486,7 @@ def approve_prods():
         prod_list = [line.split()[0] for line in prodlines]
         # approve prods
         for prod in prod_list:
-            os.system(f'gb2_prod_approve -p {prod}')
+            subprocess.run(['gb2_prod_approve', '-p', prod], check=True)
 
     except subprocess.CalledProcessError as e:
         print("Error while running the command:", e)
@@ -573,11 +588,17 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
             print(f'Skimming FEI. Using --analysis-globaltag {info["fei_gt"]}')
             print(f'b2skim-stats-submit -c {stats_dir}{inputYaml} {skim} --analysis-globaltag {info["fei_gt"]}')
             # This is the {inputYaml} in '/MC/skim/stats' folder
-            os.system(f'b2skim-stats-submit -c {stats_dir}{inputYaml} {skim} --analysis-globaltag {info["fei_gt"]}')
+            command = ['b2skim-stats-submit', '-c', f'{stats_dir}{inputYaml}', skim, '--analysis-globaltag', info["fei_gt"]]
+            result = subprocess.run(command, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error submitting stats for {skim}: {result.stderr}")
         if skim == 'SystematicsCombinedHadronic' or skim == 'SystematicsCombinedLowMulti':
             # Systematic skims get submitted as single skims (not combined)
             print(f'b2skim-stats-submit -s {skim}')
-            os.system(f'b2skim-stats-submit -s {skim}')
+            command = ['b2skim-stats-submit', '-s', skim]
+            result = subprocess.run(command, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error submitting stats for {skim}: {result.stderr}")
         else:
             # This is the {inputYaml} in '/MC/skim/stats' folder
             command = f'b2skim-stats-submit -c {stats_dir}{inputYaml} {skim}'
@@ -590,21 +611,29 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
             if flagged:
                 command += ' --flagged'
             print(command)
-            os.system(command)
+            result = subprocess.run(command.split(), capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error executing command: {result.stderr}")
 
 
 def printStats(skims, stats_dir, flagged=False):
     for skim in skims:
         if skim == 'SystematicsCombinedHadronic' or skim == 'SystematicsCombinedLowMulti':
             print(f'Printing single skim {skim} stats to json file SkimStats_{skim}.json')
-            os.system(f'b2skim-stats-print -s {skim} -J')
+            command = ['b2skim-stats-print', '-s', skim, '-J']
+            result = subprocess.run(command, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error executing command: {result.stderr}")
         else:
             print(f'Printing combined skim {skim} stats to json file SkimStats_{skim}.json')
             if flagged:
                 flaggedString = ' --flagged'
             else:
                 flaggedString = ''
-            os.system(f'b2skim-stats-print {flaggedString} -c {skim} -J')
+            command = ['b2skim-stats-print', flaggedString, '-c', skim, '-J']
+            result = subprocess.run(command, capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error executing command: {result.stderr}")
         print(f'Moving to {stats_dir}')
         # move to MC folder
         shutil.move('SkimStats.json', f'{stats_dir}SkimStats_{skim}.json')

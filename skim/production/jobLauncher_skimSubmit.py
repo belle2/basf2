@@ -38,23 +38,21 @@ parser.add_argument('-dir',
                     type=str,
                     default='./SkimProd/',
                     help="main output directory")
-parser.add_argument(
-    '-skim',
-    '--skim',
-    type=str,
-    default='flaggedSkims.yaml',
-    help="yaml file containing skims definitions")
+parser.add_argument('-skim',
+                    '--skim',
+                    type=str,
+                    default='flaggedSkims.yaml',
+                    help="yaml file containing skims definitions")
 parser.add_argument('-info',
                     '--info',
                     type=str,
                     default='infoSkim.yaml',
                     help="python file containing HLTskim, MCtype, GT of the skims")
-parser.add_argument(
-    '-coll',
-    '--collections',
-    type=str,
-    default='collections.yaml',
-    help="input collection to be used")
+parser.add_argument('-coll',
+                    '--collections',
+                    type=str,
+                    default='collections.yaml',
+                    help="input collection to be used")
 parser.add_argument('-rel',
                     '--release',
                     type=str,
@@ -107,21 +105,20 @@ except BaseException:
 
 if args.lpns:  # step1 - gbasf2, once per campaign, one command for data and one for MC
     print('>>>> Step 1: retrive LPNS')
-    # 'Fskim_test' to be replaced with 'data' for the real campaign
 
     command = f'python3 skimSubmit.py --lpns  --base_dir {args.base_dir} --collectionYaml {args.collections}'
 
     if args.data:
-        command_data = command+' --data --camp Fskim_test'  # --camp data in real campaign
+        command_data = command+' --data --camp data'
         print(f'>>>> Executed command: {command_data}')
         if not args.dry:
-            os.system(command_data)
+            subprocess.run(command_data.split(), text=True)
 
     if args.MC:
-        command_MC = command+' --mcrd --camp Fskim_test'  # --camp MC in real campaign
+        command_MC = command+' --mcrd --camp MC'
         print(f'>>>> Executed command: {command_MC}')
         if not args.dry:
-            os.system(command_MC)
+            subprocess.run(command_MC.split(), text=True)
 
 
 if args.yaml:  # step2 - basf2 once per campaign, one command for data and one for MC
@@ -133,13 +130,13 @@ if args.yaml:  # step2 - basf2 once per campaign, one command for data and one f
         command_data = command+' --data '
         print(colored(f'>>>> Executed command: {command_data}', 'green'))
         if not args.dry:
-            os.system(command_data)
+            subprocess.run(command_data.split(), text=True)
 
     if args.MC:
         command_MC = command + ' --mcrd --bkg BGx1'
         print(colored(f'>>>> Executed command: {command_MC}', 'green'))
         if not args.dry:
-            os.system(command_MC)
+            subprocess.run(command_MC.split(), text=True)
 
 
 if args.stat_sub:  # step3 - basf2, loop on skim, common for data and MC
@@ -162,7 +159,7 @@ if args.stat_sub:  # step3 - basf2, loop on skim, common for data and MC
                   f' --base_dir {args.base_dir} --inputYaml {args.skim} --infoYaml {args.info}'
         print(colored(f'>>>> Executed command: {command}', 'green'))
         if not args.dry:
-            os.system(command)
+            subprocess.run(command.split(), text=True)
 
 
 if args.stat_print:  # step4 - basf2, loop on skim, common for data and MC
@@ -175,7 +172,7 @@ if args.stat_print:  # step4 - basf2, loop on skim, common for data and MC
 
     jobs_notDone = True
     while jobs_notDone:
-        bjobs_out = subprocess.check_output('bjobs -q l', shell=True, text=True)
+        bjobs_out = subprocess.check_output('bjobs -q l'.split(), text=True)
 
         if bjobs_out == '':
             jobs_notDone = False
@@ -194,7 +191,7 @@ if args.stat_print:  # step4 - basf2, loop on skim, common for data and MC
                   f' --infoYaml {args.info} --base_dir {args.base_dir}'
         print(colored(f'>>>> Executed command: {command}', 'green'))
         if not args.dry:
-            os.system(command)
+            subprocess.run(command.split(), text=True)
 
 if args.json:  # step5 - basf2, loop on skim, one command for data and one for MC
     print(colored('>>>> Step 5: create json', 'blue', attrs=['bold']))
@@ -221,13 +218,13 @@ if args.json:  # step5 - basf2, loop on skim, one command for data and one for M
             command_data = command+f' --data --camp data --genskim {HLTstring} {GTstring}'
             print(colored(f'>>>> Executed command: {command_data}', 'green'))
             if not args.dry:
-                os.system(command_data)
+                subprocess.run(command_data.split(), text=True)
 
         if args.MC:
             command_MC = command+f' --mcrd --camp mcrd --mctype {MCTypeString} {GTstring}'
             print(colored(f'>>>> Executed command: {command_MC}', 'green'))
             if not args.dry:
-                os.system(command_MC)
+                subprocess.run(command_MC.split(), text=True)
 
 if args.check:  # step6 - basf2, loop on skim, one command for data and one for MC
     print(colored('>>>> Step 6: check json', 'blue', attrs=['bold']))
@@ -240,12 +237,12 @@ if args.check:  # step6 - basf2, loop on skim, one command for data and one for 
             command_data = command+' -d Data'
             print(colored(f'>>>> Executed command: {command_data}', 'green'))
             if not args.dry:
-                os.system(command_data)
+                subprocess.run(command_data.split(), text=True)
         if args.MC:
             command_MC = command+' -d MC'
             print(colored(f'>>>> Executed command: {command_MC}', 'green'))
             if not args.dry:
-                os.system(command_MC)
+                subprocess.run(command_MC.split(), text=True)
 
 if args.register:  # step7 - gbasf2, loop on skim, one command for data and one for MC
     print('>>>> Step 7: register productions on grid')
@@ -259,13 +256,13 @@ if args.register:  # step7 - gbasf2, loop on skim, one command for data and one 
             command_data = command+' --data'
             print(f'>>>> Executed command: {command_data}')
             if not args.dry:
-                os.system(command_data)
+                subprocess.run(command_data.split(), text=True)
 
         if args.MC:
             command_MC = command+' --mcrd'
             print(f'>>>> Executed command: {command_MC}')
             if not args.dry:
-                os.system(command_MC)
+                subprocess.run(command_MC.split(), text=True)
 
 
 if args.upload:  # step8 - gbasf2, one command for data and one for MC
@@ -277,36 +274,42 @@ if args.upload:  # step8 - gbasf2, one command for data and one for MC
         command_data = command+' --data'
         print(f'>>>> Executed command: {command_data}')
         if not args.dry:
-            os.system(command_data)
+            subprocess.run(command_data.split(), text=True)
 
     if args.MC:
         command_MC = command+' --mcrd'
         print(f'>>>> Executed command: {command_MC}')
         if not args.dry:
-            os.system(command_MC)
+            subprocess.run(command_MC.split(), text=True)
 
 
 if args.approve:  # step9 - gbasf2, common for data and MC
     print('>>>> Step 9: approve productions')
 
-    status_out = subprocess.check_output('gb2_prod_status -g skim -s all --date 1w', shell=True, text=True)
+    command_check = 'gb2_prod_status -g skim -s all --date 1w'
+    status_out = subprocess.check_output(command_check.split(), text=True)
     while 'Registered' in status_out or 'Initialized' in status_out or 'ToApprove' in status_out:
-        status_out = subprocess.check_output('gb2_prod_status -g skim -s all --date 1w', shell=True, text=True)
+        status_out = subprocess.check_output(command_check.split(), text=True)
 
         if 'ToApprove' in status_out:
             command = f'python3 skimSubmit.py --approve --base_dir {args.base_dir}'
             print(f'>>>> Executed command: {command}')
             if not args.dry:
-                os.system(command)
+                subprocess.run(command.split(), text=True)
+
         else:
             print("There are still productions not in 'ToApprove' status. Waiting 5 minutes")
             print(status_out)
             time.sleep(300)
 
-if args.ask:  # step 10 - copy-paste the printed output on gitlab ticket/mail to Hideki-san (hideki.miyake@kek.jp)
-    print('>>>> Step 10: ask Hideki-san to launch the productions')
+if args.ask:  # step 10 - open a ticket with the produced output (output_stats.log) tagging the production system manager.
+    print('>>>> Step 10: ask computing team to launch the productions')
     print('>>>> WARNING: all the Approved skim productions within last week will be listed')
-    command = 'gb2_prod_expected -s Approved -g skim --date 1w | tee output_for_Hideki.log'
+    command = 'gb2_prod_expected -s Approved -g skim --date 1w'
     print(f'>>>> Executed command: {command}')
     if not args.dry:
-        os.system(command)
+        result = subprocess.run(command.split(), capture_output=True, text=True)
+        with open('output_stats.log', 'w') as file:
+            file.write(result.stdout)
+        with open('output_stats_err.log', 'w') as file:
+            file.write(result.stderr)

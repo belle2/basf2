@@ -1,0 +1,121 @@
+f_SLME_p1 :
+  - PRsemileptonicUntagged
+  - LeptonicUntagged
+  - SLUntagged
+  - B0toDstarl_Kpi_Kpipi0_Kpipipi
+  - BtoDl_and_ROE_e_or_mu_or_lowmult
+
+f_EWP_p1 :
+  - BtoXgamma
+  - BtoXll
+  - BtoXll_LFV
+
+f_TDCPV_p1 :
+  - TDCPV_ccs
+  - TDCPV_dilepton
+
+# f_TDCPV_p2 :
+#   - TDCPV_qqs
+
+f_bhadronic_p1 : #b2charm
+  - BtoD0h_Kspi0
+  - BtoD0h_Kspipipi0
+  - BtoDstarpipipi0_D0pi_Kpi
+  - B0toDpi_Kpipi
+  - B0toDpi_Kspi
+  - B0toDstarPi_D0pi_Kpi
+  - B0toDstarPi_D0pi_Kpipipi_Kpipi0
+  - B0toDrho_Kpipi
+  - B0toDrho_Kspi
+  - B0toDstarRho_D0pi_Kpi
+  - B0toDstarRho_D0pi_Kpipipi_Kpipi0
+  - BptoD0etapi_Kpi
+  - BptoD0pipi0_Kpi
+  - BtoD0h_hh
+  - BtoD0h_Kpi
+  - B0toDstarpipi0_D0pi_Kpi
+  - BtoD0h_Kpipipi_Kpipi0
+  - B0toDstaretapi_D0pi_Kpi
+  - BtoD0h_Kshh
+  - BtoD0rho_Kpi
+  - BtoD0rho_Kpipipi_Kpipi0
+  - B0toDD_Kpipi_Kspi
+  - B0toDstarD
+  - B0toD0Kpipi0_pi0
+  - B0toDs1D
+  - B0toDDs0star
+  
+f_bhadronic_p2 : #b2charmless
+  - BtoPi0Pi0
+  - BtoHadTracks
+  - BtoHad1Pi0
+  - BtoHad3Tracks1Pi0
+  - BtoRhopRhom
+  - BtoEtapKstp
+
+f_quarkonium_p1 :
+  - InclusiveLambda
+  - BottomoniumEtabExclusive
+  - BottomoniumUpsilon
+  - InclusiveUpsilon
+  - CharmoniumPsi
+
+f_charm_p1 :
+  - XToD0_D0ToHpJm
+  - XToD0_D0ToNeutrals
+  - DstToD0Pi_D0ToRare  
+  - XToDp_DpToKsHp
+  - XToDp_DpToHpHmJp
+  - LambdacTopHpJm
+  - DstToD0Pi_D0ToGeneric
+  - LambdacToSHpJm
+  - XicpTopHpJm
+  - XictoXimpippim
+  - Xic0ToLHpJm  
+  - DstToD0Pi_D0ToHpJm
+  - DstToD0Pi_D0ToHpJmPi0
+  - DstToD0Pi_D0ToKsOmega
+  - DstToD0Pi_D0ToHpJmEta
+  - DstToD0Pi_D0ToNeutrals
+  - DstToD0Pi_D0ToHpJmKs
+  - EarlyData_DstToD0Pi_D0ToHpJmPi0
+  - EarlyData_DstToD0Pi_D0ToHpHmPi0
+  - DstToDpPi0_DpToHpPi0
+  - DpToHpPi0
+  - DpToKsHp
+  - DstToD0Pi_D0ToHpHmHpJm
+  - DstToD0Pi_D0ToVGamma
+  - DpToPipepem
+  - DpToPipmupmum
+  - DpToPipKpKm
+  - DpToHpOmega
+  - DspToHpOmega
+
+
+f_dark_p1 : #dark
+  - SinglePhotonDark
+  - GammaGammaControlKLMDark
+  - ALP3Gamma
+  - EGammaControlDark
+  - InelasticDarkMatter
+  - RadBhabhaV0Control
+  - DimuonPlusMissingEnergy
+  - ElectronMuonPlusMissingEnergy
+  - DielectronPlusMissingEnergy
+  - LFVZpVisible
+  - BtoKplusLLP
+  - InelasticDarkMatterWithDarkHiggs
+  - AA2uuuu
+  - DimuonPlusVisibleDarkHiggs
+  - DielectronPlusVisibleDarkHiggs
+# f_dark_p2 : #low multi 
+  - TwoTrackLeptonsForLuminosity 
+  - LowMassTwoTrack
+  - SingleTagPseudoScalar
+  - LowMassOneTrack
+
+f_tau_p1 :
+  - TauLFV
+  - TauGeneric
+  - TauThrust
+  - TauKshort

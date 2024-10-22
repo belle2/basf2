@@ -74,9 +74,11 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
   TTree* TTreeGammaWrap = TTreeGamma.get();
 
   std::vector<TString> PIDDetectors;
-  PIDDetectors.push_back("ALL");
   PIDDetectors.push_back("SVDonly");
-  PIDDetectors.push_back("noSVD");
+  if (m_FullValidation) {
+    PIDDetectors.push_back("ALL");
+    PIDDetectors.push_back("noSVD");
+  }
 
   std::map<TTree*, TString> SWeightNameMap = {
     {TTreeGammaWrap, "1"},
@@ -113,25 +115,26 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
                         0., m_MomHighEff);
   }
 
-  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
-               SWeightNameMap[TTreeDstarSW], "PionD",
-               "pion", "BinaryElectronPionID");
-  PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
-               SWeightNameMap[TTreeDstarSW], "Kaon",
-               "kaon", "BinaryElectronKaonID");
-  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD",
-               "pion",
-               "BinaryProtonPionID");
-  PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon",
-               "kaon",
-               "BinaryProtonKaonID");
-  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon",
-               "kaon",
-               "BinaryPionKaonID");
-  PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD",
-               "pion",
-               "BinaryKaonPionID");
-
+  if (m_FullValidation) {
+    PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
+                 SWeightNameMap[TTreeDstarSW], "PionD",
+                 "pion", "BinaryElectronPionID");
+    PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
+                 SWeightNameMap[TTreeDstarSW], "Kaon",
+                 "kaon", "BinaryElectronKaonID");
+    PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD",
+                 "pion",
+                 "BinaryProtonPionID");
+    PlotROCCurve(TTreeLambdaSW, SWeightNameMap[TTreeLambdaSW], "Proton", "proton", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon",
+                 "kaon",
+                 "BinaryProtonKaonID");
+    PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD", "pion", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon",
+                 "kaon",
+                 "BinaryPionKaonID");
+    PlotROCCurve(TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "Kaon", "kaon", TTreeDstarSW, SWeightNameMap[TTreeDstarSW], "PionD",
+                 "pion",
+                 "BinaryKaonPionID");
+  }
   B2INFO("SVD dE/dx validation done!");
 
   return c_OK;
@@ -183,10 +186,34 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                      SignalWeightName + Form("* (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), MomLow, SignalVarName.Data(), MomHigh), "goff");
     TH1F* hSignalProtonLLDistribution = (TH1F*)gDirectory->Get("hSignalProtonLLDistribution");
 
+    // same but only for tracks that are expected to actually have SVD dEdx info
+    SignalTree->Draw(Form("%sElectronLLSVDonly>>hSignalElectronLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
+                                             SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalElectronLLDistributionGood = (TH1F*)gDirectory->Get("hSignalElectronLLDistributionGood");
+    SignalTree->Draw(Form("%sPionLLSVDonly>>hSignalPionLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
+                                             SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalPionLLDistributionGood = (TH1F*)gDirectory->Get("hSignalPionLLDistributionGood");
+    SignalTree->Draw(Form("%sKaonLLSVDonly>>hSignalKaonLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
+                                             SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalKaonLLDistributionGood = (TH1F*)gDirectory->Get("hSignalKaonLLDistributionGood");
+    SignalTree->Draw(Form("%sProtonLLSVDonly>>hSignalProtonLLDistributionGood(100,-17.,3.)", SignalVarName.Data()),
+                     SignalWeightName + Form("* (%sSVDdEdx>0) * (%sMomentum>%f && %sMomentum<%f)", SignalVarName.Data(), SignalVarName.Data(), MomLow,
+                                             SignalVarName.Data(), MomHigh), "goff");
+    TH1F* hSignalProtonLLDistributionGood = (TH1F*)gDirectory->Get("hSignalProtonLLDistributionGood");
+
+
     hSignalElectronLLDistribution->Scale(1. / hSignalElectronLLDistribution->Integral());
     hSignalPionLLDistribution->Scale(1. / hSignalPionLLDistribution->Integral());
     hSignalKaonLLDistribution->Scale(1. / hSignalKaonLLDistribution->Integral());
     hSignalProtonLLDistribution->Scale(1. / hSignalProtonLLDistribution->Integral());
+
+    hSignalElectronLLDistributionGood->Scale(1. / hSignalElectronLLDistributionGood->Integral());
+    hSignalPionLLDistributionGood->Scale(1. / hSignalPionLLDistributionGood->Integral());
+    hSignalKaonLLDistributionGood->Scale(1. / hSignalKaonLLDistributionGood->Integral());
+    hSignalProtonLLDistributionGood->Scale(1. / hSignalProtonLLDistributionGood->Integral());
 
     hSignalElectronLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
     hSignalElectronLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
@@ -203,6 +230,22 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalProtonLLDistribution->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
     hSignalProtonLLDistribution->GetYaxis()->SetTitle("Candidates, normalised");
     hSignalProtonLLDistribution->SetMaximum(1.35 * hSignalProtonLLDistribution->GetMaximum());
+
+    hSignalElectronLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "ElectronLLSVDonly");
+    hSignalElectronLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalElectronLLDistributionGood->SetMaximum(1.35 * hSignalElectronLLDistributionGood->GetMaximum());
+
+    hSignalPionLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "PionLLSVDonly");
+    hSignalPionLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalPionLLDistributionGood->SetMaximum(1.35 * hSignalPionLLDistributionGood->GetMaximum());
+
+    hSignalKaonLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "KaonLLSVDonly");
+    hSignalKaonLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalKaonLLDistributionGood->SetMaximum(1.35 * hSignalKaonLLDistributionGood->GetMaximum());
+
+    hSignalProtonLLDistributionGood->GetXaxis()->SetTitle(PIDVarName + "ProtonLLSVDonly");
+    hSignalProtonLLDistributionGood->GetYaxis()->SetTitle("Candidates, normalised");
+    hSignalProtonLLDistributionGood->SetMaximum(1.35 * hSignalProtonLLDistributionGood->GetMaximum());
 
     TCanvas* DistribCanvas = new TCanvas("DistribCanvas", "", 600, 600);
     gPad->SetTopMargin(0.05);
@@ -221,9 +264,67 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
                          .substr(0, 3) +
                          "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
 
+    hSignalElectronLLDistribution->SetLineWidth(2);
+    hSignalPionLLDistribution->SetLineWidth(2);
+    hSignalKaonLLDistribution->SetLineWidth(2);
+    hSignalProtonLLDistribution->SetLineWidth(2);
+
+    hSignalElectronLLDistributionGood->SetLineWidth(2);
+    hSignalPionLLDistributionGood->SetLineWidth(2);
+    hSignalKaonLLDistributionGood->SetLineWidth(2);
+    hSignalProtonLLDistributionGood->SetLineWidth(2);
+
+    hSignalElectronLLDistributionGood->SetLineColor(kBlack);
+    hSignalPionLLDistributionGood->SetLineColor(kBlack);
+    hSignalKaonLLDistributionGood->SetLineColor(kBlack);
+    hSignalProtonLLDistributionGood->SetLineColor(kBlack);
+
+    hSignalElectronLLDistribution->SetTitle("ElectronLL (SVD), all tracks");
+    hSignalPionLLDistribution->SetTitle("PionLL (SVD), all tracks");
+    hSignalKaonLLDistribution->SetTitle("KaonLL (SVD), all tracks");
+    hSignalProtonLLDistribution->SetTitle("ProtonLL (SVD), all tracks");
+
+    hSignalElectronLLDistributionGood->SetTitle("ElectronLL (SVD), tracks with dEdx info");
+    hSignalPionLLDistributionGood->SetTitle("PionLL (SVD), tracks with dEdx info");
+    hSignalKaonLLDistributionGood->SetTitle("KaonLL (SVD), tracks with dEdx info");
+    hSignalProtonLLDistributionGood->SetTitle("ProtonLL (SVD), tracks with dEdx info");
+
+    hSignalElectronLLDistribution->GetXaxis()->SetTitleSize(0.04);
+    hSignalElectronLLDistribution->GetYaxis()->SetTitleSize(0.04);
+    hSignalElectronLLDistribution->GetXaxis()->SetTitleOffset(1.0);
+    hSignalElectronLLDistribution->GetYaxis()->SetTitleOffset(1.3);
+    hSignalElectronLLDistribution->GetYaxis()->SetLabelSize(0.04);
+    hSignalElectronLLDistribution->GetXaxis()->SetLabelSize(0.04);
+
+    hSignalPionLLDistribution->GetXaxis()->SetTitleSize(0.04);
+    hSignalPionLLDistribution->GetYaxis()->SetTitleSize(0.04);
+    hSignalPionLLDistribution->GetXaxis()->SetTitleOffset(1.0);
+    hSignalPionLLDistribution->GetYaxis()->SetTitleOffset(1.3);
+    hSignalPionLLDistribution->GetYaxis()->SetLabelSize(0.04);
+    hSignalPionLLDistribution->GetXaxis()->SetLabelSize(0.04);
+
+    hSignalKaonLLDistribution->GetXaxis()->SetTitleSize(0.04);
+    hSignalKaonLLDistribution->GetYaxis()->SetTitleSize(0.04);
+    hSignalKaonLLDistribution->GetXaxis()->SetTitleOffset(1.0);
+    hSignalKaonLLDistribution->GetYaxis()->SetTitleOffset(1.3);
+    hSignalKaonLLDistribution->GetYaxis()->SetLabelSize(0.04);
+    hSignalKaonLLDistribution->GetXaxis()->SetLabelSize(0.04);
+
+    hSignalProtonLLDistribution->GetXaxis()->SetTitleSize(0.04);
+    hSignalProtonLLDistribution->GetYaxis()->SetTitleSize(0.04);
+    hSignalProtonLLDistribution->GetXaxis()->SetTitleOffset(1.0);
+    hSignalProtonLLDistribution->GetYaxis()->SetTitleOffset(1.3);
+    hSignalProtonLLDistribution->GetYaxis()->SetLabelSize(0.04);
+    hSignalProtonLLDistribution->GetXaxis()->SetLabelSize(0.04);
 
     TCanvas* LLCanvas = new TCanvas("LLCanvas", "", 900, 700);
-    LLCanvas->Divide(2, 2, 0, 0);
+
+    gPad->SetTopMargin(0.05);
+    gPad->SetRightMargin(0.05);
+    gPad->SetLeftMargin(0.13);
+    gPad->SetBottomMargin(0.12);
+
+    LLCanvas->Divide(2, 2, 0.01, 0.01);
     LLCanvas->cd(1);
     hSignalElectronLLDistribution->Draw("hist");
     LLCanvas->cd(2);
@@ -233,12 +334,36 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     LLCanvas->cd(4);
     hSignalProtonLLDistribution->Draw("hist");
 
+    TCanvas* LLCanvasGood = new TCanvas("LLCanvasGood", "", 900, 700);
+
+    gPad->SetTopMargin(0.05);
+    gPad->SetRightMargin(0.05);
+    gPad->SetLeftMargin(0.13);
+    gPad->SetBottomMargin(0.12);
+
+    LLCanvasGood->Divide(2, 2, 0.01, 0.01);
+    LLCanvasGood->cd(1);
+    hSignalElectronLLDistributionGood->Draw("hist");
+    LLCanvasGood->cd(2);
+    hSignalPionLLDistributionGood->Draw("hist");
+    LLCanvasGood->cd(3);
+    hSignalKaonLLDistributionGood->Draw("hist");
+    LLCanvasGood->cd(4);
+    hSignalProtonLLDistributionGood->Draw("hist");
+
     LLCanvas->Print("SVDdEdxValidation_LLDistributions_" + SignalVarNameFull +
                     "_SVDonly_MomRange_" +
                     std::to_string(
                       MomLow)
                     .substr(0, 3) +
                     "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
+
+    LLCanvasGood->Print("SVDdEdxValidation_LLDistributions_GoodSVDTracks_" + SignalVarNameFull +
+                        "_SVDonly_MomRange_" +
+                        std::to_string(
+                          MomLow)
+                        .substr(0, 3) +
+                        "_" + std::to_string(MomHigh).substr(0, 3) + ".pdf");
 
     TFile DistribFile("SVDdEdxValidation_Distribution_" + SignalVarNameFull + PIDVarName + PIDDetectorsName +
                       "_MomRange_" +
@@ -263,6 +388,8 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
     hSignalKaonLLDistribution->Write();
     hSignalProtonLLDistribution->Write();
     LLDistribFile.Close();
+    delete LLCanvas;
+    delete LLCanvasGood;
   }
 
   // ---------- Momentum distributions (for efficiency determination) ----------
@@ -312,8 +439,8 @@ void SVDdEdxValidationAlgorithm::PlotEfficiencyPlots(const TString& PIDDetectors
   TH1F* EffHistoSig = (TH1F*)hAllSignal->Clone("EffHistoSig");   // signal efficiency
   TH1F* EffHistoFake = (TH1F*)hAllFakes->Clone("EffHistoFake");  // fakes efficiency
 
-  EffHistoSig->Divide(hSelectedSignal, hAllSignal, 1, 1, "B");
-  EffHistoFake->Divide(hSelectedFakes, hAllFakes, 1, 1, "B");
+  EffHistoSig->Divide(hSelectedSignal, hAllSignal);//, 1, 1, "B");
+  EffHistoFake->Divide(hSelectedFakes, hAllFakes);//, 1, 1, "B");
 
   // PID plots
   TH1F* hBase = new TH1F("hBase", "", 100, 0.0, MomHigh);

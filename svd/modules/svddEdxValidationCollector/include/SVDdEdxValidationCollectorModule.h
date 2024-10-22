@@ -49,8 +49,6 @@ namespace Belle2 {
     double m_InvMLambda;       /**<  Invariant mass of Lambda candidates */
     double m_protonp;       /**<   momentum for the proton from the Lambda */
     double m_protonSVDdEdx;     /**<  SVD dE/dx response for the proton from the Lambda */
-    double m_pionLambdap;    /**<   momentum for the pion from the Lambda */
-    double m_pionLambdaSVDdEdx;    /**<  SVD dE/dx response for the pion from the Lambda */
 
     double m_InvMDstar;       /**<  Invariant mass of Dstar candidates */
     double m_InvMD0;       /**<  Invariant mass of D0 candidates */
@@ -93,12 +91,6 @@ namespace Belle2 {
     double m_firstElectronKaonIDALL;   /**<  kaon ID value (all subdetectors) for the e+ from gamma */
     double m_firstElectronProtonIDALL;   /**<  proton ID value (all subdetectors) for the e+ from gamma */
 
-    double m_secondElectronElectronIDALL;   /**<  electron ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronPionIDALL;   /**<  pion ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronKaonIDALL;   /**<  kaon ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronProtonIDALL;   /**<  proton ID value (all subdetectors) for the e- from gamma */
-
-
     double m_protonElectronIDSVDonly;  /**<  electron ID value (only SVD) for the proton from Lambda */
     double m_protonPionIDSVDonly;  /**<  pion ID value (only SVD) for the proton from Lambda */
     double m_protonKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the proton from Lambda */
@@ -123,11 +115,6 @@ namespace Belle2 {
     double m_firstElectronPionIDSVDonly;  /**<  pion ID value (only SVD) for the e+ from gamma */
     double m_firstElectronKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the e+ from gamma */
     double m_firstElectronProtonIDSVDonly;  /**<  proton ID value (only SVD) for the e+ from gamma */
-
-    double m_secondElectronElectronIDSVDonly;  /**<  electron ID value (only SVD) for the e- from gamma */
-    double m_secondElectronPionIDSVDonly;  /**<  pion ID value (only SVD) for the e- from gamma */
-    double m_secondElectronKaonIDSVDonly;  /**<  kaon ID value (only SVD) for the e- from gamma */
-    double m_secondElectronProtonIDSVDonly;  /**<  proton ID value (only SVD) for the e- from gamma */
 
     double m_protonElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the proton from Lambda */
     double m_protonPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the proton from Lambda */
@@ -154,11 +141,6 @@ namespace Belle2 {
     double m_firstElectronKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the e+ from gamma */
     double m_firstElectronProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the e+ from gamma */
 
-    double m_secondElectronElectronLLSVDonly;  /**<  electron log-likelihood value (only SVD) for the e- from gamma */
-    double m_secondElectronPionLLSVDonly;  /**<  pion log-likelihood value (only SVD) for the e- from gamma */
-    double m_secondElectronKaonLLSVDonly;  /**<  kaon log-likelihood value (only SVD) for the e- from gamma */
-    double m_secondElectronProtonLLSVDonly;  /**<  proton log-likelihood value (only SVD) for the e- from gamma */
-
     double m_protonElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the p from Lambda */
     double m_protonPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the p from Lambda */
     double m_protonKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the p from Lambda */
@@ -183,11 +165,6 @@ namespace Belle2 {
     double m_firstElectronPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the e+ from gamma */
     double m_firstElectronKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the e+ from gamma */
     double m_firstElectronProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the e+ from gamma */
-
-    double m_secondElectronElectronIDnoSVD;  /**<  electron ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronPionIDnoSVD;  /**<  pion ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronKaonIDnoSVD;  /**<  kaon ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronProtonIDnoSVD;  /**<  proton ID value (all subdetectors except SVD) for the e- from gamma */
 
 
     double m_protonBinaryProtonElectronIDALL;  /**<  binary p/e ID value (all subdetectors) for the p from Lambda */
@@ -230,15 +207,6 @@ namespace Belle2 {
     double m_firstElectronBinaryKaonElectronIDALL;  /**<  binary K/e ID value (all subdetectors) for the e+ from gamma */
     double m_firstElectronBinaryProtonElectronIDALL;  /**<  binary p/e ID value (all subdetectors) for the e+ from gamma */
 
-    double m_secondElectronBinaryElectronPionIDALL;  /**<  binary e/pi ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryElectronKaonIDALL;  /**<  binary e/K ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryElectronProtonIDALL;  /**<  binary e/p ID value (all subdetectors) for the e- from gamma */
-
-    double m_secondElectronBinaryPionElectronIDALL;  /**<  binary pi/e ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryKaonElectronIDALL;  /**<  binary K/e ID value (all subdetectors) for the e- from gamma */
-    double m_secondElectronBinaryProtonElectronIDALL;  /**<  binary p/e ID value (all subdetectors) for the e- from gamma */
-
-
 
     double m_protonBinaryProtonElectronIDnoSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the p from Lambda */
     double m_protonBinaryProtonPionIDnoSVD;  /**<  binary p/pi ID value (all subdetectors except SVD) for the p from Lambda */
@@ -280,15 +248,6 @@ namespace Belle2 {
     double m_firstElectronBinaryKaonElectronIDnoSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the e+ from gamma */
     double m_firstElectronBinaryProtonElectronIDnoSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the e+ from gamma */
 
-    double m_secondElectronBinaryElectronPionIDnoSVD;  /**<  binary e/pi ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronKaonIDnoSVD;  /**<  binary e/K ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronProtonIDnoSVD;  /**<  binary e/p ID value (all subdetectors except SVD) for the e- from gamma */
-
-    double m_secondElectronBinaryPionElectronIDnoSVD;  /**<  binary pi/e ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryKaonElectronIDnoSVD;  /**<  binary K/e ID value (all subdetectors except SVD) for the e- from gamma */
-    double m_secondElectronBinaryProtonElectronIDnoSVD;  /**<  binary p/e ID value (all subdetectors except SVD) for the e- from gamma */
-
-
     double m_protonBinaryProtonElectronIDSVDonly;  /**<  binary p/e ID value (only SVD) for the p from Lambda */
     double m_protonBinaryProtonPionIDSVDonly;  /**<  binary p/pi ID value (only SVD) for the p from Lambda */
     double m_protonBinaryProtonKaonIDSVDonly;  /**<  binary p/K ID value (only SVD) for the p from Lambda */
@@ -328,14 +287,6 @@ namespace Belle2 {
     double m_firstElectronBinaryPionElectronIDSVDonly;  /**<  binary pi/e ID value (only SVD) for the e+ from gamma */
     double m_firstElectronBinaryKaonElectronIDSVDonly;  /**<  binary K/e ID value (only SVD) for the e+ from gamma */
     double m_firstElectronBinaryProtonElectronIDSVDonly;  /**<  binary p/e ID value (only SVD) for the e+ from gamma */
-
-    double m_secondElectronBinaryElectronPionIDSVDonly;  /**<  binary e/pi ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronKaonIDSVDonly;  /**<  binary e/K ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryElectronProtonIDSVDonly;  /**<  binary e/p ID value (only SVD) for the e- from gamma */
-
-    double m_secondElectronBinaryPionElectronIDSVDonly;  /**<  binary pi/e ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryKaonElectronIDSVDonly;  /**<  binary K/e ID value (only SVD) for the e- from gamma */
-    double m_secondElectronBinaryProtonElectronIDSVDonly;  /**<  binary p/e ID value (only SVD) for the e- from gamma */
 
     std::string m_LambdaListName = "";    /**< Name of the Lambda particle list */
     std::string m_DstarListName = "";    /**< Name of the Dstar particle list */

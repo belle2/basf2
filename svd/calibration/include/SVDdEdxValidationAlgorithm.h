@@ -31,6 +31,11 @@ namespace Belle2 {
     virtual ~SVDdEdxValidationAlgorithm() {}
 
     /**
+     * decide between full or basic validation mode. full validation also produces global PID performance plots.
+     */
+    void setMode(bool value = false) { m_FullValidation = value; }
+
+    /**
      * function to enable plotting
      */
     void setMonitoringPlots(bool value = false) { m_isMakePlots = value; }
@@ -72,6 +77,7 @@ namespace Belle2 {
     virtual EResult calibrate() override;
 
   private:
+    bool m_FullValidation;   /**< decide between full or basic validation mode. full validation also produces global PID performance plots.  */
     bool m_isMakePlots;                                                           /**< produce plots for monitoring of the fit quality */
     /**
      * a generic function to produce efficiency plots

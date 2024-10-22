@@ -25,17 +25,20 @@ using namespace Belle2;
 
 REG_MODULE(KLMDigitizer);
 
-/**
- * Compare MCParticles by index.
- *
- * @param[in] particle1 MC particle 1.
- * @param[in] particle2 MC particle 2.
- */
-static bool compareMCParticlesByIndex(const MCParticle* particle1,
-                                      const MCParticle* particle2)
-{
-  return particle1->getIndex() < particle2->getIndex();
-}
+class CompareMCParticlesByIndex {
+
+public:
+  /**
+   * Compare MCParticles by index.
+   *
+   * @param[in] particle1 MC particle 1.
+   * @param[in] particle2 MC particle 2.
+   */
+  bool operator()(const MCParticle* particle1, const MCParticle* particle2) const
+  {
+    return particle1->getIndex() < particle2->getIndex();
+  }
+};
 
 KLMDigitizerModule::KLMDigitizerModule() :
   Module(),
@@ -432,7 +435,7 @@ void KLMDigitizerModule::event()
      * the different order of efficiencyCorrection() calls below.
      */
     std::multimap<const MCParticle*, const KLMSimHit*,
-        compareMCParticlesByIndex> particleHitMap;
+        CompareMCParticlesByIndex> particleHitMap;
     std::multimap<const MCParticle*, const KLMSimHit*>::iterator
     itParticle, it2Particle;
     it = m_MapPlaneSimHit.begin();

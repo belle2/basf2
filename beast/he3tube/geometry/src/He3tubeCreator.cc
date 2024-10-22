@@ -14,9 +14,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <boost/format.hpp>
 #include <boost/foreach.hpp>
-#include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -30,7 +28,6 @@
 
 
 using namespace std;
-using namespace boost;
 
 namespace Belle2 {
 

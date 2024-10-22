@@ -21,11 +21,10 @@
 
 
 using namespace std;
-using namespace boost;
 using namespace Belle2;
 
 /** Simple struct to check boost graph for cyclic references. */
-struct cycle_detector : public dfs_visitor<> {
+struct cycle_detector : public boost::dfs_visitor<> {
   /**
    * This method is invoked on back edges in the graph.
    * If a back edge is found, it means a cyclic reference was found and therefore
@@ -132,7 +131,7 @@ public:
     int& d1 = mother.m_firstDaughter;
     int& d2 = mother.m_lastDaughter;
 
-    typename graph_traits<Graph>::out_edge_iterator j, j_end;
+    typename boost::graph_traits<Graph>::out_edge_iterator j, j_end;
     for (tie(j, j_end) = out_edges(v, g); j != j_end; ++j) {
       //Get daughter particle from list
       Vertex nv = target(*j, g);
@@ -212,7 +211,7 @@ void MCParticleGraph::generateList(const string& name, int options)
 
   //Make Graph and connect all primary vertices (particles without mother)
   //to an artificial 0ths vertex to be able to find them easily
-  typedef adjacency_list<vecS, vecS, directedS> Graph;
+  typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS> Graph;
   int num_particles(0);
   //Determine number of not ignored particles and add an edge from 0ths vertex to any primary
   //particle

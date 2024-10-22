@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/core/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysisSVD.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
@@ -25,7 +25,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDClustersOnTrackModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDClustersOnTrackModule final : public DQMHistAnalysisSVDModule {
 
     // Public functions
   public:
@@ -75,20 +75,13 @@ namespace Belle2 {
     float m_refMeanP; /**< mean of the signal time peak from Physics reference run */
     float m_refMeanC; /**< mean of the signal time peak from Cosmic reference run */
 
+    int getTimeStatus(TH1F& histo); /**< get status of time histogram */
+
     TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/
 
     TH1F m_hClusterOnTrackTimeL456V3Samples; /**< time for clusters on Track for L456V histo for 3 samples*/
     TCanvas* m_cClusterOnTrackTimeL456V3Samples = nullptr; /**< time for clusters on Track for L456V canvas for 3 sampples */
-
-
-    TPaveText* m_legTiProblem = nullptr; /**< cluster time on tracks plot legend, problem */
-    TPaveText* m_legTiNormal = nullptr; /**< cluster time on tracks plot legend, normal */
-    TPaveText* m_legTiEmpty = nullptr; /**< cluster time on tracks plot legend, empty */
-
-    TPaveText* m_legTi3Problem = nullptr; /**< cluster time on tracks  for 3 samples plot legend, problem */
-    TPaveText* m_legTi3Normal = nullptr; /**< cluster time on tracks for 3 samples  plot legend, normal */
-    TPaveText* m_legTi3Empty = nullptr; /**< cluster time on tracks  for 3 samples plot legend, empty */
 
     TString m_runtype = nullptr; /**< string with runtype: physics or cosmic */
 

@@ -81,10 +81,10 @@ def create_path(rerun_reco, isMC, expert_config):
             rec_path.add_module("Gearbox")
             rec_path.add_module("Geometry")
 
-        re.add_reconstruction(path=rec_path, pruneTracks=False)  # , reconstruct_cdst='rawFormat')
+        re.add_reconstruction(path=rec_path, pruneTracks=False)
         rec_path.add_module('VXDDedxPID')
     else:
-        rec_path.add_module('RootInput')  # , excludeBranchNames=['VXDDedxLikelihoods', 'VXDDedxTracks'])
+        rec_path.add_module('RootInput')
 
     # Fill particle lists
     ma.fillParticleList("pi+:all", "", path=rec_path)
@@ -211,7 +211,8 @@ def get_calibrations(input_data, **kwargs):
     max_files_per_run = expert_config["MaxFilesPerRun"]
     max_files_per_run_validation = expert_config["MaxFilesPerRunValidation"]
 
-    validation_mode = 1 if expert_config["validation_mode"] == "full" else 0  # full validation?
+    # Choose between the basic (default) or the full validation (produces more plots but depends on the global PID)
+    validation_mode = 1 if expert_config["validation_mode"] == "full" else 0
 
     # If you are using Raw data there's a chance that input files could have zero events.
     # This causes a B2FATAL in basf2 RootInput so the collector job will fail.

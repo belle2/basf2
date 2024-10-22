@@ -25,9 +25,13 @@ using namespace Belle2;
 
 REG_MODULE(KLMDigitizer);
 
+/**
+ * Comparison of MCParticles by index.
+ */
 class CompareMCParticlesByIndex {
 
 public:
+
   /**
    * Compare MCParticles by index.
    *

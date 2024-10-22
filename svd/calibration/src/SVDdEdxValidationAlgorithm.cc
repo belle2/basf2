@@ -75,7 +75,7 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
 
   std::vector<TString> PIDDetectors;
   PIDDetectors.push_back("SVDonly");
-  if (m_FullValidation) {
+  if (m_fullValidation) {
     PIDDetectors.push_back("ALL");
     PIDDetectors.push_back("noSVD");
   }
@@ -115,7 +115,7 @@ CalibrationAlgorithm::EResult SVDdEdxValidationAlgorithm::calibrate()
                         0., m_MomHighEff);
   }
 
-  if (m_FullValidation) {
+  if (m_fullValidation) {
     PlotROCCurve(TTreeGammaWrap, SWeightNameMap[TTreeGammaWrap], "FirstElectron", "electron", TTreeDstarSW,
                  SWeightNameMap[TTreeDstarSW], "PionD",
                  "pion", "BinaryElectronPionID");

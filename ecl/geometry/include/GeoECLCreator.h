@@ -54,7 +54,7 @@ namespace Belle2 {
       virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
       /** Function to create the geometry database.
-       * This function should be implemented to convert Gearbox parameters to one ore more database payloads
+       * This function should be implemented to convert Gearbox parameters to one or more database payloads
        * @param content GearDir pointing to the parameters which should be used for construction
        * @param iov interval of validity to use when generating payloads
        */

@@ -173,7 +173,7 @@ void ProfileModule::terminate()
                    m_rssOutputFileName, m_extractRssMem);
 
   // add them to the metadata service
-  MetadataService::Instance().addRootNtupleFile(m_outputFileName);
-  MetadataService::Instance().addRootNtupleFile(m_rssOutputFileName);
+  MetadataService::Instance().addNtuple(m_outputFileName);
+  MetadataService::Instance().addNtuple(m_rssOutputFileName);
 
 }

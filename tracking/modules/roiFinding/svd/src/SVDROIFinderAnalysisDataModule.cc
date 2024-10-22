@@ -58,7 +58,7 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   , m_h1GoodROItrack_lambda(nullptr)
   , m_h1GoodROItrack_cosTheta(nullptr)
   , m_h1GoodROItrack_pVal(nullptr)
-  //tracks with an attached Good ROI contaning at least one SVDShaperDigit
+  //tracks with an attached Good ROI containing at least one SVDShaperDigit
   , m_h1FullROItrack(nullptr)
   , m_h1FullROItrack_pt(nullptr)
   , m_h1FullROItrack_phi(nullptr)
@@ -98,7 +98,7 @@ SVDROIFinderAnalysisDataModule::SVDROIFinderAnalysisDataModule() : Module()
   setDescription("This module performs the analysis of the SVDROIFinder module output ON DATA");
 
   addParam("writeToRoot", m_writeToRoot,
-           "set true if you want to save the informations in a root file named by parameter 'rootFileName'", bool(true));
+           "set true if you want to save the information in a root file named by parameter 'rootFileName'", bool(true));
 
   addParam("rootFileName", m_rootFileName,
            "fileName used for . Will be ignored if parameter 'writeToRoot' is false (standard)",

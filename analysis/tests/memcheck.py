@@ -137,5 +137,6 @@ main.add_module('Profile', outputFileName='vmem_profile.png', rssOutputFileName=
 # execute all
 process(main)
 
-# Print call statistics
+# Print and store call statistics
 print(statistics)
+statistics.csv('memcheck.csv')

@@ -202,16 +202,16 @@ namespace Belle2 {
 #define ASSERT_NEGATIVE(expected) ASSERT_PRED1(::Belle2::TestHelpers::isNegative, expected)
 
 /**
- * Expectation macro for combound structures containing floating point values like TVector3, etc. to be close to each other.
+ * Expectation macro for combound structures containing floating point values like ROOT::Math::XYZVector, etc. to be close to each other.
  *
  * Generally it compares each contained floating point value to be no less than the tolerance apart.
  *
  * The macro uses the templated predicate template<class T> allNear(const T& expected, const T& actual, double tolerance)
  * to compute whether the two structures are close to each other.
  *
- * Currently it has been specialised for TVector3.
+ * Currently it has been specialised for ROOT::Math::XYZVector.
  *
- * You may specialise the template for other combound types like has been done for TVector3 below or
+ * You may specialise the template for other combound types like has been done for ROOT::Math::XYZVector below or
  * in framework/tests/Helix.cc to compare two helices.
  *
  * Note for the google test framework to properly print your type either a operator<< or PrintTo(const T& expected, std::ostream* out)
@@ -220,16 +220,16 @@ namespace Belle2 {
 #define EXPECT_ALL_NEAR(expected, actual, tolerance) EXPECT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
 
 /**
- * Assertation macro for combound structures containing floating point values like TVector3, etc. to be close to each other.
+ * Assertation macro for combound structures containing floating point values like ROOT::Math::XYZVector, etc. to be close to each other.
  *
  * Generally it compares each contained floating point value to be no less than the tolerance apart.
  *
  * The macro uses the templated predicate template<class T> allNear(const T& expected, const T& actual, double tolerance)
  * to compute whether the two structures are close to each other.
  *
- * Currently it has been specialised for TVector3.
+ * Currently it has been specialised for ROOT::Math::XYZVector.
  *
- * You may specialise the template for other combound types like has been done for TVector3 below or
+ * You may specialise the template for other combound types like has been done for ROOT::Math::XYZVector below or
  * in framework/tests/Helix.cc to compare two helices.
  *
  * Note for the google test framework to properly print your type either a operator<< or PrintTo(const T& expected, std::ostream* out)
@@ -237,7 +237,6 @@ namespace Belle2 {
  */
 #define ASSERT_ALL_NEAR(expected, actual, tolerance) ASSERT_PRED3(::Belle2::TestHelpers::allNear<decltype(expected)>, expected, actual, tolerance)
 
-class TVector3;
 namespace Belle2 {
   namespace  TestHelpers {
     /** Predicate checking that two angular values are close to each other modulus a 2 * PI difference. */
@@ -266,8 +265,8 @@ namespace Belle2 {
     template<>
     bool allNear<ROOT::Math::XYZVector>(const ROOT::Math::XYZVector& expected, const ROOT::Math::XYZVector& actual, double tolerance);
 
-    /** Print function for the google test framework to print a TVector3 to an output stream */
-    void PrintTo(const TVector3& tVector3, ::std::ostream& output);
+    /** Print function for the google test framework to print a ROOT::Math::XYZVector to an output stream */
+    void PrintTo(const ROOT::Math::XYZVector& vector3, ::std::ostream& output);
   }
 }
 

@@ -66,17 +66,17 @@ namespace Belle2 {
 
       /*!
        *  Reconstruct from wire hits with attached right left passage hypotheses
-       *  by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
+       *  by constructing tangents between adjacent hits pairs and averaging the reconstructed position.
        */
       static CDCSegment2D reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment);
 
       /*!
        *  Reconstruct from wire hits with attached right left passage hypotheses
-       *  by constructing facets between adjacent hits triples and averaging the reconstucted position.
+       *  by constructing facets between adjacent hits triples and averaging the reconstructed position.
        */
       static CDCSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
-      //! Comparision of segments up to the super cluster id keeping them close together on sort
+      //! Comparison of segments up to the super cluster id keeping them close together on sort
       bool operator<(const CDCSegment2D& segment2D) const;
 
       //! Helper constructor to create a relation in python

@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     using CDCAxialSegment2D = class CDCSegment2D;
 
-    /// Filter for the constuction of axial to axial segment pairs based on simple criterions
+    /// Filter for the construction of axial to axial segment pairs based on simple criteria
     class SimpleAxialSegmentPairFilter : public BaseAxialSegmentPairFilter {
 
     public:

@@ -208,7 +208,7 @@ namespace Belle2 {
 
       if (fromMCTrackId != toMCTrackId) return EForwardBackward::c_Invalid;
 
-      // Check if the segments are sensable on their own
+      // Check if the segments are meaningful on their own
       EForwardBackward fromFBInfo = isForwardOrBackwardToMCTrack(ptrFromHits);
       if (fromFBInfo == EForwardBackward::c_Invalid) return EForwardBackward::c_Invalid;
 

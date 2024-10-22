@@ -10,16 +10,16 @@ import pathlib
 import tempfile
 import numpy as np
 
-from tensorflow.keras.layers import Dense, Input
-from tensorflow.keras.models import Model, load_model
-from tensorflow.keras.losses import binary_crossentropy
+from keras.layers import Dense, Input
+from keras.models import Model, load_model
+from keras.losses import binary_crossentropy
 import tensorflow as tf
 from basf2 import B2WARNING
 
 
 class State:
     """
-    Tensorflow.keras state
+    keras state
     """
 
     def __init__(self, model=None, **kwargs):
@@ -45,7 +45,7 @@ def feature_importance(state):
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
     """
-    Return default tensorflow.keras model
+    Return dummy default keras model
     """
 
     input = Input(shape=(number_of_features,))
@@ -62,21 +62,19 @@ def get_model(number_of_features, number_of_spectators, number_of_events, traini
 
 def load(obj):
     """
-    Load Tensorflow.keras model into state
+    Load keras model into state
     """
     with tempfile.TemporaryDirectory() as temp_path:
 
         temp_path = pathlib.Path(temp_path)
 
-        file_names = obj[0]
-        for file_index, file_name in enumerate(file_names):
-            path = temp_path.joinpath(pathlib.Path(file_name))
-            path.parents[0].mkdir(parents=True, exist_ok=True)
+        filename = obj[0]
+        path = temp_path.joinpath(pathlib.Path(filename))
 
-            with open(path, 'w+b') as file:
-                file.write(bytes(obj[1][file_index]))
+        with open(path, 'w+b') as file:
+            file.write(bytes(obj[1]))
 
-        state = State(load_model(pathlib.Path(temp_path) / 'my_model'))
+        state = State(load_model(path))
 
         for index, key in enumerate(obj[2]):
             setattr(state, key, obj[3][index])
@@ -105,7 +103,7 @@ def begin_fit(state, Xtest, Stest, ytest, wtest, nBatches):
 
 def partial_fit(state, X, S, y, w, epoch, batch):
     """
-    Pass received data to tensorflow.keras session
+    Pass received data to keras model and fit it
     """
     if epoch > 0:
         B2WARNING("The keras training interface has been called with specific_options.m_nIterations > 1."
@@ -121,24 +119,18 @@ def partial_fit(state, X, S, y, w, epoch, batch):
 
 def end_fit(state):
     """
-    Store tensorflow.keras session in a graph
+    Store trained keras model
     """
 
     with tempfile.TemporaryDirectory() as temp_path:
 
         temp_path = pathlib.Path(temp_path)
-        state.model.save(temp_path.joinpath('my_model'))
+        filename = 'my_model.keras'
+        filepath = temp_path.joinpath(filename)
+        state.model.save(filepath)
 
-        # this creates:
-        # path/my_model/saved_model.pb
-        # path/my_model/keras_metadata.pb (sometimes)
-        # path/my_model/variables/*
-        # path/my_model/assets/*
-        file_names = [f.relative_to(temp_path) for f in temp_path.rglob('*') if f.is_file()]
-        files = []
-        for file_name in file_names:
-            with open(temp_path.joinpath(file_name), 'rb') as file:
-                files.append(file.read())
+        with open(filepath, 'rb') as file:
+            filecontent = file.read()
 
         collection_keys = state.collection_keys
         collections_to_store = []
@@ -146,4 +138,4 @@ def end_fit(state):
             collections_to_store.append(getattr(state, key))
 
     del state
-    return [file_names, files, collection_keys, collections_to_store]
+    return [filename, filecontent, collection_keys, collections_to_store]

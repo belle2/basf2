@@ -20,7 +20,7 @@
 # the inputfile is the same provided by eventSimulation.py script, otherwise a
 # default pre-simulated inputfile is provided in this script if -i is omitted.
 # the validation attach to the NoKickCuts.root file some useful histograms to
-# validate the selection, the FitMethod istead is not recommended because it has
+# validate the selection, the FitMethod instead is not recommended because it has
 # not been optimized for Belle II Phase III Training Sample.
 #####################################################################
 

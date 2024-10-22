@@ -29,6 +29,11 @@ namespace Belle2 {
      */
     DQMHistAnalysisTRGModule();
 
+    /**
+     * A utility function to find the location of the tail of histograms
+     */
+    static double getThreshold(const TH1* hist, const double lower_bound, const double widthFraction = 0.01);
+
   private:
 
     /**

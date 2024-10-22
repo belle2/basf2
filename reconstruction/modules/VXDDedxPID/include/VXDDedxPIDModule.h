@@ -125,7 +125,7 @@ namespace Belle2 {
       return (d == Dedx::c_PXD and m_usePXD) or (d == Dedx::c_SVD and m_useSVD);
     }
 
-    /** Check the pdfs for consistency everytime they change in the database */
+    /** Check the pdfs for consistency every time they change in the database */
     void checkPDFs();
 
     // pdfs for PID

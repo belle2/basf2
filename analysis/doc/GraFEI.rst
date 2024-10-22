@@ -31,11 +31,11 @@ This new representation of the LCA is called LCAS matrix, where the S stands for
 An example of decay tree with its corresponding LCAS matrix is:
 
 .. figure:: figs/decay_tree.png
-   :width: 22.2em
-   :align: left
+   :width: 23em
+   :align: center
 .. figure:: figs/lcas.png
-   :width: 18.6em
-   :align: right
+   :width: 23em
+   :align: center
 
 The model can be trained and evaluated in two modes:
 

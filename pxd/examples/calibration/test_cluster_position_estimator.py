@@ -111,7 +111,7 @@ class PXDPositionEstimation(b2.Module):
 
         for truehit in truehits:
             if isinstance(truehit, Belle2.PXDTrueHit):
-                sensor_info = Belle2.VXD.GeoCache.get(truehit.getSensorID())
+                sensor_info = Belle2.VXD.GeoCache.getInstance().getSensorInfo(truehit.getSensorID())
                 clusters = truehit.getRelationsFrom("PXDClusters")
 
                 # now check if we find a cluster

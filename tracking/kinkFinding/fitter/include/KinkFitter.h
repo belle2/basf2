@@ -13,7 +13,6 @@
 #include <mdst/dataobjects/Kink.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
-#include <genfit/Track.h>
 
 #include <utility>
 
@@ -249,10 +248,6 @@ namespace Belle2 {
 
 
   private:
-
-    // Objects containing the track fitters (DAF and ordinary Kalman Filter).
-    std::unique_ptr<TrackFitter> m_trackFitterDAF; ///< Object containing the DAF track fitter.
-    std::unique_ptr<TrackFitter> m_trackFitterKF; ///< Object containing the KalmanFitter.
 
     // variables used for input
     std::string m_recoTracksName;   ///< RecoTrackColName (input).

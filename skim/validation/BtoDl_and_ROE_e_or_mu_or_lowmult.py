@@ -28,7 +28,6 @@ path = b2.Path()
 skim = BtoDl_and_ROE_e_or_mu_or_lowmult(
     validation=True,
     udstOutput=False,
-    analysisGlobaltag=ma.getAnalysisGlobaltag(),
 )
 
 ma.inputMdstList(

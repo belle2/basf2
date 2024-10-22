@@ -100,7 +100,7 @@ double BKLMTrackFitter::fit(std::list<KLMHit2d* >& listHitSector)
   }
 
   if (!m_globalFit) {
-    //transfer to the global system, choose two abitrary points on track within in the sector jpionts on this track
+    //transfer to the global system, choose two arbitrary points on track within in the sector jpionts on this track
     const Belle2::bklm::Module* refMod = m_GeoPar->findModule((*listHitSector.begin())->getSection(),
                                                               (*listHitSector.begin())->getSector(), 1);
 
@@ -482,7 +482,7 @@ double BKLMTrackFitter::fit1dSectorTrack(std::list< KLMHit2d* > hitList,
 
 }
 
-//! do fit in global system, handle tracks that go thrugh multi-sectors
+//! do fit in global system, handle tracks that go through multi-sectors
 double BKLMTrackFitter::fit1dTrack(std::list< KLMHit2d* > hitList,
                                    HepVector&  eta,
                                    HepSymMatrix&  error,

@@ -22,7 +22,7 @@
 namespace Belle2 {
 
   /** Module to convert TrueHits into Clusters using a simplified process. Supports PXD (2D) and SVD (1D)
-   * usefull for tracking purposes and crosschecks with the PXD/SVDDigitizer and Clusterizer modules.
+   * useful for tracking purposes and crosschecks with the PXD/SVDDigitizer and Clusterizer modules.
    * so far only the coordinates (smeared) and the timestamp (sharp) are useful values
    */
   class VXDSimpleClusterizerModule : public Module {

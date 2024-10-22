@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 // this is an example for storing DQM TCanvases and control variables into an output root file
-// The file should containg one DQMFileMetaData object which holds information about the data processing
+// The file should containing one DQMFileMetaData object which holds information about the data processing
 // Several MonitoringObjects can then be stored in the same file. For example for mumu, Dstar, etc.
 // Please always set processingID in the DQMFileMetaData as it is used by the webpage to discriminate
 // results from different processing.

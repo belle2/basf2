@@ -180,7 +180,7 @@ namespace Belle2 {
     // parameter values for the intercept filter only
     // the seed filter parameter values are not stored in this payload
 
-    /** Treshold on pT to apply inverse pT scale on cut value */
+    /** Threshold on pT to apply inverse pT scale on cut value */
     double m_paramPtThresholdTrackToHitCut;
     /** Cut in phi for the difference between PXDIntercept from RecoTrack on the same layer and current hit-based state */
     double m_paramPhiInterceptToHitCut;

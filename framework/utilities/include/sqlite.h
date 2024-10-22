@@ -197,8 +197,24 @@ namespace sqlite {
     using value_type = ObjectType;
 
     /** Iterator class to allow iterating over the rows */
-    class iterator: public std::iterator<std::input_iterator_tag, value_type, size_t> {
+    class iterator {
     public:
+
+      /** Iterator category. */
+      using iterator_category = std::input_iterator_tag;
+
+      /** Value type. */
+      using value_type = ObjectType;
+
+      /** Difference type. */
+      using difference_type = size_t;
+
+      /** Pointer. */
+      using pointer = value_type*;
+
+      /** Reference. */
+      using reference = value_type&;
+
       /** with a default constructor */
       iterator() = default;
       /** and a real constructor to a statement */

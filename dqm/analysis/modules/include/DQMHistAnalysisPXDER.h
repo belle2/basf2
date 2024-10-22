@@ -161,7 +161,7 @@ namespace Belle2 {
        * Flag values:
        * -3: nonexisting Type
        * -2: histogram is missing or masked
-       * -1: less than 100 samles, skip comparition
+       * -1: less than 100 samples, skip comparison
        *  0: good much with reference
        *  1: warning level = diff > 6 * sigma and < error level
        *  2: error level = diff > 10 * sigma
@@ -180,7 +180,7 @@ namespace Belle2 {
        * @param name_hist Histogram of sources.
        * @param name_refhist Reference histogram.
        * @param flaghist Histogram of flags.
-       * @return Indication of succes of realizing of condition, 1: OK.
+       * @return Indication of success of realizing of condition, 1: OK.
        */
     int SetFlag(int Type, int bin, const double* pars, double ratio, const std::string& name_hist, const std::string& name_refhist,
                 TH1I* flaghist);
@@ -188,7 +188,7 @@ namespace Belle2 {
        * Flag values:
        * -3: nonexisting Type
        * -2: histogram is missing or masked
-       * -1: less than 100 samles, skip comparition
+       * -1: less than 100 samples, skip comparison
        *  0: good much with reference
        *  1: warning level = diff > 6 * sigma and < error level
        *  2: error level = diff > 10 * sigma
@@ -207,7 +207,7 @@ namespace Belle2 {
        * @param hist Histogram of sources.
        * @param refhist Reference histogram.
        * @param flag Histogram of flags.
-       * @return Indication of succes of realizing of condition, 1: OK.
+       * @return Indication of success of realizing of condition, 1: OK.
        */
 //     int SetFlag(int Type, int bin, double* pars, double ratio, TH1I* hist, TH1I* refhist, TH1I* flaghist);
 

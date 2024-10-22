@@ -10,6 +10,7 @@
 
 # Import EventsOfDoomParameters payloads
 
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import EventsOfDoomParameters, Database, IntervalOfValidity
 
 parameters = EventsOfDoomParameters()

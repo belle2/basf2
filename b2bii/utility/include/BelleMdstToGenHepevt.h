@@ -39,7 +39,7 @@ const Belle::Gen_hepevt& get_hepevt(const Belle::Mdst_charged&, int ith = 0);
 /**
  * Returns reference to MC matched Belle::Gen_hepevt object
  *
- * returns correponding hepevt(This hepevt might be made at inside of ECL).
+ * returns corresponding hepevt(This hepevt might be made at inside of ECL).
  * the following example will return what most of you want!
  * Belle::Mdst_ecl & e = ...
  * const Belle::Gen_hepevt & h(Belle::Gen_level(get_hepevt(e)));
@@ -50,7 +50,7 @@ const Belle::Gen_hepevt& get_hepevt(const Belle::Mdst_ecl&, int ith = 0);
 /**
  * Returns reference to MC matched Belle::Gen_hepevt object
  *
- * returns correponding hepevt(This hepevt might be made at inside of ECL).
+ * returns corresponding hepevt(This hepevt might be made at inside of ECL).
  * the following example will return what most of you want!
  * Belle::Mdst_ecl & e = ...
  * const Belle::Gen_hepevt & h(Belle::Gen_level(get_hepevt(e)));

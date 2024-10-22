@@ -59,15 +59,6 @@ KinkFitter::KinkFitter(const std::string& trackFitResultsName, const std::string
   /// relation : m_recoTracks <--> m_copiedRecoTracks
   m_copiedRecoTracks.registerRelationTo(m_recoTracks);
 
-  /// DAF and KF pointers to be used during operation of the class
-  m_trackFitterDAF = std::make_unique<TrackFitter>();
-  m_trackFitterKF = std::make_unique<TrackFitter>();
-  std::shared_ptr<genfit::KalmanFitterRefTrack> kalmanFitter = std::make_shared<genfit::KalmanFitterRefTrack>();
-  kalmanFitter->setMinIterations(static_cast<unsigned int>(3));
-  kalmanFitter->setMaxIterations(static_cast<unsigned int>(10));
-  kalmanFitter->setMaxFailedHits(static_cast<unsigned int>(5));
-  m_trackFitterKF->resetFitter(kalmanFitter);
-
   B2ASSERT("Material effects not set up.  Please use SetupGenfitExtrapolationModule.",
            genfit::MaterialEffects::getInstance()->isInitialized());
   B2ASSERT("Magnetic field not set up.  Please use SetupGenfitExtrapolationModule.",
@@ -127,16 +118,16 @@ TrackFitResult* KinkFitter::buildTrackFitResult(RecoTrack* recoTrack,
                                                 const Const::ParticleType trackHypothesis)
 {
   const uint64_t hitPatternCDCInitializer = TrackBuilder::getHitPatternCDCInitializer(*recoTrack);
-  uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
-  genfit::Track track = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
+  const uint32_t hitPatternVXDInitializer = TrackBuilder::getHitPatternVXDInitializer(*recoTrack);
+  const genfit::FitStatus* trackFitStatus = recoTrack->getTrackFitStatus();
 
   TrackFitResult* kinkTrackFitResult
     = m_trackFitResults.appendNew(ROOT::Math::XYZVector(msop.getPos()), ROOT::Math::XYZVector(msop.getMom()),
                                   msop.get6DCov(), msop.getCharge(),
                                   trackHypothesis,
-                                  track.getFitStatus()->getPVal(),
+                                  trackFitStatus->getPVal(),
                                   Bz, hitPatternCDCInitializer, hitPatternVXDInitializer,
-                                  track.getFitStatus()->getNdf());
+                                  trackFitStatus->getNdf());
   return kinkTrackFitResult;
 }
 
@@ -223,7 +214,13 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
   // copy recoTracks to a separate StoreArray using seed information
   RecoTrack* recoTrack = m_copiedRecoTracks.appendNew(ROOT::Math::XYZVector(recoTrackToCopy->getPositionSeed()),
                                                       ROOT::Math::XYZVector(recoTrackToCopy->getMomentumSeed()),
-                                                      static_cast<short>(recoTrackToCopy->getChargeSeed()));
+                                                      static_cast<short>(recoTrackToCopy->getChargeSeed()),
+                                                      recoTrackToCopy->getStoreArrayNameOfPXDHits(),
+                                                      recoTrackToCopy->getStoreArrayNameOfSVDHits(),
+                                                      recoTrackToCopy->getStoreArrayNameOfCDCHits(),
+                                                      recoTrackToCopy->getStoreArrayNameOfBKLMHits(),
+                                                      recoTrackToCopy->getStoreArrayNameOfEKLMHits(),
+                                                      recoTrackToCopy->getStoreArrayNameOfRecoHitInformation());
   recoTrack->setTimeSeed(recoTrackToCopy->getTimeSeed());
   recoTrack->setSeedCovariance(recoTrackToCopy->getSeedCovariance());
 
@@ -267,7 +264,7 @@ RecoTrack* KinkFitter::copyRecoTrackAndReassignCDCHits(RecoTrack* motherRecoTrac
   } else {
 
     // In case of hit reassignment, we do not want to have VXD hits in the beginning of daughter track
-    // even if they exist (absense of VXD hits at the end of the track was checked in KinkFinderModule)
+    // even if they exist (absence of VXD hits at the end of the track was checked in KinkFinderModule)
 
     if (deltaMother)
       sortingParameterOffset = motherRecoTrack->getRecoHitInformation(motherCDCHit[motherCDCHit.size() +
@@ -315,9 +312,11 @@ bool KinkFitter::refitRecoTrackAfterReassign(RecoTrack* recoTrackMotherRefit, Re
                                              const RecoTrack* recoTrackMother, const RecoTrack* recoTrackDaughter)
 {
 
+  // initialize fitter
+  TrackFitter trackFitterDAF;
   // fit the new tracks
-  m_trackFitterDAF->fit(*recoTrackMotherRefit);
-  m_trackFitterDAF->fit(*recoTrackDaughterRefit);
+  trackFitterDAF.fit(*recoTrackMotherRefit);
+  trackFitterDAF.fit(*recoTrackDaughterRefit);
 
   if (!recoTrackMotherRefit->wasFitSuccessful() || !recoTrackDaughterRefit->wasFitSuccessful()) {
     B2DEBUG(29, "Refit of the tracks with reassigned hits failed ");
@@ -362,16 +361,28 @@ RecoTrack* KinkFitter::copyRecoTrackForFlipAndRefit(const RecoTrack* recoTrack,
                                                     const double& timeSeed)
 {
   // copy recoTracks to a separate StoreArray using seed information
-  RecoTrack* newRecoTrack = m_copiedRecoTracks.appendNew(positionSeed,
-                                                         -momentumSeed,
-                                                         static_cast<short>(-recoTrack->getChargeSeed()));
+  RecoTrack* newRecoTrack = m_copiedRecoTracks.appendNew(positionSeed, -momentumSeed,
+                                                         static_cast<short>(-recoTrack->getChargeSeed()),
+                                                         recoTrack->getStoreArrayNameOfPXDHits(),
+                                                         recoTrack->getStoreArrayNameOfSVDHits(),
+                                                         recoTrack->getStoreArrayNameOfCDCHits(),
+                                                         recoTrack->getStoreArrayNameOfBKLMHits(),
+                                                         recoTrack->getStoreArrayNameOfEKLMHits(),
+                                                         recoTrack->getStoreArrayNameOfRecoHitInformation());
   newRecoTrack->setTimeSeed(timeSeed);
   newRecoTrack->setSeedCovariance(recoTrack->getSeedCovariance());
-  newRecoTrack->addHitsFromRecoTrack(recoTrack, newRecoTrack->getNumberOfTotalHits(), true);
+  newRecoTrack->addHitsFromRecoTrack(recoTrack, 0, true);
 
-  // fit the new track
+  // initialize fitter
+  TrackFitter trackFitterKF;
   // DAF fitter usually works badly with flipped tracks, so kalmanFitter is used instead
-  m_trackFitterKF->fit(*newRecoTrack);
+  std::shared_ptr<genfit::KalmanFitterRefTrack> kalmanFitter = std::make_shared<genfit::KalmanFitterRefTrack>();
+  kalmanFitter->setMinIterations(static_cast<unsigned int>(3));
+  kalmanFitter->setMaxIterations(static_cast<unsigned int>(10));
+  kalmanFitter->setMaxFailedHits(static_cast<unsigned int>(5));
+  trackFitterKF.resetFitter(kalmanFitter);
+  // fit the new track
+  trackFitterKF.fit(*newRecoTrack);
 
   return newRecoTrack;
 }
@@ -385,12 +396,17 @@ RecoTrack* KinkFitter::copyRecoTrackForRefit(const RecoTrack* recoTrack,
 {
 
   // copy recoTracks to a separate StoreArray using seed information
-  RecoTrack* newRecoTrack = m_copiedRecoTracks.appendNew(positionSeed,
-                                                         momentumSeed,
-                                                         static_cast<short>(recoTrack->getChargeSeed()));
+  RecoTrack* newRecoTrack = m_copiedRecoTracks.appendNew(positionSeed, momentumSeed,
+                                                         static_cast<short>(recoTrack->getChargeSeed()),
+                                                         recoTrack->getStoreArrayNameOfPXDHits(),
+                                                         recoTrack->getStoreArrayNameOfSVDHits(),
+                                                         recoTrack->getStoreArrayNameOfCDCHits(),
+                                                         recoTrack->getStoreArrayNameOfBKLMHits(),
+                                                         recoTrack->getStoreArrayNameOfEKLMHits(),
+                                                         recoTrack->getStoreArrayNameOfRecoHitInformation());
   newRecoTrack->setTimeSeed(timeSeed);
   newRecoTrack->setSeedCovariance(recoTrack->getSeedCovariance());
-  newRecoTrack->addHitsFromRecoTrack(recoTrack, newRecoTrack->getNumberOfTotalHits());
+  newRecoTrack->addHitsFromRecoTrack(recoTrack);
 
   // block the hits in the first stereo layer and all before (leave at least 6 hits for fit)
   // (usually, wrong assignment of first stereo layer is responsible for wrong z coordinate)
@@ -408,11 +424,19 @@ RecoTrack* KinkFitter::copyRecoTrackForRefit(const RecoTrack* recoTrack,
   }
 
   // fit the new track
+  // initialize fitter
+  TrackFitter trackFitter;
   // if useAnotherFitter true, set ordinary KalmanFilter (for filterFlag 6 it performs better than DAF)
   if (useAnotherFitter) {
-    m_trackFitterKF->fit(*newRecoTrack);
+    std::shared_ptr<genfit::KalmanFitterRefTrack> kalmanFitter = std::make_shared<genfit::KalmanFitterRefTrack>();
+    kalmanFitter->setMinIterations(static_cast<unsigned int>(3));
+    kalmanFitter->setMaxIterations(static_cast<unsigned int>(10));
+    kalmanFitter->setMaxFailedHits(static_cast<unsigned int>(5));
+    trackFitter.resetFitter(kalmanFitter);
+
+    trackFitter.fit(*newRecoTrack);
   } else {
-    m_trackFitterDAF->fit(*newRecoTrack);
+    trackFitter.fit(*newRecoTrack);
   }
 
   return newRecoTrack;
@@ -451,8 +475,10 @@ unsigned int KinkFitter::combineTracksAndFit(const Track* trackMother, const Tra
   RecoTrack* recoTrackCombinedRefit = copyRecoTrackAndReassignCDCHits(recoTrackMother,
                                       recoTrackDaughter, true, -recoTrackDaughter->getNumberOfCDCHits());
 
+  // initialize fitter
+  TrackFitter trackFitterDAF;
   // fit the new track
-  m_trackFitterDAF->fit(*recoTrackCombinedRefit);
+  trackFitterDAF.fit(*recoTrackCombinedRefit);
 
   // return 19 if the track fit failed
   if (!recoTrackCombinedRefit->wasFitSuccessful()) {
@@ -511,9 +537,13 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
   }
 
   // copy recoTrack to a separate StoreArray using seed information
-  RecoTrack* recoTrack = m_copiedRecoTracks.appendNew(positionSeed,
-                                                      momentumSeed,
-                                                      chargeSeed);
+  RecoTrack* recoTrack = m_copiedRecoTracks.appendNew(positionSeed, momentumSeed, chargeSeed,
+                                                      splitRecoTrack->getStoreArrayNameOfPXDHits(),
+                                                      splitRecoTrack->getStoreArrayNameOfSVDHits(),
+                                                      splitRecoTrack->getStoreArrayNameOfCDCHits(),
+                                                      splitRecoTrack->getStoreArrayNameOfBKLMHits(),
+                                                      splitRecoTrack->getStoreArrayNameOfEKLMHits(),
+                                                      splitRecoTrack->getStoreArrayNameOfRecoHitInformation());
   recoTrack->setTimeSeed(timeSeed);
   recoTrack->setSeedCovariance(splitRecoTrack->getSeedCovariance());
 
@@ -581,6 +611,8 @@ RecoTrack* KinkFitter::copyRecoTrackAndSplit(const RecoTrack* splitRecoTrack,
 /// Split track into two based on |chi2/ndf - 1|
 bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrackIndexMother, short& recoTrackIndexDaughter)
 {
+  // initialize fitter
+  TrackFitter trackFitterDAF;
 
   // initial default value for the |chi2/ndf - 1|
   constexpr double defaultChi2NdfRatio = std::numeric_limits<double>::max();
@@ -641,8 +673,8 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
     recoTrackDaughter[splitHitNumberIndex] = copyRecoTrackAndSplit(recoTrackSplit, false, splitHitNumber[splitHitNumberIndex]);
 
     // fit of the RecoTracks
-    m_trackFitterDAF->fit(*(recoTrackMother[splitHitNumberIndex]));
-    m_trackFitterDAF->fit(*(recoTrackDaughter[splitHitNumberIndex]));
+    trackFitterDAF.fit(*(recoTrackMother[splitHitNumberIndex]));
+    trackFitterDAF.fit(*(recoTrackDaughter[splitHitNumberIndex]));
 
     // if the fit failed, skip this track pair
     if (!recoTrackMother[splitHitNumberIndex]->wasFitSuccessful() ||
@@ -742,8 +774,8 @@ bool KinkFitter::splitRecoTrack(const RecoTrack* recoTrackSplit, short& recoTrac
     recoTrackDaughter[c_middlePoint] = copyRecoTrackAndSplit(recoTrackSplit, false, splitHitNumber[c_middlePoint]);
 
     // fit of the mother and daughter RecoTracks in the new middle point
-    m_trackFitterDAF->fit(*(recoTrackMother[c_middlePoint]));
-    m_trackFitterDAF->fit(*(recoTrackDaughter[c_middlePoint]));
+    trackFitterDAF.fit(*(recoTrackMother[c_middlePoint]));
+    trackFitterDAF.fit(*(recoTrackDaughter[c_middlePoint]));
 
     // if the fit failed, skip this track pair
     if (!recoTrackMother[c_middlePoint]->wasFitSuccessful() ||
@@ -976,7 +1008,7 @@ bool KinkFitter::fitAndStore(const Track* trackMother, const Track* trackDaughte
       unsigned short countBadReassignTries = 0;
 
       // find threshold hit position in the track
-      // hit bellow the threshold are to be reassigned
+      // hit below the threshold are to be reassigned
       // positive for daughter hits reassignment to mother, negative vice-versa
       int hitPositionForReassignment = 0;
       if (reassignHitStatus & 0x1) {

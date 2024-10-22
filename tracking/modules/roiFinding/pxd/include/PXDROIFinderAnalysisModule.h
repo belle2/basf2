@@ -193,7 +193,7 @@ namespace Belle2 {
     TH2F* m_h2ROIuMinMax = nullptr; /**< u-coordinate Min vs Max */
     TH2F* m_h2ROIvMinMax = nullptr; /**< v-coordinate Min vs Max */
     TH1F* m_h1totROIs = nullptr; /**< distribution of number of all ROIs*/
-    TH1F* m_h1okROIs = nullptr; /**< distribution of number of ROIs containin a PXDDigit*/
+    TH1F* m_h1okROIs = nullptr; /**< distribution of number of ROIs containing a PXDDigit*/
     TH1F* m_h1okROIfrac = nullptr; /**< distribution of number of ROIsreduction factor*/
     TH1F* m_h1redFactor = nullptr; /**< distribution of number of ROIsreduction factor*/
     TH1F* m_h1redFactor_L1 = nullptr; /**< distribution of number of ROIsreduction factor*/

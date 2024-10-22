@@ -67,7 +67,7 @@ namespace Belle2 {
     /** pValue of track fit */
     double m_pValue;
 
-    /** total number of genrated charged stable MCParticles */
+    /** total number of generated charged stable MCParticles */
     double m_nGeneratedChargedStableMcParticles;
 
     /** total number of reconstructed track candidates */

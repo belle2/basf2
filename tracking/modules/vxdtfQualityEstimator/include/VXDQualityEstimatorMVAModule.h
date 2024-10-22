@@ -79,7 +79,7 @@ namespace Belle2 {
     /** pointer to the object to interact with the MVA package */
     std::unique_ptr<MVAExpert> m_mvaExpert;
 
-    /** pointer to object that extracts the results from the estimation mehtod
+    /** pointer to object that extracts the results from the estimation method
     * (including QI, chi2, p_t and p_mag) */
     std::unique_ptr<QEResultsExtractor> m_qeResultsExtractor;
 
@@ -90,7 +90,7 @@ namespace Belle2 {
     std::vector<Named<float*>>  m_variableSet;
 
     /** number of SpacePoints in SPTC as additional info for MVA,
-     * type is float to be consistend with m_variableSet (and MVA implementation) */
+     * type is float to be consistent with m_variableSet (and MVA implementation) */
     float m_nSpacePoints = NAN;
 
   };

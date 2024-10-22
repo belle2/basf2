@@ -27,7 +27,7 @@ namespace Belle2 {
       /**  Destructor. */
       ~ECLLeakagePosition();
 
-      /** Return postion. Elements of returned vector: */
+      /** Return position. Elements of returned vector: */
       /** cellID, thetaID, region, localThetaBin, localPhiBin, phiMech, status */
       /** region: 0 = forward, 1 = barrel, 2 = backward */
       /** localPhiBin is from edge with mechanical structure, or else lower edge */

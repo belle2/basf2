@@ -20,7 +20,7 @@ from stdV0s import stdLambdas
 from variables import variables as v
 
 __liaison__ = "Sen Jia <jiasen@seu.edu.cn>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

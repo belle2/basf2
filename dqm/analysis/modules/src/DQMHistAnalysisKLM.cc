@@ -51,8 +51,6 @@ DQMHistAnalysisKLMModule::DQMHistAnalysisKLMModule()
   addParam("MessageThreshold", m_MessageThreshold,
            "Max number of messages to show up in channel occupancy plots", 12);
   addParam("HistogramDirectoryName", m_histogramDirectoryName, "Name of histogram directory", std::string("KLM"));
-  addParam("RefHistogramDirectoryPrefix", m_refHistogramDirectoryPrefix, "Prefix to account for reference file", std::string("ref/"));
-  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("KLM_DQM_REF_BEAM.root"));
 
   m_MinProcessedEventsForMessages = m_MinProcessedEventsForMessagesInput;
   m_2DHitsLine.SetLineColor(kRed);
@@ -76,10 +74,6 @@ void DQMHistAnalysisKLMModule::initialize()
     B2FATAL("The threshold used for hot channels is larger than the one for masked channels."
             << LogVar("Threshold for hot channels", m_ThresholdForHot)
             << LogVar("Threshold for masked channels", m_ThresholdForMasked));
-
-  if (m_refFileName != "") {
-    m_refFile = TFile::Open(m_refFileName.data(), "READ");
-  }
 
   // register plots for delta histogramming
   addDeltaPar(m_histogramDirectoryName, "time_rpc", HistDelta::c_Entries, m_minEntries, 1);
@@ -112,21 +106,10 @@ void DQMHistAnalysisKLMModule::initialize()
     }
   }
 
-
-  //search for reference
-  if (m_refFile && m_refFile->IsOpen()) {
-    B2INFO("DQMHistAnalysisKLM: reference root file (" << m_refFileName << ") FOUND, able to read ref histograms");
-
-  } else
-    B2WARNING("DQMHistAnalysisKLM: reference root file (" << m_refFileName << ") not found, or closed");
 }
 
 void DQMHistAnalysisKLMModule::terminate()
 {
-  if (m_refFile) {
-    m_refFile->Close();
-    delete m_refFile;
-  }
 }
 
 void DQMHistAnalysisKLMModule::beginRun()
@@ -212,15 +195,9 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   deltaDrawer(delta, histogram, canvas); //draw normalized delta on top
   n = histogram->GetXaxis()->GetNbins();
 
-  /* call reference histograms */
-  TH1* ref_histogram = nullptr;
+  /* call reference histograms from base class*/
+  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleNone);
   float ref_average = 0;
-  if (m_refFile && m_refFile->IsOpen()) {
-    ref_histogram = (TH1*)m_refFile->Get((m_refHistogramDirectoryPrefix + histogram->GetName()).data());
-    if (!ref_histogram) {
-      B2WARNING("Unable to find " << m_refHistogramDirectoryPrefix << histogram->GetName() << " in reference file.");
-    }
-  }
 
   if (ref_histogram != nullptr) {
     for (i = 1; i <= n; i++) {
@@ -374,8 +351,8 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
       divisions = 7;
       shift = 1;
     } else {
-      divisions = 8;
-      shift = 8;
+      divisions = BKLMElementNumbers::getMaximalSectorNumber();
+      shift = BKLMElementNumbers::getMaximalSectorNumber();
     }
     for (int k = 0; k < divisions; k++) {
       xLine = (histogram->GetXaxis()->GetBinLowEdge(bin) - canvas->GetX1()) / (canvas->GetX2() - canvas->GetX1());
@@ -520,11 +497,11 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
         if (sector > 0)
           m_PlaneLine.DrawLine(xLine, gPad->GetUymin(), xLine, gPad->GetUymax());
         name = "B";
-        if (sector < 8)
+        if (sector < BKLMElementNumbers::getMaximalSectorNumber())
           name += "B";
         else
           name += "F";
-        name += std::to_string(sector % 8);
+        name += std::to_string(sector % BKLMElementNumbers::getMaximalSectorNumber());
         m_PlaneText.DrawText(xText, yText, name.c_str());
       }
       /* Then, color the canvas with red if there is a dead module

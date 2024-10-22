@@ -23,7 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Class that accomodates many variable sets and presents them as on set of variables.
+     *  Class that accommodates many variable sets and presents them as on set of variables.
      *  In contrast to the UnionVarSet the individual VarSets are given as variadic template parameters.
      *
      *  Dummy implementation based on UnionVarSet. The UnionVarSet can be optimized and leverage that
@@ -76,7 +76,7 @@ namespace Belle2 {
 
       /**
        *  Getter for the named references to the individual variables
-       *  Base implementaton returns empty vector
+       *  Base implementation returns empty vector
        */
       std::vector<Named<Float_t*>> getNamedVariables(const std::string& prefix) override
       {

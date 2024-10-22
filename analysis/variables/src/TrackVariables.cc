@@ -20,6 +20,7 @@
 #include <framework/dataobjects/Helix.h>
 
 // dataobjects from the MDST
+#include <mdst/dbobjects/BeamSpot.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -42,11 +43,6 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
 
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the number of track hits.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       if (det == Const::EDetector::CDC) {
         return trackFit->getHitPatternCDC().getNHits();
       } else if (det == Const::EDetector::SVD) {
@@ -96,11 +92,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first SVD layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternVXD().getFirstSVDLayer();
     }
 
@@ -108,11 +99,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first PXD layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternVXD().getFirstPXDLayer(HitPatternVXD::PXDMode::normal);
     }
 
@@ -120,11 +106,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the first CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternCDC().getFirstLayer();
     }
 
@@ -132,11 +113,6 @@ namespace Belle2 {
     {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
-      // Before release-05 (MC13 + proc 11 and older) the hit patterns of TrackFitResults for V0s from the V0Finder were set to 0.
-      // Then, we have to take the detour via the related track to access the real pattern and get the last CDC layer if available.
-      if (trackFit->getHitPatternCDC().getNHits() + trackFit->getHitPatternVXD().getNdf() < 1) {
-        trackFit = part->getTrack()->getTrackFitResultWithClosestMass(Const::ChargedStable(std::abs(part->getPDGCode())));
-      }
       return trackFit->getHitPatternCDC().getLastLayer();
     }
 
@@ -173,6 +149,36 @@ namespace Belle2 {
       auto trackFit = part->getTrackFitResult();
       if (!trackFit) return Const::doubleNaN;
       return trackFit->getTanLambda();
+    }
+
+    double trackD0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getD0();
+    }
+
+    double trackZ0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getZ0();
+    }
+
+    double trackPhi0FromIP(const Particle* part)
+    {
+      auto trackFit = part->getTrackFitResult();
+      if (!trackFit) return Const::doubleNaN;
+      static DBObjPtr<BeamSpot> beamSpotDB;
+      auto helix = trackFit->getHelix();
+      helix.passiveMoveBy(ROOT::Math::XYZVector(beamSpotDB->getIPPosition()));
+      return helix.getPhi0();
     }
 
     double trackD0Error(const Particle* part)
@@ -737,10 +743,10 @@ point-of-closest-approach (POCA) in the :math:`r-\phi` plane.
 
 .. note::
 
-        Tracking parameters are with respect to the origin (0,0,0).  For the
+        Tracking parameters are with respect to the origin (0,0,0). For the
         POCA with respect to the measured beam interaction point, see
         :b2:var:`dr` (you probably want this unless you're doing a tracking
-        study or some debugging).
+        study or some debugging) and :b2:var:`d0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -748,6 +754,12 @@ Returns NaN if called for something other than a track-based particle.
     REGISTER_VARIABLE("phi0", trackPhi0, R"DOC(
 Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
 momentum in the :math:`r-\phi` plane.
+
+.. note::
+
+        Tracking parameters are with respect to the origin (0,0,0). For the
+        POCA with respect to the measured beam interaction point, see
+        :b2:var:`phi0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -764,10 +776,10 @@ point-of-closest-approach (POCA).
 
 .. note::
 
-        Tracking parameters are with respect to the origin (0,0,0).  For the
+        Tracking parameters are with respect to the origin (0,0,0). For the
         POCA with respect to the measured beam interaction point, see
         :b2:var:`dz` (you probably want this unless you're doing a tracking
-        study or some debugging).
+        study or some debugging) and :b2:var:`z0FromIP`.
 
 Returns NaN if called for something other than a track-based particle.
 
@@ -777,6 +789,27 @@ Returns :math:`\tan\lambda`, the slope of the track in the :math:`r-z` plane.
 
 Returns NaN if called for something other than a track-based particle.
     )DOC");
+    REGISTER_VARIABLE("d0FromIP", trackD0FromIP, R"DOC(
+Returns the tracking parameter :math:`d_0`, the signed distance to the
+point-of-closest-approach (POCA) in the :math:`r-\phi` plane, with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("z0FromIP", trackZ0FromIP, R"DOC(
+Returns the tracking parameter :math:`z_0`, the z-coordinate of the
+point-of-closest-approach (POCA), with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "cm");
+    REGISTER_VARIABLE("phi0FromIP", trackPhi0FromIP, R"DOC(
+Returns the tracking parameter :math:`\phi_0`, the angle of the transverse
+momentum in the :math:`r-\phi` plane, with respect to the measured beam interaction point.
+
+Returns NaN if called for something other than a track-based particle.
+
+)DOC", "rad");
     REGISTER_VARIABLE("d0Err", trackD0Error, R"DOC(
 Returns the uncertainty on :math:`d_0`, the signed distance to the
 point-of-closest-approach (POCA) in the :math:`r-\phi` plane.

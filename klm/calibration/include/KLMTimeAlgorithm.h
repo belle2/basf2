@@ -82,7 +82,7 @@ namespace Belle2 {
       /**
        * Get propagation time + cableDelay time.
        */
-      double time()
+      double time() const
       {
         return recTime - flyTime;
       }

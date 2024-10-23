@@ -133,7 +133,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
   double ratio3_6 = 0.;
   TH1* m_h = findHist("SVDClsTrk/SVDTRK_ClusterTimeV456");
 
-  int status = good;
+  int status;
   if (m_h != NULL) {
 
     m_hClusterOnTrackTime_L456V.Clear();

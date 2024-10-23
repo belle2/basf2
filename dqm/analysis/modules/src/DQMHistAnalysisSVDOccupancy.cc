@@ -318,11 +318,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cOccupancyU->cd();
       m_hOccupancy->getHistogram(1)->Draw("text");
       colorizeCanvas(m_cOccupancyU, c_StatusDefault);
+
     } else {
-
-      Int_t nStrips = 768;
-
-      Float_t occU = htmp->GetEntries() / nStrips / nEvents * 100;
+      Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
       m_hOccupancy->fill(m_SVDModules[i], 1, occU);
       setOccStatus(occU, m_occUstatus);
 
@@ -357,11 +355,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         m_cOccupancyU3Samples->cd();
         m_hOccupancy3Samples->getHistogram(1)->Draw("text");
         colorizeCanvas(m_cOccupancyU3Samples, c_StatusDefault);
+
       } else {
-
-        Int_t nStrips = 768;
-
-        Float_t occU = htmp->GetEntries() / nStrips / nEvents * 100;
+        Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
         m_hOccupancy3Samples->fill(m_SVDModules[i], 1, occU);
         setOccStatus(occU, m_occU3Samples);
       }
@@ -376,11 +372,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cOccupancyUGroupId0->cd();
       m_hOccupancyGroupId0->getHistogram(1)->Draw("text");
       colorizeCanvas(m_cOccupancyUGroupId0, c_StatusDefault);
+
     } else {
-
-      Int_t nStrips = 768;
-
-      Float_t occU = htmp->GetEntries() / nStrips / nEvents * 100;
+      Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
       m_hOccupancyGroupId0->fill(m_SVDModules[i], 1, occU);
       setOccStatus(occU, m_occUGroupId0);
     }
@@ -395,13 +389,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cOccupancyV->cd();
       m_hOccupancy->getHistogram(0)->Draw("text");
       colorizeCanvas(m_cOccupancyV, c_StatusDefault);
+
     } else {
-
-      Int_t nStrips = 768;
-      if (tmp_layer != 3)
-        nStrips = 512;
-
-      Float_t occV = htmp->GetEntries() / nStrips / nEvents * 100;
+      Float_t occV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
       m_hOccupancy->fill(m_SVDModules[i], 0, occV);
       setOccStatus(occV, m_occVstatus);
 
@@ -436,13 +426,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         m_cOccupancyV3Samples->cd();
         m_hOccupancy3Samples->getHistogram(0)->Draw("text");
         colorizeCanvas(m_cOccupancyV3Samples, c_StatusDefault);
+
       } else {
-
-        Int_t nStrips = 768;
-        if (tmp_layer != 3)
-          nStrips = 512;
-
-        Float_t occV = htmp->GetEntries() / nStrips / nEvents * 100;
+        Float_t occV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
         m_hOccupancy3Samples->fill(m_SVDModules[i], 0, occV);
         setOccStatus(occV, m_occV3Samples);
       }
@@ -458,13 +444,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cOccupancyVGroupId0->cd();
       m_hOccupancyGroupId0->getHistogram(0)->Draw("text");
       colorizeCanvas(m_cOccupancyVGroupId0, c_StatusDefault);
+
     } else {
-
-      Int_t nStrips = 768;
-      if (tmp_layer != 3)
-        nStrips = 512;
-
-      Float_t occV = htmp->GetEntries() / nStrips / nEvents * 100;
+      Float_t occV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
       m_hOccupancyGroupId0->fill(m_SVDModules[i], 0, occV);
       setOccStatus(occV, m_occVGroupId0);
     }
@@ -479,15 +461,10 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cOnlineOccupancyV->cd();
       m_hOnlineOccupancy->getHistogram(0)->Draw("text");
       colorizeCanvas(m_cOnlineOccupancyV, c_StatusDefault);
+
     } else {
-
-      Int_t nStrips = 768;
-      if (tmp_layer != 3)
-        nStrips = 512;
-
-      Float_t onlineOccV = htmp->GetEntries() / nStrips / nEvents * 100;
+      Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
       m_hOnlineOccupancy->fill(m_SVDModules[i], 0, onlineOccV);
-
 
       for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
@@ -508,13 +485,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         m_cOnlineOccupancyV3Samples->cd();
         m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text");
         colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusDefault);
+
       } else {
-
-        Int_t nStrips = 768;
-        if (tmp_layer != 3)
-          nStrips = 512;
-
-        Float_t onlineOccV = htmp->GetEntries() / nStrips / nEvents * 100;
+        Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
         m_hOnlineOccupancy3Samples->fill(m_SVDModules[i], 0, onlineOccV);
 
         for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
@@ -535,11 +508,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       m_cOnlineOccupancyU->cd();
       m_hOnlineOccupancy->getHistogram(1)->Draw("text");
       colorizeCanvas(m_cOnlineOccupancyU, c_StatusDefault);
+
     } else {
-
-      Int_t nStrips = 768;
-
-      Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
+      Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
       m_hOnlineOccupancy->fill(m_SVDModules[i], 1, onlineOccU);
 
       for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
@@ -560,11 +531,9 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         m_cOnlineOccupancyU3Samples->cd();
         m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text");
         colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusDefault);
+
       } else {
-
-        Int_t nStrips = 768;
-
-        Float_t onlineOccU = htmp->GetEntries() / nStrips / nEvents * 100;
+        Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
         m_hOnlineOccupancy3Samples->fill(m_SVDModules[i], 1, onlineOccU);
 
         for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
@@ -709,6 +678,15 @@ Int_t DQMHistAnalysisSVDOccupancyModule::findBinY(Int_t layer, Int_t sensor)
     return 11 + 1 + sensor; // 17
   else
     return -1;
+}
+
+Float_t DQMHistAnalysisSVDOccupancyModule::getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV)
+{
+  Int_t nStrips = 768;
+  if (tmp_layer != 3 && sideV)
+    nStrips = 512;
+
+  return (entries / nStrips / nEvents * 100);
 }
 
 void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, int& ocStatus, bool online)

@@ -70,7 +70,7 @@ f_charm_p1 :
   - DstToD0Pi_D0ToGeneric
   - LambdacToSHpJm
   - XicpTopHpJm
-  - XictoXimpippim
+  # - XictoXimpippim
   - Xic0ToLHpJm  
   - DstToD0Pi_D0ToHpJm
   - DstToD0Pi_D0ToHpJmPi0
@@ -82,11 +82,11 @@ f_charm_p1 :
   - EarlyData_DstToD0Pi_D0ToHpHmPi0
   - DstToDpPi0_DpToHpPi0
   - DpToHpPi0
-  - DpToKsHp
+  # - DpToKsHp
   - DstToD0Pi_D0ToHpHmHpJm
   - DstToD0Pi_D0ToVGamma
-  - DpToPipepem
-  - DpToPipmupmum
+  # - DpToPipepem
+  # - DpToPipmupmum
   - DpToPipKpKm
   - DpToHpOmega
   - DspToHpOmega

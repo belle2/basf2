@@ -174,13 +174,6 @@ def getArgumentParser():
         ),
     )
 
-    # parser.add_argument(
-    #     "-flagged",
-    #     "--flagged",
-    #     default=False,
-    #     type = int,
-    #     help="run on flagged skim",
-    # )
     parser.add_argument(
         "-flagged",
         "--flagged",

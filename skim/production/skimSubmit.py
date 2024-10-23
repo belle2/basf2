@@ -37,7 +37,10 @@ def get_argument_parser():
         action="store_true",
         help="Flag to request jsons. Must be set up in basf2. yamls must already exist (use --yamls to generate).")
     actionType.add_argument(
-        "--stats", action="store_true", help="Flag to request stats. Must be set up in basf2."
+        "--stats_submit", action="store_true", help="Flag to request stats. Must be set up in basf2."
+    )
+    actionType.add_argument(
+        "--stats_print", action="store_true", help="Flag to request stats printing. Must be set up in basf2."
     )
     actionType.add_argument(
         "--register",
@@ -50,7 +53,8 @@ def get_argument_parser():
          "--upload", action="store_true", help="Flag to upload skim scripts for all skims in Initialized or Registered state."
     )
 
-    campaignType = parser.add_mutually_exclusive_group(required=(not {'--stats', '--upload', '--approve'} & set(sys.argv)))
+    campaignType = parser.add_mutually_exclusive_group(
+        required=(not {'--stats_submit', '--stats_print', '--upload', '--approve'} & set(sys.argv)))
     campaignType.add_argument(
          "--mcri", action="store_true", help="Flag to indicate the LPNs are for run-independent MC."
     )
@@ -63,7 +67,7 @@ def get_argument_parser():
 
     parser.add_argument(
         "--camp",
-        required=(not {'--stats', '--upload', '--approve', '--register', '--yamls'} & set(sys.argv)),
+        required=(not {'--stats_submit', '--stats_print', '--upload', '--approve', '--register', '--yamls'} & set(sys.argv)),
         help="""Requested campaign. Use corresponding data campaign for run-dependent MC.
         Examples: MC15ri_b, bucket28, proc13exp7, or from [mc15ri, prompt, chunk1, chunk2, chunk3, chunk4, chunk5, proc13, data]"""
     )
@@ -101,17 +105,10 @@ def get_argument_parser():
     parser.add_argument(
         "-s",
         "--skims",
-        required=(("--jsons" or "--stats" or "--register") in sys.argv),
+        required=(("--jsons" or "--stats_submit" or "--stats_print" or "--register") in sys.argv),
         nargs="+",
         metavar="CombinedSkim",
         help="List of skims to produce json request files for. Required if --jsons used."
-    )
-
-    parser.add_argument(
-        "--action",
-        required=("--stats" in sys.argv),
-        choices=("print", "submit"),
-        help="Submit skim stats or print skim stats. Required if --stats used.",
     )
 
     parser.add_argument(
@@ -385,7 +382,7 @@ def getJSONs(
                     command += ' --flagged'
                 print(command)
                 counter_JSONs += 1
-                my_proc = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                my_proc = subprocess.Popen(command.split(), stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                 my_proc.stdin.write(b'1\n')
                 stdout, stderr = my_proc.communicate()
                 print(f'stdout = {stdout}')
@@ -435,11 +432,16 @@ def upload_files(json_dir, release):
     it would be better if this could know what prods already have files uploaded
     current setup can lead to trying to re-upload a lot of scripts, although it does no harm besides waste time
     '''
-    prod_cmd = 'gb2_prod_status -g skim -s all | grep -e Initialized -e Registered'
+
+    prod_cmd = 'gb2_prod_status -g skim -s all'
+    grep_cmd = ['grep', '-e', 'Initialized', '-e', 'Registered']
 
     # Run the command and capture the output
     try:
-        output = subprocess.check_output(prod_cmd.split(), text=True)
+        proc1 = subprocess.Popen(prod_cmd.split(), stdout=subprocess.PIPE, text=True)
+        proc2 = subprocess.Popen(grep_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE, text=True)
+        proc1.stdout.close()  # Allow proc1 to receive a SIGPIPE if proc2 exits
+        output, _ = proc2.communicate()
         print(output)
 
         # Split the output into lines
@@ -473,12 +475,17 @@ def upload_files(json_dir, release):
 def approve_prods():
     # look for all prods in "ToApprove" state and approve them
 
-    prod_cmd = 'gb2_prod_status -g skim -s ToApprove | grep ToApprove'
+    prod_cmd = 'gb2_prod_status -g skim -s all'
+    grep_cmd = ['grep', 'ToApprove']
 
     # Run the command and capture the output
     try:
-        output = subprocess.check_output(prod_cmd.split(), text=True)
+        proc1 = subprocess.Popen(prod_cmd.split(), stdout=subprocess.PIPE, text=True)
+        proc2 = subprocess.Popen(grep_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE, text=True)
+        proc1.stdout.close()  # Allow proc1 to receive a SIGPIPE if proc2 exits
+        output, _ = proc2.communicate()
         print(output)
+
         # Split the output into lines
         prodlines = output.strip().split('\n')
 
@@ -486,7 +493,9 @@ def approve_prods():
         prod_list = [line.split()[0] for line in prodlines]
         # approve prods
         for prod in prod_list:
-            subprocess.run(['gb2_prod_approve', '-p', prod], check=True)
+            result = subprocess.run(['gb2_prod_approve', '-p', prod], capture_output=True, text=True)
+            if result.returncode != 0:
+                print(f"Error approving prod {prod}: {result.stderr}")
 
     except subprocess.CalledProcessError as e:
         print("Error while running the command:", e)
@@ -586,9 +595,15 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
         if skim == 'FEI':
             # Include analysis globaltag for FEI
             print(f'Skimming FEI. Using --analysis-globaltag {info["fei_gt"]}')
-            print(f'b2skim-stats-submit -c {stats_dir}{inputYaml} {skim} --analysis-globaltag {info["fei_gt"]}')
+            print(f'b2skim-stats-submit -c {stats_dir}{inputYaml.split("/")[-1]} {skim} --analysis-globaltag {info["fei_gt"]}')
             # This is the {inputYaml} in '/MC/skim/stats' folder
-            command = ['b2skim-stats-submit', '-c', f'{stats_dir}{inputYaml}', skim, '--analysis-globaltag', info["fei_gt"]]
+            command = [
+                'b2skim-stats-submit',
+                '-c',
+                f'{stats_dir}{inputYaml.split("/")[-1]}',
+                skim,
+                '--analysis-globaltag',
+                info["fei_gt"]]
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"Error submitting stats for {skim}: {result.stderr}")
@@ -601,7 +616,7 @@ def getStats(info, skims, stats_dir, inputYaml, gt=False, pidgt=False, flagged=F
                 print(f"Error submitting stats for {skim}: {result.stderr}")
         else:
             # This is the {inputYaml} in '/MC/skim/stats' folder
-            command = f'b2skim-stats-submit -c {stats_dir}{inputYaml} {skim}'
+            command = f'b2skim-stats-submit -c {stats_dir}{inputYaml.split("/")[-1]} {skim}'
             if gt:
                 print(f'Skimming {skim}. Using --analysis-globaltag {info["ana_gt"]}')
                 command += f' --analysis-globaltag {info["ana_gt"]}'
@@ -626,11 +641,9 @@ def printStats(skims, stats_dir, flagged=False):
                 print(f"Error executing command: {result.stderr}")
         else:
             print(f'Printing combined skim {skim} stats to json file SkimStats_{skim}.json')
+            command = ['b2skim-stats-print', '-c', skim, '-J']
             if flagged:
-                flaggedString = ' --flagged'
-            else:
-                flaggedString = ''
-            command = ['b2skim-stats-print', flaggedString, '-c', skim, '-J']
+                command.append('--flagged')
             result = subprocess.run(command, capture_output=True, text=True)
             if result.returncode != 0:
                 print(f"Error executing command: {result.stderr}")
@@ -648,7 +661,7 @@ def main():
     parser = get_argument_parser()
     args = parser.parse_args()
 
-    if args.stats or args.jsons or args.register or args.upload:
+    if args.stats_submit or args.stats_print or args.jsons or args.register or args.upload:
         infoDict = init_info(args.infoYaml)
 
     json_dir, yaml_dir, lpn_dir, stats_dir = getDirs(args.data, args.base_dir)
@@ -656,18 +669,18 @@ def main():
     if args.lpns:
         getLPNs(collection=args.collectionYaml, dataset_type=args.camp, lpn_dir=lpn_dir)
 
-    elif args.stats:
-        if args.action == 'submit':
-            getStats(
-                info=infoDict,
-                skims=args.skims,
-                stats_dir=args.base_dir,
-                gt=args.analysis_GT,
-                pidgt=args.PID_GT,
-                flagged=args.flagged,
-                inputYaml=args.inputYaml)
-        elif args.action == 'print':
-            printStats(args.skims, stats_dir, args.flagged)
+    elif args.stats_submit:
+        getStats(
+            info=infoDict,
+            skims=args.skims,
+            stats_dir=args.base_dir,
+            gt=args.analysis_GT,
+            pidgt=args.PID_GT,
+            flagged=args.flagged,
+            inputYaml=args.inputYaml)
+
+    elif args.stats_print:
+        printStats(args.skims, stats_dir, args.flagged)
 
     elif args.approve:
         approve_prods()

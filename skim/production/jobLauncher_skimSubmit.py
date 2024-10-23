@@ -68,8 +68,8 @@ parser.add_argument('-dry',   '--dry',          type=int, default=False,        
 # steps to be run arguments (NB: you cannot mix in the same config basf2 and gbasf2 steps!)
 parser.add_argument('-s1',   '--lpns',          action="store_true",        help="create LPNS (gbasf2)")
 parser.add_argument('-s2',   '--yaml',          action="store_true",        help="create yaml (basf2)")
-parser.add_argument('-s3',   '--stat_sub',          action="store_true",        help="create stats (basf2)")
-parser.add_argument('-s4',   '--stat_print',          action="store_true",        help="print stats (basf2)")
+parser.add_argument('-s3',   '--stats_submit',          action="store_true",        help="create stats (basf2)")
+parser.add_argument('-s4',   '--stats_print',          action="store_true",        help="print stats (basf2)")
 parser.add_argument('-s5',   '--json',          action="store_true",        help="create json (basf2)")
 parser.add_argument('-s6',   '--check',          action="store_true",        help="check json (basf2)")
 parser.add_argument('-s7',   '--register',          action="store_true",        help="register productions (gbasf2)")
@@ -139,7 +139,7 @@ if args.yaml:  # step2 - basf2 once per campaign, one command for data and one f
             subprocess.run(command_MC.split(), text=True)
 
 
-if args.stat_sub:  # step3 - basf2, loop on skim, common for data and MC
+if args.stats_submit:  # step3 - basf2, loop on skim, common for data and MC
     print(colored('>>>> Step 3: create stats for all the skims ', 'blue', attrs=['bold']))
     print('>>>> NB:bsub used, will take a wile to submit and to run)', 'red')
 
@@ -155,14 +155,14 @@ if args.stat_sub:  # step3 - basf2, loop on skim, common for data and MC
                 GTstring += ' --analysis_GT 1 '
             if GT == 'PID':
                 GTstring += ' --PID_GT 1 '
-        command = f'python3 skimSubmit.py --stats --skims {skim} {flaggedString} --action submit {GTstring} ' \
+        command = f'python3 skimSubmit.py --stats_submit --skims {skim} {flaggedString} {GTstring} ' \
                   f' --base_dir {args.base_dir} --inputYaml {args.skim} --infoYaml {args.info}'
         print(colored(f'>>>> Executed command: {command}', 'green'))
         if not args.dry:
             subprocess.run(command.split(), text=True)
 
 
-if args.stat_print:  # step4 - basf2, loop on skim, common for data and MC
+if args.stats_print:  # step4 - basf2, loop on skim, common for data and MC
     print(colored('>>>> Step 4: print the results of the stats', 'blue', attrs=['bold']))
 
     print(colored('>>>> WARNING: check if some jobs are still running. You should not have your personal jobs on queues', 'red'))
@@ -187,7 +187,7 @@ if args.stat_print:  # step4 - basf2, loop on skim, common for data and MC
         flaggedString = ''
 
     for skim, skimVal in skims_dict.items():
-        command = f'python3 skimSubmit.py --stats --skims {skim} {flaggedString} --action print ' \
+        command = f'python3 skimSubmit.py --stats_print --skims {skim} {flaggedString} ' \
                   f' --infoYaml {args.info} --base_dir {args.base_dir}'
         print(colored(f'>>>> Executed command: {command}', 'green'))
         if not args.dry:
@@ -231,7 +231,7 @@ if args.check:  # step6 - basf2, loop on skim, one command for data and one for 
 
     for skim, skimVal in skims_dict.items():
 
-        command = f'python3 checkJSONs.py -s {skim} --path {args.base_dir} --verbose 1'
+        command = f'python3 ../tools/checkJSONs.py -s {skim} --path {args.base_dir} --verbose 1'
 
         if args.data:
             command_data = command+' -d Data'
@@ -246,6 +246,8 @@ if args.check:  # step6 - basf2, loop on skim, one command for data and one for 
 
 if args.register:  # step7 - gbasf2, loop on skim, one command for data and one for MC
     print('>>>> Step 7: register productions on grid')
+    # Note: the name of the Productions is unique, think about that before registering.
+    # The name is coded in the json files, as "ProductionName", defined in b2skim-prod.
 
     for skim, skimVal in skims_dict.items():
 

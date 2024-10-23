@@ -281,13 +281,20 @@ void ECLDQMModule::beginRun()
   h_adc_hits->Reset();
   h_time_crate_Thr1GeV_large->Reset();
   h_cell_psd_norm->Reset();
-  std::for_each(h_cids.begin(), h_cids.end(), [](auto & it) {it->Reset();});
-  std::for_each(h_edeps.begin(), h_edeps.end(), [](auto & it) {it->Reset();});
-  std::for_each(h_time_barrels.begin(), h_time_barrels.end(), [](auto & it) {it->Reset();});
-  std::for_each(h_time_endcaps.begin(), h_time_endcaps.end(), [](auto & it) {it->Reset();});
-  std::for_each(h_ncevs.begin(), h_ncevs.end(), [](auto & it) {it->Reset();});
-  std::for_each(h_cells.begin(), h_cells.end(), [](auto & it) {it->Reset();});
-  for (int i = 0; i < ECL_CRATES; i++) h_time_crate_Thr1GeV[i]->Reset();
+  for (TH1F* histogram : h_cids)
+    histogram->Reset();
+  for (TH1F* histogram : h_edeps)
+    histogram->Reset();
+  for (TH1F* histogram : h_time_barrels)
+    histogram->Reset();
+  for (TH1F* histogram : h_time_endcaps)
+    histogram->Reset();
+  for (TH1F* histogram : h_ncevs)
+    histogram->Reset();
+  for (TH1F* histogram : h_cells)
+    histogram->Reset();
+  for (TH1F* histogram : h_time_crate_Thr1GeV)
+    histogram->Reset();
   h_trigtag2_trigid->Reset();
   h_pedmean_cellid->Reset();
   h_pedrms_cellid->Reset();

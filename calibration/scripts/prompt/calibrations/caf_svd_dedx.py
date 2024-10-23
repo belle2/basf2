@@ -259,7 +259,7 @@ def get_calibrations(input_data, **kwargs):
         algo_val.setMaxROCMomentum(expert_config['MaxROCMomentum'])
         algo_val.setNumEffBins(expert_config['NumEffBins'])
         algo_val.setMaxEffMomentum(expert_config['MaxEffMomentum'])
-        algo_val.setMode(validation_mode)
+        algo_val.validationMode(validation_mode)
 
     ###################################################
     # Calibration setup

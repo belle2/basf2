@@ -18,7 +18,6 @@
 #include <genfit/MeasurementOnPlane.h>
 #include <genfit/MeasuredStateOnPlane.h>
 #include <genfit/StateOnPlane.h>
-#include <boost/foreach.hpp>
 
 #include <cdc/translators/RealisticCDCGeometryTranslator.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
@@ -368,7 +367,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
   std::vector<genfit::TrackPoint*> tps = track->getHitPointsWithMeasurement();
   numhits = tps.size();
-  BOOST_FOREACH(genfit::TrackPoint * tp, tps) {
+  for (genfit::TrackPoint* tp : tps) {
     if (!tp->hasRawMeasurements())
       continue;
 

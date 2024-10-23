@@ -564,7 +564,7 @@ namespace Belle2 {
   void arichBtestModule::terminate()
   {
     int j = 1;
-    BOOST_FOREACH(const std::string & fname, m_runList) {
+    for (const std::string& fname : m_runList) {
       B2INFO(m_eveList[j] << " events processed from file " << fname);
       j++;
     }

@@ -18,7 +18,6 @@
 
 //c++
 #include <cmath>
-#include <boost/foreach.hpp>
 #include <string>
 #include <fstream>
 #include <stdlib.h>
@@ -103,10 +102,9 @@ void He3DigitizerModule::event()
     for (int i = 0; i < nMCParticles; ++i) {
       MCParticle& mcp = *mcParticles[i];
 
-      //Find all He3tubeSimHits which point from that MCParticle using a typedef and BOOST_FOREACH
-      //The typedef is needed as BOOST_FOREACH is a macro and cannot handle anything including a comma
+      // Find all He3tubeSimHits which point from that MCParticle.
       typedef RelationIndex<MCParticle, He3tubeSimHit>::Element relMCSimHit_Element;
-      BOOST_FOREACH(const relMCSimHit_Element & relation, relMCSimHit.getElementsFrom(mcp)) {
+      for (const relMCSimHit_Element& relation : relMCSimHit.getElementsFrom(mcp)) {
 
         //int processNum = mcp.getSecondaryPhysicsProcess();
 
@@ -203,7 +201,7 @@ void He3DigitizerModule::getXMLData()
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"HE3TUBE\"]/Content/");
 
   //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+  for (const GearDir& activeParams : content.getNodes("Active")) {
     B2DEBUG(250, "Tubes located at x=" << activeParams.getLength("x_he3tube"));
     numOfTubes++;
   }

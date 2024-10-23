@@ -17,7 +17,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
@@ -59,7 +58,7 @@ namespace Belle2 {
     GeoBeamPipeCreator::~GeoBeamPipeCreator()
     {
       //Delete all sensitive detectors
-      BOOST_FOREACH(SensitiveDetector * sensitive, m_sensitive) {
+      for (SensitiveDetector* sensitive : m_sensitive) {
         delete sensitive;
       }
       m_sensitive.clear();

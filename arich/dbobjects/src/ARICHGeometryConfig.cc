@@ -364,7 +364,7 @@ void ARICHGeometryConfig::modulesPosition(const GearDir& content)
   {
   GearDir modParams(content, "Mirrors/Alignment");
 
-  BOOST_FOREACH(const GearDir & plate, modParams.getNodes("Plate")) {
+  for (const GearDir& plate : modParams.getNodes("Plate")) {
   int id = atoi(plate.getString("@id").c_str());
   double dr = plate.getLength("dr");
   double dphi = plate.getAngle("dphi");

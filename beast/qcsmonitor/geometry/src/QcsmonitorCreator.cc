@@ -16,7 +16,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 #include <G4LogicalVolume.hh>
@@ -69,7 +68,7 @@ namespace Belle2 {
       coppercolor->SetForceAuxEdgeVisible(true);
 
       //Lets loop over all the Active nodes
-      BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
+      for (const GearDir& activeParams : content.getNodes("Active")) {
         int phase = activeParams.getInt("phase");
         G4double dx_scint = activeParams.getLength("dx_scint") / 2.*CLHEP::cm;
         G4double dy_scint = activeParams.getLength("dy_scint") / 2.*CLHEP::cm;

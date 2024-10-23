@@ -8,7 +8,6 @@
 #include <sstream>
 #include <string.h>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 
 //#include <geant4/G4LogicalVolume.hh>
@@ -110,7 +109,7 @@ namespace Belle2 {
       char nodestr[100];
       sprintf(nodestr, "run[runno=%d]", run);
       if (Type == "beamtest") {
-        BOOST_FOREACH(const GearDir & runparam, content.getNodes(nodestr)) {
+        for (const GearDir& runparam : content.getNodes(nodestr)) {
           m_runno       = runparam.getInt("runno", -1);
           m_author      = runparam.getString("author", "");
           m_neve        = runparam.getInt("neve", -1);

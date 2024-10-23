@@ -85,7 +85,6 @@ class TDCPV_qqs(BaseSkim):
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
     * ``5.2 < Mbc < 5.29``
     * ``abs(deltaE) < 0.5``
-    * ``abs(deltaE) < 0.250 for KL``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``E_ECL_TDCPV < 9``
     """
@@ -215,8 +214,6 @@ class TDCPV_qqs(BaseSkim):
                             f'Energy difference of B for {directory} mode', '', '#Delta E [GeV]', 'Candidates'])
             metadata.append(['Mbc', directory, 'Mbc', __liaison__,
                             f'Beam-constrained mass for {directory} mode', '', 'M_{bc} [GeV]', 'Candidates'])
-        metadata.append(['deltaE', 'KL_etap', '#Delta E', __liaison__,
-                         "Energy difference of B for B0 -> eta' K_{L}", '', '#Delta E [GeV]', 'Candidates'])
         path.add_module(ValidationMetadataSetter(metadata, filename))
         ma.variablesToHistogram('B0:etap', variableshisto, filename=filename, path=path, directory="etap")
         ma.variablesToHistogram('B0:Kspipig', variableshisto, filename=filename, path=path, directory="Kspipig")
@@ -236,21 +233,22 @@ class TDCPV_klong(BaseSkim):
     **Particle lists used**:
 
     * ``phi:SkimHighEff``
-    * ``eta':SkimHighEff``
+    * ``eta:SkimHighEff1``
+    * ``eta:SkimHighEff2``
+    * ``rho0:SkimHighEff``
     * ``K_L0:allklm``
     * ``K_L0:allecl``
 
     **Cuts used**:
 
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
-    * ``5.2 < Mbc < 5.29``
-    * ``abs(deltaE) < 0.5``
-    * ``abs(deltaE) < 0.250 for KL``
+    * ``abs(deltaE) < 0.15``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``E_ECL_TDCPV < 9``
+    # ``foxWolframR2<0.6``
     """
 
-    __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
+    __authors__ = ["Michele Veronesi", "Noah Brenny"]
     __description__ = "Skim for time-dependent CP violation analysis b->qqs decays using Klongs"
     __contact__ = __liaison__
     __category__ = "physics, TDCPV"
@@ -310,7 +308,7 @@ class TDCPV_klong(BaseSkim):
         vm.addAlias('E_ECL_gamma_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(gamma:TDCPV_qqs_eventshape)')
         vm.addAlias('E_ECL_TDCPV_qqs', 'formula(E_ECL_pi_TDCPV_qqs+E_ECL_gamma_TDCPV_qqs)')
 
-        btotcpvcuts_KL = 'abs(deltaE) < 0.1'  # and R2<0.5'
+        btotcpvcuts_KL = 'abs(deltaE) < 0.15'
 
         bd_klong_Channels = [
             'phi:SkimHighEff K_L0:eclklm_qqs_0',

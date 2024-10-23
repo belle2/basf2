@@ -150,6 +150,8 @@ class TDCPV_qqs(BaseSkim):
             'pi0:skim K_S0:merged gamma:E15',
             'pi0:SkimHighEff K_S0:merged gamma:ECMS16',
             'phi:SkimHighEff2 K_S0:merged',
+            'phi:SkimHighEff pi0:eff40_May2020 pi0:eff40_May2020',
+            'eta\':SkimHighEff pi0:eff40_May2020 pi0:eff40_May2020'
         ]
 
         bu_qqs_Channels = [

@@ -77,18 +77,18 @@ void He3DigitizerModule::event()
   StoreArray<He3tubeSimHit> He3SimHits;
   StoreArray<He3tubeHit> He3Hits;
 
-  auto peak = new double[numOfTubes]();
-  auto lowTime = new double[numOfTubes]();  //earliest deposit in each tube
-  std::fill_n(lowTime, numOfTubes, 9999999999999);
-  auto edepDet = new double[numOfTubes]();  //total energy deposited per tube
-  auto NbEle_tot = new double[numOfTubes]();
-
   //skip events with no He3SimHits, but continue the event counter
   if (He3SimHits.getEntries() == 0) {
     B2DEBUG(250, "Skipping event #" << Event << " since there are no sim hits");
     Event++;
     return;
   }
+
+  auto peak = new double[numOfTubes]();
+  auto lowTime = new double[numOfTubes]();  //earliest deposit in each tube
+  std::fill_n(lowTime, numOfTubes, 9999999999999);
+  auto edepDet = new double[numOfTubes]();  //total energy deposited per tube
+  auto NbEle_tot = new double[numOfTubes]();
 
   auto definiteNeutron = new bool[numOfTubes]();
   //vector<int> neutronIDs;

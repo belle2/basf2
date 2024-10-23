@@ -603,16 +603,15 @@ void KLMTimeAlgorithm::fillTimeDistanceProfiles(
     if (m_cFlag[channel] == ChannelCalibrationStatus::c_NotEnoughData)
       continue;
 
-    std::vector<struct Event>::iterator it;
     std::vector<struct Event> eventsChannel;
     eventsChannel = m_evts[channel];
     int iSub = klmChannel.getSubdetector();
 
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      double timeHit = it->time() - m_timeShift[channel];
+    for (const Event& event : eventsChannel) {
+      double timeHit = event.time() - m_timeShift[channel];
       if (m_useEventT0)
-        timeHit = timeHit - it->t0;
-      double distHit = it->dist;
+        timeHit = timeHit - event.t0;
+      double distHit = event.dist;
 
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
@@ -657,7 +656,6 @@ void KLMTimeAlgorithm::timeDistance2dFit(
   const std::vector< std::pair<KLMChannelNumber, unsigned int> >& channels,
   double& delay, double& delayError)
 {
-  std::vector<struct Event>::iterator it;
   std::vector<struct Event> eventsChannel;
   int nFits = 1000;
   int nConvergedFits = 0;
@@ -688,16 +686,16 @@ void KLMTimeAlgorithm::timeDistance2dFit(
     }
     eventsChannel = m_evts[channels[i].first];
     double averageTime = 0;
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      double timeHit = it->time();
+    for (const Event& event : eventsChannel) {
+      double timeHit = event.time();
       if (m_useEventT0)
-        timeHit = timeHit - it->t0;
+        timeHit = timeHit - event.t0;
       averageTime = averageTime + timeHit;
       int timeBin = std::floor((timeHit - s_LowerTimeBoundary) * c_NBinsTime /
                                (s_UpperTimeBoundary - s_LowerTimeBoundary));
       if (timeBin < 0 || timeBin >= c_NBinsTime)
         continue;
-      int distanceBin = std::floor(it->dist * c_NBinsDistance / s_StripLength);
+      int distanceBin = std::floor(event.dist * c_NBinsDistance / s_StripLength);
       if (distanceBin < 0 || distanceBin >= c_NBinsDistance) {
         B2ERROR("The distance to SiPM is greater than the strip length.");
         continue;
@@ -771,7 +769,6 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
   m_outFile = new TFile(name.c_str(), "recreate");
   createHistograms();
 
-  std::vector<struct Event>::iterator it;
   std::vector<struct Event> eventsChannel;
 
   eventsChannel.clear();
@@ -827,12 +824,12 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     eventsChannel = m_evts[channelId];
     int iSub = klmChannel.getSubdetector();
 
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      XYZVector diffD = XYZVector(it->diffDistX, it->diffDistY, it->diffDistZ);
+    for (const Event& event : eventsChannel) {
+      XYZVector diffD = XYZVector(event.diffDistX, event.diffDistY, event.diffDistZ);
       h_diff->Fill(diffD.R());
-      double timeHit = it->time();
+      double timeHit = event.time();
       if (m_useEventT0)
-        timeHit = timeHit - it->t0;
+        timeHit = timeHit - event.t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -978,10 +975,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
       continue;
     eventsChannel = m_evts[channelId];
 
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      double timeHit = it->time();
+    for (const Event& event : eventsChannel) {
+      double timeHit = event.time();
       if (m_useEventT0)
-        timeHit = timeHit - it->t0;
+        timeHit = timeHit - event.t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -991,9 +988,9 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         if (iL > 1) {
           double propgationT;
           if (iP == BKLMElementNumbers::c_ZPlane)
-            propgationT = it->dist * delayRPCZ;
+            propgationT = event.dist * delayRPCZ;
           else
-            propgationT = it->dist * delayRPCPhi;
+            propgationT = event.dist * delayRPCPhi;
           double time = timeHit - propgationT;
           h_time_rpc->Fill(time);
           h_timeF_rpc[iF]->Fill(time);
@@ -1005,7 +1002,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           h2_timeFS[iF][iS]->Fill(iL, time);
           h2_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         } else {
-          double propgationT = it->dist * delayBKLM;
+          double propgationT = event.dist * delayBKLM;
           double time = timeHit - propgationT;
           h_time_scint->Fill(time);
           h_timeF_scint[iF]->Fill(time);
@@ -1023,7 +1020,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it->dist * delayEKLM;
+        double propgationT = event.dist * delayEKLM;
         double time = timeHit - propgationT;
         h_time_scint_end->Fill(time);
         h_timeF_scint_end[iF]->Fill(time);
@@ -1174,10 +1171,10 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
     channelId = klmChannel.getKLMChannelNumber();
     int iSub = klmChannel.getSubdetector();
     eventsChannel = m_evts[channelId];
-    for (it = eventsChannel.begin(); it != eventsChannel.end(); ++it) {
-      double timeHit = it->time();
+    for (const Event& event : eventsChannel) {
+      double timeHit = event.time();
       if (m_useEventT0)
-        timeHit = timeHit - it->t0;
+        timeHit = timeHit - event.t0;
       if (iSub == KLMElementNumbers::c_BKLM) {
         int iF = klmChannel.getSection();
         int iS = klmChannel.getSector() - 1;
@@ -1187,9 +1184,9 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         if (iL > 1) {
           double propgationT;
           if (iP == BKLMElementNumbers::c_ZPlane)
-            propgationT = it->dist * delayRPCZ;
+            propgationT = event.dist * delayRPCZ;
           else
-            propgationT = it->dist * delayRPCPhi;
+            propgationT = event.dist * delayRPCPhi;
           double time = timeHit - propgationT - m_timeShift[channelId];
           hc_time_rpc->Fill(time);
           hc_timeF_rpc[iF]->Fill(time);
@@ -1201,7 +1198,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
           h2c_timeFS[iF][iS]->Fill(iL, time);
           h2c_timeFSLP[iF][iS][iL][iP]->Fill(iC, time);
         } else {
-          double propgationT = it->dist * delayBKLM;
+          double propgationT = event.dist * delayBKLM;
           double time = timeHit - propgationT - m_timeShift[channelId];
           hc_time_scint->Fill(time);
           hc_timeF_scint[iF]->Fill(time);
@@ -1219,7 +1216,7 @@ CalibrationAlgorithm::EResult KLMTimeAlgorithm::calibrate()
         int iL = klmChannel.getLayer() - 1;
         int iP = klmChannel.getPlane() - 1;
         int iC = klmChannel.getStrip() - 1;
-        double propgationT = it->dist * delayEKLM;
+        double propgationT = event.dist * delayEKLM;
         double time = timeHit - propgationT - m_timeShift[channelId];
         hc_time_scint_end->Fill(time);
         hc_timeF_scint_end[iF]->Fill(time);

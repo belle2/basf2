@@ -463,7 +463,7 @@ void CDCCRTestModule::plotResults(Belle2::RecoTrack* track)
 
 void CDCCRTestModule::getHitDistInTrackCand(const RecoTrack* track)
 {
-  BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
+  for (const RecoHitInformation::UsedCDCHit* cdchit : track->getCDCHitList()) {
     int iclay = getICLayer(cdchit->getISuperLayer(), cdchit->getILayer());
     B2DEBUG(99, "In TrackCand: ICLayer: " << iclay << "IWire: " << cdchit->getIWire());
     m_hHitDistInTrCand[iclay]->Fill(cdchit->getIWire());
@@ -502,7 +502,7 @@ void CDCCRTestModule::HitEfficiency(const Belle2::RecoTrack* track)
   }
   */
   ////
-  BOOST_FOREACH(const RecoHitInformation::UsedCDCHit * cdchit, track->getCDCHitList()) {
+  for (const RecoHitInformation::UsedCDCHit* cdchit : track->getCDCHitList()) {
     WireID Wid = WireID(cdchit->getID());
     const genfit::TrackPoint* tp = track->getCreatedTrackPoint(track->getRecoHitInformation(cdchit));
     //some hit didn't take account in fitting, so I use left/right info from track finding results.

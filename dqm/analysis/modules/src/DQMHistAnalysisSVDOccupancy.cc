@@ -201,19 +201,19 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legEmpty->AddText("from at least one sensor");
 
   //ONLINE occupancy plots legend
-  m_legOnProblem->Clear();
-  m_legOnProblem->AddText("ERROR!");
-  m_legOnProblem->AddText("at least one sensor with:");
-  m_legOnProblem->AddText(Form("online occupancy > %1.1f%%", m_onlineOccError));
+  m_legOnlineProblem->Clear();
+  m_legOnlineProblem->AddText("ERROR!");
+  m_legOnlineProblem->AddText("at least one sensor with:");
+  m_legOnlineProblem->AddText(Form("online occupancy > %1.1f%%", m_onlineOccError));
 
-  m_legOnWarning->Clear();
-  m_legOnWarning->AddText("WARNING!");
-  m_legOnWarning->AddText("at least one sensor with:");
-  m_legOnWarning->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccWarning, m_onlineOccError));
+  m_legOnlineWarning->Clear();
+  m_legOnlineWarning->AddText("WARNING!");
+  m_legOnlineWarning->AddText("at least one sensor with:");
+  m_legOnlineWarning->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccWarning, m_onlineOccError));
 
-  m_legOnNormal->Clear();
-  m_legOnNormal->AddText("OCCUPANCY WITHIN LIMITS");
-  m_legOnNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
+  m_legOnlineNormal->Clear();
+  m_legOnlineNormal->AddText("OCCUPANCY WITHIN LIMITS");
+  m_legOnlineNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
 }
 
 void DQMHistAnalysisSVDOccupancyModule::event()
@@ -259,16 +259,16 @@ void DQMHistAnalysisSVDOccupancyModule::event()
 
   //check MODULE OCCUPANCY online & offline
   //reset canvas color
-  m_occUstatus = 0;
-  m_occVstatus = 0;
-  m_onlineOccUstatus = 0;
-  m_onlineOccVstatus = 0;
+  m_occUstatus = good;
+  m_occVstatus = good;
+  m_onlineOccUstatus = good;
+  m_onlineOccVstatus = good;
 
-  m_onlineOccU3Samples = 0;
-  m_onlineOccV3Samples = 0;
+  m_onlineOccU3Samples = good;
+  m_onlineOccV3Samples = good;
 
-  m_occU3Samples = 0;
-  m_occV3Samples = 0;
+  m_occU3Samples = good;
+  m_occV3Samples = good;
 
   //update titles with exp and run number
 
@@ -689,26 +689,26 @@ Float_t DQMHistAnalysisSVDOccupancyModule::getOccupancy(float entries, int tmp_l
   return (entries / nStrips / nEvents * 100);
 }
 
-void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, int& ocStatus, bool online)
+void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, occStatus& occupancyStatus, bool online)
 {
   if (online) {
     if (occupancy <= m_onlineOccEmpty) {
-      if (ocStatus < lowStat) ocStatus = lowStat;
+      if (occupancyStatus < lowStat) occupancyStatus = lowStat;
     } else if (occupancy > m_onlineOccWarning) {
       if (occupancy < m_onlineOccError) {
-        if (ocStatus < warning) ocStatus = warning;
+        if (occupancyStatus < warning) occupancyStatus = warning;
       } else {
-        if (ocStatus < error) ocStatus = error;
+        if (occupancyStatus < error) occupancyStatus = error;
       }
     }
   } else {
     if (occupancy <= m_occEmpty) {
-      if (ocStatus < lowStat) ocStatus = lowStat;
+      if (occupancyStatus < lowStat) occupancyStatus = lowStat;
     } else if (occupancy > m_occWarning) {
       if (occupancy < m_occError) {
-        if (ocStatus < warning) ocStatus = warning;
+        if (occupancyStatus < warning) occupancyStatus = warning;
       } else {
-        if (ocStatus < error) m_occUstatus = error;
+        if (occupancyStatus < error) occupancyStatus = error;
       }
     }
   }

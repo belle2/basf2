@@ -114,22 +114,6 @@ namespace Belle2 {
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
     Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
 
-    void setOccStatus(float occ, int& occStatus, bool online = false); /**< get occupancy status */
-
-    Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_occU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
-
-    Int_t m_occUGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occVGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
-
-    Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-
-    Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
-    Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
-
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 
     //! IDs of all SVD Modules to iterate over
@@ -143,6 +127,22 @@ namespace Belle2 {
       lowStat = 3,  /**< gray frame */
       noStat = 4 /**< purple frame */
     };
+
+    occStatus m_occUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    occStatus m_occVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    occStatus m_occU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    occStatus m_occV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+
+    occStatus m_occUGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    occStatus m_occVGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+
+    occStatus m_onlineOccUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    occStatus m_onlineOccVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+
+    occStatus m_onlineOccU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sample*/
+    occStatus m_onlineOccV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampes*/
+
+    void setOccStatus(float occ, occStatus& occupancyStatus, bool online = false); /**< set occupancy status */
 
   };
 } // end namespace Belle2

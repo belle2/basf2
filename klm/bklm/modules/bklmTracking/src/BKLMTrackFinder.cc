@@ -46,9 +46,6 @@ bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
                              std::list<KLMHit2d*>& hits,
                              std::list<KLMHit2d*>& track)
 {
-
-  std::list<KLMHit2d*>::iterator i;
-
   track = seed;
 
   if (m_Fitter == 0) {
@@ -58,8 +55,8 @@ bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
 
   m_Fitter->fit(track);//fit seed
 
-  for (i = hits.begin(); i != hits.end(); ++i) {
-    if ((*i)->getSubdetector() != KLMElementNumbers::c_BKLM)
+  for (KLMHit2d* hit2d : hits) {
+    if (hit2d->getSubdetector() != KLMElementNumbers::c_BKLM)
       continue;
 
     // Prevent duplicate hits or hits on same layer
@@ -72,14 +69,14 @@ bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
     // if (skip == true)
     //   continue;
 
-    if ((*i)->isOnStaTrack() == false) {
+    if (hit2d->isOnStaTrack() == false) {
       double error, sigma;
       if (m_globalFit)
-        m_Fitter->globalDistanceToHit(*i, error, sigma);
-      else m_Fitter->distanceToHit(*i, error, sigma);
+        m_Fitter->globalDistanceToHit(hit2d, error, sigma);
+      else m_Fitter->distanceToHit(hit2d, error, sigma);
       //B2INFO("BKLMTrackFinder" << " Error: " << error << " Sigma: " << sigma);
       if (sigma < 5.0) {
-        track.push_back(*i);
+        track.push_back(hit2d);
       }
     }
   }
@@ -93,8 +90,8 @@ bool BKLMTrackFinder::filter(const std::list<KLMHit2d*>& seed,
 
   // Do this the hard way to count each layer separately.
   std::list<int> hitLayers;
-  for (i = track.begin(); i != track.end(); ++i) {
-    hitLayers.push_back((*i)->getLayer());
+  for (KLMHit2d* hit2d : track) {
+    hitLayers.push_back(hit2d->getLayer());
   }
   hitLayers.sort();
   hitLayers.unique();

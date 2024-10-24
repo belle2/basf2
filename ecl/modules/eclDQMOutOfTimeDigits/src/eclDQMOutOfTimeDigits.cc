@@ -85,7 +85,9 @@ void ECLDQMOutOfTimeDigitsModule::initialize()
 
 void ECLDQMOutOfTimeDigitsModule::beginRun()
 {
-  std::for_each(h_out_of_time.begin(), h_out_of_time.end(), [](auto & it) {it.second->Reset();});
+  for (std::map<std::string, TH1F*>::iterator it = h_out_of_time.begin();
+       it != h_out_of_time.end(); ++it)
+    it->second->Reset();
 }
 
 std::string ECLDQMOutOfTimeDigitsModule::getEventType()

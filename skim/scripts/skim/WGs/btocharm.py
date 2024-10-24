@@ -1567,29 +1567,6 @@ class BtoDsthpipi_D0pi_Kpi(BaseSkim):
 
         return ["B-:Dsthpipi_D0pi_Kpi"]
 
-    # def validation_histograms(self, path):
-    #     # NOTE: the validation package is not part of the light releases, so this import
-    #     # must be made here rather than at the top of the file.
-    #     from validation_tools.metadata import create_validation_histograms
-
-    #     stdPi0s(listtype='eff50_May2020Fit', path=path)
-
-    #     ma.reconstructDecay('D0 -> K_S0:merged pi0:eff50_May2020Fit', '1.84 < M < 1.89', path=path)
-    #     ma.reconstructDecay('B-:ch3 -> D0 K-:all', '5.24 < Mbc < 5.3 and abs(deltaE) < 0.15', path=path)
-
-    #     # the variables that are printed out are: Mbc, deltaE and the daughter particle invariant masses.
-    #     create_validation_histograms(
-    #         rootfile=f'{self}_Validation.root',
-    #         particlelist='B-:ch3',
-    #         variables_1d=[
-    #             ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
-    #             ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates'),
-    #             ('daughter(0, InvM)', 100, 1.8, 1.9, 'D0_InvM', self.__contact__, 'D0 invariant mass', '', 'InvM', 'Candidates')],
-    #         variables_2d=[
-    #             ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
-    #              'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
-    #         path=path)
-
 
 @fancy_skim_header
 class BtoDpipi_Kpipi(BaseSkim):
@@ -1624,21 +1601,3 @@ class BtoDpipi_Kpipi(BaseSkim):
                             Bcuts,
                             path=path)
         return ["B-:BtoDpipi_Kpipi"]
-
-    # def validation_histograms(self, path):
-    #     # NOTE: the validation package is not part of the light releases, so this import
-    #     # must be made here rather than at the top of the file.
-    #     from validation_tools.metadata import create_validation_histograms
-
-    #     # the variables that are printed out are:
-    #     # Mbc, deltaE and the daughter particle invariant masses.
-    #     create_validation_histograms(
-    #         rootfile=f'{self}_Validation.root',
-    #         particlelist='B-:',
-    #         variables_1d=[
-    #             ('Mbc', 100, 5.2, 5.3, 'Mbc', self.__contact__, 'Beam constrained mass', '', 'Mbc', 'Candidates'),
-    #             ('deltaE', 100, -1, 1, 'deltaE', self.__contact__, 'Energy difference of B', '', 'deltaE', 'Candidates')],
-    #         variables_2d=[
-    #             ('Mbc', 50, 5.23, 5.31, 'deltaE', 50, -0.7, 0.7, 'Mbc vs deltaE', self.__contact__,
-    #              'Beam constrainted mass vs energy difference of reconstructed B', 'Mbc', 'DeltaE')],
-    #         path=path)

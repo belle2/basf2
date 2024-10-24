@@ -196,7 +196,7 @@ void DQMHistAnalysisKLMModule::analyseChannelHitHistogram(
   n = histogram->GetXaxis()->GetNbins();
 
   /* call reference histograms from base class*/
-  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries);
+  TH1* ref_histogram = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
   if (ref_histogram) {ref_histogram->Draw("hist,same");}
   float ref_average = 0;
 
@@ -422,7 +422,7 @@ void DQMHistAnalysisKLMModule::processTimeHistogram(
       deltaDrawer(delta, histogram, canvas);
     }
     //reference check
-    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries);
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
     if (ref) {ref->Draw("hist,same");}
   }
 }
@@ -489,7 +489,7 @@ void DQMHistAnalysisKLMModule::processPlaneHistogram(
     histogram->SetStats(false);
     histogram->Draw();
     //reference check
-    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries);
+    TH1* ref = findRefHist(histogram->GetName(), ERefScaling::c_RefScaleEntries, histogram);
     if (ref) {ref->Draw("hist,same");}
 
     int message_counter = 0;

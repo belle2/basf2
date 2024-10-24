@@ -315,8 +315,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
-      setEffStatus(denU, effU, m_effUstatus);
-      setEffStatus(denV, effV, m_effVstatus);
+      setEffStatus(denU, effU, true);
+      setEffStatus(denV, effV, false);
 
       B2DEBUG(10, "Status U-side is " << m_effUstatus);
       B2DEBUG(10, "Status V-side is " << m_effVstatus);
@@ -484,8 +484,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
           erreffV = std::sqrt(effV * (1 - effV) / denV);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
 
-        setEffStatus(denU, effU, m_effUstatus);
-        setEffStatus(denV, effV, m_effVstatus);
+        setEffStatus(denU, effU, true);
+        setEffStatus(denV, effV, false);
 
         B2DEBUG(10, "Status U-side is " << m_effUstatus);
         B2DEBUG(10, "Status V-side is " << m_effVstatus);
@@ -732,15 +732,22 @@ void DQMHistAnalysisSVDEfficiencyModule::drawText()
   for (int i = 0; i < (int)m_sensorsText.size(); i++) m_sensorsText[i]->Draw("same");
 }
 
-void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, effStatus& efStatus)
+void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool sideU)
 {
+  effStatus efficiencyStatus;
+
+  if (sideU)
+    efficiencyStatus = m_effUstatus;
+  else
+    efficiencyStatus = m_effVstatus;
+
   if (den < m_statThreshold) {
-    efStatus = std::max(lowStat, efStatus);
+    efficiencyStatus = std::max(lowStat, efficiencyStatus);
   } else if (eff > m_effWarning) {
-    efStatus = std::max(good, efStatus);
+    efficiencyStatus = std::max(good, efficiencyStatus);
   } else if ((eff <= m_effWarning) && (eff > m_effError)) {
-    efStatus = std::max(warning, efStatus);
+    efficiencyStatus = std::max(warning, efficiencyStatus);
   } else if ((eff <= m_effError)) {
-    efStatus = std::max(error, efStatus);
+    efficiencyStatus = std::max(error, efficiencyStatus);
   }
 }

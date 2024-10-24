@@ -247,7 +247,7 @@ class TDCPV_klong(BaseSkim):
     * ``abs(deltaE) < 0.15``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``E_ECL_TDCPV < 9``
-    # ``foxWolframR2<0.6``
+    * ``foxWolframR2<0.6``
     """
 
     __authors__ = ["Michele Veronesi", "Noah Brenny"]

@@ -77,17 +77,17 @@ DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online)
   m_legEmpty->SetTextColor(kBlack);
 
   if (online) {
-    m_legOnProblem = new TPaveText(x1, y1, x2, y2, "brNDC");
-    m_legOnProblem->SetFillColor(c_ColorDefault);
-    m_legOnProblem->SetTextColor(kBlack);
+    m_legOnlineProblem = new TPaveText(x1, y1, x2, y2, "brNDC");
+    m_legOnlineProblem->SetFillColor(c_ColorDefault);
+    m_legOnlineProblem->SetTextColor(kBlack);
 
-    m_legOnWarning = new TPaveText(x1, y1, x2, y2, "brNDC");
-    m_legOnWarning->SetFillColor(c_ColorDefault);
-    m_legOnWarning->SetTextColor(kBlack);
+    m_legOnlineWarning = new TPaveText(x1, y1, x2, y2, "brNDC");
+    m_legOnlineWarning->SetFillColor(c_ColorDefault);
+    m_legOnlineWarning->SetTextColor(kBlack);
 
-    m_legOnNormal = new TPaveText(x1, y1, x2, y2, "brNDC");
-    m_legOnNormal->SetFillColor(c_ColorDefault);
-    m_legOnNormal->SetTextColor(kBlack);
+    m_legOnlineNormal = new TPaveText(x1, y1, x2, y2, "brNDC");
+    m_legOnlineNormal->SetFillColor(c_ColorDefault);
+    m_legOnlineNormal->SetTextColor(kBlack);
   }
 }
 
@@ -98,9 +98,9 @@ DQMHistAnalysisSVDModule::~ DQMHistAnalysisSVDModule()
   delete m_legWarning;
   delete m_legEmpty;
 
-  if (m_legOnProblem) delete m_legOnProblem;
-  if (m_legOnNormal)  delete m_legOnNormal;
-  if (m_legOnWarning) delete m_legOnWarning;
+  if (m_legOnlineProblem) delete m_legOnlineProblem;
+  if (m_legOnlineNormal)  delete m_legOnlineNormal;
+  if (m_legOnlineWarning) delete m_legOnlineWarning;
 }
 
 void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg, bool online)
@@ -110,7 +110,7 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
       colorizeCanvas(canvas, c_StatusGood);
       if (plotLeg) {
         if (online)
-          m_legOnNormal->Draw();
+          m_legOnlineNormal->Draw();
         else
           m_legNormal->Draw();
       }
@@ -120,7 +120,7 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
       colorizeCanvas(canvas, c_StatusWarning);
       if (plotLeg) {
         if (online)
-          m_legOnWarning->Draw();
+          m_legOnlineWarning->Draw();
         else
           m_legWarning->Draw();
       }
@@ -130,7 +130,7 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
       colorizeCanvas(canvas, c_StatusError);
       if (plotLeg) {
         if (online)
-          m_legOnProblem->Draw();
+          m_legOnlineProblem->Draw();
         else
           m_legProblem->Draw();
       }

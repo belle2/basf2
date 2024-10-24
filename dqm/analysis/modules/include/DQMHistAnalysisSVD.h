@@ -7,7 +7,7 @@
  **************************************************************************/
 //+
 // File : DQMHistAnalysisSVDClustersOnTrack.h
-// Description : module for DQM histogram analysis of SVD sensors occupancies
+// Description : base module for DQM histogram analysis of SVD
 //-
 
 #pragma once
@@ -43,14 +43,14 @@ namespace Belle2 {
     void setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg = true, bool online = false); /**< set status of Canvas */
 
   protected:
-    TPaveText* m_legProblem = nullptr; /**< cluster time on tracks plot legend, problem */
-    TPaveText* m_legNormal = nullptr; /**< cluster time on tracks plot legend, normal */
-    TPaveText* m_legEmpty = nullptr; /**< cluster time on tracks plot legend, empty */
-    TPaveText* m_legWarning = nullptr; /**< cluster time on tracks plot legend, warning */
+    TPaveText* m_legProblem = nullptr;  /**< plot legend, problem */
+    TPaveText* m_legNormal = nullptr;   /**< plot legend, normal */
+    TPaveText* m_legEmpty = nullptr;    /**< plot legend, empty */
+    TPaveText* m_legWarning = nullptr;  /**< plot legend, warning */
 
-    TPaveText* m_legOnProblem = nullptr; /**< onlineOccupancy plot legend, problem */
-    TPaveText* m_legOnWarning = nullptr; /**< onlineOccupancy plot legend, warning */
-    TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */
+    TPaveText* m_legOnlineProblem = nullptr; /**< onlineOccupancy plot legend, problem */
+    TPaveText* m_legOnlineWarning = nullptr; /**< onlineOccupancy plot legend, warning */
+    TPaveText* m_legOnlineNormal = nullptr;  /**< onlineOccupancy plot legend, normal */
 
     /**  status flags */
     enum svdStatus {

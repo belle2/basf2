@@ -75,7 +75,7 @@ namespace Belle2 {
     float m_refMeanP; /**< mean of the signal time peak from Physics reference run */
     float m_refMeanC; /**< mean of the signal time peak from Cosmic reference run */
 
-    int getTimeStatus(TH1F& histo); /**< get status of time histogram */
+    int getCanvasStatus(TH1F& histo); /**< get canvas status */
 
     TH1F m_hClusterOnTrackTime_L456V; /**< time for clusters on Track for L456V histo*/
     TCanvas* m_cClusterOnTrackTime_L456V = nullptr; /**< time for clusters on Track for L456V canvas*/

@@ -142,7 +142,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
     m_hClusterOnTrackTime_L456V.SetTitle(Form("ClusterOnTrack Time L456V %s", runID.Data()));
 
     if (nEvents > m_statThreshold)
-      status = getTimeStatus(m_hClusterOnTrackTime_L456V);
+      status = getCanvasStatus(m_hClusterOnTrackTime_L456V);
     else
       status = lowStat;
 
@@ -172,7 +172,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
       m_hClusterOnTrackTimeL456V3Samples.SetTitle(Form("ClusterOnTrack Time L456V 3 samples %s", runID.Data()));
 
       if (nEvents > m_statThreshold)
-        status = getTimeStatus(m_hClusterOnTrackTimeL456V3Samples);
+        status = getCanvasStatus(m_hClusterOnTrackTimeL456V3Samples);
       else
         status = lowStat;
 
@@ -210,7 +210,7 @@ void DQMHistAnalysisSVDClustersOnTrackModule::terminate()
   delete m_cClusterOnTrackTimeL456V3Samples;
 }
 
-int DQMHistAnalysisSVDClustersOnTrackModule::getTimeStatus(TH1F& histo)
+int DQMHistAnalysisSVDClustersOnTrackModule::getCanvasStatus(TH1F& histo)
 {
   int status = good;
   histo.GetXaxis()->SetRange(110, 190); // [-40 ns,40 ns]

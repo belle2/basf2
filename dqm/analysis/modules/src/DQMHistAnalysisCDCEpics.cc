@@ -27,11 +27,12 @@ DQMHistAnalysisCDCEpicsModule::DQMHistAnalysisCDCEpicsModule()
   addParam("HistTDC", m_histoTDC, "TDC Histogram Name", std::string("hTDC"));
   addParam("HistPhiIndex", m_histoPhiIndex, "Phi Index Histogram Name", std::string("hPhiIndex"));
   addParam("HistPhiEff", m_histoPhiEff, "Phi Eff Histogram Name", std::string("hPhiEff"));
+  addParam("HistHitsPhi", m_histoHitsPhi, "Phi Hits Histogram Name", std::string("hPhiNCDC"));
   addParam("HistTrackingWireEff", m_histoTrackingWireEff, "Wire Eff Histogram Name", std::string("hTrackingWireEff"));
   addParam("PvPrefix", m_pvPrefix, "PV Prefix and Name", std::string("CDC:"));
   addParam("RefFilePhi", m_refNamePhi, "Reference histogram file name", std::string("CDCDQM_PhiRef.root"));
   addParam("RefDirectory", m_refDir, "Reference histogram dir", std::string("ref/CDC/default"));
-  addParam("MinEvt", m_minevt, "Min events for intra-run point", 20000);
+  addParam("MinEvt", m_minevt, "Min events for intra-run point", 1000);
   addParam("FirstEffBoundary", m_firstEffBoundary, "The first boundary of the efficiency range", m_firstEffBoundary);
   addParam("SecondEffBoundary", m_secondEffBoundary, "The second boundary of the efficiency range", m_secondEffBoundary);
   for (int i = 0; i < 300; i++) {
@@ -57,9 +58,12 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   m_hist_tdc->SetTitle("TDC Medians; CDC board index; TDC medians");
 
   //array of various phi histograms
-  c_hist_skimphi = new TCanvas("CDC/c_hist_skimphi", "c_hist_skimphi", 1600, 800);
+  for (int ic = 0; ic < 8; ic++) {
+    c_hist_skimphi[ic] = new TCanvas(Form("CDC/c_hist_skimphi_c%d", ic), Form("hist_skimphi_c%d", ic), 500, 400);
+  }
 
   c_hist_crphi = new TCanvas("CDC/c_hist_crphi", "c_hist_crphi", 500, 400);
+  c_hist_hitsphi = new TCanvas("CDC/c_hist_hitsphi", "c_hist_hitsphi", 500, 400);
 
   //CR alram reference
   if (m_refNamePhi != "") {
@@ -103,6 +107,9 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
 
   if (!hasDeltaPar(m_histoDir, m_histoPhiEff))
     addDeltaPar(m_histoDir, m_histoPhiEff, HistDelta::c_Entries, m_minevt, 1);
+
+  if (!hasDeltaPar(m_histoDir, m_histoHitsPhi))
+    addDeltaPar(m_histoDir, m_histoHitsPhi, HistDelta::c_Entries, m_minevt, 1);
 
   if (!hasDeltaPar(m_histoDir, m_histoTrackingWireEff))
     addDeltaPar(m_histoDir, m_histoTrackingWireEff, HistDelta::c_Entries, m_minevt, 1);
@@ -227,8 +234,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
 
   //get phi plots for various options
   auto m_delta_skimphi = (TH2F*)getDelta(m_histoDir, m_histoPhiIndex, 0, true); //true=only if updated
-  c_hist_skimphi->Clear();
-  c_hist_skimphi->Divide(4, 2);
   if (m_delta_skimphi) {
     TString sip[2] = {"OffIP", "IP"};
     TString sname[4] = {"all", "bhabha", "hadron", "mumutrk"};
@@ -240,7 +245,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
         m_hist_skimphi[k]->SetTitle(TString::Format("cdc-track #phi (%s, %s-events);#phi;entries", sip[j].Data(), sname[i].Data()));
         if (k < 4)m_hist_skimphi[k]->SetFillColor(kGray);
         else m_hist_skimphi[k]->SetFillColor(kCyan);
-        c_hist_skimphi->cd(k + 1);
+        c_hist_skimphi[k]->Clear();
+        c_hist_skimphi[k]->cd();
         gPad->SetGridx(1);
         gPad->SetGridy(1);
         m_hist_skimphi[k]->Draw("hist");
@@ -314,7 +320,7 @@ void DQMHistAnalysisCDCEpicsModule::event()
       m_hist_effphi->SetBinError(iphi + 1, 0);
     }
     m_hist_effphi->GetYaxis()->SetRangeUser(80.0, 110.0); //per efficiency
-    m_hist_effphi->SetTitle("Tracking efficiency via cdchits (>20/all); cdc-track #phi; efficiency");
+    m_hist_effphi->SetTitle("CDC track efficiency(cdchits>20/all); cdc-track #phi; tracking efficiency");
     c_hist_effphi->cd();
     gPad->SetGridx();
     gPad->SetGridy();
@@ -322,6 +328,17 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_effphi->Draw("hist");
     c_hist_effphi->Update();
     UpdateCanvas(c_hist_effphi);
+  }
+
+  //get cdc hits vs phi
+  auto m_delta_hitphi = (TH2F*)getDelta(m_histoDir, m_histoHitsPhi, 0, true); //true=only if updated
+  c_hist_hitsphi->Clear();
+  if (m_delta_hitphi) {
+    m_delta_hitphi->SetTitle("CDC track #phi vs cdchits; cdc-track #phi; nCDCHits");
+    c_hist_hitsphi->cd();
+    m_delta_hitphi->Draw("COLZ");
+    c_hist_hitsphi->Update();
+    UpdateCanvas(c_hist_hitsphi);
   }
 
   // get wire efficiency

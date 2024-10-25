@@ -105,10 +105,12 @@ namespace Belle2 {
     TCanvas* c_hist_crphi = nullptr; /**< canvas for control shifter phi */
     TH1D* m_hist_crphi = nullptr; /**< for above*/
 
+    TCanvas* c_hist_hitsphi = nullptr; /**< expert canvas for hits vs phi */
+
     TCanvas* c_hist_effphi = nullptr; /**< canvas for tracking efficiency */
     TH1D* m_hist_effphi = nullptr; /**< for above*/
 
-    TCanvas* c_hist_skimphi = nullptr; /**< canvas for various phi distribution */
+    TCanvas* c_hist_skimphi[8] = {nullptr}; /**< canvas for various phi distribution */
     TH1D* m_hist_skimphi[8] = {nullptr}; /**< for above*/
 
     TCanvas* c_hist_attach_eff[4] = {nullptr}; /**< canvas for layer efficiency */
@@ -125,6 +127,7 @@ namespace Belle2 {
     std::string m_histoTDC = ""; /**< TDC histogram names of CDC DQMs */
     std::string m_histoPhiIndex = ""; /**< Phi Inedx histogram names of CDC DQMs */
     std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
+    std::string m_histoHitsPhi = ""; /**< Phi Hits histogram names of CDC DQMs */
     std::string m_histoTrackingWireEff = ""; /**< Wire Eff histogram names of CDC DQMs */
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
     std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */

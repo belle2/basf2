@@ -86,7 +86,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   int nSLayers = cdcgeo.getNumberOfSenseLayers();
   double layerR = cdcgeo.senseWireR(nSLayers - 1);
-  m_hist_attach_eff[0] = new TH2F("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Efficiency",
+  m_hist_attach_eff[0] = new TH2F("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin",
                                   nSLayers * 6, -layerR * 1.02, layerR * 1.02,
                                   nSLayers * 6, -layerR * 1.02, layerR * 1.02);
   m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);

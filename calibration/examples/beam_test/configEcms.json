@@ -1,0 +1,7 @@
+{
+    "caf_script": "caf_ecms.py",
+    "database_chain": ["online", "data_prompt_rel08", "AIRFLOW_data_staging_calibration_prompt"],
+    "expert_config" : {"outerLoss" : "pow(0.000010e0*rawTime, 2) +  1./nEv",  "innerLoss" : "pow(0.000120e0*rawTime, 2) +  1./nEv"},
+    "requested_iov" : [0,0,-1,-1],
+    "backend_args": {"queue": "s"}
+}

@@ -12,7 +12,9 @@ Airflow script to perform eCMS calibration (combination of the had-B and mumu me
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
-from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
+# from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
+import rawdata as rd
+import reconstruction as re
 
 from basf2 import create_path, register_module, get_file_metadata, B2INFO, B2WARNING
 import modularAnalysis as ma
@@ -67,10 +69,30 @@ def get_hadB_path(isCDST):
     # module to be run prior the collector
     rec_path_1 = create_path()
     if isCDST:
-        prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+        branches = [
+            "EventMetaData",
+            "RawFTSWs",
+            "ROIpayload",
+            "SoftwareTriggerResult",
+            "SoftwareTriggerVariables",
+            "TRGSummary",
+            "RawCDCs",
+            "RawSVDs",
+            "RawPXDs",
+            "RawTOPs",
+            "RawARICHs",
+            "RawKLMs",
+            "RawECLs",
+            "RawTRGs",
+            "ROIs",
+            "OnlineEventT0s"]
+        rec_path_1.add_module("RootInput", branchNames=branches)
+        # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+        rd.add_unpackers(rec_path_1)
+        re.add_reconstruction(rec_path_1)
 
-    add_pid_module(rec_path_1)
-    add_ecl_modules(rec_path_1)
+    # add_pid_module(rec_path_1)
+    # add_ecl_modules(rec_path_1)
 
     stdCharged.stdPi(listtype='loose', path=rec_path_1)
     stdCharged.stdK(listtype='good', path=rec_path_1)
@@ -211,7 +233,27 @@ def get_mumu_path(isCDST):
     # module to be run prior the collector
     rec_path_1 = create_path()
     if isCDST:
-        prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+        branches = [
+            "EventMetaData",
+            "RawFTSWs",
+            "ROIpayload",
+            "SoftwareTriggerResult",
+            "SoftwareTriggerVariables",
+            "TRGSummary",
+            "RawCDCs",
+            "RawSVDs",
+            "RawPXDs",
+            "RawTOPs",
+            "RawARICHs",
+            "RawKLMs",
+            "RawECLs",
+            "RawTRGs",
+            "ROIs",
+            "OnlineEventT0s"]
+        rec_path_1.add_module("RootInput", branchNames=branches)
+        # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+        rd.add_unpackers(rec_path_1)
+        re.add_reconstruction(rec_path_1)
 
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'

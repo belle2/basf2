@@ -315,6 +315,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
+
       setEffStatus(denU, effU, true);
       setEffStatus(denV, effV, false);
 
@@ -750,4 +751,9 @@ void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool
   } else if ((eff <= m_effError)) {
     efficiencyStatus = std::max(error, efficiencyStatus);
   }
+
+  if (sideU)
+    m_effUstatus = efficiencyStatus;
+  else
+    m_effVstatus = efficiencyStatus;
 }

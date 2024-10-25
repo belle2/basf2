@@ -83,17 +83,19 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_attach_eff[1] = new TCanvas("CDC/c_hist_expected_wires", "c_hist_expected_wires", 403, 400);
   c_hist_attach_eff[2] = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 403, 400);
   c_hist_attach_eff[3] = new TCanvas("CDC/c_hist_attach_eff_1d", "c_hist_attach_eff_1d", 403, 400);
-  m_hist_attach_eff[0] = createEffiTH2Poly("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin");
+  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+  int nSLayers = cdcgeo.getNumberOfSenseLayers();
+  double layerR = cdcgeo.senseWireR(nSLayers - 1);
+  m_hist_attach_eff[0] = new TH2F("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Efficiency",
+                                  nSLayers * 6, -layerR * 1.02, layerR * 1.02,
+                                  nSLayers * 6, -layerR * 1.02, layerR * 1.02);
   m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);
-  m_hist_attach_eff[0]->SetDirectory(gDirectory);
-  m_hist_attach_eff[1] = (TH2Poly*)m_hist_attach_eff[0]->Clone();
+  m_hist_attach_eff[1] = (TH2F*)m_hist_attach_eff[0]->Clone();
   m_hist_attach_eff[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires;X [cm];Y [cm]; Track / bin");
-  m_hist_attach_eff[1]->SetDirectory(gDirectory);
-  m_hist_attach_eff[2] = (TH2Poly*)m_hist_attach_eff[0]->Clone();
+  m_hist_attach_eff[2] = (TH2F*)m_hist_attach_eff[0]->Clone();
   m_hist_attach_eff[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff;X [cm];Y [cm]; Efficiency");
-  m_hist_attach_eff[2]->SetDirectory(gDirectory);
-  m_hist_wire_attach_eff_1d = new TH1F("CDC/hist_wire_attach_eff_1d", "hist_wire_attach_eff_1d;Wire Efficiency;Wire / bin", 208,
-                                       -0.02, 1.02);
+  m_hist_wire_attach_eff_1d = new TH1F("CDC/hist_wire_attach_eff_1d", "hist_wire_attach_eff_1d;Wire Efficiency;Wire / bin",
+                                       208, -0.02, 1.02);
   m_hist_wire_attach_eff_1d->GetYaxis()->SetTitleOffset(1.4);
 
   if (!hasDeltaPar(m_histoDir, m_histoADC))
@@ -350,7 +352,19 @@ void DQMHistAnalysisCDCEpicsModule::event()
   for (int ij = 0; ij < 4; ij++) c_hist_attach_eff[ij]->Clear();
   if (m_delta_efflay) {
     m_hist_wire_attach_eff_1d->Reset();
-    fillEffiTH2Poly(m_delta_efflay, m_hist_attach_eff[0], m_hist_attach_eff[1], m_hist_attach_eff[2]);
+    int nEffiValues = 0;
+    for (int ij = 1; ij <= m_delta_efflay->GetNbinsX(); ij++) {
+      int halfYbin = m_delta_efflay->GetNbinsY() / 2;
+      for (int jk = 0; jk < halfYbin; jk++) {
+        if (m_delta_efflay->GetBinContent(ij, jk + 1) == 0) continue;
+        double binEffi = m_delta_efflay->GetBinContent(ij, jk + halfYbin + 1) / m_delta_efflay->GetBinContent(ij, jk + 1);
+        m_hist_wire_attach_eff_1d->Fill(binEffi);
+        meanWireAttachProb += binEffi;
+        nEffiValues++;
+      }
+    }
+    if (nEffiValues) meanWireAttachProb /= nEffiValues;
+    fillEffiTH2(m_delta_efflay, m_hist_attach_eff[0], m_hist_attach_eff[1], m_hist_attach_eff[2]);
     c_hist_attach_eff[0]->cd();
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
     m_hist_attach_eff[0]->SetStats(0);
@@ -361,15 +375,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
     m_hist_attach_eff[1]->Draw("COLZ");
     c_hist_attach_eff[2]->cd();
     gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
-    int nEffiValues = 0;
-    for (int ij = 0; ij < m_hist_attach_eff[2]->GetNumberOfBins(); ij++) {
-      if (m_hist_attach_eff[1]->GetBinContent(ij + 1) == 0) continue;
-      double binEffi = m_hist_attach_eff[2]->GetBinContent(ij + 1);
-      m_hist_wire_attach_eff_1d->Fill(binEffi);
-      meanWireAttachProb += binEffi;
-      nEffiValues++;
-    }
-    if (nEffiValues) meanWireAttachProb /= nEffiValues;
     m_hist_attach_eff[2]->SetMinimum(0.0);
     m_hist_attach_eff[2]->SetMaximum(1.0);
     m_hist_attach_eff[2]->SetStats(0);
@@ -438,67 +443,62 @@ void DQMHistAnalysisCDCEpicsModule::terminate()
   B2DEBUG(20, "DQMHistAnalysisCDCEpics: terminate called");
 }
 
-TH2Poly* DQMHistAnalysisCDCEpicsModule::createEffiTH2Poly(const TString& name, const TString& title)
+void DQMHistAnalysisCDCEpicsModule::fillEffiTH2(TH2F* hist, TH2F* attached, TH2F* expected, TH2F* efficiency)
 {
-  TH2Poly* hist = new TH2Poly();
   static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
   int nSLayers = cdcgeo.getNumberOfSenseLayers();
-  for (int lay = 0; lay < nSLayers; lay++) {
-    int nWires = cdcgeo.nWiresInLayer(lay);
-    double offset = cdcgeo.offset(lay);
-    double layerR = cdcgeo.senseWireR(lay);
-    double r_inner = 0;
-    double r_outer = 0;
-    if (lay == 0) {
-      r_inner = layerR - (cdcgeo.senseWireR(1) - cdcgeo.senseWireR(0)) / 2;
-      r_outer = layerR + (cdcgeo.senseWireR(1) - cdcgeo.senseWireR(0)) / 2;
-    } else if (lay == nSLayers - 1) {
-      r_inner = layerR - (cdcgeo.senseWireR(lay) - cdcgeo.senseWireR(lay - 1)) / 2;
-      r_outer = layerR + (cdcgeo.senseWireR(lay) - cdcgeo.senseWireR(lay - 1)) / 2;
-    } else {
-      r_inner = layerR - (cdcgeo.senseWireR(lay) - cdcgeo.senseWireR(lay - 1)) / 2;
-      r_outer = layerR + (cdcgeo.senseWireR(lay + 1) - cdcgeo.senseWireR(lay)) / 2;
-    }
-    for (int wire = 0; wire < nWires; wire++) {
-      double phi_inner = (wire - 0.5 + offset) * 2 * TMath::Pi() / nWires;
-      double phi_outer = (wire + 0.5 + offset) * 2 * TMath::Pi() / nWires;
-      // Calculate the four corners of the bin
-      double x0 = r_inner * TMath::Cos(phi_inner);
-      double y0 = r_inner * TMath::Sin(phi_inner);
-      double x1 = r_outer * TMath::Cos(phi_inner);
-      double y1 = r_outer * TMath::Sin(phi_inner);
-      double x2 = r_outer * TMath::Cos(phi_outer);
-      double y2 = r_outer * TMath::Sin(phi_outer);
-      double x3 = r_inner * TMath::Cos(phi_outer);
-      double y3 = r_inner * TMath::Sin(phi_outer);
-      double xx[] = {x0, x1, x2, x3};
-      double yy[] = {y0, y1, y2, y3};
-      hist->AddBin(4, xx, yy);
-    }
-  }
-  hist->SetNameTitle(name, title);
-  return hist;
-}
 
-void DQMHistAnalysisCDCEpicsModule::fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency)
-{
-  attached->Reset("ICES");
-  expected->Reset("ICES");
-  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-  int nSLayers = cdcgeo.getNumberOfSenseLayers();
-  for (int lay = 0; lay < nSLayers; lay++) {
-    int nWires = cdcgeo.nWiresInLayer(lay);
-    double layerR = cdcgeo.senseWireR(lay);
-    double offset = cdcgeo.offset(lay);
-    int expBin = hist->GetYaxis()->FindBin(lay);
-    int obsBin = expBin + nSLayers;
-    // fill the bins for this layer
-    for (int wire = 0; wire < nWires; wire++) {
-      double phi = (wire + offset) * 2 * TMath::Pi() / nWires;
-      double fillX = layerR * TMath::Cos(phi);
-      double fillY = layerR * TMath::Sin(phi);
-      attached->Fill(fillX, fillY, hist->GetBinContent(wire + 1, obsBin));
-      expected->Fill(fillX, fillY, hist->GetBinContent(wire + 1, expBin));
+  // Array to hold bin edges, with nSLayers + 1 edges needed for nSLayers bins
+  std::vector<double> binEdges(nSLayers + 1);
+
+  // Set the first bin edge, halfway between the first and second layer radii
+  double firstR = cdcgeo.senseWireR(0);
+  double secondR = cdcgeo.senseWireR(1);
+  binEdges[0] = firstR - (secondR - firstR) / 2;
+
+  // Calculate middle bin edges
+  for (int lay = 1; lay < nSLayers; lay++) {
+    double prevR = cdcgeo.senseWireR(lay - 1);
+    double currentR = cdcgeo.senseWireR(lay);
+    binEdges[lay] = (prevR + currentR) / 2;
+  }
+
+  // Set the last bin edge, halfway between the last and second-last layer radii
+  double lastR = cdcgeo.senseWireR(nSLayers - 1);
+  double secondLastR = cdcgeo.senseWireR(nSLayers - 2);
+  binEdges[nSLayers] = lastR + (lastR - secondLastR) / 2;
+
+  // Create TH1F histogram on the stack with bin edges based on calculated binEdges array
+  TH1F layerHist("layerHist", "Layer Histogram", nSLayers, binEdges.data());
+
+  for (int binx = 1; binx <= efficiency->GetNbinsX(); binx++) {
+    for (int biny = 1; biny <= efficiency->GetNbinsY(); biny++) {
+      double bincenterx = efficiency->GetXaxis()->GetBinCenter(binx);
+      double bincentery = efficiency->GetYaxis()->GetBinCenter(biny);
+
+      // Convert (x, y) to polar coordinates (r, phi)
+      double r = TMath::Sqrt(bincenterx * bincenterx + bincentery * bincentery);
+      double phi = TMath::ATan2(bincentery, bincenterx);
+
+      int layerBin = layerHist.FindBin(r); // Get the bin corresponding to r
+      if (layerBin < 1 || layerBin > nSLayers) continue;
+      int layerExpected = layerBin - 1;
+
+      // Calculate the number of wires in the layer
+      int nWires = cdcgeo.nWiresInLayer(layerExpected);
+      double offset = cdcgeo.offset(layerExpected);
+
+      // Calculate the wire index based on phi
+      int wireExpected = static_cast<int>((phi / (2 * TMath::Pi()) * nWires) - offset);
+      if (wireExpected < 0) wireExpected += nWires;
+      if (wireExpected >= nWires) wireExpected -= nWires;
+
+      // Calculate the expected and attached bin indices in `hist`
+      int expBin = hist->GetYaxis()->FindBin(layerExpected);
+      int obsBin = expBin + nSLayers;
+
+      expected->SetBinContent(binx, biny, hist->GetBinContent(wireExpected + 1, expBin));
+      attached->SetBinContent(binx, biny, hist->GetBinContent(wireExpected + 1, obsBin));
     }
   }
   efficiency->Divide(attached, expected);

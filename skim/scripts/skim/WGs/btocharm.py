@@ -1536,11 +1536,10 @@ class BtoDsthpipi_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 
-    * :math:`B^{-}\\to \\D^{*+} (\\to D^0 (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^-`,
+    * :math:`B^{-}\\to D^{*+} (\\to D^0 (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^-`,
 
     Cuts applied:
 
-    * ``1.84 < M_D < 1.89``
     * ``5.22 < Mbc``
     * ``-0.3 < deltaE < 0.2``
 
@@ -1578,7 +1577,6 @@ class BtoDpipi_Kpipi(BaseSkim):
 
     Cuts applied:
 
-    * ``1.84 < M_D < 1.89``
     * ``5.22 < Mbc``
     * ``-0.3 < deltaE < 0.2``
     """

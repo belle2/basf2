@@ -83,6 +83,16 @@ namespace Belle2 {
     float getHistMedian(TH1D* h) const;
 
     /**
+     * Convenient function to create a TH2Poly based on CDC geometry
+     */
+    TH2Poly* createEffiTH2Poly(const TString& name, const TString& title) ;
+
+    /**
+     * Populate the efficiency histograms
+     */
+    void fillEffiTH2Poly(TH2F* hist, TH2Poly* attached, TH2Poly* expected, TH2Poly* efficiency) ;
+
+    /**
      * Populate the efficiency histograms
      */
     void fillEffiTH2(TH2F* hist, TH2F* attached, TH2F* expected, TH2F* efficiency) ;
@@ -110,6 +120,7 @@ namespace Belle2 {
 
     TCanvas* c_hist_attach_eff[4] = {nullptr}; /**< canvas for layer efficiency */
     TH2F* m_hist_attach_eff[3] = {nullptr}; /**< for above*/
+    TH2Poly* m_hist_attach_eff_Poly[3] = {nullptr}; /**< for above*/
     TH1F* m_hist_wire_attach_eff_1d = nullptr; /**< for above*/
 
     TLine* m_line_ladc  = nullptr; /**< line for lower ADC window */
@@ -124,6 +135,7 @@ namespace Belle2 {
     std::string m_histoPhiEff = ""; /**< Phi Eff histogram names of CDC DQMs */
     std::string m_histoHitsPhi = ""; /**< Phi Hits histogram names of CDC DQMs */
     std::string m_histoTrackingWireEff = ""; /**< Wire Eff histogram names of CDC DQMs */
+    bool        m_doTH2PolyTrackingWireEff = false; /**< If true, creates TH2Poly instead of TH2F for TrackingWireEff Histos */
     std::string m_pvPrefix = ""; /**< Prefix of PVs */
     std::string m_refDir = ""; /**< reference histogram dir of CDC DQMs */
     std::string m_refNamePhi = ""; /**< reference histogram of phi */

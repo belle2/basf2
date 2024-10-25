@@ -229,8 +229,8 @@ class TDCPV_klong(BaseSkim):
 
     **Decay Channels**:
 
-    * ``B0 -> phi K_L0``
-    * ``B0 -> eta' K_L0``
+    * :math:`B^0 \\to \\phi K_L^0`
+    * :math:`B^0 \\to \\eta ' K_L^0`
 
     **Particle lists used**:
 

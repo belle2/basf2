@@ -259,9 +259,9 @@ class TDCPV_klong(BaseSkim):
 
     * :math:`B^0 \\to \\phi K_L^0`
     * :math:`B^0 \\to \\eta ' K_L^0`
-    * :math:`B^0 \\to \\omega ' K_L^0`
-    * :math:`B^0 \\to \\rho^0 ' K_L^0`
-    * :math:`B^0 \\to \\pi^0 ' K_L^0`
+    * :math:`B^0 \\to \\omega K_L^0`
+    * :math:`B^0 \\to \\rho^0 K_L^0`
+    * :math:`B^0 \\to \\pi^0 K_L^0`
 
     **Particle lists used**:
 

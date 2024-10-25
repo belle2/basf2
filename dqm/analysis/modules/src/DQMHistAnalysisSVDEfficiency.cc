@@ -223,9 +223,12 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
   m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
   m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
 
+  m_legLowStat->Clear();
+  m_legLowStat->AddText("Not enough statistics,");
+  m_legLowStat->AddText("check again in a few minutes");
+
   m_legEmpty->Clear();
-  m_legEmpty->AddText("Not enough statistics,");
-  m_legEmpty->AddText("check again in a few minutes");
+  m_legEmpty->AddText("Track/clusters plots are emtpy");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
@@ -309,12 +312,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denV = found_tracksV->GetBinContent(bin);
       if (denV > 0)
         effV = numV / denV;
+
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       if (denV > 0)
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
-
 
       setEffStatus(denU, effU, true);
       setEffStatus(denV, effV, false);
@@ -325,37 +328,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   } else {
     if (matched_clusU == NULL || found_tracksU == NULL) {
       B2INFO("Histograms needed for U-side Efficiency computation are not found");
-      m_cEfficiencyU->Draw();
-      m_cEfficiencyU->cd();
-      if (m_hEfficiency)
-        m_hEfficiency->getHistogram(1)->Draw("text colz");
-      colorizeCanvas(m_cEfficiencyU, c_StatusDefault);
-
-      m_cEfficiencyRPhiViewU->Draw();
-      m_cEfficiencyRPhiViewU->cd();
-      if (m_hEfficiency) {
-        if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-        else m_hEfficiency->getPoly(1)->Draw("colz l");
-        drawText();
-      }
-      colorizeCanvas(m_cEfficiencyRPhiViewU, c_StatusDefault);
+      setEffStatus(-1, -1, true);
     }
     if (matched_clusV == NULL || found_tracksV == NULL) {
       B2INFO("Histograms needed for V-side Efficiency computation are not found");
-      m_cEfficiencyV->cd();
-      m_cEfficiencyV->Draw();
-      if (m_hEfficiency)
-        m_hEfficiency->getHistogram(0)->Draw("text colz");
-      colorizeCanvas(m_cEfficiencyV, c_StatusDefault);
-
-      m_cEfficiencyRPhiViewV->cd();
-      m_cEfficiencyRPhiViewV->Draw();
-      if (m_hEfficiency) {
-        if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-        else m_hEfficiency->getPoly(0)->Draw("colz l");
-        drawText();
-      }
-      colorizeCanvas(m_cEfficiencyRPhiViewV, c_StatusDefault);
+      setEffStatus(-1, -1, false);
     }
   }
 
@@ -494,37 +471,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     } else {
       if (matched3_clusU == NULL || found3_tracksU == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
-        m_cEfficiencyU3Samples->Draw();
-        m_cEfficiencyU3Samples->cd();
-        if (m_hEfficiency3Samples)
-          m_hEfficiency3Samples->getHistogram(1)->Draw("text");
-        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusDefault);
-
-        m_cEfficiencyRPhiViewU3Samples->Draw();
-        m_cEfficiencyRPhiViewU3Samples->cd();
-        if (m_hEfficiency3Samples) {
-          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-          else m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
-          drawText();
-        }
-        colorizeCanvas(m_cEfficiencyRPhiViewU3Samples, c_StatusDefault);
+        setEffStatus(-1, -1, true);
       }
       if (matched3_clusV == NULL || found3_tracksV == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
-        m_cEfficiencyV3Samples->Draw();
-        m_cEfficiencyV3Samples->cd();
-        if (m_hEfficiency3Samples)
-          m_hEfficiency3Samples->getHistogram(0)->Draw("text");
-        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusDefault);
-
-        m_cEfficiencyRPhiViewV3Samples->Draw();
-        m_cEfficiencyRPhiViewV3Samples->cd();
-        if (m_hEfficiency3Samples) {
-          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-          else m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
-          drawText();
-        }
-        colorizeCanvas(m_cEfficiencyRPhiViewV3Samples, c_StatusDefault);
+        setEffStatus(-1, -1, false);
       }
     }
 
@@ -735,25 +686,22 @@ void DQMHistAnalysisSVDEfficiencyModule::drawText()
 
 void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool sideU)
 {
-  effStatus efficiencyStatus;
+  effStatus* efficiencyStatus;
 
   if (sideU)
-    efficiencyStatus = m_effUstatus;
+    efficiencyStatus = &m_effUstatus;
   else
-    efficiencyStatus = m_effVstatus;
+    efficiencyStatus = &m_effVstatus;
 
-  if (den < m_statThreshold) {
-    efficiencyStatus = std::max(lowStat, efficiencyStatus);
+  if (den < 0) {
+    *efficiencyStatus = std::max(noStat, *efficiencyStatus);
+  } else if (den < m_statThreshold) {
+    *efficiencyStatus = std::max(lowStat, *efficiencyStatus);
   } else if (eff > m_effWarning) {
-    efficiencyStatus = std::max(good, efficiencyStatus);
+    *efficiencyStatus = std::max(good, *efficiencyStatus);
   } else if ((eff <= m_effWarning) && (eff > m_effError)) {
-    efficiencyStatus = std::max(warning, efficiencyStatus);
+    *efficiencyStatus = std::max(warning, *efficiencyStatus);
   } else if ((eff <= m_effError)) {
-    efficiencyStatus = std::max(error, efficiencyStatus);
+    *efficiencyStatus = std::max(error, *efficiencyStatus);
   }
-
-  if (sideU)
-    m_effUstatus = efficiencyStatus;
-  else
-    m_effVstatus = efficiencyStatus;
 }

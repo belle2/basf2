@@ -42,8 +42,8 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
 
   setDescription("DQM Analysis Module that produces colored canvas for a straightforward interpretation of the SVD Data Quality.");
 
-  addParam("occLevel_Error", m_occError, "Maximum Occupancy (%) allowed for safe operations (red)", double(5));
-  addParam("occLevel_Warning", m_occWarning, "Occupancy (%) at WARNING level (orange)", double(3));
+  addParam("occLevel_Error", m_occError, "Maximum Occupancy (%) allowed for safe operations (red)", double(2));
+  addParam("occLevel_Warning", m_occWarning, "Occupancy (%) at WARNING level (orange)", double(1.5));
   addParam("occLevel_Empty", m_occEmpty, "Maximum Occupancy (%) for which the sensor is considered empty", double(0));
   addParam("onlineOccLevel_Error", m_onlineOccError, "Maximum OnlineOccupancy (%) allowed for safe operations (red)", double(10));
   addParam("onlineOccLevel_Warning", m_onlineOccWarning, "OnlineOccupancy (%) at WARNING level (orange)", double(5));
@@ -196,9 +196,12 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legNormal->AddText(Form("%1.1f%% < occupancy < %1.1f%%", m_occEmpty, m_occWarning));
 
+  m_legLowStat->Clear();
+  m_legLowStat->AddText("LOW STATISTICS");
+  m_legLowStat->AddText("from at least one sensor");
+
   m_legEmpty->Clear();
-  m_legEmpty->AddText("NO DATA RECEIVED");
-  m_legEmpty->AddText("from at least one sensor");
+  m_legEmpty->AddText("at least one sensor is emtpy");
 
   //ONLINE occupancy plots legend
   m_legOnlineProblem->Clear();
@@ -259,17 +262,6 @@ void DQMHistAnalysisSVDOccupancyModule::event()
 
   //check MODULE OCCUPANCY online & offline
   //reset canvas color
-  m_occUstatus = good;
-  m_occVstatus = good;
-  m_onlineOccUstatus = good;
-  m_onlineOccVstatus = good;
-
-  m_onlineOccU3Samples = good;
-  m_onlineOccV3Samples = good;
-
-  m_occU3Samples = good;
-  m_occV3Samples = good;
-
   //update titles with exp and run number
 
   m_hOccupancy->reset();
@@ -314,16 +306,11 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy U histogram not found");
-      m_cOccupancyU->Draw();
-      m_cOccupancyU->cd();
-      m_hOccupancy->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cOccupancyU, c_StatusDefault);
-
+      setOccStatus(-1, m_occUstatus);
     } else {
       Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
       m_hOccupancy->fill(m_SVDModules[i], 1, occU);
       setOccStatus(occU, m_occUstatus);
-
       //produce the occupancy plot
       if (m_additionalPlots) {
         m_hStripOccupancyU[i].Clear();
@@ -351,10 +338,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("Occupancy U histogram not found for 3 samples");
-        m_cOccupancyU3Samples->Draw();
-        m_cOccupancyU3Samples->cd();
-        m_hOccupancy3Samples->getHistogram(1)->Draw("text");
-        colorizeCanvas(m_cOccupancyU3Samples, c_StatusDefault);
+        setOccStatus(-1, m_occU3Samples);
 
       } else {
         Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -368,10 +352,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy U histogram for group Id0 not found");
-      m_cOccupancyUGroupId0->Draw();
-      m_cOccupancyUGroupId0->cd();
-      m_hOccupancyGroupId0->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cOccupancyUGroupId0, c_StatusDefault);
+      setOccStatus(-1, m_occUGroupId0);
 
     } else {
       Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -385,10 +366,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy V histogram not found");
-      m_cOccupancyV->Draw();
-      m_cOccupancyV->cd();
-      m_hOccupancy->getHistogram(0)->Draw("text");
-      colorizeCanvas(m_cOccupancyV, c_StatusDefault);
+      setOccStatus(-1, m_occVstatus);
 
     } else {
       Float_t occV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -422,10 +400,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("Occupancy V histogram not found");
-        m_cOccupancyV3Samples->Draw();
-        m_cOccupancyV3Samples->cd();
-        m_hOccupancy3Samples->getHistogram(0)->Draw("text");
-        colorizeCanvas(m_cOccupancyV3Samples, c_StatusDefault);
+        setOccStatus(-1, m_occV3Samples);
 
       } else {
         Float_t occV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -440,10 +415,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpnameGrpId0.Data());
     if (htmp == NULL) {
       B2INFO("Occupancy U histogram for group Id0 not found");
-      m_cOccupancyVGroupId0->Draw();
-      m_cOccupancyVGroupId0->cd();
-      m_hOccupancyGroupId0->getHistogram(0)->Draw("text");
-      colorizeCanvas(m_cOccupancyVGroupId0, c_StatusDefault);
+      setOccStatus(-1, m_occVGroupId0);
 
     } else {
       Float_t occV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -457,10 +429,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("OnlineOccupancy V histogram not found");
-      m_cOnlineOccupancyV->Draw();
-      m_cOnlineOccupancyV->cd();
-      m_hOnlineOccupancy->getHistogram(0)->Draw("text");
-      colorizeCanvas(m_cOnlineOccupancyV, c_StatusDefault);
+      setOccStatus(-1, m_onlineOccVstatus);
 
     } else {
       Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -481,10 +450,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("OnlineOccupancy3 V histogram not found");
-        m_cOnlineOccupancyV3Samples->Draw();
-        m_cOnlineOccupancyV3Samples->cd();
-        m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text");
-        colorizeCanvas(m_cOnlineOccupancyV3Samples, c_StatusDefault);
+        setOccStatus(-1, m_onlineOccV3Samples);
 
       } else {
         Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -504,10 +470,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("OnlineOccupancy U histogram not found");
-      m_cOnlineOccupancyU->Draw();
-      m_cOnlineOccupancyU->cd();
-      m_hOnlineOccupancy->getHistogram(1)->Draw("text");
-      colorizeCanvas(m_cOnlineOccupancyU, c_StatusDefault);
+      setOccStatus(-1, m_onlineOccUstatus);
 
     } else {
       Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -527,10 +490,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("OnlineOccupancy3 U histogram not found");
-        m_cOnlineOccupancyU3Samples->Draw();
-        m_cOnlineOccupancyU3Samples->cd();
-        m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text");
-        colorizeCanvas(m_cOnlineOccupancyU3Samples, c_StatusDefault);
+        setOccStatus(-1, m_onlineOccU3Samples);
 
       } else {
         Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -563,53 +523,53 @@ void DQMHistAnalysisSVDOccupancyModule::event()
   //update summary offline occupancy U canvas
   m_cOccupancyU->Draw();
   m_cOccupancyU->cd();
-  m_hOccupancy->getHistogram(1)->Draw("text");
+  m_hOccupancy->getHistogram(1)->Draw("text colz");
   setStatusOfCanvas(m_occUstatus, m_cOccupancyU);
 
   if (m_3Samples) {
     //update summary offline occupancy U canvas for 3 samples
     m_cOccupancyU3Samples->Draw();
     m_cOccupancyU3Samples->cd();
-    m_hOccupancy3Samples->getHistogram(1)->Draw("text");
+    m_hOccupancy3Samples->getHistogram(1)->Draw("text colz");
     setStatusOfCanvas(m_occU3Samples, m_cOccupancyU3Samples);
   }
 
   //update summary offline occupancy U canvas for groupId0
   m_cOccupancyUGroupId0->Draw();
   m_cOccupancyUGroupId0->cd();
-  m_hOccupancyGroupId0->getHistogram(1)->Draw("text");
+  m_hOccupancyGroupId0->getHistogram(1)->Draw("text colz");
   setStatusOfCanvas(m_occUGroupId0, m_cOccupancyUGroupId0);
 
   //update summary offline occupancy V canvas
   m_cOccupancyV->Draw();
   m_cOccupancyV->cd();
-  m_hOccupancy->getHistogram(0)->Draw("text");
+  m_hOccupancy->getHistogram(0)->Draw("text colz");
   setStatusOfCanvas(m_occVstatus, m_cOccupancyV);
 
   if (m_3Samples) {
     //update summary offline occupancy V canvas for 3 samples
     m_cOccupancyV3Samples->Draw();
     m_cOccupancyV3Samples->cd();
-    m_hOccupancy3Samples->getHistogram(0)->Draw("text");
+    m_hOccupancy3Samples->getHistogram(0)->Draw("text colz");
     setStatusOfCanvas(m_occV3Samples, m_cOccupancyV3Samples);
   }
 
   //update summary offline occupancy V canvas for groupId0
   m_cOccupancyVGroupId0->Draw();
   m_cOccupancyVGroupId0->cd();
-  m_hOccupancyGroupId0->getHistogram(0)->Draw("text");
+  m_hOccupancyGroupId0->getHistogram(0)->Draw("text colz");
   setStatusOfCanvas(m_occVGroupId0, m_cOccupancyVGroupId0);
 
   //update summary online occupancy U canvas
   m_cOnlineOccupancyU->Draw();
   m_cOnlineOccupancyU->cd();
-  m_hOnlineOccupancy->getHistogram(1)->Draw("text");
+  m_hOnlineOccupancy->getHistogram(1)->Draw("text colz");
   setStatusOfCanvas(m_onlineOccUstatus, m_cOnlineOccupancyU, true, true);
 
   //update summary online occupancy V canvas
   m_cOnlineOccupancyV->Draw();
   m_cOnlineOccupancyV->cd();
-  m_hOnlineOccupancy->getHistogram(0)->Draw("text");
+  m_hOnlineOccupancy->getHistogram(0)->Draw("text colz");
   setStatusOfCanvas(m_onlineOccVstatus, m_cOnlineOccupancyV, true, true);
 
   if (m_printCanvas) {
@@ -623,13 +583,13 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     //update summary online occupancy U canvas for 3 samples
     m_cOnlineOccupancyU3Samples->Draw();
     m_cOnlineOccupancyU3Samples->cd();
-    m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text");
+    m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text colz");
     setStatusOfCanvas(m_onlineOccU3Samples, m_cOnlineOccupancyU3Samples, true, true);
 
     //update summary online occupancy V canvas for 3 samples
     m_cOnlineOccupancyV3Samples->Draw();
     m_cOnlineOccupancyV3Samples->cd();
-    m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text");
+    m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text colz");
     setStatusOfCanvas(m_onlineOccV3Samples, m_cOnlineOccupancyV3Samples, true, true);
   }
 }
@@ -692,24 +652,28 @@ Float_t DQMHistAnalysisSVDOccupancyModule::getOccupancy(float entries, int tmp_l
 void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, occStatus& occupancyStatus, bool online)
 {
   if (online) {
-    if (occupancy <= m_onlineOccEmpty) {
-      if (occupancyStatus < lowStat) occupancyStatus = lowStat;
-    } else if (occupancy > m_onlineOccWarning) {
-      if (occupancy < m_onlineOccError) {
-        if (occupancyStatus < warning) occupancyStatus = warning;
-      } else {
-        if (occupancyStatus < error) occupancyStatus = error;
-      }
+    if (occupancy < 0)
+      occupancyStatus = std::max(noStat, occupancyStatus);
+    else if (occupancy <= m_onlineOccEmpty) {
+      occupancyStatus = std::max(lowStat, occupancyStatus);
+    } else if (occupancy < m_onlineOccWarning) {
+      occupancyStatus = std::max(good, occupancyStatus);
+    } else if (occupancy > m_onlineOccWarning && occupancy < m_onlineOccError) {
+      occupancyStatus = std::max(warning, occupancyStatus);
+    } else if (occupancy >= m_onlineOccError)  {
+      occupancyStatus = std::max(error, occupancyStatus);
     }
   } else {
-    if (occupancy <= m_occEmpty) {
-      if (occupancyStatus < lowStat) occupancyStatus = lowStat;
-    } else if (occupancy > m_occWarning) {
-      if (occupancy < m_occError) {
-        if (occupancyStatus < warning) occupancyStatus = warning;
-      } else {
-        if (occupancyStatus < error) occupancyStatus = error;
-      }
+    if (occupancy < 0)
+      occupancyStatus = std::max(noStat, occupancyStatus);
+    else if (occupancy <= m_occEmpty) {
+      occupancyStatus = std::max(lowStat, occupancyStatus);
+    } else if (occupancy < m_occWarning) {
+      occupancyStatus = std::max(good, occupancyStatus);
+    } else if (occupancy > m_occWarning && occupancy < m_occError) {
+      occupancyStatus = std::max(warning, occupancyStatus);
+    } else if (occupancy >= m_occError)  {
+      occupancyStatus = std::max(error, occupancyStatus);
     }
   }
 }

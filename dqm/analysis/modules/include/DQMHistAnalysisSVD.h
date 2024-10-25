@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 //+
-// File : DQMHistAnalysisSVDClustersOnTrack.h
+// File : DQMHistAnalysisSVDModule.h
 // Description : base module for DQM histogram analysis of SVD
 //-
 

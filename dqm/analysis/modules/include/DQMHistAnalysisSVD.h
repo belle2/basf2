@@ -45,6 +45,7 @@ namespace Belle2 {
   protected:
     TPaveText* m_legProblem = nullptr;  /**< plot legend, problem */
     TPaveText* m_legNormal = nullptr;   /**< plot legend, normal */
+    TPaveText* m_legLowStat = nullptr;    /**< plot legend, low stats */
     TPaveText* m_legEmpty = nullptr;    /**< plot legend, empty */
     TPaveText* m_legWarning = nullptr;  /**< plot legend, warning */
 

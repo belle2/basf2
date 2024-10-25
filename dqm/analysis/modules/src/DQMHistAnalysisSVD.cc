@@ -76,6 +76,10 @@ DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online)
   m_legEmpty->SetFillColor(c_ColorDefault);
   m_legEmpty->SetTextColor(kBlack);
 
+  m_legLowStat = new TPaveText(x1, y1, x2, y2, "brNDC");
+  m_legLowStat->SetFillColor(c_ColorDefault);
+  m_legLowStat->SetTextColor(kBlack);
+
   if (online) {
     m_legOnlineProblem = new TPaveText(x1, y1, x2, y2, "brNDC");
     m_legOnlineProblem->SetFillColor(c_ColorDefault);
@@ -96,6 +100,7 @@ DQMHistAnalysisSVDModule::~ DQMHistAnalysisSVDModule()
   delete m_legProblem;
   delete m_legNormal;
   delete m_legWarning;
+  delete m_legLowStat;
   delete m_legEmpty;
 
   if (m_legOnlineProblem) delete m_legOnlineProblem;
@@ -138,11 +143,12 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
     }
     case lowStat: {
       colorizeCanvas(canvas, c_StatusTooFew);
-      if (plotLeg) m_legEmpty->Draw();
+      if (plotLeg) m_legLowStat->Draw();
       break;
     }
     case noStat: {
       colorizeCanvas(canvas, c_StatusDefault);
+      if (plotLeg) m_legEmpty->Draw();
       break;
     }
     default: {

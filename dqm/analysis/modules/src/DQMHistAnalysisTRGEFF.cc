@@ -107,31 +107,31 @@ void DQMHistAnalysisTRGEFFModule::initialize()
   ///////////////////////////////////////////////////////
   m_efficiencyList.clear();
   m_efficiencyList = {
-    // Histogram names, efficiency pointers, and corresponding canvases
-    {"TRGEFF/hPt_psnecl",             &m_hPt_eff,               m_cPt_eff},
-    {"TRGEFF/hPhi_psnecl",            &m_hPhi_eff,              m_cPhi_eff},
-    {"TRGEFF/nobha_hPt_psnecl",       &m_nobha_hPt_eff,         m_nobha_cPt_eff},
-    {"TRGEFF/hP3_z_psnecl",           &m_hP3_z_eff,             m_cP3_z_eff},
-    {"TRGEFF/hP3_y_psnecl",           &m_hP3_y_eff,             m_cP3_y_eff},
-    {"TRGEFF/nobha_hP3_z_psnecl",     &m_nobha_hP3_z_eff,       m_nobha_cP3_z_eff},
-    {"TRGEFF/nobha_hP3_y_psnecl",     &m_nobha_hP3_y_eff,       m_nobha_cP3_y_eff},
-    {"TRGEFF/fyo_dphi_psnecl",        &m_fyo_dphi_eff,          m_c_fyo_dphi_eff},
-    {"TRGEFF/nobha_fyo_dphi_psnecl",  &m_nobha_fyo_dphi_eff,    m_c_nobha_fyo_dphi_eff},
-    {"TRGEFF/stt_phi_psnecl",         &m_stt_phi_eff,           m_c_stt_phi_eff},
-    {"TRGEFF/stt_P3_psnecl",          &m_stt_P3_eff,            m_c_stt_P3_eff},
-    {"TRGEFF/stt_theta_psnecl",       &m_stt_theta_eff,         m_c_stt_theta_eff},
-    {"TRGEFF/nobha_stt_phi_psnecl",   &m_nobha_stt_phi_eff,     m_c_nobha_stt_phi_eff},
-    {"TRGEFF/nobha_stt_P3_psnecl",    &m_nobha_stt_P3_eff,      m_c_nobha_stt_P3_eff},
-    {"TRGEFF/nobha_stt_theta_psnecl", &m_nobha_stt_theta_eff,   m_c_nobha_stt_theta_eff},
-    {"TRGEFF/hie_E_psnecl",           &m_hie_E_eff,             m_c_hie_E_eff},
-    {"TRGEFF/nobha_hie_E_psnecl",     &m_nobha_hie_E_eff,       m_c_nobha_hie_E_eff},
-    {"TRGEFF/ecltiming_E_psnecl",     &m_ecltiming_E_eff,       m_c_ecltiming_E_eff},
-    {"TRGEFF/ecltiming_theta_psnecl", &m_ecltiming_theta_eff,   m_c_ecltiming_theta_eff},
-    {"TRGEFF/ecltiming_phi_psnecl",   &m_ecltiming_phi_eff,     m_c_ecltiming_phi_eff},
-    {"TRGEFF/klmhit_phi_psnecl",      &m_klmhit_phi_eff,        m_c_klmhit_phi_eff},
-    {"TRGEFF/klmhit_theta_psnecl",    &m_klmhit_theta_eff,      m_c_klmhit_theta_eff},
-    {"TRGEFF/eklmhit_phi_psnecl",     &m_eklmhit_phi_eff,       m_c_eklmhit_phi_eff},
-    {"TRGEFF/eklmhit_theta_psnecl",   &m_eklmhit_theta_eff,     m_c_eklmhit_theta_eff}
+    // Histogram names, efficiency pointers,  corresponding canvases and title
+    {"TRGEFF/hPt_psnecl",             &m_hPt_eff,               m_cPt_eff, "f with Pt [GeV]"},
+    {"TRGEFF/hPhi_psnecl",            &m_hPhi_eff,              m_cPhi_eff, "f with #phi [degree]"},
+    {"TRGEFF/nobha_hPt_psnecl",       &m_nobha_hPt_eff,         m_nobha_cPt_eff, "nobha f with Pt [GeV]"},
+    {"TRGEFF/hP3_z_psnecl",           &m_hP3_z_eff,             m_cP3_z_eff, "z with P [GeV]"},
+    {"TRGEFF/hP3_y_psnecl",           &m_hP3_y_eff,             m_cP3_y_eff, "y with P [GeV]"},
+    {"TRGEFF/nobha_hP3_z_psnecl",     &m_nobha_hP3_z_eff,       m_nobha_cP3_z_eff, "nobha z with P [GeV]"},
+    {"TRGEFF/nobha_hP3_y_psnecl",     &m_nobha_hP3_y_eff,       m_nobha_cP3_y_eff, "nobha y with P [GeV]"},
+    {"TRGEFF/fyo_dphi_psnecl",        &m_fyo_dphi_eff,          m_c_fyo_dphi_eff, "fyo with #Delta#phi [degree]"},
+    {"TRGEFF/nobha_fyo_dphi_psnecl",  &m_nobha_fyo_dphi_eff,    m_c_nobha_fyo_dphi_eff, "nobha fyo with #Delta#phi [degree]"},
+    {"TRGEFF/stt_phi_psnecl",         &m_stt_phi_eff,           m_c_stt_phi_eff, "stt with #phi [degree]"},
+    {"TRGEFF/stt_P3_psnecl",          &m_stt_P3_eff,            m_c_stt_P3_eff, "stt with P [GeV]"},
+    {"TRGEFF/stt_theta_psnecl",       &m_stt_theta_eff,         m_c_stt_theta_eff, "stt with #theta [degree]"},
+    {"TRGEFF/nobha_stt_phi_psnecl",   &m_nobha_stt_phi_eff,     m_c_nobha_stt_phi_eff, "nobha stt with #phi [degree]"},
+    {"TRGEFF/nobha_stt_P3_psnecl",    &m_nobha_stt_P3_eff,      m_c_nobha_stt_P3_eff, "nobha stt with P [GeV]"},
+    {"TRGEFF/nobha_stt_theta_psnecl", &m_nobha_stt_theta_eff,   m_c_nobha_stt_theta_eff, "nobha stt with #theta [degree]"},
+    {"TRGEFF/hie_E_psnecl",           &m_hie_E_eff,             m_c_hie_E_eff, "hie with E [GeV]"},
+    {"TRGEFF/nobha_hie_E_psnecl",     &m_nobha_hie_E_eff,       m_c_nobha_hie_E_eff, "nobha hie with E [GeV]"},
+    {"TRGEFF/ecltiming_E_psnecl",     &m_ecltiming_E_eff,       m_c_ecltiming_E_eff, "ecltiming with E [GeV]"},
+    {"TRGEFF/ecltiming_theta_psnecl", &m_ecltiming_theta_eff,   m_c_ecltiming_theta_eff, "ecltiming with #theta [degree]"},
+    {"TRGEFF/ecltiming_phi_psnecl",   &m_ecltiming_phi_eff,     m_c_ecltiming_phi_eff, "ecltiming with #phi [degree]"},
+    {"TRGEFF/klmhit_phi_psnecl",      &m_klmhit_phi_eff,        m_c_klmhit_phi_eff, "klmhit with #phi [degree]"},
+    {"TRGEFF/klmhit_theta_psnecl",    &m_klmhit_theta_eff,      m_c_klmhit_theta_eff, "klmhit with #theta [degree]"},
+    {"TRGEFF/eklmhit_phi_psnecl",     &m_eklmhit_phi_eff,       m_c_eklmhit_phi_eff, "eklmhit with #phi [degree]"},
+    {"TRGEFF/eklmhit_theta_psnecl",   &m_eklmhit_theta_eff,     m_c_eklmhit_theta_eff, "eklmhit with #theta [degree]"}
 
     // Add more entries as needed
   };
@@ -155,6 +155,7 @@ void DQMHistAnalysisTRGEFFModule::event()
     const std::string& name     = std::get<0>(entry);   // Get the histogram name
     TEfficiency** efficiencyPtr = std::get<1>(entry);   // Get the efficiency pointer
     TCanvas* canvas = std::get<2>(entry);               // Get the canvas pointer
+    const std::string& title    = std::get<3>(entry);   // Get the histogram title
 
     B2DEBUG(1, "The current histogram name is   " << name);  // Debug print
     TH1F* hist = (TH1F*)findHist(name);
@@ -173,6 +174,7 @@ void DQMHistAnalysisTRGEFFModule::event()
     // Check consistency and create a new TEfficiency
     if (TEfficiency::CheckConsistency(*histFtdf, *hist)) {
       *efficiencyPtr = new TEfficiency(*histFtdf, *hist);
+      (*efficiencyPtr)->SetTitle(title.c_str());
 
       // Draw efficiency on canvas and update it
       canvas->Clear();

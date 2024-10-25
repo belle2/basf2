@@ -98,8 +98,11 @@ void DQMHistAnalysisSVDClustersOnTrackModule::beginRun()
   m_legNormal->AddText("TIME SHIFT UNDER LIMIT");
   m_legNormal->AddText(Form("abs(Mean) < %3.1f ns", m_timeThreshold));
 
+  m_legLowStat->Clear();
+  m_legLowStat->AddText("Not enough statistics");
+
   m_legEmpty->Clear();
-  m_legEmpty->AddText("Not enough statistics");
+  m_legEmpty->AddText("No data recieved");
 }
 
 void DQMHistAnalysisSVDClustersOnTrackModule::event()

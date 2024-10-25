@@ -546,7 +546,6 @@ TH2Poly* DQMHistAnalysisCDCEpicsModule::createEffiTH2Poly(const TString& name, c
       hist->AddBin(4, xx, yy);
     }
   }
-  hist->SetNameTitle(name, title);
   return hist;
 }
 

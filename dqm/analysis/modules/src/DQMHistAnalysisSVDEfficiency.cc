@@ -281,6 +281,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   Float_t effV = -1;
   Float_t erreffU = -1;
   Float_t erreffV = -1;
+  Float_t minEff = 99999;
 
   // Efficiency for the U and V sides
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
@@ -302,6 +303,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denU = found_tracksU->GetBinContent(bin);
       if (denU > 0)
         effU = numU / denU;
+      if (effU < minEff) minEff = effU;
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       if (denU > 0)
@@ -312,7 +314,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denV = found_tracksV->GetBinContent(bin);
       if (denV > 0)
         effV = numV / denV;
-
+      if (effV < minEff) minEff = effV;
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       if (denV > 0)
@@ -339,15 +341,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   // update summary for U side
   m_cEfficiencyU->Draw();
   m_cEfficiencyU->cd();
-  if (m_hEfficiency)
+  if (m_hEfficiency) {
+    if (!m_setEfficiencyRange) m_hEfficiency->setMinimum(minEff * 99.9);
     m_hEfficiency->getHistogram(1)->Draw("text colz");
+  }
   setStatusOfCanvas(m_effUstatus, m_cEfficiencyU, true);
-
-//   setEpicsPV("EfficiencyUAlarm", alarm);
-
-  m_cEfficiencyU->Update();
-  m_cEfficiencyU->Modified();
-  m_cEfficiencyU->Update();
 
   m_cEfficiencyRPhiViewU->Draw();
   m_cEfficiencyRPhiViewU->cd();
@@ -358,20 +356,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
   setStatusOfCanvas(m_effUstatus, m_cEfficiencyRPhiViewU, false);
 
-  m_cEfficiencyRPhiViewU->Update();
-  m_cEfficiencyRPhiViewU->Modified();
-  m_cEfficiencyRPhiViewU->Update();
-
   // update summary for V side
   m_cEfficiencyV->cd();
   m_cEfficiencyV->Draw();
   if (m_hEfficiency)
     m_hEfficiency->getHistogram(0)->Draw("text colz");
   setStatusOfCanvas(m_effVstatus, m_cEfficiencyV, true);
-
-  m_cEfficiencyV->Update();
-  m_cEfficiencyV->Modified();
-  m_cEfficiencyV->Update();
 
   m_cEfficiencyRPhiViewV->cd();
   m_cEfficiencyRPhiViewV->Draw();
@@ -383,37 +373,37 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV, false);
 
   m_cEfficiencyErrU->cd();
+  m_cEfficiencyErrU->Draw();
   if (m_hEfficiencyErr)
     m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
-  m_cEfficiencyErrU->Draw();
   m_cEfficiencyErrU->Update();
   m_cEfficiencyErrU->Modified();
   m_cEfficiencyErrU->Update();
 
   m_cEfficiencyErrRPhiViewU->cd();
+  m_cEfficiencyErrRPhiViewU->Draw();
   if (m_hEfficiencyErr) {
     m_hEfficiencyErr->getPoly(1, 0)->Draw("colz l");
     drawText();
   }
-  m_cEfficiencyErrRPhiViewU->Draw();
   m_cEfficiencyErrRPhiViewU->Update();
   m_cEfficiencyErrRPhiViewU->Modified();
   m_cEfficiencyErrRPhiViewU->Update();
 
   m_cEfficiencyErrV->cd();
+  m_cEfficiencyErrV->Draw();
   if (m_hEfficiencyErr)
     m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
-  m_cEfficiencyErrV->Draw();
   m_cEfficiencyErrV->Update();
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
 
   m_cEfficiencyErrRPhiViewV->cd();
+  m_cEfficiencyErrRPhiViewV->Draw();
   if (m_hEfficiencyErr) {
     m_hEfficiencyErr->getPoly(0, 0)->Draw("colz l");
     drawText();
   }
-  m_cEfficiencyErrRPhiViewV->Draw();
   m_cEfficiencyErrRPhiViewV->Update();
   m_cEfficiencyErrRPhiViewV->Modified();
   m_cEfficiencyErrRPhiViewV->Update();
@@ -445,6 +435,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denU = found3_tracksU->GetBinContent(bin);
         if (denU > 0)
           effU = numU / denU;
+        if (effU < minEff) minEff = effU;
         B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         if (denU > 0)
@@ -456,6 +447,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denV = found3_tracksV->GetBinContent(bin);
         if (denV > 0)
           effV = numV / denV;
+        if (effV < minEff) minEff = effV;
         B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         if (denV > 0)
@@ -482,8 +474,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     // update summary for U side
     m_cEfficiencyU3Samples->Draw();
     m_cEfficiencyU3Samples->cd();
-    if (m_hEfficiency3Samples)
-      m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+    if (m_hEfficiency3Samples) {
+      if (!m_setEfficiencyRange) m_hEfficiency->setMinimum(minEff * 99.9);
+      m_hEfficiency3Samples->getHistogram(1)->Draw("text colz");
+    }
     setStatusOfCanvas(m_effUstatus, m_cEfficiencyV3Samples, true);
 
     m_cEfficiencyRPhiViewU3Samples->Draw();
@@ -503,7 +497,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyV3Samples->Draw();
     m_cEfficiencyV3Samples->cd();
     if (m_hEfficiency3Samples)
-      m_hEfficiency3Samples->getHistogram(0)->Draw("text");
+      m_hEfficiency3Samples->getHistogram(0)->Draw("text colz");
     setStatusOfCanvas(m_effVstatus, m_cEfficiencyV3Samples, true);
 
     m_cEfficiencyRPhiViewV3Samples->Draw();
@@ -516,12 +510,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV3Samples, false);
 
     m_cEfficiencyErrU3Samples->cd();
+    m_cEfficiencyErrU3Samples->Draw();
     if (m_hEfficiencyErr3Samples)
       m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
-    m_cEfficiencyErrU3Samples->Draw();
-    m_cEfficiencyErrU3Samples->Update();
-    m_cEfficiencyErrU3Samples->Modified();
-    m_cEfficiencyErrU3Samples->Update();
 
     m_cEfficiencyErrRPhiViewU3Samples->cd();
     if (m_hEfficiencyErr3Samples) {
@@ -534,9 +525,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyErrRPhiViewU3Samples->Update();
 
     m_cEfficiencyErrV3Samples->cd();
+    m_cEfficiencyErrV3Samples->Draw();
     if (m_hEfficiencyErr3Samples)
       m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
-    m_cEfficiencyErrV3Samples->Draw();
     m_cEfficiencyErrV3Samples->Update();
     m_cEfficiencyErrV3Samples->Modified();
     m_cEfficiencyErrV3Samples->Update();

@@ -85,28 +85,29 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
   c_hist_attach_eff[1] = new TCanvas("CDC/c_hist_expected_wires", "c_hist_expected_wires", 403, 400);
   c_hist_attach_eff[2] = new TCanvas("CDC/c_hist_attach_eff", "c_hist_attach_eff", 403, 400);
   c_hist_attach_eff[3] = new TCanvas("CDC/c_hist_attach_eff_1d", "c_hist_attach_eff_1d", 403, 400);
-  static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
-  int nSLayers = cdcgeo.getNumberOfSenseLayers();
-  double layerR = cdcgeo.senseWireR(nSLayers - 1);
   if (m_doTH2PolyTrackingWireEff) {
-    m_hist_attach_eff_Poly[0] = createEffiTH2Poly("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin");
+    m_hist_attach_eff_Poly[0] = createEffiTH2Poly("CDC/hist_attachedWires",
+                                                  "hist_attachedWires (backplate view);X [cm];Y [cm]; Track / bin");
     m_hist_attach_eff_Poly[0]->GetYaxis()->SetTitleOffset(1.4);
     m_hist_attach_eff_Poly[0]->SetDirectory(gDirectory);
     m_hist_attach_eff_Poly[1] = (TH2Poly*)m_hist_attach_eff_Poly[0]->Clone();
-    m_hist_attach_eff_Poly[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires;X [cm];Y [cm]; Track / bin");
+    m_hist_attach_eff_Poly[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires (backplate view);X [cm];Y [cm]; Track / bin");
     m_hist_attach_eff_Poly[1]->SetDirectory(gDirectory);
     m_hist_attach_eff_Poly[2] = (TH2Poly*)m_hist_attach_eff_Poly[0]->Clone();
-    m_hist_attach_eff_Poly[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff;X [cm];Y [cm]; Efficiency");
+    m_hist_attach_eff_Poly[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff (backplate view);X [cm];Y [cm]; Efficiency");
     m_hist_attach_eff_Poly[2]->SetDirectory(gDirectory);
   } else {
-    m_hist_attach_eff[0] = new TH2F("CDC/hist_attachedWires", "hist_attachedWires;X [cm];Y [cm]; Track / bin",
-                                    nSLayers * 6, -layerR * 1.02, layerR * 1.02,
-                                    nSLayers * 6, -layerR * 1.02, layerR * 1.02);
+    static CDC::CDCGeometryPar& cdcgeo = CDC::CDCGeometryPar::Instance();
+    int nSLayers = cdcgeo.getNumberOfSenseLayers();
+    double maxLayerR = cdcgeo.senseWireR(nSLayers - 1);
+    m_hist_attach_eff[0] = new TH2F("CDC/hist_attachedWires", "hist_attachedWires (backplate view);X [cm];Y [cm]; Track / bin",
+                                    nSLayers * 6, -maxLayerR * 1.02, maxLayerR * 1.02,
+                                    nSLayers * 6, -maxLayerR * 1.02, maxLayerR * 1.02);
     m_hist_attach_eff[0]->GetYaxis()->SetTitleOffset(1.4);
     m_hist_attach_eff[1] = (TH2F*)m_hist_attach_eff[0]->Clone();
-    m_hist_attach_eff[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires;X [cm];Y [cm]; Track / bin");
+    m_hist_attach_eff[1]->SetNameTitle("CDC/hist_expectedWires", "hist_expectedWires (backplate view);X [cm];Y [cm]; Track / bin");
     m_hist_attach_eff[2] = (TH2F*)m_hist_attach_eff[0]->Clone();
-    m_hist_attach_eff[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff;X [cm];Y [cm]; Efficiency");
+    m_hist_attach_eff[2]->SetNameTitle("CDC/hist_wireAttachEff", "hist_wireAttachEff (backplate view);X [cm];Y [cm]; Efficiency");
   }
   m_hist_wire_attach_eff_1d = new TH1F("CDC/hist_wire_attach_eff_1d", "hist_wire_attach_eff_1d;Wire Efficiency;Wire / bin",
                                        208, -0.02, 1.02);

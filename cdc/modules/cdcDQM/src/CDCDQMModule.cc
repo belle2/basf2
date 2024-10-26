@@ -74,7 +74,7 @@ void CDCDQMModule::defineHisto()
   m_hPhiNCDC = new TH2F("hPhiNCDC", "hPhiNCDC", 45, -180.0, 180.0, 61, -0.5, 60.5);
   m_hPhiNCDC->SetTitle("nCDCHits vs #phi;Track-#phi;nCDCHits;Track / bin");
   m_hTrackingWireEff = new TH2F("hTrackingWireEff", "title", 400, 0.5, 400 + 0.5, 56 * 2, -0.5, 56 * 2 - 0.5);
-  m_hTrackingWireEff->SetTitle("Attached vs Expected hits for all layers;wire;layer;Track / bin");
+  m_hTrackingWireEff->SetTitle("Attached vs Expected wires for all layers (backplate view);wire;layer;Track / bin");
   oldDir->cd();
 }
 
@@ -218,7 +218,7 @@ void CDCDQMModule::event()
         if (result.Z() > cdcgeo.senseWireFZ(lay) || result.Z() < cdcgeo.senseWireBZ(lay)) continue;
         // get phi of extrapolation and fill
         double phi = getShiftedPhi(result, lay);
-        int fillXbin = findThetaBin(phi, lay);
+        int fillXbin = findPhiBin(phi, lay);
         m_hTrackingWireEff->Fill(fillXbin, lay);
         if (hitInSLayer.count(lay)) // if hit is attached in this layer
           m_hTrackingWireEff->Fill(fillXbin, lay + nSLayers);
@@ -289,7 +289,7 @@ void CDCDQMModule::terminate()
 {
 }
 
-int CDCDQMModule::findThetaBin(double phi, const int& lay)
+int CDCDQMModule::findPhiBin(double phi, const int& lay)
 {
   static CDCGeometryPar& cdcgeo = CDCGeometryPar::Instance();
   int nWires = cdcgeo.nWiresInLayer(lay);
@@ -319,9 +319,8 @@ double CDCDQMModule::getShiftedPhi(const ROOT::Math::XYZVector& position, const 
       double R = cdcgeo.senseWireR(lay);
       double phiSize = 2 * TMath::Pi() / nWires;
       double phiF = phiSize * 0.5 * nShifts;
-      double phiB = 0;
       B2Vector3D f(R * TMath::Cos(phiF), R * TMath::Sin(phiF), fZ);
-      B2Vector3D b(R * TMath::Cos(phiB), R * TMath::Sin(phiB), bZ);
+      B2Vector3D b(R, 0, bZ);
       B2Vector3D v = f - b;
       B2Vector3D u = v.Unit();
       double beta = (position.Z() - b.Z()) / u.Z();

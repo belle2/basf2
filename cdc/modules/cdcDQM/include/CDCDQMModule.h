@@ -94,7 +94,7 @@ namespace Belle2 {
      * Find bin corresponds to a specific phi in a layer
      * phi must be in [0,2pi]
      */
-    int findThetaBin(double phi, const int& lay);
+    int findPhiBin(double phi, const int& lay);
 
   protected:
 

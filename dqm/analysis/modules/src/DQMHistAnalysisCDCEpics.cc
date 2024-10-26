@@ -128,7 +128,7 @@ void DQMHistAnalysisCDCEpicsModule::initialize()
     addDeltaPar(m_histoDir, m_histoHitsPhi, HistDelta::c_Entries, m_minevt, 1);
 
   if (!hasDeltaPar(m_histoDir, m_histoTrackingWireEff))
-    addDeltaPar(m_histoDir, m_histoTrackingWireEff, HistDelta::c_Entries, m_minevt, 1);
+    addDeltaPar(m_histoDir, m_histoTrackingWireEff, HistDelta::c_Events, m_minevt, 1);
 
   registerEpicsPV(m_pvPrefix + "cdcboards_wadc", "adcboards");
   registerEpicsPV(m_pvPrefix + "cdcboards_wtdc", "tdcboards");

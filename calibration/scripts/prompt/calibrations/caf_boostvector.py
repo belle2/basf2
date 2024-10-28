@@ -12,6 +12,10 @@ Airflow script to perform BoostVector calibration.
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_beamspot import settings as beamspot
+from prompt.calibrations.caf_ecms import is_cDST_file
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+import rawdata as rd
+import reconstruction as re
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -28,7 +32,8 @@ settings = CalibrationSettings(
         INPUT_DATA_FILTERS["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
-        "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)"},
+        "innerLoss": "pow(rawTime - 8.0, 2) + 10 * pow(maxGap, 2)",
+        "minPXDhits": 0},
     depends_on=[beamspot])
 
 ##############################
@@ -71,6 +76,8 @@ def get_calibrations(input_data, **kwargs):
     input_files_physics = list(reduced_file_to_iov_physics.keys())
     basf2.B2INFO(f"Total number of files actually used as input = {len(input_files_physics)}")
 
+    isCDST = is_cDST_file(input_files_physics[0]) if len(input_files_physics) > 0 else True
+
     # Get the overall IoV we our process should cover. Includes the end values that we may want to ignore since our output
     # IoV should be open ended. We could also use this as part of the input data selection in some way.
     requested_iov = kwargs.get("requested_iov", None)
@@ -93,15 +100,20 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
-    from reconstruction import prepare_cdst_analysis
+    # from reconstruction import prepare_cdst_analysis
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
+    if isCDST:
+        rec_path_1.add_module("RootInput", branchNames=ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
+        rd.add_unpackers(rec_path_1)
+        re.add_reconstruction(rec_path_1)
 
+    minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
     vertex.treeFit('Upsilon(4S):BV', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)

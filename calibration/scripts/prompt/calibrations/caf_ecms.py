@@ -12,7 +12,7 @@ Airflow script to perform eCMS calibration (combination of the had-B and mumu me
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
-from hlt.softwaretrigger.scripts.softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
 # from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 import rawdata as rd
 import reconstruction as re
@@ -58,7 +58,8 @@ settings = CalibrationSettings(
         "innerLoss": "pow(0.000120e0*rawTime, 2) +  1./nEv",
         "runHadB": True,
         "eCMSmumuSpread": 5.2e-3,
-        "eCMSmumuShift": 10e-3},
+        "eCMSmumuShift": 10e-3,
+        "minPXDhits": 0},
     depends_on=[boostvector])
 
 ##############################
@@ -207,7 +208,7 @@ def get_hadB_path(isCDST):
     return rec_path_1
 
 
-def get_mumu_path(isCDST):
+def get_mumu_path(isCDST, kwargs):
     """ Selects the ee -> mumu events, function returns corresponding path  """
 
     # module to be run prior the collector
@@ -217,9 +218,10 @@ def get_mumu_path(isCDST):
         rd.add_unpackers(rec_path_1)
         re.add_reconstruction(rec_path_1)
 
+    minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
 
     ma.fillParticleList('mu+:BV', muSelection, path=rec_path_1)
     ma.reconstructDecay('Upsilon(4S):BV -> mu+:BV mu-:BV', '9.5<M<11.5', path=rec_path_1)
@@ -310,7 +312,7 @@ def get_calibrations(input_data, **kwargs):
     isCDST_mumu = is_cDST_file((input_files_MuMu4S + input_files_MuMuOff)[0])
 
     rec_path_HadB = get_hadB_path(isCDST_had)
-    rec_path_MuMu = get_mumu_path(isCDST_mumu)
+    rec_path_MuMu = get_mumu_path(isCDST_mumu, kwargs)
 
     collector_HadB = register_module('EcmsCollector')
     collector_MuMu = register_module('BoostVectorCollector', Y4SPListName='Upsilon(4S):BV')

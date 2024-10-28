@@ -98,7 +98,7 @@ def get_calibrations(input_data, **kwargs):
     minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += f' and nPXDHits >={minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >= {minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
 

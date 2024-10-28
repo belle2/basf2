@@ -20,20 +20,36 @@ _RegisteredSkims = [
     # --- Flagged skims ---
     ("21000100", "flagged", "f_SLME_p1"),
     ("21000200", "flagged", "f_SLME_p2"),
+    ("21000300", "flagged", "f_SLME_p3"),
+    ("21000400", "flagged", "f_SLME_p4"),
     ("22000100", "flagged", "f_EWP_p1"),
     ("22000200", "flagged", "f_EWP_p2"),
+    ("22000300", "flagged", "f_EWP_p3"),
+    ("22000400", "flagged", "f_EWP_p4"),
     ("23000100", "flagged", "f_TDCPV_p1"),
     ("23000200", "flagged", "f_TDCPV_p2"),
+    ("23000300", "flagged", "f_TDCPV_p3"),
+    ("23000400", "flagged", "f_TDCPV_p4"),
     ("24000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
     ("24000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
+    ("24000300", "flagged", "f_bhadronic_p3"),  # btocharmless is included here
+    ("24000400", "flagged", "f_bhadronic_p4"),  # btocharmless is included here
     ("25000100", "flagged", "f_quarkonium_p1"),
     ("25000200", "flagged", "f_quarkonium_p2"),
+    ("25000300", "flagged", "f_quarkonium_p3"),
+    ("25000400", "flagged", "f_quarkonium_p4"),
     ("27000100", "flagged", "f_charm_p1"),
     ("27000200", "flagged", "f_charm_p2"),
+    ("27000300", "flagged", "f_charm_p3"),
+    ("27000400", "flagged", "f_charm_p4"),
     ("28000100", "flagged", "f_dark_p1"),
     ("28000200", "flagged", "f_dark_p2"),
+    ("28000300", "flagged", "f_dark_p3"),
+    ("28000400", "flagged", "f_dark_p4"),
     ("29000100", "flagged", "f_tau_p1"),
     ("29000200", "flagged", "f_tau_p2"),
+    ("29000300", "flagged", "f_tau_p3"),
+    ("29000400", "flagged", "f_tau_p4"),
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),

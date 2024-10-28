@@ -27,7 +27,8 @@ settings = CalibrationSettings(
             INPUT_DATA_FILTERS["Magnet"]["On"]]},
     expert_config={
         "outerLoss": "pow(rawTime - 2.0, 2) + 10 * pow(maxGap, 2)",
-        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)"},
+        "innerLoss": "pow(rawTime - 0.5, 2) + 10 * pow(maxGap, 2)",
+        "minPXDhits": 0},
     depends_on=[])
 
 ##############################
@@ -94,9 +95,10 @@ def get_calibrations(input_data, **kwargs):
     # module to be run prior the collector
     rec_path_1 = create_path()
 
+    minPXDhits = kwargs['expert_config']['minPXDhits']
     muSelection = '[p>1.0]'
     muSelection += ' and abs(dz)<2.0 and abs(dr)<0.5'
-    muSelection += ' and nPXDHits >=1 and nSVDHits >= 8 and nCDCHits >= 20'
+    muSelection += f' and nPXDHits >={minPXDhits} and nSVDHits >= 8 and nCDCHits >= 20'
     ana.fillParticleList('mu+:BS', muSelection, path=rec_path_1)
     ana.reconstructDecay('Upsilon(4S):BS -> mu+:BS mu-:BS', '9.5<M<11.5', path=rec_path_1)
 

@@ -429,7 +429,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("OnlineOccupancy V histogram not found");
-      setOccStatus(-1, m_onlineOccVstatus);
+      setOccStatus(-1, m_onlineOccVstatus, true);
 
     } else {
       Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -440,7 +440,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       }
       htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
 
-      setOccStatus(onlineOccV, m_onlineOccVstatus);
+      setOccStatus(onlineOccV, m_onlineOccVstatus, true);
     }
 
     if (m_3Samples) {
@@ -450,7 +450,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("OnlineOccupancy3 V histogram not found");
-        setOccStatus(-1, m_onlineOccV3Samples);
+        setOccStatus(-1, m_onlineOccV3Samples, true);
 
       } else {
         Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -460,7 +460,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
           htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
         }
         htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-        setOccStatus(onlineOccV, m_onlineOccV3Samples);
+        setOccStatus(onlineOccV, m_onlineOccV3Samples, true);
       }
     }
 
@@ -470,7 +470,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("OnlineOccupancy U histogram not found");
-      setOccStatus(-1, m_onlineOccUstatus);
+      setOccStatus(-1, m_onlineOccUstatus, true);
 
     } else {
       Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -480,7 +480,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
       htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-      setOccStatus(onlineOccU, m_onlineOccUstatus);
+      setOccStatus(onlineOccU, m_onlineOccUstatus, true);
     }
 
     if (m_3Samples) {
@@ -490,7 +490,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("OnlineOccupancy3 U histogram not found");
-        setOccStatus(-1, m_onlineOccU3Samples);
+        setOccStatus(-1, m_onlineOccU3Samples, true);
 
       } else {
         Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -500,7 +500,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
           htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
         }
         htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-        setOccStatus(onlineOccU, m_onlineOccU3Samples);
+        setOccStatus(onlineOccU, m_onlineOccU3Samples, true);
       }
     }
 

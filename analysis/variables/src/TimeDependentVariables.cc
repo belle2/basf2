@@ -88,6 +88,26 @@ namespace Belle2 {
       return vert->getMCTagVertex().Z();
     }
 
+    double particleTagVcovM(const Particle* particle, const std::vector<double>& element)
+    {
+      int elementI = int(std::lround(element[0]));
+      int elementJ = int(std::lround(element[1]));
+
+      if (elementI < 0 || elementI > 2) {
+        B2WARNING("Index is out of boundaries [0 - 2]:" << LogVar("i", elementI));
+        return Const::doubleNaN;
+      }
+      if (elementJ < 0 || elementJ > 2) {
+        B2WARNING("Index is out of boundaries [0 - 2]:" << LogVar("j", elementJ));
+        return Const::doubleNaN;
+      }
+
+      auto* vert = particle->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      TMatrixDSym TagVErr = vert->getTagVertexErrMatrix();
+      return TagVErr(elementI, elementJ);
+    }
+
     double particleTagVxErr(const Particle* particle)
     {
       auto* vert = particle->getRelatedTo<TagVertex>();
@@ -466,6 +486,27 @@ namespace Belle2 {
       return DistanceTools::trackToVtxDist(tagParticle->getTrackFitResult()->getPosition(),
                                            tagParticle->getMomentum(),
                                            vert->getConstraintCenter());
+    }
+
+    double getY4Sx(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      return vert->getConstraintCenter().X();
+    }
+
+    double getY4Sy(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      return vert->getConstraintCenter().Y();
+    }
+
+    double getY4Sz(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      return vert->getConstraintCenter().Z();
     }
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
@@ -899,6 +940,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty\n\n", "cm");
+    REGISTER_VARIABLE("TagVcovM(i,j)", particleTagVcovM,
+                      "returns the (i,j)-th element of the TagV Covariance Matrix (3x3).\n"
+                      "Order of elements in the covariance matrix is: x, y, z.\n\n", "cm, cm, cm");
+
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
     REGISTER_VARIABLE("TagVNTracks", particleTagVNTracks, "Number of tracks in the tag vertex");
     REGISTER_VARIABLE("TagVType", particleTagVType,
@@ -965,6 +1010,10 @@ namespace Belle2 {
                       "Returns the error of the vertex in the boost direction\n\n", "cm");
     REGISTER_VARIABLE("OBoostErr", vertexErrOrthBoostDirection,
                       "Returns the error of the vertex in the direction orthogonal to the boost\n\n", "cm");
+
+    REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns x-component of Y4S vtx", "cm");
+    REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns y-component of Y4S vtx", "cm");
+    REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns z-component of Y4S vtx", "cm");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
                       "Returns the TagV component in the boost direction\n\n", "cm");

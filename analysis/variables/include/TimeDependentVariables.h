@@ -40,6 +40,9 @@ namespace Belle2 {
      */
     double particleTagVz(const Particle* particle);
 
+    double getY4Sx(const Particle* part);
+    double getY4Sy(const Particle* part);
+    double getY4Sz(const Particle* part);
 
     /**
      * return MC X component of the tag vertex

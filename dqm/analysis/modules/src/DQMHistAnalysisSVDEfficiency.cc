@@ -32,7 +32,7 @@ REG_MODULE(DQMHistAnalysisSVDEfficiency);
 //-----------------------------------------------------------------
 
 DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
-  : DQMHistAnalysisModule(),
+  : DQMHistAnalysisSVDModule(),
     m_effUstatus(good),
     m_effVstatus(good)
 {
@@ -41,7 +41,6 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
 
   setDescription("DQM Analysis Module that computes the average SVD sensor efficiency.");
 
-  addParam("RefHistoFile", m_refFileName, "Reference histogram file name", std::string("SVDrefHisto.root"));
   addParam("effLevel_Error", m_effError, "Efficiency error (%) level (red)", double(0.9));
   addParam("effLevel_Warning", m_effWarning, "Efficiency WARNING (%) level (orange)", double(0.94));
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", double(100));
@@ -55,38 +54,15 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
            int(-1111)); //-1111 set the maximum depending on the content
 }
 
-DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule() { }
+DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule()
+{
+
+}
 
 void DQMHistAnalysisSVDEfficiencyModule::initialize()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: initialize");
 
-  //build the legend
-  m_legProblem = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
-  m_legProblem->AddText("ERROR!");
-  m_legProblem->AddText("at least one sensor with:");
-  m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
-  m_legProblem->SetFillColor(c_ColorDefault);
-  m_legProblem->SetTextColor(kBlack);
-
-  m_legWarning = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
-  m_legWarning->AddText("WARNING!");
-  m_legWarning->AddText("at least one sensor with:");
-  m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
-  m_legWarning->SetFillColor(c_ColorDefault);
-  m_legWarning->SetTextColor(kBlack);
-
-  m_legNormal = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
-  m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
-  m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
-  m_legNormal->SetFillColor(c_ColorDefault);
-  m_legNormal->SetTextColor(kBlack);
-
-  m_legEmpty = new TPaveText(0.62, 0.22, 0.88, 0.35, "brNDC");
-  m_legEmpty->AddText("Not enough statistics,");
-  m_legEmpty->AddText("check again in a few minutes");
-  m_legEmpty->SetFillColor(c_ColorDefault);
-  m_legEmpty->SetTextColor(kBlack);
 
   const VXD::GeoCache& geo = VXD::GeoCache::getInstance();
 
@@ -231,6 +207,28 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
   B2DEBUG(10, " SVD efficiency thresholds taken from EPICS configuration file:");
   B2DEBUG(10, "  EFFICIENCY: normal > " << m_effWarning << " > warning > " << m_effError << " > error with minimum statistics of " <<
           m_statThreshold);
+
+  //build the legend
+  m_legProblem->Clear();
+  m_legProblem->AddText("ERROR!");
+  m_legProblem->AddText("at least one sensor with:");
+  m_legProblem->AddText(Form("efficiency < %1.0f%%", m_effError * 100));
+
+  m_legWarning->Clear();
+  m_legWarning->AddText("WARNING!");
+  m_legWarning->AddText("at least one sensor with:");
+  m_legWarning->AddText(Form("%1.0f%% < efficiency < %1.0f%%", m_effError * 100, m_effWarning * 100));
+
+  m_legNormal->Clear();
+  m_legNormal->AddText("EFFICIENCY WITHIN LIMITS");
+  m_legNormal->AddText(Form("efficiency > %1.0f%%", m_effWarning * 100));
+
+  m_legLowStat->Clear();
+  m_legLowStat->AddText("Not enough statistics,");
+  m_legLowStat->AddText("check again in a few minutes");
+
+  m_legEmpty->Clear();
+  m_legEmpty->AddText("Track/clusters plots are emtpy");
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
@@ -279,11 +277,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
   }
 
-
   Float_t effU = -1;
   Float_t effV = -1;
   Float_t erreffU = -1;
   Float_t erreffV = -1;
+  Float_t minEff = 99999;
 
   // Efficiency for the U and V sides
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
@@ -305,6 +303,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denU = found_tracksU->GetBinContent(bin);
       if (denU > 0)
         effU = numU / denU;
+      if (effU < minEff) minEff = effU;
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       if (denU > 0)
@@ -315,83 +314,38 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denV = found_tracksV->GetBinContent(bin);
       if (denV > 0)
         effV = numV / denV;
+      if (effV < minEff) minEff = effV;
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       if (denV > 0)
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
 
-      if (denU < m_statThreshold) {
-        m_effUstatus = std::max(lowStat, m_effUstatus);
-      } else if (effU > m_effWarning) {
-        m_effUstatus = std::max(good, m_effUstatus);
-      } else if ((effU <= m_effWarning) && (effU > m_effError)) {
-        m_effUstatus = std::max(warning, m_effUstatus);
-      } else if ((effU <= m_effError)) {
-        m_effUstatus = std::max(error, m_effUstatus);
-      }
+      setEffStatus(denU, effU, true);
+      setEffStatus(denV, effV, false);
 
-      if (denV < m_statThreshold) {
-        m_effVstatus = std::max(lowStat, m_effVstatus);
-      } else if (effV > m_effWarning) {
-        m_effVstatus = std::max(good, m_effVstatus);
-      } else if ((effV <= m_effWarning) && (effV > m_effError)) {
-        m_effVstatus = std::max(warning, m_effVstatus);
-      } else if ((effV <= m_effError)) {
-        m_effVstatus = std::max(error, m_effVstatus);
-      }
       B2DEBUG(10, "Status U-side is " << m_effUstatus);
       B2DEBUG(10, "Status V-side is " << m_effVstatus);
     }
   } else {
     if (matched_clusU == NULL || found_tracksU == NULL) {
       B2INFO("Histograms needed for U-side Efficiency computation are not found");
-      m_cEfficiencyU->Draw();
-      m_cEfficiencyU->cd();
-      if (m_hEfficiency)
-        m_hEfficiency->getHistogram(1)->Draw("text colz");
-      colorizeCanvas(m_cEfficiencyU, c_StatusDefault);
-
-      m_cEfficiencyRPhiViewU->Draw();
-      m_cEfficiencyRPhiViewU->cd();
-      if (m_hEfficiency) {
-        if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-        else m_hEfficiency->getPoly(1)->Draw("colz l");
-        drawText();
-      }
-      colorizeCanvas(m_cEfficiencyRPhiViewU, c_StatusDefault);
+      setEffStatus(-1, -1, true);
     }
     if (matched_clusV == NULL || found_tracksV == NULL) {
       B2INFO("Histograms needed for V-side Efficiency computation are not found");
-      m_cEfficiencyV->cd();
-      m_cEfficiencyV->Draw();
-      if (m_hEfficiency)
-        m_hEfficiency->getHistogram(0)->Draw("text colz");
-      colorizeCanvas(m_cEfficiencyV, c_StatusDefault);
-
-      m_cEfficiencyRPhiViewV->cd();
-      m_cEfficiencyRPhiViewV->Draw();
-      if (m_hEfficiency) {
-        if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-        else m_hEfficiency->getPoly(0)->Draw("colz l");
-        drawText();
-      }
-      colorizeCanvas(m_cEfficiencyRPhiViewV, c_StatusDefault);
+      setEffStatus(-1, -1, false);
     }
   }
 
   // update summary for U side
   m_cEfficiencyU->Draw();
   m_cEfficiencyU->cd();
-  if (m_hEfficiency)
+  if (m_hEfficiency) {
+    if (!m_setEfficiencyRange) m_hEfficiency->setMinimum(minEff * 99.9);
     m_hEfficiency->getHistogram(1)->Draw("text colz");
+  }
   setStatusOfCanvas(m_effUstatus, m_cEfficiencyU, true);
-
-//   setEpicsPV("EfficiencyUAlarm", alarm);
-
-  m_cEfficiencyU->Update();
-  m_cEfficiencyU->Modified();
-  m_cEfficiencyU->Update();
 
   m_cEfficiencyRPhiViewU->Draw();
   m_cEfficiencyRPhiViewU->cd();
@@ -402,20 +356,12 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
   setStatusOfCanvas(m_effUstatus, m_cEfficiencyRPhiViewU, false);
 
-  m_cEfficiencyRPhiViewU->Update();
-  m_cEfficiencyRPhiViewU->Modified();
-  m_cEfficiencyRPhiViewU->Update();
-
   // update summary for V side
   m_cEfficiencyV->cd();
   m_cEfficiencyV->Draw();
   if (m_hEfficiency)
     m_hEfficiency->getHistogram(0)->Draw("text colz");
   setStatusOfCanvas(m_effVstatus, m_cEfficiencyV, true);
-
-  m_cEfficiencyV->Update();
-  m_cEfficiencyV->Modified();
-  m_cEfficiencyV->Update();
 
   m_cEfficiencyRPhiViewV->cd();
   m_cEfficiencyRPhiViewV->Draw();
@@ -426,42 +372,38 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
   setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV, false);
 
-  m_cEfficiencyRPhiViewV->Update();
-  m_cEfficiencyRPhiViewV->Modified();
-  m_cEfficiencyRPhiViewV->Update();
-
   m_cEfficiencyErrU->cd();
+  m_cEfficiencyErrU->Draw();
   if (m_hEfficiencyErr)
     m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
-  m_cEfficiencyErrU->Draw();
   m_cEfficiencyErrU->Update();
   m_cEfficiencyErrU->Modified();
   m_cEfficiencyErrU->Update();
 
   m_cEfficiencyErrRPhiViewU->cd();
+  m_cEfficiencyErrRPhiViewU->Draw();
   if (m_hEfficiencyErr) {
     m_hEfficiencyErr->getPoly(1, 0)->Draw("colz l");
     drawText();
   }
-  m_cEfficiencyErrRPhiViewU->Draw();
   m_cEfficiencyErrRPhiViewU->Update();
   m_cEfficiencyErrRPhiViewU->Modified();
   m_cEfficiencyErrRPhiViewU->Update();
 
   m_cEfficiencyErrV->cd();
+  m_cEfficiencyErrV->Draw();
   if (m_hEfficiencyErr)
     m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
-  m_cEfficiencyErrV->Draw();
   m_cEfficiencyErrV->Update();
   m_cEfficiencyErrV->Modified();
   m_cEfficiencyErrV->Update();
 
   m_cEfficiencyErrRPhiViewV->cd();
+  m_cEfficiencyErrRPhiViewV->Draw();
   if (m_hEfficiencyErr) {
     m_hEfficiencyErr->getPoly(0, 0)->Draw("colz l");
     drawText();
   }
-  m_cEfficiencyErrRPhiViewV->Draw();
   m_cEfficiencyErrRPhiViewV->Update();
   m_cEfficiencyErrRPhiViewV->Modified();
   m_cEfficiencyErrRPhiViewV->Update();
@@ -493,41 +435,27 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denU = found3_tracksU->GetBinContent(bin);
         if (denU > 0)
           effU = numU / denU;
+        if (effU < minEff) minEff = effU;
         B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         if (denU > 0)
           erreffU = std::sqrt(effU * (1 - effU) / denU);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
+
         // V-side
         float numV = matched3_clusV->GetBinContent(bin);
         float denV = found3_tracksV->GetBinContent(bin);
         if (denV > 0)
           effV = numV / denV;
+        if (effV < minEff) minEff = effV;
         B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         if (denV > 0)
           erreffV = std::sqrt(effV * (1 - effV) / denV);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
 
-        if (denU < m_statThreshold) {
-          m_effUstatus = std::max(lowStat, m_effUstatus);
-        } else if (effU > m_effWarning) {
-          m_effUstatus = std::max(good, m_effUstatus);
-        } else if ((effU <= m_effWarning) && (effU > m_effError)) {
-          m_effUstatus = std::max(warning, m_effUstatus);
-        } else if ((effU <= m_effError)) {
-          m_effUstatus = std::max(error, m_effUstatus);
-        }
-
-        if (denV < m_statThreshold) {
-          m_effVstatus = std::max(lowStat, m_effVstatus);
-        } else if (effV > m_effWarning) {
-          m_effVstatus = std::max(good, m_effVstatus);
-        } else if ((effV <= m_effWarning) && (effV > m_effError)) {
-          m_effVstatus = std::max(warning, m_effVstatus);
-        } else if ((effV <= m_effError)) {
-          m_effVstatus = std::max(error, m_effVstatus);
-        }
+        setEffStatus(denU, effU, true);
+        setEffStatus(denV, effV, false);
 
         B2DEBUG(10, "Status U-side is " << m_effUstatus);
         B2DEBUG(10, "Status V-side is " << m_effVstatus);
@@ -535,50 +463,22 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     } else {
       if (matched3_clusU == NULL || found3_tracksU == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
-        m_cEfficiencyU3Samples->Draw();
-        m_cEfficiencyU3Samples->cd();
-        if (m_hEfficiency3Samples)
-          m_hEfficiency3Samples->getHistogram(1)->Draw("text");
-        colorizeCanvas(m_cEfficiencyU3Samples, c_StatusDefault);
-
-        m_cEfficiencyRPhiViewU3Samples->Draw();
-        m_cEfficiencyRPhiViewU3Samples->cd();
-        if (m_hEfficiency3Samples) {
-          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-          else m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
-          drawText();
-        }
-        colorizeCanvas(m_cEfficiencyRPhiViewU3Samples, c_StatusDefault);
+        setEffStatus(-1, -1, true);
       }
       if (matched3_clusV == NULL || found3_tracksV == NULL) {
         B2INFO("Histograms needed for Efficiency computation are not found");
-        m_cEfficiencyV3Samples->Draw();
-        m_cEfficiencyV3Samples->cd();
-        if (m_hEfficiency3Samples)
-          m_hEfficiency3Samples->getHistogram(0)->Draw("text");
-        colorizeCanvas(m_cEfficiencyV3Samples, c_StatusDefault);
-
-        m_cEfficiencyRPhiViewV3Samples->Draw();
-        m_cEfficiencyRPhiViewV3Samples->cd();
-        if (m_hEfficiency3Samples) {
-          if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-          else m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
-          drawText();
-        }
-        colorizeCanvas(m_cEfficiencyRPhiViewV3Samples, c_StatusDefault);
+        setEffStatus(-1, -1, false);
       }
     }
 
     // update summary for U side
     m_cEfficiencyU3Samples->Draw();
     m_cEfficiencyU3Samples->cd();
-    if (m_hEfficiency3Samples)
-      m_hEfficiency3Samples->getHistogram(1)->Draw("text");
+    if (m_hEfficiency3Samples) {
+      if (!m_setEfficiencyRange) m_hEfficiency->setMinimum(minEff * 99.9);
+      m_hEfficiency3Samples->getHistogram(1)->Draw("text colz");
+    }
     setStatusOfCanvas(m_effUstatus, m_cEfficiencyV3Samples, true);
-
-    m_cEfficiencyU3Samples->Update();
-    m_cEfficiencyU3Samples->Modified();
-    m_cEfficiencyU3Samples->Update();
 
     m_cEfficiencyRPhiViewU3Samples->Draw();
     m_cEfficiencyRPhiViewU3Samples->cd();
@@ -597,12 +497,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyV3Samples->Draw();
     m_cEfficiencyV3Samples->cd();
     if (m_hEfficiency3Samples)
-      m_hEfficiency3Samples->getHistogram(0)->Draw("text");
+      m_hEfficiency3Samples->getHistogram(0)->Draw("text colz");
     setStatusOfCanvas(m_effVstatus, m_cEfficiencyV3Samples, true);
-
-    m_cEfficiencyV3Samples->Update();
-    m_cEfficiencyV3Samples->Modified();
-    m_cEfficiencyV3Samples->Update();
 
     m_cEfficiencyRPhiViewV3Samples->Draw();
     m_cEfficiencyRPhiViewV3Samples->cd();
@@ -613,17 +509,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
     setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV3Samples, false);
 
-    m_cEfficiencyRPhiViewV3Samples->Update();
-    m_cEfficiencyRPhiViewV3Samples->Modified();
-    m_cEfficiencyRPhiViewV3Samples->Update();
-
     m_cEfficiencyErrU3Samples->cd();
+    m_cEfficiencyErrU3Samples->Draw();
     if (m_hEfficiencyErr3Samples)
       m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
-    m_cEfficiencyErrU3Samples->Draw();
-    m_cEfficiencyErrU3Samples->Update();
-    m_cEfficiencyErrU3Samples->Modified();
-    m_cEfficiencyErrU3Samples->Update();
 
     m_cEfficiencyErrRPhiViewU3Samples->cd();
     if (m_hEfficiencyErr3Samples) {
@@ -636,9 +525,9 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     m_cEfficiencyErrRPhiViewU3Samples->Update();
 
     m_cEfficiencyErrV3Samples->cd();
+    m_cEfficiencyErrV3Samples->Draw();
     if (m_hEfficiencyErr3Samples)
       m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
-    m_cEfficiencyErrV3Samples->Draw();
     m_cEfficiencyErrV3Samples->Update();
     m_cEfficiencyErrV3Samples->Modified();
     m_cEfficiencyErrV3Samples->Update();
@@ -663,12 +552,6 @@ void DQMHistAnalysisSVDEfficiencyModule::endRun()
 void DQMHistAnalysisSVDEfficiencyModule::terminate()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDEfficiency: terminate called");
-
-  delete m_refFile;
-  delete m_legProblem;
-  delete m_legWarning;
-  delete m_legNormal;
-  delete m_legEmpty;
 
   delete m_hEfficiency;
   delete m_cEfficiencyU;
@@ -792,32 +675,24 @@ void DQMHistAnalysisSVDEfficiencyModule::drawText()
   for (int i = 0; i < (int)m_sensorsText.size(); i++) m_sensorsText[i]->Draw("same");
 }
 
-void DQMHistAnalysisSVDEfficiencyModule::setStatusOfCanvas(int status, TCanvas* canvas, bool plotLeg)
+void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool sideU)
 {
-  switch (status) {
-    case good: {
-      colorizeCanvas(canvas, c_StatusGood);
-      if (plotLeg) m_legNormal->Draw();
-      break;
-    }
-    case error: {
-      colorizeCanvas(canvas, c_StatusError);
-      if (plotLeg) m_legProblem->Draw();
-      break;
-    }
-    case warning: {
-      colorizeCanvas(canvas, c_StatusWarning);
-      if (plotLeg) m_legWarning->Draw();
-      break;
-    }
-    case lowStat: {
-      colorizeCanvas(canvas, c_StatusTooFew);
-      if (plotLeg) m_legEmpty->Draw();
-      break;
-    }
-    default: {
-      B2INFO("efficiency status not set properly: " << status);
-      break;
-    }
+  effStatus* efficiencyStatus;
+
+  if (sideU)
+    efficiencyStatus = &m_effUstatus;
+  else
+    efficiencyStatus = &m_effVstatus;
+
+  if (den < 0) {
+    *efficiencyStatus = std::max(noStat, *efficiencyStatus);
+  } else if (den < m_statThreshold) {
+    *efficiencyStatus = std::max(lowStat, *efficiencyStatus);
+  } else if (eff > m_effWarning) {
+    *efficiencyStatus = std::max(good, *efficiencyStatus);
+  } else if ((eff <= m_effWarning) && (eff > m_effError)) {
+    *efficiencyStatus = std::max(warning, *efficiencyStatus);
+  } else if ((eff <= m_effError)) {
+    *efficiencyStatus = std::max(error, *efficiencyStatus);
   }
 }

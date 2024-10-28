@@ -12,7 +12,7 @@
 
 #pragma once
 
-#include <dqm/core/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysisSVD.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
@@ -25,7 +25,7 @@
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDOccupancyModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDOccupancyModule final : public DQMHistAnalysisSVDModule {
 
     // Public functions
   public:
@@ -112,36 +112,37 @@ namespace Belle2 {
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
-
-    TPaveText* m_legProblem = nullptr; /**< OfflineOccupancy plot legend, problem */
-    TPaveText* m_legWarning = nullptr; /**< OfflineOccupancy plot legend, warning */
-    TPaveText* m_legNormal = nullptr; /**< OfflineOccupancy plot legend, normal */
-    TPaveText* m_legEmpty = nullptr; /**< OfflineOccupancy plot legend, empty */
-    TPaveText* m_legError = nullptr; /**< OfflineOccupancy plot legend, error*/
-    TPaveText* m_legOnProblem = nullptr; /**< onlineOccupancy plot legend, problem */
-    TPaveText* m_legOnWarning = nullptr; /**< onlineOccupancy plot legend, warning */
-    TPaveText* m_legOnNormal = nullptr; /**< onlineOccupancy plot legend, normal */
-    TPaveText* m_legOnEmpty = nullptr; /**< onlineOccupancy plot legend, empty */
-    TPaveText* m_legOnError = nullptr; /**< onlineOccupancy plot legend, error*/
-
-    Int_t m_occUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_occVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_occU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
-
-    Int_t m_occUGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 samples*/
-    Int_t m_occVGroupId0 = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampels*/
-
-    Int_t m_onlineOccUstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-    Int_t m_onlineOccVstatus = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error*/
-
-    Int_t m_onlineOccU3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sample*/
-    Int_t m_onlineOccV3Samples = 0; /**< 0 = normal, 1 = empty, 2 = warning, 3 = error for 3 sampes*/
+    Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;
+
+    /** occupancy status flags */
+    enum occStatus {
+      good = 0,    /**< green frame */
+      warning = 1, /**< orange frame */
+      error = 2,   /**< red frame */
+      lowStat = 3,  /**< gray frame */
+      noStat = 4 /**< purple frame */
+    };
+
+    occStatus m_occUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    occStatus m_occVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    occStatus m_occU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    occStatus m_occV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+
+    occStatus m_occUGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 samples*/
+    occStatus m_occVGroupId0; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampels*/
+
+    occStatus m_onlineOccUstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+    occStatus m_onlineOccVstatus; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+
+    occStatus m_onlineOccU3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sample*/
+    occStatus m_onlineOccV3Samples; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error for 3 sampes*/
+
+    void setOccStatus(float occ, occStatus& occupancyStatus, bool online = false); /**< set occupancy status */
 
   };
 } // end namespace Belle2

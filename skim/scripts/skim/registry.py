@@ -84,6 +84,7 @@ _RegisteredSkims = [
     ("13160300", "tdcpv", "TDCPV_qqs"),
     ("13160400", "tdcpv", "TDCPV_klong"),
     ("13130300", "tdcpv", "TDCPV_dilepton"),
+    ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
 
 
     # --- WG4: Charmed B decays ---

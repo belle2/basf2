@@ -658,3 +658,90 @@ class TDCPV_dilepton(BaseSkim):
                      path=path)
 
         return ["Upsilon(4S):ll", "Delta++:ll"]
+
+
+@fancy_skim_header
+class TDCPV_inclusiveJpsi(BaseSkim):
+    """
+    **Physics channels**:  bd → ccs
+
+    This skims inclusive J/psi events, which include Psi(2S) to dileptons as well as Psi(2S) to J/psi X or chi_c1 to J/psi gamma
+
+    **Decay Channels**:
+
+    * ``B0 -> J/psi (ee/mumu) X``
+
+    **Cuts used**:
+
+    * ``abs(d0) < 0.5 and abs(z0) < 2.0 and thetaInCDCAcceptance`` for muon and electron tracks
+    * ``muonID_noSVD > 0.01`` for muons and ``electronID > 0.01`` for electrons as PID cuts
+    * ``E < 1`` for photons for Bremsstrahlung correction for electrons
+    * ``2.7 < M < 4.1 and useCMSFrame(p) < 3.1`` for J/psi (or Psi(2S)) reconstruction
+    """
+
+    __authors__ = ["Xu Dong", "Thibaud Humair", "Tadeas Bilka"]
+    __description__ = "Inclusive J/psi (ee/mumu) skim for time-dependent CP violation analysis."
+    __contact__ = __liaison__
+    __category__ = "physics, TDCPV"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+
+        stdE("all", path=path)
+        stdMu("all", path=path)
+        stdPhotons("loose", path=path)
+
+    def build_lists(self, path):
+
+        # Apply the event-level cuts
+        path = self.skim_event_cuts('nCleanedTracks(abs(d0) < 0.5 and abs(z0) < 2.0) >= 3', path=path)
+
+        # NOTE: This is almost like for standad charged list, but without nCDCHits cut,
+        # plus we want specific PID cut below, while a typical loose cut is set to 0.1 in stdCharged.py
+        goodChargedTrackCut = 'abs(dr) < 0.5 and abs(dz) < 2 and thetaInCDCAcceptance'
+
+        # Fill reduced particle lists for muons, electrons, and photons
+        ma.cutAndCopyList('mu+:withPID', 'mu+:all', f'{goodChargedTrackCut} and muonID_noSVD > 0.01', path=path)
+        ma.cutAndCopyList('e+:uncorrected_withPID', 'e+:all', f'{goodChargedTrackCut} and electronID > 0.01', path=path)
+        ma.cutAndCopyList('gamma:bremsinput', 'gamma:loose', 'E < 1', path=path)
+
+        # Perform bremsstrahlung correction for electrons and fill new list with corrected electrons
+        ma.correctBremsBelle('e+:corrected_withPID', 'e+:uncorrected_withPID', 'gamma:bremsinput', path=path)
+        ma.correctBremsBelle('e+:corrected', 'e+:all', 'gamma:bremsinput', path=path)
+
+        # Reconstruct J/psi decays
+        ma.reconstructDecay('J/psi:inclusive_ee -> e+:corrected_withPID e-:corrected',
+                            '2.7 < M < 4.1 and useCMSFrame(p) < 3.1', path=path)
+        ma.reconstructDecay('J/psi:inclusive_mumu -> mu+:withPID mu-:all',
+                            '2.7 < M < 4.1 and useCMSFrame(p) < 3.1', path=path)
+
+        # Return the particle lists that will be used in the skim
+        return ['J/psi:inclusive_ee', 'J/psi:inclusive_mumu']
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import ValidationMetadataSetter
+
+        # Define the list of variables to histogram
+        variableshisto = [('InvM', 100, 2.7, 4.1)]
+
+        # Define the metadata for the validation histograms
+        metadata = [
+            ['InvM', 'ee', 'InvM', __liaison__,
+             'Invariant mass of the inclusive J/psi in the ee mode', '', 'InvM(e+e-) [GeV]', 'Candidates'],
+            ['InvM', 'mumu', 'InvM', __liaison__,
+             'Invariant mass of the inclusive J/psi in the mumu mode', '', 'InvM(mu+mu-) [GeV]', 'Candidates']
+        ]
+
+        # Define the name of the output file for the validation histograms
+        filename = f'{self}_validation.root'
+
+        # Add the metadata to the output file
+        path.add_module(ValidationMetadataSetter(metadata, filename))
+
+        # Produce the validation histograms
+        ma.variablesToHistogram('J/psi:inclusive_ee', variableshisto, filename=filename, path=path, directory="ee")
+        ma.variablesToHistogram('J/psi:inclusive_mumu', variableshisto, filename=filename, path=path, directory="mumu")

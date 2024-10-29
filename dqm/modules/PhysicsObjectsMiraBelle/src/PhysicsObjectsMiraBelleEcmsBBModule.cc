@@ -12,8 +12,13 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <mdst/dataobjects/PIDLikelihood.h>
 #include <framework/particledb/EvtGenDatabasePDG.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <analysis/dataobjects/ParticleList.h>
 
 #include <TTree.h>
+#include <TH1D.h>
 
 
 using namespace Belle2;
@@ -29,65 +34,53 @@ REG_MODULE(PhysicsObjectsMiraBelleEcmsBB);
 //                 Implementation
 //-----------------------------------------------------------------
 
-PhysicsObjectsMiraBelleEcmsBBModule::PhysicsObjectsMiraBelleEcmsBBModule() : Module()
+PhysicsObjectsMiraBelleEcmsBBModule::PhysicsObjectsMiraBelleEcmsBBModule() : HistoModule()
 {
   //Set module properties
+  setPropertyFlags(c_ParallelProcessingCertified);
 
   setDescription("Collect data for eCMS calibration algorithm using the momenta of the hadronic events");
-  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
-void PhysicsObjectsMiraBelleEcmsBBModule::prepare()
+
+void PhysicsObjectsMiraBelleEcmsBBModule::initialize()
 {
-  B2INFO("Init of the trees");
-  TString objectName = "events";
-  //Data object creation --------------------------------------------------
-  TTree* tree = new TTree(objectName, "");
-
-  tree->Branch<int>("event", &m_evt);
-  tree->Branch<int>("exp", &m_exp);
-  tree->Branch<int>("run", &m_run);
-  tree->Branch<double>("time", &m_time);
-
-  tree->Branch<std::vector<double>>("pBcms", &m_pBcms);
-  tree->Branch<std::vector<double>>("mB", &m_mB);
-
-  tree->Branch<std::vector<int>>("pdg", &m_pdg);
-  tree->Branch<std::vector<int>>("mode", &m_mode);
-  tree->Branch<std::vector<double>>("Kpid", &m_Kpid);
-  tree->Branch<std::vector<double>>("R2", &m_R2);
-  tree->Branch<std::vector<double>>("mD", &m_mD);
-  tree->Branch<std::vector<double>>("dmDstar", &m_dmDstar);
-
-
-  // We register the objects so that our framework knows about them.
-  // Don't try and hold onto the pointers or fill these objects directly
-  // Use the getObjectPtr functions to access collector objects
-  registerObject<TTree>(objectName.Data(), tree);
+  REG_HISTOGRAM
 }
 
-
-void PhysicsObjectsMiraBelleEcmsBBModule::resize(int n)
+void PhysicsObjectsMiraBelleEcmsBBModule::defineHisto()
 {
-  m_pBcms.resize(n);
-  m_mB.resize(n);
-  m_pdg.resize(n);
-  m_mode.resize(n);
-  m_Kpid.resize(n);
-  m_R2.resize(n);
-  m_mD.resize(n);
-  m_dmDstar.resize(n);
+  TDirectory* oldDir = gDirectory;
+  oldDir->mkdir("PhysicsObjectsMiraBelleEcmsBB");
+  oldDir->cd("PhysicsObjectsMiraBelleEcmsBB");
+
+  const double cMBp = EvtGenDatabasePDG::Instance()->GetParticle("B+")->Mass();
+  //const double cMB0 = EvtGenDatabasePDG::Instance()->GetParticle("B0")->Mass();
+
+  // In the original ML-based analysis there are 40 bins for visualisation
+  // For simplicity, the same histogram lower bound (B+ mass) is used
+  m_hB0 = new TH1D("hB0", "", 80, cMBp, 5.37);
+  m_hBp = new TH1D("hBp", "", 80, cMBp, 5.37);
+  oldDir->cd();
+}
+
+void PhysicsObjectsMiraBelleEcmsBBModule::beginRun()
+{
+  m_hBp->Reset();
+  m_hB0->Reset();
 }
 
 
 
-void PhysicsObjectsMiraBelleEcmsBBModule::collect()
+
+
+void PhysicsObjectsMiraBelleEcmsBBModule::event()
 {
   // store event info
-  m_evt  = m_emd->getEvent();
-  m_run  = m_emd->getRun();
-  m_exp  = m_emd->getExperiment();
-  m_time = m_emd->getTime() / 1e9 / 3600.; //from ns to hours
+  //m_evt  = m_emd->getEvent();
+  //m_run  = m_emd->getRun();
+  //m_exp  = m_emd->getExperiment();
+  //m_time = m_emd->getTime() / 1e9 / 3600.; //from ns to hours
 
 
   StoreObjPtr<ParticleList> B0("B0:merged");
@@ -110,22 +103,19 @@ void PhysicsObjectsMiraBelleEcmsBBModule::collect()
 
   if (Bparts.size() == 0) return;
 
-
-  resize(Bparts.size());
-
   for (unsigned i = 0; i < Bparts.size(); ++i) {
     const Particle* Bpart = Bparts[i];
 
     //Convert mBC and deltaE to the Y4S reference
-    m_pBcms[i]  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
-    m_mB[i]     = Bpart->getMass();
-    m_pdg[i]    = Bpart->getPDGCode();
-    m_mode[i]   = Bpart->getExtraInfo("decayModeID");
-    m_R2[i]     = Variable::R2(Bpart);
+    double m_pBcms  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
+    double m_mB        = Bpart->getMass();
+    double m_pdg       = Bpart->getPDGCode();
+    //double m_mode      = Bpart->getExtraInfo("decayModeID");
+    double m_R2        = Variable::R2(Bpart);
 
 
     const Particle* D    = nullptr;
-    m_dmDstar[i] = -99;
+    double m_dmDstar = -99;
 
 
     static const int c_PdgD0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
@@ -140,25 +130,57 @@ void PhysicsObjectsMiraBelleEcmsBBModule::collect()
     } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstar0 || abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstarPlus) {
       const Particle* Dstar = Bpart->getDaughter(0);
       D = Dstar->getDaughter(0);
-      m_dmDstar[i] = Dstar->getMass() - D->getMass();
+      m_dmDstar    = Dstar->getMass() - D->getMass();
     } else {
       B2INFO("No D meson found");
     }
+    double m_mD;
+    //double m_Kpid;
     if (D != nullptr) {
-      m_mD[i] = D->getMass();
-      const Particle* Kaon =  D->getDaughter(0);
+      m_mD    = D->getMass();
+      //const Particle* Kaon =  D->getDaughter(0);
 
-      m_Kpid[i] = -99;
-      if (Kaon && Kaon->getPIDLikelihood()) {
-        m_Kpid[i] = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
-      }
+      //m_Kpid    = -99;
+      //if (Kaon && Kaon->getPIDLikelihood()) {
+      //  m_Kpid   = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
+      //}
     } else {
-      m_mD[i] = -99;
-      m_Kpid[i] = -99;
+      m_mD    = -99;
+      //m_Kpid    = -99;
     }
+
+    // Fill events to histogram
+    //const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
+
+
+    double p =  m_pBcms;
+    double mInv =  m_mB;
+    double mD = m_mD;
+    double dmDstar = m_dmDstar;
+    double pdg = m_pdg;
+    double R2 = m_R2;
+
+    //get mass of B+- or B0
+    double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(pdg))->Mass();
+
+
+    // Filling the events
+    if (1.830 < mD && mD < 1.894)
+      if (abs(mInv - mB) < 0.05)
+        if (R2 < 0.3)
+          if ((dmDstar < -10)  || (0.143 < dmDstar && dmDstar < 0.147)) {
+            double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+            if (eBC > 5.37) continue;
+
+            if (abs(pdg) == 511) {
+              m_hB0->Fill(eBC);
+            } else {
+              m_hBp->Fill(eBC);
+            }
+
+          }
   }
 
 
-  getObjectPtr<TTree>("events")->Fill();
 
 }

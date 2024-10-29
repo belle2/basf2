@@ -5,7 +5,10 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-#include <framework/core/Module.h>
+#pragma once
+
+#include <framework/core/HistoModule.h>
+#include <TH1D.h>
 
 #include <limits>
 #include <vector>
@@ -21,7 +24,7 @@ namespace Belle2 {
 
 
   /// Collector for the collision energy calibration based on the hadronic modes
-  class PhysicsObjectsMiraBelleEcmsBBModule : public Module {
+  class PhysicsObjectsMiraBelleEcmsBBModule : public HistoModule {
 
   public:
     /**
@@ -29,34 +32,25 @@ namespace Belle2 {
      */
     PhysicsObjectsMiraBelleEcmsBBModule();
 
+    void defineHisto() override final;
+
+    void initialize() override final;
     /**
      * Initialize the module
      */
-    void prepare() override final;
+    void beginRun() override final;
 
     /**
      * Event processor
      * The filling of the tree
      */
-    void collect() override final;
+    void event() override final;
 
   private:
 
-    void resize(int n);  ///< resize the event members to n candidates
 
-    int m_exp = -1;          ///< experiment number
-    int m_run = -1;          ///< run number
-    int m_evt = -1;          ///< event number
-    double m_time = realNaN; ///< event time [hours]
-
-    std::vector<double> m_pBcms = {};   ///< B mesons CMS momentum
-    std::vector<double> m_mB  = {};     ///< B mesons mass
-    std::vector<int>    m_pdg = {};      ///< B meson PDG code (can neutral or charged)
-    std::vector<int>    m_mode = {};     ///< decay mode ID
-    std::vector<double> m_Kpid = {};    ///< Kaon PID
-    std::vector<double> m_R2 = {};      ///< the R2 variable used for the continuum suppression
-    std::vector<double> m_mD = {};      ///< D meson mass
-    std::vector<double> m_dmDstar = {}; ///< D*-D0 mass
+    TH1D* m_hB0 = nullptr;
+    TH1D* m_hBp = nullptr;
 
   };
 

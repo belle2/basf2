@@ -40,6 +40,10 @@ PhysicsObjectsMiraBelleEcmsBBModule::PhysicsObjectsMiraBelleEcmsBBModule() : His
   setPropertyFlags(c_ParallelProcessingCertified);
 
   setDescription("Collect data for eCMS calibration algorithm using the momenta of the hadronic events");
+  addParam("TriggerIdentifier", m_triggerIdentifier,
+           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadron"));
+  addParam("BmListName", m_BmListName, "Name of the B- particle list", std::string("B-:merged"));
+  addParam("B0ListName", m_B0ListName, "Name of the B0 particle list", std::string("B0:merged"));
 }
 
 
@@ -82,9 +86,18 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
   //m_exp  = m_emd->getExperiment();
   //m_time = m_emd->getTime() / 1e9 / 3600.; //from ns to hours
 
+  StoreObjPtr<SoftwareTriggerResult> result;
+  if (!result.isValid()) {
+    B2WARNING("SoftwareTriggerResult object not available but needed to select events for the histograms.");
+    return;
+  }
 
-  StoreObjPtr<ParticleList> B0("B0:merged");
-  StoreObjPtr<ParticleList> Bm("B-:merged");
+
+  const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
+  if (accepted == false) return;
+
+  StoreObjPtr<ParticleList> B0(m_B0ListName);//"B0:merged");
+  StoreObjPtr<ParticleList> Bm(m_BmListName);//"B-:merged");
 
 
   //put all the B candidates into the vector

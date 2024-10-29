@@ -52,6 +52,13 @@ namespace Belle2 {
     TH1D* m_hB0 = nullptr;
     TH1D* m_hBp = nullptr;
 
+    /** Trigger identifier string used to select events for the histograms */
+    std::string m_triggerIdentifier = "";
+
+    std::string m_BmListName = "";
+    std::string m_B0ListName = "";
+
+
   };
 
 } // end namespace Belle2

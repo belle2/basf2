@@ -281,6 +281,9 @@ namespace Belle2 {
       /// input Alpha list of a NN track
       std::array<float, 9> inputAlpha;
       std::array<int, 9> rawinputAlpha;
+      //  input extra time list of a NN track
+      std::array<std::array<float, 11>, 4> inputExtraT;
+      std::array<std::array<float, 11>, 4> rawinputExtraT;
       /// input TS list of a NN track
       std::array<tsOut, 9> ts;
       std::array<extraHitTimeOut, 9> TSExtraT;
@@ -690,6 +693,7 @@ namespace Belle2 {
                                 std::string p_mlpin_alpha,
                                 std::string p_mlpin_drifttime,
                                 std::string p_mlpin_id,
+                                std::string p_mlpin_extratime,
                                 std::string p_netsel,
                                 const DBObjPtr<CDCTriggerNeuroConfig>& neurodb,
                                 const std::string& p_2dcc,
@@ -703,6 +707,7 @@ namespace Belle2 {
       float scale_alpha = 1. / (1 << (p_mlpin_alpha.size() - 1) / 9);
       float scale_drifttime = 1. / (1 << (p_mlpin_drifttime.size() - 1) / 9);
       float scale_id = 1. / (1 << (p_mlpin_id.size() - 1) / 9);
+      float scale_extratime = 1. / (1 << (p_mlpin_drifttime.size() - 1) / 44);
       TRGNeuroTrack foundTrack;
       int theta_raw = mlp_bin_to_signed_int(p_mlpout_theta);
       int z_raw = mlp_bin_to_signed_int(p_mlpout_z);
@@ -747,6 +752,14 @@ namespace Belle2 {
                                                                      p_2dcc) : decodeTSHitExtra(p_tsfsel.substr((8 - iSL) * lenSTS, lenSTS));
         } else {
           foundTrack.TSExtraT[iSL] =  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        }
+      }
+      for (unsigned iSL = 0; iSL < 4; ++iSL) {
+        for (unsigned iwire = 0; iwire < 11; ++iwire) {
+          foundTrack.inputExtraT[iSL][iwire] = mlp_bin_to_signed_int(p_mlpin_extratime.substr(((4 - iSL) *
+                                                                     (11 - iwire) - 1) * p_mlpin_drifttime.size() / 44, p_mlpin_drifttime.size() / 44)) * scale_extratime;
+          foundTrack.rawinputExtraT[iSL][iwire] = mlp_bin_to_signed_int(p_mlpin_extratime.substr(((4 - iSL) *
+                                                  (11 - iwire) - 1) * p_mlpin_drifttime.size() / 44, p_mlpin_drifttime.size() / 44));
         }
       }
       return foundTrack;
@@ -1318,6 +1331,13 @@ namespace Belle2 {
             continue;
           }
 
+          B2LDataField p_mlpin_extratime(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("MLPIn_extrat"));
+          if ((p_mlpin_id.name != "None") && (p_mlpin_id.data.size() == 0)) {
+            B2DEBUG(10, "Could not load Datafield: " << p_mlpin_id.name << " from bitstream. Maybe offset was out of bounds? clock: " <<
+                    iclock);
+            continue;
+          }
+
           B2LDataField p_netsel(bitsNN, iclock, iTracker, neurodb->getB2FormatLine("Netsel"));
           if ((p_netsel.name != "None") && (p_netsel.data.size() == 0)) {
             B2DEBUG(10, "Could not load Datafield: " << p_netsel.name << " from bitstream. Maybe offset was out of bounds? clock: " << iclock);
@@ -1495,6 +1515,7 @@ namespace Belle2 {
                                     p_mlpin_alpha.data,
                                     p_mlpin_drifttime.data,
                                     p_mlpin_id.data,
+                                    p_mlpin_extratime.data,
                                     p_netsel.data,
                                     neurodb,
                                     p_2dcc.data,
@@ -1555,15 +1576,25 @@ namespace Belle2 {
               if (isin2d == false) {
                 trackNN->setQualityVector(1);
               }
-              std::vector<float> inputVector(27, 0.);
-              std::vector<int> rawinputVector(27, 0.);
+              std::vector<float> inputVector(71, 0.);
+              std::vector<int> rawinputVector(71, 0.);
+              int counts = 0;
               for (unsigned iSL = 0; iSL < 9; ++iSL) {
-                inputVector[3 * iSL] = trkNN.inputID[iSL];
-                inputVector[3 * iSL + 1] = trkNN.inputT[iSL];
-                inputVector[3 * iSL + 2] = trkNN.inputAlpha[iSL];
-                rawinputVector[3 * iSL] = trkNN.rawinputID[iSL];
-                rawinputVector[3 * iSL + 1] = trkNN.rawinputT[iSL];
-                rawinputVector[3 * iSL + 2] = trkNN.rawinputAlpha[iSL];
+                inputVector[3 * iSL + counts] = trkNN.inputID[iSL];
+                inputVector[3 * iSL + 1 + counts] = trkNN.inputT[iSL];
+                inputVector[3 * iSL + 2 + counts] = trkNN.inputAlpha[iSL];
+                rawinputVector[3 * iSL + counts] = trkNN.rawinputID[iSL];
+                rawinputVector[3 * iSL + 1 + counts] = trkNN.rawinputT[iSL];
+                rawinputVector[3 * iSL + 2 + counts] = trkNN.rawinputAlpha[iSL];
+                if (iSL % 2 == 1) {
+                  counts += 11;
+                }
+              }
+              for (unsigned iSL = 0; iSL < 4; ++iSL) {
+                for (unsigned iwire = 0; iwire < 11; ++iwire) {
+                  inputVector[(iSL * (11 + 6) + iwire + 6)] = trkNN.inputExtraT[iSL][iwire];
+                  rawinputVector[(iSL * (11 + 6) + iwire + 6)] = trkNN.rawinputExtraT[iSL][iwire];
+                }
               }
               trackNN->setRawInput(rawinputVector);
 

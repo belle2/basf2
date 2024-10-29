@@ -20,7 +20,7 @@ Enddecay
 
 
 Decay B-sig
-1.000 D*0sig  rho-   SVV_HELAMP; 
+1.000 D*0sig  rho-   SVV_HELAMP 0.228 0.95 0.932 0.0 0.283 1.13; 
 Enddecay
 CDecay B+sig
 

@@ -41,35 +41,35 @@ class TDCPV_qqs(BaseSkim):
 
     **Decay Channels**:
 
-    * ``B0 -> phi K_S0``
-    * ``B0 -> phi K*``
-    * ``B0 -> eta K_S0``
-    * ``B0 -> eta' K_S0``
-    * ``B0 -> eta K*``
-    * ``B0 -> eta' K*``
-    * ``B0 -> K_S0 K_S0 K_S0``
-    * ``B0 -> pi0 K_S0``
-    * ``B0 -> rho0 K_S0``
-    * ``B0 -> omega K_S0``
-    * ``B0 -> f_0 K_S0``
-    * ``B0 -> pi0 pi0 K_S0``
-    * ``B0 -> phi K_S0 pi0``
-    * ``B0 -> pi+ pi- K_S0``
-    * ``B0 -> pi+ pi- K_S0 gamma``
-    * ``B0 -> pi0 K_S0 gamma``
-    * ``B0 -> phi K_S0 gamma``
-    * ``B0 -> eta K_S0 gamma``
-    * ``B0 -> rho0 gamma``
-    * ``B0 -> omega gamma``
-    * ``B0 -> phi gamma``
+    * :math:`B^0 \\to \\phi K_S^0`
+    * :math:`B^0 \\to \\phi K^{*0}`
+    * :math:`B^0 \\to \\eta K_S^0`
+    * :math:`B^0 \\to \\eta' K_S^0`
+    * :math:`B^0 \\to \\eta K^{*0}`
+    * :math:`B^0 \\to \\eta' K^{*0}`
+    * :math:`B^0 \\to K_S^0 K_S^0 K_S^0`
+    * :math:`B^0 \\to \\pi^0 K_S^0`
+    * :math:`B^0 \\to \\rho^0 K_S^0`
+    * :math:`B^0 \\to \\omega K_S^0`
+    * :math:`B^0 \\to f_0 K_S^0`
+    * :math:`B^0 \\to \\pi^0 \\pi^0 K_S^0`
+    * :math:`B^0 \\to \\phi K_S^0 \\pi^0`
+    * :math:`B^0 \\to \\pi^+ \\pi^- K_S^0`
+    * :math:`B^0 \\to \\pi^+ \\pi^- K_S^0 \\gamma`
+    * :math:`B^0 \\to \\pi^0 K_S^0 \\gamma`
+    * :math:`B^0 \\to \\phi K_S^0 \\gamma`
+    * :math:`B^0 \\to \\eta K_S^0 \\gamma`
+    * :math:`B^0 \\to \\rho^0 \\gamma`
+    * :math:`B^0 \\to \\omega \\gamma`
+    * :math:`B^0 \\to \\phi \\gamma`
 
-    * ``B+ -> eta' K+``
-    * ``B+ -> phi K+``
-    * ``B+ -> phi K*+``
-    * ``B+ -> omega K+``
-    * ``B+ -> rho0 K+``
-    * ``B+ -> K_S0 K_S0 K+``
-    * ``B+ -> pi+ pi- K+ gamma``
+    * :math:`B^+ \\to \\eta' K^+`
+    * :math:`B^+ \\to \\phi K^+`
+    * :math:`B^+ \\to \\phi K^{*+}`
+    * :math:`B^+ \\to \\omega K^+`
+    * :math:`B^+ \\to \\rho^0 K^+`
+    * :math:`B^+ \\to K_S^0 K_S^0 K^+`
+    * :math:`B^+ \\to \\pi^+ \\pi^- K^+ \\gamma`
 
     **Particle lists used**:
 
@@ -400,15 +400,15 @@ class TDCPV_ccs(BaseSkim):
 
     **Decay Channels**:
 
-    * ``B0 -> J/psi (ee/mm) K_S0``
-    * ``B0 -> psi(2s) (ee/mm) K_S0``
-    * ``B0 -> J/psi (ee/mm) K* (K+ pi- / K_S0 pi0)``
-    * ``B+ -> J/psi (ee/mm) K+``
-    * ``B0 -> J/psi (ee/mm) KL``
-    * ``B0 -> J/psi (ee/mm) eta (pi+ pi- pi0 / pi+ pi-)``
-    * ``B0 -> J/psi (ee/mm) pi0``
-    * ``B0 -> J/psi (ee/mm) K+ pi-``
-    * ``B+ -> J/psi (ee/mm) K*+ (pi+ K_S0 / K+ pi0)``
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) K_S^0`
+    * :math:`B^0 \\to \\psi(2S) (ee/\\mu\\mu) K_S^0`
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) K^* (K^+ \\pi^- / K_S^0 \\pi^0)`
+    * :math:`B^+ \\to J/\\psi (ee/\\mu\\mu) K^+`
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) K_L`
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) \\eta (\\pi^+ \\pi^- \\pi^0 / \\pi^+ \\pi^-)`
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) \\pi^0`
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) K^+ \\pi^-`
+    * :math:`B^+ \\to J/\\psi (ee/\\mu\\mu) K^{*+} (\\pi^+ K_S^0 / K^+ \\pi^0)`
 
     **Particle lists used**:
 
@@ -669,7 +669,7 @@ class TDCPV_inclusiveJpsi(BaseSkim):
 
     **Decay Channels**:
 
-    * ``B0 -> J/psi (ee/mumu) X``
+    * :math:`B^0 -> J/\\psi (ee/\\mu\\mu) X`
 
     **Cuts used**:
 

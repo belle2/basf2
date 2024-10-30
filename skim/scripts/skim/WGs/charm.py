@@ -1842,6 +1842,13 @@ class DpToEtaHp(BaseSkim):
 class LambdacToGeneric(BaseSkim):
     """
     **Decay Modes**:
+        * Inclusive :math:`\\Lambda_{c}^{+}` is identified in mass recoiling against
+
+            * :math:`D^{(*)-} p^{-} \\pi^{+}`,
+            * :math:`D_{s}^{(*)-} p^{-} K^{+}`, and
+            * :math:`D^{(*)0} p^{-}`.
+
+        * The tag side :math:`D` is reconstructed in the following decay modes:
         * :math:`D^{*+}\\to D^0 \\pi^{+}` and :math:`D^{*+}\\to D^{+} \\pi^{0}` (tag side)
         * :math:`D^{*0}\\to D^0 \\pi^{0}` and :math:`D^{*0}\\to D^{0} \\gamma` (tag side)
         * :math:`D_s^{*+}\\to D_s^{+} \\gamma` (tag side)
@@ -1851,7 +1858,7 @@ class LambdacToGeneric(BaseSkim):
 
     **Selection Criteria**:
         * Cut on :math:`\\pi^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0
-        * Cut on :math:`\\K^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and kaonID > 0.2
+        * Cut on :math:`K^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and kaonID > 0.2
         * Cut on :math:`p^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and protonID > 0.2
         * Cut on :math:`\\gamma` : E > 0.10
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma`: pi0:skim
@@ -1862,6 +1869,7 @@ class LambdacToGeneric(BaseSkim):
         * 0.114 < massDifference(0) < 0.176 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
         * 0.104 < massDifference(0) < 0.190 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
         * 1.4 < M < 3.4 and p* > 1.8 on signal side :math:`\\Lambda_{c}^{+}`
+        * For more details, please check the source code of this skim.
     """
 
     __authors__ = ["Lukas Bierwirth"]
@@ -1898,8 +1906,8 @@ class LambdacToGeneric(BaseSkim):
 
         suffix = "_Lambdac_inc_skim"
 
-        dummy = f"B+:dummy{suffix}"
-        antiDummy = f"B-:dummy{suffix}"
+        dummy = f"Lambda_c+:dummy{suffix}"
+        antiDummy = f"anti-Lambda_c-:dummy{suffix}"
 
         M_factor = 1.2
         p_cms = 1.8

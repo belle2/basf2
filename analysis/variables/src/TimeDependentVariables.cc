@@ -88,7 +88,7 @@ namespace Belle2 {
       return vert->getMCTagVertex().Z();
     }
 
-    double particleTagVcovM(const Particle* particle, const std::vector<double>& element)
+    double particleTagVCov(const Particle* particle, const std::vector<double>& element)
     {
       int elementI = int(std::lround(element[0]));
       int elementJ = int(std::lround(element[1]));
@@ -507,6 +507,50 @@ namespace Belle2 {
       auto* vert = part->getRelatedTo<TagVertex>();
       if (!vert) return Const::doubleNaN;
       return vert->getConstraintCenter().Z();
+    }
+
+    double getSigBdecayTime(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+      B2Vector3D vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
+      B2Vector3D vtxSigB = part->getVertex();  // SignalB vertex
+      B2Vector3D pSig = part->getMomentum(); // SigB 3-momentum
+      B2Vector3D nSig = pSig.Unit(); // SigB momentum direction
+      double mB = part->getMass(); // B meson mass
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+
+      // momentum/mass == beta*gamma
+      double tSig = (vtxSigB - vtxY4S).Dot(nSig) / (c * pSig.Mag() / mB);
+      return tSig;
+    }
+
+    double getTagBdecayTime(const Particle* part)
+    {
+      auto* vert = part->getRelatedTo<TagVertex>();
+      if (!vert) return Const::doubleNaN;
+
+      B2Vector3D vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
+      B2Vector3D vtxTagB = vert->getTagVertex();  // TagB vertex
+      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 3-momentum
+      ROOT::Math::PxPyPzEVector p4SigCms = PCmsLabTransform().labToCms(p4Sig);
+      // Assuming that pSigCms + pTagCms == 0
+      ROOT::Math::PxPyPzEVector p4TagCms(-p4SigCms.px(), -p4SigCms.py(), -p4SigCms.pz(), p4SigCms.E());
+      ROOT::Math::PxPyPzEVector p4Tag = PCmsLabTransform().cmsToLab(p4TagCms);
+      B2Vector3D pTag = p4Tag.Vect();
+
+      B2Vector3D nTag = pTag.Unit(); // TagB momentum direction
+      double mB = part->getMass(); // B meson mass
+      double c = Const::speedOfLight / 1000.; // cm ps-1
+
+      // momentum/mass == beta*gamma
+      double tTag = (vtxTagB - vtxY4S).Dot(nTag) / (c * pTag.Mag() / mB);
+      return tTag;
+    }
+
+    double getDeltaT3D(const Particle* part)
+    {
+      return getSigBdecayTime(part) - getTagBdecayTime(part);
     }
 
     double tagTrackDistanceToConstraintErr(const Particle* part, const std::vector<double>& trackIndex)
@@ -940,7 +984,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVxErr", particleTagVxErr, "Tag vertex X component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty\n\n", "cm");
-    REGISTER_VARIABLE("TagVcovM(i,j)", particleTagVcovM,
+    REGISTER_VARIABLE("TagVCov(i,j)", particleTagVCov,
                       "returns the (i,j)-th element of the TagV Covariance Matrix (3x3).\n"
                       "Order of elements in the covariance matrix is: x, y, z.\n\n", "cm, cm, cm");
 
@@ -1011,9 +1055,13 @@ namespace Belle2 {
     REGISTER_VARIABLE("OBoostErr", vertexErrOrthBoostDirection,
                       "Returns the error of the vertex in the direction orthogonal to the boost\n\n", "cm");
 
-    REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns x-component of Y4S vtx", "cm");
-    REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns y-component of Y4S vtx", "cm");
-    REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns z-component of Y4S vtx", "cm");
+    REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns x-component of Y4S vertex", "cm");
+    REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns y-component of Y4S vertex", "cm");
+    REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns z-component of Y4S vertex", "cm");
+
+    REGISTER_VARIABLE("tSigB", getSigBdecayTime, "Returns the proper decay time of the fully reconstructed signal B meson. It should be used together with the BTube constraint.", "ps")
+    REGISTER_VARIABLE("tTagB", getTagBdecayTime, "Returns the proper decay time of the tagged B meson. It should be used together with the BTube constraint.", "ps")
+    REGISTER_VARIABLE("DeltaT3D", getDeltaT3D, "Returns the DeltaT variable calculated as a difference of tSigB and tTagB, i.e. not from the projection along boost vector axis. It should be used together with the BTube constraint.", "ps")
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
                       "Returns the TagV component in the boost direction\n\n", "cm");

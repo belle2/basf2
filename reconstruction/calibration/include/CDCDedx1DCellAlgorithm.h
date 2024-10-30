@@ -8,20 +8,26 @@
 
 #pragma once
 
+#include <algorithm>
+#include <iostream>
+#include <fstream>
+
+#include <TMath.h>
+#include <TH1D.h>
+#include <TCanvas.h>
+#include <TH2D.h>
+#include <TTree.h>
+#include <TStyle.h>
+#include <TLegend.h>
+#include <TRandom.h>
+
+
 #include <reconstruction/dbobjects/CDCDedx1DCell.h>
 #include <calibration/CalibrationAlgorithm.h>
 #include <framework/database/DBObjPtr.h>
 
-#include <TF1.h>
-#include <TLine.h>
-#include <TMath.h>
-#include <TH1F.h>
-#include <TH1D.h>
-#include <TBox.h>
-#include <TString.h>
-#include <TCanvas.h>
-
 namespace Belle2 {
+
   /**
    * A calibration algorithm for CDC dE/dx electron: 1D enta cleanup correction
    *
@@ -41,94 +47,152 @@ namespace Belle2 {
     virtual ~CDCDedx1DCellAlgorithm() {}
 
     /**
-    * Set etna angle bins, Global
+    * adding suffix to control plots
     */
-    void setGlobalEntaBins(int value) {fnEntaBinG = value;}
+    void setSuffix(const std::string& value) {m_suffix = value;}
 
     /**
-    * Set asym bins flag to on or off
+    * Set Var bins flag to on or off
     */
-    void setAsymmetricBins(bool value) {IsLocalBin = value;}
+    void setVariableBins(bool value) {isVarBins = value;}
 
     /**
-    * Set rotation sys flag to on or off
+    * funtion to set truncation method (local vs global)
     */
-    void setRotationSymBins(bool value) {IsRS = value;}
+    void setLayerTrunc(bool value = false) {isFixTrunc = value;}
+
+    /**
+    * set false if generating absoulte (not relative)
+    * payload
+    */
+    void setMergePayload(bool value) { isMerge = value;}
+
+    /**
+    * set bin split factor for all range
+    */
+    void setSplitFactor(int value) {m_binSplit = value;}
+
+    /**
+    * set rotation sys to copy constants from one region to other
+    */
+    void setRotSymmetry(bool value) {isRotSymm = value;}
+
+    /**
+     * function to set bins of trunction from histogram
+    */
+    void setTrucationBins(double lowedge, double upedge)
+    {
+      m_truncMin = lowedge; m_truncMax = upedge ;
+    }
 
     /**
     * funtion to set flag active for plotting
     */
-    void setMonitoringPlots(bool value) {IsMakePlots = value;}
+    void enableExtraPlots(bool value = false) {isMakePlots = value;}
 
     /**
-    * adding suffix to filenae for uniqueness in each iter
+    * funtion to set pt limit
     */
-    void setOutFilePrefix(const std::string& value) {fSetPrefix = value;}
+    void setPtLimit(double value) {m_ptMax = value;}
 
     /**
-    * funtion to set rotation symmetry
+    * funtion to set cos #theta limit
     */
-    int GetRotationSymmericBin(int nbin, int ibin)
+    void setCosLimit(double value) {m_cosMax = value;}
+
+    /**
+    * adjust baseline based on charge or global overall
+    * works for only single charge or both
+    */
+    void setBaselineFactor(double charge, double factor)
     {
 
-      if (nbin % 4 != 0)return -1;
-      int jbin;
-      if (ibin <= nbin / 4) jbin = ibin + nbin / 2 ;
-      else if (ibin > 3 * nbin / 4) jbin = ibin - nbin / 2 ;
-      else jbin = ibin;
+      m_adjustFac = factor;
+      if (charge < 0)m_chargeType = -1.0;
+      else if (charge > 0)m_chargeType = 1.0;
+      else if (charge == 0)m_chargeType = 0.0;
+      else
+        B2FATAL("Choose charge value either +/-1 or 0");
+    }
 
+    /**
+    * class funtion to set rotation symmetry
+    */
+    int rotationalBin(int nbin, int ibin)
+    {
+      if (nbin % 4 != 0)return ibin;
+      int jbin = ibin;
+      if (ibin < nbin / 4) jbin = ibin + nbin / 2 ;
+      else if (ibin >= 3 * nbin / 4) jbin = ibin - nbin / 2 ;
       return jbin;
     }
 
     /**
-    * funtion to set variable bins
+    * function to get extract calibration run/exp
     */
-    void GetVariableBin(int nbin, std::vector<int>& nBinEnta0to100Per)
-    {
+    void getExpRunInfo();
 
-      if (nbin % 8 != 0) {
-        std::cout << "Please select global in multiple of 8 " << std::endl;
-        return ;
-      }
+    /**
+    * class function to create vectors for bin mappping (Var->symm)
+    */
+    void CreateBinMapping();
 
-      int jbin = -1;
-      std::vector<int> nBinEnta0to25Per;
-      for (int ibin = 0; ibin < nbin / 4; ibin++) {
-        if (ibin < nbin / 8) jbin++;
-        else if (TMath::Abs(ibin - nbin / 8) % 2 == 0)jbin++;
-        nBinEnta0to25Per.push_back(jbin);
-      }
+    /**
+    * function to define histograms
+    */
+    void defineHisto(std::vector<TH1D*>  hdedxhit[2],  TH1D* hdedxlay[2], TH1D* hentalay[2]);
 
-      std::vector<int> temp = nBinEnta0to25Per;
-      std::reverse(temp.begin(), temp.end());
+    /**
+    * function to get bins of trunction from histogram
+    */
+    void getTruncatedBins(TH1D* hist, int& binlow, int& binhigh);
 
-      std::vector<int> nBinEnta25to50Per; //second half (0 to pi/2)
-      for (unsigned int it = 0; it < temp.size(); ++it)nBinEnta25to50Per.push_back(2 * jbin - temp.at(it) + 1);
+    /**
+    * function to get truncated mean
+    */
+    double getTruncationMean(TH1D* hist, int binlow, int binhigh);
 
-      std::vector<int> nBinEnta0to50Per = nBinEnta0to25Per;
-      nBinEnta0to50Per.insert(nBinEnta0to50Per.end(), nBinEnta25to50Per.begin(), nBinEnta25to50Per.end());
+    /**
+     * funtion to generate final constants
+     */
+    void createPayload();
 
-      std::vector<int> nBinEnta50to100Per;
-      for (unsigned int it = 0; it < nBinEnta0to50Per.size(); ++it) {
-        nBinEnta50to100Per.push_back(nBinEnta0to50Per.at(nBinEnta0to50Per.size() - 1) + nBinEnta0to50Per.at(it) + 1);
-      }
+    /**
+     * funtion to plot merging factor
+     */
+    void plotMergeFactor(std::map<int, std::vector<double>> bounds, const std::array<int, 2> nDev,
+                         std::map<int, std::vector<int>> steps);
 
-      nBinEnta0to100Per = nBinEnta0to50Per;
-      nBinEnta0to100Per.insert(nBinEnta0to100Per.end(), nBinEnta50to100Per.begin(), nBinEnta50to100Per.end());
+    /**
+    * function to draw the dE/dx histrogram in enta bins
+    */
+    void plotdedxHist(std::vector<TH1D*> hdedxhit[2]);
 
-      TH1D* tempEnta = new TH1D("tempEnta", "tempEnta", fnEntaBinG, feaLE, feaUE);
-      fEntaBinValues.push_back(tempEnta->GetBinLowEdge(1)); //first and last manual
-      for (unsigned int i = 0; i < nBinEnta0to100Per.size() - 1; ++i) {
-        if (nBinEnta0to100Per.at(i) < nBinEnta0to100Per.at(i + 1)) {
-          double binval = tempEnta->GetBinLowEdge(i + 1) + tempEnta->GetBinWidth(i + 1);
-          if (TMath::Abs(binval) < 10e-5)binval = 0; //avoid infinite deep
-          fEntaBinValues.push_back(binval);
-        } else continue;
-      }
-      fEntaBinValues.push_back(tempEnta->GetBinLowEdge(fnEntaBinG) + tempEnta->GetBinWidth(fnEntaBinG));
-      delete tempEnta;
+    /**
+    * funtion to draw dedx dist. for Inner/outer layer
+    */
+    void plotLayerDist(TH1D* hdedxL[2]);
 
-    }
+    /**
+    * funtion to draw pt vs costh and entrance angle distribution for Inner/Outer layer
+    */
+    void plotQaPars(TH1D* hentalay[2], TH2D* hptcosth);
+
+    /**
+    * function to draw symm/Var layer constant
+    */
+    void plotRelConst(std::vector<double>tempconst, std::vector<double>layerconst, int il);
+
+    /**
+    * function to draw the old/new final constants
+    */
+    void plotConstants();
+
+    /**
+     * function to draw the stats plots
+     */
+    void plotEventStats();
+
   protected:
     /**
      * 1D cell algorithm
@@ -138,26 +202,46 @@ namespace Belle2 {
 
   private:
 
-    /** Save arithmetic and truncated mean for the 'dedx' values.
-     *
-     * @param dedx              input values
-     * @param removeLowest      lowest fraction of hits to remove (0.05)
-     * @param removeHighest     highest fraction of hits to remove (0.25)
-     */
-    int fnEntaBinG; /**<etna angle bins, Global */
-    int fnEntaBinL; /**<etna angle bins, Local */
+    double m_eaMin; /**< lower edge of enta angle */
+    double m_eaMax; /**< upper edge of enta angle */
+    double m_eaBW; /**< binwdith of enta angle bin */
+    int m_eaBin; /**< # of bins for etna angle */
 
-    Double_t feaLE; /**< Lower edge of enta angle */
-    Double_t feaUE; /**< Upper edge of enta angle */
-    Double_t feaBS; /**< Binwidth edge of enta angle */
+    double m_dedxMin;  /**< lower edge of dedxhit */
+    double m_dedxMax;  /**< upper edge of dedxhit */
+    int m_dedxBin;  /**< # of bins for dedxhit range */
 
-    std::string fSetPrefix; /**< suffix to filename */
-    std::vector<int> fEntaBinNums;  /**< Vector for enta asym bin values */
-    std::vector<double> fEntaBinValues;  /**< Vector for doca asym bin values */
+    double m_ptMax; /**< a limit on transverse momentum  */
+    double m_cosMax; /**< a limit on cos theta  */
 
-    bool IsLocalBin;  /**< if local variable bins requested  */
-    bool IsMakePlots; /**< produce plots for status */
-    bool IsRS; /**< if rotation symmtery requested */
+    double m_truncMin; /**< lower thershold on truncation*/
+    double m_truncMax; /**< uppr thershold on truncation */
+
+    int m_binSplit;/**< multiply nbins by this factor in full range */
+    int m_binMerge;/**< merge bins by this factor in (-pi/2 <-> -pi/4) and (pi/4 <-> pi/2) region*/
+
+    double m_chargeType; /**< charge type for baseline adj */
+    double m_adjustFac;/**< faactor with that one what to adjust baseline */
+
+    bool isFixTrunc; /**< true = fix window for all out/inner layers */
+    bool isVarBins;  /**< true: if variable bin size is requested */
+    bool isRotSymm; /**< if rotation symmtery requested */
+    bool isMakePlots; /**< produce plots for status */
+    bool isPrintLog; /**< print more debug information */
+    bool isMerge; /**< print more debug information */
+
+    std::string m_suffix; /**< add suffix to all plot name  */
+    std::string m_runExp; /**< add suffix to all plot name  */
+    std::string m_label[2] = {"IL", "OL"}; /**< add inner/outer layer label */
+
+    std::vector<int> m_eaBinLocal; /**< # of var bins for etna angle */
+    std::array<std::vector<int>, 2> m_binIndex; /**< symm/Var bin numebrs */
+    std::array<std::vector<double>, 2>m_binValue; /**< etna Var bin values */
+
+    std::vector<std::vector<double>> m_onedcors; /**< final vectors of calibration  */
+
+    DBObjPtr<CDCDedx1DCell> m_DBOneDCell; /**< One cell correction DB object */
+
 
   };
 } // namespace Belle2

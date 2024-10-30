@@ -275,7 +275,7 @@ class TDCPV_klong(BaseSkim):
     **Cuts used**:
 
     * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
-    * ``abs(deltaE) < 0.15``
+    * ``abs(deltaE) < 0.1``
     * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
     * ``E_ECL_TDCPV < 9``
     * ``foxWolframR2<0.6``

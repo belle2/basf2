@@ -229,12 +229,14 @@ void DQMEventProcessorBase::ComputeCommonVariables()
 void DQMEventProcessorBase::FillCommonHistograms()
 {
   if (m_isNotFirstHit && ((m_layerNumber - m_layerNumberPrev) == 1)) {
-    m_histoModule->FillTRClusterCorrelations(m_phi_deg, m_phiPrev_deg, m_theta_deg, m_thetaPrev_deg, m_correlationIndex);
+    if (m_produceTRClusters)
+      m_histoModule->FillTRClusterCorrelations(m_phi_deg, m_phiPrev_deg, m_theta_deg, m_thetaPrev_deg, m_correlationIndex);
   } else {
     m_isNotFirstHit = true;
   }
 
-  m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
+  if (m_produceTRClusters)
+    m_histoModule->FillTRClusterHitmap(m_phi_deg, m_theta_deg, m_layerIndex);
 }
 
 void DQMEventProcessorBase::SetCommonPrevVariables()

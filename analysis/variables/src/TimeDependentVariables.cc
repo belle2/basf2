@@ -515,13 +515,16 @@ namespace Belle2 {
       if (!vert) return Const::doubleNaN;
       B2Vector3D vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
       B2Vector3D vtxSigB = part->getVertex();  // SignalB vertex
-      B2Vector3D pSig = part->getMomentum(); // SigB 3-momentum
-      B2Vector3D nSig = pSig.Unit(); // SigB momentum direction
-      double mB = part->getMass(); // B meson mass
+      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 3-momentum
+      B2Vector3D nSig = p4Sig.Vect().Unit(); // SigB momentum direction
+
+      // Notice that for beta*gamma we use p / m, not p / mPDG which has worse resolution
+      double betaSig = p4Sig.Beta();
+      double gammaSig = 1 / sqrt(1 - betaSig * betaSig);
       double c = Const::speedOfLight / 1000.; // cm ps-1
 
       // momentum/mass == beta*gamma
-      double tSig = (vtxSigB - vtxY4S).Dot(nSig) / (c * pSig.Mag() / mB);
+      double tSig = (vtxSigB - vtxY4S).Dot(nSig) / (c * betaSig * gammaSig);
       return tSig;
     }
 
@@ -538,13 +541,15 @@ namespace Belle2 {
       ROOT::Math::PxPyPzEVector p4TagCms(-p4SigCms.px(), -p4SigCms.py(), -p4SigCms.pz(), p4SigCms.E());
       ROOT::Math::PxPyPzEVector p4Tag = PCmsLabTransform().cmsToLab(p4TagCms);
       B2Vector3D pTag = p4Tag.Vect();
-
       B2Vector3D nTag = pTag.Unit(); // TagB momentum direction
-      double mB = part->getMass(); // B meson mass
+
+      // Notice that for beta*gamma we use p / m, not p / mPDG which has worse resolution
+      double betaTag = p4Tag.Beta();
+      double gammaTag = 1 / sqrt(1 - betaTag * betaTag);
       double c = Const::speedOfLight / 1000.; // cm ps-1
 
       // momentum/mass == beta*gamma
-      double tTag = (vtxTagB - vtxY4S).Dot(nTag) / (c * pTag.Mag() / mB);
+      double tTag = (vtxTagB - vtxY4S).Dot(nTag) / (c * betaTag * gammaTag);
       return tTag;
     }
 

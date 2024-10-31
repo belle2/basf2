@@ -72,7 +72,6 @@ namespace Belle2 {
     double m_effWarning; /**< warning level of the efficiency */
     double m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
     bool m_3Samples; /**< if true enable 3 samples histograms analysis */
-    double m_EfficiencyMin = 0.;
 
     //! Data members
     TCanvas* m_cEfficiencyU = nullptr; /**< efficiency U plot canvas */

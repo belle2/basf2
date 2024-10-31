@@ -69,11 +69,11 @@ namespace Belle2 {
 
     /**  status flags */
     enum svdStatus {
-      noStat = -2, /**< purple frame */
-      lowStat = -1,  /**< gray frame */
       good = 0,    /**< green frame */
       warning = 1, /**< orange frame */
-      error = 2   /**< red frame */
+      error = 2,   /**< red frame */
+      noStat = 3, /**< purple frame */
+      lowStat = 4  /**< gray frame */
     };
 
   };

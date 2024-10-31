@@ -129,31 +129,6 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     B2INFO("no events, nothing to do here");
     return;
   }
-
-  // text module numbers
-  std::tuple<std::vector<TText*>, std::vector<TText*>> moduleNumbers = textModuleNumbers();
-  m_laddersText = std::get<0>(moduleNumbers);
-  m_sensorsText = std::get<1>(moduleNumbers);
-
-  // axes
-  m_ly = new TLine(0, 0, 0, 210);
-  m_ly->SetLineStyle(kDashed);
-  m_ly->SetLineWidth(2);
-
-  m_lx = new TLine(0, 0, 210, 0);
-  m_lx->SetLineStyle(kDashed);
-  m_lx->SetLineWidth(2);
-
-  m_arrowy = new TArrow(0, 0, 0, 10, 0.01, "|>");
-  m_arrowy->SetAngle(40);
-  m_arrowy->SetFillColor(1);
-  m_arrowy->SetLineWidth(2);
-
-  m_arrowx = new TArrow(0, 0, 10, 0, 0.01, "|>");
-  m_arrowx->SetAngle(40);
-  m_arrowx->SetFillColor(1);
-  m_arrowx->SetLineWidth(2);
-
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::beginRun()
@@ -229,6 +204,9 @@ void DQMHistAnalysisSVDEfficiencyModule::beginRun()
 
   m_legEmpty->Clear();
   m_legEmpty->AddText("Track/clusters plots are emtpy");
+
+  m_effUstatus = good;
+  m_effVstatus = good;
 }
 
 void DQMHistAnalysisSVDEfficiencyModule::event()
@@ -339,74 +317,16 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
 
   // update summary for U side
-  m_cEfficiencyU->Draw();
-  m_cEfficiencyU->cd();
-  if (m_hEfficiency) {
-    if (!m_setEfficiencyRange) m_hEfficiency->setMinimum(minEff * 99.9);
-    m_hEfficiency->getHistogram(1)->Draw("text colz");
-  }
-  setStatusOfCanvas(m_effUstatus, m_cEfficiencyU, true);
-
-  m_cEfficiencyRPhiViewU->Draw();
-  m_cEfficiencyRPhiViewU->cd();
-  if (m_hEfficiency) {
-    if (m_setEfficiencyRange) m_hEfficiency->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-    else m_hEfficiency->getPoly(1)->Draw("colz l");
-    drawText();
-  }
-  setStatusOfCanvas(m_effUstatus, m_cEfficiencyRPhiViewU, false);
+  updateCanvases(m_hEfficiency, m_cEfficiencyU, m_cEfficiencyRPhiViewU,  m_effUstatus, minEff, 1);
 
   // update summary for V side
-  m_cEfficiencyV->cd();
-  m_cEfficiencyV->Draw();
-  if (m_hEfficiency)
-    m_hEfficiency->getHistogram(0)->Draw("text colz");
-  setStatusOfCanvas(m_effVstatus, m_cEfficiencyV, true);
+  updateCanvases(m_hEfficiency, m_cEfficiencyV, m_cEfficiencyRPhiViewV,  m_effVstatus, minEff, 0);
 
-  m_cEfficiencyRPhiViewV->cd();
-  m_cEfficiencyRPhiViewV->Draw();
-  if (m_hEfficiency) {
-    if (m_setEfficiencyRange) m_hEfficiency->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-    else m_hEfficiency->getPoly(0)->Draw("colz l");
-    drawText();
-  }
-  setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV, false);
+  // update error summary for U side
+  updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrU, m_cEfficiencyErrRPhiViewU, 1);
 
-  m_cEfficiencyErrU->cd();
-  m_cEfficiencyErrU->Draw();
-  if (m_hEfficiencyErr)
-    m_hEfficiencyErr->getHistogram(1)->Draw("colztext");
-  m_cEfficiencyErrU->Update();
-  m_cEfficiencyErrU->Modified();
-  m_cEfficiencyErrU->Update();
-
-  m_cEfficiencyErrRPhiViewU->cd();
-  m_cEfficiencyErrRPhiViewU->Draw();
-  if (m_hEfficiencyErr) {
-    m_hEfficiencyErr->getPoly(1, 0)->Draw("colz l");
-    drawText();
-  }
-  m_cEfficiencyErrRPhiViewU->Update();
-  m_cEfficiencyErrRPhiViewU->Modified();
-  m_cEfficiencyErrRPhiViewU->Update();
-
-  m_cEfficiencyErrV->cd();
-  m_cEfficiencyErrV->Draw();
-  if (m_hEfficiencyErr)
-    m_hEfficiencyErr->getHistogram(0)->Draw("colztext");
-  m_cEfficiencyErrV->Update();
-  m_cEfficiencyErrV->Modified();
-  m_cEfficiencyErrV->Update();
-
-  m_cEfficiencyErrRPhiViewV->cd();
-  m_cEfficiencyErrRPhiViewV->Draw();
-  if (m_hEfficiencyErr) {
-    m_hEfficiencyErr->getPoly(0, 0)->Draw("colz l");
-    drawText();
-  }
-  m_cEfficiencyErrRPhiViewV->Update();
-  m_cEfficiencyErrRPhiViewV->Modified();
-  m_cEfficiencyErrRPhiViewV->Update();
+  // update error summary for V side
+  updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrV, m_cEfficiencyErrRPhiViewV, 0);
 
   if (m_3Samples) {
     /// ------ 3 samples ------
@@ -471,76 +391,17 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       }
     }
 
-    // update summary for U side
-    m_cEfficiencyU3Samples->Draw();
-    m_cEfficiencyU3Samples->cd();
-    if (m_hEfficiency3Samples) {
-      if (!m_setEfficiencyRange) m_hEfficiency->setMinimum(minEff * 99.9);
-      m_hEfficiency3Samples->getHistogram(1)->Draw("text colz");
-    }
-    setStatusOfCanvas(m_effUstatus, m_cEfficiencyV3Samples, true);
+    // update summary for U side for 3 samples
+    updateCanvases(m_hEfficiency3Samples, m_cEfficiencyU3Samples, m_cEfficiencyRPhiViewU3Samples,  m_effUstatus, minEff, 1);
 
-    m_cEfficiencyRPhiViewU3Samples->Draw();
-    m_cEfficiencyRPhiViewU3Samples->cd();
-    if (m_hEfficiency3Samples) {
-      if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(1, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-      else m_hEfficiency3Samples->getPoly(1)->Draw("colz l");
-      drawText();
-    }
-    setStatusOfCanvas(m_effUstatus, m_cEfficiencyRPhiViewU3Samples, false);
+    // update summary for V side for 3 samples
+    updateCanvases(m_hEfficiency3Samples, m_cEfficiencyV3Samples, m_cEfficiencyRPhiViewV3Samples,  m_effUstatus, minEff, 0);
 
-    m_cEfficiencyRPhiViewU3Samples->Update();
-    m_cEfficiencyRPhiViewU3Samples->Modified();
-    m_cEfficiencyRPhiViewU3Samples->Update();
+    // update error summary for U side for 3 samples
+    updateErrCanvases(m_hEfficiencyErr3Samples, m_cEfficiencyErrU3Samples, m_cEfficiencyErrRPhiViewU3Samples, 1);
 
-    // update summary for V side
-    m_cEfficiencyV3Samples->Draw();
-    m_cEfficiencyV3Samples->cd();
-    if (m_hEfficiency3Samples)
-      m_hEfficiency3Samples->getHistogram(0)->Draw("text colz");
-    setStatusOfCanvas(m_effVstatus, m_cEfficiencyV3Samples, true);
-
-    m_cEfficiencyRPhiViewV3Samples->Draw();
-    m_cEfficiencyRPhiViewV3Samples->cd();
-    if (m_hEfficiency3Samples) {
-      if (m_setEfficiencyRange) m_hEfficiency3Samples->getPoly(0, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-      else m_hEfficiency3Samples->getPoly(0)->Draw("colz l");
-      drawText();
-    }
-    setStatusOfCanvas(m_effVstatus, m_cEfficiencyRPhiViewV3Samples, false);
-
-    m_cEfficiencyErrU3Samples->cd();
-    m_cEfficiencyErrU3Samples->Draw();
-    if (m_hEfficiencyErr3Samples)
-      m_hEfficiencyErr3Samples->getHistogram(1)->Draw("colztext");
-
-    m_cEfficiencyErrRPhiViewU3Samples->cd();
-    if (m_hEfficiencyErr3Samples) {
-      m_hEfficiencyErr3Samples->getPoly(1, 0)->Draw("colz l");
-      drawText();
-    }
-    m_cEfficiencyErrRPhiViewU3Samples->Draw();
-    m_cEfficiencyErrRPhiViewU3Samples->Update();
-    m_cEfficiencyErrRPhiViewU3Samples->Modified();
-    m_cEfficiencyErrRPhiViewU3Samples->Update();
-
-    m_cEfficiencyErrV3Samples->cd();
-    m_cEfficiencyErrV3Samples->Draw();
-    if (m_hEfficiencyErr3Samples)
-      m_hEfficiencyErr3Samples->getHistogram(0)->Draw("colztext");
-    m_cEfficiencyErrV3Samples->Update();
-    m_cEfficiencyErrV3Samples->Modified();
-    m_cEfficiencyErrV3Samples->Update();
-
-    m_cEfficiencyErrRPhiViewV3Samples->cd();
-    if (m_hEfficiencyErr3Samples) {
-      m_hEfficiencyErr3Samples->getPoly(0, 0)->Draw("colz l");
-      drawText();
-    }
-    m_cEfficiencyErrRPhiViewV3Samples->Draw();
-    m_cEfficiencyErrRPhiViewV3Samples->Update();
-    m_cEfficiencyErrRPhiViewV3Samples->Modified();
-    m_cEfficiencyErrRPhiViewV3Samples->Update();
+    // update error summary for V side for 3 samples
+    updateErrCanvases(m_hEfficiencyErr3Samples, m_cEfficiencyErrV3Samples, m_cEfficiencyErrRPhiViewV3Samples, 0);
   }
 }
 
@@ -603,81 +464,10 @@ Int_t DQMHistAnalysisSVDEfficiencyModule::findBinY(Int_t layer, Int_t sensor)
     return -1;
 }
 
-std::tuple<std::vector<TText*>, std::vector<TText*>> DQMHistAnalysisSVDEfficiencyModule::textModuleNumbers()
-{
-  std::vector<TText*> ladders;
-  std::vector<TText*> sensors;
-
-  const double rLayer[4] = {40, 70, 110, 160}; // layer position
-  const double nLadders[4] = {7, 10, 12, 16}; // per layer
-  const double nSensors[4] = {2, 3, 4, 5}; // per ladder
-  const double position[4] = {0.8, 1.2, 1., 0.8}; // text position
-  const double delta[4] = {9, 8, 8, 8}; // width of sensr bins
-  const double inclination[4] = {-17, -5, -13, -12}; // inclination
-
-  double pi = TMath::Pi();
-
-  for (int layer = 0; layer < 4; layer ++) {
-    for (int ladder = 1; ladder <= nLadders[layer]; ladder++) {
-      double deltaText = delta[layer] + position[layer];
-      double r = rLayer[layer] + (deltaText) * nSensors[layer];
-      double phi = 2 * pi / nLadders[layer];
-      double dphiThisPoint = (ladder - 1) * phi - phi / 2 + inclination[layer] * pi / 180.;
-      double dphiNextPoint = dphiThisPoint + phi;
-      double minX = r * TMath::Cos(dphiThisPoint);
-      double maxX = (r + deltaText) * TMath::Cos(dphiNextPoint);
-      double minY = r * TMath::Sin(dphiThisPoint);
-      double maxY = (r + deltaText) * TMath::Sin(dphiNextPoint);
-
-      double xcen = (minX + maxX) / 2.;
-      double ycen = (minY + maxY) / 2.;
-
-      double angle = TMath::ATan2(ycen, xcen) * 180. / TMath::Pi() - 90.;
-      if (ycen < 0) angle = TMath::ATan2(ycen, xcen) * 180. / TMath::Pi() + 90;
-
-      TText* t = new TText(xcen, ycen, Form("%d.%d", layer + 3, ladder));
-      t->SetTextAlign(22);
-      t->SetTextAngle(angle);
-      t->SetTextSize(0.025);
-
-      ladders.push_back(t);
-
-      for (int sensor = 1; sensor <= nSensors[layer]; sensor++) {
-        if ((layer == 0 && ladder == 4) || (layer == 1 && ladder == 5) || (layer == 2 && ladder == 6) || (layer == 3 && ladder == 7)) {
-          double rs = rLayer[layer] + (delta[layer]) * (sensor - 1);
-          double xcens = rs * TMath::Cos(dphiThisPoint);
-          double ycens = rs * TMath::Sin(dphiThisPoint);
-
-          double angles = TMath::ATan2(ycens, xcens) * 180. / pi - 90.;
-          if (ycen < 0) angles = TMath::ATan2(ycens, xcens) * 180. / pi + 90;
-
-          TText* ts = new TText(xcens, ycens, Form("%d ", sensor));
-          ts->SetTextAlign(31);
-          ts->SetTextAngle(angles);
-          ts->SetTextSize(0.018);
-
-          sensors.push_back(ts);
-        }
-      }
-    }
-  }
-
-  return std::make_tuple(ladders, sensors);
-}
-
-void DQMHistAnalysisSVDEfficiencyModule::drawText()
-{
-  m_ly->Draw("same");
-  m_lx->Draw("same");
-  m_arrowx->Draw();
-  m_arrowy->Draw();
-  for (int i = 0; i < (int)m_laddersText.size(); i++) m_laddersText[i]->Draw("same");
-  for (int i = 0; i < (int)m_sensorsText.size(); i++) m_sensorsText[i]->Draw("same");
-}
 
 void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool sideU)
 {
-  effStatus* efficiencyStatus;
+  svdStatus* efficiencyStatus;
 
   if (sideU)
     efficiencyStatus = &m_effUstatus;
@@ -695,4 +485,52 @@ void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool
   } else if ((eff <= m_effError)) {
     *efficiencyStatus = std::max(error, *efficiencyStatus);
   }
+}
+
+void DQMHistAnalysisSVDEfficiencyModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi,
+                                                        svdStatus efficiencyStatus, float minEff, int side)
+{
+  canvas->Draw();
+  canvas->cd();
+  if (histo) {
+    if (!m_setEfficiencyRange) histo->setMinimum(minEff * 99.9);
+    histo->getHistogram(side)->Draw("text colz");
+  }
+  setStatusOfCanvas(efficiencyStatus, canvas);
+
+  canvas->Modified();
+  canvas->Update();
+
+  canvasRPhi->Draw();
+  canvasRPhi->cd();
+  if (histo) {
+    if (m_setEfficiencyRange) histo->getPoly(side, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
+    else histo->getPoly(side)->Draw("colz l");
+    drawText();
+  }
+  setStatusOfCanvas(efficiencyStatus, canvasRPhi, false);
+
+  canvasRPhi->Modified();
+  canvasRPhi->Update();
+}
+
+void DQMHistAnalysisSVDEfficiencyModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, int side)
+{
+  canvas->Draw();
+  canvas->cd();
+  if (histo)
+    histo->getHistogram(side)->Draw("text colz");
+
+  canvas->Modified();
+  canvas->Update();
+
+  canvasRPhi->Draw();
+  canvasRPhi->cd();
+  if (histo) {
+    histo->getPoly(side, 0)->Draw("colz l");
+    drawText();
+  }
+
+  canvasRPhi->Modified();
+  canvasRPhi->Update();
 }

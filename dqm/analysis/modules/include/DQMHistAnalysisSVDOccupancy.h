@@ -134,12 +134,6 @@ namespace Belle2 {
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
     Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
     void setOccStatus(float occ, svdStatus& occupancyStatus, bool online = false); /**< set occupancy status */
-    void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus occupancyStatus, int side,
-                        bool online = false); /**< update canvases */
-
-    int m_occupancyMin = 0; /**< Minimum of the occupancy histogram */
-    int m_occupancyMax = -1111; /**< Maximum of the occupancy histogram. -1111 adjust the maximum depennding on the content */
-    bool m_setOccupancyRange = false; /**< set the range of the occupancy histogram */
 
     std::string m_pvPrefix; /**< string prefix for EPICS PVs */
 

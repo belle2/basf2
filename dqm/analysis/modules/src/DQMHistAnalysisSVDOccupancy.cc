@@ -53,12 +53,6 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
-  addParam("setOccupancyRange", m_setOccupancyRange,
-           "If true you can set the range of the occupancy histogram with 'occupancyMax' and 'occupancyMin' parameters.",
-           bool(false));
-  addParam("occupancyMin", m_occupancyMin, "Minimum of occupancy histogram", int(0));
-  addParam("occupancyMax", m_occupancyMax, "Maximum of occupancy histogram",
-           int(-1111)); //-1111 set the maximum depending on the content
 }
 
 DQMHistAnalysisSVDOccupancyModule::~DQMHistAnalysisSVDOccupancyModule() { }
@@ -597,37 +591,37 @@ void DQMHistAnalysisSVDOccupancyModule::event()
   }
 
   //update summary offline occupancy U canvas
-  updateCanvases(m_hOccupancy, m_cOccupancyU, m_cOccupancyRPhiViewU,  m_occUstatus, 1);
+  updateCanvases(m_hOccupancy, m_cOccupancyU, m_cOccupancyRPhiViewU,  m_occUstatus, true);
 
   //update summary offline occupancy V canvas
-  updateCanvases(m_hOccupancy, m_cOccupancyV, m_cOccupancyRPhiViewV,  m_occVstatus, 0);
+  updateCanvases(m_hOccupancy, m_cOccupancyV, m_cOccupancyRPhiViewV,  m_occVstatus, false);
 
   //update summary offline occupancy U canvas for groupId0
-  updateCanvases(m_hOccupancyGroupId0, m_cOccupancyUGroupId0, m_cOccupancyRPhiViewUGroupId0,  m_occUGroupId0, 1);
+  updateCanvases(m_hOccupancyGroupId0, m_cOccupancyUGroupId0, m_cOccupancyRPhiViewUGroupId0,  m_occUGroupId0, true);
 
   //update summary offline occupancy V canvas for groupId0
-  updateCanvases(m_hOccupancyGroupId0, m_cOccupancyVGroupId0, m_cOccupancyRPhiViewVGroupId0,  m_occVGroupId0, 0);
+  updateCanvases(m_hOccupancyGroupId0, m_cOccupancyVGroupId0, m_cOccupancyRPhiViewVGroupId0,  m_occVGroupId0, false);
 
   //update summary online occupancy U canvas
-  updateCanvases(m_hOnlineOccupancy, m_cOnlineOccupancyU, m_cOnlineOccupancyRPhiViewU,  m_onlineOccUstatus, 1, true);
+  updateCanvases(m_hOnlineOccupancy, m_cOnlineOccupancyU, m_cOnlineOccupancyRPhiViewU,  m_onlineOccUstatus, true, true);
 
   //update summary online occupancy V canvas
-  updateCanvases(m_hOnlineOccupancy, m_cOnlineOccupancyV, m_cOnlineOccupancyRPhiViewV,  m_onlineOccVstatus, 0, true);
+  updateCanvases(m_hOnlineOccupancy, m_cOnlineOccupancyV, m_cOnlineOccupancyRPhiViewV,  m_onlineOccVstatus, false, true);
 
   if (m_3Samples) {
     //update summary offline occupancy U canvas for 3 samples
-    updateCanvases(m_hOccupancy3Samples, m_cOccupancyU3Samples, m_cOccupancyRPhiViewU3Samples,  m_occU3Samples, 1);
+    updateCanvases(m_hOccupancy3Samples, m_cOccupancyU3Samples, m_cOccupancyRPhiViewU3Samples,  m_occU3Samples, true);
 
     //update summary offline occupancy V canvas for 3 samples
-    updateCanvases(m_hOccupancy3Samples, m_cOccupancyV3Samples, m_cOccupancyRPhiViewV3Samples,  m_occV3Samples, 0);
+    updateCanvases(m_hOccupancy3Samples, m_cOccupancyV3Samples, m_cOccupancyRPhiViewV3Samples,  m_occV3Samples, false);
 
     //update summary online occupancy U canvas for 3 samples
     updateCanvases(m_hOnlineOccupancy3Samples, m_cOnlineOccupancyU3Samples, m_cOnlineOccupancyRPhiViewU3Samples,  m_onlineOccU3Samples,
-                   1, true);
+                   true, true);
 
     //update summary online occupancy V canvas for 3 samples
     updateCanvases(m_hOnlineOccupancy3Samples, m_cOnlineOccupancyV3Samples, m_cOnlineOccupancyRPhiViewV3Samples,  m_onlineOccV3Samples,
-                   0, true);
+                   false, true);
   }
 
   if (m_printCanvas) {
@@ -744,29 +738,4 @@ void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, svdStatus&
       occupancyStatus = std::max(error, occupancyStatus);
     }
   }
-}
-
-void DQMHistAnalysisSVDOccupancyModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi,
-                                                       svdStatus occupancyStatus, int side, bool online)
-{
-  canvas->Draw();
-  canvas->cd();
-  if (histo)
-    histo->getHistogram(side)->Draw("text colz");
-  setStatusOfCanvas(occupancyStatus, canvas, true, online);
-
-  canvas->Modified();
-  canvas->Update();
-
-  canvasRPhi->Draw();
-  canvasRPhi->cd();
-  if (histo) {
-    if (m_setOccupancyRange) histo->getPoly(side, m_occupancyMin, m_occupancyMax)->Draw("colz l");
-    else histo->getPoly(side)->Draw("colz l");
-    drawText();
-  }
-  setStatusOfCanvas(occupancyStatus, canvasRPhi, false);
-
-  canvasRPhi->Modified();
-  canvasRPhi->Update();
 }

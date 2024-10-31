@@ -46,12 +46,6 @@ DQMHistAnalysisSVDEfficiencyModule::DQMHistAnalysisSVDEfficiencyModule()
   addParam("statThreshold", m_statThreshold, "minimal number of tracks per sensor to set green/red alert", double(100));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
-  addParam("setEfficiencyRange", m_setEfficiencyRange,
-           "If true you can set the range of the efficiency histogram with 'efficiencyMax' and 'efficiencyMin' parameters.",
-           bool(false));
-  addParam("efficiencyMin", m_efficiencyMin, "Minimum of efficiency histogram", int(0));
-  addParam("efficiencyMax", m_efficiencyMax, "Maximum of efficiency histogram",
-           int(-1111)); //-1111 set the maximum depending on the content
 }
 
 DQMHistAnalysisSVDEfficiencyModule::~DQMHistAnalysisSVDEfficiencyModule()
@@ -90,9 +84,9 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
 
   m_hEfficiency = new SVDSummaryPlots("SVDEfficiency@view", "Summary of SVD efficiencies (%), @view/@side Side");
   m_hEfficiency->setStats(0);
-  if (m_setEfficiencyRange) {
-    m_hEfficiency->setMaximum(m_efficiencyMax);
-    m_hEfficiency->setMinimum(m_efficiencyMin);
+  if (m_setColzRange) {
+    m_hEfficiency->setMaximum(m_colzMaximum);
+    m_hEfficiency->setMinimum(m_colzMinimun);
   }
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
   m_hEfficiencyErr->setStats(0);
@@ -111,9 +105,9 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_hEfficiency3Samples = new SVDSummaryPlots("SVD3Efficiency@view",
                                                 "Summary of SVD efficiencies (%), @view/@side Side for 3 samples");
     m_hEfficiency3Samples->setStats(0);
-    if (m_setEfficiencyRange) {
-      m_hEfficiency3Samples->setMaximum(m_efficiencyMax);
-      m_hEfficiency3Samples->setMinimum(m_efficiencyMin);
+    if (m_setColzRange) {
+      m_hEfficiency3Samples->setMaximum(m_colzMaximum);
+      m_hEfficiency3Samples->setMinimum(m_colzMinimun);
     }
     m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
                                                    "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");
@@ -259,7 +253,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   Float_t effV = -1;
   Float_t erreffU = -1;
   Float_t erreffV = -1;
-  Float_t minEff = 99999;
+  m_valueMinimum = 99999;
 
   // Efficiency for the U and V sides
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
@@ -281,7 +275,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denU = found_tracksU->GetBinContent(bin);
       if (denU > 0)
         effU = numU / denU;
-      if (effU < minEff) minEff = effU;
+      if (effU < m_valueMinimum) m_valueMinimum = effU;
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       if (denU > 0)
@@ -292,7 +286,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       float denV = found_tracksV->GetBinContent(bin);
       if (denV > 0)
         effV = numV / denV;
-      if (effV < minEff) minEff = effV;
+      if (effV < m_valueMinimum) m_valueMinimum = effV;
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       if (denV > 0)
@@ -317,16 +311,16 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
 
   // update summary for U side
-  updateCanvases(m_hEfficiency, m_cEfficiencyU, m_cEfficiencyRPhiViewU,  m_effUstatus, minEff, 1);
+  updateCanvases(m_hEfficiency, m_cEfficiencyU, m_cEfficiencyRPhiViewU,  m_effUstatus, true);
 
   // update summary for V side
-  updateCanvases(m_hEfficiency, m_cEfficiencyV, m_cEfficiencyRPhiViewV,  m_effVstatus, minEff, 0);
+  updateCanvases(m_hEfficiency, m_cEfficiencyV, m_cEfficiencyRPhiViewV,  m_effVstatus, false);
 
   // update error summary for U side
-  updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrU, m_cEfficiencyErrRPhiViewU, 1);
+  updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrU, m_cEfficiencyErrRPhiViewU, true);
 
   // update error summary for V side
-  updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrV, m_cEfficiencyErrRPhiViewV, 0);
+  updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrV, m_cEfficiencyErrRPhiViewV, false);
 
   if (m_3Samples) {
     /// ------ 3 samples ------
@@ -355,7 +349,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denU = found3_tracksU->GetBinContent(bin);
         if (denU > 0)
           effU = numU / denU;
-        if (effU < minEff) minEff = effU;
+        if (effU < m_valueMinimum) m_valueMinimum = effU;
         B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         if (denU > 0)
@@ -367,7 +361,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         float denV = found3_tracksV->GetBinContent(bin);
         if (denV > 0)
           effV = numV / denV;
-        if (effV < minEff) minEff = effV;
+        if (effV < m_valueMinimum) m_valueMinimum = effV;
         B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         if (denV > 0)
@@ -392,16 +386,16 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
 
     // update summary for U side for 3 samples
-    updateCanvases(m_hEfficiency3Samples, m_cEfficiencyU3Samples, m_cEfficiencyRPhiViewU3Samples,  m_effUstatus, minEff, 1);
+    updateCanvases(m_hEfficiency3Samples, m_cEfficiencyU3Samples, m_cEfficiencyRPhiViewU3Samples,  m_effUstatus, true);
 
     // update summary for V side for 3 samples
-    updateCanvases(m_hEfficiency3Samples, m_cEfficiencyV3Samples, m_cEfficiencyRPhiViewV3Samples,  m_effUstatus, minEff, 0);
+    updateCanvases(m_hEfficiency3Samples, m_cEfficiencyV3Samples, m_cEfficiencyRPhiViewV3Samples,  m_effUstatus, false);
 
     // update error summary for U side for 3 samples
-    updateErrCanvases(m_hEfficiencyErr3Samples, m_cEfficiencyErrU3Samples, m_cEfficiencyErrRPhiViewU3Samples, 1);
+    updateErrCanvases(m_hEfficiencyErr3Samples, m_cEfficiencyErrU3Samples, m_cEfficiencyErrRPhiViewU3Samples, true);
 
     // update error summary for V side for 3 samples
-    updateErrCanvases(m_hEfficiencyErr3Samples, m_cEfficiencyErrV3Samples, m_cEfficiencyErrRPhiViewV3Samples, 0);
+    updateErrCanvases(m_hEfficiencyErr3Samples, m_cEfficiencyErrV3Samples, m_cEfficiencyErrRPhiViewV3Samples, false);
   }
 }
 
@@ -465,11 +459,11 @@ Int_t DQMHistAnalysisSVDEfficiencyModule::findBinY(Int_t layer, Int_t sensor)
 }
 
 
-void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool sideU)
+void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool isU)
 {
   svdStatus* efficiencyStatus;
 
-  if (sideU)
+  if (isU)
     efficiencyStatus = &m_effUstatus;
   else
     efficiencyStatus = &m_effVstatus;
@@ -487,50 +481,3 @@ void DQMHistAnalysisSVDEfficiencyModule::setEffStatus(float den, float eff, bool
   }
 }
 
-void DQMHistAnalysisSVDEfficiencyModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi,
-                                                        svdStatus efficiencyStatus, float minEff, int side)
-{
-  canvas->Draw();
-  canvas->cd();
-  if (histo) {
-    if (!m_setEfficiencyRange) histo->setMinimum(minEff * 99.9);
-    histo->getHistogram(side)->Draw("text colz");
-  }
-  setStatusOfCanvas(efficiencyStatus, canvas);
-
-  canvas->Modified();
-  canvas->Update();
-
-  canvasRPhi->Draw();
-  canvasRPhi->cd();
-  if (histo) {
-    if (m_setEfficiencyRange) histo->getPoly(side, m_efficiencyMin, m_efficiencyMax)->Draw("colz l");
-    else histo->getPoly(side)->Draw("colz l");
-    drawText();
-  }
-  setStatusOfCanvas(efficiencyStatus, canvasRPhi, false);
-
-  canvasRPhi->Modified();
-  canvasRPhi->Update();
-}
-
-void DQMHistAnalysisSVDEfficiencyModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, int side)
-{
-  canvas->Draw();
-  canvas->cd();
-  if (histo)
-    histo->getHistogram(side)->Draw("text colz");
-
-  canvas->Modified();
-  canvas->Update();
-
-  canvasRPhi->Draw();
-  canvasRPhi->cd();
-  if (histo) {
-    histo->getPoly(side, 0)->Draw("colz l");
-    drawText();
-  }
-
-  canvasRPhi->Modified();
-  canvasRPhi->Update();
-}

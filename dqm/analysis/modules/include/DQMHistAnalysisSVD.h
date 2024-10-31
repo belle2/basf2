@@ -67,6 +67,13 @@ namespace Belle2 {
     TArrow* m_arrowx = nullptr; /**< x-axis direction */
     TArrow* m_arrowy = nullptr; /**< y-axis direction */
 
+    int m_colzMinimun = 0; /**< Minimum of the  histogram */
+    int m_colzMaximum = -1111; /**< Maximum of the  histogram. -1111 adjust the maximum depennding on the content */
+    bool m_setColzRange = false; /**< set the range of the  histogram in colz*/
+
+    float m_valueMinimum = -1; /**< Minimum value of parameter  */
+    float m_valueMaximum = -1; /**< Maxiimum value of parameter  */
+
     /**  status flags */
     enum svdStatus {
       good = 0,    /**< green frame */
@@ -75,6 +82,10 @@ namespace Belle2 {
       noStat = 3, /**< purple frame */
       lowStat = 4  /**< gray frame */
     };
+
+    void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status, bool side,
+                        bool online = false); /**< update canvases */
+    void updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool side); /**< update error canvases */
 
   };
 } // end namespace Belle2

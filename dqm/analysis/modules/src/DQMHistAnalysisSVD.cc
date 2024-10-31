@@ -42,6 +42,12 @@ DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online)
 
   setDescription("DQM base SVD Analysis.");
 
+  addParam("setColzRange", m_setColzRange,
+           "If true you can set the range of the histogram in Z with 'ColzMax' and 'ColzMin' parameters.",
+           bool(false));
+  addParam("ColzMin", m_colzMinimun, "Minimum of Colz histogram", int(0));
+  addParam("ColzMax", m_colzMaximum, "Maximum of Colz histogram", int(-1111)); //-1111 set the maximum depending on the content
+
   float x1 = 0;
   float x2 = 0;
   float y1 = 0;
@@ -183,6 +189,54 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
 
   canvas->Modified();
   canvas->Update();
+}
+
+void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status,
+                                              bool side, bool online)
+{
+  canvas->Draw();
+  canvas->cd();
+  if (histo) {
+    if (!m_setColzRange && m_valueMinimum > 0) histo->setMinimum(m_valueMinimum * 99.9);
+    histo->getHistogram(side)->Draw("text colz");
+  }
+  setStatusOfCanvas(status, canvas, true, online);
+
+  canvas->Modified();
+  canvas->Update();
+
+  canvasRPhi->Draw();
+  canvasRPhi->cd();
+  if (histo) {
+    if (m_setColzRange) histo->getPoly(side, m_colzMinimun, m_colzMaximum)->Draw("colz l");
+    else histo->getPoly(side)->Draw("colz l");
+    drawText();
+  }
+  setStatusOfCanvas(status, canvasRPhi, false);
+
+  canvasRPhi->Modified();
+  canvasRPhi->Update();
+}
+
+void DQMHistAnalysisSVDModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool side)
+{
+  canvas->Draw();
+  canvas->cd();
+  if (histo)
+    histo->getHistogram(side)->Draw("text colz");
+
+  canvas->Modified();
+  canvas->Update();
+
+  canvasRPhi->Draw();
+  canvasRPhi->cd();
+  if (histo) {
+    histo->getPoly(side, 0)->Draw("colz l");
+    drawText();
+  }
+
+  canvasRPhi->Modified();
+  canvasRPhi->Update();
 }
 
 pair<vector<TText*>, vector<TText*>> DQMHistAnalysisSVDModule::textModuleNumbers()

@@ -72,6 +72,7 @@ namespace Belle2 {
     double m_effWarning; /**< warning level of the efficiency */
     double m_statThreshold; /**<minimal number of tracks per sensor to set green or red frame */
     bool m_3Samples; /**< if true enable 3 samples histograms analysis */
+    double m_EfficiencyMin = 0.;
 
     //! Data members
     TCanvas* m_cEfficiencyU = nullptr; /**< efficiency U plot canvas */
@@ -99,18 +100,11 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
 
     Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
-    void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus occupancyStatus, float minEff,
-                        int side); /**< update canvases */
-    void updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, int side); /**< update error canvases */
-
-    int m_efficiencyMin = 0; /**< Minimum of the efficiency histogram */
-    int m_efficiencyMax = -1111; /**< Maximum of the efficiency histogram. -1111 adjust the maximum depennding on the content */
-    bool m_setEfficiencyRange = false; /**< set the range of the efficiency histogram */
 
     svdStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     svdStatus m_effVstatus;/**< number representing the status of the efficiency V side */
 
-    void setEffStatus(float den, float eff, bool sideU = false); /**< set efficiency status */
+    void setEffStatus(float den, float eff, bool isU = false); /**< set efficiency status */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

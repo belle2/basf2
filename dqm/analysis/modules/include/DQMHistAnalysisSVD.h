@@ -21,6 +21,9 @@
 #include <TPaveText.h>
 #include <TCanvas.h>
 #include <TH2F.h>
+#include <TText.h>
+#include <TLine.h>
+#include <TArrow.h>
 
 namespace Belle2 {
   /*! Class definition for common method */
@@ -53,13 +56,24 @@ namespace Belle2 {
     TPaveText* m_legOnlineWarning = nullptr; /**< onlineOccupancy plot legend, warning */
     TPaveText* m_legOnlineNormal = nullptr;  /**< onlineOccupancy plot legend, normal */
 
+    std::pair<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
+    void drawText(); /**< draw text on the RPhi view */
+
+    std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
+    std::vector<TText*> m_sensorsText; /**< list of sensors to write on the cancas */
+
+    TLine* m_lx = nullptr; /**< y-axis */
+    TLine* m_ly = nullptr; /**< x-axis */
+    TArrow* m_arrowx = nullptr; /**< x-axis direction */
+    TArrow* m_arrowy = nullptr; /**< y-axis direction */
+
     /**  status flags */
     enum svdStatus {
+      noStat = -2, /**< purple frame */
+      lowStat = -1,  /**< gray frame */
       good = 0,    /**< green frame */
       warning = 1, /**< orange frame */
-      error = 2,   /**< red frame */
-      lowStat = 3,  /**< gray frame */
-      noStat = 4 /**< purple frame */
+      error = 2   /**< red frame */
     };
 
   };

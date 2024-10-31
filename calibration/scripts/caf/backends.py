@@ -1982,7 +1982,7 @@ class HTCondor(Batch):
                 else:
                     B2ERROR(f"Error during condor_submit: {str(e)}, sleeping for {sleep_time} seconds.")
                     time.sleep(30)
-        return sub_out.split()[0]
+        return re.search(r"(\d+\.\d+) - \d+\.\d+", sub_out).groups()[0]
 
     class HTCondorResult(Result):
         """

@@ -273,25 +273,26 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
       // U-side
       float numU = matched_clusU->GetBinContent(bin);
       float denU = found_tracksU->GetBinContent(bin);
-      if (denU > 0)
+      if (denU > 0) {
         effU = numU / denU;
-      if (effU < m_valueMinimum) m_valueMinimum = effU;
-      B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
-      m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
-      if (denU > 0)
         erreffU = std::sqrt(effU * (1 - effU) / denU);
+      }
+      if (effU < m_valueMinimum) m_valueMinimum = effU;
+      m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
+      B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
+
       // V-side
       float numV = matched_clusV->GetBinContent(bin);
       float denV = found_tracksV->GetBinContent(bin);
-      if (denV > 0)
+      if (denV > 0) {
         effV = numV / denV;
-      if (effV < m_valueMinimum) m_valueMinimum = effV;
-      B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
-      m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
-      if (denV > 0)
         erreffV = std::sqrt(effV * (1 - effV) / denV);
+      }
+      if (effV < m_valueMinimum) m_valueMinimum = effV;
+      m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
+      B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
 
       setEffStatus(denU, effU, true);
       setEffStatus(denV, effV, false);
@@ -347,26 +348,26 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         // U-side
         float numU = matched3_clusU->GetBinContent(bin);
         float denU = found3_tracksU->GetBinContent(bin);
-        if (denU > 0)
+        if (denU > 0) {
           effU = numU / denU;
-        if (effU < m_valueMinimum) m_valueMinimum = effU;
-        B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
-        m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
-        if (denU > 0)
           erreffU = std::sqrt(effU * (1 - effU) / denU);
+        }
+        if (effU < m_valueMinimum) m_valueMinimum = effU;
+        m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
+        B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
 
         // V-side
         float numV = matched3_clusV->GetBinContent(bin);
         float denV = found3_tracksV->GetBinContent(bin);
-        if (denV > 0)
+        if (denV > 0) {
           effV = numV / denV;
-        if (effV < m_valueMinimum) m_valueMinimum = effV;
-        B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
-        m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
-        if (denV > 0)
           erreffV = std::sqrt(effV * (1 - effV) / denV);
+        }
+        if (effV < m_valueMinimum) m_valueMinimum = effV;
+        m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
+        B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
 
         setEffStatus(denU, effU, true);
         setEffStatus(denV, effV, false);

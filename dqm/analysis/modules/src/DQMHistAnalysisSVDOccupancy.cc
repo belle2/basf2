@@ -53,6 +53,12 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
+  addParam("setOccupancyRange", m_setOccupancyRange,
+           "If true you can set the range of the occupancy histogram with 'occupancyMax' and 'occupancyMin' parameters.",
+           bool(false));
+  addParam("occupancyMin", m_occupancyMin, "Minimum of occupancy histogram", int(0));
+  addParam("occupancyMax", m_occupancyMax, "Maximum of occupancy histogram",
+           int(-1111)); //-1111 set the maximum depending on the content
 }
 
 DQMHistAnalysisSVDOccupancyModule::~DQMHistAnalysisSVDOccupancyModule() { }
@@ -99,21 +105,31 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   m_cOnlineOccupancyU = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyU");
   m_cOnlineOccupancyV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV");
 
+  m_cOccupancyUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyUGroupId0");
+  m_cOccupancyVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyVGroupId0");
+
+  m_cOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU", "", 800, 800);
+  m_cOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV", "", 800, 800);
+
+  m_cOnlineOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU", "", 800, 800);
+  m_cOnlineOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV", "", 800, 800);
+
+  m_cOccupancyRPhiViewUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewUGroupId0", "", 800, 800);
+  m_cOccupancyRPhiViewVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewVGroupId0", "", 800, 800);
 
   if (m_3Samples) {
     m_cOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyU3Samples");
-    //  m_cOccupancyU->SetGrid(1);
     m_cOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyV3Samples");
-    //  m_cOccupancyV->SetGrid(1);
 
     m_cOnlineOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyU3Samples");
-    //  m_cOnlineOccupancyU->SetGrid(1);
     m_cOnlineOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV3Samples");
-    //  m_cOnlineOccupancyV->SetGrid(1);
-  }
 
-  m_cOccupancyUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyUGroupId0");
-  m_cOccupancyVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyVGroupId0");
+    m_cOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU3Samples", "", 800, 800);
+    m_cOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV3Samples", "", 800, 800);
+
+    m_cOnlineOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU3Samples", "", 800, 800);
+    m_cOnlineOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV3Samples", "", 800, 800);
+  }
 
   m_hOccupancy =  new SVDSummaryPlots("hOccupancy@view", "Average OFFLINE Sensor Occupancy (%), @view/@side Side");
   m_hOccupancy->setStats(0);
@@ -140,29 +156,60 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   registerEpicsPV(m_pvPrefix + "occupancyOnlineLimits", "occOnlineLimits");
 }
 
-
 void DQMHistAnalysisSVDOccupancyModule::beginRun()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDOccupancy: beginRun called.");
-  m_cOccupancyU->Clear();
-  m_cOccupancyV->Clear();
 
-  m_cOnlineOccupancyU->Clear();
-  m_cOnlineOccupancyV->Clear();
   m_cOccupancyChartChip->Clear();
   for (int i = 0; i < m_sensors; i++) {
     m_cStripOccupancyU[i]->Clear();
     m_cStripOccupancyV[i]->Clear();
   }
 
+  // histo
+  if (m_cOccupancyU)
+    m_cOccupancyU->Clear();
+  if (m_cOccupancyV)
+    m_cOccupancyV->Clear();
+
+  if (m_cOnlineOccupancyU)
+    m_cOnlineOccupancyU->Clear();
+  if (m_cOnlineOccupancyV)
+    m_cOnlineOccupancyV->Clear();
+
+  if (m_cOccupancyUGroupId0)
+    m_cOccupancyUGroupId0->Clear();
+  if (m_cOccupancyVGroupId0)
+    m_cOccupancyVGroupId0->Clear();
+
+  // RPhiView
+  if (m_cOccupancyRPhiViewU)
+    m_cOccupancyRPhiViewU->Clear();
+  if (m_cOccupancyRPhiViewV)
+    m_cOccupancyRPhiViewV->Clear();
+
+  if (m_cOnlineOccupancyRPhiViewU)
+    m_cOnlineOccupancyRPhiViewU->Clear();
+  if (m_cOnlineOccupancyRPhiViewV)
+    m_cOnlineOccupancyRPhiViewV->Clear();
+
+  if (m_cOccupancyRPhiViewUGroupId0)
+    m_cOccupancyRPhiViewUGroupId0->Clear();
+  if (m_cOccupancyRPhiViewVGroupId0)
+    m_cOccupancyRPhiViewVGroupId0->Clear();
+
+  // 3 samples
   if (m_3Samples) {
     m_cOccupancyU3Samples->Clear();
     m_cOccupancyV3Samples->Clear();
     m_cOnlineOccupancyU3Samples->Clear();
     m_cOnlineOccupancyV3Samples->Clear();
+
+    m_cOccupancyRPhiViewU3Samples->Clear();
+    m_cOccupancyRPhiViewV3Samples->Clear();
+    m_cOnlineOccupancyRPhiViewU3Samples->Clear();
+    m_cOnlineOccupancyRPhiViewV3Samples->Clear();
   }
-  m_cOccupancyUGroupId0->Clear();
-  m_cOccupancyVGroupId0->Clear();
 
   //Retrieve limits from EPICS
   double oocErrorLoOff = 0.;
@@ -217,6 +264,21 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legOnlineNormal->Clear();
   m_legOnlineNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legOnlineNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
+
+  m_occUstatus = good; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+  m_occVstatus = good;
+
+  m_occU3Samples = good;
+  m_occV3Samples = good;
+
+  m_occUGroupId0 = good;
+  m_occVGroupId0 = good;
+
+  m_onlineOccUstatus = good;
+  m_onlineOccVstatus = good;
+
+  m_onlineOccU3Samples = good;
+  m_onlineOccV3Samples = good;
 }
 
 void DQMHistAnalysisSVDOccupancyModule::event()
@@ -311,6 +373,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       Float_t occU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
       m_hOccupancy->fill(m_SVDModules[i], 1, occU);
       setOccStatus(occU, m_occUstatus);
+
       //produce the occupancy plot
       if (m_additionalPlots) {
         m_hStripOccupancyU[i].Clear();
@@ -429,7 +492,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("OnlineOccupancy V histogram not found");
-      setOccStatus(-1, m_onlineOccVstatus);
+      setOccStatus(-1, m_onlineOccVstatus, true);
 
     } else {
       Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -438,9 +501,8 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
-      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-
-      setOccStatus(onlineOccV, m_onlineOccVstatus);
+      htmp->GetYaxis()->SetTitle("ZS3 occupancy (%)");
+      setOccStatus(onlineOccV, m_onlineOccVstatus, true);
     }
 
     if (m_3Samples) {
@@ -450,7 +512,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("OnlineOccupancy3 V histogram not found");
-        setOccStatus(-1, m_onlineOccV3Samples);
+        setOccStatus(-1, m_onlineOccV3Samples, true);
 
       } else {
         Float_t onlineOccV = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents, true);
@@ -459,8 +521,8 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
           htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
         }
-        htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-        setOccStatus(onlineOccV, m_onlineOccV3Samples);
+        htmp->GetYaxis()->SetTitle("ZS3 occupancy (%)");
+        setOccStatus(onlineOccV, m_onlineOccV3Samples, true);
       }
     }
 
@@ -470,7 +532,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     htmp = (TH1F*)findHist(tmpname.Data());
     if (htmp == NULL) {
       B2INFO("OnlineOccupancy U histogram not found");
-      setOccStatus(-1, m_onlineOccUstatus);
+      setOccStatus(-1, m_onlineOccUstatus, true);
 
     } else {
       Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -479,8 +541,8 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
         htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
       }
-      htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-      setOccStatus(onlineOccU, m_onlineOccUstatus);
+      htmp->GetYaxis()->SetTitle("ZS3 occupancy (%)");
+      setOccStatus(onlineOccU, m_onlineOccUstatus, true);
     }
 
     if (m_3Samples) {
@@ -490,7 +552,7 @@ void DQMHistAnalysisSVDOccupancyModule::event()
       htmp = (TH1F*)findHist(tmpname.Data());
       if (htmp == NULL) {
         B2INFO("OnlineOccupancy3 U histogram not found");
-        setOccStatus(-1, m_onlineOccU3Samples);
+        setOccStatus(-1, m_onlineOccU3Samples, true);
 
       } else {
         Float_t onlineOccU = getOccupancy(htmp->GetEntries(), tmp_layer, nEvents);
@@ -499,8 +561,8 @@ void DQMHistAnalysisSVDOccupancyModule::event()
         for (int b = 1; b < htmp->GetNbinsX() + 1; b++) {
           htmp->SetBinContent(b, htmp->GetBinContent(b) / nEvents * 100);
         }
-        htmp->GetYaxis()->SetTitle("ZS3 ccupancy (%)");
-        setOccStatus(onlineOccU, m_onlineOccU3Samples);
+        htmp->GetYaxis()->SetTitle("ZS3 occupancy (%)");
+        setOccStatus(onlineOccU, m_onlineOccU3Samples, true);
       }
     }
 
@@ -521,76 +583,44 @@ void DQMHistAnalysisSVDOccupancyModule::event()
   }
 
   //update summary offline occupancy U canvas
-  m_cOccupancyU->Draw();
-  m_cOccupancyU->cd();
-  m_hOccupancy->getHistogram(1)->Draw("text colz");
-  setStatusOfCanvas(m_occUstatus, m_cOccupancyU);
+  updateCanvases(m_hOccupancy, m_cOccupancyU, m_cOccupancyRPhiViewU,  m_occUstatus, 1);
+
+  //update summary offline occupancy V canvas
+  updateCanvases(m_hOccupancy, m_cOccupancyV, m_cOccupancyRPhiViewV,  m_occVstatus, 0);
+
+  //update summary offline occupancy U canvas for groupId0
+  updateCanvases(m_hOccupancyGroupId0, m_cOccupancyUGroupId0, m_cOccupancyRPhiViewUGroupId0,  m_occUGroupId0, 1);
+
+  //update summary offline occupancy V canvas for groupId0
+  updateCanvases(m_hOccupancyGroupId0, m_cOccupancyVGroupId0, m_cOccupancyRPhiViewVGroupId0,  m_occVGroupId0, 0);
+
+  //update summary online occupancy U canvas
+  updateCanvases(m_hOnlineOccupancy, m_cOnlineOccupancyU, m_cOnlineOccupancyRPhiViewU,  m_onlineOccUstatus, 1, true);
+
+  //update summary online occupancy V canvas
+  updateCanvases(m_hOnlineOccupancy, m_cOnlineOccupancyV, m_cOnlineOccupancyRPhiViewV,  m_onlineOccVstatus, 0, true);
 
   if (m_3Samples) {
     //update summary offline occupancy U canvas for 3 samples
-    m_cOccupancyU3Samples->Draw();
-    m_cOccupancyU3Samples->cd();
-    m_hOccupancy3Samples->getHistogram(1)->Draw("text colz");
-    setStatusOfCanvas(m_occU3Samples, m_cOccupancyU3Samples);
-  }
+    updateCanvases(m_hOccupancy3Samples, m_cOccupancyU3Samples, m_cOccupancyRPhiViewU3Samples,  m_occU3Samples, 1);
 
-  //update summary offline occupancy U canvas for groupId0
-  m_cOccupancyUGroupId0->Draw();
-  m_cOccupancyUGroupId0->cd();
-  m_hOccupancyGroupId0->getHistogram(1)->Draw("text colz");
-  setStatusOfCanvas(m_occUGroupId0, m_cOccupancyUGroupId0);
-
-  //update summary offline occupancy V canvas
-  m_cOccupancyV->Draw();
-  m_cOccupancyV->cd();
-  m_hOccupancy->getHistogram(0)->Draw("text colz");
-  setStatusOfCanvas(m_occVstatus, m_cOccupancyV);
-
-  if (m_3Samples) {
     //update summary offline occupancy V canvas for 3 samples
-    m_cOccupancyV3Samples->Draw();
-    m_cOccupancyV3Samples->cd();
-    m_hOccupancy3Samples->getHistogram(0)->Draw("text colz");
-    setStatusOfCanvas(m_occV3Samples, m_cOccupancyV3Samples);
+    updateCanvases(m_hOccupancy3Samples, m_cOccupancyV3Samples, m_cOccupancyRPhiViewV3Samples,  m_occV3Samples, 0);
+
+    //update summary online occupancy U canvas for 3 samples
+    updateCanvases(m_hOnlineOccupancy3Samples, m_cOnlineOccupancyU3Samples, m_cOnlineOccupancyRPhiViewU3Samples,  m_onlineOccU3Samples,
+                   1, true);
+
+    //update summary online occupancy V canvas for 3 samples
+    updateCanvases(m_hOnlineOccupancy3Samples, m_cOnlineOccupancyV3Samples, m_cOnlineOccupancyRPhiViewV3Samples,  m_onlineOccV3Samples,
+                   0, true);
   }
-
-  //update summary offline occupancy V canvas for groupId0
-  m_cOccupancyVGroupId0->Draw();
-  m_cOccupancyVGroupId0->cd();
-  m_hOccupancyGroupId0->getHistogram(0)->Draw("text colz");
-  setStatusOfCanvas(m_occVGroupId0, m_cOccupancyVGroupId0);
-
-  //update summary online occupancy U canvas
-  m_cOnlineOccupancyU->Draw();
-  m_cOnlineOccupancyU->cd();
-  m_hOnlineOccupancy->getHistogram(1)->Draw("text colz");
-  setStatusOfCanvas(m_onlineOccUstatus, m_cOnlineOccupancyU, true, true);
-
-  //update summary online occupancy V canvas
-  m_cOnlineOccupancyV->Draw();
-  m_cOnlineOccupancyV->cd();
-  m_hOnlineOccupancy->getHistogram(0)->Draw("text colz");
-  setStatusOfCanvas(m_onlineOccVstatus, m_cOnlineOccupancyV, true, true);
 
   if (m_printCanvas) {
     m_cOccupancyU->Print("c_SVDOccupancyU.pdf");
     m_cOccupancyV->Print("c_SVDOccupancyV.pdf");
     m_cOnlineOccupancyU->Print("c_SVDOnlineOccupancyU.pdf");
     m_cOnlineOccupancyV->Print("c_SVDOnlineOccupancyV.pdf");
-  }
-
-  if (m_3Samples) {
-    //update summary online occupancy U canvas for 3 samples
-    m_cOnlineOccupancyU3Samples->Draw();
-    m_cOnlineOccupancyU3Samples->cd();
-    m_hOnlineOccupancy3Samples->getHistogram(1)->Draw("text colz");
-    setStatusOfCanvas(m_onlineOccU3Samples, m_cOnlineOccupancyU3Samples, true, true);
-
-    //update summary online occupancy V canvas for 3 samples
-    m_cOnlineOccupancyV3Samples->Draw();
-    m_cOnlineOccupancyV3Samples->cd();
-    m_hOnlineOccupancy3Samples->getHistogram(0)->Draw("text colz");
-    setStatusOfCanvas(m_onlineOccV3Samples, m_cOnlineOccupancyV3Samples, true, true);
   }
 }
 
@@ -604,19 +634,43 @@ void DQMHistAnalysisSVDOccupancyModule::terminate()
 {
   B2DEBUG(10, "DQMHistAnalysisSVDOccupancy: terminate called");
 
-  delete m_cOccupancyU;
-  delete m_cOccupancyV;
-
   delete m_hOccupancy;
   delete m_hOnlineOccupancy;
   delete m_hOccupancyGroupId0;
   delete m_hOccupancy3Samples;
   delete m_hOnlineOccupancy3Samples;
 
+  delete m_cOccupancyChartChip;
+
+  delete m_cOccupancyU;
+  delete m_cOccupancyV;
+
   delete m_cOnlineOccupancyU;
   delete m_cOnlineOccupancyV;
 
-  delete m_cOccupancyChartChip;
+  delete m_cOccupancyU3Samples;
+  delete m_cOccupancyV3Samples;
+
+  delete m_cOnlineOccupancyU3Samples;
+  delete m_cOnlineOccupancyV3Samples;
+
+  delete m_cOccupancyUGroupId0;
+  delete m_cOccupancyVGroupId0;
+
+  delete m_cOccupancyRPhiViewU;
+  delete m_cOccupancyRPhiViewV;
+
+  delete m_cOnlineOccupancyRPhiViewU;
+  delete m_cOnlineOccupancyRPhiViewV;
+
+  delete m_cOccupancyRPhiViewU3Samples;
+  delete m_cOccupancyRPhiViewV3Samples;
+
+  delete m_cOnlineOccupancyRPhiViewU3Samples;
+  delete m_cOnlineOccupancyRPhiViewV3Samples;
+
+  delete m_cOccupancyRPhiViewUGroupId0;
+  delete m_cOccupancyRPhiViewVGroupId0;
 
   for (int module = 0; module < m_sensors; module++) {
     delete m_cStripOccupancyU[module];
@@ -649,7 +703,7 @@ Float_t DQMHistAnalysisSVDOccupancyModule::getOccupancy(float entries, int tmp_l
   return (entries / nStrips / nEvents * 100);
 }
 
-void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, occStatus& occupancyStatus, bool online)
+void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, svdStatus& occupancyStatus, bool online)
 {
   if (online) {
     if (occupancy < 0)
@@ -676,4 +730,29 @@ void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, occStatus&
       occupancyStatus = std::max(error, occupancyStatus);
     }
   }
+}
+
+void DQMHistAnalysisSVDOccupancyModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi,
+                                                       svdStatus occupancyStatus, int side, bool online)
+{
+  canvas->Draw();
+  canvas->cd();
+  if (histo)
+    histo->getHistogram(side)->Draw("text colz");
+  setStatusOfCanvas(occupancyStatus, canvas, true, online);
+
+  canvas->Modified();
+  canvas->Update();
+
+  canvasRPhi->Draw();
+  canvasRPhi->cd();
+  if (histo) {
+    if (m_setOccupancyRange) histo->getPoly(side, m_occupancyMin, m_occupancyMax)->Draw("colz l");
+    else histo->getPoly(side)->Draw("colz l");
+    drawText();
+  }
+  setStatusOfCanvas(occupancyStatus, canvasRPhi, false);
+
+  canvasRPhi->Modified();
+  canvasRPhi->Update();
 }

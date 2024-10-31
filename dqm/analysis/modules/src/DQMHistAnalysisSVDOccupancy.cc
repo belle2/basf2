@@ -265,7 +265,7 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legOnlineNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legOnlineNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
 
-  m_occUstatus = good; /**< 0 = normal, 4 = empty, 1 = warning, 2 = error*/
+  m_occUstatus = good;
   m_occVstatus = good;
 
   m_occU3Samples = good;
@@ -325,6 +325,20 @@ void DQMHistAnalysisSVDOccupancyModule::event()
   //check MODULE OCCUPANCY online & offline
   //reset canvas color
   //update titles with exp and run number
+  m_occUstatus = good;
+  m_occVstatus = good;
+
+  m_occU3Samples = good;
+  m_occV3Samples = good;
+
+  m_occUGroupId0 = good;
+  m_occVGroupId0 = good;
+
+  m_onlineOccUstatus = good;
+  m_onlineOccVstatus = good;
+
+  m_onlineOccU3Samples = good;
+  m_onlineOccV3Samples = good;
 
   m_hOccupancy->reset();
   m_hOccupancy->setStats(0);
@@ -710,7 +724,7 @@ void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, svdStatus&
       occupancyStatus = std::max(noStat, occupancyStatus);
     else if (occupancy <= m_onlineOccEmpty) {
       occupancyStatus = std::max(lowStat, occupancyStatus);
-    } else if (occupancy < m_onlineOccWarning) {
+    } else if (occupancy < m_onlineOccWarning && occupancy >= m_onlineOccEmpty) {
       occupancyStatus = std::max(good, occupancyStatus);
     } else if (occupancy > m_onlineOccWarning && occupancy < m_onlineOccError) {
       occupancyStatus = std::max(warning, occupancyStatus);
@@ -722,7 +736,7 @@ void DQMHistAnalysisSVDOccupancyModule::setOccStatus(float occupancy, svdStatus&
       occupancyStatus = std::max(noStat, occupancyStatus);
     else if (occupancy <= m_occEmpty) {
       occupancyStatus = std::max(lowStat, occupancyStatus);
-    } else if (occupancy < m_occWarning) {
+    } else if (occupancy < m_occWarning && occupancy >= m_occEmpty) {
       occupancyStatus = std::max(good, occupancyStatus);
     } else if (occupancy > m_occWarning && occupancy < m_occError) {
       occupancyStatus = std::max(warning, occupancyStatus);

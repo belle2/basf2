@@ -83,9 +83,9 @@ namespace Belle2 {
       lowStat = 4  /**< gray frame */
     };
 
-    void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status, bool side,
+    void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status, bool isU,
                         bool online = false); /**< update canvases */
-    void updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool side); /**< update error canvases */
+    void updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool isU); /**< update error canvases */
 
   };
 } // end namespace Belle2

@@ -192,13 +192,13 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
 }
 
 void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status,
-                                              bool side, bool online)
+                                              bool isU, bool online)
 {
   canvas->Draw();
   canvas->cd();
   if (histo) {
     if (!m_setColzRange && m_valueMinimum > 0) histo->setMinimum(m_valueMinimum * 99.9);
-    histo->getHistogram(side)->Draw("text colz");
+    histo->getHistogram(isU)->Draw("text colz");
   }
   setStatusOfCanvas(status, canvas, true, online);
 
@@ -209,7 +209,7 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
   canvasRPhi->cd();
   if (histo) {
     if (m_setColzRange) histo->getPoly(side, m_colzMinimun, m_colzMaximum)->Draw("colz l");
-    else histo->getPoly(side)->Draw("colz l");
+    else histo->getPoly(isU)->Draw("colz l");
     drawText();
   }
   setStatusOfCanvas(status, canvasRPhi, false);
@@ -218,12 +218,12 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
   canvasRPhi->Update();
 }
 
-void DQMHistAnalysisSVDModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool side)
+void DQMHistAnalysisSVDModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool isU)
 {
   canvas->Draw();
   canvas->cd();
   if (histo)
-    histo->getHistogram(side)->Draw("text colz");
+    histo->getHistogram(isU)->Draw("text colz");
 
   canvas->Modified();
   canvas->Update();
@@ -231,7 +231,7 @@ void DQMHistAnalysisSVDModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas
   canvasRPhi->Draw();
   canvasRPhi->cd();
   if (histo) {
-    histo->getPoly(side, 0)->Draw("colz l");
+    histo->getPoly(isU, 0)->Draw("colz l");
     drawText();
   }
 

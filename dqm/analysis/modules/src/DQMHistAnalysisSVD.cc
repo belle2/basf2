@@ -197,7 +197,7 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
   canvas->Draw();
   canvas->cd();
   if (histo) {
-    if (!m_setColzRange && m_valueMinimum > 0) histo->setMinimum(m_valueMinimum * 99.9);
+    if (!m_setColzRange && m_valueMinimum > 0) histo->setMinimum(m_valueMinimum);
     histo->getHistogram(isU)->Draw("text colz");
   }
   setStatusOfCanvas(status, canvas, true, online);

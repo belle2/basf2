@@ -67,7 +67,7 @@ namespace Belle2 {
     TArrow* m_arrowx = nullptr; /**< x-axis direction */
     TArrow* m_arrowy = nullptr; /**< y-axis direction */
 
-    int m_colzMinimun = 0; /**< Minimum of the  histogram */
+    int m_colzMinimum = 0; /**< Minimum of the  histogram */
     int m_colzMaximum = -1111; /**< Maximum of the  histogram. -1111 adjust the maximum depennding on the content */
     bool m_setColzRange = false; /**< set the range of the  histogram in colz*/
 

@@ -86,7 +86,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
   m_hEfficiency->setStats(0);
   if (m_setColzRange) {
     m_hEfficiency->setMaximum(m_colzMaximum);
-    m_hEfficiency->setMinimum(m_colzMinimun);
+    m_hEfficiency->setMinimum(m_colzMinimum);
   }
   m_hEfficiencyErr = new SVDSummaryPlots("SVDEfficiencyErr@view", "Summary of SVD efficiencies errors (%), @view/@side Side");
   m_hEfficiencyErr->setStats(0);
@@ -107,7 +107,7 @@ void DQMHistAnalysisSVDEfficiencyModule::initialize()
     m_hEfficiency3Samples->setStats(0);
     if (m_setColzRange) {
       m_hEfficiency3Samples->setMaximum(m_colzMaximum);
-      m_hEfficiency3Samples->setMinimum(m_colzMinimun);
+      m_hEfficiency3Samples->setMinimum(m_colzMinimum);
     }
     m_hEfficiencyErr3Samples = new SVDSummaryPlots("SVD3EfficiencyErr@view",
                                                    "Summary of SVD efficiencies errors (%), @view/@side Side for 3 samples");

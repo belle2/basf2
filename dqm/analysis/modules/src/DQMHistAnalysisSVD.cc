@@ -45,7 +45,7 @@ DQMHistAnalysisSVDModule:: DQMHistAnalysisSVDModule(bool panelTop, bool online)
   addParam("setColzRange", m_setColzRange,
            "If true you can set the range of the histogram in Z with 'ColzMax' and 'ColzMin' parameters.",
            bool(false));
-  addParam("ColzMin", m_colzMinimun, "Minimum of Colz histogram", int(0));
+  addParam("ColzMin", m_colzMinimum, "Minimum of Colz histogram", int(0));
   addParam("ColzMax", m_colzMaximum, "Maximum of Colz histogram", int(-1111)); //-1111 set the maximum depending on the content
 
   float x1 = 0;
@@ -208,7 +208,7 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
   canvasRPhi->Draw();
   canvasRPhi->cd();
   if (histo) {
-    if (m_setColzRange) histo->getPoly(isU, m_colzMinimun, m_colzMaximum)->Draw("colz l");
+    if (m_setColzRange) histo->getPoly(isU, m_colzMinimum, m_colzMaximum)->Draw("colz l");
     else histo->getPoly(isU)->Draw("colz l");
     drawText();
   }

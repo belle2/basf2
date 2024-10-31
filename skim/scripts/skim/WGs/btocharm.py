@@ -1532,7 +1532,7 @@ class BtoD0pi_Kpiomega_pipipi0(BaseSkim):
 
 
 @fancy_skim_header
-class BtoDsthpipi_D0pi_Kpi(BaseSkim):
+class BtoDstpipi_D0pi_Kpi(BaseSkim):
     """
     Reconstructed decay modes:
 

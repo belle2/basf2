@@ -251,9 +251,10 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
 
   Float_t effU = -1;
   Float_t effV = -1;
+  Float_t effMinU = 9999;
+  Float_t effMinV = 9999;
   Float_t erreffU = -1;
   Float_t erreffV = -1;
-  m_valueMinimum = 99999;
 
   // Efficiency for the U and V sides
   TH2F* found_tracksU = (TH2F*)findHist("SVDEfficiency/TrackHitsU");
@@ -277,7 +278,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effU = numU / denU;
         erreffU = std::sqrt(effU * (1 - effU) / denU);
       }
-      if (effU < m_valueMinimum) m_valueMinimum = effU;
+      if (effU < effMinU) effMinU = effU;
       m_hEfficiency->fill(m_SVDModules[i], 1, effU * 100);
       m_hEfficiencyErr->fill(m_SVDModules[i], 1, erreffU * 100);
       B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
@@ -289,7 +290,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
         effV = numV / denV;
         erreffV = std::sqrt(effV * (1 - effV) / denV);
       }
-      if (effV < m_valueMinimum) m_valueMinimum = effV;
+      if (effV < effMinV) effMinV = effV;
       m_hEfficiency->fill(m_SVDModules[i], 0, effV * 100);
       m_hEfficiencyErr->fill(m_SVDModules[i], 0, erreffV * 100);
       B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
@@ -312,9 +313,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   }
 
   // update summary for U side
+  m_valueMinimum = effMinU;
   updateCanvases(m_hEfficiency, m_cEfficiencyU, m_cEfficiencyRPhiViewU,  m_effUstatus, true);
 
   // update summary for V side
+  m_valueMinimum = effMinV;
   updateCanvases(m_hEfficiency, m_cEfficiencyV, m_cEfficiencyRPhiViewV,  m_effVstatus, false);
 
   // update error summary for U side
@@ -324,6 +327,8 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
   updateErrCanvases(m_hEfficiencyErr, m_cEfficiencyErrV, m_cEfficiencyErrRPhiViewV, false);
 
   if (m_3Samples) {
+    effMinU = 9999;
+    effMinV = 9999;
     /// ------ 3 samples ------
     m_hEfficiency3Samples->getHistogram(0)->Reset();
     m_hEfficiency3Samples->getHistogram(1)->Reset();
@@ -352,7 +357,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
           effU = numU / denU;
           erreffU = std::sqrt(effU * (1 - effU) / denU);
         }
-        if (effU < m_valueMinimum) m_valueMinimum = effU;
+        if (effU < effMinU) effMinU = effU;
         m_hEfficiency3Samples->fill(m_SVDModules[i], 1, effU * 100);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 1, erreffU * 100);
         B2DEBUG(10, "effU  = " << numU << "/" << denU << " = " << effU);
@@ -364,7 +369,7 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
           effV = numV / denV;
           erreffV = std::sqrt(effV * (1 - effV) / denV);
         }
-        if (effV < m_valueMinimum) m_valueMinimum = effV;
+        if (effV < effMinV) effMinV = effV;
         m_hEfficiency3Samples->fill(m_SVDModules[i], 0, effV * 100);
         m_hEfficiencyErr3Samples->fill(m_SVDModules[i], 0, erreffV * 100);
         B2DEBUG(10, "effV  = " << numV << "/" << denV << " = " << effV);
@@ -387,9 +392,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
 
     // update summary for U side for 3 samples
+    m_valueMinimum = effMinU * 100;
     updateCanvases(m_hEfficiency3Samples, m_cEfficiencyU3Samples, m_cEfficiencyRPhiViewU3Samples,  m_effUstatus, true);
 
     // update summary for V side for 3 samples
+    m_valueMinimum = effMinV * 100;
     updateCanvases(m_hEfficiency3Samples, m_cEfficiencyV3Samples, m_cEfficiencyRPhiViewV3Samples,  m_effUstatus, false);
 
     // update error summary for U side for 3 samples

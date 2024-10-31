@@ -346,7 +346,7 @@ void SkimSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResul
   double Etot = eTotTracks + eTotGammas;
   calculationResult["EtotLE"] = Etot;
 
-  //KLM inforamtion
+  //KLM information
   // The clusters with the largest pentrate layers in KLM.
   double numMaxLayerKLM = -1.;
   double numSecMaxLayerKLM = -1.;

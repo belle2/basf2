@@ -930,7 +930,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     const double vertexXY = vertexLocation.perp();
     const double vertexTheta = vertexLocation.theta() * TMath::RadToDeg();
 
-    //..Angular differance of two tracks to reject cosmics
+    //..Angular differaence of two tracks to reject cosmics
     //  Tolerance could be reduced from 10 deg to 2 deg if needed for physics reasons,
     //  for a 5% increase in the rate of selected displaced vertex triggers.
     //  See https://gitlab.desy.de/belle2/software/basf2/-/merge_requests/1867

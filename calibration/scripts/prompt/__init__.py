@@ -89,7 +89,7 @@ class CalibrationSettings(namedtuple('CalSet_Factory',
             To exclude specific filters, pre-append with *NOT* e.g.
             {"all_events": ["mumu_tight_or_highm_calib", "hadron_calib", "Good", "On"],
             "offres_photon_events": ["gamma_gamma_calib", "Good", "NOT On"]}.
-            Not selecting a specfic filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
+            Not selecting a specific filters (e.g. Magnet) is equivalent to not having any requirements, e.g. (Either)
 
         depends_on (list(CalibrationSettings)): The settings variables of the other prompt calibrations that you want
             want to depend on. This will allow the external automatic system to understand the overall ordering of

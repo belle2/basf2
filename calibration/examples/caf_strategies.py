@@ -79,7 +79,7 @@ def main(argv):
     # If there wasn't enough data in a run to give a success, it tries to
     # merge with the next time period's data and re-execute.
     # You should only use granularity='run' for the collector when using this strategy.
-    # The run Boundaries can be either passed directy in the parameter dictionary
+    # The run Boundaries can be either passed directly in the parameter dictionary
     # of the algorithm (key `payload_boundaries`) or calculated by the algorithm itself
     # in the function `isBoundaryRequired`.
 

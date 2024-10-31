@@ -208,7 +208,7 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
   canvasRPhi->Draw();
   canvasRPhi->cd();
   if (histo) {
-    if (m_setColzRange) histo->getPoly(side, m_colzMinimun, m_colzMaximum)->Draw("colz l");
+    if (m_setColzRange) histo->getPoly(isU, m_colzMinimun, m_colzMaximum)->Draw("colz l");
     else histo->getPoly(isU)->Draw("colz l");
     drawText();
   }

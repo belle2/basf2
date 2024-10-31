@@ -32,31 +32,38 @@ namespace Belle2 {
      */
     PhysicsObjectsMiraBelleEcmsBBModule();
 
+    /**
+     * Initialize the histograms
+     */
     void defineHisto() override final;
 
-    void initialize() override final;
     /**
-     * Initialize the module
+     * Register the histograms
+     */
+    void initialize() override final;
+
+    /**
+     * Reset the histograms
      */
     void beginRun() override final;
 
     /**
      * Event processor
-     * The filling of the tree
+     * Filling of the histograms
      */
     void event() override final;
 
   private:
 
 
-    TH1D* m_hB0 = nullptr;
-    TH1D* m_hBp = nullptr;
+    TH1D* m_hB0 = nullptr; ///< EB* histogram for neutral B
+    TH1D* m_hBp = nullptr; ///< EB* histogram for charged B
 
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
 
-    std::string m_BmListName = "";
-    std::string m_B0ListName = "";
+    std::string m_BmListName = ""; ///< List name for charged B candidates
+    std::string m_B0ListName = ""; ///< List name for neutral B candidates
 
 
   };

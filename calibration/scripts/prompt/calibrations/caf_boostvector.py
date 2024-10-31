@@ -12,10 +12,11 @@ Airflow script to perform BoostVector calibration.
 
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_beamspot import settings as beamspot
-from prompt.calibrations.caf_ecms import is_cDST_file
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
+from basf2 import get_file_metadata, B2WARNING
 import rawdata as rd
 import reconstruction as re
+import os
 
 #: Tells the automated system some details of this script
 settings = CalibrationSettings(
@@ -37,6 +38,20 @@ settings = CalibrationSettings(
     depends_on=[beamspot])
 
 ##############################
+
+
+def is_cDST_file(fName):
+    """ Check if the file is cDST based on the metadata """
+
+    metaData = get_file_metadata(fName)
+    description = metaData.getDataDescription()
+
+    # if dataLevel is missing, determine from file name
+    if 'dataLevel' not in description:
+        B2WARNING('The cdst/mdst info is not stored in file metadata')
+        return ('cdst' in os.path.basename(fName))
+
+    return (description['dataLevel'] == 'cdst')
 
 
 def get_calibrations(input_data, **kwargs):

@@ -10,6 +10,8 @@
 # Date: 01/11/2024
 #
 
+Alias K_S0sig K_S0
+
 # Upsilon(4S) decay
 Decay Upsilon(4S)
 0.500 B-sig B+   PHOTOS VSS;

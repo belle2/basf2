@@ -38,6 +38,7 @@ CDCDQMModule::CDCDQMModule() : HistoModule()
   // set module description (e.g. insert text)
   setDescription("Make summary of data quality.");
   addParam("MinHits", m_minHits, "Include only events with more than MinHits hits in CDC", 0);
+  addParam("MinNDF", m_minNdf, "Include only tracks with more than this NDF", 20);
   addParam("AdjustWireShift", m_adjustWireShift,
            "If true, gets the corrected phi view of the wires in stereo layers", m_adjustWireShift);
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -230,7 +231,7 @@ void CDCDQMModule::event()
 
     // require high NDF track
     int ndf = fs->getNdf();
-    if (ndf < 20) continue;
+    if (ndf < m_minNdf) continue;
 
     if (fabs(fitresult->getD0()) > 1.0 || fabs(fitresult->getZ0()) > 1.0) {
       //Off IP tracks

@@ -669,7 +669,7 @@ class TDCPV_inclusiveJpsi(BaseSkim):
 
     **Decay Channels**:
 
-    * :math:`B^0 -> J/\\psi (ee/\\mu\\mu) X`
+    * :math:`B^0 \\to J/\\psi (ee/\\mu\\mu) X`
 
     **Cuts used**:
 

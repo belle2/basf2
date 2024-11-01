@@ -225,12 +225,12 @@ void CDCDQMModule::event()
       }
     }
 
+    double phiDegree = fitresult->getPhi() / Unit::deg;
+    m_hPhiNCDC->Fill(phiDegree, TMath::Min(int(track->getNumberOfCDCHits()), 60));
+
     // require high NDF track
     int ndf = fs->getNdf();
     if (ndf < 20) continue;
-
-    double phiDegree = fitresult->getPhi() / Unit::deg;
-    m_hPhiNCDC->Fill(phiDegree, TMath::Min(int(track->getNumberOfCDCHits()), 60));
 
     if (fabs(fitresult->getD0()) > 1.0 || fabs(fitresult->getZ0()) > 1.0) {
       //Off IP tracks

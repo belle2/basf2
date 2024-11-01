@@ -387,7 +387,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
     latex.SetTextSize(0.025);
     for (int ij = 0; ij < 3; ij++) {
       c_hist_attach_eff[ij]->cd();
-      gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
       if (m_doTH2PolyTrackingWireEff) {
         m_hist_attach_eff_Poly[ij]->SetStats(0);
         m_hist_attach_eff_Poly[ij]->Draw("COLZ");

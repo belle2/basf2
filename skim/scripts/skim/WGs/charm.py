@@ -1860,7 +1860,7 @@ class LambdacToGeneric(BaseSkim):
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma`: pi0:skim
         * Cut on tag side :math:`D^{0}` : channel dependent mass window wider than :math:`3 \\sigma` and :math:`p^{*} > 1.8`
         * Cut on tag side :math:`D^{+}` : channel dependent mass window wider than :math:`3 \\sigma` and :math:`p^{*} > 1.8`
-        * Cut on tag side :math:`D_{s}^{+}` : channel dependent mass window wider than :math:`3 \\sigma` and :math:`\\p^{*} > 1.8`
+        * Cut on tag side :math:`D_{s}^{+}` : channel dependent mass window wider than :math:`3 \\sigma` and :math:`p^{*} > 1.8`
         * 0.120 < massDifference(0) < 0.176 on decay with :math:`\\pi_{s}^{+}` on :math:`D_{tag}^{*}`
         * 0.114 < massDifference(0) < 0.176 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
         * 0.104 < massDifference(0) < 0.190 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`

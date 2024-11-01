@@ -1843,11 +1843,7 @@ class LambdacToGeneric(BaseSkim):
     """
     **Decay Modes**:
         * Inclusive :math:`\\Lambda_{c}^{+}` is identified in mass recoiling against
-
-            * :math:`D^{(*)-} p^{-} \\pi^{+}`,
-            * :math:`D_{s}^{(*)-} p^{-} K^{+}`, and
-            * :math:`D^{(*)0} p^{-}`.
-
+          :math:`D^{(*)-} \bar{p} \\pi^{+}`, :math:`D_{s}^{(*)-} \bar{p} K^{+}`, and :math:`D^{(*)0} \bar{p}`.
         * The tag side :math:`D` is reconstructed in the following decay modes:
         * :math:`D^{*+}\\to D^0 \\pi^{+}` and :math:`D^{*+}\\to D^{+} \\pi^{0}` (tag side)
         * :math:`D^{*0}\\to D^0 \\pi^{0}` and :math:`D^{*0}\\to D^{0} \\gamma` (tag side)
@@ -1859,16 +1855,16 @@ class LambdacToGeneric(BaseSkim):
     **Selection Criteria**:
         * Cut on :math:`\\pi^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0
         * Cut on :math:`K^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and kaonID > 0.2
-        * Cut on :math:`p^{+}` : abs(dr) < 0.5 and abs(dz) < 2.0 and protonID > 0.2
+        * Cut on :math:`p` : abs(dr) < 0.5 and abs(dz) < 2.0 and protonID > 0.2
         * Cut on :math:`\\gamma` : E > 0.10
         * Cut on :math:`\\pi^{0}\\to \\gamma \\gamma`: pi0:skim
-        * Cut on tag side :math:`D^{0}` : channel dependent mass window and p* > 1.8
-        * Cut on tag side :math:`D^{+}` : channel dependent mass window and p* > 1.8
-        * Cut on tag side :math:`D_{s}^{+}` : channel dependent mass window and p* > 1.8
+        * Cut on tag side :math:`D^{0}` : channel dependent mass window wider than 3 \\sigma and p^{*} > 1.8
+        * Cut on tag side :math:`D^{+}` : channel dependent mass window wider than 3 \\sigma and p^{*} > 1.8
+        * Cut on tag side :math:`D_{s}^{+}` : channel dependent mass window wider than 3 \\sigma and p^{*} > 1.8
         * 0.120 < massDifference(0) < 0.176 on decay with :math:`\\pi_{s}^{+}` on :math:`D_{tag}^{*}`
         * 0.114 < massDifference(0) < 0.176 on decay with :math:`\\pi^{0}` on :math:`D_{tag}^{*}`
         * 0.104 < massDifference(0) < 0.190 on decay with :math:`\\gamma` on :math:`D_{tag}^{*}`
-        * 1.4 < M < 3.4 and p* > 1.8 on signal side :math:`\\Lambda_{c}^{+}`
+        * 1.4 < M < 3.4 and p^{*} > 1.8 on signal side :math:`\\Lambda_{c}^{+}`
         * For more details, please check the source code of this skim.
     """
 
@@ -1909,7 +1905,6 @@ class LambdacToGeneric(BaseSkim):
         dummy = f"Lambda_c+:dummy{suffix}"
         antiDummy = f"anti-Lambda_c-:dummy{suffix}"
 
-        M_factor = 1.2
         p_cms = 1.8
 
         ma.fillParticleListFromDummy(
@@ -1946,34 +1941,34 @@ class LambdacToGeneric(BaseSkim):
             )
 
         massCut = {
-            "D_s*+:D_s+gamma": f"[{2.078/M_factor} < M < {2.138*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D_s+:K_S0K-pi+pi+": f"[{1.938/M_factor} < M < {1.988*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D_s+:K+K-pi+pi0": f"[{1.936/M_factor} < M < {1.991*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D_s+:K_S0K_S0pi+": f"[{1.921/M_factor} < M < {2.001*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D_s+:K_S0K+": f"[{1.934/M_factor} < M < {1.994*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D_s+:K+K-pi+": f"[{1.954/M_factor} < M < {1.979*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D*+:D+pi0": f"[{1.976/M_factor} < M < {2.031*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D*+:D0pi+": f"[{1.970/M_factor} < M < {2.035*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:K+K-pi+": f"[{1.857/M_factor} < M < {1.882*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:K_S0pi+pi+pi-": f"[{1.836/M_factor} < M < {1.896*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:K_S0pi+pi0": f"[{1.810/M_factor} < M < {1.905*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:K_S0pi+": f"[{1.830/M_factor} < M < {1.900*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:K-pi+pi+pi0": f"[{1.830/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:K-pi+pi+": f"[{1.850/M_factor} < M < {1.885*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D*0:D0gamma": f"[{1.962/M_factor} < M < {2.032*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D*0:D0pi0": f"[{1.972/M_factor} < M < {2.032*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:K_S0pi+pi-pi0": f"[{1.820/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:K_S0pi+pi-": f"[{1.825/M_factor} < M < {1.890*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:K-pi+pi+pi-pi0": f"[{1.836/M_factor} < M < {1.886*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:K-pi+pi+pi-": f"[{1.845/M_factor} < M < {1.880*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:K-pi+pi0": f"[{1.815/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:K-pi+": f"[{1.845/M_factor} < M < {1.885*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D_s+:allChannels": f"[{1.944/M_factor} < M < {1.989*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D*+:allChannels": f"[{1.970/M_factor} < M < {2.035*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D+:allChannels": f"[{1.835/M_factor} < M < {1.895*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D*0:allChannels": f"[{1.967/M_factor} < M < {2.032*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-            "D0:allChannels": f"[{1.825/M_factor} < M < {1.890*M_factor}] and [useCMSFrame(p) > {p_cms}]",
-        }
+            'D_s*+:D_s+gamma': '[1.732 < M < 2.566] and [useCMSFrame(p) > {p_cms}]',
+            'D_s+:K_S0K-pi+pi+': '[1.615 < M < 2.386] and [useCMSFrame(p) > {p_cms}]',
+            'D_s+:K+K-pi+pi0': '[1.613 < M < 2.389] and [useCMSFrame(p) > {p_cms}]',
+            'D_s+:K_S0K_S0pi+': '[1.601 < M < 2.401] and [useCMSFrame(p) > {p_cms}]',
+            'D_s+:K_S0K+': '[1.612 < M < 2.393] and [useCMSFrame(p) > {p_cms}]',
+            'D_s+:K+K-pi+': '[1.628 < M < 2.375] and [useCMSFrame(p) > {p_cms}]',
+            'D*+:D+pi0': '[1.647 < M < 2.437] and [useCMSFrame(p) > {p_cms}]',
+            'D*+:D0pi+': '[1.642 < M < 2.442] and [useCMSFrame(p) > {p_cms}]',
+            'D+:K+K-pi+': '[1.548 < M < 2.258] and [useCMSFrame(p) > {p_cms}]',
+            'D+:K_S0pi+pi+pi-': '[1.530 < M < 2.275] and [useCMSFrame(p) > {p_cms}]',
+            'D+:K_S0pi+pi0': '[1.508 < M < 2.286] and [useCMSFrame(p) > {p_cms}]',
+            'D+:K_S0pi+': '[1.525 < M < 2.280] and [useCMSFrame(p) > {p_cms}]',
+            'D+:K-pi+pi+pi0': '[1.525 < M < 2.274] and [useCMSFrame(p) > {p_cms}]',
+            'D+:K-pi+pi+': '[1.542 < M < 2.262] and [useCMSFrame(p) > {p_cms}]',
+            'D*0:D0gamma': '[1.635 < M < 2.438] and [useCMSFrame(p) > {p_cms}]',
+            'D*0:D0pi0': '[1.643 < M < 2.438] and [useCMSFrame(p) > {p_cms}]',
+            'D0:K_S0pi+pi-pi0': '[1.517 < M < 2.274] and [useCMSFrame(p) > {p_cms}]',
+            'D0:K_S0pi+pi-': '[1.521 < M < 2.268] and [useCMSFrame(p) > {p_cms}]',
+            'D0:K-pi+pi+pi-pi0': '[1.530 < M < 2.263] and [useCMSFrame(p) > {p_cms}]',
+            'D0:K-pi+pi+pi-': '[1.538 < M < 2.256] and [useCMSFrame(p) > {p_cms}]',
+            'D0:K-pi+pi0': '[1.512 < M < 2.274] and [useCMSFrame(p) > {p_cms}]',
+            'D0:K-pi+': '[1.538 < M < 2.262] and [useCMSFrame(p) > {p_cms}]',
+            'D_s+:allChannels': '[1.620 < M < 2.387] and [useCMSFrame(p) > {p_cms}]',
+            'D*+:allChannels': '[1.642 < M < 2.442] and [useCMSFrame(p) > {p_cms}]',
+            'D+:allChannels': '[1.529 < M < 2.274] and [useCMSFrame(p) > {p_cms}]',
+            'D*0:allChannels': '[1.639 < M < 2.438] and [useCMSFrame(p) > {p_cms}]',
+            'D0:allChannels': '[1.521 < M < 2.268] and [useCMSFrame(p) > {p_cms}]',
+            }
 
         massDifferenceCut = {
             "D*+:D0pi+": "[0.120 < massDifference(0) < 0.176]",

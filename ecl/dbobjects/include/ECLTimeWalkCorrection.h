@@ -104,7 +104,7 @@ namespace Belle2 {
     /**
      * Number of values expected to be in the m_par vector
      */
-    const static int c_expectedParametersCount = 6;
+    const static int c_expectedParametersCount = 6; //! tells ROOT not to write it to file
 
     ClassDef(ECLTimeWalkCorrection, 1); /**< ClassDef */
   };

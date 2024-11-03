@@ -85,6 +85,8 @@ void ParticleKinematicFitterModule::initialize()
     B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
   }
 
+  m_prefix = m_listName.substr(m_listName.find(":") + 1) + "_"; //Set prefix to listname
+
   m_plist.isRequired(m_listName);
 }
 
@@ -241,10 +243,10 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
   storeOrcaKinFitParticles("Fitted", fitter, particleChildren, mother);
 
   //store general fit results
-  mother->addExtraInfo("OrcaKinFitProb", prob);
+  mother->addExtraInfo(m_prefix + "OrcaKinFitProb", prob);
   mother->setPValue(prob);
-  mother->addExtraInfo("OrcaKinFitChi2", chi2);
-  mother->addExtraInfo("OrcaKinFitErrorCode", errorcode);
+  mother->addExtraInfo(m_prefix + "OrcaKinFitChi2", chi2);
+  mother->addExtraInfo(m_prefix + "OrcaKinFitErrorCode", errorcode);
 
   // if we added an unmeasured photon, add the kinematics to the mother - at some point we may want to create a particle list from this?
   std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
@@ -254,15 +256,15 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
       if (name.find("Unmeasured") != std::string::npos) {
         auto* fitobject = static_cast<ParticleFitObject*>(fo);
         ROOT::Math::PxPyPzEVector tlv = getLorentzVector(fitobject);
-        mother->addExtraInfo("OrcaKinFit" + name + "Theta", tlv.Theta());
-        mother->addExtraInfo("OrcaKinFit" + name + "Phi", tlv.Phi());
-        mother->addExtraInfo("OrcaKinFit" + name + "E", tlv.E());
+        mother->addExtraInfo(m_prefix + "OrcaKinFit" + name + "Theta", tlv.Theta());
+        mother->addExtraInfo(m_prefix + "OrcaKinFit" + name + "Phi", tlv.Phi());
+        mother->addExtraInfo(m_prefix + "OrcaKinFit" + name + "E", tlv.E());
 
         // Uncertainty
         // const double err0 = getFitObjectError(fitobject, 0);
-        mother->addExtraInfo("OrcaKinFit" + name + "ErrorTheta", getFitObjectError(fitobject, 1));
-        mother->addExtraInfo("OrcaKinFit" + name + "ErrorPhi", getFitObjectError(fitobject, 2));
-        mother->addExtraInfo("OrcaKinFit" + name + "ErrorE", getFitObjectError(fitobject, 0));
+        mother->addExtraInfo(m_prefix + "OrcaKinFit" + name + "ErrorTheta", getFitObjectError(fitobject, 1));
+        mother->addExtraInfo(m_prefix + "OrcaKinFit" + name + "ErrorPhi", getFitObjectError(fitobject, 2));
+        mother->addExtraInfo(m_prefix + "OrcaKinFit" + name + "ErrorE", getFitObjectError(fitobject, 0));
       }
     }
     delete fo;
@@ -725,14 +727,14 @@ bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(const std::string& 
     ROOT::Math::PxPyPzEVector tlv = getLorentzVector(fitobject);
 
     // name of extra variables
-    std::string extraVariableParticlePx    = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Px";
-    std::string extraVariableParticlePy    = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Py";
-    std::string extraVariableParticlePz    = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Pz";
-    std::string extraVariableParticleE     = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_E";
-    std::string extraVariableParticlePxErr = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PxErr";
-    std::string extraVariableParticlePyErr = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PyErr";
-    std::string extraVariableParticlePzErr = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PzErr";
-    std::string extraVariableParticleEErr  = "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_EErr";
+    std::string extraVariableParticlePx    = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Px";
+    std::string extraVariableParticlePy    = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Py";
+    std::string extraVariableParticlePz    = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Pz";
+    std::string extraVariableParticleE     = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_E";
+    std::string extraVariableParticlePxErr = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PxErr";
+    std::string extraVariableParticlePyErr = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PyErr";
+    std::string extraVariableParticlePzErr = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PzErr";
+    std::string extraVariableParticleEErr  = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_EErr";
 
     mother->addExtraInfo(extraVariableParticlePx, tlv.Px());
     mother->addExtraInfo(extraVariableParticlePy, tlv.Py());

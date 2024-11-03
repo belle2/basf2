@@ -75,6 +75,7 @@ namespace Belle2 {
 
       // module parameters
       std::string m_listName;            /**< particle list name */
+      std::string m_prefix;            /**< prefix attached to extrainfo names */
       std::string m_kinematicFitter;     /**< Kinematic Fitter name */
       std::string m_orcaFitterEngine;    /**< Orca Fitter Engine name */
       std::string m_orcaTracer;          /**< Tracer (None, Text or ROOT) */

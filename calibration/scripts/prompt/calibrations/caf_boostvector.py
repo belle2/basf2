@@ -115,11 +115,9 @@ def get_calibrations(input_data, **kwargs):
 
     from caf.framework import Calibration
     from caf.strategies import SingleIOV
-    # from reconstruction import prepare_cdst_analysis
 
     # module to be run prior the collector
     rec_path_1 = create_path()
-    # prepare_cdst_analysis(path=rec_path_1, components=['CDC', 'ECL', 'KLM'])
     if isCDST:
         rec_path_1.add_module("RootInput", branchNames=ALWAYS_SAVE_OBJECTS + RAWDATA_OBJECTS)
         rd.add_unpackers(rec_path_1)

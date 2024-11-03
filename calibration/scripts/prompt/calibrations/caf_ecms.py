@@ -13,7 +13,6 @@ Airflow script to perform eCMS calibration (combination of the had-B and mumu me
 from prompt import CalibrationSettings, INPUT_DATA_FILTERS
 from prompt.calibrations.caf_boostvector import settings as boostvector
 from softwaretrigger.constants import ALWAYS_SAVE_OBJECTS, RAWDATA_OBJECTS
-# from reconstruction import add_pid_module, add_ecl_modules, prepare_cdst_analysis
 import rawdata as rd
 import reconstruction as re
 
@@ -326,7 +325,8 @@ def get_calibrations(input_data, **kwargs):
     algorithm_ecms.setMuMuEcmsOffset(kwargs['expert_config']['eCMSmumuShift'])
 
     calibration_ecms = Calibration('eCMS',
-                                   algorithms=algorithm_ecms)
+                                   algorithms=algorithm_ecms,
+                                   backend_args={"queue": "l"})
 
     collection_HadB = Collection(collector=collector_HadB,
                                  input_files=input_files_Had,
@@ -343,7 +343,6 @@ def get_calibrations(input_data, **kwargs):
     calibration_ecms.add_collection(name='hadB_4S', collection=collection_HadB)
 
     calibration_ecms.strategies = SingleIOV
-    # calibration_ecms.backend_args = {'extra_lines' : ["RequestRuntime = 6h"]}
 
     # Do this for the default AlgorithmStrategy to force the output payload IoV
     # It may be different if you are using another strategy like SequentialRunByRun

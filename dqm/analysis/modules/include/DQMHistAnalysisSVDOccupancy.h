@@ -131,7 +131,6 @@ namespace Belle2 {
     TH1F m_hStripOccupancyV[172]; /**< u-side strip chart occupancy histos*/
     TCanvas** m_cStripOccupancyV = nullptr; /**< u-side strip chart occupancy canvas*/
 
-    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, occupancy plot*/
     Float_t getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV = false); /**< get occupancy value */
     void setOccStatus(float occ, svdStatus& occupancyStatus, bool online = false); /**< set occupancy status */
 

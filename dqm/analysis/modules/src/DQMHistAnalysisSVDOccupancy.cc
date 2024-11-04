@@ -688,20 +688,6 @@ void DQMHistAnalysisSVDOccupancyModule::terminate()
   delete m_cStripOccupancyV;
 }
 
-Int_t DQMHistAnalysisSVDOccupancyModule::findBinY(Int_t layer, Int_t sensor)
-{
-  if (layer == 3)
-    return sensor; //2
-  if (layer == 4)
-    return 2 + 1 + sensor; //6
-  if (layer == 5)
-    return 6 + 1 + sensor; // 11
-  if (layer == 6)
-    return 11 + 1 + sensor; // 17
-  else
-    return -1;
-}
-
 Float_t DQMHistAnalysisSVDOccupancyModule::getOccupancy(float entries, int tmp_layer, int nEvents, bool sideV)
 {
   Int_t nStrips = 768;

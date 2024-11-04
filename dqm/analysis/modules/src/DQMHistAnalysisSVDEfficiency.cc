@@ -392,11 +392,11 @@ void DQMHistAnalysisSVDEfficiencyModule::event()
     }
 
     // update summary for U side for 3 samples
-    m_valueMinimum = effMinU * 100;
+    m_valueMinimum = effMinU;
     updateCanvases(m_hEfficiency3Samples, m_cEfficiencyU3Samples, m_cEfficiencyRPhiViewU3Samples,  m_effUstatus, true);
 
     // update summary for V side for 3 samples
-    m_valueMinimum = effMinV * 100;
+    m_valueMinimum = effMinV;
     updateCanvases(m_hEfficiency3Samples, m_cEfficiencyV3Samples, m_cEfficiencyRPhiViewV3Samples,  m_effUstatus, false);
 
     // update error summary for U side for 3 samples

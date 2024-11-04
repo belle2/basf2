@@ -191,6 +191,7 @@ void  DQMHistAnalysisSVDModule::setStatusOfCanvas(int status, TCanvas* canvas, b
   canvas->Update();
 }
 
+// This function is used both for efficiency and occupancy (flag online used onlhy for occupancy)
 void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status,
                                               bool isU, bool online)
 {

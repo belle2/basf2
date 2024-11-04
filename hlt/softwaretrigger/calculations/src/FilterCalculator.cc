@@ -202,7 +202,7 @@ void FilterCalculator::doCalculation(SoftwareTriggerObject& calculationResult)
     }
     bool l1_bit_f;
     try {
-      l1_bit_f = m_l1Trigger->testPsnm("f");
+      l1_bit_f = m_l1Trigger->testPsnm("fpre");
     } catch (const std::exception&) {
       l1_bit_f = false;
     }

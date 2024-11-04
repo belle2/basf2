@@ -111,7 +111,7 @@ namespace Belle2 {
   }
 
 
-  /// print sorted lenghts of the runs
+  /// print sorted lengths of the runs
   void printBySize(std::vector<std::pair<double, double>>  runs)
   {
     std::vector<double> dist;
@@ -196,7 +196,7 @@ namespace Belle2 {
 
 
 
-  // Get the optimal clustering of the atoms with indeces 0 .. e (recursive function with cache)
+  // Get the optimal clustering of the atoms with indices 0 .. e (recursive function with cache)
   double Splitter::getMinLoss(const std::vector<Atom>&  vec, int e, std::vector<int>& breaks)
   {
     // If entry in cache (speed up)

@@ -13,6 +13,7 @@
 
 #include <framework/core/Module.h>
 #include <framework/core/Path.h>
+#include <framework/gearbox/Const.h>
 
 #include <string>
 
@@ -126,6 +127,24 @@ namespace Belle2 {
      * @param realm basf2 execution realm
     */
     static void setRealm(const std::string& realm);
+
+    /**
+     * Function to set the run type (beam or cosmic)
+     */
+    static void setRunType(const Const::ERunType runType);
+
+    /**
+     * Function to set that the script is running on cosmics data
+     * (by default it runs on beam data)
+     */
+    static void setCosmicRun();
+
+    /**
+     * Function to set that the script is running on beam data
+     * (by default it runs on beam data, no need to use it if the
+     * run type has not been changed before).
+     */
+    static void setBeamRun();
 
     /**
      * Function for writing the simulation steps of each event into csv files.

@@ -13,7 +13,6 @@
 
 #include <iostream>
 
-using namespace std;
 using namespace Belle2;
 
 SVDCrossTalkCalibrationsAlgorithm::SVDCrossTalkCalibrationsAlgorithm(const std::string& str) :
@@ -63,7 +62,7 @@ CalibrationAlgorithm::EResult SVDCrossTalkCalibrationsAlgorithm::calibrate()
 
       if (layer == 4 && ladder == 1 && sensor == 2 && side == 1
           && hist->GetEntries() < m_minEntries) { //Check that we have enough events populating the calibration
-        cout << "Not enough Data: " << hist->GetEntries() << " entries found" << endl;
+        std::cout << "Not enough Data: " << hist->GetEntries() << " entries found" << std::endl;
         return c_NotEnoughData;
       }
 

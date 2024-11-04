@@ -54,10 +54,10 @@ namespace Belle2 {
     MCParticleGraph mpg;             /**< The MCParticle graph object. */
     bool m_useWeights;               /**< Parameter to switch on/off weight propagation */
     bool m_wrongSignPz;              /**< Parameter to signal that direction of LER and HER was switched*/
-    bool m_makeMaster;               /**< Parameter to signal if the modul should act as master */
-    int m_runNum;                    /**< The run number that should be used if the reader acts as master */
-    int m_expNum;                    /**< The experiment number that should be used if the reader acts as master */
-    int m_evtNum;                    /**< The event number is needed if the reader acts as master */
+    bool m_createEventMetaData;               /**< Parameter to allow the module to create EventMetaData and set event info  */
+    int m_runNum;                    /**< The run number that should be used if the reader handles EventMetaData */
+    int m_expNum;                    /**< The experiment number that should be used if the reader handles EventMetaData */
+    int m_evtNum;                    /**< The event number is needed if the reader handles EventMetaData */
 
   private:
 

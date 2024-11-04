@@ -7,8 +7,8 @@
 ##########################################################################
 
 
+import basf2
 import yaml
-from pathlib import Path
 import collections.abc
 
 
@@ -51,11 +51,8 @@ def load_config(cfg_path=None, model=None, dataset=None, run_name=None, samples=
         and list of tuples containing (tag name, dataset path, tag key).
     """
 
-    # Need to get this file's working directory to import config from
-    cwd = Path(__file__).resolve().parent
-
     # First load default configs
-    with open(cwd / 'config.yaml') as file:
+    with open(basf2.find_file('data/analysis/grafei_config.yaml')) as file:
         configs = yaml.safe_load(file)
 
     # Load user configs if defined, overwriting defaults

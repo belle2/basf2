@@ -34,65 +34,74 @@ DQMHistAnalysisInput2Module::DQMHistAnalysisInput2Module()
 {
   //Parameter definition
   addParam("HistMemoryPath", m_mempath, "Path to Input Hist memory", std::string(""));
+  addParam("StatFileName", m_statname, "Filename for status export", std::string(""));
   addParam("RefreshInterval", m_interval, "Refresh interval of histograms", 10);
   addParam("RemoveEmpty", m_remove_empty, "Remove empty histograms", false);
   addParam("EnableRunInfo", m_enable_run_info, "Enable Run Info", false);
-  B2DEBUG(1, "DQMHistAnalysisInput: Constructor done.");
+  B2DEBUG(1, "DQMHistAnalysisInput2: Constructor done.");
 }
-
-
-DQMHistAnalysisInput2Module::~DQMHistAnalysisInput2Module() { }
 
 void DQMHistAnalysisInput2Module::initialize()
 {
   if (m_enable_run_info) {
     m_c_info = new TCanvas("DQMInfo/c_info", "");
     m_c_info->SetTitle("");
-  } else {
-    m_c_info = NULL;
   }
   m_eventMetaDataPtr.registerInDataStore();
-  B2INFO("DQMHistAnalysisInput: initialized.");
+  B2DEBUG(1, "DQMHistAnalysisInput2: initialized.");
 }
 
 
 void DQMHistAnalysisInput2Module::beginRun()
 {
-  B2INFO("DQMHistAnalysisInput: beginRun called.");
+  B2DEBUG(1, "DQMHistAnalysisInput2: beginRun called.");
   clearHistList();
+  clearRefList();
   resetDeltaList();
   clearCanvases();
+
+  m_last_beginrun = time(0);
+  write_state();
+  m_lasttime -= std::chrono::seconds(1); // just change
+  m_forceChanged = true;
 }
 
 void DQMHistAnalysisInput2Module::event()
 {
+  m_last_event = time(0);
+  write_state();
+
   TH1::AddDirectory(false);
   initHistListBeforeEvent();
 
-  std::vector<TH1*> hs;
-  char mbstr[100];
+// we create a metadata and set the latest exp/run
+// if do not, execution will be terminate if file is not updated/zombie
+// if we only put dummy exp/run, we trigger begin/endRun ...
+  m_eventMetaDataPtr.create();
+  m_eventMetaDataPtr->setExperiment(m_expno);
+  m_eventMetaDataPtr->setRun(m_runno);
+  m_eventMetaDataPtr->setEvent(m_count);
 
-  time_t now = time(0);
-  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-  B2INFO("[" << mbstr << "] before Close File");
+  const std::filesystem::file_time_type ftime = std::filesystem::last_write_time(m_mempath);
 
-  if (m_file) {
-    m_file->Close();
-
-    now = time(0);
-    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
-    B2INFO("[" << mbstr << "] before delete File");
-    delete m_file;
-    m_file = nullptr;
+  if (m_lasttime == ftime) {
+    B2INFO("File not updated! -> Sleep");
+    sleep(m_interval);
+    setReturnValue(false);
+    return;
   }
+  m_last_file_update = time(0);
+  m_lasttime = ftime;
 
-  now = time(0);
+  char mbstr[100];
+  time_t now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] before Load File");
 
-  m_file = new TFile(m_mempath.c_str(), "READ");
-  if (m_file->IsZombie()) {
-    B2WARNING("DQMHistAnalysisInput: " << m_mempath + " is Zombie");
+  std::unique_ptr<TFile> pFile = std::unique_ptr<TFile> (new TFile(m_mempath.c_str(), "READ"));
+  if (pFile->IsZombie()) {
+    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + " is Zombie -> Sleep");
+    sleep(m_interval);
     setReturnValue(false);
     return;
   }
@@ -101,12 +110,12 @@ void DQMHistAnalysisInput2Module::event()
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after LoadFile");
 
-  const TDatime& mt = m_file->GetModificationDate();
+  const TDatime& mt = pFile->GetModificationDate();
   TDatime mmt(mt.Convert());
   std::string expno("UNKNOWN"), runno("UNKNOWN"), rtype("UNKNOWN");
 
-  m_file->cd();
-  TIter next(m_file->GetListOfKeys());
+  pFile->cd();
+  TIter next(pFile->GetListOfKeys());
   TKey* key = nullptr;
 
   now = time(0);
@@ -119,6 +128,8 @@ void DQMHistAnalysisInput2Module::event()
   }
   // update number of processed events
   m_nevent = getEventProcessed();
+
+  std::vector<TH1*> hs; // temporary histograms storage vector
 
   while ((key = (TKey*)next())) {
     auto obj = key->ReadObj(); // I now own this object and have to take care to delete it
@@ -137,7 +148,7 @@ void DQMHistAnalysisInput2Module::event()
     TString a = h->GetName();
     a.ReplaceAll(":", "");
     h->SetName(a);
-    B2DEBUG(1, "DQMHistAnalysisInput: get histo " << a.Data());
+    B2DEBUG(1, "DQMHistAnalysisInput2: get histo " << a.Data());
 
     // the following line prevent any histogram outside a directory to be processed
     if (StringSplit(a.Data(), '/').size() <= 1) {
@@ -156,10 +167,22 @@ void DQMHistAnalysisInput2Module::event()
 
   now = time(0);
   strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+  B2INFO("[" << mbstr << "] before Close File");
+
+  // we are done with reading, so close it
+  pFile->Close();
+
+  now = time(0);
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+  B2INFO("[" << mbstr << "] before delete File");
+  pFile = nullptr;
+
+  now = time(0);
+  strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
   B2INFO("[" << mbstr << "] after input loop");
 
   if (expno == std::string("UNKNOWN") || runno == std::string("UNKNOWN")) {
-    B2WARNING("DQMHistAnalysisInput: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
+    B2WARNING("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
               mmt.AsString());
     setReturnValue(false);
     for (auto& h : hs)  delete h;
@@ -171,12 +194,12 @@ void DQMHistAnalysisInput2Module::event()
     m_expno = std::stoi(expno);
     m_runno = std::stoi(runno);
   }
-  B2INFO("DQMHistAnalysisInput: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
+  B2INFO("DQMHistAnalysisInput2: " << m_mempath + ": Exp " + expno + ", Run " + runno + ", RunType " + rtype + ", Last Updated " +
          mmt.AsString());
 
 
   m_count++;
-  m_eventMetaDataPtr.create();
+  // Override with updated values
   m_eventMetaDataPtr->setExperiment(m_expno);
   m_eventMetaDataPtr->setRun(m_runno);
   m_eventMetaDataPtr->setEvent(m_count);
@@ -189,14 +212,19 @@ void DQMHistAnalysisInput2Module::event()
   ExtractEvent(hs);
 
   // this code must be run after "event processed" has been extracted
-  bool anyupdate = false; // flag if any histogram updated at all
+  bool anyupdate = m_forceChanged; // flag if any histogram updated at all
+  m_forceChanged = false;
   for (auto& h : hs) {
     anyupdate |= addHist("", h->GetName(), h);
     B2DEBUG(1, "Found : " << h->GetName() << " : " << h->GetEntries());
   }
 
-  // if there is no update, sleep a moment
-  if (!anyupdate) sleep(m_interval);
+  if (anyupdate) {
+    m_last_content_update = time(0);
+  } else {
+    // if there is no update, sleep a moment
+    sleep(m_interval);
+  }
 
   // if no histogram was updated, we could stop processing
   setReturnValue(anyupdate);
@@ -204,11 +232,34 @@ void DQMHistAnalysisInput2Module::event()
 
 void DQMHistAnalysisInput2Module::endRun()
 {
-  B2INFO("DQMHistAnalysisInput : endRun called");
+  B2DEBUG(1, "DQMHistAnalysisInput2: endRun called");
 }
 
 void DQMHistAnalysisInput2Module::terminate()
 {
-  B2INFO("terminate called");
+  B2DEBUG(1, "DQMHistAnalysisInput2: terminate called");
+  if (m_c_info) delete m_c_info;
+  clearlist(); // necessary in the Input Module! Otherwise ROOT may clean before we do
 }
 
+void DQMHistAnalysisInput2Module::write_state(void)
+{
+  if (m_statname == "") return;
+  FILE* fh = fopen(m_statname.c_str(), "wt+");
+  if (fh) {
+    char mbstr[100];
+    time_t now = time(0);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&now));
+    fprintf(fh, "%s,%s,%s,", m_statname.c_str(), m_mempath.c_str(), mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_event));
+    fprintf(fh, "%s,", mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_beginrun));
+    fprintf(fh, "%s,", mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_file_update));
+    fprintf(fh, "%s,", mbstr);
+    strftime(mbstr, sizeof(mbstr), "%F %T", localtime(&m_last_content_update));
+    fprintf(fh, "%s\n", mbstr);
+
+    fclose(fh);
+  }
+}

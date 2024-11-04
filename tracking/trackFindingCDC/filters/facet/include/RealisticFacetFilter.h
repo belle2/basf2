@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCFacet;
 
-    /// Filter for the constuction of good facets based on simple criterions.
+    /// Filter for the construction of good facets based on simple criteria.
     class RealisticFacetFilter : public BaseFacetFilter {
 
     private:

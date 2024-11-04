@@ -16,6 +16,7 @@
 #include <vxd/geometry/GeoCache.h>
 
 #include <mdst/dataobjects/MCParticle.h>
+#include <mdst/dataobjects/EventLevelTrackingInfo.h>
 #include <pxd/dataobjects/PXDDigit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <pxd/dataobjects/PXDTrueHit.h>
@@ -70,6 +71,9 @@ PXDClusterizerModule::PXDClusterizerModule() : Module()
            string("PXDClusterPositionErrorUPar"));
   addParam("PositionErrorVPayloadName", m_positionErrorVName, "Payload name for cluster position error in V",
            string("PXDClusterPositionErrorVPar"));
+  addParam("createPXDClustersForAbortedTrackingEvents", m_createPXDClustersForAbortedTrackingEvents,
+           "Create PXDClusters for events where either the SVDSpacePointCreator abort flag or the VXDTF2 and SVDCKF abort flags are set.",
+           m_createPXDClustersForAbortedTrackingEvents);
 
 }
 
@@ -157,6 +161,8 @@ void PXDClusterizerModule::initialize()
     }
   }
 
+  m_eventLevelTrackingInfo.isOptional();
+
 }
 
 void PXDClusterizerModule::beginRun()
@@ -169,6 +175,17 @@ void PXDClusterizerModule::beginRun()
 
 void PXDClusterizerModule::event()
 {
+  // Abort in case SVDSpacePointCreator was aborted (high occupancy events) or if both VXDTF2 and SVDCKF were aborted
+  // as we do not add PXD hits to CDC standalone tracks, so we don't need to run the PXDClusterizer.
+  // This veto can be overwritten by setting m_createPXDClustersForAbortedTrackingEvents to true to create them regardless.
+  if (m_eventLevelTrackingInfo.isValid()) {
+    if (not m_createPXDClustersForAbortedTrackingEvents and
+        (m_eventLevelTrackingInfo->hasSVDSpacePointCreatorAbortionFlag() or
+         (m_eventLevelTrackingInfo->hasSVDCKFAbortionFlag() and m_eventLevelTrackingInfo->hasVXDTF2AbortionFlag()))) {
+      return;
+    }
+  }
+
   const StoreArray<MCParticle> storeMCParticles(m_storeMCParticlesName);
   const StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
   const StoreArray<PXDDigit> storeDigits(m_storeDigitsName);
@@ -300,7 +317,7 @@ void PXDClusterizerModule::writeClusters(VxdID sensorID)
                                   m_relClusterTrueHitName);
 
   //Get Geometry information
-  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::get(
+  const SensorInfo& info = dynamic_cast<const SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(
                                                              sensorID));
 
   map<unsigned int, float> mc_relations;

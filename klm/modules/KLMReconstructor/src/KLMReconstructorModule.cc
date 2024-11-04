@@ -103,10 +103,9 @@ void KLMReconstructorModule::initialize()
   m_Digits.isRequired();
   if (m_EventT0Correction)
     m_EventT0.isRequired();
-  // This object is registered by both ECL and KLM packages. Let's be agnostic about the
-  // execution order of ecl and klm modules: the first package run registers the module
-  m_EventLevelClusteringInfo.isOptional() ?
-  m_EventLevelClusteringInfo.isRequired() :
+  // This object is registered by few packages. Let's be agnostic about the
+  // execution order of the modules: the first package run registers the module
+  m_EventLevelClusteringInfo.isOptional() ? m_EventLevelClusteringInfo.isRequired() :
   m_EventLevelClusteringInfo.registerInDataStore();
   m_Hit2ds.registerInDataStore();
   m_Hit2ds.registerRelationTo(m_bklmHit1ds);

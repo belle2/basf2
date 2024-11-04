@@ -5,6 +5,9 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
+#include <vector>
+#include <sstream>
+#include <string>
 
 #include <trg/ecl/modules/trgeclDQM/TRGECLDQMModule.h>
 #include <trg/ecl/TrgEclMapping.h>
@@ -31,12 +34,14 @@ TRGECLDQMModule::TRGECLDQMModule() : HistoModule()
   setPropertyFlags(c_ParallelProcessingCertified);
 
   TCId.clear();
+  TCHitWin.clear();
   TCEnergy.clear();
   TCTiming.clear();
   RevoFAM.clear();
   RevoTrg.clear();
   FineTiming.clear();
 
+  addParam("ECLNTC_grpclk", m_grpclknum, "The number of clocks to group N(TC)", 2);
 }
 
 
@@ -49,10 +54,7 @@ TRGECLDQMModule::~TRGECLDQMModule()
 void TRGECLDQMModule::defineHisto()
 {
   TDirectory* oldDir = gDirectory;
-  TDirectory* dirDQM = (TDirectory*)gDirectory->Get("TRG");
-  if (!dirDQM) {
-    dirDQM = oldDir->mkdir("TRG");
-  }
+  TDirectory* dirDQM = gDirectory->mkdir("TRG", "", true);
   dirDQM->cd();
 
   h_TCId           = new TH1D("h_TCId",          "[TRGECL] Hit TC ID",                   578, 0, 578);
@@ -65,6 +67,9 @@ void TRGECLDQMModule::defineHisto()
   h_Narrow_TotalEnergy    = new TH1D("h_Narrow_TotalEnergy",   "[TRGECL] Total TC Energy (ADC)",       100, 0, 500);
   h_Narrow_TCEnergy       = new TH1D("h_Narrow_TCEnergy",      "[TRGECL] TC Energy (ADC)",     100, 0, 100);
   h_n_TChit_event  = new TH1D("h_n_TChit_event", "[TRGECL] N(TC) ",                50, 0, 50);
+  h_n_TChit_clean  = new TH1D("h_n_TChit_clean", "[TRGECL] N(TC) (Injection BG Clean)",                300, 0, 300);
+  h_n_TChit_injHER  = new TH1D("h_n_TChit_injHER", "[TRGECL] N(TC) (HER Injection BG)",                300, 0, 300);
+  h_n_TChit_injLER  = new TH1D("h_n_TChit_injLER", "[TRGECL] N(TC) (LER Injection BG)",                300, 0, 300);
   h_nTChit_injtime = new TH2D("h_nTChit_injtime", "[TRGECL] N(TC) vs. Time since injection", 201, 0, 200, 100, 0, 50);
   h_Cluster        = new TH1D("h_Cluster",       "[TRGECL] N(Cluster) ",           20, 0, 20);
   h_TCTiming       = new TH1D("h_TCTiming",      "[TRGECL] TC Timing  (ns)",      100, 3010, 3210);
@@ -77,9 +82,45 @@ void TRGECLDQMModule::defineHisto()
   h_nTChit_injtime->GetXaxis()->SetTitle("The number of TC hits");
   h_nTChit_injtime->GetYaxis()->SetTitle("Time since injection [ms]");
 
+  std::stringstream ntcclk_titlebase_ss;
+  ntcclk_titlebase_ss << "[TRGECL] N(TC_" << m_grpclknum << "_clk)";
+  std::string ntcclk_titlebase = ntcclk_titlebase_ss.str();
+  h_n_TChit_event_clkgrp  = new TH1D("h_n_TChit_event_clkgrp", ntcclk_titlebase.c_str(),                50, 0, 50);
+  h_n_TChit_clean_clkgrp  = new TH1D("h_n_TChit_clean_clkgrp", (ntcclk_titlebase + " (Injection BG Clean)").c_str(),
+                                     300, 0, 300);
+  h_n_TChit_injHER_clkgrp  = new TH1D("h_n_TChit_injHER_clkgrp", (ntcclk_titlebase + " (HER Injection BG)").c_str(),
+                                      300, 0, 300);
+  h_n_TChit_injLER_clkgrp  = new TH1D("h_n_TChit_injLER_clkgrp", (ntcclk_titlebase + " (LER Injection BG)").c_str(),
+                                      300, 0, 300);
+  h_nTChit_injtime_clkgrp = new TH2D("h_nTChit_injtime_clkgrp", (ntcclk_titlebase + " vs. Time since injection").c_str(), 201, 0, 200,
+                                     100, 0, 50);
+
+  const std::vector<std::string> titleArr = {
+    "Forward", "Barrel", "Backward"
+  };
+  const std::vector<std::string> nameArr = {
+    "FWD", "BRL", "BWD"
+  };
+
+  for (int i = 0; i < 3; i++) {
+    std::stringstream namebase_ss;
+    std::stringstream titlebase_ss;
+
+    namebase_ss << "h_n_TChit_" << nameArr[i] << "_";
+    titlebase_ss << "[TRGECL] N_" << titleArr[i] << "(TC_" << m_grpclknum << "clk)";
+
+    h_n_TChit_part_event_clkgrp[i] = new TH1D((namebase_ss.str() + "event_clkgrp").c_str(), titlebase_ss.str().c_str(), 50, 0, 50);
+    h_n_TChit_part_clean_clkgrp[i] = new TH1D((namebase_ss.str() + "clean_clkgrp").c_str(),
+                                              (titlebase_ss.str() + " (Injection BG Clean)").c_str(), 300, 0, 300);
+    h_n_TChit_part_injHER_clkgrp[i] = new TH1D((namebase_ss.str() + "injHER_clkgrp").c_str(),
+                                               (titlebase_ss.str() + " (HER Injection BG)").c_str(), 300, 0, 300);
+    h_n_TChit_part_injLER_clkgrp[i] = new TH1D((namebase_ss.str() + "injLER_clkgrp").c_str(),
+                                               (titlebase_ss.str() + " (LER Injection BG)").c_str(), 300, 0, 300);
+    h_nTChit_part_injtime_clkgrp[i] = new TH2D((namebase_ss.str() + "injtime_clkgrp").c_str(),
+                                               (titlebase_ss.str() + " vs. Time since injection").c_str(), 201, 0, 200, 100, 0, 50);
+  }
 
   const char* label[44] = {"Hit", "Timing Source(FWD)", "Timing Source(BR)", "Timing Source(BWD)", "physics Trigger", "2D Bhabha Veto", "3D Bhabha veto", "3D Bhabha Selection", "E Low", "E High", "E LOM", "Cluster Overflow", "Low multi bit 0", "Low multi bit 1", "Low multi bit 2", "Low multi bit 3", "Low multi bit 4", "Low multi bit 5", "Low multi bit 6", "Low multi bit 7", "Low multi bit 8", "Low multi bit 9", "Low multi bit 10", "Low multi bit 11", "Low multi bit 12", "Low multi bit 13", "mumu bit", "prescale bit", "ECL burst bit", "2D Bhabha bit 1", "2D Bhabha bit 2", "2D Bhabha bit 3", "2D Bhabha bit 4", "2D Bhabha bit 5", "2D Bhabha bit 6", "2D Bhabha bit 7", "2D Bhabha bit 8", "2D Bhabha bit 9", "2D Bhabha bit 10", "2D Bhabha bit 11", "2D Bhabha bit 12", "2D Bhabha bit 13", "2D Bhabha bit 14"};
-
 
   for (int j = 0; j < 29; j++) {
     h_ECL_TriggerBit->GetXaxis()-> SetBinLabel(j + 1, label[j]);
@@ -92,6 +133,10 @@ void TRGECLDQMModule::defineHisto()
 
 void TRGECLDQMModule::initialize()
 {
+  if (m_grpclknum <= 0 || m_grpclknum >= 9) {
+    B2WARNING("The number of grouping clocks for N(TC) is wrong (It should be 1 <= clk_num <= 8). The value will set to 2.");
+    m_grpclknum = 2;
+  }
 
   // calls back the defineHisto() function, but the HistoManager module has to be in the path
   REG_HISTOGRAM
@@ -100,9 +145,7 @@ void TRGECLDQMModule::initialize()
   trgeclEvtArray.registerInDataStore();
   trgeclCluster.registerInDataStore();
   trgeclSumArray.registerInDataStore();
-
 }
-
 
 void TRGECLDQMModule::beginRun()
 {
@@ -116,6 +159,7 @@ void TRGECLDQMModule::endRun() { } void TRGECLDQMModule::terminate()
 void TRGECLDQMModule::event()
 {
   TCId.clear();
+  TCHitWin.clear();
   TCEnergy.clear();
   TCTiming.clear();
   RevoFAM.clear();
@@ -165,6 +209,7 @@ void TRGECLDQMModule::event()
     HitRevoFam = aTRGECLUnpackerStore-> getRevoFAM() ;
 
     TCId.push_back(TCID);
+    TCHitWin.push_back(hit_win);
     TCEnergy.push_back(HitEnergy);
     TCTiming.push_back(HitTiming);
     RevoFAM.push_back(HitRevoFam);
@@ -355,15 +400,17 @@ void TRGECLDQMModule::event()
 
   const int NofTCHit = TCId.size();
 
+  int nTCHitPerClk_total[8] = {0};
+  int nTCHitPerClk_part[3][8] = {0};
   double totalEnergy = 0;
   TrgEclMapping* a = new TrgEclMapping();
   double max = 0;
   double caltrgtiming = 0;
   double diff = -1;
+  bool isHER;
 
-  for (auto& i : m_rawTTD) {
-    diff = i.GetTimeSinceLastInjection(0) / 127. / 1000.;
-  }
+  diff = m_trgTime->getTimeSinceLastInjectionInMicroSeconds() / 1000.;
+  isHER = m_trgTime->isHER();
 
   for (int ihit = 0; ihit < NofTCHit ; ihit ++) {
     h_TCId -> Fill(TCId[ihit]);
@@ -388,12 +435,81 @@ void TRGECLDQMModule::event()
     }
 
     totalEnergy += TCEnergy[ihit];
-    h_n_TChit_event -> Fill(NofTCHit);
-    h_nTChit_injtime->Fill(NofTCHit, diff);
     double timing = 8 * HitRevoTrg - (128 * RevoFAM[ihit] + TCTiming[ihit]);
     if (timing < 0) {timing = timing + 10240;}
     h_TCTiming->Fill(timing);
+    nTCHitPerClk_total[TCHitWin[ihit]]++;
+
+    if (TCId[ihit] <= 80) {
+      nTCHitPerClk_part[0][TCHitWin[ihit]]++;
+    } else if (80 < TCId[ihit] && TCId[ihit] <= 512) {
+      nTCHitPerClk_part[1][TCHitWin[ihit]]++;
+    } else {
+      nTCHitPerClk_part[2][TCHitWin[ihit]]++;
+    }
   }
+
+  const double revotime_in_us = 5.120 / m_hwclkdb->getAcceleratorRF();
+  int quotient;
+  double running_in_us, diff_in_us;
+
+  diff_in_us = diff * 1000.;
+  quotient = diff_in_us / revotime_in_us;
+  running_in_us = diff_in_us - quotient * revotime_in_us;
+
+  bool cond_clean, cond_injHER, cond_injLER;
+
+  cond_clean = (6 < running_in_us && running_in_us < 8) && (50 < diff && diff < 70);
+
+  cond_injHER =  isHER && ((diff < 0.5) || ((diff < 20) && (2 < running_in_us && running_in_us < 3)));
+  cond_injLER = !isHER && ((diff < 0.5) || ((diff < 20) && (1 < running_in_us && running_in_us < 2)));
+
+  h_n_TChit_event -> Fill(NofTCHit);
+  h_nTChit_injtime->Fill(NofTCHit, diff);
+
+  if (cond_clean) {
+    h_n_TChit_clean->Fill(NofTCHit);
+  } else if (cond_injHER) {
+    h_n_TChit_injHER->Fill(NofTCHit);
+  } else if (cond_injLER) {
+    h_n_TChit_injLER->Fill(NofTCHit);
+  }
+
+  for (int iclk = 0; iclk < 8 - (m_grpclknum - 1); iclk++) {
+    int group_tcnum_total = 0;
+    int group_tcnum_part[3] = {0};
+    for (int igrp = 0; igrp < m_grpclknum; igrp++) {
+      group_tcnum_total += nTCHitPerClk_total[iclk + igrp];
+      for (int ipart = 0; ipart < 3; ipart++) {
+        group_tcnum_part[ipart] += nTCHitPerClk_part[ipart][iclk + igrp];
+      }
+    }
+
+    h_n_TChit_event_clkgrp->Fill(group_tcnum_total);
+    h_nTChit_injtime_clkgrp->Fill(group_tcnum_total, diff);
+
+    if (cond_clean) {
+      h_n_TChit_clean_clkgrp->Fill(group_tcnum_total);
+    } else if (cond_injHER) {
+      h_n_TChit_injHER_clkgrp->Fill(group_tcnum_total);
+    } else if (cond_injLER) {
+      h_n_TChit_injLER_clkgrp->Fill(group_tcnum_total);
+    }
+
+    for (int ipart = 0; ipart < 3; ipart++) {
+      h_n_TChit_part_event_clkgrp[ipart]->Fill(group_tcnum_part[ipart]);
+      h_nTChit_part_injtime_clkgrp[ipart]->Fill(group_tcnum_part[ipart], diff);
+
+      if (cond_clean) {
+        h_n_TChit_part_clean_clkgrp[ipart]->Fill(group_tcnum_part[ipart]);
+      } else if (cond_injHER) {
+        h_n_TChit_part_injHER_clkgrp[ipart]->Fill(group_tcnum_part[ipart]);
+      } else if (cond_injLER) {
+        h_n_TChit_part_injLER_clkgrp[ipart]->Fill(group_tcnum_part[ipart]);
+      }
+    }
+  }
+
   double trgtiming = 8 * HitRevoTrg - (128 *     HitRevoEvtTiming + HitFineTiming);
 
   if (trgtiming < 0) {trgtiming = trgtiming + 10240;}

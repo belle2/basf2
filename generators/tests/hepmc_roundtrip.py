@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##########################################################################
+# basf2 (Belle II Analysis Software Framework)                           #
+# Author: The Belle II Collaboration                                     #
+#                                                                        #
+# See git log for contributors and copyright holders.                    #
+# This file is licensed under LGPL-3.0, see LICENSE.md.                  #
+##########################################################################
+
 """
 Test HepMC reader and writer by reading in a hepmc file and writing out one
 again and checking if they match.

@@ -50,7 +50,7 @@ namespace Belle2 {
       }
 
       /// helper function which calculates the average distance in XY from the given center
-      /// @param circleCenter center of the cirlce for which the average distance is calculated
+      /// @param circleCenter center of the circle for which the average distance is calculated
       /// returns the average distance in cm of the hits to the circle center position
       double calcAvgDistanceXY(const B2Vector3D& circleCenter)
       {

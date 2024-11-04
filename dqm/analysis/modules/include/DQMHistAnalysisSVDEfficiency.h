@@ -12,17 +12,20 @@
 
 #pragma once
 
-#include <dqm/core/DQMHistAnalysis.h>
+#include <dqm/analysis/modules/DQMHistAnalysisSVD.h>
 #include <svd/dataobjects/SVDSummaryPlots.h>
 
 #include <TFile.h>
 #include <TPaveText.h>
 #include <TCanvas.h>
+#include <TText.h>
+#include <TLine.h>
+#include <TArrow.h>
 
 namespace Belle2 {
   /*! Class definition for the output module of Sequential ROOT I/O */
 
-  class DQMHistAnalysisSVDEfficiencyModule final : public DQMHistAnalysisModule {
+  class DQMHistAnalysisSVDEfficiencyModule final : public DQMHistAnalysisSVDModule {
 
     // Public functions
   public:
@@ -71,12 +74,6 @@ namespace Belle2 {
     bool m_3Samples; /**< if true enable 3 samples histograms analysis */
 
     //! Data members
-
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
-
     TCanvas* m_cEfficiencyU = nullptr; /**< efficiency U plot canvas */
     TCanvas* m_cEfficiencyV = nullptr; /**< efficiency V plot canvas */
     SVDSummaryPlots* m_hEfficiency = nullptr; /**< efficiency histo */
@@ -91,22 +88,44 @@ namespace Belle2 {
     TCanvas* m_cEfficiencyErrV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
     SVDSummaryPlots* m_hEfficiencyErr3Samples = nullptr; /**< efficiency error histo for 3 samples*/
 
-    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
+    TCanvas* m_cEfficiencyRPhiViewU = nullptr; /**< efficiency U plot canvas */
+    TCanvas* m_cEfficiencyRPhiViewV = nullptr; /**< efficiency V plot canvas */
+    TCanvas* m_cEfficiencyErrRPhiViewU = nullptr; /**<efficiency U error plot canvas */
+    TCanvas* m_cEfficiencyErrRPhiViewV = nullptr; /**<efficiency V error plot canvas */
 
-    TPaveText* m_legProblem = nullptr; /**< efficiency plot legend, problem */
-    TPaveText* m_legWarning = nullptr; /**< efficiency plot legend, warning */
-    TPaveText* m_legNormal = nullptr; /**< efficiency plot legend, normal */
-    TPaveText* m_legEmpty = nullptr; /**< efficiency plot legend, empty */
+    TCanvas* m_cEfficiencyRPhiViewU3Samples = nullptr; /**< efficiency U plot canvas  for 3 samples */
+    TCanvas* m_cEfficiencyRPhiViewV3Samples = nullptr; /**< efficiency V plot canvas  for 3 samples */
+    TCanvas* m_cEfficiencyErrRPhiViewU3Samples = nullptr; /**<efficiency U error plot canvas for 3 samples*/
+    TCanvas* m_cEfficiencyErrRPhiViewV3Samples = nullptr; /**<efficiency V error plot canvas for 3 samples*/
+
+    Int_t findBinY(Int_t layer, Int_t sensor); /**< find Y bin corresponding to sensor, efficiency plot*/
+    std::tuple<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
+    void drawText(); /**< draw text on the RPhi view */
+
+    std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
+    std::vector<TText*> m_sensorsText; /**< list of sensors to write on the cancas */
+
+    TLine* m_lx = nullptr; /**< y-axis */
+    TLine* m_ly = nullptr; /**< x-axis */
+    TArrow* m_arrowx = nullptr; /**< x-axis direction */
+    TArrow* m_arrowy = nullptr; /**< y-axis direction */
+
+    int m_efficiencyMin = 0; /**< Minimum of the efficiency histogram */
+    int m_efficiencyMax = -1111; /**< Maximum of the efficiency histogram. -1111 adjust the maximum depennding on the content */
+    bool m_setEfficiencyRange = false; /**< set the range of the efficiency histogram */
 
     /** efficiency status flags */
     enum effStatus {
       good = 0,    /**< green frame */
       warning = 1, /**< orange frame */
       error = 2,   /**< red frame */
-      lowStat = 3  /**< gray frame */
+      lowStat = 3,  /**< gray frame */
+      noStat = 4 /**< purple frame */
     };
     effStatus m_effUstatus; /**< number representing the status of the efficiency U side */
     effStatus m_effVstatus;/**< number representing the status of the efficiency V side */
+
+    void setEffStatus(float den, float eff, bool sideU = false); /**< set efficiency status */
 
     //! IDs of all SVD Modules to iterate over
     std::vector<VxdID> m_SVDModules;

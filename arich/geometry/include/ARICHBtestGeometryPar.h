@@ -46,7 +46,7 @@ namespace Belle2 {
     int tdc[4];
     //! TDC of the anode signal
     int atdc;
-    //! Calibration constants of the MWPC (\delta x= slope \delta t + offset) - slopes for x an y direction
+    //! Calibration constants of the MWPC (\f$\delta x = slope \delta t + offset\f$) - slopes for x an y direction
     float slp[2];
     //! Calibration constants of the MWPC - offsets for x an y direction
     float offset[2];

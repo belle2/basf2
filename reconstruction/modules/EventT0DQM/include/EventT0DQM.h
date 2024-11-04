@@ -106,7 +106,7 @@ namespace Belle2 {
     TH1F* m_histEventT0_SVD_mumu_L1_TOPTRG{nullptr};   /**< event t0 histogram for SVD, HLT mu mu events, L1 time by TOP trigger */
 
     /// EventT0 algorithms for which to calculate fractions of abundance
-    const char* c_eventT0Algorithms[5] = {"ECL", "SVD", "CDC hit based", "CDC full grid chi2", "TOP"};
+    const char* c_eventT0Algorithms[6] = {"ECL", "SVD", "CDC hit based", "CDC full grid #chi^{2}", "TOP", "Any"};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by ECL trigger
     TH1D* m_histAlgorithmSourceFractionsHadronL1ECLTRG{nullptr};
     /// Fraction of events with EventT0 from a given algorithm, HLT hadronic events, L1 time by CDC trigger
@@ -127,8 +127,8 @@ namespace Belle2 {
     TH1D* m_histAlgorithmSourceFractionsMuMuL1TOPTRG{nullptr};
 
     /// Fill fraction histogram with values
-    void fillHistogram(TH1D* hist, const bool hasECLT0, const bool hasSVDT0, const bool hasCDCHitT0, const bool hasCDCGridT0,
-                       const bool hasTOPT0);
+    void fillHistogram(TH1D* hist, const bool hasAnyT0, const bool hasECLT0, const bool hasSVDT0,
+                       const bool hasCDCHitT0, const bool hasCDCGridT0, const bool hasTOPT0);
 
 
   };

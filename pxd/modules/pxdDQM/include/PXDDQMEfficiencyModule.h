@@ -19,7 +19,7 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/dataobjects/ROIid.h>
-#include <tracking/pxdDataReductionClasses/PXDInterceptor.h>
+#include <tracking/dataobjects/PXDIntercept.h>
 
 #include "TH1F.h"
 #include "TH1D.h"

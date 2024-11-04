@@ -58,12 +58,12 @@ namespace Belle2 {
     void setMergePayload(bool value = true) {m_isMerge = value;}
 
     /**
-    * funtion to set flag active for plotting
+    * function to set flag active for plotting
     */
     void enableExtraPlots(bool value = false) {m_isMakePlots = value;}
 
     /**
-    * funtion to set trucation method (local vs global)
+    * function to set truncation method (local vs global)
     */
     void setWireBasedTruction(bool value = false) {m_isWireTruc = value;}
 
@@ -78,12 +78,12 @@ namespace Belle2 {
     void createPayload(const std::vector<double>& vdedx_tmeans);
 
     /**
-    * function to get bins of trunction from histogram
+    * function to get bins of truncation from histogram
     */
     void  getTruncatedBins(TH1D* hdedxhit, unsigned int& binlow, unsigned int& binhigh);
 
     /**
-    * function to get mean of trunction from histogram
+    * function to get mean of truncation from histogram
     */
     double getTruncationMean(TH1D* hdedxhit, int binlow, int binhigh);
 
@@ -144,7 +144,7 @@ namespace Belle2 {
     double m_truncMin; /**< min trunc range for mean */
     double m_truncMax; /**< max trunc range for mean */
 
-    std::string m_suffix; /**< suffix string to seperate plots */
+    std::string m_suffix; /**< suffix string to separate plots */
 
     DBObjPtr<CDCDedxWireGain> m_DBWireGains; /**< Wire gain DB object */
     DBObjPtr<CDCDedxBadWires> m_DBBadWires; /**< Bad wire DB object */

@@ -54,16 +54,16 @@ namespace Belle2 {
     void setRotationSymmetry(bool value) {IsRS = value;}
 
     /**
-    * adding prefix to filenae for uniqueness in each iter
+    * adding prefix to filename for uniqueness in each iter
     */
     void setOutFilePrefix(const std::string& value) {fSetPrefix = value;}
 
     /**
-    funtion to set flag active for plotting
+    function to set flag active for plotting
     */
     void setMonitoringPlots(bool value = false) {IsMakePlots = value;}
     /**
-    * funtion to set rotation symmetry
+    * function to set rotation symmetry
     */
     int GetRotationSymmericBin(int nbin, int ibin)
     {
@@ -78,7 +78,7 @@ namespace Belle2 {
     }
 
     /**
-    * funtion to set variable bins
+    * function to set variable bins
     */
     void GetVariableBin(int nbin, std::vector<int>& nBinEnta0to100Per)
     {

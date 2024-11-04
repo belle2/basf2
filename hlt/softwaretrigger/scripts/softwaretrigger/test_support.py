@@ -210,8 +210,8 @@ def test_script(script_location, input_file_name, temp_dir):
     # Move the output file with DQM histograms under the expected location:
     # for reasons we don't want to know, they are saved under the current directory
     # even if a valid and existing working directory is specified
+    final_histos_file_name = os.path.join(temp_dir, histos_file_name)
     if os.path.exists(histos_file_name):
-        final_histos_file_name = os.path.join(temp_dir, histos_file_name)
         shutil.copy(histos_file_name, os.path.join(temp_dir, final_histos_file_name))
         os.unlink(histos_file_name)
 

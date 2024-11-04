@@ -131,7 +131,7 @@ void ECLTrackCalDigitMatchModule::event()
     // extrapolate to backward z
     const double lBWD = (m_extZBWD - z0) / tanlambda > 0 ? (m_extZBWD - z0) / tanlambda : 999999.;
 
-    // pick smalles arclength
+    // pick smallest arclength
     const double l = std::min(std::min(lHelixRadius, lFWD), lBWD);
 
     B2DEBUG(50, lHelixRadius << " " << lFWD << " " << lBWD << " -> " << l);

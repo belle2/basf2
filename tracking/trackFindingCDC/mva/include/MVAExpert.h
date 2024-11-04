@@ -8,7 +8,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
-
 #include <RtypesCore.h>
 
 #include <vector>
@@ -16,6 +15,7 @@
 #include <string>
 
 namespace Belle2 {
+
   namespace TrackFindingCDC {
 
     /// Class to interact with the MVA package
@@ -42,8 +42,13 @@ namespace Belle2 {
       /// Evaluate the MVA method and return the MVAOutput
       double predict();
 
+      /// Evaluate the MVA method and return the MVAOutput for multiple inputs at the same time
+      std::vector<float> predict(float* /* test_data */, int /* nFeature */, int nRows);
+
+      /// Get selected variable names
+      std::vector<std::string> getVariableNames();
     private:
-      /// Forward declartion of implementation.
+      /// Forward declaration of implementation.
       class Impl;
 
       /// Pointer to implementation hiding the details.

@@ -36,7 +36,7 @@
 // update for exp27 run700- (by Sanjay and Senyo).
 //
 // Revision 1.33  2003/07/03 00:06:22  katayama
-// aviod seg fault
+// avoid seg fault
 //
 // Revision 1.32  2003/07/01 07:15:18  hitoshi
 // fixed typo in warning message.
@@ -163,7 +163,7 @@ namespace Belle2 {
   {
 
     setDescription("Used to fix the old Belle I mdst files before processing. This module was taken from the old Belle I code and converted into a basf2 module."
-                   "There are a lot of magic numbers in this module, where do they come from? Noone knows..."
+                   "There are a lot of magic numbers in this module, where do they come from? No one knows..."
                    "Return value is -1 if something went wrong, do not use these events!");
 
     addParam("Scale_momenta", m_scale_momenta, "Apply scale_momenta", 1);

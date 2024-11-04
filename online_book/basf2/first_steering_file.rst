@@ -24,7 +24,7 @@ First steering file
 
     **Objectives**:
 
-    * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^+)`
+    * Reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to \pi^+\pi^-)`
 
 In this hands-on tutorial you'll be writing your first steering file. Our
 ultimate goal is to reconstruct :math:`B^0 \to J/\Psi(\to e^+e^-)K_S^0(\to

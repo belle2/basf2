@@ -278,12 +278,6 @@ namespace Belle2 {
     }
 
     /**
-     * Set hit global position.
-     * @param[in] pos Position.
-     */
-    //void setPosition(const ROOT::Math::XYZVector& pos);
-
-    /**
      * Get hit global position x coordinate.
      * @return Hit x coordinate.
      */
@@ -492,7 +486,7 @@ namespace Belle2 {
     /** Whether this 2D hit is associated with a muid-extrapolated track. */
     bool m_IsOnTrack = false;
 
-    /** Wether this 2D hit is associated with a BKLM stand-alone track. */
+    /** Whether this 2D hit is associated with a BKLM stand-alone track. */
     bool m_IsOnStaTrack = false;
 
     /** Class version. */

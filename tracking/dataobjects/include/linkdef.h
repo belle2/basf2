@@ -24,9 +24,9 @@
 
 #pragma link C++ class Belle2::ROIid+; // checksum=0x67e7bffd, version=1
 #pragma link C++ class Belle2::ROIpayload+; // checksum=0x24692265, version=2
-#pragma link C++ class Belle2::VXDIntercept+; // checksum=0xbb836403, version=1
-#pragma link C++ class Belle2::PXDIntercept+; // checksum=0x756ab835, version=2
-#pragma link C++ class Belle2::SVDIntercept+; // checksum=0x14d0197f, version=4
+#pragma link C++ class Belle2::VXDIntercept+; // checksum=0xe51f7a30, version=2
+#pragma link C++ class Belle2::PXDIntercept+; // checksum=0x9f06ce62, version=3
+#pragma link C++ class Belle2::SVDIntercept+; // checksum=0xaea2b58f, version=5
 #pragma link C++ class Belle2::RecoTrack+; // checksum=0xf8191917, version=14
 #pragma link C++ class Belle2::RecoHitInformation+; // checksum=0xcf616f27, version=6
 #pragma link C++ class Belle2::BremHit+; // checksum=0xc51e119f, version=2

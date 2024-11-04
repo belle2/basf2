@@ -32,7 +32,7 @@ namespace Belle2 {
   // the center position of the Gaussian (mean) but with identical spread parameters.
   // The longer  intervals of constant spread are called "intervals"
   // The shorter intervals of constant mean value are called "subintervals"
-  // In general there are several subintervals withing single interval
+  // In general there are several subintervals within single interval
   // By definition a subinterval always belongs only to single interval.
 
 

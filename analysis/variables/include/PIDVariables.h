@@ -64,6 +64,11 @@ namespace Belle2 {
     Manager::FunctionPtr pidProbabilityExpert(const std::vector<std::string>& arguments);
 
     /**
+     * @return logarithmic probability defined as log(p / (1 - p)) where p = pidProbabilityExpert
+     */
+    Manager::FunctionPtr pidLogarithmicProbabilityExpert(const std::vector<std::string>& arguments);
+
+    /**
     * @return  returns 1 if the PID probabiliy is missing for the provided detector list, otherwise 0.
     * The possible options for the detectors are any combination of {TOP, CDC, SVD, ARICH, ECL, KLM} or ALL.
     */
@@ -73,6 +78,16 @@ namespace Belle2 {
      * @return The particle ID (of the particle's own hypothesis)
      */
     double particleID(const Particle* part);
+
+    /**
+     * @return True if PID is available
+     */
+    bool isPIDAvailable(const Particle* part);
+
+    /**
+     * @return True if PID is available from a least one of the detectors in the argument list
+     */
+    Manager::FunctionPtr isPIDAvailableFrom(const std::vector<std::string>& arguments);
 
     /**
      * @return electron ID to be used in the physics analyses
@@ -342,6 +357,11 @@ namespace Belle2 {
      * @return kaon ID from Neural Network to be used in the physics analyses
      */
     double kaonIDNN(const Particle* particle);
+
+    /**
+     * @return muon likelihoood from Neural Network (expert use only)
+     */
+    double klmMuonIDDNN(const Particle* part);
 
     /**
      * Parses the detector list for the PID metafunctions.

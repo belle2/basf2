@@ -322,8 +322,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
 
   //get tracking efficiency
   auto m_delta_effphi = (TH2F*)getDelta(m_histoDir, m_histoPhiEff, 0, true); //true=only if updated
-  c_hist_effphi->Clear();
   if (m_delta_effphi) {
+    c_hist_effphi->Clear();
     double eff = -1;
     const int all_phibins = m_delta_effphi->GetNbinsX();
     const int all_hitbins = m_delta_effphi->GetNbinsY();
@@ -349,8 +349,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
 
   //get cdc hits vs phi
   auto m_delta_hitphi = (TH2F*)getDelta(m_histoDir, m_histoHitsPhi, 0, true); //true=only if updated
-  c_hist_hitsphi->Clear();
   if (m_delta_hitphi) {
+    c_hist_hitsphi->Clear();
     m_delta_hitphi->SetTitle("CDC track #phi vs cdchits; cdc-track #phi; nCDCHits");
     c_hist_hitsphi->cd();
     m_delta_hitphi->Draw("COLZ");
@@ -364,8 +364,8 @@ void DQMHistAnalysisCDCEpicsModule::event()
   double fracWiresWithHighAttachProb = 0;
   gStyle->SetNumberContours(100);
   auto m_delta_efflay = (TH2F*)getDelta(m_histoDir, m_histoTrackingWireEff, 0, true); //true=only if updated
-  for (int ij = 0; ij < 4; ij++) c_hist_attach_eff[ij]->Clear();
   if (m_delta_efflay) {
+    for (int ij = 0; ij < 4; ij++) c_hist_attach_eff[ij]->Clear();
     m_hist_wire_attach_eff_1d->Reset();
     int nEffiValues = 0;
     for (int ij = 1; ij <= m_delta_efflay->GetNbinsX(); ij++) {
@@ -387,7 +387,6 @@ void DQMHistAnalysisCDCEpicsModule::event()
     latex.SetTextSize(0.025);
     for (int ij = 0; ij < 3; ij++) {
       c_hist_attach_eff[ij]->cd();
-      gPad->SetRightMargin(0.05 + gPad->GetRightMargin());
       if (m_doTH2PolyTrackingWireEff) {
         m_hist_attach_eff_Poly[ij]->SetStats(0);
         m_hist_attach_eff_Poly[ij]->Draw("COLZ");

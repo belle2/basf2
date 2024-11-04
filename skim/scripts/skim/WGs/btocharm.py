@@ -30,7 +30,8 @@ from skim.standardlists.charm import (loadD0_hh_loose, loadD0_Kshh_loose,
                                       loadStdDstarPlus_Dpi0_Kpipi,
                                       loadCharmlessD0_Kpipi0,
                                       loadPiSkimHighEff,
-                                      loadKSkimHighEff)
+                                      loadKSkimHighEff,
+                                      loadSlowPi)
 from skim.standardlists.lightmesons import (loadStdAllRhoPlus,
                                             loadStdPi0ForBToHadrons,
                                             loadStdSkimHighEffPhi,
@@ -1528,3 +1529,73 @@ class BtoD0pi_Kpiomega_pipipi0(BaseSkim):
         ma.reconstructDecay("B+:BtoD0pi_Kpiomega_pipipi0 -> anti-D0:BtoD0pi_Kpiomega_pipipi0 pi+:GoodTrack", Bcuts, path=path)
 
         return ["B+:BtoD0pi_Kpiomega_pipipi0"]
+
+
+@fancy_skim_header
+class BtoDstpipi_D0pi_Kpi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{-}\\to D^{*+} (\\to D^0 (\\to K^+ \\pi^-) \\pi^+) \\pi^- \\pi^-`,
+
+    Cuts applied:
+
+    * ``5.22 < Mbc``
+    * ``-0.3 < deltaE < 0.2``
+
+    """
+    __authors__ = ["Agrim Aggarwal"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadKForBtoHadrons(path=path),
+        loadPiForBtoHadrons(path=path),
+        loadStdD0_Kpi(path=path),
+        loadStdDstarPlus_D0pi_Kpi(path=path),
+        loadSlowPi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+
+        ma.reconstructDecay("B-:Dsthpipi_D0pi_Kpi -> D*+:D0_Kpi pi-:GoodTrack pi-:GoodTrack", Bcuts, path=path)
+
+        return ["B-:Dsthpipi_D0pi_Kpi"]
+
+
+@fancy_skim_header
+class BtoDpipi_Kpipi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`B^{-}\\to D^{+} (\\to K^- \\pi^+ \\pi^-) \\pi^- \\pi^-`,
+
+
+    Cuts applied:
+
+    * ``5.22 < Mbc``
+    * ``-0.3 < deltaE < 0.2``
+    """
+    __authors__ = ["Melisa-Melek Akdag"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+        ma.reconstructDecay("B-:BtoDpipi_Kpipi -> D+:Kpipi pi-:GoodTrack pi-:GoodTrack",
+                            Bcuts,
+                            path=path)
+        return ["B-:BtoDpipi_Kpipi"]

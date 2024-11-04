@@ -108,6 +108,7 @@ namespace Belle2 {
     StoreObjPtr<SoftwareTriggerResult> m_TrgResult; /**< Store array for Trigger selection */
 
     int m_minHits;                   /**< Minimum hits for processing. */
+    int m_minNdf;                   /**< Minimum track NDF for cdc dqm plots. */
     bool m_adjustWireShift = true;   /**< If true, gets the correct phi view of the boards */
     Long64_t m_nEvents = 0;          /**< Number of events processed */
     TH1F* m_hNEvents = nullptr;      /**< Histogram of num. events */

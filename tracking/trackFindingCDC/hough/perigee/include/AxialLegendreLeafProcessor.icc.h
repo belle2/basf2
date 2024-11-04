@@ -41,7 +41,7 @@ namespace Belle2 {
       // Other combinations of fit information
       // EFitPos::c_RLDriftCircle x EFitVariance::(c_Nominal, c_Pseudo, c_Proper)
       // have been tried, but found to be worse, which is
-      // not intutive. Probably the perfect circle trajectory
+      // not intuitive. Probably the perfect circle trajectory
       // is not as good of a model on the full CDC volume.
       CDCObservations2D observations2D(fitPos, fitVariance);
 

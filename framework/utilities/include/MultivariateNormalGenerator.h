@@ -12,8 +12,9 @@
 #include <Math/Vector3D.h>
 #include <TRandom.h>
 #include <TVectorT.h>
-#include <TVector3.h>
 #include <TMatrixTBase.h>
+
+#include <array>
 
 namespace Belle2 {
   /** Class to generate normal distributed, correlated random numbers given the
@@ -99,20 +100,20 @@ namespace Belle2 {
       for (int i = 0; i < x.rows(); ++i) { output[i] = x(i); }
     }
 
-    /** Generate a set of correlated random numbers with the previouly set
-     * mean and covariance and return a TVector3. Optimally, the set mean and
+    /** Generate a set of correlated random numbers with the previously set
+     * mean and covariance and return a ROOT::Math::XYZVector. Optimally, the set mean and
      * covariance matrix should be of dimension three, otherwise just the first
-     * size() elements of the TVector3 are set and the remaining elements are
+     * size() elements of the ROOT::Math::XYZVector are set and the remaining elements are
      * zero. If size() is bigger than 3 the remaining values will be discarded.
      */
-    TVector3 generateVec3() const
+    ROOT::Math::XYZVector generateVec3() const
     {
       Eigen::VectorXd x = generate();
-      TVector3 output(0, 0, 0);
+      std::array<double, 3> tmp = {0.};
       for (unsigned int i = 0; i < std::min(3u, (unsigned int)size()); ++i) {
-        output[i] = x(i);
+        tmp[i] = x(i);
       }
-      return output;
+      return ROOT::Math::XYZVector(tmp[0], tmp[1], tmp[2]);
     }
 
     /** Generate a set of correlated random numbers with the previouly set

@@ -39,7 +39,7 @@ class PDF:
 
     def _repr_html_(self):
         """HTML representation"""
-        return '<iframe src={0} width={1[0]} height={1[1]}></iframe>'.format(self.pdf, self.size)
+        return f'<iframe src={self.pdf} width={self.size[0]} height={self.size[1]}></iframe>'
 
     def _repr_latex_(self):
         """LaTeX representation"""
@@ -195,7 +195,7 @@ class MVATeacherAndAnalyser:
                     else:
                         adjust_module(path, self.recording_module, **{self.recording_parameter: "truth"})
 
-                output_file_name = "results/validation_{mva_cut}.root".format(mva_cut=mva_cut)
+                output_file_name = f"results/validation_{mva_cut}.root"
 
             run = ValidationRun()
 

@@ -46,7 +46,7 @@ namespace Belle2 {
 
     // ACCESSOR FUNCTIONS
 
-    /** Get the pionter to the 2 Space Point filter assigned to the
+    /** Get the pointer to the 2 Space Point filter assigned to the
     friendship relation among this sector; will return nullptr if filter is not found
     @param innerSector one */
     const Filter2sp* getFilter2sp(FullSecID innerSector) const
@@ -58,7 +58,7 @@ namespace Belle2 {
       return &(filter->second);
     }
 
-    /** Get the pionter to the 3 Space Point filter assigned to the
+    /** Get the pointer to the 3 Space Point filter assigned to the
     friendship relation among this sector; will return nullptr if filter is not found
     @param centerID : FullSecID for the sector between the inner and this sector
     @param innerID : FullSecID for the inner sector*/
@@ -72,7 +72,7 @@ namespace Belle2 {
     }
 
 
-    /** Get the pionter to the 4 Space Point filter assigned to the
+    /** Get the pointer to the 4 Space Point filter assigned to the
     WARNING: not implemented yet. Will return a nullptr pointer in any case!
     */
     const Filter4sp* getFilter4sp(const FullSecID& /*outerCenterID*/, const FullSecID& /*innerCenterID*/,
@@ -210,7 +210,7 @@ namespace Belle2 {
       for (auto& filter : m_3spFilters) modifySingleFilter<Filter3sp>(filter.second, adjustFunctions);
     }
 
-    /** Function that modifies the uper and lower bounds of the Ranges contained in the filter. The actual bounds
+    /** Function that modifies the upper and lower bounds of the Ranges contained in the filter. The actual bounds
         which will be modified are accessed by their index they have (see Filter::getNameAndReference where the indizes are defined).
         @param filter: a specialization of Filter
         @param adjustFunctions : a vector of tuple<int, string>.

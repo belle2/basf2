@@ -31,7 +31,7 @@ ZMQHistoServerToFileOutput::ZMQHistoServerToFileOutput(unsigned int maximalUncom
 
   // We do not free this on purpose!
   if (not m_dqmMemFileName.empty()) {
-    m_sharedMemory = new SharedMem(m_dqmMemFileName.c_str(), maximalUncompressedBufferSize);
+    m_sharedMemory = new DqmSharedMem(m_dqmMemFileName.c_str(), maximalUncompressedBufferSize);
   }
 
   log("histogram_merges", 0l);

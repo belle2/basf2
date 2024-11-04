@@ -112,7 +112,7 @@ namespace Belle2 {
     int getCellId() const { return m_CellId; }
 
     /*! Get Dsp Array
-     * @return Dsp Array 0~31
+     * @param DspArray array which gets filled with DspAVector values
      */
     void getDspA(int  DspArray[31]) const
     {

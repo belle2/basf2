@@ -16,6 +16,7 @@
 # arguments: 1 experimentLow, 2 runLow, 3 experimentHigh , 4 runHigh
 
 import basf2 as b2
+from ROOT import Belle2  # noqa: make Belle2 namespace available
 from ROOT.Belle2 import ARICHDatabaseImporter
 import sys
 

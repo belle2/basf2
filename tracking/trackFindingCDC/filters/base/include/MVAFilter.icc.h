@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/utilities/Named.h>
-
+#include <mva/interface/Dataset.h>
 #include <RtypesCore.h>
 
 #include <vector>
@@ -52,7 +52,7 @@ namespace Belle2 {
 
       moduleParamList->addParameter(prefixed(prefix, "identifier"),
                                     m_identifier,
-                                    "Database identfier of the expert of weight file name",
+                                    "Database identifier of the expert of weight file name",
                                     m_identifier);
 
       moduleParamList->addParameter(prefixed(prefix, "DBPayloadName"),
@@ -87,6 +87,23 @@ namespace Belle2 {
     {
       Super::beginRun();
       m_mvaExpert->beginRun();
+      /// Make sure that the sequence of columns (features) is correct and follows the one from the weightFile
+      const auto& selectedVars = m_mvaExpert->getVariableNames();
+      const std::vector<Named<Float_t*>>& namedVariables = Super::getVarSet().getNamedVariables();
+      m_namedVariables.clear();
+      for (const auto& name : selectedVars) {
+
+        auto itNamedVariable = std::find_if(namedVariables.begin(),
+                                            namedVariables.end(),
+        [name](const Named<Float_t*>& namedVariable) {
+          return namedVariable.getName() == name;
+        });
+        if (itNamedVariable == namedVariables.end()) {
+          B2ERROR("Variable name " << name << " mismatch for MVA filter. " <<
+                  "Could not find expected variable '" << name << "'");
+        }
+        m_namedVariables.push_back(*itNamedVariable);
+      }
     }
 
     template <class AFilter>
@@ -105,6 +122,34 @@ namespace Belle2 {
       } else {
         return m_mvaExpert->predict();
       }
+    }
+
+    template <class AFilter>
+    std::vector<float> MVA<AFilter>::predict(const std::vector<Object*>& objs)
+    {
+      const int nFeature = m_namedVariables.size();
+      const int nRows    = objs.size();
+      auto allFeatures = std::unique_ptr<float[]>(new float[nRows * nFeature]);
+      size_t iRow = 0;
+      for (const auto& obj : objs) {
+        if (Super::getVarSet().extract(obj)) {
+          for (int iFeature = 0; iFeature < nFeature; iFeature += 1) {
+            allFeatures[nFeature * iRow + iFeature] = *m_namedVariables[iFeature];
+          }
+          iRow += 1;
+        }
+      }
+      return m_mvaExpert->predict(allFeatures.get(), nFeature, nRows);
+    }
+
+    template <class AFilter>
+    std::vector<float> MVA<AFilter>::operator()(const std::vector<Object*>& objs)
+    {
+      auto out = predict(objs);
+      for (auto& res : out) {
+        res = res < m_cutValue ? NAN : res;
+      }
+      return out;
     }
 
     template <class AVarSet>

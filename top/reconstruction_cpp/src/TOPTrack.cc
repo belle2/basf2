@@ -28,7 +28,7 @@ using namespace ROOT::Math;
 namespace Belle2 {
   namespace TOP {
 
-    TOPTrack::TrackAngles::TrackAngles(const XYZVector& dir):
+    TOPTrack::TrackAngles::TrackAngles(const ROOT::Math::XYZVector& dir):
       cosTh(dir.Z()), sinTh(sqrt(1 - cosTh * cosTh)), cosFi(dir.X() / sinTh), sinFi(dir.Y() / sinTh)
     {}
 

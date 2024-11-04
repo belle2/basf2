@@ -334,7 +334,7 @@ namespace Belle2 {
   }
 
   TRGState
-  TCFrontEnd::packerInnerInside(const TRGState& input)
+  TRGCDCFrontEnd::packerInnerInside(const TRGState& input)
   {
 
     //...Input should be 48 hit pattern and 48x5 timing, total 288 bits...
@@ -564,7 +564,7 @@ namespace Belle2 {
   }
 
   TRGState
-  TCFrontEnd::packerInnerOutside(const TRGState& input)
+  TRGCDCFrontEnd::packerInnerOutside(const TRGState& input)
   {
 
     //...Input should be 48 hit pattern and 48x5 timing, total 288 bits...
@@ -916,7 +916,7 @@ namespace Belle2 {
   }
 
   TRGState
-  TCFrontEnd::packerOuterInside(const TRGState& input)
+  TRGCDCFrontEnd::packerOuterInside(const TRGState& input)
   {
 
     //...Input should be 48 hit pattern and 48x5 timing, total 288 bits...
@@ -1097,7 +1097,7 @@ namespace Belle2 {
   }
 
   TRGState
-  TCFrontEnd::packerOuterOutside(const TRGState& input)
+  TRGCDCFrontEnd::packerOuterOutside(const TRGState& input)
   {
 
     //...Input should be 48 hit pattern and 48x5 timing, total 288 bits...
@@ -1266,8 +1266,8 @@ namespace Belle2 {
   }
 
   void
-  TCFrontEnd::unpackerInnerInside(const TRGState& input,
-                                  const TRGState& output)
+  TRGCDCFrontEnd::unpackerInnerInside(const TRGState& input,
+                                      const TRGState& output)
   {
 
     cout << "Input bit size=" << input.size() << endl;
@@ -1361,8 +1361,8 @@ namespace Belle2 {
   }
 
   void
-  TCFrontEnd::unpackerInnerOutside(const TRGState& input,
-                                   const TRGState& output)
+  TRGCDCFrontEnd::unpackerInnerOutside(const TRGState& input,
+                                       const TRGState& output)
   {
 
     cout << "Input bit size=" << input.size() << endl;
@@ -1431,8 +1431,8 @@ namespace Belle2 {
   }
 
   void
-  TCFrontEnd::unpackerOuterInside(const TRGState& input,
-                                  const TRGState& output)
+  TRGCDCFrontEnd::unpackerOuterInside(const TRGState& input,
+                                      const TRGState& output)
   {
 
     cout << "Input bit size=" << input.size() << endl;
@@ -1512,8 +1512,8 @@ namespace Belle2 {
   }
 
   void
-  TCFrontEnd::unpackerOuterOutside(const TRGState& input,
-                                   const TRGState& output)
+  TRGCDCFrontEnd::unpackerOuterOutside(const TRGState& input,
+                                       const TRGState& output)
   {
 
     cout << "Input bit size=" << input.size() << endl;

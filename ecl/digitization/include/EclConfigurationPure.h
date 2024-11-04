@@ -87,9 +87,9 @@ namespace Belle2 {
          *   0     -> special point that represents average pedestal value
          *   1..15 -> signal samples
          *  2nd index (j): tabulated point ID
-         *   0                            -> point at the ADC sample #i
-         *   1..(m_ndtPure-1)             -> points to the right of ADC sample #i
-         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of ADC sample #i
+         *   0                            -> point at the ADC sample \#i
+         *   1..(m_ndtPure-1)             -> points to the right of ADC sample \#i
+         *   m_ndtPure..(2*m_ndtPure - 1) -> points to the left of ADC sample \#i
          */
         typedef double double_matrix[16][2 * m_ndtPure];
         /** Array used in shape fit algorithm.

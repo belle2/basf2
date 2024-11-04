@@ -1,0 +1,127 @@
+[INFO] Steering file: test_b2conditionsdb_commands.py
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
+--------------------------------------------------------------------------------
+Name                                            Rev  First  First  Final  Final
+Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+KLMStripEfficiency                              2670 5      0      5      100
+KLMStripEfficiency                              2914 5      199    5      250
+KLMStripEfficiency                              2999 5      251    5      298
+KLMStripEfficiency                              2670 5      299    5      299
+KLMStripEfficiency                              3001 5      300    5      399
+KLMStripEfficiency                              3112 5      400    5      499
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 valid in (5, 200, 5, 300)
+--------------------------------------------------------------------------------
+Name                                            Rev  First  First  Final  Final
+Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+KLMStripEfficiency                              2914 5      199    5      250
+KLMStripEfficiency                              2999 5      251    5      298
+KLMStripEfficiency                              2670 5      299    5      299
+KLMStripEfficiency                              3001 5      300    5      399
+globaltags to be compared:
+[INFO] Getting info for globaltag main_tag_merge_test_2
+[INFO] Getting info for globaltag main_tag_merge_test_3
+--------------------------------------------------------------------------------
+id          2464                               2465
+--------------------------------------------------------------------------------
+name        main_tag_merge_test_2              main_tag_merge_test_3
+description Globaltag used during the          Globaltag used during the
+framework test test_tag_merge.py   framework test test_tag_merge.py
+type        DEV                                DEV
+status      VALIDATED                          VALIDATED
+# payloads  5                                  3
+
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_3
+[INFO] Comparing contents ...
+Differences between main_tag_merge_test_2 and main_tag_merge_test_3
+-------------------------------------------------------------------------------
+Name                                          Rev  First  First  Final  Final
+Exp    Run    Exp    Run
+-------------------------------------------------------------------------------
+- KLMStripEfficiency                            2670 5      0      5      100
+- KLMStripEfficiency                            2914 5      199    5      250
+- KLMStripEfficiency                            2999 5      251    5      298
+- KLMStripEfficiency                            2670 5      299    5      299
+- KLMStripEfficiency                            3001 5      300    5      399
+- KLMStripEfficiency                            3112 5      400    5      499
++ KLMStripEfficiency                            3001 5      0      5      999
++ KLMStripEfficiency                            3205 5      999    5      1050
++ KLMStripEfficiency                            3299 5      1051   5      -1
+globaltags to be compared:
+[INFO] Getting info for globaltag main_tag_merge_test_2
+[INFO] Getting info for globaltag main_tag_merge_test_3
+--------------------------------------------------------------------------------
+id          2464                               2465
+--------------------------------------------------------------------------------
+name        main_tag_merge_test_2              main_tag_merge_test_3
+description Globaltag used during the          Globaltag used during the
+framework test test_tag_merge.py   framework test test_tag_merge.py
+type        DEV                                DEV
+status      VALIDATED                          VALIDATED
+# payloads  5                                  3
+
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 [valid in (5, 200, 5, 300)]
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_3 [valid in (5, 200, 5, 300)]
+[INFO] Comparing contents ...
+Differences between main_tag_merge_test_2 and main_tag_merge_test_3
+-------------------------------------------------------------------------------
+Name                                          Rev  First  First  Final  Final
+Exp    Run    Exp    Run
+-------------------------------------------------------------------------------
+- KLMStripEfficiency                            2914 5      199    5      250
+- KLMStripEfficiency                            2999 5      251    5      298
+- KLMStripEfficiency                            2670 5      299    5      299
+- KLMStripEfficiency                            3001 5      300    5      399
++ KLMStripEfficiency                            3001 5      0      5      999
+[INFO] Downloading list of payloads for main_tag_merge_test_3 tag valid in (5, 0, 5, 1000)
+[INFO] download centraldb/dbstore_KLMStripEfficiency_rev_3001.root
+[INFO] download centraldb/dbstore_KLMStripEfficiency_rev_3205.root
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 [valid in (5, 200, 5, 300)]
+[INFO] Deleting the following iovs
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294536   KLMStripEfficiency                  2914   5      199    5      250
+9294537   KLMStripEfficiency                  2999   5      251    5      298
+9294538   KLMStripEfficiency                  2670   5      299    5      299
+9294539   KLMStripEfficiency                  3001   5      300    5      399
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2 [fully contained in (5, 200, 5, 300)]
+[INFO] Deleting the following iovs
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294537   KLMStripEfficiency                  2999   5      251    5      298
+9294538   KLMStripEfficiency                  2670   5      299    5      299
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_2
+[INFO] Obtaining list of iovs for globaltag main_tag_merge_test_1
+[INFO] Copying the following iovs to main_tag_merge_test_1
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294536   KLMStripEfficiency                  2914   5      199    5      250
+9294537   KLMStripEfficiency                  2999   5      251    5      298
+9294538   KLMStripEfficiency                  2670   5      299    5      299
+9294539   KLMStripEfficiency                  3001   5      300    5      399
+9294540   KLMStripEfficiency                  3112   5      400    5      499
+[WARNING] iovs to be deleted
+--------------------------------------------------------------------------------
+IovId     Name                                Rev    First  First  Final  Final
+Exp    Run    Exp    Run
+--------------------------------------------------------------------------------
+9294527   KLMStripEfficiency                  2587   5      0      5      9
+9294529   KLMStripEfficiency                  2615   5      10     5      35
+9294531   KLMStripEfficiency                  2704   5      87     5      90
+9294532   KLMStripEfficiency                  2810   5      91     5      100
+-------------------------------------------------------------------------------------------
+IovId     Name               Rev    Old    Old    Old    Old    New    New    New    New
+First  First  Final  Final  First  First  Final  Final
+Exp    Run    Exp    Run    Exp    Run    Exp    Run
+-------------------------------------------------------------------------------------------
+9294528   KLMStripEfficiency 2553   5      0      5      200    5      101    5      198
+9294530   KLMStripEfficiency 2670   5      36     5      87     5      0      5      100
+9294533   KLMStripEfficiency 2553   5      300    5      999    5      500    5      999

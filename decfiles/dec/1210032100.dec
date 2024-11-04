@@ -9,7 +9,9 @@
 # Cuts: None
 # Date: 20170302
 # Changes: use of aliases defined in DECAY.DEC; date: 20170302; author: Pablo Goldenzweig
+# Changes: speicify the decay of K_S0; date: 20231129; author: Xiaodong Shi
 
+Alias      K_S0sig  K_S0
 
 Decay Upsilon(4S)
 0.5 B+sig B- VSS;
@@ -17,8 +19,12 @@ Decay Upsilon(4S)
 Enddecay
 
 Decay B+sig
-1.0 K_S0 pi+ pi0  PHOTOS PHSP;
+1.0 K_S0sig pi+ pi0  PHOTOS PHSP;
 Enddecay
 CDecay B-sig
+
+Decay K_S0sig
+1.0 pi+ pi- PHSP;
+Enddecay
 
 End

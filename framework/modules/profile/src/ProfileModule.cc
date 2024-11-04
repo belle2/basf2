@@ -7,6 +7,7 @@
  **************************************************************************/
 
 #include <framework/modules/profile/ProfileModule.h>
+#include <framework/core/MetadataService.h>
 #include <framework/dataobjects/ProfileInfo.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Utils.h>
@@ -170,4 +171,9 @@ void ProfileModule::terminate()
                    m_outputFileName, m_extractVirtualMem);
   storeMemoryGraph("RssMemoryProfile", "Rss Memory usage", "Rss Memory Usage [MB]",
                    m_rssOutputFileName, m_extractRssMem);
+
+  // add them to the metadata service
+  MetadataService::Instance().addNtuple(m_outputFileName);
+  MetadataService::Instance().addNtuple(m_rssOutputFileName);
+
 }

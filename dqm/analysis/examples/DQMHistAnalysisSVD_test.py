@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -23,7 +22,7 @@ import sys
 
 argv = sys.argv
 if len(argv) < 2:
-    print('\nUsage: %s input_filename\n' % argv[0])
+    print(f'\nUsage: {argv[0]} input_filename\n')
     exit(1)
 inputFile = sys.argv[1]
 

@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <mdst/dataobjects/MCParticle.h>
 
+#include <generators/modules/GeneratorBaseModule.h>
 #include <generators/aafh/AAFHInterface.h>
 #include <generators/utilities/InitialParticleGeneration.h>
 
@@ -22,7 +22,7 @@ namespace Belle2 {
   /**
    * AAFH Generator to generate 2-fermion events like e+e- -> e+e-e+e-
    */
-  class AafhInputModule : public Module {
+  class AafhInputModule : public GeneratorBaseModule {
 
   public:
 
@@ -32,10 +32,10 @@ namespace Belle2 {
     AafhInputModule();
 
     /** initialize generator */
-    virtual void initialize() override;
+    virtual void generatorInitialize() override;
 
     /** generate event */
-    virtual void event() override;
+    virtual void generatorEvent() override;
 
     /** calculate cross section */
     virtual void terminate() override;

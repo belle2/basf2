@@ -71,7 +71,7 @@ namespace Belle2 {
   private:
 
     /**
-     * Defintion of the PID cut threshold to compute the efficiency.
+     * Definition of the PID cut threshold to compute the efficiency.
      * The chosen value is arbitrary.
      */
     static constexpr float c_PID = 0.5;
@@ -241,13 +241,13 @@ namespace Belle2 {
     std::vector<float> m_deltalogl_sig_bkg = std::vector<float>(c_chargedStableHypos);
 
     /**
-     * List of global PIDs, defined by the likelihod ratio:
+     * List of global PIDs, defined by the likelihood ratio:
      *
      * \f[
-     *   PID_{i} = \frac{\matchal{L}_{i}}{\sum_{j}\matchal{L}_{j}},
+     *   PID_{i} = \frac{\mathcal{L}_{i}}{\sum_{j}\mathcal{L}_{j}},
      * \f]
      *
-     * where \f$i\fS represents each charged stable particle hypothesis as defined in `Const::chargedStableSet`.
+     * where \f$i\f$ represents each charged stable particle hypothesis as defined in `Const::chargedStableSet`.
      *
      * Book one `std::vector<float>` for each charged stable particle (and antiparticle) candidate.
      */
@@ -266,7 +266,9 @@ namespace Belle2 {
      */
     std::vector<float> m_th_binedges = {0.0, 0.2164208, 0.385, 0.561996, 1.13, 1.57, 1.88, 2.2462387, 2.47, 2.7070057, 3.1415926};
 
-    /** MCParticles. */
+    /**
+     * MCParticles.
+     */
     StoreArray<MCParticle> m_MCParticles;
 
     /**

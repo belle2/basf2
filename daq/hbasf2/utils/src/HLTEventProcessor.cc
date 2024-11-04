@@ -38,6 +38,9 @@ namespace {
   /// Received signal via a signal handler
   static int g_signalReceived = 0;
 
+  // For processor unique ID
+  static int g_processNumber = 1;
+
   static void storeSignal(int signalNumber)
   {
     if (signalNumber == SIGINT) {
@@ -51,21 +54,21 @@ namespace {
   }
 }
 
-void HLTEventProcessor::sendTerminatedMessage(unsigned int pid, bool waitForConformation)
+void HLTEventProcessor::sendTerminatedMessage(unsigned int pid, bool waitForConfirmation)
 {
   for (auto& socket : m_sockets) {
     auto message = ZMQMessageFactory::createMessage(EMessageTypes::c_deleteWorkerMessage,
                                                     ZMQParent::createIdentity(pid));
     ZMQParent::send(socket, std::move(message));
 
-    if (not waitForConformation) {
+    if (not waitForConfirmation) {
       continue;
     }
     if (ZMQParent::poll({socket.get()}, 10 * 1000)) {
       auto acceptMessage = ZMQMessageFactory::fromSocket<ZMQNoIdMessage>(socket);
       B2ASSERT("Should be an accept message", acceptMessage->isMessage(EMessageTypes::c_confirmMessage));
     } else {
-      B2FATAL("Did not receive a confirmation message!");
+      B2FATAL("Did not receive a confirmation message! waitForConfirmation is " << waitForConfirmation);
     }
   }
 }
@@ -78,7 +81,7 @@ HLTEventProcessor::HLTEventProcessor(const std::vector<std::string>& outputAddre
   }
 }
 
-void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers)
+void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers, bool appendProcessNumberToModuleName)
 {
   using namespace std::chrono_literals;
 
@@ -117,7 +120,7 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers)
 
   // Start the workers, which call the main loop
   const int numProcesses = Environment::Instance().getNumberProcesses();
-  runWorkers(path, numProcesses);
+  runWorkers(path, numProcesses, appendProcessNumberToModuleName);
 
   installMainSignalHandlers(storeSignal);
   // Back in the main process: wait for the processes and monitor them
@@ -157,6 +160,26 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers)
     std::this_thread::sleep_for(10ms);
   }
 
+  if (appendProcessNumberToModuleName) {
+    for (const int& pid : m_processList) {
+      B2INFO(g_processNumber << ": Send SIGINT to " << pid);
+      kill(pid, SIGINT);
+    }
+    for (const int& pid : m_processList) {
+      int count = 0;
+      while (true) {
+        // Do not allow internal SIGKILL to prevent data loss in case of a numbered process
+        if (kill(pid, 0) != 0) {
+          break;
+        }
+        B2DEBUG(10, g_processNumber << ": Checking process termination, count = " << count);
+        std::this_thread::sleep_for(1000ms);
+        if (count % 5 == 1) kill(pid, SIGINT);
+        ++count;
+      }
+    }
+  }
+
   checkChildProcesses();
 
   // if we still have/had processes, we should unregister them
@@ -182,7 +205,7 @@ void HLTEventProcessor::process(PathPtr path, bool restartFailedWorkers)
   }
 }
 
-void HLTEventProcessor::runWorkers(PathPtr path, unsigned int numProcesses)
+void HLTEventProcessor::runWorkers(PathPtr path, unsigned int numProcesses, bool appendProcessNumberToModuleName)
 {
   for (unsigned int i = 0; i < numProcesses; i++) {
     if (forkOut()) {
@@ -194,6 +217,12 @@ void HLTEventProcessor::runWorkers(PathPtr path, unsigned int numProcesses)
       // Start the main loop with our signal handling and error catching
       installMainSignalHandlers(storeSignal);
       try {
+        if (appendProcessNumberToModuleName) {
+          for (const auto& module : m_moduleList) {
+            module->setName(std::to_string(g_processNumber) + std::string("_") + module->getName());
+            B2INFO("New worker name is " << module->getName());
+          }
+        }
         processCore(path);
       } catch (StoppedBySignalException& e) {
         // close all open ROOT files, ROOT's exit handler will crash otherwise
@@ -314,9 +343,14 @@ bool HLTEventProcessor::processEvent(PathIterator moduleIter, bool firstRound)
         return false;
       } else if (m_previousEventMetaData.isEndOfData() or m_previousEventMetaData.isEndOfRun()) {
         // The run has changes (or we never had one), so call beginRun() before going on
-        m_processStatisticsPtr->suspendGlobal();
-        processBeginRun();
-        m_processStatisticsPtr->resumeGlobal();
+        // The run number should not be 0
+        if (m_eventMetaDataPtr->getRun() != 0) {
+          m_processStatisticsPtr->suspendGlobal();
+          processBeginRun();
+          m_processStatisticsPtr->resumeGlobal();
+        } else {
+          return false;
+        }
       }
 
       const bool runChanged = ((m_eventMetaDataPtr->getExperiment() != m_previousEventMetaData.getExperiment()) or
@@ -420,6 +454,7 @@ bool HLTEventProcessor::forkOut()
   pid_t pid = fork();
 
   if (pid > 0) {
+    g_processNumber++;
     m_processList.push_back(pid);
     return false;
   } else if (pid < 0) {
@@ -438,7 +473,8 @@ bool HLTEventProcessor::forkOut()
   }
 }
 
-void process(PathPtr startPath, const boost::python::list& outputAddresses, bool restartFailedWorkers = false)
+void processNumbered(PathPtr startPath, const boost::python::list& outputAddresses, bool restartFailedWorkers = false,
+                     bool appendProcessNumberToModuleName = true)
 {
   static bool already_executed = false;
   B2ASSERT("Can not run process() on HLT twice per file!", not already_executed);
@@ -461,7 +497,7 @@ void process(PathPtr startPath, const boost::python::list& outputAddresses, bool
     already_executed = true;
 
     HLTEventProcessor processor(outputAddressesAsString);
-    processor.process(startPath, restartFailedWorkers);
+    processor.process(startPath, restartFailedWorkers, appendProcessNumberToModuleName);
 
     DBStore::Instance().reset();
   } catch (std::exception& e) {
@@ -475,8 +511,14 @@ void process(PathPtr startPath, const boost::python::list& outputAddresses, bool
   }
 }
 
+void process(PathPtr startPath, const boost::python::list& outputAddresses, bool restartFailedWorkers = false)
+{
+  processNumbered(startPath, outputAddresses, restartFailedWorkers, false);
+}
+
 BOOST_PYTHON_MODULE(hbasf2)
 {
+  def("processNumbered", &processNumbered);
   def("process", &process);
 }
 

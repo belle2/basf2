@@ -72,11 +72,23 @@ namespace Belle2 {
     /** R2 */
     TH1F* m_h_R2 = nullptr;
 
+    /** Ups ee invariant mass */
+    TH1F* m_h_mUPSe = nullptr;
+
+    /** event physics results */
+    TH1F* m_h_physicsresults = nullptr;
+
     /** Trigger identifier string used to select events for the histograms */
     std::string m_triggerIdentifier = "";
 
     /** Trigger identifier string used to select events for the mumu histograms */
     std::string m_triggerIdentifierMuMu = "";
+
+    /** Trigger identifier string used to select events for the ee histograms */
+    std::string m_triggerIdentifierBhabha = "";
+
+    /** Trigger identifier string used to select events for the hadronb2 histograms */
+    std::string m_triggerIdentifierHadronb2 = "";
 
     /** Name of the pi0 particle list */
     std::string m_pi0PListName = "";
@@ -86,6 +98,12 @@ namespace Belle2 {
 
     /** Name of the Ups particle list */
     std::string m_upsPListName = "";
+
+    /** Name of the Ups bhabha particle list */
+    std::string m_upsBhabhaPListName = "";
+
+    /** Name of the pi hadron particle list */
+    std::string m_hadbphysDQM = "";
   };
 
 } // end namespace Belle2

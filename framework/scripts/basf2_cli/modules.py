@@ -35,16 +35,16 @@ def print_module_list(modName=None):
         if modName in avModList:
             try:
                 current_module = pybasf2._register_module(modName)
-                with Pager('Module information for "%s"' % (modName), quit_if_one_screen=True):
+                with Pager(f'Module information for "{modName}"', quit_if_one_screen=True):
                     print_params(current_module, False, avModList[modName])
             except pybasf2.ModuleNotCreatedError:
                 pybasf2.B2FATAL('The module could not be loaded.')
             except Exception as e:
-                pybasf2.B2FATAL("An exception occured when trying to create the module: %s" % e)
+                pybasf2.B2FATAL(f"An exception occured when trying to create the module: {e}")
 
         elif modName == modName.lower():
             # lower case? might be a package instead
-            with Pager('List of modules in package "%s"' % (modName)):
+            with Pager(f'List of modules in package "{modName}"'):
                 print_all_modules(avModList, modName)
         else:
             pybasf2.B2FATAL('Print module information: A module with the name "' +

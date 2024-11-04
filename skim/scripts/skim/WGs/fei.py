@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -22,8 +21,8 @@ from skim import BaseSkim, fancy_skim_header
 from skim.utils.misc import _sphinxify_decay
 from variables import variables as vm
 
-__liaison__ = "Shanette De La Motte <shanette.delamotte@adelaide.edu.au>"
-_VALIDATION_SAMPLE = "mdst14.root"
+__liaison__ = "Cameron Harris <cameron.harris@adelaide.edu.au>, Tommy Martinov <tommy.martinov@desy.de>"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 def _merge_boolean_dicts(*dicts):
@@ -131,14 +130,15 @@ class BaseFEISkim(BaseSkim):
         We define "cleaned" tracks and clusters as:
 
         * Cleaned tracks (``pi+:FEI_cleaned``): :math:`d_0 < 0.5~{\\rm cm}`,
-          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}` * Cleaned ECL
-          clusters (``gamma:FEI_cleaned``): :math:`0.296706 < \\theta < 2.61799`, and
+          :math:`|z_0| < 2~{\\rm cm}`, and :math:`p_T > 0.1~{\\rm GeV}`
+        * Cleaned ECL clusters (``gamma:FEI_cleaned``):
+          :math:`\\theta` in CDC acceptance, and
           :math:`E>0.1~{\\rm GeV}`
         """
 
         # Pre-selection cuts
-        CleanedTrackCuts = "abs(z0) < 2.0 and abs(d0) < 0.5 and pt > 0.1"
-        CleanedClusterCuts = "E > 0.1 and 0.296706 < theta < 2.61799"
+        CleanedTrackCuts = "abs(dz) < 2.0 and abs(dr) < 0.5 and pt > 0.1"
+        CleanedClusterCuts = "E > 0.1 and thetaInCDCAcceptance"
 
         ma.fillParticleList(decayString="pi+:FEI_cleaned",
                             cut=CleanedTrackCuts, path=path)
@@ -224,7 +224,7 @@ class BaseFEISkim(BaseSkim):
 
     def additional_setup(self, path):
         """Apply pre-FEI event-level cuts and apply the FEI. This setup function is run
-        by all FEI skims, so they all have the save event-level pre-cuts.
+        by all FEI skims, so they all have the same event-level pre-cuts.
 
         This function passes `FEIChannelArgs` to the cached function `run_fei_for_skims`
         to avoid applying the FEI twice.
@@ -321,10 +321,7 @@ class feiHadronicB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:generic", "Mbc>5.2", path=path)
-        ma.applyCuts("B0:generic", "abs(deltaE)<0.300", path=path)
-        ma.applyCuts("B0:generic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
-
+        ma.applyCuts("B0:generic", "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==23]", path=path)
         return ["B0:generic"]
 
     def validation_histograms(self, path):
@@ -366,7 +363,7 @@ class feiHadronicB0(BaseFEISkim):
                           ('decayModeID', 26, 0, 26, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -401,10 +398,7 @@ class feiHadronicBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:generic", "Mbc>5.2", path=path)
-        ma.applyCuts("B+:generic", "abs(deltaE)<0.300", path=path)
-        ma.applyCuts("B+:generic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-
+        ma.applyCuts("B+:generic", "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==25]", path=path)
         return ["B+:generic"]
 
     def validation_histograms(self, path):
@@ -446,7 +440,7 @@ class feiHadronicBplus(BaseFEISkim):
                           ('decayModeID', 29, 0, 29, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -483,11 +477,8 @@ class feiSLB0(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B0:semileptonic", "dmID<8", path=path)
-        ma.applyCuts("B0:semileptonic", "log10(sigProb)>-2.4", path=path)
-        ma.applyCuts("B0:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
-        ma.applyCuts("B0:semileptonic", "p_lepton_CMSframe>1.0", path=path)
-
+        Bcuts = " and ".join(["dmID < 8", "log10(sigProb) > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.applyCuts("B0:semileptonic", Bcuts, path=path)
         return ["B0:semileptonic"]
 
     def validation_histograms(self, path):
@@ -524,7 +515,113 @@ class feiSLB0(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
+                           'Decay mode ID', '#log_10(signal probability)', 'colz')],
+            path=path)
+
+
+@_FEI_skim_header("B0")
+class feiSLB0_RDstar(BaseFEISkim):
+    """
+    Tag side :math:`B` cuts:
+
+    * :math:`\\text{FoxWolframR2} < 0.4`
+    * :math:`-1.75 < \\cos\\theta_{BY} < 1.1`
+    * :math:`\\log_{10}(\\text{signal probability}) > -2.0`
+    * :math:`p_{\\ell}^{*} > 1.0~{\\rm GeV}` in CMS frame
+    * :math:`\\text{BCS:signal probability}`
+
+    SL :math:`B^0` tags are reconstructed. Hadronic :math:`B` with SL :math:`D` are not
+    reconstructed, as these are rare and time-intensive.
+
+    <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
+    """
+    __description__ = ("FEI-tagged neutral :math:`B`'s decaying semileptonically",
+                       "Analysis cuts included, best sigProb candidate kept"
+                       )
+    validation_sample = _VALIDATION_SAMPLE
+
+    FEIChannelArgs = {
+        "neutralB": True,
+        "chargedB": False,
+        "hadronic": False,
+        "semileptonic": True,
+        "KLong": False,
+        "baryonic": True,
+        "removeSLD": True
+    }
+
+    def build_lists(self, path):
+        ma.buildEventShape(inputListNames=['pi+:FEI_cleaned', 'gamma:FEI_cleaned'],
+                           foxWolfram=True,
+                           harmonicMoments=False,
+                           cleoCones=False,
+                           thrust=False,
+                           collisionAxis=False,
+                           jets=False,
+                           sphericity=False,
+                           checkForDuplicates=True,
+                           path=path)
+
+        # tightened cuts on sigprob and cosThetaBY as well as additional cut on Fox WR R2
+        vm.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
+        TighterCuts = " and ".join(
+            [
+                "foxWolframR2_maskedNaN<0.4",
+                "dmID < 8",
+                "log10(sigProb) > -2.0",
+                "-1.75 < cosThetaBY < 1.1",
+                "p_lepton_CMSframe > 1.0"
+            ]
+        )
+        ma.cutAndCopyList("B0:SLRDstar", "B0:semileptonic", TighterCuts, path=path)
+
+        # best candidate selection on signal probability
+        ma.rankByHighest("B0:SLRDstar", "sigProb", numBest=1,
+                         allowMultiRank=True, outputVariable='sigProb_rank_tag',
+                         path=path)
+
+        return ["B0:SLRDstar"]
+
+    def validation_histograms(self, path):
+        # NOTE: the validation package is not part of the light releases, so this import
+        # must be made here rather than at the top of the file.
+        from validation_tools.metadata import create_validation_histograms
+
+        vm.addAlias('sigProb', 'extraInfo(SignalProbability)')
+        vm.addAlias('log10_sigProb', 'log10(extraInfo(SignalProbability))')
+        vm.addAlias('d0_massDiff', 'daughter(0,massDifference(0))')
+        vm.addAlias('d0_M', 'daughter(0,M)')
+        vm.addAlias('decayModeID', 'extraInfo(decayModeID)')
+        vm.addAlias('nDaug', 'countDaughters(1>0)')  # Dummy cut so all daughters are selected.
+
+        histogramFilename = f"{self}_Validation.root"
+
+        create_validation_histograms(
+            rootfile=histogramFilename,
+            particlelist='B0:SLRDstar',
+            variables_1d=[
+                ('sigProb', 100, 0.0, 1.0, 'Signal probability', __liaison__,
+                 'Signal probability of the reconstructed tag B candidates', 'Most around zero, with a tail at non-zero values.',
+                 'Signal probability', 'Candidates', 'logy'),
+                ('nDaug', 6, 0.0, 6, 'Number of daughters of tag B', __liaison__,
+                 'Number of daughters of tag B', 'Some distribution of number of daughters', 'n_{daughters}', 'Candidates'),
+                ('cosThetaBetweenParticleAndNominalB', 100, -6.0, 4.0, '#cos#theta_{BY}', __liaison__,
+                 'Cosine of angle between the reconstructed B and the nominal B', 'Distribution peaking between -1 and 1',
+                 '#cos#theta_{BY}', 'Candidates'),
+                ('d0_massDiff', 100, 0.0, 0.5, 'Mass difference of D* and D', __liaison__,
+                 'Mass difference of $D^{*}$ and D', 'Peak at 0.14 GeV', 'm(D^{*})-m(D) [GeV]', 'Candidates', 'shifter'),
+                ('d0_M', 100, 0.0, 3.0, 'Mass of zeroth daughter (D* or D)', __liaison__,
+                 'Mass of zeroth daughter of tag B (either a $D^{*}$ or a D)', 'Peaks at 1.86 GeV and 2.00 GeV',
+                 'm(D^{(*)}) [GeV]', 'Candidates', 'shifter')],
+            variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
+                           'Signal probability for each decay mode ID', __liaison__,
+                           'Signal probability for each decay mode ID',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -561,11 +658,8 @@ class feiSLBplus(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.applyCuts("B+:semileptonic", "dmID<8", path=path)
-        ma.applyCuts("B+:semileptonic", "log10_sigProb>-2.4", path=path)
-        ma.applyCuts("B+:semileptonic", "-4.0<cosThetaBY<3.0", path=path)
-        ma.applyCuts("B+:semileptonic", "p_lepton_CMSframe>1.0", path=path)
-
+        Bcuts = " and ".join(["dmID < 8", "log10_sigProb > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.applyCuts("B+:semileptonic", Bcuts, path=path)
         return ["B+:semileptonic"]
 
     def validation_histograms(self, path):
@@ -602,7 +696,7 @@ class feiSLBplus(BaseFEISkim):
             variables_2d=[('decayModeID', 8, 0, 8, 'log10_sigProb', 100, -3.0, 0.0,
                            'Signal probability for each decay mode ID', __liaison__,
                            'Signal probability for each decay mode ID',
-                           'Some distribtuion of candidates in the first few decay mode IDs',
+                           'Some distribution of candidates in the first few decay mode IDs',
                            'Decay mode ID', '#log_10(signal probability)', 'colz')],
             path=path)
 
@@ -641,18 +735,134 @@ class feiHadronic(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiHadronic", "B0:generic", path=path)
-        ma.copyList("B+:feiHadronic", "B+:generic", path=path)
-        HadronicBLists = ["B0:feiHadronic", "B+:feiHadronic"]
+        ma.cutAndCopyList("B0:feiHadronic", "B0:generic",
+                          "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==23]", path=path)
+        ma.cutAndCopyList("B+:feiHadronic", "B+:generic",
+                          "Mbc > 5.2 and abs(deltaE) < 0.3 and [sigProb > 0.001 or extraInfo(dmID)==25]", path=path)
+        return ["B0:feiHadronic", "B+:feiHadronic"]
+
+
+@_FEI_skim_header(["B0", "B+"])
+class feiHadronic_DstEllNu(BaseFEISkim):
+    """
+    Tag side :math:`B` cuts:
+
+    * :math:`M_{\\text{bc}} > 5.27~{\\rm GeV}`
+    * :math:`-0.150 < \\Delta E < 0.100~{\\rm GeV}`
+    * :math:`\\text{signal probability} > 0.001` (omitted for decay mode 23 for
+      :math:`B^+`, and decay mode 25 for :math:`B^0`)
+    * :math:`\\cos{TBTO} < 0.9`
+    * Selects only the two best candidates that survive based on the signalProbability
+
+    All available FEI :math:`B^0` and :math:`B^+` hadronic tags are reconstructed. From
+    `Thomas Keck's thesis
+    <https://docs.belle2.org/record/275/files/BELLE2-MTHESIS-2015-001.pdf>`_, "the
+    channel :math:`B^0 \\to \\overline{D}^0 \\pi^0` was used by the FR, but is not yet
+    used in the FEI due to unexpected technical restrictions in the KFitter algorithm".
+
+    <CHANNELS>
+
+    See also:
+        `BaseFEISkim.FEIPrefix` for FEI training used, and `BaseFEISkim.fei_precuts` for
+        event-level cuts made before applying the FEI.
+    """
+
+    __description__ = ("FEI-tagged neutral and charged :math:`B`'s decaying hadronically. "
+                       "Analysis specific cuts applied during skimming. Best 2 candidates ranked by sigProb kept"
+                       )
+
+    FEIChannelArgs = {
+        "neutralB": True,
+        "chargedB": True,
+        "hadronic": True,
+        "semileptonic": False,
+        "KLong": False,
+        "baryonic": True,
+    }
+
+    def build_lists(self, path):
+        ma.cutAndCopyList("B0:feiHadronicDstEllNu", "B0:generic", "sigProb > 0.001 or extraInfo(dmID)==23", path=path)
+        ma.cutAndCopyList("B+:feiHadronicDstEllNu", "B+:generic", "sigProb > 0.001 or extraInfo(dmID)==25", path=path)
+        HadronicBLists = ["B0:feiHadronicDstEllNu", "B+:feiHadronicDstEllNu"]
 
         for BList in HadronicBLists:
-            ma.applyCuts(BList, "Mbc>5.2", path=path)
-            ma.applyCuts(BList, "abs(deltaE)<0.300", path=path)
-
-        ma.applyCuts("B+:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==25", path=path)
-        ma.applyCuts("B0:feiHadronic", "sigProb>0.001 or extraInfo(dmID)==23", path=path)
+            ma.applyCuts(BList, "Mbc > 5.27 and -0.15 <= deltaE <= 0.10", path=path)
+            # Need to build Btag_ROE to build continuum suppression variables i.e. cosTBTO
+            self._build_continuum_suppression(particle_list=BList, path=path)
+            ma.applyCuts(BList, "cosTBTO < 0.9", path=path)
+            # Keep only the best 2 candidates that survive based on the Signal probability.
+            # The second candidate is kept just in case an analyst wishes to
+            # perform some tag side studies
+            ma.rankByHighest(
+                particleList=BList,
+                variable="extraInfo(SignalProbability)",
+                numBest=2,
+                path=path,
+            )
 
         return HadronicBLists
+
+    def _build_continuum_suppression(self, particle_list: str, path: b2.Path):
+        """Builds continuum suppression for a given b-meson list.
+        This module is required to save the CS variables.
+
+        Args:2
+        list_name (str) : name of the b meson list. Can be list of signal or tag b meson lists
+        path (b2.Path): the basf2 path to append modules
+
+
+        """
+
+        mask_name = "btag_cs"
+
+        # First build the rest of the event for the b meson
+        ma.buildRestOfEvent(target_list_name=particle_list, path=path)
+
+        # Append the ROE mask
+        ma.appendROEMasks(
+            particle_list,
+            [self._build_btag_roe_mask(mask_name=mask_name)],
+            path=path,
+        )
+        # Build the continuum object for the given b meson
+        ma.buildContinuumSuppression(
+            list_name=particle_list, roe_mask=mask_name, path=path
+        )
+
+    @staticmethod
+    def _build_btag_roe_mask(mask_name: str):
+        """Prepares a tuple with the ROE mask name and the ROE cuts for tracks and clusters
+        The actual cuts are read from a selections dictionary
+
+            The cuts are aligning with the continuum rejection that is applied for the centrally
+            produced FEI calibration
+
+            Args:
+            mask_name (str): The name of the mask. This is the name that will be used to append the mask
+
+            Return:
+            tuple of mask_name, tracking cuts and cluster_cuts
+        """
+
+        selections = {
+            "tracks": [
+                "abs(dr) < 2",
+                "abs(dz) < 4",
+                "pt > 0.2",
+                "thetaInCDCAcceptance == 1",
+            ],
+            "clusters": [
+                "clusterNHits > 1.5",
+                "[[clusterReg==1 and E > 0.080] or [clusterReg==2 and E > 0.030] or [clusterReg==3 and E > 0.060]]",
+                "thetaInCDCAcceptance",
+                "abs(clusterTiming) < 200",
+            ],
+        }
+
+        track_cuts = "".join(["[", " and ".join(selections["tracks"]), "]"])
+        cluster_cuts = "".join(["[", " and ".join(selections["clusters"]), "]"])
+
+        return (mask_name, track_cuts, cluster_cuts)
 
 
 @_FEI_skim_header(["B0", "B+"])
@@ -686,14 +896,7 @@ class feiSL(BaseFEISkim):
     }
 
     def build_lists(self, path):
-        ma.copyList("B0:feiSL", "B0:semileptonic", path=path)
-        ma.copyList("B+:feiSL", "B+:semileptonic", path=path)
-        SLBLists = ["B0:feiSL", "B+:feiSL"]
-
-        Bcuts = ["log10_sigProb>-2.4", "-4.0<cosThetaBY<3.0", "p_lepton_CMSframe>1.0"]
-
-        for BList in SLBLists:
-            for cut in Bcuts:
-                ma.applyCuts(BList, cut, path=path)
-
-        return SLBLists
+        Bcuts = " and ".join(["log10_sigProb > -2.4", "-4 < cosThetaBY < 3", "p_lepton_CMSframe > 1"])
+        ma.cutAndCopyList("B0:feiSL", "B0:semileptonic", Bcuts, path=path)
+        ma.cutAndCopyList("B+:feiSL", "B+:semileptonic", Bcuts, path=path)
+        return ["B0:feiSL", "B+:feiSL"]

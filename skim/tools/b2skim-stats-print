@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -1059,8 +1058,8 @@ def addWeightedMC(allSkimStats, statSpecifier, samples, verbose=False):
             dict, with an extra entry for combined MC samples.
     """
 
-    beamBackgrounds = list(set(s.beam_background for s in samples.mc_samples))
-    mcCampaigns = list(set(s.campaign for s in samples.mc_samples))
+    beamBackgrounds = list({s.beam_background for s in samples.mc_samples})
+    mcCampaigns = list({s.campaign for s in samples.mc_samples})
 
     for (skim, skimStats), (stat, statSpec), beamBackground, mcCampaign in product(
         allSkimStats.items(), statSpecifier.items(), beamBackgrounds, mcCampaigns

@@ -62,7 +62,7 @@ namespace Belle2 {
      */
     std::vector<double> getTimeVector(const unsigned int ring) const
     {
-      if (ring > 2) B2ERROR("wrong index for injection ring ");
+      if (ring > 1) B2ERROR("wrong index for injection ring ");
       return m_injectionvar[ring * 3];
     };
 
@@ -71,7 +71,7 @@ namespace Belle2 {
      */
     std::vector<double> getMeanVector(const int ring) const
     {
-      if (ring <= 0 || ring > 2) B2ERROR("wrong index for injection ring ");
+      if (ring < 0 || ring > 1) B2ERROR("wrong index for injection ring ");
       return m_injectionvar[ring * 3 + 1];
     };
 
@@ -80,7 +80,7 @@ namespace Belle2 {
      */
     std::vector<double> getResoVector(const unsigned int ring) const
     {
-      if (ring > 2) B2ERROR("wrong index for injection ring ");
+      if (ring > 1) B2ERROR("wrong index for injection ring ");
       return m_injectionvar[ring * 3 + 2];
     };
 

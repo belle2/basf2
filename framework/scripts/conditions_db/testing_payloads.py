@@ -151,15 +151,11 @@ def parse_testing_payloads_file(filename, check_existing=True):
             try:
                 entry = TestingPayloadEntry(line, payload_dir)
             except ValueError as e:
-                B2ERROR("{filename}:{line} error: {error}".format(
-                    filename=filename, line=lineno, error=e
-                ))
+                B2ERROR(f"{filename}:{lineno} error: {e}")
                 continue
 
             if check_existing and not os.path.exists(entry.filename):
-                B2ERROR("{filename}:{line} error: cannot find payload file {missing}".format(
-                    filename=filename, line=lineno, missing=entry.filename
-                ))
+                B2ERROR(f"{filename}:{lineno} error: cannot find payload file {entry.filename}")
                 continue
 
             entries.append(entry)

@@ -9,10 +9,8 @@
 #pragma once
 
 #include <framework/gearbox/Const.h>
+#include <framework/utilities/LabToCms.h>
 
-#include <TMath.h>
-#include <TVector3.h>
-#include <Math/AxisAngle.h>
 #include <Math/Boost.h>
 #include <Math/LorentzRotation.h>
 #include <Math/Vector3D.h>
@@ -151,7 +149,7 @@ namespace Belle2 {
       m_vertex = vertex;
     }
 
-    /** Set collison time */
+    /** Set collision time */
     void setTime(double time) {m_time = time;}
 
     /** Set the generation flags to be used for event generation (ORed combination of EGenerationFlags) */
@@ -166,14 +164,20 @@ namespace Belle2 {
     /** Get the position of the collision */
     const ROOT::Math::XYZVector& getVertex() const { return m_vertex; }
 
-    /** Get collison time */
+    /** Get collision time */
     double getTime() const {return m_time;}
 
-    /** Get the the actual collision energy (in lab system)*/
+    /** Get the actual collision energy (in lab system)*/
     double getEnergy() const { return (m_her + m_ler).E(); }
 
     /** Get the invariant mass of the collision (= energy in CMS) */
     double getMass() const { calculateBoost(); return m_invariantMass; }
+
+    /** Get the boost vector (velocity of system produced in the collision) */
+    ROOT::Math::XYZVector getBoostVector() const { calculateBoost(); return -(m_her + m_ler).BoostToCM(); }
+
+    /** Get the 4-vector of electron beam in CM system obtained by pure boost */
+    ROOT::Math::PxPyPzEVector getBoostedHER() const { calculateBoost(); return m_boostedHER; }
 
     /** Return the LorentzRotation to convert from lab to CMS frame */
     const ROOT::Math::LorentzRotation& getLabToCMS() const
@@ -202,7 +206,6 @@ namespace Belle2 {
 
 
     /** Return the LorentzRotation from CMS to LAB based on the following parameters
-     * @param Ecms     centre-of-mass energy of the collision
      * @param bX       x-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
      * @param bY       y-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
      * @param bZ       z-component of the boost vector, i.e. of (pHER + pLER) / (eHER + eLER), where pHER & pLER are momentum 3-vectors
@@ -213,7 +216,7 @@ namespace Belle2 {
 
   private:
 
-    /** Calculate the boost if necessary */
+    /** Calculate the Lorentz transformations LAB->CMS & CMS->LAB if necessary */
     void calculateBoost() const;
     /** Reset cached transformations after changing parameters. */
     void resetBoost();
@@ -231,6 +234,8 @@ namespace Belle2 {
     mutable ROOT::Math::LorentzRotation* m_CMSToLab{nullptr}; //!transient
     /** invariant mass of HER+LER (calculated on first use, not saved to file) */
     mutable double m_invariantMass{0.0}; //!transient
+    /** HER 4-momentum in CM frame obtained by pure boost (calculated on first use, not saved to file) */
+    mutable ROOT::Math::PxPyPzEVector m_boostedHER; //!transient
     /** Flag to check if a valid MCInitialParticles object was already generated and filled in an event. */
     bool m_validFlag = false;
 
@@ -262,16 +267,12 @@ namespace Belle2 {
       return;
     }
 
-    // Transformation from Lab system to CMS system
-    m_labToCMS = new ROOT::Math::LorentzRotation(ROOT::Math::Boost(beam.BoostToCM()));
-    // boost HER e- from Lab system to CMS system
-    const ROOT::Math::PxPyPzEVector electronCMS = (*m_labToCMS) * m_her;
-    // now rotate CMS such that incoming e- is parallel to z-axis
-    const ROOT::Math::XYZVector zaxis(0., 0., 1.);
-    ROOT::Math::XYZVector rotaxis = zaxis.Cross(electronCMS.Vect()) / electronCMS.P();
-    double rotangle = TMath::ASin(rotaxis.R());
-    const ROOT::Math::LorentzRotation rotation(ROOT::Math::AxisAngle(rotaxis, -rotangle));
-    *m_labToCMS = rotation * (*m_labToCMS);
+    m_boostedHER = ROOT::Math::LorentzRotation(ROOT::Math::Boost(beam.BoostToCM())) * m_her;
+    double cmsAngleXZ = atan(m_boostedHER.X() / m_boostedHER.Z());
+    double cmsAngleYZ = atan(m_boostedHER.Y() / m_boostedHER.Z());
+    m_labToCMS = new ROOT::Math::LorentzRotation(
+      LabToCms::rotateLabToCms(-beam.BoostToCM(), cmsAngleXZ, cmsAngleYZ)
+    );
 
     //cache derived quantities
     m_CMSToLab = new ROOT::Math::LorentzRotation(m_labToCMS->Inverse());
@@ -288,6 +289,7 @@ namespace Belle2 {
     m_labToCMS = nullptr;
     m_CMSToLab = nullptr;
     m_invariantMass = 0.0;
+    m_boostedHER = ROOT::Math::PxPyPzEVector();
   }
 
 } //Belle2 namespace

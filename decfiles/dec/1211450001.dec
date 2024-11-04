@@ -1,11 +1,11 @@
 # EventType: 1211450001
 # Descriptor: [B+ -> psi(2S) [-> mu+ mu-] pi+ pi- K+]
-# NickName: Bu_psi2spipiK_mumu
+# NickName: Bu_psi2spippimKp_mumu
 # Documentation: B -> charmonium decays.
 # Tested: Yes
-# PhysicsWG: Charmonium
+# PhysicsWG: Quarkonium
 # Responsible: Kirill Chilikin
-# Email: chilikin@lebedev.ru
+# Email: K.A.Chilikin@inp.nsk.su
 # Cuts: None
 # Date: 20220601
 #

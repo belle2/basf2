@@ -65,6 +65,14 @@ VariablesToNtupleModule::VariablesToNtupleModule() :
   addParam("fileNameSuffix", m_fileNameSuffix, "The suffix of the output ROOT file to be appended before ``.root``.",
            string(""));
 
+  addParam("useFloat", m_useFloat,
+           "Use float type for floating-point numbers.", false);
+
+  addParam("storeEventType", m_storeEventType,
+           "If true, the branch __eventType__ is added. The eventType information is available from MC16 on.", true);
+
+  addParam("ignoreCommandLineOverride", m_ignoreCommandLineOverride,
+           "Ignore override of file name via command line argument -o. Useful if you have multiple output modules in one path.", false);
 }
 
 void VariablesToNtupleModule::initialize()
@@ -76,9 +84,11 @@ void VariablesToNtupleModule::initialize()
   // Initializing the output root file
 
   // override the output file name with what's been provided with the -o option
-  const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
-  if (!outputFileArgument.empty())
-    m_fileName = outputFileArgument;
+  if (!m_ignoreCommandLineOverride) {
+    const std::string& outputFileArgument = Environment::Instance().getOutputFileOverride();
+    if (!outputFileArgument.empty())
+      m_fileName = outputFileArgument;
+  }
 
   if (!m_fileNameSuffix.empty())
     m_fileName = m_fileName.insert(m_fileName.rfind(".root"), m_fileNameSuffix);
@@ -141,6 +151,12 @@ void VariablesToNtupleModule::initialize()
   if (m_stringWrapper.isOptional("MCDecayString"))
     m_tree->get().Branch("__MCDecayString__", &m_MCDecayString);
 
+  if (m_storeEventType) {
+    m_tree->get().Branch("__eventType__", &m_eventType);
+    if (not m_eventExtraInfo.isOptional())
+      B2INFO("EventExtraInfo is not registered. __eventType__ will be empty. The eventType is available from MC16 on.");
+  }
+
   for (const auto& variable : m_variables)
     if (Variable::isCounterVariable(variable)) {
       B2WARNING("The counter '" << variable
@@ -158,9 +174,16 @@ void VariablesToNtupleModule::initialize()
   });
   m_variables.erase(newEnd, m_variables.end());
 
-  m_branchAddressesDouble.resize(m_variables.size() + 1);
+  if (m_useFloat)
+    m_branchAddressesFloat.resize(m_variables.size() + 1);
+  else
+    m_branchAddressesDouble.resize(m_variables.size() + 1);
   m_branchAddressesInt.resize(m_variables.size() + 1);
-  m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
+  if (m_useFloat) {
+    m_tree->get().Branch("__weight__", &m_branchAddressesFloat[0], "__weight__/F");
+  } else {
+    m_tree->get().Branch("__weight__", &m_branchAddressesDouble[0], "__weight__/D");
+  }
   size_t enumerate = 1;
   for (const string& varStr : m_variables) {
     string branchName = MakeROOTCompatible::makeROOTCompatible(varStr);
@@ -182,7 +205,11 @@ void VariablesToNtupleModule::initialize()
         continue;
       }
       if (var->variabletype == Variable::Manager::VariableDataType::c_double) {
-        m_tree->get().Branch(branchName.c_str(), &m_branchAddressesDouble[enumerate], (branchName + "/D").c_str());
+        if (m_useFloat) {
+          m_tree->get().Branch(branchName.c_str(), &m_branchAddressesFloat[enumerate], (branchName + "/F").c_str());
+        } else {
+          m_tree->get().Branch(branchName.c_str(), &m_branchAddressesDouble[enumerate], (branchName + "/D").c_str());
+        }
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_int) {
         m_tree->get().Branch(branchName.c_str(), &m_branchAddressesInt[enumerate], (branchName + "/I").c_str());
       } else if (var->variabletype == Variable::Manager::VariableDataType::c_bool) {
@@ -247,6 +274,11 @@ void VariablesToNtupleModule::event()
   else
     m_MCDecayString = "";
 
+  if (m_storeEventType and m_eventExtraInfo.isValid())
+    m_eventType = m_eventExtraInfo->getEventType();
+  else
+    m_eventType = "";
+
   if (not m_signalSideParticleList.empty()) {
     if (m_roe.isValid()) {
       StoreObjPtr<ParticleList> signaSideParticleList(m_signalSideParticleList);
@@ -260,8 +292,13 @@ void VariablesToNtupleModule::event()
   }
 
   if (m_particleList.empty()) {
-    m_branchAddressesDouble[0] = getInverseSamplingRateWeight(nullptr);
-    if (m_branchAddressesDouble[0] > 0) {
+    double weight = getInverseSamplingRateWeight(nullptr);
+    if (m_useFloat) {
+      m_branchAddressesFloat[0] = weight;
+    } else {
+      m_branchAddressesDouble[0] = weight;
+    }
+    if (weight > 0) {
       for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
         auto var_result = std::get<0>(m_functions[iVar])(nullptr);
         auto var_type = std::get<1>(m_functions[iVar]);
@@ -269,7 +306,11 @@ void VariablesToNtupleModule::event()
           if (var_type != Variable::Manager::VariableDataType::c_double)
             B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                       "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
-          m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
+          if (m_useFloat) {
+            m_branchAddressesFloat[iVar + 1] = std::get<double>(var_result);
+          } else {
+            m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
+          }
         } else if (std::holds_alternative<int>(var_result)) {
           if (var_type != Variable::Manager::VariableDataType::c_int)
             B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
@@ -291,8 +332,13 @@ void VariablesToNtupleModule::event()
     for (unsigned int iPart = 0; iPart < m_ncandidates; iPart++) {
       m_candidate = iPart;
       const Particle* particle = particlelist->getParticle(iPart);
-      m_branchAddressesDouble[0] = getInverseSamplingRateWeight(particle);
-      if (m_branchAddressesDouble[0] > 0) {
+      double weight = getInverseSamplingRateWeight(particle);
+      if (m_useFloat) {
+        m_branchAddressesFloat[0] = weight;
+      } else {
+        m_branchAddressesDouble[0] = weight;
+      }
+      if (weight > 0) {
         for (unsigned int iVar = 0; iVar < m_variables.size(); iVar++) {
           auto var_result = std::get<0>(m_functions[iVar])(particle);
           auto var_type = std::get<1>(m_functions[iVar]);
@@ -300,7 +346,11 @@ void VariablesToNtupleModule::event()
             if (var_type != Variable::Manager::VariableDataType::c_double)
               B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +
                         "'. Expected Variable::Manager::VariableDataType::c_double. Exported data for this variable might be incorrect.");
-            m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
+            if (m_useFloat) {
+              m_branchAddressesFloat[iVar + 1] = std::get<double>(var_result);
+            } else {
+              m_branchAddressesDouble[iVar + 1] = std::get<double>(var_result);
+            }
           } else if (std::holds_alternative<int>(var_result)) {
             if (var_type != Variable::Manager::VariableDataType::c_int)
               B2WARNING("Wrong registered data type for variable '" + m_variables[iVar] +

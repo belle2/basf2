@@ -5,17 +5,14 @@
  * See git log for contributors and copyright holders.                    *
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
-//+
-// File : DQMHistAnalysisOutputFile.cc
-// Description : DQM Analysis, dump histograms to file (as reference histograms)
-//-
-
 
 #include <dqm/analysis/modules/DQMHistAnalysisOutputFile.h>
 #include <TROOT.h>
 #include <TObject.h>
 #include "TKey.h"
 #include "TFile.h"
+#include <sstream>
+#include <iomanip>
 
 using namespace std;
 using namespace Belle2;
@@ -23,21 +20,29 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
+
 REG_MODULE(DQMHistAnalysisOutputFile);
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
+
 DQMHistAnalysisOutputFileModule::DQMHistAnalysisOutputFileModule()
   : DQMHistAnalysisModule()
 {
+
+  setDescription("Module to save histograms from DQMHistAnalysisModules");
   //Parameter definition
-  addParam("HistoFile", m_filename, "Output Histogram Filename", std::string("histo.root"));
-  addParam("histogramDirectoryName", m_histogramDirectoryName, "Name of the directory where histograms will be placed",
-           std::string("ref"));
-  addParam("SaveHistos", m_saveHistos, "Save Histos (default)", true);
-  addParam("SaveCanvases", m_saveCanvases, "Save Canvases (not default)", false);
+
+  addParam("OutputFolder", m_folder, "Output file path", std::string(""));
+  addParam("FilePrefix", m_prefix,
+           "prefix of the output filename {prefix}dqm_e####r######.root is generated (unless Filename is set)", std::string(""));
+  addParam("Filename", m_filename, "name of the output file (default is {prefix}dqm_e####r######.root)", std::string(""));
+  addParam("SaveHistos", m_saveHistos, "Save Histos (not default)", false);
+  addParam("SaveCanvases", m_saveCanvases, "Save Canvases (default)", true);
+  addParam("SavePerEvent", m_savePerEvent, "Whether save to file for each event", true);
+  addParam("SavePerRun", m_savePerRun, "Whether save to file for each run (not usable in online analysis!)", false);
   B2DEBUG(20, "DQMHistAnalysisOutputFile: Constructor done.");
 }
 
@@ -46,52 +51,66 @@ DQMHistAnalysisOutputFileModule::~DQMHistAnalysisOutputFileModule() { }
 
 void DQMHistAnalysisOutputFileModule::initialize()
 {
+  m_eventMetaDataPtr.isOptional();
   B2DEBUG(20, "DQMHistAnalysisOutputFile: initialized.");
 }
-
-
-void DQMHistAnalysisOutputFileModule::beginRun()
-{
-  B2DEBUG(20, "DQMHistAnalysisOutputFile: beginRun called.");
-}
-
 
 void DQMHistAnalysisOutputFileModule::event()
 {
   B2DEBUG(20, "DQMHistAnalysisOutputFile: event called.");
+  if (m_savePerEvent) save_to_file();
 }
 
 void DQMHistAnalysisOutputFileModule::endRun()
 {
   B2INFO("DQMHistAnalysisOutputFile: endRun called");
+  if (m_savePerRun) save_to_file();
+}
 
-  // Attention, we can not do that in Terminate, as then the memFile is already closed by previous task!
-  B2INFO("open file");
-  TFile f(m_filename.data(), "recreate");
+
+void DQMHistAnalysisOutputFileModule::terminate()
+{
+  B2INFO("DQMHistAnalysisOutputFile: terminate called");
+}
+
+void DQMHistAnalysisOutputFileModule::save_to_file()
+{
+
+  std::stringstream ss;
+  ss << m_folder << "/";
+  if (m_filename != "") ss << m_filename;
+  else {
+    int exp = 0;
+    int run = 0;
+    if (m_eventMetaDataPtr) {
+      exp = m_eventMetaDataPtr->getExperiment();
+      run = m_eventMetaDataPtr->getRun();
+    }
+    ss <<  m_prefix <<  "dqm_e";
+    ss << std::setfill('0') << std::setw(4) << exp;
+    ss << "r" << std::setfill('0') << std::setw(6) << run;
+    ss << ".root";
+  }
+
+  TFile f(ss.str().data(), "recreate");
+
   if (f.IsOpen()) {
-    TDirectory* oldDir = gDirectory;
-    oldDir->mkdir(m_histogramDirectoryName.c_str());
-    oldDir->cd(m_histogramDirectoryName.c_str());
-
     if (m_saveCanvases) {
-      // we could loop over histos ... but i think the second one is better
       TSeqCollection* seq;
       seq = gROOT->GetListOfCanvases() ;
       if (seq) {
         B2INFO("found canvases");
         TIter next(seq) ;
         TObject* obj ;
-
         while ((obj = (TObject*)next())) {
           if (obj->InheritsFrom("TCanvas")) {
-            B2INFO("Canvas name: " << obj->GetName() << " title " << obj->GetTitle());
+            B2DEBUG(1, "Saving canvas " << obj->GetName());
             obj->Write();
-          } else {
-            B2INFO("Others name: " << obj->GetName() << " title " << obj->GetTitle());
           }
         }
       }
     }
+
     if (m_saveHistos) {
       TSeqCollection* files;
       files = gROOT->GetListOfFiles() ;
@@ -122,16 +141,13 @@ void DQMHistAnalysisOutputFileModule::endRun()
                   d = old = gDirectory;
                   TString myl = obj->GetName();
                   TString tok;
-// workaround for changes in histmanager/Input module ... TODO remove if not needed anymore
-//    std::string a=myl.Data();
-//    a.erase(std::remove(a.begin(), a.end(), ':'), a.end());
-//      myl=a.data();
                   Ssiz_t from = 0;
                   while (myl.Tokenize(tok, from, "/")) {
                     TString dummy;
                     Ssiz_t fr;
                     fr = from;
-                    if (myl.Tokenize(dummy, fr, "/")) { // check if its the last one
+                    if (myl.Tokenize(dummy, fr,
+                                     "/")) { // check if its the last one
                       auto e = d->GetDirectory(tok);
                       if (e) {
                         d = e;
@@ -158,16 +174,7 @@ void DQMHistAnalysisOutputFileModule::endRun()
       }
     }
 
-
     f.Write();
     f.Close();
   }
 }
-
-
-void DQMHistAnalysisOutputFileModule::terminate()
-{
-  B2INFO("DQMHistAnalysisOutputFile: terminate called");
-// Attention, we can not do that in Terminate, as then the memFile is already closed by previous task!
-}
-

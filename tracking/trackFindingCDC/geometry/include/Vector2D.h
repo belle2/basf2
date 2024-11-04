@@ -19,14 +19,11 @@
 #include <iosfwd>
 #include <cmath>
 
-class TVector2;
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     /**
-     * A two dimensional vector which is equipped with functions for correct handeling \n
+     * A two dimensional vector which is equipped with functions for correct handling \n
      * of orientation related issues in addition to the expected vector methods. \n
-     * Also this vector can be passed to functions where a TVector2 is expected syntactically.
      */
     class Vector2D {
 
@@ -37,9 +34,6 @@ namespace Belle2 {
         , m_y(0.0)
       {
       }
-
-      /// Constructor translating from a TVector2 instance
-      explicit Vector2D(const TVector2& tVector2);
 
       /// Constructor from two coordinates
       Vector2D(const double x, const double y)
@@ -60,10 +54,7 @@ namespace Belle2 {
       {
       }
 
-      /// Assignment translating from a TVector2 instance
-      Vector2D& operator=(const TVector2& tvector);
-
-      /// Constucts a unit vector with azimuth angle equal to phi
+      /// Constructs a unit vector with azimuth angle equal to phi
       static Vector2D Phi(const double phi)
       {
         return std::isnan(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi));
@@ -118,9 +109,6 @@ namespace Belle2 {
         }
       }
 
-      /// Casting the back to TVector2 seamlessly
-      operator const TVector2();
-
       /// Equality comparison with both coordinates
       bool operator==(const Vector2D& rhs) const
       {
@@ -128,9 +116,9 @@ namespace Belle2 {
       }
 
       /// Total ordering based on cylindrical radius first and azimuth angle second
-      /** Total order achiving a absolute lower bound Vector2D(0.0, 0.0). By first taking the
+      /** Total order achieving a absolute lower bound Vector2D(0.0, 0.0). By first taking the
        * cylindrical radius \n
-       *  for comparision the null vector is smaller than all other possible \n
+       *  for comparison the null vector is smaller than all other possible \n
        *  vectors. Secondly the azimuth angle is considered to have a total ordering \n
        *  for all vectors.\n
        */
@@ -141,7 +129,7 @@ namespace Belle2 {
       }
 
       /// Getter for the lowest possible vector
-      /** The lowest possilbe vector according to the comparision is the null vector */
+      /** The lowest possible vector according to the comparison is the null vector */
       static Vector2D getLowest()
       {
         return Vector2D(0.0, 0.0);
@@ -187,7 +175,7 @@ namespace Belle2 {
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs
-       *  in the mathematical positve counterclockwise direction. So a positiv angle means
+       *  in the mathematical positive counterclockwise direction. So a positive angle means
        *  rhs is more counterclockwise than this.
        */
       ///@{

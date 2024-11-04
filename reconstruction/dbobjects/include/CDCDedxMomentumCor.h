@@ -72,7 +72,7 @@ namespace Belle2 {
     }
 
     /** Return dE/dx mean value for given cos(theta)
-     * @param mom for const from momemtum value
+     * @param mom for const from momentum value
      */
     double getMean(double mom) const
     {

@@ -27,7 +27,7 @@ namespace Belle2 {
   const TRGCDCCircleFitter
   TRGCDCCircle::_fitter = TRGCDCCircleFitter("TRGCDCCircle Default Fitter");
 
-  TRGCDCCircle::TRGCDCCircle(const std::vector<TCLink*>& links)
+  TRGCDCCircle::TRGCDCCircle(const std::vector<TRGCDCLink*>& links)
     : TCTBase("UnknownCircle", 0),
       _center(ORIGIN),
       _radius(0),
@@ -40,7 +40,7 @@ namespace Belle2 {
   TRGCDCCircle::TRGCDCCircle(double r,
                              double phi,
                              double charge,
-                             const TCHPlane& plane)
+                             const TRGCDCHoughPlane& plane)
     : TCTBase("unknown", charge),
       _center(r * cos(phi), r * sin(phi)),
       _radius(r),

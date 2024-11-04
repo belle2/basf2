@@ -39,8 +39,8 @@ class EventCode(enum.IntEnum):
     pipipipiISR = 12
     #: pi+pi-pi0pi0ISR
     pipipi0pi0ISR = 13
-    #: etapi+pi-ISR
-    etapipiISR = 14
+    #: pi+pi-etaISR
+    pipietaISR = 14
     #: ppbarISR
     ppbarISR = 15
 
@@ -57,7 +57,7 @@ EventCode_CrossSection = {
     EventCode.pipipi0ISR: 0.02637,
     EventCode.pipipipiISR: 0.02586,
     EventCode.pipipi0pi0ISR: 0.03922,
-    EventCode.etapipiISR: 0.00264,
+    EventCode.pipietaISR: 0.00264,
     EventCode.KKISR: 0.01631,
     EventCode.K0K0barISR: 0.008951,
     EventCode.ppbarISR: 0.0006176,
@@ -72,7 +72,7 @@ EventCodes_hhISR = (
     EventCode.pipipi0ISR,
     EventCode.pipipipiISR,
     EventCode.pipipi0pi0ISR,
-    EventCode.etapipiISR,
+    EventCode.pipietaISR,
     EventCode.KKISR,
     EventCode.K0K0barISR,
     EventCode.ppbarISR,

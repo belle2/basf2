@@ -52,7 +52,7 @@ class ObjectsNotSupported(Exception):
 class DifferingBinCount(Exception):
     """
     The two ROOT objects provided have a different bin count
-    and therefor, cannot be compared using the Chi2 test
+    and therefore, cannot be compared using the Chi2 test
     """
 
 
@@ -278,7 +278,7 @@ class ComparisonBase(ABC):
 
     def _has_compatible_bins(self) -> bool:
         """
-        Check if both ROOT obeject have the same amount of bins
+        Check if both ROOT objects have the same amount of bins
         @return: True if the bins are equal, otherwise False
         """
         if (
@@ -296,7 +296,7 @@ class ComparisonBase(ABC):
 
     def _raise_has_compatible_bins(self) -> None:
         """
-        Raise Exception if not both ROOT obeject have the same amount of bins
+        Raise Exception if not both ROOT objects have the same amount of bins
         @return: None
         """
         if not self._has_compatible_bins():
@@ -441,10 +441,8 @@ class Chi2Test(PvalueTest):
                 b.SetBinContent(ibin, 0.0)
                 if self.debug:
                     print(
-                        "DEBUG: Warning: Setting bin content of bin {} to "
-                        "zero for both histograms, because both histograms "
-                        "have vanishing errors there.".format(ibin)
-                    )
+                        f"DEBUG: Warning: Setting bin content of bin {ibin} to zero for both histograms, because both " +
+                        "histograms have vanishing errors there.")
 
     def _compute(self) -> None:
         """
@@ -468,8 +466,7 @@ class Chi2Test(PvalueTest):
 
         if nbins < 2:
             raise TooFewBins(
-                "{} bin(s) is too few to perform the Chi2 "
-                "test.".format(nbins)
+                f"{nbins} bin(s) is too few to perform the Chi2 test."
             )
 
         weighted_types = ["TProfile", "TH1D", "TH1F"]
@@ -518,8 +515,7 @@ class Chi2Test(PvalueTest):
             print_contents_and_errors(first_obj, second_obj)
             print()
             print(
-                "Here's what ROOT's Chi2Test gave us (comp_options: '{}'):"
-                " ".format(comp_options)
+                f"Here's what ROOT's Chi2Test gave us (comp_options: '{comp_options}'): "
             )
 
             tp = TablePrinter(3, width=(10, 10, 40))
@@ -646,7 +642,7 @@ class KolmogorovTest(PvalueTest):
             )
 
         return (
-            r"Performed Komlogorov test between {{revision1}} "
+            r"Performed Kolmogorov test between {{revision1}} "
             r"and {{revision2}} "
             r" <b>p-value: {pvalue:.6f}</b> (p-value warn: {pvalue_warn}, "
             r"p-value error: {pvalue_error})".format(
@@ -772,7 +768,7 @@ class TablePrinter:
                 form = f"{{:{width}d}}"
                 out.append(form.format(col))
             elif isinstance(col, float):
-                form = "{{:{}.{}f}}".format(width, width // 2)
+                form = f"{{:{width}.{width // 2}f}}"
                 out.append(form.format(col))
             else:
                 # convert everything else to a string if it isn't already
@@ -882,8 +878,8 @@ def debug_cli():
             f"in file '{args.rootfile_b}'."
         )
 
-    # 3. Performe testing with debug option
-    # =====================================
+    # 3. Perform testing with debug option
+    # ====================================
 
     test = Chi2Test(obj_a, obj_b, debug=True)
     test.ensure_compute()

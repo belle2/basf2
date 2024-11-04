@@ -43,8 +43,8 @@ namespace {
 
       {
         //check relative filenames
-        auto pwd = ScopeGuard::guardWorkingDirectory("/tmp"); //don't influence other tests by changing pwd
-        std::string relname = fs::relative(filename, "/tmp").string();
+        auto pwd = ScopeGuard::guardWorkingDirectory(fs::temp_directory_path()); //don't influence other tests by changing pwd
+        std::string relname = fs::relative(filename, fs::temp_directory_path()).string();
         ASSERT_TRUE(FileSystem::fileExists(relname));
         chdir("/");
         ASSERT_FALSE(FileSystem::fileExists(relname));

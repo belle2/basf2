@@ -69,6 +69,8 @@ namespace Belle2 {
 
     /// Are we still in the first real event?
     bool m_firstEvent = true;
+    /// The last event has a special message type?
+    bool m_lastEventIsSpecialMessage = true;
     /// Are we still before the first real event = before the modules are initialized = before the forking?
     bool m_inInitialize = true;
 

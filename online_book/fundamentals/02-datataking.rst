@@ -15,7 +15,8 @@ Data Taking
     **Objectives**:
 
     * Understand the different detector systems in Belle II.
-    * Definiton of triggers and their effects.
+    * Learn the definition of triggers and their effects.
+    * Know the difference between proc and prompt data processing 
 
 One of the most important steps is of course to record the data we want to
 analyse. In this chapter we will go through the important concepts of the Belle
@@ -37,14 +38,14 @@ momentum, with the electrons kept at around 7 GeV/c and the positrons at around
 into (almost) head-on collision, resulting in a center-of-mass energy of
 typically around 10.58 GeV, corresponding to the :math:`\Upsilon(4S)` resonance.
 The point of collision is named the "interaction region".
-The  center of mass energy can be changed to take data at other resonances of the
+The  center-of-mass energy can be changed to take data at other resonances of the
 :math:`\Upsilon` family, from around 9.4 to 11 GeV, for the non-B physics part
 of the physics program.
 
 .. admonition:: Question
     :class: exercise stacked
 
-    At LHC, every bunch collision generates dozens of individual particle
+    At the LHC, every bunch collision generates dozens of individual particle
     interactions that overlay each other in the detectors (pile-up),
     considerably complicating the data analysis.
     This doesn't seem to be a problem at SuperKEKB and Belle II. Why?
@@ -60,7 +61,7 @@ of the physics program.
 .. admonition:: Another hint
     :class: toggle xhint stacked
 
-    The goal instantaneous luminosity of SuperKEKB is :math:`8\times 10^{35}\, \textrm
+    The goal instantaneous luminosity of SuperKEKB is :math:`6\times 10^{35}\, \textrm
     {cm}^{-2} \textrm{s}^{-1}`. It takes a beam particle bunch roughly 10 μs to complete
     a full revolution around the accelerator ring. Up to 2376 bunches will circulate
     in each ring.
@@ -68,13 +69,13 @@ of the physics program.
 .. admonition:: Solution
     :class: toggle solution
 
-    At a final design luminosity of :math:`8\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
+    At a final design luminosity of :math:`6\times 10^{35}\, \textrm{cm}^{-2}\textrm{s}^
     {-1}` at 2376 bunches per ring, each taking about 10 μs to complete a revolution, the
-    delivered luminosity per bunch crossing is about :math:`8\times 10^{35}\, \textrm
-    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 3.4\times10^{-6}\,
+    delivered luminosity per bunch crossing is about :math:`6\times 10^{35}\, \textrm
+    {cm}^{-2} \textrm{s}^{-1} \cdot 10\times 10^{-6}\ \textrm{s} / 2376 = 2.6\times10^{-6}\,
     (\textrm{nb})^{-1}`, so even the most likely Bhabha process at :math:`125\,
     \textrm{nb}` only happens about once every
-    :math:`(3.4\times 10^{-6}\cdot 125)^{-1} \approx 2400` bunch crossings.
+    :math:`(2.6\times 10^{-6}\cdot 125)^{-1} \approx 3100` bunch crossings.
 
 .. figure:: belle2.png
     :align: center
@@ -321,7 +322,7 @@ ARICH
     some analysis.
 
 ECL
-    The Electromagnetic CaLorimeter (ECL) is chiefly tasked with measuring the
+    The Electromagnetic Calorimeter (ECL) is chiefly tasked with measuring the
     electromagnetic energy of photons and electrons produced in the collision.
     In combination with tracking information, the calorimeter can distinguish, for
     example, electrons from muons.
@@ -330,8 +331,8 @@ ECL
     through as a minimum-ionising particle. It therefore provides further
     orthogonal information to the particle-identification system.
 
-    The ECL consists of over 8000 Caesium Iodide crystsals which create
-    scintillalation light when a particle flies into them. The amount of
+    The ECL consists of over 8000 Caesium Iodide crystals which create
+    scintillation light when a particle flies into them. The amount of
     light is proportional to the energy deposited in the crystal so by measuring
     it we can measure the energy of the the particle. Of course this assumes the
     particle is fully stopped and deposits all of its energy in the ECL. This is
@@ -345,7 +346,7 @@ ECL
     :alt: Picture of ECL electronics
 
     Small part of the ECL electronics in the endcap. Boards do the mapping from
-    the preamps (which you can’t see) to the cables that go to the ShaperDSPs.
+    the preamps (which you can't see) to the cables that go to the ShaperDSPs.
     You can also see the cooling lines under the boards.
 
 KLM
@@ -381,7 +382,7 @@ On Resonance, Continuum, Cosmics
 --------------------------------
 
 We saw that to collect :math:`B` mesons one must collide electrons and positrons at the
-centre-of-mass energy of :math:`\sqrt{s} = 10.580` GeV, corresponding to the
+center-of-mass energy of :math:`\sqrt{s} = 10.580` GeV, corresponding to the
 :math:`\Upsilon(4S)` resonance mass. However this is not the only energy at
 which the SuperKEKB accelerator can work, and it's not the only kind of dataset
 that Belle II can collect.
@@ -503,7 +504,7 @@ storage by at least 60%.
    are discarded and lost forever. In the latter, all the events are kept regardless of the
    HLT decision (which is however stored, so analyses of the HLT filtering efficiency
    can be conducted).
-   On top of this, the HLT also performs a first, rought skimming producing the so-called
+   On top of this, the HLT also performs a first, rough skimming producing the so-called
    **HLT skims**. All the events that are satisfying the HLT conditions (regardless of the
    HLT operation mode), are then assigned according to a quick analysis into few
    possible categories: bhabha, hadronic, tau, mumu and so on attaching a flag to them,
@@ -538,7 +539,7 @@ named prescaling. When working on your own analysis, it is very important to
 keep in mind potential prescaling of the triggers that yield the events you use
 in your analysis. Since the prescaling settings can (and will) change over
 the lifetime of the experiment, updated numbers for each run can be
-found `here <https://confluence.desy.de/display/BI/TriggerBitTable>`_.. See also
+found `here <https://xwiki.desy.de/xwiki/rest/p/2471f>`_.. See also
 `this question <https://questions.belle2.org/question/9437/where-to-find-pre-scaling-factors/>`_.
 for more details.
 
@@ -557,6 +558,38 @@ intended functionality is of highest importance for the success of the experimen
     * Prescaling might be used to only record every n-th event (on average) that
       satisfies given trigger conditions.
 
+Processing Data Samples
+------------------------
+
+Data from physics runs undergo two main stages of processing: prompt processing and reprocessing. 
+The difference between them relates to the level of calibrations that are applied during the 
+processing. The relationship between each stage of processing 
+(described below) is represented schematically in :numref:`fig:data_overview`.  
+
+Prompt processing occurs just after the data taking.
+Data is collected for a given amount of time, typically two weeks (colloquially called a "bucket"),
+then it is calibrated and processed, and then the process is iterated.
+Prompt data is always obtained using the latest major software release, and its calibration is complete,
+with quality that is hardly different from the reprocessed data. For this reason, most of the calibration
+performed in prompt is kept also for reprocessing.
+Prompt data is available for analysis after prompt processing, with a timescale of about 2 months.
+
+During a reprocessing, all data collected up to a given time is recalibrated and reprocessed.
+A reprocessing campaign, labelled with the prefix "proc" (e.g. proc13), is done every year or every two years (from 2023).
+The recalibration starts from the prompt calibration, and it is refined if improved or new calibration algorithms were developed.
+A full reprocessing of data is performed using a major software release, so that the complete dataset is available with a coherent processing.
+
+Both prompt and reprocessed datasets can be accessed on the grid using the corresponding collections reported on the Data Production web page.
+
+.. _fig:data_overview:
+.. figure:: data_overview.png
+    :align: center
+    :width: 900px
+    :alt: Diagram of relationship between prompt and reprocessed data
+
+    A diagram showing the relationship between data collected at run time, prompt datasets, showing the incremental processing
+    and reprocessed data (e.g. procXX).  
+
 .. include:: ../lesson_footer.rstinclude
 
 .. rubric:: Author(s) of this lesson
@@ -565,4 +598,6 @@ Umberto Tamponi,
 Martin Ritter,
 Oskar Hartbrich,
 Michael Eliachevitch,
-Sam Cunliffe
+Sam Cunliffe,
+Priyanka Cheema,
+Stefano Lacaprara

@@ -16,7 +16,6 @@
 
 #include <vxd/dataobjects/VxdID.h>
 
-#include <TFile.h>
 #include <TH2.h>
 #include <TF1.h>
 #include <TLine.h>
@@ -77,6 +76,8 @@ namespace Belle2 {
     double m_rangeLow;
     //! fit range hi edge for landau
     double m_rangeHigh;
+    /** Indizes of excluded PXD Modules */
+    std::vector<int> m_excluded;
 
     //! IDs of all PXD Modules to iterate over
     std::vector<VxdID> m_PXDModules;
@@ -112,10 +113,6 @@ namespace Belle2 {
     /** TLine object for lower limit of track cluster charge */
     TLine* m_line_low{};
 
-    /** Reference Histogram Root file name */
-    std::string m_refFileName;
-    /** The pointer to the reference file */
-    TFile* m_refFile = nullptr;
     /** Whether to use the color code for warnings and errors. */
     bool m_color = true;
 

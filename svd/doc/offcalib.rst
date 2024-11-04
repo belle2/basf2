@@ -10,7 +10,7 @@ Here we briefly describe the so-called offline calibrations.
 Hit Time Calibration
 ---------------------
 
-The time calibration is implemented in the :ref:`calibration_caf` and is run on **6-sample data** with AirFlow.
+The time calibration is implemented in the :ref:`calibration framework<cal_caf>` and is run on **6-sample data** with AirFlow.
 
 The hit time calibration exploits the correlation between the time of the event ``EventT0`` and the hit time. We select clusters associated to tracks and neglect the flight time of the particle.
 

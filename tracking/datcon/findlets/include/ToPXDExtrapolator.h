@@ -72,10 +72,10 @@ namespace Belle2 {
 
     // ATTENTION: hard coded values taken and derived from pxd/data/PXD-Components.xml
     /// shift of the sensor center along z for L1, in µm
-    /// for use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ
+    /// for use of mhp_z > (length/-2)+shiftZ &&  mhp_z < (length/2)+shiftZ
     const long centerZShiftLayer1[2] = {36825500, -8825500};
     /// shift of the sensor center along z for L2, in µm
-    /// for use of mhp_z > (lengh/-2)+shiftZ &&  mhp_z < (lengh/2)+shiftZ
+    /// for use of mhp_z > (length/-2)+shiftZ &&  mhp_z < (length/2)+shiftZ
     const long centerZShiftLayer2[2] = {50145500, -12145500};
     /// radius of L1 and L2, in µm
     const long layerRadius[2] = {14285, 22121};

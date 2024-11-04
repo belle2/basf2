@@ -379,7 +379,7 @@ def get_calibrations(input_data, **kwargs):
             cal_ecl_merge_i = Calibration(name=mergeCalibName, collector="DummyCollector",
                                           input_files=input_files_bhabha_1perRun)
 
-            # Read in the previous crystal payload values for comparision
+            # Read in the previous crystal payload values for comparison
             cal_ecl_merge_i.algorithms = [merging_alg]
             print("merge algorithm: read previous payload for comparison purposes")
             print("merging_alg.readPrevCrysPayload = ", merging_alg.readPrevCrysPayload)
@@ -619,7 +619,7 @@ def get_calibrations(input_data, **kwargs):
         # Collector setup for the calibration constant plotting
 
         # Set up the collector but with only one event per file
-        root_input = register_module('RootInput', entrySequences=['0:{}'.format(1)])
+        root_input = register_module('RootInput', entrySequences=[f'0:{1}'])
 
         rec_path_bhabha_plotting = create_path()
         rec_path_bhabha_plotting.add_module(root_input)

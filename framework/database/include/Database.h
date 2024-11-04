@@ -134,6 +134,12 @@ namespace Belle2 {
       return getData(eventMetaData, name).first;
     }
 
+    /**
+     * Return the names of all the payloads stored in the database at the time
+     * of this function is called. This is equivalent to getting all the payloads'
+     * names used by the current basf2 process.
+     */
+    std::set<std::string> getAllDataNames() { return DBStore::Instance().getAllEntryNames(); };
 
     /**
      * Store an object in the database.

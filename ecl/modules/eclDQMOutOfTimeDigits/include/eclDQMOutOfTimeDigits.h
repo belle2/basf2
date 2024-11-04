@@ -13,7 +13,7 @@
 #include <framework/core/ModuleParam.templateDetails.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-class TProfile;
+class TH1F;
 
 namespace Belle2 {
 
@@ -44,10 +44,6 @@ namespace Belle2 {
     virtual void beginRun() override;
     /** Event processor. */
     virtual void event() override;
-    /** Call when a run ends. */
-    virtual void endRun() override;
-    /** Terminate. */
-    virtual void terminate() override;
 
     /** Function to define histograms. */
     virtual void defineHisto() override;
@@ -72,7 +68,7 @@ namespace Belle2 {
      * event_type: rand (random trigger evts), dphy (delayed bhabha events), physics (other events)
      * ecl_part: all, fwd, bar, bwd
      */
-    std::map<std::string, TProfile*> h_out_of_time{};
+    std::map<std::string, TH1F*> h_out_of_time{};
 
     /** StoreObjPtr TRGSummary  */
     StoreObjPtr<TRGSummary> m_l1Trigger;

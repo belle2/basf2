@@ -16,20 +16,16 @@
 #include <ecl/dbobjects/ECLCrystalCalib.h>
 #include <ecl/dbobjects/ECLReferenceCrystalPerCrateCalib.h>
 #include <ecl/digitization/EclConfiguration.h>
-#include <ecl/geometry/ECLGeometryPar.h>
 
 /* Basf2 headers. */
-#include <analysis/ClusterUtility/ClusterUtils.h>
 #include <analysis/utility/PCmsLabTransform.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/gearbox/Const.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/HitPatternCDC.h>
 #include <mdst/dataobjects/Track.h>
-#include <tracking/dataobjects/RecoTrack.h>
 
 /* ROOT headers. */
-#include <TFile.h>
 #include <TH2F.h>
 #include <TTree.h>
 
@@ -108,7 +104,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_electrons->Branch("E_DIV_p", &m_E_DIV_p)->SetTitle("E DIV p");
     m_dbgTree_electrons->Branch("timeF", &m_tree_timeF)->SetTitle("Time F, ns");
     m_dbgTree_electrons->Branch("time_t_psi", &m_tree_time)->SetTitle("Time t_psi for Ts, ns");
-    m_dbgTree_electrons->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see Confluence article");
+    m_dbgTree_electrons->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see XWiki article");
     m_dbgTree_electrons->Branch("t0", &m_tree_t0)->SetTitle("T0, ns");
     m_dbgTree_electrons->Branch("t0_unc", &m_tree_t0_unc)->SetTitle("T0 uncertainty, ns");
     m_dbgTree_electrons->Branch("CrateID", &m_crystalCrate)->SetTitle("Crate id for crystal");
@@ -135,7 +131,7 @@ void ECLBhabhaTCollectorModule::inDefineHisto()
     m_dbgTree_crystals->Branch("Crystal_E", &m_tree_clustCrysE) ->SetTitle("E of crystal i from cluster");
     m_dbgTree_crystals->Branch("time_t_psi", &m_tree_time)->SetTitle("Time for Ts, ns");
     m_dbgTree_crystals->Branch("Crystal_cell_ID", &m_tree_cid)->SetTitle("Cell ID, 1..8736");
-    m_dbgTree_crystals->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see Confluence article");
+    m_dbgTree_crystals->Branch("quality", &m_tree_quality)->SetTitle("ECL FPGA fit quality, see XWiki article");
 
     m_dbgTree_crystals->SetAutoSave(10);
 
@@ -355,7 +351,7 @@ void ECLBhabhaTCollectorModule::collect()
     }
   }
 
-  /*  Fill the histgram showing that the trigger skim cut passed OR that we
+  /*  Fill the histogram showing that the trigger skim cut passed OR that we
       are skipping this selection. */
   cutIndexPassed++;
   getObjectPtr<TH1F>("cutflow")->Fill(cutIndexPassed);
@@ -519,9 +515,9 @@ void ECLBhabhaTCollectorModule::collect()
 
     // Get event t0 from CDC.  We don't want event t0 from ECL as we are calibrating the ECL wrt the more accurately measured time measurements of the time.  Start with the CDC since it has an event t0 but in the future we may switch to the TOP detector.
     // Based on the information from Thomas Hauth <Thomas.Hauth@kit.edu> (leaving physics) we should take the last event t0 in the list of event t0's from the CDC as the later event t0 measurements are calculated in slower but more accurate ways.
-    vector<EventT0::EventT0Component> evt_t0_list = m_eventT0->getTemporaryEventT0s(Const::EDetector::CDC);
-    evt_t0 = evt_t0_list.back().eventT0;   // time value
-    evt_t0_unc = evt_t0_list.back().eventT0Uncertainty;   // uncertainty on event t0
+    const auto bestCDCEventT0Candidate = m_eventT0->getBestCDCTemporaryEventT0();
+    evt_t0 = bestCDCEventT0Candidate->eventT0;   // time value
+    evt_t0_unc = bestCDCEventT0Candidate->eventT0Uncertainty;   // uncertainty on event t0
 
 
     // Correct the CDC event t0 value for the bhabha bias
@@ -713,7 +709,7 @@ void ECLBhabhaTCollectorModule::collect()
 
   /* Determine if the two tracks have the opposite electric charge.
      We know this because the track indices stores the max pt track in [0] for negatively charged track
-     and [1] fo the positively charged track.  If both are filled then both a negatively charged
+     and [1] for the positively charged track.  If both are filled then both a negatively charged
      and positively charged track were found.   */
   bool oppositelyChargedTracksPassed = maxiTrk[0] != -1  &&  maxiTrk[1] != -1;
   if (!oppositelyChargedTracksPassed) {

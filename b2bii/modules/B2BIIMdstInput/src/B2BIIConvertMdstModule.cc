@@ -37,6 +37,7 @@
 #include <Math/Vector3D.h>
 #include <Math/Vector4D.h>
 #include <Math/Point3D.h>
+#include <Math/VectorUtil.h>
 
 #include <limits>
 #include <algorithm>
@@ -309,13 +310,14 @@ void B2BIIConvertMdstModule::event()
     // Make sure beam parameters are correct: if they are not found in the
     // database or different from the ones in the database we need to override them
     if (!m_beamSpotDB || !(m_beamSpot == *m_beamSpotDB) ||
-        !m_collisionBoostVectorDB || !m_collisionInvMDB) {
-      if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB) && !m_realData) {
+        !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) {
+      if ((!m_beamSpotDB || !m_collisionBoostVectorDB || !m_collisionInvMDB || !m_collisionAxisCMSDB) && !m_realData) {
         B2INFO("No database entry for this run yet, create one");
         StoreObjPtr<EventMetaData> event;
         IntervalOfValidity iov(event->getExperiment(), event->getRun(), event->getExperiment(), event->getRun());
         Database::Instance().storeData("CollisionBoostVector", &m_collisionBoostVector, iov);
         Database::Instance().storeData("CollisionInvariantMass", &m_collisionInvM, iov);
+        Database::Instance().storeData("CollisionAxisCMS", &m_collisionAxisCMS, iov);
         Database::Instance().storeData("BeamSpot", &m_beamSpot, iov);
       }
       if (m_realData) {
@@ -331,6 +333,7 @@ void B2BIIConvertMdstModule::event()
       }
       DBStore::Instance().addConstantOverride("CollisionBoostVector", new CollisionBoostVector(m_collisionBoostVector), true);
       DBStore::Instance().addConstantOverride("CollisionInvariantMass", new CollisionInvariantMass(m_collisionInvM), true);
+      DBStore::Instance().addConstantOverride("CollisionAxisCMS", new CollisionAxisCMS(m_collisionAxisCMS), true);
       DBStore::Instance().addConstantOverride("BeamSpot", new BeamSpot(m_beamSpot), true);
     }
   }
@@ -388,7 +391,7 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   const double angleLer = M_PI; //parallel to negative z axis (different from Belle II!)
   const double angleHer = crossingAngle; //in positive z and x direction, verified to be consistent with Upsilon(4S) momentum
   const double mass_e = Const::electronMass;    //mass of electron: 0.0 in basf, 0.000510998902 in basf2;
-  TMatrixDSym covariance(0);    //0 entries = no error
+  TMatrixDSym covariance(3);    //0 entries = no error
   HepLorentzVector p_beam = Belle::BeamEnergy::p_beam(); // Testing only
 
   // Get four momentum of LER and HER
@@ -402,12 +405,20 @@ void B2BIIConvertMdstModule::convertBeamEnergy()
   // Get four momentum of beam
   ROOT::Math::PxPyPzEVector P_beam = P_her + P_ler;
 
+  ROOT::Math::PxPyPzEVector momentumHER = P_her;
+  ROOT::Math::VectorUtil::boost(momentumHER, -P_beam.BoostToCM());
+  double angleXZ = std::atan(momentumHER.X() / momentumHER.Z());
+  double angleYZ = std::atan(momentumHER.Y() / momentumHER.Z());
+
   m_collisionBoostVector.setBoost(B2Vector3D(-P_beam.BoostToCM()), covariance);
   m_collisionInvM.setMass(P_beam.M(), 0.0, 0.0);
+  m_collisionAxisCMS.setAngles(angleXZ, angleYZ, TMatrixTSym<double>(2));
+  m_collisionAxisCMS.setSpread(TMatrixTSym<double>(2), 0, 0, 0);
 
   B2DEBUG(99, "Beam Energy: E_HER = " << Eher << "; E_LER = " << Eler << "; angle = " << crossingAngle);
   B2DEBUG(99, "Beam Momentum (pre-convert) : P_X = " << p_beam.px() << "; P_Y = " << p_beam.py() << "; P_Z = " << p_beam.pz());
   B2DEBUG(99, "Beam Momentum (post-convert) : P_X = " << P_beam.Px() << "; P_Y = " << P_beam.Py() << "; P_Z = " << P_beam.Pz());
+  B2DEBUG(99, "CollisionAxisCMS: angleXZ = " << m_collisionAxisCMS.getAngleXZ() << "; angleYZ = " << m_collisionAxisCMS.getAngleYZ());
 }
 
 void B2BIIConvertMdstModule::convertIPProfile(bool beginRun)
@@ -611,7 +622,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, 1, pTypeP, momentumP, positionP, error7x7P);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumP, positionP, error7x7P, 1, pTypeP, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
 
         for (unsigned i = 0; i < 7; i++)
@@ -667,7 +678,7 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
         belleVeeDaughterToCartesian(belleV0, -1, pTypeM, momentumM, positionM, error7x7M);
         TrackFitResult* tmpTFR = new TrackFitResult(createTrackFitResult(momentumM, positionM, error7x7M, -1, pTypeM, 0.5, -1, -1, 0));
-        // TrackFitResult internaly stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
+        // TrackFitResult internally stores helix parameters at pivot = (0,0,0) so the momentum of the Particle will be wrong again.
         // Overwrite it.
         for (unsigned i = 0; i < 7; i++)
           for (unsigned j = 0; j < 7; j++)
@@ -2006,7 +2017,7 @@ void B2BIIConvertMdstModule::setTracksToECLClustersRelations()
 
       // the numbering in mdst_charged
       // not necessarily the same as in mdst_trk
-      // therfore have to find corresponding mdst_charged
+      // therefore have to find corresponding mdst_charged
       for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); ++chgIterator) {
         Belle::Mdst_charged mChar = *chgIterator;
         Belle::Mdst_trk mTRK_in_charged = mChar.trk();

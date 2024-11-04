@@ -122,8 +122,7 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
             gtname = url.path.split("/")[-1]
             if gtname in self.globaltags:
                 return self.reply(
-                    '{{ "name": "{}", "globalTagStatus": {{ "name": "{}" }} }}'.format(
-                        gtname, self.globaltags[gtname]))
+                    f'{{ "name": "{gtname}", "globalTagStatus": {{ "name": "{self.globaltags[gtname]}" }} }}')
             else:
                 return self.send_error(404)
 
@@ -232,6 +231,8 @@ def set_serverlist(serverlist):
     """Set a list of database servers."""
     basf2.conditions.metadata_providers = serverlist + [e for e in basf2.conditions.metadata_providers if not e.startswith("http")]
 
+
+os.environ.pop('BELLE2_CONDB_METADATA', None)
 
 # keep timeouts short for testing
 basf2.conditions.expert_settings(backoff_factor=1, connection_timeout=5,

@@ -162,7 +162,7 @@ class PlotFile(JsonBase):
 class Plot(JsonBase):
 
     """
-    Wrapper for one specfic plot.
+    Wrapper for one specific plot.
     """
 
     def __init__(
@@ -285,7 +285,7 @@ class ComparisonState(enum.Enum):
     #: The two distributions did not comply with the allowed
     #  differences
     FailureStastical = "statistical_failure"
-    #: The two distrubtions were equal in the envelope given by the
+    #: The two distributions were equal in the envelope given by the
     #  comparison configuration of this plot
     Equal = "equal"
 

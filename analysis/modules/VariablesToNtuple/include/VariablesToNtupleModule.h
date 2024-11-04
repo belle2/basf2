@@ -14,6 +14,7 @@
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/dataobjects/EventExtraInfo.h>
 #include <framework/pcore/RootMergeable.h>
 
 #include <TTree.h>
@@ -61,6 +62,8 @@ namespace Belle2 {
     std::string m_treeName;
     /** Suffix to be appended to the output file name. */
     std::string m_fileNameSuffix;
+    /** Use float type for floating-point numbers. */
+    bool m_useFloat;
     /** Size of TBaskets in the output ROOT file in bytes. */
     int m_basketsize;
 
@@ -75,8 +78,13 @@ namespace Belle2 {
     int m_production{ -1};           /**< production ID (to distinguish MC samples) */
     int m_candidate{ -1};            /**< candidate counter */
     unsigned int m_ncandidates{0};   /**< total n candidates */
-    /** Branch addresses of variables of type double */
+
+    /** Branch addresses of variables of type float. */
+    std::vector<float> m_branchAddressesFloat;
+
+    /** Branch addresses of variables of type double. */
     std::vector<double> m_branchAddressesDouble;
+
     /** Branch addresses of variables of type int (or bool) */
     std::vector<int> m_branchAddressesInt;
     /** List of pairs of function pointers and respective data type corresponding to given variables. */
@@ -100,5 +108,12 @@ namespace Belle2 {
     int m_signalSideCandidate{-1};             /**< signal-side candidate counter */
     unsigned int m_nSignalSideCandidates{0};   /**< total n signal-side candidates */
     StoreObjPtr<RestOfEvent> m_roe;            /**< ROE object */
+
+    bool m_storeEventType;  /**< If true, the branch __eventType__ is added */
+    StoreObjPtr<EventExtraInfo> m_eventExtraInfo; /**< pointer to EventExtraInfo  */
+    std::string m_eventType; /**< EventType to be filled */
+
+    bool m_ignoreCommandLineOverride; /**< if true, ignore override of filename */
+
   };
 } // end namespace Belle2

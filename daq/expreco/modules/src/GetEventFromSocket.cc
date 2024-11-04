@@ -27,7 +27,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(GetEventFromSocket)
+REG_MODULE(GetEventFromSocket);
 
 //-----------------------------------------------------------------
 //                 Implementation

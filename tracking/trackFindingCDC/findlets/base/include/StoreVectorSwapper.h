@@ -79,7 +79,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() override
       {
-        return "Swaps an interal vector of " + m_classMnemomicDescription + "s to the DataStore";
+        return "Swaps an internal vector of " + m_classMnemomicDescription + "s to the DataStore";
       }
 
     public:
@@ -109,10 +109,10 @@ namespace Belle2 {
       }
 
       /// Swaps the items to the DataStore or to the backup storage location.
-      void apply(std::vector<IOType>& input) final {
+      void apply(std::vector<IOType>& input) final
+      {
         // Swap items to the DataStore
-        if (m_param_writeStoreVector)
-        {
+        if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
           std::vector<IOType>& sink = *storeVector;
           sink.swap(input);

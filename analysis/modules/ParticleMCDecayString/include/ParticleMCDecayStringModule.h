@@ -92,7 +92,7 @@ namespace Belle2 {
     std::string m_fileName; /**< Filename in which the hash strings are saved, if empty the strings are not saved */
     std::string m_treeName; /**< Tree name in which the hash strings are saved */
 
-    TFile* m_file; /**< ROOT file to store the hashes and strings */
+    std::shared_ptr<TFile> m_file{nullptr}; /**< ROOT file to store the hashes and strings */
 
     StoreObjPtr<RootMergeable<TTree>> m_tree; /**< ROOT TNtuple containing the saved hashes and strings */
 

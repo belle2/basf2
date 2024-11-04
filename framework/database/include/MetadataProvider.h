@@ -160,6 +160,11 @@ namespace Belle2::Conditions {
      *    messages to indicate the correct metadata provider
      */
     void addPayload(PayloadMetadata&& payload, const std::string& messagePrefix = "");
+    /** Print an INFO message about the used metadata provider.
+     *
+     * @param provider the actual metadata provider used for the job
+     */
+    void printInfoMessage(const std::string& provider);
 
     /** List of globaltags to consider */
     std::vector<std::string> m_tags;

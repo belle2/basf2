@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 
 ##########################################################################
 # basf2 (Belle II Analysis Software Framework)                           #
@@ -17,6 +16,7 @@ doesn't cut it (such as if you are testing your skim on the grid).
 """
 
 import argparse
+
 
 import jinja2
 
@@ -116,6 +116,25 @@ def get_argument_parser():
         help=(
             "Analysis globaltag to be passed to the skims."
         ),
+    )  
+    parser.add_argument(
+        "--udst-output-name",
+        default="",
+        type=str,
+        metavar="",
+        help=(
+            "Name given to the output udst from skim script."
+        ),
+    )
+
+    parser.add_argument(
+        "--pid-globaltag",
+        default="",
+        type=str,
+        metavar="PIDGlobaltag",
+        help=(
+            "PID globaltag to be passed to the skims."
+        ),
     )
 
     return parser
@@ -155,6 +174,7 @@ def main():
     env = jinja2.Environment(loader=loader)
     env.lstrip_blocks = True
 
+    print(args.udst_output_name)
     template = env.get_template("skim_steering_file_template.jinja2")
     CodeString = template.render(
         skims=skims,
@@ -164,7 +184,9 @@ def main():
         hints=(not args.no_user_hints),
         mdstOutput=args.skimmed_mdst_output,
         backward_compatibility=(not args.no_backward_compatibility),
-        analysis_globaltag=args.analysis_globaltag
+        analysis_globaltag=args.analysis_globaltag,
+        pid_globaltag=args.pid_globaltag,
+        udst_output_name = args.udst_output_name
     )
 
     output(CodeString, OutputFilename=args.OutputFilename, skims=skims)

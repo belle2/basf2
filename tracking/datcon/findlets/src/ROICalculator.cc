@@ -75,7 +75,7 @@ void ROICalculator::apply(const std::vector<std::pair<VxdID, long>>& uExtrapolat
       double uCoordinateInCM = uExtrapolatedHit.second * Unit::nm;
       double vCoordinateInCM = vExtrapolatedHit.second * Unit::nm;
 
-      currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::get(uHitSensorID));
+      currentSensor = dynamic_cast<const PXD::SensorInfo*>(&VXD::GeoCache::getInstance().getSensorInfo(uHitSensorID));
       const short uCell = currentSensor->getUCellID(uCoordinateInCM);
       const short vCell = currentSensor->getVCellID(vCoordinateInCM);
 

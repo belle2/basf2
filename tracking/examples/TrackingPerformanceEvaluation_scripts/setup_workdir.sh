@@ -14,7 +14,7 @@
 #                                                               #
 # USAGE:
 #
-# release> source tracking/examples/TrackingPerformanceEvaluation_scripts/setup_workdir.sh relase
+# release> source tracking/examples/TrackingPerformanceEvaluation_scripts/setup_workdir.sh release
 #
 #################################################################
 

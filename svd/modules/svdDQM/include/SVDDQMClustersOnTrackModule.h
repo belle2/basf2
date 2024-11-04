@@ -53,6 +53,9 @@ namespace Belle2 {
     /** if TRUE: svdTime back in SVD time reference*/
     bool m_desynchSVDTime = false;
 
+    /** if true enable 3 samples histograms analysis */
+    bool m_3Samples = false;
+
     std::string m_svdShaperDigitsName;   /**< SVDShaperDigits data object  name*/
     std::string m_svdRecoDigitsName;   /**< SVDRecoDigits data object  name*/
     std::string m_svdClustersName;   /**< SVDClusters data object  name*/
@@ -65,9 +68,6 @@ namespace Belle2 {
 
     /** Store Object for reading the trigger decision. */
     StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-
-
-    StoreObjPtr<EventT0> m_EventT0;  /**< event T0 object */
 
     /** if true skip events rejected by HLT (default)*/
     bool m_skipRejectedEvents = true;
@@ -130,14 +130,14 @@ namespace Belle2 {
     TH1F* m_clsTrkTimeV3 = nullptr;
 
     /** u Time of clusters related to tracks for layer 3 sensors for 3 samples*/
-    TH1F* m_cls3TrkTimeU3 = nullptr;
+    TH1F* m_cls3SampleTrkTimeU3 = nullptr;
     /** v Time of clusters related to tracks for layer 3  sensors for 3 sampes*/
-    TH1F* m_cls3TrkTimeV3 = nullptr;
+    TH1F* m_cls3SampleTrkTimeV3 = nullptr;
 
     /** u Time of clusters related to tracks for layer 3 sensors for 3 samples*/
-    TH1F* m_cls6TrkTimeU3 = nullptr;
+    TH1F* m_cls6SampleTrkTimeU3 = nullptr;
     /** v Time of clusters related to tracks for layer 3  sensors for 3 sampes*/
-    TH1F* m_cls6TrkTimeV3 = nullptr;
+    TH1F* m_cls6SampleTrkTimeV3 = nullptr;
 
     /** u Time of clusters related to tracks for layer 4,5,6 sensors */
     TH1F* m_clsTrkTimeU456 = nullptr;
@@ -145,14 +145,14 @@ namespace Belle2 {
     TH1F* m_clsTrkTimeV456 = nullptr;
 
     /** u Time of clusters related to tracks for layer 4,5,6 sensors  for 3 samples*/
-    TH1F* m_cls3TrkTimeU456 = nullptr;
+    TH1F* m_cls3SampleTrkTimeU456 = nullptr;
     /** v Time of clusters related to tracks for layer 4,5,6 sensors  for 3 samples*/
-    TH1F* m_cls3TrkTimeV456 = nullptr;
+    TH1F* m_cls3SampleTrkTimeV456 = nullptr;
 
     /** u Time of clusters related to tracks for layer 4,5,6 sensors  for 6 samples*/
-    TH1F* m_cls6TrkTimeU456 = nullptr;
+    TH1F* m_cls6SampleTrkTimeU456 = nullptr;
     /** v Time of clusters related to tracks for layer 4,5,6 sensors  for 6 samples*/
-    TH1F* m_cls6TrkTimeV456 = nullptr;
+    TH1F* m_cls6SampleTrkTimeV456 = nullptr;
 
     /** map of ladder index*/
     std::map<std::pair<int, int>, int> m_ladderMap;

@@ -208,7 +208,7 @@ namespace Belle2 {
       ///       : header size is ? words ( I need to ask Nakao-san because it will be used for distinguish between 0,1, and 2
       /// ver 2 : phase II ? version
       ///       : header size is 8 words
-      ///       : Format is written by Nakao-san in ver.26(as of 2019.3.1 ) of https://confluence.desy.de/pages/viewpage.action?spaceKey=BI&title=DAQ+TimingDistribution#DAQTimingDistribution-InformationsentfromTTDtodatastream
+      ///       : Format is written by Nakao-san in ver.26(as of 2019.3.1 ) of https://xwiki.desy.de/xwiki/rest/p/a2bb3/#HInformationsentfromTTDtodatastream
       //! 0x545452?? up to ver.2 this number is more or less same. So, it cannot be used to distinguish different version numbers
       POS_NODE_FORMAT_ID = 6,  // Position of format ID in header
       FTSW_FORMAT_MASK = 0x000000FF,

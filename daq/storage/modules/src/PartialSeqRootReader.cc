@@ -18,7 +18,7 @@ using namespace Belle2;
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(PartialSeqRootReader)
+REG_MODULE(PartialSeqRootReader);
 
 //-----------------------------------------------------------------
 //                 Implementation

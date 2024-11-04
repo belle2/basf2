@@ -29,6 +29,9 @@
 // analysis utilities
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ParticleCopy.h>
+#include <analysis/ClusterUtility/ClusterUtils.h>
+
+#include <cmath>
 
 using namespace CLHEP;
 using namespace std;
@@ -244,9 +247,9 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
   mother->addExtraInfo("OrcaKinFitErrorCode", errorcode);
 
   // if we added an unmeasured photon, add the kinematics to the mother - at some point we may want to create a particle list from this?
-  if (m_addUnmeasuredPhoton) {
-    std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
-    for (auto fo : *fitObjectContainer) {
+  std::vector <BaseFitObject*>* fitObjectContainer = fitter.getFitObjects();
+  for (auto fo : *fitObjectContainer) {
+    if (m_addUnmeasuredPhoton) {
       const std::string name = fo->getName();
       if (name.find("Unmeasured") != std::string::npos) {
         auto* fitobject = static_cast<ParticleFitObject*>(fo);
@@ -260,9 +263,9 @@ bool ParticleKinematicFitterModule::doOrcaKinFitFit(Particle* mother)
         mother->addExtraInfo("OrcaKinFit" + name + "ErrorTheta", getFitObjectError(fitobject, 1));
         mother->addExtraInfo("OrcaKinFit" + name + "ErrorPhi", getFitObjectError(fitobject, 2));
         mother->addExtraInfo("OrcaKinFit" + name + "ErrorE", getFitObjectError(fitobject, 0));
-
       }
     }
+    delete fo;
   }
 
   delete pfitter;
@@ -322,17 +325,21 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
       B2ERROR("In 3C Kinematic fit, the first daughter should be the Unmeasured Photon!");
     }
 
-    double startingE = particle -> getECLCluster() -> getEnergy(particle -> getECLClusterEHypothesisBit());
-    double startingPhi = particle -> getECLCluster() -> getPhi();
-    double startingTheta = particle -> getECLCluster() -> getTheta();
+    const ECLCluster* cluster = particle->getECLCluster();
+    double startingE = cluster->getEnergy(particle->getECLClusterEHypothesisBit());
+    double startingPhi = cluster->getPhi();
+    double startingTheta = cluster->getTheta();
 
-    double startingeE = particle->getECLCluster() -> getUncertaintyEnergy();
-    double startingePhi = particle->getECLCluster() -> getUncertaintyPhi();
-    double startingeTheta = particle->getECLCluster() -> getUncertaintyTheta();
+    ClusterUtils clutls;
+    const auto EPhiThetaCov = clutls.GetCovarianceMatrix3x3FromCluster(cluster);
+    double startingeE = sqrt(fabs(EPhiThetaCov[0][0]));
+    double startingePhi = sqrt(fabs(EPhiThetaCov[1][1]));
+    double startingeTheta = sqrt(fabs(EPhiThetaCov[2][2]));
 
     B2DEBUG(17, startingPhi << " " << startingTheta << " " <<  startingePhi << " " << startingeTheta);
     // create a fit object
     ParticleFitObject* pfitobject;
+    // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
     pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, startingeE, startingeTheta, startingePhi, 0.);
     pfitobject->setParam(0, startingE, false, false);
     if (m_liftPhotonTheta)
@@ -360,6 +367,7 @@ void ParticleKinematicFitterModule::addParticleToOrcaKinFit(BaseFitter& fitter, 
 
     // create the fit object (ParticleFitObject is the base class)
     ParticleFitObject* pfitobject;
+    // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
     pfitobject  = new PxPyPzMFitObject(clheplorentzvector, clhepmomentumerrormatrix);
     std::string fitObjectName = "particle_" + SSTR(index);
     pfitobject->setName(fitObjectName.c_str());
@@ -576,6 +584,7 @@ void ParticleKinematicFitterModule::addUnmeasuredGammaToOrcaKinFit(BaseFitter& f
     fitObjectName = "Unmeasured";
   }
 
+  // memory allocated: it will be deallocated via "delete fo" in doOrcaKinFitFit
   pfitobject  = new JetFitObject(startingE, startingTheta, startingPhi, 0.0, 0.0, 0.0, 0.);
   pfitobject->setParam(0, startingE, false, false);
   pfitobject->setParam(1, startingTheta, paramFlag, paramFlag);

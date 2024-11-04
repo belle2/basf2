@@ -30,7 +30,7 @@ namespace Belle2 {
      * parameters can be passed as a string. RaveVertexFitter provides the getters to extract the results produced by Rave.
      */
     class RaveVertexFitter {
-      /** I am using std::vector<int>::size_type because it is the official return value of .size() although on normal machines a ::size_type is just an unsigned int anyway. Because std::vector<int>::size_type is so long it is shortened to VecSize */
+      /** I am using std::vector<int>::size_type because it is the official return value of .size() although on normal machines a \::size_type is just an unsigned int anyway. Because std::vector<int>::size_type is so long it is shortened to VecSize */
       typedef std::vector<int>::size_type VecSize;
     public:
 

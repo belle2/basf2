@@ -129,7 +129,7 @@ namespace Belle2 {
 
 
   private:
-    /// 3-vector with positon in global coordinates
+    /// 3-vector with position in global coordinates
     ROOT::Math::XYZVector m_position;
 
     /// uncertainty on the position

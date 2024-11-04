@@ -105,17 +105,17 @@ class MCParticleHarvester(HarvestingModule):
 
         truncated, first4, first6 = VXDMomentumEnergyEstimator.generate_truncated(normalized_charge_list)
 
-        result.update({"sum_%s_charges" % name: sum(charge_list)})
-        result.update({"mean_%s_charges" % name: np.mean(charge_list)})
-        result.update({"sum_%s_normalized_charges" % name: sum(normalized_charge_list)})
-        result.update({"mean_%s_normalized_charges" % name: np.mean(normalized_charge_list)})
+        result.update({f"sum_{name}_charges": sum(charge_list)})
+        result.update({f"mean_{name}_charges": np.mean(charge_list)})
+        result.update({f"sum_{name}_normalized_charges": sum(normalized_charge_list)})
+        result.update({f"mean_{name}_normalized_charges": np.mean(normalized_charge_list)})
 
-        result.update({"sum_%s_normalized_charges_truncated" % name: sum(truncated)})
-        result.update({"mean_%s_normalized_charges_truncated" % name: np.mean(truncated)})
-        result.update({"sum_%s_normalized_charges_first4" % name: sum(first4)})
-        result.update({"mean_%s_normalized_charges_first4" % name: np.mean(first4)})
-        result.update({"sum_%s_normalized_charges_first6" % name: sum(first6)})
-        result.update({"mean_%s_normalized_charges_first6" % name: np.mean(first6)})
+        result.update({f"sum_{name}_normalized_charges_truncated": sum(truncated)})
+        result.update({f"mean_{name}_normalized_charges_truncated": np.mean(truncated)})
+        result.update({f"sum_{name}_normalized_charges_first4": sum(first4)})
+        result.update({f"mean_{name}_normalized_charges_first4": np.mean(first4)})
+        result.update({f"sum_{name}_normalized_charges_first6": sum(first6)})
+        result.update({f"mean_{name}_normalized_charges_first6": np.mean(first6)})
 
         return result
 

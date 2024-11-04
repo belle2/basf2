@@ -45,12 +45,12 @@ namespace Belle2 {
     void setEnergyConversion(double input) { m_energyConversion = input; }
 
     /*! get true deposited hadron energy
-    * @returntrue deposited hadron energy
+    * @return true deposited hadron energy
     */
     double getHadronEnergyDep() const { return m_hadronEnergyDep; }
 
     /*! get true deposited energy
-    * @returntrue deposited energy
+    * @return true deposited energy
     */
     double getEnergyDep() const { return m_energyDep; }
 
@@ -65,7 +65,7 @@ namespace Belle2 {
     double getFlightTime() const { return m_flighttime; }
 
     /*! get time shift
-    * @return  time shift
+    * @return time shift
     */
     double getTimeShift() const { return m_timeshift; }
 
@@ -80,7 +80,7 @@ namespace Belle2 {
     double m_hadronEnergyDep{0};   /**< True deposited hadron energy*/
     double m_energyDep{0};   /**< True deposited energy*/
     double m_energyConversion{0};   /**< Conversion from energy to ADC*/
-    double m_flighttime{0};   /**< True flighttime (weighted by true energy) */
+    double m_flighttime{0};   /**< True flight time (weighted by true energy) */
     double m_timeshift{0};   /**< Time shift (weighted by true energy) */
     double m_timetosensor{0};   /**< time to sensor (weighted by true energy) */
 

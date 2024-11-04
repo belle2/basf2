@@ -76,7 +76,7 @@ namespace Belle2 {
       int getClusterkind(const PXDCluster& cluster) const;
 
       /** Return kind of cluster needed to find cluster position correction. */
-      int getClusterkind(const std::vector<Pixel>& pixels, const VxdID& sensorID) const;
+      int getClusterkind(const std::vector<Belle2::PXD::Pixel>& pixels, const Belle2::VxdID& sensorID) const;
 
       /** Get sector index from angles. Sectors in thetaU and thetaV are numbered ++, -+, --, +-. */
       int getSectorIndex(double thetaU, double thetaV) const;

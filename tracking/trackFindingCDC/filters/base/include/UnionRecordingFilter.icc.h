@@ -46,7 +46,7 @@ namespace Belle2 {
 
       moduleParamList->addParameter(prefixed(prefix, "varSets"),
                                     m_param_varSetNames,
-                                    "List of names refering to concrete variable sets."
+                                    "List of names referring to concrete variable sets."
                                     "Valid names: " +
                                     join(", ", this->getValidVarSetNames()),
                                     m_param_varSetNames);
@@ -115,9 +115,9 @@ namespace Belle2 {
 
     template <class AFilter>
     auto UnionRecording<AFilter>::createVarSet(const std::string& name) const
-    -> std::unique_ptr<AVarSet> {
-      if (name.find("filter(") == 0 and name.rfind(")") == name.size() - 1)
-      {
+    -> std::unique_ptr<AVarSet>
+    {
+      if (name.find("filter(") == 0 and name.rfind(")") == name.size() - 1) {
         B2INFO("Detected filter name");
         std::string filterName = name.substr(7, name.size() - 8);
         B2INFO("filterName = " << filterName);

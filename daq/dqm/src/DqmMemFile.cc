@@ -22,9 +22,9 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   // Record parameters
   m_size = size;
   if (mode != "write" && mode != "WRITE")
-    m_mode = 0;
+    m_writeMode = false;
   else
-    m_mode = 1;
+    m_writeMode = true;
   m_name = name;
   m_memfile = NULL;
 
@@ -32,27 +32,24 @@ DqmMemFile::DqmMemFile(string name, const string& mode, int size)
   m_buf = (char*) new int[size];
 
   // Allocate shared memory
-  m_shm = new SharedMem((char*)name.c_str(), size);
+  m_shm = new DqmSharedMem((char*)name.c_str(), size, m_writeMode);
 
-  // Open TMemFile if write mode selected
-  if (m_mode == 1) {
-    m_memfile = new TMemFile(name.c_str(), m_buf, size * sizeof(int), "RECREATE");
-    m_shm->lock();
-    m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
-    m_shm->unlock();
+  // Clear/Open TMemFile if write mode selected
+  // it will check write mode by itself!
+  if (ClearSharedMem() == 0) {
     printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
-  } else
+  } else {
     printf("DqmMemFile : TMemFile is opend in READ mode.\n");
+  }
 }
 
-DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
+
+DqmMemFile::DqmMemFile(int shm_id, int sem_id, int size)
 {
+  // This defaults to read only access
   // Record parameters
   m_size = size;
-  if (mode != "write" && mode != "WRITE")
-    m_mode = 0;
-  else
-    m_mode = 1;
+  m_writeMode = false;
   m_name = "dqm_mem_file";
   m_memfile = NULL;
 
@@ -60,14 +57,8 @@ DqmMemFile::DqmMemFile(int shm_id, int sem_id, const string& mode, int size)
   m_buf = (char*) new int[size];
 
   // Allocate shared memory
-  m_shm = new SharedMem(shm_id, sem_id, size);
-
-  // Open TMemFile if write mode selected
-  if (m_mode == 1) {
-    m_memfile = new TMemFile(m_name.c_str(), m_buf, size * sizeof(int), "RECREATE");
-    printf("DqmMemFile : TMemFile is opened in WRITE mode.\n");
-  } else
-    printf("DqmMemFile : TMemFile is opend in READ mode.\n");
+  m_shm = new DqmSharedMem(shm_id, sem_id);
+  printf("DqmMemFile : TMemFile is opend in READ mode.\n");
 }
 
 // Destructor
@@ -88,17 +79,28 @@ TMemFile* DqmMemFile::GetMemFile()
 // Copy TMemFile contents to Shared Memory
 int DqmMemFile::UpdateSharedMem()
 {
-  if (m_mode == 0) return -1;
+  if (!m_writeMode) return -1;
   m_memfile->Write(0, TObject::kOverwrite);
   m_shm->lock();
-  m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+  auto ret = m_memfile->CopyTo((char*)(m_shm->ptr()), m_memfile->GetSize());
+
+  FILE* fh = fopen(("/dev/shm/tmp_" + m_name).c_str(), "wb+");
+  if (fh) {
+    fwrite(m_shm->ptr(), 1, ret, fh);
+    fclose(fh);
+    if (rename(("/dev/shm/tmp_" + m_name).c_str(), ("/dev/shm/" + m_name).c_str())) {
+      perror("Rename dhm file failed ");
+    }
+  }
+
   m_shm->unlock();
   return 0;
 }
 
 int DqmMemFile::ClearSharedMem()
 {
-  if (m_mode == 0) return -1;
+  if (!m_writeMode) return -1;
+  // Open TMemFile only if write mode selected
 
   if (m_memfile != NULL) delete m_memfile;
   m_memfile = new TMemFile(m_name.c_str(), m_buf, m_size * sizeof(int), "RECREATE");
@@ -112,7 +114,7 @@ int DqmMemFile::ClearSharedMem()
 
 TMemFile* DqmMemFile::LoadMemFile()
 {
-  if (m_mode == 1) return NULL;
+  if (m_writeMode) return NULL;
 
   if (m_memfile != NULL) {
     delete m_memfile;
@@ -122,7 +124,7 @@ TMemFile* DqmMemFile::LoadMemFile()
   memcpy(m_buf, m_shm->ptr(), m_size * sizeof(int));
   m_shm->unlock();
   //  m_memfile = new TMemFile ( m_name.c_str(), m_buf, m_size*sizeof(int), "RECREATE" );
-  m_memfile = new TMemFile(m_name.c_str(), m_buf, MEMFILESIZE);
+  m_memfile = new TMemFile(m_name.c_str(), m_buf, c_memFileSize);
   return m_memfile;
 }
 
@@ -186,9 +188,30 @@ int DqmMemFile::StreamHistograms(TDirectory* curdir, MsgHandler* msg, int& numob
   return 0;
 }
 
+bool DqmMemFile::SaveToFile(std::string outfile)
+{
+  // we do not work on shared memory, thus can directly write w/o locking
+//   m_memfile->Write(0, TObject::kOverwrite);
+//   m_memfile->WriteToFile(outfile);
 
+  printf("dump to dqm file = %s\n", outfile.c_str());
 
+  TFile* dqmtfile = new TFile(outfile.c_str(), "RECREATE");
 
+  // Copy all histograms in TFile
+  TIter next(m_memfile->GetListOfKeys());
+  TKey* key = NULL;
+  while ((key = (TKey*)next())) {
+    TH1* hist = (TH1*)key->ReadObj();
+    // printf("HistTitle %s : entries = %f\n", hist->GetName(), hist->GetEntries());
+    hist->Write();
+  }
 
+  // Close TFile
+  dqmtfile->Write();
+  dqmtfile->Close();
 
+  delete dqmtfile;
 
+  return true;
+}

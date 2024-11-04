@@ -115,15 +115,15 @@ namespace Belle2 {
     void setZ(double z) { m_z = z; }
 
     //! Set x integer coordinate
-    //! @param x x integer coordinate of the hit in 1/8 cm
+    //! @param xInt x integer coordinate of the hit in 1/8 cm
     void setXInt(int xInt) { m_xInt = xInt; }
 
     //! Set y integer coordinate
-    //! @param y y integer coordinate of the hit in 1/8 cm
+    //! @param yInt y integer coordinate of the hit in 1/8 cm
     void setYInt(int yInt) { m_yInt = yInt; }
 
     //! Set z integer coordinate
-    //! @param z z integer coordinate of the hit in 1/8 cm
+    //! @param zInt z integer coordinate of the hit in 1/8 cm
     void setZInt(int zInt) { m_zInt = zInt; }
 
   private:

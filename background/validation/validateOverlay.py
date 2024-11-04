@@ -42,14 +42,14 @@ class Histogrammer(b2.Module):
         #: list of digits histograms
         self.hist = []
         self.hist.append(TH1F('PXDDigits', 'PXDDigits (no data reduction)',
-                              200, 10000, 80000))
-        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 8000))
+                              200, 0, 100000))
+        self.hist.append(TH1F('SVDShaperDigits', 'SVDShaperDigits', 100, 0, 10000))
         self.hist.append(TH1F('SVDShaperDigitsZS5', 'ZS5 SVDShaperDigits', 100, 0, 8000))
         self.hist.append(TH1F('CDCHits', 'CDCHits above threshold', 100, 0, 6000))
         self.hist.append(TH1F('TOPDigits', 'TOPDigits', 100, 0, 2000))
         self.hist.append(TH1F('ARICHDigits', 'ARICHDigits', 100, 0, 300))
         self.hist.append(TH1F('ECLDigits', 'ECLDigits, m_Amp > 500 (roughly 25 MeV)',
-                              100, 0, 200))
+                              100, 0, 400))
         self.hist.append(TH1F('KLMDigits', 'KLMDigits', 150, 0, 150))
 
         #: list of occupancy-like histograms

@@ -15,16 +15,19 @@
  * This file implements the main executable "basf2".
  */
 
-#include <boost/python.hpp> //Has to be the first include (restriction due to python)
+#include <Python.h> //Has to be the first include (restriction due to python)
 
 #include <framework/core/Environment.h>
 #include <framework/core/DataFlowVisualization.h>
+#include <framework/core/MetadataService.h>
+#include <framework/core/Module.h>
+#include <framework/core/ModuleManager.h>
 #include <framework/core/RandomNumbers.h>
 #include <framework/logging/Logger.h>
 #include <framework/logging/LogConfig.h>
 #include <framework/logging/LogSystem.h>
 #include <framework/utilities/FileSystem.h>
-#include <framework/core/MetadataService.h>
+
 
 #include <boost/program_options.hpp>
 #include <boost/algorithm/string/predicate.hpp> //for iequals()
@@ -46,40 +49,16 @@
 
 using namespace std;
 using namespace Belle2;
-using namespace boost::python;
 
 namespace prog = boost::program_options;
 
 namespace {
-  void executePythonFile(const string& pythonFile)
+
+  void checkPythonStatus(PyConfig& config, PyStatus& status)
   {
-    // temporarily disable users' rootlogon
-    // FIXME: remove this line when ROOT-10468 is resolved
-    import("ROOT").attr("PyConfig").attr("DisableRootLogon") =  true;
-
-    object main_module = import("__main__");
-    object main_namespace = main_module.attr("__dict__");
-    if (pythonFile.empty()) {
-      // No steering file given, start an interactive ipython session
-      object interactive = import("interactive");
-      main_namespace["__b2shell_config"] = interactive.attr("basf2_shell_config")();
-      exec("import IPython; "
-           " from basf2 import *; "
-           "IPython.embed(config=__b2shell_config, header=f\"Welcome to {basf2label}\"); ",
-           main_namespace, main_namespace);
-      return;
-    }
-    // otherwise execute the steering file
-    auto fullPath = std::filesystem::absolute(std::filesystem::path(pythonFile));
-    if ((!(std::filesystem::is_directory(fullPath))) && (std::filesystem::exists(fullPath))) {
-
-      std::ifstream file(fullPath.string().c_str());
-      std::stringstream buffer;
-      buffer << file.rdbuf();
-      Environment::Instance().setSteering(buffer.str());
-      exec_file(boost::python::str(fullPath.string()), main_namespace, main_namespace);
-    } else {
-      B2FATAL("The given filename and/or path is not valid: " + pythonFile);
+    if (PyStatus_Exception(status)) {
+      PyConfig_Clear(&config);
+      Py_ExitStatusException(status);
     }
   }
 }
@@ -130,6 +109,8 @@ int main(int argc, char* argv[])
     ("arg", prog::value<vector<string> >(&arguments), "Additional arguments to be passed to the steering file")
     ("log_level,l", prog::value<string>(),
      "Set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
+    ("package_log_level", prog::value<vector<string> >(),
+     "Set package log level. Can be specified multiple times to use more than one package. (Examples: 'klm:INFO or cdc:DEBUG:10') ")
     ("random-seed", prog::value<string>(),
      "Set the default initial seed for the random number generator. "
      "This does not take precedence over calls to set_random_seed() in the steering file, but just changes the default. "
@@ -224,9 +205,22 @@ int main(int argc, char* argv[])
     } else if (varMap.count("steering")) {
       // steering file not misused as module name, so print it's name :D
       pythonFile = varMap["steering"].as<string>();
-      B2INFO("Steering file: " << pythonFile);
+    } else {
+      // launch an interactive python session.
+      pythonFile = "interactive.py";
     }
 
+    if (!pythonFile.empty()) {
+      //Search in local or central lib/ if this isn't a direct path
+      if (!std::filesystem::exists(pythonFile)) {
+        std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
+        if (!libFile.empty())
+          pythonFile = libFile;
+      }
+      if (varMap.count("steering") and not varMap.count("modules")) {
+        B2INFO("Steering file: " << pythonFile);
+      }
+    }
 
     // -p
     // Do now so that we can override if profiling is requested
@@ -347,8 +341,51 @@ int main(int argc, char* argv[])
 
       //set log level
       LogSystem::Instance().getLogConfig()->setLogLevel((LogConfig::ELogLevel)level);
-      //and make sure it takes precedence overy anything in the steeering file
+      //and make sure it takes precedence over anything in the steering file
       Environment::Instance().setLogLevelOverride(level);
+    }
+
+    // --package_log_level
+    if (varMap.count("package_log_level")) {
+      const auto& packLogList = varMap["package_log_level"].as<vector<string>>();
+      const std::string delimiter = ":";
+      for (const std::string& packLog : packLogList) {
+        if (packLog.find(delimiter) == std::string::npos) {
+          B2FATAL("In --package_log_level input " << packLog << ", no colon detected. ");
+          break;
+        }
+        /* string parsing for packageName:LOGLEVEL or packageName:DEBUG:LEVEL*/
+        auto packageName = packLog.substr(0, packLog.find(delimiter));
+        std::string logName = packLog.substr(packLog.find(delimiter) + delimiter.length(), packLog.length());
+        int debugLevel = -1;
+        if ((logName.find("DEBUG") != std::string::npos) && logName.length() > 5) {
+          try {
+            debugLevel = std::stoi(logName.substr(logName.find(delimiter) + delimiter.length(), logName.length()));
+          } catch (std::exception& e) {
+            B2WARNING("In --package_log_level, issue parsing debugLevel. Still setting log level to DEBUG.");
+          }
+          logName = "DEBUG";
+        }
+
+        int level = -1;
+        /* determine log level for package */
+        for (int i = LogConfig::c_Debug; i < LogConfig::c_Fatal; i++) {
+          std::string thisLevel = LogConfig::logLevelToString((LogConfig::ELogLevel)i);
+          if (boost::iequals(logName, thisLevel)) { //case-insensitive
+            level = i;
+            break;
+          }
+        }
+        if (level < 0) {
+          B2FATAL("Invalid log level! Needs to be one of DEBUG, INFO, RESULT, WARNING, or ERROR.");
+        }
+        /* set package log level*/
+        if ((logName == "DEBUG") && (debugLevel >= 0)) {
+          LogSystem::Instance().getPackageLogConfig(packageName).setDebugLevel(debugLevel);
+        }
+        LogSystem::Instance().getPackageLogConfig(packageName).setLogLevel((LogConfig::ELogLevel)level);
+
+      }
     }
 
     // -d
@@ -419,64 +456,64 @@ int main(int argc, char* argv[])
   //---------------------------------------------------
   //  If the python file is set, execute it
   //---------------------------------------------------
-  if (!pythonFile.empty()) {
-    //Search in local or central lib/ if this isn't a direct path
-    if (!std::filesystem::exists(pythonFile)) {
-      std::string libFile = FileSystem::findFile((libPath / pythonFile).string(), true);
-      if (!libFile.empty())
-        pythonFile = libFile;
-    }
+  PyStatus status;
+  PyConfig config;
+  PyConfig_InitPythonConfig(&config);
+  config.install_signal_handlers = 0;
+  config.safe_path = 0;
+
+  std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+
+  std::vector<wstring> pyArgvString(arguments.size() + 2);
+
+
+  pyArgvString[0] = L"python3"; //set the executable
+  pyArgvString[1] = converter.from_bytes(pythonFile);
+  for (size_t i = 0; i < arguments.size(); i++) {
+    pyArgvString[i + 2] = converter.from_bytes(arguments[i]);
+  }
+  std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
+  for (size_t i = 0; i < pyArgvString.size(); ++i) {
+    pyArgvArray[i] = pyArgvString[i].c_str();
   }
 
-  try {
-    //Init Python interpreter
-    Py_InitializeEx(0);
 
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    std::vector<wstring> pyArgvString(arguments.size() + 1);
-    // Set argument 0 to either script name or the basf2 exectuable
-    if (!pythonFile.empty()) {
-      pyArgvString[0] = converter.from_bytes(pythonFile);
-    } else {
-      pyArgvString[0] = converter.from_bytes(argv[0]);
-    }
-    for (size_t i = 0; i < arguments.size(); i++) {
-      pyArgvString[i + 1] = converter.from_bytes(arguments[i]);
-    }
-    std::vector<const wchar_t*> pyArgvArray(pyArgvString.size());
-    for (size_t i = 0; i < pyArgvString.size(); ++i) {
-      pyArgvArray[i] = pyArgvString[i].c_str();
-    }
-    //Pass python filename and additional arguments to python
-    PySys_SetArgv(pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
+  //Pass python filename and additional arguments to python
+  status = PyConfig_SetArgv(&config, pyArgvArray.size(), const_cast<wchar_t**>(pyArgvArray.data()));
+  checkPythonStatus(config, status);
 
-    //Execute Python file
-    executePythonFile(pythonFile);
+  status = Py_InitializeFromConfig(&config);
+  checkPythonStatus(config, status);
 
-    //Finish Python interpreter
-    Py_Finalize();
+  auto fullPath = std::filesystem::absolute(std::filesystem::path(pythonFile));
 
-    //basf2.py was loaded, now do module I/O visualization
-    if (!runModuleIOVisualization.empty()) {
-      DataFlowVisualization::executeModuleAndCreateIOPlot(runModuleIOVisualization);
-    }
-
-    //--dry-run: print gathered information
-    if (Environment::Instance().getDryRun()) {
-      Environment::Instance().printJobInformation();
-    }
-
-    //Report completion in json metadata
-    MetadataService::Instance().addBasf2Status("finished successfully");
-    MetadataService::Instance().finishBasf2();
-  } catch (error_already_set&) {
-    //Apparently an exception occured which wasn't handled. So print the traceback
-    PyErr_Print();
-    //And in rare cases, i.e. when redirecting output, the buffers are not
-    //flushed unless we finalize python. So do it now
-    Py_Finalize();
-    return 1;
+  if ((std::filesystem::is_directory(fullPath)) || !(std::filesystem::exists(fullPath))) {
+    B2FATAL("The given filename and/or path is not valid: " + pythonFile);
   }
 
-  return 0;
+  std::ifstream file(fullPath.string().c_str());
+  std::stringstream buffer;
+  buffer << file.rdbuf();
+  Environment::Instance().setSteering(buffer.str());
+  int pyReturnValue = Py_RunMain();
+
+  //Finish Python interpreter
+  PyConfig_Clear(&config);
+  Py_Finalize();
+
+  //basf2.py was loaded, now do module I/O visualization
+  if (!runModuleIOVisualization.empty()) {
+    DataFlowVisualization::executeModuleAndCreateIOPlot(runModuleIOVisualization);
+  }
+
+  //--dry-run: print gathered information
+  if (Environment::Instance().getDryRun()) {
+    Environment::Instance().printJobInformation();
+  }
+
+  //Report completion in json metadata
+  MetadataService::Instance().addBasf2Status("finished successfully");
+  MetadataService::Instance().finishBasf2();
+
+  return pyReturnValue;
 }

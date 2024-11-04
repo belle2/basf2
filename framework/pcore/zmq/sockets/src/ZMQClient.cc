@@ -120,7 +120,7 @@ int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, i
   auto start = std::chrono::system_clock::now();
   int return_bitmask = 0;
   assert(socketList.size() <= 2);
-  zmq::pollitem_t items[socketList.size()];
+  std::vector<zmq::pollitem_t> items(socketList.size());
 
   for (unsigned int i = 0; i < socketList.size(); i++) {
     items[i].socket = static_cast<void*>(*socketList[i]);
@@ -130,7 +130,7 @@ int ZMQClient::pollSocketVector(const std::vector<zmq::socket_t*>& socketList, i
 
   while (timeout >= 0) {
     try {
-      zmq::poll(items, socketList.size(), timeout);
+      zmq::poll(items.data(), socketList.size(), timeout);
 
       for (unsigned int i = 0; i < socketList.size(); i++) {
         if (static_cast<bool>(items[i].revents & ZMQ_POLLIN)) {

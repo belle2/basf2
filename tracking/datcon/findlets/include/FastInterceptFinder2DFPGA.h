@@ -55,7 +55,7 @@ namespace Belle2 {
       return (layercount >= 3 ? layercount : 0);
     }
 
-    /// find intercepts in the 2D Hough Space by recursively calling itself until no hits are assinged
+    /// find intercepts in the 2D Hough Space by recursively calling itself until no hits are assigned
     /// to a given Hough Space cell, or until the maximum number of recursions (m_maxRecursionLevel) is reached
     /// @param hits vector containing the hits that are used for track finding
     /// @param xmin minimum x-index of the sub-Hough Space in the current recursion step
@@ -66,7 +66,7 @@ namespace Belle2 {
     void fastInterceptFinder2d(const std::vector<std::pair<VxdID, std::pair<long, long>>>& hits,
                                uint xmin, uint xmax, uint ymin, uint ymax, uint currentRecursion);
 
-    /// Find Hough Space clusters. Looop over all found sectors in m_SectorArray and then calls
+    /// Find Hough Space clusters. Loop over all found sectors in m_SectorArray and then calls
     /// the DepthFirstSearch function to recursively find the clusters
     void FindHoughSpaceCluster();
 

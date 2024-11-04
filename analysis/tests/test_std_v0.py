@@ -9,8 +9,13 @@
 ##########################################################################
 
 import unittest
-from basf2 import create_path
+import tempfile
+import b2test_utils
+
+from basf2 import create_path, process
+import modularAnalysis as ma
 import stdV0s
+from ROOT import TFile
 
 
 class TestStdV0(unittest.TestCase):
@@ -91,6 +96,50 @@ class TestStdV0(unittest.TestCase):
                             "ParticleListManipulator"]
         expected_lists = ['V0_ToFit', 'V0_ToFit', 'all', 'all', 'RD', 'merged']
         self._check_list(std_function=stdV0s.stdLambdas, expected_modules=expected_modules, expected_lists=expected_lists)
+
+    def test_kshort_signals(self):
+        """check the number of signals in K_S0:merged and K_S0:scaled lists"""
+
+        main = create_path()
+
+        inputfile = b2test_utils.require_file('analysis/1000_B_Jpsi_ks_pipi.root', 'validation', py_case=self)
+        ma.inputMdst(inputfile, path=main)
+
+        stdV0s.stdKshorts(path=main)  # -> K_S0:merged
+        stdV0s.scaleErrorKshorts(path=main)  # -> K_S0:scaled
+
+        ma.matchMCTruth('K_S0:merged', path=main)
+        ma.matchMCTruth('K_S0:scaled', path=main)
+
+        testFile = tempfile.NamedTemporaryFile()
+        ma.variablesToNtuple('K_S0:merged', ['isSignal', 'M'], filename=testFile.name, treename='merged', path=main)
+        ma.variablesToNtuple('K_S0:scaled', ['isSignal', 'M'], filename=testFile.name, treename='scaled', path=main)
+
+        process(main)
+
+        ntuplefile = TFile(testFile.name)
+        ntuple_merged = ntuplefile.Get('merged')
+        ntuple_scaled = ntuplefile.Get('scaled')
+
+        allSig_merged = ntuple_merged.GetEntries("isSignal == 1")
+        allSig_scaled = ntuple_scaled.GetEntries("isSignal == 1")
+
+        print(f"Number of signal K_S0:merged: {allSig_merged}")
+        print(f"Number of signal K_S0:scaled: {allSig_scaled}")
+
+        self.assertTrue(allSig_merged > 999,  "Number of signal K_S0:merged is too small.")
+        self.assertTrue(allSig_scaled > 1000, "Number of signal K_S0:scaled is too small.")
+
+        tightMSig_merged = ntuple_merged.GetEntries("isSignal == 1 && M > 0.48 && M < 0.52")
+        tightMSig_scaled = ntuple_scaled.GetEntries("isSignal == 1 && M > 0.48 && M < 0.52")
+
+        print(f"Number of signal K_S0:merged with 0.48<M<0.52: {tightMSig_merged}")
+        print(f"Number of signal K_S0:scaled with 0.48<M<0.52: {tightMSig_scaled}")
+
+        self.assertTrue(tightMSig_merged > 962, "Number of signal K_S0:merged with 0.48<M<0.52 is too small.")
+        self.assertTrue(tightMSig_scaled > 962, "Number of signal K_S0:scaled with 0.48<M<0.52  is too small.")
+
+        print("Test passed, cleaning up.")
 
 
 if __name__ == '__main__':

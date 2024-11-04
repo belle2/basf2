@@ -141,7 +141,7 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule()
   // Inputs
   addParam("prRecoTracksStoreArrayName",
            m_prRecoTracksStoreArrayName,
-           "Name of the collection containing the tracks as generate a patter recognition algorithm to be evaluated ",
+           "Name of the collection containing the tracks as generate a pattern recognition algorithm to be evaluated ",
            std::string(""));
 
   addParam("mcRecoTracksStoreArrayName",
@@ -250,7 +250,7 @@ void MCRecoTracksMatcherModule::event()
   int nMCRecoTracks = m_MCRecoTracks.getEntries();
   int nPRRecoTracks = m_PRRecoTracks.getEntries();
 
-  B2DEBUG(23, "Number patter recognition tracks is " << nPRRecoTracks);
+  B2DEBUG(23, "Number pattern recognition tracks is " << nPRRecoTracks);
   B2DEBUG(23, "Number Monte-Carlo tracks is " << nMCRecoTracks);
 
   if (not nMCRecoTracks or not nPRRecoTracks) {
@@ -264,7 +264,7 @@ void MCRecoTracksMatcherModule::event()
   std::multimap<DetHitIdPair, WeightedRecoTrackId > mcId_by_hitId;
   fillIDsFromStoreArray(mcId_by_hitId, m_MCRecoTracks);
 
-  //  Use set instead of multimap to handel to following situation
+  //  Use set instead of multimap to handle to following situation
   //  * One hit may be assigned to multiple tracks should contribute to the efficiency of both tracks
   //  * One hit assigned twice or more to the same track should not contribute to the purity multiple times
   //  The first part is handled well by the multimap. But to enforce that one hit is also only assigned
@@ -300,7 +300,7 @@ void MCRecoTracksMatcherModule::event()
   Eigen::MatrixXd weightedConfusionMatrix = Eigen::MatrixXd::Zero(nPRRecoTracks, nMCRecoTracks + 1);
 
   // Accumulated the total number of hits/ndf for each Monte-Carlo track separately to avoid double counting,
-  // in case patter recognition tracks share hits.
+  // in case pattern recognition tracks share hits.
   Eigen::RowVectorXd totalNDF_by_mcId = Eigen::RowVectorXd::Zero(nMCRecoTracks + 1);
   Eigen::RowVectorXd totalWeight_by_mcId = Eigen::RowVectorXd::Zero(nMCRecoTracks + 1);
 
@@ -343,7 +343,7 @@ void MCRecoTracksMatcherModule::event()
                                   CompDetHitIdPair()));
 
       // Assign the hits/ndf to the total ndf vector separately to avoid double counting,
-      // if patter recognition track share hits.
+      // if pattern recognition track share hits.
       if (mcIds_for_detId_hitId_pair.empty()) {
         // If the hit is not assigned to any mcRecoTrack
         // The hit is assigned to the background column
@@ -408,7 +408,7 @@ void MCRecoTracksMatcherModule::event()
   B2DEBUG(23, "Weighted efficiencies");
   B2DEBUG(23, weightedEfficiencyMatrix);
 
-  // ### Building the Monte-Carlo track to highest efficiency patter recognition track relation ###
+  // ### Building the Monte-Carlo track to highest efficiency pattern recognition track relation ###
   // Weighted efficiency
   using Efficiency = float;
   using Purity = float;
@@ -461,7 +461,7 @@ void MCRecoTracksMatcherModule::event()
     mostWeightEfficientPRId_by_mcId[mcId] = {bestPrId, bestWeightedEfficiency, bestEfficiency};
   }
 
-  // ### Building the patter recognition track to highest purity Monte-Carlo track relation ###
+  // ### Building the pattern recognition track to highest purity Monte-Carlo track relation ###
   // Unweighted purity
   struct MostPureMCId {
     RecoTrackId id;
@@ -478,7 +478,7 @@ void MCRecoTracksMatcherModule::event()
     mostPureMCId_by_prId[prId] = {mcId, highestPurity};
   }
 
-  // Log the  Monte-Carlo track to highest efficiency patter recognition track relation
+  // Log the  Monte-Carlo track to highest efficiency pattern recognition track relation
   // Weighted efficiency
   {
     RecoTrackId mcId = -1;
@@ -493,7 +493,7 @@ void MCRecoTracksMatcherModule::event()
     }
   }
 
-  // Log the patter recognition track to highest purity Monte-Carlo track relation
+  // Log the pattern recognition track to highest purity Monte-Carlo track relation
   // Unweighted purity
   {
     RecoTrackId prId = -1;
@@ -509,7 +509,7 @@ void MCRecoTracksMatcherModule::event()
   // Count the categories
   int nMatched{}, nWrongCharge{}, nBackground{}, nClones{}, nClonesWrongCharge{}, nGhost{};
 
-  // ### Classify the patter recognition tracks ###
+  // ### Classify the pattern recognition tracks ###
   // Means saving the highest purity relation to the data store
   // + setup the PRTrack to MCParticle relation
   // + save the set the MatchingStatus
@@ -541,8 +541,8 @@ void MCRecoTracksMatcherModule::event()
 
     // After the classification for bad purity and background we examine,
     // whether the highest purity Monte-Carlo track has in turn the highest efficiency
-    // patter recognition track equal to this track.
-    // All extra patter recognition tracks are marked as clones.
+    // pattern recognition track equal to this track.
+    // All extra pattern recognition tracks are marked as clones.
 
     RecoTrack* mcRecoTrack = m_MCRecoTracks[mcId];
     MCParticle* mcParticle = mcRecoTrack->getRelated<MCParticle>();
@@ -641,7 +641,6 @@ void MCRecoTracksMatcherModule::event()
     // regardless whether the charge is correctly reconstructed or not
     prRecoTrack->addRelationTo(mcRecoTrack, -purity);
     prRecoTrack->addRelationTo(mcParticle, -purity);
-    ++nClones;
 
     // Add the mc matching relation to the mc particle
     B2DEBUG(23, "Stored PRTrack " << prId << " as clone.");
@@ -654,7 +653,7 @@ void MCRecoTracksMatcherModule::event()
   B2DEBUG(23, "Number of matches " << nMatched);
   B2DEBUG(23, "Number of wrongCharge " << nWrongCharge);
   B2DEBUG(23, "Number of clones " << nClones);
-  B2DEBUG(23, "Number of clones wrongCharge" << nClonesWrongCharge);
+  B2DEBUG(23, "Number of clones wrongCharge " << nClonesWrongCharge);
   B2DEBUG(23, "Number of bkg " << nBackground);
   B2DEBUG(23, "Number of ghost " << nGhost);
 
@@ -712,10 +711,10 @@ void MCRecoTracksMatcherModule::event()
     // No related pattern recognition track
     // Do not create a relation.
     B2DEBUG(23, "mcId " << mcId << " is missing. No relation created.");
-    B2DEBUG(23, "is Primary" << m_MCRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
+    B2DEBUG(23, "is Primary " << m_MCRecoTracks[mcId]->getRelatedTo<MCParticle>()->isPrimaryParticle());
     B2DEBUG(23, "best prId " << prId << " with purity " << mostPureMCId_for_prId.purity << " -> " << mostPureMCId);
     B2DEBUG(23, "MC Total ndf " << totalNDF_by_mcId[mcId]);
-    B2DEBUG(23, "MC Total weight" << totalWeight_by_mcId[mcId]);
+    B2DEBUG(23, "MC Total weight " << totalWeight_by_mcId[mcId]);
     B2DEBUG(23, "MC Overlap ndf\n " << confusionMatrix.col(mcId).transpose());
     B2DEBUG(23, "MC Overlap weight\n " << weightedConfusionMatrix.col(mcId).transpose());
     B2DEBUG(23, "MC Efficiencies for the track\n" << efficiencyMatrix.col(mcId).transpose());

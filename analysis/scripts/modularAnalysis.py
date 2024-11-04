@@ -266,7 +266,7 @@ def setupEventInfo(noEvents, path):
     Prepare to generate events. This function sets up the EventInfoSetter.
     You should call this before adding a generator from generators.
     The experiment and run numbers are set to 0 (run independent generic MC in phase 3).
-    https://confluence.desy.de/display/BI/Experiment+numbering
+    https://xwiki.desy.de/xwiki/rest/p/59192
 
     Parameters:
         noEvents (int): number of events to be generated
@@ -741,13 +741,42 @@ def scaleTrackMomenta(inputListNames, scale=float('nan'), payloadName="", scalin
     if b2bii.isB2BII():
         B2ERROR("The tracking momentum scaler can only be run over Belle II data.")
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('scale', scale)
-    trackingmomentum.param('payloadName', payloadName)
-    trackingmomentum.param('scalingFactorName', scalingFactorName)
+    TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
+    TrackingMomentumScaleFactors.param('particleLists', inputListNames)
+    TrackingMomentumScaleFactors.param('scale', scale)
+    TrackingMomentumScaleFactors.param('payloadName', payloadName)
+    TrackingMomentumScaleFactors.param('scalingFactorName', scalingFactorName)
 
-    path.add_module(trackingmomentum)
+    path.add_module(TrackingMomentumScaleFactors)
+
+
+def correctTrackEnergy(inputListNames, correction=float('nan'), payloadName="", correctionName="SF", path=None):
+    """
+    Correct the energy loss of tracks according to a 'correction' value.
+    This correction can either be given as constant number or as the name of the payload which contains
+    the variable corrections.
+    If the particle list contains composite particles, the momenta of the track-based daughters are corrected.
+    Subsequently, the momentum of the mother particle is updated as well.
+
+    Parameters:
+        inputListNames (list(str)): input particle list names
+        correction (float): correction value to be subtracted to the particle energy (0.0 -- no correction)
+        payloadName (str): name of the payload which contains the phase-space dependent scaling factors
+        correctionName (str): name of correction variable in the payload.
+        path (basf2.Path): module is added to this path
+    """
+
+    import b2bii
+    if b2bii.isB2BII():
+        B2ERROR("The tracking energy correction can only be run over Belle II data.")
+
+    TrackingEnergyLossCorrection = register_module('TrackingEnergyLossCorrection')
+    TrackingEnergyLossCorrection.param('particleLists', inputListNames)
+    TrackingEnergyLossCorrection.param('correction', correction)
+    TrackingEnergyLossCorrection.param('payloadName', payloadName)
+    TrackingEnergyLossCorrection.param('correctionName', correctionName)
+
+    path.add_module(TrackingEnergyLossCorrection)
 
 
 def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear", path=None):
@@ -758,17 +787,17 @@ def smearTrackMomenta(inputListNames, payloadName="", smearingFactorName="smear"
 
     Parameters:
         inputListNames (list(str)): input particle list names
-        payloadName (str): name of the payload which contains the smearing valuess
+        payloadName (str): name of the payload which contains the smearing values
         smearingFactorName (str): name of smearing factor variable in the payload.
         path (basf2.Path): module is added to this path
     """
 
-    trackingmomentum = register_module('TrackingMomentum')
-    trackingmomentum.param('particleLists', inputListNames)
-    trackingmomentum.param('payloadName', payloadName)
-    trackingmomentum.param('smearingFactorName',  smearingFactorName)
+    TrackingMomentumScaleFactors = register_module('TrackingMomentumScaleFactors')
+    TrackingMomentumScaleFactors.param('particleLists', inputListNames)
+    TrackingMomentumScaleFactors.param('payloadName', payloadName)
+    TrackingMomentumScaleFactors.param('smearingFactorName',  smearingFactorName)
 
-    path.add_module(trackingmomentum)
+    path.add_module(TrackingMomentumScaleFactors)
 
 
 def mergeListsWithBestDuplicate(outputListName,
@@ -1634,23 +1663,22 @@ def reconstructMissingKlongDecayExpert(decayString,
                                        path=None,
                                        recoList="_reco"):
     """
-    Creates a list of K_L0's with their momentum determined from kinematic constraints of B->K_L0 + something else.
+    Creates a list of K_L0's and of B -> K_L0 + X, with X being a fully-reconstructed state.
+    The K_L0 momentum is determined from kinematic constraints of the two-body B decay into K_L0 and X
 
     @param decayString DecayString specifying what kind of the decay should be reconstructed
                        (from the DecayString the mother and daughter ParticleLists are determined)
-    @param cut         Particles are added to the K_L0 ParticleList if they
+    @param cut         Particles are added to the K_L0 and B ParticleList if the B candidates
                        pass the given cuts (in VariableManager style) and rejected otherwise
     @param dmID        user specified decay mode identifier
     @param writeOut    whether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
-    @param recoList    suffix appended to original K_L0 ParticleList that identifies the newly created K_L0 list
+    @param recoList    suffix appended to original K_L0 and B ParticleList that identify the newly created K_L0 and B lists
     """
 
     pcalc = register_module('KlongMomentumCalculatorExpert')
     pcalc.set_name('KlongMomentumCalculatorExpert_' + decayString)
     pcalc.param('decayString', decayString)
-    pcalc.param('cut', cut)
-    pcalc.param('decayMode', dmID)
     pcalc.param('writeOut', writeOut)
     pcalc.param('recoList', recoList)
     path.add_module(pcalc)
@@ -1996,7 +2024,8 @@ def printList(list_name, full, path):
 
 
 def variablesToNtuple(decayString, variables, treename='variables', filename='ntuple.root', path=None, basketsize=1600,
-                      signalSideParticleList="", filenameSuffix=""):
+                      signalSideParticleList="", filenameSuffix="", useFloat=False, storeEventType=True,
+                      ignoreCommandLineOverride=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager.
     If a decayString is provided, then there will be one entry per candidate (for particle in list of candidates).
@@ -2012,6 +2041,11 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
         signalSideParticleList (str): The name of the signal-side ParticleList.
                                       Only valid if the module is called in a for_each loop over the RestOfEvent.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+        useFloat (bool): Use single precision (float) instead of double precision (double)
+                         for floating-point numbers.
+        storeEventType (bool) : if true, the branch __eventType__ is added for the MC event type information.
+                                The information is available from MC16 on.
+        ignoreCommandLineOverride (bool) : if true, ignore override of file name via command line argument ``-o``.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2025,6 +2059,9 @@ def variablesToNtuple(decayString, variables, treename='variables', filename='nt
     output.param('basketSize', basketsize)
     output.param('signalSideParticleList', signalSideParticleList)
     output.param('fileNameSuffix', filenameSuffix)
+    output.param('useFloat', useFloat)
+    output.param('storeEventType', storeEventType)
+    output.param('ignoreCommandLineOverride', ignoreCommandLineOverride)
     path.add_module(output)
 
 
@@ -2035,7 +2072,8 @@ def variablesToHistogram(decayString,
                          path=None, *,
                          directory=None,
                          prefixDecayString=False,
-                         filenameSuffix=""):
+                         filenameSuffix="",
+                         ignoreCommandLineOverride=False):
     """
     Creates and fills a flat ntuple with the specified variables from the VariableManager
 
@@ -2050,6 +2088,7 @@ def variablesToHistogram(decayString,
         prefixDecayString (bool): If True the decayString will be prepended to the directory name to allow for more
             programmatic naming of the structure in the file.
         filenameSuffix (str): suffix to be appended to the filename before ``.root``.
+        ignoreCommandLineOverride (bool) : if true, ignore override of file name via command line argument ``-o``.
 
     .. tip:: The output filename can be overridden using the ``-o`` argument of basf2.
     """
@@ -2063,6 +2102,7 @@ def variablesToHistogram(decayString,
     output.param('variables_2d', variables_2d)
     output.param('fileName', filename)
     output.param('fileNameSuffix', filenameSuffix)
+    output.param('ignoreCommandLineOverride', ignoreCommandLineOverride)
     if directory is not None or prefixDecayString:
         if directory is None:
             directory = ""
@@ -3339,8 +3379,8 @@ def getBeamBackgroundProbability(particleList, weight, path=None):
     """
 
     import b2bii
-    if b2bii.isB2BII():
-        B2ERROR("The beam background MVA is not trained for Belle data.")
+    if b2bii.isB2BII() and weight != "Belle":
+        B2WARNING("weight type must be 'Belle' for b2bii.")
 
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -3357,8 +3397,8 @@ def getFakePhotonProbability(particleList, weight, path=None):
     """
 
     import b2bii
-    if b2bii.isB2BII():
-        B2ERROR("The fake photon MVA is not trained for Belle data.")
+    if b2bii.isB2BII() and weight != "Belle":
+        B2WARNING("weight type must be 'Belle' for b2bii.")
 
     path.add_module('MVAExpert',
                     listNames=particleList,
@@ -4166,6 +4206,41 @@ def correctEnergyBias(inputListNames, tableName, path=None):
     path.add_module(correctenergybias)
 
 
+def twoBodyISRPhotonCorrector(outputListName, inputListName, massiveParticle, path=None):
+    """
+    Sets photon kinematics to corrected values in two body decays with an ISR photon
+    and a massive particle. The original photon kinematics are kept in the input
+    particleList and can be accessed using the originalParticle() metavariable on the
+    new list.
+
+    @param ouputListName    new ParticleList filled with copied Particles
+    @param inputListName    input ParticleList with original Particles
+    @param massiveParticle  name or PDG code of massive particle participating in the two
+                            body decay with the ISR photon
+    @param path             modules are added to this path
+    """
+
+    # set the corrected energy of the photon in a new list
+    photon_energy_correction = register_module('TwoBodyISRPhotonCorrector')
+    photon_energy_correction.set_name('TwoBodyISRPhotonCorrector_' + outputListName)
+    photon_energy_correction.param('outputGammaList', outputListName)
+    photon_energy_correction.param('inputGammaList', inputListName)
+
+    # prepare PDG code of massive particle
+    if isinstance(massiveParticle, int):
+        photon_energy_correction.param('massiveParticlePDGCode', massiveParticle)
+    else:
+        from ROOT import Belle2
+        decayDescriptor = Belle2.DecayDescriptor()
+        if not decayDescriptor.init(massiveParticle):
+            raise ValueError("TwoBodyISRPhotonCorrector: value of massiveParticle must be" +
+                             " an int or valid decay string.")
+        pdgCode = decayDescriptor.getMother().getPDGCode()
+        photon_energy_correction.param('massiveParticlePDGCode', pdgCode)
+
+    path.add_module(photon_energy_correction)
+
+
 def addPhotonEfficiencyRatioVariables(inputListNames, tableName, path=None):
     """
     Add photon Data/MC detection efficiency ratio weights to the specified particle list
@@ -4351,8 +4426,31 @@ def reconstructDecayWithNeutralHadron(decayString, cut, allowGamma=False, allowA
     path.add_module(module)
 
 
+def updateMassHypothesis(particleList, pdg, writeOut=False, path=None):
+    """
+    Module to update the mass hypothesis of a given input particle list with the chosen PDG.
+    A new particle list is created with updated mass hypothesis.
+    The allowed mass hypotheses for both input and output are electrons, muons, pions, kaons and protons.
+
+    .. note:
+        The new particle list is named after the input one, with the additional suffix ``_converted_from_OLDHYPOTHESIS``,
+        e.g. ``e+:all`` converted to muons becomes ``mu+:all_converted_from_e``.
+
+    @param particleList The input particle list name
+    @param pdg          The PDG code for the new mass hypothesis, in [11, 13, 211, 321, 2212]
+    @param writeOut     Whether `RootOutput` module should save the new particle list
+    @param path         Modules are added to this path
+    """
+    mass_updater = register_module("ParticleMassHypothesesUpdater")
+    mass_updater.set_name("ParticleMassHypothesesUpdater_" + particleList + "_to_" + str(pdg))
+    mass_updater.param("particleList", particleList)
+    mass_updater.param("writeOut", writeOut)
+    mass_updater.param("pdgCode", pdg)
+    path.add_module(mass_updater)
+
+
 func_requiring_analysisGT = [
-    scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
+    correctTrackEnergy, scaleTrackMomenta, smearTrackMomenta, oldwritePi0EtaVeto, writePi0EtaVeto, lowEnergyPi0Identification,
     getBeamBackgroundProbability, getFakePhotonProbability, tagCurlTracks, applyChargedPidMVA, correctEnergyBias,
     addPhotonEfficiencyRatioVariables, addPi0VetoEfficiencySystematics, getNbarIDMVA]
 for _ in func_requiring_analysisGT:

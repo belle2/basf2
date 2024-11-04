@@ -9,5 +9,6 @@
 #pragma link C++ class Belle2::CDCDedxLikelihood+; // checksum=0x6c4f61c2, version=1
 #pragma link C++ class Belle2::VXDDedxTrack+; // checksum=0xf617c631, version=2
 #pragma link C++ class Belle2::VXDDedxLikelihood+; // checksum=0x60780d62, version=1
+#pragma link C++ class Belle2::KLMMuonIDDNNInputVariable+; // checksum=0x7c1d0107, version=1
 
 #endif

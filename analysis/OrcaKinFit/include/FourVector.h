@@ -19,13 +19,13 @@
 
 #include "analysis/OrcaKinFit/ThreeVector.h"
 
-namespace Belle2 {
-
-  namespace OrcaKinFit {
-
 #include <iostream>
 #include <cmath>
 #include <cassert>
+
+namespace Belle2 {
+
+  namespace OrcaKinFit {
 
 //  Class FourVector:
 /// Yet another four vector class, with metric +---

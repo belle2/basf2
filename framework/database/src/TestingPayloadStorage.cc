@@ -179,7 +179,7 @@ namespace Belle2::Conditions {
         int fileDescriptor = mkstemp(temporaryFileName);
         if ((fileDescriptor == -1) && (errno != EINTR)) {
           B2ERROR("Cannot create payload file:" << strerror(errno));
-          delete temporaryFileName;
+          delete[] temporaryFileName;
           return false;
         }
         if (fileDescriptor > 0) {
@@ -191,7 +191,7 @@ namespace Belle2::Conditions {
       }
       if (!writer(sourcefile.string())) return false;
     }
-    delete temporaryFileName;
+    delete[] temporaryFileName;
     // If we created a temporary file we want to delete it again so we'd like to
     // use a scope guard to do so. However we need it in this scope so we need
     // to create one in any case and release it if we didn't create a temporary

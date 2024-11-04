@@ -181,3 +181,5 @@ if __name__ == '__main__':
     basf2.process(main)
 
     print(basf2.statistics)
+
+# @endcond

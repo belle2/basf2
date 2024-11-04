@@ -23,7 +23,7 @@ using namespace Belle2;
 REG_MODULE(KoralWInput);
 
 
-KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_smearVertex)
+KoralWInputModule::KoralWInputModule() : GeneratorBaseModule(), m_initial(BeamParameters::c_smearVertex)
 {
   //Set module properties
   setDescription("Generates four fermion final state events with KoralW.");
@@ -33,13 +33,14 @@ KoralWInputModule::KoralWInputModule() : Module(), m_initial(BeamParameters::c_s
            FileSystem::findFile("/data/generators/koralw"));
   addParam("UserDataFile",  m_userDataFile, "The filename of the user KoralW input data file.",
            FileSystem::findFile("/data/generators/koralw/KoralW_eeee.data"));
+
 }
 
 KoralWInputModule::~KoralWInputModule()
 {
 }
 
-void KoralWInputModule::initialize()
+void KoralWInputModule::generatorInitialize()
 {
   StoreArray<MCParticle> mcparticle;
   mcparticle.registerInDataStore();
@@ -52,7 +53,7 @@ void KoralWInputModule::initialize()
   m_initialized = true;
 }
 
-void KoralWInputModule::event()
+void KoralWInputModule::generatorEvent()
 {
   // Check if KoralW is properly initialized.
   if (not m_initialized)

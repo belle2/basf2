@@ -9,6 +9,7 @@
 #pragma once
 
 #include <dqm/core/DQMHistAnalysis.h>
+#include <vxd/dataobjects/VxdID.h>
 
 #include <vector>
 
@@ -54,6 +55,10 @@ namespace Belle2 {
     /** Monitoring Object to be produced by this module, which contain defined canvases and monitoring variables */
     MonitoringObject* m_monObj = nullptr;
 
+    //! IDs of all SVD Modules to iterate over
+    std::vector<VxdID> m_SVDModules;
+
+
     /**
     * Calculate avg offline occupancy for one specific sensor, especially with high occupancy
     * @param iLayer index of layer
@@ -75,6 +80,16 @@ namespace Belle2 {
     * @return vector with values for U and V sides
     */
     std::vector<float> avgOccupancyUV(int iLayer, TH1F* hU, TH1F* hV, int min, int max, int offset, int step, int nEvents) const;
+
+
+    /**
+     * Calculate avg offline occupancy for specified layer for time group id = 0
+     * @param iLayer index of layer
+     * @param nEvents number of events
+     * @return vector with values for U and V sides
+     */
+    std::vector<float>  avgOccupancyGrpId0UV(int iLayer, int nEvents) const;
+
 
     /**
     * Calculate avg efficiency for specified sensors

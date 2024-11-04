@@ -39,7 +39,6 @@
 
 #include <sstream>
 
-using namespace std;
 using namespace Belle2;
 using boost::property_tree::ptree;
 
@@ -109,8 +108,8 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
 
   OnlineToOfflineMapFileName.hasChanged();
 
-  unique_ptr<SVDOnlineToOfflineMap> map =
-    make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
+  std::unique_ptr<SVDOnlineToOfflineMap> map =
+    std::make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
   payload.construct(defaultValue, xmlFileName);
 
@@ -126,8 +125,8 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
 
     if (backEndLayoutChild.first == "fadc") {
       int FADCid(0);
-      string FADCidString = backEndLayoutChild.second.get<string>("<xmlattr>.id");
-      stringstream ss;
+      std::string FADCidString = backEndLayoutChild.second.get<std::string>("<xmlattr>.id");
+      std::stringstream ss;
       ss << std::hex << FADCidString;
       ss >> FADCid;
 
@@ -151,11 +150,11 @@ void SVDLocalCalibrationsImporter::importSVDCalibrationsFromXML(const std::strin
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
               int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
-              string valuesString = apvChild.second.get<string>(xmlTag) ;
+              std::string valuesString = apvChild.second.get<std::string>(xmlTag) ;
               B2DEBUG(10, xmlTag << " APV25ID" << apv25ADCid << " "
                       << valuesString << "\n~~~~~~~~\n");
 
-              stringstream ssn;
+              std::stringstream ssn;
               ssn << valuesString;
               double value;
               for (int apvChannel  = 0 ; apvChannel < 128; apvChannel ++) {
@@ -218,8 +217,8 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
 
   OnlineToOfflineMapFileName.hasChanged();
 
-  unique_ptr<SVDOnlineToOfflineMap> map =
-    make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
+  std::unique_ptr<SVDOnlineToOfflineMap> map =
+    std::make_unique<SVDOnlineToOfflineMap>(OnlineToOfflineMapFileName->getFileName());
 
   pulseShapes.construct(SVDStripCalAmp(), xmlFileName);
 
@@ -235,8 +234,8 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
 
     if (backEndLayoutChild.first == "fadc") {
       int FADCid(0);
-      string FADCidString = backEndLayoutChild.second.get<string>("<xmlattr>.id");
-      stringstream ss;
+      std::string FADCidString = backEndLayoutChild.second.get<std::string>("<xmlattr>.id");
+      std::stringstream ss;
       ss << std::hex << FADCidString;
       ss >> FADCid;
 
@@ -259,17 +258,17 @@ void SVDLocalCalibrationsImporter::importSVDCalAmpCalibrationsFromXML(const std:
           for (ptree::value_type const& apvChild : fadcChild.second.get_child("")) {
             if (apvChild.first == "apv25") {
               int apv25ADCid = apvChild.second.get<int>("<xmlattr>.id");
-              string ampString = apvChild.second.get<string>("cal_peaks") ;
-              string widthString = apvChild.second.get<string>("cal_width") ;
-              string peakTimeString = apvChild.second.get<string>("cal_peak_time") ;
+              std::string ampString = apvChild.second.get<std::string>("cal_peaks") ;
+              std::string widthString = apvChild.second.get<std::string>("cal_width") ;
+              std::string peakTimeString = apvChild.second.get<std::string>("cal_peak_time") ;
 
-              stringstream ssAmp;
+              std::stringstream ssAmp;
               ssAmp << ampString;
 
-              stringstream ssWidth;
+              std::stringstream ssWidth;
               ssWidth << widthString;
 
-              stringstream ssPeak;
+              std::stringstream ssPeak;
               ssPeak << peakTimeString;
 
               double amp, width, peakTime;

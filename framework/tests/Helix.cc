@@ -9,7 +9,8 @@
 
 #include <Math/VectorUtil.h>
 #include <Math/Vector2D.h>
-#include <TVector3.h>
+#include <Math/Vector3D.h>
+#include <TMatrixD.h>
 #include <TRandom3.h>
 
 #include <framework/utilities/TestHelpers.h>
@@ -20,14 +21,14 @@ using namespace std;
 using namespace Belle2;
 using namespace HelixParameterIndex;
 
-/// String output operator for a TVector3 for gtest print support.
-std::ostream& operator<<(::std::ostream& output, const TVector3& tVector3)
+/// String output operator for a ROOT::Math::XYZVector for gtest print support.
+std::ostream& operator<<(::std::ostream& output, const ROOT::Math::XYZVector& vector3)
 {
   return output
-         << "TVector3("
-         << tVector3.X() << ", "
-         << tVector3.Y() << ", "
-         << tVector3.Z() << ")";
+         << "ROOT::Math::XYZVector("
+         << vector3.X() << ", "
+         << vector3.Y() << ", "
+         << vector3.Z() << ")";
 }
 
 namespace Belle2::TestHelpers {

@@ -94,7 +94,7 @@ namespace Belle2 {
       /// Input SpacePoints Store Array
       StoreArray<SpacePoint> m_storeSpacePoints;
 
-      /// B2Vector3D actually contining the BeamSpot position. This will be passed on to the VXDHoughState for the conformal transformation
+      /// B2Vector3D actually containing the BeamSpot position. This will be passed on to the VXDHoughState for the conformal transformation
       B2Vector3D m_BeamSpotPosition;
     };
 

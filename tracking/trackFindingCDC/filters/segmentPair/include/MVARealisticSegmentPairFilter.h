@@ -25,7 +25,7 @@ namespace Belle2 {
     using MVARealisticSegmentPairVarSet =
       VariadicUnionVarSet<BasicSegmentPairVarSet, FitlessSegmentPairVarSet, FitSegmentPairVarSet>;
 
-    /// Final filter for the constuction of segment pairs.
+    /// Final filter for the construction of segment pairs.
     class MVARealisticSegmentPairFilter : public MVAFilter<MVARealisticSegmentPairVarSet> {
 
     private:

@@ -55,8 +55,8 @@ event display for the mdst file that you were looking at in these last lessons
         display of the data-taking in real time.
 
 .. seealso::
-        `Here is a gallery of nice event display images
-        <https://confluence.desy.de/x/1nQHAg>`_.
+        `display.belle2.org <https://display.belle2.org>`_ is a browser-based
+        event display.
 
 .. include:: ../lesson_footer.rstinclude
 

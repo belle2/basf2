@@ -16,7 +16,7 @@ b2luigi
     **Questions**:
 
     * How do I implement my analysis in a b2luigi workflow?
-    * How do I automatize job submission and job steering on remote computing resources?
+    * How do I automate job submission and job steering on remote computing resources?
 
     **Objectives**:
 

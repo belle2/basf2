@@ -1,0 +1,53 @@
+# EventType: 1216052127
+# Descriptor:  Y(4S) -> B-B+
+#                       B- -> D*0 K- rho(2S)-
+#                             D*0 -> D0 pi0
+#                                    D0 -> K- pi+
+#                             rho(2S)- -> K- K_S0
+#                                     K_S0 -> pi+ pi-
+#                       B+ -> anything
+# NickName: Bu_Dst0Ds-D0pi0_K-KS_K-pi+_pi+pi-
+# PhysicsWG: B2Hadronic
+# Reponsible: Valerio Bertacchi
+# Email:bertacchi@cppm.in2p3.fr
+# Cuts: None
+# Date: 2022-07-27
+
+# Aliases
+Alias K_S0sig K_S0
+Alias rho(2S)-sig rho(2S)-
+Alias rho(2S)+sig rho(2S)+
+ChargeConj rho(2S)-sig rho(2S)+sig
+
+
+Decay Upsilon(4S)
+0.5 B-sig   B+ VSS;
+0.5 B+sig   B- VSS;
+Enddecay
+
+Decay B-sig
+1.0 D*0sig  rho(2S)-sig  SVV_HELAMP 0.228 0.95 0.932 0.0 0.283 1.13;
+Enddecay
+
+Decay D*0sig
+1.0 D0sig  pi0 VSS;
+Enddecay
+
+Decay rho(2S)-sig
+1.0 K-  K_S0sig VSS;
+Enddecay
+
+Decay D0sig
+1.0 K-   pi+ PHSP;
+Enddecay
+
+Decay K_S0sig
+1.0   pi+  pi-  PHSP;
+Enddecay
+
+CDecay B+sig
+CDecay anti-D*0sig
+CDecay anti-D0sig
+CDecay rho(2S)+sig
+
+End

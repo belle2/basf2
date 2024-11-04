@@ -8,16 +8,15 @@
 
 #include <ecl/utility/ECLTimingUtilities.h>
 
-#include <framework/database/DBObjPtr.h>
-#include <ecl/dbobjects/ECLTimeWalkCorrection.h>
-
 #include <math.h>
 #include <vector>
 
 using namespace Belle2;
 using namespace ECL;
 
-ECLTimingUtilities::ECLTimingUtilities()
+ECLTimingUtilities::ECLTimingUtilities(bool required) :
+  m_loadFromDB(required),
+  m_correctionData("", required)
 { }
 
 // Time offset as a function of the signal amplitude measured in units of ticks
@@ -25,9 +24,8 @@ double ECLTimingUtilities::energyDependentTimeOffsetElectronic(const double amp)
 {
   std::vector<double> params;
   if (m_loadFromDB) {
-    DBObjPtr<ECLTimeWalkCorrection> correction_data;
     // Get energy dependence time offset fit parameters
-    params = correction_data->getParams();
+    params = m_correctionData->getParams();
   } else {
     params = {
       energyDependenceTimeOffsetFitParam_p0,

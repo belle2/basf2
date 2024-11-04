@@ -29,11 +29,11 @@ from a different directory.
 
 .. note::
 
-   On Unix/Linux systems, exit codes are defined to be 8-bit unsigned value.  
-   Values outside the 0-255 range are truncated by taking modulo 256. If the 
-   passed code happens to be a multiple of 256, the test will be a wrongly 
-   tagged as a ``SUCCESS``. Care should be taken when directly passing return 
-   codes from other processes. 
+   On Unix/Linux systems, exit codes are defined to be 8-bit unsigned value.
+   Values outside the 0-255 range are truncated by taking modulo 256. If the
+   passed code happens to be a multiple of 256, the test will be a wrongly
+   tagged as a ``SUCCESS``. Care should be taken when directly passing return
+   codes from other processes.
 
 .. seealso:: `b2test_utils.skip_test`
 
@@ -70,14 +70,44 @@ import tempfile
 import timeit
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from b2test_utils import temporary_set_environment
+from enum import Enum
 
+from b2test_utils import temporary_set_environment
 # allow stopping tests with Ctrl+c
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # avoid mixing print statements from different threads
 print_lock = threading.Lock()
+
+
+class TestState(Enum):
+    """Enum to store the state of a test"""
+    DEFAULT = 0
+    PASSED = 1
+    FAILED = 2
+    SKIPPED = 3
+    TIMEOUT = 4
+
+
+class TestInformation:
+    """Class to store information about a test"""
+
+    def __init__(self, name="", release_dir=""):
+        self.name = name
+        self.release_dir = release_dir
+
+        self.state = TestState.DEFAULT
+        self.message = ""
+        self.time = 0
+        self.output = ""
+
+        self.filename = os.path.join(release_dir, name)
+        self.extension = os.path.splitext(name)[1]
+
+    def __str__(self) -> str:
+        return f"{self.filename}: \n\tState: {self.state.name}, \n\tTime: {self.time}"\
+            f", \n\tMessage: {self.message}, \n\tOutput: {self.output}"
 
 
 def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
@@ -132,27 +162,25 @@ def format_output(name, out, err):
     return "".join(output)
 
 
-def report_test_result(result, extra, name, message, time):
+def report_test_result(testinformation):
     """ print out the result of one test"""
-    result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
-    print(f"{extra}finished test {name}\n     -> {result_message}: {message}\n     -> exec. time: {int(time)}s",
+    print(f"{testinformation.output}finished test {testinformation.name}\n     "
+          f"-> {testinformation.state.name}: {testinformation.message}\n     -> exec. time: {testinformation.time}s",
           flush=True)
 
 
-def run_test(argument):
+def run_test(testinformation):
     """ run either regurlar python tests (with basf2) or as jupyter notebooks """
 
-    name, release_dir = argument
-    ext = os.path.splitext(name)[1]
-    if ext == ".ipynb":
-        return run_test_ipynb(argument)
-    elif ext == ".py":
-        return run_test_py(argument)
+    if testinformation.extension == ".ipynb":
+        return run_test_ipynb(testinformation)
+    elif testinformation.extension == ".py":
+        return run_test_py(testinformation)
     else:
-        print(f"Testfile {name} with extension {ext} not supported")
+        print(f"Testfile {testinformation.name} with extension {testinformation.extension} not supported")
 
 
-def run_test_ipynb(argument):
+def run_test_ipynb(testinformation):
     """Run the test within a jupyter notebook
     Currently not supported is skipping ipynb's and forwarding output of the notebook
     """
@@ -160,46 +188,44 @@ def run_test_ipynb(argument):
     global options
     global print_lock
 
-    name, release_dir = argument
-    nb_filename = os.path.join(release_dir, name)
-    result = None
-    message = None
-    extra = ""
     time_start = timeit.default_timer()
 
-    result = None
     try:
-        with open(nb_filename) as f:
+        with open(testinformation.filename) as f:
             nb = nbformat.read(f, as_version=4)
             # wait 30 seconds for each cell executing before timing out
             ep = ExecutePreprocessor(timeout=30, kernel_name='python3')
             ep.preprocess(nb, resources={})
-            result = True
-            message = "finished successfully"
+
+            testinformation.state = TestState.PASSED
+            testinformation.message = "finished successfully"
+
     # execution errors within the notebook will throw this exception
     except CellExecutionError as ce:
-        result = False
-        message = "A CellExecutionError happened. Please re-run the run-tests stage if this failure happened in the GitLab" \
-            " pipeline."
-        extra = str(ce)
+        testinformation.state = TestState.FAILED
+        testinformation.message = "A CellExecutionError happened. Please re-run the run-tests stage" \
+            " if this failure happened in the GitLab pipeline."
+        testinformation.output = str(ce)
     except TimeoutError as te:
-        result = False
-        message = "A TimeoutError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
-        extra = str(te)
+        testinformation.state = TestState.TIMEOUT
+        testinformation.message = "A TimeoutError happened. Please re-run the run-tests stage"\
+            " if this failure happened in the GitLab pipeline."
+        testinformation.output = str(te)
     except RuntimeError as re:
-        result = False
-        message = "A RuntimeError happened. Please re-run the run-tests stage if this failure happened in the GitLab pipeline."
-        extra = str(re)
+        testinformation.state = TestState.TIMEOUT
+        testinformation.message = "A RuntimeError happened. Please re-run the run-tests stage"\
+            " if this failure happened in the GitLab pipeline."
+        testinformation.output = str(re)
 
-    time = timeit.default_timer() - time_start
+    testinformation.time = timeit.default_timer() - time_start
 
     with print_lock:
-        report_test_result(result, extra, name, message, time)
+        report_test_result(testinformation)
 
-    return (result, message, time, extra)
+    return testinformation
 
 
-def run_test_py(argument):
+def run_test_py(testinformation):
     """Run the test for the given steering file"""
 
     global options
@@ -209,62 +235,68 @@ def run_test_py(argument):
     # happens when loading readline https://bugzilla.redhat.com/show_bug.cgi?id=304181
     os.putenv('TERM', 'vt100')
 
-    name, release_dir = argument
-    steering = os.path.join(release_dir, name)
-    result = None
-    message = None
-    output_diff = None
-    extra = ""
     time_start = timeit.default_timer()
     try:
-        process = subprocess.run(['basf2', steering], stdout=subprocess.PIPE,
+        process = subprocess.run(['basf2', testinformation.filename], stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE, timeout=options.timeout)
     except subprocess.TimeoutExpired as e:
         # apparently test case took to long so format result message. Without
         # timeout result would be None so we can distinguish later.
-        result = False
-        message = f"timeout of {options.timeout} seconds reached"
-        extra = format_output(name, e.stderr, e.stdout)
+        testinformation.state = TestState.TIMEOUT
+        testinformation.message = f"timeout of {options.timeout} seconds reached"
+        testinformation.output = format_output(testinformation.name, e.stdout, e.stderr)
 
-    time = timeit.default_timer() - time_start
+    testinformation.time = timeit.default_timer() - time_start
 
     with print_lock:
-        if result is False:
+        if testinformation.state == TestState.TIMEOUT:
             # timeout happened, everything is already setup
             pass
         elif process.returncode != 0:
             # check for skipped test
             skipped = re.search(br"^TEST SKIPPED:\s*(.+)$", process.stderr, re.MULTILINE)
             if skipped:
-                result = None
-                message = skipped.group(1).decode()
+                testinformation.state = TestState.SKIPPED
+                testinformation.message = skipped.group(1).decode()
             else:
-                result = False
-                message = f"exited with return code {int(process.returncode)}"
-                extra = format_output(name, process.stdout, process.stderr)
+                testinformation.state = TestState.FAILED
+                testinformation.message = f"exited with return code {int(process.returncode)}"
+                testinformation.output = format_output(testinformation.name, process.stdout, process.stderr)
         else:
-            log_tests = [compare_log(release_dir, name, process.stdout, 'out', 1, options.diff_lines),
-                         compare_log(release_dir, name, process.stderr, 'err', 0, options.diff_lines)]
+            log_tests = [
+                compare_log(
+                    testinformation.release_dir,
+                    testinformation.name,
+                    process.stdout,
+                    'out',
+                    1,
+                    options.diff_lines),
+                compare_log(
+                    testinformation.release_dir,
+                    testinformation.name,
+                    process.stderr,
+                    'err',
+                    0,
+                    options.diff_lines)]
             logs_failed = sum(0 if e is None else len(e) for e in log_tests)
             if log_tests[0] is None and log_tests[1] is None:
-                result = True
-                message = "finished successfully"
+                testinformation.state = TestState.PASSED
+                testinformation.message = "finished successfully"
             elif logs_failed == 0:
-                result = True
-                message = "logs ok"
+                testinformation.state = TestState.PASSED
+                testinformation.message = "logs ok"
             else:
-                result = False
-                message = "logs differ from expectation"
-                # Format diff of output
-                output_diff = "\n".join(e for e in log_tests if e is not None)
+                testinformation.state = TestState.FAILED
+                testinformation.message = "logs differ from expectation"
+                testinformation.output = "\n".join(e for e in log_tests if e is not None)
 
-        report_test_result(result, extra, name, message, time)
+        report_test_result(testinformation)
 
     # we didn't want to print the diff in full but we want to return it if it
     # exists so let's replace the extra
-    if output_diff is not None:
-        extra = output_diff
-    return (result, message, time, extra)
+    # if output_diff is not None:
+    #     extra = output_diff
+    return testinformation
 
 
 def process_dir(dir, release_dir, prepare_step=False):
@@ -281,12 +313,12 @@ def process_dir(dir, release_dir, prepare_step=False):
             for steering in glob.glob(os.path.join(dir_entry, '*.py')) + glob.glob(os.path.join(dir_entry, '*.ipynb')):
                 name = steering[len(release_dir):]
                 name = name.lstrip('/')
-                tests.append((name, release_dir))
+                tests.append(TestInformation(name, release_dir))
         elif prepare_step and entry == 'prepare':
             for steering in glob.glob(os.path.join(dir_entry, '*.py')):
                 name = steering[len(release_dir):]
                 name = name.lstrip('/')
-                tests.append((name, release_dir))
+                tests.append(TestInformation(name, release_dir))
         else:
             tests += process_dir(dir_entry, release_dir, prepare_step)
 
@@ -328,18 +360,18 @@ class TestSuite(list):
         #: time in seconds needed for test execution
         self.time = 0
 
-    def add(self, name, passed, message, time, output):
+    def add(self, testinformation):
         """Add a new test to the suite. Return True if test was successful or
         skipped, False if it failed"""
-        self.append((name, passed, message, time, output))
-        self.time += time
-        if passed is True:
+        self.append(testinformation)
+        self.time += testinformation.time
+        if testinformation.state == TestState.PASSED:
             self.passed += 1
-        elif passed is False:
-            self.failed += 1
-        else:
+        elif testinformation.state == TestState.SKIPPED:
             self.skipped += 1
-        return (passed is not False)
+        else:
+            self.failed += 1
+        return (testinformation.state == TestState.PASSED or testinformation.state == TestState.SKIPPED)
 
 
 def get_argument_parser():
@@ -382,6 +414,7 @@ def executor(options, prepare_step):
         all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs, prepare_step)
         release_dir = os.environ['BELLE2_RELEASE_DIR']
 
+    # TODO: adjust for TestInformation class
     for name, invert in [("filter", False), ("exclude", True)]:
         arg = getattr(options, name)
         if arg is not None:
@@ -390,18 +423,18 @@ def executor(options, prepare_step):
             except Exception as e:
                 print(f"The --{name} argument {arg:r} is not a valid regular expression: {e}")
                 sys.exit(1)
-            all_tests = [e for e in all_tests if (re_filter.search(e[0]) is not None) != invert]
+            all_tests = [test for test in all_tests if (re_filter.search(test.name) is not None) != invert]
 
-    all_tests.sort()
+    # all_tests.sort()
 
     # Small hack for scheduling the slowest tests first
     # to be removed/improved via getting the list as input
     slowest_tests = [
-        (os.path.join('tracking', 'tests', 'tracking_doxygen_check.py'), release_dir),
-        (os.path.join('framework', 'tests', 'sphinx.py'), release_dir),
-        (os.path.join('mva', 'tests', 'all_classifiers.py'), release_dir),
-        (os.path.join('online_book', 'tests', 'steering_files.py'), release_dir),
-        (os.path.join('framework', 'tests', 'signals.py'), release_dir),
+        TestInformation(os.path.join('tracking', 'tests', 'tracking_doxygen_check.py'), release_dir),
+        TestInformation(os.path.join('framework', 'tests', 'sphinx.py'), release_dir),
+        TestInformation(os.path.join('mva', 'tests', 'all_classifiers.py'), release_dir),
+        TestInformation(os.path.join('online_book', 'tests', 'steering_files.py'), release_dir),
+        TestInformation(os.path.join('framework', 'tests', 'signals.py'), release_dir),
     ]
     for t in reversed(slowest_tests):
         if t in all_tests:
@@ -423,15 +456,15 @@ def executor(options, prepare_step):
     test_suites = defaultdict(TestSuite)
     tests_failed = []
     tests_skipped = []
-    for (test, release_dir), result in zip(all_tests, results):
-        if not test_results.add(test, *result):
-            tests_failed.append((test, result[1]))
-        if result[0] is None:
-            tests_skipped.append((test, result[1]))
-        suite = os.path.dirname(test)
+    for test in results:
+        if not test_results.add(test):
+            tests_failed.append((test.name, test.message))
+        if test.state == TestState.SKIPPED:
+            tests_skipped.append((test.name, test.message))
+        suite = os.path.dirname(test.name)
         if suite.endswith("/tests"):
             suite = os.path.dirname(suite)
-        test_suites[suite].add(test, *result)
+        test_suites[suite].add(test)
 
     if options.xml and len(all_tests):
         # now let's make the xml
@@ -441,14 +474,17 @@ def executor(options, prepare_step):
         for suite, tests in sorted(test_suites.items()):
             suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
                                      failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
-            for name, passed, message, time, output in tests:
-                test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(name),
-                                        classname=suite, time=str(time))
-                if passed is not True:
-                    failure = ET.SubElement(test_el, "failure" if passed is False else "skipped", message=message,
-                                            type="FAILED" if passed is False else "SKIPPED")
-                    if output is not None:
-                        failure.text = re.sub('\033\\[[0-9;]*m', '', output)
+            for test in tests:
+                test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(test.name),
+                                        classname=suite, time=str(test.time))
+                if test.state != TestState.PASSED:
+                    failure = ET.SubElement(
+                        test_el,
+                        "failure" if test.state != TestState.SKIPPED else "skipped",
+                        message=test.message,
+                        type="FAILED" if test.state != TestState.SKIPPED else "SKIPPED")
+                    if test.output is not None:
+                        failure.text = re.sub('\033\\[[0-9;]*m', '', test.output)
 
         tree = ET.ElementTree(root_el)
         tree.write(options.xml, encoding="UTF-8", xml_declaration=True)

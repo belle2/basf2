@@ -304,8 +304,10 @@ def get_hadB_path():
     # Builds the rest of event object, which contains all particles not used in the reconstruction of B0 candidates.
     ma.buildRestOfEvent(target_list_name='B0:merged', path=rec_path_1)
 
-    # Calculates the continuum suppression variables
+    # CleanMask is identical for B0 and B+
     cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
+
+    # Calculates the continuum suppression variables
     ma.appendROEMasks(list_name='B0:merged', mask_tuples=[cleanMask], path=rec_path_1)
     ma.buildContinuumSuppression(list_name='B0:merged', roe_mask='cleanMask', path=rec_path_1)
 
@@ -313,7 +315,6 @@ def get_hadB_path():
     ma.buildRestOfEvent(target_list_name='B-:merged', path=rec_path_1)
 
     # Calculates the continuum suppression variables
-    cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
     ma.appendROEMasks(list_name='B-:merged', mask_tuples=[cleanMask], path=rec_path_1)
     ma.buildContinuumSuppression(list_name='B-:merged', roe_mask='cleanMask', path=rec_path_1)
 

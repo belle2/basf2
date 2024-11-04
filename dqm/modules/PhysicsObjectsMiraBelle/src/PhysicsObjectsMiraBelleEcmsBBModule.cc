@@ -37,9 +37,9 @@ REG_MODULE(PhysicsObjectsMiraBelleEcmsBB);
 PhysicsObjectsMiraBelleEcmsBBModule::PhysicsObjectsMiraBelleEcmsBBModule() : HistoModule()
 {
   //Set module properties
+  setDescription("Monitor Physics Objects Quality");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  setDescription("Collect data for eCMS calibration algorithm using the momenta of the hadronic events");
   addParam("TriggerIdentifier", m_triggerIdentifier,
            "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadron"));
   addParam("BmListName", m_BmListName, "Name of the B- particle list", std::string("B-:merged"));
@@ -80,12 +80,6 @@ void PhysicsObjectsMiraBelleEcmsBBModule::beginRun()
 
 void PhysicsObjectsMiraBelleEcmsBBModule::event()
 {
-  // store event info
-  //m_evt  = m_emd->getEvent();
-  //m_run  = m_emd->getRun();
-  //m_exp  = m_emd->getExperiment();
-  //m_time = m_emd->getTime() / 1e9 / 3600.; //from ns to hours
-
   StoreObjPtr<SoftwareTriggerResult> result;
   if (!result.isValid()) {
     B2WARNING("SoftwareTriggerResult object not available but needed to select events for the histograms.");
@@ -96,8 +90,8 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
   const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
   if (accepted == false) return;
 
-  StoreObjPtr<ParticleList> B0(m_B0ListName);//"B0:merged");
-  StoreObjPtr<ParticleList> Bm(m_BmListName);//"B-:merged");
+  StoreObjPtr<ParticleList> B0(m_B0ListName);
+  StoreObjPtr<ParticleList> Bm(m_BmListName);
 
 
   //put all the B candidates into the vector
@@ -119,17 +113,8 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
   for (unsigned i = 0; i < Bparts.size(); ++i) {
     const Particle* Bpart = Bparts[i];
 
-    //Convert mBC and deltaE to the Y4S reference
-    double m_pBcms  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
-    double m_mB        = Bpart->getMass();
-    double m_pdg       = Bpart->getPDGCode();
-    //double m_mode      = Bpart->getExtraInfo("decayModeID");
-    double m_R2        = Variable::R2(Bpart);
-
-
     const Particle* D    = nullptr;
-    double m_dmDstar = -99;
-
+    double dmDstar = -99;
 
     static const int c_PdgD0    = abs(EvtGenDatabasePDG::Instance()->GetParticle("D0")->PdgCode());
     static const int c_PdgDplus = abs(EvtGenDatabasePDG::Instance()->GetParticle("D+")->PdgCode());
@@ -143,46 +128,27 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     } else if (abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstar0 || abs(Bpart->getDaughter(0)->getPDGCode()) == c_PdgDstarPlus) {
       const Particle* Dstar = Bpart->getDaughter(0);
       D = Dstar->getDaughter(0);
-      m_dmDstar    = Dstar->getMass() - D->getMass();
+      dmDstar    = Dstar->getMass() - D->getMass();
     } else {
       B2INFO("No D meson found");
     }
-    double m_mD;
-    //double m_Kpid;
-    if (D != nullptr) {
-      m_mD    = D->getMass();
-      //const Particle* Kaon =  D->getDaughter(0);
+    double mD = !D ? D->getMass() : -99;
 
-      //m_Kpid    = -99;
-      //if (Kaon && Kaon->getPIDLikelihood()) {
-      //  m_Kpid   = Kaon->getPIDLikelihood()->getProbability(Const::kaon, Const::pion);
-      //}
-    } else {
-      m_mD    = -99;
-      //m_Kpid    = -99;
-    }
-
-    // Fill events to histogram
-    //const double cmsE0 = EvtGenDatabasePDG::Instance()->GetParticle("Upsilon(4S)")->Mass(); //Y4S mass
-
-
-    double p =  m_pBcms;
-    double mInv =  m_mB;
-    double mD = m_mD;
-    double dmDstar = m_dmDstar;
-    double pdg = m_pdg;
-    double R2 = m_R2;
+    //Convert mBC and deltaE to the Y4S reference
+    double pBcms  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
+    double mInv        = Bpart->getMass();
+    double pdg       = Bpart->getPDGCode();
+    double R2        = Variable::R2(Bpart);
 
     //get mass of B+- or B0
     double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(pdg))->Mass();
 
-
-    // Filling the events
+    // Filling the histograms
     if (1.830 < mD && mD < 1.894)
       if (abs(mInv - mB) < 0.05)
         if (R2 < 0.3)
           if ((dmDstar < -10)  || (0.143 < dmDstar && dmDstar < 0.147)) {
-            double eBC = sqrt(p * p + pow(mB, 2)); // beam constrained energy
+            double eBC = sqrt(pBcms * pBcms + pow(mB, 2)); // beam constrained energy
             if (eBC > 5.37) continue;
 
             if (abs(pdg) == 511) {
@@ -190,10 +156,6 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
             } else {
               m_hBp->Fill(eBC);
             }
-
           }
   }
-
-
-
 }

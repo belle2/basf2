@@ -14,7 +14,7 @@ This module defines functions to add analysis DQM modules.
 
 import basf2 as b2
 from stdPi0s import stdPi0s
-from stdCharged import stdCharged
+from stdCharged import stdPi, stdK
 import modularAnalysis as ma
 import stdV0s
 import vertex
@@ -178,21 +178,21 @@ def add_mirabelle_dqm(path):
 
 
 #  Selection for the EcmsBB analysis
-def get_hadB_path():
+def get_hadB_path(path):
     """ Selects the hadronic B decays, function returns corresponding path  """
 
     # module to be run prior the collector
     rec_path_1 = b2.create_path()
-    trigger_skim_BB = rec_path_1.add_module(
+    trigger_skim_BB = path.add_module(
         "TriggerSkim",
-        triggerLines=["software_trigger_cut&skim&accept_hadronb2"],  # TODO what to put there
+        triggerLines=["software_trigger_cut&skim&accept_btocharm"],
         resultOnMissing=0,
     )
     trigger_skim_BB.if_value("==1", rec_path_1, b2.AfterConditionPath.CONTINUE)
 
-    stdCharged.stdPi(listtype='loose', path=rec_path_1)
-    stdCharged.stdK(listtype='good', path=rec_path_1)
-    stdPi0s.stdPi0s(listtype='eff40_May2020', path=rec_path_1)
+    stdPi(listtype='loose', path=rec_path_1)
+    stdK(listtype='good', path=rec_path_1)
+    stdPi0s(listtype='eff40_May2020', path=rec_path_1)
 
     ma.cutAndCopyList("pi+:my", "pi+:loose", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)
     ma.cutAndCopyList("K+:my", "K+:good", "[abs(dz)<2.0] and [abs(dr)<0.5]", path=rec_path_1)

@@ -70,8 +70,8 @@ void PhysicsObjectsMiraBelleEcmsBBModule::defineHisto()
 
 void PhysicsObjectsMiraBelleEcmsBBModule::beginRun()
 {
-  m_hBp->Reset();
-  m_hB0->Reset();
+  if (m_hBp) m_hBp->Reset();
+  if (m_hB0) m_hB0->Reset();
 }
 
 

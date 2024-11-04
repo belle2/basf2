@@ -715,7 +715,7 @@ void ParticleKinematicFitterModule::updateOrcaKinFitMother(BaseFitter& fitter, s
   mother->updateMomentum(momnew, pos, errMatrix, pvalue);
 }
 
-bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter,
+bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(const std::string& fitSuffix, BaseFitter& fitter,
     std::vector<Particle*>& particleChildren, Particle* mother)
 {
   bool updated = false;
@@ -727,14 +727,14 @@ bool ParticleKinematicFitterModule::storeOrcaKinFitParticles(const std::string& 
     ROOT::Math::PxPyPzEVector tlv = getLorentzVector(fitobject);
 
     // name of extra variables
-    std::string extraVariableParticlePx    = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Px";
-    std::string extraVariableParticlePy    = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Py";
-    std::string extraVariableParticlePz    = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_Pz";
-    std::string extraVariableParticleE     = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_E";
-    std::string extraVariableParticlePxErr = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PxErr";
-    std::string extraVariableParticlePyErr = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PyErr";
-    std::string extraVariableParticlePzErr = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_PzErr";
-    std::string extraVariableParticleEErr  = m_prefix + "OrcaKinFit" + prefix + "_" + SSTR(iChild) + "_EErr";
+    std::string extraVariableParticlePx    = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_Px";
+    std::string extraVariableParticlePy    = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_Py";
+    std::string extraVariableParticlePz    = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_Pz";
+    std::string extraVariableParticleE     = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_E";
+    std::string extraVariableParticlePxErr = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_PxErr";
+    std::string extraVariableParticlePyErr = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_PyErr";
+    std::string extraVariableParticlePzErr = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_PzErr";
+    std::string extraVariableParticleEErr  = m_prefix + "OrcaKinFit" + fitSuffix + "_" + SSTR(iChild) + "_EErr";
 
     mother->addExtraInfo(extraVariableParticlePx, tlv.Px());
     mother->addExtraInfo(extraVariableParticlePy, tlv.Py());

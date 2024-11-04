@@ -321,24 +321,39 @@ class TDCPV_klong(BaseSkim):
     def additional_setup(self, path):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
+
+        # loose cuts
         ma.cutAndCopyList(
-            'K_L0:allecl_qqs',
+            'K_L0:ecl_loose',
             'K_L0:allecl',
-            '[clusterPulseShapeDiscriminationMVA<0.5] and [clusterE>0.100]',
+            'clusterE>0.150',
             path=path)
         ma.cutAndCopyList(
-            'K_L0:allklm_qqs',
+            'K_L0:klm_loose',
             'K_L0:allklm',
-            '[klmClusterKlId>0.05] and [klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
+            '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
             path=path)
-        ma.copyLists('K_L0:eclklm_qqs_0', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # phi(KK)KL
-        ma.copyLists('K_L0:eclklm_qqs_1', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # phi(3pi)KL
-        ma.copyLists('K_L0:eclklm_qqs_2', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # eta'(eta(gg)pipi)KL
-        ma.copyLists('K_L0:eclklm_qqs_3', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # eta'(eta(3pi)pipi)KL
-        ma.copyLists('K_L0:eclklm_qqs_4', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # eta'(rho(pipi)gam)KL
-        ma.copyLists('K_L0:eclklm_qqs_5', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # omegaKL
-        ma.copyLists('K_L0:eclklm_qqs_6', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # rho0KL
-        ma.copyLists('K_L0:eclklm_qqs_7', ['K_L0:allecl_qqs', 'K_L0:allklm_qqs'], path=path)  # pi0KL
+
+        # tight cuts
+        ma.cutAndCopyList(
+            'K_L0:ecl_tight',
+            'K_L0:allecl',
+            '[clusterPulseShapeDiscriminationMVA<0.15] and [clusterE>0.25]',
+            path=path)
+        ma.cutAndCopyList(
+            'K_L0:klm_tight',
+            'K_L0:allklm',
+            '[klmClusterKlId>0.1] and [klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
+            path=path)
+
+        ma.copyLists('K_L0:eclklm_qqs_0', ['K_L0:ecl_loose', 'K_L0:klm_loose'], path=path)  # phi(KK)KL
+        ma.copyLists('K_L0:eclklm_qqs_1', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # phi(3pi)KL
+        ma.copyLists('K_L0:eclklm_qqs_2', ['K_L0:ecl_loose', 'K_L0:klm_loose'], path=path)  # eta'(eta(gg)pipi)KL
+        ma.copyLists('K_L0:eclklm_qqs_3', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # eta'(eta(3pi)pipi)KL
+        ma.copyLists('K_L0:eclklm_qqs_4', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # eta'(rho(pipi)gam)KL
+        ma.copyLists('K_L0:eclklm_qqs_5', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # omegaKL
+        ma.copyLists('K_L0:eclklm_qqs_6', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # rho0KL
+        ma.copyLists('K_L0:eclklm_qqs_7', ['K_L0:ecl_tight', 'K_L0:klm_tight'], path=path)  # pi0KL
 
     def build_lists(self, path):
         vm.addAlias('E_ECL_pi_TDCPV_qqs', 'totalECLEnergyOfParticlesInList(pi+:TDCPV_qqs_eventshape)')

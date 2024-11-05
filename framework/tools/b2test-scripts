@@ -93,9 +93,10 @@ class TestState(Enum):
 class TestInformation:
     """Class to store information about a test"""
 
-    def __init__(self, name="", release_dir=""):
+    def __init__(self, name="", release_dir="", args=""):
         self.name = name
         self.release_dir = release_dir
+        self.args = args
 
         self.state = TestState.DEFAULT
         self.message = ""
@@ -237,7 +238,7 @@ def run_test_py(testinformation):
 
     time_start = timeit.default_timer()
     try:
-        process = subprocess.run(['basf2', testinformation.filename], stdout=subprocess.PIPE,
+        process = subprocess.run(['basf2', testinformation.filename, testinformation.args], stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE, timeout=options.timeout)
     except subprocess.TimeoutExpired as e:
         # apparently test case took to long so format result message. Without
@@ -431,7 +432,7 @@ def executor(options, prepare_step):
     # to be removed/improved via getting the list as input
     slowest_tests = [
         TestInformation(os.path.join('tracking', 'tests', 'tracking_doxygen_check.py'), release_dir),
-        TestInformation(os.path.join('framework', 'tests', 'sphinx.py'), release_dir),
+        TestInformation(os.path.join('framework', 'tests', 'sphinx.py'), release_dir, "--output shpinx_test_dir"),
         TestInformation(os.path.join('mva', 'tests', 'all_classifiers.py'), release_dir),
         TestInformation(os.path.join('online_book', 'tests', 'steering_files.py'), release_dir),
         TestInformation(os.path.join('framework', 'tests', 'signals.py'), release_dir),

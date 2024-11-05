@@ -283,7 +283,7 @@ def get_hadB_path(path):
     vertex.treeFit('B-:D0pi_Kpipipi', updateAllDaughters=True, ipConstraint=True, path=rec_path_1)
 
     ma.copyLists(
-        outputListName='B0:merged',
+        outputListName='B0:combined',
         inputListNames=[
             'B0:Dstpi_D0pi_Kpi',
             'B0:Dstpi_D0pi_Kpipi0',
@@ -293,7 +293,7 @@ def get_hadB_path(path):
         path=rec_path_1)
 
     ma.copyLists(
-        outputListName='B-:merged',
+        outputListName='B-:combined',
         inputListNames=[
             'B-:D0pi_Kpi',
             'B-:D0pi_Kpipi0',
@@ -302,28 +302,28 @@ def get_hadB_path(path):
         path=rec_path_1)
 
     # Builds the rest of event object, which contains all particles not used in the reconstruction of B0 candidates.
-    ma.buildRestOfEvent(target_list_name='B0:merged', path=rec_path_1)
+    ma.buildRestOfEvent(target_list_name='B0:combined', path=rec_path_1)
 
     # CleanMask is identical for B0 and B+
     cleanMask = ('cleanMask', 'nCDCHits > 0 and useCMSFrame(p)<=3.2', 'p >= 0.05 and useCMSFrame(p)<=3.2')
 
     # Calculates the continuum suppression variables
-    ma.appendROEMasks(list_name='B0:merged', mask_tuples=[cleanMask], path=rec_path_1)
-    ma.buildContinuumSuppression(list_name='B0:merged', roe_mask='cleanMask', path=rec_path_1)
+    ma.appendROEMasks(list_name='B0:combined', mask_tuples=[cleanMask], path=rec_path_1)
+    ma.buildContinuumSuppression(list_name='B0:combined', roe_mask='cleanMask', path=rec_path_1)
 
     # Builds the rest of event object, which contains all particles not used in the reconstruction of B- candidates.
-    ma.buildRestOfEvent(target_list_name='B-:merged', path=rec_path_1)
+    ma.buildRestOfEvent(target_list_name='B-:combined', path=rec_path_1)
 
     # Calculates the continuum suppression variables
-    ma.appendROEMasks(list_name='B-:merged', mask_tuples=[cleanMask], path=rec_path_1)
-    ma.buildContinuumSuppression(list_name='B-:merged', roe_mask='cleanMask', path=rec_path_1)
+    ma.appendROEMasks(list_name='B-:combined', mask_tuples=[cleanMask], path=rec_path_1)
+    ma.buildContinuumSuppression(list_name='B-:combined', roe_mask='cleanMask', path=rec_path_1)
 
-    ma.applyCuts("B0:merged", "[R2 < 0.3] and " + Bcut, path=rec_path_1)
-    ma.applyCuts("B-:merged", "[R2 < 0.3] and " + Bcut, path=rec_path_1)
+    ma.applyCuts("B0:combined", "[R2 < 0.3] and " + Bcut, path=rec_path_1)
+    ma.applyCuts("B-:combined", "[R2 < 0.3] and " + Bcut, path=rec_path_1)
 
     MiraBelleEcmsBB = b2.register_module('PhysicsObjectsMiraBelleEcmsBB')
-    MiraBelleEcmsBB.param('B0ListName', 'B0:merged')
-    MiraBelleEcmsBB.param('BmListName', 'Bp:merged')
+    MiraBelleEcmsBB.param('B0ListName', 'B0:combined')
+    MiraBelleEcmsBB.param('BmListName', 'B-:combined')
     rec_path_1.add_module(MiraBelleEcmsBB)
 
     return rec_path_1

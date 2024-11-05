@@ -41,9 +41,9 @@ PhysicsObjectsMiraBelleEcmsBBModule::PhysicsObjectsMiraBelleEcmsBBModule() : His
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("TriggerIdentifier", m_triggerIdentifier,
-           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_hadron"));
-  addParam("BmListName", m_BmListName, "Name of the B- particle list", std::string("B-:merged"));
-  addParam("B0ListName", m_B0ListName, "Name of the B0 particle list", std::string("B0:merged"));
+           "Trigger identifier string used to select events for the histograms", std::string("software_trigger_cut&skim&accept_btocharm"));
+  addParam("BmListName", m_BmListName, "Name of the B- particle list", std::string("B-:combined"));
+  addParam("B0ListName", m_B0ListName, "Name of the B0 particle list", std::string("B0:combined"));
 }
 
 
@@ -86,13 +86,11 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     return;
   }
 
-
   const bool accepted = (result->getResult(m_triggerIdentifier) == SoftwareTriggerCutResult::c_accept);
   if (accepted == false) return;
 
   StoreObjPtr<ParticleList> B0(m_B0ListName);
   StoreObjPtr<ParticleList> Bm(m_BmListName);
-
 
   //put all the B candidates into the vector
   std::vector<const Particle*> Bparts;
@@ -107,6 +105,7 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
       if (Bm->getParticle(i))
         Bparts.push_back(Bm->getParticle(i));
   }
+
 
   if (Bparts.size() == 0) return;
 
@@ -132,7 +131,7 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     } else {
       B2INFO("No D meson found");
     }
-    double mD = !D ? D->getMass() : -99;
+    double mD = D ? D->getMass() : -99;
 
     //Convert mBC and deltaE to the Y4S reference
     double pBcms  = PCmsLabTransform::labToCms(Bpart->get4Vector()).P();
@@ -143,6 +142,7 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
     //get mass of B+- or B0
     double mB = EvtGenDatabasePDG::Instance()->GetParticle(abs(pdg))->Mass();
 
+
     // Filling the histograms
     if (1.830 < mD && mD < 1.894)
       if (abs(mInv - mB) < 0.05)
@@ -150,7 +150,6 @@ void PhysicsObjectsMiraBelleEcmsBBModule::event()
           if ((dmDstar < -10)  || (0.143 < dmDstar && dmDstar < 0.147)) {
             double eBC = sqrt(pBcms * pBcms + pow(mB, 2)); // beam constrained energy
             if (eBC > 5.37) continue;
-
             if (abs(pdg) == 511) {
               m_hB0->Fill(eBC);
             } else {

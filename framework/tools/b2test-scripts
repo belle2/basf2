@@ -109,6 +109,12 @@ class TestInformation:
     def __str__(self) -> str:
         return f"{self.filename}: \n\tState: {self.state.name}, \n\tTime: {self.time}"\
             f", \n\tMessage: {self.message}, \n\tOutput: {self.output}"
+    
+    def report_test_result(self):
+        """ print out the result of one test"""
+        print(f"{self.output}finished test {self.name}\n     "
+            f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
+            flush=True)
 
 
 def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
@@ -163,11 +169,7 @@ def format_output(name, out, err):
     return "".join(output)
 
 
-def report_test_result(testinformation):
-    """ print out the result of one test"""
-    print(f"{testinformation.output}finished test {testinformation.name}\n     "
-          f"-> {testinformation.state.name}: {testinformation.message}\n     -> exec. time: {testinformation.time}s",
-          flush=True)
+
 
 
 def run_test(testinformation):
@@ -221,7 +223,7 @@ def run_test_ipynb(testinformation):
     testinformation.time = timeit.default_timer() - time_start
 
     with print_lock:
-        report_test_result(testinformation)
+        testinformation.report_test_result(testinformation)
 
     return testinformation
 
@@ -291,7 +293,7 @@ def run_test_py(testinformation):
                 testinformation.message = "logs differ from expectation"
                 testinformation.output = "\n".join(e for e in log_tests if e is not None)
 
-        report_test_result(testinformation)
+        testinformation.report_test_result(testinformation)
 
     # we didn't want to print the diff in full but we want to return it if it
     # exists so let's replace the extra
@@ -432,7 +434,7 @@ def executor(options, prepare_step):
     # to be removed/improved via getting the list as input
     slowest_tests = [
         TestInformation(os.path.join('tracking', 'tests', 'tracking_doxygen_check.py'), release_dir),
-        TestInformation(os.path.join('framework', 'tests', 'sphinx.py'), release_dir, "--output shpinx_test_dir"),
+        TestInformation(os.path.join('framework', 'tests', 'sphinx.py'), release_dir, "-o shpinx_test_dir"),
         TestInformation(os.path.join('mva', 'tests', 'all_classifiers.py'), release_dir),
         TestInformation(os.path.join('online_book', 'tests', 'steering_files.py'), release_dir),
         TestInformation(os.path.join('framework', 'tests', 'signals.py'), release_dir),

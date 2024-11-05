@@ -690,7 +690,7 @@ void DQMHistAnalysisSVDOccupancyModule::terminate()
 
     delete m_cOnlineOccupancyRPhiViewU3Samples;
     delete m_cOnlineOccupancyRPhiViewV3Samples;
-    if (m_RPhiView) {
+    if (m_RPhiViewId0) {
       delete m_cOccupancyRPhiViewUGroupId0;
       delete m_cOccupancyRPhiViewVGroupId0;
     }

@@ -97,8 +97,7 @@ def V0Selector_Training(
         'decayAngle(1)',
         'daughterAngleDiffInMother',
         'daughtersDeltaZ',
-        'pip_nSVDHits', 'pip_nPXDHits',
-        'pin_nSVDHits', 'pin_nPXDHits',
+        'pip_nSVDHits', 'pin_nSVDHits',
         'pip_dr', 'pin_dr',
     ]
 
@@ -121,7 +120,7 @@ def V0Selector_Training(
     python_options = basf2_mva.PythonOptions()
 
     python_options.m_framework = "custom"
-    python_options.m_steering_file = "MVALightGBM.py"
+    python_options.m_steering_file = "analysis/scripts/MVALightGBM.py"
 
     import json
     param = {'num_leaves': 256,
@@ -202,7 +201,7 @@ def LambdaVeto_Training(
     python_options = basf2_mva.PythonOptions()
 
     python_options.m_framework = "custom"
-    python_options.m_steering_file = "MVALightGBM.py"
+    python_options.m_steering_file = "analysis/scripts/MVALightGBM.py"
 
     import json
     param = {'num_leaves': 256,

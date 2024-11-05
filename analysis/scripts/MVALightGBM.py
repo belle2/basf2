@@ -16,7 +16,16 @@ class StandardScaler():
     """
 
     def __init__(self, mean=None, scale=None):
+        """
+        Init the scalar
+
+        Args:
+            mean (numpy.ndarray): The mean value for each feature in the data.
+            scale (numpy.ndarray): Per-feature relative scaling.
+        """
+        #: means for scaler
         self.mean_ = mean
+        #: scale for scaler
         self.scale_ = scale
 
     def fit(self, sample):
@@ -27,6 +36,9 @@ class StandardScaler():
         return self
 
     def __call__(self, sample):
+        """
+        Do scaler
+        """
         return (sample - self.mean_) / self.scale_
 
     def inverse_transform(self, sample):
@@ -37,20 +49,29 @@ class StandardScaler():
 
 class State(object):
     """
-    Tensorflow state
+    LGBM state
     """
 
     def __init__(self, bst=None, params=None, X_valid=None, y_valid=None, path='LGBM.txt', trainFraction=0.8, num_round=100):
         """ Constructor of the state object """
-        #: tensorflow model inheriting from tf.Module
+        #: X valid
         self.X_valid = X_valid
+        #: Y valid
         self.y_valid = y_valid
+        #: weights save path
         self.path = path
+        #: LightGBM Model parameter
         self.params = params
+        #: Scaler parameter
         self.scale_param = {}
+        #: saved Best model
         self.bst = bst
+        #: scaler function
         self.StandardScaler = StandardScaler()
+        #: train fraction for dataset splitting
         self.trainFraction = trainFraction
+        #: If applied scaler, always false here
+        self.DoScaler = False
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -97,8 +118,7 @@ def partial_fit(state, X, S, y, w, epoch, batch):
     # Determine the split index
     split_index = int(X.shape[0] * state.trainFraction)
 
-    DoScaler = False
-    if DoScaler:
+    if state.DoScaler:
         state.StandardScaler.fit(X)
         X = state.StandardScaler(X)
         state.scale_param['mean'] = state.StandardScaler.mean_
@@ -122,10 +142,12 @@ def end_fit(state):
             with open(os.path.join(path, file_name), 'rb') as file:
                 files.append(file.read())
         params = state.params
-        scale = state.scale_param
+        scale = {}
+        if state.DoScaler:
+            scale = state.scale_param
         print(scale)
     del state
-    return [file_names, files, params]
+    return [file_names, files, params, scale]
 
 
 def load(obj):
@@ -140,7 +162,11 @@ def load(obj):
         state = State()
         state.bst = bst
         state.params = obj[2]
-        # state.StandardScaler.__init__(mean=obj[3]['mean'],scale=obj[3]['scale'])
+        if state.DoScaler:
+            try:
+                state.StandardScaler.__init__(mean=obj[3]['mean'], scale=obj[3]['scale'])
+            except BaseException:
+                print("not find saved scale parameters")
     return state
 
 

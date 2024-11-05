@@ -707,7 +707,7 @@ namespace Belle2 {
       float scale_alpha = 1. / (1 << (p_mlpin_alpha.size() - 1) / 9);
       float scale_drifttime = 1. / (1 << (p_mlpin_drifttime.size() - 1) / 9);
       float scale_id = 1. / (1 << (p_mlpin_id.size() - 1) / 9);
-      float scale_extratime = 1. / (1 << (p_mlpin_drifttime.size() - 1) / 44);
+      float scale_extratime = 1. / (1 << (p_mlpin_extratime.size() - 1) / 44);
       TRGNeuroTrack foundTrack;
       int theta_raw = mlp_bin_to_signed_int(p_mlpout_theta);
       int z_raw = mlp_bin_to_signed_int(p_mlpout_z);
@@ -756,10 +756,10 @@ namespace Belle2 {
       }
       for (unsigned iSL = 0; iSL < 4; ++iSL) {
         for (unsigned iwire = 0; iwire < 11; ++iwire) {
-          foundTrack.inputExtraT[iSL][iwire] = mlp_bin_to_signed_int(p_mlpin_extratime.substr(((4 - iSL) *
-                                                                     (11 - iwire) - 1) * p_mlpin_drifttime.size() / 44, p_mlpin_drifttime.size() / 44)) * scale_extratime;
-          foundTrack.rawinputExtraT[iSL][iwire] = mlp_bin_to_signed_int(p_mlpin_extratime.substr(((4 - iSL) *
-                                                  (11 - iwire) - 1) * p_mlpin_drifttime.size() / 44, p_mlpin_drifttime.size() / 44));
+          foundTrack.inputExtraT[iSL][iwire] = mlp_bin_to_signed_int(p_mlpin_extratime.substr((((3 - iSL) *
+                                                                     11) + (10 - iwire)) * p_mlpin_extratime.size() / 44, p_mlpin_extratime.size() / 44)) * scale_extratime;
+          foundTrack.rawinputExtraT[iSL][iwire] = mlp_bin_to_signed_int(p_mlpin_extratime.substr((((3 - iSL) *
+                                                  11) + (10 - iwire)) * p_mlpin_extratime.size() / 44, p_mlpin_extratime.size() / 44));
         }
       }
       return foundTrack;

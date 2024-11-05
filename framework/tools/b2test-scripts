@@ -71,6 +71,7 @@ import timeit
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from enum import Enum
+from typing import Dict, List
 
 from b2test_utils import temporary_set_environment
 # allow stopping tests with Ctrl+c
@@ -93,19 +94,19 @@ class TestState(Enum):
 class TestInformation:
     """Class to store information about a test"""
 
-    def __init__(self, name="", release_dir="", args=""):
+    def __init__(self, name: str="", release_dir: str="", args: str=""):
         self.name = name
         self.release_dir = release_dir
         self.args = args
 
-        self.state = TestState.DEFAULT
-        self.message = ""
-        self.time = 0
-        self.output = ""
+        self.state: TestState = TestState.DEFAULT
+        self.message: str = ""
+        self.time: float = 0 # in s
+        self.output: str = ""
 
-        self.filename = os.path.join(release_dir, name)
-        self.extension = os.path.splitext(name)[1]
-        self.suite = os.path.dirname(name)
+        self.filename: str = os.path.join(release_dir, name)
+        self.extension: str = os.path.splitext(name)[1]
+        self.suite: str = os.path.dirname(name)
         if self.suite.endswith("/tests"):
             self.suite = os.path.dirname(self.suite)
 
@@ -113,13 +114,13 @@ class TestInformation:
         return f"{self.filename}: \n\tState: {self.state.name}, \n\tTime: {self.time}"\
             f", \n\tMessage: {self.message}, \n\tOutput: {self.output}"
     
-    def report_test_result(self):
+    def report_test_result(self) -> None:
         """ print out the result of one test"""
         print(f"{self.output}finished test {self.name}\n     "
             f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
             flush=True)
         
-    def create_testcase_xml_element(self, suite_name):
+    def create_testcase_xml_element(self, suite_name: ET.SubElement) -> ET.SubElement:
         test_el = ET.SubElement(
             suite_name,
             "testcase",
@@ -142,38 +143,38 @@ class TestInformation:
 class TestSuite:
     """Class to aggregate test case results by directory"""
 
-    def __init__(self, name=""):
+    def __init__(self, name: str=""):
         self.name = name
         """Init the suite with empty values"""
         #: passed tests in the suite/package
-        self.passed_tests = []
+        self.passed_tests: List[TestInformation] = []
         #: failed tests in the suite/package
-        self.failed_tests = []
+        self.failed_tests: List[TestInformation] = []
         #: skipped tests in the suite/package
-        self.skipped_tests = []
+        self.skipped_tests: List[TestInformation] = []
         #: time in seconds needed for test execution
-        self.time = 0
+        self.time: float = 0
 
     @property
-    def passed(self):
+    def passed(self) -> int:
         return len(self.passed_tests)
     
     @property
-    def failed(self):
+    def failed(self) -> int:
         return len(self.failed_tests)
     
     @property
-    def skipped(self):
+    def skipped(self) -> int:
         return len(self.skipped_tests)
     
-    def get_tests(self):
+    def get_tests(self) -> List[TestInformation]:
         return self.passed_tests + self.failed_tests + self.skipped_tests
     
     @property
-    def total(self):
+    def total(self) -> int:
         return len(self.get_tests())
     
-    def add(self, testinformation):
+    def add(self, testinformation: TestInformation) -> None:
         """Add a new test to the suite. Return True if test was successful or
         skipped, False if it failed"""
         if testinformation.state == TestState.PASSED:
@@ -185,7 +186,7 @@ class TestSuite:
 
         self.time += testinformation.time
 
-    def create_testsuite_xml_element(self, root):
+    def create_testsuite_xml_element(self, root: ET.Element) -> ET.SubElement:
         suite_el = ET.SubElement(
             root,
             "testsuite",
@@ -205,43 +206,43 @@ class TestResult:
     """Class to store the results of a test run"""
 
     def __init__(self):
-        self.suites = {}
+        self.suites: Dict[str, TestSuite] = {}
 
     @property
-    def total(self):
+    def total(self) -> int:
         return sum(suite.total for suite in self.suites.values())
     
     @property
-    def failed(self):
+    def failed(self) -> int:
         return sum(suite.failed for suite in self.suites.values())
     
     @property
-    def skipped(self):
+    def skipped(self) -> int:
         return sum(suite.skipped for suite in self.suites.values())
     
     @property
-    def time(self):
+    def time(self) -> float:
         return sum(suite.time for suite in self.suites.values())
     
-    def get_skipped(self):
+    def get_skipped(self) -> List[TestInformation]:
         skipped = []
         for suite in self.suites.values():
             skipped += suite.skipped_tests
         return skipped
     
-    def get_failed(self):
+    def get_failed(self) -> List[TestInformation]:
         failed = []
         for suite in self.suites.values():
             failed += suite.failed_tests
         return failed
 
-    def add(self, testinformation):
+    def add(self, testinformation: TestInformation) -> None:
         suite_name = testinformation.suite
         if suite_name not in self.suites:
             self.suites[suite_name] = TestSuite(suite_name)
         self.suites[suite_name].add(testinformation)
 
-    def create_testresult_xml_element(self):
+    def create_testresult_xml_element(self) -> ET.Element:
         root_el = ET.Element("testsuites", 
                             tests=str(self.total), 
                             failures=str(self.failed),
@@ -255,11 +256,11 @@ class TestResult:
 
         return root_el
     
-    def report_results_xml(self):
+    def report_results_xml(self) -> None:
         tree = ET.ElementTree(self.create_testresult_xml_element())
         tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
 
-    def report_results(self, prepare_step=True):
+    def report_results(self, prepare_step: bool=True) -> None:
         print(flush=True)
         if self.skipped > 0:
             print("\n    ".join([f"Skipped tests: {test.name} ({test.message})" for test in self.get_skipped()]), flush=True)

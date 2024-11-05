@@ -105,6 +105,9 @@ class TestInformation:
 
         self.filename = os.path.join(release_dir, name)
         self.extension = os.path.splitext(name)[1]
+        self.suite = os.path.dirname(name)
+        if self.suite.endswith("/tests"):
+            self.suite = os.path.dirname(self.suite)
 
     def __str__(self) -> str:
         return f"{self.filename}: \n\tState: {self.state.name}, \n\tTime: {self.time}"\
@@ -115,6 +118,156 @@ class TestInformation:
         print(f"{self.output}finished test {self.name}\n     "
             f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
             flush=True)
+        
+    def create_testcase_xml_element(self, suite_name):
+        test_el = ET.SubElement(
+            suite_name,
+            "testcase",
+            name=os.path.basename(self.name),
+            classname=suite_name,
+            time=str(self.time)
+        )
+        
+        if self.state != TestState.PASSED:
+            failure_type = "failure" if self.state != TestState.SKIPPED else "skipped"
+            failure_message = self.message
+            failure = ET.SubElement(test_el, failure_type, message=failure_message, 
+                                    type=failure_type.upper())
+            
+            if self.output:
+                failure.text = re.sub(r'\033\[[0-9;]*m', '', self.output)
+        
+        return test_el
+        
+class TestSuite:
+    """Class to aggregate test case results by directory"""
+
+    def __init__(self, name=""):
+        self.name = name
+        """Init the suite with empty values"""
+        #: passed tests in the suite/package
+        self.passed_tests = []
+        #: failed tests in the suite/package
+        self.failed_tests = []
+        #: skipped tests in the suite/package
+        self.skipped_tests = []
+        #: time in seconds needed for test execution
+        self.time = 0
+
+    @property
+    def passed(self):
+        return len(self.passed_tests)
+    
+    @property
+    def failed(self):
+        return len(self.failed_tests)
+    
+    @property
+    def skipped(self):
+        return len(self.skipped_tests)
+    
+    def get_tests(self):
+        return self.passed_tests + self.failed_tests + self.skipped_tests
+    
+    @property
+    def total(self):
+        return len(self.get_tests())
+    
+    def add(self, testinformation):
+        """Add a new test to the suite. Return True if test was successful or
+        skipped, False if it failed"""
+        if testinformation.state == TestState.PASSED:
+            self.passed_tests.append(testinformation)
+        elif testinformation.state == TestState.SKIPPED:
+            self.skipped_tests.append(testinformation)
+        else:
+            self.failed_tests.append(testinformation)
+
+        self.time += testinformation.time
+
+    def create_testsuite_xml_element(self, root):
+        suite_el = ET.SubElement(
+            root,
+            "testsuite",
+            name=self.name,
+            tests=str(self.total),
+            failures=str(self.failed),
+            skipped=str(self.skipped),
+            time=str(self.time)
+        )
+        
+        for test in self.get_tests():
+            test.create_testcase_element(suite_el)
+        
+        return suite_el        
+    
+class TestResult:
+    """Class to store the results of a test run"""
+
+    def __init__(self):
+        self.suites = {}
+
+    @property
+    def total(self):
+        return sum(suite.total for suite in self.suites.values())
+    
+    @property
+    def failed(self):
+        return sum(suite.failed for suite in self.suites.values())
+    
+    @property
+    def skipped(self):
+        return sum(suite.skipped for suite in self.suites.values())
+    
+    @property
+    def time(self):
+        return sum(suite.time for suite in self.suites.values())
+    
+    def get_skipped(self):
+        skipped = []
+        for suite in self.suites.values():
+            skipped += suite.skipped_tests
+        return skipped
+    
+    def get_failed(self):
+        failed = []
+        for suite in self.suites.values():
+            failed += suite.failed_tests
+        return failed
+
+    def add(self, testinformation):
+        suite_name = testinformation.suite
+        if suite_name not in self.suites:
+            self.suites[suite_name] = TestSuite(suite_name)
+        self.suites[suite_name].add(testinformation)
+
+    def create_testresult_xml_element(self):
+        root_el = ET.Element("testsuites", 
+                            tests=str(self.total), 
+                            failures=str(self.failed),
+                            skipped=str(self.skipped), 
+                            timestamp=datetime.datetime.now().isoformat(),
+                            time=str(self.time), 
+                            name="Basf2 Tests")
+        
+        for suite in self.suites.values():
+            suite.create_testsuite_xml_element(root_el)
+
+        return root_el
+    
+    def report_results_xml(self):
+        tree = ET.ElementTree(self.create_testresult_xml_element())
+        tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
+
+    def report_results(self, prepare_step=True):
+        print(flush=True)
+        if self.skipped > 0:
+            print("\n    ".join([f"Skipped tests: {test.name} ({test.message})" for test in self.get_skipped()]), flush=True)
+        if self.failed > 0:
+            print("\n    ".join([f"FAILED tests: {test.name} ({test.message})" for test in self.get_failed()]), flush=True)
+        # print summary and exit
+        print(f'{self.failed} out of {self.total} {"prepare steps" if prepare_step else "tests"} '
+            f'failed, {self.skipped} were skipped\n', flush=True)
 
 
 def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
@@ -167,10 +320,6 @@ def format_output(name, out, err):
     if len(output):
         output.append(f"=== end {name} ===\n")
     return "".join(output)
-
-
-
-
 
 def run_test(testinformation):
     """ run either regurlar python tests (with basf2) or as jupyter notebooks """
@@ -348,35 +497,6 @@ def process_top_dir(release_dir, directories, processed_dirs, prepare_step=False
 
     return tests
 
-
-class TestSuite(list):
-    """Class to aggregate test case results by directory"""
-
-    def __init__(self):
-        """Init the suite with empty values"""
-        #: number of passed tests in the suite/package
-        self.passed = 0
-        #: number of failed tests in the suite/package
-        self.failed = 0
-        #: number of skippedtests in the suite/package
-        self.skipped = 0
-        #: time in seconds needed for test execution
-        self.time = 0
-
-    def add(self, testinformation):
-        """Add a new test to the suite. Return True if test was successful or
-        skipped, False if it failed"""
-        self.append(testinformation)
-        self.time += testinformation.time
-        if testinformation.state == TestState.PASSED:
-            self.passed += 1
-        elif testinformation.state == TestState.SKIPPED:
-            self.skipped += 1
-        else:
-            self.failed += 1
-        return (testinformation.state == TestState.PASSED or testinformation.state == TestState.SKIPPED)
-
-
 def get_argument_parser():
     """Return an argument parser correctly setup for all known options"""
     description, epilog = __doc__.split("--epilog--", 1)
@@ -455,53 +575,16 @@ def executor(options, prepare_step):
         results = map(run_test, all_tests)
 
     # and present the results
-    test_results = TestSuite()
-    test_suites = defaultdict(TestSuite)
-    tests_failed = []
-    tests_skipped = []
-    for test in results:
-        if not test_results.add(test):
-            tests_failed.append((test.name, test.message))
-        if test.state == TestState.SKIPPED:
-            tests_skipped.append((test.name, test.message))
-        suite = os.path.dirname(test.name)
-        if suite.endswith("/tests"):
-            suite = os.path.dirname(suite)
-        test_suites[suite].add(test)
+    test_results = TestResult()
+    for result in results:
+        test_results.add(result)
 
     if options.xml and len(all_tests):
-        # now let's make the xml
-        root_el = ET.Element("testsuites", tests=str(len(test_results)), failures=str(test_results.failed),
-                             skipped=str(test_results.skipped), timestamp=datetime.datetime.now().isoformat(),
-                             time=str(test_results.time), name="Basf2 Tests")
-        for suite, tests in sorted(test_suites.items()):
-            suite_el = ET.SubElement(root_el, "testsuite", name=suite, tests=str(len(tests)),
-                                     failures=str(tests.failed), skipped=str(tests.skipped), time=str(tests.time))
-            for test in tests:
-                test_el = ET.SubElement(suite_el, "testcase", name=os.path.basename(test.name),
-                                        classname=suite, time=str(test.time))
-                if test.state != TestState.PASSED:
-                    failure = ET.SubElement(
-                        test_el,
-                        "failure" if test.state != TestState.SKIPPED else "skipped",
-                        message=test.message,
-                        type="FAILED" if test.state != TestState.SKIPPED else "SKIPPED")
-                    if test.output is not None:
-                        failure.text = re.sub('\033\\[[0-9;]*m', '', test.output)
-
-        tree = ET.ElementTree(root_el)
-        tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
+        test_results.report_results_xml()
 
     # print a list of failed tests to find them more easily
-    print(flush=True)
-    if test_results.skipped > 0:
-        print("\n    ".join(["Skipped tests: "] + ["%s (%s)" % e for e in tests_skipped]), flush=True)
-    if test_results.failed > 0:
-        print("\n    ".join(["FAILED tests: "] + ["%s (%s)" % e for e in tests_failed]), flush=True)
-    # print summary and exit
-    print(f'{test_results.failed} out of {len(test_results)} {"prepare steps" if prepare_step else "tests"} '
-          f'failed, {test_results.skipped} were skipped\n', flush=True)
-    return len(tests_failed)
+    test_results.report_results(prepare_step)
+    return test_results.failed
 
 
 if __name__ == "__main__":

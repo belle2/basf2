@@ -3387,8 +3387,16 @@ namespace Belle2 {
         auto func = [var](const Particle * particle) -> int {
           auto var_result = var->function(particle);
           if (std::holds_alternative<double>(var_result))
-            return static_cast<int>(std::get<double>(var_result));
-          else if (std::holds_alternative<int>(var_result))
+          {
+            double value = std::get<double>(var_result);
+            if (value > std::numeric_limits<int>::max())
+              value = std::numeric_limits<int>::max();
+            if (value < std::numeric_limits<int>::min())
+              value = std::numeric_limits<int>::min();
+            if (std::isnan(value))
+              value = 0;
+            return static_cast<int>(value);
+          } else if (std::holds_alternative<int>(var_result))
             return std::get<int>(var_result);
           else if (std::holds_alternative<bool>(var_result))
             return static_cast<int>(std::get<bool>(var_result));
@@ -3756,7 +3764,13 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("int(variable)", convertToInt, "Returns integer value of a variable.", Manager::VariableDataType::c_int);
+    REGISTER_METAVARIABLE("int(variable)", convertToInt, R"DOC(
+                      Casts the output of the variable to an integer value. 
+
+                      .. warning::
+                        Overflow and underflow are clipped at maximum and minimum values, respectively. NaN values are represented as zeros, please use :b2:var:`ifNANgiveX` to change this.
+
+                      )DOC",  Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.", Manager::VariableDataType::c_bool);

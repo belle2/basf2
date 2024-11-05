@@ -93,11 +93,11 @@ class TDCPV_qqs(BaseSkim):
 
     **Cuts used**:
 
-    * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
-    * ``5.2 < Mbc < 5.29``
-    * ``abs(deltaE) < 0.5``
-    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
-    * ``E_ECL_TDCPV < 9``
+    * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
+    * 5.2 < Mbc < 5.29
+    * abs(deltaE) < 0.5
+    * nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1
+    * E_ECL_TDCPV < 9
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -274,11 +274,15 @@ class TDCPV_klong(BaseSkim):
 
     **Cuts used**:
 
-    * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
-    * ``abs(deltaE) < 0.1``
-    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
-    * ``E_ECL_TDCPV < 9``
-    * ``foxWolframR2<0.6``
+    * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
+    * clusterE>0.150 for loose ECL KL
+    * klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for loose KLM KL
+    * clusterPulseShapeDiscriminationMVA<0.15 and clusterE>0.25 for tight ECL KL
+    * klmClusterKlId>0.1 and klmClusterInnermostLayer<=10 and klmClusterLayers<=10 for tight KLM KL
+    * abs(deltaE) < 0.1
+    * nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1,
+    * E_ECL_TDCPV < 9
+    * foxWolframR2<0.6
     """
 
     __authors__ = ["Michele Veronesi", "Noah Brenny"]
@@ -302,16 +306,17 @@ class TDCPV_klong(BaseSkim):
         stdPi0s("eff40_May2020", path=path)
 
         loadStdSkimHighEffPhi(path=path)
-        loadStdSkimHighEffEta(path=path)  # eta:SkimHighEff1 (gg), eta:SkimHighEff2 (3pi)
+        loadStdSkimHighEffEta(path=path)
         loadStdSkimHighEffRho0(path=path)
         loadStdSkimHighEffOmega(path=path)
 
+        # Additional non-standard lists
         ma.reconstructDecay('phi:SkimHighEff2 -> pi0:skim pi-:SkimHighEff pi+:SkimHighEff', '0.97 < M < 1.1', path=path)
 
-        ma.cutAndCopyList('eta:SkimKlong2', 'eta:SkimHighEff2', '0.5 < M < 0.6', path=path)  # eta->pipipi0 default 0.4 < M < 0.6
+        ma.cutAndCopyList('eta:SkimKlong2', 'eta:SkimHighEff2', '0.5 < M < 0.6', path=path)
 
         ma.reconstructDecay('eta\':klong_ggpp -> eta:SkimHighEff1 pi+:SkimHighEff pi-:SkimHighEff',
-                            '0.8 < M < 1.1', path=path)  # default 0.8 < M < 1.1
+                            '0.8 < M < 1.1', path=path)
         ma.reconstructDecay('eta\':klong_pipipi -> eta:SkimKlong2 pi+:SkimHighEff pi-:SkimHighEff', '0.9 < M < 1', path=path)
         ma.reconstructDecay('eta\':klong_rhogam -> rho0:SkimHighEff gamma:tight', '0.9 < M < 1', path=path)
 
@@ -322,7 +327,7 @@ class TDCPV_klong(BaseSkim):
         ma.cutAndCopyList('gamma:E15', 'gamma:all', '1.4<E<4', path=path)
         ma.cutAndCopyList('gamma:ECMS16', 'gamma:all', '1.6<useCMSFrame(E)', path=path)
 
-        # loose cuts
+        # loose KL
         ma.cutAndCopyList(
             'K_L0:ecl_loose',
             'K_L0:allecl',
@@ -334,7 +339,7 @@ class TDCPV_klong(BaseSkim):
             '[klmClusterInnermostLayer<=10] and [klmClusterLayers<=10]',
             path=path)
 
-        # tight cuts
+        # tight KL
         ma.cutAndCopyList(
             'K_L0:ecl_tight',
             'K_L0:allecl',
@@ -443,14 +448,14 @@ class TDCPV_ccs(BaseSkim):
 
     **Cuts used**:
 
-    * ``SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01``
-    * ``5.2 < Mbc < 5.29 for Ks/K*``
-    * ``abs(deltaE) < 0.3 and 5.05 < Mbc < 5.29 for KL``
-    * ``abs(deltaE) < 0.5``
-    * ``nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3``
-    * ``nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1``,
-    * ``visibleEnergyOfEventCMS>4"``,
-    * ``E_ECL_TDCPV < 9``
+    * SkimHighEff tracks thetaInCDCAcceptance AND chiProb > 0 AND abs(dr) < 0.5 AND abs(dz) < 3 and PID>0.01
+    * 5.2 < Mbc < 5.29 for Ks/K*
+    * abs(deltaE) < 0.3 and 5.05 < Mbc < 5.29 for KL
+    * abs(deltaE) < 0.5
+    * nCleanedTracks(abs(dz) < 2.0 and abs(dr) < 0.5 and nCDCHits>20)>=3
+    * nCleanedECLClusters(thetaInCDCAcceptance and E>0.2)>1
+    * visibleEnergyOfEventCMS>4
+    * E_ECL_TDCPV < 9
     """
 
     __authors__ = ["Reem Rasheed", "Chiara La Licata", "Stefano Lacaprara"]
@@ -688,10 +693,10 @@ class TDCPV_inclusiveJpsi(BaseSkim):
 
     **Cuts used**:
 
-    * ``abs(d0) < 0.5 and abs(z0) < 2.0 and thetaInCDCAcceptance`` for muon and electron tracks
-    * ``muonID_noSVD > 0.01`` for muons and ``electronID > 0.01`` for electrons as PID cuts
-    * ``E < 1`` for photons for Bremsstrahlung correction for electrons
-    * ``2.7 < M < 4.1 and useCMSFrame(p) < 3.1`` for J/psi (or Psi(2S)) reconstruction
+    * abs(d0) < 0.5 and abs(z0) < 2.0 and thetaInCDCAcceptance for muon and electron tracks
+    * muonID_noSVD > 0.01 for muons and electronID > 0.01 for electrons as PID cuts
+    * E < 1 for photons for Bremsstrahlung correction for electrons
+    * 2.7 < M < 4.1 and useCMSFrame(p) < 3.1 for J/psi (or Psi(2S)) reconstruction
     """
 
     __authors__ = ["Xu Dong", "Thibaud Humair", "Tadeas Bilka"]

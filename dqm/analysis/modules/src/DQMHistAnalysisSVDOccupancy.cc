@@ -51,6 +51,8 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
            double(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
+  addParam("RPhiView", m_RPhiView, "Flag to produce RPhi view plots",   bool(false));
+  addParam("RPhiViewId0", m_RPhiViewId0, "Flag to produce  RPhi view plots for Id0 group",   bool(false));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));
 }
@@ -102,14 +104,18 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
   m_cOccupancyUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyUGroupId0");
   m_cOccupancyVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyVGroupId0");
 
-  m_cOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU", "", 800, 800);
-  m_cOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV", "", 800, 800);
+  if (m_RPhiView) {
+    m_cOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU", "", 800, 800);
+    m_cOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV", "", 800, 800);
 
-  m_cOnlineOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU", "", 800, 800);
-  m_cOnlineOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV", "", 800, 800);
+    m_cOnlineOccupancyRPhiViewU = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU", "", 800, 800);
+    m_cOnlineOccupancyRPhiViewV = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV", "", 800, 800);
 
-  m_cOccupancyRPhiViewUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewUGroupId0", "", 800, 800);
-  m_cOccupancyRPhiViewVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewVGroupId0", "", 800, 800);
+    if (m_RPhiViewId0) {
+      m_cOccupancyRPhiViewUGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewUGroupId0", "", 800, 800);
+      m_cOccupancyRPhiViewVGroupId0 = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewVGroupId0", "", 800, 800);
+    }
+  }
 
   if (m_3Samples) {
     m_cOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyU3Samples");
@@ -118,11 +124,13 @@ void DQMHistAnalysisSVDOccupancyModule::initialize()
     m_cOnlineOccupancyU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyU3Samples");
     m_cOnlineOccupancyV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyV3Samples");
 
-    m_cOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU3Samples", "", 800, 800);
-    m_cOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV3Samples", "", 800, 800);
+    if (m_RPhiView) {
+      m_cOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewU3Samples", "", 800, 800);
+      m_cOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOccupancyRPhiViewV3Samples", "", 800, 800);
 
-    m_cOnlineOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU3Samples", "", 800, 800);
-    m_cOnlineOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV3Samples", "", 800, 800);
+      m_cOnlineOccupancyRPhiViewU3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewU3Samples", "", 800, 800);
+      m_cOnlineOccupancyRPhiViewV3Samples = new TCanvas("SVDAnalysis/c_SVDOnlineOccupancyRPhiViewV3Samples", "", 800, 800);
+    }
   }
 
   m_hOccupancy =  new SVDSummaryPlots("hOccupancy@view", "Average OFFLINE Sensor Occupancy (%), @view/@side Side");
@@ -177,21 +185,23 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
     m_cOccupancyVGroupId0->Clear();
 
   // RPhiView
-  if (m_cOccupancyRPhiViewU)
-    m_cOccupancyRPhiViewU->Clear();
-  if (m_cOccupancyRPhiViewV)
-    m_cOccupancyRPhiViewV->Clear();
+  if (m_RPhiView) {
+    if (m_cOccupancyRPhiViewU)
+      m_cOccupancyRPhiViewU->Clear();
+    if (m_cOccupancyRPhiViewV)
+      m_cOccupancyRPhiViewV->Clear();
 
-  if (m_cOnlineOccupancyRPhiViewU)
-    m_cOnlineOccupancyRPhiViewU->Clear();
-  if (m_cOnlineOccupancyRPhiViewV)
-    m_cOnlineOccupancyRPhiViewV->Clear();
-
-  if (m_cOccupancyRPhiViewUGroupId0)
-    m_cOccupancyRPhiViewUGroupId0->Clear();
-  if (m_cOccupancyRPhiViewVGroupId0)
-    m_cOccupancyRPhiViewVGroupId0->Clear();
-
+    if (m_cOnlineOccupancyRPhiViewU)
+      m_cOnlineOccupancyRPhiViewU->Clear();
+    if (m_cOnlineOccupancyRPhiViewV)
+      m_cOnlineOccupancyRPhiViewV->Clear();
+    if (m_RPhiViewId0) {
+      if (m_cOccupancyRPhiViewUGroupId0)
+        m_cOccupancyRPhiViewUGroupId0->Clear();
+      if (m_cOccupancyRPhiViewVGroupId0)
+        m_cOccupancyRPhiViewVGroupId0->Clear();
+    }
+  }
   // 3 samples
   if (m_3Samples) {
     m_cOccupancyU3Samples->Clear();
@@ -199,10 +209,12 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
     m_cOnlineOccupancyU3Samples->Clear();
     m_cOnlineOccupancyV3Samples->Clear();
 
-    m_cOccupancyRPhiViewU3Samples->Clear();
-    m_cOccupancyRPhiViewV3Samples->Clear();
-    m_cOnlineOccupancyRPhiViewU3Samples->Clear();
-    m_cOnlineOccupancyRPhiViewV3Samples->Clear();
+    if (m_RPhiView) {
+      m_cOccupancyRPhiViewU3Samples->Clear();
+      m_cOccupancyRPhiViewV3Samples->Clear();
+      m_cOnlineOccupancyRPhiViewU3Samples->Clear();
+      m_cOnlineOccupancyRPhiViewV3Samples->Clear();
+    }
   }
 
   //Retrieve limits from EPICS
@@ -666,20 +678,23 @@ void DQMHistAnalysisSVDOccupancyModule::terminate()
   delete m_cOccupancyUGroupId0;
   delete m_cOccupancyVGroupId0;
 
-  delete m_cOccupancyRPhiViewU;
-  delete m_cOccupancyRPhiViewV;
+  if (m_RPhiView) {
+    delete m_cOccupancyRPhiViewU;
+    delete m_cOccupancyRPhiViewV;
 
-  delete m_cOnlineOccupancyRPhiViewU;
-  delete m_cOnlineOccupancyRPhiViewV;
+    delete m_cOnlineOccupancyRPhiViewU;
+    delete m_cOnlineOccupancyRPhiViewV;
 
-  delete m_cOccupancyRPhiViewU3Samples;
-  delete m_cOccupancyRPhiViewV3Samples;
+    delete m_cOccupancyRPhiViewU3Samples;
+    delete m_cOccupancyRPhiViewV3Samples;
 
-  delete m_cOnlineOccupancyRPhiViewU3Samples;
-  delete m_cOnlineOccupancyRPhiViewV3Samples;
-
-  delete m_cOccupancyRPhiViewUGroupId0;
-  delete m_cOccupancyRPhiViewVGroupId0;
+    delete m_cOnlineOccupancyRPhiViewU3Samples;
+    delete m_cOnlineOccupancyRPhiViewV3Samples;
+    if (m_RPhiView) {
+      delete m_cOccupancyRPhiViewUGroupId0;
+      delete m_cOccupancyRPhiViewVGroupId0;
+    }
+  }
 
   for (int module = 0; module < m_sensors; module++) {
     delete m_cStripOccupancyU[module];

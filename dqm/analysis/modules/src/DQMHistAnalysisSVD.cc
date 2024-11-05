@@ -206,17 +206,19 @@ void DQMHistAnalysisSVDModule::updateCanvases(SVDSummaryPlots* histo, TCanvas* c
   canvas->Modified();
   canvas->Update();
 
-  canvasRPhi->Draw();
-  canvasRPhi->cd();
-  if (histo) {
-    if (m_setColzRange) histo->getPoly(isU, m_colzMinimum, m_colzMaximum)->Draw("colz l");
-    else histo->getPoly(isU)->Draw("colz l");
-    drawText();
-  }
-  setStatusOfCanvas(status, canvasRPhi, false);
+  if (canvasRPhi) {
+    canvasRPhi->Draw();
+    canvasRPhi->cd();
+    if (histo) {
+      if (m_setColzRange) histo->getPoly(isU, m_colzMinimum, m_colzMaximum)->Draw("colz l");
+      else histo->getPoly(isU)->Draw("colz l");
+      drawText();
+    }
+    setStatusOfCanvas(status, canvasRPhi, false);
 
-  canvasRPhi->Modified();
-  canvasRPhi->Update();
+    canvasRPhi->Modified();
+    canvasRPhi->Update();
+  }
 }
 
 void DQMHistAnalysisSVDModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool isU)
@@ -229,15 +231,17 @@ void DQMHistAnalysisSVDModule::updateErrCanvases(SVDSummaryPlots* histo, TCanvas
   canvas->Modified();
   canvas->Update();
 
-  canvasRPhi->Draw();
-  canvasRPhi->cd();
-  if (histo) {
-    histo->getPoly(isU, 0)->Draw("colz l");
-    drawText();
-  }
+  if (canvasRPhi) {
+    canvasRPhi->Draw();
+    canvasRPhi->cd();
+    if (histo) {
+      histo->getPoly(isU, 0)->Draw("colz l");
+      drawText();
+    }
 
-  canvasRPhi->Modified();
-  canvasRPhi->Update();
+    canvasRPhi->Modified();
+    canvasRPhi->Update();
+  }
 }
 
 pair<vector<TText*>, vector<TText*>> DQMHistAnalysisSVDModule::textModuleNumbers()

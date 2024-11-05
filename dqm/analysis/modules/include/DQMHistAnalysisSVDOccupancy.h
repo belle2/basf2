@@ -122,6 +122,12 @@ namespace Belle2 {
     /** additional plots flag*/
     bool m_additionalPlots = false;
 
+    /** RPhi plots flag*/
+    bool m_RPhiView = false;
+
+    /** additional plots flag*/
+    bool m_RPhiViewId0 = false;
+
     TH1F m_hOccupancyChartChip; /**< occupancy chart histo */
     TCanvas* m_cOccupancyChartChip = nullptr; /**< occupancy chart histo canvas */
 

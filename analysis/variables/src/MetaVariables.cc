@@ -3379,6 +3379,27 @@ namespace Belle2 {
       return func;
     }
 
+
+    Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> int {
+          auto var_result = var->function(particle);
+          if (std::holds_alternative<double>(var_result))
+            return static_cast<int>(std::get<double>(var_result));
+          else if (std::holds_alternative<int>(var_result))
+            return std::get<int>(var_result);
+          else if (std::holds_alternative<bool>(var_result))
+            return static_cast<int>(std::get<bool>(var_result));
+          else return 0;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function int");
+      }
+    }
+
     VARIABLE_GROUP("MetaFunctions");
     REGISTER_METAVARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
                           "[Eventbased] Returns the number of clean Clusters in the event\n"
@@ -3735,6 +3756,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
+    REGISTER_METAVARIABLE("int(variable)", convertToInt, "Returns integer value of a variable.", Manager::VariableDataType::c_int);
     REGISTER_METAVARIABLE("isNAN(variable)", isNAN,
                       "Returns true if variable value evaluates to nan (determined via std::isnan(double)).\n"
                       "Useful for debugging.", Manager::VariableDataType::c_bool);

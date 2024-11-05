@@ -58,7 +58,7 @@ void DQMHistAnalysisPhysicsModule::initialize()
   m_cmUPSe_text->SetTextAlign(12);
   m_cmUPSe_text->SetBorderSize(0);
   m_cmUPSe_text->SetTextSize(0.026);
-  m_ratio_text = new TPaveText(0.6, 0.6, 0.9, 0.9, "NDC");
+  m_ratio_text = new TPaveText(0.55, 0.6, 0.85, 0.9, "NDC");
   m_ratio_text->SetFillColor(0);
   m_ratio_text->SetFillStyle(0);
   m_ratio_text->SetTextAlign(12);
@@ -106,17 +106,27 @@ void DQMHistAnalysisPhysicsModule::event()
     double ratio_hadronb2_bhabha = 0.;
     double ratio_hadronb2_tight_bhabha = 0.;
     double ratio_mumu_tight_bhabha = 0.;
+    double error_hadron_bhabha = -10.;
+    double error_hadronb2_bhabha = -10.;
+    double error_hadronb2_tight_bhabha = -10.;
+    double error_mumu_tight_bhabha = -10.;
+
 
     if (bhabha_all_ntot != 0) {
       ratio_hadron_bhabha = had_ntot / bhabha_all_ntot;
+      error_hadron_bhabha = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bhabha_all_ntot));
       ratio_hadronb2_bhabha = hadb2_ntot / bhabha_all_ntot;
+      error_hadronb2_bhabha = ratio_hadronb2_bhabha * sqrt((1 / hadb2_ntot) + (1 / bhabha_all_ntot));
       ratio_hadronb2_tight_bhabha = hadb2_tight_ntot / bhabha_all_ntot;
+      error_hadronb2_tight_bhabha = ratio_hadronb2_tight_bhabha * sqrt((1 / hadb2_tight_ntot) + (1 / bhabha_all_ntot));
       ratio_mumu_tight_bhabha = mumu_tight_ntot / bhabha_all_ntot;
+      error_mumu_tight_bhabha = ratio_mumu_tight_bhabha * sqrt((1 / mumu_tight_ntot) + (1 / bhabha_all_ntot));
     }
-    m_ratio_text->AddText(Form("hadronb2_tight/bhabha: %.4f", float(ratio_hadronb2_tight_bhabha)));
-    m_ratio_text->AddText(Form("hadronb2/bhabha: %.4f", float(ratio_hadronb2_bhabha)));
-    m_ratio_text->AddText(Form("mumu_tight/bhabha: %.4f", float(ratio_mumu_tight_bhabha)));
-    m_ratio_text->AddText(Form("hadron/bhabha: %.4f", float(ratio_hadron_bhabha)));
+    m_ratio_text->AddText(Form("hadronb2_tight/bhabha: %.4f +/- %.4f", float(ratio_hadronb2_tight_bhabha),
+                               float(error_hadronb2_tight_bhabha)));
+    m_ratio_text->AddText(Form("hadronb2/bhabha: %.4f +/- %.4f", float(ratio_hadronb2_bhabha), float(error_hadronb2_bhabha)));
+    m_ratio_text->AddText(Form("mumu_tight/bhabha: %.4f +/- %.4f", float(ratio_mumu_tight_bhabha), float(error_mumu_tight_bhabha)));
+    m_ratio_text->AddText(Form("hadron/bhabha: %.4f +/- %.4f", float(ratio_hadron_bhabha), float(error_hadron_bhabha)));
 
   }
   // for pv #new hadronb2_tight/#bhabha_all

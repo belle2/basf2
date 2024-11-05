@@ -271,6 +271,20 @@ void DQMHistAnalysisSVDOccupancyModule::beginRun()
   m_legOnlineNormal->AddText("OCCUPANCY WITHIN LIMITS");
   m_legOnlineNormal->AddText(Form("%1.1f%% < online occupancy < %1.1f%%", m_onlineOccEmpty, m_onlineOccWarning));
 
+  m_occUstatus = good;
+  m_occVstatus = good;
+
+  m_occU3Samples = good;
+  m_occV3Samples = good;
+
+  m_occUGroupId0 = good;
+  m_occVGroupId0 = good;
+
+  m_onlineOccUstatus = good;
+  m_onlineOccVstatus = good;
+
+  m_onlineOccU3Samples = good;
+  m_onlineOccV3Samples = good;
 }
 
 void DQMHistAnalysisSVDOccupancyModule::event()
@@ -286,20 +300,6 @@ void DQMHistAnalysisSVDOccupancyModule::event()
     B2DEBUG(10, "SVDExpReco/SVDDQM_nEvents found");
   }
 
-  m_occUstatus = good;
-  m_occVstatus = good;
-
-  m_occU3Samples = good;
-  m_occV3Samples = good;
-
-  m_occUGroupId0 = good;
-  m_occVGroupId0 = good;
-
-  m_onlineOccUstatus = good;
-  m_onlineOccVstatus = good;
-
-  m_onlineOccU3Samples = good;
-  m_onlineOccV3Samples = good;
 
   TString tmp = hnEvnts->GetTitle();
   Int_t pos = tmp.Last('~');

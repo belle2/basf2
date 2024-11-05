@@ -198,7 +198,7 @@ class TestSuite:
         )
         
         for test in self.get_tests():
-            test.create_testcase_element(suite_el)
+            test.create_testcase_xml_element(suite_el)
         
         return suite_el        
     
@@ -373,7 +373,7 @@ def run_test_ipynb(testinformation):
     testinformation.time = timeit.default_timer() - time_start
 
     with print_lock:
-        testinformation.report_test_result(testinformation)
+        testinformation.report_test_result()
 
     return testinformation
 
@@ -443,7 +443,7 @@ def run_test_py(testinformation):
                 testinformation.message = "logs differ from expectation"
                 testinformation.output = "\n".join(e for e in log_tests if e is not None)
 
-        testinformation.report_test_result(testinformation)
+        testinformation.report_test_result()
 
     # we didn't want to print the diff in full but we want to return it if it
     # exists so let's replace the extra

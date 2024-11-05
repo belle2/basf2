@@ -143,12 +143,13 @@ The following restrictions apply:
         if(trees!=allEventTrees){
           B2ERROR("Trees in " << std::quoted(input) << " differ from "
               << std::quoted(inputfilenames.front()));
+          continue;
         }
       }
       for(const auto& tree : allEventTrees) {
         auto branches = (tree=="tree") ? fileInfo.getBranchNames() : fileInfo.getNtupleBranchNames(tree);
         if(branches.empty()) {
-          throw std::runtime_error("Could not find any branches in event tree");
+          throw std::runtime_error("Could not find any branches in " + tree);
         }
         if(allEventBranches[tree].empty()) {
           std::swap(allEventBranches[tree],branches);

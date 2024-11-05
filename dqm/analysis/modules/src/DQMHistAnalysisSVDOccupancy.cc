@@ -51,7 +51,7 @@ DQMHistAnalysisSVDOccupancyModule::DQMHistAnalysisSVDOccupancyModule()
            double(0));
   addParam("printCanvas", m_printCanvas, "if True prints pdf of the analysis canvas", bool(false));
   addParam("additionalPlots", m_additionalPlots, "Flag to produce additional plots",   bool(false));
-  addParam("RPhiView", m_RPhiView, "Flag to produce RPhi view plots",   bool(false));
+  addParam("RPhiView", m_RPhiView, "Flag to produce RPhi view plots",   bool(true));
   addParam("RPhiViewId0", m_RPhiViewId0, "Flag to produce  RPhi view plots for Id0 group",   bool(false));
   addParam("samples3", m_3Samples, "if True 3 samples histograms analysis is performed", bool(false));
   addParam("PVPrefix", m_pvPrefix, "PV Prefix", std::string("SVD:"));

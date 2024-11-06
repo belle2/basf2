@@ -434,41 +434,39 @@ def upload_files(json_dir, release):
     '''
 
     prod_cmd = 'gb2_prod_status -g skim -s all'
-    grep_cmd = ['grep', '-e', 'Initialized', '-e', 'Registered']
 
-    # Run the command and capture the output
     try:
-        proc1 = subprocess.Popen(prod_cmd.split(), stdout=subprocess.PIPE, text=True)
-        proc2 = subprocess.Popen(grep_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE, text=True)
-        proc1.stdout.close()  # Allow proc1 to receive a SIGPIPE if proc2 exits
-        output, _ = proc2.communicate()
-        print(output)
+        result = subprocess.run(prod_cmd.split(), capture_output=True, text=True)
 
-        # Split the output into lines
-        prodlines = output.strip().split('\n')
+        if result.returncode == 0:
+            output = '\n'.join(line for line in result.stdout.split('\n') if 'Initialized' in line or 'Registered' in line)
+            print(output)
 
-        # Extract the first value from each line and store them in a list
-        prod_list = [line.split()[0] for line in prodlines]
-        camp_list = [line.split()[1] for line in prodlines]
+            prodlines = output.strip().split('\n')
 
-        # upload skim files
-        for prod, camp in zip(prod_list, camp_list):
-            if 'bucket' in camp or 'PromptExp' in camp:
-                camp = 'prompt'
-            elif 'proc13' in camp:
-                camp = 'proc13'
-            elif 'MC15rd_a' in camp:
-                camp = 'MC15rd_a'
-            elif 'MC15rd_b' in camp:
-                camp = 'MC15rd_b'
-            script_dir = f'{json_dir}skim/{camp}/{release}/SkimScripts'
-            command = ['gb2_prod_uploadFile', '-p', prod]
-            result = subprocess.run(command, cwd=script_dir, capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f"Error uploading files for prod {prod}: {result.stderr}")
+            prod_list = [line.split()[0] for line in prodlines]
+            camp_list = [line.split()[1] for line in prodlines]
 
-    except subprocess.CalledProcessError as e:
-        print("Error while running the command:", e)
+            # upload skim files
+            for prod, camp in zip(prod_list, camp_list):
+                if 'bucket' in camp or 'PromptExp' in camp:
+                    camp = 'prompt'
+                elif 'proc13' in camp:
+                    camp = 'proc13'
+                elif 'MC15rd_a' in camp:
+                    camp = 'MC15rd_a'
+                elif 'MC15rd_b' in camp:
+                    camp = 'MC15rd_b'
+                script_dir = f'{json_dir}skim/{camp}/{release}/SkimScripts'
+                command = ['gb2_prod_uploadFile', '-p', prod]
+                result_upload = subprocess.run(command, cwd=script_dir, capture_output=True, text=True)
+                if result_upload.returncode != 0:
+                    print(f"Error uploading files for prod {prod}: {result_upload.stderr}")
+        else:
+            print(f"Error running command: {result.stderr}")
+
+    except (subprocess.CalledProcessError, IndexError) as e:
+        print("Error while running the command. Error:", e)
         print('Probably no prods in Initialized/Registered state.')
 
 
@@ -476,29 +474,28 @@ def approve_prods():
     # look for all prods in "ToApprove" state and approve them
 
     prod_cmd = 'gb2_prod_status -g skim -s all'
-    grep_cmd = ['grep', 'ToApprove']
 
-    # Run the command and capture the output
     try:
-        proc1 = subprocess.Popen(prod_cmd.split(), stdout=subprocess.PIPE, text=True)
-        proc2 = subprocess.Popen(grep_cmd, stdin=proc1.stdout, stdout=subprocess.PIPE, text=True)
-        proc1.stdout.close()  # Allow proc1 to receive a SIGPIPE if proc2 exits
-        output, _ = proc2.communicate()
-        print(output)
+        result = subprocess.run(prod_cmd.split(), capture_output=True, text=True)
 
-        # Split the output into lines
-        prodlines = output.strip().split('\n')
+        if result.returncode == 0:
+            output = '\n'.join(line for line in result.stdout.split('\n') if 'ToApprove' in line)
+            print(output)
 
-        # Extract the first value from each line and store them in a list
-        prod_list = [line.split()[0] for line in prodlines]
-        # approve prods
-        for prod in prod_list:
-            result = subprocess.run(['gb2_prod_approve', '-p', prod], capture_output=True, text=True)
-            if result.returncode != 0:
-                print(f"Error approving prod {prod}: {result.stderr}")
+            prodlines = output.strip().split('\n')
 
-    except subprocess.CalledProcessError as e:
-        print("Error while running the command:", e)
+            prod_list = [line.split()[0] for line in prodlines]
+
+            # approve prods
+            for prod in prod_list:
+                result_approve = subprocess.run(['gb2_prod_approve', '-p', prod], capture_output=True, text=True)
+                if result_approve.returncode != 0:
+                    print(f"Error approving prod {prod}: {result_approve.stderr}")
+        else:
+            print(f"Error running command: {result.stderr}")
+
+    except (subprocess.CalledProcessError, IndexError) as e:
+        print("Error while running the command. Error:", e)
         print('Probably no prods in ToApprove state.')
 
 

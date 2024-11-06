@@ -6,8 +6,8 @@
 # This file is licensed under LGPL-3.0, see LICENSE.md.                  #
 ##########################################################################
 
-import os
 import argparse
+import subprocess
 
 parser = argparse.ArgumentParser("")
 parser.add_argument('-min',   '--min',          type=str, default='',        help="starting number of prod to cancel")
@@ -17,4 +17,4 @@ args = parser.parse_args()
 
 for i in range(int(args.min), int(args.max)+1):
     print(f'cancelling prod {i}')
-    os.system(f'gb2_prod_cancel -p {i} --comment "{args.comment}" ')
+    subprocess.run(['gb2_prod_cancel', '-p', str(i), '--comment', args.comment])

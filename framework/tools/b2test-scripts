@@ -571,14 +571,19 @@ class TestScheduler:
         self.release_dir: str = os.environ.get("BELLE2_RELEASE_DIR") or os.environ.get("BELLE2_LOCAL_DIR")
 
     def filter_tests(self, tests: List[TestInformation]) -> List[TestInformation]:
-        filter_stred_tests = [
-            test for test in tests
-            if (self.filter_str and re.search(self.filter_str, test.filename))
-        ]
-        filter_stred_tests = [
-            test for test in filter_stred_tests
-            if not (self.exclude_str and re.search(self.exclude_str, test.filename))
-        ]
+        filter_stred_tests = tests
+
+        if self.filter_str:
+            filter_stred_tests = [
+                test for test in filter_stred_tests
+                if re.search(self.filter_str, test.filename)
+            ]
+
+        if self.exclude_str:
+            filter_stred_tests = [
+                test for test in filter_stred_tests
+                if not re.search(self.exclude_str, test.filename)
+            ]
         return filter_stred_tests
 
     def read_results_xml(self) -> None:
@@ -675,7 +680,7 @@ class TestScheduler:
         other_tests = self.filter_tests(tests_to_execute[1])
 
         print(f"Running steering file tests in {self.nprocess} processes", flush=True)
-
+        print()
         xml_report_el = None
         if prepare_tests:
             xml_report_el = self._run_tests(tests=prepare_tests, prepare_step=True, root_el=xml_report_el)

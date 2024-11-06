@@ -225,7 +225,7 @@ def run_test_py(testinformation):
 
     time_start = timeit.default_timer()
     try:
-        process = subprocess.run(['basf2', testinformation.filename, testinformation.args], stdout=subprocess.PIPE,
+        process = subprocess.run(['basf2', testinformation.filename], stdout=subprocess.PIPE,
                                  stderr=subprocess.PIPE, timeout=options.timeout)
     except subprocess.TimeoutExpired as e:
         # apparently test case took to long so format result message. Without
@@ -343,10 +343,9 @@ class TestState(Enum):
 class TestInformation:
     """Class to store information about a test"""
 
-    def __init__(self, name: str = "", release_dir: str = "", args: str = "") -> None:
+    def __init__(self, name: str = "", release_dir: str = "") -> None:
         self.name = name
         self.release_dir = release_dir
-        self.args = args
 
         self.state: TestState = TestState.DEFAULT
         self.message: str = ""
@@ -680,7 +679,6 @@ class TestScheduler:
         other_tests = self.filter_tests(tests_to_execute[1])
 
         print(f"Running steering file tests in {self.nprocess} processes", flush=True)
-        print()
         xml_report_el = None
         if prepare_tests:
             xml_report_el = self._run_tests(tests=prepare_tests, prepare_step=True, root_el=xml_report_el)

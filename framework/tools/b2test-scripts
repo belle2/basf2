@@ -563,7 +563,6 @@ class TestScheduler:
         self.filter_str = filter_str
         self.exclude_str = exclude_str
         self.nprocess = nprocess
-        self.pool = ThreadPoolExecutor(max_workers=nprocess)
 
         self.new_suites: Dict[str, TestSuite] = {}
         self.previous_suites: Dict[str, TestSuite] = {}
@@ -645,11 +644,11 @@ class TestScheduler:
                    root_el: Optional[ET.Element] = None) -> ET.Element:
         print(f'Collected {len(tests)} {"prepare steps" if prepare_step else "tests"}...', flush=True)
         if self.nprocess > 1:
-            with self.pool:
+            with ThreadPoolExecutor(max_workers=self.nprocess) as pool:
                 # run tests in multiple threads but consume the iterator right away to
                 # avoid a bug in python 3.5 when zipping over a futures result iterator
                 # and then exiting using sys.exit().
-                results = list(self.pool.map(run_test, tests))
+                results = list(pool.map(run_test, tests))
         else:
             results = map(run_test, tests)
 

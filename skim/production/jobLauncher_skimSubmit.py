@@ -231,7 +231,7 @@ if args.check:  # step6 - basf2, loop on skim, one command for data and one for 
 
     for skim, skimVal in skims_dict.items():
 
-        command = f'python3 ../tools/checkJSONs.py -s {skim} --path {args.base_dir} --verbose 1'
+        command = f'python3 checkJSONs.py -s {skim} --path {args.base_dir} --verbose 1'
 
         if args.data:
             command_data = command+' -d Data'

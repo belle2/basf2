@@ -21,6 +21,9 @@
 #include <TPaveText.h>
 #include <TCanvas.h>
 #include <TH2F.h>
+#include <TText.h>
+#include <TLine.h>
+#include <TArrow.h>
 
 namespace Belle2 {
   /*! Class definition for common method */
@@ -53,14 +56,36 @@ namespace Belle2 {
     TPaveText* m_legOnlineWarning = nullptr; /**< onlineOccupancy plot legend, warning */
     TPaveText* m_legOnlineNormal = nullptr;  /**< onlineOccupancy plot legend, normal */
 
+    std::pair<std::vector<TText*>, std::vector<TText*>> textModuleNumbers(); /**< create vectors of TText to write on the canvas */
+    void drawText(); /**< draw text on the RPhi view */
+
+    std::vector<TText*> m_laddersText; /**< list of ladders to write on the canvas */
+    std::vector<TText*> m_sensorsText; /**< list of sensors to write on the cancas */
+
+    TLine* m_lx = nullptr; /**< y-axis */
+    TLine* m_ly = nullptr; /**< x-axis */
+    TArrow* m_arrowx = nullptr; /**< x-axis direction */
+    TArrow* m_arrowy = nullptr; /**< y-axis direction */
+
+    int m_colzMinimum = 0; /**< Minimum of the  histogram */
+    int m_colzMaximum = -1111; /**< Maximum of the  histogram. -1111 adjust the maximum depennding on the content */
+    bool m_setColzRange = false; /**< set the range of the  histogram in colz*/
+
+    float m_valueMinimum = -1; /**< Minimum value of parameter  */
+    float m_valueMaximum = -1; /**< Maxiimum value of parameter  */
+
     /**  status flags */
     enum svdStatus {
       good = 0,    /**< green frame */
       warning = 1, /**< orange frame */
       error = 2,   /**< red frame */
-      lowStat = 3,  /**< gray frame */
-      noStat = 4 /**< purple frame */
+      noStat = 3, /**< purple frame */
+      lowStat = 4  /**< gray frame */
     };
+
+    void updateCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, svdStatus status, bool isU,
+                        bool online = false); /**< update canvases */
+    void updateErrCanvases(SVDSummaryPlots* histo, TCanvas* canvas, TCanvas* canvasRPhi, bool isU); /**< update error canvases */
 
   };
 } // end namespace Belle2

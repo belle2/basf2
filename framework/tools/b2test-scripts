@@ -55,7 +55,6 @@ from a different directory.
 
 import sys
 import os
-import glob
 import subprocess
 import difflib
 from concurrent.futures import ThreadPoolExecutor
@@ -69,9 +68,8 @@ import datetime
 import tempfile
 import timeit
 import xml.etree.ElementTree as ET
-from collections import defaultdict
 from enum import Enum
-from typing import Dict, List
+from typing import Dict, List, Tuple, Optional
 
 from b2test_utils import temporary_set_environment
 # allow stopping tests with Ctrl+c
@@ -82,193 +80,29 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 print_lock = threading.Lock()
 
 
-class TestState(Enum):
-    """Enum to store the state of a test"""
-    DEFAULT = 0
-    PASSED = 1
-    FAILED = 2
-    SKIPPED = 3
-    TIMEOUT = 4
-
-
-class TestInformation:
-    """Class to store information about a test"""
-
-    def __init__(self, name: str="", release_dir: str="", args: str=""):
-        self.name = name
-        self.release_dir = release_dir
-        self.args = args
-
-        self.state: TestState = TestState.DEFAULT
-        self.message: str = ""
-        self.time: float = 0 # in s
-        self.output: str = ""
-
-        self.filename: str = os.path.join(release_dir, name)
-        self.extension: str = os.path.splitext(name)[1]
-        self.suite: str = os.path.dirname(name)
-        if self.suite.endswith("/tests"):
-            self.suite = os.path.dirname(self.suite)
-
-    def __str__(self) -> str:
-        return f"{self.filename}: \n\tState: {self.state.name}, \n\tTime: {self.time}"\
-            f", \n\tMessage: {self.message}, \n\tOutput: {self.output}"
-    
-    def report_test_result(self) -> None:
-        """ print out the result of one test"""
-        print(f"{self.output}finished test {self.name}\n     "
-            f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
-            flush=True)
-        
-    def create_testcase_xml_element(self, suite_name: ET.SubElement) -> ET.SubElement:
-        test_el = ET.SubElement(
-            suite_name,
-            "testcase",
-            name=os.path.basename(self.name),
-            classname=suite_name,
-            time=str(self.time)
-        )
-        
-        if self.state != TestState.PASSED:
-            failure_type = "failure" if self.state != TestState.SKIPPED else "skipped"
-            failure_message = self.message
-            failure = ET.SubElement(test_el, failure_type, message=failure_message, 
-                                    type=failure_type.upper())
-            
-            if self.output:
-                failure.text = re.sub(r'\033\[[0-9;]*m', '', self.output)
-        
-        return test_el
-        
-class TestSuite:
-    """Class to aggregate test case results by directory"""
-
-    def __init__(self, name: str=""):
-        self.name = name
-        """Init the suite with empty values"""
-        #: passed tests in the suite/package
-        self.passed_tests: List[TestInformation] = []
-        #: failed tests in the suite/package
-        self.failed_tests: List[TestInformation] = []
-        #: skipped tests in the suite/package
-        self.skipped_tests: List[TestInformation] = []
-        #: time in seconds needed for test execution
-        self.time: float = 0
-
-    @property
-    def passed(self) -> int:
-        return len(self.passed_tests)
-    
-    @property
-    def failed(self) -> int:
-        return len(self.failed_tests)
-    
-    @property
-    def skipped(self) -> int:
-        return len(self.skipped_tests)
-    
-    def get_tests(self) -> List[TestInformation]:
-        return self.passed_tests + self.failed_tests + self.skipped_tests
-    
-    @property
-    def total(self) -> int:
-        return len(self.get_tests())
-    
-    def add(self, testinformation: TestInformation) -> None:
-        """Add a new test to the suite. Return True if test was successful or
-        skipped, False if it failed"""
-        if testinformation.state == TestState.PASSED:
-            self.passed_tests.append(testinformation)
-        elif testinformation.state == TestState.SKIPPED:
-            self.skipped_tests.append(testinformation)
-        else:
-            self.failed_tests.append(testinformation)
-
-        self.time += testinformation.time
-
-    def create_testsuite_xml_element(self, root: ET.Element) -> ET.SubElement:
-        suite_el = ET.SubElement(
-            root,
-            "testsuite",
-            name=self.name,
-            tests=str(self.total),
-            failures=str(self.failed),
-            skipped=str(self.skipped),
-            time=str(self.time)
-        )
-        
-        for test in self.get_tests():
-            test.create_testcase_xml_element(suite_el)
-        
-        return suite_el        
-    
-class TestResult:
-    """Class to store the results of a test run"""
-
-    def __init__(self):
-        self.suites: Dict[str, TestSuite] = {}
-
-    @property
-    def total(self) -> int:
-        return sum(suite.total for suite in self.suites.values())
-    
-    @property
-    def failed(self) -> int:
-        return sum(suite.failed for suite in self.suites.values())
-    
-    @property
-    def skipped(self) -> int:
-        return sum(suite.skipped for suite in self.suites.values())
-    
-    @property
-    def time(self) -> float:
-        return sum(suite.time for suite in self.suites.values())
-    
-    def get_skipped(self) -> List[TestInformation]:
-        skipped = []
-        for suite in self.suites.values():
-            skipped += suite.skipped_tests
-        return skipped
-    
-    def get_failed(self) -> List[TestInformation]:
-        failed = []
-        for suite in self.suites.values():
-            failed += suite.failed_tests
-        return failed
-
-    def add(self, testinformation: TestInformation) -> None:
-        suite_name = testinformation.suite
-        if suite_name not in self.suites:
-            self.suites[suite_name] = TestSuite(suite_name)
-        self.suites[suite_name].add(testinformation)
-
-    def create_testresult_xml_element(self) -> ET.Element:
-        root_el = ET.Element("testsuites", 
-                            tests=str(self.total), 
-                            failures=str(self.failed),
-                            skipped=str(self.skipped), 
-                            timestamp=datetime.datetime.now().isoformat(),
-                            time=str(self.time), 
-                            name="Basf2 Tests")
-        
-        for suite in self.suites.values():
-            suite.create_testsuite_xml_element(root_el)
-
-        return root_el
-    
-    def report_results_xml(self) -> None:
-        tree = ET.ElementTree(self.create_testresult_xml_element())
-        tree.write(options.xml, encoding="UTF-8", xml_declaration=True)
-
-    def report_results(self, prepare_step: bool=True) -> None:
-        print(flush=True)
-        if self.skipped > 0:
-            print("\n    ".join([f"Skipped tests: {test.name} ({test.message})" for test in self.get_skipped()]), flush=True)
-        if self.failed > 0:
-            print("\n    ".join([f"FAILED tests: {test.name} ({test.message})" for test in self.get_failed()]), flush=True)
-        # print summary and exit
-        print(f'{self.failed} out of {self.total} {"prepare steps" if prepare_step else "tests"} '
-            f'failed, {self.skipped} were skipped\n', flush=True)
+def get_argument_parser():
+    """Return an argument parser correctly setup for all known options"""
+    description, epilog = __doc__.split("--epilog--", 1)
+    parser = argparse.ArgumentParser(description=description, epilog=epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("-j", type=int, default=1, dest="nprocess", metavar="N",
+                        help="Number of test cases to run in parallel")
+    parser.add_argument("--xml", type=str, default=None, help="Save results into given "
+                        "file using xml format compatible with JUnit parsers")
+    parser.add_argument("-n", "--diff-lines", type=int, default=10,
+                        help="Number of lines to show if output is different from template")
+    parser.add_argument("-q", "--quiet", action="store_true", default=False,
+                        help="if given don't print output of failed tests")
+    parser.add_argument("--filter", type=str, default="", help="Only run tests where the name "
+                        "of the steering file matches the given regular expression")
+    parser.add_argument("--exclude", type=str, default="", help="Exclude all tests where the name "
+                        "of the steering file matches the given regular expression")
+    parser.add_argument("directories", nargs="*", help="run all tests included in this directory."
+                        "If none are specified run all tests", metavar="DIRECTORY")
+    parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
+                        help="if given this is the maximum runtime in seconds for each "
+                        "test case before they are killed and marked as failed")
+    return parser
 
 
 def compare_log(release, name, log, logtype, ignore_lines=0, diff_lines=10):
@@ -321,6 +155,7 @@ def format_output(name, out, err):
     if len(output):
         output.append(f"=== end {name} ===\n")
     return "".join(output)
+
 
 def run_test(testinformation):
     """ run either regurlar python tests (with basf2) or as jupyter notebooks """
@@ -452,140 +287,402 @@ def run_test_py(testinformation):
     return testinformation
 
 
-def process_dir(dir, release_dir, prepare_step=False):
+def process_dir(dir, release_dir):
     """Search a directory for prepare/test steering files"""
 
-    exclude_dirs = ['include', 'src', 'tools', 'scripts', 'data', 'doc', 'examples']
+    exclude_str_dirs = ['include', 'src', 'tools', 'scripts', 'data', 'doc', 'examples']
     tests = []
     for entry in os.listdir(dir):
         dir_entry = os.path.join(dir, entry)
-        if entry.find('.') > -1 or not os.path.isdir(dir_entry) or entry in exclude_dirs:
+        if entry.find('.') > -1 or not os.path.isdir(dir_entry) or entry in exclude_str_dirs:
             continue
-        if not prepare_step and entry == 'tests':
+        if entry in ("tests", "prepare"):
             # search for files with .py (basf2 steering files) and .ipynb (jupyter notebooks) extensions
-            for steering in glob.glob(os.path.join(dir_entry, '*.py')) + glob.glob(os.path.join(dir_entry, '*.ipynb')):
-                name = steering[len(release_dir):]
-                name = name.lstrip('/')
-                tests.append(TestInformation(name, release_dir))
-        elif prepare_step and entry == 'prepare':
-            for steering in glob.glob(os.path.join(dir_entry, '*.py')):
-                name = steering[len(release_dir):]
-                name = name.lstrip('/')
-                tests.append(TestInformation(name, release_dir))
+            for root, _, files in os.walk(dir_entry):
+                if root.startswith(os.path.join(dir_entry, 'prepare')) or root == dir_entry:
+                    for file in files:
+                        if file.endswith('.py') or file.endswith('.ipynb'):
+                            full_path = os.path.join(root, file)
+                            name = full_path[len(release_dir):].lstrip('/')
+                            tests.append(TestInformation(name, release_dir))
         else:
-            tests += process_dir(dir_entry, release_dir, prepare_step)
+            tests += process_dir(dir_entry, release_dir)
 
     return tests
 
 
-def process_top_dir(release_dir, directories, processed_dirs, prepare_step=False):
+def process_top_dir(release_dir, directories):
     """Loop over folders in the top release directory"""
 
     dirs = os.listdir(release_dir)
     if len(directories) > 0:
         dirs = directories
 
-    exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'externals']
+    exclude_str_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'externals']
     tests = []
     for entry in dirs:
-        if entry in processed_dirs or entry in exclude_dirs:
+        if entry in exclude_str_dirs:
             continue
         dir_entry = os.path.join(release_dir, entry)
         if entry.find('.') > -1 or not os.path.isdir(dir_entry):
             continue
-        tests += process_dir(dir_entry, release_dir, prepare_step)
-        processed_dirs.append(entry)
+        tests += process_dir(dir_entry, release_dir)
 
     return tests
 
-def get_argument_parser():
-    """Return an argument parser correctly setup for all known options"""
-    description, epilog = __doc__.split("--epilog--", 1)
-    parser = argparse.ArgumentParser(description=description, epilog=epilog,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("-j", type=int, default=1, dest="nprocess", metavar="N",
-                        help="Number of test cases to run in parallel")
-    parser.add_argument("--xml", type=str, default=None, help="Save results into given "
-                        "file using xml format compatible with JUnit parsers")
-    parser.add_argument("-n", "--diff-lines", type=int, default=10,
-                        help="Number of lines to show if output is different from template")
-    parser.add_argument("-q", "--quiet", action="store_true", default=False,
-                        help="if given don't print output of failed tests")
-    parser.add_argument("--filter", type=str, default=None, help="Only run tests where the name "
-                        "of the steering file matches the given regular expression")
-    parser.add_argument("--exclude", type=str, default=None, help="Exclude all tests where the name "
-                        "of the steering file matches the given regular expression")
-    parser.add_argument("directories", nargs="*", help="run all tests included in this directory."
-                        "If none are specified run all tests", metavar="DIRECTORY")
-    parser.add_argument("-t", "--timeout", type=int, default=None, metavar="SECONDS",
-                        help="if given this is the maximum runtime in seconds for each "
-                        "test case before they are killed and marked as failed")
-    return parser
+
+class TestState(Enum):
+    """Enum to store the state of a test"""
+    DEFAULT = 0
+    PASSED = 1
+    FAILED = 2
+    SKIPPED = 3
+    TIMEOUT = 4
 
 
-def executor(options, prepare_step):
+class TestInformation:
+    """Class to store information about a test"""
 
-    print(f"Running steering file tests in {options.nprocess} processes", flush=True)
+    def __init__(self, name: str = "", release_dir: str = "", args: str = "") -> None:
+        self.name = name
+        self.release_dir = release_dir
+        self.args = args
 
-    # let's collect all tests
-    all_tests = []
-    processed_dirs = []
-    release_dir = ''
-    if "BELLE2_LOCAL_DIR" in os.environ:
-        all_tests += process_top_dir(os.environ['BELLE2_LOCAL_DIR'], options.directories, processed_dirs, prepare_step)
-        release_dir = os.environ['BELLE2_LOCAL_DIR']
-    if "BELLE2_RELEASE_DIR" in os.environ:
-        all_tests += process_top_dir(os.environ['BELLE2_RELEASE_DIR'], options.directories, processed_dirs, prepare_step)
-        release_dir = os.environ['BELLE2_RELEASE_DIR']
+        self.state: TestState = TestState.DEFAULT
+        self.message: str = ""
+        self.time: float = 0  # in s
+        self.output: str = ""
 
-    # TODO: adjust for TestInformation class
-    for name, invert in [("filter", False), ("exclude", True)]:
-        arg = getattr(options, name)
-        if arg is not None:
-            try:
-                re_filter = re.compile(arg)
-            except Exception as e:
-                print(f"The --{name} argument {arg:r} is not a valid regular expression: {e}")
-                sys.exit(1)
-            all_tests = [test for test in all_tests if (re_filter.search(test.name) is not None) != invert]
+        self._suite: str = os.path.dirname(self.name)
+        if self._suite.endswith("/tests"):
+            self._suite = os.path.dirname(self._suite)
 
-    # all_tests.sort()
+    @property
+    def filename(self) -> str:
+        return os.path.join(self.release_dir, self.name)
 
-    # Small hack for scheduling the slowest tests first
-    # to be removed/improved via getting the list as input
-    slowest_tests = [
-        TestInformation(os.path.join('tracking', 'tests', 'tracking_doxygen_check.py'), release_dir),
-        TestInformation(os.path.join('framework', 'tests', 'sphinx.py'), release_dir, "-o shpinx_test_dir"),
-        TestInformation(os.path.join('mva', 'tests', 'all_classifiers.py'), release_dir),
-        TestInformation(os.path.join('online_book', 'tests', 'steering_files.py'), release_dir),
-        TestInformation(os.path.join('framework', 'tests', 'signals.py'), release_dir),
-    ]
-    for t in reversed(slowest_tests):
-        if t in all_tests:
-            all_tests.insert(0, all_tests.pop(all_tests.index(t)))
-    print(f'Collected {len(all_tests)} {"prepare steps" if prepare_step else "tests"}...', flush=True)
+    @property
+    def suite(self) -> str:
+        return self._suite
 
-    # now let's run them, either in multiprocessing or in a single process
-    if options.nprocess > 1:
-        with ThreadPoolExecutor(max_workers=options.nprocess) as pool:
-            # run tests in multiple threads but consume the iterator right away to
-            # avoid a bug in python 3.5 when zipping over a futures result iterator
-            # and then exiting using sys.exit().
-            results = list(pool.map(run_test, all_tests))
-    else:
-        results = map(run_test, all_tests)
+    @suite.setter
+    def suite(self, value: str) -> None:
+        self._suite = value
 
-    # and present the results
-    test_results = TestResult()
-    for result in results:
-        test_results.add(result)
+    @property
+    def extension(self) -> str:
+        return os.path.splitext(self.name)[1]
 
-    if options.xml and len(all_tests):
-        test_results.report_results_xml()
+    @property
+    def is_prepare(self) -> bool:
+        return "prepare" in self.suite
 
-    # print a list of failed tests to find them more easily
-    test_results.report_results(prepare_step)
-    return test_results.failed
+    def report_test_result(self) -> None:
+        """ print out the result of one test"""
+        print(f"{self.output}finished test {self.name}\n     "
+              f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
+              flush=True)
+
+    def create_testcase_xml_element(self, suite: ET.Element) -> ET.Element:
+        test_el = ET.SubElement(
+            suite,
+            "testcase",
+            name=os.path.basename(self.name),
+            classname=self.suite,
+            time=str(self.time)
+        )
+
+        if self.state != TestState.PASSED:
+            failure_type = "failure" if self.state != TestState.SKIPPED else "skipped"
+            failure_message = self.message
+            failure = ET.SubElement(test_el, failure_type, message=failure_message,
+                                    type=failure_type.upper())
+
+            if self.output:
+                failure.text = re.sub(r'\033\[[0-9;]*m', '', self.output)
+
+        return test_el
+
+
+class TestSuite:
+    """Class to aggregate test case results by directory"""
+
+    def __init__(self, name: str = "") -> None:
+        self.name = name
+        """Init the suite with empty values"""
+        #: passed tests in the suite/package
+        self.passed_tests: List[TestInformation] = []
+        #: failed tests in the suite/package
+        self.failed_tests: List[TestInformation] = []
+        #: skipped tests in the suite/package
+        self.skipped_tests: List[TestInformation] = []
+        #: time in seconds needed for test execution
+        self.time: float = 0
+
+    @property
+    def passed(self) -> int:
+        return len(self.passed_tests)
+
+    @property
+    def failed(self) -> int:
+        return len(self.failed_tests)
+
+    @property
+    def skipped(self) -> int:
+        return len(self.skipped_tests)
+
+    def get_tests(self) -> List[TestInformation]:
+        return self.passed_tests + self.failed_tests + self.skipped_tests
+
+    @property
+    def total(self) -> int:
+        return len(self.get_tests())
+
+    @property
+    def is_prepare(self) -> bool:
+        return "prepare" in self.name
+
+    def add(self, testinformation: TestInformation) -> None:
+        """Add a new test to the suite. Return True if test was successful or
+        skipped, False if it failed"""
+        if testinformation.state == TestState.PASSED:
+            self.passed_tests.append(testinformation)
+        elif testinformation.state == TestState.SKIPPED:
+            self.skipped_tests.append(testinformation)
+        else:
+            self.failed_tests.append(testinformation)
+
+        self.time += testinformation.time
+
+    def create_testsuite_xml_element(self, root: ET.Element) -> ET.Element:
+        suite_el = ET.SubElement(
+            root,
+            "testsuite",
+            name=self.name,
+            tests=str(self.total),
+            failures=str(self.failed),
+            skipped=str(self.skipped),
+            time=str(self.time)
+        )
+
+        for test in self.get_tests():
+            test.create_testcase_xml_element(suite_el)
+
+        return suite_el
+
+
+class TestResult:
+    """Class to store the results of a test run"""
+
+    def __init__(self) -> None:
+        self.suites: Dict[str, TestSuite] = {}
+
+    @property
+    def total(self) -> int:
+        return sum(suite.total for suite in self.suites.values())
+
+    @property
+    def failed(self) -> int:
+        return sum(suite.failed for suite in self.suites.values())
+
+    @property
+    def skipped(self) -> int:
+        return sum(suite.skipped for suite in self.suites.values())
+
+    @property
+    def time(self) -> float:
+        return sum(suite.time for suite in self.suites.values())
+
+    def get_skipped(self) -> List[TestInformation]:
+        skipped = []
+        for suite in self.suites.values():
+            skipped += suite.skipped_tests
+        return skipped
+
+    def get_failed(self) -> List[TestInformation]:
+        failed = []
+        for suite in self.suites.values():
+            failed += suite.failed_tests
+        return failed
+
+    def add(self, testinformation: TestInformation) -> None:
+        suite_name = testinformation.suite
+        if suite_name not in self.suites:
+            self.suites[suite_name] = TestSuite(suite_name)
+        self.suites[suite_name].add(testinformation)
+
+    def create_testresult_xml_element(self, root_el: Optional[ET.Element] = None) -> ET.Element:
+        if root_el is None:
+            root_el = ET.Element("testsuites",
+                                 tests=str(self.total),
+                                 failures=str(self.failed),
+                                 skipped=str(self.skipped),
+                                 timestamp=datetime.datetime.now().isoformat(),
+                                 time=str(self.time),
+                                 name="Basf2 Tests")
+
+        for suite in self.suites.values():
+            suite.create_testsuite_xml_element(root_el)
+
+        return root_el
+
+    def report_results_xml(self, filename: str = "", root_el: Optional[ET.Element] = None) -> ET.Element:
+        root = self.create_testresult_xml_element(root_el)
+        if filename:
+            tree = ET.ElementTree(root)
+            tree.write(filename, encoding="UTF-8", xml_declaration=True)
+
+        return root
+
+    def report_results(self, prepare_step: bool = True) -> None:
+        print(flush=True)
+        if self.skipped > 0:
+            print("\n    ".join([f"Skipped tests: {test.name} ({test.message})" for test in self.get_skipped()]), flush=True)
+        if self.failed > 0:
+            print("\n    ".join([f"FAILED tests: {test.name} ({test.message})" for test in self.get_failed()]), flush=True)
+        # print summary and exit
+        print(f'{self.failed} out of {self.total} {"prepare steps" if prepare_step else "tests"} '
+              f'failed, {self.skipped} were skipped\n', flush=True)
+
+
+class TestScheduler:
+    """Class to run tests in parallel"""
+
+    def __init__(
+                self,
+                xml_input_file: str = "",
+                xml_output_file: str = "",
+                directories: List[str] = [],
+                filter_str: str = "",
+                exclude_str: str = "",
+                nprocess: int = 1
+            ) -> None:
+        self.xml_input_file = xml_input_file
+        self.xml_output_file = xml_output_file
+        self.directories = directories
+        self.filter_str = filter_str
+        self.exclude_str = exclude_str
+        self.nprocess = nprocess
+        self.pool = ThreadPoolExecutor(max_workers=nprocess)
+
+        self.new_suites: Dict[str, TestSuite] = {}
+        self.previous_suites: Dict[str, TestSuite] = {}
+        self.execute_times: Dict[TestInformation, float] = {}
+
+        self.release_dir: str = os.environ.get("BELLE2_RELEASE_DIR") or os.environ.get("BELLE2_LOCAL_DIR")
+
+    def filter_tests(self, tests: List[TestInformation]) -> List[TestInformation]:
+        filter_stred_tests = [
+            test for test in tests
+            if (self.filter_str and re.search(self.filter_str, test.filename))
+        ]
+        filter_stred_tests = [
+            test for test in filter_stred_tests
+            if not (self.exclude_str and re.search(self.exclude_str, test.filename))
+        ]
+        return filter_stred_tests
+
+    def read_results_xml(self) -> None:
+        if self.xml_input_file:
+            tree: ET.ElementTree = ET.parse(self.xml_input_file)
+            root: ET.Element = tree.getroot()
+
+            for suite_el in root.findall("testsuite"):
+                suite_name: str = suite_el.get("name")
+                suite = TestSuite(suite_name)
+                for test_el in suite_el.findall("testcase"):
+                    test = TestInformation()
+                    test.name = test_el.get("name")
+                    test.suite = suite_name
+                    test.time = float(test_el.get("time"))
+                    suite.add(test)
+                self.previous_suites[suite_name] = suite
+
+    def get_previous_tests(self) -> List[TestInformation]:
+        tests = []
+        for suite in self.previous_suites.values():
+            tests += suite.get_tests()
+        return tests
+
+    def load_execution_times(self) -> None:
+        self.read_results_xml()
+        previous_tests = self.get_previous_tests()
+        for test in previous_tests:
+            self.execute_times[(test.name, test.is_prepare)] = test.time
+
+    def add_new_test(self, testinformation: TestInformation) -> None:
+        suite_name = testinformation.suite
+        if suite_name not in self.new_suites:
+            self.new_suites[suite_name] = TestSuite(suite_name)
+        self.new_suites[suite_name].add(testinformation)
+
+    def load_new_tests(self) -> None:
+        all_tests = []
+        all_tests += process_top_dir(self.release_dir, self.directories)
+        for test in all_tests:
+            self.add_new_test(test)
+
+    def get_new_tests(self) -> List[TestInformation]:
+        tests = []
+        for suite in self.new_suites.values():
+            tests += suite.get_tests()
+        return tests
+
+    def get_tests_to_execute(self) -> Tuple[List[TestInformation]]:
+        self.load_execution_times()
+        self.load_new_tests()
+
+        new_tests = self.get_new_tests()
+        for test in new_tests:
+            test.time = self.execute_times.get((os.path.basename(test.name), test.is_prepare), 9000)
+
+        prepare_tests = sorted([test for test in new_tests if test.is_prepare], key=lambda test: test.time, reverse=True)
+        other_tests = sorted([test for test in new_tests if not test.is_prepare], key=lambda test: test.time, reverse=True)
+
+        return [prepare_tests, other_tests]
+
+    def _run_tests(self, tests: List[TestInformation], prepare_step: bool = False,
+                   root_el: Optional[ET.Element] = None) -> ET.Element:
+        print(f'Collected {len(tests)} {"prepare steps" if prepare_step else "tests"}...', flush=True)
+        if self.nprocess > 1:
+            with self.pool:
+                # run tests in multiple threads but consume the iterator right away to
+                # avoid a bug in python 3.5 when zipping over a futures result iterator
+                # and then exiting using sys.exit().
+                results = list(self.pool.map(run_test, tests))
+        else:
+            results = map(run_test, tests)
+
+        test_results = TestResult()
+        for result in results:
+            test_results.add(result)
+
+        output_el = test_results.report_results_xml(
+            filename=self.xml_output_file if not prepare_step else "",
+            root_el=root_el
+        )
+
+        # print a list of failed tests to find them more easily
+        test_results.report_results(prepare_step)
+
+        if test_results.failed > 0:
+            sys.exit(test_results.failed)
+
+        return output_el
+
+    def execute_tests(self):
+        tests_to_execute = self.get_tests_to_execute()
+        prepare_tests = self.filter_tests(tests_to_execute[0])
+        other_tests = self.filter_tests(tests_to_execute[1])
+
+        print(f"Running steering file tests in {self.nprocess} processes", flush=True)
+
+        xml_report_el = None
+        if prepare_tests:
+            xml_report_el = self._run_tests(tests=prepare_tests, prepare_step=True, root_el=xml_report_el)
+
+        if other_tests:
+            _ = self._run_tests(tests=other_tests, prepare_step=False, root_el=xml_report_el)
 
 
 if __name__ == "__main__":
@@ -603,11 +700,13 @@ if __name__ == "__main__":
         # and temporary set the BELLE2_PREPARE_PATH variable
         with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
 
-            # prepare step
-            exit_code = executor(options, prepare_step=True)
-            if exit_code > 0:  # if everything is fine, do not exit immediately!
-                sys.exit(exit_code)
+            scheduler = TestScheduler(
+                xml_input_file="",
+                xml_output_file=options.xml,
+                directories=options.directories,
+                filter_str=options.filter,
+                exclude_str=options.exclude,
+                nprocess=options.nprocess
+            )
 
-            # test step
-            exit_code = executor(options, prepare_step=False)
-            sys.exit(exit_code)
+            scheduler.execute_tests()

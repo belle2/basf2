@@ -11,19 +11,24 @@
 # Date: 2024/11/04
 ##########################################################################################
 
+Alias      Upsilon_2(1D)sig        Upsilon_2(1D)
+ChargeConj Upsilon_2(1D)sig        Upsilon_2(1D)sig
+Alias      chi_b1sig        chi_b1
+ChargeConj chi_b1sig        chi_b1sig
+
 Decay vpho
-1.0 pi+ pi- Upsilon_2(1D) PHSP;
+1.0 pi+ pi- Upsilon_2(1D)sig PHSP;
 Enddecay
 
-Decay Upsilon_2(1D)
-1.0 gamma chi_b1 PHSP;
+Decay Upsilon_2(1D)sig
+1.0 gamma chi_b1sig PHSP;
 Enddecay
 
-Decay chi_b1
-1.0 gamma   Upsilon                                 HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
+Decay chi_b1sig
+1.0 gamma   Upsilonsig                                 HELAMP 1. 0. 1. 0. -1. 0. -1. 0.;
 Enddecay
 
-Decay Upsilon
+Decay Upsilonsig
 0.5 e+ e- VLL;
 0.5 mu+ mu- VLL;
 Enddecay

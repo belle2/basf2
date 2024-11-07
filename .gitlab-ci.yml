@@ -123,8 +123,8 @@ run-tests:
           - tests_report/tests-google.xml
           - tests_report/tests-framework.xml
           - tests_report/tests-non-framework.xml
-      paths:
-          - build/html/
+    paths:
+        - build/html/
   script:
     - echo "stage start time -> $(date +%H:%M:%S)"
     - mkdir -p tests_report

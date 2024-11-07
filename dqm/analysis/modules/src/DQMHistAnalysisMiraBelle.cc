@@ -28,6 +28,8 @@ DQMHistAnalysisMiraBelleModule::DQMHistAnalysisMiraBelleModule()
   setDescription("Modify and analyze the data quality histograms of MiraBelle");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("scale_dst", m_scale_dst, "Scale factor signal/sideband", 0.09375);
+  addParam("reference_hadb", reference_hadb, "reference for hadronb2_tight bhabha ratio", 0.193);
+  addParam("reference_mumu", reference_mumu, "reference for mumu inv mass", 10.568);
 }
 
 DQMHistAnalysisMiraBelleModule::~DQMHistAnalysisMiraBelleModule()
@@ -318,8 +320,7 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   if (fit_mumumass < 9.) fit_mumumass = 9.;
   if (fit_mumumass > 12.) fit_mumumass = 12.;
   double fit_mumumass_error = f_mumuInvM->GetParError(1);
-  double mumumass_reference = 10.568;
-  double pull_mumumass = (fit_mumumass - mumumass_reference) / fit_mumumass_error;
+  double pull_mumumass = (fit_mumumass - reference_mumu) / fit_mumumass_error;
   double fit_sigma_mumu = f_mumuInvM->GetParameter(2);
 
   // set values
@@ -361,7 +362,6 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   mon_mumu->setVariable("fit_mumumass_error", fit_mumumass_error);
   mon_mumu->setVariable("pull_mumumass", pull_mumumass);
   mon_mumu->setVariable("sigma_mumumass", fit_sigma_mumu);
-  mon_mumu->setVariable("fit_mumumass_ref", mumumass_reference);
 
   // ========== D*
   // get existing histograms produced by DQM modules
@@ -1069,18 +1069,16 @@ void DQMHistAnalysisMiraBelleModule::endRun()
   //pull
   double ratio_pull_hadBhabha = -10.;
   double error_ratio = -10.;
-  double ratio_reference = 0.193;
   if (bh_ntot != 0) {
     ratio_hadron_bhabha = had_ntot / bh_neve_bhabha;
     //pull
     error_ratio = ratio_hadron_bhabha * sqrt((1 / had_ntot) + (1 / bh_neve_bhabha));
-    ratio_pull_hadBhabha = (ratio_hadron_bhabha - ratio_reference) / error_ratio;
+    ratio_pull_hadBhabha = (ratio_hadron_bhabha - reference_hadb) / error_ratio;
   }
   // set values
   mon_bhabha->setVariable("had_ntot", had_ntot);
   mon_hadron->setVariable("ratio_hadron_bhabha", ratio_hadron_bhabha);
   mon_hadron->setVariable("error_ratio", error_ratio);
-  mon_hadron->setVariable("reference_ratio", ratio_reference);
   mon_hadron->setVariable("ratio_pull_hadBhabha", ratio_pull_hadBhabha);
 
   B2DEBUG(20, "DQMHistAnalysisMiraBelle : endRun called");

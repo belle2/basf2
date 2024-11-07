@@ -64,6 +64,8 @@ namespace Belle2 {
 
   protected:
     double m_scale_dst; /**< Scale factor "signal region" / "sideband", assuming uniform events */
+    double reference_hadb; /**< Reference value for hadronb2_tight bhabha ratio */
+    double reference_mumu; /**< Reference value for mumu inv mass */
     Belle2::MonitoringObject* mon_mumu = nullptr; /**< MonitoringObject for mumu events */
     Belle2::MonitoringObject* mon_dst = nullptr; /**< MonitoringObject for D* events */
     Belle2::MonitoringObject* mon_bhabha = nullptr; /**< MonitoringObject for bhabha events */

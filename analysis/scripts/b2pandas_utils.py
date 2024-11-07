@@ -258,7 +258,11 @@ class VariablesToHDF5(VariablesToTable):
     """
 
     def __init__(self, listname, variables, filename):
-        super().__init__(listname, variables, filename, "hdf5")
+        assert self._filename.split(".")[-1] in ["h5", "hdf", "hdf5"], (
+            "Filename must end with .h5, .hdf or .hdf5 for HDF5 output. "
+            f"Got {self._filename}"
+        )
+        super().__init__(listname, variables, filename)
 
 
 def make_mcerrors_readable(dataframe, column="mcErrors"):

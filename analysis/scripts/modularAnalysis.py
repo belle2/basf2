@@ -3114,6 +3114,8 @@ def writePi0EtaVeto(
     etaPayloadNameOverride=None,
     etaSoftPhotonCutOverride=None,
     requireSoftPhotonIsInROE=False,
+    pi0Selection='',
+    etaSelection=''
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -3169,6 +3171,8 @@ def writePi0EtaVeto(
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
                                     or not. Default is False, i.e. all soft photons in the event are used.
+    @param pi0Selection     Selection for the pi0 reconstruction.
+    @param etaSelection     Selection for the eta reconstruction.
     """
 
     import b2bii
@@ -3264,7 +3268,7 @@ def writePi0EtaVeto(
     # fill the particleList for soft photon with energy, timing and clusterNHits cuts
     fillParticleList(pi0soft, Pi0SoftPhotonCut, path=roe_path)
     # reconstruct pi0
-    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, '',
+    reconstructDecay('pi0:Pi0Veto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + pi0soft, pi0Selection,
                      allowChargeViolation=True, path=roe_path)
     # MVA training is conducted.
     roe_path.add_module('MVAExpert', listNames=['pi0:Pi0Veto' + ListName],
@@ -3292,7 +3296,7 @@ def writePi0EtaVeto(
 
     etasoft = f'gamma:EtaSoft{suffix}' + ListName + '_' + particleList.replace(':', '_')
     fillParticleList(etasoft, EtaSoftPhotonCut, path=roe_path)
-    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, '',
+    reconstructDecay('eta:EtaVeto' + ListName + f' -> {hardParticle}:HardPhoton{suffix} ' + etasoft, etaSelection,
                      allowChargeViolation=True, path=roe_path)
     roe_path.add_module('MVAExpert', listNames=['eta:EtaVeto' + ListName],
                         extraInfoName=EtaExtraInfoName, identifier=EtaPayloadName)

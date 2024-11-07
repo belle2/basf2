@@ -30,6 +30,7 @@ namespace Belle2 {
   class MCParticle;
   class PIDLikelihood;
   class V0;
+  class Kink;
 
   /**
    * Class to store reconstructed particles.
@@ -83,7 +84,8 @@ namespace Belle2 {
       c_V0            = 4,
       c_MCParticle    = 5,
       c_Composite     = 6,
-      c_NoMDSTSource  = 7
+      c_NoMDSTSource  = 7,
+      c_Kink          = 9
     };
 
     /** describes flavor type, see getFlavorType(). */
@@ -842,6 +844,14 @@ namespace Belle2 {
      * @return const pointer to the V0
      */
     const V0* getV0() const;
+
+    /**
+     * Returns the pointer to the Kink object that was used to create this
+     * Particle (if ParticleType == c_Kink). NULL pointer is returned if the
+     * Particle was not made from a Kink.
+     * @return const pointer to the Kink
+     */
+    const Kink* getKink() const;
 
     /**
      * Returns the pointer to the PIDLikelihood object that is related to the Track, which

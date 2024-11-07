@@ -17,6 +17,7 @@
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
 #include <mdst/dataobjects/V0.h>
+#include <mdst/dataobjects/Kink.h>
 #include <mdst/dbobjects/CollisionBoostVector.h>
 #include <mdst/dbobjects/CollisionInvariantMass.h>
 
@@ -887,6 +888,15 @@ const V0* Particle::getV0() const
   }
 }
 
+const Kink* Particle::getKink() const
+{
+  if (m_particleSource == c_Kink) {
+    StoreArray<Kink> kinks{};
+    return kinks[m_mdstIndex];
+  } else {
+    return nullptr;
+  }
+}
 
 const ECLCluster* Particle::getECLCluster() const
 {

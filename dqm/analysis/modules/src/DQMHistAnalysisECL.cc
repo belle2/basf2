@@ -494,7 +494,6 @@ void DQMHistAnalysisECLModule::terminate()
   delete m_lower_boundary_time_offsets;
   delete m_upper_boundary_time_offsets;
   delete c_crate_time_offsets;
-  delete h_time_crate_Thr1GeV;
   delete h_crate_time_offsets;
   delete c_logic_summary;
   delete h_logic_summary;

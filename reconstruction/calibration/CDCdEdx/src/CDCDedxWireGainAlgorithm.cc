@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedxWireGainAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxWireGainAlgorithm.h>
 
 using namespace Belle2;
 using namespace CDC;

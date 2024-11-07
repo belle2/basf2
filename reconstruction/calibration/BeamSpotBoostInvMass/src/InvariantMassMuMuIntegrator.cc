@@ -8,8 +8,8 @@
 
 
 
-#include <tracking/calibration/InvariantMassMuMuIntegrator.h>
-#include <tracking/calibration/InvariantMassMuMuStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuIntegrator.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
 
 #include <cassert>
 #include <cmath>

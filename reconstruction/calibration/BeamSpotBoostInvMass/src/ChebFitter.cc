@@ -19,8 +19,8 @@
 
 //If compiled within BASF2
 #ifdef _PACKAGE_
-#include <tracking/calibration/ChebFitter.h>
-#include <tracking/calibration/nodes.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/ChebFitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/nodes.h>
 #include <framework/logging/Logger.h>
 #else
 #include <ChebFitter.h>

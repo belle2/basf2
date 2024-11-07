@@ -9,9 +9,9 @@
 #pragma once
 
 #include <calibration/CalibrationAlgorithm.h>
-#include <tracking/calibration/InvariantMassMuMuStandAlone.h>
-#include <tracking/calibration/InvariantMassBhadStandAlone.h>
-#include <tracking/calibration/calibTools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassBhadStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/calibTools.h>
 
 namespace Belle2 {
   /**

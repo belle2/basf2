@@ -43,9 +43,9 @@
 
 //if compiled within BASF2
 #ifdef _PACKAGE_
-#include <tracking/calibration/InvariantMassBhadStandAlone.h>
-#include <tracking/calibration/Splitter.h>
-#include <tracking/calibration/tools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassBhadStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/Splitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/tools.h>
 #else
 #include <InvariantMassBhadStandAlone.h>
 #include <Splitter.h>

@@ -89,6 +89,8 @@ def get_argument_parser():
                         help="Number of test cases to run in parallel")
     parser.add_argument("--xml", type=str, default=None, help="Save results into given "
                         "file using xml format compatible with JUnit parsers")
+    parser.add_argument("--xml-input", type=str, default="", help="Read previous results from "
+                        "file using xml format compatible with JUnit parsers")
     parser.add_argument("-n", "--diff-lines", type=int, default=10,
                         help="Number of lines to show if output is different from template")
     parser.add_argument("-q", "--quiet", action="store_true", default=False,
@@ -378,7 +380,7 @@ class TestInformation:
 
     def report_test_result(self) -> None:
         """ print out the result of one test"""
-        print(f"{self.output}finished test {self.name}\n     "
+        print(f"{self.output}\nfinished test {self.name}\n     "
               f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
               flush=True)
 
@@ -703,7 +705,7 @@ if __name__ == "__main__":
         with temporary_set_environment(BELLE2_PREPARE_PATH=prepare_path):
 
             scheduler = TestScheduler(
-                xml_input_file="",
+                xml_input_file=options.xml_input,
                 xml_output_file=options.xml,
                 directories=options.directories,
                 filter_str=options.filter,

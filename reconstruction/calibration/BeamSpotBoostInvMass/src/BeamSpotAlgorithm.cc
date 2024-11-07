@@ -7,9 +7,9 @@
  **************************************************************************/
 
 #include <mdst/dbobjects/BeamSpot.h>
-#include <tracking/calibration/BeamSpotAlgorithm.h>
-#include <tracking/calibration/BeamSpotStandAlone.h>
-#include <tracking/calibration/calibTools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BeamSpotAlgorithm.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BeamSpotStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/calibTools.h>
 
 #include <Eigen/Dense>
 

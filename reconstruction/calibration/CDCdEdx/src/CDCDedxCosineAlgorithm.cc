@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedxCosineAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxCosineAlgorithm.h>
 
 #include <TF1.h>
 #include <TLine.h>

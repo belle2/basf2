@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedx1DCellAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedx1DCellAlgorithm.h>
 using namespace Belle2;
 
 //-----------------------------------------------------------------

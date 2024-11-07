@@ -14,7 +14,7 @@
 
 //If compiled within BASF2
 #ifdef _PACKAGE_
-#include <tracking/calibration/Splitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/Splitter.h>
 #else
 #include <Splitter.h>
 #endif

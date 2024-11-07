@@ -36,12 +36,12 @@
 
 //if compiled within BASF2
 #ifdef _PACKAGE_
-#include <tracking/calibration/InvariantMassMuMuStandAlone.h>
-#include <tracking/calibration/InvariantMassMuMuIntegrator.h>
-#include <tracking/calibration/BoostVectorStandAlone.h>
-#include <tracking/calibration/Splitter.h>
-#include <tracking/calibration/tools.h>
-#include <tracking/calibration/ChebFitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuIntegrator.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BoostVectorStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/Splitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/tools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/ChebFitter.h>
 #else
 #include <InvariantMassMuMuStandAlone.h>
 #include <InvariantMassMuMuIntegrator.h>

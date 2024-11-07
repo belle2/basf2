@@ -11,7 +11,7 @@
 #include <TH1I.h>
 #include <TLegend.h>
 
-#include <reconstruction/calibration/CDCDedxCosEdgeAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxCosEdgeAlgorithm.h>
 
 using namespace Belle2;
 using namespace std;

@@ -8,10 +8,10 @@
 
 
 #include <mdst/dbobjects/CollisionInvariantMass.h>
-#include <tracking/calibration/InvariantMassAlgorithm.h>
-#include <tracking/calibration/InvariantMassMuMuStandAlone.h>
-#include <tracking/calibration/InvariantMassBhadStandAlone.h>
-#include <tracking/calibration/calibTools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassAlgorithm.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassMuMuStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/InvariantMassBhadStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/calibTools.h>
 #include <TFile.h>
 
 #include <Eigen/Dense>

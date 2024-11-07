@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedx2DCellAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedx2DCellAlgorithm.h>
 
 #include <reconstruction/dbobjects/CDCDedx2DCell.h>
 

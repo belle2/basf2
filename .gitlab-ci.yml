@@ -144,20 +144,6 @@ build-clang:
     - basf2 --info
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
-build-doc:
-  stage: build-doc
-  needs: [run-tests]
-  artifacts:
-    when: on_success
-    expose_as: 'sphinx documentation'
-    paths:
-      - build/html/
-  script:
-    - echo "stage start time -> $(date +%H:%M:%S)"
-    - b2code-option opt
-    - scons --no-debuginfo --sphinx html
-    - echo "stage stop time -> $(date +%H:%M:%S)"
-
 release-validation:
   stage: release-validation
   needs: [run-tests]

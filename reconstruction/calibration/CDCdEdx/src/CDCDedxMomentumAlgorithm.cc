@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedxMomentumAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxMomentumAlgorithm.h>
 
 #include <reconstruction/dbobjects/CDCDedxMomentumCor.h>
 

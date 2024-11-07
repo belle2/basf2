@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedxInjectTimeAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxInjectTimeAlgorithm.h>
 
 using namespace Belle2;
 

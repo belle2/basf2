@@ -42,9 +42,9 @@
 
 //if compiled within BASF2
 #ifdef _PACKAGE_
-#include <tracking/calibration/BeamSpotStandAlone.h>
-#include <tracking/calibration/Splitter.h>
-#include <tracking/calibration/tools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BeamSpotStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/Splitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/tools.h>
 #else
 #include <BeamSpotStandAlone.h>
 #include <Splitter.h>

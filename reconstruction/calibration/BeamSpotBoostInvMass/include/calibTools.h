@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/calibration/Splitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/Splitter.h>
 #include <TMatrixDSym.h>
 #include <functional>
 #include <map>

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedxBadWireAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxBadWireAlgorithm.h>
 
 using namespace Belle2;
 using namespace CDC;

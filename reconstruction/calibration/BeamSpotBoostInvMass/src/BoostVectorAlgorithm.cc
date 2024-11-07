@@ -7,9 +7,9 @@
  **************************************************************************/
 
 #include <mdst/dbobjects/CollisionBoostVector.h>
-#include <tracking/calibration/BoostVectorAlgorithm.h>
-#include <tracking/calibration/BoostVectorStandAlone.h>
-#include <tracking/calibration/calibTools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BoostVectorAlgorithm.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BoostVectorStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/calibTools.h>
 
 #include <Eigen/Dense>
 

@@ -6,7 +6,7 @@
  * This file is licensed under LGPL-3.0, see LICENSE.md.                  *
  **************************************************************************/
 
-#include <reconstruction/calibration/CDCDedxRunGainAlgorithm.h>
+#include <reconstruction/calibration/CDCdEdx/CDCDedxRunGainAlgorithm.h>
 
 #include <TF1.h>
 #include <TCanvas.h>

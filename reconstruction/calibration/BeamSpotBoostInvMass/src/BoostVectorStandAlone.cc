@@ -14,10 +14,10 @@
 
 //if compiled within BASF2
 #ifdef _PACKAGE_
-#include <tracking/calibration/BoostVectorStandAlone.h>
-#include <tracking/calibration/Splitter.h>
-#include <tracking/calibration/tools.h>
-#include <tracking/calibration/minimizer.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/BoostVectorStandAlone.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/Splitter.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/tools.h>
+#include <reconstruction/calibration/BeamSpotBoostInvMass/minimizer.h>
 #else
 #include <BoostVectorStandAlone.h>
 #include <Splitter.h>

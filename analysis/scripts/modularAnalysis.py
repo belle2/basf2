@@ -3113,7 +3113,7 @@ def writePi0EtaVeto(
     pi0SoftPhotonCutOverride=None,
     etaPayloadNameOverride=None,
     etaSoftPhotonCutOverride=None,
-    requireSoftPhotonIsInROE=True,
+    requireSoftPhotonIsInROE=False,
 ):
     """
     Give pi0/eta probability for hard photon.
@@ -3168,7 +3168,7 @@ def writePi0EtaVeto(
     @param etaSoftPhotonCutOverride specify the soft photon selection criteria of eta veto only if one wants to use non-default one.
                                     (default is None)
     @param requireSoftPhotonIsInROE specify if the soft photons used to build pi0 and eta candidates have to be in the current ROE
-                                    or not. Default is True, i.e. only soft photons in the ROE are used.
+                                    or not. Default is False, i.e. all soft photons in the event are used.
     """
 
     import b2bii

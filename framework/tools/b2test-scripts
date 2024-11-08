@@ -380,8 +380,14 @@ class TestInformation:
 
     def report_test_result(self) -> None:
         """ print out the result of one test"""
+        time = ""
+        minutes = int(self.time // 60)
+        seconds = int(self.time % 60)
+        time += f"{minutes}m " if minutes > 0 else ""
+        time += f"{seconds}s"
+
         print(f"{self.output}\nfinished test {self.name}\n     "
-              f"-> {self.state.name}: {self.message}\n     -> exec. time: {self.time}s",
+              f"-> {self.state.name}: {self.message}\n     -> exec. time: {time}",
               flush=True)
 
     def create_testcase_xml_element(self, suite: ET.Element) -> ET.Element:

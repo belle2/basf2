@@ -17,6 +17,7 @@ def fitKinematic4C(
     constraint='HardBeam',
     daughtersUpdate=True,
     addUnmeasuredPhoton=False,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -39,6 +40,7 @@ def fitKinematic4C(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -47,6 +49,7 @@ def UnmeasuredfitKinematic1C(
     fitterEngine='NewFitterGSL',
     constraint='HardBeam',
     daughtersUpdate=True,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -68,6 +71,7 @@ def UnmeasuredfitKinematic1C(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', True)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -78,6 +82,7 @@ def fitKinematic3C(
         daughtersUpdate=True,
         addUnmeasuredPhoton=False,
         add3CPhoton=True,
+        variablePrefix="",
         path=None,
 ):
     """
@@ -103,6 +108,7 @@ def fitKinematic3C(
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', addUnmeasuredPhoton)
     orca.param('add3CPhoton', add3CPhoton)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -112,6 +118,7 @@ def fitKinematic2C(
         constraint='HardBeam',
         daughtersUpdate=True,
         addUnmeasuredPhotonAlongBeam="",
+        variablePrefix="",
         path=None,
 ):
     """
@@ -149,6 +156,7 @@ def fitKinematic2C(
             orca.param('fixUnmeasuredToHER', True)
         else:  # should be LER
             orca.param('fixUnmeasuredToLER', True)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -158,6 +166,7 @@ def MassfitKinematic1CRecoil(
     fitterEngine='NewFitterGSL',
     constraint='RecoilMass',
     daughtersUpdate=True,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -181,6 +190,7 @@ def MassfitKinematic1CRecoil(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 
@@ -190,6 +200,7 @@ def MassfitKinematic1C(
     fitterEngine='NewFitterGSL',
     constraint='Mass',
     daughtersUpdate=True,
+    variablePrefix="",
     path=None,
 ):
     """
@@ -213,6 +224,7 @@ def MassfitKinematic1C(
     orca.param('listName', list_name)
     orca.param('updateDaughters', daughtersUpdate)
     orca.param('addUnmeasuredPhoton', False)
+    orca.param('variablePrefix', variablePrefix)
     path.add_module(orca)
 
 

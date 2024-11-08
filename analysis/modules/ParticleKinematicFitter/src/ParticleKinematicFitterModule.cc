@@ -73,6 +73,7 @@ ParticleKinematicFitterModule::ParticleKinematicFitterModule() : Module(), m_tex
   addParam("updateDaughters", m_updateDaughters, "Update the daughter kinematics.", false);
   addParam("recoilMass", m_recoilMass, "Recoil mass in GeV. RecoilMass constraint only.", 0.0);
   addParam("invMass", m_invMass, "Invariant mass in GeV. Mass constraint only.", 0.0);
+  addParam("variablePrefix", m_prefix, "Prefix attached to extra info variables.", "");
 
 }
 
@@ -84,8 +85,6 @@ void ParticleKinematicFitterModule::initialize()
     m_decaydescriptor.init(m_decayString);
     B2INFO("ParticleKinematicFitter: Using specified decay string: " << m_decayString);
   }
-
-  m_prefix = m_listName.substr(m_listName.find(":") + 1) + "_"; //Set prefix to listname
 
   m_plist.isRequired(m_listName);
 }

@@ -123,6 +123,7 @@ run-tests:
           - tests_report/tests-google.xml
           - tests_report/tests-framework.xml
           - tests_report/tests-non-framework.xml
+    expose_as: 'sphinx documentation'
     paths:
         - build/html/
   script:
@@ -133,7 +134,6 @@ run-tests:
     - b2test-units --gtest_output=xml:${BELLE2_LOCAL_DIR}/tests_report/tests-google.xml
     - b2test-scripts -j $(nproc) --filter "^framework/tests/(?!(foreach.py))" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-framework.xml --timeout 1200
     - b2test-scripts -j $(nproc) --filter "^(?!framework/tests/.*)" --xml=${BELLE2_LOCAL_DIR}/tests_report/tests-non-framework.xml --timeout 1200
-    - ls $BELLE2_SPHINX_OUTPUTDIR
     - echo "stage stop time -> $(date +%H:%M:%S)"
 
 build-clang:

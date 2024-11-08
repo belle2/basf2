@@ -1599,3 +1599,38 @@ class BtoDpipi_Kpipi(BaseSkim):
                             Bcuts,
                             path=path)
         return ["B-:BtoDpipi_Kpipi"]
+
+
+@fancy_skim_header
+class antiB0toDpipi0_Kpipi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`\\bar{B^{0}}\\to D^{+} (\\to K^- \\pi^+ \\pi^-) \\pi^- \\pi^0`,
+
+
+    Cuts applied:
+
+    * ``5.22 < Mbc``
+    * ``-0.3 < deltaE < 0.2``
+    """
+    __authors__ = ["Melisa-Melek Akdag"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+        stdPi0s("eff50_May2020Fit", path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+        ma.reconstructDecay("anti-B0:antiB0toDpipi0_Kpipi -> D+:Kpipi pi-:GoodTrack pi0:eff50_May2020Fit",
+                            Bcuts,
+                            path=path)
+        return ["anti-B0:antiB0toDpipi0_Kpipi"]

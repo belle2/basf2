@@ -47,24 +47,27 @@ if __name__ == "__main__":
     #: ignore missing tracking_eventtimeextraction
     ignoretrackingeventtimeextraction = 'tracking_eventtimeextraction'
 
-    sphinx_output_dir = os.getenv("BELLE2_SPHINX_OUTPUTDIR")
-    check_error_free("b2code-sphinx-warnings", "sphinx", None,
-                     lambda x:
-                     re.findall(ignorebackward, x) or
-                     re.findall(ignoreaddsimulation, x) or
-                     re.findall(ignoreaddtriggersimulation, x) or
-                     re.findall(ignoreaddreconstruction, x) or
-                     re.findall(ignoreaddcdstoutput, x) or
-                     re.findall(ignorevalidationtools, x) or
-                     re.findall(ignoreincludeproblem, x) or
-                     re.findall(ignoreonlinebook, x) or
-                     re.findall(ignoretrackmatching, x) or
-                     re.findall(ignoretrackingeventtimeextraction, x),
-                     ['--light'] + ["-o", sphinx_output_dir] if sphinx_output_dir else []
-                     )
+    sphinx_light_output_dir = os.getenv("BELLE2_SPHINX_LIGHT_OUTPUTDIR")
+    check_error_free(
+        "b2code-sphinx-warnings", "sphinx", None,
+        lambda x:
+        re.findall(ignorebackward, x) or
+        re.findall(ignoreaddsimulation, x) or
+        re.findall(ignoreaddtriggersimulation, x) or
+        re.findall(ignoreaddreconstruction, x) or
+        re.findall(ignoreaddcdstoutput, x) or
+        re.findall(ignorevalidationtools, x) or
+        re.findall(ignoreincludeproblem, x) or
+        re.findall(ignoreonlinebook, x) or
+        re.findall(ignoretrackmatching, x) or
+        re.findall(ignoretrackingeventtimeextraction, x),
+        ['--light'] + ["-o", sphinx_light_output_dir] if sphinx_light_output_dir else []
+    )
     if not light_build:
-        check_error_free("b2code-sphinx-warnings", "sphinx", None,
-                         lambda x:
-                         re.findall(ignorebackward, x),
-                         ["-o", sphinx_output_dir] if sphinx_output_dir else []
-                         )
+        sphinx_output_dir = os.getenv("BELLE2_SPHINX_OUTPUTDIR")
+        check_error_free(
+            "b2code-sphinx-warnings", "sphinx", None,
+            lambda x:
+            re.findall(ignorebackward, x),
+            ["-o", sphinx_output_dir] if sphinx_output_dir else []
+        )

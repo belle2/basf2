@@ -946,8 +946,7 @@ class DarkShower(BaseSkim):
             cut="[dr > 0.2] and [significanceOfDistance > 10]",
             path=path,
         )
-
-        ma.applyEventCuts(f"[nParticlesInList(K_S0:{skim_str}) == 1]", path=path)
+        path = self.skim_event_cuts(f"[nParticlesInList(K_S0:{skim_str}) == 1]", path=path)
 
         ma.buildRestOfEvent(
             target_list_name=f"K_S0:{skim_str}",

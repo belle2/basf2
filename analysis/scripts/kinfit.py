@@ -28,7 +28,7 @@ def fitKinematic4C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
-    @param variablePrefix added to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times.
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -60,7 +60,7 @@ def UnmeasuredfitKinematic1C(
     @param fitterEngine which fitter engine to use? 'NewFitterGSL' or 'OPALFitterGSL'
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
-    @param variablePrefix added to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times.
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -97,7 +97,7 @@ def fitKinematic3C(
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhoton add one unmeasured photon (uses up three constraints)
     @param add3CPhoton add one photon with unmeasured energy (uses up a constraint)
-    @param variablePrefix added to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times.
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -136,7 +136,7 @@ def fitKinematic2C(
     @param constraint       HardBeam or RecoilMass
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
     @param addUnmeasuredPhotonAlongBeam add an unmeasured photon along beam if 'HER' or 'LER' is set
-    @param variablePrefix added to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times.
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -181,7 +181,7 @@ def MassfitKinematic1CRecoil(
     @param constraint       HardBeam or RecoilMass
     @param recoilMass       RecoilMass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
-    @param variablePrefix added to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times.
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 
@@ -216,7 +216,7 @@ def MassfitKinematic1C(
     @param constraint       HardBeam or RecoilMass or Mass
     @param invMass       Invariant Mass (GeV)
     @param daughtersUpdate make copy of the daughters and update them after the vertex fit
-    @param variablePrefix added to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times.
+    @param variablePrefix prepended to fit variables stored in extra info. Required if ParticleKinematicFitter is run multiple times
     @param path         modules are added to this path
     """
 

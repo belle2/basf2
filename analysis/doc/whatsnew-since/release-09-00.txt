@@ -27,6 +27,10 @@ Variables
 * Added a meta variable `useMCancestorBRestFrame` which returns the given variable in the rest frame of the
   ancestor B MC particle.
 
+Kinematic Fitting tools
+++++++++++++++++++
+* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+
 Command line tools
 ++++++++++++++++++
 * Improved output and content of the :ref:`b2help-recommendation`.

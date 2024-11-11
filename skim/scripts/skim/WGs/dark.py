@@ -904,8 +904,10 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
 @fancy_skim_header
 class DarkShower(BaseSkim):
     """
-    Skim list contains events with one displaced vertex and a maximum of one other good track.
+    Skim list contains events with only one displaced vertex and a maximum of one other good track.
+    We are reconstructing the displaced vertex as a "Kshort": e+e- -> Ks, Ks -> pi+pi-
     """
+
     __authors__ = ["Miho Wakai"]
     __contact__ = __liaison__
     __description__ = "Skim for the dark shower analysis."
@@ -919,7 +921,7 @@ class DarkShower(BaseSkim):
         skim_str = "DarkShower"
         n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [p > 0.15] and [abs(dz) < 10] ) <= 3]"
 
-        track_requirements = "[(pt>0.1) and (nCDCHits >= 5)]"
+        track_requirements = "[(pt>0.1)] and [(nCDCHits >= 5)]"
 
         ma.cutAndCopyList(
             f"pi+:{skim_str}",

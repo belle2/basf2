@@ -921,7 +921,7 @@ class DarkShower(BaseSkim):
         skim_str = "DarkShower"
         n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [p > 0.15] and [abs(dz) < 10] ) <= 3]"
 
-        track_requirements = "[(pt>0.1)] and [(nCDCHits >= 5)]"
+        track_requirements = "[pt > 0.1] and [nCDCHits >= 5]"
 
         ma.cutAndCopyList(
             f"pi+:{skim_str}",
@@ -943,7 +943,7 @@ class DarkShower(BaseSkim):
         )
         ma.applyCuts(
             list_name=f"K_S0:{skim_str}",
-            cut="dr > 0.2 and significanceOfDistance > 10",
+            cut="[dr > 0.2] and [significanceOfDistance > 10]",
             path=path,
         )
 

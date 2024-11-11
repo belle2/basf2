@@ -204,7 +204,7 @@ class DimuonRecoilMassSquared(BaseSkim):
     """
     __authors__ = ["Robin Leboucher"]
     __description__ = (
-        "Dimuon skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} [\\to \\mu^{+}\\mu^{-}] (\\gamma)"
+        "Dimuon skim, needed for :math:`e^{+}e^{-} \\to A^{\\prime} [\\to \\mu^{+}\\mu^{-}] (\\gamma)`"
         "and other searches."
     )
     __contact__ = __liaison__

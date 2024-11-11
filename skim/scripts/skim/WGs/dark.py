@@ -960,8 +960,8 @@ class DarkShower(BaseSkim):
                 ("ds_roe",
                  '',  # no track cuts
                  "formula(clusterTiming/clusterErrorTiming) < 2 and minC2TDist > 50" +
-                 "and thetaInCDCAcceptance" +
-                 "and [[clusterReg==1 and E>0.1] or [clusterReg==2 and E>0.060] or [clusterReg==3 and E>0.150]]")],
+                 " and thetaInCDCAcceptance" +
+                 " and [[clusterReg==1 and E>0.1] or [clusterReg==2 and E>0.060] or [clusterReg==3 and E>0.150]]")],
             path=path,
          )
 

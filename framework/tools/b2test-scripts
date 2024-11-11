@@ -300,11 +300,11 @@ def process_dir(dir, release_dir):
             continue
         if entry in ("tests", "prepare"):
             # search for files with .py (basf2 steering files) and .ipynb (jupyter notebooks) extensions
-            for root, _, files in os.walk(dir_entry):
-                if root.startswith(os.path.join(dir_entry, 'prepare')) or root == dir_entry:
+            for root_dir, _, files in os.walk(dir_entry):
+                if root_dir.startswith(os.path.join(dir_entry, 'prepare')) or root_dir == dir_entry:
                     for file in files:
                         if file.endswith('.py') or file.endswith('.ipynb'):
-                            full_path = os.path.join(root, file)
+                            full_path = os.path.join(root_dir, file)
                             name = full_path[len(release_dir):].lstrip('/')
                             tests.append(TestInformation(name, release_dir))
         else:

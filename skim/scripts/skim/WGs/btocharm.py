@@ -1711,6 +1711,7 @@ class antiB0toDpipi0_Kpipi(BaseSkim):
         return ["anti-B0:antiB0toDpipi0_Kpipi"]
 
 
+@fancy_skim_header
 class antiB0toDsDsst_Kpi0(BaseSkim):
     """
     Reconstructed decay modes:

@@ -200,7 +200,7 @@ class DimuonPlusMissingEnergy(BaseSkim):
 @fancy_skim_header
 class DimuonRecoilMassSquared(BaseSkim):
     """
-    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-}`.
+    **Physics channel**: :math:`e^{+}e^{-} \\to \\mu^{+}\\mu^{-} \\gamma`.
     """
     __authors__ = ["Robin Leboucher"]
     __description__ = (

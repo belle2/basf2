@@ -18,38 +18,38 @@ from tabulate import tabulate
 
 _RegisteredSkims = [
     # --- Flagged skims ---
-    ("21000100", "flagged", "f_SLME_p1"),
-    ("21000200", "flagged", "f_SLME_p2"),
-    ("21000300", "flagged", "f_SLME_p3"),
-    ("21000400", "flagged", "f_SLME_p4"),
-    ("22000100", "flagged", "f_EWP_p1"),
-    ("22000200", "flagged", "f_EWP_p2"),
-    ("22000300", "flagged", "f_EWP_p3"),
-    ("22000400", "flagged", "f_EWP_p4"),
-    ("23000100", "flagged", "f_TDCPV_p1"),
-    ("23000200", "flagged", "f_TDCPV_p2"),
-    ("23000300", "flagged", "f_TDCPV_p3"),
-    ("23000400", "flagged", "f_TDCPV_p4"),
-    ("24000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
-    ("24000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
-    ("24000300", "flagged", "f_bhadronic_p3"),  # btocharmless is included here
-    ("24000400", "flagged", "f_bhadronic_p4"),  # btocharmless is included here
-    ("25000100", "flagged", "f_quarkonium_p1"),
-    ("25000200", "flagged", "f_quarkonium_p2"),
-    ("25000300", "flagged", "f_quarkonium_p3"),
-    ("25000400", "flagged", "f_quarkonium_p4"),
-    ("27000100", "flagged", "f_charm_p1"),
-    ("27000200", "flagged", "f_charm_p2"),
-    ("27000300", "flagged", "f_charm_p3"),
-    ("27000400", "flagged", "f_charm_p4"),
-    ("28000100", "flagged", "f_dark_p1"),
-    ("28000200", "flagged", "f_dark_p2"),
-    ("28000300", "flagged", "f_dark_p3"),
-    ("28000400", "flagged", "f_dark_p4"),
-    ("29000100", "flagged", "f_tau_p1"),
-    ("29000200", "flagged", "f_tau_p2"),
-    ("29000300", "flagged", "f_tau_p3"),
-    ("29000400", "flagged", "f_tau_p4"),
+    ("f1000100", "flagged", "f_SLME_p1"),
+    ("f1000200", "flagged", "f_SLME_p2"),
+    ("f1000300", "flagged", "f_SLME_p3"),
+    ("f1000400", "flagged", "f_SLME_p4"),
+    ("f2000100", "flagged", "f_EWP_p1"),
+    ("f2000200", "flagged", "f_EWP_p2"),
+    ("f2000300", "flagged", "f_EWP_p3"),
+    ("f2000400", "flagged", "f_EWP_p4"),
+    ("f3000100", "flagged", "f_TDCPV_p1"),
+    ("f3000200", "flagged", "f_TDCPV_p2"),
+    ("f3000300", "flagged", "f_TDCPV_p3"),
+    ("f3000400", "flagged", "f_TDCPV_p4"),
+    ("f4000100", "flagged", "f_bhadronic_p1"),  # btocharmless is included here
+    ("f4000200", "flagged", "f_bhadronic_p2"),  # btocharmless is included here
+    ("f4000300", "flagged", "f_bhadronic_p3"),  # btocharmless is included here
+    ("f4000400", "flagged", "f_bhadronic_p4"),  # btocharmless is included here
+    ("f5000100", "flagged", "f_quarkonium_p1"),
+    ("f5000200", "flagged", "f_quarkonium_p2"),
+    ("f5000300", "flagged", "f_quarkonium_p3"),
+    ("f5000400", "flagged", "f_quarkonium_p4"),
+    ("f7000100", "flagged", "f_charm_p1"),
+    ("f7000200", "flagged", "f_charm_p2"),
+    ("f7000300", "flagged", "f_charm_p3"),
+    ("f7000400", "flagged", "f_charm_p4"),
+    ("f8000100", "flagged", "f_dark_p1"),
+    ("f8000200", "flagged", "f_dark_p2"),
+    ("f8000300", "flagged", "f_dark_p3"),
+    ("f8000400", "flagged", "f_dark_p4"),
+    ("f9000100", "flagged", "f_tau_p1"),
+    ("f9000200", "flagged", "f_tau_p2"),
+    ("f9000300", "flagged", "f_tau_p3"),
+    ("f9000400", "flagged", "f_tau_p4"),
 
     # --- WG0: Systematics ---
     ("10000000", "systematics", "Random"),

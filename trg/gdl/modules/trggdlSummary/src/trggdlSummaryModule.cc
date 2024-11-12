@@ -100,38 +100,7 @@ void TRGGDLSummaryModule::initialize()
     if (strcmp(LeafNames[i], "itd9") == 0)   ee_itd[9] = LeafBitMap[i];
   }
 
-  for (unsigned int i = 0; i < TRGSummary::c_ntrgWords; i++) {
-    e_inBitWPTMasks[i] = 0;
-    e_outBitWPTMasks[i] = 0;
-  }
-
-  for (const auto& nowbn : e_inBitsWithPSNMTiming) {
-    unsigned int nowbit;
-    try {
-      nowbit = GDLResult->getInputBitNumber(nowbn);
-    } catch (std::invalid_argument& e) {
-      B2WARNING("The input bitname '" << nowbn << "' is not in the input bitname list! This bitname will be skipped!");
-      continue;
-    };
-    int iWord = nowbit / TRGSummary::c_trgWordSize;
-    int iBit = nowbit % TRGSummary::c_trgWordSize;
-
-    e_inBitWPTMasks[iWord] |= (1u << iBit);
-  }
-
-  for (const auto& nowbn : e_outBitsWithPSNMTiming) {
-    unsigned int nowbit;
-    try {
-      nowbit = GDLResult->getOutputBitNumber(nowbn);
-    } catch (std::invalid_argument& e) {
-      B2WARNING("The output bitname '" << nowbn << "' is not in the FTDL bitname list! This bitname will be skipped!");
-      continue;
-    };
-    int iWord = nowbit / TRGSummary::c_trgWordSize;
-    int iBit = nowbit % TRGSummary::c_trgWordSize;
-
-    e_outBitWPTMasks[iWord] |= (1u << iBit);
-  }
+  maskInitialized = false;
 
   if (_debugLevel > 9) printf("TRGGDLSummaryModule::initialize() end\n");
 }
@@ -198,6 +167,42 @@ void TRGGDLSummaryModule::event()
   }
 
   GDLResult.create(true);
+
+  if (!maskInitialized) {
+    maskInitialized = true;
+    for (unsigned int i = 0; i < TRGSummary::c_ntrgWords; i++) {
+      e_inBitWPTMasks[i] = 0;
+      e_outBitWPTMasks[i] = 0;
+    }
+
+    for (const auto& nowbn : e_inBitsWithPSNMTiming) {
+      unsigned int nowbit;
+      try {
+        nowbit = GDLResult->getInputBitNumber(nowbn);
+      } catch (std::invalid_argument& e) {
+        B2WARNING("The input bitname '" << nowbn << "' is not in the input bitname list! This bitname will be skipped!");
+        continue;
+      };
+      int iWord = nowbit / TRGSummary::c_trgWordSize;
+      int iBit = nowbit % TRGSummary::c_trgWordSize;
+
+      e_inBitWPTMasks[iWord] |= (1u << iBit);
+    }
+
+    for (const auto& nowbn : e_outBitsWithPSNMTiming) {
+      unsigned int nowbit;
+      try {
+        nowbit = GDLResult->getOutputBitNumber(nowbn);
+      } catch (std::invalid_argument& e) {
+        B2WARNING("The output bitname '" << nowbn << "' is not in the FTDL bitname list! This bitname will be skipped!");
+        continue;
+      };
+      int iWord = nowbit / TRGSummary::c_trgWordSize;
+      int iBit = nowbit % TRGSummary::c_trgWordSize;
+
+      e_outBitWPTMasks[iWord] |= (1u << iBit);
+    }
+  }
 
   // reg_tmdl_timtype in header. 3bit, no quality info.
   GDL::EGDLTimingType gtt = (GDL::EGDLTimingType)_data[_e_timtype][0];

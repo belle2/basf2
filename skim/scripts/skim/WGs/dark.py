@@ -905,12 +905,15 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
 class DarkShower(BaseSkim):
     """
     Skim list contains events with only one displaced vertex and a maximum of one other good track.
-    We are reconstructing the displaced vertex as a "Kshort": e+e- -> Ks, Ks -> pi+pi-
     """
 
     __authors__ = ["Miho Wakai"]
     __contact__ = __liaison__
-    __description__ = "Skim for the dark shower analysis."
+    __description__ = (
+        "Skim for the dark shower analysis. "
+        "We are reconstructing the displaced vertex as a"
+        "We are reconstructing the displaced vertex as a :math:`e^+e^- \\to K_s(\\to \\pi^+ \\pi^-)`"
+        )
     __category__ = "physics, dark sector"
     ApplyHLTHadronCut = False
 

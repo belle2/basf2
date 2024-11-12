@@ -1084,8 +1084,8 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("DeltaT3D", getDeltaT3D, R"DOC("Returns the :math:`\Delta t` variable calculated as a difference of :b2:var:`tSigB` and :b2:var:`tTagB`, i.e. not from the projection along boost vector axis.\n"
                                                "The result is meaningful and nontrivial when the signal B vertex"
-                                               "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.)DOC",
-                      "ps");
+                                               "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.
+                                               )DOC", "ps");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
                       "Returns the TagV component in the boost direction\n\n", "cm");

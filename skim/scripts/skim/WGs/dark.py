@@ -911,7 +911,6 @@ class DarkShower(BaseSkim):
     __contact__ = __liaison__
     __description__ = (
         "Skim for the dark shower analysis. "
-        "We are reconstructing the displaced vertex as a"
         "We are reconstructing the displaced vertex as a :math:`e^+e^- \\to K_s(\\to \\pi^+ \\pi^-)`"
         )
     __category__ = "physics, dark sector"

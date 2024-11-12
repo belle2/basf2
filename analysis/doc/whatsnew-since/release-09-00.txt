@@ -1,3 +1,10 @@
+Changes in the analysis package in light-2411-aldebaran
+-------------------------------------------------------
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 
@@ -26,10 +33,6 @@ Variables
 * Added energy [in tau rest frame] of radiated photon from tau+/- decays: 'tauPlusEgstar'/'tauMinusEgstar'
 * Added a meta variable `useMCancestorBRestFrame` which returns the given variable in the rest frame of the
   ancestor B MC particle.
-
-Kinematic Fitting tools
-++++++++++++++++++
-* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
 
 Command line tools
 ++++++++++++++++++

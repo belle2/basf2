@@ -40,9 +40,47 @@ namespace Belle2 {
      */
     double particleTagVz(const Particle* particle);
 
+    /**
+     * Returns x component of the Y4S vertex.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
     double getY4Sx(const Particle* part);
+
+    /**
+     * Returns y component of the Y4S vertex.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
     double getY4Sy(const Particle* part);
+
+    /**
+     * Returns z component of the Y4S vertex.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
     double getY4Sz(const Particle* part);
+
+    /**
+     * Returns reconstructed Signal B proper decay time.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getSigBdecayTime(const Particle* part);
+
+    /**
+     * Returns reconstructed Tag B proper decay time.
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getTagBdecayTime(const Particle* part);
+
+    /**
+     * Returns DeltaT calculated as a difference of tSigB and tTagB, i.e. not from the projection along boost vector
+     * The result is meaningful only with the Tag vertex tube constraint and
+     * SigB reconstructed with TreeFitter with ipConstraint.
+     */
+    double getDeltaT3D(const Particle* part);
 
     /**
      * return MC X component of the tag vertex

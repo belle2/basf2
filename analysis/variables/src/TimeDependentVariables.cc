@@ -515,7 +515,7 @@ namespace Belle2 {
       if (!vert) return Const::doubleNaN;
       B2Vector3D vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
       B2Vector3D vtxSigB = part->getVertex();  // SignalB vertex
-      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 3-momentum
+      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 4-momentum
       B2Vector3D nSig = p4Sig.Vect().Unit(); // SigB momentum direction
 
       // Notice that for beta*gamma we use p / m, not p / mPDG which has worse resolution
@@ -523,7 +523,8 @@ namespace Belle2 {
       double gammaSig = 1 / sqrt(1 - betaSig * betaSig);
       double c = Const::speedOfLight / 1000.; // cm ps-1
 
-      // momentum/mass == beta*gamma
+      // The projection of the flight path into the SigB momentum direction is used.
+      // I.e. the decay time can be negative
       double tSig = (vtxSigB - vtxY4S).Dot(nSig) / (c * betaSig * gammaSig);
       return tSig;
     }
@@ -535,20 +536,20 @@ namespace Belle2 {
 
       B2Vector3D vtxY4S  = vert->getConstraintCenter(); // Y4Svtx
       B2Vector3D vtxTagB = vert->getTagVertex();  // TagB vertex
-      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 3-momentum
+      ROOT::Math::PxPyPzEVector p4Sig = part->get4Vector(); // SigB 4-momentum
       ROOT::Math::PxPyPzEVector p4SigCms = PCmsLabTransform().labToCms(p4Sig);
       // Assuming that pSigCms + pTagCms == 0
       ROOT::Math::PxPyPzEVector p4TagCms(-p4SigCms.px(), -p4SigCms.py(), -p4SigCms.pz(), p4SigCms.E());
       ROOT::Math::PxPyPzEVector p4Tag = PCmsLabTransform().cmsToLab(p4TagCms);
-      B2Vector3D pTag = p4Tag.Vect();
-      B2Vector3D nTag = pTag.Unit(); // TagB momentum direction
+      B2Vector3D nTag = p4Tag.Vect().Unit(); // TagB momentum direction
 
       // Notice that for beta*gamma we use p / m, not p / mPDG which has worse resolution
       double betaTag = p4Tag.Beta();
       double gammaTag = 1 / sqrt(1 - betaTag * betaTag);
       double c = Const::speedOfLight / 1000.; // cm ps-1
 
-      // momentum/mass == beta*gamma
+      // The projection of the flight path into the TagB momentum direction is used.
+      // I.e. the decay time can be negative
       double tTag = (vtxTagB - vtxY4S).Dot(nTag) / (c * betaTag * gammaTag);
       return tTag;
     }
@@ -990,7 +991,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("TagVyErr", particleTagVyErr, "Tag vertex Y component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVzErr", particleTagVzErr, "Tag vertex Z component uncertainty\n\n", "cm");
     REGISTER_VARIABLE("TagVCov(i,j)", particleTagVCov,
-                      "returns the (i,j)-th element of the TagV Covariance Matrix (3x3).\n"
+                      "returns the (i,j)-th element of the Tag vertex covariance matrix (3x3).\n"
                       "Order of elements in the covariance matrix is: x, y, z.\n\n", "cm, cm, cm");
 
     REGISTER_VARIABLE("TagVpVal", particleTagVpVal, "Tag vertex p-Value");
@@ -1060,13 +1061,31 @@ namespace Belle2 {
     REGISTER_VARIABLE("OBoostErr", vertexErrOrthBoostDirection,
                       "Returns the error of the vertex in the direction orthogonal to the boost\n\n", "cm");
 
-    REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns x-component of Y4S vertex", "cm");
-    REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns y-component of Y4S vertex", "cm");
-    REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns z-component of Y4S vertex", "cm");
+    REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns X component of Y4S vertex.\n"
+                                          "The result is meaningful and nontrivial when the signal B vertex"
+                                          "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "cm");
 
-    REGISTER_VARIABLE("tSigB", getSigBdecayTime, "Returns the proper decay time of the fully reconstructed signal B meson. It should be used together with the BTube constraint.", "ps")
-    REGISTER_VARIABLE("tTagB", getTagBdecayTime, "Returns the proper decay time of the tagged B meson. It should be used together with the BTube constraint.", "ps")
-    REGISTER_VARIABLE("DeltaT3D", getDeltaT3D, "Returns the DeltaT variable calculated as a difference of tSigB and tTagB, i.e. not from the projection along boost vector axis. It should be used together with the BTube constraint.", "ps")
+    REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns Y component of Y4S vertex.\n"
+                                          "The result is meaningful and nontrivial when the signal B vertex"
+                                          "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "cm");
+
+    REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns Z component of Y4S vertex.\n"
+                                          "The result is meaningful and nontrivial when the signal B vertex"
+                                          "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "cm");
+
+
+    REGISTER_VARIABLE("tSigB", getSigBdecayTime, "Returns the proper decay time of the fully reconstructed signal B meson.\n"
+                                                 "The result is meaningful and nontrivial when the signal B vertex"
+                                                 "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "ps");
+
+    REGISTER_VARIABLE("tTagB", getTagBdecayTime, "Returns the proper decay time of the tagged B meson.\n"
+                                                 "The result is meaningful and nontrivial when the signal B vertex"
+                                                 "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "ps");
+
+    REGISTER_VARIABLE("DeltaT3D", getDeltaT3D, R"DOC("Returns the :math:`\Delta t` variable calculated as a difference of :b2:var:`tSigB` and :b2:var:`tTagB`, i.e. not from the projection along boost vector axis.\n"
+                                               "The result is meaningful and nontrivial when the signal B vertex"
+                                               "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.)DOC",
+                      "ps");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,
                       "Returns the TagV component in the boost direction\n\n", "cm");

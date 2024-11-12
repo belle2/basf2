@@ -1063,28 +1063,28 @@ namespace Belle2 {
 
     REGISTER_VARIABLE("Y4SvtxX", getY4Sx, "Returns X component of Y4S vertex.\n"
                                           "The result is meaningful and nontrivial when the signal B vertex"
-                                          "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "cm");
+                                          "is determined by treeFit with ipConstraint=True and the Tag vertex is called with BTube constraint.\n\n", "cm");
 
     REGISTER_VARIABLE("Y4SvtxY", getY4Sy, "Returns Y component of Y4S vertex.\n"
                                           "The result is meaningful and nontrivial when the signal B vertex"
-                                          "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "cm");
+                                          "is determined by treeFit with ipConstraint=True and the Tag vertex is called with BTube constraint.\n\n", "cm");
 
     REGISTER_VARIABLE("Y4SvtxZ", getY4Sz, "Returns Z component of Y4S vertex.\n"
                                           "The result is meaningful and nontrivial when the signal B vertex"
-                                          "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "cm");
+                                          "is determined by treeFit with ipConstraint=True and the Tag vertex is called with BTube constraint.\n\n", "cm");
 
 
     REGISTER_VARIABLE("tSigB", getSigBdecayTime, "Returns the proper decay time of the fully reconstructed signal B meson.\n"
                                                  "The result is meaningful and nontrivial when the signal B vertex"
-                                                 "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "ps");
+                                                 "is determined by treeFit with ipConstraint=True and the Tag vertex is called with BTube constraint.\n\n", "ps");
 
     REGISTER_VARIABLE("tTagB", getTagBdecayTime, "Returns the proper decay time of the tagged B meson.\n"
                                                  "The result is meaningful and nontrivial when the signal B vertex"
-                                                 "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.\n\n", "ps");
+                                                 "is determined by treeFit with ipConstraint=True and the Tag vertex is called with BTube constraint.\n\n", "ps");
 
     REGISTER_VARIABLE("DeltaT3D", getDeltaT3D, R"DOC("Returns the :math:`\Delta t` variable calculated as a difference of :b2:var:`tSigB` and :b2:var:`tTagB`, i.e. not from the projection along boost vector axis.\n"
                                                "The result is meaningful and nontrivial when the signal B vertex"
-                                               "is determined by treeFit with `ipConstraint=True` and the Tag vertex is called with BTube constraint.
+                                               "is determined by treeFit with ipConstraint=True and the Tag vertex is called with BTube constraint.
                                                )DOC", "ps");
 
     REGISTER_VARIABLE("TagVLBoost", tagVBoostDirection,

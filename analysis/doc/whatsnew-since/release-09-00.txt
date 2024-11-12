@@ -1,12 +1,12 @@
 Changes in the analysis package in light-2411-aldebaran
-------------------------------------------------------
+-------------------------------------------------------
 
 Variables
 +++++++++
 * Added variables `tSigB`, `tTagB` which represent reconstructed proper decay times of individual B mesons.
-* Added `DeltaT3D=tSigB-tTagB` as an alternative to the `DeltaT` variable.
+* Added `DeltaT3D`=`tSigB`-`tTagB` as an alternative to the `DeltaT` variable.
 * Added the reconstructed coordinates of the Y4S vertex `Y4SvtxX`, `Y4SvtxY`, `Y4SvtxZ` and the Tag vertex
-  covariance matrix `TagVCov(i,j)`
+  covariance matrix `TagVCov`.
 
 
 Changes in the analysis package in light-2409-toyger

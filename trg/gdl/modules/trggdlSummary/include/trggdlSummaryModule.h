@@ -61,6 +61,7 @@ namespace Belle2 {
     std::vector<std::string> e_inBitsWithPSNMTiming;
     std::vector<std::string> e_outBitsWithPSNMTiming;
 
+    bool maskInitialized;
     unsigned int e_inBitWPTMasks[TRGSummary::c_ntrgWords];
     unsigned int e_outBitWPTMasks[TRGSummary::c_ntrgWords];
 

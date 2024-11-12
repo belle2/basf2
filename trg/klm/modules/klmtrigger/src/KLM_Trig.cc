@@ -72,7 +72,7 @@ namespace Belle2 {
                      hits1[0].section,
                      hits1[0].sector
                    ).apply_append(
-                     hits,
+                     hits1,
     [](const auto & e1) {
       auto bit_mask = to_bit_mask<layer>(e1);
       return nt::ntuple(

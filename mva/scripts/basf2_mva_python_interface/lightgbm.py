@@ -5,48 +5,6 @@ import os
 import tempfile
 
 
-class StandardScaler():
-    """Standardize data by removing the mean and scaling to
-    unit variance. This object can be used as a transform
-    in PyTorch data loaders.
-
-    Args:
-        mean (numpy.ndarray): The mean value for each feature in the data.
-        scale (numpy.ndarray): Per-feature relative scaling.
-    """
-
-    def __init__(self, mean=None, scale=None):
-        """
-        Init the scalar
-
-        Args:
-            mean (numpy.ndarray): The mean value for each feature in the data.
-            scale (numpy.ndarray): Per-feature relative scaling.
-        """
-        #: means for scaler
-        self.mean_ = mean
-        #: scale for scaler
-        self.scale_ = scale
-
-    def fit(self, sample):
-        """Set the mean and scale values based on the sample data.
-        """
-        self.mean_ = np.mean(sample, axis=0, keepdims=True)
-        self.scale_ = np.std(sample, axis=0, ddof=0, keepdims=True)
-        return self
-
-    def __call__(self, sample):
-        """
-        Do scaler
-        """
-        return (sample - self.mean_) / self.scale_
-
-    def inverse_transform(self, sample):
-        """Scale the data back to the original representation
-        """
-        return sample * self.scale_ + self.mean_
-
-
 class State(object):
     """
     LGBM state
@@ -62,16 +20,10 @@ class State(object):
         self.path = path
         #: LightGBM Model parameter
         self.params = params
-        #: Scaler parameter
-        self.scale_param = {}
         #: saved Best model
         self.bst = bst
-        #: scaler function
-        self.StandardScaler = StandardScaler()
         #: train fraction for dataset splitting
         self.trainFraction = trainFraction
-        #: If applied scaler, always false here
-        self.DoScaler = False
 
 
 def get_model(number_of_features, number_of_spectators, number_of_events, training_fraction, parameters):
@@ -110,19 +62,12 @@ def feature_importance(state):
 
 def partial_fit(state, X, S, y, w, epoch, batch):
     # Internal imply the batch and epoch setting, so just keep epoch and batch as default (1, and 0 )
-    print(f"0: {X.shape[0]}, 1: {X.shape[1]}, len: {len(X)}")
     # Randomly shuffle the indices of the array
-    np.random.seed(42)  # Set seed for reproducibility
+    # np.random.seed(42)  # Set seed for reproducibility
     shuffled_indices = np.random.permutation(X.shape[0])
 
     # Determine the split index
     split_index = int(X.shape[0] * state.trainFraction)
-
-    if state.DoScaler:
-        state.StandardScaler.fit(X)
-        X = state.StandardScaler(X)
-        state.scale_param['mean'] = state.StandardScaler.mean_
-        state.scale_param['scale'] = state.StandardScaler.scale_
 
     state.train_set = lgb.Dataset(X[shuffled_indices[:split_index]], label=y[shuffled_indices[:split_index]])
     state.validation_set = state.train_set.create_valid(X[shuffled_indices[split_index:]], label=y[shuffled_indices[split_index:]])
@@ -142,12 +87,8 @@ def end_fit(state):
             with open(os.path.join(path, file_name), 'rb') as file:
                 files.append(file.read())
         params = state.params
-        scale = {}
-        if state.DoScaler:
-            scale = state.scale_param
-        print(scale)
     del state
-    return [file_names, files, params, scale]
+    return [file_names, files, params]
 
 
 def load(obj):
@@ -162,11 +103,6 @@ def load(obj):
         state = State()
         state.bst = bst
         state.params = obj[2]
-        if state.DoScaler:
-            try:
-                state.StandardScaler.__init__(mean=obj[3]['mean'], scale=obj[3]['scale'])
-            except BaseException:
-                print("not find saved scale parameters")
     return state
 
 

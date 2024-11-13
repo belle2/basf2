@@ -1743,7 +1743,7 @@ class antiB0toDsDsst_Kpi0(BaseSkim):
         loadKForBtoHadrons(path=path)
         stdKshorts(path=path)
         stdPhotons("loose", path=path)
-        stdPi0s("eff50_May2020Fit", path=path)
+        stdPi0s("eff40_May2020Fit", path=path)
 
     def build_lists(self, path):
 
@@ -1769,8 +1769,8 @@ class antiB0toDsDsst_Kpi0(BaseSkim):
                             cut="[2.06 < M < 2.15]", path=path)
 
         BsigChannels = [
-            "D_s+:all K-:GoodTrack pi0:eff50_May2020Fit",
-            "D_s*+:Dsg K-:GoodTrack pi0:eff50_May2020Fit",
+            "D_s+:all K-:GoodTrack pi0:eff40_May2020Fit",
+            "D_s*+:Dsg K-:GoodTrack pi0:eff40_May2020Fit",
             ]
 
         BsigList = []

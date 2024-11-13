@@ -1,3 +1,10 @@
+Changes in the analysis package in light-2411-aldebaran
+-------------------------------------------------------
+
+Kinematic Fitting tools
++++++++++++++++++++++++
+* Added option to prepend label to OrkaKinfit variables to allow multiple fits to be performed in same path.
+
 Changes in the analysis package in light-2409-toyger
 ----------------------------------------------------
 

@@ -100,8 +100,24 @@ def create_testfile_ntuple(input, output, treeNames=["tree1", "tree2"], **argk):
         f.write(testfile_ntuple_steering)
 
     subprocess.call(
-        ["basf2", "-i", input, "-o", output, steering_file] + treeNames, env=env
+        ["basf2", "-i", input, "-o", "tmp.root", steering_file] + treeNames, env=env
     )
+
+    # update release in metadata to avoid 'modified-xxx' warnings
+    metadata = get_metadata("tmp.root")
+    metadata.setCreationData(
+        metadata.getDate(), metadata.getSite(), metadata.getUser(), "test-release"
+    )
+    f = ROOT.TFile(output, "RECREATE")
+    t = ROOT.TTree("persistent", "persistent")
+    t.Branch("FileMetaData", metadata)
+    t.Fill()
+    t.Write()
+    f.Close()
+    opts = ROOT.RDF.RSnapshotOptions()
+    opts.fMode = "update"
+    for tree in treeNames:
+        ROOT.RDataFrame(tree, "tmp.root").Snapshot(tree, output, "", opts)
 
 
 def get_metadata(name="output.root"):
@@ -296,7 +312,7 @@ def check_15_noeventbranches():
 
 
 def check_16_nonmergeable():
-    """Check that merging fails it there a ron mergeable persistent trees"""
+    """Check that merging fails if there are mutiple mergeable persistent trees"""
     f = ROOT.TFile("test1.root", "RECREATE")
     t = ROOT.TTree("persistent", "persistent")
     meta = FileMetaData()

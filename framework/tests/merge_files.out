@@ -70,7 +70,7 @@ check_14_noeventtree passed
 running check_15_noeventbranches: Check that merging fails without event tree
 [ERROR] input file "test1.root": Could not find any branches in tree
 check_15_noeventbranches passed
-running check_16_nonmergeable: Check that merging fails it there a ron mergeable persistent trees
+running check_16_nonmergeable: Check that merging fails if there are mutiple mergeable persistent trees
 [ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
 [WARNING] File "test1.root" is empty.
 check_16_nonmergeable passed
@@ -128,13 +128,17 @@ running check_26_ntuple_merge: Check that we can merge two ntuple output files
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
 [INFO] Steering file: steering-ntuple.py
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
 [INFO] Steering file: steering-ntuple.py
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
 check_26_ntuple_merge passed
 running check_27_ntuple_trees: Check that ntuple merge failes if the tree names are different
 [INFO] Steering file: steering-test1.root.py
 [INFO] Steering file: steering-test2.root.py
 [INFO] Steering file: steering-ntuple.py
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
 [INFO] Steering file: steering-ntuple.py
+Info in <TCanvas::MakeDefCanvas>:  created default TCanvas with name c1
 [ERROR] Trees in "ntuple2.root" differ from "ntuple1.root"
 check_27_ntuple_trees passed
 running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.

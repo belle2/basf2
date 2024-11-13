@@ -165,7 +165,7 @@ def get_calibrations(input_data, **kwargs):
     print(f"\nUniqueID:\n{uniqueID}")
 
     requested_iov = kwargs.get("requested_iov", None)
-    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, requested_iov.exp_high, requested_iov.run_high)
+    output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, requested_iov.exp_high, -1)
 
     coll = create_collector(name="SVDOccupancyCalibrationsCollector",
                             svdShaperDigits="SVDShaperDigitsZS5")
@@ -181,6 +181,7 @@ def get_calibrations(input_data, **kwargs):
                               pre_collector_path=pre_collector_path)
 
     calibration.strategies = strategies.SequentialRunByRun
+
     for algorithm in calibration.algorithms:
         algorithm.params = {"iov_coverage": output_iov}
 

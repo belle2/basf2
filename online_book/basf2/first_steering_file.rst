@@ -488,7 +488,7 @@ of the CDC (`thetaInCDCAcceptance`).
     :class: toggle xhint stacked
 
     Previously we were using an empty string ``""`` as argument to
-    ``fileParticleList``. Now you need to change this.
+    ``fillParticleList``. Now you need to change this.
 
 .. admonition:: Solution
     :class: toggle solution

@@ -167,7 +167,6 @@ void DQMHistAnalysisSVDClustersOnTrackModule::event()
   // cluster time for clusters of track for 3 samples
   if (m_3Samples) {
     m_h = findHist("SVDClsTrk/SVDTRK_Cluster3TimeV456");
-    status = good;
 
     if (m_h != NULL) {
       m_hClusterOnTrackTimeL456V3Samples.Clear();

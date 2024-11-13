@@ -284,9 +284,8 @@ TH2F SVDdEdxCalibrationAlgorithm::LambdaMassFit(std::shared_ptr<TTree> preselTre
   RooDataSet* LambdaDatasetSWeighted = new RooDataSet(LambdaDataset->GetName(), LambdaDataset->GetTitle(), LambdaDataset,
                                                       *LambdaDataset->get());
 
-  RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(LambdaDatasetSWeighted->store())->tree())->SetName("treeLambda_sw");
   TTree* treeLambda_sw = LambdaDatasetSWeighted->GetClonedTree();
+  treeLambda_sw->SetName("treeLambda_sw");
 
   B2INFO("Lambda: sPlot done. Proceed to histogramming");
 
@@ -462,9 +461,8 @@ std::tuple<TH2F, TH2F, TH2F> SVDdEdxCalibrationAlgorithm::DstarMassFit(std::shar
   RooDataSet* DstarDatasetSWeighted = new RooDataSet(DstarDataset->GetName(), DstarDataset->GetTitle(), DstarDataset,
                                                      *DstarDataset->get());
 
-  RooDataSet::setDefaultStorageType(RooAbsData::Tree);
-  ((RooTreeDataStore*)(DstarDatasetSWeighted->store())->tree())->SetName("treeDstar_sw");
   TTree* treeDstar_sw = DstarDatasetSWeighted->GetClonedTree();
+  treeDstar_sw->SetName("treeDstar_sw");
 
   B2INFO("Dstar: sPlot done. Proceed to histogramming");
 

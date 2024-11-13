@@ -941,19 +941,19 @@ class DarkShower(BaseSkim):
             list_name=f"K_S0:{skim_str}",
             conf_level=0,
             updateAllDaughters=True,
-            path=path,
+            path=path
         )
         ma.applyCuts(
             list_name=f"K_S0:{skim_str}",
             cut="[dr > 0.2] and [significanceOfDistance > 10]",
-            path=path,
+            path=path
         )
         path = self.skim_event_cuts(f"[nParticlesInList(K_S0:{skim_str}) == 1]", path=path)
 
         ma.buildRestOfEvent(
             target_list_name=f"K_S0:{skim_str}",
             fillWithMostLikely=True,
-            path=path,
+            path=path
         )
         ma.appendROEMasks(
             list_name=f"K_S0:{skim_str}",
@@ -963,13 +963,13 @@ class DarkShower(BaseSkim):
                  "formula(clusterTiming/clusterErrorTiming) < 2 and minC2TDist > 50" +
                  " and thetaInCDCAcceptance" +
                  " and [[clusterReg==1 and E>0.1] or [clusterReg==2 and E>0.060] or [clusterReg==3 and E>0.150]]")],
-            path=path,
+            path=path
          )
 
         ma.applyCuts(
             list_name=f"K_S0:{skim_str}",
             cut="roeNeextra(ds_roe) < 1.5",
-            path=path,
+            path=path
         )
 
         return [f"K_S0:{skim_str}"]

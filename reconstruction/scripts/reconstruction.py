@@ -847,6 +847,8 @@ def add_dedx_modules(path, components=None):
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
+        path.add_module('CDCDedxHitSaver')
+        path.add_module('CDCDedxPIDCreator', dedxTracksName='cdcDedxTracks', likelihoodsName='cdcDedxLikelihoods')
         path.add_module('CDCDedxPID')
     # VXD dE/dx PID
     # only run this if the SVD is enabled - PXD is disabled by default

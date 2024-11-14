@@ -227,7 +227,6 @@ void TrackingAbortDQMModule::event()
   try {
     if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
   } catch (const std::exception&) {
-    B2WARNING("Requested trigger bits for passive_veto or cdcecl_veto do not exist");
   }
 
   //fill the tracking abort reason histogram & nEvents with Abort

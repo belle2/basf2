@@ -60,6 +60,8 @@ eclGammaGammaECollectorModule::eclGammaGammaECollectorModule() : CalibrationColl
   addParam("maxTime", m_maxTime, "maximum (time-<t>)/dt99 of photons", 1.);
   addParam("measureTrueEnergy", m_measureTrueEnergy, "use MC events to obtain expected energies", false);
   addParam("requireL1", m_requireL1, "only use events that have a level 1 trigger", true);
+  addParam("expectedEnergyScale", m_expectedEnergyScale, "scale expected energies for non-4S calibration", 1.);
+
 }
 
 
@@ -123,6 +125,7 @@ void eclGammaGammaECollectorModule::prepare()
   B2INFO("maxTime: " << m_maxTime);
   B2INFO("measureTrueEnergy: " << m_measureTrueEnergy);
   B2INFO("requireL1: " << m_requireL1);
+  B2INFO("expectedEnergyScale: " << m_expectedEnergyScale);
 
   /** Resize vectors */
   EperCrys.resize(ECLElementNumbers::c_NCrystals);
@@ -330,7 +333,8 @@ void eclGammaGammaECollectorModule::collect()
   for (int ic = 0; ic < 2; ic++) {
     if (crysIDMax[ic] >= 0) {
       /** ExpGammaGammaE is negative if the algorithm was unable to calculate a value. In this case, the nominal input value has been stored with a minus sign */
-      getObjectPtr<TH2F>("EnVsCrysID")->Fill(crysIDMax[ic] + 0.001, EperCrys[crysIDMax[ic]] / abs(ExpGammaGammaE[crysIDMax[ic]]));
+      getObjectPtr<TH2F>("EnVsCrysID")->Fill(crysIDMax[ic] + 0.001,
+                                             EperCrys[crysIDMax[ic]] / (m_expectedEnergyScale * abs(ExpGammaGammaE[crysIDMax[ic]])));
       getObjectPtr<TH1F>("ExpEvsCrys")->Fill(crysIDMax[ic] + 0.001, ExpGammaGammaE[crysIDMax[ic]]);
       getObjectPtr<TH1F>("ElecCalibvsCrys")->Fill(crysIDMax[ic] + 0.001, ElectronicsCalib[crysIDMax[ic]]);
       getObjectPtr<TH1F>("InitialCalibvsCrys")->Fill(crysIDMax[ic] + 0.001, GammaGammaECalib[crysIDMax[ic]]);

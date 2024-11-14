@@ -319,7 +319,7 @@ void KLMTriggerModule::event()
       dummy.event_nr    = m_event_nr;
       dummy.subdetector = digit->getSubdetector();
       dummy.section     = digit->getSection();
-      dummy.sector      = digit->getSector();
+      dummy.sector      = digit->getSector() - 1;
       dummy.plane       = digit->getPlane();
       dummy.layer       = digit->getLayer();
       dummy.strip       = digit->getStrip();

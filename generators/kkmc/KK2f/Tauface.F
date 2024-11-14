@@ -165,7 +165,6 @@ C  KeyA1 is used for formfactors actually not in use
       LAMDEC    = XPAR(ITAUXPAR+906)
       CHCONJUGATE= XPAR(ITAUXPAR+909)
       TauToElOrMu= XPAR(ITAUXPAR+910)
-      IF (TauToElOrMu.EQ.1) JAK2=1
 C
       DO IUSER = 1,100
          USERACTIVE(IUSER) = 0

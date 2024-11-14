@@ -93,6 +93,13 @@ void ProcessStatisticsPython::clear()
   getWrapped()->clear();
 }
 
+void ProcessStatisticsPython::csv(const char* filename)
+{
+  if (!getWrapped())
+    return;
+  getWrapped()->write_csv(filename);
+}
+
 
 void ProcessStatisticsPython::exposePythonAPI()
 {
@@ -156,6 +163,7 @@ counters defined in `StatisticCounters`:
        "Get global `ModuleStatistics` containing total elapsed time etc.")
   .def("clear", &ProcessStatisticsPython::clear, "Clear collected statistics but keep names of modules")
   .def_readonly("modules", &ProcessStatisticsPython::getAll, "List of all `ModuleStatistics` objects.")
+  .def("csv", &ProcessStatisticsPython::csv, "Write statistics to a csv file")
   ;
 
   //Set scope to current class

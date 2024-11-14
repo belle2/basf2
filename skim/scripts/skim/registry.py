@@ -82,7 +82,9 @@ _RegisteredSkims = [
     # --- WG3: Time-dependent CP violation ---
     ("13160200", "tdcpv", "TDCPV_ccs"),
     ("13160300", "tdcpv", "TDCPV_qqs"),
+    ("13160400", "tdcpv", "TDCPV_klong"),
     ("13130300", "tdcpv", "TDCPV_dilepton"),
+    ("13110100", "tdcpv", "TDCPV_inclusiveJpsi"),
 
 
     # --- WG4: Charmed B decays ---
@@ -121,6 +123,9 @@ _RegisteredSkims = [
     ("14141701", "btocharm", "B0toDomegapi_Kpipi_pipipi0"),
     ("14141702", "btocharm", "B0toDomegapi_Kspi_pipipi0"),
     ("14141703", "btocharm", "BtoD0pi_Kpiomega_pipipi0"),
+    ("14121401", "btocharm", "BtoDstpipi_D0pi_Kpi"),
+    ("14121402", "btocharm", "BtoDpipi_Kpipi"),
+    ("14121403", "btocharm", "BtoDsDsst_Kpi_KK"),
 
     # --- WG5: Quarkonium ---
     ("15410300", "quarkonium", "InclusiveLambda"),
@@ -162,7 +167,6 @@ _RegisteredSkims = [
     ("17240900", "charm", "EarlyData_DstToD0Pi_D0ToHpHmPi0"),  # D* -> D0 -> h h pi0
     ("17241000", "charm", "DstToDpPi0_DpToHpPi0"),  # D*+ -> D+ pi0, D+ -> h+ pi0
     ("17232000", "charm", "DpToHpPi0"),  # D+ -> h+ pi0
-    ("17222100", "charm", "DpToKsHp"),  # D+ -> Ks pi+
     ("17241100", "charm", "DstToD0Pi_D0ToHpHmHpJm"),  # D* -> D0 -> h h h j
     ("17241200", "charm", "DstToD0Pi_D0ToVGamma"),  # D* -> D0 -> vgamma
     ("17220100", "charm", "DpToPipEpEm"),  # D+ -> pi+ e+ e-
@@ -170,6 +174,9 @@ _RegisteredSkims = [
     ("17220300", "charm", "DpToPipKpKm"),  # D+ -> pi+ K+ K-
     ("17260100", "charm", "DpToHpOmega"),  # D+ -> K/pi+ omega / omega -> pi+ pi- pi0
     ("17260200", "charm", "DspToHpOmega"),  # D_s+ -> K/pi+ omega / omega -> pi+ pi- pi0
+    ("17241300", "charm", "DpToEtaHp"),  # D+ -> eta h+
+    ("17241400", "charm", "LambdacToGeneric"),  # Lambda_c+ -> X
+
 
 
     # --- WG8: Dark matter searches and tau physics ---

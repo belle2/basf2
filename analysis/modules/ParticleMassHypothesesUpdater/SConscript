@@ -1,5 +1,5 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'analysis_dataobjects', 'analysis_DecayDescriptor']
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'analysis_DecayDescriptor', 'analysis_utility']
 Return('env')
 

@@ -133,7 +133,7 @@ namespace Belle2 {
 
 
     /** The accept method of the filter:
-     * All the real computations are occuring in this method.
+     * All the real computations are occurring in this method.
      * @tparam argsType: template arguments depending on the filter
      * @param args: values to be tested by the filters
      * @return boolean indicating if filter is passed
@@ -258,7 +258,7 @@ namespace Belle2 {
 
 
   /// Bypassable Filter ///
-  /** Extended implementation of the Filter tools which allowes to bypass the filter by returning always true if wanted.
+  /** Extended implementation of the Filter tools which allows to bypass the filter by returning always true if wanted.
    * An external bool variable bypass can force the Filter accept method to always return true.
    * E.g.:
       \code
@@ -327,7 +327,7 @@ namespace Belle2 {
 
 
     /** The accept method of the bypassable filter:
-     * All the real computations are occuring in this method.
+     * All the real computations are occurring in this method.
      * @tparam argsType: template arguments depending on the filter
      * @param args: values to be tested by the filters
      * @return boolean indicating if filter is passed
@@ -356,7 +356,7 @@ namespace Belle2 {
     }
 
   private:
-    /// Member pointer to boolean indicating if filters are bypassed (true) or thier actual result is returned (false).
+    /// Member pointer to boolean indicating if filters are bypassed (true) or their actual result is returned (false).
     const bool* m_bypass;
   };
 
@@ -435,7 +435,7 @@ namespace Belle2 {
     Filter() = default;
 
     /** The accept method of the activatable filter:
-     * All the real computations are occuring in this method.
+     * All the real computations are occurring in this method.
      * @tparam argsType: template arguments depending on the filter
      * @param args: values to be tested by the filters
      * @return boolean indicating if filter is passed

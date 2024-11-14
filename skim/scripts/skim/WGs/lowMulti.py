@@ -16,7 +16,7 @@ from stdCharged import stdE, stdPi
 from stdPhotons import stdPhotons
 from variables import variables as vm
 
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header

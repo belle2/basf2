@@ -79,9 +79,8 @@ void BoostVectorCollectorModule::collect()
   if (Y4SParticles->getListSize() !=  1)
     return;
 
-
-  std::vector<int> indxes =  Y4SParticles->getParticle(0)->getDaughterIndices();
-  if (indxes.size() != 2) return;
+  if (Y4SParticles->getParticle(0)->getDaughterIndices().size() != 2)
+    return;
 
   const Particle* part0 = Y4SParticles->getParticle(0)->getDaughter(0);
   const Particle* part1 = Y4SParticles->getParticle(0)->getDaughter(1);

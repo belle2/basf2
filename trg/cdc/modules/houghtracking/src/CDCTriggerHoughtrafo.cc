@@ -112,16 +112,13 @@ CDCTrigger2DFinderModule::fastInterceptFinder(cdcMap& hits,
 
       idx_list.clear();
       bool layerHit[CDC_SUPER_LAYERS] = {false}; /* For layer filter */
-      //bool layerHit[CDC_SUPER_LAYERS*5] = {false}; /* For layer filter */
-      int iit = 0;
       for (auto it = hits.begin(); it != hits.end(); ++it) {
         iHit = it->first;
         hp = it->second;
         iSL = hp.first;
         m = hp.second.X();
         a = hp.second.Y();
-        //std::cout << "checking bin content" << iit << " " << iSL <<  " " << m << " " << a << std::endl;
-        iit++;
+
         // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
         y1 = m * sin(x1_d - 1e-10) - a * cos(x1_d - 1e-10);
         y2 = m * sin(x2_d + 1e-10) - a * cos(x2_d + 1e-10);

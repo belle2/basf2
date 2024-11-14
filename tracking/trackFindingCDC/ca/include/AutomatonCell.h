@@ -16,9 +16,9 @@ namespace Belle2 {
      *  Cell used by the cellular automata.
      *
      *  This class represents a cell in the cellular automata algorithm the local tracking is build on.
-     *  Different to the ordinary cellular automaton algorihms this class stores the state not as a interger number but \n
+     *  Different to the ordinary cellular automaton algorithms this class stores the state not as a integer number but \n
      *  as a float value. This enables to have fractional measures of quality attached to the cell if say one new item \n
-     *  is not worth a full point, but a probability measure which is additiv. The points that can be gained by picking \n
+     *  is not worth a full point, but a probability measure which is additive. The points that can be gained by picking \n
      *  this cell are stored in the cell weight property. Moreover the class defines status flags to be set and/or read by\n
      *  the cellular automaton.
      */
@@ -42,7 +42,7 @@ namespace Belle2 {
         c_BadADCOrTOT = 1024, // A CDCWireHit with bad ADC or TOT should not be used in pattern recognition.
       };
 
-      /// Type for an ored combination of the status flags of cells in the cellular automata
+      /// Type for an ordered combination of the status flags of cells in the cellular automata
       using ECellFlags = ECellFlag;
 
       /// Constant summing all possible cell flags
@@ -57,7 +57,7 @@ namespace Belle2 {
                                                       ECellFlag::c_Alias +
                                                       ECellFlag::c_BadADCOrTOT);
 
-      /// Flage that are reset at the start of each run of the cellular automaton
+      /// Flags that are reset at the start of each run of the cellular automaton
       static const ECellFlags c_TemporaryFlags = ECellFlags(ECellFlag::c_Assigned +
                                                             ECellFlag::c_Start +
                                                             ECellFlag::c_PriorityPath +
@@ -104,9 +104,9 @@ namespace Belle2 {
        *  Getter for the cell weight.
        *
        *  The cell might carry more than one unit of information to be added to the path. \n
-       *  The weight discribes an additiv constant to be gained when picking up this cell. \n
+       *  The weight describes an additive constant to be gained when picking up this cell. \n
        *  For instance segments may provide their number of hits as weight. \n
-       *  Or they could have a reduced number of hits deminshed by the quality of a fit to the segment. \n
+       *  Or they could have a reduced number of hits diminished by the quality of a fit to the segment. \n
        *  For on the other side wire hits this should be one.
        */
       Weight getCellWeight() const
@@ -341,8 +341,8 @@ namespace Belle2 {
       }
 
       /**
-       *  Getter for the ored combination of the cell flags to mark some status of the cell.
-       *  Give the ored combination of all cell flags, therefore providing a bit pattern. \n
+       *  Getter for the ordered combination of the cell flags to mark some status of the cell.
+       *  Give the ordered combination of all cell flags, therefore providing a bit pattern. \n
        *  Use rather hasAnyFlags() to retrieve stats even for single state values.
        */
       const ECellFlags& getFlags() const

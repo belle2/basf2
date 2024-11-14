@@ -112,7 +112,7 @@ void vxdDigitMaskingModule::defineHisto()
       int iLadder = id.getLadderNumber();
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
-      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      PXD::SensorInfo SensorInfo = dynamic_cast<const PXD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
       int nPixelsU = SensorInfo.getUCells();
@@ -152,7 +152,7 @@ void vxdDigitMaskingModule::defineHisto()
       int iLadder = id.getLadderNumber();
       int iSensor = id.getSensorNumber();
       VxdID sensorID(iLayer, iLadder, iSensor);
-      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::get(sensorID));
+      SVD::SensorInfo SensorInfo = dynamic_cast<const SVD::SensorInfo&>(VXD::GeoCache::getInstance().getSensorInfo(sensorID));
       string sensorDescr = str(format("%1%_%2%_%3%") % iLayer % iLadder % iSensor);
 
       int nStripsU = SensorInfo.getUCells();

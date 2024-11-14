@@ -86,7 +86,7 @@ namespace Belle2 {
       bool checkDerivative(QuadTree* node, const CDCWireHit* wireHit) const;
 
       /**
-       * Checks whether extremum point is located whithin QuadTree node's ranges
+       * Checks whether extreme point is located within QuadTree node's ranges
        * @param node QuadTree node
        * @param wireHit hit to check
        * @return true or false
@@ -100,7 +100,7 @@ namespace Belle2 {
       void drawNode(QuadTree* node) const;
 
     private:
-      /// Pinned lookup table for precompute cosine and sine values
+      /// Pinned lookup table for precomputed cosine and sine values
       const LookupTable<Vector2D>* m_cosSinLookupTable;
 
       /// Local origin on which the phase space coordinates are centered

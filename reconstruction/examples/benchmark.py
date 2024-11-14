@@ -29,6 +29,7 @@ parser = ArgumentParser(description='Measure the execution time.')
 parser.add_argument('-m', '--multiplicity', default='high', choices=['high', 'low', 'data'], help='Multiplicity or type of events')
 parser.add_argument('-l', '--limits', help='Name of file containing limits')
 parser.add_argument('-f', '--file', help='Name of benchmark output file')
+parser.add_argument('-c', '--csv', help='Name of statistics csv file')
 args = parser.parse_args()
 
 # create path and reduce log level
@@ -70,9 +71,11 @@ else:
 # reconstruction
 add_reconstruction(main)
 
-# process events and print call statistics
+# process events, print call statistics, and write statistics to a csv file
 b2.process(main)
 print(b2.statistics)
+if args.csv is not None:
+    b2.statistics.csv(args.csv)
 
 # read limits
 limits = {}

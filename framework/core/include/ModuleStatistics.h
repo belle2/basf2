@@ -10,6 +10,7 @@
 
 #include <framework/utilities/CalcMeanCov.h>
 #include <string>
+#include <ostream>
 
 namespace Belle2 {
 
@@ -115,6 +116,11 @@ namespace Belle2 {
     {
       return m_stats[type].getCorrelation<0, 1>();
     }
+
+    /** write csv header to the given stream */
+    void csv_header(std::ostream& output) const;
+    /** write data to the given stream in csv format */
+    void csv(std::ostream& output) const;
 
     /** Check if name is identical. */
     bool operator==(const ModuleStatistics& other) const { return m_name == other.m_name; }

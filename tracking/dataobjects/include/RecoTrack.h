@@ -739,7 +739,7 @@ namespace Belle2 {
     /// Name of the store array of the eklm hits.
     const std::string& getStoreArrayNameOfEKLMHits() const { return m_storeArrayNameOfEKLMHits; }
 
-    /// Name of the store array of the reco hit informations.
+    /// Name of the store array of the reco hit information.
     const std::string& getStoreArrayNameOfRecoHitInformation() const { return m_storeArrayNameOfRecoHitInformation; }
 
     /// Revert the sorting order of the RecoHitInformation

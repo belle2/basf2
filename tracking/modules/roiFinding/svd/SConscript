@@ -7,7 +7,8 @@ env['LIBS'] = [
     'genfit2',
     'svd_dataobjects',
     'tracking', 
-    'tracking_dataobjects']
+    'tracking_dataobjects',
+    'vxd_dataobjects']
 
 Return('env')
 

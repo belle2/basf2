@@ -89,7 +89,7 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
           outputTracks.push_back(track);
         }
       } else {
-        // Ambigious keep both options
+        // Ambiguous keep both options
         outputTracks.push_back(track);
         outputTracks.push_back(track.reversed());
       }

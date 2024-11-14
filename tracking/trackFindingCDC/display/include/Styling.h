@@ -126,7 +126,7 @@ namespace Belle2 {
       /**
        *  Create a mapping for the object from a name.
        *
-       *  Can be overriden by the subclass to introduce names with specific meanings.
+       *  Can be overridden by the subclass to introduce names with specific meanings.
        *  The default is to use the name as a fixed attribute value.
        */
       virtual std::unique_ptr<ObjectMapping> createMapping(const std::string& mappingName)

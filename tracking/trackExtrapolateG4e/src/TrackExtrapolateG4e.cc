@@ -1728,7 +1728,7 @@ void TrackExtrapolateG4e::adjustIntersection(Intersection& intersection, const d
   correction.invert(fail);
   if (fail != 0)
     return;
-  // Matrix inversion succeeeded and is reasonable.
+  // Matrix inversion succeeded and is reasonable.
   // Evaluate chi-squared increment assuming that the Kalman filter
   // won't be able to adjust the extrapolated track's position (fall-back).
   intersection.chi2 = (correction.similarityT(residual))[0][0];

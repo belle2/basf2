@@ -94,7 +94,7 @@ SpacePoint::SpacePoint(std::vector<const SVDCluster*>& clusters,
   m_position = aSensorInfo->pointToGlobal(ROOT::Math::XYZVector(uCoord, vCoord, 0), true);
   m_normalizedLocal = convertLocalToNormalizedCoordinates({ uCoord, vCoord }, m_vxdID, aSensorInfo);
 
-  // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is asumed:
+  // if sigma for a coordinate is not known, a uniform distribution over the whole sensor is assumed:
   if (uSigma < 0) {
     uSigma = aSensorInfo->getUSize(vCoord) / sqrt(12.);
   }
@@ -164,7 +164,7 @@ std::pair<double, double> SpacePoint::convertLocalToNormalizedCoordinates(
   double sensorSizeV =  aSensorInfo->getVSize();
 
   double normalizedUPosition = (hitLocal.first +  0.5 * sensorSizeU) /
-                               sensorSizeU; // indepedent of the trapezoidal sensor-issue by definition
+                               sensorSizeU; // independent of the trapezoidal sensor-issue by definition
   double normalizedVPosition = (hitLocal.second +  0.5 * sensorSizeV) / sensorSizeV;
 
   boundaryEnforce(normalizedUPosition, normalizedVPosition, 0, 1, 0, vxdID);

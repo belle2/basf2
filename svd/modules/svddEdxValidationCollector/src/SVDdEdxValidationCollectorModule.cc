@@ -104,6 +104,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   LambdaTree->Branch<double>("ProtonKaonIDSVDonly", &m_protonKaonIDSVDonly);
   LambdaTree->Branch<double>("ProtonProtonIDSVDonly", &m_protonProtonIDSVDonly);
 
+  LambdaTree->Branch<double>("ProtonElectronLLSVDonly", &m_protonElectronLLSVDonly);
+  LambdaTree->Branch<double>("ProtonPionLLSVDonly", &m_protonPionLLSVDonly);
+  LambdaTree->Branch<double>("ProtonKaonLLSVDonly", &m_protonKaonLLSVDonly);
+  LambdaTree->Branch<double>("ProtonProtonLLSVDonly", &m_protonProtonLLSVDonly);
+
   LambdaTree->Branch<double>("ProtonBinaryProtonKaonIDALL", &m_protonBinaryProtonKaonIDALL);
   LambdaTree->Branch<double>("ProtonBinaryProtonPionIDALL", &m_protonBinaryProtonPionIDALL);
   LambdaTree->Branch<double>("ProtonBinaryProtonElectronIDALL", &m_protonBinaryProtonElectronIDALL);
@@ -136,6 +141,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("KaonPionIDSVDonly", &m_kaonPionIDSVDonly);
   DstarTree->Branch<double>("KaonKaonIDSVDonly", &m_kaonKaonIDSVDonly);
   DstarTree->Branch<double>("KaonProtonIDSVDonly", &m_kaonProtonIDSVDonly);
+
+  DstarTree->Branch<double>("KaonElectronLLSVDonly", &m_kaonElectronLLSVDonly);
+  DstarTree->Branch<double>("KaonPionLLSVDonly", &m_kaonPionLLSVDonly);
+  DstarTree->Branch<double>("KaonKaonLLSVDonly", &m_kaonKaonLLSVDonly);
+  DstarTree->Branch<double>("KaonProtonLLSVDonly", &m_kaonProtonLLSVDonly);
 
   DstarTree->Branch<double>("KaonBinaryKaonProtonIDALL", &m_kaonBinaryKaonProtonIDALL);
   DstarTree->Branch<double>("KaonBinaryKaonPionIDALL", &m_kaonBinaryKaonPionIDALL);
@@ -170,6 +180,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("PionDKaonIDSVDonly", &m_pionDKaonIDSVDonly);
   DstarTree->Branch<double>("PionDProtonIDSVDonly", &m_pionDProtonIDSVDonly);
 
+  DstarTree->Branch<double>("PionDElectronLLSVDonly", &m_pionDElectronLLSVDonly);
+  DstarTree->Branch<double>("PionDPionLLSVDonly", &m_pionDPionLLSVDonly);
+  DstarTree->Branch<double>("PionDKaonLLSVDonly", &m_pionDKaonLLSVDonly);
+  DstarTree->Branch<double>("PionDProtonLLSVDonly", &m_pionDProtonLLSVDonly);
+
   DstarTree->Branch<double>("PionDBinaryPionProtonIDALL", &m_pionDBinaryPionProtonIDALL);
   DstarTree->Branch<double>("PionDBinaryPionKaonIDALL", &m_pionDBinaryPionKaonIDALL);
   DstarTree->Branch<double>("PionDBinaryPionElectronIDALL", &m_pionDBinaryPionElectronIDALL);
@@ -203,6 +218,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   DstarTree->Branch<double>("SlowPionKaonIDSVDonly", &m_slowPionKaonIDSVDonly);
   DstarTree->Branch<double>("SlowPionProtonIDSVDonly", &m_slowPionProtonIDSVDonly);
 
+  DstarTree->Branch<double>("SlowPionElectronLLSVDonly", &m_slowPionElectronLLSVDonly);
+  DstarTree->Branch<double>("SlowPionPionLLSVDonly", &m_slowPionPionLLSVDonly);
+  DstarTree->Branch<double>("SlowPionKaonLLSVDonly", &m_slowPionKaonLLSVDonly);
+  DstarTree->Branch<double>("SlowPionProtonLLSVDonly", &m_slowPionProtonLLSVDonly);
+
   DstarTree->Branch<double>("SlowPionBinaryPionProtonIDALL", &m_slowPionBinaryPionProtonIDALL);
   DstarTree->Branch<double>("SlowPionBinaryPionKaonIDALL", &m_slowPionBinaryPionKaonIDALL);
   DstarTree->Branch<double>("SlowPionBinaryPionElectronIDALL", &m_slowPionBinaryPionElectronIDALL);
@@ -235,6 +255,11 @@ void SVDdEdxValidationCollectorModule::prepare()
   GammaTree->Branch<double>("FirstElectronPionIDSVDonly", &m_firstElectronPionIDSVDonly);
   GammaTree->Branch<double>("FirstElectronKaonIDSVDonly", &m_firstElectronKaonIDSVDonly);
   GammaTree->Branch<double>("FirstElectronProtonIDSVDonly", &m_firstElectronProtonIDSVDonly);
+
+  GammaTree->Branch<double>("FirstElectronElectronLLSVDonly", &m_firstElectronElectronLLSVDonly);
+  GammaTree->Branch<double>("FirstElectronPionLLSVDonly", &m_firstElectronPionLLSVDonly);
+  GammaTree->Branch<double>("FirstElectronKaonLLSVDonly", &m_firstElectronKaonLLSVDonly);
+  GammaTree->Branch<double>("FirstElectronProtonLLSVDonly", &m_firstElectronProtonLLSVDonly);
 
   GammaTree->Branch<double>("FirstElectronBinaryElectronProtonIDALL", &m_firstElectronBinaryElectronProtonIDALL);
   GammaTree->Branch<double>("FirstElectronBinaryElectronKaonIDALL", &m_firstElectronBinaryElectronKaonIDALL);
@@ -294,6 +319,26 @@ void SVDdEdxValidationCollectorModule::collect()
   if (!LambdaParticles.isValid() && !DstarParticles.isValid() && !GammaParticles.isValid())
     return;
 
+  static Manager::FunctionPtr electronPIDSVDOnlyFunction = pidProbabilityExpert({"11", "SVD"});
+  static Manager::FunctionPtr pionPIDSVDOnlyFunction = pidProbabilityExpert({"211", "SVD"});
+  static Manager::FunctionPtr kaonPIDSVDOnlyFunction = pidProbabilityExpert({"321", "SVD"});
+  static Manager::FunctionPtr protonPIDSVDOnlyFunction = pidProbabilityExpert({"2212", "SVD"});
+  static Manager::FunctionPtr binaryKaonProtonPIDSVDOnlyFunction = pidPairProbabilityExpert({"321", "2212", "SVD"});
+  static Manager::FunctionPtr binaryPionProtonPIDSVDOnlyFunction = pidPairProbabilityExpert({"211", "2212", "SVD"});
+  static Manager::FunctionPtr binaryElectronProtonPIDSVDOnlyFunction = pidPairProbabilityExpert({"11", "2212", "SVD"});
+  static Manager::FunctionPtr binaryProtonKaonPIDSVDOnlyFunction = pidPairProbabilityExpert({"2212", "321", "SVD"});
+  static Manager::FunctionPtr binaryProtonPionPIDSVDOnlyFunction = pidPairProbabilityExpert({"2212", "211", "SVD"});
+  static Manager::FunctionPtr binaryProtonElectronPIDSVDOnlyFunction = pidPairProbabilityExpert({"2212", "11", "SVD"});
+  static Manager::FunctionPtr binaryKaonElectronPIDSVDOnlyFunction = pidPairProbabilityExpert({"321", "11", "SVD"});
+  static Manager::FunctionPtr binaryElectronKaonPIDSVDOnlyFunction = pidPairProbabilityExpert({"11", "321", "SVD"});
+  static Manager::FunctionPtr binaryPionElectronPIDSVDOnlyFunction = pidPairProbabilityExpert({"211", "11", "SVD"});
+  static Manager::FunctionPtr binaryElectronPionPIDSVDOnlyFunction = pidPairProbabilityExpert({"11", "211", "SVD"});
+
+  static Manager::FunctionPtr electronLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"11", "SVD"});
+  static Manager::FunctionPtr pionLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"211", "SVD"});
+  static Manager::FunctionPtr kaonLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"321", "SVD"});
+  static Manager::FunctionPtr protonLLSVDOnlyFunction = pidLogLikelihoodValueExpert({"2212", "SVD"});
+
   if (LambdaParticles->getListSize() > 0) {
     for (unsigned int iParticle = 0; iParticle < LambdaParticles->getListSize(); ++iParticle) {
 
@@ -318,81 +363,42 @@ void SVDdEdxValidationCollectorModule::collect()
 
 
 
-      m_protonElectronIDALL = std::get<double>
-                              (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonPionIDALL = std::get<double>
-                          (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonKaonIDALL = std::get<double>
-                          (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonProtonIDALL = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                               partPFromLambda));
-      m_protonElectronIDnoSVD = std::get<double>
-                                (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonPionIDnoSVD = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonKaonIDnoSVD = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonProtonIDnoSVD = std::get<double>
-                              (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(partPFromLambda));
-      m_protonElectronIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD)")->function(
-                                                     partPFromLambda));
-      m_protonPionIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD)")->function(
-                                                 partPFromLambda));
-      m_protonKaonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD)")->function(
-                                                 partPFromLambda));
-      m_protonProtonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD)")->function(
-                                                   partPFromLambda));
+      m_protonElectronIDALL = Variable::electronID(partPFromLambda);
+      m_protonPionIDALL = Variable::pionID(partPFromLambda);
+      m_protonKaonIDALL = Variable::kaonID(partPFromLambda);
+      m_protonProtonIDALL = Variable::protonID(partPFromLambda);
+      m_protonElectronIDnoSVD = Variable::electronID_noSVD(partPFromLambda);
+      m_protonPionIDnoSVD = Variable::pionID_noSVD(partPFromLambda);
+      m_protonKaonIDnoSVD = Variable::kaonID_noSVD(partPFromLambda);
+      m_protonProtonIDnoSVD = Variable::protonID_noSVD(partPFromLambda);
+      m_protonElectronIDSVDonly = std::get<double>(electronPIDSVDOnlyFunction(partPFromLambda));
+      m_protonPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partPFromLambda));
+      m_protonKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partPFromLambda));
+      m_protonProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partPFromLambda));
+      m_protonElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partPFromLambda));
+      m_protonPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partPFromLambda));
+      m_protonKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partPFromLambda));
+      m_protonProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partPFromLambda));
 
-      m_protonBinaryProtonKaonIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partPFromLambda));
-      m_protonBinaryProtonPionIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partPFromLambda));
-      m_protonBinaryProtonElectronIDALL = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                             partPFromLambda));
-      m_protonBinaryProtonKaonIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 321, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                           partPFromLambda));
-      m_protonBinaryProtonPionIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                           partPFromLambda));
-      m_protonBinaryProtonElectronIDnoSVD = std::get<double>
-                                            (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 11, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                               partPFromLambda));
-      m_protonBinaryProtonKaonIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 321, SVD)")->function(partPFromLambda));
-      m_protonBinaryProtonPionIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, SVD)")->function(partPFromLambda));
-      m_protonBinaryProtonElectronIDSVDonly = std::get<double>
-                                              (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 11, SVD)")->function(partPFromLambda));
+      m_protonBinaryProtonKaonIDALL = Variable::binaryPID(partPFromLambda, {2212., 321.});
+      m_protonBinaryProtonPionIDALL = Variable::binaryPID(partPFromLambda, {2212., 211.});
+      m_protonBinaryProtonElectronIDALL = Variable::binaryPID(partPFromLambda, {2212., 11.});
+      m_protonBinaryProtonKaonIDnoSVD = Variable::binaryPID_noSVD(partPFromLambda, {2212., 321.});
+      m_protonBinaryProtonPionIDnoSVD = Variable::binaryPID_noSVD(partPFromLambda, {2212., 211.});
+      m_protonBinaryProtonElectronIDnoSVD = Variable::binaryPID_noSVD(partPFromLambda, {2212., 11.});
+      m_protonBinaryProtonKaonIDSVDonly = std::get<double>(binaryProtonKaonPIDSVDOnlyFunction(partPFromLambda));
+      m_protonBinaryProtonPionIDSVDonly = std::get<double>(binaryProtonPionPIDSVDOnlyFunction(partPFromLambda));
+      m_protonBinaryProtonElectronIDSVDonly = std::get<double>(binaryProtonElectronPIDSVDOnlyFunction(partPFromLambda));
 
-      m_protonBinaryKaonProtonIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partPFromLambda));
-      m_protonBinaryPionProtonIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partPFromLambda));
-      m_protonBinaryElectronProtonIDALL = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                             partPFromLambda));
-      m_protonBinaryKaonProtonIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                           partPFromLambda));
-      m_protonBinaryPionProtonIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                           partPFromLambda));
-      m_protonBinaryElectronProtonIDnoSVD = std::get<double>
-                                            (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                               partPFromLambda));
-      m_protonBinaryKaonProtonIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, SVD)")->function(partPFromLambda));
-      m_protonBinaryPionProtonIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, SVD)")->function(partPFromLambda));
-      m_protonBinaryElectronProtonIDSVDonly = std::get<double>
-                                              (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 2212, SVD)")->function(partPFromLambda));
+      m_protonBinaryKaonProtonIDALL = Variable::binaryPID(partPFromLambda, {321., 2212.});
+      m_protonBinaryPionProtonIDALL = Variable::binaryPID(partPFromLambda, {211., 2212.});
+      m_protonBinaryElectronProtonIDALL = Variable::binaryPID(partPFromLambda, {11., 2212.});
+      m_protonBinaryKaonProtonIDnoSVD = Variable::binaryPID_noSVD(partPFromLambda, {321., 2212.});
+      m_protonBinaryPionProtonIDnoSVD = Variable::binaryPID_noSVD(partPFromLambda, {211., 2212.});
+      m_protonBinaryElectronProtonIDnoSVD = Variable::binaryPID_noSVD(partPFromLambda, {11., 2212.});
+      m_protonBinaryKaonProtonIDSVDonly = std::get<double>(binaryKaonProtonPIDSVDOnlyFunction(partPFromLambda));
+      m_protonBinaryPionProtonIDSVDonly = std::get<double>(binaryPionProtonPIDSVDOnlyFunction(partPFromLambda));
+      m_protonBinaryElectronProtonIDSVDonly = std::get<double>(binaryElectronProtonPIDSVDOnlyFunction(partPFromLambda));
 
       getObjectPtr<TTree>("Lambda")->Fill();
     }
@@ -440,220 +446,124 @@ void SVDdEdxValidationCollectorModule::collect()
         m_slowPionSVDdEdx = dedxTrackPiS->getDedx(Const::EDetector::SVD);
       }
 
-      m_kaonElectronIDALL = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonPionIDALL = std::get<double>
-                        (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonKaonIDALL = std::get<double>
-                        (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonProtonIDALL = std::get<double>
-                          (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonElectronIDnoSVD = std::get<double>
-                              (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonPionIDnoSVD = std::get<double>
-                          (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonKaonIDnoSVD = std::get<double>
-                          (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonProtonIDnoSVD = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonElectronIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD)")->function(
-                                                   partKFromD));
-      m_kaonPionIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD)")->function(
-                                               partKFromD));
-      m_kaonKaonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD)")->function(
-                                               partKFromD));
-      m_kaonProtonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD)")->function(
-                                                 partKFromD));
+      static Manager::FunctionPtr binaryKaonPionPIDSVDOnlyFunction = pidPairProbabilityExpert({"321", "211", "SVD"});
+      static Manager::FunctionPtr binaryPionKaonPIDSVDOnlyFunction = pidPairProbabilityExpert({"211", "321", "SVD"});
 
-      m_kaonBinaryKaonProtonIDALL = std::get<double>
-                                    (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                       partKFromD));
-      m_kaonBinaryKaonPionIDALL = std::get<double>
-                                  (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                     partKFromD));
-      m_kaonBinaryKaonElectronIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partKFromD));
-      m_kaonBinaryKaonProtonIDnoSVD = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonBinaryKaonPionIDnoSVD = std::get<double>
-                                    (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonBinaryKaonElectronIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 11, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonBinaryKaonProtonIDSVDonly = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 2212, SVD)")->function(partKFromD));
-      m_kaonBinaryKaonPionIDSVDonly = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, SVD)")->function(partKFromD));
-      m_kaonBinaryKaonElectronIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 11, SVD)")->function(partKFromD));
-
-      m_kaonBinaryProtonKaonIDALL = std::get<double>
-                                    (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                       partKFromD));
-      m_kaonBinaryPionKaonIDALL = std::get<double>
-                                  (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                     partKFromD));
-      m_kaonBinaryElectronKaonIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partKFromD));
-      m_kaonBinaryProtonKaonIDnoSVD = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 321, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonBinaryPionKaonIDnoSVD = std::get<double>
-                                    (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonBinaryElectronKaonIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, CDC, TOP, ARICH, ECL, KLM)")->function(partKFromD));
-      m_kaonBinaryProtonKaonIDSVDonly = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 321, SVD)")->function(partKFromD));
-      m_kaonBinaryPionKaonIDSVDonly = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, SVD)")->function(partKFromD));
-      m_kaonBinaryElectronKaonIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, SVD)")->function(partKFromD));
+      m_kaonElectronIDALL = Variable::electronID(partKFromD);
+      m_kaonPionIDALL = Variable::pionID(partKFromD);
+      m_kaonKaonIDALL = Variable::kaonID(partKFromD);
+      m_kaonProtonIDALL = Variable::protonID(partKFromD);
+      m_kaonElectronIDnoSVD = Variable::electronID(partKFromD);
+      m_kaonPionIDnoSVD = Variable::pionID_noSVD(partKFromD);
+      m_kaonKaonIDnoSVD = Variable::kaonID_noSVD(partKFromD);
+      m_kaonProtonIDnoSVD = Variable::protonID_noSVD(partKFromD);
+      m_kaonElectronIDSVDonly = std::get<double>(electronPIDSVDOnlyFunction(partKFromD));
+      m_kaonPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partKFromD));
+      m_kaonKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partKFromD));
+      m_kaonProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partKFromD));
+      m_kaonElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partKFromD));
+      m_kaonPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partKFromD));
+      m_kaonKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partKFromD));
+      m_kaonProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partKFromD));
 
 
-      m_pionDElectronIDALL = std::get<double>
-                             (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDPionIDALL = std::get<double>
-                         (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDKaonIDALL = std::get<double>
-                         (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDProtonIDALL = std::get<double>
-                           (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDElectronIDnoSVD = std::get<double>
-                               (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDPionIDnoSVD = std::get<double>
-                           (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDKaonIDnoSVD = std::get<double>
-                           (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDProtonIDnoSVD = std::get<double>
-                             (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDElectronIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD)")->function(
-                                                    partPiFromD));
-      m_pionDPionIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD)")->function(
-                                                partPiFromD));
-      m_pionDKaonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD)")->function(
-                                                partPiFromD));
-      m_pionDProtonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD)")->function(
-                                                  partPiFromD));
+      m_kaonBinaryKaonProtonIDALL = Variable::binaryPID(partKFromD, {321., 2212.});
+      m_kaonBinaryKaonPionIDALL = Variable::binaryPID(partKFromD, {321., 211.});
+      m_kaonBinaryKaonElectronIDALL = Variable::binaryPID(partKFromD, {321., 11.});
+      m_kaonBinaryKaonProtonIDnoSVD = Variable::binaryPID_noSVD(partKFromD, {321., 2212.});
+      m_kaonBinaryKaonPionIDnoSVD = Variable::binaryPID_noSVD(partKFromD, {321., 211.});
+      m_kaonBinaryKaonElectronIDnoSVD = Variable::binaryPID_noSVD(partKFromD, {321., 11.});
+      m_kaonBinaryKaonProtonIDSVDonly = std::get<double>(binaryKaonProtonPIDSVDOnlyFunction(partKFromD));
 
-      m_pionDBinaryPionProtonIDALL = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                        partPiFromD));
-      m_pionDBinaryPionKaonIDALL = std::get<double>
-                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                      partPiFromD));
-      m_pionDBinaryPionElectronIDALL = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                          partPiFromD));
-      m_pionDBinaryPionProtonIDnoSVD = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                          partPiFromD));
-      m_pionDBinaryPionKaonIDnoSVD = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDBinaryPionElectronIDnoSVD = std::get<double>
-                                         (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDBinaryPionProtonIDSVDonly = std::get<double>
-                                         (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, SVD)")->function(partPiFromD));
-      m_pionDBinaryPionKaonIDSVDonly = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, SVD)")->function(partPiFromD));
-      m_pionDBinaryPionElectronIDSVDonly = std::get<double>
-                                           (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, SVD)")->function(partPiFromD));
+      m_kaonBinaryKaonPionIDSVDonly = std::get<double>(binaryKaonPionPIDSVDOnlyFunction(partKFromD));
+      m_kaonBinaryKaonElectronIDSVDonly = std::get<double>(binaryKaonElectronPIDSVDOnlyFunction(partKFromD));
 
-      m_pionDBinaryProtonPionIDALL = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                        partPiFromD));
-      m_pionDBinaryKaonPionIDALL = std::get<double>
-                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                      partPiFromD));
-      m_pionDBinaryElectronPionIDALL = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                          partPiFromD));
-      m_pionDBinaryProtonPionIDnoSVD = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                          partPiFromD));
-      m_pionDBinaryKaonPionIDnoSVD = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDBinaryElectronPionIDnoSVD = std::get<double>
-                                         (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, CDC, TOP, ARICH, ECL, KLM)")->function(partPiFromD));
-      m_pionDBinaryProtonPionIDSVDonly = std::get<double>
-                                         (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, SVD)")->function(partPiFromD));
-      m_pionDBinaryKaonPionIDSVDonly = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, SVD)")->function(partPiFromD));
-      m_pionDBinaryElectronPionIDSVDonly = std::get<double>
-                                           (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, SVD)")->function(partPiFromD));
+      m_kaonBinaryProtonKaonIDALL = Variable::binaryPID(partKFromD, {2212., 321.});
+      m_kaonBinaryPionKaonIDALL = Variable::binaryPID(partKFromD, {211., 321.});
+      m_kaonBinaryElectronKaonIDALL = Variable::binaryPID(partKFromD, {11., 321.});
+      m_kaonBinaryProtonKaonIDnoSVD = Variable::binaryPID_noSVD(partKFromD, {2212., 321.});
+      m_kaonBinaryPionKaonIDnoSVD = Variable::binaryPID_noSVD(partKFromD, {211., 321.});
+      m_kaonBinaryElectronKaonIDnoSVD = Variable::binaryPID_noSVD(partKFromD, {11., 321.});
+      m_kaonBinaryProtonKaonIDSVDonly = std::get<double>(binaryProtonKaonPIDSVDOnlyFunction(partKFromD));
+      m_kaonBinaryPionKaonIDSVDonly = std::get<double>(binaryPionKaonPIDSVDOnlyFunction(partKFromD));
+      m_kaonBinaryElectronKaonIDSVDonly = std::get<double>(binaryElectronKaonPIDSVDOnlyFunction(partKFromD));
 
 
-      m_slowPionElectronIDALL = std::get<double>
-                                (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionPionIDALL = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionKaonIDALL = std::get<double>
-                            (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionProtonIDALL = std::get<double>
-                              (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionElectronIDnoSVD = std::get<double>
-                                  (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionPionIDnoSVD = std::get<double>
-                              (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionKaonIDnoSVD = std::get<double>
-                              (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionProtonIDnoSVD = std::get<double>
-                                (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionElectronIDSVDonly = std::get<double>
-                                    (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD)")->function(
-                                       partPiS));
-      m_slowPionPionIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD)")->function(
-                                                   partPiS));
-      m_slowPionKaonIDSVDonly = std::get<double>(Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD)")->function(
-                                                   partPiS));
-      m_slowPionProtonIDSVDonly = std::get<double>
-                                  (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD)")->function(
-                                     partPiS));
+      m_pionDElectronIDALL = Variable::electronID(partPiFromD);
+      m_pionDPionIDALL = Variable::pionID(partPiFromD);
+      m_pionDKaonIDALL = Variable::kaonID(partPiFromD);
+      m_pionDProtonIDALL = Variable::protonID(partPiFromD);
+      m_pionDElectronIDnoSVD = Variable::electronID_noSVD(partPiFromD);
+      m_pionDPionIDnoSVD = Variable::pionID_noSVD(partPiFromD);
+      m_pionDKaonIDnoSVD = Variable::kaonID_noSVD(partPiFromD);
+      m_pionDProtonIDnoSVD = Variable::protonID_noSVD(partPiFromD);
+      m_pionDElectronIDSVDonly = std::get<double>(electronPIDSVDOnlyFunction(partPiFromD));
+      m_pionDPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partPiFromD));
+      m_pionDKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partPiFromD));
+      m_pionDProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partPiFromD));
+      m_pionDElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partPiFromD));
+      m_pionDPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partPiFromD));
+      m_pionDKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partPiFromD));
+      m_pionDProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partPiFromD));
 
-      m_slowPionBinaryPionProtonIDALL = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                           partPiS));
-      m_slowPionBinaryPionKaonIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partPiS));
-      m_slowPionBinaryPionElectronIDALL = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                             partPiS));
-      m_slowPionBinaryPionProtonIDnoSVD = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                             partPiS));
-      m_slowPionBinaryPionKaonIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionBinaryPionElectronIDnoSVD = std::get<double>
-                                            (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionBinaryPionProtonIDSVDonly = std::get<double>
-                                            (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 2212, SVD)")->function(partPiS));
-      m_slowPionBinaryPionKaonIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 321, SVD)")->function(partPiS));
-      m_slowPionBinaryPionElectronIDSVDonly = std::get<double>
-                                              (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, SVD)")->function(partPiS));
+      m_pionDBinaryPionProtonIDALL = Variable::binaryPID(partPiFromD, {211., 2212.});
+      m_pionDBinaryPionKaonIDALL = Variable::binaryPID(partPiFromD, {211., 321.});
+      m_pionDBinaryPionElectronIDALL = Variable::binaryPID(partPiFromD, {211., 11.});
+      m_pionDBinaryPionProtonIDnoSVD = Variable::binaryPID_noSVD(partPiFromD, {211., 2212});
+      m_pionDBinaryPionKaonIDnoSVD = Variable::binaryPID_noSVD(partPiFromD, {211., 321.});
+      m_pionDBinaryPionElectronIDnoSVD = Variable::binaryPID_noSVD(partPiFromD, {211., 11.});
+      m_pionDBinaryPionProtonIDSVDonly = std::get<double>(binaryPionProtonPIDSVDOnlyFunction(partPiFromD));
+      m_pionDBinaryPionKaonIDSVDonly = std::get<double>(binaryPionKaonPIDSVDOnlyFunction(partPiFromD));
+      m_pionDBinaryPionElectronIDSVDonly = std::get<double>(binaryPionElectronPIDSVDOnlyFunction(partPiFromD));
 
-      m_slowPionBinaryProtonPionIDALL = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                           partPiS));
-      m_slowPionBinaryKaonPionIDALL = std::get<double>
-                                      (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                         partPiS));
-      m_slowPionBinaryElectronPionIDALL = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                             partPiS));
-      m_slowPionBinaryProtonPionIDnoSVD = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                             partPiS));
-      m_slowPionBinaryKaonPionIDnoSVD = std::get<double>
-                                        (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionBinaryElectronPionIDnoSVD = std::get<double>
-                                            (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, CDC, TOP, ARICH, ECL, KLM)")->function(partPiS));
-      m_slowPionBinaryProtonPionIDSVDonly = std::get<double>
-                                            (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 211, SVD)")->function(partPiS));
-      m_slowPionBinaryKaonPionIDSVDonly = std::get<double>
-                                          (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 211, SVD)")->function(partPiS));
-      m_slowPionBinaryElectronPionIDSVDonly = std::get<double>
-                                              (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, SVD)")->function(partPiS));
+      m_pionDBinaryProtonPionIDALL = Variable::binaryPID(partPiFromD, {2212., 211.});
+      m_pionDBinaryKaonPionIDALL = Variable::binaryPID(partPiFromD, {321., 211.});
+      m_pionDBinaryElectronPionIDALL = Variable::binaryPID(partPiFromD, {11., 211.});
+      m_pionDBinaryProtonPionIDnoSVD = Variable::binaryPID_noSVD(partPiFromD, {2212., 211.});
+      m_pionDBinaryKaonPionIDnoSVD = Variable::binaryPID_noSVD(partPiFromD, {321., 211.});
+      m_pionDBinaryElectronPionIDnoSVD = Variable::binaryPID_noSVD(partPiFromD, {11., 211.});
+      m_pionDBinaryProtonPionIDSVDonly = std::get<double>(binaryProtonPionPIDSVDOnlyFunction(partPiFromD));
+      m_pionDBinaryKaonPionIDSVDonly = std::get<double>(binaryKaonPionPIDSVDOnlyFunction(partPiFromD));
+      m_pionDBinaryElectronPionIDSVDonly = std::get<double>(binaryElectronPionPIDSVDOnlyFunction(partPiFromD));
+
+
+      m_slowPionElectronIDALL = Variable::electronID(partPiS);
+      m_slowPionPionIDALL = Variable::pionID(partPiS);
+      m_slowPionKaonIDALL = Variable::kaonID(partPiS);
+      m_slowPionProtonIDALL = Variable::protonID(partPiS);
+      m_slowPionElectronIDnoSVD = Variable::electronID_noSVD(partPiS);
+      m_slowPionPionIDnoSVD = Variable::pionID_noSVD(partPiS);
+      m_slowPionKaonIDnoSVD = Variable::kaonID_noSVD(partPiS);
+      m_slowPionProtonIDnoSVD = Variable::protonID_noSVD(partPiS);
+      m_slowPionElectronIDSVDonly = std::get<double>(electronPIDSVDOnlyFunction(partPiS));
+      m_slowPionPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partPiS));
+      m_slowPionKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partPiS));
+      m_slowPionProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partPiS));
+      m_slowPionElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partPiS));
+      m_slowPionPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partPiS));
+      m_slowPionKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partPiS));
+      m_slowPionProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partPiS));
+
+
+      m_slowPionBinaryPionProtonIDALL = Variable::binaryPID(partPiS, {211., 2212.});
+      m_slowPionBinaryPionKaonIDALL = Variable::binaryPID(partPiS, {211., 321.});
+      m_slowPionBinaryPionElectronIDALL = Variable::binaryPID(partPiS, {211., 11.});
+      m_slowPionBinaryPionProtonIDnoSVD = Variable::binaryPID_noSVD(partPiS, {211., 2212.});
+      m_slowPionBinaryPionKaonIDnoSVD = Variable::binaryPID_noSVD(partPiS, {211., 321.});
+      m_slowPionBinaryPionElectronIDnoSVD = Variable::binaryPID_noSVD(partPiS, {211., 11.});
+      m_slowPionBinaryPionProtonIDSVDonly = std::get<double>(binaryPionProtonPIDSVDOnlyFunction(partPiS));
+      m_slowPionBinaryPionKaonIDSVDonly = std::get<double>(binaryPionKaonPIDSVDOnlyFunction(partPiS));
+      m_slowPionBinaryPionElectronIDSVDonly = std::get<double>(binaryPionElectronPIDSVDOnlyFunction(partPiS));
+
+      m_slowPionBinaryProtonPionIDALL = Variable::binaryPID(partPiS, {2212., 211.});
+      m_slowPionBinaryKaonPionIDALL = Variable::binaryPID(partPiS, {321., 211.});
+      m_slowPionBinaryElectronPionIDALL = Variable::binaryPID(partPiS, {11., 211.});
+      m_slowPionBinaryProtonPionIDnoSVD = Variable::binaryPID_noSVD(partPiS, {2212., 211.});
+      m_slowPionBinaryKaonPionIDnoSVD = Variable::binaryPID_noSVD(partPiS, {321., 211.});
+      m_slowPionBinaryElectronPionIDnoSVD = Variable::binaryPID_noSVD(partPiS, {11., 211.});
+      m_slowPionBinaryProtonPionIDSVDonly = std::get<double>(binaryProtonPionPIDSVDOnlyFunction(partPiS));
+      m_slowPionBinaryKaonPionIDSVDonly = std::get<double>(binaryKaonPionPIDSVDOnlyFunction(partPiS));
+      m_slowPionBinaryElectronPionIDSVDonly = std::get<double>(binaryElectronPionPIDSVDOnlyFunction(partPiS));
 
       getObjectPtr<TTree>("Dstar")->Fill();
     }
@@ -688,85 +598,42 @@ void SVDdEdxValidationCollectorModule::collect()
         m_secondElectronSVDdEdx = dedxTrackE2FromGamma->getDedx(Const::EDetector::SVD);
       }
 
-      m_firstElectronElectronIDALL = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronPionIDALL = std::get<double>
-                                 (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronKaonIDALL = std::get<double>
-                                 (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronProtonIDALL = std::get<double>
-                                   (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                      partE1FromGamma));
-      m_firstElectronElectronIDnoSVD = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronPionIDnoSVD = std::get<double>
-                                   (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronKaonIDnoSVD = std::get<double>
-                                   (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronProtonIDnoSVD = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, CDC, TOP, ARICH, ECL, KLM)")->function(partE1FromGamma));
-      m_firstElectronElectronIDSVDonly = std::get<double>
-                                         (Variable::Manager::Instance().getVariable("pidProbabilityExpert(11, SVD)")->function(
-                                            partE1FromGamma));
-      m_firstElectronPionIDSVDonly = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidProbabilityExpert(211, SVD)")->function(
-                                        partE1FromGamma));
-      m_firstElectronKaonIDSVDonly = std::get<double>
-                                     (Variable::Manager::Instance().getVariable("pidProbabilityExpert(321, SVD)")->function(
-                                        partE1FromGamma));
-      m_firstElectronProtonIDSVDonly = std::get<double>
-                                       (Variable::Manager::Instance().getVariable("pidProbabilityExpert(2212, SVD)")->function(
-                                          partE1FromGamma));
+      m_firstElectronElectronIDALL = Variable::electronID(partE1FromGamma);
+      m_firstElectronPionIDALL = Variable::pionID(partE1FromGamma);
+      m_firstElectronKaonIDALL = Variable::kaonID(partE1FromGamma);
+      m_firstElectronProtonIDALL = Variable::protonID(partE1FromGamma);
+      m_firstElectronElectronIDnoSVD = Variable::electronID_noSVD(partE1FromGamma);
+      m_firstElectronPionIDnoSVD = Variable::pionID_noSVD(partE1FromGamma);
+      m_firstElectronKaonIDnoSVD = Variable::kaonID_noSVD(partE1FromGamma);
+      m_firstElectronProtonIDnoSVD = Variable::protonID_noSVD(partE1FromGamma);
+      m_firstElectronElectronIDSVDonly = std::get<double>(electronPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronPionIDSVDonly = std::get<double>(pionPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronKaonIDSVDonly = std::get<double>(kaonPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronProtonIDSVDonly = std::get<double>(protonPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronElectronLLSVDonly = std::get<double>(electronLLSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronPionLLSVDonly = std::get<double>(pionLLSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronKaonLLSVDonly = std::get<double>(kaonLLSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronProtonLLSVDonly = std::get<double>(protonLLSVDOnlyFunction(partE1FromGamma));
 
-      m_firstElectronBinaryElectronProtonIDALL = std::get<double>
-                                                 (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 2212, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                    partE1FromGamma));
-      m_firstElectronBinaryElectronKaonIDALL = std::get<double>
-                                               (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                  partE1FromGamma));
-      m_firstElectronBinaryElectronPionIDALL = std::get<double>
-                                               (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                  partE1FromGamma));
-      m_firstElectronBinaryElectronProtonIDnoSVD = std::get<double>
-                                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 2212, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                      partE1FromGamma));
-      m_firstElectronBinaryElectronKaonIDnoSVD = std::get<double>
-                                                 (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                    partE1FromGamma));
-      m_firstElectronBinaryElectronPionIDnoSVD = std::get<double>
-                                                 (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                    partE1FromGamma));
-      m_firstElectronBinaryElectronProtonIDSVDonly = std::get<double>
-                                                     (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 2212, SVD)")->function(partE1FromGamma));
-      m_firstElectronBinaryElectronKaonIDSVDonly = std::get<double>
-                                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 321, SVD)")->function(partE1FromGamma));
-      m_firstElectronBinaryElectronPionIDSVDonly = std::get<double>
-                                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(11, 211, SVD)")->function(partE1FromGamma));
+      m_firstElectronBinaryElectronProtonIDALL = Variable::binaryPID(partE1FromGamma, {11., 2212.});
+      m_firstElectronBinaryElectronKaonIDALL = Variable::binaryPID(partE1FromGamma, {11., 321.});
+      m_firstElectronBinaryElectronPionIDALL = Variable::binaryPID(partE1FromGamma, {11., 211.});
+      m_firstElectronBinaryElectronProtonIDnoSVD = Variable::binaryPID_noSVD(partE1FromGamma, {11., 2212.});
+      m_firstElectronBinaryElectronKaonIDnoSVD = Variable::binaryPID_noSVD(partE1FromGamma, {11., 321.});
+      m_firstElectronBinaryElectronPionIDnoSVD = Variable::binaryPID_noSVD(partE1FromGamma, {11., 211.});
+      m_firstElectronBinaryElectronProtonIDSVDonly = std::get<double>(binaryElectronProtonPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronBinaryElectronKaonIDSVDonly = std::get<double>(binaryElectronKaonPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronBinaryElectronPionIDSVDonly = std::get<double>(binaryElectronPionPIDSVDOnlyFunction(partE1FromGamma));
 
-      m_firstElectronBinaryProtonElectronIDALL = std::get<double>
-                                                 (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                    partE1FromGamma));
-      m_firstElectronBinaryKaonElectronIDALL = std::get<double>
-                                               (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                  partE1FromGamma));
-      m_firstElectronBinaryPionElectronIDALL = std::get<double>
-                                               (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, SVD, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                  partE1FromGamma));
-      m_firstElectronBinaryProtonElectronIDnoSVD = std::get<double>
-                                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 11, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                      partE1FromGamma));
-      m_firstElectronBinaryKaonElectronIDnoSVD = std::get<double>
-                                                 (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 11, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                    partE1FromGamma));
-      m_firstElectronBinaryPionElectronIDnoSVD = std::get<double>
-                                                 (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, CDC, TOP, ARICH, ECL, KLM)")->function(
-                                                    partE1FromGamma));
-      m_firstElectronBinaryProtonElectronIDSVDonly = std::get<double>
-                                                     (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(2212, 11, SVD)")->function(partE1FromGamma));
-      m_firstElectronBinaryKaonElectronIDSVDonly = std::get<double>
-                                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(321, 11, SVD)")->function(partE1FromGamma));
-      m_firstElectronBinaryPionElectronIDSVDonly = std::get<double>
-                                                   (Variable::Manager::Instance().getVariable("pidPairProbabilityExpert(211, 11, SVD)")->function(partE1FromGamma));
+      m_firstElectronBinaryProtonElectronIDALL = Variable::binaryPID(partE1FromGamma, {2212., 11.});
+      m_firstElectronBinaryKaonElectronIDALL = Variable::binaryPID(partE1FromGamma, {321., 11.});
+      m_firstElectronBinaryPionElectronIDALL = Variable::binaryPID(partE1FromGamma, {211., 11.});
+      m_firstElectronBinaryProtonElectronIDnoSVD = Variable::binaryPID_noSVD(partE1FromGamma, {2212., 11.});
+      m_firstElectronBinaryKaonElectronIDnoSVD = Variable::binaryPID_noSVD(partE1FromGamma, {321., 11.});
+      m_firstElectronBinaryPionElectronIDnoSVD = Variable::binaryPID_noSVD(partE1FromGamma, {211., 11.});
+      m_firstElectronBinaryProtonElectronIDSVDonly = std::get<double>(binaryProtonElectronPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronBinaryKaonElectronIDSVDonly = std::get<double>(binaryKaonElectronPIDSVDOnlyFunction(partE1FromGamma));
+      m_firstElectronBinaryPionElectronIDSVDonly = std::get<double>(binaryPionElectronPIDSVDOnlyFunction(partE1FromGamma));
 
       getObjectPtr<TTree>("Gamma")->Fill();
     }

@@ -22,7 +22,7 @@ from stdCharged import stdE, stdK, stdMu, stdPi
 from stdPhotons import stdPhotons
 
 __liaison__ = "Ihor Prudiiev <Ihor.Prudiiev@ijs.si>"
-_VALIDATION_SAMPLE = "mdst14.root"
+_VALIDATION_SAMPLE = "mdst16.root"
 
 
 @fancy_skim_header
@@ -195,7 +195,7 @@ class BtoXll(BaseSkim):
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp_btxll', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp_btxll', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
         ma.cutAndCopyList('mu+:ewp_btxll', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
@@ -313,7 +313,7 @@ class BtoXll_LFV(BaseSkim):
         # Apply muon cuts p > 0.395 GeV, muonID > 0.5 + fairTrack
         fairTrack = 'dr < 0.5 and abs(dz) < 2'
 
-        ma.cutAndCopyList('e+:ewp_btxlllfv', 'e+:all', 'p > 0.395 and electronID_noTOP > 0.1 and ' + fairTrack, path=path)
+        ma.cutAndCopyList('e+:ewp_btxlllfv', 'e+:all', 'p > 0.395 and electronID > 0.1 and ' + fairTrack, path=path)
         ma.cutAndCopyList('mu+:ewp_btxlllfv', 'mu+:all', 'p > 0.395 and muonID > 0.5 and ' + fairTrack, path=path)
 
         # Apply dilepton cut E_ll > 1.5 GeV (in CMS frame)
@@ -357,6 +357,8 @@ class B0TwoBody(BaseSkim):
     __category__ = "Physics, 2 Body, no PID"
 
     validation_sample = _VALIDATION_SAMPLE
+
+    ApplyHLTHadronCut = False
 
     def load_standard_lists(self, path):
         stdE("all", path=path)
@@ -420,7 +422,7 @@ class FourLepton(BaseSkim):
         * :math:`5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
         * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
         * :math:`muonID>0.1`
-        * :math:`electronID_noTOP>0.1`
+        * :math:`electronID>0.1`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -430,6 +432,8 @@ class FourLepton(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
@@ -437,7 +441,7 @@ class FourLepton(BaseSkim):
     def build_lists(self, path):
         cut_trk = 'dr < 0.5 and abs(dz) < 2 '
 
-        ma.cutAndCopyList('e+:ewp_4b', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('e+:ewp_4b', 'e+:all', 'pt > 0.1 and electronID > 0.1 and ' + cut_trk, path=path)
         ma.cutAndCopyList('mu+:ewp_4b', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=5"
@@ -487,7 +491,7 @@ class RadiativeDilepton(BaseSkim):
         * :math:` 5.2 < M_{bc} < 5.3 \\text{GeV}/c^2`
         * :math:`dr < 0.5 \\text{cm}, |dz| < 2 \\text{cm}`
         * :math:`muonID>0.1`
-        * :math:`electronID_noTOP>0.1`
+        * :math:`electronID>0.1`
     """
 
     __authors__ = ["Santi Naylor and Ryan Mueller"]
@@ -497,6 +501,8 @@ class RadiativeDilepton(BaseSkim):
 
     validation_sample = _VALIDATION_SAMPLE
 
+    ApplyHLTHadronCut = False
+
     def load_standard_lists(self, path):
         stdE("all", path=path)
         stdMu("all", path=path)
@@ -505,7 +511,7 @@ class RadiativeDilepton(BaseSkim):
     def build_lists(self, path):
 
         cut_trk = 'dr < 0.5 and abs(dz) < 2'
-        ma.cutAndCopyList('e+:ewp_radll', 'e+:all', 'pt > 0.1 and electronID_noTOP > 0.1 and ' + cut_trk, path=path)
+        ma.cutAndCopyList('e+:ewp_radll', 'e+:all', 'pt > 0.1 and electronID > 0.1 and ' + cut_trk, path=path)
         ma.cutAndCopyList('mu+:ewp_radll', 'mu+:all', 'pt > 0.1 and muonID > 0.1 and ' + cut_trk, path=path)
 
         cut_evt = "nCleanedTracks(abs(dr) < 0.5 and abs(dz) < 2)>=3"

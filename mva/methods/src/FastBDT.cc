@@ -116,6 +116,9 @@ namespace Belle2 {
 
     Weightfile FastBDTTeacher::train(Dataset& training_data) const
     {
+      if (training_data.getNumberOfEvents() > 5e+6) {
+        B2WARNING("Number of events for training exceeds 5 million. FastBDT performance starts getting worse when the number reaches O(10^7).");
+      }
 
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
       unsigned int numberOfSpectators = training_data.getNumberOfSpectators();

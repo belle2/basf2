@@ -133,7 +133,7 @@ namespace Belle2 {
 
     bool m_mcParticlesPresent =
       false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
-    double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into seperate tracks. If < 0, don't do splitting.*/
+    double m_splitAfterDeltaT; /**< Minimal time delay between two sim hits (in ns) after which MC reco track will be split into separate tracks. If < 0, don't do splitting.*/
 
     bool m_discardAuxiliaryHits = false; /**< if true hits marked as auxiliary will not be included in the RecoTrack */
 

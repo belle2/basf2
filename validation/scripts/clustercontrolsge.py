@@ -39,7 +39,7 @@ class Cluster:
     @staticmethod
     def name():
         """
-        Returns name of this job contol
+        Returns name of this job control
         """
         return "cluster-sge"
 

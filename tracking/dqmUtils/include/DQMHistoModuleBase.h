@@ -254,7 +254,7 @@ namespace Belle2 {
     TH2F** m_TRClusterHitmap = nullptr;
     /** Track related clusters - neighbor correlations in Phi */
     TH2F** m_TRClusterCorrelationsPhi = nullptr;
-    /** Track related clusters - neighbor corelations in Theta */
+    /** Track related clusters - neighbor correlations in Theta */
     TH2F** m_TRClusterCorrelationsTheta = nullptr;
 
     /** Track momentum Pt.Phi */

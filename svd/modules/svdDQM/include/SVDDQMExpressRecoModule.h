@@ -69,6 +69,9 @@ namespace Belle2 {
     /** additional plots flag*/
     bool m_additionalPlots = false;
 
+    /** if true enable 3 samples histograms analysis */
+    bool m_3Samples = false;
+
     /** list of cumulative histograms */
     TList* m_histoList = nullptr;
 
@@ -187,23 +190,23 @@ namespace Belle2 {
     TH1F** m_stripCountGroupId0V = nullptr;
 
     /** u strip count for 3 samples */
-    TH1F** m_strip3CountU = nullptr;
+    TH1F** m_strip3SampleCountU = nullptr;
     /** v strip count  for 3 samples*/
-    TH1F** m_strip3CountV = nullptr;
+    TH1F** m_strip3SampleCountV = nullptr;
     /** u strip count (online Zero Suppression)  for 3 samples*/
-    TH1F** m_onlineZSstrip3CountU = nullptr;
+    TH1F** m_onlineZSstrip3SampleCountU = nullptr;
     /** v strip count (online Zero Suppression  for 3 samples*/
-    TH1F** m_onlineZSstrip3CountV = nullptr;
+    TH1F** m_onlineZSstrip3SampleCountV = nullptr;
 
 
     /** u strip count for 6 samples */
-    TH1F** m_strip6CountU = nullptr;
+    TH1F** m_strip6SampleCountU = nullptr;
     /** v strip count  for 3 samples*/
-    TH1F** m_strip6CountV = nullptr;
+    TH1F** m_strip6SampleCountV = nullptr;
     /** u strip count (online Zero Suppression)  for 6 samples*/
-    TH1F** m_onlineZSstrip6CountU = nullptr;
+    TH1F** m_onlineZSstrip6sampleCountU = nullptr;
     /** v strip count (online Zero Suppression  for 6 samples*/
-    TH1F** m_onlineZSstrip6CountV = nullptr;
+    TH1F** m_onlineZSstrip6sampleCountV = nullptr;
 
     /** u size */
     TH1F** m_clusterSizeU = nullptr;
@@ -217,14 +220,14 @@ namespace Belle2 {
 
 
     /** time group id for  U side for fine trigger**/
-    TH2F* m_clusterTime3GroupIdU = nullptr;
+    TH2F* m_clusterTimeFineGroupIdU = nullptr;
     /** time group id for  V side for fine trigger**/
-    TH2F* m_clusterTime3GroupIdV = nullptr;
+    TH2F* m_clusterTimeFineGroupIdV = nullptr;
 
     /** time group id for  U side for coarse trigger**/
-    TH2F* m_clusterTime6GroupIdU = nullptr;
+    TH2F* m_clusterTimeCoarseGroupIdU = nullptr;
     /** time group id for  V side for coarse trigger**/
-    TH2F* m_clusterTime6GroupIdV = nullptr;
+    TH2F* m_clusterTimeCoarseGroupIdV = nullptr;
 
     /** u time */
     TH1F** m_clusterTimeU = nullptr;
@@ -244,22 +247,22 @@ namespace Belle2 {
     TH1F* m_clusterTimeV456 = nullptr;
 
     /** u Time of clusters for layer 3 sensors  for 3 samples*/
-    TH1F* m_cluster3TimeU3 = nullptr;
+    TH1F* m_cluster3SampleTimeU3 = nullptr;
     /** v Time of clusters for layer 3  sensors   for 3 samples*/
-    TH1F* m_cluster3TimeV3 = nullptr;
+    TH1F* m_cluster3SampleTimeV3 = nullptr;
     /** u Time of clusters for layer 4,5,6 sensors  for 3 samples*/
-    TH1F* m_cluster3TimeU456 = nullptr;
+    TH1F* m_cluster3SampleTimeU456 = nullptr;
     /** v Time of clusters for layer 4,5,6 sensors  for 3 samples*/
-    TH1F* m_cluster3TimeV456 = nullptr;
+    TH1F* m_cluster3SampleTimeV456 = nullptr;
 
     /** u Time of clusters for layer 3 sensors   for 6 samples*/
-    TH1F* m_cluster6TimeU3 = nullptr;
+    TH1F* m_cluster6SampleTimeU3 = nullptr;
     /** v Time of clusters for layer 3  sensors  for 6 samples*/
-    TH1F* m_cluster6TimeV3 = nullptr;
+    TH1F* m_cluster6SampleTimeV3 = nullptr;
     /** u Time of clusters for layer 4,5,6 sensors  for 6 samples */
-    TH1F* m_cluster6TimeU456 = nullptr;
+    TH1F* m_cluster6SampleTimeU456 = nullptr;
     /** v Time of clusters for layer 4,5,6 sensors  for 6 samples */
-    TH1F* m_cluster6TimeV456 = nullptr;
+    TH1F* m_cluster6SampleTimeV456 = nullptr;
 
     //----------------------------------------------------------------
     // Additional histograms for out of ExpressReco

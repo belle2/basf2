@@ -24,8 +24,8 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /**
      *  Class to combine the run of the cellular automaton and the repeated path extraction.
-     *  Execute the cellular automaton and extracting paths interatively blocking the already used
-     *  knots until there is no more path fullfilling the minimal length / energy requirement given
+     *  Execute the cellular automaton and extracting paths iteratively blocking the already used
+     *  knots until there is no more path fulfilling the minimal length / energy requirement given
      *  as minStateToFollow to the constructor.
      */
     template <class ACellHolder>

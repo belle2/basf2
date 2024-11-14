@@ -313,9 +313,16 @@ void TRGEFFDQMModule::event()
     double phiDegree = b2klmcluster.getMomentum().Phi() / Unit::deg;
 
     bool trg_KLMecl  = m_trgSummary->testPsnm("hie")        || m_trgSummary->testPsnm("c4")   || m_trgSummary->testPsnm("eclmumu") ||
-                       m_trgSummary->testPsnm("ecltaub2b3") || m_trgSummary->testPsnm("hie4") || m_trgSummary->testPsnm("lml1")    ||
-                       m_trgSummary->testPsnm("lml2")       || m_trgSummary->testPsnm("lml6") || m_trgSummary->testPsnm("lml7")    ||
-                       m_trgSummary->testPsnm("lml8")       || m_trgSummary->testPsnm("lml9") || m_trgSummary->testPsnm("lml10");
+                       m_trgSummary->testPsnm("lml1") || m_trgSummary->testPsnm("lml2")    ||
+                       m_trgSummary->testPsnm("lml6")       || m_trgSummary->testPsnm("lml7") || m_trgSummary->testPsnm("lml8")    ||
+                       m_trgSummary->testPsnm("lml9")       || m_trgSummary->testPsnm("lml10");
+    // this trigger flag is not available in older data
+    try {
+      trg_KLMecl |= m_trgSummary->testPsnm("ecltaub2b3") || m_trgSummary->testPsnm("hie4");
+    } catch (const std::exception&) {
+      B2WARNING("Requested trigger bits for passive_veto or cdcecl_veto do not exist");
+    }
+
 
     bool trg_klmhit  = m_trgSummary->testFtdl("klmhit");
     bool trg_eklmhit = m_trgSummary->testFtdl("eklmhit");

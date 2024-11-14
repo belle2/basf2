@@ -226,13 +226,13 @@ void TrackingAbortDQMModule::event()
   int index = 0; //events accepted in the passive veto window but not in the active
   try {
     if (m_trgSummary->testInput("passive_veto") == 1 &&  m_trgSummary->testInput("cdcecl_veto") == 0) index = 1;
-  } catch (catch (const std::out_of_range& e) {
-      B2WARNING("Requested trigger bits for passive_veto or cdcecl_veto do not exist");
-    }
+  } catch (const std::exception&) {
+    B2WARNING("Requested trigger bits for passive_veto or cdcecl_veto do not exist");
+  }
 
   //fill the tracking abort reason histogram & nEvents with Abort
   if (m_eventLevelTrackingInfo.isValid()) {
-  if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
+    if (m_eventLevelTrackingInfo->hasAnErrorFlag()) {
 
       m_nEventsWithAbort[index]->Fill(1);
 
@@ -252,29 +252,29 @@ void TrackingAbortDQMModule::event()
   } else //EventLevelTrackingInfo not valid
     m_nEventsWithAbort[index]->Fill(0);
 
-    //compute the number of ZS5 strips of L3 and L4, both sides
-    float nStripsL3UZS5 = 0;
-                          float nStripsL3VZS5 = 0;
-                          float nStripsL4UZS5 = 0;
-                          float nStripsL4VZS5 = 0;
-    for (const SVDShaperDigit& hit : m_strips) {
+  //compute the number of ZS5 strips of L3 and L4, both sides
+  float nStripsL3UZS5 = 0;
+  float nStripsL3VZS5 = 0;
+  float nStripsL4UZS5 = 0;
+  float nStripsL4VZS5 = 0;
+  for (const SVDShaperDigit& hit : m_strips) {
     const VxdID& sensorID = hit.getSensorID();
-      if (sensorID.getLayerNumber() > 4) continue;
-      const float noise = m_NoiseCal.getNoise(sensorID, hit.isUStrip(), hit.getCellID());
-      const float cutMinSignal = std::round(5 * noise);
+    if (sensorID.getLayerNumber() > 4) continue;
+    const float noise = m_NoiseCal.getNoise(sensorID, hit.isUStrip(), hit.getCellID());
+    const float cutMinSignal = std::round(5 * noise);
 
-      if (hit.passesZS(1, cutMinSignal)) {
-        if (sensorID.getLayerNumber() == 3) {
-          if (hit.isUStrip()) nStripsL3UZS5++;
-          else nStripsL3VZS5++;
-        } else if (hit.isUStrip()) nStripsL4UZS5++;
-        else nStripsL4VZS5++;
-      }
+    if (hit.passesZS(1, cutMinSignal)) {
+      if (sensorID.getLayerNumber() == 3) {
+        if (hit.isUStrip()) nStripsL3UZS5++;
+        else nStripsL3VZS5++;
+      } else if (hit.isUStrip()) nStripsL4UZS5++;
+      else nStripsL4VZS5++;
     }
+  }
 
   //fill the SVD L3 v-side cluster time
   for (const SVDCluster& hit : m_clusters) {
-  const VxdID& sensorID = hit.getSensorID();
+    const VxdID& sensorID = hit.getSensorID();
     if (sensorID.getLayerNumber() != 3) continue;
     if (hit.isUCluster()) continue;
 
@@ -286,15 +286,15 @@ void TrackingAbortDQMModule::event()
 
   //fill the nCDCExtraHits, add the overflow in the last bin to make them visible in the plot
   if (m_eventLevelTrackingInfo.isValid())
-  m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
+    m_nCDCExtraHits[index]->Fill(std::min((int)m_eventLevelTrackingInfo->getNCDCHitsNotAssigned(), (int)4999));
 
   //compute number of CDC hits in the inner and outer layers
   int nCDCHitsInner = 0;
-                      int nCDCHitsOuter = 0;
+  int nCDCHitsOuter = 0;
   for (const CDCHit& hit : m_cdcHits) {
     if (hit.getISuperLayer() == 0) nCDCHitsInner++;
-      else nCDCHitsOuter++;
-    }
+    else nCDCHitsOuter++;
+  }
 
   // fill the integrated averages TH1F
   // bin 1: nCDCHits Inner layers

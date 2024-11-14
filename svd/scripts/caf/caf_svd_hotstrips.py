@@ -7,7 +7,8 @@
 ##########################################################################
 '''
 Script to perform the svd hot-strips calibration.
-This calibration is run manually on single-beam runs.
+It identifies the hot strips using the criteria in defined in SVDHotStripsCalibrationsAlgorithm.
+This calibration is run manually on pedestal runs (runs without beams and detector on PEAK).
 
 b2caf-prompt-run Local config.json inputs.json --permissive
 
@@ -37,13 +38,17 @@ now = datetime.datetime.now()
 
 input_branches = ['RawSVDs']
 
-b2.set_log_level(b2.LogLevel.INFO)
-
 settings = CalibrationSettings(name="caf_svd_hotstrips",
                                expert_username="lgcorona",
                                description=__doc__,
                                input_data_formats=["raw"],
-                               input_data_names=["beam"])
+                               input_data_names=["beam"],
+                               expert_config={
+                                   "snrThreshold": 5,
+                                   "computeAverageOccupancyPerChip": False,
+                                   "relativeOccupancyWrtAvgOccupancy": 5.0,
+                                   "absoluteOccupancyThreshold": 0.2
+                               })
 
 
 def create_collector(name="SVDOccupancyCalibrationsCollector",
@@ -53,7 +58,7 @@ def create_collector(name="SVDOccupancyCalibrationsCollector",
 
     Parameters:
         name: name of the collector to run
-        svdShaperDigits: name of the SVDShaperDigits sto object to use as input
+        svdShaperDigits: name of the SVDShaperDigits store object to use as input
 
     Returns:
         pybasf2.Module
@@ -65,24 +70,35 @@ def create_collector(name="SVDOccupancyCalibrationsCollector",
     return collector
 
 
-def create_algorithm(unique_id):
+def create_algorithm(unique_id,
+                     computeAvgOccupancyPerChip=False,
+                     relativeOccupacyWrtAvgOccupancy=5.,
+                     absoluteOccupancyThreshold=0.2):
     """
     Simply creates a SVDHotStripsCalibrationsAlgorithm class.
 
     Parameters:
         unique_id: name of the uniqueID written in the payload to identify it
+        computeAvgOccupancyPerChip: true, compute the average occupancy per chip;
+                                    false, compute the average occupancy per sensor/side
+        relativeOccupacyWrtAvgOccupancy: relative occupancy threshold wrt the average sensor/side
+                                         or chip occupancy to define a strp as hot
+        absoluteOccupancyThreshold: absolute occupancy threshold to define a strip as hot
 
     Returns:
         ROOT.Belle2.SVDHotStripsCalibrationAlgorithm
     """
 
     algorithm = SVDHotStripsCalibrationsAlgorithm(unique_id)
+    algorithm.computeAverageOccupancyPerChip(computeAvgOccupancyPerChip)
+    algorithm.setRelativeOccupancyWrtAvgOccupancy(relativeOccupacyWrtAvgOccupancy)
+    algorithm.setAbsoluteOccupancyThreshold(absoluteOccupancyThreshold)
 
     return algorithm
 
 
 def crate_svd_zerosuppression(svdShaperDigits="SVDShaperDigits",
-                              svdShaperDigitsOutput="SVDShaperDigitsZS5",
+                              svdShaperDigitsOutput="SVDShaperDigitsZS",
                               snrThreshold=5,
                               fadcMode=True):
     """
@@ -93,7 +109,9 @@ def crate_svd_zerosuppression(svdShaperDigits="SVDShaperDigits",
         svdShaperDigitsOutput: name of the output SVDShaperDigits store object.
                                Kept shaper digits are selected with snrThreshold
         snrThreshold: signal-to-noise ratio treshold to select strips
-        fadcMode: if true the approximation to integer is done
+        fadcMode: if true, the approximation to integer for the minimum signal-to-noise
+                  ratio (int(snrThreshold*strip_noise + 0.5)) is done. This is the same algorithm
+                  applied on the FADC
 
     Returns:
         pybasf2.Module
@@ -108,7 +126,10 @@ def crate_svd_zerosuppression(svdShaperDigits="SVDShaperDigits",
     return svdZSemulator
 
 
-def create_pre_collector_path():
+def create_pre_collector_path(svdShaperDigits="SVDShaperDigits",
+                              svdShaperDigitsOutput="SVDShaperDigitsZS",
+                              snrThreshold=5,
+                              fadcMode=True):
     """
     Create a basf2 path that runs the unpacker and zero suppression emulator.
 
@@ -126,10 +147,10 @@ def create_pre_collector_path():
     path.add_module("Gearbox")
     path.add_module("Geometry", useDB=True)
     raw.add_unpackers(path, components=['SVD'])
-    svdZSemulator = crate_svd_zerosuppression(svdShaperDigits="SVDShaperDigits",
-                                              svdShaperDigitsOutput="SVDShaperDigitsZS5",
-                                              snrThreshold=5,
-                                              fadcMode=True)
+    svdZSemulator = crate_svd_zerosuppression(svdShaperDigits=svdShaperDigits,
+                                              svdShaperDigitsOutput=svdShaperDigitsOutput,
+                                              snrThreshold=snrThreshold,
+                                              fadcMode=fadcMode)
     path.add_module(svdZSemulator)
 
     return path
@@ -149,6 +170,16 @@ def get_calibrations(input_data, **kwargs):
     file_to_iov = input_data["beam"]
     input_files = list(file_to_iov.keys())
 
+    expert_config = kwargs.get("expert_config")
+    snrThreshold = expert_config["snrThreshold"]
+    computeAverageOccupancyPerChip = expert_config["computeAverageOccupancyPerChip"]
+    relativeOccupancyWrtAvgOccupancy = expert_config["relativeOccupancyWrtAvgOccupancy"]
+    absoluteOccupancyThreshold = expert_config["absoluteOccupancyThreshold"]
+
+    avgOcc = "avgOccPerSensor"
+    if (computeAverageOccupancyPerChip):
+        avgOcc = "avgOccPerChip"
+
     exps = [i.exp_low for i in file_to_iov.values()]
     runs = sorted([i.run_low for i in file_to_iov.values()])
 
@@ -161,18 +192,22 @@ def get_calibrations(input_data, **kwargs):
         sys.exit(1)
 
     uniqueID = f"SVDHotStripsCalibrations_{now.isoformat()}_INFO:"\
-               f"_ZS5_base=-1_relOccPrec=5_absOccThr=0.2_Exp{expNum}_runsFrom{firstRun}to{lastRun}"
+               f"_ZS{snrThreshold}_{avgOcc}_relOccPrec={relativeOccupancyWrtAvgOccupancy}"\
+               f"_absOccThr={absoluteOccupancyThreshold}_Exp{expNum}_runsFrom{firstRun}to{lastRun}"
     print(f"\nUniqueID:\n{uniqueID}")
 
     requested_iov = kwargs.get("requested_iov", None)
     output_iov = IoV(requested_iov.exp_low, requested_iov.run_low, requested_iov.exp_high, -1)
 
+    pre_collector_path = create_pre_collector_path(snrThreshold=snrThreshold)
+
     coll = create_collector(name="SVDOccupancyCalibrationsCollector",
-                            svdShaperDigits="SVDShaperDigitsZS5")
+                            svdShaperDigits="SVDShaperDigitsZS")
 
-    algo = create_algorithm(uniqueID)
-
-    pre_collector_path = create_pre_collector_path()
+    algo = create_algorithm(uniqueID,
+                            computeAverageOccupancyPerChip,
+                            relativeOccupancyWrtAvgOccupancy,
+                            absoluteOccupancyThreshold)
 
     calibration = Calibration("SVDHotStripsCalibrations",
                               collector=coll,

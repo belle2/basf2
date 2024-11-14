@@ -22,7 +22,7 @@
 namespace Belle2 {
 
   /** This class defines the wrapper to retrieve the the list
-   *  of the hot strips flgged offline.
+   *  of the hot strips flagged offline.
    *
    */
   class SVDHotStripsCalibrations {

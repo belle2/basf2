@@ -22,8 +22,6 @@ SVDHotStripsCalibrationsAlgorithm::SVDHotStripsCalibrationsAlgorithm(const std::
 {
   setDescription("SVDHotStripsCalibrations calibration algorithm");
   m_id = str;
-  m_base = -1;
-  m_relOccPrec = 5.;
 }
 
 CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
@@ -36,7 +34,7 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   for (int i = 0; i < 768; i++) { vecHS[i] = 0; stripOccAfterAbsCut[i] = 0;}
 
   //  float occCal = 1.;
-  float occThr = 0.2; //first absolute cut for strips with occupancy >20%
+  float occThr = m_absoluteOccupancyThreshold; //first absolute cut for strips with occupancy >20%
 
   //  auto HSBitmap = new Belle2::SVDCalibrationsBitmap();
   auto payload = new Belle2::SVDHotStripsCalibrations::t_payload(isHotStrip, m_id);
@@ -105,17 +103,17 @@ bool SVDHotStripsCalibrationsAlgorithm::theHSFinder(double* stripOccAfterAbsCut,
 {
   bool found = false;
 
-  if (m_base == -1)
-    m_base = nstrips;
+  int base = nstrips;
+  if (m_computeAverageOccupancyPerChip) base = 128;
 
-  int N = nstrips / m_base;
+  int N = nstrips / base;
 
   for (int sector = 0; sector < N; sector++) {
 
     int nafter = 0;
     double sensorOccAverage = 0;
 
-    for (int l = sector * m_base; l < sector * m_base + m_base; l++) {
+    for (int l = sector * base; l < sector * base + base; l++) {
       sensorOccAverage = sensorOccAverage + stripOccAfterAbsCut[l];
       if (stripOccAfterAbsCut[l] > 0) nafter++;
     }
@@ -123,16 +121,14 @@ bool SVDHotStripsCalibrationsAlgorithm::theHSFinder(double* stripOccAfterAbsCut,
 
     B2DEBUG(1, "Average occupancy: " << sensorOccAverage);
 
-    for (int l = sector * m_base; l < sector * m_base + m_base; l++) {
+    for (int l = sector * base; l < sector * base + base; l++) {
 
-      // flag additional HS by comparing each strip occupancy with the sensor-based average occupancy
-
-      if (stripOccAfterAbsCut[l] > sensorOccAverage * m_relOccPrec) {
+      // flag additional HS by comparing each strip occupancy with the sensor/side-based average occupancy
+      if (stripOccAfterAbsCut[l] > sensorOccAverage * m_relativeOccupancyWrtAvgOccupancy) {
         hsflag[l] = 1;
         found = true;
         stripOccAfterAbsCut[l] = 0;
       }
-      //    else hsflag[l]=0;
     }
   }
 

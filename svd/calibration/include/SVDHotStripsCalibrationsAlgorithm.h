@@ -17,23 +17,45 @@ namespace Belle2 {
   class SVDHotStripsCalibrationsAlgorithm : public CalibrationAlgorithm {
   public:
 
-    /// Constructor set the prefix to SVDHotStripsCalibrationsCollector
+    /** Constructor set the prefix to SVDHotStripsCalibrationsCollector */
     explicit SVDHotStripsCalibrationsAlgorithm(const std::string& str);
 
-    /// Destructor
+    /** Destructor */
     virtual ~SVDHotStripsCalibrationsAlgorithm() {}
+
+    /** Setter of m_computeAverageOccupancyPerChip */
+    void computeAverageOccupancyPerChip(bool value) {m_computeAverageOccupancyPerChip = value;}
+
+    /** Setter of m_relativeOccupancyWrtAvgOccupancy */
+    void setRelativeOccupancyWrtAvgOccupancy(float value) {m_relativeOccupancyWrtAvgOccupancy = value;}
+
+    /** Setter of m_absoluteOccupancyThreshold */
+    void setAbsoluteOccupancyThreshold(float value) {m_absoluteOccupancyThreshold = value;}
+
+    /** Setter of m_computeAverageOccupancyPerChip */
+    bool getComputeAverageOccupancyPerChip() {return m_computeAverageOccupancyPerChip;}
+
+    /** Setter of m_relativeOccupancyWrtAvgOccupancy */
+    float getRelativeOccupancyWrtAvgOccupancy() {return m_relativeOccupancyWrtAvgOccupancy;}
+
+    /** Setter of m_relativeOccupancyWrtAvgOccupancy */
+    float getAbsoluteOccupancyThreshold() {return m_absoluteOccupancyThreshold;}
 
   protected:
 
-    /// Run algo on data
+    /** Run algo on data */
     virtual EResult calibrate() override;
 
   private:
 
     std::string m_id; /**< Parameter given to set the UniqueID of the payload*/
     bool theHSFinder(double* stripOccAfterAbsCut, int* hsflag, int nstrips); /**< returns true if the strip is hot*/
-    int m_base; /**< parameter to tune finder angorithm*/
-    float m_relOccPrec; /**< parameter to tune the finder algorithm*/
+    bool m_computeAverageOccupancyPerChip = false; /**< granularity used to estimate average occupancy.
+                  True: the avg. occupancy per chip is considered.
+                  False: the the avg. occupancy per sensor/side is considered.*/
+    float m_relativeOccupancyWrtAvgOccupancy = 5.0; /**< occupancy relative to the average sensor occupancy used
+               to define a strip as hot.*/
+    float m_absoluteOccupancyThreshold = 0.2; /**< absolute occupancy thresold to define a strip as hot.*/
   };
 } // namespace Belle2
 

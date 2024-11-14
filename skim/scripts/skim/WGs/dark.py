@@ -945,7 +945,7 @@ class DarkShower(BaseSkim):
         )
         ma.applyCuts(
             list_name=f"K_S0:{skim_str}",
-            cut="[dr > 0.2] and [significanceOfDistance > 10]",
+            cut="[dr > 0.2] and [significanceOfDistance > 10] and [cosAngleBetweenMomentumAndVertexVector > 0.950212931632136]",
             path=path
         )
         path = self.skim_event_cuts(f"[nParticlesInList(K_S0:{skim_str}) == 1]", path=path)

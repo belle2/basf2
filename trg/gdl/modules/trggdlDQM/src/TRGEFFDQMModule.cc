@@ -398,9 +398,14 @@ void TRGEFFDQMModule::event()
       double theta     = fitresult->getMomentum().Theta() / Unit::deg;
 
       bool trg_psnecl  = m_trgSummary->testPsnm("hie")        || m_trgSummary->testPsnm("c4")   || m_trgSummary->testPsnm("eclmumu") ||
-                         m_trgSummary->testPsnm("ecltaub2b3") || m_trgSummary->testPsnm("hie4") || m_trgSummary->testPsnm("lml1")    ||
-                         m_trgSummary->testPsnm("lml2")       || m_trgSummary->testPsnm("lml6") || m_trgSummary->testPsnm("lml7")    ||
-                         m_trgSummary->testPsnm("lml8")       || m_trgSummary->testPsnm("lml9") || m_trgSummary->testPsnm("lml10");
+                         m_trgSummary->testPsnm("lml1")       || m_trgSummary->testPsnm("lml2") || m_trgSummary->testPsnm("lml6")    ||
+                         m_trgSummary->testPsnm("lml7")       || m_trgSummary->testPsnm("lml8") || m_trgSummary->testPsnm("lml9")    ||
+                         m_trgSummary->testPsnm("lml10");
+      // these trigger flags are not available in older data
+      try {
+        trg_psnecl |= m_trgSummary->testPsnm("ecltaub2b3") || m_trgSummary->testPsnm("hie4");
+      } catch (const std::exception&) {
+      }
 
       bool trg_ftdf    = m_trgSummary->testFtdl("f");
 

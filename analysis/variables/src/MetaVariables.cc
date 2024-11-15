@@ -3402,7 +3402,7 @@ namespace Belle2 {
             return std::get<int>(var_result);
           else if (std::holds_alternative<bool>(var_result))
             return static_cast<int>(std::get<bool>(var_result));
-          else return 0;
+          else return default_val;
         };
         return func;
       } else {

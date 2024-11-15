@@ -31,12 +31,10 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   int vecHS[768];
   double stripOccAfterAbsCut[768];
 
-  for (int i = 0; i < 768; i++) { vecHS[i] = 0; stripOccAfterAbsCut[i] = 0;}
+  // float occCal = 1.;
+  float occThr = m_absoluteOccupancyThreshold; // first absolute cut for strips with occupancy >20%
 
-  //  float occCal = 1.;
-  float occThr = m_absoluteOccupancyThreshold; //first absolute cut for strips with occupancy >20%
-
-  //  auto HSBitmap = new Belle2::SVDCalibrationsBitmap();
+  // auto HSBitmap = new Belle2::SVDCalibrationsBitmap();
   auto payload = new Belle2::SVDHotStripsCalibrations::t_payload(isHotStrip, m_id);
 
   auto tree = getObjectPtr<TTree>("HTreeOccupancyCalib");
@@ -60,15 +58,37 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
   tree->SetBranchAddress("sensor", &sensor);
   tree->SetBranchAddress("view", &side);
 
+  std::map<std::tuple<int, int, int, int>, TH1F*> map_hocc;
 
   for (int i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
+
+    TH1F*& h = map_hocc[std::make_tuple(layer, ladder, sensor, side)];
+    if (h == nullptr) {
+      h = (TH1F*)hocc->Clone(Form("hocc_L%dL%dS%d_%d", layer, ladder, sensor, side));
+    } else {
+      h->Add(hocc);
+    }
+  }
+
+  FileStat_t info;
+  int cal_rev = 1;
+  while (gSystem->GetPathInfo(Form("algorithm_SVDHotStripsCalibrations_output_rev_%d.root", cal_rev), info) == 0)
+    cal_rev++;
+  std::unique_ptr<TFile> f(new TFile(Form("algorithm_SVDHotStripsCalibrations_output_rev_%d.root", cal_rev), "RECREATE"));
+
+  for (const auto& [key, h] : map_hocc) {
+    std::tie(layer, ladder, sensor, side) = key;
     int nstrips = 768;
     if (!side && layer != 3) nstrips = 512;
 
+    f->WriteTObject(h);
+
+    for (int i = 0; i < nstrips; i++) { vecHS[i] = 0;}
+
     for (int iterStrip = 0; iterStrip < nstrips; iterStrip++) {
-      float occCal = hocc->GetBinContent(iterStrip + 1);
-      //      B2INFO("Occupancy for" << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " << occCal);
+      float occCal = h->GetBinContent(iterStrip + 1);
+      // B2INFO("Occupancy for: " << layer << "." << ladder << "." << sensor << "." << side << ", strip:" << iterStrip << ": " << occCal);
 
       if (occCal > occThr) {
         vecHS[iterStrip] = 1;
@@ -76,13 +96,10 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
       } else stripOccAfterAbsCut[iterStrip] = occCal;
     }
 
-    //iterative procedure
-    //    B2INFO("Starting iterative procedure for hot strips finding");
-    bool moreHS = true;
+    // iterative procedure
+    // B2INFO("Starting iterative procedure for hot strips finding");
 
-    while (moreHS && theHSFinder(stripOccAfterAbsCut, vecHS, nstrips)) {
-      moreHS = theHSFinder(stripOccAfterAbsCut, vecHS, nstrips);
-    }
+    while (theHSFinder(stripOccAfterAbsCut, vecHS, nstrips)) {}
 
     for (int l = 0; l < nstrips; l++) {
       isHotStrip = (int) vecHS[l];
@@ -114,7 +131,7 @@ bool SVDHotStripsCalibrationsAlgorithm::theHSFinder(double* stripOccAfterAbsCut,
     double sensorOccAverage = 0;
 
     for (int l = sector * base; l < sector * base + base; l++) {
-      sensorOccAverage = sensorOccAverage + stripOccAfterAbsCut[l];
+      sensorOccAverage += stripOccAfterAbsCut[l];
       if (stripOccAfterAbsCut[l] > 0) nafter++;
     }
     sensorOccAverage = sensorOccAverage / nafter;

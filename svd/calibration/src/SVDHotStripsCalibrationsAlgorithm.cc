@@ -77,10 +77,12 @@ CalibrationAlgorithm::EResult SVDHotStripsCalibrationsAlgorithm::calibrate()
     cal_rev++;
   std::unique_ptr<TFile> f(new TFile(Form("algorithm_SVDHotStripsCalibrations_output_rev_%d.root", cal_rev), "RECREATE"));
 
-  for (const auto& [key, h] : map_hocc) {
-    std::tie(layer, ladder, sensor, side) = key;
+  for (const auto& key : map_hocc) {
+    std::tie(layer, ladder, sensor, side) = key.first;
     int nstrips = 768;
     if (!side && layer != 3) nstrips = 512;
+
+    TH1F* h = (TH1F*)key.second;
 
     f->WriteTObject(h);
 

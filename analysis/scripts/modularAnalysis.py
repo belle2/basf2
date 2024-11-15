@@ -3179,6 +3179,14 @@ def writePi0EtaVeto(
     if b2bii.isB2BII():
         B2ERROR("The pi0 / eta veto is not suitable for Belle analyses.")
 
+    if (requireSoftPhotonIsInROE):
+        B2WARNING("Requiring the soft photon to being in the ROE was not done for the MVA training. "
+                  "Please check the results carefully.")
+    if (pi0Selection is not None or etaSelection is not None):
+        B2WARNING(
+            "Additional selection criteria for the pi0 or the eta during reconstructDecay were not done for the MVA training. "
+            "Please check the results carefully.")
+
     renameSuffix = False
 
     for module in path.modules():

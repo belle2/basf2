@@ -899,3 +899,77 @@ class DielectronPlusVisibleDarkHiggs(BaseSkim):
              path=path)
 
         return [f'vpho:{skim_str}']
+
+
+@fancy_skim_header
+class DarkShower(BaseSkim):
+    """
+    Skim list contains events with only one displaced vertex and a maximum of one other good track.
+    """
+
+    __authors__ = ["Miho Wakai"]
+    __contact__ = __liaison__
+    __description__ = (
+        "Skim for the dark shower analysis. "
+        "We are reconstructing the displaced vertex as a :math:`e^+e^- \\to K_s(\\to \\pi^+ \\pi^-)`"
+        )
+    __category__ = "physics, dark sector"
+    ApplyHLTHadronCut = False
+
+    def load_standard_lists(self, path):
+        stdPi("all", path=path)
+
+    def build_lists(self, path):
+        skim_str = "DarkShower"
+        n_track_event_cut = "[nCleanedTracks([thetaInCDCAcceptance] and [p > 0.15] and [abs(dz) < 10] ) <= 3]"
+
+        track_requirements = "[pt > 0.1] and [nCDCHits >= 5]"
+
+        ma.cutAndCopyList(
+            f"pi+:{skim_str}",
+            "pi+:all",
+            f"[{track_requirements} and {n_track_event_cut}]",
+            path=path)
+
+        ma.reconstructDecay(
+            decayString=f"K_S0:{skim_str} -> pi+:{skim_str} pi-:{skim_str}",
+            cut="",
+            path=path
+        )
+
+        vertex.treeFit(
+            list_name=f"K_S0:{skim_str}",
+            conf_level=0,
+            updateAllDaughters=True,
+            path=path
+        )
+        ma.applyCuts(
+            list_name=f"K_S0:{skim_str}",
+            cut="[dr > 0.2] and [significanceOfDistance > 10] and [cosAngleBetweenMomentumAndVertexVector > 0.950212931632136]",
+            path=path
+        )
+        path = self.skim_event_cuts(f"[nParticlesInList(K_S0:{skim_str}) == 1]", path=path)
+
+        ma.buildRestOfEvent(
+            target_list_name=f"K_S0:{skim_str}",
+            fillWithMostLikely=True,
+            path=path
+        )
+        ma.appendROEMasks(
+            list_name=f"K_S0:{skim_str}",
+            mask_tuples=[
+                ("ds_roe",
+                 '',  # no track cuts
+                 "formula(clusterTiming/clusterErrorTiming) < 2 and minC2TDist > 50" +
+                 " and thetaInCDCAcceptance" +
+                 " and [[clusterReg==1 and E>0.1] or [clusterReg==2 and E>0.060] or [clusterReg==3 and E>0.150]]")],
+            path=path
+         )
+
+        ma.applyCuts(
+            list_name=f"K_S0:{skim_str}",
+            cut="roeNeextra(ds_roe) < 1.5",
+            path=path
+        )
+
+        return [f"K_S0:{skim_str}"]

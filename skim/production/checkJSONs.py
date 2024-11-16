@@ -55,7 +55,7 @@ if args.MAXEventCPUTime:
     valueLIM = args.MAXEventCPUTime
 print('Looking for JSONs with ExpectedEventCPUTime > {valueLIM}')
 
-json_path = f'{base_path}*/*/*/*/*.json'
+json_path = f'{base_path}*/*/*/*.json'
 if args.skim:
     skims = args.skim
     print('Checking JSONs files for the following skims:', skims)

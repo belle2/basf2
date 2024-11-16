@@ -1674,3 +1674,108 @@ class BtoDsDsst_Kpi_KK(BaseSkim):
             BsigList.append("B+:Ds" + str(chID))
 
         return BsigList
+
+
+@fancy_skim_header
+class antiB0toDpipi0_Kpipi(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`\\bar{B^{0}}\\to D^{+} (\\to K^- \\pi^+ \\pi^-) \\pi^- \\pi^0`,
+
+
+    Cuts applied:
+
+    * ``5.22 < Mbc``
+    * ``-0.3 < deltaE < 0.2``
+    """
+    __authors__ = ["Agrim Aggarwal"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+    validation_sample = _VALIDATION_SAMPLE
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        loadStdDplus_Kpipi(path=path)
+        stdPi0s("eff50_May2020Fit", path=path)
+
+    def build_lists(self, path):
+        Bcuts = "Mbc > 5.22 and -0.3 < deltaE < 0.2"
+        ma.reconstructDecay("anti-B0:antiB0toDpipi0_Kpipi -> D+:Kpipi pi-:GoodTrack pi0:eff50_May2020Fit",
+                            Bcuts,
+                            path=path)
+        return ["anti-B0:antiB0toDpipi0_Kpipi"]
+
+
+@fancy_skim_header
+class antiB0toDsDsst_Kpi0(BaseSkim):
+    """
+    Reconstructed decay modes:
+
+    * :math:`\\bar{B^{0}}\\to D_{s}^{+} (\\to \\phi (\\to K^+ K^-) \\pi^+) K^- \\pi^0`,
+    * :math:`\\bar{B^{0}}\\to D_{s}^{+} (\\to K^{*0} (\\to K^- \\pi^+) K^-) K^- \\pi^0`,
+    * :math:`\\bar{B^{0}}\\to D_{s}^{+} (\\to K_{\\rm S}^0 (\\to \\pi^+ \\pi^-) K^-) K^- \\pi^0`,
+    * :math:`\\bar{B^{0}}\\to D_{s}^{*+} (\\to D_{s}^{-} \\gamma ) K^- \\pi^0`,
+
+
+    Cuts applied:
+
+    * ``5.24 < Mbc``
+    * ``-0.2 < deltaE < 0.2``
+    * ``0.82 < M_K*0 < 0.98``
+    * ``1.93 < M_Ds < 1.99``
+    * ``2.06 < M_D*s < 2.15``
+    """
+
+    __authors__ = ["Agrim Aggarwal"]
+    __description__ = ""
+    __contact__ = __liaison__
+    __category__ = "physics, hadronic B to charm"
+
+    ApplyHLTHadronCut = True
+
+    def load_standard_lists(self, path):
+        loadPiForBtoHadrons(path=path)
+        loadKForBtoHadrons(path=path)
+        stdKshorts(path=path)
+        stdPhotons("loose", path=path)
+        stdPi0s("eff40_May2020Fit", path=path)
+
+    def build_lists(self, path):
+
+        Bcuts = "Mbc > 5.24 and -0.2 < deltaE < 0.2"
+
+        ma.reconstructDecay("anti-K*0:Kpi -> K-:GoodTrack pi+:GoodTrack",
+                            cut="[0.82 < M < 0.98]", path=path)
+
+        ma.reconstructDecay("D_s+:KKpi -> K+:GoodTrack K-:GoodTrack pi+:GoodTrack ",
+                            cut="[1.93 < M < 1.99]", path=path)
+
+        ma.reconstructDecay("D_s+:KstK -> anti-K*0:Kpi K+:GoodTrack",
+                            cut="[1.93 < M < 1.99]", path=path)
+
+        ma.reconstructDecay("D_s+:KszK -> K_S0:merged K+:GoodTrack ",
+                            cut="[1.93 < M < 1.99]", path=path)
+
+        Dslist = ['D_s+:KKpi', 'D_s+:KstK', 'D_s+:KszK']
+
+        ma.copyLists(outputListName='D_s+:all', inputListNames=Dslist, path=path)
+
+        ma.reconstructDecay('D_s*+:Dsg -> D_s+:all gamma:loose',
+                            cut="[2.06 < M < 2.15]", path=path)
+
+        BsigChannels = [
+            "D_s+:all K-:GoodTrack pi0:eff40_May2020Fit",
+            "D_s*+:Dsg K-:GoodTrack pi0:eff40_May2020Fit",
+            ]
+
+        BsigList = []
+        for chID, channel in enumerate(BsigChannels):
+            ma.reconstructDecay("anti-B0:Ds" + str(chID) + " -> " + channel, Bcuts, chID, path=path)
+            BsigList.append("anti-B0:Ds" + str(chID))
+
+        return BsigList

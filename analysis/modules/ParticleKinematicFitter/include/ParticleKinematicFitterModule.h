@@ -75,6 +75,7 @@ namespace Belle2 {
 
       // module parameters
       std::string m_listName;            /**< particle list name */
+      std::string m_prefix;            /**< prefix attached to extrainfo names */
       std::string m_kinematicFitter;     /**< Kinematic Fitter name */
       std::string m_orcaFitterEngine;    /**< Orca Fitter Engine name */
       std::string m_orcaTracer;          /**< Tracer (None, Text or ROOT) */
@@ -216,12 +217,12 @@ namespace Belle2 {
 
       /**
        * store fit object information as ExtraInfo
-       * @param prefix can be used to distinguish e.g. "Fitted" and "Measured"
+       * @param fitSuffix can be used to distinguish e.g. "Fitted" and "Measured"
        * @param fitter reference to OrcaKinFit fitter object
        * @param particleChildren list of all particle children
        * @param mother mother particle
        */
-      bool storeOrcaKinFitParticles(const std::string& prefix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
+      bool storeOrcaKinFitParticles(const std::string& fitSuffix, BaseFitter& fitter, std::vector<Particle*>& particleChildren,
                                     Particle* mother);
 
 

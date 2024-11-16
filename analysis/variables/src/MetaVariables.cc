@@ -3382,10 +3382,9 @@ namespace Belle2 {
 
     Manager::FunctionPtr convertToInt(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() <= 2) {
+      if (arguments.size() == 2) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
-        int default_val = 0;
-        if (arguments.size() == 2) default_val = Belle2::convertString<int>(arguments[1]);
+        int default_val = Belle2::convertString<int>(arguments[1]);
         auto func = [var, default_val](const Particle * particle) -> int {
           auto var_result = var->function(particle);
           if (std::holds_alternative<double>(var_result))
@@ -3406,7 +3405,7 @@ namespace Belle2 {
         };
         return func;
       } else {
-        B2FATAL("Wrong number of arguments for meta function int, only 2 agruments are supported!");
+        B2FATAL("Wrong number of arguments for meta function int, please provide variable name and replacement value for NaN!");
       }
     }
 
@@ -3766,7 +3765,7 @@ generator-level :math:`\Upsilon(4S)` (i.e. the momentum of the second B meson in
     REGISTER_METAVARIABLE("exp(variable)", exp, "Returns exponential evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log(variable)", log, "Returns natural logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
     REGISTER_METAVARIABLE("log10(variable)", log10, "Returns base-10 logarithm evaluated for the given variable.", Manager::VariableDataType::c_double);
-    REGISTER_METAVARIABLE("int(variable, nan_default=0)", convertToInt, R"DOC(
+    REGISTER_METAVARIABLE("int(variable, nan_replacement)", convertToInt, R"DOC(
                       Casts the output of the variable to an integer value. 
 
                       .. note::

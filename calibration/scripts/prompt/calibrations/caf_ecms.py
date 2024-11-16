@@ -324,9 +324,7 @@ def get_calibrations(input_data, **kwargs):
     algorithm_ecms.setMuMuEcmsSpread(kwargs['expert_config']['eCMSmumuSpread'])
     algorithm_ecms.setMuMuEcmsOffset(kwargs['expert_config']['eCMSmumuShift'])
 
-    calibration_ecms = Calibration('eCMS',
-                                   algorithms=algorithm_ecms,
-                                   backend_args={"queue": "l"})
+    calibration_ecms = Calibration('eCMS', algorithms=algorithm_ecms)
 
     collection_HadB = Collection(collector=collector_HadB,
                                  input_files=input_files_Had,

@@ -11,7 +11,17 @@
 #include <framework/core/Module.h>
 #include <svd/persistenceManager/PersistenceManager.h>
 
-namespace Belle2 {
+struct Counters {
+  int event;
+  int run;
+  int experiment;
+  int production;
+  int track;
+  int cluster;
+  unsigned int nClusters;
+};
+
+namespace Belle2::SVD {
   class SVDValidationModule : public Module {
   public:
     SVDValidationModule();
@@ -25,8 +35,10 @@ namespace Belle2 {
     virtual void terminate() override;
 
   private:
-    std::unique_ptr<PersistenceManager> persistenceManager;
-
     std::string m_storageType;
+    std::string m_variables;
+    Counters m_counters;
+
+    std::unique_ptr<PersistenceManager> persistenceManager;
   };
 }
